@@ -1,0 +1,13 @@
+{
+	"name" : "Physics",
+	"sources" : ["Physics"],
+	"includes" : ["../Graphics/Model.h"],
+	"classes" : ["CollisionShape", "Constraint", "PhysicsWorld", "RigidBody"],
+ 	"overloads" : {
+		"RigidBody" : {
+			"ApplyImpulse" : ["Vector3"]
+		}
+
+	}
+}
+

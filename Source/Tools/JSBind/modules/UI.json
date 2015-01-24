@@ -1,0 +1,19 @@
+{
+	"name" : "UI",
+	"sources" : ["UI"],
+	"includes" : ["../Graphics/Material.h", "../Scene/Node.h", "../Scene/Scene.h", "../Graphics/Texture2D.h"],
+	"classes" : ["Font", "UI", "UIElement", "Text", "BorderImage", "Button", "CheckBox",
+			     "Cursor", "DropDownList", "Menu", "FileSelector", "FontFace", "FontFaceBitmap", 
+			     "FontFaceFreeType", "LineEdit", "ListView", "ScrollView", "MessageBox",
+			     "ScrollBar", "Slider", "Sprite", "Text3D", "ToolTip", "Window", "View3D"],
+	"overloads" : {
+		"Text" : {
+			"SetFont" : ["Font", "int"]
+		},
+		"UIElement" : {
+			"SetColor" : ["Color"]
+		}
+
+	}
+}
+

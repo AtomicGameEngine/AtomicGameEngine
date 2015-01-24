@@ -1,0 +1,8 @@
+{
+	"name" : "Network",
+	"sources" : ["Network"],
+	"includes" : ["../Network/Protocol.h", "../Scene/Scene.h"],
+	"classes" : ["Network", "NetworkPriority"]
+
+
+}

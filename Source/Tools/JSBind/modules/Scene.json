@@ -1,0 +1,22 @@
+{
+	"name" : "Scene",
+	"sources" : ["Scene"],
+	"includes" : ["../Scene/LogicComponent.h", "../Network/Connection.h"],
+	"classes" : ["Animatable", "Node", "Scene", "Component", "Serializable", 
+				 "ObjectAnimation", "SmoothedTransform", "SplinePath",
+				 "ValueAnimation", "ValueAnimationInfo"],
+	"overloads" : {
+		"Node" : {
+			"CreateChild" : ["String", "CreateMode", "unsigned"],
+			"GetChild" : ["String", "bool"],
+			"SetScale" : ["Vector3"],
+			"SetPosition2D" : ["Vector2"],
+			"SetScale2D" : ["Vector2"]
+		},
+		"ValueAnimationInfo" : {
+			"ValueAnimationInfo" : ["ValueAnimation", "WrapMode", "float"]
+		}
+
+	}
+}
+

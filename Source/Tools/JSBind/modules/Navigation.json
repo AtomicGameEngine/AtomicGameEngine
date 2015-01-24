@@ -1,0 +1,6 @@
+{
+	"name" : "Navigation",
+	"sources" : ["Navigation"],
+	"includes" : ["../Scene/Node.h"],
+	"classes" : ["Navigable", "NavigationMesh", "OffMeshConnection"] 
+}

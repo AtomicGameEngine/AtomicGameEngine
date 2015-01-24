@@ -1,0 +1,6 @@
+
+{
+	"modules" : ["Container", "Math", "Core", "Scene", "Graphics", "Atomic2D", "Audio", 
+	"Physics", "Navigation", "Input", "UI", "Resource", "Network", "IO",
+	"Engine", "Javascript", "Environment"]
+}
