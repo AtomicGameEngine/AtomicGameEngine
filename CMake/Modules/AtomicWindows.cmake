@@ -1,6 +1,11 @@
 
 set (CMAKE_DEBUG_POSTFIX _d)
 
+add_definitions(-DATOMIC_PLATFORM_WINDOWS -D_CRT_SECURE_NO_WARNINGS)
+
+list (APPEND ATOMIC_LINK_LIBRARIES MojoShader user32 gdi32 winmm imm32 ole32 oleaut32 version uuid d3d9 d3dcompiler)
+
+# compile with static runtime
 set(CompilerFlags
     CMAKE_CXX_FLAGS
     CMAKE_CXX_FLAGS_DEBUG
@@ -14,7 +19,6 @@ foreach(CompilerFlag ${CompilerFlags})
     string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
 endforeach()
 
-add_definitions (-D_CRT_SECURE_NO_WARNINGS)
 set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /fp:fast /Zi /GS-")
 set (CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELWITHDEBINFO})
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
@@ -27,4 +31,3 @@ endif ()
 set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
 set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
 
-list (APPEND ATOMIC_LINK_LIBRARIES MojoShader user32 gdi32 winmm imm32 ole32 oleaut32 version uuid d3d9 d3dcompiler)

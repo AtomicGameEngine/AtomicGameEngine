@@ -2,6 +2,8 @@
 
 include (BundleUtilities)
 
+add_definitions(-DATOMIC_PLATFORM_OSX)
+
 add_definitions(-DATOMIC_OPENGL)
 list (APPEND ATOMIC_LINK_LIBRARIES GLEW)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -std=gnu++0x")
