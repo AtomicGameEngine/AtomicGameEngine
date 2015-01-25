@@ -32,7 +32,7 @@
 #include "../Audio/SoundListener.h"
 #include "../Audio/SoundSource3D.h"
 
-#include <SDL/SDL.h>
+#include <SDL/include/SDL.h>
 
 #include "../DebugNew.h"
 

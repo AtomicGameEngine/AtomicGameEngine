@@ -35,7 +35,7 @@
 #if defined(IOS)
 #include <mach/mach_host.h>
 #elif !defined(ANDROID) && !defined(RPI)
-#include <LibCpuId/libcpuid.h>
+#include <LibCpuId/src/libcpuid.h>
 #endif
 
 #ifdef WIN32

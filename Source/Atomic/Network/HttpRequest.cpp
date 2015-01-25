@@ -26,7 +26,7 @@
 #include "../Core/Profiler.h"
 #include "../Core/Timer.h"
 
-#include <Civetweb/civetweb.h>
+#include <Civetweb/include/civetweb.h>
 
 #include "../DebugNew.h"
 

@@ -36,9 +36,9 @@
 #include "../Scene/SceneEvents.h"
 #include "../Scene/SmoothedTransform.h"
 
-#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
-#include <Bullet/BulletDynamics/Dynamics/btRigidBody.h>
-#include <Bullet/BulletCollision/CollisionShapes/btCompoundShape.h>
+#include <Bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <Bullet/src/BulletDynamics/Dynamics/btRigidBody.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btCompoundShape.h>
 
 namespace Atomic
 {

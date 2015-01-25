@@ -31,11 +31,11 @@
 #include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 
-#include <Bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
-#include <Bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h>
-#include <Bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
-#include <Bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h>
-#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <Bullet/src/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
+#include <Bullet/src/BulletDynamics/ConstraintSolver/btHingeConstraint.h>
+#include <Bullet/src/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
+#include <Bullet/src/BulletDynamics/ConstraintSolver/btSliderConstraint.h>
+#include <Bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
 namespace Atomic
 {

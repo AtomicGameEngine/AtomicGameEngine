@@ -38,14 +38,14 @@
 #include "../Scene/SceneEvents.h"
 #include "../Container/Sort.h"
 
-#include <Bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
-#include <Bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h>
-#include <Bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
-#include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
-#include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btSphereShape.h>
-#include <Bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
-#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <Bullet/src/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
+#include <Bullet/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h>
+#include <Bullet/src/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
+#include <Bullet/src/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btBoxShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btSphereShape.h>
+#include <Bullet/src/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
+#include <Bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
 extern ContactAddedCallback gContactAddedCallback;
 

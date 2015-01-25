@@ -27,8 +27,8 @@
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 
-#include <kNet/IMessageHandler.h>
-#include <kNet/INetworkServerListener.h>
+#include <kNet/include/kNet/IMessageHandler.h>
+#include <kNet/include/kNet/INetworkServerListener.h>
 
 namespace Atomic
 {

@@ -29,8 +29,8 @@
 #include "../Core/Timer.h"
 #include "../IO/VectorBuffer.h"
 
-#include <kNet/kNetFwd.h>
-#include <kNet/SharedPtr.h>
+#include <kNet/include/kNetFwd.h>
+#include <kNet/include/kNet/SharedPtr.h>
 
 #ifdef SendMessage
 #undef SendMessage
