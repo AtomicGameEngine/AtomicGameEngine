@@ -18,7 +18,7 @@ file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
-file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h)
+file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h Javascript/Modules/*.cpp  Javascript/Modules/*.h )
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
 
