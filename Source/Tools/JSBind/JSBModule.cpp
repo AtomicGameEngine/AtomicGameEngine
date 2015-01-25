@@ -350,6 +350,15 @@ void JSBModule::Load(const String &moduleJSONFilename)
 
     this->name_ = moduleJSON.GetString("name");
 
+    if (this->name_ == "Graphics")
+    {
+#ifdef _MSC_VER
+        sources.AddString("Graphics/Direct3D9");
+#else
+        sources.AddString("Graphics/OpenGL");
+#endif
+    }
+
     for (unsigned j = 0; j < sources.GetSize(); j++)
     {
         String sourceFolder = sources.GetString(j);

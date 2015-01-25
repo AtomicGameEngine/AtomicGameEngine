@@ -25,7 +25,7 @@
 #include "../../Math/Color.h"
 
 #include <d3d9.h>
-#include <SDL/SDL.h>
+#include <SDL/include/SDL.h>
 
 namespace Atomic
 {

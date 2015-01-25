@@ -20,3 +20,7 @@ add_subdirectory(TurboBadger)
 if (APPLE)
     add_subdirectory(GLEW)
 endif()
+
+if (MSVC)
+    add_subdirectory(MojoShader)
+endif()
