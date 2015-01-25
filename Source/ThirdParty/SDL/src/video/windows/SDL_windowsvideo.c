@@ -93,8 +93,8 @@ WIN_CreateDevice(int devindex)
         
         // Urho3D: call SetProcessDPIAware if available to prevent Windows 8.1 from performing unwanted scaling
         data->SetProcessDPIAware = (BOOL (WINAPI *)()) SDL_LoadFunction(data->userDLL, "SetProcessDPIAware");
-        if (data->SetProcessDPIAware)
-            data->SetProcessDPIAware();
+        //if (data->SetProcessDPIAware)
+        //    data->SetProcessDPIAware();
     }
 
     /* Set the function pointers */

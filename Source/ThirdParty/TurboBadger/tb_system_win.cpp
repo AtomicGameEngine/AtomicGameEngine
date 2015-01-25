@@ -52,6 +52,8 @@ int TBSystem::GetPixelsPerLine()
 
 int TBSystem::GetDPI()
 {
+	return 96;
+	/*
 	HDC hdc = GetDC(nullptr);
 	int DPI_x = GetDeviceCaps(hdc, LOGPIXELSX);
 	ReleaseDC(nullptr, hdc);
@@ -59,6 +61,7 @@ int TBSystem::GetDPI()
 	DPI_x *= 2;
 #endif
 	return DPI_x;
+	*/
 }
 
 }; // namespace tb

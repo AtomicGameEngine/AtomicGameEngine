@@ -374,6 +374,12 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
+void Graphics::RaiseWindow()
+{
+    if (impl_->window_)
+        SDL_RaiseWindow(impl_->window_);
+}
+
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);

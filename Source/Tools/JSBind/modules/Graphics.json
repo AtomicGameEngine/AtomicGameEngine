@@ -6,7 +6,7 @@
 				 "Viewport", "Renderer", "Octree", "Zone", "StaticModel", "Camera", "Light", "RenderPath",
 				 "Animation", "AnimatedModel", "AnimationController", "AnimationState", "BillboardSet", "CustomGeometry",
 				 "DebugRenderer", "DecalSet", "OcclusionBuffer", "ParticleEffect", "ParticleEmitter",
-				 "RenderSurface", "Shader", "ShaderPrecache", "ShaderProgram", "ShaderVariation", 
+				 "RenderSurface", "Shader", "ShaderPrecache", "ShaderVariation", 
 				 "Skybox", "StaticModelGroup", "Pass", "Technique", "Terrain", "TerrainPatch", 
 				 "Texture3D", "TextureCube", "View"],
 	"overloads" : {
