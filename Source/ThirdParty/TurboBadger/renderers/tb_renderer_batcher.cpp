@@ -235,35 +235,43 @@ void TBRendererBatcher::AddQuadInternal(const TBRect &dst_rect, const TBRect &sr
 		m_uu = (float)(src_rect.x + src_rect.w) / bitmap_w;
 		m_vv = (float)(src_rect.y + src_rect.h) / bitmap_h;
 	}
+
+#ifdef _MSC_VER
+       //Direct3D Adjustment
+       float posAdjust = 0.5f;
+#else
+       float posAdjust = 0.0f;
+#endif
+
 	Vertex *ver = batch.Reserve(this, 6);
-	ver[0].x = (float) dst_rect.x;
-	ver[0].y = (float) (dst_rect.y + dst_rect.h);
+    ver[0].x = (float) dst_rect.x + posAdjust;
+    ver[0].y = (float) (dst_rect.y + dst_rect.h) + posAdjust;
 	ver[0].u = m_u;
 	ver[0].v = m_vv;
 	ver[0].col = color;
-	ver[1].x = (float) (dst_rect.x + dst_rect.w);
-	ver[1].y = (float) (dst_rect.y + dst_rect.h);
+    ver[1].x = (float) (dst_rect.x + dst_rect.w) + posAdjust;
+    ver[1].y = (float) (dst_rect.y + dst_rect.h) + posAdjust;
 	ver[1].u = m_uu;
 	ver[1].v = m_vv;
 	ver[1].col = color;
-	ver[2].x = (float) dst_rect.x;
-	ver[2].y = (float) dst_rect.y;
+    ver[2].x = (float) dst_rect.x + posAdjust;
+    ver[2].y = (float) dst_rect.y + posAdjust;
 	ver[2].u = m_u;
 	ver[2].v = m_v;
 	ver[2].col = color;
 
-	ver[3].x = (float) dst_rect.x;
-	ver[3].y = (float) dst_rect.y;
+    ver[3].x = (float) dst_rect.x + posAdjust;
+    ver[3].y = (float) dst_rect.y + posAdjust;
 	ver[3].u = m_u;
 	ver[3].v = m_v;
 	ver[3].col = color;
-	ver[4].x = (float) (dst_rect.x + dst_rect.w);
-	ver[4].y = (float) (dst_rect.y + dst_rect.h);
+    ver[4].x = (float) (dst_rect.x + dst_rect.w) + posAdjust;
+    ver[4].y = (float) (dst_rect.y + dst_rect.h) + posAdjust;
 	ver[4].u = m_uu;
 	ver[4].v = m_vv;
 	ver[4].col = color;
-	ver[5].x = (float) (dst_rect.x + dst_rect.w);
-	ver[5].y = (float) dst_rect.y;
+    ver[5].x = (float) (dst_rect.x + dst_rect.w) + posAdjust;
+    ver[5].y = (float) dst_rect.y + posAdjust;
 	ver[5].u = m_uu;
 	ver[5].v = m_v;
 	ver[5].col = color;

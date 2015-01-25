@@ -190,10 +190,13 @@ bool TBUIBitmap::Init(int width, int height, tb::uint32 *data)
     height_ = height;
 
     texture_ = new Texture2D(renderer_->context_);
-    texture_->SetMipsToSkip(0, 0);
+    texture_->SetMipsToSkip(QUALITY_LOW, 0); // No quality reduction
     texture_->SetNumLevels(1);
+    texture_->SetAddressMode(COORD_U, ADDRESS_BORDER);
+    texture_->SetAddressMode(COORD_V, ADDRESS_BORDER),
+    texture_->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
     texture_->SetSize(width_, height_,  Graphics::GetRGBAFormat(), TEXTURE_STATIC);
-    texture_->SetFilterMode(FILTER_NEAREST);
+
     SetData(data);
 
     return true;
@@ -261,7 +264,7 @@ void TBUI::Initialize()
     // Load the default skin, and override skin that contains the graphics specific to the demo.
     tb::g_tb_skin->Load("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
 
-    register_tbbf_font_renderer();
+    //register_tbbf_font_renderer();
     //register_stb_font_renderer();
     register_freetype_font_renderer();
 
