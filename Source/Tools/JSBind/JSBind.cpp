@@ -1,7 +1,7 @@
 
-#include "../Atomic.h"
-#include "../Core/ProcessUtils.h"
-#include "../Resource/ResourceCache.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include "JSBind.h"
 #include "JSBindings.h"

@@ -1,9 +1,9 @@
 
-#include "../Atomic.h"
-#include "../IO/Log.h"
-#include "../Core/ProcessUtils.h"
-#include "../Resource/ResourceCache.h"
-#include "../Resource/JSONFile.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/JSONFile.h>
 #include "JSBind.h"
 #include "JSBModule.h"
 #include "JSBindings.h"

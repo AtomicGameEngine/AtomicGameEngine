@@ -1,2 +1,2 @@
 
-#include "../Atomic.h"
+#include <Atomic/Atomic.h>

@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "../Container/Vector.h"
-#include "../Container/HashMap.h"
+#include <Atomic/Container/Vector.h>
+#include <Atomic/Container/HashMap.h>
 #include "JSBClass.h"
 
 using namespace Atomic;

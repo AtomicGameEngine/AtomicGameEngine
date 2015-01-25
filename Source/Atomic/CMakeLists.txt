@@ -35,6 +35,11 @@ file (GLOB GRAPHICS_IMPL_SOURCE Graphics/OpenGL/*.cpp Graphics/OpenGL/*.h)
 
 endif()
 
+if (APPLE)
+    set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
+endif()
+
+
 
 
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
@@ -43,7 +48,8 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${PHYSICS_SOURCE} ${NAVIGATION_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
-                  ${JAVASCRIPT_SOURCE} ${SCENE_SOURCE} ${UI_SOURCE})
+                  ${JAVASCRIPT_SOURCE} ${SCENE_SOURCE} ${UI_SOURCE}
+                  ${PLATFORM_SOURCE})
 
 add_library(Atomic ${SOURCE_FILES})
 

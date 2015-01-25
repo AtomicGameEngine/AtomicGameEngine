@@ -1,8 +1,8 @@
 
-#include "../Atomic.h"
-#include "../IO/Log.h"
-#include "../Core/ProcessUtils.h"
-#include "../Resource/ResourceCache.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Resource/ResourceCache.h>
 #include "JSBind.h"
 #include "JSBindings.h"
 #include "JSBModule.h"

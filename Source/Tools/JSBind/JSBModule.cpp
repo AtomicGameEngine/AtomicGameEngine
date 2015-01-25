@@ -1,9 +1,9 @@
 
-#include "../Atomic.h"
-#include "../IO/Log.h"
-#include "../Resource/JSONFile.h"
-#include "../Resource/ResourceCache.h"
-#include "../Core/ProcessUtils.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/Resource/JSONFile.h>
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Core/ProcessUtils.h>
 
 #include "JSBind.h"
 #include "JSBindings.h"
@@ -184,7 +184,7 @@ void JSBModule::WriteIncludes(String& source)
 #ifdef WIN32
         headerPath.Replace(JSBind::ROOT_FOLDER + "/Source/Atomic", "../..");
 #else
-		headerPath.Replace(JSBind::ROOT_FOLDER + "/Source/Atomic", "../..");
+        headerPath.Replace(JSBind::ROOT_FOLDER + "/Source/Atomic", "../..");
 #endif        
         source.AppendWithFormat("#include \"%s%s\"\n", headerPath.CString(), headerfile.CString());
 

@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "../Container/Vector.h"
-#include "../Container/Str.h"
+#include <Atomic/Container/Vector.h>
+#include <Atomic/Container/Str.h>
 
 using namespace Atomic;
 

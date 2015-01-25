@@ -1,0 +1,4 @@
+
+*.user
+Bin/Atomic.d.ts
+Source/Atomic/Javascript/Modules/*

@@ -16,3 +16,7 @@ add_subdirectory(SQLite)
 add_subdirectory(StanHull)
 add_subdirectory(STB)
 add_subdirectory(TurboBadger)
+
+if (APPLE)
+    add_subdirectory(GLEW)
+endif()
