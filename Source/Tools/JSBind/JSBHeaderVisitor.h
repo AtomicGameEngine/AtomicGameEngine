@@ -1,13 +1,14 @@
 
 #pragma once
 
-#include "../IO/Log.h"
+#include <Atomic/IO/Log.h>
+#include <Atomic/Core/ProcessUtils.h>
+
 #include "JSBHeader.h"
 #include "JSBModule.h"
 #include "JSBindings.h"
 #include "JSBClass.h"
 #include "JSBFunction.h"
-#include "../Core/ProcessUtils.h"
 
 #include "JSBNameVisitor.h"
 

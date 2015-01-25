@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../IO/Log.h"
+#include <Atomic/IO/Log.h>
 #include "JSBClass.h"
 #include "JSBType.h"
 

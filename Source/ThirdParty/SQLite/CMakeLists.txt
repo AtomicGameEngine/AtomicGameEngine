@@ -1,15 +1,8 @@
-# Define target name
-set (TARGET_NAME SQLite)
-
 # Define source files
-file (GLOB CPP_FILES *.c)
+file (GLOB C_FILES *.c)
 file (GLOB H_FILES *.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
-set (INCLUDE_DIRS .)
+set (SOURCE_FILES ${C_FILES} ${H_FILES})
 
-# Setup target
-setup_library ()
+add_library(SQLite ${SOURCE_FILES})
 
-# Install headers for building the Urho3D library
-install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SQLite FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)  # Note: the trailing slash is significant

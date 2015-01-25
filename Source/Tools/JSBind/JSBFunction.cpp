@@ -1,5 +1,5 @@
 
-#include "../Atomic.h"
+#include <Atomic/Atomic.h>
 #include "JSBFunction.h"
 
 void JSBFunction::WriteParameterMarshal(String& source)

@@ -14,7 +14,9 @@
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
-set (TARGET_NAME kNet)
+#set (TARGET_NAME kNet)
+
+include_directories(include)
 
 file (GLOB kNetSourceFiles src/*.cpp)
 file (GLOB kNetHeaderFiles include/*.h include/kNet/*.h include/kNet/*.inl)
@@ -59,13 +61,6 @@ endif ()
 # Define source files
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 
-# Define dependency libs
-set (INCLUDE_DIRS include)
+add_library(kNet ${SOURCE_FILES})
 
-# Setup target
-setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for Urho3D/Network/Connection.h and Urho3D/Network/Network.h)
-install_header_files (DIRECTORY include/kNet/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet FILES_MATCHING PATTERN *.h *.inl USE_FILE_SYMLINK)     # Note: the trailing slash is significant
-file (GLOB kNetHeaderFiles include/*.h)
-install_header_files (FILES ${kNetHeaderFiles} DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/kNet)

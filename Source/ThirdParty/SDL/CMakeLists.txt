@@ -1,5 +1,5 @@
-# Define target name
-set (TARGET_NAME SDL)
+
+include_directories(include)
 
 # Define source files
 file (GLOB C_FILES
@@ -14,18 +14,18 @@ if (WIN32)
     if (MINGW)
         add_definitions (-DUNICODE=1)
     endif ()
-    CHECK_INCLUDE_FILES (wbemcli.h HAVE_WBEMCLI_H)
-    if (HAVE_WBEMCLI_H)
+    #CHECK_INCLUDE_FILES (wbemcli.h HAVE_WBEMCLI_H)
+    #if (HAVE_WBEMCLI_H)
         add_definitions (-DSDL_JOYSTICK_DINPUT)
         add_definitions (-DSDL_HAPTIC_DINPUT)
         set (HAPTIC_DRIVER windows)
-    else ()
-        message (STATUS "Building SDL without DX joystick support due to missing wbemcli.h")
-        message (STATUS "For MSVC, get it from Windows 7 SDK. For MinGW, get it from eg. Wine sources or from MinGW-w64")
-        add_definitions (-DSDL_JOYSTICK_WINMM)
-        add_definitions (-DSDL_HAPTIC_DUMMY)
-        set (HAPTIC_DRIVER dummy)
-    endif ()
+    #else ()
+    #    message (STATUS "Building SDL without DX joystick support due to missing wbemcli.h")
+    #    message (STATUS "For MSVC, get it from Windows 7 SDK. For MinGW, get it from eg. Wine sources or #from MinGW-w64")
+    #    add_definitions (-DSDL_JOYSTICK_WINMM)
+    #    add_definitions (-DSDL_HAPTIC_DUMMY)
+    #    set (HAPTIC_DRIVER dummy)
+    #endif ()
     file (GLOB SYS_C_FILES
         src/audio/directsound/*.c src/haptic/${HAPTIC_DRIVER}/*.c src/joystick/windows/*.c src/core/windows/*.c src/loadso/windows/*.c
         src/power/windows/*.c src/thread/windows/*.c src/thread/generic/SDL_syscond.c src/timer/windows/*.c src/video/windows/*.c src/joystick/dummy/*.c
@@ -113,17 +113,5 @@ set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
 set_source_files_properties (${SYS_C_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
 
-# Define dependency libs
-set (INCLUDE_DIRS include)
+add_library(SDL ${SOURCE_FILES})
 
-# Setup target
-setup_library ()
-
-# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-# Install dependency for SDL_android_main.c
-if (ANDROID)
-    install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-    install_header_files (FILES src/SDL_internal.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-    install_header_files (DIRECTORY src/dynapi DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h)
-endif ()

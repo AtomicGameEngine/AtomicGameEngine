@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../Container/Str.h"
+#include <Atomic/Container/Str.h>
 
 #include "cplusplus/CPlusPlus.h"
 using namespace CPlusPlus;

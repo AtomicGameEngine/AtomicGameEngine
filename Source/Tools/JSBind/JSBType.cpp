@@ -1,5 +1,5 @@
 
-#include "../Atomic.h"
+#include <Atomic/Atomic.h>
 #include "JSBType.h"
 #include "JSBindings.h"
 

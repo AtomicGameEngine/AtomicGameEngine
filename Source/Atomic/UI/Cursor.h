@@ -26,7 +26,7 @@
 #include "../Resource/Image.h"
 #include "../Graphics/Texture.h"
 
-#include <SDL/SDL_mouse.h>
+#include <SDL/include/SDL_mouse.h>
 
 namespace Atomic
 {

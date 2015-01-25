@@ -16,8 +16,8 @@ subject to the following restrictions:
 #ifndef BT_DYNAMICS_WORLD_H
 #define BT_DYNAMICS_WORLD_H
 
-#include "BulletCollision/CollisionDispatch/btCollisionWorld.h"
-#include "BulletDynamics/ConstraintSolver/btContactSolverInfo.h"
+#include "../../BulletCollision/CollisionDispatch/btCollisionWorld.h"
+#include "../../BulletDynamics/ConstraintSolver/btContactSolverInfo.h"
 
 class btTypedConstraint;
 class btActionInterface;

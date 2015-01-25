@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "../Core/Context.h"
-#include "../IO/FileSystem.h"
-#include "../Engine/Engine.h"
+#include <Atomic/Core/Context.h>
+#include <Atomic/IO/FileSystem.h>
+#include <Atomic/Engine/Engine.h>
 
 using namespace Atomic;
 

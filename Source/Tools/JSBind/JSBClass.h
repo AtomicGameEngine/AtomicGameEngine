@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "../IO/Log.h"
-#include "../Container/Str.h"
-#include "../Container/Vector.h"
+#include <Atomic/IO/Log.h>
+#include <Atomic/Container/Str.h>
+#include <Atomic/Container/Vector.h>
 
 using namespace Atomic;
 

@@ -25,8 +25,8 @@
 #include "../Math/Quaternion.h"
 #include "../Math/Vector3.h"
 
-#include <Bullet/LinearMath/btVector3.h>
-#include <Bullet/LinearMath/btQuaternion.h>
+#include <Bullet/src/LinearMath/btVector3.h>
+#include <Bullet/src/LinearMath/btQuaternion.h>
 
 namespace Atomic
 {

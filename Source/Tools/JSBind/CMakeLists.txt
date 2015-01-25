@@ -1,13 +1,11 @@
-# Define target name
-set (TARGET_NAME JSBind)
+
+include_directories(${CMAKE_SOURCE_DIR}/Source)
 
 add_definitions(-DCPLUSPLUS_WITHOUT_QT)
 
 # Define source files
-define_source_files (GLOB_CPP_PATTERNS *.cpp *.c cplusplus/*.cpp GLOB_H_PATTERNS *.h cplusplus/*.h PARENT_SCOPE)
+file (GLOB SOURCE_FILES *.cpp cplusplus/*.cpp *.h cplusplus/*.h )
 
-# Setup target
-if (APPLE)
-    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
-endif ()
-setup_executable ()
+add_executable(JSBind ${SOURCE_FILES})
+
+target_link_libraries(JSBind ${ATOMIC_LINK_LIBRARIES})

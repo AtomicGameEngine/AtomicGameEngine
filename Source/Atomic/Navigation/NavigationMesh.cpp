@@ -41,10 +41,10 @@
 #include "../IO/VectorBuffer.h"
 
 #include <cfloat>
-#include <Detour/DetourNavMesh.h>
-#include <Detour/DetourNavMeshBuilder.h>
-#include <Detour/DetourNavMeshQuery.h>
-#include <Recast/Recast.h>
+#include <Detour/include/DetourNavMesh.h>
+#include <Detour/include/DetourNavMeshBuilder.h>
+#include <Detour/include/DetourNavMeshQuery.h>
+#include <Recast/include/Recast.h>
 
 #include "../DebugNew.h"
 

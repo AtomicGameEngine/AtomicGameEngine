@@ -29,7 +29,7 @@
 #include "../Math/Vector3.h"
 #include "../IO/VectorBuffer.h"
 
-#include <Bullet/LinearMath/btIDebugDraw.h>
+#include <Bullet/src/LinearMath/btIDebugDraw.h>
 
 class btCollisionConfiguration;
 class btCollisionShape;

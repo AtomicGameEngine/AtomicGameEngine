@@ -25,7 +25,7 @@
 #include "../Scene/Component.h"
 #include "../IO/VectorBuffer.h"
 
-#include <Bullet/LinearMath/btMotionState.h>
+#include <Bullet/src/LinearMath/btMotionState.h>
 
 class btCompoundShape;
 class btRigidBody;

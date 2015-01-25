@@ -16,7 +16,7 @@ subject to the following restrictions:
 #ifndef BT_CONTACT_SOLVER_INFO
 #define BT_CONTACT_SOLVER_INFO
 
-#include "LinearMath/btScalar.h"
+#include "../../LinearMath/btScalar.h"
 
 enum	btSolverMode
 {

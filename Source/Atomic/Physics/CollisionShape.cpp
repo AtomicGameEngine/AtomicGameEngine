@@ -40,19 +40,19 @@
 #include "../Graphics/Terrain.h"
 #include "../Graphics/VertexBuffer.h"
 
-#include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
-#include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btCapsuleShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btCompoundShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btConeShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btConvexHullShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btCylinderShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btSphereShape.h>
-#include <Bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
-#include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
-#include <Bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h>
+#include <Bullet/src/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btBoxShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btCapsuleShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btCompoundShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btConeShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btConvexHullShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btCylinderShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btSphereShape.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
+#include <Bullet/src/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
+#include <Bullet/src/BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <StanHull/hull.h>
 
 namespace Atomic

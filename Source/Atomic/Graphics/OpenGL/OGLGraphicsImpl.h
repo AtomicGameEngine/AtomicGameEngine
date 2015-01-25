@@ -58,7 +58,7 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-#include <SDL/SDL.h>
+#include <SDL/include/SDL.h>
 
 namespace Atomic
 {

@@ -1,6 +1,6 @@
 {
 	"name" : "Graphics",
-	"sources" : ["Graphics", "Graphics/Direct3D9"],
+	"sources" : ["Graphics"],
 	"includes" : ["../../Scene/Scene.h", "../../Graphics/Animation.h", "../../Graphics/OcclusionBuffer.h", "../../Scene/ValueAnimation.h"],
 	"classes" : ["Graphics", "Texture", "Texture2D", "Model", "Material", "Drawable", 
 				 "Viewport", "Renderer", "Octree", "Zone", "StaticModel", "Camera", "Light", "RenderPath",

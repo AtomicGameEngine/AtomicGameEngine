@@ -20,26 +20,26 @@
 // THE SOFTWARE.
 //
 
-#include "../Atomic.h"
-#include "../Engine/Engine.h"
-#include "../IO/FileSystem.h"
-#include "../IO/Log.h"
-#include "../Core/Main.h"
-#include "../Core/ProcessUtils.h"
-#include "../Resource/ResourceCache.h"
-#include "../Resource/ResourceEvents.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/Engine/Engine.h>
+#include <Atomic/IO/FileSystem.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/Core/Main.h>
+#include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/ResourceEvents.h>
 
 // Move me
-#include "../Environment/Environment.h"
+#include <Atomic/Environment/Environment.h>
 
-#include "../Javascript/Javascript.h"
-#include "../Javascript/JSFile.h"
+#include <Atomic/Javascript/Javascript.h>
+#include <Atomic/Javascript/JSFile.h>
 
 #include "AtomicPlayer.h"
 
-#include "../DebugNew.h"
+#include <Atomic/DebugNew.h>
 
-#include "../UI/TBUI.h"
+#include <Atomic/UI/TBUI.h>
 
 #ifdef EMSCRIPTEN
 

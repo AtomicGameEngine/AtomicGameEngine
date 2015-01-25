@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "../Container/Vector.h"
-#include "../Container/Str.h"
-#include "../Container/ArrayPtr.h"
+#include <Atomic/Container/Vector.h>
+#include <Atomic/Container/Str.h>
+#include <Atomic/Container/ArrayPtr.h>
 
 using namespace Atomic;
 
