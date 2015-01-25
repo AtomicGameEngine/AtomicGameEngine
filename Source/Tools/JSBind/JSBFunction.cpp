@@ -146,13 +146,13 @@ void JSBFunction::WriteParameterMarshal(String& source)
 
                 if (init.Length())
                 {
-                    source.AppendWithFormat("%s __arg%i = duk_get_top(ctx) >= %i ? ((%s) duk_to_number(ctx, %i)) : %s;\n", etype->enum_->name_.CString(),
+                    source.AppendWithFormat("%s __arg%i = duk_get_top(ctx) >= %i ? ((%s) ((int) duk_to_number(ctx, %i))) : %s;\n", etype->enum_->name_.CString(),
                                             cparam,  cparam + 1, etype->enum_->name_.CString(),  cparam, init.CString());
 
                 }
                 else
                 {
-                    source.AppendWithFormat("%s __arg%i = (%s) duk_to_number(ctx, %i);\n", etype->enum_->name_.CString(),
+                    source.AppendWithFormat("%s __arg%i = (%s) ((int)duk_to_number(ctx, %i));\n", etype->enum_->name_.CString(),
                                             cparam, etype->enum_->name_.CString(),  cparam);
 
                 }

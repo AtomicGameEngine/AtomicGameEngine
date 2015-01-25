@@ -1,6 +1,6 @@
 
-#include "../Atomic.h"
-#include "../IO/File.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/IO/File.h>
 #include "JSBHeader.h"
 #include "JSBHeaderVisitor.h"
 #include "JSBPreprocessVisitor.h"

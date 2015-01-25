@@ -8,6 +8,7 @@
 #ifdef TB_FILE_POSIX
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 namespace tb {

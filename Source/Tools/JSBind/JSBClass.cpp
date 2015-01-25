@@ -1,7 +1,7 @@
 
-#include "../Atomic.h"
-#include "../IO/Log.h"
-#include "../Core/ProcessUtils.h"
+#include <Atomic/Atomic.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/Core/ProcessUtils.h>
 #include "JSBClass.h"
 #include "JSBFunction.h"
 

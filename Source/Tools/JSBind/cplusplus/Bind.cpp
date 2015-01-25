@@ -33,6 +33,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <algorithm>
 
 
 using namespace CPlusPlus;

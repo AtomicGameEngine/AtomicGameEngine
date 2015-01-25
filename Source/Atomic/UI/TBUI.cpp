@@ -1,6 +1,7 @@
+#include "Precompiled.h"
+
 #ifdef ATOMIC_TBUI
 
-#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../Core/Profiler.h"
@@ -25,6 +26,7 @@
 #include <TurboBadger/tb_node_tree.h>
 #include <TurboBadger/tb_widgets_reader.h>
 #include <TurboBadger/tb_window.h>
+
 
 void register_tbbf_font_renderer();
 void register_stb_font_renderer();

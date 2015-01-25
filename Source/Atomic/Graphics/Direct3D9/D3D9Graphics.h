@@ -107,7 +107,7 @@ public:
     /// Close the window.
     void Close();
     /// Take a screenshot. Return true if successful.
-    bool TakeScreenShot(Image& destImage);
+    bool TakeScreenShot(Image* destImage);
     /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
     /// End frame rendering and swap buffers.

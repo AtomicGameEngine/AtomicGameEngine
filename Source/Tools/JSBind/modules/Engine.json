@@ -1,6 +1,6 @@
 {
 	"name" : "Engine",
 	"sources" : ["Engine"],
-	"includes" : ["../UI/Text.h", "../UI/Button.h", "../UI/LineEdit.h"],
+	"includes" : ["../../UI/Text.h", "../../UI/Button.h", "../../UI/LineEdit.h"],
 	"classes" : ["Engine", "DebugHud", "Console"]
 }

@@ -6,13 +6,21 @@
 #include "JSBind.h"
 #include "JSBindings.h"
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 using namespace Atomic;
 
 SharedPtr<Context> JSBind::context_;
 SharedPtr<FileSystem> JSBind::fileSystem_;
 SharedPtr<Engine> JSBind::engine_;
 
+#ifdef WIN32
+String JSBind::ROOT_FOLDER("C:/Dev/atomic/AtomicRuntime");
+#else
 String JSBind::ROOT_FOLDER("/Users/josh/Dev/atomic/AtomicRuntime");
+#endif
 
 void JSBind::Initialize()
 {

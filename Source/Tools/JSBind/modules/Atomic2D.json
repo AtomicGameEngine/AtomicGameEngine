@@ -1,7 +1,7 @@
 {
 	"name" : "Atomic2D",
 	"sources" : ["Atomic2D"],
-	"includes" : ["../Graphics/Texture2D.h", "../Scene/Node.h", "../Graphics/Material.h"],
+	"includes" : ["../../Graphics/Texture2D.h", "../../Scene/Node.h", "../../Graphics/Material.h"],
 	"classes" : [ "SpriteSheet2D", "Sprite2D", "Drawable2D", "StaticSprite2D", "AnimationSet2D", "AnimatedSprite2D",
 				 "CollisionShape2D", "CollisionBox2D", "RigidBody2D", "Animation2D", "CollisionChain2D",
 				 "CollisionCircle2D", "CollisionEdge2D", "CollisionPolygon2D",
