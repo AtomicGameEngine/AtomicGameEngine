@@ -156,6 +156,11 @@ void AtomicPlayer::Setup()
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
 
+#ifdef __APPLE__
+    engineParameters_["ResourcePrefixPath"] = "../Resources";
+#endif
+
+
     // Show usage if not found
     if (scriptFileName_.Empty())
     {

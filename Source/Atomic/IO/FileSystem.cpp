@@ -984,7 +984,7 @@ String FileSystem::GetAppBundleResourceFolder()
 
     // Fix up to use the bundle layout
     String programDir = GetProgramDir();
-    unsigned p = programDir.Find("/MacOS");
+    unsigned p = programDir.FindLast("/MacOS/");
     if (p != String::NPOS)
     {
         programDir.Erase(p, programDir.Length() - p);

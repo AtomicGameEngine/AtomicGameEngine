@@ -3,3 +3,4 @@
 Bin/Atomic.d.ts
 Source/Atomic/Javascript/Modules/*
 AtomicEditor/*
+Artifacts/*
