@@ -752,8 +752,8 @@ extern "C" {
 
 static AAssetManager *gAssetManager = NULL;
 
-void Java_com_github_urho3d_Urho3D_nativeSetAssetManager(JNIEnv *env, jobject thiz, jobject assetManageObject)
-{
+void Java_com_github_atomic_Atomic_nativeSetAssetManager(JNIEnv *env, jobject thiz, jobject assetManageObject)
+{    
     gAssetManager = AAssetManager_fromJava(env, assetManageObject);
 }
 

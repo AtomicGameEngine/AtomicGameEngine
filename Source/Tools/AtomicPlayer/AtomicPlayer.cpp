@@ -106,9 +106,10 @@ AtomicPlayer::AtomicPlayer(Context* context) :
 
 void AtomicPlayer::Setup()
 {
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    FileSystem* filesystem = GetSubsystem<FileSystem>();       
 
     // On Android and iOS, read command line from a file as parameters can not otherwise be easily given
+/*
     #if defined(ANDROID) || defined(IOS)
     SharedPtr<File> commandFile(new File(context_, filesystem->GetProgramDir() + "Data/CommandLine.txt",
         FILE_READ));
@@ -118,7 +119,7 @@ void AtomicPlayer::Setup()
     // Reparse engine startup parameters now
     engineParameters_ = Engine::ParseParameters(GetArguments());
     #endif
-
+*/
     // Check for script file name
     const Vector<String>& arguments = GetArguments();    
     for (unsigned i = 0; i < arguments.Size(); ++i)
@@ -136,32 +137,29 @@ void AtomicPlayer::Setup()
     engineParameters_["FullScreen"] = false;    
     scriptFileName_ = "PhysicsPlatformer.js";
 
-#else
-    // TODO: FIX!
-    #if !defined(ANDROID)
-    //GetSubsystem<TBUI>()->SetInputDisabled(true);
-    //GetSubsystem<TBUI>()->FadeOut(.1f);
-    #else
-        scriptFileName_ = "PhysicsPlatformer.js";
-    #endif
-
 #endif
-
     scriptFileName_ = "Script/Main.js";
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    engineParameters_["ResourcePaths"] = "AtomicResources";
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();    
     engineParameters_["WindowTitle"] = "AtomicPlayer";
+
+#if (ATOMIC_PLATFORM_ANDROID)
+    engineParameters_["FullScreen"] = true;
+    engineParameters_["ResourcePaths"] = "CoreData;Data;AtomicResources";
+#else
+    engineParameters_["ResourcePaths"] = "AtomicResources";
     engineParameters_["FullScreen"] = false;
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    engineParameters_["ResourcePrefixPath"] = "AtomicPlayer_Resources";
-#else
-    engineParameters_["ResourcePrefixPath"] = "../Resources";
 #endif
 
+#if ATOMIC_PLATFORM_WINDOWS
+    engineParameters_["ResourcePrefixPath"] = "AtomicPlayer_Resources";
+#elif ATOMIC_PLATFORM_ANDROID
+    //engineParameters_["ResourcePrefixPath"] = "assets";
+#elif ATOMIC_PLATFORM_OSX
+    engineParameters_["ResourcePrefixPath"] = "../Resources";
+#endif
 
     // Show usage if not found
     if (scriptFileName_.Empty())
@@ -255,6 +253,7 @@ void AtomicPlayer::Start()
         }
         else
         {
+            LOGERROR("Poop");
             ErrorExit("Error loading Javascript file");
             return;
         }

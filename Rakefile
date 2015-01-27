@@ -32,7 +32,7 @@ namespace :android do
     end
 
     Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
-      sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+      sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Debug ../../"
       sh "make -j8"
     end 
 

@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.0.0)
 
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-add_definitions(-DATOMIC_STATIC_DEFINE -DATOMIC_PHYSICS -DATOMIC_NETWORK -DATOMIC_ATOMIC2D)
+add_definitions(-DATOMIC_STATIC_DEFINE -DATOMIC_LOGGING -DATOMIC_PHYSICS -DATOMIC_NETWORK -DATOMIC_ATOMIC2D)
 
 set (ATOMIC_LINK_LIBRARIES Atomic Box2D Bullet Civetweb Detour Duktape FreeType JO kNet LZ4 
 						   PugiXml Recast SDL  StanHull STB )
