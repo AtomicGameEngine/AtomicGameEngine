@@ -253,7 +253,6 @@ void AtomicPlayer::Start()
         }
         else
         {
-            LOGERROR("Poop");
             ErrorExit("Error loading Javascript file");
             return;
         }
