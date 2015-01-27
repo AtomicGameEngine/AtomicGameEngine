@@ -4,13 +4,12 @@
 
 // Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
-// Urho3D - use SDK include dir
-#include <SDL/SDL_internal.h>
+#include "../../SDL_internal.h"
 
 #ifdef __ANDROID__
 
 /* Include the SDL main definition header */ // Urho3D - use SDK include dir
-#include <SDL/SDL_main.h>
+#include <SDL/include/SDL_main.h>
 
 /*******************************************************************************
                  Functions called by JNI

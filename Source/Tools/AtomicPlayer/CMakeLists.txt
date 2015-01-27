@@ -11,7 +11,12 @@ else()
     set (EXE_TYPE MACOSX_BUNDLE)
 endif()
 
-add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES})
+if (ANDROID)
+	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
+	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
+else()
+	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES})
+endif()
 
 target_link_libraries(AtomicPlayer ${ATOMIC_LINK_LIBRARIES})
 

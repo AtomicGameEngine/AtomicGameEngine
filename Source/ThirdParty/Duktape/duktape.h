@@ -213,7 +213,7 @@ static __inline__ unsigned long long duk_rdtsc(void) {
 #if defined(i386) || defined(__i386) || defined(__i386__) || \
     defined(__i486__) || defined(__i586__) || defined(__i686__) || \
     defined(__IA32__) || defined(_M_IX86) || defined(__X86__) || \
-    defined(_X86_) || defined(__THW_INTEL__) || defined(__I86__)
+    defined(_X86_) || defined(__THW_INTEL__) || defined(__I86__) || defined(ANDROID)
 #define DUK_F_X86
 #endif
 

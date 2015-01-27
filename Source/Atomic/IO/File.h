@@ -28,7 +28,7 @@
 #include "../Core/Object.h"
 
 #ifdef ANDROID
-#include <SDL/SDL_rwops.h>
+#include <SDL/include/SDL_rwops.h>
 #endif
 
 namespace Atomic
