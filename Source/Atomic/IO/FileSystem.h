@@ -100,7 +100,11 @@ public:
     String GetAppPreferencesDir(const String& org, const String& app) const;
 
     String GetAppBundleResourceFolder();
+    /// Remove a directory
     bool RemoveDir(const String& directoryIn, bool recursive);
+    bool CreateDirsRecursive(const String& directoryIn, const String& directoryOut);
+    /// Copy a directory, directoryOut must not exist
+    bool CopyDir(const String& directoryIn, const String& directoryOut);
     
 private:
     /// Scan directory, called internally.

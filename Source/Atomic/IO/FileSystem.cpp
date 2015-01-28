@@ -759,7 +759,6 @@ void Java_com_github_atomic_Atomic_nativeSetAssetManager(JNIEnv *env, jobject th
 
 }
 
-
 // TODO: AAssetManager_openDir doesn't support subdirectories :/ 
 
 void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
@@ -894,6 +893,53 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 }
 
 #endif
+
+bool FileSystem::CreateDirsRecursive(const String& directoryIn, const String& directoryOut)
+{
+    if (!CreateDir(directoryOut))
+        return false;
+
+    Vector<String> results;
+    ScanDir(results, directoryIn, "*", SCAN_DIRS, false );
+
+    while (results.Remove(".")) {}
+    while (results.Remove("..")) {}
+
+    for (unsigned i = 0; i < results.Size(); i++)
+    {
+        String dirIn = directoryIn + "/" + results[i];
+        String dirOut = directoryOut + "/" + results[i];
+
+        //LOGINFOF("SRC: %s, DST: %s", dirIn.CString(), dirOut.CString());
+
+        if (!CreateDirsRecursive(dirIn, dirOut))
+            return false;
+    }
+
+    return true;
+}
+
+bool FileSystem::CopyDir(const String& directoryIn, const String& directoryOut)
+{
+    if (FileExists(directoryOut) || DirExists(directoryOut))
+        return false;
+
+    CreateDirsRecursive(directoryIn, directoryOut);
+
+    Vector<String> results;
+    ScanDir(results, directoryIn, "*", SCAN_FILES, true );
+
+    for (unsigned i = 0; i < results.Size(); i++)
+    {
+        String srcFile = directoryIn + "/" + results[i];
+        String dstFile = directoryOut + "/" + results[i];
+        //LOGINFOF("SRC: %s DST: %s", srcFile.CString(), dstFile.CString());
+        Copy(srcFile, dstFile);
+    }
+
+    return true;
+
+}
 
 bool FileSystem::RemoveDir(const String& directoryIn, bool recursive)
 {
