@@ -745,72 +745,64 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
 
 #if defined(ANDROID)
 
-extern "C" {
-
-#include <android/asset_manager.h>
-#include <android/asset_manager_jni.h>
-
-static AAssetManager *gAssetManager = NULL;
-
-void Java_com_github_atomic_Atomic_nativeSetAssetManager(JNIEnv *env, jobject thiz, jobject assetManageObject)
-{    
-    gAssetManager = AAssetManager_fromJava(env, assetManageObject);
-}
-
-}
-
-// TODO: AAssetManager_openDir doesn't support subdirectories :/ 
+// the android asset manager is quite limited, so use a manifest instead
+static Vector<String> _atomicManifest;
 
 void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
     const String& filter, unsigned flags, bool recursive) const
 {
-    if (!gAssetManager)
-    {
-        LOGERROR("FileSystem::ScanDirInternal - AssetManager Not Set");
-        return;
-    }
 
+    if (!_atomicManifest.Size())
+    {
+        File file(context_, "/apk/AtomicManifest", FILE_READ);
+        if (!file.IsOpen())
+        {
+            LOGERRORF("Unabled to open AtomicManifest");
+            return;
+        }
+
+        String manifest = file.ReadString();
+        _atomicManifest = manifest.Split(';');
+    }
 
     if (path.StartsWith("/apk/"))
         path = path.Substring(5);
 
-    // Asset Manager is very sensitive on paths
     path.Replace(String("//"), String("/"));
     path = RemoveTrailingSlash(path);
 
-    //LOGINFOF("Scanning: %s", path.CString());
+    // first path is the Data/CoreData/AtomicResources folder
+    path = path.Substring(path.Find('/') + 1) + "/";
 
     String filterExtension = filter.Substring(filter.Find('.'));
     if (filterExtension.Contains('*'))
-        filterExtension.Clear();    
+        filterExtension.Clear();
 
-    String deltaPath;
-    if (path.Length() > startPath.Length())
-        deltaPath = path.Substring(startPath.Length());
+    for (unsigned i = 0; i < _atomicManifest.Size(); i++ )
+    {
+        const String& file = _atomicManifest[i];
+        String filePath = GetPath(file);
+        String filename = GetFileNameAndExtension(file);
 
-    AAssetDir* assetDir = AAssetManager_openDir(gAssetManager, path.CString());
+        //LOGINFOF("%s : %s : %s", path.CString(), filePath.CString(), filename.CString());
 
-    const char* _filename = (const char*)NULL;
-
-    while ((_filename = AAssetDir_getNextFileName(assetDir)) != NULL) {
-
-        String filename = _filename;
-
-        if (flags & SCAN_FILES)
+        if (filePath.StartsWith(path))
         {
-            if (filterExtension.Empty() || filename.EndsWith(filterExtension))
-                result.Push(deltaPath + filename);
+            if (flags & SCAN_FILES)
+            {
+                if (filterExtension.Empty() || filename.EndsWith(filterExtension))
+                {
+                    String deltaPath;
+
+                    if (path.Length() > startPath.Length())
+                        deltaPath = path.Substring(startPath.Length());
+
+                    result.Push(deltaPath + GetFileNameAndExtension(file));
+                }
+            }
         }
-
-        //LOGINFOF("filename: %s", filename.CString());
-
     }
-
-    AAssetDir_close(assetDir);    
-
-    return;
 }
-
 
 #else
 
