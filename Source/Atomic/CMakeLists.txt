@@ -38,17 +38,17 @@ if (APPLE)
     set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
 endif()
 
-
-
-
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
-                  ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE} ${NETWORK_SOURCE}
-                  ${RESOURCE_SOURCE}
-                  ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
-                  ${PHYSICS_SOURCE} ${NAVIGATION_SOURCE}
+                  ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE} 
+                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE}
+                  ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}                  
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
                   ${JAVASCRIPT_SOURCE} ${SCENE_SOURCE} ${UI_SOURCE}
                   ${PLATFORM_SOURCE})
+
+if (NOT EMSCRIPTEN)
+  set (SOURCE_FILES ${SOURCEFILES} ${NETWORK_SOURCE} ${NAVIGATION_SOURCE})
+endif()
 
 add_library(Atomic ${SOURCE_FILES})
 

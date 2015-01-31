@@ -35,11 +35,35 @@ namespace :android do
       sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
     end 
+    
+  end
 
+end  
+
+namespace :web do
+
+  CMAKE_WEB_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/Web_Build"
+
+  task :build_player do
+
+    if !Dir.exists?("#{CMAKE_WEB_BUILD_FOLDER}")
+      FileUtils.mkdir_p(CMAKE_WEB_BUILD_FOLDER)
+    end
+
+    Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
+      sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+      sh "make -j8"
+    end 
+
+    Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/Tools/AtomicPlayer") do
+      sh "mv AtomicPlayer AtomicPlayer.bc"
+      sh "emcc -O3 --llvm-lto 1 --memory-init-file 0 -s VERBOSE=0 -s USE_SDL=2 -s ASM_JS=1 -s ASSERTIONS=1 -s OUTLINING_LIMIT=20000 -s TOTAL_MEMORY=520093696 --closure 0 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"      
+    end
 
   end
 
 end  
+
 
 namespace :build_macosx do
 

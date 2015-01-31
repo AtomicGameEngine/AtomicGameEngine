@@ -1,5 +1,5 @@
 
-if (NOT ANDROID)
+if (NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(JSBind)
 endif()
 
