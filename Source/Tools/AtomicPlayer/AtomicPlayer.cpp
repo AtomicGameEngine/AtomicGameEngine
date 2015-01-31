@@ -108,18 +108,6 @@ void AtomicPlayer::Setup()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();       
 
-    // On Android and iOS, read command line from a file as parameters can not otherwise be easily given
-/*
-    #if defined(ANDROID) || defined(IOS)
-    SharedPtr<File> commandFile(new File(context_, filesystem->GetProgramDir() + "Data/CommandLine.txt",
-        FILE_READ));
-    String commandLine = commandFile->ReadLine();
-    commandFile->Close();
-    ParseArguments(commandLine, false);
-    // Reparse engine startup parameters now
-    engineParameters_ = Engine::ParseParameters(GetArguments());
-    #endif
-*/
     // Check for script file name
     const Vector<String>& arguments = GetArguments();    
     for (unsigned i = 0; i < arguments.Size(); ++i)
@@ -135,9 +123,8 @@ void AtomicPlayer::Setup()
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
     engineParameters_["FullScreen"] = false;    
-    scriptFileName_ = "PhysicsPlatformer.js";
-
 #endif
+    
     scriptFileName_ = "Script/Main.js";
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();    
@@ -145,6 +132,8 @@ void AtomicPlayer::Setup()
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
+    engineParameters_["ResourcePaths"] = "CoreData;Data;AtomicResources";
+#elif ATOMIC_PLATFORM_WEB
     engineParameters_["ResourcePaths"] = "CoreData;Data;AtomicResources";
 #else
     engineParameters_["ResourcePaths"] = "AtomicResources";
