@@ -207,6 +207,17 @@ void jsapi_init_atomic(JSVM* vm)
     // Atomic
     duk_get_global_string(ctx, "Atomic");
 
+#ifdef ATOMIC_PLATFORM_OSX
+    duk_push_string(ctx, "Mac");
+    duk_put_prop_string(ctx, -2, "platform");
+#elif ATOMIC_PLATFORM_WINDOWS
+    duk_push_string(ctx, "Windows");
+    duk_put_prop_string(ctx, -2, "platform");
+#elif ATOMIC_PLATFORM_ANDROID
+    duk_push_string(ctx, "Android");
+    duk_put_prop_string(ctx, -2, "platform");
+#endif
+
     // Node registry
     duk_push_global_stash(ctx);
     duk_push_object(ctx);

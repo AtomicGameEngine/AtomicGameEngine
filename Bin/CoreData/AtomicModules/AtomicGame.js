@@ -9,6 +9,11 @@ function Game() {
 	this.graphics = Atomic.GetGraphics();
 	this.input = Atomic.GetInput();
 
+    if (Atomic.platform == "Android") {
+        this.renderer.reuseShadowMaps = false;
+        this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
+    }
+
 }
 
 Game.prototype.init = function(start, update) {
