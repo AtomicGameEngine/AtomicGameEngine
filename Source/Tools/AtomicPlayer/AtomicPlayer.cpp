@@ -79,11 +79,15 @@ int main(int argc, char** argv)
 
     EmscriptenApp::sInstance_->application_->Run();
 
+    emscripten_set_main_loop(RunFrame, 0, 1);
+
+/*
     int firefox = EM_ASM_INT ( return ((navigator.userAgent.toLowerCase().indexOf('firefox') > -1) ? 1 : 0), 0);
     if (firefox)
         emscripten_set_main_loop(RunFrame, 0, 1);
     else
         emscripten_set_main_loop(RunFrame, 60, 1);
+*/        
     return 0;
 }
 
@@ -132,8 +136,6 @@ void AtomicPlayer::Setup()
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
-    engineParameters_["ResourcePaths"] = "CoreData;Data;AtomicResources";
-#elif ATOMIC_PLATFORM_WEB
     engineParameters_["ResourcePaths"] = "CoreData;Data;AtomicResources";
 #else
     engineParameters_["ResourcePaths"] = "AtomicResources";
