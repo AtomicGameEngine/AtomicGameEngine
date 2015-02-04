@@ -214,7 +214,7 @@ namespace :build_windows do
 
   task :editor => "build_windows:player" do
 
-    Dir.chdir(CMAKE_BUILD_FOLDER) do
+    Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
       # add the generated JS bindings
       sh "nmake AtomicEditor"
 
