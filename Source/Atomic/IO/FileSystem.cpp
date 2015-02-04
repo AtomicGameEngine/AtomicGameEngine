@@ -399,11 +399,12 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
     if (allowedPaths_.Empty())
     {
-        if (!FileExists(fileName) && !DirExists(fileName))
-        {
-            LOGERROR("File or directory " + fileName + " not found");
-            return false;
-        }
+        if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://"))
+            if (!FileExists(fileName) && !DirExists(fileName))
+            {
+                LOGERROR("File or directory " + fileName + " not found");
+                return false;
+            }
 
         #ifdef WIN32
         bool success = (size_t)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
