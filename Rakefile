@@ -104,7 +104,7 @@ namespace :build_macosx do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       sh "make -j8 JSBind"
-      sh "./Source/Tools/JSBind/JSBind"
+      sh "./Source/Tools/JSBind/JSBind #{$RAKE_ROOT}"
     end
 
 	end
