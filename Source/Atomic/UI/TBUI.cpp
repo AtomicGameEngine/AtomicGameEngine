@@ -510,12 +510,23 @@ static bool InvokeKey(TBWidget* root, unsigned int key, SPECIAL_KEY special_key,
 
 void TBUI::HandleKey(bool keydown, int keycode, int scancode)
 {
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    if (keycode == KEY_LCTRL || keycode == KEY_RCTRL)
+        return;
+#else
     if (keycode == KEY_LGUI || keycode == KEY_RGUI)
         return;
+#endif
 
     Input* input = GetSubsystem<Input>();
     int qualifiers = input->GetQualifiers();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#else
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#endif
     MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
 
     switch (keycode)
