@@ -197,7 +197,7 @@ namespace :build_windows do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
       sh "nmake JSBind"
-      sh "./Source/Tools/JSBind/JSBind.exe"
+      sh "./Source/Tools/JSBind/JSBind.exe #{$RAKE_ROOT}"
     end
 
 	end

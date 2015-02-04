@@ -36,19 +36,11 @@ void JSBindings::ParseHeaders()
 
     //JSBClass::DumpAllClasses();
 
-#ifdef WIN32
-    EmitJSModules("C:\\Dev\\atomic\\AtomicRuntime\\Source\\Atomic\\Javascript\\Modules");
-#else
-	EmitJSModules("/Users/josh/Dev/atomic/AtomicRuntime/Source/Atomic/Javascript/Modules");
-#endif
+    EmitJSModules(JSBind::ROOT_FOLDER + "/Source/Atomic/Javascript/Modules");
+
     JSBTypeScript* ts = new JSBTypeScript();
 
-#ifdef WIN32
-    ts->Emit("C:\\Dev\\atomic\\AtomicRuntime\\Bin\\Atomic.d.ts");
-#else
-	ts->Emit("/Users/josh/Dev/atomic/AtomicRuntime/Bin/Atomic.d.ts");	
-#endif
-
+    ts->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.d.ts");
 
 }
 

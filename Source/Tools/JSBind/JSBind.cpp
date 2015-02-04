@@ -15,12 +15,7 @@ using namespace Atomic;
 SharedPtr<Context> JSBind::context_;
 SharedPtr<FileSystem> JSBind::fileSystem_;
 SharedPtr<Engine> JSBind::engine_;
-
-#ifdef WIN32
-String JSBind::ROOT_FOLDER("C:/Dev/atomic/AtomicRuntime");
-#else
-String JSBind::ROOT_FOLDER("/Users/josh/Dev/atomic/AtomicRuntime");
-#endif
+String JSBind::ROOT_FOLDER;
 
 void JSBind::Initialize()
 {
@@ -30,9 +25,24 @@ void JSBind::Initialize()
 
 }
 
+#include <stdio.h>
+
 void Run(const Vector<String>& arguments)
 {
     JSBind::Initialize();
+
+    if (arguments.Size() < 1)
+    {
+        ErrorExit("Usage: JSBind absolute_path_to_atomic_runtime_source_tree");
+    }
+
+    JSBind::ROOT_FOLDER = arguments[0];
+
+    if (!JSBind::fileSystem_->DirExists(JSBind::ROOT_FOLDER + "/Source/Tools/JSBind"))
+    {
+        ErrorExit("The given Atomic Runtime source tree is invalid");
+    }
+
     VariantMap engineParameters;
     engineParameters["Headless"] = true;
     engineParameters["WorkerThreads"] = false;
@@ -52,11 +62,7 @@ int main(int argc, char** argv)
 {
     Vector<String> arguments;
 
-#ifdef WIN32
-    arguments = ParseArguments(GetCommandLineW());
-#else
     arguments = ParseArguments(argc, argv);
-#endif
 
     Run(arguments);
     return 0;
