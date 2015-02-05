@@ -86,7 +86,7 @@ String JSBDoc::GenFunctionDoc(JSBFunction* function)
     }
     else
     {
-        docString.AppendWithFormat(" * %s\n * @memberof %s.prototype\n%s%s\n",
+        docString.AppendWithFormat(" * %s\n * @memberof Atomic.%s.prototype\n%s%s\n",
                                    function->docString_.CString(),
                                    function->class_->GetName().CString(),
                                    params.CString(),
@@ -127,12 +127,25 @@ void JSBDoc::ExportModuleClasses(const String& moduleName)
 
             JSBFunctionType* ftype = NULL;
 
+            String desc;
+
             if (prop->getter_ && !prop->getter_->Skip())
             {
+                desc = prop->getter_->docString_;
                 ftype = prop->getter_->returnType_;
             }
             else if (prop->setter_ && !prop->setter_->Skip())
+            {
                 ftype = prop->setter_->parameters_[0];
+            }
+
+            if (prop->setter_ && prop->setter_->docString_.Length())
+            {
+                // overwrite getter docstring if it exsists
+                desc = prop->setter_->docString_;
+
+            }
+
 
             if (!ftype)
                 continue;
@@ -142,7 +155,14 @@ void JSBDoc::ExportModuleClasses(const String& moduleName)
             String scriptName =  propertyNames[j];
             scriptName[0] = tolower(scriptName[0]);
 
-            source_ += " * @property {" +  scriptType + "} " + scriptName + "\n";
+            if (desc.Length())
+            {
+                source_ += " * @property {" +  scriptType + "} " + scriptName + " - " + desc + "\n";
+            }
+            else
+            {
+                source_ += " * @property {" +  scriptType + "} " + scriptName + "\n";
+            }
 
         }
 
