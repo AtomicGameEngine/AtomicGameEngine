@@ -9,6 +9,7 @@
 #include "JSBindings.h"
 #include "JSBClass.h"
 #include "JSBTypeScript.h"
+#include "JSBDoc.h"
 
 JSBindings* JSBindings::instance_ = NULL;
 
@@ -39,9 +40,10 @@ void JSBindings::ParseHeaders()
     EmitJSModules(JSBind::ROOT_FOLDER + "/Source/Atomic/Javascript/Modules");
 
     JSBTypeScript* ts = new JSBTypeScript();
-
     ts->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.d.ts");
 
+    JSBDoc* jsdoc = new JSBDoc();
+    jsdoc->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.js");
 }
 
 void JSBindings::EmitJSModules(const String& rootpath)

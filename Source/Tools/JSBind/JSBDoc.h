@@ -7,7 +7,7 @@ using namespace Atomic;
 
 class JSBFunction;
 
-class JSBTypeScript
+class JSBDoc
 {
 
     String source_;
@@ -16,7 +16,7 @@ class JSBTypeScript
 
     void End();
 
-    void ExportFunction(JSBFunction* function);
+    String GenFunctionDoc(JSBFunction* function);
 
     void ExportModuleEnums(const String& moduleName);
     void ExportModuleConstants(const String& moduleName);

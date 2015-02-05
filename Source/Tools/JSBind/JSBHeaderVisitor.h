@@ -262,7 +262,7 @@ public:
         {
             if (comment[0] == '/' && comment[1] == '/' && comment[2] == '/')
             {
-                int index = 1;
+                int index = 3;
                 while(comment[index] && comment[index] != '\n' && comment[index] != '\r')
                     jfunction->docString_ += comment[index++];
 
