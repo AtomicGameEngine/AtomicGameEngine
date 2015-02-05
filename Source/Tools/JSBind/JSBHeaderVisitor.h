@@ -21,6 +21,7 @@ class JSBHeaderVisitor : public SymbolVisitor
     JSBHeader* header_;
     JSBModule* module_;
     JSBindings* bindings_;
+    TranslationUnit* unit_;
 
     Namespace* globalNamespace_;
 
@@ -28,6 +29,7 @@ public:
 
     JSBHeaderVisitor(JSBHeader* header, TranslationUnit *unit, Namespace* globalNamespace) :
         header_(header),
+        unit_(unit),
         globalNamespace_(globalNamespace)
     {
         module_ = header_->module_;
@@ -235,6 +237,39 @@ public:
 
             }
         }
+
+        jfunction->sourceLocation_ = function->sourceLocation();
+        jfunction->fileName_ = function->fileName();
+        jfunction->sourceLine_ = function->line();
+        jfunction->sourceColumn_ = function->column();
+        //const Token &token = unit_->tokenAt(function->sourceLocation());
+        //const char* source = unit_->firstSourceChar() + token.byteOffset;
+        const char* comment = NULL;
+        for (unsigned i = 0; i < unit_->commentCount(); i++)
+        {
+            const Token &tcomment = unit_->commentAt(i);
+            unsigned line;
+            unit_->getPosition(tcomment.utf16charOffset, &line);
+
+            if (line ==  function->line() - 1)
+            {
+                comment = unit_->firstSourceChar() + tcomment.byteOffset;
+                break;
+            }
+        }
+
+        if (comment && strlen(comment) > 3)
+        {
+            if (comment[0] == '/' && comment[1] == '/' && comment[2] == '/')
+            {
+                int index = 1;
+                while(comment[index] && comment[index] != '\n' && comment[index] != '\r')
+                    jfunction->docString_ += comment[index++];
+
+            }
+
+        }
+
 
         return jfunction;
 

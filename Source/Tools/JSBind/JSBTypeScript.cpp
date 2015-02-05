@@ -64,6 +64,9 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
         scriptName[0] = tolower(scriptName[0]);
     }
 
+    if (function->docString_.Length())
+        source_ += "      " + function->docString_ + "\n";
+
     source_ += "      " + scriptName + "(";
 
     for (unsigned i = 0; i < function->parameters_.Size(); i++)

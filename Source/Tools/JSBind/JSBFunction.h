@@ -5,6 +5,7 @@
 #include <Atomic/IO/Log.h>
 #include "JSBClass.h"
 #include "JSBType.h"
+#include "JSBSymbol.h"
 
 class JSBFunctionType
 {
@@ -63,7 +64,7 @@ public:
 
 };
 
-class JSBFunction
+class JSBFunction : public JSBSymbol
 {
 public:
 
@@ -72,6 +73,7 @@ public:
     String propertyName_;
     JSBFunctionType* returnType_;
     Vector<JSBFunctionType*> parameters_;
+    String docString_;
 
     bool isConstructor_;
     bool isDestructor_;
