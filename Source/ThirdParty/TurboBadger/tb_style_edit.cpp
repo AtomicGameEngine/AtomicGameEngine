@@ -1816,7 +1816,7 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
                 {
                     block->InsertText(0, "    ", 4, false);
                     // these shouldn't be multiple undo events
-                    undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), 1, "\t", true);
+                    undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), 4, "    ", true);
                 }
 
                 if (block == selection.stop.block)
@@ -1828,19 +1828,60 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
     {
         if (!selection.IsSelected() || selection.start.block == selection.stop.block)
         {
-            if (!selection.IsSelected() && caret.pos.block)
+            TBBlock* block = caret.pos.block;
+            if (block)
             {
-                int32 start = caret.pos.block->FirstNonTabPos();
+                int32 start = block->FirstNonTabPos();
+
+                if (start > 4)
+                    start = 4;
+
                 if (start)
                 {
-                    caret.pos.block->RemoveContent(0, 1);
+                    TBStr str;
+                    for (int32 i = 0; i < start; i++)
+                    {
+                        str.Append(" ");
+                    }
+
+                    undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), start, str.CStr(), false);
+                    block->RemoveContent(0, start);
                 }
 
-            }
+                selection.SelectNothing();
+                start = block->FirstNonTabPos();
+                caret.Place(block, start);
 
+            }
         }
         else
         {
+            for (TBBlock* block = selection.start.block; block; block = block->GetNext())
+            {
+                if (block != selection.stop.block || selection.stop.ofs != 0)
+                {
+                    int32 start = block->FirstNonTabPos();
+
+                    if (start > 4)
+                        start = 4;
+
+                    if (start)
+                    {
+                        TBStr str;
+                        for (int32 i = 0; i < start; i++)
+                        {
+                            str.Append(" ");
+                        }
+
+                        // shouldn't be individual undo events
+                        undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), start, str.CStr(), false);
+                        block->RemoveContent(0, start);
+                    }
+                }
+
+                if (block == selection.stop.block)
+                    break;
+            }
         }
     }
     else if (!packed.read_only && (special_key == TB_KEY_ENTER && packed.multiline_on) && !(ctrlOrSuper))
