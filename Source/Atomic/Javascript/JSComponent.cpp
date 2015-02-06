@@ -24,6 +24,9 @@
 #include "../Javascript/JSComponent.h"
 #include "../Javascript/JSAPI.h"
 
+#include "../UI/UIEvents.h"
+#include "../UI/UIElement.h"
+
 namespace Atomic
 {
 
@@ -436,7 +439,27 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
         duk_context* ctx = vm_->GetJSContext();
         JS_HEAP_PTR function = scriptEventFunctions_[eventType];
 
-        if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
+        if (eventType == E_UIMOUSECLICK)
+        {
+            UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
+            if (clicked)
+            {
+                duk_push_heapptr(ctx, function);
+                js_push_class_object_instance(ctx, clicked);
+
+                if (duk_pcall(ctx, 1) != 0)
+                {
+                    vm_->SendJSErrorEvent();
+                }
+
+                duk_pop(ctx);
+
+            }
+
+
+        }
+
+        else if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
         {
             using namespace PhysicsBeginContact2D;
             PhysicsWorld2D* world = static_cast<PhysicsWorld2D*>(eventData[P_WORLD].GetPtr());
@@ -499,18 +522,6 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    /*
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
-
-    VariantVector parameters;
-    if (method->GetParamCount() > 0)
-    {
-        parameters.Push(Variant((void*)&eventType));
-        parameters.Push(Variant((void*)&eventData));
-    }
-
-    scriptFile_->Execute(scriptObject_, method, parameters);
-    */
 }
 
 

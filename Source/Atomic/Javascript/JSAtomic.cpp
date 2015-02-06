@@ -110,6 +110,13 @@ static int js_atomic_GetGraphics(duk_context* ctx)
     return 1;
 }
 
+static int js_atomic_GetUI(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm->GetSubsystem<UI>());
+    return 1;
+}
+
 static int js_atomic_GetInput(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -238,6 +245,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
     duk_put_prop_string(ctx, -2, "GetInput");
+
+    duk_push_c_function(ctx, js_atomic_GetUI, 0);
+    duk_put_prop_string(ctx, -2, "GetUI");
 
     duk_push_c_function(ctx, js_atomic_destroy, 1);
     duk_put_prop_string(ctx, -2, "destroy");

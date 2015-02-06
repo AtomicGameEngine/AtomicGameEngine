@@ -25,7 +25,7 @@ public:
     /// Destruct.
     virtual ~JSVM();
 
-    bool ExecuteMain();
+    bool ExecuteMain(const String& mainPath);
 
     bool ExecuteFile(JSFile* jsfile);
 

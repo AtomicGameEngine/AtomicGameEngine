@@ -1834,6 +1834,10 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
                 if (block == selection.stop.block)
                     break;
             }
+
+            if (text_change_listener)
+                text_change_listener->OnChange(this);
+
         }
     }
     else if (!packed.read_only && (modifierkeys & TB_SHIFT) && (special_key == TB_KEY_TAB && packed.multiline_on))
@@ -1896,6 +1900,9 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
                 if (block == selection.stop.block)
                     break;
             }
+            if (text_change_listener)
+                text_change_listener->OnChange(this);
+
         }
     }
     else if (!packed.read_only && (special_key == TB_KEY_ENTER && packed.multiline_on) && !(ctrlOrSuper))

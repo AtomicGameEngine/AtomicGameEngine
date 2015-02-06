@@ -398,7 +398,7 @@ void JSVM::SendJSErrorEvent()
 
 }
 
-bool JSVM::ExecuteMain()
+bool JSVM::ExecuteMain(const String &mainPath)
 {
     SharedPtr<JSFile> jsFile;
     jsFile = GetSubsystem<ResourceCache>()->GetResource<JSFile>("Scripts/main.js");
@@ -418,7 +418,7 @@ bool JSVM::ExecuteMain()
 
     source += "}\n return __main_function;\n});";
 
-    duk_push_string(jsContext_, "Main.js");
+    duk_push_string(jsContext_, mainPath.CString());
 
     if (duk_eval_raw(jsContext_, source.CString(), source.Length(),
                      DUK_COMPILE_EVAL | DUK_COMPILE_NOSOURCE | DUK_COMPILE_SAFE) != 0)

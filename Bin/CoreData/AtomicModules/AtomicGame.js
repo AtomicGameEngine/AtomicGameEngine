@@ -8,6 +8,7 @@ function Game() {
 	this.renderer = Atomic.GetRenderer();
 	this.graphics = Atomic.GetGraphics();
 	this.input = Atomic.GetInput();
+    this.ui = Atomic.GetUI();
 
     if (Atomic.platform == "Android") {
         this.renderer.reuseShadowMaps = false;
@@ -74,6 +75,12 @@ Game.prototype.createScene2D = function() {
     if (Atomic.editor) {
         var _viewport = Atomic.editor.viewport;
         viewport.rect = [_viewport.left, _viewport.top, _viewport.right, _viewport.bottom];
+
+        var width = (_viewport.right - 8) - _viewport.left;
+        var height = _viewport.bottom - _viewport.top;
+
+        this.ui.getRoot().setPosition(_viewport.left, _viewport.top);
+        this.ui.getRoot().setSize(width, height);        
     }
 
     this.renderer.setViewport(0, viewport);
@@ -100,8 +107,16 @@ Game.prototype.createScene3D = function() {
     var viewport = new Atomic.Viewport(scene, camera);
 
     if (Atomic.editor) {
+
         var _viewport = Atomic.editor.viewport;
         viewport.rect = [_viewport.left, _viewport.top, _viewport.right - 8, _viewport.bottom];
+
+        var width = (_viewport.right - 8) - _viewport.left;
+        var height = _viewport.bottom - _viewport.top;
+
+        this.ui.getRoot().setPosition(_viewport.left + width/2, _viewport.top + height/2);
+        this.ui.getRoot().setSize(width, height);        
+
     }
 
     this.renderer.setViewport(0, viewport);
