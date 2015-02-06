@@ -325,8 +325,8 @@ void TBSelection::RemoveContent()
 	styledit->BeginLockScrollbars();
 	if (start.block == stop.block)
 	{
-		if (!styledit->undoredo.applying)
-			styledit->undoredo.Commit(styledit, start.GetGlobalOfs(styledit), stop.ofs - start.ofs, start.block->str.CStr() + start.ofs, false);
+        if (!styledit->undoredo.applying)
+            styledit->undoredo.Commit(styledit, start.GetGlobalOfs(styledit), stop.ofs - start.ofs, start.block->str.CStr() + start.ofs, false);
 		start.block->RemoveContent(start.ofs, stop.ofs - start.ofs);
 	}
 	else
@@ -1701,6 +1701,8 @@ void TBStyleEdit::InsertText(const char *text, int32 len, bool after_last, bool 
 	if (len == TB_ALL_TO_TERMINATION)
 		len = strlen(text);
 
+    bool selected = selection.IsSelected();
+
 	selection.RemoveContent();
 
 	if (after_last)
@@ -1709,12 +1711,19 @@ void TBStyleEdit::InsertText(const char *text, int32 len, bool after_last, bool 
 	int32 len_inserted = caret.pos.block->InsertText(caret.pos.ofs, text, len, true);
 	if (clear_undo_redo)
 		undoredo.Clear(true, true);
-	else
-		undoredo.Commit(this, caret.GetGlobalOfs(), len_inserted, text, true);
+    else
+    {
+        TBUndoEvent* uevent = undoredo.Commit(this, caret.GetGlobalOfs(), len_inserted, text, true);
+        if (selected)
+            uevent->chain = true;
+    }
 
 	caret.Place(caret.pos.block, caret.pos.ofs + len, false);
 	caret.UpdatePos();
 	caret.UpdateWantedX();
+
+    if (selected)
+        selection.SelectNothing();
 
     if (text_change_listener)
         text_change_listener->OnChange(this);
@@ -1810,13 +1819,16 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
         }
         else
         {
+            bool chain = false;
             for (TBBlock* block = selection.start.block; block; block = block->GetNext())
             {
                 if (block != selection.stop.block || selection.stop.ofs != 0)
                 {
                     block->InsertText(0, "    ", 4, false);
-                    // these shouldn't be multiple undo events
-                    undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), 4, "    ", true);
+
+                    TBUndoEvent* uevent = undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), 4, "    ", true);
+                    uevent->chain = chain;
+                    chain = true;
                 }
 
                 if (block == selection.stop.block)
@@ -1856,6 +1868,7 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
         }
         else
         {
+            bool chain = false;
             for (TBBlock* block = selection.start.block; block; block = block->GetNext())
             {
                 if (block != selection.stop.block || selection.stop.ofs != 0)
@@ -1873,8 +1886,9 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
                             str.Append(" ");
                         }
 
-                        // shouldn't be individual undo events
-                        undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), start, str.CStr(), false);
+                        TBUndoEvent* uevent = undoredo.Commit(this, block->fragments.GetFirst()->GetGlobalOfs(), start, str.CStr(), false);
+                        uevent->chain = chain;
+                        chain = true;
                         block->RemoveContent(0, start);
                     }
                 }
@@ -2223,6 +2237,9 @@ void TBUndoRedoStack::Undo(TBStyleEdit *styledit)
 	TBUndoEvent *e = undos.Remove(undos.GetNumItems() - 1);
 	redos.Add(e);
 	Apply(styledit, e, true);
+
+    if (e->chain)
+        Undo(styledit);
 }
 
 void TBUndoRedoStack::Redo(TBStyleEdit *styledit)
@@ -2232,6 +2249,10 @@ void TBUndoRedoStack::Redo(TBStyleEdit *styledit)
 	TBUndoEvent *e = redos.Remove(redos.GetNumItems() - 1);
 	undos.Add(e);
 	Apply(styledit, e, false);
+
+    if (redos.GetNumItems())
+        if (redos[0]->chain)
+            Redo(styledit);
 }
 
 void TBUndoRedoStack::Apply(TBStyleEdit *styledit, TBUndoEvent *e, bool reverse)

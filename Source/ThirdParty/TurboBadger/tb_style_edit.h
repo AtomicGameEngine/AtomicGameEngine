@@ -253,6 +253,9 @@ public:
 	int32 gofs;
 	TBStr text;
 	bool insert;
+    bool chain;
+
+    TBUndoEvent() : gofs(0), insert(false), chain(false) {}
 };
 
 /** Keeps track of all TBUndoEvents used for undo and redo functionality. */
