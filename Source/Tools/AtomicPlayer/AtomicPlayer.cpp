@@ -129,7 +129,7 @@ void AtomicPlayer::Setup()
     engineParameters_["FullScreen"] = false;    
 #endif
     
-    scriptFileName_ = "Script/Main.js";
+    scriptFileName_ = "Scripts/main.js";
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();    
     engineParameters_["WindowTitle"] = "AtomicPlayer";

@@ -401,7 +401,7 @@ void JSVM::SendJSErrorEvent()
 bool JSVM::ExecuteMain()
 {
     SharedPtr<JSFile> jsFile;
-    jsFile = GetSubsystem<ResourceCache>()->GetResource<JSFile>("Script/Main.js");
+    jsFile = GetSubsystem<ResourceCache>()->GetResource<JSFile>("Scripts/main.js");
     if (jsFile.Null())
         return false;
 
