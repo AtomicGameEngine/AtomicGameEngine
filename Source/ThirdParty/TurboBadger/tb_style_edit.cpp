@@ -2144,6 +2144,25 @@ void TBStyleEdit::SetWrapping(bool wrapping)
 	Reformat(false);
 }
 
+int32 TBStyleEdit::GetCaretLine()
+{
+    int line = 0;
+    TBBlock *block = NULL;
+    TBTextFragment* frag = caret.GetFragment();
+    if (!frag)
+        return 0;
+
+    for (block = blocks.GetFirst(); block; block = block->GetNext())
+    {
+        if (frag->block == block)
+            return line;
+        line++;
+    }
+
+    return 0;
+
+}
+
 // == TBUndoRedoStack ==================================================
 
 TBUndoRedoStack::~TBUndoRedoStack()

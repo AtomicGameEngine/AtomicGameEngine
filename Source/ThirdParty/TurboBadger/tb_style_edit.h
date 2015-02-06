@@ -400,6 +400,7 @@ public:
 	void InsertBreak();
 
 	TBBlock *FindBlock(int32 y) const;
+    int32 GetCaretLine();
 
 	void ScrollIfNeeded(bool x = true, bool y = true);
 	void SetScrollPos(int32 x, int32 y);

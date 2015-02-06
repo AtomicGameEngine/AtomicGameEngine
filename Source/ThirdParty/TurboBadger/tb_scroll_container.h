@@ -69,6 +69,8 @@ public:
 	void SetAdaptContentSize(bool adapt);
 	bool GetAdaptContentSize() { return m_adapt_content_size; }
 
+    void SetIgnoreScrollEvents(bool ignore) { m_ignore_scroll_events = ignore; }
+
 	void SetScrollMode(SCROLL_MODE mode);
 	SCROLL_MODE GetScrollMode() { return m_mode; }
 
@@ -94,6 +96,7 @@ protected:
 	bool m_adapt_to_content_size;
 	bool m_adapt_content_size;
 	bool m_layout_is_invalid;
+    bool m_ignore_scroll_events;
 	SCROLL_MODE m_mode;
 	void ValidateLayout(const SizeConstraints &constraints);
 };

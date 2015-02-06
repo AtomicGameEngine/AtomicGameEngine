@@ -214,8 +214,8 @@ bool TBScrollContainer::OnEvent(const TBWidgetEvent &ev)
 		Invalidate();
 		OnScroll(m_scrollbar_x.GetValue(), m_scrollbar_y.GetValue());
 		return true;
-	}
-	else if (ev.type == EVENT_TYPE_WHEEL && ev.modifierkeys == TB_MODIFIER_NONE)
+	}    
+    else if (ev.type == EVENT_TYPE_WHEEL && ev.modifierkeys == TB_MODIFIER_NONE && !m_ignore_scroll_events)
 	{
 		double old_val_y = m_scrollbar_y.GetValueDouble();
 		m_scrollbar_y.SetValueDouble(old_val_y + ev.delta_y * TBSystem::GetPixelsPerLine());
@@ -223,7 +223,7 @@ bool TBScrollContainer::OnEvent(const TBWidgetEvent &ev)
 		m_scrollbar_x.SetValueDouble(old_val_x + ev.delta_x * TBSystem::GetPixelsPerLine());
 		return (m_scrollbar_x.GetValueDouble() != old_val_x || m_scrollbar_y.GetValueDouble() != old_val_y);
 	}
-	else if (ev.type == EVENT_TYPE_KEY_DOWN)
+    else if (ev.type == EVENT_TYPE_KEY_DOWN && !m_ignore_scroll_events)
 	{
 		if (ev.special_key == TB_KEY_LEFT && m_scrollbar_x.CanScrollNegative())
 			ScrollBySmooth(-TBSystem::GetPixelsPerLine(), 0);
