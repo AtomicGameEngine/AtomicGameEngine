@@ -1944,10 +1944,15 @@ bool TBStyleEdit::MouseDown(const TBPoint &point, int button, int clicks, MODIFI
 	}
 	else if (packed.selection_on)
 	{
-		//if (modifierkeys & P_SHIFT) // Select to new caretpos
-		//{
-		//}
-		//else // Start selection
+        if (modifierkeys & TB_SHIFT) // Select to new caretpos
+        {
+            mousedown_fragment = nullptr;
+            mousedown_point = TBPoint(point.x + scroll_x, point.y + scroll_y);
+            TBTextOfs old_caret_pos = caret.pos;
+            caret.Place(mousedown_point);
+            selection.SelectToCaret(old_caret_pos.block, old_caret_pos.ofs);
+        }
+        else // Start selection
 		{
 			mousedown_point = TBPoint(point.x + scroll_x, point.y + scroll_y);
 			selection.SelectNothing();

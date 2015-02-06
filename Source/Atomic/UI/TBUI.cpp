@@ -49,6 +49,26 @@ namespace Atomic
 
 extern const char* UI_CATEGORY;
 
+static MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
+{
+    MODIFIER_KEYS code = TB_MODIFIER_NONE;
+    if (qualifiers & QUAL_ALT)	code |= TB_ALT;
+    if (qualifiers & QUAL_CTRL)	code |= TB_CTRL;
+    if (qualifiers & QUAL_SHIFT)	code |= TB_SHIFT;
+    if (superKey)	code |= TB_SUPER;
+    return code;
+}
+
+
+// @return Return the upper case of a ascii charcter. Only for shortcut handling.
+static int toupr_ascii(int ascii)
+{
+    if (ascii >= 'a' && ascii <= 'z')
+        return ascii + 'A' - 'a';
+    return ascii;
+}
+
+
 class TBUIRenderer;
 
 class TBUIBitmap : public tb::TBBitmap
@@ -353,6 +373,18 @@ void TBUI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     IntVector2 pos;
     pos = GetSubsystem<UI>()->GetCursorPosition();
 
+    Input* input = GetSubsystem<Input>();
+    int qualifiers = input->GetQualifiers();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#else
+    bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#endif
+
+    MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
+
+
     static double last_time = 0;
     static int counter = 1;
 
@@ -366,9 +398,9 @@ void TBUI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
     last_time = time;
     if (button == MOUSEB_RIGHT)
-        rootWidget_->InvokeRightPointerDown(pos.x_, pos.y_, counter, tb::TB_MODIFIER_NONE);
+        rootWidget_->InvokeRightPointerDown(pos.x_, pos.y_, counter, mod);
     else
-        rootWidget_->InvokePointerDown(pos.x_, pos.y_, counter, tb::TB_MODIFIER_NONE, false);
+        rootWidget_->InvokePointerDown(pos.x_, pos.y_, counter, mod, false);
 
 
 }
@@ -384,11 +416,22 @@ void TBUI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 
     IntVector2 pos;
     pos = GetSubsystem<UI>()->GetCursorPosition();
+    Input* input = GetSubsystem<Input>();
+    int qualifiers = input->GetQualifiers();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#else
+    bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#endif
+
+    MODIFIER_KEYS mod = GetModifierKeys(qualifiers, superdown);
+
 
     if (button == MOUSEB_RIGHT)
-        rootWidget_->InvokeRightPointerUp(pos.x_, pos.y_, tb::TB_MODIFIER_NONE);
+        rootWidget_->InvokeRightPointerUp(pos.x_, pos.y_, mod);
     else
-        rootWidget_->InvokePointerUp(pos.x_, pos.y_, tb::TB_MODIFIER_NONE, false);
+        rootWidget_->InvokePointerUp(pos.x_, pos.y_, mod, false);
 }
 
 
@@ -420,25 +463,6 @@ void TBUI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
     rootWidget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, delta > 0 ? -1 : 1, tb::TB_MODIFIER_NONE);
 
-}
-
-static MODIFIER_KEYS GetModifierKeys(int qualifiers, bool superKey)
-{
-    MODIFIER_KEYS code = TB_MODIFIER_NONE;
-    if (qualifiers & QUAL_ALT)	code |= TB_ALT;
-    if (qualifiers & QUAL_CTRL)	code |= TB_CTRL;
-    if (qualifiers & QUAL_SHIFT)	code |= TB_SHIFT;
-    if (superKey)	code |= TB_SUPER;
-    return code;
-}
-
-
-// @return Return the upper case of a ascii charcter. Only for shortcut handling.
-static int toupr_ascii(int ascii)
-{
-    if (ascii >= 'a' && ascii <= 'z')
-        return ascii + 'A' - 'a';
-    return ascii;
 }
 
 static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool down)
