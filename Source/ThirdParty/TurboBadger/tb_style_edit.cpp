@@ -501,8 +501,13 @@ bool TBCaret::Move(bool forward, bool word)
 			{
 				while (pos.ofs < len && !is_wordbreak(str[pos.ofs]))
 					pos.ofs++;
-				while (pos.ofs < len && is_space(str[pos.ofs]))
-					pos.ofs++;
+
+                // This is causing trailing space to be selected
+                // on double click of text fragment
+                // I seem to remember disabling this once before
+                // and having an issue, so leaving it here for reference
+                //while (pos.ofs < len && is_space(str[pos.ofs]))
+                    //pos.ofs++;
 			}
 		}
 		else if (pos.ofs > 0)
