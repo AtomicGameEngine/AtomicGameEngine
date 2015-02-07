@@ -250,6 +250,11 @@ void Batch::Prepare(View* view, bool setModelTransform, bool allowDepthWrite) co
                 graphics->SetShaderParameter(VSP_BILLBOARDROT, cameraNode->GetWorldRotation().RotationMatrix());
         }
     }
+
+    if (lightmapTilingOffset_)
+    {
+        graphics->SetShaderParameter(VSP_LMOFFSET, *lightmapTilingOffset_);
+    }
     
     // Set zone-related shader parameters
     BlendMode blend = graphics->GetBlendMode();
