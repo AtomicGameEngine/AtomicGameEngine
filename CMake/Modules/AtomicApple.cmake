@@ -2,7 +2,7 @@
 include (BundleUtilities)
 include(AtomicDesktop)
 
-add_definitions(-DATOMIC_PLATFORM_OSX -DATOMIC_OPENGL)
+add_definitions(-DATOMIC_PLATFORM_OSX -DATOMIC_OPENGL -DKNET_UNIX)
 
 list (APPEND ATOMIC_LINK_LIBRARIES GLEW)
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,6 +104,16 @@ void StaticSprite2D::SetColor(const Color& color)
         return;
 
     color_ = color;
+    verticesDirty_ = true;
+    MarkNetworkUpdate();
+}
+
+void StaticSprite2D::SetAlpha(float alpha)
+{
+    if (alpha == color_.a_)
+        return;
+
+    color_.a_ = alpha;
     verticesDirty_ = true;
     MarkNetworkUpdate();
 }

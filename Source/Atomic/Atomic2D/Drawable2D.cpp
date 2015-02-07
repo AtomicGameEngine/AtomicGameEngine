@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,7 @@ Drawable2D::Drawable2D(Context* context) :
     layer_(0),
     orderInLayer_(0),
     blendMode_(BLEND_ALPHA),
-    verticesDirty_(true),
-    visibility_(true)
+    verticesDirty_(true)
 {
 }
 
@@ -182,9 +181,7 @@ void Drawable2D::OnNodeSet(Node* node)
         Scene* scene = GetScene();
         if (scene)
         {
-            if (renderer_.Null())
-                renderer_ = scene->GetOrCreateComponent<Renderer2D>();
-
+            renderer_ = scene->GetOrCreateComponent<Renderer2D>();
             if (IsEnabledEffective())
                 renderer_->AddDrawable(this);
         }

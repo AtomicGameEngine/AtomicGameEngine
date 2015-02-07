@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1079,9 +1079,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             
             bool success = vs->Create();
             if (success)
-            {
-                //LOGDEBUG("Compiled vertex shader " + vs->GetFullName());
-            }
+                LOGDEBUG("Compiled vertex shader " + vs->GetFullName());
             else
             {
                 LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
@@ -1148,7 +1146,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             SharedPtr<ShaderProgram> newProgram(new ShaderProgram(this, vs, ps));
             if (newProgram->Link())
             {
-                //LOGDEBUG("Linked vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName());
+                LOGDEBUG("Linked vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName());
                 // Note: Link() calls glUseProgram() to set the texture sampler uniforms,
                 // so it is not necessary to call it again
                 shaderProgram_ = newProgram;
@@ -1412,7 +1410,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
         return false;
 }
 
-bool Graphics::HasShaderParameter(ShaderType type, StringHash param)
+bool Graphics::HasShaderParameter(StringHash param)
 {
     return shaderProgram_ && shaderProgram_->HasParameter(param);
 }
@@ -1485,8 +1483,12 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             if (glType != textureTypes_[index])
             {
                 if (textureTypes_[index])
+                {
+                    if (textures_[index])
+                        glBindTexture(textureTypes_[index], 0);
                     glDisable(textureTypes_[index]);
-                
+                }
+
                 glEnable(glType);
                 textureTypes_[index] = glType;
             }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -158,7 +158,7 @@ public:
     /// Check whether a shader parameter group needs update. Does not actually check whether parameters exist in the shaders.
     bool NeedParameterUpdate(ShaderParameterGroup group, const void* source);
     /// Check whether a shader parameter exists on the currently set shaders.
-    bool HasShaderParameter(ShaderType type, StringHash param);
+    bool HasShaderParameter(StringHash param);
     /// Check whether the current pixel shader uses a texture unit.
     bool HasTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter source group.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ namespace Atomic
 {
 
 /// Physics world is about to be stepped.
-EVENT(E_PHYSICSPRESTEP2D, Physics2DPreStep2D)
+EVENT(E_PHYSICSPRESTEP2D, PhysicsPreStep2D)
 {
     PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
     PARAM(P_TIMESTEP, TimeStep);            // float

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -285,7 +285,7 @@ bool ParticleEffect2D::Save(Serializer& dest) const
     WriteFloat(rootElem, "rotationEnd", rotationEnd_);
     WriteFloat(rootElem, "rotationEndVariance", rotationEndVariance_);
 
-	return xmlFile.Save(dest);
+    return xmlFile.Save(dest);
 }
 
 void ParticleEffect2D::SetSprite(Sprite2D* sprite)
@@ -487,30 +487,30 @@ Vector2 ParticleEffect2D::ReadVector2(const XMLElement& element, const String& n
 
 void ParticleEffect2D::WriteInt(XMLElement& element, const String& name, int value) const
 {
-	XMLElement child = element.CreateChild(name);
-	child.SetInt("value", value);
+    XMLElement child = element.CreateChild(name);
+    child.SetInt("value", value);
 }
 
 void ParticleEffect2D::WriteFloat(XMLElement& element, const String& name, float value) const
 {
-	XMLElement child = element.CreateChild(name);
-	child.SetFloat("value", value);
+    XMLElement child = element.CreateChild(name);
+    child.SetFloat("value", value);
 }
 
 void ParticleEffect2D::WriteColor(XMLElement& element, const String& name, const Color& color) const
 {
-	XMLElement child = element.CreateChild(name);
-	child.SetFloat("red", color.r_);
-	child.SetFloat("green", color.g_);
-	child.SetFloat("blue", color.b_);
-	child.SetFloat("alpha", color.a_);
+    XMLElement child = element.CreateChild(name);
+    child.SetFloat("red", color.r_);
+    child.SetFloat("green", color.g_);
+    child.SetFloat("blue", color.b_);
+    child.SetFloat("alpha", color.a_);
 }
 
 void ParticleEffect2D::WriteVector2(XMLElement& element,const String& name,const Vector2& value) const
 {
-	XMLElement child = element.CreateChild(name);
-	child.SetFloat("x", value.x_);
-	child.SetFloat("y", value.y_);
+    XMLElement child = element.CreateChild(name);
+    child.SetFloat("x", value.x_);
+    child.SetFloat("y", value.y_);
 }
 
 }

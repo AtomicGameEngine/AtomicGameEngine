@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,11 +31,14 @@ class Drawable2D;
 class IndexBuffer;
 class Material;
 class VertexBuffer;
+struct FrameInfo;
 
 /// 2D renderer components.
 class ATOMIC_API Renderer2D : public Drawable
 {
     OBJECT(Renderer2D);
+
+    friend void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex);
 
 public:
     /// Construct.
@@ -91,18 +94,20 @@ private:
     PODVector<Drawable2D*> materialDirtyDrawables_;
     /// Order dirty.
     bool orderDirty_;
-    /// Materials.
-    Vector<SharedPtr<Material> > materials_;
-    /// Geometries.
+    /// View frameinfo for current frame.
+    FrameInfo frame_;
+    /// Used geometry count. Shared by all views and reset when a new frame begins.
+    unsigned geometryCount_;
+    /// Vertex count by view.
+    HashMap<Camera*, unsigned> vertexCount_;
+    /// Index count by view.
+    HashMap<Camera*, unsigned> indexCount_;
+    /// Geometries used in all views.
     Vector<SharedPtr<Geometry> > geometries_;
     /// Frustum for current frame.
     const Frustum* frustum_;
     /// Frustum bounding box for current frame.
     BoundingBox frustumBoundingBox_;
-    /// Total index count for the current frame.
-    unsigned indexCount_;
-    /// Total vertex count for the current frame.
-    unsigned vertexCount_;
     /// Cached materials.
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
 
