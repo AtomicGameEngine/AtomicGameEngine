@@ -73,6 +73,10 @@ public:
     View* GetView() const;
     /// Return rectangle.
     const IntRect& GetRect() const { return rect_; }
+    /// Return the viewport width
+    int GetWidth () const { return rect_.Width(); }
+    /// Return the viewport height
+    int GetHeight () const { return rect_.Height(); }
     /// Return rendering path.
     RenderPath* GetRenderPath() const;
     /// Return whether to draw debug geometry.
