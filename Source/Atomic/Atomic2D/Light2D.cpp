@@ -435,6 +435,7 @@ void Light2DGroup::RegisterObject(Context* context)
 
 void Light2DGroup::OnNodeSet(Node* node)
 {
+    // Do not call Drawable2D::OnNodeSet(node)
 
     if (node)
     {
@@ -447,9 +448,22 @@ void Light2DGroup::OnNodeSet(Node* node)
         if (light2DMaterial_.Null())
             CreateLight2DMaterial();
 
-    }
+        Scene* scene = GetScene();
+        if (scene)
+        {
+            if (IsEnabledEffective())
+                renderer_->AddDrawable(this);
+        }
 
-    Drawable2D::OnNodeSet(node);
+        node->AddListener(this);
+
+
+    }
+    else
+    {
+        if (renderer_)
+            renderer_->RemoveDrawable(this);
+    }
 
 }
 
