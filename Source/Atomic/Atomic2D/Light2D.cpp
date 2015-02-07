@@ -593,7 +593,7 @@ void Light2DGroup::CreateLight2DMaterial()
     RenderTargetInfo ntarget;
     ntarget.enabled_ = true;
     ntarget.name_ = "light2dtarget";
-    ntarget.tag_ = "light2d";
+    ntarget.tag_ = "Light2D";
     ntarget.format_ = Graphics::GetRGBAFormat();
     ntarget.sizeMode_ = SIZE_VIEWPORTDIVISOR;
     ntarget.size_ = Vector2(4, 4);
@@ -644,6 +644,7 @@ void Light2DGroup::CreateLight2DMaterial()
     Technique* tech = new Technique(context_);
     Pass* pass = tech->CreatePass(PASS_LIGHT2D);
     pass->SetBlendMode(BLEND_ADDALPHA);
+    pass->SetDepthTestMode(CMP_ALWAYS);
 
     pass->SetVertexShader("Light2D");
     pass->SetPixelShader("Light2D");
