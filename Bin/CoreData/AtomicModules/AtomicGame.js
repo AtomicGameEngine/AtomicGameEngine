@@ -3,12 +3,12 @@ Atomic.editor = null;
 
 function Game() {
 
-	this.engine = Atomic.GetEngine();
-	this.cache = Atomic.GetResourceCache();	
-	this.renderer = Atomic.GetRenderer();
-	this.graphics = Atomic.GetGraphics();
-	this.input = Atomic.GetInput();
-    this.ui = Atomic.GetUI();
+	this.engine = Atomic.getEngine();
+	this.cache = Atomic.getResourceCache();	
+	this.renderer = Atomic.getRenderer();
+	this.graphics = Atomic.getGraphics();
+	this.input = Atomic.getInput();
+    this.ui = Atomic.getUI();
 
     if (Atomic.platform == "Android") {
         this.renderer.reuseShadowMaps = false;
@@ -19,12 +19,13 @@ function Game() {
 
 Game.prototype.init = function(start, update) {
 
-	this.start = start;
 	this.update = update;
 
-	// register globals to get at quickly
-	__js_atomicgame_start = start;
+	// register global to get at quickly
 	__js_atomicgame_update = update;
+
+    if (typeof(start) === "function")
+        start();
 
 }
 

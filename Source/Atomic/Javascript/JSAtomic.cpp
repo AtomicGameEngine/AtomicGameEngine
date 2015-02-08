@@ -250,22 +250,22 @@ void jsapi_init_atomic(JSVM* vm)
     duk_pop(ctx);
 
     duk_push_c_function(ctx, js_atomic_GetEngine, 0);
-    duk_put_prop_string(ctx, -2, "GetEngine");
+    duk_put_prop_string(ctx, -2, "getEngine");
 
     duk_push_c_function(ctx, js_atomic_GetGraphics, 0);
-    duk_put_prop_string(ctx, -2, "GetGraphics");
+    duk_put_prop_string(ctx, -2, "getGraphics");
 
     duk_push_c_function(ctx, js_atomic_GetRenderer, 0);
-    duk_put_prop_string(ctx, -2, "GetRenderer");
+    duk_put_prop_string(ctx, -2, "getRenderer");
 
     duk_push_c_function(ctx, js_atomic_GetResourceCache, 0);
-    duk_put_prop_string(ctx, -2, "GetResourceCache");
+    duk_put_prop_string(ctx, -2, "getResourceCache");
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
-    duk_put_prop_string(ctx, -2, "GetInput");
+    duk_put_prop_string(ctx, -2, "getInput");
 
     duk_push_c_function(ctx, js_atomic_GetUI, 0);
-    duk_put_prop_string(ctx, -2, "GetUI");
+    duk_put_prop_string(ctx, -2, "getUI");
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");

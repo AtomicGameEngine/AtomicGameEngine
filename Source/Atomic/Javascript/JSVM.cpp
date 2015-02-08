@@ -378,6 +378,9 @@ bool JSVM::ExecuteScript(const String& scriptPath)
     if (!path.StartsWith("Scripts/"))
         path = "Scripts/" + path;
 
+    if (!path.EndsWith(".js"))
+        path += ".js";
+
     SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile(path));
 
     if (file.Null())
@@ -457,7 +460,6 @@ bool JSVM::ExecuteMain()
 
     duk_pop(ctx_);
 
-    ExecuteFunction("__js_atomicgame_start");
     return true;
 }
 
