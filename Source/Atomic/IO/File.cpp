@@ -92,6 +92,7 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     writeSyncNeeded_(false)
 {
     Open(fileName, mode);
+    fullPath_ = fileName;
 }
 
 File::File(Context* context, PackageFile* package, const String& fileName) :

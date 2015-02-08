@@ -14,7 +14,6 @@
 #include "../Resource/ResourceCache.h"
 
 #include "../Javascript/JSEvents.h"
-#include "../Javascript/JSFile.h"
 #include "../Javascript/JSVM.h"
 #include "../Javascript/JSAtomic.h"
 
@@ -25,34 +24,34 @@ JSVM* JSVM::instance_ = NULL;
 
 JSVM::JSVM(Context* context) :
     Object(context),
-    jsContext_(0),
+    ctx_(0),
     gcTime_(0.0f)
 {
     assert(!instance_);
 
     instance_ = this;
 
-    jsContext_ = duk_create_heap_default();
+    ctx_ = duk_create_heap_default();
 
     // create root Atomic Object
-    duk_push_global_object(jsContext_);
-    duk_push_object(jsContext_);
-    duk_put_prop_string(jsContext_, -2, "Atomic");
-    duk_pop(jsContext_);
+    duk_push_global_object(ctx_);
+    duk_push_object(ctx_);
+    duk_put_prop_string(ctx_, -2, "Atomic");
+    duk_pop(ctx_);
 
-    duk_push_global_stash(jsContext_);
-    duk_push_object(jsContext_);
-    duk_put_prop_index(jsContext_, -2, JS_GLOBALSTASH_INDEX_COMPONENTS);
-    duk_pop(jsContext_);
+    duk_push_global_stash(ctx_);
+    duk_push_object(ctx_);
+    duk_put_prop_index(ctx_, -2, JS_GLOBALSTASH_INDEX_COMPONENTS);
+    duk_pop(ctx_);
 
-    duk_get_global_string(jsContext_, "Duktape");
-    duk_push_c_function(jsContext_, js_module_search, 1);
-    duk_put_prop_string(jsContext_, -2, "modSearch");
-    duk_pop(jsContext_);
+    duk_get_global_string(ctx_, "Duktape");
+    duk_push_c_function(ctx_, js_module_search, 1);
+    duk_put_prop_string(ctx_, -2, "modSearch");
+    duk_pop(ctx_);
 
     jsapi_init_atomic(this);
 
-    InitScripts();
+    InitComponents();
 
     // handle this elsewhere?
     SubscribeToEvents();
@@ -60,7 +59,7 @@ JSVM::JSVM(Context* context) :
 
 JSVM::~JSVM()
 {
-    duk_destroy_heap(jsContext_);
+    duk_destroy_heap(ctx_);
     instance_ = NULL;
 }
 
@@ -88,39 +87,39 @@ void JSVM::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // see duktape docs
         // also ensure #define DUK_OPT_NO_VOLUNTARY_GC
         // is enabled in duktape.h
-        duk_gc(jsContext_, 0);
-        duk_gc(jsContext_, 0);
+        duk_gc(ctx_, 0);
+        duk_gc(ctx_, 0);
 
         gcTime_ = 0;
 
     }
 
-    duk_get_global_string(jsContext_, "__js_atomicgame_update");
+    duk_get_global_string(ctx_, "__js_atomicgame_update");
 
-    if (duk_is_function(jsContext_, -1))
+    if (duk_is_function(ctx_, -1))
     {
-        duk_push_number(jsContext_, timeStep);
-        duk_pcall(jsContext_, 1);
-        duk_pop(jsContext_);
+        duk_push_number(ctx_, timeStep);
+        duk_pcall(ctx_, 1);
+        duk_pop(ctx_);
     }
 
     else
     {
-        duk_pop(jsContext_);
+        duk_pop(ctx_);
     }
 }
 
 bool JSVM::ExecuteFunction(const String& functionName)
 {
-    duk_get_global_string(jsContext_, functionName.CString());
-    if (duk_is_function(jsContext_, -1))
+    duk_get_global_string(ctx_, functionName.CString());
+    if (duk_is_function(ctx_, -1))
     {
         bool ok = true;
 
-        if (duk_pcall(jsContext_, 0) != 0)
+        if (duk_pcall(ctx_, 0) != 0)
         {
             ok = false;
-            if (duk_is_object(jsContext_, -1))
+            if (duk_is_object(ctx_, -1))
             {
                 SendJSErrorEvent();
             }
@@ -130,13 +129,13 @@ bool JSVM::ExecuteFunction(const String& functionName)
             }
                     }
 
-        duk_pop(jsContext_);
+        duk_pop(ctx_);
         return ok;
 
     }
     else
     {
-        duk_pop(jsContext_);
+        duk_pop(ctx_);
     }
 
     return false;
@@ -147,7 +146,7 @@ void JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
 {
     String source = "(function() {\n function __component_function(self) {\n";
 
-    source += csource;
+    source += csource.CString();
 
     source += "self.node.components = self.node.components || {};\n";
 
@@ -171,27 +170,27 @@ void JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
 
     source += "}\n return __component_function;\n});";
 
-    duk_push_string(jsContext_, jsfilename.CString());
+    duk_push_string(ctx_, jsfilename.CString());
 
-    if (duk_eval_raw(jsContext_, source.CString(), source.Length(),
+    if (duk_eval_raw(ctx_, source.CString(), source.Length(),
                      DUK_COMPILE_EVAL | DUK_COMPILE_NOSOURCE | DUK_COMPILE_SAFE) != 0)
     {
-        if (duk_is_object(jsContext_, -1))
+        if (duk_is_object(ctx_, -1))
         {
             SendJSErrorEvent();
-            duk_pop(jsContext_);
+            duk_pop(ctx_);
         }
         else
         {
             assert(0);
         }
     }
-    else if (duk_pcall(jsContext_, 0) != 0)
+    else if (duk_pcall(ctx_, 0) != 0)
     {
-        if (duk_is_object(jsContext_, -1))
+        if (duk_is_object(ctx_, -1))
         {
             SendJSErrorEvent();
-            duk_pop(jsContext_);
+            duk_pop(ctx_);
         }
         else
         {
@@ -200,22 +199,22 @@ void JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
     }
     else
     {
-        if (!duk_is_function(jsContext_, -1))
+        if (!duk_is_function(ctx_, -1))
         {
-            const char* error = duk_to_string(jsContext_, -1);
+            const char* error = duk_to_string(ctx_, -1);
             assert(false);
         }
 
-        duk_put_prop_string(jsContext_, -2, cname.CString());
+        duk_put_prop_string(ctx_, -2, cname.CString());
     }
 }
 
-void JSVM::InitPackageScripts()
+void JSVM::InitPackageComponents()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    duk_push_global_stash(jsContext_);
-    duk_get_prop_index(jsContext_, -1, JS_GLOBALSTASH_INDEX_COMPONENTS);
+    duk_push_global_stash(ctx_);
+    duk_get_prop_index(ctx_, -1, JS_GLOBALSTASH_INDEX_COMPONENTS);
 
     const Vector<SharedPtr<PackageFile> >& packageFiles = cache->GetPackageFiles();
 
@@ -233,34 +232,34 @@ void JSVM::InitPackageScripts()
             String cname = GetFileName(name);
             String jsname = name;
 
-            JSFile* jsfile = cache->GetResource<JSFile>(name);
-            String csource = jsfile->GetSource();
-
+            SharedPtr<File> jsfile(cache->GetFile(name));
+            String csource;
+            jsfile->ReadText(csource);
             GenerateComponent(cname, jsname, csource);
 
         }
     }
 
     // pop stash and component object
-    duk_pop_2(jsContext_);
+    duk_pop_2(ctx_);
 
 }
 
-void JSVM::InitScripts()
+void JSVM::InitComponents()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     if (cache->GetPackageFiles().Size())
     {
-        InitPackageScripts();
+        InitPackageComponents();
         return;
     }
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     const Vector<String>& dirs = cache->GetResourceDirs();
 
-    duk_push_global_stash(jsContext_);
-    duk_get_prop_index(jsContext_, -1, JS_GLOBALSTASH_INDEX_COMPONENTS);
+    duk_push_global_stash(ctx_);
+    duk_get_prop_index(ctx_, -1, JS_GLOBALSTASH_INDEX_COMPONENTS);
 
     for (unsigned i = 0; i < dirs.Size(); i++)
     {
@@ -273,9 +272,10 @@ void JSVM::InitScripts()
             String cname = GetFileName(files[j]);
             String jsname = dirs[i]+"Components/" + files[j];
 
-            JSFile* jsfile = cache->GetResource<JSFile>("Components/" + files[j]);
+            SharedPtr<File> jsfile = cache->GetFile("Components/" + files[j]);
 
-            String csource = jsfile->GetSource();
+            String csource;
+            jsfile->ReadText(csource);
 
             GenerateComponent(cname, jsname, csource);
 
@@ -284,26 +284,8 @@ void JSVM::InitScripts()
     }
 
     // pop stash and component object
-    duk_pop_2(jsContext_);
+    duk_pop_2(ctx_);
 
-}
-
-bool JSVM::ExecuteFile(JSFile* jsfile)
-{
-    PROFILE(ExecuteFile);
-
-    bool ok = true;
-
-    if (duk_peval_string(jsContext_, jsfile->GetSource()) != 0)
-    {
-        ok = false;
-        printf("Error: %s\n", duk_safe_to_string(jsContext_, -1));
-    }
-
-    // ignore result
-    duk_pop(jsContext_);
-
-    return ok;
 }
 
 int JSVM::js_module_search(duk_context* ctx)
@@ -333,36 +315,21 @@ int JSVM::js_module_search(duk_context* ctx)
         path = vm->moduleSearchPath_ + "/" + path + ".js";
     }
 
-    JSFile* jsfile = cache->GetResource<JSFile>(path);
+    SharedPtr<File> jsfile(cache->GetFile(path));
+
     if (!jsfile)
     {
         duk_push_null(ctx);
     }
     else
     {
-        duk_push_string(ctx, jsfile->GetSource());
+        String source;
+        jsfile->ReadText(source);
+        duk_push_string(ctx, source.CString());
     }
 
     return 1;
 }
-
-/*
-name	standard	Name of error, e.g. TypeError, inherited
-message	standard	Optional message of error, own property, empty message inherited if absent
-fileName	Rhino	Filename related to error source, inherited accessor
-lineNumber	Rhino	Linenumber related to error source, inherited accessor
-stack	V8	Traceback as a multi-line human redable string, inherited accessor
-
-
-EVENT(E_JSERROR, JSError)
-{
-    PARAM(P_ERRORNAME, ErrorName); // string
-    PARAM(P_ERRORMESSAGE, ErrorMessage); // string
-    PARAM(P_ERRORFILENAME, ErrorFileName); // string
-    PARAM(P_ERRORLINENUMBER, ErrorLineNumber); // int
-    PARAM(P_ERRORSTACK, ErrorStack); // string
-}
-*/
 
 void JSVM::SendJSErrorEvent()
 {
@@ -374,7 +341,8 @@ void JSVM::SendJSErrorEvent()
     VariantMap eventData;
 
     duk_get_prop_string(ctx, -1, "fileName");
-    eventData[P_ERRORFILENAME] = duk_to_string(ctx, -1);
+    String filename = duk_to_string(ctx, -1);
+    eventData[P_ERRORFILENAME] = filename;
 
     // Component script are wrapped within a closure, the line number
     // needs to be offset by this header
@@ -384,133 +352,113 @@ void JSVM::SendJSErrorEvent()
     eventData[P_ERRORLINENUMBER] =  lineNumber;
 
     duk_get_prop_string(ctx, -3, "name");
-    eventData[P_ERRORNAME] = duk_to_string(ctx, -1);
+    String name = duk_to_string(ctx, -1);
+    eventData[P_ERRORNAME] = name;
 
     duk_get_prop_string(ctx, -4, "message");
-    eventData[P_ERRORMESSAGE] = duk_to_string(ctx, -1);
+    String message = duk_to_string(ctx, -1);
+    eventData[P_ERRORMESSAGE] = message;
 
     duk_get_prop_string(ctx, -5, "stack");
-    eventData[P_ERRORSTACK] = duk_to_string(ctx, -1);
+    String stack = duk_to_string(ctx, -1);
+    eventData[P_ERRORSTACK] = stack;
 
     duk_pop_n(ctx, 5);
+
+    LOGERRORF("JSErrorEvent: %s : Line %i\n Name: %s\n Message: %s\n Stack:%s",
+              filename.CString(), lineNumber, name.CString(), message.CString(), stack.CString());
 
     SendEvent(E_JSERROR, eventData);
 
 }
 
-bool JSVM::ExecuteMain(const String &mainPath)
+bool JSVM::ExecuteScript(const String& scriptPath)
 {
-    SharedPtr<JSFile> jsFile;
-    jsFile = GetSubsystem<ResourceCache>()->GetResource<JSFile>("Scripts/main.js");
-    if (jsFile.Null())
-        return false;
+    String path = scriptPath;
+    if (!path.StartsWith("Scripts/"))
+        path = "Scripts/" + path;
 
-    int top = duk_get_top(jsContext_);
+    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile(path));
 
-    // wrap in a closure
-    String source = "(function() {\n function __main_function(self) {\n";
-
-    source += "require(\"AtomicGame\");\n";
-
-    source += jsFile->GetSource();
-
-    source += "\nAtomic.game.init(Start, Update);\n";
-
-    source += "}\n return __main_function;\n});";
-
-    duk_push_string(jsContext_, mainPath.CString());
-
-    if (duk_eval_raw(jsContext_, source.CString(), source.Length(),
-                     DUK_COMPILE_EVAL | DUK_COMPILE_NOSOURCE | DUK_COMPILE_SAFE) != 0)
+    if (file.Null())
     {
-        if (duk_is_object(jsContext_, -1))
-        {
-            SendJSErrorEvent();
-            duk_pop(jsContext_);
-            return false;
-        }
-        else
-        {
-            assert(0);
-        }
-    }
-    else if (duk_pcall(jsContext_, 0) != 0)
-    {
-        if (duk_is_object(jsContext_, -1))
-        {
-            SendJSErrorEvent();
-            duk_pop(jsContext_);
-            return false;
-        }
-        else
-        {
-            assert(0);
-        }
-    }
-
-    if (!duk_is_function(jsContext_, -1))
-    {
-
-        duk_pop(jsContext_);
         return false;
     }
 
-    if (duk_pcall(jsContext_, 0) != 0)
+    String source;
+
+    file->ReadText(source);
+
+    duk_push_string(ctx_, file->GetFullPath().CString());
+    if (duk_eval_raw(ctx_, source.CString(), 0,
+                     DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
-        if (duk_is_object(jsContext_, -1))
-        {
+        if (duk_is_object(ctx_, -1))
             SendJSErrorEvent();
-            duk_pop(jsContext_);
-            return false;
-        }
-        else
-        {
-            assert(0);
-        }
+
+        duk_pop(ctx_);
+        return false;
     }
 
-    duk_pop(jsContext_);
-
-    ExecuteFunction("__js_atomicgame_start");
-
-    assert(top == duk_get_top(jsContext_));
+    duk_pop(ctx_);
 
     return true;
-
 }
 
-
-/*
-void JSVM::DumpJavascriptObjects()
+bool JSVM::ExecuteFile(File *file)
 {
-    HashMap<String, unsigned> counts;
+    if (!file)
+        return false;
 
-    List<Object*>::Iterator itr = jsObjects_.Begin();
-    while (itr != jsObjects_.End())
+    String source;
+
+    file->ReadText(source);
+
+    duk_push_string(ctx_, file->GetFullPath().CString());
+    if (duk_eval_raw(ctx_, source.CString(), 0,
+                     DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
-        const String& tname = (*itr)->GetTypeName();
-        if (!counts.Contains(tname))
-        {
-            counts[tname] = 0;
-        }
-        else
-        {
-            counts[tname]++;
-        }
-        itr++;
+        if (duk_is_object(ctx_, -1))
+            SendJSErrorEvent();
+
+        duk_pop(ctx_);
+        return false;
     }
 
-    HashMap<String, unsigned>::Iterator oitr = counts.Begin();
-    while (oitr != counts.End())
-    {
-        // currently outputting in destructor so log might already be gone
-        //LOGINFOF("%s: %u", oitr->first_.CString(), oitr->second_);
-        printf("%s: %u\n", oitr->first_.CString(), oitr->second_);
+    duk_pop(ctx_);
 
-        oitr++;
-    }
-
+    return true;
 }
-*/
+
+
+bool JSVM::ExecuteMain()
+{
+    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("Scripts/main.js"));
+
+    if (file.Null())
+    {
+        return false;
+    }
+
+    String source;
+
+    file->ReadText(source);
+
+    duk_push_string(ctx_, file->GetFullPath().CString());
+    if (duk_eval_raw(ctx_, source.CString(), 0,
+                     DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
+    {
+        if (duk_is_object(ctx_, -1))
+            SendJSErrorEvent();
+
+        duk_pop(ctx_);
+        return false;
+    }
+
+    duk_pop(ctx_);
+
+    ExecuteFunction("__js_atomicgame_start");
+    return true;
+}
 
 }

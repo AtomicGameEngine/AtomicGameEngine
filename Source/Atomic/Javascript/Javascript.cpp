@@ -9,7 +9,6 @@
 #include "../Scene/Scene.h"
 
 #include "../Javascript/Javascript.h"
-#include "../Javascript/JSFile.h"
 #include "../Javascript/JSComponent.h"
 #include "../Javascript/JSVM.h"
 
@@ -45,7 +44,6 @@ void Javascript::ShutdownVM(const String& name)
 
 void RegisterJavascriptLibrary(Context* context)
 {
-    JSFile::RegisterObject(context);
     JSComponent::RegisterObject(context);
 }
 

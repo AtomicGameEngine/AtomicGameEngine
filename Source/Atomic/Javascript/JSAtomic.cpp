@@ -124,6 +124,24 @@ static int js_atomic_GetInput(duk_context* ctx)
     return 1;
 }
 
+static int js_atomic_script(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+
+    if (duk_is_string(ctx, 0))
+    {
+        if ( vm->ExecuteScript(duk_to_string(ctx, 0)))
+            duk_push_boolean(ctx, 1);
+        else
+            duk_push_boolean(ctx, 0);
+    }
+    else
+        duk_push_boolean(ctx, 0);
+
+    return 1;
+}
+
+
 static int js_atomic_destroy(duk_context* ctx)
 {
     if (!duk_is_object(ctx, 0))
@@ -248,6 +266,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetUI, 0);
     duk_put_prop_string(ctx, -2, "GetUI");
+
+    duk_push_c_function(ctx, js_atomic_script, 1);
+    duk_put_prop_string(ctx, -2, "script");
 
     duk_push_c_function(ctx, js_atomic_destroy, 1);
     duk_put_prop_string(ctx, -2, "destroy");

@@ -49,11 +49,8 @@ private:
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-
-    /// Script file name.
-    String scriptFileName_;
     
     /// Script file.
-    SharedPtr<JSFile> jsFile_;
+    SharedPtr<File> jsFile_;
 
 };

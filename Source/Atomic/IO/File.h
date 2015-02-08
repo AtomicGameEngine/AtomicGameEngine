@@ -82,6 +82,8 @@ public:
     void Flush();
     /// Change the file name. Used by the resource system.
     void SetName(const String& name);
+    /// Set the fullpath to the file
+    void SetFullPath(const String& path) { fullPath_ = path; }
     
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
@@ -91,10 +93,16 @@ public:
     void* GetHandle() const { return handle_; }
     /// Return whether the file originates from a package.
     bool IsPackaged() const { return offset_ != 0; }
+    /// Return the fullpath to the file
+    const String& GetFullPath() const { return fullPath_; }
     
 private:
     /// File name.
     String fileName_;
+
+    /// Full path to file
+    String fullPath_;
+
     /// Open mode.
     FileMode mode_;
     /// File handle.
@@ -121,6 +129,7 @@ private:
     bool readSyncNeeded_;
     /// Synchronization needed before write -flag.
     bool writeSyncNeeded_;
+
 };
 
 }

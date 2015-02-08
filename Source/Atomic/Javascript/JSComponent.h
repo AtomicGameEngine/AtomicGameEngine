@@ -85,10 +85,6 @@ private:
 #endif
     /// Handle an event in script.
     void HandleScriptEvent(StringHash eventType, VariantMap& eventData);
-    /// Handle script file reload start.
-    void HandleScriptFileReload(StringHash eventType, VariantMap& eventData);
-    /// Handle script file reload finished.
-    void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
 
     /// Class name.
     String className_;
@@ -97,9 +93,6 @@ private:
     SharedPtr<Javascript> script_;
 
     WeakPtr<JSVM> vm_;
-
-    /// Script file.
-    WeakPtr<JSFile> scriptFile_;
 
     HashMap<StringHash, JS_HEAP_PTR> scriptEventFunctions_;
 

@@ -20,7 +20,6 @@
 #include "../Atomic2D/RigidBody2D.h"
 
 #include "../Javascript/JSEvents.h"
-#include "../Javascript/JSFile.h"
 #include "../Javascript/JSComponent.h"
 #include "../Javascript/JSAPI.h"
 
@@ -176,24 +175,8 @@ void JSComponent::ReleaseObject()
 
 void JSComponent::SetScriptFile(JSFile* scriptFile)
 {
-    if (scriptFile == scriptFile_ && scriptObject_)
-        return;
 
     ReleaseObject();
-
-    // Unsubscribe from the reload event of previous script file (if any), then subscribe to the new
-    if (scriptFile_)
-    {
-        UnsubscribeFromEvent(scriptFile_, E_RELOADSTARTED);
-        UnsubscribeFromEvent(scriptFile_, E_RELOADFINISHED);
-    }
-    if (scriptFile)
-    {
-        SubscribeToEvent(scriptFile, E_RELOADSTARTED, HANDLER(JSComponent, HandleScriptFileReload));
-        SubscribeToEvent(scriptFile, E_RELOADFINISHED, HANDLER(JSComponent, HandleScriptFileReloadFinished));
-    }
-
-    scriptFile_ = scriptFile;
 
     CreateObject();
     MarkNetworkUpdate();
@@ -359,17 +342,6 @@ void JSComponent::UpdateEventSubscription()
     }
 }
 
-void JSComponent::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
-{
-    ReleaseObject();
-}
-
-void JSComponent::HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
-{
-    if (!className_.Empty())
-        CreateObject();
-}
-
 
 void JSComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -423,7 +395,6 @@ void JSComponent::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventD
 
     VariantVector parameters;
     parameters.Push(eventData[P_TIMESTEP]);
-    //scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
 }
 #endif
 void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)

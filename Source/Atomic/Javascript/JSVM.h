@@ -25,9 +25,13 @@ public:
     /// Destruct.
     virtual ~JSVM();
 
-    bool ExecuteMain(const String& mainPath);
+    bool ExecuteFile(File* file);
 
-    bool ExecuteFile(JSFile* jsfile);
+    // Resources/Scripts/*.js
+    bool ExecuteScript(const String& scriptPath);
+    // Resources/Script/main.js
+
+    bool ExecuteMain();
 
     bool ExecuteFunction(const String& functionName);
 
@@ -36,7 +40,7 @@ public:
         return instance_;
     }
 
-    inline duk_context* GetJSContext() { return jsContext_; }
+    inline duk_context* GetJSContext() { return ctx_; }
 
     void DumpJavascriptObjects() {}
 
@@ -113,15 +117,16 @@ public:
 private:
 
     void GenerateComponent(const String& cname, const String& jsfilename, const String& csource);
-    void InitScripts();
-    void InitPackageScripts();
+
+    void InitComponents();
+    void InitPackageComponents();
 
     void SubscribeToEvents();
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     static int js_module_search(duk_context* ctx);
 
-    duk_context* jsContext_;
+    duk_context* ctx_;
 
     HashMap<void*, RefCounted*> heapToObject_;
 
