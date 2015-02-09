@@ -30,7 +30,16 @@ JSVM::JSVM(Context* context) :
     assert(!instance_);
 
     instance_ = this;
+}
 
+JSVM::~JSVM()
+{
+    duk_destroy_heap(ctx_);
+    instance_ = NULL;
+}
+
+void JSVM::InitJSContext()
+{
     ctx_ = duk_create_heap_default();
 
     // create root Atomic Object
@@ -55,13 +64,9 @@ JSVM::JSVM(Context* context) :
 
     // handle this elsewhere?
     SubscribeToEvents();
+
 }
 
-JSVM::~JSVM()
-{
-    duk_destroy_heap(ctx_);
-    instance_ = NULL;
-}
 
 void JSVM::SubscribeToEvents()
 {
@@ -177,7 +182,7 @@ void JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
     {
         if (duk_is_object(ctx_, -1))
         {
-            SendJSErrorEvent();
+            SendJSErrorEvent(jsfilename);
             duk_pop(ctx_);
         }
         else
@@ -189,7 +194,7 @@ void JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
     {
         if (duk_is_object(ctx_, -1))
         {
-            SendJSErrorEvent();
+            SendJSErrorEvent(jsfilename);
             duk_pop(ctx_);
         }
         else
@@ -315,7 +320,7 @@ int JSVM::js_module_search(duk_context* ctx)
         path = vm->moduleSearchPath_ + "/" + path + ".js";
     }
 
-    SharedPtr<File> jsfile(cache->GetFile(path));
+    SharedPtr<File> jsfile(cache->GetFile(path));    
 
     if (!jsfile)
     {
@@ -323,6 +328,7 @@ int JSVM::js_module_search(duk_context* ctx)
     }
     else
     {
+        vm->SetLastModuleSearchFile(jsfile->GetFullPath());
         String source;
         jsfile->ReadText(source);
         duk_push_string(ctx, source.CString());
@@ -331,7 +337,7 @@ int JSVM::js_module_search(duk_context* ctx)
     return 1;
 }
 
-void JSVM::SendJSErrorEvent()
+void JSVM::SendJSErrorEvent(const String& filename)
 {
     duk_context* ctx = GetJSContext();
     assert(duk_is_object(ctx, -1));
@@ -341,8 +347,14 @@ void JSVM::SendJSErrorEvent()
     VariantMap eventData;
 
     duk_get_prop_string(ctx, -1, "fileName");
-    String filename = duk_to_string(ctx, -1);
-    eventData[P_ERRORFILENAME] = filename;
+    if (duk_is_string(ctx, -1))
+    {
+        eventData[P_ERRORFILENAME] = duk_to_string(ctx, -1);
+    }
+    else
+    {
+        eventData[P_ERRORFILENAME] = filename;
+    }
 
     // Component script are wrapped within a closure, the line number
     // needs to be offset by this header
@@ -358,6 +370,33 @@ void JSVM::SendJSErrorEvent()
     duk_get_prop_string(ctx, -4, "message");
     String message = duk_to_string(ctx, -1);
     eventData[P_ERRORMESSAGE] = message;
+
+    // we're not getting good file/line from duktape on parser errors
+    if (name == "SyntaxError")
+    {
+        lineNumber = -1;
+        // parse line if we have it
+        if (message.Contains("(line "))
+        {
+            if (!filename.Length())
+                eventData[P_ERRORFILENAME] = lastModuleSearchFilename_;
+
+            unsigned pos = message.Find("(line ");
+            const char* parse = message.CString() + pos + 6;
+            String number;
+            while (*parse >= '0' && *parse<='9')
+            {
+                number += *parse;
+                parse++;
+            }
+
+            lineNumber = ToInt(number);
+
+        }
+
+        eventData[P_ERRORLINENUMBER] =  lineNumber;
+
+    }
 
     duk_get_prop_string(ctx, -5, "stack");
     String stack = duk_to_string(ctx, -1);
@@ -397,7 +436,7 @@ bool JSVM::ExecuteScript(const String& scriptPath)
                      DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
         if (duk_is_object(ctx_, -1))
-            SendJSErrorEvent();
+            SendJSErrorEvent(path);
 
         duk_pop(ctx_);
         return false;
@@ -422,7 +461,7 @@ bool JSVM::ExecuteFile(File *file)
                      DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
         if (duk_is_object(ctx_, -1))
-            SendJSErrorEvent();
+            SendJSErrorEvent(file->GetFullPath());
 
         duk_pop(ctx_);
         return false;
@@ -452,7 +491,7 @@ bool JSVM::ExecuteMain()
                      DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
         if (duk_is_object(ctx_, -1))
-            SendJSErrorEvent();
+            SendJSErrorEvent(file->GetFullPath());
 
         duk_pop(ctx_);
         return false;

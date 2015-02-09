@@ -25,6 +25,8 @@ public:
     /// Destruct.
     virtual ~JSVM();
 
+    void InitJSContext();
+
     bool ExecuteFile(File* file);
 
     // Resources/Scripts/*.js
@@ -111,9 +113,14 @@ public:
     {
         moduleSearchPath_ = searchPath;
     }
+
+    void SetLastModuleSearchFile(const String& fileName) { lastModuleSearchFilename_ = fileName; }
+
+    const String& GetLastModuleSearchFile() { return lastModuleSearchFilename_; }
+
     const String& GetErrorString() { return errorString_; }
 
-    void SendJSErrorEvent();
+    void SendJSErrorEvent(const String& filename = String::EMPTY);
 
 private:
 
@@ -142,6 +149,7 @@ private:
     float gcTime_;
 
     String moduleSearchPath_;
+    String lastModuleSearchFilename_;
 
     String errorString_;
 
