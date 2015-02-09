@@ -276,4 +276,30 @@ namespace :atomictiled do
 
   end
 
+    task :build_osx do
+
+    QT_BIN_DIR = "/Users/josh/Qt/5.4/clang_64/bin"
+
+    ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
+    ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
+    ATOMICTILED_DEPLOYED_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Deployed"
+
+    FileUtils.mkdir_p(ATOMICTILED_BUILD_DIR)
+
+    Dir.chdir(ATOMICTILED_BUILD_DIR) do
+      sh "#{QT_BIN_DIR}/qmake -r \"#{ATOMICTILED_SOURCE_DIR}/tiled.pro\" \"CONFIG+=release\" \"QMAKE_CXXFLAGS+=-DBUILD_INFO_VERSION=ATOMIC_BUILD\""
+      sh "make -j8"
+    end
+
+    FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
+
+    FileUtils.cp_r("#{ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{ATOMICTILED_DEPLOYED_DIR}/Tiled.app")
+
+    Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
+      sh "#{QT_BIN_DIR}/macdeployqt #{ATOMICTILED_DEPLOYED_DIR}/Tiled.app"
+    end
+
+  end
+
+
 end
