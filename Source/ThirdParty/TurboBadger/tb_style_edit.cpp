@@ -1799,7 +1799,22 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
 	else if (special_key == TB_KEY_END && modifierkeys & TB_CTRL)
 		caret.Place(TBPoint(32000, blocks.GetLast()->ypos + blocks.GetLast()->height));
     else if (special_key == TB_KEY_HOME || ( special_key == TB_KEY_LEFT && superDown))
-		caret.Place(TBPoint(0, caret.y));
+    {
+        if (old_caret_pos.block)
+        {
+            int32 pos =  old_caret_pos.block->FirstNonTabPos();
+
+            if (old_caret_pos.block->str[pos] == '\n' || old_caret_pos.block->str[pos] == '\r')
+                pos = 0;
+
+            if (old_caret_pos.ofs <= pos)
+                pos = 0;
+
+            caret.Place(old_caret_pos.block, pos);
+        }
+        else
+            caret.Place(TBPoint(0, caret.y));
+    }
     else if (special_key == TB_KEY_END || ( special_key == TB_KEY_RIGHT && superDown))
 		caret.Place(TBPoint(32000, caret.y));
 	else if (key == '8' && (modifierkeys & TB_CTRL))
