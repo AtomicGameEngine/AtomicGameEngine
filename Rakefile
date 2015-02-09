@@ -245,3 +245,35 @@ namespace :package_windows do
   end
 
 end
+
+namespace :atomictiled do
+
+  task :build_windows do
+
+    QT_BIN_DIR = "C:\\Qt\\5.4\\msvc2013_64\\bin"
+    QT_CREATOR_BIN_DIR = "C:\\Qt\\Tools\\QtCreator\\bin"  
+    ENV['PATH'] = "#{QT_BIN_DIR};" + ENV['PATH']    
+
+    ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
+    ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}\\..\\AtomicTiled"
+    ATOMICTILED_DEPLOYED_DIR = "#{$RAKE_ROOT}\\Artifacts\\AtomicTiled_Deployed"
+
+    FileUtils.mkdir_p(ATOMICTILED_BUILD_DIR)
+
+    Dir.chdir(ATOMICTILED_BUILD_DIR) do
+      sh "qmake.exe -r \"#{ATOMICTILED_SOURCE_DIR}\\tiled.pro\" \"CONFIG+=release\" \"QMAKE_CXXFLAGS+=-DBUILD_INFO_VERSION=ATOMIC_BUILD\""
+      sh "#{QT_CREATOR_BIN_DIR}\\jom.exe -j8"
+    end
+
+    FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
+
+    FileUtils.cp("#{ATOMICTILED_BUILD_DIR}\\tiled.exe", "#{ATOMICTILED_DEPLOYED_DIR}")
+    FileUtils.cp("#{ATOMICTILED_BUILD_DIR}\\tiled.dll", "#{ATOMICTILED_DEPLOYED_DIR}")
+
+    Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
+      sh "windeployqt.exe --release #{ATOMICTILED_DEPLOYED_DIR}\\tiled.exe"
+    end
+
+  end
+
+end
