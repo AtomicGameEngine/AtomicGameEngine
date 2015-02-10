@@ -1,25 +1,27 @@
 
-require 'rbconfig'
+include RbConfig
 
-def get_os
-@os ||= (
-  host_os = RbConfig::CONFIG['host_os']
-  case host_os
-  when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-    :windows
-  when /darwin|mac os/
-    :macosx
-  when /linux/
-    :linux
-  when /solaris|bsd/
-    :unix
-  else
-    raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-  end
-)
+case CONFIG['host_os']
+when /mswin|windows|mingw32/i
+    $HOST_OS = "windows"
+when /darwin/i
+    $HOST_OS = "darwin"
+else
+    abort("Unknown host config: Config::CONFIG['host_os']: #{Config::CONFIG['host_os']}")
 end
 
 $RAKE_ROOT = File.dirname(__FILE__)
+
+$ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
+$ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
+
+
+if $HOST_OS == "darwin"
+  $QT_BIN_DIR = "/Users/josh/Qt/5.4/clang_64/bin"
+else
+  $QT_BIN_DIR = "C:\\Qt\\5.4\\msvc2013_64\\bin"
+end
+
 
 namespace :android do
 
@@ -119,7 +121,7 @@ namespace :build_macosx do
 
 	end
 
-  task :editor => "build_macosx:player" do
+  task :editor => ["build_macosx:player", "atomictiled:build_osx"] do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       # add the generated JS bindings
@@ -143,6 +145,17 @@ namespace :build_macosx do
       sh "cp -r #{DATA_FOLDER} #{EDITOR_APP_FOLDER}/Contents/Resources/Data"
       sh "cp -r #{EDITORRESOURCES_FOLDER} #{EDITOR_APP_FOLDER}/Contents/Resources/EditorResources"
       sh "cp -r #{PLAYER_APP_FOLDER} #{DEPLOYMENT_FOLDER}/AtomicPlayer.app"
+
+    ATOMICTILED_DEPLOYED_DIR = "#{EDITOR_APP_FOLDER}/Contents/Applications"
+
+    FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
+
+    FileUtils.cp_r("#{$ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{ATOMICTILED_DEPLOYED_DIR}/Tiled.app")
+
+    Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
+      sh "#{$QT_BIN_DIR}/macdeployqt #{ATOMICTILED_DEPLOYED_DIR}/Tiled.app"
+    end
+
 
     end
 
@@ -250,9 +263,8 @@ namespace :atomictiled do
 
   task :build_windows do
 
-    QT_BIN_DIR = "C:\\Qt\\5.4\\msvc2013_64\\bin"
     QT_CREATOR_BIN_DIR = "C:\\Qt\\Tools\\QtCreator\\bin"  
-    ENV['PATH'] = "#{QT_BIN_DIR};" + ENV['PATH']    
+    ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH']    
 
     ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
     ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}\\..\\AtomicTiled"
@@ -278,26 +290,12 @@ namespace :atomictiled do
 
     task :build_osx do
 
-    QT_BIN_DIR = "/Users/josh/Qt/5.4/clang_64/bin"
+      FileUtils.mkdir_p($ATOMICTILED_BUILD_DIR)
 
-    ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
-    ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
-    ATOMICTILED_DEPLOYED_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Deployed"
-
-    FileUtils.mkdir_p(ATOMICTILED_BUILD_DIR)
-
-    Dir.chdir(ATOMICTILED_BUILD_DIR) do
-      sh "#{QT_BIN_DIR}/qmake -r \"#{ATOMICTILED_SOURCE_DIR}/tiled.pro\" \"CONFIG+=release\" \"QMAKE_CXXFLAGS+=-DBUILD_INFO_VERSION=ATOMIC_BUILD\""
-      sh "make -j8"
-    end
-
-    FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
-
-    FileUtils.cp_r("#{ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{ATOMICTILED_DEPLOYED_DIR}/Tiled.app")
-
-    Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
-      sh "#{QT_BIN_DIR}/macdeployqt #{ATOMICTILED_DEPLOYED_DIR}/Tiled.app"
-    end
+      Dir.chdir($ATOMICTILED_BUILD_DIR) do
+        sh "#{$QT_BIN_DIR}/qmake -r \"#{$ATOMICTILED_SOURCE_DIR}/tiled.pro\" \"CONFIG+=release\" \"QMAKE_CXXFLAGS+=-DBUILD_INFO_VERSION=ATOMIC_BUILD\""
+        sh "make -j8"
+      end
 
   end
 

@@ -427,9 +427,7 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 
             }
 
-
         }
-
         else if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
         {
             using namespace PhysicsBeginContact2D;
@@ -489,6 +487,17 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
                 duk_pop(ctx);
 
             }
+
+        }
+        else
+        {
+            duk_push_heapptr(ctx, function);
+            if (duk_pcall(ctx, 0) != 0)
+            {
+                vm_->SendJSErrorEvent();
+            }
+
+            duk_pop(ctx);
 
         }
     }

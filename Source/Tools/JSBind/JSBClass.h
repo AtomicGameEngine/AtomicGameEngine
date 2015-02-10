@@ -129,6 +129,11 @@ public:
             numberArrayElements_ = 4;
             arrayElementType_ = "int";
         }
+        else if (name_ == "IntVector2")
+        {
+            numberArrayElements_ = 2;
+            arrayElementType_ = "int";
+        }
 
         allClasses_.Push(this);
     }

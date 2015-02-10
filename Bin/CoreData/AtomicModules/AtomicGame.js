@@ -115,7 +115,7 @@ Game.prototype.createScene3D = function() {
         var width = (_viewport.right - 8) - _viewport.left;
         var height = _viewport.bottom - _viewport.top;
 
-        this.ui.getRoot().setPosition(_viewport.left + width/2, _viewport.top + height/2);
+        this.ui.getRoot().position = [_viewport.left, _viewport.top];
         this.ui.getRoot().setSize(width, height);        
 
     }

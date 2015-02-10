@@ -11,7 +11,9 @@
 			"SetFont" : ["Font", "int"]
 		},
 		"UIElement" : {
-			"SetColor" : ["Color"]
+			"SetColor" : ["Color"],
+			"SetPosition" : ["IntVector2"],
+			"SetSize" : ["int", "int"]
 		}
 
 	}
