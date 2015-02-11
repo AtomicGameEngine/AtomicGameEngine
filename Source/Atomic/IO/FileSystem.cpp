@@ -399,7 +399,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
     if (allowedPaths_.Empty())
     {
-        if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://"))
+        if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://") && !fileName.StartsWith("file://"))
             if (!FileExists(fileName) && !DirExists(fileName))
             {
                 LOGERROR("File or directory " + fileName + " not found");
