@@ -870,7 +870,7 @@ void TBUI::TBFileReader(const char* filename, void** data, unsigned* length)
 
     ResourceCache* cache = readerContext_->GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(filename);
-    if (!file->IsOpen())
+    if (!file || !file->IsOpen())
         return;
 
     unsigned size = file->GetSize();
