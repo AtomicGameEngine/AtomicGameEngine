@@ -6,14 +6,14 @@
 #ifndef TB_IMAGE_MANAGER_H
 #define TB_IMAGE_MANAGER_H
 
-#include "tb_core.h"
+#include "../tb_core.h"
 
 #ifdef TB_IMAGE
 
-#include "tb_linklist.h"
-#include "tb_hashtable.h"
-#include "tb_bitmap_fragment.h"
-#include "tb_renderer.h"
+#include "../tb_linklist.h"
+#include "../tb_hashtable.h"
+#include "../tb_bitmap_fragment.h"
+#include "../tb_renderer.h"
 
 namespace tb {
 

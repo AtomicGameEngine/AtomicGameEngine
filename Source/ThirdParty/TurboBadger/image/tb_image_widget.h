@@ -6,11 +6,11 @@
 #ifndef TB_IMAGE_WIDGET_H
 #define TB_IMAGE_WIDGET_H
 
-#include "tb_widgets.h"
+#include "../tb_widgets.h"
 
 #ifdef TB_IMAGE
 
-#include "image/tb_image_manager.h"
+#include "tb_image_manager.h"
 
 namespace tb {
 
@@ -28,6 +28,9 @@ public:
 
 	void SetImage(const TBImage &image) { m_image = image; }
 	void SetImage(const char *filename) { m_image = g_image_manager->GetImage(filename); }
+
+    int32 GetImageWidth() { return m_image.Width(); }
+    int32 GetImageHeight() { return m_image.Height(); }
 
 	virtual PreferredSize OnCalculatePreferredContentSize(const SizeConstraints &constraints);
 

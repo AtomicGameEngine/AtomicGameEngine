@@ -13,7 +13,8 @@
 		"UIElement" : {
 			"SetColor" : ["Color"],
 			"SetPosition" : ["IntVector2"],
-			"SetSize" : ["int", "int"]
+			"SetSize" : ["int", "int"],
+			"SetMinSize" : ["int", "int"]
 		}
 
 	}
