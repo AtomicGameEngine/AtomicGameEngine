@@ -1,2 +1,4 @@
 npm install git+https://github.com/jsdoc3/jsdoc
 git clone https://github.com/AtomicGameEngine/jaguarjs-jsdoc
+cd jaguarjs-jsdoc
+git checkout atomic_master
