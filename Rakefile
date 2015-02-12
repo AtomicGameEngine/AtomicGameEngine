@@ -233,6 +233,7 @@ namespace :package do
 
       # Android Deployment
       sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Android #{DEPLOYMENT_FOLDER_DST}/Android"
+      FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a")
       sh "cp #{CMAKE_ANDROID_BUILD_FOLDER}/Source/Tools/AtomicPlayer/libAtomicPlayer.so #{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a/libAtomicPlayer.so"
 
       sh "cp -r #{EXAMPLES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Examples"
