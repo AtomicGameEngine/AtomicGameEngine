@@ -17,7 +17,7 @@ $ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
 
 
 if $HOST_OS == "darwin"
-  $QT_BIN_DIR = "/Users/josh/Qt/5.4/clang_64/bin"
+  $QT_BIN_DIR = "#{ENV["QT_SDK"]}/bin"
 else
   $QT_BIN_DIR = "C:\\Qt\\5.4\\msvc2013_64\\bin"
 end
