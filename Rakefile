@@ -165,16 +165,9 @@ namespace :macosx do
 
 	end
 
-  task :editor => [#"android:player",
-                   #"web:player",
-                   "macosx:player", 
-                   "atomictiled:osx",
-                   "macosx:generate_examples", 
-                   "macosx:generate_docs"
-                   ] do
+  task :editor => ["macosx:player"] do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
-
       
       sh "make -j8 AtomicEditor"
 
@@ -186,44 +179,61 @@ end
 
 namespace :package do
 
-  task :macosx_editor => ['macosx:clean', 
-                          'macosx:editor'] do 
-
+  task :macosx_preflight => ['macosx:clean', 
+                          'android:player',
+                          "atomictiled:osx",
+                          'macosx:editor',
+                          'macosx:generate_examples', 
+                          'macosx:generate_docs'] do
 
       FileUtils.mkdir_p(MACOSX_PACKAGE_FOLDER)                    
 
       MAC_PLAYER_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/Tools/AtomicPlayer/AtomicPlayer.app"
       MAC_EDITOR_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/AtomicEditor/AtomicEditor.app"
 
+      # Resources
       COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Bin/CoreData"
       DATA_FOLDER_SRC = "#{$RAKE_ROOT}/Bin/Data"
       EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/AtomicEditor/EditorResources"
+      EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/AtomicEditor/EditorApplicationData"
 
-      PROJECTTEMPLATES_FOLDER_SRC = "#{$RAKE_ROOT}/AtomicEditor/EditorApplicationData/ProjectTemplates"
+      # Project Templates
+      PROJECTTEMPLATES_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ProjectTemplates"
 
+      #Examples
       #Example info could possibly go in the AtomicExamples repo
-      EXAMPLEINFO_FOLDER_SRC = "#{$RAKE_ROOT}/AtomicEditor/EditorApplicationData/ExampleInfo"
-
+      EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"
       EXAMPLES_FOLDER_SRC = "#{$RAKE_ROOT}/Artifacts/Examples"
+
+
+      #Docs
       DOCS_FOLDER_SRC = "#{$RAKE_ROOT}/Artifacts/Docs"
 
       MAC_EDITOR_APP_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app"
-      MAC_EDITOR_APP_RESOURCE_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app/Contents/Resources"
-      
+      MAC_EDITOR_APP_RESOURCE_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app/Contents/Resources"      
 
+      # Copy the Editor application
       sh "cp -r #{MAC_EDITOR_APP_FOLDER_SRC} #{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app"
 
       DEPLOYMENT_FOLDER_DST = "#{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Deployment"
 
+      # Make Deployment folder
       FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}")
 
-      FileUtils.mkdir_p(DEPLOYMENT_FOLDER_DST + "/MacOS")
-      FileUtils.mkdir_p(DEPLOYMENT_FOLDER_DST + "/Android")
-
+      # Copy Resources
       sh "cp -r #{COREDATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/CoreData"
       sh "cp -r #{DATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Data"
       sh "cp -r #{EDITORRESOURCES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/EditorResources"
+
+      # Copy Deployment
+
+      # MacOS deployment
+      FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}/MacOS")
       sh "cp -r #{MAC_PLAYER_APP_FOLDER_SRC} #{DEPLOYMENT_FOLDER_DST}/MacOS/AtomicPlayer.app"
+
+      # Android Deployment
+      sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Android #{DEPLOYMENT_FOLDER_DST}/Android"
+      sh "cp #{CMAKE_ANDROID_BUILD_FOLDER}/Source/Tools/AtomicPlayer/libAtomicPlayer.so #{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a/libAtomicPlayer.so"
 
       sh "cp -r #{EXAMPLES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Examples"
       sh "cp -r #{DOCS_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Docs"
@@ -242,6 +252,9 @@ namespace :package do
         sh "#{$QT_BIN_DIR}/macdeployqt #{ATOMICTILED_DEPLOYED_DIR}/Tiled.app"
       end
 
+  end
+
+  task :macosx_editor do
 
   end
 
