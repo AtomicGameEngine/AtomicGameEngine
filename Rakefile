@@ -20,6 +20,8 @@ if $HOST_OS == "darwin"
   $QT_BIN_DIR = "#{ENV["QT_SDK"]}/bin"
 else
   $QT_BIN_DIR = "C:\\Qt\\5.4\\msvc2013_64\\bin"
+  QT_CREATOR_BIN_DIR = "C:\\Qt\\Tools\\QtCreator\\bin"  
+  ENV['PATH'] = "#{QT_CREATOR_BIN_DIR};" + ENV['PATH']    
 end
 
 
@@ -275,7 +277,7 @@ namespace :windows do
     FileUtils.mkdir_p(CMAKE_WINDOWS_BUILD_FOLDER)
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
-      sh "cmake ../../ -G\"NMake Makefiles\" -DCMAKE_BUILD_TYPE=Release"
+      sh "cmake ../../ -G\"NMake Makefiles JOM\" -DCMAKE_BUILD_TYPE=Release"
     end 
 
 	end
@@ -283,7 +285,7 @@ namespace :windows do
 	task :generate_javascript_bindings => "windows:cmake" do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
-      sh "nmake JSBind"
+      sh "jom -j4 JSBind"
       sh "./Source/Tools/JSBind/JSBind.exe #{$RAKE_ROOT}"
     end
 
@@ -293,8 +295,8 @@ namespace :windows do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
       # add the generated JS bindings
-      sh "cmake ../../ -G\"NMake Makefiles\" -DCMAKE_BUILD_TYPE=Release"
-      sh "nmake AtomicPlayer"
+      sh "cmake ../../ -G\"NMake Makefiles JOM\" -DCMAKE_BUILD_TYPE=Release"
+      sh "jom -j4 AtomicPlayer"
     end
 
 	end
@@ -302,8 +304,8 @@ namespace :windows do
   task :editor => "windows:player" do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
-      # add the generated JS bindings
-      sh "nmake AtomicEditor"
+      
+      sh "jom -j4 AtomicEditor"
 
       PLAYER_APP_EXE = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/Tools/AtomicPlayer/AtomicPlayer.exe"
       EDITOR_APP_FOLDER = "#{CMAKE_WINDOWS_BUILD_FOLDER}/AtomicEditor"
@@ -337,7 +339,6 @@ namespace :atomictiled do
 
   task :windows do
 
-    QT_CREATOR_BIN_DIR = "C:\\Qt\\Tools\\QtCreator\\bin"  
     ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH']    
 
     ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
