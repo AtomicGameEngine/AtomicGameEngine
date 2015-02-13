@@ -1,0 +1,12 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBLayout: 
+		TBTextField: text: "OutputPath:"
+		TBTextField: id: build_path
+			lp: min-width: 280
+		TBButton: text: "Choose" id: choose_path
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: 
+		TBButton: text: Build, id: build
+			TBSkinImage: skin: LogoAtomic64, id: current_platform_indicator
+				lp: height: 28, width: 28
+		TBButton: text: Cancel, id: cancel

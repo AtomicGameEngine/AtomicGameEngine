@@ -1,0 +1,5 @@
+TBLayout: axis: y, distribution: gravity
+	lp: min-width: 320, min-height: 240
+	TBTextField: id: message
+		font: size: 14
+	TBProgressSpinner: id: spinner, value: 1

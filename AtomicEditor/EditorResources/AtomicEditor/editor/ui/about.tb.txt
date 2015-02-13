@@ -1,0 +1,6 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBLayout: 
+		TBTextField: text: "About:"
+		TBTextField: text: "The Atomic Game Engine"
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBButton: text: OK, id: ok

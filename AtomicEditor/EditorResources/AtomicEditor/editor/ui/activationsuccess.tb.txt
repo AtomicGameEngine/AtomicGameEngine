@@ -1,0 +1,6 @@
+TBLayout: axis: y, distribution: gravity
+	TBTextField: text: "Activation Successful"
+		font: size:18
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBButton: text: OK, id: ok
+		lp: min-width: 128, min-height: 64

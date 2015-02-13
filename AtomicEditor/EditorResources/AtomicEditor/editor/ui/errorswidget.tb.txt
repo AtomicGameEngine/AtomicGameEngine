@@ -1,0 +1,4 @@
+TBLayout: distribution: gravity, axis: y
+	TBTextField: gravity: left, text-align: left
+		text Errors
+	TBLayout: distribution: gravity, id: errorlayout

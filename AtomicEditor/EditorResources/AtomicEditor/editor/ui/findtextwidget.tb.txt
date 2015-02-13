@@ -1,0 +1,22 @@
+definitions
+	findtextbutton		
+		lp: height: 28
+		skin TBButton.flat
+TBContainer: skin: AEContainer, gravity: left right, id: findcontainer
+	TBLayout: distribution: gravity, size: available
+		TBButton: gravity: left
+			@include definitions>findtextbutton
+			text Case
+		TBButton: : gravity: left
+			@include definitions>findtextbutton
+			text Word
+		TBButton: : gravity: left
+			@include definitions>findtextbutton
+			text Wrap
+		TBEditField: gravity: left right, text-align: left, id: findtextedit
+		TBButton: : gravity: right
+			@include definitions>findtextbutton
+			text Find
+		TBButton: : gravity: right
+			@include definitions>findtextbutton
+			text Find Next

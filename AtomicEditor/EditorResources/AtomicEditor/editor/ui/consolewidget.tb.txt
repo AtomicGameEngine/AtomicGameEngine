@@ -1,0 +1,5 @@
+TBLayout: distribution: gravity, axis: y
+	TBTextField: gravity: left, text-align: left
+		text Console
+	TBLayout: distribution: gravity, id: consolelayout
+

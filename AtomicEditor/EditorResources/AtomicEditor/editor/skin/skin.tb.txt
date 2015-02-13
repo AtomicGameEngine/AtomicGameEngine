@@ -1,0 +1,104 @@
+# Editor skin override (contains some additions for the atomic editor)
+elements
+	background
+		bitmap bg_tile.png
+		type Tile
+	background_solid
+		background-color #3b3b3b
+		padding 10
+	AEContainer
+		type StretchBox
+		bitmap window.png
+		cut 16
+		expand 12
+		padding 0
+	Folder
+		text-color #aaaaaa
+	Folder.selected
+		text-color #ffffff
+	Folder.icon: type: Image, bitmap: folder.png
+
+	ImageCaption
+		background-color #00000066
+	ImageFrame
+		overlays
+			element ImageFrame.overlay
+				state all
+	ImageFrame.overlay
+		bitmap image_frame.png
+		cut 22
+		expand 15
+
+	StarButton
+		overlays
+			element Star
+				condition: target: ancestors, property: skin, value: "StarCondition"
+
+
+	Star
+		bitmap star_gray.png
+		type Image
+		img-position-x 0
+		img-position-y 0
+		img-ofs-x -8
+		img-ofs-y -12
+		overrides
+			element Star.active
+				condition: target: parent, property: hover
+	Star.active
+		bitmap star_gold.png
+		type Image
+		img-position-x 0
+		img-position-y 0
+		img-ofs-x -10
+		img-ofs-y -14
+
+	LineNumberSelectList
+		background-color #23241f
+
+	ComponentBitmap
+		bitmap component.png
+
+	MagnifierBitmap
+		bitmap magnifier.png
+
+	JavascriptBitmap
+		bitmap javascript.png
+
+	FolderCreateBitmap
+		bitmap folder_create.png
+
+	FolderDeleteBitmap
+		bitmap folder_delete.png
+
+	FileBitmap
+		bitmap file.png
+
+	PlayButton
+		bitmap play.png
+
+	AESeparator
+		bitmap item_separator_x.png
+		type Stretch Image
+
+	LogoAndroid
+		bitmap logo_android.png
+
+	LogoHTML5
+		bitmap logo_html5.png
+
+	LogoIOS
+		bitmap logo_ios.png
+
+	LogoMac
+		bitmap logo_mac.png
+
+	LogoWindows
+		bitmap logo_windows.png
+
+	LogoAtomic64
+		bitmap logo_atomic_64.png
+
+	TextCode
+		background-color #23241f
+

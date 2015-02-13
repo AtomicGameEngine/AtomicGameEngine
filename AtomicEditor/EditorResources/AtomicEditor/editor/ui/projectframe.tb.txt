@@ -1,0 +1,13 @@
+TBLayout: distribution: gravity, axis: y, id: projectframe
+	lp: min-width: 300
+	TBEditField
+		id filter
+		gravity all
+		placeholder @search
+		type search	
+	TBWidget: gravity: all
+		TBLayout: distribution: gravity, id: foldercontainer, gravity: all
+	TBScrollContainer: scroll-mode: y-auto, id: contentcontainerscroll
+		TBLayout: id: contentcontainer, axis: y, position: left
+	
+

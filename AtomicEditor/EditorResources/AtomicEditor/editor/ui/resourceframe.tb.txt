@@ -1,0 +1,2 @@
+TBLayout: distribution: gravity, size: available, axis: y, id: resourcelayout
+	TBTabContainer: gravity: all, id: tabcontainer

@@ -1,0 +1,22 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: distribution: gravity
+		TBTextField: text: "License Key:"
+			font: size:18
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: license_key, autofocus: 1
+				lp: min-width: 380
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: text: Activate, id: activate
+			lp: min-width: 128, min-height: 64
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: text: "Get Activation Key", id: get_key
+		TBButton: text: "Lost My Key", id: lost_key
+		TBButton: text: Quit, id: quit
+
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBTextField: text: "Please contact sales@atomicgameengine.com with any product key issues"		
+		
+

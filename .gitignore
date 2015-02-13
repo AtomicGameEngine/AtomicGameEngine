@@ -3,7 +3,6 @@
 Bin/Atomic.d.ts
 Bin/Atomic.js
 Source/Atomic/Javascript/Modules/*
-AtomicEditor/*
 Artifacts/*
 Docs/out/*
 Docs/node_modules/*

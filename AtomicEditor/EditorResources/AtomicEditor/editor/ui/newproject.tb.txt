@@ -1,0 +1,13 @@
+TBLayout: axis: y, position: left
+	TBTextField: text: "Please select project type:"
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: id: project_2d
+			TBImageWidget: filename: "AtomicEditor/editor/images/newproject_2d.png"
+		TBButton: id: project_3d
+			TBImageWidget: filename: "AtomicEditor/editor/images/newproject_3d.png"
+		TBButton: id: project_empty
+			TBImageWidget: filename: "AtomicEditor/editor/images/newproject_empty.png"			
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: text: Cancel, id: cancel

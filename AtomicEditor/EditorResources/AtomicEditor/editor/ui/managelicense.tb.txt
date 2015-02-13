@@ -1,0 +1,6 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBLayout: 
+		TBButton: id: "return_activation" text: "Return Activation"
+		TBTextField: text: "Return the activation on this computer"
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBButton: text: OK, id: ok

@@ -1,0 +1,10 @@
+TBLayout: axis: y, distribution: gravity
+	TBEditField: multiline: 1, styling: 1, gravity: all, id: info, readonly: 1
+		text: "There are no platform deployments available\n\n" \
+				"You will be able to preview gameplay in the Atomic Editor.\n" \
+				"A platform license is required to deploy apps.\n\n"
+		lp: min-width: 480, min-height: 100
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: text: OK, id: ok
+		TBButton: text: Purchase, id: purchase
