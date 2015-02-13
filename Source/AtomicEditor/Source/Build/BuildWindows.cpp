@@ -31,7 +31,12 @@ void BuildWindows::Initialize()
     Project* project = editor->GetProject();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
     String bundleResources = fileSystem->GetProgramDir();
+#else
+    String bundleResources = fileSystem->GetAppBundleResourceFolder();
+#endif
 
     String projectResources = project->GetResourcePath();
     String dataFolder = bundleResources + "Data/";
@@ -52,7 +57,12 @@ void BuildWindows::Build(const String& buildPath)
     Initialize();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
+#ifdef ATOMIC_PLATFORM_WINDOWS
     String buildSourceDir = fileSystem->GetProgramDir();
+#else
+    String buildSourceDir = fileSystem->GetAppBundleResourceFolder();
+#endif
+
     buildSourceDir += "Deployment/Win64";
 
     fileSystem->CreateDir(buildPath);
