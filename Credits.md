@@ -1,12 +1,16 @@
-Atomic Runtime
---------------
+## Atomic Game Engine
+------------------
 
-Licensed under the MIT license, see License.txt for details.
+Please see [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md) for the **Atomic Game Engine Source Code EULA**
 
-The Atomic Runtime was forked by THUNDERBEAST GAMES LLC in November 2014 from the Urho3D project.
+Credits:
 
-Urho3D - Website & Credits
+Josh Engebretson (Technical Director, THUNDERBEAST GAMES LLC)
+
+#### Urho3D - Website & Credits
 --------------------------
+
+The Atomic Game Engine started as a fork of the Urho3D project in November 2014
 
 Website:
 
