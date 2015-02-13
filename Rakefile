@@ -324,6 +324,11 @@ namespace :package do
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Docs", "#{EDITOR_APP_FOLDER_DST}/Docs")
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Examples", "#{EDITOR_APP_FOLDER_DST}/Examples")
 
+    # copy windows player to mac
+    PLAYER_APP_EXE_SRC = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.exe"
+    FileUtils.mkdir_p("#{MAC_ARTIFACTS_SRC}/Deployment/Win64")
+    FileUtils.cp("#{PLAYER_APP_EXE_SRC}", "#{MAC_ARTIFACTS_SRC}/Deployment/Win64/AtomicPlayer.exe")
+
   end
 
 
