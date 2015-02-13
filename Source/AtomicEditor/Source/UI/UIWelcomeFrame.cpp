@@ -42,7 +42,7 @@ WelcomeFrame::WelcomeFrame(Context* context) :
 #ifdef ATOMIC_PLATFORM_OSX
     exampleSourceDir_ = fileSystem->GetAppBundleResourceFolder();
 #else
-    String exampleSourceDir_ = fileSystem->GetProgramDir();
+    exampleSourceDir_ = fileSystem->GetProgramDir();
 #endif
 
     exampleInfoDir_ = exampleSourceDir_ + "ExampleInfo";

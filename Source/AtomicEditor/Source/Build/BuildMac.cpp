@@ -51,7 +51,13 @@ void BuildMac::Build(const String& buildPath)
     Initialize();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+ #ifdef ATOMIC_PLATFORM_WINDOWS
+    String buildSourceDir = fileSystem->GetProgramDir();
+ #else
     String buildSourceDir = fileSystem->GetAppBundleResourceFolder();
+ #endif
+
     buildSourceDir += "Deployment/MacOS/AtomicPlayer.app";
 
     fileSystem->CreateDir(buildPath);
@@ -67,14 +73,15 @@ void BuildMac::Build(const String& buildPath)
     fileSystem->Copy(buildSourceDir + "/Contents/Info.plist", buildPath + "/Contents/Info.plist");    
     fileSystem->Copy(buildSourceDir + "/Contents/MacOS/AtomicPlayer", buildPath + "/Contents/MacOS/AtomicPlayer");
 
+#ifdef ATOMIC_PLATFORM_OSX
     Vector<String> args;
     args.Push("+x");
     args.Push(buildPath + "/Contents/MacOS/AtomicPlayer");
     fileSystem->SystemRun("chmod", args);
+#endif
 
     ProjectUtils* utils = GetSubsystem<ProjectUtils>();
     utils->RevealInFinder(GetPath(buildPath));
-
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
     buildSystem->BuildComplete();
