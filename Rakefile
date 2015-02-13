@@ -188,14 +188,14 @@ namespace :package do
 
       FileUtils.mkdir_p(MACOSX_PACKAGE_FOLDER)                    
 
-      MAC_PLAYER_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/Tools/AtomicPlayer/AtomicPlayer.app"
-      MAC_EDITOR_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/AtomicEditor/AtomicEditor.app"
+      MAC_PLAYER_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.app"
+      MAC_EDITOR_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicEditor/AtomicEditor.app"
 
       # Resources
-      COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Bin/CoreData"
-      DATA_FOLDER_SRC = "#{$RAKE_ROOT}/Bin/Data"
-      EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/AtomicEditor/EditorResources"
-      EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/AtomicEditor/EditorApplicationData"
+      COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
+      DATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/Data"
+      EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
+      EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
       # Project Templates
       PROJECTTEMPLATES_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ProjectTemplates"
@@ -234,7 +234,7 @@ namespace :package do
       # Android Deployment
       sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Android #{DEPLOYMENT_FOLDER_DST}/Android"
       FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a")
-      sh "cp #{CMAKE_ANDROID_BUILD_FOLDER}/Source/Tools/AtomicPlayer/libAtomicPlayer.so #{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a/libAtomicPlayer.so"
+      sh "cp #{CMAKE_ANDROID_BUILD_FOLDER}/Source/AtomicPlayer/libAtomicPlayer.so #{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a/libAtomicPlayer.so"
 
       sh "cp -r #{EXAMPLES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Examples"
       sh "cp -r #{DOCS_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Docs"

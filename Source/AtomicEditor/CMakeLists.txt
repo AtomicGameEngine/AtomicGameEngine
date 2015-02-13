@@ -4,7 +4,7 @@ include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty ${CMAKE_SOURCE_DIR}/So
 
 file (GLOB_RECURSE SOURCE_FILES Source/*.cpp Source/*.h)
 
-include_directories (${CMAKE_SOURCE_DIR}/AtomicEditor/Source)
+include_directories (${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Vendor/nativefiledialog)
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Vendor/Poco/Foundation/include)
 

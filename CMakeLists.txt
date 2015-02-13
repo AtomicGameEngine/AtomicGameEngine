@@ -33,15 +33,3 @@ elseif(EMSCRIPTEN)
 endif()
 
 add_subdirectory(Source)
-
-#Build Editor if it is available
-if (NOT ANDROID AND NOT EMSCRIPTEN)
-
-    if (IS_DIRECTORY ${CMAKE_SOURCE_DIR}/AtomicEditor)
-
-        add_subdirectory(AtomicEditor)
-
-    endif()
-
-endif()
-
