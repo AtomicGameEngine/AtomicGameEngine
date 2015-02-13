@@ -298,7 +298,7 @@ namespace :package do
     FileUtils.cp("#{EDITOR_APP_EXE_SRC}", "#{EDITOR_APP_FOLDER_DST}/AtomicEditor.exe")
 
     # DEPLOY TILED
-    ATOMICTILED_DEPLOYED_DIR = "#{EDITOR_APP_FOLDER_DST}/Applications/Tiled"
+    ATOMICTILED_DEPLOYED_DIR = "#{EDITOR_APP_FOLDER_DST}/Applications/AtomicTiled"
 
     FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
 
