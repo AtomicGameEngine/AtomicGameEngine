@@ -256,6 +256,28 @@ namespace :package do
 
   task :macosx_editor do
 
+    EDITOR_APP_FOLDER = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app" 
+    if (!File.file?("#{EDITOR_APP_FOLDER}/Contents/Resources/Deployment/Win64/AtomicPlayer.exe"))
+      abort("Missing Windows player, please run rake package:windows_editor from Windows")
+    end
+
+    Dir.chdir("#{MACOSX_PACKAGE_FOLDER}") do
+
+      if (File.file?("AtomicEditor_MacOSX.zip"))
+        sh "rm AtomicEditor_MacOSX.zip"
+      end 
+
+      if (File.file?("AtomicEditor_MacOSX.zip"))
+        abort ("Couldn't remove editor")
+      end       
+
+      sh "zip -r AtomicEditor_MacOSX.zip ./AtomicEditor.app"
+      sh "zip -T AtomicEditor_MacOSX.zip"
+
+    end
+
+
+
   end
 
 
