@@ -312,6 +312,21 @@ namespace :package do
 
   end
 
+  task :windows_editor do
+
+    MAC_ARTIFACTS_SRC = "Z:/Artifacts/MacOSX_Package/AtomicEditor.app/Contents/Resources"
+    EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor"
+
+    DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment"
+    FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/Android", "#{EDITOR_APP_FOLDER_DST}/Deployment/Android")
+    FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/MacOS", "#{EDITOR_APP_FOLDER_DST}/Deployment/MacOS")
+
+    FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Docs", "#{EDITOR_APP_FOLDER_DST}/Docs")
+    FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Examples", "#{EDITOR_APP_FOLDER_DST}/Examples")
+
+  end
+
+
 end
 
 namespace :windows do
