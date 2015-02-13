@@ -259,9 +259,9 @@ namespace :package do
   end
 
 
-  task :windows_preflight do #=> ['windows:clean', 
-                          #    'windows:editor', 
-                          #    'atomictiled:windows' ] do
+  task :windows_preflight => ['windows:clean', 
+                              'windows:editor', 
+                              'atomictiled:windows' ] do
                           
 
     EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor" 
