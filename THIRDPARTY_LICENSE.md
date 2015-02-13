@@ -1,7 +1,9 @@
 
-Atomic Game Engine - Third Party Technology Licenses and Copyrights
+### Third Party Technology Licenses and Copyrights
 
-Please see LICENSE.md for the Atomic Game Engine Source Code EULA
+This file contains information for third party technology used in the Atomic Game Engine
+
+Please see [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md) for the **Atomic Game Engine Source Code EULA**
 
 -------------------------------------------------------------------
 
