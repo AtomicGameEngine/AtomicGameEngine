@@ -1,4 +1,4 @@
-### UNDER CONSTRUCTION
+##### UNDER CONSTRUCTION
 
 Hello!  We're working to get everything setup for an initial release around GDC 2015.  In the meantime, feel free to have a look around :)
 
@@ -19,5 +19,5 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 ### Website
 
-Visit http://www.AtomicGameEngine.com for all the latest new and downloads of the Atomic Game Engine
+Visit http://www.AtomicGameEngine.com for all the latest news and downloads of the Atomic Game Engine
 
