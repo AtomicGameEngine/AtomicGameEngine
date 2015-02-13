@@ -53,7 +53,7 @@ void BuildWindows::Build(const String& buildPath)
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String buildSourceDir = fileSystem->GetProgramDir();
-    buildSourceDir += "Deployment/Win32";
+    buildSourceDir += "Deployment/Win64";
 
     fileSystem->CreateDir(buildPath);
     fileSystem->CreateDir(buildPath + "/AtomicPlayer_Resources");

@@ -12,8 +12,8 @@ end
 
 $RAKE_ROOT = File.dirname(__FILE__)
 
-$ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
-$ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
+ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
+ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
 
 
 if $HOST_OS == "darwin"
@@ -205,7 +205,6 @@ namespace :package do
       EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"
       EXAMPLES_FOLDER_SRC = "#{$RAKE_ROOT}/Artifacts/Examples"
 
-
       #Docs
       DOCS_FOLDER_SRC = "#{$RAKE_ROOT}/Artifacts/Docs"
 
@@ -223,7 +222,7 @@ namespace :package do
       # Copy Resources
       sh "cp -r #{COREDATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/CoreData"
       sh "cp -r #{DATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Data"
-      sh "cp -r #{EDITORRESOURCES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/EditorResources"
+      sh "cp -r #{EDITORRESOURCES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/EditorData"
 
       # Copy Deployment
 
@@ -247,7 +246,7 @@ namespace :package do
 
       FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
 
-      FileUtils.cp_r("#{$ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{ATOMICTILED_DEPLOYED_DIR}/Tiled.app")
+      FileUtils.cp_r("#{ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{ATOMICTILED_DEPLOYED_DIR}/Tiled.app")
 
       Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
         sh "#{$QT_BIN_DIR}/macdeployqt #{ATOMICTILED_DEPLOYED_DIR}/Tiled.app"
@@ -259,30 +258,85 @@ namespace :package do
 
   end
 
+
+  task :windows_preflight do #=> ['windows:clean', 
+                          #    'windows:editor', 
+                          #    'atomictiled:windows' ] do
+                          
+
+    EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor" 
+    
+    FileUtils.mkdir_p(EDITOR_APP_FOLDER_DST)
+
+    PLAYER_APP_EXE_SRC = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.exe"
+    EDITOR_APP_EXE_SRC = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/AtomicEditor.exe"
+
+    DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment/Win64"
+
+    # Resources
+    COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
+    DATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/Data"
+    EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
+    EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
+
+    # Project Templates
+    PROJECTTEMPLATES_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ProjectTemplates"
+
+    #Examples
+    #Example info could possibly go in the AtomicExamples repo
+    EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"    
+    
+    FileUtils.cp_r("#{COREDATA_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/CoreData")
+    FileUtils.cp_r("#{DATA_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/Data")
+    FileUtils.cp_r("#{EDITORRESOURCES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/EditorData")
+
+    FileUtils.cp_r("#{PROJECTTEMPLATES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ProjectTemplates")
+    FileUtils.cp_r("#{EXAMPLEINFO_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ExampleInfo")
+    
+    FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER}")
+    FileUtils.cp("#{PLAYER_APP_EXE_SRC}", "#{DEPLOYMENT_FOLDER}/AtomicPlayer.exe")
+    FileUtils.cp("#{EDITOR_APP_EXE_SRC}", "#{EDITOR_APP_FOLDER_DST}/AtomicEditor.exe")
+
+    # DEPLOY TILED
+    ATOMICTILED_DEPLOYED_DIR = "#{EDITOR_APP_FOLDER_DST}/Applications/Tiled"
+
+    FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
+
+    FileUtils.cp("#{ATOMICTILED_BUILD_DIR}/tiled.exe", "#{ATOMICTILED_DEPLOYED_DIR}")
+    FileUtils.cp("#{ATOMICTILED_BUILD_DIR}/tiled.dll", "#{ATOMICTILED_DEPLOYED_DIR}")
+
+    ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH'] 
+    Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
+      sh "windeployqt.exe --release #{ATOMICTILED_DEPLOYED_DIR}/tiled.exe"
+    end
+
+  end
+
 end
 
 namespace :windows do
 
   CMAKE_WINDOWS_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/Windows_Build"
-  PACKAGE_WINDOWS_FOLDER = "#{$RAKE_ROOT}/Artifacts/Windows_Package"
+  WINDOWS_PACKAGE_FOLDER = "#{$RAKE_ROOT}/Artifacts/Windows_Package"
 
   task :clean do
 
-    if Dir.exists?("#{CMAKE_WINDOWS_BUILD_FOLDER}")
-    	FileUtils.rmtree("#{CMAKE_WINDOWS_BUILD_FOLDER}")
-    end
 
-    if Dir.exists?("#{CMAKE_WINDOWS_BUILD_FOLDER}")
-        abort("Unable to clean #{CMAKE_WINDOWS_BUILD_FOLDER}")
-    end
+    folders = ["#{CMAKE_WINDOWS_BUILD_FOLDER}", "#{WINDOWS_PACKAGE_FOLDER}",
+               "#{ARTIFACTS_FOLDER}/AtomicExamples", "#{ARTIFACTS_FOLDER}/Docs",
+               "#{ARTIFACTS_FOLDER}/Examples",  "#{ARTIFACTS_FOLDER}/AtomicTiled_Build"]
 
-    if Dir.exists?("#{PACKAGE_WINDOWS_FOLDER}")
-      FileUtils.rmtree("#{PACKAGE_WINDOWS_FOLDER}")
-    end
+    for index in 0 ... folders.size    
 
-    if Dir.exists?("#{PACKAGE_WINDOWS_FOLDER}")
-        abort("Unable to clean #{PACKAGE_WINDOWS_FOLDER}")
-    end  
+        if Dir.exists?(folders[index])
+            FileUtils.rmtree(folders[index])          
+        end
+
+        if Dir.exists?(folders[index])
+            abort("Unable to clean #{folders[index]}")
+        end
+    
+    end           
 
   end
 
@@ -321,29 +375,7 @@ namespace :windows do
       
       sh "jom -j4 AtomicEditor"
 
-      PLAYER_APP_EXE = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/Tools/AtomicPlayer/AtomicPlayer.exe"
-      EDITOR_APP_FOLDER = "#{CMAKE_WINDOWS_BUILD_FOLDER}/AtomicEditor"
-      DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER}/Deployment/Win32"
-
-      COREDATA_FOLDER = "#{$RAKE_ROOT}/Bin/CoreData"
-      DATA_FOLDER = "#{$RAKE_ROOT}/Bin/Data"
-      EDITORRESOURCES_FOLDER = "#{$RAKE_ROOT}/AtomicEditor/EditorResources"
-
-      FileUtils.mkdir_p(DEPLOYMENT_FOLDER)
-
-      FileUtils.cp_r("#{COREDATA_FOLDER}", "#{EDITOR_APP_FOLDER}/CoreData")
-      FileUtils.cp_r("#{DATA_FOLDER}", "#{EDITOR_APP_FOLDER}/Data")
-      FileUtils.cp_r("#{EDITORRESOURCES_FOLDER}", "#{EDITOR_APP_FOLDER}/EditorResources")
-      FileUtils.cp("#{PLAYER_APP_EXE}", "#{DEPLOYMENT_FOLDER}/AtomicPlayer.exe")
     end
-
-  end
-
-end
-
-namespace :package_windows do
-
-  task :editor => ['windows:clean', 'windows:editor'] do
 
   end
 
@@ -355,10 +387,6 @@ namespace :atomictiled do
 
     ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH']    
 
-    ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
-    ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}\\..\\AtomicTiled"
-    ATOMICTILED_DEPLOYED_DIR = "#{$RAKE_ROOT}\\Artifacts\\AtomicTiled_Deployed"
-
     FileUtils.mkdir_p(ATOMICTILED_BUILD_DIR)
 
     Dir.chdir(ATOMICTILED_BUILD_DIR) do
@@ -366,23 +394,14 @@ namespace :atomictiled do
       sh "#{QT_CREATOR_BIN_DIR}\\jom.exe -j8"
     end
 
-    FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
-
-    FileUtils.cp("#{ATOMICTILED_BUILD_DIR}\\tiled.exe", "#{ATOMICTILED_DEPLOYED_DIR}")
-    FileUtils.cp("#{ATOMICTILED_BUILD_DIR}\\tiled.dll", "#{ATOMICTILED_DEPLOYED_DIR}")
-
-    Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
-      sh "windeployqt.exe --release #{ATOMICTILED_DEPLOYED_DIR}\\tiled.exe"
-    end
-
   end
 
     task :osx do
 
-      FileUtils.mkdir_p($ATOMICTILED_BUILD_DIR)
+      FileUtils.mkdir_p(ATOMICTILED_BUILD_DIR)
 
-      Dir.chdir($ATOMICTILED_BUILD_DIR) do
-        sh "#{$QT_BIN_DIR}/qmake -r \"#{$ATOMICTILED_SOURCE_DIR}/tiled.pro\" \"CONFIG+=release\" \"QMAKE_CXXFLAGS+=-DBUILD_INFO_VERSION=ATOMIC_BUILD\""
+      Dir.chdir(ATOMICTILED_BUILD_DIR) do
+        sh "#{$QT_BIN_DIR}/qmake -r \"#{ATOMICTILED_SOURCE_DIR}/tiled.pro\" \"CONFIG+=release\" \"QMAKE_CXXFLAGS+=-DBUILD_INFO_VERSION=ATOMIC_BUILD\""
         sh "make -j8"
       end
 

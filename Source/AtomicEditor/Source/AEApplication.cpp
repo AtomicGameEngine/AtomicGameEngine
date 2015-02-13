@@ -63,9 +63,9 @@ void AEApplication::Start()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef __APPLE__    
-    String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorResources/";
+    String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorData/";
 #else
-    String editorResources = fileSystem->GetProgramDir() + "EditorResources/";
+    String editorResources = fileSystem->GetProgramDir() + "EditorData/";
 #endif    
     assert(fileSystem->DirExists(editorResources));
     cache->AddResourceDir(editorResources);
