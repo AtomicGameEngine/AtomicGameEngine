@@ -7,7 +7,7 @@ Please see [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blo
 
 -------------------------------------------------------------------
 
-Urho3D license
+#### Urho3D license
 --------------
 
 Copyright (c) 2008-2014 the Urho3D project. (http://urho3d.github.io)
@@ -30,7 +30,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE.
 
-Duktape License
+#### Duktape License
 ---------------
 
 Copyright (c) 2013-2015
@@ -54,7 +54,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-TurboBadger license
+#### TurboBadger license
 -------------------
 
 This software is provided 'as-is', without any express or implied warranty. In no
@@ -75,7 +75,7 @@ following restrictions:
 
   3. This notice may not be removed or altered from any source distribution.
 
-SQLite license
+#### SQLite license
 --------------
 All of the code and documentation in SQLite has been dedicated to the public domain 
 by the authors. All code authors, and representatives of the companies they work for, 
@@ -86,7 +86,7 @@ SQLite code, either in source code form or as a compiled binary, for any purpose
 commercial or non-commercial, and by any means.
 
 
-Open Asset Import Library license
+#### Open Asset Import Library license
 ---------------------------------
 
 Open Asset Import Library (Assimp)
@@ -126,7 +126,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Box2D license
+#### Box2D license
 -------------
 
 Copyright (c) 2006-2013 Erin Catto http://www.gphysics.com
@@ -148,7 +148,7 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 
-Bullet license
+#### Bullet license
 --------------
 
 Bullet Continuous Collision Detection and Physics Library
@@ -170,7 +170,7 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 
-Civetweb license
+#### Civetweb license
 ----------------
 
 Copyright (c) 2004-2012 Sergey Lyubka
@@ -194,14 +194,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-The FreeType Project disclaimer
+#### The FreeType Project disclaimer
 -------------------------------
 
 Portions of this software are copyright © 2010 The FreeType Project
 (www.freetype.org).  All rights reserved.
 
 
-GLEW license
+#### GLEW license
 ------------
 
 The OpenGL Extension Wrangler Library
@@ -234,7 +234,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Mesa 3-D graphics library
+#### Mesa 3-D graphics library
 Version:  7.0
 
 Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
@@ -279,7 +279,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 
 
-kNet license
+#### kNet license
 ------------
 
 Copyright The kNet Project.
@@ -297,7 +297,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-libcpuid license
+#### libcpuid license
 ----------------
 
 Copyright 2008  Veselin Georgiev,
@@ -325,7 +325,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-LZ4 license
+#### LZ4 license
 -----------
 
 LZ4 - Fast LZ compression algorithm
@@ -361,7 +361,7 @@ You can contact the author at :
 - LZ4 source repository : http://code.google.com/p/lz4/
 
 
-MojoShader license
+#### MojoShader license
 ------------------
 
 Copyright (c) 2008-2011 Ryan C. Gordon.
@@ -387,7 +387,7 @@ misrepresented as being the original software.
    Ryan C. Gordon <icculus@icculus.org>
 
 
-Oolong Engine license
+#### Oolong Engine license
 ---------------------
 
 Oolong Engine for the iPhone / iPod touch
@@ -408,7 +408,7 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 
-pugixml license
+#### pugixml license
 ---------------
 
 Copyright (c) 2006-2010 Arseny Kapoulkine
@@ -435,7 +435,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 
-rapidjson license
+#### rapidjson license
 ---------------
 
 Copyright (C) 2011 Milo Yip
@@ -459,7 +459,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-Recast/Detour license
+#### Recast/Detour license
 ---------------------
 
 Copyright (c) 2009 Mikko Mononen memon@inside.org
@@ -481,7 +481,7 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 
-SDL license
+#### SDL license
 -----------
 
 Simple DirectMedia Layer
@@ -504,7 +504,7 @@ freely, subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 
 
-Squish license
+#### Squish license
 --------------
 
 Copyright (c) 2006 Simon Brown                          si@sjbrown.co.uk
@@ -529,7 +529,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-StanHull license
+#### StanHull license
 ----------------
 
 Copyright (c) 2004 Open Dynamics Framework Group
