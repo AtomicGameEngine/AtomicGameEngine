@@ -55,18 +55,18 @@ AtomicPlayer::AtomicPlayer(Context* context) :
 void AtomicPlayer::Setup()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
-
-#ifdef EMSCRIPTEN
-    engineParameters_["WindowWidth"] = 1280;
-    engineParameters_["WindowHeight"] = 720;
-    engineParameters_["FullScreen"] = false;
-#endif
     
     engineParameters_["WindowTitle"] = "AtomicPlayer";
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
     engineParameters_["ResourcePaths"] = "CoreData;Data;AtomicResources";
+#elif ATOMIC_PLATFORM_WEB
+    engineParameters_["FullScreen"] = false;
+    engineParameters_["ResourcePaths"] = "AtomicResources";
+    engineParameters_["WindowWidth"] = 1280;
+    engineParameters_["WindowHeight"] = 720;
+
 #else
     engineParameters_["ResourcePaths"] = "AtomicResources";
     engineParameters_["FullScreen"] = false;
@@ -81,7 +81,6 @@ void AtomicPlayer::Setup()
 #elif ATOMIC_PLATFORM_OSX
     engineParameters_["ResourcePrefixPath"] = "../Resources";
 #endif
-
 
     // Use the script file name as the base name for the log file
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";

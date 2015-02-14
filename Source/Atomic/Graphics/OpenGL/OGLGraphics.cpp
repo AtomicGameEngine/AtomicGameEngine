@@ -329,8 +329,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         fullscreen = false;
 
     multiSample = Clamp(multiSample, 1, 16);
-bool isInitialized = IsInitialized();
-LOGINFO(isInitialized ? "isInitialized == true" : "isInitialized == false");
+    bool isInitialized = IsInitialized();
+    LOGINFO(isInitialized ? "isInitialized == true" : "isInitialized == false");
 
     
     //if (IsInitialized() && width == width_ && height == height_ && fullscreen == fullscreen_ && borderless == borderless_ && resizable == resizable_ &&

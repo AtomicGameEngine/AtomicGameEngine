@@ -91,27 +91,6 @@ void BuildSystem::HandleEditorBuild(StringHash eventType, VariantMap& eventData)
     Editor* editor = GetSubsystem<Editor>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    // OK, we need to redo this as can't be removing folders like this
-    if (buildPlatform != "Web") // removing the folder is screwing up the simple web server I am using
-    {
-        if (fileSystem->DirExists(buildPath) || fileSystem->FileExists(buildPath))
-        {
-            bool result;
-
-            if (fileSystem->DirExists(buildPath))
-                result = fileSystem->RemoveDir(buildPath, true);
-            else
-                result = fileSystem->Delete(buildPath);
-
-            if (!result)
-            {
-                editor->PostModalError("Build Path Exists", ToString("The build path:\n\n%s\n\nalready exists and failed to be removed", buildPath.CString()));
-                return;
-            }
-
-        }
-    }
-
     if (buildPlatform == "Mac")
     {
         DoBuildMac(buildPath);
