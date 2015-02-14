@@ -6,3 +6,4 @@ Source/Atomic/Javascript/Modules/*
 Artifacts/*
 Docs/out/*
 Docs/node_modules/*
+Data/AtomicEditor/Deployment/Web/AtomicPlayer.js
