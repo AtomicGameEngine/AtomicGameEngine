@@ -229,6 +229,8 @@ public:
                     if (arg->hasInitializer())
                     {
                         ftype->initializer_ = arg->initializer()->chars();
+                        if (ftype->initializer_.StartsWith("\\"))
+                            ftype->initializer_ = "\"" + ftype->initializer_ + "\"";
                     }
 
                     jfunction->AddParameter(ftype);
