@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,13 @@ namespace Atomic
 {
 
 class Vector3;
+
+/// Graphics capability support level. HTML5 (Emscripten) also uses OpenGL ES, but is considered a desktop platform capability-wise
+#if defined(ANDROID) || defined(IOS) || defined(RPI)
+#define MOBILE_GRAPHICS
+#else
+#define DESKTOP_GRAPHICS
+#endif
 
 /// Primitive type.
 enum PrimitiveType

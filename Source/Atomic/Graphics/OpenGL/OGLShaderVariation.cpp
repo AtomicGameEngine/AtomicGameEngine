@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -148,6 +148,9 @@ bool ShaderVariation::Create()
     #ifdef RPI
     if (type_ == VS)
         shaderCode += "#define RPI\n";
+    #endif
+    #ifdef EMSCRIPTEN
+    shaderCode += "#define WEBGL\n";
     #endif
 
     // When version define found, do not insert it a second time

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,9 +69,6 @@ static const char* lightingModeNames[] =
     "perpixel",
     0
 };
-
-static bool desktopSupportChecked = false;
-static bool desktopSupportResult = false;
 
 Pass::Pass(StringHash type) :
     type_(type),
@@ -174,14 +171,11 @@ Technique::Technique(Context* context) :
     Graphics* graphics = GetSubsystem<Graphics>();
     sm3Support_ = graphics ? graphics->GetSM3Support() : true;
     
-    if (!desktopSupportChecked)
-    {
-        String platformString = GetPlatform();
-        desktopSupportResult = (platformString == "Windows" || platformString == "Mac OS X" || platformString == "Linux");
-        desktopSupportChecked = true;
-    }
-    
-    desktopSupport_ = desktopSupportResult;
+    #ifdef DESKTOP_GRAPHICS
+    desktopSupport_ = true;
+    #else
+    desktopSupport_ = false;
+    #endif
 }
 
 Technique::~Technique()
