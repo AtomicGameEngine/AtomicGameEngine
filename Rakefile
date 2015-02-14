@@ -339,6 +339,18 @@ namespace :package do
     MAC_ARTIFACTS_SRC = "Z:/Artifacts/MacOSX_Package/AtomicEditor.app/Contents/Resources"
     EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor"
 
+     Dir.chdir("#{WINDOWS_PACKAGE_FOLDER}") do
+
+      if (File.exists?("AtomicEditor_Windows.zip"))
+        FileUtils.rm("AtomicEditor_Windows.zip")
+      end 
+
+      if (File.exists?("AtomicEditor_Windows.zip"))
+        abort("Unable to remove AtomicEditor_Windows.zip")
+      end 
+ 
+    end  
+
     DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment"
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/Android", "#{EDITOR_APP_FOLDER_DST}/Deployment/Android")
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/MacOS", "#{EDITOR_APP_FOLDER_DST}/Deployment/MacOS")
@@ -350,6 +362,13 @@ namespace :package do
     PLAYER_APP_EXE_SRC = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.exe"
     FileUtils.mkdir_p("#{MAC_ARTIFACTS_SRC}/Deployment/Win64")
     FileUtils.cp("#{PLAYER_APP_EXE_SRC}", "#{MAC_ARTIFACTS_SRC}/Deployment/Win64/AtomicPlayer.exe")
+
+    Dir.chdir("#{WINDOWS_PACKAGE_FOLDER}") do
+
+      sh "\"C:\\Program Files\\7-Zip\\7z.exe\" a -tzip AtomicEditor_Windows.zip AtomicEditor"
+      sh "\"C:\\Program Files\\7-Zip\\7z.exe\" t AtomicEditor_Windows.zip"
+
+    end  
 
   end
 
