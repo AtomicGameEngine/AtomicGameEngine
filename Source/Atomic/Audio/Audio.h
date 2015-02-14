@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -95,6 +95,12 @@ public:
     /// Mix sound sources into the buffer.
     void MixOutput(void *dest, unsigned samples);
 
+    /// Final multiplier for for audio byte conversion
+#ifdef EMSCRIPTEN
+    static const int SAMPLE_SIZE_MUL = 2;
+#else
+    static const int SAMPLE_SIZE_MUL = 1;
+#endif
 private:
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);

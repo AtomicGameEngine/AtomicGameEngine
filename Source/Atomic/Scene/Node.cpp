@@ -1,5 +1,5 @@
 ﻿//
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -224,14 +224,14 @@ void Node::AddReplicationState(NodeReplicationState* state)
     networkState_->replicationStates_.Push(state);
 }
 
-bool Node::SaveXML(Serializer& dest) const
+bool Node::SaveXML(Serializer& dest, const String& indentation) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("node");
     if (!SaveXML(rootElem))
         return false;
 
-    return xml->Save(dest);
+    return xml->Save(dest, indentation);
 }
 
 void Node::SetName(const String& name)
@@ -1778,8 +1778,6 @@ Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mod
 
 void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
 {
-    WeakPtr<Component> componentWeak(*i);
-
     // Send node change event. Do not send when already being destroyed
     if (Refs() > 0 && scene_)
     {
@@ -1796,11 +1794,8 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     RemoveListener(*i);
     if (scene_)
         scene_->ComponentRemoved(*i);
+    (*i)->SetNode(0);
     components_.Erase(i);
-
-    // If the component is still referenced elsewhere, reset its node pointer now
-    if (componentWeak)
-        componentWeak->SetNode(0);
 }
 
 void Node::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@
 
 #if defined(IOS)
 #include <mach/mach_host.h>
-#elif !defined(ANDROID) && !defined(RPI)
+#elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
 #include <LibCpuId/src/libcpuid.h>
 #endif
 
@@ -349,6 +349,8 @@ String GetPlatform()
     return "Mac OS X";
     #elif defined(RPI)
     return "Raspberry Pi";
+    #elif defined(EMSCRIPTEN)
+    return "HTML5";
     #elif defined(__linux__)
     return "Linux";
     #else
@@ -393,7 +395,7 @@ unsigned GetNumPhysicalCPUs()
     #endif
     #elif defined(ANDROID)
     return GetAndroidCPUCount();
-    #elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+    #elif !defined(RPI) && !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -415,7 +417,7 @@ unsigned GetNumLogicalCPUs()
     #endif
     #elif defined(ANDROID)
     return GetAndroidCPUCount();
-    #elif !defined(ANDROID) && !defined(RPI) && !defined(EMSCRIPTEN)
+    #elif !defined(RPI) && !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;

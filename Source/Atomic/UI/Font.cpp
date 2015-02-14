@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ bool Font::BeginLoad(Deserializer& source)
     return true;
 }
 
-bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs)
+bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs, const String& indentation)
 {
     FontFace* fontFace = GetFace(pointSize);
     if (!fontFace)
@@ -113,7 +113,7 @@ bool Font::SaveXML(Serializer& dest, int pointSize, bool usedGlyphs)
     if (!packedFontFace->Load(fontFace, usedGlyphs))
         return false;
 
-    return packedFontFace->Save(dest, pointSize);
+    return packedFontFace->Save(dest, pointSize, indentation);
 }
 
 void Font::SetAbsoluteGlyphOffset(const IntVector2& offset)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -217,7 +217,7 @@ bool Scene::LoadXML(Deserializer& source)
         return false;
 }
 
-bool Scene::SaveXML(Serializer& dest) const
+bool Scene::SaveXML(Serializer& dest, const String& indentation) const
 {
     PROFILE(SaveSceneXML);
 
@@ -230,7 +230,7 @@ bool Scene::SaveXML(Serializer& dest) const
     if (ptr)
         LOGINFO("Saving scene to " + ptr->GetName());
 
-    if (xml->Save(dest))
+    if (xml->Save(dest, indentation))
     {
         FinishSaving(&dest);
         return true;

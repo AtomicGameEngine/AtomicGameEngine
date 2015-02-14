@@ -1,204 +1,115 @@
-#-------------------------------------------------------------------------------
-#	emscripten.toolchain.cmake
-#	Oryol cmake toolchain file for cross-compiling to emscripten.
-#-------------------------------------------------------------------------------
-
-message("Target Platform: emscripten")
-
 #
-# FIXME FIXME FIXME:
+# Copyright (c) 2008-2015 the Urho3D project.
 #
-#   emar currently has trouble using a non-standard .emscripten config
-#   file: https://github.com/kripken/emscripten/issues/2886
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-#   once this is fixed, set the CMAKE_AR_FLAGS variable to
-#   use the --em-config like the C/CXX compilers.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 #
 
-# depending on whether the official EMSDK is used or the
-# 'raw' emscripten SDK, OSX and Linux have 2 potential
-# locations for the emscripten SDK and the .emscripten file
-#
-# (NOTE: the 'raw SDK' is not supported on Windows)
-if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
-    set(EMSC_EMSDK_DIRNAME "sdks/windows/emsdk_portable/emscripten/incoming")
-    set(EMSC_RAWSDK_DIRNAME "")
-elseif (${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Darwin")
-    set(EMSC_EMSDK_DIRNAME "sdks/emsdk_portable/emscripten/incoming")
-    set(EMSC_RAWSDK_DIRNAME "sdks/osx/emscripten")
-elseif (${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Linux")
-    set(EMSC_EMSDK_DIRNAME "sdks/linux/emsdk_portable/emscripten/incoming")
-    set(EMSC_RAWSDK_DIRNAME "sdks/linux/emscripten")
-endif()
+# Based on cmake/Modules/Platform/Emscripten.cmake from https://github.com/kripken/emscripten
 
-set(ORYOL_PLATFORM EMSCRIPTEN)
-set(ORYOL_PLATFORM_NAME "emsc")
-set(ORYOL_EMSCRIPTEN 1)
-set(ORYOL_POSIX 1)
-set(ORYOL_OPENGL 1)
-set(ORYOL_OPENGLES2 1)
-set(ORYOL_PLATFORM_DEFINES " -DORYOL_EMSCRIPTEN=1 -DORYOL_POSIX=1")
-set(EMSCRIPTEN 1)
+cmake_minimum_required (VERSION 2.6.3)
 
-# total memory is 128MB for main thread, and 16 MB for worker
-# NOTE: USE_MEMORY_INIT_FILE has/had problems that the script is already starting but the MEM file isn't loaded yet(?)
-# at least I'm having weird startup problems...
-set(EMSCRIPTEN_TOTAL_MEMORY 134217728)
-set(EMSCRIPTEN_TOTAL_MEMORY_WORKER 16777216)
-set(EMSCRIPTEN_USE_MEMORY_INIT_FILE 1)
-set(EMSCRIPTEN_LTO_LEVEL 1)
-set(EMSCRIPTEN_NO_FILESYSTEM 1)
+if (CMAKE_TOOLCHAIN_FILE)
+    # Reference toolchain variable to suppress "unused variable" warning
+    mark_as_advanced (CMAKE_TOOLCHAIN_FILE)
+endif ()
 
-# disable closure for now, as long as ANGLE_instanced_array support is not fully supported in emscripten
-set(EMSCRIPTEN_USE_CLOSURE 0)
-set(EMSCRIPTEN_ASSERTIONS 0)
-set(EMSCRIPTEN_OUTLINING_LIMIT 20000)
+# this one is important
+set (CMAKE_SYSTEM_NAME Linux)
+# this one not so much
+set (CMAKE_SYSTEM_VERSION 1)
 
-if (ORYOL_COMPILE_VERBOSE)
-    set(EMSCRIPTEN_BUILD_VERBOSE 1)
-else()
-    set(EMSCRIPTEN_BUILD_VERBOSE 0)
-endif()
-
-# exceptions on/off?
-if (ORYOL_EXCEPTIONS)
-    message("C++ exceptions are enabled")
-    set(ORYOL_EMSC_EXCEPTION_FLAGS "")
-    set(EMSCRIPTEN_DISABLE_EXCEPTION_CATCHING 0)
-else()
-    message("C++ exceptions are disabled")
-    set(ORYOL_EMSC_EXCEPTION_FLAGS "-fno-exceptions")
-    set(EMSCRIPTEN_DISABLE_EXCEPTION_CATCHING 1)
-endif()
-
-message("EMSCRIPTEN_TOTAL_MEMORY: ${EMSCRIPTEN_TOTAL_MEMORY}")
-message("EMSCRIPTEN_TOTAL_MEMORY_WORKER: ${EMSCRIPTEN_TOTAL_MEMORY_WORKER}")
-message("EMSCRIPTEN_USE_MEMORY_INIT_FILE: ${EMSCRIPTEN_USE_MEMORY_INIT_FILE}")
-message("EMSCRIPTEN_LTO_LEVEL: ${EMSCRIPTEN_LTO_LEVEL}")
-message("EMSCRIPTEN_USE_CLOSURE: ${EMSCRIPTEN_USE_CLOSURE}")
-message("EMSCRIPTEN_ASSERTIONS: ${EMSCRIPTEN_ASSERTIONS}")
-message("EMSCRIPTEN_OUTLINING_LIMIT: ${EMSCRIPTEN_OUTLINING_LIMIT}")
-message("EMSCRIPTEN_DISABLE_EXCEPTION_CATCHING: ${EMSCRIPTEN_DISABLE_EXCEPTION_CATCHING}")
-message("EMSCRIPTEN_NO_FILESYSTEM: ${EMSCRIPTEN_NO_FILESYSTEM}")
-
-set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_VERSION 1)
-set(COMPILING on)
-set(CMAKE_CROSSCOMPILING TRUE)
-
-# find the emscripten SDK and set the "EMSC_HAS_LOCAL_CONFIG" variable
-set(EMSC_HAS_LOCAL_CONFIG 0)
-macro(find_emscripten_sdk)
-    # first check for the official EMSDK, this does not allow to override
-    # the location of the .emscripten config file
-    get_filename_component(EMSCRIPTEN_ROOT_PATH "/Users/josh/Dev/${EMSC_EMSDK_DIRNAME}" ABSOLUTE)
-
-
-    message ("${EMSCRIPTEN_ROOT_PATH}")
-
-    if (EXISTS "${EMSCRIPTEN_ROOT_PATH}/emcc")
-        message("Emscripten SDK found (emsdk): ${EMSCRIPTEN_ROOT_PATH}")
-    else()
-        # check for the RAW SDK (not supported on Windows)
-        get_filename_component(EMSCRIPTEN_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/../${EMSC_RAWSDK_DIRNAME}" ABSOLUTE)
-        if (EXISTS "${EMSCRIPTEN_ROOT_PATH}/emcc")
-            message("Emscripten SDK found (raw sdk): ${EMSCRIPTEN_ROOT_PATH}")
-            set(EMSC_HAS_LOCAL_CONFIG 1)
-        else()
-            message(FATAL_ERROR "Could not find emscripten SDK! See BUILD.md for instructions to setup Oryol for emscripten development!")
-        endif()
-    endif()
-endmacro()
-
-# find the emscripten SDK
-find_emscripten_sdk()
-
-# Normalize, convert Windows backslashes to forward slashes or CMake will crash.
-get_filename_component(EMSCRIPTEN_ROOT_PATH "${EMSCRIPTEN_ROOT_PATH}" ABSOLUTE)
-
-# Set the path to .emscripten file
-get_filename_component(EMSCRIPTEN_DOT_FILE "${EMSCRIPTEN_ROOT_PATH}/../.emscripten" ABSOLUTE)
-
-# Set up options that we always want to pass to emscripten
-if (EMSC_HAS_LOCAL_CONFIG)
-    set(EMSCRIPTEN_CONFIG_OPTIONS "--em-config ${EMSCRIPTEN_DOT_FILE}")
-else()
-    set(EMSCRIPTEN_CONFIG_OPTIONS "")    
-endif()
-
-# tool suffic (.bat on windows)
+# specify the cross compiler
+if (NOT EMSCRIPTEN_ROOT_PATH AND DEFINED ENV{EMSCRIPTEN_ROOT_PATH})
+    file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_ROOT_PATH} EMSCRIPTEN_ROOT_PATH)
+endif ()
+if (NOT EXISTS ${EMSCRIPTEN_ROOT_PATH}/emcc)
+    message (FATAL_ERROR "Could not find Emscripten cross compilation tool. "
+        "Use EMSCRIPTEN_ROOT_PATH environment variable or build option to specify the location of the toolchain.")
+endif ()
 if (CMAKE_HOST_WIN32)
-    set(EMCC_SUFFIX ".bat")
-else()
-    set(EMCC_SUFFIX "")
-endif()
+    set (TOOL_EXT .bat)
+endif ()
+set (CMAKE_C_COMPILER   ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT}     CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_ROOT_PATH}/em++${TOOL_EXT}     CACHE PATH "C++ compiler")
+set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
+set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
 
-include(CMakeForceCompiler)
-CMAKE_FORCE_C_COMPILER("${CMAKE_C_COMPILER}" Clang)
-CMAKE_FORCE_CXX_COMPILER("${CMAKE_CXX_COMPILER}" Clang)
+# specify the system root
+if (NOT EMSCRIPTEN_SYSROOT)
+    if (DEFINED ENV{EMSCRIPTEN_SYSROOT})
+        file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_SYSROOT} EMSCRIPTEN_SYSROOT)
+    else ()
+        set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_ROOT_PATH}/system)
+    endif ()
+    if (NOT EXISTS ${EMSCRIPTEN_SYSROOT})
+        message (FATAL_ERROR "Could not find Emscripten system root. "
+            "Use EMSCRIPTEN_SYSROOT environment variable or build option to specify the location of system root.")
+    endif ()
+    set (EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)" FORCE)
+    set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_SYSROOT} CACHE PATH "Path to Emscripten system root (Emscripten cross-compiling build only)" FORCE)
+endif ()
+set (CMAKE_FIND_ROOT_PATH ${EMSCRIPTEN_SYSROOT})
 
-# define configurations
-set(CMAKE_CONFIGURATION_TYPES Debug Release)
+# only search libraries, and headers in the target directories
+set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-# specify cross-compilers
-set(CMAKE_C_COMPILER "${EMSCRIPTEN_ROOT_PATH}/emcc${EMCC_SUFFIX}" CACHE PATH "gcc" FORCE)
-set(CMAKE_CXX_COMPILER "${EMSCRIPTEN_ROOT_PATH}/em++${EMCC_SUFFIX}" CACHE PATH "g++" FORCE)
-set(CMAKE_AR "${EMSCRIPTEN_ROOT_PATH}/emar${EMCC_SUFFIX}" CACHE PATH "archive" FORCE)
-set(CMAKE_LINKER "${EMSCRIPTEN_ROOT_PATH}/emcc${EMCC_SUFFIX}" CACHE PATH "linker" FORCE)
-set(CMAKE_RANLIB "${EMSCRIPTEN_ROOT_PATH}/emranlib${EMCC_SUFFIX}" CACHE PATH "ranlib" FORCE)
+# Don't do compiler autodetection, since we are cross-compiling.
+include (CMakeForceCompiler)
+CMAKE_FORCE_C_COMPILER ("${CMAKE_C_COMPILER}" Clang)
+CMAKE_FORCE_CXX_COMPILER ("${CMAKE_CXX_COMPILER}" Clang)
 
-# only search for libraries and includes in the toolchain
-set(CMAKE_FIND_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH})
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+# Hardwire support for cmake-2.8/Modules/CMakeBackwardsCompatibilityC.cmake without having CMake to try complex things
+# to autodetect these:
+set (CMAKE_SKIP_COMPATIBILITY_TESTS 1)
+set (CMAKE_SIZEOF_CHAR 1)
+set (CMAKE_SIZEOF_UNSIGNED_SHORT 2)
+set (CMAKE_SIZEOF_SHORT 2)
+set (CMAKE_SIZEOF_INT 4)
+set (CMAKE_SIZEOF_UNSIGNED_LONG 4)
+set (CMAKE_SIZEOF_UNSIGNED_INT 4)
+set (CMAKE_SIZEOF_LONG 4)
+set (CMAKE_SIZEOF_VOID_P 4)
+set (CMAKE_SIZEOF_FLOAT 4)
+set (CMAKE_SIZEOF_DOUBLE 8)
+set (CMAKE_C_SIZEOF_DATA_PTR 4)
+set (CMAKE_CXX_SIZEOF_DATA_PTR 4)
+set (CMAKE_HAVE_LIMITS_H 1)
+set (CMAKE_HAVE_UNISTD_H 1)
+set (CMAKE_HAVE_PTHREAD_H 1)
+set (CMAKE_HAVE_SYS_PRCTL_H 1)
+set (CMAKE_WORDS_BIGENDIAN 0)
+set (CMAKE_DL_LIBS)
 
-set(CMAKE_SYSTEM_INCLUDE_PATH "${EMSCRIPTEN_ROOT_PATH}/system/include")
+# In order for check_function_exists() detection to work, we must signal it to pass an additional flag, which causes the compilation
+# to abort if linking results in any undefined symbols. The CMake detection mechanism depends on the undefined symbol error to be raised.
+set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 
-# c++ compiler flags
-set(CMAKE_CXX_FLAGS "${ORYOL_PLATFORM_DEFINES} ${EMSCRIPTEN_CONFIG_OPTIONS} -std=c++11 -stdlib=libc++ ${ORYOL_EMSC_EXCEPTION_FLAGS} -fstrict-aliasing -Wall -Wno-warn-absolute-paths -Wno-multichar -Wextra -Wno-unused-parameter -Wno-unknown-pragmas -Wno-ignored-qualifiers -Wno-long-long -Wno-overloaded-virtual -Wno-deprecated-writable-strings -Wno-unused-volatile-lvalue")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-O3 -g -D_DEBUG_ -D_DEBUG -DORYOL_DEBUG=1")
-set(CMAKE_CXX_FLAGS_PROFILING "-O3 --profiling")
+# Use response files on Windows host
+if (CMAKE_HOST_WIN32)
+    foreach (lang C CXX)
+        foreach (cat LIBRARIES OBJECTS INCLUDES)
+            set (CMAKE_${lang}_USE_RESPONSE_FILE_FOR_${cat} 1)
+        endforeach ()
+        set (CMAKE_${lang}_CREATE_STATIC_LIBRARY "<CMAKE_AR> cr <TARGET> <LINK_FLAGS> <OBJECTS>")
+    endforeach ()
+endif ()
 
-# c compiler flags
-set(CMAKE_C_FLAGS "${ORYOL_PLATFORM_DEFINES} ${EMSCRIPTEN_CONFIG_OPTIONS} -fstrict-aliasing -Wall -Wno-warn-absolute-paths -Wextra -Wno-multichar -Wno-unused-parameter -Wno-unknown-pragmas -Wno-ignored-qualifiers -Wno-long-long -Wno-overloaded-virtual -Wno-deprecated-writable-strings -Wno-unused-volatile-lvalue")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_C_FLAGS_DEBUG "-O3 -g -D_DEBUG_ -D_DEBUG -DORYOL_DEBUG=1")
-set(CMAKE_C_FLAGS_PROFILING "-O3 --profiling")
-
-# linker flags
-set(CMAKE_EXE_LINKER_FLAGS "${EMSCRIPTEN_CONFIG_OPTIONS} --memory-init-file ${EMSCRIPTEN_USE_MEMORY_INIT_FILE} -s WARN_ON_UNDEFINED_SYMBOLS=1 -s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY} -s DISABLE_EXCEPTION_CATCHING=${EMSCRIPTEN_DISABLE_EXCEPTION_CATCHING} -s NO_FILESYSTEM=${EMSCRIPTEN_NO_FILESYSTEM}")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-O3 --llvm-lto ${EMSCRIPTEN_LTO_LEVEL} -s VERBOSE=${EMSCRIPTEN_BUILD_VERBOSE} -s ASM_JS=1 -s ASSERTIONS=${EMSCRIPTEN_ASSERTIONS} -s OUTLINING_LIMIT=${EMSCRIPTEN_OUTLINING_LIMIT} --closure ${EMSCRIPTEN_USE_CLOSURE}")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-O3 -g -s ASM_JS=1 -s VERBOSE=${EMSCRIPTEN_BUILD_VERBOSE}")
-set(CMAKE_EXE_LINKER_FLAGS_PROFILING "--profiling -O3 --llvm-lto ${EMSCRIPTEN_LTO_LEVEL} -s VERBOSE=${EMSCRIPTEN_BUILD_VERBOSE} -s ASM_JS=1 -s ASSERTIONS=${EMSCRIPTEN_ASSERTIONS} -s OUTLINING_LIMIT=${EMSCRIPTEN_OUTLINING_LIMIT}")
-
-# dynamic lib linker flags
-set(CMAKE_SHARED_LINKER_FLAGS "-shared ${EMSCRIPTEN_CONFIG_OPTIONS} --memory-init-file 0 -s WARN_ON_UNDEFINED_SYMBOLS=1 -s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY_WORKER} -s BUILD_AS_WORKER=1 -s EXPORTED_FUNCTIONS=[\\\"_dowork\\\"] -s DISABLE_EXCEPTION_CATCHING=${EMSCRIPTEN_DISABLE_EXCEPTION_CATCHING} -s NO_FILESYSTEM=${EMSCRIPTEN_NO_FILESYSTEM}")
-set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-O3 --llvm-lto ${EMSCRIPTEN_LTO_LEVEL} -s VERBOSE=${EMSCRIPTEN_BUILD_VERBOSE} -s ASM_JS=1 -s ASSERTIONS=${EMSCRIPTEN_ASSERTIONS} -s OUTLINING_LIMIT=${EMSCRIPTEN_OUTLINING_LIMIT} --closure ${EMSCRIPTEN_USE_CLOSURE}")
-set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-O3 -g -s ASM_JS=1 -s VERBOSE=${EMSCRIPTEN_BUILD_VERBOSE} --closure 0")
-set(CMAKE_SHARED_LINKER_FLAGS_PROFILING "--profiling -O3 --llvm-lto ${EMSCRIPTEN_LTO_LEVEL} -s VERBOSE=${EMSCRIPTEN_BUILD_VERBOSE} -s ASM_JS=1 -s ASSERTIONS=${EMSCRIPTEN_ASSERTIONS} -s OUTLINING_LIMIT=${EMSCRIPTEN_OUTLINING_LIMIT}")
-
-# update cache variables for cmake gui
-set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Config Type" FORCE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" CACHE STRING "Generic C++ Compiler Flags" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}" CACHE STRING "C++ Debug Compiler Flags" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" CACHE STRING "C++ Release Compiler Flags" FORCE)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Generic C Compiler Flags" FORCE)
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "C Debug Compiler Flags" FORCE)
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "C Release Compiler Flags" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}" CACHE STRING "Generic Linker Flags" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}" CACHE STRING "Debug Linker Flags" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" CACHE STRING "Release Linker Flags" FORCE)
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" CACHE STRING "Generic Shared Linker Flags" FORCE)
-set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}" CACHE STRING "Debug Shared Linker Flags" FORCE)
-set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}" CACHE STRING "Release Shared Linker Flags" FORCE)
-
-# set the build type to use
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Compile Type" FORCE)
-endif()
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release)
-
-message("Emscripten toolchain configured")
+set (EMSCRIPTEN 1)

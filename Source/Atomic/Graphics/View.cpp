@@ -1932,8 +1932,6 @@ void View::AllocateScreenBuffers()
     unsigned format = renderTarget_ ? renderTarget_->GetParentTexture()->GetFormat() : Graphics::GetRGBFormat();
     
     // If HDR rendering is enabled use RGBA16f and reserve a buffer
-    bool hdrRendering = renderer_->GetHDRRendering();
-
     if (renderer_->GetHDRRendering())
     {
         format = Graphics::GetRGBAFloat16Format();
@@ -1941,7 +1939,7 @@ void View::AllocateScreenBuffers()
     }
     
     #ifdef ATOMIC_OPENGL
-    if (deferred_ && !hdrRendering)
+    if (deferred_ && !renderer_->GetHDRRendering())
         format = Graphics::GetRGBAFormat();
     #endif
     

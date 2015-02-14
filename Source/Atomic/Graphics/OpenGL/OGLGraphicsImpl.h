@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,15 +26,12 @@
 #include "../../Container/HashMap.h"
 #include "../../Core/Timer.h"
 
-#if defined(ANDROID) || defined (RPI)
+#if defined(ANDROID) || defined (RPI) || defined (EMSCRIPTEN)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #elif defined(IOS)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
-#elif defined(EMSCRIPTEN)
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
 #else
 #include <GLEW/glew.h>
 #endif

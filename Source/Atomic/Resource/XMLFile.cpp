@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -134,8 +134,13 @@ bool XMLFile::BeginLoad(Deserializer& source)
 
 bool XMLFile::Save(Serializer& dest) const
 {
+    return Save(dest, "\t");
+}
+
+bool XMLFile::Save(Serializer& dest, const String& indendation) const
+{
     XMLWriter writer(dest);
-    document_->save(writer);
+    document_->save(writer, indendation.CString());
     return writer.success_;
 }
 
@@ -167,11 +172,11 @@ XMLElement XMLFile::GetRoot(const String& name)
         return XMLElement(this, root.internal_object());
 }
 
-String XMLFile::ToString() const
+String XMLFile::ToString(const String& indendation) const
 {
     VectorBuffer dest;
     XMLWriter writer(dest);
-    document_->save(writer);
+    document_->save(writer, indendation.CString());
     return String((const char*)dest.GetData(), dest.GetSize());
 }
 

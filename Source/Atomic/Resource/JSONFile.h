@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,10 @@ public:
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
-    /// Save resource. Return true if successful. Only supports saving to a File.
+    /// Save resource with default indentation (one tab). Return true if successful.
     virtual bool Save(Serializer& dest) const;
+    /// Save resource with user-defined indentation, only the first character (if any) of the string is used and the length of the string defines the character count. Return true if successful.
+    bool Save(Serializer& dest, const String& indendation) const;
 
     /// Clear the document and create a root value, default is object type.
     JSONValue CreateRoot(JSONValueType valueType = JSON_OBJECT);

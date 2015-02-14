@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -538,11 +538,11 @@ bool UIElement::LoadXML(Deserializer& source)
     return xml->Load(source) && LoadXML(xml->GetRoot());
 }
 
-bool UIElement::SaveXML(Serializer& dest) const
+bool UIElement::SaveXML(Serializer& dest, const String& indentation) const
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement rootElem = xml->CreateRoot("element");
-    return SaveXML(rootElem) && xml->Save(dest);
+    return SaveXML(rootElem) && xml->Save(dest, indentation);
 }
 
 bool UIElement::FilterAttributes(XMLElement& dest) const

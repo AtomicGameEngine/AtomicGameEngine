@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ class ATOMIC_API LogicComponent : public Component
     virtual void Start() {}
     /// Called before the first update. At this point all other components of the node should exist. Will also be called if update events are not wanted; in that case the event is immediately unsubscribed afterward.
     virtual void DelayedStart() {}
-    /// Called when the component is detached from a scene node, usually on destruction.
+    /// Called when the component is detached from a scene node, usually on destruction. Note that you will no longer have access to the node and scene at that point.
     virtual void Stop() {}
     /// Called on scene update, variable timestep.
     virtual void Update(float timeStep);

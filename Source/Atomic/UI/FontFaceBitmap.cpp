@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -262,7 +262,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     return true;
 }
 
-bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
+bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indentation)
 {
     Context* context = font_->GetContext();
 
@@ -338,7 +338,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize)
         }
     }
 
-    return xml->Save(dest);
+    return xml->Save(dest, indentation);
 }
 
 unsigned FontFaceBitmap::ConvertFormatToNumComponents(unsigned format)
