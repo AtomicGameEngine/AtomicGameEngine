@@ -19,6 +19,7 @@ SharedPtr<Context> JSBind::context_;
 SharedPtr<FileSystem> JSBind::fileSystem_;
 SharedPtr<Engine> JSBind::engine_;
 String JSBind::ROOT_FOLDER;
+String JSBind::PLATFORM;
 
 void JSBind::Initialize()
 {
@@ -36,10 +37,17 @@ void Run(const Vector<String>& arguments)
 
     if (arguments.Size() < 1)
     {
-        ErrorExit("Usage: JSBind absolute_path_to_atomic_runtime_source_tree");
+        ErrorExit("Usage: JSBind absolute_path_to_atomic_runtime_source_tree [optional] platform");
     }
 
     JSBind::ROOT_FOLDER = arguments[0];
+
+    if (arguments.Size() > 1)
+        JSBind::PLATFORM = arguments[1];
+
+    if (JSBind::PLATFORM.Length() && JSBind::PLATFORM != "WEB")
+        ErrorExit("Platform argument only supports WEB at this time");
+
 
     if (!JSBind::fileSystem_->DirExists(JSBind::ROOT_FOLDER + "/Source/Tools/JSBind"))
     {

@@ -42,11 +42,14 @@ void JSBindings::ParseHeaders()
 
     EmitJSModules(JSBind::ROOT_FOLDER + "/Source/Atomic/Javascript/Modules");
 
-    JSBTypeScript* ts = new JSBTypeScript();
-    ts->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.d.ts");
+    if (JSBind::PLATFORM != "WEB")
+    {
+        JSBTypeScript* ts = new JSBTypeScript();
+        ts->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.d.ts");
 
-    JSBDoc* jsdoc = new JSBDoc();
-    jsdoc->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.js");
+        JSBDoc* jsdoc = new JSBDoc();
+        jsdoc->Emit(JSBind::ROOT_FOLDER + "/Bin/Atomic.js");
+    }
 }
 
 void JSBindings::EmitJSModules(const String& rootpath)
@@ -170,8 +173,25 @@ void JSBindings::Initialize()
     JSONValue json = jsonFile->GetRoot();
     JSONValue modules = json.GetChild("modules");
 
+    List<String> moduleExclusions;
+
+    if (JSBind::PLATFORM == "WEB")
+    {
+        JSONValue jmodulesExclude = json.GetChild("modulePlatformExclude");
+        JSONValue jexcludes = jmodulesExclude.GetChild("WEB");
+
+        for (unsigned i = 0; i < jexcludes.GetSize(); i++)
+        {
+            moduleExclusions.Push(jexcludes.GetString(i));
+        }
+
+    }
+
     for (unsigned i = 0; i < modules.GetSize(); i++)
     {
+        if (moduleExclusions.Contains(modules.GetString(i)))
+            continue;
+
         String moduleName = "modules/" + modules.GetString(i) + ".json";
 
         JSBModule* jsbModule = new JSBModule(this);

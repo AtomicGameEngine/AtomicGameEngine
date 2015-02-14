@@ -40,62 +40,7 @@
 
 #include <Atomic/UI/TBUI.h>
 
-#ifdef EMSCRIPTEN
-
-#include "emscripten.h"
-
-class EmscriptenApp
-{
-public:
-    Atomic::SharedPtr<Atomic::Context> context_;
-    Atomic::SharedPtr<AtomicPlayer> application_;
-
-    static EmscriptenApp* sInstance_;
-
-    EmscriptenApp() : context_(new Atomic::Context()), application_(new AtomicPlayer(context_))
-    {
-        sInstance_ = this;
-    }
-
-};
-
-EmscriptenApp* EmscriptenApp::sInstance_ = NULL;
-
-static void RunFrame()
-{
-    Engine* engine = EmscriptenApp::sInstance_->application_->GetSubsystem<Engine>();
-    if (engine->IsInitialized())
-        engine->RunFrame();
-    else
-        printf("ENGINE NOT INITIALIZED\n");
-}
-
-int main(int argc, char** argv)
-{    
-    Atomic::ParseArguments(argc, argv);
-    // leak
-    new EmscriptenApp();
-
-    EmscriptenApp::sInstance_->application_->Run();
-
-    emscripten_set_main_loop(RunFrame, 0, 1);
-
-    /*
-    int firefox = EM_ASM_INT ( return ((navigator.userAgent.toLowerCase().indexOf('firefox') > -1) ? 1 : 0), 0);
-    if (firefox)
-        emscripten_set_main_loop(RunFrame, 0, 1);
-    else
-        emscripten_set_main_loop(RunFrame, 60, 1);
-*/        
-    return 0;
-}
-
-
-#else
-
 DEFINE_APPLICATION_MAIN(AtomicPlayer);
-
-#endif
 
 // fixme
 static JSVM* vm = NULL;

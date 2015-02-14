@@ -55,11 +55,11 @@ namespace :web do
     end
 
     Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
-      sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+      sh "cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
     end 
 
-    Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/Tools/AtomicPlayer") do
+    Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer") do
       sh "mv AtomicPlayer AtomicPlayer.bc"
       sh "emcc -O3 --llvm-lto 1 --memory-init-file 0 -s VERBOSE=0 -s USE_SDL=2 -s ASM_JS=1 -s ASSERTIONS=1 -s OUTLINING_LIMIT=20000 -s TOTAL_MEMORY=520093696 --closure 0 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
     end
@@ -111,7 +111,7 @@ namespace :macosx do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       sh "make -j8 JSBind"
-      sh "./Source/Tools/JSBind/JSBind #{$RAKE_ROOT}"
+      sh "./Source/Tools/JSBind/JSBind #{$RAKE_ROOT} WEB"
     end
 
 	end
@@ -179,7 +179,8 @@ end
 
 namespace :package do
 
-  task :macosx_preflight => ['macosx:clean', 
+  task :macosx_preflight => ['macosx:clean',
+                          'web:player',
                           'android:player',
                           "atomictiled:osx",
                           'macosx:editor',
@@ -234,6 +235,10 @@ namespace :package do
       sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Android #{DEPLOYMENT_FOLDER_DST}/Android"
       FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a")
       sh "cp #{CMAKE_ANDROID_BUILD_FOLDER}/Source/AtomicPlayer/libAtomicPlayer.so #{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a/libAtomicPlayer.so"
+
+      # Web Deployment
+      sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Web #{DEPLOYMENT_FOLDER_DST}/Web"
+      sh "cp #{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.js #{DEPLOYMENT_FOLDER_DST}/Web/AtomicPlayer.js"
 
       sh "cp -r #{EXAMPLES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Examples"
       sh "cp -r #{DOCS_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Docs"

@@ -21,5 +21,6 @@ public:
     static SharedPtr<Engine> engine_;
 
     static String ROOT_FOLDER;
+    static String PLATFORM;
 };
 
