@@ -18,9 +18,13 @@ if (MSVC)
 
     include(AtomicWindows)
 
+elseif (IOS)
+
+	include(AtomicIOS)
+
 elseif(APPLE)
 
-    include(AtomicApple)
+    include(AtomicMac)
 
 elseif(ANDROID)
 

@@ -34,7 +34,7 @@ else()
 
 endif()
 
-if (APPLE)
+if (APPLE AND NOT IOS)
     set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
 endif()
 

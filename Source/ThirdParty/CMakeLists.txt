@@ -17,13 +17,13 @@ if (NOT EMSCRIPTEN)
 	add_subdirectory(kNet)
 endif()
 
-if (NOT ANDROID AND NOT EMSCRIPTEN)
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(LibCpuId)
     add_subdirectory(SQLite)
     add_subdirectory(TurboBadger)    
 endif ()
 
-if (APPLE)
+if (APPLE AND NOT IOS)
     add_subdirectory(GLEW)
 endif()
 
