@@ -29,9 +29,15 @@ SubprocessSystem::~SubprocessSystem()
 
 Subprocess* SubprocessSystem::Launch(const String& command, const Vector<String>& args, const String& initialDirectory)
 {
+    Poco::Process::Env env;
+    return Launch(command, args, initialDirectory, env);
+}
+
+Subprocess* SubprocessSystem::Launch(const String& command, const Vector<String>& args, const String& initialDirectory, const Poco::Process::Env& env)
+{
     SharedPtr<Subprocess> process(new Subprocess(context_));
 
-    if (process->Launch(GetNativePath(command), args, GetNativePath(initialDirectory)))
+    if (process->Launch(GetNativePath(command), args, GetNativePath(initialDirectory), env))
     {
         processes_.Push(process);
         return process;
@@ -40,6 +46,7 @@ Subprocess* SubprocessSystem::Launch(const String& command, const Vector<String>
     return 0;
 
 }
+
 
 void SubprocessSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {

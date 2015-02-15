@@ -25,6 +25,7 @@ public:
 
 
     Subprocess* Launch(const String& command, const Vector<String>& args, const String& initialDirectory = "");
+    Subprocess* Launch(const String& command, const Vector<String>& args, const String& initialDirectory, const Poco::Process::Env& env);
 
 private:
 

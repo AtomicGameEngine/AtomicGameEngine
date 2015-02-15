@@ -35,6 +35,7 @@ private:
     void DoBuildMac(const String& buildPath);
     void DoBuildWindows(const String& buildPath);
     void DoBuildAndroid(const String& buildPath);
+    void DoBuildIOS(const String& buildPath);
     void DoBuildWeb(const String& buildPath);
 
     SharedPtr<BuildSettings> buildSettings_;

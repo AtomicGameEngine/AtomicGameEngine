@@ -58,6 +58,9 @@ UIBuild::UIBuild(Context* context):
         platformIndicator->SetSkinBg(TBIDC("LogoAndroid"));
     else if (platform == AE_PLATFORM_HTML5)
         platformIndicator->SetSkinBg(TBIDC("LogoHTML5"));
+    else if (platform == AE_PLATFORM_IOS)
+        platformIndicator->SetSkinBg(TBIDC("LogoIOS"));
+
 }
 
 
@@ -116,7 +119,7 @@ bool UIBuild::OnEvent(const TBWidgetEvent &ev)
                 else if (platform == AE_PLATFORM_HTML5)
                     neventData[P_PLATFORM] = "HTML5";
                 else if (platform == AE_PLATFORM_IOS)
-                    neventData[P_PLATFORM] = "iOS";
+                    neventData[P_PLATFORM] = "IOS";
 
                 ops->Hide();
                 neventData[P_BUILDPATH] = buildPath;

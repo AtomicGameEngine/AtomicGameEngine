@@ -129,6 +129,12 @@ bool Subprocess::Update(SubprocessSystem* system)
 
 bool Subprocess::Launch(const String& command, const Vector<String>& args, const String& initialDirectory)
 {
+    Poco::Process::Env env;
+    return Launch(command, args, initialDirectory, env);
+}
+
+bool Subprocess::Launch(const String& command, const Vector<String>& args, const String& initialDirectory, const Poco::Process::Env& env)
+{
     Poco::Process::Args pargs;
 
     for (unsigned i = 0; i < args.Size(); i++)
@@ -138,7 +144,7 @@ bool Subprocess::Launch(const String& command, const Vector<String>& args, const
     std::string pinitialDirectory = initialDirectory.CString();
 
     // this can take an ENV as well, may come in useful
-    handle_ = new Poco::ProcessHandle(Poco::Process::launch(pcommand, pargs, pinitialDirectory, &pipeIn_, &pipeOut_, &pipeError_));
+    handle_ = new Poco::ProcessHandle(Poco::Process::launch(pcommand, pargs, pinitialDirectory, &pipeIn_, &pipeOut_, &pipeError_, env));
 
     if (!Poco::Process::isRunning(*handle_))
         return false;

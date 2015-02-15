@@ -52,6 +52,7 @@ private:
 
 
     bool Launch(const String& command, const Vector<String>& args, const String& initialDirectory = "");
+    bool Launch(const String& command, const Vector<String>& args, const String& initialDirectory, const Poco::Process::Env& env);
 
     String output_;
     String errorOutput_;

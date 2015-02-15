@@ -12,6 +12,7 @@
 #include "BuildMac.h"
 #include "BuildWindows.h"
 #include "BuildAndroid.h"
+#include "BuildIOS.h"
 #include "BuildWeb.h"
 
 #include "../AEEvents.h"
@@ -65,6 +66,12 @@ void BuildSystem::DoBuildWeb(const String& buildPath)
 
 }
 
+void BuildSystem::DoBuildIOS(const String& buildPath)
+{
+    currentBuild_ = SharedPtr<BuildBase>(new BuildIOS(context_));
+    currentBuild_->Build(buildPath);
+}
+
 void BuildSystem::LoadBuildSettings(rapidjson::Value::Member* jobject)
 {
     buildSettings_->Load(jobject);
@@ -106,6 +113,10 @@ void BuildSystem::HandleEditorBuild(StringHash eventType, VariantMap& eventData)
     else if (buildPlatform == "HTML5")
     {
         DoBuildWeb(buildPath);
+    }
+    else if (buildPlatform == "IOS")
+    {
+        DoBuildIOS(buildPath);
     }
 
 }
