@@ -13,6 +13,7 @@ namespace tb
 {
 class TBLayout;
 class TBEditField;
+class TBTextField;
 class TBSelectDropdown;
 }
 
@@ -36,6 +37,8 @@ public:
 
 private:
 
+    bool ParseProvisionData(const String& provisionFile);
+
     String targetOutput_;
     HashMap<unsigned, String> targetLookup_;
 
@@ -45,6 +48,7 @@ private:
     TBEditField* companyNameEdit_;
 
     TBEditField* provisionPath_;
+    TBTextField* applicationIDPrefix_;
 
 };
 

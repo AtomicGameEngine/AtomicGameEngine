@@ -34,6 +34,7 @@ struct IOSBuildSettings
     String companyName;
     String productName;
     String provisionFile;
+    String appidPrefix;
 };
 
 

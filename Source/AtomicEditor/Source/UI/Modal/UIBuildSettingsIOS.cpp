@@ -3,6 +3,7 @@
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
 #include "AtomicEditor.h"
+#include <PugiXml/src/pugixml.hpp>
 #include <TurboBadger/tb_layout.h>
 #include <TurboBadger/tb_editfield.h>
 #include <TurboBadger/tb_select.h>
@@ -19,6 +20,7 @@
 #include "Subprocess/AESubprocessSystem.h"
 
 #include "Build/BuildSystem.h"
+#include "Build/BuildIOSUtils.h"
 
 #include "UIBuildSettingsIOS.h"
 
@@ -45,6 +47,9 @@ UIBuildSettingsIOS::UIBuildSettingsIOS(Context* context) :
 
     provisionPath_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("provision_path"));
     assert(provisionPath_);
+
+    applicationIDPrefix_ = delegate_->GetWidgetByIDAndType<TBTextField>(TBIDC("appid_prefix"));
+    assert(applicationIDPrefix_);
 
     Refresh();
 }
@@ -82,6 +87,11 @@ void UIBuildSettingsIOS::StoreSettings()
     settings.provisionFile = text.CStr();
     text.Clear();
 
+    applicationIDPrefix_->GetText(text);
+    settings.appidPrefix = text.CStr();
+    text.Clear();
+
+
     buildSystem->GetBuildSettings()->SetIOSSettings(settings);
 
 }
@@ -97,6 +107,60 @@ void UIBuildSettingsIOS::Refresh()
     appPackageEdit_->SetText(settings.package.CString());
     productNameEdit_->SetText(settings.productName.CString());
     companyNameEdit_->SetText(settings.companyName.CString());
+    applicationIDPrefix_->SetText(settings.appidPrefix.CString());
+}
+
+bool UIBuildSettingsIOS::ParseProvisionData(const String& provisionFile)
+{
+    String pdata = GetMobileProvisionData(provisionFile.CString());
+
+    if (!pdata.Length())
+        return false;
+
+    pugi::xml_document doc;
+
+    if (!doc.load(pdata.CString()))
+    {
+        return false;
+    }
+
+    String AppIDName;
+    String ApplicationIdentifierPrefix;
+
+    pugi::xml_node dict = doc.document_element().child("dict");
+
+    for (pugi::xml_node key = dict.child("key"); key; key = key.next_sibling("key"))
+    {
+        String keyName = key.child_value();
+
+        if (keyName == "AppIDName")
+        {
+            pugi::xml_node value = key.next_sibling();
+            if (!strcmp(value.name(), "string"))
+                AppIDName = value.child_value();
+        }
+        else if (keyName == "ApplicationIdentifierPrefix")
+        {
+            pugi::xml_node array = key.next_sibling();
+            if (!strcmp(array.name(), "array"))
+            {
+                pugi::xml_node value = array.first_child();
+                if (!strcmp(value.name(), "string"))
+                    ApplicationIdentifierPrefix = value.child_value();
+            }
+
+        }
+    }
+
+    if (!ApplicationIdentifierPrefix.Length())
+        return false;
+
+    applicationIDPrefix_->SetText(ApplicationIdentifierPrefix.CString());
+    provisionPath_->SetText(provisionFile.CString());
+
+    return true;
+
+
 }
 
 bool UIBuildSettingsIOS::OnEvent(const TBWidgetEvent &ev)
@@ -109,7 +173,13 @@ bool UIBuildSettingsIOS::OnEvent(const TBWidgetEvent &ev)
         if (ev.target->GetID() == TBIDC("choose_provision_path"))
         {
             String path = utils->GetMobileProvisionPath();
-            provisionPath_->SetText(path.CString());
+            if (path.Length())
+            {
+                if (!ParseProvisionData(path))
+                    editor->PostModalError("Mobile Provision Error", "Could not parse mobile provision");
+                else
+                    StoreSettings();
+            }
             return true;
         }
     }

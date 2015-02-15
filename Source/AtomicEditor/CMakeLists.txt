@@ -13,7 +13,7 @@ set (SOURCE_FILES ${SOURCE_FILES} Vendor/nativefiledialog/nfd_common.c)
 
 if (APPLE)
     set (EXE_TYPE MACOSX_BUNDLE)
-    set (SOURCE_FILES ${SOURCE_FILES} Vendor/nativefiledialog/nfd_cocoa.mm Vendor/nativefiledialog/nfd.h)
+    set (SOURCE_FILES ${SOURCE_FILES} Source/Build/BuildIOSUtils.mm Vendor/nativefiledialog/nfd_cocoa.mm Vendor/nativefiledialog/nfd.h)
 else()
     include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Vendor/libcurl/include)
     add_definitions(-DCURL_STATICLIB)

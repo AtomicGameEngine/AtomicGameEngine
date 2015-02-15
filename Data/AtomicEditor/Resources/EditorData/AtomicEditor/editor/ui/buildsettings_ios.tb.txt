@@ -8,17 +8,17 @@ TBLayout: axis: y, distribution: gravity, position: left
 	TBLayout: distribution: gravity
 		TBTextField: text: "App Package:"
 		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: app_package, autofocus: 1
+			TBEditField: id: app_package, autofocus: 0
 				lp: min-width: 220
 	TBLayout: distribution: gravity
 		TBTextField: text: "Company Name:"
 		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: company_name, autofocus: 1
+			TBEditField: id: company_name, autofocus: 0
 				lp: min-width: 220
 	TBLayout: distribution: gravity
 		TBTextField: text: "Product Name:"
 		TBLayout: gravity: left right, distribution-position: right bottom
-			TBEditField: id: product_name, autofocus: 1
+			TBEditField: id: product_name, autofocus: 0
 				lp: min-width: 220
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout: axis: y, position: left, distribution: gravity
@@ -27,6 +27,11 @@ TBLayout: axis: y, distribution: gravity, position: left
 			TBEditField: id: provision_path, autofocus: 0
 				lp: min-width: 250
 			TBButton: text: "Choose" id: choose_provision_path
+		TBLayout: distribution: gravity
+			TBTextField: text: "AppID Prefix:"
+			TBLayout: gravity: left right, distribution-position: right bottom
+				TBTextField: id: appid_prefix
+					lp: min-width: 220
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBTextField: text: "Icon:"
 	TBLayout: gravity: left right, distribution-position: right bottom

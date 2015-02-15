@@ -56,6 +56,7 @@ void BuildSettings::Load(rapidjson::Value::Member* jobject)
         ios_.provisionFile = GetStringMember(jios, "provision_file");
         ios_.companyName = GetStringMember(jios, "company_name");
         ios_.productName = GetStringMember(jios, "product_name");
+        ios_.appidPrefix = GetStringMember(jios, "appid_prefix");
     }
     // END IOS ------
 
@@ -105,6 +106,8 @@ void BuildSettings::Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer)
     writer.String(ios_.companyName.CString());
     writer.String("product_name");
     writer.String(ios_.productName.CString());
+    writer.String("appid_prefix");
+    writer.String(ios_.appidPrefix.CString());
 
     writer.EndObject();
     // END IOS ------
