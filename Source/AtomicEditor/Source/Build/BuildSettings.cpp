@@ -46,6 +46,19 @@ void BuildSettings::Load(rapidjson::Value::Member* jobject)
         android_.productName = GetStringMember(jandroid, "product_name");
     }
     // END ANDROID ------
+
+    // IOS ------
+    rapidjson::Value::Member* jios = jobject->value.FindMember("ios");
+    if (jios && jios->value.IsObject())
+    {
+        ios_.appName = GetStringMember(jios, "app_name");
+        ios_.package = GetStringMember(jios, "package");
+        ios_.provisionFile = GetStringMember(jios, "provision_file");
+        ios_.companyName = GetStringMember(jios, "company_name");
+        ios_.productName = GetStringMember(jios, "product_name");
+    }
+    // END IOS ------
+
 }
 
 void BuildSettings::Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer)
@@ -77,6 +90,25 @@ void BuildSettings::Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer)
 
     writer.EndObject();
     // END ANDROID ------
+
+    // IOS ------
+    writer.String("ios");
+    writer.StartObject();
+
+    writer.String("app_name");
+    writer.String(ios_.appName.CString());
+    writer.String("package");
+    writer.String(ios_.package.CString());
+    writer.String("provision_file");
+    writer.String(ios_.provisionFile.CString());
+    writer.String("company_name");
+    writer.String(ios_.companyName.CString());
+    writer.String("product_name");
+    writer.String(ios_.productName.CString());
+
+    writer.EndObject();
+    // END IOS ------
+
 
     writer.EndObject();
 

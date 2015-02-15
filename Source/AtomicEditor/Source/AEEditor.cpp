@@ -226,12 +226,6 @@ void Editor::RequestPlatformChange(AEEditorPlatform platform)
         return;
     }
 
-    if (platform == AE_PLATFORM_IOS)
-    {
-        PostModalInfo("iOS Platform Info", "iOS Platform not supported in this Atomic Editor Preview Build");
-        return;
-    }
-
     if (currentPlatform_ == platform)
         return;
 

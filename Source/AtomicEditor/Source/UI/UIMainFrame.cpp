@@ -640,6 +640,8 @@ void MainFrame::HandlePlatformChange(StringHash eventType, VariantMap& eventData
         platformIndicator_->SetSkinBg(TBIDC("LogoAndroid"));
     else if (platform == AE_PLATFORM_HTML5)
         platformIndicator_->SetSkinBg(TBIDC("LogoHTML5"));
+    else if (platform == AE_PLATFORM_IOS)
+        platformIndicator_->SetSkinBg(TBIDC("LogoIOS"));
 
 }
 

@@ -27,6 +27,16 @@ struct AndroidBuildSettings
     String productName;
 };
 
+struct IOSBuildSettings
+{
+    String appName;
+    String package;
+    String companyName;
+    String productName;
+    String provisionFile;
+};
+
+
 class BuildSettings : public Object
 {
     OBJECT(BuildSettings);
@@ -40,6 +50,9 @@ public:
     const AndroidBuildSettings& GetAndroidSettings() { return android_; }
     void SetAndroidSettings(const AndroidBuildSettings& settings) { android_ = settings; }
 
+    const IOSBuildSettings& GetIOSSettings() { return ios_; }
+    void SetIOSSettings(const IOSBuildSettings& settings) { ios_ = settings; }
+
     void Load(rapidjson::Value::Member* jobject);
     void Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer);
 
@@ -48,6 +61,7 @@ private:
     String GetStringMember(rapidjson::Value::Member* jobject, const String& name);
 
     AndroidBuildSettings android_;
+    IOSBuildSettings ios_;
 
 };
 

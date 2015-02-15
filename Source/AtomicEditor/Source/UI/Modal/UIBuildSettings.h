@@ -14,6 +14,7 @@
 #include "UIBuildSettingsWindows.h"
 #include "UIBuildSettingsAndroid.h"
 #include "UIBuildSettingsWeb.h"
+#include "UIBuildSettingsIOS.h"
 
 namespace AtomicEditor
 {
@@ -40,6 +41,7 @@ private:
     void SelectAndroidSettings();
     void SelectMacSettings();
     void SelectWebSettings();
+    void SelectIOSSettings();
 
     void StoreSettings();
 
@@ -53,6 +55,7 @@ private:
     SharedPtr<UIBuildSettingsWindows> windowsSettings_;
     SharedPtr<UIBuildSettingsAndroid> androidSettings_;
     SharedPtr<UIBuildSettingsWeb> webSettings_;
+    SharedPtr<UIBuildSettingsIOS> iosSettings_;
 
 };
 

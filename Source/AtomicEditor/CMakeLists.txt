@@ -1,12 +1,11 @@
 
-include_directories(${CMAKE_SOURCE_DIR}/Source)
-include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include)
+include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
+                     ${CMAKE_CURRENT_SOURCE_DIR}/Vendor/nativefiledialog
+                     ${CMAKE_CURRENT_SOURCE_DIR}/Vendor/Poco/Foundation/include)
+
 
 file (GLOB_RECURSE SOURCE_FILES Source/*.cpp Source/*.h)
-
-include_directories (${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)
-include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Vendor/nativefiledialog)
-include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Vendor/Poco/Foundation/include)
 
 add_definitions(-DPOCO_NO_AUTOMATIC_LIBS)
 

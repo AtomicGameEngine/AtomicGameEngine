@@ -67,6 +67,30 @@ String ProjectUtils::GetBuildPath(const String& defaultPath)
 
 }
 
+String ProjectUtils::GetMobileProvisionPath()
+{
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_OpenDialog( "mobileprovision",
+                                NULL,
+                                &outPath);
+
+    String fullpath;
+
+    if (outPath && result == NFD_OKAY)
+    {
+         fullpath = outPath;
+    }
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    if (outPath)
+        free(outPath);
+
+    return fullpath;
+
+}
+
 String ProjectUtils::GetAndroidSDKPath(const String& defaultPath)
 {
     String sdkPath;

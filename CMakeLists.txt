@@ -7,6 +7,9 @@ set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 add_definitions( -DATOMIC_STATIC_DEFINE -DATOMIC_LOGGING -DATOMIC_PHYSICS -DATOMIC_ATOMIC2D )
 
+# this is here as QtCreator is having trouble picking up #include <Atomic/*> without it
+include_directories(${CMAKE_SOURCE_DIR}/Source ${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)
+
 set (ATOMIC_LINK_LIBRARIES Atomic Box2D Bullet Duktape FreeType JO LZ4 PugiXml StanHull STB )
 
 if (NOT EMSCRIPTEN)
@@ -20,11 +23,13 @@ if (MSVC)
 
 elseif (IOS)
 
-	include(AtomicIOS)
-
 elseif(APPLE)
 
-    include(AtomicMac)
+    if (IOS)
+        include(AtomicIOS)
+    else()
+        include(AtomicMac)
+    endif()
 
 elseif(ANDROID)
 

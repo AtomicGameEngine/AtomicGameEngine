@@ -27,6 +27,7 @@ UIBuildSettings::UIBuildSettings(Context* context):
     windowsSettings_(new UIBuildSettingsWindows(context)),
     androidSettings_(new UIBuildSettingsAndroid(context)),
     webSettings_(new UIBuildSettingsWeb(context)),
+    iosSettings_(new UIBuildSettingsIOS(context)),
     platformIndicator_(0)
 {
     TBUI* tbui = GetSubsystem<TBUI>();
@@ -85,6 +86,9 @@ UIBuildSettings::UIBuildSettings(Context* context):
         SelectAndroidSettings();
     else if (platform == AE_PLATFORM_HTML5)
         SelectWebSettings();
+    else if (platform == AE_PLATFORM_IOS)
+        SelectIOSSettings();
+
 
     window_->ResizeToFitContent();
     Center();
@@ -106,6 +110,10 @@ void UIBuildSettings::RemoveSettingsWidgets()
 
     if (webSettings_->GetWidgetDelegate()->GetParent() == settingscontainer)
         settingscontainer->RemoveChild(webSettings_->GetWidgetDelegate());
+
+    if (iosSettings_->GetWidgetDelegate()->GetParent() == settingscontainer)
+        settingscontainer->RemoveChild(iosSettings_->GetWidgetDelegate());
+
 
 }
 
@@ -144,6 +152,20 @@ void UIBuildSettings::SelectAndroidSettings()
     platformSelect_->SetValue(3);
 
 }
+
+void UIBuildSettings::SelectIOSSettings()
+{
+    RemoveSettingsWidgets();
+
+    TBLayout* settingscontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("settingscontainer"));
+    assert(settingscontainer);
+    settingscontainer->AddChild(iosSettings_->GetWidgetDelegate());
+    iosSettings_->Refresh();
+
+    platformSelect_->SetValue(4);
+
+}
+
 
 void UIBuildSettings::SelectMacSettings()
 {
@@ -207,6 +229,7 @@ void UIBuildSettings::RequestPlatformChange(TBID id)
 void UIBuildSettings::StoreSettings()
 {
     androidSettings_->StoreSettings();
+    iosSettings_->StoreSettings();
 
     Editor* editor = GetSubsystem<Editor>();
     editor->SaveProject();
@@ -233,6 +256,11 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
         else if (ev.ref_id == TBIDC("WebGLBuildSettings"))
         {
             SelectWebSettings();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("iOSBuildSettings"))
+        {
+            SelectIOSSettings();
             return true;
         }
         else if (ev.target->GetID() == TBIDC("set_current_platform"))
@@ -269,6 +297,9 @@ void UIBuildSettings::UpdateCurrentPlatform(AEEditorPlatform platform)
         platformIndicator_->SetSkinBg(TBIDC("LogoAndroid"));
     else if (platform == AE_PLATFORM_HTML5)
         platformIndicator_->SetSkinBg(TBIDC("LogoHTML5"));
+    else if (platform == AE_PLATFORM_IOS)
+        platformIndicator_->SetSkinBg(TBIDC("LogoIOS"));
+
 }
 
 void UIBuildSettings::HandlePlatformChange(StringHash eventType, VariantMap& eventData)

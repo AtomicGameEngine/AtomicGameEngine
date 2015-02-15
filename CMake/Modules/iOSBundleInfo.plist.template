@@ -5,13 +5,13 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleExecutable</key>
-    <string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+    <string>AtomicPlayer</string>
     <key>CFBundleGetInfoString</key>
-    <string>${MACOSX_BUNDLE_INFO_STRING}</string>
+    <string>"Atomic Player"</string>
     <key>CFBundleIconFile</key>
     <string>${MACOSX_BUNDLE_ICON_FILE}</string>
     <key>CFBundleIdentifier</key>
-    <string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+    <string>com.atomicgameengine.atomicplayer</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleLongVersionString</key>
@@ -31,7 +31,7 @@
     <key>LSRequiresCarbon</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
-    <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+    <string>"(c) THUNDERBEAST GAMES LLC"</string>
     <key>CFBundleIconFiles</key>
     <array>
         <string>${MACOSX_BUNDLE_ICON_FILE}</string>

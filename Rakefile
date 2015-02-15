@@ -44,6 +44,26 @@ namespace :android do
 
 end  
 
+namespace :ios do
+
+  CMAKE_IOS_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/IOS_Build"
+
+  task :player do
+
+    if !Dir.exists?("#{CMAKE_IOS_BUILD_FOLDER}")
+      FileUtils.mkdir_p(CMAKE_IOS_BUILD_FOLDER)
+    end
+
+    Dir.chdir(CMAKE_IOS_BUILD_FOLDER) do
+      sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
+      sh "xcodebuild -configuration Release"
+    end 
+    
+  end
+
+end  
+
+
 namespace :web do
 
   CMAKE_WEB_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/Web_Build"
