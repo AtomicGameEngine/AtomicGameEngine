@@ -53,7 +53,7 @@ namespace :ios do
 
   CMAKE_IOS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/IOS_Build"
 
-  task :player do
+  task :player => "macosx:jsbind" do
 
     if !Dir.exists?("#{CMAKE_IOS_BUILD_FOLDER}")
       FileUtils.mkdir_p(CMAKE_IOS_BUILD_FOLDER)
@@ -74,7 +74,7 @@ namespace :web do
 
   CMAKE_WEB_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Web_Build"
 
-  task :player do
+  task :player => "macosx:jsbind" do
 
     if !Dir.exists?("#{CMAKE_WEB_BUILD_FOLDER}")
       FileUtils.mkdir_p(CMAKE_WEB_BUILD_FOLDER)
@@ -217,7 +217,7 @@ namespace :package do
 
   task :macosx_preflight => ['macosx:clean',
                           'iosdeploy',
-                          #'web:player',
+                          'web:player',
                           'android:player',
                           'ios:player',
                           "atomictiled:osx",
@@ -280,8 +280,8 @@ namespace :package do
       sh "cp #{CMAKE_IOS_BUILD_FOLDER}/Source/AtomicPlayer/Release-iphoneos/AtomicPlayer.app/PkgInfo #{DEPLOYMENT_FOLDER_DST}/IOS/AtomicPlayer.app/PkgInfo"
 
       # Web Deployment
-      #sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Web #{DEPLOYMENT_FOLDER_DST}/Web"
-      #sh "cp #{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.js #{DEPLOYMENT_FOLDER_DST}/Web/AtomicPlayer.js"
+      sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Web #{DEPLOYMENT_FOLDER_DST}/Web"
+      sh "cp #{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.js #{DEPLOYMENT_FOLDER_DST}/Web/AtomicPlayer.js"
 
       sh "cp -r #{EXAMPLES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Examples"
       sh "cp -r #{DOCS_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Docs"
