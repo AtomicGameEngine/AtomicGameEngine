@@ -29,6 +29,7 @@
 #include "Subprocess/AESubprocessSystem.h"
 #include "Build/BuildSystem.h"
 #include "License/AELicenseSystem.h"
+#include "License/AEVersionCheck.h"
 #include "Net/CurlManager.h"
 
 // just for testing, remove me
@@ -89,10 +90,6 @@ void AEApplication::Start()
 
     // The mouse isn't showing up on OSX until I tab, this is a hack and temp workaround
     input->SetMouseVisible(true);
-    input->SetMouseVisible(false);
-    input->SetMouseVisible(true);
-    input->SetMouseVisible(false);
-    input->SetMouseVisible(true);
 
     context_->RegisterSubsystem(new ProjectUtils(context_));
     context_->RegisterSubsystem(new Javascript(context_));
@@ -103,6 +100,7 @@ void AEApplication::Start()
 
 // BEGIN LICENSE MANAGEMENT
     context_->RegisterSubsystem(new LicenseSystem(context_));
+    context_->RegisterSubsystem(new VersionCheck(context_));
 // END LICENSE MANAGEMENT
 
     Editor* editor = new Editor(context_);

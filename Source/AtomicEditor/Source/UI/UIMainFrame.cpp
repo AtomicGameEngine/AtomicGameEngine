@@ -24,6 +24,8 @@
 #include "UI/Modal/UIModalOps.h"
 #include "UI/Modal/UIMessageModal.h"
 
+#include "License/AEVersionCheck.h"
+
 #include "UIFindTextWidget.h"
 #include "../AEEvents.h"
 #include "../AEEditor.h"
@@ -52,6 +54,7 @@ MainFrame::MainFrame(Context* context) :
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("-"));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Manage License", TBIDC("manage license")));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("-"));
+    menuAtomicEditorSource.AddItem(new TBGenericStringItem("Check for Updates", TBIDC("check update")));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Quit", TBIDC("quit")));
 
     menuFileSource.AddItem(new TBGenericStringItem("New Project", TBIDC("new project")));
@@ -435,6 +438,11 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
             else if (ev.ref_id == TBIDC("manage license"))
             {
                 uiModalOps_->ShowManageLicense();
+                return true;
+            }
+            else if (ev.ref_id == TBIDC("check update"))
+            {
+                GetSubsystem<VersionCheck>()->DoVersionCheck();
                 return true;
             }
             else if (ev.ref_id == TBIDC("quit"))

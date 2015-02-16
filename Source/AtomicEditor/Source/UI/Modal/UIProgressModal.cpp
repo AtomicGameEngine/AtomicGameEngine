@@ -41,6 +41,7 @@ ProgressModal::ProgressModal(Context* context, const String &title, const String
     assert(message_);
 
     message_->SetText(message.CString());
+    window_->SetText(title.CString());
 
     Center();
 }
