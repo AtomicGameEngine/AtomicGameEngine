@@ -17,6 +17,8 @@
 #include "BuildSystem.h"
 #include "UI/Modal/UIModalOps.h"
 
+#include "Tools/External/AEExternalTooling.h"
+
 
 
 namespace AtomicEditor
@@ -168,6 +170,15 @@ void BuildIOS::HandleEvent(StringHash eventType, VariantMap& eventData)
             {
                 RunCodeSign();
             }
+            else if (currentBuildPhase_ == CodeSign)
+            {
+                RunDeploy();
+            }
+            else if (currentBuildPhase_ == Deploy)
+            {
+                buildSystem->BuildComplete();
+            }
+
         }
         else
         {
@@ -215,7 +226,7 @@ void BuildIOS::RunCodeSign()
     Poco::Process::Env env;
     env["CODESIGN_ALLOCATE"] =  "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/codesign_allocate";
 
-    currentBuildPhase_ = ConvertPList;
+    currentBuildPhase_ = CodeSign;
     Subprocess* subprocess = subs->Launch("/usr/bin/codesign", args, buildPath_, env);
 
     if (!subprocess)
@@ -225,14 +236,46 @@ void BuildIOS::RunCodeSign()
         return;
     }
 
+    SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildIOS, HandleEvent));
+    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildIOS, HandleEvent));
+
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
+
+}
+
+void BuildIOS::RunDeploy()
+{
+    SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
+    ExternalTooling* tooling = GetSubsystem<ExternalTooling>();
+    String iosDeploy = tooling->GetToolApplicationPath();
+    iosDeploy += "CommandLine/ios-deploy";
+
+
+    Vector<String> args;
+
+    args.Push("--uninstall");
+    args.Push("--bundle");
+    args.Push("./AtomicPlayer.app");
+
+    currentBuildPhase_ = Deploy;
+    Subprocess* subprocess = subs->Launch(iosDeploy.CString(), args, buildPath_);
+
+    if (!subprocess)
+    {
+        assert(0);
+        // ERROR
+        return;
+    }
 
     SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildIOS, HandleEvent));
     SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildIOS, HandleEvent));
 
-}
 
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
+    ops->SetProgramOutputSubprocess(subprocess);
+
+}
 
 
 void BuildIOS::Build(const String& buildPath)

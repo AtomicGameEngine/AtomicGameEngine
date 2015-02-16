@@ -32,11 +32,12 @@ private:
     {
         ConvertPList,
         CodeSign,
-        Deploy,
+        Deploy
     };
 
     void RunConvertPList();
     void RunCodeSign();
+    void RunDeploy();
 
     String GenerateEntitlements();
     String GenerateInfoPlist();

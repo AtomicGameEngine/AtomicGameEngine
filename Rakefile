@@ -100,7 +100,8 @@ namespace :macosx do
     folders = ["#{CMAKE_MACOSX_BUILD_FOLDER}", "#{MACOSX_PACKAGE_FOLDER}",
                "#{ARTIFACTS_FOLDER}/Android_Build", "#{ARTIFACTS_FOLDER}/Web_Build",  
                "#{ARTIFACTS_FOLDER}/AtomicExamples", "#{ARTIFACTS_FOLDER}/Docs",
-               "#{ARTIFACTS_FOLDER}/Examples",  "#{ARTIFACTS_FOLDER}/AtomicTiled_Build"]
+               "#{ARTIFACTS_FOLDER}/Examples",  "#{ARTIFACTS_FOLDER}/AtomicTiled_Build",
+               "#{ARTIFACTS_FOLDER}/IOSDeploy_Build"]
 
     for index in 0 ... folders.size    
 
@@ -200,6 +201,7 @@ end
 namespace :package do
 
   task :macosx_preflight => ['macosx:clean',
+                          'iosdeploy',
                           'web:player',
                           'android:player',
                           "atomictiled:osx",
@@ -267,15 +269,19 @@ namespace :package do
       sh "cp -r #{EXAMPLEINFO_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/ExampleInfo"
 
       # DEPLOY TILED
-      ATOMICTILED_DEPLOYED_DIR = "#{MAC_EDITOR_APP_FOLDER_DST}/Contents/Applications"
+      APPLICATIONS_FOLDER_DST = "#{MAC_EDITOR_APP_FOLDER_DST}/Contents/Applications"
 
-      FileUtils.mkdir_p(ATOMICTILED_DEPLOYED_DIR)
+      FileUtils.mkdir_p(APPLICATIONS_FOLDER_DST)
 
-      FileUtils.cp_r("#{ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{ATOMICTILED_DEPLOYED_DIR}/Tiled.app")
+      FileUtils.cp_r("#{ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{APPLICATIONS_FOLDER_DST}/Tiled.app")
 
       Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
-        sh "#{$QT_BIN_DIR}/macdeployqt #{ATOMICTILED_DEPLOYED_DIR}/Tiled.app"
+        sh "#{$QT_BIN_DIR}/macdeployqt #{APPLICATIONS_FOLDER_DST}/Tiled.app"
       end
+
+      FileUtils.mkdir_p("#{APPLICATIONS_FOLDER_DST}/CommandLine")
+
+      FileUtils.cp("#{CMAKE_IOSDEPLOY_BUILD_FOLDER}/ios-deploy", "#{APPLICATIONS_FOLDER_DST}/CommandLine/ios-deploy")
 
   end
 
@@ -466,6 +472,26 @@ namespace :windows do
   end
 
 end
+
+task :iosdeploy do
+
+  CMAKE_IOSDEPLOY_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/ios-deploy"
+
+  if Dir.exists?(CMAKE_IOSDEPLOY_BUILD_FOLDER)
+      FileUtils.rmtree(CMAKE_IOSDEPLOY_BUILD_FOLDER)          
+  end
+
+  Dir.chdir("#{$RAKE_ROOT}/Artifacts") do
+
+    sh "git clone https://github.com/AtomicGameEngine/ios-deploy"
+    
+    Dir.chdir("ios-deploy") do
+      sh "make"
+    end
+
+  end
+
+end  
 
 namespace :atomictiled do
 
