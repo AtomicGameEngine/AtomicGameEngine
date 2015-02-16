@@ -132,7 +132,7 @@ namespace :macosx do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       sh "make -j8 JSBind"
-      sh "./Source/Tools/JSBind/JSBind #{$RAKE_ROOT} WEB"
+      sh "./Source/Tools/JSBind/JSBind #{$RAKE_ROOT}"
     end
 
 	end
@@ -202,8 +202,9 @@ namespace :package do
 
   task :macosx_preflight => ['macosx:clean',
                           'iosdeploy',
-                          'web:player',
+                          #'web:player',
                           'android:player',
+                          'ios:player',
                           "atomictiled:osx",
                           'macosx:editor',
                           'macosx:generate_examples', 
@@ -257,6 +258,11 @@ namespace :package do
       sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Android #{DEPLOYMENT_FOLDER_DST}/Android"
       FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a")
       sh "cp #{CMAKE_ANDROID_BUILD_FOLDER}/Source/AtomicPlayer/libAtomicPlayer.so #{DEPLOYMENT_FOLDER_DST}/Android/libs/armeabi-v7a/libAtomicPlayer.so"
+
+      # iOS Deployment
+      FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER_DST}/IOS/AtomicPlayer.app")
+      sh "cp #{CMAKE_IOS_BUILD_FOLDER}/Source/AtomicPlayer/Release-iphoneos/AtomicPlayer.app/AtomicPlayer #{DEPLOYMENT_FOLDER_DST}/IOS/AtomicPlayer.app/AtomicPlayer"
+      sh "cp #{CMAKE_IOS_BUILD_FOLDER}/Source/AtomicPlayer/Release-iphoneos/AtomicPlayer.app/PkgInfo #{DEPLOYMENT_FOLDER_DST}/IOS/AtomicPlayer.app/PkgInfo"
 
       # Web Deployment
       sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Web #{DEPLOYMENT_FOLDER_DST}/Web"
