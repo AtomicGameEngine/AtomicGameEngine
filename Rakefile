@@ -265,8 +265,8 @@ namespace :package do
       sh "cp #{CMAKE_IOS_BUILD_FOLDER}/Source/AtomicPlayer/Release-iphoneos/AtomicPlayer.app/PkgInfo #{DEPLOYMENT_FOLDER_DST}/IOS/AtomicPlayer.app/PkgInfo"
 
       # Web Deployment
-      sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Web #{DEPLOYMENT_FOLDER_DST}/Web"
-      sh "cp #{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.js #{DEPLOYMENT_FOLDER_DST}/Web/AtomicPlayer.js"
+      #sh "cp -r #{EDITORAPPLICATIONDATA_FOLDER_SRC}/Deployment/Web #{DEPLOYMENT_FOLDER_DST}/Web"
+      #sh "cp #{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.js #{DEPLOYMENT_FOLDER_DST}/Web/AtomicPlayer.js"
 
       sh "cp -r #{EXAMPLES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Examples"
       sh "cp -r #{DOCS_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Docs"
