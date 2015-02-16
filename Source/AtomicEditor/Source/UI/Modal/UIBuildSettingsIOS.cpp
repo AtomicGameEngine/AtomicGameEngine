@@ -112,6 +112,11 @@ void UIBuildSettingsIOS::Refresh()
 
 bool UIBuildSettingsIOS::ParseProvisionData(const String& provisionFile)
 {
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+    return false;
+
+#else    
     String pdata = GetMobileProvisionData(provisionFile.CString());
 
     if (!pdata.Length())
@@ -159,7 +164,7 @@ bool UIBuildSettingsIOS::ParseProvisionData(const String& provisionFile)
     provisionPath_->SetText(provisionFile.CString());
 
     return true;
-
+#endif
 
 }
 

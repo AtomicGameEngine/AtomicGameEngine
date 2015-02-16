@@ -406,6 +406,7 @@ namespace :package do
     DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment"
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/Android", "#{EDITOR_APP_FOLDER_DST}/Deployment/Android")
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/MacOS", "#{EDITOR_APP_FOLDER_DST}/Deployment/MacOS")
+    FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/Web", "#{EDITOR_APP_FOLDER_DST}/Deployment/Web")
 
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Docs", "#{EDITOR_APP_FOLDER_DST}/Docs")
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Examples", "#{EDITOR_APP_FOLDER_DST}/Examples")
@@ -467,7 +468,7 @@ namespace :windows do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
       sh "jom -j4 JSBind"
-      sh "./Source/Tools/JSBind/JSBind.exe #{$RAKE_ROOT}"
+      sh "./Source/Tools/JSBind/JSBind.exe #{$RAKE_ROOT} WINDOWS"
     end
 
 	end

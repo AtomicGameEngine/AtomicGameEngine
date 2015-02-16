@@ -26,6 +26,7 @@ file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
 
 if (MSVC)
+    set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "WINDOWS")  
     file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
 else()
 
