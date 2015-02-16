@@ -887,6 +887,30 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 
 #endif
 
+bool FileSystem::CreateDirs(const String& root, const String& subdirectory)
+{
+    String folder = AddTrailingSlash(GetInternalPath(root));
+    String sub = GetInternalPath(subdirectory);
+    Vector<String> subs = sub.Split('/');
+
+    for (unsigned i = 0; i < subs.Size(); i++)
+    {
+        folder += subs[i];
+        folder += "/";
+
+        if (DirExists(folder))
+            continue;
+
+        CreateDir(folder);
+
+        if (!DirExists(folder))
+            return false;
+    }
+
+    return true;
+
+}
+
 bool FileSystem::CreateDirsRecursive(const String& directoryIn, const String& directoryOut)
 {
     if (!CreateDir(directoryOut))

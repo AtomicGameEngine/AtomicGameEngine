@@ -4,6 +4,7 @@ Bin/Atomic.d.ts
 Bin/Atomic.js
 Source/Atomic/Javascript/Modules/*
 Artifacts/*
+Build/*
 Docs/out/*
 Docs/node_modules/*
 Data/AtomicEditor/Deployment/Web/AtomicPlayer.js

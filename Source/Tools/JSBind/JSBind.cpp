@@ -35,19 +35,13 @@ void Run(const Vector<String>& arguments)
 {
     JSBind::Initialize();
 
-    if (arguments.Size() < 1)
+    if (arguments.Size() < 2)
     {
-        ErrorExit("Usage: JSBind absolute_path_to_atomic_runtime_source_tree [optional] platform");
+        ErrorExit("Usage: JSBind absolute_path_to_atomic_runtime_source_tree platform");
     }
 
     JSBind::ROOT_FOLDER = arguments[0];
-
-    if (arguments.Size() > 1)
-        JSBind::PLATFORM = arguments[1];
-
-    if (JSBind::PLATFORM.Length() && JSBind::PLATFORM != "WEB")
-        ErrorExit("Platform argument only supports WEB at this time");
-
+    JSBind::PLATFORM = arguments[1];
 
     if (!JSBind::fileSystem_->DirExists(JSBind::ROOT_FOLDER + "/Source/Tools/JSBind"))
     {

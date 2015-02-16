@@ -101,10 +101,13 @@ public:
 
     String GetAppBundleResourceFolder();
     /// Remove a directory
-    bool RemoveDir(const String& directoryIn, bool recursive);
-    bool CreateDirsRecursive(const String& directoryIn, const String& directoryOut);
+    bool RemoveDir(const String& directoryIn, bool recursive);    
+    /// Create directory and all necessary subdirectories below a given root
+    bool CreateDirs(const String& root, const String& subdirectory);
     /// Copy a directory, directoryOut must not exist
     bool CopyDir(const String& directoryIn, const String& directoryOut);
+
+    bool CreateDirsRecursive(const String& directoryIn, const String& directoryOut);
     
 private:
     /// Scan directory, called internally.

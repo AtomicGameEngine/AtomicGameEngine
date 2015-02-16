@@ -12,7 +12,10 @@ end
 
 $RAKE_ROOT = File.dirname(__FILE__)
 
-ATOMICTILED_BUILD_DIR = "#{$RAKE_ROOT}/Artifacts/AtomicTiled_Build"
+ARTIFACTS_FOLDER = "#{$RAKE_ROOT}/Artifacts"
+BUILD_FOLDER = "#{$RAKE_ROOT}/Build"
+
+ATOMICTILED_BUILD_DIR = "#{ARTIFACTS_FOLDER}/AtomicTiled_Build"
 ATOMICTILED_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicTiled"
 
 
@@ -25,17 +28,19 @@ else
 end
 
 
-namespace :android do
+namespace :android  do
 
-  CMAKE_ANDROID_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/Android_Build"
+  CMAKE_ANDROID_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Android_Build"
 
-  task :player do
+  task :player => "macosx:jsbind" do
 
     if !Dir.exists?("#{CMAKE_ANDROID_BUILD_FOLDER}")
       FileUtils.mkdir_p(CMAKE_ANDROID_BUILD_FOLDER)
     end
 
     Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
+
+      sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} ANDROID"
       sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
     end 
@@ -46,7 +51,7 @@ end
 
 namespace :ios do
 
-  CMAKE_IOS_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/IOS_Build"
+  CMAKE_IOS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/IOS_Build"
 
   task :player do
 
@@ -55,6 +60,7 @@ namespace :ios do
     end
 
     Dir.chdir(CMAKE_IOS_BUILD_FOLDER) do
+      sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} IOS"
       sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
       sh "xcodebuild -configuration Release"
     end 
@@ -66,7 +72,7 @@ end
 
 namespace :web do
 
-  CMAKE_WEB_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/Web_Build"
+  CMAKE_WEB_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Web_Build"
 
   task :player do
 
@@ -75,6 +81,7 @@ namespace :web do
     end
 
     Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
+      sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} WEB"
       sh "cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
     end 
@@ -91,9 +98,9 @@ end
 
 namespace :macosx do
 
-  ARTIFACTS_FOLDER = "#{$RAKE_ROOT}/Artifacts"
-  CMAKE_MACOSX_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/MacOSX_Build"
-  MACOSX_PACKAGE_FOLDER = "#{$RAKE_ROOT}/Artifacts/MacOSX_Package"
+  
+  CMAKE_MACOSX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Build"
+  MACOSX_PACKAGE_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Package"
 
   task :clean do
 
@@ -128,11 +135,19 @@ namespace :macosx do
 
 	end
 
-	task :generate_javascript_bindings => "macosx:cmake" do
+  task :jsbind => "macosx:cmake" do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       sh "make -j8 JSBind"
-      sh "./Source/Tools/JSBind/JSBind #{$RAKE_ROOT}"
+      sh "cp ./Source/Tools/JSBind/JSBind #{BUILD_FOLDER}/JSBind"
+    end
+
+  end 
+
+	task :generate_javascript_bindings => "macosx:jsbind" do
+
+    Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
+      sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} MACOSX"
     end
 
 	end
@@ -147,14 +162,14 @@ namespace :macosx do
 
       # add the generated JS bindings
       sh "./gendocs.sh"
-      sh "cp -r out #{$RAKE_ROOT}/Artifacts/Docs"
+      sh "cp -r out #{ARTIFACTS_FOLDER}/Docs"
     end
 
   end  
 
   task :generate_examples do
 
-    Dir.chdir("#{$RAKE_ROOT}/Artifacts") do
+    Dir.chdir("#{ARTIFACTS_FOLDER}") do
 
       if Dir.exists?("AtomicExamples")
         sh "rm -rf AtomicExamples"
@@ -169,7 +184,7 @@ namespace :macosx do
       sh "git clone https://github.com/AtomicGameEngine/AtomicExamples"
       
       Dir.chdir("AtomicExamples") do
-        sh "git archive master | tar -x -C #{$RAKE_ROOT}/Artifacts/Examples"
+        sh "git archive master | tar -x -C #{ARTIFACTS_FOLDER}/Examples"
       end
 
     end
@@ -227,10 +242,10 @@ namespace :package do
       #Examples
       #Example info could possibly go in the AtomicExamples repo
       EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"
-      EXAMPLES_FOLDER_SRC = "#{$RAKE_ROOT}/Artifacts/Examples"
+      EXAMPLES_FOLDER_SRC = "#{ARTIFACTS_FOLDER}/Examples"
 
       #Docs
-      DOCS_FOLDER_SRC = "#{$RAKE_ROOT}/Artifacts/Docs"
+      DOCS_FOLDER_SRC = "#{ARTIFACTS_FOLDER}/Docs"
 
       MAC_EDITOR_APP_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app"
       MAC_EDITOR_APP_RESOURCE_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app/Contents/Resources"      
@@ -414,8 +429,8 @@ end
 
 namespace :windows do
 
-  CMAKE_WINDOWS_BUILD_FOLDER = "#{$RAKE_ROOT}/Artifacts/Windows_Build"
-  WINDOWS_PACKAGE_FOLDER = "#{$RAKE_ROOT}/Artifacts/Windows_Package"
+  CMAKE_WINDOWS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Windows_Build"
+  WINDOWS_PACKAGE_FOLDER = "#{ARTIFACTS_FOLDER}/Windows_Package"
 
   task :clean do
 
@@ -487,7 +502,7 @@ task :iosdeploy do
       FileUtils.rmtree(CMAKE_IOSDEPLOY_BUILD_FOLDER)          
   end
 
-  Dir.chdir("#{$RAKE_ROOT}/Artifacts") do
+  Dir.chdir("#{ARTIFACTS_FOLDER}") do
 
     sh "git clone https://github.com/AtomicGameEngine/ios-deploy"
     

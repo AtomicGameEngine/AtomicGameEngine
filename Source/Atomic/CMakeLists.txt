@@ -19,7 +19,7 @@ file (GLOB NAVIGATION_SOURCE Navigation/*.cpp Navigation/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 file (GLOB ENVIRONMENT_SOURCE Environment/*.cpp Environment/*.h)
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
-file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h Javascript/Modules/*.cpp  Javascript/Modules/*.h )
+file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
 
@@ -35,16 +35,34 @@ else()
 
 endif()
 
-if (APPLE AND NOT IOS)
-    set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
+if (ANDROID)
+  
+  set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "ANDROID")  
+
 endif()
+
+if (APPLE)
+    if (NOT IOS)
+      set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "MACOSX")  
+      set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
+    else()
+      set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "IOS")  
+    endif()
+endif()
+
+if (EMSCRIPTEN)
+  set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "WEB")  
+endif()
+
+
+file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_SOURCE_FOLDER}/Javascript/Modules/*.cpp)
 
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
                   ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE} 
                   ${RESOURCE_SOURCE} ${PHYSICS_SOURCE}
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}                  
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
-                  ${JAVASCRIPT_SOURCE} ${SCENE_SOURCE} ${UI_SOURCE}
+                  ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} ${SCENE_SOURCE} ${UI_SOURCE}
                   ${PLATFORM_SOURCE})
 
 if (NOT EMSCRIPTEN)
