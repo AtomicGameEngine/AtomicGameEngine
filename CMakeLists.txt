@@ -20,9 +20,7 @@ endif()
 if (MSVC)
 
     include(AtomicWindows)
-
-elseif (IOS)
-
+    
 elseif(APPLE)
 
     if (IOS)
