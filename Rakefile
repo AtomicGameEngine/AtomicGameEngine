@@ -281,7 +281,7 @@ namespace :package do
 
       FileUtils.cp_r("#{ATOMICTILED_BUILD_DIR}/bin/Tiled.app", "#{APPLICATIONS_FOLDER_DST}/Tiled.app")
 
-      Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
+      Dir.chdir(APPLICATIONS_FOLDER_DST) do
         sh "#{$QT_BIN_DIR}/macdeployqt #{APPLICATIONS_FOLDER_DST}/Tiled.app"
       end
 
