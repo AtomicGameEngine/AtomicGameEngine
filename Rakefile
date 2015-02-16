@@ -101,7 +101,7 @@ namespace :macosx do
                "#{ARTIFACTS_FOLDER}/Android_Build", "#{ARTIFACTS_FOLDER}/Web_Build",  
                "#{ARTIFACTS_FOLDER}/AtomicExamples", "#{ARTIFACTS_FOLDER}/Docs",
                "#{ARTIFACTS_FOLDER}/Examples",  "#{ARTIFACTS_FOLDER}/AtomicTiled_Build",
-               "#{ARTIFACTS_FOLDER}/IOSDeploy_Build"]
+               "#{ARTIFACTS_FOLDER}/IOS_Build", "#{ARTIFACTS_FOLDER}/IOSDeploy_Build"]
 
     for index in 0 ... folders.size    
 
