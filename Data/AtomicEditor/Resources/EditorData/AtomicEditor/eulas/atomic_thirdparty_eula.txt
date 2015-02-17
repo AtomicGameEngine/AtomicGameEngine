@@ -1,4 +1,3 @@
-
 THIRD PARTY TECHNOLOGY LICENSES AND COPYRIGHTS
 
 <color #D4FB79>This file contains information for third party technology used in the Atomic Game Engine</color>

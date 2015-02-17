@@ -199,8 +199,7 @@ void LicenseSystem::SaveLicense()
     licenseFilePath += "AtomicLicense";
 
     SharedPtr<File> file(new File(context_, licenseFilePath, FILE_WRITE));
-    file->WriteInt(2); // version
-    file->WriteBool(eulaAgreementConfirmed_);
+    file->WriteInt(1); // version
     file->WriteString(key_);
 
     file->WriteBool(licenseWindows_);

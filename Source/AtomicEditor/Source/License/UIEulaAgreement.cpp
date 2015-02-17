@@ -36,17 +36,14 @@ UIEulaAgreement::UIEulaAgreement(Context* context):
     UIModalOpWindow(context)
 {
     TBUI* tbui = GetSubsystem<TBUI>();
-    window_->SetText("Atomic Game Engine - End User License Agreement");
+    window_->SetText("License Agreement");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/eulaagreement.tb.txt");
 
     eulaCheck_ = window_->GetWidgetByIDAndType<TBCheckBox>(TBIDC("eula_check"));
     assert(eulaCheck_);
 
-    TBEditField* editor_license = window_->GetWidgetByIDAndType<TBEditField>(TBIDC("editor_license"));
-    assert(editor_license);
-
-    TBEditField* source_license = window_->GetWidgetByIDAndType<TBEditField>(TBIDC("source_license"));
-    assert(source_license);
+    TBEditField* age_license = window_->GetWidgetByIDAndType<TBEditField>(TBIDC("age_license"));
+    assert(age_license);
 
     TBEditField* thirdparty_license = window_->GetWidgetByIDAndType<TBEditField>(TBIDC("thirdparty_license"));
     assert(thirdparty_license);
@@ -57,10 +54,10 @@ UIEulaAgreement::UIEulaAgreement(Context* context):
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    SharedPtr<File> file = cache->GetFile("AtomicEditor/eulas/atomic_source_code_eula.txt");
+    SharedPtr<File> file = cache->GetFile("AtomicEditor/eulas/atomic_game_engine_eula.txt");
     String text;
     file->ReadText(text);
-    source_license->SetText(text.CString());
+    age_license->SetText(text.CString());
 
     file = cache->GetFile("AtomicEditor/eulas/atomic_thirdparty_eula.txt");
     file->ReadText(text);
@@ -69,10 +66,6 @@ UIEulaAgreement::UIEulaAgreement(Context* context):
     file = cache->GetFile("AtomicEditor/eulas/atomic_external_tools_eula.txt");
     file->ReadText(text);
     externaltool_license->SetText(text.CString());
-
-    file = cache->GetFile("AtomicEditor/eulas/atomic_editor_eula.txt");
-    file->ReadText(text);
-    editor_license->SetText(text.CString());
 
     window_->ResizeToFitContent();
     Center();
