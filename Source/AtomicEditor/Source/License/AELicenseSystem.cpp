@@ -40,6 +40,7 @@ namespace AtomicEditor
 
 LicenseSystem::LicenseSystem(Context* context) :
     Object(context)
+    , eulaAgreementConfirmed_(false)
 
 {
     ResetLicense();
@@ -52,16 +53,45 @@ LicenseSystem::~LicenseSystem()
 
 void LicenseSystem::Initialize()
 {
-    if (!LoadLicense() || !key_.Length())
+
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    String eulaConfirmedFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
+    eulaConfirmedFilePath = AddTrailingSlash(eulaConfirmedFilePath);
+    eulaConfirmedFilePath += "EulaConfirmed";
+
+    eulaAgreementConfirmed_ = filesystem->FileExists(eulaConfirmedFilePath);
+
+    if (!LoadLicense() || !key_.Length() || !eulaAgreementConfirmed_)
     {
         ResetLicense();
         UIModalOps* ops = GetSubsystem<UIModalOps>();
-        ops->ShowActivation();
+
+        if (eulaAgreementConfirmed_)
+            ops->ShowActivation();
+        else
+            ops->ShowEulaAgreement();
     }
     else
     {
         RequestServerVerification(key_);
     }
+}
+
+void LicenseSystem::LicenseAgreementConfirmed()
+{
+    eulaAgreementConfirmed_ = true;
+
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    String eulaConfirmedFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
+    eulaConfirmedFilePath = AddTrailingSlash(eulaConfirmedFilePath);
+    eulaConfirmedFilePath += "EulaConfirmed";
+
+    SharedPtr<File> file(new File(context_, eulaConfirmedFilePath, FILE_WRITE));
+    file->WriteInt(1);
+    file->Close();
+
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
+    ops->ShowActivation();
 }
 
 String LicenseSystem::GenerateMachineID()
@@ -82,7 +112,7 @@ String LicenseSystem::GenerateMachineID()
 }
 
 void LicenseSystem::ResetLicense()
-{
+{   
     key_ = "";
     licenseWindows_ = false;
     licenseMac_ = false;
@@ -169,7 +199,8 @@ void LicenseSystem::SaveLicense()
     licenseFilePath += "AtomicLicense";
 
     SharedPtr<File> file(new File(context_, licenseFilePath, FILE_WRITE));
-    file->WriteInt(1); // version
+    file->WriteInt(2); // version
+    file->WriteBool(eulaAgreementConfirmed_);
     file->WriteString(key_);
 
     file->WriteBool(licenseWindows_);

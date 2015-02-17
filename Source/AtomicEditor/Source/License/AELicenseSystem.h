@@ -74,6 +74,8 @@ public:
     String GenerateMachineID();
     String GetEmail() { return email_;}
 
+    void LicenseAgreementConfirmed();
+
     int ParseResponse(const String& response, LicenseParse &parse);
 
 private:
@@ -86,6 +88,8 @@ private:
 
     void HandleVerification(StringHash eventType, VariantMap& eventData);
     void HandleDeactivate(StringHash eventType, VariantMap& eventData);
+
+    bool eulaAgreementConfirmed_;
 
     String key_;
     String email_;

@@ -33,7 +33,7 @@
 #include "License/UIActivationSuccess.h"
 #include "License/UIManageLicense.h"
 #include "License/AELicenseSystem.h"
-
+#include "License/UIEulaAgreement.h"
 
 namespace AtomicEditor
 {
@@ -239,6 +239,14 @@ void UIModalOps::ShowPlatformsInfo()
     opWindow_ = new PlatformsInfo(context_);
 }
 
+void UIModalOps::ShowEulaAgreement()
+{
+    assert(opWindow_.Null());
+
+    Show();
+    opWindow_ = new UIEulaAgreement(context_);
+
+}
 
 void UIModalOps::OnWidgetDelete(TBWidget *widget)
 {
