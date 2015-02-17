@@ -2,7 +2,7 @@
 
 Hello!  We're working to get everything setup for an initial release around GDC 2015.  In the meantime, feel free to have a look around :)
 
-###Atomic Game Engine Source Code Repository
+###Atomic Game Engine™ Source Code Repository
 
 This repository contains the full source code to the Atomic Game Engine Runtime and Editor
 
@@ -14,7 +14,7 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 ### Licensing Information
 
-[Atomic Game Engine Source Code EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE.md)  
+[Atomic Game Engine™ EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE.md)  
 [Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/THIRDPARTY_LICENSE.md)
 
 ### Website
