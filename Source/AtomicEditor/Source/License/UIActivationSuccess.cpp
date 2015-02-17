@@ -21,6 +21,7 @@
 #include "../Project/AEProject.h"
 #include "../Project/ProjectUtils.h"
 
+
 #include "UIActivationSuccess.h"
 #include "AELicenseSystem.h"
 
@@ -45,8 +46,6 @@ UIActivationSuccess::~UIActivationSuccess()
 
 }
 
-
-
 bool UIActivationSuccess::OnEvent(const TBWidgetEvent &ev)
 {
     UIModalOps* ops = GetSubsystem<UIModalOps>();
@@ -55,6 +54,18 @@ bool UIActivationSuccess::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.target->GetID() == TBIDC("ok"))
         {
+
+            LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+
+            if (!licenseSystem->HasPlatformLicense())
+            {
+                SharedPtr<UIActivationSuccess> keepAlive(this);
+                UIModalOps* ops = GetSubsystem<UIModalOps>();
+                ops->Hide();
+                ops->ShowPlatformsInfo();
+                return true;
+            }
+
             ops->Hide();
             return true;
         }

@@ -81,6 +81,9 @@ elements
 		bitmap item_separator_x.png
 		type Stretch Image
 
+	LogoWindows
+		bitmap logo_windows.png
+
 	LogoAndroid
 		bitmap logo_android.png
 
@@ -93,8 +96,35 @@ elements
 	LogoMac
 		bitmap logo_mac.png
 
-	LogoWindows
+	LogoWindows-Small
 		bitmap logo_windows.png
+		width 48
+		height 48
+
+	LogoAndroid-Small
+		bitmap logo_android.png
+		width 48
+		height 48
+
+	LogoHTML5-Small
+		bitmap logo_html5.png
+		width 48
+		height 48
+
+	LogoIOS-Small
+		bitmap logo_ios.png
+		width 48
+		height 48
+
+	LogoMac-Small
+		bitmap logo_mac.png
+		width 48
+		height 48
+
+	LogoWindows-Small
+		bitmap logo_windows.png
+		width 48
+		height 48
 
 	LogoAtomic64
 		bitmap logo_atomic_64.png

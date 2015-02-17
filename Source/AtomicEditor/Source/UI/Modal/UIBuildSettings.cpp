@@ -17,6 +17,10 @@
 
 #include "UIBuildSettings.h"
 
+// BEGIN LICENSE MANAGEMENT
+#include "License/AELicenseSystem.h"
+// END LICENSE MANAGEMENT
+
 namespace AtomicEditor
 {
 
@@ -237,8 +241,7 @@ void UIBuildSettings::StoreSettings()
 }
 
 bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
-{
-    Editor* editor = GetSubsystem<Editor>();
+{    
     UIModalOps* ops = GetSubsystem<UIModalOps>();
 
     if (ev.type == EVENT_TYPE_CLICK)
@@ -265,9 +268,22 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
         }
         else if (ev.target->GetID() == TBIDC("set_current_platform"))
         {
+// BEGIN LICENSE MANAGEMENT
+
+            LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+            if (!licenseSystem->HasPlatformLicense())
+            {
+                SharedPtr<UIBuildSettings> keepAlive(this);
+                UIModalOps* ops = GetSubsystem<UIModalOps>();
+                ops->Hide();
+                ops->ShowPlatformsInfo();
+                return true;
+            }
+
             TBID id = platformSelect_->GetSelectedItemID();
             RequestPlatformChange(id);
             return true;
+// END LICENSE MANAGEMENT
 
         }
         else if (ev.target->GetID() == TBIDC("ok"))

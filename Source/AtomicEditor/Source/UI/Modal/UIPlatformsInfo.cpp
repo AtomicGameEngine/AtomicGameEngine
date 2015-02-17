@@ -34,7 +34,7 @@ PlatformsInfo::PlatformsInfo(Context* context):
     Project* project = editor->GetProject();
 
     TBUI* tbui = GetSubsystem<TBUI>();
-    window_->SetText("Platform Information");
+    window_->SetText("Platform License Required");
 
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/platformsinfo.tb.txt");
 
