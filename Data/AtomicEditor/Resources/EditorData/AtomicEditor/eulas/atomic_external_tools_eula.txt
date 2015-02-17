@@ -1,6 +1,6 @@
-ATOMIC GAME ENGINE EXTERNAL TOOL LICENSE INFORMATION
+<color #D4FB79>Atomic Game Engine External Tool License Information</color>
 
-<color #D4FB79>Several external tools are distributed with the Atomic Game Engine Editor</color>
+Several external tools are distributed with the Atomic Game Engine Editor
 
 <color #76D6FF><u>Tiled Map Editor</u></color>
 

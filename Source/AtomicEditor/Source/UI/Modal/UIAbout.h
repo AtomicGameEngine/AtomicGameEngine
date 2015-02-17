@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "UIModalOps.h"
+#include "UI/Modal/UIModalOps.h"
 
-#include <TurboBadger/tb_select.h>
-#include <TurboBadger/tb_select_item.h>
+#include <TurboBadger/tb_widgets_common.h>
 
 namespace AtomicEditor
 {
@@ -24,6 +23,10 @@ public:
 
 private:
 
+    void GenerateAboutText(String& text);
+
+
 };
 
 }
+

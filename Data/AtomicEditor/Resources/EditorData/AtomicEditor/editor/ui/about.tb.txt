@@ -1,6 +1,28 @@
-TBLayout: axis: y, distribution: gravity, position: left
-	TBLayout: 
-		TBTextField: text: "About:"
-		TBTextField: text: "The Atomic Game Engine"
-	TBSeparator: gravity: left right, skin: AESeparator
+TBLayout: axis: y
+	TBTabContainer
+		gravity all
+		id tabcontainer
+		tabs
+			TBButton: text: "About"
+			TBButton: text: "Atomic Game Engine License"
+			TBButton: text: "Third Party Licenses"
+			TBButton: text: "External Tool Licenses"
+		TBEditField: multiline: 1, styling: 1, gravity: all, id: about_text, readonly: 1, adapt-to-content: 0
+			font: size: 12
+			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
+			text: "..."
+		TBEditField: multiline: 1, styling: 1, gravity: all, id: age_license, readonly: 1, adapt-to-content: 0
+			font: size: 12
+			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
+			text: "..."
+		TBEditField: multiline: 1, styling: 1, gravity: all, id: thirdparty_license, readonly: 1, adapt-to-content: 0
+			font: size: 12
+			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
+			text: "..."
+		TBEditField: multiline: 1, styling: 1, gravity: all, id: externaltool_license, readonly: 1, adapt-to-content: 0
+			font: size: 12
+			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
+			text: "..."			
 	TBButton: text: OK, id: ok
+		lp: min-width: 128, min-height: 48
+

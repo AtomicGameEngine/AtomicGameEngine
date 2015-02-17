@@ -1,6 +1,6 @@
-THIRD PARTY TECHNOLOGY LICENSES AND COPYRIGHTS
+<color #D4FB79>Third Party Technology Licenses And Copyrights</color>
 
-<color #D4FB79>This file contains information for third party technology used in the Atomic Game Engine</color>
+This file contains information for third party technology used in the Atomic Game Engine
 
 <color #76D6FF><u>Urho3D License</u></color>
 

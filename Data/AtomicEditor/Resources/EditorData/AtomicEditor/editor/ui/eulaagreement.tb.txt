@@ -7,15 +7,15 @@ TBLayout: axis: y
 			TBButton: text: "Third Party Licenses"
 			TBButton: text: "External Tool Licenses"
 		TBEditField: multiline: 1, styling: 1, gravity: all, id: age_license, readonly: 1, adapt-to-content: 0
-			font: size: 14
+			font: size: 12
 			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
 			text: "..."
 		TBEditField: multiline: 1, styling: 1, gravity: all, id: thirdparty_license, readonly: 1, adapt-to-content: 0
-			font: size: 14
+			font: size: 12
 			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
 			text: "..."
 		TBEditField: multiline: 1, styling: 1, gravity: all, id: externaltool_license, readonly: 1, adapt-to-content: 0
-			font: size: 14
+			font: size: 12
 			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
 			text: "..."			
 	TBLayout: axis: y
