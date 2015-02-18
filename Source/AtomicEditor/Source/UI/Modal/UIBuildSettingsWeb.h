@@ -12,6 +12,9 @@ using namespace tb;
 namespace tb
 {
 class TBLayout;
+class TBEditField;
+class TBTextField;
+class TBSelectDropdown;
 }
 
 namespace AtomicEditor
@@ -28,9 +31,18 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
+    void Refresh();
+    void StoreSettings();
+
     //void HandleMessage(StringHash eventType, VariantMap& eventData);
 
 private:
+
+    TBEditField* appNameEdit_;
+    TBEditField* appPackageEdit_;
+    TBEditField* productNameEdit_;
+    TBEditField* companyNameEdit_;
+
 
 };
 

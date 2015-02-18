@@ -32,6 +32,7 @@ UIBuildSettings::UIBuildSettings(Context* context):
     androidSettings_(new UIBuildSettingsAndroid(context)),
     webSettings_(new UIBuildSettingsWeb(context)),
     iosSettings_(new UIBuildSettingsIOS(context)),
+    macSettings_(new UIBuildSettingsMac(context)),
     platformIndicator_(0)
 {
     TBUI* tbui = GetSubsystem<TBUI>();
@@ -118,6 +119,8 @@ void UIBuildSettings::RemoveSettingsWidgets()
     if (iosSettings_->GetWidgetDelegate()->GetParent() == settingscontainer)
         settingscontainer->RemoveChild(iosSettings_->GetWidgetDelegate());
 
+    if (macSettings_->GetWidgetDelegate()->GetParent() == settingscontainer)
+        settingscontainer->RemoveChild(macSettings_->GetWidgetDelegate());
 
 }
 
@@ -128,6 +131,7 @@ void UIBuildSettings::SelectWindowsSettings()
     TBLayout* settingscontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("settingscontainer"));
     assert(settingscontainer);
     settingscontainer->AddChild(windowsSettings_->GetWidgetDelegate());
+    windowsSettings_->Refresh();
     platformSelect_->SetValue(0);
 
 }
@@ -139,6 +143,7 @@ void UIBuildSettings::SelectWebSettings()
     TBLayout* settingscontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("settingscontainer"));
     assert(settingscontainer);
     settingscontainer->AddChild(webSettings_->GetWidgetDelegate());
+    webSettings_->Refresh();
     platformSelect_->SetValue(2);
 
 }
@@ -175,10 +180,13 @@ void UIBuildSettings::SelectMacSettings()
 {
     RemoveSettingsWidgets();
 
+    RemoveSettingsWidgets();
+
     TBLayout* settingscontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("settingscontainer"));
     assert(settingscontainer);
-    settingscontainer->AddChild(windowsSettings_->GetWidgetDelegate());
-    androidSettings_->Refresh();
+    settingscontainer->AddChild(macSettings_->GetWidgetDelegate());
+    macSettings_->Refresh();
+
     platformSelect_->SetValue(1);
 
 }
@@ -234,6 +242,9 @@ void UIBuildSettings::StoreSettings()
 {
     androidSettings_->StoreSettings();
     iosSettings_->StoreSettings();
+    macSettings_->StoreSettings();
+    windowsSettings_->StoreSettings();
+    webSettings_->StoreSettings();
 
     Editor* editor = GetSubsystem<Editor>();
     editor->SaveProject();
@@ -266,6 +277,12 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
             SelectIOSSettings();
             return true;
         }
+        else if (ev.ref_id == TBIDC("MacBuildSettings"))
+        {
+            SelectMacSettings();
+            return true;
+        }
+
         else if (ev.target->GetID() == TBIDC("set_current_platform"))
         {
 // BEGIN LICENSE MANAGEMENT

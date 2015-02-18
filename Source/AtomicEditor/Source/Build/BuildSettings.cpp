@@ -60,6 +60,39 @@ void BuildSettings::Load(rapidjson::Value::Member* jobject)
     }
     // END IOS ------
 
+    // Mac ------
+    rapidjson::Value::Member* jmac = jobject->value.FindMember("mac");
+    if (jmac && jmac->value.IsObject())
+    {
+        mac_.appName = GetStringMember(jmac, "app_name");
+        mac_.package = GetStringMember(jmac, "package");
+        mac_.companyName = GetStringMember(jmac, "company_name");
+        mac_.productName = GetStringMember(jmac, "product_name");
+    }
+    // END Mac ------
+
+    // Windows ------
+    rapidjson::Value::Member* jwindows = jobject->value.FindMember("windows");
+    if (jwindows && jwindows->value.IsObject())
+    {
+        windows_.appName = GetStringMember(jwindows, "app_name");
+        windows_.package = GetStringMember(jwindows, "package");
+        windows_.companyName = GetStringMember(jwindows, "company_name");
+        windows_.productName = GetStringMember(jwindows, "product_name");
+    }
+    // END Windows ------
+
+    // WebGL ------
+    rapidjson::Value::Member* jwebgl = jobject->value.FindMember("webgl");
+    if (jwebgl && jwebgl->value.IsObject())
+    {
+        webgl_.appName = GetStringMember(jwebgl, "app_name");
+        webgl_.package = GetStringMember(jwebgl, "package");
+        webgl_.companyName = GetStringMember(jwebgl, "company_name");
+        webgl_.productName = GetStringMember(jwebgl, "product_name");
+    }
+    // END WebGL ------
+
 }
 
 void BuildSettings::Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer)
@@ -111,6 +144,54 @@ void BuildSettings::Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer)
 
     writer.EndObject();
     // END IOS ------
+
+    // Mac ------
+    writer.String("mac");
+    writer.StartObject();
+
+    writer.String("app_name");
+    writer.String(mac_.appName.CString());
+    writer.String("package");
+    writer.String(mac_.package.CString());
+    writer.String("company_name");
+    writer.String(mac_.companyName.CString());
+    writer.String("product_name");
+    writer.String(mac_.productName.CString());
+
+    writer.EndObject();
+    // END Mac ------
+
+    // Windows ------
+    writer.String("windows");
+    writer.StartObject();
+
+    writer.String("app_name");
+    writer.String(windows_.appName.CString());
+    writer.String("package");
+    writer.String(windows_.package.CString());
+    writer.String("company_name");
+    writer.String(windows_.companyName.CString());
+    writer.String("product_name");
+    writer.String(windows_.productName.CString());
+
+    writer.EndObject();
+    // END Windows ------
+
+    // WebGL ------
+    writer.String("webgl");
+    writer.StartObject();
+
+    writer.String("app_name");
+    writer.String(webgl_.appName.CString());
+    writer.String("package");
+    writer.String(webgl_.package.CString());
+    writer.String("company_name");
+    writer.String(webgl_.companyName.CString());
+    writer.String("product_name");
+    writer.String(webgl_.productName.CString());
+
+    writer.EndObject();
+    // END WebGL ------
 
 
     writer.EndObject();

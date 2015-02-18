@@ -37,6 +37,30 @@ struct IOSBuildSettings
     String appidPrefix;
 };
 
+struct MacBuildSettings
+{
+    String appName;
+    String package;
+    String companyName;
+    String productName;
+};
+
+struct WindowsBuildSettings
+{
+    String appName;
+    String package;
+    String companyName;
+    String productName;
+};
+
+struct WebGLSettings
+{
+    String appName;
+    String package;
+    String companyName;
+    String productName;
+};
+
 
 class BuildSettings : public Object
 {
@@ -54,6 +78,15 @@ public:
     const IOSBuildSettings& GetIOSSettings() { return ios_; }
     void SetIOSSettings(const IOSBuildSettings& settings) { ios_ = settings; }
 
+    const MacBuildSettings& GetMacSettings() { return mac_; }
+    void SetMacSettings(const MacBuildSettings& settings) { mac_ = settings; }
+
+    const WindowsBuildSettings& GetWindowsSettings() { return windows_; }
+    void SetWindowsSettings(const WindowsBuildSettings& settings) { windows_ = settings; }
+
+    const WebGLSettings& GetWebGLSettings() { return webgl_; }
+    void SetWebGLSettings(const WebGLSettings& settings) { webgl_ = settings; }
+
     void Load(rapidjson::Value::Member* jobject);
     void Save(rapidjson::PrettyWriter<rapidjson::FileStream>& writer);
 
@@ -63,6 +96,9 @@ private:
 
     AndroidBuildSettings android_;
     IOSBuildSettings ios_;
+    MacBuildSettings mac_;
+    WindowsBuildSettings windows_;
+    WebGLSettings webgl_;
 
 };
 

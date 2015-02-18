@@ -92,8 +92,7 @@ void BuildWeb::Build(const String& buildPath)
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
     buildSystem->BuildComplete();
 
-    fileSystem->SystemCommandAsync("/Applications/Firefox.app/Contents/MacOS/firefox");
-
+    //fileSystem->SystemCommandAsync("/Applications/Firefox.app/Contents/MacOS/firefox");
 
 }
 

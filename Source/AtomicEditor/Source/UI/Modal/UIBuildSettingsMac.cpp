@@ -12,16 +12,16 @@
 #include <Atomic/UI/TBUI.h>
 
 #include "Build/BuildSystem.h"
-#include "UIBuildSettingsWindows.h"
+#include "UIBuildSettingsMac.h"
 
 namespace AtomicEditor
 {
 
-UIBuildSettingsWindows::UIBuildSettingsWindows(Context* context) :
+UIBuildSettingsMac::UIBuildSettingsMac(Context* context) :
     AEWidget(context)
 {
     TBUI* tbui = GetSubsystem<TBUI>();
-    tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/buildsettings_windows.tb.txt");
+    tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/buildsettings_mac.tb.txt");
 
     appNameEdit_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("app_name"));
     assert(appNameEdit_);
@@ -37,16 +37,16 @@ UIBuildSettingsWindows::UIBuildSettingsWindows(Context* context) :
 
 }
 
-UIBuildSettingsWindows::~UIBuildSettingsWindows()
+UIBuildSettingsMac::~UIBuildSettingsMac()
 {
 
 }
 
-void UIBuildSettingsWindows::Refresh()
+void UIBuildSettingsMac::Refresh()
 {
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
-    const WindowsBuildSettings& settings = buildSystem->GetBuildSettings()->GetWindowsSettings();
+    const MacBuildSettings& settings = buildSystem->GetBuildSettings()->GetMacSettings();
 
     appNameEdit_->SetText(settings.appName.CString());
     appPackageEdit_->SetText(settings.package.CString());
@@ -55,11 +55,11 @@ void UIBuildSettingsWindows::Refresh()
 
 }
 
-void UIBuildSettingsWindows::StoreSettings()
+void UIBuildSettingsMac::StoreSettings()
 {
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
-    WindowsBuildSettings settings;
+    MacBuildSettings settings;
 
     TBStr text;
     appNameEdit_->GetText(text);
@@ -79,12 +79,13 @@ void UIBuildSettingsWindows::StoreSettings()
     text.Clear();
 
 
-    buildSystem->GetBuildSettings()->SetWindowsSettings(settings);
+    buildSystem->GetBuildSettings()->SetMacSettings(settings);
 
 }
 
 
-bool UIBuildSettingsWindows::OnEvent(const TBWidgetEvent &ev)
+
+bool UIBuildSettingsMac::OnEvent(const TBWidgetEvent &ev)
 {
     return false;
 }

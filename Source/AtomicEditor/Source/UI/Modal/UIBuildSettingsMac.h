@@ -12,19 +12,22 @@ using namespace tb;
 namespace tb
 {
 class TBLayout;
+class TBEditField;
+class TBTextField;
+class TBSelectDropdown;
 }
 
 namespace AtomicEditor
 {
 
-class UIBuildSettingsWindows: public AEWidget
+class UIBuildSettingsMac: public AEWidget
 {
-    OBJECT(UIBuildSettingsWindows);
+    OBJECT(UIBuildSettingsMac);
 
 public:
 
-    UIBuildSettingsWindows(Context* context);
-    virtual ~UIBuildSettingsWindows();
+    UIBuildSettingsMac(Context* context);
+    virtual ~UIBuildSettingsMac();
 
     bool OnEvent(const TBWidgetEvent &ev);
 
@@ -39,6 +42,7 @@ private:
     TBEditField* appPackageEdit_;
     TBEditField* productNameEdit_;
     TBEditField* companyNameEdit_;
+
 
 };
 
