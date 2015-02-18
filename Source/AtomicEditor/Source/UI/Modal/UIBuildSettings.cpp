@@ -46,6 +46,8 @@ UIBuildSettings::UIBuildSettings(Context* context):
     platformSelect_->SetSource(&platformSource_);
     LayoutParams lp;
     lp.min_h = 370;
+    lp.max_h = 370;
+    lp.min_w = 160;
     platformSelect_->SetLayoutParams(lp);
     platformSelect_->SetGravity(WIDGET_GRAVITY_ALL);
 
@@ -77,6 +79,8 @@ UIBuildSettings::UIBuildSettings(Context* context):
 
     platformIndicator_ = delegate_->GetWidgetByIDAndType<TBSkinImage>(TBIDC("current_platform_indicator"));
     assert(platformIndicator_);
+
+    RefreshSettings();
 
     Editor* editor = GetSubsystem<Editor>();
     AEEditorPlatform platform = editor->GetCurrentPlatform();
@@ -238,6 +242,15 @@ void UIBuildSettings::RequestPlatformChange(TBID id)
     editor->RequestPlatformChange(platform);
 }
 
+void UIBuildSettings::RefreshSettings()
+{
+    androidSettings_->Refresh();
+    iosSettings_->Refresh();
+    macSettings_->Refresh();
+    windowsSettings_->Refresh();
+    webSettings_->Refresh();
+}
+
 void UIBuildSettings::StoreSettings()
 {
     androidSettings_->StoreSettings();
@@ -309,8 +322,15 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
             ops->Hide();
             return true;
         }
-
-        if (ev.target->GetID() == TBIDC("cancel"))
+        else if (ev.target->GetID() == TBIDC("build"))
+        {
+            StoreSettings();
+            SharedPtr<UIBuildSettings> keepAlive(this);
+            ops->Hide();
+            ops->ShowBuild();
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("cancel"))
         {
             ops->Hide();
             return true;

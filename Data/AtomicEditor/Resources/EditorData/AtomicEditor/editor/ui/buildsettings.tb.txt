@@ -1,14 +1,20 @@
 TBLayout: axis: y, distribution: gravity, position: left
-	TBLayout: position: top
-		TBLayout: id: platformcontainer, axis: y, position: left, gravity: top bottom
-			lp: min-width: 160
+	lp: min-height: 512
+	TBLayout: distribution: gravity, position: top
+		TBLayout: id: platformcontainer
 		TBLayout: id: settingscontainer
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout: distribution: gravity
-		TBLayout: axis: y, position: left, gravity: top left
+		TBLayout: axis: y
 			TBButton: text: "Set Current Platform", id: set_current_platform
+				lp: min-height: 42
 				TBSkinImage: skin: LogoAtomic64, id: current_platform_indicator
 					lp: height: 28, width: 28
 		TBLayout:
+			TBButton: text: Build, id: build
+				lp: min-height: 42, min-width: 84
+		TBLayout:
 			TBButton: text: Ok, id: ok
+				lp: min-height: 42, min-width: 64
 			TBButton: text: Cancel, id: cancel
+				lp: min-height: 42, min-width: 64

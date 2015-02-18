@@ -46,11 +46,14 @@ void BuildWeb::Initialize()
 }
 void BuildWeb::Build(const String& buildPath)
 {
-    buildPath_ = buildPath;
+    buildPath_ = buildPath + "/Web-Build";
 
     Initialize();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem->DirExists(buildPath_))
+        fileSystem->RemoveDir(buildPath_, true);
+
     String buildSourceDir = fileSystem->GetAppBundleResourceFolder();
     buildSourceDir += "Deployment/Web";
 

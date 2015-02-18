@@ -318,7 +318,8 @@ void BuildAndroid::Build(const String& buildPath)
     Editor* editor = GetSubsystem<Editor>();
     Project* project = editor->GetProject();
 
-    buildPath_ = buildPath;
+    buildPath_ = buildPath + "/Android-Build";
+
     androidSDKPath_ = editor->GetPreferences()->GetAndroidSDKPath();
 
 #ifdef ATOMIC_PLATFORM_OSX
@@ -342,6 +343,10 @@ void BuildAndroid::Build(const String& buildPath)
     }
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    if (fileSystem->DirExists(buildPath_))
+        fileSystem->RemoveDir(buildPath_, true);
+
 
 #ifdef ATOMIC_PLATFORM_OSX
     String buildSourceDir = fileSystem->GetAppBundleResourceFolder();

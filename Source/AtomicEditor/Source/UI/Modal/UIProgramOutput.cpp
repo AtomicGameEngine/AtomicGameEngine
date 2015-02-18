@@ -74,6 +74,12 @@ bool UIProgramOutput::OnEvent(const TBWidgetEvent &ev)
             return true;
         }
 
+        if (ev.target->GetID() == TBIDC("ok"))
+        {
+            ops->Hide();
+            return true;
+        }
+
         if (ev.target->GetID() == TBIDC("cancel"))
         {
             ops->Hide();

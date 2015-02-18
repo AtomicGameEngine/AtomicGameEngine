@@ -46,6 +46,8 @@ private:
 
     void StoreSettings();
 
+    void RefreshSettings();
+
     void UpdateCurrentPlatform(AEEditorPlatform platform);
     void RequestPlatformChange(TBID id);
 

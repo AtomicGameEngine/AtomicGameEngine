@@ -51,11 +51,13 @@ void BuildMac::Initialize()
 
 void BuildMac::Build(const String& buildPath)
 {
-    buildPath_ = buildPath;
+    buildPath_ = buildPath + "/Mac-Build";
 
     Initialize();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem->DirExists(buildPath_))
+        fileSystem->RemoveDir(buildPath_, true);
 
  #ifdef ATOMIC_PLATFORM_WINDOWS
     String buildSourceDir = fileSystem->GetProgramDir();
