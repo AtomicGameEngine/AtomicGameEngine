@@ -82,6 +82,9 @@ void ProgressModal::Show()
 void ProgressModal::Hide()
 {
 
+    TBUI* tbui = GetSubsystem<TBUI>();
+    tbui->GetRootWidget()->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
+
     if (dimmer_->GetParent())
         dimmer_->GetParent()->RemoveChild(dimmer_);
 

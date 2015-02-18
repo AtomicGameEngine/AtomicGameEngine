@@ -100,6 +100,9 @@ void UIModalOps::Hide()
 
     opWindow_ = NULL;
 
+    TBUI* tbui = GetSubsystem<TBUI>();
+    tbui->GetRootWidget()->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
+
     isHiding_ = false;
 
 }
