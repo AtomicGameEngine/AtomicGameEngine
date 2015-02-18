@@ -32,6 +32,8 @@ public:
     void Read();
     void Write();
 
+    void UpdateRecentFiles(bool write = true);
+
 private:
 
     void Clear();

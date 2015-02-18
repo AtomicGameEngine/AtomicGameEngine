@@ -29,6 +29,7 @@
 #include "UIFindTextWidget.h"
 #include "../AEEvents.h"
 #include "../AEEditor.h"
+#include "../AEPreferences.h"
 #include "../AEJavascript.h"
 #include "../Player/AEPlayer.h"
 #include "../Project/AEProject.h"
@@ -91,6 +92,8 @@ MainFrame::MainFrame(Context* context) :
     menuHelpSource.AddItem(new TBGenericStringItem("API Documentation", TBIDC("help_api")));
     menuHelpSource.AddItem(new TBGenericStringItem("-"));
     menuHelpSource.AddItem(new TBGenericStringItem("Forums", TBIDC("help_forums")));
+    menuHelpSource.AddItem(new TBGenericStringItem("-"));
+    menuHelpSource.AddItem(new TBGenericStringItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
 
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/mainframe.tb.txt");
@@ -360,6 +363,7 @@ void MainFrame::ShowWelcomeFrame(bool show)
 
     if (show)
     {
+        welcomeframe_->UpdateRecentProjects();
         if (!child)
         {
             resourceviewcontainer_->AddChild(welcomeframe_->GetWidgetDelegate());
@@ -503,7 +507,12 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
                 fileSystem->SystemOpen("http://www.atomicgameengine.com/forum");
 
             }
+            if (ev.ref_id == TBIDC("help_github"))
+            {
 
+                fileSystem->SystemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine");
+
+            }
             else if (ev.ref_id == TBIDC("help_api"))
             {
                 #ifdef ATOMIC_PLATFORM_OSX

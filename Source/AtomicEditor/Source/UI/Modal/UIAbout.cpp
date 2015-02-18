@@ -33,7 +33,7 @@ UIAbout::UIAbout(Context* context):
     UIModalOpWindow(context)
 {
     TBUI* tbui = GetSubsystem<TBUI>();
-    window_->SetText("License Agreement");
+    window_->SetText("About the Atomic Game Engine");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/about.tb.txt");
 
     TBEditField* age_license = window_->GetWidgetByIDAndType<TBEditField>(TBIDC("age_license"));

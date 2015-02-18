@@ -88,6 +88,8 @@ void AEPreferences::Read()
     if (android_sdk_path && android_sdk_path->value.IsString())
         androidSDKPath_ = android_sdk_path->value.GetString();
 
+    UpdateRecentFiles(false);
+
 }
 
 void AEPreferences::Write()
@@ -120,6 +122,31 @@ void AEPreferences::Write()
 
 }
 
+void AEPreferences::UpdateRecentFiles(bool write)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    Vector<String> recentProjects;
+
+    for (unsigned i = 0; i < recentProjects_.Size(); i++)
+    {
+        String path = recentProjects_[i];
+
+        if (!fileSystem->FileExists(path))
+            continue;
+
+
+        recentProjects.Push(path);
+
+        if (recentProjects.Size() == 10)
+            break;
+    }
+
+    recentProjects_ = recentProjects;
+
+    if (write)
+        Write();
+}
+
 void AEPreferences::RegisterRecentProject(const String& fullpath)
 {
     if (recentProjects_.Contains(fullpath))
@@ -129,7 +156,8 @@ void AEPreferences::RegisterRecentProject(const String& fullpath)
 
     recentProjects_.Insert(0, fullpath);
 
-    Write();
+
+    UpdateRecentFiles();
 
 }
 

@@ -1,7 +1,7 @@
 TBLayout: axis: y, distribution: gravity, position: left
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout: distribution: gravity
-		TBTextField: text: "License Key:"
+		TBTextField: text: "Product Key:"
 			font: size:18
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: license_key, autofocus: 1

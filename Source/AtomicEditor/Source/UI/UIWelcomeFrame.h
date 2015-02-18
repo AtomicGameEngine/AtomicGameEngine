@@ -29,6 +29,8 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
+    void UpdateRecentProjects();
+
 private:
 
     struct ExampleInfo
@@ -40,9 +42,7 @@ private:
 
     void AddExample(const String& name, const String& desc, const String& screenshot, const String &folder);
     void FillExamples();
-    bool HandleExampleCopy(const String& name, const String& exampleFolder, String &atomicProjectFile);
-
-    void UpdateRecentProjects();
+    bool HandleExampleCopy(const String& name, const String& exampleFolder, String &atomicProjectFile);    
 
     String exampleInfoDir_;
     String exampleSourceDir_;
