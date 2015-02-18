@@ -70,6 +70,7 @@ private:
     void HandlePlayStarted(StringHash eventType, VariantMap& eventData);
     void HandlePlayStop(StringHash eventType, VariantMap& eventData);
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
+    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<AEPlayer> player_;
     SharedPtr<Project> project_;

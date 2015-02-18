@@ -18,6 +18,13 @@ class AEPreferences : public Object
 
 public:
 
+    struct StartupPreferences
+    {
+        IntVector2 windowPos;
+        int windowWidth;
+        int windowHeight;
+    };
+
     /// Construct.
     AEPreferences(Context* context);
     /// Destruct.
@@ -31,6 +38,8 @@ public:
 
     void Read();
     void Write();
+
+    static bool ReadStartupPrefs(Context* context, StartupPreferences& prefs);
 
     void UpdateRecentFiles(bool write = true);
 

@@ -41,6 +41,7 @@ class MainFrame : public AEWidget
     TBGenericStringItemSource menuResourcesSource;
     TBGenericStringItemSource menuResourcesCreateSource;
     TBGenericStringItemSource menuHelpSource;
+    TBGenericStringItemSource menuDeveloperSource;
 
 public:
     /// Construct.

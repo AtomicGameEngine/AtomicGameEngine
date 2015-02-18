@@ -32,6 +32,10 @@ TBLayout: distribution: gravity, axis: y
 							@include definitions>menubutton
 							text Help
 							id menu help
+						TBButton
+							@include definitions>menubutton
+							text Developer
+							id menu developer
 						TBLayout: gravity: left right
 							TBWidget
 			TBLayout: distribution: gravity, position: top

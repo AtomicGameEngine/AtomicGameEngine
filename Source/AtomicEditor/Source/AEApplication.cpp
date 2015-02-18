@@ -37,6 +37,7 @@
 #include "Import/AEJSONSceneProcess.h"
 
 #include "AEEditor.h"
+#include "AEPreferences.h"
 
 #include "AEApplication.h"
 
@@ -56,6 +57,9 @@ void AEApplication::Start()
 {
     // refactor this
     RegisterEnvironmenttLibrary(context_);
+
+    Engine* engine = GetSubsystem<Engine>();
+    engine->SetAutoExit(false);
 
     // Get default style
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -133,6 +137,14 @@ void AEApplication::Setup()
     engineParameters_["WindowTitle"] = "AtomicEditor";
     engineParameters_["WindowResizable"] = true;
     engineParameters_["FullScreen"] = false;
+
+    AEPreferences::StartupPreferences prefs;
+    if (AEPreferences::ReadStartupPrefs(context_, prefs))
+    {
+        engineParameters_["WindowWidth"] = prefs.windowWidth;
+        engineParameters_["WindowHeight"] = prefs.windowHeight;
+    }
+
 
 #ifdef __APPLE__
     engineParameters_["ResourcePrefixPath"] = "../Resources";

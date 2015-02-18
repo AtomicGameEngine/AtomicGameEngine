@@ -12,6 +12,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
+#include <Atomic/Graphics/Graphics.h>
 
 #include "AEPreferences.h"
 
@@ -101,6 +102,20 @@ void AEPreferences::Write()
     if (!file)
         return;
 
+    Graphics* graphics = GetSubsystem<Graphics>();
+
+    IntVector2 pos(-1, -1);
+
+    int width = -1;
+    int height = -1;
+
+    if (graphics && !graphics->GetFullscreen())
+    {
+        pos = graphics->GetWindowPosition();
+        width = graphics->GetWidth();
+        height = graphics->GetHeight();
+    }
+
     rapidjson::FileStream s(file);
     rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
 
@@ -115,6 +130,15 @@ void AEPreferences::Write()
 
     writer.String("android_sdk_path");
     writer.String(androidSDKPath_.CString());
+
+    writer.String("window_pos_x");
+    writer.Int(pos.x_);
+    writer.String("window_pos_y");
+    writer.Int(pos.y_);
+    writer.String("window_width");
+    writer.Int(width);
+    writer.String("window_height");
+    writer.Int(height);
 
     writer.EndObject();
 
@@ -158,6 +182,83 @@ void AEPreferences::RegisterRecentProject(const String& fullpath)
 
 
     UpdateRecentFiles();
+
+}
+
+bool AEPreferences::ReadStartupPrefs(Context *context, StartupPreferences& prefs)
+{
+
+    FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
+    String filepath = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+    filepath += "prefs.json";
+
+    if (!fileSystem->FileExists(filepath))
+        return false;
+
+    SharedPtr<File> file(new File(context, filepath, FILE_READ));
+
+    if (!file->IsOpen())
+        return false;
+
+    String json;
+    file->ReadText(json);
+
+    if (!json.Length())
+        return false;
+
+    rapidjson::Document document;
+
+    if (document.Parse<0>(json.CString()).HasParseError())
+    {
+        return false;
+    }
+
+    bool success = true;
+
+    const Value::Member* imember = document.FindMember("window_pos_x");
+    if (imember && imember->value.IsInt())
+    {
+        prefs.windowPos.x_ = imember->value.GetInt();
+    }
+    else
+    {
+        success = false;
+    }
+
+    imember = document.FindMember("window_pos_y");
+    if (imember && imember->value.IsInt())
+    {
+        prefs.windowPos.y_ = imember->value.GetInt();
+    }
+    else
+    {
+        success = false;
+    }
+
+    imember = document.FindMember("window_width");
+    if (imember && imember->value.IsInt())
+    {
+        prefs.windowWidth = imember->value.GetInt();
+    }
+    else
+    {
+        success = false;
+    }
+
+    imember = document.FindMember("window_height");
+    if (imember && imember->value.IsInt())
+    {
+        prefs.windowHeight = imember->value.GetInt();
+    }
+    else
+    {
+        success = false;
+    }
+
+    if (prefs.windowHeight < 128 || prefs.windowWidth < 128)
+        return false;
+
+    return success;
 
 }
 

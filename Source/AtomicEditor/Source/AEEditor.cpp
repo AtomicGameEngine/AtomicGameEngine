@@ -4,6 +4,7 @@
 
 #include "AtomicEditor.h"
 
+#include <Atomic/Engine/Engine.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Input/Input.h>
@@ -58,6 +59,8 @@ Editor::Editor(Context* context) :
 
     // Create the Main Editor Frame
     mainframe_ = new MainFrame(context_);
+
+    SubscribeToEvent(E_EXITREQUESTED, HANDLER(Editor, HandleExitRequested));
 
     SubscribeToEvent(E_PLAYERERROR, HANDLER(Editor, HandlePlayerError));
     SubscribeToEvent(E_POSTUPDATE, HANDLER(Editor, HandlePostUpdate));
@@ -293,6 +296,18 @@ void Editor::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     }
 
 }
+
+void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
+{
+    if (aepreferences_.NotNull())
+    {
+        aepreferences_->Write();
+    }
+
+    Engine* engine = GetSubsystem<Engine>();
+    engine->Exit();
+}
+
 
 void RegisterEditorLibrary(Context* context)
 {

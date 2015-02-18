@@ -95,6 +95,9 @@ MainFrame::MainFrame(Context* context) :
     menuHelpSource.AddItem(new TBGenericStringItem("-"));
     menuHelpSource.AddItem(new TBGenericStringItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
 
+    menuDeveloperSource.AddItem(new TBGenericStringItem("Set 1920x1080 Resolution", TBIDC("developer_resolution")));
+
+
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/mainframe.tb.txt");
 
@@ -530,6 +533,17 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
 
         }
 
+        if (ev.target->GetID() == TBIDC("developer popup"))
+        {
+            if (ev.ref_id == TBIDC("developer_resolution"))
+            {
+                Graphics* graphics = GetSubsystem<Graphics>();
+                graphics->SetWindowSize(1920, 1080);
+                graphics->CenterWindow();
+            }
+        }
+
+
         if (ev.target->GetID() == TBIDC("menu atomic editor"))
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("atomic editor popup")))
@@ -589,6 +603,13 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("help popup")))
                 menu->Show(&menuHelpSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu developer"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("developer popup")))
+                menu->Show(&menuDeveloperSource, TBPopupAlignment());
 
             return true;
         }

@@ -94,6 +94,11 @@ public:
     void SetWindowPosition(const IntVector2& position);
     /// Set window position.
     void SetWindowPosition(int x, int y);
+    /// Set window size.
+    void SetWindowSize(int width, int height);
+    /// Center window.
+    void CenterWindow();
+    /// Bring the window to front with focus
     void RaiseWindow();
     /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
