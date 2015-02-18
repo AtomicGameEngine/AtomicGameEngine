@@ -68,19 +68,16 @@ void BuildWindows::Build(const String& buildPath)
 
     buildSourceDir += "Deployment/Win64";
 
-    fileSystem->CreateDir(buildPath);
-    fileSystem->CreateDir(buildPath + "/AtomicPlayer_Resources");
+    fileSystem->CreateDir(buildPath_);
+    fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources");
 
-    String resourcePackagePath = buildPath + "/AtomicPlayer_Resources/AtomicResources.pak";
+    String resourcePackagePath = buildPath_ + "/AtomicPlayer_Resources/AtomicResources.pak";
     GenerateResourcePackage(resourcePackagePath);
 
-    fileSystem->Copy(buildSourceDir + "/AtomicPlayer.exe", buildPath + "/AtomicPlayer.exe");
-
-    ProjectUtils* utils = GetSubsystem<ProjectUtils>();
-    utils->RevealInFinder(GetPath(buildPath));
+    fileSystem->Copy(buildSourceDir + "/AtomicPlayer.exe", buildPath_ + "/AtomicPlayer.exe");
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-    buildSystem->BuildComplete();
+    buildSystem->BuildComplete(AE_PLATFORM_WINDOWS, buildPath_);
 
 }
 

@@ -67,32 +67,34 @@ void BuildMac::Build(const String& buildPath)
 
     buildSourceDir += "Deployment/MacOS/AtomicPlayer.app";
 
-    fileSystem->CreateDir(buildPath);
-    fileSystem->CreateDir(buildPath + "/Contents");
-    fileSystem->CreateDir(buildPath + "/Contents/MacOS");
-    fileSystem->CreateDir(buildPath + "/Contents/Resources");
+    fileSystem->CreateDir(buildPath_);
 
-    String resourcePackagePath = buildPath + "/Contents/Resources/AtomicResources.pak";
+    buildPath_ += "/AtomicPlayer.app";
+
+    fileSystem->CreateDir(buildPath_);
+
+    fileSystem->CreateDir(buildPath_ + "/Contents");
+    fileSystem->CreateDir(buildPath_ + "/Contents/MacOS");
+    fileSystem->CreateDir(buildPath_ + "/Contents/Resources");
+
+    String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources.pak";
     GenerateResourcePackage(resourcePackagePath);
 
-    fileSystem->Copy(buildSourceDir + "/Contents/Resources/Atomic.icns", buildPath + "/Contents/Resources/Atomic.icns");
+    fileSystem->Copy(buildSourceDir + "/Contents/Resources/Atomic.icns", buildPath_ + "/Contents/Resources/Atomic.icns");
 
-    fileSystem->Copy(buildSourceDir + "/Contents/Info.plist", buildPath + "/Contents/Info.plist");    
-    fileSystem->Copy(buildSourceDir + "/Contents/MacOS/AtomicPlayer", buildPath + "/Contents/MacOS/AtomicPlayer");
+    fileSystem->Copy(buildSourceDir + "/Contents/Info.plist", buildPath_ + "/Contents/Info.plist");
+    fileSystem->Copy(buildSourceDir + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer");
 
 #ifdef ATOMIC_PLATFORM_OSX
     Vector<String> args;
     args.Push("+x");
-    args.Push(buildPath + "/Contents/MacOS/AtomicPlayer");
+    args.Push(buildPath_ + "/Contents/MacOS/AtomicPlayer");
     fileSystem->SystemRun("chmod", args);
 #endif
 
-    ProjectUtils* utils = GetSubsystem<ProjectUtils>();
-    utils->RevealInFinder(GetPath(buildPath));
-
+    buildPath_ = buildPath + "/Mac-Build";
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-    buildSystem->BuildComplete();
-
+    buildSystem->BuildComplete(AE_PLATFORM_MAC, buildPath_);
 
 }
 

@@ -268,6 +268,7 @@ bool UIModalOps::OnWidgetDying(TBWidget *widget)
 
 UIModalOps::~UIModalOps()
 {
+    TBWidgetListener::RemoveGlobalListener(this);
 
 }
 

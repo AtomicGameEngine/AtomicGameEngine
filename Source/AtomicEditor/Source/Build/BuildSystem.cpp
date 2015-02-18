@@ -35,8 +35,62 @@ BuildSystem::~BuildSystem()
 
 }
 
-void BuildSystem::BuildComplete()
+void BuildSystem::ClearBuildCompleteUI()
 {
+    if (uiBuildComplete_.Null())
+        return;
+
+    uiBuildComplete_->Hide();
+
+    uiBuildComplete_ = 0;
+
+}
+
+void BuildSystem::BuildComplete(AEEditorPlatform platform, const String &buildFolder, bool success)
+{
+    String title;
+    String message;
+
+    if (platform == AE_PLATFORM_ANDROID)
+    {
+        title = "Android Deployment";
+        message = "Android Deployment";
+    }
+    else if (platform == AE_PLATFORM_IOS)
+    {
+        title = "iOS Deployment";
+        message = "iOS Deployment";
+    }
+    else if (platform == AE_PLATFORM_MAC)
+    {
+        title = "Mac Deployment";
+        message = "Mac Deployment";
+    }
+    else if (platform == AE_PLATFORM_WINDOWS)
+    {
+        title = "Windows Deployment";
+        message = "Windows Deployment";
+    }
+    else if (platform == AE_PLATFORM_HTML5)
+    {
+        title = "Web Deployment";
+        message = "Web Deployment";
+    }
+
+    if (success)
+    {
+        title += " Success";
+        message += " Success";
+    }
+    else
+    {
+        title += " Failed";
+        message += " Failed";
+    }
+
+    uiBuildComplete_ = new UIBuildComplete(context_, title, message, buildFolder, success);
+    uiBuildComplete_->Show();
+
     currentBuild_ = 0;
 }
 
@@ -89,14 +143,6 @@ void BuildSystem::HandleEditorBuild(StringHash eventType, VariantMap& eventData)
 
     String buildPlatform = eventData[P_PLATFORM].GetString();
     String buildPath = eventData[P_BUILDPATH].GetString();
-
-    if (buildPlatform == "Mac")
-    {
-        buildPath += "/AtomicPlayer.app";
-    }
-
-    Editor* editor = GetSubsystem<Editor>();
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
     if (buildPlatform == "Mac")
     {

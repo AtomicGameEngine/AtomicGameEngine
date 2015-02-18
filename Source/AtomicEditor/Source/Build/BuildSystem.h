@@ -10,6 +10,8 @@
 
 using namespace Atomic;
 
+#include "UI/Modal/UIBuildComplete.h"
+
 namespace AtomicEditor
 {
 
@@ -28,7 +30,8 @@ public:
     void LoadBuildSettings(rapidjson::Value::Member* jobject);
     void SaveBuildSettings(rapidjson::PrettyWriter<rapidjson::FileStream>& writer);
 
-    void BuildComplete();
+    void ClearBuildCompleteUI();
+    void BuildComplete(AEEditorPlatform platform,const String& buildFolder, bool success = true);
 
 private:
 
@@ -39,8 +42,9 @@ private:
     void DoBuildWeb(const String& buildPath);
 
     SharedPtr<BuildSettings> buildSettings_;
-
     SharedPtr<BuildBase> currentBuild_;
+
+    SharedPtr<UIBuildComplete> uiBuildComplete_;
 
     void HandleEditorBuild(StringHash eventType, VariantMap& eventData);
 };

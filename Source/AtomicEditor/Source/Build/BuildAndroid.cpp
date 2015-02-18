@@ -113,7 +113,7 @@ void BuildAndroid::HandleEvent(StringHash eventType, VariantMap& eventData)
                 else
                 {
                     // can't proceed
-                    buildSystem->BuildComplete();
+                    buildSystem->BuildComplete(AE_PLATFORM_ANDROID, buildPath_);
                 }
 
             }
@@ -123,14 +123,14 @@ void BuildAndroid::HandleEvent(StringHash eventType, VariantMap& eventData)
             }
             else if (currentBuildPhase_ == ADBStartActivity)
             {
-                buildSystem->BuildComplete();
+                buildSystem->BuildComplete(AE_PLATFORM_ANDROID, buildPath_);
             }
 
         }
         else
         {
 
-            buildSystem->BuildComplete();
+            buildSystem->BuildComplete(AE_PLATFORM_ANDROID, buildPath_, false);
         }
 
 

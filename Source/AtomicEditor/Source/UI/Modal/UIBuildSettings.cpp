@@ -98,7 +98,6 @@ UIBuildSettings::UIBuildSettings(Context* context):
     else if (platform == AE_PLATFORM_IOS)
         SelectIOSSettings();
 
-
     window_->ResizeToFitContent();
     Center();
 

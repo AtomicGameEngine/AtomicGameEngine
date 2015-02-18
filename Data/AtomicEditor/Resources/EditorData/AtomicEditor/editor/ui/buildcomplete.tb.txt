@@ -1,0 +1,11 @@
+TBLayout: axis: y, distribution: gravity
+	lp: min-width: 400
+	TBLayout: 
+		TBTextField: id: message
+			font: size: 14
+	TBSeparator: gravity: left right, skin: AESeparator			
+	TBLayout: 
+		TBButton: text: OK, id: ok
+			lp: min-width: 64, min-height: 48
+		TBButton: text: Open Build Folder, id: reveal
+			lp: min-height: 48

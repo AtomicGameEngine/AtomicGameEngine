@@ -176,13 +176,13 @@ void BuildIOS::HandleEvent(StringHash eventType, VariantMap& eventData)
             }
             else if (currentBuildPhase_ == Deploy)
             {
-                buildSystem->BuildComplete();
+                buildSystem->BuildComplete(AE_PLATFORM_IOS, buildPath_);
             }
 
         }
         else
         {
-            buildSystem->BuildComplete();
+            buildSystem->BuildComplete(AE_PLATFORM_IOS, buildPath_, false);
 
         }
     }
