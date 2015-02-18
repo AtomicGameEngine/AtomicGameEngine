@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/IO/FileSystem.h>
 
 using namespace Atomic;
 
@@ -34,7 +35,7 @@ public:
     const Vector<String>& GetRecentProjects() { return recentProjects_; }
 
     void SetAndroidSDKPath(const String& path) { androidSDKPath_ = path; Write(); }
-    const String& GetAndroidSDKPath() { return androidSDKPath_; }
+    String GetAndroidSDKPath() { return AddTrailingSlash(androidSDKPath_); }
 
     void Read();
     void Write();

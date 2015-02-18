@@ -172,6 +172,7 @@ void UIBuildSettingsAndroid::StoreSettings()
 void UIBuildSettingsAndroid::Refresh()
 {
     Editor* editor = context_->GetSubsystem<Editor>();
+
     TBEditField* sdk_path = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("sdk_path"));
     sdk_path->SetText(editor->GetPreferences()->GetAndroidSDKPath().CString());
 
@@ -196,7 +197,11 @@ bool UIBuildSettingsAndroid::OnEvent(const TBWidgetEvent &ev)
         if (ev.target->GetID() == TBIDC("choose_sdk_path"))
         {
             String path = utils->GetAndroidSDKPath("");
-            editor->GetPreferences()->SetAndroidSDKPath(path);
+            if (path.Length())
+            {
+                editor->GetPreferences()->SetAndroidSDKPath(path);
+                Refresh();
+            }
             return true;
         }
         if (ev.target->GetID() == TBIDC("refresh_sdk_targets"))
