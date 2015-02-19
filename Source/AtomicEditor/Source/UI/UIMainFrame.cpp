@@ -29,6 +29,7 @@
 #include "UIFindTextWidget.h"
 #include "../AEEvents.h"
 #include "../AEEditor.h"
+#include "../AEEditorStrings.h"
 #include "../AEPreferences.h"
 #include "../AEJavascript.h"
 #include "../Player/AEPlayer.h"
@@ -51,6 +52,8 @@ MainFrame::MainFrame(Context* context) :
 {
     context->RegisterSubsystem(this);
 
+    // Instead of TBGenericStringItem here, we need custom item so can have shortcuts be right aligned
+
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("About Atomic Editor", TBIDC("about atomic editor")));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("-"));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Manage License", TBIDC("manage license")));
@@ -58,22 +61,28 @@ MainFrame::MainFrame(Context* context) :
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Check for Updates", TBIDC("check update")));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Quit", TBIDC("quit")));
 
+
     menuFileSource.AddItem(new TBGenericStringItem("New Project", TBIDC("new project")));
     menuFileSource.AddItem(new TBGenericStringItem("Open Project", TBIDC("open project")));
     menuFileSource.AddItem(new TBGenericStringItem("Save Project", TBIDC("save project")));
     menuFileSource.AddItem(new TBGenericStringItem("-"));
     menuFileSource.AddItem(new TBGenericStringItem("Close Project", TBIDC("close project")));
+    menuFileSource.AddItem(new TBGenericStringItem("-"));
+    menuFileSource.AddItem(new TBGenericStringItem("-"));
+    menuFileSource.AddItem(new TBGenericStringItem("Close File"));
 
-    menuEditSource.AddItem(new TBGenericStringItem("Undo", TBIDC("edit undo")));
-    menuEditSource.AddItem(new TBGenericStringItem("Redo", TBIDC("edit redo")));
-    menuEditSource.AddItem(new TBGenericStringItem("-"));
-    menuEditSource.AddItem(new TBGenericStringItem("Cut", TBIDC("edit cut")));
-    menuEditSource.AddItem(new TBGenericStringItem("Copy", TBIDC("edit copy")));
-    menuEditSource.AddItem(new TBGenericStringItem("Paste", TBIDC("edit paste")));
-    menuEditSource.AddItem(new TBGenericStringItem("-"));
-    menuEditSource.AddItem(new TBGenericStringItem("Find", TBIDC("edit find")));
-    menuEditSource.AddItem(new TBGenericStringItem("-"));
-    menuEditSource.AddItem(new TBGenericStringItem("Format Code", TBIDC("format code")));
+    menuBuildSource.AddItem(new TBGenericStringItem("Build", TBIDC("project_build")));
+    menuBuildSource.AddItem(new TBGenericStringItem("Build Settings", TBIDC("project_build_settings")));
+
+    menuEditSource.AddItem(new MenubarItem("Undo", TBIDC("edit undo"),  EDITOR_STRING(ShortcutUndo)));
+    menuEditSource.AddItem(new MenubarItem("Redo", TBIDC("edit redo"),  EDITOR_STRING(ShortcutRedo)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Cut", TBIDC("edit cut"),  EDITOR_STRING(ShortcutCut)));
+    menuEditSource.AddItem(new MenubarItem("Copy", TBIDC("edit copy"),  EDITOR_STRING(ShortcutCopy)));
+    menuEditSource.AddItem(new MenubarItem("Paste", TBIDC("edit paste"),  EDITOR_STRING(ShortcutPaste)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Find", TBIDC("edit find"),  EDITOR_STRING(ShortcutFind)));
+    menuEditSource.AddItem(new MenubarItem("Format Code", TBIDC("format code"),  EDITOR_STRING(ShortcutBeautify)));
 
     menuResourcesSource.AddItem(new TBGenericStringItem("Create", &menuResourcesCreateSource));
     menuResourcesSource.AddItem(new TBGenericStringItem("-"));
@@ -101,9 +110,6 @@ MainFrame::MainFrame(Context* context) :
     item = new TBGenericStringItem("2D Level", TBIDC("create_2d_level"));
     item->SetSkinImage(TBIDC("2DLevelBitmap"));
     menuResourcesCreateSource.AddItem(item);
-
-    menuProjectSource.AddItem(new TBGenericStringItem("Build", TBIDC("project_build")));
-    menuProjectSource.AddItem(new TBGenericStringItem("Build Settings", TBIDC("project_build_settings")));
 
     menuHelpSource.AddItem(new TBGenericStringItem("API Documentation", TBIDC("help_api")));
     menuHelpSource.AddItem(new TBGenericStringItem("-"));
@@ -485,7 +491,7 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
 
         }
 
-        if (ev.target->GetID() == TBIDC("project popup"))
+        if (ev.target->GetID() == TBIDC("build popup"))
         {
             if (!IsProjectLoaded())
                 return true;
@@ -601,13 +607,6 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
 
             return true;
         }
-        else if (ev.target->GetID() == TBIDC("menu file"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("file popup")))
-                menu->Show(&menuFileSource, TBPopupAlignment());
-
-            return true;
-        }
         else if (ev.target->GetID() == TBIDC("menu edit"))
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("edit popup")))
@@ -615,10 +614,10 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
 
             return true;
         }
-        else if (ev.target->GetID() == TBIDC("menu project"))
+        else if (ev.target->GetID() == TBIDC("menu file"))
         {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("project popup")))
-                menu->Show(&menuProjectSource, TBPopupAlignment());
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("file popup")))
+                menu->Show(&menuFileSource, TBPopupAlignment());
 
             return true;
         }
@@ -626,6 +625,13 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("resources popup")))
                 menu->Show(&menuResourcesSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu build"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("build popup")))
+                menu->Show(&menuBuildSource, TBPopupAlignment());
 
             return true;
         }

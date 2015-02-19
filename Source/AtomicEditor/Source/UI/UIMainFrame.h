@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AEWidget.h"
+#include "UIMenubar.h"
 
 #include <TurboBadger/tb_menu_window.h>
 
@@ -37,8 +38,9 @@ class MainFrame : public AEWidget
 
     TBGenericStringItemSource menuAtomicEditorSource;
     TBGenericStringItemSource menuFileSource;
-    TBGenericStringItemSource menuEditSource;
-    TBGenericStringItemSource menuProjectSource;
+    MenubarItemSource menuEditSource;
+    TBGenericStringItemSource menuBuildSource;
+
     TBGenericStringItemSource menuResourcesSource;
     TBGenericStringItemSource menuResourcesCreateSource;
     TBGenericStringItemSource menuHelpSource;

@@ -25,6 +25,7 @@
 #include <Atomic/Environment/Environment.h>
 #include <Atomic/Graphics/Renderer.h>
 
+#include "AEEditorStrings.h"
 #include "Project/ProjectUtils.h"
 #include "Subprocess/AESubprocessSystem.h"
 #include "Build/BuildSystem.h"
@@ -38,7 +39,6 @@
 
 #include "AEEditor.h"
 #include "AEPreferences.h"
-
 #include "AEApplication.h"
 
 #include "Tools/External/AEExternalTooling.h"
@@ -95,6 +95,7 @@ void AEApplication::Start()
 
     input->SetMouseVisible(true);
 
+    context_->RegisterSubsystem(new EditorStrings(context_));
     context_->RegisterSubsystem(new ProjectUtils(context_));
     context_->RegisterSubsystem(new Javascript(context_));
     context_->RegisterSubsystem(new SubprocessSystem(context_));
