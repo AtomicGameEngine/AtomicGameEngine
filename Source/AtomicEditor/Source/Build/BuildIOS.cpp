@@ -297,7 +297,9 @@ void BuildIOS::Build(const String& buildPath)
 
     String buildAppSourceDir = buildSourceDir + "Deployment/IOS/AtomicPlayer.app";
 
-    String buildDestDist = buildPath + "/AtomicPlayer.app";
+    fileSystem->CreateDir(buildPath_);
+
+    String buildDestDist = buildPath_ + "/AtomicPlayer.app";
 
     fileSystem->CreateDir(buildDestDist);
 

@@ -82,7 +82,7 @@ Pass::Pass(StringHash type) :
     isDesktop_(false)
 {
     // Guess default lighting mode from pass name
-    if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED || type == PASS_LIGHT2D)
+    if (type == PASS_BASE || type == PASS_ALPHA || type == PASS_MATERIAL || type == PASS_DEFERRED)
         lightingMode_ = LIGHTING_PERVERTEX;
     else if (type == PASS_LIGHT || type == PASS_LITBASE || type == PASS_LITALPHA)
         lightingMode_ = LIGHTING_PERPIXEL;
