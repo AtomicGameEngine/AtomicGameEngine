@@ -40,7 +40,9 @@ namespace AtomicEditor
 
 Editor::Editor(Context* context) :
     Object(context),
-    currentPlatform_(AE_PLATFORM_UNDEFINED)
+    currentPlatform_(AE_PLATFORM_UNDEFINED),
+    requestExit_(false)
+
 {
     RegisterEditorLibrary(context_);
 
@@ -289,6 +291,12 @@ void Editor::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     if (player_ && player_->HasErrors())
     {
         SendEvent(E_EDITORPLAYSTOP);
+    }
+
+    if (requestExit_)
+    {
+        requestExit_ = false;
+        SendEvent(E_EXITREQUESTED);
     }
 
 }

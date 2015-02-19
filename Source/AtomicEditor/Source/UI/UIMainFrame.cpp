@@ -59,7 +59,7 @@ MainFrame::MainFrame(Context* context) :
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Quit", TBIDC("quit")));
 
     menuFileSource.AddItem(new TBGenericStringItem("New Project", TBIDC("new project")));
-    menuFileSource.AddItem(new TBGenericStringItem("Open Project", TBIDC("open project")));    
+    menuFileSource.AddItem(new TBGenericStringItem("Open Project", TBIDC("open project")));
     menuFileSource.AddItem(new TBGenericStringItem("Save Project", TBIDC("save project")));
     menuFileSource.AddItem(new TBGenericStringItem("-"));
     menuFileSource.AddItem(new TBGenericStringItem("Close Project", TBIDC("close project")));
@@ -73,7 +73,7 @@ MainFrame::MainFrame(Context* context) :
     menuEditSource.AddItem(new TBGenericStringItem("-"));
     menuEditSource.AddItem(new TBGenericStringItem("Find", TBIDC("edit find")));
     menuEditSource.AddItem(new TBGenericStringItem("-"));
-    menuEditSource.AddItem(new TBGenericStringItem("Format Code", TBIDC("format code")));    
+    menuEditSource.AddItem(new TBGenericStringItem("Format Code", TBIDC("format code")));
 
     menuResourcesSource.AddItem(new TBGenericStringItem("Create", &menuResourcesCreateSource));
     menuResourcesSource.AddItem(new TBGenericStringItem("-"));
@@ -158,7 +158,7 @@ MainFrame::MainFrame(Context* context) :
     resourceframe_ = new ResourceFrame(context_);
 
     // better way to do this? projectviewcontainer isn't a layout
-    wd = resourceframe_->GetWidgetDelegate();    
+    wd = resourceframe_->GetWidgetDelegate();
     wd->SetSize(rect.w, rect.h);
     //resourceviewcontainer->AddChild(wd);
 
@@ -413,12 +413,12 @@ bool MainFrame::IsProjectLoaded()
 
 bool MainFrame::OnEvent(const TBWidgetEvent &ev)
 {
+    Editor* editor = GetSubsystem<Editor>();
+
     if (ev.type == EVENT_TYPE_CLICK)
     {
         if (ev.target->GetID() == TBIDC("file popup"))
         {
-            Editor* editor = GetSubsystem<Editor>();
-
             if (ev.ref_id == TBIDC("new project"))
             {
                 if (editor->IsProjectLoaded())
@@ -472,7 +472,14 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
             else if (ev.ref_id == TBIDC("quit"))
             {
                 // TODO: confirmation
-                SendEvent(E_EXITREQUESTED);
+
+                // shenanigens, need to delete the popup on quit
+                // otherwise it is still live with a source at exit
+                ev.target->GetParent()->RemoveChild(ev.target);
+                delete ev.target;
+                TBWidgetEvent* eptr = (TBWidgetEvent*) &ev;
+                eptr->target = NULL;
+                editor->RequestExit();
                 return true;
             }
 
@@ -559,11 +566,11 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
             }
             else if (ev.ref_id == TBIDC("help_api"))
             {
-                #ifdef ATOMIC_PLATFORM_OSX
-                    String docSourceDir = fileSystem->GetAppBundleResourceFolder();
-                #else
-                    String docSourceDir = fileSystem->GetProgramDir();
-                #endif
+#ifdef ATOMIC_PLATFORM_OSX
+                String docSourceDir = fileSystem->GetAppBundleResourceFolder();
+#else
+                String docSourceDir = fileSystem->GetProgramDir();
+#endif
 
                 docSourceDir += "Docs/index.html";
 
@@ -588,7 +595,9 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
         if (ev.target->GetID() == TBIDC("menu atomic editor"))
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("atomic editor popup")))
+            {
                 menu->Show(&menuAtomicEditorSource, TBPopupAlignment());
+            }
 
             return true;
         }

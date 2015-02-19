@@ -44,11 +44,8 @@ UINewProject::~UINewProject()
 
 }
 
-bool UINewProject::Create2DProject(const String& fullpath)
+bool UINewProject::Create2DProject(const String& projectPath, const String& filename)
 {
-    Vector<String> elements = fullpath.Split('/');
-    String projectName = elements.Back();
-
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef ATOMIC_PLATFORM_OSX
@@ -58,19 +55,16 @@ bool UINewProject::Create2DProject(const String& fullpath)
 #endif
 
     templateSourceDir += "/ProjectTemplates/Project2D";
-    fileSystem->CopyDir(templateSourceDir + "/Resources", fullpath + "/Resources");
+    fileSystem->CopyDir(templateSourceDir + "/Resources", projectPath + "/Resources");
 
-    File file(context_, fullpath + "/" + projectName + ".atomic", FILE_WRITE);
+    File file(context_, projectPath + "/" + filename + ".atomic", FILE_WRITE);
     file.Close();
 
     return true;
 }
 
-bool UINewProject::CreateEmptyProject(const String& fullpath)
+bool UINewProject::CreateEmptyProject(const String& projectPath, const String &filename)
 {
-    Vector<String> elements = fullpath.Split('/');
-    String projectName = elements.Back();
-
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef ATOMIC_PLATFORM_OSX
@@ -80,18 +74,17 @@ bool UINewProject::CreateEmptyProject(const String& fullpath)
 #endif
 
     templateSourceDir += "/ProjectTemplates/EmptyProject";
-    fileSystem->CopyDir(templateSourceDir + "/Resources", fullpath + "/Resources");
 
-    File file(context_, fullpath + "/" + projectName + ".atomic", FILE_WRITE);
+    fileSystem->CopyDir(templateSourceDir + "/Resources", projectPath + "/Resources");
+
+    File file(context_, projectPath + "/" + filename + ".atomic", FILE_WRITE);
     file.Close();
 
     return true;
 }
 
-bool UINewProject::Create3DProject(const String& fullpath)
+bool UINewProject::Create3DProject(const String& projectPath, const String &filename)
 {
-    Vector<String> elements = fullpath.Split('/');
-    String projectName = elements.Back();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -102,9 +95,9 @@ bool UINewProject::Create3DProject(const String& fullpath)
 #endif
 
     templateSourceDir += "/ProjectTemplates/Project3D";
-    fileSystem->CopyDir(templateSourceDir + "/Resources", fullpath + "/Resources");
+    fileSystem->CopyDir(templateSourceDir + "/Resources", projectPath + "/Resources");
 
-    File file(context_, fullpath + "/" + projectName + ".atomic", FILE_WRITE);
+    File file(context_, projectPath + "/" + filename + ".atomic", FILE_WRITE);
     file.Close();
 
     return true;
@@ -141,10 +134,16 @@ bool UINewProject::OnEvent(const TBWidgetEvent &ev)
 
         if (projectType != -1)
         {
-            String projectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
+            String fullProjectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
 
-            if (!projectPath.Length())
+            if (!fullProjectPath.Length())
                 return true;
+
+            String projectPath;
+            String fileName;
+            String ext;
+
+            SplitPath(fullProjectPath, projectPath, fileName, ext);
 
             FileSystem* fileSystem = GetSubsystem<FileSystem>();
             if (!fileSystem->DirExists(projectPath))
@@ -164,17 +163,18 @@ bool UINewProject::OnEvent(const TBWidgetEvent &ev)
             }
 
             bool result = false;
+
             if (projectType == 0)
             {
-                result = CreateEmptyProject(projectPath);
+                result = CreateEmptyProject(projectPath, fileName);
             }
             else if (projectType == 1)
             {
-                result = Create2DProject(projectPath);
+                result = Create2DProject(projectPath, fileName);
             }
             else if (projectType == 2)
             {
-                result = Create3DProject(projectPath);
+                result = Create3DProject(projectPath, fileName);
             }
 
             if (!result)

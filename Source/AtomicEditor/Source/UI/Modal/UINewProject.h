@@ -24,9 +24,9 @@ public:
 
 private:
 
-    bool CreateEmptyProject(const String& fullpath);
-    bool Create2DProject(const String& fullpath);
-    bool Create3DProject(const String& fullpath);
+    bool CreateEmptyProject(const String& projectPath, const String &filename);
+    bool Create2DProject(const String& projectPath, const String &filename);
+    bool Create3DProject(const String& projectPath, const String &filename);
 
 };
 

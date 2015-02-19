@@ -15,6 +15,7 @@ namespace tb
 
 class TBEditField;
 class TBLayout;
+class TBMenuWindow;
 
 }
 

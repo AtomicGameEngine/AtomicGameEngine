@@ -62,6 +62,9 @@ public:
     void RequestPlatformChange(AEEditorPlatform platform);
     AEEditorPlatform GetCurrentPlatform() { return currentPlatform_; }
 
+    /// Called from UI code such as MainFrame quit menu, caught in post update
+    void RequestExit() { requestExit_ = true; }
+
 private:
 
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
@@ -82,6 +85,8 @@ private:
     WeakPtr<ResourceOps> resourceCreator_;
 
     AEEditorPlatform currentPlatform_;
+
+    bool requestExit_;
 
 };
 

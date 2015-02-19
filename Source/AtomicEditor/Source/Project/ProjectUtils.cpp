@@ -119,11 +119,12 @@ String ProjectUtils::GetAndroidSDKPath(const String& defaultPath)
 
 String ProjectUtils::NewProjectFileDialog()
 {
+
     String projectPath;
 
     nfdchar_t *outPath = NULL;
 
-    nfdresult_t result = NFD_ChooseDirectory( "Please create a new folder for the project",
+    nfdresult_t result = NFD_SaveDialog( "atomic",
                                 NULL,
                                 &outPath);
 
@@ -132,12 +133,12 @@ String ProjectUtils::NewProjectFileDialog()
         projectPath = outPath;
     }
 
+    GetSubsystem<Graphics>()->RaiseWindow();
+
     if (outPath)
         free(outPath);
 
-    GetSubsystem<Graphics>()->RaiseWindow();
-
-    return GetInternalPath(projectPath);
+    return projectPath;
 
 }
 

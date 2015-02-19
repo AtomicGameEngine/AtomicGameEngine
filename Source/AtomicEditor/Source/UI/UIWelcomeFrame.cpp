@@ -192,21 +192,21 @@ void WelcomeFrame::FillExamples()
 
     for (Value::ConstValueIterator itr = examples->value.Begin(); itr != examples->value.End(); itr++)
     {
-         if (!(*itr).IsObject())
+        if (!(*itr).IsObject())
             continue;
 
-         const Value::Member* name = (*itr).FindMember("name");
-         const Value::Member* desc = (*itr).FindMember("desc");
-         const Value::Member* screenshot = (*itr).FindMember("screenshot");
-         const Value::Member* folder = (*itr).FindMember("folder");
+        const Value::Member* name = (*itr).FindMember("name");
+        const Value::Member* desc = (*itr).FindMember("desc");
+        const Value::Member* screenshot = (*itr).FindMember("screenshot");
+        const Value::Member* folder = (*itr).FindMember("folder");
 
-         if (!name || !desc || !screenshot || !folder)
-             continue;
+        if (!name || !desc || !screenshot || !folder)
+            continue;
 
-         if (!name->value.IsString() || !desc->value.IsString() || !screenshot->value.IsString() || !folder->value.IsString())
-             continue;
+        if (!name->value.IsString() || !desc->value.IsString() || !screenshot->value.IsString() || !folder->value.IsString())
+            continue;
 
-         AddExample(name->value.GetString(), desc->value.GetString(), screenshot->value.GetString(), folder->value.GetString());
+        AddExample(name->value.GetString(), desc->value.GetString(), screenshot->value.GetString(), folder->value.GetString());
     }
 
 }
@@ -214,10 +214,17 @@ void WelcomeFrame::FillExamples()
 bool WelcomeFrame::HandleExampleCopy(const String& name, const String& exampleFolder, String& atomicProjectFile)\
 {
     Editor* editor = GetSubsystem<Editor>();
-    String projectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
 
-    if (!projectPath.Length())
-        return false;
+    String fullProjectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
+
+    if (!fullProjectPath.Length())
+        return true;
+
+    String projectPath;
+    String fileName;
+    String ext;
+
+    SplitPath(fullProjectPath, projectPath, fileName, ext);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -249,8 +256,9 @@ bool WelcomeFrame::HandleExampleCopy(const String& name, const String& exampleFo
     }
 
     // example folder name and .atomic must match
-    atomicProjectFile = projectPath + "/" + exampleFolder + ".atomic";
-    result = fileSystem->Copy(exampleSourceDir + "/" + exampleFolder + ".atomic", atomicProjectFile);
+    atomicProjectFile = projectPath + fileName + ".atomic";
+    String sourceProjectFile = exampleSourceDir + "/" + exampleFolder + ".atomic";
+    result = fileSystem->Copy(sourceProjectFile , atomicProjectFile);
 
     if (!result)
     {
