@@ -36,15 +36,15 @@ class MainFrame : public AEWidget
 {
     OBJECT(MainFrame);
 
-    TBGenericStringItemSource menuAtomicEditorSource;
+    MenubarItemSource menuAtomicEditorSource;
     MenubarItemSource menuFileSource;
     MenubarItemSource menuEditSource;
-    TBGenericStringItemSource menuBuildSource;
+    MenubarItemSource menuBuildSource;
 
-    TBGenericStringItemSource menuResourcesSource;
-    TBGenericStringItemSource menuResourcesCreateSource;
-    TBGenericStringItemSource menuHelpSource;
-    TBGenericStringItemSource menuDeveloperSource;
+    MenubarItemSource menuResourcesSource;
+    MenubarItemSource menuResourcesCreateSource;
+    MenubarItemSource menuHelpSource;
+    MenubarItemSource menuDeveloperSource;
 
     MenubarItemSource menuToolsSource;
 

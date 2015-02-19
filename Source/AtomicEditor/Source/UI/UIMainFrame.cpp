@@ -54,12 +54,12 @@ MainFrame::MainFrame(Context* context) :
 
     // Instead of TBGenericStringItem here, we need custom item so can have shortcuts be right aligned
 
-    menuAtomicEditorSource.AddItem(new TBGenericStringItem("About Atomic Editor", TBIDC("about atomic editor")));
-    menuAtomicEditorSource.AddItem(new TBGenericStringItem("-"));
-    menuAtomicEditorSource.AddItem(new TBGenericStringItem("Manage License", TBIDC("manage license")));
-    menuAtomicEditorSource.AddItem(new TBGenericStringItem("-"));
-    menuAtomicEditorSource.AddItem(new TBGenericStringItem("Check for Updates", TBIDC("check update")));
-    menuAtomicEditorSource.AddItem(new TBGenericStringItem("Quit", TBIDC("quit")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("About Atomic Editor", TBIDC("about atomic editor")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
+    menuAtomicEditorSource.AddItem(new MenubarItem("Manage License", TBIDC("manage license")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
+    menuAtomicEditorSource.AddItem(new MenubarItem("Check for Updates", TBIDC("check update")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("Quit", TBIDC("quit")));
 
     menuFileSource.AddItem(new MenubarItem("New Project", TBIDC("new project")));
     menuFileSource.AddItem(new MenubarItem("Open Project", TBIDC("open project")));
@@ -70,8 +70,9 @@ MainFrame::MainFrame(Context* context) :
     menuFileSource.AddItem(new MenubarItem("Save File", TBIDC("save file"), EDITOR_STRING(ShortcutSaveFile)));
     menuFileSource.AddItem(new MenubarItem("Close File", TBIDC("close file"), EDITOR_STRING(ShortcutCloseFile)));
 
-    menuBuildSource.AddItem(new TBGenericStringItem("Build", TBIDC("project_build")));
-    menuBuildSource.AddItem(new TBGenericStringItem("Build Settings", TBIDC("project_build_settings")));
+    menuBuildSource.AddItem(new MenubarItem("Build", TBIDC("project_build"), EDITOR_STRING(ShortcutBuild)));
+    menuBuildSource.AddItem(new MenubarItem("-"));
+    menuBuildSource.AddItem(new MenubarItem("Build Settings", TBIDC("project_build_settings"), EDITOR_STRING(ShortcutBuildSettings)));
 
     menuToolsSource.AddItem(new MenubarItem("Tiled Map Editor", TBIDC("tools tiled")));
 
@@ -87,40 +88,40 @@ MainFrame::MainFrame(Context* context) :
     menuEditSource.AddItem(new MenubarItem("-"));
     menuEditSource.AddItem(new MenubarItem("Play", TBIDC("play"),  EDITOR_STRING(ShortcutPlay)));
 
-    menuResourcesSource.AddItem(new TBGenericStringItem("Create", &menuResourcesCreateSource));
-    menuResourcesSource.AddItem(new TBGenericStringItem("-"));
-    menuResourcesSource.AddItem(new TBGenericStringItem("Reveal in Finder", TBIDC("reveal")));
+    menuResourcesSource.AddItem(new MenubarItem("Create", &menuResourcesCreateSource));
+    menuResourcesSource.AddItem(new MenubarItem("-"));
+    menuResourcesSource.AddItem(new MenubarItem("Reveal in Finder", TBIDC("reveal")));
 
-    TBGenericStringItem* item;
-    item = new TBGenericStringItem("Folder", TBIDC("create_folder"));
+    MenubarItem* item;
+    item = new MenubarItem("Folder", TBIDC("create_folder"));
     item->SetSkinImage(TBIDC("Folder.icon"));
     menuResourcesCreateSource.AddItem(item);
 
-    menuResourcesCreateSource.AddItem(new TBGenericStringItem("-"));
+    menuResourcesCreateSource.AddItem(new MenubarItem("-"));
 
-    item = new TBGenericStringItem("Component", TBIDC("create_component"));
+    item = new MenubarItem("Component", TBIDC("create_component"));
     item->SetSkinImage(TBIDC("JavascriptBitmap"));
     menuResourcesCreateSource.AddItem(item);
-    item = new TBGenericStringItem("Script", TBIDC("create_script"));
+    item = new MenubarItem("Script", TBIDC("create_script"));
     item->SetSkinImage(TBIDC("JavascriptBitmap"));
     menuResourcesCreateSource.AddItem(item);
-    item = new TBGenericStringItem("Module", TBIDC("create_module"));
+    item = new MenubarItem("Module", TBIDC("create_module"));
     item->SetSkinImage(TBIDC("JavascriptBitmap"));
     menuResourcesCreateSource.AddItem(item);
 
-    menuResourcesCreateSource.AddItem(new TBGenericStringItem("-"));
+    menuResourcesCreateSource.AddItem(new MenubarItem("-"));
 
-    item = new TBGenericStringItem("2D Level", TBIDC("create_2d_level"));
+    item = new MenubarItem("2D Level", TBIDC("create_2d_level"));
     item->SetSkinImage(TBIDC("2DLevelBitmap"));
     menuResourcesCreateSource.AddItem(item);
 
-    menuHelpSource.AddItem(new TBGenericStringItem("API Documentation", TBIDC("help_api")));
-    menuHelpSource.AddItem(new TBGenericStringItem("-"));
-    menuHelpSource.AddItem(new TBGenericStringItem("Forums", TBIDC("help_forums")));
-    menuHelpSource.AddItem(new TBGenericStringItem("-"));
-    menuHelpSource.AddItem(new TBGenericStringItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
+    menuHelpSource.AddItem(new MenubarItem("API Documentation", TBIDC("help_api")));
+    menuHelpSource.AddItem(new MenubarItem("-"));
+    menuHelpSource.AddItem(new MenubarItem("Forums", TBIDC("help_forums")));
+    menuHelpSource.AddItem(new MenubarItem("-"));
+    menuHelpSource.AddItem(new MenubarItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
 
-    menuDeveloperSource.AddItem(new TBGenericStringItem("Set 1920x1080 Resolution", TBIDC("developer_resolution")));
+    menuDeveloperSource.AddItem(new MenubarItem("Set 1920x1080 Resolution", TBIDC("developer_resolution")));
 
 
     TBUI* tbui = GetSubsystem<TBUI>();

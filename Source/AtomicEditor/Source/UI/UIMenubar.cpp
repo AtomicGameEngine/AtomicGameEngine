@@ -10,6 +10,29 @@
 
 using namespace tb;
 
+namespace tb {
+
+
+// THIS MUST MATCH TBSimpleLayoutItemWidget in tb_select_item.cpp
+class TBSimpleLayoutItemWidget : public TBLayout, private TBWidgetListener
+{
+public:
+    TBSimpleLayoutItemWidget(TBID image, TBSelectItemSource *source, const char *str);
+    ~TBSimpleLayoutItemWidget();
+    virtual bool OnEvent(const TBWidgetEvent &ev);
+private:
+    TBSelectItemSource *m_source;
+    TBTextField m_textfield;
+    TBSkinImage m_image;
+    TBSkinImage m_image_arrow;
+    TBMenuWindow *m_menu; ///< Points to the submenu window if opened
+    virtual void OnWidgetDelete(TBWidget *widget);
+    void OpenSubMenu();
+    void CloseSubMenu();
+};
+
+}
+
 namespace AtomicEditor
 {
 
@@ -29,8 +52,8 @@ MenubarItemWidget::MenubarItemWidget(MenubarItem *item, MenubarItemSource *sourc
     TBWidget* root = GetContentRoot();
 
     TBFontDescription fd;
-    fd.SetID(TBIDC("Vera"));
-    fd.SetSize(13);
+    fd.SetID(TBIDC("Monaco-Bold"));
+    fd.SetSize(12);
 
     TBTextField* text = new TBTextField();
     text->SetIgnoreInput(true);
@@ -76,7 +99,16 @@ bool MenubarItemSource::Filter(int index, const char *filter)
 TBWidget *MenubarItemSource::CreateItemWidget(int index, TBSelectItemViewer *viewer)
 {
     const char *string = GetItemString(index);
-    if (string && *string == '-')
+
+    TBSelectItemSource *sub_source = GetItemSubSource(index);
+    TBID image = GetItemImage(index);
+
+    if (sub_source || image)
+    {
+        if (TBSimpleLayoutItemWidget *itemwidget = new TBSimpleLayoutItemWidget(image, sub_source, string))
+            return itemwidget;
+    }
+    else if (string && *string == '-')
     {
         if (TBSeparator *separator = new TBSeparator)
         {
@@ -85,8 +117,7 @@ TBWidget *MenubarItemSource::CreateItemWidget(int index, TBSelectItemViewer *vie
             return separator;
         }
     }
-
-    if (TBLayout *layout = new MenubarItemWidget(GetItem(index), this, viewer, index))
+    else if (TBLayout *layout = new MenubarItemWidget(GetItem(index), this, viewer, index))
     {
         layout->SetID(GetItem(index)->id);
         return layout;

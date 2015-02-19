@@ -1,6 +1,7 @@
 definitions
 	menubutton		
 		lp: height: 28
+		font: name: Vera
 		skin TBButton.flat
 TBLayout: distribution: gravity, axis: y
 	TBContainer: skin: AEContainer, gravity: all, id: mainframecontainer

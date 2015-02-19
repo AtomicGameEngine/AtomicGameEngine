@@ -44,12 +44,15 @@ void EditorStrings::InitializeStrings()
     stringLookup_[ShortcutCopy] = "⌘C";
     stringLookup_[ShortcutPaste] = "⌘V";
     stringLookup_[ShortcutFind] = "⌘F";
-    stringLookup_[ShortcutBeautify] = "⌘B";
+    stringLookup_[ShortcutBeautify] = "⌘I";
 
     stringLookup_[ShortcutSaveFile] = "⌘S";
     stringLookup_[ShortcutCloseFile] = "⌘W";
 
     stringLookup_[ShortcutPlay] = "⌘P";
+
+    stringLookup_[ShortcutBuild] = "⌘B";
+    stringLookup_[ShortcutBuildSettings] = "⇧⌘B";
 
 
 }

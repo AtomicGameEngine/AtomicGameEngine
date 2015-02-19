@@ -33,7 +33,9 @@ public:
         ShortcutBeautify,
         ShortcutCloseFile,
         ShortcutSaveFile,
-        ShortcutPlay
+        ShortcutPlay,
+        ShortcutBuild,
+        ShortcutBuildSettings,
     };
 
 

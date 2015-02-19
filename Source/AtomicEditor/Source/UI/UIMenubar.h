@@ -26,6 +26,8 @@ public:
 
     }
 
+    MenubarItem(const char *str, TBSelectItemSource *sub_source) : TBGenericStringItem(str, sub_source) {}
+
     String shortcut_;
 
 };
