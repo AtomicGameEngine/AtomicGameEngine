@@ -9,6 +9,7 @@
 #include <TurboBadger/tb_window.h>
 #include <TurboBadger/tb_select.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/tb_message_window.h>
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/UI/TBUI.h>
@@ -54,26 +55,38 @@ UIManageLicense::~UIManageLicense()
 bool UIManageLicense::OnEvent(const TBWidgetEvent &ev)
 {
     Editor* editor = GetSubsystem<Editor>();
-    UIModalOps* modelOps = GetSubsystem<UIModalOps>();
     LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
 
     if (ev.type == EVENT_TYPE_CLICK)
     {
+        if (ev.type == EVENT_TYPE_CLICK)
+        {
+            if (ev.target->GetID() == TBIDC("confirm_license_return"))
+            {
+                if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
+                {
+                    request_ = licenseSystem->Deactivate();
+                    SubscribeToEvent(request_, E_CURLCOMPLETE, HANDLER(UIManageLicense, HandleCurlComplete));
+                    progressModal_->SetMessage("Returning license, please wait...");
+                    progressModal_->Show();
+                }
+            }
+        }
+
         if (ev.target->GetID() == TBIDC("return_activation"))
         {
-
             if (editor->IsProjectLoaded())
             {
                 editor->PostModalError("Close Project", "Please close the current project before deactiving license");
             }
             else
             {
-                request_ = licenseSystem->Deactivate();
-                SubscribeToEvent(request_, E_CURLCOMPLETE, HANDLER(UIManageLicense, HandleCurlComplete));
-                progressModal_->SetMessage("Returning license, please wait...");
-                progressModal_->Show();
+                TBMessageWindow *msg_win = new TBMessageWindow(window_, TBIDC("confirm_license_return"));
+                TBMessageWindowSettings settings(TB_MSG_OK_CANCEL, TBID(uint32(0)));
+                settings.dimmer = true;
+                settings.styling = true;
+                msg_win->Show("Return License", "Are you sure you want to return the installed license?", &settings, 300, 140);
             }
-
 
             return true;
         }
@@ -85,6 +98,8 @@ bool UIManageLicense::OnEvent(const TBWidgetEvent &ev)
 void UIManageLicense::HandleCurlComplete(StringHash eventType, VariantMap& eventData)
 {
     progressModal_->Hide();
+
+
 }
 
 }
