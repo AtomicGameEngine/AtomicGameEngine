@@ -18,6 +18,7 @@
 
 #include "AtomicEditor.h"
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Core/Context.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/Log.h>
@@ -44,6 +45,8 @@ LicenseSystem::LicenseSystem(Context* context) :
 
 {
     ResetLicense();
+
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(LicenseSystem, HandleEditorShutdown));
 }
 
 LicenseSystem::~LicenseSystem()
@@ -516,6 +519,11 @@ void LicenseSystem::HandleDeactivate(StringHash eventType, VariantMap& eventData
         deactivate_ = 0;
     }
 
+}
+
+void LicenseSystem::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

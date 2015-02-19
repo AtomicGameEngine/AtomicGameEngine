@@ -181,6 +181,7 @@ MainFrame::MainFrame(Context* context) :
     SubscribeToEvent(E_SCREENMODE, HANDLER(MainFrame, HandleScreenMode));
     SubscribeToEvent(E_JAVASCRIPTSAVED, HANDLER(MainFrame, HandleJavascriptSaved));
     SubscribeToEvent(E_PLATFORMCHANGE, HANDLER(MainFrame, HandlePlatformChange));
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(MainFrame, HandleEditorShutdown));
 
     messageModal_ = new MessageModal(context_);
     uiModalOps_ = new UIModalOps(context_);
@@ -710,6 +711,11 @@ void MainFrame::HandlePlatformChange(StringHash eventType, VariantMap& eventData
     else if (platform == AE_PLATFORM_IOS)
         platformIndicator_->SetSkinBg(TBIDC("LogoIOS"));
 
+}
+
+void MainFrame::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

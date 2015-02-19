@@ -34,6 +34,8 @@ public:
 
 private:
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     SharedPtr<ListView> consoleList_;
     TBLayout* consolelayout_;
 

@@ -7,14 +7,14 @@
 #include <TurboBadger/tb_layout.h>
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/UI/TBUI.h>
 
+#include "AEEvents.h"
 #include "UIListView.h"
 #include "UIErrorsWidget.h"
 #include "UIMainFrame.h"
 #include "UIResourceFrame.h"
-
-#include <Atomic/IO/FileSystem.h>
 
 namespace AtomicEditor
 {
@@ -38,6 +38,8 @@ ErrorsWidget::ErrorsWidget(Context* context) :
     errorListWD->SetGravity(WIDGET_GRAVITY_ALL);
 
     errorlayout_->AddChild(errorListWD);
+
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(ErrorsWidget, HandleEditorShutdown));
 }
 
 ErrorsWidget::~ErrorsWidget()
@@ -99,6 +101,11 @@ bool ErrorsWidget::OnEvent(const TBWidgetEvent &ev)
     }
 
     return false;
+}
+
+void ErrorsWidget::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

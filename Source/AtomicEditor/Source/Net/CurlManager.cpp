@@ -4,6 +4,7 @@
 
 #include "AtomicEditor.h"
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Core/Context.h>
 #include "CurlManager.h"
 #include <curl/curl.h>
 
@@ -74,6 +75,7 @@ CurlManager::CurlManager(Context* context) :
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     SubscribeToEvent(E_UPDATE, HANDLER(CurlManager, HandleUpdate));
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(CurlManager, HandleEditorShutdown));
 }
 
 CurlManager::~CurlManager()
@@ -115,5 +117,9 @@ void CurlManager::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
+void CurlManager::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
+}
 
 }

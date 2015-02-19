@@ -83,6 +83,7 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     void HandleJavascriptSaved(StringHash eventType, VariantMap& eventData);
     void HandlePlatformChange(StringHash eventType, VariantMap& eventData);
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     TBEditField* consoletext_;
     TBLayout* resourceviewcontainer_;

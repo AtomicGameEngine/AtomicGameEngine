@@ -59,6 +59,7 @@ public:
 
 private:
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     Vector< SharedPtr<CurlRequest> > requests_;

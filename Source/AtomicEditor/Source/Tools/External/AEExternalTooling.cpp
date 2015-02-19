@@ -4,11 +4,13 @@
 
 #include "AtomicEditor.h"
 
+#include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 
-#include "AEExternalTooling.h"
+#include "AEEvents.h"
 
+#include "AEExternalTooling.h"
 #include "AtomicTiled.h"
 
 namespace AtomicEditor
@@ -17,6 +19,7 @@ namespace AtomicEditor
 ExternalTooling::ExternalTooling(Context* context) :
     Object(context)
 {
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(ExternalTooling, HandleEditorShutdown));
 }
 
 ExternalTooling::~ExternalTooling()
@@ -76,6 +79,11 @@ String ExternalTooling::GetToolApplicationPath()
 
     return appDir;
 
+}
+
+void ExternalTooling::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 

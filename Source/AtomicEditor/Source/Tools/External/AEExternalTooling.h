@@ -33,6 +33,8 @@ public:
 
 private:
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     HashMap<String, SharedPtr<ExternalTool> > tools_;
 
 

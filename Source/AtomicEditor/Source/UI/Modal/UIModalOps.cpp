@@ -81,6 +81,8 @@ UIModalOps::UIModalOps(Context* context) :
     TBWidgetListener::AddGlobalListener(this);
     context->RegisterSubsystem(this);
     dimmer_ = new TBDimmer();
+
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(UIModalOps, HandleEditorShutdown));
 }
 
 void UIModalOps::Show()
@@ -307,6 +309,11 @@ UIModalOps::~UIModalOps()
 bool UIModalOps::OnEvent(const TBWidgetEvent &ev)
 {
     return false;
+}
+
+void UIModalOps::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

@@ -4,8 +4,11 @@
 
 #include "AtomicEditor.h"
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Core/Context.h>
 #include <Atomic/IO/FileSystem.h>
-#include "AtomicEditor.h"
+
+#include "AEEvents.h"
+
 #include "AESubprocessSystem.h"
 
 namespace AtomicEditor
@@ -16,6 +19,7 @@ SubprocessSystem::SubprocessSystem(Context* context) :
     updateTimer_(0.0f)
 {
     SubscribeToEvent(E_UPDATE, HANDLER(SubprocessSystem, HandleUpdate));
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(SubprocessSystem, HandleEditorShutdown));
 }
 
 SubprocessSystem::~SubprocessSystem()
@@ -66,6 +70,11 @@ void SubprocessSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
         processes_.Remove(SharedPtr<Subprocess>(remove[i]));
     }
 
+}
+
+void SubprocessSystem::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

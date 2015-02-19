@@ -27,6 +27,7 @@ public:
     void DoVersionCheck();
 
 private:
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
     void HandleCurlComplete(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<CurlRequest> versionRequest_;

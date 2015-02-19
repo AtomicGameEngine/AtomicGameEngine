@@ -44,11 +44,7 @@ Editor::Editor(Context* context) :
 {
     RegisterEditorLibrary(context_);
 
-    javascript_ = new Javascript(context_);
-    context_->RegisterSubsystem(javascript_);
-
     aejavascript_ = new AEJavascript(context_);
-
     aepreferences_ = new AEPreferences(context_);
 
 #ifdef USE_SPIDERMONKEY
@@ -303,6 +299,14 @@ void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
     {
         aepreferences_->Write();
     }
+
+    mainframe_ = 0;
+    context_->RemoveSubsystem(Javascript::GetBaseTypeStatic());
+
+    SendEvent(E_EDITORSHUTDOWN);
+
+    SharedPtr<Editor> keepAlive(this);
+    context_->RemoveSubsystem(GetType());
 
     Engine* engine = GetSubsystem<Engine>();
     engine->Exit();

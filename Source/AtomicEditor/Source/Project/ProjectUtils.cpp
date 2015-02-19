@@ -8,6 +8,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Graphics/Graphics.h>
 #include "ProjectUtils.h"
+#include "AEEvents.h"
 #include "nfd.h"
 
 #include "../AEEditor.h"
@@ -18,7 +19,7 @@ namespace AtomicEditor
 ProjectUtils::ProjectUtils(Context* context) :
     Object(context)
 {
-
+     SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(ProjectUtils, HandleEditorShutdown));
 }
 
 void ProjectUtils::OpenProjectFileDialog()
@@ -152,5 +153,11 @@ void ProjectUtils::RevealInFinder(const String& fullpath)
 ProjectUtils::~ProjectUtils()
 {
 }
+
+void ProjectUtils::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
+}
+
 
 }

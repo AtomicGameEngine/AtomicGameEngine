@@ -55,6 +55,7 @@ private:
     Vector<AEPlayerError> errors_;
 
     void HandleJSError(StringHash eventType, VariantMap& eventData);
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<JSVM> vm_;
 

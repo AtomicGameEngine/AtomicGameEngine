@@ -375,6 +375,33 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
+void Graphics::SetWindowSize(int width, int height)
+{
+    if (impl_->window_)
+    {
+        SDL_SetWindowSize(impl_->window_, width, height);
+        WindowResized();
+    }
+}
+
+void Graphics::CenterWindow()
+{
+    if (impl_->window_)
+    {
+        SDL_DisplayMode mode;
+        SDL_GetDesktopDisplayMode(0, &mode);
+
+        int width, height;
+        SDL_GetWindowSize(impl_->window_, &width, &height);
+
+        int x = mode.w/2 - width/2;
+        int y = mode.h/2 - height/2;
+
+        SetWindowPosition(x, y);
+
+    }
+}
+
 void Graphics::RaiseWindow()
 {
     if (impl_->window_)

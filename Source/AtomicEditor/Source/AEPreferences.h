@@ -46,8 +46,9 @@ public:
 
 private:
 
-    void Clear();
+     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
+    void Clear();
     String GetPreferencesFullPath();
 
     String androidSDKPath_;

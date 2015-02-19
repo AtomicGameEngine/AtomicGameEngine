@@ -13,6 +13,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 
 #include "AEEditor.h"
+#include "AEEvents.h"
 #include "Project/AEProject.h"
 
 #include "AEJavascript.h"
@@ -40,6 +41,7 @@ AEJavascript::AEJavascript(Context* context) :
     errorChecker_ = new JSErrorChecker(context, ctx_);
 
     SubscribeToEvent(E_FILECHANGED, HANDLER(AEJavascript, HandleFileChanged));
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(AEJavascript, HandleEditorShutdown));
 
     ExecuteFile("AtomicEditor/javascript/AtomicEditor.js");
 }
@@ -312,6 +314,9 @@ int AEJavascript::js_module_search(duk_context* ctx)
     return 1;
 }
 
-
+void AEJavascript::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
+}
 
 }

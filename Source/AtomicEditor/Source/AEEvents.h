@@ -120,5 +120,9 @@ EVENT(E_CURLCOMPLETE, CurlComplete)
     PARAM(P_CURLREQUEST, Request);      // CurlRequest*
 }
 
+EVENT(E_EDITORSHUTDOWN, EditorShutdown)
+{
+
+}
 
 }

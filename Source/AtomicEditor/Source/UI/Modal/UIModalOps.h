@@ -85,6 +85,8 @@ private:
 
     void Show();
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     // TBWidgetListener
     void OnWidgetDelete(TBWidget *widget);
     bool OnWidgetDying(TBWidget *widget);

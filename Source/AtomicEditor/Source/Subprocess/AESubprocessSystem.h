@@ -30,6 +30,7 @@ public:
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     Vector<SharedPtr<Subprocess> > processes_;
     float updateTimer_;

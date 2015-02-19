@@ -88,6 +88,7 @@ private:
 
     void HandleVerification(StringHash eventType, VariantMap& eventData);
     void HandleDeactivate(StringHash eventType, VariantMap& eventData);
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     bool eulaAgreementConfirmed_;
 

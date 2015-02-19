@@ -8,6 +8,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/UI/TBUI.h>
 
 #include "UIListView.h"
@@ -15,9 +16,8 @@
 #include "UIMainFrame.h"
 #include "UIResourceFrame.h"
 
-#include <Atomic/IO/FileSystem.h>
-
-#include "../AEJavascript.h"
+#include "AEEvents.h"
+#include "AEJavascript.h"
 
 namespace AtomicEditor
 {
@@ -41,6 +41,8 @@ IssuesWidget::IssuesWidget(Context* context) :
     issueListWD->SetGravity(WIDGET_GRAVITY_ALL);
 
     issuelayout_->AddChild(issueListWD);
+
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(IssuesWidget, HandleEditorShutdown));
 }
 
 IssuesWidget::~IssuesWidget()
@@ -100,6 +102,11 @@ bool IssuesWidget::OnEvent(const TBWidgetEvent &ev)
     }
 
     return false;
+}
+
+void IssuesWidget::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

@@ -28,6 +28,7 @@ AEPlayer::AEPlayer(Context* context) :
     Object(context),
     mode_(AE_PLAYERMODE_WIDGET)
 {
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(AEPlayer, HandleEditorShutdown));
 
     assert(!context->GetSubsystem<AEPlayer>());
     context->RegisterSubsystem(this);
@@ -104,6 +105,11 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
     }
 
     return ok;
+}
+
+void AEPlayer::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

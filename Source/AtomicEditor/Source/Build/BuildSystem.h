@@ -47,6 +47,7 @@ private:
     SharedPtr<UIBuildComplete> uiBuildComplete_;
 
     void HandleEditorBuild(StringHash eventType, VariantMap& eventData);
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 };
 
 

@@ -34,6 +34,8 @@ public:
 
 private:
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     SharedPtr<ListView> issueList_;
     TBLayout* issuelayout_;
 

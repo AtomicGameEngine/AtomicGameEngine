@@ -41,6 +41,8 @@ public:
 
 private:
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     TBEditField* findtextedit_;
 
 };

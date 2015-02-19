@@ -32,6 +32,8 @@ public:
     void HandleCreate2DLevel(const String& resourcePath, const String& resourceName, bool navigateToResource = false, bool reportError = true);
 private:
 
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     bool CopyFile(File* srcFile, const String& destFileName);
 
     bool CheckCreateComponent(const String& resourcePath, const String& resourceName, bool reportError);

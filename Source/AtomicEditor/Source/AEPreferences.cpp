@@ -14,6 +14,7 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/Graphics/Graphics.h>
 
+#include "AEEvents.h"
 #include "AEPreferences.h"
 
 using namespace rapidjson;
@@ -25,6 +26,8 @@ AEPreferences::AEPreferences(Context* context) :
     Object(context)
 {
     context->RegisterSubsystem(this);
+
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(AEPreferences, HandleEditorShutdown));
 
     Read();
 }
@@ -260,6 +263,11 @@ bool AEPreferences::ReadStartupPrefs(Context *context, StartupPreferences& prefs
 
     return success;
 
+}
+
+void AEPreferences::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

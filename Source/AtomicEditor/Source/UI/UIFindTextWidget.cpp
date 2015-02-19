@@ -34,6 +34,7 @@ FindTextWidget::FindTextWidget(Context* context) :
 
     SubscribeToEvent(E_FINDTEXTOPEN, HANDLER(FindTextWidget, HandleFindTextOpen));
     SubscribeToEvent(E_FINDTEXTCLOSE, HANDLER(FindTextWidget, HandleFindTextClose));
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(FindTextWidget, HandleEditorShutdown));
 }
 
 FindTextWidget::~FindTextWidget()
@@ -146,6 +147,11 @@ bool FindTextWidget::OnEvent(const TBWidgetEvent &ev)
 
 
     return false;
+}
+
+void FindTextWidget::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

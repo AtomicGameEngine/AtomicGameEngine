@@ -28,6 +28,11 @@ public:
     ProjectUtils(Context* context);
     /// Destruct.
     ~ProjectUtils();
+
+private:
+
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
 };
 
 

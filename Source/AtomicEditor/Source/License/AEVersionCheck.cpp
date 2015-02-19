@@ -7,6 +7,7 @@
 #include <rapidjson/prettywriter.h>
 
 #include "AtomicEditor.h"
+#include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
 #include "AEEditor.h"
 #include "AEEvents.h"
@@ -20,6 +21,7 @@ VersionCheck::VersionCheck(Context* context) :
     Object(context)
 
 {
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(VersionCheck, HandleEditorShutdown));
     progressModal_ = new ProgressModal(context_, "Checking for Updates", "Checking for updates, please wait...");
 }
 
@@ -123,6 +125,11 @@ void VersionCheck::HandleCurlComplete(StringHash eventType, VariantMap& eventDat
 
     versionRequest_ = 0;
 
+}
+
+void VersionCheck::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 /*

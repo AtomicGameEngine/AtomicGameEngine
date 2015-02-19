@@ -30,6 +30,7 @@ ConsoleWidget::ConsoleWidget(Context* context) :
     consolelayout_(0)
 {
     context_->RegisterSubsystem(this);
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(ConsoleWidget, HandleEditorShutdown));
 
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/consolewidget.tb.txt");
@@ -81,6 +82,11 @@ bool ConsoleWidget::OnEvent(const TBWidgetEvent &ev)
 {
 
     return false;
+}
+
+void ConsoleWidget::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

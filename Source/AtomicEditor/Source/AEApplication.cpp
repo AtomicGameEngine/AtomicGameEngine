@@ -92,7 +92,7 @@ void AEApplication::Start()
 
     Input* input = GetSubsystem<Input>();
 
-    // The mouse isn't showing up on OSX until I tab, this is a hack and temp workaround
+
     input->SetMouseVisible(true);
 
     context_->RegisterSubsystem(new ProjectUtils(context_));

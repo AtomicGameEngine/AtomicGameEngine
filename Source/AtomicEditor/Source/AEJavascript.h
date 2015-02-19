@@ -48,6 +48,7 @@ private:
 
     bool ReadZeroTerminatedSourceFile(const String& path, String& source);
     void HandleFileChanged(StringHash eventType, VariantMap& eventData);
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     static int js_module_search(duk_context* ctx);
     static int js_read_source(duk_context* ctx);

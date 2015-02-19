@@ -28,6 +28,8 @@ ResourceOps::ResourceOps(Context* context) :
     Object(context)
 {
     context->RegisterSubsystem(this);
+
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(ResourceOps, HandleEditorShutdown));
 }
 
 /// Destruct.
@@ -437,6 +439,11 @@ void ResourceOps::HandleCreate2DLevel(const String& resourcePath, const String& 
 
     GetSubsystem<MainFrame>()->GetProjectFrame()->Refresh();
 
+}
+
+void ResourceOps::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 

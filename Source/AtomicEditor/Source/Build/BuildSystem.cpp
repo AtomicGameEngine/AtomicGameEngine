@@ -27,6 +27,7 @@ BuildSystem::BuildSystem(Context* context) :
     buildSettings_ = new BuildSettings(context);
 
     SubscribeToEvent(E_EDITORBUILD, HANDLER(BuildSystem, HandleEditorBuild));
+    SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(BuildSystem, HandleEditorShutdown));
 
 }
 
@@ -165,6 +166,11 @@ void BuildSystem::HandleEditorBuild(StringHash eventType, VariantMap& eventData)
         DoBuildIOS(buildPath);
     }
 
+}
+
+void BuildSystem::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
+{
+    context_->RemoveSubsystem(GetType());
 }
 
 }

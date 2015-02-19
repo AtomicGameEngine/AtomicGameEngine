@@ -34,6 +34,9 @@ public:
     bool OnEvent(const TBWidgetEvent &ev);
 
 private:
+
+    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
     Vector<AEPlayerError> errors_;
     SharedPtr<ListView> errorList_;
     TBLayout* errorlayout_;
