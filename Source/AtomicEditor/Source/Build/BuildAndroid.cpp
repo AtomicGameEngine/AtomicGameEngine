@@ -177,6 +177,8 @@ void BuildAndroid::RunStartActivity()
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
 
+    ops->PrintToProgramOutput("\n\nStarting Android Activity\n\n");
+
 }
 
 void BuildAndroid::RunADBInstall()
@@ -208,6 +210,8 @@ void BuildAndroid::RunADBInstall()
 
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
+
+    ops->PrintToProgramOutput("\n\n<color #D4FB79>Installing on Android Devices</color>\n\n");
 
 }
 
@@ -243,6 +247,8 @@ void BuildAndroid::RunADBListDevices()
 
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
+
+    ops->PrintToProgramOutput("\n\n<color #D4FB79>Listing Android Devices</color>\n\n");
 
 }
 
@@ -282,6 +288,8 @@ void BuildAndroid::RunAntDebug()
 
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->ShowProgramOutput(subprocess);
+
+    ops->PrintToProgramOutput("<color #D4FB79>Starting Android Deployment</color>\n\n");
 }
 
 void BuildAndroid::RunAndroidUpdate()

@@ -204,6 +204,18 @@ void UIModalOps::SetProgramOutputSubprocess(Object* subprocess)
     output->SetSubprocess(subprocess);
 }
 
+void UIModalOps::PrintToProgramOutput(const String& text)
+{
+    if (opWindow_.Null())
+        return;
+
+    if (opWindow_->GetType() != UIProgramOutput::GetTypeStatic())
+        return;
+
+    UIProgramOutput* output = (UIProgramOutput*)(opWindow_.Get());
+    output->OutputText(text);
+}
+
 void UIModalOps::ShowProgramOutput(Object *subprocess)
 {
     assert(opWindow_.Null());

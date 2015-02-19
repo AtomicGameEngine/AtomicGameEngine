@@ -52,6 +52,15 @@ void UIProgramOutput::HandleEvent(StringHash eventType, VariantMap& eventData)
     }
 }
 
+void UIProgramOutput::OutputText(const String& text)
+{
+    TBStr tbText;
+    output_->GetText(tbText);
+    tbText.Append(text.CString());
+    output_->SetText(tbText);
+    output_->ScrollTo(0, 0xffffff);
+}
+
 void UIProgramOutput::SetSubprocess(Object* subprocess)
 {
     UnsubscribeFromAllEvents();

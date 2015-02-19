@@ -66,6 +66,7 @@ class UIModalOps: public AEWidget, private TBWidgetListener
     bool ModalActive() { return opWindow_.NotNull(); }
 
     void ShowProgramOutput(Object* subprocess);
+    void PrintToProgramOutput(const String& text);
 
     /// Allows you to change the program key being output to the output window
     void SetProgramOutputSubprocess(Object* subprocess);

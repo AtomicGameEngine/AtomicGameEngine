@@ -26,6 +26,8 @@ public:
 
     void SetSubprocess(Object*subprocess);
 
+    void OutputText(const String& text);
+
 private:
 
     void HandleEvent(StringHash eventType, VariantMap& eventData);

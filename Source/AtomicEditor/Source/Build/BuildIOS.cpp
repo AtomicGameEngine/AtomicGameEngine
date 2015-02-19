@@ -209,6 +209,8 @@ void BuildIOS::RunConvertPList()
 
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->ShowProgramOutput(subprocess);
+
+    ops->PrintToProgramOutput("<color #D4FB79>Starting iOS Deployment</color>\n\n");
 }
 
 void BuildIOS::RunCodeSign()
@@ -242,6 +244,8 @@ void BuildIOS::RunCodeSign()
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
 
+    ops->PrintToProgramOutput("\n\n<color #D4FB79>Signing iOS Deployment</color>\n\n");
+
 }
 
 void BuildIOS::RunDeploy()
@@ -274,6 +278,8 @@ void BuildIOS::RunDeploy()
 
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
+
+    ops->PrintToProgramOutput("\n\n<color #D4FB79>Deploying to iOS Device</color>\n\n");
 
 }
 
