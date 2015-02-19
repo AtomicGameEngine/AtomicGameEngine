@@ -117,6 +117,74 @@ bool ResourceOps::CheckCreateScript(const String& resourcePath, const String& re
 }
 
 
+bool ResourceOps::CheckCreateModule(const String& resourcePath, const String& resourceName, bool reportError)
+{
+
+    Editor* editor = GetSubsystem<Editor>();
+    Project* project = editor->GetProject();
+
+    String fullpath = resourcePath + resourceName;
+    if (!resourceName.EndsWith(".js"))
+        fullpath += ".js";
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (fs->FileExists(fullpath))
+    {
+        if (reportError)
+        {
+            String errorMsg;
+            errorMsg.AppendWithFormat("The module:\n\n%s\n\nalready exists", fullpath.CString());
+            editor->PostModalError("Create Module Error", errorMsg);
+        }
+
+        return false;
+    }
+
+    if (!project->IsModulesDirOrFile(resourcePath))
+    {
+        if (reportError)
+        {
+            String errorMsg;
+            errorMsg.AppendWithFormat("Modules must reside in or in a subfolder of the Modules folder");
+            editor->PostModalError("Create Module Error", errorMsg);
+        }
+
+        return false;
+    }
+
+    return true;
+
+}
+
+bool ResourceOps::CheckCreate2DLevel(const String& resourcePath, const String& resourceName, bool reportError)
+{
+
+    Editor* editor = GetSubsystem<Editor>();
+    Project* project = editor->GetProject();
+
+    String fullpath = resourcePath + resourceName;
+    if (!resourceName.EndsWith(".tmx"))
+        fullpath += ".tmx";
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (fs->FileExists(fullpath))
+    {
+        if (reportError)
+        {
+            String errorMsg;
+            errorMsg.AppendWithFormat("The level:\n\n%s\n\nalready exists", fullpath.CString());
+            editor->PostModalError("Create 2D Level Error", errorMsg);
+        }
+
+        return false;
+    }
+
+    return true;
+
+}
+
 bool ResourceOps::CopyFile(File* srcFile, const String& destFileName)
 {
     SharedPtr<File> destFile(new File(context_, destFileName, FILE_WRITE));
@@ -139,8 +207,9 @@ void ResourceOps::HandleResourceDelete(const String& resourcePath, bool reportEr
 
     if (fs->DirExists(resourcePath))
     {
-        if (reportError)
-            editor->PostModalError("Delete Resource Error", "Deleting Folders not currently implemented");
+        fs->RemoveDir(resourcePath, true);
+
+        GetSubsystem<MainFrame>()->GetProjectFrame()->Refresh();
 
         return;
     }
@@ -289,5 +358,86 @@ void ResourceOps::HandleCreateScript(const String& resourcePath, const String& r
     GetSubsystem<MainFrame>()->GetProjectFrame()->Refresh();
 
 }
+
+void ResourceOps::HandleCreateModule(const String& resourcePath, const String& resourceName,
+                                        bool navigateToResource, bool reportError)
+{
+    Editor* editor = GetSubsystem<Editor>();
+
+    if (!CheckCreateModule(resourcePath, resourceName, reportError))
+        return;
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    SharedPtr<File> srcFile = cache->GetFile("AtomicEditor/templates/template_module.js");
+    if (srcFile.Null() || !srcFile->IsOpen())
+    {
+        editor->PostModalError("Create Script Error", "Could not open module template");
+        return;
+    }
+
+    String fullpath = resourcePath + resourceName;
+    if (!resourceName.EndsWith(".js"))
+        fullpath += ".js";
+
+    if (!CopyFile(srcFile, fullpath))
+    {
+        String errorMsg;
+        errorMsg.AppendWithFormat("Error copying template:\n\n%s\n\nto:\n\n%s",
+                                  "AtomicEditor/template_module.js", fullpath.CString());
+        editor->PostModalError("Create Module Error", errorMsg);
+        return;
+    }
+
+    if (navigateToResource)
+    {
+        ResourceFrame* rframe = GetSubsystem<MainFrame>()->GetResourceFrame();
+        rframe->EditResource(fullpath);
+    }
+
+    GetSubsystem<MainFrame>()->GetProjectFrame()->Refresh();
+
+}
+
+void ResourceOps::HandleCreate2DLevel(const String& resourcePath, const String& resourceName,
+                                        bool navigateToResource, bool reportError)
+{
+    Editor* editor = GetSubsystem<Editor>();
+
+    if (!CheckCreate2DLevel(resourcePath, resourceName, reportError))
+        return;
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    SharedPtr<File> srcFile = cache->GetFile("AtomicEditor/templates/template_empty.tmx");
+    if (srcFile.Null() || !srcFile->IsOpen())
+    {
+        editor->PostModalError("Create Script Error", "Could not open module template");
+        return;
+    }
+
+    String fullpath = resourcePath + resourceName;
+    if (!resourceName.EndsWith(".tmx"))
+        fullpath += ".tmx";
+
+    if (!CopyFile(srcFile, fullpath))
+    {
+        String errorMsg;
+        errorMsg.AppendWithFormat("Error copying template:\n\n%s\n\nto:\n\n%s",
+                                  "AtomicEditor/template_empty.tmx", fullpath.CString());
+        editor->PostModalError("Create 2D Level Error", errorMsg);
+        return;
+    }
+
+    if (navigateToResource)
+    {
+        //ResourceFrame* rframe = GetSubsystem<MainFrame>()->GetResourceFrame();
+        //rframe->EditResource(fullpath);
+    }
+
+    GetSubsystem<MainFrame>()->GetProjectFrame()->Refresh();
+
+}
+
 
 }

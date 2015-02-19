@@ -28,12 +28,16 @@ public:
     void HandleNewFolder(const String& resourcePath, bool reportError = true);
     void HandleCreateComponent(const String& resourcePath, const String& resourceName, bool navigateToResource = true, bool reportError = true);
     void HandleCreateScript(const String& resourcePath, const String& resourceName, bool navigateToResource = true, bool reportError = true);
+    void HandleCreateModule(const String& resourcePath, const String& resourceName, bool navigateToResource = true, bool reportError = true);
+    void HandleCreate2DLevel(const String& resourcePath, const String& resourceName, bool navigateToResource = false, bool reportError = true);
 private:
 
     bool CopyFile(File* srcFile, const String& destFileName);
 
     bool CheckCreateComponent(const String& resourcePath, const String& resourceName, bool reportError);
     bool CheckCreateScript(const String& resourcePath, const String& resourceName, bool reportError);
+    bool CheckCreateModule(const String& resourcePath, const String& resourceName, bool reportError);
+    bool CheckCreate2DLevel(const String& resourcePath, const String& resourceName, bool reportError);
 
 };
 

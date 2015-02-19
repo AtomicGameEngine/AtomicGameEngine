@@ -47,7 +47,7 @@ public:
 
     void SelectCurrentContentFolder(const String& folder);
 
-    const String& GetCurrentContentFolder() { return currentContentFolder_; }
+    String GetCurrentContentFolder();
 
 private:
 

@@ -67,7 +67,6 @@ public:
 
     // reveals the current project folder in finder/explorer
     void RevealInFinder();
-    void ShowResourceCreateWindow(const String& resourceType);
 
     PlayerWidget* GetPlayerWidget();
 

@@ -33,8 +33,6 @@ elements
 		overlays
 			element Star
 				condition: target: ancestors, property: skin, value: "StarCondition"
-
-
 	Star
 		bitmap star_gray.png
 		type Image
@@ -64,6 +62,9 @@ elements
 
 	JavascriptBitmap
 		bitmap javascript.png
+
+	2DLevelBitmap
+		bitmap 2d_level.png
 
 	FolderCreateBitmap
 		bitmap folder_create.png

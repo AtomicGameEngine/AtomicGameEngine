@@ -116,6 +116,23 @@ void UIModalOps::ShowCreateComponent(const String& resourcePath)
     opWindow_ = new UICreateComponent(context_);
 }
 
+void UIModalOps::ShowCreateModule(const String& resourcePath)
+{
+    assert(opWindow_.Null());
+
+    resourcePath_ = resourcePath;
+    Show();
+    opWindow_ = new UICreateModule(context_);
+}
+
+void UIModalOps::ShowCreate2DLevel(const String& resourcePath)
+{
+    assert(opWindow_.Null());
+
+    resourcePath_ = resourcePath;
+    Show();
+    opWindow_ = new UICreate2DLevel(context_);
+}
 
 void UIModalOps::ShowCreateScript(const String& resourcePath)
 {

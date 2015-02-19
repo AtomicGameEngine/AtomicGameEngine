@@ -208,4 +208,100 @@ bool UICreateScript::OnEvent(const TBWidgetEvent &ev)
     return false;
 }
 
+// UICreateModule------------------------------------------------
+
+UICreateModule::UICreateModule(Context* context):
+    UIModalOpWindow(context)
+{
+    TBUI* tbui = GetSubsystem<TBUI>();
+    window_->SetText("Create Module");
+    tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcecreatemodule.tb.txt");
+    nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("module_name"));
+    assert(nameField_);
+    window_->ResizeToFitContent();
+    Center();
+}
+
+UICreateModule::~UICreateModule()
+{
+
+}
+
+bool UICreateModule::OnEvent(const TBWidgetEvent &ev)
+{
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
+
+    if (ev.type == EVENT_TYPE_POINTER_MOVE)
+        return false;
+
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        if (ev.target->GetID() == TBIDC("create"))
+        {
+            TBStr text;
+            nameField_->GetText(text);
+            ResourceOps* rops = GetSubsystem<ResourceOps>();
+            rops->HandleCreateModule(ops->GetResourcePath(), text.CStr(), true, true);
+            ops->Hide();
+            return true;
+        }
+
+        if (ev.target->GetID() == TBIDC("cancel"))
+        {
+            ops->Hide();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// UICreateModule------------------------------------------------
+
+UICreate2DLevel::UICreate2DLevel(Context* context):
+    UIModalOpWindow(context)
+{
+    TBUI* tbui = GetSubsystem<TBUI>();
+    window_->SetText("Create 2D Level");
+    tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcecreate2dlevel.tb.txt");
+    nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("level_name"));
+    assert(nameField_);
+    window_->ResizeToFitContent();
+    Center();
+}
+
+UICreate2DLevel::~UICreate2DLevel()
+{
+
+}
+
+bool UICreate2DLevel::OnEvent(const TBWidgetEvent &ev)
+{
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
+
+    if (ev.type == EVENT_TYPE_POINTER_MOVE)
+        return false;
+
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        if (ev.target->GetID() == TBIDC("create"))
+        {
+            TBStr text;
+            nameField_->GetText(text);
+            ResourceOps* rops = GetSubsystem<ResourceOps>();
+            rops->HandleCreate2DLevel(ops->GetResourcePath(), text.CStr(), true, true);
+            ops->Hide();
+            return true;
+        }
+
+        if (ev.target->GetID() == TBIDC("cancel"))
+        {
+            ops->Hide();
+            return true;
+        }
+    }
+
+    return false;
+}
+
 }

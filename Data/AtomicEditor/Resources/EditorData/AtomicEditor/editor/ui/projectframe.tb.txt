@@ -7,7 +7,7 @@ TBLayout: distribution: gravity, axis: y, id: projectframe
 		type search	
 	TBWidget: gravity: all
 		TBLayout: distribution: gravity, id: foldercontainer, gravity: all
-	TBScrollContainer: scroll-mode: y-auto, id: contentcontainerscroll
+	TBScrollContainer: scroll-mode: y-auto, id: contentcontainerscroll, gravity: all
 		TBLayout: id: contentcontainer, axis: y, position: left
 	
 

@@ -62,6 +62,7 @@ bool AtomicTiled::Launch(const String& args)
     {
         SubscribeToEvent(subprocess_, E_SUBPROCESSCOMPLETE, HANDLER(AtomicTiled, HandleEvent));
         SubscribeToEvent(subprocess_, E_SUBPROCESSOUTPUT, HANDLER(AtomicTiled, HandleEvent));
+        return true;
     }
 
     return false;

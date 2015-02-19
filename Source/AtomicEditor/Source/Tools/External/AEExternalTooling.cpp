@@ -51,7 +51,7 @@ void ExternalTooling::ToolExited(const String& name)
     if (!tools_.Contains(name))
         return;
 
-    tools_[name] = 0;
+    tools_.Erase(name);
 
 }
 

@@ -40,6 +40,7 @@ ProjectFrame::ProjectFrame(Context* context) :
     assert(foldercontainer);
 
     folderList_ = new ListView(context_, "folderList_");
+    folderList_->GetRootList()->SetGravity(WIDGET_GRAVITY_ALL);
 
     TBWidgetDelegate* folderListWD = folderList_->GetWidgetDelegate();
 
@@ -62,6 +63,7 @@ void ProjectFrame::Refresh()
 {
     String cfolder = currentContentFolder_;
     currentContentFolder_ = "";
+    RefreshFolders();
     SelectCurrentContentFolder(cfolder);
 }
 
@@ -399,6 +401,14 @@ bool ProjectFrame::OnContextMenuEvent(const TBWidgetEvent &ev)
     {
         ops->ShowCreateScript(contextMenuPath_);
     }
+    else if (ev.ref_id == TBIDC("create_module"))
+    {
+        ops->ShowCreateModule(contextMenuPath_);
+    }
+    else if (ev.ref_id == TBIDC("create_2d_level"))
+    {
+        ops->ShowCreate2DLevel(contextMenuPath_);
+    }
     else if (ev.ref_id == TBIDC("new_folder"))
     {
         ops->ShowNewFolder(contextMenuPath_);
@@ -409,6 +419,21 @@ bool ProjectFrame::OnContextMenuEvent(const TBWidgetEvent &ev)
     }
 
     return true;
+}
+
+String ProjectFrame::GetCurrentContentFolder()
+{
+    if (currentContentFolder_.Length())
+        return currentContentFolder_;
+
+    Editor* editor = GetSubsystem<Editor>();
+    Project* project = editor->GetProject();
+
+    if (project)
+        return project->GetResourcePath();
+
+    return "";
+
 }
 
 void ProjectFrame::CreateFolderContextMenu(const String& folder, int x, int y)
@@ -425,8 +450,10 @@ void ProjectFrame::CreateFolderContextMenu(const String& folder, int x, int y)
     item->SetSkinImage(TBIDC("FolderCreateBitmap"));
     source->AddItem(item);
 
+    bool isJS = false;
     if (project->IsComponentsDirOrFile(folder))
     {
+        isJS = true;
         source->AddItem(new TBGenericStringItem("-"));
         item = new TBGenericStringItem("Create Component", TBIDC("create_component"));
         item->SetSkinImage(TBIDC("ComponentBitmap"));
@@ -434,6 +461,7 @@ void ProjectFrame::CreateFolderContextMenu(const String& folder, int x, int y)
     }
     else if (project->IsScriptsDirOrFile(folder))
     {
+        isJS = true;
         source->AddItem(new TBGenericStringItem("-"));
         item = new TBGenericStringItem("Create Script", TBIDC("create_script"));
         item->SetSkinImage(TBIDC("JavascriptBitmap"));
@@ -441,12 +469,19 @@ void ProjectFrame::CreateFolderContextMenu(const String& folder, int x, int y)
     }
     else if (project->IsModulesDirOrFile(folder))
     {
+        isJS = true;
         source->AddItem(new TBGenericStringItem("-"));
         item = new TBGenericStringItem("Create Module", TBIDC("create_module"));
         item->SetSkinImage(TBIDC("JavascriptBitmap"));
         source->AddItem(item);
     }
 
+    if (!isJS)
+    {
+        item = new TBGenericStringItem("Create 2D Level", TBIDC("create_2d_level"));
+        item->SetSkinImage(TBIDC("2DLevelBitmap"));
+        source->AddItem(item);
+    }
 
     source->AddItem(new TBGenericStringItem("-"));
     item = new TBGenericStringItem("Reveal in Finder", TBIDC("reveal_in_finder"));
@@ -513,8 +548,10 @@ void ProjectFrame::CreateContentContainerContextMenu(int x, int y)
 
     source->AddItem(item);
 
+    bool isJS = false;
     if (project->IsComponentsDirOrFile(currentContentFolder_))
     {
+        isJS = true;
         source->AddItem(new TBGenericStringItem("-"));
         item = new TBGenericStringItem("Create Component", TBIDC("create_component"));
         item->SetSkinImage(TBIDC("ComponentBitmap"));
@@ -522,6 +559,7 @@ void ProjectFrame::CreateContentContainerContextMenu(int x, int y)
     }
     else if (project->IsScriptsDirOrFile(currentContentFolder_))
     {
+        isJS = true;
         source->AddItem(new TBGenericStringItem("-"));
         item = new TBGenericStringItem("Create Script", TBIDC("create_script"));
         item->SetSkinImage(TBIDC("JavascriptBitmap"));
@@ -529,9 +567,17 @@ void ProjectFrame::CreateContentContainerContextMenu(int x, int y)
     }
     else if (project->IsModulesDirOrFile(currentContentFolder_))
     {
+        isJS = true;
         source->AddItem(new TBGenericStringItem("-"));
         item = new TBGenericStringItem("Create Module", TBIDC("create_module"));
         item->SetSkinImage(TBIDC("JavascriptBitmap"));
+        source->AddItem(item);
+    }
+
+    if (!isJS)
+    {
+        item = new TBGenericStringItem("Create 2D Level", TBIDC("create_2d_level"));
+        item->SetSkinImage(TBIDC("2DLevelBitmap"));
         source->AddItem(item);
     }
 

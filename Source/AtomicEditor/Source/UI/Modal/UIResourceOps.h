@@ -37,6 +37,36 @@ private:
     TBEditField* nameField_;
 };
 
+class UICreateModule: public UIModalOpWindow
+{
+    OBJECT(UICreateModule);
+
+public:
+
+    UICreateModule(Context* context);
+    virtual ~UICreateModule();
+    bool OnEvent(const TBWidgetEvent &ev);
+
+private:
+
+    TBEditField* nameField_;
+};
+
+class UICreate2DLevel: public UIModalOpWindow
+{
+    OBJECT(UICreate2DLevel);
+
+public:
+
+    UICreate2DLevel(Context* context);
+    virtual ~UICreate2DLevel();
+    bool OnEvent(const TBWidgetEvent &ev);
+
+private:
+
+    TBEditField* nameField_;
+};
+
 
 class UIResourceDelete: public UIModalOpWindow
 {

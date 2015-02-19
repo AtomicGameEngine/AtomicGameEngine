@@ -79,12 +79,28 @@ MainFrame::MainFrame(Context* context) :
     menuResourcesSource.AddItem(new TBGenericStringItem("-"));
     menuResourcesSource.AddItem(new TBGenericStringItem("Reveal in Finder", TBIDC("reveal")));
 
-    menuResourcesCreateSource.AddItem(new TBGenericStringItem("Component", TBIDC("create_component")));
-    menuResourcesCreateSource.AddItem(new TBGenericStringItem("2D Level", TBIDC("create_tmx")));
+    TBGenericStringItem* item;
+    item = new TBGenericStringItem("Folder", TBIDC("create_folder"));
+    item->SetSkinImage(TBIDC("Folder.icon"));
+    menuResourcesCreateSource.AddItem(item);
+
     menuResourcesCreateSource.AddItem(new TBGenericStringItem("-"));
-    menuResourcesCreateSource.AddItem(new TBGenericStringItem("Javascript", TBIDC("create_javascript")));
+
+    item = new TBGenericStringItem("Component", TBIDC("create_component"));
+    item->SetSkinImage(TBIDC("JavascriptBitmap"));
+    menuResourcesCreateSource.AddItem(item);
+    item = new TBGenericStringItem("Script", TBIDC("create_script"));
+    item->SetSkinImage(TBIDC("JavascriptBitmap"));
+    menuResourcesCreateSource.AddItem(item);
+    item = new TBGenericStringItem("Module", TBIDC("create_module"));
+    item->SetSkinImage(TBIDC("JavascriptBitmap"));
+    menuResourcesCreateSource.AddItem(item);
+
     menuResourcesCreateSource.AddItem(new TBGenericStringItem("-"));
-    menuResourcesCreateSource.AddItem(new TBGenericStringItem("Folder", TBIDC("create_folder")));
+
+    item = new TBGenericStringItem("2D Level", TBIDC("create_2d_level"));
+    item->SetSkinImage(TBIDC("2DLevelBitmap"));
+    menuResourcesCreateSource.AddItem(item);
 
     menuProjectSource.AddItem(new TBGenericStringItem("Build", TBIDC("project_build")));
     menuProjectSource.AddItem(new TBGenericStringItem("Build Settings", TBIDC("project_build_settings")));
@@ -489,15 +505,39 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
 
         if (ev.target->GetID() == TBIDC("resources popup"))
         {
-            if (ev.ref_id == TBIDC("create_component"))
+            UIModalOps* ops = GetSubsystem<UIModalOps>();
+
+            String resourcePath = projectframe_->GetCurrentContentFolder();
+
+            if (resourcePath.Length())
             {
-                ShowResourceCreateWindow("Component");
-                return true;
+                if (ev.ref_id == TBIDC("create_component"))
+                {
+                    ops->ShowCreateComponent(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_script"))
+                {
+                    ops->ShowCreateScript(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_module"))
+                {
+                    ops->ShowCreateModule(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_2d_level"))
+                {
+                    ops->ShowCreate2DLevel(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_folder"))
+                {
+                    ops->ShowNewFolder(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("reveal"))
+                {
+                    RevealInFinder();
+                }
             }
-            else if (ev.ref_id == TBIDC("reveal"))
-            {
-                RevealInFinder();
-            }
+
+            return true;
         }
 
         if (ev.target->GetID() == TBIDC("help popup"))
@@ -653,17 +693,6 @@ void MainFrame::RevealInFinder()
     ProjectUtils* utils = context_->GetSubsystem<ProjectUtils>();
     utils->RevealInFinder(resourcePath);
 
-}
-
-void MainFrame::ShowResourceCreateWindow(const String& resourceType)
-{
-    Editor* editor = context_->GetSubsystem<Editor>();
-    Project* project = editor->GetProject();
-
-    if (!project)
-        return;
-
-    //new ResourceCreateWindow(resourceType, context_);
 }
 
 void MainFrame::HandlePlatformChange(StringHash eventType, VariantMap& eventData)

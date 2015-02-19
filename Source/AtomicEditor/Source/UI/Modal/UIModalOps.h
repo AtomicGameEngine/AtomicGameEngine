@@ -48,6 +48,8 @@ class UIModalOps: public AEWidget, private TBWidgetListener
 
     void ShowCreateComponent(const String& resourcePath);
     void ShowCreateScript(const String& resourcePath);
+    void ShowCreateModule(const String& resourcePath);
+    void ShowCreate2DLevel(const String& resourcePath);
     void ShowResourceDelete(const String& resourcePath);
     void ShowNewFolder(const String& resourcePath);
     void ShowBuildSettings();
