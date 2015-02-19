@@ -61,18 +61,19 @@ MainFrame::MainFrame(Context* context) :
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Check for Updates", TBIDC("check update")));
     menuAtomicEditorSource.AddItem(new TBGenericStringItem("Quit", TBIDC("quit")));
 
-
-    menuFileSource.AddItem(new TBGenericStringItem("New Project", TBIDC("new project")));
-    menuFileSource.AddItem(new TBGenericStringItem("Open Project", TBIDC("open project")));
-    menuFileSource.AddItem(new TBGenericStringItem("Save Project", TBIDC("save project")));
-    menuFileSource.AddItem(new TBGenericStringItem("-"));
-    menuFileSource.AddItem(new TBGenericStringItem("Close Project", TBIDC("close project")));
-    menuFileSource.AddItem(new TBGenericStringItem("-"));
-    menuFileSource.AddItem(new TBGenericStringItem("-"));
-    menuFileSource.AddItem(new TBGenericStringItem("Close File"));
+    menuFileSource.AddItem(new MenubarItem("New Project", TBIDC("new project")));
+    menuFileSource.AddItem(new MenubarItem("Open Project", TBIDC("open project")));
+    menuFileSource.AddItem(new MenubarItem("Save Project", TBIDC("save project")));
+    menuFileSource.AddItem(new MenubarItem("-"));
+    menuFileSource.AddItem(new MenubarItem("Close Project", TBIDC("close project")));
+    menuFileSource.AddItem(new MenubarItem("-"));
+    menuFileSource.AddItem(new MenubarItem("Save File", TBIDC("save file"), EDITOR_STRING(ShortcutSaveFile)));
+    menuFileSource.AddItem(new MenubarItem("Close File", TBIDC("close file"), EDITOR_STRING(ShortcutCloseFile)));
 
     menuBuildSource.AddItem(new TBGenericStringItem("Build", TBIDC("project_build")));
     menuBuildSource.AddItem(new TBGenericStringItem("Build Settings", TBIDC("project_build_settings")));
+
+    menuToolsSource.AddItem(new MenubarItem("Tiled Map Editor", TBIDC("tools tiled")));
 
     menuEditSource.AddItem(new MenubarItem("Undo", TBIDC("edit undo"),  EDITOR_STRING(ShortcutUndo)));
     menuEditSource.AddItem(new MenubarItem("Redo", TBIDC("edit redo"),  EDITOR_STRING(ShortcutRedo)));
@@ -83,6 +84,8 @@ MainFrame::MainFrame(Context* context) :
     menuEditSource.AddItem(new MenubarItem("-"));
     menuEditSource.AddItem(new MenubarItem("Find", TBIDC("edit find"),  EDITOR_STRING(ShortcutFind)));
     menuEditSource.AddItem(new MenubarItem("Format Code", TBIDC("format code"),  EDITOR_STRING(ShortcutBeautify)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Play", TBIDC("play"),  EDITOR_STRING(ShortcutPlay)));
 
     menuResourcesSource.AddItem(new TBGenericStringItem("Create", &menuResourcesCreateSource));
     menuResourcesSource.AddItem(new TBGenericStringItem("-"));
@@ -632,6 +635,13 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("build popup")))
                 menu->Show(&menuBuildSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu tools"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("tools popup")))
+                menu->Show(&menuToolsSource, TBPopupAlignment());
 
             return true;
         }

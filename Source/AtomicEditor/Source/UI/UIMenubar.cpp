@@ -28,39 +28,42 @@ MenubarItemWidget::MenubarItemWidget(MenubarItem *item, MenubarItemSource *sourc
 
     TBWidget* root = GetContentRoot();
 
+    TBFontDescription fd;
+    fd.SetID(TBIDC("Vera"));
+    fd.SetSize(13);
+
     TBTextField* text = new TBTextField();
+    text->SetIgnoreInput(true);
     text->SetText(item->str);
+    text->SetFontDescription(fd);
     root->AddChild(text);
 
     if (item->shortcut_.Length())
     {
         TBWidget* spacer = new TBWidget();
+        spacer->SetIgnoreInput(true);
         spacer->SetGravity(WIDGET_GRAVITY_LEFT_RIGHT);
         root->AddChild(spacer);
 
         TBTextField* shortcut = new TBTextField();
+        shortcut->SetIgnoreInput(true);
         shortcut->SetText(item->shortcut_.CString());
+        shortcut->SetFontDescription(fd);
         shortcut->SetGravity(WIDGET_GRAVITY_RIGHT);
         root->AddChild(shortcut);
-
     }
 
 }
 
 bool MenubarItemWidget::OnEvent(const TBWidgetEvent &ev)
 {
-    if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("check"))
+    if (m_source && ev.type == EVENT_TYPE_CLICK && ev.target == this)
     {
-        // MenubarItem *item = m_source->GetItem(m_index);
-        m_source->InvokeItemChanged(m_index, m_source_viewer);
-        return true;
+        //OpenSubMenu();
+        return false;
     }
-    else if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("delete"))
-    {
-        m_source->DeleteItem(m_index);
-        return true;
-    }
-    return TBLayout::OnEvent(ev);
+
+    return false;
 }
 
 // == AdvancedItemSource ======================================================
@@ -78,16 +81,18 @@ TBWidget *MenubarItemSource::CreateItemWidget(int index, TBSelectItemViewer *vie
         if (TBSeparator *separator = new TBSeparator)
         {
             separator->SetGravity(WIDGET_GRAVITY_ALL);
-            separator->SetSkinBg(TBIDC("TBSelectItem.separator"));
+            separator->SetSkinBg(TBIDC("AESeparator"));
             return separator;
         }
     }
 
     if (TBLayout *layout = new MenubarItemWidget(GetItem(index), this, viewer, index))
+    {
+        layout->SetID(GetItem(index)->id);
         return layout;
+    }
+
     return NULL;
 }
-
-
 
 }

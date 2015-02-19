@@ -30,7 +30,10 @@ public:
         ShortcutCopy,
         ShortcutPaste,
         ShortcutFind,
-        ShortcutBeautify
+        ShortcutBeautify,
+        ShortcutCloseFile,
+        ShortcutSaveFile,
+        ShortcutPlay
     };
 
 

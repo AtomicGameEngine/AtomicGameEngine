@@ -138,9 +138,17 @@ void TBSelectItemViewer::SetSource(TBSelectItemSource *source)
 
 TBSelectItemSource::~TBSelectItemSource()
 {
+    TBLinkListOf<TBSelectItemViewer>::Iterator iter = m_viewers.IterateForward();
+    while (TBSelectItemViewer *viewer = iter.GetAndStep())
+    {
+        viewer->SetSource(nullptr);
+    }
+
+    m_viewers.RemoveAll();
+
 	// If this assert trig, you are deleting a model that's still set on some
 	// TBSelect widget. That might be dangerous.
-	assert(!m_viewers.HasLinks());
+    assert(!m_viewers.HasLinks());
 }
 
 bool TBSelectItemSource::Filter(int index, const char *filter)

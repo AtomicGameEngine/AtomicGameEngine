@@ -37,7 +37,7 @@ class MainFrame : public AEWidget
     OBJECT(MainFrame);
 
     TBGenericStringItemSource menuAtomicEditorSource;
-    TBGenericStringItemSource menuFileSource;
+    MenubarItemSource menuFileSource;
     MenubarItemSource menuEditSource;
     TBGenericStringItemSource menuBuildSource;
 
@@ -45,6 +45,8 @@ class MainFrame : public AEWidget
     TBGenericStringItemSource menuResourcesCreateSource;
     TBGenericStringItemSource menuHelpSource;
     TBGenericStringItemSource menuDeveloperSource;
+
+    MenubarItemSource menuToolsSource;
 
 public:
     /// Construct.

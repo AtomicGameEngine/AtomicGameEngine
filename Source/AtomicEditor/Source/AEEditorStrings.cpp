@@ -45,6 +45,13 @@ void EditorStrings::InitializeStrings()
     stringLookup_[ShortcutPaste] = "⌘V";
     stringLookup_[ShortcutFind] = "⌘F";
     stringLookup_[ShortcutBeautify] = "⌘B";
+
+    stringLookup_[ShortcutSaveFile] = "⌘S";
+    stringLookup_[ShortcutCloseFile] = "⌘W";
+
+    stringLookup_[ShortcutPlay] = "⌘P";
+
+
 }
 
 void EditorStrings::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)
