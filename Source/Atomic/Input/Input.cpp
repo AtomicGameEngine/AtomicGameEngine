@@ -673,7 +673,7 @@ static void PopulateMouseButtonBindingMap(HashMap<String, int>& mouseButtonBindi
     }
 }
 
-SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
+int Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 {
     static HashMap<String, int> keyBindingMap;
     static HashMap<String, int> mouseButtonBindingMap;

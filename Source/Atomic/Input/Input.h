@@ -171,7 +171,7 @@ public:
      *
      *  This method should only be called in main thread.
      */
-    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     /// Remove screen joystick by instance ID.
     /** Return true if successful.
      *

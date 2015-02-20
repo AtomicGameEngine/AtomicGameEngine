@@ -6,6 +6,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Javascript/Javascript.h>
 #include <Atomic/Javascript/JSVM.h>
@@ -55,6 +56,9 @@ AEPlayer::~AEPlayer()
     if (javascript)
         javascript->ShutdownVM("AEPlayerVM");
     vm_ = NULL;
+
+    GetSubsystem<Input>()->SetTouchEmulation(false);
+
 }
 
 void AEPlayer::Invalidate()
