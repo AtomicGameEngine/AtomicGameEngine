@@ -100,10 +100,6 @@ void UIAbout::GenerateAboutText(String& text)
         text += "<color #FF2600>    No platform licenses installed</color>\n\n";
     }
 
-    text += "<color #76D6FF>Credits:</color>\n\n";
-    text += "    Technical Director: Josh Engebretson\n\n";
-    text += "    Producer: Lara Engebretson\n\n";
-
     text += "<color #76D6FF>Special Thanks:</color>\n\n";
     text += "    The Urho3D Project - http://urho3d.github.io\n\n";
     text += "    Sami Vaarala - http://www.duktape.org";
