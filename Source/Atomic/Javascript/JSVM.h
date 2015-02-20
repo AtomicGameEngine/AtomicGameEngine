@@ -128,7 +128,7 @@ public:
 
 private:
 
-    void GenerateComponent(const String& cname, const String& jsfilename, const String& csource);
+    bool GenerateComponent(const String& cname, const String& jsfilename, const String& csource);
 
     void InitComponents();
     void InitPackageComponents();

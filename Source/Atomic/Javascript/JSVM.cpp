@@ -150,8 +150,9 @@ bool JSVM::ExecuteFunction(const String& functionName)
 
 }
 
-void JSVM::GenerateComponent(const String &cname, const String &jsfilename, const String& csource)
+bool JSVM::GenerateComponent(const String &cname, const String &jsfilename, const String& csource)
 {
+
     String source = "(function() {\n function __component_function(self) {\n";
 
     source += csource.CString();
@@ -210,11 +211,14 @@ void JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
         if (!duk_is_function(ctx_, -1))
         {
             const char* error = duk_to_string(ctx_, -1);
-            assert(false);
+            SendJSErrorEvent();
         }
 
         duk_put_prop_string(ctx_, -2, cname.CString());
+        return true;
     }
+
+    return false;
 }
 
 void JSVM::InitPackageComponents()
@@ -243,7 +247,9 @@ void JSVM::InitPackageComponents()
             SharedPtr<File> jsfile(cache->GetFile(name));
             String csource;
             jsfile->ReadText(csource);
-            GenerateComponent(cname, jsname, csource);
+
+            if (!GenerateComponent(cname, jsname, csource))
+                break;
 
         }
     }
@@ -285,7 +291,8 @@ void JSVM::InitComponents()
             String csource;
             jsfile->ReadText(csource);
 
-            GenerateComponent(cname, jsname, csource);
+            if (!GenerateComponent(cname, jsname, csource))
+                break;
 
         }
 

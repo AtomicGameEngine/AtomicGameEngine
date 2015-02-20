@@ -667,8 +667,7 @@ String FileSystem::GetProgramDir() const
     // current working directory instead
     /// \todo Should not rely on such fixed convention
     String currentDir = GetCurrentDir();
-    if (!DirExists(programDir_ + "CoreData") && !DirExists(programDir_ + "Data") && (DirExists(currentDir + "CoreData") ||
-        DirExists(currentDir + "Data")))
+    if (!DirExists(programDir_ + "CoreData") && (DirExists(currentDir + "CoreData")))
         programDir_ = currentDir;
     
     // Sanitate /./ construct away
@@ -772,7 +771,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     path.Replace(String("//"), String("/"));
     path = RemoveTrailingSlash(path);
 
-    // first path is the Data/CoreData/AtomicResources folder
+    // first path is the CoreData/AtomicResources folder
     path = path.Substring(path.Find('/') + 1) + "/";
 
     String filterExtension = filter.Substring(filter.Find('.'));

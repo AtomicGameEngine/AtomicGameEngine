@@ -215,7 +215,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         resourcePrefixPath = fileSystem->GetProgramDir();
     else if (!IsAbsolutePath(resourcePrefixPath))
         resourcePrefixPath = fileSystem->GetProgramDir() + resourcePrefixPath;
-    Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "Data;CoreData").GetString().Split(';');
+    Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "CoreData").GetString().Split(';');
     Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
     Vector<String> autoLoadPaths = GetParameter(parameters, "AutoloadPaths", "Autoload").GetString().Split(';');
 

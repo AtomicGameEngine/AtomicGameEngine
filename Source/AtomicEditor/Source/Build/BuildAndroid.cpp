@@ -50,11 +50,9 @@ void BuildAndroid::Initialize()
 #endif
 
     String projectResources = project->GetResourcePath();
-    String dataFolder = bundleResources + "Data/";
     String coreDataFolder = bundleResources + "CoreData/";
 
     AddResourceDir(coreDataFolder);
-    AddResourceDir(dataFolder);
     AddResourceDir(projectResources);
 
     BuildResourceEntries();
@@ -211,7 +209,7 @@ void BuildAndroid::RunADBInstall()
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->SetProgramOutputSubprocess(subprocess);
 
-    ops->PrintToProgramOutput("\n\n<color #D4FB79>Installing on Android Devices</color>\n\n");
+    ops->PrintToProgramOutput("\n\n<color #D4FB79>Installing on Android Device</color>\n\n");
 
 }
 
@@ -364,12 +362,10 @@ void BuildAndroid::Build(const String& buildPath)
 
     String androidProject = buildSourceDir + "Deployment/Android";
     String projectResources = project->GetResourcePath();
-    String dataFolder = buildSourceDir + "Data/";
     String coreDataFolder = buildSourceDir + "CoreData/";
 
     fileSystem->CopyDir(androidProject, buildPath_);
-    fileSystem->CopyDir(projectResources, buildPath_ + "/assets/AtomicResources");
-    fileSystem->CopyDir(dataFolder, buildPath_ + "/assets/Data");
+    fileSystem->CopyDir(projectResources, buildPath_ + "/assets/AtomicResources");    
     fileSystem->CopyDir(coreDataFolder, buildPath_ + "/assets/CoreData");
 
     // write the manifest

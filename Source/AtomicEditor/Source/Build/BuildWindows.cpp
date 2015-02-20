@@ -39,11 +39,9 @@ void BuildWindows::Initialize()
 #endif
 
     String projectResources = project->GetResourcePath();
-    String dataFolder = bundleResources + "Data/";
     String coreDataFolder = bundleResources + "CoreData/";
 
     AddResourceDir(coreDataFolder);
-    AddResourceDir(dataFolder);
     AddResourceDir(projectResources);
 
     BuildResourceEntries();

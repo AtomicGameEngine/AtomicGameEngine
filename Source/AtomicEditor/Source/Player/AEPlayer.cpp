@@ -41,6 +41,10 @@ AEPlayer::AEPlayer(Context* context) :
     SubscribeToEvent(vm_, E_JSERROR, HANDLER(AEPlayer, HandleJSError));
 
     vm_->InitJSContext();
+
+    if (errors_.Size())
+        return;
+
     vm_->SetModuleSearchPath("Modules");
 
     duk_eval_string_noresult(vm_->GetJSContext(), "require(\"AtomicGame\"); require (\"AtomicEditor\");");
@@ -86,6 +90,10 @@ void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
+
+    if (errors_.Size())
+        return false;
+
     mode_ = mode;
 
     duk_context* ctx = vm_->GetJSContext();
@@ -98,8 +106,6 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     Editor* editor = GetSubsystem<Editor>();
     Project* project = editor->GetProject();
-
-    String mainPath = project->GetResourcePath();
 
     bool ok = vm_->ExecuteMain();
 

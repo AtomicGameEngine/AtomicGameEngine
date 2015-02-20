@@ -231,8 +231,7 @@ namespace :package do
       MAC_EDITOR_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicEditor/AtomicEditor.app"
 
       # Resources
-      COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
-      DATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/Data"
+      COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"    
       EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
       EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
@@ -260,7 +259,6 @@ namespace :package do
 
       # Copy Resources
       sh "cp -r #{COREDATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/CoreData"
-      sh "cp -r #{DATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/Data"
       sh "cp -r #{EDITORRESOURCES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/EditorData"
 
       # Copy Deployment
@@ -348,8 +346,7 @@ namespace :package do
     DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment/Win64"
 
     # Resources
-    COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
-    DATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/Data"
+    COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"    
     EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
     EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
@@ -361,7 +358,6 @@ namespace :package do
     EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"    
     
     FileUtils.cp_r("#{COREDATA_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/CoreData")
-    FileUtils.cp_r("#{DATA_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/Data")
     FileUtils.cp_r("#{EDITORRESOURCES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/EditorData")
 
     FileUtils.cp_r("#{PROJECTTEMPLATES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ProjectTemplates")

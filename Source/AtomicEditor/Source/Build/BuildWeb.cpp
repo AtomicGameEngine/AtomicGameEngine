@@ -35,11 +35,9 @@ void BuildWeb::Initialize()
     String bundleResources = fileSystem->GetAppBundleResourceFolder();
 
     String projectResources = project->GetResourcePath();
-    String dataFolder = bundleResources + "Data/";
     String coreDataFolder = bundleResources + "CoreData/";
 
     AddResourceDir(coreDataFolder);
-    AddResourceDir(dataFolder);
     AddResourceDir(projectResources);
 
     BuildResourceEntries();
