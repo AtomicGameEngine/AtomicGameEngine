@@ -52,7 +52,7 @@ MenubarItemWidget::MenubarItemWidget(MenubarItem *item, MenubarItemSource *sourc
     TBWidget* root = GetContentRoot();
 
     TBFontDescription fd;
-    fd.SetID(TBIDC("Monaco-Bold"));
+    fd.SetID(TBIDC("Vera"));
     fd.SetSize(12);
 
     TBTextField* text = new TBTextField();

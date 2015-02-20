@@ -289,7 +289,6 @@ void TBUI::Initialize()
     register_freetype_font_renderer();
 
     tb::g_font_manager->AddFontInfo("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-    tb::g_font_manager->AddFontInfo("AtomicEditor/resources/MesloLGS-Bold.ttf", "Monaco-Bold");
     tb::g_font_manager->AddFontInfo("AtomicEditor/resources/vera.ttf", "Vera");
 
     tb::TBFontDescription fd;
