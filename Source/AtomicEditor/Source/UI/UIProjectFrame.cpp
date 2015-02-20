@@ -372,8 +372,10 @@ bool ProjectFrame::OnEvent(const TBWidgetEvent &ev)
 
         if (ev.target->GetID() == TBIDC("menu create"))
         {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("create popup")))
-                menu->Show(&menuCreateSource, TBPopupAlignment());
+            TBUI* tbui = GetSubsystem<TBUI>();
+            if (!tbui->GetRootWidget()->GetWidgetByID(TBIDC("create popup")))
+                if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("create popup")))
+                    menu->Show(&menuCreateSource, TBPopupAlignment());
 
             return true;
         }
