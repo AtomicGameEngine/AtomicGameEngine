@@ -85,8 +85,6 @@ private:
 
     void UpdateFindTextWidget();
 
-    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
-    void HandleKeyUp(StringHash eventType, VariantMap& eventData);
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     void HandleJavascriptSaved(StringHash eventType, VariantMap& eventData);
     void HandlePlatformChange(StringHash eventType, VariantMap& eventData);

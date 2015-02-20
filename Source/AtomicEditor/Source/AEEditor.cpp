@@ -309,6 +309,12 @@ void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
     }
 
     mainframe_ = 0;
+    player_ = 0;
+    project_ = 0;
+    javascript_ = 0;
+    aejavascript_ = 0;
+    aepreferences_ = 0;
+
     context_->RemoveSubsystem(Javascript::GetBaseTypeStatic());
 
     SendEvent(E_EDITORSHUTDOWN);

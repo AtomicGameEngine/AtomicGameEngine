@@ -43,6 +43,7 @@ void EditorStrings::InitializeStrings()
     stringLookup_[ShortcutCut] = "⌘X";
     stringLookup_[ShortcutCopy] = "⌘C";
     stringLookup_[ShortcutPaste] = "⌘V";
+    stringLookup_[ShortcutSelectAll] = "⌘A";
     stringLookup_[ShortcutFind] = "⌘F";
     stringLookup_[ShortcutFindNext] = "⌘G";
     stringLookup_[ShortcutFindPrev] = "⇧⌘G";

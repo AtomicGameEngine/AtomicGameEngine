@@ -29,6 +29,7 @@ public:
         ShortcutCut,
         ShortcutCopy,
         ShortcutPaste,
+        ShortcutSelectAll,
         ShortcutFind,
         ShortcutFindNext,
         ShortcutFindPrev,

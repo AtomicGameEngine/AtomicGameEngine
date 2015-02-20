@@ -508,7 +508,7 @@ static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modif
         id = TBIDC("findnext");
     else if (upper_key == 'P')
         id = TBIDC("play");
-    else if (upper_key == 'B')
+    else if (upper_key == 'I')
         id = TBIDC("beautify");
     else if (special_key == TB_KEY_PAGE_UP)
         id = TBIDC("prev_doc");

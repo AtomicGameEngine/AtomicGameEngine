@@ -83,6 +83,8 @@ void ProjectFrame::InitializeMenuSources()
     item->SetSkinImage(TBIDC("JavascriptBitmap"));
     menuCreateSource.AddItem(item);
 
+    menuCreateSource.AddItem(new MenubarItem("-"));
+
     item = new MenubarItem("2D Level", TBIDC("create_2d_level"));
     item->SetSkinImage(TBIDC("2DLevelBitmap"));
     menuCreateSource.AddItem(item);

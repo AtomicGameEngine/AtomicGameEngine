@@ -52,8 +52,6 @@ private:
     TBEditField* editField_;
     JSAutocomplete* autocomplete_;
 
-
-
     float textDelta_;
     bool textDirty_;
 

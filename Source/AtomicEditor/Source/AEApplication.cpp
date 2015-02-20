@@ -26,6 +26,7 @@
 #include <Atomic/Graphics/Renderer.h>
 
 #include "AEEditorStrings.h"
+#include "AEEditorShortcuts.h"
 #include "Project/ProjectUtils.h"
 #include "Subprocess/AESubprocessSystem.h"
 #include "Build/BuildSystem.h"
@@ -96,6 +97,7 @@ void AEApplication::Start()
     input->SetMouseVisible(true);
 
     context_->RegisterSubsystem(new EditorStrings(context_));
+    context_->RegisterSubsystem(new EditorShortcuts(context_));
     context_->RegisterSubsystem(new ProjectUtils(context_));
     context_->RegisterSubsystem(new Javascript(context_));
     context_->RegisterSubsystem(new SubprocessSystem(context_));

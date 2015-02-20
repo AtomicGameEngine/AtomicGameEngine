@@ -164,6 +164,12 @@ bool TextResourceEditor::OnEvent(const TBWidgetEvent &ev)
 
             finder->Find(text, flags);
         }
+        else if (ev.ref_id == TBIDC("cut") || ev.ref_id == TBIDC("copy") || ev.ref_id == TBIDC("paste")
+                 || ev.ref_id == TBIDC("selectall") || ev.ref_id == TBIDC("undo") || ev.ref_id == TBIDC("redo") )
+        {
+            editField_->OnEvent(ev);
+        }
+
     }
 
     if (ev.type == EVENT_TYPE_CLICK)

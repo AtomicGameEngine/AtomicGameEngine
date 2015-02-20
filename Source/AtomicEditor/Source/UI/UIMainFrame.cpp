@@ -11,8 +11,6 @@
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/Context.h>
-#include <Atomic/Input/Input.h>
-#include <Atomic/Input/InputEvents.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/GraphicsEvents.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -33,6 +31,7 @@
 #include "AEEvents.h"
 #include "AEEditor.h"
 #include "AEEditorStrings.h"
+#include "AEEditorShortcuts.h"
 #include "AEPreferences.h"
 #include "AEJavascript.h"
 #include "Player/AEPlayer.h"
@@ -118,8 +117,6 @@ MainFrame::MainFrame(Context* context) :
     findtextwidget_ = new FindTextWidget(context_);
     UpdateFindTextWidget();
 
-    SubscribeToEvent(E_KEYDOWN, HANDLER(MainFrame, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(MainFrame, HandleKeyUp));
     SubscribeToEvent(E_SCREENMODE, HANDLER(MainFrame, HandleScreenMode));
     SubscribeToEvent(E_JAVASCRIPTSAVED, HANDLER(MainFrame, HandleJavascriptSaved));
     SubscribeToEvent(E_PLATFORMCHANGE, HANDLER(MainFrame, HandlePlatformChange));
@@ -170,14 +167,15 @@ void MainFrame::InitializeMenuSources()
     menuEditSource.AddItem(new MenubarItem("Cut", TBIDC("edit cut"),  EDITOR_STRING(ShortcutCut)));
     menuEditSource.AddItem(new MenubarItem("Copy", TBIDC("edit copy"),  EDITOR_STRING(ShortcutCopy)));
     menuEditSource.AddItem(new MenubarItem("Paste", TBIDC("edit paste"),  EDITOR_STRING(ShortcutPaste)));
+    menuEditSource.AddItem(new MenubarItem("Select All", TBIDC("edit select all"),  EDITOR_STRING(ShortcutSelectAll)));
     menuEditSource.AddItem(new MenubarItem("-"));
     menuEditSource.AddItem(new MenubarItem("Find", TBIDC("edit find"),  EDITOR_STRING(ShortcutFind)));
     menuEditSource.AddItem(new MenubarItem("Find Next", TBIDC("edit find next"),  EDITOR_STRING(ShortcutFindNext)));
     menuEditSource.AddItem(new MenubarItem("Find Prev", TBIDC("edit find prev"),  EDITOR_STRING(ShortcutFindPrev)));
     menuEditSource.AddItem(new MenubarItem("-"));
-    menuEditSource.AddItem(new MenubarItem("Format Code", TBIDC("format code"),  EDITOR_STRING(ShortcutBeautify)));
+    menuEditSource.AddItem(new MenubarItem("Format Code", TBIDC("edit format code"),  EDITOR_STRING(ShortcutBeautify)));
     menuEditSource.AddItem(new MenubarItem("-"));
-    menuEditSource.AddItem(new MenubarItem("Play", TBIDC("play"),  EDITOR_STRING(ShortcutPlay)));
+    menuEditSource.AddItem(new MenubarItem("Play", TBIDC("edit play"),  EDITOR_STRING(ShortcutPlay)));
 
     menuHelpSource.AddItem(new MenubarItem("API Documentation", TBIDC("help_api")));
     menuHelpSource.AddItem(new MenubarItem("-"));
@@ -260,44 +258,6 @@ bool MainFrame::UpdateJavascriptErrors()
 
 
     return hasErrors;
-
-}
-
-void MainFrame::HandleKeyDown(StringHash eventType, VariantMap& eventData)
-{
-    using namespace KeyDown;
-
-    Input* input = context_->GetSubsystem<Input>();
-    Editor* editor = context_->GetSubsystem<Editor>();
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    bool cmdKey = (input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL));
-#else
-    bool cmdKey = (input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI));
-#endif
-
-    int keycode = eventData[P_KEY].GetInt();
-
-    if (cmdKey && keycode == KEY_P)
-    {
-        if (!editor->IsPlayingProject())
-        {
-            VariantMap eventData;
-            eventData[EditorPlayRequest::P_MODE] = (unsigned) AE_PLAYERMODE_WIDGET;
-            SendEvent(E_EDITORPLAYREQUEST, eventData);
-        }
-        else
-        {
-            SendEvent(E_EDITORPLAYSTOP);
-        }
-    }
-
-}
-
-void MainFrame::HandleKeyUp(StringHash eventType, VariantMap& eventData)
-{
-    using namespace KeyUp;
-
 
 }
 
@@ -480,6 +440,8 @@ bool MainFrame::HandleMenubarEvent(const TBWidgetEvent &ev)
 
 bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
 {
+    EditorShortcuts* shortcuts = GetSubsystem<EditorShortcuts>();
+
     if (ev.type == EVENT_TYPE_CLICK)
     {
         Editor* editor = GetSubsystem<Editor>();
@@ -509,11 +471,18 @@ bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
                     return true;
                 }
             }
-
             else if (ev.ref_id == TBIDC("close project"))
             {
                 //TODO: Confirmation
                 editor->CloseProject();
+            }
+            else if (ev.ref_id == TBIDC("close file"))
+            {
+                shortcuts->InvokeFileClose();
+            }
+            else if (ev.ref_id == TBIDC("save file"))
+            {
+                shortcuts->InvokeFileSave();
             }
 
             return true;
@@ -555,16 +524,13 @@ bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
 
         if (ev.target->GetID() == TBIDC("build popup"))
         {
-            if (!IsProjectLoaded())
-                return true;
-
             if (ev.ref_id == TBIDC("project_build_settings"))
             {
-                uiModalOps_->ShowBuildSettings();
+                shortcuts->InvokeBuildSettings();
             }
             else if (ev.ref_id == TBIDC("project_build"))
             {
-                uiModalOps_->ShowBuild();
+                shortcuts->InvokeBuild();
             }
 
             return true;
@@ -573,9 +539,49 @@ bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
 
         if (ev.target->GetID() == TBIDC("edit popup"))
         {
-            if (ev.ref_id == TBIDC("format code"))
+            if (ev.ref_id == TBIDC("edit cut"))
             {
-
+                shortcuts->InvokeEditCut();
+            }
+            else if (ev.ref_id == TBIDC("edit copy"))
+            {
+                shortcuts->InvokeEditCopy();
+            }
+            else if (ev.ref_id == TBIDC("edit paste"))
+            {
+                shortcuts->InvokeEditPaste();
+            }
+            else if (ev.ref_id == TBIDC("edit select all"))
+            {
+                shortcuts->InvokeEditSelectAll();
+            }
+            else if (ev.ref_id == TBIDC("edit undo"))
+            {
+                shortcuts->InvokeEditUndo();
+            }
+            else if (ev.ref_id == TBIDC("edit redo"))
+            {
+                shortcuts->InvokeEditRedo();
+            }
+            else if (ev.ref_id == TBIDC("edit find"))
+            {
+                shortcuts->InvokeEditFind();
+            }
+            else if (ev.ref_id == TBIDC("edit find next"))
+            {
+                shortcuts->InvokeEditFindNext();
+            }
+            else if (ev.ref_id == TBIDC("edit find prev"))
+            {
+                shortcuts->InvokeEditFindPrev();
+            }
+            else if (ev.ref_id == TBIDC("edit format code"))
+            {
+                shortcuts->InvokeEditFormatCode();
+            }
+            else if (ev.ref_id == TBIDC("edit play"))
+            {
+                shortcuts->InvokePlayStop();
             }
 
             return true;

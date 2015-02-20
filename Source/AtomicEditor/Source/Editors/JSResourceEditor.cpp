@@ -273,16 +273,9 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
             file.Write((void*) text.CStr(), text.Length());
             file.Close();
 
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-            //SharedPtr<File> jsFile (GetSubsystem<ResourceCache>()->GetFile<File>(fullpath_));
-            //cache->ReloadResource(jsFile);
-
             String filename = GetFileNameAndExtension(fullpath_);
             button_->SetText(filename.CString());
-
             modified_ = false;
-
             SendEvent(E_JAVASCRIPTSAVED);
 
             return true;
@@ -329,6 +322,11 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
                     }
                 }
             }
+        }
+        else if (ev.ref_id == TBIDC("cut") || ev.ref_id == TBIDC("copy") || ev.ref_id == TBIDC("paste")
+                 || ev.ref_id == TBIDC("selectall") || ev.ref_id == TBIDC("undo") || ev.ref_id == TBIDC("redo") )
+        {
+            editField_->OnEvent(ev);
         }
     }
 
