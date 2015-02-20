@@ -27,7 +27,9 @@ bool ExternalTool::LaunchInternal(const String& applicationPath, const String& a
 {
     SubprocessSystem* system = GetSubsystem<SubprocessSystem>();
 
-    Vector<String> vargs = args.Split(' ');
+    Vector<String> vargs;
+    if (args.Length())
+        vargs = args.Split(' ');
 
     subprocess_ = system->Launch(applicationPath, vargs);
 

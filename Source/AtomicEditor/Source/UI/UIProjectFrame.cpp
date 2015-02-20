@@ -6,10 +6,12 @@
 
 #include <TurboBadger/tb_select.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
+
+#include <Atomic/UI/TBUI.h>
 
 #include "../AEEditor.h"
 #include "../Project/AEProject.h"
@@ -52,10 +54,38 @@ ProjectFrame::ProjectFrame(Context* context) :
 
     SubscribeToEvent(E_FILECHANGED, HANDLER(ProjectFrame, HandleFileChanged));
 
+    InitializeMenuSources();
+
 }
 
 ProjectFrame::~ProjectFrame()
 {
+
+}
+
+void ProjectFrame::InitializeMenuSources()
+{
+
+    MenubarItem* item;
+    item = new MenubarItem("Folder", TBIDC("create_folder"));
+    item->SetSkinImage(TBIDC("Folder.icon"));
+    menuCreateSource.AddItem(item);
+
+    menuCreateSource.AddItem(new MenubarItem("-"));
+
+    item = new MenubarItem("Component", TBIDC("create_component"));
+    item->SetSkinImage(TBIDC("JavascriptBitmap"));
+    menuCreateSource.AddItem(item);
+    item = new MenubarItem("Script", TBIDC("create_script"));
+    item->SetSkinImage(TBIDC("JavascriptBitmap"));
+    menuCreateSource.AddItem(item);
+    item = new MenubarItem("Module", TBIDC("create_module"));
+    item->SetSkinImage(TBIDC("JavascriptBitmap"));
+    menuCreateSource.AddItem(item);
+
+    item = new MenubarItem("2D Level", TBIDC("create_2d_level"));
+    item->SetSkinImage(TBIDC("2DLevelBitmap"));
+    menuCreateSource.AddItem(item);
 
 }
 
@@ -157,6 +187,8 @@ void ProjectFrame::RefreshFolders()
 
     resources->SetExpanded(true);
     RefreshContent(resourcePath);
+
+    folderList_->GetRootList()->SetValue(0);
 
 }
 
@@ -280,15 +312,70 @@ void ProjectFrame::RefreshContent(const String& fullpath)
 
 }
 
+bool ProjectFrame::HandlePopMenuEvent(const TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        if (ev.target->GetID() == TBIDC("create popup"))
+        {
+            UIModalOps* ops = GetSubsystem<UIModalOps>();
+
+            String resourcePath = GetCurrentContentFolder();
+
+            if (resourcePath.Length())
+            {
+                if (ev.ref_id == TBIDC("create_component"))
+                {
+                    if (CheckResourceCreatePath(resourcePath, "Component"))
+                        ops->ShowCreateComponent(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_script"))
+                {
+                    if (CheckResourceCreatePath(resourcePath, "Script"))
+                        ops->ShowCreateScript(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_module"))
+                {
+                    if (CheckResourceCreatePath(resourcePath, "Module"))
+                        ops->ShowCreateModule(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_2d_level"))
+                {
+                    ops->ShowCreate2DLevel(resourcePath);
+                }
+                else if (ev.ref_id == TBIDC("create_folder"))
+                {
+                    ops->ShowNewFolder(resourcePath);
+                }
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
 bool ProjectFrame::OnEvent(const TBWidgetEvent &ev)
 {
     if (!ev.target)
         return false;
 
-    TBID id = ev.target->GetID();
+    if (HandlePopMenuEvent(ev))
+        return true;
 
     if (ev.type == EVENT_TYPE_CLICK)
     {
+
+        if (ev.target->GetID() == TBIDC("menu create"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("create popup")))
+                menu->Show(&menuCreateSource, TBPopupAlignment());
+
+            return true;
+        }
+
         // context menu
         if (ev.target->GetID() == TBIDC("contextmenu"))
         {
@@ -381,6 +468,44 @@ void ProjectFrame::SelectCurrentContentFolder(const String& folder)
         RefreshContent(folder);
 }
 
+bool ProjectFrame::CheckResourceCreatePath(const String& path, const String& resourceType)
+{
+    Editor* editor = GetSubsystem<Editor>();
+    Project* project = editor->GetProject();
+
+    if (resourceType == "Script")
+    {
+        if (!project->IsScriptsDirOrFile(path))
+        {
+            editor->PostModalError("Create Script Error", "Scripts must reside in or in a subfolder of the Scripts folder");
+            return false;
+        }
+
+
+    }
+    if (resourceType == "Module")
+    {
+        if (!project->IsModulesDirOrFile(path))
+        {
+            editor->PostModalError("Create Module Error", "Modules must reside in or in a subfolder of the Modules folder");
+            return false;
+        }
+
+
+    }
+    if (resourceType == "Component")
+    {
+        if (!project->IsComponentsDirOrFile(path))
+        {
+            editor->PostModalError("Create Component Error", "Components must reside in or in a subfolder of the Components folder");
+            return false;
+        }
+
+    }
+
+    return true;
+
+}
 
 // Context Menus
 

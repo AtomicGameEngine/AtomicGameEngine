@@ -23,10 +23,6 @@ TBLayout: distribution: gravity, axis: y
 							id menu edit
 						TBButton
 							@include definitions>menubutton
-							text Resources
-							id menu resources
-						TBButton
-							@include definitions>menubutton
 							text Build
 							id menu build
 						TBButton

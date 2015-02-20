@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AEWidget.h"
+#include "UIMenubar.h"
 
 using namespace Atomic;
 
@@ -51,6 +52,10 @@ public:
 
 private:
 
+    void InitializeMenuSources();
+    bool HandlePopMenuEvent(const TBWidgetEvent &ev);
+    bool CheckResourceCreatePath(const String& path, const String& resourceType);
+
     bool OnContextMenuEvent(const TBWidgetEvent &ev);
     void CreateFolderContextMenu(const String& folder, int x, int y);
     void CreateContentContextMenu(const String& content, int x, int y);
@@ -65,6 +70,8 @@ private:
     HashMap<uint32, String> tbidToFolder_;
     HashMap<uint32, String> tbidToContent_;
     HashMap<uint32, String> tbidToContentFolder_;
+
+    MenubarItemSource menuCreateSource;
 
     String currentContentFolder_;
 

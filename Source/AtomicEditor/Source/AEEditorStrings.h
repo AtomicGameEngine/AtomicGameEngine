@@ -30,6 +30,8 @@ public:
         ShortcutCopy,
         ShortcutPaste,
         ShortcutFind,
+        ShortcutFindNext,
+        ShortcutFindPrev,
         ShortcutBeautify,
         ShortcutCloseFile,
         ShortcutSaveFile,

@@ -82,7 +82,6 @@ bool MenubarItemWidget::OnEvent(const TBWidgetEvent &ev)
 {
     if (m_source && ev.type == EVENT_TYPE_CLICK && ev.target == this)
     {
-        //OpenSubMenu();
         return false;
     }
 
@@ -106,7 +105,10 @@ TBWidget *MenubarItemSource::CreateItemWidget(int index, TBSelectItemViewer *vie
     if (sub_source || image)
     {
         if (TBSimpleLayoutItemWidget *itemwidget = new TBSimpleLayoutItemWidget(image, sub_source, string))
+        {
+            itemwidget->SetID(GetItem(index)->id);
             return itemwidget;
+        }
     }
     else if (string && *string == '-')
     {

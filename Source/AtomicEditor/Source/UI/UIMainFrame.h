@@ -41,8 +41,6 @@ class MainFrame : public AEWidget
     MenubarItemSource menuEditSource;
     MenubarItemSource menuBuildSource;
 
-    MenubarItemSource menuResourcesSource;
-    MenubarItemSource menuResourcesCreateSource;
     MenubarItemSource menuHelpSource;
     MenubarItemSource menuDeveloperSource;
 
@@ -80,6 +78,10 @@ public:
     bool IsProjectLoaded();
 
 private:
+
+    bool HandleMenubarEvent(const TBWidgetEvent &ev);
+    bool HandlePopupMenuEvent(const TBWidgetEvent &ev);
+    void InitializeMenuSources();
 
     void UpdateFindTextWidget();
 

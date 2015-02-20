@@ -279,7 +279,6 @@ bool ResourceFrame::ConsoleWidgetVisible()
 
 }
 
-
 void ResourceFrame::ShowConsoleWidget(bool show)
 {
     if (show && ErrorsWidgetVisible())
@@ -307,7 +306,6 @@ void ResourceFrame::ShowConsoleWidget(bool show)
         if (child)
             resourceLayout_->RemoveChild(child);
     }
-
 
 }
 

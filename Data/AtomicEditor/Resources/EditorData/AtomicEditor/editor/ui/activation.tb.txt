@@ -5,6 +5,7 @@ TBLayout: axis: y, distribution: gravity, position: left
 			font: size:18
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: license_key, autofocus: 1
+				placeholder ATOMIC-XXXX-XXXX-XXXX-XXXX
 				lp: min-width: 380
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:

@@ -4,6 +4,9 @@
 
 #include "AtomicEditor.h"
 
+#include <TurboBadger/tb_message_window.h>
+#include <TurboBadger/tb_editfield.h>
+
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/IO/Log.h>
@@ -27,17 +30,17 @@
 #include "License/AEVersionCheck.h"
 
 #include "UIFindTextWidget.h"
-#include "../AEEvents.h"
-#include "../AEEditor.h"
-#include "../AEEditorStrings.h"
-#include "../AEPreferences.h"
-#include "../AEJavascript.h"
-#include "../Player/AEPlayer.h"
-#include "../Project/AEProject.h"
-#include "../Project/ProjectUtils.h"
+#include "AEEvents.h"
+#include "AEEditor.h"
+#include "AEEditorStrings.h"
+#include "AEPreferences.h"
+#include "AEJavascript.h"
+#include "Player/AEPlayer.h"
+#include "Project/AEProject.h"
+#include "Project/ProjectUtils.h"
 
-#include <TurboBadger/tb_message_window.h>
-#include <TurboBadger/tb_editfield.h>
+#include "Tools/External/AEExternalTooling.h"
+
 
 using namespace tb;
 
@@ -52,78 +55,7 @@ MainFrame::MainFrame(Context* context) :
 {
     context->RegisterSubsystem(this);
 
-    // Instead of TBGenericStringItem here, we need custom item so can have shortcuts be right aligned
-
-    menuAtomicEditorSource.AddItem(new MenubarItem("About Atomic Editor", TBIDC("about atomic editor")));
-    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
-    menuAtomicEditorSource.AddItem(new MenubarItem("Manage License", TBIDC("manage license")));
-    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
-    menuAtomicEditorSource.AddItem(new MenubarItem("Check for Updates", TBIDC("check update")));
-    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
-    menuAtomicEditorSource.AddItem(new MenubarItem("Quit", TBIDC("quit")));
-
-    menuFileSource.AddItem(new MenubarItem("New Project", TBIDC("new project")));
-    menuFileSource.AddItem(new MenubarItem("Open Project", TBIDC("open project")));
-    menuFileSource.AddItem(new MenubarItem("Save Project", TBIDC("save project")));
-    menuFileSource.AddItem(new MenubarItem("-"));
-    menuFileSource.AddItem(new MenubarItem("Close Project", TBIDC("close project")));
-    menuFileSource.AddItem(new MenubarItem("-"));
-    menuFileSource.AddItem(new MenubarItem("Save File", TBIDC("save file"), EDITOR_STRING(ShortcutSaveFile)));
-    menuFileSource.AddItem(new MenubarItem("Close File", TBIDC("close file"), EDITOR_STRING(ShortcutCloseFile)));
-
-    menuBuildSource.AddItem(new MenubarItem("Build", TBIDC("project_build"), EDITOR_STRING(ShortcutBuild)));
-    menuBuildSource.AddItem(new MenubarItem("-"));
-    menuBuildSource.AddItem(new MenubarItem("Build Settings", TBIDC("project_build_settings"), EDITOR_STRING(ShortcutBuildSettings)));
-
-    menuToolsSource.AddItem(new MenubarItem("Tiled Map Editor", TBIDC("tools tiled")));
-
-    menuEditSource.AddItem(new MenubarItem("Undo", TBIDC("edit undo"),  EDITOR_STRING(ShortcutUndo)));
-    menuEditSource.AddItem(new MenubarItem("Redo", TBIDC("edit redo"),  EDITOR_STRING(ShortcutRedo)));
-    menuEditSource.AddItem(new MenubarItem("-"));
-    menuEditSource.AddItem(new MenubarItem("Cut", TBIDC("edit cut"),  EDITOR_STRING(ShortcutCut)));
-    menuEditSource.AddItem(new MenubarItem("Copy", TBIDC("edit copy"),  EDITOR_STRING(ShortcutCopy)));
-    menuEditSource.AddItem(new MenubarItem("Paste", TBIDC("edit paste"),  EDITOR_STRING(ShortcutPaste)));
-    menuEditSource.AddItem(new MenubarItem("-"));
-    menuEditSource.AddItem(new MenubarItem("Find", TBIDC("edit find"),  EDITOR_STRING(ShortcutFind)));
-    menuEditSource.AddItem(new MenubarItem("Format Code", TBIDC("format code"),  EDITOR_STRING(ShortcutBeautify)));
-    menuEditSource.AddItem(new MenubarItem("-"));
-    menuEditSource.AddItem(new MenubarItem("Play", TBIDC("play"),  EDITOR_STRING(ShortcutPlay)));
-
-    menuResourcesSource.AddItem(new MenubarItem("Create", &menuResourcesCreateSource));
-    menuResourcesSource.AddItem(new MenubarItem("-"));
-    menuResourcesSource.AddItem(new MenubarItem("Reveal in Finder", TBIDC("reveal")));
-
-    MenubarItem* item;
-    item = new MenubarItem("Folder", TBIDC("create_folder"));
-    item->SetSkinImage(TBIDC("Folder.icon"));
-    menuResourcesCreateSource.AddItem(item);
-
-    menuResourcesCreateSource.AddItem(new MenubarItem("-"));
-
-    item = new MenubarItem("Component", TBIDC("create_component"));
-    item->SetSkinImage(TBIDC("JavascriptBitmap"));
-    menuResourcesCreateSource.AddItem(item);
-    item = new MenubarItem("Script", TBIDC("create_script"));
-    item->SetSkinImage(TBIDC("JavascriptBitmap"));
-    menuResourcesCreateSource.AddItem(item);
-    item = new MenubarItem("Module", TBIDC("create_module"));
-    item->SetSkinImage(TBIDC("JavascriptBitmap"));
-    menuResourcesCreateSource.AddItem(item);
-
-    menuResourcesCreateSource.AddItem(new MenubarItem("-"));
-
-    item = new MenubarItem("2D Level", TBIDC("create_2d_level"));
-    item->SetSkinImage(TBIDC("2DLevelBitmap"));
-    menuResourcesCreateSource.AddItem(item);
-
-    menuHelpSource.AddItem(new MenubarItem("API Documentation", TBIDC("help_api")));
-    menuHelpSource.AddItem(new MenubarItem("-"));
-    menuHelpSource.AddItem(new MenubarItem("Forums", TBIDC("help_forums")));
-    menuHelpSource.AddItem(new MenubarItem("-"));
-    menuHelpSource.AddItem(new MenubarItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
-
-    menuDeveloperSource.AddItem(new MenubarItem("Set 1920x1080 Resolution", TBIDC("developer_resolution")));
-
+    InitializeMenuSources();
 
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/mainframe.tb.txt");
@@ -171,7 +103,6 @@ MainFrame::MainFrame(Context* context) :
     // better way to do this? projectviewcontainer isn't a layout
     wd = resourceframe_->GetWidgetDelegate();
     wd->SetSize(rect.w, rect.h);
-    //resourceviewcontainer->AddChild(wd);
 
     platformIndicator_ = delegate_->GetWidgetByIDAndType<TBSkinImage>(TBIDC("current_platform_indicator"));
     assert(platformIndicator_);
@@ -204,6 +135,57 @@ MainFrame::MainFrame(Context* context) :
 
 MainFrame::~MainFrame()
 {
+}
+
+void MainFrame::InitializeMenuSources()
+{
+    // Instead of TBGenericStringItem here, we need custom item so can have shortcuts be right aligned
+
+    menuAtomicEditorSource.AddItem(new MenubarItem("About Atomic Editor", TBIDC("about atomic editor")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
+    menuAtomicEditorSource.AddItem(new MenubarItem("Manage License", TBIDC("manage license")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
+    menuAtomicEditorSource.AddItem(new MenubarItem("Check for Updates", TBIDC("check update")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
+    menuAtomicEditorSource.AddItem(new MenubarItem("Quit", TBIDC("quit")));
+
+    menuFileSource.AddItem(new MenubarItem("New Project", TBIDC("new project")));
+    menuFileSource.AddItem(new MenubarItem("Open Project", TBIDC("open project")));
+    menuFileSource.AddItem(new MenubarItem("Save Project", TBIDC("save project")));
+    menuFileSource.AddItem(new MenubarItem("-"));
+    menuFileSource.AddItem(new MenubarItem("Close Project", TBIDC("close project")));
+    menuFileSource.AddItem(new MenubarItem("-"));
+    menuFileSource.AddItem(new MenubarItem("Save File", TBIDC("save file"), EDITOR_STRING(ShortcutSaveFile)));
+    menuFileSource.AddItem(new MenubarItem("Close File", TBIDC("close file"), EDITOR_STRING(ShortcutCloseFile)));
+
+    menuBuildSource.AddItem(new MenubarItem("Build", TBIDC("project_build"), EDITOR_STRING(ShortcutBuild)));
+    menuBuildSource.AddItem(new MenubarItem("-"));
+    menuBuildSource.AddItem(new MenubarItem("Build Settings", TBIDC("project_build_settings"), EDITOR_STRING(ShortcutBuildSettings)));
+
+    menuToolsSource.AddItem(new MenubarItem("Tiled Map Editor", TBIDC("tools tiled")));
+
+    menuEditSource.AddItem(new MenubarItem("Undo", TBIDC("edit undo"),  EDITOR_STRING(ShortcutUndo)));
+    menuEditSource.AddItem(new MenubarItem("Redo", TBIDC("edit redo"),  EDITOR_STRING(ShortcutRedo)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Cut", TBIDC("edit cut"),  EDITOR_STRING(ShortcutCut)));
+    menuEditSource.AddItem(new MenubarItem("Copy", TBIDC("edit copy"),  EDITOR_STRING(ShortcutCopy)));
+    menuEditSource.AddItem(new MenubarItem("Paste", TBIDC("edit paste"),  EDITOR_STRING(ShortcutPaste)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Find", TBIDC("edit find"),  EDITOR_STRING(ShortcutFind)));
+    menuEditSource.AddItem(new MenubarItem("Find Next", TBIDC("edit find next"),  EDITOR_STRING(ShortcutFindNext)));
+    menuEditSource.AddItem(new MenubarItem("Find Prev", TBIDC("edit find prev"),  EDITOR_STRING(ShortcutFindPrev)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Format Code", TBIDC("format code"),  EDITOR_STRING(ShortcutBeautify)));
+    menuEditSource.AddItem(new MenubarItem("-"));
+    menuEditSource.AddItem(new MenubarItem("Play", TBIDC("play"),  EDITOR_STRING(ShortcutPlay)));
+
+    menuHelpSource.AddItem(new MenubarItem("API Documentation", TBIDC("help_api")));
+    menuHelpSource.AddItem(new MenubarItem("-"));
+    menuHelpSource.AddItem(new MenubarItem("Forums", TBIDC("help_forums")));
+    menuHelpSource.AddItem(new MenubarItem("-"));
+    menuHelpSource.AddItem(new MenubarItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
+
+    menuDeveloperSource.AddItem(new MenubarItem("Set 1920x1080 Resolution", TBIDC("developer_resolution")));
 }
 
 ProjectFrame* MainFrame::GetProjectFrame()
@@ -246,15 +228,6 @@ void MainFrame::HandleJavascriptSaved(StringHash eventType, VariantMap& eventDat
     UpdateJavascriptErrors();
 }
 
-void MainFrame::HandleKeyDown(StringHash eventType, VariantMap& eventData)
-{
-    using namespace KeyDown;
-
-    int keycode = eventData[P_KEY].GetInt();
-    int scancode = eventData[P_SCANCODE].GetInt();
-
-}
-
 bool MainFrame::UpdateJavascriptErrors()
 {
     // parse errors
@@ -290,9 +263,9 @@ bool MainFrame::UpdateJavascriptErrors()
 
 }
 
-void MainFrame::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+void MainFrame::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    using namespace KeyUp;
+    using namespace KeyDown;
 
     Input* input = context_->GetSubsystem<Input>();
     Editor* editor = context_->GetSubsystem<Editor>();
@@ -318,6 +291,13 @@ void MainFrame::HandleKeyUp(StringHash eventType, VariantMap& eventData)
             SendEvent(E_EDITORPLAYSTOP);
         }
     }
+
+}
+
+void MainFrame::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+{
+    using namespace KeyUp;
+
 
 }
 
@@ -421,13 +401,89 @@ bool MainFrame::IsProjectLoaded()
 
 }
 
-
-bool MainFrame::OnEvent(const TBWidgetEvent &ev)
+bool MainFrame::HandleMenubarEvent(const TBWidgetEvent &ev)
 {
-    Editor* editor = GetSubsystem<Editor>();
-
     if (ev.type == EVENT_TYPE_CLICK)
     {
+        if (ev.target->GetID() == TBIDC("menu atomic editor"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("atomic editor popup")))
+            {
+                menu->Show(&menuAtomicEditorSource, TBPopupAlignment());
+            }
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu edit"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("edit popup")))
+                menu->Show(&menuEditSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu file"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("file popup")))
+                menu->Show(&menuFileSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu build"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("build popup")))
+                menu->Show(&menuBuildSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu tools"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("tools popup")))
+                menu->Show(&menuToolsSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu issues"))
+        {
+            resourceframe_->ShowIssuesWidget(!resourceframe_->IssuesWidgetVisible());
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu console"))
+        {
+            resourceframe_->ShowConsoleWidget(!resourceframe_->ConsoleWidgetVisible());
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu errors"))
+        {
+            resourceframe_->ShowErrorsWidget(!resourceframe_->ErrorsWidgetVisible());
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu help"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("help popup")))
+                menu->Show(&menuHelpSource, TBPopupAlignment());
+
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("menu developer"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("developer popup")))
+                menu->Show(&menuDeveloperSource, TBPopupAlignment());
+
+            return true;
+        }
+
+    }
+
+    return false;
+
+}
+
+bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        Editor* editor = GetSubsystem<Editor>();
+
         if (ev.target->GetID() == TBIDC("file popup"))
         {
             if (ev.ref_id == TBIDC("new project"))
@@ -491,8 +547,9 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
                 TBWidgetEvent* eptr = (TBWidgetEvent*) &ev;
                 eptr->target = NULL;
                 editor->RequestExit();
-                return true;
             }
+
+            return true;
 
         }
 
@@ -520,40 +577,16 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
             {
 
             }
+
+            return true;
         }
 
-        if (ev.target->GetID() == TBIDC("resources popup"))
+        if (ev.target->GetID() == TBIDC("tools popup"))
         {
-            UIModalOps* ops = GetSubsystem<UIModalOps>();
-
-            String resourcePath = projectframe_->GetCurrentContentFolder();
-
-            if (resourcePath.Length())
+            if (ev.ref_id == TBIDC("tools tiled"))
             {
-                if (ev.ref_id == TBIDC("create_component"))
-                {
-                    ops->ShowCreateComponent(resourcePath);
-                }
-                else if (ev.ref_id == TBIDC("create_script"))
-                {
-                    ops->ShowCreateScript(resourcePath);
-                }
-                else if (ev.ref_id == TBIDC("create_module"))
-                {
-                    ops->ShowCreateModule(resourcePath);
-                }
-                else if (ev.ref_id == TBIDC("create_2d_level"))
-                {
-                    ops->ShowCreate2DLevel(resourcePath);
-                }
-                else if (ev.ref_id == TBIDC("create_folder"))
-                {
-                    ops->ShowNewFolder(resourcePath);
-                }
-                else if (ev.ref_id == TBIDC("reveal"))
-                {
-                    RevealInFinder();
-                }
+                ExternalTooling* tooling = GetSubsystem<ExternalTooling>();
+                tooling->LaunchOrOpen("AtomicTiled", "");
             }
 
             return true;
@@ -600,88 +633,32 @@ bool MainFrame::OnEvent(const TBWidgetEvent &ev)
                 graphics->SetWindowSize(1920, 1080);
                 graphics->CenterWindow();
             }
-        }
-
-
-        if (ev.target->GetID() == TBIDC("menu atomic editor"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("atomic editor popup")))
-            {
-                menu->Show(&menuAtomicEditorSource, TBPopupAlignment());
-            }
 
             return true;
         }
-        else if (ev.target->GetID() == TBIDC("menu edit"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("edit popup")))
-                menu->Show(&menuEditSource, TBPopupAlignment());
 
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu file"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("file popup")))
-                menu->Show(&menuFileSource, TBPopupAlignment());
+    }
 
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu resources"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("resources popup")))
-                menu->Show(&menuResourcesSource, TBPopupAlignment());
+    return false;
+}
 
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu build"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("build popup")))
-                menu->Show(&menuBuildSource, TBPopupAlignment());
 
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu tools"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("tools popup")))
-                menu->Show(&menuToolsSource, TBPopupAlignment());
+bool MainFrame::OnEvent(const TBWidgetEvent &ev)
+{
+    if (HandleMenubarEvent(ev))
+        return true;
 
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu issues"))
-        {
-            resourceframe_->ShowIssuesWidget(!resourceframe_->IssuesWidgetVisible());
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu console"))
-        {
-            resourceframe_->ShowConsoleWidget(!resourceframe_->ConsoleWidgetVisible());
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu errors"))
-        {
-            resourceframe_->ShowErrorsWidget(!resourceframe_->ErrorsWidgetVisible());
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
+    if (HandlePopupMenuEvent(ev))
+        return true;
+
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+
+        if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
         {
             resourceframe_->FocusCurrentTab();
             return true;
         }
-        else if (ev.target->GetID() == TBIDC("menu help"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("help popup")))
-                menu->Show(&menuHelpSource, TBPopupAlignment());
-
-            return true;
-        }
-        else if (ev.target->GetID() == TBIDC("menu developer"))
-        {
-            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("developer popup")))
-                menu->Show(&menuDeveloperSource, TBPopupAlignment());
-
-            return true;
-        }
-
 
     }
 
