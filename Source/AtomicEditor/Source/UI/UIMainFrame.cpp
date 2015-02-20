@@ -59,6 +59,7 @@ MainFrame::MainFrame(Context* context) :
     menuAtomicEditorSource.AddItem(new MenubarItem("Manage License", TBIDC("manage license")));
     menuAtomicEditorSource.AddItem(new MenubarItem("-"));
     menuAtomicEditorSource.AddItem(new MenubarItem("Check for Updates", TBIDC("check update")));
+    menuAtomicEditorSource.AddItem(new MenubarItem("-"));
     menuAtomicEditorSource.AddItem(new MenubarItem("Quit", TBIDC("quit")));
 
     menuFileSource.AddItem(new MenubarItem("New Project", TBIDC("new project")));
