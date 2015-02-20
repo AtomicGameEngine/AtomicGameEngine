@@ -20,7 +20,7 @@ class ListViewItemWidget;
 class MenubarItem : public TBGenericStringItem
 {
 public:
-    MenubarItem(const char *str, const TBID &id = TBID((int32)0), const String& shortcut = String::EMPTY)
+    MenubarItem(const char *str, const TBID &id = TBID((uint32)0), const String& shortcut = String::EMPTY)
         : TBGenericStringItem(str, id), shortcut_(shortcut)
     {
 
