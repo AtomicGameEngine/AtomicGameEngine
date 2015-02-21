@@ -270,6 +270,13 @@ void JSComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 
         duk_pop(ctx);
     }
+    else
+    {
+        Scene* scene = GetScene();
+        if (scene)
+            UnsubscribeFromEvent(scene, E_SCENEUPDATE);
+        subscribed_ = false;
+    }
 }
 
 void JSComponent::UpdateEventSubscription()
@@ -285,7 +292,8 @@ void JSComponent::UpdateEventSubscription()
 
     if (enabled)
     {
-        if (!subscribed_ && (methods_[JSMETHOD_UPDATE] || methods_[JSMETHOD_DELAYEDSTART] ))
+        // we get at least one scene update if not started
+        if (!subscribed_ && (!started_ || (methods_[JSMETHOD_UPDATE] || methods_[JSMETHOD_DELAYEDSTART] )))
         {
             SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(JSComponent, HandleSceneUpdate));
             subscribed_ = true;
