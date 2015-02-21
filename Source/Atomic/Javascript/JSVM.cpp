@@ -153,7 +153,7 @@ bool JSVM::ExecuteFunction(const String& functionName)
 bool JSVM::GenerateComponent(const String &cname, const String &jsfilename, const String& csource)
 {
 
-    String source = "(function() {\n function __component_function(self) {\n";
+    String source = "(function() {var start = null; var update = null; var fixedUpdate = null; var postUpdate = null;\n function __component_function(self) {\n";
 
     source += csource.CString();
 
@@ -163,10 +163,10 @@ bool JSVM::GenerateComponent(const String &cname, const String &jsfilename, cons
                             cname.CString(), cname.CString());
 
 
-    source += "if (typeof start != \"undefined\") self.start = start; " \
-              "if (typeof update != \"undefined\") self.update = update; "\
-              "if (typeof fixedUpdate != \"undefined\") self.fixedUpdate = fixedUpdate; " \
-              "if (typeof postUpdate != \"undefined\") self.postUpdate = postUpdate;\n";
+    source += "if (start instanceof Function) self.start = start; " \
+              "if (update instanceof Function) self.update = update; "\
+              "if (fixedUpdate instanceof Function) self.fixedUpdate = fixedUpdate; " \
+              "if (postUpdate instanceof Function) self.postUpdate = postUpdate;\n";
 
     String scriptName = cname;
     scriptName[0] = tolower(scriptName[0]);
