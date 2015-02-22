@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <TurboBadger/tb_widgets_common.h>
-#include "ResourceEditor.h"
+#include <Atomic/Core/Object.h>
 
 using namespace Atomic;
-using namespace tb;
 
 namespace Atomic
 {
@@ -23,39 +21,43 @@ class Octree;
 namespace AtomicEditor
 {
 
-class JSAutocomplete;
+class SceneEditor3D;
 
-class SceneResourceEditor: public ResourceEditor
+class SceneView3D: public Object
 {
-    OBJECT(SceneResourceEditor);
+    OBJECT(SceneView3D);
 
 public:
 
-    SceneResourceEditor(Context* context, const String& fullpath, TBTabContainer* container);
+    SceneView3D(Context* context, SceneEditor3D* sceneEditor);
 
-    virtual ~SceneResourceEditor();
+    virtual ~SceneView3D();
 
-    bool OnEvent(const TBWidgetEvent &ev);
+    void SelectNode(Node* node);
 
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
 
     void MoveCamera(float timeStep);
 
-    SharedPtr<Scene> scene_;
-    SharedPtr<Node> cameraNode_;
-    SharedPtr<View3D> view3D_;
-    SharedPtr<Camera> camera_;
+    WeakPtr<SceneEditor3D> sceneEditor_;
+    WeakPtr<Scene> scene_;
+
+    // Camera
+    WeakPtr<Node> cameraNode_;
+    WeakPtr<Camera> camera_;
+
     float yaw_;
     float pitch_;
 
-    TBLayout* layout_;
-    TBContainer* view3DContainer_;
+    SharedPtr<View3D> view3D_;
 
     WeakPtr<DebugRenderer> debugRenderer_;
     WeakPtr<Octree> octree_;
+    WeakPtr<Node> selectedNode_;
 
 };
 

@@ -16,7 +16,7 @@
 #include "UIResourceFrame.h"
 
 #include "../Editors/JSResourceEditor.h"
-#include "../Editors/SceneResourceEditor.h"
+#include "../Editors/SceneEditor3D/SceneEditor3D.h"
 #include "../Editors/ModelResourceEditor.h"
 #include "../Editors/TextResourceEditor.h"
 #include "../AEEvents.h"
@@ -120,7 +120,7 @@ void ResourceFrame::EditResource(const String& fullpath)
     }
     else if (ext == ".scene")
     {
-        SceneResourceEditor* sre = new SceneResourceEditor(context_, fullpath, tabcontainer_);
+        SceneEditor3D* sre = new SceneEditor3D(context_, fullpath, tabcontainer_);
         editor = sre;
     }
     else if (ext == ".xml" || ext == ".txt")

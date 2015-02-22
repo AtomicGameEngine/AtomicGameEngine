@@ -12,6 +12,8 @@
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Octree.h>
 
+#include <Atomic/Input/Input.h>
+
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -20,8 +22,8 @@
 #include "AEEditor.h"
 #include "AEEvents.h"
 
-#include <Atomic/Input/Input.h>
-#include "SceneResourceEditor.h"
+#include "SceneView3D.h"
+#include "SceneEditor3D.h"
 
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
@@ -30,65 +32,38 @@
 namespace AtomicEditor
 {
 
-SceneResourceEditor ::SceneResourceEditor(Context* context, const String &fullpath, TBTabContainer *container) :
-    ResourceEditor(context, fullpath, container),
-    layout_(0),
-    view3DContainer_(0),
+SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
+    Object(context),
     yaw_(0.0f),
     pitch_(0.0f)
 {
-    layout_ = new TBLayout();
-    layout_->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
-    layout_->SetSize(container_->GetRect().w, container_->GetRect().h);
 
-    view3DContainer_ = new TBContainer();
-    view3DContainer_->SetGravity(WIDGET_GRAVITY_ALL);
+    sceneEditor_ = sceneEditor;
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    scene_ = new Scene(context_);
-    SharedPtr<File> xmlFile = cache->GetFile(fullpath);
-
-    if (GetExtension(fullpath) == ".scene")
-        scene_->LoadXML(*xmlFile);
-    else
-        scene_->Load(*xmlFile);
-
-    scene_->SetUpdateEnabled(false);
-
-    debugRenderer_ = scene_->GetComponent<DebugRenderer>();
-
-    if (debugRenderer_.Null())
-    {
-        debugRenderer_ = scene_->CreateComponent<DebugRenderer>();
-    }
-
-    octree_ = scene_->GetComponent<Octree>();
-
-    if (octree_.Null())
-    {
-        LOGWARNING("Scene without an octree loaded");
-        octree_ = scene_->CreateComponent<Octree>();
-    }
-
+    scene_ = sceneEditor->GetScene();
 
     cameraNode_ = scene_->CreateChild("Camera");
     camera_ = cameraNode_->CreateComponent<Camera>();
 
+    debugRenderer_ = scene_->GetComponent<DebugRenderer>();
+    assert(debugRenderer_.NotNull());
+    octree_ = scene_->GetComponent<Octree>();
+    assert(octree_.NotNull());
+
     cameraNode_->SetPosition(Vector3(0, 0, -10));
-
-    layout_->AddChild(view3DContainer_);
-
-    container_->GetContentRoot()->AddChild(layout_);
 
     view3D_ = new View3D(context_);
     view3D_->SetView(scene_, camera_);
     view3D_->SetAutoUpdate(false);
+    view3D_->SetSize(800, 800);
 
     GetSubsystem<UI>()->GetRoot()->AddChild(view3D_);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(SceneResourceEditor, HandleUpdate));
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneResourceEditor, HandlePostRenderUpdate));
+    SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
+    SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
 
     // TODO: generate this event properly
     VariantMap eventData;
@@ -97,17 +72,12 @@ SceneResourceEditor ::SceneResourceEditor(Context* context, const String &fullpa
 
 }
 
-SceneResourceEditor::~SceneResourceEditor()
+SceneView3D::~SceneView3D()
 {
     GetSubsystem<UI>()->GetRoot()->RemoveChild(view3D_);
 }
 
-bool SceneResourceEditor::OnEvent(const TBWidgetEvent &ev)
-{
-    return false;
-}
-
-void SceneResourceEditor::MoveCamera(float timeStep)
+void SceneView3D::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
@@ -144,7 +114,7 @@ void SceneResourceEditor::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
-void SceneResourceEditor::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (!view3D_->IsVisible())
         return;
@@ -176,61 +146,28 @@ void SceneResourceEditor::HandlePostRenderUpdate(StringHash eventType, VariantMa
 
 }
 
-void SceneResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void SceneView3D::SelectNode(Node* node)
 {
 
-    if ((layout_->GetVisibility() != WIDGET_VISIBILITY_VISIBLE) || GetSubsystem<Editor>()->IsPlayingProject())
-    {
-        if (view3D_->IsVisible())
-            view3D_->SetVisible(false);
+}
 
-        return;
-    }
-
-    if (!view3D_->IsVisible())
-        view3D_->SetVisible(true);
-
-    /*
-    Vector3 cpos = cameraNode_->GetPosition();
-    Quaternion crot = cameraNode_->GetRotation();
-    LOGINFOF("%f %f %f - %f %f", cpos.x_, cpos.y_, cpos.z_, pitch_, yaw_);
-    */
+void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
 
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 
     MoveCamera(timeStep);
 
-    bool dirty = false;
-
-    TBRect rect = layout_->GetRect();
-    TBWidget* parent = layout_->GetParent();
-    while (parent)
-    {
-        TBRect prect = parent->GetRect();
-        rect.x += prect.x;
-        rect.y += prect.y;
-        parent = parent->GetParent();
-    }
-
-    const IntVector2& pos = view3D_->GetPosition();
-    if (pos.x_ != rect.x || pos.y_ != rect.y)
-        dirty = true;
-
-    const IntVector2& size = view3D_->GetSize();
-
-    if (size.x_ != rect.w || size.y_ != rect.h)
-        dirty = true;
-
-    if (dirty)
-    {
-
-        view3D_->SetPosition(rect.x, rect.y);
-        view3D_->SetSize(rect.w, rect.h);
-    }
-
     view3D_->QueueUpdate();
 }
+
+void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
+    SelectNode(node);
+}
+
 
 
 }

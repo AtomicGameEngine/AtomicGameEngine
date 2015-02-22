@@ -1,5 +1,6 @@
 
 #include <TurboBadger/tb_widgets_common.h>
+#include <TurboBadger/tb_menu_window.h>
 #include <TurboBadger/tb_inline_select.h>
 
 #include "AtomicEditor.h"
@@ -25,9 +26,52 @@ void InspectorDataBinding::SetObjectValueFromWidget(TBWidget *srcWidget)
         TBCheckBox* box = (TBCheckBox *) widget_;
         Variant v(box->GetValue() ? true : false);
         object_->SetAttribute(attrInfo_->name_, v);
+    }
+    else if (type == VAR_INT)
+    {
+        TBEditField* field = (TBEditField*) widget_;
+        Variant v(ToInt(field->GetText().CStr()));
+        object_->SetAttribute(attrInfo_->name_, v);
+    }
+    else if (type == VAR_FLOAT)
+    {
+        TBEditField* field = (TBEditField*) widget_;
+        Variant v(ToFloat(field->GetText().CStr()));
+        object_->SetAttribute(attrInfo_->name_, v);
+    }
+    else if (type == VAR_STRING)
+    {
+        TBEditField* field = (TBEditField*) widget_;
+        Variant v(String(field->GetText().CStr()));
+        object_->SetAttribute(attrInfo_->name_, v);
+    }
+    else if (type == VAR_COLOR && srcWidget)
+    {
+        Color value = object_->GetAttribute(attrInfo_->name_).GetColor();
 
-        // refresh widget
-        SetWidgetValueFromObject();
+        TBInlineSelect* select = NULL;
+        if (srcWidget->GetID() == TBID(unsigned(1)))
+        {
+            select = (TBInlineSelect*) srcWidget;
+            value.r_ = (float ) select->GetValueDouble();
+        }
+        else if (srcWidget->GetID() == TBID(unsigned(2)))
+        {
+            select = (TBInlineSelect*) srcWidget;
+            value.g_ = (float ) select->GetValueDouble();
+        }
+        else if (srcWidget->GetID() == TBID(unsigned(3)))
+        {
+            select = (TBInlineSelect*) srcWidget;
+            value.b_ = (float ) select->GetValueDouble();
+        }
+        else if (srcWidget->GetID() == TBID(unsigned(4)))
+        {
+            select = (TBInlineSelect*) srcWidget;
+            value.a_ = (float ) select->GetValueDouble();
+        }
+
+        object_->SetAttribute(attrInfo_->name_, value);
     }
     else if (type == VAR_VECTOR3 && srcWidget)
     {
@@ -60,6 +104,8 @@ void InspectorDataBinding::SetObjectValueFromWidget(TBWidget *srcWidget)
         object_->SetAttribute(attrInfo_->name_, q);
     }
 
+    // refresh widget
+    //SetWidgetValueFromObject();
 
     objectLocked_ = false;
 
@@ -76,7 +122,7 @@ void InspectorDataBinding::SetWidgetValueFromObject()
     {
         bool value = object_->GetAttribute(attrInfo_->name_).GetBool();
         widget_->SetValue(value ? 1 : 0);
-    }
+            }
     else if (attrInfo_->type_ == VAR_VECTOR3)
     {
         Vector3 value = object_->GetAttribute(attrInfo_->name_).GetVector3();
@@ -129,6 +175,25 @@ void InspectorDataBinding::SetWidgetValueFromObject()
         }
 
     }
+    else if (attrInfo_->type_ == VAR_COLOR)
+    {
+        Color value = object_->GetAttribute(attrInfo_->name_).GetColor();
+
+        TBInlineSelect* select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(1)));
+        if (select)
+            select->SetValue(value.r_);
+        select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(2)));
+        if (select)
+            select->SetValue(value.g_);
+        select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(3)));
+        if (select)
+            select->SetValue(value.b_);
+        select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(4)));
+        if (select)
+            select->SetValue(value.a_);
+
+    }
+
 
     widgetLocked_ = false;
 
@@ -141,7 +206,30 @@ bool InspectorDataBinding::OnEvent(const TBWidgetEvent &ev)
         if (objectLocked_)
             return false;
 
-        if (widget_ == ev.target || widget_->IsAncestorOf(ev.target))
+        String id = attrInfo_->name_;
+        id += " enum popup";
+
+        if (ev.target->GetID() == TBIDC(id.CString()))
+        {
+            Variant value(int(ev.ref_id-1));
+            object_->SetAttribute(attrInfo_->name_, value);
+            SetWidgetValueFromObject();
+        }
+        else if (widget_ == ev.target && attrInfo_->enumNames_)
+        {
+            TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC(id.CString()));
+            TBGenericStringItemSource* source = menu->GetList()->GetDefaultSource();
+            const char** enumPtr = attrInfo_->enumNames_;
+            unsigned v = 1;
+            while (*enumPtr)
+            {
+                source->AddItem(new TBGenericStringItem(*enumPtr, TBID(v++)));
+                enumPtr++;
+            }
+            menu->Show(source, TBPopupAlignment());
+
+        }
+        else if (widget_ == ev.target || widget_->IsAncestorOf(ev.target))
         {
             SetObjectValueFromWidget(ev.target);
         }
