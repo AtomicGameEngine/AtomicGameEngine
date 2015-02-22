@@ -4,10 +4,7 @@
 
 #include "AtomicEditor.h"
 
-#include <TurboBadger/tb_select.h>
 #include <TurboBadger/tb_editfield.h>
-#include <TurboBadger/tb_inline_select.h>
-
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
@@ -20,8 +17,9 @@
 #include "AEEditor.h"
 #include "AEEvents.h"
 
-#include "UIListView.h"
+#include "UIInspectorDataBinding.h"
 #include "UIInspectorFrame.h"
+
 
 #include "UI/Modal/UIModalOps.h"
 
@@ -32,7 +30,6 @@ namespace AtomicEditor
 
 InspectorFrame::InspectorFrame(Context* context) :
     AEWidget(context)
-  , refreshing_(false)
 {
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/inspectorframe.tb.txt");
@@ -46,24 +43,14 @@ InspectorFrame::InspectorFrame(Context* context) :
 
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(InspectorFrame, HandleEditorActiveNodeChange));
 
-    CreateTransformLayout();
-
 }
 
 InspectorFrame::~InspectorFrame()
 {
-    if (transformLayout_->GetParent())
-        transformLayout_->GetParent()->RemoveChild(transformLayout_);
-
-    transformLayout_->Die();
 
 }
 
-void InspectorFrame::Clear()
-{
-
-}
-
+/*
 TBLayout* InspectorFrame::CreateComponentLayout(Component* component)
 {
     TBLayout* componentLayout = new TBLayout(AXIS_Y);
@@ -187,8 +174,14 @@ TBLayout* InspectorFrame::CreateComponentLayout(Component* component)
     return componentLayout;
 }
 
+*/
+
 bool InspectorFrame::OnEvent(const TBWidgetEvent &ev)
 {
+    for (unsigned i = 0; i < dataBindings_.Size(); i++)
+        dataBindings_[i]->OnEvent(ev);
+
+    /*
     if (ev.type == EVENT_TYPE_KEY_DOWN)
     {
         for (unsigned i = 0; i < dataBindings_.Size(); i++)
@@ -305,10 +298,12 @@ bool InspectorFrame::OnEvent(const TBWidgetEvent &ev)
         }
 
     }
+    */
 
     return false;
 }
 
+/*
 void InspectorFrame::CreateTransformLayout()
 {
     // transform
@@ -399,50 +394,24 @@ void InspectorFrame::CreateTransformLayout()
     transformLayout_->AddChild(scaleLayout);
 
 }
-
-void InspectorFrame::RefreshTransform()
-{
-    if (node_.Null())
-        return;
-
-    refreshing_ = true;
-
-    Vector3 pos = node_->GetPosition();
-    Vector3 scale = node_->GetScale();
-    Vector3 rot = node_->GetRotation().EulerAngles();
-
-    posXSelect_->SetValue(pos.x_);
-    posYSelect_->SetValue(pos.y_);
-    posZSelect_->SetValue(pos.z_);
-    rotXSelect_->SetValue(rot.x_);
-    rotYSelect_->SetValue(rot.y_);
-    rotZSelect_->SetValue(rot.z_);
-    scaleXSelect_->SetValue(scale.x_);
-    scaleYSelect_->SetValue(scale.y_);
-    scaleZSelect_->SetValue(scale.x_);
-
-    refreshing_ = false;
-
-}
+*/
 
 void InspectorFrame::InspectNode(Node* node)
 {
     if (node_ == node)
         return;
 
-    refreshing_ = true;
-
     node_ = node;
 
-    if (transformLayout_->GetParent())
-        transformLayout_->GetParent()->RemoveChild(transformLayout_);
-
     inspectorContainer_->DeleteAllChildren();
+
+    for (unsigned i = 0; i < dataBindings_.Size(); i++)
+        delete dataBindings_[i];
+
     dataBindings_.Clear();
 
     if (!node_)
     {
-        refreshing_ = false;
         return;
     }
     else
@@ -451,8 +420,118 @@ void InspectorFrame::InspectNode(Node* node)
         fd.SetID(TBIDC("Vera"));
         fd.SetSize(11);
 
+        LayoutParams nlp;
+        nlp.SetWidth(304);
         TBLayout* nodeLayout = new TBLayout(AXIS_Y);
+
+        nodeLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
         nodeLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
+        nodeLayout->SetLayoutParams(nlp);
+
+        TBContainer* nodeContainer = new TBContainer();
+        nodeContainer->SetGravity(WIDGET_GRAVITY_ALL);
+
+        TBLayout* attrsVerticalLayout = new TBLayout(AXIS_Y);
+        attrsVerticalLayout->SetGravity(WIDGET_GRAVITY_ALL);
+        attrsVerticalLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
+        nodeContainer->AddChild(attrsVerticalLayout);
+
+        const Vector<AttributeInfo>* attrs = node->GetAttributes();
+
+        for (unsigned i = 0; i < attrs->Size(); i++)
+        {
+            const AttributeInfo* attr = &attrs->At(i);
+
+            InspectorDataBinding*  binding = InspectorDataBinding::Create(node, attr);
+
+            if (binding)
+            {
+                dataBindings_.Push(binding);
+
+                TBLayout* attrLayout = new TBLayout();
+
+                attrLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
+                TBTextField* name = new TBTextField();
+
+                String bname = attr->name_;
+                if (bname == "Is Enabled")
+                    bname = "Enabled";
+
+                name->SetText(bname.CString());
+                name->SetFontDescription(fd);
+
+                attrLayout->AddChild(name);
+                TBWidget* bwidget = binding->GetWidget();
+                attrLayout->AddChild(bwidget);
+
+                attrsVerticalLayout->AddChild(attrLayout);
+            }
+
+        }
+
+        nodeLayout->AddChild(nodeContainer);
+
+        const Vector<SharedPtr<Component> > components = node->GetComponents();
+        for (unsigned i = 0; i < components.Size(); i++)
+        {
+            Component* c = components[i];
+
+            TBContainer* componentContainer = new TBContainer();
+            componentContainer->SetGravity(WIDGET_GRAVITY_ALL);
+
+            TBLayout* attrsVerticalLayout = new TBLayout(AXIS_Y);
+            attrsVerticalLayout->SetGravity(WIDGET_GRAVITY_ALL);
+            attrsVerticalLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
+
+            TBTextField* cnameField = new TBTextField();
+            cnameField->SetText(c->GetTypeName().CString());
+            //cnameField->SetFontDescription(fd);
+            attrsVerticalLayout->AddChild(cnameField);
+
+
+            componentContainer->AddChild(attrsVerticalLayout);
+
+            const Vector<AttributeInfo>* attrs = c->GetAttributes();
+
+            if (attrs)
+                for (unsigned i = 0; i < attrs->Size(); i++)
+                {
+                    const AttributeInfo* attr = &attrs->At(i);
+
+                    InspectorDataBinding*  binding = InspectorDataBinding::Create(c, attr);
+
+                    if (binding)
+                    {
+                        dataBindings_.Push(binding);
+
+                        TBLayout* attrLayout = new TBLayout();
+
+                        attrLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
+                        TBTextField* name = new TBTextField();
+
+                        String bname = attr->name_;
+                        if (bname == "Is Enabled")
+                            bname = "Enabled";
+
+                        name->SetText(bname.CString());
+                        name->SetFontDescription(fd);
+
+                        attrLayout->AddChild(name);
+                        TBWidget* bwidget = binding->GetWidget();
+                        attrLayout->AddChild(bwidget);
+
+                        attrsVerticalLayout->AddChild(attrLayout);
+                    }
+
+                }
+
+            nodeLayout->AddChild(componentContainer);
+
+        }
+
+
+        /*
+
 
         // enabled and name
         TBLayout* nameLayout = new TBLayout();
@@ -488,12 +567,16 @@ void InspectorFrame::InspectNode(Node* node)
             nodeLayout->AddChild(sep);
         }
 
-        inspectorContainer_->AddChild(nodeLayout);
+
 
         RefreshTransform();
-    }
+        */
 
-    refreshing_ = false;
+        inspectorContainer_->AddChild(nodeLayout);
+
+        for (unsigned i = 0; i < dataBindings_.Size(); i++)
+            dataBindings_[i]->SetWidgetValueFromObject();
+    }
 
 }
 

@@ -57,8 +57,9 @@ public:
     float GetFadeAlpha() { return fadeAlpha_; }
     void SetFadeAlpha(float fadeAlpha) { fadeAlpha_ = fadeAlpha; }
 
-
     void Initialize();
+
+    void Shutdown();
 
 private:
 
@@ -82,6 +83,8 @@ private:
     SharedPtr<VertexBuffer> vertexBuffer_;
 
     WeakPtr<Graphics> graphics_;
+
+    bool shuttingDown_;
 
 
 

@@ -245,7 +245,8 @@ TBUI::TBUI(Context* context) :
     fadeAlpha_(1.0f),
     fadeTarget_(1.0f),
     currentFadeTime_(0.0f),
-    fadeTime_(0.0f)
+    fadeTime_(0.0f),
+    shuttingDown_(false)
 {
     SubscribeToEvent(E_SCREENMODE, HANDLER(TBUI, HandleScreenMode));
 }
@@ -328,6 +329,12 @@ void TBUI::Initialize()
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 
     initialized_ = true;
+}
+
+void TBUI::Shutdown()
+{
+    shuttingDown_ = true;
+    SetInputDisabled(true);
 }
 
 void TBUI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)

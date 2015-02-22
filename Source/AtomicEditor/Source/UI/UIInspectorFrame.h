@@ -5,7 +5,6 @@
 #pragma once
 
 #include "AEWidget.h"
-#include "UIMenubar.h"
 
 #include <Atomic/Scene/Scene.h>
 
@@ -23,6 +22,7 @@ namespace AtomicEditor
 
 class ListView;
 class ListViewItem;
+class InspectorDataBinding;
 
 class InspectorFrame : public AEWidget
 {
@@ -39,40 +39,13 @@ public:
 
 private:
 
-    struct DataBinding
-    {
-        TBWidget* widget;
-        Component* component;
-        unsigned attrIndex;
-    };
-
-    void Clear();
-
     void InspectNode(Node* node);
-
-    void CreateTransformLayout();
-
-    TBLayout* CreateComponentLayout(Component *component);
-    void RefreshTransform();
 
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
 
     TBLayout* inspectorContainer_;
 
-    TBLayout* transformLayout_;
-    TBInlineSelect* posXSelect_;
-    TBInlineSelect* posYSelect_;
-    TBInlineSelect* posZSelect_;
-    TBInlineSelect* rotXSelect_;
-    TBInlineSelect* rotYSelect_;
-    TBInlineSelect* rotZSelect_;
-    TBInlineSelect* scaleXSelect_;
-    TBInlineSelect* scaleYSelect_;
-    TBInlineSelect* scaleZSelect_;
-
-    Vector<DataBinding> dataBindings_;
-
-    bool refreshing_;
+    Vector<InspectorDataBinding*> dataBindings_;
 
     SharedPtr<Node> node_;
 

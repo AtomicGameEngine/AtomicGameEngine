@@ -308,6 +308,9 @@ void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
         aepreferences_->Write();
     }
 
+    TBUI* tbui = GetSubsystem<TBUI>();
+    tbui->Shutdown();
+
     mainframe_ = 0;
     player_ = 0;
     project_ = 0;
