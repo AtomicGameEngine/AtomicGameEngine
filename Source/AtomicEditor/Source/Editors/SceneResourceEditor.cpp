@@ -7,6 +7,11 @@
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Graphics/Camera.h>
+
+#include <Atomic/Graphics/DebugRenderer.h>
+#include <Atomic/Graphics/Viewport.h>
+#include <Atomic/Graphics/Octree.h>
+
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -51,6 +56,22 @@ SceneResourceEditor ::SceneResourceEditor(Context* context, const String &fullpa
 
     scene_->SetUpdateEnabled(false);
 
+    debugRenderer_ = scene_->GetComponent<DebugRenderer>();
+
+    if (debugRenderer_.Null())
+    {
+        debugRenderer_ = scene_->CreateComponent<DebugRenderer>();
+    }
+
+    octree_ = scene_->GetComponent<Octree>();
+
+    if (octree_.Null())
+    {
+        LOGWARNING("Scene without an octree loaded");
+        octree_ = scene_->CreateComponent<Octree>();
+    }
+
+
     cameraNode_ = scene_->CreateChild("Camera");
     camera_ = cameraNode_->CreateComponent<Camera>();
 
@@ -67,6 +88,7 @@ SceneResourceEditor ::SceneResourceEditor(Context* context, const String &fullpa
     GetSubsystem<UI>()->GetRoot()->AddChild(view3D_);
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneResourceEditor, HandleUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneResourceEditor, HandlePostRenderUpdate));
 
     // TODO: generate this event properly
     VariantMap eventData;
@@ -120,6 +142,38 @@ void SceneResourceEditor::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input->GetKeyDown('D'))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
+}
+
+void SceneResourceEditor::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (!view3D_->IsVisible())
+        return;
+
+    UI* ui = GetSubsystem<UI>();
+    Viewport* viewport = view3D_->GetViewport();
+    IntRect view = viewport->GetRect();
+
+    IntVector2 cpos = ui->GetCursorPosition();
+
+    Ray camRay = camera_->GetScreenRay(float(cpos.x_ - view3D_->GetPosition().x_) / view3D_->GetSize().x_,
+                          float(cpos.y_ - view3D_->GetPosition().y_) / view3D_->GetSize().y_);
+
+    PODVector<RayQueryResult> result;
+    RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, DEFAULT_VIEWMASK);
+    octree_->RaycastSingle(query);
+
+    if (query.result_.Size())
+    {
+        const RayQueryResult& r = result[0];
+
+        if (r.drawable_)
+        {
+            debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
+            r.drawable_->DrawDebugGeometry(debugRenderer_, false);
+        }
+
+    }
+
 }
 
 void SceneResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventData)

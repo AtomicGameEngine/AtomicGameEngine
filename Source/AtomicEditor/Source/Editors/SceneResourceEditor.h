@@ -16,6 +16,8 @@ class Scene;
 class Node;
 class View3D;
 class Camera;
+class DebugRenderer;
+class Octree;
 }
 
 namespace AtomicEditor
@@ -35,9 +37,10 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
 private:
+
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
 
     void MoveCamera(float timeStep);
 
@@ -50,6 +53,9 @@ private:
 
     TBLayout* layout_;
     TBContainer* view3DContainer_;
+
+    WeakPtr<DebugRenderer> debugRenderer_;
+    WeakPtr<Octree> octree_;
 
 };
 
