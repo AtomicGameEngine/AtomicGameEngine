@@ -255,12 +255,22 @@ TBLayout* ProjectFrame::CreateButtonLayout(const String& fullpath, const String&
     blayout->AddChild(spacer);
 
     TBButton* button = new TBButton();
+
+    LayoutParams lp;
+    lp.SetHeight(20);
+
+    TBFontDescription fd;
+    fd.SetID(TBIDC("Vera"));
+    fd.SetSize(11);
+
     button->SetGravity(WIDGET_GRAVITY_LEFT);
     TBSkinImage* image = new TBSkinImage(bitmapID);
-    image->SetRect(TBRect(0, 0, 16, 16));
+    image->SetRect(TBRect(0, 0, 12, 12));
     image->SetGravity(WIDGET_GRAVITY_RIGHT);
     blayout->AddChild(image);
     button->SetID(TBIDC(fullpath.CString()));
+    button->SetLayoutParams(lp);
+    button->SetFontDescription(fd);
     button->SetText(text.CString());
     button->SetSkinBg(TBIDC("TBButton.flat"));
     blayout->AddChild(button);
@@ -289,11 +299,21 @@ void ProjectFrame::RefreshContent(const String& fullpath)
 
     if (fullpath != project->GetResourcePath())
     {
+        LayoutParams lp;
+        lp.SetHeight(20);
+
+        TBFontDescription fd;
+        fd.SetID(TBIDC("Vera"));
+        fd.SetSize(11);
+
         TBButton* button = new TBButton();
         button->SetGravity(WIDGET_GRAVITY_LEFT);
-        button->SetText("..");
+        button->SetText("..                     ");
         button->SetID(TBIDC(".."));
         button->SetSkinBg(TBIDC("TBButton.flat"));
+        button->SetLayoutParams(lp);
+        button->SetFontDescription(fd);
+
         container->AddChild(button);
     }
 

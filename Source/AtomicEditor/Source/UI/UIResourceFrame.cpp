@@ -118,6 +118,11 @@ void ResourceFrame::EditResource(const String& fullpath)
         JSResourceEditor* jse = new JSResourceEditor(context_, fullpath, tabcontainer_);
         editor = jse;
     }
+    else if (ext == ".scene")
+    {
+        SceneResourceEditor* sre = new SceneResourceEditor(context_, fullpath, tabcontainer_);
+        editor = sre;
+    }
     else if (ext == ".xml" || ext == ".txt")
     {
         //SceneResourceEditor* sre = new SceneResourceEditor(context_, fullpath, tabcontainer_);

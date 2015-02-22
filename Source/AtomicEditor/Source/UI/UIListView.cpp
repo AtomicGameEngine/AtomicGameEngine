@@ -55,10 +55,15 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
         GetContentRoot()->AddChild(skinImage);
     }
 
+    TBFontDescription fd;
+    fd.SetID(TBIDC("Vera"));
+    fd.SetSize(11);
+
     TBTextField* tfield = new TBTextField();
     tfield->SetIgnoreInput(true);
     tfield->SetSkinBg(TBIDC("Folder"));
     tfield->SetText(item->str);
+    tfield->SetFontDescription(fd);
 
     SetSkinBg(TBIDC("TBSelectItem"));
     GetContentRoot()->AddChild(tfield);
@@ -68,6 +73,11 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
 
 bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_WHEEL)
+    {
+        return false;
+    }
+
     // get clicks this way, not sure we want to
     if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == item_->id)
     {
@@ -114,7 +124,7 @@ ListView::ListView(Context* context, const TBID& id) :
 {
     rootList_ = new TBSelectList();
     rootList_->SetID(id);
-    //rootList_->GetScrollContainer()->SetScrollMode(SCROLL_MODE_X_AUTO_Y_AUTO);
+
 
     // dummy filter so filter is called
     rootList_->SetFilter(" ");

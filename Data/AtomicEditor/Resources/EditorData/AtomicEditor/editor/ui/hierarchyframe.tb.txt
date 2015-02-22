@@ -1,0 +1,17 @@
+definitions
+	menubutton		
+		lp: height: 20
+		font: name: Vera, size: 11
+TBLayout: distribution: gravity, axis: y, id: hierarchyframe
+	lp: min-width: 220
+	TBLayout: distribution: gravity
+		TBButton
+			@include definitions>menubutton
+			text Create
+			id menu create
+		TBEditField
+			id filter
+			gravity left right
+			placeholder @search
+			type search	
+	TBLayout: distribution: gravity, id: hierarchycontainer, gravity: all

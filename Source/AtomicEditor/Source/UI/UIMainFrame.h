@@ -24,6 +24,8 @@ namespace AtomicEditor
 {
 
 class ProjectFrame;
+class HierarchyFrame;
+class InspectorFrame;
 class ResourceFrame;
 class FindTextWidget;
 class MainToolbar;
@@ -55,6 +57,7 @@ public:
     bool OnEvent(const TBWidgetEvent &ev);
 
     ProjectFrame* GetProjectFrame();
+    HierarchyFrame* GetHierarchyFrame();
     ResourceFrame* GetResourceFrame();
     WelcomeFrame* GetWelcomeFrame();
     FindTextWidget* GetFindTextWidget();
@@ -95,6 +98,8 @@ private:
     TBSkinImage* platformIndicator_;
 
     SharedPtr<ProjectFrame> projectframe_;
+    SharedPtr<HierarchyFrame> hierarchyframe_;
+    SharedPtr<InspectorFrame> inspectorframe_;
     SharedPtr<ResourceFrame> resourceframe_;
     SharedPtr<FindTextWidget> findtextwidget_;
     SharedPtr<MainToolbar> maintoolbar_;

@@ -12,7 +12,8 @@
 
 #include <Atomic/Physics/PhysicsWorld.h>
 
-#include "../AEEditor.h"
+#include "AEEditor.h"
+#include "AEEvents.h"
 
 #include <Atomic/Input/Input.h>
 #include "SceneResourceEditor.h"
@@ -43,36 +44,17 @@ SceneResourceEditor ::SceneResourceEditor(Context* context, const String &fullpa
     scene_ = new Scene(context_);
     SharedPtr<File> xmlFile = cache->GetFile(fullpath);
 
-    if (GetExtension(fullpath) == ".xml")
+    if (GetExtension(fullpath) == ".scene")
         scene_->LoadXML(*xmlFile);
     else
         scene_->Load(*xmlFile);
 
-    // TODO: Fix this properly, currently simulates immediately
-    PhysicsWorld* physics = scene_->GetComponent<PhysicsWorld>();
-    if (physics)
-        scene_->RemoveComponent(physics);
+    scene_->SetUpdateEnabled(false);
 
     cameraNode_ = scene_->CreateChild("Camera");
     camera_ = cameraNode_->CreateComponent<Camera>();
 
-    if (fullpath_.Contains("CompartmentScene"))
-    {
-        pitch_ = 19.4f;
-        yaw_ = -228.6f;
-        cameraNode_->SetPosition(Vector3(-42.66f, 6.68f, 9.34f));
-    }
-    else
-    {
-        pitch_ = 26.8f;
-        yaw_ = 121.4f;
-        cameraNode_->SetPosition(Vector3(-135.81f, 76.56f, 16.42f));
-    }
-
-
-    // in a view3D_ procsky renders wrong (inversed?)
-    //Node* skyNode = scene_->CreateChild("ProcSky", LOCAL );
-    //skyNode->CreateComponent<ProcSky>();
+    cameraNode_->SetPosition(Vector3(0, 0, -10));
 
     layout_->AddChild(view3DContainer_);
 
@@ -82,15 +64,20 @@ SceneResourceEditor ::SceneResourceEditor(Context* context, const String &fullpa
     view3D_->SetView(scene_, camera_);
     view3D_->SetAutoUpdate(false);
 
-    GetSubsystem<TBUI>()->AddChild(view3D_);
+    GetSubsystem<UI>()->GetRoot()->AddChild(view3D_);
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneResourceEditor, HandleUpdate));
+
+    // TODO: generate this event properly
+    VariantMap eventData;
+    eventData[EditorActiveSceneChange::P_SCENE] = scene_;
+    SendEvent(E_EDITORACTIVESCENECHANGE, eventData);
 
 }
 
 SceneResourceEditor::~SceneResourceEditor()
 {
-
+    GetSubsystem<UI>()->GetRoot()->RemoveChild(view3D_);
 }
 
 bool SceneResourceEditor::OnEvent(const TBWidgetEvent &ev)
@@ -136,7 +123,7 @@ void SceneResourceEditor::MoveCamera(float timeStep)
 }
 
 void SceneResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventData)
-{    
+{
 
     if ((layout_->GetVisibility() != WIDGET_VISIBILITY_VISIBLE) || GetSubsystem<Editor>()->IsPlayingProject())
     {
@@ -183,9 +170,9 @@ void SceneResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventDa
 
     if (dirty)
     {
+
         view3D_->SetPosition(rect.x, rect.y);
-        view3D_->SetWidth(rect.w);
-        view3D_->SetHeight(rect.h);
+        view3D_->SetSize(rect.w, rect.h);
     }
 
     view3D_->QueueUpdate();

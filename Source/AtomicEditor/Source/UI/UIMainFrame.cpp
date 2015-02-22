@@ -19,6 +19,8 @@
 #include "UIMainFrame.h"
 #include "UIMainToolbar.h"
 #include "UIProjectFrame.h"
+#include "UIHierarchyFrame.h"
+#include "UIInspectorFrame.h"
 #include "UIPlayerWidget.h"
 #include "UIResourceFrame.h"
 #include "UIWelcomeFrame.h"
@@ -39,7 +41,6 @@
 #include "Project/ProjectUtils.h"
 
 #include "Tools/External/AEExternalTooling.h"
-
 
 using namespace tb;
 
@@ -82,6 +83,27 @@ MainFrame::MainFrame(Context* context) :
     rect = projectviewcontainer->GetRect();
     wd->SetSize(rect.w, rect.h);
     projectviewcontainer->AddChild(wd);
+
+    hierarchyframe_ = new HierarchyFrame(context_);
+    TBLayout* hierarchycontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("hierarchycontainer"));
+    assert(hierarchycontainer);
+
+    // better way to do this? projectviewcontainer isn't a layout
+    wd = hierarchyframe_->GetWidgetDelegate();
+    rect = hierarchycontainer->GetRect();
+    wd->SetSize(rect.w, rect.h);
+    hierarchycontainer->AddChild(wd);
+
+    inspectorframe_ = new InspectorFrame(context_);
+    TBLayout* inspectorcontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("inspectorcontainer"));
+    assert(inspectorcontainer);
+
+    // better way to do this? inspectorcontainer isn't a layout
+    wd = inspectorframe_->GetWidgetDelegate();
+    rect = inspectorcontainer->GetRect();
+    wd->SetSize(rect.w, rect.h);
+    inspectorcontainer->AddChild(wd);
+
 
     resourceviewcontainer_ = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("resourceviewcontainer"));
     assert(resourceviewcontainer_);
