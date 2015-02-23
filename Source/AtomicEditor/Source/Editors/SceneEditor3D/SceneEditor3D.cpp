@@ -66,6 +66,10 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
 
     container_->GetContentRoot()->AddChild(layout_);
 
+    gizmo3D_ = new Gizmo3D(context_);
+    gizmo3D_->SetView(sceneView_);
+    gizmo3D_->Show();
+
     SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
 
@@ -78,6 +82,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
 
 SceneEditor3D::~SceneEditor3D()
 {
+
 }
 
 bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
@@ -87,11 +92,14 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 
 void SceneEditor3D::SelectNode(Node* node)
 {
-
+    selectedNode_ = node;
 }
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {    
+    Vector<Node*> editNodes;
+    editNodes.Push(selectedNode_);
+    gizmo3D_->Update(editNodes);
 }
 
 void SceneEditor3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)

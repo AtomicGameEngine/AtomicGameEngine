@@ -8,10 +8,15 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/Math/MathDefs.h>
 #include <Atomic/Math/Ray.h>
 #include <Atomic/Scene/Scene.h>
 
 #include <Atomic/Graphics/StaticModel.h>
+#include <Atomic/Graphics/Camera.h>
+
+
+#include "SceneView3D.h"
 
 using namespace Atomic;
 
@@ -45,35 +50,29 @@ public:
         lastD_ = 0.0;
     }
 
-    /*
-    void Update(Ray cameraRay, float scale, bool drag)
+    void Update(Ray cameraRay, float scale, bool drag, Node* cameraNode)
     {
-        // Do not select when UI has modal element
-        if (ui.HasModalElement())
-        {
-            selected = false;
-            return;
-        }
+        const float axisMaxD = 0.1f;
+        const float axisMaxT = 1.0f;
 
-        Vector3 closest = cameraRay.ClosestPoint(axisRay);
-        Vector3 projected = axisRay.Project(closest);
-        d = axisRay.Distance(closest);
-        t = (projected - axisRay.origin).DotProduct(axisRay.direction);
+        Vector3 closest = cameraRay.ClosestPoint(axisRay_);
+        Vector3 projected = axisRay_.Project(closest);
+        d_ = axisRay_.Distance(closest);
+        t_ = (projected - axisRay_.origin_).DotProduct(axisRay_.direction_);
 
         // Determine the sign of d from a plane that goes through the camera position to the axis
-        Plane axisPlane(cameraNode.position, axisRay.origin, axisRay.origin + axisRay.direction);
+        Plane axisPlane(cameraNode->GetPosition(), axisRay_.origin_, axisRay_.origin_ + axisRay_.direction_);
         if (axisPlane.Distance(closest) < 0.0)
-            d = -d;
+            d_ = -d_;
 
         // Update selected status only when not dragging
         if (!drag)
         {
-            selected = Abs(d) < axisMaxD * scale && t >= -axisMaxD * scale && t <= axisMaxT * scale;
-            lastT = t;
-            lastD = d;
+            selected_ = Abs(d_) < axisMaxD * scale && t_ >= -axisMaxD * scale && t_ <= axisMaxT * scale;
+            lastT_ = t_;
+            lastD_ = d_;
         }
     }
-    */
 
     void Moved()
     {
@@ -88,27 +87,58 @@ class Gizmo3D: public Object
 
 public:
 
-    enum GizmoMode
+    enum EditMode
     {
-        EDIT_MOVE
+        EDIT_SELECT,
+        EDIT_MOVE,
+        EDIT_ROTATE,
+        EDIT_SCALE
+    };
+
+    enum AxisMode
+    {
+        AXIS_WORLD = 0,
+        AXIS_LOCAL
     };
 
     Gizmo3D(Context* context);
     virtual ~Gizmo3D();
 
+    void SetView(SceneView3D* view3D);
+
+    void Show();
+    void Hide();
+    void Update(Vector<Node*>& editNodes);
+
     Node* GetGizmoNode() { return gizmoNode_; }
 
 private:
 
+    void Position();
+    void Use();
+    void Drag();
+    void Moved();
+    void CalculateGizmoAxes();
+
+    bool MoveEditNodes(Vector3 adjust);
+
     SharedPtr<Node> gizmoNode_;
 
+    WeakPtr<SceneView3D> view3D_;
+    WeakPtr<Scene> scene_;
+    WeakPtr<Camera> camera_;
     WeakPtr<StaticModel> gizmo_;
 
     Gizmo3DAxis gizmoAxisX_;
     Gizmo3DAxis gizmoAxisY_;
     Gizmo3DAxis gizmoAxisZ_;
 
-    GizmoMode lastGizmoMode_;
+    EditMode editMode_;
+    EditMode lastEditMode_;
+
+    AxisMode axisMode_;
+
+    Vector<Node *> *editNodes_;
 
 };
 

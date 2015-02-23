@@ -8,6 +8,7 @@
 
 #include "../ResourceEditor.h"
 #include "SceneView3D.h"
+#include "Gizmo3D.h"
 
 using namespace Atomic;
 using namespace tb;
@@ -51,6 +52,8 @@ private:
 
     // TODO: multiple views
     SharedPtr<SceneView3D> sceneView_;
+
+    SharedPtr<Gizmo3D> gizmo3D_;
 
     TBLayout* layout_;
     TBContainer* view3DContainer_;

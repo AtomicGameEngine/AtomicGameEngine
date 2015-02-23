@@ -34,6 +34,8 @@ public:
     virtual ~SceneView3D();
     void SelectNode(Node* node);
 
+    Ray GetCameraRay();
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

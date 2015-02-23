@@ -125,23 +125,28 @@ void SceneView3D::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
-void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+Ray SceneView3D::GetCameraRay()
 {
+    Ray camRay;
 
-    /*
     UI* ui = GetSubsystem<UI>();
 
     IntVector2 cpos = ui->GetCursorPosition();
 
-    TBRect rect = widget_->GetRect();
+    TBRect rect = GetWidgetDelegate()->GetRect();
 
     if (!rect.w || !rect.h)
-        return;
+        return camRay;
 
-    widget_->ConvertToRoot(rect.x, rect.y);
+    GetWidgetDelegate()->ConvertToRoot(rect.x, rect.y);
 
-    Ray camRay = camera_->GetScreenRay(float(cpos.x_ - rect.x) / rect.w,
-                          float(cpos.y_ - rect.y) /rect.h);
+    return  camera_->GetScreenRay(float(cpos.x_ - rect.x) / rect.w,
+                                       float(cpos.y_ - rect.y) /rect.h);
+}
+
+void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    Ray camRay  = GetCameraRay();
 
     PODVector<RayQueryResult> result;
     RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, DEFAULT_VIEWMASK);
@@ -158,7 +163,6 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
         }
 
     }
-    */
 
 }
 
