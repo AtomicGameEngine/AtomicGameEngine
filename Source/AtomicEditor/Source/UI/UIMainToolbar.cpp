@@ -11,6 +11,9 @@
 #include "../AETypes.h"
 #include "../AEEditor.h"
 
+#include "UIMainFrame.h"
+#include "UIResourceFrame.h"
+
 using namespace tb;
 
 namespace AtomicEditor
@@ -32,6 +35,14 @@ bool MainToolbar::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CLICK)
     {
+        if (ev.target->GetID() == TBIDC("3d_translate") ||
+                ev.target->GetID() == TBIDC("3d_rotate") ||
+                ev.target->GetID() == TBIDC("3d_scale") )
+        {
+            ResourceFrame* rframe = GetSubsystem<MainFrame>()->GetResourceFrame();
+            rframe->SendCurrentEditorEvent(ev);
+        }
+
         if (ev.target && ev.target->GetID() == TBIDC("maintoolbar_play"))
         {
             if (GetSubsystem<Editor>()->IsPlayingProject())

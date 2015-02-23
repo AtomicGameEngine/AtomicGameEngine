@@ -314,6 +314,17 @@ void ResourceFrame::ShowConsoleWidget(bool show)
 
 }
 
+void ResourceFrame::SendCurrentEditorEvent(const TBWidgetEvent &ev)
+{
+    TBWidget* widget = tabcontainer_->GetCurrentPageWidget();
+    if (!widget)
+        return;
+
+    if (editorLookup_.Contains(widget))
+        editorLookup_[widget]->OnEvent(ev);
+
+}
+
 void ResourceFrame::NavigateToResource(const String& fullpath, int lineNumber, int tokenPos)
 {
     if (!editors_.Contains(fullpath))

@@ -87,6 +87,25 @@ SceneEditor3D::~SceneEditor3D()
 
 bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.target)
+    {
+        if (ev.target->GetID() == TBIDC("3d_translate"))
+        {
+            gizmo3D_->SetEditMode(Gizmo3D::EDIT_MOVE);
+            return false;
+        }
+        else if (ev.target->GetID() == TBIDC("3d_rotate"))
+        {
+            gizmo3D_->SetEditMode(Gizmo3D::EDIT_ROTATE);
+            return false;
+        }
+        else if (ev.target->GetID() == TBIDC("3d_scale"))
+        {
+            gizmo3D_->SetEditMode(Gizmo3D::EDIT_SCALE);
+            return false;
+        }
+    }
+
     return false;
 }
 

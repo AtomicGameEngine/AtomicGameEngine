@@ -1,3 +1,5 @@
+// Portions Copyright (c) 2008-2015 the Urho3D project.
+
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
@@ -12,6 +14,7 @@
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Octree.h>
+#include <Atomic/Graphics/Terrain.h>
 
 #include <Atomic/Input/Input.h>
 
@@ -144,12 +147,47 @@ Ray SceneView3D::GetCameraRay()
                                        float(cpos.y_ - rect.y) /rect.h);
 }
 
+void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
+{
+    if (drawNode)
+        debug->AddNode(node, 1.0, false);
+
+    // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
+    // components can have a large performance hit. Also do not draw terrain child nodes due to their large amount
+    // (TerrainPatch component itself draws nothing as debug geometry)
+    if (node != scene_ && !node->GetComponent<Terrain>())
+    {
+        const Vector<SharedPtr<Component> >& components = node->GetComponents();
+
+        for (uint j = 0; j < components.Size(); ++j)
+            components[j]->DrawDebugGeometry(debug, false);
+
+        // To avoid cluttering the view, do not draw the node axes for child nodes
+        for (uint k = 0; k < node->GetNumChildren(); ++k)
+            DrawNodeDebug(node->GetChild(k), debug, false);
+    }
+}
+
+
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
+
+    // Visualize the currently selected nodes
+    if (selectedNode_.NotNull())
+    {
+
+    }
+    //for (uint i = 0; i < selectedNodes.length; ++i)
+        DrawNodeDebug(selectedNode_, debugRenderer_);
+
+    // Visualize the currently selected components
+    //for (uint i = 0; i < selectedComponents.length; ++i)
+    //    selectedComponents[i].DrawDebugGeometry(debug, false);
+
     Ray camRay  = GetCameraRay();
 
     PODVector<RayQueryResult> result;
-    RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, DEFAULT_VIEWMASK);
+    RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, 0x7fffffff);
     octree_->RaycastSingle(query);
 
     if (query.result_.Size())
@@ -168,7 +206,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
 void SceneView3D::SelectNode(Node* node)
 {
-
+    selectedNode_ = node;
 }
 
 void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)

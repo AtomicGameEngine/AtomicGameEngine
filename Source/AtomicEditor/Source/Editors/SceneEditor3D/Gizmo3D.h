@@ -106,6 +106,8 @@ public:
 
     void SetView(SceneView3D* view3D);
 
+    void SetEditMode(EditMode);
+
     void Show();
     void Hide();
     void Update(Vector<Node*>& editNodes);
@@ -121,6 +123,8 @@ private:
     void CalculateGizmoAxes();
 
     bool MoveEditNodes(Vector3 adjust);
+    bool RotateEditNodes(Vector3 adjust);
+    bool ScaleEditNodes(Vector3 adjust);
 
     SharedPtr<Node> gizmoNode_;
 

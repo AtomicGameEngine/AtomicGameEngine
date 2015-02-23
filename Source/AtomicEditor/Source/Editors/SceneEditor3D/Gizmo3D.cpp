@@ -27,10 +27,6 @@ Gizmo3D::Gizmo3D(Context* context) : Object(context)
     gizmoNode_ = new Node(context_);
     gizmo_ = gizmoNode_->CreateComponent<StaticModel>();
     gizmo_->SetModel(cache->GetResource<Model>("AtomicEditor/Models/Axes.mdl"));
-    gizmo_->SetMaterial(0, cache->GetResource<Material>("AtomicEditor/Materials/RedUnlit.xml"));
-    gizmo_->SetMaterial(1, cache->GetResource<Material>("AtomicEditor/Materials/GreenUnlit.xml"));
-    gizmo_->SetMaterial(2, cache->GetResource<Material>("AtomicEditor/Materials/BlueUnlit.xml"));
-
 
     gizmo_->SetEnabled(false);
     gizmo_->SetViewMask(0x80000000); // Editor raycasts use viewmask 0x7fffffff
@@ -42,8 +38,8 @@ Gizmo3D::Gizmo3D(Context* context) : Object(context)
     gizmoAxisY_.lastSelected_ = false;
     gizmoAxisZ_.lastSelected_ = false;
 
-    editMode_ = EDIT_MOVE;
-    lastEditMode_ = EDIT_MOVE;
+    editMode_ = EDIT_SELECT;
+    lastEditMode_ = EDIT_SELECT;
 }
 
 Gizmo3D::~Gizmo3D()
@@ -77,7 +73,7 @@ void Gizmo3D::Position()
 
     if (editNodes_->Empty() || containsScene)
     {
-        //HideGizmo();
+        Hide();
         return;
     }
 
@@ -249,6 +245,94 @@ bool Gizmo3D::MoveEditNodes(Vector3 adjust)
 
 }
 
+bool Gizmo3D::RotateEditNodes(Vector3 adjust)
+{
+    bool moved = false;
+
+    /*
+    if (rotateSnap)
+    {
+        float rotateStepScaled = rotateStep * snapScale;
+        adjust.x = Floor(adjust.x / rotateStepScaled + 0.5) * rotateStepScaled;
+        adjust.y = Floor(adjust.y / rotateStepScaled + 0.5) * rotateStepScaled;
+        adjust.z = Floor(adjust.z / rotateStepScaled + 0.5) * rotateStepScaled;
+    }
+    */
+
+    if (adjust.Length() > M_EPSILON)
+    {
+        moved = true;
+
+        for (uint i = 0; i < editNodes_->Size(); ++i)
+        {
+            Node* node = editNodes_->At(i);
+            Quaternion rotQuat(adjust.x_, adjust.y_, adjust.z_);
+            if (axisMode_ == AXIS_LOCAL && editNodes_->Size() == 1)
+                node->SetRotation(node->GetRotation() * rotQuat);
+            else
+            {
+                Vector3 offset = node->GetWorldPosition() - gizmoAxisX_.axisRay_.origin_;
+                if (node->GetParent() && node->GetParent()->GetWorldRotation() != Quaternion(1, 0, 0, 0))
+                    rotQuat = node->GetParent()->GetWorldRotation().Inverse() * rotQuat * node->GetParent()->GetWorldRotation();
+                node->SetRotation(rotQuat * node->GetRotation());
+                Vector3 newPosition = gizmoAxisX_.axisRay_.origin_ + rotQuat * offset;
+                if (node->GetParent())
+                    newPosition = node->GetParent()->WorldToLocal(newPosition);
+                node->SetPosition(newPosition);
+            }
+        }
+    }
+
+    return moved;
+}
+
+bool Gizmo3D::ScaleEditNodes(Vector3 adjust)
+{
+    bool moved = false;
+
+    if (adjust.Length() > M_EPSILON)
+    {
+        for (uint i = 0; i < editNodes_->Size(); ++i)
+        {
+            Node* node = editNodes_->At(i);
+
+            Vector3 scale = node->GetScale();
+            Vector3 oldScale = scale;
+
+            if (true)//!scaleSnap)
+                scale += adjust;
+            else
+            {
+                /*
+                float scaleStepScaled = scaleStep * snapScale;
+                if (adjust.x != 0)
+                {
+                    scale.x += adjust.x * scaleStepScaled;
+                    scale.x = Floor(scale.x / scaleStepScaled + 0.5) * scaleStepScaled;
+                }
+                if (adjust.y != 0)
+                {
+                    scale.y += adjust.y * scaleStepScaled;
+                    scale.y = Floor(scale.y / scaleStepScaled + 0.5) * scaleStepScaled;
+                }
+                if (adjust.z != 0)
+                {
+                    scale.z += adjust.z * scaleStepScaled;
+                    scale.z = Floor(scale.z / scaleStepScaled + 0.5) * scaleStepScaled;
+                }
+                */
+            }
+
+            if (scale != oldScale)
+                moved = true;
+
+            node->SetScale(scale);
+        }
+    }
+
+    return moved;
+}
+
 void Gizmo3D::Moved()
 {
     gizmoAxisX_.Moved();
@@ -260,6 +344,8 @@ void Gizmo3D::Moved()
 void Gizmo3D::Drag()
 {
     bool moved = false;
+
+    float scale = gizmoNode_->GetScale().x_;
 
     if (editMode_ == EDIT_MOVE)
     {
@@ -273,39 +359,39 @@ void Gizmo3D::Drag()
 
         moved = MoveEditNodes(adjust);
     }
-    /*
-    else if (editMode == EDIT_ROTATE)
+    else if (editMode_ == EDIT_ROTATE)
     {
-        Vector3 adjust(0, 0, 0);
-        if (gizmoAxisX.selected)
-            adjust.x = (gizmoAxisX.d - gizmoAxisX.lastD) * rotSensitivity / scale;
-        if (gizmoAxisY.selected)
-            adjust.y = -(gizmoAxisY.d - gizmoAxisY.lastD) * rotSensitivity / scale;
-        if (gizmoAxisZ.selected)
-            adjust.z = (gizmoAxisZ.d - gizmoAxisZ.lastD) * rotSensitivity / scale;
+        const float rotSensitivity = 50.0;
 
-        moved = RotateNodes(adjust);
+        Vector3 adjust(0, 0, 0);
+        if (gizmoAxisX_.selected_)
+            adjust.x_ = (gizmoAxisX_.d_ - gizmoAxisX_.lastD_) * rotSensitivity / scale;
+        if (gizmoAxisY_.selected_)
+            adjust.y_ = -(gizmoAxisY_.d_ - gizmoAxisY_.lastD_) * rotSensitivity / scale;
+        if (gizmoAxisZ_.selected_)
+            adjust.z_ = (gizmoAxisZ_.d_ - gizmoAxisZ_.lastD_) * rotSensitivity / scale;
+
+        moved = RotateEditNodes(adjust);
     }
-    else if (editMode == EDIT_SCALE)
+    else if (editMode_ == EDIT_SCALE)
     {
         Vector3 adjust(0, 0, 0);
-        if (gizmoAxisX.selected)
-            adjust += Vector3(1, 0, 0) * (gizmoAxisX.t - gizmoAxisX.lastT);
-        if (gizmoAxisY.selected)
-            adjust += Vector3(0, 1, 0) * (gizmoAxisY.t - gizmoAxisY.lastT);
-        if (gizmoAxisZ.selected)
-            adjust += Vector3(0, 0, 1) * (gizmoAxisZ.t - gizmoAxisZ.lastT);
+        if (gizmoAxisX_.selected_)
+            adjust += Vector3(1, 0, 0) * (gizmoAxisX_.t_ - gizmoAxisX_.lastT_);
+        if (gizmoAxisY_.selected_)
+            adjust += Vector3(0, 1, 0) * (gizmoAxisY_.t_ - gizmoAxisY_.lastT_);
+        if (gizmoAxisZ_.selected_)
+            adjust += Vector3(0, 0, 1) * (gizmoAxisZ_.t_ - gizmoAxisZ_.lastT_);
 
         // Special handling for uniform scale: use the unmodified X-axis movement only
-        if (editMode == EDIT_SCALE && gizmoAxisX.selected && gizmoAxisY.selected && gizmoAxisZ.selected)
+        if (editMode_ == EDIT_SCALE && gizmoAxisX_.selected_ && gizmoAxisY_.selected_ && gizmoAxisZ_.selected_)
         {
-            float x = gizmoAxisX.t - gizmoAxisX.lastT;
+            float x = gizmoAxisX_.t_ - gizmoAxisX_.lastT_;
             adjust = Vector3(x, x, x);
         }
 
-        moved = ScaleNodes(adjust);
+        moved = ScaleEditNodes(adjust);
     }
-    */
 
     if (moved)
     {
@@ -316,6 +402,10 @@ void Gizmo3D::Drag()
 
 }
 
+void Gizmo3D::SetEditMode(EditMode mode)
+{
+    editMode_ = mode;
+}
 
 void Gizmo3D::Hide()
 {

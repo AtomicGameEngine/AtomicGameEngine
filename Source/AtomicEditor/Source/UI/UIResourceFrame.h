@@ -55,6 +55,8 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
+    void SendCurrentEditorEvent(const TBWidgetEvent &ev);
+
 private:
 
     void HandleFindText(StringHash eventType, VariantMap& eventData);
