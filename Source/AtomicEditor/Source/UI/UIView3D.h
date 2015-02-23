@@ -53,7 +53,7 @@ public:
     void OnResize(const IntVector2& newSize);
 
     /// Define the scene and camera to use in rendering. When ownScene is true the View3D will take ownership of them with shared pointers.
-    void SetView(Scene* scene, Camera* camera, bool ownScene = true);
+    void SetView(Scene* scene, Camera* camera);
     /// Set render texture pixel format. Default is RGB.
     void SetFormat(unsigned format);
     /// Set render target auto update mode. Default is true.

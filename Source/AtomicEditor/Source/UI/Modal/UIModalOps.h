@@ -62,6 +62,8 @@ class UIModalOps: public AEWidget, private TBWidgetListener
     void ShowPlatformsInfo();
     void ShowEulaAgreement();
 
+    void ShowPlayer();
+
     // Whether there is a modal window currently showing
     bool ModalActive() { return opWindow_.NotNull(); }
 

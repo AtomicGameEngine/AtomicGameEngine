@@ -20,6 +20,8 @@ class JSVM;
 namespace AtomicEditor
 {
 
+class UIPlayer;
+
 struct AEPlayerError
 {
     String name_;
@@ -46,7 +48,11 @@ public:
     void Invalidate();
 
     bool HasErrors() { return errors_.Size() != 0; }
+
     const Vector<AEPlayerError>& GetErrors() { return errors_; }
+
+    UIPlayer* GetUIPlayer() { return uiPlayer_; }
+    void SetUIPlayer(UIPlayer* uiPlayer);
 
 private:
 
@@ -56,6 +62,8 @@ private:
 
     void HandleJSError(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
+    WeakPtr<UIPlayer> uiPlayer_;
 
     SharedPtr<JSVM> vm_;
 

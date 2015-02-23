@@ -414,17 +414,17 @@ void ResourceFrame::CloseResourceEditor(ResourceEditor* editor, bool navigateToA
 
 void ResourceFrame::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
 {
-    delegate_->SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
+    //delegate_->SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
     delegate_->SetIgnoreInput(true);
-    delegate_->SetState(WIDGET_STATE_DISABLED, true);
+    //delegate_->SetState(WIDGET_STATE_DISABLED, true);
 }
 
 
 void ResourceFrame::HandlePlayStopped(StringHash eventType, VariantMap& eventData)
 {
-    delegate_->SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
+    //delegate_->SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
     delegate_->SetIgnoreInput(false);
-    delegate_->SetState(WIDGET_STATE_DISABLED, false);
+    //delegate_->SetState(WIDGET_STATE_DISABLED, false);
 }
 
 void ResourceFrame::CloseAllResourceEditors()

@@ -27,6 +27,13 @@
 namespace Atomic
 {
 
+
+static Viewport* __fixmeViewport = NULL;
+void FixMeSetLight2DGroupViewport(Viewport *viewport)
+{
+    __fixmeViewport = viewport;
+}
+
 extern const char* ATOMIC2D_CATEGORY;
 
 Light2D::Light2D(Context* context) : Component(context),
@@ -479,20 +486,22 @@ Light2DGroup::Light2DGroup(Context* context) : Drawable2D(context),
 }
 
 Light2DGroup::~Light2DGroup()
-{
+{   
     Renderer* renderer = GetSubsystem<Renderer>();
+
     if (renderer)
     {
-        Viewport* viewport = renderer->GetViewport(0);
+        Viewport* viewport = __fixmeViewport ? __fixmeViewport :  renderer->GetViewport(0);
         if (viewport)
         {
             RenderPath* renderpath = viewport->GetRenderPath();
             if (renderpath)
                 renderpath->RemoveCommands("Light2D");
-
         }
 
     }
+
+    __fixmeViewport = NULL;
 
 }
 
@@ -576,7 +585,7 @@ void Light2DGroup::SetAmbientColor(const Color& color)
     // only on main viewport atm and viewport must first be set
     if (renderer)
     {
-        Viewport* viewport = renderer->GetViewport(0);
+        Viewport* viewport = __fixmeViewport ? __fixmeViewport :  renderer->GetViewport(0);
         if (viewport)
         {
             RenderPath* renderpath = viewport->GetRenderPath();
@@ -590,7 +599,7 @@ void Light2DGroup::CreateLight2DMaterial()
 {
     Renderer* renderer = GetSubsystem<Renderer>();
     // only on main viewport atm and viewport must first be set
-    Viewport* viewport = renderer->GetViewport(0);
+    Viewport* viewport = __fixmeViewport ? __fixmeViewport :  renderer->GetViewport(0);
     RenderPath* renderpath = viewport->GetRenderPath();
 
     RenderTargetInfo ntarget;

@@ -19,11 +19,28 @@
 #include "AEEditor.h"
 #include "Project/AEProject.h"
 
+#include "UIPlayer.h"
+#include "UI/Modal/UIModalOps.h"
+
 // TODO: Remove dependency
 #include <Duktape/duktape.h>
 
 namespace AtomicEditor
 {
+
+static int js_atomiceditor_SetView(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    AEPlayer* player = vm->GetSubsystem<AEPlayer>();
+
+    Scene* scene = js_to_class_instance<Scene>(ctx, 0, 0);
+    Camera* camera = js_to_class_instance<Camera>(ctx, 1, 0);
+
+    player->GetUIPlayer()->SetView(scene, camera);
+
+    return 0;
+}
+
 
 AEPlayer::AEPlayer(Context* context) :
     Object(context),
@@ -49,7 +66,6 @@ AEPlayer::AEPlayer(Context* context) :
 
     duk_eval_string_noresult(vm_->GetJSContext(), "require(\"AtomicGame\"); require (\"AtomicEditor\");");
 
-
 }
 
 AEPlayer::~AEPlayer()
@@ -67,6 +83,8 @@ AEPlayer::~AEPlayer()
 
 void AEPlayer::Invalidate()
 {
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
+    ops->Hide();
     context_->RemoveSubsystem<AEPlayer>();
     GetSubsystem<UI>()->GetRoot()->RemoveAllChildren();
 }
@@ -96,16 +114,17 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     mode_ = mode;
 
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
+
+    ops->ShowPlayer();
+
     duk_context* ctx = vm_->GetJSContext();
 
-    String init;
-    init.AppendWithFormat("Atomic.editor.setViewport(%i, %i, %i, %i);",
-                          rect.left_, rect.top_, rect.right_, rect.bottom_);
-
-    duk_eval_string_noresult(vm_->GetJSContext(),init.CString());
-
-    Editor* editor = GetSubsystem<Editor>();
-    Project* project = editor->GetProject();
+    duk_get_global_string(ctx, "Atomic");
+    duk_get_prop_string(ctx, -1, "editor");
+    duk_push_c_function(ctx, js_atomiceditor_SetView, 2);
+    duk_put_prop_string(ctx, -2, "setView");
+    duk_pop_2(ctx);
 
     bool ok = vm_->ExecuteMain();
 
@@ -115,6 +134,11 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
     }
 
     return ok;
+}
+
+void AEPlayer::SetUIPlayer(UIPlayer* uiPlayer)
+{
+    uiPlayer_ = uiPlayer;
 }
 
 void AEPlayer::HandleEditorShutdown(StringHash eventType, VariantMap& eventData)

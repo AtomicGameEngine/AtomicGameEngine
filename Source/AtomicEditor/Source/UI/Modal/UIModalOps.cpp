@@ -35,6 +35,8 @@
 #include "License/AELicenseSystem.h"
 #include "License/UIEulaAgreement.h"
 
+#include "Player/UIPlayer.h"
+
 namespace AtomicEditor
 {
 
@@ -280,6 +282,14 @@ void UIModalOps::ShowEulaAgreement()
     Show();
     opWindow_ = new UIEulaAgreement(context_);
 
+}
+
+void UIModalOps::ShowPlayer()
+{
+    assert(opWindow_.Null());
+
+    Show();
+    opWindow_ = new UIPlayer(context_);
 }
 
 void UIModalOps::OnWidgetDelete(TBWidget *widget)

@@ -71,20 +71,14 @@ Game.prototype.createScene2D = function() {
     camera.orthographic = true;
     camera.orthoSize = this.graphics.height * Atomic.PIXEL_SIZE;
 
-    var viewport = new Atomic.Viewport(scene, camera);
-
+    var viewport = null;
+    
     if (Atomic.editor) {
-        var _viewport = Atomic.editor.viewport;
-        viewport.rect = [_viewport.left, _viewport.top, _viewport.right, _viewport.bottom];
-
-        var width = (_viewport.right - 8) - _viewport.left;
-        var height = _viewport.bottom - _viewport.top;
-
-        this.ui.getRoot().position = [_viewport.left, _viewport.top];
-        this.ui.getRoot().setSize(width, height);        
+        Atomic.editor.setView(scene, camera);
+    } else {
+        var viewport = new Atomic.Viewport(scene, camera);
+        this.renderer.setViewport(0, viewport);
     }
-
-    this.renderer.setViewport(0, viewport);
 
     this.scene = scene;
     this.cameraNode = cameraNode;
@@ -105,22 +99,13 @@ Game.prototype.createScene3D = function() {
 
     var camera = cameraNode.createComponent("Camera");    
 
-    var viewport = new Atomic.Viewport(scene, camera);
-
+    var viewport = null;
     if (Atomic.editor) {
-
-        var _viewport = Atomic.editor.viewport;
-        viewport.rect = [_viewport.left, _viewport.top, _viewport.right - 8, _viewport.bottom];
-
-        var width = (_viewport.right - 8) - _viewport.left;
-        var height = _viewport.bottom - _viewport.top;
-
-        this.ui.getRoot().position = [_viewport.left, _viewport.top];
-        this.ui.getRoot().setSize(width, height);        
-
+        Atomic.editor.setView(scene, camera);
+    } else {
+        var viewport = new Atomic.Viewport(scene, camera);
+        this.renderer.setViewport(0, viewport);
     }
-
-    this.renderer.setViewport(0, viewport);
 
     this.scene = scene;
     this.cameraNode = cameraNode;

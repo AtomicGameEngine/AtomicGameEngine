@@ -91,8 +91,7 @@ void SceneEditor3D::SelectNode(Node* node)
 }
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
-{
-    // view3D_->QueueUpdate();
+{    
 }
 
 void SceneEditor3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)

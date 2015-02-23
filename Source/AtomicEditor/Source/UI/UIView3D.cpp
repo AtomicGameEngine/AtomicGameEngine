@@ -10,6 +10,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Camera.h>
+#include <Atomic/Graphics/RenderPath.h>
 
 #include "UIView3D.h"
 
@@ -26,7 +27,7 @@ namespace AtomicEditor
 View3D::View3D(Context* context) :
     AEWidget(context),
     rttFormat_(Graphics::GetRGBFormat()),
-    autoUpdate_(true),
+    autoUpdate_(false),
     size_(-1, -1)
 {
     renderTexture_ = new Texture2D(context_);
@@ -35,12 +36,20 @@ View3D::View3D(Context* context) :
 
     view3DWidget_ = new View3DWidget();
     view3DWidget_->SetGravity(WIDGET_GRAVITY_ALL);
+
     view3DWidget_->view3D_ = this;
     delegate_->AddChild(view3DWidget_);
 }
 
 View3D::~View3D()
 {
+    // FIXME: need to refactor Light2D viewport handling
+    if (viewport_.NotNull())
+    {
+        RenderPath* renderpath = viewport_->GetRenderPath();
+        if (renderpath)
+            renderpath->RemoveCommands("Light2D");
+    }
 
 }
 
@@ -74,7 +83,7 @@ void View3D::OnResize(const IntVector2 &newSize)
 }
 
 
-void View3D::SetView(Scene* scene, Camera* camera, bool ownScene)
+void View3D::SetView(Scene* scene, Camera* camera)
 {
     scene_ = scene;
     cameraNode_ = camera ? camera->GetNode() : 0;

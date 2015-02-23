@@ -1,2 +1,1 @@
 TBLayout: distribution: gravity, size: available, axis: y, id: playerlayout
-	TBContainer: gravity: all, id: playercontainer
