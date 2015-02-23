@@ -26,17 +26,14 @@
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
 
-#include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
-#include <Atomic/UI/View3D.h>
-
-#include "View3DWidget.h"
+#include <Atomic/UI/TBUI.h>
 
 namespace AtomicEditor
 {
 
 SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
-    Object(context),
+    View3D(context),
     yaw_(0.0f),
     pitch_(0.0f)
 {
@@ -46,6 +43,21 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     scene_ = sceneEditor->GetScene();
+
+    debugRenderer_ = scene_->GetComponent<DebugRenderer>();
+
+    if (debugRenderer_.Null())
+    {
+        debugRenderer_ = scene_->CreateComponent<DebugRenderer>();
+    }
+
+    octree_ = scene_->GetComponent<Octree>();
+
+    if (octree_.Null())
+    {
+        LOGWARNING("Scene without an octree loaded");
+        octree_ = scene_->CreateComponent<Octree>();
+    }
 
     cameraNode_ = scene_->CreateChild("Camera");
     camera_ = cameraNode_->CreateComponent<Camera>();
@@ -57,13 +69,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
 
     cameraNode_->SetPosition(Vector3(0, 0, -10));
 
-    view3D_ = new View3D(context_);
-    view3D_->SetView(scene_, camera_);
-    view3D_->SetAutoUpdate(false);
-
-    TBUI* tbui = GetSubsystem<TBUI>();
-    widget_ = new View3DWidget();
-    widget_->SetView3D(tbui, view3D_);
+    SetView(scene_, camera_);
+    SetAutoUpdate(false);
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
@@ -120,17 +127,21 @@ void SceneView3D::MoveCamera(float timeStep)
 
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!view3D_->IsVisible())
-        return;
 
+    /*
     UI* ui = GetSubsystem<UI>();
-    Viewport* viewport = view3D_->GetViewport();
-    IntRect view = viewport->GetRect();
 
     IntVector2 cpos = ui->GetCursorPosition();
 
-    Ray camRay = camera_->GetScreenRay(float(cpos.x_ - view3D_->GetPosition().x_) / view3D_->GetSize().x_,
-                          float(cpos.y_ - view3D_->GetPosition().y_) / view3D_->GetSize().y_);
+    TBRect rect = widget_->GetRect();
+
+    if (!rect.w || !rect.h)
+        return;
+
+    widget_->ConvertToRoot(rect.x, rect.y);
+
+    Ray camRay = camera_->GetScreenRay(float(cpos.x_ - rect.x) / rect.w,
+                          float(cpos.y_ - rect.y) /rect.h);
 
     PODVector<RayQueryResult> result;
     RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, DEFAULT_VIEWMASK);
@@ -147,6 +158,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
         }
 
     }
+    */
 
 }
 
@@ -163,7 +175,7 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     MoveCamera(timeStep);
 
-    view3D_->QueueUpdate();
+    QueueUpdate();
 }
 
 void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)

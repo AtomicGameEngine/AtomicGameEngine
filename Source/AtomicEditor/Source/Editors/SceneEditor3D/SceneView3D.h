@@ -6,13 +6,14 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "UI/UIView3D.h"
+
 using namespace Atomic;
 
 namespace Atomic
 {
 class Scene;
 class Node;
-class View3D;
 class Camera;
 class DebugRenderer;
 class Octree;
@@ -22,21 +23,16 @@ namespace AtomicEditor
 {
 
 class SceneEditor3D;
-class View3DWidget;
 
-class SceneView3D: public Object
+class SceneView3D: public View3D
 {
     OBJECT(SceneView3D);
 
 public:
 
     SceneView3D(Context* context, SceneEditor3D* sceneEditor);
-
     virtual ~SceneView3D();
-
     void SelectNode(Node* node);
-
-    View3DWidget* GetWidget() { return widget_; }
 
 private:
 
@@ -47,22 +43,14 @@ private:
     void MoveCamera(float timeStep);
 
     WeakPtr<SceneEditor3D> sceneEditor_;
-    WeakPtr<Scene> scene_;
-
-    // Camera
-    WeakPtr<Node> cameraNode_;
-    WeakPtr<Camera> camera_;
 
     float yaw_;
     float pitch_;
 
-    SharedPtr<View3D> view3D_;
-
-    View3DWidget* widget_;
-
-    WeakPtr<DebugRenderer> debugRenderer_;
-    WeakPtr<Octree> octree_;
-    WeakPtr<Node> selectedNode_;
+    SharedPtr<Camera> camera_;
+    SharedPtr<DebugRenderer> debugRenderer_;
+    SharedPtr<Octree> octree_;
+    SharedPtr<Node> selectedNode_;
 
 };
 

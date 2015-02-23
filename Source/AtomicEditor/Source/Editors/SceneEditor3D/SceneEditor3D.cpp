@@ -28,7 +28,6 @@
 #include <Atomic/UI/View3D.h>
 
 #include "SceneEditor3D.h"
-#include "View3DWidget.h"
 
 namespace AtomicEditor
 {
@@ -57,28 +56,11 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
 
     scene_->SetUpdateEnabled(false);
 
-    debugRenderer_ = scene_->GetComponent<DebugRenderer>();
-
-    if (debugRenderer_.Null())
-    {
-        debugRenderer_ = scene_->CreateComponent<DebugRenderer>();
-    }
-
-    octree_ = scene_->GetComponent<Octree>();
-
-    if (octree_.Null())
-    {
-        LOGWARNING("Scene without an octree loaded");
-        octree_ = scene_->CreateComponent<Octree>();
-    }
-
-    // once octree/debugrenderer exist
     sceneView_ = new SceneView3D(context_, this);
 
-    View3DWidget* widget = sceneView_->GetWidget();
-    widget->SetGravity(WIDGET_GRAVITY_ALL);
-
-    view3DContainer_->AddChild(widget);
+    TBWidgetDelegate* delegate = sceneView_->GetWidgetDelegate();
+    delegate->SetGravity(WIDGET_GRAVITY_ALL);
+    view3DContainer_->AddChild(delegate);
 
     layout_->AddChild(view3DContainer_);
 

@@ -55,8 +55,6 @@ private:
     TBLayout* layout_;
     TBContainer* view3DContainer_;
 
-    WeakPtr<DebugRenderer> debugRenderer_;
-    WeakPtr<Octree> octree_;
     WeakPtr<Node> selectedNode_;
 
 };

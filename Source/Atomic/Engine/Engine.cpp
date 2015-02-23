@@ -649,9 +649,9 @@ void Engine::Render()
 
     GetSubsystem<Renderer>()->Render();
 
-    #ifdef ATOMIC_TBUI
+#ifdef ATOMIC_TBUI
     GetSubsystem<TBUI>()->Render();
-    #endif
+#endif
 
     GetSubsystem<UI>()->Render();
     graphics->EndFrame();
