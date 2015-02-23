@@ -38,6 +38,8 @@ public:
 
     Ray GetCameraRay();
 
+    bool OnEvent(const TBWidgetEvent &ev);
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

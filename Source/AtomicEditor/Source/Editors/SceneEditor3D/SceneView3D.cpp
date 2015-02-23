@@ -175,17 +175,11 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
     // Visualize the currently selected nodes
     if (selectedNode_.NotNull())
     {
-
-    }
-    //for (uint i = 0; i < selectedNodes.length; ++i)
         DrawNodeDebug(selectedNode_, debugRenderer_);
 
-    // Visualize the currently selected components
-    //for (uint i = 0; i < selectedComponents.length; ++i)
-    //    selectedComponents[i].DrawDebugGeometry(debug, false);
+    }
 
     Ray camRay  = GetCameraRay();
-
     PODVector<RayQueryResult> result;
     RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, 0x7fffffff);
     octree_->RaycastSingle(query);
@@ -208,6 +202,34 @@ void SceneView3D::SelectNode(Node* node)
 {
     selectedNode_ = node;
 }
+
+bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        Ray camRay  = GetCameraRay();
+        PODVector<RayQueryResult> result;
+        RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, 0x7fffffff);
+        octree_->RaycastSingle(query);
+
+        if (query.result_.Size())
+        {
+            const RayQueryResult& r = result[0];
+
+            if (r.drawable_)
+            {
+
+                VariantMap neventData;
+                neventData[EditorActiveNodeChange::P_NODE] = r.drawable_->GetNode();
+                SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
+            }
+        }
+    }
+
+    return false;
+}
+
 
 void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {

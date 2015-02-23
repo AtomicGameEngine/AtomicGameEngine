@@ -78,7 +78,7 @@ public:
 
     const IntVector2& GetSize() const { return size_; }
 
-    bool OnEvent(const TBWidgetEvent &ev);
+    virtual bool OnEvent(const TBWidgetEvent &ev);
 
 protected:
 
