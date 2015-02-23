@@ -22,6 +22,7 @@ namespace AtomicEditor
 {
 
 class SceneEditor3D;
+class View3DWidget;
 
 class SceneView3D: public Object
 {
@@ -34,6 +35,8 @@ public:
     virtual ~SceneView3D();
 
     void SelectNode(Node* node);
+
+    View3DWidget* GetWidget() { return widget_; }
 
 private:
 
@@ -54,6 +57,8 @@ private:
     float pitch_;
 
     SharedPtr<View3D> view3D_;
+
+    View3DWidget* widget_;
 
     WeakPtr<DebugRenderer> debugRenderer_;
     WeakPtr<Octree> octree_;

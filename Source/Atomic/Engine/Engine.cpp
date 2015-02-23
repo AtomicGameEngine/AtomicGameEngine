@@ -647,11 +647,12 @@ void Engine::Render()
     if (!graphics->BeginFrame())
         return;
 
+    GetSubsystem<Renderer>()->Render();
+
     #ifdef ATOMIC_TBUI
     GetSubsystem<TBUI>()->Render();
     #endif
 
-    GetSubsystem<Renderer>()->Render();
     GetSubsystem<UI>()->Render();
     graphics->EndFrame();
 }

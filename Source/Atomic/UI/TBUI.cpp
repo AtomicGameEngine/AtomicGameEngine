@@ -359,6 +359,24 @@ void TBUI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     }
 }
 
+void TBUI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
+{
+    UIBatch b(this, BLEND_ALPHA , TBUIRenderer::renderer_->currentScissor_, texture, &vertexData_);
+
+    unsigned begin = b.vertexData_->Size();
+    b.vertexData_->Resize(begin + vertexData.Size());
+    float* dest = &(b.vertexData_->At(begin));
+    b.vertexEnd_ = b.vertexData_->Size();
+
+    for (unsigned i = 0; i < vertexData.Size(); i++, dest++)
+    {
+        *dest = vertexData[i];
+    }
+
+    UIBatch::AddOrMerge(b, batches_);
+
+}
+
 void TBUI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     if (!initialized_)
@@ -781,6 +799,9 @@ void TBUI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsig
     graphics_->SetDrawAntialiased(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
+
+    graphics_->ResetRenderTargets();
+
     graphics_->SetVertexBuffer(buffer);
 
     ShaderVariation* noTextureVS = graphics_->GetShader(VS, "Basic", "VERTEXCOLOR");

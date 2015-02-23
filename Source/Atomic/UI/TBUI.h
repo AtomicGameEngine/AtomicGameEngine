@@ -47,7 +47,10 @@ public:
     bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
 
     void Render();
+
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+
+    void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
     void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 

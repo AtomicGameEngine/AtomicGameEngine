@@ -8,6 +8,7 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Graphics/Camera.h>
 
+#include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Octree.h>
@@ -28,6 +29,8 @@
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/View3D.h>
+
+#include "View3DWidget.h"
 
 namespace AtomicEditor
 {
@@ -57,9 +60,10 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     view3D_ = new View3D(context_);
     view3D_->SetView(scene_, camera_);
     view3D_->SetAutoUpdate(false);
-    view3D_->SetSize(800, 800);
 
-    GetSubsystem<UI>()->GetRoot()->AddChild(view3D_);
+    TBUI* tbui = GetSubsystem<TBUI>();
+    widget_ = new View3DWidget();
+    widget_->SetView3D(tbui, view3D_);
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
@@ -74,7 +78,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
 
 SceneView3D::~SceneView3D()
 {
-    GetSubsystem<UI>()->GetRoot()->RemoveChild(view3D_);
+
 }
 
 void SceneView3D::MoveCamera(float timeStep)

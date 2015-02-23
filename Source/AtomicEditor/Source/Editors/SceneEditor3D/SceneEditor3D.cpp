@@ -21,11 +21,14 @@
 #include "AEEvents.h"
 
 #include <Atomic/Input/Input.h>
-#include "SceneEditor3D.h"
+
 
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/View3D.h>
+
+#include "SceneEditor3D.h"
+#include "View3DWidget.h"
 
 namespace AtomicEditor
 {
@@ -71,6 +74,11 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
 
     // once octree/debugrenderer exist
     sceneView_ = new SceneView3D(context_, this);
+
+    View3DWidget* widget = sceneView_->GetWidget();
+    widget->SetGravity(WIDGET_GRAVITY_ALL);
+
+    view3DContainer_->AddChild(widget);
 
     layout_->AddChild(view3DContainer_);
 
