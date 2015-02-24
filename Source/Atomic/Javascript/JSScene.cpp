@@ -3,10 +3,15 @@
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
 #include "Precompiled.h"
+
+#include "../Resource/ResourceCache.h"
+#include "../IO/File.h"
+
 #include "../Javascript/JSScene.h"
 #include "../Javascript/JSComponent.h"
 #include "../Javascript/JSVM.h"
 #include "../Scene/Node.h"
+#include "../Scene/Scene.h"
 
 namespace Atomic
 {
@@ -47,6 +52,37 @@ static int Node_GetChildrenWithComponent(duk_context* ctx)
     return 1;
 }
 
+static int Scene_LoadXML(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+
+    String filename = duk_to_string(ctx, 0);
+
+    ResourceCache* cache = vm->GetSubsystem<ResourceCache>();
+
+    SharedPtr<File> file = cache->GetFile(filename);
+
+    if (!file->IsOpen())
+    {
+        duk_push_false(ctx);
+        return 1;
+    }
+
+    duk_push_this(ctx);
+    Scene* scene = js_to_class_instance<Scene>(ctx, -1, 0);
+
+    bool success = scene->LoadXML(*file);
+
+    if (success)
+        duk_push_true(ctx);
+    else
+        duk_push_false(ctx);
+
+
+    return 1;
+
+}
+
 
 void jsapi_init_scene(JSVM* vm)
 {
@@ -59,6 +95,10 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "createJSComponent");
     duk_pop(ctx);
 
+    js_class_get_prototype(ctx, "Scene");
+    duk_push_c_function(ctx, Scene_LoadXML, 1);
+    duk_put_prop_string(ctx, -2, "loadXML");
+    duk_pop(ctx);
 
 }
 

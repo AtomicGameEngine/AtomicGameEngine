@@ -89,10 +89,14 @@ Game.prototype.createScene2D = function() {
 
 }
 
-Game.prototype.createScene3D = function() {
+Game.prototype.createScene3D = function(filename) {
 
     var scene = new Atomic.Scene();
-    scene.createComponent("Octree");
+
+    if (typeof(filename) == "string")
+        scene.loadXML(filename)
+    else
+        scene.createComponent("Octree");
 
     var cameraNode = scene.createChild("Camera");
     cameraNode.position = [0.0, 0.0, -10.0];

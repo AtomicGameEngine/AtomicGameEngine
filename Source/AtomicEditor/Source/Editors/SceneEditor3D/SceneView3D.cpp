@@ -181,7 +181,16 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
     Ray camRay  = GetCameraRay();
     PODVector<RayQueryResult> result;
-    RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, 0x7fffffff);
+
+    /*
+    Array<int> pickModeDrawableFlags = {
+        DRAWABLE_GEOMETRY,
+        DRAWABLE_LIGHT,
+        DRAWABLE_ZONE
+    };
+    */
+
+    RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
     octree_->RaycastSingle(query);
 
     if (query.result_.Size())
@@ -209,7 +218,15 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
     {
         Ray camRay  = GetCameraRay();
         PODVector<RayQueryResult> result;
-        RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_ANY, 0x7fffffff);
+
+        /*
+        Array<int> pickModeDrawableFlags = {
+            DRAWABLE_GEOMETRY,
+            DRAWABLE_LIGHT,
+            DRAWABLE_ZONE
+        };
+        */
+        RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
         octree_->RaycastSingle(query);
 
         if (query.result_.Size())
