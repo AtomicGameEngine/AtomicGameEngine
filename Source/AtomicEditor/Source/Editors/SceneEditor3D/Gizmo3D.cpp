@@ -263,7 +263,7 @@ bool Gizmo3D::RotateEditNodes(Vector3 adjust)
     {
         moved = true;
 
-        for (uint i = 0; i < editNodes_->Size(); ++i)
+        for (unsigned i = 0; i < editNodes_->Size(); ++i)
         {
             Node* node = editNodes_->At(i);
             Quaternion rotQuat(adjust.x_, adjust.y_, adjust.z_);
@@ -292,7 +292,7 @@ bool Gizmo3D::ScaleEditNodes(Vector3 adjust)
 
     if (adjust.Length() > M_EPSILON)
     {
-        for (uint i = 0; i < editNodes_->Size(); ++i)
+        for (unsigned i = 0; i < editNodes_->Size(); ++i)
         {
             Node* node = editNodes_->At(i);
 

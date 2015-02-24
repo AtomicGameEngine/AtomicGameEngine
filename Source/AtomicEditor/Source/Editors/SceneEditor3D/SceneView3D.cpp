@@ -159,11 +159,11 @@ void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
     {
         const Vector<SharedPtr<Component> >& components = node->GetComponents();
 
-        for (uint j = 0; j < components.Size(); ++j)
+        for (unsigned j = 0; j < components.Size(); ++j)
             components[j]->DrawDebugGeometry(debug, false);
 
         // To avoid cluttering the view, do not draw the node axes for child nodes
-        for (uint k = 0; k < node->GetNumChildren(); ++k)
+        for (unsigned k = 0; k < node->GetNumChildren(); ++k)
             DrawNodeDebug(node->GetChild(k), debug, false);
     }
 }
