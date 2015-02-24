@@ -270,12 +270,14 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
     else if (attrInfo->type_ == VAR_STRING)
     {
         TBEditField* field = new TBEditField();
+        field->SetTextAlign(TB_TEXT_ALIGN_CENTER);
         field->SetFontDescription(fd);
         widget = field;
     }
     else if (attrInfo->type_ == VAR_FLOAT)
     {
         TBEditField* field = new TBEditField();
+        field->SetTextAlign(TB_TEXT_ALIGN_CENTER);
         field->SetFontDescription(fd);
         widget = field;
     }
@@ -310,6 +312,7 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
         else
         {
             TBEditField* field = new TBEditField();
+            field->SetTextAlign(TB_TEXT_ALIGN_CENTER);
             field->SetFontDescription(fd);
             widget = field;
         }

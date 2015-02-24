@@ -197,10 +197,6 @@ bool JSONSceneProcess::WriteHierarchy(Scene* scene)
         itr++;
     }
 
-    // TODO: only add proc sky to outdoor scenes
-    //Atomic::Node* skyNode = scene->CreateChild("ProcSky");
-    //skyNode->CreateComponent<ProcSky>();
-
     File file(context_);
 
     bool useXML = true;

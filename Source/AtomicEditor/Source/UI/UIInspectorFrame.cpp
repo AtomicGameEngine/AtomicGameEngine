@@ -144,13 +144,12 @@ void InspectorFrame::InspectNode(Node* node)
 
             TBLayout* attrsVerticalLayout = new TBLayout(AXIS_Y);
             attrsVerticalLayout->SetGravity(WIDGET_GRAVITY_ALL);
+            attrsVerticalLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
             attrsVerticalLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
 
             TBTextField* cnameField = new TBTextField();
             cnameField->SetText(c->GetTypeName().CString());
-            //cnameField->SetFontDescription(fd);
             attrsVerticalLayout->AddChild(cnameField);
-
 
             componentContainer->AddChild(attrsVerticalLayout);
 
@@ -170,17 +169,24 @@ void InspectorFrame::InspectNode(Node* node)
                         TBLayout* attrLayout = new TBLayout();
 
                         attrLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
-                        TBTextField* name = new TBTextField();
 
+                        TBTextField* name = new TBTextField();
                         String bname = attr->name_;
                         if (bname == "Is Enabled")
                             bname = "Enabled";
 
+                        name->SetTextAlign(TB_TEXT_ALIGN_LEFT);
                         name->SetText(bname.CString());
                         name->SetFontDescription(fd);
 
+                        LayoutParams lp;
+                        lp.SetWidth(140);
+                        name->SetLayoutParams(lp);
+
                         attrLayout->AddChild(name);
+
                         TBWidget* bwidget = binding->GetWidget();
+
                         attrLayout->AddChild(bwidget);
 
                         attrsVerticalLayout->AddChild(attrLayout);
