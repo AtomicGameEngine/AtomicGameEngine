@@ -96,10 +96,13 @@ protected:
     Matrix3x4 customWorldTransform_;
 
     bool initialized_;
+    bool flipped_;
 
     void OnNodeSet(Node* node);
 
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
+
     void Initialize();
 
     void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);

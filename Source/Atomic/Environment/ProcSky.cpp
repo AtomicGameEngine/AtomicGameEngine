@@ -5,6 +5,8 @@
 #include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsEvents.h"
+#include "../Graphics/View.h"
 #include "../Scene/Scene.h"
 #include "../Graphics/Camera.h"
 #include "../Scene/SceneEvents.h"
@@ -39,8 +41,8 @@ ProcSky::ProcSky(Context* context) :
     lastDayTimeUpdate_(-1.0f),
     shadowFade_(1.0f),
     customWorldTransform_(Matrix3x4::IDENTITY),
-    initialized_(false)
-
+    initialized_(false),
+    flipped_(false)
 {
 
 }
@@ -74,10 +76,6 @@ void ProcSky::UpdateBatches(const FrameInfo& frame)
         batches_[i].worldTransform_ = &customWorldTransform_;
         batches_[i].numWorldTransforms_ = 1;
         batches_[i].distance_ = 0.0f;
-
-
-        // URHO3D UPDATE, this likely breaks proc sky for now
-        // batches_[i].overrideView_ = true;
     }
 
 }
@@ -113,7 +111,20 @@ void ProcSky::OnNodeSet(Node* node)
     if (node && node->GetScene())
     {     
         SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, HANDLER(ProcSky, HandleSceneUpdate));
+        SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(ProcSky, HandleBeginViewUpdate));
     }
+
+}
+
+void ProcSky::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData)
+{
+#ifdef ATOMIC_OPENGL
+    flipped_ = false;
+    View* view = static_cast<View*>(eventData[BeginViewUpdate::P_VIEW].GetPtr());
+    if (view && view->GetRenderTarget())
+        flipped_ = true;
+
+#endif
 
 }
 
@@ -313,10 +324,19 @@ void ProcSky::UpdateVertexBuffer(const FrameInfo &frame)
     planes[2] = frustum.planes_[PLANE_UP].normal_;
     planes[3] = frustum.planes_[PLANE_DOWN].normal_;
 
+
+    float top = 1.0f;
+    float bottom = -1.0f;
+
+#ifdef ATOMIC_OPENGL
+    top = -1.0f;
+    bottom = 1.0f;
+#endif
+
     // 0 2
     n = planes[0].CrossProduct(planes[2]);
     *vdest++ = -1.0f;
-    *vdest++ =  1.0f;
+    *vdest++ =  top;
     *vdest++ =  0.5f;
 
     *vdest++ = n.x_;
@@ -327,7 +347,7 @@ void ProcSky::UpdateVertexBuffer(const FrameInfo &frame)
     // 3 0
     n = planes[3].CrossProduct(planes[0]);
     *vdest++ = -1.0f;
-    *vdest++ = -1.0f;
+    *vdest++ = bottom;
     *vdest++ =  0.5f;
 
     *vdest++ = n.x_;
@@ -338,7 +358,7 @@ void ProcSky::UpdateVertexBuffer(const FrameInfo &frame)
     // 1 3
     n = planes[1].CrossProduct(planes[3]);
     *vdest++ = 1.0f;
-    *vdest++ = -1.0f;
+    *vdest++ = bottom;
     *vdest++ =  0.5f;
 
     *vdest++ = n.x_;
@@ -350,7 +370,7 @@ void ProcSky::UpdateVertexBuffer(const FrameInfo &frame)
     // 2 1
     n = planes[2].CrossProduct(planes[1]);
     *vdest++ = 1.0f;
-    *vdest++ = 1.0f;
+    *vdest++ = top;
     *vdest++ =  0.5f;
 
     *vdest++ = n.x_;
