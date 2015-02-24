@@ -94,6 +94,8 @@ void InspectorFrame::InspectNode(Node* node)
         TBContainer* nodeContainer = new TBContainer();
         nodeContainer->SetGravity(WIDGET_GRAVITY_ALL);
 
+        nodeContainer->SetSkinBg("InspectorTopLayout");
+
         TBLayout* attrsVerticalLayout = new TBLayout(AXIS_Y);
         attrsVerticalLayout->SetGravity(WIDGET_GRAVITY_ALL);
         attrsVerticalLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
@@ -113,8 +115,18 @@ void InspectorFrame::InspectNode(Node* node)
 
                 TBLayout* attrLayout = new TBLayout();
 
+                if (attr->type_ == VAR_VECTOR3 || attr->type_ == VAR_COLOR || attr->type_ == VAR_QUATERNION)
+                {
+                    attrLayout->SetAxis(AXIS_Y);
+                    attrLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
+                    attrLayout->SetSkinBg("InspectorVectorAttrLayout");
+                }
+
                 attrLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
+
                 TBTextField* name = new TBTextField();
+                name->SetTextAlign(TB_TEXT_ALIGN_LEFT);
+                name->SetSkinBg(TBIDC("InspectorTextAttrName"));
 
                 String bname = attr->name_;
                 if (bname == "Is Enabled")
@@ -140,6 +152,9 @@ void InspectorFrame::InspectNode(Node* node)
             Component* c = components[i];
 
             TBContainer* componentContainer = new TBContainer();
+
+            componentContainer->SetSkinBg("InspectorTopLayout");
+
             componentContainer->SetGravity(WIDGET_GRAVITY_ALL);
 
             TBLayout* attrsVerticalLayout = new TBLayout(AXIS_Y);
@@ -170,6 +185,13 @@ void InspectorFrame::InspectNode(Node* node)
 
                         attrLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
 
+                        if (attr->type_ == VAR_VECTOR3 || attr->type_ == VAR_COLOR || attr->type_ == VAR_QUATERNION)
+                        {
+                            attrLayout->SetAxis(AXIS_Y);
+                            attrLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
+                            attrLayout->SetSkinBg("InspectorVectorAttrLayout");
+                        }
+
                         TBTextField* name = new TBTextField();
                         String bname = attr->name_;
                         if (bname == "Is Enabled")
@@ -178,6 +200,8 @@ void InspectorFrame::InspectNode(Node* node)
                         name->SetTextAlign(TB_TEXT_ALIGN_LEFT);
                         name->SetText(bname.CString());
                         name->SetFontDescription(fd);
+
+                        name->SetSkinBg(TBIDC("InspectorTextAttrName"));
 
                         LayoutParams lp;
                         lp.SetWidth(140);

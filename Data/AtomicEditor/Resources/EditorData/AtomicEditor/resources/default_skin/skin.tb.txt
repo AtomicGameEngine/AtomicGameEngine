@@ -269,7 +269,7 @@ elements
 	TBEditField.selection
 		cut 2
 		bitmap selection.png
-	TBEditField
+	TBEditField		
 		bitmap editfield.png
 		cut 12
 		expand 4
@@ -289,6 +289,11 @@ elements
 		type Image
 		img-position-x 0
 		img-ofs-x 5
+
+	TBAttrEditorField
+		clone TBEditField
+		text-color #aaaaaa
+
 
 	# == TBWindow skin =================================================================================
 	TBWindow
@@ -358,6 +363,18 @@ elements
 	TBCheckBox.pressed
 		bitmap checkbox_pressed.png
 		type Image
+
+	TBGreyCheckBox
+		clone TBCheckBox
+		children
+			element TBGreyCheckBox.selected
+				state selected
+
+	TBGreyCheckBox.selected
+		bitmap checkbox_mark_grey.png
+		expand 7
+		type Image
+
 	TBRadioButton
 		bitmap radio.png
 		cut 19
@@ -479,6 +496,8 @@ elements
 
 	arrow.left: type: Image, bitmap: arrow_left.png, min-width: 5, min-height: 10
 	arrow.right: type: Image, bitmap: arrow_right.png, min-width: 5, min-height: 10
+	arrowdark.left: type: Image, bitmap: arrow_left_dark.png, min-width: 5, min-height: 10
+	arrowdark.right: type: Image, bitmap: arrow_right_dark.png, min-width: 5, min-height: 10	
 	arrow.up: type: Image, bitmap: arrow_up.png, min-width: 10, min-height: 5
 	arrow.down: type: Image, bitmap: arrow_down.png, min-width: 10, min-height: 5
 	generic_focus

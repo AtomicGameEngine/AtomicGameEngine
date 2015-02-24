@@ -133,3 +133,13 @@ elements
 	TextCode
 		background-color #23241f
 
+	InspectorTopLayout
+		background-color #333333
+
+	InspectorVectorAttrLayout
+		background-color #3a3a3a
+
+	InspectorTextAttrName
+		text-color #aaaaaa
+		min-width 140
+		max-width 140

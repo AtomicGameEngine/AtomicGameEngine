@@ -29,8 +29,8 @@ TBInlineSelect::TBInlineSelect()
 	m_layout.SetSpacing(0);
 	m_buttons[0].SetSkinBg(TBIDC("TBButton.flat"));
 	m_buttons[1].SetSkinBg(TBIDC("TBButton.flat"));
-	m_buttons[0].GetContentRoot()->AddChild(new TBSkinImage(TBIDC("arrow.left")));
-	m_buttons[1].GetContentRoot()->AddChild(new TBSkinImage(TBIDC("arrow.right")));
+    m_buttons[0].GetContentRoot()->AddChild(new TBSkinImage(TBIDC("arrowdark.left")));
+    m_buttons[1].GetContentRoot()->AddChild(new TBSkinImage(TBIDC("arrowdark.right")));
 	m_buttons[0].SetIsFocusable(false);
 	m_buttons[1].SetIsFocusable(false);
 	m_buttons[0].SetID(TBIDC("dec"));

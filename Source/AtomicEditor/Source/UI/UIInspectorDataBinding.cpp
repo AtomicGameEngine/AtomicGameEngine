@@ -265,19 +265,26 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
     if (attrInfo->type_ == VAR_BOOL)
     {
         TBCheckBox* box = new TBCheckBox();
+        box->SetSkinBg(TBIDC("TBGreyCheckBox"));
         widget = box;
     }
     else if (attrInfo->type_ == VAR_STRING)
     {
         TBEditField* field = new TBEditField();
-        field->SetTextAlign(TB_TEXT_ALIGN_CENTER);
+        field->SetTextAlign(TB_TEXT_ALIGN_LEFT);
+        field->SetSkinBg(TBIDC("TBAttrEditorField"));
         field->SetFontDescription(fd);
+        LayoutParams lp;
+        lp.SetWidth(140);
+        field->SetLayoutParams(lp);
+
         widget = field;
     }
     else if (attrInfo->type_ == VAR_FLOAT)
     {
         TBEditField* field = new TBEditField();
         field->SetTextAlign(TB_TEXT_ALIGN_CENTER);
+        field->SetSkinBg(TBIDC("TBAttrEditorField"));
         field->SetFontDescription(fd);
         widget = field;
     }
@@ -314,6 +321,7 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
             TBEditField* field = new TBEditField();
             field->SetTextAlign(TB_TEXT_ALIGN_CENTER);
             field->SetFontDescription(fd);
+            field->SetSkinBg(TBIDC("TBAttrEditorField"));
             widget = field;
         }
     }
@@ -331,6 +339,7 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
             TBInlineSelect* select = new TBInlineSelect();
             select->SetID(TBID(i + 1));
             select->SetFontDescription(fd);
+            select->SetSkinBg(TBIDC("InspectorTextAttrName"));
             select->SetLimits(-10000000, 10000000);
             select->SetLayoutParams(lp);
             layout->AddChild(select);
