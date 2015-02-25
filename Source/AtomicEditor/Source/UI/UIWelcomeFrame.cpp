@@ -310,11 +310,15 @@ bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
                 // we clicked the recent projects list
                 TBSelectList* list = (TBSelectList*) ev.target;
                 int value = list->GetValue();
-                TBGenericStringItemSource* source = list->GetDefaultSource();
-                if (source->GetNumItems())
+
+                if (value >= 0)
                 {
-                    String projectpath = String(source->GetItemString(value));
-                    GetSubsystem<Editor>()->LoadProject(projectpath);
+                    TBGenericStringItemSource* source = list->GetDefaultSource();
+                    if (source->GetNumItems())
+                    {
+                        String projectpath = String(source->GetItemString(value));
+                        GetSubsystem<Editor>()->LoadProject(projectpath);
+                    }
                 }
 
                 return true;

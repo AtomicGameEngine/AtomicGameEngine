@@ -37,25 +37,38 @@ void EditorStrings::InitializeStrings()
 
     stringLookup_[RevealInFinder] = "Reveal in Finder";
 
-    // Shortcuts
-    stringLookup_[ShortcutUndo] = "⌘Z";
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    String shortcutKey = "Ctrl-";
+    stringLookup_[ShortcutRedo] ="Ctrl-Y";
+    stringLookup_[ShortcutFindNext] = "F3";
+    stringLookup_[ShortcutFindPrev] = "Shift-F3";
+    stringLookup_[ShortcutBuildSettings] = "Ctrl-Shift-B";
+#else
+    String shortcutKey = "⌘";
     stringLookup_[ShortcutRedo] ="⇧⌘Z";
-    stringLookup_[ShortcutCut] = "⌘X";
-    stringLookup_[ShortcutCopy] = "⌘C";
-    stringLookup_[ShortcutPaste] = "⌘V";
-    stringLookup_[ShortcutSelectAll] = "⌘A";
-    stringLookup_[ShortcutFind] = "⌘F";
     stringLookup_[ShortcutFindNext] = "⌘G";
     stringLookup_[ShortcutFindPrev] = "⇧⌘G";
-    stringLookup_[ShortcutBeautify] = "⌘I";
-
-    stringLookup_[ShortcutSaveFile] = "⌘S";
-    stringLookup_[ShortcutCloseFile] = "⌘W";
-
-    stringLookup_[ShortcutPlay] = "⌘P";
-
-    stringLookup_[ShortcutBuild] = "⌘B";
     stringLookup_[ShortcutBuildSettings] = "⇧⌘B";
+
+#endif
+    // Shortcuts
+    stringLookup_[ShortcutUndo] = shortcutKey + "Z";
+
+    stringLookup_[ShortcutCut] = shortcutKey + "X";
+    stringLookup_[ShortcutCopy] = shortcutKey + "C";
+    stringLookup_[ShortcutPaste] = shortcutKey + "V";
+    stringLookup_[ShortcutSelectAll] = shortcutKey + "A";
+    stringLookup_[ShortcutFind] = shortcutKey + "F";
+
+    stringLookup_[ShortcutBeautify] = shortcutKey + "I";
+
+    stringLookup_[ShortcutSaveFile] = shortcutKey + "S";
+    stringLookup_[ShortcutCloseFile] = shortcutKey + "W";
+
+    stringLookup_[ShortcutPlay] = shortcutKey + "P";
+
+    stringLookup_[ShortcutBuild] = shortcutKey +"B";
+
 
 
 }
