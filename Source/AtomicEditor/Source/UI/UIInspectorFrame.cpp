@@ -41,6 +41,8 @@ InspectorFrame::InspectorFrame(Context* context) :
     inspectorContainer_ = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("inspectorcontainer"));
     assert(inspectorContainer_);
 
+    InitializeSources();
+
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(InspectorFrame, HandleEditorActiveNodeChange));
 
 }
@@ -50,10 +52,73 @@ InspectorFrame::~InspectorFrame()
 
 }
 
+void InspectorFrame::InitializeSources()
+{
+    componentCreateSource.AddItem(new MenubarItem("Audio", &audioCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Geometry", &geometryCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Logic", &logicCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Navigation", &navigationCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Network", &networkCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Physics", &physicsCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Scene", &sceneCreateSource));
+    componentCreateSource.AddItem(new MenubarItem("Subsystem", &subsystemCreateSource));
+
+    audioCreateSource.AddItem(new MenubarItem("SoundListener", TBIDC("create component")));
+    audioCreateSource.AddItem(new MenubarItem("SoundSource",  TBIDC("create component")));
+    audioCreateSource.AddItem(new MenubarItem("SoundSource3D", TBIDC("create component")));
+
+    geometryCreateSource.AddItem(new MenubarItem("AnimatedModel", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("BillboardSet",  TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("CustomGeometry", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("ParticleEmitter", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("Skybox", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("StaticModel", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("StaticModelGroup", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("Terrain", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("Text3D", TBIDC("create component")));
+    geometryCreateSource.AddItem(new MenubarItem("Water", TBIDC("create component")));
+
+    logicCreateSource.AddItem(new MenubarItem("AnimationController", TBIDC("create component")));
+    logicCreateSource.AddItem(new MenubarItem("Javascript Component", TBIDC("create component")));
+    logicCreateSource.AddItem(new MenubarItem("SplinePath", TBIDC("create component")));
+
+    navigationCreateSource.AddItem(new MenubarItem("Navigable", TBIDC("create component")));
+    navigationCreateSource.AddItem(new MenubarItem("NavigationMesh", TBIDC("create component")));
+    navigationCreateSource.AddItem(new MenubarItem("OffMeshConnection", TBIDC("create component")));
+
+    networkCreateSource.AddItem(new MenubarItem("Network Priority", TBIDC("create component")));
+
+    physicsCreateSource.AddItem(new MenubarItem("CollisionShape", TBIDC("create component")));
+    physicsCreateSource.AddItem(new MenubarItem("Constraint", TBIDC("create component")));
+    physicsCreateSource.AddItem(new MenubarItem("RigidBody", TBIDC("create component")));
+
+    sceneCreateSource.AddItem(new MenubarItem("Camera", TBIDC("create component")));
+    sceneCreateSource.AddItem(new MenubarItem("Light", TBIDC("create component")));
+    sceneCreateSource.AddItem(new MenubarItem("Zone", TBIDC("create component")));
+
+    subsystemCreateSource.AddItem(new MenubarItem("DebugRenderer", TBIDC("create component")));
+    subsystemCreateSource.AddItem(new MenubarItem("Octree", TBIDC("create component")));
+    subsystemCreateSource.AddItem(new MenubarItem("PhysicsWorld", TBIDC("create component")));
+
+}
+
 bool InspectorFrame::OnEvent(const TBWidgetEvent &ev)
 {
     for (unsigned i = 0; i < dataBindings_.Size(); i++)
         dataBindings_[i]->OnEvent(ev);
+
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        if (ev.target->GetID() == TBIDC("create button"))
+        {
+            if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("create popup")))
+            {
+                menu->Show(&componentCreateSource, TBPopupAlignment(TB_ALIGN_LEFT));
+            }
+
+            return true;
+        }
+    }
 
     return false;
 }
@@ -101,6 +166,14 @@ void InspectorFrame::InspectNode(Node* node)
         attrsVerticalLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
         nodeContainer->AddChild(attrsVerticalLayout);
 
+        TBTextField* nodeLabel = new TBTextField();
+        nodeLabel->SetTextAlign(TB_TEXT_ALIGN_LEFT);
+        nodeLabel->SetText("Node");
+        nodeLabel->SetSkinBg(TBIDC("InspectorTextLabel"));
+        attrsVerticalLayout->AddChild(nodeLabel);
+
+
+
         const Vector<AttributeInfo>* attrs = node->GetAttributes();
 
         for (unsigned i = 0; i < attrs->Size(); i++)
@@ -146,6 +219,25 @@ void InspectorFrame::InspectNode(Node* node)
 
         nodeLayout->AddChild(nodeContainer);
 
+        TBLayout* componentsLayout = new TBLayout();
+
+        TBTextField* componentsLabel = new TBTextField();
+        componentsLabel->SetText("Components");
+        componentsLabel->SetSkinBg(TBIDC("InspectorTextLabel"));
+        componentsLabel->SetTextAlign(TB_TEXT_ALIGN_LEFT);
+        componentsLayout->AddChild(componentsLabel);
+
+        TBButton* create = new TBButton();
+        LayoutParams createLP;
+        createLP.SetHeight(20);
+        create->SetLayoutParams(createLP);
+        create->SetFontDescription(fd);
+        create->SetText("Create");
+        create->SetID(TBIDC("create button"));
+        componentsLayout->AddChild(create);
+
+        nodeLayout->AddChild(componentsLayout);
+
         const Vector<SharedPtr<Component> > components = node->GetComponents();
         for (unsigned i = 0; i < components.Size(); i++)
         {
@@ -164,6 +256,9 @@ void InspectorFrame::InspectNode(Node* node)
 
             TBTextField* cnameField = new TBTextField();
             cnameField->SetText(c->GetTypeName().CString());
+            cnameField->SetSkinBg(TBIDC("InspectorTextLabel"));
+            cnameField->SetTextAlign(TB_TEXT_ALIGN_LEFT);
+            cnameField->SetFontDescription(fd);
             attrsVerticalLayout->AddChild(cnameField);
 
             componentContainer->AddChild(attrsVerticalLayout);

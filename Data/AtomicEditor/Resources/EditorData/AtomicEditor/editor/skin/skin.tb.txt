@@ -139,6 +139,11 @@ elements
 	InspectorVectorAttrLayout
 		background-color #3a3a3a
 
+	InspectorTextLabel
+		text-color #dddddd
+		min-width 140
+		max-width 140
+
 	InspectorTextAttrName
 		text-color #aaaaaa
 		min-width 140

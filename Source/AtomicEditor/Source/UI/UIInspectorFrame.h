@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AEWidget.h"
+#include "UIMenubar.h"
 
 #include <Atomic/Scene/Scene.h>
 
@@ -39,6 +40,8 @@ public:
 
 private:
 
+    void InitializeSources();
+
     void InspectNode(Node* node);
 
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
@@ -48,6 +51,16 @@ private:
     Vector<InspectorDataBinding*> dataBindings_;
 
     SharedPtr<Node> node_;
+
+    MenubarItemSource componentCreateSource;
+    MenubarItemSource audioCreateSource;
+    MenubarItemSource geometryCreateSource;
+    MenubarItemSource logicCreateSource;
+    MenubarItemSource navigationCreateSource;
+    MenubarItemSource networkCreateSource;
+    MenubarItemSource physicsCreateSource;
+    MenubarItemSource sceneCreateSource;
+    MenubarItemSource subsystemCreateSource;
 
 };
 
