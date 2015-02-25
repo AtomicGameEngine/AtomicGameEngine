@@ -13,7 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
 
 #ifndef BT_IDEBUG_DRAW__H
 #define BT_IDEBUG_DRAW__H
@@ -47,14 +46,12 @@ class	btIDebugDraw
 		DBG_DrawConstraints = (1 << 11),
 		DBG_DrawConstraintLimits = (1 << 12),
 		DBG_FastWireframe = (1<<13),
-        DBG_DrawNormals = (1<<14),
+		DBG_DrawNormals = (1<<14),
+		DBG_DrawFrames = (1<<15),
 		DBG_MAX_DEBUG_DRAW_MODE
 	};
 
 	virtual ~btIDebugDraw() {};
-	
-	// Urho3D: added function to test visibility of an AABB
-	virtual bool    isVisible(const btVector3& aabbMin,const btVector3& aabbMax)=0;
 
 	virtual void	drawLine(const btVector3& from,const btVector3& to,const btVector3& color)=0;
 		
@@ -151,7 +148,7 @@ class	btIDebugDraw
 		const btVector3& vx = axis;
 		btVector3 vy = normal.cross(axis);
 		btScalar step = stepDegrees * SIMD_RADS_PER_DEG;
-		int nSteps = (int)((maxAngle - minAngle) / step);
+		int nSteps = (int)btFabs((maxAngle - minAngle) / step);
 		if(!nSteps) nSteps = 1;
 		btVector3 prev = center + radiusA * vx * btCos(minAngle) + radiusB * vy * btSin(minAngle);
 		if(drawSect)
@@ -441,6 +438,10 @@ class	btIDebugDraw
 		btVector3 pt3 = planeOrigin - vec1*vecLen;
 		drawLine(transform*pt0,transform*pt1,color);
 		drawLine(transform*pt2,transform*pt3,color);
+	}
+
+	virtual void flushLines()
+	{
 	}
 };
 
