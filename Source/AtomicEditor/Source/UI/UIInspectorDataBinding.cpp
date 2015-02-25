@@ -78,11 +78,11 @@ void InspectorDataBinding::SetObjectValueFromWidget(TBWidget *srcWidget)
         Vector3 value = object_->GetAttribute(attrInfo_->name_).GetVector3();
 
         if (srcWidget->GetID() == TBID(unsigned(1)))
-            value.x_ = srcWidget->GetValue();
+            value.x_ = srcWidget->GetValueDouble();
         else if (srcWidget->GetID() == TBID(unsigned(2)))
-            value.y_ = srcWidget->GetValue();
+            value.y_ = srcWidget->GetValueDouble();
         else if (srcWidget->GetID() == TBID(unsigned(3)))
-            value.z_ = srcWidget->GetValue();
+            value.z_ = srcWidget->GetValueDouble();
 
         object_->SetAttribute(attrInfo_->name_, value);
     }
@@ -93,11 +93,11 @@ void InspectorDataBinding::SetObjectValueFromWidget(TBWidget *srcWidget)
         Vector3 value = q.EulerAngles();
 
         if (srcWidget->GetID() == TBID(unsigned(1)))
-            value.x_ = srcWidget->GetValue();
+            value.x_ = srcWidget->GetValueDouble();
         else if (srcWidget->GetID() == TBID(unsigned(2)))
-            value.y_ = srcWidget->GetValue();
+            value.y_ = srcWidget->GetValueDouble();
         else if (srcWidget->GetID() == TBID(unsigned(3)))
-            value.z_ = srcWidget->GetValue();
+            value.z_ = srcWidget->GetValueDouble();
 
         q.FromEulerAngles(value.x_, value.y_, value.z_);
 
@@ -129,13 +129,13 @@ void InspectorDataBinding::SetWidgetValueFromObject()
 
         TBInlineSelect* select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(1)));
         if (select)
-            select->SetValue(value.x_);
+            select->SetValueDouble(value.x_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(2)));
         if (select)
-            select->SetValue(value.y_);
+            select->SetValueDouble(value.y_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(3)));
         if (select)
-            select->SetValue(value.z_);
+            select->SetValueDouble(value.z_);
     }
     else if (attrInfo_->type_ == VAR_QUATERNION)
     {
@@ -143,13 +143,13 @@ void InspectorDataBinding::SetWidgetValueFromObject()
 
         TBInlineSelect* select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(1)));
         if (select)
-            select->SetValue(value.x_);
+            select->SetValueDouble(value.x_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(2)));
         if (select)
-            select->SetValue(value.y_);
+            select->SetValueDouble(value.y_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(3)));
         if (select)
-            select->SetValue(value.z_);
+            select->SetValueDouble(value.z_);
     }
     else if (attrInfo_->type_ == VAR_STRING)
     {
@@ -181,16 +181,16 @@ void InspectorDataBinding::SetWidgetValueFromObject()
 
         TBInlineSelect* select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(1)));
         if (select)
-            select->SetValue(value.r_);
+            select->SetValueDouble(value.r_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(2)));
         if (select)
-            select->SetValue(value.g_);
+            select->SetValueDouble(value.g_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(3)));
         if (select)
             select->SetValue(value.b_);
         select = widget_->GetWidgetByIDAndType<TBInlineSelect>(TBID(unsigned(4)));
         if (select)
-            select->SetValue(value.a_);
+            select->SetValueDouble(value.a_);
 
     }
 

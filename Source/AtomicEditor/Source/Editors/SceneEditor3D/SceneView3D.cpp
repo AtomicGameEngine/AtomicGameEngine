@@ -38,7 +38,9 @@ namespace AtomicEditor
 SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     View3D(context),
     yaw_(0.0f),
-    pitch_(0.0f)
+    pitch_(0.0f),
+    mouseLeftDown_(false),
+    mouseMoved_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -105,7 +107,7 @@ void SceneView3D::MoveCamera(float timeStep)
     const float MOUSE_SENSITIVITY = 0.2f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    if (input->GetKeyDown('F'))
+    if (input->GetMouseButtonDown(MOUSEB_RIGHT))
     {
         IntVector2 mouseMove = input->GetMouseMove();
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
@@ -179,30 +181,76 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
     }
 
-    Ray camRay  = GetCameraRay();
-    PODVector<RayQueryResult> result;
+    Input* input = GetSubsystem<Input>();
 
-    /*
-    Array<int> pickModeDrawableFlags = {
-        DRAWABLE_GEOMETRY,
-        DRAWABLE_LIGHT,
-        DRAWABLE_ZONE
-    };
-    */
+    mouseLeftDown_ = false;
 
-    RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
-    octree_->RaycastSingle(query);
-
-    if (query.result_.Size())
+    if (input->GetMouseButtonPress(MOUSEB_LEFT))
     {
-        const RayQueryResult& r = result[0];
-
-        if (r.drawable_)
+        if (!mouseMoved_ && !sceneEditor_->GetGizmo()->Selected())
         {
-            debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
-            r.drawable_->DrawDebugGeometry(debugRenderer_, false);
+            Ray camRay  = GetCameraRay();
+            PODVector<RayQueryResult> result;
+
+            RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
+            octree_->RaycastSingle(query);
+
+            if (query.result_.Size())
+            {
+                const RayQueryResult& r = result[0];
+
+                if (r.drawable_)
+                {
+
+                    VariantMap neventData;
+                    neventData[EditorActiveNodeChange::P_NODE] = r.drawable_->GetNode();
+                    SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
+                }
+            }
         }
 
+        mouseMoved_ = false;
+
+    }
+    else if (!input->GetMouseButtonDown(MOUSEB_LEFT))
+    {
+
+        Ray camRay  = GetCameraRay();
+        PODVector<RayQueryResult> result;
+
+        mouseMoved_ = false;
+
+        /*
+        Array<int> pickModeDrawableFlags = {
+            DRAWABLE_GEOMETRY,
+            DRAWABLE_LIGHT,
+            DRAWABLE_ZONE
+        };
+        */
+
+        RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
+        octree_->RaycastSingle(query);
+
+        if (query.result_.Size())
+        {
+            const RayQueryResult& r = result[0];
+
+            if (r.drawable_)
+            {
+                debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
+                r.drawable_->DrawDebugGeometry(debugRenderer_, false);
+            }
+
+        }
+    }
+    else
+    {
+        mouseLeftDown_ = true;
+        if (Abs(input->GetMouseMoveX() > 3 || input->GetMouseMoveY() >  3))
+        {
+            mouseMoved_ = true;
+        }
     }
 
 }
@@ -216,32 +264,6 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CLICK)
     {
-        Ray camRay  = GetCameraRay();
-        PODVector<RayQueryResult> result;
-
-        /*
-        Array<int> pickModeDrawableFlags = {
-            DRAWABLE_GEOMETRY,
-            DRAWABLE_LIGHT,
-            DRAWABLE_ZONE
-        };
-        */
-        RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
-        octree_->RaycastSingle(query);
-
-        if (query.result_.Size())
-        {
-            const RayQueryResult& r = result[0];
-
-            if (r.drawable_)
-            {
-
-                VariantMap neventData;
-                neventData[EditorActiveNodeChange::P_NODE] = r.drawable_->GetNode();
-                SendEvent(E_EDITORACTIVENODECHANGE, neventData);
-
-            }
-        }
     }
 
     return false;

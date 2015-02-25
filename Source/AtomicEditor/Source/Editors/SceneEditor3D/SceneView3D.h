@@ -55,6 +55,9 @@ private:
     float yaw_;
     float pitch_;
 
+    bool mouseLeftDown_;
+    bool mouseMoved_;
+
     SharedPtr<Camera> camera_;
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;

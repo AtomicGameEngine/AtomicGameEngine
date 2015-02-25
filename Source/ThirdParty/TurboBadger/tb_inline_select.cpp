@@ -50,15 +50,15 @@ TBInlineSelect::~TBInlineSelect()
 	RemoveChild(&m_layout);
 }
 
-void TBInlineSelect::SetLimits(int min, int max)
+void TBInlineSelect::SetLimits(double min, double max)
 {
 	assert(min <= max);
 	m_min = min;
 	m_max = max;
-	SetValue(m_value);
+    SetValueDouble(m_value);
 }
 
-void TBInlineSelect::SetValueInternal(int value, bool update_text)
+void TBInlineSelect::SetValueInternal(double value, bool update_text)
 {
 	value = CLAMP(value, m_min, m_max);
 	if (value == m_value)
@@ -68,7 +68,7 @@ void TBInlineSelect::SetValueInternal(int value, bool update_text)
 	if (update_text)
 	{
 		TBStr strval;
-		strval.SetFormatted("%d", m_value);
+        strval.SetFormatted("%.2f", m_value);
 		m_editfield.SetText(strval);
 	}
 
@@ -90,26 +90,26 @@ bool TBInlineSelect::OnEvent(const TBWidgetEvent &ev)
 	{
 		if (ev.special_key == TB_KEY_UP || ev.special_key == TB_KEY_DOWN)
 		{
-			int dv = ev.special_key == TB_KEY_UP ? 1 : -1;
-			SetValue(GetValue() + dv);
+            double dv = ev.special_key == TB_KEY_UP ? 1 : -1;
+            SetValueDouble(GetValueDouble() + dv);
 			return true;
 		}
 	}
 	else if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("dec"))
 	{
-		SetValue(GetValue() - 1);
+        SetValueDouble(GetValueDouble() - 1);
 		return true;
 	}
 	else if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("inc"))
 	{
-		SetValue(GetValue() + 1);
+        SetValueDouble(GetValueDouble() + 1);
 		return true;
 	}
 	else if (ev.type == EVENT_TYPE_CHANGED && ev.target == &m_editfield)
 	{
 		TBStr text;
 		m_editfield.GetText(text);
-		SetValueInternal(atoi(text), false);
+        SetValueInternal((double) atof(text), false);
 	}
 	return false;
 }

@@ -42,6 +42,8 @@ public:
     void SelectNode(Node* node);
 
     Scene* GetScene() { return scene_; }
+    Gizmo3D* GetGizmo() { return gizmo3D_; }
+
 
 private:
 

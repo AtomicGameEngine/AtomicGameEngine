@@ -108,6 +108,11 @@ public:
 
     void SetEditMode(EditMode);
 
+    bool Selected()
+    {
+        return gizmoAxisX_.selected_ || gizmoAxisY_.selected_ || gizmoAxisZ_.selected_;
+    }
+
     void Show();
     void Hide();
     void Update(Vector<Node*>& editNodes);

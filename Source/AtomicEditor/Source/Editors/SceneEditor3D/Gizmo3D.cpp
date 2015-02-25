@@ -38,7 +38,7 @@ Gizmo3D::Gizmo3D(Context* context) : Object(context)
     gizmoAxisY_.lastSelected_ = false;
     gizmoAxisZ_.lastSelected_ = false;
 
-    editMode_ = EDIT_SELECT;
+    editMode_ = EDIT_MOVE;
     lastEditMode_ = EDIT_SELECT;
 }
 
@@ -163,13 +163,21 @@ void Gizmo3D::Use()
     float scale = gizmoNode_->GetScale().x_;
 
     // Recalculate axes only when not left-dragging
-    bool drag = input->GetMouseButtonDown(MOUSEB_LEFT);
+    bool drag = input->GetMouseButtonDown(MOUSEB_LEFT);// && (Abs(input->GetMouseMoveX()) > 3 || Abs(input->GetMouseMoveY()) > 3);
     if (!drag)
         CalculateGizmoAxes();
 
     gizmoAxisX_.Update(cameraRay, scale, drag, camera_->GetNode());
     gizmoAxisY_.Update(cameraRay, scale, drag, camera_->GetNode());
     gizmoAxisZ_.Update(cameraRay, scale, drag, camera_->GetNode());
+
+    if (!editNodes_->Size() || editNodes_->At(0) == scene_)
+    {
+        gizmoAxisX_.selected_ = gizmoAxisY_.selected_ = gizmoAxisZ_.selected_ = false;
+        // this just forces an update
+        gizmoAxisX_.lastSelected_ = gizmoAxisY_.lastSelected_ = gizmoAxisZ_.lastSelected_ = true;
+    }
+
 
     if (gizmoAxisX_.selected_ != gizmoAxisX_.lastSelected_)
     {
