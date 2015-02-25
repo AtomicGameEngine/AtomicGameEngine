@@ -63,7 +63,7 @@ private:
     void HandleJSError(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
-    WeakPtr<UIPlayer> uiPlayer_;
+    SharedPtr<UIPlayer> uiPlayer_;
 
     SharedPtr<JSVM> vm_;
 
