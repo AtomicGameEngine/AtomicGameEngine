@@ -36,9 +36,15 @@ static int js_atomiceditor_SetView(duk_context* ctx)
     Scene* scene = js_to_class_instance<Scene>(ctx, 0, 0);
     Camera* camera = js_to_class_instance<Camera>(ctx, 1, 0);
 
-    player->GetUIPlayer()->SetView(scene, camera);
+    UIPlayer* uiPlayer = player->GetUIPlayer();
+    Viewport* viewport = uiPlayer->SetView(scene, camera);
 
-    return 0;
+    IntVector2 size = uiPlayer->GetPlayerSize();
+    viewport->SetRect(IntRect(0, 0, size.x_, size.y_));
+
+    js_push_class_object_instance(ctx, viewport, "Viewport");
+
+    return 1;
 }
 
 

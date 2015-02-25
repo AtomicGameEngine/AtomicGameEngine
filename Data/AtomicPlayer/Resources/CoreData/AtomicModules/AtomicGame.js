@@ -74,9 +74,9 @@ Game.prototype.createScene2D = function() {
     var viewport = null;
     
     if (Atomic.editor) {
-        Atomic.editor.setView(scene, camera);
+        viewport = Atomic.editor.setView(scene, camera);
     } else {
-        var viewport = new Atomic.Viewport(scene, camera);
+        viewport = new Atomic.Viewport(scene, camera);
         this.renderer.setViewport(0, viewport);
     }
 
@@ -105,9 +105,9 @@ Game.prototype.createScene3D = function(filename) {
 
     var viewport = null;
     if (Atomic.editor) {
-        Atomic.editor.setView(scene, camera);
+        viewport = Atomic.editor.setView(scene, camera);
     } else {
-        var viewport = new Atomic.Viewport(scene, camera);
+        viewport = new Atomic.Viewport(scene, camera);
         this.renderer.setViewport(0, viewport);
     }
 

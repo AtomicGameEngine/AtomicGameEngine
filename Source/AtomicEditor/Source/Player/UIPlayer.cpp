@@ -57,9 +57,12 @@ UIPlayer::UIPlayer(Context* context):
     float aspect = float(graphics->GetHeight())/ gwidth;
     gwidth -= 150;
 
+    playerSize_.x_ = gwidth;
+    playerSize_.y_ = gwidth * aspect;
+
     LayoutParams lp;
-    lp.SetWidth(gwidth);
-    lp.SetHeight(gwidth * aspect);
+    lp.SetWidth(playerSize_.x_);
+    lp.SetHeight(playerSize_.y_);
     view3DDelegate->SetLayoutParams(lp);
 
     TBLayout* playercontainer = window_->GetWidgetByIDAndType<TBLayout>(TBIDC("playerlayout"));
@@ -74,9 +77,10 @@ UIPlayer::UIPlayer(Context* context):
     SubscribeToEvent(E_UPDATE, HANDLER(UIPlayer, HandleUpdate));
 }
 
-void UIPlayer::SetView(Scene* scene, Camera* camera)
+Viewport *UIPlayer::SetView(Scene* scene, Camera* camera)
 {
     view3D_->SetView(scene, camera);
+    return view3D_->GetViewport();
 }
 
 UIPlayer::~UIPlayer()

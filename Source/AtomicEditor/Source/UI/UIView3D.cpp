@@ -70,6 +70,7 @@ void View3D::OnResize(const IntVector2 &newSize)
 
     if (width > 0 && height > 0)
     {
+        viewport_->SetRect(IntRect(0, 0, width, height));
         renderTexture_->SetSize(width, height, rttFormat_, TEXTURE_RENDERTARGET);
         depthTexture_->SetSize(width, height, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
         RenderSurface* surface = renderTexture_->GetRenderSurface();

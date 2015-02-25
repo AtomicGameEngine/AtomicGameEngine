@@ -30,9 +30,11 @@ public:
     UIPlayer(Context* context);
     virtual ~UIPlayer();
 
-    void SetView(Scene* scene, Camera* camera);
+    Viewport* SetView(Scene* scene, Camera* camera);
 
     bool OnEvent(const TBWidgetEvent &ev);
+
+    const IntVector2& GetPlayerSize() { return playerSize_; }
 
 private:
 
@@ -40,6 +42,8 @@ private:
     SharedPtr<View3D> view3D_;
     WeakPtr<AEPlayer> aePlayer_;
 
+
+    IntVector2 playerSize_;
 };
 
 }
