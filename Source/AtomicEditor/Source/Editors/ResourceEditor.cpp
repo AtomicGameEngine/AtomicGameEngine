@@ -80,6 +80,10 @@ ResourceEditor::ResourceEditor(Context* context, const String& fullpath, TBTabCo
 
     container_->GetTabLayout()->AddChild(editorTabLayout_);
 
+    rootContentWidget_ = new TBWidget();
+    rootContentWidget_->SetGravity(WIDGET_GRAVITY_ALL);
+    container_->GetContentRoot()->AddChild(rootContentWidget_);
+
     SubscribeToEvent(E_FILECHANGED, HANDLER(ResourceEditor, HandleFileChanged));
 }
 

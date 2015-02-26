@@ -33,12 +33,9 @@ TextResourceEditor ::TextResourceEditor(Context* context, const String &fullpath
     modified_(false),
     currentFindPos_(-1)
 {
-    rootContentWidget_ = new TBWidget();
-    rootContentWidget_->SetGravity(WIDGET_GRAVITY_ALL);
 
     TBLayout* layout =  new TBLayout();
     layout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
-    layout->SetSize(container_->GetRect().w, container_->GetRect().h);
     layout->SetGravity(WIDGET_GRAVITY_ALL);
 
     rootContentWidget_->AddChild(layout);
@@ -71,8 +68,6 @@ TextResourceEditor ::TextResourceEditor(Context* context, const String &fullpath
     layout->AddChild(c);
     layout->SetSpacing(0);
 
-    container_->GetContentRoot()->AddChild(rootContentWidget_);
-
     TBStyleEdit* sedit = text->GetStyleEdit();
     sedit->text_change_listener = this;
 
@@ -85,6 +80,12 @@ TextResourceEditor ::TextResourceEditor(Context* context, const String &fullpath
     styleEdit_ = sedit;
 
     SubscribeToEvent(E_UPDATE, HANDLER(TextResourceEditor, HandleUpdate));
+
+    // FIXME: Set the size at the end of setup, so all children are updated accordingly
+    // future size changes will be handled automatically
+    TBRect rect = container_->GetContentRoot()->GetRect();
+    rootContentWidget_->SetSize(rect.w, rect.h);
+
 
 }
 
@@ -204,11 +205,7 @@ void TextResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventDat
 
     if (!styleEdit_)
         return;
-
-    // FIXME
-    rootContentWidget_->SetSize(rootContentWidget_->GetParent()->GetRect().w, rootContentWidget_->GetParent()->GetRect().h);
 }
-
 
 void TextResourceEditor::FindTextClose()
 {

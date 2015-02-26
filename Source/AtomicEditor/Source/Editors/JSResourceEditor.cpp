@@ -49,9 +49,6 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, TB
     currentFindPos_(-1)
 {
 
-    rootContentWidget_ = new TBWidget();
-    rootContentWidget_->SetGravity(WIDGET_GRAVITY_ALL);
-
     TBLayout* layout = new TBLayout();
     layout->SetLayoutSize(LAYOUT_SIZE_GRAVITY);
     layout->SetGravity(WIDGET_GRAVITY_ALL);
@@ -108,8 +105,6 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, TB
     layout->AddChild(c);
     layout->SetSpacing(0);
 
-    container_->GetContentRoot()->AddChild(rootContentWidget_);
-
     TBStyleEdit* sedit = text->GetStyleEdit();
     TBTextTheme* theme = new TBTextTheme();
     for (unsigned i = 0; i < TB_MAX_TEXT_THEME_COLORS; i++)
@@ -152,6 +147,10 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, TB
 
     SubscribeToEvent(E_UPDATE, HANDLER(JSResourceEditor, HandleUpdate));
 
+    // FIXME: Set the size at the end of setup, so all children are updated accordingly
+    // future size changes will be handled automatically
+    TBRect rect = container_->GetContentRoot()->GetRect();
+    rootContentWidget_->SetSize(rect.w, rect.h);
 }
 
 JSResourceEditor::~JSResourceEditor()
@@ -361,9 +360,6 @@ void JSResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (!styleEdit_)
         return;
-
-    // FIXME
-    rootContentWidget_->SetSize(rootContentWidget_->GetParent()->GetRect().w, rootContentWidget_->GetParent()->GetRect().h);
 
     // sync line number
     lineNumberList_->GetScrollContainer()->ScrollTo(0, styleEdit_->scroll_y);
