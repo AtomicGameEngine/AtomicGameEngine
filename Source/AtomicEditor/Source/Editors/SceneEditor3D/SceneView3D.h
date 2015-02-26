@@ -26,7 +26,7 @@ namespace AtomicEditor
 
 class SceneEditor3D;
 
-class SceneView3D: public View3D
+class SceneView3D: public UIView3D
 {
     OBJECT(SceneView3D);
 

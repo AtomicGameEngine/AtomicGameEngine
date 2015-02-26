@@ -36,7 +36,7 @@ namespace AtomicEditor
 {
 
 SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
-    View3D(context),
+    UIView3D(context),
     yaw_(0.0f),
     pitch_(0.0f),
     mouseLeftDown_(false),

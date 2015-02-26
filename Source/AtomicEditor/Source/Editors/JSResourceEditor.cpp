@@ -49,10 +49,15 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, TB
     currentFindPos_(-1)
 {
 
-    TBLayout* layout = rootContentLayout_ = new TBLayout();
-    layout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
-    layout->SetSize(container_->GetRect().w, container_->GetRect().h);
+    rootContentWidget_ = new TBWidget();
+    rootContentWidget_->SetGravity(WIDGET_GRAVITY_ALL);
+
+    TBLayout* layout = new TBLayout();
+    layout->SetLayoutSize(LAYOUT_SIZE_GRAVITY);
     layout->SetGravity(WIDGET_GRAVITY_ALL);
+    layout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
+
+    rootContentWidget_->AddChild(layout);
 
     TBContainer* c = new TBContainer();
     c->SetGravity(WIDGET_GRAVITY_ALL);
@@ -103,7 +108,7 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, TB
     layout->AddChild(c);
     layout->SetSpacing(0);
 
-    container_->GetContentRoot()->AddChild(layout);
+    container_->GetContentRoot()->AddChild(rootContentWidget_);
 
     TBStyleEdit* sedit = text->GetStyleEdit();
     TBTextTheme* theme = new TBTextTheme();
@@ -356,6 +361,9 @@ void JSResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (!styleEdit_)
         return;
+
+    // FIXME
+    rootContentWidget_->SetSize(rootContentWidget_->GetParent()->GetRect().w, rootContentWidget_->GetParent()->GetRect().h);
 
     // sync line number
     lineNumberList_->GetScrollContainer()->ScrollTo(0, styleEdit_->scroll_y);

@@ -52,7 +52,7 @@ public:
 
 ResourceEditor::ResourceEditor(Context* context, const String& fullpath, TBTabContainer* container):
     Object(context), fullpath_(fullpath), container_(container),
-    editorTabLayout_(0), rootContentLayout_(0), button_(0)
+    editorTabLayout_(0), rootContentWidget_(0), button_(0)
 {
 
     String filename = GetFileNameAndExtension(fullpath_);

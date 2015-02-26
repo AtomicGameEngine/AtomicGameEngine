@@ -41,14 +41,14 @@ public:
 
     const String& GetFullPath() { return fullpath_; }
 
-    TBLayout* GetRootContentLayout() { return rootContentLayout_; }
+    TBWidget* GetRootContentWidget() { return rootContentWidget_; }
 
 protected:
 
     String fullpath_;
     TBTabContainer* container_;
     EditorTabLayout* editorTabLayout_;
-    TBLayout* rootContentLayout_;
+    TBWidget* rootContentWidget_;
     TBButton* button_;
 
 private:

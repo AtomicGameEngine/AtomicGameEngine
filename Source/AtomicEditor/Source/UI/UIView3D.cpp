@@ -6,11 +6,15 @@
 
 #include "AtomicEditor.h"
 
+
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/Engine/Engine.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Camera.h>
 #include <Atomic/Graphics/RenderPath.h>
+#include <Atomic/Graphics/Renderer.h>
+#include <Atomic/Core/CoreEvents.h>
 
 #include "UIView3D.h"
 
@@ -24,11 +28,12 @@ namespace AtomicEditor
 {
 
 
-View3D::View3D(Context* context) :
+UIView3D::UIView3D(Context* context) :
     AEWidget(context),
     rttFormat_(Graphics::GetRGBFormat()),
     autoUpdate_(false),
-    size_(-1, -1)
+    size_(-1, -1),
+    resizeRequired_(false)
 {
     renderTexture_ = new Texture2D(context_);
     depthTexture_ = new Texture2D(context_);
@@ -39,9 +44,11 @@ View3D::View3D(Context* context) :
 
     view3DWidget_->view3D_ = this;
     delegate_->AddChild(view3DWidget_);
+
+   SubscribeToEvent(E_ENDFRAME, HANDLER(UIView3D, HandleEndFrame));
 }
 
-View3D::~View3D()
+UIView3D::~UIView3D()
 {
     // FIXME: need to refactor Light2D viewport handling
     if (viewport_.NotNull())
@@ -53,18 +60,28 @@ View3D::~View3D()
 
 }
 
-bool View3D::OnEvent(const TBWidgetEvent &ev)
+bool UIView3D::OnEvent(const TBWidgetEvent &ev)
 {
     return false;
 }
 
+void UIView3D::HandleEndFrame(StringHash eventType, VariantMap& eventData)
+{
+    if (resizeRequired_)
+    {
+        TBRect rect = view3DWidget_->GetRect();
+        OnResize(IntVector2(rect.w, rect.h));
+        resizeRequired_ = false;
+    }
 
-void View3D::OnResize(const IntVector2 &newSize)
+}
+
+
+void UIView3D::OnResize(const IntVector2 &newSize)
 {
     if (newSize.x_ == size_.x_ && newSize.y_ == size_.y_)
         return;
 
-    size_ = newSize;
     int width = newSize.x_;
     int height = newSize.y_;
 
@@ -73,18 +90,19 @@ void View3D::OnResize(const IntVector2 &newSize)
         viewport_->SetRect(IntRect(0, 0, width, height));
         renderTexture_->SetSize(width, height, rttFormat_, TEXTURE_RENDERTARGET);
         depthTexture_->SetSize(width, height, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+
         RenderSurface* surface = renderTexture_->GetRenderSurface();
         surface->SetViewport(0, viewport_);
         surface->SetUpdateMode(autoUpdate_ ? SURFACE_UPDATEALWAYS : SURFACE_MANUALUPDATE);
         surface->SetLinkedDepthStencil(depthTexture_->GetRenderSurface());
 
-        if (!autoUpdate_)
-            surface->QueueUpdate();
+        size_ = newSize;
+
     }
 }
 
 
-void View3D::SetView(Scene* scene, Camera* camera)
+void UIView3D::SetView(Scene* scene, Camera* camera)
 {
     scene_ = scene;
     cameraNode_ = camera ? camera->GetNode() : 0;
@@ -94,7 +112,7 @@ void View3D::SetView(Scene* scene, Camera* camera)
     QueueUpdate();
 }
 
-void View3D::SetFormat(unsigned format)
+void UIView3D::SetFormat(unsigned format)
 {
     if (format != rttFormat_)
     {
@@ -102,7 +120,7 @@ void View3D::SetFormat(unsigned format)
     }
 }
 
-void View3D::SetAutoUpdate(bool enable)
+void UIView3D::SetAutoUpdate(bool enable)
 {
     if (enable != autoUpdate_)
     {
@@ -113,7 +131,7 @@ void View3D::SetAutoUpdate(bool enable)
     }
 }
 
-void View3D::QueueUpdate()
+void UIView3D::QueueUpdate()
 {
     if (!autoUpdate_)
     {
@@ -123,27 +141,27 @@ void View3D::QueueUpdate()
     }
 }
 
-Scene* View3D::GetScene() const
+Scene* UIView3D::GetScene() const
 {
     return scene_;
 }
 
-Node* View3D::GetCameraNode() const
+Node* UIView3D::GetCameraNode() const
 {
     return cameraNode_;
 }
 
-Texture2D* View3D::GetRenderTexture() const
+Texture2D* UIView3D::GetRenderTexture() const
 {
     return renderTexture_;
 }
 
-Texture2D* View3D::GetDepthTexture() const
+Texture2D* UIView3D::GetDepthTexture() const
 {
     return depthTexture_;
 }
 
-Viewport* View3D::GetViewport() const
+Viewport* UIView3D::GetViewport() const
 {
     return viewport_;
 }
@@ -164,13 +182,13 @@ View3DWidget::View3DWidget()
     data[32] = 0; data[33] = color; data[34] = 0; data[35] = 1;
 }
 
+
 void View3DWidget::OnPaint(const PaintProps &paint_props)
 {
     if (view3D_.Null())
         return;
 
     TBRect rect = GetRect();
-
     ConvertToRoot(rect.x, rect.y);
 
     IntVector2 size = view3D_->GetSize();
@@ -179,7 +197,8 @@ void View3DWidget::OnPaint(const PaintProps &paint_props)
     {
         size.x_ = rect.w;
         size.y_ = rect.h;
-        view3D_->OnResize(size);
+        view3D_->SetResizeRequired();
+        return;
     }
 
     float* data = &vertexData_[0];

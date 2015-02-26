@@ -37,6 +37,8 @@ public:
 
 private:
 
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
     void UpdateLineNumbers();
 
     tb::TBStyleEdit* styleEdit_;

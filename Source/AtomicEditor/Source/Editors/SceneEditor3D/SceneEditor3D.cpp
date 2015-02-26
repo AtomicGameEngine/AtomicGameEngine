@@ -33,16 +33,10 @@ namespace AtomicEditor
 {
 
 SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabContainer *container) :
-    ResourceEditor(context, fullpath, container),
-    layout_(0),
-    view3DContainer_(0)
+    ResourceEditor(context, fullpath, container)
 {
-    layout_ = rootContentLayout_ = new TBLayout();
-    layout_->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
-    layout_->SetSize(container_->GetRect().w, container_->GetRect().h);
-
-    view3DContainer_ = new TBContainer();
-    view3DContainer_->SetGravity(WIDGET_GRAVITY_ALL);
+    rootContentWidget_ = new TBWidget();
+    rootContentWidget_->SetGravity(WIDGET_GRAVITY_ALL);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
@@ -60,11 +54,10 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
 
     TBWidgetDelegate* delegate = sceneView_->GetWidgetDelegate();
     delegate->SetGravity(WIDGET_GRAVITY_ALL);
-    view3DContainer_->AddChild(delegate);
 
-    layout_->AddChild(view3DContainer_);
+    rootContentWidget_->AddChild(delegate);
 
-    container_->GetContentRoot()->AddChild(layout_);
+    container_->GetContentRoot()->AddChild(rootContentWidget_);
 
     gizmo3D_ = new Gizmo3D(context_);
     gizmo3D_->SetView(sceneView_);
@@ -116,6 +109,10 @@ void SceneEditor3D::SelectNode(Node* node)
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {    
+
+    // FIXME
+    rootContentWidget_->SetSize(rootContentWidget_->GetParent()->GetRect().w, rootContentWidget_->GetParent()->GetRect().h);
+
     Vector<Node*> editNodes;
     editNodes.Push(selectedNode_);
     gizmo3D_->Update(editNodes);

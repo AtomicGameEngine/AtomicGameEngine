@@ -17,11 +17,11 @@ using namespace Atomic;
 namespace AtomicEditor
 {
 
-class View3D;
+class UIView3D;
 
 class View3DWidget : public TBWidget
 {
-    friend class View3D;
+    friend class UIView3D;
 
 public:
     // For safe typecasting
@@ -33,21 +33,21 @@ public:
 
 private:
 
-    WeakPtr<View3D> view3D_;
+    WeakPtr<UIView3D> view3D_;
     PODVector<float> vertexData_;
 
 };
 
 
-class View3D : public AEWidget
+class UIView3D : public AEWidget
 {
-    OBJECT(View3D);
+    OBJECT(UIView3D);
 
 public:
     /// Construct.
-    View3D(Context* context);
+    UIView3D(Context* context);
     /// Destruct.
-    virtual ~View3D();
+    virtual ~UIView3D();
 
     /// React to resize.
     void OnResize(const IntVector2& newSize);
@@ -76,11 +76,14 @@ public:
     /// Return viewport.
     Viewport* GetViewport() const;
 
+    void SetResizeRequired() {resizeRequired_ = true;}
     const IntVector2& GetSize() const { return size_; }
 
     virtual bool OnEvent(const TBWidgetEvent &ev);
 
 protected:
+
+    void HandleEndFrame(StringHash eventType, VariantMap& eventData);
 
     /// Renderable texture.
     SharedPtr<Texture2D> renderTexture_;
@@ -96,6 +99,8 @@ protected:
     unsigned rttFormat_;
     /// Render texture auto update mode.
     bool autoUpdate_;
+
+    bool resizeRequired_;
 
     IntVector2 size_;
 

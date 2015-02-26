@@ -49,8 +49,6 @@ ResourceFrame::ResourceFrame(Context* context) :
 
     delegate_->SetGravity(WIDGET_GRAVITY_ALL);
 
-    //delegate_->SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
-
     issueswidget_ = new IssuesWidget(context_);
     errorswidget_ = new ErrorsWidget(context_);
     consolewidget_ = new ConsoleWidget(context_);
@@ -154,7 +152,7 @@ void ResourceFrame::EditResource(const String& fullpath)
         }
 
         editors_[fullpath] = editor;
-        editorLookup_[editor->GetRootContentLayout()] = editor;
+        editorLookup_[editor->GetRootContentWidget()] = editor;
         tabcontainer_->SetCurrentPage(tabcontainer_->GetNumPages()-1);
 
     }

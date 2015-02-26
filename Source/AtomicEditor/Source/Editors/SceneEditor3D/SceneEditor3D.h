@@ -59,9 +59,6 @@ private:
 
     SharedPtr<Gizmo3D> gizmo3D_;
 
-    TBLayout* layout_;
-    TBContainer* view3DContainer_;
-
     WeakPtr<Node> selectedNode_;
 
 };

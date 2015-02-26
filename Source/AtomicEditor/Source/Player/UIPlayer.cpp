@@ -45,7 +45,7 @@ UIPlayer::UIPlayer(Context* context):
 
     Graphics* graphics = GetSubsystem<Graphics>();
 
-    view3D_ = new View3D(context_);
+    view3D_ = new UIView3D(context_);
 
     // horrible hack
     Viewport* viewport = view3D_->GetViewport();

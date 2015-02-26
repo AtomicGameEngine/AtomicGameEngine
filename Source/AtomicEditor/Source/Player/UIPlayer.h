@@ -39,7 +39,7 @@ public:
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    SharedPtr<View3D> view3D_;
+    SharedPtr<UIView3D> view3D_;
     WeakPtr<AEPlayer> aePlayer_;
 
 
