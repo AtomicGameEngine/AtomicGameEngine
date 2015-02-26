@@ -37,7 +37,7 @@ PreferredSize TBTabLayout::OnCalculatePreferredContentSize(const SizeConstraints
 
 TBTabContainer::TBTabContainer()
 	: m_need_page_update(true)
-	, m_current_page(0)
+    , m_current_page(-1)
 	, m_align(TB_ALIGN_TOP)
 {
 	AddChild(&m_root_layout);
@@ -75,8 +75,9 @@ void TBTabContainer::SetAxis(AXIS axis)
 
 void TBTabContainer::SetValue(int index)
 {
-	if (index == m_current_page)
+    if (index == m_current_page || !GetNumPages())
 		return;
+
 	m_current_page = index;
 
 	// Update the pages visibility and tabs pressed value.
@@ -89,6 +90,9 @@ void TBTabContainer::SetValue(int index)
 		page->SetVisibilility(active ? WIDGET_VISIBILITY_VISIBLE : WIDGET_VISIBILITY_INVISIBLE);
 		tab->SetValue(active ? 1 : 0);
 	}
+
+    TBWidgetEvent ev(EVENT_TYPE_TAB_CHANGED);
+    InvokeEvent(ev);
 }
 
 int TBTabContainer::GetNumPages()
@@ -96,11 +100,18 @@ int TBTabContainer::GetNumPages()
 	int count = 0;
 	for (TBWidget *tab = m_tab_layout.GetFirstChild(); tab; tab = tab->GetNext())
 		count++;
+
+    if (!count)
+        m_current_page = -1;
+
 	return count;
 }
 
 TBWidget *TBTabContainer::GetCurrentPageWidget() const
 {
+    if (m_current_page == -1)
+        return nullptr;
+
 	return m_content_root.GetChildFromIndex(m_current_page);
 }
 

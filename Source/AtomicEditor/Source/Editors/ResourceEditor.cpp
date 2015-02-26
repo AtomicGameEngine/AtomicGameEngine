@@ -52,33 +52,33 @@ public:
 
 ResourceEditor::ResourceEditor(Context* context, const String& fullpath, TBTabContainer* container):
     Object(context), fullpath_(fullpath), container_(container),
-    layout_(0), button_(0)
+    editorTabLayout_(0), rootContentLayout_(0), button_(0)
 {
 
     String filename = GetFileNameAndExtension(fullpath_);
 
-    layout_ = new EditorTabLayout();
-    layout_->SetID(TBIDC("tab"));
+    editorTabLayout_ = new EditorTabLayout();
+    editorTabLayout_->SetID(TBIDC("tab"));
 
     button_ = new TBButton();
     button_->SetText(filename.CString());
     button_->SetSqueezable(true);
     button_->SetSkinBg(TBIDC("TBButton.flat"));
     button_->SetValue(1);
-    layout_->AddChild(button_);
+    editorTabLayout_->AddChild(button_);
 
     TBButton* closebutton = new TBButton();
-    layout_->AddChild(closebutton);
+    editorTabLayout_->AddChild(closebutton);
     closebutton->SetSkinBg(TBIDC("TBWindow.close"));
     closebutton->SetIsFocusable(false);
     closebutton->SetID(TBIDC("tabclose"));
 
-    layout_->editor_ = this;
-    layout_->button_ = button_;
-    layout_->close_ = closebutton;
-    layout_->container_ = container;
+    editorTabLayout_->editor_ = this;
+    editorTabLayout_->button_ = button_;
+    editorTabLayout_->close_ = closebutton;
+    editorTabLayout_->container_ = container;
 
-    container_->GetTabLayout()->AddChild(layout_);
+    container_->GetTabLayout()->AddChild(editorTabLayout_);
 
     SubscribeToEvent(E_FILECHANGED, HANDLER(ResourceEditor, HandleFileChanged));
 }
@@ -107,7 +107,7 @@ void ResourceEditor::Close(bool navigateToAvailabeResource)
     // keep us alive through the close
     SharedPtr<ResourceEditor> keepalive(this);
 
-    container_->GetTabLayout()->RemoveChild(layout_);
+    container_->GetTabLayout()->RemoveChild(editorTabLayout_);
 
     MainFrame* frame = GetSubsystem<MainFrame>();
     ResourceFrame* rframe = frame->GetResourceFrame();

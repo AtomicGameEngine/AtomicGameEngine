@@ -58,6 +58,7 @@ public:
 
     ProjectFrame* GetProjectFrame();
     HierarchyFrame* GetHierarchyFrame();
+    InspectorFrame* GetInspectorFrame();
     ResourceFrame* GetResourceFrame();
     WelcomeFrame* GetWelcomeFrame();
     FindTextWidget* GetFindTextWidget();
@@ -68,8 +69,13 @@ public:
     // content views
     void ShowResourceFrame(bool show = true);
     void ShowWelcomeFrame(bool show = true);    
+
     bool ResourceFrameVisible();
     bool WelcomeFrameVisible();
+    bool InspectorFrameVisible();
+
+
+    void ShowInspectorFrame(bool show);
 
     // reveals the current project folder in finder/explorer
     void RevealInFinder();
@@ -92,9 +98,11 @@ private:
     void HandleJavascriptSaved(StringHash eventType, VariantMap& eventData);
     void HandlePlatformChange(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+    void HandleResourceEditorChanged(StringHash eventType, VariantMap& eventData);
 
     TBEditField* consoletext_;
     TBLayout* resourceviewcontainer_;
+    TBLayout* inspectorlayout_;
     TBSkinImage* platformIndicator_;
 
     SharedPtr<ProjectFrame> projectframe_;

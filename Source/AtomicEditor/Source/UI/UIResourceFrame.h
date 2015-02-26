@@ -67,6 +67,8 @@ private:
     HashMap<String, SharedPtr<ResourceEditor> > editors_;
     HashMap<TBWidget*, SharedPtr<ResourceEditor> > editorLookup_;
 
+    WeakPtr<ResourceEditor> currentResourceEditor_;
+
     SharedPtr<IssuesWidget> issueswidget_;
     SharedPtr<ErrorsWidget> errorswidget_;
     SharedPtr<ConsoleWidget> consolewidget_;    

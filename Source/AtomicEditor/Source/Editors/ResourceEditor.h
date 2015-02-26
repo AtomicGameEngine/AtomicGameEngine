@@ -37,13 +37,18 @@ public:
     virtual bool FindText(const String& text, unsigned flags) { return false; }
     virtual void FindTextClose() { }
 
+    virtual bool RequiresInspector() { return false; }
+
     const String& GetFullPath() { return fullpath_; }
+
+    TBLayout* GetRootContentLayout() { return rootContentLayout_; }
 
 protected:
 
     String fullpath_;
     TBTabContainer* container_;
-    EditorTabLayout* layout_;
+    EditorTabLayout* editorTabLayout_;
+    TBLayout* rootContentLayout_;
     TBButton* button_;
 
 private:

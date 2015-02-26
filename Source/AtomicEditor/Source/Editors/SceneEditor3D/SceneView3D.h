@@ -42,6 +42,8 @@ public:
 
 private:
 
+    bool MouseInView();
+
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);

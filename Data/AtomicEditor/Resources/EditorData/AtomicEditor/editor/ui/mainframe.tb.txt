@@ -56,7 +56,7 @@ TBLayout: distribution: gravity, axis: y
 					TBContainer: skin: AEContainer, gravity: left right bottom, id: consolecontainer
 						TBEditField: multiline: 1, styling: 1, gravity: left right, id: consoletext
 							text: "Hello World!"
-				TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom
+				TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom, id: inspectorlayout
 					TBEditField: text: "<color #AAAAAA>Inspector</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
 						font: size: 11
 					TBLayout: distribution: gravity, id: inspectorcontainer

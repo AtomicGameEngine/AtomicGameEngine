@@ -102,9 +102,12 @@ void SceneView3D::MoveCamera(float timeStep)
     Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 20.0f;
+    float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.2f;
+
+    if (input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT))
+        MOVE_SPEED *= 3.0f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     if (input->GetMouseButtonDown(MOUSEB_RIGHT))
@@ -170,6 +173,18 @@ void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
     }
 }
 
+bool SceneView3D::MouseInView()
+{
+    UI* ui = GetSubsystem<UI>();
+    IntVector2 pos = ui->GetCursorPosition();
+
+    TBRect rect = GetWidgetDelegate()->GetRect();
+    GetWidgetDelegate()->ConvertToRoot(rect.x, rect.y);
+
+    return rect.Contains(TBPoint(pos.x_, pos.y_));
+
+}
+
 
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -180,6 +195,9 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
         DrawNodeDebug(selectedNode_, debugRenderer_);
 
     }
+
+    if (!MouseInView())
+        return;
 
     Input* input = GetSubsystem<Input>();
 
@@ -276,7 +294,8 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 
-    MoveCamera(timeStep);
+    if (MouseInView())
+        MoveCamera(timeStep);
 
     QueueUpdate();
 }

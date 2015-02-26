@@ -40,6 +40,8 @@
 #include "Project/AEProject.h"
 #include "Project/ProjectUtils.h"
 
+#include "Editors/ResourceEditor.h"
+
 #include "Tools/External/AEExternalTooling.h"
 
 using namespace tb;
@@ -94,6 +96,9 @@ MainFrame::MainFrame(Context* context) :
     wd->SetSize(rect.w, rect.h);
     hierarchycontainer->AddChild(wd);
 
+    inspectorlayout_ = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("inspectorlayout"));
+    assert(inspectorlayout_);
+
     inspectorframe_ = new InspectorFrame(context_);
     TBLayout* inspectorcontainer = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("inspectorcontainer"));
     assert(inspectorcontainer);
@@ -143,9 +148,12 @@ MainFrame::MainFrame(Context* context) :
     SubscribeToEvent(E_JAVASCRIPTSAVED, HANDLER(MainFrame, HandleJavascriptSaved));
     SubscribeToEvent(E_PLATFORMCHANGE, HANDLER(MainFrame, HandlePlatformChange));
     SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(MainFrame, HandleEditorShutdown));
+    SubscribeToEvent(E_EDITORRESOURCEEDITORCHANGED, HANDLER(MainFrame, HandleResourceEditorChanged));
 
     messageModal_ = new MessageModal(context_);
     uiModalOps_ = new UIModalOps(context_);
+
+    ShowInspectorFrame(false);
 
     // show welcome frame to start
     ShowWelcomeFrame();
@@ -241,6 +249,24 @@ MessageModal* MainFrame::GetMessageModal()
 UIModalOps* MainFrame::GetUIModalOps()
 {
     return uiModalOps_;
+}
+
+InspectorFrame* MainFrame::GetInspectorFrame()
+{
+    return inspectorframe_;
+}
+
+void MainFrame::ShowInspectorFrame(bool show)
+{
+    if (!show)
+        inspectorlayout_->SetVisibilility(WIDGET_VISIBILITY_GONE);
+    else
+        inspectorlayout_->SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
+}
+
+bool MainFrame::InspectorFrameVisible()
+{
+    return inspectorlayout_->GetVisibility() == WIDGET_VISIBILITY_VISIBLE;
 }
 
 void MainFrame::HandleJavascriptSaved(StringHash eventType, VariantMap& eventData)
@@ -356,6 +382,7 @@ void MainFrame::ShowWelcomeFrame(bool show)
 
     if (show)
     {
+        ShowInspectorFrame(false);
         welcomeframe_->UpdateRecentProjects();
         if (!child)
         {
@@ -725,6 +752,17 @@ void MainFrame::RevealInFinder()
 
     ProjectUtils* utils = context_->GetSubsystem<ProjectUtils>();
     utils->RevealInFinder(resourcePath);
+
+}
+
+void MainFrame::HandleResourceEditorChanged(StringHash eventType, VariantMap& eventData)
+{
+    ResourceEditor* editor = static_cast<ResourceEditor*>(eventData[EditorResourceEditorChanged::P_RESOURCEEDITOR].GetPtr());
+
+    if (!editor || !editor->RequiresInspector())
+        ShowInspectorFrame(false);
+    else
+        ShowInspectorFrame(true);
 
 }
 

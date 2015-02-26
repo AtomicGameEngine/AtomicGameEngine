@@ -154,8 +154,9 @@ void ResourceFrame::EditResource(const String& fullpath)
         }
 
         editors_[fullpath] = editor;
+        editorLookup_[editor->GetRootContentLayout()] = editor;
         tabcontainer_->SetCurrentPage(tabcontainer_->GetNumPages()-1);
-        editorLookup_[tabcontainer_->GetCurrentPageWidget()] = editor;
+
     }
 
 }
@@ -169,6 +170,27 @@ void ResourceFrame::FocusCurrentTab()
 
 bool ResourceFrame::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_TAB_CHANGED && ev.target == tabcontainer_)
+    {
+        TBWidget* widget = tabcontainer_->GetCurrentPageWidget();
+        if (widget)
+        {
+            if (editorLookup_.Contains(widget))
+            {
+                ResourceEditor* editor = editorLookup_[widget];
+                if (editor != currentResourceEditor_)
+                {
+                    VariantMap eventData;
+                    eventData[EditorResourceEditorChanged::P_RESOURCEEDITOR] = editor;
+                    SendEvent(E_EDITORRESOURCEEDITORCHANGED, eventData);
+                    currentResourceEditor_ = editor;
+                }
+            }
+        }
+
+        return true;
+    }
+
     if (ev.type == EVENT_TYPE_KEY_DOWN || ev.type == EVENT_TYPE_SHORTCUT
             || ev.type == EVENT_TYPE_CLICK || ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
     {

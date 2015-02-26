@@ -52,6 +52,13 @@ EVENT(E_EDITORPLAYSTOP, EditorPlayStop)
 
 }
 
+// stop play mode
+EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
+{
+    PARAM(P_RESOURCEEDITOR, ResourceEditor); // ResourceEditor*
+}
+
+
 // emitted once play has started
 EVENT(E_EDITORPLAYSTARTED, EditorPlayStarted)
 {

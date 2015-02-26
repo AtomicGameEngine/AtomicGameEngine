@@ -37,7 +37,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
     layout_(0),
     view3DContainer_(0)
 {
-    layout_ = new TBLayout();
+    layout_ = rootContentLayout_ = new TBLayout();
     layout_->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
     layout_->SetSize(container_->GetRect().w, container_->GetRect().h);
 

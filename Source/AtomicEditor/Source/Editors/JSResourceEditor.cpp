@@ -49,7 +49,7 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, TB
     currentFindPos_(-1)
 {
 
-    TBLayout* layout = new TBLayout();
+    TBLayout* layout = rootContentLayout_ = new TBLayout();
     layout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
     layout->SetSize(container_->GetRect().w, container_->GetRect().h);
     layout->SetGravity(WIDGET_GRAVITY_ALL);

@@ -82,6 +82,9 @@ enum EVENT_TYPE {
 		the widget. The event is guaranteed to be a TBWidgetEventFileDrop. */
 	EVENT_TYPE_FILE_DROP,
 
+    /** Invoked by the platform when a tab container's tab changed */
+    EVENT_TYPE_TAB_CHANGED,
+
 	/** Custom event. Not used internally. ref_id may be used for additional type info. */
 	EVENT_TYPE_CUSTOM
 };
