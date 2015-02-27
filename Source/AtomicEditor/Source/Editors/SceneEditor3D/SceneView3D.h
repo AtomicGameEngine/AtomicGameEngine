@@ -40,6 +40,9 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
+    void SetPitch(float pitch) { pitch_ = pitch; }
+    void SetYaw(float yaw) { yaw_ = yaw; }
+
 private:
 
     bool MouseInView();

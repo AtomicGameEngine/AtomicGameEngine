@@ -121,6 +121,10 @@ void SceneView3D::MoveCamera(float timeStep)
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 
+    //Vector3 pos = cameraNode_->GetWorldPosition();
+    //Quaternion q = cameraNode_->GetWorldRotation();
+    //LOGINFOF("%f %f %f : %f %f %f %f", pos.x_, pos.y_, pos.z_, q.x_, q.y_, q.z_, q.w_ );
+
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the Translate() function (default local space) to move relative to the node's orientation.
     if (input->GetKeyDown('W'))

@@ -49,6 +49,26 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
 
     sceneView_ = new SceneView3D(context_, this);
 
+    // EARLY ACCESS
+    if (fullpath.Find(String("ToonTown")) != String::NPOS)
+    {
+          sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073, 76.1121, 16.47763));
+          Quaternion q(0.55, 0.14,  0.8, -0.2);
+          sceneView_->SetYaw(q.YawAngle());
+          sceneView_->SetPitch(q.PitchAngle());
+          sceneView_->GetCameraNode()->SetWorldRotation(q);
+    }
+    else
+    {
+        Node* playerSpawn = scene_->GetChild("PlayerInfoStart", true);
+        if (playerSpawn)
+        {
+            sceneView_->GetCameraNode()->SetPosition(playerSpawn->GetPosition());
+            sceneView_->SetYaw(playerSpawn->GetRotation().EulerAngles().y_);
+        }
+
+    }
+
     TBWidgetDelegate* delegate = sceneView_->GetWidgetDelegate();
     delegate->SetGravity(WIDGET_GRAVITY_ALL);
 
