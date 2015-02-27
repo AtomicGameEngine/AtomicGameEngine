@@ -481,7 +481,7 @@ elements
 	TBResizer
 		bitmap resizer.png
 	TBInlineSelect
-		max-width 110
+		max-width 140
 	TBDimmer
 		background-color #00000088
 

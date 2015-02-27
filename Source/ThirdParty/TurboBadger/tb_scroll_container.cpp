@@ -98,6 +98,7 @@ TBScrollContainer::TBScrollContainer()
 	: m_adapt_to_content_size(false)
 	, m_adapt_content_size(false)
 	, m_layout_is_invalid(false)
+    , m_ignore_scroll_events(false)
 	, m_mode(SCROLL_MODE_X_Y)
 {
 	AddChild(&m_scrollbar_x);

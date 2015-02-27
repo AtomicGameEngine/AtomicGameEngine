@@ -5,6 +5,7 @@
 
 #include "tb_inline_select.h"
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 
 namespace tb {
@@ -50,6 +51,11 @@ TBInlineSelect::~TBInlineSelect()
 	RemoveChild(&m_layout);
 }
 
+void TBInlineSelect::SetEditFieldLayoutParams(LayoutParams& lp)
+{
+    m_editfield.SetLayoutParams(lp);
+}
+
 void TBInlineSelect::SetLimits(double min, double max)
 {
 	assert(min <= max);
@@ -66,9 +72,18 @@ void TBInlineSelect::SetValueInternal(double value, bool update_text)
 	m_value = value;
 
 	if (update_text)
-	{
+	{        
 		TBStr strval;
-        strval.SetFormatted("%.2f", m_value);
+
+        double prec = m_value - floor(m_value);
+        if (prec < .001)
+        {
+            strval.SetFormatted("%.0f", m_value);
+        }
+        else
+            strval.SetFormatted("%.2f", m_value);
+
+
 		m_editfield.SetText(strval);
 	}
 

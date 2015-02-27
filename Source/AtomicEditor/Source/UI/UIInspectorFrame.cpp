@@ -151,6 +151,7 @@ void InspectorFrame::InspectNode(Node* node)
         LayoutParams nlp;
         nlp.SetWidth(304);
         TBLayout* nodeLayout = new TBLayout(AXIS_Y);
+        nodeLayout->SetSpacing(4);
 
         nodeLayout->SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
         nodeLayout->SetLayoutPosition(LAYOUT_POSITION_LEFT_TOP);
@@ -171,8 +172,6 @@ void InspectorFrame::InspectNode(Node* node)
         nodeLabel->SetText("Node");
         nodeLabel->SetSkinBg(TBIDC("InspectorTextLabel"));
         attrsVerticalLayout->AddChild(nodeLabel);
-
-
 
         const Vector<AttributeInfo>* attrs = node->GetAttributes();
 

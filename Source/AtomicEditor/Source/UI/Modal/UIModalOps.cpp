@@ -52,6 +52,8 @@ UIModalOpWindow::UIModalOpWindow(Context* context):
     // start with full screen as size
     delegate_->SetRect(TBRect(0, 0, root->GetRect().w, root->GetRect().h));
     delegate_->AddChild(window_);
+
+    delegate_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
 }
 
 UIModalOpWindow::~UIModalOpWindow()

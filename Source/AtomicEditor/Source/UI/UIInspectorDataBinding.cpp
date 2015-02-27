@@ -332,7 +332,7 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
         layout->SetSpacing(0);
 
         LayoutParams lp;
-        lp.SetWidth(90);
+        lp.SetWidth(100);
 
         for (unsigned i = 0; i < 3; i++)
         {
@@ -341,6 +341,9 @@ InspectorDataBinding* InspectorDataBinding::Create(Serializable* object, const A
             select->SetFontDescription(fd);
             select->SetSkinBg(TBIDC("InspectorTextAttrName"));
             select->SetLimits(-10000000, 10000000);
+            LayoutParams editlp;
+            editlp.min_w = 60;
+            select->SetEditFieldLayoutParams(editlp);
             select->SetLayoutParams(lp);
             layout->AddChild(select);
         }

@@ -72,7 +72,7 @@ UIPlayer::UIPlayer(Context* context):
 
     window_->ResizeToFitContent();
 
-    Center();
+    Center();    
 
     SubscribeToEvent(E_UPDATE, HANDLER(UIPlayer, HandleUpdate));
 }
@@ -105,7 +105,7 @@ void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 bool UIPlayer::OnEvent(const TBWidgetEvent &ev)
 {
-    return false;
+    return true;
 }
 
 
