@@ -1,6 +1,12 @@
 {
 	"Examples" : [
 			{
+				"name": "ToonTown",
+				"desc" : "Town, Terrain, Day/Night Cycles",
+				"screenshot" : "ToonTown.png",
+				"folder" : "ToonTown"
+			},	
+			{
 				"name": "Physics Platformer 2D",
 				"desc" : "Moving platforms, vines, and neat 2D lighting",
 				"screenshot" : "PhysicsPlatformer2D.png",
