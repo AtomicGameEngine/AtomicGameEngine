@@ -957,6 +957,8 @@ bool JSONSceneProcess::ProcessHierarchy(Scene* scene)
 
 bool JSONSceneProcess::Process()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    cache->AddResourceDir(__rootFolder);
     scene_ = new Scene(context_);
     scene_->CreateComponent<PhysicsWorld>();
     scene_->CreateComponent<Octree>();
