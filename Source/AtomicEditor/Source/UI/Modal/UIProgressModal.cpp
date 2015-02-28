@@ -32,6 +32,7 @@ ProgressModal::ProgressModal(Context* context, const String &title, const String
     dimmer_ = new TBDimmer();
 
     window_ = new TBWindow();
+    window_->DisableCloseButton();
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/progressmodal.tb.txt");
 
     window_->ResizeToFitContent();

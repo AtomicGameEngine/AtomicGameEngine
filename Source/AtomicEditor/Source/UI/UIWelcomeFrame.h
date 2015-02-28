@@ -37,10 +37,11 @@ private:
     {
         String name;
         String folder;
+        String module;
         TBID id;
     };
 
-    void AddExample(const String& name, const String& desc, const String& screenshot, const String &folder);
+    void AddExample(const String& name, const String& desc, const String& screenshot, const String &folder, const String &module);
     void FillExamples();
     bool HandleExampleCopy(const String& name, const String& exampleFolder, String &atomicProjectFile);    
 

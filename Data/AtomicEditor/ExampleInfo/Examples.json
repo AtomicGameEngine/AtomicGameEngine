@@ -1,46 +1,54 @@
 {
 	"Examples" : [
 			{
-				"name": "ToonTown",
-				"desc" : "Town, Terrain, Day/Night Cycles",
-				"screenshot" : "ToonTown.png",
-				"folder" : "ToonTown"
-			},	
-			{
 				"name": "Physics Platformer 2D",
 				"desc" : "Moving platforms, vines, and neat 2D lighting",
 				"screenshot" : "PhysicsPlatformer2D.png",
-				"folder" : "PhysicsPlatformer"
+				"folder" : "PhysicsPlatformer",
+				"module" : "2D"
 			},
+			{
+				"name": "ToonTown",
+				"desc" : "Town, Terrain, Day/Night Cycles",
+				"screenshot" : "ToonTown.png",
+				"folder" : "ToonTown",
+				"module" : "3D"
+			},			
 			{
 				"name": "Roboman 3D",
 				"desc" : "A 3D physics example featuring Roboman!",
 				"screenshot" : "Roboman3D.png",
-				"folder" : "RoboMan3D"
+				"folder" : "RoboMan3D",
+				"module" : "3D"
 			},
 			{
 				"name": "SpaceGame",
 				"desc" : "A 2D Arcade Space Game",
 				"screenshot" : "SpaceGame.png",
-				"folder" : "SpaceGame"
+				"folder" : "SpaceGame",
+				"module" : "2D"
+
 			},
 			{
 				"name": "Character Animation 3D",
 				"desc" : "Example of controlling a skeletally animated character",
 				"screenshot" : "CharacterAnimation3D.png",
-				"folder" : "CharacterAnimation3D"
+				"folder" : "CharacterAnimation3D",
+				"module" : "3D"
 			},
 			{
 				"name": "Light 2D",
 				"desc" : "An example of realtime 2D lights with shadows",
 				"screenshot" : "Light2D.png",
-				"folder" : "Light2DExample"
+				"folder" : "Light2DExample",
+				"module" : "2D"
 			},
 			{
 				"name": "UI Example",
 				"desc" : "A basic UI example showing responding to a click",
 				"screenshot" : "UIExample.png",
-				"folder" : "UIExample"
+				"folder" : "UIExample",
+				"module" : "2D"
 			}
 
 	] 

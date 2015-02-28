@@ -55,6 +55,7 @@ bool UIActivationSuccess::OnEvent(const TBWidgetEvent &ev)
         if (ev.target->GetID() == TBIDC("ok"))
         {
 
+            /*
             LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
 
             if (licenseSystem->IsStarterLicense())
@@ -65,6 +66,7 @@ bool UIActivationSuccess::OnEvent(const TBWidgetEvent &ev)
                 ops->ShowPlatformsInfo();
                 return true;
             }
+            */
 
             ops->Hide();
             return true;

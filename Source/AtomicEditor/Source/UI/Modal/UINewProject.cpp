@@ -11,6 +11,8 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/UI/TBUI.h>
 
+#include "License/AELicenseSystem.h"
+
 #include "Resources/AEResourceOps.h"
 #include "AEPreferences.h"
 
@@ -129,6 +131,19 @@ bool UINewProject::OnEvent(const TBWidgetEvent &ev)
         }
         else if (ev.target->GetID() == TBIDC("project_3d"))
         {
+// BEGIN LICENSE MANAGEMENT
+            LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+
+            if (licenseSystem->IsStarterLicense())
+            {
+                SharedPtr<UINewProject>(this);
+                UIModalOps* ops = GetSubsystem<UIModalOps>();
+                ops->Hide();
+                ops->ShowInfoModule3D();
+                return true;
+            }
+// END LICENSE MANAGEMENT
+
             projectType = 2;
         }
 

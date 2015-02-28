@@ -21,6 +21,8 @@ using namespace rapidjson;
 
 #include <Atomic/UI/TBUI.h>
 
+#include "License/AELicenseSystem.h"
+
 #include "../Project/ProjectUtils.h"
 #include "../AEPreferences.h"
 #include "../AEEditor.h"
@@ -63,7 +65,7 @@ WelcomeFrame::~WelcomeFrame()
 
 }
 
-void WelcomeFrame::AddExample(const String& name, const String& desc, const String& screenshot, const String& folder)
+void WelcomeFrame::AddExample(const String& name, const String& desc, const String& screenshot, const String& folder, const String& module)
 {
     TBLayout* exlayout = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("examples_layout"));
     assert(exlayout);
@@ -156,6 +158,7 @@ void WelcomeFrame::AddExample(const String& name, const String& desc, const Stri
     info.name = name;
     info.folder = folder;
     info.id = id;
+    info.module = module;
 
     exampleInfo_.Push(info);
 
@@ -199,14 +202,19 @@ void WelcomeFrame::FillExamples()
         const Value::Member* desc = (*itr).FindMember("desc");
         const Value::Member* screenshot = (*itr).FindMember("screenshot");
         const Value::Member* folder = (*itr).FindMember("folder");
+        const Value::Member* module = (*itr).FindMember("module");
 
-        if (!name || !desc || !screenshot || !folder)
+        if (!name || !desc || !screenshot || !folder || !module)
             continue;
 
-        if (!name->value.IsString() || !desc->value.IsString() || !screenshot->value.IsString() || !folder->value.IsString())
+        if (!name->value.IsString() || !desc->value.IsString() || !screenshot->value.IsString()
+                                    || !folder->value.IsString() || !module->value.IsString())
+        {
             continue;
+        }
 
-        AddExample(name->value.GetString(), desc->value.GetString(), screenshot->value.GetString(), folder->value.GetString());
+        AddExample(name->value.GetString(), desc->value.GetString(),
+                   screenshot->value.GetString(), folder->value.GetString(), module->value.GetString());
     }
 
 }
@@ -218,7 +226,7 @@ bool WelcomeFrame::HandleExampleCopy(const String& name, const String& exampleFo
     String fullProjectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
 
     if (!fullProjectPath.Length())
-        return true;
+        return false;
 
     String projectPath;
     String fileName;
@@ -332,6 +340,20 @@ bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
                     {
                         if (ev.target->GetID() == (*itr).id)
                         {
+
+// BEGIN LICENSE MANAGEMENT
+                            LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+                            if (licenseSystem->IsStarterLicense())
+                            {
+                                if ((*itr).module == "3D")
+                                {
+                                    UIModalOps* ops = GetSubsystem<UIModalOps>();
+                                    ops->ShowInfoModule3D();
+                                    return true;
+                                }
+                            }
+// END LICENSE MANAGEMENT
+
                             String projectPath;
                             if (HandleExampleCopy((*itr).name, (*itr).folder, projectPath))
                             {
