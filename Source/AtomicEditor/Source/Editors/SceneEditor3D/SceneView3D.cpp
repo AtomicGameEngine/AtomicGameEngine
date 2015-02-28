@@ -66,6 +66,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     }
 
     cameraNode_ = scene_->CreateChild("Camera");
+    cameraNode_->SetTemporary(true);
     camera_ = cameraNode_->CreateComponent<Camera>();
 
     debugRenderer_ = scene_->GetComponent<DebugRenderer>();
@@ -86,6 +87,9 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     VariantMap eventData;
     eventData[EditorActiveSceneChange::P_SCENE] = scene_;
     SendEvent(E_EDITORACTIVESCENECHANGE, eventData);
+
+    delegate_->SetIsFocusable(true);
+
 
 }
 
@@ -306,11 +310,7 @@ void SceneView3D::SelectNode(Node* node)
 
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 {
-    if (ev.type == EVENT_TYPE_CLICK)
-    {
-    }
-
-    return false;
+    return sceneEditor_->OnEvent(ev);
 }
 
 

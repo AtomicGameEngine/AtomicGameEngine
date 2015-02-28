@@ -155,6 +155,9 @@ void ResourceFrame::EditResource(const String& fullpath)
         editorLookup_[editor->GetRootContentWidget()] = editor;
         tabcontainer_->SetCurrentPage(tabcontainer_->GetNumPages()-1);
 
+        editor->SetFocus();
+
+
     }
 
 }
@@ -446,7 +449,7 @@ void ResourceFrame::CloseResourceEditor(ResourceEditor* editor, bool navigateToA
 void ResourceFrame::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
 {
     //delegate_->SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
-    delegate_->SetIgnoreInput(true);
+    //delegate_->SetIgnoreInput(true);
     //delegate_->SetState(WIDGET_STATE_DISABLED, true);
 }
 

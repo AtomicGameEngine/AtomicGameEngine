@@ -44,6 +44,8 @@ public:
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
 
+    void SetFocus();
+
     virtual bool RequiresInspector() { return true; }
 
 

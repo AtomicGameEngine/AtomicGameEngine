@@ -103,26 +103,53 @@ SceneEditor3D::~SceneEditor3D()
 
 bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 {
-    if (ev.target)
+
+    if (ev.type == EVENT_TYPE_SHORTCUT)
     {
-        if (ev.target->GetID() == TBIDC("3d_translate"))
+        if (ev.ref_id == TBIDC("save"))
         {
-            gizmo3D_->SetEditMode(Gizmo3D::EDIT_MOVE);
-            return false;
+            File file(context_);
+            if (file.Open(fullpath_, FILE_WRITE))
+            {
+                scene_->SaveXML(file);
+                file.Close();
+            }
+
+            return true;
+
         }
-        else if (ev.target->GetID() == TBIDC("3d_rotate"))
+    }
+
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        SetFocus();
+
+        if (ev.target)
         {
-            gizmo3D_->SetEditMode(Gizmo3D::EDIT_ROTATE);
-            return false;
-        }
-        else if (ev.target->GetID() == TBIDC("3d_scale"))
-        {
-            gizmo3D_->SetEditMode(Gizmo3D::EDIT_SCALE);
-            return false;
+            if (ev.target->GetID() == TBIDC("3d_translate"))
+            {
+                gizmo3D_->SetEditMode(Gizmo3D::EDIT_MOVE);
+                return false;
+            }
+            else if (ev.target->GetID() == TBIDC("3d_rotate"))
+            {
+                gizmo3D_->SetEditMode(Gizmo3D::EDIT_ROTATE);
+                return false;
+            }
+            else if (ev.target->GetID() == TBIDC("3d_scale"))
+            {
+                gizmo3D_->SetEditMode(Gizmo3D::EDIT_SCALE);
+                return false;
+            }
         }
     }
 
     return false;
+}
+
+void SceneEditor3D::SetFocus()
+{
+    sceneView_->GetWidgetDelegate()->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
 }
 
 void SceneEditor3D::SelectNode(Node* node)
