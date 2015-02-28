@@ -165,9 +165,11 @@ void Editor::HandlePlayStop(StringHash eventType, VariantMap& eventData)
     if (!player_)
         return;
 
+    TBUI* tbui = GetSubsystem<TBUI>();
+    tbui->SetKeyboardDisabled(false);
     if (player_->GetMode() != AE_PLAYERMODE_WIDGET)
     {
-        TBUI* tbui = GetSubsystem<TBUI>();
+
         tbui->SetInputDisabled(false);
         tbui->FadeIn(.5f);
     }
@@ -267,9 +269,11 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
 
     AEPlayerMode mode = (AEPlayerMode) eventData[EditorPlayStarted::P_MODE].GetUInt();
 
+    TBUI* tbui = GetSubsystem<TBUI>();
+    tbui->SetKeyboardDisabled(true);
+
     if (mode != AE_PLAYERMODE_WIDGET)
     {
-        TBUI* tbui = context_->GetSubsystem<TBUI>();
         tbui->SetInputDisabled(true);
         tbui->FadeOut(.5f);
     }

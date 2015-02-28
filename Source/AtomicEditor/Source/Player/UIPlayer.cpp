@@ -49,6 +49,10 @@ UIPlayer::UIPlayer(Context* context):
     aePlayer_->SetUIPlayer(this);
 
     TBUI* tbui = GetSubsystem<TBUI>();
+
+    // FIXME: disabling close button as having the widget die is currently bad
+    window_->DisableCloseButton();
+
     window_->SetText("Atomic Player");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/playerwidget.tb.txt");
 
@@ -127,6 +131,18 @@ void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 bool UIPlayer::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_CLICK)
+    {
+        if (ev.target->GetID() == TBIDC("play"))
+        {
+            if (GetSubsystem<Editor>()->IsPlayingProject())
+            {
+                SendEvent(E_EDITORPLAYSTOP);
+                return true;
+            }
+        }
+    }
+
     return true;
 }
 

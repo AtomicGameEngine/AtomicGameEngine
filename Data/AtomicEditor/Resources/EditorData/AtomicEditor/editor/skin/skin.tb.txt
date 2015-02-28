@@ -78,6 +78,9 @@ elements
 	PlayButton
 		bitmap play.png
 
+	PowerOffButton
+		bitmap power_off.png
+
 	AESeparator
 		bitmap item_separator_x.png
 		type Stretch Image

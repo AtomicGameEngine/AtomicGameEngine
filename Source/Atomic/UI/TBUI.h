@@ -52,6 +52,7 @@ public:
 
     void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
+    void SetKeyboardDisabled(bool disabled) {keyboardDisabled_ = disabled; }
     void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 
     void FadeOut(float time);
@@ -73,6 +74,7 @@ private:
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
 
     bool inputDisabled_;
+    bool keyboardDisabled_;
 
     float fadeAlpha_;
     float fadeTarget_;

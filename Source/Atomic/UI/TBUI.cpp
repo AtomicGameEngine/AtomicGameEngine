@@ -242,6 +242,7 @@ TBUI::TBUI(Context* context) :
     rootWidget_(0),
     initialized_(false),
     inputDisabled_(false),
+    keyboardDisabled_(false),
     fadeAlpha_(1.0f),
     fadeTarget_(1.0f),
     currentFadeTime_(0.0f),
@@ -673,7 +674,7 @@ void TBUI::HandleKey(bool keydown, int keycode, int scancode)
 
 void TBUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_)
+    if (inputDisabled_ || keyboardDisabled_)
         return;
 
     using namespace KeyDown;
@@ -687,7 +688,7 @@ void TBUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
 void TBUI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_)
+    if (inputDisabled_ || keyboardDisabled_)
         return;
 
     using namespace KeyUp;
@@ -701,7 +702,7 @@ void TBUI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 
 void TBUI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_)
+    if (inputDisabled_ || keyboardDisabled_)
         return;
 
     using namespace TextInput;

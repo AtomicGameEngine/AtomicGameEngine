@@ -1,1 +1,6 @@
-TBLayout: distribution: gravity, size: available, axis: y, id: playerlayout
+TBLayout: distribution: gravity,  axis: y, spacing: 8
+	TBLayout: distribution: gravity
+		TBButton 
+			TBSkinImage: skin: PowerOffButton
+			id play
+	TBLayout: distribution: gravity, size: available, axis: y, id: playerlayout, spacing: 0
