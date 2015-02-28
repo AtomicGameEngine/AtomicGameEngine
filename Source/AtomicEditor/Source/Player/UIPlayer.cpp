@@ -16,6 +16,10 @@
 
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Viewport.h>
+#include <Atomic/Graphics/Camera.h>
+
+#include "UI/Modal/UIModalOps.h"
+#include "License/AELicenseSystem.h"
 
 #include "AEEditor.h"
 #include "AEEvents.h"
@@ -35,6 +39,11 @@ namespace AtomicEditor
 UIPlayer::UIPlayer(Context* context):
     UIModalOpWindow(context)
 {
+
+// BEGIN LICENSE MANAGEMENT
+    LicenseSystem* license = GetSubsystem<LicenseSystem>();
+    starterLicense_ = license->IsStarterLicense();
+// END LICENSE MANAGEMENT
 
     aePlayer_ = GetSubsystem<AEPlayer>();
     aePlayer_->SetUIPlayer(this);
@@ -90,9 +99,22 @@ UIPlayer::~UIPlayer()
 
 void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-
     view3D_->QueueUpdate();
     UI* ui = GetSubsystem<UI>();
+
+    // BEGIN LICENSE MANAGEMENT
+    if (starterLicense_)
+    {
+        Camera* camera = view3D_->GetViewport()->GetCamera();
+        if (camera && !camera->IsOrthographic())
+        {
+            SendEvent(E_EDITORPLAYSTOP);
+            UIModalOps* ops = GetSubsystem<UIModalOps>();
+            ops->ShowInfoModule3D();
+            return;
+        }
+    }
+    // END LICENSE MANAGEMENT
 
     TBWidgetDelegate* view3DDelegate = view3D_->GetWidgetDelegate();
     TBRect rect = view3DDelegate->GetRect();

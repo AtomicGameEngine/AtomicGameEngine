@@ -230,9 +230,9 @@ void LicenseSystem::RemoveLicense()
     }
 }
 
-bool LicenseSystem::HasPlatformLicense()
+bool LicenseSystem::IsStarterLicense()
 {
-    return licenseWindows_ || licenseMac_ || licenseAndroid_ || licenseIOS_ || licenseHTML5_;
+    return !licenseAndroid_;
 }
 
 
@@ -407,7 +407,14 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
             else if (code == 2)
             {
                 // something is wrong with the key
-                key_ = "";
+                LOGERRORF("Error with product key");
+
+                RemoveLicense();
+                ResetLicense();
+                UIModalOps* ops = GetSubsystem<UIModalOps>();
+                ops->Hide();
+                ops->ShowActivation();
+
             }
             else if (code == 3)
             {
@@ -461,13 +468,13 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
                     SaveLicense();
                 }
 
-                if (!HasPlatformLicense())
-                {
-                    UIModalOps* ops = GetSubsystem<UIModalOps>();
-                    if (!ops->ModalActive())
-                        ops->ShowPlatformsInfo();
+                //if (!HasPlatformLicense())
+                //{
+                //    UIModalOps* ops = GetSubsystem<UIModalOps>();
+                //    if (!ops->ModalActive())
+                //        ops->ShowPlatformsInfo();
 
-                }
+               // }
 
             }
 

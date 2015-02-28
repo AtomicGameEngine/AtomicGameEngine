@@ -9,6 +9,7 @@
 #include <TurboBadger/tb_window.h>
 #include <TurboBadger/tb_select.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/tb_tab_container.h>
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/File.h>
@@ -69,6 +70,11 @@ UIEulaAgreement::UIEulaAgreement(Context* context):
 
     window_->ResizeToFitContent();
     Center();
+
+    TBTabContainer* container = window_->GetWidgetByIDAndType<TBTabContainer>(TBIDC("tabcontainer"));
+    assert(container);
+    container->SetValue(0);
+
 }
 
 

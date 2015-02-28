@@ -127,6 +127,16 @@ elements
 		width 48
 		height 48
 
+	Module2D-Small
+		bitmap module_2d.png
+		width 48
+		height 48
+
+	Module3D-Small
+		bitmap module_3d.png
+		width 48
+		height 48
+
 	LogoAtomic64
 		bitmap logo_atomic_64.png
 

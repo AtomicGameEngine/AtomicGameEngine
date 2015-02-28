@@ -57,7 +57,7 @@ bool UIActivationSuccess::OnEvent(const TBWidgetEvent &ev)
 
             LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
 
-            if (!licenseSystem->HasPlatformLicense())
+            if (licenseSystem->IsStarterLicense())
             {
                 SharedPtr<UIActivationSuccess> keepAlive(this);
                 UIModalOps* ops = GetSubsystem<UIModalOps>();

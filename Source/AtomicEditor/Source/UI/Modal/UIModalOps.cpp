@@ -28,6 +28,7 @@
 #include "UINewProject.h"
 #include "UIAbout.h"
 #include "UIPlatformsInfo.h"
+#include "UIInfoModule3D.h"
 
 #include "License/UIActivation.h"
 #include "License/UIActivationSuccess.h"
@@ -182,10 +183,12 @@ void UIModalOps::ShowBuild()
     Show();
 // BEGIN LICENSE MANAGEMENT
     LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+    /*
     if (licenseSystem->HasPlatformLicense())
+    */
         opWindow_ = new UIBuild(context_);
-    else
-        opWindow_ = new PlatformsInfo(context_);
+    //else
+    //    opWindow_ = new PlatformsInfo(context_);
 // END LICENSE MANAGEMENT
 }
 
@@ -292,6 +295,13 @@ void UIModalOps::ShowPlayer()
 
     Show();
     opWindow_ = new UIPlayer(context_);
+}
+
+void UIModalOps::ShowInfoModule3D()
+{
+    assert(opWindow_.Null());
+    Show();
+    opWindow_ = new InfoModule3D(context_);
 }
 
 void UIModalOps::OnWidgetDelete(TBWidget *widget)

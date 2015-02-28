@@ -300,6 +300,7 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
 // BEGIN LICENSE MANAGEMENT
 
             LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+            /*
             if (!licenseSystem->HasPlatformLicense())
             {
                 SharedPtr<UIBuildSettings> keepAlive(this);
@@ -308,6 +309,7 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
                 ops->ShowPlatformsInfo();
                 return true;
             }
+            */
 
             TBID id = platformSelect_->GetSelectedItemID();
             RequestPlatformChange(id);

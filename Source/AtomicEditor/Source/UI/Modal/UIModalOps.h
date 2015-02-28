@@ -59,6 +59,7 @@ class UIModalOps: public AEWidget, private TBWidgetListener
     void ShowActivationSuccess();
     void ShowManageLicense();
     void ShowAbout();
+    void ShowInfoModule3D();
     void ShowPlatformsInfo();
     void ShowEulaAgreement();
 

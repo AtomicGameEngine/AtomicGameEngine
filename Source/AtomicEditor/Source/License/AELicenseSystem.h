@@ -58,7 +58,7 @@ public:
     bool LicenseModule3D() { return licenseModule3D_; }
 
     /// Returns whether there are any platform licenses available
-    bool HasPlatformLicense();
+    bool IsStarterLicense();
 
     bool RequestPlatformChange(AEEditorPlatform platform);
 

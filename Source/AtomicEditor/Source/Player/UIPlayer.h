@@ -44,6 +44,8 @@ private:
 
 
     IntVector2 playerSize_;
+
+    bool starterLicense_;
 };
 
 }

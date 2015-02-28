@@ -7,6 +7,7 @@
 #include <TurboBadger/tb_window.h>
 #include <TurboBadger/tb_select.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/tb_tab_container.h>
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/File.h>
@@ -48,7 +49,6 @@ UIAbout::UIAbout(Context* context):
     TBEditField* about_text = window_->GetWidgetByIDAndType<TBEditField>(TBIDC("about_text"));
     assert(about_text);
 
-
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     SharedPtr<File> file = cache->GetFile("AtomicEditor/eulas/atomic_game_engine_eula.txt");
@@ -70,6 +70,10 @@ UIAbout::UIAbout(Context* context):
 
     window_->ResizeToFitContent();
     Center();
+
+    TBTabContainer* container = window_->GetWidgetByIDAndType<TBTabContainer>(TBIDC("tabcontainer"));
+    assert(container);
+    container->SetValue(0);
 }
 
 
@@ -87,17 +91,22 @@ void UIAbout::GenerateAboutText(String& text)
     text.AppendWithFormat("<color #D4FB79>Version  %i.%i.p%i</color>\n", ATOMIC_EDITOR_VERSION_MAJOR, ATOMIC_EDITOR_VERSION_MINOR, ATOMIC_EDITOR_VERSION_PATCH);
     text += "(c) 2014-2015 THUNDERBEAST GAMES LLC\n\n";
 
-    text += "<color #76D6FF>Installed platform licenses:</color>\n\n";
+    text += "<color #D4FB79>Installed platforms and modules:</color>\n\n";
 
-    if (licenseSystem->HasPlatformLicense())
+    if (licenseSystem->IsStarterLicense())
     {
-        text += "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> " \
-        "<widget TBSkinImage: skin: 'LogoHTML5-Small'> <widget TBSkinImage: skin: 'LogoAndroid-Small'> " \
-        "<widget TBSkinImage: skin: 'LogoIOS-Small'>\n\n";
+        text += "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> <widget TBSkinImage: skin: 'Module2D-Small'>\n\n";
+
+        text += "<color #76D6FF>Available platforms and modules:</color>\n\n" \
+        "    <widget TBSkinImage: skin: 'LogoHTML5-Small'> <widget TBSkinImage: skin: 'LogoAndroid-Small'> " \
+        "<widget TBSkinImage: skin: 'LogoIOS-Small'> <widget TBSkinImage: skin: 'Module3D-Small'> "\
+        "<widget TBButton: text: 'Purchase' id: 'purchase_pro' >\n\n";
     }
     else
     {
-        text += "<color #FF2600>    No platform licenses installed</color>\n\n";
+        text += "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> " \
+        "<widget TBSkinImage: skin: 'LogoHTML5-Small'> <widget TBSkinImage: skin: 'LogoAndroid-Small'> " \
+        "<widget TBSkinImage: skin: 'LogoIOS-Small'> <widget TBSkinImage: skin: 'Module2D-Small'> <widget TBSkinImage: skin: 'Module3D-Small'>\n\n";
     }
 
     text += "<color #76D6FF>Special Thanks:</color>\n\n";
@@ -109,7 +118,12 @@ bool UIAbout::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CLICK)
     {
-        if (ev.target->GetID() == TBIDC("ok"))
+        if (ev.target->GetID() == TBIDC("purchase_pro"))
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            fileSystem->SystemOpen("https://store.atomicgameengine.com/store/store.php");
+        }
+        else if (ev.target->GetID() == TBIDC("ok"))
         {
             GetSubsystem<UIModalOps>()->Hide();
             return true;

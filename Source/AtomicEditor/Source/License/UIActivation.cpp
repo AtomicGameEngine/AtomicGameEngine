@@ -82,7 +82,16 @@ bool UIActivation::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_CLICK)
     {
-        if (ev.target->GetID() == TBIDC("activate"))
+        if (ev.target->GetID() == TBIDC("get_key"))
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            fileSystem->SystemOpen("https://store.atomicgameengine.com/store/store.php");
+        }
+        else if (ev.target->GetID() == TBIDC("quit"))
+        {
+            editor->RequestExit();
+        }
+        else if (ev.target->GetID() == TBIDC("activate"))
         {
             TBStr _key;
             licenseKey_->GetText(_key);
