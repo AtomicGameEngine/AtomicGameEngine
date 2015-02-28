@@ -1,17 +1,17 @@
-TBLayout: axis: y, distribution: gravity, position: left
-	TBSeparator: gravity: left right, skin: AESeparator
+TBLayout: axis: y, distribution: gravity
 	TBLayout: distribution: gravity
+		TBImageWidget: filename: "AtomicEditor/editor/images/atomic_logo.png"
 		TBTextField: text: "Product Key:"
 			font: size:18
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: license_key, autofocus: 1
 				placeholder ATOMIC-XXXX-XXXX-XXXX-XXXX
-				lp: min-width: 380
+				lp: width: 240
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:
 		TBButton: text: Activate, id: activate
 			lp: min-width: 128, min-height: 64
-		TBButton: text: "Get Free Key", id: get_key
+		TBButton: text: "Get Free Key", id: get_key, skin: TBButton.greentext
 			lp: min-width: 128, min-height: 64			
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:

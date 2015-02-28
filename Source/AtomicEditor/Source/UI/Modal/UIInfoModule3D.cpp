@@ -43,7 +43,6 @@ InfoModule3D::InfoModule3D(Context* context):
 
 }
 
-
 InfoModule3D::~InfoModule3D()
 {
 }

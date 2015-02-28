@@ -69,6 +69,10 @@ elements
 		bitmap button_flat_pressed.png
 		cut 8
 
+	TBButton.greentext
+		clone TBButton
+		text-color #D4FB79
+
 
 	# == TBButtonInGroup is not a widget. It's only used as override for TBButton under a "button_group" ====
 	TBButtonInGroup

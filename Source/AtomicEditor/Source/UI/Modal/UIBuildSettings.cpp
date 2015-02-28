@@ -299,19 +299,21 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
         {
 // BEGIN LICENSE MANAGEMENT
 
-            LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-            /*
-            if (!licenseSystem->HasPlatformLicense())
-            {
-                SharedPtr<UIBuildSettings> keepAlive(this);
-                UIModalOps* ops = GetSubsystem<UIModalOps>();
-                ops->Hide();
-                ops->ShowPlatformsInfo();
-                return true;
-            }
-            */
-
             TBID id = platformSelect_->GetSelectedItemID();
+            LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+            if (licenseSystem->IsStarterLicense())
+            {
+                if (id == TBIDC("WebGLBuildSettings") || id == TBIDC("AndroidBuildSettings") || id == TBIDC("iOSBuildSettings"))
+                {
+                    SharedPtr<UIBuildSettings> keepAlive(this);
+                    UIModalOps* ops = GetSubsystem<UIModalOps>();
+                    ops->Hide();
+                    ops->ShowPlatformsInfo();
+                    return true;
+                }
+
+            }
+
             RequestPlatformChange(id);
             return true;
 // END LICENSE MANAGEMENT
