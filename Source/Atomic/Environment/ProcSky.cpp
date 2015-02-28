@@ -171,10 +171,14 @@ float ProcSky::SetDayTime(float time)
 
             sunlight_->SetShadowIntensity(shadowFade_);
 
+            if (!sunlight_->GetCastShadows())
+                sunlight_->SetCastShadows(true);
+
         }
         else
         {
-
+            if (sunlight_->GetCastShadows())
+                sunlight_->SetCastShadows(false);
         }
 
     }
@@ -189,9 +193,15 @@ float ProcSky::SetDayTime(float time)
                 shadowFade_ = 0.0f;
 
             sunlight_->SetShadowIntensity(shadowFade_);
+
+            if (!sunlight_->GetCastShadows())
+                sunlight_->SetCastShadows(true);
+
         }
         else
         {
+            if (!sunlight_->GetCastShadows())
+                sunlight_->SetCastShadows(true);
         }
     }
 
@@ -319,8 +329,11 @@ void ProcSky::UpdateVertexBuffer(const FrameInfo &frame)
     float bottom = -1.0f;
 
 #ifdef ATOMIC_OPENGL
+if (flipped_)
+{
     top = -1.0f;
     bottom = 1.0f;
+}
 #endif
 
     // 0 2
