@@ -171,14 +171,10 @@ float ProcSky::SetDayTime(float time)
 
             sunlight_->SetShadowIntensity(shadowFade_);
 
-            if (!sunlight_->GetCastShadows())
-                sunlight_->SetCastShadows(true);
-
         }
         else
         {
-            if (sunlight_->GetCastShadows())
-                sunlight_->SetCastShadows(false);
+
         }
 
     }
@@ -193,15 +189,9 @@ float ProcSky::SetDayTime(float time)
                 shadowFade_ = 0.0f;
 
             sunlight_->SetShadowIntensity(shadowFade_);
-
-            if (!sunlight_->GetCastShadows())
-                sunlight_->SetCastShadows(true);
-
         }
         else
         {
-            if (!sunlight_->GetCastShadows())
-                sunlight_->SetCastShadows(true);
         }
     }
 
