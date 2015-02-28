@@ -43,6 +43,10 @@ public:
     void SetPitch(float pitch) { pitch_ = pitch; }
     void SetYaw(float yaw) { yaw_ = yaw; }
 
+    void Enable();
+    void Disable();
+    bool IsEnabled() { return enabled_; }
+
 private:
 
     bool MouseInView();
@@ -62,6 +66,8 @@ private:
 
     bool mouseLeftDown_;
     bool mouseMoved_;
+
+    bool enabled_;
 
     SharedPtr<Camera> camera_;
     SharedPtr<DebugRenderer> debugRenderer_;

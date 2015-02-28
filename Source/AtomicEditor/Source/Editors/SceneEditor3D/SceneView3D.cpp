@@ -40,7 +40,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     yaw_(0.0f),
     pitch_(0.0f),
     mouseLeftDown_(false),
-    mouseMoved_(false)
+    mouseMoved_(false),
+    enabled_(true)
 {
 
     sceneEditor_ = sceneEditor;
@@ -93,10 +94,31 @@ SceneView3D::~SceneView3D()
 
 }
 
+void SceneView3D::Enable()
+{
+    if (enabled_)
+        return;
+
+    enabled_ = true;
+
+    view3DWidget_->SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
+}
+
+void SceneView3D::Disable()
+{
+    if (!enabled_)
+        return;
+
+    enabled_ = false;
+
+    view3DWidget_->SetVisibilility(WIDGET_VISIBILITY_INVISIBLE);
+
+}
+
 void SceneView3D::MoveCamera(float timeStep)
 {
     // Do not move if the UI has a focused element (the console)
-    if (GetSubsystem<UI>()->GetFocusElement())
+    if (GetSubsystem<UI>()->GetFocusElement() || !enabled_)
         return;
 
     Input* input = GetSubsystem<Input>();

@@ -24,11 +24,28 @@ MainToolbar::MainToolbar(Context* context) :
 {
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/maintoolbar.tb.txt");
+
+    Show3DWidgets(false);
 }
 
 MainToolbar::~MainToolbar()
 {
 
+}
+
+void MainToolbar::Show3DWidgets(bool value)
+{
+    TBButton* button = delegate_->GetWidgetByIDAndType<TBButton>(TBIDC("3d_translate"));
+    if (button)
+        button->SetVisibilility( value ? WIDGET_VISIBILITY_VISIBLE : WIDGET_VISIBILITY_GONE);
+
+    button = delegate_->GetWidgetByIDAndType<TBButton>(TBIDC("3d_rotate"));
+    if (button)
+        button->SetVisibilility( value ? WIDGET_VISIBILITY_VISIBLE : WIDGET_VISIBILITY_GONE);
+
+    button = delegate_->GetWidgetByIDAndType<TBButton>(TBIDC("3d_scale"));
+    if (button)
+        button->SetVisibilility( value ? WIDGET_VISIBILITY_VISIBLE : WIDGET_VISIBILITY_GONE);
 }
 
 bool MainToolbar::OnEvent(const TBWidgetEvent &ev)

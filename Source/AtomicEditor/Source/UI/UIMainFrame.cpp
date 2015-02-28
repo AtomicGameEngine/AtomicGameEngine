@@ -771,9 +771,15 @@ void MainFrame::HandleResourceEditorChanged(StringHash eventType, VariantMap& ev
     ResourceEditor* editor = static_cast<ResourceEditor*>(eventData[EditorResourceEditorChanged::P_RESOURCEEDITOR].GetPtr());
 
     if (!editor || !editor->RequiresInspector())
+    {
         ShowInspectorFrame(false);
+        maintoolbar_->Show3DWidgets(false);
+    }
     else
+    {
         ShowInspectorFrame(true);
+        maintoolbar_->Show3DWidgets(true);
+    }
 
 }
 

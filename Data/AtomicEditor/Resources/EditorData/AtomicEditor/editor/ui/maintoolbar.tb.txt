@@ -7,15 +7,12 @@ TBLayout: distribution: gravity
 		@include definitions>menubutton
 		TBSkinImage: skin: PlayButton
 		id maintoolbar_play
-	TBButton 
-		@include definitions>menubutton
-		text: "T"
+	TBButton: skin: TBButton.flat
+		TBSkinImage: skin: 3DTranslateBitmap
 		id 3d_translate
-	TBButton 
-		@include definitions>menubutton
-		text: "R"
+	TBButton: skin: TBButton.flat
+		TBSkinImage: skin: 3DRotateBitmap
 		id 3d_rotate
-	TBButton 
-		@include definitions>menubutton
-		text: "S"
+	TBButton: skin: TBButton.flat
+		TBSkinImage: skin: 3DScaleBitmap
 		id 3d_scale

@@ -51,6 +51,8 @@ private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
+    void HandlePlayStarted(StringHash eventType, VariantMap& eventData);
+    void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<Scene> scene_;
 

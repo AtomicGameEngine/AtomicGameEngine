@@ -91,6 +91,9 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, TBTabCon
     eventData[EditorActiveSceneChange::P_SCENE] = scene_;
     SendEvent(E_EDITORACTIVESCENECHANGE, eventData);
 
+    SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
+    SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
+
 }
 
 SceneEditor3D::~SceneEditor3D()
@@ -139,6 +142,18 @@ void SceneEditor3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMa
     Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
     SelectNode(node);
 }
+
+void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
+{
+    sceneView_->Disable();
+
+}
+
+void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventData)
+{
+    sceneView_->Enable();
+}
+
 
 
 

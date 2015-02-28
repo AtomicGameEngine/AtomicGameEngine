@@ -163,6 +163,8 @@ void Editor::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
 
 void Editor::HandlePlayStop(StringHash eventType, VariantMap& eventData)
 {    
+    SendEvent(E_EDITORPLAYSTOPPED);
+
     if (!player_)
         return;
 
@@ -182,8 +184,6 @@ void Editor::HandlePlayStop(StringHash eventType, VariantMap& eventData)
 
     player_->Invalidate();
     player_ = NULL;
-
-    SendEvent(E_EDITORPLAYSTOPPED);
 
 }
 

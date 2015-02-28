@@ -146,6 +146,13 @@ elements
 	TextCode
 		background-color #23241f
 
+	3DScaleBitmap
+		bitmap 3d_scale.png		
+	3DTranslateBitmap
+		bitmap 3d_translate.png		
+	3DRotateBitmap
+		bitmap 3d_rotate.png		
+
 	InspectorTopLayout
 		background-color #333333
 

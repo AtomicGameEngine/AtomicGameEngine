@@ -88,6 +88,7 @@ UIPlayer::UIPlayer(Context* context):
     Center();    
 
     SubscribeToEvent(E_UPDATE, HANDLER(UIPlayer, HandleUpdate));
+
 }
 
 Viewport *UIPlayer::SetView(Scene* scene, Camera* camera)

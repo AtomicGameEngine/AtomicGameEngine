@@ -129,8 +129,8 @@ void ResourceFrame::EditResource(const String& fullpath)
     }
     else if (ext == ".mdl")
     {
-        ModelResourceEditor* mre = new ModelResourceEditor(context_, fullpath, tabcontainer_);
-        editor = mre;
+        //ModelResourceEditor* mre = new ModelResourceEditor(context_, fullpath, tabcontainer_);
+        //editor = mre;
     }
     else if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".ogg")
     {
@@ -454,7 +454,7 @@ void ResourceFrame::HandlePlayStarted(StringHash eventType, VariantMap& eventDat
 void ResourceFrame::HandlePlayStopped(StringHash eventType, VariantMap& eventData)
 {
     //delegate_->SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
-    delegate_->SetIgnoreInput(false);
+    //delegate_->SetIgnoreInput(false);
     //delegate_->SetState(WIDGET_STATE_DISABLED, false);
 }
 

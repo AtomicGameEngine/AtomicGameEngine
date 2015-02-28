@@ -23,6 +23,8 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
+    void Show3DWidgets(bool value);
+
 private:
 
 };
