@@ -1,6 +1,10 @@
-TBLayout: axis: y, distribution: gravity, position: left
-	TBLayout: 
-		TBButton: id: "return_activation" text: "Return Activation"
-		TBTextField: text: "Return the activation on this computer"
-	TBSeparator: gravity: left right, skin: AESeparator
-	TBButton: text: OK, id: ok
+TBLayout: axis: y
+	TBLayout: axis: y, distribution: gravity, position: left
+		TBLayout: 
+			TBButton: id: "return_activation" text: "Return Activation"
+				lp: min-width: 128, min-height: 64			
+			TBTextField: text: "Return the activation on this computer"
+		TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: distribution: gravity
+		TBButton: text: OK, id: ok
+			lp: min-width: 64, min-height: 32

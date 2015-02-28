@@ -515,9 +515,12 @@ void LicenseSystem::HandleDeactivate(StringHash eventType, VariantMap& eventData
             }
             else if (response.StartsWith("AC_NOTACTIVATED") || response.StartsWith("AC_SUCCESS"))
             {
-                editor->PostModalInfo("Deactivation Success", "Deactivation was successful");
                 ResetLicense();
                 RemoveLicense();
+
+                UIModalOps* ops = GetSubsystem<UIModalOps>();
+                ops->Hide();
+                ops->ShowActivation();
             }
 
         }

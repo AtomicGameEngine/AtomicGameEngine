@@ -34,6 +34,7 @@
 #include "Resources/AEResourceOps.h"
 
 #include <TurboBadger/tb_message_window.h>
+#include <TurboBadger/animation/tb_animation.h>
 
 namespace AtomicEditor
 {
@@ -312,15 +313,17 @@ void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
         aepreferences_->Write();
     }
 
-    TBUI* tbui = GetSubsystem<TBUI>();
-    tbui->Shutdown();
-
     mainframe_ = 0;
     player_ = 0;
     project_ = 0;
     javascript_ = 0;
     aejavascript_ = 0;
     aepreferences_ = 0;
+
+    TBAnimationManager::BeginBlockAnimations();
+
+    TBUI* tbui = GetSubsystem<TBUI>();
+    tbui->Shutdown();
 
     context_->RemoveSubsystem(Javascript::GetBaseTypeStatic());
 

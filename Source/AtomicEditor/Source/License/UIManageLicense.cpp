@@ -50,6 +50,7 @@ UIManageLicense::UIManageLicense(Context* context):
 
 UIManageLicense::~UIManageLicense()
 {
+    progressModal_->Hide();
 }
 
 bool UIManageLicense::OnEvent(const TBWidgetEvent &ev)
@@ -59,17 +60,22 @@ bool UIManageLicense::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_CLICK)
     {
-        if (ev.type == EVENT_TYPE_CLICK)
+
+        if (ev.target->GetID() == TBIDC("ok"))
         {
-            if (ev.target->GetID() == TBIDC("confirm_license_return"))
+            UIModalOps* ops = GetSubsystem<UIModalOps>();
+            ops->Hide();
+            return true;
+        }
+
+        if (ev.target->GetID() == TBIDC("confirm_license_return"))
+        {
+            if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
             {
-                if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
-                {
-                    request_ = licenseSystem->Deactivate();
-                    SubscribeToEvent(request_, E_CURLCOMPLETE, HANDLER(UIManageLicense, HandleCurlComplete));
-                    progressModal_->SetMessage("Returning license, please wait...");
-                    progressModal_->Show();
-                }
+                request_ = licenseSystem->Deactivate();
+                SubscribeToEvent(request_, E_CURLCOMPLETE, HANDLER(UIManageLicense, HandleCurlComplete));
+                progressModal_->SetMessage("Returning license, please wait...");
+                progressModal_->Show();
             }
         }
 
@@ -98,8 +104,6 @@ bool UIManageLicense::OnEvent(const TBWidgetEvent &ev)
 void UIManageLicense::HandleCurlComplete(StringHash eventType, VariantMap& eventData)
 {
     progressModal_->Hide();
-
-
 }
 
 }
