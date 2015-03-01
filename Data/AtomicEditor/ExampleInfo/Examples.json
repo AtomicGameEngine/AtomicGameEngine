@@ -15,13 +15,6 @@
 				"module" : "3D"
 			},			
 			{
-				"name": "Roboman 3D",
-				"desc" : "A 3D physics example featuring Roboman!",
-				"screenshot" : "Roboman3D.png",
-				"folder" : "RoboMan3D",
-				"module" : "3D"
-			},
-			{
 				"name": "SpaceGame",
 				"desc" : "A 2D Arcade Space Game",
 				"screenshot" : "SpaceGame.png",
@@ -29,6 +22,20 @@
 				"module" : "2D"
 
 			},
+			{
+				"name": "Roboman 3D",
+				"desc" : "A 3D physics example featuring Roboman!",
+				"screenshot" : "Roboman3D.png",
+				"folder" : "RoboMan3D",
+				"module" : "3D"
+			},			
+			{
+				"name": "Character Animation 2D",
+				"desc" : "Example of controlling a Spriter animated character",
+				"screenshot" : "CharacterAnimation2D.png",
+				"folder" : "CharacterAnimation2D",
+				"module" : "2D"
+			},			
 			{
 				"name": "Character Animation 3D",
 				"desc" : "Example of controlling a skeletally animated character",
