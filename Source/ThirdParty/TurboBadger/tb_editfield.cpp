@@ -269,10 +269,10 @@ bool TBEditField::OnEvent(const TBWidgetEvent &ev)
 			return false;
 		return true;
 	}
-	else if (ev.type == EVENT_TYPE_CONTEXT_MENU && ev.target == this)
+    else if ((ev.type == EVENT_TYPE_CONTEXT_MENU || ev.type == EVENT_TYPE_RIGHT_POINTER_UP) && ev.target == this)
 	{
 		TBPoint pos_in_root(ev.target_x, ev.target_y);
-		ev.target->ConvertToRoot(pos_in_root.x, pos_in_root.y);
+        //ev.target->ConvertToRoot(pos_in_root.x, pos_in_root.y);
 
 		if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("popupmenu")))
 		{
