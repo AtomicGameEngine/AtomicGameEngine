@@ -1,6 +1,6 @@
-##### UNDER CONSTRUCTION
+[WelcomeScreen]: https://github.com/AtomicGameEngine/AtomicExamples/wiki/images/WelcomeScreen.png
 
-Hello!  We're working to get everything setup for an initial release around GDC 2015.  In the meantime, feel free to have a look around :)
+![alt text][WelcomeScreen]
 
 ###Atomic Game Engine™ Source Code Repository
 
