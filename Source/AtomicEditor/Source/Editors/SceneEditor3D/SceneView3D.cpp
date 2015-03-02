@@ -142,12 +142,16 @@ void SceneView3D::MoveCamera(float timeStep)
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
         pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-        input->SetMouseMode(MM_RELATIVE);
+        // Not working on OSX
+        //input->SetMouseMode(MM_RELATIVE);
     }
     else
     {
+        // Not working on OSX
+        /*
         if (input->GetMouseMode() != MM_ABSOLUTE)
             input->SetMouseMode(MM_ABSOLUTE);
+        */
     }
 
 
