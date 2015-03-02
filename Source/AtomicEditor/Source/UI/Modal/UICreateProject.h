@@ -15,7 +15,7 @@ class UICreateProject: public UIModalOpWindow
 
 public:
 
-    UICreateProject(Context* context, const String& templateFolder);
+    UICreateProject(Context* context, const String& templateFolder, const String& imagePath = String::EMPTY);
     virtual ~UICreateProject();
     bool OnEvent(const TBWidgetEvent &ev);
 

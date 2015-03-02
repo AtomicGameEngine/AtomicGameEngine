@@ -202,12 +202,12 @@ void UIModalOps::ShowNewProject()
     opWindow_ = new UINewProject(context_);
 }
 
-void UIModalOps::ShowCreateProject(const String &templateFolder)
+void UIModalOps::ShowCreateProject(const String &templateFolder, const String &imagePath)
 {
     assert(opWindow_.Null());
 
     Show();
-    opWindow_ = new UICreateProject(context_, templateFolder);
+    opWindow_ = new UICreateProject(context_, templateFolder, imagePath);
 }
 
 

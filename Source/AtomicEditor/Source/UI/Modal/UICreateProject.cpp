@@ -9,6 +9,7 @@
 #include <TurboBadger/tb_window.h>
 #include <TurboBadger/tb_select.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/image/tb_image_widget.h>
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/StringUtils.h>
@@ -29,7 +30,7 @@ namespace AtomicEditor
 
 // UIBuildSettings------------------------------------------------
 
-UICreateProject::UICreateProject(Context* context, const String &templateFolder):
+UICreateProject::UICreateProject(Context* context, const String &templateFolder, const String &imagePath):
     UIModalOpWindow(context)
   , projectPathField_(0)
   , templateFolder_(templateFolder)
@@ -46,6 +47,14 @@ UICreateProject::UICreateProject(Context* context, const String &templateFolder)
 
     projectNameField_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("project_name"));
     assert(projectNameField_);
+
+    TBImageWidget* image = delegate_->GetWidgetByIDAndType<TBImageWidget>(TBIDC("project_image"));
+    assert(image);
+
+    if (!imagePath.Length())
+        image->SetVisibilility(WIDGET_VISIBILITY_GONE);
+    else
+        image->SetImage(imagePath.CString());
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 

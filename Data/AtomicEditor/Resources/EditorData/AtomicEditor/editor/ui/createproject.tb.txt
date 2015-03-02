@@ -1,8 +1,13 @@
 TBLayout: axis: y, distribution: gravity, position: left
 	TBLayout: distribution: gravity
-	TBTextField: text: "Project Name:"
-	TBEditField: id: project_name, text: "MyGame", autofocus: 1
-		lp: min-width: 220	
+		TBLayout: distribution: gravity
+			TBTextField: text: "Project Name:"
+			TBLayout: gravity: left right, distribution-position: right bottom				
+				TBEditField: id: project_name, text: "MyGame", autofocus: 1
+					lp: min-width: 240
+		TBLayout: gravity: left right, distribution-position: right bottom				
+			TBImageWidget: id: project_image
+				lp: width: 128, height: 96
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBTextField: text: "Project Directory:"		
 	TBLayout: axis: y, distribution: gravity, position: left

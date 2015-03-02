@@ -38,6 +38,7 @@ private:
         String name;
         String folder;
         String module;
+        String screenshot;
         TBID id;
     };
 

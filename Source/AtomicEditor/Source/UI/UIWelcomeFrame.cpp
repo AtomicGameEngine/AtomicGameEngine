@@ -159,6 +159,7 @@ void WelcomeFrame::AddExample(const String& name, const String& desc, const Stri
     info.folder = folder;
     info.id = id;
     info.module = module;
+    info.screenshot = exampleInfoDir_ + "/" + screenshot;
 
     exampleInfo_.Push(info);
 
@@ -296,7 +297,7 @@ bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
                             }
 // END LICENSE MANAGEMENT
                             String exampleSourceDir = exampleSourceDir_ + "/" + (*itr).folder;
-                            ops->ShowCreateProject(exampleSourceDir);
+                            ops->ShowCreateProject(exampleSourceDir, (*itr).screenshot);
                             return true;
                         }
 
