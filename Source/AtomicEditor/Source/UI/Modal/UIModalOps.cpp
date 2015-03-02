@@ -26,6 +26,7 @@
 #include "UIBuildSettings.h"
 #include "UIProgramOutput.h"
 #include "UINewProject.h"
+#include "UICreateProject.h"
 #include "UIAbout.h"
 #include "UIPlatformsInfo.h"
 #include "UIInfoModule3D.h"
@@ -200,6 +201,15 @@ void UIModalOps::ShowNewProject()
     Show();
     opWindow_ = new UINewProject(context_);
 }
+
+void UIModalOps::ShowCreateProject(const String &templateFolder)
+{
+    assert(opWindow_.Null());
+
+    Show();
+    opWindow_ = new UICreateProject(context_, templateFolder);
+}
+
 
 void UIModalOps::SetProgramOutputSubprocess(Object* subprocess)
 {

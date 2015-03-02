@@ -55,6 +55,7 @@ class UIModalOps: public AEWidget, private TBWidgetListener
     void ShowBuildSettings();
     void ShowBuild();
     void ShowNewProject();
+    void ShowCreateProject(const String& templateFolder);
     void ShowActivation();
     void ShowActivationSuccess();
     void ShowManageLicense();

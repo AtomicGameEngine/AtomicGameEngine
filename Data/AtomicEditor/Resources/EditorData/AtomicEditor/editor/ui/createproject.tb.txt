@@ -1,0 +1,16 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBLayout: distribution: gravity
+	TBTextField: text: "Project Name:"
+	TBEditField: id: project_name, text: "MyGame", autofocus: 1
+		lp: min-width: 220	
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBTextField: text: "Project Directory:"		
+	TBLayout: axis: y, distribution: gravity, position: left
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: project_path
+				lp: min-width: 380
+			TBButton: text: "Choose" id: choose_path
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: 
+		TBButton: text: Create, id: create
+		TBButton: text: Cancel, id: cancel

@@ -33,7 +33,7 @@ UINewProject::UINewProject(Context* context):
     Project* project = editor->GetProject();
 
     TBUI* tbui = GetSubsystem<TBUI>();
-    window_->SetText("New Project");
+    window_->SetText("Project Type");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/newproject.tb.txt");
 
     window_->ResizeToFitContent();
@@ -136,7 +136,7 @@ bool UINewProject::OnEvent(const TBWidgetEvent &ev)
 
             if (licenseSystem->IsStarterLicense())
             {
-                SharedPtr<UINewProject>(this);
+                SharedPtr<UINewProject> keepAlive(this);
                 UIModalOps* ops = GetSubsystem<UIModalOps>();
                 ops->Hide();
                 ops->ShowInfoModule3D();
@@ -149,62 +149,28 @@ bool UINewProject::OnEvent(const TBWidgetEvent &ev)
 
         if (projectType != -1)
         {
-            String fullProjectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
-
-            if (!fullProjectPath.Length())
-                return true;
-
-            String projectPath;
-            String fileName;
-            String ext;
-
-            SplitPath(fullProjectPath, projectPath, fileName, ext);
-
             FileSystem* fileSystem = GetSubsystem<FileSystem>();
-            if (!fileSystem->DirExists(projectPath))
-            {
-                editor->PostModalInfo("New Project Editor Error", "Project folder does not exist");
-                return true;
-            }
-            Vector<String> results;
-            fileSystem->ScanDir(results, projectPath, "*", SCAN_DIRS | SCAN_FILES, false);
-            while (results.Remove(".")) {}
-            while (results.Remove("..")) {}
 
-            if (results.Size())
-            {
-                editor->PostModalInfo("New Project Editor Error", "Project folder must be empty.\nPlease create a new folder or select an empty one");
-                return true;
-            }
-
-            bool result = false;
+        #ifdef ATOMIC_PLATFORM_OSX
+            String templateSourceDir = fileSystem->GetAppBundleResourceFolder();
+        #else
+            String templateSourceDir = fileSystem->GetProgramDir();
+        #endif
 
             if (projectType == 0)
-            {
-                result = CreateEmptyProject(projectPath, fileName);
-            }
+                templateSourceDir += "/ProjectTemplates/EmptyProject";
             else if (projectType == 1)
-            {
-                result = Create2DProject(projectPath, fileName);
-            }
-            else if (projectType == 2)
-            {
-                result = Create3DProject(projectPath, fileName);
-            }
+                templateSourceDir += "/ProjectTemplates/Project2D";
+            else
+                templateSourceDir += "/ProjectTemplates/Project3D";
 
-            if (!result)
-            {
-                editor->PostModalInfo("New Project Editor Error", "Error Creating Project");
-                return true;
-            }
-
-            Vector<String> elements = projectPath.Split('/');
-            String projectName = elements.Back();
-
-            editor->LoadProject(projectPath + "/" + projectName + ".atomic");
-
+            SharedPtr<UINewProject> keepAlive(this);
+            UIModalOps* ops = GetSubsystem<UIModalOps>();
             ops->Hide();
+            ops->ShowCreateProject(templateSourceDir);
+
             return true;
+
         }
 
     }

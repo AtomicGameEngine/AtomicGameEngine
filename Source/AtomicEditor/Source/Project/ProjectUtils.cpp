@@ -124,9 +124,10 @@ String ProjectUtils::NewProjectFileDialog()
 
     nfdchar_t *outPath = NULL;
 
-    nfdresult_t result = NFD_SaveDialog( "atomic",
+    nfdresult_t result = NFD_ChooseDirectory( "Please choose the root folder for your project",
                                 NULL,
                                 &outPath);
+
 
     if (outPath && result == NFD_OKAY)
     {

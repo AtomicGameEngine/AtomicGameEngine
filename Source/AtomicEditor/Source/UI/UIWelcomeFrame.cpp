@@ -219,65 +219,6 @@ void WelcomeFrame::FillExamples()
 
 }
 
-bool WelcomeFrame::HandleExampleCopy(const String& name, const String& exampleFolder, String& atomicProjectFile)\
-{
-    Editor* editor = GetSubsystem<Editor>();
-
-    String fullProjectPath = GetSubsystem<ProjectUtils>()->NewProjectFileDialog();
-
-    if (!fullProjectPath.Length())
-        return false;
-
-    String projectPath;
-    String fileName;
-    String ext;
-
-    SplitPath(fullProjectPath, projectPath, fileName, ext);
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
-    if (!fileSystem->DirExists(projectPath))
-    {
-        editor->PostModalInfo("New Project Editor Error", "Project folder does not exist");
-        return false;
-    }
-
-    Vector<String> results;
-    fileSystem->ScanDir(results, projectPath, "*", SCAN_DIRS | SCAN_FILES, false);
-    while (results.Remove(".")) {}
-    while (results.Remove("..")) {}
-
-    if (results.Size())
-    {
-        editor->PostModalInfo("New Project Editor Error", "Project folder must be empty.\nPlease create a new folder or select an empty one");
-        return false;
-    }
-
-    String exampleSourceDir = exampleSourceDir_ + "/" + exampleFolder;
-
-    bool result = fileSystem->CopyDir(exampleSourceDir + "/" + "Resources", projectPath + "/" + "Resources");
-
-    if (!result)
-    {
-        editor->PostModalInfo("New Project Editor Error", "Error copying example");
-        return false;
-    }
-
-    // example folder name and .atomic must match
-    atomicProjectFile = projectPath + fileName + ".atomic";
-    String sourceProjectFile = exampleSourceDir + "/" + exampleFolder + ".atomic";
-    result = fileSystem->Copy(sourceProjectFile , atomicProjectFile);
-
-    if (!result)
-    {
-        editor->PostModalInfo("New Project Editor Error", "Error copying example project file");
-        return false;
-    }
-
-    return true;
-
-}
-
 void WelcomeFrame::UpdateRecentProjects()
 {
     TBSelectList* select = delegate_->GetWidgetByIDAndType<TBSelectList>(TBIDC("recentprojects"));
@@ -298,6 +239,7 @@ void WelcomeFrame::UpdateRecentProjects()
 
 bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
 {
+    UIModalOps* ops = GetSubsystem<UIModalOps>();
     if (ev.type == EVENT_TYPE_CLICK)
     {
         if (ev.target)
@@ -347,20 +289,14 @@ bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
                             {
                                 if ((*itr).module == "3D")
                                 {
-                                    UIModalOps* ops = GetSubsystem<UIModalOps>();
+
                                     ops->ShowInfoModule3D();
                                     return true;
                                 }
                             }
 // END LICENSE MANAGEMENT
-
-                            String projectPath;
-                            if (HandleExampleCopy((*itr).name, (*itr).folder, projectPath))
-                            {
-                                GetSubsystem<Editor>()->LoadProject(projectPath);
-
-                            }
-
+                            String exampleSourceDir = exampleSourceDir_ + "/" + (*itr).folder;
+                            ops->ShowCreateProject(exampleSourceDir);
                             return true;
                         }
 

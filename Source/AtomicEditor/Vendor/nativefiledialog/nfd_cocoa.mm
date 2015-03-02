@@ -55,14 +55,22 @@ static void AddFilterListToDialog( NSSavePanel *dialog, const char *filterList )
     }
 }
 
-static void SetDefaultPath( NSSavePanel *dialog, const nfdchar_t *defaultPath )
+static void SetDefaultPath( NSSavePanel *dialog, const nfdchar_t *defaultPath, const nfdchar_t *defaultFilename )
 {
-    if ( !defaultPath || strlen(defaultPath) == 0 )
-        return;
+    if ( defaultPath && strlen(defaultPath))
+    {
+        NSString *defaultPathString = [NSString stringWithUTF8String: defaultPath];
+        NSURL *url = [NSURL fileURLWithPath:defaultPathString isDirectory:YES];
+        [dialog setDirectoryURL:url];
+    }
 
-    NSString *defaultPathString = [NSString stringWithUTF8String: defaultPath];
-    NSURL *url = [NSURL fileURLWithPath:defaultPathString isDirectory:YES];
-    [dialog setDirectoryURL:url];    
+
+    if ( defaultFilename && strlen(defaultFilename))
+    {
+        NSString *defaultFilenameString = [NSString stringWithUTF8String: defaultFilename];
+        [dialog setNameFieldStringValue:defaultFilenameString];
+    }
+
 }
 
 
@@ -130,7 +138,7 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
     AddFilterListToDialog(dialog, filterList);
 
     // Set the starting directory
-    SetDefaultPath(dialog, defaultPath);
+    SetDefaultPath(dialog, defaultPath, NULL);
 
     nfdresult_t nfdResult = NFD_CANCEL;
     if ( [dialog runModal] == NSModalResponseOK )
@@ -169,7 +177,7 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
     AddFilterListToDialog(dialog, filterList);
 
     // Set the starting directory
-    SetDefaultPath(dialog, defaultPath);
+    SetDefaultPath(dialog, defaultPath, NULL);
     
     nfdresult_t nfdResult = NFD_CANCEL;
     if ( [dialog runModal] == NSModalResponseOK )
@@ -198,6 +206,7 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
 
 nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
                             const nfdchar_t *defaultPath,
+                            const nfdchar_t *defaultFilename,
                             nfdchar_t **outPath )
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -210,7 +219,7 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
     AddFilterListToDialog(dialog, filterList);
 
     // Set the starting directory
-    SetDefaultPath(dialog, defaultPath);
+    SetDefaultPath(dialog, defaultPath, defaultFilename);
 
     nfdresult_t nfdResult = NFD_CANCEL;
     if ( [dialog runModal] == NSModalResponseOK )
@@ -248,7 +257,7 @@ nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaul
     [dialog setPrompt:@"Ok"];
 
     // Set the starting directory
-    SetDefaultPath(dialog, defaultPath);
+    SetDefaultPath(dialog, defaultPath, NULL);
 
     nfdresult_t nfdResult = NFD_CANCEL;
     if ( [dialog runModal] == NSModalResponseOK )
