@@ -62,6 +62,8 @@ UICreateProject::UICreateProject(Context* context, const String &templateFolder,
 
 #if defined(ATOMIC_PLATFORM_OSX)
     userDocuments += "Documents/AtomicProjects";
+#else
+    userDocuments += "AtomicProjects";
 #endif
 
     projectPathField_->SetText(userDocuments.CString());
