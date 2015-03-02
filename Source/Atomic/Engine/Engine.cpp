@@ -345,8 +345,26 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "DumpShaders"))
             graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
+
+        //TODO: make this a preference
+        bool useDeferred = false;
+
+#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_WINDOWS)
+        useDeferred = graphics->GetDeferredSupport();
+#endif
+        if (useDeferred)
+        {
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>("RenderPaths/Deferred.xml"));
+        }
+        else
+        {
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>("RenderPaths/Prepass.xml"));
+        }
+
+        /*
         if (HasParameter(parameters, "RenderPath"))
             renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
+        */
 
         renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())

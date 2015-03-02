@@ -340,7 +340,7 @@ if (flipped_)
     n = planes[0].CrossProduct(planes[2]);
     *vdest++ = -1.0f;
     *vdest++ =  top;
-    *vdest++ =  0.5f;
+    *vdest++ =  1.0f;
 
     *vdest++ = n.x_;
     *vdest++ = -n.y_;
@@ -351,7 +351,7 @@ if (flipped_)
     n = planes[3].CrossProduct(planes[0]);
     *vdest++ = -1.0f;
     *vdest++ = bottom;
-    *vdest++ =  0.5f;
+    *vdest++ =  1.0f;
 
     *vdest++ = n.x_;
     *vdest++ = -n.y_;
@@ -362,7 +362,7 @@ if (flipped_)
     n = planes[1].CrossProduct(planes[3]);
     *vdest++ = 1.0f;
     *vdest++ = bottom;
-    *vdest++ =  0.5f;
+    *vdest++ =  1.0f;
 
     *vdest++ = n.x_;
     *vdest++ = -n.y_;
@@ -374,7 +374,7 @@ if (flipped_)
     n = planes[2].CrossProduct(planes[1]);
     *vdest++ = 1.0f;
     *vdest++ = top;
-    *vdest++ =  0.5f;
+    *vdest++ = 1.0f;
 
     *vdest++ = n.x_;
     *vdest++ = -n.y_;
