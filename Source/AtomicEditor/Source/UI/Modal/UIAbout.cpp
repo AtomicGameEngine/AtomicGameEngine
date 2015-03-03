@@ -100,7 +100,7 @@ void UIAbout::GenerateAboutText(String& text)
         text += "<color #76D6FF>Available platforms and modules:</color>\n\n" \
         "    <widget TBSkinImage: skin: 'LogoHTML5-Small'> <widget TBSkinImage: skin: 'LogoAndroid-Small'> " \
         "<widget TBSkinImage: skin: 'LogoIOS-Small'> <widget TBSkinImage: skin: 'Module3D-Small'> "\
-        "<widget TBButton: text: 'Purchase' id: 'purchase_pro' >\n\n";
+        "<widget TBButton: text: 'Get Pro' skin: 'TBButton.greentext' id: 'purchase_pro' >\n\n";
     }
     else
     {

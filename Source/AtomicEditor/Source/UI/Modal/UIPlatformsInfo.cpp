@@ -34,6 +34,7 @@ PlatformsInfo::PlatformsInfo(Context* context):
     Project* project = editor->GetProject();
 
     TBUI* tbui = GetSubsystem<TBUI>();
+    window_->DisableCloseButton();
     window_->SetText("Atomic Game Engine Pro Required");
 
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/platformsinfo.tb.txt");
