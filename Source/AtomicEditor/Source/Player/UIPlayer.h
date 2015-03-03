@@ -33,6 +33,7 @@ public:
     Viewport* SetView(Scene* scene, Camera* camera);
 
     bool OnEvent(const TBWidgetEvent &ev);
+    bool Show3DInfo() { return show3DInfo_; }
 
     const IntVector2& GetPlayerSize() { return playerSize_; }
 
@@ -44,7 +45,8 @@ private:
 
     IntVector2 playerSize_;
 
-    bool starterLicense_;    
+    bool standardLicense_;
+    bool show3DInfo_;
 };
 
 }

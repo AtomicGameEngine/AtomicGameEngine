@@ -42,7 +42,8 @@ UIPlayer::UIPlayer(Context* context):
 
 // BEGIN LICENSE MANAGEMENT
     LicenseSystem* license = GetSubsystem<LicenseSystem>();
-    starterLicense_ = license->IsStandardLicense();
+    standardLicense_ = license->IsStandardLicense();
+    show3DInfo_ = false;
 // END LICENSE MANAGEMENT
 
     aePlayer_ = GetSubsystem<AEPlayer>();
@@ -108,15 +109,12 @@ void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     UI* ui = GetSubsystem<UI>();
 
     // BEGIN LICENSE MANAGEMENT
-    if (starterLicense_)
+    if (standardLicense_)
     {
         Camera* camera = view3D_->GetViewport()->GetCamera();
         if (camera && !camera->IsOrthographic())
         {
-            UIModalOps* ops = GetSubsystem<UIModalOps>();
-            ops->Hide();
-            ops->ShowInfoModule3D();
-            starterLicense_ = false;
+            show3DInfo_ = true;
         }
     }
     // END LICENSE MANAGEMENT
@@ -138,7 +136,7 @@ bool UIPlayer::OnEvent(const TBWidgetEvent &ev)
         {
             if (GetSubsystem<Editor>()->IsPlayingProject())
             {
-                SendEvent(E_EDITORPLAYSTOP);
+                SendEvent(E_EDITORPLAYSTOP);                               
                 return true;
             }
         }

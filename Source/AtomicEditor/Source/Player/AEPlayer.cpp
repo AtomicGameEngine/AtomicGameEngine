@@ -93,6 +93,12 @@ void AEPlayer::Invalidate()
     ops->Hide();
     context_->RemoveSubsystem<AEPlayer>();
     GetSubsystem<UI>()->GetRoot()->RemoveAllChildren();
+
+// BEGIN LICENSE MANAGEMENT
+    if (uiPlayer_.NotNull() && uiPlayer_->Show3DInfo())
+        ops->ShowInfoModule3D();
+// END LICENSE MANAGEMENT
+
 }
 
 void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
