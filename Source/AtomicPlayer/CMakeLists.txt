@@ -7,15 +7,19 @@ file (GLOB SOURCE_FILES *.cpp *.h )
 
 if (MSVC)
     set (EXE_TYPE WIN32)
-else()
-    set (EXE_TYPE MACOSX_BUNDLE)
+elseif(APPLE)
+    #ICNS
+    set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
+    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
+    set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set (EXE_TYPE MACOSX_BUNDLE)    
 endif()
 
 if (ANDROID)
 	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
 	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 else()
-	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES})
+	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 endif()
 
 target_link_libraries(AtomicPlayer ${ATOMIC_LINK_LIBRARIES})

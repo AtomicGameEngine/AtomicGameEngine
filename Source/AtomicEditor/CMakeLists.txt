@@ -14,6 +14,11 @@ set (SOURCE_FILES ${SOURCE_FILES} Vendor/nativefiledialog/nfd_common.c)
 if (APPLE)
     set (EXE_TYPE MACOSX_BUNDLE)
     set (SOURCE_FILES ${SOURCE_FILES} Source/Build/BuildIOSUtils.mm Vendor/nativefiledialog/nfd_cocoa.mm Vendor/nativefiledialog/nfd.h)
+
+    #ICNS
+    set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
+    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
+    set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")    
 else()
     include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Vendor/libcurl/include)
     add_definitions(-DCURL_STATICLIB)
@@ -23,11 +28,12 @@ endif(APPLE)
 
 add_subdirectory(Vendor)
 
-add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES})
+add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
 target_link_libraries(AtomicEditor ${ATOMIC_LINK_LIBRARIES} Poco)
 
 if (APPLE)
+    
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
     target_link_libraries(AtomicEditor curl)
 else()
