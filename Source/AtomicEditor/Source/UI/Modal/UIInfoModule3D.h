@@ -18,12 +18,14 @@ class InfoModule3D : public UIModalOpWindow
 
 public:
 
-    InfoModule3D(Context* context);
+    InfoModule3D(Context* context, const String &exampleFolder, const String &exampleScreenshot);
     virtual ~InfoModule3D();
     bool OnEvent(const TBWidgetEvent &ev);
 
 private:
 
+    String exampleFolder_;
+    String exampleScreenshot_;
 };
 
 }

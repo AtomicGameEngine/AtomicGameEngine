@@ -31,7 +31,7 @@ public:
     void SaveBuildSettings(rapidjson::PrettyWriter<rapidjson::FileStream>& writer);
 
     void ClearBuildCompleteUI();
-    void BuildComplete(AEEditorPlatform platform,const String& buildFolder, bool success = true);
+    void BuildComplete(AEEditorPlatform platform,const String& buildFolder, bool success = true, bool fail3D = false);
 
 private:
 

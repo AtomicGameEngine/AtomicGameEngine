@@ -134,7 +134,7 @@ bool UINewProject::OnEvent(const TBWidgetEvent &ev)
 // BEGIN LICENSE MANAGEMENT
             LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
 
-            if (licenseSystem->IsStarterLicense())
+            if (licenseSystem->IsStandardLicense())
             {
                 SharedPtr<UINewProject> keepAlive(this);
                 UIModalOps* ops = GetSubsystem<UIModalOps>();

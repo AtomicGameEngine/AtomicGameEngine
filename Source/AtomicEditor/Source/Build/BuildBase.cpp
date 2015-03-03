@@ -12,7 +12,7 @@
 namespace AtomicEditor
 {
 
-BuildBase::BuildBase(Context * context) : Object(context)
+BuildBase::BuildBase(Context * context) : Object(context), containsMDL_(false)
 {
 
     if (UseResourcePackager())
@@ -67,6 +67,13 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
         }
 
         BuildResourceEntry* newEntry = new BuildResourceEntry;
+
+// BEGIN LICENSE MANAGEMENT
+        if (GetExtension(filename) == ".mdl")
+        {
+            containsMDL_ = true;
+        }
+// END LICENSE MANAGEMENT
 
         newEntry->absolutePath_ = resourceDir + filename;
         newEntry->packagePath_ = filename;

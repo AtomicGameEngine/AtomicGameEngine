@@ -307,11 +307,11 @@ void UIModalOps::ShowPlayer()
     opWindow_ = new UIPlayer(context_);
 }
 
-void UIModalOps::ShowInfoModule3D()
+void UIModalOps::ShowInfoModule3D(const String &exampleFolder, const String &exampleScreenshot)
 {
     assert(opWindow_.Null());
     Show();
-    opWindow_ = new InfoModule3D(context_);
+    opWindow_ = new InfoModule3D(context_, exampleFolder, exampleScreenshot);
 }
 
 void UIModalOps::OnWidgetDelete(TBWidget *widget)

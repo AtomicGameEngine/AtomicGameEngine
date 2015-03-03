@@ -26,6 +26,10 @@
 #include "UIErrorsWidget.h"
 #include "UIConsoleWidget.h"
 
+#include "License/AELicenseSystem.h"
+
+#include "Modal/UIModalOps.h"
+
 #include "../Tools/External/AEExternalTooling.h"
 
 using namespace tb;
@@ -157,6 +161,17 @@ void ResourceFrame::EditResource(const String& fullpath)
 
         editor->SetFocus();
 
+// BEGIN LICENSE MANAGEMENT
+        LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+        if(licenseSystem->IsStandardLicense())
+        {
+            if (ext == ".scene" )
+            {
+                UIModalOps* ops = GetSubsystem<UIModalOps>();
+                ops->ShowInfoModule3D();
+            }
+        }
+// END LICENSE MANAGEMENT
 
     }
 

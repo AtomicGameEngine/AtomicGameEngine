@@ -61,6 +61,10 @@ void EditorShortcuts::InvokePlayStop()
 
     if (!editor->IsPlayingProject())
     {
+        UIModalOps* ops = GetSubsystem<UIModalOps>();
+        if (ops->ModalActive())
+            return;
+
         VariantMap eventData;
         eventData[EditorPlayRequest::P_MODE] = (unsigned) AE_PLAYERMODE_WIDGET;
         SendEvent(E_EDITORPLAYREQUEST, eventData);

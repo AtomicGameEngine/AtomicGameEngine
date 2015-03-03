@@ -42,7 +42,7 @@ UIPlayer::UIPlayer(Context* context):
 
 // BEGIN LICENSE MANAGEMENT
     LicenseSystem* license = GetSubsystem<LicenseSystem>();
-    starterLicense_ = license->IsStarterLicense();
+    starterLicense_ = license->IsStandardLicense();
 // END LICENSE MANAGEMENT
 
     aePlayer_ = GetSubsystem<AEPlayer>();
@@ -113,10 +113,10 @@ void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
         Camera* camera = view3D_->GetViewport()->GetCamera();
         if (camera && !camera->IsOrthographic())
         {
-            SendEvent(E_EDITORPLAYSTOP);
             UIModalOps* ops = GetSubsystem<UIModalOps>();
+            ops->Hide();
             ops->ShowInfoModule3D();
-            return;
+            starterLicense_ = false;
         }
     }
     // END LICENSE MANAGEMENT

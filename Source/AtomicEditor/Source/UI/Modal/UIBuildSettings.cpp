@@ -301,7 +301,7 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
 
             TBID id = platformSelect_->GetSelectedItemID();
             LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-            if (licenseSystem->IsStarterLicense())
+            if (licenseSystem->IsStandardLicense())
             {
                 if (id == TBIDC("WebGLBuildSettings") || id == TBIDC("AndroidBuildSettings") || id == TBIDC("iOSBuildSettings"))
                 {

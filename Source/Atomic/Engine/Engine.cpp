@@ -358,7 +358,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         }
         else
         {
-            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>("RenderPaths/Prepass.xml"));
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>("RenderPaths/Forward.xml"));
         }
 
         /*

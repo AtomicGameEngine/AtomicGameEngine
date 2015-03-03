@@ -60,7 +60,7 @@ class UIModalOps: public AEWidget, private TBWidgetListener
     void ShowActivationSuccess();
     void ShowManageLicense();
     void ShowAbout();
-    void ShowInfoModule3D();
+    void ShowInfoModule3D(const String& exampleFolder = String::EMPTY, const String &exampleScreenshot = String::EMPTY);
     void ShowPlatformsInfo();
     void ShowEulaAgreement();
 

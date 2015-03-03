@@ -1,11 +1,14 @@
 TBLayout: axis: y, distribution: gravity
 	TBImageWidget: filename: "AtomicEditor/editor/images/3dmodule_header.png"
+		lp: width: 512, height: 167
 	TBEditField: multiline: 1, styling: 1, gravity: all, id: info, readonly: 1
 		font: size: 14
-		text: "3D module required for 3D content\n\n" \
-				"<widget TBSkinImage: skin: 'Module3D-Small'>" 
-		lp: min-width: 480, min-height: 240
+		text: "<widget TBSkinImage: skin: 'Module3D-Small'> 3D module is required for 3D content.\n\n" \
+				"You will be able to preview 3D in the editor.\n\nAtomic Game Engine Pro is required for app deployment." 
+		lp: min-width: 480, min-height: 160
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:
 		TBButton: text: OK, id: ok
-		TBButton: text: Purchase, id: purchase
+			lp: min-width: 64, min-height: 64
+		TBButton: text: Get Pro, id: purchase, skin: TBButton.greentext
+			lp: min-width: 128, min-height: 64

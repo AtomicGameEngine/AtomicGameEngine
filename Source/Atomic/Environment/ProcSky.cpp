@@ -414,7 +414,7 @@ void ProcSky::Initialize()
 #if ANDROID
     sunlight_->SetShadowCascade(CascadeParameters(50.0f, 0.0f, 0.0f, 0.0f, 0.8f));
 #else
-    sunlight_->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
+    sunlight_->SetShadowCascade(CascadeParameters(30.0f, 60.0f, 120.0f, 200.0f, 0.8f));
 #endif
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();

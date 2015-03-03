@@ -93,7 +93,7 @@ void UIAbout::GenerateAboutText(String& text)
 
     text += "<color #D4FB79>Installed platforms and modules:</color>\n\n";
 
-    if (licenseSystem->IsStarterLicense())
+    if (licenseSystem->IsStandardLicense())
     {
         text += "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> <widget TBSkinImage: skin: 'Module2D-Small'>\n\n";
 
@@ -121,7 +121,7 @@ bool UIAbout::OnEvent(const TBWidgetEvent &ev)
         if (ev.target->GetID() == TBIDC("purchase_pro"))
         {
             FileSystem* fileSystem = GetSubsystem<FileSystem>();
-            fileSystem->SystemOpen("https://store.atomicgameengine.com/store/store.php");
+            fileSystem->SystemOpen("https://store.atomicgameengine.com/site");
         }
         else if (ev.target->GetID() == TBIDC("ok"))
         {

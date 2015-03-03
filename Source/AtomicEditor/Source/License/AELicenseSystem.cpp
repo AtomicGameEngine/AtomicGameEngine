@@ -230,7 +230,7 @@ void LicenseSystem::RemoveLicense()
     }
 }
 
-bool LicenseSystem::IsStarterLicense()
+bool LicenseSystem::IsStandardLicense()
 {
     return !licenseAndroid_;
 }

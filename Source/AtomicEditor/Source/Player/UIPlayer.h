@@ -42,10 +42,9 @@ private:
     SharedPtr<UIView3D> view3D_;
     WeakPtr<AEPlayer> aePlayer_;
 
-
     IntVector2 playerSize_;
 
-    bool starterLicense_;
+    bool starterLicense_;    
 };
 
 }

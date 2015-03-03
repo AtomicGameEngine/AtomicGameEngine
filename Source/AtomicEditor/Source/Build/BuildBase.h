@@ -45,6 +45,8 @@ protected:
     String buildPath_;
     PODVector<BuildResourceEntry*> resourceEntries_;
 
+    bool containsMDL_;
+
 private:
 
     Vector<String> buildLog_;

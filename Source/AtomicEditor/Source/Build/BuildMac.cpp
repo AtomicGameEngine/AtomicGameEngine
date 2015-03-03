@@ -7,6 +7,7 @@
 #include "../AEEditor.h"
 #include "../Project/AEProject.h"
 #include "../Project/ProjectUtils.h"
+#include "License/AELicenseSystem.h"
 
 #include "BuildMac.h"
 #include "BuildSystem.h"
@@ -53,6 +54,20 @@ void BuildMac::Build(const String& buildPath)
 
     Initialize();
 
+    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+
+// BEGIN LICENSE MANAGEMENT
+    LicenseSystem *licenseSystem = GetSubsystem<LicenseSystem>();
+    if (licenseSystem->IsStandardLicense())
+    {
+        if (containsMDL_)
+        {
+            buildSystem->BuildComplete(AE_PLATFORM_MAC, buildPath_, false, true);
+            return;
+        }
+    }
+// END LICENSE MANAGEMENT
+
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
@@ -90,8 +105,7 @@ void BuildMac::Build(const String& buildPath)
     fileSystem->SystemRun("chmod", args);
 #endif
 
-    buildPath_ = buildPath + "/Mac-Build";
-    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+    buildPath_ = buildPath + "/Mac-Build";    
     buildSystem->BuildComplete(AE_PLATFORM_MAC, buildPath_);
 
 }

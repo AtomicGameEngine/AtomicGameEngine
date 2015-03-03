@@ -86,7 +86,7 @@ bool UIActivation::OnEvent(const TBWidgetEvent &ev)
         if (ev.target->GetID() == TBIDC("get_key"))
         {
             FileSystem* fileSystem = GetSubsystem<FileSystem>();
-            fileSystem->SystemOpen("https://store.atomicgameengine.com/store/store.php");
+            fileSystem->SystemOpen("https://store.atomicgameengine.com/site");
         }
         else if (ev.target->GetID() == TBIDC("quit"))
         {

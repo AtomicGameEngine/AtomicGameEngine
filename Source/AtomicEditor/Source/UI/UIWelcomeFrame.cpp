@@ -283,20 +283,20 @@ bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
                     {
                         if (ev.target->GetID() == (*itr).id)
                         {
+                            String exampleSourceDir = exampleSourceDir_ + "/" + (*itr).folder;
 
 // BEGIN LICENSE MANAGEMENT
                             LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-                            if (licenseSystem->IsStarterLicense())
+                            if (licenseSystem->IsStandardLicense())
                             {
                                 if ((*itr).module == "3D")
                                 {
 
-                                    ops->ShowInfoModule3D();
+                                    ops->ShowInfoModule3D(exampleSourceDir, (*itr).screenshot);
                                     return true;
                                 }
                             }
-// END LICENSE MANAGEMENT
-                            String exampleSourceDir = exampleSourceDir_ + "/" + (*itr).folder;
+// END LICENSE MANAGEMENT                            
                             ops->ShowCreateProject(exampleSourceDir, (*itr).screenshot);
                             return true;
                         }

@@ -15,6 +15,8 @@
 #include "BuildIOS.h"
 #include "BuildWeb.h"
 
+#include "UI/Modal/UIModalOps.h"
+
 #include "../AEEvents.h"
 #include "../AEEditor.h"
 
@@ -47,7 +49,7 @@ void BuildSystem::ClearBuildCompleteUI()
 
 }
 
-void BuildSystem::BuildComplete(AEEditorPlatform platform, const String &buildFolder, bool success)
+void BuildSystem::BuildComplete(AEEditorPlatform platform, const String &buildFolder, bool success, bool fail3D)
 {
     String title;
     String message;
@@ -89,8 +91,19 @@ void BuildSystem::BuildComplete(AEEditorPlatform platform, const String &buildFo
         message += " Failed";
     }
 
-    uiBuildComplete_ = new UIBuildComplete(context_, title, message, buildFolder, success);
-    uiBuildComplete_->Show();
+// BEGIN LICENSE MANAGEMENT
+    if (fail3D)
+    {
+        UIModalOps* ops = GetSubsystem<UIModalOps>();
+        ops->ShowInfoModule3D();
+    }
+    else
+    {
+        uiBuildComplete_ = new UIBuildComplete(context_, title, message, buildFolder, success);
+        uiBuildComplete_->Show();
+    }
+
+// END LICENSE MANAGEMENT
 
     currentBuild_ = 0;
 }
