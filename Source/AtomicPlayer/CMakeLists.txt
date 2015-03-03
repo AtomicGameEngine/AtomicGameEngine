@@ -7,6 +7,7 @@ file (GLOB SOURCE_FILES *.cpp *.h )
 
 if (MSVC)
     set (EXE_TYPE WIN32)
+    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
 elseif(APPLE)
     #ICNS
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)

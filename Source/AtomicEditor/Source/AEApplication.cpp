@@ -52,6 +52,7 @@ namespace AtomicEditor
 AEApplication::AEApplication(Context* context) :
     Application(context)
 {
+
 }
 
 void AEApplication::Start()
@@ -151,6 +152,8 @@ void AEApplication::Setup()
 
 #ifdef __APPLE__
     engineParameters_["ResourcePrefixPath"] = "../Resources";
+#else
+     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
 #endif
 
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "AtomicEditor.log";

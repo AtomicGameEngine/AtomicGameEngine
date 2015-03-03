@@ -77,6 +77,7 @@ void AtomicPlayer::Setup()
 #endif
 
 #if ATOMIC_PLATFORM_WINDOWS
+    engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
     engineParameters_["ResourcePrefixPath"] = "AtomicPlayer_Resources";
 #elif ATOMIC_PLATFORM_ANDROID
     //engineParameters_["ResourcePrefixPath"] = "assets";

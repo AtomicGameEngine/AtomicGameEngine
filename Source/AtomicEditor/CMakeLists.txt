@@ -24,6 +24,7 @@ else()
     add_definitions(-DCURL_STATICLIB)
     set (EXE_TYPE WIN32)
     set (SOURCE_FILES ${SOURCE_FILES} Vendor/nativefiledialog/nfd_win.cpp Vendor/nativefiledialog/nfd.h)
+    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
 endif(APPLE)
 
 add_subdirectory(Vendor)
