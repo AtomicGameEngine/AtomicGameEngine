@@ -88,6 +88,7 @@ void BuildWindows::Build(const String& buildPath)
     GenerateResourcePackage(resourcePackagePath);
 
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.exe", buildPath_ + "/AtomicPlayer.exe");
+    fileSystem->Copy(buildSourceDir + "/D3DCompiler_47.dll", buildPath_ + "/D3DCompiler_47.dll");
 
     buildSystem->BuildComplete(AE_PLATFORM_WINDOWS, buildPath_);
 
