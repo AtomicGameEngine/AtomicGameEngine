@@ -498,7 +498,7 @@ static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modif
 #else
     bool shortcut_key = (modifierkeys & TB_CTRL) ? true : false;
 #endif
-    if (!TBWidget::focused_widget || !down || !shortcut_key)
+    if (!TBWidget::focused_widget || !down || (!shortcut_key && special_key ==TB_KEY_UNDEFINED))
         return false;
     bool reverse_key = (modifierkeys & TB_SHIFT) ? true : false;
     int upper_key = toupr_ascii(key);
@@ -528,10 +528,18 @@ static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modif
         id = TBIDC("close");
     else if (upper_key == 'F')
         id = TBIDC("find");
+ #ifdef ATOMIC_PLATFORM_OSX
     else if (upper_key == 'G' && (modifierkeys & TB_SHIFT))
         id = TBIDC("findprev");
     else if (upper_key == 'G')
         id = TBIDC("findnext");
+#else
+    else if (special_key == TB_KEY_F3 && (modifierkeys & TB_SHIFT))
+        id = TBIDC("findprev");
+    else if (special_key == TB_KEY_F3)
+        id = TBIDC("findnext");
+
+#endif
     else if (upper_key == 'P')
         id = TBIDC("play");
     else if (upper_key == 'I')

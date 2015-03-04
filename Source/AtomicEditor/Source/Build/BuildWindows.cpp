@@ -8,6 +8,7 @@
 #include "../Project/AEProject.h"
 
 #include "../Project/ProjectUtils.h"
+#include "License/AELicenseSystem.h"
 
 #include "BuildSystem.h"
 #include "BuildWindows.h"
@@ -54,6 +55,20 @@ void BuildWindows::Build(const String& buildPath)
 
     Initialize();
 
+    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+
+// BEGIN LICENSE MANAGEMENT
+    LicenseSystem *licenseSystem = GetSubsystem<LicenseSystem>();
+    if (licenseSystem->IsStandardLicense())
+    {
+        if (containsMDL_)
+        {
+            buildSystem->BuildComplete(AE_PLATFORM_WINDOWS, buildPath_, false, true);
+            return;
+        }
+    }
+// END LICENSE MANAGEMENT
+
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
@@ -74,7 +89,6 @@ void BuildWindows::Build(const String& buildPath)
 
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.exe", buildPath_ + "/AtomicPlayer.exe");
 
-    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
     buildSystem->BuildComplete(AE_PLATFORM_WINDOWS, buildPath_);
 
 }
