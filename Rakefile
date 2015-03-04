@@ -378,6 +378,9 @@ namespace :package do
     ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH'] 
     Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
       sh "windeployqt.exe --release #{ATOMICTILED_DEPLOYED_DIR}/tiled.exe"
+      FileUtils.cp("C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist/x64/Microsoft.VC120.CRT/msvcp120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcp120.dll")
+      FileUtils.cp("C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist/x64/Microsoft.VC120.CRT/msvcr120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcr120.dll")
+      FileUtils.cp("C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist/x64/Microsoft.VC120.CRT/vccorlib120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/vccorlib120.dll")
     end
 
   end
