@@ -2,6 +2,11 @@
 
 Several external tools are distributed with the Atomic Game Engine Editor
 
+<color #76D6FF><u>ios-deploy</u></color>
+
+ios-deploy is available under the provisions of the GNU General Public License,
+version 3 (or later), available here: http://www.gnu.org/licenses/gpl-3.0.html
+
 <color #76D6FF><u>Tiled Map Editor</u></color>
 
 Copyright 2008-2015, Thorbjørn Lindeijer 

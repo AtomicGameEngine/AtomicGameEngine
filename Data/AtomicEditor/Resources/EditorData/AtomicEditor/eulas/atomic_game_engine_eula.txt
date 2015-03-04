@@ -21,7 +21,7 @@ The use of the Atomic Game Engine is governed by this license agreement ("Agreem
 
     (a) Licensee may not:  (i) <color #76D6FF>use the Engine to create derivative game creation software including but not limited to game editors and game engines;</color> (ii) redistribute, encumber, sell, rent, lease, sublicense, or otherwise transfer rights to the Engine;  (iii) remove or alter any trademark, logo, copyright or other proprietary notices, legends, symbols or labels in the Engine; or (iv) use the Engine for any illegal purpose.
 
-    (b) The annual revenue of any company employing, partnering, or affiliated in any way with the Licensee is <color #76D6FF>less than $250,000 USD annually</color>. Please contact sales@atomicgameengine.com if annual revenue exceeds $250,000 USD.
+    (b) The annual revenue of any company employing, partnering, or affiliated in any way with the Licensee is less than $5,000,000 USD annually. Please contact sales@atomicgameengine.com if annual revenue exceeds $5,000,000 USD for Enterprise Licensing.
 
     (c)  Licensee may not remove, alter, or circumvent any functionality related to <color #76D6FF>product activation</color> or <color #76D6FF>feature and platform license management</color>.  This code is clearly commented between "// BEGIN LICENSE MANAGEMENT" and "// END LICENSE MANAGEMENT" blocks in the Atomic Game Engine source code.
 
@@ -31,7 +31,7 @@ The use of the Atomic Game Engine is governed by this license agreement ("Agreem
 
 5. CONSENT TO THE USE OF DATA.
 
-    (a) Collection of Data. Licensee agrees that THUNDERBEAST GAMES LLC and its affiliates may collect technical and usage information related to the Engine.
+    (a) Collection of Data. Licensee agrees that THUNDERBEAST GAMES LLC and its affiliates may collect technical and usage information related solely to the Atomic Game Engine Editor.
 
     (b) Use of Data. THUNDERBEAST GAMES LLC may use this information to: (i) improve products and services; (ii) validate license keys; and (iii) check for updates. THUNDERBEAST GAMES LLC will not disclose this information in a form that personally identifies Licensee.
 
