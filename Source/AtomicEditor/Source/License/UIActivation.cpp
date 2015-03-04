@@ -152,7 +152,7 @@ void UIActivation::HandleCurlComplete(StringHash eventType, VariantMap& eventDat
         else if (code == 1)
         {
             editor->PostModalError("Activations Exceeded",
-                            "The key has exceeded the activation limit");
+                            "This key has 2 activations in use.\n\nPlease return a license from Atomic Editor - Manage License menu on one of these active computers.\n\nIf you are unable to do so, please contact sales@atomicgameengine.com providing the key to reset it");
         }
         else if (code == 2)
         {
