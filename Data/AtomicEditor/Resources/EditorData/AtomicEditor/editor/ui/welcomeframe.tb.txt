@@ -22,20 +22,18 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
 				"<color #D4FB79>First Steps</color>\n\n" \
 				"• Try out some of the example projects!\n\n" \
 				"• Create a new project based on a 2D or 3D template.\n\n" \
-				"<color #D4FB79>Getting Started Videos</color>\n" \
-				"<widget TBButton: text: 'http://atomicgameengine.com/videos', skin: TBButton.link>\n\n" \
-				"<color #D4FB79>API Documentation</color>\n" \
-				"<widget TBButton: text: 'http://atomicgameengine.com/learn', skin: TBButton.link>\n\n" \
+				"<color #D4FB79>Getting Started Videos & Javascript API Docs</color>\n" \
+				"<widget TBButton: id: 'getting_started' text: 'http://atomicgameengine.com/learn', skin: TBButton.link>\n\n" \
 				"<color #D4FB79>Forum</color>\n" \
-				"<widget TBButton: text: 'http://atomicgameengine.com/forum', skin: TBButton.link>\n\n" \
+				"<widget TBButton: id: 'forum' text: 'http://atomicgameengine.com/forum', skin: TBButton.link>\n\n" \
 				"<color #D4FB79>Atomic Game Engine on GitHub</color>\n" \
-				"<widget TBButton: text: 'https://github.com/AtomicGameEngine', skin: TBButton.link>\n\n"				
+				"<widget TBButton: id: 'atomic_github' text: 'https://github.com/AtomicGameEngine', skin: TBButton.link>\n\n"				
 		TBLayout: distribution: gravity, axis: y, spacing: 12
 			TBLayout: distribution: gravity, size: available
 				TBContainer: gravity: left right
 					TBLayout: distribution: gravity
 						TBEditField: text: "<color #76D6FF>More Examples:</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
-						TBButton: text: "https://github.com/AtomicGameEngine/AtomicExamples", skin: TBButton.link
+						TBButton: id: 'examples_github' text: "https://github.com/AtomicGameEngine/AtomicExamples", skin: TBButton.link
 						TBWidget: gravity: left right
 			TBScrollContainer: scroll-mode: auto
 				TBLayout: id: examples_layout, axis: y, spacing: 12
