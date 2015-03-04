@@ -414,9 +414,11 @@ namespace :package do
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Examples", "#{EDITOR_APP_FOLDER_DST}/Examples")
 
     # copy windows player to mac
+    ATOMICBUILDBOX_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicBuildBox/Windows/x64"
     PLAYER_APP_EXE_SRC = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.exe"
     FileUtils.mkdir_p("#{MAC_ARTIFACTS_SRC}/Deployment/Win64")
     FileUtils.cp("#{PLAYER_APP_EXE_SRC}", "#{MAC_ARTIFACTS_SRC}/Deployment/Win64/AtomicPlayer.exe")
+    FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/D3DCompiler_47.dll", "#{MAC_ARTIFACTS_SRC}/Deployment/Win64/D3DCompiler_47.dll")
 
     Dir.chdir("#{WINDOWS_PACKAGE_FOLDER}") do
 
