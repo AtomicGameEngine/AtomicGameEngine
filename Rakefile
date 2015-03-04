@@ -336,6 +336,7 @@ namespace :package do
                               'atomictiled:windows' ] do
                           
 
+    ATOMICBUILDBOX_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicBuildBox/Windows/x64"
     EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor" 
     
     FileUtils.mkdir_p(EDITOR_APP_FOLDER_DST)
@@ -364,8 +365,10 @@ namespace :package do
     FileUtils.cp_r("#{EXAMPLEINFO_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ExampleInfo")
     
     FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER}")
+    FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/D3DCompiler_47.dll", "#{DEPLOYMENT_FOLDER}/D3DCompiler_47.dll")
     FileUtils.cp("#{PLAYER_APP_EXE_SRC}", "#{DEPLOYMENT_FOLDER}/AtomicPlayer.exe")
     FileUtils.cp("#{EDITOR_APP_EXE_SRC}", "#{EDITOR_APP_FOLDER_DST}/AtomicEditor.exe")
+    FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/D3DCompiler_47.dll", "#{EDITOR_APP_FOLDER_DST}/D3DCompiler_47.dll")
 
     # DEPLOY TILED
     ATOMICTILED_DEPLOYED_DIR = "#{EDITOR_APP_FOLDER_DST}/Applications/AtomicTiled"
@@ -378,9 +381,9 @@ namespace :package do
     ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH'] 
     Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
       sh "windeployqt.exe --release #{ATOMICTILED_DEPLOYED_DIR}/tiled.exe"
-      FileUtils.cp("C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist/x64/Microsoft.VC120.CRT/msvcp120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcp120.dll")
-      FileUtils.cp("C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist/x64/Microsoft.VC120.CRT/msvcr120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcr120.dll")
-      FileUtils.cp("C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist/x64/Microsoft.VC120.CRT/vccorlib120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/vccorlib120.dll")
+      FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/msvcp120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcp120.dll")
+      FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/msvcr120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcr120.dll")
+      FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/vccorlib120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/vccorlib120.dll")
     end
 
   end
