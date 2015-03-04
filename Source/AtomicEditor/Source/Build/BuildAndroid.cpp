@@ -76,7 +76,7 @@ void BuildAndroid::HandleEvent(StringHash eventType, VariantMap& eventData)
 
         int code = eventData[SubprocessComplete::P_RETCODE].GetInt();
 
-        if (!code)
+        if (!code || currentBuildPhase_ == ADBListDevices)
         {
             // success
             if (currentBuildPhase_ == AndroidUpdateProject)
@@ -230,7 +230,7 @@ void BuildAndroid::RunADBListDevices()
     Vector<String> args = String("devices").Split(' ');
 
     currentBuildPhase_ = ADBListDevices;
-    Subprocess* subprocess = subs->Launch(adbCommand, args, buildPath_);
+    Subprocess* subprocess = subs->Launch(adbCommand, args, "");
 
     if (!subprocess)
     {
@@ -353,6 +353,13 @@ void BuildAndroid::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
+    if (fileSystem->DirExists(buildPath_))
+    {
+        BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+        buildSystem->BuildComplete(AE_PLATFORM_ANDROID, buildPath_, false);
+        editor->PostModalInfo("Build Error", ToString("Build Folder:\n\n %s\n\nis in use and could not be removed, please select another build folder.", buildPath_.CString()));
+        return;
+    }
 
 #ifdef ATOMIC_PLATFORM_OSX
     String buildSourceDir = fileSystem->GetAppBundleResourceFolder();
