@@ -241,11 +241,28 @@ void WelcomeFrame::UpdateRecentProjects()
 bool WelcomeFrame::OnEvent(const TBWidgetEvent &ev)
 {
     UIModalOps* ops = GetSubsystem<UIModalOps>();
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (ev.type == EVENT_TYPE_CLICK)
     {
         if (ev.target)
         {
-            if (ev.target->GetID() == TBIDC("open project"))
+            if (ev.target->GetID() == TBIDC("getting_started"))
+            {
+                fileSystem->SystemOpen("http://atomicgameengine.com/videos");
+            }
+            else if (ev.target->GetID() ==  TBIDC("forum"))
+            {
+                fileSystem->SystemOpen("http://atomicgameengine.com/forum");
+            }
+            else if (ev.target->GetID() == TBIDC("atomic_github"))
+            {
+                fileSystem->SystemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine");
+            }
+            else if (ev.target->GetID() == TBIDC("examples_github"))
+            {
+                fileSystem->SystemOpen("https://github.com/AtomicGameEngine/AtomicExamples");
+            }
+            else if (ev.target->GetID() == TBIDC("open project"))
             {
                 GetSubsystem<ProjectUtils>()->OpenProjectFileDialog();
                 return true;

@@ -495,17 +495,6 @@ bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
     {
         Editor* editor = GetSubsystem<Editor>();
 
-        // modals
-        if (ev.target->GetID() == TBIDC("modal_info"))
-        {
-            messageModal_ = 0;
-        }
-        else if (ev.target->GetID() == TBIDC("modal_error"))
-        {
-            messageModal_ = 0;
-        }
-
-
         if (ev.target->GetID() == TBIDC("file popup"))
         {
             if (ev.ref_id == TBIDC("new project"))
@@ -524,6 +513,7 @@ bool MainFrame::HandlePopupMenuEvent(const TBWidgetEvent &ev)
                 if (editor->IsProjectLoaded())
                 {
                     editor->PostModalError("Close Project", "Please close the current project before opening a new one");
+                    return true;
                 }
                 else
                 {
