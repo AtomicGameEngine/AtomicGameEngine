@@ -79,7 +79,6 @@ Game.prototype.createScene2D = function() {
         viewport = Atomic.editor.setView(scene, camera);
     } else {
         viewport = new Atomic.Viewport(scene, camera);
-        viewport.rect = [0, 0, this.graphics.width, this.graphics.height];
         this.renderer.setViewport(0, viewport);
     }
 
