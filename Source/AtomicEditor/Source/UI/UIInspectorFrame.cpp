@@ -109,6 +109,16 @@ bool InspectorFrame::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_CLICK)
     {
+        if (ev.target->GetID() == TBIDC("create popup"))
+        {
+            if (ev.ref_id == TBIDC("create component"))
+            {
+                Editor* editor = GetSubsystem<Editor>();
+                editor->PostModalInfo("Early Access - Not Implemented", "Component creation not implemented in this early access build");
+            }
+
+        }
+
         if (ev.target->GetID() == TBIDC("create button"))
         {
             if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("create popup")))

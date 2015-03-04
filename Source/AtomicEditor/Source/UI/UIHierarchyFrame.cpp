@@ -93,8 +93,16 @@ void HierarchyFrame::RefreshHierarchyList()
 
 bool HierarchyFrame::OnEvent(const TBWidgetEvent &ev)
 {
+    Editor* editor = GetSubsystem<Editor>();
     if (ev.type == EVENT_TYPE_CLICK)
     {
+        if (ev.target->GetID() == TBIDC("menu create"))
+        {
+
+            editor->PostModalInfo("Early Access - Not Implemented", "Node creation not implemented in this Early Access build");
+
+        }
+
         if (scene_.NotNull())
         {
             if (ev.target->GetID() == TBIDC("hierarchyList_"))

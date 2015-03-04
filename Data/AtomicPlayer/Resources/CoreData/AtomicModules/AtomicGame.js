@@ -10,6 +10,8 @@ function Game() {
 	this.input = Atomic.getInput();
     this.ui = Atomic.getUI();
 
+    this.input.setMouseVisible(true);
+
     if (Atomic.platform == "Android") {
         this.renderer.reuseShadowMaps = false;
         this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
