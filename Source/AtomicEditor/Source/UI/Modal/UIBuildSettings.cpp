@@ -314,6 +314,17 @@ bool UIBuildSettings::OnEvent(const TBWidgetEvent &ev)
 
             }
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+                if (id == TBIDC("iOSBuildSettings"))
+                {
+                    Editor* editor = GetSubsystem<Editor>();
+                    editor->PostModalInfo("MacOSX Required", "iOS platform requires MacOSX Editor");
+                    return true;
+                }
+#endif
+
+
             RequestPlatformChange(id);
             return true;
 // END LICENSE MANAGEMENT

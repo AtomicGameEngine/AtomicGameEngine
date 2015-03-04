@@ -83,7 +83,7 @@ bool UIManageLicense::OnEvent(const TBWidgetEvent &ev)
         {
             if (editor->IsProjectLoaded())
             {
-                editor->PostModalError("Close Project", "Please close the current project before deactiving license");
+                editor->PostModalError("Close Project", "Please close the current project before deactivating license");
             }
             else
             {

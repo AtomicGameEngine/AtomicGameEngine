@@ -89,18 +89,18 @@ void UIAbout::GenerateAboutText(String& text)
 
     text += "<widget TBImageWidget: filename: 'AtomicEditor/editor/images/atomic_logo.png'>\n\n";
     text.AppendWithFormat("<color #D4FB79>Version  %i.%i.p%i</color>\n\n", ATOMIC_EDITOR_VERSION_MAJOR, ATOMIC_EDITOR_VERSION_MINOR, ATOMIC_EDITOR_VERSION_PATCH);
-    text += "(c) 2014-2015 THUNDERBEAST GAMES LLC\n\n";
+    text += "(c) 2014-2015 THUNDERBEAST GAMES LLC\n\n\n";
 
     text += "<color #D4FB79>Installed platforms and modules:</color>\n\n";
 
     if (licenseSystem->IsStandardLicense())
     {
-        text += "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> <widget TBSkinImage: skin: 'Module2D-Small'>\n\n";
+        text += "    <widget TBSkinImage: skin: 'LogoMac-Small'> <widget TBSkinImage: skin: 'LogoWindows-Small'> <widget TBSkinImage: skin: 'Module2D-Small'>\n\n\n";
 
         text += "<color #76D6FF>Available platforms and modules:</color>\n\n" \
         "    <widget TBSkinImage: skin: 'LogoHTML5-Small'> <widget TBSkinImage: skin: 'LogoAndroid-Small'> " \
         "<widget TBSkinImage: skin: 'LogoIOS-Small'> <widget TBSkinImage: skin: 'Module3D-Small'> "\
-        "<widget TBButton: text: 'Get Pro' skin: 'TBButton.greentext' id: 'purchase_pro' >\n\n";
+        "<widget TBButton: text: 'Get Pro' skin: 'TBButton.greentext' id: 'purchase_pro' >\n\n\n";
     }
     else
     {

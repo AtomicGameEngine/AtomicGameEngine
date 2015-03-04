@@ -133,6 +133,10 @@ MainFrame::MainFrame(Context* context) :
     platformIndicator_ = delegate_->GetWidgetByIDAndType<TBSkinImage>(TBIDC("current_platform_indicator"));
     assert(platformIndicator_);
 
+    TBButton* developer = delegate_->GetWidgetByIDAndType<TBButton>(TBIDC("menu developer"));
+    assert(developer);
+    developer->SetVisibilility(WIDGET_VISIBILITY_GONE);
+
     consoletext_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("consoletext"));
     consoletext_->SetText("Atomic Editor Initialized");
 
