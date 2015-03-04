@@ -224,6 +224,10 @@ bool AEJavascript::CheckJSErrors(bool fullCheck)
 bool AEJavascript::ParseJavascriptToJSON(const char* source, String& json, bool loose)
 {
     json.Clear();
+
+    // forcing loose to false, as issues with MSVC release - 3/3/2015 First Early Access Release
+    loose = false;
+
     duk_get_global_string(ctx_, loose ? "__atomic_parse_to_json_loose" : "__atomic_parse_to_json");
     duk_push_string(ctx_, source);
     bool ok = true;
