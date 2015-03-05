@@ -2,7 +2,11 @@
 
 ![alt text][WelcomeScreen]
 
-###Atomic Game Engine™ Source Code Repository
+#### Looking for Javascript examples?
+
+They are over here: https://github.com/AtomicGameEngine/AtomicExamples
+
+###Atomic Game Engine™ Editor and Player Source Repository
 
 This repository contains the full source code to the Atomic Game Engine Runtime and Editor
 
