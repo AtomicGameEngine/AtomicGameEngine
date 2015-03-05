@@ -35,7 +35,12 @@ public:
     const Vector<String>& GetRecentProjects() { return recentProjects_; }
 
     void SetAndroidSDKPath(const String& path) { androidSDKPath_ = path; Write(); }
+    void SetAntPath(const String& path) { antPath_ = path; Write(); }
+    void SetJDKRootPath(const String& path) { jdkRootPath_ = path; Write(); }
+
     String GetAndroidSDKPath() { return AddTrailingSlash(androidSDKPath_); }
+    String GetJDKRootPath() { return AddTrailingSlash(jdkRootPath_); }
+    String GetAntPath() { return AddTrailingSlash(antPath_); }
 
     void Read();
     void Write();
@@ -52,6 +57,8 @@ private:
     String GetPreferencesFullPath();
 
     String androidSDKPath_;
+    String jdkRootPath_;
+    String antPath_;
 
     String lastProjectFullPath_;
     Vector<String> recentProjects_;    

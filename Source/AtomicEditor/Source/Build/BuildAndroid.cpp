@@ -253,17 +253,21 @@ void BuildAndroid::RunADBListDevices()
 void BuildAndroid::RunAntDebug()
 {
     Editor* editor = GetSubsystem<Editor>();
+    AEPreferences* prefs = editor->GetPreferences();
     SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
 
-    //TODO: ensure ant is on path, also JAVA_HOME env variable needs to be set jdk root on Windows
+     Poco::Process::Env env;
+
 #ifdef ATOMIC_PLATFORM_OSX
     String antCommand = "/usr/local/bin/ant";
     Vector<String> args;
     args.Push("debug");
 #else
+     // C:\ProgramData\Oracle\Java\javapath;
     Vector<String> args;
     String antCommand = "cmd";
-    String antPath = "C:\\Dev\\apache-ant-1.9.4\\bin\\ant.bat";
+    String antPath = prefs->GetAntPath() + "/ant.bat";
+    env["JAVA_HOME"] = prefs->GetJDKRootPath().CString();
     // ant is a batch file on windows, so have to run with cmd /c
     args.Push("/c");
     args.Push("\"" + antPath + "\"");
@@ -271,7 +275,7 @@ void BuildAndroid::RunAntDebug()
 #endif
 
     currentBuildPhase_ = AntBuildDebug;
-    Subprocess* subprocess = subs->Launch(antCommand, args, buildPath_);
+    Subprocess* subprocess = subs->Launch(antCommand, args, buildPath_, env);
 
     if (!subprocess)
     {

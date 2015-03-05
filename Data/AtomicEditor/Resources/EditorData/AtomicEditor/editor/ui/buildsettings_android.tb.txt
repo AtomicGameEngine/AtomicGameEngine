@@ -22,21 +22,38 @@ TBLayout: axis: y, distribution: gravity, position: left
 				lp: min-width: 220
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout: axis: y, position: left, distribution: gravity
-		TBTextField: text: "Android SDK Path:"
+		TBTextField: text: "Android SDK Path:", skin: DarkGrayText
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: sdk_path, autofocus: 0
 				lp: min-width: 250
 			TBButton: text: "Choose" id: choose_sdk_path
 	TBLayout: axis: y, position: left, distribution: gravity
-		TBTextField: text: "Android API Level:"
+		TBTextField: text: "Android API Level:", skin: DarkGrayText
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBSelectDropdown: id: sdk_target_select
 				lp: min-width: 250
 			TBButton: text: "Refresh" id: refresh_sdk_targets
+	TBLayout: axis: y, position: left, distribution: gravity
+		TBTextField: text: "Ant Path:" id: ant_path_text, skin: DarkGrayText
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: ant_path, autofocus: 0
+				lp: min-width: 250
+			TBButton: text: "Choose" id: choose_ant_path
+	TBLayout: axis: y, position: left, distribution: gravity
+		TBTextField: text: "JDK Root:" id: jdk_root_text, skin: DarkGrayText
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: jdk_root, autofocus: 0
+				lp: min-width: 250
+			TBButton: text: "Choose" id: choose_jdk_root
 	TBSeparator: gravity: left right, skin: AESeparator
-	TBTextField: text: "Icon:"
-	TBLayout: gravity: left right, distribution-position: right bottom
-		TBSkinImage: skin: LogoAtomic64
-	TBTextField: text: "Splash Screen:"
-	TBLayout: gravity: left right, distribution-position: right bottom
-		TBSkinImage: skin: LogoAtomic64
+	TBLayout:
+		TBLayout: axis: y
+			TBTextField: text: "Icon:"
+			TBLayout: gravity: left right, distribution-position: right bottom
+				TBSkinImage: skin: LogoAtomic64
+					lp: min-width: 64, min-height:64
+		TBLayout: axis: y
+			TBTextField: text: "Splash Screen:"
+			TBLayout: gravity: left right, distribution-position: right bottom
+				TBSkinImage: skin: LogoAtomic64
+					lp: min-width: 64, min-height:64

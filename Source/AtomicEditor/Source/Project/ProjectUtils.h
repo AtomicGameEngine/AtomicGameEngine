@@ -21,6 +21,8 @@ class ProjectUtils : public Object
 
     String GetBuildPath(const String& defaultPath);
     String GetAndroidSDKPath(const String& defaultPath);
+    String GetAntPath(const String& defaultPath);
+    String GetJDKRootPath(const String& defaultPath);
     String GetMobileProvisionPath();
 
 public:

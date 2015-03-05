@@ -92,6 +92,14 @@ void AEPreferences::Read()
     if (android_sdk_path && android_sdk_path->value.IsString())
         androidSDKPath_ = android_sdk_path->value.GetString();
 
+    const Value::Member* jdk_root_path = document.FindMember("jdk_root_path");
+    if (jdk_root_path && jdk_root_path->value.IsString())
+        jdkRootPath_ = jdk_root_path->value.GetString();
+
+    const Value::Member* ant_path = document.FindMember("ant_path");
+    if (ant_path && ant_path->value.IsString())
+        antPath_ = ant_path->value.GetString();
+
     UpdateRecentFiles(false);
 
 }
@@ -133,6 +141,12 @@ void AEPreferences::Write()
 
     writer.String("android_sdk_path");
     writer.String(androidSDKPath_.CString());
+
+    writer.String("jdk_root_path");
+    writer.String(jdkRootPath_.CString());
+
+    writer.String("ant_path");
+    writer.String(antPath_.CString());
 
     writer.String("window_pos_x");
     writer.Int(pos.x_);

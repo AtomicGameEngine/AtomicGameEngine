@@ -45,6 +45,16 @@ UIBuildSettingsAndroid::UIBuildSettingsAndroid(Context* context) :
 
     sdkTargetSelect_ = delegate_->GetWidgetByIDAndType<TBSelectDropdown>(TBIDC("sdk_target_select"));
     assert(sdkTargetSelect_);
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    TBTextField* jdk_root_text = delegate_->GetWidgetByIDAndType<TBTextField>(TBIDC("jdk_root_text"));
+    assert(jdk_root_text);
+    jdk_root_text->SetText("JDK Root: (Ex. C:\\Program Files\\Java\\jdk1.8.0_31)");
+
+    TBTextField* ant_path_text = delegate_->GetWidgetByIDAndType<TBTextField>(TBIDC("ant_path_text"));
+    assert(ant_path_text);
+    ant_path_text->SetText("Ant Path: (The folder that contains ant.bat)");
+#endif
 }
 
 UIBuildSettingsAndroid::~UIBuildSettingsAndroid()
@@ -173,8 +183,16 @@ void UIBuildSettingsAndroid::Refresh()
 {
     Editor* editor = context_->GetSubsystem<Editor>();
 
+    AEPreferences* prefs = editor->GetPreferences();
+
     TBEditField* sdk_path = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("sdk_path"));
-    sdk_path->SetText(editor->GetPreferences()->GetAndroidSDKPath().CString());
+    sdk_path->SetText(prefs->GetAndroidSDKPath().CString());
+
+    TBEditField* ant_path = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("ant_path"));
+    ant_path->SetText(prefs->GetAntPath().CString());
+
+    TBEditField* jdk_root = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("jdk_root"));
+    jdk_root->SetText(prefs->GetJDKRootPath().CString());
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
     const AndroidBuildSettings& settings = buildSystem->GetBuildSettings()->GetAndroidSettings();
@@ -204,7 +222,27 @@ bool UIBuildSettingsAndroid::OnEvent(const TBWidgetEvent &ev)
             }
             return true;
         }
-        if (ev.target->GetID() == TBIDC("refresh_sdk_targets"))
+        else if (ev.target->GetID() == TBIDC("choose_ant_path"))
+        {
+            String path = utils->GetAntPath("");
+            if (path.Length())
+            {
+                editor->GetPreferences()->SetAntPath(path);
+                Refresh();
+            }
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("choose_jdk_root"))
+        {
+            String path = utils->GetJDKRootPath("");
+            if (path.Length())
+            {
+                editor->GetPreferences()->SetJDKRootPath(path);
+                Refresh();
+            }
+            return true;
+        }
+        else if (ev.target->GetID() == TBIDC("refresh_sdk_targets"))
         {
             RefreshAndroidTargets();
         }

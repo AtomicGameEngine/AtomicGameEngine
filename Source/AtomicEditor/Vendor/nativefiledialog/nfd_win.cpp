@@ -627,6 +627,12 @@ nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaul
     HRESULT result = ::CoInitializeEx(NULL,
                                       ::COINIT_APARTMENTTHREADED |
                                       ::COINIT_DISABLE_OLE1DDE );
+
+    wchar_t *promptW = {0};
+    if (prompt && strlen(prompt))
+        CopyNFDCharToWChar( prompt, &promptW );
+
+
     if ( !SUCCEEDED(result))
     {
         NFDi_SetError("Could not initialize COM.");
@@ -657,6 +663,9 @@ nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaul
     {
         goto end;
     }
+
+    fileOpenDialog->SetTitle(promptW);
+
 
     // Show the dialog.
     result = fileOpenDialog->Show(NULL);
@@ -700,6 +709,10 @@ nfdresult_t NFD_ChooseDirectory(const nfdchar_t *prompt, const nfdchar_t *defaul
     }
 
  end:
+
+    if (prompt && strlen(prompt));
+        NFDi_Free( promptW );
+
     ::CoUninitialize();
 
     return nfdResult;
