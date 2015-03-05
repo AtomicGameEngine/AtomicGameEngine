@@ -153,6 +153,10 @@ elements
 	3DRotateBitmap
 		bitmap 3d_rotate.png		
 
+	DarkGrayText
+		text-color #aaaaaa
+
+
 	InspectorTopLayout
 		background-color #333333
 
