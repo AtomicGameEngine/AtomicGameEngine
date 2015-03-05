@@ -46,14 +46,38 @@ UIBuildSettingsAndroid::UIBuildSettingsAndroid(Context* context) :
     sdkTargetSelect_ = delegate_->GetWidgetByIDAndType<TBSelectDropdown>(TBIDC("sdk_target_select"));
     assert(sdkTargetSelect_);
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
     TBTextField* jdk_root_text = delegate_->GetWidgetByIDAndType<TBTextField>(TBIDC("jdk_root_text"));
     assert(jdk_root_text);
-    jdk_root_text->SetText("JDK Root: (Ex. C:\\Program Files\\Java\\jdk1.8.0_31)");
 
     TBTextField* ant_path_text = delegate_->GetWidgetByIDAndType<TBTextField>(TBIDC("ant_path_text"));
     assert(ant_path_text);
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    jdk_root_text->SetText("JDK Root: (Ex. C:\\Program Files\\Java\\jdk1.8.0_31)");
     ant_path_text->SetText("Ant Path: (The folder that contains ant.bat)");
+#else
+
+    TBButton* choose_jdk_root = delegate_->GetWidgetByIDAndType<TBButton>(TBIDC("choose_jdk_root"));
+    assert(choose_jdk_root);
+
+    TBButton* choose_ant_path = delegate_->GetWidgetByIDAndType<TBButton>(TBIDC("choose_ant_path"));
+    assert(choose_ant_path);
+
+    choose_jdk_root->SetVisibilility(WIDGET_VISIBILITY_GONE);
+    choose_ant_path->SetVisibilility(WIDGET_VISIBILITY_GONE);
+
+    TBEditField* ant_path = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("ant_path"));
+    assert(ant_path);
+
+    ant_path->SetVisibilility(WIDGET_VISIBILITY_GONE);
+    ant_path_text->SetVisibilility(WIDGET_VISIBILITY_GONE);
+
+    TBEditField* jdk_root = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("jdk_root"));
+    assert(jdk_root);
+
+    jdk_root->SetVisibilility(WIDGET_VISIBILITY_GONE);
+    jdk_root_text->SetVisibilility(WIDGET_VISIBILITY_GONE);
+
 #endif
 }
 
