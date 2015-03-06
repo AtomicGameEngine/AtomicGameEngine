@@ -376,6 +376,15 @@ void BuildAndroid::Build(const String& buildPath)
     String coreDataFolder = buildSourceDir + "CoreData/";
 
     fileSystem->CopyDir(androidProject, buildPath_);
+
+    if (!fileSystem->DirExists(buildPath_))
+    {
+        BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+        buildSystem->BuildComplete(AE_PLATFORM_ANDROID, buildPath_, false);
+        editor->PostModalInfo("Build Error", ToString("Build Folder:\n\n %s\n\ncould not be written to, is it in use?", buildPath_.CString()));
+        return;
+    }
+
     fileSystem->CopyDir(projectResources, buildPath_ + "/assets/AtomicResources");    
     fileSystem->CopyDir(coreDataFolder, buildPath_ + "/assets/CoreData");
 
@@ -386,7 +395,14 @@ void BuildAndroid::Build(const String& buildPath)
 
     AndroidProjectGenerator gen(context_);
     gen.SetBuildPath(buildPath_);
-    gen.Generate();
+
+    if (!gen.Generate())
+    {
+        BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+        buildSystem->BuildComplete(AE_PLATFORM_ANDROID, buildPath_, false);
+        editor->PostModalInfo("Build Error", ToString("Unable to generate Android project, please check build settings and try again"));
+        return;
+    }
 
     // RunAndroidUpdate();
     RunAntDebug();

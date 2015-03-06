@@ -9,6 +9,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/Main.h>
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
 #include <Atomic/DebugNew.h>
@@ -94,8 +95,17 @@ void AEApplication::Start()
 
     Input* input = GetSubsystem<Input>();
 
-
     input->SetMouseVisible(true);
+
+ #ifdef ATOMIC_PLATFORM_WINDOWS
+    // on windows maximize, otherwise window does funky thing with "restore down"
+    // todo: better way of handling this?  Windows 8 restore down goes below taskbar :(
+    Graphics* graphics = GetSubsystem<Graphics>();
+    IntVector2 resolution = graphics->GetDesktopResolution();
+    int height = graphics->GetHeight();
+    if ( Abs(height - resolution.y_) < 128)
+        GetSubsystem<Graphics>()->Maximize();
+ #endif
 
     context_->RegisterSubsystem(new EditorStrings(context_));
     context_->RegisterSubsystem(new EditorShortcuts(context_));
