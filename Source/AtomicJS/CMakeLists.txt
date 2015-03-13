@@ -12,7 +12,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 
 file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h)
 
-
 if (MSVC)
     set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "WINDOWS")  
 else()
@@ -37,7 +36,6 @@ endif()
 if (EMSCRIPTEN)
   set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "WEB")  
 endif()
-
 
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_SOURCE_FOLDER}/Javascript/Modules/*.cpp)
 

@@ -368,11 +368,17 @@ void JSBModule::Load(const String &moduleJSONFilename)
     {
         String sourceFolder = sources.GetString(j);
         Vector<String> fileNames;
-        JSBind::fileSystem_->ScanDir(fileNames, JSBind::ROOT_FOLDER + "/Source/Atomic/" + sourceFolder, "*.h", SCAN_FILES, false);        
+
+        String sourceRoot = "Atomic";
+
+        if (sourceFolder == "Javascript")
+            sourceRoot = "AtomicJS";
+
+        JSBind::fileSystem_->ScanDir(fileNames, JSBind::ROOT_FOLDER + "/Source/" + sourceRoot + "/" + sourceFolder, "*.h", SCAN_FILES, false);
         for (unsigned k = 0; k < fileNames.Size(); k++)
         {
             // TODO: filter
-            String filepath = JSBind::ROOT_FOLDER + "/Source/Atomic/" + sourceFolder + "/" + fileNames[k];
+            String filepath = JSBind::ROOT_FOLDER + "/Source/" + sourceRoot + "/" + sourceFolder + "/" + fileNames[k];
 
             this->headerFiles_.Push(filepath);
         }
