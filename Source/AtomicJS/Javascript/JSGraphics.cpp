@@ -2,10 +2,9 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "Precompiled.h"
-#include "../Javascript/JSGraphics.h"
-#include "../Javascript/JSVM.h"
-#include "../Graphics/Light.h"
+#include "JSGraphics.h"
+#include "JSVM.h"
+#include <Atomic/Graphics/Light.h>
 
 namespace Atomic
 {

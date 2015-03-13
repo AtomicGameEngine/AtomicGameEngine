@@ -47,7 +47,9 @@
 #else
 
 #ifdef ATOMIC_STATIC_DEFINE
+#ifndef ATOMIC_API
 #  define ATOMIC_API
+#endif
 #  define ATOMIC_NO_EXPORT
 #else
 #  ifndef ATOMIC_API

@@ -2,9 +2,8 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "Precompiled.h"
-#include "../Javascript/JSAPI.h"
-#include "../Javascript/JSVM.h"
+#include "JSAPI.h"
+#include "JSVM.h"
 
 /*
 

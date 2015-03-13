@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Scene/Component.h"
+#include <Atomic/Scene/Component.h>
 
 namespace Atomic
 {

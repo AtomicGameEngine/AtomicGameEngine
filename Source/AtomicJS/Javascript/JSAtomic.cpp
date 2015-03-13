@@ -2,30 +2,29 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "Precompiled.h"
-#include "../Core/ProcessUtils.h"
-#include "../IO/FileSystem.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../Input/Input.h"
-#include "../Graphics/Renderer.h"
-#include "../Graphics/Graphics.h"
+#include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/IO/FileSystem.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Input/Input.h>
+#include <Atomic/Graphics/Renderer.h>
+#include <Atomic/Graphics/Graphics.h>
 
-#include "../UI/UI.h"
+#include <Atomic/UI/UI.h>
 
-#include "../Engine/Engine.h"
+#include <Atomic/Engine/Engine.h>
 
-#include "../Javascript/JSEvents.h"
-#include "../Javascript/JSVM.h"
-#include "../Javascript/JSComponent.h"
-#include "../Javascript/JSGraphics.h"
-#include "../Javascript/JSScene.h"
+#include "JSEvents.h"
+#include "JSVM.h"
+#include "JSComponent.h"
+#include "JSGraphics.h"
+#include "JSScene.h"
 
-#include "../Javascript/JSAtomicGame.h"
-#include "../Javascript/JSAtomic.h"
+#include "JSAtomicGame.h"
+#include "JSAtomic.h"
 
-#include "../Scene/Scene.h"
-#include "../Environment/ProcSky.h"
+#include <Atomic/Scene/Scene.h>
+#include <Atomic/Environment/ProcSky.h>
 
 namespace Atomic
 {

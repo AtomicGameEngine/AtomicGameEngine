@@ -20,9 +20,6 @@
 #include <Atomic/Input/Input.h>
 
 #include <Atomic/UI/TBUI.h>
-
-#include <Atomic/Javascript/Javascript.h>
-
 #include <Atomic/Environment/Environment.h>
 #include <Atomic/Graphics/Renderer.h>
 
@@ -44,6 +41,8 @@
 #include "AEApplication.h"
 
 #include "Tools/External/AEExternalTooling.h"
+
+#include <AtomicJS/Javascript/Javascript.h>
 
 DEFINE_APPLICATION_MAIN(AtomicEditor::AEApplication);
 

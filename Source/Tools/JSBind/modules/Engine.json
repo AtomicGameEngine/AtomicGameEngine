@@ -1,6 +1,6 @@
 {
 	"name" : "Engine",
 	"sources" : ["Engine"],
-	"includes" : ["UI/Text.h", "UI/Button.h", "UI/LineEdit.h"],
+	"includes" : ["<Atomic/UI/Text.h>", "<Atomic/UI/Button.h>", "<Atomic/UI/LineEdit.h>"],
 	"classes" : ["Engine", "DebugHud", "Console"]
 }

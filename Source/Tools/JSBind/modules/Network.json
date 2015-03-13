@@ -1,7 +1,7 @@
 {
 	"name" : "Network",
 	"sources" : ["Network"],
-	"includes" : ["Network/Protocol.h", "Scene/Scene.h"],
+	"includes" : ["<Atomic/Network/Protocol.h>", "<Atomic/Scene/Scene.h>"],
 	"classes" : ["Network", "NetworkPriority"]
 
 

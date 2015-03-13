@@ -31,7 +31,7 @@ add_subdirectory(Vendor)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor ${ATOMIC_LINK_LIBRARIES} Poco)
+target_link_libraries(AtomicEditor ${ATOMIC_LINK_LIBRARIES} AtomicJS Poco)
 
 if (APPLE)
     

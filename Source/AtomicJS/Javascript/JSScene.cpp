@@ -2,16 +2,14 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "Precompiled.h"
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/IO/File.h>
+#include <Atomic/Scene/Node.h>
+#include <Atomic/Scene/Scene.h>
 
-#include "../Resource/ResourceCache.h"
-#include "../IO/File.h"
-
-#include "../Javascript/JSScene.h"
-#include "../Javascript/JSComponent.h"
-#include "../Javascript/JSVM.h"
-#include "../Scene/Node.h"
-#include "../Scene/Scene.h"
+#include "JSScene.h"
+#include "JSComponent.h"
+#include "JSVM.h"
 
 namespace Atomic
 {

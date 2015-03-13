@@ -9,8 +9,9 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/UI/TBUI.h>
-#include <Atomic/Javascript/Javascript.h>
 #include <Atomic/Core/CoreEvents.h>
+
+#include <AtomicJS/Javascript/Javascript.h>
 
 #include "AEEditor.h"
 
