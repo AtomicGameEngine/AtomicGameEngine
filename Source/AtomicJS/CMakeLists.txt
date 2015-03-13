@@ -1,4 +1,8 @@
 
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
+    add_subdirectory(JSBind)
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
@@ -41,3 +45,6 @@ set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} )
 
 add_library(AtomicJS ${SOURCE_FILES})
 
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
+    add_dependencies(AtomicJS JSBind)
+endif()
