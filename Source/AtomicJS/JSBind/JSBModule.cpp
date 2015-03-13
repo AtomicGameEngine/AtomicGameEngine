@@ -184,11 +184,8 @@ void JSBModule::WriteIncludes(String& source)
 
 		String headerfile = GetFileNameAndExtension(header->filepath_);
 
-#ifdef WIN32
-        headerPath.Replace(JSBind::ROOT_FOLDER + "/Source/Atomic/", "");
-#else
         headerPath.Replace(JSBind::ROOT_FOLDER + "/Source/Atomic/", "Atomic/");
-#endif        
+
         source.AppendWithFormat("#include <%s%s>\n", headerPath.CString(), headerfile.CString());
 
         included.Push(header);

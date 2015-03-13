@@ -1,4 +1,18 @@
 
+if (MSVC)
+    set (JAVASCRIPT_BINDINGS_PLATFORM "WINDOWS")
+elseif(APPLE)
+    if (NOT IOS)
+      set (JAVASCRIPT_BINDINGS_PLATFORM "MACOSX")
+    else()
+      set (JAVASCRIPT_BINDINGS_PLATFORM "IOS")
+    endif()
+elseif(ANDROID)
+    set (JAVASCRIPT_BINDINGS_PLATFORM "ANDROID")
+elseif (EMSCRIPTEN)
+  set (JAVASCRIPT_BINDINGS_PLATFORM "WEB")
+endif()
+
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(JSBind)
 endif()
@@ -12,32 +26,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 
 file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h)
 
-if (MSVC)
-    set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "WINDOWS")  
-else()
+if (NOT MSVC)
     # for kNet
     add_definitions (-DUNIX)
 endif()
 
-if (ANDROID)
-  
-  set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "ANDROID")  
 
-endif()
-
-if (APPLE)
-    if (NOT IOS)
-      set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "MACOSX")  
-    else()
-      set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "IOS")  
-    endif()
-endif()
-
-if (EMSCRIPTEN)
-  set (JAVASCRIPT_BINDINGS_SOURCE_FOLDER "WEB")  
-endif()
-
-file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_SOURCE_FOLDER}/Javascript/Modules/*.cpp)
+file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Modules/*.cpp)
 
 set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} )
 

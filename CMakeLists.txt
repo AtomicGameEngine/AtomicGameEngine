@@ -18,9 +18,9 @@ if (NOT EMSCRIPTEN)
     set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} SDL Civetweb Recast Detour kNet )
 endif()
 
-if (NOT MSVC)
+#if (NOT MSVC)
     add_definitions(-DATOMIC_API=)
-endif()
+#endif()
 
 if (MSVC)
 

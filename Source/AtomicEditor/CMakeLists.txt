@@ -44,4 +44,6 @@ endif ()
 
 if (APPLE)
     include(AtomicEditorMac.cmake)
-endif(APPLE)
+elseif(MSVC)
+    include(AtomicEditorWindows.cmake)
+endif()
