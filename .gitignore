@@ -2,6 +2,7 @@
 *.user
 Bin/Atomic.d.ts
 Bin/Atomic.js
+Bin/*.pak
 Source/Atomic/Javascript/Modules/*
 Artifacts/*
 Build/*

@@ -70,12 +70,12 @@ void AEApplication::Start()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef __APPLE__    
-    String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorData/";
+    String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorData.pak";
 #else
     String editorResources = fileSystem->GetProgramDir() + "EditorData/";
 #endif    
-    assert(fileSystem->DirExists(editorResources));
-    cache->AddResourceDir(editorResources);
+    assert(fileSystem->FileExists(editorResources));
+    cache->AddPackageFile(editorResources);
 
     // initialize after EditorResources set
     TBUI* tbui = GetSubsystem<TBUI>();
