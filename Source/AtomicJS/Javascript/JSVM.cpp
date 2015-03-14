@@ -261,10 +261,16 @@ void JSVM::InitComponents()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    if (cache->GetPackageFiles().Size())
+    // TODO: better way to detect player?
+    const Vector<SharedPtr<PackageFile> >& packageFiles = cache->GetPackageFiles();
+    for (unsigned i = 0; i < packageFiles.Size(); i++)
     {
-        InitPackageComponents();
-        return;
+        String packageName = packageFiles[i]->GetName();
+        if (packageName.Find("AtomicResources") != String::NPOS)
+        {
+            InitPackageComponents();
+            return;
+        }
     }
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
