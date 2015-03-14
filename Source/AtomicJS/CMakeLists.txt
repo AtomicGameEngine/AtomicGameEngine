@@ -39,5 +39,5 @@ set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} )
 add_library(AtomicJS ${SOURCE_FILES})
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-    add_dependencies(AtomicJS JSBind)
+    add_dependencies(AtomicJS JSBind BuildJSBindings)
 endif()

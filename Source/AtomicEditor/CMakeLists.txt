@@ -41,27 +41,3 @@ endif()
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
-
-file (GLOB_RECURSE EDITORDATA_FILES ${CMAKE_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData/*)
-file (GLOB_RECURSE COREDATA_FILES ${CMAKE_SOURCE_DIR}/Data/AtomicPlayer/Resources/CoreData/*)
-
-if (MSVC)
-    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/EditorData.pak"
-                       COMMAND $<TARGET_FILE:PackageTool> "${CMAKE_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData" "${CMAKE_CURRENT_BINARY_DIR}/EditorData.pak" -c
-                       DEPENDS PackageTool ${EDITORDATA_FILES})
-
-    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/CoreData.pak"
-                      COMMAND $<TARGET_FILE:PackageTool> "${CMAKE_SOURCE_DIR}/Data/AtomicPlayer/Resources/CoreData" "${CMAKE_CURRENT_BINARY_DIR}/CoreData.pak" -c
-                      DEPENDS PackageTool ${COREDATA_FILES})
-
-    add_custom_target(BuildPakFiles ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EditorData.pak" "${CMAKE_CURRENT_BINARY_DIR}/CoreData.pak")
-endif()
-
-
-
-
-
-
-
-
-
