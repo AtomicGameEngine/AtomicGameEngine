@@ -72,7 +72,7 @@ void AEApplication::Start()
 #ifdef __APPLE__    
     String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorData.pak";
 #else
-    String editorResources = fileSystem->GetProgramDir() + "EditorData/";
+    String editorResources = fileSystem->GetProgramDir() + "EditorData.pak";
 #endif    
     assert(fileSystem->FileExists(editorResources));
     cache->AddPackageFile(editorResources);

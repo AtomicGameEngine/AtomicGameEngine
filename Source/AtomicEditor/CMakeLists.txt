@@ -59,20 +59,27 @@ add_custom_command (OUTPUT "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak"
 add_custom_target(BuildEditorDataPak DEPENDS "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak")
 add_custom_target(BuildCoreDataPak DEPENDS "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak")
 
-add_dependencies( AtomicEditor BuildCoreDataPak BuildEditorDataPak)
-
 if (APPLE)
 
     add_custom_target(CopyPakFiles ALL
-                       COMMAND
-                       rsync -u "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak" "$<TARGET_FILE_DIR:AtomicEditor>/../Resources/EditorData.pak"
-                       COMMAND
-                       rsync -u "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak" "$<TARGET_FILE_DIR:AtomicEditor>/../Resources/CoreData.pak"
-                       COMMENT "Copying Editor Resources")
+                      COMMAND
+                      rsync -u "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak" "$<TARGET_FILE_DIR:AtomicEditor>/../Resources/EditorData.pak"
+                      COMMAND
+                      rsync -u "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak" "$<TARGET_FILE_DIR:AtomicEditor>/../Resources/CoreData.pak"
+                      COMMENT "Copying Editor Resources")
+
 
 else()
 
+    add_custom_target(CopyPakFiles ALL
+                      COMMAND xcopy \"${CMAKE_SOURCE_DIR}\\Bin\\EditorData.pak\" \"$<TARGET_FILE_DIR:AtomicEditor>\" /y
+                      COMMAND xcopy \"${CMAKE_SOURCE_DIR}\\Bin\\CoreData.pak\" \"$<TARGET_FILE_DIR:AtomicEditor>\" /y
+                      COMMENT "Copying Editor Resources")
+
 endif()
+
+add_dependencies( AtomicEditor BuildCoreDataPak BuildEditorDataPak)
+
 
 
 
