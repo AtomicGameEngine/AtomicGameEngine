@@ -42,44 +42,20 @@ if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
 
-
 file (GLOB_RECURSE EDITORDATA_FILES ${CMAKE_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData/*)
 file (GLOB_RECURSE COREDATA_FILES ${CMAKE_SOURCE_DIR}/Data/AtomicPlayer/Resources/CoreData/*)
 
-add_custom_command (OUTPUT "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak"
-                    COMMAND $<TARGET_FILE:PackageTool> "${CMAKE_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData" "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak" -c
-                    DEPENDS PackageTool ${EDITORDATA_FILES}
-                    COMMENT "Packaging Editor Data")
+if (MSVC)
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/EditorData.pak"
+                       COMMAND $<TARGET_FILE:PackageTool> "${CMAKE_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData" "${CMAKE_CURRENT_BINARY_DIR}/EditorData.pak" -c
+                       DEPENDS PackageTool ${EDITORDATA_FILES})
 
-add_custom_command (OUTPUT "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak"
-                    COMMAND $<TARGET_FILE:PackageTool> "${CMAKE_SOURCE_DIR}/Data/AtomicPlayer/Resources/CoreData" "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak" -c
-                    DEPENDS PackageTool ${COREDATA_FILES}
-                    COMMENT "Packaging Core Data")
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/CoreData.pak"
+                      COMMAND $<TARGET_FILE:PackageTool> "${CMAKE_SOURCE_DIR}/Data/AtomicPlayer/Resources/CoreData" "${CMAKE_CURRENT_BINARY_DIR}/CoreData.pak" -c
+                      DEPENDS PackageTool ${COREDATA_FILES})
 
-add_custom_target(BuildEditorDataPak DEPENDS "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak")
-add_custom_target(BuildCoreDataPak DEPENDS "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak")
-
-if (APPLE)
-
-    add_custom_target(CopyPakFiles ALL
-                      COMMAND
-                      rsync -u "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak" "$<TARGET_FILE_DIR:AtomicEditor>/../Resources/EditorData.pak"
-                      COMMAND
-                      rsync -u "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak" "$<TARGET_FILE_DIR:AtomicEditor>/../Resources/CoreData.pak"
-                      COMMENT "Copying Editor Resources")
-
-
-else()
-
-    add_custom_target(CopyPakFiles ALL
-                      COMMAND xcopy \"${CMAKE_SOURCE_DIR}\\Bin\\EditorData.pak\" \"$<TARGET_FILE_DIR:AtomicEditor>\" /y
-                      COMMAND xcopy \"${CMAKE_SOURCE_DIR}\\Bin\\CoreData.pak\" \"$<TARGET_FILE_DIR:AtomicEditor>\" /y
-                      COMMENT "Copying Editor Resources")
-
+    add_custom_target(BuildPakFiles ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EditorData.pak" "${CMAKE_CURRENT_BINARY_DIR}/CoreData.pak")
 endif()
-
-add_dependencies( AtomicEditor BuildCoreDataPak BuildEditorDataPak)
-
 
 
 
