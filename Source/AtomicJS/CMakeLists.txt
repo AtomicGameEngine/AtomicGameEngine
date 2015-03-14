@@ -31,6 +31,23 @@ if (NOT MSVC)
     add_definitions (-DUNIX)
 endif()
 
+# Create the JSBind files ahead of time, so they are picked up with glob
+set (JSFILES JSModuleAtomic2D.cpp;JSModuleAudio.cpp;JSModuleContainer.cpp;JSModuleCore.cpp;
+             JSModuleEngine.cpp;JSModuleEnvironment.cpp;JSModuleGraphics.cpp;JSModuleInput.cpp;
+             JSModuleIO.cpp;JSModuleJavascript.cpp;JSModuleMath.cpp;JSModuleNavigation.cpp;
+             JSModuleNetwork.cpp;JSModulePhysics.cpp;JSModuleResource.cpp;JSModules.cpp;
+             JSModuleScene.cpp;JSModuleUI.cpp)
+
+foreach(JSFILE ${JSFILES})
+
+  set (JSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Modules/${JSFILE}")
+
+  if (NOT EXISTS ${JSFILEPATH})
+    file(WRITE "${JSFILEPATH}" "// will be created by JSBind")
+  endif()
+
+endforeach()
+
 
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Modules/*.cpp)
 
@@ -39,5 +56,5 @@ set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} )
 add_library(AtomicJS ${SOURCE_FILES})
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-    add_dependencies(AtomicJS JSBind BuildJSBindings)
+    add_dependencies(AtomicJS JSBind)
 endif()
