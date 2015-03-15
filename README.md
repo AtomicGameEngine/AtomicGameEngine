@@ -21,6 +21,10 @@ For **supported binary releases** and to acquire **product activation keys** or 
 [Atomic Game Engine™ EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE.md)  
 [Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/THIRDPARTY_LICENSE.md)
 
+### Building the Atomic Editor from Source
+
+Please see [https://github.com/AtomicGameEngine/AtomicGameEngine/wiki](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki) for Visual Studio 2013, XCode, and QtCreator build instructions.
+
 ### Website
 
 Visit http://www.AtomicGameEngine.com for all the latest news and downloads of the Atomic Game Engine
