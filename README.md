@@ -23,7 +23,7 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 ### Building the Atomic Editor from Source
 
-Please see [https://github.com/AtomicGameEngine/AtomicGameEngine/wiki](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki) for Visual Studio 2013, XCode, and QtCreator build instructions.
+Please see [Building the Atomic Editor from Source](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-the-Atomic-Editor-from-Source) for Visual Studio 2013, XCode, and QtCreator build instructions.
 
 ### Website
 
