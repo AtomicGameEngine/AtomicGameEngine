@@ -10,7 +10,7 @@ They are over here: https://github.com/AtomicGameEngine/AtomicExamples
 
 This repository contains the full source code to the Atomic Game Engine Runtime and Editor
 
-The source code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** (which will be ) available for download at our website.
+The source code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** available for [DOWNLOAD on our website](http://atomicgameengine.com/download).
 
 Custom builds of the Atomic Game Engine Editor require product activation and platform deployment licenses.  These can also be acquired at our website.
 
