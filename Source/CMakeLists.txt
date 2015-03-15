@@ -1,11 +1,12 @@
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
+add_subdirectory(AtomicJS)
 add_subdirectory(AtomicPlayer)
 
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-add_subdirectory(Tools)
-add_subdirectory(AtomicEditor)
+if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)    
+    add_subdirectory(AtomicEditor)
+    add_subdirectory(Tools)
 endif()
 
 

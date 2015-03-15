@@ -3,31 +3,29 @@
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
 
-#include "Precompiled.h"
-#include "../Core/Context.h"
-#include "../IO/Log.h"
+#include <Atomic/Core/Context.h>
+#include <Atomic/IO/Log.h>
 #ifdef ATOMIC_PHYSICS
-#include "../Physics/PhysicsEvents.h"
-#include "../Physics/PhysicsWorld.h"
+#include <Atomic/Physics/PhysicsEvents.h>
+#include <Atomic/Physics/PhysicsWorld.h>
 #endif
-#include "../Core/Profiler.h"
-#include "../IO/MemoryBuffer.h"
-#include "../Resource/ResourceCache.h"
-#include "../Resource/ResourceEvents.h"
-#include "../Scene/Scene.h"
-#include "../Scene/SceneEvents.h"
-#include "../Javascript/Javascript.h"
 
-#include "../Atomic2D/PhysicsEvents2D.h"
-#include "../Atomic2D/PhysicsWorld2D.h"
-#include "../Atomic2D/RigidBody2D.h"
+#include <Atomic/Core/Profiler.h>
+#include <Atomic/IO/MemoryBuffer.h>
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/ResourceEvents.h>
+#include <Atomic/Scene/Scene.h>
+#include <Atomic/Scene/SceneEvents.h>
+#include <Atomic/Atomic2D/PhysicsEvents2D.h>
+#include <Atomic/Atomic2D/PhysicsWorld2D.h>
+#include <Atomic/Atomic2D/RigidBody2D.h>
+#include <Atomic/UI/UIEvents.h>
+#include <Atomic/UI/UIElement.h>
 
-#include "../Javascript/JSEvents.h"
-#include "../Javascript/JSComponent.h"
-#include "../Javascript/JSAPI.h"
-
-#include "../UI/UIEvents.h"
-#include "../UI/UIElement.h"
+#include "Javascript.h"
+#include "JSEvents.h"
+#include "JSComponent.h"
+#include "JSAPI.h"
 
 namespace Atomic
 {

@@ -1,6 +1,6 @@
 
 
-add_subdirectory(JSBind)
+add_subdirectory(PackageTool)
 
 
 

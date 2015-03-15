@@ -23,7 +23,7 @@ else()
 	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 endif()
 
-target_link_libraries(AtomicPlayer ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicPlayer AtomicJS ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
 

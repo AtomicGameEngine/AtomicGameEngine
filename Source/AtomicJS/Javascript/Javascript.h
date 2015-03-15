@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Core/Context.h"
-#include "../Core/Object.h"
-#include "../Javascript/JSVM.h"
+#include <Atomic/Core/Context.h>
+#include <Atomic/Core/Object.h>
+#include "JSVM.h"
 
 namespace Atomic
 {

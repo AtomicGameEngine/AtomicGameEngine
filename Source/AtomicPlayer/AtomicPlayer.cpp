@@ -32,7 +32,7 @@
 // Move me
 #include <Atomic/Environment/Environment.h>
 
-#include <Atomic/Javascript/Javascript.h>
+#include <AtomicJS/Javascript/Javascript.h>
 
 #include "AtomicPlayer.h"
 

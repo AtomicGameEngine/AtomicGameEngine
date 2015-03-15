@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "../Core/Context.h"
-#include "../Core/Object.h"
-#include "../Container/List.h"
+#include <Atomic/Core/Context.h>
+#include <Atomic/Core/Object.h>
+#include <Atomic/Container/List.h>
 
-#include "../IO/Log.h"
+#include <Atomic/IO/Log.h>
 
-#include "../Javascript/JSAPI.h"
+#include "JSAPI.h"
 
 //#define JSVM_DEBUG
 

@@ -11,7 +11,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Core/CoreEvents.h>
-#include <Atomic/Javascript/JSEvents.h>
+#include <AtomicJS/Javascript/JSEvents.h>
 
 #include "UIResourceFrame.h"
 

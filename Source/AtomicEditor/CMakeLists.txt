@@ -1,9 +1,7 @@
-
 include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty
                      ${CMAKE_CURRENT_SOURCE_DIR}/Vendor/nativefiledialog
                      ${CMAKE_CURRENT_SOURCE_DIR}/Vendor/Poco/Foundation/include)
-
 
 file (GLOB_RECURSE SOURCE_FILES Source/*.cpp Source/*.h)
 
@@ -31,16 +29,13 @@ add_subdirectory(Vendor)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor ${ATOMIC_LINK_LIBRARIES} Poco)
+target_link_libraries(AtomicEditor ${ATOMIC_LINK_LIBRARIES} AtomicJS Poco)
 
-if (APPLE)
-    
+if (APPLE)    
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
     target_link_libraries(AtomicEditor curl)
 else()
-
     target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
-
 endif()
 
 if (TARGET_PROPERTIES)

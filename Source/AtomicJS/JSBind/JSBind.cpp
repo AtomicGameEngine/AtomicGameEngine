@@ -43,7 +43,7 @@ void Run(const Vector<String>& arguments)
     JSBind::ROOT_FOLDER = arguments[0];
     JSBind::PLATFORM = arguments[1];
 
-    if (!JSBind::fileSystem_->DirExists(JSBind::ROOT_FOLDER + "/Source/Tools/JSBind"))
+    if (!JSBind::fileSystem_->DirExists(JSBind::ROOT_FOLDER + "/Source/AtomicJS/JSBind"))
     {
         ErrorExit("The given Atomic Runtime source tree is invalid");
     }
@@ -56,7 +56,7 @@ void Run(const Vector<String>& arguments)
     JSBind::engine_->Initialize(engineParameters);
 
     ResourceCache* cache = JSBind::context_->GetSubsystem<ResourceCache>();
-    cache->AddResourceDir(JSBind::ROOT_FOLDER + "/Source/Tools/JSBind");
+    cache->AddResourceDir(JSBind::ROOT_FOLDER + "/Source/AtomicJS/JSBind");
 
     JSBindings* bindings = new JSBindings();
     bindings->Initialize();

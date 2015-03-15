@@ -8,11 +8,13 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/Javascript/Javascript.h>
-#include <Atomic/Javascript/JSVM.h>
-#include <Atomic/Javascript/JSEvents.h>
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
+
+#include <AtomicJS/Javascript/Javascript.h>
+#include <AtomicJS/Javascript/JSVM.h>
+#include <AtomicJS/Javascript/JSEvents.h>
+
 
 #include "AEPlayer.h"
 #include "AEEvents.h"

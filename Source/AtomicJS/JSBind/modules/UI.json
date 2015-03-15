@@ -1,7 +1,7 @@
 {
 	"name" : "UI",
 	"sources" : ["UI"],
-	"includes" : ["Graphics/Material.h", "Scene/Node.h", "Scene/Scene.h", "Graphics/Texture2D.h"],
+	"includes" : ["<Atomic/Graphics/Material.h>", "<Atomic/Scene/Node.h>", "<Atomic/Scene/Scene.h>", "<Atomic/Graphics/Texture2D.h>"],
 	"classes" : ["Font", "UI", "UIElement", "Text", "BorderImage", "Button", "CheckBox",
 			     "Cursor", "DropDownList", "Menu", "FileSelector", "FontFace", "FontFaceBitmap", 
 			     "FontFaceFreeType", "LineEdit", "ListView", "ScrollView", "MessageBox",

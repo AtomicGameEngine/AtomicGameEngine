@@ -20,9 +20,6 @@
 #include <Atomic/Input/Input.h>
 
 #include <Atomic/UI/TBUI.h>
-
-#include <Atomic/Javascript/Javascript.h>
-
 #include <Atomic/Environment/Environment.h>
 #include <Atomic/Graphics/Renderer.h>
 
@@ -44,6 +41,8 @@
 #include "AEApplication.h"
 
 #include "Tools/External/AEExternalTooling.h"
+
+#include <AtomicJS/Javascript/Javascript.h>
 
 DEFINE_APPLICATION_MAIN(AtomicEditor::AEApplication);
 
@@ -71,12 +70,12 @@ void AEApplication::Start()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef __APPLE__    
-    String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorData/";
+    String editorResources = fileSystem->GetAppBundleResourceFolder() + "EditorData.pak";
 #else
-    String editorResources = fileSystem->GetProgramDir() + "EditorData/";
+    String editorResources = fileSystem->GetProgramDir() + "EditorData.pak";
 #endif    
-    assert(fileSystem->DirExists(editorResources));
-    cache->AddResourceDir(editorResources);
+    assert(fileSystem->FileExists(editorResources));
+    cache->AddPackageFile(editorResources);
 
     // initialize after EditorResources set
     TBUI* tbui = GetSubsystem<TBUI>();

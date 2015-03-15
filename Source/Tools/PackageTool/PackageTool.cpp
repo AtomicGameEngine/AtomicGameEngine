@@ -34,8 +34,8 @@
 
 #include <cstdio>
 #include <cstring>
-#include <LZ4/lz4.h>
-#include <LZ4/lz4hc.h>
+#include <ThirdParty/LZ4/lz4.h>
+#include <ThirdParty/LZ4/lz4hc.h>
 
 #include <Atomic/DebugNew.h>
 

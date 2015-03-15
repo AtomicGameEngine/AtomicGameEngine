@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Core/Object.h"
+#include <Atomic/Core/Object.h>
 
 namespace Atomic
 {

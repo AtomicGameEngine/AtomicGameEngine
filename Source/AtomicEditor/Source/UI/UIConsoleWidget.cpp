@@ -15,9 +15,9 @@
 #include "UIMainFrame.h"
 #include "UIResourceFrame.h"
 
-#include <Atomic/Javascript/JSEvents.h>
-
 #include <Atomic/IO/FileSystem.h>
+
+#include <AtomicJS/Javascript/JSEvents.h>
 
 #include "../AEJavascript.h"
 #include "../AEEvents.h"

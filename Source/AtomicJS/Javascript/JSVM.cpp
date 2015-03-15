@@ -2,23 +2,21 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "Precompiled.h"
-
 #include <Duktape/duktape.h>
 
-#include "../Core/Profiler.h"
-#include "../Core/CoreEvents.h"
+#include <Atomic/Core/Profiler.h>
+#include <Atomic/Core/CoreEvents.h>
 
-#include "../IO/File.h"
-#include "../IO/Log.h"
-#include "../IO/FileSystem.h"
-#include "../IO/PackageFile.h"
+#include <Atomic/IO/File.h>
+#include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
+#include <Atomic/IO/PackageFile.h>
 
-#include "../Resource/ResourceCache.h"
+#include <Atomic/Resource/ResourceCache.h>
 
-#include "../Javascript/JSEvents.h"
-#include "../Javascript/JSVM.h"
-#include "../Javascript/JSAtomic.h"
+#include "JSEvents.h"
+#include "JSVM.h"
+#include "JSAtomic.h"
 
 namespace Atomic
 {
@@ -263,10 +261,16 @@ void JSVM::InitComponents()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    if (cache->GetPackageFiles().Size())
+    // TODO: better way to detect player?
+    const Vector<SharedPtr<PackageFile> >& packageFiles = cache->GetPackageFiles();
+    for (unsigned i = 0; i < packageFiles.Size(); i++)
     {
-        InitPackageComponents();
-        return;
+        String packageName = packageFiles[i]->GetName();
+        if (packageName.Find("AtomicResources") != String::NPOS)
+        {
+            InitPackageComponents();
+            return;
+        }
     }
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
