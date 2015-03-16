@@ -139,7 +139,7 @@ namespace :macosx do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       sh "make -j8 JSBind"
-      sh "cp ./Source/Tools/JSBind/JSBind #{BUILD_FOLDER}/JSBind"
+      sh "cp ./Source/AtomicJS/JSBind/JSBind #{BUILD_FOLDER}/JSBind"
     end
 
   end 
