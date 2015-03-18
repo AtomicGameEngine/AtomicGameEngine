@@ -1,16 +1,28 @@
+####Atomic Game Engine™ Editor and Player Source Repository
+
+##### Looking for the Javascript examples?
+
+They are over here: https://github.com/AtomicGameEngine/AtomicExamples
+
+##### Chat
+
+[![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+##### Forums
+
+<a href="http://atomicgameengine.com/forum">Atomic Game Engine Forums</a>
+
+##### Twitter
+
+<a href="https://twitter.com/AtomicGEngine">Follow @AtomicGEngine</a>
+
 [WelcomeScreen]: https://github.com/AtomicGameEngine/AtomicExamples/wiki/images/WelcomeScreen.png
 
 ![alt text][WelcomeScreen]
 
-#### Looking for Javascript examples?
-
-They are over here: https://github.com/AtomicGameEngine/AtomicExamples
-
-###Atomic Game Engine™ Editor and Player Source Repository
-
 This repository contains the full source code to the Atomic Game Engine Runtime and Editor
 
-The source code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** available for [DOWNLOAD on our website](http://atomicgameengine.com/download).
+The source code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** available for [DOWNLOAD](http://atomicgameengine.com/download) on our website.
 
 Custom builds of the Atomic Game Engine Editor require product activation and platform deployment licenses.  These can also be acquired at our website.
 
