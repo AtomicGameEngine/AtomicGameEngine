@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,8 +62,6 @@ public:
     void SetLooped(bool enable);
     /// Define loop.
     void SetLoop(unsigned repeatOffset, unsigned endOffset);
-    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
-    void FixInterpolation();
     
     /// Return a new instance of a decoder sound stream. Used by compressed sounds.
     SharedPtr<SoundStream> GetDecoderStream() const;
@@ -94,6 +92,9 @@ public:
     /// Return whether is compressed.
     bool IsCompressed() const { return compressed_; }
     
+    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.) Called internally, does not normally need to be called, unless the sound data is modified manually on the fly.
+    void FixInterpolation();
+
 private:
     /// Load optional parameters from an XML file.
     void LoadParameters();

@@ -652,3 +652,13 @@ private:
 };
 
 }
+
+namespace std
+{
+
+template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator begin(const Atomic::HashMap<T, U>& v) { return v.Begin(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator end(const Atomic::HashMap<T, U>& v) { return v.End(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::Iterator begin(Atomic::HashMap<T, U>& v) { return v.Begin(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::Iterator end(Atomic::HashMap<T, U>& v) { return v.End(); }
+
+}

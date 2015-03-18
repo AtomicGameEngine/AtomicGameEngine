@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/FileSystem.h"
@@ -1484,7 +1483,13 @@ void View::ExecuteRenderPathCommands()
                 {
                     currentRenderTarget_ = viewportTextures_[1]->GetRenderSurface();
                     // If the render path ends into a quad, it can be redirected to the final render target
+                    // However, on OpenGL we can not reliably do this in case the final target is the backbuffer, and we want to
+                    // render depth buffer sensitive debug geometry afterward (backbuffer and textures can not share depth)
+                    #ifndef ATOMIC_OPENGL
                     if (i == lastCommandIndex && command.type_ == CMD_QUAD)
+                    #else
+                    if (i == lastCommandIndex && command.type_ == CMD_QUAD && renderTarget_)
+                    #endif
                         currentRenderTarget_ = renderTarget_;
                 }
                 else
@@ -1635,8 +1640,8 @@ void View::SetRenderTargets(RenderPathCommand& command)
             {
                 Texture2D* texture = renderTargets_[nameHash];
                 // Check for depth only rendering (by specifying a depth texture as the sole output)
-                if (!index && command.outputNames_.Size() == 1 && texture && texture->GetFormat() == 
-                    Graphics::GetReadableDepthFormat() || texture->GetFormat() == Graphics::GetDepthStencilFormat())
+                if (!index && command.outputNames_.Size() == 1 && texture && (texture->GetFormat() ==
+                    Graphics::GetReadableDepthFormat() || texture->GetFormat() == Graphics::GetDepthStencilFormat()))
                 {
                     useColorWrite = false;
                     useCustomDepth = true;

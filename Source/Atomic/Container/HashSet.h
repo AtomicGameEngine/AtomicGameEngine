@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -548,5 +548,15 @@ private:
     /// Compute a hash based on the key and the bucket size
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
+
+}
+
+namespace std
+{
+
+template <class T> typename Atomic::HashSet<T>::ConstIterator begin(const Atomic::HashSet<T>& v) { return v.Begin(); }
+template <class T> typename Atomic::HashSet<T>::ConstIterator end(const Atomic::HashSet<T>& v) { return v.End(); }
+template <class T> typename Atomic::HashSet<T>::Iterator begin(Atomic::HashSet<T>& v) { return v.Begin(); }
+template <class T> typename Atomic::HashSet<T>::Iterator end(Atomic::HashSet<T>& v) { return v.End(); }
 
 }

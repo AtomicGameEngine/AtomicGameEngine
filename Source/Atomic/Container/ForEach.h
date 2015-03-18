@@ -29,42 +29,12 @@
 
 #include <algorithm>
 
-namespace std
-{
-
-template <class T> typename Atomic::Vector<T>::ConstIterator begin(const Atomic::Vector<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::Vector<T>::ConstIterator end(const Atomic::Vector<T>& v) { return v.End(); }
-template <class T> typename Atomic::Vector<T>::Iterator begin(Atomic::Vector<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::Vector<T>::Iterator end(Atomic::Vector<T>& v) { return v.End(); }
-
-template <class T> typename Atomic::PODVector<T>::ConstIterator begin(const Atomic::PODVector<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::PODVector<T>::ConstIterator end(const Atomic::PODVector<T>& v) { return v.End(); }
-template <class T> typename Atomic::PODVector<T>::Iterator begin(Atomic::PODVector<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::PODVector<T>::Iterator end(Atomic::PODVector<T>& v) { return v.End(); }
-
-template <class T> typename Atomic::List<T>::ConstIterator begin(const Atomic::List<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::List<T>::ConstIterator end(const Atomic::List<T>& v) { return v.End(); }
-template <class T> typename Atomic::List<T>::Iterator begin(Atomic::List<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::List<T>::Iterator end(Atomic::List<T>& v) { return v.End(); }
-
-template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator begin(const Atomic::HashMap<T, U>& v) { return v.Begin(); }
-template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator end(const Atomic::HashMap<T, U>& v) { return v.End(); }
-template <class T, class U> typename Atomic::HashMap<T, U>::Iterator begin(Atomic::HashMap<T, U>& v) { return v.Begin(); }
-template <class T, class U> typename Atomic::HashMap<T, U>::Iterator end(Atomic::HashMap<T, U>& v) { return v.End(); }
-
-template <class T> typename Atomic::HashSet<T>::ConstIterator begin(const Atomic::HashSet<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::HashSet<T>::ConstIterator end(const Atomic::HashSet<T>& v) { return v.End(); }
-template <class T> typename Atomic::HashSet<T>::Iterator begin(Atomic::HashSet<T>& v) { return v.Begin(); }
-template <class T> typename Atomic::HashSet<T>::Iterator end(Atomic::HashSet<T>& v) { return v.End(); }
-
-}
-
 // VS2010+ and other compilers: use std::begin(), std::end() & range based for
 // C++11 features need to be enabled
 #if !defined(_MSC_VER) || _MSC_VER > 1600
 #define foreach(VAL, VALS) for (VAL : VALS)
 // Fallback solution for VS2010. Will have problem with break statement.
-// See https://github.com/urho3d/Atomic/issues/561
+// See https://github.com/urho3d/Urho3D/issues/561
 #else
 
 namespace Atomic

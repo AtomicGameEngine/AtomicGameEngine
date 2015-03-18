@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Core/Mutex.h"
 #include "../Core/ProcessUtils.h"
 #include "../Math/MathDefs.h"
@@ -358,8 +357,8 @@ String GetPlatform()
     #endif
 }
 
-#ifdef ANDROID
-static unsigned GetAndroidCPUCount()
+#if defined(ANDROID) || defined(RPI)
+static unsigned GetArmCPUCount()
 {
     FILE* fp;
     int res, i = -1, j = -1;
@@ -393,9 +392,9 @@ unsigned GetNumPhysicalCPUs()
     #else
     return data.physical_cpu;
     #endif
-    #elif defined(ANDROID)
-    return GetAndroidCPUCount();
-    #elif !defined(RPI) && !defined(EMSCRIPTEN)
+    #elif defined(ANDROID) || defined(RPI)
+    return GetArmCPUCount();
+    #elif !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_cores;
@@ -415,9 +414,9 @@ unsigned GetNumLogicalCPUs()
     #else
     return data.logical_cpu;
     #endif
-    #elif defined(ANDROID)
-    return GetAndroidCPUCount();
-    #elif !defined(RPI) && !defined(EMSCRIPTEN)
+    #elif defined(ANDROID) || defined (RPI)
+    return GetArmCPUCount();
+    #elif !defined(EMSCRIPTEN)
     struct cpu_id_t data;
     GetCPUData(&data);
     return data.num_logical_cpus;

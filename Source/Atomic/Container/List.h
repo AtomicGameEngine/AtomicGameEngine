@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -410,5 +410,15 @@ private:
         AllocatorFree(allocator_, node);
     }
 };
+
+}
+
+namespace std
+{
+
+template <class T> typename Atomic::List<T>::ConstIterator begin(const Atomic::List<T>& v) { return v.Begin(); }
+template <class T> typename Atomic::List<T>::ConstIterator end(const Atomic::List<T>& v) { return v.End(); }
+template <class T> typename Atomic::List<T>::Iterator begin(Atomic::List<T>& v) { return v.Begin(); }
+template <class T> typename Atomic::List<T>::Iterator end(Atomic::List<T>& v) { return v.End(); }
 
 }

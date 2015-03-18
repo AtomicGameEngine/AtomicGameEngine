@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../IO/FileSystem.h"
@@ -94,8 +93,6 @@ UIElement* TouchState::GetTouchedElement()
  * - The user can press 'escape' key and browser will force user out of pointer lock. Urho will send the E_MOUSEMODECHANGED event.
  * - SetMouseMode(MM_ABSOLUTE) will leave pointer lock.
  * - MM_WRAP is unsupported.
- *
- * Touch Input:
  */
 /// % Emscripten Input glue. Intended to be used by the Input subsystem only.
 class EmscriptenInput
@@ -105,11 +102,9 @@ public:
     EmscriptenInput(Input* inputInst);
 
     /// Static callback method for Pointer Lock API. Handles change in Pointer Lock state and sends events for mouse mode change.
-    static EM_BOOL PointerLockCallback(int eventType, const EmscriptenPointerlockChangeEvent* keyEvent, void* userData);
-    /// Static callback method for tracking lose focus event.
-    static EM_BOOL LoseFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData);
-    /// Static callback method for tracking gain focus event.
-    static EM_BOOL GainFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData);
+    static EM_BOOL HandlePointerLockChange(int eventType, const EmscriptenPointerlockChangeEvent* keyEvent, void* userData);
+    /// Static callback method for tracking focus change events.
+    static EM_BOOL HandleFocusChange(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData);
 
     /// Send request to user to gain pointer lock. This requires a user-browser interaction on the first call.
     void RequestPointerLock();
@@ -126,11 +121,12 @@ private:
 EmscriptenInput::EmscriptenInput(Input* inputInst)
 {
     inputInst_ = inputInst;
-    emscripten_set_pointerlockchange_callback(NULL, (void*)inputInst, false, EmscriptenInput::PointerLockCallback);
+    void* vInputInst = (void*)inputInst;
+    emscripten_set_pointerlockchange_callback(NULL, vInputInst, false, EmscriptenInput::HandlePointerLockChange);
 
     // Handle focus changes:
-    emscripten_set_blur_callback(NULL, (void*)inputInst, false, EmscriptenInput::LoseFocus);
-    emscripten_set_focus_callback(NULL, (void*)inputInst, false, EmscriptenInput::GainFocus);
+    emscripten_set_blur_callback(NULL, vInputInst, false, EmscriptenInput::HandleFocusChange);
+    emscripten_set_focus_callback(NULL, vInputInst, false, EmscriptenInput::HandleFocusChange);
 }
 
 void EmscriptenInput::RequestPointerLock()
@@ -155,7 +151,7 @@ bool EmscriptenInput::IsVisible()
     return true;
 }
 
-EM_BOOL EmscriptenInput::PointerLockCallback(int eventType, const EmscriptenPointerlockChangeEvent* keyEvent, void* userData)
+EM_BOOL EmscriptenInput::HandlePointerLockChange(int eventType, const EmscriptenPointerlockChangeEvent* keyEvent, void* userData)
 {
     Input* inputInst = (Input*)userData;
     if (keyEvent->isActive >= EM_TRUE)
@@ -172,18 +168,12 @@ EM_BOOL EmscriptenInput::PointerLockCallback(int eventType, const EmscriptenPoin
     return EM_TRUE;
 }
 
-EM_BOOL EmscriptenInput::LoseFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData)
+EM_BOOL EmscriptenInput::HandleFocusChange(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData)
 {
     Input* inputInst = (Input*)userData;
     if (eventType == EMSCRIPTEN_EVENT_BLUR)
         inputInst->LoseFocus();
-    return EM_TRUE;
-}
-
-EM_BOOL EmscriptenInput::GainFocus(int eventType, const EmscriptenFocusEvent* keyEvent, void* userData)
-{
-    Input* inputInst = (Input*)userData;
-    if (eventType == EMSCRIPTEN_EVENT_FOCUS)
+    else if (eventType == EMSCRIPTEN_EVENT_FOCUS)
         inputInst->GainFocus();
     return EM_TRUE;
 }
@@ -425,18 +415,18 @@ void Input::Update()
         }
     }
 
-#ifndef EMSCRIPTEN
-   if (mouseMode_ == MM_RELATIVE)
-   {
-       IntVector2 mousePosition = GetMousePosition();
-       IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-       if (mousePosition != center)
-       {
-           SetMousePosition(center);
-           lastMousePosition_ = center;
-       }
-   }
-   #endif
+    #ifndef EMSCRIPTEN
+    if (mouseMode_ == MM_RELATIVE)
+    {
+        IntVector2 mousePosition = GetMousePosition();
+        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+        if (mousePosition != center)
+        {
+            SetMousePosition(center);
+            lastMousePosition_ = center;
+        }
+    }
+    #endif
 }
 
 void Input::SetMouseVisible(bool enable, bool suppressEvent)
@@ -1641,8 +1631,12 @@ void Input::HandleSDLEvent(void* sdlEvent)
             int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
+            #ifndef EMSCRIPTEN
             state.lastPosition_ = state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
+            #else
+            state.position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
+            #endif
             state.delta_ = IntVector2::ZERO;
             state.pressure_ = evt.tfinger.pressure;
 
@@ -1689,8 +1683,12 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 break;
             TouchState& state = touches_[touchID];
             state.touchID_ = touchID;
+            #ifndef EMSCRIPTEN
             state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
+            #else
+            state.position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
+            #endif
             state.delta_ = state.position_ - state.lastPosition_;
             state.pressure_ = evt.tfinger.pressure;
 
@@ -1700,8 +1698,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_TOUCHID] = touchID;
             eventData[P_X] = state.position_.x_;
             eventData[P_Y] = state.position_.y_;
+            #ifndef EMSCRIPTEN
             eventData[P_DX] = (int)(evt.tfinger.dx * graphics_->GetWidth());
             eventData[P_DY] = (int)(evt.tfinger.dy * graphics_->GetHeight());
+            #else
+            eventData[P_DX] = (int)(evt.tfinger.dx);
+            eventData[P_DY] = (int)(evt.tfinger.dy);
+            #endif
             eventData[P_PRESSURE] = state.pressure_;
             SendEvent(E_TOUCHMOVE, eventData);
         }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -175,8 +175,6 @@ private:
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
-    /// Mark patch(es) dirty based on location. Used when checking the heightmap image for changes.
-    void MarkPatchesDirty(PODVector<bool>& dirtyPatches, int x, int z);
 
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;

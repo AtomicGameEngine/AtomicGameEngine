@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
@@ -294,7 +293,7 @@ void Sound::SetLoop(unsigned repeatOffset, unsigned endOffset)
 
 void Sound::FixInterpolation()
 {
-    if (!data_)
+    if (!data_ || compressed_)
         return;
     
     // If looped, copy loop start to loop end. If oneshot, insert silence to end
