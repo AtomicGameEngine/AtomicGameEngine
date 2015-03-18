@@ -472,7 +472,7 @@ namespace :windows do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
       sh "jom -j4 JSBind"
-      sh "./Source/Tools/JSBind/JSBind.exe #{$RAKE_ROOT} WINDOWS"
+      sh "./Source/AtomicJS/JSBind/JSBind.exe #{$RAKE_ROOT} WINDOWS"
     end
 
 	end
