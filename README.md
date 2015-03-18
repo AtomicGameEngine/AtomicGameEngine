@@ -1,8 +1,12 @@
 ####Atomic Game Engine™ Editor and Player Source Repository
 
-##### Looking for the Javascript examples?
+###### Looking for the Javascript examples?
 
-They are over here: https://github.com/AtomicGameEngine/AtomicExamples
+They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript Examples</a>
+
+##### Website
+
+<a href="http://atomicgameengine.com">http://www.AtomicGameEngine.com</a>
 
 ##### Chat
 
