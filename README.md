@@ -4,6 +4,8 @@
 
 #### Looking for Javascript examples?
 
+[![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 They are over here: https://github.com/AtomicGameEngine/AtomicExamples
 
 ###Atomic Game Engine™ Editor and Player Source Repository
