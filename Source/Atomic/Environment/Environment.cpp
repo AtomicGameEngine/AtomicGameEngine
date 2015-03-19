@@ -10,7 +10,7 @@
 namespace Atomic
 {
 
-void RegisterEnvironmenttLibrary(Context* context)
+void RegisterEnvironmentLibrary(Context* context)
 {
     ProcSky::RegisterObject(context);
     TimeOfDay::RegisterObject(context);

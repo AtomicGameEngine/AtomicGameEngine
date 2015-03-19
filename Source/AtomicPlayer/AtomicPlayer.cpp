@@ -49,7 +49,9 @@ static Javascript* javascript = NULL;
 AtomicPlayer::AtomicPlayer(Context* context) :
     Application(context)
 {
-    RegisterEnvironmenttLibrary(context_);
+#ifdef ATOMIC_3D
+    RegisterEnvironmentLibrary(context_);
+#endif
 }
 
 void AtomicPlayer::Setup()

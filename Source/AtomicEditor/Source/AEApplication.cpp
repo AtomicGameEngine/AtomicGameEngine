@@ -58,7 +58,7 @@ AEApplication::AEApplication(Context* context) :
 void AEApplication::Start()
 {
     // refactor this
-    RegisterEnvironmenttLibrary(context_);
+    RegisterEnvironmentLibrary(context_);
 
     Engine* engine = GetSubsystem<Engine>();
     engine->SetAutoExit(false);

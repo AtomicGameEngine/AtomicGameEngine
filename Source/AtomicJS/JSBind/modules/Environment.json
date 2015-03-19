@@ -1,5 +1,6 @@
 {
 	"name" : "Environment",
+	"requires" : ["3D"],
 	"sources" : ["Environment"],
 	"classes" : ["ProcSky"]
 }
