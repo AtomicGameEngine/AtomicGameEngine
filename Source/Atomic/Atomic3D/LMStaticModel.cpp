@@ -6,7 +6,7 @@
 #include "../Core/Context.h"
 #include "../Resource/ResourceCache.h"
 #include "../Graphics/Technique.h"
-#include "../Graphics/LMStaticModel.h"
+#include "../Atomic3D/LMStaticModel.h"
 
 namespace Atomic
 {

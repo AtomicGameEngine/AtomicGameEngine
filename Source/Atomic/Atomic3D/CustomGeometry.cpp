@@ -24,7 +24,7 @@
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
-#include "../Graphics/CustomGeometry.h"
+#include "../Atomic3D/CustomGeometry.h"
 #include "../Graphics/Geometry.h"
 #include "../IO/Log.h"
 #include "../Graphics/Material.h"

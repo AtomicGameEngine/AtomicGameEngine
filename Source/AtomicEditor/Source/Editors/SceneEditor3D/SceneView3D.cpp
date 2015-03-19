@@ -14,7 +14,7 @@
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Octree.h>
-#include <Atomic/Graphics/Terrain.h>
+#include <Atomic/Atomic3D/Terrain.h>
 
 #include <Atomic/Input/Input.h>
 

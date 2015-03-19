@@ -1,27 +1,20 @@
 {
 	"name" : "Graphics",
 	"sources" : ["Graphics"],
-	"includes" : ["<Atomic/Scene/Scene.h>", "<Atomic/Graphics/Animation.h>", "<Atomic/Graphics/OcclusionBuffer.h>", "<Atomic/Scene/ValueAnimation.h>"],
-	"classes" : ["Graphics", "Texture", "Texture2D", "Model", "Material", "Drawable", 
-				 "Viewport", "Renderer", "Octree", "Zone", "StaticModel", "Camera", "Light", "RenderPath",
-				 "Animation", "AnimatedModel", "AnimationController", "AnimationState", "BillboardSet", "CustomGeometry",
-				 "DebugRenderer", "DecalSet", "OcclusionBuffer", "ParticleEffect", "ParticleEmitter",
+	"includes" : ["<Atomic/Scene/Scene.h>", "<Atomic/Graphics/OcclusionBuffer.h>", "<Atomic/Scene/ValueAnimation.h>"],
+	"classes" : ["Graphics", "Texture", "Texture2D", "Material", "Drawable", 
+				 "Viewport", "Renderer", "Octree", "Zone", "Camera", "Light", "RenderPath",				 
+				 "DebugRenderer", 
 				 "RenderSurface", "Shader", "ShaderPrecache", "ShaderVariation", 
-				 "Skybox", "StaticModelGroup", "Pass", "Technique", "Terrain", "TerrainPatch", 
+				 "Pass", "Technique", 
 				 "Texture3D", "TextureCube", "View"],
 	"overloads" : {
-		"StaticModel" : {
-			"SetMaterial" : ["Material"]
-		},
 		"Viewport" : {
 			"Viewport" : ["Context", "Scene", "Camera", "RenderPath"]
 		},
 		"Camera" : {
 			"SetOrthoSize" : ["float"]
-		},
-		"AnimationState" : {
-			"AnimationState" : ["AnimatedModel", "Animation"]
-		}		
+		}
 
 	}
 

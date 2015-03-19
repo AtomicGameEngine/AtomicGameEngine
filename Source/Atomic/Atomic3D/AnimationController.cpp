@@ -21,10 +21,10 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/AnimatedModel.h"
-#include "../Graphics/Animation.h"
-#include "../Graphics/AnimationController.h"
-#include "../Graphics/AnimationState.h"
+#include "../Atomic3D/AnimatedModel.h"
+#include "../Atomic3D/Animation.h"
+#include "../Atomic3D/AnimationController.h"
+#include "../Atomic3D/AnimationState.h"
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"

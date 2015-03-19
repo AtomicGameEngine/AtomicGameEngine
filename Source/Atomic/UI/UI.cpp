@@ -1767,7 +1767,9 @@ void RegisterUILibrary(Context* context)
     CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);
     Text::RegisterObject(context);
+#ifdef ATOMIC_3D
     Text3D::RegisterObject(context);
+#endif
     Window::RegisterObject(context);
     View3D::RegisterObject(context);
     LineEdit::RegisterObject(context);

@@ -24,7 +24,7 @@
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Graphics/Material.h"
-#include "../Graphics/ParticleEffect.h"
+#include "../Atomic3D/ParticleEffect.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 

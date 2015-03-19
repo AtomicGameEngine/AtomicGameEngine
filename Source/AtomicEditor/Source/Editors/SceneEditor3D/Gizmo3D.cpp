@@ -6,7 +6,7 @@
 
 #include "AtomicEditor.h"
 
-#include <Atomic/Graphics/Model.h>
+#include <Atomic/Atomic3D/Model.h>
 #include <Atomic/Graphics/Material.h>
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Resource/ResourceCache.h>

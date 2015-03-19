@@ -24,7 +24,7 @@
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
-#include "../Graphics/Skeleton.h"
+#include "../Atomic3D/Skeleton.h"
 
 #include "../DebugNew.h"
 

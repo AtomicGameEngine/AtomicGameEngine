@@ -21,7 +21,7 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/Animation.h"
+#include "../Atomic3D/Animation.h"
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/FileSystem.h"

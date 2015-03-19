@@ -29,7 +29,7 @@
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Scene/Scene.h"
-#include "../Graphics/StaticModelGroup.h"
+#include "../Atomic3D/StaticModelGroup.h"
 
 #include "../DebugNew.h"
 

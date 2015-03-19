@@ -12,7 +12,7 @@
 #include <Atomic/Math/Ray.h>
 #include <Atomic/Scene/Scene.h>
 
-#include <Atomic/Graphics/StaticModel.h>
+#include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Graphics/Camera.h>
 
 

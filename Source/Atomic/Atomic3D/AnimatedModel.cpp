@@ -21,9 +21,9 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/AnimatedModel.h"
-#include "../Graphics/Animation.h"
-#include "../Graphics/AnimationState.h"
+#include "../Atomic3D/AnimatedModel.h"
+#include "../Atomic3D/Animation.h"
+#include "../Atomic3D/AnimationState.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"

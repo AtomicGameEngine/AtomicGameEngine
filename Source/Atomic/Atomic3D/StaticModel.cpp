@@ -21,7 +21,7 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/AnimatedModel.h"
+#include "../Atomic3D/AnimatedModel.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
@@ -29,7 +29,7 @@
 #include "../Graphics/Geometry.h"
 #include "../IO/Log.h"
 #include "../Graphics/Material.h"
-#include "../Graphics/Model.h"
+#include "../Atomic3D/Model.h"
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Core/Profiler.h"

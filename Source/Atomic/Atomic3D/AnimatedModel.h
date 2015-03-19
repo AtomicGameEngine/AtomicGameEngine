@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Graphics/Model.h"
-#include "../Graphics/Skeleton.h"
-#include "../Graphics/StaticModel.h"
+#include "../Atomic3D/Model.h"
+#include "../Atomic3D/Skeleton.h"
+#include "../Atomic3D/StaticModel.h"
 
 namespace Atomic
 {

@@ -30,8 +30,8 @@
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Core/Profiler.h"
-#include "../Graphics/Terrain.h"
-#include "../Graphics/TerrainPatch.h"
+#include "../Atomic3D/Terrain.h"
+#include "../Atomic3D/TerrainPatch.h"
 #include "../Graphics/VertexBuffer.h"
 
 #include "../DebugNew.h"

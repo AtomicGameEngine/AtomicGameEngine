@@ -8,10 +8,10 @@
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Camera.h>
 #include <Atomic/Graphics/Zone.h>
-#include <Atomic/Graphics/AnimatedModel.h>
-#include <Atomic/Graphics/Animation.h>
-#include <Atomic/Graphics/AnimationState.h>
-#include <Atomic/Graphics/AnimationController.h>
+#include <Atomic/Atomic3D/AnimatedModel.h>
+#include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Atomic3D/AnimationState.h>
+#include <Atomic/Atomic3D/AnimationController.h>
 #include <Atomic/Graphics/Material.h>
 #include <Atomic/Graphics/DebugRenderer.h>
 

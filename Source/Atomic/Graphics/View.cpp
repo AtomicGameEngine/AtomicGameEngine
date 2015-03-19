@@ -37,7 +37,9 @@
 #include "../Core/Profiler.h"
 #include "../Scene/Scene.h"
 #include "../Graphics/ShaderVariation.h"
-#include "../Graphics/Skybox.h"
+#ifdef ATOMIC_3D
+#include "../Atomic3D/Skybox.h"
+#endif
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/Texture3D.h"
@@ -218,7 +220,9 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
                 drawable->ClearLights();
                 
                 // Expand the scene bounding box and Z range (skybox not included because of infinite size) and store the drawawble
+#ifdef ATOMIC_3D
                 if (drawable->GetType() != Skybox::GetTypeStatic())
+#endif
                 {
                     result.minZ_ = Min(result.minZ_, minZ);
                     result.maxZ_ = Max(result.maxZ_, maxZ);
@@ -2534,9 +2538,11 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
         {
             Drawable* drawable = geometries_[i];
             
-            // Skip skyboxes as they have undefinedly large bounding box size
+#ifdef ATOMIC_3D
+            // Skip skyboxes as they have undefinedly large bounding box size            
             if (drawable->GetType() == Skybox::GetTypeStatic())
                 continue;
+#endif
             
             if (drawable->GetMinZ() <= farSplit && drawable->GetMaxZ() >= nearSplit &&
                 (GetLightMask(drawable) & light->GetLightMask()))

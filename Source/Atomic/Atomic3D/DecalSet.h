@@ -25,7 +25,7 @@
 #include "../Graphics/Drawable.h"
 #include "../Math/Frustum.h"
 #include "../Container/List.h"
-#include "../Graphics/Skeleton.h"
+#include "../Atomic3D/Skeleton.h"
 
 namespace Atomic
 {

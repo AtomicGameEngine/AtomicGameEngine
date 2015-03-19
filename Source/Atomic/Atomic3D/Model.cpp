@@ -26,7 +26,7 @@
 #include "../Graphics/Geometry.h"
 #include "../Graphics/IndexBuffer.h"
 #include "../IO/Log.h"
-#include "../Graphics/Model.h"
+#include "../Atomic3D/Model.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Graphics.h"
 #include "../IO/Serializer.h"

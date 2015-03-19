@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Graphics/StaticModel.h"
+#include "../Atomic3D/StaticModel.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/Material.h"
 

@@ -1,13 +1,16 @@
 
 add_subdirectory(Box2D)
-add_subdirectory(Bullet)
 add_subdirectory(Duktape)
 add_subdirectory(FreeType)
 add_subdirectory(JO)
 add_subdirectory(LZ4)
 add_subdirectory(PugiXml)
-add_subdirectory(StanHull)
 add_subdirectory(STB)
+
+if (NOT ATOMIC_BUILD_2D)
+	add_subdirectory(Bullet)
+	add_subdirectory(StanHull)
+endif()
 
 if (NOT EMSCRIPTEN)
 	add_subdirectory(SDL)

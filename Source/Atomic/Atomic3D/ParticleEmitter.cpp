@@ -22,8 +22,8 @@
 
 #include "Precompiled.h"
 #include "../Core/Context.h"
-#include "../Graphics/ParticleEffect.h"
-#include "../Graphics/ParticleEmitter.h"
+#include "../Atomic3D/ParticleEffect.h"
+#include "../Atomic3D/ParticleEmitter.h"
 #include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"

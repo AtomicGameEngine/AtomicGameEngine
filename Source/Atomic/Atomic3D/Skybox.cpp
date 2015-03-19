@@ -25,7 +25,7 @@
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
 #include "../Scene/Node.h"
-#include "../Graphics/Skybox.h"
+#include "../Atomic3D/Skybox.h"
 
 #include "../DebugNew.h"
 

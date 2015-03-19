@@ -25,7 +25,7 @@
 #include "../Container/ArrayPtr.h"
 #include "../Math/BoundingBox.h"
 #include "../Graphics/GraphicsDefs.h"
-#include "../Graphics/Skeleton.h"
+#include "../Atomic3D/Skeleton.h"
 #include "../Resource/Resource.h"
 #include "../Container/Ptr.h"
 

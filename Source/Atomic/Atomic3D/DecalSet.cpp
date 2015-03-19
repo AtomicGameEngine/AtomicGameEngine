@@ -21,11 +21,11 @@
 //
 
 #include "Precompiled.h"
-#include "../Graphics/AnimatedModel.h"
+#include "../Atomic3D/AnimatedModel.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
-#include "../Graphics/DecalSet.h"
+#include "../Atomic3D/DecalSet.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"

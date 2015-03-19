@@ -22,7 +22,7 @@
 
 #include "Precompiled.h"
 #include "../Graphics/Batch.h"
-#include "../Graphics/BillboardSet.h"
+#include "../Atomic3D/BillboardSet.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
 #include "../Graphics/Geometry.h"

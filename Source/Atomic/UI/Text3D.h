@@ -22,6 +22,9 @@
 
 #pragma once
 
+
+#ifdef ATOMIC_3D
+
 #include "../Graphics/Drawable.h"
 #include "../Math/Matrix3x4.h"
 #include "../UI/Text.h"
@@ -186,4 +189,6 @@ private:
 };
 
 }
+
+#endif
 

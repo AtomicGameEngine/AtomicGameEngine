@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../Graphics/BillboardSet.h"
+#include "../Atomic3D/BillboardSet.h"
 
 namespace Atomic
 {

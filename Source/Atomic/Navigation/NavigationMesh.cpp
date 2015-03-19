@@ -30,14 +30,14 @@
 #include "../Graphics/Geometry.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#include "../Graphics/Model.h"
+#include "../Atomic3D/Model.h"
 #include "../Navigation/Navigable.h"
 #include "../Navigation/NavigationMesh.h"
 #include "../Navigation/OffMeshConnection.h"
 #include "../Core/Profiler.h"
 #include "../Scene/Scene.h"
-#include "../Graphics/StaticModel.h"
-#include "../Graphics/TerrainPatch.h"
+#include "../Atomic3D/StaticModel.h"
+#include "../Atomic3D/TerrainPatch.h"
 #include "../IO/VectorBuffer.h"
 
 #include <cfloat>

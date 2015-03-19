@@ -4,7 +4,7 @@
 	"Physics", "Navigation", "Input", "UI", "Resource", "Network", "IO",
 	"Engine", "Javascript", "Environment"],
 
-	"modulePlatformExclude" : {
+	"moduleExclude" : {
 		"WEB" : ["Network", "Navigation"]
 	}
 }
