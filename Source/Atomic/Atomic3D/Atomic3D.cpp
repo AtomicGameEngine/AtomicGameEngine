@@ -2,6 +2,8 @@
 #include "StaticModel.h"
 #include "StaticModelGroup.h"
 #include "Skybox.h"
+#include "Animation.h"
+#include "Model.h"
 #include "AnimatedModel.h"
 #include "AnimationController.h"
 #include "BillboardSet.h"
@@ -19,6 +21,8 @@ namespace Atomic
 
 void RegisterAtomic3DLibrary(Context* context)
 {
+    Animation::RegisterObject(context);
+    Model::RegisterObject(context);
     StaticModel::RegisterObject(context);
     StaticModelGroup::RegisterObject(context);
     Skybox::RegisterObject(context);
