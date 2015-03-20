@@ -82,13 +82,13 @@ namespace :web do
 
     Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
       sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} WEB"
-      sh "cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+      sh "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
     end 
 
     Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer") do
       sh "mv AtomicPlayer AtomicPlayer.bc"
-      sh "emcc -O3 --llvm-lto 1 --memory-init-file 0 -s VERBOSE=0 -s USE_SDL=2 -s ASM_JS=1 -s ASSERTIONS=1 -s OUTLINING_LIMIT=20000 -s TOTAL_MEMORY=520093696 --closure 0 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
+      sh "emcc -O3 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=268435456 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
     end
 
   end
