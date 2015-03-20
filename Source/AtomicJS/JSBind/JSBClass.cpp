@@ -7,6 +7,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include "JSBClass.h"
 #include "JSBFunction.h"
+#include "JSBModule.h"
 
 Vector<JSBClass*> JSBClass::allClasses_;
 
@@ -166,9 +167,17 @@ void JSBClass::WriteProtoTypeRecursive(String &source, JSBClass* klass,  Vector<
     JSBClass* base = klass->baseClasses_.Size() ? klass->baseClasses_[0] : NULL;
 
     if (!klass->isNumberArray())
+    {
+        JSBModule* module = klass->GetModule();
+
+        if (module->Requires("3D"))
+            source += "\n#ifdef ATOMIC_3D\n";
         source.AppendWithFormat("   js_setup_prototype(vm, \"%s\", \"%s\", %s);\n",
                                 klass->GetName().CString(), base ? base->GetName().CString() : "",
                                 klass->hasProperties() ? "true" : "false");
+        if (module->Requires("3D"))
+            source += "#endif\n\n";
+    }
 
     written.Push(klass);
 

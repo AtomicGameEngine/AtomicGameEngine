@@ -195,7 +195,7 @@ void JSBindings::Initialize()
 
     if (JSBind::PLATFORM == "WEB")
     {
-        JSONValue jmodulesExclude = json.GetChild("modulePlatformExclude");
+        JSONValue jmodulesExclude = json.GetChild("moduleExclude");
         JSONValue jexcludes = jmodulesExclude.GetChild("WEB");
 
         for (unsigned i = 0; i < jexcludes.GetSize(); i++)
