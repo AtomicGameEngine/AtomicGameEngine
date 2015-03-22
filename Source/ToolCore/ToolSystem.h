@@ -11,6 +11,7 @@ namespace ToolCore
 {
 
 class Platform;
+class Project;
 
 class ToolSystem : public Object
 {
@@ -21,8 +22,11 @@ public:
     ToolSystem(Context* context);
     virtual ~ToolSystem();
 
-    void RegisterPlatform(Platform* platform);
+    bool LoadProject(const String& fullpath);
+    Project* GetProject() { return project_; }
 
+    // Platforms
+    void RegisterPlatform(Platform* platform);
     void SetCurrentPlatform(PlatformID platform);
     PlatformID GetCurrentPlatform();
 
@@ -32,6 +36,8 @@ private:
 
     // PlatformID -> platform
     HashMap<unsigned, SharedPtr<Platform> > platforms_;
+
+    SharedPtr<Project> project_;
 
 };
 
