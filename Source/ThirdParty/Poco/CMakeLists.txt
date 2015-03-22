@@ -1,6 +1,8 @@
 
 add_definitions(-DHAVE_STDINT_H -DPOCO_STATIC -DPOCO_NO_AUTOMATIC_LIBS)
 
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/Foundation/include)
+
 set (SOURCE_FILES
     Foundation/src/Pipe.cpp
     Foundation/src/Process.cpp
