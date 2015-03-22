@@ -40,8 +40,6 @@ private:
     SharedPtr<BuildSettings> buildSettings_;
     SharedPtr<BuildBase> currentBuild_;
 
-    void HandleEditorBuild(StringHash eventType, VariantMap& eventData);
-    void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 };
 
 
