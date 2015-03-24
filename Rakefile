@@ -205,7 +205,17 @@ namespace :macosx do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       
-      sh "make -j8 AtomicEditor"
+      sh "make -j8 BuildEditorFiles"
+
+    end
+
+  end
+
+  task :cli => ["macosx:player", "macosx:editor"] do
+
+    Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
+      
+      sh "make -j8 AtomicTool"
 
     end
 

@@ -7,27 +7,27 @@
 
 #include <ToolCore/License/LicenseSystem.h>
 
-#include "CLI.h"
+#include "AtomicTool.h"
 
 using namespace ToolCore;
 
-DEFINE_APPLICATION_MAIN(AtomicCLI::CLI);
+DEFINE_APPLICATION_MAIN(AtomicTool::AtomicTool);
 
-namespace AtomicCLI
+namespace AtomicTool
 {
 
-CLI::CLI(Context* context) :
+AtomicTool::AtomicTool(Context* context) :
     Application(context)
 {
 
 }
 
-CLI::~CLI()
+AtomicTool::~AtomicTool()
 {
 
 }
 
-void CLI::Setup()
+void AtomicTool::Setup()
 {
     const Vector<String>& arguments = GetArguments();
 
@@ -46,7 +46,7 @@ void CLI::Setup()
     engineParameters_["ResourcePaths"] = "";
 }
 
-void CLI::Start()
+void AtomicTool::Start()
 {
     context_->RegisterSubsystem(new ToolSystem(context_));
 
@@ -55,7 +55,7 @@ void CLI::Start()
     // END LICENSE MANAGEMENT
 }
 
-void CLI::Stop()
+void AtomicTool::Stop()
 {
 
 }

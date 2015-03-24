@@ -5,17 +5,17 @@
 
 using namespace Atomic;
 
-namespace AtomicCLI
+namespace AtomicTool
 {
 
-class CLI : public Application
+class AtomicTool : public Application
 {
-    OBJECT(CLI);
+    OBJECT(AtomicTool);
 
 public:
 
-    CLI(Context* context);
-    virtual ~CLI();
+    AtomicTool(Context* context);
+    virtual ~AtomicTool();
 
     /// Setup before engine initialization. Verify that a script file has been specified.
     virtual void Setup();
