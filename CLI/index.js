@@ -54,4 +54,8 @@ exports.atomictool = atomictool
 
 exports.newProject = function (output) {
   return atomictool(["new", output], {output:true});
+};
+
+exports.build = function (platform) {
+  return atomictool(["build", platform], {output:true});
 };;

@@ -2,6 +2,7 @@
 #include "CommandParser.h"
 
 #include "NewProjectCmd.h"
+#include "BuildCmd.h"
 
 namespace ToolCore
 {
@@ -30,12 +31,19 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             {
                 cmd = new NewProjectCmd(context_);
             }
+            else if (argument == "build")
+            {
+                cmd = new BuildCmd(context_);
+            }
         }
 
         if (cmd)
         {
             if (cmd->Parse(arguments, i, errorMsg_))
                 return cmd;
+
+            cmd->ReleaseRef();
+            break;
         }
 
     }

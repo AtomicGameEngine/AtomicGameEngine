@@ -54,6 +54,21 @@ cmd.setDefaults({action: function (args) {
     });
 }});
 
+var cmd = commands.addParser("build", {help: "Builds the project",
+    description: "Builds the platform"});
+cmd.addArgument(["platform"], {help: "The platform to build (windows|mac|ios|android|ios)"});
+cmd.setDefaults({action: function (args) {
+    cli.build(args.platform)
+    .then(function () {
+        console.log("Project built " + path.resolve(args.path));
+    })
+    .catch(function (error) {
+        console.error("Error: Could not build " + path.resolve(args.path));
+        process.exit(1);
+    });
+}});
+
+
 // GO!
 if (process.argv.length > 2) {
     var args = parser.parseArgs();
