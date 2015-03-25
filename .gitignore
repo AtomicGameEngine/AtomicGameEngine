@@ -10,3 +10,4 @@ Docs/out/*
 Docs/node_modules/*
 Data/AtomicEditor/Deployment/Web/AtomicPlayer.js
 Data/AtomicEditor/Deployment/IOS/AtomicPlayer.app/AtomicPlayer
+node_modules/*

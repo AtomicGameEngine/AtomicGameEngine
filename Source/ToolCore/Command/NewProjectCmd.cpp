@@ -1,6 +1,9 @@
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/File.h>
+
+#include "../ToolSystem.h"
 
 #include "NewProjectCmd.h"
 
@@ -51,7 +54,25 @@ void NewProjectCmd::Run()
         return;
     }
 
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    String templateDir = tsystem->GetDataPath();
+    templateDir += "/Atomic/ProjectTemplates/Project2D/Resources";
+
+    Poco::File projectSrc(templateDir.CString());
+    if (!projectSrc.exists() || !projectSrc.isDirectory())
+    {
+        Error(ToString("New project path: %s source does not exist", templateDir.CString()));
+        return;
+    }
+
     LOGINFOF("Creating new project in: %s", projectPath_.CString());
+
+    projectDest.createDirectory();
+    projectSrc.copyTo((projectPath_ + "/Resources").CString());
+
+    String filename("NewProject");
+    File file(context_, projectPath_ + "/" + filename + ".atomic", FILE_WRITE);
+    file.Close();
 
     Finished();
 }
