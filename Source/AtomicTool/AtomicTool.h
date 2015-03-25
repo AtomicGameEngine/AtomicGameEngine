@@ -5,6 +5,10 @@
 
 using namespace Atomic;
 
+#include <ToolCore/Command/Command.h>
+
+using namespace ToolCore;
+
 namespace AtomicTool
 {
 
@@ -25,6 +29,13 @@ public:
     virtual void Stop();
 
 private:
+
+    void HandleCommandFinished(StringHash eventType, VariantMap& eventData);
+    void HandleCommandError(StringHash eventType, VariantMap& eventData);
+
+    String cliDataPath_;
+
+    SharedPtr<Command> command_;
 
 };
 

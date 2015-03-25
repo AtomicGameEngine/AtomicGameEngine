@@ -9,7 +9,18 @@
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "websocket": "~1.0.8"
+    "adm-zip": "~0.4.3",
+    "argparse": "~0.1.15",
+    "connect": "~2.8.3",
+    "js-yaml": "~2.1.0",
+    "ncp": "~0.4.2",
+    "open": "~0.0.3",
+    "q": "~0.9.6",
+    "watch": "~0.8.0",
+    "websocket": "~1.0.8",
+    "wrench": "~1.5.1",
+    "xmldom": "~0.1.16",
+    "httpreq": "*"
   },
   "description": "CLI for the Atomic Game Engine",
   "engines": {
