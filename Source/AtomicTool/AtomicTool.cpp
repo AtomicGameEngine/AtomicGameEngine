@@ -1,6 +1,7 @@
 
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Engine/Engine.h>
 
 #include <ToolCore/ToolSystem.h>
@@ -86,6 +87,7 @@ void AtomicTool::Start()
     tsystem->SetDataPath(cliDataPath_);
 
     SharedPtr<CommandParser> parser(new CommandParser(context_));
+
     SharedPtr<Command> cmd(parser->Parse(arguments));
     if (!cmd)
     {
@@ -95,10 +97,40 @@ void AtomicTool::Start()
             error = parser->GetErrorMessage();
 
         ErrorExit(error);
+        return;
+    }
+
+    if (cmd->RequiresProjectLoad())
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        String projectDirectory = fileSystem->GetCurrentDir();
+
+        Vector<String> projectFiles;
+        fileSystem->ScanDir(projectFiles, projectDirectory, "*.atomic", SCAN_FILES, false);
+        if (!projectFiles.Size())
+        {
+            ErrorExit(ToString("No .atomic project file in %s", projectDirectory.CString()));
+            return;
+        }
+        else if (projectFiles.Size() > 1)
+        {
+            ErrorExit(ToString("Multiple .atomic project files found in %s", projectDirectory.CString()));
+            return;
+        }
+
+        String projectFile = projectDirectory + "/" + projectFiles[0];
+
+        if (!tsystem->LoadProject(projectFile))
+        {
+            ErrorExit(ToString("Failed to load project: %s", projectFile.CString()));
+            return;
+        }
+
     }
 
     // BEGIN LICENSE MANAGEMENT
-    GetSubsystem<LicenseSystem>()->Initialize();
+    // GetSubsystem<LicenseSystem>()->Initialize();
     // END LICENSE MANAGEMENT
 
     cmd->Run();

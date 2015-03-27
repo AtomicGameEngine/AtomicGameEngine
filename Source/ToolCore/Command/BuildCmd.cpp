@@ -4,9 +4,9 @@
 #include <Atomic/IO/File.h>
 
 #include "../ToolSystem.h"
+#include "../Build/BuildSystem.h"
 
 #include "BuildCmd.h"
-
 #include <Poco/File.h>
 
 namespace ToolCore
@@ -39,7 +39,7 @@ bool BuildCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Strin
         return false;
     }
 
-    buildPlatform_ = value;
+    buildPlatform_ = value.ToLower();
 
     return true;
 }
@@ -48,6 +48,29 @@ void BuildCmd::Run()
 {
     LOGINFOF("Building project for: %s", buildPlatform_.CString());
 
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+
+    Platform* platform = NULL;
+
+    if (buildPlatform_ == "mac")
+        platform = tsystem->GetPlatformByID(PLATFORMID_MAC);
+
+    if (!platform)
+    {
+        Error(ToString("Unknown build platform: %s", buildPlatform_.CString()));
+        return;
+    }
+
+    // create the build
+    BuildBase* buildBase = platform->NewBuild(project);
+
+    // add it to the build system
+    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+    buildSystem->QueueBuild(buildBase);
+
+    // clear the current platform
+    tsystem->SetCurrentPlatform(PLATFORMID_UNDEFINED);
     Finished();
 }
 

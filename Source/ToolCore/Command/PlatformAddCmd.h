@@ -8,24 +8,22 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-class NewProjectCmd: public Command
+class PlatformAddCmd: public Command
 {
-    OBJECT(NewProjectCmd);
+    OBJECT(PlatformAddCmd);
 
 public:
 
-    NewProjectCmd(Context* context);
-    virtual ~NewProjectCmd();
+    PlatformAddCmd(Context* context);
+    virtual ~PlatformAddCmd();
 
     bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
 
     void Run();
 
-    bool RequiresProjectLoad() { return false; }
-
 private:
 
-    String projectPath_;
+    String platformToAdd_;
 
 };
 

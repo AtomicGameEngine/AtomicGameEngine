@@ -68,6 +68,20 @@ cmd.setDefaults({action: function (args) {
     });
 }});
 
+var cmd = commands.addParser("platform-add", {help: "Adds a platform to the project",
+    description: "Adds a platform to the project"});
+cmd.addArgument(["platform"], {help: "The platform to add (windows|mac|ios|android|ios)"});
+cmd.setDefaults({action: function (args) {
+    cli.addPlatform(args.platform)
+    .then(function () {
+        console.log("Platform added " + path.resolve(args.path));
+    })
+    .catch(function (error) {
+        console.error("Error: Platform Could not be added " + path.resolve(args.path));
+        process.exit(1);
+    });
+}});
+
 
 // GO!
 if (process.argv.length > 2) {

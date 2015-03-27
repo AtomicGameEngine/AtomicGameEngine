@@ -8,6 +8,9 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+class BuildBase;
+class Project;
+
 enum PlatformID
 {
     PLATFORMID_UNDEFINED,
@@ -29,6 +32,8 @@ public:
 
     virtual String GetName() = 0;
     virtual PlatformID GetPlatformID() = 0;
+
+    virtual BuildBase* NewBuild(Project* project) = 0;
 
 private:
 

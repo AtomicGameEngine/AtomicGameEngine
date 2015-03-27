@@ -9,13 +9,15 @@
 namespace ToolCore
 {
 
+class Project;
+
 class BuildWeb : public BuildBase
 {
     OBJECT(BuildWeb);
 
 public:
 
-    BuildWeb(Context* context);
+    BuildWeb(Context* context, Project* project);
     virtual ~BuildWeb();
 
     void Build(const String& buildPath);

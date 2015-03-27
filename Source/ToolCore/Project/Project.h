@@ -3,6 +3,8 @@
 
 using namespace Atomic;
 
+#include "../Platform/Platform.h"
+
 namespace ToolCore
 {
 
@@ -16,6 +18,10 @@ public:
     /// Destruct.
     virtual ~Project();
 
+    void Load(const String& fullpath);
+    void Save(const String& fullpath = "");
+
+    /// Paths
     const String GetResourcePath() { return resourcePath_; }
     void SetResourcePath(const String& resourcePath)
     {
@@ -24,8 +30,6 @@ public:
         scriptsPath_ = resourcePath_ + "Scripts";
         modulesPath_ = resourcePath_ + "Modules";
     }
-    void Load(const String& fullpath);
-    void Save(const String& fullpath = "");
 
     const String& GetComponentsPath() { return componentsPath_; }
     const String& GetScriptsPath() { return scriptsPath_; }
@@ -39,6 +43,12 @@ public:
 
     const String& GetLastBuildPath() { return lastBuildPath_; }
     void SetLastBuildPath(const String& path) { lastBuildPath_ = path; }
+
+    void SaveBuildSettings(const String& path);
+    bool LoadBuildSettings(const String& path);
+
+    void AddPlatform(PlatformID platformID);
+    void RemovePlatform(PlatformID platformID);
 
 private:
 
@@ -54,6 +64,10 @@ private:
     String modulesPath_;
 
     String lastBuildPath_;
+
+    VariantMap buildSettings_;
+
+    List<SharedPtr<Platform>> platforms_;
 
 };
 

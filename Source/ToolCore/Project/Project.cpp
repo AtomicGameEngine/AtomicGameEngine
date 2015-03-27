@@ -10,6 +10,8 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 
+#include <Atomic/Resource/JSONFile.h>
+
 #include "Project.h"
 
 using namespace rapidjson;
@@ -131,6 +133,35 @@ void Project::SaveUserPrefs(const String& fullpath)
     fclose(file);
 }
 
+void Project::SaveBuildSettings(const String& path)
+{
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    jsonFile->CreateRoot();
+
+    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
+
+    jsonFile->Save(*file, String("   "));
+
+    file->Close();
+
+}
+
+bool Project::LoadBuildSettings(const String& path)
+{
+    return false;
+}
+
+void Project::AddPlatform(PlatformID platformID)
+{
+
+}
+
+void Project::RemovePlatform(PlatformID platformID)
+{
+
+}
+
 void Project::Load(const String& fullpath)
 {
     projectFilePath_ = fullpath;
@@ -178,7 +209,7 @@ String Project::GetUserPrefsFullPath(const String& projectPath)
 {
     String path = GetPath(projectPath);
     String filename = GetFileName(projectPath);
-    String prefsPath = path + "/" + filename + ".atomic.userprefs";
+    String prefsPath = path + filename + ".atomic.userprefs";
     return prefsPath;
 }
 

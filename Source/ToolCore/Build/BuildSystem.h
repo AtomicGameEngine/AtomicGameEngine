@@ -27,6 +27,8 @@ public:
 
     BuildSettings* GetBuildSettings() { return buildSettings_; }
 
+    void QueueBuild(BuildBase* buildBase);
+
     void LoadBuildSettings(rapidjson::Value::Member* jobject);
     void SaveBuildSettings(rapidjson::PrettyWriter<rapidjson::FileStream>& writer);
 
@@ -35,7 +37,7 @@ public:
 
 private:
 
-    void DoBuildWeb(const String& buildPath);
+    List<SharedPtr<BuildBase>> queuedBuilds_;
 
     SharedPtr<BuildSettings> buildSettings_;
     SharedPtr<BuildBase> currentBuild_;

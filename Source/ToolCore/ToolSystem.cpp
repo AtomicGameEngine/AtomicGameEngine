@@ -4,6 +4,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 
 #include "Platform/PlatformWeb.h"
+#include "Platform/PlatformMac.h"
 #include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
@@ -23,6 +24,7 @@ ToolSystem::ToolSystem(Context* context) : Object(context)
     context_->RegisterSubsystem(new BuildSystem(context_));
 
     // platform registration
+    RegisterPlatform(new PlatformMac(context));
     RegisterPlatform(new PlatformWeb(context));
 }
 
@@ -52,6 +54,12 @@ bool ToolSystem::LoadProject(const String& fullpath)
 
 void ToolSystem::SetCurrentPlatform(PlatformID platform)
 {
+    if (platform == PLATFORMID_UNDEFINED)
+    {
+        currentPlatform_ = NULL;
+        return;
+    }
+
     if (!platforms_.Contains((unsigned) platform))
         return;
 
@@ -59,12 +67,31 @@ void ToolSystem::SetCurrentPlatform(PlatformID platform)
 
 }
 
-PlatformID ToolSystem::GetCurrentPlatform()
+Platform* ToolSystem::GetPlatformByID(PlatformID platform)
 {
-    if (currentPlatform_.Null())
-        return PLATFORMID_UNDEFINED;
+    if (!platforms_.Contains((unsigned) platform))
+        return NULL;
 
-    return currentPlatform_->GetPlatformID();
+    return platforms_[(unsigned)platform];
+
+}
+
+Platform* ToolSystem::GetPlatformByName(const String& name)
+{
+    HashMap<unsigned, SharedPtr<Platform> >::Iterator itr = platforms_.Begin();
+    while (itr != platforms_.End())
+    {
+        if ((*itr).second_->GetName().ToLower()== name.ToLower())
+            return (*itr).second_;
+        itr++;
+    }
+
+    return NULL;
+}
+
+Platform *ToolSystem::GetCurrentPlatform()
+{
+    return currentPlatform_;
 }
 
 void ToolSystem::RegisterPlatform(Platform* platform)

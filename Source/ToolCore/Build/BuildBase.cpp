@@ -6,19 +6,19 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include "../Project/Project.h"
 #include "BuildBase.h"
 #include "ResourcePackager.h"
 
 namespace ToolCore
 {
 
-BuildBase::BuildBase(Context * context) : Object(context), containsMDL_(false)
+BuildBase::BuildBase(Context * context, Project* project) : Object(context), containsMDL_(false)
 {
-
     if (UseResourcePackager())
         resourcePackager_ = new ResourcePackager(context, this);
 
-    BuildLog("Build Started");
+    project_ = project;
 
 }
 

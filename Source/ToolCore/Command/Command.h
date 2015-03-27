@@ -38,6 +38,8 @@ public:
 
     virtual void Cancel() {}
 
+    virtual bool RequiresProjectLoad() { return true; }
+
 private:
 
     float timeOut_;

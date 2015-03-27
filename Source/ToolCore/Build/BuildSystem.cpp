@@ -26,6 +26,11 @@ BuildSystem::~BuildSystem()
 
 }
 
+void BuildSystem::QueueBuild(BuildBase* buildBase)
+{
+    queuedBuilds_.Push(SharedPtr<BuildBase>(buildBase));
+}
+
 void BuildSystem::BuildComplete(PlatformID platform, const String &buildFolder, bool success, bool fail3D)
 {
 
@@ -37,13 +42,6 @@ void BuildSystem::BuildComplete(PlatformID platform, const String &buildFolder, 
     currentBuild_ = 0;
 }
 
-
-void BuildSystem::DoBuildWeb(const String& buildPath)
-{
-    currentBuild_ = SharedPtr<BuildBase>(new BuildWeb(context_));
-    currentBuild_->Build(buildPath);
-
-}
 
 void BuildSystem::LoadBuildSettings(rapidjson::Value::Member* jobject)
 {

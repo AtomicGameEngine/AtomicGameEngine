@@ -13,6 +13,7 @@ namespace ToolCore
 {
 
 class ResourcePackager;
+class Project;
 
 class BuildBase : public Object
 {
@@ -20,7 +21,7 @@ class BuildBase : public Object
 
 public:
 
-    BuildBase(Context* context);
+    BuildBase(Context* context, Project* project);
     virtual ~BuildBase();
 
     virtual void Build(const String& buildPath) = 0;
@@ -55,6 +56,7 @@ private:
 
     void ScanResourceDirectory(const String& resourceDir);
 
+    SharedPtr<Project> project_;
     SharedPtr<ResourcePackager> resourcePackager_;
     Vector<String> resourceDirs_;
 

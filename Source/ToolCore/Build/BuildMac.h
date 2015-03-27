@@ -9,13 +9,15 @@
 namespace ToolCore
 {
 
+class Project;
+
 class BuildMac : public BuildBase
 {
     OBJECT(BuildMac);
 
 public:
 
-    BuildMac(Context* context);
+    BuildMac(Context* context, Project* project);
     virtual ~BuildMac();
 
     void Build(const String& buildPath);

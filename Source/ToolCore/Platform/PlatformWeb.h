@@ -18,6 +18,8 @@ public:
     String GetName() { return "WEB"; }
     PlatformID GetPlatformID() { return PLATFORMID_WEB; }
 
+    BuildBase* NewBuild(Project *project);
+
 };
 
 }

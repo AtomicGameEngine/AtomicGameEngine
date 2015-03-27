@@ -30,8 +30,11 @@ public:
 
     // Platforms
     void RegisterPlatform(Platform* platform);
+    Platform* GetPlatformByID(PlatformID platform);
+    Platform* GetPlatformByName(const String& name);
+
     void SetCurrentPlatform(PlatformID platform);
-    PlatformID GetCurrentPlatform();
+    Platform* GetCurrentPlatform();
 
 private:
 

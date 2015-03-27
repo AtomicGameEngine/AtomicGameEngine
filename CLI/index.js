@@ -58,4 +58,8 @@ exports.newProject = function (output) {
 
 exports.build = function (platform) {
   return atomictool(["build", platform], {output:true});
-};;
+};
+
+exports.addPlatform = function (platform) {
+  return atomictool(["platform-add", platform], {output:true});
+};

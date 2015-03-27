@@ -13,7 +13,7 @@
 namespace ToolCore
 {
 
-BuildWeb::BuildWeb(Context * context) : BuildBase(context)
+BuildWeb::BuildWeb(Context* context, Project* project) : BuildBase(context, project)
 {
 
 }

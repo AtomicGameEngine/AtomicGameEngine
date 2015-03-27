@@ -2,6 +2,7 @@
 #include "CommandParser.h"
 
 #include "NewProjectCmd.h"
+#include "PlatformAddCmd.h"
 #include "BuildCmd.h"
 
 namespace ToolCore
@@ -35,6 +36,11 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             {
                 cmd = new BuildCmd(context_);
             }
+            else if (argument == "platform-add")
+            {
+                cmd = new PlatformAddCmd(context_);
+            }
+
         }
 
         if (cmd)
