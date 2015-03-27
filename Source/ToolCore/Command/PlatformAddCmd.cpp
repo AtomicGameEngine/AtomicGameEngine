@@ -4,6 +4,7 @@
 #include <Atomic/IO/File.h>
 
 #include "../ToolSystem.h"
+#include "../Project/Project.h"
 
 #include "PlatformAddCmd.h"
 
@@ -35,7 +36,7 @@ bool PlatformAddCmd::Parse(const Vector<String>& arguments, unsigned startIndex,
 
     if (!value.Length())
     {
-        errorMsg = "Unable to parse build platform";
+        errorMsg = "Unable to parse platform";
         return false;
     }
 
@@ -46,12 +47,26 @@ bool PlatformAddCmd::Parse(const Vector<String>& arguments, unsigned startIndex,
 
 void PlatformAddCmd::Run()
 {
-    LOGINFOF("Adding platform: %s", platformToAdd_.CString());
-
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     Project* project = tsystem->GetProject();
 
-    Platform* platform = NULL;
+    Platform* platform = tsystem->GetPlatformByName(platformToAdd_);
+
+    if (!platform)
+    {
+        Error(ToString("Unknown platform: %s", platformToAdd_.CString()));
+        return;
+    }
+
+    if (project->ContainsPlatform(platform->GetPlatformID()))
+    {
+        Error(ToString("Project already contains platform: %s", platformToAdd_.CString()));
+        return;
+    }
+
+    LOGINFOF("Adding platform: %s", platformToAdd_.CString());
+
+    project->AddPlatform(platform->GetPlatformID());
 
     Finished();
 }

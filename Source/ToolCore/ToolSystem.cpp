@@ -46,10 +46,8 @@ bool ToolSystem::LoadProject(const String& fullpath)
 
     project_ = new Project(context_);
     project_->SetResourcePath(resourcePath);
-    project_->Load(fullpath);
 
-    return true;
-
+    return project_->Load(fullpath);
 }
 
 void ToolSystem::SetCurrentPlatform(PlatformID platform)

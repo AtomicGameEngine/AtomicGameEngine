@@ -134,6 +134,7 @@ void AtomicTool::Start()
     // END LICENSE MANAGEMENT
 
     cmd->Run();
+
 }
 
 void AtomicTool::Stop()

@@ -1,3 +1,6 @@
+#include "../ToolSystem.h"
+#include "../Project/Project.h"
+
 #include "Command.h"
 
 namespace ToolCore
@@ -23,6 +26,12 @@ void Command::Error(const String& errorMsg)
 
 void Command::Finished()
 {
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+
+    if (project && project->IsDirty())
+        project->Save(project->GetProjectFilePath());
+
     SendEvent(E_COMMANDFINISHED);
 }
 

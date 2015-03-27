@@ -8,8 +8,13 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+class ProjectUserPrefs;
+class ProjectBuildSettings;
+
 class Project : public Object
 {
+    friend class ProjectFile;
+
     OBJECT(Project);
 
 public:
@@ -18,7 +23,7 @@ public:
     /// Destruct.
     virtual ~Project();
 
-    void Load(const String& fullpath);
+    bool Load(const String& fullpath);
     void Save(const String& fullpath = "");
 
     /// Paths
@@ -41,20 +46,24 @@ public:
     bool IsScriptsDirOrFile(const String& fullPath);
     bool IsModulesDirOrFile(const String& fullPath);
 
-    const String& GetLastBuildPath() { return lastBuildPath_; }
-    void SetLastBuildPath(const String& path) { lastBuildPath_ = path; }
-
     void SaveBuildSettings(const String& path);
     bool LoadBuildSettings(const String& path);
 
     void AddPlatform(PlatformID platformID);
+    bool ContainsPlatform(PlatformID platformID);
     void RemovePlatform(PlatformID platformID);
+
+    bool IsDirty() { return dirty_; }
+
+    ProjectBuildSettings* GetBuildSettings();
+
+    String GetUserPrefsFullPath();
+    String GetBuildSettingsFullPath();
 
 private:
 
     void LoadUserPrefs(const String& fullpath);
     void SaveUserPrefs(const String& fullpath);
-    String GetUserPrefsFullPath(const String& projectPath);
 
     String projectFilePath_;
     String resourcePath_;
@@ -63,11 +72,12 @@ private:
     String scriptsPath_;
     String modulesPath_;
 
-    String lastBuildPath_;
+    bool dirty_;
 
-    VariantMap buildSettings_;
+    SharedPtr<ProjectUserPrefs> userPrefs_;
+    SharedPtr<ProjectBuildSettings> buildSettings_;
 
-    List<SharedPtr<Platform>> platforms_;
+    List<PlatformID> platforms_;
 
 };
 

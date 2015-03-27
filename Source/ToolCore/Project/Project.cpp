@@ -12,6 +12,11 @@
 
 #include <Atomic/Resource/JSONFile.h>
 
+#include "../Platform/Platform.h"
+
+#include "ProjectFile.h"
+#include "ProjectBuildSettings.h"
+#include "ProjectUserPrefs.h"
 #include "Project.h"
 
 using namespace rapidjson;
@@ -20,9 +25,11 @@ namespace ToolCore
 {
 
 Project::Project(Context* context) :
-    Object(context)
+    Object(context),
+    dirty_(false)
 {
-
+    userPrefs_ = new ProjectUserPrefs(context_);
+    buildSettings_ = new ProjectBuildSettings(context_);
 }
 
 Project::~Project()
@@ -79,11 +86,13 @@ void Project::LoadUserPrefs(const String& fullpath)
     }
     */
 
+    /*
     const Value::Member* last_build_path = document.FindMember("last_build_path");
     if (last_build_path && last_build_path->value.IsString())
     {
         lastBuildPath_ = last_build_path->value.GetString();
     }
+    */
 
     // probably will want to move this, it will trigger a save (which is guarded with load_)
     /*
@@ -95,55 +104,11 @@ void Project::LoadUserPrefs(const String& fullpath)
 
 void Project::SaveUserPrefs(const String& fullpath)
 {
-    //Editor* editor = GetSubsystem<Editor>();
 
-    FILE* file = fopen(fullpath.CString(), "w");
-
-    if (!file)
-        return;
-
-    rapidjson::FileStream s(file);
-    rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
-
-    writer.StartObject();
-    writer.String("version");
-    writer.Int(1);
-
-/*
-    writer.String("current_platform");
-
-    AEEditorPlatform platform = editor->GetCurrentPlatform();
-    if (platform == AE_PLATFORM_WINDOWS)
-        writer.String("Windows");
-    else if (platform == AE_PLATFORM_MAC)
-        writer.String("Mac");
-    else if (platform == AE_PLATFORM_HTML5)
-        writer.String("HTML5");
-    else if (platform == AE_PLATFORM_IOS)
-        writer.String("iOS");
-    else if (platform == AE_PLATFORM_ANDROID)
-        writer.String("Android");
-*/
-
-    writer.String("last_build_path");
-    writer.String(lastBuildPath_.CString());
-
-    writer.EndObject();
-
-    fclose(file);
 }
 
 void Project::SaveBuildSettings(const String& path)
 {
-    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
-
-    jsonFile->CreateRoot();
-
-    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
-
-    jsonFile->Save(*file, String("   "));
-
-    file->Close();
 
 }
 
@@ -154,93 +119,62 @@ bool Project::LoadBuildSettings(const String& path)
 
 void Project::AddPlatform(PlatformID platformID)
 {
+    if (ContainsPlatform(platformID))
+        return;
+
+    dirty_ = true;
+
+    platforms_.Push(platformID);
 
 }
 
 void Project::RemovePlatform(PlatformID platformID)
 {
+    if (!ContainsPlatform(platformID))
+        return;
 
 }
 
-void Project::Load(const String& fullpath)
+bool Project::ContainsPlatform(PlatformID platformID)
+{
+    for (List<PlatformID>::ConstIterator i = platforms_.Begin(); i != platforms_.End(); ++i)
+    {
+        if ((*i) == platformID)
+            return true;
+    }
+
+    return false;
+
+}
+
+bool Project::Load(const String& fullpath)
 {
     projectFilePath_ = fullpath;
-
-    LoadUserPrefs(GetUserPrefsFullPath(fullpath));
-
-    rapidjson::Document document;
-
-    File jsonFile(context_, fullpath);
-
-    if (!jsonFile.IsOpen())
-    {
-        return;
-    }
-
-    String json;
-    jsonFile.ReadText(json);
-
-    if (!json.Length())
-    {
-        return;
-    }
-
-    if (document.Parse<0>(json.CString()).HasParseError())
-    {
-        LOGERRORF("Could not parse Project JSON data from %s", fullpath.CString());
-        return;
-    }
-
-    const Value::Member* version = document.FindMember("version");
-    if (version && version->value.IsInt())
-    {
-
-    }
-
-    Value::Member* build_settings = document.FindMember("build_settings");
-    if (build_settings && build_settings->value.IsObject())
-    {
-        //BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-        //buildSystem->LoadBuildSettings(build_settings);
-    }
+    SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
+    return pfile->Load(this);
 }
 
-String Project::GetUserPrefsFullPath(const String& projectPath)
+String Project::GetBuildSettingsFullPath()
 {
-    String path = GetPath(projectPath);
-    String filename = GetFileName(projectPath);
-    String prefsPath = path + filename + ".atomic.userprefs";
+    String path = GetPath(projectFilePath_);
+    String filename = GetFileName(projectFilePath_);
+    String buildSettingsPath = path + filename + ".buildsettings";
+    return buildSettingsPath;
+}
+
+String Project::GetUserPrefsFullPath()
+{
+    String path = GetPath(projectFilePath_);
+    String filename = GetFileName(projectFilePath_);
+    String prefsPath = path + filename + ".userprefs";
     return prefsPath;
 }
 
 void Project::Save(const String& fullpath)
 {
-    if (fullpath.Length())
-        projectFilePath_ = fullpath;
-
-    String path = projectFilePath_;
-
-    SaveUserPrefs(GetUserPrefsFullPath(path));
-
-    FILE* file = fopen(path.CString(), "w");
-
-    if (!file)
-        return;
-
-    rapidjson::FileStream s(file);
-    rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);
-
-    writer.StartObject();
-    writer.String("version");
-    writer.Int(1);
-
-    //BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-    //buildSystem->SaveBuildSettings(writer);
-
-    writer.EndObject();
-
-    fclose(file);
-
+    SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
+    pfile->Save(this);
+    dirty_ = false;
 }
 
 bool Project::IsComponentsDirOrFile(const String& fullPath)
