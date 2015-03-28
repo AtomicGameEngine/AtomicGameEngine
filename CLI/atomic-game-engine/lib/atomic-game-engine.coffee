@@ -10,25 +10,37 @@ module.exports = AtomicGameEngine =
     @subscriptions = new CompositeDisposable
 
     # Register command that toggles this view
-    @subscriptions.add atom.commands.add 'atom-workspace', 'atomic-game-engine:toggle': => @toggle()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atomic-game-engine:openEditor': => @openEditor()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'atomic-game-engine:run': => @run()
 
   deactivate: ->
     @subscriptions.dispose()
 
   serialize: ->
 
-  toggle: ->
 
-    # AtomicCLI.atomiceditor([])
+  getAtomicProjectPath: ->
+
     paths = atom.project.getPaths();
 
-    gotone = false;
     for path in paths
-      glob path + "/*.atomic", (er, files) ->
-        if files.length
-          gotone = true
-          AtomicCLI.atomiceditor ["-project", path]
-      if gotone
-        break
+      files = glob.sync path + "/*.atomic"
+      if files.length
+        return path
 
-    console.log 'AtomicGameEngine was toggled!'
+    return null
+
+  openEditor: ->
+
+    path = @getAtomicProjectPath()
+
+    if path
+      AtomicCLI.atomiceditor ["-project", path]
+
+  run: ->
+
+    path = @getAtomicProjectPath()
+
+    if path
+      process.chdir(path)
+      AtomicCLI.run("mac")

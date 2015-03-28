@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "A short description of your package",
   "activationCommands": {
-    "atom-workspace": "atomic-game-engine:toggle"
+    "atom-workspace": ["atomic-game-engine:openEditor", "atomic-game-engine:run"] 
   },
   "repository": "https://github.com/atom/atomic-game-engine",
   "license": "MIT",
