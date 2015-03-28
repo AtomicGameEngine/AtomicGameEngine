@@ -66,7 +66,9 @@ void BuildCmd::Run()
     Platform* platform = NULL;
 
     if (buildPlatform_ == "mac")
-        platform = tsystem->GetPlatformByID(PLATFORMID_MAC);
+        platform = tsystem->GetPlatformByID(PLATFORMID_MAC);    
+    else if (buildPlatform_ == "web")
+        platform = tsystem->GetPlatformByID(PLATFORMID_WEB);
 
     if (!platform)
     {

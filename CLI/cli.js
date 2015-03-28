@@ -82,6 +82,13 @@ cmd.setDefaults({action: function (args) {
     });
 }});
 
+var cmd = commands.addParser("serve", {help: "Start a development server.",
+    description: "Starts a development web server for testing.",
+    aliases: ["server"]});
+cmd.setDefaults({action: function (args) {
+            var server = new cli.Server();
+            server.start();
+}});
 
 // GO!
 if (process.argv.length > 2) {

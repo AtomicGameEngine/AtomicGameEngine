@@ -25,14 +25,12 @@ BuildWeb::~BuildWeb()
 
 void BuildWeb::Initialize()
 {
-    ToolSystem* tools = GetSubsystem<ToolSystem>();
-    Project* project = tools->GetProject();
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    String bundleResources = fileSystem->GetAppBundleResourceFolder();
-
+    String dataPath = tsystem->GetDataPath();
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = bundleResources + "CoreData/";
+    String coreDataFolder = dataPath + "Atomic/Resources/CoreData/";
 
     AddResourceDir(coreDataFolder);
     AddResourceDir(projectResources);
@@ -41,7 +39,9 @@ void BuildWeb::Initialize()
 }
 void BuildWeb::Build(const String& buildPath)
 {
-    buildPath_ = buildPath + "/Web-Build";
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
+    buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
     Initialize();
 
@@ -49,8 +49,9 @@ void BuildWeb::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
-    String buildSourceDir = fileSystem->GetAppBundleResourceFolder();
-    buildSourceDir += "Deployment/Web";
+    String dataPath = tsystem->GetDataPath();
+
+    String buildSourceDir  = dataPath + "Atomic/Deployment/Web";
 
     fileSystem->CreateDir(buildPath_);
 
