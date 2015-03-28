@@ -109,6 +109,14 @@ cmd.setDefaults({action: function (args) {
             server.start();
 }});
 
+var cmd = commands.addParser("editor", {help: "Starts the Atomic Editor and loads current project",
+    description: "Starts the Atomic Editor and loads current project.",
+    aliases: ["edit"]});
+cmd.setDefaults({action: function (args) {
+            cli.editor()
+}});
+
+
 // GO!
 if (process.argv.length > 2) {
     var args = parser.parseArgs();
@@ -116,5 +124,3 @@ if (process.argv.length > 2) {
 } else {
     parser.printHelp();
 }
-
-// spawn(cli.ATOMIC_TOOL_BIN, { stdio: 'inherit' });

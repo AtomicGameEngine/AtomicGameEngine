@@ -9,18 +9,13 @@ var wrench = require("wrench");
 
 try {
   var platform_cli = require('atomic-cli-mac');
-  console.log(platform_cli);
 }
 catch (e) {
-
-  console.log(e);
 }
 
-
 var DATA_DIR = platform_cli.EDITOR_DATA_DIR;
-exports.DATA_DIR = DATA_DIR;
-
 var ATOMIC_TOOL_BIN = platform_cli.ATOMICTOOL_BIN;
+var EDITOR_APPLICATION = platform_cli.EDITOR_APPLICATION;
 
 var HTTP_PORT = 4000;
 var SOCKET_PORT = HTTP_PORT+1;
@@ -56,7 +51,6 @@ var exec = function (command, flags, opts) {
 };
 exports.exec = exec;
 
-
 var atomictool = function (flags, opts) {
     opts = opts || {};
     opts.windowsCmd = false;
@@ -66,6 +60,15 @@ var atomictool = function (flags, opts) {
     return exec(ATOMIC_TOOL_BIN, flags, opts);
 };
 exports.atomictool = atomictool
+
+var atomiceditor = function (flags, opts) {
+    opts = opts || {};
+    opts.detached = true;
+    opts.stdio = ["ignore", "ignore", "ignore"];
+    var child = spawn(EDITOR_APPLICATION, flags, opts);
+    child.unref();
+};
+exports.atomiceditor = atomiceditor
 
 exports.newProject = function (output) {
   return atomictool(["new", output], {output:true});
@@ -77,6 +80,10 @@ exports.build = function (platform) {
 
 exports.addPlatform = function (platform) {
   return atomictool(["platform-add", platform], {output:true});
+};
+
+exports.editor = function () {
+  return atomiceditor(["-project", process.cwd()], {output:true});
 };
 
 exports.run = function (platform, opts) {

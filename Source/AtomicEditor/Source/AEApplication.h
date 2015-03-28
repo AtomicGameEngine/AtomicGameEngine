@@ -28,6 +28,8 @@ public:
     virtual void Stop();
 
 private:
+
+    String cmdLineProjectFile_;
     
 };
 
