@@ -36,7 +36,7 @@ ToolSystem::~ToolSystem()
 
 bool ToolSystem::LoadProject(const String& fullpath)
 {
-    String path = GetPath(fullpath);
+    String path = RemoveTrailingSlash(GetPath(fullpath));
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->AddResourceDir(path, 0);

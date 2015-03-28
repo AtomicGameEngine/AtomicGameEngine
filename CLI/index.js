@@ -22,7 +22,7 @@ exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).versi
 var exec = function (command, flags, opts) {
     opts = opts || {};
     if (opts.verbose !== false) {
-        console.log([command].concat(flags).join(" "));
+        //console.log([command].concat(flags).join(" "));
     }
 
     // Run everything through cmd.exe on Windows to be able to find .bat files

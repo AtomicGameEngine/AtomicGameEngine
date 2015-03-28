@@ -22,6 +22,27 @@ ProjectFile::~ProjectFile()
 
 }
 
+void ProjectFile::WriteNewProject(const String& fullpath)
+{
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    JSONValue root = jsonFile->CreateRoot();
+
+    root.SetInt("version", PROJECTFILE_VERSION);
+
+    // project object
+    JSONValue jproject = root.CreateChild("project");
+    jproject.SetString("version", "1.0.0");
+
+    // platforms
+    root.CreateChild("platforms", JSON_ARRAY);
+
+    SharedPtr<File> file(new File(context_, fullpath, FILE_WRITE));
+    jsonFile->Save(*file, String("   "));
+    file->Close();
+
+}
+
 void ProjectFile::Save(Project* project)
 {
     project_ = project;
@@ -36,12 +57,10 @@ void ProjectFile::Save(Project* project)
     root.SetInt("version", PROJECTFILE_VERSION);
 
     // project object
-
     JSONValue jproject = root.CreateChild("project");
     jproject.SetString("version", project_->GetVersion());
 
     // platforms
-
     JSONValue platforms = root.CreateChild("platforms", JSON_ARRAY);
 
     for (List<PlatformID>::ConstIterator i = project_->platforms_.Begin(); i != project_->platforms_.End(); ++i)
@@ -70,7 +89,8 @@ bool ProjectFile::Load(Project* project)
     SharedPtr<File> file(new File(context_, fullpath, FILE_READ));
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    jsonFile->BeginLoad(*file);
+    if (!jsonFile->BeginLoad(*file))
+        return false;
 
     JSONValue root = jsonFile->GetRoot();
 

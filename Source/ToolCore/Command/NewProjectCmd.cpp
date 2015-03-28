@@ -4,6 +4,7 @@
 #include <Atomic/IO/File.h>
 
 #include "../ToolSystem.h"
+#include "../Project/ProjectFile.h"
 
 #include "NewProjectCmd.h"
 
@@ -71,8 +72,8 @@ void NewProjectCmd::Run()
     projectSrc.copyTo((projectPath_ + "/Resources").CString());
 
     String filename("NewProject");
-    File file(context_, projectPath_ + "/" + filename + ".atomic", FILE_WRITE);
-    file.Close();
+    SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
+    pfile->WriteNewProject(projectPath_ + "/" + filename + ".atomic");
 
     Finished();
 }

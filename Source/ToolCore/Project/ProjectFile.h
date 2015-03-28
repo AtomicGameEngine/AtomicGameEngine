@@ -25,6 +25,8 @@ public:
     void Save(Project* project);
     bool Load(Project* project);
 
+    void WriteNewProject(const String& fullpath);
+
 private:
 
     SharedPtr<Project> project_;

@@ -56,6 +56,7 @@ void AtomicTool::Setup()
         ErrorExit("Unable to parse --data-path");
 
     engineParameters_["Headless"] = true;
+    engineParameters_["LogLevel"] = LOG_WARNING;
     engineParameters_["ResourcePaths"] = "";
 }
 
