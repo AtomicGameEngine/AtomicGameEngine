@@ -29,7 +29,7 @@ void BuildMac::Initialize()
 
     String dataPath = tsystem->GetDataPath();
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = dataPath + "Atomic/Resources/CoreData/";
+    String coreDataFolder = dataPath + "CoreData/";
 
     AddResourceDir(coreDataFolder);
     AddResourceDir(projectResources);
@@ -54,7 +54,7 @@ void BuildMac::Build(const String& buildPath)
 
     String dataPath = tsystem->GetDataPath();
 
-    String appSrcPath = dataPath + "Atomic/Deployment/MacOS/AtomicPlayer.app";
+    String appSrcPath = dataPath + "Deployment/MacOS/AtomicPlayer.app";
 
     fileSystem->CreateDir(buildPath_);
 

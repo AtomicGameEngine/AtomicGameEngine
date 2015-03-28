@@ -22,6 +22,9 @@
     "xmldom": "~0.1.16",
     "httpreq": "*"
   },
+  "optionalDependencies" : {
+    "atomic-cli-mac" : "./atomic-cli-mac-disabled/"
+  },
   "description": "CLI for the Atomic Game Engine",
   "engines": {
     "node": ">=0.8.0"

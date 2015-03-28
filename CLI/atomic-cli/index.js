@@ -7,10 +7,20 @@ var path = require("path");
 var spawn = require("child_process").spawn;
 var wrench = require("wrench");
 
-var DATA_DIR = __dirname + "/data/";
+try {
+  var platform_cli = require('atomic-cli-mac');
+  console.log(platform_cli);
+}
+catch (e) {
+
+  console.log(e);
+}
+
+
+var DATA_DIR = platform_cli.EDITOR_DATA_DIR;
 exports.DATA_DIR = DATA_DIR;
 
-var ATOMIC_TOOL_BIN = __dirname + "/data/bin/Mac/AtomicTool";
+var ATOMIC_TOOL_BIN = platform_cli.ATOMICTOOL_BIN;
 
 var HTTP_PORT = 4000;
 var SOCKET_PORT = HTTP_PORT+1;
@@ -22,7 +32,7 @@ exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).versi
 var exec = function (command, flags, opts) {
     opts = opts || {};
     if (opts.verbose !== false) {
-        //console.log([command].concat(flags).join(" "));
+        console.log([command].concat(flags).join(" "));
     }
 
     // Run everything through cmd.exe on Windows to be able to find .bat files

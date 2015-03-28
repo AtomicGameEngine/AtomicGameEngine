@@ -46,7 +46,7 @@ void AtomicTool::Setup()
                 if (!value.Length())
                     ErrorExit("Unable to parse --cli-data-path");
 
-                cliDataPath_ = value;
+                cliDataPath_ = AddTrailingSlash(value);
             }
         }
 
