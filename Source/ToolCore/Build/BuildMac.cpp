@@ -29,7 +29,7 @@ void BuildMac::Initialize()
 
     String dataPath = tsystem->GetDataPath();
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = dataPath + "CoreData/";
+    String coreDataFolder = dataPath + "Atomic/Resources/CoreData/";
 
     AddResourceDir(coreDataFolder);
     AddResourceDir(projectResources);
