@@ -68,6 +68,25 @@ cmd.setDefaults({action: function (args) {
     });
 }});
 
+var addCommonArguments = function (parser) {
+    parser.addArgument(["--debug"], {action: "storeTrue", help: "Build in debug mode."});
+};
+
+var cmd = commands.addParser("run", {help: "Build and run on a given platform.",
+    description: "Builds and runs the game on a single given platform."});
+cmd.addArgument(["platform"], {metavar: "platform", nargs: "?",
+    help: "A platform to target. Choose from " + cli.PLATFORMS.join(", ") + ". If omitted, 'default_platform' will be used."});
+addCommonArguments(cmd);
+cmd.addArgument(["--no-build"], {action: "storeTrue", help: "Don't rebuild before running."});
+
+cmd.setDefaults({action: function (args) {
+  cli.run(args.platform, {
+      debug: args.debug,
+      noBuild: args.no_build,
+  });
+}});
+
+
 var cmd = commands.addParser("platform-add", {help: "Adds a platform to the project",
     description: "Adds a platform to the project"});
 cmd.addArgument(["platform"], {help: "The platform to add (windows|mac|ios|android|ios)"});

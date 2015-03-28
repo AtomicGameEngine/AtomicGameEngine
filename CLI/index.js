@@ -15,6 +15,8 @@ var ATOMIC_TOOL_BIN = __dirname + "/data/bin/Mac/AtomicTool";
 var HTTP_PORT = 4000;
 var SOCKET_PORT = HTTP_PORT+1;
 
+exports.PLATFORMS = ["windows", "mac", "android", "ios", "web"];
+
 exports.VERSION = JSON.parse(fs.readFileSync(__dirname + "/package.json")).version;
 
 var exec = function (command, flags, opts) {
@@ -65,6 +67,40 @@ exports.build = function (platform) {
 
 exports.addPlatform = function (platform) {
   return atomictool(["platform-add", platform], {output:true});
+};
+
+exports.run = function (platform, opts) {
+    opts = opts || {};
+    var debug = opts.debug;
+
+    if (platform == null) {
+        // platform = get(config, "default_platform", "flash");
+    }
+
+    //checkPlatforms([platform]);
+
+    var run = function () {
+        switch (platform) {
+        case "web":
+            var url = "http://localhost:" + HTTP_PORT + "/AtomicPlayer.html";
+            console.log("Launching: " + url);
+
+            var open = require("open");
+            open(url);
+            break;
+
+          case "mac":
+              var open = require("open");
+              open("Build/Mac-Build/AtomicPlayer.app");
+              break;
+
+        }
+    };
+
+    return opts.noBuild ? run() : exports.build([platform], opts).then(function () {
+        console.log();
+        return run();
+    });
 };
 
 // Web Server (from flambe: https://raw.githubusercontent.com/aduros/flambe/master/command/index.js)
