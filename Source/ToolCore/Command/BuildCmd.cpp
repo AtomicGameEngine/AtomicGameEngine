@@ -5,6 +5,7 @@
 
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
+#include "../Build/BuildEvents.h"
 #include "../Build/BuildSystem.h"
 
 #include "BuildCmd.h"
@@ -45,6 +46,16 @@ bool BuildCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Strin
     return true;
 }
 
+void BuildCmd::HandleBuildComplete(StringHash eventType, VariantMap& eventData)
+{
+    Finished();
+}
+
+void BuildCmd::HandleBuildFailed(StringHash eventType, VariantMap& eventData)
+{
+    Error("Build Failed");
+}
+
 void BuildCmd::Run()
 {
     LOGINFOF("Building project for: %s", buildPlatform_.CString());
@@ -77,12 +88,12 @@ void BuildCmd::Run()
 
     buildSystem->QueueBuild(buildBase);
 
+    SubscribeToEvent(E_BUILDCOMPLETE, HANDLER(BuildCmd, HandleBuildComplete));
+    SubscribeToEvent(E_BUILDFAILED, HANDLER(BuildCmd, HandleBuildFailed));
+
     // TODO: parallel/serial builds
     buildSystem->StartNextBuild();
 
-    // clear the current platform
-    //tsystem->SetCurrentPlatform(PLATFORMID_UNDEFINED);
-    //Finished();
 }
 
 }

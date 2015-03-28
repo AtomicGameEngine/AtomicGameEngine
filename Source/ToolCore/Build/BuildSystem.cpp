@@ -13,8 +13,7 @@
 #include "../Project/ProjectUserPrefs.h"
 
 #include "BuildSystem.h"
-#include "BuildWeb.h"
-
+#include "BuildEvents.h"
 
 namespace ToolCore
 {
@@ -35,10 +34,10 @@ bool BuildSystem::StartNextBuild()
     if (!queuedBuilds_.Size())
         return false;
 
-    SharedPtr<BuildBase> build = queuedBuilds_.Front();
+    currentBuild_ = queuedBuilds_.Front();
     queuedBuilds_.PopFront();
 
-    build->Build(buildPath_);
+    currentBuild_->Build(buildPath_);
 
     return true;
 }
@@ -50,11 +49,20 @@ void BuildSystem::QueueBuild(BuildBase* buildBase)
 
 void BuildSystem::BuildComplete(PlatformID platform, const String &buildFolder, bool success, bool fail3D)
 {
+    VariantMap eventData;
 
     if (success)
+    {
+        eventData[BuildComplete::P_PLATFORMID] = (unsigned) platform;
+        SendEvent(E_BUILDCOMPLETE, eventData);
         LOGINFOF("Build Success");
+    }
     else
+    {
+        eventData[BuildFailed::P_PLATFORMID] = (unsigned) platform;
+        SendEvent(E_BUILDFAILED, eventData);
         LOGINFOF("Build Failed");
+    }
 
     currentBuild_ = 0;
 }

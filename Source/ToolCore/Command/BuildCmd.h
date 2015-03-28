@@ -23,6 +23,9 @@ public:
 
 private:
 
+    void HandleBuildComplete(StringHash eventType, VariantMap& eventData);
+    void HandleBuildFailed(StringHash eventType, VariantMap& eventData);
+
     String buildPlatform_;
 
 };
