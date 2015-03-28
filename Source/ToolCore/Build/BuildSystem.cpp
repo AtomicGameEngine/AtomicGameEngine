@@ -8,6 +8,10 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 
+#include "../ToolSystem.h"
+#include "../Project/Project.h"
+#include "../Project/ProjectUserPrefs.h"
+
 #include "BuildSystem.h"
 #include "BuildWeb.h"
 
@@ -18,12 +22,25 @@ namespace ToolCore
 BuildSystem::BuildSystem(Context* context) :
     Object(context)
 {
-    buildSettings_ = new BuildSettings(context);
+
 }
 
 BuildSystem::~BuildSystem()
 {
 
+}
+
+bool BuildSystem::StartNextBuild()
+{
+    if (!queuedBuilds_.Size())
+        return false;
+
+    SharedPtr<BuildBase> build = queuedBuilds_.Front();
+    queuedBuilds_.PopFront();
+
+    build->Build(buildPath_);
+
+    return true;
 }
 
 void BuildSystem::QueueBuild(BuildBase* buildBase)
@@ -41,18 +58,6 @@ void BuildSystem::BuildComplete(PlatformID platform, const String &buildFolder, 
 
     currentBuild_ = 0;
 }
-
-
-void BuildSystem::LoadBuildSettings(rapidjson::Value::Member* jobject)
-{
-    buildSettings_->Load(jobject);
-}
-
-void BuildSystem::SaveBuildSettings(rapidjson::PrettyWriter<rapidjson::FileStream>& writer)
-{
-    buildSettings_->Save(writer);
-}
-
 
 
 

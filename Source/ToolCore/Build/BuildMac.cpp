@@ -24,19 +24,12 @@ BuildMac::~BuildMac()
 
 void BuildMac::Initialize()
 {
-    ToolSystem* tools = GetSubsystem<ToolSystem>();
-    Project* project = tools->GetProject();
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    String bundleResources = fileSystem->GetProgramDir();
-#else
-    String bundleResources = fileSystem->GetAppBundleResourceFolder();
-#endif
-
+    String dataPath = tsystem->GetDataPath();
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = bundleResources + "CoreData/";
+    String coreDataFolder = dataPath + "CoreData/";
 
     AddResourceDir(coreDataFolder);
     AddResourceDir(projectResources);
@@ -47,7 +40,9 @@ void BuildMac::Initialize()
 
 void BuildMac::Build(const String& buildPath)
 {
-    buildPath_ = buildPath + "/Mac-Build";
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
+    buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
     Initialize();
 
@@ -57,13 +52,9 @@ void BuildMac::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
- #ifdef ATOMIC_PLATFORM_WINDOWS
-    String buildSourceDir = fileSystem->GetProgramDir();
- #else
-    String buildSourceDir = fileSystem->GetAppBundleResourceFolder();
- #endif
+    String dataPath = tsystem->GetDataPath();
 
-    buildSourceDir += "Deployment/MacOS/AtomicPlayer.app";
+    String appSrcPath = dataPath + "Atomic/Deployment/MacOS/AtomicPlayer.app";
 
     fileSystem->CreateDir(buildPath_);
 
@@ -78,10 +69,10 @@ void BuildMac::Build(const String& buildPath)
     String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources.pak";
     GenerateResourcePackage(resourcePackagePath);
 
-    fileSystem->Copy(buildSourceDir + "/Contents/Resources/Atomic.icns", buildPath_ + "/Contents/Resources/Atomic.icns");
+    fileSystem->Copy(appSrcPath + "/Contents/Resources/Atomic.icns", buildPath_ + "/Contents/Resources/Atomic.icns");
 
-    fileSystem->Copy(buildSourceDir + "/Contents/Info.plist", buildPath_ + "/Contents/Info.plist");
-    fileSystem->Copy(buildSourceDir + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer");
+    fileSystem->Copy(appSrcPath + "/Contents/Info.plist", buildPath_ + "/Contents/Info.plist");
+    fileSystem->Copy(appSrcPath + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer");
 
 #ifdef ATOMIC_PLATFORM_OSX
     Vector<String> args;

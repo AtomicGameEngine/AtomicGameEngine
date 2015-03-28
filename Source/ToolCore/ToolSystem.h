@@ -36,6 +36,9 @@ public:
     void SetCurrentPlatform(PlatformID platform);
     Platform* GetCurrentPlatform();
 
+    void SetCLI() { cli_ = true; }
+    bool IsCLI() { return cli_; }
+
 private:
 
     /// Full path to data files
@@ -47,6 +50,8 @@ private:
     HashMap<unsigned, SharedPtr<Platform> > platforms_;
 
     SharedPtr<Project> project_;
+
+    bool cli_;
 
 };
 

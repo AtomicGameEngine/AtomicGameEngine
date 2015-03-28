@@ -5,7 +5,6 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
-#include "BuildSettings.h"
 #include "BuildBase.h"
 
 #include "../Platform/Platform.h"
@@ -25,21 +24,19 @@ public:
     /// Destruct.
     virtual ~BuildSystem();
 
-    BuildSettings* GetBuildSettings() { return buildSettings_; }
+    void SetBuildPath(const String& path) { buildPath_ = path; }
 
     void QueueBuild(BuildBase* buildBase);
 
-    void LoadBuildSettings(rapidjson::Value::Member* jobject);
-    void SaveBuildSettings(rapidjson::PrettyWriter<rapidjson::FileStream>& writer);
+    bool StartNextBuild();
 
-    void ClearBuildCompleteUI();
     void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, bool fail3D = false);
 
 private:
 
-    List<SharedPtr<BuildBase>> queuedBuilds_;
+    String buildPath_;
 
-    SharedPtr<BuildSettings> buildSettings_;
+    List<SharedPtr<BuildBase>> queuedBuilds_;
     SharedPtr<BuildBase> currentBuild_;
 
 };

@@ -5,6 +5,8 @@
 
 using namespace Atomic;
 
+#include "../Platform/Platform.h"
+
 namespace ToolCore
 {
 
@@ -18,11 +20,14 @@ public:
     /// Destruct.
     virtual ~ProjectUserPrefs();
 
+    // platform used when not specified
+    PlatformID GetDefaultPlatform();
+
     const String& GetLastBuildPath() { return lastBuildPath_; }
     void SetLastBuildPath(const String& path) { lastBuildPath_ = path; }
 
 private:
-
+    PlatformID defaultPlatform_;
     String lastBuildPath_;
 
 };

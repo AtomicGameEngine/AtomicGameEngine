@@ -4,6 +4,7 @@
 
 #pragma once
 
+/*
 #include <rapidjson/document.h>
 #include <rapidjson/filestream.h>
 #include <rapidjson/prettywriter.h>
@@ -103,3 +104,5 @@ private:
 };
 
 }
+
+*/

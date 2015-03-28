@@ -4,6 +4,7 @@
 #include <Atomic/IO/File.h>
 
 #include "../ToolSystem.h"
+#include "../Project/Project.h"
 #include "../Build/BuildSystem.h"
 
 #include "BuildCmd.h"
@@ -62,16 +63,26 @@ void BuildCmd::Run()
         return;
     }
 
+    if (!project->ContainsPlatform(platform->GetPlatformID()))
+    {
+        Error(ToString("Project does not contain platform: %s", buildPlatform_.CString()));
+        return;
+    }
+
     // create the build
     BuildBase* buildBase = platform->NewBuild(project);
 
     // add it to the build system
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+
     buildSystem->QueueBuild(buildBase);
 
+    // TODO: parallel/serial builds
+    buildSystem->StartNextBuild();
+
     // clear the current platform
-    tsystem->SetCurrentPlatform(PLATFORMID_UNDEFINED);
-    Finished();
+    //tsystem->SetCurrentPlatform(PLATFORMID_UNDEFINED);
+    //Finished();
 }
 
 }

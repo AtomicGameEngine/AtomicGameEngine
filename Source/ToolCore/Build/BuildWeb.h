@@ -22,6 +22,8 @@ public:
 
     void Build(const String& buildPath);
 
+    String GetBuildSubfolder() { return "Web-Build"; }
+
 protected:
 
     void Initialize();

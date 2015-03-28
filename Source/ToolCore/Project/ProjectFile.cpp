@@ -32,7 +32,13 @@ void ProjectFile::Save(Project* project)
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
     JSONValue root = jsonFile->CreateRoot();
+
     root.SetInt("version", PROJECTFILE_VERSION);
+
+    // project object
+
+    JSONValue jproject = root.CreateChild("project");
+    jproject.SetString("version", project_->GetVersion());
 
     // platforms
 
@@ -72,6 +78,15 @@ bool ProjectFile::Load(Project* project)
 
     if (version != PROJECTFILE_VERSION)
         return false;
+
+    // project object
+    JSONValue jproject = root.GetChild("project");
+
+    if (jproject.IsObject())
+    {
+        String pversion = jproject.GetString("version");
+        project_->SetVersion(pversion);
+    }
 
     JSONValue platforms = root.GetChild("platforms");
     if (!platforms.IsArray())

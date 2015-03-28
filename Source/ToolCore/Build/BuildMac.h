@@ -20,6 +20,8 @@ public:
     BuildMac(Context* context, Project* project);
     virtual ~BuildMac();
 
+    String GetBuildSubfolder() { return "Mac-Build"; }
+
     void Build(const String& buildPath);
 
 protected:

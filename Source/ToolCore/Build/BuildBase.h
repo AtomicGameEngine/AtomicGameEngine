@@ -29,6 +29,8 @@ public:
     // some platforms may want to do their own packaging of resources
     virtual bool UseResourcePackager() { return true; }
 
+    virtual String GetBuildSubfolder() = 0;
+
     // add in search order, first added is first searched
     // will warn on name conflicts
     void AddResourceDir(const String& dir);

@@ -40,30 +40,38 @@ public:
     const String& GetScriptsPath() { return scriptsPath_; }
     const String& GetModulesPath() { return modulesPath_; }
 
-    const String& GetProjectFilePath() { return projectFilePath_; }
-
     bool IsComponentsDirOrFile(const String& fullPath);
     bool IsScriptsDirOrFile(const String& fullPath);
     bool IsModulesDirOrFile(const String& fullPath);
 
-    void SaveBuildSettings(const String& path);
-    bool LoadBuildSettings(const String& path);
 
     void AddPlatform(PlatformID platformID);
     bool ContainsPlatform(PlatformID platformID);
     void RemovePlatform(PlatformID platformID);
 
     bool IsDirty() { return dirty_; }
+    void SetDirty() { if (!loading_) dirty_ = true; }
 
-    ProjectBuildSettings* GetBuildSettings();
+    ProjectBuildSettings* GetBuildSettings() { return buildSettings_; }
+    ProjectUserPrefs* GetUserPrefs() { return userPrefs_; }
 
+    const String& GetProjectFilePath() { return projectFilePath_; }
     String GetUserPrefsFullPath();
     String GetBuildSettingsFullPath();
 
+    const String& GetVersion() { return version_; }
+    void SetVersion(const String& version) { version_ = version; }
+
+    void SaveBuildSettings();
+    bool LoadBuildSettings();
+
+    void SaveUserPrefs();
+    bool LoadUserPrefs();
+
 private:
 
-    void LoadUserPrefs(const String& fullpath);
-    void SaveUserPrefs(const String& fullpath);
+
+    String version_;
 
     String projectFilePath_;
     String resourcePath_;
@@ -72,6 +80,7 @@ private:
     String scriptsPath_;
     String modulesPath_;
 
+    bool loading_;
     bool dirty_;
 
     SharedPtr<ProjectUserPrefs> userPrefs_;

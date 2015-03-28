@@ -5,6 +5,7 @@
 #include <Atomic/Engine/Engine.h>
 
 #include <ToolCore/ToolSystem.h>
+#include <ToolCore/Build/BuildSystem.h>
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/Command/Command.h>
 #include <ToolCore/Command/CommandParser.h>
@@ -84,7 +85,10 @@ void AtomicTool::Start()
 
     ToolSystem* tsystem = new ToolSystem(context_);
     context_->RegisterSubsystem(tsystem);
+    tsystem->SetCLI();
     tsystem->SetDataPath(cliDataPath_);
+
+    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
     SharedPtr<CommandParser> parser(new CommandParser(context_));
 
@@ -125,6 +129,21 @@ void AtomicTool::Start()
         {
             ErrorExit(ToString("Failed to load project: %s", projectFile.CString()));
             return;
+        }
+
+        // Set the build path
+        String buildFolder = projectDirectory + "/" + "Build";
+        buildSystem->SetBuildPath(buildFolder);
+
+        if (!fileSystem->DirExists(buildFolder))
+        {
+            fileSystem->CreateDir(buildFolder);
+
+            if (!fileSystem->DirExists(buildFolder))
+            {
+                ErrorExit(ToString("Failed to create build folder: %s", buildFolder.CString()));
+                return;
+            }
         }
 
     }

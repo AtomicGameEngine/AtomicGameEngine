@@ -16,7 +16,8 @@
 namespace ToolCore
 {
 
-ToolSystem::ToolSystem(Context* context) : Object(context)
+ToolSystem::ToolSystem(Context* context) : Object(context),
+    cli_(false)
 {
 
     context_->RegisterSubsystem(new CurlManager(context_));
