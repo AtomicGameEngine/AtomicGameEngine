@@ -2,12 +2,12 @@
 'context-menu':
   'atom-text-editor': [
     {
-      'label': 'Open Atomic Editor'
-      'command': 'atomic-game-engine:openEditor'
-    },
-    {
       'label': 'Run in Atomic Player'
       'command': 'atomic-game-engine:run'
+    },
+    {
+      'label': 'Open Atomic Editor'
+      'command': 'atomic-game-engine:openEditor'
     }
   ]
 'menu': [
@@ -17,14 +17,13 @@
       'label': 'Atomic Game Engine'
       'submenu': [
         {
-          'label': 'Open Atomic Editor'
-          'command': 'atomic-game-engine:openEditor'
-        },
-        {
           'label': 'Run in Atomic Player'
           'command': 'atomic-game-engine:run'
-        }
-
+        },
+        {
+          'label': 'Open Atomic Editor'
+          'command': 'atomic-game-engine:openEditor'
+        }      
       ]
     ]
   }

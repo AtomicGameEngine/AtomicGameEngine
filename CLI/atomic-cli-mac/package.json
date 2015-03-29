@@ -9,7 +9,7 @@
   },
   "dependencies": {
   },
-  "description": "Mac dependencies for atomic-cli",
+  "description": "Mac dependencies for atomic-cli package",
   "engines": {
     "node": ">=0.8.0"
   },
@@ -18,10 +18,11 @@
     "type": "Atomic Game Engine",
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md"
   }],
+  "files" : ["bin"],
   "main": "./index.js",
   "name": "atomic-cli-mac",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.2.4",
+  "version": "0.0.0",
   "os" : ["darwin"]
 }
