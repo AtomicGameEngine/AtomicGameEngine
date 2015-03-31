@@ -57,6 +57,12 @@ program
 
   });
 
+program
+  .command('edit [path-to-project]')
+  .description('edits the project in the cwd or on at a specified path')
+  .action(function(options){
+    cli.atomiceditor(["-project", process.cwd()], {output:true});
+  });
 
   program.parse(process.argv);
 

@@ -5,8 +5,6 @@ var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawn;
 
-var cli = require ("atomic-cli")
-
 try {
   var platform_cli = require('atomic-cli-mac');
 }
