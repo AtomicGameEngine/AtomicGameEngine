@@ -87,6 +87,7 @@ exports.editor = function () {
 };
 
 exports.run = function (platform, opts) {
+  
     opts = opts || {};
     var debug = opts.debug;
 

@@ -4,26 +4,19 @@
     "name": "Atomic Game Engine",
     "url": "http://www.AtomicGameEngine.com"
   },
-  "bin": { "atomic-cli" : "./cli.js" },
   "bugs": {
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "adm-zip": "~0.4.3",
-    "argparse": "~0.1.15",
-    "connect": "~2.8.3",
-    "js-yaml": "~2.1.0",
-    "ncp": "~0.4.2",
-    "open": "~0.0.3",
-    "q": "~0.9.6",
-    "watch": "~0.8.0",
-    "websocket": "~1.0.8",
-    "wrench": "~1.5.1",
-    "xmldom": "~0.1.16",
-    "httpreq": "*"
+    "q": "*",
+    "commander" : "*",
+    "update-notifier" : "*",
+    "open": "*"
+  },
+  "devDependencies" : {
   },
   "optionalDependencies" : {
-    "atomic-cli-mac" : "./atomic-cli-mac-disabled/"
+    "atomic-cli-mac" : "*"
   },
   "description": "CLI for the Atomic Game Engine",
   "engines": {
@@ -34,7 +27,8 @@
     "type": "Atomic Game Engine",
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md"
   }],
-  "main": "index.js",
+  "bin": { "atomic-cli" : "./bin/atomic-cli.js" },
+  "main": "./lib/main.js",
   "name": "atomic-cli",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",

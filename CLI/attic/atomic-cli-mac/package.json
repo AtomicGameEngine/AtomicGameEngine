@@ -8,7 +8,6 @@
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "atomic-cli-mac-data" : "file:atomic-cli-mac-data"    
   },
   "description": "Mac dependencies for atomic-cli package",
   "engines": {

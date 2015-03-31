@@ -1,0 +1,12 @@
+{
+  "description": "Mac data for atomic-cli-mac package",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "homepage": "http://www.AtomicGameEngine.com",
+  "files" : ["data"],
+  "main": "./index.js",
+  "name": "atomic-cli-mac-data",
+  "version": "0.0.1",
+  "os" : ["darwin"]
+}

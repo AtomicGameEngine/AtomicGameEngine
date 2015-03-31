@@ -57,7 +57,7 @@ void NewProjectCmd::Run()
 
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     String templateDir = tsystem->GetDataPath();
-    templateDir += "/Atomic/ProjectTemplates/Project2D/Resources";
+    templateDir += "ProjectTemplates/Project2D/Resources";
 
     Poco::File projectSrc(templateDir.CString());
     if (!projectSrc.exists() || !projectSrc.isDirectory())
