@@ -16,7 +16,7 @@
   "devDependencies" : {
   },
   "optionalDependencies" : {
-    "atomic-cli-mac" : "*"
+    "atomic-cli-mac" : "0.0.3"
   },
   "description": "CLI for the Atomic Game Engine",
   "engines": {
@@ -32,5 +32,5 @@
   "name": "atomic-cli",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.2.4"
+  "version": "0.2.6"
 }

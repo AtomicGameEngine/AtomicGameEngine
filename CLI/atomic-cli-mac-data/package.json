@@ -5,8 +5,7 @@
   },
   "homepage": "http://www.AtomicGameEngine.com",
   "files" : ["data"],
-  "main": "./index.js",
+  "main": "./data/index.js",
   "name": "atomic-cli-mac-data",
-  "version": "0.0.1",
-  "os" : ["darwin"]
+  "version": "0.0.1"
 }

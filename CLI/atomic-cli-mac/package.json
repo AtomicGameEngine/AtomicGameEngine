@@ -8,7 +8,7 @@
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "atomic-cli-mac-data" : "file:atomic-cli-mac-data"    
+    "atomic-cli-mac-data" : "http://docs.atomicgameengine.com/npm/atomic-cli-mac-data-0.0.1.tgz"
   },
   "description": "Mac dependencies for atomic-cli package",
   "engines": {
@@ -19,11 +19,10 @@
     "type": "Atomic Game Engine",
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md"
   }],
-  "files" : ["bin"],
   "main": "./index.js",
   "name": "atomic-cli-mac",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "os" : ["darwin"]
 }
