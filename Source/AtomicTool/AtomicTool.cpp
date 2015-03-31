@@ -12,9 +12,9 @@
 
 #include "AtomicTool.h"
 
-using namespace ToolCore;
-
 DEFINE_APPLICATION_MAIN(AtomicTool::AtomicTool);
+
+using namespace ToolCore;
 
 namespace AtomicTool
 {

@@ -21,14 +21,9 @@
 //
 
 #include "Precompiled.h"
-#include "../../Graphics/AnimatedModel.h"
-#include "../../Graphics/Animation.h"
-#include "../../Graphics/AnimationController.h"
 #include "../../Graphics/Camera.h"
 #include "../../Core/Context.h"
-#include "../../Graphics/CustomGeometry.h"
 #include "../../Graphics/DebugRenderer.h"
-#include "../../Graphics/DecalSet.h"
 #include "../../IO/File.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
@@ -37,19 +32,13 @@
 #include "../../IO/Log.h"
 #include "../../Graphics/Material.h"
 #include "../../Graphics/Octree.h"
-#include "../../Graphics/ParticleEffect.h"
-#include "../../Graphics/ParticleEmitter.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderVariation.h"
-#include "../../Graphics/Skybox.h"
-#include "../../Graphics/StaticModelGroup.h"
 #include "../../Graphics/Technique.h"
-#include "../../Graphics/Terrain.h"
-#include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
@@ -2876,9 +2865,7 @@ void Graphics::SetTextureUnitMappings()
 
 void RegisterGraphicsLibrary(Context* context)
 {
-    Animation::RegisterObject(context);
     Material::RegisterObject(context);
-    Model::RegisterObject(context);
     Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
@@ -2887,18 +2874,6 @@ void RegisterGraphicsLibrary(Context* context)
     Camera::RegisterObject(context);
     Drawable::RegisterObject(context);
     Light::RegisterObject(context);
-    StaticModel::RegisterObject(context);
-    StaticModelGroup::RegisterObject(context);
-    Skybox::RegisterObject(context);
-    AnimatedModel::RegisterObject(context);
-    AnimationController::RegisterObject(context);
-    BillboardSet::RegisterObject(context);
-    ParticleEffect::RegisterObject(context);
-    ParticleEmitter::RegisterObject(context);
-    CustomGeometry::RegisterObject(context);
-    DecalSet::RegisterObject(context);
-    Terrain::RegisterObject(context);
-    TerrainPatch::RegisterObject(context);
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);

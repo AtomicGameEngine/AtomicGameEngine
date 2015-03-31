@@ -33,6 +33,6 @@ if (APPLE AND NOT IOS)
 endif()
 
 if (MSVC)
-	add_subdirectory(libcurl)
+    add_subdirectory(libcurl)
     add_subdirectory(MojoShader)
 endif()
