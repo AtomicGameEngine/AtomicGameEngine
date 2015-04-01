@@ -35,10 +35,21 @@ private:
     void HandleLicenseSuccess(StringHash eventType, VariantMap& eventData);
     void HandleLicenseError(StringHash eventType, VariantMap& eventData);
 
+    void HandleLicenseActivationError(StringHash eventType, VariantMap& eventData);
+    void HandleLicenseActivationSuccess(StringHash eventType, VariantMap& eventData);
+    void HandleLicenseDeactivationError(StringHash eventType, VariantMap& eventData);
+    void HandleLicenseDeactivationSuccess(StringHash eventType, VariantMap& eventData);
+
     void HandleCommandFinished(StringHash eventType, VariantMap& eventData);
     void HandleCommandError(StringHash eventType, VariantMap& eventData);
 
+    void DoActivation();
+    void DoDeactivation();
+
+    // use a variant map instead?
     String cliDataPath_;
+    String activationKey_;
+    bool deactivate_;
 
     SharedPtr<Command> command_;
 

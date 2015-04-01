@@ -11,7 +11,8 @@
     "q": "*",
     "commander" : "*",
     "update-notifier" : "*",
-    "open": "*"
+    "open": "*",
+    "prompt": "latest"
   },
   "devDependencies" : {
   },

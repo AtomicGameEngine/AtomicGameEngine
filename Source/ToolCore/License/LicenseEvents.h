@@ -35,6 +35,24 @@ EVENT(E_LICENSE_SUCCESS, LicenseSuccess)
 
 }
 
+EVENT(E_LICENSE_ACTIVATIONSUCCESS, LicenseActivationSuccess)
+{
+}
+
+EVENT(E_LICENSE_ACTIVATIONERROR, LicenseActivationError)
+{
+    PARAM(P_MESSAGE, Message); // String
+}
+
+EVENT(E_LICENSE_DEACTIVATIONSUCCESS, LicenseDeactivationSuccess)
+{
+}
+
+EVENT(E_LICENSE_DEACTIVATIONERROR, LicenseDeactivationError)
+{
+    PARAM(P_MESSAGE, Message); // String
+}
+
 
 // license error
 EVENT(E_LICENSE_ERROR, LicenseError)

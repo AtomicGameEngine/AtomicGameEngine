@@ -21,7 +21,8 @@ namespace AtomicTool
 {
 
 AtomicTool::AtomicTool(Context* context) :
-    Application(context)
+    Application(context),
+    deactivate_(false)
 {
 
 }
@@ -49,6 +50,18 @@ void AtomicTool::Setup()
 
                 cliDataPath_ = AddTrailingSlash(value);
             }
+            else if (argument == "--activate")
+            {
+                if (!value.Length())
+                    ErrorExit("Unable to parse --activation product key");
+
+                activationKey_ = value;
+            }
+            else if (argument == "--deactivate")
+            {
+                deactivate_ = true;
+            }
+
         }
 
     }
@@ -57,7 +70,7 @@ void AtomicTool::Setup()
         ErrorExit("Unable to parse --data-path");
 
     engineParameters_["Headless"] = true;
-    engineParameters_["LogLevel"] = LOG_INFO;
+    engineParameters_["LogLevel"] = LOG_WARNING;
     engineParameters_["ResourcePaths"] = "";
 }
 
@@ -79,22 +92,91 @@ void AtomicTool::HandleCommandError(StringHash eventType, VariantMap& eventData)
 
 void AtomicTool::HandleLicenseEulaRequired(StringHash eventType, VariantMap& eventData)
 {
-
+    ErrorExit("\nActivation Required: Please run: atomic-cli activate\n");
 }
 
 void AtomicTool::HandleLicenseActivationRequired(StringHash eventType, VariantMap& eventData)
 {
-
+    ErrorExit("\nActivation Required: Please run: atomic-cli activate\n");
 }
 
 void AtomicTool::HandleLicenseSuccess(StringHash eventType, VariantMap& eventData)
 {
+    if (command_.Null())
+    {
+        GetSubsystem<Engine>()->Exit();
+        return;
+    }
+
     command_->Run();
 }
 
 void AtomicTool::HandleLicenseError(StringHash eventType, VariantMap& eventData)
 {
+    ErrorExit("\nActivation Required: Please run: atomic-cli activate\n");
+}
 
+void AtomicTool::HandleLicenseActivationError(StringHash eventType, VariantMap& eventData)
+{
+    String message = eventData[LicenseActivationError::P_MESSAGE].ToString();
+    ErrorExit(message);
+}
+
+void AtomicTool::HandleLicenseActivationSuccess(StringHash eventType, VariantMap& eventData)
+{
+    LOGRAW("\nActivation successful, thank you!\n\n");
+    GetSubsystem<Engine>()->Exit();
+}
+
+void AtomicTool::DoActivation()
+{
+    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+
+    if (!licenseSystem->ValidateKey(activationKey_))
+    {
+        ErrorExit(ToString("\nProduct key: %s is invalid. (Keys are in the form ATOMIC-XXXX-XXXX-XXXX-XXXX)\n"));
+        return;
+    }
+
+    licenseSystem->LicenseAgreementConfirmed();
+
+    SubscribeToEvent(E_LICENSE_ACTIVATIONERROR, HANDLER(AtomicTool, HandleLicenseActivationError));
+    SubscribeToEvent(E_LICENSE_ACTIVATIONSUCCESS, HANDLER(AtomicTool, HandleLicenseActivationSuccess));
+
+    licenseSystem->RequestServerActivation(activationKey_);
+
+}
+
+void AtomicTool::HandleLicenseDeactivationError(StringHash eventType, VariantMap& eventData)
+{
+    String message = eventData[LicenseDeactivationError::P_MESSAGE].ToString();
+    ErrorExit(message);
+}
+
+void AtomicTool::HandleLicenseDeactivationSuccess(StringHash eventType, VariantMap& eventData)
+{
+    LOGRAW("\nDeactivation successful\n\n");
+    GetSubsystem<Engine>()->Exit();
+}
+
+void AtomicTool::DoDeactivation()
+{
+    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+
+    if (!licenseSystem->LoadLicense())
+    {
+        ErrorExit("\nNot activated");
+        return;
+    }
+
+    SharedPtr<CurlRequest> request = licenseSystem->Deactivate();
+    if (request.Null())
+    {
+        ErrorExit("\nNot activated\n");
+        return;
+    }
+    SubscribeToEvent(E_LICENSE_DEACTIVATIONERROR, HANDLER(AtomicTool, HandleLicenseDeactivationError));
+    SubscribeToEvent(E_LICENSE_DEACTIVATIONSUCCESS, HANDLER(AtomicTool, HandleLicenseDeactivationSuccess));
 }
 
 void AtomicTool::Start()
@@ -114,6 +196,16 @@ void AtomicTool::Start()
     context_->RegisterSubsystem(tsystem);
     tsystem->SetCLI();
     tsystem->SetDataPath(cliDataPath_);
+
+    if (activationKey_.Length())
+    {
+        DoActivation();
+        return;
+    } else if (deactivate_)
+    {
+        DoDeactivation();
+        return;
+    }
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 

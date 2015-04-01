@@ -62,9 +62,13 @@ public:
     SharedPtr<CurlRequest>& Deactivate();
 
     void ResetLicense();
+    bool LoadLicense();
 
     /// Basic key validation
     bool ValidateKey(const String &key);
+
+    /// Activate on server
+    void RequestServerActivation(const String& key);
 
     const String& GetKey() { return key_; }
     String GenerateMachineID();
@@ -78,7 +82,6 @@ private:
 
     void RequestServerVerification(const String& key);
 
-    bool LoadLicense();
     void SaveLicense();
     void RemoveLicense();
 
@@ -87,6 +90,8 @@ private:
     void HandleVerification(StringHash eventType, VariantMap& eventData);
     void HandleDeactivate(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
+
+    void HandleActivationResult(StringHash eventType, VariantMap& eventData);
 
     bool eulaAgreementConfirmed_;
 
@@ -103,6 +108,7 @@ private:
     bool licenseHTML5_;
     bool licenseModule3D_;
 
+    SharedPtr<CurlRequest> serverActivation_;
     SharedPtr<CurlRequest> serverVerification_;
     SharedPtr<CurlRequest> deactivate_;
 

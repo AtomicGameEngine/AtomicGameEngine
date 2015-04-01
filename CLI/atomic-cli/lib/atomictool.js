@@ -39,6 +39,14 @@ var build = function (platform) {
   return atomictool(["build", platform], {output:true});
 };
 
+var activate = function (productkey) {
+  return atomictool(["--activate", productkey.toUpperCase()], {output:true});
+};
+
+var deactivate = function () {
+  return atomictool(["--deactivate"], {output:true});
+};
+
 var run = function (platform, opts) {
 
     opts = opts || {};
@@ -109,5 +117,7 @@ module.exports = {
   "newProject" : newProject,
   "addPlatform" : addPlatform,
   "build" : build,
-  "run" : run
+  "run" : run,
+  "activate" : activate,
+  "deactivate" : deactivate
 }

@@ -487,37 +487,36 @@ void LicenseSystem::HandleDeactivate(StringHash eventType, VariantMap& eventData
 {
     CurlRequest* request = (CurlRequest*) (eventData[CurlComplete::P_CURLREQUEST].GetPtr());
 
+    VariantMap eventDataOut;
+
     if (deactivate_.NotNull())
     {
         assert(request == deactivate_);
 
         if (deactivate_->GetError().Length())
         {
-            String msg;
+            String msg = "Deactivation Error:\n";
             msg.AppendWithFormat("Unable to deactivate with server: %s", deactivate_->GetError().CString());
-            //editor->PostModalError("Deactivation Error", msg);
-            LOGERROR(msg);
+
+            eventDataOut[LicenseDeactivationError::P_MESSAGE] = msg;
+            SendEvent(E_LICENSE_DEACTIVATIONERROR, eventDataOut);
         }
         else
         {
             String response = request->GetResponse();
             if (response.StartsWith("AC_FAILED"))
             {
-                String msg;
+                String msg = "Deactivation Error:\n";
                 msg.AppendWithFormat("Unable to deactivate with server: %s", response.CString());
-                //editor->PostModalError("Deactivation Error", msg);
-                LOGERROR(msg);
+
+                eventDataOut[LicenseDeactivationError::P_MESSAGE] = msg;
+                SendEvent(E_LICENSE_DEACTIVATIONERROR, eventDataOut);
             }
             else if (response.StartsWith("AC_NOTACTIVATED") || response.StartsWith("AC_SUCCESS"))
             {
                 ResetLicense();
                 RemoveLicense();
-
-                /*
-                UIModalOps* ops = GetSubsystem<UIModalOps>();
-                ops->Hide();
-                ops->ShowActivation();
-                */
+                SendEvent(E_LICENSE_DEACTIVATIONSUCCESS);
             }
 
         }
@@ -526,6 +525,80 @@ void LicenseSystem::HandleDeactivate(StringHash eventType, VariantMap& eventData
         deactivate_ = 0;
     }
 
+}
+
+void LicenseSystem::HandleActivationResult(StringHash eventType, VariantMap& eventData)
+{
+    VariantMap eventDataOut;
+
+    if (serverActivation_->GetError().Length())
+    {
+        String errorMessage;
+        errorMessage.AppendWithFormat("There was an error contacting the activation server\n\n%s", serverActivation_->GetError().CString());
+
+        eventDataOut[LicenseActivationError::P_MESSAGE] = errorMessage;
+        SendEvent(E_LICENSE_ACTIVATIONERROR, eventDataOut);
+        return;
+    }
+    else
+    {
+        LicenseParse parse;
+        int code = ParseResponse(serverActivation_->GetResponse(), parse);
+
+        if (code == 0)
+        {
+            Activate(key_, parse);
+            SendEvent(E_LICENSE_ACTIVATIONSUCCESS);
+        }
+        else if (code == 1)
+        {
+            // TODO: check for CLI and prompt to use CLI command to return license
+            String message = "Activations Exceeded:\nThis key has 2 activations in use.\n\nPlease return a license from Atomic Editor - Manage License menu on one of these active computers.\n\nIf you are unable to do so, please contact sales@atomicgameengine.com providing the key to reset it";
+            eventDataOut[LicenseActivationError::P_MESSAGE] = message;
+            SendEvent(E_LICENSE_ACTIVATIONERROR, eventDataOut);
+
+        }
+        else if (code == 2)
+        {
+            String message = "License Error:\nThere was a problem with the license key.\n\nPlease check the key and try again.\n\nIf the problem persists please contact sales@atomicgameengine.com";
+            eventDataOut[LicenseActivationError::P_MESSAGE] = message;
+            SendEvent(E_LICENSE_ACTIVATIONERROR, eventDataOut);
+
+
+        }
+        else if (code == 3)
+        {
+            String message ="Activation Server Error:\nThere was an error on the activation server\n\nIf the problem persists please contact sales@atomicgameengine.com";
+            eventDataOut[LicenseActivationError::P_MESSAGE] = message;
+            SendEvent(E_LICENSE_ACTIVATIONERROR, eventDataOut);
+        }
+
+    }
+
+    UnsubscribeFromEvents(serverActivation_);
+    serverActivation_ = 0;
+}
+
+void LicenseSystem::RequestServerActivation(const String& key)
+{
+    if (serverActivation_.NotNull())
+    {
+        LOGERROR("UIActivation::RequestServerActivation - request already exists");
+        return;
+    }
+
+    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+
+    key_ = key;
+    CurlManager* cm = GetSubsystem<CurlManager>();
+    String post;
+    String id = licenseSystem->GenerateMachineID();
+    post.AppendWithFormat("key=%s&id=%s", key.CString(), id.CString());
+
+    // todo, this should be a verify url (shouldn't auto add id)
+    serverActivation_ = cm->MakeRequest("https://store.atomicgameengine.com/licenses/license_activate.php", post);
+
+    SubscribeToEvent(serverActivation_, E_CURLCOMPLETE, HANDLER(LicenseSystem, HandleActivationResult));
 }
 
 }

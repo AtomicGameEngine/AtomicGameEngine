@@ -7,12 +7,51 @@
 var path = require("path");
 var program = require('commander');
 var cli = require("atomic-cli")
+var open = require("open");
+var prompt = require('prompt');
 
-
+prompt.message = "";
+prompt.delimiter = "";
 
 program
   .version('0.0.1')
   .parse(process.argv);
+
+// activation command
+program
+  .command('activate')
+  .description('activate')
+  .action(function(folder){
+
+    prompt.start();
+
+    prompt.get([ { description: 'Please confirm EULA agreement (Y)es, (N)o, or (V)iew', default: "Y", name: "eulaconfirm" }], function (err, result) {
+        var eulaconfirm = result.eulaconfirm.toLowerCase();
+        if (eulaconfirm == 'y') {
+          prompt.get([ { description: 'Please enter Product Key or (G)et free key: ', name: "productkey" }], function (err, result) {
+            var productkey = result.productkey.toLowerCase();
+            if (productkey == 'g') {
+              console.log ("Opening Atomic Store in default browser window");
+              open("https://store.atomicgameengine.com/site");
+            } else {
+              cli.activate(productkey);
+            }
+          });
+        } else if (eulaconfirm == 'v') {
+          console.log ("Opening EULA in default browser window");
+          open("https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md");
+        }
+    });
+  });
+
+// deactivation
+program
+  .command('deactivate')
+  .description('deactivates and returns a product activation to the server')
+  .action(function(){
+    cli.deactivate();
+  });
+
 
 // new project command
 program

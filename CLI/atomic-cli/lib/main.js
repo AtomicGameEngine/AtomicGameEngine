@@ -12,6 +12,8 @@ module.exports = {
   "addPlatform" : atomictool.addPlatform,
   "build" : atomictool.build,
   "run" : atomictool.run,
+  "activate" : atomictool.activate,
+  "deactivate" : atomictool.deactivate,
   "atomiceditor" : atomiceditor
 
 }
