@@ -134,7 +134,7 @@ void AtomicTool::DoActivation()
 
     if (!licenseSystem->ValidateKey(activationKey_))
     {
-        ErrorExit(ToString("\nProduct key: %s is invalid. (Keys are in the form ATOMIC-XXXX-XXXX-XXXX-XXXX)\n"));
+        ErrorExit(ToString("\nProduct key \"%s\" is invalid, keys are in the form ATOMIC-XXXX-XXXX-XXXX-XXXX\n", activationKey_.CString()));
         return;
     }
 

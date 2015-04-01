@@ -40,7 +40,7 @@ var build = function (platform) {
 };
 
 var activate = function (productkey) {
-  return atomictool(["--activate", productkey.toUpperCase()], {output:true});
+  return atomictool(["--activate", productkey.toUpperCase().trim()], {output:true});
 };
 
 var deactivate = function () {
