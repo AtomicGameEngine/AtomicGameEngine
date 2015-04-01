@@ -344,6 +344,7 @@ namespace :package do
 
   task :windows_preflight => ['windows:clean',
                               'windows:editor',
+                              'windows:atomictool',
                               'atomictiled:windows' ] do
 
 
@@ -396,6 +397,9 @@ namespace :package do
       FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/msvcr120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcr120.dll")
       FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/vccorlib120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/vccorlib120.dll")
     end
+
+    FileUtils.mkdir_p("#{EDITOR_APP_FOLDER_DST}/Applications/CommandLine")
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicTool/AtomicTool.exe", "#{EDITOR_APP_FOLDER_DST}/Applications/CommandLine/AtomicTool.exe")
 
   end
 
@@ -503,6 +507,16 @@ namespace :windows do
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
 
       sh "jom -j4 AtomicEditor"
+
+    end
+
+  end
+
+  task :atomictool => "windows:editor" do
+
+    Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
+
+      sh "jom -j4 AtomicTool"
 
     end
 
