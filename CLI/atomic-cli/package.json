@@ -8,10 +8,10 @@
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "q": "*",
-    "commander" : "*",
-    "update-notifier" : "*",
-    "open": "*",
+    "q": "latest",
+    "commander" : "latest",
+    "update-notifier" : "latest",
+    "open": "latest",
     "prompt": "latest"
   },
   "devDependencies" : {
@@ -34,5 +34,5 @@
   "name": "atomic-cli",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.3.0"
+  "version": "0.3.1"
 }
