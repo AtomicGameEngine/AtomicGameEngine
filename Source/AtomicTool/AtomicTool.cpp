@@ -6,6 +6,7 @@
 
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/Build/BuildSystem.h>
+#include <ToolCore/License/LicenseEvents.h>
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/Command/Command.h>
 #include <ToolCore/Command/CommandParser.h>
@@ -56,7 +57,7 @@ void AtomicTool::Setup()
         ErrorExit("Unable to parse --data-path");
 
     engineParameters_["Headless"] = true;
-    engineParameters_["LogLevel"] = LOG_WARNING;
+    engineParameters_["LogLevel"] = LOG_INFO;
     engineParameters_["ResourcePaths"] = "";
 }
 
@@ -76,11 +77,36 @@ void AtomicTool::HandleCommandError(StringHash eventType, VariantMap& eventData)
     ErrorExit(error);
 }
 
+void AtomicTool::HandleLicenseEulaRequired(StringHash eventType, VariantMap& eventData)
+{
+
+}
+
+void AtomicTool::HandleLicenseActivationRequired(StringHash eventType, VariantMap& eventData)
+{
+
+}
+
+void AtomicTool::HandleLicenseSuccess(StringHash eventType, VariantMap& eventData)
+{
+    command_->Run();
+}
+
+void AtomicTool::HandleLicenseError(StringHash eventType, VariantMap& eventData)
+{
+
+}
+
 void AtomicTool::Start()
 {
     // Subscribe to events
     SubscribeToEvent(E_COMMANDERROR, HANDLER(AtomicTool, HandleCommandError));
     SubscribeToEvent(E_COMMANDFINISHED, HANDLER(AtomicTool, HandleCommandFinished));
+
+    SubscribeToEvent(E_LICENSE_EULAREQUIRED, HANDLER(AtomicTool, HandleLicenseEulaRequired));
+    SubscribeToEvent(E_LICENSE_ACTIVATIONREQUIRED, HANDLER(AtomicTool, HandleLicenseActivationRequired));
+    SubscribeToEvent(E_LICENSE_ERROR, HANDLER(AtomicTool, HandleLicenseError));
+    SubscribeToEvent(E_LICENSE_SUCCESS, HANDLER(AtomicTool, HandleLicenseSuccess));
 
     const Vector<String>& arguments = GetArguments();
 
@@ -149,11 +175,11 @@ void AtomicTool::Start()
 
     }
 
-    // BEGIN LICENSE MANAGEMENT
-    // GetSubsystem<LicenseSystem>()->Initialize();
-    // END LICENSE MANAGEMENT
+    command_ = cmd;
 
-    cmd->Run();
+    // BEGIN LICENSE MANAGEMENT
+    GetSubsystem<LicenseSystem>()->Initialize();
+    // END LICENSE MANAGEMENT
 
 }
 

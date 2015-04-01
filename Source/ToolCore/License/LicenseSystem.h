@@ -82,11 +82,17 @@ private:
     void SaveLicense();
     void RemoveLicense();
 
+    void CreateOrUpdateLicenseCache();
+
     void HandleVerification(StringHash eventType, VariantMap& eventData);
     void HandleDeactivate(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     bool eulaAgreementConfirmed_;
+
+    String licenseFilePath_;
+    String licenseCachePath_;
+    String eulaAgreementPath_;
 
     String key_;
     String email_;

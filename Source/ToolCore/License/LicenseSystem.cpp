@@ -18,10 +18,12 @@
 
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Core/Context.h>
+#include <Atomic/Core/Timer.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/Log.h>
 
+#include "LicenseEvents.h"
 #include "LicenseSystem.h"
 
 #include <Poco/MD5Engine.h>
@@ -35,8 +37,28 @@ LicenseSystem::LicenseSystem(Context* context) :
     , eulaAgreementConfirmed_(false)
 
 {
-    ResetLicense();
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
 
+    licenseFilePath_ = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
+    licenseFilePath_ = AddTrailingSlash(licenseFilePath_);
+
+    if (!filesystem->DirExists(licenseFilePath_))
+    {
+        Poco::File dirs(licenseFilePath_.CString());
+        dirs.createDirectories();
+    }
+
+    licenseCachePath_ = licenseFilePath_;
+
+    licenseCachePath_ += "AtomicLicenseCache";
+
+    licenseFilePath_ += "AtomicLicense";
+
+    eulaAgreementPath_ = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
+    eulaAgreementPath_ = AddTrailingSlash(eulaAgreementPath_);
+    eulaAgreementPath_ += "EulaConfirmed";
+
+    ResetLicense();
 }
 
 LicenseSystem::~LicenseSystem()
@@ -48,23 +70,21 @@ void LicenseSystem::Initialize()
 {
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
-    String eulaConfirmedFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
-    eulaConfirmedFilePath = AddTrailingSlash(eulaConfirmedFilePath);
-    eulaConfirmedFilePath += "EulaConfirmed";
 
-    eulaAgreementConfirmed_ = filesystem->FileExists(eulaConfirmedFilePath);
+    eulaAgreementConfirmed_ = filesystem->FileExists(eulaAgreementPath_);
 
-    if (!LoadLicense() || !key_.Length() || !eulaAgreementConfirmed_)
+    if (!eulaAgreementConfirmed_)
+    {
+        SendEvent(E_LICENSE_EULAREQUIRED);
+        return;
+    }
+
+    if (!LoadLicense() || !key_.Length())
     {
         ResetLicense();
-        /*
-        UIModalOps* ops = GetSubsystem<UIModalOps>();
 
-        if (eulaAgreementConfirmed_)
-            ops->ShowActivation();
-        else
-            ops->ShowEulaAgreement();
-        */
+        SendEvent(E_LICENSE_ACTIVATIONREQUIRED);
+        return;
     }
     else
     {
@@ -76,12 +96,7 @@ void LicenseSystem::LicenseAgreementConfirmed()
 {
     eulaAgreementConfirmed_ = true;
 
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
-    String eulaConfirmedFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
-    eulaConfirmedFilePath = AddTrailingSlash(eulaConfirmedFilePath);
-    eulaConfirmedFilePath += "EulaConfirmed";
-
-    SharedPtr<File> file(new File(context_, eulaConfirmedFilePath, FILE_WRITE));
+    SharedPtr<File> file(new File(context_, eulaAgreementPath_, FILE_WRITE));
     file->WriteInt(1);
     file->Close();
 
@@ -126,14 +141,11 @@ bool LicenseSystem::LoadLicense()
     ResetLicense();
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
-    String licenseFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
-    licenseFilePath = AddTrailingSlash(licenseFilePath);
-    licenseFilePath += "AtomicLicense";
 
-    if (!filesystem->FileExists(licenseFilePath))
+    if (!filesystem->FileExists(licenseFilePath_))
         return false;
 
-    SharedPtr<File> file(new File(context_, licenseFilePath, FILE_READ));
+    SharedPtr<File> file(new File(context_, licenseFilePath_, FILE_READ));
 
     file->ReadInt(); // version
 
@@ -183,19 +195,7 @@ bool LicenseSystem::ValidateKey(const String& key)
 
 void LicenseSystem::SaveLicense()
 {
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
-    String licenseFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
-    licenseFilePath = AddTrailingSlash(licenseFilePath);
-
-    if (!filesystem->DirExists(licenseFilePath))
-    {
-        Poco::File dirs(licenseFilePath.CString());
-        dirs.createDirectories();
-    }
-
-    licenseFilePath += "AtomicLicense";
-
-    SharedPtr<File> file(new File(context_, licenseFilePath, FILE_WRITE));
+    SharedPtr<File> file(new File(context_, licenseFilePath_, FILE_WRITE));
     file->WriteInt(1); // version
     file->WriteString(key_);
 
@@ -214,13 +214,14 @@ void LicenseSystem::RemoveLicense()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
 
-    String licenseFilePath = filesystem->GetAppPreferencesDir("AtomicEditor", "License");
-    licenseFilePath = AddTrailingSlash(licenseFilePath);
-    licenseFilePath += "AtomicLicense";
-
-    if (filesystem->FileExists(licenseFilePath))
+    if (filesystem->FileExists(licenseFilePath_))
     {
-        filesystem->Delete(licenseFilePath);
+        filesystem->Delete(licenseFilePath_);
+    }
+
+    if (filesystem->FileExists(licenseCachePath_))
+    {
+        filesystem->Delete(licenseCachePath_);
     }
 }
 
@@ -237,6 +238,24 @@ void LicenseSystem::RequestServerVerification(const String& key)
         LOGERROR("LicenseSystem::RequestServerLicense - request already exists");
         return;
     }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    if (fileSystem->FileExists(licenseCachePath_))
+    {
+        Time* time = GetSubsystem<Time>();
+        unsigned currentTime = time->GetTimeSinceEpoch();
+        unsigned fileTime = fileSystem->GetLastModifiedTime(licenseCachePath_);
+        unsigned deltaMinutes = (currentTime - fileTime)/60;
+        if (deltaMinutes < 1)
+        {
+            LOGINFOF("%u minutes, using cached license", deltaMinutes);
+            SendEvent(E_LICENSE_SUCCESS);
+            return;
+        }
+    }
+
+    LOGINFO("LicenseSystem::RequestServerLicense - requesting verification");
 
     key_ = key;
     CurlManager* cm = GetSubsystem<CurlManager>();
@@ -347,6 +366,21 @@ SharedPtr<CurlRequest>& LicenseSystem::Deactivate()
 
 }
 
+void LicenseSystem::CreateOrUpdateLicenseCache()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    Time* time = GetSubsystem<Time>();
+
+    if (!fileSystem->FileExists(licenseCachePath_))
+    {
+        SharedPtr<File> file(new File(context_, licenseCachePath_, FILE_WRITE));
+        file->WriteInt(1);
+        file->Close();
+    }
+
+    fileSystem->SetLastModifiedTime(licenseCachePath_, time->GetTimeSinceEpoch());
+}
+
 void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventData)
 {
 
@@ -436,14 +470,9 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
                     SaveLicense();
                 }
 
-                //if (!HasPlatformLicense())
-                //{
-                //    UIModalOps* ops = GetSubsystem<UIModalOps>();
-                //    if (!ops->ModalActive())
-                //        ops->ShowPlatformsInfo();
+                CreateOrUpdateLicenseCache();
 
-               // }
-
+                SendEvent(E_LICENSE_SUCCESS);
             }
 
         }

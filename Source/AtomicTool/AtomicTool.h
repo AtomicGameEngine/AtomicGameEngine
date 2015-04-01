@@ -30,6 +30,11 @@ public:
 
 private:
 
+    void HandleLicenseEulaRequired(StringHash eventType, VariantMap& eventData);
+    void HandleLicenseActivationRequired(StringHash eventType, VariantMap& eventData);
+    void HandleLicenseSuccess(StringHash eventType, VariantMap& eventData);
+    void HandleLicenseError(StringHash eventType, VariantMap& eventData);
+
     void HandleCommandFinished(StringHash eventType, VariantMap& eventData);
     void HandleCommandError(StringHash eventType, VariantMap& eventData);
 
