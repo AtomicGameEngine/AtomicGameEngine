@@ -8,7 +8,7 @@
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "atomic-cli-mac-data" : "file:atomic-cli-windows-data"
+    "atomic-cli-windows-data" : "http://docs.atomicgameengine.com/npm/atomic-cli-windows-data-0.0.1.tgz"
   },
   "description": "Windows dependencies for atomic-cli package",
   "engines": {
@@ -23,6 +23,6 @@
   "name": "atomic-cli-windows",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.0.1",
-  "os" : ["win32"]
+  "os" : ["win32"],
+  "version": "0.0.3"
 }

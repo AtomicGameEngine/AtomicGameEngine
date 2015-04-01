@@ -17,7 +17,7 @@
   },
   "optionalDependencies" : {
     "atomic-cli-mac" : "0.0.3",
-    "atomic-cli-windows" : "0.0.1"
+    "atomic-cli-windows" : "0.0.3"
   },
   "description": "CLI for the Atomic Game Engine",
   "engines": {
@@ -33,5 +33,5 @@
   "name": "atomic-cli",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.2.6"
+  "version": "0.2.9"
 }
