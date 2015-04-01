@@ -5,7 +5,11 @@ try {
   var platform_cli = require('atomic-cli-mac');
 }
 catch (e) {
-  console.log(e);
+}
+try {
+  var platform_cli = require('atomic-cli-windows');
+}
+catch (e) {
 }
 
 var atomiceditor = function (flags, opts) {

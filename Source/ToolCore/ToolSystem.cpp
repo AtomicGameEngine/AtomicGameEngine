@@ -5,6 +5,7 @@
 
 #include "Platform/PlatformWeb.h"
 #include "Platform/PlatformMac.h"
+#include "Platform/PlatformWindows.h"
 #include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
@@ -27,6 +28,7 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     // platform registration
     RegisterPlatform(new PlatformMac(context));
     RegisterPlatform(new PlatformWeb(context));
+    RegisterPlatform(new PlatformWindows(context));
 }
 
 ToolSystem::~ToolSystem()

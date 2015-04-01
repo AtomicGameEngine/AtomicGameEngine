@@ -9,13 +9,20 @@ try {
   var platform_cli = require('atomic-cli-mac');
 }
 catch (e) {
-  console.log(e);
+}
+try {
+  var platform_cli = require('atomic-cli-windows');
+}
+catch (e) {
 }
 
 var mode = process.env.ATOMIC_GAME_ENGINE_ENV || 'production';
-if (mode == 'dev')
-  platform_cli.ATOMICTOOL_BIN = "/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicTool/AtomicTool"
-
+if (mode == 'dev') {
+  if (process.platform == 'darwin')
+    platform_cli.ATOMICTOOL_BIN = "/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicTool/AtomicTool";
+  else
+    platform_cli.ATOMICTOOL_BIN = "C:/Dev/atomic/AtomicGameEngine-build/Source/AtomicTool/AtomicTool.exe";
+}
 // Commands ----------------------
 
 var newProject = function(folder) {
@@ -54,6 +61,10 @@ var run = function (platform, opts) {
               open(path.resolve("Build/Mac-Build/AtomicPlayer.app"));
               break;
 
+          case "windows":
+              var open = require("open");
+              open(path.resolve("Build/Windows-Build/AtomicPlayer.exe"));
+              break;
         }
     };
 
