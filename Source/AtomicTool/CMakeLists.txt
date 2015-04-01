@@ -1,10 +1,10 @@
 set (ATOMIC_TOOL_SOURCES AtomicTool.cpp AtomicTool.h)
 
 if (MSVC)
-    set (EXE_TYPE WIN32)
+    add_definitions(-DATOMIC_WIN32_CONSOLE)
 endif()
 
-add_executable(AtomicTool ${EXE_TYPE} ${ATOMIC_TOOL_SOURCES})
+add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
 target_link_libraries(AtomicTool ${ATOMIC_LINK_LIBRARIES} ToolCore Poco)
 

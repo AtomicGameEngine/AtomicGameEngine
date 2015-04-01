@@ -28,6 +28,8 @@ public:
     /// Cleanup after the main loop. Run the script's stop function if it exists.
     virtual void Stop();
 
+    void ErrorExit(const String& message = String::EMPTY);
+
 private:
 
     void HandleLicenseEulaRequired(StringHash eventType, VariantMap& eventData);

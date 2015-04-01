@@ -280,6 +280,24 @@ void AtomicTool::Stop()
 
 }
 
+void AtomicTool::ErrorExit(const String& message)
+{
+    engine_->Exit(); // Close the rendering window
+    exitCode_ = EXIT_FAILURE;
+
+    // Only for WIN32, otherwise the error messages would be double posted on Mac OS X and Linux platforms
+    if (!message.Length())
+    {
+        #ifdef WIN32
+        Atomic::ErrorExit(startupErrors_.Length() ? startupErrors_ :
+            "Application has been terminated due to unexpected error.", exitCode_);
+        #endif
+    }
+    else
+        Atomic::ErrorExit(message, exitCode_);
+}
+
+
 
 }
 

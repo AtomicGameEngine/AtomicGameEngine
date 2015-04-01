@@ -87,7 +87,7 @@ var run = function (platform, opts) {
 var exec = function (command, flags, opts) {
     opts = opts || {};
     if (opts.verbose !== false) {
-        console.log([command].concat(flags).join(" "));
+        //console.log([command].concat(flags).join(" "));
     }
 
     var deferred = Q.defer();

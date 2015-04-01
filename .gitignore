@@ -1,5 +1,6 @@
 
 *.user
+*.log
 Bin/Atomic.d.ts
 Bin/Atomic.js
 Bin/*.pak
