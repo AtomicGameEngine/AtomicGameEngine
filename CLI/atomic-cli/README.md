@@ -27,7 +27,7 @@ Command line tools for the [Atomic Game Engine](http://www.atomicgameengine.com)
 atomic-cli must be installed and activated
 
 ```
-npm install -g atomic-cli
+npm install atomic-cli -g
 atomic-cli activate
 ```
 
@@ -41,7 +41,8 @@ Usage: atomic-cli
     activate                  activate
     deactivate                deactivates
     new <folder>              creates project in the specified folder
-    add <platform>            adds a platform to the project (mac|windows|ios|android|web)
+    add <platform>            adds a platform to the project
+                              (mac|windows|ios|android|web)
     run [options] <platform>  builds and runs the project on a specified platform
     edit [path_to_project]    opens the Atomic Editor loading specified project
 

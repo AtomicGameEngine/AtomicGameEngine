@@ -22,6 +22,7 @@
     "atomic-cli-windows" : "latest"
   },
   "description": "CLI for the Atomic Game Engine",
+  "keywords": ["game engine", "webgl", "android", "ios", "html5"],
   "engines": {
     "node": ">=0.8.0"
   },
@@ -35,5 +36,5 @@
   "name": "atomic-cli",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.3.3"
+  "version": "0.3.4"
 }
