@@ -7,7 +7,7 @@
   "files" : ["data"],
   "main": "./data/index.js",
   "name": "atomic-cli-windows-data",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "os" : ["win32"]
 
 }

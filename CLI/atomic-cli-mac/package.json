@@ -8,7 +8,7 @@
     "url": "https://github.com/AtomicGameEngine/AtomicGameEngine/issues"
   },
   "dependencies": {
-    "atomic-cli-mac-data" : "http://docs.atomicgameengine.com/npm/atomic-cli-mac-data-0.0.3.tgz"
+    "atomic-cli-mac-data" : "http://docs.atomicgameengine.com/npm/atomic-cli-mac-data-0.0.4.tgz"
   },
   "description": "Mac dependencies for atomic-cli package",
   "engines": {
@@ -23,6 +23,6 @@
   "name": "atomic-cli-mac",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "os" : ["darwin"]
 }
