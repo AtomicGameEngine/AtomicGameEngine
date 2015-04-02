@@ -5,6 +5,7 @@
 
 // https://github.com/tj/commander.js
 var path = require("path");
+var fs = require("fs");
 var program = require('commander');
 var cli = require("atomic-cli")
 var open = require("open");
@@ -13,9 +14,32 @@ var prompt = require('prompt');
 prompt.message = "";
 prompt.delimiter = "";
 
+var saveAtomicConfig = function(activated) {
+
+  var directory = process.env["HOME"] + "/.atomicgameengine";
+
+  if (!fs.existsSync(directory)) {
+    fs.mkdir(directory);
+  }
+
+  var config = {
+    "nodePath" : process.execPath,
+    "cliScript" : __filename,
+    "activated" : activated
+  }
+
+  fs.writeFile(directory + "/config.json", JSON.stringify(config, null, 4), function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        //console.log("config saved to " + directory + "/config.json");
+      }
+  });
+
+}
+
 program
   .version('0.0.1')
-  .parse(process.argv);
 
 // activation command
 program
@@ -34,7 +58,10 @@ program
               console.log ("Opening Atomic Store in default browser window");
               open("https://store.atomicgameengine.com/site");
             } else {
-              cli.activate(productkey);
+              cli.activate(productkey)
+              .then(function () {
+                saveAtomicConfig(true);
+              })
             }
           });
         } else if (eulaconfirm == 'v') {
@@ -49,7 +76,10 @@ program
   .command('deactivate')
   .description('deactivates and returns a product activation to the server')
   .action(function(){
-    cli.deactivate();
+    cli.deactivate().
+    then(function() {
+      saveAtomicConfig(false);
+    })
   });
 
 
@@ -84,9 +114,13 @@ program
 
 
 program
-  .command('run <platform> [no-build]')
+  .command('run <platform>')
+  .option('--project <path>')
   .description('runs the project on a specified platform')
-  .action(function(platform){
+  .action(function(platform, options) {
+    if(options.project) {
+      process.chdir(options.project)
+    }
     cli.run(platform)
     .then(function () {
     })
@@ -97,10 +131,12 @@ program
   });
 
 program
-  .command('edit [path-to-project]')
+  .command('edit [path_to_project]')
   .description('edits the project in the cwd or on at a specified path')
-  .action(function(options){
-    cli.atomiceditor(["-project", process.cwd()], {output:true});
+  .action(function(path_to_project, options){
+
+    var path = path_to_project || process.cwd();
+    cli.atomiceditor(["-project", path], {output:true});
   });
 
   program.parse(process.argv);
