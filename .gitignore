@@ -1,5 +1,6 @@
 
 *.user
+*.log
 Bin/Atomic.d.ts
 Bin/Atomic.js
 Bin/*.pak
@@ -10,3 +11,4 @@ Docs/out/*
 Docs/node_modules/*
 Data/AtomicEditor/Deployment/Web/AtomicPlayer.js
 Data/AtomicEditor/Deployment/IOS/AtomicPlayer.app/AtomicPlayer
+node_modules/*

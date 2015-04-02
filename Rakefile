@@ -23,8 +23,8 @@ if $HOST_OS == "darwin"
   $QT_BIN_DIR = "#{ENV["QT_SDK"]}/bin"
 else
   $QT_BIN_DIR = "C:\\Qt\\5.4\\msvc2013_64\\bin"
-  QT_CREATOR_BIN_DIR = "C:\\Qt\\Tools\\QtCreator\\bin"  
-  ENV['PATH'] = "#{QT_CREATOR_BIN_DIR};" + ENV['PATH']    
+  QT_CREATOR_BIN_DIR = "C:\\Qt\\Tools\\QtCreator\\bin"
+  ENV['PATH'] = "#{QT_CREATOR_BIN_DIR};" + ENV['PATH']
 end
 
 
@@ -43,11 +43,11 @@ namespace :android  do
       sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} ANDROID"
       sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
-    end 
-    
+    end
+
   end
 
-end  
+end
 
 namespace :ios do
 
@@ -63,11 +63,11 @@ namespace :ios do
       sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} IOS"
       sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
       sh "xcodebuild -configuration Release"
-    end 
-    
+    end
+
   end
 
-end  
+end
 
 
 namespace :web do
@@ -82,35 +82,35 @@ namespace :web do
 
     Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
       sh "#{BUILD_FOLDER}/JSBind #{$RAKE_ROOT} WEB"
-      sh "cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+      sh "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
       sh "make -j8"
-    end 
+    end
 
     Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer") do
       sh "mv AtomicPlayer AtomicPlayer.bc"
-      sh "emcc -O3 --llvm-lto 1 --memory-init-file 0 -s VERBOSE=0 -s USE_SDL=2 -s ASM_JS=1 -s ASSERTIONS=1 -s OUTLINING_LIMIT=20000 -s TOTAL_MEMORY=520093696 --closure 0 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
+      sh "emcc -O3 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=268435456 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
     end
 
   end
 
-end  
+end
 
 
 namespace :macosx do
 
-  
+
   CMAKE_MACOSX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Build"
   MACOSX_PACKAGE_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Package"
 
   task :clean do
 
     folders = ["#{CMAKE_MACOSX_BUILD_FOLDER}", "#{MACOSX_PACKAGE_FOLDER}",
-               "#{ARTIFACTS_FOLDER}/Android_Build", "#{ARTIFACTS_FOLDER}/Web_Build",  
+               "#{ARTIFACTS_FOLDER}/Android_Build", "#{ARTIFACTS_FOLDER}/Web_Build",
                "#{ARTIFACTS_FOLDER}/AtomicExamples", "#{ARTIFACTS_FOLDER}/Docs",
                "#{ARTIFACTS_FOLDER}/Examples",  "#{ARTIFACTS_FOLDER}/AtomicTiled_Build",
                "#{ARTIFACTS_FOLDER}/IOS_Build", "#{ARTIFACTS_FOLDER}/IOSDeploy_Build"]
 
-    for index in 0 ... folders.size    
+    for index in 0 ... folders.size
 
         if Dir.exists?(folders[index])
             puts "rm -rf #{folders[index]}"
@@ -120,8 +120,8 @@ namespace :macosx do
         if Dir.exists?(folders[index])
             abort("Unable to clean #{folders[index]}")
         end
-    
-    end           
+
+    end
 
   end
 
@@ -131,7 +131,7 @@ namespace :macosx do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
       sh "cmake ../../ -DCMAKE_BUILD_TYPE=Release"
-    end 
+    end
 
 	end
 
@@ -142,7 +142,7 @@ namespace :macosx do
       sh "cp ./Source/AtomicJS/JSBind/JSBind #{BUILD_FOLDER}/JSBind"
     end
 
-  end 
+  end
 
 	task :generate_javascript_bindings => "macosx:jsbind" do
 
@@ -165,7 +165,7 @@ namespace :macosx do
       sh "cp -r out #{ARTIFACTS_FOLDER}/Docs"
     end
 
-  end  
+  end
 
   task :generate_examples do
 
@@ -182,14 +182,14 @@ namespace :macosx do
       sh "mkdir Examples"
 
       sh "git clone https://github.com/AtomicGameEngine/AtomicExamples"
-      
+
       Dir.chdir("AtomicExamples") do
         sh "git archive master | tar -x -C #{ARTIFACTS_FOLDER}/Examples"
       end
 
     end
 
-  end  
+  end
 
 	task :player => "macosx:generate_javascript_bindings" do
 
@@ -204,8 +204,18 @@ namespace :macosx do
   task :editor => ["macosx:player"] do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
-      
-      sh "make -j8 AtomicEditor"
+
+      sh "make -j8 BuildEditorFiles"
+
+    end
+
+  end
+
+  task :atomictool => ["macosx:player", "macosx:editor"] do
+
+    Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
+
+      sh "make -j8 AtomicTool"
 
     end
 
@@ -222,17 +232,17 @@ namespace :package do
                           'ios:player',
                           "atomictiled:osx",
                           'macosx:editor',
-                          'macosx:generate_examples', 
+                          'macosx:atomictool',
+                          'macosx:generate_examples',
                           'macosx:generate_docs'] do
 
-      FileUtils.mkdir_p(MACOSX_PACKAGE_FOLDER)                    
+      FileUtils.mkdir_p(MACOSX_PACKAGE_FOLDER)
 
       MAC_PLAYER_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.app"
       MAC_EDITOR_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicEditor/AtomicEditor.app"
 
       # Resources
-      COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"    
-      EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
+      COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
       EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
       # Project Templates
@@ -247,7 +257,7 @@ namespace :package do
       DOCS_FOLDER_SRC = "#{ARTIFACTS_FOLDER}/Docs"
 
       MAC_EDITOR_APP_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app"
-      MAC_EDITOR_APP_RESOURCE_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app/Contents/Resources"      
+      MAC_EDITOR_APP_RESOURCE_FOLDER_DST = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app/Contents/Resources"
 
       # Copy the Editor application
       sh "cp -r #{MAC_EDITOR_APP_FOLDER_SRC} #{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app"
@@ -259,7 +269,6 @@ namespace :package do
 
       # Copy Resources
       sh "cp -r #{COREDATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/CoreData"
-      sh "cp -r #{EDITORRESOURCES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/EditorData"
 
       # Copy Deployment
 
@@ -302,11 +311,13 @@ namespace :package do
 
       FileUtils.cp("#{CMAKE_IOSDEPLOY_BUILD_FOLDER}/ios-deploy", "#{APPLICATIONS_FOLDER_DST}/CommandLine/ios-deploy")
 
+      FileUtils.cp("#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicTool/AtomicTool", "#{APPLICATIONS_FOLDER_DST}/CommandLine/AtomicTool")
+
   end
 
   task :macosx_editor do
 
-    EDITOR_APP_FOLDER = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app" 
+    EDITOR_APP_FOLDER = "#{MACOSX_PACKAGE_FOLDER}/AtomicEditor.app"
     if (!File.file?("#{EDITOR_APP_FOLDER}/Contents/Resources/Deployment/Win64/AtomicPlayer.exe"))
       abort("Missing Windows player, please run rake package:windows_editor from Windows")
     end
@@ -315,30 +326,29 @@ namespace :package do
 
       if (File.file?("AtomicEditor_MacOSX.zip"))
         sh "rm AtomicEditor_MacOSX.zip"
-      end 
+      end
 
       if (File.file?("AtomicEditor_MacOSX.zip"))
         abort ("Couldn't remove editor")
-      end       
+      end
 
       sh "zip -r AtomicEditor_MacOSX.zip ./AtomicEditor.app"
       sh "zip -T AtomicEditor_MacOSX.zip"
 
     end
 
-
-
   end
 
 
-  task :windows_preflight => ['windows:clean', 
-                              'windows:editor', 
+  task :windows_preflight => ['windows:clean',
+                              'windows:editor',
+                              'windows:atomictool',
                               'atomictiled:windows' ] do
-                          
+
 
     ATOMICBUILDBOX_SOURCE_DIR =  "#{$RAKE_ROOT}/../AtomicBuildBox/Windows/x64"
-    EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor" 
-    
+    EDITOR_APP_FOLDER_DST = "#{WINDOWS_PACKAGE_FOLDER}/AtomicEditor"
+
     FileUtils.mkdir_p(EDITOR_APP_FOLDER_DST)
 
     PLAYER_APP_EXE_SRC = "#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicPlayer/AtomicPlayer.exe"
@@ -347,8 +357,7 @@ namespace :package do
     DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment/Win64"
 
     # Resources
-    COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"    
-    EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
+    COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
     EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
     # Project Templates
@@ -356,14 +365,17 @@ namespace :package do
 
     #Examples
     #Example info could possibly go in the AtomicExamples repo
-    EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"    
-    
+    EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"
+
+    # This shouldn't ne in root, used for deployment atm, however the editor can use coredata from pak
     FileUtils.cp_r("#{COREDATA_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/CoreData")
-    FileUtils.cp_r("#{EDITORRESOURCES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/EditorData")
+
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/EditorData.pak", "#{EDITOR_APP_FOLDER_DST}/EditorData.pak")
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/CoreData.pak", "#{EDITOR_APP_FOLDER_DST}/CoreData.pak")
 
     FileUtils.cp_r("#{PROJECTTEMPLATES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ProjectTemplates")
     FileUtils.cp_r("#{EXAMPLEINFO_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ExampleInfo")
-    
+
     FileUtils.mkdir_p("#{DEPLOYMENT_FOLDER}")
     FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/D3DCompiler_47.dll", "#{DEPLOYMENT_FOLDER}/D3DCompiler_47.dll")
     FileUtils.cp("#{PLAYER_APP_EXE_SRC}", "#{DEPLOYMENT_FOLDER}/AtomicPlayer.exe")
@@ -378,13 +390,16 @@ namespace :package do
     FileUtils.cp("#{ATOMICTILED_BUILD_DIR}/tiled.exe", "#{ATOMICTILED_DEPLOYED_DIR}")
     FileUtils.cp("#{ATOMICTILED_BUILD_DIR}/tiled.dll", "#{ATOMICTILED_DEPLOYED_DIR}")
 
-    ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH'] 
+    ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH']
     Dir.chdir(ATOMICTILED_DEPLOYED_DIR) do
       sh "windeployqt.exe --release #{ATOMICTILED_DEPLOYED_DIR}/tiled.exe"
       FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/msvcp120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcp120.dll")
       FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/msvcr120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/msvcr120.dll")
       FileUtils.cp("#{ATOMICBUILDBOX_SOURCE_DIR}/vccorlib120.dll", "#{ATOMICTILED_DEPLOYED_DIR}/vccorlib120.dll")
     end
+
+    FileUtils.mkdir_p("#{EDITOR_APP_FOLDER_DST}/Applications/CommandLine")
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicTool/AtomicTool.exe", "#{EDITOR_APP_FOLDER_DST}/Applications/CommandLine/AtomicTool.exe")
 
   end
 
@@ -397,13 +412,13 @@ namespace :package do
 
       if (File.exists?("AtomicEditor_Windows.zip"))
         FileUtils.rm("AtomicEditor_Windows.zip")
-      end 
+      end
 
       if (File.exists?("AtomicEditor_Windows.zip"))
         abort("Unable to remove AtomicEditor_Windows.zip")
-      end 
- 
-    end  
+      end
+
+    end
 
     DEPLOYMENT_FOLDER = "#{EDITOR_APP_FOLDER_DST}/Deployment"
     FileUtils.cp_r("#{MAC_ARTIFACTS_SRC}/Deployment/Android", "#{EDITOR_APP_FOLDER_DST}/Deployment/Android")
@@ -425,7 +440,7 @@ namespace :package do
       sh "\"C:\\Program Files\\7-Zip\\7z.exe\" a -tzip AtomicEditor_Windows.zip AtomicEditor"
       sh "\"C:\\Program Files\\7-Zip\\7z.exe\" t AtomicEditor_Windows.zip"
 
-    end  
+    end
 
   end
 
@@ -444,17 +459,17 @@ namespace :windows do
                "#{ARTIFACTS_FOLDER}/AtomicExamples", "#{ARTIFACTS_FOLDER}/Docs",
                "#{ARTIFACTS_FOLDER}/Examples",  "#{ARTIFACTS_FOLDER}/AtomicTiled_Build"]
 
-    for index in 0 ... folders.size    
+    for index in 0 ... folders.size
 
         if Dir.exists?(folders[index])
-            FileUtils.rmtree(folders[index])          
+            FileUtils.rmtree(folders[index])
         end
 
         if Dir.exists?(folders[index])
             abort("Unable to clean #{folders[index]}")
         end
-    
-    end           
+
+    end
 
   end
 
@@ -464,7 +479,7 @@ namespace :windows do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
       sh "cmake ../../ -G\"NMake Makefiles JOM\" -DCMAKE_BUILD_TYPE=Release"
-    end 
+    end
 
 	end
 
@@ -490,8 +505,19 @@ namespace :windows do
   task :editor => "windows:player" do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
-      
+
       sh "jom -j4 AtomicEditor"
+      sh "jom BuildEditorFiles"
+
+    end
+
+  end
+
+  task :atomictool => "windows:editor" do
+
+    Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
+
+      sh "jom -j4 AtomicTool"
 
     end
 
@@ -504,26 +530,26 @@ task :iosdeploy do
   CMAKE_IOSDEPLOY_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/ios-deploy"
 
   if Dir.exists?(CMAKE_IOSDEPLOY_BUILD_FOLDER)
-      FileUtils.rmtree(CMAKE_IOSDEPLOY_BUILD_FOLDER)          
+      FileUtils.rmtree(CMAKE_IOSDEPLOY_BUILD_FOLDER)
   end
 
   Dir.chdir("#{ARTIFACTS_FOLDER}") do
 
     sh "git clone https://github.com/AtomicGameEngine/ios-deploy"
-    
+
     Dir.chdir("ios-deploy") do
       sh "make"
     end
 
   end
 
-end  
+end
 
 namespace :atomictiled do
 
   task :windows do
 
-    ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH']    
+    ENV['PATH'] = "#{$QT_BIN_DIR};" + ENV['PATH']
 
     FileUtils.mkdir_p(ATOMICTILED_BUILD_DIR)
 

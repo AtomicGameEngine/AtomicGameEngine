@@ -22,7 +22,6 @@
 
 #include "Precompiled.h"
 
-#include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
@@ -36,6 +35,11 @@
 #include "../Graphics/VertexBuffer.h"
 
 #include "../DebugNew.h"
+
+#include "../Scene/Node.h"
+#ifdef ATOMIC_3D
+#include "../Atomic3D/AnimatedModel.h"
+#endif
 
 namespace Atomic
 {
@@ -242,6 +246,7 @@ void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool dep
     }
 }
 
+#ifdef ATOMIC_3D
 void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest)
 {
     const Vector<Bone>& bones = skeleton.GetBones();
@@ -275,6 +280,8 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
         AddLine(start, end, uintColor, depthTest);
     }
 }
+
+#endif
 
 void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
     unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest)

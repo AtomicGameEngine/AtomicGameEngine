@@ -43,6 +43,13 @@ namespace Atomic
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
 #endif
+// SDL2 needs a main loop to be running during initialization
+// otherwise EGL will error, so this is the main loop used during init
+// and is canceled once everything is initialized
+void InitializationMainLoop()
+{
+
+}
 void RunFrame(void* data)
 {
     static_cast<Engine*>(data)->RunFrame();
@@ -69,6 +76,10 @@ int Application::Run()
     // Thus, the try-catch block below should be optimised out except in Debug build configuration
     try
     {
+  #if defined(EMSCRIPTEN)
+        emscripten_set_main_loop(InitializationMainLoop, 0, 0);
+  #endif
+
         Setup();
         if (exitCode_)
             return exitCode_;
@@ -95,6 +106,9 @@ int Application::Run()
         #if defined(IOS)
         SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, engine_);
         #elif defined(EMSCRIPTEN)
+        // cancel the initialization loop
+        emscripten_cancel_main_loop();
+        // and run the engine loop
         emscripten_set_main_loop_arg(RunFrame, engine_, 0, 1);
         #endif
         #endif

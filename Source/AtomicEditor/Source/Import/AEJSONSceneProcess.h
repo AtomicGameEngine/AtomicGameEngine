@@ -12,7 +12,7 @@
 #include <Atomic/Graphics/Technique.h>
 #include <Atomic/Graphics/Texture2D.h>
 #include <Atomic/Graphics/Material.h>
-#include <Atomic/Graphics/Model.h>
+#include <Atomic/Atomic3D/Model.h>
 #include <Atomic/Scene/Scene.h>
 
 using namespace Atomic;

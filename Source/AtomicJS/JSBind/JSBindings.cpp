@@ -96,7 +96,11 @@ void JSBindings::EmitJSModules(const String& rootpath)
     for (unsigned i = 0; i < modules_.Size(); i++)
     {
         JSBModule* module = modules_.At(i);
+        if (module->Requires("3D"))
+            source += "\n#ifdef ATOMIC_3D";
         source.AppendWithFormat("\n   jsb_preinit_%s(vm);", module->name_.ToLower().CString());
+        if (module->Requires("3D"))
+            source += "\n#endif //ATOMIC_3D\n";
     }
 
     source += "\n}\n\n";
@@ -110,7 +114,11 @@ void JSBindings::EmitJSModules(const String& rootpath)
     for (unsigned i = 0; i < modules_.Size(); i++)
     {
         JSBModule* module = modules_.At(i);
+        if (module->Requires("3D"))
+            source += "\n#ifdef ATOMIC_3D";
         source.AppendWithFormat("\n   jsb_init_%s(vm);", module->name_.ToLower().CString());
+        if (module->Requires("3D"))
+            source += "\n#endif //ATOMIC_3D\n";
     }
 
     source += "\n}\n\n";
@@ -187,7 +195,7 @@ void JSBindings::Initialize()
 
     if (JSBind::PLATFORM == "WEB")
     {
-        JSONValue jmodulesExclude = json.GetChild("modulePlatformExclude");
+        JSONValue jmodulesExclude = json.GetChild("moduleExclude");
         JSONValue jexcludes = jmodulesExclude.GetChild("WEB");
 
         for (unsigned i = 0; i < jexcludes.GetSize(); i++)

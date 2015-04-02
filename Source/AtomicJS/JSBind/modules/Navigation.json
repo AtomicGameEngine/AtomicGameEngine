@@ -1,5 +1,6 @@
 {
 	"name" : "Navigation",
+	"requires" : ["3D"],
 	"sources" : ["Navigation"],
 	"includes" : ["<Atomic/Scene/Node.h>"],
 	"classes" : ["Navigable", "NavigationMesh", "OffMeshConnection"] 

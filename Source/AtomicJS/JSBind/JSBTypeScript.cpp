@@ -256,6 +256,7 @@ void JSBTypeScript::Emit(const String& path)
     modules.Push("Scene");
     modules.Push("UI");
     modules.Push("Atomic2D");
+    modules.Push("Atomic3D");
     modules.Push("Audio");
     modules.Push("Graphics");
     modules.Push("Input");

@@ -50,7 +50,7 @@ public:
     /// Initialize the engine and run the main loop, then return the application exit code. Catch out-of-memory exceptions while running.
     int Run();
     /// Show an error message (last log message if empty), terminate the main loop, and set failure exit code.
-    void ErrorExit(const String& message = String::EMPTY);
+    virtual void ErrorExit(const String& message = String::EMPTY);
 
 protected:
     /// Handle log message.

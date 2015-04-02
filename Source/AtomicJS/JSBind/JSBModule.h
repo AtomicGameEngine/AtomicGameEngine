@@ -38,6 +38,8 @@ public:
     void PreprocessHeaders();
     void VisitHeaders();
 
+    bool Requires(const String& requirement) { return requirements_.Contains(requirement); }
+
     void EmitSource(const String& filepath);
 
     void RegisterConstant(const String& name)
@@ -55,6 +57,7 @@ public:
     Vector<JSBEnum*> enums_;
     Vector<String> constants_;
     JSBindings* bindings_;
+    Vector<String> requirements_;
 
     String source_;
 

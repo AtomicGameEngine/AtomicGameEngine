@@ -26,7 +26,7 @@
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/Log.h"
-#include "../Graphics/Model.h"
+#include "../Atomic3D/Model.h"
 #include "../Core/Mutex.h"
 #include "../Physics/PhysicsEvents.h"
 #include "../Physics/PhysicsUtils.h"

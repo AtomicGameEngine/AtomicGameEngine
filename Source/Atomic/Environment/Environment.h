@@ -9,6 +9,6 @@
 namespace Atomic
 {
 
-void RegisterEnvironmenttLibrary(Context* context);
+void RegisterEnvironmentLibrary(Context* context);
 
 }

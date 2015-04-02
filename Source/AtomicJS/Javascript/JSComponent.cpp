@@ -461,6 +461,7 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
             duk_pop(ctx);
 
         }
+#ifdef ATOMIC_PHYSICS
         else if (eventType == E_NODECOLLISION)
         {
             // Check collision contacts and see if character is standing on ground (look for a contact that has near vertical normal)
@@ -498,6 +499,7 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
             }
 
         }
+#endif
         else
         {
             duk_push_heapptr(ctx, function);

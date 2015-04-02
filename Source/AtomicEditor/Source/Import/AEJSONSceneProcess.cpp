@@ -16,11 +16,11 @@
 
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Zone.h>
-#include <Atomic/Graphics/AnimatedModel.h>
-#include <Atomic/Graphics/StaticModel.h>
-#include <Atomic/Graphics/LMStaticModel.h>
-#include <Atomic/Graphics/Terrain.h>
-#include <Atomic/Graphics/Animation.h>
+#include <Atomic/Atomic3D/AnimatedModel.h>
+#include <Atomic/Atomic3D/StaticModel.h>
+#include <Atomic/Atomic3D/LMStaticModel.h>
+#include <Atomic/Atomic3D/Terrain.h>
+#include <Atomic/Atomic3D/Animation.h>
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Physics/CollisionShape.h>
 #include <Atomic/Physics/RigidBody.h>

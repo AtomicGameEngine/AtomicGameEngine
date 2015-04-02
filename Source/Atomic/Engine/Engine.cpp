@@ -52,6 +52,9 @@
 #ifdef ATOMIC_ATOMIC2D
 #include "../Atomic2D/Atomic2D.h"
 #endif
+#ifdef ATOMIC_3D
+#include "../Atomic3D/Atomic3D.h"
+#endif
 
 #ifdef ATOMIC_TBUI
 #include "../UI/TBUI.h"
@@ -166,12 +169,18 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (!headless_)
     {
         context_->RegisterSubsystem(new Graphics(context_));
+#ifdef ATOMIC_3D
+        RegisterAtomic3DLibrary(context_);
+#endif
         context_->RegisterSubsystem(new Renderer(context_));
     }
     else
     {
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
+#ifdef ATOMIC_3D
+        RegisterAtomic3DLibrary(context_);
+#endif
     }
 
 #ifdef ATOMIC_ATOMIC2D

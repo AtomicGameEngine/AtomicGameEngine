@@ -58,7 +58,7 @@ AEApplication::AEApplication(Context* context) :
 void AEApplication::Start()
 {
     // refactor this
-    RegisterEnvironmenttLibrary(context_);
+    RegisterEnvironmentLibrary(context_);
 
     Engine* engine = GetSubsystem<Engine>();
     engine->SetAutoExit(false);
@@ -141,11 +141,46 @@ void AEApplication::Start()
         sceneProcess->Process();
         sceneProcess->Write();
     }
+
+    if (cmdLineProjectFile_.Length())
+    {
+        editor->LoadProject(cmdLineProjectFile_);
+    }
 }
 
 void AEApplication::Setup()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
+
+    const Vector<String>& arguments = GetArguments();
+
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1 && arguments[i][0] == '-')
+        {
+            String argument = arguments[i].Substring(1).ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "project" && value.Length())
+            {
+                Vector<String> projectFiles;
+                filesystem->ScanDir(projectFiles, value, "*.atomic", SCAN_FILES, false);
+                if (!projectFiles.Size())
+                {
+                    ErrorExit(ToString("No .atomic project file in %s", value.CString()));
+                    return;
+                }
+                else if (projectFiles.Size() > 1)
+                {
+                    ErrorExit(ToString("Multiple .atomic project files found in %s", value.CString()));
+                    return;
+                }
+
+                cmdLineProjectFile_ = value + "/" + projectFiles[0];
+
+            }
+        }
+    }
 
     engineParameters_["WindowTitle"] = "AtomicEditor";
     engineParameters_["WindowResizable"] = true;
@@ -157,7 +192,6 @@ void AEApplication::Setup()
         engineParameters_["WindowWidth"] = prefs.windowWidth;
         engineParameters_["WindowHeight"] = prefs.windowHeight;
     }
-
 
 #ifdef __APPLE__
     engineParameters_["ResourcePrefixPath"] = "../Resources";

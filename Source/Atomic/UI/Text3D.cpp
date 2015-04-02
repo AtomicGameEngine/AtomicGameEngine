@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#ifdef ATOMIC_3D
+
 #include "Precompiled.h"
 #include "../Graphics/Camera.h"
 #include "../Core/Context.h"
@@ -584,3 +586,5 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
 }
 
 }
+
+#endif
