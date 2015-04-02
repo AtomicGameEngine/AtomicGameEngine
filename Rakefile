@@ -243,7 +243,6 @@ namespace :package do
 
       # Resources
       COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
-      EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
       EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
       # Project Templates
@@ -270,7 +269,6 @@ namespace :package do
 
       # Copy Resources
       sh "cp -r #{COREDATA_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/CoreData"
-      sh "cp -r #{EDITORRESOURCES_FOLDER_SRC} #{MAC_EDITOR_APP_RESOURCE_FOLDER_DST}/EditorData"
 
       # Copy Deployment
 
