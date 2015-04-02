@@ -12,7 +12,8 @@
     "commander" : "latest",
     "update-notifier" : "latest",
     "open": "latest",
-    "prompt": "latest"
+    "prompt": "latest",
+    "osenv" : "latest"
   },
   "devDependencies" : {
   },

@@ -10,13 +10,14 @@ var program = require('commander');
 var cli = require("atomic-cli")
 var open = require("open");
 var prompt = require('prompt');
+var osenv = require('osenv')
 
 prompt.message = "";
 prompt.delimiter = "";
 
 var saveAtomicConfig = function(activated) {
 
-  var directory = process.env["HOME"] + "/.atomicgameengine";
+  var directory = osenv.home() + "/.atomicgameengine";
 
   if (!fs.existsSync(directory)) {
     fs.mkdir(directory);
