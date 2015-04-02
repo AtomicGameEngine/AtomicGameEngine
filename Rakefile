@@ -360,7 +360,6 @@ namespace :package do
 
     # Resources
     COREDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicPlayer/Resources/CoreData"
-    EDITORRESOURCES_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor/Resources/EditorData"
     EDITORAPPLICATIONDATA_FOLDER_SRC = "#{$RAKE_ROOT}/Data/AtomicEditor"
 
     # Project Templates
@@ -370,8 +369,11 @@ namespace :package do
     #Example info could possibly go in the AtomicExamples repo
     EXAMPLEINFO_FOLDER_SRC = "#{EDITORAPPLICATIONDATA_FOLDER_SRC}/ExampleInfo"
 
+    # This shouldn't ne in root, used for deployment atm, however the editor can use coredata from pak
     FileUtils.cp_r("#{COREDATA_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/CoreData")
-    FileUtils.cp_r("#{EDITORRESOURCES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/EditorData")
+
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/EditorData.pak", "#{EDITOR_APP_FOLDER_DST}/EditorData.pak")
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/CoreData.pak", "#{EDITOR_APP_FOLDER_DST}/CoreData.pak")
 
     FileUtils.cp_r("#{PROJECTTEMPLATES_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ProjectTemplates")
     FileUtils.cp_r("#{EXAMPLEINFO_FOLDER_SRC}", "#{EDITOR_APP_FOLDER_DST}/ExampleInfo")
@@ -507,6 +509,7 @@ namespace :windows do
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
 
       sh "jom -j4 AtomicEditor"
+      sh "jom BuildEditorFiles"
 
     end
 
