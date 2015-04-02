@@ -35,5 +35,5 @@
   "name": "atomic-cli",
   "preferGlobal": true,
   "repository": "https://github.com/AtomicGameEngine/AtomicGameEngine",
-  "version": "0.3.1"
+  "version": "0.3.3"
 }
