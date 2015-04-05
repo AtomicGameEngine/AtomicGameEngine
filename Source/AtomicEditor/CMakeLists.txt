@@ -16,6 +16,8 @@ if (APPLE)
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
     set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+elseif(LINUX)
+
 else()
     include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
     add_definitions(-DCURL_STATICLIB)
@@ -25,11 +27,13 @@ endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor ${ATOMIC_LINK_LIBRARIES} AtomicJS Poco nativefiledialog)
+target_link_libraries(AtomicEditor AtomicJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
     target_link_libraries(AtomicEditor curl)
+elseif(LINUX)
+    target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
 else()
     target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
 endif()

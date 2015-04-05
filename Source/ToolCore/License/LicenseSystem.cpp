@@ -108,7 +108,7 @@ void LicenseSystem::LicenseAgreementConfirmed()
 
 String LicenseSystem::GenerateMachineID()
 {
-#ifdef ATOMIC_PLATFORM_OSX
+#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_LINUX) 
     String path = getenv("HOME");
 #else
     wchar_t pathName[MAX_PATH];
@@ -604,4 +604,3 @@ void LicenseSystem::RequestServerActivation(const String& key)
 }
 
 // END LICENSE MANAGEMENT
-

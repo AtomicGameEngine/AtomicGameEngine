@@ -25,7 +25,7 @@ static void AddTypeToFilterName( const char *typebuf, char *filterName, size_t b
         strncat( filterName, SEP, bufsize - len - 1 );
         len += strlen(SEP);
     }
-    
+
     strncat( filterName, typebuf, bufsize - len - 1 );
 }
 
@@ -36,34 +36,34 @@ static void AddFiltersToDialog( GtkWidget *dialog, const char *filterList )
     const char *p_filterList = filterList;
     char *p_typebuf = typebuf;
     char filterName[NFD_MAX_STRLEN] = {0};
-    
+
     if ( !filterList || strlen(filterList) == 0 )
         return;
 
     filter = gtk_file_filter_new();
     while ( 1 )
     {
-        
+
         if ( NFDi_IsFilterSegmentChar(*p_filterList) )
         {
             char typebufWildcard[NFD_MAX_STRLEN];
             /* add another type to the filter */
             assert( strlen(typebuf) > 0 );
             assert( strlen(typebuf) < NFD_MAX_STRLEN-1 );
-            
+
             snprintf( typebufWildcard, NFD_MAX_STRLEN, "*.%s", typebuf );
             AddTypeToFilterName( typebuf, filterName, NFD_MAX_STRLEN );
-            
+
             gtk_file_filter_add_pattern( filter, typebufWildcard );
-            
+
             p_typebuf = typebuf;
             memset( typebuf, 0, sizeof(char) * NFD_MAX_STRLEN );
         }
-        
+
         if ( *p_filterList == ';' || *p_filterList == '\0' )
         {
             /* end of filter -- add it to the dialog */
-            
+
             gtk_file_filter_set_name( filter, filterName );
             gtk_file_chooser_add_filter( GTK_FILE_CHOOSER(dialog), filter );
 
@@ -72,7 +72,7 @@ static void AddFiltersToDialog( GtkWidget *dialog, const char *filterList )
             if ( *p_filterList == '\0' )
                 break;
 
-            filter = gtk_file_filter_new();            
+            filter = gtk_file_filter_new();
         }
 
         if ( !NFDi_IsFilterSegmentChar( *p_filterList ) )
@@ -83,7 +83,7 @@ static void AddFiltersToDialog( GtkWidget *dialog, const char *filterList )
 
         p_filterList++;
     }
-    
+
     /* always append a wildcard option to the end*/
 
     filter = gtk_file_filter_new();
@@ -111,7 +111,7 @@ static nfdresult_t AllocPathSet( GSList *fileList, nfdpathset_t *pathSet )
     GSList *node;
     nfdchar_t *p_buf;
     size_t count = 0;
-    
+
     assert(fileList);
     assert(pathSet);
 
@@ -140,7 +140,7 @@ static nfdresult_t AllocPathSet( GSList *fileList, nfdpathset_t *pathSet )
         nfdchar_t *path = (nfdchar_t*)(node->data);
         size_t byteLen = strlen(path)+1;
         ptrdiff_t index;
-        
+
         memcpy( p_buf, path, byteLen );
         g_free(node->data);
 
@@ -153,7 +153,7 @@ static nfdresult_t AllocPathSet( GSList *fileList, nfdpathset_t *pathSet )
     }
 
     g_slist_free( fileList );
-    
+
     return NFD_OKAY;
 }
 
@@ -162,13 +162,13 @@ static void WaitForCleanup(void)
     while (gtk_events_pending())
         gtk_main_iteration();
 }
-                                 
+
 /* public */
 
 nfdresult_t NFD_OpenDialog( const char *filterList,
                             const nfdchar_t *defaultPath,
                             nfdchar_t **outPath )
-{    
+{
     GtkWidget *dialog;
     nfdresult_t result;
 
@@ -257,7 +257,7 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
             gtk_widget_destroy(dialog);
             return NFD_ERROR;
         }
-        
+
         result = NFD_OKAY;
     }
 
@@ -269,6 +269,7 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
 
 nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
                             const nfdchar_t *defaultPath,
+                            const nfdchar_t *defaultFilename,
                             nfdchar_t **outPath )
 {
     GtkWidget *dialog;
@@ -285,18 +286,18 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
                                           GTK_FILE_CHOOSER_ACTION_SAVE,
                                           "_Cancel", GTK_RESPONSE_CANCEL,
                                           "_Save", GTK_RESPONSE_ACCEPT,
-                                          NULL ); 
+                                          NULL );
     gtk_file_chooser_set_do_overwrite_confirmation( GTK_FILE_CHOOSER(dialog), TRUE );
 
-    /* Build the filter list */    
+    /* Build the filter list */
     AddFiltersToDialog(dialog, filterList);
-    
-    result = NFD_CANCEL;    
+
+    result = NFD_CANCEL;
     if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT )
     {
         char *filename;
         filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(dialog) );
-        
+
         {
             size_t len = strlen(filename);
             *outPath = NFDi_Malloc( len + 1 );
@@ -316,6 +317,15 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
     gtk_widget_destroy(dialog);
 
     WaitForCleanup();
-    
+
     return result;
+}
+
+nfdresult_t NFD_ChooseDirectory( const nfdchar_t *prompt,
+                                 const nfdchar_t *defaultPath,
+                                 nfdchar_t **outPath )
+{
+
+  return NFD_ERROR;
+
 }

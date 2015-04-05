@@ -112,11 +112,11 @@ void UIBuildSettingsIOS::Refresh()
 
 bool UIBuildSettingsIOS::ParseProvisionData(const String& provisionFile)
 {
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#if defined(ATOMIC_PLATFORM_WINDOWS) || defined(ATOMIC_PLATFORM_LINUX)
 
     return false;
 
-#else    
+#else
     String pdata = GetMobileProvisionData(provisionFile.CString());
 
     if (!pdata.Length())
@@ -194,4 +194,3 @@ bool UIBuildSettingsIOS::OnEvent(const TBWidgetEvent &ev)
 }
 
 }
-

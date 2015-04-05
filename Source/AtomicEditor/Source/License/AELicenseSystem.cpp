@@ -99,7 +99,7 @@ void LicenseSystem::LicenseAgreementConfirmed()
 
 String LicenseSystem::GenerateMachineID()
 {
-#ifdef ATOMIC_PLATFORM_OSX
+#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_LINUX)
     String path = getenv("HOME");
 #else
     wchar_t pathName[MAX_PATH];
@@ -115,7 +115,7 @@ String LicenseSystem::GenerateMachineID()
 }
 
 void LicenseSystem::ResetLicense()
-{   
+{
     key_ = "";
     licenseWindows_ = false;
     licenseMac_ = false;
@@ -160,7 +160,7 @@ bool LicenseSystem::LoadLicense()
 }
 
 bool LicenseSystem::ValidateKey(const String& key)
-{    
+{
     if (!key.StartsWith("ATOMIC-"))
         return false;
 
@@ -539,4 +539,3 @@ void LicenseSystem::HandleEditorShutdown(StringHash eventType, VariantMap& event
 }
 
 // END LICENSE MANAGEMENT
-

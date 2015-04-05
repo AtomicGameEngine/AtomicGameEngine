@@ -20,7 +20,7 @@
 #include "stdint.h"
 #endif
 
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || defined(ATOMIC_PLATFORM_LINUX)
 #include <stdint.h>
 #endif
 
@@ -32,7 +32,7 @@ extern const char* GEOMETRY_CATEGORY;
 float ProcSky::timeOfDay_ = 0.0f;
 
 ProcSky::ProcSky(Context* context) :
-    Drawable(context, DRAWABLE_GEOMETRY),    
+    Drawable(context, DRAWABLE_GEOMETRY),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
@@ -109,7 +109,7 @@ void ProcSky::OnNodeSet(Node* node)
     Drawable::OnNodeSet(node);
 
     if (node && node->GetScene())
-    {     
+    {
         SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, HANDLER(ProcSky, HandleSceneUpdate));
         SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(ProcSky, HandleBeginViewUpdate));
     }

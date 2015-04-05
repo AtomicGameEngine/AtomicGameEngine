@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Atomic/IO/Filesystem.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Core/Object.h>
 
 using namespace Atomic;

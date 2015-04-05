@@ -106,7 +106,7 @@
 #define TB_FILE_POSIX
 #define TB_TARGET_LINUX
 #define TB_SYSTEM_LINUX
-#define TB_CLIPBOARD_GLFW
+#define TB_CLIPBOARD_DUMMY
 #endif
 
 #ifdef MACOSX
