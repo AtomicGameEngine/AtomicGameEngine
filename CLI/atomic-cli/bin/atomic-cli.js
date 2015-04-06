@@ -140,6 +140,19 @@ program
     cli.atomiceditor(["-project", path], {output:true});
   });
 
+// http server
+program
+  .command('serve')
+  .option('-p, --port [8000]', 'The port to run the server on [8000]', '8000')
+  .description('start a http server on the specified port which serves the current folder')
+  .action(function(options) {
+    var args = {}
+    args.port = options.port;
+    var server = require("../lib/httpserver");
+    server.run(args)
+  });
+
+
   program.parse(process.argv);
 
   if (!program.args.length) program.help();
