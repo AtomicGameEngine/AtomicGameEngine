@@ -66,8 +66,8 @@ void AtomicPlayer::Setup()
 #elif ATOMIC_PLATFORM_WEB
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";
-    engineParameters_["WindowWidth"] = 1280;
-    engineParameters_["WindowHeight"] = 720;
+    // engineParameters_["WindowWidth"] = 1280;
+    // engineParameters_["WindowHeight"] = 720;
 #elif ATOMIC_PLATFORM_IOS
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";

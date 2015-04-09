@@ -131,6 +131,25 @@ program
 
   });
 
+
+  program
+    .command('build <platform>')
+    .option('--project <path>')
+    .description('builds the project for the specified platform')
+    .action(function(platform, options) {
+      if(options.project) {
+        process.chdir(options.project)
+      }
+      cli.build(platform)
+      .then(function () {
+      })
+      .catch(function (error) {
+          process.exit(1);
+      });
+
+    });
+
+
 program
   .command('edit [path_to_project]')
   .description('edits the project in the cwd or on at a specified path')

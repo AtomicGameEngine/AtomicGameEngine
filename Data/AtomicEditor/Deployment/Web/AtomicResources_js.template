@@ -24,9 +24,9 @@ Module.expectedDataFileDownloads++;
     var REMOTE_PACKAGE_NAME = typeof Module['locateFile'] === 'function' ?
                               Module['locateFile'](REMOTE_PACKAGE_BASE) :
                               ((Module['filePackagePrefixURL'] || '') + REMOTE_PACKAGE_BASE);
-    var REMOTE_PACKAGE_SIZE = 1265134;
+    var REMOTE_PACKAGE_SIZE = $$REMOTE_PACKAGE_SIZE$$;
     var PACKAGE_UUID = 'd832f5b3-9296-453e-be32-e9a18cf5c8c7';
-  
+
     function fetchRemotePackage(packageName, packageSize, callback, errback) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', packageName, true);
@@ -71,7 +71,7 @@ Module.expectedDataFileDownloads++;
     function handleError(error) {
       console.error('package error:', error);
     };
-  
+
       var fetched = null, fetchedCallback = null;
       fetchRemotePackage(REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE, function(data) {
         if (fetchedCallback) {
@@ -81,7 +81,7 @@ Module.expectedDataFileDownloads++;
           fetched = data;
         }
       }, handleError);
-    
+
   function runWithFS() {
 
 function assert(check, msg) {
@@ -122,14 +122,15 @@ function assert(check, msg) {
         this.requests[this.name] = null;
       },
     };
-      $$ATOMIC_RESOURCES_DATA_REQUEST$$
+
+    $$ATOMIC_RESOURCES_DATA_REQUEST$$
 
     function processPackageData(arrayBuffer) {
       Module.finishedDataFileDownloads++;
       assert(arrayBuffer, 'Loading data file failed.');
       var byteArray = new Uint8Array(arrayBuffer);
       var curr;
-      
+
       // copy the entire loaded file into a spot in the heap. Files will refer to slices in that. They cannot be freed though.
       var ptr = Module['_malloc'](byteArray.length);
       Module['HEAPU8'].set(byteArray, ptr);
@@ -139,9 +140,9 @@ function assert(check, msg) {
 
     };
     Module['addRunDependency']('datafile_AtomicResources.data');
-  
+
     if (!Module.preloadResults) Module.preloadResults = {};
-  
+
       Module.preloadResults[PACKAGE_NAME] = {fromCache: false};
       if (fetched) {
         processPackageData(fetched);
@@ -149,7 +150,7 @@ function assert(check, msg) {
       } else {
         fetchedCallback = processPackageData;
       }
-    
+
   }
   if (Module['calledRun']) {
     runWithFS();
