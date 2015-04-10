@@ -48,7 +48,6 @@
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../UI/UI.h"
 #ifdef ATOMIC_ATOMIC2D
 #include "../Atomic2D/Atomic2D.h"
 #endif
@@ -135,7 +134,7 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new TBUI(context_));
     #endif
 
-    context_->RegisterSubsystem(new UI(context_));
+    //context_->RegisterSubsystem(new UI(context_));
 
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
@@ -687,7 +686,7 @@ void Engine::Render()
     GetSubsystem<TBUI>()->Render();
 #endif
 
-    GetSubsystem<UI>()->Render();
+    //GetSubsystem<UI>()->Render();
     graphics->EndFrame();
 }
 

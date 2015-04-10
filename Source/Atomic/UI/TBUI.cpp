@@ -14,7 +14,6 @@
 #include "../Graphics/VertexBuffer.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
-#include "../UI/UI.h"
 #include "../UI/TBUI.h"
 
 #include <TurboBadger/tb_core.h>
@@ -153,7 +152,7 @@ public:
             texture = tbuibitmap->texture_;
         }
 
-        UIBatch b(tbui_, BLEND_ALPHA , currentScissor_, texture, vertexData_);
+        UIBatch b(BLEND_ALPHA , currentScissor_, texture, vertexData_);
 
         float fadeAlpha = tbui_->GetFadeAlpha();
 
@@ -238,7 +237,7 @@ public:
 WeakPtr<Context> TBUI::readerContext_;
 
 TBUI::TBUI(Context* context) :
-    UIElement(context),
+    Object(context),
     rootWidget_(0),
     initialized_(false),
     inputDisabled_(false),
@@ -312,7 +311,7 @@ void TBUI::Initialize()
     int width = graphics->GetWidth();
     int height = graphics->GetHeight();
     rootWidget_->SetSize(width, height);
-    SetSize(width, height);
+    //SetSize(width, height);
 
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
@@ -362,7 +361,7 @@ void TBUI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
 
 void TBUI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
 {
-    UIBatch b(this, BLEND_ALPHA , TBUIRenderer::renderer_->currentScissor_, texture, &vertexData_);
+    UIBatch b(BLEND_ALPHA , TBUIRenderer::renderer_->currentScissor_, texture, &vertexData_);
 
     unsigned begin = b.vertexData_->Size();
     b.vertexData_->Resize(begin + vertexData.Size());
@@ -385,7 +384,7 @@ void TBUI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
     using namespace ScreenMode;
     rootWidget_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
-    SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
+    //SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
 }
 
 void TBUI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
@@ -397,7 +396,7 @@ void TBUI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     unsigned button = eventData[P_BUTTON].GetUInt();
 
     IntVector2 pos;
-    pos = GetSubsystem<UI>()->GetCursorPosition();
+    pos = GetSubsystem<Input>()->GetMousePosition();
 
     Input* input = GetSubsystem<Input>();
     int qualifiers = input->GetQualifiers();
@@ -441,8 +440,9 @@ void TBUI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     unsigned button = eventData[P_BUTTON].GetUInt();
 
     IntVector2 pos;
-    pos = GetSubsystem<UI>()->GetCursorPosition();
+
     Input* input = GetSubsystem<Input>();
+    pos = input->GetMousePosition();
     int qualifiers = input->GetQualifiers();
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
@@ -894,8 +894,9 @@ void TBUI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     batches_.Clear();
     vertexData_.Clear();
 
-    const IntVector2& rootSize = GetSize();
-    IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
+    TBRect rect = rootWidget_->GetRect();
+
+    IntRect currentScissor = IntRect(0, 0, rect.w, rect.h);
     GetBatches(batches_, vertexData_, currentScissor);
 
 }

@@ -46,7 +46,6 @@
 #include "../Graphics/TextureCube.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/View.h"
-#include "../UI/UI.h"
 #include "../Core/WorkQueue.h"
 
 #include "../DebugNew.h"
@@ -1611,8 +1610,8 @@ void View::ExecuteRenderPathCommands()
             
             case CMD_RENDERUI:
                 {
-                    SetRenderTargets(command);
-                    GetSubsystem<UI>()->Render(false);
+                    //SetRenderTargets(command);
+                    //GetSubsystem<UI>()->Render(false);
                 }
                 break;
 

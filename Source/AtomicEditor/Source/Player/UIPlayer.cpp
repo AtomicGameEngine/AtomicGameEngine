@@ -11,7 +11,6 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/UI.h>
 #include <Atomic/UI/TBUI.h>
 
 #include <Atomic/Graphics/Graphics.h>
@@ -106,7 +105,6 @@ UIPlayer::~UIPlayer()
 void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     view3D_->QueueUpdate();
-    UI* ui = GetSubsystem<UI>();
 
     // BEGIN LICENSE MANAGEMENT
     if (standardLicense_)
@@ -122,9 +120,6 @@ void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
     TBWidgetDelegate* view3DDelegate = view3D_->GetWidgetDelegate();
     TBRect rect = view3DDelegate->GetRect();
     view3DDelegate->ConvertToRoot(rect.x, rect.y);
-
-    ui->GetRoot()->SetPosition(rect.x, rect.y);
-    ui->GetRoot()->SetSize(rect.w, rect.h);
 }
 
 

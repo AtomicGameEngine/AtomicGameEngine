@@ -20,7 +20,6 @@
 #include <Atomic/Atomic2D/PhysicsWorld2D.h>
 #include <Atomic/Atomic2D/RigidBody2D.h>
 #include <Atomic/UI/UIEvents.h>
-#include <Atomic/UI/UIElement.h>
 
 #include "Javascript.h"
 #include "JSEvents.h"
@@ -419,25 +418,7 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
         duk_context* ctx = vm_->GetJSContext();
         JS_HEAP_PTR function = scriptEventFunctions_[eventType];
 
-        if (eventType == E_UIMOUSECLICK)
-        {
-            UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
-            if (clicked)
-            {
-                duk_push_heapptr(ctx, function);
-                js_push_class_object_instance(ctx, clicked);
-
-                if (duk_pcall(ctx, 1) != 0)
-                {
-                    vm_->SendJSErrorEvent();
-                }
-
-                duk_pop(ctx);
-
-            }
-
-        }
-        else if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
+        if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
         {
             using namespace PhysicsBeginContact2D;
             PhysicsWorld2D* world = static_cast<PhysicsWorld2D*>(eventData[P_WORLD].GetPtr());

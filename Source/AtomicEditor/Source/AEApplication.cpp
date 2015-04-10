@@ -10,6 +10,7 @@
 #include <Atomic/Core/Main.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Graphics/Graphics.h>
+#include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
 #include <Atomic/DebugNew.h>

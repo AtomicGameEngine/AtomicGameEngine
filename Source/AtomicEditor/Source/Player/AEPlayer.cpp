@@ -9,8 +9,6 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/UI/TBUI.h>
-#include <Atomic/UI/UI.h>
-
 #include <AtomicJS/Javascript/Javascript.h>
 #include <AtomicJS/Javascript/JSVM.h>
 #include <AtomicJS/Javascript/JSEvents.h>
@@ -94,7 +92,6 @@ void AEPlayer::Invalidate()
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->Hide();
     context_->RemoveSubsystem<AEPlayer>();
-    GetSubsystem<UI>()->GetRoot()->RemoveAllChildren();
 
 // BEGIN LICENSE MANAGEMENT
     if (uiPlayer_.NotNull() && uiPlayer_->Show3DInfo())

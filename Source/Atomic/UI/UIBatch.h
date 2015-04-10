@@ -33,7 +33,6 @@ class PixelShader;
 class Graphics;
 class Matrix3x4;
 class Texture;
-class UIElement;
 
 static const unsigned UI_VERTEX_SIZE = 6;
 
@@ -44,7 +43,7 @@ public:
     /// Construct with defaults.
     UIBatch();
     /// Construct.
-    UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
+    UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
     
     /// Set new color for the batch. Overrides gradient.
     void SetColor(const Color& color, bool overrideAlpha = false);
@@ -58,14 +57,10 @@ public:
     void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
-    /// Return an interpolated color for the UI element.
-    unsigned GetInterpolatedColor(int x, int y);
     
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
     
-    /// Element this batch represents.
-    UIElement* element_;
     /// Blending mode.
     BlendMode blendMode_;
     /// Scissor rectangle.

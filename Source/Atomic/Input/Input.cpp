@@ -34,7 +34,6 @@
 #include "../Resource/ResourceCache.h"
 #include "../IO/RWOpsWrapper.h"
 #include "../Core/StringUtils.h"
-#include "../UI/UI.h"
 
 #include <cstring>
 
@@ -852,34 +851,11 @@ int Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 
 bool Input::RemoveScreenJoystick(SDL_JoystickID id)
 {
-    if (!joysticks_.Contains(id))
-    {
-        LOGERRORF("Failed to remove non-existing screen joystick ID #%d", id);
-        return false;
-    }
-
-    JoystickState& state = joysticks_[id];
-    if (!state.screenJoystick_)
-    {
-        LOGERRORF("Failed to remove joystick with ID #%d which is not a screen joystick", id);
-        return false;
-    }
-
-    state.screenJoystick_->Remove();
-    joysticks_.Erase(id);
-
     return true;
 }
 
 void Input::SetScreenJoystickVisible(SDL_JoystickID id, bool enable)
 {
-    if (joysticks_.Contains(id))
-    {
-        JoystickState& state = joysticks_[id];
-
-        if (state.screenJoystick_)
-            state.screenJoystick_->SetVisible(enable);
-    }
 }
 
 void Input::SetScreenKeyboardVisible(bool enable)
@@ -1150,8 +1126,7 @@ JoystickState* Input::GetJoystick(SDL_JoystickID id)
 
 bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
 {
-    HashMap<SDL_JoystickID, JoystickState>::ConstIterator i = joysticks_.Find(id);
-    return i != joysticks_.End() && i->second_.screenJoystick_ && i->second_.screenJoystick_->IsVisible();
+    return false;
 }
 
 bool Input::GetScreenKeyboardSupport() const
@@ -2006,14 +1981,6 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         SetMousePosition(center);
         lastMousePosition_ = center;
     }
-
-    // Resize screen joysticks to new screen size
-    for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
-    {
-        UIElement* screenjoystick = i->second_.screenJoystick_;
-        if (screenjoystick)
-            screenjoystick->SetSize(graphics_->GetWidth(), graphics_->GetHeight());
-    }
     
     focusedThisFrame_ = true;
 
@@ -2029,143 +1996,7 @@ void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 
 void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventData)
 {
-    using namespace TouchBegin;
 
-    // Only interested in events from screen joystick(s)
-    TouchState& state = touches_[eventData[P_TOUCHID].GetInt()];
-    IntVector2 position(state.position_.x_, state.position_.y_);
-    UIElement* element = eventType == E_TOUCHBEGIN ? GetSubsystem<UI>()->GetElementAt(position) : state.touchedElement_;
-    if (!element)
-        return;
-    Variant variant = element->GetVar(VAR_SCREEN_JOYSTICK_ID);
-    if (variant.IsEmpty())
-        return;
-    SDL_JoystickID joystickID = variant.GetInt();
-
-    if (eventType == E_TOUCHEND)
-        state.touchedElement_.Reset();
-    else
-        state.touchedElement_ = element;
-
-    // Prepare a fake SDL event
-    SDL_Event evt;
-
-    const String& name = element->GetName();
-    if (name.StartsWith("Button"))
-    {
-        if (eventType == E_TOUCHMOVE)
-            return;
-
-        // Determine whether to inject a joystick event or keyboard/mouse event
-        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        Variant mouseButtonBindingVar = element->GetVar(VAR_BUTTON_MOUSE_BUTTON_BINDING);
-        if (keyBindingVar.IsEmpty() && mouseButtonBindingVar.IsEmpty())
-        {
-            evt.type = eventType == E_TOUCHBEGIN ? SDL_JOYBUTTONDOWN : SDL_JOYBUTTONUP;
-            evt.jbutton.which = joystickID;
-            evt.jbutton.button = ToUInt(name.Substring(6));
-        }
-        else
-        {
-            if (!keyBindingVar.IsEmpty())
-            {
-                evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
-                evt.key.keysym.sym = keyBindingVar.GetInt();
-                evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
-            }
-            if (!mouseButtonBindingVar.IsEmpty())
-            {
-                // Mouse button are sent as extra events besides key events
-                // Disable touch emulation handling during this to prevent endless loop
-                bool oldTouchEmulation = touchEmulation_;
-                touchEmulation_ = false;
-
-                SDL_Event evt;
-                evt.type = eventType == E_TOUCHBEGIN ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
-                evt.button.button = mouseButtonBindingVar.GetInt();
-                HandleSDLEvent(&evt);
-
-                touchEmulation_ = oldTouchEmulation;
-            }
-        }
-    }
-    else if (name.StartsWith("Hat"))
-    {
-        Variant keyBindingVar = element->GetVar(VAR_BUTTON_KEY_BINDING);
-        if (keyBindingVar.IsEmpty())
-        {
-            evt.type = SDL_JOYHATMOTION;
-            evt.jaxis.which = joystickID;
-            evt.jhat.hat = ToUInt(name.Substring(3));
-            evt.jhat.value = HAT_CENTER;
-            if (eventType != E_TOUCHEND)
-            {
-                IntVector2 relPosition = position - element->GetScreenPosition() - element->GetSize() / 2;
-                if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.jhat.value |= HAT_UP;
-                if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.jhat.value |= HAT_DOWN;
-                if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.jhat.value |= HAT_LEFT;
-                if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.jhat.value |= HAT_RIGHT;
-            }
-        }
-        else
-        {
-            // Hat is binded by 4 keys, like 'WASD'
-            String keyBinding = keyBindingVar.GetString();
-
-            if (eventType == E_TOUCHEND)
-            {
-                evt.type = SDL_KEYUP;
-                evt.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetInt();
-                if (!evt.key.keysym.sym)
-                    return;
-
-                element->SetVar(VAR_LAST_KEYSYM, 0);
-            }
-            else
-            {
-                evt.type = SDL_KEYDOWN;
-                IntVector2 relPosition = position - element->GetScreenPosition() - element->GetSize() / 2;
-                if (relPosition.y_ < 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[0];
-                else if (relPosition.y_ > 0 && Abs(relPosition.x_ * 3 / 2) < Abs(relPosition.y_))
-                    evt.key.keysym.sym = keyBinding[1];
-                else if (relPosition.x_ < 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.key.keysym.sym = keyBinding[2];
-                else if (relPosition.x_ > 0 && Abs(relPosition.y_ * 3 / 2) < Abs(relPosition.x_))
-                    evt.key.keysym.sym = keyBinding[3];
-                else
-                    return;
-
-                if (eventType == E_TOUCHMOVE && evt.key.keysym.sym != element->GetVar(VAR_LAST_KEYSYM).GetInt())
-                {
-                    // Dragging past the directional boundary will cause an additional key up event for previous key symbol
-                    SDL_Event evt;
-                    evt.type = SDL_KEYUP;
-                    evt.key.keysym.sym = element->GetVar(VAR_LAST_KEYSYM).GetInt();
-                    if (evt.key.keysym.sym)
-                    {
-                        evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
-                        HandleSDLEvent(&evt);
-                    }
-
-                    element->SetVar(VAR_LAST_KEYSYM, 0);
-                }
-
-                evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
-
-                element->SetVar(VAR_LAST_KEYSYM, evt.key.keysym.sym);
-            }
-        }
-    }
-    else
-        return;
-
-    // Handle the fake SDL event to turn it into Atomic genuine event
-    HandleSDLEvent(&evt);
 }
 
 }

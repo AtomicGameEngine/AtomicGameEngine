@@ -21,10 +21,7 @@
 #include "AEEvents.h"
 
 #include <Atomic/Input/Input.h>
-
-
 #include <Atomic/UI/TBUI.h>
-#include <Atomic/UI/UI.h>
 
 #include "SceneEditor3D.h"
 

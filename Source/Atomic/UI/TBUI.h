@@ -2,7 +2,8 @@
 
 #ifdef ATOMIC_TBUI
 
-#include "UIElement.h"
+#include "../Core/Object.h"
+#include "../UI/UIBatch.h"
 
 namespace tb
 {
@@ -17,7 +18,7 @@ namespace Atomic
 class VertexBuffer;
 
 /// %UI element which renders a 3D scene.
-class ATOMIC_API TBUI : public UIElement
+class ATOMIC_API TBUI : public Object
 {
     OBJECT(TBUI);
 
