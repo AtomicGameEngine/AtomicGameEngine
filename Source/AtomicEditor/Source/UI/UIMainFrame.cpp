@@ -8,7 +8,7 @@
 #include <TurboBadger/tb_editfield.h>
 
 #include <Atomic/Core/ProcessUtils.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/Context.h>
 #include <Atomic/Graphics/Graphics.h>
@@ -59,7 +59,7 @@ MainFrame::MainFrame(Context* context) :
 
     InitializeMenuSources();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/mainframe.tb.txt");
 
     Graphics* graphics = GetSubsystem<Graphics>();

@@ -25,19 +25,54 @@ using namespace tb;
 #include "../Graphics/VertexBuffer.h"
 
 #include "UIRenderer.h"
-#include "UIState.h"
+#include "UI.h"
+
+namespace tb
+{
+
+void TBSystem::RescheduleTimer(double fire_time)
+{
+
+}
+
+}
+
 
 namespace Atomic
 {
 
-WeakPtr<Context> UIState::readerContext_;
+WeakPtr<Context> UI::readerContext_;
 
 
-UIState::UIState(Context* context) :
+UI::UI(Context* context) :
     Object(context),
     rootWidget_(0),
     inputDisabled_(false),
-    keyboardDisabled_(false)
+    keyboardDisabled_(false),
+    initialized_(false)
+{
+
+}
+
+UI::~UI()
+{
+    if (initialized_)
+    {
+        tb::TBWidgetsAnimationManager::Shutdown();
+        delete rootWidget_;
+        // leak
+        //delete TBUIRenderer::renderer_;
+        tb_core_shutdown();
+    }
+
+}
+
+void UI::Shutdown()
+{
+    SetInputDisabled(true);
+}
+
+void UI::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     assert(graphics);
@@ -46,23 +81,6 @@ UIState::UIState(Context* context) :
 
     vertexBuffer_ = new VertexBuffer(context_);
 
-    Initialize();
-
-}
-
-UIState::~UIState()
-{
-    tb::TBWidgetsAnimationManager::Shutdown();
-    delete rootWidget_;
-    // leak
-    //delete TBUIRenderer::renderer_;
-    tb_core_shutdown();
-
-}
-
-// refactor
-void UIState::Initialize()
-{
     readerContext_ = context_;
     TBFile::SetReaderFunction(TBFileReader);
 
@@ -104,22 +122,24 @@ void UIState::Initialize()
 
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UIState, HandleMouseButtonDown));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UIState, HandleMouseButtonUp));
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UIState, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UIState, HandleMouseWheel));
-    SubscribeToEvent(E_KEYDOWN, HANDLER(UIState, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(UIState, HandleKeyUp));
-    SubscribeToEvent(E_TEXTINPUT, HANDLER(UIState, HandleTextInput));
-    SubscribeToEvent(E_UPDATE, HANDLER(UIState, HandleUpdate));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UI, HandleMouseWheel));
+    SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, HANDLER(UI, HandleKeyUp));
+    SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
+    SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
 
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UIState, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+
+    initialized_ = true;
 
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 }
 
 
-void UIState::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
 
     if (batches.Empty())
@@ -203,7 +223,7 @@ void UIState::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, un
     }
 }
 
-void UIState::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
 {
     if (vertexData.Empty())
         return;
@@ -218,13 +238,13 @@ void UIState::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexDa
 }
 
 
-void UIState::Render()
+void UI::Render()
 {
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
 }
 
-void UIState::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
+void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Get rendering batches from the non-modal UI elements
     batches_.Clear();
@@ -237,7 +257,7 @@ void UIState::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-void UIState::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     //if (!initialized_)
     //    return;
@@ -257,7 +277,7 @@ void UIState::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDa
     tb::g_renderer->EndPaint();
 }
 
-void UIState::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
+void UI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
 {
     UIBatch b(BLEND_ALPHA , renderer_->currentScissor_, texture, &vertexData_);
 
@@ -275,7 +295,7 @@ void UIState::SubmitBatchVertexData(Texture* texture, const PODVector<float>& ve
 
 }
 
-void UIState::TBFileReader(const char* filename, void** data, unsigned* length)
+void UI::TBFileReader(const char* filename, void** data, unsigned* length)
 {
     *data = 0;
     *length = 0;
@@ -305,12 +325,11 @@ void UIState::TBFileReader(const char* filename, void** data, unsigned* length)
 
 }
 
-bool UIState::LoadResourceFile(TBWidget* widget, const String& filename)
+bool UI::LoadResourceFile(TBWidget* widget, const String& filename)
 {
 
     tb::TBNode node;
 
-    // TODO: use Urho resources
     if (!node.ReadFile(filename.CString()))
         return false;
 
@@ -319,7 +338,7 @@ bool UIState::LoadResourceFile(TBWidget* widget, const String& filename)
 }
 
 
-void UIState::HandleScreenMode(StringHash eventType, VariantMap& eventData)
+void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScreenMode;
     rootWidget_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
@@ -328,7 +347,7 @@ void UIState::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 
 
-void UIState::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     TBMessageHandler::ProcessMessages();
 }

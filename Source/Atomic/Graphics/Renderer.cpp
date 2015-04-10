@@ -674,7 +674,7 @@ void Renderer::Render()
         graphics_->SetStencilTest(false);
         graphics_->ResetRenderTargets();
 
-        // ATOMIC: Do not clear, as this will clear the TBUI backbuffer
+        // ATOMIC: Do not clear, as this will clear the UI backbuffer
         //graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, defaultZone_->GetFogColor());
         
         numPrimitives_ = 0;

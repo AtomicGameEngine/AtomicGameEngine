@@ -5,7 +5,7 @@
 #include "AtomicEditor.h"
 
 #include <Atomic/Container/ArrayPtr.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
@@ -42,7 +42,7 @@ ResourceFrame::ResourceFrame(Context* context) :
     tabcontainer_(0),
     resourceLayout_(0)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/resourceframe.tb.txt");
 
     tabcontainer_  = delegate_->GetWidgetByIDAndType<TBTabContainer>(TBIDC("tabcontainer"));

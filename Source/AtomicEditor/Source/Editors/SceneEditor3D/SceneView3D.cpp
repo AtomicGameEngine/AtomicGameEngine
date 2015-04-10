@@ -28,7 +28,7 @@
 
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 namespace AtomicEditor
 {

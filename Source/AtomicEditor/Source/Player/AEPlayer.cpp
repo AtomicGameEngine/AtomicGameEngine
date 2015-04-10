@@ -8,7 +8,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <AtomicJS/Javascript/Javascript.h>
 #include <AtomicJS/Javascript/JSVM.h>
 #include <AtomicJS/Javascript/JSEvents.h>

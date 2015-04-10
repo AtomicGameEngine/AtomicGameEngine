@@ -11,7 +11,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/Graphics/Graphics.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEvents.h"
 
@@ -48,7 +48,7 @@ UIModalOpWindow::UIModalOpWindow(Context* context):
     AEWidget(context)
 {
     window_ = new TBWindow();
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBWidget* root = tbui->GetRootWidget();
     root->AddChild(delegate_);
     // start with full screen as size
@@ -69,7 +69,7 @@ bool UIModalOpWindow::OnEvent(const TBWidgetEvent &ev)
 
 void UIModalOpWindow::Center()
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBRect rect = window_->GetRect();
     TBWidget* root = tbui->GetRootWidget();
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
@@ -94,7 +94,7 @@ UIModalOps::UIModalOps(Context* context) :
 void UIModalOps::Show()
 {
     assert(!dimmer_->GetParent());
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBWidget* root = tbui->GetRootWidget();
     root->AddChild(dimmer_);
 }
@@ -108,7 +108,7 @@ void UIModalOps::Hide()
 
     opWindow_ = NULL;
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->GetRootWidget()->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
 
     isHiding_ = false;

@@ -13,7 +13,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/StringUtils.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Resources/AEResourceOps.h"
 #include "AEPreferences.h"
@@ -38,7 +38,7 @@ UICreateProject::UICreateProject(Context* context, const String &templateFolder,
     Editor* editor = GetSubsystem<Editor>();
     Project* project = editor->GetProject();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Create Project");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/createproject.tb.txt");
 

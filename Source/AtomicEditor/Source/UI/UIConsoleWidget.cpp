@@ -8,7 +8,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "UIListView.h"
 #include "UIConsoleWidget.h"
@@ -32,7 +32,7 @@ ConsoleWidget::ConsoleWidget(Context* context) :
     context_->RegisterSubsystem(this);
     SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(ConsoleWidget, HandleEditorShutdown));
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/consolewidget.tb.txt");
 
     consolelayout_ = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("consolelayout"));

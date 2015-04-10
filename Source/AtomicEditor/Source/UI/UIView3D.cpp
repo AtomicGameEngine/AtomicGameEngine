@@ -221,7 +221,7 @@ void View3DWidget::OnPaint(const PaintProps &paint_props)
     data[30] = rect.x;
     data[31] = rect.y + rect.h;
 
-    //view3D_->GetSubsystem<TBUI>()->SubmitBatchVertexData(view3D_->GetRenderTexture(), vertexData_);
+    //view3D_->GetSubsystem<UI>()->SubmitBatchVertexData(view3D_->GetRenderTexture(), vertexData_);
 
 }
 

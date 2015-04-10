@@ -56,7 +56,7 @@
 #endif
 
 #ifdef ATOMIC_TBUI
-#include "../UI/TBUI.h"
+#include "../UI/UI.h"
 #endif
 
 #include "../Core/WorkQueue.h"
@@ -130,11 +130,8 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Audio(context_));
 
     #ifdef ATOMIC_TBUI
-    // will render before UI
-    context_->RegisterSubsystem(new TBUI(context_));
+    context_->RegisterSubsystem(new UI(context_));
     #endif
-
-    //context_->RegisterSubsystem(new UI(context_));
 
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
@@ -683,7 +680,7 @@ void Engine::Render()
     GetSubsystem<Renderer>()->Render();
 
 #ifdef ATOMIC_TBUI
-    GetSubsystem<TBUI>()->Render();
+    GetSubsystem<UI>()->Render();
 #endif
 
     graphics->EndFrame();

@@ -8,7 +8,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Input/Input.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/Core/CoreEvents.h>
 
 #include <AtomicJS/Javascript/Javascript.h>
@@ -169,7 +169,7 @@ void Editor::HandlePlayStop(StringHash eventType, VariantMap& eventData)
     if (!player_)
         return;
 
-    //TBUI* tbui = GetSubsystem<TBUI>();
+    //UI* tbui = GetSubsystem<UI>();
     //tbui->SetKeyboardDisabled(false);
     if (player_->GetMode() != AE_PLAYERMODE_WIDGET)
     {
@@ -269,7 +269,7 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
 
     AEPlayerMode mode = (AEPlayerMode) eventData[EditorPlayStarted::P_MODE].GetUInt();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     //tbui->SetKeyboardDisabled(true);
 
     if (mode != AE_PLAYERMODE_WIDGET)
@@ -320,7 +320,7 @@ void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
     TBAnimationManager::BeginBlockAnimations();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->Shutdown();
 
     context_->RemoveSubsystem(Javascript::GetBaseTypeStatic());

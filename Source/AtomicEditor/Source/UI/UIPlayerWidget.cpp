@@ -4,7 +4,7 @@
 
 #include "AtomicEditor.h"
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>
 
 #include "UIPlayerWidget.h"
@@ -17,7 +17,7 @@ namespace AtomicEditor
 PlayerWidget::PlayerWidget(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/playerwidget.tb.txt");
 }
 

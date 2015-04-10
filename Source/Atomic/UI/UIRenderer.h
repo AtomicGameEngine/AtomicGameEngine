@@ -15,11 +15,11 @@ class TBRect;
 namespace Atomic
 {
 
-class TBUI;
+class UI;
 
 class UIRenderer : public tb::TBRendererBatcher
 {
-    friend class UIState;
+    friend class UI;
 public:
 
     UIRenderer(Context* context);

@@ -23,7 +23,7 @@
 
 #include "ModelResourceEditor.h"
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 namespace AtomicEditor
 {

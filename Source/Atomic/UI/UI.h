@@ -15,16 +15,16 @@ namespace Atomic
 class VertexBuffer;
 class UIRenderer;
 
-class UIState : public Object
+class UI : public Object
 {
-    OBJECT(UIState)
+    OBJECT(UI)
 
 public:
 
     /// Construct.
-    UIState(Context* context);
+    UI(Context* context);
     /// Destruct.
-    virtual ~UIState();
+    virtual ~UI();
 
     tb::TBWidget* GetRootWidget() { return rootWidget_; }
     bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
@@ -36,9 +36,10 @@ public:
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
-private:
-
     void Initialize();
+    void Shutdown();
+
+private:
 
     static WeakPtr<Context> readerContext_;
     static void TBFileReader(const char* filename, void** data, unsigned* length);
@@ -60,6 +61,7 @@ private:
 
     bool inputDisabled_;
     bool keyboardDisabled_;
+    bool initialized_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);

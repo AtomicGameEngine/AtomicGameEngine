@@ -9,7 +9,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Build/BuildSystem.h"
 #include "UIBuildSettingsWeb.h"
@@ -20,7 +20,7 @@ namespace AtomicEditor
 UIBuildSettingsWeb::UIBuildSettingsWeb(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/buildsettings_html5.tb.txt");
 
     appNameEdit_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("app_name"));

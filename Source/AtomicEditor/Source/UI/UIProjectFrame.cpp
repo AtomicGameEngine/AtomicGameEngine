@@ -11,7 +11,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "../AEEditor.h"
 #include "../Project/AEProject.h"
@@ -30,7 +30,7 @@ namespace AtomicEditor
 ProjectFrame::ProjectFrame(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/projectframe.tb.txt");
 
     delegate_->SetID(TBIDC("projectframe_delegate"));
@@ -392,7 +392,7 @@ bool ProjectFrame::OnEvent(const TBWidgetEvent &ev)
 
         if (ev.target->GetID() == TBIDC("menu create"))
         {
-            TBUI* tbui = GetSubsystem<TBUI>();
+            UI* tbui = GetSubsystem<UI>();
             if (!tbui->GetRootWidget()->GetWidgetByID(TBIDC("create popup")))
                 if (TBMenuWindow *menu = new TBMenuWindow(ev.target, TBIDC("create popup")))
                     menu->Show(&menuCreateSource, TBPopupAlignment());

@@ -11,7 +11,7 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Viewport.h>
@@ -48,7 +48,7 @@ UIPlayer::UIPlayer(Context* context):
     aePlayer_ = GetSubsystem<AEPlayer>();
     aePlayer_->SetUIPlayer(this);
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
 
     // FIXME: disabling close button as having the widget die is currently bad
     window_->DisableCloseButton();

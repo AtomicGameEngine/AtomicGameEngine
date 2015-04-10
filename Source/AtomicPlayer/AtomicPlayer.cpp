@@ -38,7 +38,7 @@
 
 #include <Atomic/DebugNew.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 DEFINE_APPLICATION_MAIN(AtomicPlayer);
 

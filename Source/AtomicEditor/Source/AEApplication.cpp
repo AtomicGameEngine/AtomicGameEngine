@@ -20,7 +20,7 @@
 
 #include <Atomic/Input/Input.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/Environment/Environment.h>
 #include <Atomic/Graphics/Renderer.h>
 
@@ -79,7 +79,7 @@ void AEApplication::Start()
     cache->AddPackageFile(editorResources);
 
     // initialize after EditorResources set
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->Initialize();
 
     Input* input = GetSubsystem<Input>();

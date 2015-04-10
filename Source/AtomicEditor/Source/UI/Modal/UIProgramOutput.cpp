@@ -7,7 +7,7 @@
 
 #include "AtomicEditor.h"
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEvents.h"
 #include "UIProgramOutput.h"
@@ -21,7 +21,7 @@ UIProgramOutput::UIProgramOutput(Context* context):
     UIModalOpWindow(context)
 {
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Program Output");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/programoutput.tb.txt");
     output_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("output"));
