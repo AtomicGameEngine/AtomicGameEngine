@@ -83,15 +83,6 @@ void AEApplication::Start()
 
     XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
 
-    // Create console
-    Console* console = engine_->CreateConsole();
-    console->SetDefaultStyle(xmlFile);
-    console->GetBackground()->SetOpacity(0.8f);
-
-    // Create debug HUD.
-    DebugHud* debugHud = engine_->CreateDebugHud();
-    debugHud->SetDefaultStyle(xmlFile);
-
     Input* input = GetSubsystem<Input>();
 
     input->SetMouseVisible(true);

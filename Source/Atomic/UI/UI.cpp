@@ -21,39 +21,24 @@
 //
 
 #include "Precompiled.h"
-#include "../UI/CheckBox.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../UI/Cursor.h"
-#include "../UI/DropDownList.h"
-#include "../UI/FileSelector.h"
-#include "../UI/Font.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
-#include "../UI/LineEdit.h"
-#include "../UI/ListView.h"
 #include "../IO/Log.h"
 #include "../Math/Matrix3x4.h"
-#include "../UI/MessageBox.h"
 #include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
-#include "../UI/ScrollBar.h"
 #include "../Graphics/Shader.h"
 #include "../Graphics/ShaderVariation.h"
-#include "../UI/Slider.h"
 #include "../Container/Sort.h"
-#include "../UI/Sprite.h"
-#include "../UI/Text.h"
-#include "../UI/Text3D.h"
 #include "../Graphics/Texture2D.h"
-#include "../UI/ToolTip.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
 #include "../Graphics/VertexBuffer.h"
-#include "../UI/Window.h"
-#include "../UI/View3D.h"
 
 #include <SDL/include/SDL.h>
 
@@ -209,80 +194,6 @@ void UI::SetFocusElement(UIElement* element, bool byKey)
     eventData[P_CLICKEDELEMENT] = originalElement;
     eventData[P_ELEMENT] = element;
     SendEvent(E_FOCUSCHANGED, eventData);
-}
-
-bool UI::SetModalElement(UIElement* modalElement, bool enable)
-{
-    if (!modalElement)
-        return false;
-
-    // Currently only allow modal window
-    if (modalElement->GetType() != Window::GetTypeStatic())
-        return false;
-
-    assert(rootModalElement_);
-    UIElement* currParent = modalElement->GetParent();
-    if (enable)
-    {
-        // Make sure it is not already the child of the root modal element
-        if (currParent == rootModalElement_)
-            return false;
-
-        // Adopt modal root as parent
-        modalElement->SetVar(VAR_ORIGINAL_PARENT, currParent);
-        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, currParent ? currParent->FindChild(modalElement) : M_MAX_UNSIGNED);
-        modalElement->SetParent(rootModalElement_);
-
-        // If it is a popup element, bring along its top-level parent
-        UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
-        if (originElement)
-        {
-            UIElement* element = originElement;
-            while (element && element->GetParent() != rootElement_)
-                element = element->GetParent();
-            if (element)
-            {
-                originElement->SetVar(VAR_PARENT_CHANGED, element);
-                UIElement* oriParent = element->GetParent();
-                element->SetVar(VAR_ORIGINAL_PARENT, oriParent);
-                element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : M_MAX_UNSIGNED);
-                element->SetParent(rootModalElement_);
-            }
-        }
-
-        return true;
-    }
-    else
-    {
-        // Only the modal element can disable itself
-        if (currParent != rootModalElement_)
-            return false;
-
-        // Revert back to original parent
-        modalElement->SetParent(static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
-            modalElement->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
-        VariantMap& vars = const_cast<VariantMap&>(modalElement->GetVars());
-        vars.Erase(VAR_ORIGINAL_PARENT);
-        vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
-
-        // If it is a popup element, revert back its top-level parent
-        UIElement* originElement = static_cast<UIElement*>(modalElement->GetVar(VAR_ORIGIN).GetPtr());
-        if (originElement)
-        {
-            UIElement* element = static_cast<UIElement*>(originElement->GetVar(VAR_PARENT_CHANGED).GetPtr());
-            if (element)
-            {
-                const_cast<VariantMap&>(originElement->GetVars()).Erase(VAR_PARENT_CHANGED);
-                element->SetParent(static_cast<UIElement*>(element->GetVar(VAR_ORIGINAL_PARENT).GetPtr()),
-                    element->GetVar(VAR_ORIGINAL_CHILD_INDEX).GetUInt());
-                vars = const_cast<VariantMap&>(element->GetVars());
-                vars.Erase(VAR_ORIGINAL_PARENT);
-                vars.Erase(VAR_ORIGINAL_CHILD_INDEX);
-            }
-        }
-
-        return true;
-    }
 }
 
 void UI::Clear()
@@ -545,18 +456,6 @@ void UI::SetDefaultToolTipDelay(float delay)
     defaultToolTipDelay_ = Max(delay, 0.0f);
 }
 
-void UI::SetMaxFontTextureSize(int size)
-{
-    if (IsPowerOfTwo(size) && size >= FONT_TEXTURE_MIN_SIZE)
-    {
-        if (size != maxFontTextureSize_)
-        {
-            maxFontTextureSize_ = size;
-            ReleaseFontFaces();
-        }
-    }
-}
-
 void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 {
     nonFocusedMouseWheel_ = nonFocusedMouseWheel;
@@ -570,24 +469,6 @@ void UI::SetUseSystemClipboard(bool enable)
 void UI::SetUseScreenKeyboard(bool enable)
 {
     useScreenKeyboard_ = enable;
-}
-
-void UI::SetUseMutableGlyphs(bool enable)
-{
-    if (enable != useMutableGlyphs_)
-    {
-        useMutableGlyphs_ = enable;
-        ReleaseFontFaces();
-    }
-}
-
-void UI::SetForceAutoHint(bool enable)
-{
-    if (enable != forceAutoHint_)
-    {
-        forceAutoHint_ = enable;
-        ReleaseFontFaces();
-    }
 }
 
 IntVector2 UI::GetCursorPosition() const
@@ -981,17 +862,6 @@ void UI::SetCursorShape(CursorShape shape)
 {
     if (cursor_)
         cursor_->SetShape(shape);
-}
-
-void UI::ReleaseFontFaces()
-{
-    LOGDEBUG("Reloading font faces");
-
-    PODVector<Font*> fonts;
-    GetSubsystem<ResourceCache>()->GetResources<Font>(fonts);
-
-    for (unsigned i = 0; i < fonts.Size(); ++i)
-        fonts[i]->ReleaseFaces();
 }
 
 void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor)
@@ -1438,201 +1308,27 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
-    if (input->IsMouseGrabbed())
-        return;
-
-    using namespace MouseWheel;
-
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
-    int delta = eventData[P_WHEEL].GetInt();
-    usingTouchInput_ = false;
-
-    IntVector2 cursorPos;
-    bool cursorVisible;
-    GetCursorPositionAndVisible(cursorPos, cursorVisible);
-
-    UIElement* element;
-    if (!nonFocusedMouseWheel_&& (element = focusElement_))
-        element->OnWheel(delta, mouseButtons_, qualifiers_);
-    else
-    {
-        // If no element has actual focus or in non-focused mode, get the element at cursor
-        if (cursorVisible)
-        {
-            element = GetElementAt(cursorPos);
-            if (nonFocusedMouseWheel_)
-            {
-                // Going up the hierarchy chain to find element that could handle mouse wheel
-                while (element)
-                {
-                    if (element->GetType() == ListView::GetTypeStatic() ||
-                        element->GetType() == ScrollView::GetTypeStatic())
-                        break;
-                    element = element->GetParent();
-                }
-            }
-            else
-                // If the element itself is not focusable, search for a focusable parent,
-                // although the focusable element may not actually handle mouse wheel
-                element = GetFocusableElement(element);
-
-            if (element && (nonFocusedMouseWheel_ || element->GetFocusMode() >= FM_FOCUSABLE))
-                element->OnWheel(delta, mouseButtons_, qualifiers_);
-        }
-    }
 }
 
 void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
-    if (input->IsMouseGrabbed())
-        return;
-
-    using namespace TouchBegin;
-
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    usingTouchInput_ = true;
-
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
-    WeakPtr<UIElement> element(GetElementAt(pos));
-
-    if (element)
-    {
-        ProcessClickBegin(pos, touchId, touchDragElements_[element], 0, 0, true);
-        touchDragElements_[element] |= touchId;
-    }
-    else
-        ProcessClickBegin(pos, touchId, touchId, 0, 0, true);
 }
 
 void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 {
-    using namespace TouchEnd;
-
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-
-    // Get the touch index
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
-
-    // Transmit hover end to the position where the finger was lifted
-    WeakPtr<UIElement> element(GetElementAt(pos));
-
-    // Clear any drag events that were using the touch id
-    for (HashMap<WeakPtr<UIElement>, int>::Iterator i = touchDragElements_.Begin(); i != touchDragElements_.End(); )
-    {
-        int touches = i->second_;
-        if (touches & touchId)
-            i = touchDragElements_.Erase(i);
-        else
-            ++i;
-    }
-
-    if (element && element->IsEnabled())
-        element->OnHover(element->ScreenToElement(pos), pos, 0, 0, 0);
-
-    ProcessClickEnd(pos, touchId, 0, 0, 0, true);
 }
 
 void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
-    using namespace TouchMove;
-
-    IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-    IntVector2 deltaPos(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
-    usingTouchInput_ = true;
-
-    int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
-
-    ProcessMove(pos, deltaPos, touchId, 0, 0, true);
 }
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    using namespace KeyDown;
 
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
-    int key = eventData[P_KEY].GetInt();
-
-    // Cancel UI dragging
-    if (key == KEY_ESC && dragElementsCount_ > 0)
-    {
-        ProcessDragCancel();
-
-        return;
-    }
-
-    // Dismiss modal element if any when ESC key is pressed
-    if (key == KEY_ESC && HasModalElement())
-    {
-        UIElement* element = rootModalElement_->GetChild(rootModalElement_->GetNumChildren() - 1);
-        if (element->GetVars().Contains(VAR_ORIGIN))
-            // If it is a popup, dismiss by defocusing it
-            SetFocusElement(0);
-        else
-        {
-            // If it is a modal window, by resetting its modal flag
-            Window* window = dynamic_cast<Window*>(element);
-            if (window && window->GetModalAutoDismiss())
-                window->SetModal(false);
-        }
-
-        return;
-    }
-
-    UIElement* element = focusElement_;
-    if (element)
-    {
-        // Switch focus between focusable elements in the same top level window
-        if (key == KEY_TAB)
-        {
-            UIElement* topLevel = element->GetParent();
-            while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
-                topLevel = topLevel->GetParent();
-            if (topLevel)
-            {
-                topLevel->GetChildren(tempElements_, true);
-                for (PODVector<UIElement*>::Iterator i = tempElements_.Begin(); i != tempElements_.End();)
-                {
-                    if ((*i)->GetFocusMode() < FM_FOCUSABLE)
-                        i = tempElements_.Erase(i);
-                    else
-                        ++i;
-                }
-                for (unsigned i = 0; i < tempElements_.Size(); ++i)
-                {
-                    if (tempElements_[i] == element)
-                    {
-                        int dir = (qualifiers_ & QUAL_SHIFT) ? -1 : 1;
-                        unsigned nextIndex = (tempElements_.Size() + i + dir) % tempElements_.Size();
-                        UIElement* next = tempElements_[nextIndex];
-                        SetFocusElement(next, true);
-                        return;
-                    }
-                }
-            }
-        }
-        // Defocus the element
-        else if (key == KEY_ESC && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
-            element->SetFocus(false);
-        // If none of the special keys, pass the key to the focused element
-        else
-            element->OnKey(key, mouseButtons_, qualifiers_);
-    }
 }
 
 void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
-    using namespace TextInput;
-
-    mouseButtons_ = eventData[P_BUTTONS].GetInt();
-    qualifiers_ = eventData[P_QUALIFIERS].GetInt();
-
-    UIElement* element = focusElement_;
-    if (element)
-        element->OnTextInput(eventData[P_TEXT].GetString(), mouseButtons_, qualifiers_);
 }
 
 void UI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
@@ -1758,30 +1454,9 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
 
 void RegisterUILibrary(Context* context)
 {
-    Font::RegisterObject(context);
-
     UIElement::RegisterObject(context);
     BorderImage::RegisterObject(context);
-    Sprite::RegisterObject(context);
-    Button::RegisterObject(context);
-    CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);
-    Text::RegisterObject(context);
-#ifdef ATOMIC_3D
-    Text3D::RegisterObject(context);
-#endif
-    Window::RegisterObject(context);
-    View3D::RegisterObject(context);
-    LineEdit::RegisterObject(context);
-    Slider::RegisterObject(context);
-    ScrollBar::RegisterObject(context);
-    ScrollView::RegisterObject(context);
-    ListView::RegisterObject(context);
-    Menu::RegisterObject(context);
-    DropDownList::RegisterObject(context);
-    FileSelector::RegisterObject(context);
-    MessageBox::RegisterObject(context);
-    ToolTip::RegisterObject(context);
 }
 
 }

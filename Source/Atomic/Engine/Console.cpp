@@ -1,3 +1,5 @@
+#ifdef __disabled
+
 //
 // Copyright (c) 2008-2014 the Urho3D project.
 //
@@ -24,20 +26,14 @@
 #include "../Engine/Console.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
-#include "../UI/DropDownList.h"
 #include "../Engine/EngineEvents.h"
-#include "../UI/Font.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 #include "../IO/IOEvents.h"
-#include "../UI/LineEdit.h"
-#include "../UI/ListView.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
-#include "../UI/ScrollBar.h"
-#include "../UI/Text.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
 
@@ -437,3 +433,5 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 }
 
 }
+
+#endif

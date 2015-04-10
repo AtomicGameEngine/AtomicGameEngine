@@ -471,6 +471,8 @@ void Engine::RunFrame()
 
 Console* Engine::CreateConsole()
 {
+    return 0;
+    /*
     if (headless_ || !initialized_)
         return 0;
 
@@ -483,10 +485,14 @@ Console* Engine::CreateConsole()
     }
 
     return console;
+    */
 }
 
 DebugHud* Engine::CreateDebugHud()
 {
+    return 0;
+
+    /*
     if (headless_ || !initialized_)
         return 0;
 
@@ -499,6 +505,7 @@ DebugHud* Engine::CreateDebugHud()
     }
 
     return debugHud;
+    */
 }
 
 void Engine::SetTimeStepSmoothing(int frames)

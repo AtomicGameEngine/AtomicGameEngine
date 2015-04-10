@@ -25,7 +25,6 @@
 
 #include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
-#include <Atomic/UI/View3D.h>
 
 #include "SceneEditor3D.h"
 

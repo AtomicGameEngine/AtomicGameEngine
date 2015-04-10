@@ -54,9 +54,6 @@ public:
     void SetCursor(Cursor* cursor);
     /// Set focused UI element.
     void SetFocusElement(UIElement* element, bool byKey = false);
-    /// Set modal element. Until all the modal elements are dismissed, all the inputs and events are only sent to them. Return true when successful.
-    /// Only the modal element can clear its modal status or when it is being destructed.
-    bool SetModalElement(UIElement* modalElement, bool enable);
     /// Clear the UI (excluding the cursor.)
     void Clear();
     /// Update the UI logic. Called by HandlePostUpdate().
@@ -82,19 +79,13 @@ public:
     /// Set UI drag event start distance threshold in pixels.
     void SetDragBeginDistance(int pixels);
     /// Set tooltip default display delay in seconds.
-    void SetDefaultToolTipDelay(float delay);
-    /// Set maximum font face texture size. Must be a power of two. Default is 2048.
-    void SetMaxFontTextureSize(int size);
+    void SetDefaultToolTipDelay(float delay);    
     /// Set whether mouse wheel can control also a non-focused element.
     void SetNonFocusedMouseWheel(bool nonFocusedMouseWheel);
     /// Set whether to use system clipboard. Default false.
     void SetUseSystemClipboard(bool enable);
     /// Set whether to show the on-screen keyboard (if supported) when a %LineEdit is focused. Default true on mobile devices.
     void SetUseScreenKeyboard(bool enable);
-    /// Set whether to use mutable (eraseable) glyphs to ensure a font face never expands to more than one texture. Default false.
-    void SetUseMutableGlyphs(bool enable);
-    /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
-    void SetForceAutoHint(bool enable);
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -181,8 +172,6 @@ private:
     void GetCursorPositionAndVisible(IntVector2& pos, bool& visible);
     /// Set active cursor's shape.
     void SetCursorShape(CursorShape shape);
-    /// Force release of font faces when global font properties change.
-    void ReleaseFontFaces();
     /// Handle button or touch hover
     void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.

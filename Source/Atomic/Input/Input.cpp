@@ -34,7 +34,6 @@
 #include "../Resource/ResourceCache.h"
 #include "../IO/RWOpsWrapper.h"
 #include "../Core/StringUtils.h"
-#include "../UI/Text.h"
 #include "../UI/UI.h"
 
 #include <cstring>
@@ -678,6 +677,10 @@ static void PopulateMouseButtonBindingMap(HashMap<String, int>& mouseButtonBindi
 
 int Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
 {
+
+    return -1;
+
+    /*
     static HashMap<String, int> keyBindingMap;
     static HashMap<String, int> mouseButtonBindingMap;
 
@@ -844,6 +847,7 @@ int Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
     SubscribeToEvent(E_TOUCHEND, HANDLER(Input, HandleScreenJoystickTouch));
 
     return joystickID;
+    */
 }
 
 bool Input::RemoveScreenJoystick(SDL_JoystickID id)
