@@ -7,7 +7,7 @@
 #include "AtomicEditor.h"
 
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UIBatch.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/Graphics/Graphics.h>

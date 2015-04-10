@@ -82,10 +82,7 @@ void AEApplication::Start()
     TBUI* tbui = GetSubsystem<TBUI>();
     tbui->Initialize();
 
-    XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
-
     Input* input = GetSubsystem<Input>();
-
     input->SetMouseVisible(true);
 
  #ifdef ATOMIC_PLATFORM_WINDOWS

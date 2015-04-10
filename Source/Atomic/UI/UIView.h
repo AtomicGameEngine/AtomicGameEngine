@@ -26,6 +26,9 @@ public:
     /// Destruct.
     virtual ~UIView();
 
+    tb::TBWidget* GetRootWidget() { return rootWidget_; }
+    bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
+
     void SetKeyboardDisabled(bool disabled) {keyboardDisabled_ = disabled; }
     void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 

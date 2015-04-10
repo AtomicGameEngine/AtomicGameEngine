@@ -18,14 +18,8 @@
 
 #include <TurboBadger/tb_core.h>
 #include <TurboBadger/tb_system.h>
-#include <TurboBadger/tb_debug.h>
-#include <TurboBadger/animation/tb_widget_animation.h>
-#include <TurboBadger/renderers/tb_renderer_batcher.h>
-#include <TurboBadger/tb_font_renderer.h>
-#include <TurboBadger/tb_node_tree.h>
-#include <TurboBadger/tb_widgets_reader.h>
-#include <TurboBadger/tb_window.h>
 
+#include "UIView.h"
 
 using namespace tb;
 
@@ -43,52 +37,45 @@ namespace Atomic
 {
 
 TBUI::TBUI(Context* context) :
-    Object(context),
-    rootWidget_(0),
-    initialized_(false),
-    shuttingDown_(false)
+    Object(context)
 {
-//    /SubscribeToEvent(E_SCREENMODE, HANDLER(TBUI, HandleScreenMode));
+
 }
 
 TBUI::~TBUI()
 {
-    if (initialized_)
-    {
-        tb::TBWidgetsAnimationManager::Shutdown();
-        delete rootWidget_;
-        // leak
-        //delete TBUIRenderer::renderer_;
-        tb_core_shutdown();
-    }
+
 }
 
+void TBUI::Render()
+{
+    theView_->Render();
+}
+
+tb::TBWidget* TBUI::GetRootWidget()
+{
+    return theView_->GetRootWidget();
+}
+
+bool TBUI::LoadResourceFile(tb::TBWidget* widget, const String& filename)
+{
+    return theView_->LoadResourceFile(widget, filename);
+}
 
 void TBUI::Shutdown()
 {
-    shuttingDown_ = true;
-    //SetInputDisabled(true);
+    theView_->SetInputDisabled(true);
+    theView_ = 0;
 }
 
 
 void TBUI::Initialize()
 {
+    theView_ = new UIView(context_);
 
 }
 
 
-bool TBUI::LoadResourceFile(TBWidget* widget, const String& filename)
-{
-
-    tb::TBNode node;
-
-    // TODO: use Urho resources
-    if (!node.ReadFile(filename.CString()))
-        return false;
-
-    tb::g_widgets_reader->LoadNodeTree(widget, &node);
-    return true;
-}
 
 
 

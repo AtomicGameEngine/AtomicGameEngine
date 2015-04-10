@@ -3,8 +3,6 @@
 #ifdef ATOMIC_TBUI
 
 #include "../Core/Object.h"
-#include "../UI/UIBatch.h"
-
 namespace tb
 {
 
@@ -15,15 +13,11 @@ class TBWidget;
 namespace Atomic
 {
 
-class VertexBuffer;
+class UIView;
 
-/// %UI element which renders a 3D scene.
 class ATOMIC_API TBUI : public Object
 {
     OBJECT(TBUI)
-
-    tb::TBWidget* rootWidget_;
-    bool initialized_;    
 
 public:
     /// Construct.
@@ -31,8 +25,8 @@ public:
     /// Destruct.
     virtual ~TBUI();
 
-    tb::TBWidget* GetRootWidget() { return rootWidget_; }
-
+    void Render();
+    tb::TBWidget* GetRootWidget();
     bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
 
     void Initialize();
@@ -41,7 +35,8 @@ public:
 
 private:
 
-    bool shuttingDown_;
+    SharedPtr<UIView> theView_;
+
 };
 
 }
