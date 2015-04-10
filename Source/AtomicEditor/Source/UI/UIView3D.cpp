@@ -7,6 +7,7 @@
 #include "AtomicEditor.h"
 
 
+#include <Atomic/UI/UI.h>
 #include <Atomic/UI/UIBatch.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Engine/Engine.h>
@@ -221,7 +222,7 @@ void View3DWidget::OnPaint(const PaintProps &paint_props)
     data[30] = rect.x;
     data[31] = rect.y + rect.h;
 
-    //view3D_->GetSubsystem<UI>()->SubmitBatchVertexData(view3D_->GetRenderTexture(), vertexData_);
+    view3D_->GetSubsystem<UI>()->SubmitBatchVertexData(view3D_->GetRenderTexture(), vertexData_);
 
 }
 
