@@ -15,16 +15,16 @@ namespace Atomic
 class VertexBuffer;
 class UIRenderer;
 
-class UIView : public Object
+class UIState : public Object
 {
-    OBJECT(UIView)
+    OBJECT(UIState)
 
 public:
 
     /// Construct.
-    UIView(Context* context);
+    UIState(Context* context);
     /// Destruct.
-    virtual ~UIView();
+    virtual ~UIState();
 
     tb::TBWidget* GetRootWidget() { return rootWidget_; }
     bool LoadResourceFile(tb::TBWidget* widget, const String& filename);

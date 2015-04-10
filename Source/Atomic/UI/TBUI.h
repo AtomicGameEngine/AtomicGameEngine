@@ -13,7 +13,7 @@ class TBWidget;
 namespace Atomic
 {
 
-class UIView;
+class UIState;
 
 class ATOMIC_API TBUI : public Object
 {
@@ -35,7 +35,7 @@ public:
 
 private:
 
-    SharedPtr<UIView> theView_;
+    SharedPtr<UIState> theView_;
 
 };
 

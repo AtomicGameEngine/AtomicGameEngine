@@ -19,7 +19,7 @@
 #include <TurboBadger/tb_core.h>
 #include <TurboBadger/tb_system.h>
 
-#include "UIView.h"
+#include "UIState.h"
 
 using namespace tb;
 
@@ -71,7 +71,7 @@ void TBUI::Shutdown()
 
 void TBUI::Initialize()
 {
-    theView_ = new UIView(context_);
+    theView_ = new UIState(context_);
 
 }
 

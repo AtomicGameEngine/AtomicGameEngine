@@ -19,7 +19,7 @@ class TBUI;
 
 class UIRenderer : public tb::TBRendererBatcher
 {
-    friend class UIView;
+    friend class UIState;
 public:
 
     UIRenderer(Context* context);

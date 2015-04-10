@@ -25,15 +25,15 @@ using namespace tb;
 #include "../Graphics/VertexBuffer.h"
 
 #include "UIRenderer.h"
-#include "UIView.h"
+#include "UIState.h"
 
 namespace Atomic
 {
 
-WeakPtr<Context> UIView::readerContext_;
+WeakPtr<Context> UIState::readerContext_;
 
 
-UIView::UIView(Context* context) :
+UIState::UIState(Context* context) :
     Object(context),
     rootWidget_(0),
     inputDisabled_(false),
@@ -50,7 +50,7 @@ UIView::UIView(Context* context) :
 
 }
 
-UIView::~UIView()
+UIState::~UIState()
 {
     tb::TBWidgetsAnimationManager::Shutdown();
     delete rootWidget_;
@@ -61,7 +61,7 @@ UIView::~UIView()
 }
 
 // refactor
-void UIView::Initialize()
+void UIState::Initialize()
 {
     readerContext_ = context_;
     TBFile::SetReaderFunction(TBFileReader);
@@ -104,22 +104,22 @@ void UIView::Initialize()
 
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UIView, HandleMouseButtonDown));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UIView, HandleMouseButtonUp));
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UIView, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UIView, HandleMouseWheel));
-    SubscribeToEvent(E_KEYDOWN, HANDLER(UIView, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(UIView, HandleKeyUp));
-    SubscribeToEvent(E_TEXTINPUT, HANDLER(UIView, HandleTextInput));
-    SubscribeToEvent(E_UPDATE, HANDLER(UIView, HandleUpdate));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UIState, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UIState, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UIState, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UIState, HandleMouseWheel));
+    SubscribeToEvent(E_KEYDOWN, HANDLER(UIState, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, HANDLER(UIState, HandleKeyUp));
+    SubscribeToEvent(E_TEXTINPUT, HANDLER(UIState, HandleTextInput));
+    SubscribeToEvent(E_UPDATE, HANDLER(UIState, HandleUpdate));
 
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UIView, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UIState, HandleRenderUpdate));
 
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 }
 
 
-void UIView::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
+void UIState::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
 
     if (batches.Empty())
@@ -203,7 +203,7 @@ void UIView::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, uns
     }
 }
 
-void UIView::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+void UIState::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
 {
     if (vertexData.Empty())
         return;
@@ -218,13 +218,13 @@ void UIView::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexDat
 }
 
 
-void UIView::Render()
+void UIState::Render()
 {
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
 }
 
-void UIView::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
+void UIState::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Get rendering batches from the non-modal UI elements
     batches_.Clear();
@@ -237,7 +237,7 @@ void UIView::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-void UIView::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void UIState::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     //if (!initialized_)
     //    return;
@@ -257,7 +257,7 @@ void UIView::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     tb::g_renderer->EndPaint();
 }
 
-void UIView::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
+void UIState::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
 {
     UIBatch b(BLEND_ALPHA , renderer_->currentScissor_, texture, &vertexData_);
 
@@ -275,7 +275,7 @@ void UIView::SubmitBatchVertexData(Texture* texture, const PODVector<float>& ver
 
 }
 
-void UIView::TBFileReader(const char* filename, void** data, unsigned* length)
+void UIState::TBFileReader(const char* filename, void** data, unsigned* length)
 {
     *data = 0;
     *length = 0;
@@ -305,7 +305,7 @@ void UIView::TBFileReader(const char* filename, void** data, unsigned* length)
 
 }
 
-bool UIView::LoadResourceFile(TBWidget* widget, const String& filename)
+bool UIState::LoadResourceFile(TBWidget* widget, const String& filename)
 {
 
     tb::TBNode node;
@@ -319,7 +319,7 @@ bool UIView::LoadResourceFile(TBWidget* widget, const String& filename)
 }
 
 
-void UIView::HandleScreenMode(StringHash eventType, VariantMap& eventData)
+void UIState::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScreenMode;
     rootWidget_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
@@ -328,7 +328,7 @@ void UIView::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 
 
-void UIView::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void UIState::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     TBMessageHandler::ProcessMessages();
 }

@@ -6,7 +6,7 @@ using namespace tb;
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 
-#include "UIView.h"
+#include "UIState.h"
 
 namespace Atomic
 {
@@ -30,7 +30,7 @@ static int toupr_ascii(int ascii)
     return ascii;
 }
 
-void UIView::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
+void UIState::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_)
         return;
@@ -74,7 +74,7 @@ void UIView::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 }
 
 
-void UIView::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
+void UIState::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_)
         return;
@@ -104,7 +104,7 @@ void UIView::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 }
 
 
-void UIView::HandleMouseMove(StringHash eventType, VariantMap& eventData)
+void UIState::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
@@ -119,7 +119,7 @@ void UIView::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 }
 
 
-void UIView::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
+void UIState::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_)
         return;
@@ -209,7 +209,7 @@ static bool InvokeKey(TBWidget* root, unsigned int key, SPECIAL_KEY special_key,
 }
 
 
-void UIView::HandleKey(bool keydown, int keycode, int scancode)
+void UIState::HandleKey(bool keydown, int keycode, int scancode)
 {
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
@@ -323,7 +323,7 @@ void UIView::HandleKey(bool keydown, int keycode, int scancode)
 
 }
 
-void UIView::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void UIState::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_ || keyboardDisabled_)
         return;
@@ -337,7 +337,7 @@ void UIView::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
 }
 
-void UIView::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+void UIState::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_ || keyboardDisabled_)
         return;
@@ -351,7 +351,7 @@ void UIView::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 
 }
 
-void UIView::HandleTextInput(StringHash eventType, VariantMap& eventData)
+void UIState::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
     if (inputDisabled_ || keyboardDisabled_)
         return;
