@@ -169,13 +169,11 @@ void Editor::HandlePlayStop(StringHash eventType, VariantMap& eventData)
     if (!player_)
         return;
 
-    TBUI* tbui = GetSubsystem<TBUI>();
-    tbui->SetKeyboardDisabled(false);
+    //TBUI* tbui = GetSubsystem<TBUI>();
+    //tbui->SetKeyboardDisabled(false);
     if (player_->GetMode() != AE_PLAYERMODE_WIDGET)
     {
-
-        tbui->SetInputDisabled(false);
-        tbui->FadeIn(.5f);
+        //tbui->SetInputDisabled(false);
     }
 
     Input* input = GetSubsystem<Input>();
@@ -272,12 +270,11 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
     AEPlayerMode mode = (AEPlayerMode) eventData[EditorPlayStarted::P_MODE].GetUInt();
 
     TBUI* tbui = GetSubsystem<TBUI>();
-    tbui->SetKeyboardDisabled(true);
+    //tbui->SetKeyboardDisabled(true);
 
     if (mode != AE_PLAYERMODE_WIDGET)
     {
-        tbui->SetInputDisabled(true);
-        tbui->FadeOut(.5f);
+        //tbui->SetInputDisabled(true);
     }
 
     player_ = new AEPlayer(context_);
