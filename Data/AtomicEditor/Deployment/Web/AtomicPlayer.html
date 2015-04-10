@@ -3,12 +3,55 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script type="text/javascript" src="AtomicLoader.js"></script>
+
     <title>Atomic Player</title>
 
     <style>
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; }
+      canvas.atomic { border: 0px none; }
+
+      /* spinner as this keeps going even when page setInterval does not*/
+      .spinner {
+              height: 30px;
+              width: 30px;
+              margin: 0;
+              margin-top: 20px;
+              margin-left: 20px;
+              display: inline-block;
+              vertical-align: top;
+
+              -webkit-animation: rotation .8s linear infinite;
+              -moz-animation: rotation .8s linear infinite;
+              -o-animation: rotation .8s linear infinite;
+              animation: rotation 0.8s linear infinite;
+
+              border-left: 5px solid rgb(235, 235, 235);
+              border-right: 5px solid rgb(235, 235, 235);
+              border-bottom: 5px solid rgb(235, 235, 235);
+              border-top: 5px solid rgb(120, 120, 120);
+
+              border-radius: 100%;
+              background-color: rgb(189, 215, 46);
+            }
+
+            @-webkit-keyframes rotation {
+              from {-webkit-transform: rotate(0deg);}
+              to {-webkit-transform: rotate(360deg);}
+            }
+            @-moz-keyframes rotation {
+              from {-moz-transform: rotate(0deg);}
+              to {-moz-transform: rotate(360deg);}
+            }
+            @-o-keyframes rotation {
+              from {-o-transform: rotate(0deg);}
+              to {-o-transform: rotate(360deg);}
+            }
+            @keyframes rotation {
+              from {transform: rotate(0deg);}
+              to {transform: rotate(360deg);}
+            }
 
     </style>
 
@@ -16,19 +59,35 @@
 
   <body>
 
-    <script>
+    <div id="atomic_player_canvas_wrapper">
+    <canvas class="atomic" id="atomic_player_canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
 
-      console.log( $( window ).width() + 'is the width' );
-      console.log( $( window ).height() + 'is the height' );
+    <div class="spinner" id='atomic_spinner'></div>
+
+    <script type="text/javascript">
+
+      (function() {
+
+      var playerCanvas = document.getElementById('atomic_player_canvas');
+      var spinner = document.getElementById('atomic_spinner');
+
+      var width = $( window ).width();
+      var height = $( window ).height();
+
+      new AtomicLoader(playerCanvas, spinner, width, height);
+
+      }) ();
 
     </script>
 
-    <canvas id="loadcanvas" width="800" height="600" oncontextmenu="event.preventDefault()"></canvas>
-    <canvas class="emscripten" id="canvas" width="800" height="600" oncontextmenu="event.preventDefault()"></canvas>
+    <!---->
+    <!--
 
     <!-- <textarea id="output" rows="8" cols="80"></textarea> -->
 
-    <script type="text/javascript" src="AtomicLoader.js"></script>
+
+
     <script async type="text/javascript" src="AtomicResources.js"></script>
     <script async type="text/javascript" src="AtomicPlayer.js"></script>
 
