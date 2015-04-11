@@ -9,7 +9,9 @@
 #include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
+
 #include "ToolSystem.h"
+#include "ToolEnvironment.h"
 
 #include "Project/Project.h"
 

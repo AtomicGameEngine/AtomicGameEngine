@@ -15,6 +15,7 @@
 #include <AtomicJS/Javascript/JSVM.h>
 #include <AtomicJS/Javascript/JSEvents.h>
 
+#include <ToolCore/ToolEnvironment.h>
 
 #include "AEPlayer.h"
 #include "AEEvents.h"
@@ -23,9 +24,6 @@
 
 #include "UIPlayer.h"
 #include "UI/Modal/UIModalOps.h"
-
-// TODO: Remove dependency
-#include <Duktape/duktape.h>
 
 namespace AtomicEditor
 {
@@ -61,15 +59,24 @@ void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
+    ToolCore::ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
+    const String& playerBinary = env->GetPlayerBinary();
+
     SubprocessSystem* system = GetSubsystem<SubprocessSystem>();
 
-    Vector<String> vargs;
-    String args = \
-    "--editor-resource-paths \"/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicExamples/Basic2D/Resources\"";
-    if (args.Length())
-        vargs = args.Split(' ');
+    Vector<String> paths;
+    paths.Push(env->GetCoreDataDir());
+    paths.Push("/Users/josh/Dev/atomic/AtomicExamples/Basic2D/Resources");
 
-    system->Launch("/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicPlayer/AtomicPlayer.app/Contents/MacOS/AtomicPlayer", vargs);
+    String resourcePaths;
+    resourcePaths.Join(paths, "!");
+
+    Vector<String> vargs;
+
+    String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
+    vargs = args.Split(' ');
+
+    system->Launch(playerBinary, vargs);
 
     return false;
 }

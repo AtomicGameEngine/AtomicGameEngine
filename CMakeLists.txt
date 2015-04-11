@@ -7,6 +7,8 @@ set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 add_definitions( -DATOMIC_API= -DATOMIC_STATIC_DEFINE -DATOMIC_ATOMIC2D -DATOMIC_LOGGING)
 
+add_definitions( -DATOMIC_DEV_BUILD )
+
 # this is here as QtCreator is having trouble picking up #include <Atomic/*> without it
 include_directories(${CMAKE_SOURCE_DIR}/Source ${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)
 
