@@ -15,7 +15,7 @@ file (GLOB IO_SOURCE IO/*.cpp IO/*.h)
 file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
-file (GLOB INTERPROCESS_SOURCE Interprocess/*.cpp Interprocess/*.h)
+file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
 
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
@@ -56,7 +56,7 @@ endif()
 
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
                   ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE} 
-                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE} ${INTERPROCESS_SOURCE}
+                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE} ${IPC_SOURCE}
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
