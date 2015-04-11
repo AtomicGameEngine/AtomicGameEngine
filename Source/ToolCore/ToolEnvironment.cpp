@@ -57,8 +57,17 @@ bool ToolEnvironment::InitFromJSON()
         return false;
     }
 
-    //env->SetRootSourceDir("/Users/josh/Dev/atomic/AtomicGameEngine");
-    //env->SetRootBuildDir("/Users/josh/Dev/atomic/AtomicGameEngine-build", true);
+    const Value::Member* rootSourceDir = document.FindMember("rootSourceDir");
+    if (rootSourceDir && rootSourceDir->value.IsString())
+        SetRootSourceDir(rootSourceDir->value.GetString());
+    else
+        return false;
+
+    const Value::Member* rootBuildDir = document.FindMember("rootBuildDir");
+    if (rootBuildDir && rootBuildDir->value.IsString())
+        SetRootBuildDir(rootBuildDir->value.GetString(), true);
+    else
+        return false;
 
     return true;
 
@@ -75,7 +84,7 @@ const String& ToolEnvironment::GetDevConfigFilename()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef ATOMIC_PLATFORM_OSX
-    devConfigFilename_ = fileSystem->GetUserDocumentsDir() = ".atomicgameengine/devConfig.json";
+    devConfigFilename_ = fileSystem->GetUserDocumentsDir() + ".atomicgameengine/toolEnv.json";
 #endif
 
     return devConfigFilename_;
@@ -85,6 +94,7 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 {
     rootSourceDir_ = AddTrailingSlash(sourceDir);
     resourceCoreDataDir_ = rootSourceDir_ + "Data/AtomicPlayer/Resources/CoreData";
+    resourceEditorDataDir_ = rootSourceDir_ + "Data/AtomicEditor/Resources/EditorData";
 }
 
 void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPaths)

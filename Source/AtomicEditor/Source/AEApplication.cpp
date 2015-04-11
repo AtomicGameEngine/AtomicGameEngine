@@ -167,7 +167,6 @@ void AEApplication::Setup()
 
 #endif
 
-
     const Vector<String>& arguments = GetArguments();
 
     for (unsigned i = 0; i < arguments.Size(); ++i)
@@ -209,10 +208,20 @@ void AEApplication::Setup()
         engineParameters_["WindowHeight"] = prefs.windowHeight;
     }
 
+#ifdef ATOMIC_DEV_BUILD
+    engineParameters_["ResourcePrefixPath"] = "";
+    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir();
+    engineParameters_["ResourcePaths"] = resourcePaths;
+#else
+
 #ifdef __APPLE__
     engineParameters_["ResourcePrefixPath"] = "../Resources";
-#else
-     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
+#endif
+
+#endif // ATOMIC_DEV_BUILD
+
+#ifndef __APPLE__
+    engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
 #endif
 
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "AtomicEditor.log";
