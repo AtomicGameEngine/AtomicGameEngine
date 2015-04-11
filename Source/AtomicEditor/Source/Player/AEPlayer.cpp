@@ -4,6 +4,8 @@
 
 #include "AtomicEditor.h"
 
+#include "../Subprocess/AESubprocessSystem.h"
+
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Input/Input.h>
@@ -28,25 +30,6 @@
 namespace AtomicEditor
 {
 
-static int js_atomiceditor_SetView(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
-    AEPlayer* player = vm->GetSubsystem<AEPlayer>();
-
-    Scene* scene = js_to_class_instance<Scene>(ctx, 0, 0);
-    Camera* camera = js_to_class_instance<Camera>(ctx, 1, 0);
-
-    UIPlayer* uiPlayer = player->GetUIPlayer();
-    Viewport* viewport = uiPlayer->SetView(scene, camera);
-
-    IntVector2 size = uiPlayer->GetPlayerSize();
-    viewport->SetRect(IntRect(0, 0, size.x_, size.y_));
-
-    js_push_class_object_instance(ctx, viewport, "Viewport");
-
-    return 1;
-}
-
 
 AEPlayer::AEPlayer(Context* context) :
     Object(context),
@@ -57,33 +40,10 @@ AEPlayer::AEPlayer(Context* context) :
     assert(!context->GetSubsystem<AEPlayer>());
     context->RegisterSubsystem(this);
 
-    Javascript* javascript = context->GetSubsystem<Javascript>();
-    vm_ = javascript->InstantiateVM("AEPlayerVM");
-
-    // only subscribe to errors on our VM
-    SubscribeToEvent(vm_, E_JSERROR, HANDLER(AEPlayer, HandleJSError));
-
-    vm_->InitJSContext();
-
-    if (errors_.Size())
-        return;
-
-    vm_->SetModuleSearchPath("Modules");
-
-    duk_eval_string_noresult(vm_->GetJSContext(), "require(\"AtomicGame\"); require (\"AtomicEditor\");");
-
 }
 
 AEPlayer::~AEPlayer()
 {
-    UnsubscribeFromEvent(E_JSERROR);
-    Javascript* javascript = context_->GetSubsystem<Javascript>();
-    // this can be NULL when exiting during play mode
-    if (javascript)
-        javascript->ShutdownVM("AEPlayerVM");
-    vm_ = NULL;
-
-    GetSubsystem<Input>()->SetTouchEmulation(false);
 
 }
 
@@ -92,59 +52,26 @@ void AEPlayer::Invalidate()
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->Hide();
     context_->RemoveSubsystem<AEPlayer>();
-
-// BEGIN LICENSE MANAGEMENT
-    if (uiPlayer_.NotNull() && uiPlayer_->Show3DInfo())
-        ops->ShowInfoModule3D();
-// END LICENSE MANAGEMENT
-
 }
 
 void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 {
-    SendEvent(E_PLAYERERROR);
-
-    AEPlayerError err;
-
-    using namespace JSError;
-    err.name_ = eventData[P_ERRORNAME].GetString();
-    err.message_ = eventData[P_ERRORMESSAGE].GetString();
-    err.filename_ = eventData[P_ERRORFILENAME].GetString();
-    err.stack_ = eventData[P_ERRORSTACK].GetString();
-    err.lineNumber_ = eventData[P_ERRORLINENUMBER].GetInt();
-
-    errors_.Push(err);
 
 }
 
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
+    SubprocessSystem* system = GetSubsystem<SubprocessSystem>();
 
-    if (errors_.Size())
-        return false;
+    Vector<String> vargs;
+    String args = \
+    "--editor-resource-paths \"/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicExamples/Basic2D/Resources\"";
+    if (args.Length())
+        vargs = args.Split(' ');
 
-    mode_ = mode;
+    system->Launch("/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicPlayer/AtomicPlayer.app/Contents/MacOS/AtomicPlayer", vargs);
 
-    UIModalOps* ops = GetSubsystem<UIModalOps>();
-
-    ops->ShowPlayer();
-
-    duk_context* ctx = vm_->GetJSContext();
-
-    duk_get_global_string(ctx, "Atomic");
-    duk_get_prop_string(ctx, -1, "editor");
-    duk_push_c_function(ctx, js_atomiceditor_SetView, 2);
-    duk_put_prop_string(ctx, -2, "setView");
-    duk_pop_2(ctx);
-
-    bool ok = vm_->ExecuteMain();
-
-    if (!ok)
-    {
-        SendEvent(E_PLAYERERROR);
-    }
-
-    return ok;
+    return false;
 }
 
 void AEPlayer::SetUIPlayer(UIPlayer* uiPlayer)

@@ -87,6 +87,24 @@ void AtomicPlayer::Setup()
     engineParameters_["ResourcePrefixPath"] = "../Resources";
 #endif
 
+    const Vector<String>& arguments = GetArguments();
+
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1)
+        {
+            String argument = arguments[i].ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "--editor-resource-paths" && value.Length())
+            {
+                engineParameters_["ResourcePrefixPath"] = "";
+                value.Replace("!", ";");
+                engineParameters_["ResourcePaths"] = value;
+            }
+        }
+    }
+
     // Use the script file name as the base name for the log file
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
 }

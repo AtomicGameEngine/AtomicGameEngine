@@ -269,9 +269,6 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
 
     AEPlayerMode mode = (AEPlayerMode) eventData[EditorPlayStarted::P_MODE].GetUInt();
 
-    UI* tbui = GetSubsystem<UI>();
-    //tbui->SetKeyboardDisabled(true);
-
     if (mode != AE_PLAYERMODE_WIDGET)
     {
         //tbui->SetInputDisabled(true);
@@ -283,7 +280,12 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
     TBRect rect = tb->GetRect();
     tb->ConvertToRoot(rect.x, rect.y);
 
-    player_->Play(mode, IntRect(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h));
+    if (!player_->Play(mode, IntRect(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h)))
+    {
+        player_->Invalidate();
+        player_ = 0;
+        return;
+    }
 
     SendEvent(E_EDITORPLAYSTARTED, eventData);
 

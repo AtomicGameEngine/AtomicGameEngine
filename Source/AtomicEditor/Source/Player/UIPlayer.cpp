@@ -39,12 +39,6 @@ UIPlayer::UIPlayer(Context* context):
     UIModalOpWindow(context)
 {
 
-// BEGIN LICENSE MANAGEMENT
-    LicenseSystem* license = GetSubsystem<LicenseSystem>();
-    standardLicense_ = license->IsStandardLicense();
-    show3DInfo_ = false;
-// END LICENSE MANAGEMENT
-
     aePlayer_ = GetSubsystem<AEPlayer>();
     aePlayer_->SetUIPlayer(this);
 
@@ -58,14 +52,6 @@ UIPlayer::UIPlayer(Context* context):
 
     Graphics* graphics = GetSubsystem<Graphics>();
 
-    view3D_ = new UIView3D(context_);
-
-    // horrible hack
-    Viewport* viewport = view3D_->GetViewport();
-    FixMeSetLight2DGroupViewport(viewport);
-
-    TBWidgetDelegate* view3DDelegate = view3D_->GetWidgetDelegate();
-
     float gwidth = graphics->GetWidth();
     float aspect = float(graphics->GetHeight())/ gwidth;
     gwidth -= 150;
@@ -73,15 +59,8 @@ UIPlayer::UIPlayer(Context* context):
     playerSize_.x_ = gwidth;
     playerSize_.y_ = gwidth * aspect;
 
-    LayoutParams lp;
-    lp.SetWidth(playerSize_.x_);
-    lp.SetHeight(playerSize_.y_);
-    view3DDelegate->SetLayoutParams(lp);
-
     TBLayout* playercontainer = window_->GetWidgetByIDAndType<TBLayout>(TBIDC("playerlayout"));
     assert(playercontainer);
-
-    playercontainer->AddChild(view3DDelegate);
 
     window_->ResizeToFitContent();
 
@@ -91,11 +70,6 @@ UIPlayer::UIPlayer(Context* context):
 
 }
 
-Viewport *UIPlayer::SetView(Scene* scene, Camera* camera)
-{
-    view3D_->SetView(scene, camera);
-    return view3D_->GetViewport();
-}
 
 UIPlayer::~UIPlayer()
 {
@@ -104,22 +78,7 @@ UIPlayer::~UIPlayer()
 
 void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    view3D_->QueueUpdate();
 
-    // BEGIN LICENSE MANAGEMENT
-    if (standardLicense_)
-    {
-        Camera* camera = view3D_->GetViewport()->GetCamera();
-        if (camera && !camera->IsOrthographic())
-        {
-            show3DInfo_ = true;
-        }
-    }
-    // END LICENSE MANAGEMENT
-
-    TBWidgetDelegate* view3DDelegate = view3D_->GetWidgetDelegate();
-    TBRect rect = view3DDelegate->GetRect();
-    view3DDelegate->ConvertToRoot(rect.x, rect.y);
 }
 
 
