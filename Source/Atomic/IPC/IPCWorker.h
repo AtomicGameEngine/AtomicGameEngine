@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <SimpleIPC/ipc_pipe.h>
-
 #include "../Core/Mutex.h"
 #include "../Core/Thread.h"
 #include "../Core/Object.h"

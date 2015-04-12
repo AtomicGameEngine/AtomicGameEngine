@@ -1,15 +1,16 @@
 
 #pragma once
 
-#include <Poco/Process.h>
-#include <SimpleIPC/ipc_pipe.h>
-
 #include "../Core/Mutex.h"
 #include "../Core/Thread.h"
 #include "../Core/Object.h"
 
+#include "IPCUnix.h"
+
 namespace Atomic
 {
+
+class IPCProcess;
 
 class IPCBroker : public Object, public Thread
 {
@@ -24,14 +25,11 @@ public:
     void ThreadFunction();
 
     bool SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
-    bool SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory, const Poco::Process::Env& env);
 
 private:
 
+    SharedPtr<IPCProcess> workerProcess_;
     PipeTransport transport_;
-    PipePair pp_;
-
-    Poco::ProcessHandle* workerHandle_;
 
 };
 

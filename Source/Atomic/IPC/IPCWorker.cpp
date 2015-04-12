@@ -1,11 +1,9 @@
 
-#include "IPCWorker.h"
-
 #include "../IO/Log.h"
 
-#include <SimpleIPC/ipc_channel.h>
-#include <SimpleIPC/ipc_codec.h>
-#include <SimpleIPC/ipc_msg_dispatch.h>
+#include "IPCWorker.h"
+#include "IPCMessage.h"
+#include "IPCUnix.h"
 
 namespace Atomic
 {
@@ -33,11 +31,13 @@ void IPCWorker::ThreadFunction()
         return;
     }
 
-    int answer = 42;
-    size_t sz = sizeof(int);
-    transport.Write(&answer, sz);
+    IPCMessageEvent msgEvent;
 
-    LOGERRORF("Wrote to IPC transport fd = %i", fd_);
+    StringHash eventType(42);
+    VariantMap eventData;
+    eventData[eventType] = "MyMy";
+    msgEvent.DoSend(transport, eventType, eventData);
+
 
 }
 
