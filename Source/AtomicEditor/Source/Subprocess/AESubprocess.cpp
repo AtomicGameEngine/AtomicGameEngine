@@ -15,7 +15,7 @@ namespace AtomicEditor
 
 Subprocess::Subprocess(Context* context) :
     Object(context),
-    handle_(NULL),
+    processHandle_(NULL),
     inStream_(pipeOut_),
     errorStream_(pipeError_),
     returnCode_(-1)
@@ -25,8 +25,8 @@ Subprocess::Subprocess(Context* context) :
 
 Subprocess::~Subprocess()
 {
-    if (handle_)
-        delete handle_;
+    if (processHandle_)
+        delete processHandle_;
 }
 
 
@@ -37,7 +37,7 @@ void Subprocess::ThreadFunction()
         int read;
         char data[129];
 
-        if (!Poco::Process::isRunning(*handle_))
+        if (!Poco::Process::isRunning(*processHandle_))
         {
             shouldRun_ = false;
             break;
@@ -57,7 +57,7 @@ void Subprocess::ThreadFunction()
 
         if (inStream_.eof())
         {
-            returnCode_ = handle_->wait();
+            returnCode_ = processHandle_->wait();
 
             if (returnCode_)
             {
@@ -143,10 +143,9 @@ bool Subprocess::Launch(const String& command, const Vector<String>& args, const
     std::string pcommand = command.CString();
     std::string pinitialDirectory = initialDirectory.CString();
 
-    // this can take an ENV as well, may come in useful
-    handle_ = new Poco::ProcessHandle(Poco::Process::launch(pcommand, pargs, pinitialDirectory, &pipeIn_, &pipeOut_, &pipeError_, env));
+    processHandle_ = new Poco::ProcessHandle(Poco::Process::launch(pcommand, pargs, pinitialDirectory, &pipeIn_, &pipeOut_, &pipeError_, env));
 
-    if (!Poco::Process::isRunning(*handle_))
+    if (!Poco::Process::isRunning(*processHandle_))
         return false;
 
     return Run();

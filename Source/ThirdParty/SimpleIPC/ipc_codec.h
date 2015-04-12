@@ -86,14 +86,14 @@ public:
 
   bool OnString8(const IPCString& s, int tag) {
     SetHeaderNext(tag | ENC_STRN08);
-    PushBack(s.size());
+    PushBack((unsigned int) s.size());
     if (s.size()) AddStr(s);
     return true;
   }
 
   bool OnString16(const IPCWString& s, int tag) {
     SetHeaderNext(tag | ENC_STRN16);
-    PushBack(s.size());
+    PushBack((unsigned int) s.size());
     if (s.size()) AddStr(s);
     return true;
   }

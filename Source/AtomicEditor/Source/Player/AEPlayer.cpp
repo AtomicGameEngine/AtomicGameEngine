@@ -7,13 +7,13 @@
 #include "../Subprocess/AESubprocessSystem.h"
 
 #include <Atomic/Core/Context.h>
+#include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/UI/UI.h>
-#include <AtomicJS/Javascript/Javascript.h>
-#include <AtomicJS/Javascript/JSVM.h>
-#include <AtomicJS/Javascript/JSEvents.h>
+
+#include <Atomic/IPC/IPCBroker.h>
 
 #include <ToolCore/ToolEnvironment.h>
 
@@ -60,9 +60,9 @@ void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
     ToolCore::ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
-    const String& playerBinary = env->GetPlayerBinary();
+    const String& editorBinary = env->GetEditorBinary();
 
-    SubprocessSystem* system = GetSubsystem<SubprocessSystem>();
+    IPCBroker* broker = new IPCBroker(context_);
 
     Vector<String> paths;
     paths.Push(env->GetCoreDataDir());
@@ -74,9 +74,19 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
     Vector<String> vargs;
 
     String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
+
+
     vargs = args.Split(' ');
+    vargs.Insert(0, "--player");
+
+    broker->SpawnWorker(editorBinary, vargs);
+
+    /*
+    SubprocessSystem* system = GetSubsystem<SubprocessSystem>();
+
 
     system->Launch(playerBinary, vargs);
+    */
 
     return false;
 }

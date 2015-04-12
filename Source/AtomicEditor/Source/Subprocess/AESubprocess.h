@@ -58,7 +58,7 @@ private:
     String errorOutput_;
     int returnCode_;
 
-    Poco::ProcessHandle* handle_;
+    Poco::ProcessHandle* processHandle_;
     Poco::Pipe pipeIn_;
     Poco::Pipe pipeOut_;
     Poco::Pipe pipeError_;

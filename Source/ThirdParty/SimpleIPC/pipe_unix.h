@@ -21,7 +21,10 @@
 
 class PipePair {
 public:
-  PipePair();
+
+  // unused bool so matches windows PipePair constructor
+  // which allows inheriting
+  PipePair(bool unused = false);
   
   int fd1() const { return fd_[0]; }
   int fd2() const { return fd_[1]; }

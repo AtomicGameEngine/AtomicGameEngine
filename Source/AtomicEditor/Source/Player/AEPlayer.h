@@ -63,9 +63,7 @@ private:
     void HandleJSError(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
-    SharedPtr<UIPlayer> uiPlayer_;
-
-    SharedPtr<JSVM> vm_;
+    SharedPtr<UIPlayer> uiPlayer_;    
 
 };
 

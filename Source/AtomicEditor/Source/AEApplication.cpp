@@ -48,8 +48,6 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 
-DEFINE_APPLICATION_MAIN(AtomicEditor::AEApplication);
-
 using namespace ToolCore;
 
 namespace AtomicEditor

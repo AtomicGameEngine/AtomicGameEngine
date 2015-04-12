@@ -105,6 +105,7 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
     {
 #ifdef ATOMIC_PLATFORM_OSX
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.app/Contents/MacOS/AtomicEditor";
 #endif
     }
 

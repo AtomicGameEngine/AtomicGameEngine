@@ -65,7 +65,7 @@ size_t WriteToFD(int fd, const char* data, size_t size) {
 }  // namespace
 
 
-PipePair::PipePair() {
+PipePair::PipePair(bool unused) {
   fd_[0] = -1;
   fd_[1] = -1;
   
