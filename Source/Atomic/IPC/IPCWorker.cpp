@@ -36,7 +36,11 @@ void IPCWorker::ThreadFunction()
     StringHash eventType(42);
     VariantMap eventData;
     eventData[eventType] = "MyMy";
-    msgEvent.DoSend(transport, eventType, eventData);
+
+    for (unsigned i = 0; i < 380; i++)
+    {
+        msgEvent.DoSend(transport, eventType, eventData);
+    }
 
 
 }

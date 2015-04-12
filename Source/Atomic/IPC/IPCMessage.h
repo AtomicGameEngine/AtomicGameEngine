@@ -10,14 +10,21 @@
 namespace Atomic
 {
 
-const unsigned IPC_MESSAGE_EVENT = 0;
+const unsigned IPC_MESSAGE_UNDEFINED = 0;
+const unsigned IPC_MESSAGE_EVENT = 1;
+
+struct IPCMessageHeader
+{
+    unsigned messageType_;
+    unsigned messageSize_;
+};
 
 class IPCMessageEvent
 {
 
 public:
 
-    bool DoRead(VectorBuffer& buffer, StringHash& eventType, VariantMap& eventData)
+    bool DoRead(MemoryBuffer& buffer, StringHash& eventType, VariantMap& eventData)
     {
         eventType = buffer.ReadStringHash();
         eventData.Clear();
@@ -31,10 +38,12 @@ public:
         buffer.WriteStringHash(eventType);
         buffer.WriteVariantMap(eventData);
 
-        unsigned sz = buffer.GetSize();
-        transport.Write(&IPC_MESSAGE_EVENT, sizeof(unsigned));
-        transport.Write(&sz, sizeof(unsigned));
-        transport.Write(buffer.GetData(), sz);
+        IPCMessageHeader header;
+        header.messageType_ = IPC_MESSAGE_EVENT;
+        header.messageSize_ = buffer.GetSize();
+
+        transport.Write(&header, sizeof(IPCMessageHeader));
+        transport.Write(buffer.GetData(), header.messageSize_);
 
         return true;
     }

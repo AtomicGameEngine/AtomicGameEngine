@@ -23,30 +23,74 @@ IPCBroker::~IPCBroker()
 
 void IPCBroker::ThreadFunction()
 {
+    unsigned count = 0;
+
+    IPCMessageHeader header;
+    header.messageType_ = IPC_MESSAGE_UNDEFINED;
+    VectorBuffer dataBuffer;
+
     while (shouldRun_)
     {
-        unsigned msgType;
-        unsigned msgSize;
+        size_t sz = 0;
 
-        size_t sz = sizeof(unsigned);
-        transport_.Read(&msgType, &sz);
+        const char* data = transport_.Receive(&sz);
 
-        sz = sizeof(unsigned);
-        transport_.Read(&msgSize, &sz);
+        if (!data)
+        {
+            shouldRun_ = false;
+            break;
+        }
 
-        VectorBuffer buffer;
-        buffer.Resize(msgSize);
+        if (!sz)
+            continue;
 
-        sz = msgSize;
-        transport_.Read(buffer.GetModifiableData(), &sz);
-        assert(sz = msgSize);
+        dataBuffer.Seek(dataBuffer.GetSize());
+        dataBuffer.Write(data, sz);
+        dataBuffer.Seek(0);
 
-        IPCMessageEvent event;
+        while (true)
+        {
+            if (header.messageType_ == IPC_MESSAGE_UNDEFINED &&
+                    dataBuffer.GetSize() - dataBuffer.GetPosition() >= sizeof(IPCMessageHeader))
+            {
+                dataBuffer.Read(&header, sizeof(IPCMessageHeader));
+            }
 
-        StringHash eventType;
-        VariantMap eventData;
-        event.DoRead(buffer, eventType, eventData);
+            if (header.messageType_ == IPC_MESSAGE_UNDEFINED)
+                break;
+
+            if (header.messageType_ != IPC_MESSAGE_UNDEFINED &&
+                     header.messageSize_ <= dataBuffer.GetSize() - dataBuffer.GetPosition())
+            {
+                MemoryBuffer buffer(dataBuffer.GetData() + dataBuffer.GetPosition(), header.messageSize_);
+                dataBuffer.Seek( dataBuffer.GetPosition() + header.messageSize_);
+                header.messageType_ = IPC_MESSAGE_UNDEFINED;
+
+                IPCMessageEvent event;
+                StringHash eventType;
+                VariantMap eventData;
+                event.DoRead(buffer, eventType, eventData);
+
+                // LOGINFOF("Message: %s %i", eventData[eventType].ToString().CString(), (int) count++);
+            }
+
+            if (dataBuffer.IsEof())
+            {
+                dataBuffer.Clear();
+            }
+
+            if (dataBuffer.GetPosition() == 0)
+                break;
+
+            VectorBuffer newBuffer;
+            newBuffer.Write(dataBuffer.GetData() + dataBuffer.GetPosition(), dataBuffer.GetSize() - dataBuffer.GetPosition());
+            newBuffer.Seek(0);
+            dataBuffer = newBuffer;
+        }
+
     }
+
+    shouldRun_ = false;
 
 }
 
