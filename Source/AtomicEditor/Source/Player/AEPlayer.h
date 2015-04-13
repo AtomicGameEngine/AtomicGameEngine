@@ -67,6 +67,7 @@ private:
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
     void HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData);
+    void HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<IPCBroker> broker_;
 

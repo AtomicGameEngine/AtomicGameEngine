@@ -93,6 +93,10 @@ void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
         SharedPtr<IPCBroker>& broker = brokers_[i];
         if (!broker->Update())
         {
+            VariantMap brokerData;
+            brokerData[WorkerExit::P_BROKER] = broker;
+            brokerData[WorkerExit::P_EXITCODE] = 0;
+            broker->SendEvent(E_IPCWORKEREXIT, brokerData);
             remove.Push(broker);
         }
     }

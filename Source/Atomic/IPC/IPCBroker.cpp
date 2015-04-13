@@ -49,6 +49,7 @@ bool IPCBroker::Update()
     if (!shouldRun_)
     {
         Stop();
+        close(pp_.fd1());
         return false;
     }
 

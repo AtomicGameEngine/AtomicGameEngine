@@ -42,7 +42,7 @@ AEPlayer::AEPlayer(Context* context) :
 
 AEPlayer::~AEPlayer()
 {
-    LOGINFO("Player down");
+
 }
 
 void AEPlayer::Invalidate()
@@ -59,13 +59,17 @@ void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 
 void AEPlayer::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
-    LOGINFOF("Yay");
-
     VariantMap weventData;
     weventData[HelloFromBroker::P_HELLO] = "Hello";
     weventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING] = 42;
     broker_->PostMessage(E_IPCHELLOFROMBROKER, weventData);
 }
+
+void AEPlayer::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
+{
+    SendEvent(E_EDITORPLAYSTOP);
+}
+
 
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
@@ -88,6 +92,11 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     IPC* ipc = GetSubsystem<IPC>();
     broker_ = ipc->SpawnWorker(editorBinary, vargs);
+
+    if (broker_)
+    {
+        SubscribeToEvent(broker_, E_IPCWORKEREXIT, HANDLER(AEPlayer, HandleIPCWorkerExit));
+    }
 
     return broker_.NotNull();
 }
