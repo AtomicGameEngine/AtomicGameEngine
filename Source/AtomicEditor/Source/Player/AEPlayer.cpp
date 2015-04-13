@@ -14,10 +14,6 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/UI/UI.h>
 
-#include <Atomic/IPC/IPC.h>
-#include <Atomic/IPC/IPCEvents.h>
-#include <Atomic/IPC/IPCBroker.h>
-
 #include <ToolCore/ToolEnvironment.h>
 
 #include "AEPlayer.h"
@@ -46,7 +42,7 @@ AEPlayer::AEPlayer(Context* context) :
 
 AEPlayer::~AEPlayer()
 {
-
+    LOGINFO("Player down");
 }
 
 void AEPlayer::Invalidate()
@@ -63,17 +59,18 @@ void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 
 void AEPlayer::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
-
     LOGINFOF("Yay");
 
+    VariantMap weventData;
+    weventData[HelloFromBroker::P_HELLO] = "Hello";
+    weventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING] = 42;
+    broker_->PostMessage(E_IPCHELLOFROMBROKER, weventData);
 }
 
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
     ToolCore::ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
     const String& editorBinary = env->GetEditorBinary();
-
-    IPCBroker* broker = new IPCBroker(context_);
 
     Vector<String> paths;
     paths.Push(env->GetCoreDataDir());
@@ -86,20 +83,13 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
 
-
     vargs = args.Split(' ');
     vargs.Insert(0, "--player");
 
-    broker->SpawnWorker(editorBinary, vargs);
+    IPC* ipc = GetSubsystem<IPC>();
+    broker_ = ipc->SpawnWorker(editorBinary, vargs);
 
-    /*
-    SubprocessSystem* system = GetSubsystem<SubprocessSystem>();
-
-
-    system->Launch(playerBinary, vargs);
-    */
-
-    return true;
+    return broker_.NotNull();
 }
 
 void AEPlayer::SetUIPlayer(UIPlayer* uiPlayer)

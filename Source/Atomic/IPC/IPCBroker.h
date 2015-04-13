@@ -10,6 +10,8 @@ class IPCProcess;
 
 class IPCBroker : public IPCChannel
 {
+    friend class IPC;
+
     OBJECT(IPCBroker);
 
 public:
@@ -20,12 +22,11 @@ public:
 
     void ThreadFunction();
 
-    bool SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
-
 private:
 
-    SharedPtr<IPCProcess> workerProcess_;
+    bool SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
 
+    SharedPtr<IPCProcess> workerProcess_;
 
 };
 

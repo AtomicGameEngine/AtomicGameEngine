@@ -30,6 +30,7 @@
 #include <Atomic/Resource/ResourceEvents.h>
 
 #include <Atomic/IPC/IPC.h>
+#include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCWorker.h>
 
 // Move me
@@ -138,9 +139,22 @@ void AEPlayerApplication::Setup()
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
 }
 
+void AEPlayerApplication::HandleHelloFromBroker(StringHash eventType, VariantMap& eventData)
+{
+    assert(eventData[HelloFromBroker::P_HELLO].GetString() == "Hello");
+    assert(eventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING].GetInt() == 42);
+
+    LOGERROR("Passed Test!");
+}
+
 void AEPlayerApplication::Start()
 {
-    context_->RegisterSubsystem(new IPC(context_, fd_[0], fd_[1]));
+
+    SubscribeToEvent(E_IPCHELLOFROMBROKER, HANDLER(AEPlayerApplication, HandleHelloFromBroker));
+
+    IPC* ipc = new IPC(context_);
+    context_->RegisterSubsystem(ipc);
+    ipc->InitWorker(fd_[0], fd_[1]);
 
     // Instantiate and register the Javascript subsystem
     javascript = new Javascript(context_);

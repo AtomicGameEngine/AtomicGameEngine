@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "IPC.h"
 #include "IPCChannel.h"
 
 namespace Atomic

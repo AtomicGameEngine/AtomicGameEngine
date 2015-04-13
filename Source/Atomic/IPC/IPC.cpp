@@ -14,26 +14,40 @@
 namespace Atomic
 {
 
-IPC::IPC(Context* context, int fd1, int fd2) : Object(context)
+IPC::IPC(Context* context) : Object(context)
 {
     SubscribeToEvent(E_UPDATE, HANDLER(IPC, HandleUpdate));
-
-    if (fd1 != -1 && fd2 != -1)
-    {
-        // close server fd
-        close(fd1);
-
-        worker_ = new IPCWorker(fd2, context_);
-        worker_->Run();
-
-        SendEventToBroker(E_IPCWORKERSTART);
-    }
-
 }
 
 IPC::~IPC()
 {
 
+}
+
+bool IPC::InitWorker(int fd1, int fd2)
+{
+    // close server fd
+    close(fd1);
+
+    worker_ = new IPCWorker(fd2, context_);
+    worker_->Run();
+
+    SendEventToBroker(E_IPCWORKERSTART);
+
+    return true;
+}
+
+IPCBroker* IPC::SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory)
+{
+    SharedPtr<IPCBroker> broker(new IPCBroker(context_));
+
+    if (broker->SpawnWorker(command, args, initialDirectory))
+    {
+        brokers_.Push(broker);
+        return broker;
+    }
+
+    return 0;
 }
 
 void IPC::SendEventToBroker(StringHash eventType)
@@ -48,7 +62,6 @@ void IPC::SendEventToBroker(StringHash eventType, VariantMap& eventData)
         worker_->PostMessage(eventType, eventData);
     }
 }
-
 
 void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {

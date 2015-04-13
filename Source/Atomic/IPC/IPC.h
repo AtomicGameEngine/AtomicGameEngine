@@ -24,12 +24,17 @@ class IPC : public Object
 public:
 
     /// Construct.
-    IPC(Context* context, int fd1 = -1, int fd2 = -1);
+    IPC(Context* context);
     /// Destruct.
     virtual ~IPC();
 
     void QueueEvent(StringHash eventType, VariantMap& eventData);
 
+    bool InitWorker(int fd1, int fd2);
+
+    IPCBroker* SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
+
+    // worker -> broker
     void SendEventToBroker(StringHash eventType);
     void SendEventToBroker(StringHash eventType, VariantMap& eventData);
 
