@@ -1,18 +1,14 @@
 
 #pragma once
 
-#include "../Core/Mutex.h"
-#include "../Core/Thread.h"
-#include "../Core/Object.h"
-
-#include "IPCUnix.h"
+#include "IPCChannel.h"
 
 namespace Atomic
 {
 
 class IPCProcess;
 
-class IPCBroker : public Object, public Thread
+class IPCBroker : public IPCChannel
 {
     OBJECT(IPCBroker);
 
@@ -29,7 +25,7 @@ public:
 private:
 
     SharedPtr<IPCProcess> workerProcess_;
-    PipeTransport transport_;
+
 
 };
 

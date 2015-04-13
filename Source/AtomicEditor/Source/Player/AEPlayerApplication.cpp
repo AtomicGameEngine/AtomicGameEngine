@@ -29,6 +29,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
+#include <Atomic/IPC/IPC.h>
 #include <Atomic/IPC/IPCWorker.h>
 
 // Move me
@@ -56,6 +57,9 @@ static Javascript* javascript = NULL;
 AEPlayerApplication::AEPlayerApplication(Context* context) :
     Application(context)
 {
+    fd_[0] = -1;
+    fd_[1] = -1;
+
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);
 #endif
@@ -96,9 +100,6 @@ void AEPlayerApplication::Setup()
 
     const Vector<String>& arguments = GetArguments();
 
-    int ipc_server_fd = -1;
-    int ipc_client_fd = -1;
-
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
         if (arguments[i].Length() > 1)
@@ -115,14 +116,10 @@ void AEPlayerApplication::Setup()
                 {
                     int fd = ToInt(ipc[1].CString());
                     if (argument.StartsWith("--ipc-server="))
-                        ipc_server_fd = fd;
+                        fd_[0] = fd;
                     else
                     {
-
-                        ipc_client_fd = fd;
-                        close(ipc_server_fd);
-                        IPCWorker* worker = new IPCWorker(ipc_client_fd, context_);
-                        worker->Run();
+                        fd_[1] = fd;
                     }
 
                 }
@@ -143,6 +140,7 @@ void AEPlayerApplication::Setup()
 
 void AEPlayerApplication::Start()
 {
+    context_->RegisterSubsystem(new IPC(context_, fd_[0], fd_[1]));
 
     // Instantiate and register the Javascript subsystem
     javascript = new Javascript(context_);

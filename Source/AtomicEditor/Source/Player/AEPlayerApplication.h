@@ -52,6 +52,8 @@ private:
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
 
+    int fd_[2];
+
 };
 
 }

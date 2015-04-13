@@ -8,9 +8,18 @@
 namespace Atomic
 {
 
-IPCWorker::IPCWorker(int fd, Context* context) : Object(context),
+IPCWorker::IPCWorker(int fd, Context* context) : IPCChannel(context),
     fd_(fd)
 {
+    if (!transport_.OpenClient(fd_))
+    {
+        LOGERRORF("Unable to open IPC transport fd = %i", fd_);
+        shouldRun_ = false;
+        return;
+    }
+
+    LOGERRORF("Opened IPC transport fd = %i", fd_);
+
 
 }
 
@@ -22,26 +31,14 @@ IPCWorker::~IPCWorker()
 void IPCWorker::ThreadFunction()
 {
 
-    PipeTransport transport;
-
-    if (!transport.OpenClient(fd_))
+    while(shouldRun_)
     {
-        LOGERRORF("Unable to open IPC transport fd = %i", fd_);
-        shouldRun_ = false;
-        return;
+        if (!Receive())
+        {
+            Stop();
+            break;
+        }
     }
-
-    IPCMessageEvent msgEvent;
-
-    StringHash eventType(42);
-    VariantMap eventData;
-    eventData[eventType] = "MyMy";
-
-    for (unsigned i = 0; i < 380; i++)
-    {
-        msgEvent.DoSend(transport, eventType, eventData);
-    }
-
 
 }
 

@@ -6,88 +6,29 @@
 
 #include "IPCUnix.h"
 #include "IPCBroker.h"
-#include "IPCMessage.h"
+
 
 namespace Atomic
 {
 
-IPCBroker::IPCBroker(Context* context) : Object(context)
-{
+IPCBroker::IPCBroker(Context* context) : IPCChannel(context)
+{    
 
 }
 
 IPCBroker::~IPCBroker()
 {
-
 }
 
 void IPCBroker::ThreadFunction()
 {
-    unsigned count = 0;
-
-    IPCMessageHeader header;
-    header.messageType_ = IPC_MESSAGE_UNDEFINED;
-    VectorBuffer dataBuffer;
-
     while (shouldRun_)
     {
-        size_t sz = 0;
-
-        const char* data = transport_.Receive(&sz);
-
-        if (!data)
+        if (!Receive())
         {
-            shouldRun_ = false;
+            Stop();
             break;
         }
-
-        if (!sz)
-            continue;
-
-        dataBuffer.Seek(dataBuffer.GetSize());
-        dataBuffer.Write(data, sz);
-        dataBuffer.Seek(0);
-
-        while (true)
-        {
-            if (header.messageType_ == IPC_MESSAGE_UNDEFINED &&
-                    dataBuffer.GetSize() - dataBuffer.GetPosition() >= sizeof(IPCMessageHeader))
-            {
-                dataBuffer.Read(&header, sizeof(IPCMessageHeader));
-            }
-
-            if (header.messageType_ == IPC_MESSAGE_UNDEFINED)
-                break;
-
-            if (header.messageType_ != IPC_MESSAGE_UNDEFINED &&
-                     header.messageSize_ <= dataBuffer.GetSize() - dataBuffer.GetPosition())
-            {
-                MemoryBuffer buffer(dataBuffer.GetData() + dataBuffer.GetPosition(), header.messageSize_);
-                dataBuffer.Seek( dataBuffer.GetPosition() + header.messageSize_);
-                header.messageType_ = IPC_MESSAGE_UNDEFINED;
-
-                IPCMessageEvent event;
-                StringHash eventType;
-                VariantMap eventData;
-                event.DoRead(buffer, eventType, eventData);
-
-                // LOGINFOF("Message: %s %i", eventData[eventType].ToString().CString(), (int) count++);
-            }
-
-            if (dataBuffer.IsEof())
-            {
-                dataBuffer.Clear();
-            }
-
-            if (dataBuffer.GetPosition() == 0)
-                break;
-
-            VectorBuffer newBuffer;
-            newBuffer.Write(dataBuffer.GetData() + dataBuffer.GetPosition(), dataBuffer.GetSize() - dataBuffer.GetPosition());
-            newBuffer.Seek(0);
-            dataBuffer = newBuffer;
-        }
-
     }
 
     shouldRun_ = false;

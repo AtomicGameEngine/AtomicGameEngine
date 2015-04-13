@@ -1,14 +1,12 @@
 
 #pragma once
 
-#include "../Core/Mutex.h"
-#include "../Core/Thread.h"
-#include "../Core/Object.h"
+#include "IPCChannel.h"
 
 namespace Atomic
 {
 
-class IPCWorker : public Object, public Thread
+class IPCWorker : public IPCChannel
 {
     OBJECT(IPCWorker);
 

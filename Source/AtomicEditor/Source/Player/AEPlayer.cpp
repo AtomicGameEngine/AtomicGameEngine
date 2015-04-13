@@ -9,10 +9,13 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/IO/Log.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/UI/UI.h>
 
+#include <Atomic/IPC/IPC.h>
+#include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCBroker.h>
 
 #include <ToolCore/ToolEnvironment.h>
@@ -34,6 +37,7 @@ AEPlayer::AEPlayer(Context* context) :
     mode_(AE_PLAYERMODE_WIDGET)
 {
     SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(AEPlayer, HandleEditorShutdown));
+    SubscribeToEvent(E_IPCWORKERSTART, HANDLER(AEPlayer, HandleIPCWorkerStarted));
 
     assert(!context->GetSubsystem<AEPlayer>());
     context->RegisterSubsystem(this);
@@ -54,6 +58,13 @@ void AEPlayer::Invalidate()
 
 void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 {
+
+}
+
+void AEPlayer::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
+{
+
+    LOGINFOF("Yay");
 
 }
 
@@ -88,7 +99,7 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
     system->Launch(playerBinary, vargs);
     */
 
-    return false;
+    return true;
 }
 
 void AEPlayer::SetUIPlayer(UIPlayer* uiPlayer)

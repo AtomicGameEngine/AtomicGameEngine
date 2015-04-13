@@ -24,6 +24,8 @@
 #include <Atomic/Environment/Environment.h>
 #include <Atomic/Graphics/Renderer.h>
 
+#include <Atomic/IPC/IPC.h>
+
 #include "AEEditorStrings.h"
 #include "AEEditorShortcuts.h"
 #include "Project/ProjectUtils.h"
@@ -69,6 +71,9 @@ void AEApplication::Start()
 
     Engine* engine = GetSubsystem<Engine>();
     engine->SetAutoExit(false);
+
+    // Register IPC system
+    context_->RegisterSubsystem(new IPC(context_));
 
     // Get default style
     ResourceCache* cache = GetSubsystem<ResourceCache>();
