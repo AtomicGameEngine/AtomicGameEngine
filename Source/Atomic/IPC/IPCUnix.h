@@ -51,26 +51,28 @@ private:
   PODVector<char> buf_;
 };
 
-// held by broker
 class IPCProcess : public Object
 {
     OBJECT(IPCProcess)
 
 public:
 
-    IPCProcess(Context* context);
+    IPCProcess(Context* context, int fd1, int fd2, int pid = -1);
+
     virtual ~IPCProcess();
 
-    int fd1() const { return pp_.fd1(); }
-    int fd2() const { return pp_.fd2(); }
+    bool IsRunning();
+
+    int fd1() const { return fd1_; }
+    int fd2() const { return fd2_; }
 
     bool Launch(const String& command, const Vector<String>& args, const String& initialDirectory);
 
 private:
 
     int pid_;
-    PipePair pp_;
-
+    int fd1_;
+    int fd2_;
 };
 
 

@@ -4,6 +4,7 @@
 #endif
 
 #include "../Core/CoreEvents.h"
+#include "../Engine/Engine.h"
 #include "../IO/Log.h"
 
 #include "IPCBroker.h"
@@ -21,7 +22,15 @@ IPC::IPC(Context* context) : Object(context)
 
 IPC::~IPC()
 {
+    for (unsigned i = 0; i < brokers_.Size(); i++)
+        brokers_[i]->Stop();
 
+    brokers_.Clear();
+
+    if (worker_.NotNull())
+        worker_->Stop();
+
+    worker_ = 0;
 }
 
 bool IPC::InitWorker(int fd1, int fd2)
@@ -65,6 +74,34 @@ void IPC::SendEventToBroker(StringHash eventType, VariantMap& eventData)
 
 void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // If we're a worker, if update fails, time to exit
+    if (worker_.NotNull())
+    {
+        if (!worker_->Update())
+        {
+            worker_ = 0;
+            GetSubsystem<Engine>()->Exit();
+            return;
+        }
+    }
+
+    // Update brokers
+    Vector<IPCBroker*> remove;
+
+    for (unsigned i = 0; i < brokers_.Size(); i++)
+    {
+        SharedPtr<IPCBroker>& broker = brokers_[i];
+        if (!broker->Update())
+        {
+            remove.Push(broker);
+        }
+    }
+
+    for (unsigned i = 0; i < remove.Size(); i++)
+    {
+        brokers_.Remove(SharedPtr<IPCBroker>(remove[i]));
+    }
+
     eventMutex_.Acquire();
 
     for (List<QueuedEvent>::Iterator itr = queuedEvents_.Begin(); itr != queuedEvents_.End(); itr++)

@@ -32,8 +32,12 @@ protected:
 
     // for access from thread
     WeakPtr<IPC> ipc_;
-    PipeTransport transport_;
 
+    // for brokers this is the worker process
+    // for workers, the broker process
+    SharedPtr<IPCProcess> otherProcess_;
+
+    PipeTransport transport_;
     IPCMessageHeader currentHeader_;
     VectorBuffer dataBuffer_;
 

@@ -11,6 +11,13 @@ EVENT(E_IPCWORKERSTART, WorkerStart)
 
 }
 
+/// Worker exited
+EVENT(E_IPCWORKEREXIT, WorkerExit)
+{
+    PARAM(P_BROKER, Broker);   // Broker*
+    PARAM(P_EXITCODE, ExitCode);   // int
+}
+
 /// Worker start
 EVENT(E_IPCHELLOFROMBROKER, HelloFromBroker)
 {

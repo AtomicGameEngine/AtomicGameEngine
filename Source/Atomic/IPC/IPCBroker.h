@@ -22,11 +22,14 @@ public:
 
     void ThreadFunction();
 
+    bool Update();
+
 private:
 
     bool SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
 
-    SharedPtr<IPCProcess> workerProcess_;
+    // broker instantiates the pipe pair
+    PipePair pp_;
 
 };
 

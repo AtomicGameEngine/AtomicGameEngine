@@ -18,15 +18,20 @@ IPCBroker::IPCBroker(Context* context) : IPCChannel(context)
 
 IPCBroker::~IPCBroker()
 {
+
 }
 
 void IPCBroker::ThreadFunction()
 {
     while (shouldRun_)
     {
-        if (!Receive())
+        if (!otherProcess_->IsRunning())
         {
-            Stop();
+            break;
+        }
+
+        if (!Receive())
+        {            
             break;
         }
     }
@@ -35,13 +40,28 @@ void IPCBroker::ThreadFunction()
 
 }
 
+bool IPCBroker::Update()
+{
+
+    if (otherProcess_.Null())
+        return false;
+
+    if (!shouldRun_)
+    {
+        Stop();
+        return false;
+    }
+
+    return true;
+}
+
 bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory)
 {
     Vector<String> pargs;
 
-    workerProcess_ = new IPCProcess(context_);
+    otherProcess_ = new IPCProcess(context_, pp_.fd1(), pp_.fd2());
 
-    transport_.OpenServer(workerProcess_->fd1());
+    transport_.OpenServer(otherProcess_->fd1());
 
     // copy args
     for (unsigned i = 0; i < args.Size(); i++)
@@ -55,14 +75,14 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
         writable_cmdline += kCmdLinePipeEq + std::wstring(pipe_num);
     */
 #else
-    pargs.Push(ToString("--ipc-server=%i", workerProcess_->fd1()));
-    pargs.Push(ToString("--ipc-client=%i", workerProcess_->fd2()));
+    pargs.Push(ToString("--ipc-server=%i", pp_.fd1()));
+    pargs.Push(ToString("--ipc-client=%i", pp_.fd2()));
 #endif
 
-    if (!workerProcess_->Launch(command, pargs, initialDirectory))
+    if (!otherProcess_->Launch(command, pargs, initialDirectory))
         return false;
 
-    close(workerProcess_->fd2());
+    close(pp_.fd2());
 
     return Run();
 

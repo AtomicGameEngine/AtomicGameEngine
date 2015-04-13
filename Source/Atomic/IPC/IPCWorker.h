@@ -19,6 +19,8 @@ public:
 
     void ThreadFunction();
 
+    bool Update();
+
 private:
 
     int fd_;
