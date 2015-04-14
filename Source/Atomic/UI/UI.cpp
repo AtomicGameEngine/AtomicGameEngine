@@ -72,7 +72,7 @@ void UI::Shutdown()
     SetInputDisabled(true);
 }
 
-void UI::Initialize()
+void UI::Initialize(const String& languageFile)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     assert(graphics);
@@ -87,39 +87,17 @@ void UI::Initialize()
     TBWidgetsAnimationManager::Init();
 
     renderer_ = new UIRenderer(graphics_->GetContext());
-    tb_core_init(renderer_, "AtomicEditor/resources/language/lng_en.tb.txt");
-
-    // Load the default skin, and override skin that contains the graphics specific to the demo.
-    tb::g_tb_skin->Load("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
+    tb_core_init(renderer_, languageFile.CString());
 
     //register_tbbf_font_renderer();
     //register_stb_font_renderer();
     register_freetype_font_renderer();
 
-    tb::g_font_manager->AddFontInfo("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-    tb::g_font_manager->AddFontInfo("AtomicEditor/resources/vera.ttf", "Vera");
-
-    tb::TBFontDescription fd;
-    fd.SetID(tb::TBIDC("Vera"));
-    fd.SetSize(tb::g_tb_skin->GetDimensionConverter()->DpToPx(12));
-    tb::g_font_manager->SetDefaultFontDescription(fd);
-
-    // Create the font now.
-    tb::TBFontFace *font = tb::g_font_manager->CreateFontFace(tb::g_font_manager->GetDefaultFontDescription());
-
-    // Render some glyphs in one go now since we know we are going to use them. It would work fine
-    // without this since glyphs are rendered when needed, but with some extra updating of the glyph bitmap.
-    if (font)
-        font->RenderGlyphs(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~•·åäöÅÄÖ");
-
     rootWidget_ = new TBWidget();
-    //rootWidget_->SetSkinBg(tb::TBIDC("background"));
 
     int width = graphics_->GetWidth();
     int height = graphics_->GetHeight();
     rootWidget_->SetSize(width, height);
-    //SetSize(width, height);
-
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
@@ -138,6 +116,32 @@ void UI::Initialize()
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 }
 
+void UI::LoadSkin(const String& skin, const String& overrideSkin)
+{
+    // Load the default skin, and override skin
+    tb::g_tb_skin->Load(skin.CString(), overrideSkin.CString());
+}
+
+void UI::SetDefaultFont(const String& name, int size)
+{
+    tb::TBFontDescription fd;
+    fd.SetID(tb::TBIDC(name.CString()));
+    fd.SetSize(tb::g_tb_skin->GetDimensionConverter()->DpToPx(12));
+    tb::g_font_manager->SetDefaultFontDescription(fd);
+
+    // Create the font now.
+    tb::TBFontFace *font = tb::g_font_manager->CreateFontFace(tb::g_font_manager->GetDefaultFontDescription());
+
+    // Render some glyphs in one go now since we know we are going to use them. It would work fine
+    // without this since glyphs are rendered when needed, but with some extra updating of the glyph bitmap.
+    if (font)
+        font->RenderGlyphs(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~•·åäöÅÄÖ");
+}
+
+void UI::AddFont(const String& fontFile, const String& name)
+{
+    tb::g_font_manager->AddFontInfo(fontFile.CString(), name.CString());
+}
 
 void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {

@@ -96,7 +96,12 @@ void AEApplication::Start()
 
     // initialize after EditorResources set
     UI* tbui = GetSubsystem<UI>();
-    tbui->Initialize();
+
+    tbui->Initialize("AtomicEditor/resources/language/lng_en.tb.txt");
+    tbui->LoadSkin("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
+    tbui->AddFont("AtomicEditor/resources/vera.ttf", "Vera");
+    tbui->AddFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
+    tbui->SetDefaultFont("Vera", 12);
 
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);

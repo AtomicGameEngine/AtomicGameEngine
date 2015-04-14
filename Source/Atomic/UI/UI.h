@@ -36,8 +36,13 @@ public:
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
-    void Initialize();
+    void Initialize(const String& languageFile);
+
     void Shutdown();
+
+    void LoadSkin(const String& skin, const String& overrideSkin);
+    void AddFont(const String& fontFile, const String &name);
+    void SetDefaultFont(const String& name, int size);
 
 private:
 

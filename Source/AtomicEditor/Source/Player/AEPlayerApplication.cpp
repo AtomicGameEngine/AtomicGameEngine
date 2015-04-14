@@ -152,9 +152,19 @@ void AEPlayerApplication::Start()
 
     SubscribeToEvent(E_IPCHELLOFROMBROKER, HANDLER(AEPlayerApplication, HandleHelloFromBroker));
 
-    IPC* ipc = new IPC(context_);
-    context_->RegisterSubsystem(ipc);
-    ipc->InitWorker(fd_[0], fd_[1]);
+    if (fd_[0] != -1 && fd_[1] != -1)
+    {
+        IPC* ipc = new IPC(context_);
+        context_->RegisterSubsystem(ipc);
+        ipc->InitWorker(fd_[0], fd_[1]);
+    }
+
+    UI* tbui = GetSubsystem<UI>();
+
+    tbui->Initialize("UI/language/lng_en.tb.txt");
+    tbui->LoadSkin("UI/default_skin/skin.tb.txt", "");
+    tbui->AddFont("UI/fonts/vera.ttf", "Vera");
+    tbui->SetDefaultFont("Vera", 12);
 
     // Instantiate and register the Javascript subsystem
     javascript = new Javascript(context_);

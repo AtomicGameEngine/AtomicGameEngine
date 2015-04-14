@@ -128,7 +128,7 @@ bool TBSkin::Load(const char *skin_file, const char *override_skin_file)
 {
 	if (!LoadInternal(skin_file))
 		return false;
-	if (override_skin_file && !LoadInternal(override_skin_file))
+    if (override_skin_file && strlen(override_skin_file) && !LoadInternal(override_skin_file))
 		return false;
 	return ReloadBitmaps();
 }

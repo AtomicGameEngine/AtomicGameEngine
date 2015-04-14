@@ -34,6 +34,7 @@ public:
     const String& GetToolBinary() { return toolBinary_; }
 
     const String& GetCoreDataDir() { return resourceCoreDataDir_; }
+    const String& GetPlayerDataDir() { return resourcePlayerDataDir_; }
     const String& GetEditorDataDir() { return resourceEditorDataDir_; }
 
     const String& GetDeploymentDataDir() { return toolBinary_; }
@@ -66,6 +67,7 @@ private:
 
     // resources
     String resourceCoreDataDir_;
+    String resourcePlayerDataDir_;
     String resourceEditorDataDir_;
 
     // deployment

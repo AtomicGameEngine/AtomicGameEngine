@@ -78,7 +78,8 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     Vector<String> paths;
     paths.Push(env->GetCoreDataDir());
-    paths.Push("/Users/josh/Dev/atomic/AtomicExamples/Basic2D/Resources");
+    paths.Push(env->GetPlayerDataDir());
+    paths.Push("/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources");
 
     String resourcePaths;
     resourcePaths.Join(paths, "!");
@@ -89,6 +90,10 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     vargs = args.Split(' ');
     vargs.Insert(0, "--player");
+
+    String dump;
+    dump.Join(vargs, " ");
+    LOGINFOF("Launching Broker %s", dump.CString());
 
     IPC* ipc = GetSubsystem<IPC>();
     broker_ = ipc->SpawnWorker(editorBinary, vargs);
