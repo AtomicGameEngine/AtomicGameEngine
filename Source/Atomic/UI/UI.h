@@ -14,6 +14,7 @@ namespace Atomic
 
 class VertexBuffer;
 class UIRenderer;
+class UIWidget;
 
 class UI : public Object
 {
@@ -44,6 +45,8 @@ public:
     void AddFont(const String& fontFile, const String &name);
     void SetDefaultFont(const String& name, int size);
 
+    UIWidget* WrapWidget(tb::TBWidget* widget);
+
 private:
 
     static WeakPtr<Context> readerContext_;
@@ -63,6 +66,8 @@ private:
     SharedPtr<VertexBuffer> vertexBuffer_;
 
     WeakPtr<Graphics> graphics_;
+
+    HashMap<tb::TBWidget*, UIWidget*> widgetWrap_;
 
     bool inputDisabled_;
     bool keyboardDisabled_;

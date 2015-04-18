@@ -26,6 +26,8 @@ using namespace tb;
 
 #include "UIRenderer.h"
 #include "UI.h"
+#include "UIButton.h"
+#include "UITextField.h"
 
 namespace tb
 {
@@ -349,11 +351,33 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     //SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
 }
 
-
-
 void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     TBMessageHandler::ProcessMessages();
+}
+
+UIWidget* UI::WrapWidget(tb::TBWidget* widget)
+{
+    if (widgetWrap_.Contains(widget))
+        return widgetWrap_[widget];
+
+    if (widget->IsOfType<TBButton>())
+    {
+        UIButton* button = new UIButton(context_, false);
+        button->SetWidget(widget);
+        widgetWrap_[widget] = button;
+        return button;
+    }
+
+    if (widget->IsOfType<TBTextField>())
+    {
+        UITextField* textfield = new UITextField(context_, false);
+        textfield->SetWidget(widget);
+        widgetWrap_[widget] = textfield;
+        return textfield;
+    }
+
+    return 0;
 }
 
 

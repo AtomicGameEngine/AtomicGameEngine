@@ -17,6 +17,7 @@
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSAtomic.h"
+#include "JSUI.h"
 
 namespace Atomic
 {
@@ -62,6 +63,8 @@ void JSVM::InitJSContext()
     jsapi_init_atomic(this);
 
     InitComponents();
+
+    ui_ = new JSUI(context_);
 
     // handle this elsewhere?
     SubscribeToEvents();

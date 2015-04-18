@@ -18,6 +18,7 @@ namespace Atomic
 {
 
 class JSFile;
+class JSUI;
 
 class ATOMIC_API JSVM : public Object
 {
@@ -35,8 +36,8 @@ public:
 
     // Resources/Scripts/*.js
     bool ExecuteScript(const String& scriptPath);
-    // Resources/Script/main.js
 
+    // Resources/Script/main.js
     // Catches not requiring AtomicGame, etc
     bool ExecuteMain();
 
@@ -148,14 +149,14 @@ private:
 
 #endif
 
-    List<Object*> jsObjects_;
-
     float gcTime_;
 
     String moduleSearchPath_;
     String lastModuleSearchFilename_;
 
     String errorString_;
+
+    SharedPtr<JSUI> ui_;
 
     static JSVM* instance_;
 

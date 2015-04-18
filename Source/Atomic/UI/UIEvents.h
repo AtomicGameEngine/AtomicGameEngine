@@ -27,6 +27,22 @@
 namespace Atomic
 {
 
+EVENT(E_WIDGETEVENT, WidgetEvent)
+{
+    PARAM(P_TARGET, Target);             // UIWidget pointer
+    PARAM(P_TYPE, Type);                 // EVENT_TYPE enum
+    PARAM(P_X, X);                       // int
+    PARAM(P_Y, Y);                       // int
+    PARAM(P_DELTAX, DeltaX);             // int
+    PARAM(P_DELTAY, DeltaY);             // int
+    PARAM(P_COUNT, Count);               // int
+    PARAM(P_KEY, Key);                   // int
+    PARAM(P_SPECIALKEY, SpecialKey);     // enum SPECIAL_KEY
+    PARAM(P_MODIFIERKEYS, ModifierKeys); // enum MODIFIER_KEYS
+    PARAM(P_ID, ID);                     // unsigned (TBID)
+    PARAM(P_TOUCH, Touch);               // bool
+}
+
 /// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
