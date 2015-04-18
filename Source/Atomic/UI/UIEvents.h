@@ -43,6 +43,11 @@ EVENT(E_WIDGETEVENT, WidgetEvent)
     PARAM(P_TOUCH, Touch);               // bool
 }
 
+EVENT(E_WIDGETLOADED, WidgetLoaded)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+}
+
 /// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {

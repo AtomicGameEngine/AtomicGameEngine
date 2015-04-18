@@ -34,7 +34,12 @@ bool UIWidget::Load(const String& filename)
     UI* ui = GetSubsystem<UI>();
 
     if  (!ui->LoadResourceFile(widget_ , filename))
-        return false;
+        return false;    
+
+    VariantMap eventData;
+    eventData[WidgetLoaded::P_WIDGET] = this;
+    SendEvent(E_WIDGETLOADED, eventData);
+    return true;
 
     return true;
 }

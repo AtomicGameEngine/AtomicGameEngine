@@ -34,6 +34,8 @@ public:
 
     void AddChild(UIWidget* child);
 
+    tb::TBWidget* GetInternalWidget() { return widget_; }
+
 protected:
 
     void ConvertEvent(UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);

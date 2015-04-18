@@ -4,6 +4,11 @@
 #include <Duktape/duktape.h>
 #include <Atomic/Core/Object.h>
 
+namespace tb
+{
+class TBWidget;
+}
+
 namespace Atomic
 {
 
@@ -21,7 +26,9 @@ private:
     duk_context* ctx_;
 
     void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
+    void HandleWidgetLoaded(StringHash eventType, VariantMap& eventData);
 
+    void GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets);
 
 };
 
