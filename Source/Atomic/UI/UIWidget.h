@@ -30,6 +30,8 @@ public:
     void SetSize(int width, int height);
     bool SetText(const String& text);
 
+    void Center();
+
     UIWidget* GetWidgetByID(const String& id);
 
     void AddChild(UIWidget* child);

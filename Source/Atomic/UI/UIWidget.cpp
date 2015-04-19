@@ -111,4 +111,17 @@ void UIWidget::SetSize(int width, int height)
     widget_->SetSize(width, height);
 }
 
+void UIWidget::Center()
+{
+    if (!widget_)
+        return;
+
+    UI* ui = GetSubsystem<UI>();
+    TBRect rect = widget_->GetRect();
+    TBWidget* root = ui->GetRootWidget();
+    TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
+    widget_->SetRect(rect.CenterIn(bounds).MoveIn(bounds).Clip(bounds));
+
+}
+
 }
