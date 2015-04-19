@@ -29,11 +29,11 @@ public:
 
     void SetSize(int width, int height);
     void SetPosition(int x, int y);
-    bool SetText(const String& text);
+    void SetText(const String& text);
 
     void Center();
 
-    UIWidget* GetWidgetByID(const String& id);
+    UIWidget* GetWidget(const String& id);
 
     void AddChild(UIWidget* child);
 

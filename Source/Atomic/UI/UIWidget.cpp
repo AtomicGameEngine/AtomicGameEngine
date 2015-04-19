@@ -40,11 +40,9 @@ bool UIWidget::Load(const String& filename)
     eventData[WidgetLoaded::P_WIDGET] = this;
     SendEvent(E_WIDGETLOADED, eventData);
     return true;
-
-    return true;
 }
 
-UIWidget* UIWidget::GetWidgetByID(const String& id)
+UIWidget* UIWidget::GetWidget(const String& id)
 {
     if (!widget_)
         return 0;
@@ -95,12 +93,12 @@ void UIWidget::AddChild(UIWidget* child)
     widget_->AddChild(child->widget_);
 }
 
-bool UIWidget::SetText(const String& text)
+void UIWidget::SetText(const String& text)
 {
     if (!widget_)
-        return false;
+        return;
 
-    return widget_->SetText(text.CString());
+    widget_->SetText(text.CString());
 }
 
 void UIWidget::SetPosition(int x, int y)

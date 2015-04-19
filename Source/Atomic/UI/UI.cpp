@@ -8,6 +8,7 @@
 #include <TurboBadger/tb_node_tree.h>
 #include <TurboBadger/tb_widgets_reader.h>
 #include <TurboBadger/tb_window.h>
+#include <TurboBadger/tb_editfield.h>
 
 void register_tbbf_font_renderer();
 void register_stb_font_renderer();
@@ -28,6 +29,7 @@ using namespace tb;
 #include "UI.h"
 #include "UIButton.h"
 #include "UITextField.h"
+#include "UIEditField.h"
 
 namespace tb
 {
@@ -393,6 +395,15 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         widgetWrap_[widget] = textfield;
         return textfield;
     }
+
+    if (widget->IsOfType<TBEditField>())
+    {
+        UIEditField* editfield = new UIEditField(context_, false);
+        editfield->SetWidget(widget);
+        widgetWrap_[widget] = editfield;
+        return editfield;
+    }
+
 
     return 0;
 }
