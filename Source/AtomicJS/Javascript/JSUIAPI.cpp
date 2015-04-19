@@ -2,12 +2,15 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
+#include <TurboBadger/tb_window.h>
+
 #include "JSUIAPI.h"
 #include "JSVM.h"
 
 #include <Atomic/UI/UISelectItem.h>
 #include <Atomic/UI/UIMenuWindow.h>
 #include <Atomic/UI/UIButton.h>
+#include <Atomic/UI/UIWindow.h>
 
 namespace Atomic
 {
@@ -73,6 +76,30 @@ static int UIButton_Popup(duk_context* ctx)
     return 0;
 }
 
+int UIWindow_GetResizeToFitContentRect(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    UIWindow* window = js_to_class_instance<UIWindow>(ctx, -1, 0);
+    duk_pop(ctx);
+
+    tb::TBWindow* tbwindow = (tb::TBWindow*) window->GetInternalWidget();
+
+    tb::TBRect rect = tbwindow->GetResizeToFitContentRect();
+
+    duk_push_object(ctx);
+    duk_push_number(ctx, rect.x);
+    duk_put_prop_string(ctx, -2, "x");
+    duk_push_number(ctx, rect.y);
+    duk_put_prop_string(ctx, -2, "y");
+    duk_push_number(ctx, rect.w);
+    duk_put_prop_string(ctx, -2, "width");
+    duk_push_number(ctx, rect.h);
+    duk_put_prop_string(ctx, -2, "height");
+    return 1;
+
+}
+
+
 void jsapi_init_ui(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -81,6 +108,12 @@ void jsapi_init_ui(JSVM* vm)
     duk_push_c_function(ctx, UIButton_Popup, 2);
     duk_put_prop_string(ctx, -2, "popup");
     duk_pop(ctx);
+
+    js_class_get_prototype(ctx, "UIWindow");
+    duk_push_c_function(ctx, UIWindow_GetResizeToFitContentRect, 0);
+    duk_put_prop_string(ctx, -2, "getResizeToFitContentRect");
+    duk_pop(ctx);
+
 
 }
 

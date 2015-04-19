@@ -382,6 +382,10 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     if (widget->IsOfType<TBButton>())
     {
+        // don't wrap the close button of a TBWindow.close
+        if (widget->GetID() == TBIDC("TBWindow.close"))
+            return 0;
+
         UIButton* button = new UIButton(context_, false);
         button->SetWidget(widget);
         widgetWrap_[widget] = button;
