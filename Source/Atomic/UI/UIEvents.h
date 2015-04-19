@@ -48,6 +48,13 @@ EVENT(E_WIDGETLOADED, WidgetLoaded)
     PARAM(P_WIDGET, Widget);             // UIWidget pointer
 }
 
+EVENT(E_POPUPMENUSELECT, PopupMenuSelect)
+{
+    PARAM(P_BUTTON, Button);             // UIButton that created popup
+    PARAM(P_REFID, RefID);             // unsigned tbid
+}
+
+
 /// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {

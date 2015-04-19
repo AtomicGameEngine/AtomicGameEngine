@@ -27,6 +27,7 @@ private:
 
     void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
     void HandleWidgetLoaded(StringHash eventType, VariantMap& eventData);
+    void HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData);
 
     void GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets);
 

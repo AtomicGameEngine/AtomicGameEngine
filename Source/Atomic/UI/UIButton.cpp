@@ -25,15 +25,33 @@ UIButton::~UIButton()
 }
 
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    if (ev.type == EVENT_TYPE_CLICK && ev.target == widget_)
-    {
-        VariantMap eventData;
-        ConvertEvent(this, ev, eventData);
-        SendEvent(E_WIDGETEVENT, eventData);
+{       
+    if (ev.type == EVENT_TYPE_CLICK)
+    {        
+        if (ev.target == widget_) // button clicked itself
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
 
-        // this is catching the window close button
-        return true;
+            // this is catching the window close button
+            return true;
+        }
+
+        if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
+        {
+            // popup menu
+
+            if (JSGetHeapPtr())
+            {
+                VariantMap eventData;
+                eventData[PopupMenuSelect::P_BUTTON] = this;
+                eventData[PopupMenuSelect::P_REFID] = (unsigned) ev.ref_id;
+                SendEvent(E_POPUPMENUSELECT, eventData);
+            }
+
+            return true;
+        }
     }
 
     return false;

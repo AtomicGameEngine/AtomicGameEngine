@@ -43,7 +43,7 @@ void TBSystem::RescheduleTimer(double fire_time)
 namespace Atomic
 {
 
-WeakPtr<Context> UI::readerContext_;
+WeakPtr<Context> UI::uiContext_;
 
 
 UI::UI(Context* context) :
@@ -67,6 +67,11 @@ UI::~UI()
         tb_core_shutdown();
     }
 
+    uiContext_ = 0;
+    TBFile::SetReaderFunction(0);
+    TBID::tbidRegisterCallback = 0;
+
+
 }
 
 void UI::Shutdown()
@@ -83,8 +88,10 @@ void UI::Initialize(const String& languageFile)
 
     vertexBuffer_ = new VertexBuffer(context_);
 
-    readerContext_ = context_;
+    uiContext_ = context_;
+
     TBFile::SetReaderFunction(TBFileReader);
+    TBID::tbidRegisterCallback = UI::TBIDRegisterStringCallback;
 
     TBWidgetsAnimationManager::Init();
 
@@ -306,7 +313,7 @@ void UI::TBFileReader(const char* filename, void** data, unsigned* length)
     *data = 0;
     *length = 0;
 
-    ResourceCache* cache = readerContext_->GetSubsystem<ResourceCache>();
+    ResourceCache* cache = uiContext_->GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(filename);
     if (!file || !file->IsOpen())
         return;
@@ -329,6 +336,16 @@ void UI::TBFileReader(const char* filename, void** data, unsigned* length)
     *length = size;
     *data = _data;
 
+}
+
+void UI::GetTBIDString(unsigned id, String& value)
+{
+    value = tbidToString_[id];
+}
+
+void UI::TBIDRegisterStringCallback(unsigned id, const char* value)
+{
+    uiContext_->GetSubsystem<UI>()->tbidToString_[id] = String(value);
 }
 
 bool UI::LoadResourceFile(TBWidget* widget, const String& filename)

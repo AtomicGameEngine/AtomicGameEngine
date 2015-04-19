@@ -2,6 +2,7 @@
 
 #include <Atomic/UI/UIEvents.h>
 #include <Atomic/UI/UIWidget.h>
+#include <Atomic/UI/UIButton.h>
 #include <Atomic/UI/UI.h>
 #include "JSVM.h"
 #include "JSUI.h"
@@ -16,6 +17,7 @@ JSUI::JSUI(Context* context) : Object(context)
     ctx_ = JSVM::GetJSVM(nullptr)->GetJSContext();
     SubscribeToEvent(E_WIDGETEVENT, HANDLER(JSUI, HandleWidgetEvent));
     SubscribeToEvent(E_WIDGETLOADED, HANDLER(JSUI, HandleWidgetLoaded));
+    SubscribeToEvent(E_POPUPMENUSELECT, HANDLER(JSUI, HandlePopupMenuSelect));
 }
 
 JSUI::~JSUI()
@@ -81,6 +83,48 @@ void JSUI::HandleWidgetLoaded(StringHash eventType, VariantMap& eventData)
 
     duk_put_prop_string(ctx_, -2, "__child_widgets");
     duk_pop(ctx_);
+
+}
+
+void JSUI::HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData)
+{
+    using namespace PopupMenuSelect;
+
+    UIButton* button = static_cast<UIButton*>(eventData[P_BUTTON].GetPtr());
+    if (!button)
+        return;
+
+    void* heapptr = button->JSGetHeapPtr();
+
+    if (!heapptr) // gc'd
+        return;
+
+    int top = duk_get_top(ctx_);
+
+    duk_push_heapptr(ctx_, heapptr);
+    duk_get_prop_string(ctx_, -1, "__popup_menu_callback");
+    if (!duk_is_callable(ctx_, -1))
+    {
+        duk_pop_n(ctx_, 2);
+        assert(top == duk_get_top(ctx_));
+        return;
+    }
+
+    UI* ui = GetSubsystem<UI>();
+    String id;
+    ui->GetTBIDString(eventData[P_REFID].GetUInt(), id);
+
+    duk_push_string(ctx_, id.CString());
+    duk_insert(ctx_, -1);
+
+    if (duk_pcall(ctx_, 1) != 0)
+    {
+        JSVM::GetJSVM(nullptr)->SendJSErrorEvent();
+    }
+
+    duk_pop_n(ctx_, 2);
+
+    assert(top == duk_get_top(ctx_));
 
 }
 

@@ -12,6 +12,8 @@
 
 namespace tb {
 
+typedef void (*TBIDRegisterStringCallback) (uint32 id, const char* string);
+
 /** TBID is a wrapper for a uint32 to be used as ID.
 	The uint32 can be set directly to any uint32, or it can be
 	set from a string which will be hashed into the uint32. */
@@ -43,6 +45,8 @@ public:
 	friend class TBLanguage;
 	TBStr debug_string;
 #endif
+
+    static TBIDRegisterStringCallback tbidRegisterCallback;
 };
 
 }; // namespace tb

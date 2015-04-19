@@ -15,6 +15,7 @@
 #include "JSVM.h"
 #include "JSComponent.h"
 #include "JSGraphics.h"
+#include "JSUIAPI.h"
 #include "JSScene.h"
 
 #include "JSAtomicGame.h"
@@ -206,6 +207,7 @@ void jsapi_init_atomic(JSVM* vm)
 
     // extensions
     jsapi_init_graphics(vm);
+    jsapi_init_ui(vm);
     jsapi_init_scene(vm);
 
     jsapi_init_atomicgame(vm);

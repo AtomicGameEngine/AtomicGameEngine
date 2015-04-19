@@ -47,10 +47,13 @@ public:
 
     UIWidget* WrapWidget(tb::TBWidget* widget);
 
+    void GetTBIDString(unsigned id, String& value);
+
 private:
 
-    static WeakPtr<Context> readerContext_;
+    static WeakPtr<Context> uiContext_;
     static void TBFileReader(const char* filename, void** data, unsigned* length);
+    static void TBIDRegisterStringCallback(unsigned id, const char* value);
 
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
@@ -68,6 +71,7 @@ private:
     WeakPtr<Graphics> graphics_;
 
     HashMap<tb::TBWidget*, UIWidget*> widgetWrap_;
+    HashMap<unsigned, String> tbidToString_;
 
     bool inputDisabled_;
     bool keyboardDisabled_;
