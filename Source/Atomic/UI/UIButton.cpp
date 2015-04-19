@@ -31,6 +31,7 @@ bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
         VariantMap eventData;
         ConvertEvent(this, ev, eventData);
         SendEvent(E_WIDGETEVENT, eventData);
+
         // this is catching the window close button
         return true;
     }

@@ -103,12 +103,21 @@ bool UIWidget::SetText(const String& text)
     return widget_->SetText(text.CString());
 }
 
+void UIWidget::SetPosition(int x, int y)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetPosition(TBPoint(x, y));
+
+}
+
 void UIWidget::SetSize(int width, int height)
 {
     if (!widget_)
         return;
 
-    widget_->SetSize(width, height);
+    widget_->SetSize(width, height);       
 }
 
 void UIWidget::Center()
@@ -122,6 +131,14 @@ void UIWidget::Center()
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
     widget_->SetRect(rect.CenterIn(bounds).MoveIn(bounds).Clip(bounds));
 
+}
+
+bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_CLICK)
+        return false;
+
+    return false;
 }
 
 }

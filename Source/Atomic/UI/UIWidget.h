@@ -28,6 +28,7 @@ public:
     bool Load(const String& filename);
 
     void SetSize(int width, int height);
+    void SetPosition(int x, int y);
     bool SetText(const String& text);
 
     void Center();
@@ -44,7 +45,7 @@ protected:
 
     void SetWidget(tb::TBWidget* widget);
 
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev) { return false; }
+    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
     virtual void OnDelete();
 
     tb::TBWidget* widget_;

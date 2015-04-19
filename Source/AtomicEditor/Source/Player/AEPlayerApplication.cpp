@@ -162,7 +162,7 @@ void AEPlayerApplication::Start()
     UI* tbui = GetSubsystem<UI>();
 
     tbui->Initialize("UI/language/lng_en.tb.txt");
-    tbui->LoadSkin("UI/default_skin/skin.tb.txt", "");
+    tbui->LoadSkin("UI/default_skin/skin.tb.txt", "Skin/skin.tb.txt");
     tbui->AddFont("UI/fonts/vera.ttf", "Vera");
     tbui->SetDefaultFont("Vera", 12);
 
