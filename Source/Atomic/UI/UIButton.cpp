@@ -22,7 +22,6 @@ UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, fals
 
 UIButton::~UIButton()
 {
-
 }
 
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)

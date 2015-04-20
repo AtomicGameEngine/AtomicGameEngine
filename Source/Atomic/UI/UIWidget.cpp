@@ -91,6 +91,11 @@ void UIWidget::OnDelete()
     }
 
     widget_ = 0;
+
+    VariantMap eventData;
+    eventData[WidgetDeleted::P_WIDGET] = this;
+    SendEvent(E_WIDGETDELETED, eventData);
+
     ReleaseRef();
 }
 
@@ -100,6 +105,7 @@ void UIWidget::AddChild(UIWidget* child)
         return;
 
     widget_->AddChild(child->widget_);
+
 }
 
 void UIWidget::SetText(const String& text)
@@ -167,7 +173,6 @@ void UIWidget::RemoveChild(UIWidget* child)
         return;
 
     widget_->RemoveChild(childw);
-
 }
 
 

@@ -11,6 +11,7 @@
 #include <Atomic/IO/Log.h>
 
 #include "JSAPI.h"
+#include "JSEvents.h"
 
 //#define JSVM_DEBUG
 
@@ -82,10 +83,16 @@ public:
             removedHeapPtr_.Erase(itr);
 #endif
 
+        objectAddedData_[ObjectAdded::P_OBJECT] = object;
+        SendEvent(E_JSOBJECTADDED, objectAddedData_);
+
     }
 
     inline void RemoveObject(RefCounted* object)
     {
+        objectRemovedData_[ObjectRemoved::P_OBJECT] = object;
+        SendEvent(E_JSOBJECTREMOVED, objectRemovedData_);
+
         void* heapptr = object->JSGetHeapPtr();
         assert(heapptr);
         object->JSSetHeapPtr(NULL);
@@ -157,6 +164,9 @@ private:
     String errorString_;
 
     SharedPtr<JSUI> ui_;
+
+    VariantMap objectAddedData_;
+    VariantMap objectRemovedData_;
 
     static JSVM* instance_;
 

@@ -420,7 +420,7 @@ void UI::PruneUnreachableWidgets()
 
         delete toDelete;
 
-        // this will likely be flagged by valgrind as assessing invalid memory
+        // this will likely be flagged by valgrind as accessing invalid memory
         assert(!widgetWrap_.Contains(toDelete));
     }
 }
@@ -430,6 +430,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widgetWrap_.Contains(widget))
         return widgetWrap_[widget];
 
+    // this is order dependent as we're using IsOfType which also works if a base class
     if (widget->IsOfType<TBLayout>())
     {
         UILayout* layout = new UILayout(context_, false);

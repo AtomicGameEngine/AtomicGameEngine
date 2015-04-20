@@ -17,10 +17,30 @@ JSUI::JSUI(Context* context) : Object(context),
     updateTime_(0.0f)
 {
     ctx_ = JSVM::GetJSVM(nullptr)->GetJSContext();
+
     SubscribeToEvent(E_UPDATE, HANDLER(JSUI, HandleUpdate));
+
+    SubscribeToEvent(E_JSOBJECTADDED, HANDLER(JSUI, HandleObjectAdded));
+
+    SubscribeToEvent(E_WIDGETDELETED, HANDLER(JSUI, HandleWidgetDeleted));
     SubscribeToEvent(E_WIDGETEVENT, HANDLER(JSUI, HandleWidgetEvent));
     SubscribeToEvent(E_WIDGETLOADED, HANDLER(JSUI, HandleWidgetLoaded));
     SubscribeToEvent(E_POPUPMENUSELECT, HANDLER(JSUI, HandlePopupMenuSelect));
+
+    duk_push_global_stash(ctx_);
+    duk_push_object(ctx_);
+    duk_put_prop_string(ctx_, -2, "__jsui_widgetkeepalive");
+    duk_pop(ctx_);
+
+    uiTypes_["UIWidget"] = true;
+    uiTypes_["UIButton"] = true;
+    uiTypes_["UIView"] = true;
+    uiTypes_["UIEditField"] = true;
+    uiTypes_["UITextField"] = true;
+    uiTypes_["UIImageWidget"] = true;
+    uiTypes_["UILayout"] = true;
+    uiTypes_["UIMenuWindow"] = true;
+    uiTypes_["UIWindow"] = true;
 }
 
 JSUI::~JSUI()
@@ -40,6 +60,48 @@ void JSUI::GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets
 
 }
 
+void JSUI::HandleObjectAdded(StringHash eventType, VariantMap& eventData)
+{
+    Object* o = static_cast<Object*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
+
+    // for any UI type, we make sure it is kept alive
+    if (uiTypes_.Contains(o->GetType()))
+    {
+        assert(o->JSGetHeapPtr());
+
+        duk_push_global_stash(ctx_);
+        duk_get_prop_string(ctx_, -1, "__jsui_widgetkeepalive");
+        // can't use instance as key, as this coerces to [Object] for
+        // string property, pointer will be string representation of
+        // address, so, unique key
+        duk_push_pointer(ctx_, o);
+        duk_push_heapptr(ctx_, o->JSGetHeapPtr());
+        duk_put_prop(ctx_, -3);
+        duk_pop_2(ctx_);
+
+    }
+
+}
+
+void JSUI::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
+{
+    UIWidget* widget = static_cast<UIWidget*>(eventData[WidgetDeleted::P_WIDGET].GetPtr());
+
+    if (!widget->JSGetHeapPtr())
+        return;
+
+    duk_push_global_stash(ctx_);
+    duk_get_prop_string(ctx_, -1, "__jsui_widgetkeepalive");
+    // can't use instance as key, as this coerces to [Object] for
+    // string property, pointer will be string representation of
+    // address, so, unique key
+    duk_push_pointer(ctx_, widget);
+    duk_push_null(ctx_);
+    duk_put_prop(ctx_, -3);
+    duk_pop_2(ctx_);
+
+}
+
 void JSUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
@@ -52,7 +114,6 @@ void JSUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         updateTime_ = 0.0f;
     }
 }
-
 
 
 void JSUI::HandleWidgetLoaded(StringHash eventType, VariantMap& eventData)

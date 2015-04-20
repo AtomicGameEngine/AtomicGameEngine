@@ -49,6 +49,11 @@ EVENT(E_WIDGETLOADED, WidgetLoaded)
     PARAM(P_WIDGET, Widget);             // UIWidget pointer
 }
 
+EVENT(E_WIDGETDELETED, WidgetDeleted)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+}
+
 EVENT(E_POPUPMENUSELECT, PopupMenuSelect)
 {
     PARAM(P_BUTTON, Button);             // UIButton that created popup
