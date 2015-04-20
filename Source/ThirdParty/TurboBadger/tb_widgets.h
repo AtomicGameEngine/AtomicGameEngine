@@ -343,6 +343,7 @@ enum WIDGET_HIT_STATUS {
 	WIDGET_HIT_STATUS_HIT_NO_CHILDREN		///< The widget was hit, no children should be hit.
 };
 
+// ATOMIC: this must only be used by UIWidget, as we are casting to it
 class TBWidgetDelegate
 {
 public:

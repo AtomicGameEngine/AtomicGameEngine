@@ -45,6 +45,7 @@ public:
     void AddFont(const String& fontFile, const String &name);
     void SetDefaultFont(const String& name, int size);
 
+    bool IsWidgetWrapped(tb::TBWidget* widget);
     UIWidget* WrapWidget(tb::TBWidget* widget);
 
     void GetTBIDString(unsigned id, String& value);

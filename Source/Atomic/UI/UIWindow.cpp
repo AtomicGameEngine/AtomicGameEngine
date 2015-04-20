@@ -38,7 +38,7 @@ UIWindow::~UIWindow()
 
 bool UIWindow::OnEvent(const tb::TBWidgetEvent &ev)
 {
-    return false;
+    return UIWidget::OnEvent(ev);
 }
 
 }

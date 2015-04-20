@@ -29,6 +29,7 @@ namespace Atomic
 
 EVENT(E_WIDGETEVENT, WidgetEvent)
 {
+    PARAM(P_HANDLER, Handler);           // UIWidget pointer of widget's OnEvent we are in
     PARAM(P_TARGET, Target);             // UIWidget pointer
     PARAM(P_TYPE, Type);                 // EVENT_TYPE enum
     PARAM(P_X, X);                       // int
@@ -39,7 +40,7 @@ EVENT(E_WIDGETEVENT, WidgetEvent)
     PARAM(P_KEY, Key);                   // int
     PARAM(P_SPECIALKEY, SpecialKey);     // enum SPECIAL_KEY
     PARAM(P_MODIFIERKEYS, ModifierKeys); // enum MODIFIER_KEYS
-    PARAM(P_ID, ID);                     // unsigned (TBID)
+    PARAM(P_REFID, RefID);                     // unsigned (TBID)
     PARAM(P_TOUCH, Touch);               // bool
 }
 

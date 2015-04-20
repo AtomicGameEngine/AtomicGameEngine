@@ -9,6 +9,7 @@
 #include <TurboBadger/tb_widgets_reader.h>
 #include <TurboBadger/tb_window.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
 void register_stb_font_renderer();
@@ -30,6 +31,8 @@ using namespace tb;
 #include "UIButton.h"
 #include "UITextField.h"
 #include "UIEditField.h"
+#include "UILayout.h"
+#include "UIImageWidget.h"
 
 namespace tb
 {
@@ -342,7 +345,14 @@ void UI::TBFileReader(const char* filename, void** data, unsigned* length)
 
 void UI::GetTBIDString(unsigned id, String& value)
 {
-    value = tbidToString_[id];
+    if (!id)
+    {
+        value = "";
+    }
+    else
+    {
+        value = tbidToString_[id];
+    }
 }
 
 void UI::TBIDRegisterStringCallback(unsigned id, const char* value)
@@ -375,10 +385,23 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
     TBMessageHandler::ProcessMessages();
 }
 
+bool UI::IsWidgetWrapped(tb::TBWidget* widget)
+{
+    return widgetWrap_.Contains(widget);
+}
+
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 {
     if (widgetWrap_.Contains(widget))
         return widgetWrap_[widget];
+
+    if (widget->IsOfType<TBLayout>())
+    {
+        UILayout* layout = new UILayout(context_, false);
+        layout->SetWidget(widget);
+        widgetWrap_[widget] = layout;
+        return layout;
+    }
 
     if (widget->IsOfType<TBButton>())
     {
@@ -408,6 +431,13 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return editfield;
     }
 
+    if (widget->IsOfType<TBImageWidget>())
+    {
+        UIImageWidget* imagewidget = new UIImageWidget(context_, false);
+        imagewidget->SetWidget(widget);
+        widgetWrap_[widget] = imagewidget;
+        return imagewidget;
+    }
 
     return 0;
 }

@@ -62,9 +62,10 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
     widget_->SetDelegate(this);
 }
 
-void UIWidget::ConvertEvent(UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
+void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
     using namespace WidgetEvent;
+    data[P_HANDLER] = handler;
     data[P_TARGET] = target;
     data[P_TYPE] = (unsigned) ev.type;
     data[P_X] = ev.target_x;
@@ -75,7 +76,7 @@ void UIWidget::ConvertEvent(UIWidget* target, const tb::TBWidgetEvent &ev, Varia
     data[P_KEY] = ev.key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
-    data[P_ID] = (unsigned) ev.ref_id;
+    data[P_REFID] = (unsigned) ev.ref_id;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
 
@@ -131,10 +132,88 @@ void UIWidget::Center()
 
 }
 
+UIWidget* UIWidget::GetParent()
+{
+    if (!widget_)
+        return 0;
+
+    TBWidget* parent = widget_->GetParent();
+
+    if (!parent)
+        return 0;
+
+    UI* ui = GetSubsystem<UI>();
+
+    return ui->WrapWidget(parent);
+
+}
+
+void UIWidget::RemoveChild(UIWidget* child)
+{
+    if (!widget_ || !child)
+        return;
+
+    TBWidget* childw = child->GetInternalWidget();
+
+    if (!childw)
+        return;
+
+    widget_->RemoveChild(childw);
+
+}
+
+
+const String& UIWidget::GetId()
+{
+    if (!widget_ || !widget_->GetID())
+    {
+        if (id_.Length())
+            id_.Clear();
+
+        return id_;
+    }
+
+    if (id_.Length())
+        return id_;
+
+    UI* ui = GetSubsystem<UI>();
+    ui->GetTBIDString(widget_->GetID(), id_);
+
+    return id_;
+
+}
+
 bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
+    UI* ui = GetSubsystem<UI>();
+
     if (ev.type == EVENT_TYPE_CLICK)
-        return false;
+    {
+        if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
+        {
+            // popup menu
+
+            if (JSGetHeapPtr())
+            {
+                VariantMap eventData;
+                eventData[PopupMenuSelect::P_BUTTON] = this;
+                eventData[PopupMenuSelect::P_REFID] = (unsigned) ev.ref_id;
+                SendEvent(E_POPUPMENUSELECT, eventData);
+            }
+
+            return true;
+        }
+        else
+        {
+            if (!ev.target || ui->IsWidgetWrapped(ev.target))
+            {
+                VariantMap eventData;
+                ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+                SendEvent(E_WIDGETEVENT, eventData);
+            }
+        }
+
+    }
 
     return false;
 }

@@ -31,8 +31,16 @@ public:
     void SetPosition(int x, int y);
     void SetText(const String& text);
 
+    UIWidget* GetParent();
+
+    void RemoveChild(UIWidget* child);
+
+    // String ID
+    const String& GetId();
+
     void Center();
 
+    // get this or child widget with id
     UIWidget* GetWidget(const String& id);
 
     void AddChild(UIWidget* child);
@@ -41,12 +49,14 @@ public:
 
 protected:
 
-    void ConvertEvent(UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
+    void ConvertEvent(UIWidget* handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
 
     void SetWidget(tb::TBWidget* widget);
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
     virtual void OnDelete();
+
+    String id_;
 
     tb::TBWidget* widget_;
 

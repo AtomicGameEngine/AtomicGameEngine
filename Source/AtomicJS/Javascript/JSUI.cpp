@@ -128,25 +128,115 @@ void JSUI::HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData)
 
 }
 
+void JSUI::PushWidgetEventObject(VariantMap& eventData)
+{
+
+    UI* ui = GetSubsystem<UI>();
+
+    using namespace WidgetEvent;
+
+    // create the event object
+    duk_push_object(ctx_);
+
+    // target
+    UIWidget* target = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());
+
+    if (target)
+    {
+        assert(target->JSGetHeapPtr());
+        duk_push_heapptr(ctx_, target->JSGetHeapPtr());
+    }
+    else
+    {
+        duk_push_null(ctx_);
+    }
+
+    duk_put_prop_string(ctx_, -2, "target");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_TYPE].GetUInt());
+    duk_put_prop_string(ctx_, -2, "type");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_X].GetInt());
+    duk_put_prop_string(ctx_, -2, "x");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_Y].GetInt());
+    duk_put_prop_string(ctx_, -2, "y");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_DELTAX].GetInt());
+    duk_put_prop_string(ctx_, -2, "deltaX");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_DELTAX].GetInt());
+    duk_put_prop_string(ctx_, -2, "deltaY");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_COUNT].GetInt());
+    duk_put_prop_string(ctx_, -2, "count");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_KEY].GetInt());
+    duk_put_prop_string(ctx_, -2, "key");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_SPECIALKEY].GetInt());
+    duk_put_prop_string(ctx_, -2, "specialKey");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_MODIFIERKEYS].GetInt());
+    duk_put_prop_string(ctx_, -2, "modifierKeys");
+
+    duk_push_number(ctx_, (duk_double_t) eventData[P_MODIFIERKEYS].GetInt());
+    duk_put_prop_string(ctx_, -2, "modifierKeys");
+
+    String id;
+    unsigned blah = eventData[P_REFID].GetUInt();
+    ui->GetTBIDString(eventData[P_REFID].GetUInt(), id);
+    duk_push_string(ctx_, id.CString() );
+    duk_put_prop_string(ctx_, -2, "refID");
+
+    duk_push_boolean(ctx_,eventData[P_TOUCH].GetBool() ? 1 : 0);
+    duk_put_prop_string(ctx_, -2, "touch");
+
+}
+
 void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
 {
     using namespace WidgetEvent;
 
-    UIWidget* widget = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());
-    if (!widget)
+    UIWidget* handler = static_cast<UIWidget*>(eventData[P_HANDLER].GetPtr());
+    UIWidget* target = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());
+
+    if (!handler)
         return;
 
-    void* heapptr = widget->JSGetHeapPtr();
+    void* handlerHeapPtr = handler->JSGetHeapPtr();
 
-    if (!heapptr)
+    if (!handlerHeapPtr)
+        return;
+
+    // if we have a target, however no corresponding JS object return
+    if (target && !target->JSGetHeapPtr())
         return;
 
     tb::EVENT_TYPE type = (tb::EVENT_TYPE) eventData[P_TYPE].GetUInt();
 
+    // general event handler, bubbles to (wrapped) parent widgets unless handled (returns true)
     if (type == tb::EVENT_TYPE_CLICK)
     {
         int top = duk_get_top(ctx_);
-        duk_push_heapptr(ctx_, heapptr);
+        duk_push_heapptr(ctx_, handlerHeapPtr);
+        duk_get_prop_string(ctx_, -1, "onEvent");
+        if (duk_is_callable(ctx_, -1)) {
+
+            PushWidgetEventObject(eventData);
+
+            duk_call(ctx_, 1);
+        }
+        duk_pop_n(ctx_, 2);
+        assert(top == duk_get_top(ctx_));
+    }
+
+    // specific event handlers
+
+    if (type == tb::EVENT_TYPE_CLICK)
+    {
+        int top = duk_get_top(ctx_);
+        duk_push_heapptr(ctx_, handlerHeapPtr);
         duk_get_prop_string(ctx_, -1, "onClick");
         if (duk_is_callable(ctx_, -1)) {
             duk_call(ctx_, 0);
@@ -155,19 +245,6 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
         assert(top == duk_get_top(ctx_));
         return;
     }
-
-    eventData[P_TYPE];
-    eventData[P_X];
-    eventData[P_Y];
-    eventData[P_DELTAX];
-    eventData[P_DELTAY];
-    eventData[P_COUNT];
-    eventData[P_KEY];
-    eventData[P_SPECIALKEY];
-    eventData[P_MODIFIERKEYS];
-    eventData[P_ID];
-    eventData[P_TOUCH];
-
 
 }
 
