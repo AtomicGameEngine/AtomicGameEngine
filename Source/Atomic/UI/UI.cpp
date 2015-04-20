@@ -66,6 +66,8 @@ UI::~UI()
     if (initialized_)
     {
         tb::TBWidgetsAnimationManager::Shutdown();
+
+        widgetWrap_.Clear();
         delete rootWidget_;
         // leak
         //delete TBUIRenderer::renderer_;
@@ -75,8 +77,6 @@ UI::~UI()
     uiContext_ = 0;
     TBFile::SetReaderFunction(0);
     TBID::tbidRegisterCallback = 0;
-
-
 }
 
 void UI::Shutdown()
@@ -388,6 +388,41 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 bool UI::IsWidgetWrapped(tb::TBWidget* widget)
 {
     return widgetWrap_.Contains(widget);
+}
+
+bool UI::UnwrapWidget(tb::TBWidget* widget)
+{
+    if (widgetWrap_.Contains(widget))
+    {
+        widgetWrap_.Erase(widget);
+        return true;
+    }
+
+    return false;
+
+}
+
+void UI::PruneUnreachableWidgets()
+{
+    HashMap<tb::TBWidget*, SharedPtr<UIWidget>>::Iterator itr;
+
+    for (itr = widgetWrap_.Begin(); itr != widgetWrap_.End(); )
+    {
+        if ((*itr).first_->GetParent() || (*itr).second_->JSGetHeapPtr())
+        {
+            itr++;
+            continue;
+        }
+
+        tb::TBWidget* toDelete = (*itr).first_;
+
+        itr.GotoNext();
+
+        delete toDelete;
+
+        // this will likely be flagged by valgrind as assessing invalid memory
+        assert(!widgetWrap_.Contains(toDelete));
+    }
 }
 
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)

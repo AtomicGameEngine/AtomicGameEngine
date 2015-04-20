@@ -47,6 +47,9 @@ public:
 
     bool IsWidgetWrapped(tb::TBWidget* widget);
     UIWidget* WrapWidget(tb::TBWidget* widget);
+    bool UnwrapWidget(tb::TBWidget* widget);
+
+    void PruneUnreachableWidgets();
 
     void GetTBIDString(unsigned id, String& value);
 
@@ -71,7 +74,7 @@ private:
 
     WeakPtr<Graphics> graphics_;
 
-    HashMap<tb::TBWidget*, UIWidget*> widgetWrap_;
+    HashMap<tb::TBWidget*, SharedPtr<UIWidget> > widgetWrap_;
     HashMap<unsigned, String> tbidToString_;
 
     bool inputDisabled_;

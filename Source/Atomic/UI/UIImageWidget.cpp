@@ -25,7 +25,6 @@ UIImageWidget::UIImageWidget(Context* context, bool createWidget) : UIWidget(con
 
 UIImageWidget::~UIImageWidget()
 {
-    LOGINFOF("Hey!");
 }
 
 bool UIImageWidget::OnEvent(const tb::TBWidgetEvent &ev)

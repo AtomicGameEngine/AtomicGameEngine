@@ -146,8 +146,6 @@ static int js_atomic_destroy(duk_context* ctx)
     if (!obj)
         return 0;
 
-    JSVM* vm = JSVM::GetJSVM(ctx);
-
     if (obj->GetType() == Node::GetTypeStatic())
     {
 

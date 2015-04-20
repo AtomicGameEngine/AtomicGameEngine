@@ -82,6 +82,14 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
 
 void UIWidget::OnDelete()
 {
+    if (widget_)
+    {
+        // if we don't have a UI subsystem, we are exiting
+        UI* ui = GetSubsystem<UI>();
+        if (ui)
+            ui->UnwrapWidget(widget_);
+    }
+
     widget_ = 0;
     ReleaseRef();
 }

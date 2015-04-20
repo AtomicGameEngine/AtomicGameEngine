@@ -1,5 +1,6 @@
 #include <TurboBadger/tb_widgets.h>
 
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/UI/UIEvents.h>
 #include <Atomic/UI/UIWidget.h>
 #include <Atomic/UI/UIButton.h>
@@ -12,9 +13,11 @@ using namespace tb;
 namespace Atomic
 {
 
-JSUI::JSUI(Context* context) : Object(context)
+JSUI::JSUI(Context* context) : Object(context),
+    updateTime_(0.0f)
 {
     ctx_ = JSVM::GetJSVM(nullptr)->GetJSContext();
+    SubscribeToEvent(E_UPDATE, HANDLER(JSUI, HandleUpdate));
     SubscribeToEvent(E_WIDGETEVENT, HANDLER(JSUI, HandleWidgetEvent));
     SubscribeToEvent(E_WIDGETLOADED, HANDLER(JSUI, HandleWidgetLoaded));
     SubscribeToEvent(E_POPUPMENUSELECT, HANDLER(JSUI, HandlePopupMenuSelect));
@@ -36,6 +39,21 @@ void JSUI::GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets
     }
 
 }
+
+void JSUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
+
+    updateTime_ += timeStep;
+    if (updateTime_ > 1.0f)
+    {
+        UI* ui = GetSubsystem<UI>();
+        ui->PruneUnreachableWidgets();
+        updateTime_ = 0.0f;
+    }
+}
+
+
 
 void JSUI::HandleWidgetLoaded(StringHash eventType, VariantMap& eventData)
 {

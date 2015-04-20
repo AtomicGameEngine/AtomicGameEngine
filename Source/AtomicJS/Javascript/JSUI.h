@@ -24,9 +24,11 @@ public:
 private:
 
     duk_context* ctx_;
+    float updateTime_;
 
     void PushWidgetEventObject(VariantMap& eventData);
 
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
     void HandleWidgetLoaded(StringHash eventType, VariantMap& eventData);
     void HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData);
