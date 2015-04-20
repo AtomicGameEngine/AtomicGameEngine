@@ -129,25 +129,18 @@ void JSUI::HandleWidgetLoaded(StringHash eventType, VariantMap& eventData)
     if (!heapptr)
         return;
 
-    // a loaded widget recursively gathers children which have id's and
-    // stashes them in an internal array, so that they don't go out of scope
-    // for instance var button = window.getWidgetByID("reveal");
-    // if we didn't stash, any callback on button wouldn't work if button went out
-    // of scope, which isn't expected behavior (in JS you would think the button is
-    // in some way attached to the window object)
-
     TBWidget* tbwidget = widget->GetInternalWidget();
     assert(tbwidget);
+
+    // all widgets with id's are wrapped, so that event handlers are bubbled up properly
+    // note that all js widget object representations are kept alive in HandleObjectAdded
+    // when pushed into the VM
 
     PODVector<TBWidget*> widgets;
     GatherWidgets(tbwidget, widgets);
 
     UI* ui = GetSubsystem<UI>();
 
-    duk_push_heapptr(ctx_, heapptr);
-    duk_push_array(ctx_);
-
-    unsigned arrayCount = 0;
     for (unsigned i = 0; i < widgets.Size(); i++)
     {
         UIWidget* o =  ui->WrapWidget(widgets.At(i));
@@ -156,12 +149,7 @@ void JSUI::HandleWidgetLoaded(StringHash eventType, VariantMap& eventData)
             continue;
 
         js_push_class_object_instance(ctx_, o);
-
-        duk_put_prop_index(ctx_, -2, arrayCount++);
     }
-
-    duk_put_prop_string(ctx_, -2, "__child_widgets");
-    duk_pop(ctx_);
 
 }
 

@@ -33,7 +33,6 @@ void UIWindow::ResizeToFitContent()
 
 UIWindow::~UIWindow()
 {
-
 }
 
 bool UIWindow::OnEvent(const tb::TBWidgetEvent &ev)
