@@ -29,6 +29,7 @@ private:
     void PushWidgetEventObject(VariantMap& eventData);
 
     void HandleObjectAdded(StringHash eventType, VariantMap& eventData);
+    void HandleObjectRemoved(StringHash eventType, VariantMap& eventData);
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);

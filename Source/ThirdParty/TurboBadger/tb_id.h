@@ -31,7 +31,7 @@ public:
 #else
 	void Set(uint32 newid)			{ id = newid; }
 	void Set(const TBID &newid)		{ id = newid; }
-	void Set(const char *string)	{ id = TBGetHash(string); }
+    void Set(const char *string)	{ id = TBGetHash(string); if (tbidRegisterCallback) tbidRegisterCallback(id, string); }
 #endif
 
 	operator uint32 () const		{ return id; }

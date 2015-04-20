@@ -22,6 +22,9 @@ JSUI::JSUI(Context* context) : Object(context),
 
     SubscribeToEvent(E_JSOBJECTADDED, HANDLER(JSUI, HandleObjectAdded));
 
+    // for debugging only, commented out otherwise
+    //SubscribeToEvent(E_JSOBJECTREMOVED, HANDLER(JSUI, HandleObjectRemoved));
+
     SubscribeToEvent(E_WIDGETDELETED, HANDLER(JSUI, HandleWidgetDeleted));
     SubscribeToEvent(E_WIDGETEVENT, HANDLER(JSUI, HandleWidgetEvent));
     SubscribeToEvent(E_WIDGETLOADED, HANDLER(JSUI, HandleWidgetLoaded));
@@ -80,6 +83,14 @@ void JSUI::HandleObjectAdded(StringHash eventType, VariantMap& eventData)
         duk_pop_2(ctx_);
 
     }
+
+}
+
+void JSUI::HandleObjectRemoved(StringHash eventType, VariantMap& eventData)
+{
+    Object* o = static_cast<Object*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
+
+    LOGINFOF("Removing %s", o->GetTypeName().CString());
 
 }
 
