@@ -5,6 +5,7 @@
 
 #include "../IO/Log.h"
 
+#include "UI.h"
 #include "UIEvents.h"
 #include "UIWindow.h"
 
@@ -19,6 +20,7 @@ UIWindow::UIWindow(Context* context, bool createWidget) : UIWidget(context, fals
     {
         widget_ = new TBWindow();
         widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
 

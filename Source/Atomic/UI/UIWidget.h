@@ -13,7 +13,7 @@ class TBWidget;
 namespace Atomic
 {
 
-/// Wraps a TurboBadger widget
+/// Wraps a TurboBadger widget in our Object model
 class UIWidget : public Object, public tb::TBWidgetDelegate
 {
     friend class UI;
@@ -33,12 +33,14 @@ public:
 
     UIWidget* GetParent();
 
-    void RemoveChild(UIWidget* child);
+    void RemoveChild(UIWidget* child, bool cleanup = true);
 
     // String ID
     const String& GetId();
 
     void Center();
+
+    void Destroy();
 
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);

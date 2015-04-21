@@ -21,7 +21,11 @@ UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
     {
         widget_ = new TBWidget();
         widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
+
+    UI* ui = GetSubsystem<UI>();
+
 }
 
 UIWidget::~UIWidget()
@@ -162,7 +166,18 @@ UIWidget* UIWidget::GetParent()
 
 }
 
-void UIWidget::RemoveChild(UIWidget* child)
+void UIWidget::Destroy()
+{
+    if (!widget_)
+        return;
+
+    if (widget_->GetParent())
+        widget_->GetParent()->RemoveChild(widget_);
+
+    delete widget_;
+}
+
+void UIWidget::RemoveChild(UIWidget* child, bool cleanup)
 {
     if (!widget_ || !child)
         return;
@@ -173,6 +188,9 @@ void UIWidget::RemoveChild(UIWidget* child)
         return;
 
     widget_->RemoveChild(childw);
+
+    if (cleanup)
+        delete childw;
 }
 
 
@@ -223,6 +241,10 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
                 VariantMap eventData;
                 ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
                 SendEvent(E_WIDGETEVENT, eventData);
+
+                if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                    return true;
+
             }
         }
 

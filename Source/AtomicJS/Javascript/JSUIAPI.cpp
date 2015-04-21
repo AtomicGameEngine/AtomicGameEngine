@@ -7,6 +7,7 @@
 #include "JSUIAPI.h"
 #include "JSVM.h"
 
+#include <Atomic/UI/UI.h>
 #include <Atomic/UI/UISelectItem.h>
 #include <Atomic/UI/UIMenuWindow.h>
 #include <Atomic/UI/UIButton.h>
@@ -99,10 +100,56 @@ int UIWindow_GetResizeToFitContentRect(duk_context* ctx)
 
 }
 
+int UI_DebugGetUIKeepAliveCount(duk_context* ctx)
+{
+    duk_push_global_stash(ctx);
+    duk_get_prop_string(ctx, -1, "__jsui_widgetkeepalive");
+
+    duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+    double count = 0;
+
+    while (duk_next(ctx, -1 , 0)) {
+
+        duk_pop(ctx);  /* pop_key */
+        count++;
+    }
+
+    duk_pop_n(ctx, 3);  /* pop enum object, keep alive object, and stash */
+
+    duk_push_number(ctx, count);
+
+    return 1;
+}
+
+int UI_DebugGetWrappedWidgetCount(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    UI* ui = vm->GetSubsystem<UI>();
+
+    duk_push_number(ctx, (double) ui->DebugGetWrappedWidgetCount());
+    return 1;
+}
 
 void jsapi_init_ui(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
+
+    // UI object
+    duk_get_global_string(ctx, "Atomic");
+
+    duk_push_object(ctx);
+
+    duk_push_c_function(ctx, UI_DebugGetWrappedWidgetCount, 0);
+    duk_put_prop_string(ctx, -2, "debugGetWrappedWidgetCount");
+
+    duk_push_c_function(ctx, UI_DebugGetUIKeepAliveCount, 0);
+    duk_put_prop_string(ctx, -2, "debugGetUIKeepAliveCount");
+
+    duk_put_prop_string(ctx, -2, "UI");
+
+
+    duk_pop(ctx);
 
     js_class_get_prototype(ctx, "UIButton");
     duk_push_c_function(ctx, UIButton_Popup, 2);

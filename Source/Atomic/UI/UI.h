@@ -46,8 +46,16 @@ public:
     void SetDefaultFont(const String& name, int size);
 
     bool IsWidgetWrapped(tb::TBWidget* widget);
+
+    // wrap an existing widget we new'd from script
+    void WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget);
+
+    // given a TB widget, creating a UIWidget
     UIWidget* WrapWidget(tb::TBWidget* widget);
+
     bool UnwrapWidget(tb::TBWidget* widget);
+
+    unsigned DebugGetWrappedWidgetCount() { return widgetWrap_.Size(); }
 
     void PruneUnreachableWidgets();
 

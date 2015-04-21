@@ -107,8 +107,7 @@ void JSUI::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
     // string property, pointer will be string representation of
     // address, so, unique key
     duk_push_pointer(ctx_, widget);
-    duk_push_null(ctx_);
-    duk_put_prop(ctx_, -3);
+    duk_del_prop(ctx_, -2);
     duk_pop_2(ctx_);
 
 }
@@ -304,13 +303,15 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
             PushWidgetEventObject(eventData);
 
             duk_call(ctx_, 1);
+
+            if (duk_is_boolean(ctx_, -1) && duk_to_boolean(ctx_, -1))
+                eventData[P_HANDLED] = true;
         }
         duk_pop_n(ctx_, 2);
         assert(top == duk_get_top(ctx_));
     }
 
     // specific event handlers
-
     if (type == tb::EVENT_TYPE_CLICK)
     {
         int top = duk_get_top(ctx_);
@@ -318,6 +319,10 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
         duk_get_prop_string(ctx_, -1, "onClick");
         if (duk_is_callable(ctx_, -1)) {
             duk_call(ctx_, 0);
+
+            if (duk_is_boolean(ctx_, -1) && duk_to_boolean(ctx_, -1))
+                eventData[P_HANDLED] = true;
+
         }
         duk_pop_n(ctx_, 2);
         assert(top == duk_get_top(ctx_));

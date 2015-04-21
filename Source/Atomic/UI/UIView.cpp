@@ -13,6 +13,7 @@ UIView::UIView(Context* context) : UIWidget(context, false)
 {
     widget_ = new TBWidget();
     widget_->SetDelegate(this);
+    GetSubsystem<UI>()->WrapWidget(this, widget_);
 
     UI* ui = GetSubsystem<UI>();
 

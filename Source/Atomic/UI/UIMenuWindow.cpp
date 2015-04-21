@@ -3,6 +3,7 @@
 #include <TurboBadger/tb_widgets_common.h>
 #include <TurboBadger/tb_menu_window.h>
 
+#include "UI.h"
 #include "UIEvents.h"
 #include "UIWidget.h"
 #include "UISelectItem.h"
@@ -16,8 +17,10 @@ namespace Atomic
 UIMenuWindow::UIMenuWindow(Context* context, UIWidget* target, const String& id) : UIWidget(context, false)
   , source_(0)
 {
-    widget_ = new TBMenuWindow(target->GetInternalWidget(), TBID(id.CString()));
+    widget_ = new TBMenuWindow(target->GetInternalWidget(), TBID(id.CString()));    
     widget_->SetDelegate(this);
+    GetSubsystem<UI>()->WrapWidget(this, widget_);
+
 }
 
 UIMenuWindow::~UIMenuWindow()

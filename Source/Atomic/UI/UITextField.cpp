@@ -2,6 +2,7 @@
 #include <TurboBadger/tb_widgets.h>
 #include <TurboBadger/tb_widgets_common.h>
 
+#include "UI.h"
 #include "UIEvents.h"
 #include "UITextField.h"
 
@@ -16,6 +17,7 @@ UITextField::UITextField(Context* context, bool createWidget) : UIWidget(context
     {
         widget_ = new TBTextField();
         widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
 

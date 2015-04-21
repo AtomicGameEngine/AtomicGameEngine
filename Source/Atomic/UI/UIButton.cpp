@@ -19,6 +19,7 @@ UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, fals
     {
         widget_ = new TBButton();
         widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
 

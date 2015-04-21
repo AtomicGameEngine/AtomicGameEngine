@@ -42,6 +42,10 @@ EVENT(E_WIDGETEVENT, WidgetEvent)
     PARAM(P_MODIFIERKEYS, ModifierKeys); // enum MODIFIER_KEYS
     PARAM(P_REFID, RefID);                     // unsigned (TBID)
     PARAM(P_TOUCH, Touch);               // bool
+
+    // EventHandled can be set by event receivers to stop event bubble
+    PARAM(P_HANDLED, Handled);               // [OUT] -> bool
+
 }
 
 EVENT(E_WIDGETLOADED, WidgetLoaded)

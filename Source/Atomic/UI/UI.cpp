@@ -425,6 +425,14 @@ void UI::PruneUnreachableWidgets()
     }
 }
 
+void UI::WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget)
+{
+    assert (!widgetWrap_.Contains(tbwidget));
+
+    widgetWrap_[tbwidget] = widget;
+
+}
+
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 {
     if (widgetWrap_.Contains(widget))

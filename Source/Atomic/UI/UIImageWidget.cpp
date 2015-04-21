@@ -5,6 +5,7 @@
 
 #include <Atomic/IO/Log.h>
 
+#include "UI.h"
 #include "UIEvents.h"
 #include "UIWidget.h"
 #include "UIImageWidget.h"
@@ -20,6 +21,7 @@ UIImageWidget::UIImageWidget(Context* context, bool createWidget) : UIWidget(con
     {
         widget_ = new TBImageWidget();
         widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
 
