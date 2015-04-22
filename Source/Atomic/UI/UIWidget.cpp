@@ -110,6 +110,11 @@ void UIWidget::AddChild(UIWidget* child)
 
     widget_->AddChild(child->widget_);
 
+    // this is to get proper padding, for instance when adding to a window
+    // takes title into account.  This *may* cause problems here, if so
+    // may need to make UIWidget AddChild virtual and inflate only on UIWindow::AddChild, etc
+    widget_->OnInflateChild(child->widget_);
+
 }
 
 void UIWidget::SetText(const String& text)
@@ -137,11 +142,20 @@ void UIWidget::SetSize(int width, int height)
     widget_->SetSize(width, height);       
 }
 
+void UIWidget::Invalidate()
+{
+    if (!widget_)
+        return;
+
+    widget_->Invalidate();
+}
+
 void UIWidget::Center()
 {
     if (!widget_)
         return;
 
+    // this should center on parent widget, not root
     UI* ui = GetSubsystem<UI>();
     TBRect rect = widget_->GetRect();
     TBWidget* root = ui->GetRootWidget();
@@ -164,6 +178,21 @@ UIWidget* UIWidget::GetParent()
 
     return ui->WrapWidget(parent);
 
+}
+
+UIWidget* UIWidget::GetContentRoot()
+{
+    if (!widget_)
+        return 0;
+
+    TBWidget* root = widget_->GetContentRoot();
+
+    if (!root)
+        return 0;
+
+    UI* ui = GetSubsystem<UI>();
+
+    return ui->WrapWidget(root);
 }
 
 void UIWidget::Destroy()

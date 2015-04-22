@@ -32,6 +32,7 @@ public:
     void SetText(const String& text);
 
     UIWidget* GetParent();
+    UIWidget* GetContentRoot();
 
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
@@ -40,6 +41,7 @@ public:
 
     void Center();
 
+    void Invalidate();
     void Destroy();
 
     // get this or child widget with id

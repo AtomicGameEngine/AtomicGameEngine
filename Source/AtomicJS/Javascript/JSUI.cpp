@@ -65,7 +65,11 @@ void JSUI::GatherWidgets(tb::TBWidget* widget, PODVector<tb::TBWidget*>& widgets
 
 void JSUI::HandleObjectAdded(StringHash eventType, VariantMap& eventData)
 {
-    Object* o = static_cast<Object*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
+    RefCounted* ref = static_cast<RefCounted*>(eventData[ObjectAdded::P_OBJECT].GetPtr());
+
+    assert(ref->IsObject());
+
+    Object* o = (Object*) ref;
 
     // for any UI type, we make sure it is kept alive
     if (uiTypes_.Contains(o->GetType()))

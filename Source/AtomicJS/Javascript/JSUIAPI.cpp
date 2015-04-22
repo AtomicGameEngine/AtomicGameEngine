@@ -131,6 +131,21 @@ int UI_DebugGetWrappedWidgetCount(duk_context* ctx)
     return 1;
 }
 
+int UI_Init(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    UI* ui = vm->GetSubsystem<UI>();
+
+    // TODO: take a config object
+    ui->Initialize("DefaultUI/language/lng_en.tb.txt");
+    ui->LoadSkin("DefaultUI/skin/skin.tb.txt", "");
+    ui->AddFont("DefaultUI/fonts/vera.ttf", "Vera");
+
+    ui->SetDefaultFont("Vera", 12);
+
+    return 0;
+}
+
 void jsapi_init_ui(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -140,14 +155,53 @@ void jsapi_init_ui(JSVM* vm)
 
     duk_push_object(ctx);
 
+    duk_push_c_function(ctx, UI_Init, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "__init");
+
     duk_push_c_function(ctx, UI_DebugGetWrappedWidgetCount, 0);
     duk_put_prop_string(ctx, -2, "debugGetWrappedWidgetCount");
 
     duk_push_c_function(ctx, UI_DebugGetUIKeepAliveCount, 0);
     duk_put_prop_string(ctx, -2, "debugGetUIKeepAliveCount");
 
-    duk_put_prop_string(ctx, -2, "UI");
+    // Layout
 
+    duk_push_number(ctx, (double) tb::AXIS_X);
+    duk_put_prop_string(ctx, -2, "AXIS_X");
+
+    duk_push_number(ctx, (double) tb::AXIS_Y);
+    duk_put_prop_string(ctx, -2, "AXIS_Y");
+
+    duk_push_number(ctx, (double) tb::LAYOUT_SIZE_GRAVITY);
+    duk_put_prop_string(ctx, -2, "LAYOUT_SIZE_GRAVITY");
+    duk_push_number(ctx, (double) tb::LAYOUT_SIZE_PREFERRED);
+    duk_put_prop_string(ctx, -2, "LAYOUT_SIZE_PREFERRED");
+    duk_push_number(ctx, (double) tb::LAYOUT_SIZE_AVAILABLE);
+    duk_put_prop_string(ctx, -2, "LAYOUT_SIZE_AVAILABLE");
+
+    duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_PREFERRED);
+    duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_PREFERRED");
+    duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_AVAILABLE);
+    duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_AVAILABLE");
+    duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_GRAVITY);
+    duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_GRAVITY");
+
+
+    // Window Settings
+    duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_NONE);
+    duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_NONE");
+    duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_TITLEBAR);
+    duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_TITLEBAR");
+    duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_RESIZABLE);
+    duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_RESIZABLE");
+    duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_CLOSE_BUTTON);
+    duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_CLOSE_BUTTON");
+    duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_CAN_ACTIVATE);
+    duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_CAN_ACTIVATE");
+    duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_DEFAULT);
+    duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_DEFAULT");
+
+    duk_put_prop_string(ctx, -2, "UI");
 
     duk_pop(ctx);
 

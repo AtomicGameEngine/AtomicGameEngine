@@ -16,6 +16,8 @@ public:
     UIWindow(Context* context, bool createWidget = true);
     virtual ~UIWindow();
 
+    void SetSettings(unsigned settings);
+
     void ResizeToFitContent();
 
 protected:

@@ -24,6 +24,14 @@ UIWindow::UIWindow(Context* context, bool createWidget) : UIWidget(context, fals
     }
 }
 
+void UIWindow::SetSettings(unsigned settings)
+{
+    if (!widget_)
+        return;
+
+    ((TBWindow*)widget_)->SetSettings((WINDOW_SETTINGS) settings);
+}
+
 void UIWindow::ResizeToFitContent()
 {
     if (!widget_)

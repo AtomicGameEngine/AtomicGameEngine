@@ -91,8 +91,6 @@ public:
 		shouldn't have any title bar) */
 	int GetTitleHeight();
 
-    void DisableCloseButton() { m_close_button.SetVisibilility(WIDGET_VISIBILITY_GONE); }
-
 	virtual TBRect GetPaddingRect();
 	virtual PreferredSize OnCalculatePreferredSize(const SizeConstraints &constraints);
 

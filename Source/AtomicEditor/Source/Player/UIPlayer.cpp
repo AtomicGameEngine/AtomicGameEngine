@@ -44,8 +44,7 @@ UIPlayer::UIPlayer(Context* context):
 
     UI* tbui = GetSubsystem<UI>();
 
-    // FIXME: disabling close button as having the widget die is currently bad
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
 
     window_->SetText("Atomic Player");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/playerwidget.tb.txt");

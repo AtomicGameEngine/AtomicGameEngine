@@ -9,12 +9,20 @@ function Game() {
 	this.graphics = Atomic.getGraphics();
 	this.input = Atomic.getInput();
 
-    this.input.setMouseVisible(true);
+  this.input.setMouseVisible(true);
 
-    if (Atomic.platform == "Android") {
-        this.renderer.reuseShadowMaps = false;
-        this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
-    }
+  if (Atomic.platform == "Android") {
+      this.renderer.reuseShadowMaps = false;
+      this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
+  }
+
+	// initialize the UI subsystem
+	// TODO: this needs to take a config with default font
+	// skin, etc
+	Atomic.UI.__init();
+
+	// root view
+	this.uiView = new Atomic.UIView();
 
 }
 

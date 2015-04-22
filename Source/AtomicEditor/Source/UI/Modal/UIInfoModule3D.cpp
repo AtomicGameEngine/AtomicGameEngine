@@ -36,7 +36,7 @@ InfoModule3D::InfoModule3D(Context* context,const String &exampleFolder, const S
     Project* project = editor->GetProject();
 
     UI* tbui = GetSubsystem<UI>();
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     window_->SetText("Atomic Game Engine Pro Required");
 
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/infomodule3d.tb.txt");

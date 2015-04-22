@@ -31,10 +31,9 @@ PlatformsInfo::PlatformsInfo(Context* context):
     UIModalOpWindow(context)
 {
     Editor* editor = GetSubsystem<Editor>();
-    Project* project = editor->GetProject();
 
     UI* tbui = GetSubsystem<UI>();
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     window_->SetText("Atomic Game Engine Pro Required");
 
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/platformsinfo.tb.txt");

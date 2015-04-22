@@ -37,7 +37,7 @@ UIEulaAgreement::UIEulaAgreement(Context* context):
     UIModalOpWindow(context)
 {
     UI* tbui = GetSubsystem<UI>();
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     window_->SetText("License Agreement");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/eulaagreement.tb.txt");
 

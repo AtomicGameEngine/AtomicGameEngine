@@ -35,7 +35,7 @@ UIActivation::UIActivation(Context* context):
     licenseKey_(0)
 {
     UI* tbui = GetSubsystem<UI>();
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     window_->SetText("Product Activation");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/activation.tb.txt");
 
