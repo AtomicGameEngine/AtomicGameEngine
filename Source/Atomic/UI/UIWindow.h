@@ -20,6 +20,8 @@ public:
 
     void ResizeToFitContent();
 
+    void AddChild(UIWidget *child);
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

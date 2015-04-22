@@ -41,6 +41,21 @@ void UIWindow::ResizeToFitContent()
 
 }
 
+void UIWindow::AddChild(UIWidget *child)
+{
+    if (!widget_ || !child->GetInternalWidget())
+        return;
+
+    UIWidget::AddChild(child);
+
+    // this is to get proper padding, this may cause problems
+    // as this is called from the widget_reader, and not as part of
+    // AddChild.  This may also need to be called from other widgets
+    // that have padding, etc
+    widget_->OnInflateChild(child->GetInternalWidget());
+
+}
+
 UIWindow::~UIWindow()
 {
 }

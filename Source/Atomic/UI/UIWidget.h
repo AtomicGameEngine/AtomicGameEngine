@@ -47,7 +47,7 @@ public:
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);
 
-    void AddChild(UIWidget* child);
+    virtual void AddChild(UIWidget* child);
 
     tb::TBWidget* GetInternalWidget() { return widget_; }
 

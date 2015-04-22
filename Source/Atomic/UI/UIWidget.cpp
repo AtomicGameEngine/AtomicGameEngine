@@ -109,12 +109,6 @@ void UIWidget::AddChild(UIWidget* child)
         return;
 
     widget_->AddChild(child->widget_);
-
-    // this is to get proper padding, for instance when adding to a window
-    // takes title into account.  This *may* cause problems here, if so
-    // may need to make UIWidget AddChild virtual and inflate only on UIWindow::AddChild, etc
-    widget_->OnInflateChild(child->widget_);
-
 }
 
 void UIWidget::SetText(const String& text)
