@@ -34,6 +34,22 @@ void UILayout::SetSpacing(int spacing)
         return;
 
     ((tb::TBLayout*)widget_)->SetSpacing(spacing);
+}
+
+void UILayout::SetLayoutPosition(/*LAYOUT_POSITION*/ unsigned position)
+{
+    if (!widget_)
+        return;
+
+    ((tb::TBLayout*)widget_)->SetLayoutPosition( (LAYOUT_POSITION) position);
+}
+
+void UILayout::SetLayoutDistributionPosition(/*LAYOUT_DISTRIBUTION_POSITION*/ unsigned distribution_pos)
+{
+    if (!widget_)
+        return;
+
+    ((tb::TBLayout*)widget_)->SetLayoutDistributionPosition( (LAYOUT_DISTRIBUTION_POSITION) distribution_pos);
 
 }
 

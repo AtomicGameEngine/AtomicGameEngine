@@ -131,6 +131,19 @@ int UI_DebugGetWrappedWidgetCount(duk_context* ctx)
     return 1;
 }
 
+int UI_DebugShowSettingsWindow(duk_context* ctx)
+{
+    UIWidget* widget = js_to_class_instance<UIWidget>(ctx, 0, 0);
+
+    if (!widget)
+        return 0;
+
+    if (widget->GetInternalWidget())
+        tb::ShowDebugInfoSettingsWindow(widget->GetInternalWidget());
+
+    return 0;
+}
+
 int UI_Init(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -164,11 +177,33 @@ void jsapi_init_ui(JSVM* vm)
     duk_push_c_function(ctx, UI_DebugGetUIKeepAliveCount, 0);
     duk_put_prop_string(ctx, -2, "debugGetUIKeepAliveCount");
 
+    duk_push_c_function(ctx, UI_DebugShowSettingsWindow, 1);
+    duk_put_prop_string(ctx, -2, "debugShowSettingsWindow");
+
+
     // Layout
+
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_NONE);
+    duk_put_prop_string(ctx, -2, "GRAVITY_NONE");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_LEFT);
+    duk_put_prop_string(ctx, -2, "GRAVITY_LEFT");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_RIGHT);
+    duk_put_prop_string(ctx, -2, "GRAVITY_RIGHT");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_TOP);
+    duk_put_prop_string(ctx, -2, "GRAVITY_TOP");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_BOTTOM);
+    duk_put_prop_string(ctx, -2, "GRAVITY_BOTTOM");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_LEFT_RIGHT);
+    duk_put_prop_string(ctx, -2, "GRAVITY_LEFT_RIGHT");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_TOP_BOTTOM);
+    duk_put_prop_string(ctx, -2, "GRAVITY_TOP_BOTTOM");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_ALL);
+    duk_put_prop_string(ctx, -2, "GRAVITY_ALL");
+    duk_push_number(ctx, (double) tb::WIDGET_GRAVITY_DEFAULT);
+    duk_put_prop_string(ctx, -2, "GRAVITY_DEFAULT");
 
     duk_push_number(ctx, (double) tb::AXIS_X);
     duk_put_prop_string(ctx, -2, "AXIS_X");
-
     duk_push_number(ctx, (double) tb::AXIS_Y);
     duk_put_prop_string(ctx, -2, "AXIS_Y");
 
@@ -186,6 +221,21 @@ void jsapi_init_ui(JSVM* vm)
     duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_GRAVITY);
     duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_GRAVITY");
 
+    duk_push_number(ctx, (double) tb::LAYOUT_POSITION_CENTER);
+    duk_put_prop_string(ctx, -2, "LAYOUT_POSITION_CENTER");
+    duk_push_number(ctx, (double) tb::LAYOUT_POSITION_LEFT_TOP);
+    duk_put_prop_string(ctx, -2, "LAYOUT_POSITION_LEFT_TOP");
+    duk_push_number(ctx, (double) tb::LAYOUT_POSITION_RIGHT_BOTTOM);
+    duk_put_prop_string(ctx, -2, "LAYOUT_POSITION_RIGHT_BOTTOM");
+    duk_push_number(ctx, (double) tb::LAYOUT_POSITION_GRAVITY);
+    duk_put_prop_string(ctx, -2, "LAYOUT_POSITION_GRAVITY");
+
+    duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_POSITION_CENTER);
+    duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_POSITION_CENTER");
+    duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP);
+    duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP");
+    duk_push_number(ctx, (double) tb::LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM);
+    duk_put_prop_string(ctx, -2, "LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM");
 
     // Window Settings
     duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_NONE);

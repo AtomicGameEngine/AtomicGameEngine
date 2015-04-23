@@ -119,6 +119,15 @@ void UIWidget::SetText(const String& text)
     widget_->SetText(text.CString());
 }
 
+void UIWidget::SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetGravity((WIDGET_GRAVITY) gravity);
+
+}
+
 void UIWidget::SetPosition(int x, int y)
 {
     if (!widget_)
@@ -236,6 +245,22 @@ const String& UIWidget::GetId()
     return id_;
 
 }
+
+void UIWidget::SetId(const String& id)
+{
+    if (!widget_)
+    {
+        if (id_.Length())
+            id_.Clear();
+
+        return;
+    }
+
+    id_ = id;
+    widget_->SetID(TBIDC(id.CString()));
+
+}
+
 
 bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {

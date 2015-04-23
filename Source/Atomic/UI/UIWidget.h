@@ -38,8 +38,11 @@ public:
 
     // String ID
     const String& GetId();
+    void SetId(const String& id);
 
     void Center();
+    void SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity);
+
 
     void Invalidate();
     void Destroy();
