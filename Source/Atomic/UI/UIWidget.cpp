@@ -137,6 +137,23 @@ void UIWidget::SetPosition(int x, int y)
 
 }
 
+IntRect UIWidget::GetRect()
+{
+    IntRect rect(0, 0, 0, 0);
+
+    if (!widget_)
+        return rect;
+
+    tb::TBRect tbrect = widget_->GetRect();
+
+    rect.top_ = tbrect.y;
+    rect.left_ = tbrect.x;
+    rect.right_ = tbrect.x + tbrect.w;
+    rect.bottom_ = tbrect.y + tbrect.h;
+
+    return rect;
+}
+
 void UIWidget::SetSize(int width, int height)
 {
     if (!widget_)

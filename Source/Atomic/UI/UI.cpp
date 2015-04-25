@@ -483,6 +483,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return imagewidget;
     }
 
+    if (widget->IsOfType<TBWidget>())
+    {
+        UIWidget* nwidget = new UIWidget(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
     return 0;
 }
 

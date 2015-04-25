@@ -27,6 +27,8 @@ public:
 
     bool Load(const String& filename);
 
+    IntRect GetRect();
+
     void SetSize(int width, int height);
     void SetPosition(int x, int y);
     void SetText(const String& text);
