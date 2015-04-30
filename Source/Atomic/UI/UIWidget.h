@@ -47,7 +47,7 @@ public:
 
 
     void Invalidate();
-    void Destroy();
+    void Die();
 
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);

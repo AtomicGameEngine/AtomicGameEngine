@@ -70,7 +70,7 @@ Game.prototype.showDebugHud = function() {
 
 Game.prototype.createScene2D = function() {
 
-	var scene = new Atomic.Scene();
+		var scene = new Atomic.Scene();
     scene.createComponent("Octree");
 
     var cameraNode = scene.createChild("Camera");

@@ -215,15 +215,18 @@ UIWidget* UIWidget::GetContentRoot()
     return ui->WrapWidget(root);
 }
 
-void UIWidget::Destroy()
+void UIWidget::Die()
 {
     if (!widget_)
         return;
 
-    if (widget_->GetParent())
-        widget_->GetParent()->RemoveChild(widget_);
+    // clear delegate
+    widget_->SetDelegate(NULL);
+    // explictly die (can trigger an animation)
+    widget_->Die();
+    // call OnDelete, which unwraps the widget and does some bookkeeping
+    OnDelete();
 
-    delete widget_;
 }
 
 void UIWidget::RemoveChild(UIWidget* child, bool cleanup)

@@ -138,8 +138,11 @@ int UI_DebugShowSettingsWindow(duk_context* ctx)
     if (!widget)
         return 0;
 
+#ifdef TB_RUNTIME_DEBUG_INFO
     if (widget->GetInternalWidget())
         tb::ShowDebugInfoSettingsWindow(widget->GetInternalWidget());
+#endif
+
 
     return 0;
 }

@@ -41,7 +41,7 @@ public:
 
     void Shutdown();
 
-    void LoadSkin(const String& skin, const String& overrideSkin);
+    void LoadSkin(const String& skin, const String& overrideSkin = String::EMPTY);
     void AddFont(const String& fontFile, const String &name);
     void SetDefaultFont(const String& name, int size);
 

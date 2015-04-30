@@ -314,7 +314,8 @@ int JSVM::js_module_search(duk_context* ctx)
 {
     JSVM* vm = GetJSVM(ctx);
 
-    ResourceCache* cache = vm->GetContext()->GetSubsystem<ResourceCache>();
+    FileSystem* fs = vm->GetSubsystem<FileSystem>();
+    ResourceCache* cache = vm->GetSubsystem<ResourceCache>();
 
     String path = duk_to_string(ctx, 0);
 
@@ -334,7 +335,20 @@ int JSVM::js_module_search(duk_context* ctx)
     }
     else
     {
-        path = vm->moduleSearchPath_ + "/" + path + ".js";
+        // a module can exist in the Modules path or reside in a project directory
+        // prefer modules path
+        String modulePath = vm->moduleSearchPath_ + "/" + path + ".js";
+
+        if (fs->FileExists(modulePath))
+        {
+            // unless the file doesn't exist and then use project path
+            path = modulePath;
+        }
+        else
+        {
+            path += ".js";
+        }
+
     }
 
     SharedPtr<File> jsfile(cache->GetFile(path));    
