@@ -18,6 +18,7 @@
 #include "JSVM.h"
 #include "JSAtomic.h"
 #include "JSUI.h"
+#include "JSMetrics.h"
 
 namespace Atomic
 {
@@ -32,6 +33,8 @@ JSVM::JSVM(Context* context) :
     assert(!instance_);
 
     instance_ = this;
+
+    metrics_ = new JSMetrics(context, this);
 }
 
 JSVM::~JSVM()

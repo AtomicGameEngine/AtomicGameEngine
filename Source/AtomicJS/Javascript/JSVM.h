@@ -20,9 +20,13 @@ namespace Atomic
 
 class JSFile;
 class JSUI;
+class JSMetrics;
 
 class ATOMIC_API JSVM : public Object
 {
+
+    friend class JSMetrics;
+
     OBJECT(JSVM);
 
 public:
@@ -50,6 +54,8 @@ public:
     }
 
     inline duk_context* GetJSContext() { return ctx_; }
+
+    JSMetrics* GetMetrics() { return metrics_; }
 
     void DumpJavascriptObjects() {}
 
@@ -173,6 +179,8 @@ private:
 
     VariantMap objectAddedData_;
     VariantMap objectRemovedData_;
+
+    SharedPtr<JSMetrics> metrics_;
 
     static JSVM* instance_;
 

@@ -82,6 +82,13 @@ static int js_assert(duk_context* ctx)
     return 0;
 }
 
+static int js_atomic_GetVM(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm);
+    return 1;
+}
+
 
 static int js_atomic_GetEngine(duk_context* ctx)
 {
@@ -238,6 +245,9 @@ void jsapi_init_atomic(JSVM* vm)
     duk_push_object(ctx);
     duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
     duk_pop(ctx);
+
+    duk_push_c_function(ctx, js_atomic_GetVM, 0);
+    duk_put_prop_string(ctx, -2, "getVM");
 
     duk_push_c_function(ctx, js_atomic_GetEngine, 0);
     duk_put_prop_string(ctx, -2, "getEngine");
