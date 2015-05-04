@@ -17,6 +17,12 @@ class JSMetrics : public Object
 {
     OBJECT(JSMetrics);
 
+    struct ObjectMetric
+    {
+        String classname;
+        int count;
+    };
+
 public:
 
     /// Construct.
@@ -25,7 +31,6 @@ public:
     virtual ~JSMetrics();
 
     void Capture();
-
     void Dump();
 
 private:
@@ -33,8 +38,7 @@ private:
     WeakPtr<JSVM> vm_;
 
     // Object
-    List<String> classNames_;
-    HashMap<StringHash, int> classInstances_;
+    HashMap<StringHash, ObjectMetric> objectMetrics_;
 
 };
 

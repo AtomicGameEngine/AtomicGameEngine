@@ -1,4 +1,6 @@
 
+#include <Atomic/Container/Sort.h>
+
 #include "JSVM.h"
 #include "JSMetrics.h"
 
@@ -16,22 +18,36 @@ JSMetrics::~JSMetrics()
 
 }
 
+static bool CompareObjectMetrics(const JSMetrics::ObjectMetric& lhs, const JSMetrics::ObjectMetric& rhs)
+{
+    return lhs.count > rhs.count;
+}
+
 void JSMetrics::Dump()
 {
-    List<String>::ConstIterator itr = classNames_.Begin();
-    while (itr != classNames_.End())
+    Vector<ObjectMetric> sorted;
+
+    HashMap<StringHash, ObjectMetric>::ConstIterator itr = objectMetrics_.Begin();
+    while (itr != objectMetrics_.End())
     {
-        const String& classname = *itr;
-        LOGINFOF("%s %i", classname.CString(), classInstances_[classname] );
+        sorted.Push(itr->second_);
         itr++;
     }
 
+    Sort(sorted.Begin(), sorted.End(), CompareObjectMetrics);
+
+    Vector<ObjectMetric>::ConstIterator vitr = sorted.Begin();
+    while (vitr != sorted.End())
+    {
+        const String& classname = (*vitr).classname;
+        LOGINFOF("%s %i", classname.CString(), objectMetrics_[classname].count);
+        vitr++;
+    }
 }
 
 void JSMetrics::Capture()
 {
-    classNames_.Clear();
-    classInstances_.Clear();
+    objectMetrics_.Clear();
 
     HashMap<void*, RefCounted*>::ConstIterator itr = vm_->heapToObject_.Begin();
     while (itr != vm_->heapToObject_.End())
@@ -42,14 +58,17 @@ void JSMetrics::Capture()
             classname = ((Object*) itr->second_)->GetTypeName();
         }
 
-        if (!classNames_.Contains(classname))
+        if (!objectMetrics_.Contains(classname))
         {
-            classNames_.Push(classname);
-            classInstances_[classname] = 1;
+            JSMetrics::ObjectMetric metric;
+            metric.classname = classname;
+            metric.count = 1;
+
+            objectMetrics_[classname] = metric;
         }
         else
         {
-            classInstances_[classname]++;
+            objectMetrics_[classname].count++;
         }
 
         itr++;
