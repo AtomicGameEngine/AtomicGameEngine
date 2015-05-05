@@ -31,7 +31,9 @@ public:
     virtual ~JSMetrics();
 
     void Capture();
+
     void Dump();
+    void DumpJSComponents();
 
 private:
 
