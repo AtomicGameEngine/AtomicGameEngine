@@ -142,6 +142,58 @@ static int js_atomic_script(duk_context* ctx)
     return 1;
 }
 
+static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = false)
+{
+
+    if (root)
+    {
+        PODVector<Node*> children;
+        node->GetChildren(children, true);
+
+        for (unsigned i = 0; i < children.Size(); i++)
+        {
+            if (children.At(i)->JSGetHeapPtr())
+                js_atomic_destroy_node(children.At(i), ctx);
+        }
+    }
+
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+
+    for (unsigned i = 0; i < components.Size(); i++)
+    {
+         Component* component = components[i];
+
+         if (component->GetType() == JSComponent::GetTypeStatic())
+         {
+             JSComponent* jscomponent = (JSComponent*) component;
+             jscomponent->SetDestroyed();
+         }
+
+         component->UnsubscribeFromAllEvents();
+    }
+
+    node->RemoveAllComponents();
+    node->UnsubscribeFromAllEvents();
+
+    if (node->GetParent())
+    {
+        assert(node->Refs() >= 2);
+        node->Remove();
+    }
+
+    int top = duk_get_top(ctx);
+    duk_push_global_stash(ctx);
+    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
+    duk_push_pointer(ctx, (void*) node);
+    duk_del_prop(ctx, -2);
+    duk_pop_2(ctx);
+    assert(top = duk_get_top(ctx));
+}
+
+static void js_atomic_destroy_scene(Scene* scene, duk_context* ctx)
+{
+    js_atomic_destroy_node(scene, ctx, true);
+}
 
 static int js_atomic_destroy(duk_context* ctx)
 {
@@ -155,45 +207,19 @@ static int js_atomic_destroy(duk_context* ctx)
 
     if (obj->GetType() == Node::GetTypeStatic())
     {
-
         Node* node = (Node*) obj;
-
-        const Vector<SharedPtr<Component> >& components = node->GetComponents();
-
-        for (unsigned i = 0; i < components.Size(); i++)
-        {
-             Component* component = components[i];
-
-             if (component->GetType() == JSComponent::GetTypeStatic())
-             {
-                 JSComponent* jscomponent = (JSComponent*) component;
-                 jscomponent->SetDestroyed();
-             }
-
-             component->UnsubscribeFromAllEvents();
-        }
-
-        node->RemoveAllComponents();
-        node->UnsubscribeFromAllEvents();
-
-        if (node->GetParent())
-        {
-            assert(node->Refs() >= 2);
-            node->Remove();
-        }
-
-        int top = duk_get_top(ctx);
-        duk_push_global_stash(ctx);
-        duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-        duk_push_pointer(ctx, (void*) node);
-        duk_del_prop(ctx, -2);
-        duk_pop_2(ctx);
-        assert(top = duk_get_top(ctx));
-
+        js_atomic_destroy_node(node, ctx, true);
+        return 0;
+    }
+    if (obj->GetType() == Scene::GetTypeStatic())
+    {
+        Scene* scene = (Scene*) obj;
+        js_atomic_destroy_scene(scene, ctx);
         return 0;
     }
     else if (obj->GetType() == JSComponent::GetTypeStatic())
     {
+        // FIXME: want to be able to destroy a single component
         assert(0);
         JSComponent* component = (JSComponent*) obj;
         component->UnsubscribeFromAllEvents();
