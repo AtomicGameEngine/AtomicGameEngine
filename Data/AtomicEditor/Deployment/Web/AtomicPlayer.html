@@ -8,7 +8,16 @@
 
     <title>Atomic Player</title>
 
+    <script>window.addEventListener("keydown", function(e) {
+        // Disable stock behavior, which was causing scroll errors
+        // space and arrow keys
+        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+            e.preventDefault();
+        }
+        }, false);</script>
+
     <style>
+
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
       canvas.atomic { border: 0px none; }
 
@@ -85,8 +94,6 @@
     <!--
 
     <!-- <textarea id="output" rows="8" cols="80"></textarea> -->
-
-
 
     <script async type="text/javascript" src="AtomicResources.js"></script>
     <script async type="text/javascript" src="AtomicPlayer.js"></script>
