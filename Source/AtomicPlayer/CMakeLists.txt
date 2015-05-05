@@ -13,7 +13,7 @@ elseif(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
     set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    set (EXE_TYPE MACOSX_BUNDLE)    
+    set (EXE_TYPE MACOSX_BUNDLE)
 endif()
 
 if (ANDROID)
@@ -51,4 +51,3 @@ endif(APPLE)
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicPlayer PROPERTIES ${TARGET_PROPERTIES})
 endif ()
-

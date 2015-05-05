@@ -109,6 +109,13 @@
 #define TB_CLIPBOARD_DUMMY
 #endif
 
+#ifdef EMSCRIPTEN
+#define TB_FILE_POSIX
+#define TB_TARGET_EMSCRIPTEN
+#define TB_SYSTEM_LINUX
+#define TB_CLIPBOARD_DUMMY
+#endif
+
 #ifdef MACOSX
 #define TB_FILE_POSIX
 #define TB_TARGET_MACOSX
