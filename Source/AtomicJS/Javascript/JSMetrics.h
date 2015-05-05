@@ -23,6 +23,13 @@ class JSMetrics : public Object
         int count;
     };
 
+    struct NodeMetric
+    {
+        String name;
+        int count;
+    };
+
+
 public:
 
     /// Construct.
@@ -33,6 +40,7 @@ public:
     void Capture();
 
     void Dump();
+    void DumpNodes();
     void DumpJSComponents();
 
 private:
@@ -41,6 +49,9 @@ private:
 
     // Object
     HashMap<StringHash, ObjectMetric> objectMetrics_;
+
+    // Nodes
+    HashMap<StringHash, NodeMetric> nodeMetrics_;
 
 };
 

@@ -56,6 +56,7 @@ public:
     virtual void OnSetEnabled();
     void OnNodeSet(Node *node);
 
+    bool GetDestroyed() { return destroyed_; }
     void SetDestroyed() { destroyed_ = true; }
 
     /// Create object of certain class from the script file. Return true if successful.

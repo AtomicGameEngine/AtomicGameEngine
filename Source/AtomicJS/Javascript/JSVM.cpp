@@ -506,6 +506,12 @@ bool JSVM::ExecuteFile(File *file)
     return true;
 }
 
+void JSVM::GC()
+{
+    // run twice to ensure finalizers are run
+    duk_gc(ctx_, 0);
+    duk_gc(ctx_, 0);
+}
 
 bool JSVM::ExecuteMain()
 {

@@ -98,6 +98,25 @@ Game.prototype.createScene2D = function() {
 
 }
 
+Game.prototype.dumpMetrics = function() {
+
+	var metrics = Atomic.getVM().metrics;
+  metrics.capture();
+  print("--------------");
+  print("Object Instances:");
+  print("--------------");
+  metrics.dump();
+	print("--------------");
+  print("Nodes:");
+  print("--------------");
+  metrics.dumpNodes();
+  print("--------------");
+  print("JS Components:");
+  print("--------------");
+  metrics.dumpJSComponents();
+
+}
+
 Game.prototype.createScene3D = function(filename) {
 
     var scene = new Atomic.Scene();

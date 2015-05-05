@@ -1,5 +1,6 @@
 
 #include <Atomic/Container/Sort.h>
+#include <Atomic/Scene/Node.h>
 
 #include "JSVM.h"
 #include "JSComponent.h"
@@ -24,6 +25,12 @@ static bool CompareObjectMetrics(const JSMetrics::ObjectMetric& lhs, const JSMet
     return lhs.count > rhs.count;
 }
 
+static bool CompareNodeMetrics(const JSMetrics::NodeMetric& lhs, const JSMetrics::NodeMetric& rhs)
+{
+    return lhs.count > rhs.count;
+}
+
+
 void JSMetrics::Dump()
 {
     Vector<ObjectMetric> sorted;
@@ -44,7 +51,33 @@ void JSMetrics::Dump()
         LOGINFOF("%s %i", classname.CString(), objectMetrics_[classname].count);
         vitr++;
     }
+
 }
+
+
+void JSMetrics::DumpNodes()
+{
+    Vector<NodeMetric> sorted;
+
+    HashMap<StringHash, NodeMetric>::ConstIterator itr = nodeMetrics_.Begin();
+    while (itr != nodeMetrics_.End())
+    {
+        sorted.Push(itr->second_);
+        itr++;
+    }
+
+    Sort(sorted.Begin(), sorted.End(), CompareNodeMetrics);
+
+    Vector<NodeMetric>::ConstIterator vitr = sorted.Begin();
+    while (vitr != sorted.End())
+    {
+        const String& nodename = (*vitr).name;
+        LOGINFOF("%s %i", nodename.CString(), nodeMetrics_[nodename].count);
+        vitr++;
+    }
+
+}
+
 
 void JSMetrics::DumpJSComponents()
 {
@@ -64,6 +97,13 @@ void JSMetrics::DumpJSComponents()
         {
             JSComponent* jsc = (JSComponent*) itr->second_;
             const String& classname = jsc->GetClassName();
+
+            if (jsc->GetDestroyed())
+            {
+                // this is an error
+                LOGINFOF("Destroyed: %s Node: %p JSHeapPtr: %p", jsc->GetClassName().CString(), (void*) jsc->GetNode(), (void*) jsc->JSGetHeapPtr());
+            }
+
             if (!jscomponents.Contains(classname))
             {
                 jsnames.Push(classname);
@@ -87,6 +127,7 @@ void JSMetrics::DumpJSComponents()
 void JSMetrics::Capture()
 {
     objectMetrics_.Clear();
+    nodeMetrics_.Clear();
 
     // run twice to call finalizers
     // see duktape docs
@@ -101,7 +142,33 @@ void JSMetrics::Capture()
         if (itr->second_->IsObject())
         {
             classname = ((Object*) itr->second_)->GetTypeName();
+
+            if (classname == "Node")
+            {
+                String nodename = ((Node*) itr->second_)->GetName();
+
+                if (nodename == String::EMPTY)
+                {
+                    nodename = String("(Anonymous)");
+                }
+
+                if (!nodeMetrics_.Contains(nodename))
+                {
+                    JSMetrics::NodeMetric metric;
+                    metric.name = nodename;
+                    metric.count = 1;
+                    nodeMetrics_[nodename] = metric;
+                }
+                else
+                {
+                    nodeMetrics_[nodename].count++;
+                }
+
+            }
+
         }
+
+
 
         if (!objectMetrics_.Contains(classname))
         {

@@ -55,6 +55,7 @@ public:
 
     inline duk_context* GetJSContext() { return ctx_; }
 
+    void GC();
     JSMetrics* GetMetrics() { return metrics_; }
 
     void DumpJavascriptObjects() {}

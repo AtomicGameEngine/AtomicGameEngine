@@ -158,17 +158,6 @@ static int js_atomic_destroy(duk_context* ctx)
 
         Node* node = (Node*) obj;
 
-        if (node->JSGetHeapPtr())
-        {
-            int top = duk_get_top(ctx);
-            duk_push_global_stash(ctx);
-            duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-            duk_push_pointer(ctx, node->JSGetHeapPtr());
-            duk_del_prop(ctx, -2);
-            duk_pop_2(ctx);
-            assert(top = duk_get_top(ctx));
-        }
-
         const Vector<SharedPtr<Component> >& components = node->GetComponents();
 
         for (unsigned i = 0; i < components.Size(); i++)
@@ -187,9 +176,19 @@ static int js_atomic_destroy(duk_context* ctx)
         node->RemoveAllComponents();
         node->UnsubscribeFromAllEvents();
 
-        assert(node->Refs() >= 2);
+        if (node->GetParent())
+        {
+            assert(node->Refs() >= 2);
+            node->Remove();
+        }
 
-        node->Remove();
+        int top = duk_get_top(ctx);
+        duk_push_global_stash(ctx);
+        duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
+        duk_push_pointer(ctx, (void*) node);
+        duk_del_prop(ctx, -2);
+        duk_pop_2(ctx);
+        assert(top = duk_get_top(ctx));
 
         return 0;
     }
