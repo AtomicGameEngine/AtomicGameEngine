@@ -113,6 +113,8 @@ public:
         bool isReference = false;
         bool isTemplate = false;
 
+        bool isConst = false;
+
         if (type->isPointerType())
         {
             isPointer=true;
@@ -124,6 +126,7 @@ public:
             isReference=true;
             FullySpecifiedType pfst = type->asReferenceType()->elementType();
             type = pfst.type();
+            isConst = pfst.isConst();
         }
         if (!isPointer && retType)
         {
@@ -160,9 +163,21 @@ public:
         if (!jtype)
             return NULL;
 
+        bool skip = false;
+
         // no pointers to prim atm
-        if ((isPointer || isReference) && jtype->asPrimitiveType())
-            return NULL;
+        if (isPointer || isReference)
+        {
+            if (jtype->asPrimitiveType())
+                skip = true;
+            else if (!retType && !isConst && (jtype->asStringType() || jtype->asStringHashType()))
+            {
+                skip = true;
+            }
+
+            if (skip)
+                return NULL;
+        }
 
         JSBFunctionType* ftype = new JSBFunctionType(jtype);
         ftype->isPointer_ = isPointer;
