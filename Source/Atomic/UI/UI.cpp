@@ -34,6 +34,8 @@ using namespace tb;
 #include "UIEditField.h"
 #include "UILayout.h"
 #include "UIImageWidget.h"
+#include "UIClickLabel.h"
+#include "UICheckBox.h"
 
 namespace tb
 {
@@ -442,6 +444,8 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widgetWrap_.Contains(widget))
         return widgetWrap_[widget];
 
+    // switch this to use a factory?
+
     // this is order dependent as we're using IsOfType which also works if a base class
     if (widget->IsOfType<TBLayout>())
     {
@@ -485,6 +489,21 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         imagewidget->SetWidget(widget);
         widgetWrap_[widget] = imagewidget;
         return imagewidget;
+    }
+    if (widget->IsOfType<TBClickLabel>())
+    {
+        UIClickLabel* nwidget = new UIClickLabel(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBCheckBox>())
+    {
+        UICheckBox* nwidget = new UICheckBox(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
     }
 
     if (widget->IsOfType<TBWidget>())

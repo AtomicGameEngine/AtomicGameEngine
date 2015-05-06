@@ -291,6 +291,24 @@ void UIWidget::SetState(/*WIDGET_STATE*/ unsigned state, bool on)
 
 }
 
+void UIWidget::SetValue(double value)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetValueDouble(value);
+}
+
+double UIWidget::GetValue()
+{
+    if (!widget_)
+        return 0.0;
+
+    return widget_->GetValueDouble();
+
+}
+
+
 bool UIWidget::GetState(/*WIDGET_STATE*/ unsigned state)
 {
     if (!widget_)
@@ -324,7 +342,21 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
     UI* ui = GetSubsystem<UI>();
 
-    if (ev.type == EVENT_TYPE_CLICK)
+    if (ev.type == EVENT_TYPE_CHANGED)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
+    else if (ev.type == EVENT_TYPE_CLICK)
     {
         if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
         {

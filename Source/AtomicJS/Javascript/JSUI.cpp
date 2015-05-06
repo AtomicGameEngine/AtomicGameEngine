@@ -44,6 +44,8 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UILayout"] = true;
     uiTypes_["UIMenuWindow"] = true;
     uiTypes_["UIWindow"] = true;
+    uiTypes_["UIClickLabel"] = true;
+    uiTypes_["UICheckBox"] = true;
 }
 
 JSUI::~JSUI()
@@ -295,6 +297,29 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
         return;
 
     tb::EVENT_TYPE type = (tb::EVENT_TYPE) eventData[P_TYPE].GetUInt();
+
+    if (type == tb::EVENT_TYPE_CHANGED)
+    {
+        int top = duk_get_top(ctx_);
+        duk_push_heapptr(ctx_, handlerHeapPtr);
+        duk_get_prop_string(ctx_, -1, "onChanged");
+        if (duk_is_callable(ctx_, -1)) {
+
+            if (duk_pcall(ctx_, 0) != 0)
+            {
+                JSVM::GetJSVM(nullptr)->SendJSErrorEvent();
+            }
+            else
+            {
+                if (duk_is_boolean(ctx_, -1) && duk_to_boolean(ctx_, -1))
+                    eventData[P_HANDLED] = true;
+            }
+        }
+        duk_pop_n(ctx_, 2);
+        assert(top == duk_get_top(ctx_));
+        return;
+
+    }
 
     // general event handler, bubbles to (wrapped) parent widgets unless handled (returns true)
     if (type == tb::EVENT_TYPE_CLICK)

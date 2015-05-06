@@ -45,6 +45,9 @@ public:
     void Center();
     void SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity);
 
+    void SetValue(double value);
+    double GetValue();
+
     void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
     bool GetState(/*WIDGET_STATE*/ unsigned state);
 

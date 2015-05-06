@@ -427,7 +427,7 @@ bool TBRadioCheckBox::OnEvent(const TBWidgetEvent &ev)
 			SetValue(!GetValue());
 		}
 	}
-	return false;
+    return TBWidget::OnEvent(ev);
 }
 
 // == TBScrollBar =======================================
