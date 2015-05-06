@@ -111,6 +111,7 @@ public:
         bool isPointer = false;
         bool isSharedPtr = false;
         bool isReference = false;
+        bool isTemplate = false;
 
         if (type->isPointerType())
         {
@@ -137,6 +138,7 @@ public:
                     {
                         FullySpecifiedType pfst = tnid->templateArgumentAt(0);
                         type = pfst.type();
+                        isTemplate = true;
                     }
                 }
             }
@@ -166,6 +168,7 @@ public:
         ftype->isPointer_ = isPointer;
         ftype->isSharedPtr_ = isSharedPtr;
         ftype->isReference_ = isReference;
+        ftype->isTemplate_ = isTemplate;
 
         return ftype;
 
