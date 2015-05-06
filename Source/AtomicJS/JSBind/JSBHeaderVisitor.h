@@ -103,7 +103,7 @@ public:
 
     }
 
-    JSBFunctionType* processFunctionType(FullySpecifiedType fst)
+    JSBFunctionType* processFunctionType(FullySpecifiedType fst, bool retType = false)
     {
         JSBType* jtype = NULL;
         Type* type = fst.type();
@@ -123,6 +123,23 @@ public:
             isReference=true;
             FullySpecifiedType pfst = type->asReferenceType()->elementType();
             type = pfst.type();
+        }
+        if (!isPointer && retType)
+        {
+            if (type->isNamedType())
+            {
+                NamedType* ntype = type->asNamedType();
+                if (ntype->name()->asTemplateNameId())
+                {
+                    const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
+                    String classname = getNameString(tnid->identifier()->asNameId());
+                    if (classname == "SharedPtr")
+                    {
+                        FullySpecifiedType pfst = tnid->templateArgumentAt(0);
+                        type = pfst.type();
+                    }
+                }
+            }
         }
 
         if (fst.isUnsigned())
@@ -176,7 +193,7 @@ public:
             return NULL;
         }
 
-        JSBFunctionType* jtype = processFunctionType(function->returnType());
+        JSBFunctionType* jtype = processFunctionType(function->returnType(), true);
 
         if (!jtype)
             return NULL;
