@@ -281,6 +281,44 @@ void UIWidget::SetId(const String& id)
 
 }
 
+void UIWidget::SetState(/*WIDGET_STATE*/ unsigned state, bool on)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetState((WIDGET_STATE) state, on);
+
+
+}
+
+bool UIWidget::GetState(/*WIDGET_STATE*/ unsigned state)
+{
+    if (!widget_)
+        return false;
+
+    return widget_->GetState((WIDGET_STATE) state);
+
+}
+
+void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetStateRaw((WIDGET_STATE) state);
+
+}
+
+/*WIDGET_STATE*/ unsigned UIWidget::GetStateRaw()
+{
+    if (!widget_)
+        return false;
+
+    return (unsigned) widget_->GetStateRaw();
+
+}
+
+
 
 bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {

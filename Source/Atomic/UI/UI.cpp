@@ -18,6 +18,7 @@ void register_freetype_font_renderer();
 using namespace tb;
 
 #include "../Core/CoreEvents.h"
+#include "../IO/Log.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 #include "../Resource/ResourceCache.h"
@@ -321,7 +322,10 @@ void UI::TBFileReader(const char* filename, void** data, unsigned* length)
     ResourceCache* cache = uiContext_->GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(filename);
     if (!file || !file->IsOpen())
+    {
+        LOGERRORF("UI::TBFileReader: Unable to load file: %s", filename);
         return;
+    }
 
     unsigned size = file->GetSize();
 

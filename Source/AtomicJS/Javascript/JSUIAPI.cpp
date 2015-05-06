@@ -154,7 +154,7 @@ int UI_Init(duk_context* ctx)
 
     // TODO: take a config object
     ui->Initialize("DefaultUI/language/lng_en.tb.txt");
-    ui->LoadSkin("DefaultUI/skin/skin.tb.txt", "");
+    ui->LoadSkin("DefaultUI/skin/skin.tb.txt", "Skin/skin.ui.txt");
     ui->AddFont("DefaultUI/fonts/vera.ttf", "Vera");
 
     ui->SetDefaultFont("Vera", 12);
@@ -253,6 +253,21 @@ void jsapi_init_ui(JSVM* vm)
     duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_CAN_ACTIVATE");
     duk_push_number(ctx, (double) tb::WINDOW_SETTINGS_DEFAULT);
     duk_put_prop_string(ctx, -2, "WINDOW_SETTINGS_DEFAULT");
+
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_NONE);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_NONE");
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_DISABLED);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_DISABLED");
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_FOCUSED);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_FOCUSED");
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_PRESSED);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_PRESSED");
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_SELECTED);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_SELECTED");
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_HOVERED);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_HOVERED");
+    duk_push_number(ctx, (double) tb::WIDGET_STATE_ALL);
+    duk_put_prop_string(ctx, -2, "WIDGET_STATE_ALL");
 
     duk_put_prop_string(ctx, -2, "UI");
 

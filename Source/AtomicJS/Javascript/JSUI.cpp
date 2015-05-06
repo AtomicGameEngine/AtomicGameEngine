@@ -322,11 +322,16 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
         duk_push_heapptr(ctx_, handlerHeapPtr);
         duk_get_prop_string(ctx_, -1, "onClick");
         if (duk_is_callable(ctx_, -1)) {
-            duk_call(ctx_, 0);
 
-            if (duk_is_boolean(ctx_, -1) && duk_to_boolean(ctx_, -1))
-                eventData[P_HANDLED] = true;
-
+            if (duk_pcall(ctx_, 0) != 0)
+            {
+                JSVM::GetJSVM(nullptr)->SendJSErrorEvent();
+            }
+            else
+            {
+                if (duk_is_boolean(ctx_, -1) && duk_to_boolean(ctx_, -1))
+                    eventData[P_HANDLED] = true;
+            }
         }
         duk_pop_n(ctx_, 2);
         assert(top == duk_get_top(ctx_));
