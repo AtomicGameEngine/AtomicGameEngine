@@ -27,7 +27,7 @@ public:
     void Save(const String& fullpath = "");
 
     /// Paths
-    const String GetResourcePath() { return resourcePath_; }
+    const String& GetResourcePath() { return resourcePath_; }
     void SetResourcePath(const String& resourcePath)
     {
         resourcePath_ = AddTrailingSlash(resourcePath);

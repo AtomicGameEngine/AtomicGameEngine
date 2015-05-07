@@ -16,7 +16,7 @@
 
 using namespace Atomic;
 
-namespace AtomicEditor
+namespace ToolCore
 {
 
 class JSONSceneImporter;
@@ -44,10 +44,12 @@ public:
         importer_ = importer;
     }
 
-    bool Process();
+    bool Process(const String& resourcePath);
     bool Write();
 
 private:
+
+    String resourcePath_;
 
     HashMap<String, SharedPtr<Material> > materials_;
     HashMap<String, SharedPtr<Model> > models_;

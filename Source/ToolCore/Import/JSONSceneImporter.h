@@ -21,7 +21,7 @@ typedef GenericDocument<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Document
 }
 
 
-namespace AtomicEditor
+namespace ToolCore
 {
 
 class JSONSceneImporter;

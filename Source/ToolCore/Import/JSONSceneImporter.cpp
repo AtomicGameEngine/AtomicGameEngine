@@ -13,7 +13,7 @@
 
 using namespace rapidjson;
 
-namespace AtomicEditor
+namespace ToolCore
 {
 
 static unsigned char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

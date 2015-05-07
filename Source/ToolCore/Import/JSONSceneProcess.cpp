@@ -7,6 +7,7 @@
 #include "AtomicEditor.h"
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include <Atomic/Resource/Image.h>
 
@@ -30,9 +31,7 @@
 #include "JSONSceneProcess.h"
 #include "JSONSceneImporter.h"
 
-static String __rootFolder = "/Users/josh/Desktop/Test/Resources";
-
-namespace AtomicEditor
+namespace ToolCore
 {
 
 bool JSONSceneProcess::ProcessTextures()
@@ -46,7 +45,7 @@ bool JSONSceneProcess::ProcessTextures()
         unsigned length;
         const unsigned char* pixels = jtexture->GetPNGPixels(length);
 
-        String filename = __rootFolder + "/Textures/" + jtexture->GetName() + ".png";
+        String filename = resourcePath_ + "Textures/" + jtexture->GetName() + ".png";
 
         SharedPtr<File> file (new File(context_, filename, FILE_WRITE));
 
@@ -70,7 +69,7 @@ bool JSONSceneProcess::ProcessLightmaps()
         unsigned length;
         const unsigned char* pixels = jlightmap->GetPNGPixels(length);
 
-        String filename = __rootFolder + "/Textures/" + jlightmap->GetName() + ".png";
+        String filename = resourcePath_ + "Textures/" + jlightmap->GetName() + ".png";
 
         SharedPtr<File> file (new File(context_, filename, FILE_WRITE));
 
@@ -160,7 +159,7 @@ bool JSONSceneProcess::WriteMaterials()
     {
         Material* material = itr->second_;
         SharedPtr<File> file;
-        file = new File(context_, __rootFolder + "/" + material->GetName(), FILE_WRITE);
+        file = new File(context_, resourcePath_ + material->GetName(), FILE_WRITE);
         material->Save(*file);
         itr++;
     }
@@ -175,7 +174,7 @@ bool JSONSceneProcess::WriteModels()
     {
         Model* model = itr->second_;
         SharedPtr<File> file;
-        file = new File(context_, __rootFolder + "/" + model->GetName(), FILE_WRITE);
+        file = new File(context_, resourcePath_ + model->GetName(), FILE_WRITE);
         model->Save(*file);
         itr++;
     }
@@ -202,12 +201,12 @@ bool JSONSceneProcess::WriteHierarchy(Scene* scene)
 
     filename.AppendWithFormat("%s", importer_->GetSceneName().CString());
 
-    if (!useXML)
+    //if (!useXML)
         filename += ".scene";
-    else
-        filename += ".xml";
+    //else
+        //filename += ".xml";
 
-    filename = __rootFolder + "/Scenes/" + filename;
+    filename = resourcePath_ + "Scenes/" + filename;
 
     if (!file.Open(filename, FILE_WRITE))
         ErrorExit("Could not open output file: Scenes/Test.bin");
@@ -621,7 +620,7 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONTerrain* jterrain)
     image->SetSize(heightmapWidth, heightmapHeight, 4);
     image->SetData(&bytes[0]);
 
-    String heightMapPath = __rootFolder + "/Textures/TerrainHeightMap.png";
+    String heightMapPath = resourcePath_ + "Textures/TerrainHeightMap.png";
     image->SavePNG(heightMapPath);
 
     int alphamapWidth = jterrain->GetAlphaMapHeight();
@@ -658,7 +657,7 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONTerrain* jterrain)
     alphaWeights->SetSize(alphamapWidth, alphamapHeight, 4);
     alphaWeights->SetData(&bytes[0]);
 
-    String alphaWeightsPath = __rootFolder + "/Textures/TerrainWeights.png";
+    String alphaWeightsPath = resourcePath_ + "Textures/TerrainWeights.png";
     alphaWeights->SavePNG(alphaWeightsPath);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -760,15 +759,14 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONAnimation* janim )
 
         outAnim->SetTracks(tracks);
 
-        String filename = __rootFolder;
+        String filename = resourcePath_;
 
-        filename.AppendWithFormat("/Models/AS_FatZombie_FBX_FatZombie_LOD0_%s.ani", clip->name_.CString());
+        filename.AppendWithFormat("Models/FIXME_ANIMATION_PROCESSNAME_%s.ani", clip->name_.CString());
 
         File outFile(context_);
         if (!outFile.Open(filename, FILE_WRITE))
             ErrorExit("Could not open output file for animation");
         outAnim->Save(outFile);
-
 
     }
 
@@ -952,10 +950,11 @@ bool JSONSceneProcess::ProcessHierarchy(Scene* scene)
     return true;
 }
 
-bool JSONSceneProcess::Process()
+bool JSONSceneProcess::Process(const String &resourcePath)
 {
+    resourcePath_ = resourcePath;
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    cache->AddResourceDir(__rootFolder);
+    cache->AddResourceDir(resourcePath_);
     scene_ = new Scene(context_);
     scene_->CreateComponent<PhysicsWorld>();
     scene_->CreateComponent<Octree>();
@@ -977,6 +976,16 @@ bool JSONSceneProcess::Process()
 
 bool JSONSceneProcess::Write()
 {
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (!fs->DirExists(resourcePath_ + "Scenes"))
+        fs->CreateDir(resourcePath_ + "Scenes");
+    if (!fs->DirExists(resourcePath_ + "Models"))
+        fs->CreateDir(resourcePath_ + "Models");
+    if (!fs->DirExists(resourcePath_ + "Materials"))
+        fs->CreateDir(resourcePath_ + "Materials");
+    if (!fs->DirExists(resourcePath_ + "Textures"))
+        fs->CreateDir(resourcePath_ + "Textures");
 
     WriteMaterials();
     WriteModels();

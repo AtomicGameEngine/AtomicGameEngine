@@ -70,8 +70,9 @@ void AtomicTool::Setup()
         ErrorExit("Unable to parse --data-path");
 
     engineParameters_["Headless"] = true;
-    engineParameters_["LogLevel"] = LOG_WARNING;
-    engineParameters_["ResourcePaths"] = "";
+    engineParameters_["LogLevel"] = LOG_INFO;
+    // FIXME
+    engineParameters_["ResourcePaths"] = "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData";
 }
 
 void AtomicTool::HandleCommandFinished(StringHash eventType, VariantMap& eventData)
