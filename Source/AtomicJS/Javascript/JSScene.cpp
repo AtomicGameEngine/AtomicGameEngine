@@ -50,6 +50,32 @@ static int Node_GetChildrenWithComponent(duk_context* ctx)
     return 1;
 }
 
+static int Node_GetChildrenWithName(duk_context* ctx)
+{
+	StringHash nameHash = duk_to_string(ctx, 0);
+
+	bool recursive = false;
+	if (duk_get_top(ctx) == 2)
+		if (duk_get_boolean(ctx, 1))
+			recursive = true;
+
+	duk_push_this(ctx);
+	Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+	PODVector<Node*> dest;
+	node->GetChildrenWithName(dest, nameHash, recursive);
+
+	duk_push_array(ctx);
+
+	for (unsigned i = 0; i < dest.Size(); i++)
+	{
+		js_push_class_object_instance(ctx, dest[i], "Node");
+		duk_put_prop_index(ctx, -2, i);
+	}
+
+	return 1;
+}
+
 static int Scene_LoadXML(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -89,7 +115,9 @@ void jsapi_init_scene(JSVM* vm)
     js_class_get_prototype(ctx, "Node");
     duk_push_c_function(ctx, Node_GetChildrenWithComponent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "getChildrenWithComponent");
-    duk_push_c_function(ctx, Node_CreateJSComponent, 1);
+	duk_push_c_function(ctx, Node_GetChildrenWithName, DUK_VARARGS);
+	duk_put_prop_string(ctx, -2, "getChildrenWithName");
+	duk_push_c_function(ctx, Node_CreateJSComponent, 1);
     duk_put_prop_string(ctx, -2, "createJSComponent");
     duk_pop(ctx);
 
