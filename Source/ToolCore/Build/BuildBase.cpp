@@ -78,6 +78,10 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
             }
         }
 
+        // TODO: Add additional filters
+        if (GetExtension(filename) == ".psd")
+            continue;
+
         BuildResourceEntry* newEntry = new BuildResourceEntry;
 
 // BEGIN LICENSE MANAGEMENT
