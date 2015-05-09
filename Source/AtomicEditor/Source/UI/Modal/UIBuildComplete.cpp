@@ -15,7 +15,7 @@
 #include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include <Build/BuildSystem.h>
 #include <Project/ProjectUtils.h>
@@ -35,7 +35,7 @@ UIBuildComplete::UIBuildComplete(Context* context, const String &title, const St
     buildFolder_ = buildFolder;
     success_ = success;
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     dimmer_ = new TBDimmer();
 
     window_ = new TBWindow();
@@ -99,7 +99,7 @@ void UIBuildComplete::SetMessage(const String& message)
 
 void UIBuildComplete::Center()
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBRect rect = window_->GetRect();
     TBWidget* root = tbui->GetRootWidget();
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
@@ -111,7 +111,7 @@ void UIBuildComplete::Center()
 void UIBuildComplete::Show()
 {
     assert(!dimmer_->GetParent());
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBWidget* root = tbui->GetRootWidget();
     root->AddChild(dimmer_);
     root->AddChild(delegate_);
@@ -120,7 +120,7 @@ void UIBuildComplete::Show()
 
 void UIBuildComplete::Hide()
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->GetRootWidget()->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
 
     if (dimmer_->GetParent())

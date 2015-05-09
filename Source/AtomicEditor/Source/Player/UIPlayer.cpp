@@ -12,7 +12,6 @@
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/UI/UI.h>
-#include <Atomic/UI/TBUI.h>
 
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Viewport.h>
@@ -40,32 +39,17 @@ UIPlayer::UIPlayer(Context* context):
     UIModalOpWindow(context)
 {
 
-// BEGIN LICENSE MANAGEMENT
-    LicenseSystem* license = GetSubsystem<LicenseSystem>();
-    standardLicense_ = license->IsStandardLicense();
-    show3DInfo_ = false;
-// END LICENSE MANAGEMENT
-
     aePlayer_ = GetSubsystem<AEPlayer>();
     aePlayer_->SetUIPlayer(this);
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
 
-    // FIXME: disabling close button as having the widget die is currently bad
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
 
     window_->SetText("Atomic Player");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/playerwidget.tb.txt");
 
     Graphics* graphics = GetSubsystem<Graphics>();
-
-    view3D_ = new UIView3D(context_);
-
-    // horrible hack
-    Viewport* viewport = view3D_->GetViewport();
-    FixMeSetLight2DGroupViewport(viewport);
-
-    TBWidgetDelegate* view3DDelegate = view3D_->GetWidgetDelegate();
 
     float gwidth = graphics->GetWidth();
     float aspect = float(graphics->GetHeight())/ gwidth;
@@ -74,15 +58,8 @@ UIPlayer::UIPlayer(Context* context):
     playerSize_.x_ = gwidth;
     playerSize_.y_ = gwidth * aspect;
 
-    LayoutParams lp;
-    lp.SetWidth(playerSize_.x_);
-    lp.SetHeight(playerSize_.y_);
-    view3DDelegate->SetLayoutParams(lp);
-
     TBLayout* playercontainer = window_->GetWidgetByIDAndType<TBLayout>(TBIDC("playerlayout"));
     assert(playercontainer);
-
-    playercontainer->AddChild(view3DDelegate);
 
     window_->ResizeToFitContent();
 
@@ -92,11 +69,6 @@ UIPlayer::UIPlayer(Context* context):
 
 }
 
-Viewport *UIPlayer::SetView(Scene* scene, Camera* camera)
-{
-    view3D_->SetView(scene, camera);
-    return view3D_->GetViewport();
-}
 
 UIPlayer::~UIPlayer()
 {
@@ -105,26 +77,7 @@ UIPlayer::~UIPlayer()
 
 void UIPlayer::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    view3D_->QueueUpdate();
-    UI* ui = GetSubsystem<UI>();
 
-    // BEGIN LICENSE MANAGEMENT
-    if (standardLicense_)
-    {
-        Camera* camera = view3D_->GetViewport()->GetCamera();
-        if (camera && !camera->IsOrthographic())
-        {
-            show3DInfo_ = true;
-        }
-    }
-    // END LICENSE MANAGEMENT
-
-    TBWidgetDelegate* view3DDelegate = view3D_->GetWidgetDelegate();
-    TBRect rect = view3DDelegate->GetRect();
-    view3DDelegate->ConvertToRoot(rect.x, rect.y);
-
-    ui->GetRoot()->SetPosition(rect.x, rect.y);
-    ui->GetRoot()->SetSize(rect.w, rect.h);
 }
 
 

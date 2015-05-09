@@ -4,7 +4,7 @@
 
 #include "AtomicEditor.h"
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>
 #include "UIMenubar.h"
 

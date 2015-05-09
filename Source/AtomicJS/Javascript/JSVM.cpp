@@ -17,6 +17,8 @@
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSAtomic.h"
+#include "JSUI.h"
+#include "JSMetrics.h"
 
 namespace Atomic
 {
@@ -31,6 +33,8 @@ JSVM::JSVM(Context* context) :
     assert(!instance_);
 
     instance_ = this;
+
+    metrics_ = new JSMetrics(context, this);
 }
 
 JSVM::~JSVM()
@@ -62,6 +66,8 @@ void JSVM::InitJSContext()
     jsapi_init_atomic(this);
 
     InitComponents();
+
+    ui_ = new JSUI(context_);
 
     // handle this elsewhere?
     SubscribeToEvents();
@@ -311,7 +317,8 @@ int JSVM::js_module_search(duk_context* ctx)
 {
     JSVM* vm = GetJSVM(ctx);
 
-    ResourceCache* cache = vm->GetContext()->GetSubsystem<ResourceCache>();
+    FileSystem* fs = vm->GetSubsystem<FileSystem>();
+    ResourceCache* cache = vm->GetSubsystem<ResourceCache>();
 
     String path = duk_to_string(ctx, 0);
 
@@ -331,7 +338,20 @@ int JSVM::js_module_search(duk_context* ctx)
     }
     else
     {
-        path = vm->moduleSearchPath_ + "/" + path + ".js";
+        // a module can exist in the Modules path or reside in a project directory
+        // prefer modules path
+        String modulePath = vm->moduleSearchPath_ + "/" + path + ".js";
+
+        if (fs->FileExists(modulePath))
+        {
+            // unless the file doesn't exist and then use project path
+            path = modulePath;
+        }
+        else
+        {
+            path += ".js";
+        }
+
     }
 
     SharedPtr<File> jsfile(cache->GetFile(path));    
@@ -486,6 +506,12 @@ bool JSVM::ExecuteFile(File *file)
     return true;
 }
 
+void JSVM::GC()
+{
+    // run twice to ensure finalizers are run
+    duk_gc(ctx_, 0);
+    duk_gc(ctx_, 0);
+}
 
 bool JSVM::ExecuteMain()
 {

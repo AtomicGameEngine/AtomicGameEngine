@@ -30,23 +30,14 @@ public:
     UIPlayer(Context* context);
     virtual ~UIPlayer();
 
-    Viewport* SetView(Scene* scene, Camera* camera);
-
     bool OnEvent(const TBWidgetEvent &ev);
-    bool Show3DInfo() { return show3DInfo_; }
-
     const IntVector2& GetPlayerSize() { return playerSize_; }
 
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    SharedPtr<UIView3D> view3D_;
     WeakPtr<AEPlayer> aePlayer_;
-
     IntVector2 playerSize_;
-
-    bool standardLicense_;
-    bool show3DInfo_;
 };
 
 }

@@ -17,6 +17,16 @@ lineNumber	Rhino	Linenumber related to error source, inherited accessor
 stack	V8	Traceback as a multi-line human redable string, inherited accessor
 */
 
+EVENT(E_JSOBJECTADDED, ObjectAdded)
+{
+    PARAM(P_OBJECT, Object); // object
+}
+
+EVENT(E_JSOBJECTREMOVED, ObjectRemoved)
+{
+    PARAM(P_OBJECT, Object); // object
+}
+
 EVENT(E_JSERROR, JSError)
 {
     PARAM(P_ERRORNAME, ErrorName); // string

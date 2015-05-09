@@ -343,6 +343,15 @@ enum WIDGET_HIT_STATUS {
 	WIDGET_HIT_STATUS_HIT_NO_CHILDREN		///< The widget was hit, no children should be hit.
 };
 
+// ATOMIC: this must only be used by UIWidget, as we are casting to it
+class TBWidgetDelegate
+{
+public:
+    virtual bool OnEvent(const TBWidgetEvent &ev) = 0;
+
+    virtual void OnDelete() = 0;
+};
+
 /** The base TBWidget class.
 	Make a subclass to implement UI controls.
 	Each widget has a background skin (no skin specified by default) which will be used to
@@ -600,6 +609,9 @@ public:
 		events are going through this widget (See GetEventDestination()) */
 	bool IsEventDestinationFor(TBWidget *other_widget) const;
 
+    TBWidgetDelegate* GetDelegate() {return m_delegate; }
+    void SetDelegate(TBWidgetDelegate* delegate) { m_delegate = delegate; }
+
 	// == Callbacks ==============================================
 
 	/** Add a listener to this widget. It should be removed again with
@@ -611,7 +623,7 @@ public:
 	/** Callback for handling events.
 		Return true if the event is handled and should not
 		continue to be handled by any parent widgets. */
-	virtual bool OnEvent(const TBWidgetEvent &ev) { return false; }
+    virtual bool OnEvent(const TBWidgetEvent &ev) { if (m_delegate) return m_delegate->OnEvent(ev); return false; }
 
 	/** Callback for doing anything that might be needed before paint.
 		F.ex Updating invalid layout, formatting text etc. */
@@ -994,6 +1006,7 @@ private:
 	LayoutParams *m_layout_params;	///< Layout params, or nullptr.
 	TBScroller *m_scroller;
 	TBLongClickTimer *m_long_click_timer;
+    TBWidgetDelegate* m_delegate;
 	union {
 		struct {
 			uint16 is_group_root : 1;

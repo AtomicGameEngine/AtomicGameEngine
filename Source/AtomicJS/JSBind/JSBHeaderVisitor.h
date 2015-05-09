@@ -103,7 +103,7 @@ public:
 
     }
 
-    JSBFunctionType* processFunctionType(FullySpecifiedType fst)
+    JSBFunctionType* processFunctionType(FullySpecifiedType fst, bool retType = false)
     {
         JSBType* jtype = NULL;
         Type* type = fst.type();
@@ -111,6 +111,9 @@ public:
         bool isPointer = false;
         bool isSharedPtr = false;
         bool isReference = false;
+        bool isTemplate = false;
+
+        bool isConst = false;
 
         if (type->isPointerType())
         {
@@ -123,6 +126,25 @@ public:
             isReference=true;
             FullySpecifiedType pfst = type->asReferenceType()->elementType();
             type = pfst.type();
+            isConst = pfst.isConst();
+        }
+        if (!isPointer && retType)
+        {
+            if (type->isNamedType())
+            {
+                NamedType* ntype = type->asNamedType();
+                if (ntype->name()->asTemplateNameId())
+                {
+                    const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
+                    String classname = getNameString(tnid->identifier()->asNameId());
+                    if (classname == "SharedPtr")
+                    {
+                        FullySpecifiedType pfst = tnid->templateArgumentAt(0);
+                        type = pfst.type();
+                        isTemplate = true;
+                    }
+                }
+            }
         }
 
         if (fst.isUnsigned())
@@ -141,14 +163,27 @@ public:
         if (!jtype)
             return NULL;
 
+        bool skip = false;
+
         // no pointers to prim atm
-        if ((isPointer || isReference) && jtype->asPrimitiveType())
-            return NULL;
+        if (isPointer || isReference)
+        {
+            if (jtype->asPrimitiveType())
+                skip = true;
+            else if (!retType && !isConst && (jtype->asStringType() || jtype->asStringHashType()))
+            {
+                skip = true;
+            }
+
+            if (skip)
+                return NULL;
+        }
 
         JSBFunctionType* ftype = new JSBFunctionType(jtype);
         ftype->isPointer_ = isPointer;
         ftype->isSharedPtr_ = isSharedPtr;
         ftype->isReference_ = isReference;
+        ftype->isTemplate_ = isTemplate;
 
         return ftype;
 
@@ -176,7 +211,7 @@ public:
             return NULL;
         }
 
-        JSBFunctionType* jtype = processFunctionType(function->returnType());
+        JSBFunctionType* jtype = processFunctionType(function->returnType(), true);
 
         if (!jtype)
             return NULL;

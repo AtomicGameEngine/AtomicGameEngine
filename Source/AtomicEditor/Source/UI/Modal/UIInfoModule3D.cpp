@@ -9,7 +9,7 @@
 #include <TurboBadger/tb_editfield.h>
 
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Resources/AEResourceOps.h"
 #include "AEPreferences.h"
@@ -35,8 +35,8 @@ InfoModule3D::InfoModule3D(Context* context,const String &exampleFolder, const S
     Editor* editor = GetSubsystem<Editor>();
     Project* project = editor->GetProject();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
-    window_->DisableCloseButton();
+    UI* tbui = GetSubsystem<UI>();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     window_->SetText("Atomic Game Engine Pro Required");
 
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/infomodule3d.tb.txt");

@@ -1,12 +1,9 @@
 include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Poco/Foundation/include
                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog)
 
 
 file (GLOB_RECURSE SOURCE_FILES Source/*.cpp Source/*.h)
-
-add_definitions(-DPOCO_NO_AUTOMATIC_LIBS)
 
 if (APPLE)
     set (EXE_TYPE MACOSX_BUNDLE)
@@ -27,7 +24,7 @@ endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor AtomicJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicEditor ToolCore AtomicJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)

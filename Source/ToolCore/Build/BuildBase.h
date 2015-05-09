@@ -45,6 +45,8 @@ protected:
 
     void BuildResourceEntries();
 
+    void GetDefaultResourcePaths(Vector<String>& paths);
+
     String buildPath_;
     PODVector<BuildResourceEntry*> resourceEntries_;
 

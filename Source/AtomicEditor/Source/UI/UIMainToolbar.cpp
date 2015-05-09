@@ -4,7 +4,7 @@
 
 #include "AtomicEditor.h"
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>
 #include "UIMainToolbar.h"
 #include "../AEEvents.h"
@@ -22,7 +22,7 @@ namespace AtomicEditor
 MainToolbar::MainToolbar(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/maintoolbar.tb.txt");
 
     Show3DWidgets(false);

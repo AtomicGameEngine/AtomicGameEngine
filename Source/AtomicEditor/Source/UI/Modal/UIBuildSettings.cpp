@@ -9,7 +9,7 @@
 #include <TurboBadger/tb_editfield.h>
 
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEvents.h"
 #include "AEEditor.h"
@@ -35,7 +35,7 @@ UIBuildSettings::UIBuildSettings(Context* context):
     macSettings_(new UIBuildSettingsMac(context)),
     platformIndicator_(0)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Atomic Player - Build Settings");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/buildsettings.tb.txt");
 

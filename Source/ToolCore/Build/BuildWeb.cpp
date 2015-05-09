@@ -2,6 +2,7 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
+#include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/File.h>
 
@@ -30,7 +31,7 @@ void BuildWeb::Initialize()
 
     String dataPath = tsystem->GetDataPath();
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = dataPath + "Atomic/Resources/CoreData/";
+    String coreDataFolder = dataPath + "CoreData/";
 
     AddResourceDir(coreDataFolder);
     AddResourceDir(projectResources);
@@ -51,7 +52,7 @@ void BuildWeb::Build(const String& buildPath)
 
     String dataPath = tsystem->GetDataPath();
 
-    String buildSourceDir  = dataPath + "Atomic/Deployment/Web";
+    String buildSourceDir  = dataPath + "Deployment/Web";
 
     fileSystem->CreateDir(buildPath_);
 
@@ -59,6 +60,7 @@ void BuildWeb::Build(const String& buildPath)
     GenerateResourcePackage(resourcePackagePath);
 
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.html", buildPath_ + "/AtomicPlayer.html");
+    fileSystem->Copy(buildSourceDir + "/AtomicPlayer.html.mem", buildPath_ + "/AtomicPlayer.html.mem");
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.js", buildPath_ + "/AtomicPlayer.js");
 
     File file(context_, buildSourceDir + "/AtomicResources_js.template", FILE_READ);
@@ -79,6 +81,7 @@ void BuildWeb::Build(const String& buildPath)
     String request;
     request.AppendWithFormat("new DataRequest(0, %i, 0, 0).open('GET', '/AtomicResources.pak');", rsize);
 
+    resourcejs.Replace("$$REMOTE_PACKAGE_SIZE$$", ToString("%i", rsize));
     resourcejs.Replace("$$ATOMIC_RESOURCES_DATA_REQUEST$$", request);
 
     file.Open(buildPath_ + "/AtomicResources.js", FILE_WRITE);

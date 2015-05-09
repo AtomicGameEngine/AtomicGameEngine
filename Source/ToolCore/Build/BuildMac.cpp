@@ -25,13 +25,18 @@ BuildMac::~BuildMac()
 void BuildMac::Initialize()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
     Project* project = tsystem->GetProject();
 
-    String dataPath = tsystem->GetDataPath();
+    Vector<String> defaultResourcePaths;
+    GetDefaultResourcePaths(defaultResourcePaths);
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = dataPath + "CoreData/";
 
-    AddResourceDir(coreDataFolder);
+    for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
+    {
+        AddResourceDir(defaultResourcePaths[i]);
+    }
+
     AddResourceDir(projectResources);
 
     BuildResourceEntries();

@@ -9,7 +9,7 @@
 #include <TurboBadger/tb_editfield.h>
 
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Resources/AEResourceOps.h"
 #include "AEPreferences.h"
@@ -33,7 +33,7 @@ UIBuild::UIBuild(Context* context):
     Editor* editor = GetSubsystem<Editor>();
     Project* project = editor->GetProject();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Build Player");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/build.tb.txt");
 

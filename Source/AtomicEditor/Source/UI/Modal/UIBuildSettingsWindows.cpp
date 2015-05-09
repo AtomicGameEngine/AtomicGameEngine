@@ -9,7 +9,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Build/BuildSystem.h"
 #include "UIBuildSettingsWindows.h"
@@ -20,7 +20,7 @@ namespace AtomicEditor
 UIBuildSettingsWindows::UIBuildSettingsWindows(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/buildsettings_windows.tb.txt");
 
     appNameEdit_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("app_name"));

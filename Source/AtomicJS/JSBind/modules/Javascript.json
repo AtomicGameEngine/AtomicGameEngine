@@ -1,5 +1,5 @@
 {
 	"name" : "Javascript",
 	"sources" : ["Javascript"],
-	"classes" : ["JSComponent"]
+	"classes" : ["JSVM", "JSComponent", "JSMetrics"]
 }

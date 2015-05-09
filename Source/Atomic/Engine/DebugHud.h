@@ -1,3 +1,5 @@
+#ifdef __disabled
+
 //
 // Copyright (c) 2008-2014 the Urho3D project.
 //
@@ -118,3 +120,5 @@ private:
 };
 
 }
+
+#endif

@@ -25,7 +25,7 @@
 #include "../Math/Matrix3x4.h"
 #include "../Graphics/ShaderVariation.h"
 #include "../Graphics/Texture.h"
-#include "../UI/UIElement.h"
+#include "../UI/UIBatch.h"
 
 #include "../DebugNew.h"
 
@@ -41,7 +41,6 @@ static const float posAdjust = 0.5f;
 static const Vector3 posAdjustVec(posAdjust, posAdjust, 0.0f);
 
 UIBatch::UIBatch() :
-    element_(0),
     blendMode_(BLEND_REPLACE),
     texture_(0),
     invTextureSize_(Vector2::ONE),
@@ -52,8 +51,7 @@ UIBatch::UIBatch() :
     SetDefaultColor();
 }
 
-UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
-    element_(element),
+UIBatch::UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
     blendMode_(blendMode),
     scissor_(scissor),
     texture_(texture),
@@ -67,51 +65,24 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
 
 void UIBatch::SetColor(const Color& color, bool overrideAlpha)
 {
-    if (!element_)
-        overrideAlpha = true;
-
     useGradient_ = false;
-    color_ = overrideAlpha ? color.ToUInt() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToUInt();
+    color_ = color.ToUInt();
 }
 
 void UIBatch::SetDefaultColor()
 {
-    if (element_)
-    {
-        color_ = element_->GetDerivedColor().ToUInt();
-        useGradient_ = element_->HasColorGradient();
-    }
-    else
-    {
-        color_ = 0xffffffff;
-        useGradient_ = false;
-    }
+    color_ = 0xffffffff;
+    useGradient_ = false;
 }
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
-    unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
-
-    if (!useGradient_)
-    {
-        // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(color_ & 0xff000000))
-            return;
-        
-        topLeftColor = color_;
-        topRightColor = color_;
-        bottomLeftColor = color_;
-        bottomRightColor = color_;
-    }
-    else
-    {
-        topLeftColor = GetInterpolatedColor(x, y);
-        topRightColor = GetInterpolatedColor(x + width, y);
-        bottomLeftColor = GetInterpolatedColor(x, y + height);
-        bottomRightColor = GetInterpolatedColor(x + width, y + height);
-    }
-    
-    const IntVector2& screenPos = element_->GetScreenPosition();
+    // If alpha is 0, nothing will be rendered, so do not add the quad
+    if (!(color_ & 0xff000000))
+        return;
+            
+    //const IntVector2& screenPos = element_->GetScreenPosition();
+   IntVector2 screenPos(0, 0);
     
     float left = (float)(x + screenPos.x_) - posAdjust;
     float right = left + (float)width;
@@ -129,27 +100,27 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     vertexEnd_ = vertexData_->Size();
     
     dest[0] = left; dest[1] = top; dest[2] = 0.0f;
-    ((unsigned&)dest[3]) = topLeftColor;
+    ((unsigned&)dest[3]) = color_;
     dest[4] = leftUV; dest[5] = topUV;
     
     dest[6] = right; dest[7] = top; dest[8] = 0.0f;
-    ((unsigned&)dest[9]) = topRightColor;
+    ((unsigned&)dest[9]) = color_;
     dest[10] = rightUV; dest[11] = topUV;
     
     dest[12] = left; dest[13] = bottom; dest[14] = 0.0f;
-    ((unsigned&)dest[15]) = bottomLeftColor;
+    ((unsigned&)dest[15]) = color_;
     dest[16] = leftUV; dest[17] = bottomUV;
     
     dest[18] = right; dest[19] = top; dest[20] = 0.0f;
-    ((unsigned&)dest[21]) = topRightColor;
+    ((unsigned&)dest[21]) = color_;
     dest[22] = rightUV; dest[23] = topUV;
     
     dest[24] = right; dest[25] = bottom; dest[26] = 0.0f;
-    ((unsigned&)dest[27]) = bottomRightColor;
+    ((unsigned&)dest[27]) = color_;
     dest[28] = rightUV; dest[29] = bottomUV;
 
     dest[30] = left; dest[31] = bottom; dest[32] = 0.0f;
-    ((unsigned&)dest[33]) = bottomLeftColor;
+    ((unsigned&)dest[33]) = color_;
     dest[34] = leftUV; dest[35] = bottomUV;
 
     dest += 36;
@@ -158,27 +129,6 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
     int texWidth, int texHeight)
 {
-    unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
-    
-    if (!useGradient_)
-    {
-        // If alpha is 0, nothing will be rendered, so do not add the quad
-        if (!(color_ & 0xff000000))
-            return;
-        
-        topLeftColor = color_;
-        topRightColor = color_;
-        bottomLeftColor = color_;
-        bottomRightColor = color_;
-    }
-    else
-    {
-        topLeftColor = GetInterpolatedColor(x, y);
-        topRightColor = GetInterpolatedColor(x + width, y);
-        bottomLeftColor = GetInterpolatedColor(x, y + height);
-        bottomRightColor = GetInterpolatedColor(x + width, y + height);
-    }
-    
     Vector3 v1 = (transform * Vector3((float)x, (float)y, 0.0f)) - posAdjustVec;
     Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f)) - posAdjustVec;
     Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f)) - posAdjustVec;
@@ -195,35 +145,33 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
     vertexEnd_ = vertexData_->Size();
 
     dest[0] = v1.x_; dest[1] = v1.y_; dest[2] = 0.0f;
-    ((unsigned&)dest[3]) = topLeftColor;
+    ((unsigned&)dest[3]) = color_;
     dest[4] = leftUV; dest[5] = topUV;
     
     dest[6] = v2.x_; dest[7] = v2.y_; dest[8] = 0.0f;
-    ((unsigned&)dest[9]) = topRightColor;
+    ((unsigned&)dest[9]) = color_;
     dest[10] = rightUV; dest[11] = topUV;
     
     dest[12] = v3.x_; dest[13] = v3.y_; dest[14] = 0.0f;
-    ((unsigned&)dest[15]) = bottomLeftColor;
+    ((unsigned&)dest[15]) = color_;
     dest[16] = leftUV; dest[17] = bottomUV;
     
     dest[18] = v2.x_; dest[19] = v2.y_; dest[20] = 0.0f;
-    ((unsigned&)dest[21]) = topRightColor;
+    ((unsigned&)dest[21]) = color_;
     dest[22] = rightUV; dest[23] = topUV;
     
     dest[24] = v4.x_; dest[25] = v4.y_; dest[26] = 0.0f;
-    ((unsigned&)dest[27]) = bottomRightColor;
+    ((unsigned&)dest[27]) = color_;
     dest[28] = rightUV; dest[29] = bottomUV;
 
     dest[30] = v3.x_; dest[31] = v3.y_; dest[32] = 0.0f;
-    ((unsigned&)dest[33]) = bottomLeftColor;
+    ((unsigned&)dest[33]) = color_;
     dest[34] = leftUV; dest[35] = bottomUV;
 }
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled)
 {
-    if (!(element_->HasColorGradient() || element_->GetDerivedColor().ToUInt() & 0xff000000))
-        return; // No gradient and alpha is 0, so do not add the quad
-    
+
     if (!tiled)
     {
         AddQuad(x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
@@ -264,29 +212,6 @@ bool UIBatch::Merge(const UIBatch& batch)
     
     vertexEnd_ = batch.vertexEnd_;
     return true;
-}
-
-unsigned UIBatch::GetInterpolatedColor(int x, int y)
-{
-    const IntVector2& size = element_->GetSize();
-    
-    if (size.x_ && size.y_)
-    {
-        float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
-        float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);
-        
-        Color topColor = element_->GetColor(C_TOPLEFT).Lerp(element_->GetColor(C_TOPRIGHT), cLerpX);
-        Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
-        Color color = topColor.Lerp(bottomColor, cLerpY);
-        color.a_ *= element_->GetDerivedOpacity();
-        return color.ToUInt();
-    }
-    else
-    {
-        Color color = element_->GetColor(C_TOPLEFT);
-        color.a_ *= element_->GetDerivedOpacity();
-        return color.ToUInt();
-    }
 }
 
 void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)

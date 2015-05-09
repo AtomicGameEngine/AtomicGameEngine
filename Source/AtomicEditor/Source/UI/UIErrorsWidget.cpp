@@ -8,7 +8,7 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEvents.h"
 #include "UIListView.h"
@@ -25,7 +25,7 @@ ErrorsWidget::ErrorsWidget(Context* context) :
 {
     context_->RegisterSubsystem(this);
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/errorswidget.tb.txt");
 
     errorlayout_ = delegate_->GetWidgetByIDAndType<TBLayout>(TBIDC("errorlayout"));

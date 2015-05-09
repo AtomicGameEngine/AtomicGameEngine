@@ -8,7 +8,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Input/Input.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/Core/CoreEvents.h>
 
 #include <AtomicJS/Javascript/Javascript.h>
@@ -169,13 +169,11 @@ void Editor::HandlePlayStop(StringHash eventType, VariantMap& eventData)
     if (!player_)
         return;
 
-    TBUI* tbui = GetSubsystem<TBUI>();
-    tbui->SetKeyboardDisabled(false);
+    //UI* tbui = GetSubsystem<UI>();
+    //tbui->SetKeyboardDisabled(false);
     if (player_->GetMode() != AE_PLAYERMODE_WIDGET)
     {
-
-        tbui->SetInputDisabled(false);
-        tbui->FadeIn(.5f);
+        //tbui->SetInputDisabled(false);
     }
 
     Input* input = GetSubsystem<Input>();
@@ -271,13 +269,9 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
 
     AEPlayerMode mode = (AEPlayerMode) eventData[EditorPlayStarted::P_MODE].GetUInt();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
-    tbui->SetKeyboardDisabled(true);
-
     if (mode != AE_PLAYERMODE_WIDGET)
     {
-        tbui->SetInputDisabled(true);
-        tbui->FadeOut(.5f);
+        //tbui->SetInputDisabled(true);
     }
 
     player_ = new AEPlayer(context_);
@@ -286,7 +280,12 @@ void Editor::HandlePlayRequest(StringHash eventType, VariantMap& eventData)
     TBRect rect = tb->GetRect();
     tb->ConvertToRoot(rect.x, rect.y);
 
-    player_->Play(mode, IntRect(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h));
+    if (!player_->Play(mode, IntRect(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h)))
+    {
+        player_->Invalidate();
+        player_ = 0;
+        return;
+    }
 
     SendEvent(E_EDITORPLAYSTARTED, eventData);
 
@@ -323,7 +322,7 @@ void Editor::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
     TBAnimationManager::BeginBlockAnimations();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->Shutdown();
 
     context_->RemoveSubsystem(Javascript::GetBaseTypeStatic());

@@ -4,18 +4,25 @@ Atomic.editor = null;
 function Game() {
 
 	this.engine = Atomic.getEngine();
-	this.cache = Atomic.getResourceCache();	
+	this.cache = Atomic.getResourceCache();
 	this.renderer = Atomic.getRenderer();
 	this.graphics = Atomic.getGraphics();
 	this.input = Atomic.getInput();
-    this.ui = Atomic.getUI();
 
-    this.input.setMouseVisible(true);
+  this.input.setMouseVisible(true);
 
-    if (Atomic.platform == "Android") {
-        this.renderer.reuseShadowMaps = false;
-        this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
-    }
+  if (Atomic.platform == "Android") {
+      this.renderer.reuseShadowMaps = false;
+      this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
+  }
+
+	// initialize the UI subsystem
+	// TODO: this needs to take a config with default font
+	// skin, etc
+	Atomic.UI.__init();
+
+	// root view
+	this.uiView = new Atomic.UIView();
 
 }
 
@@ -63,18 +70,18 @@ Game.prototype.showDebugHud = function() {
 
 Game.prototype.createScene2D = function() {
 
-	var scene = new Atomic.Scene();
+		var scene = new Atomic.Scene();
     scene.createComponent("Octree");
 
     var cameraNode = scene.createChild("Camera");
     cameraNode.position = [0.0, 0.0, -10.0];
 
-    var camera = cameraNode.createComponent("Camera");    
+    var camera = cameraNode.createComponent("Camera");
     camera.orthographic = true;
     camera.orthoSize = this.graphics.height * Atomic.PIXEL_SIZE;
 
     var viewport = null;
-    
+
     if (Atomic.editor) {
         viewport = Atomic.editor.setView(scene, camera);
     } else {
@@ -85,9 +92,28 @@ Game.prototype.createScene2D = function() {
     this.scene = scene;
     this.cameraNode = cameraNode;
     this.camera = camera;
-    this.viewport = viewport;    
+    this.viewport = viewport;
 
     return scene;
+
+}
+
+Game.prototype.dumpMetrics = function() {
+
+	var metrics = Atomic.getVM().metrics;
+  metrics.capture();
+  print("--------------");
+  print("Object Instances:");
+  print("--------------");
+  metrics.dump();
+	print("--------------");
+  print("Nodes:");
+  print("--------------");
+  metrics.dumpNodes();
+  print("--------------");
+  print("JS Components:");
+  print("--------------");
+  metrics.dumpJSComponents();
 
 }
 
@@ -103,7 +129,7 @@ Game.prototype.createScene3D = function(filename) {
     var cameraNode = scene.createChild("Camera");
     cameraNode.position = [0.0, 0.0, -10.0];
 
-    var camera = cameraNode.createComponent("Camera");    
+    var camera = cameraNode.createComponent("Camera");
 
     var viewport = null;
     if (Atomic.editor) {
@@ -116,7 +142,7 @@ Game.prototype.createScene3D = function(filename) {
     this.scene = scene;
     this.cameraNode = cameraNode;
     this.camera = camera;
-    this.viewport = viewport;    
+    this.viewport = viewport;
 
     return scene;
 
@@ -124,4 +150,3 @@ Game.prototype.createScene3D = function(filename) {
 
 
 Atomic.game = exports.game = new Game();
-

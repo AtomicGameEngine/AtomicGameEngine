@@ -5,7 +5,7 @@
 #include "AtomicEditor.h"
 
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include <TurboBadger/tb_widgets.h>
 #include <TurboBadger/tb_window.h>

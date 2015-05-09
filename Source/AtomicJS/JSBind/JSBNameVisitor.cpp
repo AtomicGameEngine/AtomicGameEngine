@@ -36,7 +36,18 @@ void JSBNameVisitor::visit(const Identifier *name)
 
 void JSBNameVisitor::visit(const TemplateNameId *name)
 {
-    _name = "Not Implemented";
+    _name = "Not Implemented TemplateNameId";
+
+    unsigned numTemplateArgs = name->templateArgumentCount();
+    if (numTemplateArgs != 1)
+        return;
+
+    FullySpecifiedType fst = name->templateArgumentAt(0);
+
+    const Identifier *id = name->identifier();
+
+    _name = String(id->chars(), id->size());
+
 }
 
 void JSBNameVisitor::visit(const DestructorNameId *name)

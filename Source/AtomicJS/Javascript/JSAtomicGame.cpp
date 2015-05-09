@@ -8,9 +8,6 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Graphics/Graphics.h>
-
-#include <Atomic/UI/UI.h>
-
 #include <Atomic/Engine/Engine.h>
 
 #include "JSEvents.h"

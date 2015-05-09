@@ -1,3 +1,5 @@
+#ifdef __disabled
+
 //
 // Copyright (c) 2008-2014 the Urho3D project.
 //
@@ -24,12 +26,10 @@
 #include "../Core/CoreEvents.h"
 #include "../Engine/DebugHud.h"
 #include "../Engine/Engine.h"
-#include "../UI/Font.h"
 #include "../Graphics/Graphics.h"
 #include "../IO/Log.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Renderer.h"
-#include "../UI/Text.h"
 #include "../UI/UI.h"
 
 #include "../DebugNew.h"
@@ -267,3 +267,5 @@ void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 }
 
 }
+
+#endif

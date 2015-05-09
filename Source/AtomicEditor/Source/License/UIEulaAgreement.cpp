@@ -15,7 +15,7 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Input/InputEvents.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Resources/AEResourceOps.h"
 #include "AEPreferences.h"
@@ -36,8 +36,8 @@ namespace AtomicEditor
 UIEulaAgreement::UIEulaAgreement(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
-    window_->DisableCloseButton();
+    UI* tbui = GetSubsystem<UI>();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     window_->SetText("License Agreement");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/eulaagreement.tb.txt");
 

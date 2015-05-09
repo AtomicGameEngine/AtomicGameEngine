@@ -11,7 +11,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEditor.h"
 #include "AEEvents.h"
@@ -29,7 +29,7 @@ namespace AtomicEditor
 HierarchyFrame::HierarchyFrame(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/hierarchyframe.tb.txt");
 
     delegate_->SetID(TBIDC("projectframe_delegate"));

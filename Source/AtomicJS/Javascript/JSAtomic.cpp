@@ -9,15 +9,14 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Graphics/Graphics.h>
-
-#include <Atomic/UI/UI.h>
-
 #include <Atomic/Engine/Engine.h>
 
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSComponent.h"
 #include "JSGraphics.h"
+#include "JSIO.h"
+#include "JSUIAPI.h"
 #include "JSScene.h"
 
 #include "JSAtomicGame.h"
@@ -84,6 +83,13 @@ static int js_assert(duk_context* ctx)
     return 0;
 }
 
+static int js_atomic_GetVM(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm);
+    return 1;
+}
+
 
 static int js_atomic_GetEngine(duk_context* ctx)
 {
@@ -113,13 +119,6 @@ static int js_atomic_GetGraphics(duk_context* ctx)
     return 1;
 }
 
-static int js_atomic_GetUI(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
-    js_push_class_object_instance(ctx, vm->GetSubsystem<UI>());
-    return 1;
-}
-
 static int js_atomic_GetInput(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -144,6 +143,58 @@ static int js_atomic_script(duk_context* ctx)
     return 1;
 }
 
+static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = false)
+{
+
+    if (root)
+    {
+        PODVector<Node*> children;
+        node->GetChildren(children, true);
+
+        for (unsigned i = 0; i < children.Size(); i++)
+        {
+            if (children.At(i)->JSGetHeapPtr())
+                js_atomic_destroy_node(children.At(i), ctx);
+        }
+    }
+
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+
+    for (unsigned i = 0; i < components.Size(); i++)
+    {
+         Component* component = components[i];
+
+         if (component->GetType() == JSComponent::GetTypeStatic())
+         {
+             JSComponent* jscomponent = (JSComponent*) component;
+             jscomponent->SetDestroyed();
+         }
+
+         component->UnsubscribeFromAllEvents();
+    }
+
+    node->RemoveAllComponents();
+    node->UnsubscribeFromAllEvents();
+
+    if (node->GetParent())
+    {
+        assert(node->Refs() >= 2);
+        node->Remove();
+    }
+
+    int top = duk_get_top(ctx);
+    duk_push_global_stash(ctx);
+    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
+    duk_push_pointer(ctx, (void*) node);
+    duk_del_prop(ctx, -2);
+    duk_pop_2(ctx);
+    assert(top = duk_get_top(ctx));
+}
+
+static void js_atomic_destroy_scene(Scene* scene, duk_context* ctx)
+{
+    js_atomic_destroy_node(scene, ctx, true);
+}
 
 static int js_atomic_destroy(duk_context* ctx)
 {
@@ -155,50 +206,21 @@ static int js_atomic_destroy(duk_context* ctx)
     if (!obj)
         return 0;
 
-    JSVM* vm = JSVM::GetJSVM(ctx);
-
     if (obj->GetType() == Node::GetTypeStatic())
     {
-
         Node* node = (Node*) obj;
-
-        if (node->JSGetHeapPtr())
-        {
-            int top = duk_get_top(ctx);
-            duk_push_global_stash(ctx);
-            duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-            duk_push_pointer(ctx, node->JSGetHeapPtr());
-            duk_del_prop(ctx, -2);
-            duk_pop_2(ctx);
-            assert(top = duk_get_top(ctx));
-        }
-
-        const Vector<SharedPtr<Component> >& components = node->GetComponents();
-
-        for (unsigned i = 0; i < components.Size(); i++)
-        {
-             Component* component = components[i];
-
-             if (component->GetType() == JSComponent::GetTypeStatic())
-             {
-                 JSComponent* jscomponent = (JSComponent*) component;
-                 jscomponent->SetDestroyed();
-             }
-
-             component->UnsubscribeFromAllEvents();
-        }
-
-        node->RemoveAllComponents();
-        node->UnsubscribeFromAllEvents();
-
-        assert(node->Refs() >= 2);
-
-        node->Remove();
-
+        js_atomic_destroy_node(node, ctx, true);
+        return 0;
+    }
+    if (obj->GetType() == Scene::GetTypeStatic())
+    {
+        Scene* scene = (Scene*) obj;
+        js_atomic_destroy_scene(scene, ctx);
         return 0;
     }
     else if (obj->GetType() == JSComponent::GetTypeStatic())
     {
+        // FIXME: want to be able to destroy a single component
         assert(0);
         JSComponent* component = (JSComponent*) obj;
         component->UnsubscribeFromAllEvents();
@@ -215,7 +237,9 @@ void jsapi_init_atomic(JSVM* vm)
     jsb_modules_init(vm);
 
     // extensions
+    jsapi_init_io(vm);
     jsapi_init_graphics(vm);
+    jsapi_init_ui(vm);
     jsapi_init_scene(vm);
 
     jsapi_init_atomicgame(vm);
@@ -249,6 +273,9 @@ void jsapi_init_atomic(JSVM* vm)
     duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
     duk_pop(ctx);
 
+    duk_push_c_function(ctx, js_atomic_GetVM, 0);
+    duk_put_prop_string(ctx, -2, "getVM");
+
     duk_push_c_function(ctx, js_atomic_GetEngine, 0);
     duk_put_prop_string(ctx, -2, "getEngine");
 
@@ -263,9 +290,6 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
     duk_put_prop_string(ctx, -2, "getInput");
-
-    duk_push_c_function(ctx, js_atomic_GetUI, 0);
-    duk_put_prop_string(ctx, -2, "getUI");
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");

@@ -194,7 +194,7 @@ public:
     ~RenderPath();
     
     /// Clone the rendering path.
-    SharedPtr<RenderPath> Clone();
+    RenderPath* Clone();
     /// Clear existing data and load from an XML file. Return true if successful.
     bool Load(XMLFile* file);
     /// Append data from an XML file. Return true if successful.

@@ -264,9 +264,9 @@ RenderPath::~RenderPath()
 {
 }
 
-SharedPtr<RenderPath> RenderPath::Clone()
+RenderPath *RenderPath::Clone()
 {
-    SharedPtr<RenderPath> newRenderPath(new RenderPath());
+    RenderPath* newRenderPath = new RenderPath();
     newRenderPath->renderTargets_ = renderTargets_;
     newRenderPath->commands_ = commands_;
     return newRenderPath;

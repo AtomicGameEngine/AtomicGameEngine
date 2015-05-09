@@ -28,8 +28,6 @@
 #include "../Core/Object.h"
 #include "../Container/List.h"
 
-#include "../UI/Cursor.h"
-
 namespace Atomic
 {
 
@@ -74,7 +72,7 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0), controller_(0), screenJoystick_(0)
+        joystick_(0), controller_(0)
     {
     }
 
@@ -107,7 +105,7 @@ struct JoystickState
     /// SDL game controller.
     SDL_GameController* controller_;
     /// UI element containing the screen joystick.
-    UIElement* screenJoystick_;
+    // UIElement* screenJoystick_;
     /// Joystick name.
     String name_;
     /// Button up/down state.

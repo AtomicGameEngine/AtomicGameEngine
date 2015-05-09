@@ -16,6 +16,10 @@ file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 
+if (NOT EMSCRIPTEN)
+  file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
+endif()
+
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
@@ -39,13 +43,13 @@ else()
 endif()
 
 if (ANDROID)
-  
+
 endif()
 
 if (APPLE)
-    if (NOT IOS)      
+    if (NOT IOS)
       set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
-    else()      
+    else()
     endif()
 endif()
 
@@ -53,9 +57,32 @@ if (EMSCRIPTEN)
 
 endif()
 
+# These are used to create visual studio folders.
+source_group(Container FILES ${CONTAINER_SOURCE})
+source_group(Core FILES ${CORE_SOURCE})
+source_group(Engine FILES ${ENGINE_SOURCE})
+source_group(Audio FILES ${AUDIO_SOURCE})
+source_group(Math FILES ${MATH_SOURCE})
+source_group(Resource FILES ${RESOURCE_SOURCE})
+source_group(Input FILES ${INPUT_SOURCE})
+source_group(IO FILES ${IO_SOURCE})
+source_group(Resource FILES ${RESOURCE_SOURCE})
+source_group(Physics FILES ${PHYSICS_SOURCE})
+source_group(IPC FILES ${IPC_SOURCE})
+source_group(Graphics FILES ${GRAPHICS_SOURCE})
+source_group(GraphicsDriver FILES ${GRAPHICS_IMPL_SOURCE})
+source_group(Atomic3D FILES ${ATOMIC3D_SOURCE})
+source_group(Atomic2D FILES ${ATOMIC2D_SOURCE})
+source_group(Environment FILES ${ENVIRONMENT_SOURCE})
+source_group(Scene FILES ${SCENE_SOURCE})
+source_group(UI FILES ${UI_SOURCE})
+source_group(Platform FILES ${PLATFORM_SOURCE})
+source_group(Network FILES $NETWORK_SOURCE})
+source_group(Navigation FILES $NAVIGATION_SOURCE})
+
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
-                  ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE} 
-                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE}
+                  ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE}
+                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE} ${IPC_SOURCE}
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
@@ -67,4 +94,3 @@ if (NOT EMSCRIPTEN)
 endif()
 
 add_library(Atomic ${SOURCE_FILES})
-

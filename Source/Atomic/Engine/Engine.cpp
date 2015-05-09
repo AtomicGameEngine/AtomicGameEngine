@@ -48,7 +48,6 @@
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
-#include "../UI/UI.h"
 #ifdef ATOMIC_ATOMIC2D
 #include "../Atomic2D/Atomic2D.h"
 #endif
@@ -57,7 +56,7 @@
 #endif
 
 #ifdef ATOMIC_TBUI
-#include "../UI/TBUI.h"
+#include "../UI/UI.h"
 #endif
 
 #include "../Core/WorkQueue.h"
@@ -131,11 +130,8 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Audio(context_));
 
     #ifdef ATOMIC_TBUI
-    // will render before UI
-    context_->RegisterSubsystem(new TBUI(context_));
-    #endif
-
     context_->RegisterSubsystem(new UI(context_));
+    #endif
 
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
@@ -471,6 +467,8 @@ void Engine::RunFrame()
 
 Console* Engine::CreateConsole()
 {
+    return 0;
+    /*
     if (headless_ || !initialized_)
         return 0;
 
@@ -483,10 +481,14 @@ Console* Engine::CreateConsole()
     }
 
     return console;
+    */
 }
 
 DebugHud* Engine::CreateDebugHud()
 {
+    return 0;
+
+    /*
     if (headless_ || !initialized_)
         return 0;
 
@@ -499,6 +501,7 @@ DebugHud* Engine::CreateDebugHud()
     }
 
     return debugHud;
+    */
 }
 
 void Engine::SetTimeStepSmoothing(int frames)
@@ -677,10 +680,9 @@ void Engine::Render()
     GetSubsystem<Renderer>()->Render();
 
 #ifdef ATOMIC_TBUI
-    GetSubsystem<TBUI>()->Render();
+    GetSubsystem<UI>()->Render();
 #endif
 
-    GetSubsystem<UI>()->Render();
     graphics->EndFrame();
 }
 

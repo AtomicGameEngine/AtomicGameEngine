@@ -8,6 +8,8 @@ target_link_libraries(PackageTool ${ATOMIC_LINK_LIBRARIES})
 file (GLOB_RECURSE EDITORDATA_FILES ${CMAKE_SOURCE_DIR}/Data/AtomicEditor/Resources/EditorData/*)
 file (GLOB_RECURSE COREDATA_FILES ${CMAKE_SOURCE_DIR}/Data/AtomicPlayer/Resources/CoreData/*)
 
+if (ATOMIC_BUILD_PAK_FILES)
+
 set (EDITORDATA_PAK "${CMAKE_SOURCE_DIR}/Bin/EditorData.pak")
 set (COREDATA_PAK "${CMAKE_SOURCE_DIR}/Bin/CoreData.pak")
 
@@ -52,3 +54,5 @@ elseif (LINUX)
 endif()
 
 add_custom_target(BuildEditorFiles ALL DEPENDS AtomicEditor "${EDITORDATA_PAK}" "${COREDATA_PAK}")
+
+endif()
