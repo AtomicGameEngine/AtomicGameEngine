@@ -85,6 +85,8 @@ const String& ToolEnvironment::GetDevConfigFilename()
 
 #ifdef ATOMIC_PLATFORM_OSX
     devConfigFilename_ = fileSystem->GetUserDocumentsDir() + ".atomicgameengine/toolEnv.json";
+#elif ATOMIC_PLATFORM_WINDOWS
+    devConfigFilename_ = fileSystem->GetUserDocumentsDir() + "AtomicGameEngine/toolEnv.json";
 #endif
 
     return devConfigFilename_;
