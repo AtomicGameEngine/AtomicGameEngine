@@ -2,8 +2,9 @@
 
 #include "../Core/Object.h"
 #include "../Core/Mutex.h"
-
 #include "../Container/List.h"
+
+#include "IPCTypes.h"
 
 namespace Atomic
 {
@@ -32,7 +33,7 @@ public:
     void QueueEvent(StringHash eventType, VariantMap& eventData);
 
     // for a child worker process
-    bool InitWorker(int fd1, int fd2);
+    bool InitWorker(IPCHandle fd1, IPCHandle fd2);
 
     // spawn a worker process
     IPCBroker* SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");

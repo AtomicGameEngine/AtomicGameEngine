@@ -10,54 +10,54 @@ namespace Atomic
 
 class PipePair {
 public:
-  PipePair();
+    PipePair();
 
-  int fd1() const { return fd_[0]; }
-  int fd2() const { return fd_[1]; }
+    int fd1() const { return fd_[0]; }
+    int fd2() const { return fd_[1]; }
 
 private:
-  int fd_[2];
+    int fd_[2];
 };
 
 
 class PipeUnix {
 public:
-  PipeUnix();
+    PipeUnix();
 
-  bool OpenClient(int fd);
-  bool OpenServer(int fd);
+    bool OpenClient(int fd);
+    bool OpenServer(int fd);
 
-  bool Write(const void* buf, size_t sz);
-  bool Read(void* buf, size_t* sz);
+    bool Write(const void* buf, size_t sz);
+    bool Read(void* buf, size_t* sz);
 
-  bool IsConnected() const { return fd_ != -1; }
+    bool IsConnected() const { return fd_ != -1; }
 
 private:
-  int fd_;
+    int fd_;
 };
 
 
 class PipeTransport : public PipeUnix {
 public:
-  static const size_t kBufferSz = 4096;
+    static const size_t kBufferSz = 4096;
 
-  bool Send(const void* buf, size_t sz) {
-    return Write(buf, sz);
-  }
+    bool Send(const void* buf, size_t sz) {
+        return Write(buf, sz);
+    }
 
-  char* Receive(size_t* size);
+    char* Receive(size_t* size);
 
 private:
-  PODVector<char> buf_;
+    PODVector<char> buf_;
 };
 
 class IPCProcess : public Object
 {
     OBJECT(IPCProcess)
 
-public:
+    public:
 
-    IPCProcess(Context* context, int fd1, int fd2, int pid = -1);
+        IPCProcess(Context* context, int fd1, int fd2, int pid = -1);
 
     virtual ~IPCProcess();
 

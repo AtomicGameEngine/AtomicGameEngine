@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "IPCTypes.h"
 #include "IPC.h"
 #include "IPCChannel.h"
 
@@ -13,7 +14,7 @@ class IPCWorker : public IPCChannel
 
 public:
     /// Construct.
-    IPCWorker(int fd, Context* context);
+    IPCWorker(IPCHandle fd, Context* context);
     /// Destruct.
     virtual ~IPCWorker();
 
@@ -23,7 +24,7 @@ public:
 
 private:
 
-    int fd_;
+    IPCHandle fd_;
 
 };
 

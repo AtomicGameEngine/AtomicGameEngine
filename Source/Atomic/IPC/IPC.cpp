@@ -33,10 +33,13 @@ IPC::~IPC()
     worker_ = 0;
 }
 
-bool IPC::InitWorker(int fd1, int fd2)
+bool IPC::InitWorker(IPCHandle fd1, IPCHandle fd2)
 {
     // close server fd
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
     close(fd1);
+#endif
 
     worker_ = new IPCWorker(fd2, context_);
     worker_->Run();

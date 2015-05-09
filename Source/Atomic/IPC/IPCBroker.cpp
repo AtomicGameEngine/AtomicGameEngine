@@ -1,5 +1,7 @@
 
+#ifndef ATOMIC_PLATFORM_WINDOWS
 #include <unistd.h>
+#endif
 
 #include "../Core/StringUtils.h"
 #include "../IO/Log.h"
@@ -49,7 +51,9 @@ bool IPCBroker::Update()
     if (!shouldRun_)
     {
         Stop();
+#ifndef ATOMIC_PLATFORM_WINDOWS
         close(pp_.fd1());
+#endif
         return false;
     }
 
@@ -83,7 +87,9 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
     if (!otherProcess_->Launch(command, pargs, initialDirectory))
         return false;
 
+#ifndef ATOMIC_PLATFORM_WINDOWS
     close(pp_.fd2());
+#endif
 
     return Run();
 

@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     Atomic::ParseArguments(GetCommandLineW());
-    return function;
+    return RunEditorApplication();
 }
 // MSVC release mode: write minidump on crash
 #elif defined(_MSC_VER) && defined(ATOMIC_MINIDUMPS) && !defined(ATOMIC_WIN32_CONSOLE)

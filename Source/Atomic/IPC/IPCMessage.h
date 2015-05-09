@@ -5,7 +5,11 @@
 #include "../IO/VectorBuffer.h"
 #include "../IO/MemoryBuffer.h"
 
+#ifndef ATOMIC_PLATFORM_WINDOWS
 #include "IPCUnix.h"
+#else
+#include "IPCWindows.h"
+#endif
 
 namespace Atomic
 {

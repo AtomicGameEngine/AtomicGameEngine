@@ -3,21 +3,25 @@
 
 #include "IPCWorker.h"
 #include "IPCMessage.h"
-#include "IPCUnix.h"
+
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
+#include "IPCWindows.h"
 #else
-    #include <unistd.h>
+#include "IPCUnix.h"
+#include <unistd.h>
 #endif
 
 namespace Atomic
 {
 
-IPCWorker::IPCWorker(int fd, Context* context) : IPCChannel(context),
+IPCWorker::IPCWorker(IPCHandle fd, Context* context) : IPCChannel(context),
     fd_(fd)
 {
 
+#ifndef ATOMIC_PLATFORM_WINDOWS
     otherProcess_ = new IPCProcess(context_, -1, fd, getppid());
+#endif
 
     if (!transport_.OpenClient(fd_))
     {

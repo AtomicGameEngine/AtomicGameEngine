@@ -156,7 +156,7 @@ void AEPlayerApplication::Start()
     {
         IPC* ipc = new IPC(context_);
         context_->RegisterSubsystem(ipc);
-        ipc->InitWorker(fd_[0], fd_[1]);
+        //ipc->InitWorker(fd_[0], fd_[1]);
     }
 
     // Instantiate and register the Javascript subsystem
