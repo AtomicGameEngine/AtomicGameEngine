@@ -29,6 +29,9 @@ public:
     void SetRootSourceDir(const String& sourceDir);
     void SetRootBuildDir(const String& buildDir, bool setBinaryPaths = false);
 
+    const String& GetRootSourceDir() { return rootSourceDir_; }
+    const String& GetRootBuildDir() { return rootBuildDir_; }
+
     const String& GetEditorBinary() { return editorBinary_; }
     const String& GetPlayerBinary() { return playerBinary_; }
     const String& GetToolBinary() { return toolBinary_; }

@@ -7,6 +7,8 @@
 #include <Atomic/IO/FileSystem.h>
 
 #include "../Project/Project.h"
+#include "../ToolEnvironment.h"
+
 #include "BuildBase.h"
 #include "ResourcePackager.h"
 
@@ -43,6 +45,16 @@ void BuildBase::BuildWarn(const String& warning)
 void BuildBase::BuildError(const String& error)
 {
     buildErrors_.Push(error);
+}
+
+void BuildBase::GetDefaultResourcePaths(Vector<String>& paths)
+{
+    paths.Clear();
+
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
+    paths.Push(AddTrailingSlash(tenv->GetCoreDataDir()));
+    paths.Push(AddTrailingSlash(tenv->GetPlayerDataDir()));
 }
 
 

@@ -1,17 +1,16 @@
 
 #pragma once
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
 namespace Atomic
 {
 
-// avoid needing to include <windows.h>
+#ifdef ATOMIC_PLATFORM_WINDOWS
 
-// Windows handle type
+// avoid needing to include <windows.h>
 
 //#define INVALID_HANDLE_VALUE -1
 
+// Windows handle type
 #define INVALID_IPCHANDLE_VALUE (void *)(-1)
 typedef void* IPCHandle;
 

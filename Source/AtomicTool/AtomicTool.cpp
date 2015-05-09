@@ -3,8 +3,10 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Engine/Engine.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include <ToolCore/ToolSystem.h>
+#include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/Build/BuildSystem.h>
 #include <ToolCore/License/LicenseEvents.h>
 #include <ToolCore/License/LicenseSystem.h>
@@ -65,14 +67,18 @@ void AtomicTool::Setup()
         }
 
     }
-
+#ifndef ATOMIC_DEV_BUILD
     if (!cliDataPath_.Length())
+    {
         ErrorExit("Unable to parse --data-path");
+    }
+#endif
 
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
-    // FIXME
-    engineParameters_["ResourcePaths"] = "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData";
+
+    // no default resources (will be initialized later)
+    engineParameters_["ResourcePaths"] = "";
 }
 
 void AtomicTool::HandleCommandFinished(StringHash eventType, VariantMap& eventData)
@@ -195,8 +201,32 @@ void AtomicTool::Start()
 
     ToolSystem* tsystem = new ToolSystem(context_);
     context_->RegisterSubsystem(tsystem);
+
+    ToolEnvironment* env = new ToolEnvironment(context_);
+    context_->RegisterSubsystem(env);
+
+#ifdef ATOMIC_DEV_BUILD
+
+    if (!env->InitFromJSON())
+    {
+        ErrorExit(ToString("Unable to initialize tool environment from %s", env->GetDevConfigFilename().CString()));
+        return;
+    }
+
+    if (!cliDataPath_.Length())
+    {
+        cliDataPath_ = env->GetRootSourceDir() + "/Data/AtomicEditor/";
+    }
+
+#endif
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    cache->AddResourceDir(env->GetCoreDataDir());
+    cache->AddResourceDir(env->GetPlayerDataDir());
+
     tsystem->SetCLI();
     tsystem->SetDataPath(cliDataPath_);
+
 
     if (activationKey_.Length())
     {
