@@ -34,7 +34,7 @@ if (NOT MSVC)
 endif()
 
 # Create the JSBind files ahead of time, so they are picked up with glob
-set (JSFILES JSModuleAtomic2D.cpp;JSModuleAtomic2D.cpp;JSModuleAudio.cpp;JSModuleContainer.cpp;JSModuleCore.cpp;
+set (JSFILES JSModuleAtomic2D.cpp;JSModuleAtomic3D.cpp;JSModuleAudio.cpp;JSModuleContainer.cpp;JSModuleCore.cpp;
              JSModuleEngine.cpp;JSModuleEnvironment.cpp;JSModuleGraphics.cpp;JSModuleInput.cpp;
              JSModuleIO.cpp;JSModuleJavascript.cpp;JSModuleMath.cpp;JSModuleNavigation.cpp;
              JSModuleNetwork.cpp;JSModulePhysics.cpp;JSModuleResource.cpp;JSModules.cpp;
