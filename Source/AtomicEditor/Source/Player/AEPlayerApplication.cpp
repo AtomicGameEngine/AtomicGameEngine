@@ -126,8 +126,25 @@ void AEPlayerApplication::Setup()
                 }
 
             }
+            else if (argument == "--project" && value.Length())
+            {
+                engineParameters_["ResourcePrefixPath"] = "";
+
+
+                // This works for a local dev build, --editor-resource-paths command below is for
+                // launching from AtomicEditor (IPC)
+
+                String resourcePaths = ToString("%s/Data/AtomicPlayer/Resources/CoreData;%s/Data/AtomicPlayer/Resources/PlayerData;%s/Resources",
+                         ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString());
+
+                LOGINFOF("Adding ResourcePaths: %s", resourcePaths.CString());
+
+                engineParameters_["ResourcePaths"] = resourcePaths;
+
+            }
             else if (argument == "--editor-resource-paths" && value.Length())
             {
+                // "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/PlayerData!/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame/Resources"
                 engineParameters_["ResourcePrefixPath"] = "";
                 value.Replace("!", ";");
                 engineParameters_["ResourcePaths"] = value;

@@ -38,7 +38,14 @@ bool ToolEnvironment::InitFromJSON()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
     if (!fileSystem->FileExists(devConfigFilename_))
-        return false;
+    {
+        // default to build directories
+
+        SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
+        SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR);
+
+        return true;
+    }
 
     File jsonFile(context_, devConfigFilename_);
 
