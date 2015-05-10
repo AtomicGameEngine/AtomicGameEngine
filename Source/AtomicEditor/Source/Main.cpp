@@ -78,7 +78,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
     Atomic::ParseArguments(GetCommandLineW());
-    return function;
+
+    const Vector<String>& arguments = GetArguments();
+
+    bool runPlayer = false;
+    for (unsigned i = 0; i < arguments.Size();i++)
+    {
+        if (arguments.At(i) == "--player")
+        {
+            runPlayer = true;
+            break;
+        }
+    }
+
+    if (runPlayer)
+        return RunPlayerApplication();
+
+    return RunEditorApplication();
 }
 // Linux or OS X: use main
 #else

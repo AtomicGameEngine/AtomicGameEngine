@@ -35,6 +35,12 @@ elseif(LINUX)
     target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
 else()
     target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
+    
+    # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
+    add_custom_command (TARGET AtomicEditor POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -E copy \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicEditor>/D3DCompiler_47.dll\")
+
 endif()
 
 if (TARGET_PROPERTIES)
