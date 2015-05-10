@@ -27,7 +27,7 @@ protected:
 public:
 	TBStrC(const char *str) : s(const_cast<char *>(str)) {}
 
-	inline int Length() const							{ return strlen(s); }
+	inline int Length() const							{ return (int) strlen(s); }
 	inline bool IsEmpty() const							{ return s[0] == 0; }
 
 	inline int Compare(const char* str) const			{ return strcmp(s, str); }
@@ -66,7 +66,7 @@ public:
 
 	void Remove(int ofs, int len);
 	bool Insert(int ofs, const char *ins, int ins_len = TB_ALL_TO_TERMINATION);
-	bool Append(const char *ins, int ins_len = TB_ALL_TO_TERMINATION)	{ return Insert(strlen(s), ins, ins_len); }
+	bool Append(const char *ins, int ins_len = TB_ALL_TO_TERMINATION)	{ return Insert((int)strlen(s), ins, ins_len); }
 
 	inline operator char *() const						{ return s; }
 	char *CStr() const									{ return s; }
