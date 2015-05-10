@@ -160,14 +160,19 @@ void OpenConsoleWindow()
 
 void PrintUnicode(const String& str, bool error)
 {
-    #if !defined(ANDROID) && !defined(IOS)
-    #ifdef WIN32
+#if !defined(ANDROID) && !defined(IOS)
+#ifdef WIN32
     HANDLE stream = GetStdHandle(error ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE);
     if (stream == INVALID_HANDLE_VALUE)
         return;
     WString strW(str);
     DWORD charsWritten;
     WriteConsoleW(stream, strW.CString(), strW.Length(), &charsWritten, 0);
+    
+    if (IsDebuggerPresent())
+    {
+        OutputDebugString(str.CString());
+    }
     #else
     fprintf(error ? stderr : stdout, "%s", str.CString());
     #endif
