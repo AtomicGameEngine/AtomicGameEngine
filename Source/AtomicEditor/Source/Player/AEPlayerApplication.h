@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <Atomic/IPC/IPCTypes.h>
 #include <Atomic/Engine/Application.h>
 
 using namespace Atomic;
@@ -54,8 +55,7 @@ private:
 
     void HandleHelloFromBroker(StringHash eventType, VariantMap& eventData);
 
-    int fd_[2];
-
+    IPCHandle fd_[2];
 };
 
 }

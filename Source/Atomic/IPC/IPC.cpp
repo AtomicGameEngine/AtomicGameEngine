@@ -35,9 +35,9 @@ IPC::~IPC()
 
 bool IPC::InitWorker(IPCHandle fd1, IPCHandle fd2)
 {
-    // close server fd
-
+    
 #ifndef ATOMIC_PLATFORM_WINDOWS
+    // close server fd
     close(fd1);
 #endif
 

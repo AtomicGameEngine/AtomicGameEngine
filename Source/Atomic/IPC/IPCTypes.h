@@ -17,6 +17,7 @@ typedef void* IPCHandle;
 #else
 
 typedef int IPCHandle;
+#define INVALID_IPCHANDLE_VALUE -1
 
 #endif
 

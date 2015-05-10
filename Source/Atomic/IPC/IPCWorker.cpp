@@ -19,7 +19,9 @@ IPCWorker::IPCWorker(IPCHandle fd, Context* context) : IPCChannel(context),
     fd_(fd)
 {
 
-#ifndef ATOMIC_PLATFORM_WINDOWS
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    otherProcess_ = new IPCProcess(context_, INVALID_IPCHANDLE_VALUE, fd_, INVALID_IPCHANDLE_VALUE);
+#else
     otherProcess_ = new IPCProcess(context_, -1, fd, getppid());
 #endif
 
@@ -64,7 +66,7 @@ void IPCWorker::ThreadFunction()
 
         if (!Receive())
         {
-            break;
+           break;
         }
     }
 

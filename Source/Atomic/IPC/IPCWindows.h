@@ -12,7 +12,7 @@ namespace Atomic
 class PipePair {
 
 public:
-    PipePair(bool inherit_fd2 = false);
+    PipePair(bool inherit_fd2 = true);
     IPCHandle fd1() const { return srv_; }
     IPCHandle fd2() const { return cln_; }
 
