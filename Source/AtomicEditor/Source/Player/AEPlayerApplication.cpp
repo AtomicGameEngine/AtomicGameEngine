@@ -58,8 +58,8 @@ static Javascript* javascript = NULL;
 AEPlayerApplication::AEPlayerApplication(Context* context) :
     Application(context)
 {
-    fd_[0] = -1;
-    fd_[1] = -1;
+    fd_[0] = INVALID_IPCHANDLE_VALUE;
+    fd_[1] = INVALID_IPCHANDLE_VALUE;
 
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);
@@ -113,14 +113,30 @@ void AEPlayerApplication::Setup()
                 LOGINFOF("Starting IPCWorker %s", argument.CString());
 
                 Vector<String> ipc = argument.Split(argument.CString(), '=');
+
                 if (ipc.Size() == 2)
                 {
-                    int fd = ToInt(ipc[1].CString());
                     if (argument.StartsWith("--ipc-server="))
+                    {
+#ifdef ATOMIC_PLATFORM_WINDOWS
+                        WString wipc(ipc[1]);
+                        HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
+                        fd_[0] = pipe;
+#else
+                        int fd = ToInt(ipc[1].CString());
                         fd_[0] = fd;
+#endif
+                    }
                     else
                     {
+#ifdef ATOMIC_PLATFORM_WINDOWS
+                        WString wipc(ipc[1]);
+                        HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
+                        fd_[1] = pipe;
+#else
+                        int fd = ToInt(ipc[1].CString());
                         fd_[1] = fd;
+#endif
                     }
 
                 }
@@ -129,7 +145,6 @@ void AEPlayerApplication::Setup()
             else if (argument == "--project" && value.Length())
             {
                 engineParameters_["ResourcePrefixPath"] = "";
-
 
                 // This works for a local dev build, --editor-resource-paths command below is for
                 // launching from AtomicEditor (IPC)
@@ -169,12 +184,27 @@ void AEPlayerApplication::Start()
 
     SubscribeToEvent(E_IPCHELLOFROMBROKER, HANDLER(AEPlayerApplication, HandleHelloFromBroker));
 
-    if (fd_[0] != -1 && fd_[1] != -1)
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    if (fd_[0] != INVALID_IPCHANDLE_VALUE)
+    {
+        //::CloseHandle(fd_[0]);
+        fd_[0] = INVALID_IPCHANDLE_VALUE;
+    }
+
+    if (fd_[1] != INVALID_IPCHANDLE_VALUE)
     {
         IPC* ipc = new IPC(context_);
         context_->RegisterSubsystem(ipc);
         //ipc->InitWorker(fd_[0], fd_[1]);
     }
+#else
+    if (fd_[0] != INVALID_IPCHANDLE_VALUE && fd_[1] != INVALID_IPCHANDLE_VALUE)
+    {
+        IPC* ipc = new IPC(context_);
+        context_->RegisterSubsystem(ipc);
+        ipc->InitWorker(fd_[0], fd_[1]);
+    }
+#endif
 
     // Instantiate and register the Javascript subsystem
     javascript = new Javascript(context_);
