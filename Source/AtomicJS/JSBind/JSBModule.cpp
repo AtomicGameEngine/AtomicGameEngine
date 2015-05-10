@@ -383,7 +383,13 @@ void JSBModule::Load(const String &moduleJSONFilename)
     if (this->name_ == "Graphics")
     {
 #ifdef _MSC_VER
-        sources.AddString("Graphics/Direct3D9");
+        if (JSBind::PLATFORM == "ANDROID" || JSBind::PLATFORM == "WEB")
+        {
+            sources.AddString("Graphics/OpenGL");
+        }
+        else {
+            sources.AddString("Graphics/Direct3D9");
+        }
 #else
         sources.AddString("Graphics/OpenGL");
 #endif
