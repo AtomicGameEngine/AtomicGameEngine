@@ -22,6 +22,8 @@ else()
     set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
 endif(APPLE)
 
+GroupSources("Source")
+
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
 target_link_libraries(AtomicEditor ToolCore AtomicJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
