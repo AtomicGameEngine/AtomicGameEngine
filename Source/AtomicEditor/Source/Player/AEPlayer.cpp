@@ -73,13 +73,16 @@ void AEPlayer::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
 
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
+    Editor* editor = GetSubsystem<Editor>();
     ToolCore::ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
     const String& editorBinary = env->GetEditorBinary();
+
+    Project* project = editor->GetProject();
 
     Vector<String> paths;
     paths.Push(env->GetCoreDataDir());
     paths.Push(env->GetPlayerDataDir());
-    paths.Push("/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources");
+    paths.Push(project->GetResourcePath());
 
     String resourcePaths;
     resourcePaths.Join(paths, "!");
@@ -93,7 +96,7 @@ bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 
     String dump;
     dump.Join(vargs, " ");
-    LOGINFOF("Launching Broker %s", dump.CString());
+    LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
 
     IPC* ipc = GetSubsystem<IPC>();
     broker_ = ipc->SpawnWorker(editorBinary, vargs);

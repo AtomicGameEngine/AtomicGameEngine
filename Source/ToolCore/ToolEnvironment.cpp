@@ -42,7 +42,7 @@ bool ToolEnvironment::InitFromJSON()
         // default to build directories
 
         SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
-        SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR);
+        SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR, true);
 
         return true;
     }

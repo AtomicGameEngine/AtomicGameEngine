@@ -108,9 +108,9 @@ void AEPlayerApplication::Setup()
             String argument = arguments[i].ToLower();
             String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
 
-            LOGERRORF("Starting IPCWorker %s", argument.CString());
             if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
             {
+                LOGINFOF("Starting IPCWorker %s", argument.CString());
 
                 Vector<String> ipc = argument.Split(argument.CString(), '=');
                 if (ipc.Size() == 2)
