@@ -378,6 +378,13 @@ public:
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
     /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
+    /// Return child scene nodes by name, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive = false) const;
+    /// Return child scene nodes by name, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive = false) const;
+    /// Return child scene nodes by name hash, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive = false) const;
+    /// Return child scene nodes with a specific component.
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
     /// Return child scene node by name.
@@ -490,6 +497,8 @@ private:
     void GetChildrenRecursive(PODVector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively.
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const;
+    /// Return child nodes by name, recursively
+    void GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const;
     /// Return specific components recursively.
     void GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const;
     /// Clone node recursively.

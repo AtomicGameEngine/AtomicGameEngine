@@ -1739,6 +1739,44 @@ void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) 
         (*i)->GetComponentsRecursive(dest, type);
 }
 
+void Node::GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive) const
+{
+    GetChildrenWithName(dest, StringHash(name), recursive);
+}
+
+void Node::GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive) const
+{
+    GetChildrenWithName(dest, StringHash(name), recursive);
+}
+
+void Node::GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive) const
+{
+    dest.Clear();
+
+    if (!recursive)
+    {
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            if ((*i)->GetNameHash() == nameHash)
+                dest.Push(*i);
+        }
+    }
+    else
+        GetChildrenWithNameRecursive(dest, nameHash);
+}
+
+void Node::GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const
+{
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+    {
+        Node* node = *i;
+        if (node->GetNameHash() == nameHash)
+            dest.Push(node);
+        if (!node->children_.Empty())
+            node->GetChildrenWithNameRecursive(dest, nameHash);
+    }
+}
+
 Node* Node::CloneRecursive(Node* parent, SceneResolver& resolver, CreateMode mode)
 {
     // Create clone node
