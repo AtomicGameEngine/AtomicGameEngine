@@ -48,9 +48,9 @@ double TBSystem::GetTimeMS()
 	return now.tv_usec / 1000 + now.tv_sec * 1000;
 }
 
-void TBSystem::RescheduleTimer(double fire_time)
-{
-}
+//void TBSystem::RescheduleTimer(double fire_time)
+//{
+//}
 
 int TBSystem::GetLongClickDelayMS()
 {
@@ -79,6 +79,8 @@ int TBSystem::GetDPI()
 }
 
 // == TBFile =====================================
+
+TBFileExternalReaderFunction TBFile::reader_function = NULL;
 
 class TBAndroidFile : public TBFile
 {
