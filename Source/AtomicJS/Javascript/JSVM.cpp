@@ -14,6 +14,7 @@
 
 #include <Atomic/Resource/ResourceCache.h>
 
+#include "JSRequire.h"
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSAtomic.h"
@@ -58,11 +59,7 @@ void JSVM::InitJSContext()
     duk_put_prop_index(ctx_, -2, JS_GLOBALSTASH_INDEX_COMPONENTS);
     duk_pop(ctx_);
 
-    duk_get_global_string(ctx_, "Duktape");
-    duk_push_c_function(ctx_, js_module_search, 1);
-    duk_put_prop_string(ctx_, -2, "modSearch");
-    duk_pop(ctx_);
-
+    js_init_require(this);
     jsapi_init_atomic(this);
 
     InitComponents();
@@ -311,64 +308,6 @@ void JSVM::InitComponents()
     // pop stash and component object
     duk_pop_2(ctx_);
 
-}
-
-int JSVM::js_module_search(duk_context* ctx)
-{
-    JSVM* vm = GetJSVM(ctx);
-
-    FileSystem* fs = vm->GetSubsystem<FileSystem>();
-    ResourceCache* cache = vm->GetSubsystem<ResourceCache>();
-
-    String path = duk_to_string(ctx, 0);
-
-    // first check if this is an AtomicModule
-    // attempting to avoid module search paths
-    // so have AtomicEditor, Atomic, and the projects "Modules"
-    String pathName, fileName, extension;
-    SplitPath(path, pathName, fileName, extension);
-
-    if (fileName.StartsWith("AtomicEditor"))
-    {
-        path =  "AtomicEditor/Modules/" + path + ".js";
-    }
-    else if (fileName.StartsWith("Atomic"))
-    {
-        path =  "AtomicModules/" + path + ".js";
-    }
-    else
-    {
-        // a module can exist in the Modules path or reside in a project directory
-        // prefer modules path
-        String modulePath = vm->moduleSearchPath_ + "/" + path + ".js";
-
-        if (fs->FileExists(modulePath))
-        {
-            // unless the file doesn't exist and then use project path
-            path = modulePath;
-        }
-        else
-        {
-            path += ".js";
-        }
-
-    }
-
-    SharedPtr<File> jsfile(cache->GetFile(path));    
-
-    if (!jsfile)
-    {
-        duk_push_null(ctx);
-    }
-    else
-    {
-        vm->SetLastModuleSearchFile(jsfile->GetFullPath());
-        String source;
-        jsfile->ReadText(source);
-        duk_push_string(ctx, source.CString());
-    }
-
-    return 1;
 }
 
 void JSVM::SendJSErrorEvent(const String& filename)

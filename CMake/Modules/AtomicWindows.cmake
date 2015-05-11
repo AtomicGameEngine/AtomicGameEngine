@@ -2,7 +2,7 @@
 
 include(AtomicDesktop)
 
-set (CMAKE_DEBUG_POSTFIX _d)
+#set (CMAKE_DEBUG_POSTFIX _d)
 
 set (D3DCOMPILER_47_DLL ${CMAKE_SOURCE_DIR}/Build/Windows/Binaries/x64/D3DCompiler_47.dll)
 

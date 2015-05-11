@@ -4,6 +4,7 @@
 Bin/Atomic.d.ts
 Bin/Atomic.js
 Bin/*.pak
+Bin/NativeSDK/*
 Source/Atomic/Javascript/Modules/*
 Data/AtomicPlayer/Resources/CoreData/Shaders/HLSL/Cache
 Artifacts/*

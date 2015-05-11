@@ -28,6 +28,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 
 file (GLOB JAVASCRIPT_SOURCE Javascript/*.cpp Javascript/*.h)
 
+GroupSources("Javascript")
+
 if (NOT MSVC)
     # for kNet
     add_definitions (-DUNIX)

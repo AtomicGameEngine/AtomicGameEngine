@@ -156,9 +156,7 @@ private:
 
     void SubscribeToEvents();
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
-    static int js_module_search(duk_context* ctx);
-
+    
     duk_context* ctx_;
 
     HashMap<void*, RefCounted*> heapToObject_;
