@@ -18,7 +18,11 @@ elseif(LINUX)
 else()
     include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
     add_definitions(-DCURL_STATICLIB)
-    set (EXE_TYPE WIN32)
+    
+    # We want the console for now
+    #set (EXE_TYPE WIN32)
+    add_definitions(-DATOMIC_WIN32_CONSOLE)
+    
     set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
 endif(APPLE)
 

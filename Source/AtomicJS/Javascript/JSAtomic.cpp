@@ -74,6 +74,15 @@ static int js_print(duk_context* ctx)
     return 0;
 }
 
+static int js_openConsoleWindow(duk_context* ctx)
+{
+#ifdef _WIN32
+    OpenConsoleWindow();
+#endif
+
+    return 0;
+}
+
 static int js_assert(duk_context* ctx)
 {
     if (!duk_to_boolean(ctx, 0))
@@ -259,7 +268,6 @@ void jsapi_init_atomic(JSVM* vm)
     // Atomic
     duk_get_global_string(ctx, "Atomic");
 
-
     String platform = GetPlatform();
     if (platform == "Mac OS X")
         platform = "MacOSX";
@@ -272,6 +280,9 @@ void jsapi_init_atomic(JSVM* vm)
     duk_push_object(ctx);
     duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
     duk_pop(ctx);
+
+    duk_push_c_function(ctx, js_openConsoleWindow, 0);
+    duk_put_prop_string(ctx, -2, "openConsoleWindow");
 
     duk_push_c_function(ctx, js_atomic_GetVM, 0);
     duk_put_prop_string(ctx, -2, "getVM");
