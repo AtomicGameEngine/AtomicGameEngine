@@ -14,7 +14,7 @@ if (MSVC)
 	add_library(AtomicPlugin ${SOURCE_FILES})
 	add_custom_command (TARGET AtomicPlugin POST_BUILD
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy_if_different \"${CMAKE_CURRENT_SOURCE_DIR}/duktape.h\" \"${CMAKE_SOURCE_DIR}/Bin/NativeSDK/Windows/AtomicPlugin.h\"
+    ARGS -E copy_if_different \"${CMAKE_CURRENT_SOURCE_DIR}/duktape.h\" \"${CMAKE_SOURCE_DIR}/Bin/NativePluginSDK/Windows/AtomicPlugin.h\"
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy \"$<TARGET_LINKER_FILE:AtomicPlugin>\" \"${CMAKE_SOURCE_DIR}/Bin/NativeSDK/Windows/x64/$<TARGET_LINKER_FILE_NAME:AtomicPlugin>\")
+    ARGS -E copy \"$<TARGET_LINKER_FILE:AtomicPlugin>\" \"${CMAKE_SOURCE_DIR}/Bin/NativePluginSDK/Windows/x64/$<TARGET_LINKER_FILE_NAME:AtomicPlugin>\")
 endif()
