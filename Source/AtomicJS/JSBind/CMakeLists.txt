@@ -16,7 +16,7 @@ if (MSVC)
     # TODO: Remove this dependency
     add_custom_command (TARGET JSBind POST_BUILD
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:JSBind>/D3DCompiler_47.dll\")
+    ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:JSBind>/D3DCompiler_47.dll\")
 endif()
 
 #TODO: finer grained dependencies

@@ -17,7 +17,7 @@ if (MSVC)
     # TODO: Remove this dependency
     add_custom_command (TARGET AtomicTool POST_BUILD
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicTool>/D3DCompiler_47.dll\")
+    ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicTool>/D3DCompiler_47.dll\")
     
 else()
     target_link_libraries(AtomicTool curl)

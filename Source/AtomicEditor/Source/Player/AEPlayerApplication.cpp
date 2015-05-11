@@ -24,6 +24,7 @@
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/IOEvents.h>
 #include <Atomic/Core/Main.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -64,6 +65,7 @@ AEPlayerApplication::AEPlayerApplication(Context* context) :
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);
 #endif
+
 }
 
 void AEPlayerApplication::Setup()
@@ -107,6 +109,11 @@ void AEPlayerApplication::Setup()
         {
             String argument = arguments[i].ToLower();
             String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "--log-std")
+            {
+                SubscribeToEvent(E_LOGMESSAGE, HANDLER(AEPlayerApplication, HandleLogMessage));
+            }
 
             if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
             {
@@ -240,5 +247,28 @@ void AEPlayerApplication::HandleScriptReloadFailed(StringHash eventType, Variant
 {
     ErrorExit();
 }
+
+void AEPlayerApplication::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+{
+    using namespace LogMessage;
+
+    int level = eventData[P_LEVEL].GetInt();
+    // The message may be multi-line, so split to rows in that case
+    Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
+
+    for (unsigned i = 0; i < rows.Size(); ++i)
+    {
+        if (level == LOG_ERROR)
+        {
+            fprintf(stderr, "%s\n", rows[i].CString());
+        }
+        else
+        {
+            fprintf(stdout, "%s\n", rows[i].CString());
+        }
+    }
+        
+}
+
 
 }

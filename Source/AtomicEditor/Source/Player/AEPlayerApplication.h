@@ -53,6 +53,9 @@ private:
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
 
+    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
+
+
     void HandleHelloFromBroker(StringHash eventType, VariantMap& eventData);
 
     IPCHandle fd_[2];
