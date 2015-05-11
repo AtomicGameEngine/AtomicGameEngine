@@ -12,7 +12,7 @@
 
 #include <Atomic/Scene/Component.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEditor.h"
 #include "AEEvents.h"
@@ -31,7 +31,7 @@ namespace AtomicEditor
 InspectorFrame::InspectorFrame(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/inspectorframe.tb.txt");
 
     delegate_->SetID(TBIDC("projectframe_delegate"));

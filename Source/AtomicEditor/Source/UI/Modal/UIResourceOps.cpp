@@ -8,7 +8,7 @@
 #include <TurboBadger/tb_editfield.h>
 
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Resources/AEResourceOps.h"
 
@@ -22,7 +22,7 @@ namespace AtomicEditor
 UINewFolder::UINewFolder(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("New Folder");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcenewfolder.tb.txt");
     nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("folder_name"));
@@ -69,7 +69,7 @@ UIResourceDelete::UIResourceDelete(Context* context):
 {
     UIModalOps* ops = GetSubsystem<UIModalOps>();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Delete Resource");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcedelete.tb.txt");
 
@@ -117,7 +117,7 @@ bool UIResourceDelete::OnEvent(const TBWidgetEvent &ev)
 UICreateComponent::UICreateComponent(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Create Javascript Component");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
     nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("component_name"));
@@ -165,7 +165,7 @@ bool UICreateComponent::OnEvent(const TBWidgetEvent &ev)
 UICreateScript::UICreateScript(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Create Script");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcecreatescript.tb.txt");
     nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("script_name"));
@@ -213,7 +213,7 @@ bool UICreateScript::OnEvent(const TBWidgetEvent &ev)
 UICreateModule::UICreateModule(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Create Module");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcecreatemodule.tb.txt");
     nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("module_name"));
@@ -261,7 +261,7 @@ bool UICreateModule::OnEvent(const TBWidgetEvent &ev)
 UICreate2DLevel::UICreate2DLevel(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Create 2D Level");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/resourcecreate2dlevel.tb.txt");
     nameField_ = window_->GetContentRoot()->GetWidgetByIDAndType<TBEditField>(TBIDC("level_name"));

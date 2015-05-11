@@ -4,17 +4,17 @@
 
 #include "AtomicEditor.h"
 
+#include "../Subprocess/AESubprocessSystem.h"
+
 #include <Atomic/Core/Context.h>
+#include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/IO/Log.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/UI/TBUI.h>
 #include <Atomic/UI/UI.h>
 
-#include <AtomicJS/Javascript/Javascript.h>
-#include <AtomicJS/Javascript/JSVM.h>
-#include <AtomicJS/Javascript/JSEvents.h>
-
+#include <ToolCore/ToolEnvironment.h>
 
 #include "AEPlayer.h"
 #include "AEEvents.h"
@@ -24,30 +24,8 @@
 #include "UIPlayer.h"
 #include "UI/Modal/UIModalOps.h"
 
-// TODO: Remove dependency
-#include <Duktape/duktape.h>
-
 namespace AtomicEditor
 {
-
-static int js_atomiceditor_SetView(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
-    AEPlayer* player = vm->GetSubsystem<AEPlayer>();
-
-    Scene* scene = js_to_class_instance<Scene>(ctx, 0, 0);
-    Camera* camera = js_to_class_instance<Camera>(ctx, 1, 0);
-
-    UIPlayer* uiPlayer = player->GetUIPlayer();
-    Viewport* viewport = uiPlayer->SetView(scene, camera);
-
-    IntVector2 size = uiPlayer->GetPlayerSize();
-    viewport->SetRect(IntRect(0, 0, size.x_, size.y_));
-
-    js_push_class_object_instance(ctx, viewport, "Viewport");
-
-    return 1;
-}
 
 
 AEPlayer::AEPlayer(Context* context) :
@@ -55,37 +33,15 @@ AEPlayer::AEPlayer(Context* context) :
     mode_(AE_PLAYERMODE_WIDGET)
 {
     SubscribeToEvent(E_EDITORSHUTDOWN, HANDLER(AEPlayer, HandleEditorShutdown));
+    SubscribeToEvent(E_IPCWORKERSTART, HANDLER(AEPlayer, HandleIPCWorkerStarted));
 
     assert(!context->GetSubsystem<AEPlayer>());
     context->RegisterSubsystem(this);
-
-    Javascript* javascript = context->GetSubsystem<Javascript>();
-    vm_ = javascript->InstantiateVM("AEPlayerVM");
-
-    // only subscribe to errors on our VM
-    SubscribeToEvent(vm_, E_JSERROR, HANDLER(AEPlayer, HandleJSError));
-
-    vm_->InitJSContext();
-
-    if (errors_.Size())
-        return;
-
-    vm_->SetModuleSearchPath("Modules");
-
-    duk_eval_string_noresult(vm_->GetJSContext(), "require(\"AtomicGame\"); require (\"AtomicEditor\");");
 
 }
 
 AEPlayer::~AEPlayer()
 {
-    UnsubscribeFromEvent(E_JSERROR);
-    Javascript* javascript = context_->GetSubsystem<Javascript>();
-    // this can be NULL when exiting during play mode
-    if (javascript)
-        javascript->ShutdownVM("AEPlayerVM");
-    vm_ = NULL;
-
-    GetSubsystem<Input>()->SetTouchEmulation(false);
 
 }
 
@@ -94,60 +50,63 @@ void AEPlayer::Invalidate()
     UIModalOps* ops = GetSubsystem<UIModalOps>();
     ops->Hide();
     context_->RemoveSubsystem<AEPlayer>();
-    GetSubsystem<UI>()->GetRoot()->RemoveAllChildren();
-
-// BEGIN LICENSE MANAGEMENT
-    if (uiPlayer_.NotNull() && uiPlayer_->Show3DInfo())
-        ops->ShowInfoModule3D();
-// END LICENSE MANAGEMENT
-
 }
 
 void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 {
-    SendEvent(E_PLAYERERROR);
-
-    AEPlayerError err;
-
-    using namespace JSError;
-    err.name_ = eventData[P_ERRORNAME].GetString();
-    err.message_ = eventData[P_ERRORMESSAGE].GetString();
-    err.filename_ = eventData[P_ERRORFILENAME].GetString();
-    err.stack_ = eventData[P_ERRORSTACK].GetString();
-    err.lineNumber_ = eventData[P_ERRORLINENUMBER].GetInt();
-
-    errors_.Push(err);
 
 }
 
+void AEPlayer::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
+{
+    VariantMap weventData;
+    weventData[HelloFromBroker::P_HELLO] = "Hello";
+    weventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING] = 42;
+    broker_->PostMessage(E_IPCHELLOFROMBROKER, weventData);
+}
+
+void AEPlayer::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
+{
+    SendEvent(E_EDITORPLAYSTOP);
+}
+
+
 bool AEPlayer::Play(AEPlayerMode mode, const IntRect &rect)
 {
+    Editor* editor = GetSubsystem<Editor>();
+    ToolCore::ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
+    const String& editorBinary = env->GetEditorBinary();
 
-    if (errors_.Size())
-        return false;
+    Project* project = editor->GetProject();
 
-    mode_ = mode;
+    Vector<String> paths;
+    paths.Push(env->GetCoreDataDir());
+    paths.Push(env->GetPlayerDataDir());
+    paths.Push(project->GetResourcePath());
 
-    UIModalOps* ops = GetSubsystem<UIModalOps>();
+    String resourcePaths;
+    resourcePaths.Join(paths, "!");
 
-    ops->ShowPlayer();
+    Vector<String> vargs;
 
-    duk_context* ctx = vm_->GetJSContext();
+    String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
 
-    duk_get_global_string(ctx, "Atomic");
-    duk_get_prop_string(ctx, -1, "editor");
-    duk_push_c_function(ctx, js_atomiceditor_SetView, 2);
-    duk_put_prop_string(ctx, -2, "setView");
-    duk_pop_2(ctx);
+    vargs = args.Split(' ');
+    vargs.Insert(0, "--player");
 
-    bool ok = vm_->ExecuteMain();
+    String dump;
+    dump.Join(vargs, " ");
+    LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
 
-    if (!ok)
+    IPC* ipc = GetSubsystem<IPC>();
+    broker_ = ipc->SpawnWorker(editorBinary, vargs);
+
+    if (broker_)
     {
-        SendEvent(E_PLAYERERROR);
+        SubscribeToEvent(broker_, E_IPCWORKEREXIT, HANDLER(AEPlayer, HandleIPCWorkerExit));
     }
 
-    return ok;
+    return broker_.NotNull();
 }
 
 void AEPlayer::SetUIPlayer(UIPlayer* uiPlayer)

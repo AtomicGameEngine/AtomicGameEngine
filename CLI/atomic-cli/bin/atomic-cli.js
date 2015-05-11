@@ -131,6 +131,25 @@ program
 
   });
 
+
+  program
+    .command('build <platform>')
+    .option('--project <path>')
+    .description('builds the project for the specified platform')
+    .action(function(platform, options) {
+      if(options.project) {
+        process.chdir(options.project)
+      }
+      cli.build(platform)
+      .then(function () {
+      })
+      .catch(function (error) {
+          process.exit(1);
+      });
+
+    });
+
+
 program
   .command('edit [path_to_project]')
   .description('edits the project in the cwd or on at a specified path')
@@ -139,6 +158,19 @@ program
     var path = path_to_project || process.cwd();
     cli.atomiceditor(["-project", path], {output:true});
   });
+
+// http server
+program
+  .command('serve')
+  .option('-p, --port [8000]', 'The port to run the server on [8000]', '8000')
+  .description('start a http server on the specified port which serves the current folder')
+  .action(function(options) {
+    var args = {}
+    args.port = options.port;
+    var server = require("../lib/httpserver");
+    server.run(args)
+  });
+
 
   program.parse(process.argv);
 

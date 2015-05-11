@@ -11,6 +11,7 @@
 #include <Atomic/IO/Log.h>
 
 #include "JSAPI.h"
+#include "JSEvents.h"
 
 //#define JSVM_DEBUG
 
@@ -18,9 +19,14 @@ namespace Atomic
 {
 
 class JSFile;
+class JSUI;
+class JSMetrics;
 
 class ATOMIC_API JSVM : public Object
 {
+
+    friend class JSMetrics;
+
     OBJECT(JSVM);
 
 public:
@@ -35,8 +41,8 @@ public:
 
     // Resources/Scripts/*.js
     bool ExecuteScript(const String& scriptPath);
-    // Resources/Script/main.js
 
+    // Resources/Script/main.js
     // Catches not requiring AtomicGame, etc
     bool ExecuteMain();
 
@@ -48,6 +54,9 @@ public:
     }
 
     inline duk_context* GetJSContext() { return ctx_; }
+
+    void GC();
+    JSMetrics* GetMetrics() { return metrics_; }
 
     void DumpJavascriptObjects() {}
 
@@ -81,10 +90,22 @@ public:
             removedHeapPtr_.Erase(itr);
 #endif
 
+        if (object->IsObject())
+        {
+            objectAddedData_[ObjectAdded::P_OBJECT] = object;
+            SendEvent(E_JSOBJECTADDED, objectAddedData_);
+        }
+
     }
 
     inline void RemoveObject(RefCounted* object)
     {
+        if (object->IsObject())
+        {
+            objectRemovedData_[ObjectRemoved::P_OBJECT] = object;
+            SendEvent(E_JSOBJECTREMOVED, objectRemovedData_);
+        }
+
         void* heapptr = object->JSGetHeapPtr();
         assert(heapptr);
         object->JSSetHeapPtr(NULL);
@@ -148,14 +169,19 @@ private:
 
 #endif
 
-    List<Object*> jsObjects_;
-
     float gcTime_;
 
     String moduleSearchPath_;
     String lastModuleSearchFilename_;
 
     String errorString_;
+
+    SharedPtr<JSUI> ui_;
+
+    VariantMap objectAddedData_;
+    VariantMap objectRemovedData_;
+
+    SharedPtr<JSMetrics> metrics_;
 
     static JSVM* instance_;
 

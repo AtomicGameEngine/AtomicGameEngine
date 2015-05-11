@@ -11,7 +11,7 @@
 #include <TurboBadger/tb_editfield.h>
 
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "../Resources/AEResourceOps.h"
 #include "../AEPreferences.h"
@@ -33,7 +33,7 @@ namespace AtomicEditor
 UIActivationSuccess::UIActivationSuccess(Context* context):
     UIModalOpWindow(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Product Activation Successful");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/activationsuccess.tb.txt");
 

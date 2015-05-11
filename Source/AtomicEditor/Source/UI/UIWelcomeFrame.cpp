@@ -19,7 +19,7 @@ using namespace rapidjson;
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/Log.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "License/AELicenseSystem.h"
 
@@ -50,7 +50,7 @@ WelcomeFrame::WelcomeFrame(Context* context) :
     exampleInfoDir_ = exampleSourceDir_ + "ExampleInfo";
     exampleSourceDir_ += "Examples";
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/welcomeframe.tb.txt");
 
     delegate_->SetGravity(WIDGET_GRAVITY_ALL);

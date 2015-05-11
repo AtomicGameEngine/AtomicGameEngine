@@ -38,7 +38,7 @@
 
 #include <Atomic/DebugNew.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 DEFINE_APPLICATION_MAIN(AtomicPlayer);
 
@@ -66,8 +66,8 @@ void AtomicPlayer::Setup()
 #elif ATOMIC_PLATFORM_WEB
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";
-    engineParameters_["WindowWidth"] = 1280;
-    engineParameters_["WindowHeight"] = 720;
+    // engineParameters_["WindowWidth"] = 1280;
+    // engineParameters_["WindowHeight"] = 720;
 #elif ATOMIC_PLATFORM_IOS
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";
@@ -86,6 +86,24 @@ void AtomicPlayer::Setup()
 #elif ATOMIC_PLATFORM_OSX
     engineParameters_["ResourcePrefixPath"] = "../Resources";
 #endif
+
+    const Vector<String>& arguments = GetArguments();
+
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1)
+        {
+            String argument = arguments[i].ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "--editor-resource-paths" && value.Length())
+            {
+                engineParameters_["ResourcePrefixPath"] = "";
+                value.Replace("!", ";");
+                engineParameters_["ResourcePaths"] = value;
+            }
+        }
+    }
 
     // Use the script file name as the base name for the log file
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";

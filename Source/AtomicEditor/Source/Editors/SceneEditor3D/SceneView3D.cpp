@@ -28,9 +28,7 @@
 
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
-
 #include <Atomic/UI/UI.h>
-#include <Atomic/UI/TBUI.h>
 
 namespace AtomicEditor
 {
@@ -121,8 +119,7 @@ void SceneView3D::Disable()
 
 void SceneView3D::MoveCamera(float timeStep)
 {
-    // Do not move if the UI has a focused element (the console)
-    if (GetSubsystem<UI>()->GetFocusElement() || !enabled_)
+    if (!enabled_)
         return;
 
     Input* input = GetSubsystem<Input>();
@@ -178,9 +175,8 @@ Ray SceneView3D::GetCameraRay()
 {
     Ray camRay;
 
-    UI* ui = GetSubsystem<UI>();
-
-    IntVector2 cpos = ui->GetCursorPosition();
+    Input* input = GetSubsystem<Input>();
+    IntVector2 cpos = input->GetMousePosition();
 
     TBRect rect = GetWidgetDelegate()->GetRect();
 
@@ -216,8 +212,8 @@ void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
 
 bool SceneView3D::MouseInView()
 {
-    UI* ui = GetSubsystem<UI>();
-    IntVector2 pos = ui->GetCursorPosition();
+    Input* input = GetSubsystem<Input>();
+    IntVector2 pos = input->GetMousePosition();
 
     TBRect rect = GetWidgetDelegate()->GetRect();
     GetWidgetDelegate()->ConvertToRoot(rect.x, rect.y);

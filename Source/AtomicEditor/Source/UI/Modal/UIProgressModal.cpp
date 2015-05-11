@@ -15,7 +15,7 @@
 #include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
 
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 using namespace tb;
 
@@ -28,11 +28,11 @@ ProgressModal::ProgressModal(Context* context, const String &title, const String
     , window_(0)
     , dimmer_(0)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     dimmer_ = new TBDimmer();
 
     window_ = new TBWindow();
-    window_->DisableCloseButton();
+    window_->SetSettings(WINDOW_SETTINGS_DEFAULT & ~WINDOW_SETTINGS_CLOSE_BUTTON);
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/progressmodal.tb.txt");
 
     window_->ResizeToFitContent();
@@ -61,7 +61,7 @@ void ProgressModal::SetMessage(const String& message)
 
 void ProgressModal::Center()
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBRect rect = window_->GetRect();
     TBWidget* root = tbui->GetRootWidget();
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
@@ -73,7 +73,7 @@ void ProgressModal::Center()
 void ProgressModal::Show()
 {
     assert(!dimmer_->GetParent());
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     TBWidget* root = tbui->GetRootWidget();
     root->AddChild(dimmer_);
     root->AddChild(delegate_);
@@ -83,7 +83,7 @@ void ProgressModal::Show()
 void ProgressModal::Hide()
 {
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->GetRootWidget()->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
 
     if (dimmer_->GetParent())

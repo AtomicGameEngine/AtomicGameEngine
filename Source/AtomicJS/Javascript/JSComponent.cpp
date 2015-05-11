@@ -20,7 +20,6 @@
 #include <Atomic/Atomic2D/PhysicsWorld2D.h>
 #include <Atomic/Atomic2D/RigidBody2D.h>
 #include <Atomic/UI/UIEvents.h>
-#include <Atomic/UI/UIElement.h>
 
 #include "Javascript.h"
 #include "JSEvents.h"
@@ -75,15 +74,17 @@ void JSComponent::OnNodeSet(Node *node)
         assert(node->JSGetHeapPtr());
 
         duk_context* ctx = vm_->GetJSContext();
+        int top = duk_get_top(ctx);
         duk_push_global_stash(ctx);
         duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
         // can't use instance as key, as this coerces to [Object] for
         // string property, pointer will be string representation of
         // address, so, unique key
-        duk_push_pointer(ctx, node->JSGetHeapPtr());
+        duk_push_pointer(ctx, (void*) node);
         js_push_class_object_instance(ctx, node);
         duk_put_prop(ctx, -3);
         duk_pop_2(ctx);
+        assert(duk_get_top(ctx) == top);
     }
 }
 
@@ -138,6 +139,8 @@ bool JSComponent::CreateObject(JSFile* scriptFile, const String& className)
 
 void JSComponent::SetClassName(const String& className)
 {
+    assert(className.Length());
+
     if (className == className_ && scriptObject_)
         return;
 
@@ -419,25 +422,7 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
         duk_context* ctx = vm_->GetJSContext();
         JS_HEAP_PTR function = scriptEventFunctions_[eventType];
 
-        if (eventType == E_UIMOUSECLICK)
-        {
-            UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());
-            if (clicked)
-            {
-                duk_push_heapptr(ctx, function);
-                js_push_class_object_instance(ctx, clicked);
-
-                if (duk_pcall(ctx, 1) != 0)
-                {
-                    vm_->SendJSErrorEvent();
-                }
-
-                duk_pop(ctx);
-
-            }
-
-        }
-        else if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
+        if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
         {
             using namespace PhysicsBeginContact2D;
             PhysicsWorld2D* world = static_cast<PhysicsWorld2D*>(eventData[P_WORLD].GetPtr());

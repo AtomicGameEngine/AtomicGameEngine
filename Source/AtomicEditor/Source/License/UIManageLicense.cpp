@@ -12,7 +12,7 @@
 #include <TurboBadger/tb_message_window.h>
 
 #include <Atomic/Core/Context.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "Resources/AEResourceOps.h"
 #include "AEPreferences.h"
@@ -37,7 +37,7 @@ UIManageLicense::UIManageLicense(Context* context):
     Editor* editor = GetSubsystem<Editor>();
     Project* project = editor->GetProject();
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     window_->SetText("Manage License");
     tbui->LoadResourceFile(window_->GetContentRoot(), "AtomicEditor/editor/ui/managelicense.tb.txt");
 

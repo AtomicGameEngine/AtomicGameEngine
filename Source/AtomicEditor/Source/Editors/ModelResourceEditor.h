@@ -14,7 +14,6 @@ namespace Atomic
 {
 class Scene;
 class Node;
-class View3D;
 class Camera;
 }
 
@@ -43,7 +42,7 @@ private:
 
     SharedPtr<Scene> scene_;
     SharedPtr<Node> cameraNode_;
-    SharedPtr<View3D> view3D_;
+    //SharedPtr<View3D> view3D_;
     SharedPtr<Camera> camera_;
     float yaw_;
     float pitch_;

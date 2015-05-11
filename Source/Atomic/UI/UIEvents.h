@@ -27,6 +27,44 @@
 namespace Atomic
 {
 
+EVENT(E_WIDGETEVENT, WidgetEvent)
+{
+    PARAM(P_HANDLER, Handler);           // UIWidget pointer of widget's OnEvent we are in
+    PARAM(P_TARGET, Target);             // UIWidget pointer
+    PARAM(P_TYPE, Type);                 // EVENT_TYPE enum
+    PARAM(P_X, X);                       // int
+    PARAM(P_Y, Y);                       // int
+    PARAM(P_DELTAX, DeltaX);             // int
+    PARAM(P_DELTAY, DeltaY);             // int
+    PARAM(P_COUNT, Count);               // int
+    PARAM(P_KEY, Key);                   // int
+    PARAM(P_SPECIALKEY, SpecialKey);     // enum SPECIAL_KEY
+    PARAM(P_MODIFIERKEYS, ModifierKeys); // enum MODIFIER_KEYS
+    PARAM(P_REFID, RefID);                     // unsigned (TBID)
+    PARAM(P_TOUCH, Touch);               // bool
+
+    // EventHandled can be set by event receivers to stop event bubble
+    PARAM(P_HANDLED, Handled);               // [OUT] -> bool
+
+}
+
+EVENT(E_WIDGETLOADED, WidgetLoaded)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+}
+
+EVENT(E_WIDGETDELETED, WidgetDeleted)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+}
+
+EVENT(E_POPUPMENUSELECT, PopupMenuSelect)
+{
+    PARAM(P_BUTTON, Button);             // UIButton that created popup
+    PARAM(P_REFID, RefID);             // unsigned tbid
+}
+
+
 /// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {

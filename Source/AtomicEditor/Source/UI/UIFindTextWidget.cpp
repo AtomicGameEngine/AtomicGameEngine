@@ -6,7 +6,7 @@
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include <TurboBadger/tb_editfield.h>
 
@@ -23,7 +23,7 @@ FindTextWidget::FindTextWidget(Context* context) :
 {
     context_->RegisterSubsystem(this);
 
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/findtextwidget.tb.txt");
     tbui->GetRootWidget()->AddChild(delegate_);
 

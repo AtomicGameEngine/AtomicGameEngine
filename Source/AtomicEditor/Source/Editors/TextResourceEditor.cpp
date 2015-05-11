@@ -4,7 +4,7 @@
 
 #include "AtomicEditor.h"
 #include <Atomic/Container/ArrayPtr.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>

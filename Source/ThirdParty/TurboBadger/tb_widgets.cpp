@@ -70,7 +70,8 @@ TBWidget::TBWidget()
 	, m_gravity(WIDGET_GRAVITY_DEFAULT)
 	, m_layout_params(nullptr)
 	, m_scroller(nullptr)
-	, m_long_click_timer(nullptr)
+    , m_long_click_timer(nullptr)
+    , m_delegate(nullptr)
 	, m_packed_init(0)
 {
 #ifdef TB_RUNTIME_DEBUG_INFO
@@ -90,6 +91,9 @@ TBWidget::~TBWidget()
 		captured_widget = nullptr;
 	if (this == focused_widget)
 		focused_widget = nullptr;
+
+    if (m_delegate)
+        m_delegate->OnDelete();
 
 	TBWidgetListener::InvokeWidgetDelete(this);
 	DeleteAllChildren();

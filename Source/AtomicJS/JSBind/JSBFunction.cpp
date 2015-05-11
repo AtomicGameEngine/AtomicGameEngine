@@ -370,7 +370,12 @@ void JSBFunction::WriteFunction(String& source)
         {
             JSBClassType* klassType = returnType_->type_->asClassType();
 
-            if (klassType->class_->isObject())
+            if (returnType_->isTemplate_)
+            {
+                returnDeclared = true;
+                source.AppendWithFormat("SharedPtr<%s> object = ", klassType->class_->GetClassName().CString());
+            }
+            else if (klassType->class_->isObject())
             {
                 returnDeclared = true;
                 source.Append("const Object* object = ");

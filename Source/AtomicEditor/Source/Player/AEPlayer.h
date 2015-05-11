@@ -5,6 +5,9 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/IPC/IPC.h>
+#include <Atomic/IPC/IPCEvents.h>
+#include <Atomic/IPC/IPCBroker.h>
 
 #include "../AETypes.h"
 
@@ -63,9 +66,13 @@ private:
     void HandleJSError(StringHash eventType, VariantMap& eventData);
     void HandleEditorShutdown(StringHash eventType, VariantMap& eventData);
 
-    SharedPtr<UIPlayer> uiPlayer_;
+    void HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData);
+    void HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData);
 
-    SharedPtr<JSVM> vm_;
+    SharedPtr<IPCBroker> broker_;
+
+
+    SharedPtr<UIPlayer> uiPlayer_;    
 
 };
 

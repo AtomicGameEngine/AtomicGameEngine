@@ -386,6 +386,9 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
 
     CurlRequest* request = (CurlRequest*) (eventData[CurlComplete::P_CURLREQUEST].GetPtr());
 
+    bool licenseError = false;
+    bool resetLicense = false;
+
     if (serverVerification_.NotNull())
     {
         assert(request == serverVerification_);
@@ -399,34 +402,29 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
             LicenseParse parse;
             int code = ParseResponse(serverVerification_->GetResponse(), parse);
 
-            // Not activated
             if (code == 4)
             {
-
+                // not activated
+                resetLicense = true;
+                licenseError = true;
             }
             else if (code == 2)
             {
                 // something is wrong with the key
-                LOGERRORF("Error with product key");
-
-                RemoveLicense();
-                ResetLicense();
-                /*
-                UIModalOps* ops = GetSubsystem<UIModalOps>();
-                ops->Hide();
-                ops->ShowActivation();
-                */
+                resetLicense = true;
+                licenseError = true;
 
             }
             else if (code == 3)
             {
                 // something is wrong on the activation server
-                key_ = "";
+                licenseError = true;
             }
             else if (code == 1)
             {
                 // exceeded code, should not happen here as we aren't activating
-                key_ = "";
+                resetLicense = true;
+                licenseError = true;
             }
             else if (code == 0)
             {
@@ -479,6 +477,18 @@ void LicenseSystem::HandleVerification(StringHash eventType, VariantMap& eventDa
 
         UnsubscribeFromEvents(serverVerification_);
         serverVerification_ = 0;
+    }
+
+    if (resetLicense)
+    {
+        RemoveLicense();
+        ResetLicense();
+    }
+
+    if (licenseError)
+    {
+        LOGINFO("There was an issue with the atomic-cli activation.  Please reactivate or contact sales@atomicgameengine.com if this problem persists");
+        SendEvent(E_LICENSE_ERROR);
     }
 
 }

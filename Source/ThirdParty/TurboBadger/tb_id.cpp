@@ -8,6 +8,8 @@
 
 namespace tb {
 
+TBIDRegisterStringCallback TBID::tbidRegisterCallback = nullptr;
+
 // == TBID ==============================================================================
 
 #ifdef TB_RUNTIME_DEBUG_INFO
@@ -67,6 +69,8 @@ void TBID::Set(const char *string)
 		{
 			is_adding = true;
 			all_id_hash.Add(id, new TBID(*this));
+            if (tbidRegisterCallback)
+                tbidRegisterCallback(id, string);
 			is_adding = false;
 		}
 	}

@@ -226,7 +226,7 @@ bool TBWindow::OnEvent(const TBWidgetEvent &ev)
 			Close();
 		return true;
 	}
-	return false;
+    return TBWidget::OnEvent(ev);
 }
 
 void TBWindow::OnAdded()

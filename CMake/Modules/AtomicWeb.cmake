@@ -1,5 +1,7 @@
 
 add_definitions(-DATOMIC_PLATFORM_WEB)
-add_definitions(-DATOMIC_OPENGL -Wno-warn-absolute-paths)
+add_definitions(-DATOMIC_OPENGL -Wno-warn-absolute-paths -DATOMIC_TBUI)
 
-list (APPEND ATOMIC_LINK_LIBRARIES)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -std=gnu++0x")
+
+set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES})

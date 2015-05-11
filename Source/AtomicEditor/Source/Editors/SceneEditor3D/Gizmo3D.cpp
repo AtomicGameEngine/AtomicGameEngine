@@ -11,7 +11,6 @@
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Resource/ResourceCache.h>
 
-#include <Atomic/UI/UI.h>
 #include <Atomic/Input/Input.h>
 
 #include "Gizmo3D.h"

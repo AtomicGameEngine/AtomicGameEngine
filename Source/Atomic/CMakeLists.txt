@@ -16,6 +16,10 @@ file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 
+if (NOT EMSCRIPTEN)
+  file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
+endif()
+
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
@@ -39,13 +43,13 @@ else()
 endif()
 
 if (ANDROID)
-  
+
 endif()
 
 if (APPLE)
-    if (NOT IOS)      
+    if (NOT IOS)
       set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
-    else()      
+    else()
     endif()
 endif()
 
@@ -54,8 +58,8 @@ if (EMSCRIPTEN)
 endif()
 
 set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SOURCE}
-                  ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE} 
-                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE}
+                  ${AUDIO_SOURCE} ${IO_SOURCE} ${MATH_SOURCE}
+                  ${RESOURCE_SOURCE} ${PHYSICS_SOURCE} ${IPC_SOURCE}
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
@@ -66,5 +70,23 @@ if (NOT EMSCRIPTEN)
   set (SOURCE_FILES ${SOURCE_FILES} ${NETWORK_SOURCE} ${NAVIGATION_SOURCE})
 endif()
 
-add_library(Atomic ${SOURCE_FILES})
+GroupSources("Atomic2D")
+GroupSources("Atomic3D")
+GroupSources("Audio")
+GroupSources("Container")
+GroupSources("Core")
+GroupSources("Engine")
+GroupSources("Environment")
+GroupSources("Graphics")
+GroupSources("Input")
+GroupSources("IO")
+GroupSources("IPC")
+GroupSources("Math")
+GroupSources("Navigation")
+GroupSources("Network")
+GroupSources("Physics")
+GroupSources("Resource")
+GroupSources("Scene")
+GroupSources("UI")
 
+add_library(Atomic ${SOURCE_FILES})

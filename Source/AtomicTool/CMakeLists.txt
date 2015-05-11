@@ -12,6 +12,13 @@ add_dependencies(AtomicTool AtomicEditor)
 
 if (MSVC)
     target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
+    
+    # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
+    # TODO: Remove this dependency
+    add_custom_command (TARGET AtomicTool POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicTool>/D3DCompiler_47.dll\")
+    
 else()
     target_link_libraries(AtomicTool curl)
 endif()

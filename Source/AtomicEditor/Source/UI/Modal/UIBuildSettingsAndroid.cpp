@@ -10,7 +10,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/MemoryBuffer.h>
-#include <Atomic/UI/TBUI.h>
+#include <Atomic/UI/UI.h>
 
 #include "AEEditor.h"
 #include "AEEvents.h"
@@ -28,7 +28,7 @@ namespace AtomicEditor
 UIBuildSettingsAndroid::UIBuildSettingsAndroid(Context* context) :
     AEWidget(context)
 {
-    TBUI* tbui = GetSubsystem<TBUI>();
+    UI* tbui = GetSubsystem<UI>();
     tbui->LoadResourceFile(delegate_, "AtomicEditor/editor/ui/buildsettings_android.tb.txt");
 
     appNameEdit_ = delegate_->GetWidgetByIDAndType<TBEditField>(TBIDC("app_name"));
