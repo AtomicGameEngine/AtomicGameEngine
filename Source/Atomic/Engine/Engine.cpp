@@ -58,9 +58,12 @@
 #ifdef ATOMIC_TBUI
 #include "../UI/UI.h"
 #endif
-
 #include "../Core/WorkQueue.h"
 #include "../Resource/XMLFile.h"
+
+#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+#include <emscripten.h>
+#endif
 
 #include "../DebugNew.h"
 
@@ -271,7 +274,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         else
             LOGDEBUGF("Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'", resourcePackages[i].CString());
     }
-    
+
     // Add auto load folders. Prioritize these (if exist) before the default folders
     for (unsigned i = 0; i < autoLoadPaths.Size(); ++i)
     {
@@ -327,7 +330,6 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "ExternalWindow"))
             graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
-        graphics->SetForceSM2(GetParameter(parameters, "ForceSM2", false).GetBool());
         graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Atomic").GetString());
         graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
         graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
@@ -335,6 +337,11 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "WindowPositionX") && HasParameter(parameters, "WindowPositionY"))
             graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(), GetParameter(parameters, "WindowPositionY").GetInt());
+
+        #ifdef URHO3D_OPENGL
+        if (HasParameter(parameters, "ForceGL2"))
+            graphics->SetForceGL2(GetParameter(parameters, "ForceGL2").GetBool());
+        #endif
 
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
@@ -378,7 +385,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         renderer->SetTextureQuality(GetParameter(parameters, "TextureQuality", QUALITY_HIGH).GetInt());
         renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, "TextureFilterMode", FILTER_TRILINEAR).GetInt());
         renderer->SetTextureAnisotropy(GetParameter(parameters, "TextureAnisotropy", 4).GetInt());
-        
+
         if (GetParameter(parameters, "Sound", true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
@@ -770,6 +777,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["FrameLimiter"] = false;
             else if (argument == "flushgpu")
                 ret["FlushGPU"] = true;
+            else if (argument == "gl2")
+                ret["ForceGL2"] = true;
             else if (argument == "landscape")
                 ret["Orientations"] = "LandscapeLeft LandscapeRight " + ret["Orientations"].GetString();
             else if (argument == "portrait")
@@ -795,8 +804,6 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LowQualityShadows"] = true;
             else if (argument == "nothreads")
                 ret["WorkerThreads"] = false;
-            else if (argument == "sm2")
-                ret["ForceSM2"] = true;
             else if (argument == "v")
                 ret["VSync"] = true;
             else if (argument == "t")
@@ -934,6 +941,9 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
+    #if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+    emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
+    #endif
 }
 
 }

@@ -23,6 +23,7 @@
 #include "Precompiled.h"
 #include "../IO/Log.h"
 #include "../Core/Profiler.h"
+#include "../Core/Thread.h"
 #include "../Resource/Resource.h"
 
 namespace Atomic
@@ -47,12 +48,13 @@ bool Resource::Load(Deserializer& source)
         profiler->BeginBlock(profileBlockName.CString());
 #endif
 
-    // Make sure any previous async state is cancelled
-    SetAsyncLoadState(ASYNC_DONE);
-
+    // If we are loading synchronously in a non-main thread, behave as if async loading (for example use
+    // GetTempResource() instead of GetResource() to load resource dependencies)
+    SetAsyncLoadState(Thread::IsMainThread() ? ASYNC_DONE : ASYNC_LOADING);
     bool success = BeginLoad(source);
     if (success)
         success &= EndLoad();
+    SetAsyncLoadState(ASYNC_DONE);
 
 #ifdef ATOMIC_PROFILING
     if (profiler)
