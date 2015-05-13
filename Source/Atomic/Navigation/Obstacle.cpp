@@ -31,7 +31,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* NAVIGATION_CATEGORY;

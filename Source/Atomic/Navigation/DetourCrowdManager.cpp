@@ -39,12 +39,12 @@
 #include "../Physics/PhysicsEvents.h"
 #endif
 
-#include <DetourCrowd/DetourCrowd.h>
-#include <Recast/Recast.h>
+#include <DetourCrowd/include/DetourCrowd.h>
+#include <Recast/include/Recast.h>
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
     
 extern const char* NAVIGATION_CATEGORY;

@@ -28,7 +28,7 @@
 #include "../Scene/Node.h"
 #include "../Container/Str.h"
 
-namespace Urho3D
+namespace Atomic
 {
     static const unsigned MAX_NAV_AREA_ID = 255;
     static const Vector3 DEFAULT_BOUNDING_BOX_MIN(-10.0f, -10.0f, -10.0f);

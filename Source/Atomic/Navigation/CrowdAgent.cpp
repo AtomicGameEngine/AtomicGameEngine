@@ -34,12 +34,12 @@
 #include "../Scene/Serializable.h"
 #include "../Core/Variant.h"
 
-#include <Detour/DetourCommon.h>
-#include <DetourCrowd/DetourCrowd.h>
+#include <Detour/include/DetourCommon.h>
+#include <DetourCrowd/include/DetourCrowd.h>
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* NAVIGATION_CATEGORY;
@@ -352,7 +352,7 @@ Vector3 CrowdAgent::GetActualVelocity() const
     return Vector3::ZERO;
 }
 
-Urho3D::CrowdAgentState CrowdAgent::GetAgentState() const
+Atomic::CrowdAgentState CrowdAgent::GetAgentState() const
 {
     if (crowdManager_ && inCrowd_)
     {
@@ -364,7 +364,7 @@ Urho3D::CrowdAgentState CrowdAgent::GetAgentState() const
     return CROWD_AGENT_INVALID;
 }
 
-Urho3D::CrowdTargetState CrowdAgent::GetTargetState() const
+Atomic::CrowdTargetState CrowdAgent::GetTargetState() const
 {
     if (crowdManager_ && inCrowd_)
     {

@@ -174,7 +174,7 @@ public:
     void AddLight(Light2D* light);
     Vector<WeakPtr<Light2D> >& GetLights() { return lights_; }
 
-    void SetDirty() { verticesDirty_ = true; }
+    void SetDirty() { /*verticesDirty_ = true;*/ }
 
     void SetAmbientColor(const Color& color);
     const Color& GetAmbientColor() { return ambientColor_; }
@@ -187,6 +187,12 @@ protected:
     void OnWorldBoundingBoxUpdate();
     void UpdateVertices();
     void OnNodeSet(Node* node);
+
+    /// Handle draw order changed.
+    virtual void OnDrawOrderChanged(){}
+    /// Update source batches.
+    virtual void UpdateSourceBatches(){}
+
 
 private:
 

@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
 #include "../IO/FileSystem.h"
@@ -1987,8 +1988,6 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     }
     else
         lastMousePosition_ = GetMousePosition();
-
-    }
 
     if (graphics_->GetFullscreen())
         focusedThisFrame_ = true;

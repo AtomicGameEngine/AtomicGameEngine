@@ -1,9 +1,7 @@
 #ifndef DETOURTILECACHE_H
 #define DETOURTILECACHE_H
 
-#include "DetourStatus.h"
-
-
+#include <Detour/include/DetourStatus.h>
 
 typedef unsigned int dtObstacleRef;
 

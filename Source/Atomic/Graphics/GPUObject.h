@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,10 @@
 
 #pragma once
 
-#ifdef ATOMIC_OPENGL
+#if defined(ATOMIC_OPENGL)
 #include "OpenGL/OGLGPUObject.h"
+#elif defined(ATOMIC_D3D11)
+#include "Direct3D11/D3D11GPUObject.h"
 #else
 #include "Direct3D9/D3D9GPUObject.h"
 #endif

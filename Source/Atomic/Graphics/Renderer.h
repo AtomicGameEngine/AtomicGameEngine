@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ class RenderSurface;
 class ResourceCache;
 class Skeleton;
 class OcclusionBuffer;
+class Texture;
 class Texture2D;
 class TextureCube;
 class View;
@@ -173,15 +174,15 @@ public:
     void SetTextureAnisotropy(int level);
     /// Set texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
-    /// Set texture quality level.
+    /// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
     void SetTextureQuality(int quality);
-    /// Set material quality level.
+    /// Set material quality level. See the QUALITY constants in GraphicsDefs.h.
     void SetMaterialQuality(int quality);
     /// Set shadows on/off.
     void SetDrawShadows(bool enable);
     /// Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// Set shadow quality (amount of samples and bit depth.)
+    /// Set shadow quality mode. See the SHADOWQUALITY constants in GraphicsDefs.h.
     void SetShadowQuality(int quality);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
@@ -191,8 +192,6 @@ public:
     void SetDynamicInstancing(bool enable);
     /// Set minimum number of instances required in a batch group to render as instanced.
     void SetMinInstances(int instances);
-    /// Set maximum number of triangles per object for instancing.
-    void SetMaxInstanceTriangles(int triangles);
     /// Set maximum number of sorted instances per batch group. If exceeded, instances are rendered unsorted.
     void SetMaxSortedInstances(int instances);
     /// Set maximum number of occluder trianges.
@@ -240,8 +239,6 @@ public:
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return minimum number of instances required in a batch group to render as instanced.
     int GetMinInstances() const { return minInstances_; }
-    /// Return maximum number of triangles per object for instancing.
-    int GetMaxInstanceTriangles() const { return maxInstanceTriangles_; }
     /// Return maximum number of sorted instances per batch group.
     int GetMaxSortedInstances() const { return maxSortedInstances_; }
     /// Return maximum number of occluder triangles.
@@ -303,7 +300,7 @@ public:
     /// Allocate a shadow map. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
-    Texture2D* GetScreenBuffer(int width, int height, unsigned format, bool filtered, bool srgb, unsigned persistentKey = 0);
+    Texture* GetScreenBuffer(int width, int height, unsigned format, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
     RenderSurface* GetDepthStencil(int width, int height);
     /// Allocate an occlusion buffer.
@@ -335,7 +332,7 @@ private:
     /// Reload shaders.
     void LoadShaders();
     /// Reload shaders for a material pass.
-    void LoadPassShaders(Technique* tech, StringHash passType);
+    void LoadPassShaders(Pass* pass);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.
@@ -360,8 +357,6 @@ private:
     void ResetBuffers();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle graphics features (re)check event. Event only sent by D3D9Graphics class.
-    void HandleGraphicsFeatures(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     
@@ -400,7 +395,7 @@ private:
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
     /// Screen buffers by resolution and format.
-    HashMap<long long, Vector<SharedPtr<Texture2D> > > screenBuffers_;
+    HashMap<long long, Vector<SharedPtr<Texture> > > screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
     HashMap<long long, unsigned> screenBufferAllocations_;
     /// Saved status of screen buffer allocations for restoring.
@@ -439,8 +434,6 @@ private:
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.
     int minInstances_;
-    /// Maximum triangles per object for instancing.
-    int maxInstanceTriangles_;
     /// Maximum sorted instances per batch group.
     int maxSortedInstances_;
     /// Maximum occluder triangles.

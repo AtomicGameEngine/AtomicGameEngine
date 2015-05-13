@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -246,7 +246,27 @@ void DebugRenderer::AddSphere(const Sphere& sphere, const Color& color, bool dep
     }
 }
 
+void DebugRenderer::AddCylinder(const Vector3& position, float radius, float height, const Color& color, bool depthTest)
+{
+    Sphere sphere(position, radius);
+    Vector3 heightVec(0, height, 0);
+    Vector3 offsetXVec(radius, 0, 0);
+    Vector3 offsetZVec(0, 0, radius);
+    for (unsigned i = 0; i < 360; i += 45)
+    {
+        Vector3 p1 = PointOnSphere(sphere, i, 90);
+        Vector3 p2 = PointOnSphere(sphere, i + 45, 90);
+        AddLine(p1, p2, color, depthTest);
+        AddLine(p1 + heightVec, p2 + heightVec, color, depthTest);
+    }
+    AddLine(position + offsetXVec, position + heightVec + offsetXVec, color, depthTest);
+    AddLine(position - offsetXVec, position + heightVec - offsetXVec, color, depthTest);
+    AddLine(position + offsetZVec, position + heightVec + offsetZVec, color, depthTest);
+    AddLine(position - offsetZVec, position + heightVec - offsetZVec, color, depthTest);
+}
+
 #ifdef ATOMIC_3D
+
 void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest)
 {
     const Vector<Bone>& bones = skeleton.GetBones();
@@ -330,7 +350,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
 
 void DebugRenderer::Render()
 {
-    if (lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty())
+    if (!HasContent())
         return;
 
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -413,7 +433,6 @@ void DebugRenderer::Render()
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);
     graphics->SetDepthWrite(true);
-    graphics->SetDrawAntialiased(true);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     graphics->SetShaders(vs, ps);
@@ -459,6 +478,11 @@ void DebugRenderer::Render()
 bool DebugRenderer::IsInside(const BoundingBox& box) const
 {
     return frustum_.IsInsideFast(box) == INSIDE;
+}
+
+bool DebugRenderer::HasContent() const
+{
+    return (lines_.Empty() && noDepthLines_.Empty() && triangles_.Empty() && noDepthTriangles_.Empty()) ? false : true;
 }
 
 void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)

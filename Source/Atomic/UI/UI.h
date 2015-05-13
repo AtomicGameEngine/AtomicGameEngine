@@ -33,7 +33,7 @@ public:
     void SetKeyboardDisabled(bool disabled) {keyboardDisabled_ = disabled; }
     void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 
-    void Render();
+    void Render(bool resetRenderTargets = true);
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 

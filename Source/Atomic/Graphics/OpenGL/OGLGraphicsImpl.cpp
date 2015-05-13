@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,12 @@ namespace Atomic
 GraphicsImpl::GraphicsImpl() :
     window_(0),
     context_(0),
-    systemFbo_(0),
+    systemFBO_(0),
     activeTexture_(0),
     enabledAttributes_(0),
-    boundFbo_(0),
+    boundFBO_(0),
+    boundVBO_(0),
+    boundUBO_(0),
     pixelFormat_(0),
     fboDirty_(false)
 {

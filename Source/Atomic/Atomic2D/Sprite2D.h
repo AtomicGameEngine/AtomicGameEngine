@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,6 +69,13 @@ public:
     const IntVector2& GetOffset() const { return offset_; }
     /// Return sprite sheet.
     SpriteSheet2D* GetSpriteSheet() const { return spriteSheet_; }
+
+    /// Return draw rectangle.
+    bool GetDrawRectangle(Rect& rect, bool flipX = false, bool flipY = false) const;
+    /// Return draw rectangle with custom hot spot.
+    bool GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX = false, bool flipY = false) const;
+    /// Return texture rectangle.
+    bool GetTextureRectangle(Rect& rect, bool flipX = false, bool flipY = false) const;
 
     /// Save sprite to ResourceRef.
     static ResourceRef SaveToResourceRef(Sprite2D* sprite);

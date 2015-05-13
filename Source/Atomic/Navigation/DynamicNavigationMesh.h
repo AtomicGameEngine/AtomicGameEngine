@@ -32,13 +32,13 @@ struct dtTileCacheLayer;
 struct dtTileCacheContourSet;
 struct dtTileCachePolyMesh;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class OffMeshConnection;
 class Obstacle;
 
-class URHO3D_API DynamicNavigationMesh : public NavigationMesh
+class ATOMIC_API DynamicNavigationMesh : public NavigationMesh
 {
     OBJECT(DynamicNavigationMesh)
     friend class Obstacle;

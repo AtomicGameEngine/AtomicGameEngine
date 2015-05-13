@@ -28,7 +28,7 @@ class dtCrowd;
 struct dtCrowdAgent;
 struct dtCrowdAgentDebugInfo;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class CrowdAgent;
@@ -50,7 +50,7 @@ enum NavigationPushiness
 
 
 /// Detour Crowd Simulation Scene Component. Should be added only to the root scene node. Agent's radius and height is set through the navigation mesh. \todo support multiple agent's radii and heights.
-class URHO3D_API DetourCrowdManager : public Component
+class ATOMIC_API DetourCrowdManager : public Component
 {
     OBJECT(DetourCrowdManager);
     friend class CrowdAgent;

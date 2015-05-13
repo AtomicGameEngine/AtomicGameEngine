@@ -24,7 +24,7 @@
 
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Complete rebuild of navigation mesh.

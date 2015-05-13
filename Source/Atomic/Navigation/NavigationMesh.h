@@ -68,6 +68,7 @@ struct NavigationGeometryInfo
 };
 
 /// Navigation mesh component. Collects the navigation geometry from child nodes with the Navigable component and responds to path queries.
+class ATOMIC_API NavigationMesh : public Component
 {
     OBJECT(NavigationMesh);
     friend class DetourCrowdManager;

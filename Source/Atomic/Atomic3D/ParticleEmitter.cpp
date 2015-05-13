@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -484,7 +484,7 @@ bool ParticleEmitter::EmitNewParticle()
     billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
     billboard.rotation_ = effect_->GetRandomRotation();
     const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
-    billboard.color_ = colorFrames_[0].color_;
+    billboard.color_ = colorFrames_.Size() ? colorFrames_[0].color_ : Color();
     billboard.enabled_ = true;
 
     return true;

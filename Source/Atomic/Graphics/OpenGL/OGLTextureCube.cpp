@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -441,10 +441,19 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
     
     if (!image->IsCompressed())
     {
+        // Convert unsuitable formats to RGBA
+        unsigned components = image->GetComponents();
+        if (Graphics::GetGL3Support() && ((components == 1 && !useAlpha) || components == 2))
+        {
+            image = image->ConvertToRGBA();
+            if (!image)
+                return false;
+            components = image->GetComponents();
+        }
+
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
-        unsigned components = image->GetComponents();
         unsigned format = 0;
         
         if (levelWidth != levelHeight)

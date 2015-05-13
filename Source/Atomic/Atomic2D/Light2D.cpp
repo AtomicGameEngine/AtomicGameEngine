@@ -452,7 +452,7 @@ void Light2DGroup::OnNodeSet(Node* node)
         if (renderer_.Null())
         {
             renderer_ = node->GetOrCreateComponent<Renderer2D>();
-            renderer_->SetUseTris(true);
+            //renderer_->SetUseTris(true);
         }
 
         if (light2DMaterial_.Null())
@@ -527,7 +527,7 @@ void Light2DGroup::HandleBeginViewUpdate(StringHash eventType, VariantMap& event
 
 void Light2DGroup::HandleBeginRendering(StringHash eventType, VariantMap& eventData)
 {
-    verticesDirty_ = true;
+    //verticesDirty_ = true;
 }
 
 void Light2DGroup::OnWorldBoundingBoxUpdate()
@@ -539,10 +539,10 @@ void Light2DGroup::OnWorldBoundingBoxUpdate()
 void Light2DGroup::UpdateVertices()
 {
     // This is the shadow map
-    if (!verticesDirty_)
-        return;
+    //if (!verticesDirty_)
+    //    return;
 
-    vertices_.Clear();
+    //vertices_.Clear();
 
     for (Vector<WeakPtr<Light2D> >::Iterator itr = lights_.Begin(); itr != lights_.End(); itr++)
     {
@@ -550,10 +550,10 @@ void Light2DGroup::UpdateVertices()
         if (!light->IsEnabled())
             continue;
         light->UpdateVertices();
-        light->AddVertices(vertices_);
+      //  light->AddVertices(vertices_);
     }
 
-    verticesDirty_ = false;
+    //verticesDirty_ = false;
 
 }
 
@@ -653,6 +653,7 @@ void Light2DGroup::CreateLight2DMaterial()
     light2DMaterial_ = new Material(context_);
     light2DMaterial_->SetName("Light2DMaterial");
 
+    /*
     Technique* tech = new Technique(context_);
     Pass* pass = tech->CreatePass(PASS_LIGHT2D);
     pass->SetBlendMode(BLEND_ADDALPHA);
@@ -667,6 +668,7 @@ void Light2DGroup::CreateLight2DMaterial()
     light2DMaterial_->SetCullMode(CULL_NONE);
 
     SetCustomMaterial(light2DMaterial_);
+    */
 
 }
 

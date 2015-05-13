@@ -38,20 +38,20 @@
 
 #include <LZ4/lz4.h>
 #include <cfloat>
-#include <Detour/DetourNavMesh.h>
-#include <Detour/DetourNavMeshBuilder.h>
-#include <Detour/DetourNavMeshQuery.h>
-#include <DetourTileCache/DetourTileCache.h>
-#include <DetourTileCache/DetourTileCacheBuilder.h>
-#include <Recast/Recast.h>
-#include <Recast/RecastAlloc.h>
+#include <Detour/include/DetourNavMesh.h>
+#include <Detour/include/DetourNavMeshBuilder.h>
+#include <Detour/include/DetourNavMeshQuery.h>
+#include <DetourTileCache/include/DetourTileCache.h>
+#include <DetourTileCache/include/DetourTileCacheBuilder.h>
+#include <Recast/include/Recast.h>
+#include <Recast/include/RecastAlloc.h>
 
 //DebugNew is deliberately not used because the macro 'free' conflicts DetourTileCache's LinearAllocator interface
 //#include "../DebugNew.h"
 
 #define TILECACHE_MAXLAYERS 128
 
-namespace Urho3D
+namespace Atomic
 {
     
 extern const char* NAVIGATION_CATEGORY;

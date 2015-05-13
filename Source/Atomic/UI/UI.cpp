@@ -183,8 +183,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetColorWrite(true);
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(false);
-    graphics_->SetDrawAntialiased(false);
+    graphics_->SetDepthWrite(false);    
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
 
@@ -229,7 +228,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
         }
 
         graphics_->SetShaders(vs, ps);
-        if (graphics_->NeedParameterUpdate(SP_OBJECTTRANSFORM, this))
+        if (graphics_->NeedParameterUpdate(SP_OBJECT, this))
             graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
         if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
@@ -259,7 +258,7 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
 }
 
 
-void UI::Render()
+void UI::Render(bool resetRenderTargets)
 {
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());

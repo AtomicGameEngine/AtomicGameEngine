@@ -22,8 +22,8 @@
 
 #pragma once
 
-#if defined(URHO3D_OPENGL)
+#if defined(ATOMIC_OPENGL)
 #include "OpenGL/OGLConstantBuffer.h"
-#elif defined(URHO3D_D3D11)
+#elif defined(ATOMIC_D3D11)
 #include "Direct3D11/D3D11ConstantBuffer.h"
 #endif

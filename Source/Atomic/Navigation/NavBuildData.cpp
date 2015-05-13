@@ -22,14 +22,14 @@
 
 #include "../Navigation/NavBuildData.h"
 
-#include <Recast/Recast.h>
-#include <Detour/DetourNavMesh.h>
-#include <Detour/DetourNavMeshBuilder.h>
-#include <Detour/DetourNavMeshQuery.h>
-#include <DetourTileCache/DetourTileCache.h>
-#include <DetourTileCache/DetourTileCacheBuilder.h>
+#include <Recast/include/Recast.h>
+#include <Detour/include/DetourNavMesh.h>
+#include <Detour/include/DetourNavMeshBuilder.h>
+#include <Detour/include/DetourNavMeshQuery.h>
+#include <DetourTileCache/include/DetourTileCache.h>
+#include <DetourTileCache/include/DetourTileCacheBuilder.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 NavBuildData::NavBuildData() :

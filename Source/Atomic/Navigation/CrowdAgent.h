@@ -25,7 +25,7 @@
 #include "../Scene/Component.h"
 #include "../Navigation/DetourCrowdManager.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 enum CrowdTargetState
@@ -48,7 +48,7 @@ enum CrowdAgentState
 };
 
 /// DetourCrowd Agent, requires a DetourCrowdManager in the scene. Agent's radius and height is set through the navigation mesh.
-class URHO3D_API CrowdAgent : public Component
+class ATOMIC_API CrowdAgent : public Component
 {
     OBJECT(CrowdAgent);
     friend class DetourCrowdManager;
