@@ -13,6 +13,9 @@
 #endif
 varying vec3 vNormal;
 varying vec4 vWorldPos;
+#ifdef VERTEXCOLOR
+    varying vec4 vColor;
+#endif
 #ifdef PERPIXEL
     #ifdef SHADOW
         varying vec4 vShadowPos[NUMCASCADES];
@@ -42,6 +45,10 @@ void VS()
     vNormal = GetWorldNormal(modelMatrix);
     vWorldPos = vec4(worldPos, GetDepth(gl_Position));
 
+    #ifdef VERTEXCOLOR
+        vColor = iColor;
+    #endif
+
     #ifdef NORMALMAP
         vec3 tangent = GetWorldTangent(modelMatrix);
         vec3 bitangent = cross(tangent, vNormal) * iTangent.w;
@@ -63,11 +70,11 @@ void VS()
 
         #ifdef SPOTLIGHT
             // Spotlight projection: transform from world space to projector texture coordinates
-            vSpotPos = cLightMatrices[0] * projWorldPos;
+            vSpotPos =  projWorldPos * cLightMatrices[0];
         #endif
     
         #ifdef POINTLIGHT
-            vCubeMaskVec = mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz) * (worldPos - cLightPos.xyz);
+            vCubeMaskVec = (worldPos - cLightPos.xyz) * mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz);
         #endif
     #else
         // Ambient & per-vertex lighting
@@ -75,7 +82,7 @@ void VS()
             // If using lightmap, disregard zone ambient light
             // If using AO, calculate ambient in the PS
             vVertexLight = vec3(0.0, 0.0, 0.0);
-            vTexCoord2 = GetLightMapTexCoord(iTexCoord2);
+            vTexCoord2 = iTexCoord2;
         #else
             vVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif
@@ -105,6 +112,10 @@ void PS()
         vec4 diffColor = cMatDiffColor * diffInput;
     #else
         vec4 diffColor = cMatDiffColor;
+    #endif
+
+    #ifdef VERTEXCOLOR
+        diffColor *= vColor;
     #endif
     
     // Get material specular albedo
@@ -217,9 +228,7 @@ void PS()
             finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;
         #endif
         #ifdef LIGHTMAP
-            // Lightmap with HDR encoded in alpha
-            vec4 lightMapColor = texture2D(sEmissiveMap, vTexCoord2);
-            finalColor += lightMapColor.rgb * lightMapColor.a * 8.0 * diffColor.rgb;
+            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * diffColor.rgb;
         #endif
         #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * texture2D(sEmissiveMap, vTexCoord.xy).rgb;
