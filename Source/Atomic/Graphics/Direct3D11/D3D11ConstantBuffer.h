@@ -27,11 +27,11 @@
 #include "../../Container/ArrayPtr.h"
 #include "../../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Hardware constant buffer.
-class URHO3D_API ConstantBuffer : public Object, public GPUObject
+class ATOMIC_API ConstantBuffer : public Object, public GPUObject
 {
     OBJECT(ConstantBuffer);
     

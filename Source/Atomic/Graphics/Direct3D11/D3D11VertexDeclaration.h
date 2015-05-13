@@ -26,7 +26,7 @@
 #include "../../Container/RefCounted.h"
 #include "../../Container/Vector.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Graphics;
@@ -34,7 +34,7 @@ class ShaderVariation;
 class VertexBuffer;
 
 /// Vertex declaration.
-class URHO3D_API VertexDeclaration : public RefCounted
+class ATOMIC_API VertexDeclaration : public RefCounted
 {
 public:
     /// Construct with vertex buffers and element masks to base declaration on.

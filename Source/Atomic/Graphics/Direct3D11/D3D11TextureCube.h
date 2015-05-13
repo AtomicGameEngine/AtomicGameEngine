@@ -26,14 +26,14 @@
 #include "../../Container/Ptr.h"
 #include "../../Graphics/Texture.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Deserializer;
 class Image;
 
 /// Cube texture resource.
-class URHO3D_API TextureCube : public Texture
+class ATOMIC_API TextureCube : public Texture
 {
     OBJECT(TextureCube);
     

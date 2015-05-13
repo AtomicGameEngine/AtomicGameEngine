@@ -29,7 +29,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers, unsigned* elementMasks) :

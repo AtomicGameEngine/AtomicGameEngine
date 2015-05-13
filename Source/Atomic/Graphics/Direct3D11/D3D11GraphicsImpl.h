@@ -27,13 +27,13 @@
 
 #include <d3d11.h>
 #include <dxgi.h>
-#include <SDL/SDL.h>
+#include <SDL/include/SDL.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Graphics implementation. Holds API-specific objects.
-class URHO3D_API GraphicsImpl
+class ATOMIC_API GraphicsImpl
 {
     friend class Graphics;
     

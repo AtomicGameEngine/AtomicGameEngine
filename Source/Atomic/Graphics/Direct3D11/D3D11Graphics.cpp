@@ -20,15 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "../../Graphics/AnimatedModel.h"
-#include "../../Graphics/Animation.h"
-#include "../../Graphics/AnimationController.h"
 #include "../../Graphics/Camera.h"
 #include "../../Graphics/ConstantBuffer.h"
 #include "../../Core/Context.h"
-#include "../../Graphics/CustomGeometry.h"
 #include "../../Graphics/DebugRenderer.h"
-#include "../../Graphics/DecalSet.h"
 #include "../../IO/File.h"
 #include "../../Graphics/Geometry.h"
 #include "../../Graphics/Graphics.h"
@@ -38,8 +33,6 @@
 #include "../../IO/Log.h"
 #include "../../Graphics/Material.h"
 #include "../../Graphics/Octree.h"
-#include "../../Graphics/ParticleEffect.h"
-#include "../../Graphics/ParticleEmitter.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
 #include "../../Graphics/Renderer.h"
@@ -48,11 +41,7 @@
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
-#include "../../Graphics/Skybox.h"
-#include "../../Graphics/StaticModelGroup.h"
 #include "../../Graphics/Technique.h"
-#include "../../Graphics/Terrain.h"
-#include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
@@ -61,7 +50,7 @@
 #include "../../Graphics/VertexDeclaration.h"
 #include "../../Graphics/Zone.h"
 
-#include <SDL/SDL_syswm.h>
+#include <SDL/include/SDL_syswm.h>
 
 #include "../../DebugNew.h"
 
@@ -74,7 +63,7 @@ extern "C" {
     __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const D3D11_COMPARISON_FUNC d3dCmpFunc[] =
@@ -376,6 +365,39 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
+void Graphics::SetWindowSize(int width, int height)
+{
+    if (impl_->window_)
+    {
+        SDL_SetWindowSize(impl_->window_, width, height);
+        WindowResized();
+    }
+}
+
+void Graphics::CenterWindow()
+{
+    if (impl_->window_)
+    {
+        SDL_DisplayMode mode;
+        SDL_GetDesktopDisplayMode(0, &mode);
+
+        int width, height;
+        SDL_GetWindowSize(impl_->window_, &width, &height);
+
+        int x = mode.w / 2 - width / 2;
+        int y = mode.h / 2 - height / 2;
+
+        SetWindowPosition(x, y);
+
+    }
+}
+
+void Graphics::RaiseWindow()
+{
+    if (impl_->window_)
+        SDL_RaiseWindow(impl_->window_);
+}
+
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
@@ -554,7 +576,7 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot(Image* destImage)
 {
     PROFILE(TakeScreenShot);
 
@@ -612,8 +634,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
     mappedData.pData = 0;
     impl_->deviceContext_->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
 
-    destImage.SetSize(width_, height_, 3);
-    unsigned char* destData = destImage.GetData();
+    destImage->SetSize(width_, height_, 3);
+    unsigned char* destData = destImage->GetData();
     if (mappedData.pData)
     {
         for (int y = 0; y < height_; ++y)
@@ -2697,10 +2719,8 @@ void Graphics::SetTextureUnitMappings()
 }
 
 void RegisterGraphicsLibrary(Context* context)
-{
-    Animation::RegisterObject(context);
+{ 
     Material::RegisterObject(context);
-    Model::RegisterObject(context);
     Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
@@ -2709,18 +2729,6 @@ void RegisterGraphicsLibrary(Context* context)
     Camera::RegisterObject(context);
     Drawable::RegisterObject(context);
     Light::RegisterObject(context);
-    StaticModel::RegisterObject(context);
-    StaticModelGroup::RegisterObject(context);
-    Skybox::RegisterObject(context);
-    AnimatedModel::RegisterObject(context);
-    AnimationController::RegisterObject(context);
-    BillboardSet::RegisterObject(context);
-    ParticleEffect::RegisterObject(context);
-    ParticleEmitter::RegisterObject(context);
-    CustomGeometry::RegisterObject(context);
-    DecalSet::RegisterObject(context);
-    Terrain::RegisterObject(context);
-    TerrainPatch::RegisterObject(context);
     DebugRenderer::RegisterObject(context);
     Octree::RegisterObject(context);
     Zone::RegisterObject(context);

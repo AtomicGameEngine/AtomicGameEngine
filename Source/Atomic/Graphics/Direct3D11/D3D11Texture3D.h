@@ -26,13 +26,13 @@
 #include "../../Container/Ptr.h"
 #include "../../Graphics/Texture.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Image;
 
 /// 3D texture resource.
-class URHO3D_API Texture3D : public Texture
+class ATOMIC_API Texture3D : public Texture
 {
     OBJECT(Texture3D);
     

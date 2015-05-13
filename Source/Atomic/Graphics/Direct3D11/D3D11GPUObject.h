@@ -24,13 +24,13 @@
 
 #include "../../Container/Ptr.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Graphics;
 
 /// Base class for GPU resources.
-class URHO3D_API GPUObject
+class ATOMIC_API GPUObject
 {
 public:
     /// Construct with graphics subsystem pointer.

@@ -27,11 +27,11 @@
 #include "../../Graphics/GraphicsDefs.h"
 #include "../../Container/ArrayPtr.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Hardware index buffer.
-class URHO3D_API IndexBuffer : public Object, public GPUObject
+class ATOMIC_API IndexBuffer : public Object, public GPUObject
 {
     OBJECT(IndexBuffer);
     

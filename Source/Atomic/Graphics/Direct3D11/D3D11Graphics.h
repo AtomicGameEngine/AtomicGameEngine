@@ -33,7 +33,7 @@
 #include "../../Graphics/GraphicsDefs.h"
 #include "../../Graphics/ShaderVariation.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ConstantBuffer;
@@ -77,7 +77,7 @@ struct ScratchBuffer
 typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
-class URHO3D_API Graphics : public Object
+class ATOMIC_API Graphics : public Object
 {
     OBJECT(Graphics);
     
@@ -97,6 +97,12 @@ public:
     void SetWindowPosition(const IntVector2& position);
     /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
+    /// Set window size.
+    void SetWindowSize(int width, int height);
+    /// Center window.
+    void CenterWindow();
+    /// Bring the window to front with focus
+    void RaiseWindow();
     /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
     /// Set screen resolution only. Return true if successful.
@@ -112,7 +118,7 @@ public:
     /// Close the window.
     void Close();
     /// Take a screenshot. Return true if successful.
-    bool TakeScreenShot(Image& destImage);
+    bool TakeScreenShot(Image* destImage);
     /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
     /// End frame rendering and swap buffers.
@@ -633,6 +639,6 @@ private:
 };
 
 /// Register Graphics library objects.
-void URHO3D_API RegisterGraphicsLibrary(Context* context);
+void ATOMIC_API RegisterGraphicsLibrary(Context* context);
 
 }

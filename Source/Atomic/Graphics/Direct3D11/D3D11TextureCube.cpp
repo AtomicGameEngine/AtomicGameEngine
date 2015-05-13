@@ -38,7 +38,7 @@
 #pragma warning(disable:4355)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const char* cubeMapLayoutNames[] = {

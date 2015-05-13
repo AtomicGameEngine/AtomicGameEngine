@@ -25,13 +25,13 @@
 #include "../../Graphics/GraphicsDefs.h"
 #include "../../Graphics/Viewport.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Texture;
 
 /// %Color or depth-stencil surface that can be rendered into.
-class URHO3D_API RenderSurface : public RefCounted
+class ATOMIC_API RenderSurface : public RefCounted
 {
     friend class Texture2D;
     friend class TextureCube;

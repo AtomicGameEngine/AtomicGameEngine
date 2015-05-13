@@ -34,7 +34,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Texture2D::Texture2D(Context* context) :

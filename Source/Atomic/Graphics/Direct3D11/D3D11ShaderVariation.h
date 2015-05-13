@@ -28,7 +28,7 @@
 #include "../../Container/RefCounted.h"
 #include "../../Container/ArrayPtr.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ConstantBuffer;
@@ -73,7 +73,7 @@ struct ShaderParameter
 };
 
 /// Vertex or pixel shader on the GPU.
-class URHO3D_API ShaderVariation : public RefCounted, public GPUObject
+class ATOMIC_API ShaderVariation : public RefCounted, public GPUObject
 {
 public:
     /// Construct.
