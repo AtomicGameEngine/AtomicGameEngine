@@ -25,7 +25,7 @@
 #include "../../Container/HashMap.h"
 #include "../../Graphics/ShaderVariation.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Combined information for specific vertex and pixel shaders.
