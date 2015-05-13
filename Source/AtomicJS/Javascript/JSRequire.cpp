@@ -67,13 +67,16 @@ namespace Atomic
             for (unsigned i = 0; i < resourceDirs.Size(); i++)
             {
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+             String pluginLibrary;
 
-                // TODO: proper platform folder detection
+             // TODO: proper platform folder detection
+#ifdef ATOMIC_PLATFORM_WINDOWS              
+              pluginLibrary = resourceDirs.At(i) + "Plugins/Windows/x64/" + moduleID + ".dll";
+#elif ATOMIC_PLATFORM_OSX
+             pluginLibrary = resourceDirs.At(i) + "Plugins/Mac/x64/lib" + moduleID + ".dylib";
+#endif
 
-                String pluginLibrary = resourceDirs.At(i) + "Plugins/Windows/x64/" + moduleID + ".dll";
-
-                if (fs->FileExists(pluginLibrary))
+               if (pluginLibrary.Length() && fs->FileExists(pluginLibrary))
                 {
                     // let duktape know we loaded a native module
                     if (jsplugin_load(vm, pluginLibrary))
@@ -82,10 +85,7 @@ namespace Atomic
                         return 1;
                     }
                 }
-
             }
-
-#endif
         }
         else
         {

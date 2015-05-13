@@ -5,6 +5,8 @@
 #include "JSPluginExports.h"
 #include "JSVM.h"
 
+#include <ThirdParty/SDL/include/SDL.h>
+
 namespace Atomic
 {
     
@@ -13,51 +15,69 @@ namespace Atomic
     static void jsplugin_bind_jsvmexports();
     static JSVMImports gJSVMExports;
 
-    bool jsplugin_load(JSVM* vm, const String& pluginLibrary)
+    static bool jsplugin_get_entry_points(const String& pluginLibrary, atomic_plugin_validate_function* fvalidate,
+                                          duk_c_function* finit, String& errorMsg)
     {
+        *fvalidate = NULL;
+        *finit = NULL;
 
-        duk_context* ctx = vm->GetJSContext();
+        // TODO: cache and use SDL_UnloadObject (when no longer needed)
+        void* handle = SDL_LoadObject(pluginLibrary.CString());
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
-        LOGINFOF("Loading Native Plugin: %s", pluginLibrary.CString());
-
-        HMODULE hmodule = ::LoadLibrary(pluginLibrary.CString());
-
-        if (hmodule == NULL)
+        if (handle == NULL)
         {
-            LOGERRORF("Native Plugin: Unable to load %s", pluginLibrary.CString());
+            errorMsg = ToString("Native Plugin: Unable to load %s", pluginLibrary.CString());
             return false;
         }
 
-        atomic_plugin_validate_function vfunc = (atomic_plugin_validate_function) ::GetProcAddress(hmodule, "atomic_plugin_validate");
+        *fvalidate = (atomic_plugin_validate_function) SDL_LoadFunction(handle, "atomic_plugin_validate");
 
-        if (!vfunc)
+        if (!*fvalidate)
         {
-            LOGERRORF("Native Plugin: Unable to get atomic_plugin_validate entry point in %s", pluginLibrary.CString());
+            errorMsg = ToString("Native Plugin: Unable to get atomic_plugin_validate entry point in %s", pluginLibrary.CString());
             return false;
         }
 
-        int version = ATOMIC_JSPLUGIN_VERSION;
-        if (!vfunc(version, &gJSVMExports, sizeof(JSVMImports)))
-        {
-            LOGERRORF("Native Plugin: atomic_plugin_validate failed: %s", pluginLibrary.CString());
-            return false;
-        }
+        *finit = (duk_c_function) SDL_LoadFunction(handle, "atomic_plugin_init");
 
-        duk_c_function func = (duk_c_function) ::GetProcAddress(hmodule, "atomic_plugin_init");
-
-        if (!func)
+        if (!*finit)
         {
             LOGERRORF("Native Plugin: Unable to get atomic_plugin_init entry point in %s", pluginLibrary.CString());
             return false;
         }
 
+        return true;
+
+    }
+
+    bool jsplugin_load(JSVM* vm, const String& pluginLibrary)
+    {
+         String errorMsg;
+         atomic_plugin_validate_function validatefunc;
+         duk_c_function initfunc;
+
+         duk_context* ctx = vm->GetJSContext();
+
+         LOGINFOF("Loading Native Plugin: %s", pluginLibrary.CString());
+
+         if (!jsplugin_get_entry_points(pluginLibrary, &validatefunc, &initfunc, errorMsg))
+         {
+             LOGERRORF("%s", errorMsg.CString());
+             return false;
+         }
+
+         int version = ATOMIC_JSPLUGIN_VERSION;
+         if (!validatefunc(version, &gJSVMExports, sizeof(JSVMImports)))
+         {
+             LOGERRORF("Native Plugin: atomic_plugin_validate failed: %s", pluginLibrary.CString());
+             return false;
+         }
+
         // just to verify that we're not doing anything funky with the stack
         int top = duk_get_top(ctx);
 
         // the import function is a standard duktape c function, neat
-        duk_push_c_function(ctx, func, 1);
+        duk_push_c_function(ctx, initfunc, 1);
 
         // requires exports to be at index 2
         duk_dup(ctx, 2);
@@ -82,9 +102,6 @@ namespace Atomic
 
         return success;
 
-#else
-        return false;
-#endif
 
     }
 

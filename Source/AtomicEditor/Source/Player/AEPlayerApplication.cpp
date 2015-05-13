@@ -86,7 +86,6 @@ void AEPlayerApplication::Setup()
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";
 #else
-    engineParameters_["ResourcePaths"] = "AtomicResources";
     engineParameters_["FullScreen"] = false;
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
