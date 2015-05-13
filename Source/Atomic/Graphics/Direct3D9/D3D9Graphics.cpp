@@ -628,7 +628,7 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot(Image* destImage)
 {
     PROFILE(TakeScreenShot);
     
@@ -696,8 +696,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
         return false;
     }
     
-    destImage.SetSize(width_, height_, 3);
-    unsigned char* destData = destImage.GetData();
+    destImage->SetSize(width_, height_, 3);
+    unsigned char* destData = destImage->GetData();
     
     if (surfaceDesc.Format == D3DFMT_R5G6B5)
     {
