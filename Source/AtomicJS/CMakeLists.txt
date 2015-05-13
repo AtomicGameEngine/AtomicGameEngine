@@ -62,3 +62,8 @@ add_library(AtomicJS ${SOURCE_FILES})
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_dependencies(AtomicJS JSBind)
 endif()
+
+add_custom_command (TARGET AtomicJS POST_BUILD
+COMMAND ${CMAKE_COMMAND}
+ARGS -E copy_if_different \"${CMAKE_CURRENT_SOURCE_DIR}/JSPlugin/AtomicPlugin.h\" \"${CMAKE_SOURCE_DIR}/Bin/NativePluginSDK/AtomicPlugin.h\")
+

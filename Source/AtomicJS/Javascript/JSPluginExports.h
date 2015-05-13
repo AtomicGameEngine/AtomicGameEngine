@@ -1,131 +1,135 @@
 
 #pragma once
 
-namespace AtomicPlugin
+#include <Duktape/duktape.h>
+
+namespace Atomic
 {
-    // include duktape.h sources, under AtomicPlugin namespace
-    #include <Duktape\duktape.h>
+
+    #define ATOMIC_JSPLUGIN_VERSION 1
+
+    // MUST MATCH AtomicPlugin.h definitions exactly (typedefs and JSVMImports struct layout)
 
     extern "C"
     {
-        
+
         typedef duk_context* (*__duk_create_heap)(duk_alloc_function alloc_func,
             duk_realloc_function realloc_func,
             duk_free_function free_func,
             void *heap_udata,
             duk_fatal_function fatal_handler);
 
-        typedef void (*__duk_destroy_heap)(duk_context *ctx);
+        typedef void(*__duk_destroy_heap)(duk_context *ctx);
 
         typedef void* (*__duk_alloc_raw)(duk_context *ctx, duk_size_t size);
-        typedef void  (*__duk_free_raw)(duk_context *ctx, void *ptr);
+        typedef void(*__duk_free_raw)(duk_context *ctx, void *ptr);
         typedef void* (*__duk_realloc_raw)(duk_context *ctx, void *ptr, duk_size_t size);
         typedef void* (*__duk_alloc)(duk_context *ctx, duk_size_t size);
-        typedef void  (*__duk_free)(duk_context *ctx, void *ptr);
+        typedef void(*__duk_free)(duk_context *ctx, void *ptr);
         typedef void* (*__duk_realloc)(duk_context *ctx, void *ptr, duk_size_t size);
-        typedef void  (*__duk_get_memory_functions)(duk_context *ctx, duk_memory_functions *out_funcs);
-        typedef void  (*__duk_gc)(duk_context *ctx, duk_uint_t flags);
+        typedef void(*__duk_get_memory_functions)(duk_context *ctx, duk_memory_functions *out_funcs);
+        typedef void(*__duk_gc)(duk_context *ctx, duk_uint_t flags);
 
-        typedef void (*__duk_throw)(duk_context *ctx);
-        typedef void (*__duk_fatal)(duk_context *ctx, duk_errcode_t err_code, const char *err_msg);
-        typedef void (*__duk_error_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, ...);
-        typedef void (*__duk_error_va_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, va_list ap);
+        typedef void(*__duk_throw)(duk_context *ctx);
+        typedef void(*__duk_fatal)(duk_context *ctx, duk_errcode_t err_code, const char *err_msg);
+        typedef void(*__duk_error_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, ...);
+        typedef void(*__duk_error_va_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, va_list ap);
 
-        typedef duk_bool_t (*__duk_is_strict_call)(duk_context *ctx);
-        typedef duk_bool_t (*__duk_is_constructor_call)(duk_context *ctx);
+        typedef duk_bool_t(*__duk_is_strict_call)(duk_context *ctx);
+        typedef duk_bool_t(*__duk_is_constructor_call)(duk_context *ctx);
 
-        typedef duk_idx_t (*__duk_normalize_index)(duk_context *ctx, duk_idx_t index);
-        typedef duk_idx_t (*__duk_require_normalize_index)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_valid_index)(duk_context *ctx, duk_idx_t index);
-        typedef void (*__duk_require_valid_index)(duk_context *ctx, duk_idx_t index);
-        typedef duk_idx_t (*__duk_get_top)(duk_context *ctx);
-        typedef void (*__duk_set_top)(duk_context *ctx, duk_idx_t index);
-        typedef duk_idx_t (*__duk_get_top_index)(duk_context *ctx);
-        typedef duk_idx_t (*__duk_require_top_index)(duk_context *ctx);
-        typedef duk_bool_t (*__duk_check_stack)(duk_context *ctx, duk_idx_t extra);
-        typedef void (*__duk_require_stack)(duk_context *ctx, duk_idx_t extra);
-        typedef duk_bool_t (*__duk_check_stack_top)(duk_context *ctx, duk_idx_t top);
-        typedef void (*__duk_require_stack_top)(duk_context *ctx, duk_idx_t top);
-        typedef void (*__duk_swap)(duk_context *ctx, duk_idx_t index1, duk_idx_t index2);
-        typedef void (*__duk_swap_top)(duk_context *ctx, duk_idx_t index);
-        typedef void (*__duk_dup)(duk_context *ctx, duk_idx_t from_index);
-        typedef void (*__duk_dup_top)(duk_context *ctx);
-        typedef void (*__duk_insert)(duk_context *ctx, duk_idx_t to_index);
-        typedef void (*__duk_replace)(duk_context *ctx, duk_idx_t to_index);
-        typedef void (*__duk_copy)(duk_context *ctx, duk_idx_t from_index, duk_idx_t to_index);
-        typedef void (*__duk_remove)(duk_context *ctx, duk_idx_t index);
-        typedef void (*__duk_xcopymove_raw)(duk_context *to_ctx, duk_context *from_ctx, duk_idx_t count, duk_bool_t is_copy);
+        typedef duk_idx_t(*__duk_normalize_index)(duk_context *ctx, duk_idx_t index);
+        typedef duk_idx_t(*__duk_require_normalize_index)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_valid_index)(duk_context *ctx, duk_idx_t index);
+        typedef void(*__duk_require_valid_index)(duk_context *ctx, duk_idx_t index);
+        typedef duk_idx_t(*__duk_get_top)(duk_context *ctx);
+        typedef void(*__duk_set_top)(duk_context *ctx, duk_idx_t index);
+        typedef duk_idx_t(*__duk_get_top_index)(duk_context *ctx);
+        typedef duk_idx_t(*__duk_require_top_index)(duk_context *ctx);
+        typedef duk_bool_t(*__duk_check_stack)(duk_context *ctx, duk_idx_t extra);
+        typedef void(*__duk_require_stack)(duk_context *ctx, duk_idx_t extra);
+        typedef duk_bool_t(*__duk_check_stack_top)(duk_context *ctx, duk_idx_t top);
+        typedef void(*__duk_require_stack_top)(duk_context *ctx, duk_idx_t top);
+        typedef void(*__duk_swap)(duk_context *ctx, duk_idx_t index1, duk_idx_t index2);
+        typedef void(*__duk_swap_top)(duk_context *ctx, duk_idx_t index);
+        typedef void(*__duk_dup)(duk_context *ctx, duk_idx_t from_index);
+        typedef void(*__duk_dup_top)(duk_context *ctx);
+        typedef void(*__duk_insert)(duk_context *ctx, duk_idx_t to_index);
+        typedef void(*__duk_replace)(duk_context *ctx, duk_idx_t to_index);
+        typedef void(*__duk_copy)(duk_context *ctx, duk_idx_t from_index, duk_idx_t to_index);
+        typedef void(*__duk_remove)(duk_context *ctx, duk_idx_t index);
+        typedef void(*__duk_xcopymove_raw)(duk_context *to_ctx, duk_context *from_ctx, duk_idx_t count, duk_bool_t is_copy);
 
-        typedef void (*__duk_push_undefined)(duk_context *ctx);
-        typedef void (*__duk_push_null)(duk_context *ctx);
-        typedef void (*__duk_push_boolean)(duk_context *ctx, duk_bool_t val);
-        typedef void (*__duk_push_true)(duk_context *ctx);
-        typedef void (*__duk_push_false)(duk_context *ctx);
-        typedef void (*__duk_push_number)(duk_context *ctx, duk_double_t val);
-        typedef void (*__duk_push_nan)(duk_context *ctx);
-        typedef void (*__duk_push_int)(duk_context *ctx, duk_int_t val);
-        typedef void (*__duk_push_uint)(duk_context *ctx, duk_uint_t val);
+        typedef void(*__duk_push_undefined)(duk_context *ctx);
+        typedef void(*__duk_push_null)(duk_context *ctx);
+        typedef void(*__duk_push_boolean)(duk_context *ctx, duk_bool_t val);
+        typedef void(*__duk_push_true)(duk_context *ctx);
+        typedef void(*__duk_push_false)(duk_context *ctx);
+        typedef void(*__duk_push_number)(duk_context *ctx, duk_double_t val);
+        typedef void(*__duk_push_nan)(duk_context *ctx);
+        typedef void(*__duk_push_int)(duk_context *ctx, duk_int_t val);
+        typedef void(*__duk_push_uint)(duk_context *ctx, duk_uint_t val);
         typedef const char* (*__duk_push_string)(duk_context *ctx, const char *str);
         typedef const char* (*__duk_push_lstring)(duk_context *ctx, const char *str, duk_size_t len);
-        typedef void (*__duk_push_pointer)(duk_context *ctx, void *p);
+        typedef void(*__duk_push_pointer)(duk_context *ctx, void *p);
         typedef const char* (*__duk_push_sprintf)(duk_context *ctx, const char *fmt, ...);
         typedef const char* (*__duk_push_vsprintf)(duk_context *ctx, const char *fmt, va_list ap);
 
         typedef const char* (*__duk_push_string_file_raw)(duk_context *ctx, const char *path, duk_uint_t flags);
 
-        typedef void (*__duk_push_this)(duk_context *ctx);
-        typedef void (*__duk_push_current_function)(duk_context *ctx);
-        typedef void (*__duk_push_current_thread)(duk_context *ctx);
-        typedef void (*__duk_push_global_object)(duk_context *ctx);
-        typedef void (*__duk_push_heap_stash)(duk_context *ctx);
-        typedef void (*__duk_push_global_stash)(duk_context *ctx);
-        typedef void (*__duk_push_thread_stash)(duk_context *ctx, duk_context *target_ctx);
+        typedef void(*__duk_push_this)(duk_context *ctx);
+        typedef void(*__duk_push_current_function)(duk_context *ctx);
+        typedef void(*__duk_push_current_thread)(duk_context *ctx);
+        typedef void(*__duk_push_global_object)(duk_context *ctx);
+        typedef void(*__duk_push_heap_stash)(duk_context *ctx);
+        typedef void(*__duk_push_global_stash)(duk_context *ctx);
+        typedef void(*__duk_push_thread_stash)(duk_context *ctx, duk_context *target_ctx);
 
-        typedef duk_idx_t (*__duk_push_object)(duk_context *ctx);
-        typedef duk_idx_t (*__duk_push_array)(duk_context *ctx);
-        typedef duk_idx_t (*__duk_push_c_function)(duk_context *ctx, duk_c_function func, duk_idx_t nargs);
-        typedef duk_idx_t (*__duk_push_c_lightfunc)(duk_context *ctx, duk_c_function func, duk_idx_t nargs, duk_idx_t length, duk_int_t magic);
-        typedef duk_idx_t (*__duk_push_thread_raw)(duk_context *ctx, duk_uint_t flags);
+        typedef duk_idx_t(*__duk_push_object)(duk_context *ctx);
+        typedef duk_idx_t(*__duk_push_array)(duk_context *ctx);
+        typedef duk_idx_t(*__duk_push_c_function)(duk_context *ctx, duk_c_function func, duk_idx_t nargs);
+        typedef duk_idx_t(*__duk_push_c_lightfunc)(duk_context *ctx, duk_c_function func, duk_idx_t nargs, duk_idx_t length, duk_int_t magic);
+        typedef duk_idx_t(*__duk_push_thread_raw)(duk_context *ctx, duk_uint_t flags);
 
-        typedef duk_idx_t (*__duk_push_error_object_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, ...);
-        typedef duk_idx_t (*__duk_push_error_object_va_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, va_list ap);
+        typedef duk_idx_t(*__duk_push_error_object_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, ...);
+        typedef duk_idx_t(*__duk_push_error_object_va_raw)(duk_context *ctx, duk_errcode_t err_code, const char *filename, duk_int_t line, const char *fmt, va_list ap);
         typedef void* (*__duk_push_buffer_raw)(duk_context *ctx, duk_size_t size, duk_small_uint_t flags);
-        typedef duk_idx_t (*__duk_push_heapptr)(duk_context *ctx, void *ptr);
+        typedef duk_idx_t(*__duk_push_heapptr)(duk_context *ctx, void *ptr);
 
-        typedef void (*__duk_pop)(duk_context *ctx);
-        typedef void (*__duk_pop_n)(duk_context *ctx, duk_idx_t count);
-        typedef void (*__duk_pop_2)(duk_context *ctx);
-        typedef void (*__duk_pop_3)(duk_context *ctx);
+        typedef void(*__duk_pop)(duk_context *ctx);
+        typedef void(*__duk_pop_n)(duk_context *ctx, duk_idx_t count);
+        typedef void(*__duk_pop_2)(duk_context *ctx);
+        typedef void(*__duk_pop_3)(duk_context *ctx);
 
-        typedef duk_int_t (*__duk_get_type)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_check_type)(duk_context *ctx, duk_idx_t index, duk_int_t type);
-        typedef duk_uint_t (*__duk_get_type_mask)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_check_type_mask)(duk_context *ctx, duk_idx_t index, duk_uint_t mask);
+        typedef duk_int_t(*__duk_get_type)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_check_type)(duk_context *ctx, duk_idx_t index, duk_int_t type);
+        typedef duk_uint_t(*__duk_get_type_mask)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_check_type_mask)(duk_context *ctx, duk_idx_t index, duk_uint_t mask);
 
-        typedef duk_bool_t (*__duk_is_undefined)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_null)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_null_or_undefined)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_boolean)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_number)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_nan)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_string)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_object)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_buffer)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_pointer)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_lightfunc)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_undefined)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_null)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_null_or_undefined)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_boolean)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_number)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_nan)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_string)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_object)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_buffer)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_pointer)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_lightfunc)(duk_context *ctx, duk_idx_t index);
 
-        typedef duk_bool_t (*__duk_is_array)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_function)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_c_function)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_ecmascript_function)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_bound_function)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_thread)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_array)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_function)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_c_function)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_ecmascript_function)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_bound_function)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_thread)(duk_context *ctx, duk_idx_t index);
 
-        typedef duk_bool_t (*__duk_is_callable)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_dynamic_buffer)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_fixed_buffer)(duk_context *ctx, duk_idx_t index);
-        typedef duk_bool_t (*__duk_is_primitive)(duk_context *ctx, duk_idx_t index);
-        typedef duk_errcode_t (*__duk_get_error_code)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_callable)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_dynamic_buffer)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_fixed_buffer)(duk_context *ctx, duk_idx_t index);
+        typedef duk_bool_t(*__duk_is_primitive)(duk_context *ctx, duk_idx_t index);
+        typedef duk_errcode_t(*__duk_get_error_code)(duk_context *ctx, duk_idx_t index);
 
         typedef duk_bool_t(*__duk_get_boolean)(duk_context *ctx, duk_idx_t index);
         typedef duk_double_t(*__duk_get_number)(duk_context *ctx, duk_idx_t index);
@@ -493,5 +497,6 @@ namespace AtomicPlugin
             }
         };
     }
+
 }
 

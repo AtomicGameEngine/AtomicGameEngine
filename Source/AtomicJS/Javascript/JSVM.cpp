@@ -15,6 +15,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 
 #include "JSRequire.h"
+#include "JSPlugin.h"
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSAtomic.h"
@@ -60,6 +61,7 @@ void JSVM::InitJSContext()
     duk_pop(ctx_);
 
     js_init_require(this);
+    js_init_jsplugin(this);
     jsapi_init_atomic(this);
 
     InitComponents();
