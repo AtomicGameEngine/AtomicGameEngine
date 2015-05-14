@@ -60,9 +60,16 @@ namespace Atomic
  
         }
 
-        SharedPtr<File> jsfile(cache->GetFile(path, false));
-
-        if (!jsfile)
+        if (cache->Exists(path))
+        {
+            SharedPtr<File> jsfile(cache->GetFile(path, false));
+            vm->SetLastModuleSearchFile(jsfile->GetFullPath());
+            String source;
+            jsfile->ReadText(source);
+            duk_push_string(ctx, source.CString());
+            return 1;
+        }
+        else
         {
             // we're not a JS file, so check if we're a native module
             const Vector<String>& resourceDirs = cache->GetResourceDirs();
@@ -95,19 +102,10 @@ namespace Atomic
                 }
             }
 
-            duk_push_sprintf(ctx, "Failed loading module: %s", path.CString());
-            duk_throw(ctx);
-
-        }
-        else
-        {
-            vm->SetLastModuleSearchFile(jsfile->GetFullPath());
-            String source;
-            jsfile->ReadText(source);
-            duk_push_string(ctx, source.CString());
         }
 
-        return 1;
+        duk_push_sprintf(ctx, "Failed loading module: %s", path.CString());
+        duk_throw(ctx);
 
     }
 
