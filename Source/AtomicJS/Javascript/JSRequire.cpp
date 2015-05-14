@@ -54,6 +54,9 @@ namespace Atomic
         else
         {
             path += ".js";
+
+            if (!cache->Exists(path) && cache->Exists("Modules/" + path))
+                path = "Modules/" + path;
  
         }
 
@@ -84,8 +87,17 @@ namespace Atomic
                         duk_push_undefined(ctx);
                         return 1;
                     }
+                    else
+                    {
+                        duk_push_sprintf(ctx, "Failed loading native plugins: %s", pluginLibrary.CString());
+                        duk_throw(ctx);
+                    }
                 }
             }
+
+            duk_push_sprintf(ctx, "Failed loading module: %s", path.CString());
+            duk_throw(ctx);
+
         }
         else
         {
