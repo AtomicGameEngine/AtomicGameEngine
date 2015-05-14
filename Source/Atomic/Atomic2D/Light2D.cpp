@@ -388,7 +388,7 @@ void PositionalLight2D::UpdateVertices()
     }
 }
 
-PointLight2D::PointLight2D(Context* context) : PositionalLight2D(context),    
+PointLight2D::PointLight2D(Context* context) : PositionalLight2D(context),
     radius_(1.0f)
 {
     lightType_ = LIGHT2D_POINT;
@@ -452,7 +452,7 @@ void Light2DGroup::OnNodeSet(Node* node)
         if (renderer_.Null())
         {
             renderer_ = node->GetOrCreateComponent<Renderer2D>();
-            //renderer_->SetUseTris(true);
+            renderer_->SetUseTris(true);
         }
 
         if (light2DMaterial_.Null())
@@ -481,12 +481,13 @@ Light2DGroup::Light2DGroup(Context* context) : Drawable2D(context),
     ambientColor_(0, 0, 0, 0),
     frustum_(0)
 {
+    sourceBatches_.Resize(1);
     SubscribeToEvent(E_BEGINRENDERING, HANDLER(Light2DGroup, HandleBeginRendering));
     SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Light2DGroup, HandleBeginViewUpdate));
 }
 
 Light2DGroup::~Light2DGroup()
-{   
+{
     Renderer* renderer = GetSubsystem<Renderer>();
 
     if (renderer)
@@ -527,7 +528,7 @@ void Light2DGroup::HandleBeginViewUpdate(StringHash eventType, VariantMap& event
 
 void Light2DGroup::HandleBeginRendering(StringHash eventType, VariantMap& eventData)
 {
-    //verticesDirty_ = true;
+    sourceBatchesDirty_ = true;
 }
 
 void Light2DGroup::OnWorldBoundingBoxUpdate()
@@ -536,24 +537,32 @@ void Light2DGroup::OnWorldBoundingBoxUpdate()
     worldBoundingBox_.Define(-M_LARGE_VALUE, M_LARGE_VALUE);
 }
 
-void Light2DGroup::UpdateVertices()
+void Light2DGroup::OnDrawOrderChanged()
 {
-    // This is the shadow map
-    //if (!verticesDirty_)
-    //    return;
+    sourceBatches_[0].drawOrder_ = GetDrawOrder();
+}
 
-    //vertices_.Clear();
+void Light2DGroup::UpdateSourceBatches()
+{
+    if (!sourceBatchesDirty_)
+        return;
+
+    Vector<Vertex2D>& vertices = sourceBatches_[0].vertices_;
+    vertices.Clear();
 
     for (Vector<WeakPtr<Light2D> >::Iterator itr = lights_.Begin(); itr != lights_.End(); itr++)
     {
         Light2D* light = *itr;
+
         if (!light->IsEnabled())
             continue;
+
         light->UpdateVertices();
-      //  light->AddVertices(vertices_);
+        light->AddVertices(vertices);
     }
 
-    //verticesDirty_ = false;
+    sourceBatchesDirty_ = false;
+
 
 }
 
@@ -653,9 +662,8 @@ void Light2DGroup::CreateLight2DMaterial()
     light2DMaterial_ = new Material(context_);
     light2DMaterial_->SetName("Light2DMaterial");
 
-    /*
     Technique* tech = new Technique(context_);
-    Pass* pass = tech->CreatePass(PASS_LIGHT2D);
+    Pass* pass = tech->CreatePass("light2d");
     pass->SetBlendMode(BLEND_ADDALPHA);
     pass->SetDepthTestMode(CMP_ALWAYS);
 
@@ -667,8 +675,7 @@ void Light2DGroup::CreateLight2DMaterial()
     light2DMaterial_->SetTechnique(0, tech);
     light2DMaterial_->SetCullMode(CULL_NONE);
 
-    SetCustomMaterial(light2DMaterial_);
-    */
+    sourceBatches_[0].material_ = light2DMaterial_;
 
 }
 

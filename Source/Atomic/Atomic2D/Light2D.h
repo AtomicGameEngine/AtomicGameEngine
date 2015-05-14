@@ -185,13 +185,13 @@ protected:
 
     /// Recalculate the world-space bounding box.
     void OnWorldBoundingBoxUpdate();
-    void UpdateVertices();
+
     void OnNodeSet(Node* node);
 
     /// Handle draw order changed.
-    virtual void OnDrawOrderChanged(){}
+    virtual void OnDrawOrderChanged();
     /// Update source batches.
-    virtual void UpdateSourceBatches(){}
+    virtual void UpdateSourceBatches();
 
 
 private:
