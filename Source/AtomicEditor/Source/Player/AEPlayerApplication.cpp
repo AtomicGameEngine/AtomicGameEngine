@@ -189,6 +189,8 @@ void AEPlayerApplication::Start()
 {
 
     SubscribeToEvent(E_IPCHELLOFROMBROKER, HANDLER(AEPlayerApplication, HandleHelloFromBroker));
+    SubscribeToEvent(E_JSERROR, HANDLER(AEPlayerApplication, HandleJSError));
+
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     if (fd_[0] != INVALID_IPCHANDLE_VALUE)
@@ -267,6 +269,22 @@ void AEPlayerApplication::HandleLogMessage(StringHash eventType, VariantMap& eve
         }
     }
         
+}
+
+void AEPlayerApplication::HandleJSError(StringHash eventType, VariantMap& eventData)
+{
+    using namespace JSError;
+    //String errName = eventData[P_ERRORNAME].GetString();
+    String errMessage = eventData[P_ERRORMESSAGE].GetString();
+    String errFilename = eventData[P_ERRORFILENAME].GetString();
+    //String errStack = eventData[P_ERRORSTACK].GetString();
+    int errLineNumber = eventData[P_ERRORLINENUMBER].GetInt();
+
+    String errorString = ToString("%s - %s - Line: %i",
+                                  errFilename.CString(), errMessage.CString(), errLineNumber);
+
+    ErrorExit(errorString);
+
 }
 
 

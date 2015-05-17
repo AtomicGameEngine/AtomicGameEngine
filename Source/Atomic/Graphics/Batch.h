@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -275,6 +275,8 @@ struct LightBatchQueue
 {
     /// Per-pixel light.
     Light* light_;
+    /// Light negative flag.
+    bool negative_;
     /// Shadow map depth texture.
     Texture2D* shadowMap_;
     /// Lit geometry draw calls, base (replace blend mode)

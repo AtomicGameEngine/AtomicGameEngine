@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -124,6 +124,12 @@ struct ATOMIC_API DirtyBits
 /// Per-object attribute state for network replication, allocated on demand.
 struct ATOMIC_API NetworkState
 {
+    /// Construct with defaults.
+    NetworkState() :
+        interceptMask_(0)
+    {
+    }
+
     /// Cached network attribute infos.
     const Vector<AttributeInfo>* attributes_;
     /// Current network attribute values.
@@ -134,6 +140,8 @@ struct ATOMIC_API NetworkState
     PODVector<ReplicationState*> replicationStates_;
     /// Previous user variables.
     VariantMap previousVars_;
+    /// Bitmask for intercepting network messages. Used on the client only.
+    unsigned long long interceptMask_;
 };
 
 /// Base class for per-user network replication states.

@@ -176,7 +176,7 @@ public:
     }
     
     /// Create an object of the specific type.
-    virtual SharedPtr<Object>(CreateObject()) { return SharedPtr<Object>(new T(context_)); }
+    virtual SharedPtr<Object> CreateObject() { return SharedPtr<Object>(new T(context_)); }
 };
 
 /// Internal helper class for invoking event handler functions.

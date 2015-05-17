@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -285,10 +285,10 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     
     graphics_->SetTextureForUpdate(this);
     
+    #ifndef GL_ES_VERSION_2_0
     bool wholeLevel = x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth;
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     
-    #ifndef GL_ES_VERSION_2_0
     if (!IsCompressed())
     {
         if (wholeLevel)
@@ -326,11 +326,20 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
     
     if (!image->IsCompressed())
     {
+        // Convert unsuitable formats to RGBA
+        unsigned components = image->GetComponents();
+        if (Graphics::GetGL3Support() && ((components == 1 && !useAlpha) || components == 2))
+        {
+            image = image->ConvertToRGBA();
+            if (!image)
+                return false;
+            components = image->GetComponents();
+        }
+
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
         int levelDepth = image->GetDepth();
-        unsigned components = image->GetComponents();
         unsigned format = 0;
         
         // Discard unnecessary mip levels

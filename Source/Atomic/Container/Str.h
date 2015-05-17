@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -206,10 +206,18 @@ public:
     String& operator += (int rhs);
     /// Add-assign a short integer.
     String& operator += (short rhs);
+    /// Add-assign a long integer.
+    String& operator += (long rhs);
+    /// Add-assign a long long integer.
+    String& operator += (long long rhs);
     /// Add-assign an unsigned integer.
     String& operator += (unsigned rhs);
     /// Add-assign a short unsigned integer.
     String& operator += (unsigned short rhs);
+    /// Add-assign a long unsigned integer.
+    String& operator += (unsigned long rhs);
+    /// Add-assign a long long unsigned integer.
+    String& operator += (unsigned long long rhs);
     /// Add-assign a float.
     String& operator += (float rhs);
     /// Add-assign a bool.
@@ -439,7 +447,7 @@ public:
         const char* ptr = str;
         while (*ptr)
             ++ptr;
-        return ptr - str;
+        return (unsigned)(ptr - str);
         #endif
     }
     

@@ -218,7 +218,7 @@ void JSBModule::EmitSource(const String& filepath)
         source_ += "#ifdef ATOMIC_3D\n";
     }
 
-    source_ += "#include <Duktape/duktape.h>\n";    
+    source_ += "#include <Duktape/duktape.h>\n";
     source_ += "#include <AtomicJS/Javascript/JSVM.h>\n";
     source_ += "#include <AtomicJS/Javascript/JSAPI.h>\n";
 
@@ -387,8 +387,13 @@ void JSBModule::Load(const String &moduleJSONFilename)
         {
             sources.AddString("Graphics/OpenGL");
         }
-        else {
+        else
+        {
+#ifdef ATOMIC_D3D11
+            sources.AddString("Graphics/Direct3D11");
+#else
             sources.AddString("Graphics/Direct3D9");
+#endif
         }
 #else
         sources.AddString("Graphics/OpenGL");

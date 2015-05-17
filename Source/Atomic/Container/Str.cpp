@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -183,12 +183,32 @@ String& String::operator += (short rhs)
     return *this += String(rhs);
 }
 
+String& String::operator += (long rhs)
+{
+    return *this += String(rhs);
+}
+
+String& String::operator += (long long rhs)
+{
+    return *this += String(rhs);
+}
+
 String& String::operator += (unsigned rhs)
 {
     return *this += String(rhs);
 }
 
 String& String::operator += (unsigned short rhs)
+{
+    return *this += String(rhs);
+}
+
+String& String::operator += (unsigned long rhs)
+{
+    return *this += String(rhs);
+}
+
+String& String::operator += (unsigned long long rhs)
 {
     return *this += String(rhs);
 }

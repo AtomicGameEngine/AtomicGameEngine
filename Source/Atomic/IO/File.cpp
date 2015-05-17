@@ -125,7 +125,7 @@ bool File::Open(const String& fileName, FileMode mode)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        LOGERRORF("Access denied to %s", fileName.CString());
         return false;
     }
 
@@ -141,7 +141,7 @@ bool File::Open(const String& fileName, FileMode mode)
         assetHandle_ = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
         if (!assetHandle_)
         {
-            LOGERROR("Could not open asset file " + fileName);
+            LOGERRORF("Could not open asset file %s", fileName.CString());
             return false;
         }
         else
@@ -184,7 +184,7 @@ bool File::Open(const String& fileName, FileMode mode)
     
     if (!handle_)
     {
-        LOGERROR("Could not open file " + fileName);
+        LOGERRORF("Could not open file %s", fileName.CString());
         return false;
     }
 
@@ -198,8 +198,16 @@ bool File::Open(const String& fileName, FileMode mode)
     writeSyncNeeded_ = false;
 
     fseek((FILE*)handle_, 0, SEEK_END);
-    size_ = ftell((FILE*)handle_);
+    long size = ftell((FILE*)handle_);
     fseek((FILE*)handle_, 0, SEEK_SET);
+    if (size > M_MAX_UNSIGNED)
+    {
+        LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
+        Close();
+        size_ = 0;
+        return false;
+    }
+    size_ = (unsigned)size;
     return true;
 }
 

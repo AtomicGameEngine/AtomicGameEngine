@@ -18,6 +18,8 @@ if (NOT EMSCRIPTEN)
 	add_subdirectory(Recast)
 	add_subdirectory(Civetweb)
 	add_subdirectory(Detour)
+        add_subdirectory(DetourCrowd)
+        add_subdirectory(DetourTileCache)
 	add_subdirectory(kNet)
 endif()
 

@@ -53,6 +53,8 @@ private:
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
 
+    void HandleJSError(StringHash eventType, VariantMap& eventData);
+
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
 
 
