@@ -1,5 +1,5 @@
 
-#ifdef __APPLE__
+#ifndef ATOMIC_PLATFORM_WINDOWS
 #include <unistd.h>
 #endif
 

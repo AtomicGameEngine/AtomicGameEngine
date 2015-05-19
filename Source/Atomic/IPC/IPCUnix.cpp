@@ -9,7 +9,12 @@ namespace Atomic
 #include <unistd.h>
 #include <signal.h>
 #include <sys/socket.h>
+#ifdef __APPLE__
 #include <libproc.h>
+#endif
+#ifndef SO_NOSIGPIPE
+#define SO_NOSIGPIPE 0
+#endif
 #include <errno.h>
 
 #define HANDLE_EINTR(x) ({ \
