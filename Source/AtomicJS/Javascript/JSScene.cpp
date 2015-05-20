@@ -24,6 +24,27 @@ static int Node_CreateJSComponent(duk_context* ctx)
     return 1;
 }
 
+static int Node_GetJSComponent(duk_context* ctx)
+{
+	StringHash classNameHash = duk_to_string(ctx, 0);
+	duk_push_this(ctx);
+	Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+	PODVector<JSComponent*> jsComponents;
+	node->GetComponents<JSComponent>(jsComponents);
+
+	for (unsigned i = 0; i < jsComponents.Size(); i++)
+	{
+		if (StringHash(jsComponents[i]->GetClassName()) == classNameHash)
+		{
+			js_push_class_object_instance(ctx, jsComponents[i]);
+			break;
+		}
+	}
+
+	return 1;
+}
+
 static int Node_GetChildrenWithComponent(duk_context* ctx)
 {
     StringHash type = duk_to_string(ctx, 0);
@@ -119,7 +140,9 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getChildrenWithName");
     duk_push_c_function(ctx, Node_CreateJSComponent, 1);
     duk_put_prop_string(ctx, -2, "createJSComponent");
-    duk_pop(ctx);
+	duk_push_c_function(ctx, Node_GetJSComponent, 1);
+	duk_put_prop_string(ctx, -2, "getJSComponent");
+	duk_pop(ctx);
 
     js_class_get_prototype(ctx, "Scene");
     duk_push_c_function(ctx, Scene_LoadXML, 1);
