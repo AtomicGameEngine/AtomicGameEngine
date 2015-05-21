@@ -78,7 +78,11 @@ namespace :build  do
 
       Dir.chdir(CMAKE_IOS_BUILD_FOLDER) do
         sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} IOS"
-        sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"        
+        sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
+        sh "KEYCHAIN=/Users/jenkins/Library/Keychains/codesign.keychain"
+        # the -s option adds $KEYCHAIN to the search scope, while the -d option adds $KEYCHAIN to the system domain; both are needed
+        sh "security -v list-keychains -d system -s $KEYCHAIN"
+        sh "security -v unlock-keychain -p codesign $KEYCHAIN"
         sh "xcodebuild -configuration Release"
       end
 
