@@ -84,6 +84,24 @@ namespace :build  do
 
   end
 
+  task :web => "build:macosx_jsbind" do
+
+      if !Dir.exists?("#{CMAKE_WEB_BUILD_FOLDER}")
+        FileUtils.mkdir_p(CMAKE_WEB_BUILD_FOLDER)
+      end
+
+      Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
+        sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} WEB"
+        sh "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+        sh "make -j4"
+      end
+
+      Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer") do
+        sh "mv AtomicPlayer AtomicPlayer.bc"
+        sh "emcc -O3 -s ASM_JS=1 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
+      end
+
+  end
 
 
 end
