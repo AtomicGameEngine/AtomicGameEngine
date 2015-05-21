@@ -8,6 +8,7 @@
 #include "JSBClass.h"
 #include "JSBFunction.h"
 #include "JSBModule.h"
+#include "JSBind.h"
 
 Vector<JSBClass*> JSBClass::allClasses_;
 
@@ -32,6 +33,54 @@ void JSBFunctionOverride::Parse()
             ErrorExit("Unable to parse override type");
         }
         types_.Push(type);
+    }
+
+}
+
+void JSBEnum::Preprocess()
+{
+    // TextureUnit is a special case as uses preprocessor for values depending on
+    // Desktop or Mobile graphics
+
+    if (name_ == "TextureUnit")
+    {
+        values_.Clear();
+
+        values_.Push("TU_DIFFUSE");
+        values_.Push("TU_ALBEDOBUFFER");
+        values_.Push("TU_NORMAL");
+        values_.Push("TU_NORMALBUFFER");
+        values_.Push("TU_SPECULAR");
+        values_.Push("TU_EMISSIVE");
+        values_.Push("TU_ENVIRONMENT");
+
+        bool mobile = JSBind::PLATFORM == "WEB" || JSBind::PLATFORM == "ANDROID" || JSBind::PLATFORM == "IOS";
+
+        if (mobile)
+        {
+            values_.Push("TU_LIGHTRAMP");
+            values_.Push("TU_LIGHTSHAPE");
+            values_.Push("TU_SHADOWMAP");
+            values_.Push("MAX_MATERIAL_TEXTURE_UNITS");
+            values_.Push("MAX_TEXTURE_UNITS");
+        }
+        else
+        {
+            values_.Push("TU_VOLUMEMAP");
+            values_.Push("TU_CUSTOM1");
+            values_.Push("TU_CUSTOM2");
+            values_.Push("TU_LIGHTRAMP");
+            values_.Push("TU_LIGHTSHAPE");
+            values_.Push("TU_SHADOWMAP");
+            values_.Push("TU_FACESELECT");
+            values_.Push("TU_INDIRECTION");
+            values_.Push("TU_DEPTHBUFFER");
+            values_.Push("TU_LIGHTBUFFER");
+            values_.Push("TU_ZONE");
+            values_.Push("MAX_MATERIAL_TEXTURE_UNITS");
+            values_.Push("MAX_TEXTURE_UNITS");
+        }
+
     }
 
 }

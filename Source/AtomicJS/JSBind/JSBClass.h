@@ -43,6 +43,8 @@ public:
     String name_;
     Vector<String> values_;
 
+    void Preprocess();
+
 };
 
 class JSBProperty
