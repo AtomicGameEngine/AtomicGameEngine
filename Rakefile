@@ -14,6 +14,7 @@ $RAKE_ROOT = File.dirname(__FILE__)
 
 ARTIFACTS_FOLDER = "#{$RAKE_ROOT}/Artifacts"
 
+CMAKE_WINDOWS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Windows_Build"
 CMAKE_MACOSX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Build"
 CMAKE_ANDROID_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Android_Build"
 CMAKE_IOS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/IOS_Build"
@@ -38,7 +39,21 @@ namespace :build  do
 
   end
 
-  #IOS MACOSX
+  task :windows do
+
+    if !Dir.exists?("#{CMAKE_WINDOWS_BUILD_FOLDER}")
+      FileUtils.mkdir_p(CMAKE_WINDOWS_BUILD_FOLDER)
+    end
+
+    Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
+
+      sh "cmake ../../ -G \"Visual Studio 12 2013 Win64\""
+      sh "msbuild Atomic.sln /p:Configuration=Release"
+
+    end
+
+  end
+
   task :macosx do
 
     if !Dir.exists?("#{CMAKE_MACOSX_BUILD_FOLDER}")
@@ -47,7 +62,7 @@ namespace :build  do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
 
-      sh "cmake ../../ -G Xcode -DCMAKE_BUILD_TYPE=Release"
+      sh "cmake ../../ -G Xcode"
       sh "xcodebuild -configuration Release"
 
     end
