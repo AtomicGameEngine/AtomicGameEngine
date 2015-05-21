@@ -69,5 +69,21 @@ namespace :build  do
 
   end
 
+  task :android =>  "build:macosx_jsbind" do
+
+      if !Dir.exists?("#{CMAKE_ANDROID_BUILD_FOLDER}")
+        FileUtils.mkdir_p(CMAKE_ANDROID_BUILD_FOLDER)
+      end
+
+      Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
+
+        sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} ANDROID"
+        sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+        sh "make -j4"
+      end
+
+  end
+
+
 
 end
