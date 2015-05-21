@@ -79,7 +79,7 @@ namespace :build  do
       Dir.chdir(CMAKE_IOS_BUILD_FOLDER) do
         sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} IOS"
         sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
-        sh "security unlock ~/Library/Keychains/login.keychain"
+        sh "security unlock -u ~/Library/Keychains/login.keychain"
         sh "xcodebuild -configuration Release"
       end
 
