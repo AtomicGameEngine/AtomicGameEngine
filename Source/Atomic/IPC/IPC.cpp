@@ -1,5 +1,5 @@
 
-#ifdef __APPLE__
+#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_LINUX)
 #include <unistd.h>
 #endif
 
@@ -35,7 +35,7 @@ IPC::~IPC()
 
 bool IPC::InitWorker(IPCHandle fd1, IPCHandle fd2)
 {
-    
+
 #ifndef ATOMIC_PLATFORM_WINDOWS
     // close server fd
     close(fd1);

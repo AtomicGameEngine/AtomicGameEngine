@@ -7,7 +7,7 @@ when /mswin|windows|mingw32/i
 when /darwin/i
     $HOST_OS = "darwin"
 else
-    abort("Unknown host config: Config::CONFIG['host_os']: #{Config::CONFIG['host_os']}")
+    $HOST_OS = "linux"
 end
 
 $RAKE_ROOT = File.dirname(__FILE__)
@@ -19,6 +19,7 @@ CMAKE_MACOSX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Build"
 CMAKE_ANDROID_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Android_Build"
 CMAKE_IOS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/IOS_Build"
 CMAKE_WEB_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Web_Build"
+CMAKE_LINUX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Linux_Build"
 
 JSBIND_BIN_MACOSX = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicJS/JSBind/Release/JSBind"
 
@@ -68,6 +69,22 @@ namespace :build  do
     end
 
   end
+
+  task :linux do
+
+    if !Dir.exists?("#{CMAKE_LINUX_BUILD_FOLDER}")
+      FileUtils.mkdir_p(CMAKE_LINUX_BUILD_FOLDER)
+    end
+
+    Dir.chdir(CMAKE_LINUX_BUILD_FOLDER) do
+
+      sh "cmake ../../ -DLINUX=1 -G \"Unix Makefiles\""
+      sh "make -j2"
+
+    end
+
+  end
+
 
   #IOS, dependent on macosx for JSBind
   task :ios =>  "build:macosx_jsbind" do
