@@ -16,7 +16,7 @@ file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 
-if (NOT EMSCRIPTEN)
+if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
   file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
 endif()
 

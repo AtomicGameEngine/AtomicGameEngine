@@ -256,14 +256,11 @@ enum TextureUnit
     MAX_MATERIAL_TEXTURE_UNITS = 8,
     MAX_TEXTURE_UNITS = 16
 #else
-    #error JSBind has a enum collision as doesn't know about "DESKTOP_GRAPHICS
-    /*
     TU_LIGHTRAMP = 5,
     TU_LIGHTSHAPE = 6,
     TU_SHADOWMAP = 7,
     MAX_MATERIAL_TEXTURE_UNITS = 5,
     MAX_TEXTURE_UNITS = 8
-    */
 #endif
 };
 

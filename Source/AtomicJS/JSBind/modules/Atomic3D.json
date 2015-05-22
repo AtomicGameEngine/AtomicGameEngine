@@ -2,12 +2,12 @@
 	"name" : "Atomic3D",
 	"sources" : ["Atomic3D"],
 	"requires" : ["3D"],
-	"includes" : ["<Atomic/Scene/Scene.h>", "<Atomic/Atomic3D/Animation.h>", "<Atomic/Graphics/OcclusionBuffer.h>", 
+	"includes" : ["<Atomic/Container/ArrayPtr.h>","<Atomic/Scene/Scene.h>", "<Atomic/Atomic3D/Animation.h>", "<Atomic/Graphics/OcclusionBuffer.h>", 
 			      "<Atomic/Scene/ValueAnimation.h>", "<Atomic/Graphics/Material.h>", "<Atomic/Resource/Image.h>"],
 	"classes" : ["Model",
-				 "StaticModel", 
+				 "StaticModel",
 				 "Animation", "AnimatedModel", "AnimationController", "AnimationState", "BillboardSet", "CustomGeometry",
-				 "DecalSet", "ParticleEffect", "ParticleEmitter",				
+				 "DecalSet", "ParticleEffect", "ParticleEmitter",
 				 "Skybox", "StaticModelGroup", "Terrain", "TerrainPatch"],
 	"overloads" : {
 		"StaticModel" : {
@@ -15,7 +15,7 @@
 		},
 		"AnimationState" : {
 			"AnimationState" : ["AnimatedModel", "Animation"]
-		}		
+		}
 
 	}
 
