@@ -48,6 +48,8 @@ public:
 
     const String& GetDevConfigFilename();
 
+    void Dump();
+
 private:
 
     // root source directory (for development builds)

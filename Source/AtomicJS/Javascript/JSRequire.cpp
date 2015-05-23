@@ -55,9 +55,19 @@ namespace Atomic
         {
             path += ".js";
 
-            if (!cache->Exists(path) && cache->Exists("Modules/" + path))
-                path = "Modules/" + path;
- 
+            if (!cache->Exists(path))
+            {
+                const Vector<String>& searchPaths = vm->GetModuleSearchPaths();
+                for (unsigned i = 0; i < searchPaths.Size(); i++)
+                {
+                    String search = searchPaths[i] + path;
+                    if (cache->Exists(search))
+                    {
+                        path = search;
+                        break;
+                    }
+                }
+            }
         }
 
         if (cache->Exists(path))

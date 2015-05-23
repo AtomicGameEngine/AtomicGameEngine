@@ -9,6 +9,7 @@
 #include <Atomic/Container/List.h>
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include "JSAPI.h"
 #include "JSEvents.h"
@@ -134,10 +135,20 @@ public:
         return heapToObject_[heapptr];
     }
 
-    void SetModuleSearchPath(const String& searchPath)
+    void SetModuleSearchPaths(const String& searchPath)
     {
-        moduleSearchPath_ = searchPath;
+        moduleSearchPath_ = searchPath.Split(';');
+        for (unsigned i = 0; i < moduleSearchPath_.Size(); i++)
+        {
+            moduleSearchPath_[i] = AddTrailingSlash(moduleSearchPath_[i]);
+        }
     }
+
+    const Vector<String>& GetModuleSearchPaths()
+    {
+        return moduleSearchPath_;
+    }
+
 
     void SetLastModuleSearchFile(const String& fileName) { lastModuleSearchFilename_ = fileName; }
 
@@ -169,7 +180,7 @@ private:
 
     float gcTime_;
 
-    String moduleSearchPath_;
+    Vector<String> moduleSearchPath_;
     String lastModuleSearchFilename_;
 
     String errorString_;
