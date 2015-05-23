@@ -5,6 +5,7 @@
 #include "PlatformAddCmd.h"
 #include "BuildCmd.h"
 #include "ImportCmd.h"
+#include "PlayCmd.h"
 
 namespace ToolCore
 {
@@ -44,6 +45,10 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             else if (argument == "import")
             {
                 cmd = new ImportCmd(context_);
+            }
+            else if (argument == "play")
+            {
+                cmd = new PlayCmd(context_);
             }
 
         }
