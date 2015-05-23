@@ -6,6 +6,7 @@
 #include "BuildCmd.h"
 #include "ImportCmd.h"
 #include "PlayCmd.h"
+#include "EditCmd.h"
 
 namespace ToolCore
 {
@@ -49,6 +50,10 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             else if (argument == "play")
             {
                 cmd = new PlayCmd(context_);
+            }
+            else if (argument == "edit")
+            {
+                cmd = new EditCmd(context_);
             }
 
         }

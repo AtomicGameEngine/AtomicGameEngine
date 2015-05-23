@@ -184,7 +184,7 @@ void AEApplication::Setup()
             String argument = arguments[i].Substring(1).ToLower();
             String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
 
-            if (argument == "project" && value.Length())
+            if (argument == "-project" && value.Length())
             {
                 Vector<String> projectFiles;
                 filesystem->ScanDir(projectFiles, value, "*.atomic", SCAN_FILES, false);

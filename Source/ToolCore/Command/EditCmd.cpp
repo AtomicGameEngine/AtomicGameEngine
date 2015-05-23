@@ -10,36 +10,36 @@
 #include "../Build/BuildEvents.h"
 #include "../Build/BuildSystem.h"
 
-#include "PlayCmd.h"
+#include "EditCmd.h"
 
 namespace ToolCore
 {
 
-PlayCmd::PlayCmd(Context* context) : Command(context)
+EditCmd::EditCmd(Context* context) : Command(context)
 {
 
 }
 
-PlayCmd::~PlayCmd()
+EditCmd::~EditCmd()
 {
 
 }
 
-bool PlayCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
+bool EditCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
 {
     String argument = arguments[startIndex].ToLower();
     String value = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;
 
-    if (argument != "play")
+    if (argument != "edit")
     {
-        errorMsg = "Unable to parse play command";
+        errorMsg = "Unable to parse edit command";
         return false;
     }
 
     return true;
 }
 
-bool PlayCmd::LaunchPlayerProcess(const String& command, const Vector<String>& args, const String& initialDirectory)
+bool EditCmd::LaunchEditorProcess(const String& command, const Vector<String>& args, const String& initialDirectory)
 {
     Poco::Process::Args pargs;
 
@@ -54,7 +54,7 @@ bool PlayCmd::LaunchPlayerProcess(const String& command, const Vector<String>& a
 
     if (!Poco::Process::isRunning(handle))
     {
-        Error(ToString("Unable to launch player process: %s", command.CString()));
+        Error(ToString("Unable to launch editor process: %s", command.CString()));
         return false;
     }
 
@@ -65,32 +65,20 @@ bool PlayCmd::LaunchPlayerProcess(const String& command, const Vector<String>& a
 }
 
 
-void PlayCmd::Run()
+void EditCmd::Run()
 {
-    LOGINFOF("Playing project");
+    LOGINFOF("Editing project");
 
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     ToolEnvironment* env = GetSubsystem<ToolCore::ToolEnvironment>();
     Project* project = tsystem->GetProject();
     const String& editorBinary = env->GetEditorBinary();
 
-    Vector<String> paths;
-    paths.Push(env->GetCoreDataDir());
-    paths.Push(env->GetPlayerDataDir());
-    paths.Push(project->GetResourcePath());
-
-    String resourcePaths;
-    resourcePaths.Join(paths, "!");
-
     Vector<String> vargs;
+    vargs.Push("--project");
+    vargs.Push(project->GetProjectPath());
 
-    String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
-
-    vargs = args.Split(' ');
-    vargs.Insert(0, "--player");
-
-    // TODO: use IPC (maybe before this set log location/access the log and output it, we need access to errors)
-    LaunchPlayerProcess(editorBinary, vargs, "");
+    LaunchEditorProcess(editorBinary, vargs, "");
 
     Finished();
 
