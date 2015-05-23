@@ -4,13 +4,70 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 
+/*
+// subsystem requires
+
+#include <Atomic/Engine/Engine.h>
+#include <Atomic/Graphics/Graphics.h>
+#include <Atomic/Graphics/Renderer.h>
+#include <Atomic/Input/Input.h>
+#include <Atomic/Resource/ResourceCache.h>
+*/
+
 #include "JSVM.h"
 #include "JSRequire.h"
 #include "JSPlugin.h"
 
 namespace Atomic
 {
-    
+
+/*
+    static bool js_require_subsystem(const String& name, JSVM* vm)
+    {
+        duk_context* ctx = vm->GetJSContext();
+
+        String lowername = name.ToLower();
+
+        if (lowername.ToLower() == "input")
+        {
+            js_push_class_object_instance(ctx, vm->GetSubsystem<Input>());
+            return true;
+        }
+
+        if (lowername.ToLower() == "resourcecache")
+        {
+            js_push_class_object_instance(ctx, vm->GetSubsystem<ResourceCache>());
+            return true;
+        }
+
+        if (lowername.ToLower() == "engine")
+        {
+            js_push_class_object_instance(ctx, vm->GetSubsystem<Engine>());
+            return true;
+        }
+
+        if (lowername.ToLower() == "renderer")
+        {
+            js_push_class_object_instance(ctx, vm->GetSubsystem<Renderer>());
+            return true;
+        }
+
+        if (lowername == "graphics")
+        {
+            js_push_class_object_instance(ctx, vm->GetSubsystem<Graphics>());
+            return true;
+        }
+
+        if (lowername.ToLower() == "vm")
+        {
+            js_push_class_object_instance(ctx, vm);
+            return true;
+        }
+
+        return false;
+    }
+*/
+
     // see http://duktape.org/guide.html#modules   
     static int js_module_search(duk_context* ctx)
     {       

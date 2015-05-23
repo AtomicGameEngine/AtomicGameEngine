@@ -68,6 +68,9 @@ UI::~UI()
 {
     if (initialized_)
     {
+        TBFile::SetReaderFunction(0);
+        TBID::tbidRegisterCallback = 0;
+
         tb::TBWidgetsAnimationManager::Shutdown();
 
         widgetWrap_.Clear();
@@ -78,8 +81,6 @@ UI::~UI()
     }
 
     uiContext_ = 0;
-    TBFile::SetReaderFunction(0);
-    TBID::tbidRegisterCallback = 0;
 }
 
 void UI::Shutdown()

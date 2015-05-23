@@ -61,8 +61,6 @@ void jsapi_init_graphics(JSVM* vm)
     duk_push_c_function(ctx, Light_SetShadowBias, 2);
     duk_put_prop_string(ctx, -2, "setShadowBias");
     duk_pop(ctx);
-
-
 }
 
 }
