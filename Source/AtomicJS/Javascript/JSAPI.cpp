@@ -147,4 +147,84 @@ void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, b
     assert (top == duk_get_top(ctx));
 }
 
+void js_push_variant(duk_context *ctx, const Variant& v)
+{
+    VariantType type = v.GetType();
+    RefCounted* ref;
+    Object* object;
+    Vector2& vector2 = (Vector2&) Vector2::ZERO;
+    Vector3& vector3 = (Vector3&) Vector3::ZERO;
+
+    switch (type)
+    {
+    case VAR_PTR:
+
+        ref = v.GetPtr();
+
+        if (!ref || !ref->IsObject())
+        {
+            duk_push_null(ctx);
+            break;
+        }
+
+        object = (Object*) ref;
+
+        // check that class is supported
+        duk_get_global_string(ctx, "Atomic");
+
+        // will not handle renamed classes!
+        duk_get_prop_string(ctx, -1, object->GetTypeName().CString());
+
+        if (!duk_is_function(ctx, -1))
+            object = NULL;
+
+        duk_pop_n(ctx, 2);
+
+        if (object)
+            js_push_class_object_instance(ctx, object);
+        else
+            duk_push_undefined(ctx);
+        break;
+
+    case VAR_BOOL:
+        duk_push_boolean(ctx, v.GetBool() ? 1 : 0);
+        break;
+    case VAR_INT:
+        duk_push_number(ctx, v.GetInt());
+        break;
+    case VAR_FLOAT:
+        duk_push_number(ctx, v.GetFloat());
+        break;
+    case VAR_STRING:
+        duk_push_string(ctx, v.GetString().CString());
+        break;
+    case VAR_VECTOR2:
+        vector2 = v.GetVector2();
+        duk_push_array(ctx);
+        duk_push_number(ctx, vector2.x_);
+        duk_put_prop_index(ctx, -1, 0);
+        duk_push_number(ctx, vector2.y_);
+        duk_put_prop_index(ctx, -1, 1);
+        break;
+    case VAR_VECTOR3:
+        vector3 = v.GetVector3();
+        duk_push_array(ctx);
+        duk_push_number(ctx, vector3.x_);
+        duk_put_prop_index(ctx, -1, 0);
+        duk_push_number(ctx, vector3.y_);
+        duk_put_prop_index(ctx, -1, 1);
+        duk_push_number(ctx, vector3.z_);
+        duk_put_prop_index(ctx, -1, 1);
+        break;
+
+    default:
+        duk_push_undefined(ctx);
+        break;
+    }
+
+
 }
+
+
+}
+

@@ -18,9 +18,13 @@ public:
 
     void AddEventHandler(StringHash eventType);
 
+    VariantMap& GetCurrentData() { return currentData_; }
+
 private:
 
     void HandleEvent(StringHash eventType, VariantMap& eventData);
+
+    VariantMap& currentData_;
 
 };
 

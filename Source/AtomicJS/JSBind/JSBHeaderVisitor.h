@@ -66,6 +66,9 @@ public:
             NamedType* ntype = type->asNamedType();
             String classname = getNameString(ntype->name());
 
+            if (classname.StartsWith("Atomic::"))
+                classname.Replace("Atomic::", "");
+
             if (classname == "String")
             {
                 jtype = new JSBStringType();

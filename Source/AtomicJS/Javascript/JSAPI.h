@@ -28,4 +28,7 @@ void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, b
 void js_class_push_propertyobject(JSVM* vm, const char* classname);
 void js_class_get_prototype(duk_context* ctx, const char *classname);
 
+/// Pushes variant value or undefined if can't be pushed
+void js_push_variant(duk_context* ctx, const Variant &v);
+
 }

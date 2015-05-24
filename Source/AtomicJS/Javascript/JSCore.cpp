@@ -9,6 +9,33 @@
 namespace Atomic
 {
 
+static int EventHandler_Property_Get(duk_context* ctx)
+{
+    // targ, key, recv
+
+    if (duk_is_string(ctx, 1))
+    {
+        const char* cstr = duk_to_string(ctx, 1);
+        StringHash key = cstr;
+
+        JSEventHelper* helper = js_to_class_instance<JSEventHelper>(ctx, 0, 0);
+        VariantMap& data = helper->GetCurrentData();
+
+        if (!data.Contains(key))
+        {
+            duk_push_undefined(ctx);
+            return 1;
+        }
+
+        js_push_variant(ctx, data[key]);
+        return 1;
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+
+}
+
 static int Object_SubscribeToEvent(duk_context* ctx)
 {
     duk_push_this(ctx); // stack 2
@@ -23,6 +50,18 @@ static int Object_SubscribeToEvent(duk_context* ctx)
 
         // construct a new event helper
         js_push_class_object_instance(ctx, new JSEventHelper(object->GetContext()));
+
+        // proxy support
+        duk_get_global_string(ctx, "Proxy");
+
+        duk_dup(ctx, -2);
+
+        // setup property handler
+        duk_push_object(ctx);
+        duk_push_c_function(ctx, EventHandler_Property_Get, 3);
+        duk_put_prop_string(ctx, -2, "get");
+        duk_new(ctx, 2);
+        duk_put_prop_string(ctx, -2, "__eventHelperProxy");
 
         duk_push_object(ctx);
         duk_put_prop_string(ctx, -2, "__eventHelperFunctions");
@@ -58,7 +97,6 @@ void jsapi_init_core(JSVM* vm)
     js_class_get_prototype(ctx, "AObject");
     duk_push_c_function(ctx, Object_SubscribeToEvent, 2);
     duk_put_prop_string(ctx, -2, "subscribeToEvent");
-
     duk_pop(ctx);
 }
 

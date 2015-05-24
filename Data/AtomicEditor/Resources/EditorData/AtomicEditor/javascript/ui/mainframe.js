@@ -6,15 +6,20 @@ var view = new Atomic.UIView();
 
 var mainframe = new UIWidget();
 
-mainframe.load("AtomicEditor/editor/ui/mainframe.tb.txt");
 mainframe.setSize(graphics.width, graphics.height);
 
-var handleEvent = function() {
+mainframe.subscribeToEvent("ScreenMode", function(data) {
 
-  print("Got Event");
+  mainframe.setSize(data.width, data.height);
 
-}
+});
 
-mainframe.subscribeToEvent("ScreenMode", handleEvent);
+mainframe.subscribeToEvent("WidgetLoaded", function(data) {
+
+  print("Widget Loaded", data.widget == mainframe);
+
+});
+
+mainframe.load("AtomicEditor/editor/ui/mainframe.tb.txt");
 
 view.addChild(mainframe);

@@ -6,13 +6,14 @@ namespace Atomic
 {
 
 JSEventHelper::JSEventHelper(Context* context) :
-    Object(context)
+    Object(context),
+    currentData_((VariantMap&) Variant::emptyVariantMap)
 {
 }
 
 JSEventHelper::~JSEventHelper()
 {
-    LOGINFO("Boom");
+
 }
 
 void JSEventHelper::AddEventHandler(StringHash eventType)
@@ -37,7 +38,12 @@ void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 
     if (duk_is_function(ctx, -1))
     {
-        if (duk_pcall(ctx, 0) != 0)
+        currentData_ = (const VariantMap&) eventData;
+        // pass in event helper proxy
+        duk_get_prop_string(ctx, -3, "__eventHelperProxy");
+        assert(duk_is_object(ctx, -1));
+
+        if (duk_pcall(ctx, 1) != 0)
         {
             vm->SendJSErrorEvent();
         }
