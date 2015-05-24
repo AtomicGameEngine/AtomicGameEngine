@@ -38,12 +38,44 @@ static int EventHandler_Property_Get(duk_context* ctx)
 
 static int Object_SubscribeToEvent(duk_context* ctx)
 {
+
+    int top = duk_get_top(ctx);
+
+    Object* sender = NULL;
+
+    StringHash eventType = StringHash::ZERO;
+
+
+    if ( top == 2 ) // General notification: subscribeToEvent("ScreenMode", function() {});
+    {
+        if (duk_is_string(ctx, 0) && duk_is_function(ctx, 1))
+        {
+            eventType = duk_to_string(ctx, 0);
+        }
+    }
+    else if (top == 3) // Listen to specific object sender subscribeToEvent(graphics, "ScreenMode", function() {});
+    {
+        if (duk_is_object(ctx, 0) && duk_is_string(ctx, 1) && duk_is_function(ctx, 2))
+        {
+            sender = js_to_class_instance<Object>(ctx, 0, 0);
+            eventType = duk_to_string(ctx, 1);
+        }
+    }
+
+    if ( eventType == StringHash::ZERO)
+    {
+        duk_push_string(ctx, "Object.subscribeToEvent() - Bad Arguments");
+        duk_throw(ctx);
+    }
+
     duk_push_this(ctx); // stack 2
 
+    // event receiver
     Object* object = js_to_class_instance<Object>(ctx, -1, 0);
 
     duk_get_prop_string(ctx, -1, "__eventHelper");
 
+    // need to setup the handler
     if (duk_is_null_or_undefined(ctx, -1))
     {
         duk_pop(ctx); // pop null or undefined
@@ -74,18 +106,17 @@ static int Object_SubscribeToEvent(duk_context* ctx)
 
     JSEventHelper* helper = js_to_class_instance<JSEventHelper>(ctx, -1, 0);
 
-    if (duk_is_string(ctx, 0))
-    {
-        StringHash eventType = duk_to_string(ctx, 0);
+    duk_get_prop_string(ctx, -1, "__eventHelperFunctions");
+    assert(duk_is_object(ctx, -1));
+    assert(duk_is_function(ctx, sender ? 2 : 1));
+    duk_dup(ctx, sender ? 2 : 1);
+    duk_put_prop_string(ctx, -2,  eventType.ToString().CString());
+    duk_pop(ctx);
 
-        duk_get_prop_string(ctx, -1, "__eventHelperFunctions");
-        assert(duk_is_object(ctx, -1));
-        assert(duk_is_function(ctx, 1));
-        duk_dup(ctx, 1);
-        duk_put_prop_string(ctx, -2,  eventType.ToString().CString());
-        duk_pop(ctx);
+    if (sender)
+        helper->AddEventHandler(sender, eventType);
+    else
         helper->AddEventHandler(eventType);
-    }
 
     return 0;
 }
@@ -95,7 +126,7 @@ void jsapi_init_core(JSVM* vm)
     duk_context* ctx = vm->GetJSContext();
 
     js_class_get_prototype(ctx, "AObject");
-    duk_push_c_function(ctx, Object_SubscribeToEvent, 2);
+    duk_push_c_function(ctx, Object_SubscribeToEvent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "subscribeToEvent");
     duk_pop(ctx);
 }

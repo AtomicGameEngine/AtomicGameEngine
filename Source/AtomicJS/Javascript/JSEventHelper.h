@@ -18,6 +18,8 @@ public:
 
     void AddEventHandler(StringHash eventType);
 
+    void AddEventHandler(Object* sender, StringHash eventType);
+
     VariantMap& GetCurrentData() { return currentData_; }
 
 private:

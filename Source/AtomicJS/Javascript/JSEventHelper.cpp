@@ -21,6 +21,11 @@ void JSEventHelper::AddEventHandler(StringHash eventType)
     SubscribeToEvent(eventType, HANDLER(JSEventHelper, HandleEvent));
 }
 
+void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
+{
+    SubscribeToEvent(sender, eventType, HANDLER(JSEventHelper, HandleEvent));
+}
+
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
     JSVM* vm = JSVM::GetJSVM(context_);
