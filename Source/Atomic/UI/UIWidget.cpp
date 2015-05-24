@@ -68,6 +68,11 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
 
 void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
+    UI* ui = GetSubsystem<UI>();
+    String id;
+
+    ui->GetTBIDString(ev.ref_id, id);
+
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
     data[P_TARGET] = target;
@@ -80,7 +85,7 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_KEY] = ev.key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
-    data[P_REFID] = (unsigned) ev.ref_id;
+    data[P_REFID] = id;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
 
@@ -366,7 +371,9 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
             {
                 VariantMap eventData;
                 eventData[PopupMenuSelect::P_BUTTON] = this;
-                eventData[PopupMenuSelect::P_REFID] = (unsigned) ev.ref_id;
+                String id;
+                ui->GetTBIDString(ev.ref_id, id);
+                eventData[PopupMenuSelect::P_REFID] = id;
                 SendEvent(E_POPUPMENUSELECT, eventData);
             }
 

@@ -14,9 +14,6 @@ using namespace Atomic;
 namespace AtomicEditor
 {
 
-class ListViewItemSource;
-class ListViewItemWidget;
-
 class MenubarItem : public TBGenericStringItem
 {
 public:

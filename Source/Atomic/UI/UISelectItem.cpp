@@ -63,7 +63,7 @@ UISelectItemSource::~UISelectItemSource()
 
 }
 
-tb::TBGenericStringItemSource* UISelectItemSource::GetTBItemSource()
+TBSelectItemSource *UISelectItemSource::GetTBItemSource()
 {
     // caller's responsibility to clean up
     TBGenericStringItemSource* src = new TBGenericStringItemSource();

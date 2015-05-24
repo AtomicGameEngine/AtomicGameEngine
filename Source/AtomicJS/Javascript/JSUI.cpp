@@ -193,9 +193,8 @@ void JSUI::HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData)
         return;
     }
 
-    UI* ui = GetSubsystem<UI>();
     String id;
-    ui->GetTBIDString(eventData[P_REFID].GetUInt(), id);
+    id = eventData[P_REFID].GetString();
 
     duk_push_string(ctx_, id.CString());
     duk_insert(ctx_, -1);
@@ -213,8 +212,6 @@ void JSUI::HandlePopupMenuSelect(StringHash eventType, VariantMap& eventData)
 
 void JSUI::PushWidgetEventObject(VariantMap& eventData)
 {
-
-    UI* ui = GetSubsystem<UI>();
 
     using namespace WidgetEvent;
 
@@ -266,9 +263,7 @@ void JSUI::PushWidgetEventObject(VariantMap& eventData)
     duk_push_number(ctx_, (duk_double_t) eventData[P_MODIFIERKEYS].GetInt());
     duk_put_prop_string(ctx_, -2, "modifierKeys");
 
-    String id;
-    unsigned blah = eventData[P_REFID].GetUInt();
-    ui->GetTBIDString(eventData[P_REFID].GetUInt(), id);
+    String id = eventData[P_REFID].GetString();
     duk_push_string(ctx_, id.CString() );
     duk_put_prop_string(ctx_, -2, "refID");
 
@@ -280,6 +275,8 @@ void JSUI::PushWidgetEventObject(VariantMap& eventData)
 void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
 {
     using namespace WidgetEvent;
+
+    return;
 
     UIWidget* handler = static_cast<UIWidget*>(eventData[P_HANDLER].GetPtr());
     UIWidget* target = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());

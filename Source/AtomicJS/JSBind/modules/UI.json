@@ -4,7 +4,7 @@
 	"includes" : ["<Atomic/Graphics/Material.h>", "<Atomic/Scene/Node.h>", "<Atomic/Scene/Scene.h>", "<Atomic/Graphics/Texture2D.h>"],
 	"classes" : ["UIWidget", "UILayout", "UIView", "UIWindow", "UIButton", "UITextField",
 								"UISelectItem", "UISelectItemSource", "UIMenuWindow", "UIEditField",
-								"UIImageWidget", "UIClickLabel", "UICheckBox"],
+								"UIImageWidget", "UIClickLabel", "UICheckBox", "UIMenuItem", "UIMenuItemSource"],
 	"overloads" : {
 	}
 }

@@ -68,7 +68,7 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         duk_throw(ctx);
     }
 
-    duk_push_this(ctx); // stack 2
+    duk_push_this(ctx);
 
     // event receiver
     Object* object = js_to_class_instance<Object>(ctx, -1, 0);
@@ -101,7 +101,7 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         // dup so when we set the helper is left on stack
         duk_dup_top(ctx);
 
-        duk_put_prop_string(ctx, 2, "__eventHelper");
+        duk_put_prop_string(ctx, -3, "__eventHelper");
     }
 
     JSEventHelper* helper = js_to_class_instance<JSEventHelper>(ctx, -1, 0);
