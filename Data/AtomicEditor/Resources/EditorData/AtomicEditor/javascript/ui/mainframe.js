@@ -22,30 +22,64 @@ mainframe.subscribeToEvent(graphics, "ScreenMode", function(data) {
 
 });
 
-mainframe.subscribeToEvent(mainframe, "WidgetEvent", function(data) {
+var srcLookup = {};
 
-  if (data.type == UI.EVENT_TYPE_CLICK) {
+mainframe.handleMenuAtomicEditor = function(data) {
 
-    var target = data.target;
+  var target = data.target;
 
-    if (target.id == "menu atomic editor") {
+  if (target && target.id == "menu atomic editor popup") {
 
-      print ("CLICK! ", target.id);
+    if (data.refid == "quit") {
 
-      var menu = new UIMenuWindow(target, "atomic editor popup");
-      menu.show(mainframe.menuAtomicEditorSource);
-      return true; // handled
+      // todo, send a request for file saves, etc
+      Atomic.getEngine().exit();
 
-    } else if (target.id == "menu edit") {
+      return true;
 
-      print ("CLICK! ", target.id);
-
-      var menu = new UIMenuWindow(target, "edit popup");
-      menu.show(mainframe.menuEditSource);
-      return true; // handled
     }
 
   }
+
+}
+
+mainframe.handleMenuBarEvent = function(data) {
+
+  if (data.type == UI.EVENT_TYPE_CLICK) {
+
+    if (mainframe.handleMenuAtomicEditor(data)) {
+
+      return true;
+
+    }
+
+    var target = data.target;
+
+    var src = srcLookup[target.id];
+
+    if (src) {
+
+      var menu = new UIMenuWindow(target, target.id + " popup");
+      menu.show(src);
+      return true;
+    }
+
+  }
+
+  return false;
+
+
+}
+
+mainframe.subscribeToEvent(mainframe, "WidgetEvent", function(data) {
+
+  if (mainframe.handleMenuBarEvent(data)) {
+
+    return true;
+
+  }
+
+  return false;
 
 });
 
@@ -53,70 +87,76 @@ initializeMenuSources();
 
 function initializeMenuSources() {
 
-  //var src = mainframe.menuAtomicEditorSource = new UIMenuItemSource();
-
-  var aboutItems = {
+  var editorItems = {
     "About Atomic Editor": "about atomic editor",
-    "-" : null,
+    "-1" : null,
     "Manage License" : "manage license",
-    "-" : null,
+    "-2" : null,
     "Check for Updates" : "check update",
-    "-" : null,
+    "-3" : null,
     "Quit" : "quit"
-
   };
 
   var editItems = {
 
     "Undo" : ["edit undo", editorStrings.ShortcutUndo],
     "Redo" : ["edit redo", editorStrings.ShortcutRedo],
-    "-" : null,
+    "-1" : null,
     "Cut" : ["edit cut", editorStrings.ShortcutCut],
     "Copy" : ["edit copy", editorStrings.ShortcutCopy],
     "Paste" : ["edit paste", editorStrings.ShortcutPaste],
     "Select All" : ["edit select all", editorStrings.ShortcutSelectAll],
-    "-" : null,
+    "-2" : null,
     "Find" : ["edit find", editorStrings.ShortcutFind],
     "Find Next" : ["edit find next", editorStrings.ShortcutFindNext],
     "Find Prev" : ["edit find prev", editorStrings.ShortcutFindPrev],
-    "-" : null,
+    "-3" : null,
     "Format Code" : ["edit format code", editorStrings.ShortcutBeautify],
-    "-" : null,
+    "-4" : null,
     "Play" : ["edit play", editorStrings.ShortcutPlay]
   };
 
-  mainframe.menuAtomicEditorSource = utils.createMenuItemSource(aboutItems);
-  mainframe.menuEditSource = utils.createMenuItemSource(editItems);
+  var fileItems = {
+    "New Project" : "new project",
+    "Open Project" : "open project",
+    "Save Project" : "save project",
+    "-1" : null,
+    "Close Project" : "close project",
+    "-2" : null,
+    "Save File" : ["save file", editorStrings.ShortcutSaveFile],
+    "Close File" : ["close file", editorStrings.ShortcutCloseFile],
 
+  };
 
+  var buildItems = {
+    "Build" : ["build project", editorStrings.ShortcutBuild],
+    "-1" : null,
+    "Build Settings" : ["build project settings", editorStrings.ShortcutBuildSettings],
+  };
 
+  var toolsItems = {
+    "Tiled Map Editor" : "tools tiles"
+  };
 
-  /*
+  var helpItems = {
+    "API Documentation" : "help api",
+    "-1" : null,
+    "Forums" : "help forums",
+    "-2" : null,
+    "Atomic Game Engine on GitHub" : "help github"
+  };
 
-  menuFileSource.AddItem(new MenubarItem("New Project", TBIDC("new project")));
-  menuFileSource.AddItem(new MenubarItem("Open Project", TBIDC("open project")));
-  menuFileSource.AddItem(new MenubarItem("Save Project", TBIDC("save project")));
-  menuFileSource.AddItem(new MenubarItem("-"));
-  menuFileSource.AddItem(new MenubarItem("Close Project", TBIDC("close project")));
-  menuFileSource.AddItem(new MenubarItem("-"));
-  menuFileSource.AddItem(new MenubarItem("Save File", TBIDC("save file"), EDITOR_STRING(ShortcutSaveFile)));
-  menuFileSource.AddItem(new MenubarItem("Close File", TBIDC("close file"), EDITOR_STRING(ShortcutCloseFile)));
+  var developerItems = {
+    "Set 1920x1080 Resolution" : "developer resolution"
+  };
 
-  menuBuildSource.AddItem(new MenubarItem("Build", TBIDC("project_build"), EDITOR_STRING(ShortcutBuild)));
-  menuBuildSource.AddItem(new MenubarItem("-"));
-  menuBuildSource.AddItem(new MenubarItem("Build Settings", TBIDC("project_build_settings"), EDITOR_STRING(ShortcutBuildSettings)));
-
-  menuToolsSource.AddItem(new MenubarItem("Tiled Map Editor", TBIDC("tools tiled")));
-
-
-  menuHelpSource.AddItem(new MenubarItem("API Documentation", TBIDC("help_api")));
-  menuHelpSource.AddItem(new MenubarItem("-"));
-  menuHelpSource.AddItem(new MenubarItem("Forums", TBIDC("help_forums")));
-  menuHelpSource.AddItem(new MenubarItem("-"));
-  menuHelpSource.AddItem(new MenubarItem("Atomic Game Engine on GitHub", TBIDC("help_github")));
-
-  menuDeveloperSource.AddItem(new MenubarItem("Set 1920x1080 Resolution", TBIDC("developer_resolution")));
-  */
+  srcLookup["menu atomic editor"] = utils.createMenuItemSource(editorItems);
+  srcLookup["menu file"] = utils.createMenuItemSource(fileItems);
+  srcLookup["menu edit"] = utils.createMenuItemSource(editItems);
+  srcLookup["menu build"] = utils.createMenuItemSource(buildItems);
+  srcLookup["menu tools"] = utils.createMenuItemSource(toolsItems);
+  srcLookup["menu help"] = utils.createMenuItemSource(helpItems);
+  srcLookup["menu developer"] = utils.createMenuItemSource(developerItems);
 
 
 }
