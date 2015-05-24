@@ -136,6 +136,14 @@ static int js_atomic_GetInput(duk_context* ctx)
     return 1;
 }
 
+static int js_atomic_GetFileSystem(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm->GetSubsystem<FileSystem>());
+    return 1;
+}
+
+
 static int js_atomic_script(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -303,6 +311,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
     duk_put_prop_string(ctx, -2, "getInput");
+
+    duk_push_c_function(ctx, js_atomic_GetFileSystem, 0);
+    duk_put_prop_string(ctx, -2, "getFileSystem");
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");

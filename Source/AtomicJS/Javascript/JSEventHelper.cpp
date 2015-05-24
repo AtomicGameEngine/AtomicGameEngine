@@ -15,7 +15,7 @@ JSEventHelper::JSEventHelper(Context* context) :
 
 JSEventHelper::~JSEventHelper()
 {
-    LOGINFO("Boom");
+
 }
 
 void JSEventHelper::AddEventHandler(StringHash eventType)

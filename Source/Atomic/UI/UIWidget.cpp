@@ -24,8 +24,6 @@ UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 
-    UI* ui = GetSubsystem<UI>();
-
 }
 
 UIWidget::~UIWidget()
@@ -38,7 +36,7 @@ bool UIWidget::Load(const String& filename)
     UI* ui = GetSubsystem<UI>();
 
     if  (!ui->LoadResourceFile(widget_ , filename))
-        return false;    
+        return false;
 
     VariantMap eventData;
     eventData[WidgetLoaded::P_WIDGET] = this;
@@ -159,12 +157,29 @@ IntRect UIWidget::GetRect()
     return rect;
 }
 
+void UIWidget::SetRect(IntRect rect)
+{
+    if (!widget_)
+        return;
+
+    tb::TBRect tbrect;
+
+    tbrect.y = rect.top_;
+    tbrect.x = rect.left_;
+    tbrect.w = rect.right_ - rect.left_;
+    tbrect.h = rect.bottom_ - rect.top_;
+
+    widget_->SetRect(tbrect);
+
+}
+
+
 void UIWidget::SetSize(int width, int height)
 {
     if (!widget_)
         return;
 
-    widget_->SetSize(width, height);       
+    widget_->SetSize(width, height);
 }
 
 void UIWidget::Invalidate()

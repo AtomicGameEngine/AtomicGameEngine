@@ -86,7 +86,7 @@ tb::TBGenericStringItem* UIMenuItem::GetTBItem()
 
     if (!subSource_)
     {
-         item = new MenubarItem(str_.CString(), id_, shortcut_);
+        item = new MenubarItem(str_.CString(), id_, shortcut_);
     }
     else
     {
