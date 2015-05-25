@@ -1,0 +1,8 @@
+{
+	"name" : "Core",
+	"sources" : ["Source/Atomic/Core"],
+	"classes" : ["Context", "Object"],
+	"classes_rename" : {
+		"Object" : "AObject"
+	}
+}
