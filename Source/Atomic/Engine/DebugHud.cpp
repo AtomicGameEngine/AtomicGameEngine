@@ -1,7 +1,7 @@
 #ifdef __disabled
 
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,12 @@
 #include "../Core/CoreEvents.h"
 #include "../Engine/DebugHud.h"
 #include "../Engine/Engine.h"
+#include "../UI/Font.h"
 #include "../Graphics/Graphics.h"
 #include "../IO/Log.h"
 #include "../Core/Profiler.h"
 #include "../Graphics/Renderer.h"
+#include "../UI/Text.h"
 #include "../UI/UI.h"
 
 #include "../DebugNew.h"
@@ -143,7 +145,7 @@ void DebugHud::Update()
     if (modeText_->IsVisible())
     {
         String mode;
-        mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s Mode:%s",
+        mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
             qualityTexts[renderer->GetTextureQuality()],
             qualityTexts[renderer->GetMaterialQuality()],
             renderer->GetSpecularLighting() ? "On" : "Off",
@@ -152,11 +154,7 @@ void DebugHud::Update()
             shadowQualityTexts[renderer->GetShadowQuality()],
             renderer->GetMaxOccluderTriangles() > 0 ? "On" : "Off",
             renderer->GetDynamicInstancing() ? "On" : "Off",
-            #ifdef ATOMIC_OPENGL
-            "OGL");
-            #else
-            graphics->GetSM3Support() ? "SM3" : "SM2");
-            #endif
+            graphics->GetApiName().CString());
 
         modeText_->SetText(mode);
     }

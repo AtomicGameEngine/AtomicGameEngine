@@ -37,6 +37,7 @@
 #include "../../Resource/ResourceCache.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
+#include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../Graphics/Technique.h"
 #include "../../Graphics/Texture2D.h"
@@ -233,6 +234,8 @@ static HWND GetWindowHandle(SDL_Window* window)
 
 static unsigned readableDepthFormat = 0;
 
+const Vector2 Graphics::pixelUVOffset(0.5f, 0.5f);
+
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
@@ -253,20 +256,18 @@ Graphics::Graphics(Context* context) :
     queryIssued_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
-    hardwareShadowSupport_(false),
-    streamOffsetSupport_(false),
+    instancingSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
-    hasSM3_(false),
-    forceSM2_(false),
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
-    currentShaderParameters_(0),
+    shaderProgram_(0),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
-    orientations_("LandscapeLeft LandscapeRight")
+    orientations_("LandscapeLeft LandscapeRight"),
+    apiName_("D3D9")
 {
     SetTextureUnitMappings();
     
@@ -283,7 +284,7 @@ Graphics::~Graphics()
         MutexLock lock(gpuObjectMutex_);
 
         // Release all GPU objects that still exist
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->Release();
         gpuObjects_.Clear();
     }
@@ -396,7 +397,6 @@ void Graphics::RaiseWindow()
     if (impl_->window_)
         SDL_RaiseWindow(impl_->window_);
 }
-
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample)
 {
     PROFILE(SetScreenMode);
@@ -797,9 +797,6 @@ bool Graphics::BeginFrame()
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         SetTexture(i, 0);
     
-    // Cleanup stream frequencies from previous frame
-    ResetStreamFrequencies();
-    
     numPrimitives_ = 0;
     numBatches_ = 0;
     
@@ -965,7 +962,7 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.Size() > MAX_VERTEX_STREAMS)
+    if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
@@ -1039,73 +1036,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
 bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.Size() > MAX_VERTEX_STREAMS)
-    {
-        LOGERROR("Too many vertex buffers");
-        return false;
-    }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
-    
-    unsigned long long hash = 0;
-    for (unsigned i = 0; i < buffers.Size(); ++i)
-    {
-        if (!buffers[i])
-            continue;
-        
-        hash |= buffers[i]->GetBufferHash(i, elementMasks[i]);
-    }
-    
-    if (hash)
-    {
-        if (!vertexDeclarations_.Contains(hash))
-        {
-            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
-            if (!newDeclaration->GetDeclaration())
-            {
-                LOGERROR("Failed to create vertex declaration");
-                return false;
-            }
-            
-            vertexDeclarations_[hash] = newDeclaration;
-        }
-        
-        VertexDeclaration* declaration = vertexDeclarations_[hash];
-        if (declaration != vertexDeclaration_)
-        {
-            impl_->device_->SetVertexDeclaration(declaration->GetDeclaration());
-            vertexDeclaration_ = declaration;
-        }
-    }
-    
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        VertexBuffer* buffer = 0;
-        unsigned offset = 0;
-        
-        if (i < buffers.Size())
-        {
-            buffer = buffers[i];
-            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
-                offset = instanceOffset * buffer->GetVertexSize();
-        }
-        
-        if (buffer != vertexBuffers_[i] || offset != streamOffsets_[i])
-        {
-            if (buffer)
-                impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset, buffer->GetVertexSize());
-            else
-                impl_->device_->SetStreamSource(i, 0, 0, 0);
-            
-            vertexBuffers_[i] = buffer;
-            streamOffsets_[i] = offset;
-        }
-    }
-    
-    return true;
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)
@@ -1193,29 +1124,17 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (vertexShader_ && pixelShader_)
     {
         Pair<ShaderVariation*, ShaderVariation*> key = MakePair(vertexShader_, pixelShader_);
-        HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, Pair<ShaderType, unsigned> > >::Iterator i =
-            shaderParameters_.Find(key);
-        if (i != shaderParameters_.End())
-            currentShaderParameters_ = &i->second_;
+        ShaderProgramMap::Iterator i = shaderPrograms_.Find(key);
+        if (i != shaderPrograms_.End())
+            shaderProgram_ = i->second_.Get();
         else
         {
-            HashMap<StringHash, Pair<ShaderType, unsigned> >& parameters = shaderParameters_[key];
-
-            const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader_->GetParameters();
-            for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)
-                parameters[i->first_] = MakePair(i->second_.type_, i->second_.register_);
-
-            const HashMap<StringHash, ShaderParameter>& psParams = pixelShader_->GetParameters();
-            for (HashMap<StringHash, ShaderParameter>::ConstIterator i = psParams.Begin(); i != psParams.End(); ++i)
-                parameters[i->first_] = MakePair(i->second_.type_, i->second_.register_);
-
-            // Optimize shader parameter lookup by rehashing to next power of two
-            parameters.Rehash(NextPowerOfTwo(parameters.Size()));
-            currentShaderParameters_ = &parameters;
+            ShaderProgram* newProgram = shaderPrograms_[key] = new ShaderProgram(vertexShader_, pixelShader_);
+            shaderProgram_ = newProgram;
         }
     }
     else
-        currentShaderParameters_ = 0;
+        shaderProgram_ = 0;
 
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
@@ -1224,161 +1143,148 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, data, count / 4);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, data, count / 4);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, data, count / 4);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, data, count / 4);
 }
 
 void Graphics::SetShaderParameter(StringHash param, float value)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    float data[4];
+    static Vector4 data(Vector4::ZERO);
+    data.x_ = value;
     
-    data[0] = value;
-    data[1] = 0.0f;
-    data[2] = 0.0f;
-    data[3] = 0.0f;
-    
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, &data[0], 1);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, &data[0], 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     /// \todo Bool constants possibly have no effect on Direct3D9
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
 
     BOOL data = value;
 
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantB(i->second_.second_, &data, 1);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantB(i->second_.register_, &data, 1);
     else
-        impl_->device_->SetPixelShaderConstantB(i->second_.second_, &data, 1);
+        impl_->device_->SetPixelShaderConstantB(i->second_.register_, &data, 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Color& color)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, color.Data(), 1);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, color.Data(), 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, color.Data(), 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, color.Data(), 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    float data[4];
+    static Vector4 data(Vector4::ZERO);
+    data.x_ = vector.x_;
+    data.y_ = vector.y_;
     
-    data[0] = vector.x_;
-    data[1] = vector.y_;
-    data[2] = 0.0f;
-    data[3] = 0.0f;
-    
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, &data[0], 1);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, &data[0], 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    float data[12];
+    static Matrix3x4 data(Matrix3x4::ZERO);
+    data.m00_ = matrix.m00_;
+    data.m01_ = matrix.m01_;
+    data.m02_ = matrix.m02_;
+    data.m10_ = matrix.m10_;
+    data.m11_ = matrix.m11_;
+    data.m12_ = matrix.m12_;
+    data.m20_ = matrix.m20_;
+    data.m21_ = matrix.m21_;
+    data.m22_ = matrix.m22_;
     
-    data[0] = matrix.m00_;
-    data[1] = matrix.m01_;
-    data[2] = matrix.m02_;
-    data[3] = 0.0f;
-    data[4] = matrix.m10_;
-    data[5] = matrix.m11_;
-    data[6] = matrix.m12_;
-    data[7] = 0.0f;
-    data[8] = matrix.m20_;
-    data[9] = matrix.m21_;
-    data[10] = matrix.m22_;
-    data[11] = 0.0f;
-    
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, &data[0], 3);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.m00_, 3);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, &data[0], 3);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.m00_, 3);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    float data[4];
-    
-    data[0] = vector.x_;
-    data[1] = vector.y_;
-    data[2] = vector.z_;
-    data[3] = 0.0f;
-    
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, &data[0], 1);
+    static Vector4 data(Vector4::ZERO);
+    data.x_ = vector.x_;
+    data.y_ = vector.y_;
+    data.z_ = vector.z_;
+
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, &data.x_, 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, &data[0], 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, matrix.Data(), 4);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 4);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, matrix.Data(), 4);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 4);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, vector.Data(), 1);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, vector.Data(), 1);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, vector.Data(), 1);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, vector.Data(), 1);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 {
-    HashMap<StringHash, Pair<ShaderType, unsigned> >::Iterator i;
-    if (!currentShaderParameters_ || (i = currentShaderParameters_->Find(param)) == currentShaderParameters_->End())
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
         return;
     
-    if (i->second_.first_ == VS)
-        impl_->device_->SetVertexShaderConstantF(i->second_.second_, matrix.Data(), 3);
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 3);
     else
-        impl_->device_->SetPixelShaderConstantF(i->second_.second_, matrix.Data(), 3);
+        impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 3);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Variant& value)
@@ -1440,7 +1346,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
 
 bool Graphics::HasShaderParameter(StringHash param)
 {
-    return currentShaderParameters_ && currentShaderParameters_->Find(param) != currentShaderParameters_->End();
+    return shaderProgram_ && shaderProgram_->parameters_.Find(param) != shaderProgram_->parameters_.End();
 }
 
 bool Graphics::HasTextureUnit(TextureUnit unit)
@@ -1462,7 +1368,7 @@ void Graphics::ClearParameterSources()
 void Graphics::ClearTransformSources()
 {
     shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
-    shaderParameterSources_[SP_OBJECTTRANSFORM] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SP_OBJECT] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)
@@ -1796,15 +1702,6 @@ void Graphics::SetDepthWrite(bool enable)
     }
 }
 
-void Graphics::SetDrawAntialiased(bool enable)
-{
-    if (enable != drawAntialiased_)
-    {
-        impl_->device_->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, enable ? TRUE : FALSE);
-        drawAntialiased_ = enable;
-    }
-}
-
 void Graphics::SetFillMode(FillMode mode)
 {
     if (mode != fillMode_)
@@ -1969,35 +1866,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
         Matrix4 viewProj = projection * view;
         impl_->device_->SetClipPlane(0, clipPlane.Transformed(viewProj).ToVector4().Data());
     }
-}
-
-void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
-{
-    if (index < MAX_VERTEX_STREAMS && streamFrequencies_[index] != frequency)
-    {
-        impl_->device_->SetStreamSourceFreq(index, frequency);
-        streamFrequencies_[index] = frequency;
-    }
-}
-
-void Graphics::ResetStreamFrequencies()
-{
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        if (streamFrequencies_[i] != 1)
-        {
-            impl_->device_->SetStreamSourceFreq(i, 1);
-            streamFrequencies_[i] = 1;
-        }
-    }
-}
-
-void Graphics::SetForceSM2(bool enable)
-{
-    if (!IsInitialized())
-        forceSM2_ = enable;
-    else
-        LOGERROR("Force Shader Model 2 can not be changed after setting the initial screen mode");
 }
 
 void Graphics::BeginDumpShaders(const String& fileName)
@@ -2166,11 +2034,6 @@ RenderSurface* Graphics::GetRenderTarget(unsigned index) const
     return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
 }
 
-unsigned Graphics::GetStreamFrequency(unsigned index) const
-{
-    return index < MAX_VERTEX_STREAMS ? streamFrequencies_[index] : 0;
-}
-
 IntVector2 Graphics::GetRenderTargetDimensions() const
 {
     int width, height;
@@ -2225,7 +2088,7 @@ void Graphics::WindowResized()
 
 void Graphics::WindowMoved()
 {
-    if (!impl_->device_ || !impl_->window_)
+    if (!impl_->device_ || !impl_->window_ || fullscreen_)
         return;
 
     int newX, newY;
@@ -2354,19 +2217,18 @@ void Graphics::CleanupScratchBuffers()
     maxScratchBufferRequest_ = 0;
 }
 
-void Graphics::CleanupShaderParameters(ShaderVariation* variation)
+void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
 {
-    for (HashMap<Pair<ShaderVariation*, ShaderVariation*>, HashMap<StringHash, Pair<ShaderType, unsigned> > >::Iterator i =
-        shaderParameters_.Begin(); i != shaderParameters_.End();)
+    for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
     {
         if (i->first_.first_ == variation || i->first_.second_ == variation)
-            i = shaderParameters_.Erase(i);
+            i = shaderPrograms_.Erase(i);
         else
             ++i;
     }
 
     if (vertexShader_ == variation || pixelShader_ == variation)
-        currentShaderParameters_ = 0;
+        shaderProgram_ = 0;
 }
 
 unsigned Graphics::GetAlphaFormat()
@@ -2489,6 +2351,27 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
+void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
+{
+    if (index < MAX_VERTEX_STREAMS && streamFrequencies_[index] != frequency)
+    {
+        impl_->device_->SetStreamSourceFreq(index, frequency);
+        streamFrequencies_[index] = frequency;
+    }
+}
+
+void Graphics::ResetStreamFrequencies()
+{
+    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    {
+        if (streamFrequencies_[i] != 1)
+        {
+            impl_->device_->SetStreamSourceFreq(i, 1);
+            streamFrequencies_[i] = 1;
+        }
+    }
+}
+
 bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
     if (!externalWindow_)
@@ -2574,9 +2457,9 @@ bool Graphics::CreateInterface()
         return false;
     }
     
-    if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(2, 0))
+    if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
     {
-        LOGERROR("Shader model 2.0 display adapter is required");
+        LOGERROR("Shader model 3.0 display adapter is required");
         return false;
     }
     
@@ -2626,8 +2509,7 @@ void Graphics::CheckFeatureSupport()
     lightPrepassSupport_ = false;
     deferredSupport_ = false;
     hardwareShadowSupport_ = false;
-    streamOffsetSupport_ = false;
-    hasSM3_ = false;
+    instancingSupport_ = false;
     readableDepthFormat = 0;
     
     // Check hardware shadow map support: prefer NVIDIA style hardware depth compared shadow maps if available
@@ -2684,14 +2566,6 @@ void Graphics::CheckFeatureSupport()
         dummyColorFormat_ = D3DFMT_R5G6B5;
     else if (impl_->CheckFormatSupport(D3DFMT_A4R4G4B4, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE))
         dummyColorFormat_ = D3DFMT_A4R4G4B4;
-        
-    // Check for Shader Model 3
-    if (!forceSM2_)
-    {
-        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
-            D3DPS_VERSION(3, 0))
-            hasSM3_ = true;
-    }
     
     // Check for light prepass and deferred rendering support
     if (impl_->deviceCaps_.NumSimultaneousRTs >= 2 && impl_->CheckFormatSupport(D3DFMT_R32F, D3DUSAGE_RENDERTARGET,
@@ -2704,14 +2578,12 @@ void Graphics::CheckFeatureSupport()
     
     // Check for stream offset (needed for instancing)
     if (impl_->deviceCaps_.DevCaps2 & D3DDEVCAPS2_STREAMOFFSET)
-        streamOffsetSupport_ = true;
+        instancingSupport_ = true;
     
     // Check for sRGB read & write
     /// \todo Should be checked for each texture format separately
     sRGBSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE);
     sRGBWriteSupport_ = impl_->CheckFormatSupport(D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE);
-    
-    SendEvent(E_GRAPHICSFEATURES);
 }
 
 void Graphics::ResetDevice()
@@ -2748,7 +2620,7 @@ void Graphics::OnDeviceLost()
     {
         MutexLock lock(gpuObjectMutex_);
 
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceLost();
     }
     
@@ -2760,7 +2632,7 @@ void Graphics::OnDeviceReset()
     {
         MutexLock lock(gpuObjectMutex_);
 
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
             (*i)->OnDeviceReset();
     }
     
@@ -2834,7 +2706,6 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    drawAntialiased_ = true;
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;
     impl_->destBlend_ = D3DBLEND_ZERO;

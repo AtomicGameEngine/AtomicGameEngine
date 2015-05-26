@@ -36,6 +36,7 @@
 #include "../Core/StringUtils.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
+#include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../Scene/ValueAnimation.h"
 #include "../Resource/XMLFile.h"
@@ -54,6 +55,10 @@ static const char* textureUnitNames[] =
     "specular",
     "emissive",
     "environment",
+#ifdef DESKTOP_GRAPHICS
+    "volume",
+    "custom1",
+    "custom2",
     "lightramp",
     "lightshape",
     "shadowmap",
@@ -61,9 +66,14 @@ static const char* textureUnitNames[] =
     "indirection",
     "depth",
     "light",
-    "volume",
     "zone",
     0
+#else
+    "lightramp",
+    "lightshape",
+    "shadowmap",
+    0
+#endif
 };
 
 static const char* cullModeNames[] =
@@ -71,6 +81,14 @@ static const char* cullModeNames[] =
     "none",
     "ccw",
     "cw",
+    0
+};
+
+static const char* fillModeNames[] =
+{
+    "solid",
+    "wireframe",
+    "point",
     0
 };
 
@@ -154,7 +172,6 @@ void ShaderParameterAnimationInfo::ApplyValue(const Variant& newValue)
 Material::Material(Context* context) :
     Resource(context),
     auxViewFrameNumber_(0),
-    numUsedTextureUnits_(0),
     shaderParameterHash_(0),
     occlusion_(true),
     specular_(false),
@@ -203,7 +220,17 @@ bool Material::BeginLoad(Deserializer& source)
                 // Detect cube maps by file extension: they are defined by an XML file
                 /// \todo Differentiate with 3D textures by actually reading the XML content
                 if (GetExtension(name) == ".xml")
-                    cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                {
+                    #ifdef DESKTOP_GRAPHICS
+                    TextureUnit unit = TU_DIFFUSE;
+                    if (textureElem.HasAttribute("unit"))
+                        unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
+                    if (unit == TU_VOLUMEMAP)
+                        cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else
+                    #endif
+                        cache->BackgroundLoadResource<TextureCube>(name, true, this);
+                }
                 else
                     cache->BackgroundLoadResource<Texture2D>(name, true, this);
                 textureElem = textureElem.GetNext("texture");
@@ -295,7 +322,14 @@ bool Material::Load(const XMLElement& source)
             // Detect cube maps by file extension: they are defined by an XML file
             /// \todo Differentiate with 3D textures by actually reading the XML content
             if (GetExtension(name) == ".xml")
-                SetTexture(unit, cache->GetResource<TextureCube>(name));
+            {
+                #ifdef DESKTOP_GRAPHICS
+                if (unit == TU_VOLUMEMAP)
+                    SetTexture(unit, cache->GetResource<Texture3D>(name));
+                else
+                #endif
+                    SetTexture(unit, cache->GetResource<TextureCube>(name));
+            }
             else
                 SetTexture(unit, cache->GetResource<Texture2D>(name));
         }
@@ -348,6 +382,10 @@ bool Material::Load(const XMLElement& source)
     if (shadowCullElem)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetAttribute("value").CString(), cullModeNames, CULL_CCW));
 
+    XMLElement fillElem = source.GetChild("fill");
+    if (fillElem)
+        SetFillMode((FillMode)GetStringListIndex(fillElem.GetAttribute("value").CString(), fillModeNames, FILL_SOLID));
+
     XMLElement depthBiasElem = source.GetChild("depthbias");
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
@@ -386,7 +424,7 @@ bool Material::Save(XMLElement& dest) const
         if (texture)
         {
             XMLElement textureElem = dest.CreateChild("texture");
-            textureElem.SetString("unit", j < MAX_NAMED_TEXTURE_UNITS ? textureUnitNames[j] : String(j).CString());
+            textureElem.SetString("unit", textureUnitNames[j]);
             textureElem.SetString("name", texture->GetName());
         }
     }
@@ -418,6 +456,10 @@ bool Material::Save(XMLElement& dest) const
 
     XMLElement shadowCullElem = dest.CreateChild("shadowcull");
     shadowCullElem.SetString("value", cullModeNames[shadowCullMode_]);
+
+    // Write fill mode
+    XMLElement fillElem = dest.CreateChild("fill");
+    fillElem.SetString("value", fillModeNames[fillMode_]);
 
     // Write depth bias
     XMLElement depthBiasElem = dest.CreateChild("depthbias");
@@ -527,16 +569,10 @@ void Material::SetTexture(TextureUnit unit, Texture* texture)
 {
     if (unit < MAX_TEXTURE_UNITS)
     {
-        textures_[unit] = texture;
-
-        // Update the number of used texture units
-        if (texture && (unsigned)unit >= numUsedTextureUnits_)
-            numUsedTextureUnits_ = unit + 1;
-        else if (!texture && unit == numUsedTextureUnits_ - 1)
-        {
-            while (numUsedTextureUnits_ && !textures_[numUsedTextureUnits_ - 1])
-                --numUsedTextureUnits_;
-        }
+        if (texture)
+            textures_[unit] = texture;
+        else
+            textures_.Erase(unit);
     }
 }
 
@@ -583,6 +619,11 @@ void Material::SetShadowCullMode(CullMode mode)
     shadowCullMode_ = mode;
 }
 
+void Material::SetFillMode(FillMode mode)
+{
+    fillMode_ = mode;
+}
+
 void Material::SetDepthBias(const BiasParameters& parameters)
 {
     depthBias_ = parameters;
@@ -627,13 +668,12 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
     ret->shaderParameters_ = shaderParameters_;
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        ret->textures_[i] = textures_[i];
+    ret->textures_ = textures_;
     ret->occlusion_ = occlusion_;
     ret->specular_ = specular_;
     ret->cullMode_ = cullMode_;
     ret->shadowCullMode_ = shadowCullMode_;
-    ret->numUsedTextureUnits_ = numUsedTextureUnits_;
+    ret->fillMode_ = fillMode_;
     ret->RefreshMemoryUse();
 
     return ret;
@@ -659,15 +699,16 @@ Technique* Material::GetTechnique(unsigned index) const
     return index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
 }
 
-Pass* Material::GetPass(unsigned index, StringHash passType) const
+Pass* Material::GetPass(unsigned index, const String& passName) const
 {
     Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
-    return tech ? tech->GetPass(passType) : 0;
+    return tech ? tech->GetPass(passName) : 0;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
-    return unit < MAX_TEXTURE_UNITS ? textures_[unit] : (Texture*)0;
+    HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures_.Find(unit);
+    return i != textures_.End() ? i->second_.Get() : (Texture*)0;
 }
 
 const Variant& Material::GetShaderParameter(const String& name) const
@@ -722,7 +763,7 @@ void Material::CheckOcclusion()
         Technique* tech = techniques_[i].technique_;
         if (tech)
         {
-            Pass* pass = tech->GetPass(PASS_BASE);
+            Pass* pass = tech->GetPass("base");
             if (pass && pass->GetDepthWrite() && !pass->GetAlphaMask())
                 occlusion_ = true;
         }
@@ -738,8 +779,7 @@ void Material::ResetToDefaults()
     SetNumTechniques(1);
     SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        textures_[i] = 0;
+    textures_.Clear();
 
     batchedParameterUpdate_ = true;
     shaderParameters_.Clear();
@@ -753,6 +793,7 @@ void Material::ResetToDefaults()
 
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
+    fillMode_ = FILL_SOLID;
     depthBias_ = BiasParameters(0.0f, 0.0f);
 
     RefreshShaderParameterHash();

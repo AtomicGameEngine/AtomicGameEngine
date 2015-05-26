@@ -45,6 +45,7 @@ public:
             jenum->values_.Push(getNameString(symbol->name()));
         }
 
+        jenum->Preprocess();
 
         bindings_->RegisterEnum(jenum);
 

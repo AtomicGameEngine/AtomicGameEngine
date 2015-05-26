@@ -9,8 +9,11 @@ namespace Atomic
 #include <unistd.h>
 #include <signal.h>
 #include <sys/socket.h>
-#include <libproc.h>
 #include <errno.h>
+
+#ifdef ATOMIC_PLATFORM_OSX
+#include <libproc.h>
+#endif
 
 #define HANDLE_EINTR(x) ({ \
     typeof(x) __eintr_result__; \
@@ -21,6 +24,8 @@ namespace Atomic
 })
 
 bool SilenceSocket(int fd) {
+
+#ifdef ATOMIC_PLATFORM_OSX
     int nosigpipe = 1;
     // On OSX an attempt to read or write to a closed socket may generate a
     // SIGPIPE rather than returning -1.  setsockopt will shut this off.
@@ -28,6 +33,7 @@ bool SilenceSocket(int fd) {
                         &nosigpipe, sizeof nosigpipe)) {
         return false;
     }
+#endif    
     return true;
 }
 
@@ -229,4 +235,3 @@ bool IPCProcess::Launch(const String& command, const Vector<String>& args, const
 
 
 #endif
-

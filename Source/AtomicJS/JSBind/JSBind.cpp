@@ -52,6 +52,7 @@ void Run(const Vector<String>& arguments)
     engineParameters["Headless"] = true;
     engineParameters["WorkerThreads"] = false;
     engineParameters["LogName"] = String::EMPTY;
+    engineParameters["ResourcePaths"] = String::EMPTY;
 
     JSBind::engine_->Initialize(engineParameters);
 

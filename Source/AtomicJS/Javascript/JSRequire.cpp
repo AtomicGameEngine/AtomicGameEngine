@@ -54,12 +54,22 @@ namespace Atomic
         else
         {
             path += ".js";
+
+            if (!cache->Exists(path) && cache->Exists("Modules/" + path))
+                path = "Modules/" + path;
  
         }
 
-        SharedPtr<File> jsfile(cache->GetFile(path, false));
-
-        if (!jsfile)
+        if (cache->Exists(path))
+        {
+            SharedPtr<File> jsfile(cache->GetFile(path, false));
+            vm->SetLastModuleSearchFile(jsfile->GetFullPath());
+            String source;
+            jsfile->ReadText(source);
+            duk_push_string(ctx, source.CString());
+            return 1;
+        }
+        else
         {
             // we're not a JS file, so check if we're a native module
             const Vector<String>& resourceDirs = cache->GetResourceDirs();
@@ -67,13 +77,16 @@ namespace Atomic
             for (unsigned i = 0; i < resourceDirs.Size(); i++)
             {
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+             String pluginLibrary;
 
-                // TODO: proper platform folder detection
+             // TODO: proper platform folder detection
+#ifdef ATOMIC_PLATFORM_WINDOWS              
+              pluginLibrary = resourceDirs.At(i) + "Plugins/Windows/x64/" + moduleID + ".dll";
+#elif ATOMIC_PLATFORM_OSX
+             pluginLibrary = resourceDirs.At(i) + "Plugins/Mac/x64/lib" + moduleID + ".dylib";
+#endif
 
-                String pluginLibrary = resourceDirs.At(i) + "Plugins/Windows/x64/" + moduleID + ".dll";
-
-                if (fs->FileExists(pluginLibrary))
+               if (pluginLibrary.Length() && fs->FileExists(pluginLibrary))
                 {
                     // let duktape know we loaded a native module
                     if (jsplugin_load(vm, pluginLibrary))
@@ -81,21 +94,18 @@ namespace Atomic
                         duk_push_undefined(ctx);
                         return 1;
                     }
+                    else
+                    {
+                        duk_push_sprintf(ctx, "Failed loading native plugins: %s", pluginLibrary.CString());
+                        duk_throw(ctx);
+                    }
                 }
-
             }
 
-#endif
-        }
-        else
-        {
-            vm->SetLastModuleSearchFile(jsfile->GetFullPath());
-            String source;
-            jsfile->ReadText(source);
-            duk_push_string(ctx, source.CString());
         }
 
-        return 1;
+        duk_push_sprintf(ctx, "Failed loading module: %s", path.CString());
+        duk_throw(ctx);
 
     }
 

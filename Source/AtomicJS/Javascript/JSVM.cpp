@@ -315,11 +315,23 @@ void JSVM::InitComponents()
 void JSVM::SendJSErrorEvent(const String& filename)
 {
     duk_context* ctx = GetJSContext();
-    assert(duk_is_object(ctx, -1));
 
     using namespace JSError;
 
     VariantMap eventData;
+
+    if (duk_is_string(ctx, -1))
+    {
+        eventData[P_ERRORNAME] = "(Unknown Error Name)";
+        eventData[P_ERRORFILENAME] = "(Unknown Filename)";
+        eventData[P_ERRORLINENUMBER] =  -1;
+        eventData[P_ERRORMESSAGE] = duk_to_string(ctx, -1);
+        eventData[P_ERRORSTACK] = "";
+        SendEvent(E_JSERROR, eventData);
+        return;
+    }
+
+    assert(duk_is_object(ctx, -1));
 
     duk_get_prop_string(ctx, -1, "fileName");
     if (duk_is_string(ctx, -1))

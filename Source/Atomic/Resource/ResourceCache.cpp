@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -144,7 +144,7 @@ bool ResourceCache::AddPackageFile(PackageFile* package, unsigned priority)
 bool ResourceCache::AddPackageFile(const String& fileName, unsigned priority)
 {
     SharedPtr<PackageFile> package(new PackageFile(context_));
-    return package->Open(fileName) && AddPackageFile(package, priority);
+    return package->Open(fileName) && AddPackageFile(package);
 }
 
 bool ResourceCache::AddManualResource(Resource* resource)
@@ -500,6 +500,25 @@ SharedPtr<File> ResourceCache::GetFile(const String& nameIn, bool sendEventOnFai
     return SharedPtr<File>();
 }
 
+Resource* ResourceCache::GetExistingResource(StringHash type, const String& nameIn)
+{
+    String name = SanitateResourceName(nameIn);
+
+    if (!Thread::IsMainThread())
+    {
+        LOGERROR("Attempted to get resource " + name + " from outside the main thread");
+        return 0;
+    }
+
+    // If empty name, return null pointer immediately
+    if (name.Empty())
+        return 0;
+
+    StringHash nameHash(name);
+
+    const SharedPtr<Resource>& existing = FindResource(type, nameHash);
+    return existing;
+}
 Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
 {
     String name = SanitateResourceName(nameIn);

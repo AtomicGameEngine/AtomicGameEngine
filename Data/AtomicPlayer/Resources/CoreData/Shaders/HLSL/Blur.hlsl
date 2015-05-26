@@ -24,8 +24,10 @@ void VS(float4 iPos : POSITION,
 
 void PS(float2 iTexCoord : TEXCOORD0,
     float2 iScreenPos : TEXCOORD1,
-    out float4 oColor : COLOR0)
+    out float4 oColor : OUTCOLOR0)
 {
+
+#ifndef D3D11
     #ifdef BLUR3
         oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
     #endif
@@ -41,4 +43,22 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef BLUR9
         oColor = GaussianBlur(9, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, sDiffMap, iTexCoord);
     #endif
+
+#else
+    #ifdef BLUR3
+        oColor = GaussianBlur(3, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
+    #endif
+
+    #ifdef BLUR5
+        oColor = GaussianBlur(5, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
+    #endif
+
+    #ifdef BLUR7
+        oColor = GaussianBlur(7, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffmap, sDiffMap, iTexCoord);
+    #endif
+
+    #ifdef BLUR9
+        oColor = GaussianBlur(9, cBlurDir, cBlurHInvSize * cBlurRadius, cBlurSigma, tDiffMap, sDiffMap, iTexCoord);
+    #endif
+#endif
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,8 @@ public:
     void SetFilterMode(TextureFilterMode filter);
     /// Set addressing mode by texture coordinate.
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    /// Set shadow compare mode. No-op on D3D9.
+    void SetShadowCompare(bool enable) {}
     /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
     /// Set sRGB sampling and writing mode.
@@ -75,6 +77,8 @@ public:
     TextureFilterMode GetFilterMode() const { return filterMode_; }
     /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+    /// Return whether shadow compare is enabled. Always false on D3D9.
+    bool GetShadowCompare() const { return false; }
     /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
     /// Return whether is using sRGB sampling and writing.

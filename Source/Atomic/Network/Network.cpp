@@ -49,6 +49,8 @@ static const int DEFAULT_UPDATE_FPS = 30;
 Network::Network(Context* context) :
     Object(context),
     updateFps_(DEFAULT_UPDATE_FPS),
+    simulatedLatency_(0),
+    simulatedPacketLoss_(0.0f),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
     updateAcc_(0.0f)
 {
@@ -122,7 +124,7 @@ void Network::HandleMessage(kNet::MessageConnection *source, kNet::packet_id_t p
     Connection* connection = GetConnection(source);
     if (connection)
     {
-        MemoryBuffer msg(data, numBytes);
+        MemoryBuffer msg(data, (unsigned)numBytes);
         if (connection->ProcessMessage(msgId, msg))
             return;
         
@@ -151,7 +153,7 @@ u32 Network::ComputeContentID(kNet::message_id_t msgId, const char* data, size_t
     case MSG_COMPONENTLATESTDATA:
         {
             // Return the node or component ID, which is first in the message
-            MemoryBuffer msg(data, numBytes);
+            MemoryBuffer msg(data, (unsigned)numBytes);
             return msg.ReadNetID();
         }
         
@@ -167,6 +169,7 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     
     // Create a new client connection corresponding to this MessageConnection
     SharedPtr<Connection> newConnection(new Connection(context_, true, kNet::SharedPtr<kNet::MessageConnection>(connection)));
+    newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     clientConnections_[connection] = newConnection;
     LOGINFO("Client " + newConnection->ToString() + " connected");
     
@@ -216,6 +219,8 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         serverConnection_->SetScene(scene);
         serverConnection_->SetIdentity(identity);
         serverConnection_->SetConnectPending(true);
+        serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
         LOGINFO("Connecting to server " + serverConnection_->ToString());
         return true;
     }
@@ -333,6 +338,18 @@ void Network::SetUpdateFps(int fps)
     updateFps_ = Max(fps, 1);
     updateInterval_ = 1.0f / (float)updateFps_;
     updateAcc_ = 0.0f;
+}
+
+void Network::SetSimulatedLatency(int ms)
+{
+    simulatedLatency_ = Max(ms, 0);
+    ConfigureNetworkSimulator();
+}
+
+void Network::SetSimulatedPacketLoss(float loss)
+{
+    simulatedPacketLoss_ = Clamp(loss, 0.0f, 1.0f);
+    ConfigureNetworkSimulator();
 }
 
 void Network::RegisterRemoteEvent(StringHash eventType)
@@ -564,6 +581,16 @@ void Network::OnServerDisconnected()
         LOGERROR("Failed to connect to server");
         SendEvent(E_CONNECTFAILED);
     }
+}
+
+void Network::ConfigureNetworkSimulator()
+{
+    if (serverConnection_)
+        serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+        i != clientConnections_.End(); ++i)
+        i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }
 
 void RegisterNetworkLibrary(Context* context)

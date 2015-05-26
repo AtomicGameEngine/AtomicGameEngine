@@ -103,6 +103,7 @@ bool Project::Load(const String& fullpath)
 {
     loading_ = true;
 
+    projectPath_ = GetPath(fullpath);
     projectFilePath_ = fullpath;
     SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
     bool result = pfile->Load(this);

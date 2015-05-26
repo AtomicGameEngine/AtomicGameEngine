@@ -5,7 +5,7 @@
 
 #include "tb_system.h"
 
-#ifdef TB_SYSTEM_ANDROID
+#ifdef TB_SYSTEM_ANDROID_DISABLED
 
 #include <android/log.h>
 #include <sys/time.h>

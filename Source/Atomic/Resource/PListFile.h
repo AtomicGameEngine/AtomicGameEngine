@@ -43,6 +43,7 @@ enum PListValueType
 
 class PListValue;
 
+/// PList value map.
 class PListValueMap : public HashMap<String, PListValue>
 {
 public:
@@ -53,6 +54,7 @@ public:
 typedef Vector<PListValue> PListValueVector;
 
 class ATOMIC_API PListValue
+/// PList value.
 {
 public:
     // Construct.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -168,6 +168,16 @@ EVENT(E_COMPONENTENABLEDCHANGED, ComponentEnabledChanged)
 EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
 {
     PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+}
+
+/// A network attribute update from the server has been intercepted.
+EVENT(E_INTERCEPTNETWORKUPDATE, InterceptNetworkUpdate)
+{
+    PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
+    PARAM(P_TIMESTAMP, TimeStamp);          // unsigned (0-255)
+    PARAM(P_INDEX, Index);                  // unsigned
+    PARAM(P_NAME, Name);                    // String
+    PARAM(P_VALUE, Value);                  // Variant
 }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ extern ATOMIC_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
 extern ATOMIC_API const StringHash VSP_BILLBOARDROT("BillboardRot");
 extern ATOMIC_API const StringHash VSP_CAMERAPOS("CameraPos");
 extern ATOMIC_API const StringHash VSP_CAMERAROT("CameraRot");
+extern ATOMIC_API const StringHash VSP_CLIPPLANE("ClipPlane");
 extern ATOMIC_API const StringHash VSP_NEARCLIP("NearClip");
 extern ATOMIC_API const StringHash VSP_FARCLIP("FarClip");
 extern ATOMIC_API const StringHash VSP_DEPTHMODE("DepthMode");
@@ -76,20 +77,6 @@ extern ATOMIC_API const StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
 extern ATOMIC_API const StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
 extern ATOMIC_API const StringHash PSP_SHADOWSPLITS("ShadowSplits");
 extern ATOMIC_API const StringHash PSP_LIGHTMATRICES("LightMatricesPS");
-
-extern ATOMIC_API const StringHash PASS_BASE("base");
-extern ATOMIC_API const StringHash PASS_LITBASE("litbase");
-extern ATOMIC_API const StringHash PASS_LIGHT("light");
-extern ATOMIC_API const StringHash PASS_ALPHA("alpha");
-extern ATOMIC_API const StringHash PASS_LITALPHA("litalpha");
-extern ATOMIC_API const StringHash PASS_SHADOW("shadow");
-extern ATOMIC_API const StringHash PASS_DEFERRED("deferred");
-extern ATOMIC_API const StringHash PASS_PREPASS("prepass");
-extern ATOMIC_API const StringHash PASS_MATERIAL("material");
-extern ATOMIC_API const StringHash PASS_POSTOPAQUE("postopaque");
-extern ATOMIC_API const StringHash PASS_REFRACT("refract");
-extern ATOMIC_API const StringHash PASS_POSTALPHA("postalpha");
-extern ATOMIC_API const StringHash PASS_LIGHT2D("light2d");
 
 extern ATOMIC_API const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 

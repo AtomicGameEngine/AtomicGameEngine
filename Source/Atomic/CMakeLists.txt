@@ -16,7 +16,7 @@ file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 
-if (NOT EMSCRIPTEN)
+if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
   file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
 endif()
 
@@ -34,7 +34,11 @@ endif()
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
 
 if (MSVC)
-    file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
+    if (ATOMIC_D3D11)  
+      file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
+    else()
+      file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
+    endif()  
 else()
 
 # for kNet

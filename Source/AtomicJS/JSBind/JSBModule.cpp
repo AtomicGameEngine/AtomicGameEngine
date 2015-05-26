@@ -160,6 +160,14 @@ void JSBModule::WriteModuleInit(String& source)
 void JSBModule::WriteIncludes(String& source)
 {
 
+    for (unsigned i = 0; i < includes_.Size(); i++)
+    {
+      if (includes_[i].StartsWith("<"))
+          source.AppendWithFormat("#include %s\n", includes_[i].CString());
+      else
+          source.AppendWithFormat("#include \"%s\"\n", includes_[i].CString());
+    }
+
     Vector<JSBHeader*> allheaders;
 
     for (unsigned i = 0; i < enums_.Size(); i++)
@@ -173,6 +181,7 @@ void JSBModule::WriteIncludes(String& source)
     }
 
     Vector<JSBHeader*> included;
+
     for (unsigned i = 0; i < allheaders.Size(); i++)
     {
         JSBHeader* header = allheaders.At(i);
@@ -182,7 +191,7 @@ void JSBModule::WriteIncludes(String& source)
 
         String headerPath = GetPath(header->filepath_);
 
-		String headerfile = GetFileNameAndExtension(header->filepath_);
+		    String headerfile = GetFileNameAndExtension(header->filepath_);
 
         headerPath.Replace(JSBind::ROOT_FOLDER + "/Source/Atomic/", "Atomic/");
 
@@ -191,13 +200,6 @@ void JSBModule::WriteIncludes(String& source)
         included.Push(header);
     }
 
-    for (unsigned i = 0; i < includes_.Size(); i++)
-    {
-        if (includes_[i].StartsWith("<"))
-            source.AppendWithFormat("#include %s\n", includes_[i].CString());
-        else
-            source.AppendWithFormat("#include \"%s\"\n", includes_[i].CString());
-    }
 }
 
 void JSBModule::EmitSource(const String& filepath)
@@ -218,7 +220,7 @@ void JSBModule::EmitSource(const String& filepath)
         source_ += "#ifdef ATOMIC_3D\n";
     }
 
-    source_ += "#include <Duktape/duktape.h>\n";    
+    source_ += "#include <Duktape/duktape.h>\n";
     source_ += "#include <AtomicJS/Javascript/JSVM.h>\n";
     source_ += "#include <AtomicJS/Javascript/JSAPI.h>\n";
 
@@ -387,8 +389,13 @@ void JSBModule::Load(const String &moduleJSONFilename)
         {
             sources.AddString("Graphics/OpenGL");
         }
-        else {
+        else
+        {
+#ifdef ATOMIC_D3D11
+            sources.AddString("Graphics/Direct3D11");
+#else
             sources.AddString("Graphics/Direct3D9");
+#endif
         }
 #else
         sources.AddString("Graphics/OpenGL");
