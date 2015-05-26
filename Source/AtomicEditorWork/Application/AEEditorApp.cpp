@@ -79,6 +79,10 @@ void AEEditorApp::Setup()
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);
 
+    ToolSystem* system = new ToolSystem(context_);
+    context_->RegisterSubsystem(system);
+
+
 #ifdef ATOMIC_DEV_BUILD
 
     if (!env->InitFromJSON())

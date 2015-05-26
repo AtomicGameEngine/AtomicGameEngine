@@ -17,6 +17,14 @@ Command::~Command()
 
 }
 
+bool Command::Parse(const String& command)
+{
+    Vector<String> args = command.Split(' ');
+    String errorMsg;
+
+    return Parse(args, 0, errorMsg);
+}
+
 void Command::Error(const String& errorMsg)
 {
     VariantMap eventData;
