@@ -1,0 +1,5 @@
+{
+	"name" : "ToolCore",
+	"sources" : ["Source/ToolCore"],
+	"classes" : ["ToolEnvironment"]
+}

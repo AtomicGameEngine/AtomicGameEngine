@@ -5,6 +5,11 @@
 
 using namespace Atomic;
 
+namespace Atomic
+{
+class JSONFile;
+}
+
 namespace ToolCore
 {
 
@@ -36,9 +41,11 @@ public:
 
     bool Load(const String& jsonFilename);
     void PreprocessHeaders();
-
+    void VisitHeaders();
 
 private:
+
+    void ProcessOverloads();
 
     void ScanHeaders();
 
@@ -56,6 +63,8 @@ private:
     HashMap<StringHash, SharedPtr<JSBClass> > classes_;
     HashMap<StringHash, SharedPtr<JSBEnum> > enums_;
     Vector<String> constants_;
+
+    SharedPtr<JSONFile> moduleJSON_;
 
 };
 

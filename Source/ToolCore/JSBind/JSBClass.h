@@ -12,6 +12,25 @@ namespace ToolCore
 
 class JSBModule;
 class JSBFunction;
+class JSBType;
+
+// chosen function overrides
+class JSBFunctionOverride
+{
+
+public:
+
+    JSBFunctionOverride(const String& name, const Vector<String>& sig);
+
+    String name_;
+    Vector<String> sig_;
+    Vector<JSBType*> types_;
+
+    void Parse() ;
+
+    bool parsed_;
+
+};
 
 class JSBClass : public Object
 {
@@ -26,16 +45,30 @@ public:
     const String& GetName() { return name_; }
     const String& GetNativeName() { return nativeName_; }
 
+    bool IsAbstract() { return isAbstract_; }
+
+    /// Note that if we at some point want to generate bindings for JSBClass
+    /// this override will need to be addressed, as we'll need to know that JSBClass is
+    /// itself an object
+    bool IsObject() { return isObject_; }
+
+    void SetAbstract(bool value = true) { isAbstract_ = value; }
+    void SetObject(bool value = true) { isObject_ = value; }
+
+    bool IsNumberArray() { return numberArrayElements_ != 0; }
+    int  GetNumberArrayElements() { return numberArrayElements_;}
+    const String& GetArrayElementType() const { return arrayElementType_; }
+
     void SetHeader(JSBHeader* header) { header_ = header; }
 
-    void AddBaseClass(JSBClass* baseClass) { baseClasses_.Push(baseClass); }
-    void SetAbstract() { isAbstract_ = true; }
+    void AddBaseClass(JSBClass* baseClass);
 
     void AddFunction(JSBFunction* function);
+    void AddFunctionOverride(JSBFunctionOverride* override) { overrides_.Push(override); }
+
+    void Dump();
 
 private:
-
-    bool isAbstract_;
 
     String name_;
     String nativeName_;
@@ -43,9 +76,17 @@ private:
     SharedPtr<JSBHeader> header_;
     SharedPtr<JSBModule> module_;
 
-
-    PODVector<JSBFunction*> functions;
+    PODVector<JSBFunction*> functions_;
     PODVector<JSBClass*> baseClasses_;
+
+    PODVector<JSBFunctionOverride*> overrides_;
+
+    bool isAbstract_;
+    bool isObject_;
+
+    // Vector3, Color, etc are marshalled via arrays
+    int numberArrayElements_;
+    String arrayElementType_;
 
 };
 

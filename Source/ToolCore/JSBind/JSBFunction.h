@@ -77,19 +77,36 @@ class JSBFunction : public JSBSymbol
 {
 public:
 
-    JSBClass* class_;
-    String name_;
-    String propertyName_;
-    JSBFunctionType* returnType_;
-    Vector<JSBFunctionType*> parameters_;
-    String docString_;
+    JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
+                                   isConstructor_(false), isDestructor_(false),
+                                   isGetter_(false), isSetter_(false),
+                                   isOverride_(false), skip_(false)
+    {
 
-    bool isConstructor_;
-    bool isDestructor_;
-    bool isGetter_;
-    bool isSetter_;
-    bool isOverride_;
-    bool skip_;
+    }
+
+    const String& GetName() { return name_; }
+
+    bool IsConstructor() { return isConstructor_; }
+    bool IsDestructor() { return isDestructor_; }
+    bool IsSetter() { return isSetter_; }
+    bool IsGetter() { return isGetter_; }
+    bool IsOverride() { return isOverride_; }
+    bool Skip() { return skip_; }
+
+    JSBFunctionType* GetReturnType() { return returnType_; }
+
+    const String& GetDocString() { return docString_; }
+
+    void SetName(const String& name) { name_ = name; }
+    void SetConstructor(bool value = true) { isConstructor_ = value; }
+    void SetDestructor(bool value = true) { isDestructor_ = value; }
+    void SetSetter(bool value = true) { isSetter_ = value; }
+    void SetGetter(bool value = true) { isGetter_ = value; }
+    void SetOverride(bool value = true) { isOverride_ = value; }
+    void SetSkip(bool value) { skip_ = value; }
+    void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
+    void SetDocString(const String& docString) { docString_ = docString; }
 
     int FirstDefaultParameter()
     {
@@ -107,16 +124,6 @@ public:
         parameters_.Push(parm);
     }
 
-    JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
-                                   isConstructor_(false), isDestructor_(false),
-                                   isGetter_(false), isSetter_(false),
-                                   isOverride_(false), skip_(false)
-    {
-
-    }
-
-    void SetSkip(bool value) { skip_ = value; }
-    bool Skip() { return skip_; }
 
     void Process();
 
@@ -149,6 +156,25 @@ public:
         LOGINFOF("      %s", sig.CString());
 
     }
+
+private:
+
+    SharedPtr<JSBClass> class_;
+
+    String name_;
+    String propertyName_;
+
+    JSBFunctionType* returnType_;
+    Vector<JSBFunctionType*> parameters_;
+
+    String docString_;
+
+    bool isConstructor_;
+    bool isDestructor_;
+    bool isGetter_;
+    bool isSetter_;
+    bool isOverride_;
+    bool skip_;
 
 };
 

@@ -26,6 +26,8 @@ public:
 
     void PreprocessModules();
 
+    void ProcessModules();
+
     JSBClass* GetClass(const String& name);
 
     // get a class by name across all loaded packages

@@ -44,7 +44,7 @@ void BindCmd::Run()
 
     bindPlatform_ = "MACOSX";
     sourceRootFolder_ = env->GetRootSourceDir();
-    packageFolder_ = "Source/AtomicJS/Packages/Atomic/";
+    packageFolder_ = "Source/AtomicJS/Packages/ToolCore/";
 
     SharedPtr<JSBind> jsbind(new JSBind(context_));
 

@@ -17,7 +17,7 @@ class JSBEnum : public Object
 
 public:
 
-    JSBEnum(Context* context, JSBModule* module, const String& name);
+    JSBEnum(Context* context, JSBModule* module, const String& name);    
     virtual ~JSBEnum();
 
     const String& GetName() { return name_; }

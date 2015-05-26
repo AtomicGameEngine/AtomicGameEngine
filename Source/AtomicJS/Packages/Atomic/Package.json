@@ -2,7 +2,7 @@
 {
 
   "name" : "Atomic",
-  "namespace" : "Atomic",  
-  "modules" : ["Container", "Core"]
+  "namespace" : "Atomic",
+  "modules" : ["Container", "Math", "Core", "Graphics", "Scene"]
 
 }

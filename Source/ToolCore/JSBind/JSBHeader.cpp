@@ -4,6 +4,7 @@
 using namespace CPlusPlus;
 
 #include "JSBPreprocessVisitor.h"
+#include "JSBHeaderVisitor.h"
 
 #include "JSBModule.h"
 #include "JSBHeader.h"
@@ -68,6 +69,12 @@ void JSBHeader::VisitPreprocess()
 {
     JSBPreprocessVisitor(this, translationUnit_,globalNamespace_);
 }
+
+void JSBHeader::VisitHeader()
+{
+    JSBHeaderVisitor(this, translationUnit_, globalNamespace_);
+}
+
 
 
 

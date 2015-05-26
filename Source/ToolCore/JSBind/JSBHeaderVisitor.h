@@ -236,24 +236,29 @@ public:
         if (function->isVariadic())
             return NULL;
 
-        jfunction->name_ = getNameString(function->name());
+        String name = getNameString(function->name());
+
+        jfunction->SetName(name);
 
         // don't support operators atm
-        if (jfunction->name_.StartsWith("operator "))
+        if (name.StartsWith("operator "))
             return NULL;
 
-        if (jfunction->name_ == klass->GetName())
-            jfunction->isConstructor_ = true;
+        if (name == klass->GetName())
+            jfunction->SetConstructor();
 
-        if (jfunction->name_.StartsWith("~"))
-            jfunction->isDestructor_ = true;
+        if (name.StartsWith("~"))
+            jfunction->SetDestructor();
 
         // see if we support return type
         if (function->hasReturnType() && !function->returnType().type()->isVoidType())
         {
-            jfunction->returnType_ = processFunctionReturnType(function);
-            if (!jfunction->returnType_)
+            JSBFunctionType* returnType = processFunctionReturnType(function);
+
+            if (!returnType)
                 return NULL;
+
+            jfunction->SetReturnType(returnType);
         }
 
         if (function->hasArguments())
@@ -312,7 +317,11 @@ public:
             {
                 int index = 3;
                 while(comment[index] && comment[index] != '\n' && comment[index] != '\r')
-                    jfunction->docString_ += comment[index++];
+                {
+                    String docString = jfunction->GetDocString();
+                    docString += comment[index++];
+                    jfunction->SetDocString(docString);
+                }
 
             }
 

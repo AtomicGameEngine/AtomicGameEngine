@@ -34,6 +34,78 @@ void JSBModule::PreprocessHeaders()
     }
 }
 
+void JSBModule::VisitHeaders()
+{
+    for (unsigned i = 0; i < headers_.Size(); i++)
+    {
+        headers_[i]->VisitHeader();
+    }
+
+    // validate that all classes found
+    for (unsigned i = 0; i < classnames_.Size(); i++)
+    {
+        JSBClass* cls = GetClass(classnames_[i]);
+
+        if (!cls)
+        {
+            ErrorExit(ToString("Module class not found %s", classnames_[i].CString()));
+        }
+    }
+
+    ProcessOverloads();
+
+}
+
+void JSBModule::ProcessOverloads()
+{
+    // overloads
+
+    JSONValue root = moduleJSON_->GetRoot();
+
+    JSONValue overloads = root.GetChild("overloads");
+
+    if (overloads.IsObject())
+    {
+        Vector<String> childNames = overloads.GetChildNames();
+
+        for (unsigned j = 0; j < childNames.Size(); j++)
+        {
+            String classname = childNames.At(j);
+
+            JSBClass* klass = GetClass(classname);
+
+            if (!klass)
+            {
+                ErrorExit("Bad overload klass");
+            }
+
+            JSONValue classoverloads = overloads.GetChild(classname);
+
+            Vector<String> functionNames = classoverloads.GetChildNames();
+
+            for (unsigned k = 0; k < functionNames.Size(); k++)
+            {
+                JSONValue sig = classoverloads.GetChild(functionNames[k]);
+
+                if (!sig.IsArray())
+                {
+                    ErrorExit("Bad overload defintion");
+                }
+
+                Vector<String> values;
+                for (unsigned x = 0; x < sig.GetSize(); x++)
+                {
+                    values.Push(sig.GetString(x));
+                }
+
+                JSBFunctionOverride* fo = new JSBFunctionOverride(functionNames[k], values);
+                klass->AddFunctionOverride(fo);
+
+            }
+        }
+    }
+}
+
 void JSBModule::ScanHeaders()
 {
     JSBind* jsbind = GetSubsystem<JSBind>();
@@ -126,6 +198,12 @@ bool JSBModule::ContainsConstant(const String& constantName)
 
 void JSBModule::RegisterConstant(const String& constantName)
 {
+    // MAX_CASCADE_SPLITS is defined differently for desktop/mobile
+    if (constantName == "MAX_CASCADE_SPLITS" && JSBPackage::ContainsConstantAllPackages(constantName))
+    {
+        return;
+    }
+
     if (JSBPackage::ContainsConstantAllPackages(constantName))
     {
         ErrorExit(ToString("Constant collision: %s", constantName.CString()));
@@ -147,15 +225,15 @@ bool JSBModule::Load(const String& jsonFilename)
         return false;
     }
 
-    SharedPtr<JSONFile> moduleJSON(new JSONFile(context_));
+    moduleJSON_ = new JSONFile(context_);
 
-    if (!moduleJSON->BeginLoad(*jsonFile))
+    if (!moduleJSON_->BeginLoad(*jsonFile))
     {
         LOGERRORF("Unable to parse module json: %s", jsonFilename.CString());
         return false;
     }
 
-    JSONValue root = moduleJSON->GetRoot();
+    JSONValue root = moduleJSON_->GetRoot();
 
     name_ = root.GetString("name");
 
@@ -188,6 +266,27 @@ bool JSBModule::Load(const String& jsonFilename)
     {
         sourceDirs_.Push(sources.GetString(i));
     }
+
+    if (name_ == "Graphics")
+    {
+#ifdef _MSC_VER
+        if (JSBind::PLATFORM == "ANDROID" || JSBind::PLATFORM == "WEB")
+        {
+            sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");
+        }
+        else
+        {
+#ifdef ATOMIC_D3D11
+            sourceDirs_.Push("Source/Atomic/Graphics/Direct3D11");
+#else
+            sourceDirs_.Push("Source/Atomic/Graphics/Direct3D9");
+#endif
+        }
+#else
+        sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");
+#endif
+    }
+
 
     ScanHeaders();
 

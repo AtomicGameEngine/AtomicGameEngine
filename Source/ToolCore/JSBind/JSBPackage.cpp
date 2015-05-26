@@ -1,7 +1,9 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/JSONFile.h>
 
+#include "JSBind.h"
 #include "JSBModule.h"
 #include "JSBPackage.h"
 
@@ -25,6 +27,14 @@ void JSBPackage::PreprocessModules()
     for (unsigned i = 0; i < modules_.Size(); i++)
     {
         modules_[i]->PreprocessHeaders();
+    }
+}
+
+void JSBPackage::ProcessModules()
+{
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        modules_[i]->VisitHeaders();
     }
 }
 
@@ -121,6 +131,29 @@ bool JSBPackage::Load(const String& packageFolder)
 
     JSONValue root = packageJSON->GetRoot();
 
+    // first load dependencies
+    JSONValue deps = root.GetChild("dependencies");
+
+    if (deps.IsArray())
+    {
+        JSBind* jsbind = GetSubsystem<JSBind>();
+
+        for (unsigned i = 0; i < deps.GetSize(); i++)
+        {
+            String dpackageFolder = AddTrailingSlash(deps.GetString(i));
+
+            SharedPtr<JSBPackage> depPackage (new JSBPackage(context_));
+
+            if (!depPackage->Load(jsbind->GetSourceRootFolder() + dpackageFolder))
+            {
+                LOGERRORF("Unable to load package dependency: %s", dpackageFolder.CString());
+                return false;
+            }
+
+        }
+
+    }
+
     name_ = root.GetString("name");
     namespace_ = root.GetString("namespace");
 
@@ -142,9 +175,10 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
-    PreprocessModules();
-
     allPackages_.Push(SharedPtr<JSBPackage>(this));
+
+    PreprocessModules();
+    ProcessModules();
 
     return true;
 }
