@@ -19,6 +19,11 @@
 
 using namespace ToolCore;
 
+namespace ToolCore
+{
+    extern void jsapi_init_toolcore(JSVM* vm);
+}
+
 namespace AtomicEditor
 {
 
@@ -49,6 +54,8 @@ void AEEditorApp::Start()
     vm_ = javascript->InstantiateVM("MainVM");
     vm_->InitJSContext();
     vm_->SetModuleSearchPaths("AtomicEditor/javascript");
+
+    jsapi_init_toolcore(vm_);
 
     SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/javascript/main.js"));
 

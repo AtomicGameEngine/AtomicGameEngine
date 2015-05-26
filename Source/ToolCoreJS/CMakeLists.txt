@@ -17,6 +17,8 @@ endforeach()
 
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/ToolCore/*.cpp)
 
-add_library(ToolCoreJS ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
+set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE} )
+
+add_library(ToolCoreJS ${SOURCE_FILES})
 
 target_link_libraries(ToolCoreJS ToolCore)
