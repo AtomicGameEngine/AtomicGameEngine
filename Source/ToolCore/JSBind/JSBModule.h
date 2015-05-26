@@ -20,6 +20,7 @@ class JSBEnum;
 
 class JSBModule : public Object
 {
+    friend class JSBModuleWriter;
 
     OBJECT(JSBModule)
 
@@ -28,20 +29,31 @@ public:
     JSBModule(Context* context, JSBPackage* package);
     virtual ~JSBModule();
 
+    const String& GetName() { return name_; }
     JSBPackage* GetPackage() { return package_; }
 
     JSBClass* GetClass(const String& name);
+
     void RegisterClass(String name);
 
     JSBEnum* GetEnum(const String& name);
-    void RegisterEnum(JSBEnum* jenum);
+    void RegisterEnum(JSBEnum* jenum);       
 
     bool ContainsConstant(const String& constantName);
     void RegisterConstant(const String& constantName);
 
+    bool Requires(const String& requirement) { return requirements_.Contains(requirement); }
+
     bool Load(const String& jsonFilename);
     void PreprocessHeaders();
     void VisitHeaders();
+
+    void PreprocessClasses();
+    void ProcessClasses();
+    void PostProcessClasses();
+
+    void GenerateSource(const String& outPath);
+    const String& GetSource();
 
 private:
 
@@ -53,6 +65,7 @@ private:
 
     SharedPtr<JSBPackage> package_;
     Vector<SharedPtr<JSBHeader>> headers_;
+    Vector<String> includes_;
 
     Vector<String> sourceDirs_;
     Vector<String> classnames_;
@@ -63,8 +76,11 @@ private:
     HashMap<StringHash, SharedPtr<JSBClass> > classes_;
     HashMap<StringHash, SharedPtr<JSBEnum> > enums_;
     Vector<String> constants_;
+    Vector<String> requirements_;
 
     SharedPtr<JSONFile> moduleJSON_;
+
+    String source_;
 
 };
 

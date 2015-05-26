@@ -7,6 +7,8 @@
 #include "JSBModule.h"
 #include "JSBPackage.h"
 
+#include "JSBPackageWriter.h"
+
 namespace ToolCore
 {
 
@@ -35,6 +37,40 @@ void JSBPackage::ProcessModules()
     for (unsigned i = 0; i < modules_.Size(); i++)
     {
         modules_[i]->VisitHeaders();
+    }
+
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        modules_[i]->PreprocessClasses();
+    }
+
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        modules_[i]->ProcessClasses();
+    }
+
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        modules_[i]->PostProcessClasses();
+    }
+
+}
+
+void JSBPackage::GenerateSource(const String &outPath)
+{
+    JSBPackageWriter writer(this);
+    writer.GenerateSource(source_);
+
+    String filepath = outPath + "/JSPackage" + name_ + ".cpp";
+
+    File file(context_);
+    file.Open(filepath, FILE_WRITE);
+    file.Write(source_.CString(), source_.Length());
+    file.Close();
+
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        modules_[i]->GenerateSource(outPath);
     }
 }
 

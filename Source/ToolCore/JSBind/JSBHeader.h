@@ -33,12 +33,13 @@ public:
     JSBHeader(Context* context, JSBModule* module, const String& filepath);
     virtual ~JSBHeader();
 
+    const String& GetFilePath() { return filepath_; }
+    JSBModule* GetModule() { return module_; }
+
     void Parse();
 
     void VisitPreprocess();
     void VisitHeader();
-
-    JSBModule* GetModule() { return module_; }
 
 private:
 

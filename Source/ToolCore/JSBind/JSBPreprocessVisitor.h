@@ -46,6 +46,7 @@ public:
         JSBModule* module = header_->GetModule();
 
         JSBEnum* jenum = new JSBEnum(header_->GetContext(), module_, getNameString(penum->name()));
+        jenum->SetHeader(header_);
 
         for (unsigned i = 0; i < penum->memberCount(); i++)
         {

@@ -158,7 +158,7 @@ public:
 
     String ToString()
     {
-        return class_->GetName();
+        return class_->GetNativeName();
     }
 
 };

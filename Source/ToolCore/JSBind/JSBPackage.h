@@ -15,6 +15,8 @@ class JSBEnum;
 class JSBPackage : public Object
 {
 
+    friend class JSBPackageWriter;
+
     OBJECT(JSBPackage)
 
 public:
@@ -28,7 +30,14 @@ public:
 
     void ProcessModules();
 
+    const String& GetName() { return name_; }
+    const String& GetNamespace() { return namespace_; }
+
+
     JSBClass* GetClass(const String& name);
+
+    PODVector<JSBClass*>& GetAllClasses() { return allClasses_; }
+    void RegisterClass(JSBClass* cls) {allClasses_.Push(cls); }
 
     // get a class by name across all loaded packages
     static JSBClass* GetClassAllPackages(const String& name);
@@ -42,6 +51,7 @@ public:
 
     static bool ContainsConstantAllPackages(const String& constantName);
 
+    void GenerateSource(const String& outPath);
 
 private:
 
@@ -54,8 +64,11 @@ private:
     Vector<SharedPtr<JSBPackage> > dependencies_;
 
     Vector<SharedPtr<JSBModule> > modules_;
+    PODVector<JSBClass*> allClasses_;
 
     static Vector<SharedPtr<JSBPackage> > allPackages_;
+
+    String source_;
 
 };
 

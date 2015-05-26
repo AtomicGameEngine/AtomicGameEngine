@@ -1,0 +1,6 @@
+{
+	"name" : "Input",
+	"sources" : ["Source/Atomic/Input"],
+	"classes" : ["Input"]
+
+}

@@ -8,7 +8,7 @@ add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
 target_link_libraries(AtomicTool ToolCore Poco ${ATOMIC_LINK_LIBRARIES})
 
-add_dependencies(AtomicTool AtomicEditor)
+# add_dependencies(AtomicTool AtomicEditor)
 
 if (MSVC)
     target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
@@ -22,3 +22,9 @@ if (MSVC)
 else()
     target_link_libraries(AtomicTool curl)
 endif()
+
+
+add_custom_command(TARGET AtomicTool POST_BUILD
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Source/AtomicJS/Packages/Atomic/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Source/AtomicJS/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMENT "Generating Javascript Bindings")

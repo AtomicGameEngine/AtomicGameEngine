@@ -10,7 +10,7 @@ namespace ToolCore
 {
 
 JSBEnum::JSBEnum(Context* context, JSBModule *module, const String& name) : Object(context),
-    module_(module), name_(name)
+    module_(module), name_(name), header_(0)
 {
 
 }

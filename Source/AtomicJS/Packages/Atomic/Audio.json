@@ -1,0 +1,11 @@
+{
+	"name" : "Audio",
+	"sources" : ["Source/Atomic/Audio"],
+	"classes" : ["Sound", "SoundSource"],
+	"overloads" : {
+		"SoundSource" : {
+			"Play" : ["Sound"]
+		}
+	}
+
+ }

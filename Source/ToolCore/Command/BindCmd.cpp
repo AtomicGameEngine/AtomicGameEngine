@@ -27,13 +27,35 @@ BindCmd::~BindCmd()
 bool BindCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg)
 {
     String argument = arguments[startIndex].ToLower();
-    String value = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;
+    sourceRootFolder_ = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;
+    packageFolder_ = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
+    bindPlatform_ = startIndex + 3 < arguments.Size() ? arguments[startIndex + 3] : String::EMPTY;
 
     if (argument != "bind")
     {
         errorMsg = "Unable to parse bind command";
         return false;
     }
+
+    if (!sourceRootFolder_.Length())
+    {
+        errorMsg = "Unable to parse bind command";
+        return false;
+    }
+
+
+    if (!packageFolder_.Length())
+    {
+        errorMsg = "Unable to parse bind command";
+        return false;
+    }
+
+    if (!bindPlatform_.Length())
+    {
+        errorMsg = "Unable to parse bind command";
+        return false;
+    }
+
 
     return true;
 }
@@ -42,9 +64,9 @@ void BindCmd::Run()
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
 
-    bindPlatform_ = "MACOSX";
+    //bindPlatform_ = "MACOSX";
     sourceRootFolder_ = env->GetRootSourceDir();
-    packageFolder_ = "Source/AtomicJS/Packages/ToolCore/";
+    //packageFolder_ = "Source/AtomicJS/Packages/Atomic/";
 
     SharedPtr<JSBind> jsbind(new JSBind(context_));
 

@@ -1,20 +1,37 @@
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include <Atomic/Atomic.h>
+
+
+#include <Atomic/IO/FileSystem.h>
+
+#include "JSBind.h"
+#include "JSBModule.h"
+#include "JSBPackage.h"
+#include "JSBEnum.h"
+#include "JSBClass.h"
 #include "JSBFunction.h"
 
-void JSBFunction::WriteParameterMarshal(String& source)
+#include "JSBFunctionWriter.h"
+
+namespace ToolCore
+{
+
+JSBFunctionWriter::JSBFunctionWriter(JSBFunction *function) : function_(function)
+{
+
+}
+
+void JSBFunctionWriter::WriteParameterMarshal(String& source)
 {
     // generate args
 
+    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
     int cparam = 0;
-    if (parameters_.Size())
+    if (parameters.Size())
     {
-        for (unsigned int i = 0; i < parameters_.Size(); i++, cparam++)
+        for (unsigned int i = 0; i < parameters.Size(); i++, cparam++)
         {
-            JSBFunctionType * ptype = parameters_.At(i);
+            JSBFunctionType * ptype = parameters.At(i);
 
 
             // ignore "Context" parameters
@@ -22,7 +39,7 @@ void JSBFunction::WriteParameterMarshal(String& source)
             {
                 JSBClassType* classType = ptype->type_->asClassType();
                 JSBClass* klass = classType->class_;
-                if (klass->GetClassName() == "Context")
+                if (klass->GetName() == "Context")
                 {
                     cparam--;
                     continue;
@@ -39,17 +56,17 @@ void JSBFunction::WriteParameterMarshal(String& source)
 
                 JSBClass* klass = classType->class_;
 
-                if (!klass->isNumberArray())
+                if (!klass->IsNumberArray())
                 {
                     if (init.Length())
                     {
                         source.AppendWithFormat("%s = duk_get_top(ctx) >= %i ? js_to_class_instance<%s>(ctx, %i, 0) : %s;\n",
-                                                pstring.CString(), cparam + 1, klass->GetClassName().CString(), cparam, init.CString());
+                                                pstring.CString(), cparam + 1, klass->GetNativeName().CString(), cparam, init.CString());
                     }
                     else
                     {
                         source.AppendWithFormat("%s = js_to_class_instance<%s>(ctx, %i, 0);\n",
-                                                pstring.CString(), klass->GetClassName().CString(), cparam);
+                                                pstring.CString(), klass->GetNativeName().CString(), cparam);
                     }
                 }
                 else
@@ -60,7 +77,7 @@ void JSBFunction::WriteParameterMarshal(String& source)
 
                     if (init.Length())
                     {
-                        source.AppendWithFormat("const %s& defaultArg%i = %s;\n", klass->GetClassName().CString(), cparam,  init.CString());
+                        source.AppendWithFormat("const %s& defaultArg%i = %s;\n", klass->GetNativeName().CString(), cparam,  init.CString());
                         source.AppendWithFormat("if (duk_get_top(ctx) >= %i) {\n", cparam + 1);
                     }
 
@@ -77,11 +94,11 @@ void JSBFunction::WriteParameterMarshal(String& source)
                         source.Append("}\n");
 
                         source.AppendWithFormat("%s __arg%i(duk_get_top(ctx) >= %i ? arrayData%i : defaultArg%i);\n",
-                                                klass->GetClassName().CString(), cparam, cparam + 1, cparam, cparam);
+                                                klass->GetNativeName().CString(), cparam, cparam + 1, cparam, cparam);
                     }
                     else
                     {
-                        source.AppendWithFormat("%s __arg%i(arrayData%i);\n", klass->GetClassName().CString(), cparam, cparam);
+                        source.AppendWithFormat("%s __arg%i(arrayData%i);\n", klass->GetNativeName().CString(), cparam, cparam);
                     }
 
 
@@ -149,14 +166,14 @@ void JSBFunction::WriteParameterMarshal(String& source)
 
                 if (init.Length())
                 {
-                    source.AppendWithFormat("%s __arg%i = duk_get_top(ctx) >= %i ? ((%s) ((int) duk_to_number(ctx, %i))) : %s;\n", etype->enum_->name_.CString(),
-                                            cparam,  cparam + 1, etype->enum_->name_.CString(),  cparam, init.CString());
+                    source.AppendWithFormat("%s __arg%i = duk_get_top(ctx) >= %i ? ((%s) ((int) duk_to_number(ctx, %i))) : %s;\n", etype->enum_->GetName().CString(),
+                                            cparam,  cparam + 1, etype->enum_->GetName().CString(),  cparam, init.CString());
 
                 }
                 else
                 {
-                    source.AppendWithFormat("%s __arg%i = (%s) ((int)duk_to_number(ctx, %i));\n", etype->enum_->name_.CString(),
-                                            cparam, etype->enum_->name_.CString(),  cparam);
+                    source.AppendWithFormat("%s __arg%i = (%s) ((int)duk_to_number(ctx, %i));\n", etype->enum_->GetName().CString(),
+                                            cparam, etype->enum_->GetName().CString(),  cparam);
 
                 }
 
@@ -166,96 +183,56 @@ void JSBFunction::WriteParameterMarshal(String& source)
     }
 }
 
-void JSBFunction::Process()
-{
-    if (skip_)
-    {
-        return;
-    }
 
-    // if not already marked as a getter
-    if (!isGetter_)
-    {
-        if (!parameters_.Size() && returnType_)
-        {
-            if (name_.Length() > 3 && name_.StartsWith("Get") && isupper(name_[3]))
-            {
-                String pname = name_.Substring(3);
-                class_->SetSkipFunction(pname);
-                isGetter_ = true;
-                propertyName_ = pname;
-
-            }
-        }
-    }
-
-    if (!isSetter_)
-    {
-        if (parameters_.Size() == 1 && !returnType_)
-        {
-            if (name_.Length() > 3 && name_.StartsWith("Set") && isupper(name_[3]))
-            {
-
-                String pname = name_.Substring(3);
-                class_->SetSkipFunction(pname);
-                isSetter_ = true;
-                propertyName_ = pname;
-            }
-        }
-    }
-
-    if (isGetter_)
-        class_->AddPropertyFunction(this);
-    if (isSetter_)
-        class_->AddPropertyFunction(this);
-
-}
-
-void JSBFunction::WriteConstructor(String& source)
+void JSBFunctionWriter::WriteConstructor(String& source)
 {
 
     // TODO: refactor this
 
-    if (name_ == "RefCounted")
+    if (function_->name_ == "RefCounted")
     {
         source.Append("// finalizer may be called more than once\n" \
                       "static int jsb_finalizer_RefCounted(duk_context *ctx)\n" \
                       "{\n" \
-                          "JSVM* vm =  JSVM::GetJSVM(ctx);\n" \
-                          \
-                          "duk_get_prop_index(ctx, 0, JS_INSTANCE_INDEX_FINALIZED);\n" \
-                          \
-                          "if (!duk_is_boolean(ctx, -1))\n" \
-                          "{\n" \
-                              "RefCounted* ref = vm->GetObjectPtr(duk_get_heapptr(ctx, 0));\n" \
-                              "vm->RemoveObject(ref);\n" \
-                              "ref->ReleaseRef();\n" \
-                              "duk_push_boolean(ctx, 1);\n" \
-                              "duk_put_prop_index(ctx, 0, JS_INSTANCE_INDEX_FINALIZED);\n" \
-                          "}\n" \
-                          \
-                          "return 0;\n" \
+                      "JSVM* vm =  JSVM::GetJSVM(ctx);\n" \
+                      \
+                      "duk_get_prop_index(ctx, 0, JS_INSTANCE_INDEX_FINALIZED);\n" \
+                      \
+                      "if (!duk_is_boolean(ctx, -1))\n" \
+                      "{\n" \
+                      "RefCounted* ref = vm->GetObjectPtr(duk_get_heapptr(ctx, 0));\n" \
+                      "vm->RemoveObject(ref);\n" \
+                      "ref->ReleaseRef();\n" \
+                      "duk_push_boolean(ctx, 1);\n" \
+                      "duk_put_prop_index(ctx, 0, JS_INSTANCE_INDEX_FINALIZED);\n" \
+                      "}\n" \
+                      \
+                      "return 0;\n" \
                       "}\n");
     }
 
-    JSBClass* base = class_->GetBaseClass();
+    JSBClass* klass = function_->class_;
+    JSBClass* base = klass->GetBaseClass();
+
 
     // Constructor
-    source.AppendWithFormat("duk_ret_t jsb_constructor_%s(duk_context* ctx)\n{\n", class_->GetName().CString());
+    source.AppendWithFormat("duk_ret_t jsb_constructor_%s(duk_context* ctx)\n{\n", klass->GetName().CString());
 
     source.Append("   if (duk_is_constructor_call(ctx))\n   {\n");
-    if (!class_->isAbstract() && !class_->isNumberArray())
+    if (!klass->IsAbstract() && !klass->IsNumberArray())
     {
 
         String marshal;
         WriteParameterMarshal(marshal);
 
         String sparams;
-
         int cparam = 0;
-        for (unsigned i = 0; i < parameters_.Size(); i++, cparam++)
+
+        Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
+        for (unsigned i = 0; i < parameters.Size(); i++, cparam++)
         {
-            JSBFunctionType * ptype = parameters_.At(i);
+            JSBFunctionType * ptype = parameters.At(i);
 
             String sarg;
 
@@ -263,7 +240,7 @@ void JSBFunction::WriteConstructor(String& source)
             {
                 JSBClassType* classType = ptype->type_->asClassType();
                 JSBClass* klass = classType->class_;
-                if (klass->GetClassName() == "Context")
+                if (klass->GetName() == "Context")
                 {
                     sarg = "JSVM::GetJSVM(ctx)->GetContext()";
                     cparam--;
@@ -278,31 +255,32 @@ void JSBFunction::WriteConstructor(String& source)
 
             sparams += sarg;
 
-            if (i + 1 < parameters_.Size())
+            if (i + 1 < parameters.Size())
                 sparams += ", ";
 
         }
 
         source.AppendWithFormat("if (!duk_get_top(ctx) || !duk_is_pointer(ctx, 0))\n"\
-        "{\n"\
-          "%s\n"\
-          "%s* native = new %s(%s);\n" \
-          "duk_push_this(ctx);\n" \
-          "JSVM::GetJSVM(ctx)->AddObject(duk_get_heapptr(ctx, -1), native);\n"\
-          "duk_pop(ctx);\n"\
-          "}\n" \
-        "else if (duk_is_pointer(ctx, 0))\n" \
-        "{\n" \
-            "duk_push_this(ctx);\n" \
-            "JSVM::GetJSVM(ctx)->AddObject(duk_get_heapptr(ctx, -1), (RefCounted*) duk_get_pointer(ctx, 0));\n" \
-            "duk_pop(ctx);\n" \
-        "}\n", marshal.CString(), class_->GetClassName().CString(), class_->GetClassName().CString(), sparams.CString());
+                                "{\n"\
+                                "%s\n"\
+                                "%s* native = new %s(%s);\n" \
+                                "duk_push_this(ctx);\n" \
+                                "JSVM::GetJSVM(ctx)->AddObject(duk_get_heapptr(ctx, -1), native);\n"\
+                                "duk_pop(ctx);\n"\
+                                "}\n" \
+                                "else if (duk_is_pointer(ctx, 0))\n" \
+                                "{\n" \
+                                "duk_push_this(ctx);\n" \
+                                "JSVM::GetJSVM(ctx)->AddObject(duk_get_heapptr(ctx, -1), (RefCounted*) duk_get_pointer(ctx, 0));\n" \
+                                "duk_pop(ctx);\n" \
+                                "}\n", marshal.CString(), klass->GetNativeName().CString(), klass->GetNativeName().CString(), sparams.CString());
     }
     else
     {
-        if (class_->isAbstract())
+        if (klass->IsAbstract())
             source.Append("assert(0); // abstract class new'd\n");
-        if (class_->isNumberArray())
+
+        if (klass->IsNumberArray())
             source.Append("assert(0); // number array class new'd\n");
 
     }
@@ -313,16 +291,16 @@ void JSBFunction::WriteConstructor(String& source)
         source.AppendWithFormat("   js_constructor_basecall(ctx, \"%s\");\n", base->GetName().CString());
     }
 
-    if (name_ == "RefCounted")
+    if (function_->name_ == "RefCounted")
     {
         source.Append("duk_push_this(ctx);\n "\
-                  "duk_push_c_function(ctx, jsb_finalizer_RefCounted, 1);\n "\
-                  "duk_set_finalizer(ctx, -2);\n "\
-                  \
-                  "RefCounted* ref = JSVM::GetJSVM(ctx)->GetObjectPtr(duk_get_heapptr(ctx, -1));\n "\
-                  "ref->AddRef();\n "\
-                  \
-                  "duk_pop(ctx);\n");
+                      "duk_push_c_function(ctx, jsb_finalizer_RefCounted, 1);\n "\
+                      "duk_set_finalizer(ctx, -2);\n "\
+                      \
+                      "RefCounted* ref = JSVM::GetJSVM(ctx)->GetObjectPtr(duk_get_heapptr(ctx, -1));\n "\
+                      "ref->AddRef();\n "\
+                      \
+                      "duk_pop(ctx);\n");
 
     }
 
@@ -331,29 +309,34 @@ void JSBFunction::WriteConstructor(String& source)
 
 }
 
-void JSBFunction::WriteFunction(String& source)
+void JSBFunctionWriter::WriteFunction(String& source)
 {
-    source.AppendWithFormat("static int jsb_class_%s_%s(duk_context* ctx)\n{\n", class_->GetName().CString(), name_.CString());
+    JSBClass* klass = function_->class_;
+
+    source.AppendWithFormat("static int jsb_class_%s_%s(duk_context* ctx)\n{\n", klass->GetName().CString(), function_->name_.CString());
 
     WriteParameterMarshal(source);
 
     source.Append("duk_push_this(ctx);\n");
-    source.AppendWithFormat("%s* native = js_to_class_instance<%s>(ctx, -1, 0);\n", class_->GetClassName().CString(), class_->GetClassName().CString());
+    source.AppendWithFormat("%s* native = js_to_class_instance<%s>(ctx, -1, 0);\n", klass->GetNativeName().CString(), klass->GetNativeName().CString());
 
     // declare return value;
     bool returnDeclared = false;
-    if (returnType_)
+
+    JSBFunctionType* returnType = function_->returnType_;
+
+    if (returnType)
     {
-        if (returnType_->type_->asStringType())
+        if (returnType->type_->asStringType())
         {
             returnDeclared = true;
             source.Append("const String& retValue = ");
         }
-        else if (returnType_->type_->asPrimitiveType())
+        else if (returnType->type_->asPrimitiveType())
         {
             returnDeclared = true;
 
-            JSBPrimitiveType* prtype = returnType_->type_->asPrimitiveType();
+            JSBPrimitiveType* prtype = returnType->type_->asPrimitiveType();
 
             if (prtype->kind_ == JSBPrimitiveType::Bool)
             {
@@ -365,21 +348,21 @@ void JSBFunction::WriteFunction(String& source)
             }
 
         }
-        else if (returnType_->type_->asClassType())
+        else if (returnType->type_->asClassType())
         {
-            JSBClassType* klassType = returnType_->type_->asClassType();
+            JSBClassType* klassType = returnType->type_->asClassType();
 
-            if (returnType_->isTemplate_)
+            if (returnType->isTemplate_)
             {
                 returnDeclared = true;
-                source.AppendWithFormat("SharedPtr<%s> object = ", klassType->class_->GetClassName().CString());
+                source.AppendWithFormat("SharedPtr<%s> object = ", klassType->class_->GetNativeName().CString());
             }
-            else if (klassType->class_->isObject())
+            else if (klassType->class_->IsObject())
             {
                 returnDeclared = true;
                 source.Append("const Object* object = ");
             }
-            else if (klassType->class_->isNumberArray())
+            else if (klassType->class_->IsNumberArray())
             {
                 returnDeclared = true;
                 source.AppendWithFormat("const %s& retValue = ", klassType->class_->GetName().CString());
@@ -390,21 +373,23 @@ void JSBFunction::WriteFunction(String& source)
                 source.Append("const RefCounted* object = ");
             }
         }
-        else if (returnType_->type_->asEnumType())
+        else if (returnType->type_->asEnumType())
         {
-            JSBEnumType* enumType = returnType_->type_->asEnumType();
+            JSBEnumType* enumType = returnType->type_->asEnumType();
             returnDeclared = true;
-            source.AppendWithFormat("%s retValue = ", enumType->enum_->name_.CString());
+            source.AppendWithFormat("%s retValue = ", enumType->enum_->GetName().CString());
         }
     }
 
-    source.AppendWithFormat("native->%s(", name_.CString());
+    source.AppendWithFormat("native->%s(", function_->name_.CString());
 
-    for (unsigned int i = 0; i < parameters_.Size(); i++)
+    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
+    for (unsigned int i = 0; i < parameters.Size(); i++)
     {
         source.AppendWithFormat("__arg%i",  i);
 
-        if (i != parameters_.Size() - 1)
+        if (i != parameters.Size() - 1)
         {
             source += ", ";
         }
@@ -414,13 +399,13 @@ void JSBFunction::WriteFunction(String& source)
 
     if (returnDeclared)
     {
-        if (returnType_->type_->asStringType())
+        if (returnType->type_->asStringType())
         {
             source.Append("duk_push_string(ctx, retValue.CString());\n");
         }
-        else if (returnType_->type_->asPrimitiveType())
+        else if (returnType->type_->asPrimitiveType())
         {
-            JSBPrimitiveType* prtype = returnType_->type_->asPrimitiveType();
+            JSBPrimitiveType* prtype = returnType->type_->asPrimitiveType();
 
             if (prtype->kind_ == JSBPrimitiveType::Bool)
             {
@@ -432,16 +417,16 @@ void JSBFunction::WriteFunction(String& source)
             }
 
         }
-        else if (returnType_->type_->asClassType())
+        else if (returnType->type_->asClassType())
         {
-            JSBClassType* klassType = returnType_->type_->asClassType();
+            JSBClassType* klassType = returnType->type_->asClassType();
 
-            if (klassType->class_->isObject())
+            if (klassType->class_->IsObject())
             {
                 returnDeclared = true;
                 source.Append("js_push_class_object_instance(ctx, object);\n");
             }
-            else if (klassType->class_->isNumberArray())
+            else if (klassType->class_->IsNumberArray())
             {
                 returnDeclared = true;
                 String elementType = klassType->class_->GetArrayElementType();
@@ -459,7 +444,7 @@ void JSBFunction::WriteFunction(String& source)
                 source.AppendWithFormat("js_push_class_object_instance(ctx, object, \"%s\");\n", klassType->class_->GetName().CString());
             }
         }
-        else if (returnType_->type_->asEnumType())
+        else if (returnType->type_->asEnumType())
         {
             returnDeclared = true;
             source.Append("duk_push_number(ctx, (double) retValue);\n");
@@ -476,9 +461,11 @@ void JSBFunction::WriteFunction(String& source)
     source.Append("}\n");
 }
 
-void JSBFunction::Write(String& source)
+void JSBFunctionWriter::GenerateSource(String& sourceOut)
 {
-    if (isConstructor_)
+    String source = "";
+
+    if (function_->IsConstructor())
     {
         WriteConstructor(source);
     }
@@ -486,5 +473,10 @@ void JSBFunction::Write(String& source)
     {
         WriteFunction(source);
     }
+
+    sourceOut += source;
+
+}
+
 }
 

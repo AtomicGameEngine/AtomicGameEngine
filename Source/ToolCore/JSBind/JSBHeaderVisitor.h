@@ -244,7 +244,7 @@ public:
         if (name.StartsWith("operator "))
             return NULL;
 
-        if (name == klass->GetName())
+        if (name == klass->GetNativeName())
             jfunction->SetConstructor();
 
         if (name.StartsWith("~"))
@@ -413,7 +413,7 @@ public:
             }
             else
             {
-                jclass->AddBaseClass(base);
+                jclass->SetBaseClass(base);
             }
         }
 

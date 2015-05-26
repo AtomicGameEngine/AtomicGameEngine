@@ -2,6 +2,8 @@
 include (BundleUtilities)
 include(AtomicDesktop)
 
+set (JAVASCRIPT_BINDINGS_PLATFORM "MACOSX")
+
 add_definitions(-DATOMIC_PLATFORM_OSX -DATOMIC_OPENGL -DKNET_UNIX)
 
 list (APPEND ATOMIC_LINK_LIBRARIES GLEW)

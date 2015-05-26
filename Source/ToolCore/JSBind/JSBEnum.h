@@ -9,6 +9,7 @@ namespace ToolCore
 {
 
 class JSBModule;
+class JSBHeader;
 
 class JSBEnum : public Object
 {
@@ -21,6 +22,11 @@ public:
     virtual ~JSBEnum();
 
     const String& GetName() { return name_; }
+    JSBHeader* GetHeader() { return header_; }
+
+    Vector<String>& GetValues() { return values_; }
+
+    void SetHeader(JSBHeader* header) { header_ = header; }
 
     void Preprocess();
 
@@ -33,6 +39,8 @@ private:
     SharedPtr<JSBModule> module_;
 
     Vector<String> values_;
+
+    JSBHeader* header_;
 
 };
 

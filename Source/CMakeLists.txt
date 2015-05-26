@@ -6,6 +6,7 @@ add_subdirectory(AtomicPlayer)
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(ToolCore)
+    add_subdirectory(ToolCoreJS)
     add_subdirectory(AtomicEditor)
     add_subdirectory(AtomicEditorWork)
     add_subdirectory(AtomicTool)

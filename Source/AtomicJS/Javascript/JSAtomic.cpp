@@ -29,7 +29,7 @@
 namespace Atomic
 {
 
-extern void jsb_modules_init(JSVM* vm);
+extern void jsb_package_atomic_init(JSVM* vm);
 
 static int js_module_read_file(duk_context* ctx)
 {
@@ -252,7 +252,7 @@ static int js_atomic_destroy(duk_context* ctx)
 void jsapi_init_atomic(JSVM* vm)
 {
     // core modules
-    jsb_modules_init(vm);
+    jsb_package_atomic_init(vm);
 
     // extensions
     jsapi_init_core(vm);

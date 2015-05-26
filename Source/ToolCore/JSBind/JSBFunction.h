@@ -75,6 +75,8 @@ public:
 
 class JSBFunction : public JSBSymbol
 {
+    friend class JSBFunctionWriter;
+
 public:
 
     JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
@@ -94,7 +96,10 @@ public:
     bool IsOverride() { return isOverride_; }
     bool Skip() { return skip_; }
 
+    const String& GetPropertyName() { return propertyName_; }
+
     JSBFunctionType* GetReturnType() { return returnType_; }
+    Vector<JSBFunctionType*>& GetParameters() { return parameters_; }
 
     const String& GetDocString() { return docString_; }
 

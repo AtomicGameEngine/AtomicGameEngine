@@ -1,20 +1,4 @@
 
-if (MSVC)
-    set (JAVASCRIPT_BINDINGS_PLATFORM "WINDOWS")
-elseif(APPLE)
-    if (NOT IOS)
-      set (JAVASCRIPT_BINDINGS_PLATFORM "MACOSX")
-    else()
-      set (JAVASCRIPT_BINDINGS_PLATFORM "IOS")
-    endif()
-elseif(LINUX)
-    set (JAVASCRIPT_BINDINGS_PLATFORM "LINUX")
-elseif(ANDROID)
-    set (JAVASCRIPT_BINDINGS_PLATFORM "ANDROID")
-elseif (EMSCRIPTEN)
-  set (JAVASCRIPT_BINDINGS_PLATFORM "WEB")
-endif()
-
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(JSBind)
 endif()
@@ -39,12 +23,12 @@ endif()
 set (JSFILES JSModuleAtomic2D.cpp;JSModuleAtomic3D.cpp;JSModuleAudio.cpp;JSModuleContainer.cpp;JSModuleCore.cpp;
              JSModuleEngine.cpp;JSModuleEnvironment.cpp;JSModuleGraphics.cpp;JSModuleInput.cpp;
              JSModuleIO.cpp;JSModuleJavascript.cpp;JSModuleMath.cpp;JSModuleNavigation.cpp;
-             JSModuleNetwork.cpp;JSModulePhysics.cpp;JSModuleResource.cpp;JSModules.cpp;
+             JSModuleNetwork.cpp;JSModulePhysics.cpp;JSModuleResource.cpp;JSPackageAtomic.cpp;
              JSModuleScene.cpp;JSModuleUI.cpp)
 
 foreach(JSFILE ${JSFILES})
 
-  set (JSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Modules/${JSFILE}")
+  set (JSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Atomic/${JSFILE}")
 
   if (NOT EXISTS ${JSFILEPATH})
     file(WRITE "${JSFILEPATH}" "// will be created by JSBind")
@@ -53,17 +37,16 @@ foreach(JSFILE ${JSFILES})
 endforeach()
 
 
-file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Modules/*.cpp)
+file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Atomic/*.cpp)
 
 set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} )
 
 add_library(AtomicJS ${SOURCE_FILES})
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-    add_dependencies(AtomicJS JSBind)
+    add_dependencies(AtomicJS AtomicTool)
 endif()
 
 add_custom_command (TARGET AtomicJS POST_BUILD
 COMMAND ${CMAKE_COMMAND}
 ARGS -E copy_if_different \"${CMAKE_CURRENT_SOURCE_DIR}/JSPlugin/AtomicPlugin.h\" \"${CMAKE_SOURCE_DIR}/Bin/NativePluginSDK/AtomicPlugin.h\")
-

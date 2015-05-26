@@ -11,6 +11,7 @@
 #include "JSBHeader.h"
 #include "JSBClass.h"
 #include "JSBEnum.h"
+#include "JSBModuleWriter.h"
 
 namespace ToolCore
 {
@@ -54,6 +55,36 @@ void JSBModule::VisitHeaders()
 
     ProcessOverloads();
 
+}
+
+void JSBModule::PreprocessClasses()
+{
+    HashMap<StringHash, SharedPtr<JSBClass> >::Iterator itr;
+
+    for (itr = classes_.Begin(); itr != classes_.End(); itr++)
+    {
+        itr->second_->Preprocess();
+    }
+}
+
+void JSBModule::ProcessClasses()
+{
+    HashMap<StringHash, SharedPtr<JSBClass> >::Iterator itr;
+
+    for (itr = classes_.Begin(); itr != classes_.End(); itr++)
+    {
+        itr->second_->Process();
+    }
+}
+
+void JSBModule::PostProcessClasses()
+{
+    HashMap<StringHash, SharedPtr<JSBClass> >::Iterator itr;
+
+    for (itr = classes_.Begin(); itr != classes_.End(); itr++)
+    {
+        itr->second_->PostProcess();
+    }
 }
 
 void JSBModule::ProcessOverloads()
@@ -164,7 +195,7 @@ void JSBModule::RegisterClass(String name)
 
         classes_[nativeName] = cls;
 
-        LOGINFOF("Registered Class: %s", cls->GetName().CString());
+        package_->RegisterClass(cls);
     }
 }
 
@@ -177,7 +208,6 @@ void JSBModule::RegisterEnum(JSBEnum* jenum)
 
     enums_[jenum->GetName()] = jenum;
 
-    LOGINFOF("Registered Enum: %s", jenum->GetName().CString());
 }
 
 JSBEnum* JSBModule::GetEnum(const String& name)
@@ -237,6 +267,17 @@ bool JSBModule::Load(const String& jsonFilename)
 
     name_ = root.GetString("name");
 
+    JSONValue requires = root.GetChild("requires");
+
+    if (requires.IsArray())
+    {
+        for (unsigned j = 0; j < requires.GetSize(); j++)
+        {
+            requirements_.Push(requires.GetString(j));
+        }
+
+    }
+
     JSONValue classes = root.GetChild("classes");
 
     for (unsigned i = 0; i < classes.GetSize(); i++)
@@ -258,6 +299,17 @@ bool JSBModule::Load(const String& jsonFilename)
 
         }
 
+    }
+
+    JSONValue includes = root.GetChild("includes");
+
+    if (includes.IsArray())
+    {
+        for (unsigned j = 0; j < includes.GetSize(); j++)
+        {
+            includes_.Push(includes.GetString(j));
+
+        }
     }
 
     JSONValue sources = root.GetChild("sources");
@@ -291,6 +343,18 @@ bool JSBModule::Load(const String& jsonFilename)
     ScanHeaders();
 
     return true;
+}
+
+void JSBModule::GenerateSource(const String& outPath)
+{
+    JSBModuleWriter writer(this);
+    writer.GenerateSource(source_);
+
+    String filepath = outPath + "/JSModule" + name_ + ".cpp";
+    File file(context_);
+    file.Open(filepath, FILE_WRITE);
+    file.Write(source_.CString(), source_.Length());
+    file.Close();
 }
 
 }
