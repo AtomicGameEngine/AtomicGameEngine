@@ -41,6 +41,19 @@ mainframe.handleMenuAtomicEditor = function(data) {
 
   }
 
+  if (target && target.id == "menu edit popup") {
+
+    if (data.refid == "edit play") {
+
+      new Atomic.PlayCmd().run();
+
+      return true;
+
+    }
+
+  }
+
+
 }
 
 mainframe.handleMenuBarEvent = function(data) {

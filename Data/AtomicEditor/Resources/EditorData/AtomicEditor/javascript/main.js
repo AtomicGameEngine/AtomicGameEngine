@@ -9,7 +9,6 @@ var system = Atomic.getToolSystem();
 
 system.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
 
-new Atomic.PlayCmd().run();
 
 ( function() {
 

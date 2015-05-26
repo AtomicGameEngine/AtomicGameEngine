@@ -278,8 +278,6 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
 {
     using namespace WidgetEvent;
 
-    return;
-
     UIWidget* handler = static_cast<UIWidget*>(eventData[P_HANDLER].GetPtr());
     UIWidget* target = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());
 
