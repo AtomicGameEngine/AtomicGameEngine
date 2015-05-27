@@ -307,12 +307,12 @@ void jsapi_init_ui(JSVM* vm)
 
     duk_pop(ctx);
 
-    js_class_get_prototype(ctx, "UIButton");
+    js_class_get_prototype(ctx, "Atomic", "UIButton");
     duk_push_c_function(ctx, UIButton_Popup, 2);
     duk_put_prop_string(ctx, -2, "popup");
     duk_pop(ctx);
 
-    js_class_get_prototype(ctx, "UIWindow");
+    js_class_get_prototype(ctx, "Atomic", "UIWindow");
     duk_push_c_function(ctx, UIWindow_GetResizeToFitContentRect, 0);
     duk_put_prop_string(ctx, -2, "getResizeToFitContentRect");
     duk_pop(ctx);

@@ -45,7 +45,7 @@ mainframe.handleMenuAtomicEditor = function(data) {
 
     if (data.refid == "edit play") {
 
-      new Atomic.PlayCmd().run();
+      new ToolCore.PlayCmd().run();
 
       return true;
 

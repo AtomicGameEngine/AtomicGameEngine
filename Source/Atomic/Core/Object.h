@@ -107,6 +107,7 @@ public:
     const String& GetCategory() const;
 
     virtual bool IsObject() const { return true; }
+    static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic("Object"); return typeNameStatic; }
     
 protected:
     /// Execution context.

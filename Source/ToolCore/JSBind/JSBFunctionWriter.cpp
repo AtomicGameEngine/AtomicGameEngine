@@ -288,7 +288,8 @@ void JSBFunctionWriter::WriteConstructor(String& source)
 
     if (base)
     {
-        source.AppendWithFormat("   js_constructor_basecall(ctx, \"%s\");\n", base->GetName().CString());
+        String basePackage = base->GetModule()->GetPackage()->GetName();
+        source.AppendWithFormat("   js_constructor_basecall(ctx, \"%s\", \"%s\");\n", basePackage.CString(), base->GetName().CString());
     }
 
     if (function_->name_ == "RefCounted")

@@ -226,15 +226,27 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
         return true;
     }
 
-    duk_get_global_string(ctx, "Atomic");
-
     // will not handle renamed classes
     if (instance->IsObject())
+    {
+        Object *obj = (Object*) instance;
+
+        void* uniqueClassID = (void *) obj->GetTypeName().CString();
+        duk_push_heap_stash(ctx);
+        duk_push_pointer(ctx, uniqueClassID);
+        duk_get_prop(ctx, -2);
+        const char* package = duk_require_string(ctx, -1);
+        duk_pop_2(ctx);
+
+        duk_get_global_string(ctx, package);
         duk_get_prop_string(ctx, -1, ((Object*)instance)->GetTypeName().CString());
+    }
     else
     {
+        duk_get_global_string(ctx, "Atomic");
         duk_get_prop_string(ctx, -1, classname);
     }
+
     duk_push_pointer(ctx, (void*) instance);
     duk_new(ctx, 1);
     duk_remove(ctx, -2); // remove Atomic object

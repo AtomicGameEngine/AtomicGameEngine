@@ -26,19 +26,19 @@
 namespace Atomic
 {
 
-void js_class_get_prototype(duk_context* ctx, const char* classname)
+void js_class_get_prototype(duk_context* ctx, const char* package, const char *classname)
 {
-    duk_get_global_string(ctx, "Atomic");
+    duk_get_global_string(ctx, package);
     duk_get_prop_string(ctx, -1, classname);
     duk_get_prop_string(ctx, -1, "prototype");
     duk_remove(ctx, -2); // remove class object
     duk_remove(ctx, -2); // remove Atomic object
 }
 
-void js_constructor_basecall(duk_context* ctx, const char* baseclass)
+void js_constructor_basecall(duk_context* ctx, const char* package, const char* baseclass)
 {
     int top = duk_get_top(ctx);
-    duk_get_global_string(ctx, "Atomic");
+    duk_get_global_string(ctx, package);
     duk_get_prop_string(ctx, -1, baseclass);
     assert(duk_is_function(ctx, -1));
     duk_push_this(ctx);
@@ -47,31 +47,46 @@ void js_constructor_basecall(duk_context* ctx, const char* baseclass)
     assert (top == duk_get_top(ctx));
 }
 
-void js_class_declare(JSVM* vm, const char* classname, duk_c_function constructor)
+void js_class_declare_internal(JSVM* vm, void* uniqueClassID, const char* package, const char* classname, duk_c_function constructor)
 {
     duk_context* ctx = vm->GetJSContext();
-    duk_get_global_string(ctx, "Atomic");
+
+    // stash a lookup from the uniqueID to the package name
+    // (NULL) == non-object, so core "Atomic" package
+
+    if (uniqueClassID)
+    {
+        duk_push_heap_stash(ctx);
+        duk_push_pointer(ctx, uniqueClassID);
+        duk_push_string(ctx, package);
+        duk_put_prop(ctx, -3);
+        duk_pop(ctx);
+    }
+    else
+    {
+        assert(String("Atomic") == package );
+    }
+
+    duk_get_global_string(ctx, package);
     duk_push_c_function(ctx, constructor, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, classname);
     duk_pop(ctx);
 }
 
-void js_class_push_propertyobject(JSVM* vm, const char* classname)
+void js_class_push_propertyobject(JSVM* vm, const char* package, const char* classname)
 {
     duk_context* ctx = vm->GetJSContext();
     String pname;
     pname.AppendWithFormat("__%s__Properties", classname);
 
-    duk_get_global_string(ctx, "Atomic");
+    duk_get_global_string(ctx, package);
     duk_push_object(ctx);
     duk_dup(ctx, -1);
     duk_put_prop_string(ctx, -3, pname.CString());
     duk_remove(ctx, -2); // remove Atomic object
 }
 
-
-
-void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, bool hasProperties)
+void js_setup_prototype(JSVM* vm, const char* package, const char* classname, const char* basePackage, const char* basename, bool hasProperties)
 {
     duk_context* ctx = vm->GetJSContext();
 
@@ -80,7 +95,7 @@ void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, b
 
     int top = duk_get_top(ctx);
 
-    duk_get_global_string(ctx, "Atomic");
+    duk_get_global_string(ctx,package);
     duk_get_prop_string(ctx, -1, classname);
     assert(duk_is_c_function(ctx, -1));
 
@@ -108,7 +123,7 @@ void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, b
 
     duk_remove(ctx, -2); // remove Object
 
-    duk_get_global_string(ctx, "Atomic");
+    duk_get_global_string(ctx, basePackage);
     duk_get_prop_string(ctx, -1, basename);
     assert(duk_is_function(ctx, -1));
     duk_get_prop_string(ctx, -1, "prototype");
@@ -120,13 +135,15 @@ void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, b
     int numargs = 1;
     if (hasProperties)
     {
-        duk_get_prop_string(ctx, -2, pname.CString());
+        duk_get_global_string(ctx, package);
+        duk_get_prop_string(ctx, -1, pname.CString());
         assert(duk_is_object(ctx, -1));
-        duk_remove(ctx, -3); // remove Atomic
+        duk_remove(ctx, -2);
+        duk_remove(ctx, -3); // remove package
         numargs++;
     }
     else
-        duk_remove(ctx, -2); // remove Atomic
+        duk_remove(ctx, -2); // remove package
 
     duk_call(ctx, numargs);
 
@@ -154,6 +171,8 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     Object* object;
     Vector2& vector2 = (Vector2&) Vector2::ZERO;
     Vector3& vector3 = (Vector3&) Vector3::ZERO;
+    void* uniqueClassID = NULL;
+    const char* package = NULL;
 
     switch (type)
     {
@@ -169,8 +188,17 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
         object = (Object*) ref;
 
+
         // check that class is supported
-        duk_get_global_string(ctx, "Atomic");
+        uniqueClassID = (void *) object->GetTypeName().CString();
+        duk_push_heap_stash(ctx);
+        duk_push_pointer(ctx, uniqueClassID);
+        duk_get_prop(ctx, -2);
+        package = duk_to_string(ctx, -1);
+        duk_pop_2(ctx);
+
+        // check that class is supported
+        duk_get_global_string(ctx, package);
 
         // will not handle renamed classes!
         duk_get_prop_string(ctx, -1, object->GetTypeName().CString());

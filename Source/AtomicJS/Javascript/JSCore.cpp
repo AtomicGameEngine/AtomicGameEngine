@@ -125,7 +125,7 @@ void jsapi_init_core(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    js_class_get_prototype(ctx, "AObject");
+    js_class_get_prototype(ctx, "Atomic", "AObject");
     duk_push_c_function(ctx, Object_SubscribeToEvent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "subscribeToEvent");
     duk_pop(ctx);

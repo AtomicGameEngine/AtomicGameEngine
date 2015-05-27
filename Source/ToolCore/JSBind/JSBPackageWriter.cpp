@@ -42,9 +42,15 @@ void JSBPackageWriter::WriteProtoTypeRecursive(String &source, JSBClass* klass, 
 
         if (module->Requires("3D"))
             source += "\n#ifdef ATOMIC_3D\n";
-        source.AppendWithFormat("   js_setup_prototype(vm, \"%s\", \"%s\", %s);\n",
-                                klass->GetName().CString(), base ? base->GetName().CString() : "",
+
+        String packageName =  klass->GetModule()->GetPackage()->GetName();
+        String basePackage =  base ? base->GetModule()->GetPackage()->GetName() : "";
+
+        source.AppendWithFormat("   js_setup_prototype(vm, \"%s\", \"%s\", \"%s\", \"%s\", %s);\n",
+                                packageName.CString(), klass->GetName().CString(),
+                                base ? basePackage.CString() : "", base ? base->GetName().CString() : "",
                                 klass->HasProperties() ? "true" : "false");
+
         if (module->Requires("3D"))
             source += "#endif\n\n";
     }

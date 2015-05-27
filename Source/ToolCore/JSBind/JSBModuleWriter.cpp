@@ -43,6 +43,8 @@ void JSBModuleWriter::WriteClassDeclaration(String& source)
 
     source += "duk_context* ctx = vm->GetJSContext();\n";
 
+    String packageName = module_->GetPackage()->GetName();
+
     for (unsigned i = 0; i < classes.Size(); i++)
     {
         JSBClass* klass = classes.At(i);
@@ -50,12 +52,15 @@ void JSBModuleWriter::WriteClassDeclaration(String& source)
         if (klass->IsNumberArray())
             continue;
 
-        source.AppendWithFormat("   js_class_declare(vm, \"%s\", jsb_constructor_%s);\n", klass->GetName().CString(), klass->GetName().CString());
+        if (klass->IsObject())
+            source.AppendWithFormat("   js_class_declare<%s>(vm, \"%s\", \"%s\", jsb_constructor_%s);\n", klass->GetNativeName().CString(), packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
+        else
+            source.AppendWithFormat("   js_class_declare_internal(vm, NULL, \"%s\", \"%s\", jsb_constructor_%s);\n", packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
+
 
         if (klass->HasProperties())
         {
-            source.AppendWithFormat("js_class_push_propertyobject(vm, \"%s\");\n", klass->GetName().CString());
-
+            source.AppendWithFormat("js_class_push_propertyobject(vm, \"%s\", \"%s\");\n", packageName.CString(), klass->GetName().CString());
 
             Vector<String> pnames;
             klass->GetPropertyNames(pnames);

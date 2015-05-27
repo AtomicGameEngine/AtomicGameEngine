@@ -59,12 +59,12 @@ void jsapi_init_io(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    js_class_get_prototype(ctx, "File");
+    js_class_get_prototype(ctx, "Atomic", "File");
     duk_push_c_function(ctx, File_ReadText, 0);
     duk_put_prop_string(ctx, -2, "readText");
     duk_pop(ctx);
 
-    js_class_get_prototype(ctx, "FileSystem");
+    js_class_get_prototype(ctx, "Atomic", "FileSystem");
     duk_push_c_function(ctx, FileSystem_ScanDir, 4);
     duk_put_prop_string(ctx, -2, "scanDir");
     duk_pop(ctx);

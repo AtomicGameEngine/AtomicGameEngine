@@ -49,9 +49,11 @@ void JSBClassWriter::GenerateSource(String& sourceOut)
 
     WriteFunctions(source);
 
+    String packageName = klass_->GetModule()->GetPackage()->GetName();
+
     source.AppendWithFormat("static void jsb_class_define_%s(JSVM* vm)\n{\n", klass_->GetName().CString());
     source.Append("duk_context* ctx = vm->GetJSContext();\n");
-    source.AppendWithFormat("js_class_get_prototype(ctx, \"%s\");\n", klass_->GetName().CString());
+    source.AppendWithFormat("js_class_get_prototype(ctx, \"%s\", \"%s\");\n", packageName.CString(), klass_->GetName().CString());
 
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)
     {

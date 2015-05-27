@@ -1,11 +1,11 @@
 
 var ui = require("./ui/ui");
 
-var env = Atomic.getToolEnvironment();
+var env = ToolCore.getToolEnvironment();
 
 print(env.rootSourceDir);
 
-var system = Atomic.getToolSystem();
+var system = ToolCore.getToolSystem();
 
 system.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
 
