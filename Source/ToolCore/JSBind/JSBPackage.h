@@ -26,6 +26,8 @@ public:
 
     bool Load(const String& packageFolder);
 
+    Vector<SharedPtr<JSBModule>>& GetModules() {return modules_;}
+
     void PreprocessModules();
 
     void ProcessModules();

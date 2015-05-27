@@ -27,6 +27,16 @@ JSBModule::~JSBModule()
 
 }
 
+Vector<SharedPtr<JSBClass>> JSBModule::GetClasses()
+{
+    return classes_.Values();
+}
+
+Vector<SharedPtr<JSBEnum>> JSBModule::GetEnums()
+{
+    return enums_.Values();
+}
+
 void JSBModule::PreprocessHeaders()
 {
     for (unsigned i = 0; i < headers_.Size(); i++)

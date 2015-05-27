@@ -33,6 +33,9 @@ public:
     JSBPackage* GetPackage() { return package_; }
 
     JSBClass* GetClass(const String& name);
+    Vector<SharedPtr<JSBClass>> GetClasses();
+    Vector<SharedPtr<JSBEnum>> GetEnums();
+    Vector<String>& GetConstants() { return constants_; }
 
     void RegisterClass(String name);
 

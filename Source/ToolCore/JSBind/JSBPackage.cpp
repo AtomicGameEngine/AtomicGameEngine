@@ -8,6 +8,8 @@
 #include "JSBPackage.h"
 
 #include "JSBPackageWriter.h"
+#include "JSBDoc.h"
+#include "JSBTypeScript.h"
 
 namespace ToolCore
 {
@@ -72,6 +74,14 @@ void JSBPackage::GenerateSource(const String &outPath)
     {
         modules_[i]->GenerateSource(outPath);
     }
+
+    JSBind* jsbind = GetSubsystem<JSBind>();
+
+    JSBDoc jdoc;
+    jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Bin/" + name_ + ".js");
+
+    JSBTypeScript ts;
+    ts.Emit(this, jsbind->GetSourceRootFolder() + "Bin/" + name_ + ".d.ts");
 }
 
 JSBClass* JSBPackage::GetClass(const String& name)

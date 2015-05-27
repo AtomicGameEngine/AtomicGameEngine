@@ -96,8 +96,8 @@ public:
     bool IsOverride() { return isOverride_; }
     bool Skip() { return skip_; }
 
+    JSBClass* GetClass() { return class_; }
     const String& GetPropertyName() { return propertyName_; }
-
     JSBFunctionType* GetReturnType() { return returnType_; }
     Vector<JSBFunctionType*>& GetParameters() { return parameters_; }
 

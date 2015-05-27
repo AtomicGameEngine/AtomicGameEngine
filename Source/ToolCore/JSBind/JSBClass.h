@@ -63,6 +63,7 @@ public:
     const String& GetNativeName() { return nativeName_; }
     JSBClass* GetBaseClass();
     PODVector<JSBClass*>& GetBaseClasses() {return baseClasses_; }
+    PODVector<JSBFunction*>& GetFunctions() { return functions_; }
 
     bool IsAbstract() { return isAbstract_; }
 
