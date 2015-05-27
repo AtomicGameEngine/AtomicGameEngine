@@ -48,7 +48,7 @@ void JSBDoc::Begin()
 {
     source_ += "//Atomic JSDoc Definitions\n\n\n";
 
-    source_ += "/**\n * Atomic Game Engine\n * @namespace\n*/\n var Atomic = {}\n\n";
+    source_ += "/**\n * Atomic Game Engine\n * @namespace\n*/\n var " + package_->GetName() + " = {}\n\n";
 }
 
 void JSBDoc::End()

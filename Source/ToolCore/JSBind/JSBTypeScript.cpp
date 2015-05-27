@@ -47,7 +47,7 @@ static String GetScriptType(JSBFunctionType* ftype)
 void JSBTypeScript::Begin()
 {
     source_ += "//Atomic TypeScript Definitions\n\n\n";
-    source_ += "declare module Atomic {\n\n";
+    source_ += "declare module "+ package_->GetName() + " {\n\n";
 }
 
 void JSBTypeScript::End()

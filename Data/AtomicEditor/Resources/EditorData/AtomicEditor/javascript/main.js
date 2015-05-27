@@ -9,6 +9,9 @@ var system = ToolCore.getToolSystem();
 
 system.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
 
+var cool = new Editor.MyJSClass();
+print(cool.aha);
+
 
 ( function() {
 
