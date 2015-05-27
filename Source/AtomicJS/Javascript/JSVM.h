@@ -121,11 +121,16 @@ public:
 
     }
 
-    inline RefCounted* GetObjectPtr(void* heapptr)
+    inline RefCounted* GetObjectPtr(void* heapptr, bool allowNull = false)
     {
 #ifdef JSVM_DEBUG
         assert(!removedHeapPtr_.Contains(heapptr));
-#endif        
+#endif
+        if (allowNull && !heapToObject_.Contains(heapptr))
+        {
+            return NULL;
+        }
+
         assert(heapToObject_.Contains(heapptr));
 
 #ifdef JSVM_DEBUG

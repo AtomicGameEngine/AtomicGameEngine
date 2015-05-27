@@ -218,7 +218,41 @@ void JSBFunctionWriter::WriteConstructor(String& source)
     // Constructor
     source.AppendWithFormat("duk_ret_t jsb_constructor_%s(duk_context* ctx)\n{\n", klass->GetName().CString());
 
-    source.Append("   if (duk_is_constructor_call(ctx))\n   {\n");
+    /*
+
+duk_ret_t jsb_constructor_MyJSClass(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    duk_push_this(ctx);
+    void *ptr = duk_get_heapptr(ctx, -1);
+    duk_pop(ctx);
+
+    if (!vm->GetObjectPtr(ptr, true))
+    {
+        if (!duk_get_top(ctx) || !duk_is_pointer(ctx, 0))
+        {
+            MyJSClass* native = new MyJSClass(JSVM::GetJSVM(ctx)->GetContext());
+            vm->AddObject(ptr, native);
+        }
+        else if (duk_is_pointer(ctx, 0))
+        {
+            vm->AddObject(ptr, (RefCounted*) duk_get_pointer(ctx, 0));
+        }
+    }
+
+    js_constructor_basecall(ctx, "Atomic", "AObject");
+    return 0;
+}
+
+     */
+
+    source.Append( "\nJSVM* vm = JSVM::GetJSVM(ctx);\n" \
+            "duk_push_this(ctx);\n" \
+            "void *ptr = duk_get_heapptr(ctx, -1);\n" \
+            "duk_pop(ctx);\n\n");
+
+    source.Append("   if (!vm->GetObjectPtr(ptr, true))\n   {\n");
+
     if (!klass->IsAbstract() && !klass->IsNumberArray())
     {
 
@@ -242,7 +276,7 @@ void JSBFunctionWriter::WriteConstructor(String& source)
                 JSBClass* klass = classType->class_;
                 if (klass->GetName() == "Context")
                 {
-                    sarg = "JSVM::GetJSVM(ctx)->GetContext()";
+                    sarg = "vm->GetContext()";
                     cparam--;
                 }
 
@@ -264,15 +298,11 @@ void JSBFunctionWriter::WriteConstructor(String& source)
                                 "{\n"\
                                 "%s\n"\
                                 "%s* native = new %s(%s);\n" \
-                                "duk_push_this(ctx);\n" \
-                                "JSVM::GetJSVM(ctx)->AddObject(duk_get_heapptr(ctx, -1), native);\n"\
-                                "duk_pop(ctx);\n"\
+                                "vm->AddObject(ptr, native);\n"\
                                 "}\n" \
                                 "else if (duk_is_pointer(ctx, 0))\n" \
                                 "{\n" \
-                                "duk_push_this(ctx);\n" \
-                                "JSVM::GetJSVM(ctx)->AddObject(duk_get_heapptr(ctx, -1), (RefCounted*) duk_get_pointer(ctx, 0));\n" \
-                                "duk_pop(ctx);\n" \
+                                "vm->AddObject(ptr, (RefCounted*) duk_get_pointer(ctx, 0));\n" \
                                 "}\n", marshal.CString(), klass->GetNativeName().CString(), klass->GetNativeName().CString(), sparams.CString());
     }
     else
