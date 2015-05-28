@@ -1,8 +1,9 @@
 
 import strings = require("./EditorStrings");
 import menubar = require("./MainFrameMenu");
+import scriptwidget = require("./ScriptWidget");
 
-export class MainFrame extends Atomic.UIWidget {
+export class MainFrame extends scriptwidget.ScriptWidget {
 
 	constructor(view: Atomic.UIView, width: number, height: number) {
 
@@ -12,79 +13,49 @@ export class MainFrame extends Atomic.UIWidget {
 
 		this.setSize(width, height);
 
-		this.subscribeToEvent(this, "WidgetEvent", function(data) {
-			
-			// this no longer refers to this MainFrame, 
-			// instead it is the this of the function call 
-			// look into fixing this
+	}
 
-			if (data.handler.handleMenuBarEvent(data)) return true;
+	onEventClick(target: Atomic.UIWidget, refid: string): void {
+
+		if (this.handlePopupMenu(target, refid))
+			return;
+
+		var src = menubar.getMenuItemSource(target.id);
+
+		if (src) {
+
+			var menu = new Atomic.UIMenuWindow(target, target.id + " popup");
+			menu.show(src);
+
+		}
+
+	}
+
+
+	handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
+
+		if (target.id == "menu atomic editor popup") {
+
+			if (refid == "quit")
+				Atomic.getEngine().exit();
+
+		}
+
+		if (target.id == "menu edit popup") {
+
+			if (refid == "edit play") {
+
+				new ToolCore.PlayCmd().run();
+				return true;
+
+			}
 
 			return false;
 
-		});
-
+		}
 	}
 
-	handlePopupMenu(data): boolean {
-
-		var target = data.target;
-
-		if (target && target.id == "menu atomic editor popup") {
-
-			if (data.refid == "quit") {
-
-				// todo, send a request for file saves, etc
-				Atomic.getEngine().exit();
-
-				return true;
-
-			}
-
-		}
-
-		if (target && target.id == "menu edit popup") {
-
-			if (data.refid == "edit play") {
-
-				new ToolCore.PlayCmd().run();
-
-				return true;
-
-			}
-
-		}
-
-
-	}
-
-	handleMenuBarEvent(data): boolean {
-
-		if (this.handlePopupMenu(data))
-			return true;
-
-		if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
-
-			//if (mainframe.handleMenuAtomicEditor(data)) return true;
-
-			var target = data.target;
-
-			var src = menubar.getMenuItemSource(target.id);
-
-			if (src) {
-
-				var menu = new Atomic.UIMenuWindow(target, target.id + " popup");
-				menu.show(src);
-				return true;
-
-			}
-
-		}
-
-		return false;
-
-	}
-
+	// override example	
 	setSize(width: number, height: number): void {
 
 		super.setSize(width, height);
