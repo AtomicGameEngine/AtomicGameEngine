@@ -49,7 +49,7 @@ namespace :build  do
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
 
       sh "cmake ../../ -G \"Visual Studio 12 2013 Win64\""
-      sh "msbuild Atomic.sln /p:Configuration=Release"
+      sh "msbuild /m Atomic.sln /p:Configuration=Release"
 
     end
 
