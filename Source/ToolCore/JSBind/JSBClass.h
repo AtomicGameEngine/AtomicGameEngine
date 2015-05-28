@@ -16,21 +16,22 @@ class JSBFunction;
 class JSBType;
 
 // chosen function overrides
-class JSBFunctionOverride
+class JSBFunctionSignature
 {
 
 public:
 
-    JSBFunctionOverride(const String& name, const Vector<String>& sig);
+    JSBFunctionSignature(const String& name, const Vector<String>& sig);
 
     String name_;
     Vector<String> sig_;
     Vector<JSBType*> types_;
 
+    bool Match(JSBFunction* function);
+
     void Parse() ;
 
     bool parsed_;
-
 };
 
 class JSBProperty
@@ -100,7 +101,8 @@ public:
 
     void SetSkipFunction(const String& name, bool skip = true);
     void AddFunction(JSBFunction* function);
-    void AddFunctionOverride(JSBFunctionOverride* override) { overrides_.Push(override); }
+    void AddFunctionOverride(JSBFunctionSignature* override) { overrides_.Push(override); }
+    void AddFunctionExclude(JSBFunctionSignature* exclude) { excludes_.Push(exclude); }
     void AddPropertyFunction(JSBFunction* function);
 
     void Preprocess();
@@ -122,7 +124,8 @@ private:
     PODVector<JSBFunction*> functions_;
     PODVector<JSBClass*> baseClasses_;
 
-    PODVector<JSBFunctionOverride*> overrides_;
+    PODVector<JSBFunctionSignature*> overrides_;
+    PODVector<JSBFunctionSignature*> excludes_;
 
     bool isAbstract_;
     bool isObject_;

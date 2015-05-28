@@ -164,6 +164,44 @@ void js_setup_prototype(JSVM* vm, const char* package, const char* classname, co
     assert (top == duk_get_top(ctx));
 }
 
+void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
+{
+    v.Clear();
+
+    duk_enum(ctx, objIdx, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+    while (duk_next(ctx, -1 /*enum_index*/, 1 /*get_value*/)) {
+
+        /* [ ... enum key ] */
+
+        const char* key = duk_to_string(ctx, -2);
+
+        if (duk_is_number(ctx, -1)) {
+
+            v[key] = (float) duk_to_number(ctx, -1);
+
+        } else if (duk_is_boolean(ctx, -1)) {
+
+            v[key] = duk_to_boolean(ctx, -1) ? true : false;
+
+        }
+        else if (duk_is_string(ctx, -1)) {
+
+            v[key] = duk_to_string(ctx, -1);
+
+        } else if (duk_get_heapptr(ctx, -1)) {
+
+            v[key] = js_to_class_instance<Object*>(ctx, -1, 0);
+
+        }
+
+        duk_pop_2(ctx);  /* pop_key & value*/
+    }
+
+    duk_pop(ctx);  /* pop enum object */
+
+}
+
 void js_push_variant(duk_context *ctx, const Variant& v)
 {
     VariantType type = v.GetType();

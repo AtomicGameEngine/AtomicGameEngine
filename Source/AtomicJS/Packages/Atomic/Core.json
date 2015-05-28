@@ -4,5 +4,10 @@
 	"classes" : ["Context", "Object"],
 	"classes_rename" : {
 		"Object" : "AObject"
+	},
+	"excludes" : {
+		"Object" : {
+			"SendEvent" : ["StringHash"]
+		}
 	}
 }

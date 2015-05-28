@@ -1,5 +1,5 @@
 {
 	"name" : "Javascript",
 	"sources" : ["Source/AtomicJS/Javascript"],
-	"classes" : ["JSVM", "JSComponent", "JSMetrics", "JSEventHelper"]
+	"classes" : ["JSVM", "JSComponent", "JSMetrics", "JSEventHelper", "JSScriptObject"]
 }

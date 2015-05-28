@@ -10,13 +10,13 @@
 namespace ToolCore
 {
 
-JSBFunctionOverride::JSBFunctionOverride(const String &name, const Vector<String>& sig) : parsed_(false)
+JSBFunctionSignature::JSBFunctionSignature(const String &name, const Vector<String>& sig) : parsed_(false)
 {
     name_ = name;
     sig_ = sig;
 }
 
-void JSBFunctionOverride::Parse()
+void JSBFunctionSignature::Parse()
 {
     if (parsed_)
         return;
@@ -32,6 +32,71 @@ void JSBFunctionOverride::Parse()
         }
         types_.Push(type);
     }
+
+}
+
+bool JSBFunctionSignature::Match(JSBFunction* function)
+{
+
+    if (name_ != function->GetName())
+        return false;
+
+    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+
+    if (types_.Size() != parameters.Size())
+        return false;
+
+    for (unsigned x = 0; x < parameters.Size(); x++)
+    {
+        JSBType* ot = types_[x];
+        JSBType* pt = parameters[x]->type_;
+
+        // should add an == operator
+        if ((ot->asPrimitiveType() == NULL) != (pt->asPrimitiveType() == NULL) ||
+                (ot->asClassType() == NULL) != (pt->asClassType() == NULL) )
+        {
+            return false;
+        }
+
+        if (ot->asPrimitiveType())
+        {
+            JSBPrimitiveType* pot = ot->asPrimitiveType();
+            JSBPrimitiveType* ppt = pt->asPrimitiveType();
+
+            if (pot->kind_ != ppt->kind_)
+            {
+                return false;
+            }
+        }
+        if (ot->asClassType())
+        {
+            JSBClassType* cot = ot->asClassType();
+            JSBClassType* cpt = pt->asClassType();
+
+            if (cot->class_ != cpt->class_)
+            {
+                return false;
+            }
+        }
+        if (ot->asStringType())
+        {
+            if (!pt->asStringType())
+            {
+                return false;
+            }
+        }
+        if (ot->asStringHashType())
+        {
+            if (!pt->asStringHashType())
+            {
+                return false;
+            }
+        }
+
+
+    }
+
+    return true;
 
 }
 
@@ -153,6 +218,28 @@ void JSBClass::Process()
         overrides_.At(j)->Parse();
     }
 
+    for (unsigned j = 0; j < excludes_.Size(); j++)
+    {
+        excludes_.At(j)->Parse();
+    }
+
+
+    // detect skips
+
+    for (unsigned j = 0; j < functions_.Size(); j++)
+    {
+
+        for (unsigned k = 0; k < excludes_.Size(); k++)
+        {
+            if (excludes_[k]->Match(functions_[j]))
+            {
+                functions_[j]->SetSkip(true);
+                break;
+            }
+
+        }
+    }
+
     // detect overridden functions, only works for in class atm (not baseclasses)
     for (unsigned j = 0; j < functions_.Size(); j++)
     {
@@ -211,77 +298,15 @@ void JSBClass::Process()
         if (function->IsOverride())
         {
             for (unsigned k = 0; k < overrides_.Size(); k++)
-            {
-                JSBFunctionOverride* override =  overrides_[k];
+            {                
+                JSBFunctionSignature* override =  overrides_[k];
 
-                if (override->name_ != function->GetName())
+                if (!override->Match(function))
                     continue;
 
-                Vector<JSBFunctionType*>& parameters = function->GetParameters();
+                function->SetSkip(false);
 
-                if (override->types_.Size() != parameters.Size())
-                    continue;
-
-                bool match = true;
-                for (unsigned x = 0; x < parameters.Size(); x++)
-                {
-                    JSBType* ot = override->types_[x];
-                    JSBType* pt = parameters[x]->type_;
-
-                    // should add an == operator
-                    if ((ot->asPrimitiveType() == NULL) != (pt->asPrimitiveType() == NULL) ||
-                            (ot->asClassType() == NULL) != (pt->asClassType() == NULL) )
-                    {
-                        match = false;
-                        break;
-                    }
-
-                    if (ot->asPrimitiveType())
-                    {
-                        JSBPrimitiveType* pot = ot->asPrimitiveType();
-                        JSBPrimitiveType* ppt = pt->asPrimitiveType();
-
-                        if (pot->kind_ != ppt->kind_)
-                        {
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (ot->asClassType())
-                    {
-                        JSBClassType* cot = ot->asClassType();
-                        JSBClassType* cpt = pt->asClassType();
-
-                        if (cot->class_ != cpt->class_)
-                        {
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (ot->asStringType())
-                    {
-                        if (!pt->asStringType())
-                        {
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (ot->asStringHashType())
-                    {
-                        if (!pt->asStringHashType())
-                        {
-                            match = false;
-                            break;
-                        }
-                    }
-
-
-                }
-                if (match)
-                {
-                    function->SetSkip(false);
-                    break;
-                }
+                break;
 
             }
 

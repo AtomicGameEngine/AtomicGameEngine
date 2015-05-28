@@ -61,6 +61,7 @@ public:
 private:
 
     void ProcessOverloads();
+    void ProcessExcludes();
 
     void ScanHeaders();
 

@@ -39,4 +39,6 @@ void js_class_get_prototype(duk_context* ctx, const char* package, const char *c
 /// Pushes variant value or undefined if can't be pushed
 void js_push_variant(duk_context* ctx, const Variant &v);
 
+void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);
+
 }

@@ -64,6 +64,7 @@ void JSBModule::VisitHeaders()
     }
 
     ProcessOverloads();
+    ProcessExcludes();
 
 }
 
@@ -139,8 +140,58 @@ void JSBModule::ProcessOverloads()
                     values.Push(sig.GetString(x));
                 }
 
-                JSBFunctionOverride* fo = new JSBFunctionOverride(functionNames[k], values);
+                JSBFunctionSignature* fo = new JSBFunctionSignature(functionNames[k], values);
                 klass->AddFunctionOverride(fo);
+
+            }
+        }
+    }
+}
+
+void JSBModule::ProcessExcludes()
+{
+    // excludes
+
+    JSONValue root = moduleJSON_->GetRoot();
+
+    JSONValue excludes = root.GetChild("excludes");
+
+    if (excludes.IsObject())
+    {
+        Vector<String> childNames = excludes.GetChildNames();
+
+        for (unsigned j = 0; j < childNames.Size(); j++)
+        {
+            String classname = childNames.At(j);
+
+            JSBClass* klass = GetClass(classname);
+
+            if (!klass)
+            {
+                ErrorExit("Bad overload klass");
+            }
+
+            JSONValue classexcludes = excludes.GetChild(classname);
+
+            Vector<String> functionNames = classexcludes.GetChildNames();
+
+            for (unsigned k = 0; k < functionNames.Size(); k++)
+            {
+                JSONValue sig = classexcludes.GetChild(functionNames[k]);
+
+                if (!sig.IsArray())
+                {
+                    ErrorExit("Bad exclude defintion");
+                }
+
+                Vector<String> values;
+                for (unsigned x = 0; x < sig.GetSize(); x++)
+                {
+                    values.Push(sig.GetString(x));
+                }
+
+                JSBFunctionSignature* fe = new JSBFunctionSignature(functionNames[k], values);
+                klass->AddFunctionExclude(fe);
 
             }
         }

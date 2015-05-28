@@ -45,7 +45,6 @@ static int Object_SubscribeToEvent(duk_context* ctx)
 
     StringHash eventType = StringHash::ZERO;
 
-
     if ( top == 2 ) // General notification: subscribeToEvent("ScreenMode", function() {});
     {
         if (duk_is_string(ctx, 0) && duk_is_function(ctx, 1))
@@ -121,6 +120,37 @@ static int Object_SubscribeToEvent(duk_context* ctx)
     return 0;
 }
 
+// so we don't keep allocating these
+static VariantMap sendEventVMap;
+static int Object_SendEvent(duk_context* ctx)
+{
+    int top = duk_get_top(ctx);
+
+    duk_push_this(ctx);
+
+    // event sender
+    Object* sender = js_to_class_instance<Object>(ctx, -1, 0);
+
+    if (top == 1)
+    {
+        sender->SendEvent(duk_to_string(ctx, 0));
+    }
+    else if (top == 2)
+    {
+        if (duk_is_object(ctx, 1)) {
+
+            js_object_to_variantmap(ctx, 1, sendEventVMap);
+
+            sender->SendEvent(duk_to_string(ctx, 0), sendEventVMap);
+
+        }
+
+    }
+
+    return 0;
+
+}
+
 void jsapi_init_core(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -128,6 +158,8 @@ void jsapi_init_core(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "AObject");
     duk_push_c_function(ctx, Object_SubscribeToEvent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "subscribeToEvent");
+    duk_push_c_function(ctx, Object_SendEvent, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "sendEvent");
     duk_pop(ctx);
 }
 
