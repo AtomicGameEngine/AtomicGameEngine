@@ -55,22 +55,22 @@ void AEEditorApp::Start()
     // Instantiate and register the Javascript subsystem
     vm_ = javascript->InstantiateVM("MainVM");
     vm_->InitJSContext();
-    vm_->SetModuleSearchPaths("AtomicEditor/javascript");
+    vm_->SetModuleSearchPaths("AtomicEditor/typescript");
 
     jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
 
-    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/javascript/main.js"));
+    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/typescript/main.js"));
 
     if (file.Null())
     {
-        ErrorExit("Unable to load AtomicEditor/javascript/main.js");
+        ErrorExit("Unable to load AtomicEditor/typescript/main.js");
         return;
     }
 
     if (!vm_->ExecuteFile(file))
     {
-        ErrorExit("Error executing AtomicEditor/javascript/main.js");
+        ErrorExit("Error executing AtomicEditor/typescript/main.js");
         return;
     }
 
