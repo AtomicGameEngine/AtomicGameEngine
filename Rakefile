@@ -42,6 +42,12 @@ namespace :build  do
 
   task :windows do
 
+    # remove existing build folder
+    if Dir.exists?("#{CMAKE_WINDOWS_BUILD_FOLDER}")
+      FileUtils.rm_rf("#{CMAKE_WINDOWS_BUILD_FOLDER}")
+    end
+
+    # create build folder
     if !Dir.exists?("#{CMAKE_WINDOWS_BUILD_FOLDER}")
       FileUtils.mkdir_p(CMAKE_WINDOWS_BUILD_FOLDER)
     end
