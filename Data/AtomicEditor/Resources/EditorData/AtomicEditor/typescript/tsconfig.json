@@ -11,6 +11,17 @@
         "./**/*.ts"
     ],
     "files": [
-        "./main.ts"
+        "./AtomicWork.d.ts",
+        "./editor/Editor.ts",
+        "./main.ts",
+        "./ui/EditorStrings.ts",
+        "./ui/MainFrame.ts",
+        "./ui/MainFrameMenu.ts",
+        "./ui/ProjectFrame.ts",
+        "./ui/ScriptWidget.ts",
+        "./ui/UIEvents.ts",
+        "./ui/modal/MessageModal.ts",
+        "./ui/modal/ModalOps.ts",
+        "./ui/ui.ts"
     ]
 }

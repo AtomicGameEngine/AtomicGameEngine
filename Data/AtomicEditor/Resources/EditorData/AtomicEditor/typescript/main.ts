@@ -4,16 +4,9 @@
 
 /// <reference path="./AtomicWork.d.ts" />
 
-import ui = require("./ui/ui");
+import Editor = require("./editor/Editor");
 
-print(ui.ui);
+var TheEditor = new Editor.Editor();
 
-var env = ToolCore.getToolEnvironment();
-
-var system = ToolCore.getToolSystem();
-
-system.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
-
-
-
-
+TheEditor.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
+TheEditor.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");

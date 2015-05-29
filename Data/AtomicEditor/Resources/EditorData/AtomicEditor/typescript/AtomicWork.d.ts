@@ -5,10 +5,12 @@
 declare module Atomic
 {
 	export function getInput() : Input;
-	export function getGraphics() : Graphics; 		
+	export function getGraphics() : Graphics;
+	export function getFileSystem(); FileSystem;
 }
 
 declare module ToolCore
 {
-	export function getToolEnvironment() : ToolEnvironment; 		
+	export function getToolEnvironment() : ToolEnvironment;
+	export function getToolSystem() : ToolSystem;
 }

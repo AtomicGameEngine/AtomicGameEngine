@@ -48,6 +48,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UICheckBox"] = true;
     uiTypes_["UISelectLost"] = true;
     uiTypes_["UIListView"] = true;
+    uiTypes_["UIMessageWindow"] = true;
 }
 
 JSUI::~JSUI()

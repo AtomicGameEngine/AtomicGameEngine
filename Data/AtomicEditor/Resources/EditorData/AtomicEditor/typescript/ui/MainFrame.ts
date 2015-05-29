@@ -1,24 +1,28 @@
-
-import strings = require("./EditorStrings");
 import menubar = require("./MainFrameMenu");
 import scriptwidget = require("./ScriptWidget");
+import projectframe = require("./ProjectFrame");
+import MessageModal = require("./modal/MessageModal");
+import UIEvents = require("./UIEvents");
 
 export class MainFrame extends scriptwidget.ScriptWidget {
 
-	constructor(view: Atomic.UIView, width: number, height: number) {
+	projectframe:projectframe.ProjectFrame;
+	private messagemodal:MessageModal.MessageModal = new MessageModal.MessageModal();
+
+	constructor() {
 
 		super();
 
 		this.load("AtomicEditor/editor/ui/mainframe.tb.txt");
 
-		this.setSize(width, height);
+		this.projectframe = new projectframe.ProjectFrame(this);
 
 	}
 
-	onEventClick(target: Atomic.UIWidget, refid: string): void {
+	onEventClick(target: Atomic.UIWidget, refid: string): boolean {
 
 		if (this.handlePopupMenu(target, refid))
-			return;
+			return true;
 
 		var src = menubar.getMenuItemSource(target.id);
 
@@ -26,8 +30,11 @@ export class MainFrame extends scriptwidget.ScriptWidget {
 
 			var menu = new Atomic.UIMenuWindow(target, target.id + " popup");
 			menu.show(src);
+			return true;
 
 		}
+
+		return false;
 
 	}
 
@@ -55,10 +62,4 @@ export class MainFrame extends scriptwidget.ScriptWidget {
 		}
 	}
 
-	// override example	
-	setSize(width: number, height: number): void {
-
-		super.setSize(width, height);
-
-	}
 }

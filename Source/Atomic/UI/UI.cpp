@@ -8,6 +8,7 @@
 #include <TurboBadger/tb_node_tree.h>
 #include <TurboBadger/tb_widgets_reader.h>
 #include <TurboBadger/tb_window.h>
+#include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
 #include <TurboBadger/tb_select.h>
 #include <TurboBadger/image/tb_image_widget.h>
@@ -38,6 +39,7 @@ using namespace tb;
 #include "UIClickLabel.h"
 #include "UICheckBox.h"
 #include "UISelectList.h"
+#include "UIMessageWindow.h"
 
 namespace tb
 {
@@ -519,6 +521,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBSelectList>())
     {
         UISelectList* nwidget = new UISelectList(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBMessageWindow>())
+    {
+        UIMessageWindow* nwidget = new UIMessageWindow(context_, NULL, "", false);
         nwidget->SetWidget(widget);
         widgetWrap_[widget] = nwidget;
         return nwidget;
