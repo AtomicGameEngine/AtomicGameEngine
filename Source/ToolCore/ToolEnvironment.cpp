@@ -4,6 +4,7 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/filestream.h>
 
+#include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/File.h>
 
@@ -127,6 +128,27 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.app/Contents/MacOS/AtomicEditor";
 #endif
     }
+
+}
+
+void ToolEnvironment::Dump()
+{
+    LOGINFOF("Root Source Dir: %s", rootSourceDir_.CString());
+    LOGINFOF("Root Build Dir: %s", rootBuildDir_.CString());
+
+    LOGINFOF("Core Resource Dir: %s", resourceCoreDataDir_.CString());
+    LOGINFOF("Player Resource Dir: %s", resourcePlayerDataDir_.CString());
+    LOGINFOF("Editor Resource Dir: %s", resourceEditorDataDir_.CString());
+
+    LOGINFOF("Editor Binary: %s", editorBinary_.CString());
+    LOGINFOF("Player Binary: %s", playerBinary_.CString());
+    LOGINFOF("Tool Binary: %s", toolBinary_.CString());
+
+    LOGINFOF("Examples Dir: %s", examplesDir_.CString());
+
+    LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());
+
+    LOGINFOF("Dev Config File: %s", devConfigFilename_.CString());
 
 }
 

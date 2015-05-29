@@ -22,9 +22,9 @@ if (MSVC)
 endif()
 
 #TODO: finer grained dependencies
-add_custom_command(TARGET JSBind POST_BUILD
-                   COMMAND $<TARGET_FILE:JSBind> "\"${CMAKE_SOURCE_DIR}\"" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMENT "Generating Javascript Bindings")
+#add_custom_command(TARGET JSBind POST_BUILD
+#                   COMMAND $<TARGET_FILE:JSBind> "\"${CMAKE_SOURCE_DIR}\"" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+#                   COMMENT "Generating Javascript Bindings")
                    
                    
         

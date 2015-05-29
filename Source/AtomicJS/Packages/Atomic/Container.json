@@ -1,0 +1,5 @@
+{
+	"name" : "Container",
+	"sources" : ["Source/Atomic/Container"],
+	"classes" : ["RefCounted"]
+}

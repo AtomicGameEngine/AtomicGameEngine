@@ -1,0 +1,6 @@
+{
+	"name" : "Engine",
+	"sources" : ["Source/Atomic/Engine"],
+	"includes" : [],
+	"classes" : ["Engine"]
+}

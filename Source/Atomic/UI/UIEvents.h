@@ -40,7 +40,7 @@ EVENT(E_WIDGETEVENT, WidgetEvent)
     PARAM(P_KEY, Key);                   // int
     PARAM(P_SPECIALKEY, SpecialKey);     // enum SPECIAL_KEY
     PARAM(P_MODIFIERKEYS, ModifierKeys); // enum MODIFIER_KEYS
-    PARAM(P_REFID, RefID);                     // unsigned (TBID)
+    PARAM(P_REFID, RefID);               // string (TBID)
     PARAM(P_TOUCH, Touch);               // bool
 
     // EventHandled can be set by event receivers to stop event bubble
@@ -61,7 +61,7 @@ EVENT(E_WIDGETDELETED, WidgetDeleted)
 EVENT(E_POPUPMENUSELECT, PopupMenuSelect)
 {
     PARAM(P_BUTTON, Button);             // UIButton that created popup
-    PARAM(P_REFID, RefID);             // unsigned tbid
+    PARAM(P_REFID, RefID);             // string tbid
 }
 
 

@@ -334,6 +334,7 @@ void JSVM::SendJSErrorEvent(const String& filename)
     assert(duk_is_object(ctx, -1));
 
     duk_get_prop_string(ctx, -1, "fileName");
+
     if (duk_is_string(ctx, -1))
     {
         eventData[P_ERRORFILENAME] = duk_to_string(ctx, -1);
@@ -447,8 +448,7 @@ bool JSVM::ExecuteFile(File *file)
     if (duk_eval_raw(ctx_, source.CString(), 0,
                      DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
-        if (duk_is_object(ctx_, -1))
-            SendJSErrorEvent(file->GetFullPath());
+        SendJSErrorEvent(file->GetFullPath());
 
         duk_pop(ctx_);
         return false;
@@ -475,24 +475,8 @@ bool JSVM::ExecuteMain()
         return false;
     }
 
-    String source;
+    return ExecuteFile(file);
 
-    file->ReadText(source);
-
-    duk_push_string(ctx_, file->GetFullPath().CString());
-    if (duk_eval_raw(ctx_, source.CString(), 0,
-                     DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
-    {
-        if (duk_is_object(ctx_, -1))
-            SendJSErrorEvent(file->GetFullPath());
-
-        duk_pop(ctx_);
-        return false;
-    }
-
-    duk_pop(ctx_);
-
-    return true;
 }
 
 }

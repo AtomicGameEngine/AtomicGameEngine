@@ -66,6 +66,9 @@ public:
             NamedType* ntype = type->asNamedType();
             String classname = getNameString(ntype->name());
 
+            if (classname.StartsWith("Atomic::"))
+                classname.Replace("Atomic::", "");
+
             if (classname == "String")
             {
                 jtype = new JSBStringType();
@@ -340,7 +343,11 @@ public:
     // global var decl or function
     virtual bool visit(Declaration* decl)
     {
+        if (decl->isTypedef())
+            return true;
+
         FullySpecifiedType dtype = decl->type();
+
         Type* type = dtype.type();
 
         if (type->isPointerType() || type->isReferenceType())
@@ -349,8 +356,16 @@ public:
         if (type->asEnumType())
             return true;
 
-        if (!type->asFloatType() && !type->asIntegerType())
+        bool _unsigned = false;
+
+        if (dtype.isUnsigned())
+            _unsigned = true;
+
+
+        if (!type->asFloatType() && !type->asIntegerType() && !_unsigned)
+        {
             return true;
+        }
 
         module_->RegisterConstant(getNameString(decl->name()).CString());
 

@@ -173,7 +173,6 @@ void JSBFunction::Process()
         return;
     }
 
-
     // if not already marked as a getter
     if (!isGetter_)
     {

@@ -9,6 +9,7 @@
 #include <TurboBadger/tb_widgets_reader.h>
 #include <TurboBadger/tb_window.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/tb_select.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -36,6 +37,7 @@ using namespace tb;
 #include "UIImageWidget.h"
 #include "UIClickLabel.h"
 #include "UICheckBox.h"
+#include "UISelectList.h"
 
 namespace tb
 {
@@ -68,6 +70,9 @@ UI::~UI()
 {
     if (initialized_)
     {
+        TBFile::SetReaderFunction(0);
+        TBID::tbidRegisterCallback = 0;
+
         tb::TBWidgetsAnimationManager::Shutdown();
 
         widgetWrap_.Clear();
@@ -78,8 +83,6 @@ UI::~UI()
     }
 
     uiContext_ = 0;
-    TBFile::SetReaderFunction(0);
-    TBID::tbidRegisterCallback = 0;
 }
 
 void UI::Shutdown()
@@ -508,6 +511,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBWidget>())
     {
         UIWidget* nwidget = new UIWidget(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBSelectList>())
+    {
+        UISelectList* nwidget = new UISelectList(context_, false);
         nwidget->SetWidget(widget);
         widgetWrap_[widget] = nwidget;
         return nwidget;

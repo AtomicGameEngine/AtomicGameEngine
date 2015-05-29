@@ -1,6 +1,7 @@
 
-
 include(AtomicDesktop)
+
+set (JAVASCRIPT_BINDINGS_PLATFORM "WINDOWS")
 
 #set (CMAKE_DEBUG_POSTFIX _d)
 

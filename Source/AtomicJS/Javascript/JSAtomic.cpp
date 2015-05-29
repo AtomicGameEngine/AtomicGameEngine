@@ -14,6 +14,7 @@
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSComponent.h"
+#include "JSCore.h"
 #include "JSGraphics.h"
 #include "JSIO.h"
 #include "JSUIAPI.h"
@@ -28,7 +29,7 @@
 namespace Atomic
 {
 
-extern void jsb_modules_init(JSVM* vm);
+extern void jsb_package_atomic_init(JSVM* vm);
 
 static int js_module_read_file(duk_context* ctx)
 {
@@ -134,6 +135,14 @@ static int js_atomic_GetInput(duk_context* ctx)
     js_push_class_object_instance(ctx, vm->GetSubsystem<Input>());
     return 1;
 }
+
+static int js_atomic_GetFileSystem(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm->GetSubsystem<FileSystem>());
+    return 1;
+}
+
 
 static int js_atomic_script(duk_context* ctx)
 {
@@ -243,9 +252,10 @@ static int js_atomic_destroy(duk_context* ctx)
 void jsapi_init_atomic(JSVM* vm)
 {
     // core modules
-    jsb_modules_init(vm);
+    jsb_package_atomic_init(vm);
 
     // extensions
+    jsapi_init_core(vm);
     jsapi_init_io(vm);
     jsapi_init_graphics(vm);
     jsapi_init_ui(vm);
@@ -301,6 +311,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
     duk_put_prop_string(ctx, -2, "getInput");
+
+    duk_push_c_function(ctx, js_atomic_GetFileSystem, 0);
+    duk_put_prop_string(ctx, -2, "getFileSystem");
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");

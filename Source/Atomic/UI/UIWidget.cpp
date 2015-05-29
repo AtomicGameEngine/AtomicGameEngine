@@ -24,8 +24,6 @@ UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 
-    UI* ui = GetSubsystem<UI>();
-
 }
 
 UIWidget::~UIWidget()
@@ -38,7 +36,7 @@ bool UIWidget::Load(const String& filename)
     UI* ui = GetSubsystem<UI>();
 
     if  (!ui->LoadResourceFile(widget_ , filename))
-        return false;    
+        return false;
 
     VariantMap eventData;
     eventData[WidgetLoaded::P_WIDGET] = this;
@@ -68,6 +66,11 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
 
 void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
+    UI* ui = GetSubsystem<UI>();
+    String id;
+
+    ui->GetTBIDString(ev.ref_id, id);
+
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
     data[P_TARGET] = target;
@@ -80,7 +83,7 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_KEY] = ev.key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
-    data[P_REFID] = (unsigned) ev.ref_id;
+    data[P_REFID] = id;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
 
@@ -154,12 +157,29 @@ IntRect UIWidget::GetRect()
     return rect;
 }
 
+void UIWidget::SetRect(IntRect rect)
+{
+    if (!widget_)
+        return;
+
+    tb::TBRect tbrect;
+
+    tbrect.y = rect.top_;
+    tbrect.x = rect.left_;
+    tbrect.w = rect.right_ - rect.left_;
+    tbrect.h = rect.bottom_ - rect.top_;
+
+    widget_->SetRect(tbrect);
+
+}
+
+
 void UIWidget::SetSize(int width, int height)
 {
     if (!widget_)
         return;
 
-    widget_->SetSize(width, height);       
+    widget_->SetSize(width, height);
 }
 
 void UIWidget::Invalidate()
@@ -366,7 +386,9 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
             {
                 VariantMap eventData;
                 eventData[PopupMenuSelect::P_BUTTON] = this;
-                eventData[PopupMenuSelect::P_REFID] = (unsigned) ev.ref_id;
+                String id;
+                ui->GetTBIDString(ev.ref_id, id);
+                eventData[PopupMenuSelect::P_REFID] = id;
                 SendEvent(E_POPUPMENUSELECT, eventData);
             }
 

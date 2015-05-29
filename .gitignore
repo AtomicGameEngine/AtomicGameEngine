@@ -1,8 +1,8 @@
 
 *.user
 *.log
-Bin/Atomic.d.ts
-Bin/Atomic.js
+Bin/*.d.ts
+Bin/*.js
 Bin/*.pak
 Bin/NativePluginSDK/*
 Source/Atomic/Javascript/Modules/*
