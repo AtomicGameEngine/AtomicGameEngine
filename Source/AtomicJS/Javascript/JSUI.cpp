@@ -49,6 +49,8 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UISelectLost"] = true;
     uiTypes_["UIListView"] = true;
     uiTypes_["UIMessageWindow"] = true;
+    uiTypes_["UISkinImage"] = true;
+
 }
 
 JSUI::~JSUI()

@@ -6,6 +6,8 @@
 #include "UIEvents.h"
 #include "UI.h"
 #include "UIWidget.h"
+#include "UILayout.h"
+#include "UIFontDescription.h"
 
 using namespace tb;
 
@@ -246,6 +248,41 @@ void UIWidget::Die()
     widget_->Die();
     // call OnDelete, which unwraps the widget and does some bookkeeping
     OnDelete();
+
+}
+
+void UIWidget::SetLayoutParams(UILayoutParams* params)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetLayoutParams(*(params->GetTBLayoutParams()));
+
+}
+
+void UIWidget::SetFontDescription(UIFontDescription* fd)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetFontDescription(*(fd->GetTBFontDescription()));
+
+}
+
+void UIWidget::DeleteAllChildren()
+{
+    if (!widget_)
+        return;
+
+    widget_->DeleteAllChildren();
+}
+
+void UIWidget::SetSkinBg(const String& id)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetSkinBg(TBIDC(id.CString()));
 
 }
 

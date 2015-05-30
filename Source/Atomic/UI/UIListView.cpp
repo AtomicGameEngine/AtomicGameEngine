@@ -21,6 +21,7 @@ public:
         : TBGenericStringItem(str, id), source_(source), parent_(0),
           depth_(0), widget_(0), expanded_(false), icon_(icon)
     {
+
     }
 
     ListViewItem* AddChild(const char* text, const char* icon, const TBID &id);
@@ -179,11 +180,9 @@ TBWidget *ListViewItemSource::CreateItemWidget(int index, TBSelectItemViewer *vi
     return nullptr;
 }
 
-//-----------------------------------------------------------------------------------
-
 UIListView::UIListView(Context* context, bool createWidget) :
     UIWidget(context, createWidget),
-    source_(0)
+    source_(0), itemLookupId_(0)
 {
     rootList_ = new UISelectList(context);
 
@@ -205,21 +204,63 @@ UIListView::~UIListView()
 
 }
 
-void UIListView::AddItem(const String& text, const String& icon, const String& id)
+unsigned UIListView::AddRootItem(const String& text, const String& icon, const String& id)
 {
     ListViewItem* item = new ListViewItem(text.CString(), TBID(id.CString()), icon.CString(), source_);
     source_->AddItem(item);
+
+    itemLookup_[itemLookupId_++] = item;
+    return itemLookupId_ - 1;
 }
+
+unsigned UIListView::AddChildItem(unsigned parentItemID, const String& text, const String& icon, const String& id)
+{
+    if (!itemLookup_.Contains(parentItemID))
+        return -1;
+
+    ListViewItem* item = itemLookup_[parentItemID];
+
+    ListViewItem* child = item->AddChild(text.CString(), icon.CString(), TBID(id.CString()));
+
+    itemLookup_[itemLookupId_++] = child;
+    return itemLookupId_ - 1;
+
+}
+
+void UIListView::SetExpanded(unsigned itemID, bool value)
+{
+    if (!itemLookup_.Contains(itemID))
+        return;
+
+    itemLookup_[itemID]->SetExpanded(value);
+
+}
+
 
 void UIListView::DeleteAllItems()
 {
-
+    itemLookup_.Clear();
+    source_->DeleteAllItems();
 }
 
 
 void UIListView::SelectItemByID(const String& id)
 {
+    TBID tid = TBIDC(id.CString());
 
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* item = source_->GetItem(i);
+
+        if (tid == item->id)
+        {
+            item->SetExpanded(true);
+            rootList_->SetValue(i);
+            rootList_->InvalidateList();
+            return;
+        }
+
+    }
 }
 
 

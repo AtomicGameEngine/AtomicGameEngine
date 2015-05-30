@@ -6,7 +6,8 @@
 	"classes" : ["UIWidget", "UILayout", "UIView", "UIWindow", "UIButton", "UITextField",
 								"UISelectItem", "UISelectItemSource", "UIMenuWindow", "UIEditField",
 								"UIImageWidget", "UIClickLabel", "UICheckBox", "UIMenuItem", "UIMenuItemSource",
-								"UISelectList", "UIListView", "UIMessageWindow"],
+								"UISelectList", "UIListView", "UIMessageWindow", "UILayoutParams", "UIFontDescription",
+								"UISkinImage"],
 	"overloads" : {
 	}
 }

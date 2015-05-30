@@ -6,6 +6,25 @@
 namespace Atomic
 {
 
+class UILayoutParams : public Object
+{
+    OBJECT(UILayoutParams)
+
+public:
+
+    UILayoutParams(Context* context);
+    virtual ~UILayoutParams();
+
+    void SetHeight(int height) { params_.SetHeight(height); }
+
+    tb::LayoutParams* GetTBLayoutParams() { return &params_; }
+
+private:
+
+    tb::LayoutParams params_;
+
+};
+
 
 class UILayout : public UIWidget
 {

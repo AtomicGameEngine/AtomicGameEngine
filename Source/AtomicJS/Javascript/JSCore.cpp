@@ -2,6 +2,8 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
+#include <Atomic/Core/ProcessUtils.h>
+
 #include "JSCore.h"
 #include "JSEventHelper.h"
 #include "JSVM.h"
@@ -151,16 +153,37 @@ static int Object_SendEvent(duk_context* ctx)
 
 }
 
+static int Atomic_GetArguments(duk_context* ctx)
+{
+    duk_push_array(ctx);
+
+    for (unsigned i = 0; i < GetArguments().Size(); i++)
+    {
+        duk_push_string(ctx, GetArguments()[i].CString());
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+
+}
+
 void jsapi_init_core(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
+
+    duk_get_global_string(ctx, "Atomic");
+
+    duk_push_c_function(ctx, Atomic_GetArguments, 0);
+    duk_put_prop_string(ctx, -2, "getArguments");
+
+    duk_pop(ctx); // pop Atomic object
 
     js_class_get_prototype(ctx, "Atomic", "AObject");
     duk_push_c_function(ctx, Object_SubscribeToEvent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "subscribeToEvent");
     duk_push_c_function(ctx, Object_SendEvent, DUK_VARARGS);
-    duk_put_prop_string(ctx, -2, "sendEvent");
-    duk_pop(ctx);
+    duk_put_prop_string(ctx, -2, "sendEvent");    
+    duk_pop(ctx); // pop AObject prototype
 }
 
 }

@@ -4,12 +4,12 @@
 namespace Atomic
 {
 
-JSScriptObject::JSScriptObject(Context* context) : Object(context)
+ScriptObject::ScriptObject(Context* context) : Object(context)
 {
 
 }
 
-JSScriptObject::~JSScriptObject()
+ScriptObject::~ScriptObject()
 {
 
 }

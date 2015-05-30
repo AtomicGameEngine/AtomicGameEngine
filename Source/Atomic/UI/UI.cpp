@@ -40,6 +40,7 @@ using namespace tb;
 #include "UICheckBox.h"
 #include "UISelectList.h"
 #include "UIMessageWindow.h"
+#include "UISkinImage.h"
 
 namespace tb
 {
@@ -485,6 +486,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         editfield->SetWidget(widget);
         widgetWrap_[widget] = editfield;
         return editfield;
+    }
+
+    if (widget->IsOfType<TBSkinImage>())
+    {
+        UISkinImage* skinimage = new UISkinImage(context_, "", false);
+        skinimage->SetWidget(widget);
+        widgetWrap_[widget] = skinimage;
+        return skinimage;
     }
 
     if (widget->IsOfType<TBImageWidget>())

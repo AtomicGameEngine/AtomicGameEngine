@@ -6,7 +6,4 @@
 
 import Editor = require("./editor/Editor");
 
-var TheEditor = new Editor.Editor();
-
-TheEditor.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
-TheEditor.loadProject("/Users/josh/Dev/atomic/AtomicExamples/NewSpaceGame");
+var TheEditor = new Editor();

@@ -24,6 +24,12 @@ public:
     void SetFilter(const String& filter);
 
     void SetSource(UISelectItemSource* source);
+    void InvalidateList();
+
+    void SetValue(int value);
+    int GetValue();
+
+    String GetSelectedItemID();
 
     tb::TBSelectList* GetTBSelectList();
 

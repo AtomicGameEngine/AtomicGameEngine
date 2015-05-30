@@ -15,6 +15,7 @@
 #include "JSVM.h"
 #include "JSComponent.h"
 #include "JSCore.h"
+#include "JSFileSystem.h"
 #include "JSGraphics.h"
 #include "JSIO.h"
 #include "JSUIAPI.h"
@@ -256,6 +257,7 @@ void jsapi_init_atomic(JSVM* vm)
 
     // extensions
     jsapi_init_core(vm);
+    jsapi_init_filesystem(vm);
     jsapi_init_io(vm);
     jsapi_init_graphics(vm);
     jsapi_init_ui(vm);

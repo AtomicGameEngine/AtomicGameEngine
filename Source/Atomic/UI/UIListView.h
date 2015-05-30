@@ -8,6 +8,7 @@ namespace Atomic
 {
 
 class ListViewItemSource;
+class ListViewItem;
 
 class UIListView : public UIWidget
 {
@@ -20,7 +21,11 @@ public:
     /// Destruct.
     virtual ~UIListView();
 
-    void AddItem(const String& text, const String& icon, const String& id);
+    unsigned AddRootItem(const String& text, const String& icon, const String& id);
+    unsigned AddChildItem(unsigned parentItemID, const String& text, const String& icon, const String& id);
+
+    void SetExpanded(unsigned itemID, bool value);
+
     void DeleteAllItems();
     void SelectItemByID(const String& id);
 
@@ -29,8 +34,11 @@ public:
 private:
 
     SharedPtr<UISelectList> rootList_;
-
     ListViewItemSource* source_;
+
+    HashMap<unsigned,ListViewItem*> itemLookup_;
+
+    unsigned itemLookupId_;
 
 };
 

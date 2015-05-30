@@ -4,9 +4,14 @@
 
 declare module Atomic
 {
+	export function getArguments() : Array<string>;
+
 	export function getInput() : Input;
 	export function getGraphics() : Graphics;
-	export function getFileSystem(); FileSystem;
+	export function getFileSystem(): FileSystem;
+
+
+
 }
 
 declare module ToolCore

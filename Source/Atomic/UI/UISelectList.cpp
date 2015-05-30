@@ -38,6 +38,47 @@ void UISelectList::SetFilter(const String& filter)
     ((TBSelectList*)widget_)->SetFilter(filter.CString());
 }
 
+void UISelectList::SetValue(int value)
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->SetValue(value);
+
+}
+
+int UISelectList::GetValue()
+{
+    if (!widget_)
+        return 0;
+
+    return ((TBSelectList*)widget_)->GetValue();
+
+}
+
+void UISelectList::InvalidateList()
+{
+    if (!widget_)
+        return;
+
+    return ((TBSelectList*)widget_)->InvalidateList();
+}
+
+String UISelectList::GetSelectedItemID()
+{
+    if (!widget_)
+        return "";
+
+    String id_;
+
+    TBID id = ((TBSelectList*)widget_)->GetSelectedItemID();
+
+    GetSubsystem<UI>()->GetTBIDString(id, id_);
+
+    return id_;
+
+}
+
 void UISelectList::SetSource(UISelectItemSource* source)
 {
     if (!widget_)

@@ -13,6 +13,7 @@
 #include <Atomic/Resource/JSONFile.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEvents.h"
 #include "../Platform/Platform.h"
 
 #include "ProjectFile.h"
@@ -105,6 +106,7 @@ bool Project::Load(const String& fullpath)
 
     projectPath_ = GetPath(fullpath);
     projectFilePath_ = fullpath;
+
     SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
     bool result = pfile->Load(this);
 
@@ -112,6 +114,12 @@ bool Project::Load(const String& fullpath)
 
     LoadBuildSettings();
     LoadUserPrefs();
+
+    if ( true /*result*/) {
+        VariantMap data;
+        data[ProjectLoaded::P_PROJECTPATH] = projectPath_;
+        SendEvent(E_PROJECTLOADED, data);
+    }
 
     return result;
 }

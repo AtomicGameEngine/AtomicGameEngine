@@ -2,7 +2,7 @@
 import UIEvents = require("../UIEvents");
 import Editor = require("../../editor/Editor");
 
-export class MessageModal extends Atomic.JSScriptObject
+export class MessageModal extends Atomic.ScriptObject
 {
 
   showErrorWindow(title:string, message:string):void {
@@ -12,7 +12,6 @@ export class MessageModal extends Atomic.JSScriptObject
     new Atomic.UIMessageWindow(mainframe, "modal_error").show(title, message, 640, 360);
 
   }
-
 
   constructor() {
 

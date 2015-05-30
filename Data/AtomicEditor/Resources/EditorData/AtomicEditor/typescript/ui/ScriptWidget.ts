@@ -1,6 +1,6 @@
 
 
-export class ScriptWidget extends Atomic.UIWidget {
+class ScriptWidget extends Atomic.UIWidget {
 
 	constructor() {
 
@@ -34,3 +34,5 @@ export class ScriptWidget extends Atomic.UIWidget {
 	}
 
 }
+
+export = ScriptWidget;

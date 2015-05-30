@@ -1,12 +1,13 @@
 import menubar = require("./MainFrameMenu");
-import scriptwidget = require("./ScriptWidget");
-import projectframe = require("./ProjectFrame");
+import ProjectFrame = require("./ProjectFrame");
 import MessageModal = require("./modal/MessageModal");
 import UIEvents = require("./UIEvents");
 
-export class MainFrame extends scriptwidget.ScriptWidget {
+import ScriptWidget = require("./ScriptWidget");
 
-	projectframe:projectframe.ProjectFrame;
+class MainFrame extends ScriptWidget {
+
+	projectframe:ProjectFrame;	
 	private messagemodal:MessageModal.MessageModal = new MessageModal.MessageModal();
 
 	constructor() {
@@ -15,7 +16,7 @@ export class MainFrame extends scriptwidget.ScriptWidget {
 
 		this.load("AtomicEditor/editor/ui/mainframe.tb.txt");
 
-		this.projectframe = new projectframe.ProjectFrame(this);
+		this.projectframe = new ProjectFrame(this);
 
 	}
 
@@ -63,3 +64,5 @@ export class MainFrame extends scriptwidget.ScriptWidget {
 	}
 
 }
+
+export = MainFrame;

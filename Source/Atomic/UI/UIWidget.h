@@ -13,6 +13,9 @@ class TBWidget;
 namespace Atomic
 {
 
+class UILayoutParams;
+class UIFontDescription;
+
 /// Wraps a TurboBadger widget in our Object model
 class UIWidget : public Object, public tb::TBWidgetDelegate
 {
@@ -34,14 +37,20 @@ public:
     void SetPosition(int x, int y);
     void SetText(const String& text);
 
+    void SetSkinBg(const String& id);
+    void SetLayoutParams(UILayoutParams* params);
+    void SetFontDescription(UIFontDescription* fd);
+
     UIWidget* GetParent();
     UIWidget* GetContentRoot();
 
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
+    void DeleteAllChildren();
+
     // String ID
     const String& GetId();
-    void SetId(const String& id);
+    virtual void SetId(const String& id);
 
     void Center();
     void SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity);

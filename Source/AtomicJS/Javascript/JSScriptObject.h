@@ -8,16 +8,16 @@ namespace Atomic
 
 /// ScriptObject makes it possible for script classes to inherit "directly" from
 /// Object (which is abstract) and use the event system, etc
-class JSScriptObject : public Object
+class ScriptObject : public Object
 {
 
-    OBJECT(JSScriptObject);
+    OBJECT(ScriptObject);
 
 public:
     /// Construct.
-    JSScriptObject(Context* context);
+    ScriptObject(Context* context);
     /// Destruct.
-    virtual ~JSScriptObject();
+    virtual ~ScriptObject();
 
 };
 
