@@ -1,11 +1,11 @@
 /*
- *  Duktape public API for Duktape 1.2.1.
+ *  Duktape public API for Duktape 1.2.99.
  *  See the API reference for documentation on call semantics.
  *  The exposed API is inside the DUK_API_PUBLIC_H_INCLUDED
  *  include guard.  Other parts of the header are Duktape
  *  internal and related to platform/compiler/feature detection.
  *
- *  Git commit 74bd1c845e5198b5e2d6cb7c98e54c3af1d6c0e4 (v1.2.1).
+ *  Git commit 9d37cf15a0cca5d3dc7c34f365072ca101d4c00e (v1.2.0-81-g9d37cf1).
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
  *  licensing information.
@@ -92,7 +92,7 @@
  *  * Josh Engebretson (https://github.com/JoshEngebretson)
  *  * Remo Eichenberger (https://github.com/remoe)
  *  * Mamod Mehyar (https://github.com/mamod)
- *  * David Demelier (https://github.com/hftmarkand)
+ *  * David Demelier (https://github.com/markand)
  *  * Tim Caswell (https://github.com/creationix)
  *  * Mitchell Blank Jr (https://github.com/mitchblank)
  *  * https://github.com/yushli
@@ -1229,7 +1229,8 @@ typedef duk_uint_t duk_ucodepoint_t;
 #define DUK_UCODEPOINT_MIN        DUK_UINT_MIN
 #define DUK_UCODEPOINT_MAX        DUK_UINT_MAX
 
-/* IEEE double typedef. */
+/* IEEE float/double typedef. */
+typedef float duk_float_t;
 typedef double duk_double_t;
 
 /* We're generally assuming that we're working on a platform with a 32-bit
@@ -3140,7 +3141,7 @@ struct duk_memory_functions;
 struct duk_function_list_entry;
 struct duk_number_list_entry;
 
-typedef void duk_context;
+typedef struct duk_hthread duk_context;
 typedef struct duk_memory_functions duk_memory_functions;
 typedef struct duk_function_list_entry duk_function_list_entry;
 typedef struct duk_number_list_entry duk_number_list_entry;
@@ -3188,13 +3189,13 @@ struct duk_number_list_entry {
  * have 99 for patch level (e.g. 0.10.99 would be a development version
  * after 0.10.0 but before the next official release).
  */
-#define DUK_VERSION                       10201L
+#define DUK_VERSION                       10299L
 
 /* Git describe for Duktape build.  Useful for non-official snapshot builds
  * so that application code can easily log which Duktape snapshot was used.
  * Not available in the Ecmascript environment.
  */
-#define DUK_GIT_DESCRIBE                  "v1.2.1"
+#define DUK_GIT_DESCRIBE                  "v1.2.0-81-g9d37cf1"
 
 /* Duktape debug protocol version used by this build. */
 #define DUK_DEBUG_PROTOCOL_VERSION        1
@@ -3795,6 +3796,7 @@ DUK_EXTERNAL_DECL duk_codepoint_t duk_char_code_at(duk_context *ctx, duk_idx_t i
 
 DUK_EXTERNAL_DECL duk_bool_t duk_equals(duk_context *ctx, duk_idx_t index1, duk_idx_t index2);
 DUK_EXTERNAL_DECL duk_bool_t duk_strict_equals(duk_context *ctx, duk_idx_t index1, duk_idx_t index2);
+DUK_EXTERNAL_DECL duk_bool_t duk_instanceof(duk_context *ctx, duk_idx_t index1, duk_idx_t index2);
 
 /*
  *  Function (method) calls
@@ -4170,6 +4172,7 @@ DUK_EXTERNAL_DECL void duk_debugger_cooperate(duk_context *ctx);
 
 union duk_double_union {
 	double d;
+	float f[2];
 #ifdef DUK_USE_64BIT_OPS
 	duk_uint64_t ull[1];
 #endif
@@ -4441,9 +4444,24 @@ typedef union duk_double_union duk_double_union;
 	} while (0)
 #endif  /* DUK_USE_PACKED_TVAL */
 
-/* Byteswap an (aligned) duk_double_union. */
+/* XXX: native 64-bit byteswaps when available */
+
+/* 64-bit byteswap, same operation independent of target endianness. */
+#define DUK_DBLUNION_BSWAP64(u) do { \
+		duk_uint32_t duk__bswaptmp1, duk__bswaptmp2; \
+		duk__bswaptmp1 = (u)->ui[0]; \
+		duk__bswaptmp2 = (u)->ui[1]; \
+		duk__bswaptmp1 = DUK_BSWAP32(duk__bswaptmp1); \
+		duk__bswaptmp2 = DUK_BSWAP32(duk__bswaptmp2); \
+		(u)->ui[0] = duk__bswaptmp2; \
+		(u)->ui[1] = duk__bswaptmp1; \
+	} while (0)
+
+/* Byteswap an IEEE double in the duk_double_union from host to network
+ * order.  For a big endian target this is a no-op.
+ */
 #if defined(DUK_USE_DOUBLE_LE)
-#define DUK_DBLUNION_BSWAP(u) do { \
+#define DUK_DBLUNION_DOUBLE_HTON(u) do { \
 		duk_uint32_t duk__bswaptmp1, duk__bswaptmp2; \
 		duk__bswaptmp1 = (u)->ui[0]; \
 		duk__bswaptmp2 = (u)->ui[1]; \
@@ -4453,7 +4471,7 @@ typedef union duk_double_union duk_double_union;
 		(u)->ui[1] = duk__bswaptmp1; \
 	} while (0)
 #elif defined(DUK_USE_DOUBLE_ME)
-#define DUK_DBLUNION_BSWAP(u) do { \
+#define DUK_DBLUNION_DOUBLE_HTON(u) do { \
 		duk_uint32_t duk__bswaptmp1, duk__bswaptmp2; \
 		duk__bswaptmp1 = (u)->ui[0]; \
 		duk__bswaptmp2 = (u)->ui[1]; \
@@ -4463,10 +4481,13 @@ typedef union duk_double_union duk_double_union;
 		(u)->ui[1] = duk__bswaptmp2; \
 	} while (0)
 #elif defined(DUK_USE_DOUBLE_BE)
-#define DUK_DBLUNION_BSWAP(u) do { } while (0)
+#define DUK_DBLUNION_DOUBLE_HTON(u) do { } while (0)
 #else
 #error internal error, double endianness insane
 #endif
+
+/* Reverse operation is the same. */
+#define DUK_DBLUNION_DOUBLE_NTOH(u) DUK_DBLUNION_DOUBLE_HTON((u))
 
 #endif  /* DUK_DBLUNION_H_INCLUDED */
 
