@@ -4,7 +4,7 @@
 
 #pragma once
 
-typedef void duk_context;
+#include <Duktape/duktape.h>
 
 #include <Atomic/Core/Object.h>
 

@@ -30,7 +30,7 @@ void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
 
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
-    JSVM* vm = JSVM::GetJSVM(context_);
+    JSVM* vm = JSVM::GetJSVM(0);
     duk_context* ctx = vm->GetJSContext();
 
     duk_idx_t top = duk_get_top(ctx);
