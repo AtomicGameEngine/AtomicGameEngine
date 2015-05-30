@@ -4,6 +4,6 @@
 
 /// <reference path="./AtomicWork.d.ts" />
 
-import Editor = require("./editor/Editor");
+import __Editor = require("./editor/Editor");
 
-var TheEditor = new Editor();
+var TheEditor = new __Editor();

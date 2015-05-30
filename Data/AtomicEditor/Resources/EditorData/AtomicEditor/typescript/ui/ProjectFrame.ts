@@ -1,6 +1,7 @@
 
 
 import ScriptWidget = require("./ScriptWidget");
+import Editor = require("../editor/Editor");
 
 var UI = Atomic.UI;
 
@@ -72,6 +73,12 @@ class ProjectFrame extends ScriptWidget {
 
                 if (fs.dirExists(id)) {
                     this.selectCurrentContentFolder(id);
+                    return true;
+                }
+
+                if (fs.fileExists(id)) {
+                  this.sendEvent("EditResource", {"path" : id } );
+                  return true;
                 }
 
             }
@@ -88,7 +95,7 @@ class ProjectFrame extends ScriptWidget {
         var cfolder = this.currentContentFolder;
         this.currentContentFolder = "";
         this.refreshFolders();
-        
+
     }
 
     private refreshContent(fullpath: string) {

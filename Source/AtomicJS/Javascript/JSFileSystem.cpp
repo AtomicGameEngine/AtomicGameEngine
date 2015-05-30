@@ -45,6 +45,15 @@ static int Atomic_AddTrailingSlash(duk_context* ctx)
     return 1;
 }
 
+static int Atomic_GetExtenstion(duk_context* ctx)
+{
+    String path = duk_require_string(ctx, 0);
+
+    duk_push_string(ctx, GetExtension(path).CString());
+
+    return 1;
+}
+
 static int Atomic_GetParentPath(duk_context* ctx)
 {
     String path = duk_require_string(ctx, 0);
@@ -69,6 +78,9 @@ void jsapi_init_filesystem(JSVM* vm)
 
     duk_push_c_function(ctx, Atomic_GetParentPath, 1);
     duk_put_prop_string(ctx, -2, "getParentPath");
+
+    duk_push_c_function(ctx, Atomic_GetExtenstion, 1);
+    duk_put_prop_string(ctx, -2, "getExtension");
 
     duk_pop(ctx); // pop Atomic object
 }

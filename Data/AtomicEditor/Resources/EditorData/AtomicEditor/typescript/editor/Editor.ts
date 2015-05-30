@@ -65,7 +65,7 @@ class Editor extends Atomic.ScriptObject
     // set initial size
     this.mainframe.setSize(graphics.width, graphics.height);
 
-    this.parseArguments();
+    this.parseArguments();    
 
   }
 

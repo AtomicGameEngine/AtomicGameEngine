@@ -11,6 +11,7 @@
 #include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
 #include <TurboBadger/tb_select.h>
+#include <TurboBadger/tb_tab_container.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -41,6 +42,7 @@ using namespace tb;
 #include "UISelectList.h"
 #include "UIMessageWindow.h"
 #include "UISkinImage.h"
+#include "UITabContainer.h"
 
 namespace tb
 {
@@ -538,6 +540,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBMessageWindow>())
     {
         UIMessageWindow* nwidget = new UIMessageWindow(context_, NULL, "", false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBTabContainer>())
+    {
+        UITabContainer* nwidget = new UITabContainer(context_);
         nwidget->SetWidget(widget);
         widgetWrap_[widget] = nwidget;
         return nwidget;

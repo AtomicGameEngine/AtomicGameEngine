@@ -1,5 +1,5 @@
 {
 	"name" : "Editor",
-	"sources" : ["Source/AtomicEditorWork/JSTest"],
-	"classes" : ["MyJSClass"]
+	"sources" : ["Source/AtomicEditorWork/JSTest", "Source/AtomicEditorWork/Editors"],
+	"classes" : ["MyJSClass", "ResourceEditor", "JSResourceEditor"]
 }

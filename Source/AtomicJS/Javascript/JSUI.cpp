@@ -50,6 +50,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UIListView"] = true;
     uiTypes_["UIMessageWindow"] = true;
     uiTypes_["UISkinImage"] = true;
+    uiTypes_["UITabContainer"] = true;
 
 }
 
