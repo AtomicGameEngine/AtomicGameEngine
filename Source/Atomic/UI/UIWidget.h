@@ -58,14 +58,22 @@ public:
     void SetValue(double value);
     double GetValue();
 
+    void SetFocus();
+
     void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
     bool GetState(/*WIDGET_STATE*/ unsigned state);
+
+    void SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility);
 
     void SetStateRaw(/*WIDGET_STATE*/ unsigned state);
     /*WIDGET_STATE*/ unsigned GetStateRaw();
 
     void Invalidate();
     void Die();
+
+    UIWidget* GetFirstChild();
+    UIWidget* GetNext();
+
 
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);

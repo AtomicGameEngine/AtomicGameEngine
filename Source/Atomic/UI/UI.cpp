@@ -448,6 +448,9 @@ void UI::WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget)
 
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 {
+    if (!widget)
+        return NULL;
+
     if (widgetWrap_.Contains(widget))
         return widgetWrap_[widget];
 

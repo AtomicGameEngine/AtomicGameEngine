@@ -108,12 +108,17 @@ void ResourceEditor::HandleFileChanged(StringHash eventType, VariantMap& eventDa
     }
 }
 
-void ResourceEditor::Close(bool navigateToAvailabeResource)
+void ResourceEditor::Close(bool navigateToAvailableResource)
 {
     // keep us alive through the close
     SharedPtr<ResourceEditor> keepalive(this);
 
     ((TBTabContainer*)container_->GetInternalWidget())->GetTabLayout()->RemoveChild(editorTabLayout_);
+
+    VariantMap data;
+    data["Editor"] = this;
+    data["NavigateToAvailableResource"] = navigateToAvailableResource;
+    SendEvent("CloseResourceEditor", data);
 
     //MainFrame* frame = GetSubsystem<MainFrame>();
     //ResourceFrame* rframe = frame->GetResourceFrame();

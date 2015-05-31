@@ -6,66 +6,88 @@ import UIEvents = require("./UIEvents");
 
 import ScriptWidget = require("./ScriptWidget");
 
+var UI = Atomic.UI;
+
 class MainFrame extends ScriptWidget {
 
-	projectframe:ProjectFrame;
-	resourceframe:ResourceFrame;
+    projectframe: ProjectFrame;
+    resourceframe: ResourceFrame;
 
-	private messagemodal:MessageModal.MessageModal = new MessageModal.MessageModal();
+    inspectorlayout: Atomic.UILayout;
 
-	constructor() {
+    private messagemodal: MessageModal.MessageModal = new MessageModal.MessageModal();
 
-		super();
+    constructor() {
 
-		this.load("AtomicEditor/editor/ui/mainframe.tb.txt");
+        super();
 
-		this.projectframe = new ProjectFrame(this);
-		this.resourceframe = new ResourceFrame(this);
+        this.load("AtomicEditor/editor/ui/mainframe.tb.txt");
 
-	}
+        this.inspectorlayout = <Atomic.UILayout> this.getWidget("inspectorlayout");
+        this.projectframe = new ProjectFrame(this);
+        this.resourceframe = new ResourceFrame(this);
 
-	onEventClick(target: Atomic.UIWidget, refid: string): boolean {
+        this.showInspectorFrame(false);
 
-		if (this.handlePopupMenu(target, refid))
-			return true;
+    }
 
-		var src = menubar.getMenuItemSource(target.id);
+    showInspectorFrame(show: boolean) {
 
-		if (src) {
+        if (show) {
 
-			var menu = new Atomic.UIMenuWindow(target, target.id + " popup");
-			menu.show(src);
-			return true;
+            this.inspectorlayout.visibility = UI.VISIBILITY_VISIBLE;
 
-		}
+        } else {
 
-		return false;
+            this.inspectorlayout.visibility = UI.VISIBILITY_GONE;
 
-	}
+        }
 
 
-	handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
+    }
 
-		if (target.id == "menu atomic editor popup") {
+    onEventClick(target: Atomic.UIWidget, refid: string): boolean {
 
-			if (refid == "quit")
-				Atomic.getEngine().exit();
+        if (this.handlePopupMenu(target, refid))
+            return true;
 
-		}
+        var src = menubar.getMenuItemSource(target.id);
 
-		if (target.id == "menu edit popup") {
+        if (src) {
 
-			if (refid == "edit play") {
+            var menu = new Atomic.UIMenuWindow(target, target.id + " popup");
+            menu.show(src);
+            return true;
 
-				new ToolCore.PlayCmd().run();
-				return true;
+        }
 
-			}
+        return false;
 
-			return false;
+    }
 
-		}
-	}
+
+    handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
+
+        if (target.id == "menu atomic editor popup") {
+
+            if (refid == "quit")
+                Atomic.getEngine().exit();
+
+        }
+
+        if (target.id == "menu edit popup") {
+
+            if (refid == "edit play") {
+
+                new ToolCore.PlayCmd().run();
+                return true;
+
+            }
+
+            return false;
+
+        }
+    }
 
 }
 

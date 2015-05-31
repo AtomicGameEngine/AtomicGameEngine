@@ -344,7 +344,41 @@ void UIWidget::SetState(/*WIDGET_STATE*/ unsigned state, bool on)
         return;
 
     widget_->SetState((WIDGET_STATE) state, on);
+}
 
+void UIWidget::SetFocus()
+{
+    if (!widget_)
+        return;
+
+    widget_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
+}
+
+void UIWidget::SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility)
+{
+
+    if (!widget_)
+        return;
+
+    widget_->SetVisibilility((WIDGET_VISIBILITY) visibility);
+
+}
+
+UIWidget* UIWidget::GetFirstChild()
+{
+    if (!widget_)
+        return NULL;
+
+    return GetSubsystem<UI>()->WrapWidget(widget_->GetFirstChild());
+
+}
+
+UIWidget* UIWidget::GetNext()
+{
+    if (!widget_)
+        return NULL;
+
+    return GetSubsystem<UI>()->WrapWidget(widget_->GetNext());
 
 }
 

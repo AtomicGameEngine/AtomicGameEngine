@@ -28,6 +28,25 @@ UITabContainer::~UITabContainer()
 
 }
 
+int UITabContainer::GetNumPages()
+{
+    if (!widget_)
+        return 0;
+
+    return ((TBTabContainer*)widget_)->GetNumPages();
+
+}
+
+
+void UITabContainer::SetCurrentPage(int page)
+{
+    if (!widget_)
+        return;
+
+    ((TBTabContainer*)widget_)->SetCurrentPage(page);
+
+}
+
 bool UITabContainer::OnEvent(const tb::TBWidgetEvent &ev)
 {
     return false;

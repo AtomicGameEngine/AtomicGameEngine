@@ -303,6 +303,13 @@ void jsapi_init_ui(JSVM* vm)
     duk_push_number(ctx, (double) tb::EVENT_TYPE_CUSTOM);
     duk_put_prop_string(ctx, -2, "EVENT_TYPE_CUSTOM");
 
+    duk_push_number(ctx, (double) tb::WIDGET_VISIBILITY_GONE);
+    duk_put_prop_string(ctx, -2, "VISIBILITY_GONE");
+    duk_push_number(ctx, (double) tb::WIDGET_VISIBILITY_INVISIBLE);
+    duk_put_prop_string(ctx, -2, "VISIBILITY_INVISIBLE");
+    duk_push_number(ctx, (double) tb::WIDGET_VISIBILITY_VISIBLE);
+    duk_put_prop_string(ctx, -2, "VISIBILITY_VISIBLE");
+
     duk_put_prop_string(ctx, -2, "UI");
 
     duk_pop(ctx);

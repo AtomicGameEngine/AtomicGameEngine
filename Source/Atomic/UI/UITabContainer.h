@@ -15,6 +15,9 @@ public:
     UITabContainer(Context* context, bool createWidget = true);
     virtual ~UITabContainer();
 
+    int GetNumPages();
+    void SetCurrentPage(int page);
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

@@ -32,7 +32,7 @@ public:
     virtual bool HasUnsavedModifications() { return false; }
 
     virtual void SetFocus() {}
-    virtual void Close(bool navigateToAvailabeResource = true);
+    virtual void Close(bool navigateToAvailableResource = true);
 
     virtual bool OnEvent(const TBWidgetEvent &ev) { return false; }
 
