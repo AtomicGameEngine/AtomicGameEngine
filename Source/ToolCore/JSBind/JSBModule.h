@@ -62,6 +62,7 @@ private:
 
     void ProcessOverloads();
     void ProcessExcludes();
+    void ProcessTypeScriptDecl();
 
     void ScanHeaders();
 

@@ -99,7 +99,7 @@ class MainFrame extends ScriptWidget {
         }
     }
 
-    handleResourceEditorChanged(data) {
+    handleResourceEditorChanged(data):void {
 
         var editor = <Editor.ResourceEditor> data.editor;
 
@@ -112,7 +112,6 @@ class MainFrame extends ScriptWidget {
             this.showInspectorFrame(false);
 
         }
-
 
     }
 

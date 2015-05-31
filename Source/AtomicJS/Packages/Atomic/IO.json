@@ -6,6 +6,10 @@
 		"File" : {
 			"File" : ["Context", "String", "FileMode"]
 		}
+	},
+	"typescript_decl" : {
+		"FileSystem" : [
+			"scanDir(pathName:string, filter:string, flags:number, recursive:boolean);"
+		]
 	}
-
 }

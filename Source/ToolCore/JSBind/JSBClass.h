@@ -105,6 +105,10 @@ public:
     void AddFunctionExclude(JSBFunctionSignature* exclude) { excludes_.Push(exclude); }
     void AddPropertyFunction(JSBFunction* function);
 
+    void AddTypeScriptDecl(const String& decl) { typeScriptDecls_.Push(decl); }
+    unsigned GetNumTypeScriptDecl() { return typeScriptDecls_.Size(); }
+    const String& GetTypeScriptDecl(unsigned idx) { return typeScriptDecls_[idx]; }
+
     void Preprocess();
     void Process();
     void PostProcess();
@@ -126,6 +130,8 @@ private:
 
     PODVector<JSBFunctionSignature*> overrides_;
     PODVector<JSBFunctionSignature*> excludes_;
+
+    Vector<String> typeScriptDecls_;
 
     bool isAbstract_;
     bool isObject_;

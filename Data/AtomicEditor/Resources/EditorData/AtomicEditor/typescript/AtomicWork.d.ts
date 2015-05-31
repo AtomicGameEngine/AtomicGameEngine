@@ -4,6 +4,14 @@
 
 declare module Atomic {
 
+    export interface PathInfo {
+
+      pathName: string;
+      fileName: string;
+      ext: string;
+      
+    }
+
     /*
         export enum UIWidgetEventType {
 
@@ -51,6 +59,8 @@ declare module Atomic {
     export function getParentPath(path: string): string;
     export function addTrailingSlash(path: string): string;
 		export function getExtension(path: string): string;
+
+    export function splitPath(path: string): PathInfo;
 
 }
 

@@ -199,6 +199,11 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
         }
 
+        for (unsigned j = 0; j < klass->GetNumTypeScriptDecl(); j++)
+        {
+            source_ += "      " + klass->GetTypeScriptDecl(j) + "\n";
+        }
+
 
 
         source_ += "\n   }\n\n";

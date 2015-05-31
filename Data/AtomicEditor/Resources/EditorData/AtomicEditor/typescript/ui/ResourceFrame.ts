@@ -29,9 +29,9 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleEditResource(data) {
+    handleEditResource(ev: UIEvents.EditorResourceEvent) {
 
-        var path = data.path;
+        var path = ev.path;
 
         if (this.editors[path]) {
 
@@ -39,7 +39,7 @@ class ResourceFrame extends ScriptWidget {
 
         }
 
-        var ext = Atomic.getExtension(data.path);
+        var ext = Atomic.getExtension(path);
 
         var editor: Editor.ResourceEditor = null;
 

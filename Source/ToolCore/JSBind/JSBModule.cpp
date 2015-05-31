@@ -65,6 +65,7 @@ void JSBModule::VisitHeaders()
 
     ProcessOverloads();
     ProcessExcludes();
+    ProcessTypeScriptDecl();
 
 }
 
@@ -168,7 +169,7 @@ void JSBModule::ProcessExcludes()
 
             if (!klass)
             {
-                ErrorExit("Bad overload klass");
+                ErrorExit("Bad exclude klass");
             }
 
             JSONValue classexcludes = excludes.GetChild(classname);
@@ -193,6 +194,39 @@ void JSBModule::ProcessExcludes()
                 JSBFunctionSignature* fe = new JSBFunctionSignature(functionNames[k], values);
                 klass->AddFunctionExclude(fe);
 
+            }
+        }
+    }
+}
+
+void JSBModule::ProcessTypeScriptDecl()
+{
+    // TypeScript declarations
+
+    JSONValue root = moduleJSON_->GetRoot();
+
+    JSONValue decl = root.GetChild("typescript_decl");
+
+    if (decl.IsObject())
+    {
+        Vector<String> childNames = decl.GetChildNames();
+
+        for (unsigned j = 0; j < childNames.Size(); j++)
+        {
+            String classname = childNames.At(j);
+
+            JSBClass* klass = GetClass(classname);
+
+            if (!klass)
+            {
+                ErrorExit("Bad TypeScript decl klass");
+            }
+
+            JSONValue classdecl = decl.GetChild(classname);
+
+            for (unsigned k = 0; k < classdecl.GetSize(); k++)
+            {
+                klass->AddTypeScriptDecl(classdecl.GetString(k));
             }
         }
     }
