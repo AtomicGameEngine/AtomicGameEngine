@@ -5,8 +5,8 @@ var UI = Atomic.UI;
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
 // so we can access the editor they belong to from the widget itself
-interface EditorRootContentWidget extends Atomic.UIWidget{
-  editor: Editor.ResourceEditor;
+interface EditorRootContentWidget extends Atomic.UIWidget {
+    editor: Editor.ResourceEditor;
 }
 
 class ResourceFrame extends ScriptWidget {
@@ -45,19 +45,19 @@ class ResourceFrame extends ScriptWidget {
 
         if (ext == ".js") {
 
-           editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+            editor = new Editor.JSResourceEditor(path, this.tabcontainer);
 
         } else if (ext == ".scene") {
 
-           editor = new Editor.SceneEditor3D(path, this.tabcontainer);
+            editor = new Editor.SceneEditor3D(path, this.tabcontainer);
 
         }
 
         if (editor) {
 
-            // add __editor which lets us lookup the editor via the rootContentWidget
-            // could this be formalized with an interface?
+            // cast and add editor lookup on widget itself
             (<EditorRootContentWidget> editor.rootContentWidget).editor = editor;
+
             this.editors[path] = editor;
             this.tabcontainer.currentPage = this.tabcontainer.numPages - 1;
             editor.setFocus();
@@ -133,34 +133,30 @@ class ResourceFrame extends ScriptWidget {
 
     handleResourceEditorChanged(data) {
 
-      var editor = <Editor.ResourceEditor> data.editor;
-      this.currentResourceEditor = editor;
+        var editor = <Editor.ResourceEditor> data.editor;
+        this.currentResourceEditor = editor;
 
     }
 
-    handleWidgetEvent(data) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-      // ok, first thing is to fix up this widget <-> editor mess
+        if (ev.type == Atomic.UI.EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
+            var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
 
-      if (data.type == Atomic.UI.EVENT_TYPE_TAB_CHANGED && data.target == this.tabcontainer)
-      {
-        var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
+            if (w && w.editor) {
 
-        if (w && w.editor) {
+                if (this.currentResourceEditor != w.editor) {
 
-          if (this.currentResourceEditor != w.editor) {
+                    this.sendEvent(UIEvents.ResourceEditorChanged, { editor: w.editor });
 
-            this.sendEvent(UIEvents.ResourceEditorChanged, { editor: w.editor});
+                }
 
-          }
+            }
 
         }
 
-
-      }
-
-      // bubble
-      return false;
+        // bubble
+        return false;
 
     }
 

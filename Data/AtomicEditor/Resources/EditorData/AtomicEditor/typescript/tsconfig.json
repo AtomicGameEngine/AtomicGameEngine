@@ -22,7 +22,6 @@
         "./ui/ScriptWidget.ts",
         "./ui/UIEvents.ts",
         "./ui/modal/MessageModal.ts",
-        "./ui/modal/ModalOps.ts",
-        "./ui/ui.ts"
+        "./ui/modal/ModalOps.ts"
     ]
 }

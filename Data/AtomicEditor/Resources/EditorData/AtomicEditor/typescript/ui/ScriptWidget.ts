@@ -20,12 +20,11 @@ class ScriptWidget extends Atomic.UIWidget {
 
     }
 
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-    handleWidgetEvent(data): boolean {
+        if (ev.type == Atomic.UI.EVENT_TYPE_CLICK) {
 
-        if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
-
-            return this.onEventClick(data.target, data.refid);
+            return this.onEventClick(ev.target, ev.refid);
 
         }
 

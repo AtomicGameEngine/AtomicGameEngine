@@ -43,13 +43,11 @@ class MainFrame extends ScriptWidget {
 
         if (show) {
 
-            print("Showing Inspector");
             this.inspectorlayout.visibility = UI.VISIBILITY_VISIBLE;
             this.inspectorframe.visibility = UI.VISIBILITY_VISIBLE;
 
         } else {
 
-            print("Hiding Inspector");
             this.inspectorframe.visibility = UI.VISIBILITY_GONE;
             this.inspectorlayout.visibility = UI.VISIBILITY_GONE;
 
@@ -103,17 +101,17 @@ class MainFrame extends ScriptWidget {
 
     handleResourceEditorChanged(data) {
 
-      var editor = <Editor.ResourceEditor> data.editor;
+        var editor = <Editor.ResourceEditor> data.editor;
 
-      if (editor) {
+        if (editor) {
 
-        this.showInspectorFrame(editor.requiresInspector());
+            this.showInspectorFrame(editor.requiresInspector());
 
-      } else {
+        } else {
 
-        this.showInspectorFrame(false);
+            this.showInspectorFrame(false);
 
-      }
+        }
 
 
     }
