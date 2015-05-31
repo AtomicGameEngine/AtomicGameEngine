@@ -1,5 +1,0 @@
-{
-	"name" : "Javascript",
-	"sources" : ["Javascript"],
-	"classes" : ["JSVM", "JSComponent", "JSMetrics", "JSEventHelper"]
-}
