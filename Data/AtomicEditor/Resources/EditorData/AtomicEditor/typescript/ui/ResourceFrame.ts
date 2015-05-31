@@ -5,85 +5,126 @@ var UI = Atomic.UI;
 
 class ResourceFrame extends ScriptWidget {
 
-    tabcontainer:Atomic.UITabContainer;
-    resourceLayout:Atomic.UILayout;
-    resourceViewContainer:Atomic.UILayout;
+    tabcontainer: Atomic.UITabContainer;
+    resourceLayout: Atomic.UILayout;
+    resourceViewContainer: Atomic.UILayout;
 
-    editors: { [path: string] : Editor.ResourceEditor; } = {};
+    editors: { [path: string]: Editor.ResourceEditor; } = {};
 
-    show(value:boolean) {
+    show(value: boolean) {
 
-      if (value) {
+        if (value) {
 
-      }
+        }
 
     }
 
     handleEditResource(data) {
 
-      var path = data.path;
+        var path = data.path;
 
-      if (this.editors[path]) {
+        if (this.editors[path]) {
 
-        return;
+            return;
 
-      }
+        }
 
-      var ext = Atomic.getExtension(data.path);
+        var ext = Atomic.getExtension(data.path);
 
-      var editor:Editor.ResourceEditor = null;
+        var editor: Editor.ResourceEditor = null;
 
-      if (ext == ".js")
-      {
-          editor = new Editor.JSResourceEditor(path, this.tabcontainer);
-      }
+        if (ext == ".js") {
+            editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+        }
 
-      if (editor)
-      {
-          this.editors[path] = editor;
-          this.tabcontainer.currentPage = this.tabcontainer.numPages - 1;
-          editor.setFocus();
-      }
+        if (editor) {
+            this.editors[path] = editor;
+            this.tabcontainer.currentPage = this.tabcontainer.numPages - 1;
+            editor.setFocus();
+        }
 
+
+    }
+
+    navigateToResource(fullpath: string, lineNumber = -1, tokenPos: number = -1) {
+
+        if (!this.editors[fullpath]) {
+            return;
+        }
+
+        var editor = this.editors[fullpath];
+        var root = this.tabcontainer.contentRoot;
+
+        var i = 0;
+
+        for (var child = root.firstChild; child; child = child.next, i++) {
+            if (editor.rootContentWidget == child) {
+                break;
+            }
+        }
+
+        if (i < this.tabcontainer.numPages) {
+
+            this.tabcontainer.currentPage = i;
+
+            editor.setFocus();
+
+            // this cast could be better
+            var ext = Atomic.getExtension(fullpath);
+
+            if (ext == ".js" && lineNumber != -1) {
+                (<Editor.JSResourceEditor>editor).gotoLineNumber(lineNumber);
+            }
+            else if (ext == ".js" && tokenPos != -1) {
+                (<Editor.JSResourceEditor>editor).gotoTokenPos(tokenPos);
+            }
+
+        }
 
     }
 
     handleCloseResourceEditor(data) {
 
-      var editor = <Editor.ResourceEditor> data.editor;
-      var navigate = <boolean> data.navigateToAvailableResource;
+        var editor = <Editor.ResourceEditor> data.editor;
+        var navigate = <boolean> data.navigateToAvailableResource;
 
-      // remove from lookup
-      this.editors[editor.fullPath] = undefined;
+        // remove from lookup
+        this.editors[editor.fullPath] = undefined;
 
-      var root = this.tabcontainer.contentRoot;
+        var root = this.tabcontainer.contentRoot;
 
-      var found = false;
+        var found = false;
 
-      var i = 0;
-      for (var child = root.firstChild; child; child = child.next, i++)
-      {
-            if (child == editor.rootContentWidget)
-            {
+        var i = 0;
+
+        for (var child = root.firstChild; child; child = child.next, i++) {
+            if (child == editor.rootContentWidget) {
                 found = true;
                 root.removeChild(child);
                 break;
             }
 
-      }
+        }
 
-      this.tabcontainer.currentPage = -1;
+        assert(found);
 
-      if (navigate) {
+        this.tabcontainer.currentPage = -1;
 
-        print("NAVIGATE!");
+        if (navigate) {
 
-      }
+            var keys = Object.keys(this.editors);
 
+            if (keys.length) {
+
+                this.navigateToResource(keys[keys.length - 1]);
+
+            }
+
+        }
 
     }
 
-    constructor(parent:Atomic.UIWidget) {
+    constructor(parent: Atomic.UIWidget) {
 
         super();
 

@@ -457,13 +457,6 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
-    if (widget->IsOfType<TBLayout>())
-    {
-        UILayout* layout = new UILayout(context_, false);
-        layout->SetWidget(widget);
-        widgetWrap_[widget] = layout;
-        return layout;
-    }
 
     if (widget->IsOfType<TBButton>())
     {
@@ -524,14 +517,6 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return nwidget;
     }
 
-    if (widget->IsOfType<TBWidget>())
-    {
-        UIWidget* nwidget = new UIWidget(context_, false);
-        nwidget->SetWidget(widget);
-        widgetWrap_[widget] = nwidget;
-        return nwidget;
-    }
-
     if (widget->IsOfType<TBSelectList>())
     {
         UISelectList* nwidget = new UISelectList(context_, false);
@@ -555,6 +540,23 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         widgetWrap_[widget] = nwidget;
         return nwidget;
     }
+
+    if (widget->IsOfType<TBLayout>())
+    {
+        UILayout* layout = new UILayout(context_, false);
+        layout->SetWidget(widget);
+        widgetWrap_[widget] = layout;
+        return layout;
+    }
+
+    if (widget->IsOfType<TBWidget>())
+    {
+        UIWidget* nwidget = new UIWidget(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
 
     return 0;
 }
