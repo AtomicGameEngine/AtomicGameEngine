@@ -12,6 +12,12 @@
 using namespace Atomic;
 using namespace tb;
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+#undef FindText
+
+#endif
+
 namespace AtomicEditor
 {
 
