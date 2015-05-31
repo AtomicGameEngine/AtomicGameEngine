@@ -17,6 +17,9 @@
 
 #include "AEEditorApp.h"
 
+// Move me
+#include <Atomic/Environment/Environment.h>
+
 using namespace ToolCore;
 
 namespace ToolCore
@@ -78,6 +81,8 @@ void AEEditorApp::Start()
 
 void AEEditorApp::Setup()
 {
+    RegisterEnvironmentLibrary(context_);
+
     FileSystem* filesystem = GetSubsystem<FileSystem>();
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);

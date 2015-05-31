@@ -126,8 +126,21 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
         JSBClass* klass = classes.At(i);
 
         source_ += "   export class " + klass->GetName();
-        if (klass->GetBaseClass())
-            source_ += " extends " + klass->GetBaseClass()->GetName();
+
+        JSBClass* base = klass->GetBaseClass();
+
+        if (base)
+        {
+            if (klass->GetPackage() != base->GetPackage())
+            {
+                source_ += " extends " + base->GetPackage()->GetName() + "." + base->GetName();
+            }
+            else
+            {
+                source_ += " extends " + base->GetName();
+            }
+
+        }
 
         source_ += " {\n\n";
 

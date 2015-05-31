@@ -218,12 +218,11 @@ bool SceneView3D::MouseInView()
     IntVector2 pos = input->GetMousePosition();
 
     IntRect rect = GetRect();
-    int x = rect.left_;
-    int y = rect.top_;
 
-    GetInternalWidget()->ConvertToRoot(x, y);
+    GetInternalWidget()->ConvertToRoot(rect.left_, rect.top_);
+    GetInternalWidget()->ConvertToRoot(rect.right_, rect.bottom_);
 
-    return rect.IsInside(IntVector2(x, y));
+    return rect.IsInside(pos);
 
 }
 
