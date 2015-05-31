@@ -43,6 +43,7 @@ using namespace tb;
 #include "UIMessageWindow.h"
 #include "UISkinImage.h"
 #include "UITabContainer.h"
+#include "UISceneView.h"
 
 namespace tb
 {
@@ -535,11 +536,20 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     if (widget->IsOfType<TBTabContainer>())
     {
-        UITabContainer* nwidget = new UITabContainer(context_);
+        UITabContainer* nwidget = new UITabContainer(context_, false);
         nwidget->SetWidget(widget);
         widgetWrap_[widget] = nwidget;
         return nwidget;
     }
+
+    if (widget->IsOfType<SceneViewWidget>())
+    {
+        UISceneView* nwidget = new UISceneView(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
 
     if (widget->IsOfType<TBLayout>())
     {

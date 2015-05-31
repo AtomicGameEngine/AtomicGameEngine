@@ -74,6 +74,8 @@ public:
     UIWidget* GetFirstChild();
     UIWidget* GetNext();
 
+    void SetIsFocusable(bool value);
+
 
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);

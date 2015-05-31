@@ -34,7 +34,13 @@ class ResourceFrame extends ScriptWidget {
         var editor: Editor.ResourceEditor = null;
 
         if (ext == ".js") {
+
             editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+            
+        } else if (ext == ".scene") {
+
+           editor = new Editor.SceneEditor3D(path, this.tabcontainer);
+
         }
 
         if (editor) {

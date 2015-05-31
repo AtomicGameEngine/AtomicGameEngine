@@ -33,6 +33,15 @@ UIWidget::~UIWidget()
 
 }
 
+void UIWidget::SetIsFocusable(bool value)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetIsFocusable(value);
+
+}
+
 bool UIWidget::Load(const String& filename)
 {
     UI* ui = GetSubsystem<UI>();
