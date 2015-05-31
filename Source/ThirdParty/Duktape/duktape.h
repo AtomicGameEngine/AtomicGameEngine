@@ -601,8 +601,10 @@ static __inline__ unsigned long long duk_rdtsc(void) {
 #ifdef GetMessage
 #undef GetMessage
 #endif
- 
-// ATOMIC END 
+#ifdef FindText
+#undef FindText
+#endif
+// ATOMIC END
 #elif defined(DUK_F_FLASHPLAYER)
 /* Crossbridge */
 #define DUK_USE_DATE_NOW_GETTIMEOFDAY

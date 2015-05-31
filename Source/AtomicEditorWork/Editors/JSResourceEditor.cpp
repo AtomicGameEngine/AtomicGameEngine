@@ -12,14 +12,7 @@
 #include <Atomic/Core/CoreEvents.h>
 #include <AtomicJS/Javascript/JSVM.h>
 
-/*
-#include "../AEEvents.h"
-#include "../UI/UIFindTextWidget.h"
-#include "../AEJavascript.h"
-*/
-
 #include "JSResourceEditor.h"
-
 
 #include "../Javascript/JSAutocomplete.h"
 #include "../Javascript/JSTheme.h"
