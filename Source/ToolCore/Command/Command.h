@@ -42,6 +42,8 @@ public:
 
     virtual bool RequiresProjectLoad() { return true; }
 
+    virtual bool RequiresLicenseValidation() { return false; }
+
 private:
 
     float timeOut_;

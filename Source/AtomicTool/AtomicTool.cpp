@@ -301,7 +301,20 @@ void AtomicTool::Start()
     command_ = cmd;
 
     // BEGIN LICENSE MANAGEMENT
-    GetSubsystem<LicenseSystem>()->Initialize();
+    if (cmd->RequiresLicenseValidation())
+    {
+        GetSubsystem<LicenseSystem>()->Initialize();
+    }
+    else
+    {
+        if (command_.Null())
+        {
+            GetSubsystem<Engine>()->Exit();
+            return;
+        }
+
+        command_->Run();
+    }
     // END LICENSE MANAGEMENT
 
 }
