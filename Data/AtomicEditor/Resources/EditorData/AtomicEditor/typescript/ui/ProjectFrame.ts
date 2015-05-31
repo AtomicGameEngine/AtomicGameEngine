@@ -77,8 +77,8 @@ class ProjectFrame extends ScriptWidget {
                 }
 
                 if (fs.fileExists(id)) {
-                  this.sendEvent("EditResource", {"path" : id } );
-                  return true;
+                    this.sendEvent("EditResource", { "path": id });
+                    return true;
                 }
 
             }

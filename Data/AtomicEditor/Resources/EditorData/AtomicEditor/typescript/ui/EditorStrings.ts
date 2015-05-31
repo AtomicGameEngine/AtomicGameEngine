@@ -1,67 +1,66 @@
 
 export enum StringID {
 
-	RevealInFinder,
-	ShortcutUndo,
-	ShortcutRedo,
-	ShortcutCut,
-	ShortcutCopy,
-	ShortcutPaste,
-	ShortcutSelectAll,
-	ShortcutFind,
-	ShortcutFindNext,
-	ShortcutFindPrev,
-	ShortcutBeautify,
-	ShortcutCloseFile,
-	ShortcutSaveFile,
-	ShortcutPlay,
-	ShortcutBuild,
-	ShortcutBuildSettings
+    RevealInFinder,
+    ShortcutUndo,
+    ShortcutRedo,
+    ShortcutCut,
+    ShortcutCopy,
+    ShortcutPaste,
+    ShortcutSelectAll,
+    ShortcutFind,
+    ShortcutFindNext,
+    ShortcutFindPrev,
+    ShortcutBeautify,
+    ShortcutCloseFile,
+    ShortcutSaveFile,
+    ShortcutPlay,
+    ShortcutBuild,
+    ShortcutBuildSettings
 }
 
 export class EditorString {
 
-	public static GetString(id: StringID):string {
+    public static GetString(id: StringID): string {
 
-		return EditorString.lookup[id];
+        return EditorString.lookup[id];
 
-	}
+    }
 
-	private static lookup: { [id: number]: string; } = {};
+    private static lookup: { [id: number]: string; } = {};
 
-	private static Ctor = (() => {
+    private static Ctor = (() => {
 
-		var lookup = EditorString.lookup;
+        var lookup = EditorString.lookup;
 
-		var shortcutKey = "⌘";
+        var shortcutKey = "⌘";
 
-		lookup[StringID.RevealInFinder] = "Reveal in Finder";
+        lookup[StringID.RevealInFinder] = "Reveal in Finder";
 
-		// Mac
-		lookup[StringID.ShortcutRedo] = "⇧⌘Z";
-		lookup[StringID.ShortcutFindNext] = "⌘G";
-		lookup[StringID.ShortcutFindPrev] = "⇧⌘G";
-		lookup[StringID.ShortcutBuildSettings] = "⇧⌘B";
+        // Mac
+        lookup[StringID.ShortcutRedo] = "⇧⌘Z";
+        lookup[StringID.ShortcutFindNext] = "⌘G";
+        lookup[StringID.ShortcutFindPrev] = "⇧⌘G";
+        lookup[StringID.ShortcutBuildSettings] = "⇧⌘B";
 
-		// General
-		lookup[StringID.ShortcutUndo] = shortcutKey + "Z";
+        // General
+        lookup[StringID.ShortcutUndo] = shortcutKey + "Z";
 
-		lookup[StringID.ShortcutCut] = shortcutKey + "X";
-		lookup[StringID.ShortcutCopy] = shortcutKey + "C";
-		lookup[StringID.ShortcutPaste] = shortcutKey + "V";
-		lookup[StringID.ShortcutSelectAll] = shortcutKey + "A";
-		lookup[StringID.ShortcutFind] = shortcutKey + "F";
+        lookup[StringID.ShortcutCut] = shortcutKey + "X";
+        lookup[StringID.ShortcutCopy] = shortcutKey + "C";
+        lookup[StringID.ShortcutPaste] = shortcutKey + "V";
+        lookup[StringID.ShortcutSelectAll] = shortcutKey + "A";
+        lookup[StringID.ShortcutFind] = shortcutKey + "F";
 
-		lookup[StringID.ShortcutBeautify] = shortcutKey + "I";
+        lookup[StringID.ShortcutBeautify] = shortcutKey + "I";
 
-		lookup[StringID.ShortcutSaveFile] = shortcutKey + "S";
-		lookup[StringID.ShortcutCloseFile] = shortcutKey + "W";
+        lookup[StringID.ShortcutSaveFile] = shortcutKey + "S";
+        lookup[StringID.ShortcutCloseFile] = shortcutKey + "W";
 
-		lookup[StringID.ShortcutPlay] = shortcutKey + "P";
+        lookup[StringID.ShortcutPlay] = shortcutKey + "P";
 
-		lookup[StringID.ShortcutBuild] = shortcutKey + "B";
+        lookup[StringID.ShortcutBuild] = shortcutKey + "B";
 
-	})();
+    })();
 
 }
-	

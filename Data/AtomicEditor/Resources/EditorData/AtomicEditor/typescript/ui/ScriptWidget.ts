@@ -2,36 +2,36 @@
 
 class ScriptWidget extends Atomic.UIWidget {
 
-	constructor() {
+    constructor() {
 
-		super();
+        super();
 
-		// JS way of binding method
-		// this.subscribeToEvent(this, "WidgetEvent", this.handleWidgetEvent.bind(this));
+        // JS way of binding method
+        // this.subscribeToEvent(this, "WidgetEvent", this.handleWidgetEvent.bind(this));
 
-		// TypeScript-ey
-		this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        // TypeScript-ey
+        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
-	}
+    }
 
-	onEventClick(target: Atomic.UIWidget, refid: string): boolean {
+    onEventClick(target: Atomic.UIWidget, refid: string): boolean {
 
-		return false;
+        return false;
 
-	}
+    }
 
 
-	handleWidgetEvent(data): boolean {
+    handleWidgetEvent(data): boolean {
 
-		if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
+        if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
 
-			return this.onEventClick(data.target, data.refid);
+            return this.onEventClick(data.target, data.refid);
 
-		}
+        }
 
-		return false;
+        return false;
 
-	}
+    }
 
 }
 
