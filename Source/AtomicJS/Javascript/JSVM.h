@@ -9,6 +9,7 @@
 #include <Atomic/Container/List.h>
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include "JSAPI.h"
 #include "JSEvents.h"
@@ -120,11 +121,16 @@ public:
 
     }
 
-    inline RefCounted* GetObjectPtr(void* heapptr)
+    inline RefCounted* GetObjectPtr(void* heapptr, bool allowNull = false)
     {
 #ifdef JSVM_DEBUG
         assert(!removedHeapPtr_.Contains(heapptr));
-#endif        
+#endif
+        if (allowNull && !heapToObject_.Contains(heapptr))
+        {
+            return NULL;
+        }
+
         assert(heapToObject_.Contains(heapptr));
 
 #ifdef JSVM_DEBUG
@@ -134,10 +140,20 @@ public:
         return heapToObject_[heapptr];
     }
 
-    void SetModuleSearchPath(const String& searchPath)
+    void SetModuleSearchPaths(const String& searchPath)
     {
-        moduleSearchPath_ = searchPath;
+        moduleSearchPath_ = searchPath.Split(';');
+        for (unsigned i = 0; i < moduleSearchPath_.Size(); i++)
+        {
+            moduleSearchPath_[i] = AddTrailingSlash(moduleSearchPath_[i]);
+        }
     }
+
+    const Vector<String>& GetModuleSearchPaths()
+    {
+        return moduleSearchPath_;
+    }
+
 
     void SetLastModuleSearchFile(const String& fileName) { lastModuleSearchFilename_ = fileName; }
 
@@ -169,7 +185,7 @@ private:
 
     float gcTime_;
 
-    String moduleSearchPath_;
+    Vector<String> moduleSearchPath_;
     String lastModuleSearchFilename_;
 
     String errorString_;
@@ -215,15 +231,27 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
         return true;
     }
 
-    duk_get_global_string(ctx, "Atomic");
-
     // will not handle renamed classes
     if (instance->IsObject())
+    {
+        Object *obj = (Object*) instance;
+
+        void* uniqueClassID = (void *) obj->GetTypeName().CString();
+        duk_push_heap_stash(ctx);
+        duk_push_pointer(ctx, uniqueClassID);
+        duk_get_prop(ctx, -2);
+        const char* package = duk_require_string(ctx, -1);
+        duk_pop_2(ctx);
+
+        duk_get_global_string(ctx, package);
         duk_get_prop_string(ctx, -1, ((Object*)instance)->GetTypeName().CString());
+    }
     else
     {
+        duk_get_global_string(ctx, "Atomic");
         duk_get_prop_string(ctx, -1, classname);
     }
+
     duk_push_pointer(ctx, (void*) instance);
     duk_new(ctx, 1);
     duk_remove(ctx, -2); // remove Atomic object

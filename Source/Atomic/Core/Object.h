@@ -106,7 +106,8 @@ public:
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
 
-    bool IsObject() const { return true; }
+    virtual bool IsObject() const { return true; }
+    static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic("Object"); return typeNameStatic; }
     
 protected:
     /// Execution context.

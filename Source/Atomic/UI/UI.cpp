@@ -8,7 +8,10 @@
 #include <TurboBadger/tb_node_tree.h>
 #include <TurboBadger/tb_widgets_reader.h>
 #include <TurboBadger/tb_window.h>
+#include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
+#include <TurboBadger/tb_select.h>
+#include <TurboBadger/tb_tab_container.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -36,6 +39,11 @@ using namespace tb;
 #include "UIImageWidget.h"
 #include "UIClickLabel.h"
 #include "UICheckBox.h"
+#include "UISelectList.h"
+#include "UIMessageWindow.h"
+#include "UISkinImage.h"
+#include "UITabContainer.h"
+#include "UISceneView.h"
 
 namespace tb
 {
@@ -68,6 +76,9 @@ UI::~UI()
 {
     if (initialized_)
     {
+        TBFile::SetReaderFunction(0);
+        TBID::tbidRegisterCallback = 0;
+
         tb::TBWidgetsAnimationManager::Shutdown();
 
         widgetWrap_.Clear();
@@ -78,8 +89,6 @@ UI::~UI()
     }
 
     uiContext_ = 0;
-    TBFile::SetReaderFunction(0);
-    TBID::tbidRegisterCallback = 0;
 }
 
 void UI::Shutdown()
@@ -440,19 +449,15 @@ void UI::WrapWidget(UIWidget* widget, tb::TBWidget* tbwidget)
 
 UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 {
+    if (!widget)
+        return NULL;
+
     if (widgetWrap_.Contains(widget))
         return widgetWrap_[widget];
 
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
-    if (widget->IsOfType<TBLayout>())
-    {
-        UILayout* layout = new UILayout(context_, false);
-        layout->SetWidget(widget);
-        widgetWrap_[widget] = layout;
-        return layout;
-    }
 
     if (widget->IsOfType<TBButton>())
     {
@@ -482,6 +487,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return editfield;
     }
 
+    if (widget->IsOfType<TBSkinImage>())
+    {
+        UISkinImage* skinimage = new UISkinImage(context_, "", false);
+        skinimage->SetWidget(widget);
+        widgetWrap_[widget] = skinimage;
+        return skinimage;
+    }
+
     if (widget->IsOfType<TBImageWidget>())
     {
         UIImageWidget* imagewidget = new UIImageWidget(context_, false);
@@ -505,6 +518,47 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         return nwidget;
     }
 
+    if (widget->IsOfType<TBSelectList>())
+    {
+        UISelectList* nwidget = new UISelectList(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBMessageWindow>())
+    {
+        UIMessageWindow* nwidget = new UIMessageWindow(context_, NULL, "", false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<TBTabContainer>())
+    {
+        UITabContainer* nwidget = new UITabContainer(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+    if (widget->IsOfType<SceneViewWidget>())
+    {
+        UISceneView* nwidget = new UISceneView(context_, false);
+        nwidget->SetWidget(widget);
+        widgetWrap_[widget] = nwidget;
+        return nwidget;
+    }
+
+
+    if (widget->IsOfType<TBLayout>())
+    {
+        UILayout* layout = new UILayout(context_, false);
+        layout->SetWidget(widget);
+        widgetWrap_[widget] = layout;
+        return layout;
+    }
+
     if (widget->IsOfType<TBWidget>())
     {
         UIWidget* nwidget = new UIWidget(context_, false);
@@ -512,6 +566,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         widgetWrap_[widget] = nwidget;
         return nwidget;
     }
+
 
     return 0;
 }

@@ -6,6 +6,8 @@
 #include "UIEvents.h"
 #include "UI.h"
 #include "UIWidget.h"
+#include "UILayout.h"
+#include "UIFontDescription.h"
 
 using namespace tb;
 
@@ -24,12 +26,19 @@ UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 
-    UI* ui = GetSubsystem<UI>();
-
 }
 
 UIWidget::~UIWidget()
 {
+
+}
+
+void UIWidget::SetIsFocusable(bool value)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetIsFocusable(value);
 
 }
 
@@ -38,7 +47,7 @@ bool UIWidget::Load(const String& filename)
     UI* ui = GetSubsystem<UI>();
 
     if  (!ui->LoadResourceFile(widget_ , filename))
-        return false;    
+        return false;
 
     VariantMap eventData;
     eventData[WidgetLoaded::P_WIDGET] = this;
@@ -68,6 +77,11 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
 
 void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
+    UI* ui = GetSubsystem<UI>();
+    String id;
+
+    ui->GetTBIDString(ev.ref_id, id);
+
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
     data[P_TARGET] = target;
@@ -80,7 +94,7 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_KEY] = ev.key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
-    data[P_REFID] = (unsigned) ev.ref_id;
+    data[P_REFID] = id;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
 
@@ -154,12 +168,29 @@ IntRect UIWidget::GetRect()
     return rect;
 }
 
+void UIWidget::SetRect(IntRect rect)
+{
+    if (!widget_)
+        return;
+
+    tb::TBRect tbrect;
+
+    tbrect.y = rect.top_;
+    tbrect.x = rect.left_;
+    tbrect.w = rect.right_ - rect.left_;
+    tbrect.h = rect.bottom_ - rect.top_;
+
+    widget_->SetRect(tbrect);
+
+}
+
+
 void UIWidget::SetSize(int width, int height)
 {
     if (!widget_)
         return;
 
-    widget_->SetSize(width, height);       
+    widget_->SetSize(width, height);
 }
 
 void UIWidget::Invalidate()
@@ -229,6 +260,41 @@ void UIWidget::Die()
 
 }
 
+void UIWidget::SetLayoutParams(UILayoutParams* params)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetLayoutParams(*(params->GetTBLayoutParams()));
+
+}
+
+void UIWidget::SetFontDescription(UIFontDescription* fd)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetFontDescription(*(fd->GetTBFontDescription()));
+
+}
+
+void UIWidget::DeleteAllChildren()
+{
+    if (!widget_)
+        return;
+
+    widget_->DeleteAllChildren();
+}
+
+void UIWidget::SetSkinBg(const String& id)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetSkinBg(TBIDC(id.CString()));
+
+}
+
 void UIWidget::RemoveChild(UIWidget* child, bool cleanup)
 {
     if (!widget_ || !child)
@@ -287,7 +353,41 @@ void UIWidget::SetState(/*WIDGET_STATE*/ unsigned state, bool on)
         return;
 
     widget_->SetState((WIDGET_STATE) state, on);
+}
 
+void UIWidget::SetFocus()
+{
+    if (!widget_)
+        return;
+
+    widget_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
+}
+
+void UIWidget::SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility)
+{
+
+    if (!widget_)
+        return;
+
+    widget_->SetVisibilility((WIDGET_VISIBILITY) visibility);
+
+}
+
+UIWidget* UIWidget::GetFirstChild()
+{
+    if (!widget_)
+        return NULL;
+
+    return GetSubsystem<UI>()->WrapWidget(widget_->GetFirstChild());
+
+}
+
+UIWidget* UIWidget::GetNext()
+{
+    if (!widget_)
+        return NULL;
+
+    return GetSubsystem<UI>()->WrapWidget(widget_->GetNext());
 
 }
 
@@ -356,6 +456,20 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
         }
 
     }
+    else if (ev.type == EVENT_TYPE_TAB_CHANGED)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
     else if (ev.type == EVENT_TYPE_CLICK)
     {
         if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
@@ -366,7 +480,9 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
             {
                 VariantMap eventData;
                 eventData[PopupMenuSelect::P_BUTTON] = this;
-                eventData[PopupMenuSelect::P_REFID] = (unsigned) ev.ref_id;
+                String id;
+                ui->GetTBIDString(ev.ref_id, id);
+                eventData[PopupMenuSelect::P_REFID] = id;
                 SendEvent(E_POPUPMENUSELECT, eventData);
             }
 

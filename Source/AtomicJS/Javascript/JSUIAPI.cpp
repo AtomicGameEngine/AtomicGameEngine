@@ -269,16 +269,57 @@ void jsapi_init_ui(JSVM* vm)
     duk_push_number(ctx, (double) tb::WIDGET_STATE_ALL);
     duk_put_prop_string(ctx, -2, "WIDGET_STATE_ALL");
 
+    // Events
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_CLICK);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_CLICK");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_LONG_CLICK);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_LONG_CLICK");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_POINTER_DOWN);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_POINTER_DOWN");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_POINTER_UP);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_POINTER_UP");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_POINTER_MOVE);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_POINTER_MOVE");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_RIGHT_POINTER_DOWN);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_RIGHT_POINTER_DOWN");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_RIGHT_POINTER_UP);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_RIGHT_POINTER_UP");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_WHEEL);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_WHEEL");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_CHANGED);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_CHANGED");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_KEY_DOWN);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_KEY_DOWN");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_KEY_UP);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_KEY_UP");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_SHORTCUT);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_SHORTCUT");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_CONTEXT_MENU);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_CONTEXT_MENU");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_FILE_DROP);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_FILE_DROP");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_TAB_CHANGED);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_TAB_CHANGED");
+    duk_push_number(ctx, (double) tb::EVENT_TYPE_CUSTOM);
+    duk_put_prop_string(ctx, -2, "EVENT_TYPE_CUSTOM");
+
+    duk_push_number(ctx, (double) tb::WIDGET_VISIBILITY_GONE);
+    duk_put_prop_string(ctx, -2, "VISIBILITY_GONE");
+    duk_push_number(ctx, (double) tb::WIDGET_VISIBILITY_INVISIBLE);
+    duk_put_prop_string(ctx, -2, "VISIBILITY_INVISIBLE");
+    duk_push_number(ctx, (double) tb::WIDGET_VISIBILITY_VISIBLE);
+    duk_put_prop_string(ctx, -2, "VISIBILITY_VISIBLE");
+
     duk_put_prop_string(ctx, -2, "UI");
 
     duk_pop(ctx);
 
-    js_class_get_prototype(ctx, "UIButton");
+    js_class_get_prototype(ctx, "Atomic", "UIButton");
     duk_push_c_function(ctx, UIButton_Popup, 2);
     duk_put_prop_string(ctx, -2, "popup");
     duk_pop(ctx);
 
-    js_class_get_prototype(ctx, "UIWindow");
+    js_class_get_prototype(ctx, "Atomic", "UIWindow");
     duk_push_c_function(ctx, UIWindow_GetResizeToFitContentRect, 0);
     duk_put_prop_string(ctx, -2, "getResizeToFitContentRect");
     duk_pop(ctx);

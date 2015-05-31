@@ -25,6 +25,15 @@ UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, fals
 
 UIButton::~UIButton()
 {
+
+}
+
+void UIButton::SetSqueezable(bool value)
+{
+    if (!widget_)
+        return;
+
+    ((TBButton*)widget_)->SetSqueezable(value);
 }
 
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)

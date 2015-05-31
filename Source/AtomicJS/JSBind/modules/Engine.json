@@ -1,6 +1,0 @@
-{
-	"name" : "Engine",
-	"sources" : ["Engine"],
-	"includes" : [],
-	"classes" : ["Engine"]
-}

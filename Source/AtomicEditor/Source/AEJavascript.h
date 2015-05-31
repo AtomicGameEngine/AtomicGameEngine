@@ -6,7 +6,7 @@
 
 #include <Atomic/Core/Object.h>
 
-typedef void duk_context;
+#include <Duktape/duktape.h>
 
 using namespace Atomic;
 

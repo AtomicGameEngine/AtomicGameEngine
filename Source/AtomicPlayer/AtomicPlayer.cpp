@@ -118,7 +118,7 @@ void AtomicPlayer::Start()
     vm = javascript->InstantiateVM("MainVM");
     vm->InitJSContext();
 
-    vm->SetModuleSearchPath("Modules");
+    vm->SetModuleSearchPaths("Modules");
 
     if (!vm->ExecuteMain())
     {
