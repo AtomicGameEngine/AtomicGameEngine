@@ -340,6 +340,8 @@ void JSBModule::RegisterConstant(const String& constantName)
 
 bool JSBModule::Load(const String& jsonFilename)
 {
+    JSBind* jsbind = GetSubsystem<JSBind>();
+
     LOGINFOF("Loading Module: %s", jsonFilename.CString());
 
     SharedPtr<File> jsonFile(new File(context_, jsonFilename));
@@ -417,7 +419,7 @@ bool JSBModule::Load(const String& jsonFilename)
     if (name_ == "Graphics")
     {
 #ifdef _MSC_VER
-        if (JSBind::PLATFORM == "ANDROID" || JSBind::PLATFORM == "WEB")
+        if (jsbind->GetPlatform() == "ANDROID" || jsbind->GetPlatform() == "WEB")
         {
             sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");
         }
