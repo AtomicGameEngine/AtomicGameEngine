@@ -21,11 +21,11 @@ CMAKE_IOS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/IOS_Build"
 CMAKE_WEB_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Web_Build"
 CMAKE_LINUX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Linux_Build"
 
-JSBIND_BIN_MACOSX = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicJS/JSBind/Release/JSBind"
+ATOMICTOOL_BIN_MACOSX = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicTool/Release/AtomicTool"
 
 namespace :build  do
 
-  task :macosx_jsbind do
+  task :macosx_atomictool do
 
     if !Dir.exists?("#{CMAKE_MACOSX_BUILD_FOLDER}")
       FileUtils.mkdir_p(CMAKE_MACOSX_BUILD_FOLDER)
@@ -34,7 +34,7 @@ namespace :build  do
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
 
       sh "cmake ../../ -G Xcode -DCMAKE_BUILD_TYPE=Release"
-      sh "xcodebuild -target JSBind -configuration Release"
+      sh "xcodebuild -target AtomicTool -configuration Release"
 
     end
 
@@ -87,14 +87,14 @@ namespace :build  do
 
 
   #IOS, dependent on macosx for JSBind
-  task :ios =>  "build:macosx_jsbind" do
+  task :ios =>  "build:macosx_atomictool" do
 
       if !Dir.exists?("#{CMAKE_IOS_BUILD_FOLDER}")
         FileUtils.mkdir_p(CMAKE_IOS_BUILD_FOLDER)
       end
 
       Dir.chdir(CMAKE_IOS_BUILD_FOLDER) do
-        sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} IOS"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Source/AtomicJS/Packages/Atomic/ IOS"
         sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
         # the -s option adds $KEYCHAIN to the search scope, while the -d option adds $KEYCHAIN to the system domain; both are needed
         sh "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain"
@@ -104,7 +104,7 @@ namespace :build  do
 
   end
 
-  task :android =>  "build:macosx_jsbind" do
+  task :android =>  "build:macosx_atomictool" do
 
       if !Dir.exists?("#{CMAKE_ANDROID_BUILD_FOLDER}")
         FileUtils.mkdir_p(CMAKE_ANDROID_BUILD_FOLDER)
@@ -112,21 +112,21 @@ namespace :build  do
 
       Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
 
-        sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} ANDROID"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Source/AtomicJS/Packages/Atomic/ ANDROID"
         sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
         sh "make -j4"
       end
 
   end
 
-  task :web => "build:macosx_jsbind" do
+  task :web => "build:macosx_atomictool" do
 
       if !Dir.exists?("#{CMAKE_WEB_BUILD_FOLDER}")
         FileUtils.mkdir_p(CMAKE_WEB_BUILD_FOLDER)
       end
 
       Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
-        sh "#{JSBIND_BIN_MACOSX} #{$RAKE_ROOT} WEB"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Source/AtomicJS/Packages/Atomic/ WEB"
         sh "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
         sh "make -j4"
       end

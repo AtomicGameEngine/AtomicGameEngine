@@ -159,6 +159,8 @@ bool JSBPackage::Load(const String& packageFolder)
 {
     LOGINFOF("Loading Package: %s", packageFolder.CString());
 
+    JSBind* jsbind = GetSubsystem<JSBind>();
+
     SharedPtr<File> jsonFile(new File(context_, packageFolder + "Package.json"));
 
     if (!jsonFile->IsOpen())
@@ -182,8 +184,6 @@ bool JSBPackage::Load(const String& packageFolder)
 
     if (deps.IsArray())
     {
-        JSBind* jsbind = GetSubsystem<JSBind>();
-
         for (unsigned i = 0; i < deps.GetSize(); i++)
         {
             String dpackageFolder = AddTrailingSlash(deps.GetString(i));
@@ -200,6 +200,37 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
+    JSONValue jmodulesExclude = root.GetChild("moduleExclude");
+
+    if (jmodulesExclude.IsObject())
+    {
+        Vector<String> platforms = jmodulesExclude.GetChildNames();
+
+        for (unsigned i = 0; i < platforms.Size(); i++)
+        {
+            const String& platform = platforms[i];
+
+            if (!moduleExcludes_.Contains(platform))
+            {
+                moduleExcludes_[platform] = Vector<String>();
+            }
+
+            JSONValue mods = jmodulesExclude.GetChild(platform);
+
+            if (mods.IsArray())
+            {
+
+                for (unsigned j = 0; j < mods.GetSize(); j++)
+                {
+                    moduleExcludes_[platform].Push(mods.GetString(j));
+                }
+
+            }
+
+        }
+
+    }
+
     name_ = root.GetString("name");
     namespace_ = root.GetString("namespace");
 
@@ -208,6 +239,12 @@ bool JSBPackage::Load(const String& packageFolder)
     for (unsigned i = 0; i < modules.GetSize(); i++)
     {
         String moduleName = modules.GetString(i);
+
+        if (moduleExcludes_.Contains(jsbind->GetPlatform()))
+        {
+            if (moduleExcludes_[jsbind->GetPlatform()].Contains(moduleName))
+                continue;
+        }
 
         SharedPtr<JSBModule> module(new JSBModule(context_, this));
 

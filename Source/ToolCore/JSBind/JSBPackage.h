@@ -65,6 +65,8 @@ private:
 
     Vector<SharedPtr<JSBPackage> > dependencies_;
 
+    HashMap<String, Vector<String>> moduleExcludes_;
+
     Vector<SharedPtr<JSBModule> > modules_;
     PODVector<JSBClass*> allClasses_;
 
