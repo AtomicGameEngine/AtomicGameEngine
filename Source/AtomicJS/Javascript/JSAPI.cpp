@@ -191,7 +191,7 @@ void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
 
         } else if (duk_get_heapptr(ctx, -1)) {
 
-            v[key] = js_to_class_instance<Object*>(ctx, -1, 0);
+            v[key] = js_to_class_instance<Object>(ctx, -1, 0);
 
         }
 
@@ -214,6 +214,10 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
     switch (type)
     {
+
+    case VAR_VOIDPTR:
+        duk_push_null(ctx);
+        break;
     case VAR_PTR:
 
         ref = v.GetPtr();

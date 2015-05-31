@@ -3,12 +3,22 @@ import UIEvents = require("./UIEvents");
 
 var UI = Atomic.UI;
 
+// the root content of editor widgets (rootContentWidget property) are extended with an editor field
+// so we can access the editor they belong to from the widget itself
+interface EditorRootContentWidget extends Atomic.UIWidget{
+  editor: Editor.ResourceEditor;
+}
+
 class ResourceFrame extends ScriptWidget {
 
     tabcontainer: Atomic.UITabContainer;
     resourceLayout: Atomic.UILayout;
     resourceViewContainer: Atomic.UILayout;
+    currentResourceEditor: Editor.ResourceEditor;
 
+    // editors have a rootCotentWidget which is what is a child of the tab container
+
+    // editors can be looked up by the full path of what they are editing
     editors: { [path: string]: Editor.ResourceEditor; } = {};
 
     show(value: boolean) {
@@ -35,8 +45,8 @@ class ResourceFrame extends ScriptWidget {
 
         if (ext == ".js") {
 
-            editor = new Editor.JSResourceEditor(path, this.tabcontainer);
-            
+           editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+
         } else if (ext == ".scene") {
 
            editor = new Editor.SceneEditor3D(path, this.tabcontainer);
@@ -44,6 +54,10 @@ class ResourceFrame extends ScriptWidget {
         }
 
         if (editor) {
+
+            // add __editor which lets us lookup the editor via the rootContentWidget
+            // could this be formalized with an interface?
+            (<EditorRootContentWidget> editor.rootContentWidget).editor = editor;
             this.editors[path] = editor;
             this.tabcontainer.currentPage = this.tabcontainer.numPages - 1;
             editor.setFocus();
@@ -95,24 +109,11 @@ class ResourceFrame extends ScriptWidget {
         var navigate = <boolean> data.navigateToAvailableResource;
 
         // remove from lookup
-        this.editors[editor.fullPath] = undefined;
+        delete this.editors[editor.fullPath];
 
         var root = this.tabcontainer.contentRoot;
 
-        var found = false;
-
-        var i = 0;
-
-        for (var child = root.firstChild; child; child = child.next, i++) {
-            if (child == editor.rootContentWidget) {
-                found = true;
-                root.removeChild(child);
-                break;
-            }
-
-        }
-
-        assert(found);
+        root.removeChild(editor.rootContentWidget);
 
         this.tabcontainer.currentPage = -1;
 
@@ -127,6 +128,39 @@ class ResourceFrame extends ScriptWidget {
             }
 
         }
+
+    }
+
+    handleResourceEditorChanged(data) {
+
+      var editor = <Editor.ResourceEditor> data.editor;
+      this.currentResourceEditor = editor;
+
+    }
+
+    handleWidgetEvent(data) {
+
+      // ok, first thing is to fix up this widget <-> editor mess
+
+      if (data.type == Atomic.UI.EVENT_TYPE_TAB_CHANGED && data.target == this.tabcontainer)
+      {
+        var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
+
+        if (w && w.editor) {
+
+          if (this.currentResourceEditor != w.editor) {
+
+            this.sendEvent(UIEvents.ResourceEditorChanged, { editor: w.editor});
+
+          }
+
+        }
+
+
+      }
+
+      // bubble
+      return false;
 
     }
 
@@ -146,6 +180,9 @@ class ResourceFrame extends ScriptWidget {
 
         this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(UIEvents.CloseResourceEditor, (data) => this.handleCloseResourceEditor(data));
+        this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
+
+        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
 
     }
 

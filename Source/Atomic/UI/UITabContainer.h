@@ -18,6 +18,8 @@ public:
     int GetNumPages();
     void SetCurrentPage(int page);
 
+    UIWidget* GetCurrentPageWidget();
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

@@ -12,6 +12,7 @@ class MainFrame extends ScriptWidget {
 
     projectframe: ProjectFrame;
     resourceframe: ResourceFrame;
+    inspectorframe: Editor.InspectorFrame;
 
     inspectorlayout: Atomic.UILayout;
 
@@ -24,10 +25,17 @@ class MainFrame extends ScriptWidget {
         this.load("AtomicEditor/editor/ui/mainframe.tb.txt");
 
         this.inspectorlayout = <Atomic.UILayout> this.getWidget("inspectorlayout");
+
+        this.inspectorframe = new Editor.InspectorFrame();
+        this.inspectorframe.load("AtomicEditor/editor/ui/inspectorframe.tb.txt");
+        this.inspectorlayout.addChild(this.inspectorframe);
+
         this.projectframe = new ProjectFrame(this);
         this.resourceframe = new ResourceFrame(this);
 
         this.showInspectorFrame(false);
+
+        this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
     }
 
@@ -35,10 +43,14 @@ class MainFrame extends ScriptWidget {
 
         if (show) {
 
+            print("Showing Inspector");
             this.inspectorlayout.visibility = UI.VISIBILITY_VISIBLE;
+            this.inspectorframe.visibility = UI.VISIBILITY_VISIBLE;
 
         } else {
 
+            print("Hiding Inspector");
+            this.inspectorframe.visibility = UI.VISIBILITY_GONE;
             this.inspectorlayout.visibility = UI.VISIBILITY_GONE;
 
         }
@@ -88,6 +100,24 @@ class MainFrame extends ScriptWidget {
 
         }
     }
+
+    handleResourceEditorChanged(data) {
+
+      var editor = <Editor.ResourceEditor> data.editor;
+
+      if (editor) {
+
+        this.showInspectorFrame(editor.requiresInspector());
+
+      } else {
+
+        this.showInspectorFrame(false);
+
+      }
+
+
+    }
+
 
 }
 

@@ -81,25 +81,25 @@ public:
     }
 };
 
+enum EditMode
+{
+    EDIT_SELECT,
+    EDIT_MOVE,
+    EDIT_ROTATE,
+    EDIT_SCALE
+};
+
+enum AxisMode
+{
+    AXIS_WORLD = 0,
+    AXIS_LOCAL
+};
+
 class Gizmo3D: public Object
 {
     OBJECT(Gizmo3D);
 
 public:
-
-    enum EditMode
-    {
-        EDIT_SELECT,
-        EDIT_MOVE,
-        EDIT_ROTATE,
-        EDIT_SCALE
-    };
-
-    enum AxisMode
-    {
-        AXIS_WORLD = 0,
-        AXIS_LOCAL
-    };
 
     Gizmo3D(Context* context);
     virtual ~Gizmo3D();

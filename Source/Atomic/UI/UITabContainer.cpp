@@ -28,6 +28,16 @@ UITabContainer::~UITabContainer()
 
 }
 
+UIWidget* UITabContainer::GetCurrentPageWidget()
+{
+    if (!widget_)
+        return 0;
+
+    TBWidget* w = ((TBTabContainer*)widget_)->GetCurrentPageWidget();
+
+    return GetSubsystem<UI>()->WrapWidget(w);
+}
+
 int UITabContainer::GetNumPages()
 {
     if (!widget_)
