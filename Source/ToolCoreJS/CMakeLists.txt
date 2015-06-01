@@ -22,3 +22,5 @@ set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE} )
 add_library(ToolCoreJS ${SOURCE_FILES})
 
 target_link_libraries(ToolCoreJS ToolCore)
+
+add_dependencies(ToolCoreJS AtomicTool)
