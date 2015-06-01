@@ -42,11 +42,11 @@ public:
 
     const String& GetDeploymentDataDir() { return toolBinary_; }
 
-    const String& GetMacPlayerDeploymentBinary();
-
     const String& GetExamplesDir() { return examplesDir_; }
 
     const String& GetDevConfigFilename();
+
+    void Dump();
 
 private:
 

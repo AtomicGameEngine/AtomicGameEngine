@@ -16,6 +16,8 @@ public:
     UIButton(Context* context, bool createWidget = true);
     virtual ~UIButton();
 
+    void SetSqueezable(bool value);
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

@@ -28,6 +28,8 @@ public:
     Command(Context* context);
     virtual ~Command();
 
+    bool Parse(const String& command);
+
     virtual bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg) = 0;
 
     virtual void Run() = 0;
@@ -39,6 +41,8 @@ public:
     virtual void Cancel() {}
 
     virtual bool RequiresProjectLoad() { return true; }
+
+    virtual bool RequiresLicenseValidation() { return false; }
 
 private:
 

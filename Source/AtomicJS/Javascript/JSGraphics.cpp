@@ -55,14 +55,12 @@ void jsapi_init_graphics(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    js_class_get_prototype(ctx, "Light");
+    js_class_get_prototype(ctx, "Atomic", "Light");
     duk_push_c_function(ctx, Light_SetShadowCascade, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "setShadowCascade");
     duk_push_c_function(ctx, Light_SetShadowBias, 2);
     duk_put_prop_string(ctx, -2, "setShadowBias");
     duk_pop(ctx);
-
-
 }
 
 }

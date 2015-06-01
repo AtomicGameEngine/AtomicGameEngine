@@ -22,10 +22,23 @@ namespace Atomic
 class JSVM;
 class Object;
 
-void js_constructor_basecall(duk_context* ctx, const char* baseclass);
-void js_class_declare(JSVM* vm, const char* classname, duk_c_function constructor);
-void js_setup_prototype(JSVM* vm, const char* classname, const char* basename, bool hasProperties = false);
-void js_class_push_propertyobject(JSVM* vm, const char* classname);
-void js_class_get_prototype(duk_context* ctx, const char *classname);
+void js_class_declare_internal(JSVM* vm, void* uniqueClassID, const char* package, const char* classname, duk_c_function constructor);
+
+template<typename T>
+void js_class_declare(JSVM* vm, const char* package, const char* classname, duk_c_function constructor)
+{
+    void* uniqueID = (void*) T::GetTypeNameStatic().CString();
+    js_class_declare_internal(vm, uniqueID, package, classname, constructor);
+}
+
+void js_constructor_basecall(duk_context* ctx, const char* package, const char* baseclass);
+void js_setup_prototype(JSVM* vm, const char* package, const char* classname, const char* basePackage, const char* basename, bool hasProperties = false);
+void js_class_push_propertyobject(JSVM* vm, const char* package, const char* classname);
+void js_class_get_prototype(duk_context* ctx, const char* package, const char *classname);
+
+/// Pushes variant value or undefined if can't be pushed
+void js_push_variant(duk_context* ctx, const Variant &v);
+
+void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);
 
 }

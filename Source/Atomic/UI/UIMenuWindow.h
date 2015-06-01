@@ -26,7 +26,7 @@ protected:
 
 private:
 
-    tb::TBGenericStringItemSource* source_;
+    tb::TBSelectItemSource* source_;
 
 };
 

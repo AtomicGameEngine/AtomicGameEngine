@@ -26,9 +26,9 @@ public:
     void SetSkinImage(const String& skinImage);
     void SetSubSource(UISelectItemSource *subSource);
 
-    tb::TBGenericStringItem* GetTBItem();
+    virtual tb::TBGenericStringItem* GetTBItem();
 
-private:
+protected:
 
     String str_;
 
@@ -53,9 +53,9 @@ public:
     void AddItem(UISelectItem* item) { items_.Push(SharedPtr<UISelectItem>(item)); }
 
     // caller's responsibility to clean up
-    tb::TBGenericStringItemSource* GetTBItemSource();
+    virtual tb::TBSelectItemSource* GetTBItemSource();
 
-private:
+protected:
 
     List<SharedPtr<UISelectItem>> items_;
 

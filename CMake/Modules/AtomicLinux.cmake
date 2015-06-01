@@ -1,5 +1,7 @@
 include(AtomicDesktop)
 
+set (JAVASCRIPT_BINDINGS_PLATFORM "LINUX")
+
 add_definitions(-DATOMIC_PLATFORM_LINUX -DATOMIC_OPENGL -DKNET_UNIX -DHAVE_INT64_T)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -std=gnu++0x")

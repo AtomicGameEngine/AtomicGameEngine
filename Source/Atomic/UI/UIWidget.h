@@ -13,6 +13,9 @@ class TBWidget;
 namespace Atomic
 {
 
+class UILayoutParams;
+class UIFontDescription;
+
 /// Wraps a TurboBadger widget in our Object model
 class UIWidget : public Object, public tb::TBWidgetDelegate
 {
@@ -28,19 +31,26 @@ public:
     bool Load(const String& filename);
 
     IntRect GetRect();
+    void SetRect(IntRect r);
 
     void SetSize(int width, int height);
     void SetPosition(int x, int y);
     void SetText(const String& text);
+
+    void SetSkinBg(const String& id);
+    void SetLayoutParams(UILayoutParams* params);
+    void SetFontDescription(UIFontDescription* fd);
 
     UIWidget* GetParent();
     UIWidget* GetContentRoot();
 
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
+    void DeleteAllChildren();
+
     // String ID
     const String& GetId();
-    void SetId(const String& id);
+    virtual void SetId(const String& id);
 
     void Center();
     void SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity);
@@ -48,14 +58,24 @@ public:
     void SetValue(double value);
     double GetValue();
 
+    void SetFocus();
+
     void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
     bool GetState(/*WIDGET_STATE*/ unsigned state);
+
+    void SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility);
 
     void SetStateRaw(/*WIDGET_STATE*/ unsigned state);
     /*WIDGET_STATE*/ unsigned GetStateRaw();
 
     void Invalidate();
     void Die();
+
+    UIWidget* GetFirstChild();
+    UIWidget* GetNext();
+
+    void SetIsFocusable(bool value);
+
 
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);

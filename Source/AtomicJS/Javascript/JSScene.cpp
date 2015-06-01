@@ -133,7 +133,7 @@ void jsapi_init_scene(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    js_class_get_prototype(ctx, "Node");
+    js_class_get_prototype(ctx, "Atomic", "Node");
     duk_push_c_function(ctx, Node_GetChildrenWithComponent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "getChildrenWithComponent");
     duk_push_c_function(ctx, Node_GetChildrenWithName, DUK_VARARGS);
@@ -144,7 +144,7 @@ void jsapi_init_scene(JSVM* vm)
 	duk_put_prop_string(ctx, -2, "getJSComponent");
 	duk_pop(ctx);
 
-    js_class_get_prototype(ctx, "Scene");
+    js_class_get_prototype(ctx, "Atomic", "Scene");
     duk_push_c_function(ctx, Scene_LoadXML, 1);
     duk_put_prop_string(ctx, -2, "loadXML");
     duk_pop(ctx);

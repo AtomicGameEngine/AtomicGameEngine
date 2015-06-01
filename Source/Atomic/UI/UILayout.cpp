@@ -13,6 +13,15 @@ using namespace tb;
 namespace Atomic
 {
 
+UILayoutParams::UILayoutParams(Context* context) : Object(context)
+{
+}
+
+UILayoutParams::~UILayoutParams()
+{
+}
+
+
 UILayout::UILayout(Context* context, bool createWidget) : UIWidget(context, false)
 {
     if (createWidget)
