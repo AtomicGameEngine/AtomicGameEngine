@@ -65,3 +65,5 @@ endif()
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditorWork PROPERTIES ${TARGET_PROPERTIES})
 endif ()
+
+add_dependencies(AtomicEditorWork AtomicTool)
