@@ -179,6 +179,10 @@ void PrintUnicode(const String& str, bool error)
         WString strW(str);
         DWORD charsWritten;
         WriteConsoleW(stream, strW.CString(), strW.Length(), &charsWritten, 0);
+        if (IsDebuggerPresent())
+        {
+            OutputDebugString(str.CString());
+        }
     }
 #else
     fprintf(error ? stderr : stdout, "%s", str.CString());
