@@ -56,9 +56,10 @@
 #pragma warning(disable:4355)
 #endif
 
-// On Intel / NVIDIA setups prefer the NVIDIA GPU
+// Prefer the high-performance GPU on switchable GPU systems
 extern "C" {
-    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+    __declspec(dllexport) DWORD NvOptimusEnablement = 1;
+    __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
 // Fix missing define in MinGW headers
@@ -2389,7 +2390,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
     if (!impl_->window_)
     {
-        LOGERROR("Could not create window");
+        LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 
