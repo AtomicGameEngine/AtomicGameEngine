@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -123,7 +123,9 @@ NavigationMesh::NavigationMesh(Context* context) :
     numTilesX_(0),
     numTilesZ_(0),
     partitionType_(NAVMESH_PARTITION_WATERSHED),
-    keepInterResults_(false)
+    keepInterResults_(false),
+    drawOffMeshConnections_(false),
+    drawNavAreas_(false)
 {
 }
 
@@ -158,6 +160,8 @@ void NavigationMesh::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Bounding Box Padding", GetPadding, SetPadding, Vector3, Vector3::ONE, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Navigation Data", GetNavigationDataAttr, SetNavigationDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
     ENUM_ACCESSOR_ATTRIBUTE("Partition Type", GetPartitionType, SetPartitionType, NavmeshPartitionType, navmeshPartitionTypeNames, NAVMESH_PARTITION_WATERSHED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw OffMeshConnections", GetDrawOffMeshConnections, SetDrawOffMeshConnections, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Draw NavAreas", GetDrawNavAreas, SetDrawNavAreas, bool, false, AM_DEFAULT);
 }
 
 void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -192,6 +196,36 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                             );
                     }
                 }
+            }
+        }
+    }
+
+    Scene* scene = GetScene();
+    if (scene)
+    {
+        // Draw OffMeshConnection components
+        if (drawOffMeshConnections_)
+        {
+            PODVector<Node*> connections;
+            scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
+            for (unsigned i = 0; i < connections.Size(); ++i)
+            {
+                OffMeshConnection* connection = connections[i]->GetComponent<OffMeshConnection>();
+                if (connection && connection->IsEnabledEffective())
+                    connection->DrawDebugGeometry(debug, depthTest);
+            }
+        }
+
+        // Draw NavArea components
+        if (drawNavAreas_)
+        {
+            PODVector<Node*> areas;
+            scene->GetChildrenWithComponent<NavArea>(areas, true);
+            for (unsigned i = 0; i < areas.Size(); ++i)
+            {
+                NavArea* area = areas[i]->GetComponent<NavArea>();
+                if (area && area->IsEnabledEffective())
+                    area->DrawDebugGeometry(debug, depthTest);
             }
         }
     }
@@ -499,7 +533,7 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
 
     Vector3 localStart = inverse * start;
     Vector3 localEnd = inverse * end;
-    
+
     dtPolyRef startRef;
     dtPolyRef endRef;
     navMeshQuery_->findNearestPoly(&localStart.x_, &extents.x_, queryFilter_, &startRef, 0);
@@ -802,6 +836,9 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
 {
     // Make sure nodes are not included twice
     if (processedNodes.Contains(node))
+        return;
+    // Exclude obstacles from consideration
+    if (node->HasComponent<Obstacle>())
         return;
     processedNodes.Insert(node);
 
@@ -1118,7 +1155,7 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     rcRasterizeTriangles(build.ctx_, &build.vertices_[0].x_, build.vertices_.Size(), &build.indices_[0],
         triAreas.Get(), numTriangles, *build.heightField_, cfg.walkableClimb);
     rcFilterLowHangingWalkableObstacles(build.ctx_, cfg.walkableClimb, *build.heightField_);
-    
+
     rcFilterWalkableLowHeightSpans(build.ctx_, cfg.walkableHeight, *build.heightField_);
     rcFilterLedgeSpans(build.ctx_, cfg.walkableHeight, cfg.walkableClimb, *build.heightField_);
 

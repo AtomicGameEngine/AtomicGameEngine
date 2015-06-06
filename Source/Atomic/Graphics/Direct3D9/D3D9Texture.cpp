@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -232,6 +232,14 @@ unsigned Texture::GetRowDataSize(int width) const
     default:
         return 0;
     }
+}
+
+unsigned Texture::GetComponents() const
+{
+    if (!width_ || IsCompressed())
+        return 0;
+    else
+        return GetRowDataSize(width_) / width_;
 }
 
 void Texture::SetParameters(XMLFile* file)

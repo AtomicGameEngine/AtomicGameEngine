@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -331,6 +331,8 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
     if (animationElem.HasAttribute("looping"))
         looped = animationElem.GetBool("looping");
 
+    float highestKeyTime = 0.0f;
+
     // Load timelines
     Vector<SpriterTimeline2D> timelines;
     for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
@@ -346,6 +348,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
         {
             SpriterTimelineKey2D key;
             key.time_ = keyElem.GetFloat("time") * 0.001f;
+            highestKeyTime = Max(highestKeyTime, key.time_);
             if (keyElem.HasAttribute("spin"))
                 key.spin_ = keyElem.GetInt("spin");
 
@@ -436,6 +439,10 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
     // Create animation
     SharedPtr<Animation2D> animation(new Animation2D(this));
+    // Crop animation length if longer than the last keyframe, prevents sprites vanishing in clamp mode, or occasional flashes
+    // when looped
+    if (length > highestKeyTime)
+        length = highestKeyTime;
     animation->SetName(name);
     animation->SetLength(length);
     animation->SetLooped(looped);
@@ -462,7 +469,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
             keyFrame.time_ = timelineKey.time_;
 
-            // Set diabled
+            // Set disabled
             keyFrame.enabled_ = false;
             keyFrame.parent_ = timeline.parent_;
             keyFrame.transform_ = Transform2D(timelineKey.position_, timelineKey.angle_, timelineKey.scale_);
@@ -472,7 +479,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             {
                 keyFrame.sprite_ = timelineKey.sprite_;
                 keyFrame.alpha_ = timelineKey.alpha_;
-                keyFrame.useHotSpot_ = timelineKey.useHotSpot_;                
+                keyFrame.useHotSpot_ = timelineKey.useHotSpot_;
                 if (timelineKey.useHotSpot_)
                     keyFrame.hotSpot_ = timelineKey.hotSpot_;
             }
