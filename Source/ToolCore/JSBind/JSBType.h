@@ -20,6 +20,7 @@ class JSBStringHashType;
 class JSBClassType;
 class JSBEnumType;
 class JSBHeapPtrType;
+class JSBVectorType;
 
 class JSBType
 {
@@ -32,6 +33,7 @@ public:
     virtual JSBStringHashType* asStringHashType() { return 0; }
     virtual JSBEnumType* asEnumType() { return 0; }
     virtual JSBHeapPtrType* asHeapPtrType() { return 0; }
+    virtual JSBVectorType* asVectorType() { return 0; }
 
     static JSBType* Parse(const String& value);
 
@@ -141,6 +143,21 @@ public:
     String ToString() { return enum_->GetName(); }
 
 };
+
+class JSBVectorType : public JSBType
+{
+
+public:
+
+    JSBType* vectorType_;
+
+    JSBVectorType(JSBType* vtype) : vectorType_(vtype) {}
+
+    virtual JSBVectorType* asVectorType() { return this; }
+
+    String ToString() { return "Vector<" + vectorType_->ToString() + ">"; }
+};
+
 
 
 class JSBClassType : public JSBType

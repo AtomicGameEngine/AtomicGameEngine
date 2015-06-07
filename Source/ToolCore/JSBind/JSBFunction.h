@@ -24,12 +24,14 @@ public:
         isPointer_ = false;
         isReference_ = false;
         isTemplate_ = false;
+        isConst_ = false;
     }
 
     bool isSharedPtr_;
     bool isPointer_;
     bool isReference_;
     bool isTemplate_;
+    bool isConst_;
 
     String name_;
     String initializer_;
