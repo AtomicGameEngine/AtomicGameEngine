@@ -40,6 +40,11 @@ static String GetScriptType(JSBFunctionType* ftype)
     if (ftype->type_->asClassType())
         scriptType = ftype->type_->asClassType()->class_->GetName();
 
+    if (ftype->type_->asVectorType())
+    {
+        scriptType = "string[]";
+    }
+
     return scriptType;
 
 }

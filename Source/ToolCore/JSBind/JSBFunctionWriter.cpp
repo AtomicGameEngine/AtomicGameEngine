@@ -178,6 +178,34 @@ void JSBFunctionWriter::WriteParameterMarshal(String& source)
                 }
 
             }
+            else if (ptype->type_->asVectorType())
+            {
+                // read only vector arguments
+                if (ptype->isConst_)
+                {
+                    JSBVectorType* vtype = ptype->type_->asVectorType();
+                    source.AppendWithFormat("%s __arg%i;\n", vtype->ToString().CString(), cparam);
+
+                    source.AppendWithFormat("if (duk_get_top(ctx) >= %i)\n{\n", cparam + 1);
+                    source.AppendWithFormat("duk_require_object_coercible(ctx, %i);\n", cparam);
+                    source.AppendWithFormat("unsigned sz = duk_get_length(ctx, %i);\n", cparam);
+                    source.AppendWithFormat("for (unsigned i = 0; i < sz; i++)\n{\n");
+
+                    source.AppendWithFormat("duk_get_prop_index(ctx, 2, i);\n");
+
+                    if (vtype->vectorType_->asStringType() || vtype->vectorType_->asStringHashType() )
+                    {
+                        source.AppendWithFormat("__arg%i.Push(duk_get_string(ctx, -1));\n", cparam);
+                    }
+
+                    source.AppendWithFormat("duk_pop(ctx);\n");
+
+                    source.AppendWithFormat("\n}\n");
+
+                    source.AppendWithFormat("\n}\n");
+
+                }
+            }
 
         }
     }
@@ -247,9 +275,9 @@ duk_ret_t jsb_constructor_MyJSClass(duk_context* ctx)
      */
 
     source.Append( "\nJSVM* vm = JSVM::GetJSVM(ctx);\n" \
-            "duk_push_this(ctx);\n" \
-            "void *ptr = duk_get_heapptr(ctx, -1);\n" \
-            "duk_pop(ctx);\n\n");
+                   "duk_push_this(ctx);\n" \
+                   "void *ptr = duk_get_heapptr(ctx, -1);\n" \
+                   "duk_pop(ctx);\n\n");
 
     source.Append("   if (!vm->GetObjectPtr(ptr, true))\n   {\n");
 

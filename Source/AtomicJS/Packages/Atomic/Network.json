@@ -2,7 +2,7 @@
 	"name" : "Network",
 	"sources" : ["Source/Atomic/Network"],
 	"includes" : ["<Atomic/Network/Protocol.h>", "<Atomic/Scene/Scene.h>"],
-	"classes" : ["Network", "NetworkPriority"]
+	"classes" : ["Network", "NetworkPriority", "HttpRequest"]
 
 
 }
