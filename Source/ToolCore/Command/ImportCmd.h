@@ -18,12 +18,13 @@ public:
     virtual ~ImportCmd();
 
     bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
-
     void Run();
+
+    bool RequiresProjectLoad() { return false; }
 
 private:
 
-    String sourceJSONFilename_;
+    String assetFilename_;
 
 };
 

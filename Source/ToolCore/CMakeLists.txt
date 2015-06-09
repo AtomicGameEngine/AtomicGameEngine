@@ -15,8 +15,4 @@ file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
 add_library(ToolCore ${SOURCE_FILES})
 
-if (LINUX)
-
-target_link_libraries(ToolCore Poco)
-
-endif()
+target_link_libraries(ToolCore Assimp Poco)
