@@ -46,22 +46,28 @@ public:
 
     bool Load(const String& assetPath);
 
+    void ExportModel(const String& outName, bool animationOnly = false);
+
     void SetVerboseLog(bool verboseLog) { verboseLog_ = verboseLog; }
 
 private:
 
-    void BuildAndSaveAnimations(OutModel* model);
+    void BuildAndSaveModel(OutModel& model);
+    void BuildAndSaveAnimations(OutModel* model = 0);
 
     void CollectSceneModels(OutScene& scene, aiNode* node);
     void CollectBones(OutModel& model, bool animationOnly = false);
     void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
     void BuildBoneCollisionInfo(OutModel& model);
-    void CollectAnimations(OutModel* model);
+    void CollectAnimations(OutModel* model = 0);
 
     String GetMeshMaterialName(aiMesh* mesh);
     String GenerateMaterialName(aiMaterial* material);
     String GetMaterialTextureName(const String& nameIn);
     String GenerateTextureName(unsigned texIndex);
+
+    // TODO: See AssetImporter
+    // void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
 
     void DumpNodes(aiNode* rootNode, unsigned level);
 
@@ -89,6 +95,7 @@ private:
     bool noOverwriteTexture_;
     bool noOverwriteNewerTexture_;
     bool checkUniqueModel_;
+    unsigned maxBones_;
 
     unsigned aiFlagsDefault_;
     unsigned aiCurrentFlags_;

@@ -108,6 +108,8 @@ unsigned GetNumValidFaces(aiMesh* mesh);
 void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights, unsigned maxBones = 64);
 
+void CollectMeshes(const aiScene* scene, OutModel& model, aiNode* node);
+
 void DumpNodes(aiNode* rootNode, unsigned level);
 
 }

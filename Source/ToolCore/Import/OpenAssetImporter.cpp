@@ -32,6 +32,10 @@
 #include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/Animation.h>
 
+#include <Atomic/Graphics/Geometry.h>
+#include <Atomic/Graphics/IndexBuffer.h>
+#include <Atomic/Graphics/VertexBuffer.h>
+
 #include "OpenAssetImporter.h"
 
 namespace ToolCore
@@ -58,6 +62,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     noOverwriteTexture_(false),
     noOverwriteNewerTexture_(false),
     checkUniqueModel_(true),
+    maxBones_(64),
     defaultTicksPerSecond_(4800.0f)
 {
 
@@ -94,8 +99,278 @@ bool OpenAssetImporter::Load(const String &assetPath)
     if (verboseLog_)
         Assimp::DefaultLogger::kill();
 
+    rootNode_ = scene_->mRootNode;
+
+    DumpNodes(rootNode_, 0);
+
     return true;
 
+}
+
+void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
+{
+    if (outName.Empty())
+        ErrorExit("No output file defined");
+
+    OutModel model;
+    model.rootNode_ = rootNode_;
+    model.outName_ = outName;
+
+    CollectMeshes(scene_, model, model.rootNode_);
+    CollectBones(model, animationOnly);
+    BuildBoneCollisionInfo(model);
+    BuildAndSaveModel(model);
+    if (!noAnimations_)
+    {
+        CollectAnimations(&model);
+        BuildAndSaveAnimations(&model);
+
+        // Save scene-global animations
+        CollectAnimations();
+        BuildAndSaveAnimations();
+    }
+}
+void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
+{
+    if (!model.rootNode_)
+        ErrorExit("Null root node for model");
+    String rootNodeName = FromAIString(model.rootNode_->mName);
+    if (!model.meshes_.Size())
+        ErrorExit("No geometries found starting from node " + rootNodeName);
+
+    PrintLine("Writing model " + rootNodeName);
+
+    SharedPtr<Model> outModel(new Model(context_));
+    Vector<PODVector<unsigned> > allBoneMappings;
+    BoundingBox box;
+
+    unsigned numValidGeometries = 0;
+
+    bool combineBuffers = true;
+    // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
+    unsigned elementMask = GetElementMask(model.meshes_[0]);
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    {
+        if (GetNumValidFaces(model.meshes_[i]))
+        {
+            ++numValidGeometries;
+            if (i > 0 && GetElementMask(model.meshes_[i]) != elementMask)
+                combineBuffers = false;
+        }
+    }
+    // Check if keeping separate buffers allows to avoid 32-bit indices
+    if (combineBuffers && model.totalVertices_ > 65535)
+    {
+        bool allUnder65k = true;
+        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+        {
+            if (GetNumValidFaces(model.meshes_[i]))
+            {
+                if (model.meshes_[i]->mNumVertices > 65535)
+                    allUnder65k = false;
+            }
+        }
+        if (allUnder65k == true)
+            combineBuffers = false;
+    }
+
+    SharedPtr<IndexBuffer> ib;
+    SharedPtr<VertexBuffer> vb;
+    Vector<SharedPtr<VertexBuffer> > vbVector;
+    Vector<SharedPtr<IndexBuffer> > ibVector;
+    unsigned startVertexOffset = 0;
+    unsigned startIndexOffset = 0;
+    unsigned destGeomIndex = 0;
+
+    outModel->SetNumGeometries(numValidGeometries);
+
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    {
+        aiMesh* mesh = model.meshes_[i];
+        unsigned elementMask = GetElementMask(mesh);
+        unsigned validFaces = GetNumValidFaces(mesh);
+        if (!validFaces)
+            continue;
+
+        bool largeIndices;
+        if (combineBuffers)
+            largeIndices = model.totalIndices_ > 65535;
+        else
+            largeIndices = mesh->mNumVertices > 65535;
+
+        // Create new buffers if necessary
+        if (!combineBuffers || vbVector.Empty())
+        {
+            vb = new VertexBuffer(context_);
+            ib = new IndexBuffer(context_);
+
+            if (combineBuffers)
+            {
+                ib->SetSize(model.totalIndices_, largeIndices);
+                vb->SetSize(model.totalVertices_, elementMask);
+            }
+            else
+            {
+                ib->SetSize(validFaces * 3, largeIndices);
+                vb->SetSize(mesh->mNumVertices, elementMask);
+            }
+
+            vbVector.Push(vb);
+            ibVector.Push(ib);
+            startVertexOffset = 0;
+            startIndexOffset = 0;
+        }
+
+        // Get the world transform of the mesh for baking into the vertices
+        Matrix3x4 vertexTransform;
+        Matrix3 normalTransform;
+        Vector3 pos, scale;
+        Quaternion rot;
+        GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
+        vertexTransform = Matrix3x4(pos, rot, scale);
+        normalTransform = rot.RotationMatrix();
+
+        SharedPtr<Geometry> geom(new Geometry(context_));
+
+        PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+            String(validFaces * 3) + " indices");
+
+        unsigned char* vertexData = vb->GetShadowData();
+        unsigned char* indexData = ib->GetShadowData();
+
+        // Build the index data
+        if (!largeIndices)
+        {
+            unsigned short* dest = (unsigned short*)indexData + startIndexOffset;
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                WriteShortIndices(dest, mesh, j, startVertexOffset);
+        }
+        else
+        {
+            unsigned* dest = (unsigned*)indexData + startIndexOffset;
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                WriteLargeIndices(dest, mesh, j, startVertexOffset);
+        }
+
+        // Build the vertex data
+        // If there are bones, get blend data
+        Vector<PODVector<unsigned char> > blendIndices;
+        Vector<PODVector<float> > blendWeights;
+        PODVector<unsigned> boneMappings;
+        if (model.bones_.Size())
+            GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights, maxBones_);
+
+        float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
+        for (unsigned j = 0; j < mesh->mNumVertices; ++j)
+            WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
+
+        // Calculate the geometry center
+        Vector3 center = Vector3::ZERO;
+        if (validFaces)
+        {
+            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+            {
+                if (mesh->mFaces[j].mNumIndices == 3)
+                {
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[0]]);
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[1]]);
+                    center += vertexTransform * ToVector3(mesh->mVertices[mesh->mFaces[j].mIndices[2]]);
+                }
+            }
+
+            center /= (float)validFaces * 3;
+        }
+
+        // Define the geometry
+        geom->SetIndexBuffer(ib);
+        geom->SetVertexBuffer(0, vb);
+        geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, validFaces * 3, true);
+        outModel->SetNumGeometryLodLevels(destGeomIndex, 1);
+        outModel->SetGeometry(destGeomIndex, 0, geom);
+        outModel->SetGeometryCenter(destGeomIndex, center);
+        if (model.bones_.Size() > maxBones_)
+            allBoneMappings.Push(boneMappings);
+
+        startVertexOffset += mesh->mNumVertices;
+        startIndexOffset += validFaces * 3;
+        ++destGeomIndex;
+    }
+
+    // Define the model buffers and bounding box
+    PODVector<unsigned> emptyMorphRange;
+    outModel->SetVertexBuffers(vbVector, emptyMorphRange, emptyMorphRange);
+    outModel->SetIndexBuffers(ibVector);
+    outModel->SetBoundingBox(box);
+
+    // Build skeleton if necessary
+    if (model.bones_.Size() && model.rootBone_)
+    {
+        PrintLine("Writing skeleton with " + String(model.bones_.Size()) + " bones, rootbone " +
+            FromAIString(model.rootBone_->mName));
+
+        Skeleton skeleton;
+        Vector<Bone>& bones = skeleton.GetModifiableBones();
+
+        for (unsigned i = 0; i < model.bones_.Size(); ++i)
+        {
+            aiNode* boneNode = model.bones_[i];
+            String boneName(FromAIString(boneNode->mName));
+
+            Bone newBone;
+            newBone.name_ = boneName;
+
+            aiMatrix4x4 transform = boneNode->mTransformation;
+            // Make the root bone transform relative to the model's root node, if it is not already
+            if (boneNode == model.rootBone_)
+                transform = GetDerivedTransform(boneNode, model.rootNode_);
+
+            GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
+
+            // Get offset information if exists
+            newBone.offsetMatrix_ = GetOffsetMatrix(model, boneName);
+            newBone.radius_ = model.boneRadii_[i];
+            newBone.boundingBox_ = model.boneHitboxes_[i];
+            newBone.collisionMask_ = BONECOLLISION_SPHERE | BONECOLLISION_BOX;
+            newBone.parentIndex_ = i;
+            bones.Push(newBone);
+        }
+        // Set the bone hierarchy
+        for (unsigned i = 1; i < model.bones_.Size(); ++i)
+        {
+            String parentName = FromAIString(model.bones_[i]->mParent->mName);
+            for (unsigned j = 0; j < bones.Size(); ++j)
+            {
+                if (bones[j].name_ == parentName)
+                {
+                    bones[i].parentIndex_ = j;
+                    break;
+                }
+            }
+        }
+
+        outModel->SetSkeleton(skeleton);
+        if (model.bones_.Size() > maxBones_)
+            outModel->SetGeometryBoneMappings(allBoneMappings);
+    }
+
+    File outFile(context_);
+    if (!outFile.Open(model.outName_, FILE_WRITE))
+        ErrorExit("Could not open output file " + model.outName_);
+    outModel->Save(outFile);
+
+    // If exporting materials, also save material list for use by the editor
+    if (!noMaterials_ && saveMaterialList_)
+    {
+        String materialListName = ReplaceExtension(model.outName_, ".txt");
+        File listFile(context_);
+        if (listFile.Open(materialListName, FILE_WRITE))
+        {
+            for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+                listFile.WriteLine(GetMeshMaterialName(model.meshes_[i]));
+        }
+        else
+            PrintLine("Warning: could not write material list file " + materialListName);
+    }
 }
 
 String OpenAssetImporter::GetMeshMaterialName(aiMesh* mesh)
