@@ -33,13 +33,15 @@ class MainFrame extends ScriptWidget {
         this.projectframe = new ProjectFrame(this);
         this.resourceframe = new ResourceFrame(this);
 
-        this.showInspectorFrame(false);
+        this.showInspectorFrame(true);
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
     }
 
     showInspectorFrame(show: boolean) {
+
+        return;
 
         if (show) {
 

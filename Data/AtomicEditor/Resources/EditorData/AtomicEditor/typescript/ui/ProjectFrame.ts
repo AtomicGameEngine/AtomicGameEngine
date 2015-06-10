@@ -34,16 +34,11 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-
-    handleProjectLoaded(data) {
-
-        this.refresh();
-
-    }
-
     handleWidgetEvent(data): boolean {
 
         if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
+
+            var db = ToolCore.getAssetDatabase();
 
             var fs = Atomic.getFileSystem();
 
@@ -57,29 +52,32 @@ class ProjectFrame extends ScriptWidget {
 
                     var selectedId = list.selectedItemID;
 
-                    if (fs.dirExists(selectedId)) {
-                        this.selectCurrentContentFolder(selectedId);
+                    // selectedId == 0 = root "Resources"
+
+                    if (selectedId != "0") {
+
+                        var asset = db.getAssetByGUID(selectedId);
+                        if (asset.isFolder)
+                            this.refreshContent(asset);
                     }
 
                     return true;
 
                 }
 
-                if (id == "..") {
-                    var parentPath = Atomic.getParentPath(this.currentContentFolder);
-                    this.selectCurrentContentFolder(parentPath);
-                    return true;
+                var asset = db.getAssetByGUID(id);
+                if (asset) {
+
+                  if (asset.isFolder()) {
+
+                    this.folderList.selectItemByID(id);
+                    this.refreshContent(asset);
+
+                  }
+
                 }
 
-                if (fs.dirExists(id)) {
-                    this.selectCurrentContentFolder(id);
-                    return true;
-                }
 
-                if (fs.fileExists(id)) {
-                    this.sendEvent("EditResource", { "path": id });
-                    return true;
-                }
 
             }
 
@@ -90,83 +88,56 @@ class ProjectFrame extends ScriptWidget {
     }
 
 
-    refresh() {
+    handleProjectLoaded(data) {
 
-        var cfolder = this.currentContentFolder;
-        this.currentContentFolder = "";
-        this.refreshFolders();
+        this.refresh();
 
     }
 
-    private refreshContent(fullpath: string) {
+    private refreshContent(folder:ToolCore.Asset) {
 
-        var system = ToolCore.getToolSystem();
-        var project = system.project;
-
-        this.currentContentFolder = fullpath;
-
-        var folders = new Array<string>();
-        var content = new Array<string>();
-
-        this.scanContentDirForContent(folders, content, fullpath);
+        var db = ToolCore.getAssetDatabase();
 
         var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
-
         container.deleteAllChildren();
 
-        if (fullpath != project.resourcePath) {
+        var assets = db.getFolderAssets(folder.path);
 
-            var lp = new Atomic.UILayoutParams();
-            lp.height = 20;
+        for (var i in assets) {
 
-            var fd = new Atomic.UIFontDescription();
-            fd.id = "Vera";
-            fd.size = 11;
+            var asset = assets[i];
 
-            var button = new Atomic.UIButton();
-            button.gravity = UI.GRAVITY_LEFT;
-            button.text = "..                     ";
-            button.id = "..";
-            button.skinBg = "TBButton.flat";
-            button.layoutParams = lp;
-            button.fontDescription = fd;
-
-            container.addChild(button);
-
+            container.addChild(this.createButtonLayout(asset));
         }
-
-        for (var folder of folders) {
-
-            var contentID = Atomic.addTrailingSlash(fullpath + folder);
-            container.addChild(this.createButtonLayout(contentID, folder));
-        }
-
-        for (var c of content) {
-
-            var contentID = Atomic.addTrailingSlash(fullpath) + c;
-            container.addChild(this.createButtonLayout(contentID, c));
-        }
-
 
     }
 
-    private recursiveAddFolder(parentItemID: number, fullpath: string, folderName: string) {
+    private recursiveAddFolder(parentItemID: number, folder: string) {
+
+        var db = ToolCore.getAssetDatabase();
 
         var folderList = this.folderList;
 
-        var childItemID = folderList.addChildItem(parentItemID, folderName, "Folder.icon", fullpath);
+        var assets = db.getFolderAssets(folder);
 
-        var dirs = new Array<string>();
+        for (var i in assets) {
 
-        this.scanDirForFolders(dirs, fullpath);
+            var asset = assets[i];
 
-        for (var folder of dirs) {
-            this.recursiveAddFolder(childItemID, fullpath + folder + "/", folder);
+            if (asset.isFolder()) {
+
+                var childItemID = folderList.addChildItem(parentItemID, asset.name, "Folder.icon", asset.guid);
+
+                this.recursiveAddFolder(childItemID, asset.path);
+
+            }
+
         }
 
     }
 
-    private refreshFolders() {
+
+    refresh() {
 
         var system = ToolCore.getToolSystem();
         var project = system.project;
@@ -175,97 +146,33 @@ class ProjectFrame extends ScriptWidget {
 
         folderList.deleteAllItems();
 
-        var resourcesID = folderList.addRootItem("Resources", "Folder.icon", project.resourcePath);
+        var resourcesID = folderList.addRootItem("Resources", "Folder.icon", "0");
 
-        var dirs = new Array<string>();
-
-        this.scanDirForFolders(dirs, project.resourcePath);
-
-        for (var folder of dirs) {
-            this.recursiveAddFolder(resourcesID, project.resourcePath + folder + "/", folder);
-        }
+        this.recursiveAddFolder(resourcesID, project.resourcePath);
 
         folderList.setExpanded(resourcesID, true);
-        this.refreshContent(project.resourcePath);
+        // this.refreshContent(project.resourcePath);
         folderList.rootList.value = 0;
 
 
     }
 
-    private selectCurrentContentFolder(folder: string) {
-
-        this.folderList.selectItemByID(folder);
-        if (this.currentContentFolder != folder)
-            this.refreshContent(folder);
-    }
-
-    private endsWith(str: string, suffix: string): boolean {
-        return str && str.indexOf(suffix, str.length - suffix.length) !== -1;
-    }
-
-    private scanDirForFolders(dirs: Array<string>, fullpath: string) {
-
-        var fileSystem = Atomic.getFileSystem();
-
-        dirs.length = 0;
-
-        var folders = fileSystem.scanDir(fullpath, "", Atomic.SCAN_DIRS, false);
-
-        for (var folder of folders) {
-
-            if (folder == "." || folder == ".." || this.endsWith(folder, "/..") || this.endsWith(folder, "/."))
-                continue;
-
-            dirs.push(folder);
-
-        }
-
-    }
-
-
-    private scanContentDirForContent(folders: Array<string>, content: Array<string>, fullPath: string) {
-
-        var fileSystem = Atomic.getFileSystem();
-
-        folders.length = content.length = 0;
-
-        var _folders = fileSystem.scanDir(fullPath, "", Atomic.SCAN_DIRS, false);
-
-        for (var folder of _folders) {
-
-            if (folder == "." || folder == ".." || this.endsWith(folder, "/..") || this.endsWith(folder, "/."))
-                continue;
-
-            folders.push(folder);
-
-        }
-
-        var _content = fileSystem.scanDir(fullPath, "", Atomic.SCAN_FILES, false);
-
-        for (var c of _content) {
-
-            content.push(c);
-
-        }
-
-    }
-
-    private createButtonLayout(fullpath: string, text: string): Atomic.UILayout {
+    private createButtonLayout(asset:ToolCore.Asset): Atomic.UILayout {
 
         var system = ToolCore.getToolSystem();
         var project = system.project;
         var fs = Atomic.getFileSystem();
 
-        var pathinfo = Atomic.splitPath(fullpath);
+        var pathinfo = Atomic.splitPath(asset.path);
 
         var bitmapID = "Folder.icon";
 
-        if (fs.fileExists(fullpath)) {
+        if (fs.fileExists(asset.path)) {
             bitmapID = "FileBitmap";
         }
 
         if (pathinfo.ext == ".js") {
-            if (project.isComponentsDirOrFile(fullpath)) {
+            if (project.isComponentsDirOrFile(asset.path)) {
                 bitmapID = "ComponentBitmap";
             }
             else {
@@ -297,19 +204,15 @@ class ProjectFrame extends ScriptWidget {
         image.gravity = UI.GRAVITY_RIGHT;
         blayout.addChild(image);
 
-        button.id = fullpath;
+        button.id = asset.guid;
         button.layoutParams = lp;
         button.fontDescription = fd;
-        button.text = text;
+        button.text = asset.name;
         button.skinBg = "TBButton.flat";
         blayout.addChild(button);
 
         return blayout;
     }
-
-
-    private currentContentFolder: string;
-
 
 }
 

@@ -19,6 +19,7 @@
         "./ui/MainFrame.ts",
         "./ui/MainFrameMenu.ts",
         "./ui/ProjectFrame.ts",
+        "./ui/ProjectFrameOld.ts",
         "./ui/ResourceFrame.ts",
         "./ui/ScriptWidget.ts",
         "./ui/UIEvents.ts",

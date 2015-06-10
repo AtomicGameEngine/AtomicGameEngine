@@ -84,8 +84,8 @@ void JSBModuleWriter::WriteClassDeclaration(String& source)
                     source.Append("duk_put_prop_string(ctx, -2, \"set\");\n");
                 }
 
-                pnames[j][0] = tolower(pnames[j][0]);
-                source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n", pnames[j].CString());
+                String propertyName = prop->GetCasePropertyName();
+                source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n", propertyName.CString());
 
             }
 

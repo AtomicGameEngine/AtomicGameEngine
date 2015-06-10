@@ -1,6 +1,6 @@
-/// <reference path="/Users/josh/Dev/thunderbeast/AtomicGameEngine/Bin/Atomic.d.ts" />
-/// <reference path="/Users/josh/Dev/thunderbeast/AtomicGameEngine/Bin/ToolCore.d.ts" />
-/// <reference path="/Users/josh/Dev/thunderbeast/AtomicGameEngine/Bin/Editor.d.ts" />
+/// <reference path="/Users/josh/Dev/atomic/AtomicGameEngine/Bin/Atomic.d.ts" />
+/// <reference path="/Users/josh/Dev/atomic/AtomicGameEngine/Bin/ToolCore.d.ts" />
+/// <reference path="/Users/josh/Dev/atomic/AtomicGameEngine/Bin/Editor.d.ts" />
 
 declare module Atomic {
 
@@ -9,7 +9,7 @@ declare module Atomic {
       pathName: string;
       fileName: string;
       ext: string;
-      
+
     }
 
     /*
@@ -67,4 +67,5 @@ declare module Atomic {
 declare module ToolCore {
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;
+    export function getAssetDatabase(): AssetDatabase;
 }

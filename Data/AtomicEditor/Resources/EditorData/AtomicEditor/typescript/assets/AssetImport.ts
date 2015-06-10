@@ -18,5 +18,4 @@ class AssetImport extends Atomic.ScriptObject {
 
 }
 
-
 export = AssetImport;

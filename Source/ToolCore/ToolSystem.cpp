@@ -6,9 +6,11 @@
 #include "Platform/PlatformWeb.h"
 #include "Platform/PlatformMac.h"
 #include "Platform/PlatformWindows.h"
+#include "Assets/AssetDatabase.h"
 #include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
+
 
 #include "ToolSystem.h"
 #include "ToolEnvironment.h"
@@ -22,7 +24,7 @@ namespace ToolCore
 ToolSystem::ToolSystem(Context* context) : Object(context),
     cli_(false)
 {
-
+    context_->RegisterSubsystem(new AssetDatabase(context_));
     context_->RegisterSubsystem(new CurlManager(context_));
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));

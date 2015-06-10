@@ -95,7 +95,7 @@ bool OpenAssetImporter::Load(const String &assetPath)
     if (verboseLog_)
         Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
 
-    PrintLine("Reading file " + assetPath);
+    //PrintLine("Reading file " + assetPath);
 
     scene_ = aiImportFile(GetNativePath(assetPath).CString(), aiCurrentFlags_);
 
@@ -144,7 +144,7 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
     if (!model.meshes_.Size())
         ErrorExit("No geometries found starting from node " + rootNodeName);
 
-    PrintLine("Writing model " + rootNodeName);
+    //PrintLine("Writing model " + rootNodeName);
 
     SharedPtr<Model> outModel(new Model(context_));
     Vector<PODVector<unsigned> > allBoneMappings;
@@ -210,6 +210,9 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
             vb = new VertexBuffer(context_);
             ib = new IndexBuffer(context_);
 
+            vb->SetShadowed(true);
+            ib->SetShadowed(true);
+
             if (combineBuffers)
             {
                 ib->SetSize(model.totalIndices_, largeIndices);
@@ -238,11 +241,14 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
 
         SharedPtr<Geometry> geom(new Geometry(context_));
 
-        PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
-            String(validFaces * 3) + " indices");
+        //PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+        //    String(validFaces * 3) + " indices");
 
         unsigned char* vertexData = vb->GetShadowData();
         unsigned char* indexData = ib->GetShadowData();
+
+        assert(vertexData);
+        assert(indexData);
 
         // Build the index data
         if (!largeIndices)
@@ -311,8 +317,8 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
     // Build skeleton if necessary
     if (model.bones_.Size() && model.rootBone_)
     {
-        PrintLine("Writing skeleton with " + String(model.bones_.Size()) + " bones, rootbone " +
-            FromAIString(model.rootBone_->mName));
+        //PrintLine("Writing skeleton with " + String(model.bones_.Size()) + " bones, rootbone " +
+        //    FromAIString(model.rootBone_->mName));
 
         Skeleton skeleton;
         Vector<Bone>& bones = skeleton.GetModifiableBones();
@@ -375,7 +381,9 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
                 listFile.WriteLine(GetMeshMaterialName(model.meshes_[i]));
         }
         else
+        {
             PrintLine("Warning: could not write material list file " + materialListName);
+        }
     }
 }
 
@@ -457,7 +465,7 @@ void OpenAssetImporter::CollectSceneModels(OutScene& scene, aiNode* node)
             {
                 if (scene.models_[i].meshIndices_ == model.meshIndices_)
                 {
-                    PrintLine("Added node " + FromAIString(node->mName));
+                    //PrintLine("Added node " + FromAIString(node->mName));
                     scene.nodes_.Push(node);
                     scene.nodeModelIndices_.Push(i);
                     unique = false;
@@ -467,8 +475,8 @@ void OpenAssetImporter::CollectSceneModels(OutScene& scene, aiNode* node)
         }
         if (unique)
         {
-            PrintLine("Added model " + model.outName_);
-            PrintLine("Added node " + FromAIString(node->mName));
+//            PrintLine("Added model " + model.outName_);
+//            PrintLine("Added node " + FromAIString(node->mName));
             CollectBones(model);
             BuildBoneCollisionInfo(model);
             if (!noAnimations_)
@@ -586,7 +594,9 @@ void OpenAssetImporter::CollectBonesFinal(PODVector<aiNode*>& dest, const HashSe
         }
 
         if (includeBone)
-            PrintLine("Including non-skinning bone " + boneName);
+        {
+            //PrintLine("Including non-skinning bone " + boneName);
+        }
     }
 
     if (includeBone)
@@ -708,7 +718,7 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
         outAnim->SetAnimationName(animName);
         outAnim->SetLength(duration * tickConversion);
 
-        PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
+        //PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {

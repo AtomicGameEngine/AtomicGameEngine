@@ -1,8 +1,16 @@
 {
 	"name" : "ToolCore",
 	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
-							 "Source/ToolCore/Import"],
+							 "Source/ToolCore/Import", "Source/ToolCore/Assets"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
-							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter"]
+							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter",
+							 "Asset", "AssetDatabase"],
+	"typescript_decl" : {
+
+		"AssetDatabase" : [
+			"getFolderAssets(folder:string):ToolCore.Asset[];"
+		]
+	}
+
 
 }
