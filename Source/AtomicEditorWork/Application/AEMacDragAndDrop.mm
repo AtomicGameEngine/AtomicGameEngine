@@ -3,7 +3,7 @@
 
 #include <ThirdParty/SDL/include/SDL.h>
 #include <ThirdParty/SDL/include/SDL_syswm.h>
-
+#include <Atomic/Input/InputEvents.h>
 #include <Atomic/Graphics/Graphics.h>
 
 #include "AEDragAndDrop.h"
@@ -24,12 +24,50 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
 
 -(NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    dragAndDrop_->BeginDrag();
+    dragAndDrop_->GetSubsystem<Graphics>()->RaiseWindow();
+
+    NSPasteboard *pboard = [sender draggingPasteboard];
+    NSString *type = [pboard availableTypeFromArray:[NSArray arrayWithObject:NSFilenamesPboardType]];
+    if (type)
+    {
+        if ([type isEqualToString:NSFilenamesPboardType])
+        {
+            NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
+            int i = (int) [filenames count];
+
+            if (i)
+                dragAndDrop_->BeginDrag();
+
+            while (i-- > 0)
+            {
+                NSString *filename = [filenames objectAtIndex:i];
+                dragAndDrop_->AddDragFilename([filename UTF8String]);
+            }
+
+        }
+    }
+
     return NSDragOperationGeneric;
 }
 
--(NSDragOperation)draggingUpdated:(id)sender
+-(NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
+    using namespace Atomic::MouseMove;
+
+    Graphics* graphics = dragAndDrop_->GetSubsystem<Graphics>();
+
+    NSPoint dragPoint = [sender draggingLocation];
+
+    VariantMap eventData;
+    eventData[P_X] = (int) dragPoint.x;
+    eventData[P_Y] = graphics->GetHeight() - (int) dragPoint.y;
+    eventData[P_DX] = 0;
+    eventData[P_DY] = 0;
+    eventData[P_BUTTONS] = 0;
+    eventData[P_QUALIFIERS] = 0;
+
+    dragAndDrop_->SendEvent(E_MOUSEMOVE, eventData);
+
     return NSDragOperationGeneric;
 }
 
@@ -45,26 +83,7 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
 
 -(void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-    NSPasteboard *pboard = [sender draggingPasteboard];
-    NSString *type = [pboard availableTypeFromArray:[NSArray arrayWithObject:NSFilenamesPboardType]];
-    if (type)
-    {
-        if ([type isEqualToString:NSFilenamesPboardType])
-        {
-            NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
-            unsigned i = [filenames count];
-            NSMutableArray *goodFiles = [NSMutableArray array];
-            NSFileManager *fm = [NSFileManager defaultManager];
-            BOOL isDir;
-            while (i-- > 0)
-            {
-                NSString *filename = [filenames objectAtIndex:i];
-                dragAndDrop_->AddDragFilename([filename UTF8String]);
-            }
-
-            dragAndDrop_->ConcludeDrag();
-        }
-    }
+    dragAndDrop_->ConcludeDrag();
 }
 
 @end
