@@ -1,12 +1,14 @@
 
 import MainFrame = require("../ui/MainFrame");
 import UIEvents = require("../ui/UIEvents");
+import AssetImport = require("../assets/AssetImport");
 
 class Editor extends Atomic.ScriptObject {
 
     project: ToolCore.Project;
     view: Atomic.UIView;
     mainframe: MainFrame;
+    assetImport: AssetImport;
 
     static instance: Editor;
 
@@ -52,6 +54,8 @@ class Editor extends Atomic.ScriptObject {
         super();
 
         Editor.instance = this;
+
+        this.assetImport = new AssetImport();
 
         var graphics = Atomic.getGraphics();
 

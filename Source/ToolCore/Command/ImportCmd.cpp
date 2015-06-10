@@ -67,7 +67,6 @@ void ImportCmd::Run()
             return;
         }
 
-
         LOGRAWF("Importing JSON: %s", assetFilename_.CString());
 
         SharedPtr<JSONSceneImporter> jimporter;
@@ -82,9 +81,10 @@ void ImportCmd::Run()
     else
     {
         SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
-
-        importer->SetVerboseLog(true);
-        importer->Load(assetFilename_);
+        if (importer->Load(assetFilename_))
+        {
+            importer->ExportModel("/Users/josh/Desktop/ExportedModel.mdl");
+        }
 
     }
 

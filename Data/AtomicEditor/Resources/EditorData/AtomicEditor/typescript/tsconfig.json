@@ -12,6 +12,7 @@
     ],
     "files": [
         "./AtomicWork.d.ts",
+        "./assets/AssetImport.ts",
         "./editor/Editor.ts",
         "./main.ts",
         "./ui/EditorStrings.ts",

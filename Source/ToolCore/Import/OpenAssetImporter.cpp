@@ -84,6 +84,12 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
 
 }
 
+OpenAssetImporter::~OpenAssetImporter()
+{
+    if (scene_)
+        aiReleaseImport(scene_);
+}
+
 bool OpenAssetImporter::Load(const String &assetPath)
 {
     if (verboseLog_)
@@ -101,7 +107,7 @@ bool OpenAssetImporter::Load(const String &assetPath)
 
     rootNode_ = scene_->mRootNode;
 
-    DumpNodes(rootNode_, 0);
+    // DumpNodes(rootNode_, 0);
 
     return true;
 

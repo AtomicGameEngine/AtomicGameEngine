@@ -7,6 +7,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Graphics/Graphics.h>
 
 #include <Atomic/UI/UI.h>
 
@@ -15,6 +16,7 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 
+#include "AEDragAndDrop.h"
 #include "AEEditorApp.h"
 
 // Move me
@@ -40,6 +42,8 @@ AEEditorApp::AEEditorApp(Context* context) :
 
 void AEEditorApp::Start()
 {
+    context_->RegisterSubsystem(new AEDragAndDrop(context_));
+
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -89,7 +93,6 @@ void AEEditorApp::Setup()
 
     ToolSystem* system = new ToolSystem(context_);
     context_->RegisterSubsystem(system);
-
 
 #ifdef ATOMIC_DEV_BUILD
 

@@ -1,7 +1,8 @@
 {
 	"name" : "ToolCore",
-	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command"],
+	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
+							 "Source/ToolCore/Import"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
-							 "PlatformWindows",
-							"Command", "PlayCmd"]
+							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter"]
+
 }

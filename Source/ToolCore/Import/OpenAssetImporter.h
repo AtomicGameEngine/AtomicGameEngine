@@ -42,7 +42,7 @@ class OpenAssetImporter : public Object
 public:
 
     OpenAssetImporter(Context* context);
-    virtual ~OpenAssetImporter() {}
+    virtual ~OpenAssetImporter();
 
     bool Load(const String& assetPath);
 
