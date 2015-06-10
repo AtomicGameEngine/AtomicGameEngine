@@ -71,6 +71,9 @@ public:
     void Invalidate();
     void Die();
 
+    void SetDragObject(Object* object) { dragObject_ = object; }
+    Object* GetDragObject() { return dragObject_; }
+
     UIWidget* GetFirstChild();
     UIWidget* GetNext();
 
@@ -96,6 +99,8 @@ protected:
     String id_;
 
     tb::TBWidget* widget_;
+
+    SharedPtr<Object> dragObject_;
 
 };
 

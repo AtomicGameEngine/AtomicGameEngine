@@ -193,6 +193,8 @@ class ProjectFrame extends ScriptWidget {
 
         var button = new Atomic.UIButton();
 
+        button.dragObject = asset;
+
         var lp = new Atomic.UILayoutParams;
         lp.height = 20;
 

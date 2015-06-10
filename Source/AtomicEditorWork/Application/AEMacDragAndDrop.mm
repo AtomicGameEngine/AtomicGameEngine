@@ -3,6 +3,8 @@
 
 #include <ThirdParty/SDL/include/SDL.h>
 #include <ThirdParty/SDL/include/SDL_syswm.h>
+
+#include <Atomic/IO/Log.h>
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Graphics/Graphics.h>
 
@@ -17,7 +19,6 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
     -(BOOL)prepareForDragOperation:(id)sender;
     -(BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
     -(void)concludeDragOperation:(id <NSDraggingInfo>)sender;
-
 @end
 
 @implementation NSWindow (NSWindowWithDragAndDrop)

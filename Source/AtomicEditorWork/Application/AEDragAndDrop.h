@@ -29,6 +29,12 @@ public:
 
 private:
 
+    void HandleMouseDown(StringHash eventType, VariantMap& eventData);
+    void HandleMouseUp(StringHash eventType, VariantMap& eventData);
+    void HandleMouseMove(StringHash eventType, VariantMap& eventData);
+
+    SharedPtr<Object> dragObject_;
+
     Vector<String> dragFilenames_;
 
 };
