@@ -26,7 +26,7 @@ public:
     const String& GetName() { return name_; }
 
     const String& GetPath() const { return path_; }
-    void SetPath(const String& path);
+    bool SetPath(const String& path);
 
     void SetDirty(bool dirty) { dirty_ = dirty; }
     bool IsDirty() const { return dirty_; }

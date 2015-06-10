@@ -3,6 +3,7 @@
 
 #include "ModelImporter.h"
 #include "FolderImporter.h"
+#include "SceneImporter.h"
 #include "Asset.h"
 
 namespace ToolCore
@@ -30,7 +31,7 @@ bool Asset::Import()
     return importer_->Import(guid_);
 }
 
-void Asset::SetPath(const String& path)
+bool Asset::SetPath(const String& path)
 {
     FileSystem* fs = GetSubsystem<FileSystem>();
 
@@ -54,7 +55,16 @@ void Asset::SetPath(const String& path)
                 name_ = GetFileName(path);
                 importer_ = new ModelImporter(context_);
             }
+            else if (ext == ".scene")
+            {
+                name_ = GetFileName(path);
+                importer_ = new SceneImporter(context_);
+            }
+
         }
+
+        if (importer_.Null())
+            return false;
 
         String assetPath = path + ".asset";
 

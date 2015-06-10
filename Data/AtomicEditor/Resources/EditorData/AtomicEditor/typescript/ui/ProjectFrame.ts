@@ -66,6 +66,7 @@ class ProjectFrame extends ScriptWidget {
                 }
 
                 var asset = db.getAssetByGUID(id);
+
                 if (asset) {
 
                   if (asset.isFolder()) {
@@ -73,11 +74,13 @@ class ProjectFrame extends ScriptWidget {
                     this.folderList.selectItemByID(id);
                     this.refreshContent(asset);
 
+                  } else {
+
+                    this.sendEvent("EditResource", { "path": asset.path });
+
                   }
 
                 }
-
-
 
             }
 
