@@ -24,8 +24,6 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
 
 -(NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    dragAndDrop_->GetSubsystem<Graphics>()->RaiseWindow();
-
     NSPasteboard *pboard = [sender draggingPasteboard];
     NSString *type = [pboard availableTypeFromArray:[NSArray arrayWithObject:NSFilenamesPboardType]];
     if (type)
