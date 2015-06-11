@@ -376,7 +376,7 @@ public:
     const Vector<SharedPtr<Node> >& GetChildren() const { return children_; }
     /// Return child scene nodes, optionally recursive.
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
-	/// Return child scene nodes with a specific component.
+    /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
     /// Return child scene nodes by name, optionally recursive
     void GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive = false) const;
@@ -495,7 +495,7 @@ private:
     void RemoveChild(Vector<SharedPtr<Node> >::Iterator i);
     /// Return child nodes recursively.
     void GetChildrenRecursive(PODVector<Node*>& dest) const;
-	/// Return child nodes with a specific component recursively.
+    /// Return child nodes with a specific component recursively.
     void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash type) const;
     /// Return child nodes by name, recursively
     void GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const;
