@@ -27,6 +27,8 @@ public:
     void AddDragFilename(const String& filename);
     void ConcludeDrag();
 
+    Object* GetDragObject() { return dragObject_; }
+
 private:
 
     void HandleMouseDown(StringHash eventType, VariantMap& eventData);

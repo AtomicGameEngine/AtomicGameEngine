@@ -53,7 +53,7 @@ void AEDragAndDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
                 LOGINFOF("Drag Asset: %s", asset->GetPath().CString());
 
                 #ifdef ATOMIC_PLATFORM_OSX
-                // START DRAG
+                StartDragAndDrop();
                 #endif
 
             }

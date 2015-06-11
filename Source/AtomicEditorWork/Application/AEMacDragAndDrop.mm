@@ -8,6 +8,8 @@
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Graphics/Graphics.h>
 
+#include <ToolCore/Assets/Asset.h>
+
 #include "AEDragAndDrop.h"
 
 static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
@@ -46,7 +48,7 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
         }
     }
 
-    return NSDragOperationGeneric;
+    return NSDragOperationCopy;
 }
 
 -(NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
@@ -67,7 +69,7 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
 
     dragAndDrop_->SendEvent(E_MOUSEMOVE, eventData);
 
-    return NSDragOperationGeneric;
+    return NSDragOperationCopy;
 }
 
 -(BOOL)prepareForDragOperation:(id)sender
@@ -90,18 +92,67 @@ static WeakPtr<AtomicEditor::AEDragAndDrop> dragAndDrop_;
 namespace AtomicEditor
 {
 
-void InitDragAndDrop(AEDragAndDrop *dragAndDrop)
+static NSWindow* GetNSWindow()
 {
-    dragAndDrop_ = dragAndDrop;
-
-    SDL_Window* window = (SDL_Window*) dragAndDrop->GetSubsystem<Graphics>()->GetSDLWindow();
+    SDL_Window* window = (SDL_Window*) dragAndDrop_->GetSubsystem<Graphics>()->GetSDLWindow();
 
     SDL_SysWMinfo info;
     SDL_VERSION(&info.version);
 
     if(SDL_GetWindowWMInfo(window, &info)) {
 
-        NSWindow* window = info.info.cocoa.window;
+        return info.info.cocoa.window;
+    }
+
+    return NULL;
+}
+
+void StartDragAndDrop()
+{
+    Object* o = dragAndDrop_->GetDragObject();
+
+    if (!o)
+        return;
+
+    ToolCore::Asset* asset = o->GetType() == ToolCore::Asset::GetTypeStatic() ? (ToolCore::Asset*) o : NULL;
+
+    if (asset)
+    {
+        NSWindow* window = GetNSWindow();
+        if (window)
+        {
+
+            NSImage *dragImage = nil;
+            NSPoint dragPosition;
+            NSString* filePath = [NSString stringWithUTF8String:asset->GetPath().CString()];
+
+            // Write data to the pasteboard
+
+            NSArray *fileList = [NSArray arrayWithObjects:filePath, nil];
+            NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+            [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType]
+                    owner:nil];
+            [pboard setPropertyList:fileList forType:NSFilenamesPboardType];
+
+            [window dragImage:dragImage
+                    at:dragPosition
+                    offset:NSZeroSize
+                    event:nil
+                    pasteboard:pboard
+                    source:window
+                    slideBack:YES];
+
+        }
+    }
+}
+
+void InitDragAndDrop(AEDragAndDrop *dragAndDrop)
+{
+    dragAndDrop_ = dragAndDrop;
+
+    NSWindow* window = GetNSWindow();
+    if (window)
+    {
         [window registerForDraggedTypes:[NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
     }
 
