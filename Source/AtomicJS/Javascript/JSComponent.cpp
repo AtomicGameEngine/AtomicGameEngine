@@ -422,7 +422,7 @@ void JSComponent::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
         duk_context* ctx = vm_->GetJSContext();
         JS_HEAP_PTR function = scriptEventFunctions_[eventType];
 
-        if (eventType == E_PHYSICSBEGINCONTACT2D || E_PHYSICSENDCONTACT2D)
+        if ((eventType == E_PHYSICSBEGINCONTACT2D) || (eventType == E_PHYSICSENDCONTACT2D))
         {
             using namespace PhysicsBeginContact2D;
             PhysicsWorld2D* world = static_cast<PhysicsWorld2D*>(eventData[P_WORLD].GetPtr());
