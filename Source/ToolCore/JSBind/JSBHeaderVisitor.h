@@ -61,7 +61,7 @@ public:
             IntegerType* itype = type->asIntegerType();
             jtype = new JSBPrimitiveType(itype->kind());
         }
-        if (type->isFloatType())
+        else if (type->isFloatType())
         {
             jtype = new JSBPrimitiveType(JSBPrimitiveType::Float);
         }
@@ -73,7 +73,20 @@ public:
             if (classname.StartsWith("Atomic::"))
                 classname.Replace("Atomic::", "");
 
-            if (classname == "String")
+            if (classname == "Vector")
+            {
+                if (ntype->name()->asTemplateNameId())
+                {
+                    const TemplateNameId* tnid = ntype->name()->asTemplateNameId();
+                    FullySpecifiedType pfst = tnid->templateArgumentAt(0);
+                    JSBType* vtype = processTypeConversion(pfst.type());
+                    if (vtype)
+                    {
+                        jtype = new JSBVectorType(vtype);
+                    }
+                }
+            }
+            else if (classname == "String")
             {
                 jtype = new JSBStringType();
             }
@@ -171,6 +184,10 @@ public:
         if (!jtype)
             return NULL;
 
+        // read only vectors atm
+        if (!isConst && jtype->asVectorType())
+            return NULL;
+
         bool skip = false;
 
         // no pointers to prim atm
@@ -192,6 +209,7 @@ public:
         ftype->isSharedPtr_ = isSharedPtr;
         ftype->isReference_ = isReference;
         ftype->isTemplate_ = isTemplate;
+        ftype->isConst_ = isConst;
 
         return ftype;
 

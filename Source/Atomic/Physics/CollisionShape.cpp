@@ -59,6 +59,7 @@ namespace Atomic
 {
 
 static const float DEFAULT_COLLISION_MARGIN = 0.04f;
+static const unsigned QUANTIZE_MAX_TRIANGLES = 1000000;
 
 static const btVector3 WHITE(1.0f, 1.0f, 1.0f);
 static const btVector3 GREEN(0.0f, 1.0f, 0.0f);
@@ -85,6 +86,7 @@ public:
     TriangleMeshInterface(Model* model, unsigned lodLevel) : btTriangleIndexVertexArray()
     {
         unsigned numGeometries = model->GetNumGeometries();
+        unsigned totalTriangles = 0;
 
         for (unsigned i = 0; i < numGeometries; ++i)
         {
@@ -125,13 +127,20 @@ public:
             meshIndex.m_indexType = (indexSize == sizeof(unsigned short)) ? PHY_SHORT : PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
             m_indexedMeshes.push_back(meshIndex);
+            
+            totalTriangles += meshIndex.m_numTriangles;
         }
+
+        // Bullet will not work properly with quantized AABB compression, if the triangle count is too large. Use a conservative
+        // threshold value
+        useQuantize_ = totalTriangles <= QUANTIZE_MAX_TRIANGLES;
     }
 
     TriangleMeshInterface(CustomGeometry* custom) : btTriangleIndexVertexArray()
     {
         const Vector<PODVector<CustomGeometryVertex> >& srcVertices = custom->GetVertices();
         unsigned totalVertexCount = 0;
+        unsigned totalTriangles = 0;
 
         for (unsigned i = 0; i < srcVertices.Size(); ++i)
             totalVertexCount += srcVertices[i].Size();
@@ -167,8 +176,15 @@ public:
             meshIndex.m_indexType = PHY_INTEGER;
             meshIndex.m_vertexType = PHY_FLOAT;
             m_indexedMeshes.push_back(meshIndex);
+
+            totalTriangles += meshIndex.m_numTriangles;
         }
+
+        useQuantize_ = totalTriangles <= QUANTIZE_MAX_TRIANGLES;
     }
+
+    /// OK to use quantization flag.
+    bool useQuantize_;
 
 private:
     /// Shared vertex/index data used in the collision
@@ -181,7 +197,7 @@ TriangleMeshData::TriangleMeshData(Model* model, unsigned lodLevel) :
     infoMap_(0)
 {
     meshInterface_ = new TriangleMeshInterface(model, lodLevel);
-    shape_ = new btBvhTriangleMeshShape(meshInterface_, true, true);
+    shape_ = new btBvhTriangleMeshShape(meshInterface_, meshInterface_->useQuantize_, true);
 
     infoMap_ = new btTriangleInfoMap();
     btGenerateInternalEdgeInfo(shape_, infoMap_);
@@ -193,7 +209,7 @@ TriangleMeshData::TriangleMeshData(CustomGeometry* custom) :
     infoMap_(0)
 {
     meshInterface_ = new TriangleMeshInterface(custom);
-    shape_ = new btBvhTriangleMeshShape(meshInterface_, true, true);
+    shape_ = new btBvhTriangleMeshShape(meshInterface_, meshInterface_->useQuantize_, true);
 
     infoMap_ = new btTriangleInfoMap();
     btGenerateInternalEdgeInfo(shape_, infoMap_);

@@ -11,6 +11,10 @@
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Engine/Engine.h>
 
+#ifdef ATOMIC_NETWORK
+#include <Atomic/Network/Network.h>
+#endif
+
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSComponent.h"
@@ -20,6 +24,10 @@
 #include "JSIO.h"
 #include "JSUIAPI.h"
 #include "JSScene.h"
+
+#ifdef ATOMIC_NETWORK
+#include "JSNetwork.h"
+#endif
 
 #include "JSAtomicGame.h"
 #include "JSAtomic.h"
@@ -144,6 +152,14 @@ static int js_atomic_GetFileSystem(duk_context* ctx)
     return 1;
 }
 
+#ifdef ATOMIC_NETWORK
+static int js_atomic_GetNetwork(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Network>());
+    return 1;
+}
+#endif
 
 static int js_atomic_script(duk_context* ctx)
 {
@@ -259,6 +275,9 @@ void jsapi_init_atomic(JSVM* vm)
     jsapi_init_core(vm);
     jsapi_init_filesystem(vm);
     jsapi_init_io(vm);
+#ifdef ATOMIC_NETWORK
+    jsapi_init_network(vm);
+#endif
     jsapi_init_graphics(vm);
     jsapi_init_ui(vm);
     jsapi_init_scene(vm);
@@ -316,6 +335,11 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetFileSystem, 0);
     duk_put_prop_string(ctx, -2, "getFileSystem");
+
+#ifdef ATOMIC_NETWORK
+    duk_push_c_function(ctx, js_atomic_GetNetwork, 0);
+    duk_put_prop_string(ctx, -2, "getNetwork");
+#endif
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");
