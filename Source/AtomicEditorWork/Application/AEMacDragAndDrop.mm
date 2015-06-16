@@ -1,4 +1,4 @@
-
+/*
 #include <stdio.h>
 
 #include <ThirdParty/SDL/include/SDL.h>
@@ -134,6 +134,7 @@ void StartDragAndDrop()
                     owner:nil];
             [pboard setPropertyList:fileList forType:NSFilenamesPboardType];
 
+            // blocks
             [window dragImage:dragImage
                     at:dragPosition
                     offset:NSZeroSize
@@ -159,4 +160,6 @@ void InitDragAndDrop(AEDragAndDrop *dragAndDrop)
 }
 
 }
+
+*/
 

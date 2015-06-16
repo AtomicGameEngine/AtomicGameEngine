@@ -44,6 +44,7 @@ using namespace tb;
 #include "UISkinImage.h"
 #include "UITabContainer.h"
 #include "UISceneView.h"
+#include "UIDragDrop.h"
 
 namespace tb
 {
@@ -125,6 +126,9 @@ void UI::Initialize(const String& languageFile)
     int height = graphics_->GetHeight();
     rootWidget_->SetSize(width, height);
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
+
+    // register the UIDragDrop subsystem
+    context_->RegisterSubsystem(new UIDragDrop(context_));
 
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));

@@ -1,3 +1,4 @@
+/*
 #pragma once
 
 namespace AtomicEditor
@@ -10,5 +11,6 @@ void InitDragAndDrop(AEDragAndDrop* dragAndDrop);
 void StartDragAndDrop();
 
 }
+*/
 
 

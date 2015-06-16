@@ -16,7 +16,6 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 
-#include "AEDragAndDrop.h"
 #include "AEEditorApp.h"
 
 // Move me
@@ -42,8 +41,6 @@ AEEditorApp::AEEditorApp(Context* context) :
 
 void AEEditorApp::Start()
 {
-    context_->RegisterSubsystem(new AEDragAndDrop(context_));
-
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 

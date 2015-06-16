@@ -1,4 +1,4 @@
-
+/*
 #pragma once
 
 #include <Atomic/Core/Object.h>
@@ -42,3 +42,4 @@ private:
 };
 
 }
+*/

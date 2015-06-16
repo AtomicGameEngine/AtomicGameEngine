@@ -1,14 +1,11 @@
 
 #pragma once
 
-#include <TurboBadger/tb_widgets.h>
+#include <ThirdParty/TurboBadger/tb_widgets.h>
+
 #include "../Core/Object.h"
 
-namespace tb
-{
-class TBWidget;
-}
-
+#include "UIPreferredSize.h"
 
 namespace Atomic
 {
@@ -30,26 +27,27 @@ public:
 
     bool Load(const String& filename);
 
-    IntRect GetRect();
-    void SetRect(IntRect r);
-
-    void SetSize(int width, int height);
-    void SetPosition(int x, int y);
-    void SetText(const String& text);
-
-    void SetSkinBg(const String& id);
-    void SetLayoutParams(UILayoutParams* params);
-    void SetFontDescription(UIFontDescription* fd);
+    const String& GetId();
 
     UIWidget* GetParent();
     UIWidget* GetContentRoot();
+    IntRect GetRect();
+
+    UIPreferredSize* GetPreferredSize();
+
+    void SetRect(IntRect r);    
+    void SetSize(int width, int height);
+    void SetPosition(int x, int y);
+    void SetText(const String& text);
+    void SetSkinBg(const String& id);
+    void SetLayoutParams(UILayoutParams* params);
+    void SetFontDescription(UIFontDescription* fd);
 
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
     void DeleteAllChildren();
 
-    // String ID
-    const String& GetId();
+    // String ID    
     virtual void SetId(const String& id);
 
     void Center();
@@ -97,8 +95,9 @@ protected:
     virtual void OnDelete();
 
     String id_;
-
     tb::TBWidget* widget_;
+
+    SharedPtr<UIPreferredSize> preferredSize_;
 
     SharedPtr<Object> dragObject_;
 

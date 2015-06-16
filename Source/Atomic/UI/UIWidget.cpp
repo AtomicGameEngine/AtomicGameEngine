@@ -15,7 +15,8 @@ namespace Atomic
 {
 
 UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
-    widget_(0)
+    widget_(0),
+    preferredSize_(new UIPreferredSize())
 {    
     AddRef();
 
@@ -53,6 +54,17 @@ bool UIWidget::Load(const String& filename)
     eventData[WidgetLoaded::P_WIDGET] = this;
     SendEvent(E_WIDGETLOADED, eventData);
     return true;
+}
+
+UIPreferredSize* UIWidget::GetPreferredSize()
+{
+    // error
+    if (!widget_)
+        return preferredSize_;
+
+    preferredSize_->SetFromTBPreferredSize(widget_->GetPreferredSize());
+
+    return preferredSize_;
 }
 
 UIWidget* UIWidget::GetWidget(const String& id)

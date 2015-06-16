@@ -1,4 +1,4 @@
-
+/*
 #include <Atomic/IO/Log.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Input/InputEvents.h>
@@ -116,3 +116,5 @@ void AEDragAndDrop::ConcludeDrag()
 }
 
 }
+
+*/
