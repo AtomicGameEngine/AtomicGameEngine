@@ -5,6 +5,8 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include <Atomic/Resource/ResourceCache.h>
+
 #include "../ToolEvents.h"
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
@@ -197,6 +199,9 @@ void AssetDatabase::GetDirtyAssets(PODVector<Asset*>& assets)
 void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventData)
 {
     project_ = GetSubsystem<ToolSystem>()->GetProject();
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    cache->AddResourceDir(GetCachePath());
 
     Scan();
 }

@@ -51,8 +51,9 @@ private:
 
     bool MouseInView();
 
+    void HandleDragEnded(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);    
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
 
     void DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode = true);

@@ -14,21 +14,29 @@
 #include <Atomic/Graphics/DebugRenderer.h>
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Octree.h>
+#include <Atomic/Graphics/Material.h>
+
 #include <Atomic/Atomic3D/Terrain.h>
+#include <Atomic/Atomic3D/Model.h>
 
 #include <Atomic/Input/Input.h>
 
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
-
 #include <Atomic/Physics/PhysicsWorld.h>
+#include <Atomic/UI/UI.h>
+#include <Atomic/UI/UIEvents.h>
+
+#include <ToolCore/Assets/Asset.h>
+#include <ToolCore/Assets/AssetDatabase.h>
 
 #include "AEEditor.h"
 #include "AEEvents.h"
 
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
-#include <Atomic/UI/UI.h>
+
+using namespace ToolCore;
 
 namespace AtomicEditor
 {
@@ -80,6 +88,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
+    SubscribeToEvent(E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
     // TODO: generate this event properly
     VariantMap eventData;
@@ -103,7 +112,7 @@ void SceneView3D::Enable()
 
     enabled_ = true;
 
-    SetVisibility(WIDGET_VISIBILITY_VISIBLE);
+    SetVisibility(UI_WIDGET_VISIBILITY_VISIBLE);
 }
 
 void SceneView3D::Disable()
@@ -113,7 +122,7 @@ void SceneView3D::Disable()
 
     enabled_ = false;
 
-    SetVisibility(WIDGET_VISIBILITY_INVISIBLE);
+    SetVisibility(UI_WIDGET_VISIBILITY_INVISIBLE);
 
 }
 
@@ -341,6 +350,50 @@ void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap&
 {
     Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
     SelectNode(node);
+}
+
+void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
+{
+    using namespace DragEnded;
+
+    UIWidget* widget = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());
+
+    if (widget != this)
+        return;
+
+    UIDragObject* dragObject = static_cast<UIDragObject*>(eventData[P_DRAGOBJECT].GetPtr());
+
+    Object* object = dragObject->GetObject();
+
+    if (object->GetType() == Asset::GetTypeStatic())
+    {
+        Asset* asset = (Asset*) object;
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+        Model* model = cache->GetResource<Model>(asset->GetGUID());
+
+        Node* node = scene_->CreateChild(asset->GetName());
+        StaticModel* mc = node->CreateComponent<StaticModel>();
+        mc->SetModel(model);
+
+        Material* material1 = cache->GetResource<Material>("Materials/AlphaMaterial.xml");
+        Material* material2 = cache->GetResource<Material>("Materials/BedMaterial.xml");
+
+        if (mc->GetNumGeometries() > 1)
+        {
+            mc->SetMaterial(0, material1);
+            mc->SetMaterial(1, material2);
+        }
+        else
+        {
+            mc->SetMaterial(0, material2);
+        }
+
+
+        LOGINFOF("Dropped %s : %s on SceneView3D", asset->GetPath().CString(), asset->GetGUID().CString());
+    }
+
 }
 
 

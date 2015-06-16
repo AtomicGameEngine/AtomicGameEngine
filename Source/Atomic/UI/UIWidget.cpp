@@ -375,7 +375,7 @@ void UIWidget::SetFocus()
     widget_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
 }
 
-void UIWidget::SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility)
+void UIWidget::SetVisibility(UI_WIDGET_VISIBILITY visibility)
 {
 
     if (!widget_)
@@ -383,6 +383,14 @@ void UIWidget::SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility)
 
     widget_->SetVisibilility((WIDGET_VISIBILITY) visibility);
 
+}
+
+UI_WIDGET_VISIBILITY UIWidget::GetVisibility()
+{
+    if (!widget_)
+        return UI_WIDGET_VISIBILITY_GONE;
+
+    return (UI_WIDGET_VISIBILITY) widget_->GetVisibility();
 }
 
 UIWidget* UIWidget::GetFirstChild()

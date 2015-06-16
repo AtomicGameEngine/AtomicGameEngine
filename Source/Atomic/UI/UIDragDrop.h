@@ -7,11 +7,12 @@ namespace Atomic
 {
 
 class UIWidget;
+class UILayout;
 class UIImageWidget;
 class UITextField;
+class UIDragObject;
 
-/// UIDragDrop subsystem,
-
+/// UIDragDrop subsystem
 class UIDragDrop : public Object
 {
 
@@ -28,11 +29,11 @@ private:
     void HandleMouseUp(StringHash eventType, VariantMap& eventData);
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
-    SharedPtr<UIWidget> dragWidget_;
+    SharedPtr<UILayout> dragLayout_;
     SharedPtr<UIImageWidget> dragImage_;
     SharedPtr<UITextField> dragText_;
 
-    SharedPtr<Object> dragObject_;
+    SharedPtr<UIDragObject> dragObject_;
 
 };
 

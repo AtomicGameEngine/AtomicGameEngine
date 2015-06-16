@@ -62,7 +62,7 @@ void UILayout::SetLayoutDistributionPosition(/*LAYOUT_DISTRIBUTION_POSITION*/ un
 
 }
 
-void UILayout::SetLayoutSize(unsigned size)
+void UILayout::SetLayoutSize(UI_LAYOUT_SIZE size)
 {
     if (!widget_)
         return;

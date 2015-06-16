@@ -7,7 +7,7 @@
 								"UISelectItem", "UISelectItemSource", "UIMenuWindow", "UIEditField",
 								"UIImageWidget", "UIClickLabel", "UICheckBox", "UIMenuItem", "UIMenuItemSource",
 								"UISelectList", "UIListView", "UIMessageWindow", "UILayoutParams", "UIFontDescription",
-								"UISkinImage", "UITabContainer", "UISceneView"],
+								"UISkinImage", "UITabContainer", "UISceneView", "UIPreferredSize", "UIDragObject"],
 	"overloads" : {
 	}
 }

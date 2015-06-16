@@ -6,9 +6,21 @@
 #include "../Core/Object.h"
 
 #include "UIPreferredSize.h"
+#include "UIDragObject.h"
 
 namespace Atomic
 {
+
+/// Defines widget visibility, used with UIWidget::SetVisibility.
+enum UI_WIDGET_VISIBILITY
+{
+    /// Visible (default)
+    UI_WIDGET_VISIBILITY_VISIBLE = tb:: WIDGET_VISIBILITY_VISIBLE,
+    /// Invisible, but layouted. Interaction disabled.
+    UI_WIDGET_VISIBILITY_INVISIBLE = tb::WIDGET_VISIBILITY_INVISIBLE,
+    /// Invisible and no layout. Interaction disabled.
+    UI_WIDGET_VISIBILITY_GONE = tb::WIDGET_VISIBILITY_GONE
+};
 
 class UILayoutParams;
 class UIFontDescription;
@@ -61,7 +73,8 @@ public:
     void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
     bool GetState(/*WIDGET_STATE*/ unsigned state);
 
-    void SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility);
+    void SetVisibility(UI_WIDGET_VISIBILITY visibility);
+    UI_WIDGET_VISIBILITY GetVisibility();
 
     void SetStateRaw(/*WIDGET_STATE*/ unsigned state);
     /*WIDGET_STATE*/ unsigned GetStateRaw();
@@ -69,8 +82,8 @@ public:
     void Invalidate();
     void Die();
 
-    void SetDragObject(Object* object) { dragObject_ = object; }
-    Object* GetDragObject() { return dragObject_; }
+    void SetDragObject(UIDragObject* object) { dragObject_ = object; }
+    UIDragObject* GetDragObject() { return dragObject_; }
 
     UIWidget* GetFirstChild();
     UIWidget* GetNext();
@@ -99,7 +112,7 @@ protected:
 
     SharedPtr<UIPreferredSize> preferredSize_;
 
-    SharedPtr<Object> dragObject_;
+    SharedPtr<UIDragObject> dragObject_;
 
 };
 
