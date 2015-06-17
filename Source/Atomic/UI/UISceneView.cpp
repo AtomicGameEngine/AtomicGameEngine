@@ -191,8 +191,8 @@ void SceneViewWidget::OnPaint(const PaintProps &paint_props)
         return;
 
     TBRect rect = GetRect();
+    rect.x = rect.y = 0;
     ConvertToRoot(rect.x, rect.y);
-
     IntVector2 size = sceneView_->GetSize();
 
     if (size.x_ != rect.w || size.y_ != rect.h)
