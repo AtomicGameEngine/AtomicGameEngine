@@ -76,6 +76,40 @@ static int Node_GetChildrenWithName(duk_context* ctx)
     return 1;
 }
 
+static int Node_GetComponents(duk_context* ctx)
+{
+    bool recursive = false;
+    StringHash typeHash = Component::GetTypeStatic();
+
+
+    if (duk_get_top(ctx) > 0)
+    {
+        if (duk_is_string(ctx, 0) && strlen(duk_get_string(ctx, 0)))
+            typeHash = duk_get_string(ctx, 0);
+    }
+
+    if (duk_get_top(ctx) > 1)
+        recursive = duk_require_boolean(ctx, 1) ? true : false;
+
+
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    PODVector<Component*> dest;
+    node->GetComponents(dest, typeHash, recursive);
+
+    duk_push_array(ctx);
+
+    for (unsigned i = 0; i < dest.Size(); i++)
+    {
+        js_push_class_object_instance(ctx, dest[i], "Component");
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+}
+
+
 static int Scene_LoadXML(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -117,6 +151,8 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getChildrenWithComponent");
     duk_push_c_function(ctx, Node_GetChildrenWithName, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "getChildrenWithName");
+    duk_push_c_function(ctx, Node_GetComponents, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "getComponents");
     duk_push_c_function(ctx, Node_CreateJSComponent, 1);
     duk_put_prop_string(ctx, -2, "createJSComponent");
     duk_pop(ctx);

@@ -17,5 +17,14 @@
 			"ValueAnimationInfo" : ["ValueAnimation", "WrapMode", "float"]
 		}
 
+	},
+	"typescript_decl" : {
+
+		"Node" : [
+			"getChildrenWithName(name:string, recursive?:boolean):Node[];",
+			"getChildrenWithComponent(componentType:string, recursive?:boolean):Node[];",
+			"getComponents(componentType?:string, recursive?:boolean):Component[];"
+		]
 	}
+
 }
