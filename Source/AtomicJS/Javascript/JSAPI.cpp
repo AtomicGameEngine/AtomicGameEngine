@@ -209,6 +209,7 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     Object* object;
     Vector2& vector2 = (Vector2&) Vector2::ZERO;
     Vector3& vector3 = (Vector3&) Vector3::ZERO;
+    Vector4& vector4 = (Vector4&) Vector3::ZERO;
     void* uniqueClassID = NULL;
     const char* package = NULL;
 
@@ -272,19 +273,31 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         vector2 = v.GetVector2();
         duk_push_array(ctx);
         duk_push_number(ctx, vector2.x_);
-        duk_put_prop_index(ctx, -1, 0);
+        duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, vector2.y_);
-        duk_put_prop_index(ctx, -1, 1);
+        duk_put_prop_index(ctx, -2, 1);
         break;
     case VAR_VECTOR3:
         vector3 = v.GetVector3();
         duk_push_array(ctx);
         duk_push_number(ctx, vector3.x_);
-        duk_put_prop_index(ctx, -1, 0);
+        duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, vector3.y_);
-        duk_put_prop_index(ctx, -1, 1);
+        duk_put_prop_index(ctx, -2, 1);
         duk_push_number(ctx, vector3.z_);
-        duk_put_prop_index(ctx, -1, 1);
+        duk_put_prop_index(ctx, -2, 2);
+        break;
+    case VAR_VECTOR4:
+        vector4 = v.GetVector4();
+        duk_push_array(ctx);
+        duk_push_number(ctx, vector4.x_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, vector4.y_);
+        duk_put_prop_index(ctx, -2, 1);
+        duk_push_number(ctx, vector4.z_);
+        duk_put_prop_index(ctx, -2, 2);
+        duk_push_number(ctx, vector4.w_);
+        duk_put_prop_index(ctx, -2, 3);
         break;
 
     default:

@@ -55,6 +55,7 @@ declare module Atomic {
     export function getInput(): Input;
     export function getGraphics(): Graphics;
     export function getFileSystem(): FileSystem;
+    export function getResourceCache(): ResourceCache;
 
     export function getParentPath(path: string): string;
     export function addTrailingSlash(path: string): string;

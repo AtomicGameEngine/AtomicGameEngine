@@ -29,7 +29,9 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
+
 #include <Atomic/Resource/XMLFile.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/Animation.h>
@@ -37,6 +39,7 @@
 #include <Atomic/Graphics/Geometry.h>
 #include <Atomic/Graphics/IndexBuffer.h>
 #include <Atomic/Graphics/VertexBuffer.h>
+#include <Atomic/Graphics/Material.h>
 
 #include "OpenAssetImporter.h"
 
@@ -124,7 +127,7 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
 
     OutModel model;
     model.rootNode_ = rootNode_;
-    model.outName_ = outName;
+    model.outName_ = outName + ".mdl";
 
     CollectMeshes(scene_, model, model.rootNode_);
     CollectBones(model, animationOnly);
@@ -145,6 +148,51 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
         HashSet<String> usedTextures;
         ExportMaterials(usedTextures);
     }
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    Model* mdl = cache->GetResource<Model>( model.outName_);
+
+    // Use a dummy model here?  It kind of depends on how resource layout is
+    // designed, importing, existing models, etc
+/*
+    // Create a dummy model so that the reference can be stored
+
+    String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
+
+    if (!cache->Exists(modelName))
+    {
+        Model* dummyModel = new Model(context_);
+        dummyModel->SetName(modelName);
+        dummyModel->SetNumGeometries(model.meshes_.Size());
+        cache->AddManualResource(dummyModel);
+    }
+*/
+
+    SharedPtr<Node> node(new Node(context_));
+    node->SetName("Model");
+    StaticModel* staticModel = node->CreateComponent<StaticModel>();
+    staticModel->SetModel(mdl);
+
+    if (!noMaterials_)
+    {
+        // Set materials if they are known
+        for (unsigned j = 0; j < model.meshes_.Size(); ++j)
+        {
+            String matName = GetMeshMaterialName(model.meshes_[j]);
+
+            String materialName = sourceAssetPath_ + matName;
+
+            staticModel->SetMaterial(j, cache->GetResource<Material>(materialName));
+        }
+
+    }
+
+    File outFile(context_);
+    if (!outFile.Open(outName, FILE_WRITE))
+        ErrorExit("Could not open output file " + outName);
+
+    node->SaveXML(outFile);
 }
 void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
 {
@@ -941,6 +989,9 @@ void OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<Strin
         specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
         emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
+
+    diffuseTexName.Replace(".tif", ".png");
+
     if (!noMaterialDiffuseColor_)
     {
         if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
@@ -950,8 +1001,8 @@ void OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<Strin
         specularColor = Color(colorVal.r, colorVal.g, colorVal.b);
     if (!emissiveAO_)
     {
-        if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
-            emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
+        // if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
+            // emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
     }
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
     {

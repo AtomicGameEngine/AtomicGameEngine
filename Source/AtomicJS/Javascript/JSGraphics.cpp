@@ -4,6 +4,8 @@
 
 #include "JSGraphics.h"
 #include "JSVM.h"
+
+#include <Atomic/Graphics/Material.h>
 #include <Atomic/Graphics/Light.h>
 
 namespace Atomic
@@ -50,6 +52,43 @@ static int Light_SetShadowBias(duk_context* ctx)
     return 0;
 }
 
+// Material
+
+static int Material_GetShaderParamaters(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Material* material = js_to_class_instance<Material>(ctx, -1, 0);
+
+    const HashMap<StringHash, MaterialShaderParameter>& params =  material->GetShaderParameters();
+
+    duk_push_array(ctx);
+
+    unsigned j = 0;
+    for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = params.Begin(); i != params.End(); ++i)
+    {
+        duk_push_object(ctx);
+
+        duk_push_string(ctx, i->second_.name_.CString());
+        duk_put_prop_string(ctx, -2, "name");
+
+        js_push_variant(ctx, i->second_.value_);
+        duk_put_prop_string(ctx, -2, "value");
+
+        duk_push_string(ctx, i->second_.value_.ToString().CString());
+        duk_put_prop_string(ctx, -2, "valueString");
+
+        duk_push_string(ctx, i->second_.value_.GetTypeName().CString());
+        duk_put_prop_string(ctx, -2, "typeName");
+
+        duk_push_number(ctx, (double) i->second_.value_.GetType());
+        duk_put_prop_string(ctx, -2, "type");
+
+        duk_put_prop_index(ctx, -2, j++);
+    }
+
+    return 1;
+}
+
 
 void jsapi_init_graphics(JSVM* vm)
 {
@@ -61,6 +100,12 @@ void jsapi_init_graphics(JSVM* vm)
     duk_push_c_function(ctx, Light_SetShadowBias, 2);
     duk_put_prop_string(ctx, -2, "setShadowBias");
     duk_pop(ctx);
+
+    js_class_get_prototype(ctx, "Atomic", "Material");
+    duk_push_c_function(ctx, Material_GetShaderParamaters, 0);
+    duk_put_prop_string(ctx, -2, "getShaderParameters");
+    duk_pop(ctx);
+
 }
 
 }

@@ -22,7 +22,25 @@ class MaterialInspector extends ScriptWidget {
 
     //this.material = mat;
 
-    this.nameTextField.text = asset.name;
+    var cache = Atomic.getResourceCache();
+
+    var material = <Atomic.Material> cache.getResource("Material", asset.path);
+
+    if (!material)
+      return;
+
+    // TODO: support quality level and lod for techniques  
+    var technique = material.getTechnique(0);
+
+    this.nameTextField.text = technique.name;
+
+    var params = material.getShaderParameters();
+
+    for (var i in params) {
+
+      print(params[i].name, " : ", params[i].value, " : ", params[i].type);
+
+    }
 
   }
 

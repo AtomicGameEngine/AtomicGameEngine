@@ -23,6 +23,7 @@
 
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Physics/PhysicsWorld.h>
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/UIEvents.h>
@@ -371,25 +372,14 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
         ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-        Model* model = cache->GetResource<Model>(asset->GetGUID());
+        const String& importer = asset->GetImporterName();
 
-        Node* node = scene_->CreateChild(asset->GetName());
-        StaticModel* mc = node->CreateComponent<StaticModel>();
-        mc->SetModel(model);
-
-        Material* material1 = cache->GetResource<Material>("Materials/AlphaMaterial.xml");
-        Material* material2 = cache->GetResource<Material>("Materials/BedMaterial.xml");
-
-        if (mc->GetNumGeometries() > 1)
+        if (importer == "ModelImporter")
         {
-            mc->SetMaterial(0, material1);
-            mc->SetMaterial(1, material2);
+            Node* node = scene_->CreateChild(asset->GetName());
+            XMLFile* xml = cache->GetResource<XMLFile>(asset->GetGUID());
+            node->LoadXML(xml->GetRoot());
         }
-        else
-        {
-            mc->SetMaterial(0, material2);
-        }
-
 
         LOGINFOF("Dropped %s : %s on SceneView3D", asset->GetPath().CString(), asset->GetGUID().CString());
     }
