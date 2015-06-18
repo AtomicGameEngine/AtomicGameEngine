@@ -23,11 +23,17 @@ public:
     UIDragDrop(Context* context);
     virtual ~UIDragDrop();
 
+    void FileDragEntered();
+    void FileDragAddFile(const String& filename);
+    void FileDragConclude();
+
 private:
 
     void HandleMouseDown(StringHash eventType, VariantMap& eventData);
     void HandleMouseUp(StringHash eventType, VariantMap& eventData);
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
+
+    void DragEnd();
 
     SharedPtr<UILayout> dragLayout_;
     SharedPtr<UIImageWidget> dragImage_;

@@ -16,6 +16,12 @@
 #include "UIDragDrop.h"
 #include "UIDragObject.h"
 
+#ifdef ATOMIC_PLATFORM_OSX
+
+#include "UIDragDropMac.h"
+
+#endif
+
 using namespace tb;
 
 namespace Atomic
@@ -45,10 +51,43 @@ UIDragDrop::UIDragDrop(Context* context) : Object(context)
     TBWidget* root = GetSubsystem<UI>()->GetRootWidget();
     root->AddChild(dragLayout_->GetInternalWidget());
 
+    InitDragAndDrop(this);
+
 }
 
 UIDragDrop::~UIDragDrop()
 {
+
+}
+
+void UIDragDrop::DragEnd()
+{
+    Input* input = GetSubsystem<Input>();
+
+    if (!input->IsMouseVisible())
+        return;
+
+    // see if we have a widget
+    TBWidget* tbw = TBWidget::hovered_widget;
+
+    while(tbw && !tbw->GetDelegate())
+    {
+        tbw = tbw->GetParent();
+    }
+
+    if (!tbw)
+        return;
+
+    UIWidget* widget = (UIWidget*) tbw->GetDelegate();
+
+    VariantMap dropData;
+    dropData[DragEnded::P_TARGET] = widget;
+    dropData[DragEnded::P_DRAGOBJECT] = dragObject_;
+    SendEvent(E_DRAGENDED, dropData);
+
+    // clean up
+    dragObject_ = 0;
+    dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
 }
 
@@ -97,25 +136,10 @@ void UIDragDrop::HandleMouseUp(StringHash eventType, VariantMap& eventData)
     if (dragObject_.Null())
         return;
 
-    Input* input = GetSubsystem<Input>();
-
-    if (!input->IsMouseVisible())
+    if (!(eventData[P_BUTTON].GetInt() ==  MOUSEB_LEFT))
         return;
 
-    if ((eventData[P_BUTTON].GetInt() ==  MOUSEB_LEFT) &&
-            TBWidget::hovered_widget && TBWidget::hovered_widget->GetDelegate())
-    {
-        UIWidget* widget = (UIWidget*) TBWidget::hovered_widget->GetDelegate();
-
-        VariantMap dropData;
-        dropData[DragEnded::P_TARGET] = widget;
-        dropData[DragEnded::P_DRAGOBJECT] = dragObject_;
-        SendEvent(E_DRAGENDED, dropData);
-    }
-
-    // clean up
-    dragObject_ = 0;
-    dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
+    DragEnd();
 
 }
 
@@ -148,5 +172,22 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     dragLayout_->SetPosition(x, y - 20);
 
 }
+
+void UIDragDrop::FileDragEntered()
+{
+    dragObject_ = new UIDragObject(context_);
+    //dragObject_->SetText("Files...");
+}
+
+void UIDragDrop::FileDragAddFile(const String& filename)
+{
+    dragObject_->AddFilename(filename);
+}
+
+void UIDragDrop::FileDragConclude()
+{
+    DragEnd();
+}
+
 
 }

@@ -31,6 +31,7 @@ class ProjectFrame extends ScriptWidget {
 
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
+        this.subscribeToEvent("DragEnded", (data) => this.handleDragEnded(data));
 
     }
 
@@ -90,6 +91,50 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    handleDragEnded(data) {
+
+      var dragObject = <Atomic.UIDragObject> data.dragObject;
+      var filenames = dragObject.filenames;
+
+      if (!filenames.length)
+        return;
+
+      // if the drop target is the folderList's root select widget
+      var rootList = this.folderList.rootList;
+
+      var hoverID = rootList.hoverItemID;
+
+      if ( hoverID != "") {
+
+        var db = ToolCore.getAssetDatabase();
+        var fileSystem = Atomic.getFileSystem();
+        var asset = db.getAssetByGUID(hoverID);
+
+        if (asset && asset.isFolder) {
+
+          for (var i in filenames) {
+
+            var srcFilename = filenames[i];
+
+            var pathInfo = Atomic.splitPath(srcFilename);
+
+            var destFilename = Atomic.addTrailingSlash(asset.path);
+
+            destFilename += pathInfo.fileName + pathInfo.ext;
+
+            fileSystem.copy(srcFilename, destFilename);
+
+          }
+
+          db.scan();
+          this.refresh();
+          this.refreshContent(asset);
+
+        }
+
+      }
+
+    }
 
     handleProjectLoaded(data) {
 
@@ -141,6 +186,9 @@ class ProjectFrame extends ScriptWidget {
 
 
     refresh() {
+
+        var container = this.getWidget("contentcontainer");
+        container.deleteAllChildren();
 
         var system = ToolCore.getToolSystem();
         var project = system.project;

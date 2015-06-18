@@ -366,6 +366,9 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
     Object* object = dragObject->GetObject();
 
+    if (!object)
+        return;
+
     if (object->GetType() == Asset::GetTypeStatic())
     {
         Asset* asset = (Asset*) object;

@@ -112,6 +112,7 @@ Asset* AssetDatabase::GetAssetByPath(const String& path)
 
 void AssetDatabase::Scan()
 {
+
     FileSystem* fs = GetSubsystem<FileSystem>();
     const String& resourcePath = project_->GetResourcePath();
 
@@ -148,8 +149,6 @@ void AssetDatabase::Scan()
 
     for (unsigned i = 0; i < importResults.Size(); i++)
     {
-        //Import(importResults[i]);
-
         const String& path = importResults[i];
 
         String md5 = GeneratePathGUID(path);
@@ -157,11 +156,12 @@ void AssetDatabase::Scan()
         // get the current time stamp
         unsigned ctimestamp = fs->GetLastModifiedTime(path);
 
-        SharedPtr<Asset> asset(new Asset(context_, md5, ctimestamp));
-        assets_.Push(asset);
-
-        asset->SetPath(path);
-
+        if (!GetAssetByPath(path))
+        {
+            SharedPtr<Asset> asset(new Asset(context_, md5, ctimestamp));
+            assets_.Push(asset);
+            asset->SetPath(path);
+        }
     }
 
     PODVector<Asset*> dirty;

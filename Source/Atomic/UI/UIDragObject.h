@@ -21,14 +21,19 @@ public:
     const String& GetIcon() { return icon_; }
     Object* GetObject() { return object_; }
 
+    const Vector<String>& GetFilenames() { return filenames_; }
+
     void SetText(const String& text) { text_ = text; }
     void SetIcon(const String& icon) { icon_ = icon; }
     void SetObject(Object* object) { object_ = object; }
+
+    void AddFilename(const String& filename) {filenames_.Push(filename); }
 
 private:
 
     String text_;
     String icon_;
+    Vector<String> filenames_;
     SharedPtr<Object> object_;
 
 };

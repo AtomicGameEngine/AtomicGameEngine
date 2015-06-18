@@ -29,6 +29,7 @@ public:
     void SetValue(int value);
     int GetValue();
 
+    String GetHoverItemID();
     String GetSelectedItemID();
 
     tb::TBSelectList* GetTBSelectList();
