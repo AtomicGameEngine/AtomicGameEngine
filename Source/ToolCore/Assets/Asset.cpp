@@ -4,6 +4,7 @@
 #include "ModelImporter.h"
 #include "FolderImporter.h"
 #include "SceneImporter.h"
+#include "MaterialImporter.h"
 #include "Asset.h"
 
 namespace ToolCore
@@ -59,6 +60,11 @@ bool Asset::SetPath(const String& path)
             {
                 name_ = GetFileName(path);
                 importer_ = new SceneImporter(context_);
+            }
+            else if (ext == ".material")
+            {
+                name_ = GetFileName(path);
+                importer_ = new MaterialImporter(context_);
             }
 
         }

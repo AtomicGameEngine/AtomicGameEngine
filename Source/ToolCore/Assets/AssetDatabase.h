@@ -22,6 +22,7 @@ public:
     virtual ~AssetDatabase();
 
     Asset* GetAssetByGUID(const String& guid);
+    Asset* GetAssetByPath(const String& guid);
 
     String GetCachePath();
 

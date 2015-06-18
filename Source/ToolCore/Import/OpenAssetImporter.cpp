@@ -25,9 +25,11 @@
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Core/Context.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/XMLFile.h>
 
 #include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/Animation.h>
@@ -58,9 +60,9 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     includeNonSkinningBones_(false),
     verboseLog_(false),
     emissiveAO_(false),
-    noOverwriteMaterial_(false),
-    noOverwriteTexture_(false),
-    noOverwriteNewerTexture_(false),
+    noOverwriteMaterial_(true),
+    noOverwriteTexture_(true),
+    noOverwriteNewerTexture_(true),
     checkUniqueModel_(true),
     maxBones_(64),
     defaultTicksPerSecond_(4800.0f)
@@ -96,6 +98,8 @@ bool OpenAssetImporter::Load(const String &assetPath)
         Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE, aiDefaultLogStream_STDOUT);
 
     //PrintLine("Reading file " + assetPath);
+
+    sourceAssetPath_ = GetPath(assetPath);
 
     scene_ = aiImportFile(GetNativePath(assetPath).CString(), aiCurrentFlags_);
 
@@ -134,6 +138,12 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
         // Save scene-global animations
         CollectAnimations();
         BuildAndSaveAnimations();
+    }
+
+    if (!noMaterials_)
+    {
+        HashSet<String> usedTextures;
+        ExportMaterials(usedTextures);
     }
 }
 void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
@@ -396,7 +406,7 @@ String OpenAssetImporter::GetMeshMaterialName(aiMesh* mesh)
     if (matName.Trimmed().Empty())
         matName = GenerateMaterialName(material);
 
-    return (useSubdirs_ ? "Materials/" : "") + matName + ".xml";
+    return (useSubdirs_ ? "Materials/" : "") + matName + ".material";
 }
 
 String OpenAssetImporter::GenerateMaterialName(aiMaterial* material)
@@ -878,6 +888,171 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
             ErrorExit("Could not open output file " + animOutName);
         outAnim->Save(outFile);
     }
+}
+
+// Materials
+void OpenAssetImporter::ExportMaterials(HashSet<String>& usedTextures)
+{
+    if (useSubdirs_)
+    {
+        context_->GetSubsystem<FileSystem>()->CreateDir(sourceAssetPath_ + "Materials");
+    }
+
+    for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
+        BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
+}
+
+void OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
+{
+    aiString matNameStr;
+    material->Get(AI_MATKEY_NAME, matNameStr);
+    String matName = SanitateAssetName(FromAIString(matNameStr));
+    if (matName.Trimmed().Empty())
+        matName = GenerateMaterialName(material);
+
+    // Do not actually create a material instance, but instead craft an xml file manually
+    XMLFile outMaterial(context_);
+    XMLElement materialElem = outMaterial.CreateRoot("material");
+
+    String diffuseTexName;
+    String normalTexName;
+    String specularTexName;
+    String lightmapTexName;
+    String emissiveTexName;
+    Color diffuseColor = Color::WHITE;
+    Color specularColor;
+    Color emissiveColor = Color::BLACK;
+    bool hasAlpha = false;
+    bool twoSided = false;
+    float specPower = 1.0f;
+
+    aiString stringVal;
+    float floatVal;
+    int intVal;
+    aiColor3D colorVal;
+
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
+        diffuseTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
+        normalTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
+        specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
+        specularTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
+        emissiveTexName = GetFileNameAndExtension(FromAIString(stringVal));
+    if (!noMaterialDiffuseColor_)
+    {
+        if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
+            diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    }
+    if (material->Get(AI_MATKEY_COLOR_SPECULAR, colorVal) == AI_SUCCESS)
+        specularColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (!emissiveAO_)
+    {
+        if (material->Get(AI_MATKEY_COLOR_EMISSIVE, colorVal) == AI_SUCCESS)
+            emissiveColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    }
+    if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
+    {
+        if (floatVal < 1.0f)
+            hasAlpha = true;
+        diffuseColor.a_ = floatVal;
+    }
+    if (material->Get(AI_MATKEY_SHININESS, floatVal) == AI_SUCCESS)
+        specPower = floatVal;
+    if (material->Get(AI_MATKEY_TWOSIDED, intVal) == AI_SUCCESS)
+        twoSided = (intVal != 0);
+
+    String techniqueName = "Techniques/NoTexture";
+    if (!diffuseTexName.Empty())
+    {
+        techniqueName = "Techniques/Diff";
+        if (!normalTexName.Empty())
+            techniqueName += "Normal";
+        if (!specularTexName.Empty())
+            techniqueName += "Spec";
+        // For now lightmap does not coexist with normal & specular
+        if (normalTexName.Empty() && specularTexName.Empty() && !lightmapTexName.Empty())
+            techniqueName += "LightMap";
+        if (lightmapTexName.Empty() && !emissiveTexName.Empty())
+            techniqueName += emissiveAO_ ? "AO" : "Emissive";
+    }
+    if (hasAlpha)
+        techniqueName += "Alpha";
+
+    XMLElement techniqueElem = materialElem.CreateChild("technique");
+    techniqueElem.SetString("name", techniqueName + ".xml");
+
+    if (!diffuseTexName.Empty())
+    {
+        XMLElement diffuseElem = materialElem.CreateChild("texture");
+        diffuseElem.SetString("unit", "diffuse");
+        diffuseElem.SetString("name", GetMaterialTextureName(diffuseTexName));
+        usedTextures.Insert(diffuseTexName);
+    }
+    if (!normalTexName.Empty())
+    {
+        XMLElement normalElem = materialElem.CreateChild("texture");
+        normalElem.SetString("unit", "normal");
+        normalElem.SetString("name", GetMaterialTextureName(normalTexName));
+        usedTextures.Insert(normalTexName);
+    }
+    if (!specularTexName.Empty())
+    {
+        XMLElement specularElem = materialElem.CreateChild("texture");
+        specularElem.SetString("unit", "specular");
+        specularElem.SetString("name", GetMaterialTextureName(specularTexName));
+        usedTextures.Insert(specularTexName);
+    }
+    if (!lightmapTexName.Empty())
+    {
+        XMLElement lightmapElem = materialElem.CreateChild("texture");
+        lightmapElem.SetString("unit", "emissive");
+        lightmapElem.SetString("name", GetMaterialTextureName(lightmapTexName));
+        usedTextures.Insert(lightmapTexName);
+    }
+    if (!emissiveTexName.Empty())
+    {
+        XMLElement emissiveElem = materialElem.CreateChild("texture");
+        emissiveElem.SetString("unit", "emissive");
+        emissiveElem.SetString("name", GetMaterialTextureName(emissiveTexName));
+        usedTextures.Insert(emissiveTexName);
+    }
+
+    XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
+    diffuseColorElem.SetString("name", "MatDiffColor");
+    diffuseColorElem.SetColor("value", diffuseColor);
+    XMLElement specularElem = materialElem.CreateChild("parameter");
+    specularElem.SetString("name", "MatSpecColor");
+    specularElem.SetVector4("value", Vector4(specularColor.r_, specularColor.g_, specularColor.b_, specPower));
+    XMLElement emissiveColorElem = materialElem.CreateChild("parameter");
+    emissiveColorElem.SetString("name", "MatEmissiveColor");
+    emissiveColorElem.SetColor("value", emissiveColor);
+
+    if (twoSided)
+    {
+        XMLElement cullElem = materialElem.CreateChild("cull");
+        XMLElement shadowCullElem = materialElem.CreateChild("shadowcull");
+        cullElem.SetString("value", "none");
+        shadowCullElem.SetString("value", "none");
+    }
+
+    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+
+    String outFileName = sourceAssetPath_ + (useSubdirs_ ? "Materials/" : "" ) + matName + ".material";
+    if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
+    {
+        PrintLine("Skipping save of existing material " + matName);
+        return;
+    }
+
+    PrintLine("Writing material " + matName);
+
+    File outFile(context_);
+    if (!outFile.Open(outFileName, FILE_WRITE))
+        ErrorExit("Could not open output file " + outFileName);
+    outMaterial.Save(outFile);
 }
 
 void OpenAssetImporter::DumpNodes(aiNode* rootNode, unsigned level)

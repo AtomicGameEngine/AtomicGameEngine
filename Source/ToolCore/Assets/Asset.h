@@ -23,6 +23,8 @@ public:
 
     const String& GetGUID() const { return guid_; }
 
+    const String& GetImporterName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }
+
     const String& GetName() { return name_; }
 
     const String& GetPath() const { return path_; }

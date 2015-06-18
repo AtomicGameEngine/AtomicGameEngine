@@ -1,0 +1,9 @@
+
+
+class DataBinding
+{
+
+}
+
+
+export = DataBinding;

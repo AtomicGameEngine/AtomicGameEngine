@@ -1,6 +1,8 @@
 import menubar = require("./MainFrameMenu");
 import ProjectFrame = require("./ProjectFrame");
 import ResourceFrame = require("./ResourceFrame");
+import InspectorFrame = require("./inspector/InspectorFrame");
+
 import MessageModal = require("./modal/MessageModal");
 import UIEvents = require("./UIEvents");
 
@@ -12,7 +14,7 @@ class MainFrame extends ScriptWidget {
 
     projectframe: ProjectFrame;
     resourceframe: ResourceFrame;
-    inspectorframe: Editor.InspectorFrame;
+    inspectorframe: InspectorFrame;
 
     inspectorlayout: Atomic.UILayout;
 
@@ -26,8 +28,7 @@ class MainFrame extends ScriptWidget {
 
         this.inspectorlayout = <Atomic.UILayout> this.getWidget("inspectorlayout");
 
-        this.inspectorframe = new Editor.InspectorFrame();
-        this.inspectorframe.load("AtomicEditor/editor/ui/inspectorframe.tb.txt");
+        this.inspectorframe = new InspectorFrame();
         this.inspectorlayout.addChild(this.inspectorframe);
 
         this.projectframe = new ProjectFrame(this);

@@ -55,6 +55,9 @@ private:
     void BuildAndSaveModel(OutModel& model);
     void BuildAndSaveAnimations(OutModel* model = 0);
 
+    void ExportMaterials(HashSet<String>& usedTextures);
+    void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
+
     void CollectSceneModels(OutScene& scene, aiNode* node);
     void CollectBones(OutModel& model, bool animationOnly = false);
     void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
@@ -75,6 +78,7 @@ private:
     aiNode* rootNode_;
 
     String inputName_;
+    String sourceAssetPath_;
     String resourcePath_;
     String outPath_;
     bool useSubdirs_;

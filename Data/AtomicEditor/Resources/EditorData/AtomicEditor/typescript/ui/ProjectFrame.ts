@@ -193,6 +193,7 @@ class ProjectFrame extends ScriptWidget {
 
         var button = new Atomic.UIButton();
 
+        // setup the drag object
         button.dragObject = new Atomic.UIDragObject(asset, asset.name);
 
         var lp = new Atomic.UILayoutParams;

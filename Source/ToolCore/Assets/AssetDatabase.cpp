@@ -93,6 +93,23 @@ Asset* AssetDatabase::GetAssetByGUID(const String& guid)
 
 }
 
+Asset* AssetDatabase::GetAssetByPath(const String& path)
+{
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    while (itr != assets_.End())
+    {
+        if (path == (*itr)->GetPath())
+            return *itr;
+
+        itr++;
+    }
+
+    return 0;
+
+}
+
+
 void AssetDatabase::Scan()
 {
     FileSystem* fs = GetSubsystem<FileSystem>();

@@ -23,6 +23,9 @@
         "./ui/ResourceFrame.ts",
         "./ui/ScriptWidget.ts",
         "./ui/UIEvents.ts",
+        "./ui/inspector/DataBinding.ts",
+        "./ui/inspector/InspectorFrame.ts",
+        "./ui/inspector/MaterialInspector.ts",
         "./ui/modal/MessageModal.ts",
         "./ui/modal/ModalOps.ts"
     ]
