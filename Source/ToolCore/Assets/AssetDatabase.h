@@ -22,7 +22,10 @@ public:
     virtual ~AssetDatabase();
 
     Asset* GetAssetByGUID(const String& guid);
-    Asset* GetAssetByPath(const String& guid);
+    Asset* GetAssetByPath(const String& path);
+
+    String GenerateAssetGUID();
+    void RegisterGUID(const String& guid);
 
     String GetCachePath();
 
@@ -32,15 +35,24 @@ public:
 
     void GetDirtyAssets(PODVector<Asset*>& assets);
 
+    String GetDotAssetFilename(const String& path);
+
 private:
 
     void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
 
-    String GeneratePathGUID(const String& path);
+    void AddAsset(SharedPtr<Asset>& asset);
+
+    void PruneOrphanedDotAssetFiles();
+
     void Import(const String& path);
+
+    void ImportDirtyAssets();
 
     SharedPtr<Project> project_;
     List<SharedPtr<Asset>> assets_;
+
+    Vector<String> usedGUID_;
 
 };
 

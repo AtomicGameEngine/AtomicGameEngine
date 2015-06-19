@@ -21,8 +21,8 @@ public:
 
 protected:
 
-    virtual bool LoadInternal();
-    virtual bool SaveInternal();
+    virtual bool LoadSettingsInternal();
+    virtual bool SaveSettingsInternal();
 
 };
 

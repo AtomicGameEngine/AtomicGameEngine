@@ -375,7 +375,7 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
         ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-        const String& importer = asset->GetImporterName();
+        const String& importer = asset->GetImporterTypeName();
 
         if (importer == "ModelImporter")
         {

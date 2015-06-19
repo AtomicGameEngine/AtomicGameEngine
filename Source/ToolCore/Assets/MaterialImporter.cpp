@@ -32,26 +32,22 @@ bool MaterialImporter::Import(const String& guid)
     return true;
 }
 
-bool MaterialImporter::LoadInternal()
+bool MaterialImporter::LoadSettingsInternal()
 {
-    if (!AssetImporter::LoadInternal())
+    if (!AssetImporter::LoadSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.GetChild("MaterialImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot_.GetChild("MaterialImporter", JSON_OBJECT);
 
     return true;
 }
 
-bool MaterialImporter::SaveInternal()
+bool MaterialImporter::SaveSettingsInternal()
 {
-    if (!AssetImporter::SaveInternal())
+    if (!AssetImporter::SaveSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.CreateChild("MaterialImporter");
+    JSONValue import = jsonRoot_.CreateChild("MaterialImporter");
 
     return true;
 }

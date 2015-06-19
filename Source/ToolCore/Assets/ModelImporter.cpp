@@ -52,26 +52,22 @@ bool ModelImporter::Import(const String& guid)
     return true;
 }
 
-bool ModelImporter::LoadInternal()
+bool ModelImporter::LoadSettingsInternal()
 {
-    if (!AssetImporter::LoadInternal())
+    if (!AssetImporter::LoadSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.GetChild("ModelImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot_.GetChild("ModelImporter", JSON_OBJECT);
 
     return true;
 }
 
-bool ModelImporter::SaveInternal()
+bool ModelImporter::SaveSettingsInternal()
 {
-    if (!AssetImporter::SaveInternal())
+    if (!AssetImporter::SaveSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.CreateChild("ModelImporter");
+    JSONValue import = jsonRoot_.CreateChild("ModelImporter");
 
     return true;
 }

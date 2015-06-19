@@ -35,37 +35,44 @@ String AssetDatabase::GetCachePath()
 
 }
 
-String AssetDatabase::GeneratePathGUID(const String &path)
+String AssetDatabase::GenerateAssetGUID()
 {
-    FileSystem* fs = GetSubsystem<FileSystem>();
 
-    Poco::MD5Engine md5;
+    Time* time = GetSubsystem<Time>();
 
-    if (fs->DirExists(path))
+    while (true)
     {
-        md5.update(path.CString(), path.Length());
-    }
-    else
-    {
-        SharedPtr<File> file(new File(context_, path));
-        PODVector<unsigned char> data;
+        Poco::MD5Engine md5;
+        PODVector<unsigned> data;
 
-        if (!data.Size())
+        for (unsigned i = 0; i < 16; i++)
         {
-            // zero length file uses path name instead of data
-            data.Resize(path.Length());
-            memcpy(&data[0], path.CString(), path.Length());
-        }
-        else
-        {
-            data.Resize(file->GetSize());
-            file->Read(&data[0], data.Size());
+            data.Push(time->GetTimeSinceEpoch() + random() % 65535);
         }
 
-        md5.update(&data[0], data.Size());
+        md5.update(&data[0], data.Size() * sizeof(unsigned));
+
+        String guid = Poco::MD5Engine::digestToHex(md5.digest()).c_str();
+
+        if (!usedGUID_.Contains(guid))
+        {
+            RegisterGUID(guid);
+            return guid;
+        }
     }
 
-    return Poco::MD5Engine::digestToHex(md5.digest()).c_str();
+    assert(0);
+    return "";
+}
+
+void AssetDatabase::RegisterGUID(const String& guid)
+{
+    if (usedGUID_.Contains(guid))
+    {
+        assert(0);
+    }
+
+    usedGUID_.Push(guid);
 }
 
 void AssetDatabase::Import(const String& path)
@@ -109,9 +116,68 @@ Asset* AssetDatabase::GetAssetByPath(const String& path)
 
 }
 
+void AssetDatabase::PruneOrphanedDotAssetFiles()
+{
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    const String& resourcePath = project_->GetResourcePath();
+
+    Vector<String> allResults;
+
+    fs->ScanDir(allResults, resourcePath, "*.asset", SCAN_FILES, true);
+
+    for (unsigned i = 0; i < allResults.Size(); i++)
+    {
+        String dotAssetFilename = resourcePath + allResults[i];
+        String assetFilename = ReplaceExtension(dotAssetFilename, "");
+
+        // remove orphaned asset files
+        if (!fs->FileExists(assetFilename) && !fs->DirExists(assetFilename))
+        {
+
+            LOGINFOF("Removing orphaned asset file: %s", dotAssetFilename.CString());
+            fs->Delete(dotAssetFilename);
+        }
+
+    }
+}
+
+String AssetDatabase::GetDotAssetFilename(const String& path)
+{
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    String assetFilename = path + ".asset";
+
+    if (fs->DirExists(path)) {
+
+        assetFilename = RemoveTrailingSlash(path) + ".asset";
+    }
+
+    return assetFilename;
+
+}
+
+void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
+{
+    assets_.Push(asset);
+}
+
+void AssetDatabase::ImportDirtyAssets()
+{
+
+    PODVector<Asset*> assets;
+    GetDirtyAssets(assets);
+
+    for (unsigned i = 0; i < assets.Size(); i++)
+    {
+        assets[i]->Import();
+    }
+
+}
 
 void AssetDatabase::Scan()
 {
+    PruneOrphanedDotAssetFiles();
 
     FileSystem* fs = GetSubsystem<FileSystem>();
     const String& resourcePath = project_->GetResourcePath();
@@ -139,38 +205,45 @@ void AssetDatabase::Scan()
         filteredResults.Push(path);
     }
 
-    Vector<String> importResults;
-
     for (unsigned i = 0; i < filteredResults.Size(); i++)
     {
         const String& path = filteredResults[i];
-        importResults.Push(path);
-    }
 
-    for (unsigned i = 0; i < importResults.Size(); i++)
-    {
-        const String& path = importResults[i];
+        String dotAssetFilename = GetDotAssetFilename(path);
 
-        String md5 = GeneratePathGUID(path);
-
-        // get the current time stamp
-        unsigned ctimestamp = fs->GetLastModifiedTime(path);
-
-        if (!GetAssetByPath(path))
+        if (!fs->FileExists(dotAssetFilename))
         {
-            SharedPtr<Asset> asset(new Asset(context_, md5, ctimestamp));
-            assets_.Push(asset);
+            // new asset
+            SharedPtr<Asset> asset(new Asset(context_));
             asset->SetPath(path);
+            AddAsset(asset);
         }
+        else
+        {
+            SharedPtr<File> file(new File(context_, dotAssetFilename));
+            SharedPtr<JSONFile> json(new JSONFile(context_));
+            json->Load(*file);
+            file->Close();
+
+            JSONValue root = json->GetRoot();
+
+            assert(root.GetInt("version") == ASSET_VERSION);
+
+            String guid = root.GetString("guid");
+
+            if (!GetAssetByGUID(guid))
+            {
+                SharedPtr<Asset> asset(new Asset(context_));
+                asset->SetPath(path);
+                AddAsset(asset);
+            }
+
+        }
+
     }
 
-    PODVector<Asset*> dirty;
-    GetDirtyAssets(dirty);
+    ImportDirtyAssets();
 
-    for (unsigned i = 0; i < dirty.Size(); i++)
-    {
-        dirty[i]->Import();
-    }
 }
 
 void AssetDatabase::GetFolderAssets(String folder, PODVector<Asset*>& assets) const

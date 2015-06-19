@@ -32,26 +32,22 @@ bool SceneImporter::Import(const String& guid)
     return true;
 }
 
-bool SceneImporter::LoadInternal()
+bool SceneImporter::LoadSettingsInternal()
 {
-    if (!AssetImporter::LoadInternal())
+    if (!AssetImporter::LoadSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.GetChild("SceneImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot_.GetChild("SceneImporter", JSON_OBJECT);
 
     return true;
 }
 
-bool SceneImporter::SaveInternal()
+bool SceneImporter::SaveSettingsInternal()
 {
-    if (!AssetImporter::SaveInternal())
+    if (!AssetImporter::SaveSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.CreateChild("SceneImporter");
+    JSONValue import = jsonRoot_.CreateChild("SceneImporter");
 
     return true;
 }

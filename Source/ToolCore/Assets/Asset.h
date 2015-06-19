@@ -10,40 +10,59 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+#define ASSET_VERSION 1
+
 class Asset : public Object
 {
     OBJECT(Asset);
 
 public:
     /// Construct.
-    Asset(Context* context, const String& guid, unsigned timestamp);
+    Asset(Context* context);
     virtual ~Asset();
 
     bool Import();
 
-    const String& GetGUID() const { return guid_; }
-
-    const String& GetImporterName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }
-
-    const String& GetName() { return name_; }
-
-    const String& GetPath() const { return path_; }
+    // the .fbx, .png, etc path, attempts to load .asset, creates missing .asset
     bool SetPath(const String& path);
+
+    const String& GetGUID() const { return guid_; }
+    const String& GetName() const { return name_; }
+    const String& GetPath() const { return path_; }
+    unsigned GetTimestamp() const { return timestamp_; }
+
+    const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }
 
     void SetDirty(bool dirty) { dirty_ = dirty; }
     bool IsDirty() const { return dirty_; }
+
+    // get the .asset filename
+    String GetDotAssetFilename();
 
     bool IsFolder() const { return isFolder_; }
 
 private:
 
+    // load .asset
+    bool Load();
+    // save .asset
+    bool Save();
+
+    bool CreateImporter();
+
+    bool CheckCacheFile();
+
     String guid_;
+
+    // can change
     String path_;
     String name_;
+    unsigned timestamp_;
 
     bool dirty_;
     bool isFolder_;
 
+    SharedPtr<JSONFile> json_;
     SharedPtr<AssetImporter> importer_;
 };
 

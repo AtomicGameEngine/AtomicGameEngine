@@ -9,8 +9,6 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-#define ASSET_VERSION 1
-
 /// deals with .asset files
 class AssetImporter : public Object
 {
@@ -21,12 +19,10 @@ public:
     AssetImporter(Context* context);
     virtual ~AssetImporter();
 
-    bool IsDirty() { return dirty_; }
-
     // load .asset
-    bool Load(const String& guid);
+    bool LoadSettings(JSONValue& root);
     // save .asset
-    bool Save(const String& guid);
+    bool SaveSettings(JSONValue& root);
 
     virtual void SetDefaults();
 
@@ -35,14 +31,10 @@ public:
 
 protected:
 
-    SharedPtr<JSONFile> json_;
-    bool dirty_;
+    JSONValue jsonRoot_;
 
-    String guid_;
-    unsigned timestamp_;
-
-    virtual bool LoadInternal();
-    virtual bool SaveInternal();
+    virtual bool LoadSettingsInternal();
+    virtual bool SaveSettingsInternal();
 
 };
 

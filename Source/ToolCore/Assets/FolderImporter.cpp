@@ -32,26 +32,22 @@ bool FolderImporter::Import(const String& guid)
     return true;
 }
 
-bool FolderImporter::LoadInternal()
+bool FolderImporter::LoadSettingsInternal()
 {
-    if (!AssetImporter::LoadInternal())
+    if (!AssetImporter::LoadSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.GetChild("FolderImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot_.GetChild("FolderImporter", JSON_OBJECT);
 
     return true;
 }
 
-bool FolderImporter::SaveInternal()
+bool FolderImporter::SaveSettingsInternal()
 {
-    if (!AssetImporter::SaveInternal())
+    if (!AssetImporter::SaveSettingsInternal())
         return false;
 
-    JSONValue root = json_->GetRoot();
-
-    JSONValue import = root.CreateChild("FolderImporter");
+    JSONValue import = jsonRoot_.CreateChild("FolderImporter");
 
     return true;
 }
