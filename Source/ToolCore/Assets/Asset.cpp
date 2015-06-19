@@ -190,7 +190,8 @@ bool Asset::SetPath(const String& path)
     path_ = path;
 
     // create importer based on path
-    CreateImporter();
+    if (!CreateImporter())
+        return false;
 
     String assetFilename = GetDotAssetFilename();
 
@@ -201,6 +202,7 @@ bool Asset::SetPath(const String& path)
     }
     else
     {
+        dirty_ = true;
         guid_ = db->GenerateAssetGUID();
         timestamp_ = fs->GetLastModifiedTime(path);
 
@@ -209,7 +211,7 @@ bool Asset::SetPath(const String& path)
 
     // TODO: handle failed
 
-
+    return true;
 
 }
 

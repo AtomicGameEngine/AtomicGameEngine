@@ -215,8 +215,9 @@ void AssetDatabase::Scan()
         {
             // new asset
             SharedPtr<Asset> asset(new Asset(context_));
-            asset->SetPath(path);
-            AddAsset(asset);
+
+            if (asset->SetPath(path))
+                AddAsset(asset);
         }
         else
         {
