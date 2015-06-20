@@ -99,7 +99,7 @@ class UILayout : public UIWidget
 
 public:
 
-    UILayout(Context* context, bool createWidget = true);
+    UILayout(Context* context, UI_AXIS axis = UI_AXIS_X, bool createWidget = true);
     virtual ~UILayout();
 
     void SetSpacing(int spacing);

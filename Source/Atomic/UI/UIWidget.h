@@ -2,6 +2,7 @@
 #pragma once
 
 #include <ThirdParty/TurboBadger/tb_widgets.h>
+#include <ThirdParty/TurboBadger/tb_widgets_common.h>
 
 #include "../Core/Object.h"
 

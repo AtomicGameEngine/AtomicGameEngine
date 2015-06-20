@@ -22,13 +22,14 @@ UILayoutParams::~UILayoutParams()
 }
 
 
-UILayout::UILayout(Context* context, bool createWidget) : UIWidget(context, false)
+UILayout::UILayout(Context* context, UI_AXIS axis, bool createWidget) : UIWidget(context, false)
 {
     if (createWidget)
     {
         widget_ = new TBLayout();
         widget_->SetDelegate(this);
         widget_->SetGravity(WIDGET_GRAVITY_ALL);
+        widget_->SetAxis((AXIS) axis);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }

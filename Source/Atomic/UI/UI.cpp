@@ -566,7 +566,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     if (widget->IsOfType<TBLayout>())
     {
-        UILayout* layout = new UILayout(context_, false);
+        UILayout* layout = new UILayout(context_, (UI_AXIS) widget->GetAxis(), false);
         layout->SetWidget(widget);
         widgetWrap_[widget] = layout;
         return layout;
