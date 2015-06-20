@@ -12,6 +12,7 @@
 #include <TurboBadger/tb_editfield.h>
 #include <TurboBadger/tb_select.h>
 #include <TurboBadger/tb_tab_container.h>
+#include <TurboBadger/tb_toggle_container.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -46,6 +47,7 @@ using namespace tb;
 #include "UISceneView.h"
 #include "UIDragDrop.h"
 #include "UIContainer.h"
+#include "UISection.h"
 
 namespace tb
 {
@@ -463,6 +465,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
+
+    if (widget->IsOfType<TBSection>())
+    {
+        UISection* section = new UISection(context_, false);
+        section->SetWidget(widget);
+        widgetWrap_[widget] = section;
+        return section;
+    }
 
     if (widget->IsOfType<TBContainer>())
     {

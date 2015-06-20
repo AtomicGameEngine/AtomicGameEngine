@@ -27,23 +27,21 @@ class NodeInspector extends ScriptWidget {
     nodeLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
     nodeLayout.layoutParams = nlp;
 
-    var nodeContainer = new Atomic.UIContainer();
-    nodeContainer.gravity = Atomic.UI_GRAVITY_ALL;
-    nodeContainer.skinBg = "InspectorTopLayout";
-
     // node attr layout
 
+    var nodeSection = new Atomic.UISection();
+    nodeSection.text = "Node";
+    nodeSection.value = 1;
+    //nodeSection.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+    //nodeSection.skinBg = "InspectorTextLabel";
+    nodeLayout.addChild(nodeSection);
+
     var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
-    attrsVerticalLayout.gravity = Atomic.UI_GRAVITY_ALL;
+    attrsVerticalLayout.spacing = 3;
     attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-    nodeContainer.addChild(attrsVerticalLayout);
+    attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
 
-    var nodeLabel = new Atomic.UITextField();
-    nodeLabel.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-    nodeLabel.text = "Node";
-    nodeLabel.skinBg = "InspectorTextLabel";
-
-    attrsVerticalLayout.addChild(nodeLabel);
+    nodeSection.contentRoot.addChild(attrsVerticalLayout);
 
     var attrs = node.getAttributes();
 
@@ -76,11 +74,7 @@ class NodeInspector extends ScriptWidget {
 
       attrsVerticalLayout.addChild(attrLayout);
 
-
-
     }
-
-    nodeLayout.addChild(nodeContainer);
 
     this.addChild(nodeLayout);
 

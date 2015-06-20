@@ -53,6 +53,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UITabContainer"] = true;
     uiTypes_["UISceneView"] = true;
     uiTypes_["UIContainer"] = true;
+    uiTypes_["UISection"] = true;
 
 }
 
