@@ -1,4 +1,5 @@
 
+#include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
 
@@ -33,7 +34,7 @@ bool Asset::CheckCacheFile()
 
     String cacheFile = cachePath + guid_;
 
-    if (!fs->FileExists(cacheFile))
+    if (!fs->FileExists(cacheFile) || fs->GetLastModifiedTime(cacheFile) < fs->GetLastModifiedTime(path_))
         return false;
 
     return true;
@@ -68,11 +69,20 @@ bool Asset::Load()
 
     db->RegisterGUID(guid_);
 
-    timestamp_ = (unsigned) root.GetDouble("timestamp");
+    timestamp_ = root.GetUInt("timestamp");
 
     dirty_ = false;
-    if (!CheckCacheFile() || timestamp_ < fs->GetLastModifiedTime(path_))
+    if (!CheckCacheFile())
+    {
+        LOGINFOF("CheckCacheFile:false - %s", path_.CString());
         dirty_ = true;
+    }
+    else if (timestamp_ < fs->GetLastModifiedTime(path_))
+    {
+        LOGINFOF("Timestamp:false - %u vs modified %u - %s", timestamp_, fs->GetLastModifiedTime(path_), path_.CString());
+        dirty_ = true;
+    }
+
 
     // handle import
 
@@ -88,6 +98,7 @@ bool Asset::Load()
 // save .asset
 bool Asset::Save()
 {
+    FileSystem* fs = GetSubsystem<FileSystem>();
     String assetFilename = GetDotAssetFilename();
 
     json_ = new JSONFile(context_);
@@ -96,7 +107,11 @@ bool Asset::Save()
 
     root.SetInt("version", ASSET_VERSION);
     root.SetString("guid", guid_);
-    root.SetDouble("timestamp", (double) timestamp_);
+
+    // update this where?
+    timestamp_ = fs->GetLastModifiedTime(path_);
+
+    root.SetUInt("timestamp", timestamp_);
 
     // handle import
 

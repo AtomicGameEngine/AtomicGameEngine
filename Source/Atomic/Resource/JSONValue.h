@@ -82,6 +82,8 @@ public:
     JSONValue GetChild(const String& name, JSONValueType valueType = JSON_ANY) const;
     /// Set int.
     void SetInt(const String& name, int value);
+    /// Set unsigned int.
+    void SetUInt(const String& name, unsigned value);
     /// Set bool.
     void SetBool(const String& name, bool value);
     /// Set float.
@@ -133,6 +135,8 @@ public:
     Vector<String> GetValueNames() const;
     /// Return int.
     int GetInt(const String& name) const;
+    /// Return unsigned int.
+    unsigned GetUInt(const String& name) const;
     /// Return bool.
     bool GetBool(const String& name) const;
     /// Return float.

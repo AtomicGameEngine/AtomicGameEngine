@@ -14,6 +14,8 @@ namespace ToolCore
 
 class Asset : public Object
 {
+    friend class AssetDatabase;
+
     OBJECT(Asset);
 
 public:

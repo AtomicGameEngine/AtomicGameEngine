@@ -127,6 +127,13 @@ void JSONValue::SetInt(const String& name, int value)
     AddMember(name, jsonValue);
 }
 
+void JSONValue::SetUInt(const String& name, unsigned value)
+{
+    Value jsonValue;
+    jsonValue.SetUint(value);
+    AddMember(name, jsonValue);
+}
+
 void JSONValue::SetBool(const String& name, bool value)
 {
     Value jsonValue;
@@ -317,6 +324,11 @@ Vector<String> JSONValue::GetValueNames() const
 int JSONValue::GetInt(const String& name) const
 {
     return GetMember(name).GetInt();
+}
+
+unsigned JSONValue::GetUInt(const String& name) const
+{
+    return GetMember(name).GetUint();
 }
 
 bool JSONValue::GetBool(const String& name) const

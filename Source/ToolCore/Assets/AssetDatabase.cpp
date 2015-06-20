@@ -171,6 +171,7 @@ void AssetDatabase::ImportDirtyAssets()
     for (unsigned i = 0; i < assets.Size(); i++)
     {
         assets[i]->Import();
+        assets[i]->Save();
     }
 
 }
