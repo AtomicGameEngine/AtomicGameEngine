@@ -145,7 +145,7 @@ void UIWidget::SetText(const String& text)
     widget_->SetText(text.CString());
 }
 
-void UIWidget::SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity)
+void UIWidget::SetGravity(UI_GRAVITY gravity)
 {
     if (!widget_)
         return;

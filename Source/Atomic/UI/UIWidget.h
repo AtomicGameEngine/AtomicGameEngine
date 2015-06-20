@@ -22,6 +22,23 @@ enum UI_WIDGET_VISIBILITY
     UI_WIDGET_VISIBILITY_GONE = tb::WIDGET_VISIBILITY_GONE
 };
 
+/// TBWidget gravity (may be combined).
+/// Gravity gives hints about positioning and sizing preferences.
+enum UI_GRAVITY {
+
+    UI_GRAVITY_NONE = tb::WIDGET_GRAVITY_NONE,
+    UI_GRAVITY_LEFT = tb::WIDGET_GRAVITY_LEFT,
+    UI_GRAVITY_RIGHT = tb::WIDGET_GRAVITY_RIGHT,
+    UI_GRAVITY_TOP = tb::WIDGET_GRAVITY_TOP,
+    UI_GRAVITY_BOTTOM = tb::WIDGET_GRAVITY_BOTTOM,
+
+    UI_GRAVITY_LEFT_RIGHT	= tb::WIDGET_GRAVITY_LEFT_RIGHT,
+    UI_GRAVITY_TOP_BOTTOM	= tb::WIDGET_GRAVITY_TOP_BOTTOM,
+    UI_GRAVITY_ALL			= tb::WIDGET_GRAVITY_ALL,
+    UI_GRAVITY_DEFAULT		= tb::WIDGET_GRAVITY_DEFAULT
+};
+
+
 class UILayoutParams;
 class UIFontDescription;
 
@@ -63,7 +80,7 @@ public:
     virtual void SetId(const String& id);
 
     void Center();
-    void SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity);
+    void SetGravity(UI_GRAVITY gravity);
 
     void SetValue(double value);
     double GetValue();

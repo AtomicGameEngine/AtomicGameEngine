@@ -6,54 +6,78 @@ import DataBinding = require("./DataBinding");
 // inspectors
 
 import MaterialInspector = require("./MaterialInspector");
+import NodeInspector = require("./NodeInspector");
 
 
 var UI = Atomic.UI;
 
 class InspectorFrame extends ScriptWidget {
 
-  constructor() {
+    constructor() {
 
-    super();
+        super();
 
-    this.gravity = UI.GRAVITY_TOP_BOTTOM;
+        this.gravity = UI.GRAVITY_TOP_BOTTOM;
 
-    this.load("AtomicEditor/editor/ui/inspectorframe.tb.txt");
+        this.load("AtomicEditor/editor/ui/inspectorframe.tb.txt");
 
-    var container = this.getWidget("inspectorcontainer");
+        var container = this.getWidget("inspectorcontainer");
 
-    this.materialInspector = new MaterialInspector();
-    container.addChild(this.materialInspector);
+        // this.materialInspector = new MaterialInspector();
+        // container.addChild(this.materialInspector);
 
-    this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
-
-  }
-
-  handleEditResource(ev: UIEvents.EditorResourceEvent) {
-
-      var path = ev.path;
-
-      var db = ToolCore.getAssetDatabase();
-      var asset = db.getAssetByPath(path);
-      if (asset) {
-
-        this.inspect(asset);
-
-      }
-
-  }
-
-
-  inspect(asset:ToolCore.Asset) {
-
-    if (asset.importerName == "MaterialImporter") {
-
-      this.materialInspector.inspect(asset);
+        this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
+        this.subscribeToEvent("EditorActiveNodeChange", (data) => this.handleActiveNodeChange(data));
 
     }
-  }
 
-  materialInspector:MaterialInspector;
+    handleEditResource(ev: UIEvents.EditorResourceEvent) {
+
+        var path = ev.path;
+
+        var db = ToolCore.getAssetDatabase();
+        var asset = db.getAssetByPath(path);
+
+        if (asset) {
+
+            this.inspectAsset(asset);
+
+        }
+
+    }
+
+    handleActiveNodeChange(data) {
+
+        var node = <Atomic.Node> data.node;
+
+        if (!node) {
+            return;
+        }
+
+        this.inspectNode(node);
+
+    }
+
+
+    inspectAsset(asset: ToolCore.Asset) {
+
+        //if (asset.importerTypeName == "MaterialImporter") {
+        //this.materialInspector.inspect(asset);
+        //}
+
+    }
+
+    inspectNode(node: Atomic.Node) {
+
+        if (!node) return;
+
+        var container = this.getWidget("inspectorcontainer");
+        var inspector = new NodeInspector();
+        container.addChild(inspector);
+
+        inspector.inspect(node);
+
+    }
 
 }
 

@@ -65,7 +65,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     }
 
-    sceneView_->SetGravity(WIDGET_GRAVITY_ALL);
+    sceneView_->SetGravity(UI_GRAVITY_ALL);
 
     rootContentWidget_->AddChild(sceneView_);
 

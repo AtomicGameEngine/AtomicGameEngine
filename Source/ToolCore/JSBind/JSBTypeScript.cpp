@@ -245,23 +245,21 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
     for (unsigned i = 0; i <enums.Size(); i++)
     {
-        JSBEnum* _enum =enums[i];
+        JSBEnum* _enum = enums[i];
 
-        source_ += "   export enum " + _enum->GetName();
-        source_ += " {\n\n";
+        // can't use a TS enum, so use a type alias
+
+        source_ += "\n   // enum " + _enum->GetName() + "\n";
+        source_ += "   export type " + _enum->GetName() + " = number;\n";
 
         Vector<String>& values = _enum->GetValues();
 
         for (unsigned j = 0; j < values.Size(); j++)
         {
-            source_ += "      " + values[j];
-            if (j !=  values.Size() - 1)
-                source_ += ",\n";
+            source_ += "   export var " + values[j] + ": " +  _enum->GetName() + ";\n";
         }
 
-        source_ += "\n\n   }\n\n";
-
-
+        source_ += "\n";
 
     }
 

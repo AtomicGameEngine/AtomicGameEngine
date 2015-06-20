@@ -190,7 +190,7 @@ UIListView::UIListView(Context* context, bool createWidget) :
     rootList_->SetFilter(" ");
 
     widget_->SetGravity(WIDGET_GRAVITY_ALL);
-    rootList_->SetGravity(WIDGET_GRAVITY_ALL);
+    rootList_->SetGravity(UI_GRAVITY_ALL);
 
     source_ = new ListViewItemSource(rootList_->GetTBSelectList());
 

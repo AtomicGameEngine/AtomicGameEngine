@@ -31,7 +31,7 @@ namespace AtomicEditor
 InspectorFrame::InspectorFrame(Context* context) :
     UIWidget(context, true)
 {
-    SetGravity(WIDGET_GRAVITY_TOP_BOTTOM);
+    SetGravity(UI_GRAVITY_TOP_BOTTOM);
 
     InitializeSources();
 

@@ -45,6 +45,7 @@ using namespace tb;
 #include "UITabContainer.h"
 #include "UISceneView.h"
 #include "UIDragDrop.h"
+#include "UIContainer.h"
 
 namespace tb
 {
@@ -462,6 +463,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
+
+    if (widget->IsOfType<TBContainer>())
+    {
+        UIContainer* container = new UIContainer(context_, false);
+        container->SetWidget(widget);
+        widgetWrap_[widget] = container;
+        return container;
+    }
 
     if (widget->IsOfType<TBButton>())
     {

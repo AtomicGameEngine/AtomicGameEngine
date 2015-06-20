@@ -83,7 +83,7 @@ ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabCo
     ((TBTabContainer*)container_->GetInternalWidget())->GetTabLayout()->AddChild(editorTabLayout_);
 
     rootContentWidget_ = new UIWidget(context_);
-    rootContentWidget_->SetGravity(WIDGET_GRAVITY_ALL);
+    rootContentWidget_->SetGravity(UI_GRAVITY_ALL);
     container_->GetContentRoot()->AddChild(rootContentWidget_);
 
     SubscribeToEvent(E_FILECHANGED, HANDLER(ResourceEditor, HandleFileChanged));

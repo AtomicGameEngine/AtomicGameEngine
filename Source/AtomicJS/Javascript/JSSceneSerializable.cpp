@@ -1,0 +1,111 @@
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// Please see LICENSE.md in repository root for license information
+// https://github.com/AtomicGameEngine/AtomicGameEngine
+
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/IO/File.h>
+#include <Atomic/Scene/Node.h>
+#include <Atomic/Scene/Scene.h>
+
+#include "JSScene.h"
+#include "JSComponent.h"
+#include "JSVM.h"
+
+namespace Atomic
+{
+
+/*
+    /// Attribute type.
+    VariantType type_;
+    /// Name.
+    String name_;
+    /// Byte offset from start of object.
+    unsigned offset_;
+    /// Enum names.
+    const char** enumNames_;
+    /// Helper object for accessor mode.
+    SharedPtr<AttributeAccessor> accessor_;
+    /// Default value for network replication.
+    Variant defaultValue_;
+    /// Attribute mode: whether to use for serialization, network replication, or both.
+    unsigned mode_;
+    /// Attribute data pointer if elsewhere than in the Serializable.
+    void* ptr_;
+
+*/
+static int Serializable_GetAttributes(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Serializable* serial = js_to_class_instance<Serializable>(ctx, -1, 0);
+    unsigned type = serial->GetType().Value();
+
+    duk_get_global_string(ctx, "__atomic_scene_serializable_attributes");
+    duk_get_prop_index(ctx, -1, type);
+
+    // return cached array of attrinfo
+    if (duk_is_object(ctx, -1))
+        return 1;
+
+    const Vector<AttributeInfo>* attrs = serial->GetAttributes();
+
+    duk_push_array(ctx);
+    duk_dup(ctx, -1);
+    duk_put_prop_index(ctx, -4, type);
+
+    for (unsigned i = 0; i < attrs->Size(); i++)
+    {
+        const AttributeInfo* attr = &attrs->At(i);
+
+        duk_push_object(ctx);
+
+        duk_push_number(ctx, (double) attr->type_);
+        duk_put_prop_string(ctx, -2, "type");
+
+        duk_push_string(ctx, attr->name_.CString());
+        duk_put_prop_string(ctx, -2, "name");
+
+        duk_push_number(ctx, (double) attr->mode_);
+        duk_put_prop_string(ctx, -2, "mode");
+
+        duk_push_string(ctx,attr->defaultValue_.ToString().CString());
+        duk_put_prop_string(ctx, -2, "defaultValue");
+
+        duk_push_array(ctx);
+
+        const char** enumPtr = attr->enumNames_;
+        unsigned enumCount = 0;
+
+        if (enumPtr)
+        {
+            while (*enumPtr)
+            {
+                duk_push_string(ctx, *enumPtr);
+                duk_put_prop_index(ctx, -2, enumCount++);
+            }
+        }
+
+        duk_put_prop_string(ctx, -2, "enumNames");
+
+        // store attr object
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+}
+
+void jsapi_init_scene_serializable(JSVM* vm)
+{
+    duk_context* ctx = vm->GetJSContext();
+
+    // cached attr
+    duk_push_object(ctx);
+    duk_put_global_string(ctx, "__atomic_scene_serializable_attributes");
+
+    js_class_get_prototype(ctx, "Atomic", "Serializable");
+    duk_push_c_function(ctx, Serializable_GetAttributes, 0);
+    duk_put_prop_string(ctx, -2, "getAttributes");
+    duk_pop(ctx);
+
+}
+
+}

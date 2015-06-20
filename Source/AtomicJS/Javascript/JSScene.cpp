@@ -14,6 +14,8 @@
 namespace Atomic
 {
 
+void jsapi_init_scene_serializable(JSVM* vm);
+
 static int Node_CreateJSComponent(duk_context* ctx)
 {
     duk_push_this(ctx);
@@ -145,6 +147,8 @@ static int Scene_LoadXML(duk_context* ctx)
 void jsapi_init_scene(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
+
+    jsapi_init_scene_serializable(vm);
 
     js_class_get_prototype(ctx, "Atomic", "Node");
     duk_push_c_function(ctx, Node_GetChildrenWithComponent, DUK_VARARGS);

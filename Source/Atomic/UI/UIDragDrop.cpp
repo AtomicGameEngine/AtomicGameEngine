@@ -39,7 +39,7 @@ UIDragDrop::UIDragDrop(Context* context) : Object(context)
 
     dragText_ = new UITextField(context);
     dragText_->SetFontDescription(fd);
-    dragText_->SetGravity(WIDGET_GRAVITY_TOP);
+    dragText_->SetGravity(UI_GRAVITY_TOP);
 
     dragLayout_ = new UILayout(context);
     dragLayout_->AddChild(dragText_);

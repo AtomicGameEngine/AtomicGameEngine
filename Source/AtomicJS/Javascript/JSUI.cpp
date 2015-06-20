@@ -52,6 +52,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UISkinImage"] = true;
     uiTypes_["UITabContainer"] = true;
     uiTypes_["UISceneView"] = true;
+    uiTypes_["UIContainer"] = true;
 
 }
 
