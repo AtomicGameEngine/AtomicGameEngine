@@ -365,7 +365,13 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
             {
                 dragNode_->LoadXML(xml->GetRoot());
                 UpdateDragNode(0, 0);
+
+                VariantMap neventData;
+                neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
+                SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
             }
+
             preloadResourceScene_ = 0;
             dragAssetGUID_ = "";
 
@@ -470,7 +476,13 @@ void SceneView3D::HandleDragExitWidget(StringHash eventType, VariantMap& eventDa
 
     if (dragNode_.NotNull())
     {
+        // BUG! https://github.com/urho3d/Urho3D/issues/748
+        dragNode_->RemoveAllComponents();
+
         scene_->RemoveChild(dragNode_);
+        VariantMap neventData;
+        neventData[EditorActiveNodeChange::P_NODE] = (RefCounted*) 0;
+        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
     }
 
     dragAssetGUID_ = 0;
