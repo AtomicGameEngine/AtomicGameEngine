@@ -55,6 +55,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UIContainer"] = true;
     uiTypes_["UISection"] = true;
     uiTypes_["UIInlineSelect"] = true;
+    uiTypes_["UITextureWidget"] = true;
 
 }
 

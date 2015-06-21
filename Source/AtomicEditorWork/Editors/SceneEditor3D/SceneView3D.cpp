@@ -365,11 +365,6 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
             {
                 dragNode_->LoadXML(xml->GetRoot());
                 UpdateDragNode(0, 0);
-
-                VariantMap neventData;
-                neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
-                SendEvent(E_EDITORACTIVENODECHANGE, neventData);
-
             }
 
             preloadResourceScene_ = 0;
@@ -485,13 +480,20 @@ void SceneView3D::HandleDragExitWidget(StringHash eventType, VariantMap& eventDa
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
     }
 
-    dragAssetGUID_ = 0;
+    dragAssetGUID_ = "";
     dragNode_ = 0;
 }
 
 
 void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 {
+    if (dragNode_.NotNull())
+    {
+        VariantMap neventData;
+        neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
+        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+    }
+    dragAssetGUID_ = "";
     dragNode_ = 0;
 }
 

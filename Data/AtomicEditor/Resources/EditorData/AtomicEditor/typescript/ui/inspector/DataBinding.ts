@@ -92,7 +92,7 @@ class DataBinding {
 
     }
 
-    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) : boolean {
 
       if (this.objectLocked)
           return false;
@@ -102,8 +102,11 @@ class DataBinding {
           if (this.widget == ev.target || this.widget.isAncestorOf(ev.target))
           {
               this.setObjectValueFromWidget(ev.target);
+              return true;
           }
       }
+
+      return false;
 
     }
 

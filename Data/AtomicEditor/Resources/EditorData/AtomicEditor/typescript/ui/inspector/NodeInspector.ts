@@ -15,14 +15,20 @@ class NodeInspector extends ScriptWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
+        var handled = false;
+
         for (var i = 0; i < this.bindings.length; i++) {
 
-          this.bindings[i].handleWidgetEvent(ev);
+          if (this.bindings[i].handleWidgetEvent(ev)) {
+
+            handled = true;
+
+          }
 
         }
 
         // return handled
-        return true;
+        return handled;
 
     }
 

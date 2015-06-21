@@ -22,9 +22,6 @@ class InspectorFrame extends ScriptWidget {
 
         var container = this.getWidget("inspectorcontainer");
 
-        // this.materialInspector = new MaterialInspector();
-        // container.addChild(this.materialInspector);
-
         this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent("EditorActiveNodeChange", (data) => this.handleActiveNodeChange(data));
 
@@ -60,9 +57,24 @@ class InspectorFrame extends ScriptWidget {
 
     inspectAsset(asset: ToolCore.Asset) {
 
-        //if (asset.importerTypeName == "MaterialImporter") {
-        //this.materialInspector.inspect(asset);
-        //}
+        if (asset.importerTypeName == "MaterialImporter") {
+
+          var cache = Atomic.getResourceCache();
+
+          var material = <Atomic.Material> cache.getResource("Material", asset.path);
+
+          if (!material)
+              return;
+
+          var container = this.getWidget("inspectorcontainer");
+          container.deleteAllChildren();
+
+          var inspector = new MaterialInspector();
+          container.addChild(inspector);
+
+          inspector.inspect(material);
+
+        }
 
     }
 
@@ -71,6 +83,8 @@ class InspectorFrame extends ScriptWidget {
         if (!node) return;
 
         var container = this.getWidget("inspectorcontainer");
+        container.deleteAllChildren();
+
         var inspector = new NodeInspector();
         container.addChild(inspector);
 

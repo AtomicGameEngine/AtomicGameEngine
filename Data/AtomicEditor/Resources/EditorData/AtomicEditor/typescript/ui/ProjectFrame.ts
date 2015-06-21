@@ -37,7 +37,7 @@ class ProjectFrame extends ScriptWidget {
 
     handleWidgetEvent(data): boolean {
 
-        if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
+        if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
             var db = ToolCore.getAssetDatabase();
 
@@ -58,6 +58,7 @@ class ProjectFrame extends ScriptWidget {
                     if (selectedId != "0") {
 
                         var asset = db.getAssetByGUID(selectedId);
+
                         if (asset.isFolder)
                             this.refreshContent(asset);
                     }

@@ -8,7 +8,7 @@
 								"UIImageWidget", "UIClickLabel", "UICheckBox", "UIMenuItem", "UIMenuItemSource",
 								"UISelectList", "UIListView", "UIMessageWindow", "UILayoutParams", "UIFontDescription",
 								"UISkinImage", "UITabContainer", "UISceneView", "UIPreferredSize", "UIDragObject",
-								"UIContainer", "UISection", "UIInlineSelect"],
+								"UIContainer", "UISection", "UIInlineSelect", "UITextureWidget"],
 	"overloads" : {
 	}
 }
