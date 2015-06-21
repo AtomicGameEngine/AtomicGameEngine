@@ -1,9 +1,8 @@
 
 import ScriptWidget = require("../ScriptWidget");
-import ComponentInspector = require("./ComponentInspector");
 import DataBinding = require("./DataBinding");
 
-class NodeInspector extends ScriptWidget {
+class ComponentInspector extends ScriptWidget {
 
     constructor() {
 
@@ -27,7 +26,7 @@ class NodeInspector extends ScriptWidget {
     }
 
 
-    inspect(node: Atomic.Node) {
+    inspect(component: Atomic.Component) {
 
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";
@@ -59,7 +58,7 @@ class NodeInspector extends ScriptWidget {
 
         nodeSection.contentRoot.addChild(attrsVerticalLayout);
 
-        var attrs = node.getAttributes();
+        var attrs = component.getAttributes();
 
         for (var i in attrs) {
 
@@ -68,7 +67,7 @@ class NodeInspector extends ScriptWidget {
             if (attr.mode & Atomic.AM_NOEDIT)
                 continue;
 
-            var binding = DataBinding.createBinding(node, attr);
+            var binding = DataBinding.createBinding(component, attr);
 
             if (!binding)
                 continue;
@@ -116,4 +115,4 @@ class NodeInspector extends ScriptWidget {
 
 }
 
-export = NodeInspector;
+export = ComponentInspector;

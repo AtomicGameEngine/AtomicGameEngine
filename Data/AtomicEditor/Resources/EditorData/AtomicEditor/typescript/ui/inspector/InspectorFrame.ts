@@ -8,7 +8,6 @@ import DataBinding = require("./DataBinding");
 import MaterialInspector = require("./MaterialInspector");
 import NodeInspector = require("./NodeInspector");
 
-
 var UI = Atomic.UI;
 
 class InspectorFrame extends ScriptWidget {
