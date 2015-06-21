@@ -23,6 +23,7 @@
         "./ui/ResourceFrame.ts",
         "./ui/ScriptWidget.ts",
         "./ui/UIEvents.ts",
+        "./ui/inspector/ComponentInspector.ts",
         "./ui/inspector/DataBinding.ts",
         "./ui/inspector/InspectorFrame.ts",
         "./ui/inspector/MaterialInspector.ts",
