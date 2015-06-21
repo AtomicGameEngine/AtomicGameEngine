@@ -62,8 +62,6 @@ class DataBinding {
 
         }
 
-
-
         if (widget) {
 
             var binding = new DataBinding(object, attrInfo, widget);
@@ -75,7 +73,45 @@ class DataBinding {
 
     }
 
+    setObjectValueFromWidget(srcWidget:Atomic.UIWidget) {
+
+      if (this.objectLocked)
+          return;
+
+      this.objectLocked = true;
+
+      var type = this.attrInfo.type;
+
+      if (type == Atomic.VAR_BOOL)
+      {
+          var box = <Atomic.UICheckBox> this.widget;
+
+          this.object.setAttribute(this.attrInfo.name, box.value ? true : false);
+      }
+
+
+
+      this.objectLocked = false;
+
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+      if (this.objectLocked)
+          return false;
+
+      if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED)
+      {
+          if (this.widget == ev.target || this.widget.isAncestorOf(ev.target))
+          {
+              this.setObjectValueFromWidget(ev.target);
+          }
+      }
+
+    }
+
     object: Atomic.Serializable;
+    objectLocked:boolean = false;
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
 
@@ -87,7 +123,23 @@ class NodeInspector extends ScriptWidget {
 
         super();
 
+        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+
     }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        for (var i = 0; i < this.bindings.length; i++) {
+
+          this.bindings[i].handleWidgetEvent(ev);
+
+        }
+
+        // return handled
+        return true;
+
+    }
+
 
     inspect(node: Atomic.Node) {
 
@@ -152,6 +204,7 @@ class NodeInspector extends ScriptWidget {
 
 
             var bname = attr.name;
+
             if (bname == "Is Enabled")
                 bname = "Enabled";
 
@@ -164,11 +217,15 @@ class NodeInspector extends ScriptWidget {
 
             attrsVerticalLayout.addChild(attrLayout);
 
+            this.bindings.push(binding);
+
         }
 
         this.addChild(nodeLayout);
 
     }
+
+    bindings:Array<DataBinding> = new Array();
 
 
 }

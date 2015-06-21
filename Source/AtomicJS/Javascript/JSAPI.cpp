@@ -202,6 +202,35 @@ void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
 
 }
 
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
+{
+    v.Clear();
+
+    if (duk_is_boolean(ctx, variantIdx))
+    {
+        v = duk_to_boolean(ctx, variantIdx) ? true : false;
+        return;
+    }
+
+    if (duk_is_string(ctx, variantIdx))
+    {
+        v = duk_to_string(ctx, variantIdx);
+        return;
+    }
+
+    if (duk_is_number(ctx, variantIdx))
+    {
+        v = (float) duk_to_number(ctx, variantIdx);
+        return;
+    }
+
+    if (duk_is_pointer(ctx, variantIdx))
+    {
+        v = (RefCounted*) duk_get_pointer(ctx, variantIdx);
+        return;
+    }
+}
+
 void js_push_variant(duk_context *ctx, const Variant& v)
 {
     VariantType type = v.GetType();

@@ -39,6 +39,62 @@ enum UI_GRAVITY {
     UI_GRAVITY_DEFAULT		= tb::WIDGET_GRAVITY_DEFAULT
 };
 
+enum UI_EVENT_TYPE {
+    /** Click event is what should be used to trig actions in almost all cases.
+
+        It is invoked on a widget after POINTER_UP if the pointer is still inside
+        its hit area. It can also be invoked by keyboard on some clickable widgets
+        (see TBWidget::SetClickByKey).
+
+        If panning of scrollable widgets start while the pointer is down, CLICK
+        won't be invoked when releasing the pointer (since that should stop panning). */
+    UI_EVENT_TYPE_CLICK = tb::EVENT_TYPE_CLICK,
+
+    /** Long click event is sent when the pointer has been down for some time
+        without moving much.
+
+        It is invoked on a widget that has enabled it (TBWidget::SetWantLongClick
+        If this event isn't handled, the widget will invoke a CONTEXT_MENU event.
+        If any of those are handled, the CLICK event that would normally be
+        invoked after the pending POINTER_UP will be suppressed. */
+    UI_EVENT_TYPE_LONG_CLICK = tb::EVENT_TYPE_LONG_CLICK,
+    UI_EVENT_TYPE_POINTER_DOWN = tb::EVENT_TYPE_POINTER_DOWN,
+    UI_EVENT_TYPE_POINTER_UP = tb::EVENT_TYPE_POINTER_UP,
+    UI_EVENT_TYPE_POINTER_MOVE = tb::EVENT_TYPE_POINTER_MOVE,
+    UI_EVENT_TYPE_RIGHT_POINTER_DOWN = tb::EVENT_TYPE_RIGHT_POINTER_DOWN,
+    UI_EVENT_TYPE_RIGHT_POINTER_UP = tb::EVENT_TYPE_RIGHT_POINTER_UP,
+    UI_EVENT_TYPE_WHEEL = tb::EVENT_TYPE_WHEEL,
+
+    /** Invoked after changing text in a TBTextField, changing selected item
+        in a TBSelectList etc. Invoking this event trigs synchronization with
+        connected TBWidgetValue and other widgets connected to it. */
+    UI_EVENT_TYPE_CHANGED = tb::EVENT_TYPE_CHANGED,
+    UI_EVENT_TYPE_KEY_DOWN = tb::EVENT_TYPE_KEY_DOWN,
+    UI_EVENT_TYPE_KEY_UP = tb::EVENT_TYPE_KEY_UP,
+
+    /** Invoked by the platform when a standard keyboard shortcut is pressed.
+        It's called before InvokeKeyDown (EVENT_TYPE_KEY_DOWN) and if the event
+        is handled (returns true), the KeyDown is canceled.
+        The ref_id will be set to one of the following:
+            "cut", "copy", "paste", "selectall", "undo", "redo", "new", "open", "save". */
+    UI_EVENT_TYPE_SHORTCUT = tb::EVENT_TYPE_SHORTCUT,
+
+    /** Invoked when a context menu should be opened at the event x and y coordinates.
+        It may be invoked automatically for a widget on long click, if nothing handles
+        the long click event. */
+    UI_EVENT_TYPE_CONTEXT_MENU = tb::EVENT_TYPE_CONTEXT_MENU,
+
+    /** Invoked by the platform when one or multiple files has been dropped on
+        the widget. The event is guaranteed to be a TBWidgetEventFileDrop. */
+    UI_EVENT_TYPE_FILE_DROP = tb::EVENT_TYPE_FILE_DROP,
+
+    /** Invoked by the platform when a tab container's tab changed */
+    UI_EVENT_TYPE_TAB_CHANGED = tb::EVENT_TYPE_TAB_CHANGED,
+
+    /** Custom event. Not used internally. ref_id may be used for additional type info. */
+    UI_EVENT_TYPE_CUSTOM = tb::EVENT_TYPE_CUSTOM
+};
+
 
 class UILayoutParams;
 class UIFontDescription;
@@ -105,6 +161,8 @@ public:
 
     UIWidget* GetFirstChild();
     UIWidget* GetNext();
+
+    bool IsAncestorOf(UIWidget* widget);
 
     void SetIsFocusable(bool value);
 

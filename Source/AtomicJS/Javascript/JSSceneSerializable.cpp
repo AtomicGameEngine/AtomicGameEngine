@@ -33,6 +33,21 @@ namespace Atomic
     void* ptr_;
 
 */
+
+static int Serializable_SetAttribute(duk_context* ctx)
+{
+    const char* name = duk_to_string(ctx, 0);
+    Variant v;
+    js_to_variant(ctx, 1, v);
+
+    duk_push_this(ctx);
+    Serializable* serial = js_to_class_instance<Serializable>(ctx, -1, 0);
+
+    serial->SetAttribute(name, v);
+
+    return 0;
+}
+
 static int Serializable_GetAttributes(duk_context* ctx)
 {
     duk_push_this(ctx);
@@ -104,6 +119,8 @@ void jsapi_init_scene_serializable(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "Serializable");
     duk_push_c_function(ctx, Serializable_GetAttributes, 0);
     duk_put_prop_string(ctx, -2, "getAttributes");
+    duk_push_c_function(ctx, Serializable_SetAttribute, 2);
+    duk_put_prop_string(ctx, -2, "setAttribute");
     duk_pop(ctx);
 
 }

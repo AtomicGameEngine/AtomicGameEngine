@@ -154,6 +154,15 @@ void UIWidget::SetGravity(UI_GRAVITY gravity)
 
 }
 
+bool UIWidget::IsAncestorOf(UIWidget* widget)
+{
+    if (!widget_ || !widget || !widget->widget_)
+        return false;
+
+    return widget_->IsAncestorOf(widget->widget_);
+
+}
+
 void UIWidget::SetPosition(int x, int y)
 {
     if (!widget_)
