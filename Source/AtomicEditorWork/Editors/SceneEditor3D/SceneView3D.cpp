@@ -28,6 +28,8 @@
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/UIEvents.h>
 
+#include <Atomic/Resource/ResourceEvents.h>
+
 #include <ToolCore/Assets/Asset.h>
 #include <ToolCore/Assets/AssetDatabase.h>
 
@@ -89,7 +91,13 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
+
+    SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
+
+    SubscribeToEvent(E_DRAGENTERWIDGET, HANDLER(SceneView3D, HandleDragEnterWidget));
+    SubscribeToEvent(E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
     SubscribeToEvent(E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
+
 
     // TODO: generate this event properly
     VariantMap eventData;
@@ -345,6 +353,25 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
         MoveCamera(timeStep);
 
     QueueUpdate();
+
+    if (preloadResourceScene_.NotNull())
+    {
+        if (preloadResourceScene_->GetAsyncProgress() == 1.0f)
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            XMLFile* xml = cache->GetResource<XMLFile>(dragAssetGUID_);
+
+            if (dragNode_.NotNull())
+            {
+                dragNode_->LoadXML(xml->GetRoot());
+                UpdateDragNode(0, 0);
+            }
+            preloadResourceScene_ = 0;
+            dragAssetGUID_ = "";
+
+        }
+    }
+
 }
 
 void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
@@ -353,11 +380,44 @@ void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap&
     SelectNode(node);
 }
 
-void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
+void SceneView3D::UpdateDragNode(int mouseX, int mouseY)
 {
-    using namespace DragEnded;
+    if (dragNode_.Null())
+        return;
 
-    UIWidget* widget = static_cast<UIWidget*>(eventData[P_TARGET].GetPtr());
+    Ray ray = GetCameraRay();
+
+    Vector3 pos = ray.origin_;
+    pos += ray.direction_ * 10;
+
+    dragNode_->SetWorldPosition(pos);
+
+}
+
+void SceneView3D::HandleMouseMove(StringHash eventType, VariantMap& eventData)
+{
+    if (dragNode_.Null())
+        return;
+
+    Input* input = GetSubsystem<Input>();
+
+    if (!input->IsMouseVisible())
+        return;
+
+    using namespace MouseMove;
+
+    int x = eventData[P_X].GetInt();
+    int y = eventData[P_Y].GetInt();
+
+    UpdateDragNode(x, y);
+
+}
+
+void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventData)
+{
+    using namespace DragEnterWidget;
+
+    UIWidget* widget = static_cast<UIWidget*>(eventData[P_WIDGET].GetPtr());
 
     if (widget != this)
         return;
@@ -373,20 +433,54 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
     {
         Asset* asset = (Asset*) object;
 
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        AssetDatabase* db = GetSubsystem<AssetDatabase>();
 
         const String& importer = asset->GetImporterTypeName();
 
         if (importer == "ModelImporter")
         {
-            Node* node = scene_->CreateChild(asset->GetName());
-            XMLFile* xml = cache->GetResource<XMLFile>(asset->GetGUID());
-            node->LoadXML(xml->GetRoot());
+            dragNode_ = scene_->CreateChild(asset->GetName());
+
+            preloadResourceScene_ = new Scene(context_);
+
+            SharedPtr<File> file(new File(context_, db->GetCachePath() + asset->GetGUID()));
+
+            preloadResourceScene_->LoadAsyncXML(file, LOAD_RESOURCES_ONLY);
+            dragAssetGUID_ = asset->GetGUID();
+
+            Input* input = GetSubsystem<Input>();
+            IntVector2 pos = input->GetMousePosition();
+
+            UpdateDragNode(pos.x_, pos.y_);
+
         }
 
-        LOGINFOF("Dropped %s : %s on SceneView3D", asset->GetPath().CString(), asset->GetGUID().CString());
+        //LOGINFOF("Dropped %s : %s on SceneView3D", asset->GetPath().CString(), asset->GetGUID().CString());
     }
 
+}
+
+void SceneView3D::HandleDragExitWidget(StringHash eventType, VariantMap& eventData)
+{
+    if (preloadResourceScene_.NotNull())
+    {
+        preloadResourceScene_->StopAsyncLoading();
+        preloadResourceScene_ = 0;
+    }
+
+    if (dragNode_.NotNull())
+    {
+        scene_->RemoveChild(dragNode_);
+    }
+
+    dragAssetGUID_ = 0;
+    dragNode_ = 0;
+}
+
+
+void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
+{
+    dragNode_ = 0;
 }
 
 

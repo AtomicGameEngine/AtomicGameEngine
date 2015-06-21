@@ -62,33 +62,23 @@ UIDragDrop::~UIDragDrop()
 
 void UIDragDrop::DragEnd()
 {
-    Input* input = GetSubsystem<Input>();
-
-    if (!input->IsMouseVisible())
-        return;
-
-    // see if we have a widget
-    TBWidget* tbw = TBWidget::hovered_widget;
-
-    while(tbw && !tbw->GetDelegate())
-    {
-        tbw = tbw->GetParent();
-    }
-
-    if (!tbw)
-        return;
-
-    UIWidget* widget = (UIWidget*) tbw->GetDelegate();
-
-    VariantMap dropData;
-    dropData[DragEnded::P_TARGET] = widget;
-    dropData[DragEnded::P_DRAGOBJECT] = dragObject_;
-    SendEvent(E_DRAGENDED, dropData);
+    SharedPtr<UIDragObject> dragObject = dragObject_;
+    SharedPtr<UIWidget> currentTargetWidget = currentTargetWidget_;
 
     // clean up
+    currentTargetWidget_ = 0;
     dragObject_ = 0;
     dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
+    if (currentTargetWidget.Null())
+    {
+        return;
+    }
+
+    VariantMap dropData;
+    dropData[DragEnded::P_TARGET] = currentTargetWidget;
+    dropData[DragEnded::P_DRAGOBJECT] = dragObject;
+    SendEvent(E_DRAGENDED, dropData);
 }
 
 void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
@@ -114,6 +104,8 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
             return;
 
         UIWidget* widget = (UIWidget*) tbw->GetDelegate();
+
+        currentTargetWidget_ = widget;
 
         if (widget->GetType() == UISelectList::GetTypeStatic())
         {
@@ -168,6 +160,38 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
     int x = eventData[P_X].GetInt();
     int y = eventData[P_Y].GetInt();
+
+    // see if we have a widget
+    TBWidget* tbw = TBWidget::hovered_widget;
+
+    while(tbw && !tbw->GetDelegate())
+    {
+        tbw = tbw->GetParent();
+    }
+
+    if (!tbw)
+        return;
+
+    UIWidget* hoverWidget = (UIWidget*) tbw->GetDelegate();
+
+    if (hoverWidget != currentTargetWidget_)
+    {
+        if (currentTargetWidget_)
+        {
+            VariantMap exitData;
+            exitData[DragExitWidget::P_WIDGET] = currentTargetWidget_;
+            exitData[DragExitWidget::P_DRAGOBJECT] = dragObject_;
+            SendEvent(E_DRAGEXITWIDGET, exitData);
+        }
+
+        currentTargetWidget_ = hoverWidget;
+
+        VariantMap enterData;
+        enterData[DragEnterWidget::P_WIDGET] = currentTargetWidget_;
+        enterData[DragEnterWidget::P_DRAGOBJECT] = dragObject_;
+        SendEvent(E_DRAGENTERWIDGET, enterData);
+
+    }
 
     dragLayout_->SetPosition(x, y - 20);
 

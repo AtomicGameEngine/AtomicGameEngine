@@ -58,6 +58,24 @@ EVENT(E_WIDGETDELETED, WidgetDeleted)
     PARAM(P_WIDGET, Widget);             // UIWidget pointer
 }
 
+EVENT(E_DRAGBEGIN, DragBegin)
+{
+    PARAM(P_TARGET, Source);             // UIWidget source
+    PARAM(P_DRAGOBJECT, DragObject);     // UIDragObject pointer
+}
+
+EVENT(E_DRAGENTERWIDGET, DragEnterWidget)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+    PARAM(P_DRAGOBJECT, DragObject);     // UIDragObject pointer
+}
+
+EVENT(E_DRAGEXITWIDGET, DragExitWidget)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+    PARAM(P_DRAGOBJECT, DragObject);     // UIDragObject pointer
+}
+
 EVENT(E_DRAGENDED, DragEnded)
 {
     PARAM(P_TARGET, Target);             // UIWidget pointer

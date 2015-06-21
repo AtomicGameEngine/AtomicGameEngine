@@ -51,7 +51,14 @@ private:
 
     bool MouseInView();
 
+    void HandleMouseMove(StringHash eventType, VariantMap& eventData);
+
+    void UpdateDragNode(int mouseX, int mouseY);
+
     void HandleDragEnded(StringHash eventType, VariantMap& eventData);
+    void HandleDragExitWidget(StringHash eventType, VariantMap& eventData);
+    void HandleDragEnterWidget(StringHash eventType, VariantMap& eventData);
+
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);    
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
@@ -74,6 +81,10 @@ private:
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
     SharedPtr<Node> selectedNode_;
+
+    SharedPtr<Scene> preloadResourceScene_;
+    String dragAssetGUID_;
+    SharedPtr<Node> dragNode_;
 
 };
 

@@ -35,9 +35,12 @@ private:
 
     void DragEnd();
 
+    // attached to mouse UI
     SharedPtr<UILayout> dragLayout_;
     SharedPtr<UIImageWidget> dragImage_;
     SharedPtr<UITextField> dragText_;
+
+    SharedPtr<UIWidget> currentTargetWidget_;
 
     SharedPtr<UIDragObject> dragObject_;
 
