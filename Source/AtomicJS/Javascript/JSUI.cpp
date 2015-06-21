@@ -56,6 +56,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UISection"] = true;
     uiTypes_["UIInlineSelect"] = true;
     uiTypes_["UITextureWidget"] = true;
+    uiTypes_["UIScrollContainer"] = true;
 
 }
 

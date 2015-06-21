@@ -8,6 +8,7 @@
 #include "UIWidget.h"
 #include "UILayout.h"
 #include "UIFontDescription.h"
+#include "UIView.h"
 
 using namespace tb;
 
@@ -465,7 +466,30 @@ void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
 
 }
 
+UIView* UIWidget::GetView()
+{
+    if (!widget_)
+        return 0;
 
+    if (GetType() == UIView::GetTypeStatic())
+        return (UIView*) this;
+
+    TBWidget* tbw = widget_->GetParent();
+    while(tbw)
+    {
+        TBWidgetDelegate* delegate = tbw->GetDelegate();
+        if (delegate)
+        {
+            UIWidget* d = (UIWidget*) delegate;
+            if (d->GetType() == UIView::GetTypeStatic())
+                return (UIView*) d;
+        }
+
+        tbw = tbw->GetParent();
+    }
+
+    return 0;
+}
 
 bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {

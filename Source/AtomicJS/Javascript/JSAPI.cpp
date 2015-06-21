@@ -35,6 +35,13 @@ void js_class_get_prototype(duk_context* ctx, const char* package, const char *c
     duk_remove(ctx, -2); // remove Atomic object
 }
 
+void js_class_get_constructor(duk_context* ctx, const char* package, const char *classname)
+{
+    duk_get_global_string(ctx, package);
+    duk_get_prop_string(ctx, -1, classname);
+    duk_remove(ctx, -2); // remove package
+}
+
 void js_constructor_basecall(duk_context* ctx, const char* package, const char* baseclass)
 {
     int top = duk_get_top(ctx);

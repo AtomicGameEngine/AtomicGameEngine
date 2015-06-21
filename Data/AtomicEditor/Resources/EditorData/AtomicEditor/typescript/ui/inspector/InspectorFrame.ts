@@ -25,8 +25,9 @@ class InspectorFrame extends ScriptWidget {
         this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent("EditorActiveNodeChange", (data) => this.handleActiveNodeChange(data));
 
-    }
 
+    }
+    
     handleEditResource(ev: UIEvents.EditorResourceEvent) {
 
         var path = ev.path;

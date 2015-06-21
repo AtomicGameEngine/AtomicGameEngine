@@ -35,6 +35,7 @@ void js_constructor_basecall(duk_context* ctx, const char* package, const char* 
 void js_setup_prototype(JSVM* vm, const char* package, const char* classname, const char* basePackage, const char* basename, bool hasProperties = false);
 void js_class_push_propertyobject(JSVM* vm, const char* package, const char* classname);
 void js_class_get_prototype(duk_context* ctx, const char* package, const char *classname);
+void js_class_get_constructor(duk_context* ctx, const char* package, const char *classname);
 
 /// Pushes variant value or undefined if can't be pushed
 void js_push_variant(duk_context* ctx, const Variant &v);

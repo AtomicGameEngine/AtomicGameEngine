@@ -14,6 +14,7 @@
 #include <TurboBadger/tb_inline_select.h>
 #include <TurboBadger/tb_tab_container.h>
 #include <TurboBadger/tb_toggle_container.h>
+#include <TurboBadger/tb_scroll_container.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -50,6 +51,7 @@ using namespace tb;
 #include "UIContainer.h"
 #include "UISection.h"
 #include "UIInlineSelect.h"
+#include "UIScrollContainer.h"
 
 namespace tb
 {
@@ -467,6 +469,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
+
+    if (widget->IsOfType<TBScrollContainer>())
+    {
+        UIScrollContainer* container = new UIScrollContainer(context_, false);
+        container->SetWidget(widget);
+        widgetWrap_[widget] = container;
+        return container;
+    }
 
     if (widget->IsOfType<TBInlineSelect>())
     {

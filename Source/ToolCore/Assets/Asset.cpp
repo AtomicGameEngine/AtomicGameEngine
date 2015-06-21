@@ -8,6 +8,7 @@
 #include "FolderImporter.h"
 #include "SceneImporter.h"
 #include "MaterialImporter.h"
+#include "TextureImporter.h"
 #include "Asset.h"
 
 namespace ToolCore
@@ -166,6 +167,11 @@ bool Asset::CreateImporter()
 
         name_ = GetFileName(path_);
 
+        Vector<String> textureFormats;
+        textureFormats.Push(".jpg");
+        textureFormats.Push(".png");
+        textureFormats.Push(".tga");
+
         // todo, externalize recognizers
         if (ext == ".fbx")
         {
@@ -178,6 +184,10 @@ bool Asset::CreateImporter()
         else if (ext == ".material")
         {
             importer_ = new MaterialImporter(context_);
+        }
+        else if (textureFormats.Contains(ext))
+        {
+            importer_ = new TextureImporter(context_);
         }
 
     }

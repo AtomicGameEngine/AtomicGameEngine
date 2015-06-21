@@ -96,6 +96,7 @@ enum UI_EVENT_TYPE {
 };
 
 
+class UIView;
 class UILayoutParams;
 class UIFontDescription;
 
@@ -166,9 +167,10 @@ public:
 
     void SetIsFocusable(bool value);
 
-
     // get this or child widget with id
     UIWidget* GetWidget(const String& id);
+
+    UIView* GetView();
 
     virtual void AddChild(UIWidget* child);
 

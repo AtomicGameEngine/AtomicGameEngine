@@ -1,5 +1,8 @@
 
 import ScriptWidget = require("../ScriptWidget");
+import UIEvents = require("../UIEvents");
+
+import TextureSelector = require("./TextureSelector");
 
 class MaterialInspector extends ScriptWidget {
 
@@ -9,7 +12,88 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
+    createShaderParametersSection(): Atomic.UISection {
+
+        var section = new Atomic.UISection();
+        section.text = "Shader Paramaters";
+        section.value = 1;
+
+        return section;
+
+    }
+
+    createTextureSection(): Atomic.UISection {
+
+        var section = new Atomic.UISection();
+        section.text = "Textures";
+        section.value = 1;
+
+        var fd = new Atomic.UIFontDescription();
+        fd.id = "Vera";
+        fd.size = 11;
+
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        attrsVerticalLayout.spacing = 3;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+
+        section.contentRoot.addChild(attrsVerticalLayout);
+
+        // TODO: Filter on technique
+        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_EMISSIVE, Atomic.TU_SPECULAR, Atomic.TU_ENVIRONMENT,
+            Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
+
+        for (var i in textureUnits) {
+
+            var tunit: Atomic.TextureUnit = textureUnits[i];
+
+            var tunitName = Atomic.Material.getTextureUnitName(tunit);
+
+            var attrLayout = new Atomic.UILayout();
+            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+            var name = new Atomic.UITextField();
+            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.skinBg = "InspectorTextAttrName";
+
+            name.text = tunitName;
+            name.fontDescription = fd;
+
+            attrLayout.addChild(name);
+
+            var textureWidget = new Atomic.UITextureWidget();
+            textureWidget.texture = this.material.getTexture(tunit);
+
+            var tlp = new Atomic.UILayoutParams();
+            tlp.width = 32;
+            tlp.height = 32;
+            textureWidget.layoutParams = tlp;
+
+            attrLayout.addChild(textureWidget);
+
+            attrsVerticalLayout.addChild(attrLayout);
+
+            var editInfo: { textureUnit: Atomic.TextureUnit } = { textureUnit: tunit };
+
+            var callback = function(ev: Atomic.UIWidgetEvent) {
+
+                var tselect = new TextureSelector(ev.target.view);
+
+                print("CALLBACK: ", ev.target.getTypeName(), this.textureUnit);
+
+            }.bind(editInfo);
+
+            textureWidget.subscribeToEvent(textureWidget, "WidgetEvent", callback);
+
+        }
+
+        return section;
+
+    }
+
     inspect(material: Atomic.Material) {
+
+        this.material = material;
 
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";
@@ -51,7 +135,6 @@ class MaterialInspector extends ScriptWidget {
         attrLayout.addChild(name);
 
 
-        /*
         var field = new Atomic.UIEditField();
         field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
         field.skinBg = "TBAttrEditorField";;
@@ -63,21 +146,6 @@ class MaterialInspector extends ScriptWidget {
         field.text = material.getTexture(Atomic.TU_DIFFUSE).name;
 
         attrLayout.addChild(field);
-
-        */
-
-
-
-        var textureWidget = new Atomic.UITextureWidget();
-        textureWidget.texture = material.getTexture(Atomic.TU_DIFFUSE);
-
-        var tlp = new Atomic.UILayoutParams();
-        tlp.width = 64;
-        tlp.height = 64;
-        textureWidget.layoutParams = tlp;
-
-
-        attrLayout.addChild(textureWidget);
 
 
         attrsVerticalLayout.addChild(attrLayout);
@@ -101,6 +169,9 @@ class MaterialInspector extends ScriptWidget {
 
         }
         */
+
+        materialLayout.addChild(this.createTextureSection());
+        materialLayout.addChild(this.createShaderParametersSection());
 
         this.addChild(materialLayout);
 

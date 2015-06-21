@@ -9,7 +9,7 @@ class NodeInspector extends ScriptWidget {
 
         super();
 
-        this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
     }
 

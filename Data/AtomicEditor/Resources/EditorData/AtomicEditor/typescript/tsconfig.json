@@ -28,6 +28,7 @@
         "./ui/inspector/InspectorFrame.ts",
         "./ui/inspector/MaterialInspector.ts",
         "./ui/inspector/NodeInspector.ts",
+        "./ui/inspector/TextureSelector.ts",
         "./ui/modal/MessageModal.ts",
         "./ui/modal/ModalOps.ts"
     ]

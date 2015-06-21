@@ -17,6 +17,12 @@
 			"SetOrthoSize" : ["float"]
 		}
 
+	},
+	"typescript_decl" : {
+
+		"Material" : [
+			"static getTextureUnitName(unit:TextureUnit):string;"
+		]
 	}
 
 }
