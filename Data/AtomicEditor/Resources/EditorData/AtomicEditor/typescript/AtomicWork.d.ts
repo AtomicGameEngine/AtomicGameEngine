@@ -15,8 +15,8 @@ declare module Atomic {
     /*
         export enum UIWidgetEventType {
 
-            EVENT_TYPE_CLICK,
-            EVENT_TYPE_LONG_CLICK,
+        EVENT_TYPE_CLICK,
+        EVENT_TYPE_LONG_CLICK,
         EVENT_TYPE_POINTER_DOWN,
         EVENT_TYPE_POINTER_UP,
         EVENT_TYPE_POINTER_MOVE,
@@ -48,6 +48,16 @@ declare module Atomic {
         modifierkeys: number;
         refid: string;
         touch: boolean;
+    }
+
+    export interface AttributeInfo {
+
+      type:VariantType;
+      name:string;
+      mode:number; // AM_*
+      defaultValue:string;
+      enumNames:string[];
+
     }
 
     export function getArguments(): Array<string>;

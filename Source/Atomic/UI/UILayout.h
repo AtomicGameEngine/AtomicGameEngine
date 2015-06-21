@@ -84,6 +84,12 @@ public:
     void SetWidth(int width) { params_.SetWidth(width); }
     void SetHeight(int height) { params_.SetHeight(height); }
 
+    void SetMinWidth(int width) { params_.min_w = width; }
+    void SetMinHeight(int height) { params_.min_h = height; }
+
+    void SetMaxWidth(int width) { params_.max_w = width; }
+    void SetMaxHeight(int height) { params_.max_h = height; }
+
     tb::LayoutParams* GetTBLayoutParams() { return &params_; }
 
 private:
@@ -106,7 +112,6 @@ public:
 
     void SetAxis(UI_AXIS axis);
     void SetLayoutSize(UI_LAYOUT_SIZE size);
-
     void SetLayoutPosition(UI_LAYOUT_POSITION position);
     void SetLayoutDistribution(UI_LAYOUT_DISTRIBUTION distribution);
     void SetLayoutDistributionPosition(UI_LAYOUT_DISTRIBUTION_POSITION distribution_pos);

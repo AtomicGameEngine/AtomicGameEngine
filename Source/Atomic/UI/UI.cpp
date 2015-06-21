@@ -11,6 +11,7 @@
 #include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
 #include <TurboBadger/tb_select.h>
+#include <TurboBadger/tb_inline_select.h>
 #include <TurboBadger/tb_tab_container.h>
 #include <TurboBadger/tb_toggle_container.h>
 #include <TurboBadger/image/tb_image_widget.h>
@@ -48,6 +49,7 @@ using namespace tb;
 #include "UIDragDrop.h"
 #include "UIContainer.h"
 #include "UISection.h"
+#include "UIInlineSelect.h"
 
 namespace tb
 {
@@ -465,6 +467,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
+
+    if (widget->IsOfType<TBInlineSelect>())
+    {
+        UIInlineSelect* select = new UIInlineSelect(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
+    }
 
     if (widget->IsOfType<TBSection>())
     {
