@@ -42,6 +42,7 @@ class NodeInspector extends ScriptWidget {
         nodeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
         nodeLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
         nodeLayout.layoutParams = nlp;
+        nodeLayout.axis = Atomic.UI_AXIS_Y;
 
         // node attr layout
 
@@ -104,6 +105,18 @@ class NodeInspector extends ScriptWidget {
             attrsVerticalLayout.addChild(attrLayout);
 
             this.bindings.push(binding);
+
+        }
+
+        var components = node.getComponents();
+
+        for (var i in components) {
+
+          var ci = new ComponentInspector();
+
+          ci.inspect(components[i]);
+
+          nodeLayout.addChild(ci);
 
         }
 

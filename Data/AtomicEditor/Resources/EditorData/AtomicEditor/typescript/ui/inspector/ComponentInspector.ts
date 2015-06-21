@@ -2,7 +2,7 @@
 import ScriptWidget = require("../ScriptWidget");
 import DataBinding = require("./DataBinding");
 
-class ComponentInspector extends ScriptWidget {
+class ComponentInspector extends Atomic.UISection {
 
     constructor() {
 
@@ -28,6 +28,9 @@ class ComponentInspector extends ScriptWidget {
 
     inspect(component: Atomic.Component) {
 
+        this.text = component.getTypeName();
+        this.value = 1;
+
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";
         fd.size = 11;
@@ -35,28 +38,12 @@ class ComponentInspector extends ScriptWidget {
         var nlp = new Atomic.UILayoutParams();
         nlp.width = 304;
 
-        var nodeLayout = new Atomic.UILayout();
-        nodeLayout.spacing = 4;
-
-        nodeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        nodeLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        nodeLayout.layoutParams = nlp;
-
-        // node attr layout
-
-        var nodeSection = new Atomic.UISection();
-        nodeSection.text = "Node";
-        nodeSection.value = 1;
-        //nodeSection.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        //nodeSection.skinBg = "InspectorTextLabel";
-        nodeLayout.addChild(nodeSection);
-
         var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
         attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
         attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
 
-        nodeSection.contentRoot.addChild(attrsVerticalLayout);
+        this.contentRoot.addChild(attrsVerticalLayout);
 
         var attrs = component.getAttributes();
 
@@ -105,8 +92,6 @@ class ComponentInspector extends ScriptWidget {
             this.bindings.push(binding);
 
         }
-
-        this.addChild(nodeLayout);
 
     }
 
