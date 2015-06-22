@@ -15,6 +15,7 @@ namespace Atomic
 {
 
 class UISceneView;
+class UIRenderer;
 
 class SceneViewWidget : public tb::TBWidget
 {
@@ -38,6 +39,9 @@ private:
 
 class UISceneView : public UIWidget
 {
+
+    friend class SceneViewWidget;
+
     OBJECT(UISceneView)
 
 public:
@@ -101,6 +105,8 @@ protected:
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
 private:
+
+    UIRenderer* renderer_;
 
 };
 

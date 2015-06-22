@@ -8,7 +8,8 @@
 	"typescript_decl" : {
 
 		"AssetDatabase" : [
-			"getFolderAssets(folder:string):ToolCore.Asset[];"
+			"getFolderAssets(folder:string):ToolCore.Asset[];",
+			"getAssetsByImporterType(type:string):ToolCore.Asset[];"
 		]
 	}
 

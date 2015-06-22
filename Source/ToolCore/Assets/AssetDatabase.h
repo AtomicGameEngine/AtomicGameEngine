@@ -33,6 +33,8 @@ public:
 
     void GetFolderAssets(String folder, PODVector<Asset*>& assets) const;
 
+    void GetAssetsByImporterType(StringHash type, PODVector<Asset*>& assets) const;
+
     void GetDirtyAssets(PODVector<Asset*>& assets);
 
     String GetDotAssetFilename(const String& path);

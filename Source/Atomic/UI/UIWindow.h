@@ -22,6 +22,8 @@ public:
 
     void AddChild(UIWidget *child);
 
+    void Close();
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

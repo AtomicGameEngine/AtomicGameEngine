@@ -274,6 +274,24 @@ void AssetDatabase::GetFolderAssets(String folder, PODVector<Asset*>& assets) co
 
 }
 
+void AssetDatabase::GetAssetsByImporterType(StringHash type, PODVector<Asset*>& assets) const
+{
+    assets.Clear();
+
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    while (itr != assets_.End())
+    {
+        Asset* asset = *itr;
+
+        if (asset->GetImporterType() == type)
+            assets.Push(asset);
+
+        itr++;
+    }
+
+}
+
 void AssetDatabase::GetDirtyAssets(PODVector<Asset*>& assets)
 {
     assets.Clear();

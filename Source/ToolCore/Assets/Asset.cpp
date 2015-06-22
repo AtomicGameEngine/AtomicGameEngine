@@ -199,6 +199,14 @@ bool Asset::CreateImporter()
 
 }
 
+String Asset::GetCachePath() const
+{
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    cachePath += guid_;
+    return cachePath;
+}
+
 
 bool Asset::SetPath(const String& path)
 {

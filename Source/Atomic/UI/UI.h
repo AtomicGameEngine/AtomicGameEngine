@@ -61,6 +61,8 @@ public:
 
     void GetTBIDString(unsigned id, String& value);
 
+    UIRenderer* GetRenderer() { return renderer_; }
+
 private:
 
     static WeakPtr<Context> uiContext_;

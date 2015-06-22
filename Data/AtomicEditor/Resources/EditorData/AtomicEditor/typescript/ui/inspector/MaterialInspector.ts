@@ -22,6 +22,29 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
+    getTextureThumbnail(texture: Atomic.Texture): Atomic.Texture {
+
+        if (!texture) return null;
+
+        var db = ToolCore.getAssetDatabase();
+        var asset = db.getAssetByPath(texture.name);
+
+        if (!asset)
+            return texture;
+
+        var thumbnail = asset.cachePath + "_thumbnail.png";
+        var cache = Atomic.getResourceCache();
+
+        var thumb = <Atomic.Texture2D> cache.getTempResource("Texture2D", thumbnail);
+
+
+        if (thumb)
+          return thumb;
+
+        return texture;
+
+    }
+
     createTextureSection(): Atomic.UISection {
 
         var section = new Atomic.UISection();
@@ -62,7 +85,7 @@ class MaterialInspector extends ScriptWidget {
             attrLayout.addChild(name);
 
             var textureWidget = new Atomic.UITextureWidget();
-            textureWidget.texture = this.material.getTexture(tunit);
+            textureWidget.texture = this.getTextureThumbnail(this.material.getTexture(tunit));
 
             var tlp = new Atomic.UILayoutParams();
             tlp.width = 32;
@@ -77,9 +100,9 @@ class MaterialInspector extends ScriptWidget {
 
             var callback = function(ev: Atomic.UIWidgetEvent) {
 
-                var tselect = new TextureSelector(ev.target.view);
-
-                print("CALLBACK: ", ev.target.getTypeName(), this.textureUnit);
+                if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+                  var tselect = new TextureSelector(ev.target.view);
+              }
 
             }.bind(editInfo);
 

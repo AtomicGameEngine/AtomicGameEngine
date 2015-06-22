@@ -7,6 +7,7 @@
 
 #include "UIEvents.h"
 #include "UI.h"
+#include "UIRenderer.h"
 #include "UITextureWidget.h"
 
 using namespace tb;
@@ -37,13 +38,17 @@ private:
 
 UITextureWidget::UITextureWidget(Context* context, bool createWidget) : UIWidget(context, false)
 {
+    UI* ui = GetSubsystem<UI>();
+
     if (createWidget)
     {
         widget_ = new TBTextureWidget();
         ((TBTextureWidget*)widget_)->uiTextureWidget_ = this;
         widget_->SetDelegate(this);
-        GetSubsystem<UI>()->WrapWidget(this, widget_);
+        ui->WrapWidget(this, widget_);
     }
+
+    renderer_ = ui->GetRenderer();
 }
 
 UITextureWidget::~UITextureWidget()
@@ -69,6 +74,7 @@ bool UITextureWidget::OnEvent(const tb::TBWidgetEvent &ev)
 TBTextureWidget::TBTextureWidget()
 {
     vertexData_.Resize(6 * UI_VERTEX_SIZE);
+
     float color;
     ((unsigned&)color) = 0xFFFFFFFF;
 
@@ -93,6 +99,18 @@ void TBTextureWidget::OnPaint(const PaintProps &paint_props)
     ConvertToRoot(rect.x, rect.y);
 
     float* data = &vertexData_[0];
+
+    float color;
+    float fopacity = GetOpacity() * uiTextureWidget_->renderer_->GetOpacity();
+    unsigned char opacity = (unsigned char) (fopacity* 255.0f);
+    ((unsigned&)color) = (0x00FFFFFF + (((uint32)opacity) << 24));
+
+    data[3] = color;
+    data[9] = color;
+    data[15] = color;
+    data[21] = color;
+    data[27] = color;
+    data[33] = color;
 
     data[0] = rect.x;
     data[1] = rect.y;

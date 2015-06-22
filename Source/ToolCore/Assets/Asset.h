@@ -31,8 +31,10 @@ public:
     const String& GetGUID() const { return guid_; }
     const String& GetName() const { return name_; }
     const String& GetPath() const { return path_; }
+    String GetCachePath() const;
     unsigned GetTimestamp() const { return timestamp_; }
 
+    const StringHash GetImporterType() { return importer_.Null() ? String::EMPTY : importer_->GetType(); }
     const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }
 
     void SetDirty(bool dirty) { dirty_ = dirty; }

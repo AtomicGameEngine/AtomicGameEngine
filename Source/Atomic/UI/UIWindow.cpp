@@ -41,6 +41,16 @@ void UIWindow::ResizeToFitContent()
 
 }
 
+void UIWindow::Close()
+{
+    if (!widget_)
+        return;
+
+    ((TBWindow*)widget_)->Close();
+
+}
+
+
 void UIWindow::AddChild(UIWidget *child)
 {
     if (!widget_ || !child->GetInternalWidget())
