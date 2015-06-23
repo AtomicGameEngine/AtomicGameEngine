@@ -348,7 +348,7 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
     }
 
     // specific event handlers
-    if (type == tb::EVENT_TYPE_CLICK)
+    if (type == tb::EVENT_TYPE_CLICK && handler == target)
     {
         int top = duk_get_top(ctx_);
         duk_push_heapptr(ctx_, handlerHeapPtr);

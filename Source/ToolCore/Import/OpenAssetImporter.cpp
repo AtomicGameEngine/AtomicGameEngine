@@ -85,6 +85,10 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
         aiProcess_FindInstances |
         aiProcess_OptimizeMeshes;
 
+    // TODO:  make this an option on importer
+
+    aiFlagsDefault_ |= aiProcess_CalcTangentSpace;
+
     aiCurrentFlags_ = aiFlagsDefault_;
 
 }

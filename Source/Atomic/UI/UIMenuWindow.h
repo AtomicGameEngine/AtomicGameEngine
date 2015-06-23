@@ -20,6 +20,8 @@ public:
 
     void Show(UISelectItemSource* source);
 
+    void Close();
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

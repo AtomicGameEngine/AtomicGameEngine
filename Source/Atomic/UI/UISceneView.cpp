@@ -205,6 +205,8 @@ void SceneViewWidget::OnPaint(const PaintProps &paint_props)
         size.x_ = rect.w;
         size.y_ = rect.h;
         sceneView_->SetResizeRequired();
+        // early out here, responsible for flicker
+        // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/115
         return;
     }
 

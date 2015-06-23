@@ -48,7 +48,6 @@ class TextureSelector extends Atomic.UIWindow {
 
         }
 
-
         mainLayout.addChild(scrollContainer);
 
         parent.addChild(this);

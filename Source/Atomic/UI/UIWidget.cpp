@@ -91,9 +91,10 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
 void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
     UI* ui = GetSubsystem<UI>();
-    String id;
 
-    ui->GetTBIDString(ev.ref_id, id);
+    String refid;
+
+    ui->GetTBIDString(ev.ref_id, refid);
 
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
@@ -107,7 +108,7 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_KEY] = ev.key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
-    data[P_REFID] = id;
+    data[P_REFID] = refid;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
 

@@ -44,4 +44,13 @@ bool UIMenuWindow::OnEvent(const tb::TBWidgetEvent &ev)
     return false;
 }
 
+void UIMenuWindow::Close()
+{
+    if (!widget_)
+        return;
+
+    ((TBMenuWindow*)widget_)->Close();
+
+}
+
 }
