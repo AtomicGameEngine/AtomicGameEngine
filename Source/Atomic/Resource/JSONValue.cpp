@@ -106,6 +106,11 @@ JSONValue JSONValue::CreateChild(const String& name, JSONValueType valueType)
     return GetChild(name, valueType);
 }
 
+bool JSONValue::HasMember(const String& name) const
+{
+    return value_->HasMember(name.CString());
+}
+
 JSONValue JSONValue::GetChild(const String& name, JSONValueType valueType) const
 {
     assert(IsObject());

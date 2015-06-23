@@ -37,6 +37,8 @@ public:
     const StringHash GetImporterType() { return importer_.Null() ? String::EMPTY : importer_->GetType(); }
     const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }
 
+    AssetImporter* GetImporter() { return importer_; }
+
     void SetDirty(bool dirty) { dirty_ = dirty; }
     bool IsDirty() const { return dirty_; }
 

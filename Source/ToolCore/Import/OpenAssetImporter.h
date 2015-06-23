@@ -41,6 +41,12 @@ class OpenAssetImporter : public Object
 
 public:
 
+    struct AnimationInfo
+    {
+        String name_;
+        String cacheFilename_;
+    };
+
     OpenAssetImporter(Context* context);
     virtual ~OpenAssetImporter();
 
@@ -48,9 +54,19 @@ public:
 
     void ExportModel(const String& outName, bool animationOnly = false);
 
+    void SetStartTime(float startTime) { startTime_ = startTime; }
+    void SetEndTime(float endTime) { endTime_ = endTime; }
+    void SetScale(float scale) { scale_ = scale; }
+    void SetExportAnimations(bool exportAnimations) { noAnimations_ = !exportAnimations; }
+
     void SetVerboseLog(bool verboseLog) { verboseLog_ = verboseLog; }
 
+    const Vector<AnimationInfo>& GetAnimationInfos() { return animationInfos_; }
+
 private:
+
+    void ApplyScale();
+    void ApplyScale(aiNode* node);
 
     void BuildAndSaveModel(OutModel& model);
     void BuildAndSaveAnimations(OutModel* model = 0);
@@ -67,7 +83,7 @@ private:
     String GetMeshMaterialName(aiMesh* mesh);
     String GenerateMaterialName(aiMaterial* material);
     String GetMaterialTextureName(const String& nameIn);
-    String GenerateTextureName(unsigned texIndex);
+    String GenerateTextureName(unsigned texIndex);    
 
     // TODO: See AssetImporter
     // void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
@@ -99,6 +115,7 @@ private:
     bool noOverwriteTexture_;
     bool noOverwriteNewerTexture_;
     bool checkUniqueModel_;
+    float scale_;
     unsigned maxBones_;
 
     unsigned aiFlagsDefault_;
@@ -110,7 +127,12 @@ private:
     HashSet<aiAnimation*> allAnimations_;
     PODVector<aiAnimation*> sceneAnimations_;
 
+    Vector<AnimationInfo> animationInfos_;
+
     float defaultTicksPerSecond_;
+
+    float startTime_;
+    float endTime_;
 
 };
 

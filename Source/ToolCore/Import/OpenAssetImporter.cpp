@@ -35,6 +35,7 @@
 
 #include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Atomic3D/AnimationController.h>
 
 #include <Atomic/Graphics/Geometry.h>
 #include <Atomic/Graphics/IndexBuffer.h>
@@ -67,8 +68,11 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     noOverwriteTexture_(true),
     noOverwriteNewerTexture_(true),
     checkUniqueModel_(true),
+    scale_(1.0f),
     maxBones_(64),
-    defaultTicksPerSecond_(4800.0f)
+    defaultTicksPerSecond_(4800.0f),
+    startTime_(-1),
+    endTime_(-1)
 {
 
     aiFlagsDefault_ =
@@ -118,9 +122,81 @@ bool OpenAssetImporter::Load(const String &assetPath)
 
     rootNode_ = scene_->mRootNode;
 
+    ApplyScale();
+
     // DumpNodes(rootNode_, 0);
 
     return true;
+
+}
+
+void OpenAssetImporter::ApplyScale(aiNode* node)
+{
+    if (!node)
+        return;
+
+    aiVector3D pos, scale;
+    aiQuaternion rot;
+    node->mTransformation.Decompose(scale, rot, pos);
+
+    pos *= scale_;
+
+    node->mTransformation = aiMatrix4x4(scale, rot, pos);
+
+    for (unsigned i = 0; i < node->mNumChildren; i++)
+    {
+        ApplyScale(node->mChildren[i]);
+    }
+
+}
+
+void OpenAssetImporter::ApplyScale()
+{
+    if (scale_ == 1.0f)
+        return;
+
+    ApplyScale(scene_->mRootNode);
+
+    for (unsigned i = 0; i < scene_->mNumMeshes; i++)
+    {
+        aiMesh* mesh = scene_->mMeshes[i];
+
+        for (unsigned j = 0; j < mesh->mNumVertices; j++)
+        {
+            mesh->mVertices[j] *= scale_;
+        }
+
+        for (unsigned j = 0; j < mesh->mNumBones; ++j)
+        {
+            aiBone* bone = mesh->mBones[j];
+
+            aiVector3D pos, scale;
+            aiQuaternion rot;
+            bone->mOffsetMatrix.Decompose(scale, rot, pos);
+
+            pos *= scale_;
+
+            bone->mOffsetMatrix = aiMatrix4x4(scale, rot, pos);
+
+        }
+    }
+
+    for (unsigned i = 0; i < scene_->mNumAnimations; i++)
+    {
+        aiAnimation* animation = scene_->mAnimations[i];
+
+        for (unsigned j = 0; j < animation->mNumChannels; j++)
+        {
+            aiNodeAnim* channel = animation->mChannels[j];
+
+            for (unsigned k = 0; k < channel->mNumPositionKeys; k++)
+            {
+                channel->mPositionKeys[k].mValue *= scale_;
+            }
+
+        }
+
+    }
 
 }
 
@@ -136,18 +212,21 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
     CollectMeshes(scene_, model, model.rootNode_);
     CollectBones(model, animationOnly);
     BuildBoneCollisionInfo(model);
-    BuildAndSaveModel(model);
+
+    if (!animationOnly)
+        BuildAndSaveModel(model);
+
     if (!noAnimations_)
     {
         CollectAnimations(&model);
         BuildAndSaveAnimations(&model);
 
         // Save scene-global animations
-        CollectAnimations();
-        BuildAndSaveAnimations();
+        // CollectAnimations();
+        // BuildAndSaveAnimations();
     }
 
-    if (!noMaterials_)
+    if (!noMaterials_ && !animationOnly)
     {
         HashSet<String> usedTextures;
         ExportMaterials(usedTextures);
@@ -175,8 +254,19 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
 
     SharedPtr<Node> node(new Node(context_));
     node->SetName("Model");
+
+    StaticModel* modelComponent = 0;
+    /*
     StaticModel* staticModel = node->CreateComponent<StaticModel>();
     staticModel->SetModel(mdl);
+    */
+
+    AnimatedModel* animatedModel = node->CreateComponent<AnimatedModel>();
+    modelComponent = animatedModel;
+    animatedModel->SetModel(mdl, false);
+
+    // create animation controller
+    AnimationController* controller = node->CreateComponent<AnimationController>();
 
     if (!noMaterials_)
     {
@@ -187,7 +277,7 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
 
             String materialName = sourceAssetPath_ + matName;
 
-            staticModel->SetMaterial(j, cache->GetResource<Material>(materialName));
+            modelComponent->SetMaterial(j, cache->GetResource<Material>(materialName));
         }
 
     }
@@ -562,34 +652,70 @@ void OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
 
-    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    if (animationOnly && !model.meshes_.Size())
     {
-        aiMesh* mesh = model.meshes_[i];
-        aiNode* meshNode = model.meshNodes_[i];
-        aiNode* meshParentNode = meshNode->mParent;
         aiNode* rootNode = 0;
 
-        for (unsigned j = 0; j < mesh->mNumBones; ++j)
+        for (unsigned i = 0; i < scene_->mNumAnimations; ++i)
         {
-            aiBone* bone = mesh->mBones[j];
-            String boneName(FromAIString(bone->mName));
-            aiNode* boneNode = GetNode(boneName, scene_->mRootNode, true);
-            if (!boneNode)
-                ErrorExit("Could not find scene node for bone " + boneName);
-            necessary.Insert(boneNode);
-            rootNode = boneNode;
+            aiAnimation* anim = scene_->mAnimations[i];
 
-            for (;;)
+            for (unsigned j = 0; j < anim->mNumChannels; ++j)
             {
-                boneNode = boneNode->mParent;
-                if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
-                    break;
-                rootNode = boneNode;
-                necessary.Insert(boneNode);
-            }
+                aiNodeAnim* channel = anim->mChannels[j];
+                String channelName = FromAIString(channel->mNodeName);
 
-            if (rootNodes.Find(rootNode) == rootNodes.End())
-                rootNodes.Insert(rootNode);
+                aiNode* boneNode = GetNode(channelName, scene_->mRootNode, true);
+
+                necessary.Insert(boneNode);
+                rootNode = boneNode;
+
+                for (;;)
+                {
+                    boneNode = boneNode->mParent;
+                    if (!boneNode)// || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
+                        break;
+                    rootNode = boneNode;
+                    necessary.Insert(boneNode);
+                }
+
+                if (rootNodes.Find(rootNode) == rootNodes.End())
+                    rootNodes.Insert(rootNode);
+
+            }
+        }
+    }
+    else
+    {
+        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+        {
+            aiMesh* mesh = model.meshes_[i];
+            aiNode* meshNode = model.meshNodes_[i];
+            aiNode* meshParentNode = meshNode->mParent;
+            aiNode* rootNode = 0;
+
+            for (unsigned j = 0; j < mesh->mNumBones; ++j)
+            {
+                aiBone* bone = mesh->mBones[j];
+                String boneName(FromAIString(bone->mName));
+                aiNode* boneNode = GetNode(boneName, scene_->mRootNode, true);
+                if (!boneNode)
+                    ErrorExit("Could not find scene node for bone " + boneName);
+                necessary.Insert(boneNode);
+                rootNode = boneNode;
+
+                for (;;)
+                {
+                    boneNode = boneNode->mParent;
+                    if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
+                        break;
+                    rootNode = boneNode;
+                    necessary.Insert(boneNode);
+                }
+
+                if (rootNodes.Find(rootNode) == rootNodes.End())
+                    rootNodes.Insert(rootNode);
+            }
         }
     }
 
@@ -761,20 +887,31 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
             ticksPerSecond = defaultTicksPerSecond_;
         float tickConversion = 1.0f / ticksPerSecond;
 
-        // Find out the start time of animation from each channel's first keyframe for adjusting the keyframe times
-        // to start from zero
-        float startTime = duration;
-        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        float startTime;
+
+        if (startTime_ >= 0.0 && endTime_ >= 0.0)
         {
-            aiNodeAnim* channel = anim->mChannels[j];
-            if (channel->mNumPositionKeys > 0)
-                startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
-            if (channel->mNumRotationKeys > 0)
-                startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
-            if (channel->mScalingKeys > 0)
-                startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
+            startTime = startTime_;
+            duration = endTime_ - startTime_;
         }
-        duration -= startTime;
+        else
+        {
+            // Find out the start time of animation from each channel's first keyframe for adjusting the keyframe times
+            // to start from zero
+            startTime = duration;
+            for (unsigned j = 0; j < anim->mNumChannels; ++j)
+            {
+                aiNodeAnim* channel = anim->mChannels[j];
+                if (channel->mNumPositionKeys > 0)
+                    startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
+                if (channel->mNumRotationKeys > 0)
+                    startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
+                if (channel->mScalingKeys > 0)
+                    startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
+            }
+
+            duration -= startTime;
+        }
 
         SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
@@ -939,6 +1076,11 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
         if (!outFile.Open(animOutName, FILE_WRITE))
             ErrorExit("Could not open output file " + animOutName);
         outAnim->Save(outFile);
+
+        AnimationInfo info;
+        info.name_ = SanitateAssetName(animName);
+        info.cacheFilename_ = animOutName;
+        animationInfos_.Push(info);
     }
 }
 

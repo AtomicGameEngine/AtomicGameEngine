@@ -10,6 +10,7 @@ var solidSource = new Atomic.UIMenuItemSource();
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse", "Diffuse"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Emissive", "Diffuse Emissive"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Normal", "Diffuse Normal"));
+solidSource.addItem(new Atomic.UIMenuItem("Diffuse Normal Specular", "Diffuse Normal Specular"));
 
 var tranSource = new Atomic.UIMenuItemSource();
 tranSource.addItem(new Atomic.UIMenuItem("Alpha", "Alpha"));
@@ -40,6 +41,7 @@ var techniqueLookup = {
     "Techniques/Diff.xml": "Diffuse",
     "Techniques/DiffEmissive.xml": "Diffuse Emissive",
     "Techniques/DiffNormal.xml": "Diffuse Normal",
+    "Techniques/DiffNormalSpec.xml": "Diffuse Normal Specular"
 }
 
 var techniqueReverseLookup = {};
@@ -152,7 +154,6 @@ class MaterialInspector extends ScriptWidget {
     createTechniquePopup(): Atomic.UIWidget {
 
         var button = this.techniqueButton = new Atomic.UIButton();
-
         var technique = this.material.getTechnique(0);
 
         button.text = techniqueLookup[technique.name];
@@ -160,7 +161,7 @@ class MaterialInspector extends ScriptWidget {
         button.fontDescription = this.fd;
 
         var lp = new Atomic.UILayoutParams();
-        lp.width = 140;
+        lp.width = 180;
         button.layoutParams = lp;
 
         button.onClick = function() {
@@ -204,7 +205,7 @@ class MaterialInspector extends ScriptWidget {
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL]// ,Atomic.TU_EMISSIVE, Atomic.TU_SPECULAR, Atomic.TU_ENVIRONMENT,
+        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR];// ,Atomic.TU_EMISSIVE, Atomic.TU_ENVIRONMENT,
             //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
 
         for (var i in textureUnits) {
@@ -260,7 +261,7 @@ class MaterialInspector extends ScriptWidget {
         this.material = material;
 
         var mlp = new Atomic.UILayoutParams();
-        mlp.width = 304;
+        mlp.width = 340;
 
         var materialLayout = new Atomic.UILayout();
         materialLayout.spacing = 4;
@@ -281,7 +282,7 @@ class MaterialInspector extends ScriptWidget {
         var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
         attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
 
         // NAME
         var nameLayout = new Atomic.UILayout();
@@ -301,7 +302,7 @@ class MaterialInspector extends ScriptWidget {
         field.skinBg = "TBAttrEditorField";;
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
-        lp.width = 140;
+        lp.width = 180;
         field.layoutParams = lp;
 
         field.text = material.getTexture(Atomic.TU_DIFFUSE).name;
@@ -313,7 +314,8 @@ class MaterialInspector extends ScriptWidget {
         // TECHNIQUE LAYOUT
 
         var techniqueLayout = new Atomic.UILayout();
-        techniqueLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        techniqueLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_GRAVITY;
+        techniqueLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_PREFERRED;
 
         name = new Atomic.UITextField();
         name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;

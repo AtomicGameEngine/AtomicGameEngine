@@ -6,6 +6,7 @@ import DataBinding = require("./DataBinding");
 // inspectors
 
 import MaterialInspector = require("./MaterialInspector");
+import ModelInspector = require("./ModelInspector");
 import NodeInspector = require("./NodeInspector");
 
 var UI = Atomic.UI;
@@ -27,7 +28,7 @@ class InspectorFrame extends ScriptWidget {
 
 
     }
-    
+
     handleEditResource(ev: UIEvents.EditorResourceEvent) {
 
         var path = ev.path;
@@ -57,6 +58,19 @@ class InspectorFrame extends ScriptWidget {
 
 
     inspectAsset(asset: ToolCore.Asset) {
+
+       if (asset.importerTypeName == "ModelImporter") {
+
+         var container = this.getWidget("inspectorcontainer");
+         container.deleteAllChildren();
+
+         var inspector = new ModelInspector();
+         container.addChild(inspector);
+
+         inspector.inspect(asset);
+
+
+       }
 
         if (asset.importerTypeName == "MaterialImporter") {
 

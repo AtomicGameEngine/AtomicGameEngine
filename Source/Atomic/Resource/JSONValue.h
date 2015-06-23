@@ -129,6 +129,10 @@ public:
 
     /// Is object type.
     bool IsObject() const;
+
+    /// HasMember
+    bool HasMember(const String& name) const;
+
     /// Return child names (only object and array child name).
     Vector<String> GetChildNames() const;
     /// Return member value names.

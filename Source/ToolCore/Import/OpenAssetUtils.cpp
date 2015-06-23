@@ -30,6 +30,14 @@ namespace ToolCore
 
 void CollectMeshes(const aiScene* scene, OutModel& model, aiNode* node)
 {
+
+    // skip LOD for now
+    String name = node->mName.C_Str();
+    if (name.Find("LOD1") != String::NPOS || name.Find("LOD2") != String::NPOS)
+    {
+        return;
+    }
+
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
