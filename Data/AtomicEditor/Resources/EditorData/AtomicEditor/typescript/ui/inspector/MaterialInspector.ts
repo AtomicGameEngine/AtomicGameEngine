@@ -70,6 +70,49 @@ class MaterialInspector extends ScriptWidget {
         section.value = 1;
         section.fontDescription = this.fd;
 
+        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        attrsVerticalLayout.spacing = 3;
+        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+
+        section.contentRoot.addChild(attrsVerticalLayout);
+
+        var params = this.material.getShaderParameters();
+
+        for (var i in params) {
+
+
+          var attrLayout = new Atomic.UILayout();
+          attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+          var name = new Atomic.UITextField();
+          name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+          name.skinBg = "InspectorTextAttrName";
+
+          name.text = params[i].name;
+          name.fontDescription = this.fd;
+
+          attrLayout.addChild(name);
+
+          var field = new Atomic.UIEditField();
+          field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+          field.skinBg = "TBAttrEditorField";;
+          field.fontDescription = this.fd;
+          var lp = new Atomic.UILayoutParams();
+          lp.width = 140;
+          field.layoutParams = lp;
+
+          field.text = params[i].value;
+
+          attrLayout.addChild(field);
+
+          attrsVerticalLayout.addChild(attrLayout);
+
+          // print(params[i].name, " : ", params[i].value, " : ", params[i].type);
+
+        }
+
+
         return section;
 
     }
@@ -288,23 +331,6 @@ class MaterialInspector extends ScriptWidget {
         attrsVerticalLayout.addChild(techniqueLayout);
 
         materialSection.contentRoot.addChild(attrsVerticalLayout);
-
-
-        /*
-
-        // TODO: support quality level and lod for techniques
-        var technique = material.getTechnique(0);
-
-        this.nameTextField.text = technique.name;
-
-        var params = material.getShaderParameters();
-
-        for (var i in params) {
-
-          print(params[i].name, " : ", params[i].value, " : ", params[i].type);
-
-        }
-        */
 
         materialLayout.addChild(this.createTextureSection());
         materialLayout.addChild(this.createShaderParametersSection());
