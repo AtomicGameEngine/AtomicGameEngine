@@ -50,7 +50,8 @@ static const unsigned MAX_NODE_ANIMATION_STATES = 256;
 extern const char* LOGIC_CATEGORY;
 
 AnimationController::AnimationController(Context* context) :
-    Component(context)
+    Component(context),
+    animationsResourcesAttr_(Animation::GetTypeStatic())
 {
 }
 
@@ -160,7 +161,21 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
 
     if (!state)
     {
-        Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
+        Animation* newAnimation = 0;
+
+        // Check if we're using attached animation resource
+        for (unsigned i = 0; i < animationsResources_.Size(); i++)
+        {
+            if (name == animationsResources_[i]->GetAnimationName())
+            {
+                newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animationsResources_[i]->GetName());
+                break;
+            }
+        }
+
+        if (!newAnimation)
+            GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
+
         state = AddAnimationState(newAnimation);
         if (!state)
             return false;
@@ -803,6 +818,16 @@ void AnimationController::FindAnimation(const String& name, unsigned& index, Ani
 {
     StringHash nameHash(name);
 
+    // Check if we're using attached animation resource
+    for (unsigned i = 0; i < animationsResources_.Size(); i++)
+    {
+        if (name == animationsResources_[i]->GetAnimationName())
+        {
+            nameHash = animationsResources_[i]->GetName();
+            break;
+        }
+    }
+
     // Find the AnimationState
     state = GetAnimationState(nameHash);
     if (state)
@@ -862,7 +887,6 @@ void AnimationController::SetAnimationResourcesAttr(const ResourceRefList& value
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < value.names_.Size(); ++i)
     {
-        animationsResources_.Clear();
         AddAnimationResource(cache->GetResource<Animation>(value.names_[i]));
     }
 }
