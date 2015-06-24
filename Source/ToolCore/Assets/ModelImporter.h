@@ -27,6 +27,9 @@ public:
     float GetEndTime() { return endTime_; }
     void SetEndTime(float endTime) { endTime_ = endTime; }
 
+    bool GetImportAnimations() { return importAnimations_; }
+    void SetImportAnimations(bool importAnimations) { importAnimations_ = importAnimations; }
+
     bool Import(const String& guid);
 
 protected:

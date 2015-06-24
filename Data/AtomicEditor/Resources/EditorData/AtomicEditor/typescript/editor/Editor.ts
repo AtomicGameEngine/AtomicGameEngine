@@ -55,6 +55,8 @@ class Editor extends Atomic.ScriptObject {
 
         Editor.instance = this;
 
+        Atomic.getResourceCache().autoReloadResources = true;
+
         this.assetImport = new AssetImport();
 
         var graphics = Atomic.getGraphics();

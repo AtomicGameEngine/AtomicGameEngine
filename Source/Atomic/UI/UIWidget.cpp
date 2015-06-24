@@ -139,6 +139,15 @@ void UIWidget::AddChild(UIWidget* child)
     widget_->AddChild(child->widget_);
 }
 
+String UIWidget::GetText()
+{
+    if (!widget_)
+        return "";
+
+    return widget_->GetText().CStr();
+}
+
+
 void UIWidget::SetText(const String& text)
 {
     if (!widget_)

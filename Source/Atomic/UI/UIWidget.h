@@ -121,6 +121,7 @@ public:
     IntRect GetRect();
 
     UIPreferredSize* GetPreferredSize();
+    String GetText();
 
     void SetRect(IntRect r);    
     void SetSize(int width, int height);

@@ -1,8 +1,8 @@
 
 
-import ScriptWidget = require("../ScriptWidget");
+import InspectorWidget = require("./InspectorWidget");
 
-class ModelInspector extends ScriptWidget {
+class ModelInspector extends InspectorWidget {
 
     constructor() {
 
@@ -16,72 +16,66 @@ class ModelInspector extends ScriptWidget {
 
     }
 
-    inspect(asset: ToolCore.Asset) {
+    onApply() {
 
-        var fd = new Atomic.UIFontDescription();
-        fd.id = "Vera";
-        fd.size = 11;
+      this.importer.scale = Number(this.scaleEdit.text);
+      this.importer.startTime = Number(this.startTimeEdit.text);
+      this.importer.endTime = Number(this.endTimeEdit.text);
 
-        var nlp = new Atomic.UILayoutParams();
-        nlp.width = 320;
+      this.importer.importAnimations = this.importAnimationBox.value ? true : false;
 
-        var assetLayout = new Atomic.UILayout();
-        assetLayout.spacing = 4;
-
-        assetLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        assetLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        assetLayout.layoutParams = nlp;
-        assetLayout.axis = Atomic.UI_AXIS_Y;
-
-        // node attr layout
-
-        var modelSection = new Atomic.UISection();
-        modelSection.text = "Model Import";
-        modelSection.value = 1;
-        //modelSection.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        //modelSection.skinBg = "InspectorTextLabel";
-        assetLayout.addChild(modelSection);
-
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
-        attrsVerticalLayout.spacing = 3;
-        attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-
-        modelSection.contentRoot.addChild(attrsVerticalLayout);
-
-        var attrLayout = new Atomic.UILayout();
-
-        attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-
-        var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        name.skinBg = "InspectorTextAttrName";
-        name.text = "Scale";
-        name.fontDescription = fd;
-        attrLayout.addChild(name);
-
-        var scaleEdit = new Atomic.UIEditField();
-        scaleEdit.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        scaleEdit.skinBg = "TBAttrEditorField";;
-        scaleEdit.fontDescription = fd;
-        var lp = new Atomic.UILayoutParams();
-        lp.width = 180;
-        scaleEdit.layoutParams = lp;
-
-        var importer = <ToolCore.ModelImporter> asset.importer;
-
-        scaleEdit.text = importer.scale.toString();
-
-        attrLayout.addChild(scaleEdit);
-
-        attrsVerticalLayout.addChild(attrLayout);
-
-        this.addChild(assetLayout);
+      this.importer.import(this.asset.guid);
+      this.asset.save();
 
     }
 
-    bindings:Array<DataBinding> = new Array();
+    inspect(asset: ToolCore.Asset) {
 
+        this.asset = asset;
+        this.importer = <ToolCore.ModelImporter> asset.importer;
+
+        // node attr layout
+        var rootLayout = this.rootLayout;
+
+        // Model Section
+        var modelSection = this.createSection("Model", 1);
+        var modelVerticalLayout = this.createVerticalAttrLayout();
+        rootLayout.addChild(modelSection);
+        modelSection.contentRoot.addChild(modelVerticalLayout);
+
+        this.scaleEdit = this.createAttrEditField("Scale", modelVerticalLayout);
+        this.scaleEdit.text = this.importer.scale.toString();
+
+        // Animations Section
+        var animationSection = this.createSection("Animation", 1);
+        var animVerticalLayout = this.createVerticalAttrLayout();
+        rootLayout.addChild(animationSection);
+        animationSection.contentRoot.addChild(animVerticalLayout);
+
+        this.importAnimationBox = this.createAttrCheckBox("Import Animations", animVerticalLayout);
+        this.importAnimationBox.value = this.importer.importAnimations ? 1 : 0;
+
+        this.startTimeEdit = this.createAttrEditField("Start Time", animVerticalLayout);
+        this.startTimeEdit.text = this.importer.startTime.toString();
+
+        this.endTimeEdit = this.createAttrEditField("End Time", animVerticalLayout);
+        this.endTimeEdit.text = this.importer.endTime.toString();
+
+        // apply button
+        rootLayout.addChild(this.createApplyButton());
+
+    }
+
+    // model
+    scaleEdit:Atomic.UIEditField;
+
+    // animation
+    startTimeEdit:Atomic.UIEditField;
+    endTimeEdit:Atomic.UIEditField;
+    importAnimationBox:Atomic.UICheckBox;
+
+    asset:ToolCore.Asset;
+    importer:ToolCore.ModelImporter;
 
 }
 

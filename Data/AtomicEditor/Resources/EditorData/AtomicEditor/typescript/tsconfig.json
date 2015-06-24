@@ -26,6 +26,7 @@
         "./ui/inspector/ComponentInspector.ts",
         "./ui/inspector/DataBinding.ts",
         "./ui/inspector/InspectorFrame.ts",
+        "./ui/inspector/InspectorWidget.ts",
         "./ui/inspector/MaterialInspector.ts",
         "./ui/inspector/ModelInspector.ts",
         "./ui/inspector/NodeInspector.ts",

@@ -47,12 +47,12 @@ public:
 
     bool IsFolder() const { return isFolder_; }
 
-private:
-
     // load .asset
     bool Load();
     // save .asset
     bool Save();
+
+private:
 
     bool CreateImporter();
 

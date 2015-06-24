@@ -34,8 +34,7 @@ class DataBinding {
 
             widget = field;
         }
-        else if (attrInfo.type == Atomic.VAR_VECTOR3 || attrInfo.type == Atomic.VAR_QUATERNION)
-        {
+        else if (attrInfo.type == Atomic.VAR_VECTOR3 || attrInfo.type == Atomic.VAR_QUATERNION) {
             var layout = new Atomic.UILayout();
             widget = layout;
             layout.spacing = 0;
@@ -43,8 +42,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 100;
 
-            for (var i = 0; i < 3; i++)
-            {
+            for (var i = 0; i < 3; i++) {
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);
                 select.fontDescription = fd;
@@ -70,48 +68,43 @@ class DataBinding {
 
     }
 
-    setObjectValueFromWidget(srcWidget:Atomic.UIWidget) {
+    setObjectValueFromWidget(srcWidget: Atomic.UIWidget) {
 
-      if (this.objectLocked)
-          return;
+        if (this.objectLocked)
+            return;
 
-      this.objectLocked = true;
+        this.objectLocked = true;
 
-      var type = this.attrInfo.type;
+        var type = this.attrInfo.type;
 
-      if (type == Atomic.VAR_BOOL)
-      {
-          var box = <Atomic.UICheckBox> this.widget;
+        if (type == Atomic.VAR_BOOL) {
+            var box = <Atomic.UICheckBox> this.widget;
 
-          this.object.setAttribute(this.attrInfo.name, box.value ? true : false);
-      }
+            this.object.setAttribute(this.attrInfo.name, box.value ? true : false);
+        }
 
-
-
-      this.objectLocked = false;
+        this.objectLocked = false;
 
     }
 
-    handleWidgetEvent(ev: Atomic.UIWidgetEvent) : boolean {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-      if (this.objectLocked)
-          return false;
+        if (this.objectLocked)
+            return false;
 
-      if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED)
-      {
-          if (this.widget == ev.target || this.widget.isAncestorOf(ev.target))
-          {
-              this.setObjectValueFromWidget(ev.target);
-              return true;
-          }
-      }
+        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+            if (this.widget == ev.target || this.widget.isAncestorOf(ev.target)) {
+                this.setObjectValueFromWidget(ev.target);
+                return true;
+            }
+        }
 
-      return false;
+        return false;
 
     }
 
     object: Atomic.Serializable;
-    objectLocked:boolean = false;
+    objectLocked: boolean = false;
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
 
