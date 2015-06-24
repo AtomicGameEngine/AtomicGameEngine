@@ -38,27 +38,21 @@ class ModelInspector extends InspectorWidget {
         var rootLayout = this.rootLayout;
 
         // Model Section
-        var modelSection = this.createSection("Model", 1);
-        var modelVerticalLayout = this.createVerticalAttrLayout();
-        rootLayout.addChild(modelSection);
-        modelSection.contentRoot.addChild(modelVerticalLayout);
+        var modelLayout = this.createSection(rootLayout, "Model", 1);
 
-        this.scaleEdit = this.createAttrEditField("Scale", modelVerticalLayout);
+        this.scaleEdit = this.createAttrEditField("Scale", modelLayout);
         this.scaleEdit.text = this.importer.scale.toString();
 
         // Animations Section
-        var animationSection = this.createSection("Animation", 1);
-        var animVerticalLayout = this.createVerticalAttrLayout();
-        rootLayout.addChild(animationSection);
-        animationSection.contentRoot.addChild(animVerticalLayout);
+        var animationLayout = this.createSection(rootLayout, "Animation", 1);
 
-        this.importAnimationBox = this.createAttrCheckBox("Import Animations", animVerticalLayout);
+        this.importAnimationBox = this.createAttrCheckBox("Import Animations", animationLayout);
         this.importAnimationBox.value = this.importer.importAnimations ? 1 : 0;
 
-        this.startTimeEdit = this.createAttrEditField("Start Time", animVerticalLayout);
+        this.startTimeEdit = this.createAttrEditField("Start Time", animationLayout);
         this.startTimeEdit.text = this.importer.startTime.toString();
 
-        this.endTimeEdit = this.createAttrEditField("End Time", animVerticalLayout);
+        this.endTimeEdit = this.createAttrEditField("End Time", animationLayout);
         this.endTimeEdit.text = this.importer.endTime.toString();
 
         // apply button

@@ -42,7 +42,7 @@ class InspectorWidget extends ScriptWidget {
       return nameField;
     }
 
-    createSection(text:string, expanded:number):Atomic.UISection {
+    createSection(parent:Atomic.UIWidget, text:string, expanded:number):Atomic.UILayout {
 
       var section = new Atomic.UISection();
 
@@ -50,7 +50,11 @@ class InspectorWidget extends ScriptWidget {
       section.value = expanded;
       section.fontDescription = this.attrFontDesc;
 
-      return section;
+      var layout = this.createVerticalAttrLayout();
+      parent.addChild(section);
+      section.contentRoot.addChild(layout);
+
+      return layout;
 
     }
 
