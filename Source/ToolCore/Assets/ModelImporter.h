@@ -3,8 +3,43 @@
 
 #include "AssetImporter.h"
 
+namespace Atomic
+{
+    class Node;
+}
+
+using namespace Atomic;
+
 namespace ToolCore
 {
+
+class AnimationImportInfo : public Object
+{
+    friend class ModelImporter;
+
+public:
+
+    OBJECT(AnimationImportInfo);
+
+    AnimationImportInfo(Context* context) : Object(context), startTime_(-1.0f), endTime_(-1.0f)
+    {
+
+    }
+
+    const String& GetName() const { return name_; }
+    float GetStartTime() const { return startTime_; }
+    float GetEndTime() const { return endTime_; }
+
+    void SetStartTime(float time) { startTime_ = time; }
+    void SetEndTime(float time) { endTime_ = time; }
+
+private:
+
+    String name_;
+    float startTime_;
+    float endTime_;
+};
+
 
 class ModelImporter : public AssetImporter
 {
@@ -13,19 +48,13 @@ class ModelImporter : public AssetImporter
 public:
 
     /// Construct.
-    ModelImporter(Context* context);
+    ModelImporter(Context* context, Asset* asset);
     virtual ~ModelImporter();
 
     virtual void SetDefaults();
 
     float GetScale() { return scale_; }
     void SetScale(float scale) {scale_ = scale; }
-
-    float GetStartTime() { return startTime_; }
-    void SetStartTime(float startTime) { startTime_ = startTime; }
-
-    float GetEndTime() { return endTime_; }
-    void SetEndTime(float endTime) { endTime_ = endTime; }
 
     bool GetImportAnimations() { return importAnimations_; }
     void SetImportAnimations(bool importAnimations) { importAnimations_ = importAnimations; }
@@ -34,13 +63,19 @@ public:
 
 protected:
 
+    bool ImportModel();
+    bool ImportAnimations();
+    bool ImportAnimation(const String& name, float startTime=-1.0f, float endTime=-1.0f);
+
     virtual bool LoadSettingsInternal();
     virtual bool SaveSettingsInternal();
 
+    WeakPtr<Asset> asset_;
     float scale_;
-    float startTime_;
-    float endTime_;
     bool importAnimations_;
+    Vector<SharedPtr<AnimationImportInfo>> animationInfo_;
+
+    SharedPtr<Node> importNode_;
 
 };
 

@@ -175,7 +175,7 @@ bool Asset::CreateImporter()
         // todo, externalize recognizers
         if (ext == ".fbx")
         {
-            importer_ = new ModelImporter(context_);
+            importer_ = new ModelImporter(context_, this);
         }
         else if (ext == ".scene")
         {

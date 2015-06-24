@@ -200,7 +200,7 @@ void OpenAssetImporter::ApplyScale()
 
 }
 
-void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
+void OpenAssetImporter::ExportModel(const String& outName, const String &animName, bool animationOnly)
 {
     if (outName.Empty())
         ErrorExit("No output file defined");
@@ -219,7 +219,7 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
     if (!noAnimations_)
     {
         CollectAnimations(&model);
-        BuildAndSaveAnimations(&model);
+        BuildAndSaveAnimations(&model, animName);
 
         // Save scene-global animations
         // CollectAnimations();
@@ -232,41 +232,28 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
         ExportMaterials(usedTextures);
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (importNode_.Null())
+        return;
 
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     Model* mdl = cache->GetResource<Model>( model.outName_);
 
-    // Use a dummy model here?  It kind of depends on how resource layout is
-    // designed, importing, existing models, etc
-/*
-    // Create a dummy model so that the reference can be stored
-
-    String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
-
-    if (!cache->Exists(modelName))
-    {
-        Model* dummyModel = new Model(context_);
-        dummyModel->SetName(modelName);
-        dummyModel->SetNumGeometries(model.meshes_.Size());
-        cache->AddManualResource(dummyModel);
-    }
-*/
-
-    SharedPtr<Node> node(new Node(context_));
-    node->SetName("Model");
+    if (!mdl)
+        return;
 
     StaticModel* modelComponent = 0;
-    /*
-    StaticModel* staticModel = node->CreateComponent<StaticModel>();
-    staticModel->SetModel(mdl);
-    */
 
-    AnimatedModel* animatedModel = node->CreateComponent<AnimatedModel>();
-    modelComponent = animatedModel;
-    animatedModel->SetModel(mdl, false);
-
-    // create animation controller
-    AnimationController* controller = node->CreateComponent<AnimationController>();
+    if (!mdl->GetSkeleton().GetNumBones())
+    {
+        modelComponent = importNode_->CreateComponent<StaticModel>();
+        modelComponent->SetModel(mdl);
+    }
+    else
+    {
+        modelComponent = importNode_->CreateComponent<AnimatedModel>();
+        importNode_->CreateComponent<AnimationController>();
+        ((AnimatedModel*)modelComponent)->SetModel(mdl, false);
+    }
 
     if (!noMaterials_)
     {
@@ -281,13 +268,8 @@ void OpenAssetImporter::ExportModel(const String& outName, bool animationOnly)
         }
 
     }
-
-    File outFile(context_);
-    if (!outFile.Open(outName, FILE_WRITE))
-        ErrorExit("Could not open output file " + outName);
-
-    node->SaveXML(outFile);
 }
+
 void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
 {
     if (!model.rootNode_)
@@ -862,7 +844,7 @@ void OpenAssetImporter::BuildBoneCollisionInfo(OutModel& model)
     }
 }
 
-void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
+void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &animNameOverride)
 {
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
 
@@ -880,6 +862,11 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
             animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
+
+        if (animNameOverride.Length())
+        {
+            animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + animNameOverride + ".ani";
+        }
 
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
@@ -914,7 +901,7 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model)
         }
 
         SharedPtr<Animation> outAnim(new Animation(context_));
-        outAnim->SetAnimationName(animName);
+        outAnim->SetAnimationName(!animNameOverride.Length() ? animName : animNameOverride);
         outAnim->SetLength(duration * tickConversion);
 
         //PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));

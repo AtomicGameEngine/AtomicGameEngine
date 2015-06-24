@@ -71,6 +71,7 @@ void js_class_declare_internal(JSVM* vm, void* uniqueClassID, const char* packag
     }
     else
     {
+        // RefCounted only supported in Atomic package
         assert(String("Atomic") == package );
     }
 

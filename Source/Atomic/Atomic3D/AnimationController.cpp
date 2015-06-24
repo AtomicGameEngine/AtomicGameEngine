@@ -66,6 +66,8 @@ void AnimationController::RegisterObject(Context* context)
     MIXED_ACCESSOR_ATTRIBUTE("Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+
+    ACCESSOR_ATTRIBUTE("Animation Resources", GetAnimationResourcesAttr, SetAnimationResourcesAttr, ResourceRefList, ResourceRefList(Animation::GetTypeStatic()), AM_FILE | AM_NOEDIT);
 }
 
 void AnimationController::OnSetEnabled()
@@ -827,5 +829,52 @@ void AnimationController::HandleScenePostUpdate(StringHash eventType, VariantMap
 
     Update(eventData[P_TIMESTEP].GetFloat());
 }
+
+void AnimationController::AddAnimationResource(Animation* animation)
+{
+    if (!animation)
+        return;
+
+    SharedPtr<Animation> anim(animation);
+
+    if (!animationsResources_.Contains(anim))
+        animationsResources_.Push(anim);
+}
+
+void AnimationController::RemoveAnimationResource(Animation* animation)
+{
+    if (!animation)
+        return;
+
+    animationsResources_.Remove(SharedPtr<Animation>(animation));
+
+}
+
+void AnimationController::ClearAnimationResources()
+{
+    animationsResources_.Clear();
+}
+
+void AnimationController::SetAnimationResourcesAttr(const ResourceRefList& value)
+{
+    animationsResources_.Clear();
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
+    {
+        animationsResources_.Clear();
+        AddAnimationResource(cache->GetResource<Animation>(value.names_[i]));
+    }
+}
+
+const ResourceRefList& AnimationController::GetAnimationResourcesAttr() const
+{
+    animationsResourcesAttr_.names_.Resize(animationsResources_.Size());
+    for (unsigned i = 0; i < animationsResources_.Size(); ++i)
+        animationsResourcesAttr_.names_[i] = GetResourceName(animationsResources_[i]);
+
+    return animationsResourcesAttr_;
+}
+
 
 }

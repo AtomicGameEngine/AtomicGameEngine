@@ -18,14 +18,14 @@ class ModelInspector extends InspectorWidget {
 
     onApply() {
 
-      this.importer.scale = Number(this.scaleEdit.text);
-      this.importer.startTime = Number(this.startTimeEdit.text);
-      this.importer.endTime = Number(this.endTimeEdit.text);
+        this.importer.scale = Number(this.scaleEdit.text);
+        //this.importer.startTime = Number(this.startTimeEdit.text);
+        //this.importer.endTime = Number(this.endTimeEdit.text);
 
-      this.importer.importAnimations = this.importAnimationBox.value ? true : false;
+        this.importer.importAnimations = this.importAnimationBox.value ? true : false;
 
-      this.importer.import(this.asset.guid);
-      this.asset.save();
+        this.importer.import(this.asset.guid);
+        this.asset.save();
 
     }
 
@@ -50,10 +50,10 @@ class ModelInspector extends InspectorWidget {
         this.importAnimationBox.value = this.importer.importAnimations ? 1 : 0;
 
         this.startTimeEdit = this.createAttrEditField("Start Time", animationLayout);
-        this.startTimeEdit.text = this.importer.startTime.toString();
+        //this.startTimeEdit.text = this.importer.startTime.toString();
 
         this.endTimeEdit = this.createAttrEditField("End Time", animationLayout);
-        this.endTimeEdit.text = this.importer.endTime.toString();
+        //this.endTimeEdit.text = this.importer.endTime.toString();
 
         // apply button
         rootLayout.addChild(this.createApplyButton());
@@ -61,15 +61,15 @@ class ModelInspector extends InspectorWidget {
     }
 
     // model
-    scaleEdit:Atomic.UIEditField;
+    scaleEdit: Atomic.UIEditField;
 
     // animation
-    startTimeEdit:Atomic.UIEditField;
-    endTimeEdit:Atomic.UIEditField;
-    importAnimationBox:Atomic.UICheckBox;
+    startTimeEdit: Atomic.UIEditField;
+    endTimeEdit: Atomic.UIEditField;
+    importAnimationBox: Atomic.UICheckBox;
 
-    asset:ToolCore.Asset;
-    importer:ToolCore.ModelImporter;
+    asset: ToolCore.Asset;
+    importer: ToolCore.ModelImporter;
 
 }
 

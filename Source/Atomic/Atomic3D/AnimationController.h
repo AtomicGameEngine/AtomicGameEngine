@@ -171,6 +171,14 @@ public:
     /// Return node animation states attribute.
     VariantVector GetNodeAnimationStatesAttr() const;
 
+    // Animation Resources
+
+    void AddAnimationResource(Animation* animation);
+    void RemoveAnimationResource(Animation* animation);
+    void ClearAnimationResources();
+    void SetAnimationResourcesAttr(const ResourceRefList& value);
+    const ResourceRefList& GetAnimationResourcesAttr() const;
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -191,6 +199,13 @@ private:
     Vector<SharedPtr<AnimationState> > nodeAnimationStates_;
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
+
+    /// animation resources
+    Vector<SharedPtr<Animation> > animationsResources_;
+
+    /// Material list attribute.
+    mutable ResourceRefList animationsResourcesAttr_;
+    ;
 };
 
 }

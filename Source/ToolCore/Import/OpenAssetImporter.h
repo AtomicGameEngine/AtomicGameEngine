@@ -29,6 +29,7 @@
 #include "OpenAssetUtils.h"
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/Scene/Node.h>
 
 using namespace Atomic;
 
@@ -52,8 +53,9 @@ public:
 
     bool Load(const String& assetPath);
 
-    void ExportModel(const String& outName, bool animationOnly = false);
+    void ExportModel(const String& outName, const String& animName = String::EMPTY, bool animationOnly = false);
 
+    void SetImportNode(Node* node) { importNode_ = node; }
     void SetStartTime(float startTime) { startTime_ = startTime; }
     void SetEndTime(float endTime) { endTime_ = endTime; }
     void SetScale(float scale) { scale_ = scale; }
@@ -69,7 +71,7 @@ private:
     void ApplyScale(aiNode* node);
 
     void BuildAndSaveModel(OutModel& model);
-    void BuildAndSaveAnimations(OutModel* model = 0);
+    void BuildAndSaveAnimations(OutModel* model = 0, const String& animNameOverride = String::EMPTY);
 
     void ExportMaterials(HashSet<String>& usedTextures);
     void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
@@ -83,7 +85,7 @@ private:
     String GetMeshMaterialName(aiMesh* mesh);
     String GenerateMaterialName(aiMaterial* material);
     String GetMaterialTextureName(const String& nameIn);
-    String GenerateTextureName(unsigned texIndex);    
+    String GenerateTextureName(unsigned texIndex);
 
     // TODO: See AssetImporter
     // void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
@@ -128,6 +130,8 @@ private:
     PODVector<aiAnimation*> sceneAnimations_;
 
     Vector<AnimationInfo> animationInfos_;
+
+    SharedPtr<Node> importNode_;
 
     float defaultTicksPerSecond_;
 
