@@ -65,7 +65,7 @@ protected:
 
     bool ImportModel();
     bool ImportAnimations();
-    bool ImportAnimation(const String& name, float startTime=-1.0f, float endTime=-1.0f);
+    bool ImportAnimation(const String &filename, const String& name, float startTime=-1.0f, float endTime=-1.0f);
 
     virtual bool LoadSettingsInternal();
     virtual bool SaveSettingsInternal();

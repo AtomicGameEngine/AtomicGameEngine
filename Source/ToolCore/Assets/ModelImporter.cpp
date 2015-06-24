@@ -61,7 +61,7 @@ bool ModelImporter::ImportModel()
     return false;
 }
 
-bool ModelImporter::ImportAnimation(const String& name, float startTime, float endTime)
+bool ModelImporter::ImportAnimation(const String& filename, const String& name, float startTime, float endTime)
 {
     SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
 
@@ -72,7 +72,7 @@ bool ModelImporter::ImportAnimation(const String& name, float startTime, float e
     importer->SetStartTime(startTime);
     importer->SetEndTime(endTime);
 
-    if (importer->Load(asset_->GetPath()))
+    if (importer->Load(filename))
     {
         importer->ExportModel(asset_->GetCachePath(), name, true);
 
@@ -111,15 +111,68 @@ bool ModelImporter::ImportAnimations()
 {
     if (!animationInfo_.Size())
     {
-        return ImportAnimation("RootAnim");
+       if (!ImportAnimation(asset_->GetPath(), "RootAnim"))
+           return false;
     }
 
+    // embedded animations
     for (unsigned i = 0; i < animationInfo_.Size(); i++)
     {
         const SharedPtr<AnimationImportInfo>& info = animationInfo_[i];
-        if (!ImportAnimation(info->GetName(), info->GetStartTime(), info->GetEndTime()))
+        if (!ImportAnimation(asset_->GetPath(), info->GetName(), info->GetStartTime(), info->GetEndTime()))
             return false;
     }
+
+    // add @ animations
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+    String pathName, fileName, ext;
+    SplitPath(asset_->GetPath(), pathName, fileName, ext);
+
+    Vector<String> results;
+
+    fs->ScanDir(results, pathName, ext, SCAN_FILES, false);
+
+    for (unsigned i = 0; i < results.Size(); i++)
+    {
+        const String& result = results[i];
+
+        if (result.Contains("@"))
+        {
+            Vector<String> components = GetFileName(result).Split('@');
+
+            if (components.Size() == 2 && components[1].Length() && components[0] == fileName)
+            {
+                String animationName = components[1];
+                AssetDatabase* db = GetSubsystem<AssetDatabase>();
+                Asset* asset = db->GetAssetByPath(pathName + result);
+                assert(asset);
+                assert(asset->GetImporter()->GetType() == ModelImporter::GetTypeStatic());
+
+                ModelImporter* importer = (ModelImporter*) asset->GetImporter();
+
+                if (!importer->animationInfo_.Size())
+                {
+                   if (!ImportAnimation(asset->GetPath(), animationName))
+                       return false;
+                }
+                else
+                {
+                    // embedded animations
+                    for (unsigned i = 0; i < importer->animationInfo_.Size(); i++)
+                    {
+                        const SharedPtr<AnimationImportInfo>& info = importer->animationInfo_[i];
+                        if (!ImportAnimation(asset->GetPath(), info->GetName(), info->GetStartTime(), info->GetEndTime()))
+                            return false;
+                    }
+                }
+
+
+            }
+        }
+    }
+
+
 
     return true;
 }
@@ -132,23 +185,21 @@ bool ModelImporter::Import(const String& guid)
     if (!asset)
         return false;
 
-    bool animationsOnly = false;
-
     String modelAssetFilename = asset->GetPath();
 
     importNode_ = new Node(context_);
 
-    if (modelAssetFilename.Contains("@"))
+    // skip external animations, they will be brought in when importing their
+    // corresponding model
+    if (!modelAssetFilename.Contains("@"))
     {
-        animationsOnly = true;
-    }
-
-    if (!animationsOnly)
         ImportModel();
 
-    if (importAnimations_)
-    {
-        ImportAnimations();
+        if (importAnimations_)
+        {
+            ImportAnimations();
+        }
+
     }
 
     File outFile(context_);
@@ -159,7 +210,6 @@ bool ModelImporter::Import(const String& guid)
     importNode_->SaveXML(outFile);
 
     importNode_ = 0;
-
 
     return true;
 }
