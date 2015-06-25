@@ -92,7 +92,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
     }
 
-    // not instance method
+    // note instance method
     onClick = () => {
 
         var menu = new Atomic.UIMenuWindow(this, "create component popup");
