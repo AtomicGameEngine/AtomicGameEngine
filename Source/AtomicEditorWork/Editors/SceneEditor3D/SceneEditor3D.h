@@ -56,6 +56,7 @@ private:
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
     void HandlePlayStarted(StringHash eventType, VariantMap& eventData);
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
+    void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<Scene> scene_;
 

@@ -27,6 +27,7 @@
 #include <ToolCore/Assets/Asset.h>
 
 #include "SceneEditor3D.h"
+#include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
 
@@ -80,6 +81,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
+
+    SubscribeToEvent(E_GIZMOEDITMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
 
     // FIXME: Set the size at the end of setup, so all children are updated accordingly
     // future size changes will be handled automatically
@@ -180,6 +183,12 @@ void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventDat
 void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventData)
 {
     sceneView_->Enable();
+}
+
+void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData)
+{
+    EditMode mode = (EditMode) eventData[GizmoEditModeChanged::P_MODE].GetFloat();
+    gizmo3D_->SetEditMode(mode);
 }
 
 bool SceneEditor3D::Save()
