@@ -24,19 +24,46 @@ class DataBinding {
         }
         else if (attrInfo.type == Atomic.VAR_INT) {
 
-          if (attrInfo.enumNames.length) {
+            if (attrInfo.enumNames.length) {
 
-            var button = new Atomic.UIButton();
-            button.fontDescription = fd;
-            button.text = "Enum Value!";
+                var button = new Atomic.UIButton();
+                button.fontDescription = fd;
+                button.text = "Enum Value!";
+                var lp = new Atomic.UILayoutParams();
+                lp.width = 140;
+                button.layoutParams = lp;
+
+                widget = button;
+
+            } else {
+
+                var field = new Atomic.UIEditField();
+                field.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
+                field.fontDescription = fd;
+                field.skinBg = "TBAttrEditorField";
+
+                var lp = new Atomic.UILayoutParams();
+                lp.width = 140;
+                field.layoutParams = lp;
+
+                widget = field;
+            }
+
+        } else if (attrInfo.type == Atomic.VAR_FLOAT) {
+
+            var field = new Atomic.UIEditField();
+            field.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
+            field.fontDescription = fd;
+            field.skinBg = "TBAttrEditorField";
+
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
-            button.layoutParams = lp;
+            field.layoutParams = lp;
 
-            widget = button;
-          }
+            widget = field;
 
-        } else if (attrInfo.type == Atomic.VAR_STRING) {
+        }
+        else if (attrInfo.type == Atomic.VAR_STRING) {
 
             var field = new Atomic.UIEditField();
             field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
@@ -69,6 +96,23 @@ class DataBinding {
                 layout.addChild(select);
             }
 
+        } else if (attrInfo.type == Atomic.VAR_COLOR) {
+            var layout = new Atomic.UILayout();
+            widget = layout;
+            layout.spacing = 0;
+
+            var lp = new Atomic.UILayoutParams();
+            lp.width = 70;
+
+            for (var i = 0; i < 4; i++) {
+                var select = new Atomic.UIInlineSelect();
+                select.id = String(i + 1);
+                select.fontDescription = fd;
+                select.setLimits(-10000000, 10000000);
+                select.layoutParams = lp;
+                layout.addChild(select);
+            }
+
         }
 
         if (widget) {
@@ -82,6 +126,79 @@ class DataBinding {
 
     }
 
+    setWidgetValueFromObject() {
+        if (this.widgetLocked)
+            return;
+
+        this.widgetLocked = true;
+
+        var attrInfo = this.attrInfo;
+        var object = this.object;
+        var widget = this.widget;
+
+        if (attrInfo.type == Atomic.VAR_BOOL) {
+            var value = object.getAttribute(attrInfo.name);
+            widget.value = (value ? 1 : 0);
+        }
+        else if (attrInfo.type == Atomic.VAR_VECTOR3) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            for (var i = 0; i < 3; i++) {
+
+                var select = widget.getWidget((i + 1).toString());
+                if (select)
+                    select.value = value[i];
+            }
+
+        }
+        else if (attrInfo.type == Atomic.VAR_QUATERNION) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            for (var i = 0; i < 3; i++) {
+
+                var select = widget.getWidget((i + 1).toString());
+                if (select)
+                    select.value = value[i];
+            }
+
+        }
+        else if (attrInfo.type == Atomic.VAR_STRING) {
+            var value = object.getAttribute(attrInfo.name);
+            widget.text = value;
+        }
+        else if (attrInfo.type == Atomic.VAR_FLOAT) {
+            var value = object.getAttribute(attrInfo.name);
+            widget.text = value.toString();
+        }
+        else if (attrInfo.type == Atomic.VAR_INT) {
+            var value = object.getAttribute(attrInfo.name);
+
+            if (attrInfo.enumNames.length) {
+                widget.text = attrInfo.enumNames[value];
+            }
+            else {
+                widget.text = value.toString();
+            }
+        }
+        else if (attrInfo.type == Atomic.VAR_COLOR) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            for (var i = 0; i < 4; i++) {
+
+                var select = widget.getWidget((i + 1).toString());
+                if (select)
+                    select.value = value[i];
+            }
+
+        }
+
+        this.widgetLocked = false;
+
+    }
+
     setObjectValueFromWidget(srcWidget: Atomic.UIWidget) {
 
         if (this.objectLocked)
@@ -89,11 +206,69 @@ class DataBinding {
 
         this.objectLocked = true;
 
-        var type = this.attrInfo.type;
+        var widget = this.widget;
+        var object = this.object;
+        var attrInfo = this.attrInfo;
+        var type = attrInfo.type;
 
         if (type == Atomic.VAR_BOOL) {
-            var box = <Atomic.UICheckBox> this.widget;
-            this.object.setAttribute(this.attrInfo.name, box.value ? true : false);
+
+            object.setAttribute(attrInfo.name, widget.value ? true : false);
+
+        } else if (type == Atomic.VAR_INT) {
+
+            object.setAttribute(attrInfo.name, Number(widget.text));
+
+        }
+        else if (type == Atomic.VAR_FLOAT) {
+
+            object.setAttribute(attrInfo.name, Number(widget.text));
+
+        }
+        else if (type == Atomic.VAR_STRING) {
+
+            object.setAttribute(attrInfo.name, widget.text);
+
+        } else if (type == Atomic.VAR_VECTOR3 && srcWidget) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            if (srcWidget.id == "1")
+                value[0] = srcWidget.value;
+            else if (srcWidget.id == "2")
+                value[1] = srcWidget.value;
+            else if (srcWidget.id == "3")
+                value[2] = srcWidget.value;
+
+            object.setAttribute(attrInfo.name, value);
+
+        } else if (type == Atomic.VAR_QUATERNION && srcWidget) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            if (srcWidget.id == "1")
+                value[0] = srcWidget.value;
+            else if (srcWidget.id == "2")
+                value[1] = srcWidget.value;
+            else if (srcWidget.id == "3")
+                value[2] = srcWidget.value;
+
+            object.setAttribute(attrInfo.name, value);
+
+        } else if (type == Atomic.VAR_COLOR && srcWidget) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            if (srcWidget.id == "1")
+                value[0] = srcWidget.value;
+            else if (srcWidget.id == "2")
+                value[1] = srcWidget.value;
+            else if (srcWidget.id == "3")
+                value[2] = srcWidget.value;
+            else if (srcWidget.id == "4")
+                value[3] = srcWidget.value;
+
+            object.setAttribute(attrInfo.name, value);
         }
 
         this.objectLocked = false;
@@ -117,7 +292,8 @@ class DataBinding {
     }
 
     object: Atomic.Serializable;
-    objectLocked: boolean = false;
+    objectLocked: boolean = true;
+    widgetLocked: boolean = false;
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
 

@@ -25,7 +25,7 @@ static int RunEditorApplication()
 static int RunPlayerApplication()
 {
     Atomic::SharedPtr<Atomic::Context> context(new Atomic::Context());
-    Atomic::SharedPtr<AEPlayerApp> application(new AEPlayerApp(context));
+    Atomic::SharedPtr<AEPlayerApplication> application(new AEPlayerApplication(context));
     return application->Run();
 }
 

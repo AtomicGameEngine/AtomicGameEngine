@@ -43,10 +43,53 @@ static int Serializable_SetAttribute(duk_context* ctx)
     duk_push_this(ctx);
     Serializable* serial = js_to_class_instance<Serializable>(ctx, -1, 0);
 
+    const Vector<AttributeInfo>* attributes = serial->GetAttributes();
+
+    for (unsigned i = 0; i < attributes->Size(); i++)
+    {
+        const AttributeInfo* attr = &attributes->At(i);
+
+        if (attr->name_ == name)
+        {
+            if (attr->type_ == VAR_QUATERNION)
+            {
+                Vector3 v3 = v.GetVector3();
+                Quaternion q;
+                q.FromEulerAngles(v3.x_, v3.y_, v3.z_);
+                v = q;
+            }
+
+            else if (attr->type_ == VAR_COLOR)
+            {
+                Vector4 v4 = v.GetVector4();
+                Color c(v4.x_, v4.y_, v4.z_, v4.w_ );
+                v = c;
+            }
+            else if (attr->type_ == VAR_INT)
+            {
+                v = (int) v.GetFloat();
+            }
+
+            break;
+        }
+    }
+
     serial->SetAttribute(name, v);
 
     return 0;
 }
+
+static int Serializable_GetAttribute(duk_context* ctx)
+{
+    const char* name = duk_to_string(ctx, 0);
+
+    duk_push_this(ctx);
+    Serializable* serial = js_to_class_instance<Serializable>(ctx, -1, 0);
+    js_push_variant(ctx,  serial->GetAttribute(name));
+
+    return 1;
+}
+
 
 static int Serializable_GetAttributes(duk_context* ctx)
 {
@@ -73,6 +116,9 @@ static int Serializable_GetAttributes(duk_context* ctx)
     for (unsigned i = 0; i < attrs->Size(); i++)
     {
         const AttributeInfo* attr = &attrs->At(i);
+
+        if (attr->mode_ & AM_NOEDIT)
+            continue;
 
         duk_push_object(ctx);
 
@@ -123,6 +169,8 @@ void jsapi_init_scene_serializable(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "Serializable");
     duk_push_c_function(ctx, Serializable_GetAttributes, 0);
     duk_put_prop_string(ctx, -2, "getAttributes");
+    duk_push_c_function(ctx, Serializable_GetAttribute, 1);
+    duk_put_prop_string(ctx, -2, "getAttribute");
     duk_push_c_function(ctx, Serializable_SetAttribute, 2);
     duk_put_prop_string(ctx, -2, "setAttribute");
     duk_pop(ctx);

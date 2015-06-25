@@ -20,6 +20,11 @@
 	},
 	"typescript_decl" : {
 
+		"Serializable" : [
+			"getAttributes():AttributeInfo[];",
+			"getAttribute(name:string):any;",
+			"setAttribute(name:string, value:any):void;"
+		],
 		"Node" : [
 			"saveXML(file:File):boolean;",
 			"getChildrenWithName(name:string, recursive?:boolean):Node[];",

@@ -23,7 +23,12 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/UI/UI.h>
 
+#include <ToolCore/Assets/AssetDatabase.h>
+#include <ToolCore/Assets/Asset.h>
+
 #include "SceneEditor3D.h"
+
+using namespace ToolCore;
 
 namespace AtomicEditor
 {
@@ -177,7 +182,18 @@ void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventDat
     sceneView_->Enable();
 }
 
+bool SceneEditor3D::Save()
+{
+    File file(context_);
 
+    if (file.Open(fullpath_, FILE_WRITE))
+    {
+        scene_->SaveXML(file);
+        file.Close();
+    }
 
+    return true;
+
+}
 
 }

@@ -482,15 +482,6 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
             dragNode_->LoadXML(xml->GetRoot());
             dragNode_->SetName(asset->GetName());
 
-            AnimationController* controller = dragNode_->GetComponent<AnimationController>();
-            if (controller)
-            {
-                controller->PlayExclusive("Idle", 0, true);
-
-                dragNode_->GetScene()->SetUpdateEnabled(true);
-            }
-
-
             /*
             dragNode_ = scene_->CreateChild(asset->GetName());            
             preloadResourceScene_ = new Scene(context_);

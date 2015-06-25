@@ -43,6 +43,8 @@ public:
 
     const String& GetFullPath() { return fullpath_; }
 
+    virtual bool Save() { return true; }
+
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }
 
 protected:

@@ -99,6 +99,13 @@ class ComponentInspector extends Atomic.UISection {
 
         }
 
+        for (var i in this.bindings)
+        {
+            this.bindings[i].setWidgetValueFromObject();
+            this.bindings[i].objectLocked = false;
+        }
+
+
     }
 
     bindings:Array<DataBinding> = new Array();

@@ -90,9 +90,7 @@ class MainFrame extends ScriptWidget {
             if (refid == "quit")
                 Atomic.getEngine().exit();
 
-        }
-
-        if (target.id == "menu edit popup") {
+        } else if (target.id == "menu edit popup") {
 
             if (refid == "edit play") {
 
@@ -103,10 +101,24 @@ class MainFrame extends ScriptWidget {
 
             return false;
 
+        } else if (target.id == "menu file popup") {
+
+            if (refid == "file save file") {
+
+               //TODO: this is horrible
+                if (this.resourceframe.currentResourceEditor)
+                  this.resourceframe.currentResourceEditor.save();
+
+                return true;
+
+            }
+
+            return false;
         }
+
     }
 
-    handleResourceEditorChanged(data):void {
+    handleResourceEditorChanged(data): void {
 
         var editor = <Editor.ResourceEditor> data.editor;
 

@@ -36,10 +36,23 @@ var editItems = {
 
 };
 
+var fileItems = {
+
+  "New Project": ["file new project"],
+  "Open Project": ["file open project"],
+  "Save Project": ["file save project"],
+  "-1": null,
+  "Close Project": ["file close project"],
+  "-2": null,
+  "Save File": ["file save file"],
+  "Close File": ["file close file"]
+}
+
 var srcLookup = {};
 
 srcLookup["menu atomic editor"] = createMenuItemSource(editorItems);
 srcLookup["menu edit"] = createMenuItemSource(editItems);
+srcLookup["menu file"] = createMenuItemSource(fileItems);
 
 export function getMenuItemSource(id: string): Atomic.UIMenuItemSource {
     return srcLookup[id];
@@ -62,6 +75,11 @@ function createMenuItemSource(items: any): Atomic.UIMenuItemSource {
             } else if (value == null) {
 
                 src.addItem(new UIMenuItem(key));
+
+            }
+            else if (typeof value === 'object' && value.length == 1) {
+
+                src.addItem(new UIMenuItem(key, value[0]));
 
             } else if (typeof value === 'object' && value.length == 2) {
 

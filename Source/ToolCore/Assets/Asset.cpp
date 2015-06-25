@@ -10,6 +10,7 @@
 #include "MaterialImporter.h"
 #include "TextureImporter.h"
 #include "PrefabImporter.h"
+#include "JavascriptImporter.h"
 
 #include "Asset.h"
 
@@ -193,6 +194,10 @@ bool Asset::CreateImporter()
         else if (ext == ".prefab")
         {
             importer_ = new PrefabImporter(context_, this);
+        }
+        else if (ext == ".js")
+        {
+            importer_ = new JavascriptImporter(context_, this);
         }
         else if (ext == ".scene")
         {

@@ -48,6 +48,7 @@ public:
 
     virtual bool RequiresInspector() { return true; }
 
+    bool Save();
 
 private:
 

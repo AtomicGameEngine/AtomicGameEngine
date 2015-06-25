@@ -237,6 +237,53 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
         v = (RefCounted*) duk_get_pointer(ctx, variantIdx);
         return;
     }
+
+    if (duk_is_array(ctx, variantIdx))
+    {
+        if (duk_get_length(ctx, variantIdx) == 2)
+        {
+            Vector2 v2;
+            duk_get_prop_index(ctx, variantIdx, 0);
+            v2.x_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 1);
+            v2.y_ = duk_to_number(ctx, -1);
+            duk_pop_n(ctx, 2);
+            v = v2;
+            return;
+        }
+        else if (duk_get_length(ctx, variantIdx) == 3)
+        {
+            Vector3 v3;
+            duk_get_prop_index(ctx, variantIdx, 0);
+            v3.x_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 1);
+            v3.y_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 2);
+            v3.z_ = duk_to_number(ctx, -1);
+            duk_pop_n(ctx, 3);
+            v = v3;
+            return;
+        }
+        else if (duk_get_length(ctx, variantIdx) == 4)
+        {
+            Vector4 v4;
+            duk_get_prop_index(ctx, variantIdx, 0);
+            v4.x_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 1);
+            v4.y_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 2);
+            v4.z_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 2);
+            v4.w_ = duk_to_number(ctx, -1);
+            duk_pop_n(ctx, 4);
+            v = v4;
+            return;
+        }
+
+
+        return;
+    }
+
 }
 
 void js_push_variant(duk_context *ctx, const Variant& v)
@@ -244,9 +291,11 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     VariantType type = v.GetType();
     RefCounted* ref;
     Object* object;
-    Vector2& vector2 = (Vector2&) Vector2::ZERO;
-    Vector3& vector3 = (Vector3&) Vector3::ZERO;
-    Vector4& vector4 = (Vector4&) Vector3::ZERO;
+    Vector2 vector2 = Vector2::ZERO;
+    Vector3 vector3 = Vector3::ZERO;
+    Vector4 vector4 = Vector4::ZERO;
+    Color color = Color::BLACK;
+
     void* uniqueClassID = NULL;
     const char* package = NULL;
 
@@ -323,6 +372,28 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         duk_put_prop_index(ctx, -2, 1);
         duk_push_number(ctx, vector3.z_);
         duk_put_prop_index(ctx, -2, 2);
+        break;
+    case VAR_QUATERNION:
+        vector3 = v.GetQuaternion().EulerAngles();
+        duk_push_array(ctx);
+        duk_push_number(ctx, vector3.x_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, vector3.y_);
+        duk_put_prop_index(ctx, -2, 1);
+        duk_push_number(ctx, vector3.z_);
+        duk_put_prop_index(ctx, -2, 2);
+        break;
+    case VAR_COLOR:
+        color = v.GetColor();
+        duk_push_array(ctx);
+        duk_push_number(ctx, color.r_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, color.g_);
+        duk_put_prop_index(ctx, -2, 1);
+        duk_push_number(ctx, color.b_);
+        duk_put_prop_index(ctx, -2, 2);
+        duk_push_number(ctx, color.a_);
+        duk_put_prop_index(ctx, -2, 3);
         break;
     case VAR_VECTOR4:
         vector4 = v.GetVector4();

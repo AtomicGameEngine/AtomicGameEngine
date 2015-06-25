@@ -78,6 +78,7 @@ void PlayCmd::Run()
     paths.Push(env->GetCoreDataDir());
     paths.Push(env->GetPlayerDataDir());
     paths.Push(project->GetResourcePath());
+    paths.Push(project->GetProjectPath());
 
     String resourcePaths;
     resourcePaths.Join(paths, "!");

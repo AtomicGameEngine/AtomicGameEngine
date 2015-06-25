@@ -133,6 +133,12 @@ class NodeInspector extends ScriptWidget {
 
         nodeLayout.addChild(button);
 
+        for (var i in this.bindings)
+        {
+            this.bindings[i].setWidgetValueFromObject();
+            this.bindings[i].objectLocked = false;
+        }
+
     }
 
     bindings:Array<DataBinding> = new Array();
