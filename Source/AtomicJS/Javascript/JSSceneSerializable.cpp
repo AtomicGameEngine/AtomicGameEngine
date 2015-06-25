@@ -96,6 +96,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
             {
                 duk_push_string(ctx, *enumPtr);
                 duk_put_prop_index(ctx, -2, enumCount++);
+                enumPtr++;
             }
         }
 

@@ -21,6 +21,20 @@ class DataBinding {
             var box = new Atomic.UICheckBox();
             box.skinBg = "TBGreyCheckBox";
             widget = box;
+        }
+        else if (attrInfo.type == Atomic.VAR_INT) {
+
+          if (attrInfo.enumNames.length) {
+
+            var button = new Atomic.UIButton();
+            button.fontDescription = fd;
+            button.text = "Enum Value!";
+            var lp = new Atomic.UILayoutParams();
+            lp.width = 140;
+            button.layoutParams = lp;
+
+            widget = button;
+          }
 
         } else if (attrInfo.type == Atomic.VAR_STRING) {
 
@@ -79,7 +93,6 @@ class DataBinding {
 
         if (type == Atomic.VAR_BOOL) {
             var box = <Atomic.UICheckBox> this.widget;
-
             this.object.setAttribute(this.attrInfo.name, box.value ? true : false);
         }
 

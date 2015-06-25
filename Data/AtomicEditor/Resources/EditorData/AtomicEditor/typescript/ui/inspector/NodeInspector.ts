@@ -2,6 +2,7 @@
 import ScriptWidget = require("../ScriptWidget");
 import ComponentInspector = require("./ComponentInspector");
 import DataBinding = require("./DataBinding");
+import CreateComponentButton = require("./CreateComponentButton");
 
 class NodeInspector extends ScriptWidget {
 
@@ -127,6 +128,10 @@ class NodeInspector extends ScriptWidget {
         }
 
         this.addChild(nodeLayout);
+
+        var button = new CreateComponentButton(node);
+
+        nodeLayout.addChild(button);
 
     }
 
