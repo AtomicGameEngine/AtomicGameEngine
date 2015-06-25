@@ -566,7 +566,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     if (!file)
         return 0;   // Error is already logged
 
-    //LOGDEBUG("Loading resource " + name);
+    LOGDEBUG("Loading resource " + name);
     resource->SetName(name);
 
     if (!resource->Load(*(file.Get())))

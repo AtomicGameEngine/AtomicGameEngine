@@ -22,6 +22,10 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         hierarchycontainer.addChild(hierList);
 
+        //this.subscribeToEvent("NodeAdded", (data) => this.handleNodeAdded(data));
+
+        this.subscribeToEvent("EditorUpdateHierarchy", (data) => this.handleUpdateHierarchy(data));
+
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
         this.subscribeToEvent("EditorActiveSceneChanged", (data) => this.handleActiveSceneChanged(data));
 
@@ -30,6 +34,7 @@ class HierarchyFrame extends Atomic.UIWidget {
     recursiveAddNode(parentID: number, node: Atomic.Node) {
 
         var name = node.name;
+
         if (!name.length)
             name = "(Anonymous)"
 
@@ -63,9 +68,16 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     }
 
+    handleUpdateHierarchy(data) {
+
+        this.refresh();
+
+    }
+
     handleActiveSceneChanged(data) {
 
         this.scene = <Atomic.Scene> data.scene;
+
         this.refresh();
 
     }

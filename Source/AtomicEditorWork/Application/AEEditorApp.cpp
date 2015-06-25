@@ -107,6 +107,7 @@ void AEEditorApp::Setup()
     engineParameters_["WindowResizable"] = true;
     engineParameters_["FullScreen"] = false;
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "AtomicEditor.log";
+    engineParameters_["LogLevel"] = LOG_DEBUG;
 
 #ifdef ATOMIC_PLATFORM_OSX
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";

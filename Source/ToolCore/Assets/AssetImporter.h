@@ -29,9 +29,13 @@ public:
     /// Imports to cached data
     virtual bool Import(const String& guid) = 0;
 
+    bool RequiresCacheFile() const { return requiresCacheFile_; }
+
 protected:
 
-    JSONValue jsonRoot_;
+    JSONValue jsonRoot_;   
+    bool requiresCacheFile_;
+
 
     virtual bool LoadSettingsInternal();
     virtual bool SaveSettingsInternal();

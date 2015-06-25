@@ -9,6 +9,8 @@
 #include "SceneImporter.h"
 #include "MaterialImporter.h"
 #include "TextureImporter.h"
+#include "PrefabImporter.h"
+
 #include "Asset.h"
 
 namespace ToolCore
@@ -29,6 +31,9 @@ Asset::~Asset()
 
 bool Asset::CheckCacheFile()
 {
+    if (importer_.Null() || !importer_->RequiresCacheFile())
+        return true;
+
     FileSystem* fs = GetSubsystem<FileSystem>();
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
     String cachePath = db->GetCachePath();
@@ -176,6 +181,10 @@ bool Asset::CreateImporter()
         if (ext == ".fbx")
         {
             importer_ = new ModelImporter(context_, this);
+        }
+        else if (ext == ".prefab")
+        {
+            importer_ = new PrefabImporter(context_);
         }
         else if (ext == ".scene")
         {

@@ -18,6 +18,7 @@
 
 #include <Atomic/Atomic3D/Terrain.h>
 #include <Atomic/Atomic3D/Model.h>
+#include <Atomic/Atomic3D/AnimationController.h>
 
 #include <Atomic/Input/Input.h>
 
@@ -32,6 +33,8 @@
 
 #include <ToolCore/Assets/Asset.h>
 #include <ToolCore/Assets/AssetDatabase.h>
+#include <ToolCore/Assets/ModelImporter.h>
+#include <ToolCore/Assets/PrefabImporter.h>
 
 #include "AEEditor.h"
 #include "AEEvents.h"
@@ -251,7 +254,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
     // Visualize the currently selected nodes
     if (selectedNode_.NotNull())
     {
-        DrawNodeDebug(selectedNode_, debugRenderer_);
+        //DrawNodeDebug(selectedNode_, debugRenderer_);
 
     }
 
@@ -315,8 +318,8 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
             if (r.drawable_)
             {
-                debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
-                r.drawable_->DrawDebugGeometry(debugRenderer_, false);
+                //debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
+                //r.drawable_->DrawDebugGeometry(debugRenderer_, false);
             }
 
         }
@@ -365,6 +368,14 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
             {
                 dragNode_->LoadXML(xml->GetRoot());
                 UpdateDragNode(0, 0);
+
+                AnimationController* controller = dragNode_->GetComponent<AnimationController>();
+                if (controller)
+                {
+                    controller->PlayExclusive("Idle", 0, true);
+
+                    dragNode_->GetScene()->SetUpdateEnabled(true);
+                }
             }
 
             preloadResourceScene_ = 0;
@@ -436,25 +447,71 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
 
         AssetDatabase* db = GetSubsystem<AssetDatabase>();
 
-        const String& importer = asset->GetImporterTypeName();
+        AssetImporter* importer = asset->GetImporter();
 
-        if (importer == "ModelImporter")
+        if (!importer)
+            return;
+
+        StringHash importerType = importer->GetType();
+
+        if (importerType == PrefabImporter::GetTypeStatic())
         {
             dragNode_ = scene_->CreateChild(asset->GetName());
 
+            SharedPtr<File> file(new File(context_, asset->GetPath()));
+            SharedPtr<XMLFile> xml(new XMLFile(context_));
+
+            if (!xml->Load(*file))
+                return;
+
+            dragNode_->LoadXML(xml->GetRoot());
+
+            dragNode_->SetName(asset->GetName());
+
+        }
+        else if (importerType == ModelImporter::GetTypeNameStatic())
+        {
+            dragNode_ = scene_->CreateChild(asset->GetName());
+
+            SharedPtr<File> file(new File(context_, asset->GetCachePath()));
+            SharedPtr<XMLFile> xml(new XMLFile(context_));
+
+            if (!xml->Load(*file))
+                return;
+
+            dragNode_->LoadXML(xml->GetRoot());
+            dragNode_->SetName(asset->GetName());
+
+            AnimationController* controller = dragNode_->GetComponent<AnimationController>();
+            if (controller)
+            {
+                controller->PlayExclusive("Idle", 0, true);
+
+                dragNode_->GetScene()->SetUpdateEnabled(true);
+            }
+
+
+            /*
+            dragNode_ = scene_->CreateChild(asset->GetName());            
             preloadResourceScene_ = new Scene(context_);
 
-            SharedPtr<File> file(new File(context_, db->GetCachePath() + asset->GetGUID()));
+            SharedPtr<File> file(new File(context_, asset->GetCachePath()));
 
             preloadResourceScene_->LoadAsyncXML(file, LOAD_RESOURCES_ONLY);
             dragAssetGUID_ = asset->GetGUID();
+            */
+        }
 
+        if (dragNode_.NotNull())
+        {
             Input* input = GetSubsystem<Input>();
             IntVector2 pos = input->GetMousePosition();
-
             UpdateDragNode(pos.x_, pos.y_);
 
+            SendEvent("EditorUpdateHierarchy");
         }
+
+
 
         //LOGINFOF("Dropped %s : %s on SceneView3D", asset->GetPath().CString(), asset->GetGUID().CString());
     }
