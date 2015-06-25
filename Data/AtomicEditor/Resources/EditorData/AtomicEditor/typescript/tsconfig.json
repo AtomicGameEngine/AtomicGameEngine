@@ -19,6 +19,7 @@
         "./ui/HierarchyFrame.ts",
         "./ui/MainFrame.ts",
         "./ui/MainFrameMenu.ts",
+        "./ui/MainToolbar.ts",
         "./ui/ProjectFrame.ts",
         "./ui/ProjectFrameOld.ts",
         "./ui/ResourceFrame.ts",

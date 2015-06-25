@@ -133,10 +133,19 @@ void UIWidget::OnDelete()
 
 void UIWidget::AddChild(UIWidget* child)
 {
-    if (!widget_ || !child->widget_)
+    if (!widget_ || !child || !child->widget_)
         return;
 
     widget_->AddChild(child->widget_);
+}
+
+void UIWidget::AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference)
+{
+    if (!widget_ || !child || !child->widget_ || !reference || !reference->widget_)
+        return;
+
+    widget_->AddChildRelative(child->widget_, (WIDGET_Z_REL) z, reference->widget_);
+
 }
 
 String UIWidget::GetText()

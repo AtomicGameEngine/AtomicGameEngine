@@ -78,7 +78,10 @@ void PlayCmd::Run()
     paths.Push(env->GetCoreDataDir());
     paths.Push(env->GetPlayerDataDir());
     paths.Push(project->GetResourcePath());
+
+    // fixme: this is for loading from cache
     paths.Push(project->GetProjectPath());
+    paths.Push(project->GetProjectPath() + "Cache");
 
     String resourcePaths;
     resourcePaths.Join(paths, "!");

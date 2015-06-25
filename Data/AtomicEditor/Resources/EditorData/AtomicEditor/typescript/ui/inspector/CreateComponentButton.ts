@@ -1,4 +1,6 @@
 
+import ComponentInspector = require("./ComponentInspector");
+
 
 var audioCreateSource = new Atomic.UIMenuItemSource();
 
@@ -22,7 +24,7 @@ geometryCreateSource.addItem(new Atomic.UIMenuItem("Water", "create component"))
 var logicCreateSource = new Atomic.UIMenuItemSource();
 
 logicCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "create component"));
-logicCreateSource.addItem(new Atomic.UIMenuItem("Javascript Component", "create component"));
+logicCreateSource.addItem(new Atomic.UIMenuItem("Javascript Component", "JSComponent"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "create component"));
 
 var navigationCreateSource = new Atomic.UIMenuItemSource();
@@ -107,7 +109,16 @@ class CreateComponentButton extends Atomic.UIButton {
 
         if (ev.target && ev.target.id == "create component popup") {
 
-            this.node.createComponent(ev.refid);
+            var c = this.node.createComponent(ev.refid);
+
+            if (c) {
+
+              var ci = new ComponentInspector();
+              ci.inspect(c);
+
+              this.parent.addChildRelative(ci, Atomic.UI_WIDGET_Z_REL_BEFORE, this);
+
+            }
 
             return true;
 

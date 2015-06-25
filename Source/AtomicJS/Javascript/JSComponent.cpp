@@ -69,9 +69,9 @@ void JSComponent::OnNodeSet(Node *node)
 {
     Component::OnNodeSet(node);
 
-    if (node)
+    if (node && node->JSGetHeapPtr())
     {
-        assert(node->JSGetHeapPtr());
+        //assert(node->JSGetHeapPtr());
 
         duk_context* ctx = vm_->GetJSContext();
         int top = duk_get_top(ctx);
@@ -91,14 +91,17 @@ void JSComponent::OnNodeSet(Node *node)
 void JSComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<JSComponent>(LOGIC_CATEGORY);
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Component Name", GetClassNameProperty, SetClassNameProperty, String, String::EMPTY, AM_DEFAULT);
+}
 
-    //ACCESSOR_ATTRIBUTE(JSComponent, VAR_BOOL, "Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    //REF_ACCESSOR_ATTRIBUTE(JSComponent, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String::EMPTY, AM_DEFAULT);
+void JSComponent::ApplyAttributes()
+{
+    Component::ApplyAttributes();
 
-    //ACCESSOR_ATTRIBUTE(JSComponent, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(JSFile::GetTypeStatic()), AM_DEFAULT);
-    //ACCESSOR_ATTRIBUTE(JSComponent, VAR_BUFFER, "Delayed Method Calls", GetDelayedCallsAttr, SetDelayedCallsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    //ACCESSOR_ATTRIBUTE(JSComponent, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    //ACCESSOR_ATTRIBUTE(JSComponent, VAR_BUFFER, "Script Network Data", GetScriptNetworkDataAttr, SetScriptNetworkDataAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_NOEDIT);
+    if (classNameProperty_.Length())
+        SetClassName(classNameProperty_);
+
 }
 
 void JSComponent::ClearScriptMethods()
@@ -198,7 +201,13 @@ void JSComponent::CreateObject()
     duk_push_global_stash(ctx);
     duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_COMPONENTS);
     duk_get_prop_string(ctx, -1, className_.CString());
-    assert(duk_is_function(ctx, -1));
+
+    // FIXME: This is happening in editor
+    if (!duk_is_function(ctx, -1))
+    {
+        duk_pop_n(ctx, 3);
+        return;
+    }
 
     js_push_class_object_instance(ctx, this);
 

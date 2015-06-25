@@ -11,7 +11,7 @@ class InspectorWidget extends ScriptWidget {
         fd.size = 11;
 
         var nlp = new Atomic.UILayoutParams();
-        nlp.width = 320;
+        nlp.width = 310;
 
         var layout = this.rootLayout = new Atomic.UILayout();
         layout.spacing = 4;
@@ -117,7 +117,7 @@ class InspectorWidget extends ScriptWidget {
       edit.skinBg = "TBAttrEditorField";
       edit.fontDescription = this.attrFontDesc;
       var lp = new Atomic.UILayoutParams();
-      lp.width = 180;
+      lp.width = 140;
       edit.layoutParams = lp;
 
       attrLayout.addChild(edit);

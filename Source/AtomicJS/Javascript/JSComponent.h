@@ -52,6 +52,9 @@ public:
     void SetScriptFileAttr(ResourceRef value);
     void SetClassName(const String& className);
 
+    const String& GetClassNameProperty() const { return classNameProperty_; }
+    void SetClassNameProperty(const String& className) { classNameProperty_ = className; }
+
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
     void OnNodeSet(Node *node);
@@ -65,6 +68,8 @@ public:
     void SetScriptFile(JSFile* scriptFile);
 
     void ListenToEvent(Object* sender, StringHash eventType, JS_HEAP_PTR __duk_function);
+
+    void ApplyAttributes();
 
 private:
 
@@ -92,6 +97,8 @@ private:
 
     /// Class name.
     String className_;
+
+    String classNameProperty_;
 
     /// Script subsystem.
     SharedPtr<Javascript> script_;

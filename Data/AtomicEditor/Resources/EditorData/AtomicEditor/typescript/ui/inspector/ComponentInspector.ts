@@ -35,7 +35,8 @@ class ComponentInspector extends Atomic.UISection {
     inspect(component: Atomic.Component) {
 
         this.text = component.getTypeName();
-        this.value = 1;
+        // don't example by default
+        this.value = 0;
 
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";

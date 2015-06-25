@@ -254,7 +254,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
     // Visualize the currently selected nodes
     if (selectedNode_.NotNull())
     {
-        //DrawNodeDebug(selectedNode_, debugRenderer_);
+        DrawNodeDebug(selectedNode_, debugRenderer_);
 
     }
 
@@ -318,8 +318,8 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
             if (r.drawable_)
             {
-                //debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
-                //r.drawable_->DrawDebugGeometry(debugRenderer_, false);
+                debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
+                r.drawable_->DrawDebugGeometry(debugRenderer_, false);
             }
 
         }

@@ -95,6 +95,11 @@ enum UI_EVENT_TYPE {
     UI_EVENT_TYPE_CUSTOM = tb::EVENT_TYPE_CUSTOM
 };
 
+/** Defines widget z level relative to another widget, used with TBWidget::AddChildRelative. */
+enum UI_WIDGET_Z_REL {
+    UI_WIDGET_Z_REL_BEFORE = tb::WIDGET_Z_REL_BEFORE,		///< Before the reference widget (visually behind reference).
+    UI_WIDGET_Z_REL_AFTER = tb::WIDGET_Z_REL_AFTER			///< After the reference widget (visually above reference).
+};
 
 class UIView;
 class UILayoutParams;
@@ -107,9 +112,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     OBJECT(UIWidget)
 
-public:
+    public:
 
-    UIWidget(Context* context, bool createWidget = true);
+        UIWidget(Context* context, bool createWidget = true);
     virtual ~UIWidget();
 
     bool Load(const String& filename);
@@ -123,7 +128,7 @@ public:
     UIPreferredSize* GetPreferredSize();
     String GetText();
 
-    void SetRect(IntRect r);    
+    void SetRect(IntRect r);
     void SetSize(int width, int height);
     void SetPosition(int x, int y);
     void SetText(const String& text);
@@ -135,7 +140,7 @@ public:
 
     void DeleteAllChildren();
 
-    // String ID    
+    // String ID
     virtual void SetId(const String& id);
 
     void Center();
@@ -174,6 +179,11 @@ public:
     UIView* GetView();
 
     virtual void AddChild(UIWidget* child);
+
+    /// Add the child to this widget. See AddChild for adding a child to the top or bottom.
+    /// This takes a relative Z and insert the child before or after the given reference widget.*/
+    void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
+
 
     tb::TBWidget* GetInternalWidget() { return widget_; }
 

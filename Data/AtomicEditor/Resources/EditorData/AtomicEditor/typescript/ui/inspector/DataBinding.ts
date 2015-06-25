@@ -16,6 +16,8 @@ class DataBinding {
         fd.id = "Vera";
         fd.size = 11;
 
+        var enumSource = null;
+
         if (attrInfo.type == Atomic.VAR_BOOL) {
 
             var box = new Atomic.UICheckBox();
@@ -25,6 +27,14 @@ class DataBinding {
         else if (attrInfo.type == Atomic.VAR_INT) {
 
             if (attrInfo.enumNames.length) {
+
+                enumSource = new Atomic.UISelectItemSource();
+
+                for (var i in attrInfo.enumNames) {
+
+                    enumSource.addItem(new Atomic.UISelectItem(attrInfo.enumNames[i], (Number(i) + 1).toString()));
+
+                }
 
                 var button = new Atomic.UIButton();
                 button.fontDescription = fd;
@@ -105,6 +115,7 @@ class DataBinding {
             lp.width = 70;
 
             for (var i = 0; i < 4; i++) {
+
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);
                 select.fontDescription = fd;
@@ -118,6 +129,7 @@ class DataBinding {
         if (widget) {
 
             var binding = new DataBinding(object, attrInfo, widget);
+            binding.enumSource = enumSource;
             return binding;
 
         }
@@ -280,6 +292,32 @@ class DataBinding {
         if (this.objectLocked)
             return false;
 
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = this.attrInfo.name + " enum popup";
+
+            if (ev.target.id == id) {
+
+                this.object.setAttribute(this.attrInfo.name, Number(ev.refid) - 1);
+                this.setWidgetValueFromObject();
+
+            }
+
+            else if (this.widget == ev.target && this.attrInfo.enumNames.length) {
+
+
+                if (this.enumSource) {
+                    var menu = new Atomic.UIMenuWindow(ev.target, id);
+                    menu.show(this.enumSource);
+                }
+
+                return true;
+
+            }
+
+
+        }
+
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
             if (this.widget == ev.target || this.widget.isAncestorOf(ev.target)) {
                 this.setObjectValueFromWidget(ev.target);
@@ -296,6 +334,7 @@ class DataBinding {
     widgetLocked: boolean = false;
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
+    enumSource: Atomic.UISelectItemSource;
 
 }
 

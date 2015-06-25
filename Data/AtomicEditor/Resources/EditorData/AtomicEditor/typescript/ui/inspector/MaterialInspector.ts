@@ -161,7 +161,7 @@ class MaterialInspector extends ScriptWidget {
         button.fontDescription = this.fd;
 
         var lp = new Atomic.UILayoutParams();
-        lp.width = 180;
+        lp.width = 140;
         button.layoutParams = lp;
 
         button.onClick = function() {
@@ -261,7 +261,7 @@ class MaterialInspector extends ScriptWidget {
         this.material = material;
 
         var mlp = new Atomic.UILayoutParams();
-        mlp.width = 340;
+        mlp.width = 310;
 
         var materialLayout = new Atomic.UILayout();
         materialLayout.spacing = 4;
@@ -302,7 +302,7 @@ class MaterialInspector extends ScriptWidget {
         field.skinBg = "TBAttrEditorField";;
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
-        lp.width = 180;
+        lp.width = 140;
         field.layoutParams = lp;
 
         field.text = material.getTexture(Atomic.TU_DIFFUSE).name;

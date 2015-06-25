@@ -3,6 +3,7 @@ import ProjectFrame = require("./ProjectFrame");
 import ResourceFrame = require("./ResourceFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
 import HierarchyFrame = require("./HierarchyFrame");
+import MainToolbar = require("./MainToolbar");
 
 import MessageModal = require("./modal/MessageModal");
 import UIEvents = require("./UIEvents");
@@ -17,8 +18,8 @@ class MainFrame extends ScriptWidget {
     resourceframe: ResourceFrame;
     inspectorframe: InspectorFrame;
     hierarchyFrame: HierarchyFrame;
-
     inspectorlayout: Atomic.UILayout;
+    mainToolbar: MainToolbar;
 
     private messagemodal: MessageModal.MessageModal = new MessageModal.MessageModal();
 
@@ -30,6 +31,8 @@ class MainFrame extends ScriptWidget {
 
         this.inspectorlayout = <Atomic.UILayout> this.getWidget("inspectorlayout");
 
+        this.getWidget("consolecontainer").visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+
         this.inspectorframe = new InspectorFrame();
         this.inspectorlayout.addChild(this.inspectorframe);
 
@@ -37,6 +40,8 @@ class MainFrame extends ScriptWidget {
         this.hierarchyFrame = new HierarchyFrame(this);
 
         this.resourceframe = new ResourceFrame(this);
+
+        this.mainToolbar = new MainToolbar(this.getWidget("maintoolbarcontainer"));
 
         this.showInspectorFrame(true);
 
