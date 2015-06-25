@@ -130,6 +130,19 @@ static int Node_GetChildAtIndex(duk_context* ctx)
     return 1;
 }
 
+static int Node_SaveXML(duk_context* ctx)
+{
+    File* file = js_to_class_instance<File>(ctx, 0, 0);
+
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    duk_push_boolean(ctx, node->SaveXML(*file) ? 1 : 0);
+
+    return 1;
+}
+
+
 static int Scene_LoadXML(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -179,6 +192,8 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "createJSComponent");
     duk_push_c_function(ctx, Node_GetChildAtIndex, 1);
     duk_put_prop_string(ctx, -2, "getChildAtIndex");
+    duk_push_c_function(ctx, Node_SaveXML, 1);
+    duk_put_prop_string(ctx, -2, "saveXML");
 
     duk_pop(ctx);
 

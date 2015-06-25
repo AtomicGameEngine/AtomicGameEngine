@@ -110,7 +110,11 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
         if (widget->GetType() == UISelectList::GetTypeStatic())
         {
             // handle select drag
-            LOGINFOF("DRAG Select: %s", widget->GetTypeName().CString());
+
+            dragObject_ = widget->GetDragObject();
+
+            LOGINFOF("DRAG Select: %s, DragObject: %s", widget->GetTypeName().CString(),
+                                                        dragObject_.Null() ? "NULL" : dragObject_->GetTypeName().CString());
         }
         else
         {

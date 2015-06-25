@@ -3,32 +3,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     hierList: Atomic.UIListView;
 
-    /*
-
-    super();
-
-    this.load("AtomicEditor/editor/ui/projectframe.tb.txt");
-
-    this.gravity = UI.GRAVITY_TOP_BOTTOM;
-
-    var projectviewcontainer = parent.getWidget("projectviewcontainer");
-
-    projectviewcontainer.addChild(this);
-
-    var foldercontainer = this.getWidget("foldercontainer");
-
-    var folderList = this.folderList = new Atomic.UIListView();
-
-    folderList.rootList.id = "folderList_";
-
-    foldercontainer.addChild(folderList);
-
-    // events
-    this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
-    this.subscribeToEvent("DragEnded", (data) => this.handleDragEnded(data));
-
-    */
-
     constructor(parent: Atomic.UIWidget) {
 
         super();
@@ -108,6 +82,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var selectedId = Number(list.selectedItemID);
                 var node = this.scene.getNode(selectedId);
+                this.hierList.rootList.dragObject = new Atomic.UIDragObject(node, node.name.length ? node.name : "(Anonymous)");
                 this.sendEvent("EditorActiveNodeChange", { node: node });
                 return false;
 

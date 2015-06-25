@@ -21,6 +21,7 @@
 	"typescript_decl" : {
 
 		"Node" : [
+			"saveXML(file:File):boolean;",
 			"getChildrenWithName(name:string, recursive?:boolean):Node[];",
 			"getChildrenWithComponent(componentType:string, recursive?:boolean):Node[];",
 			"getComponents(componentType?:string, recursive?:boolean):Component[];",

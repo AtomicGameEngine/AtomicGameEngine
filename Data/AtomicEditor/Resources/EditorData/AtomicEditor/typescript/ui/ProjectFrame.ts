@@ -71,16 +71,16 @@ class ProjectFrame extends ScriptWidget {
 
                 if (asset) {
 
-                  if (asset.isFolder()) {
+                    if (asset.isFolder()) {
 
-                    this.folderList.selectItemByID(id);
-                    this.refreshContent(asset);
+                        this.folderList.selectItemByID(id);
+                        this.refreshContent(asset);
 
-                  } else {
+                    } else {
 
-                    this.sendEvent("EditResource", { "path": asset.path });
+                        this.sendEvent("EditResource", { "path": asset.path });
 
-                  }
+                    }
 
                 }
 
@@ -92,28 +92,57 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    rescan(asset:ToolCore.Asset) {
+
+      var db = ToolCore.getAssetDatabase();
+
+      db.scan();
+      this.refresh();
+      this.refreshContent(asset);
+
+    }
+
     handleDragEnded(data) {
 
-      var dragObject = <Atomic.UIDragObject> data.dragObject;
-      var filenames = dragObject.filenames;
+        // if the drop target is the folderList's root select widget
+        var rootList = this.folderList.rootList;
+        var hoverID = rootList.hoverItemID;
 
-      if (!filenames.length)
-        return;
-
-      // if the drop target is the folderList's root select widget
-      var rootList = this.folderList.rootList;
-
-      var hoverID = rootList.hoverItemID;
-
-      if ( hoverID != "") {
+        if (hoverID == "")
+            return;
 
         var db = ToolCore.getAssetDatabase();
-        var fileSystem = Atomic.getFileSystem();
         var asset = db.getAssetByGUID(hoverID);
 
-        if (asset && asset.isFolder) {
+        if (!asset || !asset.isFolder)
+            return;
 
-          for (var i in filenames) {
+        var dragObject = <Atomic.UIDragObject> data.dragObject;
+        if (dragObject.object && dragObject.object.typeName == "Node") {
+
+            var node = <Atomic.Node> dragObject.object;
+            var destFilename = Atomic.addTrailingSlash(asset.path);
+            destFilename += node.name + ".prefab";
+
+            var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
+            node.saveXML(file);
+
+            this.rescan(asset);
+
+            return;
+
+        }
+
+        // dropped some files?
+        var filenames = dragObject.filenames;
+
+        if (!filenames.length)
+            return;
+
+        var fileSystem = Atomic.getFileSystem();
+
+
+        for (var i in filenames) {
 
             var srcFilename = filenames[i];
 
@@ -125,15 +154,9 @@ class ProjectFrame extends ScriptWidget {
 
             fileSystem.copy(srcFilename, destFilename);
 
-          }
-
-          db.scan();
-          this.refresh();
-          this.refreshContent(asset);
-
         }
 
-      }
+        this.rescan(asset);
 
     }
 
@@ -143,7 +166,7 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    private refreshContent(folder:ToolCore.Asset) {
+    private refreshContent(folder: ToolCore.Asset) {
 
         var db = ToolCore.getAssetDatabase();
 
@@ -209,7 +232,7 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    private createButtonLayout(asset:ToolCore.Asset): Atomic.UILayout {
+    private createButtonLayout(asset: ToolCore.Asset): Atomic.UILayout {
 
         var system = ToolCore.getToolSystem();
         var project = system.project;
