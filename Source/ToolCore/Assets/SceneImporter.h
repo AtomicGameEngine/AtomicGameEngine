@@ -12,7 +12,7 @@ class SceneImporter : public AssetImporter
 
 public:
     /// Construct.
-    SceneImporter(Context* context);
+    SceneImporter(Context* context, Asset *asset);
     virtual ~SceneImporter();
 
     virtual void SetDefaults();

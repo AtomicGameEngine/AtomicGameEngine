@@ -70,7 +70,7 @@ protected:
     virtual bool LoadSettingsInternal();
     virtual bool SaveSettingsInternal();
 
-    WeakPtr<Asset> asset_;
+
     float scale_;
     bool importAnimations_;
     Vector<SharedPtr<AnimationImportInfo>> animationInfo_;

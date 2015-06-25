@@ -50,6 +50,7 @@ private:
     void Import(const String& path);
 
     void ImportDirtyAssets();
+    void PreloadAssets();
 
     SharedPtr<Project> project_;
     List<SharedPtr<Asset>> assets_;

@@ -6,7 +6,7 @@
 namespace ToolCore
 {
 
-FolderImporter::FolderImporter(Context* context) : AssetImporter(context)
+FolderImporter::FolderImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
 
 }

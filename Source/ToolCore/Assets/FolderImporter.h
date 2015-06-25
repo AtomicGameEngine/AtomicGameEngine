@@ -12,7 +12,7 @@ class FolderImporter : public AssetImporter
 
 public:
     /// Construct.
-    FolderImporter(Context* context);
+    FolderImporter(Context* context, Asset* asset);
     virtual ~FolderImporter();
 
     virtual void SetDefaults();

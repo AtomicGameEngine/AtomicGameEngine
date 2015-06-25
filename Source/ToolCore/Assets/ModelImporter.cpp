@@ -20,8 +20,7 @@ namespace ToolCore
 {
 
 /// Node + Model (static or animated)
-ModelImporter::ModelImporter(Context* context, Asset *asset) : AssetImporter(context),
-    asset_(asset)
+ModelImporter::ModelImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
     SetDefaults();
 }

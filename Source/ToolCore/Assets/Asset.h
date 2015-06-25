@@ -24,6 +24,7 @@ public:
     virtual ~Asset();
 
     bool Import();
+    bool Preload();
 
     // the .fbx, .png, etc path, attempts to load .asset, creates missing .asset
     bool SetPath(const String& path);

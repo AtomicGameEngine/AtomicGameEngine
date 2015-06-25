@@ -12,7 +12,7 @@ class MaterialImporter : public AssetImporter
 
 public:
     /// Construct.
-    MaterialImporter(Context* context);
+    MaterialImporter(Context* context, Asset *asset);
     virtual ~MaterialImporter();
 
     virtual void SetDefaults();

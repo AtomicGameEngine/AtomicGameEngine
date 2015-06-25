@@ -9,6 +9,8 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+class Asset;
+
 /// deals with .asset files
 class AssetImporter : public Object
 {
@@ -16,7 +18,7 @@ class AssetImporter : public Object
 
 public:
     /// Construct.
-    AssetImporter(Context* context);
+    AssetImporter(Context* context, Asset* asset);
     virtual ~AssetImporter();
 
     // load .asset
@@ -28,11 +30,13 @@ public:
 
     /// Imports to cached data
     virtual bool Import(const String& guid) = 0;
+    virtual bool Preload() { return true; }
 
     bool RequiresCacheFile() const { return requiresCacheFile_; }
 
 protected:
 
+    WeakPtr<Asset> asset_;
     JSONValue jsonRoot_;   
     bool requiresCacheFile_;
 

@@ -7,7 +7,8 @@
 namespace ToolCore
 {
 
-AssetImporter::AssetImporter(Context* context) : Object(context),
+AssetImporter::AssetImporter(Context* context, Asset *asset) : Object(context),
+    asset_(asset),
     requiresCacheFile_(true)
 {
     SetDefaults();

@@ -54,6 +54,14 @@ bool Asset::Import()
     return importer_->Import(guid_);
 }
 
+bool Asset::Preload()
+{
+    if (importer_.Null())
+        return true;
+
+    return importer_->Preload();
+}
+
 // load .asset
 bool Asset::Load()
 {
@@ -164,7 +172,7 @@ bool Asset::CreateImporter()
     {
         name_ = GetFileName(RemoveTrailingSlash(path_));
         isFolder_ = true;
-        importer_ = new FolderImporter(context_);
+        importer_ = new FolderImporter(context_, this);
     }
     else
     {
@@ -184,19 +192,19 @@ bool Asset::CreateImporter()
         }
         else if (ext == ".prefab")
         {
-            importer_ = new PrefabImporter(context_);
+            importer_ = new PrefabImporter(context_, this);
         }
         else if (ext == ".scene")
         {
-            importer_ = new SceneImporter(context_);
+            importer_ = new SceneImporter(context_, this);
         }
         else if (ext == ".material")
         {
-            importer_ = new MaterialImporter(context_);
+            importer_ = new MaterialImporter(context_, this);
         }
         else if (textureFormats.Contains(ext))
         {
-            importer_ = new TextureImporter(context_);
+            importer_ = new TextureImporter(context_, this);
         }
 
     }

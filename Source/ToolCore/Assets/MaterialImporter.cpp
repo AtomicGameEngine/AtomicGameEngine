@@ -6,7 +6,7 @@
 namespace ToolCore
 {
 
-MaterialImporter::MaterialImporter(Context* context) : AssetImporter(context)
+MaterialImporter::MaterialImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
 
 }

@@ -9,7 +9,7 @@
 namespace ToolCore
 {
 
-TextureImporter::TextureImporter(Context* context) : AssetImporter(context)
+TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
 
 }

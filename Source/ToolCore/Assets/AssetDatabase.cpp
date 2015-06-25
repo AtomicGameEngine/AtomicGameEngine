@@ -176,6 +176,20 @@ void AssetDatabase::ImportDirtyAssets()
 
 }
 
+void AssetDatabase::PreloadAssets()
+{
+
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    while (itr != assets_.End())
+    {
+        (*itr)->Preload();
+        itr++;
+    }
+
+}
+
+
 void AssetDatabase::Scan()
 {
     PruneOrphanedDotAssetFiles();
@@ -243,6 +257,8 @@ void AssetDatabase::Scan()
         }
 
     }
+
+    PreloadAssets();
 
     ImportDirtyAssets();
 

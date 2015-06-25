@@ -12,7 +12,7 @@ class TextureImporter : public AssetImporter
 
 public:
     /// Construct.
-    TextureImporter(Context* context);
+    TextureImporter(Context* context, Asset* asset);
     virtual ~TextureImporter();
 
     virtual void SetDefaults();

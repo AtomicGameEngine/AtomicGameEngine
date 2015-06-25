@@ -6,7 +6,7 @@
 namespace ToolCore
 {
 
-SceneImporter::SceneImporter(Context* context) : AssetImporter(context)
+SceneImporter::SceneImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
 
 }

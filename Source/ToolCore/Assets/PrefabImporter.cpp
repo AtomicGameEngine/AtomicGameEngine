@@ -2,6 +2,8 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
 
+#include <Atomic/Scene/Scene.h>
+
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "PrefabImporter.h"
@@ -9,7 +11,7 @@
 namespace ToolCore
 {
 
-PrefabImporter::PrefabImporter(Context* context) : AssetImporter(context)
+PrefabImporter::PrefabImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
     requiresCacheFile_ = false;
 }
@@ -24,6 +26,18 @@ void PrefabImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
+bool PrefabImporter::Preload()
+{
+    if (!asset_)
+        return false;
+
+    preloadResourceScene_ = new Scene(context_);
+    SharedPtr<File> file(new File(context_, asset_->GetPath()));
+    preloadResourceScene_->LoadAsyncXML(file, LOAD_RESOURCES_ONLY);
+
+    return true;
+}
+
 bool PrefabImporter::Import(const String& guid)
 {
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
@@ -31,8 +45,6 @@ bool PrefabImporter::Import(const String& guid)
 
     if (!asset)
         return false;
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     return true;
 }
