@@ -16,6 +16,7 @@
         "./editor/Editor.ts",
         "./main.ts",
         "./ui/EditorStrings.ts",
+        "./ui/HierarchyFrame.ts",
         "./ui/MainFrame.ts",
         "./ui/MainFrameMenu.ts",
         "./ui/ProjectFrame.ts",

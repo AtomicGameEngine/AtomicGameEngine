@@ -111,6 +111,24 @@ static int Node_GetComponents(duk_context* ctx)
     return 1;
 }
 
+static int Node_GetChildAtIndex(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    unsigned idx = (unsigned) duk_to_number(ctx, 0);
+
+    if (node->GetNumChildren() <= idx)
+    {
+        duk_push_null(ctx);
+        return 1;
+    }
+
+    Node* child = node->GetChild(idx);
+    js_push_class_object_instance(ctx, child, "Node");
+
+    return 1;
+}
 
 static int Scene_LoadXML(duk_context* ctx)
 {
@@ -159,6 +177,9 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getComponents");
     duk_push_c_function(ctx, Node_CreateJSComponent, 1);
     duk_put_prop_string(ctx, -2, "createJSComponent");
+    duk_push_c_function(ctx, Node_GetChildAtIndex, 1);
+    duk_put_prop_string(ctx, -2, "getChildAtIndex");
+
     duk_pop(ctx);
 
     js_class_get_prototype(ctx, "Atomic", "Scene");

@@ -49,7 +49,10 @@ class ResourceFrame extends ScriptWidget {
 
         } else if (ext == ".scene") {
 
-            editor = new Editor.SceneEditor3D(path, this.tabcontainer);
+            var sceneEditor3D = new Editor.SceneEditor3D(path, this.tabcontainer);
+            editor = sceneEditor3D;
+
+            this.sendEvent("EditorActiveSceneChanged", { scene : sceneEditor3D.scene });
 
         }
 

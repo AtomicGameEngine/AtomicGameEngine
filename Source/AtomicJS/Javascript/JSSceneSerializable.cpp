@@ -67,6 +67,9 @@ static int Serializable_GetAttributes(duk_context* ctx)
     duk_dup(ctx, -1);
     duk_put_prop_index(ctx, -4, type);
 
+    if (!attrs)
+        return 1;
+
     for (unsigned i = 0; i < attrs->Size(); i++)
     {
         const AttributeInfo* attr = &attrs->At(i);

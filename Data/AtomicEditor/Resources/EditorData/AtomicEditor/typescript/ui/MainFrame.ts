@@ -2,6 +2,7 @@ import menubar = require("./MainFrameMenu");
 import ProjectFrame = require("./ProjectFrame");
 import ResourceFrame = require("./ResourceFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
+import HierarchyFrame = require("./HierarchyFrame");
 
 import MessageModal = require("./modal/MessageModal");
 import UIEvents = require("./UIEvents");
@@ -15,6 +16,7 @@ class MainFrame extends ScriptWidget {
     projectframe: ProjectFrame;
     resourceframe: ResourceFrame;
     inspectorframe: InspectorFrame;
+    hierarchyFrame: HierarchyFrame;
 
     inspectorlayout: Atomic.UILayout;
 
@@ -32,6 +34,8 @@ class MainFrame extends ScriptWidget {
         this.inspectorlayout.addChild(this.inspectorframe);
 
         this.projectframe = new ProjectFrame(this);
+        this.hierarchyFrame = new HierarchyFrame(this);
+
         this.resourceframe = new ResourceFrame(this);
 
         this.showInspectorFrame(true);

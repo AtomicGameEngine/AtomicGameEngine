@@ -23,7 +23,8 @@
 		"Node" : [
 			"getChildrenWithName(name:string, recursive?:boolean):Node[];",
 			"getChildrenWithComponent(componentType:string, recursive?:boolean):Node[];",
-			"getComponents(componentType?:string, recursive?:boolean):Component[];"
+			"getComponents(componentType?:string, recursive?:boolean):Component[];",
+			"getChildAtIndex(index:number):Node;"
 		]
 	}
 
