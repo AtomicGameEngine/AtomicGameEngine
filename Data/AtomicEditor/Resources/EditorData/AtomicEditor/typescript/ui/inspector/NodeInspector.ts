@@ -35,7 +35,8 @@ class NodeInspector extends ScriptWidget {
                 this.nodeLayout.deleteAllChildren();
                 this.nodeLayout = null;
                 this.node.removeComponents(true, true);
-                this.node.parent.removeChild(this.node);
+                if (this.node.parent)
+                  this.node.parent.removeChild(this.node);
                 this.node = null;
                 this.sendEvent("EditorActiveNodeChange", { node: null });
                 this.sendEvent("EditorUpdateHierarchy", {});
