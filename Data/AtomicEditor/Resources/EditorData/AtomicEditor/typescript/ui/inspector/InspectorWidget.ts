@@ -133,7 +133,6 @@ class InspectorWidget extends ScriptWidget {
 
     rootLayout:Atomic.UILayout;
     attrFontDesc:Atomic.UIFontDescription;
-
 }
 
 export  = InspectorWidget;

@@ -11,6 +11,29 @@ class NodeInspector extends ScriptWidget {
         super();
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent("KeyUp", (data) => this.handleKeyUp(data));
+
+    }
+
+    handleKeyUp(data) {
+
+      if (data.key == 92) {
+
+        // '\' is  delete for now
+
+        if (this.node) {
+
+          this.nodeLayout.deleteAllChildren();
+          this.nodeLayout = null;
+          this.node.removeComponents(true, true);
+          this.node.parent.removeChild(this.node);
+          this.node = null;
+          this.sendEvent("EditorActiveNodeChange", { node: null });
+          this.sendEvent("EditorUpdateHierarchy", {});
+
+        }
+
+      }
 
     }
 
@@ -36,6 +59,8 @@ class NodeInspector extends ScriptWidget {
 
     inspect(node: Atomic.Node) {
 
+        this.node = node;
+
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";
         fd.size = 11;
@@ -43,7 +68,7 @@ class NodeInspector extends ScriptWidget {
         var nlp = new Atomic.UILayoutParams();
         nlp.width = 304;
 
-        var nodeLayout = new Atomic.UILayout();
+        var nodeLayout = this.nodeLayout = new Atomic.UILayout();
         nodeLayout.spacing = 4;
 
         nodeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
@@ -141,6 +166,8 @@ class NodeInspector extends ScriptWidget {
 
     }
 
+    node:Atomic.Node;
+    nodeLayout:Atomic.UILayout;
     bindings:Array<DataBinding> = new Array();
 
 

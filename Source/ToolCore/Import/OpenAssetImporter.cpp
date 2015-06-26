@@ -252,7 +252,7 @@ void OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     {
         modelComponent = importNode_->CreateComponent<AnimatedModel>();
         importNode_->CreateComponent<AnimationController>();
-        ((AnimatedModel*)modelComponent)->SetModel(mdl, false);
+        ((AnimatedModel*)modelComponent)->SetModel(mdl, true);
     }
 
     if (!noMaterials_)
