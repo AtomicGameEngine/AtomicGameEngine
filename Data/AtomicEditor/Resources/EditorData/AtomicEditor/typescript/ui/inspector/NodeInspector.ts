@@ -17,23 +17,32 @@ class NodeInspector extends ScriptWidget {
 
     handleKeyUp(data) {
 
-      if (data.key == 92) {
+        if (data.key == 27) {
 
-        // '\' is  delete for now
-
-        if (this.node) {
-
-          this.nodeLayout.deleteAllChildren();
-          this.nodeLayout = null;
-          this.node.removeComponents(true, true);
-          this.node.parent.removeChild(this.node);
-          this.node = null;
-          this.sendEvent("EditorActiveNodeChange", { node: null });
-          this.sendEvent("EditorUpdateHierarchy", {});
-
+            if (this.nodeLayout) {
+            this.sendEvent("EditorActiveNodeChange", { node: null });
+            this.nodeLayout.deleteAllChildren();
+            this.nodeLayout = null;
+          }
         }
 
-      }
+        if (data.key == 92) {
+
+            // '\' is  delete for now
+
+            if (this.node) {
+
+                this.nodeLayout.deleteAllChildren();
+                this.nodeLayout = null;
+                this.node.removeComponents(true, true);
+                this.node.parent.removeChild(this.node);
+                this.node = null;
+                this.sendEvent("EditorActiveNodeChange", { node: null });
+                this.sendEvent("EditorUpdateHierarchy", {});
+
+            }
+
+        }
 
     }
 
@@ -43,11 +52,11 @@ class NodeInspector extends ScriptWidget {
 
         for (var i = 0; i < this.bindings.length; i++) {
 
-          if (this.bindings[i].handleWidgetEvent(ev)) {
+            if (this.bindings[i].handleWidgetEvent(ev)) {
 
-            handled = true;
+                handled = true;
 
-          }
+            }
 
         }
 
@@ -144,11 +153,11 @@ class NodeInspector extends ScriptWidget {
 
         for (var i in components) {
 
-          var ci = new ComponentInspector();
+            var ci = new ComponentInspector();
 
-          ci.inspect(components[i]);
+            ci.inspect(components[i]);
 
-          nodeLayout.addChild(ci);
+            nodeLayout.addChild(ci);
 
         }
 
@@ -158,17 +167,16 @@ class NodeInspector extends ScriptWidget {
 
         nodeLayout.addChild(button);
 
-        for (var i in this.bindings)
-        {
+        for (var i in this.bindings) {
             this.bindings[i].setWidgetValueFromObject();
             this.bindings[i].objectLocked = false;
         }
 
     }
 
-    node:Atomic.Node;
-    nodeLayout:Atomic.UILayout;
-    bindings:Array<DataBinding> = new Array();
+    node: Atomic.Node;
+    nodeLayout: Atomic.UILayout;
+    bindings: Array<DataBinding> = new Array();
 
 
 }
