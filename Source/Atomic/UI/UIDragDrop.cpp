@@ -17,9 +17,9 @@
 #include "UIDragObject.h"
 
 #ifdef ATOMIC_PLATFORM_OSX
-
 #include "UIDragDropMac.h"
-
+#elif ATOMIC_PLATFORM_WINDOWS
+#include "UIDragDropWindows.h"
 #endif
 
 using namespace tb;

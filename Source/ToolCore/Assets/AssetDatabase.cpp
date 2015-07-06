@@ -4,6 +4,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Math/Random.h>
 
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -47,7 +48,7 @@ String AssetDatabase::GenerateAssetGUID()
 
         for (unsigned i = 0; i < 16; i++)
         {
-            data.Push(time->GetTimeSinceEpoch() + random() % 65535);
+            data.Push(time->GetTimeSinceEpoch() + Rand());
         }
 
         md5.update(&data[0], data.Size() * sizeof(unsigned));

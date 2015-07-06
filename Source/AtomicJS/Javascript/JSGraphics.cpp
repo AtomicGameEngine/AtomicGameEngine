@@ -91,7 +91,7 @@ static int Material_GetShaderParameters(duk_context* ctx)
 
 static int Material_GetTextureUnitName(duk_context* ctx)
 {
-    duk_push_string(ctx, Material::GetTextureUnitName((TextureUnit) duk_get_number(ctx, 0)).CString());
+    duk_push_string(ctx, Material::GetTextureUnitName((TextureUnit) ((int) duk_get_number(ctx, 0))).CString());
     return 1;
 }
 

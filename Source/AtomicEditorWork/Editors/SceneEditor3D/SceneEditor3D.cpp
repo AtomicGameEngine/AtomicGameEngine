@@ -54,8 +54,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     // EARLY ACCESS
     if (fullpath.Find(String("ToonTown")) != String::NPOS)
     {
-          sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073, 76.1121, 16.47763));
-          Quaternion q(0.55, 0.14,  0.8, -0.2);
+          sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073f, 76.1121f, 16.47763f));
+          Quaternion q(0.55f, 0.14f,  0.8f, -0.2f);
           sceneView_->SetYaw(q.YawAngle());
           sceneView_->SetPitch(q.PitchAngle());
           sceneView_->GetCameraNode()->SetWorldRotation(q);
@@ -187,7 +187,7 @@ void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventDat
 
 void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData)
 {
-    EditMode mode = (EditMode) eventData[GizmoEditModeChanged::P_MODE].GetFloat();
+    EditMode mode = (EditMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
     gizmo3D_->SetEditMode(mode);
 }
 
