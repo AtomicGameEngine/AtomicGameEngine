@@ -1,8 +1,7 @@
-/// <reference path="/Users/josh/Dev/atomic/AtomicGameEngine/Bin/Atomic.d.ts" />
-/// <reference path="/Users/josh/Dev/atomic/AtomicGameEngine/Bin/ToolCore.d.ts" />
-/// <reference path="/Users/josh/Dev/atomic/AtomicGameEngine/Bin/Editor.d.ts" />
-
-/// <reference path="./AtomicWork.d.ts" />
+/// <reference path="../TypeScript/Atomic.d.ts" />
+/// <reference path="../TypeScript/ToolCore.d.ts" />
+/// <reference path="../TypeScript/Editor.d.ts" />
+/// <reference path="../TypeScript/AtomicWork.d.ts" />
 
 import __Editor = require("./editor/Editor");
 
