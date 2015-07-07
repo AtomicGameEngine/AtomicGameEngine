@@ -393,6 +393,11 @@ void Graphics::CenterWindow()
     }
 }
 
+void* Graphics::GetSDLWindow()
+{
+    return impl_->window_;
+}
+
 void Graphics::RaiseWindow()
 {
     if (impl_->window_)

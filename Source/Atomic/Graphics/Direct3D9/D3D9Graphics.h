@@ -99,6 +99,8 @@ public:
     void SetWindowSize(int width, int height);
     /// Center window.
     void CenterWindow();
+    /// Get the SDL_Window as a void* to avoid having to include the graphics implementation
+    void* GetSDLWindow();
     /// Bring the window to front with focus
     void RaiseWindow();
     /// Set screen mode. Return true if successful.
