@@ -215,7 +215,7 @@ void AtomicTool::Start()
 
     if (!cliDataPath_.Length())
     {
-        cliDataPath_ = env->GetRootSourceDir() + "/Data/AtomicEditor/";
+        cliDataPath_ = env->GetRootSourceDir() + "/Resources/";
     }
 
 #endif

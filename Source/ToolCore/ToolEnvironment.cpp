@@ -103,9 +103,9 @@ const String& ToolEnvironment::GetDevConfigFilename()
 void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 {
     rootSourceDir_ = AddTrailingSlash(sourceDir);
-    resourceCoreDataDir_ = rootSourceDir_ + "Data/AtomicPlayer/Resources/CoreData";
-    resourcePlayerDataDir_ = rootSourceDir_ + "Data/AtomicPlayer/Resources/PlayerData";
-    resourceEditorDataDir_ = rootSourceDir_ + "Data/AtomicEditor/Resources/EditorData";
+    resourceCoreDataDir_ = rootSourceDir_ + "Resources/CoreData";
+    resourcePlayerDataDir_ = rootSourceDir_ + "Resources/PlayerData";
+    resourceEditorDataDir_ = rootSourceDir_ + "Resources/EditorData";
 }
 
 void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPaths)
