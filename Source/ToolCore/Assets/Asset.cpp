@@ -187,7 +187,7 @@ bool Asset::CreateImporter()
         textureFormats.Push(".tga");
 
         // todo, externalize recognizers
-        if (ext == ".fbx")
+        if (ext == ".fbx" || ext == ".blend" || ext == ".dae")
         {
             importer_ = new ModelImporter(context_, this);
         }
