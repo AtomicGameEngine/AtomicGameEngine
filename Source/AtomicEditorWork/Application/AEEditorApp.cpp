@@ -59,22 +59,22 @@ void AEEditorApp::Start()
     // Instantiate and register the Javascript subsystem
     vm_ = javascript->InstantiateVM("MainVM");
     vm_->InitJSContext();
-    vm_->SetModuleSearchPaths("AtomicEditor/typescript");
+    vm_->SetModuleSearchPaths("AtomicEditor");
 
     jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
 
-    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/typescript/main.js"));
+    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/main.js"));
 
     if (file.Null())
     {
-        ErrorExit("Unable to load AtomicEditor/typescript/main.js");
+        ErrorExit("Unable to load AtomicEditor/main.js");
         return;
     }
 
     if (!vm_->ExecuteFile(file))
     {
-        ErrorExit("Error executing AtomicEditor/typescript/main.js");
+        ErrorExit("Error executing AtomicEditor/main.js");
         return;
     }
 
@@ -115,7 +115,8 @@ void AEEditorApp::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
     engineParameters_["ResourcePrefixPath"] = "";
-    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir();
+    String ScriptPath = env->GetRootSourceDir() + "Script";
+    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir() + ";" + ScriptPath;
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
 
