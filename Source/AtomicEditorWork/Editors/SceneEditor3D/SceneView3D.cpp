@@ -235,6 +235,9 @@ void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
 
 bool SceneView3D::MouseInView()
 {
+    if (!GetInternalWidget())
+        return false;
+
     Input* input = GetSubsystem<Input>();
     IntVector2 pos = input->GetMousePosition();
 
