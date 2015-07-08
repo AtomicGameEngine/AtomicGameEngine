@@ -24,6 +24,20 @@ class ModelInspector extends InspectorWidget {
 
         this.importer.importAnimations = this.importAnimationBox.value ? true : false;
 
+        for (var i = 0; i < this.importer.animationCount; i++) {
+
+          var info = this.importer.getAnimationInfo(i);
+
+          var nameEdit = this.nameEdits[i];
+          var startEdit = this.startEdits[i];
+          var endEdit = this.endEdits[i];
+
+          info.name = nameEdit.text;
+          info.startTime = Number(startEdit.text);
+          info.endTime = Number(endEdit.text);
+
+        }
+
         this.importer.import(this.asset.guid);
         this.asset.save();
 
@@ -69,28 +83,61 @@ class ModelInspector extends InspectorWidget {
 
         animationLayout.addChild(animLayout);
 
+        this.createAnimationEntries();
+
         // apply button
         rootLayout.addChild(this.createApplyButton());
 
     }
 
-    onAnimationCountChanged(count:number) {
+    createAnimationEntries() {
 
-      var layout = this.animationInfoLayout;
-      layout.deleteAllChildren();
+        var layout = this.animationInfoLayout;
+        layout.deleteAllChildren();
 
-      for (var i = 0; i < count; i++) {
+        var count = this.importer.animationCount;
 
-        var name = InspectorUtils.createAttrName("Animation " + i.toString() + ":");
-        layout.addChild(name);
+        this.importAnimationArray.countEdit.text = count.toString();
 
-        InspectorUtils.createAttrEditField("Name", layout);
-        InspectorUtils.createAttrEditField("Start", layout);
-        InspectorUtils.createAttrEditField("End", layout);
+        this.nameEdits = [];
+        this.startEdits = [];
+        this.endEdits = [];
 
-        InspectorUtils.createSeparator(layout);
+        for (var i = 0; i < count; i++) {
 
-      }
+            var animInfo = this.importer.getAnimationInfo(i);
+
+            var name = InspectorUtils.createAttrName("Animation " + i.toString() + ":");
+            layout.addChild(name);
+
+            var nameEdit = InspectorUtils.createAttrEditField("Name", layout);
+            nameEdit.text = animInfo.name;
+
+            var startEdit = InspectorUtils.createAttrEditField("Start", layout);
+            startEdit.text = animInfo.startTime.toString();
+
+            var endEdit = InspectorUtils.createAttrEditField("End", layout);
+            endEdit.text = animInfo.endTime.toString();
+
+            this.nameEdits.push(nameEdit);
+            this.startEdits.push(startEdit);
+            this.endEdits.push(endEdit);
+
+            InspectorUtils.createSeparator(layout);
+
+        }
+
+    }
+
+    onAnimationCountChanged(count: number) {
+
+        if (this.importer.animationCount == count) {
+            return;
+        }
+
+        this.importer.animationCount = count;
+
+        this.createAnimationEntries();
 
     }
 
@@ -101,6 +148,10 @@ class ModelInspector extends InspectorWidget {
     importAnimationBox: Atomic.UICheckBox;
     importAnimationArray: ArrayEditWidget;
     animationInfoLayout: Atomic.UILayout;
+
+    nameEdits: Atomic.UIEditField[];
+    startEdits: Atomic.UIEditField[];
+    endEdits: Atomic.UIEditField[];
 
     asset: ToolCore.Asset;
     importer: ToolCore.ModelImporter;

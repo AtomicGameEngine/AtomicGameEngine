@@ -313,6 +313,7 @@ declare module ToolCore {
 
       scale: number;
       importAnimations: boolean;
+      animationCount: number;
 
       // Construct.
       constructor(asset: Asset);
@@ -322,6 +323,9 @@ declare module ToolCore {
       setScale(scale: number): void;
       getImportAnimations(): boolean;
       setImportAnimations(importAnimations: boolean): void;
+      getAnimationCount(): number;
+      setAnimationCount(count: number): void;
+      getAnimationInfo(index: number): AnimationImportInfo;
       import(guid: string): boolean;
 
    }

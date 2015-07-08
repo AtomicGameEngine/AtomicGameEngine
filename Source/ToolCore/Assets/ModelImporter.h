@@ -59,6 +59,11 @@ public:
     bool GetImportAnimations() { return importAnimations_; }
     void SetImportAnimations(bool importAnimations) { importAnimations_ = importAnimations; }
 
+    unsigned GetAnimationCount();
+    void SetAnimationCount(unsigned count);
+
+    AnimationImportInfo* GetAnimationInfo(unsigned index) { return animationInfo_[index]; }
+
     bool Import(const String& guid);
 
 protected:

@@ -19,7 +19,7 @@ class ArrayEditWidget extends Atomic.UILayout {
 
         this.gravity = Atomic.UI_GRAVITY_ALL;
 
-        var countEdit = InspectorUtils.createAttrEditField(title, this);
+        var countEdit = this.countEdit = InspectorUtils.createAttrEditField(title, this);
 
         InspectorUtils.createSeparator(this);
 
@@ -71,6 +71,8 @@ class ArrayEditWidget extends Atomic.UILayout {
         }
 
     }
+
+    countEdit:Atomic.UIEditField;
 
     onCountChanged: (count:number) => void;
 

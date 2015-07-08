@@ -213,6 +213,29 @@ bool ModelImporter::Import(const String& guid)
     return true;
 }
 
+unsigned ModelImporter::GetAnimationCount()
+{
+    return animationInfo_.Size();
+}
+
+void ModelImporter::SetAnimationCount(unsigned count)
+{
+    if (animationInfo_.Size() >= count)
+    {
+        animationInfo_.Resize(count);
+    }
+    else
+    {
+        for (unsigned i = animationInfo_.Size(); i < count; i++)
+        {
+            SharedPtr<AnimationImportInfo> info(new AnimationImportInfo(context_));
+            animationInfo_.Push(info);
+        }
+
+    }
+
+}
+
 bool ModelImporter::LoadSettingsInternal()
 {
     if (!AssetImporter::LoadSettingsInternal())
