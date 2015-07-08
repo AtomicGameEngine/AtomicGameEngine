@@ -52,6 +52,7 @@ using namespace tb;
 #include "UISection.h"
 #include "UIInlineSelect.h"
 #include "UIScrollContainer.h"
+#include "UISeparator.h"
 
 namespace tb
 {
@@ -493,6 +494,15 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         widgetWrap_[widget] = section;
         return section;
     }
+
+    if (widget->IsOfType<TBSeparator>())
+    {
+        UISeparator* sep = new UISeparator(context_, false);
+        sep->SetWidget(widget);
+        widgetWrap_[widget] = sep;
+        return sep;
+    }
+
 
     if (widget->IsOfType<TBContainer>())
     {

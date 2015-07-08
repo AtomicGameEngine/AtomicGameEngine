@@ -9,15 +9,13 @@ import MaterialInspector = require("./MaterialInspector");
 import ModelInspector = require("./ModelInspector");
 import NodeInspector = require("./NodeInspector");
 
-var UI = Atomic.UI;
-
 class InspectorFrame extends ScriptWidget {
 
     constructor() {
 
         super();
 
-        this.gravity = UI.GRAVITY_TOP_BOTTOM;
+        this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
 
         this.load("AtomicEditor/editor/ui/inspectorframe.tb.txt");
 

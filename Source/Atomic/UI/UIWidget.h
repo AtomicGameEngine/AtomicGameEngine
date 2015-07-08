@@ -150,6 +150,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     double GetValue();
 
     void SetFocus();
+    void OnFocusChanged(bool focused);
 
     void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
     bool GetState(/*WIDGET_STATE*/ unsigned state);

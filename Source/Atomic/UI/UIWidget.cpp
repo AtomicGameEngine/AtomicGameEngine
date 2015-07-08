@@ -2,6 +2,7 @@
 //--player --editor-resource-paths "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/PlayerData!/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources"
 
 #include "../IO/Log.h"
+#include "../Input/InputEvents.h"
 
 #include "UIEvents.h"
 #include "UI.h"
@@ -88,6 +89,20 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
     widget_->SetDelegate(this);
 }
 
+/*
+enum SPECIAL_KEY
+{
+    TB_KEY_UNDEFINED = 0,
+    TB_KEY_UP, TB_KEY_DOWN, TB_KEY_LEFT, TB_KEY_RIGHT,
+    TB_KEY_PAGE_UP, TB_KEY_PAGE_DOWN, TB_KEY_HOME, TB_KEY_END,
+    TB_KEY_TAB, TB_KEY_BACKSPACE, TB_KEY_INSERT, TB_KEY_DELETE,
+    TB_KEY_ENTER, TB_KEY_ESC,
+    TB_KEY_F1, TB_KEY_F2, TB_KEY_F3, TB_KEY_F4, TB_KEY_F5, TB_KEY_F6,
+    TB_KEY_F7, TB_KEY_F8, TB_KEY_F9, TB_KEY_F10, TB_KEY_F11, TB_KEY_F12
+};
+*/
+
+
 void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
     UI* ui = GetSubsystem<UI>();
@@ -95,6 +110,20 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     String refid;
 
     ui->GetTBIDString(ev.ref_id, refid);
+
+    int key = ev.key;
+
+    if (ev.special_key)
+    {
+        switch (ev.special_key)
+        {
+        case TB_KEY_ENTER:
+            key = KEY_RETURN;
+            break;
+        default:
+            break;
+        }
+    }
 
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
@@ -105,7 +134,7 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_DELTAX] = ev.delta_x;
     data[P_DELTAY] = ev.delta_y;
     data[P_COUNT] = ev.count;
-    data[P_KEY] = ev.key;
+    data[P_KEY] = key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
     data[P_REFID] = refid;
@@ -510,11 +539,22 @@ UIView* UIWidget::GetView()
     return 0;
 }
 
+void UIWidget::OnFocusChanged(bool focused)
+{
+    using namespace WidgetFocusChanged;
+
+    VariantMap eventData;
+    eventData[P_WIDGET] = this;
+    eventData[P_FOCUSED] = focused;
+    SendEvent(E_WIDGETFOCUSCHANGED, eventData);
+
+}
+
 bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
     UI* ui = GetSubsystem<UI>();
 
-    if (ev.type == EVENT_TYPE_CHANGED)
+    if (ev.type == EVENT_TYPE_CHANGED || ev.type == EVENT_TYPE_KEY_UP)
     {
         if (!ev.target || ui->IsWidgetWrapped(ev.target))
         {

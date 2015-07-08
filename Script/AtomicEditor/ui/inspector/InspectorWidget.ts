@@ -103,7 +103,6 @@ class InspectorWidget extends ScriptWidget {
 
     }
 
-
     createAttrEditField(name:string, parent:Atomic.UIWidget):Atomic.UIEditField {
 
       var attrLayout = new Atomic.UILayout();

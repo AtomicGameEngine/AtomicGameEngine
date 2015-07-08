@@ -7274,6 +7274,13 @@ declare module Atomic {
 
    }
 
+   export class UISeparator extends UIWidget {
+
+      constructor(createWidget?: boolean);
+
+
+   }
+
    export class UISkinImage extends UIWidget {
 
       constructor(bitmapID: string, createWidget?: boolean);
@@ -7368,6 +7375,7 @@ declare module Atomic {
       setValue(value: number): void;
       getValue(): number;
       setFocus(): void;
+      onFocusChanged(focused: boolean): void;
       setState(state: number, on: boolean): void;
       getState(state: number): boolean;
       setVisibility(visibility: UI_WIDGET_VISIBILITY): void;

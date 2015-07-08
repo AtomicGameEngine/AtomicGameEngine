@@ -202,19 +202,25 @@ bool TBEditField::OnEvent(const TBWidgetEvent &ev)
 	if (ev.type == EVENT_TYPE_CHANGED && ev.target == &m_scrollbar_x)
 	{
 		m_style_edit.SetScrollPos(m_scrollbar_x.GetValue(), m_style_edit.scroll_y);
-		OnScroll(m_scrollbar_x.GetValue(), m_style_edit.scroll_y);
+        OnScroll(m_scrollbar_x.GetValue(), m_style_edit.scroll_y);
+        TBWidget::OnEvent(ev);
 		return true;
 	}
 	else if (ev.type == EVENT_TYPE_CHANGED && ev.target == &m_scrollbar_y)
 	{
 		m_style_edit.SetScrollPos(m_style_edit.scroll_x, m_scrollbar_y.GetValue());
-		OnScroll(m_style_edit.scroll_x, m_scrollbar_y.GetValue());
+        OnScroll(m_style_edit.scroll_x, m_scrollbar_y.GetValue());
+        TBWidget::OnEvent(ev);
 		return true;
 	}
+    else if (ev.type == EVENT_TYPE_CHANGED)
+    {
+        TBWidget::OnEvent(ev);
+    }
 	else if (ev.type == EVENT_TYPE_WHEEL && ev.modifierkeys == TB_MODIFIER_NONE)
 	{
 		int old_val = m_scrollbar_y.GetValue();
-		m_scrollbar_y.SetValue(old_val + ev.delta_y * TBSystem::GetPixelsPerLine());
+        m_scrollbar_y.SetValue(old_val + ev.delta_y * TBSystem::GetPixelsPerLine());
 		return m_scrollbar_y.GetValue() != old_val;
 	}
 	else if (ev.type == EVENT_TYPE_POINTER_DOWN && ev.target == this)
@@ -242,10 +248,12 @@ bool TBEditField::OnEvent(const TBWidgetEvent &ev)
 	}
 	else if (ev.type == EVENT_TYPE_KEY_DOWN)
 	{
+        TBWidget::OnEvent(ev);
 		return m_style_edit.KeyDown(ev.key, ev.special_key, ev.modifierkeys);
 	}
 	else if (ev.type == EVENT_TYPE_KEY_UP)
 	{
+        TBWidget::OnEvent(ev);
 		return true;
 	}
 	else if ((ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("popupmenu")) ||
@@ -348,6 +356,8 @@ void TBEditField::OnFontChanged()
 void TBEditField::OnFocusChanged(bool focused)
 {
 	m_style_edit.Focus(focused);
+
+    TBWidget::OnFocusChanged(focused);
 }
 
 void TBEditField::OnResized(int old_w, int old_h)

@@ -53,6 +53,13 @@ EVENT(E_WIDGETLOADED, WidgetLoaded)
     PARAM(P_WIDGET, Widget);             // UIWidget pointer
 }
 
+EVENT(E_WIDGETFOCUSCHANGED, WidgetFocusChanged)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+    PARAM(P_FOCUSED, Focused);             // bool
+}
+
+
 EVENT(E_WIDGETDELETED, WidgetDeleted)
 {
     PARAM(P_WIDGET, Widget);             // UIWidget pointer

@@ -1,6 +1,8 @@
 
 
 import InspectorWidget = require("./InspectorWidget");
+import ArrayEditWidget = require("./ArrayEditWidget");
+import InspectorUtils = require("./InspectorUtils");
 
 class ModelInspector extends InspectorWidget {
 
@@ -19,8 +21,6 @@ class ModelInspector extends InspectorWidget {
     onApply() {
 
         this.importer.scale = Number(this.scaleEdit.text);
-        //this.importer.startTime = Number(this.startTimeEdit.text);
-        //this.importer.endTime = Number(this.endTimeEdit.text);
 
         this.importer.importAnimations = this.importAnimationBox.value ? true : false;
 
@@ -49,14 +49,48 @@ class ModelInspector extends InspectorWidget {
         this.importAnimationBox = this.createAttrCheckBox("Import Animations", animationLayout);
         this.importAnimationBox.value = this.importer.importAnimations ? 1 : 0;
 
-        this.startTimeEdit = this.createAttrEditField("Start Time", animationLayout);
-        //this.startTimeEdit.text = this.importer.startTime.toString();
+        this.importAnimationArray = new ArrayEditWidget("Animation Count");
+        animationLayout.addChild(this.importAnimationArray);
 
-        this.endTimeEdit = this.createAttrEditField("End Time", animationLayout);
-        //this.endTimeEdit.text = this.importer.endTime.toString();
+        this.importAnimationArray.onCountChanged = (count) => this.onAnimationCountChanged(count);
+
+        var nlp = new Atomic.UILayoutParams();
+        nlp.width = 310;
+
+        var animLayout = this.animationInfoLayout = new Atomic.UILayout();
+
+        animLayout.spacing = 4;
+
+        animLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        animLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        animLayout.layoutParams = nlp;
+        animLayout.axis = Atomic.UI_AXIS_Y;
+        animLayout.gravity = Atomic.UI_GRAVITY_ALL;
+
+        animationLayout.addChild(animLayout);
 
         // apply button
         rootLayout.addChild(this.createApplyButton());
+
+    }
+
+    onAnimationCountChanged(count:number) {
+
+      var layout = this.animationInfoLayout;
+      layout.deleteAllChildren();
+
+      for (var i = 0; i < count; i++) {
+
+        var name = InspectorUtils.createAttrName("Animation " + i.toString() + ":");
+        layout.addChild(name);
+
+        InspectorUtils.createAttrEditField("Name", layout);
+        InspectorUtils.createAttrEditField("Start", layout);
+        InspectorUtils.createAttrEditField("End", layout);
+
+        InspectorUtils.createSeparator(layout);
+
+      }
 
     }
 
@@ -64,9 +98,9 @@ class ModelInspector extends InspectorWidget {
     scaleEdit: Atomic.UIEditField;
 
     // animation
-    startTimeEdit: Atomic.UIEditField;
-    endTimeEdit: Atomic.UIEditField;
     importAnimationBox: Atomic.UICheckBox;
+    importAnimationArray: ArrayEditWidget;
+    animationInfoLayout: Atomic.UILayout;
 
     asset: ToolCore.Asset;
     importer: ToolCore.ModelImporter;

@@ -74,7 +74,7 @@ void UIEditField::SetTextAlign(TEXT_ALIGN align)
 
 bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
 {
-    return false;
+    return UIWidget::OnEvent(ev);
 }
 
 }

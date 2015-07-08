@@ -111,6 +111,8 @@ class ResourceFrame extends ScriptWidget {
         var editor = <Editor.ResourceEditor> data.editor;
         var navigate = <boolean> data.navigateToAvailableResource;
 
+        editor.unsubscribeFromAllEvents();
+
         // remove from lookup
         delete this.editors[editor.fullPath];
 
