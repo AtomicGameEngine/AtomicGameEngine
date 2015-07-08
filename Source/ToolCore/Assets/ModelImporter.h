@@ -30,6 +30,7 @@ public:
     float GetStartTime() const { return startTime_; }
     float GetEndTime() const { return endTime_; }
 
+    void SetName(const String& name) { name_ = name; }
     void SetStartTime(float time) { startTime_ = time; }
     void SetEndTime(float time) { endTime_ = time; }
 

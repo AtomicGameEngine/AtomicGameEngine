@@ -54,6 +54,28 @@ static int Light_SetShadowBias(duk_context* ctx)
 
 // Material
 
+static int Material_SetShaderParameter(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Material* material = js_to_class_instance<Material>(ctx, -1, 0);
+
+    const char* name = duk_require_string(ctx, 0);
+    String value = duk_require_string(ctx, 1);
+
+    const Variant& v = material->GetShaderParameter(name);
+
+    if (v == Variant::EMPTY)
+        return 0;
+
+    Variant vset;
+    vset.FromString(v.GetType(), value);
+
+    material->SetShaderParameter(name, vset);
+
+    return 0;
+
+}
+
 static int Material_GetShaderParameters(duk_context* ctx)
 {
     duk_push_this(ctx);
@@ -110,6 +132,8 @@ void jsapi_init_graphics(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "Material");
     duk_push_c_function(ctx, Material_GetShaderParameters, 0);
     duk_put_prop_string(ctx, -2, "getShaderParameters");
+    duk_push_c_function(ctx, Material_SetShaderParameter, 2);
+    duk_put_prop_string(ctx, -2, "setShaderParameter");
     duk_pop(ctx);
 
     // static methods

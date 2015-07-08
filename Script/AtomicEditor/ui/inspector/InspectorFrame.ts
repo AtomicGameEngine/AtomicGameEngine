@@ -85,7 +85,7 @@ class InspectorFrame extends ScriptWidget {
           var inspector = new MaterialInspector();
           container.addChild(inspector);
 
-          inspector.inspect(material);
+          inspector.inspect(asset, material);
 
         }
 

@@ -19,6 +19,8 @@ public:
 
     bool Import(const String& guid);
 
+    void SaveMaterial();
+
 protected:
 
     virtual bool LoadSettingsInternal();

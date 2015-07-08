@@ -4,7 +4,7 @@
 							 "Source/ToolCore/Import", "Source/ToolCore/Assets"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
 							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter",
-							 "Asset", "AssetDatabase", "AssetImporter", "ModelImporter", "AnimationImportInfo",
+							 "Asset", "AssetDatabase", "AssetImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter"],
 	"typescript_decl" : {
 

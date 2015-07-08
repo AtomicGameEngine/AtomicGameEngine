@@ -48,7 +48,7 @@ var techniqueReverseLookup = {};
 
 for (var key in techniqueLookup) {
 
-  techniqueReverseLookup[techniqueLookup[key]] = key;
+    techniqueReverseLookup[techniqueLookup[key]] = key;
 
 }
 
@@ -83,34 +83,45 @@ class MaterialInspector extends ScriptWidget {
 
         for (var i in params) {
 
+            var attrLayout = new Atomic.UILayout();
+            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-          var attrLayout = new Atomic.UILayout();
-          attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+            var name = new Atomic.UITextField();
+            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.skinBg = "InspectorTextAttrName";
 
-          var name = new Atomic.UITextField();
-          name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-          name.skinBg = "InspectorTextAttrName";
+            name.text = params[i].name;
+            name.fontDescription = this.fd;
 
-          name.text = params[i].name;
-          name.fontDescription = this.fd;
+            attrLayout.addChild(name);
 
-          attrLayout.addChild(name);
+            var field = new Atomic.UIEditField();
+            field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            field.skinBg = "TBAttrEditorField";;
+            field.fontDescription = this.fd;
+            var lp = new Atomic.UILayoutParams();
+            lp.width = 140;
+            field.layoutParams = lp;
 
-          var field = new Atomic.UIEditField();
-          field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-          field.skinBg = "TBAttrEditorField";;
-          field.fontDescription = this.fd;
-          var lp = new Atomic.UILayoutParams();
-          lp.width = 140;
-          field.layoutParams = lp;
+            field.id = params[i].name;
+            field.text = params[i].valueString;
 
-          field.text = params[i].value;
+            field.subscribeToEvent(field, "WidgetEvent", function(ev: Atomic.UIWidgetEvent) {
 
-          attrLayout.addChild(field);
+                if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
 
-          attrsVerticalLayout.addChild(attrLayout);
+                    var field = <Atomic.UIEditField> ev.target;
+                    this.material.setShaderParameter(field.id, field.text);
 
-          // print(params[i].name, " : ", params[i].value, " : ", params[i].type);
+                }
+
+            }.bind(this));
+
+            attrLayout.addChild(field);
+
+            attrsVerticalLayout.addChild(attrLayout);
+
+            // print(params[i].name, " : ", params[i].value, " : ", params[i].type);
 
         }
 
@@ -141,13 +152,13 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
-    onTechniqueSet(techniqueName:string) {
+    onTechniqueSet(techniqueName: string) {
 
-      this.techniqueButton.text = techniqueName;
+        this.techniqueButton.text = techniqueName;
 
-      var cache = Atomic.getResourceCache();
-      var technique = <Atomic.Technique> cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
-      this.material.setTechnique(0, technique);
+        var cache = Atomic.getResourceCache();
+        var technique = <Atomic.Technique> cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
+        this.material.setTechnique(0, technique);
 
     }
 
@@ -206,7 +217,7 @@ class MaterialInspector extends ScriptWidget {
 
         // TODO: Filter on technique
         var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR];// ,Atomic.TU_EMISSIVE, Atomic.TU_ENVIRONMENT,
-            //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
+        //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
 
         for (var i in textureUnits) {
 
@@ -256,8 +267,11 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
-    inspect(material: Atomic.Material) {
 
+
+    inspect(asset:ToolCore.Asset, material: Atomic.Material) {
+
+        this.asset = asset;
         this.material = material;
 
         var mlp = new Atomic.UILayoutParams();
@@ -305,7 +319,10 @@ class MaterialInspector extends ScriptWidget {
         lp.width = 140;
         field.layoutParams = lp;
 
-        field.text = material.getTexture(Atomic.TU_DIFFUSE).name;
+        var texture = material.getTexture(Atomic.TU_DIFFUSE);
+
+        if (texture)
+            field.text = texture.name;
 
         nameLayout.addChild(field);
 
@@ -337,12 +354,27 @@ class MaterialInspector extends ScriptWidget {
         materialLayout.addChild(this.createTextureSection());
         materialLayout.addChild(this.createShaderParametersSection());
 
+        var button = new Atomic.UIButton();
+        button.fontDescription = this.fd;
+        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.text = "Save";
+
+        button.onClick = function() {
+
+          var importer = <ToolCore.MaterialImporter> this.asset.getImporter();
+          importer.saveMaterial();
+
+        }.bind(this);
+
+        materialLayout.addChild(button);
+
         this.addChild(materialLayout);
 
     }
 
-    techniqueButton:Atomic.UIButton;
+    techniqueButton: Atomic.UIButton;
     material: Atomic.Material;
+    asset: ToolCore.Asset;
     nameTextField: Atomic.UITextField;
     fd: Atomic.UIFontDescription = new Atomic.UIFontDescription();
 

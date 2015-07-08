@@ -1,4 +1,8 @@
 
+#include <Atomic/IO/File.h>
+#include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Graphics/Material.h>
+
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "MaterialImporter.h"
@@ -23,13 +27,20 @@ void MaterialImporter::SetDefaults()
 
 bool MaterialImporter::Import(const String& guid)
 {
-    AssetDatabase* db = GetSubsystem<AssetDatabase>();
-    Asset* asset = db->GetAssetByGUID(guid);
-
-    if (!asset)
-        return false;
-
     return true;
+}
+
+void MaterialImporter::SaveMaterial()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Material* material = cache->GetResource<Material>(asset_->GetPath());
+
+    if (material)
+    {
+        SharedPtr<File> file(new File(context_, asset_->GetPath(), FILE_WRITE));
+        material->Save(*file);
+    }
+
 }
 
 bool MaterialImporter::LoadSettingsInternal()

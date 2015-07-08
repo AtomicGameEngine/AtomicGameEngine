@@ -293,6 +293,17 @@ declare module ToolCore {
 
    }
 
+   export class MaterialImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+      import(guid: string): boolean;
+      saveMaterial(): void;
+
+   }
+
    export class AnimationImportInfo extends Atomic.AObject {
 
       name: string;
@@ -304,6 +315,7 @@ declare module ToolCore {
       getName(): string;
       getStartTime(): number;
       getEndTime(): number;
+      setName(name: string): void;
       setStartTime(time: number): void;
       setEndTime(time: number): void;
 
