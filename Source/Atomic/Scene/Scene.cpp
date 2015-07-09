@@ -41,6 +41,8 @@
 #include "../Core/WorkQueue.h"
 #include "../Resource/XMLFile.h"
 
+#include "../Scene/PrefabComponent.h"
+
 #include "../DebugNew.h"
 
 namespace Atomic
@@ -1233,6 +1235,7 @@ void RegisterSceneLibrary(Context* context)
     SmoothedTransform::RegisterObject(context);
     UnknownComponent::RegisterObject(context);
     SplinePath::RegisterObject(context);
+    PrefabComponent::RegisterObject(context);
 }
 
 }

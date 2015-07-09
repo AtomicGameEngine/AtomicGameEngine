@@ -33,6 +33,9 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     recursiveAddNode(parentID: number, node: Atomic.Node) {
 
+        //if (node.isTemporary())
+        //  return;
+
         var name = node.name;
 
         if (!name.length)

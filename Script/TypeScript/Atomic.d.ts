@@ -1807,6 +1807,21 @@ declare module Atomic {
 
    }
 
+   export class PrefabComponent extends Component {
+
+      prefabGUID: string;
+      prefabNode: Node;
+
+      // Construct.
+      constructor();
+
+      setPrefabGUID(guid: string): void;
+      getPrefabGUID(): string;
+      savePrefab(): boolean;
+      getPrefabNode(): Node;
+
+   }
+
    export class Scene extends Node {
 
       updateEnabled: boolean;

@@ -8,6 +8,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Scene/Scene.h>
+#include <Atomic/Scene/PrefabComponent.h>
 #include <Atomic/Graphics/Camera.h>
 
 #include <Atomic/Graphics/Graphics.h>
@@ -447,9 +448,6 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
     if (object->GetType() == Asset::GetTypeStatic())
     {
         Asset* asset = (Asset*) object;
-
-        AssetDatabase* db = GetSubsystem<AssetDatabase>();
-
         AssetImporter* importer = asset->GetImporter();
 
         if (!importer)
@@ -460,15 +458,8 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
         if (importerType == PrefabImporter::GetTypeStatic())
         {
             dragNode_ = scene_->CreateChild(asset->GetName());
-
-            SharedPtr<File> file(new File(context_, asset->GetPath()));
-            SharedPtr<XMLFile> xml(new XMLFile(context_));
-
-            if (!xml->Load(*file))
-                return;
-
-            dragNode_->LoadXML(xml->GetRoot());
-
+            PrefabComponent* pc = dragNode_->CreateComponent<PrefabComponent>();
+            pc->SetPrefabGUID(asset->GetGUID());
             dragNode_->SetName(asset->GetName());
 
         }
@@ -486,7 +477,7 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
             dragNode_->SetName(asset->GetName());
 
             /*
-            dragNode_ = scene_->CreateChild(asset->GetName());            
+            dragNode_ = scene_->CreateChild(asset->GetName());
             preloadResourceScene_ = new Scene(context_);
 
             SharedPtr<File> file(new File(context_, asset->GetCachePath()));

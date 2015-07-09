@@ -20,10 +20,10 @@ class NodeInspector extends ScriptWidget {
         if (data.key == 27) {
 
             if (this.nodeLayout) {
-            this.sendEvent("EditorActiveNodeChange", { node: null });
-            this.nodeLayout.deleteAllChildren();
-            this.nodeLayout = null;
-          }
+                this.sendEvent("EditorActiveNodeChange", { node: null });
+                this.nodeLayout.deleteAllChildren();
+                this.nodeLayout = null;
+            }
         }
 
         if (data.key == 92) {
@@ -36,7 +36,7 @@ class NodeInspector extends ScriptWidget {
                 this.nodeLayout = null;
                 this.node.removeComponents(true, true);
                 if (this.node.parent)
-                  this.node.parent.removeChild(this.node);
+                    this.node.parent.removeChild(this.node);
                 this.node = null;
                 this.sendEvent("EditorActiveNodeChange", { node: null });
                 this.sendEvent("EditorUpdateHierarchy", {});
@@ -66,10 +66,36 @@ class NodeInspector extends ScriptWidget {
 
     }
 
+    getPrefabComponent(node: Atomic.Node):Atomic.PrefabComponent {
+
+      if (node.parent && node.parent.getComponent("PrefabComponent"))
+        return <Atomic.PrefabComponent> node.parent.getComponent("PrefabComponent");
+
+      if (node.parent)
+          return this.getPrefabComponent(node.parent);
+
+        return null;
+
+    }
+
+    detectPrefab(node: Atomic.Node): boolean {
+
+      if (node.parent && node.parent.getComponent("PrefabComponent"))
+        return true;
+
+      if (node.parent)
+          return this.detectPrefab(node.parent);
+
+        return false;
+
+    }
+
 
     inspect(node: Atomic.Node) {
 
         this.node = node;
+
+        this.isPrefab = this.detectPrefab(node);
 
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";
@@ -91,8 +117,6 @@ class NodeInspector extends ScriptWidget {
         var nodeSection = new Atomic.UISection();
         nodeSection.text = "Node";
         nodeSection.value = 1;
-        //nodeSection.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        //nodeSection.skinBg = "InspectorTextLabel";
         nodeLayout.addChild(nodeSection);
 
         var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
@@ -150,6 +174,47 @@ class NodeInspector extends ScriptWidget {
 
         }
 
+        // PREFAB
+
+        if (this.isPrefab) {
+
+          var name = new Atomic.UITextField();
+          name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+          name.skinBg = "InspectorTextAttrName";
+          name.text = "Prefab"
+          name.fontDescription = fd;
+
+          var prefabLayout = new Atomic.UILayout();
+          prefabLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+          var saveButton = new Atomic.UIButton();
+          saveButton.text = "Save";
+          saveButton.fontDescription = fd;
+
+          saveButton.onClick = function() {
+
+            var prefabComponent = this.getPrefabComponent(this.node);
+
+            if (prefabComponent) {
+              prefabComponent.savePrefab();
+            }
+
+          }.bind(this);
+
+          var undoButton = new Atomic.UIButton();
+          undoButton.text = "Undo";
+          undoButton.fontDescription = fd;
+
+          prefabLayout.addChild(name);
+          prefabLayout.addChild(saveButton);
+          prefabLayout.addChild(undoButton);
+
+          attrsVerticalLayout.addChild(prefabLayout);
+
+        }
+
+        // COMPONENTS
+
         var components = node.getComponents();
 
         for (var i in components) {
@@ -175,6 +240,7 @@ class NodeInspector extends ScriptWidget {
 
     }
 
+    isPrefab:boolean;
     node: Atomic.Node;
     nodeLayout: Atomic.UILayout;
     bindings: Array<DataBinding> = new Array();

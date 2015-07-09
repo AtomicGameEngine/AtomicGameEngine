@@ -32,6 +32,8 @@ protected:
 
 private:
 
+    void HandlePrefabSave(StringHash eventType, VariantMap& eventData);
+
    SharedPtr<Atomic::Scene> preloadResourceScene_;
 
 };

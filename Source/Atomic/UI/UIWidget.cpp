@@ -568,6 +568,29 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
         }
 
     }
+    else if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    {
+        /*
+        if (ev.target)
+        {
+            TBWidget* tbwidget = ev.target;
+
+            while (tbwidget && !ui->IsWidgetWrapped(tbwidget))
+                tbwidget = tbwidget->GetParent();
+
+            if (tbwidget)
+            {
+                VariantMap eventData;
+                ConvertEvent(this, ui->WrapWidget(tbwidget), ev, eventData);
+                SendEvent(E_WIDGETEVENT, eventData);
+
+                if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                    return true;
+
+            }
+        }
+        */
+    }
     else if (ev.type == EVENT_TYPE_TAB_CHANGED)
     {
         if (!ev.target || ui->IsWidgetWrapped(ev.target))
