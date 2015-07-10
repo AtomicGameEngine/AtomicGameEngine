@@ -2495,6 +2495,9 @@ declare module Atomic {
       isNegative(): boolean;
       // Return a divisor value based on intensity for calculating the sort value.
       getIntensityDivisor(attenuation?: number): number;
+      getShadowCascade():Number[];
+      setShadowCascade(Number[] args);
+      setShadowCascadeParameter(index:number, value:number);
 
    }
 

@@ -69,7 +69,7 @@ UISceneView::~UISceneView()
 
 bool UISceneView::OnEvent(const TBWidgetEvent &ev)
 {
-    return false;
+    return UIWidget::OnEvent(ev);
 }
 
 void UISceneView::HandleEndFrame(StringHash eventType, VariantMap& eventData)

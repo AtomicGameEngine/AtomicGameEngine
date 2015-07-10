@@ -1,8 +1,6 @@
 import ScriptWidget = require("./ScriptWidget");
 import UIEvents = require("./UIEvents");
 
-var UI = Atomic.UI;
-
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
 // so we can access the editor they belong to from the widget itself
 interface EditorRootContentWidget extends Atomic.UIWidget {
@@ -145,7 +143,7 @@ class ResourceFrame extends ScriptWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI.EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
+        if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
             var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
 
             if (w && w.editor) {
@@ -171,7 +169,7 @@ class ResourceFrame extends ScriptWidget {
 
         this.load("AtomicEditor/editor/ui/resourceframe.tb.txt");
 
-        this.gravity = UI.GRAVITY_ALL;
+        this.gravity = Atomic.UI_GRAVITY_ALL;
 
         this.resourceViewContainer = <Atomic.UILayout> parent.getWidget("resourceviewcontainer");
         this.tabcontainer = <Atomic.UITabContainer> this.getWidget("tabcontainer");

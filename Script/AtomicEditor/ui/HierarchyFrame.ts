@@ -96,6 +96,13 @@ class HierarchyFrame extends Atomic.UIWidget {
 
           });
 
+          this.subscribeToEvent("NodeAdded", (data) => {
+
+              this.refresh();
+
+          });
+
+
         }
 
         this.refresh();

@@ -66,6 +66,7 @@ private:
     SharedPtr<Gizmo3D> gizmo3D_;
 
     WeakPtr<Node> selectedNode_;
+    SharedPtr<Node> clipboardNode_;
 
 };
 

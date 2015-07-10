@@ -1,7 +1,7 @@
 
 class InspectorUtils {
 
-  static init() {
+  private static Ctor = (() => {
 
     var fd = InspectorUtils.attrFontDesc = new Atomic.UIFontDescription();
     fd.id = "Vera";
@@ -10,7 +10,7 @@ class InspectorUtils {
     // must not be void dor static initializer
     return null;
 
-  }
+  })();
 
   static createSeparator(parent:Atomic.UIWidget):Atomic.UISeparator {
 
@@ -21,6 +21,16 @@ class InspectorUtils {
 
     parent.addChild(sep);
     return sep;
+
+  }
+
+  static createContainer():Atomic.UIContainer {
+
+    var container = new Atomic.UIContainer();
+
+    container.skinBg = "AEContainer";
+
+    return container;
 
   }
 
@@ -67,7 +77,6 @@ class InspectorUtils {
   }
 
   // "static constructor"
-  private static _init = InspectorUtils.init();
   private static attrFontDesc:Atomic.UIFontDescription;
 
 }

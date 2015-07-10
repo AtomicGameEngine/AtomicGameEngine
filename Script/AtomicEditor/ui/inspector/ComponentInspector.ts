@@ -1,6 +1,7 @@
 
 import ScriptWidget = require("../ScriptWidget");
 import DataBinding = require("./DataBinding");
+import InspectorUtils = require("./InspectorUtils");
 
 class ComponentInspector extends Atomic.UISection {
 
@@ -28,34 +29,6 @@ class ComponentInspector extends Atomic.UISection {
 
         // return if handled
         return handled;
-
-    }
-
-    addPrefabUI(layout:Atomic.UILayout) {
-
-      // expand prefab
-      this.value = 1;
-
-      var fd = new Atomic.UIFontDescription();
-      fd.id = "Vera";
-      fd.size = 11;
-
-      var selectButton = new Atomic.UIButton();
-      selectButton.text = "Select Prefab";
-      selectButton.fontDescription = fd;
-
-      selectButton.onClick = () => {
-
-          var node = (<Atomic.PrefabComponent> this.component).getPrefabNode();
-
-          this.sendEvent("EditorActiveNodeChange", { node: node });
-
-          return true;
-
-      }
-
-      layout.addChild(selectButton);
-
 
     }
 
@@ -110,7 +83,6 @@ class ComponentInspector extends Atomic.UISection {
                 attrLayout.skinBg = "InspectorVectorAttrLayout";
             }
 
-
             var bname = attr.name;
 
             if (bname == "Is Enabled")
@@ -133,6 +105,10 @@ class ComponentInspector extends Atomic.UISection {
 
           this.addPrefabUI(attrsVerticalLayout);
 
+        }
+
+        if (component.getTypeName() == "Light") {
+          this.addLightCascadeParametersUI(attrsVerticalLayout);
         }
 
         var deleteButton = new Atomic.UIButton();
@@ -159,6 +135,87 @@ class ComponentInspector extends Atomic.UISection {
         }
 
     }
+
+    addPrefabUI(layout:Atomic.UILayout) {
+
+      // expand prefab
+      this.value = 1;
+
+      var fd = new Atomic.UIFontDescription();
+      fd.id = "Vera";
+      fd.size = 11;
+
+      var selectButton = new Atomic.UIButton();
+      selectButton.text = "Select Prefab";
+      selectButton.fontDescription = fd;
+
+      selectButton.onClick = () => {
+
+          var node = (<Atomic.PrefabComponent> this.component).getPrefabNode();
+
+          this.sendEvent("EditorActiveNodeChange", { node: node });
+
+          return true;
+
+      }
+
+      layout.addChild(selectButton);
+
+
+    }
+
+
+    addLightCascadeParametersUI(layout:Atomic.UILayout) {
+
+      var light = <Atomic.Light> this.component;
+
+      var cascadeInfo = light.getShadowCascade();
+
+      var container = InspectorUtils.createContainer();
+      container.gravity = Atomic.UI_GRAVITY_ALL;
+      layout.addChild(container);
+
+      var panel = new Atomic.UILayout();
+      panel.axis = Atomic.UI_AXIS_Y;
+      panel.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
+      panel.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+      container.addChild(panel);
+
+      var label = InspectorUtils.createAttrName("CSM Splits:");
+      panel.addChild(label);
+
+      function createHandler(index, light, field) {
+
+        return function(data:Atomic.UIWidgetEvent) {
+
+          if (data.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+
+            this.light.setShadowCascadeParameter(this.index, Number(this.field.text));
+
+          }
+
+        }.bind({index:index, light:light, field:field});
+
+      }
+
+      var field = InspectorUtils.createAttrEditField("Split 0", panel);
+      field.text = cascadeInfo[0].toString();
+      field.subscribeToEvent(field, "WidgetEvent", createHandler(0, light, field));
+
+      field = InspectorUtils.createAttrEditField("Split 1", panel);
+      field.text = cascadeInfo[1].toString();
+      field.subscribeToEvent(field, "WidgetEvent", createHandler(1, light, field));
+
+      field = InspectorUtils.createAttrEditField("Split 2", panel);
+      field.text = cascadeInfo[2].toString();
+      field.subscribeToEvent(field, "WidgetEvent", createHandler(2, light, field));
+
+      field = InspectorUtils.createAttrEditField("Split 3", panel);
+      field.text = cascadeInfo[3].toString();
+      field.subscribeToEvent(field, "WidgetEvent", createHandler(3, light, field));
+
+    }
+
 
     component: Atomic.Component;
     bindings: Array<DataBinding> = new Array();

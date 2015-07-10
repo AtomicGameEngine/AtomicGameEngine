@@ -22,7 +22,13 @@
 
 		"Material" : [
 			"static getTextureUnitName(unit:TextureUnit):string;"
+		],
+		"Light" : [
+			"getShadowCascade():Number[];",
+			"setShadowCascade(Number[] args);",
+			"setShadowCascadeParameter(index:number, value:number);"
 		]
+
 	}
 
 }
