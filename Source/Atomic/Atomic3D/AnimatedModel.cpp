@@ -138,7 +138,7 @@ void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQu
 {
     // If no bones or no bone-level testing, use the StaticModel test
     RayQueryLevel level = query.level_;
-    if (level < RAY_TRIANGLE || !skeleton_.GetNumBones())
+    if (level < RAY_TRIANGLE || !skeleton_.GetNumBones() || !boneCreationEnabled_)
     {
         StaticModel::ProcessRayQuery(query, results);
         return;
@@ -909,7 +909,7 @@ void AnimatedModel::AssignBoneNodes()
 {
     assignBonesPending_ = false;
 
-    if (!node_)
+    if (!node_ || !boneCreationEnabled_)
         return;
 
     // Find the bone nodes from the node hierarchy and add listeners

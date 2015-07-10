@@ -333,7 +333,6 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
                 debugRenderer_->AddNode(r.drawable_->GetNode(), 1.0, false);
                 r.drawable_->DrawDebugGeometry(debugRenderer_, false);
             }
-
         }
     }
     else
