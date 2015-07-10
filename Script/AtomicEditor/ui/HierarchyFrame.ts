@@ -33,8 +33,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         });
 
-
-
     }
 
     recursiveAddNode(parentID: number, node: Atomic.Node) {
