@@ -182,7 +182,7 @@ class DataBinding {
         }
         else if (attrInfo.type == Atomic.VAR_FLOAT) {
             var value = object.getAttribute(attrInfo.name);
-            widget.text = value.toString();
+            widget.text = parseFloat(value.toFixed(5)).toString();
         }
         else if (attrInfo.type == Atomic.VAR_INT) {
             var value = object.getAttribute(attrInfo.name);
