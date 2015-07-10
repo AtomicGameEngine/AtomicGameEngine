@@ -549,7 +549,7 @@ bool JSResourceEditor::ParseJavascriptToJSON(const char* source, String& json, b
     json.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/typescript/modules/jsutils");
+    duk_push_string(ctx, "AtomicEditor/Script/jsutils");
     if (duk_pcall(ctx, 1))
     {
         printf("Error: %s\n", duk_safe_to_string(ctx, -1));
