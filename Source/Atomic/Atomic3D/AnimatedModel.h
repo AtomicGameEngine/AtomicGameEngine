@@ -149,6 +149,9 @@ public:
     /// Return per-geometry skin matrices. If empty, uses global skinning
     const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
+    /// Globally enable/disable bone creation, useful for when in the editor
+    static void SetBoneCreationEnabled(bool enabled);
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -237,6 +240,8 @@ private:
     bool loading_;
     /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
+    /// Whether bone creation is enabled, globally
+    static bool boneCreationEnabled_;
 };
 
 }

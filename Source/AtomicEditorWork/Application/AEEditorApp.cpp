@@ -8,6 +8,7 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Graphics/Graphics.h>
+#include <Atomic/Atomic3D/AnimatedModel.h>
 
 #include <Atomic/UI/UI.h>
 
@@ -41,6 +42,11 @@ AEEditorApp::AEEditorApp(Context* context) :
 
 void AEEditorApp::Start()
 {
+
+    // Do not create bone structure by default when in the editor
+    // this can be toggled temporarily, for example to setup an animation preview
+    AnimatedModel::SetBoneCreationEnabled(false);
+
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 

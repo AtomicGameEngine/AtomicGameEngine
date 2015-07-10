@@ -235,8 +235,11 @@ void OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     if (importNode_.Null())
         return;
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();    
     Model* mdl = cache->GetResource<Model>( model.outName_);
+
+    // Force a reload, though file watchers will catch this delayed and load again
+    cache->ReloadResource(mdl);
 
     if (!mdl)
         return;
@@ -252,7 +255,7 @@ void OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     {
         modelComponent = importNode_->CreateComponent<AnimatedModel>();
         importNode_->CreateComponent<AnimationController>();
-        ((AnimatedModel*)modelComponent)->SetModel(mdl, true);
+        ((AnimatedModel*)modelComponent)->SetModel(mdl, false);
     }
 
     if (!noMaterials_)

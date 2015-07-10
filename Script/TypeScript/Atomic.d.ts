@@ -3740,6 +3740,7 @@ declare module Atomic {
       updateInvisible: boolean;
       numAnimationStates: number;
       numMorphs: number;
+      boneCreationEnabled: boolean;
 
       // Construct.
       constructor();
@@ -3772,6 +3773,8 @@ declare module Atomic {
       getNumMorphs(): number;
       // Return whether is the master (first) animated model.
       isMaster(): boolean;
+      // Globally enable/disable bone creation, useful for when in the editor
+      setBoneCreationEnabled(enabled: boolean): void;
 
    }
 

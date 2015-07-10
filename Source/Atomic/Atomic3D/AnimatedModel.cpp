@@ -56,6 +56,8 @@ static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const Sh
 
 static const unsigned MAX_ANIMATION_STATES = 256;
 
+bool AnimatedModel::boneCreationEnabled_ = true;
+
 AnimatedModel::AnimatedModel(Context* context) :
     StaticModel(context),
     animationLodFrameNumber_(0),
@@ -648,6 +650,9 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
         return;
     }
+
+    if (createBones && !boneCreationEnabled_)
+        createBones = false;
 
     if (isMaster_)
     {
@@ -1318,6 +1323,11 @@ void AnimatedModel::HandleModelReloadFinished(StringHash eventType, VariantMap& 
     Model* currentModel = model_;
     model_.Reset(); // Set null to allow to be re-set
     SetModel(currentModel);
+}
+
+void AnimatedModel::SetBoneCreationEnabled(bool enabled)
+{
+    boneCreationEnabled_ = enabled;
 }
 
 }
