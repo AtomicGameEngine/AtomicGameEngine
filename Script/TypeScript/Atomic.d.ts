@@ -6974,6 +6974,7 @@ declare module Atomic {
       constructor(createWidget?: boolean);
 
       setSqueezable(value: boolean): void;
+      onClick: () => void;
 
    }
 
@@ -7111,6 +7112,7 @@ declare module Atomic {
 
       addRootItem(text: string, icon: string, id: string): number;
       addChildItem(parentItemID: number, text: string, icon: string, id: string): number;
+      deleteItemByID(id: string): void;
       setExpanded(itemID: number, value: boolean): void;
       deleteAllItems(): void;
       selectItemByID(id: string): void;

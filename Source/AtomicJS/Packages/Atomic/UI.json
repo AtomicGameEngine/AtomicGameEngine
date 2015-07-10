@@ -11,5 +11,12 @@
 								"UIContainer", "UISection", "UIInlineSelect", "UITextureWidget",
 								"UIScrollContainer", "UISeparator"],
 	"overloads" : {
+	},
+	"typescript_decl" : {
+
+		"UIButton" : [
+			"onClick: () => void;"
+		]
 	}
+
 }

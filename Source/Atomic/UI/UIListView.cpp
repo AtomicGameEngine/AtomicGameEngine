@@ -213,6 +213,20 @@ unsigned UIListView::AddRootItem(const String& text, const String& icon, const S
     return itemLookupId_ - 1;
 }
 
+void UIListView::DeleteItemByID(const String& id)
+{
+    TBID tbid(id.CString());
+
+    for (int i = 0; i <  source_->GetNumItems(); i++)
+    {
+        if (source_->GetItemID(i) == tbid)
+        {
+            source_->DeleteItem(i);
+            return;
+        }
+    }
+}
+
 unsigned UIListView::AddChildItem(unsigned parentItemID, const String& text, const String& icon, const String& id)
 {
     if (!itemLookup_.Contains(parentItemID))

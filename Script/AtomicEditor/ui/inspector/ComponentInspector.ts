@@ -18,11 +18,11 @@ class ComponentInspector extends Atomic.UISection {
 
         for (var i = 0; i < this.bindings.length; i++) {
 
-          if (this.bindings[i].handleWidgetEvent(ev)) {
+            if (this.bindings[i].handleWidgetEvent(ev)) {
 
-            handled = true;
+                handled = true;
 
-          }
+            }
 
         }
 
@@ -34,6 +34,7 @@ class ComponentInspector extends Atomic.UISection {
 
     inspect(component: Atomic.Component) {
 
+        this.component = component;
         this.text = component.getTypeName();
         // don't example by default
         this.value = 0;
@@ -100,16 +101,31 @@ class ComponentInspector extends Atomic.UISection {
 
         }
 
-        for (var i in this.bindings)
-        {
+        var deleteButton = new Atomic.UIButton();
+        deleteButton.text = "Delete Component";
+        deleteButton.fontDescription = fd;
+
+        deleteButton.onClick = () => {
+
+            var node = this.component.node;
+            this.component.remove();
+            this.sendEvent("EditorActiveNodeChange", { node: node });
+
+            return true;
+
+        }
+
+        attrsVerticalLayout.addChild(deleteButton);
+
+        for (var i in this.bindings) {
             this.bindings[i].setWidgetValueFromObject();
             this.bindings[i].objectLocked = false;
         }
 
-
     }
 
-    bindings:Array<DataBinding> = new Array();
+    component: Atomic.Component;
+    bindings: Array<DataBinding> = new Array();
 
 
 }

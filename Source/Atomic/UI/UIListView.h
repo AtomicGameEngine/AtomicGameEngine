@@ -22,7 +22,10 @@ public:
     virtual ~UIListView();
 
     unsigned AddRootItem(const String& text, const String& icon, const String& id);
+
     unsigned AddChildItem(unsigned parentItemID, const String& text, const String& icon, const String& id);
+
+    void DeleteItemByID(const String& id);
 
     void SetExpanded(unsigned itemID, bool value);
 

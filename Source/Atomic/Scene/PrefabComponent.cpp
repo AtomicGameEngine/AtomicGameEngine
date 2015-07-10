@@ -101,6 +101,12 @@ void PrefabComponent::SetPrefabGUID(const String& guid)
 void PrefabComponent::OnNodeSet(Node* node)
 {
     Component::OnNodeSet(node);
+
+    if (!node && prefabNode_.NotNull())
+    {
+        prefabNode_->Remove();
+        prefabNode_ = NULL;
+    }
 }
 
 }

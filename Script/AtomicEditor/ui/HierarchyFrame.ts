@@ -1,8 +1,6 @@
 
 class HierarchyFrame extends Atomic.UIWidget {
 
-    hierList: Atomic.UIListView;
-
     constructor(parent: Atomic.UIWidget) {
 
         super();
@@ -22,12 +20,20 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         hierarchycontainer.addChild(hierList);
 
-        //this.subscribeToEvent("NodeAdded", (data) => this.handleNodeAdded(data));
-
         this.subscribeToEvent("EditorUpdateHierarchy", (data) => this.handleUpdateHierarchy(data));
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
         this.subscribeToEvent("EditorActiveSceneChanged", (data) => this.handleActiveSceneChanged(data));
+
+        this.subscribeToEvent("EditorActiveNodeChange", (data) => {
+
+            if (data.node)
+              this.hierList.selectItemByID(data.node.id.toString());
+
+        });
+
+
 
     }
 
@@ -79,7 +85,20 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     handleActiveSceneChanged(data) {
 
+        if (this.scene)
+          this.unsubscribeFromEvents(this.scene);
+
         this.scene = <Atomic.Scene> data.scene;
+
+        if (this.scene) {
+
+          this.subscribeToEvent("NodeRemoved", (data) => {
+
+              this.hierList.deleteItemByID(data.node.id.toString());
+
+          });
+
+        }
 
         this.refresh();
 
@@ -108,6 +127,7 @@ class HierarchyFrame extends Atomic.UIWidget {
     }
 
     scene: Atomic.Scene = null;
+    hierList: Atomic.UIListView;
 
 }
 
