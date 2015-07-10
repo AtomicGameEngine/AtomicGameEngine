@@ -47,6 +47,7 @@ class InspectorFrame extends ScriptWidget {
         var node = <Atomic.Node> data.node;
 
         if (!node) {
+          
             return;
         }
 

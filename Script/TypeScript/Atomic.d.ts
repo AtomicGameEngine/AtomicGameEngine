@@ -1818,6 +1818,7 @@ declare module Atomic {
       setPrefabGUID(guid: string): void;
       getPrefabGUID(): string;
       savePrefab(): boolean;
+      undoPrefab(): void;
       getPrefabNode(): Node;
 
    }

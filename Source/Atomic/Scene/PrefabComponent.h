@@ -26,6 +26,7 @@ public:
     const String& GetPrefabGUID() const { return prefabGUID_; }
 
     bool SavePrefab();
+    void UndoPrefab();
 
     Node* GetPrefabNode() { return prefabNode_; }
 
@@ -37,7 +38,9 @@ protected:
 
 private:
 
-    void HandleReloadFinished(StringHash eventType, VariantMap& eventData);
+    void HandlePrefabChanged(StringHash eventType, VariantMap& eventData);
+
+    void LoadPrefabNode();
 
     SharedPtr<Node> prefabNode_;
     String prefabGUID_;

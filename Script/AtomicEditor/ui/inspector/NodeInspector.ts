@@ -92,6 +92,8 @@ class NodeInspector extends ScriptWidget {
 
 
     inspect(node: Atomic.Node) {
+      
+        this.bindings = new Array();
 
         this.node = node;
 
@@ -196,7 +198,13 @@ class NodeInspector extends ScriptWidget {
             var prefabComponent = this.getPrefabComponent(this.node);
 
             if (prefabComponent) {
+
               prefabComponent.savePrefab();
+
+              this.sendEvent("EditorActiveNodeChange", {node:this.node});
+
+              return true;
+
             }
 
           }.bind(this);
@@ -204,6 +212,23 @@ class NodeInspector extends ScriptWidget {
           var undoButton = new Atomic.UIButton();
           undoButton.text = "Undo";
           undoButton.fontDescription = fd;
+
+          undoButton.onClick = function() {
+
+            var prefabComponent = this.getPrefabComponent(this.node);
+
+            if (prefabComponent) {
+
+              prefabComponent.undoPrefab();
+
+              this.sendEvent("EditorActiveNodeChange", {node:this.node});
+
+              return true;
+
+            }
+
+          }.bind(this);
+
 
           prefabLayout.addChild(name);
           prefabLayout.addChild(saveButton);
@@ -243,7 +268,7 @@ class NodeInspector extends ScriptWidget {
     isPrefab:boolean;
     node: Atomic.Node;
     nodeLayout: Atomic.UILayout;
-    bindings: Array<DataBinding> = new Array();
+    bindings: Array<DataBinding>;
 
 
 }

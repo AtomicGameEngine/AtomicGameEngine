@@ -126,6 +126,7 @@ class ProjectFrame extends ScriptWidget {
 
             var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
             node.saveXML(file);
+            file.close();
 
             this.rescan(asset);
 

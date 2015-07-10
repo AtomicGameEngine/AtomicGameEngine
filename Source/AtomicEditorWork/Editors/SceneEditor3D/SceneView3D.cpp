@@ -287,7 +287,15 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
                 {
 
                     VariantMap neventData;
-                    neventData[EditorActiveNodeChange::P_NODE] = r.drawable_->GetNode();
+                    Node* node = r.drawable_->GetNode();
+
+                    // if temporary, this is a prefab
+                    // TODO: if we use temporary for other stuff
+                    // fix this to look for prefab
+                    if (node->IsTemporary())
+                        node = node->GetParent();
+
+                    neventData[EditorActiveNodeChange::P_NODE] = node;
                     SendEvent(E_EDITORACTIVENODECHANGE, neventData);
 
                 }

@@ -5,6 +5,8 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
+#include <Atomic/Physics/RigidBody.h>
+
 #include "PrefabEvents.h"
 #include "PrefabComponent.h"
 
@@ -15,7 +17,7 @@ namespace Atomic
 PrefabComponent::PrefabComponent(Context* context) :
     Component(context)
 {
-
+    SubscribeToEvent(E_PREFABCHANGED, HANDLER(PrefabComponent, HandlePrefabChanged));
 }
 
 PrefabComponent::~PrefabComponent()
@@ -32,6 +34,11 @@ bool PrefabComponent::SavePrefab()
     return true;
 }
 
+void PrefabComponent::UndoPrefab()
+{
+    LoadPrefabNode();
+}
+
 void PrefabComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<PrefabComponent>();
@@ -39,13 +46,37 @@ void PrefabComponent::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("PrefabGUID", GetPrefabGUID, SetPrefabGUID, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
 
-void PrefabComponent::HandleReloadFinished(StringHash eventType, VariantMap& eventData)
+void PrefabComponent::LoadPrefabNode()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabGUID_);
 
     prefabNode_->LoadXML(xmlfile->GetRoot());
+    prefabNode_->SetPosition(Vector3::ZERO);
+    prefabNode_->SetRotation(Quaternion::IDENTITY);
+    prefabNode_->SetScale(Vector3::ONE);
     prefabNode_->SetTemporary(true);
+
+    PODVector<RigidBody*> bodies;
+    prefabNode_->GetComponents<RigidBody>(bodies, true);
+    for (unsigned i = 0; i < bodies.Size(); i++)
+    {
+        RigidBody* body = bodies[i];
+
+        body->SetPosition(body->GetNode()->GetWorldPosition());
+        body->SetRotation(body->GetNode()->GetWorldRotation());
+    }
+
+}
+
+void PrefabComponent::HandlePrefabChanged(StringHash eventType, VariantMap& eventData)
+{
+    using namespace PrefabChanged;
+
+    if (prefabGUID_ != eventData[P_GUID].GetString())
+        return;
+
+    LoadPrefabNode();
 
 }
 
@@ -62,19 +93,8 @@ void PrefabComponent::SetPrefabGUID(const String& guid)
 
     if (prefabGUID_.Length())
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabGUID_);
-
-        SubscribeToEvent(xmlfile, E_RELOADFINISHED, HANDLER(PrefabComponent, HandleReloadFinished));
-
-        if (xmlfile)
-        {
-            prefabNode_->LoadXML(xmlfile->GetRoot());
-        }
+        LoadPrefabNode();
     }
-
-    prefabNode_->SetName(prefabNode_->GetName() + "_Prefab");
-    prefabNode_->SetTemporary(true);
 
 }
 

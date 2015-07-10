@@ -1,6 +1,6 @@
 
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/Resource/Image.h>
+#include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/PrefabEvents.h>
 #include <Atomic/Scene/PrefabComponent.h>
@@ -51,12 +51,26 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
 
     Node* node = component->GetPrefabNode();
 
+    node->SetPosition(Vector3::ZERO);
+    node->SetRotation(Quaternion::IDENTITY);
+    node->SetScale(Vector3::ONE);
+
     SharedPtr<File> file(new File(context_, asset_->GetPath(), FILE_WRITE));
     node->SaveXML(*file);
     file->Close();
 
     FileSystem* fs = GetSubsystem<FileSystem>();
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());
+
+    // reload it immediately so it is ready for use
+    // TODO: The resource cache is reloading after this reload due to catching the file cache
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* xmlfile = cache->GetResource<XMLFile>(asset_->GetGUID());
+    cache->ReloadResource(xmlfile);
+
+    VariantMap changedData;
+    changedData[PrefabChanged::P_GUID] = asset_->GetGUID();
+    SendEvent(E_PREFABCHANGED, changedData);
 
 }
 
