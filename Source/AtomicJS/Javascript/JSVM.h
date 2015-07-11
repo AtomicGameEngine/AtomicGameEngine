@@ -165,11 +165,6 @@ public:
 
 private:
 
-    bool GenerateComponent(const String& cname, const String& jsfilename, const String& csource);
-
-    void InitComponents();
-    void InitPackageComponents();
-
     void SubscribeToEvents();
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     

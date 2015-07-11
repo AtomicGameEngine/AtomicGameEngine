@@ -96,6 +96,8 @@ public:
     template <class T> T* GetSubsystem() const;
     /// Template version of returning a specific attribute description.
     template <class T> AttributeInfo* GetAttribute(const char* name);
+    /// Get whether an Editor Context
+    bool GetEditorContext() { return editorContext_; }
 
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(StringHash type) const
@@ -133,6 +135,9 @@ public:
         HashMap<StringHash, HashSet<Object*> >::Iterator i = eventReceivers_.Find(eventType);
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
+
+    /// Get whether an Editor Context
+    void SetEditorContent(bool editor) { editorContext_ = editor; }
 
 private:
     /// Add event receiver.
@@ -172,6 +177,8 @@ private:
     EventHandler* eventHandler_;
     /// Object categories.
     HashMap<String, Vector<StringHash> > objectCategories_;
+
+    bool editorContext_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

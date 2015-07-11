@@ -47,6 +47,8 @@ void AEEditorApp::Start()
     // this can be toggled temporarily, for example to setup an animation preview
     AnimatedModel::SetBoneCreationEnabled(false);
 
+    context_->SetEditorContent(true);
+
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 

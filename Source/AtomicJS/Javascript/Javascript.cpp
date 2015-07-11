@@ -13,6 +13,7 @@
 
 #include "Javascript.h"
 #include "JSComponent.h"
+#include "JSComponentFile.h"
 #include "JSVM.h"
 
 namespace Atomic
@@ -47,6 +48,7 @@ void Javascript::ShutdownVM(const String& name)
 
 void RegisterJavascriptLibrary(Context* context)
 {
+    JSComponentFile::RegisterObject(context);
     JSComponent::RegisterObject(context);
 }
 

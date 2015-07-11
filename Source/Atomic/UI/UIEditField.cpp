@@ -27,6 +27,17 @@ UIEditField::~UIEditField()
 
 }
 
+void UIEditField::SetReadOnly(bool readonly)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetReadOnly(readonly);
+
+}
+
 void UIEditField::SetWrapping(bool wrap)
 {
     if (!widget_)
@@ -35,7 +46,6 @@ void UIEditField::SetWrapping(bool wrap)
     TBEditField* w = (TBEditField*) widget_;
 
     w->SetWrapping(wrap);
-
 }
 
 bool UIEditField::GetWrapping()

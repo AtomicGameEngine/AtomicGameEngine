@@ -18,10 +18,17 @@ void jsapi_init_scene_serializable(JSVM* vm);
 
 static int Node_CreateJSComponent(duk_context* ctx)
 {
+    String path = duk_require_string(ctx, 0);
+
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
     JSComponent* jsc = node->CreateComponent<JSComponent>();
-    jsc->SetClassName(duk_to_string(ctx, 0));
+
+    ResourceCache* cache = node->GetContext()->GetSubsystem<ResourceCache>();
+    JSComponentFile* file = cache->GetResource<JSComponentFile>(path);
+
+    jsc->SetComponentFile(file);
+
     js_push_class_object_instance(ctx, jsc, "JSComponent");
     return 1;
 }

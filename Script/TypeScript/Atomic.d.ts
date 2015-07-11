@@ -746,24 +746,6 @@ declare module Atomic {
    export var FILE_READWRITE: FileMode;
 
 
-   // enum JSScriptMethod
-   export type JSScriptMethod = number;
-   export var JSMETHOD_START: JSScriptMethod;
-   export var JSMETHOD_STOP: JSScriptMethod;
-   export var JSMETHOD_DELAYEDSTART: JSScriptMethod;
-   export var JSMETHOD_UPDATE: JSScriptMethod;
-   export var JSMETHOD_POSTUPDATE: JSScriptMethod;
-   export var JSMETHOD_FIXEDUPDATE: JSScriptMethod;
-   export var JSMETHOD_FIXEDPOSTUPDATE: JSScriptMethod;
-   export var JSMETHOD_LOAD: JSScriptMethod;
-   export var JSMETHOD_SAVE: JSScriptMethod;
-   export var JSMETHOD_READNETWORKUPDATE: JSScriptMethod;
-   export var JSMETHOD_WRITENETWORKUPDATE: JSScriptMethod;
-   export var JSMETHOD_APPLYATTRIBUTES: JSScriptMethod;
-   export var JSMETHOD_TRANSFORMCHANGED: JSScriptMethod;
-   export var MAX_JSSCRIPT_METHODS: JSScriptMethod;
-
-
    export var QUICKSORT_THRESHOLD: number;
    export var CONVERSION_BUFFER_LENGTH: number;
    export var MATRIX_CONVERSION_BUFFER_LENGTH: number;
@@ -1418,6 +1400,8 @@ declare module Atomic {
    export class Context extends RefCounted {
 
       eventSender: AObject;
+      editorContext: boolean;
+      editorContent: boolean;
 
       // Construct.
       constructor();
@@ -1436,6 +1420,10 @@ declare module Atomic {
       getEventSender(): AObject;
       // Return object type name from hash, or empty if unknown.
       getTypeName(objectType: string): string;
+      // Get whether an Editor Context
+      getEditorContext(): boolean;
+      // Get whether an Editor Context
+      setEditorContent(editor: boolean): void;
 
    }
 
@@ -7029,11 +7017,13 @@ declare module Atomic {
    export class UIEditField extends UIWidget {
 
       textAlign: TEXT_ALIGN;
+      readOnly: boolean;
       wrapping: boolean;
 
       constructor(createWidget?: boolean);
 
       setTextAlign(align: TEXT_ALIGN): void;
+      setReadOnly(readonly: boolean): void;
       setWrapping(wrap: boolean): void;
       getWrapping(): boolean;
 
@@ -8024,25 +8014,20 @@ declare module Atomic {
 
    export class JSComponent extends Component {
 
-      className: string;
-      classNameProperty: string;
-      destroyed: boolean;
+      updateEventMask: number;
 
       // Construct.
       constructor();
 
-      // Return class name.
-      getClassName(): string;
-      setClassName(className: string): void;
-      getClassNameProperty(): string;
-      setClassNameProperty(className: string): void;
-      // Handle enabled/disabled state change.
-      onSetEnabled(): void;
-      onNodeSet(node: Node): void;
-      getDestroyed(): boolean;
-      setDestroyed(): void;
-      listenToEvent(sender: AObject, eventType: string, __duk_function: number): void;
       applyAttributes(): void;
+      // Handle enabled/disabled state change. Changes update event subscription.
+      onSetEnabled(): void;
+      // Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
+      setUpdateEventMask(mask: number): void;
+      // Return what update events are subscribed to.
+      getUpdateEventMask(): number;
+      // Return whether the DelayedStart() function has been called.
+      isDelayedStartCalled(): boolean;
 
    }
 

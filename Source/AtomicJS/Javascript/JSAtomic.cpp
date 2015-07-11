@@ -201,8 +201,9 @@ static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = fal
 
          if (component->GetType() == JSComponent::GetTypeStatic())
          {
-             JSComponent* jscomponent = (JSComponent*) component;
-             jscomponent->SetDestroyed();
+             // FIX COMPONENTS
+             //JSComponent* jscomponent = (JSComponent*) component;
+             //jscomponent->SetDestroyed();
          }
 
          component->UnsubscribeFromAllEvents();

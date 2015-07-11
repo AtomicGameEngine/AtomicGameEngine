@@ -111,6 +111,11 @@ class ComponentInspector extends Atomic.UISection {
           this.addLightCascadeParametersUI(attrsVerticalLayout);
         }
 
+        if (component.getTypeName() == "JSComponent") {
+          this.addJSComponentUI(attrsVerticalLayout);
+        }
+
+
         var deleteButton = new Atomic.UIButton();
         deleteButton.text = "Delete Component";
         deleteButton.fontDescription = fd;
@@ -135,6 +140,8 @@ class ComponentInspector extends Atomic.UISection {
         }
 
     }
+
+    // Move these to a mixing class
 
     addPrefabUI(layout:Atomic.UILayout) {
 
@@ -161,6 +168,30 @@ class ComponentInspector extends Atomic.UISection {
 
       layout.addChild(selectButton);
 
+    }
+
+    addJSComponentUI(layout:Atomic.UILayout) {
+
+      // expand prefab
+      this.value = 1;
+
+      var fd = new Atomic.UIFontDescription();
+      fd.id = "Vera";
+      fd.size = 11;
+
+      var selectButton = new Atomic.UIButton();
+      selectButton.text = "Select Script";
+      selectButton.fontDescription = fd;
+
+      selectButton.onClick = () => {
+
+          return true;
+      }
+
+      var field = InspectorUtils.createAttrEditField("Script", layout);
+      field.readOnly = true;
+
+      layout.addChild(selectButton);
 
     }
 

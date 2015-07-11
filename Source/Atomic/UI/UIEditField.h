@@ -25,6 +25,8 @@ public:
 
     void SetTextAlign(TEXT_ALIGN align);
 
+    void SetReadOnly(bool readonly);
+
     void SetWrapping(bool wrap);
     bool GetWrapping();
 
