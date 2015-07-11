@@ -929,7 +929,28 @@ void AnimatedModel::AssignBoneNodes()
     // If no bones found, this may be a prefab where the bone information was left out.
     // In that case reassign the skeleton now if possible
     if (!boneFound && model_)
-        SetSkeleton(model_->GetSkeleton(), true);
+    {
+        // ATOMIC: instead of calling SetSkeleton which does significant initialization
+        // create the bone nodes here (which also avoids a bone init issue)
+
+        // SetSkeleton(model_->GetSkeleton(), true);
+
+        for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+        {
+            // Create bones as local, as they are never to be directly synchronized over the network
+            Node* boneNode = node_->CreateChild(i->name_, LOCAL);
+            boneNode->AddListener(this);
+            boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+            i->node_ = boneNode;
+        }
+
+        for (unsigned i = 0; i < bones.Size(); ++i)
+        {
+            unsigned parentIndex = bones[i].parentIndex_;
+            if (parentIndex != i && parentIndex < bones.Size())
+                bones[parentIndex].node_->AddChild(bones[i].node_);
+        }
+    }
 
     // Re-assign the same start bone to animations to get the proper bone node this time
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
