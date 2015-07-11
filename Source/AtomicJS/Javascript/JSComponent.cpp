@@ -65,6 +65,7 @@ void JSComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<JSComponent>(LOGIC_CATEGORY);
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
     MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetScriptAttr, SetScriptAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
 }
 
@@ -151,6 +152,65 @@ void JSComponent::InitModule()
         return;
     }
 
+    // store, so pop doesn't clear
+    UpdateReferences();
+
+    // apply fields
+
+    const HashMap<String, VariantType>& fields =  componentFile_->GetFields();
+
+    if (fields.Size())
+    {
+        // push self
+        js_push_class_object_instance(ctx, this, "JSComponent");
+
+        HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
+        while (itr != fields.End())
+        {
+            if (fieldValues_.Contains(itr->first_))
+            {
+                Variant& v = fieldValues_[itr->first_];
+
+                if (v.GetType() == itr->second_)
+                {
+                    js_push_variant(ctx, v);
+                    duk_put_prop_string(ctx, -2, itr->first_.CString());
+                }
+            }
+            else
+            {
+                Variant v;
+
+                switch (itr->second_)
+                {
+                case VAR_BOOL:
+                    v = false;
+                    break;
+                case VAR_STRING:
+                    v = "";
+                    break;
+                case VAR_FLOAT:
+                    v = 0.0f;
+                    break;
+                case VAR_VECTOR3:
+                    v = Vector3::ZERO;
+                    break;
+                default:
+                    break;
+                }
+
+                js_push_variant(ctx,  v);
+                duk_put_prop_string(ctx, -2, itr->first_.CString());
+            }
+
+            itr++;
+        }
+
+        // pop self
+        duk_pop(ctx);
+    }
+
+
     duk_get_prop_string(ctx, -1, "component");
     if (!duk_is_function(ctx, -1))
     {
@@ -167,8 +227,6 @@ void JSComponent::InitModule()
         duk_set_top(ctx, top);
         return;
     }
-
-    UpdateReferences();
 
     duk_set_top(ctx, top);
 

@@ -41,12 +41,16 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    const HashMap<String, VariantType>& GetFields() const { return fields_; }
+
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
     /// Save resource
     virtual bool Save(Serializer& dest) const;
 
 private:
+
+    HashMap<String, VariantType> fields_;
 
 };
 

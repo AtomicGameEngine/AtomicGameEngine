@@ -45,36 +45,79 @@ static int Serializable_SetAttribute(duk_context* ctx)
 
     const Vector<AttributeInfo>* attributes = serial->GetAttributes();
 
-    for (unsigned i = 0; i < attributes->Size(); i++)
+    VariantType variantType = VAR_NONE;
+
+    bool isAttr = false;
+
+    if (attributes)
     {
-        const AttributeInfo* attr = &attributes->At(i);
-
-        if (attr->name_ == name)
+        for (unsigned i = 0; i < attributes->Size(); i++)
         {
-            if (attr->type_ == VAR_QUATERNION)
-            {
-                Vector3 v3 = v.GetVector3();
-                Quaternion q;
-                q.FromEulerAngles(v3.x_, v3.y_, v3.z_);
-                v = q;
-            }
+            const AttributeInfo* attr = &attributes->At(i);
 
-            else if (attr->type_ == VAR_COLOR)
+            if (!attr->name_.Compare(name))
             {
-                Vector4 v4 = v.GetVector4();
-                Color c(v4.x_, v4.y_, v4.z_, v4.w_ );
-                v = c;
+                isAttr = true;
+                variantType = attr->type_;
+                break;
             }
-            else if (attr->type_ == VAR_INT)
-            {
-                v = (int) v.GetFloat();
-            }
-
-            break;
         }
     }
 
-    serial->SetAttribute(name, v);
+    JSComponent* jsc = NULL;
+
+    // check dynamic
+    if (!isAttr)
+    {
+        if (serial->GetType() == JSComponent::GetTypeStatic())
+        {
+            jsc = (JSComponent*) serial;
+            JSComponentFile* file = jsc->GetComponentFile();
+
+            const HashMap<String, VariantType>& fields = file->GetFields();
+
+            if (fields.Contains(name))
+            {
+                HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
+                variantType = itr->second_;
+            }
+        }
+    }
+
+    if (variantType == VAR_NONE)
+        return 0;
+
+    if (variantType == VAR_QUATERNION)
+    {
+        Vector3 v3 = v.GetVector3();
+        Quaternion q;
+        q.FromEulerAngles(v3.x_, v3.y_, v3.z_);
+        v = q;
+    }
+
+    else if (variantType == VAR_COLOR)
+    {
+        Vector4 v4 = v.GetVector4();
+        Color c(v4.x_, v4.y_, v4.z_, v4.w_ );
+        v = c;
+    }
+    else if (variantType == VAR_INT)
+    {
+        v = (int) v.GetFloat();
+    }
+
+    if (isAttr)
+    {
+        serial->SetAttribute(name, v);
+        return 0;
+    }
+
+    // check dynamic
+    if (jsc)
+    {
+        VariantMap& values = jsc->GetFieldValues();
+        values[name] = v;
+    }
 
     return 0;
 }
@@ -85,8 +128,68 @@ static int Serializable_GetAttribute(duk_context* ctx)
 
     duk_push_this(ctx);
     Serializable* serial = js_to_class_instance<Serializable>(ctx, -1, 0);
-    js_push_variant(ctx,  serial->GetAttribute(name));
+    const Vector<AttributeInfo>* attrs = serial->GetAttributes();
 
+    if (attrs)
+    {
+        for (unsigned i = 0; i < attrs->Size(); i++)
+        {
+            const AttributeInfo* attr = &attrs->At(i);
+
+            if (!attr->name_.Compare(name))
+            {
+                // FIXME: this is a double lookup
+                js_push_variant(ctx,  serial->GetAttribute(name));
+                return 1;
+            }
+        }
+    }
+
+    if (serial->GetType() == JSComponent::GetTypeStatic())
+    {
+        JSComponent* jsc = (JSComponent*) serial;
+        JSComponentFile* file = jsc->GetComponentFile();
+
+        const HashMap<String, VariantType>& fields = file->GetFields();
+
+        if (fields.Contains(name))
+        {
+            VariantMap& values = jsc->GetFieldValues();
+
+            if (values.Contains(name))
+            {
+                js_push_variant(ctx,  values[name]);
+                return 1;
+            }
+            else
+            {
+                HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
+                Variant v;
+                switch (itr->second_)
+                {
+                case VAR_BOOL:
+                    v = false;
+                    break;
+                case VAR_STRING:
+                    v = "";
+                    break;
+                case VAR_FLOAT:
+                    v = 0.0f;
+                    break;
+                case VAR_VECTOR3:
+                    v = Vector3::ZERO;
+                    break;
+                default:
+                    break;
+                }
+
+                js_push_variant(ctx,  v);
+                return 1;
+            }
+        }
+    }
+
+    duk_push_undefined(ctx);
     return 1;
 }
 
@@ -110,49 +213,96 @@ static int Serializable_GetAttributes(duk_context* ctx)
     duk_dup(ctx, -1);
     duk_put_prop_index(ctx, -4, type);
 
-    if (!attrs)
-        return 1;
-
-    for (unsigned i = 0; i < attrs->Size(); i++)
+    unsigned count = 0;
+    if (attrs)
     {
-        const AttributeInfo* attr = &attrs->At(i);
-
-        if (attr->mode_ & AM_NOEDIT)
-            continue;
-
-        duk_push_object(ctx);
-
-        duk_push_number(ctx, (double) attr->type_);
-        duk_put_prop_string(ctx, -2, "type");
-
-        duk_push_string(ctx, attr->name_.CString());
-        duk_put_prop_string(ctx, -2, "name");
-
-        duk_push_number(ctx, (double) attr->mode_);
-        duk_put_prop_string(ctx, -2, "mode");
-
-        duk_push_string(ctx,attr->defaultValue_.ToString().CString());
-        duk_put_prop_string(ctx, -2, "defaultValue");
-
-        duk_push_array(ctx);
-
-        const char** enumPtr = attr->enumNames_;
-        unsigned enumCount = 0;
-
-        if (enumPtr)
+        count = attrs->Size();
+        for (unsigned i = 0; i < attrs->Size(); i++)
         {
-            while (*enumPtr)
+            const AttributeInfo* attr = &attrs->At(i);
+
+            if (attr->mode_ & AM_NOEDIT)
+                continue;
+
+            duk_push_object(ctx);
+
+            duk_push_number(ctx, (double) attr->type_);
+            duk_put_prop_string(ctx, -2, "type");
+
+            duk_push_string(ctx, attr->name_.CString());
+            duk_put_prop_string(ctx, -2, "name");
+
+            duk_push_number(ctx, (double) attr->mode_);
+            duk_put_prop_string(ctx, -2, "mode");
+
+            duk_push_string(ctx,attr->defaultValue_.ToString().CString());
+            duk_put_prop_string(ctx, -2, "defaultValue");
+
+            duk_push_boolean(ctx, 0);
+            duk_put_prop_string(ctx, -2, "field");
+
+            duk_push_array(ctx);
+
+            const char** enumPtr = attr->enumNames_;
+            unsigned enumCount = 0;
+
+            if (enumPtr)
             {
-                duk_push_string(ctx, *enumPtr);
-                duk_put_prop_index(ctx, -2, enumCount++);
-                enumPtr++;
+                while (*enumPtr)
+                {
+                    duk_push_string(ctx, *enumPtr);
+                    duk_put_prop_index(ctx, -2, enumCount++);
+                    enumPtr++;
+                }
+            }
+
+            duk_put_prop_string(ctx, -2, "enumNames");
+
+            // store attr object
+            duk_put_prop_index(ctx, -2, i);
+        }
+    }
+
+    // dynamic script fields
+    if (serial->GetType() == JSComponent::GetTypeStatic())
+    {
+        JSComponent* jsc = (JSComponent*) serial;
+        JSComponentFile* file = jsc->GetComponentFile();
+
+        const HashMap<String, VariantType>& fields =  file->GetFields();
+
+        if (fields.Size())
+        {
+            HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
+            while (itr != fields.End())
+            {
+                duk_push_object(ctx);
+
+                duk_push_number(ctx, (double) itr->second_);
+                duk_put_prop_string(ctx, -2, "type");
+
+                duk_push_string(ctx, itr->first_.CString());
+                duk_put_prop_string(ctx, -2, "name");
+
+                duk_push_number(ctx, (double) AM_DEFAULT);
+                duk_put_prop_string(ctx, -2, "mode");
+
+                duk_push_string(ctx,"");
+                duk_put_prop_string(ctx, -2, "defaultValue");
+
+                duk_push_boolean(ctx, 1);
+                duk_put_prop_string(ctx, -2, "field");
+
+                duk_push_array(ctx);
+
+                duk_put_prop_string(ctx, -2, "enumNames");
+
+                // store attr object
+                duk_put_prop_index(ctx, -2, count++);
+
+                itr++;
             }
         }
-
-        duk_put_prop_string(ctx, -2, "enumNames");
-
-        // store attr object
-        duk_put_prop_index(ctx, -2, i);
     }
 
     return 1;

@@ -301,6 +301,9 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
     switch (type)
     {
+    case VAR_NONE:
+        duk_push_undefined(ctx);
+        break;
 
     case VAR_VOIDPTR:
         duk_push_null(ctx);

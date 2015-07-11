@@ -63,10 +63,9 @@ public:
     void ApplyAttributes();
 
     /// Get script attribute
+    VariantMap& GetFieldValues() { return fieldValues_; }
     ResourceRef GetScriptAttr() const;
-
-    /// Set script attribute.
-    void SetScriptAttr(const ResourceRef& value);
+    JSComponentFile* GetComponentFile() { return componentFile_; }
 
     /// Handle enabled/disabled state change. Changes update event subscription.
     virtual void OnSetEnabled();
@@ -79,6 +78,8 @@ public:
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
 
+    /// Set script attribute.
+    void SetScriptAttr(const ResourceRef& value);
     void SetComponentFile(JSComponentFile* cfile, bool loading = false);
 
 protected:
@@ -132,6 +133,8 @@ private:
     bool loading_;
     WeakPtr<JSVM> vm_;
     SharedPtr<JSComponentFile> componentFile_;
+
+    VariantMap fieldValues_;
 
 };
 

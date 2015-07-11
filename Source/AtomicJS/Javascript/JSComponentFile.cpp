@@ -49,7 +49,71 @@ void JSComponentFile::RegisterObject(Context* context)
 
 bool JSComponentFile::BeginLoad(Deserializer& source)
 {
-    SetMemoryUse(0);
+    // TODO: cache these for non-editor builds
+
+    unsigned dataSize = source.GetSize();
+    if (!dataSize && !source.GetName().Empty())
+    {
+        LOGERROR("Zero sized component file in " + source.GetName());
+        return false;
+    }
+
+    SharedArrayPtr<char> buffer(new char[dataSize + 1]);
+    if (source.Read(buffer.Get(), dataSize) != dataSize)
+        return false;
+    buffer[dataSize] = '\0';
+
+    String text = buffer.Get();
+    Vector<String> lines = text.Split('\n');
+
+    for (unsigned i = 0; i < lines.Size(); i++)
+    {
+        String line = lines[i].Trimmed();
+
+        if (line[0] != '\"')
+            continue;
+
+        unsigned pos = line.Find("\";");
+        if (pos == String::NPOS)
+            continue;
+
+        text = line.Substring(1, pos - 1);
+
+        Vector<String> field = text.Split(' ');
+
+        if (field.Size() != 2 || !field[0].Length() || !field[1].Length())
+            continue;
+
+        String name = field[0];
+        String stringType = field[1];
+
+        VariantType variantType = VAR_NONE;
+
+        if (stringType == "boolean")
+        {
+            variantType = VAR_BOOL;
+        }
+        else if (stringType == "string")
+        {
+            variantType = VAR_STRING;
+        }
+        else if (stringType == "number")
+        {
+            variantType = VAR_FLOAT;
+        }
+        else if (stringType == "Vector3")
+        {
+            variantType = VAR_VECTOR3;
+        }
+
+        if (variantType == VAR_NONE)
+            continue;
+
+        fields_[name] = variantType;
+
+    }
+
+    SetMemoryUse(dataSize);
 
     return true;
 }
