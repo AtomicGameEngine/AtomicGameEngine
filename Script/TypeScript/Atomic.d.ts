@@ -8014,12 +8014,14 @@ declare module Atomic {
 
    export class JSComponent extends Component {
 
+      componentFile: JSComponentFile;
       updateEventMask: number;
 
       // Construct.
       constructor();
 
       applyAttributes(): void;
+      getComponentFile(): JSComponentFile;
       // Handle enabled/disabled state change. Changes update event subscription.
       onSetEnabled(): void;
       // Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
@@ -8028,6 +8030,15 @@ declare module Atomic {
       getUpdateEventMask(): number;
       // Return whether the DelayedStart() function has been called.
       isDelayedStartCalled(): boolean;
+      setComponentFile(cfile: JSComponentFile, loading?: boolean): void;
+
+   }
+
+   export class JSComponentFile extends Resource {
+
+      // Construct.
+      constructor();
+
 
    }
 

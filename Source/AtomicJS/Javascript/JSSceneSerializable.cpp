@@ -203,8 +203,8 @@ static int Serializable_GetAttributes(duk_context* ctx)
     duk_get_global_string(ctx, "__atomic_scene_serializable_attributes");
     duk_get_prop_index(ctx, -1, type);
 
-    // return cached array of attrinfo
-    if (duk_is_object(ctx, -1))
+    // return cached array of attrinfo, unless JSComponent which has dynamic fields
+    if (serial->GetType() != JSComponent::GetTypeStatic() && duk_is_object(ctx, -1))
         return 1;
 
     const Vector<AttributeInfo>* attrs = serial->GetAttributes();

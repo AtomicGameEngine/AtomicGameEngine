@@ -172,6 +172,8 @@ class ComponentInspector extends Atomic.UISection {
 
     addJSComponentUI(layout:Atomic.UILayout) {
 
+      var js = <Atomic.JSComponent> this.component;
+
       // expand prefab
       this.value = 1;
 
@@ -190,6 +192,7 @@ class ComponentInspector extends Atomic.UISection {
 
       var field = InspectorUtils.createAttrEditField("Script", layout);
       field.readOnly = true;
+      field.text = js.componentFile ? js.componentFile.name : "";
 
       layout.addChild(selectButton);
 

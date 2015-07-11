@@ -124,7 +124,7 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         {
             if (selectedNode_.NotNull())
             {
-                clipboardNode_ = selectedNode_->Clone();
+                clipboardNode_ = selectedNode_;
             }
         }
         else if (ev.ref_id == TBIDC("paste"))
@@ -132,15 +132,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
             if (clipboardNode_.NotNull() && selectedNode_.NotNull())
             {
                 SharedPtr<Node> pasteNode(clipboardNode_->Clone());
-                selectedNode_->GetParent()->AddChild(pasteNode);
 
                 VariantMap eventData;
                 eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
                 SendEvent(E_EDITORACTIVENODECHANGE, eventData);
-
             }
         }
-
     }
 
     if (ev.type == EVENT_TYPE_CLICK)
