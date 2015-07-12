@@ -180,25 +180,7 @@ void JSComponent::InitModule()
             else
             {
                 Variant v;
-
-                switch (itr->second_)
-                {
-                case VAR_BOOL:
-                    v = false;
-                    break;
-                case VAR_STRING:
-                    v = "";
-                    break;
-                case VAR_FLOAT:
-                    v = 0.0f;
-                    break;
-                case VAR_VECTOR3:
-                    v = Vector3::ZERO;
-                    break;
-                default:
-                    break;
-                }
-
+                componentFile_->GetDefaultFieldValue(itr->first_, v);
                 js_push_variant(ctx,  v);
                 duk_put_prop_string(ctx, -2, itr->first_.CString());
             }

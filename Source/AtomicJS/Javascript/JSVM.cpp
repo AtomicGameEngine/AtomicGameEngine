@@ -52,6 +52,8 @@ void JSVM::InitJSContext()
     // create root Atomic Object
     duk_push_global_object(ctx_);
     duk_push_object(ctx_);
+    duk_push_boolean(ctx_, context_->GetEditorContext() ? 1 : 0);
+    duk_put_prop_string(ctx_, -2, "editor");
     duk_put_prop_string(ctx_, -2, "Atomic");
     duk_pop(ctx_);
 

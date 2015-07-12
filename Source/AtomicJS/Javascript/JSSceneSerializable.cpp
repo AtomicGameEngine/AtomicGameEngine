@@ -163,26 +163,8 @@ static int Serializable_GetAttribute(duk_context* ctx)
             }
             else
             {
-                HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
                 Variant v;
-                switch (itr->second_)
-                {
-                case VAR_BOOL:
-                    v = false;
-                    break;
-                case VAR_STRING:
-                    v = "";
-                    break;
-                case VAR_FLOAT:
-                    v = 0.0f;
-                    break;
-                case VAR_VECTOR3:
-                    v = Vector3::ZERO;
-                    break;
-                default:
-                    break;
-                }
-
+                file->GetDefaultFieldValue(name, v);
                 js_push_variant(ctx,  v);
                 return 1;
             }

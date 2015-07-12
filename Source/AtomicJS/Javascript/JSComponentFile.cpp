@@ -28,6 +28,7 @@
 #include <Atomic/IO/Serializer.h>
 
 #include "JSComponentFile.h"
+#include "JSVM.h"
 
 namespace Atomic
 {
@@ -47,9 +48,47 @@ void JSComponentFile::RegisterObject(Context* context)
     context->RegisterFactory<JSComponentFile>();
 }
 
+void JSComponentFile::GetDefaultFieldValue(const String& name, Variant& v)
+{
+    v = Variant::EMPTY;
+
+    VariantMap::ConstIterator itr = defaultFieldValues_.Find(name);
+
+    if (itr == defaultFieldValues_.End())
+    {
+        HashMap<String, VariantType>::ConstIterator citr = fields_.Find(name);
+        if (citr == fields_.End())
+            return;
+
+        switch (citr->second_)
+        {
+        case VAR_BOOL:
+            v = false;
+            break;
+        case VAR_STRING:
+            v = "";
+            break;
+        case VAR_FLOAT:
+            v = 0.0f;
+            break;
+        case VAR_VECTOR3:
+            v = Vector3::ZERO;
+            break;
+        default:
+            break;
+        }
+
+        return;
+
+    }
+
+    v = itr->second_;
+
+}
+
 bool JSComponentFile::BeginLoad(Deserializer& source)
 {
-    // TODO: cache these for non-editor builds
+    // TODO: cache these for player builds
 
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
@@ -64,56 +103,130 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
     buffer[dataSize] = '\0';
 
     String text = buffer.Get();
+    text.Replace("\r", "");
     Vector<String> lines = text.Split('\n');
 
+    String eval;
+    bool valid = false;
     for (unsigned i = 0; i < lines.Size(); i++)
     {
-        String line = lines[i].Trimmed();
+        String line = lines[i];
 
-        if (line[0] != '\"')
-            continue;
-
-        unsigned pos = line.Find("\";");
-        if (pos == String::NPOS)
-            continue;
-
-        text = line.Substring(1, pos - 1);
-
-        Vector<String> field = text.Split(' ');
-
-        if (field.Size() != 2 || !field[0].Length() || !field[1].Length())
-            continue;
-
-        String name = field[0];
-        String stringType = field[1];
-
-        VariantType variantType = VAR_NONE;
-
-        if (stringType == "boolean")
+        if (!eval.Length())
         {
-            variantType = VAR_BOOL;
+            line = line.Trimmed();
+
+            if (line.StartsWith("exports.fields"))
+            {
+                eval = line.Substring(8);
+                if (line.Contains("}"))
+                {
+                    valid = true;
+                    break;
+                }
+            }
         }
-        else if (stringType == "string")
+        else
         {
-            variantType = VAR_STRING;
-        }
-        else if (stringType == "number")
-        {
-            variantType = VAR_FLOAT;
-        }
-        else if (stringType == "Vector3")
-        {
-            variantType = VAR_VECTOR3;
+            eval += line;
         }
 
-        if (variantType == VAR_NONE)
-            continue;
-
-        fields_[name] = variantType;
+        if (line.Contains("}") && eval.Length())
+        {
+            valid = true;
+            break;
+        }
 
     }
 
-    SetMemoryUse(dataSize);
+    if (valid)
+    {
+        JSVM* vm = JSVM::GetJSVM(NULL);
+
+        if (!vm)
+            return true;
+
+        duk_context* ctx = vm->GetJSContext();
+
+        int top = duk_get_top(ctx);
+
+        duk_push_string(ctx, eval.CString());
+        duk_push_string(ctx, "eval");
+        duk_compile(ctx, DUK_COMPILE_EVAL);
+        if (duk_is_function(ctx, -1) && duk_pcall(ctx, 0) == DUK_EXEC_SUCCESS)
+        {
+            if (duk_is_object(ctx, -1))
+            {
+                duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+                while (duk_next(ctx, -1, 1)) {
+
+                    String name = duk_get_string(ctx, -2);
+
+                    VariantType variantType = VAR_NONE;
+                    Variant defaultValue;
+
+                    if (duk_is_string(ctx, -1))
+                    {
+                        variantType = VAR_STRING;
+                        defaultValue = duk_to_string(ctx, -1);
+                    }
+                    else if (duk_is_number(ctx, -1))
+                    {
+                        variantType = VAR_FLOAT;
+                        defaultValue = (float) duk_to_number(ctx, -1);
+                    }
+                    else if (duk_is_array(ctx, -1))
+                    {
+                        if (duk_get_length(ctx, -1) > 0)
+                        {
+                            duk_get_prop_index(ctx, -1, 0);
+
+                            // TODO: class types
+                            variantType = (VariantType) duk_require_number(ctx, -1);
+
+                            duk_pop(ctx);
+                        }
+
+                        if (duk_get_length(ctx, -1) > 1)
+                        {
+                            duk_get_prop_index(ctx, -1, 1);
+                            // default value
+                            js_to_variant(ctx, -1, defaultValue);
+
+                            duk_pop(ctx);
+                        }
+
+                    }
+                    else if (duk_is_boolean(ctx, -1))
+                    {
+                        variantType = VAR_BOOL;
+                        defaultValue = duk_to_boolean(ctx, -1) ? true : false;
+                    }
+
+
+                    if (defaultValue.GetType() != VAR_NONE)
+                    {
+                        defaultFieldValues_[name] = defaultValue;
+
+                    }
+
+                    if (variantType != VAR_NONE)
+                        fields_[name] = variantType;
+
+                    duk_pop_2(ctx);  // pop key value
+                }
+
+                duk_pop(ctx);  // pop enum object
+
+            }
+
+        }
+
+        duk_set_top(ctx, top);
+    }
+
+    SetMemoryUse(0);
 
     return true;
 }

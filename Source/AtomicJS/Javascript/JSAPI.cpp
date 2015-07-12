@@ -214,6 +214,10 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
 {
     v.Clear();
 
+    // convert to abs index
+    if (variantIdx < 0)
+        variantIdx = duk_get_top(ctx) + variantIdx;
+
     if (duk_is_boolean(ctx, variantIdx))
     {
         v = duk_to_boolean(ctx, variantIdx) ? true : false;
@@ -273,7 +277,7 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
             v4.y_ = duk_to_number(ctx, -1);
             duk_get_prop_index(ctx, variantIdx, 2);
             v4.z_ = duk_to_number(ctx, -1);
-            duk_get_prop_index(ctx, variantIdx, 2);
+            duk_get_prop_index(ctx, variantIdx, 3);
             v4.w_ = duk_to_number(ctx, -1);
             duk_pop_n(ctx, 4);
             v = v4;

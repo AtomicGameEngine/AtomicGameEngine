@@ -48,9 +48,12 @@ public:
     /// Save resource
     virtual bool Save(Serializer& dest) const;
 
+    void GetDefaultFieldValue(const String& name, Variant& v);
+
 private:
 
     HashMap<String, VariantType> fields_;
+    VariantMap defaultFieldValues_;
 
 };
 
