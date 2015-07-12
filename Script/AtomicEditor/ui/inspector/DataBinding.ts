@@ -97,7 +97,7 @@ class DataBinding {
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);
                 select.fontDescription = fd;
-                select.skinBg = "InspectorTextAttrName";
+                select.skinBg = "InspectorVectorAttrName";
                 select.setLimits(-10000000, 10000000);
                 var editlp = new Atomic.UILayoutParams();
                 editlp.minWidth = 60;

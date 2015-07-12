@@ -168,7 +168,13 @@ elements
 		min-width 140
 		max-width 140
 
+	InspectorVectorAttrName
+		text-color #aaaaaa
+		min-width 140
+		max-width 140		
+
 	InspectorTextAttrName
+		padding 4
 		text-color #aaaaaa
 		min-width 140
 		max-width 140
