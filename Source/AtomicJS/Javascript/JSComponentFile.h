@@ -48,10 +48,16 @@ public:
     /// Save resource
     virtual bool Save(Serializer& dest) const;
 
+    bool GetScriptClass() { return scriptClass_; }
+
+    bool PushModule();
     void GetDefaultFieldValue(const String& name, Variant& v);
 
 private:
 
+    bool InitModule();
+
+    bool scriptClass_;
     HashMap<String, VariantType> fields_;
     VariantMap defaultFieldValues_;
 

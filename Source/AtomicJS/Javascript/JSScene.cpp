@@ -36,7 +36,7 @@ static int Node_CreateJSComponent(duk_context* ctx)
     JSComponentFile* file = cache->GetResource<JSComponentFile>(path);
 
     jsc->SetComponentFile(file);
-    jsc->InitModule(hasArgs, argIdx);
+    jsc->InitInstance(hasArgs, argIdx);
 
     js_push_class_object_instance(ctx, jsc, "JSComponent");
     return 1;

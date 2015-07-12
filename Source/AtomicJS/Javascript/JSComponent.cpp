@@ -51,6 +51,7 @@ JSComponent::JSComponent(Context* context) :
     currentEventMask_(0),
     started_(false),
     destroyed_(false),
+    scriptClassInstance_(false),
     delayedStartCalled_(false),
     loading_(false)
 {
@@ -120,41 +121,52 @@ void JSComponent::UpdateReferences(bool remove)
 
 void JSComponent::ApplyAttributes()
 {
-    if (!started_)
+    if (scriptClassInstance_)
+        return;
+
+    // coming in from a load, so we may have a scripted component
+
+    if (!context_->GetEditorContext() && componentFile_.NotNull())
     {
-        InitModule();
+        if (componentFile_->GetScriptClass())
+        {
+            unsigned id = this->GetID();
+
+            SharedPtr<Node> node(node_);
+            SharedPtr<Component> keepAlive(this);
+            node_->RemoveComponent(this);
+
+            duk_context* ctx = vm_->GetJSContext();
+            componentFile_->PushModule();
+            duk_new(ctx, 0);
+            if (duk_is_object(ctx, -1))
+            {
+                JSComponent* component = js_to_class_instance<JSComponent>(ctx, -1, 0);
+                component->scriptClassInstance_ = true;
+                component->fieldValues_ = fieldValues_;
+                component->SetComponentFile(componentFile_);
+                node->AddComponent(component, id, REPLICATED);
+                component->InitInstance();
+            }
+
+            duk_pop(ctx);
+
+            return;
+        }
     }
+
+    // not a class component
+    InitInstance();
 }
 
-void JSComponent::InitModule(bool hasArgs, int argIdx)
+void JSComponent::InitInstance(bool hasArgs, int argIdx)
 {
     if (context_->GetEditorContext() || componentFile_.Null())
         return;
 
     duk_context* ctx = vm_->GetJSContext();
 
-    const String& path = componentFile_->GetName();
-    String pathName, fileName, ext;
-    SplitPath(path, pathName, fileName, ext);
-
-    pathName += "/" + fileName;
-
     duk_idx_t top = duk_get_top(ctx);
-
-    duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, pathName.CString());
-
-    if (duk_pcall(ctx, 1) != 0)
-    {
-        vm_->SendJSErrorEvent();
-        return;
-    }
-
-    if (!duk_is_object(ctx, -1))
-    {
-        duk_set_top(ctx, top);
-        return;
-    }
 
     // store, so pop doesn't clear
     UpdateReferences();
@@ -215,22 +227,28 @@ void JSComponent::InitModule(bool hasArgs, int argIdx)
 
     }
 
-
-    duk_get_prop_string(ctx, -1, "component");
-    if (!duk_is_function(ctx, -1))
+    if (!componentFile_->GetScriptClass())
     {
-        duk_set_top(ctx, top);
-        return;
-    }
 
-    // call with self
-    js_push_class_object_instance(ctx, this, "JSComponent");
+        componentFile_->PushModule();
 
-    if (duk_pcall(ctx, 1) != 0)
-    {
-        vm_->SendJSErrorEvent();
-        duk_set_top(ctx, top);
-        return;
+        duk_get_prop_string(ctx, -1, "component");
+        if (!duk_is_function(ctx, -1))
+        {
+            duk_set_top(ctx, top);
+            return;
+        }
+
+        // call with self
+        js_push_class_object_instance(ctx, this, "JSComponent");
+
+        if (duk_pcall(ctx, 1) != 0)
+        {
+            vm_->SendJSErrorEvent();
+            duk_set_top(ctx, top);
+            return;
+        }
+
     }
 
     duk_set_top(ctx, top);
@@ -264,10 +282,16 @@ void JSComponent::CallScriptMethod(const String& name, bool passValue, float val
         return;
     }
 
+    // push this
+    if (scriptClassInstance_)
+        duk_push_heapptr(ctx, heapptr);
+
     if (passValue)
         duk_push_number(ctx, value);
 
-    if (duk_pcall(ctx, passValue ? 1 : 0) != 0)
+    int status = scriptClassInstance_ ? duk_pcall_method(ctx, passValue ? 1 : 0) : duk_pcall(ctx, passValue ? 1 : 0);
+
+    if (status != 0)
     {
         vm_->SendJSErrorEvent();
         duk_set_top(ctx, top);

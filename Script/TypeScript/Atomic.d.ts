@@ -8031,14 +8031,20 @@ declare module Atomic {
       // Return whether the DelayedStart() function has been called.
       isDelayedStartCalled(): boolean;
       setComponentFile(cfile: JSComponentFile, loading?: boolean): void;
+      setDestroyed(): void;
+      initInstance(hasArgs?: boolean, argIdx?: number): void;
 
    }
 
    export class JSComponentFile extends Resource {
 
+      scriptClass: boolean;
+
       // Construct.
       constructor();
 
+      getScriptClass(): boolean;
+      pushModule(): boolean;
 
    }
 

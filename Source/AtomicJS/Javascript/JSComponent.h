@@ -84,7 +84,7 @@ public:
 
     void SetDestroyed() { destroyed_ = true; }
 
-    void InitModule(bool hasArgs = false, int argIdx = 0);
+    void InitInstance(bool hasArgs = false, int argIdx = 0);
 
 protected:
     /// Handle scene node being assigned at creation.
@@ -130,6 +130,7 @@ private:
 
     bool started_;
     bool destroyed_;
+    bool scriptClassInstance_;
 
     /// Flag for delayed start.
     bool delayedStartCalled_;

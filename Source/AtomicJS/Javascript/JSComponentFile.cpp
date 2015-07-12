@@ -34,7 +34,8 @@ namespace Atomic
 {
 
 JSComponentFile::JSComponentFile(Context* context) :
-    Resource(context)
+    Resource(context),
+    scriptClass_(false)
 {
 }
 
@@ -86,9 +87,75 @@ void JSComponentFile::GetDefaultFieldValue(const String& name, Variant& v)
 
 }
 
+bool JSComponentFile::PushModule()
+{
+    if (context_->GetEditorContext())
+        return false;
+
+    JSVM* vm = JSVM::GetJSVM(NULL);
+
+    duk_context* ctx = vm->GetJSContext();
+
+    const String& path = GetName();
+    String pathName, fileName, ext;
+    SplitPath(path, pathName, fileName, ext);
+
+    pathName += "/" + fileName;
+
+    duk_get_global_string(ctx, "require");
+    duk_push_string(ctx, pathName.CString());
+
+    if (duk_pcall(ctx, 1) != 0)
+    {
+        vm->SendJSErrorEvent();
+        return false;
+    }
+
+    return true;
+
+}
+
+bool JSComponentFile::InitModule()
+{
+    if (context_->GetEditorContext())
+        return true;
+
+    JSVM* vm = JSVM::GetJSVM(NULL);
+
+    duk_context* ctx = vm->GetJSContext();
+
+    duk_idx_t top = duk_get_top(ctx);
+
+    if (!PushModule())
+        return false;
+
+    if (duk_is_function(ctx, -1))
+    {
+        // TODO: verify JSComponent in prototype chain
+        scriptClass_ = true;
+        duk_set_top(ctx, top);
+        return true;
+    }
+
+    if (!duk_is_object(ctx, -1))
+    {
+        duk_set_top(ctx, top);
+        return false;
+    }
+
+    duk_set_top(ctx, top);
+
+    return true;
+}
+
+
 bool JSComponentFile::BeginLoad(Deserializer& source)
 {
+    if (!InitModule())
+        return false;
+
     // TODO: cache these for player builds
+    // FIXME: this won't work with obfusication or minimization
 
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
@@ -116,15 +183,34 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
         {
             line = line.Trimmed();
 
-            if (line.StartsWith("exports.fields"))
+            if (line.StartsWith("inspectorFields"))
             {
-                eval = line.Substring(8);
+                eval = line;
                 if (line.Contains("}"))
                 {
                     valid = true;
                     break;
                 }
             }
+            else if (line.StartsWith("this.inspectorFields"))
+            {
+                eval = line.Substring(5);
+                if (line.Contains("}"))
+                {
+                    valid = true;
+                    break;
+                }
+            }
+            else if (line.StartsWith("var inspectorFields"))
+            {
+                eval = line.Substring(4);
+                if (line.Contains("}"))
+                {
+                    valid = true;
+                    break;
+                }
+            }
+
         }
         else
         {
