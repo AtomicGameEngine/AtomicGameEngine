@@ -120,6 +120,10 @@ void JSComponent::UpdateReferences(bool remove)
 
 void JSComponent::ApplyAttributes()
 {
+    if (!started_)
+    {
+        InitModule();
+    }
 }
 
 void JSComponent::InitModule(bool hasArgs, int argIdx)

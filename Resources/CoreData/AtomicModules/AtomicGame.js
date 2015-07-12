@@ -121,15 +121,22 @@ Game.prototype.createScene3D = function(filename) {
 
     var scene = new Atomic.Scene();
 
+		// FIXME: Node should take a string name in constructor
+		var cameraNode = new Atomic.Node();
+		cameraNode.name = "Camera";
+    cameraNode.position = [0.0, 0.0, -10.0];
+
+    var camera = cameraNode.createComponent("Camera");
+
+		this.cameraNode = cameraNode;
+    this.camera = camera;
+
     if (typeof(filename) == "string")
         scene.loadXML(filename)
     else
         scene.createComponent("Octree");
 
-    var cameraNode = scene.createChild("Camera");
-    cameraNode.position = [0.0, 0.0, -10.0];
-
-    var camera = cameraNode.createComponent("Camera");
+		scene.addChild(cameraNode);
 
     var viewport = null;
     if (Atomic.editor) {
@@ -140,8 +147,6 @@ Game.prototype.createScene3D = function(filename) {
     }
 
     this.scene = scene;
-    this.cameraNode = cameraNode;
-    this.camera = camera;
     this.viewport = viewport;
 
     return scene;
