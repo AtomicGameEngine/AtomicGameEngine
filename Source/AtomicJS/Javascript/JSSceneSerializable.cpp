@@ -74,12 +74,15 @@ static int Serializable_SetAttribute(duk_context* ctx)
             jsc = (JSComponent*) serial;
             JSComponentFile* file = jsc->GetComponentFile();
 
-            const HashMap<String, VariantType>& fields = file->GetFields();
-
-            if (fields.Contains(name))
+            if (file)
             {
-                HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
-                variantType = itr->second_;
+                const HashMap<String, VariantType>& fields = file->GetFields();
+
+                if (fields.Contains(name))
+                {
+                    HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
+                    variantType = itr->second_;
+                }
             }
         }
     }
@@ -150,23 +153,27 @@ static int Serializable_GetAttribute(duk_context* ctx)
         JSComponent* jsc = (JSComponent*) serial;
         JSComponentFile* file = jsc->GetComponentFile();
 
-        const HashMap<String, VariantType>& fields = file->GetFields();
-
-        if (fields.Contains(name))
+        if (file)
         {
-            VariantMap& values = jsc->GetFieldValues();
 
-            if (values.Contains(name))
+            const HashMap<String, VariantType>& fields = file->GetFields();
+
+            if (fields.Contains(name))
             {
-                js_push_variant(ctx,  values[name]);
-                return 1;
-            }
-            else
-            {
-                Variant v;
-                file->GetDefaultFieldValue(name, v);
-                js_push_variant(ctx,  v);
-                return 1;
+                VariantMap& values = jsc->GetFieldValues();
+
+                if (values.Contains(name))
+                {
+                    js_push_variant(ctx,  values[name]);
+                    return 1;
+                }
+                else
+                {
+                    Variant v;
+                    file->GetDefaultFieldValue(name, v);
+                    js_push_variant(ctx,  v);
+                    return 1;
+                }
             }
         }
     }
@@ -251,38 +258,41 @@ static int Serializable_GetAttributes(duk_context* ctx)
         JSComponent* jsc = (JSComponent*) serial;
         JSComponentFile* file = jsc->GetComponentFile();
 
-        const HashMap<String, VariantType>& fields =  file->GetFields();
-
-        if (fields.Size())
+        if (file)
         {
-            HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
-            while (itr != fields.End())
+            const HashMap<String, VariantType>& fields =  file->GetFields();
+
+            if (fields.Size())
             {
-                duk_push_object(ctx);
+                HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
+                while (itr != fields.End())
+                {
+                    duk_push_object(ctx);
 
-                duk_push_number(ctx, (double) itr->second_);
-                duk_put_prop_string(ctx, -2, "type");
+                    duk_push_number(ctx, (double) itr->second_);
+                    duk_put_prop_string(ctx, -2, "type");
 
-                duk_push_string(ctx, itr->first_.CString());
-                duk_put_prop_string(ctx, -2, "name");
+                    duk_push_string(ctx, itr->first_.CString());
+                    duk_put_prop_string(ctx, -2, "name");
 
-                duk_push_number(ctx, (double) AM_DEFAULT);
-                duk_put_prop_string(ctx, -2, "mode");
+                    duk_push_number(ctx, (double) AM_DEFAULT);
+                    duk_put_prop_string(ctx, -2, "mode");
 
-                duk_push_string(ctx,"");
-                duk_put_prop_string(ctx, -2, "defaultValue");
+                    duk_push_string(ctx,"");
+                    duk_put_prop_string(ctx, -2, "defaultValue");
 
-                duk_push_boolean(ctx, 1);
-                duk_put_prop_string(ctx, -2, "field");
+                    duk_push_boolean(ctx, 1);
+                    duk_put_prop_string(ctx, -2, "field");
 
-                duk_push_array(ctx);
+                    duk_push_array(ctx);
 
-                duk_put_prop_string(ctx, -2, "enumNames");
+                    duk_put_prop_string(ctx, -2, "enumNames");
 
-                // store attr object
-                duk_put_prop_index(ctx, -2, count++);
+                    // store attr object
+                    duk_put_prop_index(ctx, -2, count++);
 
-                itr++;
+                    itr++;
+                }
             }
         }
     }
