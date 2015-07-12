@@ -50,6 +50,7 @@ JSComponent::JSComponent(Context* context) :
     updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
     currentEventMask_(0),
     started_(false),
+    destroyed_(false),
     delayedStartCalled_(false),
     loading_(false)
 {
@@ -119,10 +120,9 @@ void JSComponent::UpdateReferences(bool remove)
 
 void JSComponent::ApplyAttributes()
 {
-
 }
 
-void JSComponent::InitModule()
+void JSComponent::InitModule(bool hasArgs, int argIdx)
 {
     if (context_->GetEditorContext() || componentFile_.Null())
         return;
@@ -192,6 +192,25 @@ void JSComponent::InitModule()
         duk_pop(ctx);
     }
 
+    // apply args if any
+    if (hasArgs)
+    {
+        // push self
+        js_push_class_object_instance(ctx, this, "JSComponent");
+
+        duk_enum(ctx, argIdx, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+        while (duk_next(ctx, -1, 1)) {
+
+            duk_put_prop(ctx, -4);
+
+        }
+
+        // pop self and enum object
+        duk_pop_2(ctx);
+
+    }
+
 
     duk_get_prop_string(ctx, -1, "component");
     if (!duk_is_function(ctx, -1))
@@ -211,6 +230,12 @@ void JSComponent::InitModule()
     }
 
     duk_set_top(ctx, top);
+
+    if (!started_)
+    {
+        started_ = true;
+        Start();
+    }
 
 }
 
@@ -373,12 +398,7 @@ void JSComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace SceneUpdate;
 
-    if (!started_)
-    {
-        started_ = true;
-        InitModule();
-        Start();
-    }
+    assert(!destroyed_);
 
     // Execute user-defined delayed start function before first update
     if (!delayedStartCalled_)

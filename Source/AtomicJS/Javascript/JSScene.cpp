@@ -20,6 +20,14 @@ static int Node_CreateJSComponent(duk_context* ctx)
 {
     String path = duk_require_string(ctx, 0);
 
+    bool hasArgs = false;
+    int argIdx;
+    if (duk_get_top(ctx) > 1 && duk_is_object(ctx, 1))
+    {
+        hasArgs = true;
+        argIdx = 1;
+    }
+
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
     JSComponent* jsc = node->CreateComponent<JSComponent>();
@@ -28,6 +36,7 @@ static int Node_CreateJSComponent(duk_context* ctx)
     JSComponentFile* file = cache->GetResource<JSComponentFile>(path);
 
     jsc->SetComponentFile(file);
+    jsc->InitModule(hasArgs, argIdx);
 
     js_push_class_object_instance(ctx, jsc, "JSComponent");
     return 1;
@@ -195,7 +204,7 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getChildrenWithName");
     duk_push_c_function(ctx, Node_GetComponents, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "getComponents");
-    duk_push_c_function(ctx, Node_CreateJSComponent, 1);
+    duk_push_c_function(ctx, Node_CreateJSComponent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "createJSComponent");
     duk_push_c_function(ctx, Node_GetChildAtIndex, 1);
     duk_put_prop_string(ctx, -2, "getChildAtIndex");

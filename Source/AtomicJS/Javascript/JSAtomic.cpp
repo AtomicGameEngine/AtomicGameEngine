@@ -201,9 +201,8 @@ static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = fal
 
          if (component->GetType() == JSComponent::GetTypeStatic())
          {
-             // FIX COMPONENTS
-             //JSComponent* jscomponent = (JSComponent*) component;
-             //jscomponent->SetDestroyed();
+             JSComponent* jscomponent = (JSComponent*) component;
+             jscomponent->SetDestroyed();
          }
 
          component->UnsubscribeFromAllEvents();
@@ -212,19 +211,6 @@ static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = fal
     node->RemoveAllComponents();
     node->UnsubscribeFromAllEvents();
 
-    if (node->GetParent())
-    {
-        assert(node->Refs() >= 2);
-        node->Remove();
-    }
-
-    int top = duk_get_top(ctx);
-    duk_push_global_stash(ctx);
-    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-    duk_push_pointer(ctx, (void*) node);
-    duk_del_prop(ctx, -2);
-    duk_pop_2(ctx);
-    assert(top = duk_get_top(ctx));
 }
 
 static void js_atomic_destroy_scene(Scene* scene, duk_context* ctx)

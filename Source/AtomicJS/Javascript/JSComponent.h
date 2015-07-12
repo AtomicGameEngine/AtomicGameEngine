@@ -82,6 +82,10 @@ public:
     void SetScriptAttr(const ResourceRef& value);
     void SetComponentFile(JSComponentFile* cfile, bool loading = false);
 
+    void SetDestroyed() { destroyed_ = true; }
+
+    void InitModule(bool hasArgs = false, int argIdx = 0);
+
 protected:
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node);
@@ -117,7 +121,6 @@ private:
     /// Called on physics post-update, fixed timestep.
     virtual void FixedPostUpdate(float timeStep);
 
-    void InitModule();
     void UpdateReferences(bool remove = false);
 
     /// Requested event subscription mask.
@@ -126,9 +129,12 @@ private:
     unsigned char currentEventMask_;
 
     bool started_;
+    bool destroyed_;
 
     /// Flag for delayed start.
     bool delayedStartCalled_;
+
+
 
     bool loading_;
     WeakPtr<JSVM> vm_;
