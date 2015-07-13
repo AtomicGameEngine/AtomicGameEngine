@@ -39,6 +39,7 @@ class JSVM;
 class ATOMIC_API JSComponent : public Component
 {
     friend class JSComponentFactory;
+    friend class JSComponentFile;
 
     enum EventFlags
     {

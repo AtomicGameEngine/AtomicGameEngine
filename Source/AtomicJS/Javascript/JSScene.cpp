@@ -30,12 +30,21 @@ static int Node_CreateJSComponent(duk_context* ctx)
 
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
-    JSComponent* jsc = node->CreateComponent<JSComponent>();
 
-    ResourceCache* cache = node->GetContext()->GetSubsystem<ResourceCache>();
+    ResourceCache* cache = node->GetContext()->GetSubsystem<ResourceCache>();    
     JSComponentFile* file = cache->GetResource<JSComponentFile>(path);
 
-    jsc->SetComponentFile(file);
+    if (!file)
+    {
+        LOGERRORF("Unable to load component file %s", path.CString());
+        duk_push_undefined(ctx);
+        return 1;
+    }
+
+    JSComponent* jsc = file->CreateJSComponent();
+
+    node->AddComponent(jsc, jsc->GetID(), LOCAL);
+
     jsc->InitInstance(hasArgs, argIdx);
 
     js_push_class_object_instance(ctx, jsc, "JSComponent");

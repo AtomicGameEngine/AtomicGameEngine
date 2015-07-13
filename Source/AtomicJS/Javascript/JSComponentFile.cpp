@@ -28,6 +28,7 @@
 #include <Atomic/IO/Serializer.h>
 
 #include "JSComponentFile.h"
+#include "JSComponent.h"
 #include "JSVM.h"
 
 namespace Atomic
@@ -112,6 +113,48 @@ bool JSComponentFile::PushModule()
     }
 
     return true;
+
+}
+
+JSComponent* JSComponentFile::CreateJSComponent()
+{
+    JSComponent* component = NULL;
+
+    if (!scriptClass_)
+    {
+        component =  new JSComponent(context_);
+    }
+    else
+    {
+
+        JSVM* vm = JSVM::GetJSVM(NULL);
+        duk_context* ctx = vm->GetJSContext();
+
+        PushModule();
+
+        duk_new(ctx, 0);
+
+        if (duk_is_object(ctx, -1))
+        {
+            component = js_to_class_instance<JSComponent>(ctx, -1, 0);
+            component->scriptClassInstance_ = true;
+            // store reference below so pop doesn't gc the component
+            component->UpdateReferences();
+        }
+
+        duk_pop(ctx);
+
+    }
+
+    if (!component)
+    {
+        LOGERRORF("Failed to create script class from component file %s", GetName().CString());
+        component =  new JSComponent(context_);
+    }
+
+    component->SetComponentFile(this);
+
+    return component;
 
 }
 

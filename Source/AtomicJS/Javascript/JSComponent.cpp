@@ -61,7 +61,7 @@ public:
     SharedPtr<Object> CreateObject()
     {
         SharedPtr<Object> ptr;
-        bool scriptClass = false;
+
         Variant& v = context_->GetVar("__JSComponent_ComponentFile");
 
         // __JSComponent_ComponentFile will only be set when coming from XML
@@ -81,26 +81,9 @@ public:
 
                 JSComponentFile* componentFile = cache->GetResource<JSComponentFile>(split[1]);
 
-                if (componentFile && componentFile->GetScriptClass())
+                if (componentFile)
                 {
-                    scriptClass = true;
-                    JSVM* vm = JSVM::GetJSVM(NULL);
-                    duk_context* ctx = vm->GetJSContext();
-
-                    componentFile->PushModule();
-
-                    duk_new(ctx, 0);
-                    if (duk_is_object(ctx, -1))
-                    {
-                        JSComponent* component = js_to_class_instance<JSComponent>(ctx, -1, 0);
-                        component->scriptClassInstance_ = true;
-                        // store reference below so pop doesn't gc the component
-                        component->UpdateReferences();
-                        ptr = component;
-
-                    }
-
-                    duk_pop(ctx);
+                    ptr = componentFile->CreateJSComponent();
                 }
 
             }
@@ -110,11 +93,6 @@ public:
         if (ptr.Null())
         {
             ptr = new JSComponent(context_);
-
-            if (scriptClass)
-            {
-                LOGERRORF("Failed to create script class from component file");
-            }
         }
 
         return ptr;
@@ -204,7 +182,8 @@ void JSComponent::UpdateReferences(bool remove)
 
 void JSComponent::ApplyAttributes()
 {
-    InitInstance();
+    if (!started_)
+        InitInstance();
 }
 
 void JSComponent::InitInstance(bool hasArgs, int argIdx)

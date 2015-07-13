@@ -28,6 +28,8 @@
 namespace Atomic
 {
 
+class JSComponent;
+
 /// Script document resource.
 class ATOMIC_API JSComponentFile : public Resource
 {
@@ -50,6 +52,7 @@ public:
 
     bool GetScriptClass() { return scriptClass_; }
 
+    JSComponent* CreateJSComponent();
     bool PushModule();
     void GetDefaultFieldValue(const String& name, Variant& v);
 
