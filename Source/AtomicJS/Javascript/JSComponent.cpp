@@ -259,7 +259,6 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
 
         componentFile_->PushModule();
 
-        duk_get_prop_string(ctx, -1, "component");
         if (!duk_is_function(ctx, -1))
         {
             duk_set_top(ctx, top);
