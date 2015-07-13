@@ -38,6 +38,8 @@ class JSVM;
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class ATOMIC_API JSComponent : public Component
 {
+    friend class JSComponentFactory;
+
     enum EventFlags
     {
         USE_UPDATE = 0x1,

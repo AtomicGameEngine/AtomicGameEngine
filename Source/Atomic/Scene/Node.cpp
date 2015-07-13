@@ -1233,8 +1233,48 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
+
+        // ATOMIC BEGIN
+        // At runtime, a XML JSComponent may refer to a "scriptClass"
+        // component which is new'd in JS and creates the component itself
+        // we peek ahead here to see if we have a JSComponentFile and store
+        // it off in the Context vars, for the specialized JSComponent object factory to use
+        // when creating the component
+        if (!context_->GetEditorContext())
+        {
+            // at runtime peek ahead to see if we have a ComponentFile attr
+            if (typeName == "JSComponent")
+            {
+                XMLElement attrElem = compElem.GetChild("attribute");
+
+                while (attrElem)
+                {
+                    if (attrElem.GetAttribute("name") == "ComponentFile")
+                    {
+                        String componentFile = attrElem.GetAttribute("value");
+
+                        if (componentFile.Length())
+                        {
+                            // store in context vars
+                            context_->GetVars()["__JSComponent_ComponentFile"] = componentFile;
+                            break;
+                        }
+                    }
+
+                    attrElem = attrElem.GetNext("attribute");
+                }
+            }
+        }
+        // ATOMIC END
+
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
             (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+
+        // ATOMIC BEGIN
+        // ensure component file, if any, is cleared
+        context_->GetVars()["__JSComponent_ComponentFile"] = Variant::EMPTY;
+        // ATOMIC END
+
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);

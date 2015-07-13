@@ -136,8 +136,21 @@ public:
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
 
+    // ATOMIC BEGIN
     /// Get whether an Editor Context
     void SetEditorContent(bool editor) { editorContext_ = editor; }
+
+    /// Return a user variable.
+    Variant& GetVar(StringHash key) { return vars_[key]; }
+    /// Return all user variables.
+    VariantMap& GetVars() { return vars_; }
+
+protected:
+
+    /// User variables.
+    VariantMap vars_;
+
+    // ATOMIC END
 
 private:
     /// Add event receiver.

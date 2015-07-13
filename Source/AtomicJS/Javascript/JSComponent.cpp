@@ -45,6 +45,84 @@ namespace Atomic
 
 extern const char* LOGIC_CATEGORY;
 
+class JSComponentFactory : public ObjectFactory
+{
+public:
+    /// Construct.
+    JSComponentFactory(Context* context) :
+        ObjectFactory(context)
+    {
+        type_ = JSComponent::GetTypeStatic();
+        baseType_ = JSComponent::GetBaseTypeStatic();
+        typeName_ = JSComponent::GetTypeNameStatic();
+    }
+
+    /// Create an object of the specific type.
+    SharedPtr<Object> CreateObject()
+    {
+        SharedPtr<Object> ptr;
+        bool scriptClass = false;
+        Variant& v = context_->GetVar("__JSComponent_ComponentFile");
+
+        // __JSComponent_ComponentFile will only be set when coming from XML
+        // in player builds, not in editor
+        if (v.GetType() == VAR_STRING)
+        {
+            String componentRef = v.GetString();
+
+            // clear it, in case we end up recursively creating components
+            context_->GetVars()["__JSComponent_ComponentFile"] = Variant::EMPTY;
+
+            Vector<String> split = componentRef.Split(';');
+
+            if (split.Size() == 2)
+            {
+                ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
+
+                JSComponentFile* componentFile = cache->GetResource<JSComponentFile>(split[1]);
+
+                if (componentFile && componentFile->GetScriptClass())
+                {
+                    scriptClass = true;
+                    JSVM* vm = JSVM::GetJSVM(NULL);
+                    duk_context* ctx = vm->GetJSContext();
+
+                    componentFile->PushModule();
+
+                    duk_new(ctx, 0);
+                    if (duk_is_object(ctx, -1))
+                    {
+                        JSComponent* component = js_to_class_instance<JSComponent>(ctx, -1, 0);
+                        component->scriptClassInstance_ = true;
+                        // store reference below so pop doesn't gc the component
+                        component->UpdateReferences();
+                        ptr = component;
+
+                    }
+
+                    duk_pop(ctx);
+                }
+
+            }
+
+        }
+
+        if (ptr.Null())
+        {
+            ptr = new JSComponent(context_);
+
+            if (scriptClass)
+            {
+                LOGERRORF("Failed to create script class from component file");
+            }
+        }
+
+        return ptr;
+
+    }
+};
+
+
 JSComponent::JSComponent(Context* context) :
     Component(context),
     updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
@@ -65,7 +143,9 @@ JSComponent::~JSComponent()
 
 void JSComponent::RegisterObject(Context* context)
 {
-    context->RegisterFactory<JSComponent>(LOGIC_CATEGORY);
+    context->RegisterFactory(new JSComponentFactory(context), LOGIC_CATEGORY);
+
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
     MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetScriptAttr, SetScriptAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
@@ -98,13 +178,16 @@ void JSComponent::UpdateReferences(bool remove)
     // string property, pointer will be string representation of
     // address, so, unique key
 
-    duk_push_pointer(ctx, (void*) node_);
-    if (remove)
-        duk_push_undefined(ctx);
-    else
-        js_push_class_object_instance(ctx, node_);
+    if (node_)
+    {
+        duk_push_pointer(ctx, (void*) node_);
+        if (remove)
+            duk_push_undefined(ctx);
+        else
+            js_push_class_object_instance(ctx, node_);
 
-    duk_put_prop(ctx, -3);
+        duk_put_prop(ctx, -3);
+    }
 
     duk_push_pointer(ctx, (void*) this);
     if (remove)
@@ -121,41 +204,6 @@ void JSComponent::UpdateReferences(bool remove)
 
 void JSComponent::ApplyAttributes()
 {
-    if (scriptClassInstance_)
-        return;
-
-    // coming in from a load, so we may have a scripted component
-
-    if (!context_->GetEditorContext() && componentFile_.NotNull())
-    {
-        if (componentFile_->GetScriptClass())
-        {
-            unsigned id = this->GetID();
-
-            SharedPtr<Node> node(node_);
-            SharedPtr<Component> keepAlive(this);
-            node_->RemoveComponent(this);
-
-            duk_context* ctx = vm_->GetJSContext();
-            componentFile_->PushModule();
-            duk_new(ctx, 0);
-            if (duk_is_object(ctx, -1))
-            {
-                JSComponent* component = js_to_class_instance<JSComponent>(ctx, -1, 0);
-                component->scriptClassInstance_ = true;
-                component->fieldValues_ = fieldValues_;
-                component->SetComponentFile(componentFile_);
-                node->AddComponent(component, id, REPLICATED);
-                component->InitInstance();
-            }
-
-            duk_pop(ctx);
-
-            return;
-        }
-    }
-
-    // not a class component
     InitInstance();
 }
 
