@@ -27,7 +27,7 @@
 
 #include <d3d11.h>
 #include <dxgi.h>
-#include <SDL/SDL.h>
+#include <SDL/include/SDL.h>
 
 namespace Atomic
 {
