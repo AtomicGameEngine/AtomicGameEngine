@@ -844,11 +844,11 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                         result.Push(deltaPath + fileName);
                 }
             }
-        }
-        while (FindNextFileW(handle, &info));
+        } while (FindNextFileW(handle, &info));
 
         FindClose(handle);
     }
+}
 #else
     DIR* dir;
     struct dirent* de;

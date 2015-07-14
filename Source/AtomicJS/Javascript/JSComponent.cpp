@@ -99,7 +99,12 @@ public:
             {
                 ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
                 JSComponentFile* componentFile = cache->GetResource<JSComponentFile>(split[1]);
-                ptr = componentFile->CreateJSComponent();
+                if (componentFile)
+                    ptr = componentFile->CreateJSComponent();
+                else
+                {
+                    LOGERRORF("Unable to load component file %s", split[1].CString());
+                }
             }
 
         }

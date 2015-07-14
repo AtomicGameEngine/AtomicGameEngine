@@ -315,7 +315,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
                             duk_get_prop_index(ctx, -1, 0);
 
                             // TODO: class types
-                            variantType = (VariantType) duk_require_number(ctx, -1);
+                            variantType = (VariantType) ((int)duk_require_number(ctx, -1));
 
                             duk_pop(ctx);
                         }

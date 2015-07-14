@@ -25,29 +25,18 @@
 #include "../../Core/Context.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
-#include "../../Graphics/AnimatedModel.h"
-#include "../../Graphics/Animation.h"
-#include "../../Graphics/AnimationController.h"
 #include "../../Graphics/Camera.h"
-#include "../../Graphics/CustomGeometry.h"
 #include "../../Graphics/DebugRenderer.h"
-#include "../../Graphics/DecalSet.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/IndexBuffer.h"
 #include "../../Graphics/Material.h"
 #include "../../Graphics/Octree.h"
-#include "../../Graphics/ParticleEffect.h"
-#include "../../Graphics/ParticleEmitter.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
-#include "../../Graphics/Skybox.h"
-#include "../../Graphics/StaticModelGroup.h"
 #include "../../Graphics/Technique.h"
-#include "../../Graphics/Terrain.h"
-#include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
@@ -58,7 +47,7 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
-#include <SDL/SDL_syswm.h>
+#include <SDL/include/SDL_syswm.h>
 
 #include "../../DebugNew.h"
 
@@ -647,7 +636,7 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot(Image* destImage)
 {
     PROFILE(TakeScreenShot);
 
@@ -715,8 +704,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
         return false;
     }
 
-    destImage.SetSize(width_, height_, 3);
-    unsigned char* destData = destImage.GetData();
+    destImage->SetSize(width_, height_, 3);
+    unsigned char* destData = destImage->GetData();
 
     if (surfaceDesc.Format == D3DFMT_R5G6B5)
     {
