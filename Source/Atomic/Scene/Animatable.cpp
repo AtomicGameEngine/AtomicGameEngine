@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Scene/Animatable.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
-#include "../Scene/ObjectAnimation.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/XMLElement.h"
+#include "../Scene/Animatable.h"
+#include "../Scene/ObjectAnimation.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/ValueAnimation.h"
-#include "../Resource/XMLElement.h"
 
 #include "../DebugNew.h"
 
@@ -37,7 +38,8 @@ namespace Atomic
 
 extern const char* wrapModeNames[];
 
-AttributeAnimationInfo::AttributeAnimationInfo(Animatable* target, const AttributeInfo& attributeInfo, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
+AttributeAnimationInfo::AttributeAnimationInfo(Animatable* target, const AttributeInfo& attributeInfo,
+    ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed) :
     ValueAnimationInfo(target, attributeAnimation, wrapMode, speed),
     attributeInfo_(attributeInfo)
 {
@@ -75,7 +77,8 @@ Animatable::~Animatable()
 
 void Animatable::RegisterObject(Context* context)
 {
-    MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef, ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
+        ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
 
 bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
@@ -137,7 +140,8 @@ bool Animatable::SaveXML(XMLElement& dest) const
             return false;
     }
 
-    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
     {
         ValueAnimation* attributeAnimation = i->second_->GetAnimation();
         if (attributeAnimation->GetOwner())
@@ -313,7 +317,8 @@ void Animatable::OnObjectAnimationAdded(ObjectAnimation* objectAnimation)
 
     // Set all attribute animations from the object animation
     const HashMap<String, SharedPtr<ValueAnimationInfo> >& attributeAnimationInfos = objectAnimation->GetAttributeAnimationInfos();
-    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos.Begin(); i != attributeAnimationInfos.End(); ++i)
+    for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = attributeAnimationInfos.Begin();
+         i != attributeAnimationInfos.End(); ++i)
     {
         const String& name = i->first_;
         ValueAnimationInfo* info = i->second_;
@@ -328,7 +333,8 @@ void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
 
     // Just remove all attribute animations from the object animation
     Vector<String> names;
-    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::Iterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
     {
         if (i->second_->GetAnimation()->GetOwner() == objectAnimation)
             names.Push(i->first_);
@@ -344,7 +350,8 @@ void Animatable::UpdateAttributeAnimations(float timeStep)
         return;
 
     Vector<String> finishedNames;
-    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin(); i != attributeAnimationInfos_.End(); ++i)
+    for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
+         i != attributeAnimationInfos_.End(); ++i)
     {
         if (i->second_->Update(timeStep))
             finishedNames.Push(i->second_->GetAttributeInfo().name_);
@@ -374,7 +381,7 @@ void Animatable::HandleAttributeAnimationAdded(StringHash eventType, VariantMap&
         return;
 
     using namespace AttributeAnimationAdded;
-    const String& name =eventData[P_ATTRIBUTEANIMATIONNAME].GetString();
+    const String& name = eventData[P_ATTRIBUTEANIMATIONNAME].GetString();
 
     ValueAnimationInfo* info = objectAnimation_->GetAttributeAnimationInfo(name);
     if (!info)

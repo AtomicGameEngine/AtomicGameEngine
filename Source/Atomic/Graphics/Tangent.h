@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,13 @@
 
 #pragma once
 
+
 namespace Atomic
 {
 
 /// Generate tangents to indexed geometry.
-ATOMIC_API void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, unsigned normalOffset, unsigned texCoordOffset, unsigned tangentOffset);
+ATOMIC_API void GenerateTangents
+    (void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount,
+        unsigned normalOffset, unsigned texCoordOffset, unsigned tangentOffset);
 
 }

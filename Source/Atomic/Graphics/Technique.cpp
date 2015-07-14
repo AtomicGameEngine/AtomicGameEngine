@@ -20,15 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
-#include "../IO/Log.h"
-#include "../Graphics/Technique.h"
 #include "../Core/ProcessUtils.h"
 #include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/Technique.h"
 #include "../Graphics/ShaderVariation.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
@@ -173,11 +174,11 @@ Technique::Technique(Context* context) :
     Resource(context),
     isDesktop_(false)
 {
-    #ifdef DESKTOP_GRAPHICS
+#ifdef DESKTOP_GRAPHICS
     desktopSupport_ = true;
-    #else
+#else
     desktopSupport_ = false;
-    #endif
+#endif
 }
 
 Technique::~Technique()
@@ -194,15 +195,15 @@ bool Technique::BeginLoad(Deserializer& source)
     passes_.Clear();
 
     SetMemoryUse(sizeof(Technique));
-    
+
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
-    
+
     XMLElement rootElem = xml->GetRoot();
     if (rootElem.HasAttribute("desktop"))
         isDesktop_ = rootElem.GetBool("desktop");
-    
+
     String globalVS = rootElem.GetAttribute("vs");
     String globalPS = rootElem.GetAttribute("ps");
     String globalVSDefines = rootElem.GetAttribute("vsdefines");
@@ -215,7 +216,7 @@ bool Technique::BeginLoad(Deserializer& source)
     bool globalAlphaMask = false;
     if (rootElem.HasAttribute("alphamask"))
         globalAlphaMask = rootElem.GetBool("alphamask");
-    
+
     XMLElement passElem = rootElem.GetChild("pass");
     while (passElem)
     {
@@ -225,7 +226,7 @@ bool Technique::BeginLoad(Deserializer& source)
 
             if (passElem.HasAttribute("desktop"))
                 newPass->SetIsDesktop(passElem.GetBool("desktop"));
-            
+
             // Append global defines only when pass does not redefine the shader
             if (passElem.HasAttribute("vs"))
             {
@@ -247,20 +248,20 @@ bool Technique::BeginLoad(Deserializer& source)
                 newPass->SetPixelShader(globalPS);
                 newPass->SetPixelShaderDefines(globalPSDefines + passElem.GetAttribute("psdefines"));
             }
-            
+
             if (passElem.HasAttribute("lighting"))
             {
                 String lighting = passElem.GetAttributeLower("lighting");
                 newPass->SetLightingMode((PassLightingMode)GetStringListIndex(lighting.CString(), lightingModeNames,
                     LIGHTING_UNLIT));
             }
-            
+
             if (passElem.HasAttribute("blend"))
             {
                 String blend = passElem.GetAttributeLower("blend");
                 newPass->SetBlendMode((BlendMode)GetStringListIndex(blend.CString(), blendModeNames, BLEND_REPLACE));
             }
-            
+
             if (passElem.HasAttribute("depthtest"))
             {
                 String depthTest = passElem.GetAttributeLower("depthtest");
@@ -269,10 +270,10 @@ bool Technique::BeginLoad(Deserializer& source)
                 else
                     newPass->SetDepthTestMode((CompareMode)GetStringListIndex(depthTest.CString(), compareModeNames, CMP_LESS));
             }
-            
+
             if (passElem.HasAttribute("depthwrite"))
                 newPass->SetDepthWrite(passElem.GetBool("depthwrite"));
-            
+
             if (passElem.HasAttribute("alphamask"))
                 newPass->SetAlphaMask(passElem.GetBool("alphamask"));
             else
@@ -280,10 +281,10 @@ bool Technique::BeginLoad(Deserializer& source)
         }
         else
             LOGERROR("Missing pass name");
-        
+
         passElem = passElem.GetNext("pass");
     }
-    
+
     return true;
 }
 
@@ -307,15 +308,15 @@ Pass* Technique::CreatePass(const String& name)
     Pass* oldPass = GetPass(name);
     if (oldPass)
         return oldPass;
-    
+
     SharedPtr<Pass> newPass(new Pass(name));
     unsigned passIndex = newPass->GetIndex();
     if (passIndex >= passes_.Size())
         passes_.Resize(passIndex + 1);
     passes_[passIndex] = newPass;
-    
+
     // Calculate memory use now
-    SetMemoryUse(sizeof(Technique) + GetNumPasses() * sizeof(Pass));
+    SetMemoryUse((unsigned)(sizeof(Technique) + GetNumPasses() * sizeof(Pass)));
 
     return newPass;
 }
@@ -328,7 +329,7 @@ void Technique::RemovePass(const String& name)
     else if (i->second_ < passes_.Size() && passes_[i->second_].Get())
     {
         passes_[i->second_].Reset();
-        SetMemoryUse(sizeof(Technique) + GetNumPasses() * sizeof(Pass));
+        SetMemoryUse((unsigned)(sizeof(Technique) + GetNumPasses() * sizeof(Pass)));
     }
 }
 

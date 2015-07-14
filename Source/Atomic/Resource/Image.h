@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -151,22 +151,31 @@ public:
     Color GetPixelBilinear(float x, float y) const;
     /// Return a trilinearly sampled 3D pixel color. X, Y and Z have the range 0-1.
     Color GetPixelTrilinear(float x, float y, float z) const;
+
     /// Return width.
     int GetWidth() const { return width_; }
+
     /// Return height.
     int GetHeight() const { return height_; }
+
     /// Return depth.
     int GetDepth() const { return depth_; }
+
     /// Return number of color components.
     unsigned GetComponents() const { return components_; }
+
     /// Return pixel data.
     unsigned char* GetData() const { return data_; }
+
     /// Return whether is compressed.
     bool IsCompressed() const { return compressedFormat_ != CF_NONE; }
+
     /// Return compressed format.
     CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
+
     /// Return number of compressed mip levels.
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
+
     /// Return next mip level by bilinear filtering.
     SharedPtr<Image> GetNextLevel() const;
     /// Return image converted to 4-component (RGBA) to circumvent modern rendering API's not supporting e.g. the luminance-alpha format.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,8 @@ namespace Atomic
 {
 
 /// Decompress a DXT compressed image to RGBA.
-ATOMIC_API void DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, int depth, CompressedFormat format);
+ATOMIC_API void
+    DecompressImageDXT(unsigned char* dest, const void* blocks, int width, int height, int depth, CompressedFormat format);
 /// Decompress an ETC1 compressed image to RGBA.
 ATOMIC_API void DecompressImageETC(unsigned char* dest, const void* blocks, int width, int height);
 /// Decompress a PVRTC compressed image to RGBA.

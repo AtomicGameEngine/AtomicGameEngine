@@ -20,48 +20,42 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Audio/Audio.h"
-#include "../Engine/Console.h"
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Core/ProcessUtils.h"
+#include "../Core/Profiler.h"
+#include "../Core/WorkQueue.h"
+#include "../Engine/Console.h"
 #include "../Engine/DebugHud.h"
 #include "../Engine/Engine.h"
-#include "../IO/FileSystem.h"
 #include "../Graphics/Graphics.h"
+#include "../Graphics/Renderer.h"
+#include "../IO/FileSystem.h"
 #include "../Input/Input.h"
-#include "../Input/InputEvents.h"
 #include "../IO/Log.h"
+#include "../IO/PackageFile.h"
 #ifdef ATOMIC_NAVIGATION
 #include "../Navigation/NavigationMesh.h"
 #endif
 #ifdef ATOMIC_NETWORK
 #include "../Network/Network.h"
 #endif
-#include "../IO/PackageFile.h"
 #ifdef ATOMIC_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #endif
-#include "../Core/ProcessUtils.h"
-#include "../Core/Profiler.h"
-#include "../Graphics/Renderer.h"
+#include "../Resource/XMLFile.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../UI/UI.h"
 #ifdef ATOMIC_ATOMIC2D
 #include "../Atomic2D/Atomic2D.h"
 #endif
-#ifdef ATOMIC_3D
-#include "../Atomic3D/Atomic3D.h"
-#endif
 
-#ifdef ATOMIC_TBUI
-#include "../UI/UI.h"
-#endif
-#include "../Core/WorkQueue.h"
-#include "../Resource/XMLFile.h"
-
-#if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+#if defined(EMSCRIPTEN) && defined(ATOMIC_TESTING)
 #include <emscripten.h>
 #endif
 
@@ -94,15 +88,15 @@ Engine::Engine(Context* context) :
     timeStep_(0.0f),
     timeStepSmoothing_(2),
     minFps_(10),
-    #if defined(ANDROID) || defined(IOS) || defined(RPI)
+#if defined(ANDROID) || defined(IOS) || defined(RPI)
     maxFps_(60),
     maxInactiveFps_(10),
     pauseMinimized_(true),
-    #else
+#else
     maxFps_(200),
     maxInactiveFps_(60),
     pauseMinimized_(false),
-    #endif
+#endif
 #ifdef ATOMIC_TESTING
     timeOut_(0),
 #endif
@@ -118,17 +112,17 @@ Engine::Engine(Context* context) :
     // Create subsystems which do not depend on engine initialization or startup parameters
     context_->RegisterSubsystem(new Time(context_));
     context_->RegisterSubsystem(new WorkQueue(context_));
-    #ifdef ATOMIC_PROFILING
+#ifdef ATOMIC_PROFILING
     context_->RegisterSubsystem(new Profiler(context_));
-    #endif
+#endif
     context_->RegisterSubsystem(new FileSystem(context_));
-    #ifdef ATOMIC_LOGGING
+#ifdef ATOMIC_LOGGING
     context_->RegisterSubsystem(new Log(context_));
-    #endif
+#endif
     context_->RegisterSubsystem(new ResourceCache(context_));
-    #ifdef ATOMIC_NETWORK
+#ifdef ATOMIC_NETWORK
     context_->RegisterSubsystem(new Network(context_));
-    #endif
+#endif
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new Audio(context_));
 
@@ -142,7 +136,7 @@ Engine::Engine(Context* context) :
 #ifdef ATOMIC_PHYSICS
     RegisterPhysicsLibrary(context_);
 #endif
-    
+
 #ifdef ATOMIC_NAVIGATION
     RegisterNavigationLibrary(context_);
 #endif
@@ -169,6 +163,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     {
         context_->RegisterSubsystem(new Graphics(context_));
 #ifdef ATOMIC_3D
+        void RegisterAtomic3DLibrary(Context* context);
         RegisterAtomic3DLibrary(context_);
 #endif
         context_->RegisterSubsystem(new Renderer(context_));
@@ -178,6 +173,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         // Register graphics library objects explicitly in headless mode to allow them to work without using actual GPU resources
         RegisterGraphicsLibrary(context_);
 #ifdef ATOMIC_3D
+        void RegisterAtomic3DLibrary(Context* context);
         RegisterAtomic3DLibrary(context_);
 #endif
     }
@@ -218,7 +214,8 @@ bool Engine::Initialize(const VariantMap& parameters)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    String resourcePrefixPath = AddTrailingSlash(GetParameter(parameters, "ResourcePrefixPath", getenv("ATOMIC_PREFIX_PATH")).GetString());
+    String resourcePrefixPath =
+        AddTrailingSlash(GetParameter(parameters, "ResourcePrefixPath", getenv("ATOMIC_PREFIX_PATH")).GetString());
     if (resourcePrefixPath.Empty())
         resourcePrefixPath = fileSystem->GetProgramDir();
     else if (!IsAbsolutePath(resourcePrefixPath))
@@ -254,7 +251,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (!success)
         {
-            LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'", resourcePaths[i].CString());
+            LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
+                resourcePaths[i].CString());
             return false;
         }
     }
@@ -267,12 +265,15 @@ bool Engine::Initialize(const VariantMap& parameters)
         {
             if (!cache->AddPackageFile(packageName))
             {
-                LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'", resourcePackages[i].CString());
+                LOGERRORF("Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
+                    resourcePackages[i].CString());
                 return false;
             }
         }
         else
-            LOGDEBUGF("Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'", resourcePackages[i].CString());
+            LOGDEBUGF(
+                "Skip specified resource package '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
+                resourcePackages[i].CString());
     }
 
     // Add auto load folders. Prioritize these (if exist) before the default folders
@@ -296,7 +297,9 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoResourceDir = autoLoadPath + "/" + dir;
                 if (!cache->AddResourceDir(autoResourceDir, 0))
                 {
-                    LOGERRORF("Failed to add resource directory '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'", dir.CString(), autoLoadPaths[i].CString());
+                    LOGERRORF(
+                        "Failed to add resource directory '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'",
+                        dir.CString(), autoLoadPaths[i].CString());
                     return false;
                 }
             }
@@ -313,13 +316,17 @@ bool Engine::Initialize(const VariantMap& parameters)
                 String autoPackageName = autoLoadPath + "/" + pak;
                 if (!cache->AddPackageFile(autoPackageName, 0))
                 {
-                    LOGERRORF("Failed to add package file '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'", pak.CString(), autoLoadPaths[i].CString());
+                    LOGERRORF(
+                        "Failed to add package file '%s' in autoload path %s, check the documentation on how to set the 'resource prefix path'",
+                        pak.CString(), autoLoadPaths[i].CString());
                     return false;
                 }
             }
         }
         else
-            LOGDEBUGF("Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'", autoLoadPaths[i].CString());
+            LOGDEBUGF(
+                "Skipped autoload path '%s' as it does not exist, check the documentation on how to set the 'resource prefix path'",
+                autoLoadPaths[i].CString());
     }
 
     // Initialize graphics & audio output
@@ -336,12 +343,13 @@ bool Engine::Initialize(const VariantMap& parameters)
         graphics->SetOrientations(GetParameter(parameters, "Orientations", "LandscapeLeft LandscapeRight").GetString());
 
         if (HasParameter(parameters, "WindowPositionX") && HasParameter(parameters, "WindowPositionY"))
-            graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(), GetParameter(parameters, "WindowPositionY").GetInt());
+            graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(),
+                GetParameter(parameters, "WindowPositionY").GetInt());
 
-        #ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
         if (HasParameter(parameters, "ForceGL2"))
             graphics->SetForceGL2(GetParameter(parameters, "ForceGL2").GetBool());
-        #endif
+#endif
 
         if (!graphics->SetMode(
             GetParameter(parameters, "WindowWidth", 0).GetInt(),
@@ -357,26 +365,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 
         if (HasParameter(parameters, "DumpShaders"))
             graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
-
-        //TODO: make this a preference
-        bool useDeferred = false;
-
-#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_WINDOWS)
-        useDeferred = graphics->GetDeferredSupport();
-#endif
-        if (useDeferred)
-        {
-            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>("RenderPaths/Deferred.xml"));
-        }
-        else
-        {
-            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>("RenderPaths/Forward.xml"));
-        }
-
-        /*
         if (HasParameter(parameters, "RenderPath"))
             renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
-        */
 
         renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
         if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
@@ -404,20 +394,20 @@ bool Engine::Initialize(const VariantMap& parameters)
     if (HasParameter(parameters, "TouchEmulation"))
         GetSubsystem<Input>()->SetTouchEmulation(GetParameter(parameters, "TouchEmulation").GetBool());
 
-    #ifdef ATOMIC_TESTING
+#ifdef ATOMIC_TESTING
     if (HasParameter(parameters, "TimeOut"))
         timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
-    #endif
+#endif
 
     // In debug mode, check now that all factory created objects can be created without crashing
-    #ifdef _DEBUG
+#ifdef _DEBUG
     if (!resourcePaths.Empty())
     {
         const HashMap<StringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
         for (HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
             SharedPtr<Object> object = i->second_->CreateObject();
     }
-    #endif
+#endif
 
     frameTimer_.Reset();
 
@@ -499,7 +489,7 @@ DebugHud* Engine::CreateDebugHud()
     if (headless_ || !initialized_)
         return 0;
 
-     // Return existing debug HUD if possible
+    // Return existing debug HUD if possible
     DebugHud* debugHud = GetSubsystem<DebugHud>();
     if (!debugHud)
     {
@@ -513,22 +503,22 @@ DebugHud* Engine::CreateDebugHud()
 
 void Engine::SetTimeStepSmoothing(int frames)
 {
-    timeStepSmoothing_ = Clamp(frames, 1, 20);
+    timeStepSmoothing_ = (unsigned)Clamp(frames, 1, 20);
 }
 
 void Engine::SetMinFps(int fps)
 {
-    minFps_ = Max(fps, 0);
+    minFps_ = (unsigned)Max(fps, 0);
 }
 
 void Engine::SetMaxFps(int fps)
 {
-    maxFps_ = Max(fps, 0);
+    maxFps_ = (unsigned)Max(fps, 0);
 }
 
 void Engine::SetMaxInactiveFps(int fps)
 {
-    maxInactiveFps_ = Max(fps, 0);
+    maxInactiveFps_ = (unsigned)Max(fps, 0);
 }
 
 void Engine::SetPauseMinimized(bool enable)
@@ -568,24 +558,24 @@ void Engine::DumpProfiler()
 
 void Engine::DumpResources(bool dumpFileName)
 {
-    #ifdef ATOMIC_LOGGING
+#ifdef ATOMIC_LOGGING
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
-    
+
     if (dumpFileName)
     {
         LOGRAW("Used resources:\n");
     }
-    
+
     for (HashMap<StringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
-        i != resourceGroups.End(); ++i)
+         i != resourceGroups.End(); ++i)
     {
         const HashMap<StringHash, SharedPtr<Resource> >& resources = i->second_.resources_;
         if (dumpFileName)
         {
             for (HashMap<StringHash, SharedPtr<Resource> >::ConstIterator j = resources.Begin();
-                j != resources.End(); ++j)
+                 j != resources.End(); ++j)
             {
                 LOGRAW(j->second_->GetName() + "\n");
             }
@@ -599,7 +589,7 @@ void Engine::DumpResources(bool dumpFileName)
             if (num)
             {
                 LOGRAW("Resource type " + resources.Begin()->second_->GetTypeName() +
-                    ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
+                       ": count " + String(num) + " memory use " + String(memoryUse) + "\n");
             }
         }
     }
@@ -608,13 +598,13 @@ void Engine::DumpResources(bool dumpFileName)
     {
         LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
     }
-    #endif
+#endif
 }
 
 void Engine::DumpMemory()
 {
-    #ifdef ATOMIC_LOGGING
-    #if defined(_MSC_VER) && defined(_DEBUG)
+#ifdef ATOMIC_LOGGING
+#if defined(_MSC_VER) && defined(_DEBUG)
     _CrtMemState state;
     _CrtMemCheckpoint(&state);
     _CrtMemBlockHeader* block = state.pBlockHeader;
@@ -645,10 +635,10 @@ void Engine::DumpMemory()
     }
 
     LOGRAW("Total allocated memory " + String(total) + " bytes in " + String(blocks) + " blocks\n\n");
-    #else
+#else
     LOGRAW("DumpMemory() supported on MSVC debug mode only\n\n");
-    #endif
-    #endif
+#endif
+#endif
 }
 
 void Engine::Update()
@@ -728,14 +718,14 @@ void Engine::ApplyFrameLimit()
     }
 
     elapsed = frameTimer_.GetUSec(true);
-    #ifdef ATOMIC_TESTING
+#ifdef ATOMIC_TESTING
     if (timeOut_ > 0)
     {
         timeOut_ -= elapsed;
         if (timeOut_ <= 0)
             Exit();
     }
-    #endif
+#endif
 
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)
@@ -818,8 +808,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LogQuiet"] = true;
             else if (argument == "log" && !value.Empty())
             {
-                int logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, -1);
-                if (logLevel != -1)
+                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, M_MAX_UNSIGNED);
+                if (logLevel != M_MAX_UNSIGNED)
                 {
                     ret["LogLevel"] = logLevel;
                     ++i;
@@ -898,13 +888,13 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             }
             else if (argument == "touch")
                 ret["TouchEmulation"] = true;
-            #ifdef ATOMIC_TESTING
+#ifdef ATOMIC_TESTING
             else if (argument == "timeout" && !value.Empty())
             {
                 ret["TimeOut"] = ToInt(value);
                 ++i;
             }
-            #endif
+#endif
         }
     }
 
@@ -941,9 +931,9 @@ void Engine::DoExit()
         graphics->Close();
 
     exiting_ = true;
-    #if defined(EMSCRIPTEN) && defined(URHO3D_TESTING)
+#if defined(EMSCRIPTEN) && defined(ATOMIC_TESTING)
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
-    #endif
+#endif
 }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ struct StoredLogMessage
     StoredLogMessage()
     {
     }
-    
+
     /// Construct with parameters.
     StoredLogMessage(const String& message, int level, bool error) :
         message_(message),
@@ -60,7 +60,7 @@ struct StoredLogMessage
         error_(error)
     {
     }
-    
+
     /// Message text.
     String message_;
     /// Message level. -1 for raw messages.
@@ -93,10 +93,13 @@ public:
 
     /// Return logging level.
     int GetLevel() const { return level_; }
+
     /// Return whether log messages are timestamped.
     bool GetTimeStamp() const { return timeStamp_; }
+
     /// Return last log message.
     String GetLastMessage() const { return lastMessage_; }
+
     /// Return whether log is in quiet mode (only errors printed to standard error stream).
     bool IsQuiet() const { return quiet_; }
 
@@ -108,7 +111,7 @@ public:
 private:
     /// Handle end of frame. Process the threaded log messages.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
-    
+
     /// Mutex for threaded operation.
     Mutex logMutex_;
     /// Log messages from other threads.
@@ -139,15 +142,16 @@ private:
 #define LOGERRORF(format, ...) Atomic::Log::Write(Atomic::LOG_ERROR, Atomic::ToString(format, ##__VA_ARGS__))
 #define LOGRAWF(format, ...) Atomic::Log::WriteRaw(Atomic::ToString(format, ##__VA_ARGS__))
 #else
-#define LOGDEBUG(message)
-#define LOGINFO(message)
-#define LOGWARNING(message)
-#define LOGERROR(message)
-#define LOGRAW(message)
-#define LOGDEBUGF(...)
-#define LOGINFOF(...)
-#define LOGWARNINGF(...)
-#define LOGERRORF(...)
-#define LOGRAWF(...)
+#define LOGDEBUG(message) ((void)0)
+#define LOGINFO(message) ((void)0)
+#define LOGWARNING(message) ((void)0)
+#define LOGERROR(message) ((void)0)
+#define LOGRAW(message) ((void)0)
+#define LOGDEBUGF(...) ((void)0)
+#define LOGINFOF(...) ((void)0)
+#define LOGWARNINGF(...) ((void)0)
+#define LOGERRORF(...) ((void)0)
+#define LOGRAWF(...) ((void)0)
 #endif
+
 }

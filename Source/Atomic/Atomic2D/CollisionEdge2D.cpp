@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Atomic2D/CollisionEdge2D.h"
 #include "../Atomic2D/PhysicsUtils2D.h"
@@ -38,7 +39,6 @@ CollisionEdge2D::CollisionEdge2D(Context* context) :
     CollisionShape2D(context),
     vertex1_(DEFAULT_VERTEX1),
     vertex2_(DEFAULT_VERTEX2)
-
 {
     Vector2 worldScale(cachedWorldScale_.x_, cachedWorldScale_.y_);
     edgeShape_.Set(ToB2Vec2(vertex1_ * worldScale), ToB2Vec2(vertex2_ * worldScale));

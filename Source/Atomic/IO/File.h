@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,12 @@
 #pragma once
 
 #include "../Container/ArrayPtr.h"
+#include "../Core/Object.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Serializer.h"
-#include "../Core/Object.h"
 
 #ifdef ANDROID
-#include <SDL/include/SDL_rwops.h>
+#include <SDL/SDL_rwops.h>
 #endif
 
 namespace Atomic
@@ -48,7 +48,7 @@ class PackageFile;
 class ATOMIC_API File : public Object, public Deserializer, public Serializer
 {
     OBJECT(File);
-    
+
 public:
     /// Construct.
     File(Context* context);
@@ -58,7 +58,7 @@ public:
     File(Context* context, PackageFile* package, const String& fileName);
     /// Destruct. Close the file if open.
     virtual ~File();
-    
+
     /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
     /// Reads a text file, ensuring data from file is 0 terminated
@@ -67,11 +67,13 @@ public:
     virtual unsigned Seek(unsigned position);
     /// Write bytes to the file. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size);
+
     /// Return the file name.
     virtual const String& GetName() const { return fileName_; }
+
     /// Return a checksum of the file contents using the SDBM hash algorithm.
     virtual unsigned GetChecksum();
-    
+
     /// Open a filesystem file. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);
     /// Open from within a package file. Return true if successful.
@@ -85,17 +87,22 @@ public:
     /// Set the fullpath to the file
     void SetFullPath(const String& path) { fullPath_ = path; }
     
+
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
+
     /// Return whether is open.
     bool IsOpen() const;
+
     /// Return the file handle.
     void* GetHandle() const { return handle_; }
+
     /// Return whether the file originates from a package.
     bool IsPackaged() const { return offset_ != 0; }
     /// Return the fullpath to the file
     const String& GetFullPath() const { return fullPath_; }
     
+
 private:
     /// File name.
     String fileName_;
@@ -107,10 +114,10 @@ private:
     FileMode mode_;
     /// File handle.
     void* handle_;
-    #ifdef ANDROID
+#ifdef ANDROID
     /// SDL RWops context for Android asset loading.
     SDL_RWops* assetHandle_;
-    #endif
+#endif
     /// Read buffer for Android asset or compressed file loading.
     SharedArrayPtr<unsigned char> readBuffer_;
     /// Decompression input buffer for compressed file loading.
@@ -129,7 +136,6 @@ private:
     bool readSyncNeeded_;
     /// Synchronization needed before write -flag.
     bool writeSyncNeeded_;
-
 };
 
 }

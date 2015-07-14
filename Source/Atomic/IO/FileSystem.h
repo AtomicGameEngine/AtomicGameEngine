@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,13 +42,13 @@ static const unsigned SCAN_HIDDEN = 0x4;
 class ATOMIC_API FileSystem : public Object
 {
     OBJECT(FileSystem);
-    
+
 public:
     /// Construct.
     FileSystem(Context* context);
     /// Destruct.
     ~FileSystem();
-    
+
     /// Set the current working directory.
     bool SetCurrentDir(const String& pathName);
     /// Create a directory.
@@ -75,13 +75,16 @@ public:
     void RegisterPath(const String& pathName);
     /// Set a file's last modified time as seconds since 1.1.1970. Return true on success.
     bool SetLastModifiedTime(const String& fileName, unsigned newTime);
-    
+
     /// Return the absolute current working directory.
     String GetCurrentDir() const;
+
     /// Return whether is executing engine console commands as OS-specific system command.
     bool GetExecuteConsoleCommands() const { return executeConsoleCommands_; }
+
     /// Return whether paths have been registered.
     bool HasRegisteredPaths() const { return allowedPaths_.Size() > 0; }
+
     /// Check if a path is allowed to be accessed. If no paths are registered, all are allowed.
     bool CheckAccess(const String& pathName) const;
     /// Returns the file's last modified time as seconds since 1.1.1970, or 0 if can not be accessed.
@@ -111,12 +114,13 @@ public:
     
 private:
     /// Scan directory, called internally.
-    void ScanDirInternal(Vector<String>& result, String path, const String& startPath, const String& filter, unsigned flags, bool recursive) const;
+    void ScanDirInternal
+        (Vector<String>& result, String path, const String& startPath, const String& filter, unsigned flags, bool recursive) const;
     /// Handle begin frame event to check for completed async executions.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle a console command event.
     void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
-    
+
     /// Allowed directories.
     HashSet<String> allowedPaths_;
     /// Cached program directory.
@@ -130,7 +134,8 @@ private:
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.
-ATOMIC_API void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
+ATOMIC_API void
+    SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
 /// Return the path from a full path.
 ATOMIC_API String GetPath(const String& fullPath);
 /// Return the filename from a full path.
@@ -157,6 +162,5 @@ ATOMIC_API WString GetWideNativePath(const String& pathName);
 ATOMIC_API bool IsAbsolutePath(const String& pathName);
 /// Return whether a path or file is child of another path (both must be absolute)
 ATOMIC_API bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath);
-
 
 }

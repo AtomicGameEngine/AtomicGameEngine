@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../../Math/Color.h"
 
 #include <d3d9.h>
-#include <SDL/include/SDL.h>
+#include <SDL/SDL.h>
 
 namespace Atomic
 {
@@ -34,22 +34,26 @@ namespace Atomic
 class ATOMIC_API GraphicsImpl
 {
     friend class Graphics;
-    
+
 public:
     /// Construct.
     GraphicsImpl();
-    
+
     /// Return Direct3D device.
     IDirect3DDevice9* GetDevice() const { return device_; }
+
     /// Return device capabilities.
     const D3DCAPS9& GetDeviceCaps() const { return deviceCaps_; }
+
     /// Return window.
     SDL_Window* GetWindow() const { return window_; }
+
     /// Return adapter identifier.
     const D3DADAPTER_IDENTIFIER9& GetAdapterIdentifier() const { return adapterIdentifier_; }
+
     /// Return whether a texture format and usage is supported.
     bool CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
-    
+
 private:
     /// SDL window.
     SDL_Window* window_;

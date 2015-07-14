@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ATOMIC_API ConstraintRope2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintRope2D(Context* scontext);
+    ConstraintRope2D(Context* context);
     /// Destruct.
     virtual ~ConstraintRope2D();
     /// Register object factory.
@@ -49,8 +49,10 @@ public:
 
     /// Return owner body anchor.
     const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
+
     /// Return other body anchor.
     const Vector2& GetOtherBodyAnchor() const { return otherBodyAnchor_; }
+
     /// Return max length.
     float GetMaxLength() const { return jointDef_.maxLength; }
 

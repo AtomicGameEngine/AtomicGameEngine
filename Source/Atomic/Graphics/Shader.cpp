@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
-#include "../IO/Deserializer.h"
-#include "../IO/FileSystem.h"
 #include "../Graphics/Graphics.h"
-#include "../IO/Log.h"
-#include "../Core/Profiler.h"
-#include "../Resource/ResourceCache.h"
 #include "../Graphics/Shader.h"
 #include "../Graphics/ShaderVariation.h"
-#include "../Container/Sort.h"
-#include "../Resource/XMLFile.h"
+#include "../IO/Deserializer.h"
+#include "../IO/FileSystem.h"
+#include "../IO/Log.h"
+#include "../Resource/ResourceCache.h"
 
 #include "../DebugNew.h"
 
@@ -44,9 +42,9 @@ void CommentOutFunction(String& code, const String& signature)
     unsigned braceLevel = 0;
     if (startPos == String::NPOS)
         return;
-    
+
     code.Insert(startPos, "/*");
-    
+
     for (unsigned i = startPos + 2 + signature.Length(); i < code.Length(); ++i)
     {
         if (code[i] == '{')
@@ -87,26 +85,26 @@ bool Shader::BeginLoad(Deserializer& source)
     Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return false;
-    
+
     // Load the shader source code and resolve any includes
     timeStamp_ = 0;
     String shaderCode;
     if (!ProcessSource(shaderCode, source))
         return false;
-    
+
     // Comment out the unneeded shader function
     vsSourceCode_ = shaderCode;
     psSourceCode_ = shaderCode;
     CommentOutFunction(vsSourceCode_, "void PS(");
     CommentOutFunction(psSourceCode_, "void VS(");
-    
+
     // OpenGL: rename either VS() or PS() to main(), comment out vertex attributes in pixel shaders
-    #ifdef ATOMIC_OPENGL
+#ifdef ATOMIC_OPENGL
     vsSourceCode_.Replace("void VS(", "void main(");
     psSourceCode_.Replace("void PS(", "void main(");
     psSourceCode_.Replace("attribute ", "// attribute ");
-    #endif
-    
+#endif
+
     RefreshMemoryUse();
     return true;
 }
@@ -118,7 +116,7 @@ bool Shader::EndLoad()
         i->second_->Release();
     for (HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = psVariations_.Begin(); i != psVariations_.End(); ++i)
         i->second_->Release();
-    
+
     return true;
 }
 
@@ -130,7 +128,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const String& defines)
 ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
 {
     StringHash definesHash(defines);
-    HashMap<StringHash, SharedPtr<ShaderVariation> > & variations(type == VS ? vsVariations_ : psVariations_);
+    HashMap<StringHash, SharedPtr<ShaderVariation> >& variations(type == VS ? vsVariations_ : psVariations_);
     HashMap<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations.Find(definesHash);
     if (i == variations.End())
     {
@@ -138,7 +136,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
         // so that further queries are faster
         String normalizedDefines = NormalizeDefines(defines);
         StringHash normalizedHash(normalizedDefines);
-        
+
         i = variations.Find(normalizedHash);
         if (i != variations.End())
             variations.Insert(MakePair(definesHash, i->second_));
@@ -162,7 +160,7 @@ ShaderVariation* Shader::GetVariation(ShaderType type, const char* defines)
 bool Shader::ProcessSource(String& code, Deserializer& source)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
+
     // If the source if a non-packaged file, store the timestamp
     File* file = dynamic_cast<File*>(&source);
     if (file && !file->IsPackaged())
@@ -173,23 +171,23 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
         if (fileTimeStamp > timeStamp_)
             timeStamp_ = fileTimeStamp;
     }
-    
+
     // Store resource dependencies for includes so that we know to reload if any of them changes
     if (source.GetName() != GetName())
         cache->StoreResourceDependency(this, source.GetName());
-    
+
     while (!source.IsEof())
     {
         String line = source.ReadLine();
-        
+
         if (line.StartsWith("#include"))
         {
             String includeFileName = GetPath(source.GetName()) + line.Substring(9).Replaced("\"", "").Trimmed();
-            
+
             SharedPtr<File> includeFile = cache->GetFile(includeFileName);
             if (!includeFile)
                 return false;
-            
+
             // Add the include file into the current code recursively
             if (!ProcessSource(code, *includeFile))
                 return false;
@@ -203,7 +201,7 @@ bool Shader::ProcessSource(String& code, Deserializer& source)
 
     // Finally insert an empty line to mark the space between files
     code += "\n";
-    
+
     return true;
 }
 
@@ -216,7 +214,8 @@ String Shader::NormalizeDefines(const String& defines)
 
 void Shader::RefreshMemoryUse()
 {
-    SetMemoryUse(sizeof(Shader) + vsSourceCode_.Length() + psSourceCode_.Length() + numVariations_ * sizeof(ShaderVariation));
+    SetMemoryUse(
+        (unsigned)(sizeof(Shader) + vsSourceCode_.Length() + psSourceCode_.Length() + numVariations_ * sizeof(ShaderVariation)));
 }
 
 }

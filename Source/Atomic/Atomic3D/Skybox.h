@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Atomic
 class ATOMIC_API Skybox : public StaticModel
 {
     OBJECT(Skybox);
-    
+
 public:
     /// Construct.
     Skybox(Context* context);
@@ -39,16 +39,16 @@ public:
     virtual ~Skybox();
     /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
-    
+
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
-    
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    
+
     /// Custom world transform per camera.
     HashMap<Camera*, Matrix3x4> customWorldTransforms_;
     /// Last frame counter for knowing when to erase the custom world transforms of previous frame.

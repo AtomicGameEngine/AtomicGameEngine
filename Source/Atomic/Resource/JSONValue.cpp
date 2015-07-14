@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Resource/JSONFile.h"
@@ -67,7 +68,7 @@ JSONValue::~JSONValue()
 {
 }
 
-JSONValue& JSONValue::operator = (const JSONValue& rhs)
+JSONValue& JSONValue::operator =(const JSONValue& rhs)
 {
     file_ = rhs.file_;
     value_ = rhs.value_;
@@ -406,7 +407,7 @@ bool JSONValue::GetBuffer(const String& name, void* dest, unsigned size) const
         return false;
 
     for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = ToInt(bytes[i]);
+        destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
 }
 
@@ -537,6 +538,13 @@ void JSONValue::AddFloat(float value)
 {
     Value jsonValue;
     jsonValue.SetDouble((double)value);
+    AddMember(jsonValue);
+}
+
+void JSONValue::AddDouble(double value)
+{
+    Value jsonValue;
+    jsonValue.SetDouble(value);
     AddMember(jsonValue);
 }
 
@@ -698,6 +706,11 @@ float JSONValue::GetFloat(unsigned index) const
     return (float)GetMember(index).GetDouble();
 }
 
+double JSONValue::GetDouble(unsigned index) const
+{
+    return GetMember(index).GetDouble();
+}
+
 Vector2 JSONValue::GetVector2(unsigned index) const
 {
     return ToVector2(GetCString(index));
@@ -753,7 +766,7 @@ bool JSONValue::GetBuffer(unsigned index, void* dest, unsigned size) const
         return false;
 
     for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = ToInt(bytes[i]);
+        destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
 }
 

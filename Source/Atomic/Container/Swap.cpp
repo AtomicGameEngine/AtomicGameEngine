@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,29 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Container/HashBase.h"
+#include "../Precompiled.h"
+
 #include "../Container/ListBase.h"
-#include "../Container/Str.h"
-#include "../Container/VectorBase.h"
 
 namespace Atomic
 {
 
-template<> void Swap<String>(String& first, String& second)
+template <> void Swap<String>(String& first, String& second)
 {
     first.Swap(second);
 }
 
-template<> void Swap<VectorBase>(VectorBase& first, VectorBase& second)
+template <> void Swap<VectorBase>(VectorBase& first, VectorBase& second)
 {
     first.Swap(second);
 }
 
-template<> void Swap<ListBase>(ListBase& first, ListBase& second)
+template <> void Swap<ListBase>(ListBase& first, ListBase& second)
 {
     first.Swap(second);
 }
 
-template<> void Swap<HashBase>(HashBase& first, HashBase& second)
+template <> void Swap<HashBase>(HashBase& first, HashBase& second)
 {
     first.Swap(second);
 }

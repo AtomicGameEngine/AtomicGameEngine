@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-
 #if defined(_MSC_VER) && defined(ATOMIC_MINIDUMPS)
+
+#include "../Precompiled.h"
 
 #include "../Core/ProcessUtils.h"
 
@@ -84,4 +84,5 @@ ATOMIC_API int WriteMiniDump(const char* applicationName, void* exceptionPointer
 }
 
 }
+
 #endif

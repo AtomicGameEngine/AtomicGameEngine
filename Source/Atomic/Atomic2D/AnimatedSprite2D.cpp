@@ -20,16 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../Atomic2D/AnimatedSprite2D.h"
-#include "../Atomic2D/Animation2D.h"
 #include "../Atomic2D/AnimationSet2D.h"
 #include "../Atomic2D/Sprite2D.h"
-#include "../Atomic2D/StaticSprite2D.h"
 
 #include "../DebugNew.h"
 
@@ -68,7 +68,8 @@ void AnimatedSprite2D::RegisterObject(Context* context)
     COPY_BASE_ATTRIBUTES(StaticSprite2D);
     REMOVE_ATTRIBUTE("Sprite");
     ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef, ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
+        ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
     ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
 }
@@ -174,26 +175,19 @@ ResourceRef AnimatedSprite2D::GetAnimationSetAttr() const
     return GetResourceRef(animationSet_, AnimationSet2D::GetTypeStatic());
 }
 
-void AnimatedSprite2D::OnNodeSet(Node* node)
+void AnimatedSprite2D::OnSceneSet(Scene* scene)
 {
-    StaticSprite2D::OnNodeSet(node);
+    StaticSprite2D::OnSceneSet(scene);
 
-    if (node)
+    if (scene)
     {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
+        if (scene == node_)
+            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+        if (IsEnabledEffective())
             SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
     }
     else
-    {
-        if (rootNode_)
-            rootNode_->Remove();
-
-        rootNode_ = 0;
-        numTracks_ = 0;
-        trackNodes_.Clear();
-        trackNodeInfos_.Clear();
-    }
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 void AnimatedSprite2D::SetAnimationAttr(const String& name)
@@ -304,7 +298,7 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
         {
             // Enable track node
             trackNode->SetEnabled(true);
-            
+
             // Get StaticSprite2D component
             if (track.hasSprite_)
                 staticSprite = trackNode->GetComponent<StaticSprite2D>();
@@ -364,7 +358,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     for (unsigned i = 0; i < numTracks_; ++i)
     {
         trackNodeInfos_[i].worldSpace = false;
-        
+
         const AnimationTrack2D& track = animation_->GetTrack(i);
         const Vector<AnimationKeyFrame2D>& keyFrames = track.keyFrames_;
 
@@ -392,7 +386,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
             if (index < keyFrames.Size() - 1)
             {
                 const AnimationKeyFrame2D& nextKey = keyFrames[index + 1];
-                float t = (time - currKey.time_)  / (nextKey.time_ - currKey.time_);
+                float t = (time - currKey.time_) / (nextKey.time_ - currKey.time_);
                 value.transform_ = currKey.transform_.Lerp(nextKey.transform_, t, currKey.spin_);
 
                 if (trackNodeInfos_[i].hasSprite)
@@ -463,7 +457,7 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
     }
 }
 
-void AnimatedSprite2D::CalculateTimelineWorldTransform(unsigned index)
+void AnimatedSprite2D::CalculateTimelineWorldTransform(int index)
 {
     TrackNodeInfo& info = trackNodeInfos_[index];
     if (info.worldSpace)

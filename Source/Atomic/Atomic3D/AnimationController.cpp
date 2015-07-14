@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Atomic3D/AnimatedModel.h"
 #include "../Atomic3D/Animation.h"
 #include "../Atomic3D/AnimationController.h"
 #include "../Atomic3D/AnimationState.h"
-#include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#include "../Core/Profiler.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
@@ -64,11 +65,15 @@ void AnimationController::RegisterObject(Context* context)
     context->RegisterFactory<AnimationController>(LOGIC_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, Variant::emptyVariantVector,
+        AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE("Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>,
+        Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector,
+        Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
 
     ACCESSOR_ATTRIBUTE("Animation Resources", GetAnimationResourcesAttr, SetAnimationResourcesAttr, ResourceRefList, ResourceRefList(Animation::GetTypeStatic()), AM_FILE | AM_NOEDIT);
+
 }
 
 void AnimationController::OnSetEnabled()
@@ -427,13 +432,24 @@ bool AnimationController::IsFadingOut(const String& name) const
         return false;
 
     return (animations_[index].fadeTime_ && animations_[index].targetWeight_ < state->GetWeight())
-        || (!state->IsLooped() && state->GetTime() >= state->GetLength() && animations_[index].autoFadeTime_);
+           || (!state->IsLooped() && state->GetTime() >= state->GetLength() && animations_[index].autoFadeTime_);
+}
+
+bool AnimationController::IsAtEnd(const String& name) const
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED || !state)
+        return false;
+    else
+        return state->GetTime() >= state->GetLength();
 }
 
 unsigned char AnimationController::GetLayer(const String& name) const
 {
     AnimationState* state = GetAnimationState(name);
-    return state ? state->GetLayer() : 0;
+    return (unsigned char)(state ? state->GetLayer() : 0);
 }
 
 Bone* AnimationController::GetStartBone(const String& name) const
@@ -764,14 +780,12 @@ VariantVector AnimationController::GetNodeAnimationStatesAttr() const
     return ret;
 }
 
-void AnimationController::OnNodeSet(Node* node)
+void AnimationController::OnSceneSet(Scene* scene)
 {
-    if (node)
-    {
-        Scene* scene = GetScene();
-        if (scene && IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
-    }
+    if (scene && IsEnabledEffective())
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
+    else if (!scene)
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
 AnimationState* AnimationController::AddAnimationState(Animation* animation)

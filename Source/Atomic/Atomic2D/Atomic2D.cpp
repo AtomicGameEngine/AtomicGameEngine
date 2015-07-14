@@ -1,5 +1,4 @@
-
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +19,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
 #include "../Atomic2D/AnimatedSprite2D.h"
 #include "../Atomic2D/AnimationSet2D.h"
 #include "../Atomic2D/CollisionBox2D.h"
@@ -28,7 +29,6 @@
 #include "../Atomic2D/CollisionCircle2D.h"
 #include "../Atomic2D/CollisionEdge2D.h"
 #include "../Atomic2D/CollisionPolygon2D.h"
-#include "../Atomic2D/CollisionShape2D.h"
 #include "../Atomic2D/Constraint2D.h"
 #include "../Atomic2D/ConstraintDistance2D.h"
 #include "../Atomic2D/ConstraintFriction2D.h"
@@ -41,8 +41,6 @@
 #include "../Atomic2D/ConstraintRope2D.h"
 #include "../Atomic2D/ConstraintWeld2D.h"
 #include "../Atomic2D/ConstraintWheel2D.h"
-#include "../Core/Context.h"
-#include "../Atomic2D/Drawable2D.h"
 #include "../Atomic2D/ParticleEffect2D.h"
 #include "../Atomic2D/ParticleEmitter2D.h"
 #include "../Atomic2D/PhysicsWorld2D.h"
@@ -50,7 +48,6 @@
 #include "../Atomic2D/RigidBody2D.h"
 #include "../Atomic2D/Sprite2D.h"
 #include "../Atomic2D/SpriteSheet2D.h"
-#include "../Atomic2D/StaticSprite2D.h"
 #include "../Atomic2D/TileMap2D.h"
 #include "../Atomic2D/TileMapLayer2D.h"
 #include "../Atomic2D/TmxFile2D.h"
@@ -70,7 +67,7 @@ void RegisterAtomic2DLibrary(Context* context)
 
     Sprite2D::RegisterObject(context);
     SpriteSheet2D::RegisterObject(context);
-    
+
     // Must register objects from base to derived order
     Drawable2D::RegisterObject(context);
     StaticSprite2D::RegisterObject(context);
@@ -113,7 +110,6 @@ void RegisterAtomic2DLibrary(Context* context)
     DirectionalLight2D::RegisterObject(context);
     PositionalLight2D::RegisterObject(context);
     PointLight2D::RegisterObject(context);
-
 
 }
 

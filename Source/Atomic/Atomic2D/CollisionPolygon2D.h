@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ATOMIC_API CollisionPolygon2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionPolygon2D(Context* scontext);
+    CollisionPolygon2D(Context* context);
     /// Destruct.
     virtual ~CollisionPolygon2D();
     /// Register object factory.
@@ -49,8 +49,10 @@ public:
 
     /// Return vertex count.
     unsigned GetVertexCount() const { return vertices_.Size(); }
+
     /// Return vertex.
     const Vector2& GetVertex(unsigned index) const { return (index < vertices_.Size()) ? vertices_[index] : Vector2::ZERO; }
+
     /// Return vertices.
     const PODVector<Vector2>& GetVertices() const { return vertices_; }
 

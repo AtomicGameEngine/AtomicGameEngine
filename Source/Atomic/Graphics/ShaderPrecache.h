@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,16 +36,16 @@ class ShaderVariation;
 class ATOMIC_API ShaderPrecache : public Object
 {
     OBJECT(ShaderPrecache);
-    
+
 public:
     /// Construct and begin collecting shader combinations. Load existing combinations from XML if the file exists.
     ShaderPrecache(Context* context, const String& fileName);
     /// Destruct. Write the collected shaders to XML.
     ~ShaderPrecache();
-    
+
     /// Collect a shader combination. Called by Graphics when shaders have been set.
     void StoreShaders(ShaderVariation* vs, ShaderVariation* ps);
-    
+
     /// Load shaders from an XML file.
     static void LoadShaders(Graphics* graphics, Deserializer& source);
 

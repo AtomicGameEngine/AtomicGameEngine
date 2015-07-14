@@ -20,27 +20,27 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
+#include "../Core/Context.h"
+#include "../Core/Profiler.h"
 #include "../Atomic3D/AnimatedModel.h"
 #include "../Atomic3D/Animation.h"
 #include "../Atomic3D/AnimationState.h"
 #include "../Graphics/Batch.h"
 #include "../Graphics/Camera.h"
-#include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/DrawableEvents.h"
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"
-#include "../IO/Log.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Octree.h"
-#include "../Core/Profiler.h"
+#include "../Graphics/VertexBuffer.h"
+#include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
 #include "../Scene/Scene.h"
-#include "../Container/Sort.h"
-#include "../Graphics/VertexBuffer.h"
 
 #include "../DebugNew.h"
 
@@ -95,7 +95,8 @@ void AnimatedModel::RegisterObject(Context* context)
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+        AM_DEFAULT);
     ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
@@ -105,9 +106,12 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     COPY_BASE_ATTRIBUTES(Drawable);
-    MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_DEFAULT | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
+        Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+    MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector,
+        Variant::emptyVariantVector, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+        AM_DEFAULT | AM_NOEDIT);
 }
 
 bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
@@ -335,7 +339,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
             newMorph.nameHash_ = morphs[i].nameHash_;
             newMorph.weight_ = 0.0f;
             newMorph.buffers_ = morphs[i].buffers_;
-            for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin(); j != morphs[i].buffers_.End(); ++j)
+            for (HashMap<unsigned, VertexBufferMorph>::ConstIterator j = morphs[i].buffers_.Begin();
+                 j != morphs[i].buffers_.End(); ++j)
                 morphElementMask_ |= j->second_.elementMask_;
             morphs_.Push(newMorph);
         }
@@ -666,7 +671,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             for (unsigned i = 0; i < destBones.Size(); ++i)
             {
                 if (destBones[i].node_ && destBones[i].name_ == srcBones[i].name_ && destBones[i].parentIndex_ ==
-                    srcBones[i].parentIndex_)
+                                                                                     srcBones[i].parentIndex_)
                 {
                     // If compatible, just copy the values and retain the old node and animated status
                     Node* boneNode = destBones[i].node_;
@@ -795,7 +800,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
             newState->SetLooped(value[index++].GetBool());
             newState->SetWeight(value[index++].GetFloat());
             newState->SetTime(value[index++].GetFloat());
-            newState->SetLayer(value[index++].GetInt());
+            newState->SetLayer((unsigned char)value[index++].GetInt());
         }
         else
         {
@@ -1066,7 +1071,8 @@ void AnimatedModel::CloneGeometries()
     MarkMorphsDirty();
 }
 
-void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer, VertexBuffer* srcBuffer)
+void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData, unsigned vertexCount, VertexBuffer* destBuffer,
+    VertexBuffer* srcBuffer)
 {
     unsigned mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
     unsigned normalOffset = srcBuffer->GetElementOffset(ELEMENT_NORMAL);
@@ -1293,7 +1299,8 @@ void AnimatedModel::UpdateMorphs()
     morphsDirty_ = false;
 }
 
-void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph, float weight)
+void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsigned morphRangeStart, const VertexBufferMorph& morph,
+    float weight)
 {
     unsigned elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
@@ -1350,5 +1357,4 @@ void AnimatedModel::SetBoneCreationEnabled(bool enabled)
 {
     boneCreationEnabled_ = enabled;
 }
-
 }

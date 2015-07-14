@@ -20,18 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #ifdef ATOMIC_PHYSICS
 #include "../Physics/CollisionShape.h"
 #endif
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Graphics/Drawable.h"
+#include "../Navigation/DynamicNavigationMesh.h"
 #include "../Graphics/Geometry.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Atomic3D/Model.h"
-#include "../Navigation/DynamicNavigationMesh.h"
 #include "../Navigation/NavArea.h"
 #include "../Navigation/NavBuildData.h"
 #include "../Navigation/Navigable.h"

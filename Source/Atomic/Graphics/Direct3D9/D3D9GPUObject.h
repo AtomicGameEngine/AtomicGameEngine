@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,26 +37,31 @@ public:
     GPUObject(Graphics* graphics);
     /// Destruct. Remove from the graphics subsystem.
     virtual ~GPUObject();
-    
+
     /// Release default pool resources.
-    virtual void OnDeviceLost() {}
+    virtual void OnDeviceLost() { }
+
     /// Recreate default pool resources.
-    virtual void OnDeviceReset() {}
+    virtual void OnDeviceReset() { }
+
     /// Unconditionally release the GPU resource.
-    virtual void Release() {}
-    
+    virtual void Release() { }
+
     /// Clear the data lost flag.
     void ClearDataLost();
-    
+
     /// Return the graphics subsystem.
     Graphics* GetGraphics() const;
+
     /// Return Direct3D object.
     void* GetGPUObject() const { return object_; }
+
     /// Return whether data is lost due to device loss.
     bool IsDataLost() const { return dataLost_; }
+
     /// Return whether has pending data assigned while device was lost.
     bool HasPendingData() const { return dataPending_; }
-    
+
 protected:
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;

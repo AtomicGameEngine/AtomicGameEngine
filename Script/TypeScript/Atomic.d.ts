@@ -50,6 +50,7 @@ declare module Atomic {
    export var VAR_MATRIX3: VariantType;
    export var VAR_MATRIX3X4: VariantType;
    export var VAR_MATRIX4: VariantType;
+   export var VAR_DOUBLE: VariantType;
    export var MAX_VAR_TYPES: VariantType;
 
 
@@ -314,6 +315,7 @@ declare module Atomic {
    export var RAY_AABB: RayQueryLevel;
    export var RAY_OBB: RayQueryLevel;
    export var RAY_TRIANGLE: RayQueryLevel;
+   export var RAY_TRIANGLE_UV: RayQueryLevel;
 
 
    // enum LightVSVariation
@@ -1534,8 +1536,6 @@ declare module Atomic {
       getScene(): Scene;
       // Return whether is enabled.
       isEnabled(): boolean;
-      // Return whether is enabled (so JS picks it up as a property);
-      getEnabled(): boolean;
       // Return whether is effectively enabled (node is also enabled.)
       isEnabledEffective(): boolean;
       // Return component in the same scene node by type. If there are several, returns the first.
@@ -1745,7 +1745,7 @@ declare module Atomic {
       setID(id: number): void;
       // Set scene. Called by Scene.
       setScene(scene: Scene): void;
-      // Reset scene. Called by Scene.
+      // Reset scene, ID and owner. Called by Scene.
       resetScene(): void;
       // Set network position attribute.
       setNetPositionAttr(value: Vector3): void;
@@ -2510,7 +2510,6 @@ declare module Atomic {
       setNumTechniques(num: number): void;
       // Set technique.
       setTechnique(index: number, tech: Technique, qualityLevel?: number, lodDistance?: number): void;
-      // Set shader parameter animation.
       setShaderParameterAnimation(name: string, animation: ValueAnimation, wrapMode?: WrapMode, speed?: number): void;
       // Set shader parameter animation wrap mode.
       setShaderParameterAnimationWrapMode(name: string, wrapMode: WrapMode): void;
@@ -3838,14 +3837,16 @@ declare module Atomic {
       setLooped(name: string, enable: boolean): boolean;
       // Set animation speed. Return true on success.
       setSpeed(name: string, speed: number): boolean;
-      // Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success.
+      // Set animation autofade at end (non-looped animations only.) Zero time disables. Return true on success.
       setAutoFade(name: string, fadeOutTime: number): boolean;
-      // Return whether an animation is active.
+      // Return whether an animation is active. Note that non-looping animations that are being clamped at the end also return true.
       isPlaying(name: string): boolean;
       // Return whether an animation is fading in.
       isFadingIn(name: string): boolean;
       // Return whether an animation is fading out.
       isFadingOut(name: string): boolean;
+      // Return whether an animation is at its end. Will return false if the animation is not active at all.
+      isAtEnd(name: string): boolean;
       // Return animation blending layer.
       getLayer(name: string): number;
       // Return animation start bone name, or empty string if no such animation.
@@ -4614,7 +4615,7 @@ declare module Atomic {
       getLoopMode(): LoopMode2D;
       // Return root node.
       getRootNode(): Node;
-      // Set anmiation by name.
+      // Set animation by name.
       setAnimationAttr(name: string): void;
 
    }
@@ -6871,14 +6872,13 @@ declare module Atomic {
       update(): void;
       // Set whether ALT-ENTER fullscreen toggle is enabled.
       setToggleFullscreen(enable: boolean): void;
-      // Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visiblility event can be suppressed-- this also recalls any unsuppressed SetMouseVisible which can be returned by ResetMouseVisible().
+      // Set whether the operating system mouse cursor is visible. When not visible (default), is kept centered to prevent leaving the window. Mouse visibility event can be suppressed-- this also recalls any unsuppressed SetMouseVisible which can be returned by ResetMouseVisible().
       setMouseVisible(enable: boolean, suppressEvent?: boolean): void;
-      // Reset last mouse visibilty that was not suppressed in SetMouseVisible.
+      // Reset last mouse visibility that was not suppressed in SetMouseVisible.
       resetMouseVisible(): void;
       // Set whether the mouse is currently being grabbed by an operation.
       setMouseGrabbed(grab: boolean): void;
       setMouseMode(mode: MouseMode): void;
-      addScreenJoystick(layoutFile?: XMLFile, styleFile?: XMLFile): number;
       // Show or hide on-screen keyboard on platforms that support it. When shown, keypresses from it are delivered as key events.
       setScreenKeyboardVisible(enable: boolean): void;
       // Set touch emulation by mouse. Only available on desktop platforms. When enabled, actual mouse events are no longer sent and the mouse cursor is forced visible.
@@ -6908,7 +6908,7 @@ declare module Atomic {
       // Check if a key is held down by scancode.
       getScancodeDown(scancode: number): boolean;
       // Check if a key has been pressed on this frame by scancode.
-      getScancodePress(scanode: number): boolean;
+      getScancodePress(scancode: number): boolean;
       // Check if a mouse button is held down.
       getMouseButtonDown(button: number): boolean;
       // Check if a mouse button has been pressed on this frame.
@@ -7636,7 +7636,7 @@ declare module Atomic {
       // Deserialize from a string. Return true if successful.
       fromString(source: string): boolean;
       // Serialize the XML content to a string.
-      toString(indendation?: string): string;
+      toString(indentation?: string): string;
       // Patch the XMLFile with another XMLFile. Based on RFC 5261.
       patch(patchFile: XMLFile): void;
 
@@ -8044,6 +8044,7 @@ declare module Atomic {
       constructor();
 
       getScriptClass(): boolean;
+      createJSComponent(): JSComponent;
       pushModule(): boolean;
 
    }

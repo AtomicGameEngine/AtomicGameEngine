@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
+#include "../IO/Log.h"
 #include "../Atomic2D/Animation2D.h"
 #include "../Atomic2D/AnimationSet2D.h"
-#include "../IO/Log.h"
 #include "../Atomic2D/Sprite2D.h"
 
 #include "../DebugNew.h"
@@ -39,28 +40,28 @@ Transform2D::Transform2D() :
 }
 
 Transform2D::Transform2D(const Vector2& position, float angle, const Vector2& scale) :
-    position_(position), 
-    angle_(angle), 
+    position_(position),
+    angle_(angle),
     scale_(scale)
 {
 }
 
 Transform2D::Transform2D(const Transform2D& other) :
-    position_(other.position_), 
-    angle_(other.angle_), 
+    position_(other.position_),
+    angle_(other.angle_),
     scale_(other.scale_)
 {
 }
 
-Transform2D& Transform2D::operator = (const Transform2D& other)
+Transform2D& Transform2D::operator =(const Transform2D& other)
 {
-    position_ = other.position_; 
+    position_ = other.position_;
     angle_ = other.angle_;
     scale_ = other.scale_;
     return *this;
 }
 
-Transform2D Transform2D::operator * (const Transform2D& other) const
+Transform2D Transform2D::operator *(const Transform2D& other) const
 {
     float x = scale_.x_ * other.position_.x_;
     float y = scale_.y_ * other.position_.y_;
@@ -86,16 +87,16 @@ Transform2D Transform2D::Lerp(const Transform2D& other, float t, int spin) const
     if (spin > 0 && angle_ > other.angle_)
         ret.angle_ = Atomic::Lerp(angle_, other.angle_ + 360.0f, t);
     else if (spin < 0 && angle_ < other.angle_)
-        ret.angle_= Atomic::Lerp(angle_, other.angle_ - 360.0f, t);
+        ret.angle_ = Atomic::Lerp(angle_, other.angle_ - 360.0f, t);
     else
-        ret.angle_= Atomic::Lerp(angle_, other.angle_, t);
+        ret.angle_ = Atomic::Lerp(angle_, other.angle_, t);
 
     ret.scale_ = scale_.Lerp(other.scale_, t);
     return ret;
 }
 
-AnimationKeyFrame2D::AnimationKeyFrame2D() : 
-    time_(0.0f), 
+AnimationKeyFrame2D::AnimationKeyFrame2D() :
+    time_(0.0f),
     enabled_(false),
     parent_(-1),
     spin_(1),
@@ -105,9 +106,9 @@ AnimationKeyFrame2D::AnimationKeyFrame2D() :
 {
 }
 
-Animation2D::Animation2D(AnimationSet2D* animationSet) : 
+Animation2D::Animation2D(AnimationSet2D* animationSet) :
     animationSet_(animationSet),
-    length_(0.0f), 
+    length_(0.0f),
     looped_(true)
 {
 }
