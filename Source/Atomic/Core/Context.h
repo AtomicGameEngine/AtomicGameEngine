@@ -25,6 +25,7 @@
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
 #include "../Container/HashSet.h"
+#include "../Resource/XMLElement.h"
 
 namespace Atomic
 {
@@ -41,7 +42,7 @@ public:
     ~Context();
 
     /// Create an object by type hash. Return pointer to it or null if no factory found.
-    SharedPtr<Object> CreateObject(StringHash objectType);
+    SharedPtr<Object> CreateObject(StringHash objectType, const XMLElement &source = XMLElement::EMPTY);
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
     /// Register a factory for an object type and specify the object category.
@@ -145,17 +146,6 @@ public:
     // ATOMIC BEGIN
     /// Get whether an Editor Context
     void SetEditorContent(bool editor) { editorContext_ = editor; }
-
-    /// Return a user variable.
-    Variant& GetVar(StringHash key) { return vars_[key]; }
-    /// Return all user variables.
-    VariantMap& GetVars() { return vars_; }
-
-protected:
-
-    /// User variables.
-    VariantMap vars_;
-
     // ATOMIC END
 
 private:

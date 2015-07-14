@@ -686,13 +686,18 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
 
 Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
+    return CreateComponentInternal(type, mode, id);
+}
+
+Component* Node::CreateComponentInternal(StringHash type, CreateMode mode, unsigned id, const XMLElement& source)
+{
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
     if (id_ >= FIRST_LOCAL_ID && mode == REPLICATED)
         mode = LOCAL;
 
     // Check that creation succeeds and that the object in fact is a component
-    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
+    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type, source));
     if (!newComponent)
     {
         LOGERROR("Could not create unknown component type " + type.ToString());
@@ -1239,46 +1244,8 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetInt("id");
 
-        // ATOMIC BEGIN
-        // At runtime, a XML JSComponent may refer to a "scriptClass"
-        // component which is new'd in JS and creates the component itself
-        // we peek ahead here to see if we have a JSComponentFile and store
-        // it off in the Context vars, for the specialized JSComponent object factory to use
-        // when creating the component
-        if (!context_->GetEditorContext())
-        {
-            // at runtime peek ahead to see if we have a ComponentFile attr
-            if (typeName == "JSComponent")
-            {
-                XMLElement attrElem = compElem.GetChild("attribute");
-
-                while (attrElem)
-                {
-                    if (attrElem.GetAttribute("name") == "ComponentFile")
-                    {
-                        String componentFile = attrElem.GetAttribute("value");
-
-                        if (componentFile.Length())
-                        {
-                            // store in context vars
-                            context_->GetVars()["__JSComponent_ComponentFile"] = componentFile;
-                            break;
-                        }
-                    }
-
-                    attrElem = attrElem.GetNext("attribute");
-                }
-            }
-        }
-        // ATOMIC END
-
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
-            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
-
-        // ATOMIC BEGIN
-        // ensure component file, if any, is cleared
-        context_->GetVars()["__JSComponent_ComponentFile"] = Variant::EMPTY;
-        // ATOMIC END
+            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID, compElem);
 
         if (newComponent)
         {
@@ -1681,7 +1648,7 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     }
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const Atomic::XMLElement &source)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -1690,7 +1657,7 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
 
     // First check if factory for type exists
     if (!context_->GetTypeName(type).Empty())
-        return CreateComponent(type, mode, id);
+        return CreateComponentInternal(type, mode, id, source);
     else
     {
         LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");

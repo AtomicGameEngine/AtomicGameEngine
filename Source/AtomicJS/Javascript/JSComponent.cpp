@@ -58,34 +58,48 @@ public:
     }
 
     /// Create an object of the specific type.
-    SharedPtr<Object> CreateObject()
+    SharedPtr<Object> CreateObject(const XMLElement& source = XMLElement::EMPTY)
     {
+
+        // if in editor, just create the JSComponent
+        if (context_->GetEditorContext())
+        {
+            return SharedPtr<Object>(new JSComponent(context_));
+        }
+
+        // At runtime, a XML JSComponent may refer to a "scriptClass"
+        // component which is new'd in JS and creates the component itself
+        // we peek ahead here to see if we have a JSComponentFile and if it is a script class
+
+        String componentRef;
+
+        if (source != XMLElement::EMPTY)
+        {
+            XMLElement attrElem = source.GetChild("attribute");
+
+            while (attrElem)
+            {
+                if (attrElem.GetAttribute("name") == "ComponentFile")
+                {
+                    componentRef = attrElem.GetAttribute("value");
+                    break;
+                }
+
+                attrElem = attrElem.GetNext("attribute");
+            }
+        }
+
         SharedPtr<Object> ptr;
 
-        Variant& v = context_->GetVar("__JSComponent_ComponentFile");
-
-        // __JSComponent_ComponentFile will only be set when coming from XML
-        // in player builds, not in editor
-        if (v.GetType() == VAR_STRING)
+        if (componentRef.Length())
         {
-            String componentRef = v.GetString();
-
-            // clear it, in case we end up recursively creating components
-            context_->GetVars()["__JSComponent_ComponentFile"] = Variant::EMPTY;
-
             Vector<String> split = componentRef.Split(';');
 
             if (split.Size() == 2)
             {
                 ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
-
                 JSComponentFile* componentFile = cache->GetResource<JSComponentFile>(split[1]);
-
-                if (componentFile)
-                {
-                    ptr = componentFile->CreateJSComponent();
-                }
-
+                ptr = componentFile->CreateJSComponent();
             }
 
         }
@@ -367,8 +381,7 @@ void JSComponent::OnNodeSet(Node* node)
 {
     if (node)
     {
-        // We have been attached to a node. Set initial update event subscription state
-        UpdateEventSubscription();
+
     }
     else
     {
@@ -378,18 +391,27 @@ void JSComponent::OnNodeSet(Node* node)
     }
 }
 
+void JSComponent::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        UpdateEventSubscription();
+    else
+    {
+        UnsubscribeFromEvent(E_SCENEUPDATE);
+        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
+#ifdef ATOMIC_PHYSICS
+        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
+        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
+#endif
+        currentEventMask_ = 0;
+    }
+}
+
 void JSComponent::UpdateEventSubscription()
 {
-    // If scene node is not assigned yet, no need to update subscription
-    if (!node_)
-        return;
-
     Scene* scene = GetScene();
     if (!scene)
-    {
-        LOGWARNING("Node is detached from scene, can not subscribe to update events");
         return;
-    }
 
     bool enabled = IsEnabledEffective();
 

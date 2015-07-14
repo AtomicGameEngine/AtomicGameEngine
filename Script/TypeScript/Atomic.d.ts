@@ -1408,8 +1408,6 @@ declare module Atomic {
       // Construct.
       constructor();
 
-      // Create an object by type hash. Return pointer to it or null if no factory found.
-      createObject(objectType: string): AObject;
       // Register a subsystem.
       registerSubsystem(subsystem: AObject): void;
       // Remove a subsystem.

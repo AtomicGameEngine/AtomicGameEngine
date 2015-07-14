@@ -520,9 +520,6 @@ void SceneView3D::HandleDragExitWidget(StringHash eventType, VariantMap& eventDa
 
     if (dragNode_.NotNull())
     {
-        // BUG! https://github.com/urho3d/Urho3D/issues/748
-        dragNode_->RemoveAllComponents();
-
         scene_->RemoveChild(dragNode_);
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = (RefCounted*) 0;

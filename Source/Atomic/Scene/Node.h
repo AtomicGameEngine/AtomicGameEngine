@@ -25,6 +25,7 @@
 #include "../IO/VectorBuffer.h"
 #include "../Math/Matrix3x4.h"
 #include "../Scene/Animatable.h"
+#include "../Resource/XMLElement.h"
 
 namespace Atomic
 {
@@ -576,8 +577,10 @@ protected:
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
     void SetEnabled(bool enable, bool recursive, bool storeSelf);
+    /// Internal call for creating component
+    Component* CreateComponentInternal(StringHash type, CreateMode mode = REPLICATED, unsigned id = 0, const XMLElement& source = XMLElement::EMPTY);
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
-    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id);
+    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const XMLElement& source = XMLElement::EMPTY);
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.
