@@ -1,4 +1,5 @@
 
+import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 
@@ -43,7 +44,7 @@ class CreateProject extends ModalWindow {
 
     }
 
-    checkProjectCreate(): boolean {
+    tryProjectCreate(): boolean {
 
         var name = this.projectNameField.text.trim();
 
@@ -54,11 +55,50 @@ class CreateProject extends ModalWindow {
 
         var folder = this.projectPathField.text.trim();
 
-        if (!folder)
-        {
+        if (!folder) {
             EditorUI.showModalError("New Project Editor Error", "Please choose a root project folder");
             return false;
         }
+
+        folder += "/" + name;
+
+        var fileSystem = Atomic.getFileSystem();
+
+        if (fileSystem.dirExists(folder) || fileSystem.fileExists(folder)) {
+
+            var message = folder + " exists\n\nPlease choose a different root folder or project name";
+            EditorUI.showModalError("New Project Editor Error", message);
+            return false;
+
+        }
+
+
+        folder = Atomic.addTrailingSlash(folder);
+
+        if (!fileSystem.dirExists(folder)) {
+
+          var utils = new Editor.FileUtils();
+            utils.createDirs(folder);
+
+            utils.createDirs(folder + "Cache");
+
+            if (!fileSystem.dirExists(folder)) {
+                var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
+                EditorUI.showModalError("New Project Editor Error", message);
+                return false;
+            }
+        }
+
+        // Do the creation!
+
+        fileSystem.copyDir(this.templateSourceDir + "Resources", folder + "Resources");
+
+        var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
+        file.close();
+
+        this.hide();
+
+        this.sendEvent(EditorEvents.LoadProject, { path: folder});
 
         return true;
 
@@ -85,9 +125,7 @@ class CreateProject extends ModalWindow {
             }
             else if (id == "create") {
 
-                if (this.checkProjectCreate()) {
-
-                }
+                this.tryProjectCreate();
 
                 return true;
 

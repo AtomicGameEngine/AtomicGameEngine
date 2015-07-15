@@ -1,9 +1,15 @@
 
 export const Quit = "EditorEventQuit";
 
-export const EditResource = "EditorEditResource";
+export const LoadProject = "EditorLoadProject";
+export interface LoadProjectEvent {
 
-// data
+  // The full path to the .atomic file
+  path: string;
+
+}
+
+export const EditResource = "EditorEditResource";
 export interface EditResourceEvent {
 
   // The full path to the resource to edit

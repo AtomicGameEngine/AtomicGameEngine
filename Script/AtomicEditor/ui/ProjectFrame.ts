@@ -2,6 +2,7 @@
 
 import ScriptWidget = require("./ScriptWidget");
 import Editor = require("../editor/Editor");
+import EditorEvents = require("../editor/EditorEvents");
 
 class ProjectFrame extends ScriptWidget {
 
@@ -76,7 +77,7 @@ class ProjectFrame extends ScriptWidget {
 
                     } else {
 
-                        this.sendEvent("EditResource", { "path": asset.path });
+                        this.sendEvent(EditorEvents.EditResource, { "path": asset.path });
 
                     }
 

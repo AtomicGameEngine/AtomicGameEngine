@@ -26,11 +26,12 @@ class Editor extends Atomic.ScriptObject {
 
         this.parseArguments();
 
+        this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
         this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
 
     }
 
-    loadProject(projectPath: string): boolean {
+    handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
 
         var system = ToolCore.getToolSystem();
 
@@ -43,7 +44,7 @@ class Editor extends Atomic.ScriptObject {
 
         }
 
-        return system.loadProject(projectPath);
+        return system.loadProject(event.path);
 
     }
 
@@ -57,7 +58,7 @@ class Editor extends Atomic.ScriptObject {
 
             if (args[idx] == "--project") {
 
-                this.loadProject(args[idx + 1]);
+                this.sendEvent(EditorEvents.LoadProject, {path: args[idx + 1]});
 
             }
 
