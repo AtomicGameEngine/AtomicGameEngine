@@ -37,6 +37,7 @@
         "./ui/inspector/ModelInspector.ts",
         "./ui/inspector/NodeInspector.ts",
         "./ui/inspector/TextureSelector.ts",
+        "./ui/modal/CreateProject.ts",
         "./ui/modal/MessageModal.ts",
         "./ui/modal/ModalOps.ts",
         "./ui/modal/ModalWindow.ts",

@@ -1,6 +1,7 @@
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 import NewProject = require("./NewProject");
+import CreateProject = require("./CreateProject");
 
 class ModalOps extends Atomic.ScriptObject {
 
@@ -10,6 +11,25 @@ class ModalOps extends Atomic.ScriptObject {
 
         this.dimmer = new Atomic.UIDimmer();
 
+    }
+
+    showCreateProject(projectTemplateFolder:string) {
+
+      if (this.show()) {
+
+          this.opWindow = new CreateProject(projectTemplateFolder);
+
+      }
+
+    }
+
+    showNewProject() {
+
+        if (this.show()) {
+
+            this.opWindow = new NewProject();
+
+        }
     }
 
     private show(): boolean {
@@ -42,6 +62,9 @@ class ModalOps extends Atomic.ScriptObject {
             var window = this.opWindow;
             this.opWindow = null;
 
+            if (window.parent)
+              window.parent.removeChild(window, false);
+
             var view = EditorUI.getView();
             view.setFocusRecursive();
 
@@ -54,15 +77,6 @@ class ModalOps extends Atomic.ScriptObject {
         }
 
 
-    }
-
-    showNewProject() {
-
-        if (this.show()) {
-
-            this.opWindow = new NewProject();
-
-        }
     }
 
     dimmer: Atomic.UIDimmer;

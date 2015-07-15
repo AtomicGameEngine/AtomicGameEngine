@@ -23,6 +23,11 @@ export function initialize() {
   editorUI = new EditorUI();
 }
 
+export function showModalError(windowText:string, message:string) {
+  editorUI.showModalError(windowText, message);
+}
+
+
 class EditorUI extends Atomic.ScriptObject {
 
   constructor() {
@@ -42,6 +47,12 @@ class EditorUI extends Atomic.ScriptObject {
 
     this.modalOps = new ModalOps();
 
+  }
+
+  showModalError(windowText:string, message:string)
+  {
+      var window = new Atomic.UIMessageWindow(this.view, "modal_error");
+      window.show(windowText, message, 640, 360);
   }
 
   view: Atomic.UIView;

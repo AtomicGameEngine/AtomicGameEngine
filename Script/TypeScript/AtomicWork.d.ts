@@ -7,6 +7,8 @@ declare module Atomic {
 
     export function print(...args:any[]);
 
+    export var platform:string;
+
 
     export interface PathInfo {
 
@@ -55,7 +57,7 @@ declare module Atomic {
     }
 
     export interface UIWidgetDeletedEvent {
-      
+
         widget: UIWidget;
     }
 

@@ -14,10 +14,31 @@ class ModalWindow extends Atomic.UIWindow {
 
     this.subscribeToEvent(this, "WidgetDeleted", (event:Atomic.UIWidgetDeletedEvent) => {
 
-      var modalOps = EditorUI.getModelOps();
-      modalOps.hide();
+      this.hide();
 
     });
+
+    this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
+  }
+
+  hide() {
+
+    var modalOps = EditorUI.getModelOps();
+    modalOps.hide();
+
+  }
+
+  handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+  }
+
+  init(windowText:string, uifilename:string) {
+
+    this.text = windowText;
+    this.load(uifilename);
+    this.resizeToFitContent();
+    this.center();
 
   }
 

@@ -42,6 +42,7 @@ public:
 
     const String& GetDeploymentDataDir() { return toolBinary_; }
 
+    const String& GetProjectTemplatesDir() { return projectTemplatesDir_; }
     const String& GetExamplesDir() { return examplesDir_; }
 
     const String& GetDevConfigFilename();
@@ -67,6 +68,9 @@ private:
 
     // examples directory
     String examplesDir_;
+
+    // project templates directory
+    String projectTemplatesDir_;
 
     // resources
     String resourceCoreDataDir_;

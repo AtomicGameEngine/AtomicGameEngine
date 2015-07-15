@@ -25,14 +25,15 @@ declare module Editor {
 //----------------------------------------------------
 
 
-   export class MyJSClass extends Atomic.AObject {
-
-      aha: string;
+   export class FileUtils extends Atomic.AObject {
 
       // Construct.
       constructor();
 
-      getAha(): string;
+      createDirs(folder: string): boolean;
+      openProjectFileDialog(): void;
+      newProjectFileDialog(): string;
+      revealInFinder(fullpath: string): void;
 
    }
 
@@ -97,14 +98,6 @@ declare module Editor {
       enable(): void;
       disable(): void;
       isEnabled(): boolean;
-
-   }
-
-   export class InspectorFrame extends Atomic.UIWidget {
-
-      // Construct.
-      constructor();
-
 
    }
 

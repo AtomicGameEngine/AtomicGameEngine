@@ -35,6 +35,7 @@ declare module ToolCore {
       playerDataDir: string;
       editorDataDir: string;
       deploymentDataDir: string;
+      projectTemplatesDir: string;
       examplesDir: string;
       devConfigFilename: string;
 
@@ -52,6 +53,7 @@ declare module ToolCore {
       getPlayerDataDir(): string;
       getEditorDataDir(): string;
       getDeploymentDataDir(): string;
+      getProjectTemplatesDir(): string;
       getExamplesDir(): string;
       getDevConfigFilename(): string;
       dump(): void;

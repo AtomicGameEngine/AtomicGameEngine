@@ -7045,8 +7045,11 @@ declare module Atomic {
 
    export class UIImageWidget extends UIWidget {
 
+      image: string;
+
       constructor(createWidget?: boolean);
 
+      setImage(imagePath: string): void;
 
    }
 
