@@ -25,6 +25,30 @@ declare module Editor {
 //----------------------------------------------------
 
 
+   export class AEPreferences extends Atomic.AObject {
+
+      recentProjects: string[];
+      androidSDKPath: string;
+      antPath: string;
+      jDKRootPath: string;
+
+      // Construct.
+      constructor();
+
+      registerRecentProject(fullpath: string): void;
+      getRecentProjects(): string[];
+      setAndroidSDKPath(path: string): void;
+      setAntPath(path: string): void;
+      setJDKRootPath(path: string): void;
+      getAndroidSDKPath(): string;
+      getJDKRootPath(): string;
+      getAntPath(): string;
+      read(): void;
+      write(): void;
+      updateRecentFiles(write?: boolean): void;
+
+   }
+
    export class FileUtils extends Atomic.AObject {
 
       // Construct.

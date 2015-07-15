@@ -117,7 +117,7 @@ bool Project::Load(const String& fullpath)
 
     if ( true /*result*/) {
         VariantMap data;
-        data[ProjectLoaded::P_PROJECTPATH] = projectPath_;
+        data[ProjectLoaded::P_PROJECTPATH] = projectFilePath_;
         SendEvent(E_PROJECTLOADED, data);
     }
 

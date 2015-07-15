@@ -13,6 +13,8 @@ namespace Atomic
 namespace AtomicEditor
 {
 
+class AEPreferences;
+
 class AEEditorApp : public Application
 {
     OBJECT(AEEditorApp);
@@ -30,6 +32,7 @@ public:
 
 private:
 
+    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
     void HandleJSError(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<JSVM> vm_;

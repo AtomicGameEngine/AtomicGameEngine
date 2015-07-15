@@ -97,6 +97,10 @@ declare module Atomic {
 
 }
 
+declare module Editor {
+    export function getPreferences() : AEPreferences;
+}
+
 declare module ToolCore {
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;

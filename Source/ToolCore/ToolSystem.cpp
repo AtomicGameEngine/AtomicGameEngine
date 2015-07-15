@@ -42,7 +42,21 @@ ToolSystem::~ToolSystem()
 
 bool ToolSystem::LoadProject(const String& fullpath)
 {
-    String path = RemoveTrailingSlash(GetPath(AddTrailingSlash(fullpath)));
+
+    String pathName, fileName, ext;
+
+    SplitPath(fullpath, pathName, fileName, ext);
+
+    String path;
+
+    if (ext == ".atomic")
+    {
+        path = RemoveTrailingSlash(GetPath(AddTrailingSlash(pathName)));
+    }
+    else
+    {
+        path = RemoveTrailingSlash(GetPath(AddTrailingSlash(fullpath)));
+    }
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->AddResourceDir(path, 0);

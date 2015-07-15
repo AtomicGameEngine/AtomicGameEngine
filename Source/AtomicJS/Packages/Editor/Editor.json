@@ -1,5 +1,5 @@
 {
 	"name" : "Editor",
-	"sources" : ["Source/AtomicEditorWork/Utils", "Source/AtomicEditorWork/Editors", "Source/AtomicEditorWork/Editors/SceneEditor3D"],
-	"classes" : ["FileUtils", "ResourceEditor", "JSResourceEditor", "SceneEditor3D", "SceneView3D"]
+	"sources" : ["Source/AtomicEditorWork/Application", "Source/AtomicEditorWork/Utils", "Source/AtomicEditorWork/Editors", "Source/AtomicEditorWork/Editors/SceneEditor3D"],
+	"classes" : ["FileUtils", "AEPreferences", "ResourceEditor", "JSResourceEditor", "SceneEditor3D", "SceneView3D"]
 }

@@ -52,6 +52,8 @@ public:
 
     void AddItem(UISelectItem* item) { items_.Push(SharedPtr<UISelectItem>(item)); }
 
+    void Clear() { items_.Clear(); }
+
     // caller's responsibility to clean up
     virtual tb::TBSelectItemSource* GetTBItemSource();
 

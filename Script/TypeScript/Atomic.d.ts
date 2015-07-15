@@ -7270,6 +7270,7 @@ declare module Atomic {
       constructor();
 
       addItem(item: UISelectItem): void;
+      clear(): void;
 
    }
 

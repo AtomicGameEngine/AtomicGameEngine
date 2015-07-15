@@ -1,5 +1,6 @@
 import ProjectFrame = require("./ProjectFrame");
 import ResourceFrame = require("./ResourceFrame");
+import WelcomeFrame = require("./WelcomeFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
 import HierarchyFrame = require("./HierarchyFrame");
 import MainToolbar = require("./MainToolbar");
@@ -11,16 +12,6 @@ import ScriptWidget = require("./ScriptWidget");
 import MainFrameMenu = require("./MainFrameMenu");
 
 class MainFrame extends ScriptWidget {
-
-    projectframe: ProjectFrame;
-    resourceframe: ResourceFrame;
-    inspectorframe: InspectorFrame;
-    hierarchyFrame: HierarchyFrame;
-    inspectorlayout: Atomic.UILayout;
-    mainToolbar: MainToolbar;
-    menu: MainFrameMenu;
-
-    private messagemodal: MessageModal.MessageModal = new MessageModal.MessageModal();
 
     constructor() {
 
@@ -38,21 +29,107 @@ class MainFrame extends ScriptWidget {
         this.projectframe = new ProjectFrame(this);
         this.hierarchyFrame = new HierarchyFrame(this);
 
+        this.welcomeFrame = new WelcomeFrame(this);
         this.resourceframe = new ResourceFrame(this);
 
         this.mainToolbar = new MainToolbar(this.getWidget("maintoolbarcontainer"));
 
         this.menu = new MainFrameMenu();
 
-        this.showInspectorFrame(true);
-
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
+
+        this.subscribeToEvent("ProjectLoaded", (data) => {
+          this.showResourceFrame(true);
+        });
+
+        this.showWelcomeFrame(true);
 
     }
 
-    showInspectorFrame(show: boolean) {
+    frameVisible(frame: Atomic.UIWidget): boolean {
 
-        return;
+        var container = <Atomic.UILayout> this.getWidget("resourceviewcontainer");
+
+        var child = null;
+        for (child = container.firstChild; child; child = child.next) {
+            if (child == frame)
+                return true;
+        }
+
+        return false;
+    }
+
+    showResourceFrame(show: boolean) {
+
+        if (show && this.frameVisible(this.resourceframe))
+            return;
+
+        if (show && this.frameVisible(this.welcomeFrame))
+            this.showWelcomeFrame(false);
+
+        var container = <Atomic.UILayout> this.getWidget("resourceviewcontainer");
+
+        var child = null;
+
+        for (child = container.firstChild; child; child = child.next) {
+            if (child == this.resourceframe)
+                break;
+        }
+
+        if (show) {
+
+            this.showInspectorFrame(true);
+
+            if (!child) {
+                container.addChild(this.resourceframe);
+            }
+
+        }
+        else {
+
+            if (child)
+                container.removeChild(child);
+        }
+
+    }
+
+
+    showWelcomeFrame(show: boolean) {
+
+        if (show && this.frameVisible(this.welcomeFrame))
+            return;
+
+        if (show && this.frameVisible(this.resourceframe))
+            this.showResourceFrame(false);
+
+        var container = <Atomic.UILayout> this.getWidget("resourceviewcontainer");
+
+        var child = null;
+        for (child = container.firstChild; child; child = child.next) {
+            if (child == this.welcomeFrame)
+                break;
+        }
+
+        if (show) {
+
+            this.showInspectorFrame(false);
+
+            this.welcomeFrame.updateRecentProjects();
+
+            if (!child) {
+                container.addChild(this.welcomeFrame);
+            }
+
+        }
+        else {
+            if (child)
+                container.removeChild(child);
+        }
+
+    }
+
+
+    showInspectorFrame(show: boolean) {
 
         if (show) {
 
@@ -65,7 +142,6 @@ class MainFrame extends ScriptWidget {
             this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
 
         }
-
 
     }
 
@@ -94,16 +170,24 @@ class MainFrame extends ScriptWidget {
 
         if (editor) {
 
-            this.showInspectorFrame(editor.requiresInspector());
+            //this.showInspectorFrame(editor.requiresInspector());
 
         } else {
 
-            this.showInspectorFrame(false);
+            //this.showInspectorFrame(false);
 
         }
 
     }
 
+    projectframe: ProjectFrame;
+    resourceframe: ResourceFrame;
+    inspectorframe: InspectorFrame;
+    hierarchyFrame: HierarchyFrame;
+    welcomeFrame: WelcomeFrame;
+    inspectorlayout: Atomic.UILayout;
+    mainToolbar: MainToolbar;
+    menu: MainFrameMenu;
 
 }
 

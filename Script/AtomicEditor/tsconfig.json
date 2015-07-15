@@ -26,6 +26,7 @@
         "./ui/ResourceFrame.ts",
         "./ui/ScriptWidget.ts",
         "./ui/UIEvents.ts",
+        "./ui/WelcomeFrame.ts",
         "./ui/inspector/ArrayEditWidget.ts",
         "./ui/inspector/ComponentInspector.ts",
         "./ui/inspector/CreateComponentButton.ts",

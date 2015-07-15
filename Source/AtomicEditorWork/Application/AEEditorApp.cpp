@@ -18,6 +18,7 @@
 #include <ToolCore/ToolEnvironment.h>
 
 #include "AEEditorApp.h"
+#include "AEPreferences.h"
 
 // Move me
 #include <Atomic/Environment/Environment.h>
@@ -62,7 +63,9 @@ void AEEditorApp::Start()
 
     Javascript* javascript = new Javascript(context_);
     context_->RegisterSubsystem(javascript);
+
     SubscribeToEvent(E_JSERROR, HANDLER(AEEditorApp, HandleJSError));
+    SubscribeToEvent(E_EXITREQUESTED, HANDLER(AEEditorApp, HandleExitRequested));
 
     // Instantiate and register the Javascript subsystem
     vm_ = javascript->InstantiateVM("MainVM");
@@ -91,6 +94,8 @@ void AEEditorApp::Start()
 void AEEditorApp::Setup()
 {
     RegisterEnvironmentLibrary(context_);
+
+    context_->RegisterSubsystem(new AEPreferences(context_));
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
     ToolEnvironment* env = new ToolEnvironment(context_);
@@ -138,6 +143,10 @@ void AEEditorApp::Setup()
 void AEEditorApp::Stop()
 {
 
+}
+
+void AEEditorApp::HandleExitRequested(StringHash eventType, VariantMap& eventData)
+{
 }
 
 void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
