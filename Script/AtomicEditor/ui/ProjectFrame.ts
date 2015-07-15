@@ -3,8 +3,6 @@
 import ScriptWidget = require("./ScriptWidget");
 import Editor = require("../editor/Editor");
 
-var UI = Atomic.UI;
-
 class ProjectFrame extends ScriptWidget {
 
     folderList: Atomic.UIListView;
@@ -15,7 +13,7 @@ class ProjectFrame extends ScriptWidget {
 
         this.load("AtomicEditor/editor/ui/projectframe.tb.txt");
 
-        this.gravity = UI.GRAVITY_TOP_BOTTOM;
+        this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
 
         var projectviewcontainer = parent.getWidget("projectviewcontainer");
 
@@ -258,7 +256,7 @@ class ProjectFrame extends ScriptWidget {
 
         var blayout = new Atomic.UILayout();
 
-        blayout.gravity = UI.GRAVITY_LEFT;
+        blayout.gravity = Atomic.UI_GRAVITY_LEFT;
 
         var spacer = new Atomic.UIWidget();
         spacer.rect = [0, 0, 8, 8];
@@ -276,11 +274,11 @@ class ProjectFrame extends ScriptWidget {
         fd.id = "Vera";
         fd.size = 11;
 
-        button.gravity = UI.GRAVITY_LEFT;
+        button.gravity = Atomic.UI_GRAVITY_LEFT;
 
         var image = new Atomic.UISkinImage(bitmapID);
         image.rect = [0, 0, 12, 12];
-        image.gravity = UI.GRAVITY_RIGHT;
+        image.gravity = Atomic.UI_GRAVITY_RIGHT;
         blayout.addChild(image);
 
         button.id = asset.guid;

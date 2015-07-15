@@ -22,7 +22,7 @@ class ScriptWidget extends Atomic.UIWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): void {
 
-        if (ev.type == Atomic.UI.EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
             this.onEventClick(ev.target, ev.refid);
             return;

@@ -275,6 +275,15 @@ void jsapi_init_atomic(JSVM* vm)
 
     // globals
     duk_push_global_object(ctx);
+
+    // console.log
+    duk_push_object(ctx);
+    duk_dup(ctx, -1);
+    duk_put_prop_string(ctx, -3, "console");
+    duk_push_c_function(ctx, js_print, DUK_VARARGS);
+    duk_put_prop_string(ctx, -1, "log");
+    duk_pop(ctx);
+
     duk_push_c_function(ctx, js_print, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "print");
     duk_push_c_function(ctx, js_assert, 1);
@@ -285,6 +294,10 @@ void jsapi_init_atomic(JSVM* vm)
 
     // Atomic
     duk_get_global_string(ctx, "Atomic");
+
+    // Atomic.print
+    duk_push_c_function(ctx, js_print, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "print");
 
     String platform = GetPlatform();
     if (platform == "Mac OS X")

@@ -47,7 +47,7 @@ class InspectorFrame extends ScriptWidget {
         var node = <Atomic.Node> data.node;
 
         if (!node) {
-          
+
             return;
         }
 
@@ -83,10 +83,10 @@ class InspectorFrame extends ScriptWidget {
           var container = this.getWidget("inspectorcontainer");
           container.deleteAllChildren();
 
-          var inspector = new MaterialInspector();
+          var materialInspector = new MaterialInspector();
           container.addChild(inspector);
 
-          inspector.inspect(asset, material);
+          materialInspector.inspect(asset, material);
 
         }
 

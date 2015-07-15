@@ -21,11 +21,12 @@
 	"typescript_decl" : {
 
 		"Material" : [
-			"static getTextureUnitName(unit:TextureUnit):string;"
+			"static getTextureUnitName(unit:TextureUnit):string;",
+			"getShaderParameters():ShaderParameter[];"
 		],
 		"Light" : [
 			"getShadowCascade():Number[];",
-			"setShadowCascade(Number[] args);",
+			"setShadowCascade(args:Number[]);",
 			"setShadowCascadeParameter(index:number, value:number);"
 		]
 

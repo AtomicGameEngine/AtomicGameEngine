@@ -3,6 +3,8 @@ import MainFrame = require("../ui/MainFrame");
 import UIEvents = require("../ui/UIEvents");
 import AssetImport = require("../assets/AssetImport");
 
+import EditorEvents = require("./EditorEvents");
+
 class Editor extends Atomic.ScriptObject {
 
     project: ToolCore.Project;
@@ -11,6 +13,33 @@ class Editor extends Atomic.ScriptObject {
     assetImport: AssetImport;
 
     static instance: Editor;
+
+    constructor() {
+
+        super();
+
+        Editor.instance = this;
+
+        Atomic.getResourceCache().autoReloadResources = true;
+
+        this.assetImport = new AssetImport();
+
+        var graphics = Atomic.getGraphics();
+
+        this.view = new Atomic.UIView();
+
+        this.mainframe = new MainFrame();
+
+        this.view.addChild(this.mainframe);
+
+        // set initial size
+        this.mainframe.setSize(graphics.width, graphics.height);
+
+        this.parseArguments();
+
+        this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
+
+    }
 
     loadProject(projectPath: string): boolean {
 
@@ -49,30 +78,14 @@ class Editor extends Atomic.ScriptObject {
 
     }
 
-    constructor() {
+    // event handling
 
-        super();
+    handleEditorEventQuit(data) {
 
-        Editor.instance = this;
-
-        Atomic.getResourceCache().autoReloadResources = true;
-
-        this.assetImport = new AssetImport();
-
-        var graphics = Atomic.getGraphics();
-
-        this.view = new Atomic.UIView();
-
-        this.mainframe = new MainFrame();
-
-        this.view.addChild(this.mainframe);
-
-        // set initial size
-        this.mainframe.setSize(graphics.width, graphics.height);
-
-        this.parseArguments();
+      Atomic.getEngine().exit();
 
     }
+
 
 }
 

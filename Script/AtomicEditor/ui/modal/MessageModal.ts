@@ -7,7 +7,7 @@ export class MessageModal extends Atomic.ScriptObject
 
   showErrorWindow(title:string, message:string):void {
 
-    var mainframe = Editor.getEditor().mainframe;
+    var mainframe = Editor.instance.mainframe;
 
     new Atomic.UIMessageWindow(mainframe, "modal_error").show(title, message, 640, 360);
 

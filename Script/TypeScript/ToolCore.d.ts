@@ -1,6 +1,8 @@
 //Atomic TypeScript Definitions
 
 
+/// <reference path="Atomic.d.ts" />
+
 declare module ToolCore {
 
 
@@ -205,7 +207,7 @@ declare module ToolCore {
 
    export class OpenAssetImporter extends Atomic.AObject {
 
-      importNode: Node;
+      importNode: Atomic.Node;
       startTime: number;
       endTime: number;
       scale: number;
@@ -216,7 +218,7 @@ declare module ToolCore {
 
       load(assetPath: string): boolean;
       exportModel(outName: string, animName?: string, animationOnly?: boolean): void;
-      setImportNode(node: Node): void;
+      setImportNode(node: Atomic.Node): void;
       setStartTime(startTime: number): void;
       setEndTime(endTime: number): void;
       setScale(scale: number): void;

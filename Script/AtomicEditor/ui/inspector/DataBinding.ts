@@ -93,7 +93,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 100;
 
-            for (var i = 0; i < 3; i++) {
+            for (var i:any = 0; i < 3; i++) {
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);
                 select.fontDescription = fd;
@@ -114,7 +114,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 70;
 
-            for (var i = 0; i < 4; i++) {
+            for (var i:any = 0; i < 4; i++) {
 
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);

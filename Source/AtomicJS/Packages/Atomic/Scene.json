@@ -5,7 +5,14 @@
 	"classes" : ["Animatable", "Node", "Scene", "Component", "Serializable",
 				 "ObjectAnimation", "SmoothedTransform", "SplinePath",
 				 "ValueAnimation", "ValueAnimationInfo", "PrefabComponent"],
+	"excludes" : {
+		"Scene" : {
+			"GetComponent" : ["unsigned"],
+			"MarkReplicationDirty" : ["Node"]
+		}
+	},
 	"overloads" : {
+
 		"Node" : {
 			"CreateChild" : ["String", "CreateMode", "unsigned"],
 			"GetChild" : ["String", "bool"],

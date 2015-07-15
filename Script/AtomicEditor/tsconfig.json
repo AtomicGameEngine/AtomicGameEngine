@@ -13,6 +13,7 @@
     "files": [
         "./assets/AssetImport.ts",
         "./editor/Editor.ts",
+        "./editor/EditorEvents.ts",
         "./main.ts",
         "./ui/EditorStrings.ts",
         "./ui/HierarchyFrame.ts",

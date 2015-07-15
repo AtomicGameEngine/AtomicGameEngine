@@ -1,4 +1,4 @@
-import menubar = require("./MainFrameMenu");
+import MainFrameMenu = require("./MainFrameMenu");
 import ProjectFrame = require("./ProjectFrame");
 import ResourceFrame = require("./ResourceFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
@@ -10,8 +10,6 @@ import UIEvents = require("./UIEvents");
 
 import ScriptWidget = require("./ScriptWidget");
 
-var UI = Atomic.UI;
-
 class MainFrame extends ScriptWidget {
 
     projectframe: ProjectFrame;
@@ -20,6 +18,7 @@ class MainFrame extends ScriptWidget {
     hierarchyFrame: HierarchyFrame;
     inspectorlayout: Atomic.UILayout;
     mainToolbar: MainToolbar;
+    menu: MainFrameMenu;
 
     private messagemodal: MessageModal.MessageModal = new MessageModal.MessageModal();
 
@@ -43,6 +42,8 @@ class MainFrame extends ScriptWidget {
 
         this.mainToolbar = new MainToolbar(this.getWidget("maintoolbarcontainer"));
 
+        this.menu = new MainFrameMenu();
+
         this.showInspectorFrame(true);
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
@@ -55,13 +56,13 @@ class MainFrame extends ScriptWidget {
 
         if (show) {
 
-            this.inspectorlayout.visibility = UI.VISIBILITY_VISIBLE;
-            this.inspectorframe.visibility = UI.VISIBILITY_VISIBLE;
+            this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.inspectorframe.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
 
         } else {
 
-            this.inspectorframe.visibility = UI.VISIBILITY_GONE;
-            this.inspectorlayout.visibility = UI.VISIBILITY_GONE;
+            this.inspectorframe.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.inspectorlayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
 
         }
 
@@ -70,10 +71,10 @@ class MainFrame extends ScriptWidget {
 
     onEventClick(target: Atomic.UIWidget, refid: string): boolean {
 
-        if (this.handlePopupMenu(target, refid))
+        if (this.menu.handlePopupMenu(target, refid))
             return true;
 
-        var src = menubar.getMenuItemSource(target.id);
+        var src = this.menu.getMenuItemSource(target.id);
 
         if (src) {
 
@@ -84,42 +85,6 @@ class MainFrame extends ScriptWidget {
         }
 
         return false;
-
-    }
-
-
-    handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
-
-        if (target.id == "menu atomic editor popup") {
-
-            if (refid == "quit")
-                Atomic.getEngine().exit();
-
-        } else if (target.id == "menu edit popup") {
-
-            if (refid == "edit play") {
-
-                new ToolCore.PlayCmd().run();
-                return true;
-
-            }
-
-            return false;
-
-        } else if (target.id == "menu file popup") {
-
-            if (refid == "file save file") {
-
-               //TODO: this is horrible
-                if (this.resourceframe.currentResourceEditor)
-                  this.resourceframe.currentResourceEditor.save();
-
-                return true;
-
-            }
-
-            return false;
-        }
 
     }
 

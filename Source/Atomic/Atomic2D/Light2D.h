@@ -171,7 +171,7 @@ public:
     void SetPhysicsWorld(PhysicsWorld2D* physicsWorld);
     PhysicsWorld2D* GetPhysicsWorld() { return physicsWorld_; }
 
-    void AddLight(Light2D* light);
+    void AddLight2D(Light2D* light);
     Vector<WeakPtr<Light2D> >& GetLights() { return lights_; }
 
     void SetDirty() { /*verticesDirty_ = true;*/ }

@@ -11,7 +11,7 @@ class AssetImport extends Atomic.ScriptObject {
 
   handleDropFile(data):void {
 
-    print("Dropped: ", data.fileName);
+    Atomic.print("Dropped: ", data.fileName);
 
   }
 

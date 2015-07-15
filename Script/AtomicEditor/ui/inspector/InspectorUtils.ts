@@ -7,9 +7,6 @@ class InspectorUtils {
     fd.id = "Vera";
     fd.size = 11;
 
-    // must not be void dor static initializer
-    return null;
-
   })();
 
   static createSeparator(parent:Atomic.UIWidget):Atomic.UISeparator {

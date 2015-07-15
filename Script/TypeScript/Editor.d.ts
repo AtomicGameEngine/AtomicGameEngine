@@ -1,6 +1,8 @@
 //Atomic TypeScript Definitions
 
 
+/// <reference path="Atomic.d.ts" />
+
 declare module Editor {
 
 
@@ -36,7 +38,7 @@ declare module Editor {
 
    export class JSResourceEditor extends ResourceEditor {
 
-      constructor(fullpath: string, container: UITabContainer);
+      constructor(fullpath: string, container: Atomic.UITabContainer);
 
       findText(findText: string, flags: number): boolean;
       findTextClose(): void;
@@ -49,13 +51,13 @@ declare module Editor {
 
    export class ResourceEditor extends Atomic.AObject {
 
-      button: UIButton;
+      button: Atomic.UIButton;
       fullPath: string;
-      rootContentWidget: UIWidget;
+      rootContentWidget: Atomic.UIWidget;
 
-      constructor(fullpath: string, container: UITabContainer);
+      constructor(fullpath: string, container: Atomic.UITabContainer);
 
-      getButton(): UIButton;
+      getButton(): Atomic.UIButton;
       hasUnsavedModifications(): boolean;
       setFocus(): void;
       close(navigateToAvailableResource?: boolean): void;
@@ -64,18 +66,18 @@ declare module Editor {
       requiresInspector(): boolean;
       getFullPath(): string;
       save(): boolean;
-      getRootContentWidget(): UIWidget;
+      getRootContentWidget(): Atomic.UIWidget;
 
    }
 
    export class SceneEditor3D extends ResourceEditor {
 
-      scene: Scene;
+      scene: Atomic.Scene;
 
-      constructor(fullpath: string, container: UITabContainer);
+      constructor(fullpath: string, container: Atomic.UITabContainer);
 
-      selectNode(node: Node): void;
-      getScene(): Scene;
+      selectNode(node: Atomic.Node): void;
+      getScene(): Atomic.Scene;
       setFocus(): void;
       requiresInspector(): boolean;
       save(): boolean;
@@ -89,7 +91,7 @@ declare module Editor {
 
       constructor(sceneEditor: SceneEditor3D);
 
-      selectNode(node: Node): void;
+      selectNode(node: Atomic.Node): void;
       setPitch(pitch: number): void;
       setYaw(yaw: number): void;
       enable(): void;

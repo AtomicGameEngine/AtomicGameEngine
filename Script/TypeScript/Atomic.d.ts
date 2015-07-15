@@ -1856,8 +1856,6 @@ declare module Atomic {
       unregisterAllVars(): void;
       // Return node from the whole scene by ID, or null if not found.
       getNode(id: number): Node;
-      // Return component from the whole scene by ID, or null if not found.
-      getComponent(id: number): Component;
       // Return whether updates are enabled.
       isUpdateEnabled(): boolean;
       // Return whether an asynchronous loading operation is in progress.
@@ -1910,8 +1908,6 @@ declare module Atomic {
       getVarNamesAttr(): string;
       // Prepare network update by comparing attributes and marking replication states dirty as necessary.
       prepareNetworkUpdate(): void;
-      // Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
-      markReplicationDirty(node: Node): void;
 
    }
 
@@ -2482,7 +2478,7 @@ declare module Atomic {
       // Return a divisor value based on intensity for calculating the sort value.
       getIntensityDivisor(attenuation?: number): number;
       getShadowCascade():Number[];
-      setShadowCascade(Number[] args);
+      setShadowCascade(args:Number[]);
       setShadowCascadeParameter(index:number, value:number);
 
    }
@@ -2566,6 +2562,7 @@ declare module Atomic {
       // Return name for texture unit.
       getTextureUnitName(unit: TextureUnit): string;
       static getTextureUnitName(unit:TextureUnit):string;
+      getShaderParameters():ShaderParameter[];
 
    }
 
@@ -5315,7 +5312,7 @@ declare module Atomic {
 
       setPhysicsWorld(physicsWorld: PhysicsWorld2D): void;
       getPhysicsWorld(): PhysicsWorld2D;
-      addLight(light: Light2D): void;
+      addLight2D(light: Light2D): void;
       setDirty(): void;
       setAmbientColor(color: Color): void;
       getAmbientColor(): Color;
@@ -7821,11 +7818,11 @@ declare module Atomic {
       // Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined.
       systemCommand(commandLine: string, redirectStdOutToLog?: boolean): number;
       // Run a specific program, block until it exits and return the exit code. Will fail if any allowed paths are defined.
-      systemRun(fileName: string, arguments: string[]): number;
+      systemRun(fileName: string, args: string[]): number;
       // Run a program using the command interpreter asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
       systemCommandAsync(commandLine: string): number;
       // Run a specific program asynchronously. Return a request ID or M_MAX_UNSIGNED if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
-      systemRunAsync(fileName: string, arguments: string[]): number;
+      systemRunAsync(fileName: string, args: string[]): number;
       // Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined.
       systemOpen(fileName: string, mode?: string): boolean;
       // Copy a file. Return true if successful.

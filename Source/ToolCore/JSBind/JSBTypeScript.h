@@ -15,8 +15,11 @@ class JSBModule;
 namespace ToolCore
 {
 
+class JSBFunctionType;
+
 class JSBTypeScript
 {
+
 public:
 
     void Emit(JSBPackage* package, const String& path);
@@ -30,6 +33,8 @@ private:
     void End();
 
     void ExportFunction(JSBFunction* function);
+
+    String GetScriptType(JSBFunctionType* ftype);
 
     void ExportModuleEnums(JSBModule* moduleName);
     void ExportModuleConstants(JSBModule*  moduleName);

@@ -3,8 +3,6 @@
 import ScriptWidget = require("./ScriptWidget");
 import Editor = require("../editor/Editor");
 
-var UI = Atomic.UI;
-
 class ProjectFrame extends ScriptWidget {
 
     folderList: Atomic.UIListView;
@@ -15,7 +13,7 @@ class ProjectFrame extends ScriptWidget {
 
         this.load("AtomicEditor/editor/ui/projectframe.tb.txt");
 
-        this.gravity = UI.GRAVITY_TOP_BOTTOM;
+        this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
 
         var projectviewcontainer = parent.getWidget("projectviewcontainer");
 
@@ -43,7 +41,7 @@ class ProjectFrame extends ScriptWidget {
 
     handleWidgetEvent(data): boolean {
 
-        if (data.type == Atomic.UI.EVENT_TYPE_CLICK) {
+        if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
             var fs = Atomic.getFileSystem();
 
@@ -124,7 +122,7 @@ class ProjectFrame extends ScriptWidget {
             fd.size = 11;
 
             var button = new Atomic.UIButton();
-            button.gravity = UI.GRAVITY_LEFT;
+            button.gravity = Atomic.UI_GRAVITY_LEFT;
             button.text = "..                     ";
             button.id = "..";
             button.skinBg = "TBButton.flat";
@@ -275,7 +273,7 @@ class ProjectFrame extends ScriptWidget {
 
         var blayout = new Atomic.UILayout();
 
-        blayout.gravity = UI.GRAVITY_LEFT;
+        blayout.gravity = Atomic.UI_GRAVITY_LEFT;
 
         var spacer = new Atomic.UIWidget();
         spacer.rect = [0, 0, 8, 8];
@@ -290,11 +288,11 @@ class ProjectFrame extends ScriptWidget {
         fd.id = "Vera";
         fd.size = 11;
 
-        button.gravity = UI.GRAVITY_LEFT;
+        button.gravity = Atomic.UI_GRAVITY_LEFT;
 
         var image = new Atomic.UISkinImage(bitmapID);
         image.rect = [0, 0, 12, 12];
-        image.gravity = UI.GRAVITY_RIGHT;
+        image.gravity = Atomic.UI_GRAVITY_RIGHT;
         blayout.addChild(image);
 
         button.id = fullpath;

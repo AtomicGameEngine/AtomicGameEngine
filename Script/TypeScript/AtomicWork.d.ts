@@ -2,7 +2,11 @@
 /// <reference path="ToolCore.d.ts" />
 /// <reference path="Editor.d.ts" />
 
+
 declare module Atomic {
+
+    export function print(...args:any[]);
+
 
     export interface PathInfo {
 
@@ -57,6 +61,16 @@ declare module Atomic {
       mode:number; // AM_*
       defaultValue:string;
       enumNames:string[];
+
+    }
+
+    export interface ShaderParameter {
+
+      name:string;
+      value:any;
+      valueString:string;
+      typeName:string;
+      type:VariantType;
 
     }
 

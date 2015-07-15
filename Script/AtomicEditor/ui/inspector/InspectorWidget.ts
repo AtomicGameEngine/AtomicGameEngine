@@ -29,7 +29,7 @@ class InspectorWidget extends ScriptWidget {
     }
 
     onApply() {
-      print("Apply Pressed!");
+      console.log("Apply Pressed!");
     }
 
     createAttrName(name:string):Atomic.UITextField {
