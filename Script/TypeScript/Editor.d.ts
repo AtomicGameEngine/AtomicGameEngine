@@ -55,7 +55,7 @@ declare module Editor {
       constructor();
 
       createDirs(folder: string): boolean;
-      openProjectFileDialog(): void;
+      openProjectFileDialog(): string;
       newProjectFileDialog(): string;
       revealInFinder(fullpath: string): void;
 

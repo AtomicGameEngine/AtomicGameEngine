@@ -21,7 +21,7 @@ public:
 
     bool CreateDirs(const String& folder);
 
-    void OpenProjectFileDialog();
+    String OpenProjectFileDialog();
     String NewProjectFileDialog();
     void RevealInFinder(const String& fullpath);
 

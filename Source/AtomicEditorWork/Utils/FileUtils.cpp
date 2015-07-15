@@ -23,7 +23,7 @@ FileUtils::~FileUtils()
 {
 }
 
-void FileUtils::OpenProjectFileDialog()
+String FileUtils::OpenProjectFileDialog()
 {
     nfdchar_t *outPath = NULL;
 
@@ -31,17 +31,19 @@ void FileUtils::OpenProjectFileDialog()
                                 NULL,
                                 &outPath);
 
+    String fullpath;
+
     if (outPath && result == NFD_OKAY)
     {
-        String fullpath = outPath;
-        //Editor* editor = GetSubsystem<Editor>();
-        //editor->LoadProject(fullpath);
+        fullpath = outPath;
     }
 
     GetSubsystem<Graphics>()->RaiseWindow();
 
     if (outPath)
         free(outPath);
+
+    return fullpath;
 
 }
 

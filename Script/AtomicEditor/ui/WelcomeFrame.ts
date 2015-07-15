@@ -1,5 +1,6 @@
 
 import EditorEvents = require("../editor/EditorEvents");
+import EditorUI = require("./EditorUI");
 import ScriptWidget = require("./ScriptWidget");
 
 class WelcomeFrame extends ScriptWidget {
@@ -16,7 +17,7 @@ class WelcomeFrame extends ScriptWidget {
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
 
-          Editor.getPreferences().registerRecentProject(data.ProjectPath);
+            Editor.getPreferences().registerRecentProject(data.ProjectPath);
 
         })
 
@@ -44,6 +45,27 @@ class WelcomeFrame extends ScriptWidget {
 
                 }
 
+                return true;
+
+            }
+
+            if (id == "open project") {
+
+                var utils = new Editor.FileUtils();
+                var path = utils.openProjectFileDialog();
+                if (path) {
+
+                    this.sendEvent(EditorEvents.LoadProject, { path: path });
+
+                }
+
+                return true;
+            }
+
+            if (id == "new project") {
+
+                var mo = EditorUI.getModelOps();
+                mo.showNewProject();
                 return true;
 
             }
