@@ -281,7 +281,7 @@ void jsapi_init_atomic(JSVM* vm)
     duk_dup(ctx, -1);
     duk_put_prop_string(ctx, -3, "console");
     duk_push_c_function(ctx, js_print, DUK_VARARGS);
-    duk_put_prop_string(ctx, -1, "log");
+    duk_put_prop_string(ctx, -2, "log");
     duk_pop(ctx);
 
     duk_push_c_function(ctx, js_print, DUK_VARARGS);
