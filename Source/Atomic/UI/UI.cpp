@@ -33,6 +33,8 @@ using namespace tb;
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/VertexBuffer.h"
 
+#include "UIEvents.h"
+
 #include "UIRenderer.h"
 #include "UI.h"
 #include "UIButton.h"
@@ -53,6 +55,7 @@ using namespace tb;
 #include "UIInlineSelect.h"
 #include "UIScrollContainer.h"
 #include "UISeparator.h"
+#include "UIDimmer.h"
 
 namespace tb
 {
@@ -85,6 +88,8 @@ UI::~UI()
 {
     if (initialized_)
     {
+        tb::TBWidgetListener::RemoveGlobalListener(this);
+
         TBFile::SetReaderFunction(0);
         TBID::tbidRegisterCallback = 0;
 
@@ -148,6 +153,8 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+
+    tb::TBWidgetListener::AddGlobalListener(this);
 
     initialized_ = true;
 
@@ -471,6 +478,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     // this is order dependent as we're using IsOfType which also works if a base class
 
+    if (widget->IsOfType<TBDimmer>())
+    {
+        UIDimmer* dimmer = new UIDimmer(context_, false);
+        dimmer->SetWidget(widget);
+        widgetWrap_[widget] = dimmer;
+        return dimmer;
+    }
+
     if (widget->IsOfType<TBScrollContainer>())
     {
         UIScrollContainer* container = new UIScrollContainer(context_, false);
@@ -623,6 +638,17 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     return 0;
 }
+
+void UI::OnWidgetDelete(tb::TBWidget *widget)
+{
+
+}
+
+bool UI::OnWidgetDying(tb::TBWidget *widget)
+{
+    return false;
+}
+
 
 
 }

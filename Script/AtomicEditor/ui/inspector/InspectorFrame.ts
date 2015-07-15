@@ -1,5 +1,5 @@
 
-import UIEvents = require("../UIEvents");
+import EditorEvents = require("../../editor/EditorEvents");
 import ScriptWidget = require("../ScriptWidget");
 import DataBinding = require("./DataBinding");
 
@@ -21,13 +21,13 @@ class InspectorFrame extends ScriptWidget {
 
         var container = this.getWidget("inspectorcontainer");
 
-        this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
+        this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent("EditorActiveNodeChange", (data) => this.handleActiveNodeChange(data));
 
 
     }
 
-    handleEditResource(ev: UIEvents.EditorResourceEvent) {
+    handleEditResource(ev: EditorEvents.EditResourceEvent) {
 
         var path = ev.path;
 

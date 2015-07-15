@@ -1,4 +1,5 @@
 import ScriptWidget = require("./ScriptWidget");
+import EditorEvents = require("../editor/EditorEvents");
 import UIEvents = require("./UIEvents");
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
@@ -27,7 +28,7 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleEditResource(ev: UIEvents.EditorResourceEvent) {
+    handleEditResource(ev: EditorEvents.EditResourceEvent) {
 
         var path = ev.path;
 
@@ -177,7 +178,7 @@ class ResourceFrame extends ScriptWidget {
 
         this.resourceViewContainer.addChild(this);
 
-        this.subscribeToEvent(UIEvents.EditResource, (data) => this.handleEditResource(data));
+        this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(UIEvents.CloseResourceEditor, (data) => this.handleCloseResourceEditor(data));
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 

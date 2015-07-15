@@ -16,6 +16,7 @@
         "./editor/EditorEvents.ts",
         "./main.ts",
         "./ui/EditorStrings.ts",
+        "./ui/EditorUI.ts",
         "./ui/HierarchyFrame.ts",
         "./ui/MainFrame.ts",
         "./ui/MainFrameMenu.ts",
@@ -37,6 +38,8 @@
         "./ui/inspector/NodeInspector.ts",
         "./ui/inspector/TextureSelector.ts",
         "./ui/modal/MessageModal.ts",
-        "./ui/modal/ModalOps.ts"
+        "./ui/modal/ModalOps.ts",
+        "./ui/modal/ModalWindow.ts",
+        "./ui/modal/NewProject.ts"
     ]
 }

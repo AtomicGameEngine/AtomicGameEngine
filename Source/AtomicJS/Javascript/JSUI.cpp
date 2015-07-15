@@ -58,6 +58,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UITextureWidget"] = true;
     uiTypes_["UIScrollContainer"] = true;
     uiTypes_["UISeparator"] = true;
+    uiTypes_["UIDimmer"] = true;
 
 }
 

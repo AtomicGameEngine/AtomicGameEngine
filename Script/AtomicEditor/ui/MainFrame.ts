@@ -1,4 +1,3 @@
-import MainFrameMenu = require("./MainFrameMenu");
 import ProjectFrame = require("./ProjectFrame");
 import ResourceFrame = require("./ResourceFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
@@ -9,6 +8,7 @@ import MessageModal = require("./modal/MessageModal");
 import UIEvents = require("./UIEvents");
 
 import ScriptWidget = require("./ScriptWidget");
+import MainFrameMenu = require("./MainFrameMenu");
 
 class MainFrame extends ScriptWidget {
 

@@ -1,13 +1,13 @@
 
 import UIEvents = require("../UIEvents");
-import Editor = require("../../editor/Editor");
+import EditorUI = require("../EditorUI");
 
 export class MessageModal extends Atomic.ScriptObject
 {
 
   showErrorWindow(title:string, message:string):void {
 
-    var mainframe = Editor.instance.mainframe;
+    var mainframe = EditorUI.getMainFrame();
 
     new Atomic.UIMessageWindow(mainframe, "modal_error").show(title, message, 640, 360);
 

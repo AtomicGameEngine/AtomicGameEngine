@@ -6988,6 +6988,13 @@ declare module Atomic {
 
    }
 
+   export class UIDimmer extends UIWidget {
+
+      constructor(createWidget?: boolean);
+
+
+   }
+
    export class UIDragObject extends AObject {
 
       text: string;
@@ -7384,6 +7391,8 @@ declare module Atomic {
       setValue(value: number): void;
       getValue(): number;
       setFocus(): void;
+      // Set focus to first widget which accepts it
+      setFocusRecursive(): void;
       onFocusChanged(focused: boolean): void;
       setState(state: number, on: boolean): void;
       getState(state: number): boolean;

@@ -1,11 +1,7 @@
 
 import strings = require("./EditorStrings");
 import EditorEvents = require("../editor/EditorEvents");
-
-var UIMenuItemSource = Atomic.UIMenuItemSource;
-var UIMenuItem = Atomic.UIMenuItem;
-
-var StringID = strings.StringID;
+import EditorUI = require("./EditorUI");
 
 class MainFrameMenu extends Atomic.ScriptObject {
 
@@ -42,6 +38,15 @@ class MainFrameMenu extends Atomic.ScriptObject {
           return false;
 
       } else if (target.id == "menu file popup") {
+
+          if (refid == "file new project") {
+
+            var mo = EditorUI.getModelOps();
+            mo.showNewProject();
+
+            return true;
+
+          }
 
           if (refid == "file save file") {
 
@@ -108,6 +113,10 @@ class MainFrameMenu extends Atomic.ScriptObject {
 export = MainFrameMenu;
 
 // initialization
+
+var UIMenuItemSource = Atomic.UIMenuItemSource;
+var UIMenuItem = Atomic.UIMenuItem;
+var StringID = strings.StringID;
 
 var editorItems = {
     "About Atomic Editor": "about atomic editor",

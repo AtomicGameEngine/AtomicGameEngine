@@ -433,6 +433,14 @@ void UIWidget::SetFocus()
     widget_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
 }
 
+void UIWidget::SetFocusRecursive()
+{
+    if (!widget_)
+        return;
+
+    widget_->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
+}
+
 void UIWidget::SetVisibility(UI_WIDGET_VISIBILITY visibility)
 {
 

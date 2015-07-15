@@ -54,6 +54,12 @@ declare module Atomic {
         touch: boolean;
     }
 
+    export interface UIWidgetDeletedEvent {
+      
+        widget: UIWidget;
+    }
+
+
     export interface AttributeInfo {
 
       type:VariantType;
