@@ -39,7 +39,7 @@ class MainFrame extends ScriptWidget {
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
-          this.showResourceFrame(true);
+          this.showWelcomeFrame(false);
         });
 
         this.showWelcomeFrame(true);
@@ -59,75 +59,20 @@ class MainFrame extends ScriptWidget {
         return false;
     }
 
-    showResourceFrame(show: boolean) {
-
-        if (show && this.frameVisible(this.resourceframe))
-            return;
-
-        if (show && this.frameVisible(this.welcomeFrame))
-            this.showWelcomeFrame(false);
-
-        var container = <Atomic.UILayout> this.getWidget("resourceviewcontainer");
-
-        var child = null;
-
-        for (child = container.firstChild; child; child = child.next) {
-            if (child == this.resourceframe)
-                break;
-        }
-
-        if (show) {
-
-            this.showInspectorFrame(true);
-
-            if (!child) {
-                container.addChild(this.resourceframe);
-            }
-
-        }
-        else {
-
-            if (child)
-                container.removeChild(child);
-        }
-
-    }
-
-
     showWelcomeFrame(show: boolean) {
 
-        if (show && this.frameVisible(this.welcomeFrame))
-            return;
-
-        if (show && this.frameVisible(this.resourceframe))
-            this.showResourceFrame(false);
-
-        var container = <Atomic.UILayout> this.getWidget("resourceviewcontainer");
-
-        var child = null;
-        for (child = container.firstChild; child; child = child.next) {
-            if (child == this.welcomeFrame)
-                break;
-        }
-
         if (show) {
-
-            this.showInspectorFrame(false);
-
-            this.welcomeFrame.updateRecentProjects();
-
-            if (!child) {
-                container.addChild(this.welcomeFrame);
-            }
-
+          this.showInspectorFrame(false);
+          this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+          this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         }
         else {
-            if (child)
-                container.removeChild(child);
+          this.showInspectorFrame(true);
+          this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+          this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         }
 
     }
-
 
     showInspectorFrame(show: boolean) {
 

@@ -20,6 +20,12 @@ class WelcomeFrame extends ScriptWidget {
 
         })
 
+        var container = <Atomic.UILayout> parent.getWidget("resourceviewcontainer");
+
+        container.addChild(this);
+
+        this.updateRecentProjects();
+
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
