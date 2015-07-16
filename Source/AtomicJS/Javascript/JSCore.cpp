@@ -83,8 +83,6 @@ static int Object_SubscribeToEvent(duk_context* ctx)
     return 0;
 }
 
-// so we don't keep allocating these
-static VariantMap sendEventVMap;
 static int Object_SendEvent(duk_context* ctx)
 {
     int top = duk_get_top(ctx);
@@ -102,6 +100,7 @@ static int Object_SendEvent(duk_context* ctx)
     {
         if (duk_is_object(ctx, 1)) {
 
+            VariantMap sendEventVMap;
             js_object_to_variantmap(ctx, 1, sendEventVMap);
 
             sender->SendEvent(duk_to_string(ctx, 0), sendEventVMap);

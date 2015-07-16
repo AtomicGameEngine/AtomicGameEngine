@@ -20,35 +20,16 @@ JSEventDispatcher::~JSEventDispatcher()
 
 void JSEventDispatcher::BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
 {
-    JSVM* vm = JSVM::GetJSVM(NULL);
-
-    if (!vm)
-        return;
-
-    if (!jsEvents_.Contains(eventType))
-        return;
-
-    duk_context* ctx = vm->GetJSContext();
-
-    duk_push_global_stash(ctx);
-    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_VARIANTMAP_CACHE);
-
-    duk_push_pointer(ctx, (void*) &eventData);
-    js_push_variantmap(ctx, eventData);
-    duk_put_prop(ctx, -3);
-
-    duk_pop_2(ctx);
-
 }
 
 void JSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
 {
+    if (!jsEvents_.Contains(eventType))
+        return;
+
     JSVM* vm = JSVM::GetJSVM(NULL);
 
     if (!vm)
-        return;
-
-    if (!jsEvents_.Contains(eventType))
         return;
 
     duk_context* ctx = vm->GetJSContext();
@@ -107,21 +88,30 @@ void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 
     if (duk_is_function(ctx, -1))
     {
-        assert(duk_is_object(ctx, -1));
-
+        // look in the variant map cache
         duk_push_global_stash(ctx);
         duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_VARIANTMAP_CACHE);
         duk_push_pointer(ctx, (void*) &eventData);
         duk_get_prop(ctx, -2);
 
+        if (!duk_is_object(ctx, -1))
+        {
+            // pop result
+            duk_pop(ctx);
+
+            // we need to push a new variant map and store to cache
+            // the cache object will be cleared at the send end in  the
+            // global listener above
+            js_push_variantmap(ctx, eventData);
+            duk_push_pointer(ctx, (void*) &eventData);
+            duk_dup(ctx, -2);
+            duk_put_prop(ctx, -4);
+
+        }
+
         duk_remove(ctx, -2); // vmap cache
         duk_remove(ctx, -2); // global stash
 
-        if (!duk_is_object(ctx, -1))
-        {
-            duk_set_top(ctx, top);
-            return;
-        }
 
         if (duk_pcall(ctx, 1) != 0)
         {
