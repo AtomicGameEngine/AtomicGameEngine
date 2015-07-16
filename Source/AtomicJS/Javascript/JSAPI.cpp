@@ -375,7 +375,7 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
         ref = v.GetPtr();
 
-        if (!ref || !ref->IsObject())
+        if (!ref || !ref->IsObject() || !ref->Refs())
         {
             duk_push_null(ctx);
             break;
