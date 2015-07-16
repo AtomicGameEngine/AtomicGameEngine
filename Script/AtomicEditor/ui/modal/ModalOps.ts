@@ -7,6 +7,8 @@ import EULAWindow = require("../license/EULAWindow");
 import ActivationWindow = require("../license/ActivationWindow");
 import ActivationSuccessWindow = require("../license/ActivationSuccessWindow");
 
+import UIResourceOps = require("./UIResourceOps");
+
 class ModalOps extends Atomic.ScriptObject {
 
     constructor() {
@@ -22,6 +24,16 @@ class ModalOps extends Atomic.ScriptObject {
       if (this.show()) {
 
           this.opWindow = new CreateProject(projectTemplateFolder);
+
+      }
+
+    }
+
+    showCreateFolder(resourcePath:string) {
+
+      if (this.show()) {
+
+          this.opWindow = new UIResourceOps.CreateFolder(resourcePath);
 
       }
 

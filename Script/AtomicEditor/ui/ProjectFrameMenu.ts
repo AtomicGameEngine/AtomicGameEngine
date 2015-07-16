@@ -14,13 +14,15 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
+    handlePopupMenu(target: Atomic.UIWidget, refid: string, currentContentFolder:string): boolean {
 
         if (!target || !refid) return;
 
         if (target.id == "create popup") {
 
             if (refid == "create_folder") {
+
+                EditorUI.getModelOps().showCreateFolder(currentContentFolder);
 
                 return true;
 

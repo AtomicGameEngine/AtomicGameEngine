@@ -1,6 +1,14 @@
 
 export const Quit = "EditorEventQuit";
 
+export const ModalError = "ModalError";
+export interface ModalErrorEvent {
+
+  title: string;
+  message: string;
+
+}
+
 export const LoadProject = "EditorLoadProject";
 export interface LoadProjectEvent {
 

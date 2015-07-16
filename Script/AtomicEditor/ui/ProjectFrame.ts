@@ -10,6 +10,7 @@ class ProjectFrame extends ScriptWidget {
 
     folderList: Atomic.UIListView;
     menu: ProjectFrameMenu;
+    currentFolder: ToolCore.Asset;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -45,7 +46,11 @@ class ProjectFrame extends ScriptWidget {
 
             var id = data.target.id;
 
-            if (this.menu.handlePopupMenu(data.target, data.refid))
+            var system = ToolCore.getToolSystem();
+            var project = system.project;
+
+
+            if (this.menu.handlePopupMenu(data.target, data.refid, this.currentFolder ? this.currentFolder.path : project.resourcePath))
                 return true;
 
             // create
@@ -186,6 +191,8 @@ class ProjectFrame extends ScriptWidget {
     }
 
     private refreshContent(folder: ToolCore.Asset) {
+
+        this.currentFolder = folder;
 
         var db = ToolCore.getAssetDatabase();
 

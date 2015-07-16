@@ -1,4 +1,5 @@
 
+import EditorEvents = require("../editor/EditorEvents");
 import MainFrame = require("../ui/MainFrame");
 import ModalOps = require("./modal/ModalOps");
 
@@ -46,6 +47,10 @@ class EditorUI extends Atomic.ScriptObject {
     this.mainframe.setSize(graphics.width, graphics.height);
 
     this.modalOps = new ModalOps();
+
+    this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {
+      this.showModalError(event.title, event.message);
+    })
 
   }
 

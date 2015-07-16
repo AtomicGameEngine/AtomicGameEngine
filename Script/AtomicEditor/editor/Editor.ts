@@ -27,10 +27,11 @@ class Editor extends Atomic.ScriptObject {
 
         this.assetImport = new AssetImport();
 
-        this.parseArguments();
-
         this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
         this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
+
+        this.parseArguments();
+
 
     }
 

@@ -16,6 +16,7 @@
         "./editor/EditorEvents.ts",
         "./editor/EditorLicense.ts",
         "./main.ts",
+        "./resources/ResourceOps.ts",
         "./ui/EditorStrings.ts",
         "./ui/EditorUI.ts",
         "./ui/HierarchyFrame.ts",
@@ -49,6 +50,7 @@
         "./ui/modal/ModalOps.ts",
         "./ui/modal/ModalWindow.ts",
         "./ui/modal/NewProject.ts",
-        "./ui/modal/ProgressModal.ts"
+        "./ui/modal/ProgressModal.ts",
+        "./ui/modal/UIResourceOps.ts"
     ]
 }
