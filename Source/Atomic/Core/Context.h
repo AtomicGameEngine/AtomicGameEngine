@@ -30,6 +30,17 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+
+class GlobalEventListener
+{
+public:
+    virtual void BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
+    virtual void EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
+};
+
+// ATOMIC END
+
 /// Atomic execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class ATOMIC_API Context : public RefCounted
 {
@@ -144,6 +155,10 @@ public:
     }
 
     // ATOMIC BEGIN
+
+    // hook for listening into events
+    void SetGlobalEventListener(GlobalEventListener* listener) { globalEventListener_ = listener; }
+
     /// Get whether an Editor Context
     void SetEditorContent(bool editor) { editorContext_ = editor; }
     // ATOMIC END
@@ -164,10 +179,10 @@ private:
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
 
     /// Begin event send.
-    void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
+    void BeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) { if (globalEventListener_) globalEventListener_->BeginSendEvent(this, sender, eventType, eventData); eventSenders_.Push(sender); }
 
     /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent() { eventSenders_.Pop(); }
+    void EndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) { if (globalEventListener_) globalEventListener_->EndSendEvent(this, sender, eventType, eventData); eventSenders_.Pop(); }
 
     /// Object factories.
     HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;
@@ -190,7 +205,10 @@ private:
     /// Object categories.
     HashMap<String, Vector<StringHash> > objectCategories_;
 
+    // ATOMIC BEGIN
+    GlobalEventListener* globalEventListener_;
     bool editorContext_;
+    // ATOMIC END
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

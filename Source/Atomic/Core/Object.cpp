@@ -236,7 +236,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     Context* context = context_;
     HashSet<Object*> processed;
 
-    context->BeginSendEvent(this);
+    context->BeginSendEvent(this, eventType, eventData);
 
     // Check first the specific event receivers
     const HashSet<Object*>* group = context->GetEventReceivers(this, eventType);
@@ -256,7 +256,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             // If self has been destroyed as a result of event handling, exit
             if (self.Expired())
             {
-                context->EndSendEvent();
+                context->EndSendEvent(this, eventType, eventData);
                 return;
             }
 
@@ -288,7 +288,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
                 if (self.Expired())
                 {
-                    context->EndSendEvent();
+                    context->EndSendEvent(this,eventType,  eventData);
                     return;
                 }
 
@@ -314,7 +314,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
                     if (self.Expired())
                     {
-                        context->EndSendEvent();
+                        context->EndSendEvent(this, eventType, eventData);
                         return;
                     }
 
@@ -325,7 +325,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         }
     }
 
-    context->EndSendEvent();
+    context->EndSendEvent(this,eventType, eventData);
 }
 
 VariantMap& Object::GetEventDataMap() const

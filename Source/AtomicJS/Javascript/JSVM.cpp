@@ -21,6 +21,7 @@
 #include "JSAtomic.h"
 #include "JSUI.h"
 #include "JSMetrics.h"
+#include "JSEventHelper.h"
 
 namespace Atomic
 {
@@ -37,10 +38,17 @@ JSVM::JSVM(Context* context) :
     instance_ = this;
 
     metrics_ = new JSMetrics(context, this);
+
+    context_->RegisterSubsystem(new JSEventDispatcher(context_));
+    context_->SetGlobalEventListener(context_->GetSubsystem<JSEventDispatcher>());
+
 }
 
 JSVM::~JSVM()
 {
+    context_->SetGlobalEventListener(0);
+    context_->RemoveSubsystem(JSEventDispatcher::GetTypeStatic());
+
     duk_destroy_heap(ctx_);
     instance_ = NULL;
 }
