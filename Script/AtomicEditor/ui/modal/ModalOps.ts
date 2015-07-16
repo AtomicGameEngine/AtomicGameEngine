@@ -3,6 +3,10 @@ import ModalWindow = require("./ModalWindow");
 import NewProject = require("./NewProject");
 import CreateProject = require("./CreateProject");
 
+import EULAWindow = require("../license/EULAWindow");
+import ActivationWindow = require("../license/ActivationWindow");
+import ActivationSuccessWindow = require("../license/ActivationSuccessWindow");
+
 class ModalOps extends Atomic.ScriptObject {
 
     constructor() {
@@ -30,6 +34,36 @@ class ModalOps extends Atomic.ScriptObject {
             this.opWindow = new NewProject();
 
         }
+    }
+
+    showEULAWindow() {
+
+      if (this.show()) {
+
+          this.opWindow = new EULAWindow();
+
+      }
+
+    }
+
+    showActivationWindow() {
+
+      if (this.show()) {
+
+          this.opWindow = new ActivationWindow();
+
+      }
+
+    }
+
+    showActivationSuccessWindow() {
+
+      if (this.show()) {
+
+          this.opWindow = new ActivationSuccessWindow();
+
+      }
+
     }
 
     private show(): boolean {

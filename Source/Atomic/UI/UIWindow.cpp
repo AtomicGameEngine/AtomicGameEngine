@@ -23,8 +23,16 @@ UIWindow::UIWindow(Context* context, bool createWidget) : UIWidget(context, fals
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
+UI_WINDOW_SETTINGS UIWindow::GetSettings()
+{
+    if (!widget_)
+        return UI_WINDOW_SETTINGS_DEFAULT;
 
-void UIWindow::SetSettings(unsigned settings)
+    return (UI_WINDOW_SETTINGS) ((TBWindow*)widget_)->GetSettings();
+
+}
+
+void UIWindow::SetSettings(UI_WINDOW_SETTINGS settings)
 {
     if (!widget_)
         return;

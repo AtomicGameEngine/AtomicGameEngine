@@ -4,6 +4,7 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/Assets/AssetDatabase.h>
 #include <ToolCore/Project/Project.h>
+#include <ToolCore/License/LicenseSystem.h>
 
 using namespace Atomic;
 
@@ -31,13 +32,19 @@ static int js_atomic_GetToolSystem(duk_context* ctx)
     return 1;
 }
 
+static int js_atomic_GetLicenseSystem(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm->GetSubsystem<LicenseSystem>());
+    return 1;
+}
+
 static int js_atomic_GetAssetDatabase(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
     js_push_class_object_instance(ctx, vm->GetSubsystem<AssetDatabase>());
     return 1;
 }
-
 
 static int AssetDatabase_GetFolderAssets(duk_context* ctx)
 {
@@ -108,6 +115,9 @@ void jsapi_init_toolcore(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetToolSystem, 0);
     duk_put_prop_string(ctx, -2, "getToolSystem");
+
+    duk_push_c_function(ctx, js_atomic_GetLicenseSystem, 0);
+    duk_put_prop_string(ctx, -2, "getLicenseSystem");
 
     duk_push_c_function(ctx, js_atomic_GetAssetDatabase, 0);
     duk_put_prop_string(ctx, -2, "getAssetDatabase");

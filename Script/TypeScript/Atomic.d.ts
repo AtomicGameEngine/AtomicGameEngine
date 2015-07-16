@@ -679,6 +679,16 @@ declare module Atomic {
    export var UI_WIDGET_Z_REL_AFTER: UI_WIDGET_Z_REL;
 
 
+   // enum UI_WINDOW_SETTINGS
+   export type UI_WINDOW_SETTINGS = number;
+   export var UI_WINDOW_SETTINGS_NONE: UI_WINDOW_SETTINGS;
+   export var UI_WINDOW_SETTINGS_TITLEBAR: UI_WINDOW_SETTINGS;
+   export var UI_WINDOW_SETTINGS_RESIZABLE: UI_WINDOW_SETTINGS;
+   export var UI_WINDOW_SETTINGS_CLOSE_BUTTON: UI_WINDOW_SETTINGS;
+   export var UI_WINDOW_SETTINGS_CAN_ACTIVATE: UI_WINDOW_SETTINGS;
+   export var UI_WINDOW_SETTINGS_DEFAULT: UI_WINDOW_SETTINGS;
+
+
    // enum CompressedFormat
    export type CompressedFormat = number;
    export var CF_NONE: CompressedFormat;
@@ -7422,11 +7432,12 @@ declare module Atomic {
 
    export class UIWindow extends UIWidget {
 
-      settings: number;
+      settings: UI_WINDOW_SETTINGS;
 
       constructor(createWidget?: boolean);
 
-      setSettings(settings: number): void;
+      getSettings(): UI_WINDOW_SETTINGS;
+      setSettings(settings: UI_WINDOW_SETTINGS): void;
       resizeToFitContent(): void;
       addChild(child: UIWidget): void;
       close(): void;
@@ -7808,6 +7819,7 @@ declare module Atomic {
       isPackaged(): boolean;
       // Return the fullpath to the file
       getFullPath(): string;
+      readText():string;
 
    }
 

@@ -1,11 +1,11 @@
 {
 	"name" : "ToolCore",
 	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
-							 "Source/ToolCore/Import", "Source/ToolCore/Assets"],
+							 "Source/ToolCore/Import", "Source/ToolCore/Assets", "Source/ToolCore/License"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
 							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
-							 "PrefabImporter"],
+							 "PrefabImporter", "LicenseSystem"],
 	"typescript_decl" : {
 
 		"AssetDatabase" : [

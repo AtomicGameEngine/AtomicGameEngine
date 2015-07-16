@@ -105,4 +105,5 @@ declare module ToolCore {
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;
     export function getAssetDatabase(): AssetDatabase;
+    export function getLicenseSystem(): LicenseSystem;
 }

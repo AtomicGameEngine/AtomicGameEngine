@@ -2,13 +2,14 @@
 import EditorUI = require("../ui/EditorUI");
 import UIEvents = require("../ui/UIEvents");
 import AssetImport = require("../assets/AssetImport");
-
+import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
 
 class Editor extends Atomic.ScriptObject {
 
     project: ToolCore.Project;
     assetImport: AssetImport;
+    editorLicense:EditorLicense;
 
     static instance: Editor;
 
@@ -17,6 +18,8 @@ class Editor extends Atomic.ScriptObject {
         super();
 
         Editor.instance = this;
+
+        this.editorLicense = new EditorLicense();
 
         EditorUI.initialize();
 

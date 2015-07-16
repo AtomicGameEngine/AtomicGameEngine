@@ -16,6 +16,8 @@
 
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
+#include <ToolCore/License/LicenseEvents.h>
+#include <ToolCore/License/LicenseSystem.h>
 
 #include "AEEditorApp.h"
 #include "AEPreferences.h"
@@ -88,6 +90,8 @@ void AEEditorApp::Start()
         ErrorExit("Error executing AtomicEditor/main.js");
         return;
     }
+
+    GetSubsystem<LicenseSystem>()->Initialize();
 
 }
 

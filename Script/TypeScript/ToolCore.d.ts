@@ -357,6 +357,36 @@ declare module ToolCore {
 
    }
 
+   export class LicenseSystem extends Atomic.AObject {
+
+      key: string;
+      email: string;
+
+      // Construct.
+      constructor();
+
+      initialize(): void;
+      licenseWindows(): boolean;
+      licenseMac(): boolean;
+      licenseAndroid(): boolean;
+      licenseIOS(): boolean;
+      licenseHTML5(): boolean;
+      licenseModule3D(): boolean;
+      // Returns whether there are any platform licenses available
+      isStandardLicense(): boolean;
+      resetLicense(): void;
+      loadLicense(): boolean;
+      // Basic key validation
+      validateKey(key: string): boolean;
+      // Activate on server
+      requestServerActivation(key: string): void;
+      getKey(): string;
+      generateMachineID(): string;
+      getEmail(): string;
+      licenseAgreementConfirmed(): void;
+
+   }
+
 
 
 }

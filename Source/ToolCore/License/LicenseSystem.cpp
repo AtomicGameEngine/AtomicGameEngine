@@ -100,10 +100,8 @@ void LicenseSystem::LicenseAgreementConfirmed()
     file->WriteInt(1);
     file->Close();
 
-    /*
-    UIModalOps* ops = GetSubsystem<UIModalOps>();
-    ops->ShowActivation();
-    */
+    if (!LoadLicense() || !key_.Length())
+        SendEvent(E_LICENSE_ACTIVATIONREQUIRED);
 }
 
 String LicenseSystem::GenerateMachineID()
@@ -596,13 +594,10 @@ void LicenseSystem::RequestServerActivation(const String& key)
         LOGERROR("UIActivation::RequestServerActivation - request already exists");
         return;
     }
-
-    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-
     key_ = key;
     CurlManager* cm = GetSubsystem<CurlManager>();
     String post;
-    String id = licenseSystem->GenerateMachineID();
+    String id = GenerateMachineID();
     post.AppendWithFormat("key=%s&id=%s", key.CString(), id.CString());
 
     // todo, this should be a verify url (shouldn't auto add id)

@@ -8,6 +8,9 @@
 		}
 	},
 	"typescript_decl" : {
+		"File" : [
+			"readText():string;"
+		],
 		"FileSystem" : [
 			"scanDir(pathName:string, filter:string, flags:number, recursive:boolean);"
 		]
