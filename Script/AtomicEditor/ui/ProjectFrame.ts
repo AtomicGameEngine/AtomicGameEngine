@@ -3,14 +3,19 @@
 import ScriptWidget = require("./ScriptWidget");
 import Editor = require("../editor/Editor");
 import EditorEvents = require("../editor/EditorEvents");
+import ProjectFrameMenu = require("./ProjectFrameMenu");
+import MenuItemSources = require("./menus/MenuItemSources");
 
 class ProjectFrame extends ScriptWidget {
 
     folderList: Atomic.UIListView;
+    menu: ProjectFrameMenu;
 
     constructor(parent: Atomic.UIWidget) {
 
         super();
+
+        this.menu = new ProjectFrameMenu();
 
         this.load("AtomicEditor/editor/ui/projectframe.tb.txt");
 
@@ -34,17 +39,31 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    handleWidgetEvent(data): boolean {
+    handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
         if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = data.target.id;
+
+            if (this.menu.handlePopupMenu(data.target, data.refid))
+                return true;
+
+            // create
+            if (id == "menu create") {
+
+                var src = MenuItemSources.getMenuItemSource("project create items");
+                var menu = new Atomic.UIMenuWindow(data.target, "create popup");
+                menu.show(src);
+                return true;
+
+            }
+
 
             var db = ToolCore.getAssetDatabase();
 
             var fs = Atomic.getFileSystem();
 
             if (data.target && data.target.id.length) {
-
-                var id = data.target.id;
 
                 if (id == "folderList_") {
 
@@ -91,13 +110,13 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    rescan(asset:ToolCore.Asset) {
+    rescan(asset: ToolCore.Asset) {
 
-      var db = ToolCore.getAssetDatabase();
+        var db = ToolCore.getAssetDatabase();
 
-      db.scan();
-      this.refresh();
-      this.refreshContent(asset);
+        db.scan();
+        this.refresh();
+        this.refreshContent(asset);
 
     }
 

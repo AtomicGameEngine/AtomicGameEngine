@@ -68,9 +68,10 @@ private:
 
 // UI IMPLEMENTATION
 
-UIMenuItem::UIMenuItem(Context* context, const String& str, const String& id, const String& shortcut):
+UIMenuItem::UIMenuItem(Context* context, const String& str, const String& id, const String& shortcut, const String& skinBg):
     UISelectItem(context, str, id),
-    shortcut_(shortcut)
+    shortcut_(shortcut),
+    skinBg_(skinBg)
 {
 
 }
@@ -91,6 +92,11 @@ tb::TBGenericStringItem* UIMenuItem::GetTBItem()
     else
     {
         item = new MenubarItem(str_.CString(), subSource_->GetTBItemSource());
+    }
+
+    if (skinBg_.Length())
+    {
+        item->SetSkinImage(TBIDC(skinBg_.CString()));
     }
 
     return item;

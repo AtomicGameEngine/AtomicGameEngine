@@ -7133,7 +7133,7 @@ declare module Atomic {
 
    export class UIMenuItem extends UISelectItem {
 
-      constructor(str?: string, id?: string, shortcut?: string);
+      constructor(str?: string, id?: string, shortcut?: string, skinBg?: string);
 
 
    }

@@ -11,6 +11,8 @@ import UIEvents = require("./UIEvents");
 import ScriptWidget = require("./ScriptWidget");
 import MainFrameMenu = require("./MainFrameMenu");
 
+import MenuItemSources = require("./menus/MenuItemSources");
+
 class MainFrame extends ScriptWidget {
 
     constructor() {
@@ -95,7 +97,7 @@ class MainFrame extends ScriptWidget {
         if (this.menu.handlePopupMenu(target, refid))
             return true;
 
-        var src = this.menu.getMenuItemSource(target.id);
+        var src = MenuItemSources.getMenuItemSource(target.id);
 
         if (src) {
 

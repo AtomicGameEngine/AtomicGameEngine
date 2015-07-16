@@ -58,35 +58,36 @@ class InspectorFrame extends ScriptWidget {
 
     inspectAsset(asset: ToolCore.Asset) {
 
-       if (asset.importerTypeName == "ModelImporter") {
+        if (asset.importerTypeName == "ModelImporter") {
 
-         var container = this.getWidget("inspectorcontainer");
-         container.deleteAllChildren();
+            var container = this.getWidget("inspectorcontainer");
+            container.deleteAllChildren();
 
-         var inspector = new ModelInspector();
-         container.addChild(inspector);
+            var inspector = new ModelInspector();
+            container.addChild(inspector);
 
-         inspector.inspect(asset);
+            inspector.inspect(asset);
 
 
-       }
+        }
 
         if (asset.importerTypeName == "MaterialImporter") {
 
-          var cache = Atomic.getResourceCache();
+            var cache = Atomic.getResourceCache();
 
-          var material = <Atomic.Material> cache.getResource("Material", asset.path);
+            var material = <Atomic.Material> cache.getResource("Material", asset.path);
 
-          if (!material)
-              return;
+            if (!material) {
+                return;
+            }
 
-          var container = this.getWidget("inspectorcontainer");
-          container.deleteAllChildren();
+            var container = this.getWidget("inspectorcontainer");
+            container.deleteAllChildren();
 
-          var materialInspector = new MaterialInspector();
-          container.addChild(inspector);
+            var materialInspector = new MaterialInspector();
+            container.addChild(materialInspector);
 
-          materialInspector.inspect(asset, material);
+            materialInspector.inspect(asset, material);
 
         }
 
