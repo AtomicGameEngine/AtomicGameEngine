@@ -39,6 +39,7 @@ void js_class_get_constructor(duk_context* ctx, const char* package, const char 
 
 /// Pushes variant value or undefined if can't be pushed
 void js_push_variant(duk_context* ctx, const Variant &v);
+void js_push_variantmap(duk_context* ctx, const VariantMap &vmap);
 
 void js_to_variant(duk_context* ctx, int variantIdx, Variant &v);
 

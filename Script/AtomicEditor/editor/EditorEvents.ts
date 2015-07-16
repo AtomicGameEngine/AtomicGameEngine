@@ -9,6 +9,22 @@ export interface ModalErrorEvent {
 
 }
 
+export const ContentFolderChanged = "ContentFolderChanged";
+export interface ContentFolderChangedEvent {
+
+  path: string;
+
+}
+
+export const ResourceFolderCreated = "ResourceFolderCreated";
+export interface ResourceFolderCreatedEvent {
+
+  path: string;
+  navigate:boolean;
+
+}
+
+
 export const LoadProject = "EditorLoadProject";
 export interface LoadProjectEvent {
 

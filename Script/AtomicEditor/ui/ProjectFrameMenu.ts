@@ -12,9 +12,13 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
         MenuItemSources.createMenuItemSource("project create items", createItems);
 
+        this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev:EditorEvents.ContentFolderChangedEvent) => {
+          this.contentFolder = ev.path;
+        })
+
     }
 
-    handlePopupMenu(target: Atomic.UIWidget, refid: string, currentContentFolder:string): boolean {
+    handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
 
         if (!target || !refid) return;
 
@@ -22,7 +26,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
             if (refid == "create_folder") {
 
-                EditorUI.getModelOps().showCreateFolder(currentContentFolder);
+                EditorUI.getModelOps().showCreateFolder(this.contentFolder);
 
                 return true;
 
@@ -39,6 +43,8 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
         return false;
 
     }
+
+    contentFolder:string;
 
 }
 

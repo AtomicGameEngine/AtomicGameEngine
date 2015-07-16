@@ -21,11 +21,14 @@ export function CreateNewFolder(resourcePath: string, reportError: boolean = tru
     }
 
     if (!fs.createDir(resourcePath)) {
+
         if (reportError)
             resourceOps.sendEvent(EditorEvents.ModalError, { title: title, message: "Could not create " + resourcePath });
 
         return false;
     }
+
+    resourceOps.sendEvent(EditorEvents.ResourceFolderCreated, { path: resourcePath});
 
     return true;
 

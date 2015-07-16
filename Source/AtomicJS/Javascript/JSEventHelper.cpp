@@ -8,8 +8,7 @@ namespace Atomic
 {
 
 JSEventHelper::JSEventHelper(Context* context) :
-    Object(context),
-    currentData_((VariantMap&) Variant::emptyVariantMap)
+    Object(context)
 {
 }
 
@@ -29,7 +28,8 @@ void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
 }
 
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
-{
+{    
+
     JSVM* vm = JSVM::GetJSVM(0);
     duk_context* ctx = vm->GetJSContext();
 
@@ -45,11 +45,12 @@ void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 
     if (duk_is_function(ctx, -1))
     {
-        currentData_ = (const VariantMap&) eventData;
-
-        // pass in event helper proxy
-        duk_get_prop_string(ctx, -3, "__eventHelperProxy");
         assert(duk_is_object(ctx, -1));
+
+        //TODO: this is expensive, we should be caching these in VM
+        // and reusing, instead of creating new variant map object
+        // per event handler
+        js_push_variantmap(ctx, eventData);
 
         if (duk_pcall(ctx, 1) != 0)
         {

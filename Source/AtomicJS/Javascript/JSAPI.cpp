@@ -290,6 +290,65 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
 
 }
 
+
+// variant map Proxy getter, so we can convert access to string based
+// member lookup, to string hash on the fly
+
+static int variantmap_property_get(duk_context* ctx)
+{
+    // targ, key, recv
+
+    if (duk_is_string(ctx, 1))
+    {
+        StringHash key = duk_to_string(ctx, 1);
+        duk_get_prop_index(ctx, 0, (unsigned) key.Value());
+        return 1;
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+
+}
+
+
+void js_push_variantmap(duk_context* ctx, const VariantMap &vmap)
+{
+
+    // setup proxy so we can map string
+    duk_get_global_string(ctx, "Proxy");
+
+    duk_push_object(ctx);
+
+    VariantMap::ConstIterator itr = vmap.Begin();
+
+    while (itr != vmap.End()) {
+
+        js_push_variant(ctx, itr->second_);
+
+
+        if (duk_is_undefined(ctx, -1)) {
+
+            duk_pop(ctx);
+        }
+        else
+        {
+            duk_put_prop_index(ctx, -2, (unsigned) itr->first_.Value());
+        }
+
+        itr++;
+
+    }
+
+    // setup property handler
+    duk_push_object(ctx);
+    duk_push_c_function(ctx, variantmap_property_get, 3);
+    duk_put_prop_string(ctx, -2, "get");
+
+    duk_new(ctx, 2);
+
+
+}
+
 void js_push_variant(duk_context *ctx, const Variant& v)
 {
     VariantType type = v.GetType();

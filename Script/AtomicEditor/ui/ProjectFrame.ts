@@ -37,6 +37,28 @@ class ProjectFrame extends ScriptWidget {
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
         this.subscribeToEvent("DragEnded", (data) => this.handleDragEnded(data));
+        this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
+
+        // this uses FileWatcher which doesn't catch subfolder creation
+        this.subscribeToEvent("FileChanged", (data) => {
+
+            // console.log("File CHANGED! ", data.fileName);
+
+        })
+
+    }
+
+    handleResourceFolderCreated(ev: EditorEvents.ResourceFolderCreatedEvent) {
+
+      var db = ToolCore.getAssetDatabase();
+      db.scan();
+
+      this.refresh();
+
+      var asset = db.getAssetByPath(ev.path);
+
+      if (asset && ev.navigate)
+        this.selectPath(asset.path);
 
     }
 
@@ -50,7 +72,7 @@ class ProjectFrame extends ScriptWidget {
             var project = system.project;
 
 
-            if (this.menu.handlePopupMenu(data.target, data.refid, this.currentFolder ? this.currentFolder.path : project.resourcePath))
+            if (this.menu.handlePopupMenu(data.target, data.refid))
                 return true;
 
             // create
@@ -118,10 +140,22 @@ class ProjectFrame extends ScriptWidget {
     rescan(asset: ToolCore.Asset) {
 
         var db = ToolCore.getAssetDatabase();
-
         db.scan();
         this.refresh();
-        this.refreshContent(asset);
+    }
+
+    selectPath(path:string) {
+
+      var db = ToolCore.getAssetDatabase();
+
+      var asset = db.getAssetByPath(path);
+
+      console.log("Select Path: ", path, " ", asset);
+
+      if (!asset)
+        return;
+
+      this.folderList.selectItemByID(asset.guid);
 
     }
 
@@ -191,6 +225,12 @@ class ProjectFrame extends ScriptWidget {
     }
 
     private refreshContent(folder: ToolCore.Asset) {
+
+        if (this.currentFolder != folder) {
+
+            this.sendEvent(EditorEvents.ContentFolderChanged, { path: folder.path });
+
+        }
 
         this.currentFolder = folder;
 
