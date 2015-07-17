@@ -16,15 +16,6 @@ export interface ContentFolderChangedEvent {
 
 }
 
-export const ResourceFolderCreated = "ResourceFolderCreated";
-export interface ResourceFolderCreatedEvent {
-
-  path: string;
-  navigate:boolean;
-
-}
-
-
 export const LoadProject = "EditorLoadProject";
 export interface LoadProjectEvent {
 

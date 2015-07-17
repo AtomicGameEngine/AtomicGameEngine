@@ -11,6 +11,8 @@ class ProjectFrame extends ScriptWidget {
     folderList: Atomic.UIListView;
     menu: ProjectFrameMenu;
     currentFolder: ToolCore.Asset;
+    resourcesID: number;
+    assetGUIDToItemID =  {};
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -32,12 +34,17 @@ class ProjectFrame extends ScriptWidget {
 
         folderList.rootList.id = "folderList_";
 
+        this.resourcesID = folderList.addRootItem("Resources", "Folder.icon", "0");
+
         foldercontainer.addChild(folderList);
 
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
         this.subscribeToEvent("DragEnded", (data) => this.handleDragEnded(data));
-        this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
+
+        this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
+
+        // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
         // this uses FileWatcher which doesn't catch subfolder creation
         this.subscribeToEvent("FileChanged", (data) => {
@@ -48,6 +55,35 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    handleResourceAdded(ev: ToolCore.ResourceAddedEvent) {
+
+        var db = ToolCore.getAssetDatabase();
+        var asset = db.getAssetByGUID(ev.guid);
+
+        var parent = asset.parent;
+        var folderList = this.folderList;
+
+        // these can be out of order
+        if (asset.isFolder()) {
+
+            if (!parent) {
+
+                //  root resource folder
+                var id = folderList.addChildItem(this.resourcesID, asset.name, "Folder.icon", asset.guid);
+                this.assetGUIDToItemID[asset.guid] = id;
+
+            } else {
+
+                var parentItemID = this.assetGUIDToItemID[parent.guid];
+                var id = folderList.addChildItem(parentItemID, asset.name, "Folder.icon", asset.guid);
+                this.assetGUIDToItemID[asset.guid] = id;
+            }
+
+        }
+
+    }
+
+    /*
     handleResourceFolderCreated(ev: EditorEvents.ResourceFolderCreatedEvent) {
 
       var db = ToolCore.getAssetDatabase();
@@ -57,10 +93,13 @@ class ProjectFrame extends ScriptWidget {
 
       var asset = db.getAssetByPath(ev.path);
 
+      console.log("Asset: ", asset, " : ", ev.path, " : ", ev.navigate);
+
       if (asset && ev.navigate)
         this.selectPath(asset.path);
 
     }
+    */
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
@@ -141,21 +180,19 @@ class ProjectFrame extends ScriptWidget {
 
         var db = ToolCore.getAssetDatabase();
         db.scan();
-        this.refresh();
+
     }
 
-    selectPath(path:string) {
+    selectPath(path: string) {
 
-      var db = ToolCore.getAssetDatabase();
+        var db = ToolCore.getAssetDatabase();
 
-      var asset = db.getAssetByPath(path);
+        var asset = db.getAssetByPath(path);
 
-      console.log("Select Path: ", path, " ", asset);
+        if (!asset)
+            return;
 
-      if (!asset)
-        return;
-
-      this.folderList.selectItemByID(asset.guid);
+        this.folderList.selectItemByID(asset.guid);
 
     }
 
@@ -220,7 +257,6 @@ class ProjectFrame extends ScriptWidget {
 
     handleProjectLoaded(data) {
 
-        this.refresh();
 
     }
 
@@ -247,54 +283,6 @@ class ProjectFrame extends ScriptWidget {
 
             container.addChild(this.createButtonLayout(asset));
         }
-
-    }
-
-    private recursiveAddFolder(parentItemID: number, folder: string) {
-
-        var db = ToolCore.getAssetDatabase();
-
-        var folderList = this.folderList;
-
-        var assets = db.getFolderAssets(folder);
-
-        for (var i in assets) {
-
-            var asset = assets[i];
-
-            if (asset.isFolder()) {
-
-                var childItemID = folderList.addChildItem(parentItemID, asset.name, "Folder.icon", asset.guid);
-
-                this.recursiveAddFolder(childItemID, asset.path);
-
-            }
-
-        }
-
-    }
-
-
-    refresh() {
-
-        var container = this.getWidget("contentcontainer");
-        container.deleteAllChildren();
-
-        var system = ToolCore.getToolSystem();
-        var project = system.project;
-
-        var folderList = this.folderList;
-
-        folderList.deleteAllItems();
-
-        var resourcesID = folderList.addRootItem("Resources", "Folder.icon", "0");
-
-        this.recursiveAddFolder(resourcesID, project.resourcePath);
-
-        folderList.setExpanded(resourcesID, true);
-        // this.refreshContent(project.resourcePath);
-        folderList.rootList.value = 0;
-
 
     }
 

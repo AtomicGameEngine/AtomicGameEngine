@@ -30,6 +30,20 @@ Asset::~Asset()
 
 }
 
+Asset* Asset::GetParent()
+{
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+
+    String pathName;
+    String fileName;
+    String ext;
+
+    SplitPath(path_, pathName, fileName, ext);
+
+    return db->GetAssetByPath(RemoveTrailingSlash(pathName));
+
+}
+
 bool Asset::CheckCacheFile()
 {
     if (importer_.Null() || !importer_->RequiresCacheFile())

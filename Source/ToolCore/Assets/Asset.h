@@ -40,6 +40,8 @@ public:
 
     AssetImporter* GetImporter() { return importer_; }
 
+    Asset* GetParent();
+
     void SetDirty(bool dirty) { dirty_ = dirty; }
     bool IsDirty() const { return dirty_; }
 

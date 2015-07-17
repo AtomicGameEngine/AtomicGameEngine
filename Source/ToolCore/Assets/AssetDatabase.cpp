@@ -11,6 +11,7 @@
 #include "../ToolEvents.h"
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
+#include "AssetEvents.h"
 #include "AssetDatabase.h"
 
 
@@ -160,7 +161,14 @@ String AssetDatabase::GetDotAssetFilename(const String& path)
 
 void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
 {
+
+    assert(asset->GetGUID().Length());
+
     assets_.Push(asset);
+
+    VariantMap eventData;
+    eventData[ResourceAdded::P_GUID] = asset->GetGUID();
+    SendEvent(E_RESOURCEADDED, eventData);
 }
 
 void AssetDatabase::ImportDirtyAssets()

@@ -14,6 +14,8 @@ namespace tb {
 
 class TBMenuWindow;
 
+typedef int (*TBSelectListSortCallback)(TBSelectItemSource *source, const int *a, const int *b);
+
 /** TBSelectList shows a scrollable list of items provided by a TBSelectItemSource. */
 
 class TBSelectList : public TBWidget, public TBSelectItemViewer
@@ -38,6 +40,8 @@ public:
 		Set nullptr or empty string to remove filter and show all items. */
 	void SetFilter(const char *filter);
 	const char *GetFilter() const { return m_filter; }
+
+    void SetSortCallback(TBSelectListSortCallback callback) { m_sort_callback = callback; }
 
 	/** Set the language string id for the header. The header is shown
 		at the top of the list when only a subset of all items are shown. */
@@ -102,6 +106,7 @@ protected:
 	bool m_scroll_to_current;
 	TBID m_header_lng_string_id;
 private:
+    TBSelectListSortCallback m_sort_callback;
 	TBWidget *CreateAndAddItemAfter(int index, TBWidget *reference);
 };
 

@@ -239,6 +239,7 @@ declare module ToolCore {
       importerType: string;
       importerTypeName: string;
       importer: AssetImporter;
+      parent: Asset;
       dirty: boolean;
       dotAssetFilename: string;
 
@@ -256,6 +257,7 @@ declare module ToolCore {
       getImporterType(): string;
       getImporterTypeName(): string;
       getImporter(): AssetImporter;
+      getParent(): Asset;
       setDirty(dirty: boolean): void;
       isDirty(): boolean;
       getDotAssetFilename(): string;

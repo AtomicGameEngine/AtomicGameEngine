@@ -28,7 +28,10 @@ export function CreateNewFolder(resourcePath: string, reportError: boolean = tru
         return false;
     }
 
-    resourceOps.sendEvent(EditorEvents.ResourceFolderCreated, { path: resourcePath});
+    var db = ToolCore.getAssetDatabase();
+    db.scan();
+
+    // resourceOps.sendEvent(EditorEvents.ResourceFolderCreated, { path: resourcePath, navigate: true });
 
     return true;
 

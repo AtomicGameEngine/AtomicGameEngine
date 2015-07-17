@@ -83,7 +83,50 @@ ListViewItem* ListViewItem::AddChild(const char *text, const char* icon, const T
     ListViewItem* child = new ListViewItem(text, id, icon, source_);
     child->parent_ = this;
     child->depth_ = depth_ + 1;
-    source_->AddItem(child);
+
+    // filter, alphabetically into source
+
+    ListViewItem* insert = this;
+
+    int parentIndex = -1;
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        if (source_->GetItem(i) == this)
+        {
+            parentIndex = i;
+            break;
+        }
+    }
+
+    for (int i = parentIndex + 1; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* item = source_->GetItem(i);
+
+        if (item->depth_ <= depth_)
+            break;
+
+        if (item->depth_ != depth_ + 1)
+        {
+            insert = item;
+            continue;
+        }
+
+        if (strcmp(item->str.CStr(), text) >= 0)
+            break;
+
+        insert = item;
+
+    }
+
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        if (source_->GetItem(i) == insert)
+        {
+            source_->AddItem(child, i + 1);
+            break;
+        }
+    }
+
     children_.Push(child);
     return child;
 }
@@ -180,6 +223,29 @@ TBWidget *ListViewItemSource::CreateItemWidget(int index, TBSelectItemViewer *vi
     return nullptr;
 }
 
+/*
+static int select_list_sort_cb(TBSelectItemSource *_source, const int *a, const int *b)
+{
+    ListViewItemSource* source = (ListViewItemSource*) _source;
+
+    ListViewItem* itemA = source->GetItem(*a);
+    ListViewItem* itemB = source->GetItem(*b);
+
+    int value;
+
+    if (itemA->depth_ == itemB->depth_)
+    {
+        value = strcmp(source->GetItemString(*a), source->GetItemString(*b));
+    }
+    else
+    {
+        value = itemA->depth_ > itemB->depth_ ? 1 : -1;
+    }
+
+    return source->GetSort() == TB_SORT_DESCENDING ? -value : value;
+}
+*/
+
 UIListView::UIListView(Context* context, bool createWidget) :
     UIWidget(context, createWidget),
     source_(0), itemLookupId_(0)
@@ -236,7 +302,8 @@ unsigned UIListView::AddChildItem(unsigned parentItemID, const String& text, con
 
     ListViewItem* child = item->AddChild(text.CString(), icon.CString(), TBID(id.CString()));
 
-    itemLookup_[itemLookupId_++] = child;
+    itemLookup_[itemLookupId_++] = child;       
+
     return itemLookupId_ - 1;
 
 }

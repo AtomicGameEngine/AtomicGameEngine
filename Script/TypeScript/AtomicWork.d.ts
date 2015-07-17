@@ -5,16 +5,16 @@
 
 declare module Atomic {
 
-    export function print(...args:any[]);
+    export function print(...args: any[]);
 
-    export var platform:string;
+    export var platform: string;
 
 
     export interface PathInfo {
 
-      pathName: string;
-      fileName: string;
-      ext: string;
+        pathName: string;
+        fileName: string;
+        ext: string;
 
     }
 
@@ -64,21 +64,21 @@ declare module Atomic {
 
     export interface AttributeInfo {
 
-      type:VariantType;
-      name:string;
-      mode:number; // AM_*
-      defaultValue:string;
-      enumNames:string[];
+        type: VariantType;
+        name: string;
+        mode: number; // AM_*
+        defaultValue: string;
+        enumNames: string[];
 
     }
 
     export interface ShaderParameter {
 
-      name:string;
-      value:any;
-      valueString:string;
-      typeName:string;
-      type:VariantType;
+        name: string;
+        value: any;
+        valueString: string;
+        typeName: string;
+        type: VariantType;
 
     }
 
@@ -91,17 +91,30 @@ declare module Atomic {
 
     export function getParentPath(path: string): string;
     export function addTrailingSlash(path: string): string;
-		export function getExtension(path: string): string;
+    export function getExtension(path: string): string;
 
     export function splitPath(path: string): PathInfo;
 
 }
 
 declare module Editor {
-    export function getPreferences() : AEPreferences;
+    export function getPreferences(): AEPreferences;
 }
 
 declare module ToolCore {
+
+    export interface ResourceAddedEvent {
+
+        guid: string;
+
+    }
+
+    export interface ResourceRemovedEvent {
+
+        guid: string;
+
+    }
+
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;
     export function getAssetDatabase(): AssetDatabase;
