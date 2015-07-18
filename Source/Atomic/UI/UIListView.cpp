@@ -28,6 +28,19 @@ public:
 
     bool GetExpanded() { return expanded_; }
 
+    void GetChildren(PODVector<ListViewItem*>& children, bool recursive = false)
+    {
+        children += children_;
+
+        if (recursive)
+        {
+            for (unsigned i = 0; i < children_.Size(); i++)
+            {
+                children_[i]->GetChildren(children, recursive);
+            }
+        }
+    }
+
     void SetExpanded(bool expanded)
     {
         expanded_ = expanded;
@@ -323,10 +336,29 @@ void UIListView::DeleteItemByID(const String& id)
         if (source_->GetItemID(i) == tbid)
         {
             ListViewItem* item = source_->GetItem(i);
+
             if (item->parent_)
                 item->parent_->children_.Remove(item);
 
+            PODVector<ListViewItem*> children;
+
+            item->GetChildren(children, true);
+
+            for (unsigned j = 0; j < children.Size(); j++)
+            {
+                for (int k = 0; k <  source_->GetNumItems(); k++)
+                {
+                    if (children[j] == source_->GetItem(k))
+                    {
+                        source_->DeleteItem(k);
+                        break;
+
+                    }
+                }
+            }
+
             source_->DeleteItem(i);
+
             return;
         }
     }
