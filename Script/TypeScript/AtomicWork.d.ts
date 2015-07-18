@@ -63,6 +63,29 @@ declare module Atomic {
         widget: UIWidget;
     }
 
+    export interface DragBeginEvent {
+
+        source: UIWidget;
+        dragObject: UIDragObject;
+    }
+
+    export interface DragEnterWidgetEvent {
+
+        widget: UIWidget;
+        dragObject: UIDragObject;
+    }
+
+    export interface DragExitWidgetEvent {
+
+        widget: UIWidget;
+        dragObject: UIDragObject;
+    }
+
+    export interface DragEndedEvent {
+
+        target: UIWidget;
+        dragObject: UIDragObject;
+    }
 
     export interface AttributeInfo {
 

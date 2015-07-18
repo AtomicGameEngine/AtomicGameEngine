@@ -52,7 +52,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         var parentID = this.nodeIDToItemID[node.parent.id];
 
-        var childItemID = this.hierList.addChildItem(parentID, node.name, "Folder.icon", node.id.toString());
+        var childItemID = this.recursiveAddNode(parentID, node);
 
         this.nodeIDToItemID[node.id] = childItemID;
 
@@ -71,7 +71,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.hierList.deleteItemByID(node.id.toString());
 
-        this.sendEvent("EditorActiveNodeChange", { node: ev.parent ? ev.parent : this.scene});
+        this.sendEvent("EditorActiveNodeChange", { node: ev.parent ? ev.parent : this.scene });
 
     }
 
@@ -136,8 +136,50 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var selectedId = Number(list.selectedItemID);
                 var node = this.scene.getNode(selectedId);
-                this.hierList.rootList.dragObject = new Atomic.UIDragObject(node, node.name.length ? node.name : "(Anonymous)");
-                this.sendEvent("EditorActiveNodeChange", { node: node });
+
+                if (node) {
+
+                    // set the widget's drag object
+                    var dragObject = new Atomic.UIDragObject(node, node.name.length ? "Node: " + node.name : "Node: (Anonymous)");
+                    this.hierList.rootList.dragObject = dragObject;
+
+                    // handle dropping on hierarchy, moving node
+                    this.subscribeToEvent(dragObject, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+                        var dragNode = <Atomic.Node> ev.dragObject.object;
+                        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
+
+                        if (!dropNode) {
+                            return;
+                        }
+
+                        // can't drop on self
+                        if (dragNode == dropNode) {
+                            return;
+                        }
+
+                        // check if dropping on child of ourselves
+                        var parent = dropNode.parent;
+
+                        while (parent) {
+
+                            if (parent == dragNode) {
+                                return;
+                            }
+
+                            parent = parent.parent;
+
+                        }
+
+                        // move it
+                        dropNode.addChild(dragNode);
+
+                    });
+
+                    this.sendEvent("EditorActiveNodeChange", { node: node });
+
+                }
+
                 return false;
 
             }
@@ -146,7 +188,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         return false;
     }
 
-    recursiveAddNode(parentID: number, node: Atomic.Node) {
+    recursiveAddNode(parentID: number, node: Atomic.Node):number {
 
         //if (node.isTemporary())
         //  return;
@@ -165,6 +207,8 @@ class HierarchyFrame extends Atomic.UIWidget {
             this.recursiveAddNode(childItemID, node.getChildAtIndex(i));
 
         }
+
+        return childItemID;
 
     }
 

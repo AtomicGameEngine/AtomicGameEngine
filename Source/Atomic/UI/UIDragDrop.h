@@ -44,6 +44,8 @@ private:
 
     SharedPtr<UIDragObject> dragObject_;
 
+    SharedPtr<UIDragObject> dragSelectObject_;
+
 };
 
 

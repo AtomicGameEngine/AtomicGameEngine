@@ -34,6 +34,9 @@ public:
     void DeleteAllItems();
     void SelectItemByID(const String& id);
 
+    String GetHoverItemID() { return rootList_.Null() ? "" : rootList_->GetHoverItemID(); }
+    String GetSelectedItemID() { return rootList_.Null() ? "" : rootList_->GetSelectedItemID(); }
+
     UISelectList* GetRootList() { return rootList_; }
 
 private:

@@ -7116,6 +7116,8 @@ declare module Atomic {
 
    export class UIListView extends UIWidget {
 
+      hoverItemID: string;
+      selectedItemID: string;
       rootList: UISelectList;
 
       // Construct.
@@ -7128,6 +7130,8 @@ declare module Atomic {
       setExpanded(itemID: number, value: boolean): void;
       deleteAllItems(): void;
       selectItemByID(id: string): void;
+      getHoverItemID(): string;
+      getSelectedItemID(): string;
       getRootList(): UISelectList;
 
    }

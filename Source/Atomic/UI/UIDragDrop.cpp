@@ -68,6 +68,7 @@ void UIDragDrop::DragEnd()
     // clean up
     currentTargetWidget_ = 0;
     dragObject_ = 0;
+    dragSelectObject_ = 0;
     dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
     if (currentTargetWidget.Null())
@@ -78,7 +79,7 @@ void UIDragDrop::DragEnd()
     VariantMap dropData;
     dropData[DragEnded::P_TARGET] = currentTargetWidget;
     dropData[DragEnded::P_DRAGOBJECT] = dragObject;
-    SendEvent(E_DRAGENDED, dropData);
+    dragObject->SendEvent(E_DRAGENDED, dropData);
 }
 
 void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
@@ -107,19 +108,7 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
 
         currentTargetWidget_ = widget;
 
-        if (widget->GetType() == UISelectList::GetTypeStatic())
-        {
-            // handle select drag
-
-            dragObject_ = widget->GetDragObject();
-
-            LOGINFOF("DRAG Select: %s, DragObject: %s", widget->GetTypeName().CString(),
-                                                        dragObject_.Null() ? "NULL" : dragObject_->GetTypeName().CString());
-        }
-        else
-        {
-            dragObject_ = widget->GetDragObject();
-        }
+        dragSelectObject_ = widget->GetDragObject();
 
     }
 
@@ -128,6 +117,8 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
 void UIDragDrop::HandleMouseUp(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonUp;
+
+    dragSelectObject_ = 0;
 
     if (dragObject_.Null())
         return;
@@ -141,12 +132,22 @@ void UIDragDrop::HandleMouseUp(StringHash eventType, VariantMap& eventData)
 
 void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
-    if (dragObject_.Null())
-        return;
-
     Input* input = GetSubsystem<Input>();
 
     if (!input->IsMouseVisible())
+    {
+        dragObject_ = 0;
+        dragSelectObject_ = 0;
+        return;
+    }
+
+    if (dragSelectObject_.NotNull())
+    {
+        dragObject_ = dragSelectObject_;
+        dragSelectObject_ = 0;
+    }
+
+    if (dragObject_.Null())
         return;
 
     // initialize if necessary
