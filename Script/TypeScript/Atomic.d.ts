@@ -1456,6 +1456,10 @@ declare module Atomic {
       getBaseType(): string;
       // Return type name.
       getTypeName(): string;
+      // Unsubscribe from a specific sender's events.
+      unsubscribeFromEvents(sender: AObject): void;
+      // Unsubscribe from all events.
+      unsubscribeFromAllEvents(): void;
       // Return execution context.
       getContext(): Context;
       // Return subsystem by type.
@@ -1471,10 +1475,6 @@ declare module Atomic {
       sendEvent(eventType:string, data?:Object);
       subscribeToEvent(eventType:string, callback:(data:any)=>void);
       subscribeToEvent(sender:AObject, eventType:string, callback:(data:any)=>void);
-      unsubscribeFromAllEvents();
-      unsubscribeFromEvent(event:String);
-      unsubscribeFromEvents(sender:Atomic.AObject);
-      unsubscribeFromSenderEvent(sender:Atomic.AObject, event:String);
 
    }
 

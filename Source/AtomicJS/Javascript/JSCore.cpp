@@ -113,14 +113,6 @@ static int Object_SendEvent(duk_context* ctx)
 
 }
 
-/*
-"unsubscribeFromAllEvents();",
-"unsubscribeFromEvent(event:String);",
-"unsubscribeFromEvents(sender:Atomic.AObject);",
-"unsubscribeFromSenderEvent(sender:Atomic.AObject, event:String);"
-*/
-
-
 static int Atomic_GetArguments(duk_context* ctx)
 {
     duk_push_array(ctx);
