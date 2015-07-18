@@ -7,7 +7,9 @@
 	},
 	"excludes" : {
 		"Object" : {
-			"SendEvent" : ["StringHash"]
+			"SendEvent" : ["StringHash"],
+			"UnsubscribeFromEvents" : ["Object"],
+			"UnsubscribeFromAllEvents" : []
 		}
 	},
 	"typescript_decl" : {
@@ -15,7 +17,11 @@
 		"Object" : [
 			"sendEvent(eventType:string, data?:Object);",
 			"subscribeToEvent(eventType:string, callback:(data:any)=>void);",
-			"subscribeToEvent(sender:AObject, eventType:string, callback:(data:any)=>void);"
+			"subscribeToEvent(sender:AObject, eventType:string, callback:(data:any)=>void);",
+			"unsubscribeFromAllEvents();",
+			"unsubscribeFromEvent(event:String);",
+			"unsubscribeFromEvents(sender:Atomic.AObject);",
+			"unsubscribeFromSenderEvent(sender:Atomic.AObject, event:String);"
 		]
 	}
 }

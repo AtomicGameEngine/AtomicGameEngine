@@ -499,8 +499,6 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
             Input* input = GetSubsystem<Input>();
             IntVector2 pos = input->GetMousePosition();
             UpdateDragNode(pos.x_, pos.y_);
-
-            SendEvent("EditorUpdateHierarchy");
         }
 
 

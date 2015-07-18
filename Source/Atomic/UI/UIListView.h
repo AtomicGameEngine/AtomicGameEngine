@@ -25,6 +25,8 @@ public:
 
     unsigned AddChildItem(unsigned parentItemID, const String& text, const String& icon, const String& id);
 
+
+    void SetItemText(const String& id, const String& text);
     void DeleteItemByID(const String& id);
 
     void SetExpanded(unsigned itemID, bool value);

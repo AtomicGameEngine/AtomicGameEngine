@@ -1,9 +1,19 @@
 
+import HierarchyFrameMenu = require("./HierarchyFrameMenu");
+import MenuItemSources = require("./menus/MenuItemSources");
+
 class HierarchyFrame extends Atomic.UIWidget {
+
+    scene: Atomic.Scene = null;
+    hierList: Atomic.UIListView;
+    menu: HierarchyFrameMenu;
+    nodeIDToItemID = {};
 
     constructor(parent: Atomic.UIWidget) {
 
         super();
+
+        this.menu = new HierarchyFrameMenu();
 
         this.load("AtomicEditor/editor/ui/hierarchyframe.tb.txt");
 
@@ -20,8 +30,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         hierarchycontainer.addChild(hierList);
 
-        this.subscribeToEvent("EditorUpdateHierarchy", (data) => this.handleUpdateHierarchy(data));
-
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
         this.subscribeToEvent("EditorActiveSceneChanged", (data) => this.handleActiveSceneChanged(data));
@@ -29,91 +37,98 @@ class HierarchyFrame extends Atomic.UIWidget {
         this.subscribeToEvent("EditorActiveNodeChange", (data) => {
 
             if (data.node)
-              this.hierList.selectItemByID(data.node.id.toString());
+                this.hierList.selectItemByID(data.node.id.toString());
 
         });
 
     }
 
-    recursiveAddNode(parentID: number, node: Atomic.Node) {
+    handleNodeAdded(ev: Atomic.NodeAddedEvent) {
 
-        //if (node.isTemporary())
-        //  return;
+        var node = ev.node;
 
-        var name = node.name;
-
-        if (!name.length)
-            name = "(Anonymous)"
-
-        var childItemID = this.hierList.addChildItem(parentID, name, "Folder.icon", node.id.toString());
-
-        for (var i = 0; i < node.getNumChildren(false); i++) {
-
-            this.recursiveAddNode(childItemID, node.getChildAtIndex(i));
-
-        }
-
-    }
-
-    refresh() {
-
-        this.hierList.deleteAllItems();
-
-        if (!this.scene)
+        if (!node.parent || node.scene != this.scene)
             return;
 
-        var parentID = this.hierList.addRootItem("Scene", "Folder.icon", this.scene.id.toString());
+        var parentID = this.nodeIDToItemID[node.parent.id];
 
-        for (var i = 0; i < this.scene.getNumChildren(false); i++) {
+        var childItemID = this.hierList.addChildItem(parentID, node.name, "Folder.icon", node.id.toString());
 
-            this.recursiveAddNode(parentID, this.scene.getChildAtIndex(i));
-
-        }
-
-        this.hierList.rootList.value = 0;
-        this.hierList.setExpanded(parentID, true);
+        this.nodeIDToItemID[node.id] = childItemID;
 
     }
 
-    handleUpdateHierarchy(data) {
+    handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
 
-        this.refresh();
+        console.log("handle Node Removed");
+
+        var node = ev.node;
+
+        delete this.nodeIDToItemID[node.id];
+
+        if (!node.parent || node.scene != this.scene)
+            return;
+
+        this.hierList.deleteItemByID(node.id.toString());
+
+        this.sendEvent("EditorActiveNodeChange", { node: ev.parent ? ev.parent : this.scene});
 
     }
 
     handleActiveSceneChanged(data) {
 
         if (this.scene)
-          this.unsubscribeFromEvents(this.scene);
+            this.unsubscribeFromEvents(this.scene);
 
         this.scene = <Atomic.Scene> data.scene;
 
+        this.populate();
+
         if (this.scene) {
 
-          this.subscribeToEvent("NodeRemoved", (data) => {
+            this.subscribeToEvent(this.scene, "NodeAdded", (ev: Atomic.NodeAddedEvent) => this.handleNodeAdded(ev));
+            this.subscribeToEvent(this.scene, "NodeRemoved", (ev: Atomic.NodeRemovedEvent) => this.handleNodeRemoved(ev));
+            this.subscribeToEvent(this.scene, "NodeNameChanged", (ev: Atomic.NodeNameChangedEvent) => {
 
-              this.hierList.deleteItemByID(data.node.id.toString());
+                this.hierList.setItemText(ev.node.id.toString(), ev.node.name);
 
-          });
-
-          this.subscribeToEvent("NodeAdded", (data) => {
-
-              this.refresh();
-
-          });
-
+            });
 
         }
-
-        this.refresh();
 
     }
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
-        if (data.type == Atomic.UI_EVENT_TYPE_CLICK && data.target) {
+        if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
             var id = data.target.id;
+
+            if (this.menu.handlePopupMenu(data.target, data.refid))
+                return true;
+
+            if (id == "create popup") {
+
+                if (data.refid == "create_node") {
+
+                    var selectedId = Number(this.hierList.rootList.selectedItemID);
+                    var node = this.scene.getNode(selectedId);
+                    node.createChild("Node");
+
+                }
+
+            }
+
+            // create
+            if (id == "menu create") {
+
+                var src = MenuItemSources.getMenuItemSource("hierarchy create items");
+                var menu = new Atomic.UIMenuWindow(data.target, "create popup");
+                menu.show(src);
+                return true;
+
+            }
+
 
             if (id == "hierList_") {
 
@@ -131,8 +146,50 @@ class HierarchyFrame extends Atomic.UIWidget {
         return false;
     }
 
-    scene: Atomic.Scene = null;
-    hierList: Atomic.UIListView;
+    recursiveAddNode(parentID: number, node: Atomic.Node) {
+
+        //if (node.isTemporary())
+        //  return;
+
+        var name = node.name;
+
+        if (!name.length)
+            name = "(Anonymous)"
+
+        var childItemID = this.hierList.addChildItem(parentID, name, "Folder.icon", node.id.toString());
+
+        this.nodeIDToItemID[node.id] = childItemID;
+
+        for (var i = 0; i < node.getNumChildren(false); i++) {
+
+            this.recursiveAddNode(childItemID, node.getChildAtIndex(i));
+
+        }
+
+    }
+
+    populate() {
+
+        this.nodeIDToItemID = {};
+        this.hierList.deleteAllItems();
+
+        if (!this.scene)
+            return;
+
+        var parentID = this.hierList.addRootItem("Scene", "Folder.icon", this.scene.id.toString());
+
+        this.nodeIDToItemID[this.scene.id] = parentID;
+
+        for (var i = 0; i < this.scene.getNumChildren(false); i++) {
+
+            this.recursiveAddNode(parentID, this.scene.getChildAtIndex(i));
+
+        }
+
+        this.hierList.rootList.value = 0;
+        this.hierList.setExpanded(parentID, true);
+
+    }
 
 }
 

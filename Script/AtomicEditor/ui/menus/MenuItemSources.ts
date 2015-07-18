@@ -15,9 +15,9 @@ export function getMenuItemSource(id: string): Atomic.UIMenuItemSource {
 
 }
 
-export function createMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
 
-    var src = srcLookup[id] = new UIMenuItemSource();
+    var src = new UIMenuItemSource();
 
     for (var key in items) {
 
@@ -31,35 +31,53 @@ export function createMenuItemSource(id: string, items: any): Atomic.UIMenuItemS
 
             } else if (value == null) {
 
+                // add a separator
                 src.addItem(new UIMenuItem(key));
 
+            } else if (Object.prototype.toString.call(value) === '[object Array]') {
+
+                if (value.length == 1)
+                    src.addItem(new UIMenuItem(key, value[0]));
+                else if (value.length == 2)
+                    src.addItem(new UIMenuItem(key, value[0], strings.EditorString.GetString(value[1])));
+                else if (value.length == 3) {
+
+                    var str = "";
+                    if (value[1])
+                        str = strings.EditorString.GetString(value[1]);
+
+                    var skinBg = "";
+                    if (value[2])
+                        skinBg = value[2];
+
+                    src.addItem(new UIMenuItem(key, value[0], str, skinBg));
+
+                }
+
             }
-            else if (typeof value === 'object' && value.length == 1) {
+            else if (typeof value === 'object') {
 
-                src.addItem(new UIMenuItem(key, value[0]));
+                var subsrc = createMenuItemSourceRecursive(value);
 
-            } else if (typeof value === 'object' && value.length == 2) {
-
-                src.addItem(new UIMenuItem(key, value[0], strings.EditorString.GetString(value[1])));
-
-            } else if (typeof value === 'object' && value.length == 3) {
-
-                var str = "";
-                if (value[1])
-                    str = strings.EditorString.GetString(value[1]);
-
-                var skinBg = "";
-                if (value[2])
-                    skinBg = value[2];
-
-                src.addItem(new UIMenuItem(key, value[0], str, skinBg));
+                var item = new Atomic.UIMenuItem(key);
+                item.subSource = subsrc;
+                src.addItem(item);
 
             }
+
 
         }
 
     }
 
     return src;
+
+}
+
+export function createMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+
+    srcLookup[id] = createMenuItemSourceRecursive(items);
+
+    return srcLookup[id];
 
 }

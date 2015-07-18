@@ -107,9 +107,6 @@ class ProjectFrame extends ScriptWidget {
 
             var id = data.target.id;
 
-            var system = ToolCore.getToolSystem();
-            var project = system.project;
-
 
             if (this.menu.handlePopupMenu(data.target, data.refid))
                 return true;
@@ -124,9 +121,9 @@ class ProjectFrame extends ScriptWidget {
 
             }
 
-
+            var system = ToolCore.getToolSystem();
+            var project = system.project;
             var db = ToolCore.getAssetDatabase();
-
             var fs = Atomic.getFileSystem();
 
             if (data.target && data.target.id.length) {

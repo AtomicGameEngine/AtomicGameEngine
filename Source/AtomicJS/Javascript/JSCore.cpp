@@ -55,7 +55,7 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         duk_pop(ctx); // pop null or undefined
 
         // construct a new event helper
-        js_push_class_object_instance(ctx, new JSEventHelper(object->GetContext()));
+        js_push_class_object_instance(ctx, new JSEventHelper(object->GetContext(), object));
 
         duk_push_object(ctx);
         duk_put_prop_string(ctx, -2, "__eventHelperFunctions");
@@ -112,6 +112,14 @@ static int Object_SendEvent(duk_context* ctx)
     return 0;
 
 }
+
+/*
+"unsubscribeFromAllEvents();",
+"unsubscribeFromEvent(event:String);",
+"unsubscribeFromEvents(sender:Atomic.AObject);",
+"unsubscribeFromSenderEvent(sender:Atomic.AObject, event:String);"
+*/
+
 
 static int Atomic_GetArguments(duk_context* ctx)
 {

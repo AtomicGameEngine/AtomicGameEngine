@@ -47,6 +47,8 @@ public:
         }
     }
 
+    void UpdateText(const String& text);
+
     ListViewItemSource* source_;
     ListViewItem* parent_;
     int depth_;
@@ -60,7 +62,15 @@ class ListViewItemWidget : public TBLayout
 public:
     ListViewItemWidget(ListViewItem *item, ListViewItemSource *source, TBSelectItemViewer *sourceviewer, int index);
     virtual bool OnEvent(const TBWidgetEvent &ev);
+
+    void UpdateText(const String& text)
+    {
+        if (textField_)
+            textField_->SetText(text.CString());
+    }
+
 private:
+    TBTextField* textField_;
     ListViewItemSource *source_;
     TBSelectItemViewer *sourceviewer_;
     int index_;
@@ -78,6 +88,14 @@ public:
 };
 
 // implementation
+
+void ListViewItem::UpdateText(const String& text)
+{
+    str = text.CString();
+    if (widget_)
+        widget_->UpdateText(text);
+}
+
 ListViewItem* ListViewItem::AddChild(const char *text, const char* icon, const TBID &id)
 {
     ListViewItem* child = new ListViewItem(text, id, icon, source_);
@@ -138,6 +156,7 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     , sourceviewer_(sourceviewer)
     , index_(index)
     , item_(item)
+    , textField_(0)
 {
     SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
     SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP);
@@ -166,7 +185,7 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     fd.SetID(TBIDC("Vera"));
     fd.SetSize(11);
 
-    TBTextField* tfield = new TBTextField();
+    TBTextField* tfield = textField_ = new TBTextField();
     tfield->SetIgnoreInput(true);
     tfield->SetSkinBg(TBIDC("Folder"));
     tfield->SetText(item->str);
@@ -279,6 +298,22 @@ unsigned UIListView::AddRootItem(const String& text, const String& icon, const S
     return itemLookupId_ - 1;
 }
 
+void UIListView::SetItemText(const String& id, const String& text)
+{
+    TBID tbid(id.CString());
+
+    for (int i = 0; i <  source_->GetNumItems(); i++)
+    {
+        if (source_->GetItemID(i) == tbid)
+        {
+            ListViewItem* item = source_->GetItem(i);
+            item->UpdateText(text);
+            return;
+        }
+    }
+
+}
+
 void UIListView::DeleteItemByID(const String& id)
 {
     TBID tbid(id.CString());
@@ -287,6 +322,10 @@ void UIListView::DeleteItemByID(const String& id)
     {
         if (source_->GetItemID(i) == tbid)
         {
+            ListViewItem* item = source_->GetItem(i);
+            if (item->parent_)
+                item->parent_->children_.Remove(item);
+
             source_->DeleteItem(i);
             return;
         }

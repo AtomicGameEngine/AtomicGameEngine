@@ -18,27 +18,29 @@ declare module Atomic {
 
     }
 
-    /*
-        export enum UIWidgetEventType {
+    export interface NodeAddedEvent {
 
-        EVENT_TYPE_CLICK,
-        EVENT_TYPE_LONG_CLICK,
-        EVENT_TYPE_POINTER_DOWN,
-        EVENT_TYPE_POINTER_UP,
-        EVENT_TYPE_POINTER_MOVE,
-        EVENT_TYPE_RIGHT_POINTER_DOWN,
-        EVENT_TYPE_RIGHT_POINTER_UP,
-        EVENT_TYPE_WHEEL,
-        EVENT_TYPE_CHANGED,
-        EVENT_TYPE_KEY_DOWN,
-        EVENT_TYPE_KEY_UP,
-        EVENT_TYPE_SHORTCUT,
-        EVENT_TYPE_CONTEXT_MENU,
-        EVENT_TYPE_FILE_DROP,
-        EVENT_TYPE_TAB_CHANGED,
-        EVENT_TYPE_CUSTOM
-        }
-    */
+        scene: Atomic.Scene;
+        parent: Atomic.Node;
+        node: Atomic.Node;
+
+    }
+
+    export interface NodeRemovedEvent {
+
+        scene: Atomic.Scene;
+        parent: Atomic.Node;
+        node: Atomic.Node;
+
+    }
+
+    export interface NodeNameChangedEvent {
+
+        scene: Atomic.Scene;
+        node: Atomic.Node;
+
+    }
+
     export interface UIWidgetEvent {
 
         handler: UIWidget;

@@ -34,7 +34,7 @@ class ATOMIC_API JSEventHelper : public Object
 
 public:
     /// Construct.
-    JSEventHelper(Context* context);
+    JSEventHelper(Context* context, Object* object);
     /// Destruct.
     virtual ~JSEventHelper();
 
@@ -44,6 +44,8 @@ public:
 private:
 
     void HandleEvent(StringHash eventType, VariantMap& eventData);
+
+    WeakPtr<Object> object_;
 
 };
 

@@ -11,7 +11,7 @@ class NodeInspector extends ScriptWidget {
         super();
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
-        this.subscribeToEvent("KeyUp", (data) => this.handleKeyUp(data));
+        this.subscribeToEvent("KeyUp", (data) => { this.handleKeyUp(data) });
 
     }
 
@@ -32,14 +32,18 @@ class NodeInspector extends ScriptWidget {
 
             if (this.node) {
 
+                var node = this.node;
+                this.node = null;
+
                 this.nodeLayout.deleteAllChildren();
                 this.nodeLayout = null;
-                this.node.removeComponents(true, true);
-                if (this.node.parent)
-                    this.node.parent.removeChild(this.node);
-                this.node = null;
-                this.sendEvent("EditorActiveNodeChange", { node: null });
-                this.sendEvent("EditorUpdateHierarchy", {});
+
+                if (node.parent) {
+                    node.parent.removeChild(node);
+                }
+
+                node.removeComponents(true, true);
+
 
             }
 
@@ -66,13 +70,13 @@ class NodeInspector extends ScriptWidget {
 
     }
 
-    getPrefabComponent(node: Atomic.Node):Atomic.PrefabComponent {
+    getPrefabComponent(node: Atomic.Node): Atomic.PrefabComponent {
 
-      if (node.parent && node.parent.getComponent("PrefabComponent"))
-        return <Atomic.PrefabComponent> node.parent.getComponent("PrefabComponent");
+        if (node.parent && node.parent.getComponent("PrefabComponent"))
+            return <Atomic.PrefabComponent> node.parent.getComponent("PrefabComponent");
 
-      if (node.parent)
-          return this.getPrefabComponent(node.parent);
+        if (node.parent)
+            return this.getPrefabComponent(node.parent);
 
         return null;
 
@@ -80,11 +84,11 @@ class NodeInspector extends ScriptWidget {
 
     detectPrefab(node: Atomic.Node): boolean {
 
-      if (node.parent && node.parent.getComponent("PrefabComponent"))
-        return true;
+        if (node.parent && node.parent.getComponent("PrefabComponent"))
+            return true;
 
-      if (node.parent)
-          return this.detectPrefab(node.parent);
+        if (node.parent)
+            return this.detectPrefab(node.parent);
 
         return false;
 
@@ -180,60 +184,60 @@ class NodeInspector extends ScriptWidget {
 
         if (this.isPrefab) {
 
-          var name = new Atomic.UITextField();
-          name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-          name.skinBg = "InspectorTextAttrName";
-          name.text = "Prefab"
-          name.fontDescription = fd;
+            var name = new Atomic.UITextField();
+            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.skinBg = "InspectorTextAttrName";
+            name.text = "Prefab"
+            name.fontDescription = fd;
 
-          var prefabLayout = new Atomic.UILayout();
-          prefabLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+            var prefabLayout = new Atomic.UILayout();
+            prefabLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-          var saveButton = new Atomic.UIButton();
-          saveButton.text = "Save";
-          saveButton.fontDescription = fd;
+            var saveButton = new Atomic.UIButton();
+            saveButton.text = "Save";
+            saveButton.fontDescription = fd;
 
-          saveButton.onClick = () => {
+            saveButton.onClick = () => {
 
-            var prefabComponent = this.getPrefabComponent(this.node);
+                var prefabComponent = this.getPrefabComponent(this.node);
 
-            if (prefabComponent) {
+                if (prefabComponent) {
 
-              prefabComponent.savePrefab();
+                    prefabComponent.savePrefab();
 
-              this.sendEvent("EditorActiveNodeChange", {node:this.node});
+                    this.sendEvent("EditorActiveNodeChange", { node: this.node });
 
-              return true;
+                    return true;
 
-            }
-
-          }
-
-          var undoButton = new Atomic.UIButton();
-          undoButton.text = "Undo";
-          undoButton.fontDescription = fd;
-
-          undoButton.onClick = () => {
-
-            var prefabComponent = this.getPrefabComponent(this.node);
-
-            if (prefabComponent) {
-
-              prefabComponent.undoPrefab();
-
-              this.sendEvent("EditorActiveNodeChange", {node:this.node});
-
-              return true;
+                }
 
             }
 
-          }
+            var undoButton = new Atomic.UIButton();
+            undoButton.text = "Undo";
+            undoButton.fontDescription = fd;
 
-          prefabLayout.addChild(name);
-          prefabLayout.addChild(saveButton);
-          prefabLayout.addChild(undoButton);
+            undoButton.onClick = () => {
 
-          attrsVerticalLayout.addChild(prefabLayout);
+                var prefabComponent = this.getPrefabComponent(this.node);
+
+                if (prefabComponent) {
+
+                    prefabComponent.undoPrefab();
+
+                    this.sendEvent("EditorActiveNodeChange", { node: this.node });
+
+                    return true;
+
+                }
+
+            }
+
+            prefabLayout.addChild(name);
+            prefabLayout.addChild(saveButton);
+            prefabLayout.addChild(undoButton);
+
+            attrsVerticalLayout.addChild(prefabLayout);
 
         }
 
@@ -264,7 +268,7 @@ class NodeInspector extends ScriptWidget {
 
     }
 
-    isPrefab:boolean;
+    isPrefab: boolean;
     node: Atomic.Node;
     nodeLayout: Atomic.UILayout;
     bindings: Array<DataBinding>;

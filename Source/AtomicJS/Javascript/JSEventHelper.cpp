@@ -45,8 +45,10 @@ void JSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHas
 
 }
 
-JSEventHelper::JSEventHelper(Context* context) :
-    Object(context)
+JSEventHelper::JSEventHelper(Context* context, Object* object) :
+    Object(context),
+    object_(object)
+
 {
 
 }
@@ -60,18 +62,22 @@ void JSEventHelper::AddEventHandler(StringHash eventType)
 {
     GetSubsystem<JSEventDispatcher>()->RegisterJSEvent(eventType);
 
-    SubscribeToEvent(eventType, HANDLER(JSEventHelper, HandleEvent));
+    // subscribe using object, so unsubscribing from object and not the event helper works
+    object_->SubscribeToEvent(eventType, HANDLER(JSEventHelper, HandleEvent));
 }
 
 void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
 {
     GetSubsystem<JSEventDispatcher>()->RegisterJSEvent(eventType);
 
-    SubscribeToEvent(sender, eventType, HANDLER(JSEventHelper, HandleEvent));
+    // subscribe using object, so unsubscribing from object and not the event helper works
+    object_->SubscribeToEvent(sender, eventType, HANDLER(JSEventHelper, HandleEvent));
 }
 
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
-{    
+{
+    if (object_.Null())
+        return;
 
     JSVM* vm = JSVM::GetJSVM(0);
     duk_context* ctx = vm->GetJSContext();
@@ -111,7 +117,6 @@ void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 
         duk_remove(ctx, -2); // vmap cache
         duk_remove(ctx, -2); // global stash
-
 
         if (duk_pcall(ctx, 1) != 0)
         {
