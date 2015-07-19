@@ -171,6 +171,42 @@ void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
     SendEvent(E_RESOURCEADDED, eventData);
 }
 
+void AssetDatabase::DeleteAsset(Asset* asset)
+{
+    SharedPtr<Asset> assetPtr(asset);
+
+    List<SharedPtr<Asset>>::Iterator itr = assets_.Find(assetPtr);
+
+    if (itr == assets_.End())
+        return;
+
+    assets_.Erase(itr);
+
+    const String& resourcePath = asset->GetPath();
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (fs->DirExists(resourcePath))
+    {
+        fs->RemoveDir(resourcePath, true);
+    }
+    else if (fs->FileExists(resourcePath))
+    {
+        fs->Delete(resourcePath);
+    }
+
+    String dotAsset = resourcePath + ".asset";
+
+    if (fs->FileExists(dotAsset))
+    {
+        fs->Delete(dotAsset);
+    }
+
+    VariantMap eventData;
+    eventData[ResourceRemoved::P_GUID] = asset->GetGUID();
+    SendEvent(E_RESOURCEREMOVED, eventData);
+}
+
 void AssetDatabase::ImportDirtyAssets()
 {
 

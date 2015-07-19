@@ -39,6 +39,16 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
+    showResourceDelete(asset:ToolCore.Asset) {
+
+      if (this.show()) {
+
+          this.opWindow = new UIResourceOps.ResourceDelete(asset);
+
+      }
+
+    }
+
     showNewProject() {
 
         if (this.show()) {

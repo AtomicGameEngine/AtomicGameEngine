@@ -43,6 +43,7 @@ class ProjectFrame extends ScriptWidget {
         this.subscribeToEvent("DragEnded", (data) => this.handleDragEnded(data));
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
+        this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
 
         // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
@@ -52,6 +53,13 @@ class ProjectFrame extends ScriptWidget {
             // console.log("File CHANGED! ", data.fileName);
 
         })
+
+    }
+
+    handleResourceRemoved(ev: ToolCore.ResourceRemovedEvent) {
+
+      var folderList = this.folderList;
+      folderList.deleteItemByID(ev.guid);
 
     }
 
@@ -102,6 +110,27 @@ class ProjectFrame extends ScriptWidget {
     */
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
+
+        if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
+
+            var id = data.target.id;
+
+            if (id == "folderList_") {
+
+              var db = ToolCore.getAssetDatabase();
+              var asset = db.getAssetByGUID(this.folderList.hoverItemID);
+
+              if (asset && asset.isFolder()) {
+
+                this.menu.createFolderContextMenu(this, "folder context menu", asset, data.x, data.y);
+
+              }
+
+              return true;
+
+            }
+
+        }
 
         if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
@@ -254,6 +283,8 @@ class ProjectFrame extends ScriptWidget {
 
     handleProjectLoaded(data) {
 
+      this.folderList.rootList.value = 0;
+      this.folderList.setExpanded(this.resourcesID, true);
 
     }
 

@@ -29,6 +29,8 @@ public:
 
     String GetCachePath();
 
+    void DeleteAsset(Asset* asset);
+
     void Scan();
 
     void GetFolderAssets(String folder, PODVector<Asset*>& assets) const;

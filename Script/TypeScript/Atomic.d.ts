@@ -7154,7 +7154,7 @@ declare module Atomic {
 
       constructor(target: UIWidget, id: string);
 
-      show(source: UISelectItemSource): void;
+      show(source: UISelectItemSource, x?: number, y?: number): void;
       close(): void;
 
    }

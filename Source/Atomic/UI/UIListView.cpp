@@ -237,7 +237,7 @@ bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
         return false;
     }
 
-    if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    if (ev.type == EVENT_TYPE_POINTER_DOWN || ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
     {
         TBWidget* parent = GetParent();
 

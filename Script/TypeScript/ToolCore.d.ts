@@ -279,6 +279,7 @@ declare module ToolCore {
       generateAssetGUID(): string;
       registerGUID(guid: string): void;
       getCachePath(): string;
+      deleteAsset(asset: Asset): void;
       scan(): void;
       getDotAssetFilename(path: string): string;
       getFolderAssets(folder:string):ToolCore.Asset[];

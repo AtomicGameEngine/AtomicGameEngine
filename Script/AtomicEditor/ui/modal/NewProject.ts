@@ -31,7 +31,7 @@ class NewProject extends ModalWindow {
             else if (id == "project_2d") {
                 projectType = "Project2D/";
             }
-            else if (id == "project_2d") {
+            else if (id == "project_3d") {
                 projectType = "Project3D/";
             }
 

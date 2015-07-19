@@ -29,14 +29,23 @@ UIMenuWindow::~UIMenuWindow()
         delete source_;
 }
 
-void UIMenuWindow::Show(UISelectItemSource* source)
+void UIMenuWindow::Show(UISelectItemSource* source, int x, int y)
 {
     if (source_)
         delete source_;
 
     source_ = source->GetTBItemSource();
 
-    ((TBMenuWindow*)widget_)->Show(source_, TBPopupAlignment());
+    if (x != -1 && y != -1)
+    {
+        ((TBMenuWindow*)widget_)->Show(source_, TBPopupAlignment(TBPoint(x, y)));
+    }
+    else
+    {
+        ((TBMenuWindow*)widget_)->Show(source_, TBPopupAlignment());
+    }
+
+
 }
 
 bool UIMenuWindow::OnEvent(const tb::TBWidgetEvent &ev)

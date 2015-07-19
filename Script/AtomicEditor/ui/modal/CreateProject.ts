@@ -77,7 +77,7 @@ class CreateProject extends ModalWindow {
 
         if (!fileSystem.dirExists(folder)) {
 
-          var utils = new Editor.FileUtils();
+            var utils = new Editor.FileUtils();
             utils.createDirs(folder);
 
             utils.createDirs(folder + "Cache");
@@ -98,7 +98,7 @@ class CreateProject extends ModalWindow {
 
         this.hide();
 
-        this.sendEvent(EditorEvents.LoadProject, { path: folder});
+        this.sendEvent(EditorEvents.LoadProject, { path: folder });
 
         return true;
 

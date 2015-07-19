@@ -112,8 +112,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 if (node) {
 
-                    console.log("Pointer Down: ", node.name);
-
                     // set the widget's drag object
                     var dragObject = new Atomic.UIDragObject(node, node.name.length ? "Node: " + node.name : "Node: (Anonymous)");
                     this.hierList.rootList.dragObject = dragObject;
@@ -122,8 +120,6 @@ class HierarchyFrame extends Atomic.UIWidget {
                     this.subscribeToEvent(dragObject, "DragEnded", (ev: Atomic.DragEndedEvent) => {
 
                         var dragNode = <Atomic.Node> ev.dragObject.object;
-
-                        console.log("drop hover id: ", this.hierList.hoverItemID);
 
                         var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
 
@@ -232,7 +228,12 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (!name.length)
             name = "(Anonymous)"
 
-        var childItemID = this.hierList.addChildItem(parentID, name, "Folder.icon", node.id.toString());
+        var icon = "";
+
+        if (node.isTemporary())
+          icon = "ComponentBitmap";
+
+        var childItemID = this.hierList.addChildItem(parentID, name, icon, node.id.toString());
 
         this.nodeIDToItemID[node.id] = childItemID;
 
@@ -254,7 +255,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (!this.scene)
             return;
 
-        var parentID = this.hierList.addRootItem("Scene", "Folder.icon", this.scene.id.toString());
+        var parentID = this.hierList.addRootItem("Scene", "", this.scene.id.toString());
 
         this.nodeIDToItemID[this.scene.id] = parentID;
 
