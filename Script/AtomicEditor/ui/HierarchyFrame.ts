@@ -47,6 +47,9 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         var node = ev.node;
 
+        if (this.filterNode(node))
+          return;
+
         if (!node.parent || node.scene != this.scene)
             return;
 
@@ -60,9 +63,10 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
 
-        console.log("handle Node Removed");
-
         var node = ev.node;
+
+        if (this.filterNode(node))
+          return;
 
         delete this.nodeIDToItemID[node.id];
 
@@ -188,10 +192,20 @@ class HierarchyFrame extends Atomic.UIWidget {
         return false;
     }
 
-    recursiveAddNode(parentID: number, node: Atomic.Node):number {
+    filterNode(node: Atomic.Node): boolean {
 
-        //if (node.isTemporary())
-        //  return;
+        if (!node) return false;
+
+        if (node.name == "__atomic_sceneview3d_camera") return true;
+
+        return false;
+
+    }
+
+    recursiveAddNode(parentID: number, node: Atomic.Node): number {
+
+        if (this.filterNode(node))
+          return;
 
         var name = node.name;
 

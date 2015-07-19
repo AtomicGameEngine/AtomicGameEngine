@@ -508,3 +508,13 @@ elements
 		bitmap focus_r4.png
 		cut 11
 		expand 4
+
+	TBCheckBox.uilistview
+		bitmap arrow_right_dark.png
+		type Image
+		overrides
+			element TBCheckBox.uilistview_selected
+				state selected
+	TBCheckBox.uilistview_selected
+		bitmap arrow_down.png
+		type Image

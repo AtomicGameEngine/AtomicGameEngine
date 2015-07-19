@@ -83,7 +83,8 @@ public:
     }
 
 private:
-    TBTextField* textField_;
+    TBCheckBox* expandBox_;
+    TBTextField* textField_;    
     ListViewItemSource *source_;
     TBSelectItemViewer *sourceviewer_;
     int index_;
@@ -169,6 +170,7 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     , sourceviewer_(sourceviewer)
     , index_(index)
     , item_(item)
+    , expandBox_(0)
     , textField_(0)
 {
     SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
@@ -181,6 +183,24 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     {
         LayoutParams lp;
         lp.SetWidth(6);
+        lp.SetHeight(4);
+        TBWidget* spacer = new TBWidget();
+        spacer->SetLayoutParams(lp);
+        GetContentRoot()->AddChild(spacer);
+    }
+
+    if (item_->children_.Size())
+    {
+        expandBox_ = new TBCheckBox();
+        expandBox_->SetSkinBg(TBIDC("TBCheckBox.uilistview"));
+        expandBox_->SetValue(item_->GetExpanded());
+        expandBox_->SetID(item->id);
+        GetContentRoot()->AddChild(expandBox_);
+    }
+    else
+    {
+        LayoutParams lp;
+        lp.SetWidth(12);
         lp.SetHeight(4);
         TBWidget* spacer = new TBWidget();
         spacer->SetLayoutParams(lp);
@@ -206,8 +226,6 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
 
     SetSkinBg(TBIDC("TBSelectItem"));
     GetContentRoot()->AddChild(tfield);
-
-    SetID(item->id);
 }
 
 bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
@@ -221,6 +239,7 @@ bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
     if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == item_->id)
     {
         item_->SetExpanded(!item_->GetExpanded());
+
         source_->list_->InvalidateList();
 
         // want to bubble

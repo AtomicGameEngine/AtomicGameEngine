@@ -78,7 +78,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
         octree_ = scene_->CreateComponent<Octree>();
     }
 
-    cameraNode_ = scene_->CreateChild("Camera");
+    cameraNode_ = scene_->CreateChild("__atomic_sceneview3d_camera");
     cameraNode_->SetTemporary(true);
     camera_ = cameraNode_->CreateComponent<Camera>();
 
