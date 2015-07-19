@@ -226,6 +226,8 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
 
     SetSkinBg(TBIDC("TBSelectItem"));
     GetContentRoot()->AddChild(tfield);
+
+    SetID(item->id);
 }
 
 bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
@@ -235,8 +237,28 @@ bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
         return false;
     }
 
+    if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    {
+        TBWidget* parent = GetParent();
+
+        while (parent)
+        {
+            if (parent->IsOfType<TBSelectList>())
+            {
+                TBWidgetEvent nev = ev;
+                nev.ref_id = item_->id;
+                parent->InvokeEvent(nev);
+                break;
+            }
+
+            parent = parent->GetParent();
+        }
+
+        return true;
+    }
+
     // get clicks this way, not sure we want to
-    if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == item_->id)
+    if (ev.type == EVENT_TYPE_CLICK &&  ev.target == expandBox_ && ev.target->GetID() == item_->id)
     {
         item_->SetExpanded(!item_->GetExpanded());
 

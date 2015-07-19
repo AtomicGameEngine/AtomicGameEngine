@@ -48,7 +48,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         var node = ev.node;
 
         if (this.filterNode(node))
-          return;
+            return;
 
         if (!node.parent || node.scene != this.scene)
             return;
@@ -66,7 +66,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         var node = ev.node;
 
         if (this.filterNode(node))
-          return;
+            return;
 
         delete this.nodeIDToItemID[node.id];
 
@@ -103,6 +103,62 @@ class HierarchyFrame extends Atomic.UIWidget {
     }
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
+
+        if (data.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
+
+            if (data.target == this.hierList.rootList) {
+
+                var node = this.scene.getNode(Number(data.refid));
+
+                if (node) {
+
+                    console.log("Pointer Down: ", node.name);
+
+                    // set the widget's drag object
+                    var dragObject = new Atomic.UIDragObject(node, node.name.length ? "Node: " + node.name : "Node: (Anonymous)");
+                    this.hierList.rootList.dragObject = dragObject;
+
+                    // handle dropping on hierarchy, moving node
+                    this.subscribeToEvent(dragObject, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+                        var dragNode = <Atomic.Node> ev.dragObject.object;
+
+                        console.log("drop hover id: ", this.hierList.hoverItemID);
+
+                        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
+
+                        if (!dropNode) {
+                            return;
+                        }
+
+                        // can't drop on self
+                        if (dragNode == dropNode) {
+                            return;
+                        }
+
+                        // check if dropping on child of ourselves
+                        var parent = dropNode.parent;
+
+                        while (parent) {
+
+                            if (parent == dragNode) {
+                                return;
+                            }
+
+                            parent = parent.parent;
+
+                        }
+
+                        // move it
+                        dropNode.addChild(dragNode);
+
+                    });
+
+                }
+
+            }
+
+        }
 
         if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
@@ -143,42 +199,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 if (node) {
 
-                    // set the widget's drag object
-                    var dragObject = new Atomic.UIDragObject(node, node.name.length ? "Node: " + node.name : "Node: (Anonymous)");
-                    this.hierList.rootList.dragObject = dragObject;
-
-                    // handle dropping on hierarchy, moving node
-                    this.subscribeToEvent(dragObject, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-                        var dragNode = <Atomic.Node> ev.dragObject.object;
-                        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
-
-                        if (!dropNode) {
-                            return;
-                        }
-
-                        // can't drop on self
-                        if (dragNode == dropNode) {
-                            return;
-                        }
-
-                        // check if dropping on child of ourselves
-                        var parent = dropNode.parent;
-
-                        while (parent) {
-
-                            if (parent == dragNode) {
-                                return;
-                            }
-
-                            parent = parent.parent;
-
-                        }
-
-                        // move it
-                        dropNode.addChild(dragNode);
-
-                    });
 
                     this.sendEvent("EditorActiveNodeChange", { node: node });
 
@@ -205,7 +225,7 @@ class HierarchyFrame extends Atomic.UIWidget {
     recursiveAddNode(parentID: number, node: Atomic.Node): number {
 
         if (this.filterNode(node))
-          return;
+            return;
 
         var name = node.name;
 

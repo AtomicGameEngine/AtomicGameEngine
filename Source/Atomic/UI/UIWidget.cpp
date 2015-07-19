@@ -580,26 +580,17 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
     }
     else if (ev.type == EVENT_TYPE_POINTER_DOWN)
     {
-        /*
-        if (ev.target)
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
         {
-            TBWidget* tbwidget = ev.target;
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
 
-            while (tbwidget && !ui->IsWidgetWrapped(tbwidget))
-                tbwidget = tbwidget->GetParent();
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
 
-            if (tbwidget)
-            {
-                VariantMap eventData;
-                ConvertEvent(this, ui->WrapWidget(tbwidget), ev, eventData);
-                SendEvent(E_WIDGETEVENT, eventData);
-
-                if (eventData[WidgetEvent::P_HANDLED].GetBool())
-                    return true;
-
-            }
         }
-        */
+
     }
     else if (ev.type == EVENT_TYPE_TAB_CHANGED)
     {

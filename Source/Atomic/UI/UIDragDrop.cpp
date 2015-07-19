@@ -63,12 +63,12 @@ UIDragDrop::~UIDragDrop()
 void UIDragDrop::DragEnd()
 {
     SharedPtr<UIDragObject> dragObject = dragObject_;
-    SharedPtr<UIWidget> currentTargetWidget = currentTargetWidget_;
+    WeakPtr<UIWidget> currentTargetWidget = currentTargetWidget_;
 
     // clean up
     currentTargetWidget_ = 0;
     dragObject_ = 0;
-    dragSelectObject_ = 0;
+    dragSourceWidget_ = 0;
     dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
     if (currentTargetWidget.Null())
@@ -107,8 +107,7 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
         UIWidget* widget = (UIWidget*) tbw->GetDelegate();
 
         currentTargetWidget_ = widget;
-
-        dragSelectObject_ = widget->GetDragObject();
+        dragSourceWidget_ = widget;
 
     }
 
@@ -118,10 +117,12 @@ void UIDragDrop::HandleMouseUp(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonUp;
 
-    dragSelectObject_ = 0;
-
     if (dragObject_.Null())
+    {
+        dragSourceWidget_ = 0;
+        currentTargetWidget_ = 0;
         return;
+    }
 
     if (!(eventData[P_BUTTON].GetInt() ==  MOUSEB_LEFT))
         return;
@@ -134,21 +135,20 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
 
-    if (!input->IsMouseVisible())
-    {
-        dragObject_ = 0;
-        dragSelectObject_ = 0;
+    if (dragObject_.Null() && dragSourceWidget_.Null())
         return;
-    }
-
-    if (dragSelectObject_.NotNull())
-    {
-        dragObject_ = dragSelectObject_;
-        dragSelectObject_ = 0;
-    }
 
     if (dragObject_.Null())
-        return;
+    {
+        dragObject_ = dragSourceWidget_->GetDragObject();
+
+        if (dragObject_.Null())
+        {
+            dragSourceWidget_ = 0;
+            return;
+        }
+
+    }
 
     // initialize if necessary
     if (dragLayout_->GetVisibility() == UI_WIDGET_VISIBILITY_GONE)
