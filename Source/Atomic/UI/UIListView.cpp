@@ -425,7 +425,7 @@ void UIListView::SelectItemByID(const String& id)
 
         if (tid == item->id)
         {
-            item->SetExpanded(true);
+            //item->SetExpanded(true);
             rootList_->SetValue(i);
             rootList_->InvalidateList();
             return;

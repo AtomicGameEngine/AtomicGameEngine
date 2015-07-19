@@ -516,5 +516,5 @@ elements
 			element TBCheckBox.uilistview_selected
 				state selected
 	TBCheckBox.uilistview_selected
-		bitmap arrow_down.png
+		bitmap arrow_down_dark.png
 		type Image
