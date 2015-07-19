@@ -10,7 +10,8 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
         super();
 
-        MenuItemSources.createMenuItemSource("project context folder", folderContextItems);
+        MenuItemSources.createMenuItemSource("asset context folder", assetFolderContextItems);
+        MenuItemSources.createMenuItemSource("asset context general", assetGeneralContextItems);
         MenuItemSources.createMenuItemSource("project create items", createItems);
 
         this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
@@ -19,22 +20,22 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    handleFolderContextMenu(target: Atomic.UIWidget, refid: string) {
+    handleAssetContextMenu(target: Atomic.UIWidget, refid: string) {
 
-        if (target.id == "folder context menu") {
+        if (target.id == "asset context menu") {
 
-            var folder = <ToolCore.Asset> target['folder'];
+            var asset = <ToolCore.Asset> target['asset'];
 
-            if (refid == "delete_folder") {
+            if (refid == "delete_asset") {
 
-                EditorUI.getModelOps().showResourceDelete(folder);
+                EditorUI.getModelOps().showResourceDelete(asset);
 
                 return true;
             }
 
             if (refid == "create_folder") {
 
-                EditorUI.getModelOps().showCreateFolder(folder.path);
+                EditorUI.getModelOps().showCreateFolder(asset.path);
 
                 return true;
 
@@ -46,9 +47,24 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
     createFolderContextMenu(parent: Atomic.UIWidget, id: string, folder: ToolCore.Asset, x: number, y: number) {
 
-        var menu = new Atomic.UIMenuWindow(parent, id);
-        menu['folder'] = folder;
-        var src = MenuItemSources.getMenuItemSource("project context folder");
+
+    }
+
+    createAssetContextMenu(parent: Atomic.UIWidget, asset: ToolCore.Asset, x: number, y: number) {
+
+        var menu = new Atomic.UIMenuWindow(parent, "asset context menu");
+        menu['asset'] = asset;
+
+        var srcName: string;
+
+        if (asset.isFolder()) {
+            srcName = "asset context folder";
+        } else {
+            srcName = "asset context general";
+        }
+
+
+        var src = MenuItemSources.getMenuItemSource(srcName);
         menu.show(src, x, y);
 
     }
@@ -57,7 +73,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
         if (!target || !refid) return;
 
-        if (this.handleFolderContextMenu(target, refid)) {
+        if (this.handleAssetContextMenu(target, refid)) {
 
             return true;
 
@@ -94,11 +110,17 @@ export = ProjectFrameMenus;
 // initialization
 var StringID = strings.StringID;
 
-var folderContextItems = {
+var assetGeneralContextItems = {
+    "Reveal in Finder": ["reveal_folder", undefined, ""],
+    "-1": null,
+    "Delete": ["delete_asset", undefined, ""]
+};
+
+var assetFolderContextItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
     "Reveal in Finder": ["reveal_folder", undefined, ""],
     "-1": null,
-    "Delete": ["delete_folder", undefined, "FolderDeleteBitmap"]
+    "Delete": ["delete_asset", undefined, "FolderDeleteBitmap"]
 };
 
 var createItems = {

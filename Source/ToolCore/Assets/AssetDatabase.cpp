@@ -248,6 +248,8 @@ void AssetDatabase::Scan()
 
     Vector<String> filteredResults;
 
+    filteredResults.Push(RemoveTrailingSlash(resourcePath));
+
     for (unsigned i = 0; i < allResults.Size(); i++)
     {
         allResults[i] = resourcePath + allResults[i];

@@ -11,8 +11,8 @@ class ProjectFrame extends ScriptWidget {
     folderList: Atomic.UIListView;
     menu: ProjectFrameMenu;
     currentFolder: ToolCore.Asset;
-    resourcesID: number;
-    assetGUIDToItemID =  {};
+    assetGUIDToItemID = {};
+    resourcesID:number = -1;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -33,8 +33,6 @@ class ProjectFrame extends ScriptWidget {
         var folderList = this.folderList = new Atomic.UIListView();
 
         folderList.rootList.id = "folderList_";
-
-        this.resourcesID = folderList.addRootItem("Resources", "Folder.icon", "0");
 
         foldercontainer.addChild(folderList);
 
@@ -58,8 +56,20 @@ class ProjectFrame extends ScriptWidget {
 
     handleResourceRemoved(ev: ToolCore.ResourceRemovedEvent) {
 
-      var folderList = this.folderList;
-      folderList.deleteItemByID(ev.guid);
+        var folderList = this.folderList;
+        folderList.deleteItemByID(ev.guid);
+
+        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+
+        for (var widget = container.firstChild; widget; widget = widget.next) {
+
+            if (widget.id == ev.guid) {
+
+                container.removeChild(widget);
+                break;
+            }
+
+        }
 
     }
 
@@ -76,8 +86,8 @@ class ProjectFrame extends ScriptWidget {
 
             if (!parent) {
 
-                //  root resource folder
-                var id = folderList.addChildItem(this.resourcesID, asset.name, "Folder.icon", asset.guid);
+                var id = folderList.addRootItem(asset.name, "Folder.icon", asset.guid);
+                this.resourcesID = id;
                 this.assetGUIDToItemID[asset.guid] = id;
 
             } else {
@@ -87,46 +97,33 @@ class ProjectFrame extends ScriptWidget {
                 this.assetGUIDToItemID[asset.guid] = id;
             }
 
+        } else if (parent == this.currentFolder) {
+
+            var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+            container.addChild(this.createButtonLayout(asset));
+
         }
 
     }
-
-    /*
-    handleResourceFolderCreated(ev: EditorEvents.ResourceFolderCreatedEvent) {
-
-      var db = ToolCore.getAssetDatabase();
-      db.scan();
-
-      this.refresh();
-
-      var asset = db.getAssetByPath(ev.path);
-
-      console.log("Asset: ", asset, " : ", ev.path, " : ", ev.navigate);
-
-      if (asset && ev.navigate)
-        this.selectPath(asset.path);
-
-    }
-    */
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
         if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
 
             var id = data.target.id;
+            var db = ToolCore.getAssetDatabase();
+            var asset: ToolCore.Asset;
 
-            if (id == "folderList_") {
+            if (id == "folderList_")
+                asset = db.getAssetByGUID(this.folderList.hoverItemID);
+            else
+                asset = db.getAssetByGUID(id);
 
-              var db = ToolCore.getAssetDatabase();
-              var asset = db.getAssetByGUID(this.folderList.hoverItemID);
+            if (asset) {
 
-              if (asset && asset.isFolder()) {
+                this.menu.createAssetContextMenu(this, asset, data.x, data.y);
 
-                this.menu.createFolderContextMenu(this, "folder context menu", asset, data.x, data.y);
-
-              }
-
-              return true;
+                return true;
 
             }
 
@@ -222,17 +219,35 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    handleDragEnded(data) {
+    handleDragEnded(data: Atomic.DragEndedEvent) {
 
-        // if the drop target is the folderList's root select widget
-        var rootList = this.folderList.rootList;
-        var hoverID = rootList.hoverItemID;
+        var asset: ToolCore.Asset;
 
-        if (hoverID == "")
-            return;
+        if (data.target) {
 
-        var db = ToolCore.getAssetDatabase();
-        var asset = db.getAssetByGUID(hoverID);
+            var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+
+            if (data.target.id == "contentcontainerscroll" || container.isAncestorOf(data.target)) {
+
+                asset = this.currentFolder;
+
+            }
+
+        }
+
+        if (!asset) {
+
+            // if the drop target is the folderList's root select widget
+            var rootList = this.folderList.rootList;
+            var hoverID = rootList.hoverItemID;
+
+            if (hoverID == "")
+                return;
+
+            var db = ToolCore.getAssetDatabase();
+            asset = db.getAssetByGUID(hoverID);
+
+        }
 
         if (!asset || !asset.isFolder)
             return;
@@ -283,8 +298,8 @@ class ProjectFrame extends ScriptWidget {
 
     handleProjectLoaded(data) {
 
-      this.folderList.rootList.value = 0;
-      this.folderList.setExpanded(this.resourcesID, true);
+        this.folderList.rootList.value = 0;
+        this.folderList.setExpanded(this.resourcesID, true);
 
     }
 
@@ -338,6 +353,7 @@ class ProjectFrame extends ScriptWidget {
         }
 
         var blayout = new Atomic.UILayout();
+        blayout.id = asset.guid;
 
         blayout.gravity = Atomic.UI_GRAVITY_LEFT;
 
