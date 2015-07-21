@@ -41,7 +41,7 @@ class MainFrame extends ScriptWidget {
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
-          this.showWelcomeFrame(false);
+            this.showWelcomeFrame(false);
         });
 
         this.showWelcomeFrame(true);
@@ -64,14 +64,14 @@ class MainFrame extends ScriptWidget {
     showWelcomeFrame(show: boolean) {
 
         if (show) {
-          this.showInspectorFrame(false);
-          this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
-          this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.showInspectorFrame(false);
+            this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         }
         else {
-          this.showInspectorFrame(true);
-          this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
-          this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.showInspectorFrame(true);
+            this.resourceframe.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+            this.welcomeFrame.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         }
 
     }
@@ -108,6 +108,13 @@ class MainFrame extends ScriptWidget {
         }
 
         return false;
+
+    }
+
+    shutdown() {
+
+        this.resourceframe.shutdown();
+        this.deleteAllChildren();
 
     }
 

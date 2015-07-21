@@ -188,6 +188,17 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
+    shutdown() {
+
+        // on exit close all open editors
+        for (var path in this.editors) {
+
+            this.sendEvent(EditorEvents.CloseResource, { editor: this.editors[path], navigateToAvailableResource: false });
+
+        }
+
+    }
+
     constructor(parent: Atomic.UIWidget) {
 
         super();

@@ -32,6 +32,7 @@ class Editor extends Atomic.ScriptObject {
 
         this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
         this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
+        this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
         this.parseArguments();
 
@@ -76,10 +77,15 @@ class Editor extends Atomic.ScriptObject {
     }
 
     // event handling
+    handleExitRequested(data) {
+
+      EditorUI.shutdown();
+
+    }
 
     handleEditorEventQuit(data) {
 
-      Atomic.getEngine().exit();
+      this.sendEvent("ExitRequested");
 
     }
 

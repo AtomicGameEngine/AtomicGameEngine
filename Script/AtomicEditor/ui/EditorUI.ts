@@ -24,6 +24,15 @@ export function initialize() {
   editorUI = new EditorUI();
 }
 
+export function shutdown() {
+
+  editorUI.mainframe.shutdown();
+  var view = editorUI.view;
+  view.deleteAllChildren();
+  view.parent.removeChild(view);
+
+}
+
 export function showModalError(windowText:string, message:string) {
   editorUI.showModalError(windowText, message);
 }
