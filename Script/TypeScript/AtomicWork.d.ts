@@ -107,6 +107,19 @@ declare module Atomic {
 
     }
 
+    // subsystems
+
+    export var engine:Engine;
+    export var graphics:Graphics;
+    export var renderer:Renderer;
+    export var cache:ResourceCache;
+    export var input:Input;
+    export var fileSystem:FileSystem;
+    export var network:Network;
+
+    // end subsystems
+
+
     export function getArguments(): Array<string>;
     export function getEngine(): Engine;
     export function getInput(): Input;
