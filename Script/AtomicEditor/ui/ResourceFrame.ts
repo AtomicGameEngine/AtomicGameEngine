@@ -58,7 +58,7 @@ class ResourceFrame extends ScriptWidget {
             var sceneEditor3D = new Editor.SceneEditor3D(path, this.tabcontainer);
             editor = sceneEditor3D;
 
-            this.sendEvent("EditorActiveSceneChanged", { scene: sceneEditor3D.scene });
+            this.sendEvent(EditorEvents.ActiveSceneChange, { scene: sceneEditor3D.scene });
 
         }
 
@@ -112,10 +112,16 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleCloseResourceEditor(data) {
+    handleCloseResource(ev: EditorEvents.CloseResourceEvent) {
 
-        var editor = <Editor.ResourceEditor> data.editor;
-        var navigate = <boolean> data.navigateToAvailableResource;
+        var editor = ev.editor;
+        var navigate = ev.navigateToAvailableResource;
+
+        if (!editor)
+            return;
+
+        if (this.currentResourceEditor == editor)
+            this.currentResourceEditor = null;
 
         editor.unsubscribeFromAllEvents();
 
@@ -150,6 +156,17 @@ class ResourceFrame extends ScriptWidget {
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_SHORTCUT) {
+
+            if (ev.refid == "close") {
+                if (this.currentResourceEditor) {
+                    this.currentResourceEditor.close(true);
+                    return true;
+                }
+            }
+        }
+
 
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
             var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
@@ -187,7 +204,7 @@ class ResourceFrame extends ScriptWidget {
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
-        this.subscribeToEvent(UIEvents.CloseResourceEditor, (data) => this.handleCloseResourceEditor(data));
+        this.subscribeToEvent(EditorEvents.CloseResource, (ev: EditorEvents.CloseResourceEvent) => this.handleCloseResource(ev));
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
 

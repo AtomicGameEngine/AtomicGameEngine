@@ -310,6 +310,24 @@ static int variantmap_property_get(duk_context* ctx)
 
 }
 
+// removes all keys from the variant map proxy target, REGARDLESS of key given for delete
+// see (lengthy) note in JSEventDispatcher::EndSendEvent
+static int variantmap_property_deleteproperty(duk_context* ctx)
+{
+    // deleteProperty: function (targ, key)
+
+    duk_enum(ctx, 0, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+    while (duk_next(ctx, -1, 0)) {
+        duk_push_undefined(ctx);
+        duk_put_prop(ctx, 0);
+    }
+
+    duk_push_boolean(ctx, 1);
+    return 1;
+
+}
+
 
 void js_push_variantmap(duk_context* ctx, const VariantMap &vmap)
 {
@@ -343,6 +361,8 @@ void js_push_variantmap(duk_context* ctx, const VariantMap &vmap)
     duk_push_object(ctx);
     duk_push_c_function(ctx, variantmap_property_get, 3);
     duk_put_prop_string(ctx, -2, "get");
+    duk_push_c_function(ctx, variantmap_property_deleteproperty, 2);
+    duk_put_prop_string(ctx, -2, "deleteProperty");
 
     duk_new(ctx, 2);
 

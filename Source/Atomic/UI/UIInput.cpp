@@ -197,7 +197,22 @@ static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modif
     TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
     ev.modifierkeys = modifierkeys;
     ev.ref_id = id;
-    return TBWidget::focused_widget->InvokeEvent(ev);
+
+    TBWidget* eventWidget = TBWidget::focused_widget;
+
+    if (id == TBIDC("save") || id == TBIDC("close")) {
+
+        while (eventWidget && !eventWidget->GetDelegate()) {
+
+            eventWidget = eventWidget->GetParent();
+        }
+
+    }
+
+    if (!eventWidget)
+        return false;
+
+    return eventWidget->InvokeEvent(ev);
 }
 
 static bool InvokeKey(TBWidget* root, unsigned int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool keydown)

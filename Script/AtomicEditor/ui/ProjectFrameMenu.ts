@@ -27,18 +27,18 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
             var asset = <ToolCore.Asset> target['asset'];
 
             if (refid == "delete_asset") {
-
                 EditorUI.getModelOps().showResourceDelete(asset);
-
                 return true;
             }
 
             if (refid == "create_folder") {
-
                 EditorUI.getModelOps().showCreateFolder(asset.path);
-
                 return true;
+            }
 
+            if (refid == "create_component") {
+                EditorUI.getModelOps().showCreateComponent(asset.path);
+                return true;
             }
 
         }
@@ -62,7 +62,6 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
         } else {
             srcName = "asset context general";
         }
-
 
         var src = MenuItemSources.getMenuItemSource(srcName);
         menu.show(src, x, y);
@@ -118,8 +117,10 @@ var assetGeneralContextItems = {
 
 var assetFolderContextItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
-    "Reveal in Finder": ["reveal_folder", undefined, ""],
+    "Create Component": ["create_component", undefined, "ComponentBitmap"],
     "-1": null,
+    "Reveal in Finder": ["reveal_folder", undefined, ""],
+    "-2": null,
     "Delete": ["delete_asset", undefined, "FolderDeleteBitmap"]
 };
 

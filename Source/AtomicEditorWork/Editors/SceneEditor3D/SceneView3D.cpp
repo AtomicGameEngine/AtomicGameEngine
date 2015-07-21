@@ -102,12 +102,6 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
     SubscribeToEvent(E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
-
-    // TODO: generate this event properly
-    VariantMap eventData;
-    eventData[EditorActiveSceneChange::P_SCENE] = scene_;
-    SendEvent(E_EDITORACTIVESCENECHANGE, eventData);
-
     SetIsFocusable(true);
 
 

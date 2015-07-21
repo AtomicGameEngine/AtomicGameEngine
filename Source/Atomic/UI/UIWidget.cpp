@@ -606,6 +606,20 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
         }
 
     }
+    else if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
     else if (ev.type == EVENT_TYPE_TAB_CHANGED)
     {
         if (!ev.target || ui->IsWidgetWrapped(ev.target))

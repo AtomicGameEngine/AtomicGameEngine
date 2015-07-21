@@ -3,44 +3,44 @@ import EditorUI = require("../EditorUI");
 
 class ModalWindow extends Atomic.UIWindow {
 
-  constructor() {
+    constructor() {
 
-    super();
+        super();
 
-    var view = EditorUI.getView();
-    view.addChild(this);
+        var view = EditorUI.getView();
+        view.addChild(this);
 
-    this.setFocus();
+        this.setFocus();
 
-    this.subscribeToEvent(this, "WidgetDeleted", (event:Atomic.UIWidgetDeletedEvent) => {
+        this.subscribeToEvent(this, "WidgetDeleted", (event: Atomic.UIWidgetDeletedEvent) => {
 
-      this.hide();
+            this.hide();
 
-    });
+        });
 
-    this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
-  }
+    }
 
-  hide() {
+    hide() {
 
-    var modalOps = EditorUI.getModelOps();
-    modalOps.hide();
+        var modalOps = EditorUI.getModelOps();
+        modalOps.hide();
 
-  }
+    }
 
-  handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-  }
+    }
 
-  init(windowText:string, uifilename:string) {
+    init(windowText: string, uifilename: string) {
 
-    this.text = windowText;
-    this.load(uifilename);
-    this.resizeToFitContent();
-    this.center();
+        this.text = windowText;
+        this.load(uifilename);
+        this.resizeToFitContent();
+        this.center();
 
-  }
+    }
 
 }
 

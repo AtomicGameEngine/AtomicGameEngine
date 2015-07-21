@@ -1,6 +1,7 @@
 
 import HierarchyFrameMenu = require("./HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
+import EditorEvents = require("../editor/EditorEvents");
 
 class HierarchyFrame extends Atomic.UIWidget {
 
@@ -32,12 +33,25 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
-        this.subscribeToEvent("EditorActiveSceneChanged", (data) => this.handleActiveSceneChanged(data));
 
-        this.subscribeToEvent("EditorActiveNodeChange", (data) => {
+        this.subscribeToEvent(EditorEvents.ActiveNodeChange, (data) => {
 
             if (data.node)
                 this.hierList.selectItemByID(data.node.id.toString());
+
+        });
+
+        this.subscribeToEvent(EditorEvents.ActiveSceneChange, (data) => this.handleActiveSceneChanged(data));
+
+        this.subscribeToEvent(EditorEvents.SceneClosed, (ev: EditorEvents.SceneClosedEvent) => {
+
+            if (ev.scene == this.scene) {
+
+                this.unsubscribeFromEvents(this.scene);
+                this.scene = null;
+                this.populate();
+
+            }
 
         });
 
@@ -63,6 +77,10 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
 
+        // on close
+        if (!this.scene)
+            return;
+
         var node = ev.node;
 
         if (this.filterNode(node))
@@ -75,7 +93,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.hierList.deleteItemByID(node.id.toString());
 
-        this.sendEvent("EditorActiveNodeChange", { node: ev.parent ? ev.parent : this.scene });
+        this.sendEvent(EditorEvents.ActiveNodeChange, { node: ev.parent ? ev.parent : this.scene });
 
     }
 
@@ -231,7 +249,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         var icon = "";
 
         if (node.isTemporary())
-          icon = "ComponentBitmap";
+            icon = "ComponentBitmap";
 
         var childItemID = this.hierList.addChildItem(parentID, name, icon, node.id.toString());
 

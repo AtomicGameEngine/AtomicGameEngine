@@ -101,6 +101,12 @@ public:
     bool IsPackaged() const { return offset_ != 0; }
     /// Return the fullpath to the file
     const String& GetFullPath() const { return fullPath_; }
+
+    // Atomic Begin
+    /// Copy a file from a source file, must be opened and FILE_WRITE
+    /// Unlike FileSystem.Copy this copy works when the source file is in a package file
+    bool Copy(File* srcFile);
+    // Atomic End
     
 
 private:

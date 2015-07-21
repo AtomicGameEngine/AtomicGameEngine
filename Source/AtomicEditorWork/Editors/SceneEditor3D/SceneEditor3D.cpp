@@ -89,11 +89,6 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
 
-    // TODO: generate this event properly
-    VariantMap eventData;
-    eventData[EditorActiveSceneChange::P_SCENE] = scene_;
-    SendEvent(E_EDITORACTIVESCENECHANGE, eventData);
-
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
 
@@ -109,6 +104,7 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_SHORTCUT)
     {
+        /*
         if (ev.ref_id == TBIDC("save"))
         {
             File file(context_);
@@ -120,7 +116,7 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 
             return true;
         }
-        else if (ev.ref_id == TBIDC("copy"))
+        else */if (ev.ref_id == TBIDC("copy"))
         {
             if (selectedNode_.NotNull())
             {
@@ -206,6 +202,16 @@ void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap&
 {
     EditMode mode = (EditMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
     gizmo3D_->SetEditMode(mode);
+}
+
+void SceneEditor3D::Close(bool navigateToAvailableResource)
+{
+
+    VariantMap data;
+    data["Scene"] = scene_;
+    SendEvent("EditorSceneClosed", data);
+
+    ResourceEditor::Close(navigateToAvailableResource);
 }
 
 bool SceneEditor3D::Save()

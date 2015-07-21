@@ -14,6 +14,21 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu edit", editItems);
         MenuItemSources.createMenuItemSource("menu file", fileItems);
 
+        this.subscribeToEvent("WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
+
+            if (ev.type == Atomic.UI_EVENT_TYPE_SHORTCUT) {
+
+                if (ev.refid == "save") {
+
+                    this.sendEvent(EditorEvents.SaveResource);
+                    return true;
+
+                }
+
+            }
+
+        })
+
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {

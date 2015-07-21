@@ -38,10 +38,40 @@ void JSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHas
     duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_VARIANTMAP_CACHE);
 
     duk_push_pointer(ctx, (void*) &eventData);
-    duk_push_undefined(ctx);
-    duk_put_prop(ctx, -3);
+    duk_get_prop(ctx, -2);
 
-    duk_pop_2(ctx);
+    // Ok, this is unfortunate, in an event callback it is possible
+    // to capture the Proxy object which represents the event VariantMap
+    // in a function() {} closure, which will keep the event data alive
+    // until the function happens to be gc'd (it is a member of the eventhandler)
+    // which will leave things like scenes up if there was a P_SCENE event data
+    // member, etc
+    // So, we need to check if we have an object in the variant map cache
+    // and thense call it's delete property method on the Proxy, which will clear
+    // all the data (the proxy can still be alive as a captured local, though
+    // the members won't be held
+    // This all makes it that much more important that the pointer to eventData
+    // is consistent across entire event, otherwise references may be held
+
+    // this would be a great use of weak references if duktape had them
+
+    if (duk_is_object(ctx, -1))
+    {
+        // deletes all properties, thus freeing references, even if
+        // the variant map object is held onto by script (it will be invalid, post
+        // event send)
+        // see JSAPI.cpp variantmap_property_deleteproperty
+        duk_del_prop_index(ctx, -1, 0);
+
+        duk_push_pointer(ctx, (void*) &eventData);
+        duk_push_undefined(ctx);
+
+        // clear the variant map object from the cache
+        duk_put_prop(ctx, -4);
+
+    }
+
+    duk_pop_3(ctx);
 
 }
 

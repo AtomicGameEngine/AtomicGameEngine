@@ -259,20 +259,20 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
 
         }
 
-        if (ev.ref_id == TBIDC("save") && modified_)
+        if (ev.ref_id == TBIDC("save"))
         {
-            TBStr text;
-            styleEdit_->GetText(text);
-            File file(context_, fullpath_, FILE_WRITE);
-            file.Write((void*) text.CStr(), text.Length());
-            file.Close();
+            //TBStr text;
+            //styleEdit_->GetText(text);
+            //File file(context_, fullpath_, FILE_WRITE);
+            //file.Write((void*) text.CStr(), text.Length());
+            //file.Close();
 
-            String filename = GetFileNameAndExtension(fullpath_);
-            button_->SetText(filename.CString());
-            modified_ = false;
+            //String filename = GetFileNameAndExtension(fullpath_);
+            //button_->SetText(filename.CString());
+            //modified_ = false;
             //SendEvent(E_JAVASCRIPTSAVED);
 
-            return true;
+            return false;
         }
         else if (ev.ref_id == TBIDC("find"))
         {
@@ -616,5 +616,25 @@ bool JSResourceEditor::BeautifyJavascript(const char* source, String& output)
     return ok;
 
 }
+
+bool JSResourceEditor::Save()
+{
+    if (!modified_)
+        return true;
+
+    TBStr text;
+    styleEdit_->GetText(text);
+    File file(context_, fullpath_, FILE_WRITE);
+    file.Write((void*) text.CStr(), text.Length());
+    file.Close();
+
+    String filename = GetFileNameAndExtension(fullpath_);
+    button_->SetText(filename.CString());
+    modified_ = false;
+
+    return true;
+
+}
+
 
 }

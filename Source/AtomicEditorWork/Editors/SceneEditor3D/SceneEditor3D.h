@@ -48,6 +48,7 @@ public:
 
     virtual bool RequiresInspector() { return true; }
 
+    void Close(bool navigateToAvailableResource = true);
     bool Save();
 
 private:

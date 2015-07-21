@@ -118,11 +118,7 @@ void ResourceEditor::Close(bool navigateToAvailableResource)
     VariantMap data;
     data["Editor"] = this;
     data["NavigateToAvailableResource"] = navigateToAvailableResource;
-    SendEvent("CloseResourceEditor", data);
-
-    //MainFrame* frame = GetSubsystem<MainFrame>();
-    //ResourceFrame* rframe = frame->GetResourceFrame();
-    //rframe->CloseResourceEditor(this, navigateToAvailabeResource);
+    SendEvent("EditorCloseResource", data);
 }
 
 }

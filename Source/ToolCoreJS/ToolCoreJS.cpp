@@ -113,14 +113,26 @@ void jsapi_init_toolcore(JSVM* vm)
     duk_push_c_function(ctx, js_atomic_GetToolEnvironment, 0);
     duk_put_prop_string(ctx, -2, "getToolEnvironment");
 
+    js_push_class_object_instance(ctx, vm->GetSubsystem<ToolEnvironment>(), "ToolEnvironment");
+    duk_put_prop_string(ctx, -2, "toolEnvironment");
+
     duk_push_c_function(ctx, js_atomic_GetToolSystem, 0);
     duk_put_prop_string(ctx, -2, "getToolSystem");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<ToolSystem>(), "ToolSystem");
+    duk_put_prop_string(ctx, -2, "toolSystem");
 
     duk_push_c_function(ctx, js_atomic_GetLicenseSystem, 0);
     duk_put_prop_string(ctx, -2, "getLicenseSystem");
 
+    js_push_class_object_instance(ctx, vm->GetSubsystem<LicenseSystem>(), "LicenseSystem");
+    duk_put_prop_string(ctx, -2, "licenseSystem");
+
     duk_push_c_function(ctx, js_atomic_GetAssetDatabase, 0);
     duk_put_prop_string(ctx, -2, "getAssetDatabase");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<AssetDatabase>(), "AssetDatabase");
+    duk_put_prop_string(ctx, -2, "assetDatabase");
 
     duk_pop(ctx);
 

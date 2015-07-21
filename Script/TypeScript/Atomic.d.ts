@@ -7824,6 +7824,8 @@ declare module Atomic {
       isPackaged(): boolean;
       // Return the fullpath to the file
       getFullPath(): string;
+      // Unlike FileSystem.Copy this copy works when the source file is in a package file
+      copy(srcFile: File): boolean;
       readText():string;
 
    }

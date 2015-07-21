@@ -5,53 +5,53 @@ import ResourceOps = require("../../resources/ResourceOps");
 
 export class ResourceDelete extends ModalWindow {
 
-  constructor(asset: ToolCore.Asset) {
+    constructor(asset: ToolCore.Asset) {
 
-      super();
+        super();
 
-      this.asset = asset;
-      this.init("Delete Resource", "AtomicEditor/editor/ui/resourcedelete.tb.txt");
-      var message = <Atomic.UIEditField> this.getWidget("message");
+        this.asset = asset;
+        this.init("Delete Resource", "AtomicEditor/editor/ui/resourcedelete.tb.txt");
+        var message = <Atomic.UIEditField> this.getWidget("message");
 
-      var text = "Are you sure you want to delete resource:\n\n";
-      text += asset.path;
-      text += "\n\nThis operation cannot be undone";
+        var text = "Are you sure you want to delete resource:\n\n";
+        text += asset.path;
+        text += "\n\nThis operation cannot be undone";
 
-      message.text = text;
+        message.text = text;
 
-      this.resizeToFitContent();
-      this.center();
+        this.resizeToFitContent();
+        this.center();
 
-  }
+    }
 
-  handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-      if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
-          var id = ev.target.id;
+            var id = ev.target.id;
 
-          if (id == "delete") {
+            if (id == "delete") {
 
-              this.hide();
+                this.hide();
 
-              var db = ToolCore.getAssetDatabase();
-              db.deleteAsset(this.asset);
+                var db = ToolCore.getAssetDatabase();
+                db.deleteAsset(this.asset);
 
-              return true;
-          }
+                return true;
+            }
 
-          if (id == "cancel") {
+            if (id == "cancel") {
 
-              this.hide();
+                this.hide();
 
-              return true;
-          }
+                return true;
+            }
 
-      }
+        }
 
-  }
+    }
 
-  asset: ToolCore.Asset;
+    asset: ToolCore.Asset;
 
 }
 
@@ -79,6 +79,59 @@ export class CreateFolder extends ModalWindow {
                 if (ResourceOps.CreateNewFolder(resourcePath)) {
 
                     this.hide();
+
+                }
+
+                return true;
+
+            }
+
+            if (id == "cancel") {
+
+                this.hide();
+
+                return true;
+            }
+
+        }
+
+    }
+
+    resourcePath: string;
+    nameField: Atomic.UIEditField;
+
+}
+
+export class CreateComponent extends ModalWindow {
+
+    constructor(resourcePath: string) {
+
+        super();
+
+        this.resourcePath = resourcePath;
+        this.init("New Component", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.nameField = <Atomic.UIEditField> this.getWidget("component_name");
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = ev.target.id;
+
+            if (id == "create") {
+
+                var componentName = this.nameField.text;
+                var outputFile = Atomic.addTrailingSlash(this.resourcePath) + componentName;
+
+                if (outputFile.indexOf(".js") == -1) outputFile += ".js";
+
+
+                if (ResourceOps.CreateNewComponent(outputFile, componentName)) {
+
+                    this.hide();
+
+                    this.sendEvent(EditorEvents.EditResource, { path:outputFile});
 
                 }
 

@@ -42,6 +42,8 @@ public:
 
     bool HasUnsavedModifications();
 
+    bool Save();
+
 private:
 
     bool ParseJavascriptToJSON(const char* source, String& json, bool loose = true);

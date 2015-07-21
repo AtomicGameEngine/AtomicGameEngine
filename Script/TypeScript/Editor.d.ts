@@ -71,6 +71,7 @@ declare module Editor {
       gotoLineNumber(lineNumber: number): void;
       setFocus(): void;
       hasUnsavedModifications(): boolean;
+      save(): boolean;
 
    }
 
@@ -105,6 +106,7 @@ declare module Editor {
       getScene(): Atomic.Scene;
       setFocus(): void;
       requiresInspector(): boolean;
+      close(navigateToAvailableResource?: boolean): void;
       save(): boolean;
 
    }

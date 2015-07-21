@@ -1,13 +1,17 @@
 
-// Atomic Component
+"atomic component";
 
-var game = Atomic.game;
-var node = self.node;
+var component = function (self) {
 
-function start() {
+
+  self.start = function() {
+
+  }
+
+  self.update = function(timeStep) {
+
+  }
 
 }
 
-function update(timeStep) {
-
-}
+module.exports = component;

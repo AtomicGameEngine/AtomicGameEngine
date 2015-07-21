@@ -9,6 +9,16 @@ export interface ModalErrorEvent {
 
 }
 
+export const ActiveSceneChange = "EditorActiveSceneChange";
+export const ActiveNodeChange = "EditorActiveNodeChange";
+export const SceneClosed = "EditorSceneClosed";
+export interface SceneClosedEvent {
+
+  scene: Atomic.Scene;
+
+}
+
+
 export const ContentFolderChanged = "ContentFolderChanged";
 export interface ContentFolderChangedEvent {
 
@@ -33,6 +43,13 @@ export interface SaveResourceEvent {
 
 }
 
+export const CloseResource = "EditorCloseResource";
+export interface CloseResourceEvent {
+
+  editor:Editor.ResourceEditor;
+  navigateToAvailableResource:boolean;
+
+}
 
 export const EditResource = "EditorEditResource";
 export interface EditResourceEvent {
