@@ -45,8 +45,8 @@ physicsCreateSource.addItem(new Atomic.UIMenuItem("RigidBody", "RigidBody"));
 
 var sceneCreateSource = new Atomic.UIMenuItemSource();
 
-sceneCreateSource.addItem(new Atomic.UIMenuItem("Camera", "create component"));
-sceneCreateSource.addItem(new Atomic.UIMenuItem("Light", "create component"));
+sceneCreateSource.addItem(new Atomic.UIMenuItem("Camera", "Camera"));
+sceneCreateSource.addItem(new Atomic.UIMenuItem("Light", "Light"));
 sceneCreateSource.addItem(new Atomic.UIMenuItem("Zone", "create component"));
 
 var subsystemCreateSource = new Atomic.UIMenuItemSource();

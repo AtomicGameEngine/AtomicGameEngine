@@ -11,6 +11,6 @@ namespace Atomic
 
 class JSVM;
 
-void jsapi_init_atomicgame(JSVM* vm);
+void jsapi_init_atomicplayer(JSVM* vm);
 
 }

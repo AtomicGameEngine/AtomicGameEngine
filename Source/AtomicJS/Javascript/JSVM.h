@@ -44,7 +44,6 @@ public:
     bool ExecuteScript(const String& scriptPath);
 
     // Resources/Script/main.js
-    // Catches not requiring AtomicGame, etc
     bool ExecuteMain();
 
     bool ExecuteFunction(const String& functionName);

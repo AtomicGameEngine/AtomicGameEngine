@@ -8082,51 +8082,11 @@ declare module Atomic {
 
    }
 
-   export class JSMetrics extends AObject {
-
-      // Construct.
-      constructor(vm: JSVM);
-
-      capture(): void;
-      dump(): void;
-      dumpNodes(): void;
-      dumpJSComponents(): void;
-
-   }
-
    export class ScriptObject extends AObject {
 
       // Construct.
       constructor();
 
-
-   }
-
-   export class JSVM extends AObject {
-
-      metrics: JSMetrics;
-      moduleSearchPaths: string[];
-      lastModuleSearchFile: string;
-      errorString: string;
-
-      // Construct.
-      constructor();
-
-      initJSContext(): void;
-      executeFile(file: File): boolean;
-      executeScript(scriptPath: string): boolean;
-      executeMain(): boolean;
-      executeFunction(functionName: string): boolean;
-      gC(): void;
-      getMetrics(): JSMetrics;
-      dumpJavascriptObjects(): void;
-      removeObject(object: RefCounted): void;
-      setModuleSearchPaths(searchPath: string): void;
-      getModuleSearchPaths(): string[];
-      setLastModuleSearchFile(fileName: string): void;
-      getLastModuleSearchFile(): string;
-      getErrorString(): string;
-      sendJSErrorEvent(filename?: string): void;
 
    }
 

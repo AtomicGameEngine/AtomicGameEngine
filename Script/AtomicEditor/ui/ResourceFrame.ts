@@ -28,6 +28,13 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
+    handleSaveResource(Ev: EditorEvents.SaveResourceEvent) {
+
+        if (this.currentResourceEditor)
+            this.currentResourceEditor.save();
+
+    }
+
     handleEditResource(ev: EditorEvents.EditResourceEvent) {
 
         var path = ev.path;
@@ -51,7 +58,7 @@ class ResourceFrame extends ScriptWidget {
             var sceneEditor3D = new Editor.SceneEditor3D(path, this.tabcontainer);
             editor = sceneEditor3D;
 
-            this.sendEvent("EditorActiveSceneChanged", { scene : sceneEditor3D.scene });
+            this.sendEvent("EditorActiveSceneChanged", { scene: sceneEditor3D.scene });
 
         }
 
@@ -179,8 +186,10 @@ class ResourceFrame extends ScriptWidget {
         this.resourceViewContainer.addChild(this);
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
+        this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
         this.subscribeToEvent(UIEvents.CloseResourceEditor, (data) => this.handleCloseResourceEditor(data));
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
+
 
         this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
 

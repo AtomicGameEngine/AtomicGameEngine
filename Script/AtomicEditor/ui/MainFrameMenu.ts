@@ -51,9 +51,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "file save file") {
 
-                //TODO: this is horrible
-                //if (this.resourceframe.currentResourceEditor)
-                //    this.resourceframe.currentResourceEditor.save();
+                this.sendEvent(EditorEvents.SaveResource);
 
                 return true;
 

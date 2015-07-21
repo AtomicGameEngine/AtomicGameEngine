@@ -113,7 +113,7 @@ void JSVM::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     }
 
-    duk_get_global_string(ctx_, "__js_atomicgame_update");
+    duk_get_global_string(ctx_, "__js_atomic_main_update");
 
     if (duk_is_function(ctx_, -1))
     {
@@ -317,14 +317,39 @@ void JSVM::GC()
 
 bool JSVM::ExecuteMain()
 {
-    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("Scripts/main.js"));
+    if (!GetSubsystem<ResourceCache>()->Exists("Scripts/main.js"))
+        return true;
 
-    if (file.Null())
+
+    duk_get_global_string(ctx_, "require");
+    duk_push_string(ctx_, "Scripts/main");
+
+    if (duk_pcall(ctx_, 1) != 0)
     {
+        SendJSErrorEvent();
         return false;
     }
 
-    return ExecuteFile(file);
+    if (duk_is_object(ctx_, -1))
+    {
+        duk_get_prop_string(ctx_, -1, "update");
+
+        if (duk_is_function(ctx_, -1))
+        {
+            // store function for main loop
+            duk_put_global_string(ctx_, "__js_atomic_main_update");
+        }
+        else
+        {
+            duk_pop(ctx_);
+        }
+
+    }
+
+    // pop main module
+    duk_pop(ctx_);
+
+    return true;
 
 }
 

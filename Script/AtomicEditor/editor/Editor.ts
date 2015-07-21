@@ -17,6 +17,9 @@ class Editor extends Atomic.ScriptObject {
 
         super();
 
+        // limit the framerate to limit CPU usage
+        Atomic.getEngine().maxFps = 60;
+
         Editor.instance = this;
 
         this.editorLicense = new EditorLicense();

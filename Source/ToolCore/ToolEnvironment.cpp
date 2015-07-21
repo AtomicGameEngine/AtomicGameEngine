@@ -120,14 +120,14 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
 
 #ifdef _DEBUG
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Debug/AtomicPlayer.exe";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Debug/AtomicEditor.exe";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditorWork/Debug/AtomicEditorWork.exe";
 #else
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Release/AtomicPlayer.exe";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Release/AtomicEditor.exe";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditorWork/Release/AtomicEditorWork.exe";
 #endif
 #elif ATOMIC_PLATFORM_OSX
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.app/Contents/MacOS/AtomicEditor";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditorWork/AtomicEditorWork.app/Contents/MacOS/AtomicEditorWork";
 #endif
     }
 

@@ -39,6 +39,8 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
+#include <AtomicPlayer/Player.h>
+
 #include "AEPlayerApp.h"
 
 #include <Atomic/DebugNew.h>
@@ -48,6 +50,12 @@
 #ifdef __APPLE__
 #include <unistd.h>
 #endif
+
+
+namespace AtomicPlayer
+{
+    extern void jsapi_init_atomicplayer(JSVM* vm);
+}
 
 namespace AtomicEditor
 {
@@ -219,8 +227,11 @@ void AEPlayerApplication::Start()
 
     vm = javascript->InstantiateVM("MainVM");
     vm->InitJSContext();
-
     vm->SetModuleSearchPaths("Modules");
+
+    // Instantiate and register the Player subsystem
+    context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
+    AtomicPlayer::jsapi_init_atomicplayer(vm);
 
     if (!vm->ExecuteMain())
     {
@@ -233,6 +244,9 @@ void AEPlayerApplication::Start()
 void AEPlayerApplication::Stop()
 {
     context_->RemoveSubsystem<Javascript>();
+    // make sure JSVM is really down and no outstanding refs
+    // as if not, will hold on engine subsystems, which is bad
+    assert(!JSVM::GetJSVM(0));
 }
 
 void AEPlayerApplication::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)

@@ -24,6 +24,16 @@ export interface LoadProjectEvent {
 
 }
 
+export const SaveResource = "EditorSaveResource";
+export interface SaveResourceEvent {
+
+  // The full path to the resource to save
+  // empty or undefined for current
+  path: string;
+
+}
+
+
 export const EditResource = "EditorEditResource";
 export interface EditResourceEvent {
 

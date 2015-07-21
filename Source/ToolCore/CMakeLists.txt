@@ -10,8 +10,6 @@ if (MSVC)
     add_definitions(-DCURL_STATICLIB)
 endif()
 
-file (GLOB_RECURSE SOURCE_FILES Source/*.cpp Source/*.h)
-
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
 add_library(ToolCore ${SOURCE_FILES})

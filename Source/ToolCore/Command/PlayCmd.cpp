@@ -88,10 +88,12 @@ void PlayCmd::Run()
 
     Vector<String> vargs;
 
-    String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
+    //String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
+
+    String args = ToString("--player --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
 
     vargs = args.Split(' ');
-    vargs.Insert(0, "--player");
+    //vargs.Insert(0, "--player");
 
     // TODO: use IPC (maybe before this set log location/access the log and output it, we need access to errors)
     LaunchPlayerProcess(editorBinary, vargs, "");
