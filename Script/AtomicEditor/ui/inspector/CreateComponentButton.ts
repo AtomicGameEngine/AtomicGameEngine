@@ -10,12 +10,12 @@ audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource3D", "create compone
 
 var geometryCreateSource = new Atomic.UIMenuItemSource();
 
+geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModel", "StaticModel"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimatedModel", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("BillboardSet", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("CustomGeometry", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("ParticleEmitter", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Skybox", "create component"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModel", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModelGroup", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Terrain", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Text3D", "create component"));
@@ -23,8 +23,8 @@ geometryCreateSource.addItem(new Atomic.UIMenuItem("Water", "create component"))
 
 var logicCreateSource = new Atomic.UIMenuItemSource();
 
+logicCreateSource.addItem(new Atomic.UIMenuItem("JSComponent", "JSComponent"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "create component"));
-logicCreateSource.addItem(new Atomic.UIMenuItem("Javascript Component", "JSComponent"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "create component"));
 
 var navigationCreateSource = new Atomic.UIMenuItemSource();

@@ -32,6 +32,8 @@ public:
     virtual bool Import(const String& guid) = 0;
     virtual bool Preload() { return true; }
 
+    Asset* GetAsset() { return asset_; }
+
     bool RequiresCacheFile() const { return requiresCacheFile_; }
 
 protected:

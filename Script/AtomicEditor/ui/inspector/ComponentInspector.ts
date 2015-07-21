@@ -101,20 +101,22 @@ class ComponentInspector extends Atomic.UISection {
 
         }
 
-        if (component.getTypeName() == "PrefabComponent") {
-
+        // custom component UI
+        if (component.typeName == "PrefabComponent") {
             this.addPrefabUI(attrsVerticalLayout);
-
         }
 
-        if (component.getTypeName() == "Light") {
+        if (component.typeName == "Light") {
             this.addLightCascadeParametersUI(attrsVerticalLayout);
         }
 
-        if (component.getTypeName() == "JSComponent") {
+        if (component.typeName == "JSComponent") {
             this.addJSComponentUI(attrsVerticalLayout);
         }
 
+        if (component.typeName == "StaticModel") {
+            this.addStaticModelUI(attrsVerticalLayout);
+        }
 
         var deleteButton = new Atomic.UIButton();
         deleteButton.text = "Delete Component";
@@ -170,6 +172,112 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
+    acceptAssetDrag(importerTypeName: string, ev: Atomic.DragEndedEvent): ToolCore.AssetImporter {
+
+        var dragObject = ev.dragObject;
+
+        if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+            var asset = <ToolCore.Asset> dragObject.object;
+
+            if (asset.importerTypeName == importerTypeName) {
+                return asset.importer;
+            }
+
+        }
+
+        return null;
+
+    }
+
+    addStaticModelUI(layout: Atomic.UILayout) {
+
+        var staticModel = <Atomic.StaticModel> this.component;
+        var cacheModel = staticModel.model;
+
+        // MODEL FIELD
+        var field = InspectorUtils.createAttrEditField("Model", layout);
+        field.readOnly = true;
+
+        if (cacheModel) {
+
+            var asset = ToolCore.assetDatabase.getAssetByCachePath(cacheModel.name);
+
+            if (asset) {
+
+                field.text = asset.name;
+
+            }
+
+        }
+
+        // handle dropping of model on field
+        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == field) {
+
+                var importer = this.acceptAssetDrag("ModelImporter", ev);
+
+                if (importer) {
+
+                    var modelImporter = <ToolCore.ModelImporter> importer;
+                    var asset = modelImporter.asset;
+
+                    // the model itself, not the node XML
+                    var model = <Atomic.Model> Atomic.cache.getResource("Model", asset.cachePath + ".mdl");
+
+                    if (model) {
+
+                        staticModel.model = model;
+                        ev.target.text = asset.name;
+
+                    }
+                }
+            }
+
+        });
+
+        // MATERIAL FIELD (single material, not multimaterial for now)
+
+        var materialField = InspectorUtils.createAttrEditField("Material", layout);
+        materialField.readOnly = true;
+
+        var material = staticModel.getMaterial();
+
+        if (material) {
+
+            materialField.text = material.name;
+
+        }
+
+        // handle dropping of material on field
+        materialField.subscribeToEvent(materialField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == materialField) {
+
+                var importer = this.acceptAssetDrag("MaterialImporter", ev);
+
+                if (importer) {
+
+                    var materialImporter = <ToolCore.MaterialImporter> importer;
+                    var asset = materialImporter.asset;
+
+                    var material = <Atomic.Material> Atomic.cache.getResource("Material", asset.path);
+
+                    if (material) {
+
+                        staticModel.material = material;
+                        ev.target.text = material.name;
+
+                    }
+                }
+            }
+
+        });
+
+
+    }
+
     addJSComponentUI(layout: Atomic.UILayout) {
 
         var js = <Atomic.JSComponent> this.component;
@@ -199,27 +307,21 @@ class ComponentInspector extends Atomic.UISection {
 
             if (ev.target == field) {
 
-                var dragObject = ev.dragObject;
+                var importer = this.acceptAssetDrag("JavascriptImporter", ev);
 
-                if (dragObject.object && dragObject.object.typeName == "Asset") {
+                if (importer) {
 
-                    var asset = <ToolCore.Asset> dragObject.object;
+                    var jsImporter = <ToolCore.JavascriptImporter> importer;
 
-                    if (asset.importerTypeName == "JavascriptImporter") {
+                    if (jsImporter.isComponentFile()) {
 
-                        var jsImporter = <ToolCore.JavascriptImporter> asset.importer;
-                        if (jsImporter.isComponentFile()) {
-
-                            js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", asset.path);
-                            if (js.componentFile)
-                                ev.target.text = js.componentFile.name;
-
-                        }
+                        js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", importer.asset.path);
+                        if (js.componentFile)
+                            ev.target.text = js.componentFile.name;
 
                     }
 
                 }
-
             }
 
         });

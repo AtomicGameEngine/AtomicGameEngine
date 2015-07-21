@@ -23,6 +23,7 @@ public:
 
     Asset* GetAssetByGUID(const String& guid);
     Asset* GetAssetByPath(const String& path);
+    Asset* GetAssetByCachePath(const String& cachePath);
 
     String GenerateAssetGUID();
     void RegisterGUID(const String& guid);

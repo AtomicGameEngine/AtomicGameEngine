@@ -86,6 +86,24 @@ void AssetDatabase::Import(const String& path)
         return;
 }
 
+Asset* AssetDatabase::GetAssetByCachePath(const String& cachePath)
+{
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    String cacheFilename = GetFileName(cachePath);
+
+    while (itr != assets_.End())
+    {
+        if ((*itr)->GetCachePath().Contains(cacheFilename))
+            return *itr;
+
+        itr++;
+    }
+
+    return 0;
+
+}
+
 Asset* AssetDatabase::GetAssetByGUID(const String& guid)
 {
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();

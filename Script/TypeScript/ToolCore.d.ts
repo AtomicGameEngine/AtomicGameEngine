@@ -276,6 +276,7 @@ declare module ToolCore {
 
       getAssetByGUID(guid: string): Asset;
       getAssetByPath(path: string): Asset;
+      getAssetByCachePath(cachePath: string): Asset;
       generateAssetGUID(): string;
       registerGUID(guid: string): void;
       getCachePath(): string;
@@ -289,6 +290,8 @@ declare module ToolCore {
 
    export class AssetImporter extends Atomic.AObject {
 
+      asset: Asset;
+
       // Construct.
       constructor(asset: Asset);
 
@@ -296,6 +299,7 @@ declare module ToolCore {
       // Imports to cached data
       import(guid: string): boolean;
       preload(): boolean;
+      getAsset(): Asset;
       requiresCacheFile(): boolean;
 
    }
