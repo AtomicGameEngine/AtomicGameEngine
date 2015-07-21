@@ -38,7 +38,7 @@ class ProjectFrame extends ScriptWidget {
 
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
-        this.subscribeToEvent("DragEnded", (data) => this.handleDragEnded(data));
+        this.subscribeToEvent("DragEnded", (data:Atomic.DragEndedEvent) => this.handleDragEnded(data));
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
@@ -252,7 +252,7 @@ class ProjectFrame extends ScriptWidget {
         if (!asset || !asset.isFolder)
             return;
 
-        var dragObject = <Atomic.UIDragObject> data.dragObject;
+        var dragObject = data.dragObject;
         if (dragObject.object && dragObject.object.typeName == "Node") {
 
             var node = <Atomic.Node> dragObject.object;

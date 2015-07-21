@@ -5,7 +5,7 @@
 	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
 							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
-							 "PrefabImporter", "LicenseSystem"],
+							 "PrefabImporter", "JavascriptImporter", "LicenseSystem"],
 	"typescript_decl" : {
 
 		"AssetDatabase" : [

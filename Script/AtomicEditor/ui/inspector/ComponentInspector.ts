@@ -103,16 +103,16 @@ class ComponentInspector extends Atomic.UISection {
 
         if (component.getTypeName() == "PrefabComponent") {
 
-          this.addPrefabUI(attrsVerticalLayout);
+            this.addPrefabUI(attrsVerticalLayout);
 
         }
 
         if (component.getTypeName() == "Light") {
-          this.addLightCascadeParametersUI(attrsVerticalLayout);
+            this.addLightCascadeParametersUI(attrsVerticalLayout);
         }
 
         if (component.getTypeName() == "JSComponent") {
-          this.addJSComponentUI(attrsVerticalLayout);
+            this.addJSComponentUI(attrsVerticalLayout);
         }
 
 
@@ -143,110 +143,140 @@ class ComponentInspector extends Atomic.UISection {
 
     // Move these to a mixing class
 
-    addPrefabUI(layout:Atomic.UILayout) {
+    addPrefabUI(layout: Atomic.UILayout) {
 
-      // expand prefab
-      this.value = 1;
+        // expand prefab
+        this.value = 1;
 
-      var fd = new Atomic.UIFontDescription();
-      fd.id = "Vera";
-      fd.size = 11;
+        var fd = new Atomic.UIFontDescription();
+        fd.id = "Vera";
+        fd.size = 11;
 
-      var selectButton = new Atomic.UIButton();
-      selectButton.text = "Select Prefab";
-      selectButton.fontDescription = fd;
+        var selectButton = new Atomic.UIButton();
+        selectButton.text = "Select Prefab";
+        selectButton.fontDescription = fd;
 
-      selectButton.onClick = () => {
+        selectButton.onClick = () => {
 
-          var node = (<Atomic.PrefabComponent> this.component).getPrefabNode();
+            var node = (<Atomic.PrefabComponent> this.component).getPrefabNode();
 
-          this.sendEvent("EditorActiveNodeChange", { node: node });
+            this.sendEvent("EditorActiveNodeChange", { node: node });
 
-          return true;
+            return true;
 
-      }
+        }
 
-      layout.addChild(selectButton);
-
-    }
-
-    addJSComponentUI(layout:Atomic.UILayout) {
-
-      var js = <Atomic.JSComponent> this.component;
-
-      // expand prefab
-      this.value = 1;
-
-      var fd = new Atomic.UIFontDescription();
-      fd.id = "Vera";
-      fd.size = 11;
-
-      var selectButton = new Atomic.UIButton();
-      selectButton.text = "Select Script";
-      selectButton.fontDescription = fd;
-
-      selectButton.onClick = () => {
-
-          return true;
-      }
-
-      var field = InspectorUtils.createAttrEditField("Script", layout);
-      field.readOnly = true;
-      field.text = js.componentFile ? js.componentFile.name : "";
-
-      layout.addChild(selectButton);
+        layout.addChild(selectButton);
 
     }
 
+    addJSComponentUI(layout: Atomic.UILayout) {
 
-    addLightCascadeParametersUI(layout:Atomic.UILayout) {
+        var js = <Atomic.JSComponent> this.component;
 
-      var light = <Atomic.Light> this.component;
+        // expand prefab
+        this.value = 1;
 
-      var cascadeInfo = light.getShadowCascade();
+        var fd = new Atomic.UIFontDescription();
+        fd.id = "Vera";
+        fd.size = 11;
 
-      var container = InspectorUtils.createContainer();
-      container.gravity = Atomic.UI_GRAVITY_ALL;
-      layout.addChild(container);
+        var selectButton = new Atomic.UIButton();
+        selectButton.text = "Select Script";
+        selectButton.fontDescription = fd;
 
-      var panel = new Atomic.UILayout();
-      panel.axis = Atomic.UI_AXIS_Y;
-      panel.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
-      panel.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-      container.addChild(panel);
+        selectButton.onClick = () => {
 
-      var label = InspectorUtils.createAttrName("CSM Splits:");
-      panel.addChild(label);
+            return true;
+        }
 
-      function createHandler(index, light, field) {
+        var field = InspectorUtils.createAttrEditField("Script", layout);
+        field.readOnly = true;
+        field.text = js.componentFile ? js.componentFile.name : "";
 
-        return function(data:Atomic.UIWidgetEvent) {
+        // handle dropping of component on field
+        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
 
-          if (data.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+            if (ev.target == field) {
 
-            this.light.setShadowCascadeParameter(this.index, Number(this.field.text));
+                var dragObject = ev.dragObject;
 
-          }
+                if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-        }.bind({index:index, light:light, field:field});
+                    var asset = <ToolCore.Asset> dragObject.object;
 
-      }
+                    if (asset.importerTypeName == "JavascriptImporter") {
 
-      var field = InspectorUtils.createAttrEditField("Split 0", panel);
-      field.text = cascadeInfo[0].toString();
-      field.subscribeToEvent(field, "WidgetEvent", createHandler(0, light, field));
+                        var jsImporter = <ToolCore.JavascriptImporter> asset.importer;
+                        if (jsImporter.isComponentFile()) {
 
-      field = InspectorUtils.createAttrEditField("Split 1", panel);
-      field.text = cascadeInfo[1].toString();
-      field.subscribeToEvent(field, "WidgetEvent", createHandler(1, light, field));
+                            js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", asset.path);
+                            if (js.componentFile)
+                                ev.target.text = js.componentFile.name;
 
-      field = InspectorUtils.createAttrEditField("Split 2", panel);
-      field.text = cascadeInfo[2].toString();
-      field.subscribeToEvent(field, "WidgetEvent", createHandler(2, light, field));
+                        }
 
-      field = InspectorUtils.createAttrEditField("Split 3", panel);
-      field.text = cascadeInfo[3].toString();
-      field.subscribeToEvent(field, "WidgetEvent", createHandler(3, light, field));
+                    }
+
+                }
+
+            }
+
+        });
+
+        layout.addChild(selectButton);
+
+    }
+
+
+    addLightCascadeParametersUI(layout: Atomic.UILayout) {
+
+        var light = <Atomic.Light> this.component;
+
+        var cascadeInfo = light.getShadowCascade();
+
+        var container = InspectorUtils.createContainer();
+        container.gravity = Atomic.UI_GRAVITY_ALL;
+        layout.addChild(container);
+
+        var panel = new Atomic.UILayout();
+        panel.axis = Atomic.UI_AXIS_Y;
+        panel.layoutSize = Atomic.UI_LAYOUT_SIZE_PREFERRED;
+        panel.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        container.addChild(panel);
+
+        var label = InspectorUtils.createAttrName("CSM Splits:");
+        panel.addChild(label);
+
+        function createHandler(index, light, field) {
+
+            return function(data: Atomic.UIWidgetEvent) {
+
+                if (data.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+
+                    this.light.setShadowCascadeParameter(this.index, Number(this.field.text));
+
+                }
+
+            }.bind({ index: index, light: light, field: field });
+
+        }
+
+        var field = InspectorUtils.createAttrEditField("Split 0", panel);
+        field.text = cascadeInfo[0].toString();
+        field.subscribeToEvent(field, "WidgetEvent", createHandler(0, light, field));
+
+        field = InspectorUtils.createAttrEditField("Split 1", panel);
+        field.text = cascadeInfo[1].toString();
+        field.subscribeToEvent(field, "WidgetEvent", createHandler(1, light, field));
+
+        field = InspectorUtils.createAttrEditField("Split 2", panel);
+        field.text = cascadeInfo[2].toString();
+        field.subscribeToEvent(field, "WidgetEvent", createHandler(2, light, field));
+
+        field = InspectorUtils.createAttrEditField("Split 3", panel);
+        field.text = cascadeInfo[3].toString();
+        field.subscribeToEvent(field, "WidgetEvent", createHandler(3, light, field));
 
     }
 

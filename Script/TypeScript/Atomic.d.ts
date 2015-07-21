@@ -8057,7 +8057,7 @@ declare module Atomic {
       getUpdateEventMask(): number;
       // Return whether the DelayedStart() function has been called.
       isDelayedStartCalled(): boolean;
-      setComponentFile(cfile: JSComponentFile, loading?: boolean): void;
+      setComponentFile(cfile: JSComponentFile): void;
       setDestroyed(): void;
       initInstance(hasArgs?: boolean, argIdx?: number): void;
 

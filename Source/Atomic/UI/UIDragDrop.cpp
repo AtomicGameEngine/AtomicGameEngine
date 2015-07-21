@@ -79,7 +79,7 @@ void UIDragDrop::DragEnd()
     VariantMap dropData;
     dropData[DragEnded::P_TARGET] = currentTargetWidget;
     dropData[DragEnded::P_DRAGOBJECT] = dragObject;
-    dragObject->SendEvent(E_DRAGENDED, dropData);
+    currentTargetWidget->SendEvent(E_DRAGENDED, dropData);
 }
 
 void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)

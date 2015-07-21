@@ -544,7 +544,7 @@ bool JSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
-void JSComponent::SetComponentFile(JSComponentFile* cfile, bool loading)
+void JSComponent::SetComponentFile(JSComponentFile* cfile)
 {
     componentFile_ = cfile;
 }
@@ -557,7 +557,7 @@ ResourceRef JSComponent::GetScriptAttr() const
 void JSComponent::SetScriptAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetComponentFile(cache->GetResource<JSComponentFile>(value.name_), loading_);
+    SetComponentFile(cache->GetResource<JSComponentFile>(value.name_));
 }
 
 }

@@ -83,7 +83,7 @@ public:
 
     /// Set script attribute.
     void SetScriptAttr(const ResourceRef& value);
-    void SetComponentFile(JSComponentFile* cfile, bool loading = false);
+    void SetComponentFile(JSComponentFile* cfile);
 
     void SetDestroyed() { destroyed_ = true; }
 
