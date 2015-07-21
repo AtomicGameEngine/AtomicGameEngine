@@ -19,6 +19,8 @@
 
 #include <Atomic/Atomic3D/Terrain.h>
 #include <Atomic/Atomic3D/Model.h>
+#include <Atomic/Atomic3D/StaticModel.h>
+#include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/AnimationController.h>
 
 #include <Atomic/Input/Input.h>
@@ -98,9 +100,9 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
 
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
 
-    SubscribeToEvent(E_DRAGENTERWIDGET, HANDLER(SceneView3D, HandleDragEnterWidget));
-    SubscribeToEvent(E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
-    SubscribeToEvent(E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
+    SubscribeToEvent(this, E_DRAGENTERWIDGET, HANDLER(SceneView3D, HandleDragEnterWidget));
+    SubscribeToEvent(this, E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
+    SubscribeToEvent(this, E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
     SetIsFocusable(true);
 
@@ -204,7 +206,7 @@ Ray SceneView3D::GetCameraRay()
     GetInternalWidget()->ConvertToRoot(x, y);
 
     return  camera_->GetScreenRay(float(cpos.x_ - x) / rect.Width(),
-                                       float(cpos.y_ - y) / rect.Height());
+                                  float(cpos.y_ - y) / rect.Height());
 }
 
 void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
@@ -525,6 +527,46 @@ void SceneView3D::HandleDragExitWidget(StringHash eventType, VariantMap& eventDa
 
 void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 {
+    using namespace DragEnded;
+
+    UIDragObject* dragObject = static_cast<UIDragObject*>(eventData[P_DRAGOBJECT].GetPtr());
+
+    if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())
+    {
+        Asset* asset = (ToolCore::Asset*) dragObject->GetObject();
+
+        if (asset->GetImporterTypeName() == "MaterialImporter") {
+
+            Material* material = GetSubsystem<ResourceCache>()->GetResource<Material>(asset->GetPath());
+
+            if (material) {
+
+                material = material;
+
+                Ray camRay  = GetCameraRay();
+
+                PODVector<RayQueryResult> result;
+
+                RayOctreeQuery query(result, camRay, RAY_TRIANGLE, camera_->GetFarClip(), DRAWABLE_GEOMETRY, 0x7fffffff);
+                octree_->RaycastSingle(query);
+
+                if (query.result_.Size())
+                {
+                    const RayQueryResult& r = result[0];
+
+                    if (r.drawable_ && (r.drawable_->GetType() == StaticModel::GetTypeStatic() || r.drawable_->GetType() == AnimatedModel::GetTypeStatic()))
+                    {
+                        ((StaticModel*)r.drawable_)->SetMaterial(material);
+
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
     if (dragNode_.NotNull())
     {
         VariantMap neventData;

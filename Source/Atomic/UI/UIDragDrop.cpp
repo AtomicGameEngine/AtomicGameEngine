@@ -186,7 +186,7 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
             VariantMap exitData;
             exitData[DragExitWidget::P_WIDGET] = currentTargetWidget_;
             exitData[DragExitWidget::P_DRAGOBJECT] = dragObject_;
-            SendEvent(E_DRAGEXITWIDGET, exitData);
+            currentTargetWidget_->SendEvent(E_DRAGEXITWIDGET, exitData);
         }
 
         currentTargetWidget_ = hoverWidget;
@@ -194,7 +194,7 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         VariantMap enterData;
         enterData[DragEnterWidget::P_WIDGET] = currentTargetWidget_;
         enterData[DragEnterWidget::P_DRAGOBJECT] = dragObject_;
-        SendEvent(E_DRAGENTERWIDGET, enterData);
+        currentTargetWidget_->SendEvent(E_DRAGENTERWIDGET, enterData);
 
     }
 
