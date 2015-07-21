@@ -182,6 +182,8 @@ void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
 
     assert(asset->GetGUID().Length());
 
+    assert(!GetAssetByGUID(asset->GetGUID()));
+
     assets_.Push(asset);
 
     VariantMap eventData;
@@ -225,7 +227,7 @@ void AssetDatabase::DeleteAsset(Asset* asset)
     SendEvent(E_RESOURCEREMOVED, eventData);
 }
 
-void AssetDatabase::ImportDirtyAssets()
+bool AssetDatabase::ImportDirtyAssets()
 {
 
     PODVector<Asset*> assets;
@@ -235,7 +237,10 @@ void AssetDatabase::ImportDirtyAssets()
     {
         assets[i]->Import();
         assets[i]->Save();
+        assets[i]->dirty_ = false;
     }
+
+    return assets.Size() != 0;
 
 }
 
@@ -325,7 +330,8 @@ void AssetDatabase::Scan()
 
     PreloadAssets();
 
-    ImportDirtyAssets();
+    if (ImportDirtyAssets())
+        Scan();
 
 }
 

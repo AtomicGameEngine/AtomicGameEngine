@@ -12,7 +12,7 @@ class ProjectFrame extends ScriptWidget {
     menu: ProjectFrameMenu;
     currentFolder: ToolCore.Asset;
     assetGUIDToItemID = {};
-    resourcesID:number = -1;
+    resourcesID: number = -1;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -38,7 +38,7 @@ class ProjectFrame extends ScriptWidget {
 
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
-        this.subscribeToEvent("DragEnded", (data:Atomic.DragEndedEvent) => this.handleDragEnded(data));
+        this.subscribeToEvent("DragEnded", (data: Atomic.DragEndedEvent) => this.handleDragEnded(data));
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
@@ -91,7 +91,6 @@ class ProjectFrame extends ScriptWidget {
                 this.assetGUIDToItemID[asset.guid] = id;
 
             } else {
-
                 var parentItemID = this.assetGUIDToItemID[parent.guid];
                 var id = folderList.addChildItem(parentItemID, asset.name, "Folder.icon", asset.guid);
                 this.assetGUIDToItemID[asset.guid] = id;

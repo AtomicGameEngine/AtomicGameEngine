@@ -49,6 +49,16 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
+    showCreateScene(resourcePath:string) {
+
+      if (this.show()) {
+
+          this.opWindow = new UIResourceOps.CreateScene(resourcePath);
+
+      }
+
+    }
+
     showResourceDelete(asset:ToolCore.Asset) {
 
       if (this.show()) {

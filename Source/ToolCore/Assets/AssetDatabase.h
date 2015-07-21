@@ -52,7 +52,7 @@ private:
 
     void Import(const String& path);
 
-    void ImportDirtyAssets();
+    bool ImportDirtyAssets();
     void PreloadAssets();
 
     SharedPtr<Project> project_;

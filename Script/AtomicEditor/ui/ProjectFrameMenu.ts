@@ -41,6 +41,12 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "create_scene") {
+                EditorUI.getModelOps().showCreateScene(asset.path);
+                return true;
+            }
+
+
         }
 
     }
@@ -118,6 +124,7 @@ var assetGeneralContextItems = {
 var assetFolderContextItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
     "Create Component": ["create_component", undefined, "ComponentBitmap"],
+    "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "-1": null,
     "Reveal in Finder": ["reveal_folder", undefined, ""],
     "-2": null,

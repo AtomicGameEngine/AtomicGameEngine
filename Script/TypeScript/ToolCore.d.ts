@@ -375,6 +375,16 @@ declare module ToolCore {
 
    }
 
+   export class TextureImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+      import(guid: string): boolean;
+
+   }
+
    export class LicenseSystem extends Atomic.AObject {
 
       key: string;

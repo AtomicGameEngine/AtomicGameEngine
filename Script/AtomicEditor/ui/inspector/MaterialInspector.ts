@@ -201,6 +201,25 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
+    acceptAssetDrag(importerTypeName: string, ev: Atomic.DragEndedEvent): ToolCore.AssetImporter {
+
+        var dragObject = ev.dragObject;
+
+        if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+            var asset = <ToolCore.Asset> dragObject.object;
+
+            if (asset.importerTypeName == importerTypeName) {
+                return asset.importer;
+            }
+
+        }
+
+        return null;
+
+    }
+
+
     createTextureSection(): Atomic.UISection {
 
         var section = new Atomic.UISection();
@@ -244,6 +263,7 @@ class MaterialInspector extends ScriptWidget {
             tlp.width = 64;
             tlp.height = 64;
             textureWidget.layoutParams = tlp;
+            textureWidget["tunit"] = tunit;
 
             attrLayout.addChild(textureWidget);
 
@@ -261,6 +281,30 @@ class MaterialInspector extends ScriptWidget {
 
             textureWidget.subscribeToEvent(textureWidget, "WidgetEvent", callback);
 
+            // handle dropping of texture on widget
+            textureWidget.subscribeToEvent(textureWidget, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+                var tunit2 = tunit;
+
+                var importer = this.acceptAssetDrag("TextureImporter", ev);
+
+                if (importer) {
+
+                    var textureImporter = <ToolCore.TextureImporter> importer;
+                    var asset = textureImporter.asset;
+
+                    var texture = <Atomic.Texture2D> Atomic.cache.getResource("Texture2D", asset.path);
+
+                    if (texture) {
+
+                        this.material.setTexture(ev.target["tunit"], texture);
+                        (<Atomic.UITextureWidget>ev.target).texture = this.getTextureThumbnail(texture);
+
+                    }
+                }
+            });
+
+
         }
 
         return section;
@@ -269,7 +313,7 @@ class MaterialInspector extends ScriptWidget {
 
 
 
-    inspect(asset:ToolCore.Asset, material: Atomic.Material) {
+    inspect(asset: ToolCore.Asset, material: Atomic.Material) {
 
         this.asset = asset;
         this.material = material;
@@ -361,8 +405,8 @@ class MaterialInspector extends ScriptWidget {
 
         button.onClick = function() {
 
-          var importer = <ToolCore.MaterialImporter> this.asset.getImporter();
-          importer.saveMaterial();
+            var importer = <ToolCore.MaterialImporter> this.asset.getImporter();
+            importer.saveMaterial();
 
         }.bind(this);
 
