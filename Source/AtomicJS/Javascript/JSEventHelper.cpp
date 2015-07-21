@@ -40,6 +40,13 @@ void JSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHas
     duk_push_pointer(ctx, (void*) &eventData);
     duk_get_prop(ctx, -2);
 
+
+    // If this issue is addressed, revisit this to simply remove
+    // the variantmap object from the cache, if the user explicitly
+    // keeps the event object alive in a local closure, that is allowed
+    // (though, will keep object properties from being GC'd)
+    // https://github.com/svaarala/duktape/issues/229
+
     // Ok, this is unfortunate, in an event callback it is possible
     // to capture the Proxy object which represents the event VariantMap
     // in a function() {} closure, which will keep the event data alive
@@ -53,7 +60,7 @@ void JSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHas
     // This all makes it that much more important that the pointer to eventData
     // is consistent across entire event, otherwise references may be held
 
-    // this would be a great use of weak references if duktape had them
+    // see note above about: https://github.com/svaarala/duktape/issues/229
 
     if (duk_is_object(ctx, -1))
     {

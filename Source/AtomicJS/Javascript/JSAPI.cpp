@@ -318,9 +318,8 @@ static int variantmap_property_deleteproperty(duk_context* ctx)
 
     duk_enum(ctx, 0, DUK_ENUM_OWN_PROPERTIES_ONLY);
 
-    while (duk_next(ctx, -1, 0)) {
-        duk_push_undefined(ctx);
-        duk_put_prop(ctx, 0);
+    while (duk_next(ctx, -1, 0)) {        
+        duk_del_prop(ctx, 0);
     }
 
     duk_push_boolean(ctx, 1);
