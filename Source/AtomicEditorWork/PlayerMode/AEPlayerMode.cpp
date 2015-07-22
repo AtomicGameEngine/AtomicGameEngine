@@ -41,7 +41,7 @@ void PlayerMode::HandleIPCInitialize(StringHash eventType, VariantMap& eventData
 
     if (!vm->ExecuteMain())
     {
-        //SendEvent(E_EXITREQUESTED);
+        SendEvent(E_EXITREQUESTED);
     }
 
 }
