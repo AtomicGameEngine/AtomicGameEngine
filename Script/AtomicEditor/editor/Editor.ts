@@ -2,6 +2,7 @@
 import EditorUI = require("../ui/EditorUI");
 import UIEvents = require("../ui/UIEvents");
 import AssetImport = require("../assets/AssetImport");
+import PlayMode = require("../ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
 
@@ -10,6 +11,7 @@ class Editor extends Atomic.ScriptObject {
     project: ToolCore.Project;
     assetImport: AssetImport;
     editorLicense:EditorLicense;
+    playMode:PlayMode;
 
     static instance: Editor;
 
@@ -25,6 +27,8 @@ class Editor extends Atomic.ScriptObject {
         this.editorLicense = new EditorLicense();
 
         EditorUI.initialize();
+
+        this.playMode = new PlayMode();
 
         Atomic.getResourceCache().autoReloadResources = true;
 

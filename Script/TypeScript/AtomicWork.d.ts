@@ -101,6 +101,16 @@ declare module Atomic {
         dragObject: UIDragObject;
     }
 
+    export interface IPCJSErrorEvent {
+
+      errorName:string;
+      errorMessage:string;
+      errorFileName: string;
+      errorLineNumber: number;
+      errorStack:string;
+
+    }
+
     export interface AttributeInfo {
 
         type: VariantType;
