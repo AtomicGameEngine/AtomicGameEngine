@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "AEEditorCommon.h"
+#include <Atomic/Engine/Application.h>
 
 using namespace Atomic;
 
@@ -15,13 +15,13 @@ namespace AtomicEditor
 
 class AEPreferences;
 
-class AEEditorApp : public AEEditorCommon
+class AEEditorCommon : public Application
 {
-    OBJECT(AEEditorApp);
+    OBJECT(AEEditorCommon);
 
 public:
     /// Construct.
-    AEEditorApp(Context* context);
+    AEEditorCommon(Context* context);
 
     /// Setup before engine initialization. Verify that a script file has been specified.
     virtual void Setup();
@@ -30,10 +30,11 @@ public:
     /// Cleanup after the main loop. Run the script's stop function if it exists.
     virtual void Stop();
 
-private:
+protected:
 
-    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
-    void HandleJSError(StringHash eventType, VariantMap& eventData);
+    SharedPtr<JSVM> vm_;
+
+private:
 
 
 };

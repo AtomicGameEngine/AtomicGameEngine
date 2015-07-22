@@ -61,6 +61,23 @@ declare module Editor {
 
    }
 
+   export class EditorMode extends Atomic.AObject {
+
+      // Construct.
+      constructor();
+
+      playProject(): boolean;
+
+   }
+
+   export class PlayerMode extends Atomic.AObject {
+
+      // Construct.
+      constructor();
+
+
+   }
+
    export class JSResourceEditor extends ResourceEditor {
 
       constructor(fullpath: string, container: Atomic.UITabContainer);

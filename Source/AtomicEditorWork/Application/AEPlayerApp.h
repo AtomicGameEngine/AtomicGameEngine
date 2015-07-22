@@ -22,15 +22,14 @@
 
 #pragma once
 
-#include <Atomic/IPC/IPCTypes.h>
-#include <Atomic/Engine/Application.h>
+#include "AEEditorCommon.h"
 
 using namespace Atomic;
 
 namespace AtomicEditor
 {
 
-class AEPlayerApplication : public Application
+class AEPlayerApplication : public AEEditorCommon
 {
     OBJECT(AEPlayerApplication);
 
@@ -57,10 +56,6 @@ private:
 
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
 
-
-    void HandleHelloFromBroker(StringHash eventType, VariantMap& eventData);
-
-    IPCHandle fd_[2];
 };
 
 }

@@ -19,11 +19,10 @@
 #include <ToolCore/License/LicenseEvents.h>
 #include <ToolCore/License/LicenseSystem.h>
 
+#include "../EditorMode/AEEditorMode.h"
+
 #include "AEEditorApp.h"
 #include "AEPreferences.h"
-
-// Move me
-#include <Atomic/Environment/Environment.h>
 
 using namespace ToolCore;
 
@@ -38,22 +37,22 @@ namespace AtomicEditor
 extern void jsapi_init_editor(JSVM* vm);
 
 AEEditorApp::AEEditorApp(Context* context) :
-    Application(context)
+    AEEditorCommon(context)
 {
 
 }
 
 void AEEditorApp::Start()
 {
+    AEEditorCommon::Start();
+
+    context_->RegisterSubsystem(new EditorMode(context_));
+
+    vm_->SetModuleSearchPaths("AtomicEditor");
 
     // Do not create bone structure by default when in the editor
     // this can be toggled temporarily, for example to setup an animation preview
     AnimatedModel::SetBoneCreationEnabled(false);
-
-    context_->SetEditorContent(true);
-
-    Input* input = GetSubsystem<Input>();
-    input->SetMouseVisible(true);
 
     // move UI initialization to JS
     UI* ui = GetSubsystem<UI>();
@@ -63,16 +62,8 @@ void AEEditorApp::Start()
     ui->AddFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
     ui->SetDefaultFont("Vera", 12);
 
-    Javascript* javascript = new Javascript(context_);
-    context_->RegisterSubsystem(javascript);
-
     SubscribeToEvent(E_JSERROR, HANDLER(AEEditorApp, HandleJSError));
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(AEEditorApp, HandleExitRequested));
-
-    // Instantiate and register the Javascript subsystem
-    vm_ = javascript->InstantiateVM("MainVM");
-    vm_->InitJSContext();
-    vm_->SetModuleSearchPaths("AtomicEditor");
 
     jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
@@ -97,11 +88,10 @@ void AEEditorApp::Start()
 
 void AEEditorApp::Setup()
 {
-    RegisterEnvironmentLibrary(context_);
+    context_->SetEditorContext(true);
 
     context_->RegisterSubsystem(new AEPreferences(context_));
 
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);
 
@@ -118,13 +108,13 @@ void AEEditorApp::Setup()
 
 #endif
 
-    // env->Dump();
-
     engineParameters_["WindowTitle"] = "AtomicEditor";
     engineParameters_["WindowResizable"] = true;
     engineParameters_["FullScreen"] = false;
-    engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "AtomicEditor.log";
     engineParameters_["LogLevel"] = LOG_DEBUG;
+
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "AtomicEditor.log";
 
 #ifdef ATOMIC_PLATFORM_OSX
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
@@ -146,11 +136,7 @@ void AEEditorApp::Setup()
 
 void AEEditorApp::Stop()
 {
-    vm_ = 0;
-    context_->RemoveSubsystem<Javascript>();
-    // make sure JSVM is really down and no outstanding refs
-    // as if not, will hold on engine subsystems, which is bad
-    assert(!JSVM::GetJSVM(0));
+    AEEditorCommon::Stop();
 }
 
 void AEEditorApp::HandleExitRequested(StringHash eventType, VariantMap& eventData)

@@ -32,7 +32,7 @@ class MainToolbar extends Atomic.UIWidget {
 
             } else if (ev.target.id == "maintoolbar_play") {
 
-              new ToolCore.PlayCmd().run();
+              Atomic.editorMode.playProject();
               return true;
 
             }

@@ -23,8 +23,6 @@ public:
 
     Scene* LoadScene(const String& filename, Camera* camera = NULL);
 
-    void SayHi();
-
 private:
 
     SharedPtr<Viewport> viewport_;

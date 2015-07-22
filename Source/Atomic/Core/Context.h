@@ -160,7 +160,7 @@ public:
     void SetGlobalEventListener(GlobalEventListener* listener) { globalEventListener_ = listener; }
 
     /// Get whether an Editor Context
-    void SetEditorContent(bool editor) { editorContext_ = editor; }
+    void SetEditorContext(bool editor) { editorContext_ = editor; }
     // ATOMIC END
 
 private:

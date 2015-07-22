@@ -17,7 +17,6 @@ declare module AtomicPlayer {
       constructor();
 
       loadScene(filename: string, camera?: Atomic.Camera): Atomic.Scene;
-      sayHi(): void;
 
    }
 

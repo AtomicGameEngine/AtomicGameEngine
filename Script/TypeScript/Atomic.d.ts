@@ -1413,7 +1413,6 @@ declare module Atomic {
 
       eventSender: AObject;
       editorContext: boolean;
-      editorContent: boolean;
 
       // Construct.
       constructor();
@@ -1433,7 +1432,7 @@ declare module Atomic {
       // Get whether an Editor Context
       getEditorContext(): boolean;
       // Get whether an Editor Context
-      setEditorContent(editor: boolean): void;
+      setEditorContext(editor: boolean): void;
 
    }
 

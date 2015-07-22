@@ -57,12 +57,5 @@ Scene* Player::LoadScene(const String& filename, Camera *camera)
     return scene;
 }
 
-void Player::SayHi()
-{
-
-    LOGINFO("The Player says Hi!");
-
-}
-
 
 }
