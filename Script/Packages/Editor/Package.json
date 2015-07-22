@@ -2,6 +2,6 @@
 {
   "name" : "Editor",
   "namespace" : "AtomicEditor",
-  "dependencies" : ["Source/AtomicJS/Packages/Atomic"],
+  "dependencies" : ["Script/Packages/Atomic"],
   "modules" : ["Editor"]
 }

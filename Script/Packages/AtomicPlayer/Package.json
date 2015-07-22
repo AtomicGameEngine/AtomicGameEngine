@@ -2,6 +2,6 @@
 {
   "name" : "AtomicPlayer",
   "namespace" : "AtomicPlayer",
-  "dependencies" : ["Source/AtomicJS/Packages/Atomic"],
+  "dependencies" : ["Script/Packages/Atomic"],
   "modules" : ["Player"]
 }

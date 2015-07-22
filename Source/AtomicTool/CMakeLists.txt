@@ -25,8 +25,8 @@ endif()
 
 
 add_custom_command(TARGET AtomicTool POST_BUILD
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Source/AtomicJS/Packages/Atomic/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Source/AtomicJS/Packages/AtomicPlayer/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Source/AtomicJS/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Source/AtomicJS/Packages/Editor/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Atomic/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicPlayer/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Editor/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMENT "Generating Javascript Bindings")

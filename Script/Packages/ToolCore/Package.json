@@ -1,9 +1,7 @@
 
 {
-
   "name" : "ToolCore",
   "namespace" : "ToolCore",
-  "dependencies" : ["Source/AtomicJS/Packages/Atomic"],
+  "dependencies" : ["Script/Packages/Atomic"],
   "modules" : ["ToolCore"]
-
 }
