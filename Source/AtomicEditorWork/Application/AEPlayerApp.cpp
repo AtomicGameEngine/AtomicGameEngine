@@ -145,11 +145,6 @@ void AEPlayerApplication::Start()
     context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
     AtomicPlayer::jsapi_init_atomicplayer(vm_);
 
-    if (!vm_->ExecuteMain())
-    {
-        ErrorExit("Error executing Scripts/main.js");
-    }
-
     return;
 }
 
@@ -197,15 +192,13 @@ void AEPlayerApplication::HandleJSError(StringHash eventType, VariantMap& eventD
 {
     using namespace JSError;
     //String errName = eventData[P_ERRORNAME].GetString();
+    //String errStack = eventData[P_ERRORSTACK].GetString();
     String errMessage = eventData[P_ERRORMESSAGE].GetString();
     String errFilename = eventData[P_ERRORFILENAME].GetString();
-    //String errStack = eventData[P_ERRORSTACK].GetString();
     int errLineNumber = eventData[P_ERRORLINENUMBER].GetInt();
 
     String errorString = ToString("%s - %s - Line: %i",
                                   errFilename.CString(), errMessage.CString(), errLineNumber);
-
-    ErrorExit(errorString);
 
 }
 

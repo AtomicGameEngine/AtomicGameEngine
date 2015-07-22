@@ -179,8 +179,8 @@ void AEPlayerApplication::Setup()
 
 void AEPlayerApplication::HandleHelloFromBroker(StringHash eventType, VariantMap& eventData)
 {
-    assert(eventData[HelloFromBroker::P_HELLO].GetString() == "Hello");
-    assert(eventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING].GetInt() == 42);
+    //assert(eventData[HelloFromBroker::P_HELLO].GetString() == "Hello");
+    //assert(eventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING].GetInt() == 42);
 
     LOGERROR("Passed Test!");
 }
@@ -188,7 +188,7 @@ void AEPlayerApplication::HandleHelloFromBroker(StringHash eventType, VariantMap
 void AEPlayerApplication::Start()
 {
 
-    SubscribeToEvent(E_IPCHELLOFROMBROKER, HANDLER(AEPlayerApplication, HandleHelloFromBroker));
+    //SubscribeToEvent(E_IPCHELLOFROMBROKER, HANDLER(AEPlayerApplication, HandleHelloFromBroker));
     SubscribeToEvent(E_JSERROR, HANDLER(AEPlayerApplication, HandleJSError));
 
 
@@ -210,7 +210,7 @@ void AEPlayerApplication::Start()
     {
         IPC* ipc = new IPC(context_);
         context_->RegisterSubsystem(ipc);
-        ipc->InitWorker(fd_[0], fd_[1]);
+        //ipc->InitWorker(fd_[0], fd_[1]);
     }
 #endif
 

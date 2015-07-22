@@ -13,9 +13,11 @@
 namespace Atomic
 {
 
-IPCBroker::IPCBroker(Context* context) : IPCChannel(context)
-{    
+unsigned IPCBroker::idCounter_ = 1;
 
+IPCBroker::IPCBroker(Context* context) : IPCChannel(context, idCounter_)
+{    
+    idCounter_++;
 }
 
 IPCBroker::~IPCBroker()
@@ -93,8 +95,10 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
 
 #else
     pargs.Push(ToString("--ipc-server=%i", pp_.fd1()));
-    pargs.Push(ToString("--ipc-client=%i", pp_.fd2()));
+    pargs.Push(ToString("--ipc-client=%i", pp_.fd2()));    
 #endif
+
+    pargs.Push(ToString("--ipc-id=%i", id_));
 
     if (!otherProcess_->Launch(command, pargs, initialDirectory))
         return false;

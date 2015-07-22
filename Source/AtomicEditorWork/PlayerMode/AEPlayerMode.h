@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/IPC/IPC.h>
 #include <Atomic/IPC/IPCTypes.h>
 
 using namespace Atomic;
@@ -25,9 +26,15 @@ public:
 private:
 
     void ProcessArguments();
-    void HandleHelloFromBroker(StringHash eventType, VariantMap& eventData);
+
+    void HandleJSError(StringHash eventType, VariantMap& eventData);
+    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
+    void HandleIPCInitialize(StringHash eventType, VariantMap& eventData);
 
     IPCHandle fd_[2];
+
+    WeakPtr<IPC> ipc_;
+    bool brokerActive_;
 
 };
 

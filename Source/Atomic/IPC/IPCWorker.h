@@ -14,7 +14,7 @@ class IPCWorker : public IPCChannel
 
 public:
     /// Construct.
-    IPCWorker(IPCHandle fd, Context* context);
+    IPCWorker(Context* context, IPCHandle fd, unsigned id);
     /// Destruct.
     virtual ~IPCWorker();
 

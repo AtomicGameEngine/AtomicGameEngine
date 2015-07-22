@@ -15,7 +15,7 @@
 namespace Atomic
 {
 
-IPCWorker::IPCWorker(IPCHandle fd, Context* context) : IPCChannel(context),
+IPCWorker::IPCWorker(Context* context, IPCHandle fd, unsigned id) : IPCChannel(context, id),
     fd_(fd)
 {
 

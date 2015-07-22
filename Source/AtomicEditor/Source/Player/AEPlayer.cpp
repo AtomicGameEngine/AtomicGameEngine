@@ -59,10 +59,8 @@ void AEPlayer::HandleJSError(StringHash eventType, VariantMap& eventData)
 
 void AEPlayer::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
-    VariantMap weventData;
-    weventData[HelloFromBroker::P_HELLO] = "Hello";
-    weventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING] = 42;
-    broker_->PostMessage(E_IPCHELLOFROMBROKER, weventData);
+    //VariantMap weventData;
+    //broker_->PostMessage(E_IPCSTARTUP, weventData);
 }
 
 void AEPlayer::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)

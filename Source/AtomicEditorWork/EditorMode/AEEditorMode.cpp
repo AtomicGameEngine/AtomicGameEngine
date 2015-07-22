@@ -9,6 +9,8 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/Project/Project.h>
 
+#include <AtomicJS/Javascript/JSIPCEvents.h>
+
 #include "AEEditorMode.h"
 
 using namespace ToolCore;
@@ -29,10 +31,8 @@ EditorMode::~EditorMode()
 
 void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
-    VariantMap weventData;
-    weventData[HelloFromBroker::P_HELLO] = "Hello";
-    weventData[HelloFromBroker::P_LIFETHEUNIVERSEANDEVERYTHING] = 42;
-    playerBroker_->PostMessage(E_IPCHELLOFROMBROKER, weventData);
+    VariantMap startupData;
+    playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
 }
 
 void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
@@ -40,6 +40,19 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
     //SendEvent(E_EDITORPLAYSTOP);
 }
 
+void EditorMode::HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData)
+{
+    using namespace IPCWorkerLog;
+    const String&  message = eventData[P_MESSAGE].GetString();
+
+    LOGINFOF("From Player: %s", message.CString());
+
+}
+
+void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
+{
+
+}
 
 bool EditorMode::PlayProject()
 {
@@ -77,8 +90,9 @@ bool EditorMode::PlayProject()
 
     if (playerBroker_)
     {        
+        SubscribeToEvent(playerBroker_, E_IPCJSERROR, HANDLER(EditorMode, HandleIPCJSError));
         SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, HANDLER(EditorMode, HandleIPCWorkerExit));
-
+        SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, HANDLER(EditorMode, HandleIPCWorkerLog));
     }
 
     return playerBroker_.NotNull();

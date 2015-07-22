@@ -29,6 +29,8 @@ public:
 private:
 
     void HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData);
+    void HandleIPCJSError(StringHash eventType, VariantMap& eventData);
+    void HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData);
     void HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<IPCBroker> playerBroker_;

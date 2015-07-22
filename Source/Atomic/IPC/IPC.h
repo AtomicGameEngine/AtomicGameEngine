@@ -14,6 +14,7 @@ class IPCWorker;
 
 struct QueuedEvent
 {
+    unsigned channelID_;
     StringHash eventType_;
     VariantMap eventData_;
 };
@@ -30,10 +31,10 @@ public:
     virtual ~IPC();
 
     // queues an event from a worker or broker receiving thread
-    void QueueEvent(StringHash eventType, VariantMap& eventData);
+    void QueueEvent(unsigned id, StringHash eventType, VariantMap& eventData);
 
     // for a child worker process
-    bool InitWorker(IPCHandle fd1, IPCHandle fd2);
+    bool InitWorker(unsigned id, IPCHandle fd1, IPCHandle fd2);
 
     // spawn a worker process
     IPCBroker* SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
@@ -43,6 +44,9 @@ public:
     void SendEventToBroker(StringHash eventType, VariantMap& eventData);
 
 private:
+
+    // if non-zero we're a worked and this is out broker's channel id
+    unsigned workerChannelID_;
 
     // processes queued events
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
