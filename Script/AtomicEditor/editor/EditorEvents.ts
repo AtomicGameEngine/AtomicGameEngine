@@ -18,7 +18,6 @@ export interface SceneClosedEvent {
 
 }
 
-
 export const ContentFolderChanged = "ContentFolderChanged";
 export interface ContentFolderChangedEvent {
 

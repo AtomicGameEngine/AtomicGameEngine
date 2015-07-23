@@ -2,6 +2,7 @@
 import ScriptWidget = require("../ScriptWidget");
 import DataBinding = require("./DataBinding");
 import InspectorUtils = require("./InspectorUtils");
+import EditorUI = require("../EditorUI");
 
 class ComponentInspector extends Atomic.UISection {
 
@@ -47,6 +48,11 @@ class ComponentInspector extends Atomic.UISection {
         var nlp = new Atomic.UILayoutParams();
         nlp.width = 304;
 
+        // atttribute name layout param
+        var atlp = new Atomic.UILayoutParams();
+        atlp.width = 100;
+
+
         var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
         attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
@@ -75,6 +81,7 @@ class ComponentInspector extends Atomic.UISection {
             var name = new Atomic.UITextField();
             name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
             name.skinBg = "InspectorTextAttrName";
+            name.layoutParams = atlp;
 
             if (attr.type == Atomic.VAR_VECTOR3 || attr.type == Atomic.VAR_COLOR ||
                 attr.type == Atomic.VAR_QUATERNION) {
@@ -195,9 +202,22 @@ class ComponentInspector extends Atomic.UISection {
         var staticModel = <Atomic.StaticModel> this.component;
         var cacheModel = staticModel.model;
 
-        // MODEL FIELD
-        var field = InspectorUtils.createAttrEditField("Model", layout);
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Model", layout);
+        var field = o.editField;
         field.readOnly = true;
+
+        var select = o.selectButton;
+
+        select.onClick = () => {
+
+            EditorUI.getModelOps().showResourceSelection("Select Model", "ModelImporter", function(asset: ToolCore.Asset) {
+
+                staticModel.model = <Atomic.Model> Atomic.cache.getResource("Model", asset.cachePath + ".mdl");
+                field.text = asset.name;
+
+            });
+
+        }
 
         if (cacheModel) {
 
@@ -239,8 +259,26 @@ class ComponentInspector extends Atomic.UISection {
 
         // MATERIAL FIELD (single material, not multimaterial for now)
 
-        var materialField = InspectorUtils.createAttrEditField("Material", layout);
+        o = InspectorUtils.createAttrEditFieldWithSelectButton("Material", layout);
+        var materialField = o.editField;
         materialField.readOnly = true;
+
+        select = o.selectButton;
+
+        select.onClick = () => {
+
+            EditorUI.getModelOps().showResourceSelection("Select Material", "MaterialImporter", function(asset: ToolCore.Asset) {
+
+                staticModel.setMaterial(<Atomic.Material> Atomic.cache.getResource("Material", asset.path));
+
+                if (staticModel.getMaterial())
+                    materialField.text = staticModel.getMaterial().name;
+                else
+                    materialField.text = "";
+
+            });
+
+        }
 
         var material = staticModel.getMaterial();
 
@@ -285,22 +323,25 @@ class ComponentInspector extends Atomic.UISection {
         // expand prefab
         this.value = 1;
 
-        var fd = new Atomic.UIFontDescription();
-        fd.id = "Vera";
-        fd.size = 11;
-
-        var selectButton = new Atomic.UIButton();
-        selectButton.text = "Select Script";
-        selectButton.fontDescription = fd;
-
-        selectButton.onClick = () => {
-
-            return true;
-        }
-
-        var field = InspectorUtils.createAttrEditField("Script", layout);
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Script", layout);
+        var field = o.editField;
         field.readOnly = true;
         field.text = js.componentFile ? js.componentFile.name : "";
+
+        var select = o.selectButton;
+
+        select.onClick = () => {
+
+            EditorUI.getModelOps().showResourceSelection("Select JSComponent Script", "JavascriptImporter", function(asset: ToolCore.Asset) {
+
+                js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", asset.path);
+
+                if (js.componentFile)
+                    field.text = js.componentFile.name;
+
+            });
+
+        }
 
         // handle dropping of component on field
         field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
@@ -326,7 +367,6 @@ class ComponentInspector extends Atomic.UISection {
 
         });
 
-        layout.addChild(selectButton);
 
     }
 

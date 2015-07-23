@@ -7,6 +7,8 @@ import EULAWindow = require("../license/EULAWindow");
 import ActivationWindow = require("../license/ActivationWindow");
 import ActivationSuccessWindow = require("../license/ActivationSuccessWindow");
 
+import ResourceSelection = require("./ResourceSelection");
+
 import UIResourceOps = require("./UIResourceOps");
 
 class ModalOps extends Atomic.ScriptObject {
@@ -64,6 +66,16 @@ class ModalOps extends Atomic.ScriptObject {
       if (this.show()) {
 
           this.opWindow = new UIResourceOps.ResourceDelete(asset);
+
+      }
+
+    }
+
+    showResourceSelection(windowText:string, importerType:string, callback: (asset: ToolCore.Asset) => any) {
+
+      if (this.show()) {
+
+          this.opWindow = new ResourceSelection(windowText, importerType, callback);
 
       }
 

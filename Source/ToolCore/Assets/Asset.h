@@ -32,6 +32,8 @@ public:
     const String& GetGUID() const { return guid_; }
     const String& GetName() const { return name_; }
     const String& GetPath() const { return path_; }
+    /// Get the path relative to project
+    String GetRelativePath();
     String GetCachePath() const;
     unsigned GetTimestamp() const { return timestamp_; }
 

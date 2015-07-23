@@ -17,7 +17,6 @@ export class MessageModal extends Atomic.ScriptObject
 
     super();
 
-    // Subscribe to graphics subsystems screen mode switching, so we can adjust the widget size
     this.subscribeToEvent(UIEvents.MessageModalEvent, (data) => {
 
       if (data.type == "error") {
@@ -27,7 +26,6 @@ export class MessageModal extends Atomic.ScriptObject
       }
 
     });
-
 
   }
 

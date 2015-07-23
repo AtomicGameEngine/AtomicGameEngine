@@ -51,6 +51,7 @@
         "./ui/modal/ModalWindow.ts",
         "./ui/modal/NewProject.ts",
         "./ui/modal/ProgressModal.ts",
+        "./ui/modal/ResourceSelection.ts",
         "./ui/modal/UIResourceOps.ts",
         "./ui/playmode/PlayMode.ts"
     ]

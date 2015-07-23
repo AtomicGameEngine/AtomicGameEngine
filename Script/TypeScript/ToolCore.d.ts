@@ -234,6 +234,7 @@ declare module ToolCore {
       guid: string;
       name: string;
       path: string;
+      relativePath: string;
       cachePath: string;
       timestamp: number;
       importerType: string;
@@ -252,6 +253,8 @@ declare module ToolCore {
       getGUID(): string;
       getName(): string;
       getPath(): string;
+      // Get the path relative to project
+      getRelativePath(): string;
       getCachePath(): string;
       getTimestamp(): number;
       getImporterType(): string;

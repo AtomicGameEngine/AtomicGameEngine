@@ -38,6 +38,12 @@ class InspectorUtils {
     nameField.skinBg = "InspectorTextAttrName";
     nameField.text = name;
     nameField.fontDescription = InspectorUtils.attrFontDesc;
+
+    // atttribute name layout param
+    var atlp = new Atomic.UILayoutParams();
+    atlp.width = 100;
+    nameField.layoutParams = atlp;
+
     return nameField;
   }
 
@@ -72,6 +78,34 @@ class InspectorUtils {
     return edit;
 
   }
+
+  static createAttrEditFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{editField:Atomic.UIEditField, selectButton:Atomic.UIButton} {
+
+    var attrLayout = new Atomic.UILayout();
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+
+    var _name = InspectorUtils.createAttrName(name);
+    attrLayout.addChild(_name);
+
+    var fieldLayout = new Atomic.UILayout();
+    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+
+    var edit = InspectorUtils.createEditField();
+
+    var selectButton = new Atomic.UIButton();
+    selectButton.text = "...";
+    selectButton.fontDescription = InspectorUtils.attrFontDesc;
+
+    fieldLayout.addChild(edit);
+    fieldLayout.addChild(selectButton);
+
+    attrLayout.addChild(fieldLayout);
+    parent.addChild(attrLayout);
+
+    return {editField:edit, selectButton:selectButton};
+
+  }
+
 
   // "static constructor"
   private static attrFontDesc:Atomic.UIFontDescription;

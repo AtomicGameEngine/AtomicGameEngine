@@ -3,6 +3,9 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include "../ToolSystem.h"
+#include "../Project/Project.h"
+
 #include "AssetDatabase.h"
 #include "ModelImporter.h"
 #include "FolderImporter.h"
@@ -41,6 +44,18 @@ Asset* Asset::GetParent()
     SplitPath(path_, pathName, fileName, ext);
 
     return db->GetAssetByPath(RemoveTrailingSlash(pathName));
+
+}
+
+String Asset::GetRelativePath()
+{
+    Project* project =GetSubsystem<ToolSystem>()->GetProject();
+
+    String path = path_;
+
+    path.Replace(project->GetResourcePath(), "", false);
+
+    return path;
 
 }
 
