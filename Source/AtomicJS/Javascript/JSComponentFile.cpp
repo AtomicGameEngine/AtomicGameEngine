@@ -101,7 +101,10 @@ bool JSComponentFile::PushModule()
     String pathName, fileName, ext;
     SplitPath(path, pathName, fileName, ext);
 
-    pathName += "/" + fileName;
+	if (path.Contains('/') || path.Contains('\\'))
+		pathName += "/" + fileName;
+	else
+		pathName = fileName;
 
     duk_get_global_string(ctx, "require");
     duk_push_string(ctx, pathName.CString());
