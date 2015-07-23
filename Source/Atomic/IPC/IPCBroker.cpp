@@ -66,9 +66,13 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
 {
     Vector<String> pargs;
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
     otherProcess_ = new IPCProcess(context_, pp_.clientRead(), pp_.clientWrite());
-
     transport_.OpenServer(pp_.serverRead(), pp_.serverWrite());
+#else
+    otherProcess_ = new IPCProcess(context_, pp_.fd1(), pp_.fd2());
+    transport_.OpenServer(pp_.fd1());
+#endif
 
     // copy args
     for (unsigned i = 0; i < args.Size(); i++)
