@@ -66,9 +66,9 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
 {
     Vector<String> pargs;
 
-    otherProcess_ = new IPCProcess(context_, pp_.fd1(), pp_.fd2());
+    otherProcess_ = new IPCProcess(context_, pp_.clientRead(), pp_.clientWrite());
 
-    transport_.OpenServer(pp_.fd1());
+    transport_.OpenServer(pp_.serverRead(), pp_.serverWrite());
 
     // copy args
     for (unsigned i = 0; i < args.Size(); i++)
@@ -77,7 +77,7 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
     wchar_t pipe_num[10];
-    _i64tow_s(reinterpret_cast<__int64>(pp_.fd2()), pipe_num, sizeof(pipe_num)/sizeof(pipe_num[0]), 10);
+    _i64tow_s(reinterpret_cast<__int64>(pp_.clientWrite()), pipe_num, sizeof(pipe_num)/sizeof(pipe_num[0]), 10);
     
     String cpipe;
     cpipe.SetUTF8FromWChar(pipe_num);
@@ -85,7 +85,7 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
     String ipc_client = "--ipc-client=" + cpipe;
     pargs.Push(ipc_client);
 
-    _i64tow_s(reinterpret_cast<__int64>(pp_.fd1()), pipe_num, sizeof(pipe_num)/sizeof(pipe_num[0]), 10);
+    _i64tow_s(reinterpret_cast<__int64>(pp_.clientRead()), pipe_num, sizeof(pipe_num)/sizeof(pipe_num[0]), 10);
 
     String spipe;
     spipe.SetUTF8FromWChar(pipe_num);

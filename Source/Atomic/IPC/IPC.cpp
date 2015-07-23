@@ -41,10 +41,14 @@ bool IPC::InitWorker(unsigned id, IPCHandle fd1, IPCHandle fd2)
 #ifndef ATOMIC_PLATFORM_WINDOWS
     // close server fd
     close(fd1);
+	worker_ = new IPCWorker(context_, fd2, id);
+#else
+	worker_ = new IPCWorker(context_, fd1, fd2, id);
 #endif
 
-    worker_ = new IPCWorker(context_, fd2, id);
-    worker_->Run();
+    
+    
+	worker_->Run();
 
     SendEventToBroker(E_IPCWORKERSTART);
 

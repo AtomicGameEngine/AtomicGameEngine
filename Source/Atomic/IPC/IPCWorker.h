@@ -13,9 +13,13 @@ class IPCWorker : public IPCChannel
     OBJECT(IPCWorker);
 
 public:
-    /// Construct.
-    IPCWorker(Context* context, IPCHandle fd, unsigned id);
-    /// Destruct.
+    /// POSIX Constructor   
+	IPCWorker(Context* context, IPCHandle fd, unsigned id);
+
+	// Windows Constructor, two named pipes are used
+	IPCWorker(Context* context, IPCHandle clientRead, IPCHandle clientWrite, unsigned id);
+    
+	/// Destruct.
     virtual ~IPCWorker();
 
     void ThreadFunction();
@@ -24,7 +28,9 @@ public:
 
 private:
 
-    IPCHandle fd_;
+	// on unix will be the same
+    IPCHandle clientRead_;
+	IPCHandle clientWrite_;
 
 };
 

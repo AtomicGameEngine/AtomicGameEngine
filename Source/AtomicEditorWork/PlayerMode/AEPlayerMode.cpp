@@ -78,6 +78,7 @@ void PlayerMode::ProcessArguments() {
                     if (argument.StartsWith("--ipc-server="))
                     {
 #ifdef ATOMIC_PLATFORM_WINDOWS
+						// clientRead
                         WString wipc(ipc[1]);
                         HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
                         fd_[0] = pipe;
@@ -89,6 +90,7 @@ void PlayerMode::ProcessArguments() {
                     else
                     {
 #ifdef ATOMIC_PLATFORM_WINDOWS
+						// clientWrite
                         WString wipc(ipc[1]);
                         HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
                         fd_[1] = pipe;
@@ -105,26 +107,11 @@ void PlayerMode::ProcessArguments() {
         }
     }
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    if (fd_[0] != INVALID_IPCHANDLE_VALUE)
-    {
-        //::CloseHandle(fd_[0]);
-        fd_[0] = INVALID_IPCHANDLE_VALUE;
-    }
-
-    if (fd_[1] != INVALID_IPCHANDLE_VALUE)
-    {
-        IPC* ipc = new IPC(context_);
-        context_->RegisterSubsystem(ipc);
-        //ipc->InitWorker(fd_[0], fd_[1]);
-    }
-#else
     if (id > 0 && fd_[0] != INVALID_IPCHANDLE_VALUE && fd_[1] != INVALID_IPCHANDLE_VALUE)
     {        
         SubscribeToEvent(E_IPCINITIALIZE, HANDLER(PlayerMode, HandleIPCInitialize));
         ipc_->InitWorker((unsigned) id, fd_[0], fd_[1]);
     }
-#endif
 
 }
 
