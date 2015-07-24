@@ -71,11 +71,11 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showResourceSelection(windowText:string, importerType:string, callback: (asset: ToolCore.Asset) => any) {
+    showResourceSelection(windowText:string, importerType:string, callback: (asset: ToolCore.Asset, args:any) => void, args:any = undefined) {
 
       if (this.show()) {
 
-          this.opWindow = new ResourceSelection(windowText, importerType, callback);
+          this.opWindow = new ResourceSelection(windowText, importerType, callback, args);
 
       }
 

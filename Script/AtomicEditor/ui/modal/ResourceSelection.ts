@@ -6,7 +6,8 @@ import ModalWindow = require("./ModalWindow");
 class ResourceSelection extends ModalWindow {
 
     folderList: Atomic.UIListView;
-    callback: (asset: ToolCore.Asset) => any;
+    callback: (asset: ToolCore.Asset, args:any) => void;
+    args:any;
 
     populate(importerType: string) {
 
@@ -28,11 +29,12 @@ class ResourceSelection extends ModalWindow {
 
     }
 
-    constructor(windowText: string, importerType: string, callback: (asset: ToolCore.Asset) => any) {
+    constructor(windowText: string, importerType: string, callback: (asset: ToolCore.Asset, args:any) => void, args:any) {
 
         super();
 
         this.callback = callback;
+        this.args = args;
 
         this.load("AtomicEditor/editor/ui/resourceselection.tb.txt");
 
@@ -64,7 +66,7 @@ class ResourceSelection extends ModalWindow {
 
                 if (id.length) {
 
-                  this.callback(ToolCore.assetDatabase.getAssetByGUID(id));
+                  this.callback(ToolCore.assetDatabase.getAssetByGUID(id), this.args);
 
                 }
 

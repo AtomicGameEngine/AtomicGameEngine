@@ -1,6 +1,7 @@
 
 import ScriptWidget = require("../ScriptWidget");
 import UIEvents = require("../UIEvents");
+import EditorUI = require("../EditorUI");
 
 import TextureSelector = require("./TextureSelector");
 
@@ -219,6 +220,29 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
+    createTextureButtonCallback(textureUnit:number, textureWidget:Atomic.UITextureWidget) {
+
+      return  () => {
+
+        var inspector = this;
+
+        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", function(asset: ToolCore.Asset, args: any) {
+
+            var texture = <Atomic.Texture2D> Atomic.cache.getResource("Texture2D", asset.path);
+
+            if (texture) {
+                inspector.material.setTexture(textureUnit, texture);
+                textureWidget.texture = inspector.getTextureThumbnail(texture);
+            }
+
+        });
+
+        return true;
+
+      }
+
+    }
+
 
     createTextureSection(): Atomic.UISection {
 
@@ -257,34 +281,28 @@ class MaterialInspector extends ScriptWidget {
             attrLayout.addChild(name);
 
             var textureWidget = new Atomic.UITextureWidget();
-            textureWidget.texture = this.getTextureThumbnail(this.material.getTexture(tunit));
 
             var tlp = new Atomic.UILayoutParams();
             tlp.width = 64;
             tlp.height = 64;
             textureWidget.layoutParams = tlp;
-            textureWidget["tunit"] = tunit;
+            textureWidget.texture = this.getTextureThumbnail(this.material.getTexture(tunit));
 
-            attrLayout.addChild(textureWidget);
+            var textureButton = new Atomic.UIButton();
+            textureButton.skinBg = "TBButton.flatoutline";
+            textureButton["tunit"] = tunit;
+            textureButton["textureWidget"] = textureWidget;
+
+            textureButton.onClick = this.createTextureButtonCallback(tunit, textureWidget);
+
+            textureButton.contentRoot.addChild(textureWidget);
+
+            attrLayout.addChild(textureButton);
 
             attrsVerticalLayout.addChild(attrLayout);
 
-            var editInfo: { textureUnit: Atomic.TextureUnit } = { textureUnit: tunit };
-
-            var callback = function(ev: Atomic.UIWidgetEvent) {
-
-                if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
-                    var tselect = new TextureSelector(ev.target.view);
-                }
-
-            }.bind(editInfo);
-
-            textureWidget.subscribeToEvent(textureWidget, "WidgetEvent", callback);
-
             // handle dropping of texture on widget
-            textureWidget.subscribeToEvent(textureWidget, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-                var tunit2 = tunit;
+            textureButton.subscribeToEvent(textureButton, "DragEnded", (ev: Atomic.DragEndedEvent) => {
 
                 var importer = this.acceptAssetDrag("TextureImporter", ev);
 
@@ -298,12 +316,11 @@ class MaterialInspector extends ScriptWidget {
                     if (texture) {
 
                         this.material.setTexture(ev.target["tunit"], texture);
-                        (<Atomic.UITextureWidget>ev.target).texture = this.getTextureThumbnail(texture);
+                        (<Atomic.UITextureWidget>ev.target["textureWidget"]).texture = this.getTextureThumbnail(texture);
 
                     }
                 }
             });
-
 
         }
 
