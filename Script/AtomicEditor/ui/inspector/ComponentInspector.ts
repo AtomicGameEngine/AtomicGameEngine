@@ -121,8 +121,8 @@ class ComponentInspector extends Atomic.UISection {
             this.addJSComponentUI(attrsVerticalLayout);
         }
 
-        if (component.typeName == "StaticModel") {
-            this.addStaticModelUI(attrsVerticalLayout);
+        if (component.typeName == "StaticModel" || component.typeName == "AnimatedModel") {
+            this.addModelUI(attrsVerticalLayout, component.typeName);
         }
 
         var deleteButton = new Atomic.UIButton();
@@ -197,7 +197,7 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
-    addStaticModelUI(layout: Atomic.UILayout) {
+    addModelUI(layout: Atomic.UILayout, typeName:string) {
 
         var staticModel = <Atomic.StaticModel> this.component;
         var cacheModel = staticModel.model;
