@@ -574,6 +574,17 @@ declare module Atomic {
    export var TEXT_ALIGN_CENTER: TEXT_ALIGN;
 
 
+   // enum UI_EDIT_TYPE
+   export type UI_EDIT_TYPE = number;
+   export var UI_EDIT_TYPE_TEXT: UI_EDIT_TYPE;
+   export var UI_EDIT_TYPE_SEARCH: UI_EDIT_TYPE;
+   export var UI_EDIT_TYPE_PASSWORD: UI_EDIT_TYPE;
+   export var UI_EDIT_TYPE_EMAIL: UI_EDIT_TYPE;
+   export var UI_EDIT_TYPE_PHONE: UI_EDIT_TYPE;
+   export var UI_EDIT_TYPE_URL: UI_EDIT_TYPE;
+   export var UI_EDIT_TYPE_NUMBER: UI_EDIT_TYPE;
+
+
    // enum UI_AXIS
    export type UI_AXIS = number;
    export var UI_AXIS_X: UI_AXIS;
@@ -1814,6 +1825,7 @@ declare module Atomic {
       getPrefabGUID(): string;
       savePrefab(): boolean;
       undoPrefab(): void;
+      breakPrefab(): void;
       getPrefabNode(): Node;
 
    }
@@ -7028,12 +7040,14 @@ declare module Atomic {
    export class UIEditField extends UIWidget {
 
       textAlign: TEXT_ALIGN;
+      editType: UI_EDIT_TYPE;
       readOnly: boolean;
       wrapping: boolean;
 
       constructor(createWidget?: boolean);
 
       setTextAlign(align: TEXT_ALIGN): void;
+      setEditType(type: UI_EDIT_TYPE): void;
       setReadOnly(readonly: boolean): void;
       setWrapping(wrap: boolean): void;
       getWrapping(): boolean;

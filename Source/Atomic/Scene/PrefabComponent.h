@@ -27,6 +27,7 @@ public:
 
     bool SavePrefab();
     void UndoPrefab();
+    void BreakPrefab();
 
     Node* GetPrefabNode() { return prefabNode_; }
 

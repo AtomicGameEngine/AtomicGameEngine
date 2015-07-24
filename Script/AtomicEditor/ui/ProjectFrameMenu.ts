@@ -46,6 +46,10 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "create_material") {
+                EditorUI.getModelOps().showCreateMaterial(asset.path);
+                return true;
+            }
 
         }
 
@@ -124,6 +128,7 @@ var assetGeneralContextItems = {
 var assetFolderContextItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
     "Create Component": ["create_component", undefined, "ComponentBitmap"],
+    "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "-1": null,
     "Reveal in Finder": ["reveal_folder", undefined, ""],
@@ -132,7 +137,8 @@ var assetFolderContextItems = {
 };
 
 var createItems = {
-    "Folder": ["create_folder", undefined, "Folder.icon"],
-    "-1": null,
-    "Script": ["create_script", undefined, "JavascriptBitmap"]
+  "Create Folder": ["create_folder", undefined, "Folder.icon"],
+  "Create Component": ["create_component", undefined, "ComponentBitmap"],
+  "Create Material": ["create_material", undefined, "ComponentBitmap"],
+  "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
 };

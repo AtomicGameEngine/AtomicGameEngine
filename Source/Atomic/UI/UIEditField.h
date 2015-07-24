@@ -3,6 +3,8 @@
 
 #include "UIWidget.h"
 
+#include <TurboBadger/tb_editfield.h>
+
 namespace Atomic
 {
 
@@ -13,6 +15,15 @@ enum TEXT_ALIGN
     TEXT_ALIGN_CENTER	///< Aligned center
 };
 
+enum UI_EDIT_TYPE {
+    UI_EDIT_TYPE_TEXT = tb::EDIT_TYPE_TEXT,
+    UI_EDIT_TYPE_SEARCH = tb::EDIT_TYPE_SEARCH,
+    UI_EDIT_TYPE_PASSWORD = tb::EDIT_TYPE_PASSWORD,
+    UI_EDIT_TYPE_EMAIL = tb::EDIT_TYPE_EMAIL,
+    UI_EDIT_TYPE_PHONE = tb::EDIT_TYPE_PHONE,
+    UI_EDIT_TYPE_URL = tb::EDIT_TYPE_URL,
+    UI_EDIT_TYPE_NUMBER = tb::EDIT_TYPE_NUMBER
+};
 
 class UIEditField : public UIWidget
 {
@@ -24,6 +35,8 @@ public:
     virtual ~UIEditField();
 
     void SetTextAlign(TEXT_ALIGN align);
+
+    void SetEditType(UI_EDIT_TYPE type);
 
     void SetReadOnly(bool readonly);
 

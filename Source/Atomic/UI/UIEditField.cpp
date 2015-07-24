@@ -59,6 +59,18 @@ bool UIEditField::GetWrapping()
 
 }
 
+void UIEditField::SetEditType(UI_EDIT_TYPE type)
+{
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetEditType((tb::EDIT_TYPE) type);
+
+}
+
 void UIEditField::SetTextAlign(TEXT_ALIGN align)
 {
     if (!widget_)

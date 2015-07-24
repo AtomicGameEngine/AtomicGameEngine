@@ -33,8 +33,16 @@ class ModelInspector extends InspectorWidget {
           var endEdit = this.endEdits[i];
 
           info.name = nameEdit.text;
-          info.startTime = Number(startEdit.text);
-          info.endTime = Number(endEdit.text);
+
+          // guard against NAN
+          var _startTime = Number(startEdit.text);
+          var _endTime = Number(endEdit.text);
+
+          if (isNaN(_startTime)) _startTime = 0;
+          if (isNaN(_endTime)) _endTime = 0;
+
+          info.startTime = _startTime;
+          info.endTime = _endTime;;
 
         }
 

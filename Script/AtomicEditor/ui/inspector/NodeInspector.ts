@@ -233,9 +233,29 @@ class NodeInspector extends ScriptWidget {
 
             }
 
+            var breakButton = new Atomic.UIButton();
+            breakButton.text = "Break";
+            breakButton.fontDescription = fd;
+
+            breakButton.onClick = () => {
+
+                var prefabComponent = this.getPrefabComponent(this.node);
+
+                if (prefabComponent) {
+
+                    prefabComponent.breakPrefab();
+
+                    return true;
+
+                }
+
+            }
+
+
             prefabLayout.addChild(name);
             prefabLayout.addChild(saveButton);
             prefabLayout.addChild(undoButton);
+            prefabLayout.addChild(breakButton);
 
             attrsVerticalLayout.addChild(prefabLayout);
 

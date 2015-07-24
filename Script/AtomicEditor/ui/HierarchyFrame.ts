@@ -67,7 +67,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 if (itemID) {
 
-                    this.hierList.setItemIcon(node.id.toString(), IconTemporary);
+                    this.hierList.setItemIcon(node.id.toString(), node.isTemporary() ? IconTemporary : "");
 
                 }
 

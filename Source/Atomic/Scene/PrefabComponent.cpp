@@ -52,20 +52,34 @@ void PrefabComponent::LoadPrefabNode()
     XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabGUID_);
 
     prefabNode_->LoadXML(xmlfile->GetRoot());
+    prefabNode_->SetTemporary(true);
+
     prefabNode_->SetPosition(Vector3::ZERO);
     prefabNode_->SetRotation(Quaternion::IDENTITY);
     prefabNode_->SetScale(Vector3::ONE);
-    prefabNode_->SetTemporary(true);
 
     PODVector<RigidBody*> bodies;
     prefabNode_->GetComponents<RigidBody>(bodies, true);
     for (unsigned i = 0; i < bodies.Size(); i++)
     {
         RigidBody* body = bodies[i];
-
-        body->SetPosition(body->GetNode()->GetWorldPosition());
-        body->SetRotation(body->GetNode()->GetWorldRotation());
+        body->SetTransform(body->GetNode()->GetWorldPosition(), body->GetNode()->GetWorldRotation());
     }
+
+}
+
+void PrefabComponent::BreakPrefab()
+{
+    if (!node_ || !node_->GetScene())
+        return;
+
+    SharedPtr<PrefabComponent> keepAlive(this);
+
+    if (prefabNode_.NotNull())
+        prefabNode_->SetTemporary(false);
+
+    node_->RemoveComponent(this);
+
 
 }
 
@@ -102,9 +116,13 @@ void PrefabComponent::OnNodeSet(Node* node)
 {
     Component::OnNodeSet(node);
 
+
     if (!node && prefabNode_.NotNull())
     {
-        prefabNode_->Remove();
+        // a prefab node might not be temporary is prefab is broken{
+        if (prefabNode_->IsTemporary())
+            prefabNode_->Remove();
+
         prefabNode_ = NULL;
     }
 }

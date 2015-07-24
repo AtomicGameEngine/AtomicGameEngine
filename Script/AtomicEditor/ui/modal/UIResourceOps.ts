@@ -206,3 +206,55 @@ export class CreateScene extends ModalWindow {
     nameField: Atomic.UIEditField;
 
 }
+
+export class CreateMaterial extends ModalWindow {
+
+    constructor(resourcePath: string) {
+
+        super();
+
+        this.resourcePath = resourcePath;
+        this.init("New Material", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.nameField = <Atomic.UIEditField> this.getWidget("component_name");
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = ev.target.id;
+
+            if (id == "create") {
+
+                var materialName = this.nameField.text;
+                var outputFile = Atomic.addTrailingSlash(this.resourcePath) + materialName;
+
+                if (outputFile.indexOf(".material") == -1) outputFile += ".material";
+
+                if (ResourceOps.CreateNewMaterial(outputFile, materialName)) {
+
+                    this.hide();
+
+                    this.sendEvent(EditorEvents.EditResource, { path:outputFile});
+
+                }
+
+                return true;
+
+            }
+
+            if (id == "cancel") {
+
+                this.hide();
+
+                return true;
+            }
+
+        }
+
+    }
+
+    resourcePath: string;
+    nameField: Atomic.UIEditField;
+
+}
