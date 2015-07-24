@@ -113,20 +113,12 @@ bool Asset::Load()
 
     db->RegisterGUID(guid_);
 
-    timestamp_ = root.GetUInt("timestamp");
-
     dirty_ = false;
     if (!CheckCacheFile())
     {
         LOGINFOF("CheckCacheFile:false - %s", path_.CString());
         dirty_ = true;
     }
-    else if (timestamp_ < fs->GetLastModifiedTime(path_))
-    {
-        LOGINFOF("Timestamp:false - %u vs modified %u - %s", timestamp_, fs->GetLastModifiedTime(path_), path_.CString());
-        dirty_ = true;
-    }
-
 
     // handle import
 
@@ -151,11 +143,6 @@ bool Asset::Save()
 
     root.SetInt("version", ASSET_VERSION);
     root.SetString("guid", guid_);
-
-    // update this where?
-    timestamp_ = fs->GetLastModifiedTime(path_);
-
-    root.SetUInt("timestamp", timestamp_);
 
     // handle import
 
@@ -288,7 +275,6 @@ bool Asset::SetPath(const String& path)
     {
         dirty_ = true;
         guid_ = db->GenerateAssetGUID();
-        timestamp_ = fs->GetLastModifiedTime(path);
 
         Save();
     }

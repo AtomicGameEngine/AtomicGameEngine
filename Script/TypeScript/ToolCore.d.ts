@@ -236,7 +236,6 @@ declare module ToolCore {
       path: string;
       relativePath: string;
       cachePath: string;
-      timestamp: number;
       importerType: string;
       importerTypeName: string;
       importer: AssetImporter;
@@ -256,7 +255,6 @@ declare module ToolCore {
       // Get the path relative to project
       getRelativePath(): string;
       getCachePath(): string;
-      getTimestamp(): number;
       getImporterType(): string;
       getImporterTypeName(): string;
       getImporter(): AssetImporter;

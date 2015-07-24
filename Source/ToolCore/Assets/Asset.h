@@ -35,7 +35,6 @@ public:
     /// Get the path relative to project
     String GetRelativePath();
     String GetCachePath() const;
-    unsigned GetTimestamp() const { return timestamp_; }
 
     const StringHash GetImporterType() { return importer_.Null() ? String::EMPTY : importer_->GetType(); }
     const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }
@@ -68,7 +67,6 @@ private:
     // can change
     String path_;
     String name_;
-    unsigned timestamp_;
 
     bool dirty_;
     bool isFolder_;

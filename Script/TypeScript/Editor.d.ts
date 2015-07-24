@@ -75,6 +75,7 @@ declare module Editor {
       // Construct.
       constructor();
 
+      launchedByEditor(): boolean;
 
    }
 

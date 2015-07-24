@@ -8048,6 +8048,8 @@ declare module Atomic {
 
       applyAttributes(): void;
       getComponentFile(): JSComponentFile;
+      // Match script name
+      matchScriptName(path: string): boolean;
       // Handle enabled/disabled state change. Changes update event subscription.
       onSetEnabled(): void;
       // Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
