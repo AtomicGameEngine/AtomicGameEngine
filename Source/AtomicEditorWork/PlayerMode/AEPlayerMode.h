@@ -23,6 +23,8 @@ public:
     /// Destruct.
     virtual ~PlayerMode();
 
+    bool launchedByEditor() { return launchedByEditor_; }
+
 private:
 
     void ProcessArguments();
@@ -32,9 +34,9 @@ private:
     void HandleIPCInitialize(StringHash eventType, VariantMap& eventData);
 
     IPCHandle fd_[2];
-
     WeakPtr<IPC> ipc_;
     bool brokerActive_;
+    bool launchedByEditor_;
 
 };
 

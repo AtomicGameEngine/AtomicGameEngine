@@ -17,7 +17,8 @@ namespace AtomicEditor
 
 PlayerMode::PlayerMode(Context* context) :
     Object(context),
-    brokerActive_(false)
+    brokerActive_(false),
+    launchedByEditor_(false)
 {
     fd_[0] = INVALID_IPCHANDLE_VALUE;
     fd_[1] = INVALID_IPCHANDLE_VALUE;
@@ -109,10 +110,10 @@ void PlayerMode::ProcessArguments() {
 
     if (id > 0 && fd_[0] != INVALID_IPCHANDLE_VALUE && fd_[1] != INVALID_IPCHANDLE_VALUE)
     {        
+        launchedByEditor_ = true;
         SubscribeToEvent(E_IPCINITIALIZE, HANDLER(PlayerMode, HandleIPCInitialize));
         ipc_->InitWorker((unsigned) id, fd_[0], fd_[1]);
     }
-
 }
 
 void PlayerMode::HandleJSError(StringHash eventType, VariantMap& eventData)

@@ -70,6 +70,9 @@ public:
     ResourceRef GetScriptAttr() const;
     JSComponentFile* GetComponentFile() { return componentFile_; }
 
+    /// Match script name
+    bool MatchScriptName(const String& path);
+
     /// Handle enabled/disabled state change. Changes update event subscription.
     virtual void OnSetEnabled();
 
@@ -133,6 +136,7 @@ private:
     /// Current event subscription mask.
     unsigned char currentEventMask_;
 
+    bool instanceInitialized_;
     bool started_;
     bool destroyed_;
     bool scriptClassInstance_;

@@ -25,6 +25,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/IOEvents.h>
+#include <Atomic/Input/InputEvents.h>
 #include <Atomic/Core/Main.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -145,6 +146,16 @@ void AEPlayerApplication::Start()
     context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
     AtomicPlayer::jsapi_init_atomicplayer(vm_);
 
+    if (!playerMode->launchedByEditor())
+    {
+        JSVM* vm = JSVM::GetJSVM(0);
+
+        if (!vm->ExecuteMain())
+        {
+            SendEvent(E_EXITREQUESTED);
+        }
+
+    }
     return;
 }
 

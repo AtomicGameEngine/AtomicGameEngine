@@ -6,6 +6,7 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
+#include <Atomic/Graphics/Camera.h>
 
 #include "JSScene.h"
 #include "JSComponent.h"
@@ -48,6 +49,31 @@ static int Node_CreateJSComponent(duk_context* ctx)
     jsc->InitInstance(hasArgs, argIdx);
 
     js_push_class_object_instance(ctx, jsc, "JSComponent");
+    return 1;
+}
+
+static int Node_GetJSComponent(duk_context* ctx)
+{
+    String path = duk_require_string(ctx, 0);
+
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    PODVector<JSComponent*> components;
+    node->GetComponents<JSComponent>(components, true);
+
+    for (unsigned i = 0; i < components.Size(); i++)
+    {
+        JSComponent* component = components[i];
+        if (component->MatchScriptName(path)) {
+
+            js_push_class_object_instance(ctx, component, "Component");
+            return 1;
+
+        }
+
+    }
+    duk_push_null(ctx);
     return 1;
 }
 
@@ -199,6 +225,32 @@ static int Scene_LoadXML(duk_context* ctx)
 
 }
 
+static int Scene_GetMainCamera(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Scene* scene = js_to_class_instance<Scene>(ctx, -1, 0);
+
+    PODVector<Node*> cameraNodes;
+    Camera* camera = 0;
+    scene->GetChildrenWithComponent(cameraNodes, Camera::GetTypeStatic(), true);
+    if (cameraNodes.Size())
+    {
+        camera = cameraNodes[0]->GetComponent<Camera>();
+    }
+
+    if (!camera)
+    {
+        duk_push_null(ctx);
+        return 1;
+    }
+
+    js_push_class_object_instance(ctx, camera, "Camera");
+
+    return 1;
+
+}
+
+
 
 void jsapi_init_scene(JSVM* vm)
 {
@@ -215,6 +267,8 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getComponents");
     duk_push_c_function(ctx, Node_CreateJSComponent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "createJSComponent");
+    duk_push_c_function(ctx, Node_GetJSComponent, 1);
+    duk_put_prop_string(ctx, -2, "getJSComponent");
     duk_push_c_function(ctx, Node_GetChildAtIndex, 1);
     duk_put_prop_string(ctx, -2, "getChildAtIndex");
     duk_push_c_function(ctx, Node_SaveXML, 1);
@@ -225,6 +279,8 @@ void jsapi_init_scene(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "Scene");
     duk_push_c_function(ctx, Scene_LoadXML, 1);
     duk_put_prop_string(ctx, -2, "loadXML");
+    duk_push_c_function(ctx, Scene_GetMainCamera, 0);
+    duk_put_prop_string(ctx, -2, "getMainCamera");
     duk_pop(ctx);
 
 }

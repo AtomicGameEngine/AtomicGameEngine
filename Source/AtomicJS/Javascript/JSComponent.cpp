@@ -124,6 +124,7 @@ JSComponent::JSComponent(Context* context) :
     Component(context),
     updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
     currentEventMask_(0),
+    instanceInitialized_(false),
     started_(false),
     destroyed_(false),
     scriptClassInstance_(false),
@@ -201,8 +202,6 @@ void JSComponent::UpdateReferences(bool remove)
 
 void JSComponent::ApplyAttributes()
 {
-    if (!started_)
-        InitInstance();
 }
 
 void JSComponent::InitInstance(bool hasArgs, int argIdx)
@@ -298,11 +297,7 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
 
     duk_set_top(ctx, top);
 
-    if (!started_)
-    {
-        started_ = true;
-        Start();
-    }
+    instanceInitialized_ = true;
 
 }
 
@@ -360,6 +355,15 @@ void JSComponent::DelayedStart()
 
 void JSComponent::Update(float timeStep)
 {
+    if (!instanceInitialized_)
+        InitInstance();
+
+    if (!started_)
+    {
+        started_ = true;
+        Start();
+    }
+
     static String name = "update";
     CallScriptMethod(name, true, timeStep);
 }
@@ -542,6 +546,30 @@ bool JSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
     loading_ = false;
 
     return success;
+}
+
+bool JSComponent::MatchScriptName(const String& path)
+{
+    if (componentFile_.Null())
+        return false;
+
+    String _path = path;
+    _path.Replace(".js", "", false);
+
+    const String& name = componentFile_->GetName();
+
+    if (_path == name)
+        return true;
+
+    String pathName, fileName, ext;
+    SplitPath(name, pathName, fileName, ext);
+
+    if (fileName == _path)
+        return true;
+
+
+    return false;
+
 }
 
 void JSComponent::SetComponentFile(JSComponentFile* cfile)
