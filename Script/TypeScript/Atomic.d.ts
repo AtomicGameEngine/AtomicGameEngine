@@ -7125,6 +7125,7 @@ declare module Atomic {
       addRootItem(text: string, icon: string, id: string): number;
       addChildItem(parentItemID: number, text: string, icon: string, id: string): number;
       setItemText(id: string, text: string): void;
+      setItemIcon(id: string, icon: string): void;
       deleteItemByID(id: string): void;
       setExpanded(itemID: number, value: boolean): void;
       deleteAllItems(): void;

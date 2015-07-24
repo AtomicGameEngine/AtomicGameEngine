@@ -3,6 +3,8 @@ import HierarchyFrameMenu = require("./HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import EditorEvents = require("../editor/EditorEvents");
 
+var IconTemporary = "ComponentBitmap";
+
 class HierarchyFrame extends Atomic.UIWidget {
 
     scene: Atomic.Scene = null;
@@ -50,6 +52,24 @@ class HierarchyFrame extends Atomic.UIWidget {
                 this.unsubscribeFromEvents(this.scene);
                 this.scene = null;
                 this.populate();
+
+            }
+
+        });
+
+        this.subscribeToEvent("TemporaryChanged", (ev: Atomic.TemporaryChangedEvent) => {
+
+            if (ev.serializable.typeName == "Node") {
+
+                var node = <Atomic.Node> ev.serializable;
+
+                var itemID = this.nodeIDToItemID[node.id];
+
+                if (itemID) {
+
+                    this.hierList.setItemIcon(node.id.toString(), IconTemporary);
+
+                }
 
             }
 
@@ -249,7 +269,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         var icon = "";
 
         if (node.isTemporary())
-            icon = "ComponentBitmap";
+            icon = IconTemporary;
 
         var childItemID = this.hierList.addChildItem(parentID, name, icon, node.id.toString());
 

@@ -61,6 +61,7 @@ public:
     }
 
     void UpdateText(const String& text);
+    void UpdateIcon(const String& icon);
 
     ListViewItemSource* source_;
     ListViewItem* parent_;
@@ -82,9 +83,17 @@ public:
             textField_->SetText(text.CString());
     }
 
+    void UpdateIcon(const String& icon)
+    {
+        if (icon_)
+            icon_->SetSkinBg(TBIDC(icon.CString()));
+    }
+
+
 private:
     TBCheckBox* expandBox_;
     TBTextField* textField_;    
+    TBSkinImage* icon_;
     ListViewItemSource *source_;
     TBSelectItemViewer *sourceviewer_;
     int index_;
@@ -108,6 +117,13 @@ void ListViewItem::UpdateText(const String& text)
     str = text.CString();
     if (widget_)
         widget_->UpdateText(text);
+}
+
+void ListViewItem::UpdateIcon(const String& icon)
+{
+    icon_ = icon;
+    if (widget_)
+        widget_->UpdateIcon(icon);
 }
 
 ListViewItem* ListViewItem::AddChild(const char *text, const char* icon, const TBID &id)
@@ -172,6 +188,7 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     , item_(item)
     , expandBox_(0)
     , textField_(0)
+    , icon_(0)
 {
     SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
     SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP);
@@ -209,9 +226,9 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
 
     if (item->icon_.Length())
     {
-        TBSkinImage* skinImage = new TBSkinImage(TBIDC(item->icon_.CString()));
-        skinImage->SetIgnoreInput(true);
-        GetContentRoot()->AddChild(skinImage);
+        icon_ = new TBSkinImage(TBIDC(item->icon_.CString()));
+        icon_->SetIgnoreInput(true);
+        GetContentRoot()->AddChild(icon_);
     }
 
     TBFontDescription fd;
@@ -366,6 +383,21 @@ void UIListView::SetItemText(const String& id, const String& text)
         }
     }
 
+}
+
+void UIListView::SetItemIcon(const String& id, const String& icon)
+{
+    TBID tbid(id.CString());
+
+    for (int i = 0; i <  source_->GetNumItems(); i++)
+    {
+        if (source_->GetItemID(i) == tbid)
+        {
+            ListViewItem* item = source_->GetItem(i);
+            item->UpdateIcon(icon);
+            return;
+        }
+    }
 }
 
 void UIListView::DeleteItemByID(const String& id)

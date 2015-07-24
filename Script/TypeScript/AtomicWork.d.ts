@@ -101,6 +101,12 @@ declare module Atomic {
         dragObject: UIDragObject;
     }
 
+    export interface TemporaryChangedEvent {
+
+      serializable: Atomic.Serializable;
+
+    }
+
     export interface IPCJSErrorEvent {
 
       errorName:string;
