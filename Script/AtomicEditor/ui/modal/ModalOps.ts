@@ -7,6 +7,7 @@ import CreateProject = require("./CreateProject");
 import EULAWindow = require("../license/EULAWindow");
 import ActivationWindow = require("../license/ActivationWindow");
 import ActivationSuccessWindow = require("../license/ActivationSuccessWindow");
+import ManageLicense = require("../license/ManageLicense");
 
 import ResourceSelection = require("./ResourceSelection");
 
@@ -131,6 +132,17 @@ class ModalOps extends Atomic.ScriptObject {
         }
 
     }
+
+    showManageLicense() {
+
+        if (this.show()) {
+
+            this.opWindow = new ManageLicense();
+
+        }
+
+    }
+
 
     showAbout() {
 

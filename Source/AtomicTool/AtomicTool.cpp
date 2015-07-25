@@ -176,12 +176,12 @@ void AtomicTool::DoDeactivation()
         return;
     }
 
-    SharedPtr<CurlRequest> request = licenseSystem->Deactivate();
-    if (request.Null())
+    if (!licenseSystem->Deactivate())
     {
         ErrorExit("\nNot activated\n");
         return;
     }
+
     SubscribeToEvent(E_LICENSE_DEACTIVATIONERROR, HANDLER(AtomicTool, HandleLicenseDeactivationError));
     SubscribeToEvent(E_LICENSE_DEACTIVATIONSUCCESS, HANDLER(AtomicTool, HandleLicenseDeactivationSuccess));
 }

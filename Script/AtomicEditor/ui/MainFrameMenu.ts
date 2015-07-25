@@ -26,6 +26,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "manage license") {
+
+              EditorUI.getModelOps().showManageLicense();
+
+              return true;
+
+            }
+
             if (refid == "quit") {
 
                 this.sendEvent(EditorEvents.Quit);
@@ -41,8 +49,8 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "edit format code") {
-              EditorUI.getShortcuts().invokeFormatCode();
-              return true;
+                EditorUI.getShortcuts().invokeFormatCode();
+                return true;
             }
 
             return false;
@@ -51,12 +59,43 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "file new project") {
 
+                if (ToolCore.toolSystem.project) {
+
+                    EditorUI.showModalError("Project Open",
+                        "Please close the current project before creating a new one");
+
+                    return true;
+                }
+
                 var mo = EditorUI.getModelOps();
                 mo.showNewProject();
 
                 return true;
 
             }
+            if (refid == "file open project") {
+
+                if (ToolCore.toolSystem.project) {
+
+                    EditorUI.showModalError("Project Open",
+                        "Please close the current project before opening new one");
+
+                    return true;
+                }
+
+                var utils = new Editor.FileUtils();
+                var path = utils.openProjectFileDialog();
+                if (path) {
+
+                    this.sendEvent(EditorEvents.LoadProject, { path: path });
+
+                }
+
+
+                return true;
+
+            }
+
             if (refid == "file close project") {
 
                 this.sendEvent(EditorEvents.CloseProject);

@@ -620,6 +620,13 @@ declare module Atomic {
    export var UI_LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM: UI_LAYOUT_DISTRIBUTION_POSITION;
 
 
+   // enum UI_MESSAGEWINDOW_SETTINGS
+   export type UI_MESSAGEWINDOW_SETTINGS = number;
+   export var UI_MESSAGEWINDOW_SETTINGS_OK: UI_MESSAGEWINDOW_SETTINGS;
+   export var UI_MESSAGEWINDOW_SETTINGS_OK_CANCEL: UI_MESSAGEWINDOW_SETTINGS;
+   export var UI_MESSAGEWINDOW_SETTINGS_YES_NO: UI_MESSAGEWINDOW_SETTINGS;
+
+
    // enum UI_SIZE_DEP
    export type UI_SIZE_DEP = number;
    export var UI_SIZE_DEP_NONE: UI_SIZE_DEP;
@@ -7181,7 +7188,7 @@ declare module Atomic {
 
       constructor(target: UIWidget, id: string, createWidget?: boolean);
 
-      show(title: string, message: string, width: number, height: number): void;
+      show(title: string, message: string, settings: UI_MESSAGEWINDOW_SETTINGS, dimmer: boolean, width: number, height: number): void;
 
    }
 

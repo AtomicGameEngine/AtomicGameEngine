@@ -414,6 +414,8 @@ declare module ToolCore {
       licenseModule3D(): boolean;
       // Returns whether there are any platform licenses available
       isStandardLicense(): boolean;
+      // Returns true if request to deactivate is made
+      deactivate(): boolean;
       resetLicense(): void;
       loadLicense(): boolean;
       // Basic key validation

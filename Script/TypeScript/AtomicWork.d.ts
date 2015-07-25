@@ -180,6 +180,13 @@ declare module ToolCore {
 
     }
 
+    export interface LicenseDeactivationErrorEvent {
+
+        message:string;
+
+    }
+
+
     export var toolEnvironment: ToolEnvironment;
     export var toolSystem: ToolSystem;
     export var assetDatabase: AssetDatabase;

@@ -72,7 +72,7 @@ class EditorUI extends Atomic.ScriptObject {
   showModalError(windowText:string, message:string)
   {
       var window = new Atomic.UIMessageWindow(this.view, "modal_error");
-      window.show(windowText, message, 640, 360);
+      window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
   }
 
   view: Atomic.UIView;

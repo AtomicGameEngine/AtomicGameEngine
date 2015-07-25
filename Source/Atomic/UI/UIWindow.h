@@ -31,7 +31,7 @@ class UIWindow : public UIWidget
 
     public:
 
-        UIWindow(Context* context, bool createWidget = true);
+    UIWindow(Context* context, bool createWidget = true);
     virtual ~UIWindow();
 
     UI_WINDOW_SETTINGS GetSettings();
