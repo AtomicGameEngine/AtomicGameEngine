@@ -1,0 +1,7 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBTextField: text: "Player Output:", id: project_name
+	TBEditField: multiline: 1, styling: 1, gravity: all, id: output, readonly: 1, adapt-to-content: 0
+		lp: min-width: 640, min-height: 480
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: 
+		TBButton: text: Close, id: closebutton
