@@ -83,6 +83,18 @@ void UIEditField::ScrollTo(int x, int y)
 
 }
 
+void UIEditField::AppendText(const String& text)
+{
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->AppendText(text.CString());
+
+}
+
 void UIEditField::SetTextAlign(TEXT_ALIGN align)
 {
     if (!widget_)

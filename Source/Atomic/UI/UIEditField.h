@@ -34,6 +34,8 @@ public:
     UIEditField(Context* context, bool createWidget = true);
     virtual ~UIEditField();
 
+    void AppendText(const String& text);
+
     void SetTextAlign(TEXT_ALIGN align);
 
     void SetEditType(UI_EDIT_TYPE type);

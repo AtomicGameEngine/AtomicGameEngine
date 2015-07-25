@@ -37,10 +37,11 @@ class PlayerOutput extends Atomic.UIWindow {
     handlePlayerLog(ev: EditorEvents.PlayerLogEvent) {
 
         var text = this.output.text;
+
         if (text.length > 32768)
-            text = "";
-        text += ev.message;
-        this.output.text = text + "\n";
+            this.output.text = "";
+
+        this.output.appendText(ev.message + "\n");
         this.output.scrollTo(0, 0xffffff);
     }
 

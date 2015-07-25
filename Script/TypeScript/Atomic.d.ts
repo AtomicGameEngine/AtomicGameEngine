@@ -7048,6 +7048,7 @@ declare module Atomic {
 
       constructor(createWidget?: boolean);
 
+      appendText(text: string): void;
       setTextAlign(align: TEXT_ALIGN): void;
       setEditType(type: UI_EDIT_TYPE): void;
       setReadOnly(readonly: boolean): void;
