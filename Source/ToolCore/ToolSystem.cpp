@@ -14,6 +14,7 @@
 
 #include "ToolSystem.h"
 #include "ToolEnvironment.h"
+#include "ToolEvents.h"
 
 #include "Project/Project.h"
 
@@ -69,6 +70,27 @@ bool ToolSystem::LoadProject(const String& fullpath)
     project_->SetResourcePath(resourcePath);
 
     return project_->Load(fullpath);
+}
+
+void ToolSystem::CloseProject()
+{
+    if (project_.Null())
+        return;
+
+    SendEvent(E_PROJECTUNLOADED);
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String projectPath = project_->GetProjectPath();
+    String resourcePath = project_->GetResourcePath();
+
+    project_ = 0;
+
+    cache->RemoveResourceDir(resourcePath);
+    cache->RemoveResourceDir(projectPath);
+
+    cache->ReleaseAllResources(true);
+
 }
 
 void ToolSystem::SetCurrentPlatform(PlatformID platform)

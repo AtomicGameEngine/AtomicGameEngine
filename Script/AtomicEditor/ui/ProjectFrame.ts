@@ -38,6 +38,7 @@ class ProjectFrame extends ScriptWidget {
 
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
+        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent("DragEnded", (data: Atomic.DragEndedEvent) => this.handleDragEnded(data));
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
@@ -301,7 +302,15 @@ class ProjectFrame extends ScriptWidget {
         this.folderList.setExpanded(this.resourcesID, true);
         this.sendEvent(EditorEvents.ContentFolderChanged, { path: ToolCore.toolSystem.project.resourcePath });
 
+    }
 
+    handleProjectUnloaded(data) {
+
+        this.folderList.deleteAllItems();
+
+        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        container.deleteAllChildren();
+        
     }
 
     private refreshContent(folder: ToolCore.Asset) {

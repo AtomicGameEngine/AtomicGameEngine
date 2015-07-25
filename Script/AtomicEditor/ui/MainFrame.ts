@@ -44,6 +44,10 @@ class MainFrame extends ScriptWidget {
             this.showWelcomeFrame(false);
         });
 
+        this.subscribeToEvent("ProjectUnloaded", (data) => {
+            this.showWelcomeFrame(true);
+        });
+
         this.showWelcomeFrame(true);
 
     }

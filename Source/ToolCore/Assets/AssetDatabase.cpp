@@ -21,6 +21,7 @@ namespace ToolCore
 AssetDatabase::AssetDatabase(Context* context) : Object(context)
 {
     SubscribeToEvent(E_PROJECTLOADED, HANDLER(AssetDatabase, HandleProjectLoaded));
+    SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));
 }
 
 AssetDatabase::~AssetDatabase()
@@ -402,5 +403,13 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
 
     Scan();
 }
+
+void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& eventData)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    cache->RemoveResourceDir(GetCachePath());
+    project_ = 0;
+}
+
 
 }

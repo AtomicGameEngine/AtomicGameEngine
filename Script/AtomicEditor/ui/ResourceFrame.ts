@@ -207,6 +207,14 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
+    handleProjectUnloaded(data) {
+
+      for (var i in this.editors) {
+          this.editors[i].close();
+      }
+
+    }
+
     constructor(parent: Atomic.UIWidget) {
 
         super();
@@ -221,6 +229,7 @@ class ResourceFrame extends ScriptWidget {
 
         this.resourceViewContainer.addChild(this);
 
+        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
         this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));

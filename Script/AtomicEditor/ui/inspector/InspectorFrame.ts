@@ -11,7 +11,7 @@ import NodeInspector = require("./NodeInspector");
 
 class InspectorFrame extends ScriptWidget {
 
-    inspectingNode:Atomic.Node;
+    inspectingNode: Atomic.Node;
 
     constructor() {
 
@@ -25,9 +25,19 @@ class InspectorFrame extends ScriptWidget {
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.ActiveNodeChange, (data) => this.handleActiveNodeChange(data));
+        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
 
 
     }
+
+    handleProjectUnloaded(data) {
+
+        this.inspectingNode = null;
+        var container = this.getWidget("inspectorcontainer");
+        container.deleteAllChildren();
+
+    }
+
 
     handleEditResource(ev: EditorEvents.EditResourceEvent) {
 
@@ -52,9 +62,9 @@ class InspectorFrame extends ScriptWidget {
 
             if (this.inspectingNode) {
 
-              this.inspectingNode = null;
-              var container = this.getWidget("inspectorcontainer");
-              container.deleteAllChildren();
+                this.inspectingNode = null;
+                var container = this.getWidget("inspectorcontainer");
+                container.deleteAllChildren();
 
             }
 

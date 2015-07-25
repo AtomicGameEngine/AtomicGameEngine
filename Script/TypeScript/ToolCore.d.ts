@@ -70,6 +70,7 @@ declare module ToolCore {
 
       loadProject(fullpath: string): boolean;
       getProject(): Project;
+      closeProject(): void;
       getDataPath(): string;
       setDataPath(path: string): void;
       registerPlatform(platform: Platform): void;

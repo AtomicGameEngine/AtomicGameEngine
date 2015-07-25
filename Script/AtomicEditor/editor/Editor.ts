@@ -10,8 +10,8 @@ class Editor extends Atomic.ScriptObject {
 
     project: ToolCore.Project;
     assetImport: AssetImport;
-    editorLicense:EditorLicense;
-    playMode:PlayMode;
+    editorLicense: EditorLicense;
+    playMode: PlayMode;
 
     static instance: Editor;
 
@@ -35,6 +35,8 @@ class Editor extends Atomic.ScriptObject {
         this.assetImport = new AssetImport();
 
         this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
+        this.subscribeToEvent(EditorEvents.CloseProject, (data) => this.handleEditorCloseProject(data));
+        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
@@ -60,6 +62,26 @@ class Editor extends Atomic.ScriptObject {
 
     }
 
+    handleEditorCloseProject(event) {
+
+        var system = ToolCore.getToolSystem();
+
+        if (system.project) {
+
+            system.closeProject();
+
+        }
+
+    }
+
+    handleProjectUnloaded(event) {
+
+        this.sendEvent(EditorEvents.ActiveSceneChange, { scene : null });
+
+
+
+    }
+
     parseArguments() {
 
         var args = Atomic.getArguments();
@@ -70,7 +92,7 @@ class Editor extends Atomic.ScriptObject {
 
             if (args[idx] == "--project") {
 
-                this.sendEvent(EditorEvents.LoadProject, {path: args[idx + 1]});
+                this.sendEvent(EditorEvents.LoadProject, { path: args[idx + 1] });
 
             }
 
@@ -83,13 +105,13 @@ class Editor extends Atomic.ScriptObject {
     // event handling
     handleExitRequested(data) {
 
-      EditorUI.shutdown();
+        EditorUI.shutdown();
 
     }
 
     handleEditorEventQuit(data) {
 
-      this.sendEvent("ExitRequested");
+        this.sendEvent("ExitRequested");
 
     }
 

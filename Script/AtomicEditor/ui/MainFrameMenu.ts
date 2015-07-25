@@ -57,6 +57,13 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
 
             }
+            if (refid == "file close project") {
+
+                this.sendEvent(EditorEvents.CloseProject);
+
+                return true;
+
+            }
 
             if (refid == "file save file") {
                 EditorUI.getShortcuts().invokeFileSave();
