@@ -7,6 +7,7 @@
 #include "../Project/Project.h"
 
 #include "AssetDatabase.h"
+#include "AudioImporter.h"
 #include "ModelImporter.h"
 #include "FolderImporter.h"
 #include "SceneImporter.h"
@@ -89,7 +90,9 @@ bool Asset::Preload()
     if (importer_.Null())
         return true;
 
-    return importer_->Preload();
+    // disabled preload for now, as this is on a background thread and causing init problems
+    return true;
+    //return importer_->Preload();
 }
 
 // load .asset
@@ -206,6 +209,10 @@ bool Asset::CreateImporter()
         if (ext == ".fbx" || ext == ".blend" || ext == ".dae")
         {
             importer_ = new ModelImporter(context_, this);
+        }
+        if (ext == ".ogg" || ext == ".wav")
+        {
+            importer_ = new AudioImporter(context_, this);
         }
         else if (ext == ".prefab")
         {

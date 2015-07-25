@@ -113,6 +113,8 @@ void AEPlayerApplication::Setup()
                 // This works for a local dev build, --editor-resource-paths command below is for
                 // launching from AtomicEditor (IPC)
 
+                value = AddTrailingSlash(value);
+
                 String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%s/;%s/Resources;%s;%sCache",
                          ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
 

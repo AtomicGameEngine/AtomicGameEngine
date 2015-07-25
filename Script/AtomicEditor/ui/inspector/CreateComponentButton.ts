@@ -4,9 +4,9 @@ import ComponentInspector = require("./ComponentInspector");
 
 var audioCreateSource = new Atomic.UIMenuItemSource();
 
-audioCreateSource.addItem(new Atomic.UIMenuItem("SoundListener", "create component"));
-audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource", "create component"));
-audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource3D", "create component"));
+audioCreateSource.addItem(new Atomic.UIMenuItem("SoundListener", "SoundListener"));
+audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource", "SoundSource"));
+audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource3D", "SoundSource3D"));
 
 var geometryCreateSource = new Atomic.UIMenuItemSource();
 

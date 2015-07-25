@@ -106,6 +106,8 @@ SoundSource::SoundSource(Context* context) :
     panning_(0.0f),
     autoRemoveTimer_(0.0f),
     autoRemove_(false),
+    autoPlay_(false),
+    hasAutoPlayed_(false),
     position_(0),
     fractPosition_(0),
     timePosition_(0.0f),
@@ -139,6 +141,8 @@ void SoundSource::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
     ATTRIBUTE("Autoremove on Stop", bool, autoRemove_, false, AM_FILE);
     ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
+
+    ATTRIBUTE("Autoplay", bool, autoPlay_, false, AM_FILE);
 }
 
 void SoundSource::Play(Sound* sound)
@@ -292,6 +296,13 @@ void SoundSource::Update(float timeStep)
     // If there is no actual audio output, perform fake mixing into a nonexistent buffer to check stopping/looping
     if (!audio_->IsInitialized())
         MixNull(timeStep);
+
+    // check for autoPlay
+    if (autoPlay_ && sound_.NotNull() && !hasAutoPlayed_ && !context_->GetEditorContext())
+    {
+        hasAutoPlayed_ = true;
+        Play(sound_);
+    }
 
     // Free the stream if playback has stopped
     if (soundStream_ && !position_)

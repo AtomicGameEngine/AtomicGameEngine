@@ -75,6 +75,13 @@ public:
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
 
+    // BEGIN ATOMIC
+
+    /// Return sound.
+    void SetSound(Sound* sound) { if (sound) SetSoundAttr(GetResourceRef(sound, "")); }
+
+    // END ATOMIC
+
     /// Return sound.
     Sound* GetSound() const { return sound_; }
 
@@ -144,6 +151,11 @@ protected:
     float masterGain_;
     /// Autoremove flag.
     bool autoRemove_;
+
+    // BEGIN ATOMIC
+    bool autoPlay_;
+    bool hasAutoPlayed_;
+    // END ATOMIC
 
 private:
     /// Play a sound without locking the audio mutex. Called internally.

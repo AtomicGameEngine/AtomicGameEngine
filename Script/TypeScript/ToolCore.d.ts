@@ -305,6 +305,16 @@ declare module ToolCore {
 
    }
 
+   export class AudioImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+      import(guid: string): boolean;
+
+   }
+
    export class JavascriptImporter extends AssetImporter {
 
       // Construct.

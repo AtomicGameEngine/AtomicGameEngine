@@ -6192,6 +6192,8 @@ declare module Atomic {
       // Set whether sound source will be automatically removed from the scene node when playback stops.
       setAutoRemove(enable: boolean): void;
       // Return sound.
+      setSound(sound: Sound): void;
+      // Return sound.
       getSound(): Sound;
       // Return sound type, determines the master gain group.
       getSoundType(): string;
