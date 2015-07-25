@@ -130,9 +130,6 @@ class CreateProject extends ModalWindow {
                 return true;
 
             }
-
-
-
         }
     }
 

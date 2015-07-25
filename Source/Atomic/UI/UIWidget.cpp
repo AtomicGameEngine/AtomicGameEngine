@@ -153,11 +153,11 @@ void UIWidget::OnDelete()
 
     widget_ = 0;
 
-    UnsubscribeFromAllEvents();
-
     VariantMap eventData;
     eventData[WidgetDeleted::P_WIDGET] = this;
     SendEvent(E_WIDGETDELETED, eventData);
+
+    UnsubscribeFromAllEvents();
 
     ReleaseRef();
 }

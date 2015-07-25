@@ -21,7 +21,7 @@ class EULAWindow extends ModalWindow {
         var container = this.getWidget("tabcontainer");
         container.value = 0;
 
-        var cache = Atomic.getResourceCache();
+        var cache = Atomic.cache;
 
         var file = cache.getFile("AtomicEditor/eulas/atomic_game_engine_eula.txt");
         this.age_license.text = file.readText();

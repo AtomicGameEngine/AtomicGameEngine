@@ -1,5 +1,6 @@
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
+import About = require("./About");
 import NewProject = require("./NewProject");
 import CreateProject = require("./CreateProject");
 
@@ -21,84 +22,84 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateFolder:string) {
+    showCreateProject(projectTemplateFolder: string) {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new CreateProject(projectTemplateFolder);
+            this.opWindow = new CreateProject(projectTemplateFolder);
 
-      }
-
-    }
-
-    showCreateFolder(resourcePath:string) {
-
-      if (this.show()) {
-
-          this.opWindow = new UIResourceOps.CreateFolder(resourcePath);
-
-      }
+        }
 
     }
 
-    showCreateComponent(resourcePath:string) {
+    showCreateFolder(resourcePath: string) {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new UIResourceOps.CreateComponent(resourcePath);
+            this.opWindow = new UIResourceOps.CreateFolder(resourcePath);
 
-      }
-
-    }
-
-    showCreateScript(resourcePath:string) {
-
-      if (this.show()) {
-
-          this.opWindow = new UIResourceOps.CreateScript(resourcePath);
-
-      }
+        }
 
     }
 
-    showCreateScene(resourcePath:string) {
+    showCreateComponent(resourcePath: string) {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new UIResourceOps.CreateScene(resourcePath);
+            this.opWindow = new UIResourceOps.CreateComponent(resourcePath);
 
-      }
-
-    }
-
-    showCreateMaterial(resourcePath:string) {
-
-      if (this.show()) {
-
-          this.opWindow = new UIResourceOps.CreateMaterial(resourcePath);
-
-      }
+        }
 
     }
 
+    showCreateScript(resourcePath: string) {
 
-    showResourceDelete(asset:ToolCore.Asset) {
+        if (this.show()) {
 
-      if (this.show()) {
+            this.opWindow = new UIResourceOps.CreateScript(resourcePath);
 
-          this.opWindow = new UIResourceOps.ResourceDelete(asset);
-
-      }
+        }
 
     }
 
-    showResourceSelection(windowText:string, importerType:string, callback: (asset: ToolCore.Asset, args:any) => void, args:any = undefined) {
+    showCreateScene(resourcePath: string) {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new ResourceSelection(windowText, importerType, callback, args);
+            this.opWindow = new UIResourceOps.CreateScene(resourcePath);
 
-      }
+        }
+
+    }
+
+    showCreateMaterial(resourcePath: string) {
+
+        if (this.show()) {
+
+            this.opWindow = new UIResourceOps.CreateMaterial(resourcePath);
+
+        }
+
+    }
+
+
+    showResourceDelete(asset: ToolCore.Asset) {
+
+        if (this.show()) {
+
+            this.opWindow = new UIResourceOps.ResourceDelete(asset);
+
+        }
+
+    }
+
+    showResourceSelection(windowText: string, importerType: string, callback: (asset: ToolCore.Asset, args: any) => void, args: any = undefined) {
+
+        if (this.show()) {
+
+            this.opWindow = new ResourceSelection(windowText, importerType, callback, args);
+
+        }
 
     }
 
@@ -113,31 +114,42 @@ class ModalOps extends Atomic.ScriptObject {
 
     showEULAWindow() {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new EULAWindow();
+            this.opWindow = new EULAWindow();
 
-      }
+        }
 
     }
 
     showActivationWindow() {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new ActivationWindow();
+            this.opWindow = new ActivationWindow();
 
-      }
+        }
 
     }
 
+    showAbout() {
+
+        if (this.show()) {
+
+            this.opWindow = new About();
+
+        }
+
+    }
+
+
     showActivationSuccessWindow() {
 
-      if (this.show()) {
+        if (this.show()) {
 
-          this.opWindow = new ActivationSuccessWindow();
+            this.opWindow = new ActivationSuccessWindow();
 
-      }
+        }
 
     }
 
@@ -172,7 +184,7 @@ class ModalOps extends Atomic.ScriptObject {
             this.opWindow = null;
 
             if (window.parent)
-              window.parent.removeChild(window, false);
+                window.parent.removeChild(window, false);
 
             var view = EditorUI.getView();
             view.setFocusRecursive();

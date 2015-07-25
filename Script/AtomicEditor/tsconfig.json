@@ -46,6 +46,7 @@
         "./ui/license/ActivationWindow.ts",
         "./ui/license/EULAWindow.ts",
         "./ui/menus/MenuItemSources.ts",
+        "./ui/modal/About.ts",
         "./ui/modal/CreateProject.ts",
         "./ui/modal/MessageModal.ts",
         "./ui/modal/ModalOps.ts",

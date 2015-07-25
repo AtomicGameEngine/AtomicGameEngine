@@ -19,6 +19,13 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
         if (target.id == "menu atomic editor popup") {
 
+            if (refid == "about atomic editor") {
+
+                EditorUI.getModelOps().showAbout();
+
+                return true;
+            }
+
             if (refid == "quit") {
 
                 this.sendEvent(EditorEvents.Quit);
