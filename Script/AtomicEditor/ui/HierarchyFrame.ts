@@ -121,6 +121,9 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (this.scene)
             this.unsubscribeFromEvents(this.scene);
 
+        // clear selected node
+        this.sendEvent(EditorEvents.ActiveNodeChange, { node: null });
+
         this.scene = <Atomic.Scene> data.scene;
 
         this.populate();

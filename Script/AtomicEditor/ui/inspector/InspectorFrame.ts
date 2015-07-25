@@ -11,6 +11,8 @@ import NodeInspector = require("./NodeInspector");
 
 class InspectorFrame extends ScriptWidget {
 
+    inspectingNode:Atomic.Node;
+
     constructor() {
 
         super();
@@ -22,7 +24,7 @@ class InspectorFrame extends ScriptWidget {
         var container = this.getWidget("inspectorcontainer");
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
-        this.subscribeToEvent("EditorActiveNodeChange", (data) => this.handleActiveNodeChange(data));
+        this.subscribeToEvent(EditorEvents.ActiveNodeChange, (data) => this.handleActiveNodeChange(data));
 
 
     }
@@ -48,6 +50,14 @@ class InspectorFrame extends ScriptWidget {
 
         if (!node) {
 
+            if (this.inspectingNode) {
+
+              this.inspectingNode = null;
+              var container = this.getWidget("inspectorcontainer");
+              container.deleteAllChildren();
+
+            }
+
             return;
         }
 
@@ -58,10 +68,11 @@ class InspectorFrame extends ScriptWidget {
 
     inspectAsset(asset: ToolCore.Asset) {
 
-        if (asset.importerTypeName == "ModelImporter") {
+        this.inspectingNode = null;
+        var container = this.getWidget("inspectorcontainer");
+        container.deleteAllChildren();
 
-            var container = this.getWidget("inspectorcontainer");
-            container.deleteAllChildren();
+        if (asset.importerTypeName == "ModelImporter") {
 
             var inspector = new ModelInspector();
             container.addChild(inspector);
@@ -80,9 +91,6 @@ class InspectorFrame extends ScriptWidget {
             if (!material) {
                 return;
             }
-
-            var container = this.getWidget("inspectorcontainer");
-            container.deleteAllChildren();
 
             var materialInspector = new MaterialInspector();
             container.addChild(materialInspector);
@@ -104,6 +112,8 @@ class InspectorFrame extends ScriptWidget {
         container.addChild(inspector);
 
         inspector.inspect(node);
+
+        this.inspectingNode = node;
 
     }
 
