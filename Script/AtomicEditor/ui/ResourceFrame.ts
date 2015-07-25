@@ -41,6 +41,8 @@ class ResourceFrame extends ScriptWidget {
 
         if (this.editors[path]) {
 
+            this.navigateToResource(path);
+
             return;
 
         }
@@ -82,6 +84,9 @@ class ResourceFrame extends ScriptWidget {
         }
 
         var editor = this.editors[fullpath];
+
+        if (this.currentResourceEditor == editor) return;
+
         var root = this.tabcontainer.contentRoot;
 
         var i = 0;
