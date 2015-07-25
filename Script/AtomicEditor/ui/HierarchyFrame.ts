@@ -35,7 +35,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
-
         this.subscribeToEvent(EditorEvents.ActiveNodeChange, (data) => {
 
             if (data.node)

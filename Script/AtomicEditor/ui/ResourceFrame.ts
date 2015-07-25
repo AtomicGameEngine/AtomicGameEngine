@@ -175,6 +175,12 @@ class ResourceFrame extends ScriptWidget {
 
                 if (this.currentResourceEditor != w.editor) {
 
+                    if (w.editor.typeName == "SceneEditor3D") {
+
+                        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: (<Editor.SceneEditor3D> w.editor).scene});
+
+                    }
+
                     this.sendEvent(UIEvents.ResourceEditorChanged, { editor: w.editor });
 
                 }

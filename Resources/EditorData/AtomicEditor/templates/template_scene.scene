@@ -52,7 +52,7 @@
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
 		<component type="Camera" id="1973">
-			<attribute name="FOV" value="90" />
+			<attribute name="FOV" value="45" />
 		</component>
 	</node>
 </scene>

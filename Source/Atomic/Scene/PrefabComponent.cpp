@@ -56,7 +56,7 @@ void PrefabComponent::LoadPrefabNode()
 
     prefabNode_->SetPosition(Vector3::ZERO);
     prefabNode_->SetRotation(Quaternion::IDENTITY);
-    prefabNode_->SetScale(Vector3::ONE);
+    // prefabNode_->SetScale(Vector3::ONE);
 
     PODVector<RigidBody*> bodies;
     prefabNode_->GetComponents<RigidBody>(bodies, true);
