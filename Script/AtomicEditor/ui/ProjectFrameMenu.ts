@@ -22,9 +22,16 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
     handleAssetContextMenu(target: Atomic.UIWidget, refid: string) {
 
-        if (target.id == "asset context menu") {
+        if (target.id == "asset context menu" || target.id == "create popup") {
 
+            var path;
             var asset = <ToolCore.Asset> target['asset'];
+
+            if (asset) {
+                path = asset.path;
+            } else {
+                path = this.contentFolder;
+            }
 
             if (refid == "delete_asset") {
                 EditorUI.getModelOps().showResourceDelete(asset);
@@ -32,22 +39,27 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
             }
 
             if (refid == "create_folder") {
-                EditorUI.getModelOps().showCreateFolder(asset.path);
+                EditorUI.getModelOps().showCreateFolder(path);
                 return true;
             }
 
             if (refid == "create_component") {
-                EditorUI.getModelOps().showCreateComponent(asset.path);
+                EditorUI.getModelOps().showCreateComponent(path);
+                return true;
+            }
+
+            if (refid == "create_script") {
+                EditorUI.getModelOps().showCreateScript(path);
                 return true;
             }
 
             if (refid == "create_scene") {
-                EditorUI.getModelOps().showCreateScene(asset.path);
+                EditorUI.getModelOps().showCreateScene(path);
                 return true;
             }
 
             if (refid == "create_material") {
-                EditorUI.getModelOps().showCreateMaterial(asset.path);
+                EditorUI.getModelOps().showCreateMaterial(path);
                 return true;
             }
 
@@ -88,24 +100,6 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
         }
 
-        if (target.id == "create popup") {
-
-            if (refid == "create_folder") {
-
-                EditorUI.getModelOps().showCreateFolder(this.contentFolder);
-
-                return true;
-
-            }
-
-            if (refid == "create_script") {
-
-                return true;
-
-            }
-
-        }
-
         return false;
 
     }
@@ -128,6 +122,7 @@ var assetGeneralContextItems = {
 var assetFolderContextItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
     "Create Component": ["create_component", undefined, "ComponentBitmap"],
+    "Create Script": ["create_script", undefined, "ComponentBitmap"],
     "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "-1": null,
@@ -137,8 +132,9 @@ var assetFolderContextItems = {
 };
 
 var createItems = {
-  "Create Folder": ["create_folder", undefined, "Folder.icon"],
-  "Create Component": ["create_component", undefined, "ComponentBitmap"],
-  "Create Material": ["create_material", undefined, "ComponentBitmap"],
-  "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
+    "Create Folder": ["create_folder", undefined, "Folder.icon"],
+    "Create Component": ["create_component", undefined, "ComponentBitmap"],
+    "Create Script": ["create_script", undefined, "ComponentBitmap"],
+    "Create Material": ["create_material", undefined, "ComponentBitmap"],
+    "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
 };

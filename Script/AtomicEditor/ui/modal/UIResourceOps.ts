@@ -155,6 +155,59 @@ export class CreateComponent extends ModalWindow {
 
 }
 
+export class CreateScript extends ModalWindow {
+
+    constructor(resourcePath: string) {
+
+        super();
+
+        this.resourcePath = resourcePath;
+        this.init("New Script", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.nameField = <Atomic.UIEditField> this.getWidget("component_name");
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+
+            var id = ev.target.id;
+
+            if (id == "create") {
+
+                var scriptName = this.nameField.text;
+                var outputFile = Atomic.addTrailingSlash(this.resourcePath) + scriptName;
+
+                if (outputFile.indexOf(".js") == -1) outputFile += ".js";
+
+
+                if (ResourceOps.CreateNewScript(outputFile, scriptName)) {
+
+                    this.hide();
+
+                    this.sendEvent(EditorEvents.EditResource, { path:outputFile});
+
+                }
+
+                return true;
+
+            }
+
+            if (id == "cancel") {
+
+                this.hide();
+
+                return true;
+            }
+
+        }
+
+    }
+
+    resourcePath: string;
+    nameField: Atomic.UIEditField;
+
+}
+
 export class CreateScene extends ModalWindow {
 
     constructor(resourcePath: string) {
