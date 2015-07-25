@@ -32,6 +32,16 @@ declare module Atomic {
 
     }
 
+
+    export interface UIShortcutEvent {
+
+        // keycode
+        key:number;
+        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
+        qualifiers:number;
+
+    }
+
     export interface NodeAddedEvent {
 
         scene: Atomic.Scene;

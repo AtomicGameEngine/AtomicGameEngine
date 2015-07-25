@@ -28,10 +28,18 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleSaveResource(Ev: EditorEvents.SaveResourceEvent) {
+    handleSaveResource(ev: EditorEvents.SaveResourceEvent) {
 
         if (this.currentResourceEditor)
             this.currentResourceEditor.save();
+
+    }
+
+    handleSaveAllResources(data) {
+
+        for (var i in this.editors) {
+            this.editors[i].save();
+        }
 
     }
 
@@ -162,17 +170,6 @@ class ResourceFrame extends ScriptWidget {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_SHORTCUT) {
-
-            if (ev.refid == "close") {
-                if (this.currentResourceEditor) {
-                    this.currentResourceEditor.close(true);
-                    return true;
-                }
-            }
-        }
-
-
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
             var w = <EditorRootContentWidget> this.tabcontainer.currentPageWidget;
 
@@ -182,7 +179,7 @@ class ResourceFrame extends ScriptWidget {
 
                     if (w.editor.typeName == "SceneEditor3D") {
 
-                        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: (<Editor.SceneEditor3D> w.editor).scene});
+                        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: (<Editor.SceneEditor3D> w.editor).scene });
 
                     }
 
@@ -226,7 +223,9 @@ class ResourceFrame extends ScriptWidget {
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
+        this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));
         this.subscribeToEvent(EditorEvents.CloseResource, (ev: EditorEvents.CloseResourceEvent) => this.handleCloseResource(ev));
+
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
 

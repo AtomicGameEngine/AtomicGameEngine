@@ -7396,6 +7396,7 @@ declare module Atomic {
       fontDescription: UIFontDescription;
       gravity: UI_GRAVITY;
       value: number;
+      focus: boolean;
       visibility: UI_WIDGET_VISIBILITY;
       stateRaw: number;
       dragObject: UIDragObject;
@@ -7428,6 +7429,7 @@ declare module Atomic {
       setValue(value: number): void;
       getValue(): number;
       setFocus(): void;
+      getFocus(): boolean;
       // Set focus to first widget which accepts it
       setFocusRecursive(): void;
       onFocusChanged(focused: boolean): void;

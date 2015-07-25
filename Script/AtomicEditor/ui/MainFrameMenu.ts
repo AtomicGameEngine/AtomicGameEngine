@@ -13,22 +13,6 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu atomic editor", editorItems);
         MenuItemSources.createMenuItemSource("menu edit", editItems);
         MenuItemSources.createMenuItemSource("menu file", fileItems);
-
-        this.subscribeToEvent("WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
-
-            if (ev.type == Atomic.UI_EVENT_TYPE_SHORTCUT) {
-
-                if (ev.refid == "save") {
-
-                    this.sendEvent(EditorEvents.SaveResource);
-                    return true;
-
-                }
-
-            }
-
-        })
-
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -45,10 +29,13 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu edit popup") {
 
             if (refid == "edit play") {
-
-                new ToolCore.PlayCmd().run();
+                EditorUI.getShortcuts().invokePlay();
                 return true;
+            }
 
+            if (refid == "edit format code") {
+              EditorUI.getShortcuts().invokeFormatCode();
+              return true;
             }
 
             return false;
@@ -65,12 +52,20 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "file save file") {
-
-                this.sendEvent(EditorEvents.SaveResource);
-
+                EditorUI.getShortcuts().invokeFileSave();
                 return true;
-
             }
+
+            if (refid == "file close file") {
+                EditorUI.getShortcuts().invokeFileClose();
+                return true;
+            }
+
+            if (refid == "file save all") {
+                this.sendEvent(EditorEvents.SaveAllResources);
+                return true;
+            }
+
 
             return false;
         }
@@ -124,5 +119,6 @@ var fileItems = {
     "Close Project": ["file close project"],
     "-2": null,
     "Save File": ["file save file"],
+    "Save All Files": ["file save all"],
     "Close File": ["file close file"]
 }

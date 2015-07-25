@@ -96,4 +96,11 @@ EVENT(E_POPUPMENUSELECT, PopupMenuSelect)
     PARAM(P_REFID, RefID);             // string tbid
 }
 
+EVENT(E_UISHORTCUT, UIShortcut)
+{
+    PARAM(P_KEY, Key);                    // int
+    PARAM(P_QUALIFIERS, Qualifiers);        // int
+
+}
+
 }

@@ -2,6 +2,7 @@
 import EditorEvents = require("../editor/EditorEvents");
 import MainFrame = require("../ui/MainFrame");
 import ModalOps = require("./modal/ModalOps");
+import Shortcuts = require("./Shortcuts");
 
 // this is designed with public get functions to solve
 // circular dependency issues in TS
@@ -18,6 +19,10 @@ export function getModelOps():ModalOps {
 
 export function getView():Atomic.UIView {
   return editorUI.view;
+}
+
+export function getShortcuts():Shortcuts {
+  return editorUI.shortcuts;
 }
 
 export function initialize() {
@@ -56,6 +61,7 @@ class EditorUI extends Atomic.ScriptObject {
     this.mainframe.setSize(graphics.width, graphics.height);
 
     this.modalOps = new ModalOps();
+    this.shortcuts = new Shortcuts();
 
     this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {
       this.showModalError(event.title, event.message);
@@ -72,5 +78,6 @@ class EditorUI extends Atomic.ScriptObject {
   view: Atomic.UIView;
   mainframe: MainFrame;
   modalOps: ModalOps;
+  shortcuts: Shortcuts;
 
 }

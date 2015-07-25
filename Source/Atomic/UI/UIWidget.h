@@ -150,6 +150,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     double GetValue();
 
     void SetFocus();
+    bool GetFocus();
+
+
     /// Set focus to first widget which accepts it
     void SetFocusRecursive();
     void OnFocusChanged(bool focused);

@@ -38,6 +38,8 @@ public:
     void GotoTokenPos(int tokenPos);
     void GotoLineNumber(int lineNumber);
 
+    void FormatCode();
+
     void SetFocus();
 
     bool HasUnsavedModifications();

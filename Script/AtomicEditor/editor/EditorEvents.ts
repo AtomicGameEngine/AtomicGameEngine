@@ -43,6 +43,8 @@ export interface LoadProjectEvent {
 
 }
 
+export const SaveAllResources = "EditorSaveAllResources";
+
 export const SaveResource = "EditorSaveResource";
 export interface SaveResourceEvent {
 

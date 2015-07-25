@@ -433,6 +433,15 @@ void UIWidget::SetFocus()
         return;
 
     widget_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
+
+}
+
+bool UIWidget::GetFocus()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->GetIsFocused();
 }
 
 void UIWidget::SetFocusRecursive()

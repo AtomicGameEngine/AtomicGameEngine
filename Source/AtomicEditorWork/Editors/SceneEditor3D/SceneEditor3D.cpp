@@ -104,19 +104,7 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_SHORTCUT)
     {
-        /*
-        if (ev.ref_id == TBIDC("save"))
-        {
-            File file(context_);
-            if (file.Open(fullpath_, FILE_WRITE))
-            {
-                scene_->SaveXML(file);
-                file.Close();
-            }
-
-            return true;
-        }
-        else */if (ev.ref_id == TBIDC("copy"))
+        if (ev.ref_id == TBIDC("copy"))
         {
             if (selectedNode_.NotNull())
             {

@@ -28,6 +28,7 @@
         "./ui/ProjectFrameMenu.ts",
         "./ui/ResourceFrame.ts",
         "./ui/ScriptWidget.ts",
+        "./ui/Shortcuts.ts",
         "./ui/UIEvents.ts",
         "./ui/WelcomeFrame.ts",
         "./ui/inspector/ArrayEditWidget.ts",

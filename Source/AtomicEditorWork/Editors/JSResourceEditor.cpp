@@ -147,6 +147,28 @@ JSResourceEditor::~JSResourceEditor()
 {
 }
 
+void JSResourceEditor::FormatCode()
+{
+
+    TBStr text;
+    styleEdit_->GetText(text);
+
+    if (text.Length())
+    {
+        String output;
+        if (BeautifyJavascript(text.CStr(), output))
+        {
+            if (output.Length())
+            {
+                styleEdit_->selection.SelectAll();
+                styleEdit_->InsertText(output.CString(), output.Length());
+            }
+        }
+    }
+
+
+}
+
 void JSResourceEditor::UpdateLineNumbers()
 {
     if (!styleEdit_)
@@ -259,22 +281,7 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
 
         }
 
-        if (ev.ref_id == TBIDC("save"))
-        {
-            //TBStr text;
-            //styleEdit_->GetText(text);
-            //File file(context_, fullpath_, FILE_WRITE);
-            //file.Write((void*) text.CStr(), text.Length());
-            //file.Close();
-
-            //String filename = GetFileNameAndExtension(fullpath_);
-            //button_->SetText(filename.CString());
-            //modified_ = false;
-            //SendEvent(E_JAVASCRIPTSAVED);
-
-            return false;
-        }
-        else if (ev.ref_id == TBIDC("find"))
+        if (ev.ref_id == TBIDC("find"))
         {
             //using namespace FindTextOpen;
             //SendEvent(E_FINDTEXTOPEN);
@@ -299,24 +306,6 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
 
             finder->Find(text, flags);
             */
-        }
-        else if (ev.ref_id == TBIDC("beautify"))
-        {
-            TBStr text;
-            styleEdit_->GetText(text);
-
-            if (text.Length())
-            {
-                String output;
-                if (BeautifyJavascript(text.CStr(), output))
-                {
-                    if (output.Length())
-                    {
-                        styleEdit_->selection.SelectAll();
-                        styleEdit_->InsertText(output.CString(), output.Length());
-                    }
-                }
-            }
         }
         else if (ev.ref_id == TBIDC("cut") || ev.ref_id == TBIDC("copy") || ev.ref_id == TBIDC("paste")
                  || ev.ref_id == TBIDC("selectall") || ev.ref_id == TBIDC("undo") || ev.ref_id == TBIDC("redo") )
@@ -586,7 +575,7 @@ bool JSResourceEditor::BeautifyJavascript(const char* source, String& output)
     output.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/typescript/modules/jsutils");
+    duk_push_string(ctx, "AtomicEditor/modules/jsutils");
 
     if (duk_pcall(ctx, 1))
     {

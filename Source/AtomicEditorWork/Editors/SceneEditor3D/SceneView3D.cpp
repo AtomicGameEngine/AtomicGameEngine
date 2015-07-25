@@ -137,7 +137,7 @@ void SceneView3D::Disable()
 
 void SceneView3D::MoveCamera(float timeStep)
 {
-    if (!enabled_)
+    if (!enabled_ && !GetFocus())
         return;
 
     Input* input = GetSubsystem<Input>();

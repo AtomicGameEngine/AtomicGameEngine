@@ -1,4 +1,4 @@
-
+import EditorUI = require("./EditorUI");
 
 class MainToolbar extends Atomic.UIWidget {
 
@@ -21,19 +21,19 @@ class MainToolbar extends Atomic.UIWidget {
             if (ev.target.id == "3d_translate" || ev.target.id == "3d_rotate" || ev.target.id == "3d_scale") {
 
                 var mode = 1;
-                if (ev.target.id == "3d_rotate" )
-                  mode = 2;
+                if (ev.target.id == "3d_rotate")
+                    mode = 2;
                 else if (ev.target.id == "3d_scale")
-                  mode = 3;
+                    mode = 3;
 
-                  this.sendEvent("GizmoEditModeChanged", {mode:mode});
+                this.sendEvent("GizmoEditModeChanged", { mode: mode });
 
                 return true;
 
             } else if (ev.target.id == "maintoolbar_play") {
 
-              Atomic.editorMode.playProject();
-              return true;
+                EditorUI.getShortcuts().invokePlay();
+                return true;
 
             }
 

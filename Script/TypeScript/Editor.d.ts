@@ -87,6 +87,7 @@ declare module Editor {
       findTextClose(): void;
       gotoTokenPos(tokenPos: number): void;
       gotoLineNumber(lineNumber: number): void;
+      formatCode(): void;
       setFocus(): void;
       hasUnsavedModifications(): boolean;
       save(): boolean;
