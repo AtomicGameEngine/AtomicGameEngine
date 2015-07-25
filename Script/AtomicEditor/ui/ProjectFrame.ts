@@ -299,6 +299,8 @@ class ProjectFrame extends ScriptWidget {
 
         this.folderList.rootList.value = 0;
         this.folderList.setExpanded(this.resourcesID, true);
+        this.sendEvent(EditorEvents.ContentFolderChanged, { path: ToolCore.toolSystem.project.resourcePath });
+
 
     }
 

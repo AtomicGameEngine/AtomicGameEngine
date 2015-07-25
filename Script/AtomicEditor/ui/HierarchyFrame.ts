@@ -200,18 +200,13 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             var id = data.target.id;
 
-            if (this.menu.handlePopupMenu(data.target, data.refid))
-                return true;
-
             if (id == "create popup") {
 
-                if (data.refid == "create_node") {
+                var selectedId = Number(this.hierList.rootList.selectedItemID);
+                var node = this.scene.getNode(selectedId);
 
-                    var selectedId = Number(this.hierList.rootList.selectedItemID);
-                    var node = this.scene.getNode(selectedId);
-                    node.createChild("Node");
-
-                }
+                if (this.menu.handlePopupMenu(data.target, data.refid, node))
+                    return true;
 
             }
 

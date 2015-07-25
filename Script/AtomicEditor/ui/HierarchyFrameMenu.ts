@@ -18,9 +18,44 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
+    handlePopupMenu(target: Atomic.UIWidget, refid: string, node: Atomic.Node): boolean {
 
         if (!target || !refid) return;
+
+        if (target.id == "create popup") {
+
+            var child:Atomic.Node;
+
+            if (refid == "create_node") {
+
+                if (node) {
+
+                    child = node.createChild("Node");
+
+                }
+
+            }
+
+            else if (refid == "create_light") {
+
+                if (node) {
+
+                    child = node.createChild("Light");
+                    child.createComponent("Light");
+
+                }
+
+            }
+
+            if (child) {
+
+              this.sendEvent(EditorEvents.ActiveNodeChange, { node: child });
+
+            }
+
+            return true;
+
+        }
 
         return false;
 
