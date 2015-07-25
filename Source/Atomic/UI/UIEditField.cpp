@@ -71,6 +71,18 @@ void UIEditField::SetEditType(UI_EDIT_TYPE type)
 
 }
 
+void UIEditField::ScrollTo(int x, int y)
+{
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->ScrollTo(x, y);
+
+}
+
 void UIEditField::SetTextAlign(TEXT_ALIGN align)
 {
     if (!widget_)

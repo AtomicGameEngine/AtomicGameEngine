@@ -9,6 +9,16 @@ export interface ModalErrorEvent {
 
 }
 
+export const PlayerStarted = "EditorPlayerStarted";
+export const PlayerLog = "EditorPlayerLog";
+export interface PlayerLogEvent {
+
+  message: string;
+  level: number;
+
+}
+
+
 export const ActiveSceneChange = "EditorActiveSceneChange";
 export const ActiveNodeChange = "EditorActiveNodeChange";
 export const SceneClosed = "EditorSceneClosed";

@@ -40,6 +40,8 @@ public:
 
     void SetReadOnly(bool readonly);
 
+    void ScrollTo(int x, int y);
+
     void SetWrapping(bool wrap);
     bool GetWrapping();
 

@@ -1,5 +1,6 @@
 
 import EditorEvents = require("../../editor/EditorEvents");
+import PlayerOutput = require("./PlayerOutput");
 
 class PlayMode extends Atomic.ScriptObject {
 
@@ -10,7 +11,15 @@ class PlayMode extends Atomic.ScriptObject {
         super();
 
         this.subscribeToEvent("IPCJSError", (ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev));
+        this.subscribeToEvent(EditorEvents.PlayerStarted, (ev) => this.handlePlayerStarted(ev));
 
+    }
+
+    handlePlayerStarted(ev) {
+
+        this.inErrorState = false;
+
+        new PlayerOutput();
     }
 
     handleIPCJSError(ev: Atomic.IPCJSErrorEvent) {

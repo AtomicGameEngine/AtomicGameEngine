@@ -33,6 +33,9 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 {
     VariantMap startupData;
     playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
+
+    SendEvent("EditorPlayerStarted");
+
 }
 
 void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
@@ -43,9 +46,15 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
 void EditorMode::HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData)
 {
     using namespace IPCWorkerLog;
-    const String&  message = eventData[P_MESSAGE].GetString();
 
-    LOGINFOF("From Player: %s", message.CString());
+    // convert to a player log
+
+    VariantMap playerLogData;
+
+    playerLogData["message"]  = eventData[P_MESSAGE].GetString();
+    playerLogData["level"]  = eventData[P_LEVEL].GetInt();
+
+    SendEvent("EditorPlayerLog", playerLogData);
 
 }
 

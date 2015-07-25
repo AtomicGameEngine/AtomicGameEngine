@@ -7051,6 +7051,7 @@ declare module Atomic {
       setTextAlign(align: TEXT_ALIGN): void;
       setEditType(type: UI_EDIT_TYPE): void;
       setReadOnly(readonly: boolean): void;
+      scrollTo(x: number, y: number): void;
       setWrapping(wrap: boolean): void;
       getWrapping(): boolean;
 
