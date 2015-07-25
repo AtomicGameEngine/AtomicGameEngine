@@ -57,6 +57,12 @@ class EditorUI extends Atomic.ScriptObject {
 
     this.view.addChild(this.mainframe);
 
+    this.subscribeToEvent("ScreenMode", (ev:Atomic.ScreenModeEvent) => {
+
+      this.mainframe.setSize(ev.width, ev.height);
+
+    });
+
     // set initial size
     this.mainframe.setSize(graphics.width, graphics.height);
 

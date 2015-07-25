@@ -11,15 +11,15 @@ declare module Atomic {
 
     // subsystems
 
-    export var engine:Engine;
-    export var graphics:Graphics;
-    export var renderer:Renderer;
-    export var cache:ResourceCache;
-    export var input:Input;
-    export var fileSystem:FileSystem;
-    export var network:Network;
+    export var engine: Engine;
+    export var graphics: Graphics;
+    export var renderer: Renderer;
+    export var cache: ResourceCache;
+    export var input: Input;
+    export var fileSystem: FileSystem;
+    export var network: Network;
 
-    export var editorMode:Editor.EditorMode;
+    export var editorMode: Editor.EditorMode;
 
     // end subsystems
 
@@ -32,13 +32,23 @@ declare module Atomic {
 
     }
 
+    export interface ScreenModeEvent {
+
+        width: number;
+        height: number;
+        fullscreen: boolean;
+        resizable: boolean;
+        borderless: boolean;
+
+    }
+
 
     export interface UIShortcutEvent {
 
         // keycode
-        key:number;
+        key: number;
         //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
-        qualifiers:number;
+        qualifiers: number;
 
     }
 
@@ -113,17 +123,17 @@ declare module Atomic {
 
     export interface TemporaryChangedEvent {
 
-      serializable: Atomic.Serializable;
+        serializable: Atomic.Serializable;
 
     }
 
     export interface IPCJSErrorEvent {
 
-      errorName:string;
-      errorMessage:string;
-      errorFileName: string;
-      errorLineNumber: number;
-      errorStack:string;
+        errorName: string;
+        errorMessage: string;
+        errorFileName: string;
+        errorLineNumber: number;
+        errorStack: string;
 
     }
 
@@ -182,7 +192,7 @@ declare module ToolCore {
 
     export interface LicenseDeactivationErrorEvent {
 
-        message:string;
+        message: string;
 
     }
 
