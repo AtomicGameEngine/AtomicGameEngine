@@ -235,6 +235,9 @@ bool SceneView3D::MouseInView()
     if (!GetInternalWidget())
         return false;
 
+    if (!TBWidget::hovered_widget || TBWidget::hovered_widget->GetDelegate() != this)
+        return false;
+
     Input* input = GetSubsystem<Input>();
     IntVector2 pos = input->GetMousePosition();
 
