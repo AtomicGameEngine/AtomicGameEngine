@@ -108,7 +108,7 @@ class InspectorUtils {
 
 
   // "static constructor"
-  private static attrFontDesc:Atomic.UIFontDescription;
+  static attrFontDesc:Atomic.UIFontDescription;
 
 }
 

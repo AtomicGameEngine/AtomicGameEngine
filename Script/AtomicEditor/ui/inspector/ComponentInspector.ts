@@ -117,6 +117,11 @@ class ComponentInspector extends Atomic.UISection {
             this.addLightCascadeParametersUI(attrsVerticalLayout);
         }
 
+        if (component.typeName == "CollisionShape") {
+            this.addCollisionShapeUI(attrsVerticalLayout);
+        }
+
+
         if (component.typeName == "JSComponent") {
             this.addJSComponentUI(attrsVerticalLayout);
         }
@@ -420,7 +425,6 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
-
     addLightCascadeParametersUI(layout: Atomic.UILayout) {
 
         var light = <Atomic.Light> this.component;
@@ -469,6 +473,30 @@ class ComponentInspector extends Atomic.UISection {
         field = InspectorUtils.createAttrEditField("Split 3", panel);
         field.text = cascadeInfo[3].toString();
         field.subscribeToEvent(field, "WidgetEvent", createHandler(3, light, field));
+
+    }
+
+
+    addCollisionShapeUI(layout: Atomic.UILayout) {
+
+        var shape = <Atomic.CollisionShape> this.component;
+
+        var button = new Atomic.UIButton();
+        button.fontDescription = InspectorUtils.attrFontDesc;
+        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.text = "Set from Model";
+
+        button.onClick = () => {
+
+            var model = <Atomic.Drawable> shape.node.getComponent("StaticModel");
+            if (model) {
+                var box = model.boundingBox;
+                shape.setBox([box[3] - box[0], box[4] - box[1], box[5] - box[2]]);
+            }
+
+        };
+
+        layout.addChild(button);
 
     }
 
