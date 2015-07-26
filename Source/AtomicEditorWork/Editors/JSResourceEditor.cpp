@@ -239,7 +239,9 @@ void JSResourceEditor::OnChange(TBStyleEdit* styleEdit)
         if (hasCompletions)
         {
             autocomplete_->SetPosition(TBPoint(fragment->xpos, (styleEdit_->caret.y - styleEdit_->scroll_y) + fragment->line_height));
-            autocomplete_->Show();
+
+            // autocomplete disabled until it can be looked at
+            //autocomplete_->Show();
         }
     }
 

@@ -287,8 +287,16 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
         duk_push_string(ctx, eval.CString());
         duk_push_string(ctx, "eval");
-        duk_compile(ctx, DUK_COMPILE_EVAL);
-        if (duk_is_function(ctx, -1) && duk_pcall(ctx, 0) == DUK_EXEC_SUCCESS)
+
+        if (duk_pcompile(ctx, DUK_COMPILE_EVAL) != 0)
+        {
+
+            // couldn't eval the inspector fields
+            duk_set_top(ctx, top);
+            return true;
+
+        }
+        else if (duk_is_function(ctx, -1) && duk_pcall(ctx, 0) == DUK_EXEC_SUCCESS)
         {
             if (duk_is_object(ctx, -1))
             {
