@@ -121,7 +121,7 @@ class ComponentInspector extends Atomic.UISection {
             this.addJSComponentUI(attrsVerticalLayout);
         }
 
-        if (component.typeName == "StaticModel" || component.typeName == "AnimatedModel") {
+        if (component.typeName == "StaticModel" || component.typeName == "AnimatedModel" || component.typeName == "Skybox") {
             this.addModelUI(attrsVerticalLayout, component.typeName);
         }
 
