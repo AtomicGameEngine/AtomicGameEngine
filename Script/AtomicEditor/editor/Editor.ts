@@ -40,6 +40,12 @@ class Editor extends Atomic.ScriptObject {
         this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
+        this.subscribeToEvent("ProjectLoaded", (data) => {
+
+            Atomic.editorMode.preferences.registerRecentProject(data.projectPath);
+
+        })
+
         this.parseArguments();
 
 
@@ -76,7 +82,7 @@ class Editor extends Atomic.ScriptObject {
 
     handleProjectUnloaded(event) {
 
-        this.sendEvent(EditorEvents.ActiveSceneChange, { scene : null });
+        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: null });
 
 
 

@@ -11,6 +11,8 @@
 
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
+#include "../Application/AEPreferences.h"
+
 #include "AEEditorMode.h"
 
 using namespace ToolCore;
@@ -26,6 +28,12 @@ EditorMode::EditorMode(Context* context) :
 
 EditorMode::~EditorMode()
 {
+
+}
+
+AEPreferences* EditorMode::GetPreferences()
+{
+    return GetSubsystem<AEPreferences>();
 
 }
 

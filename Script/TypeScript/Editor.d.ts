@@ -63,10 +63,13 @@ declare module Editor {
 
    export class EditorMode extends Atomic.AObject {
 
+      preferences: AEPreferences;
+
       // Construct.
       constructor();
 
       playProject(): boolean;
+      getPreferences(): AEPreferences;
 
    }
 

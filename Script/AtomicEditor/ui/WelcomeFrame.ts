@@ -15,12 +15,6 @@ class WelcomeFrame extends ScriptWidget {
         this.recentSource = new Atomic.UISelectItemSource();
         this.gravity = Atomic.UI_GRAVITY_ALL;
 
-        this.subscribeToEvent("ProjectLoaded", (data) => {
-
-            Editor.getPreferences().registerRecentProject(data.ProjectPath);
-
-        })
-
         var container = <Atomic.UILayout> parent.getWidget("resourceviewcontainer");
 
         container.addChild(this);
@@ -79,9 +73,9 @@ class WelcomeFrame extends ScriptWidget {
         this.recentSource.clear();
 
         // prune any that don't exist
-        Editor.getPreferences().updateRecentFiles();
+        Atomic.editorMode.preferences.updateRecentFiles();
 
-        this.recent = Editor.getPreferences().recentProjects;
+        this.recent = Atomic.editorMode.preferences.recentProjects;
 
         for (var i in this.recent) {
 

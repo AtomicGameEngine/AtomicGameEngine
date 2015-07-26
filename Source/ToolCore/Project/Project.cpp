@@ -113,7 +113,7 @@ bool Project::Load(const String& fullpath)
     else
     {
         projectPath_ = AddTrailingSlash(fullpath);
-        projectFilePath_ = GetFileName(RemoveTrailingSlash(projectPath_) + ".atomic");
+        projectFilePath_ = projectPath_ + GetFileName(RemoveTrailingSlash(projectPath_)) + ".atomic";
 
     }
 

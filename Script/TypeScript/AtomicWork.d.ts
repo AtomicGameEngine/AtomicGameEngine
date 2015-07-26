@@ -172,10 +172,6 @@ declare module Atomic {
 
 }
 
-declare module Editor {
-    export function getPreferences(): AEPreferences;
-}
-
 declare module ToolCore {
 
     export interface ResourceAddedEvent {

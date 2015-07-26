@@ -408,6 +408,8 @@ void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& even
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->RemoveResourceDir(GetCachePath());
+    assets_.Clear();
+    usedGUID_.Clear();
     project_ = 0;
 }
 
