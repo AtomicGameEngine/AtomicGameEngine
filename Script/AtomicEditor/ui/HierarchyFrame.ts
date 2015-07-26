@@ -112,7 +112,13 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.hierList.deleteItemByID(node.id.toString());
 
-        this.sendEvent(EditorEvents.ActiveNodeChange, { node: ev.parent ? ev.parent : this.scene });
+        var selectedId = Number(this.hierList.rootList.selectedItemID);
+        var selectedNode = this.scene.getNode(selectedId);
+        if (selectedNode == node) {
+
+          this.sendEvent(EditorEvents.ActiveNodeChange, { node: ev.parent ? ev.parent : this.scene });
+
+        }
 
     }
 

@@ -174,10 +174,13 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         tbw = tbw->GetParent();
     }
 
-    if (!tbw)
+    if (!tbw || !tbw->GetParent())
         return;
 
     UIWidget* hoverWidget = (UIWidget*) tbw->GetDelegate();
+
+    if (!hoverWidget->GetInternalWidget())
+        return;
 
     if (hoverWidget != currentTargetWidget_)
     {

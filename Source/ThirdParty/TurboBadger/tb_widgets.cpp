@@ -95,6 +95,8 @@ TBWidget::~TBWidget()
     if (m_delegate)
         m_delegate->OnDelete();
 
+    m_delegate = NULL;
+
 	TBWidgetListener::InvokeWidgetDelete(this);
 	DeleteAllChildren();
 

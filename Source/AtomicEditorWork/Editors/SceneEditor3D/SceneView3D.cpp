@@ -153,6 +153,8 @@ void SceneView3D::MoveCamera(float timeStep)
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     if (input->GetMouseButtonDown(MOUSEB_RIGHT))
     {
+
+        SetFocus();
         IntVector2 mouseMove = input->GetMouseMove();
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
@@ -177,16 +179,37 @@ void SceneView3D::MoveCamera(float timeStep)
     //Quaternion q = cameraNode_->GetWorldRotation();
     //LOGINFOF("%f %f %f : %f %f %f %f", pos.x_, pos.y_, pos.z_, q.x_, q.y_, q.z_, q.w_ );
 
-    // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    // Use the Translate() function (default local space) to move relative to the node's orientation.
-    if (input->GetKeyDown('W'))
-        cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
-        cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
-        cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
-        cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#else
+    bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#endif
+
+    if (!superdown) {
+
+        // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
+        // Use the Translate() function (default local space) to move relative to the node's orientation.
+        if (input->GetKeyDown('W'))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
+        }
+        if (input->GetKeyDown('S'))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
+        }
+        if (input->GetKeyDown('A'))
+        {   SetFocus();
+            cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
+        }
+        if (input->GetKeyDown('D'))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
+        }
+
+    }
 }
 
 Ray SceneView3D::GetCameraRay()
@@ -270,6 +293,8 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
     {
+        SetFocus();
+
         if (!mouseMoved_ && !sceneEditor_->GetGizmo()->Selected())
         {
             Ray camRay  = GetCameraRay();
@@ -518,9 +543,6 @@ void SceneView3D::HandleDragExitWidget(StringHash eventType, VariantMap& eventDa
     if (dragNode_.NotNull())
     {
         scene_->RemoveChild(dragNode_);
-        VariantMap neventData;
-        neventData[EditorActiveNodeChange::P_NODE] = (RefCounted*) 0;
-        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
     }
 
     dragAssetGUID_ = "";
@@ -533,6 +555,13 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
     using namespace DragEnded;
 
     UIDragObject* dragObject = static_cast<UIDragObject*>(eventData[P_DRAGOBJECT].GetPtr());
+
+    if (dragNode_.NotNull())
+    {
+        VariantMap neventData;
+        neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
+        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+    }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())
     {
@@ -570,12 +599,6 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
     }
 
-    if (dragNode_.NotNull())
-    {
-        VariantMap neventData;
-        neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
-        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
-    }
     dragAssetGUID_ = "";
     dragNode_ = 0;
 }
