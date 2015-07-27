@@ -62,12 +62,17 @@ void js_class_declare_internal(JSVM* vm, void* uniqueClassID, const char* packag
         duk_put_prop(ctx, -3);
         duk_pop(ctx);
     }
-    else
+    
+    if (!duk_get_global_string(ctx, package))
     {
-        assert(String("Atomic") == package );
+        // Failure leaves undefined on the stack
+        duk_pop(ctx);
+        // Create a new namespace object for the package
+        duk_push_object(ctx);
+        duk_put_global_string(ctx, package);
+        duk_get_global_string(ctx, package);
     }
 
-    duk_get_global_string(ctx, package);
     duk_push_c_function(ctx, constructor, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, classname);
     duk_pop(ctx);
