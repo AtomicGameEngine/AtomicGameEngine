@@ -14,6 +14,8 @@ $RAKE_ROOT = File.dirname(__FILE__)
 
 ARTIFACTS_FOLDER = "#{$RAKE_ROOT}/Artifacts"
 
+$CMAKE_DEV_BUILD = "-DATOMIC_DEV_BUILD=1"
+
 CMAKE_WINDOWS_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Windows_Build"
 CMAKE_MACOSX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/MacOSX_Build"
 CMAKE_ANDROID_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Android_Build"
@@ -22,6 +24,8 @@ CMAKE_WEB_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Web_Build"
 CMAKE_LINUX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Linux_Build"
 
 ATOMICTOOL_BIN_MACOSX = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicTool/Release/AtomicTool"
+
+PACKAGE_FOLDER_MACOSX = "#{ARTIFACTS_FOLDER}/MacOSX_Package"
 
 namespace :build  do
 
@@ -69,7 +73,7 @@ namespace :build  do
 
     Dir.chdir(CMAKE_MACOSX_BUILD_FOLDER) do
 
-      sh "cmake ../../ -G Xcode"
+      sh "cmake ../../ -G Xcode #{$CMAKE_DEV_BUILD}"
       sh "xcodebuild -configuration Release"
 
     end
@@ -144,5 +148,51 @@ namespace :build  do
 
   end
 
+end
+
+namespace :clean do
+
+  task :macosx do
+
+    folders = ["#{CMAKE_MACOSX_BUILD_FOLDER}", "#{PACKAGE_FOLDER_MACOSX}"]
+
+    for index in 0 ... folders.size
+
+        if Dir.exists?(folders[index])
+            sh "rm -rf #{folders[index]}"
+        end
+
+        if Dir.exists?(folders[index])
+            abort("Unable to clean #{folders[index]}")
+        end
+
+    end
+
+  end
+
+end
+
+
+namespace :package  do
+
+  $CMAKE_DEV_BUILD = "-DATOMIC_DEV_BUILD=0"
+
+  task :macosx =>  ["clean:macosx", "build:macosx"] do
+
+    FileUtils.mkdir_p("#{PACKAGE_FOLDER_MACOSX}")
+
+    MAC_EDITOR_APP_FOLDER_SRC = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicEditor/Release/AtomicEditor.app"
+
+    sh "cp -r #{MAC_EDITOR_APP_FOLDER_SRC} #{PACKAGE_FOLDER_MACOSX}"
+
+    # copy resources
+
+    sh "cp -r #{$RAKE_ROOT}/Resources/CoreData #{PACKAGE_FOLDER_MACOSX}/AtomicEditor.app/Contents/Resources/"
+    sh "cp -r #{$RAKE_ROOT}/Resources/EditorData #{PACKAGE_FOLDER_MACOSX}/AtomicEditor.app/Contents/Resources/"
+    sh "cp -r #{$RAKE_ROOT}/Resources/PlayerData #{PACKAGE_FOLDER_MACOSX}/AtomicEditor.app/Contents/Resources/"
+    sh "cp -r #{$RAKE_ROOT}/Script #{PACKAGE_FOLDER_MACOSX}/AtomicEditor.app/Contents/Resources/"
+    sh "cp -r #{$RAKE_ROOT}/Data/AtomicEditor/ProjectTemplates #{PACKAGE_FOLDER_MACOSX}/AtomicEditor.app/Contents/Resources/"
+
+  end
 
 end

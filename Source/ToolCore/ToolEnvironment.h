@@ -23,23 +23,29 @@ public:
     ToolEnvironment(Context* context);
     virtual ~ToolEnvironment();
 
-    // dev build init env from json
-    bool InitFromJSON();
+    bool InitFromPackage();
 
+    // dev build init env from json
+    bool InitFromJSON(bool atomicTool = false);
+
+    /// Root source and build directories for development source tree builds
     void SetRootSourceDir(const String& sourceDir);
     void SetRootBuildDir(const String& buildDir, bool setBinaryPaths = false);
 
     const String& GetRootSourceDir() { return rootSourceDir_; }
     const String& GetRootBuildDir() { return rootBuildDir_; }
 
+    /// Binaries
     const String& GetEditorBinary() { return editorBinary_; }
     const String& GetPlayerBinary() { return playerBinary_; }
     const String& GetToolBinary() { return toolBinary_; }
 
+    /// Resource directories
     const String& GetCoreDataDir() { return resourceCoreDataDir_; }
     const String& GetPlayerDataDir() { return resourcePlayerDataDir_; }
     const String& GetEditorDataDir() { return resourceEditorDataDir_; }
 
+    /// Data directories
     const String& GetDeploymentDataDir() { return toolBinary_; }
 
     const String& GetProjectTemplatesDir() { return projectTemplatesDir_; }

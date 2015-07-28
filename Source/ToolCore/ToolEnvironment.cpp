@@ -26,19 +26,33 @@ ToolEnvironment::~ToolEnvironment()
 
 }
 
-bool ToolEnvironment::InitFromJSON()
+bool ToolEnvironment::InitFromPackage()
 {
 
-#ifndef ATOMIC_DEV_BUILD
-    return false;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    editorBinary_ = rootBuildDir_ + fileSystem->GetProgramDir();
 #else
+    editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
+    String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
+    projectTemplatesDir_ = resourcesDir + "ProjectTemplates/";
+#endif
+
+    return true;
+
+}
+
+bool ToolEnvironment::InitFromJSON(bool atomicTool)
+{
+
 
     // make sure config path is initialized
     GetDevConfigFilename();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    if (!fileSystem->FileExists(devConfigFilename_))
+    if (atomicTool || !fileSystem->FileExists(devConfigFilename_))
     {
         // default to build directories
 
@@ -79,8 +93,6 @@ bool ToolEnvironment::InitFromJSON()
 
     return true;
 
-#endif
-
 }
 
 
@@ -120,14 +132,14 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
 
 #ifdef _DEBUG
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Debug/AtomicPlayer.exe";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditorWork/Debug/AtomicEditorWork.exe";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Debug/AtomicEditor.exe";
 #else
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Release/AtomicPlayer.exe";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditorWork/Release/AtomicEditorWork.exe";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Release/AtomicEditor.exe";
 #endif
 #elif ATOMIC_PLATFORM_OSX
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditorWork/AtomicEditorWork.app/Contents/MacOS/AtomicEditorWork";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.app/Contents/MacOS/AtomicEditor";
 #endif
     }
 
@@ -146,6 +158,8 @@ void ToolEnvironment::Dump()
     LOGINFOF("Player Binary: %s", playerBinary_.CString());
     LOGINFOF("Tool Binary: %s", toolBinary_.CString());
 
+
+    LOGINFOF("Project Templates Dir: %s", projectTemplatesDir_.CString());
     LOGINFOF("Examples Dir: %s", examplesDir_.CString());
 
     LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());

@@ -67,12 +67,6 @@ void AtomicTool::Setup()
         }
 
     }
-#ifndef ATOMIC_DEV_BUILD
-    if (!cliDataPath_.Length())
-    {
-        ErrorExit("Unable to parse --data-path");
-    }
-#endif
 
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
@@ -205,7 +199,7 @@ void AtomicTool::Start()
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);
 
-#ifdef ATOMIC_DEV_BUILD
+//#ifdef ATOMIC_DEV_BUILD
 
     if (!env->InitFromJSON())
     {
@@ -218,7 +212,7 @@ void AtomicTool::Start()
         cliDataPath_ = env->GetRootSourceDir() + "/Resources/";
     }
 
-#endif
+//#endif
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->AddResourceDir(env->GetCoreDataDir());

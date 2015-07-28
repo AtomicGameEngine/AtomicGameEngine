@@ -41,17 +41,22 @@ declare module ToolCore {
 
       constructor();
 
-      initFromJSON(): boolean;
+      initFromPackage(): boolean;
+      initFromJSON(atomicTool?: boolean): boolean;
+      // Root source and build directories for development source tree builds
       setRootSourceDir(sourceDir: string): void;
       setRootBuildDir(buildDir: string, setBinaryPaths?: boolean): void;
       getRootSourceDir(): string;
       getRootBuildDir(): string;
+      // Binaries
       getEditorBinary(): string;
       getPlayerBinary(): string;
       getToolBinary(): string;
+      // Resource directories
       getCoreDataDir(): string;
       getPlayerDataDir(): string;
       getEditorDataDir(): string;
+      // Data directories
       getDeploymentDataDir(): string;
       getProjectTemplatesDir(): string;
       getExamplesDir(): string;

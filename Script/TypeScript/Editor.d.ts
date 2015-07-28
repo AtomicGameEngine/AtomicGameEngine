@@ -20,6 +20,16 @@ declare module Editor {
    export var AXIS_LOCAL: AxisMode;
 
 
+   export var FINDTEXT_FLAG_NONE: number;
+   export var FINDTEXT_FLAG_CASESENSITIVE: number;
+   export var FINDTEXT_FLAG_WHOLEWORD: number;
+   export var FINDTEXT_FLAG_WRAP: number;
+   export var FINDTEXT_FLAG_NEXT: number;
+   export var FINDTEXT_FLAG_PREV: number;
+   export var EDITOR_MODALERROR: number;
+   export var EDITOR_MODALINFO: number;
+
+
 //----------------------------------------------------
 // MODULE: Editor
 //----------------------------------------------------

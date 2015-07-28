@@ -1,7 +1,7 @@
 {
 	"name" : "Editor",
-	"sources" : ["Source/AtomicEditorWork/Application", "Source/AtomicEditorWork/Utils",
-							"Source/AtomicEditorWork/EditorMode", "Source/AtomicEditorWork/PlayerMode",
-							 "Source/AtomicEditorWork/Editors", "Source/AtomicEditorWork/Editors/SceneEditor3D"],
+	"sources" : ["Source/AtomicEditor/Application", "Source/AtomicEditor/Utils",
+							"Source/AtomicEditor/EditorMode", "Source/AtomicEditor/PlayerMode",
+							 "Source/AtomicEditor/Editors", "Source/AtomicEditor/Editors/SceneEditor3D"],
 	"classes" : ["EditorMode", "PlayerMode", "FileUtils", "AEPreferences", "ResourceEditor", "JSResourceEditor", "SceneEditor3D", "SceneView3D"]
 }
