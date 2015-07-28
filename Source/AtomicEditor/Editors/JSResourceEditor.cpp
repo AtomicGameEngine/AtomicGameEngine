@@ -2,7 +2,6 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "AtomicEditor.h"
 #include <Atomic/Container/ArrayPtr.h>
 #include <Atomic/UI/UI.h>
 #include <Atomic/IO/Log.h>

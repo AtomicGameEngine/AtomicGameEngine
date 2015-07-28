@@ -2,8 +2,6 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "AtomicEditor.h"
-
 #include <rapidjson/document.h>
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/filestream.h"
@@ -14,7 +12,7 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/Graphics/Graphics.h>
 
-#include "AEEvents.h"
+#include "../EditorMode/AEEditorEvents.h"
 #include "AEPreferences.h"
 
 using namespace rapidjson;

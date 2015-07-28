@@ -4,7 +4,6 @@
 
 #include <TurboBadger/tb_tab_container.h>
 
-#include "AtomicEditor.h"
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
 

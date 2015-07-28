@@ -115,8 +115,20 @@ void AEPlayerApplication::Setup()
 
                 value = AddTrailingSlash(value);
 
+#ifdef ATOMIC_DEV_BUILD
+
                 String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%s/;%s/Resources;%s;%sCache",
                          ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
+
+#else
+
+#ifdef __APPLE__
+                engineParameters_["ResourcePrefixPath"] = "../Resources";
+#endif
+
+                String resourcePaths = ToString("CoreData;PlayerData;%s/;%s/Resources;%s;%sCache",
+                                                              value.CString(), value.CString(), value.CString(), value.CString());
+#endif
 
                 LOGINFOF("Adding ResourcePaths: %s", resourcePaths.CString());
 

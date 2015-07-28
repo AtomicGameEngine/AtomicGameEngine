@@ -1,8 +1,6 @@
 
 #include <Poco/File.h>
 
-#include "AtomicEditor.h"
-
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>

@@ -2,7 +2,6 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "AtomicEditor.h"
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Scene/Scene.h>
@@ -17,14 +16,13 @@
 
 #include <Atomic/Physics/PhysicsWorld.h>
 
-#include "AEEditor.h"
-#include "AEEvents.h"
-
 #include <Atomic/Input/Input.h>
 #include <Atomic/UI/UI.h>
 
 #include <ToolCore/Assets/AssetDatabase.h>
 #include <ToolCore/Assets/Asset.h>
+
+#include "../../EditorMode/AEEditorEvents.h"
 
 #include "SceneEditor3D.h"
 #include "SceneEditor3DEvents.h"

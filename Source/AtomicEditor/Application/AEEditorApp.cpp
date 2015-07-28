@@ -105,6 +105,9 @@ void AEEditorApp::Setup()
         ErrorExit(ToString("Unable to initialize tool environment from %s", env->GetDevConfigFilename().CString()));
         return;
     }
+#else
+
+    env->InitFromPackage();
 
 #endif
 
@@ -127,7 +130,10 @@ void AEEditorApp::Setup()
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
 
-    #error ATOMIC_DEV_BUILD not defined
+#ifdef __APPLE__
+    engineParameters_["ResourcePrefixPath"] = "../Resources";
+    engineParameters_["ResourcePaths"] = "CoreData;EditorData;Script";
+#endif
 
 #endif // ATOMIC_DEV_BUILD
 

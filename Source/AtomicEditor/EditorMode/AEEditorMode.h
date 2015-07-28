@@ -3,6 +3,8 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "AEEditorEvents.h"
+
 namespace Atomic
 {
     class IPCBroker;
