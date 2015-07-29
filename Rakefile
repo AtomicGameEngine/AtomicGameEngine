@@ -62,7 +62,7 @@ namespace :build  do
       sh "cmake ../../ -G \"Visual Studio 14 2015\""
 
       # specify 32 bit
-      sh "msbuild /m Atomic.sln /p:Configuration=Release /p:Platform=x86"
+      sh "msbuild /m Atomic.sln /p:Configuration=Release /p:Platform=Win32"
 
     end
 
