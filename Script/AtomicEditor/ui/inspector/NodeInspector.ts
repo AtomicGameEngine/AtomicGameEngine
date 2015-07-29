@@ -11,43 +11,6 @@ class NodeInspector extends ScriptWidget {
         super();
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
-        this.subscribeToEvent("KeyUp", (data) => { this.handleKeyUp(data) });
-
-    }
-
-    handleKeyUp(data) {
-
-        if (data.key == 27) {
-
-            if (this.nodeLayout) {
-                this.sendEvent("EditorActiveNodeChange", { node: null });
-                this.nodeLayout.deleteAllChildren();
-                this.nodeLayout = null;
-            }
-        }
-
-        if (data.key == 92) {
-
-            // '\' is  delete for now
-
-            if (this.node) {
-
-                var node = this.node;
-                this.node = null;
-
-                this.nodeLayout.deleteAllChildren();
-                this.nodeLayout = null;
-
-                if (node.parent) {
-                    node.parent.removeChild(node);
-                }
-
-                node.removeComponents(true, true);
-
-
-            }
-
-        }
 
     }
 
