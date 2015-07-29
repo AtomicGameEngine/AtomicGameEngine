@@ -32,15 +32,15 @@ bool ToolEnvironment::InitFromPackage()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-    editorBinary_ = rootBuildDir_ + fileSystem->GetProgramDir();
+	editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
 #else
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
-    String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
-    projectTemplatesDir_ = resourcesDir + "ProjectTemplates/";
 #endif
 
-    return true;
+	String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
+	projectTemplatesDir_ = resourcesDir + "ProjectTemplates/";
 
+    return true;
 }
 
 bool ToolEnvironment::InitFromJSON(bool atomicTool)

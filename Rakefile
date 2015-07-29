@@ -26,6 +26,7 @@ CMAKE_LINUX_BUILD_FOLDER = "#{ARTIFACTS_FOLDER}/Linux_Build"
 ATOMICTOOL_BIN_MACOSX = "#{CMAKE_MACOSX_BUILD_FOLDER}/Source/AtomicTool/Release/AtomicTool"
 
 PACKAGE_FOLDER_MACOSX = "#{ARTIFACTS_FOLDER}/MacOSX_Package"
+PACKAGE_FOLDER_WINDOWS = "#{ARTIFACTS_FOLDER}/Windows_Package"
 
 namespace :build  do
 
@@ -58,7 +59,7 @@ namespace :build  do
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
 
-      sh "cmake ../../ -G \"Visual Studio 12 2013 Win64\""
+      sh "cmake ../../ -G \"Visual Studio 14 2015\""
       sh "msbuild /m Atomic.sln /p:Configuration=Release"
 
     end
@@ -170,6 +171,26 @@ namespace :clean do
 
   end
 
+
+  task :windows do
+
+    folders = ["#{CMAKE_WINDOWS_BUILD_FOLDER}", "#{PACKAGE_FOLDER_WINDOWS}"]
+
+    for index in 0 ... folders.size
+
+        if Dir.exists?(folders[index])
+          FileUtils.rmtree("#{folders[index]}")
+        end
+
+        if Dir.exists?(folders[index])
+            abort("Unable to clean #{folders[index]}")
+        end
+
+    end
+
+  end
+
+
 end
 
 
@@ -194,5 +215,27 @@ namespace :package  do
     sh "cp -r #{$RAKE_ROOT}/Data/AtomicEditor/ProjectTemplates #{PACKAGE_FOLDER_MACOSX}/AtomicEditor.app/Contents/Resources/"
 
   end
+
+  task :windows => ["clean:windows", "build:windows"] do
+
+    FileUtils.mkdir_p("#{PACKAGE_FOLDER_WINDOWS}/Resources")
+
+    FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/Release/AtomicEditor.exe", "#{PACKAGE_FOLDER_WINDOWS}/AtomicEditor.exe" )
+
+    #32 bit build for packaging!
+
+
+    FileUtils.cp("#{$RAKE_ROOT}/Build/Windows/Binaries/x86/D3DCompiler_47.dll", "#{PACKAGE_FOLDER_WINDOWS}/D3DCompiler_47.dll" )
+
+    # copy resources
+
+    FileUtils.cp_r("#{$RAKE_ROOT}/Resources/CoreData",  "#{PACKAGE_FOLDER_WINDOWS}/Resources");
+    FileUtils.cp_r("#{$RAKE_ROOT}/Resources/EditorData", "#{PACKAGE_FOLDER_WINDOWS}/Resources");
+    FileUtils.cp_r("#{$RAKE_ROOT}/Resources/PlayerData", "#{PACKAGE_FOLDER_WINDOWS}/Resources");
+    FileUtils.cp_r("#{$RAKE_ROOT}/Script", "#{PACKAGE_FOLDER_WINDOWS}/Resources");
+    FileUtils.cp_r("#{$RAKE_ROOT}/Data/AtomicEditor/ProjectTemplates", "#{PACKAGE_FOLDER_WINDOWS}/Resources");
+
+  end
+
 
 end

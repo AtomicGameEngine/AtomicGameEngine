@@ -130,10 +130,14 @@ void AEEditorApp::Setup()
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
 
-#ifdef __APPLE__
+#ifdef ATOMIC_PLATFORM_OSX
     engineParameters_["ResourcePrefixPath"] = "../Resources";
-    engineParameters_["ResourcePaths"] = "CoreData;EditorData;Script";
+    
+#else
+	engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
 #endif
+
+	engineParameters_["ResourcePaths"] = "CoreData;EditorData;Script";
 
 #endif // ATOMIC_DEV_BUILD
 
