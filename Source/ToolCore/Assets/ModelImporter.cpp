@@ -56,6 +56,10 @@ bool ModelImporter::ImportModel()
 
         return true;
     }
+    else
+    {
+        asset_->PostImportError(importer->GetErrorMessage());
+    }
 
     return false;
 }

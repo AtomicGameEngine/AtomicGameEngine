@@ -115,7 +115,10 @@ bool OpenAssetImporter::Load(const String &assetPath)
     scene_ = aiImportFile(GetNativePath(assetPath).CString(), aiCurrentFlags_);
 
     if (!scene_)
-        ErrorExit("Could not open or parse input file " + assetPath + ": " + String(aiGetErrorString()));
+    {
+        errorMessage_ = "Could not open or parse input file " + assetPath + ": " + String(aiGetErrorString());
+        return false;
+    }
 
     if (verboseLog_)
         Assimp::DefaultLogger::kill();
