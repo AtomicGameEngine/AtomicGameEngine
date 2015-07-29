@@ -82,9 +82,9 @@ namespace :build  do
     end
 
     # build the Atomic Editor
-    Dir.chdir("#{$RAKE_ROOT}/Script/AtomicEditor") do
-      sh "tsc"
-    end
+    #Dir.chdir("#{$RAKE_ROOT}/Script/AtomicEditor") do
+      #sh "tsc"
+    #end
 
 
   end
