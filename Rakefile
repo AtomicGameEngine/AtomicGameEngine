@@ -60,7 +60,9 @@ namespace :build  do
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
 
       sh "cmake ../../ -G \"Visual Studio 14 2015\""
-      sh "msbuild /m Atomic.sln /p:Configuration=Release"
+
+      # specify 32 bit
+      sh "msbuild /m Atomic.sln /property:Configuration=Release /p:PlatformTarget=x86"
 
     end
 
