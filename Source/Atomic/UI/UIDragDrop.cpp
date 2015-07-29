@@ -20,6 +20,8 @@
 #include "UIDragDropMac.h"
 #elif ATOMIC_PLATFORM_WINDOWS
 #include "UIDragDropWindows.h"
+#else
+namespace Atomic { void InitDragAndDrop(UIDragDrop *dragAndDrop) {} }
 #endif
 
 using namespace tb;

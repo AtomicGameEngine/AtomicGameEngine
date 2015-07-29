@@ -28,7 +28,7 @@
 #include "../IO/Serializer.h"
 
 #ifdef ANDROID
-#include <SDL/SDL_rwops.h>
+#include <SDL/include/SDL_rwops.h>
 #endif
 
 namespace Atomic
@@ -86,7 +86,7 @@ public:
     void SetName(const String& name);
     /// Set the fullpath to the file
     void SetFullPath(const String& path) { fullPath_ = path; }
-    
+
 
     /// Return the open mode.
     FileMode GetMode() const { return mode_; }
@@ -107,7 +107,7 @@ public:
     /// Unlike FileSystem.Copy this copy works when the source file is in a package file
     bool Copy(File* srcFile);
     // Atomic End
-    
+
 
 private:
     /// File name.
