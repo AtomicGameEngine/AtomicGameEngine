@@ -2,6 +2,18 @@ import EditorEvents = require("../editor/EditorEvents");
 
 class ResourceOps extends Atomic.ScriptObject {
 
+    constructor() {
+
+        super();
+
+        this.subscribeToEvent("AssetImportError", (ev: ToolCore.AssetImportErrorEvent) => {
+
+            resourceOps.sendEvent(EditorEvents.ModalError, { title: "Asset Import Error", message: ev.error });
+
+        })
+
+    }
+
 
 }
 

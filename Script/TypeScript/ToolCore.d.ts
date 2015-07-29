@@ -215,6 +215,7 @@ declare module ToolCore {
 
    export class OpenAssetImporter extends Atomic.AObject {
 
+      errorMessage: string;
       importNode: Atomic.Node;
       startTime: number;
       endTime: number;
@@ -225,6 +226,7 @@ declare module ToolCore {
       constructor();
 
       load(assetPath: string): boolean;
+      getErrorMessage(): string;
       exportModel(outName: string, animName?: string, animationOnly?: boolean): void;
       setImportNode(node: Atomic.Node): void;
       setStartTime(startTime: number): void;
@@ -264,6 +266,7 @@ declare module ToolCore {
       getImporterType(): string;
       getImporterTypeName(): string;
       getImporter(): AssetImporter;
+      postImportError(message: string): void;
       getParent(): Asset;
       setDirty(dirty: boolean): void;
       isDirty(): boolean;
