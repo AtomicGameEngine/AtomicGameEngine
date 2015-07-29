@@ -38,6 +38,8 @@
 
 #ifdef ATOMIC_3D
 #include "../Atomic3D/AnimatedModel.h"
+#else
+#include "../Scene/Node.h"
 #endif
 namespace Atomic
 {
