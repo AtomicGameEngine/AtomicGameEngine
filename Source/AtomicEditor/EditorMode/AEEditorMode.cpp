@@ -80,6 +80,9 @@ bool EditorMode::PlayProject()
 
     Project* project = tsystem->GetProject();
 
+    if (!project)
+        return false;
+
     Vector<String> paths;
     paths.Push(env->GetCoreDataDir());
     paths.Push(env->GetPlayerDataDir());

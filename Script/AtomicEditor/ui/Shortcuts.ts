@@ -35,6 +35,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
         // pretty gross
         var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+        if (!editor) return;
         editor.close(true);
 
     }

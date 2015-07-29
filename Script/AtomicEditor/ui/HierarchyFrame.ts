@@ -116,7 +116,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         var selectedNode = this.scene.getNode(selectedId);
         if (selectedNode == node) {
 
-          this.sendEvent(EditorEvents.ActiveNodeChange, { node: ev.parent ? ev.parent : this.scene });
+            this.sendEvent(EditorEvents.ActiveNodeChange, { node: ev.parent ? ev.parent : this.scene });
 
         }
 
@@ -149,6 +149,24 @@ class HierarchyFrame extends Atomic.UIWidget {
     }
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
+
+        if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+
+            if (data.key == Atomic.KEY_DELETE || data.key == Atomic.KEY_BACKSPACE) {
+
+                var selectedId = Number(this.hierList.rootList.selectedItemID);
+
+                var node = this.scene.getNode(selectedId);
+                if (node) {
+
+                  node.removeAllComponents();
+                  node.remove();
+
+                }
+
+            }
+
+        }
 
         if (data.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
 

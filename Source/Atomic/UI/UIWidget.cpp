@@ -120,6 +120,12 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
         case TB_KEY_ENTER:
             key = KEY_RETURN;
             break;
+        case TB_KEY_BACKSPACE:
+            key = KEY_BACKSPACE;
+            break;
+        case TB_KEY_DELETE:
+            key = KEY_DELETE;
+            break;
         default:
             break;
         }

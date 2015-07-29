@@ -99,6 +99,19 @@ SceneEditor3D::~SceneEditor3D()
 
 bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_KEY_UP)
+    {
+        if (ev.special_key == TB_KEY_DELETE || ev.special_key == TB_KEY_BACKSPACE)
+        {
+            if (selectedNode_)
+            {
+                selectedNode_->RemoveAllComponents();
+                selectedNode_->Remove();
+                selectedNode_ = 0;
+            }
+        }
+
+    }
 
     if (ev.type == EVENT_TYPE_SHORTCUT)
     {
