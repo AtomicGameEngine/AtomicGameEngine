@@ -566,7 +566,7 @@ void Light2DGroup::UpdateSourceBatches()
 
 }
 
-void Light2DGroup::AddLight(Light2D* light)
+void Light2DGroup::AddLight2D(Light2D* light)
 {
     for (Vector<WeakPtr<Light2D> >::ConstIterator itr = lights_.Begin(); itr != lights_.End(); itr++)
         if (*itr == light)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,10 @@ ATOMIC_API bool ToBool(const char* source);
 ATOMIC_API float ToFloat(const String& source);
 /// Parse a float from a C string.
 ATOMIC_API float ToFloat(const char* source);
+/// Parse a double from a string.
+ATOMIC_API double ToDouble(const String& source);
+/// Parse a double from a C string.
+ATOMIC_API double ToDouble(const char* source);
 /// Parse an integer from a string.
 ATOMIC_API int ToInt(const String& source);
 /// Parse an integer from a C string.

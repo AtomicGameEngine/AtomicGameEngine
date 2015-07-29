@@ -28,17 +28,19 @@ class IPCMessageEvent
 
 public:
 
-    bool DoRead(MemoryBuffer& buffer, StringHash& eventType, VariantMap& eventData)
+    bool DoRead(MemoryBuffer& buffer, unsigned& id, StringHash& eventType, VariantMap& eventData)
     {
+        id = buffer.ReadUInt();
         eventType = buffer.ReadStringHash();
         eventData.Clear();
         eventData = buffer.ReadVariantMap();
         return true;
     }
 
-    bool DoSend(PipeTransport& transport, const StringHash& eventType, const VariantMap& eventData)
+    bool DoSend(PipeTransport& transport, unsigned id, const StringHash& eventType, const VariantMap& eventData)
     {
         VectorBuffer buffer;
+        buffer.WriteUInt(id);
         buffer.WriteStringHash(eventType);
         buffer.WriteVariantMap(eventData);
 

@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Engine/Application.h"
 #include "../Engine/Engine.h"
 #ifdef IOS
@@ -29,9 +30,6 @@
 #endif
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
-#include "../Core/ProcessUtils.h"
-
-#include <exception>
 
 #include "../DebugNew.h"
 
@@ -43,13 +41,6 @@ namespace Atomic
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
 #endif
-// SDL2 needs a main loop to be running during initialization
-// otherwise EGL will error, so this is the main loop used during init
-// and is canceled once everything is initialized
-void InitializationMainLoop()
-{
-
-}
 void RunFrame(void* data)
 {
     static_cast<Engine*>(data)->RunFrame();
@@ -76,10 +67,6 @@ int Application::Run()
     // Thus, the try-catch block below should be optimised out except in Debug build configuration
     try
     {
-  #if defined(EMSCRIPTEN)
-        emscripten_set_main_loop(InitializationMainLoop, 0, 0);
-  #endif
-
         Setup();
         if (exitCode_)
             return exitCode_;
@@ -95,23 +82,20 @@ int Application::Run()
             return exitCode_;
 
         // Platforms other than iOS and EMSCRIPTEN run a blocking main loop
-        #if !defined(IOS) && !defined(EMSCRIPTEN)
+#if !defined(IOS) && !defined(EMSCRIPTEN)
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
         Stop();
         // iOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
         // support calling the Stop() function, as the application will never stop manually
-        #else
-        #if defined(IOS)
+#else
+#if defined(IOS)
         SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetImpl()->GetWindow(), 1, &RunFrame, engine_);
-        #elif defined(EMSCRIPTEN)
-        // cancel the initialization loop
-        emscripten_cancel_main_loop();
-        // and run the engine loop
+#elif defined(EMSCRIPTEN)
         emscripten_set_main_loop_arg(RunFrame, engine_, 0, 1);
-        #endif
-        #endif
+#endif
+#endif
 
         return exitCode_;
     }
@@ -130,10 +114,10 @@ void Application::ErrorExit(const String& message)
     // Only for WIN32, otherwise the error messages would be double posted on Mac OS X and Linux platforms
     if (!message.Length())
     {
-        #ifdef WIN32
+#ifdef WIN32
         ErrorDialog(GetTypeName(), startupErrors_.Length() ? startupErrors_ :
             "Application has been terminated due to unexpected error.");
-        #endif
+#endif
     }
     else
         ErrorDialog(GetTypeName(), message);

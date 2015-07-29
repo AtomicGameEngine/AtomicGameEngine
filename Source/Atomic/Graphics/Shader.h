@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ShaderVariation;
 class ATOMIC_API Shader : public Resource
 {
     OBJECT(Shader);
-    
+
 public:
     /// Construct.
     Shader(Context* context);
@@ -42,21 +42,23 @@ public:
     virtual ~Shader();
     /// Register object factory.
     static void RegisterObject(Context* context);
-    
+
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
-    
+
     /// Return a variation with defines.
     ShaderVariation* GetVariation(ShaderType type, const String& defines);
     /// Return a variation with defines.
     ShaderVariation* GetVariation(ShaderType type, const char* defines);
+
     /// Return either vertex or pixel shader source code.
     const String& GetSourceCode(ShaderType type) const { return type == VS ? vsSourceCode_ : psSourceCode_; }
+
     /// Return the latest timestamp of the shader code and its includes.
     unsigned GetTimeStamp() const { return timeStamp_; }
-    
+
 private:
     /// Process source code and include files. Return true if successful.
     bool ProcessSource(String& code, Deserializer& file);
@@ -64,7 +66,7 @@ private:
     String NormalizeDefines(const String& defines);
     /// Recalculate the memory used by the shader.
     void RefreshMemoryUse();
-    
+
     /// Source code adapted for vertex shader.
     String vsSourceCode_;
     /// Source code adapted for pixel shader.

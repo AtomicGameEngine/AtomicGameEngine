@@ -1,4 +1,4 @@
-include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty)
+include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Assimp/include)
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 

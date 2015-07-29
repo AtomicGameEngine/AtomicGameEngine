@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Atomic2D/CollisionShape2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Scene/Node.h"
+#include "../Scene/Scene.h"
+#include "../Atomic2D/CollisionShape2D.h"
 #include "../Atomic2D/PhysicsUtils2D.h"
 #include "../Atomic2D/RigidBody2D.h"
-#include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
 
@@ -37,7 +38,7 @@ namespace Atomic
 extern const char* ATOMIC2D_CATEGORY;
 
 CollisionShape2D::CollisionShape2D(Context* context) :
-    Component(context), 
+    Component(context),
     fixture_(0),
     cachedWorldScale_(Vector3::ONE)
 {
@@ -88,7 +89,7 @@ void CollisionShape2D::SetTrigger(bool trigger)
 
     if (fixture_)
         fixture_->SetSensor(trigger);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -97,11 +98,11 @@ void CollisionShape2D::SetCategoryBits(int categoryBits)
     if (fixtureDef_.filter.categoryBits == categoryBits)
         return;
 
-    fixtureDef_.filter.categoryBits = categoryBits;
+    fixtureDef_.filter.categoryBits = (uint16)categoryBits;
 
     if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
-    
+
     MarkNetworkUpdate();
 }
 
@@ -110,7 +111,7 @@ void CollisionShape2D::SetMaskBits(int maskBits)
     if (fixtureDef_.filter.maskBits == maskBits)
         return;
 
-    fixtureDef_.filter.maskBits = maskBits;
+    fixtureDef_.filter.maskBits = (uint16)maskBits;
 
     if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
@@ -123,7 +124,7 @@ void CollisionShape2D::SetGroupIndex(int groupIndex)
     if (fixtureDef_.filter.groupIndex == groupIndex)
         return;
 
-    fixtureDef_.filter.groupIndex = groupIndex;
+    fixtureDef_.filter.groupIndex = (int16)groupIndex;
 
     if (fixture_)
         fixture_->SetFilterData(fixtureDef_.filter);
@@ -263,7 +264,7 @@ Vector2 CollisionShape2D::GetMassCenter() const
 {
     if (!fixture_)
         return Vector2::ZERO;
-    
+
     b2MassData massData;
     fixture_->GetMassData(&massData);
 
@@ -303,7 +304,7 @@ void CollisionShape2D::OnMarkedDirty(Node* node)
         scene->DelayedMarkedDirty(this);
         return;
     }
-    
+
     cachedWorldScale_ = newWorldScale;
 
     if (fixture_)

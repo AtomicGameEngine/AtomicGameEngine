@@ -349,6 +349,7 @@ void JSBClass::AddPropertyFunction(JSBFunction* function)
     if (!prop)
     {
         prop = new JSBProperty();
+        prop->name_ = function->GetPropertyName();
         properties_[function->GetPropertyName()] = prop;
     }
 

@@ -16,7 +16,7 @@
 namespace ToolCore
 {
 
-static String GetScriptType(JSBFunctionType* ftype)
+String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
 {
     String scriptType = "number";
 
@@ -38,7 +38,19 @@ static String GetScriptType(JSBFunctionType* ftype)
         scriptType = ftype->type_->asEnumType()->enum_->GetName();
 
     if (ftype->type_->asClassType())
-        scriptType = ftype->type_->asClassType()->class_->GetName();
+    {
+        JSBClass* klass = ftype->type_->asClassType()->class_;
+
+        scriptType = klass->GetName();
+
+        if (klass->GetPackage()->GetName() != package_->GetName())
+        {
+
+            scriptType = klass->GetPackage()->GetName() + "." + klass->GetName();
+
+        }
+
+    }
 
     if (ftype->type_->asVectorType())
     {
@@ -52,6 +64,12 @@ static String GetScriptType(JSBFunctionType* ftype)
 void JSBTypeScript::Begin()
 {
     source_ += "//Atomic TypeScript Definitions\n\n\n";
+
+    if (package_->GetName() != "Atomic")
+    {
+        source_ += "/// <reference path=\"Atomic.d.ts\" />\n\n";
+    }
+
     source_ += "declare module "+ package_->GetName() + " {\n\n";
 }
 
@@ -88,10 +106,16 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
 
         String scriptType = GetScriptType(ftype);
 
-        if (scriptType == "Context")
+        if (scriptType == "Context" || scriptType == "Atomic.Context")
             continue;
 
-        source_ += ftype->name_;
+        String name = ftype->name_;
+
+        // TS doesn't like arguments named arguments
+        if (name == "arguments")
+            name = "args";
+
+        source_ += name;
 
         if (ftype->initializer_.Length())
             source_ += "?";
@@ -171,9 +195,7 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
                 continue;
 
             String scriptType = GetScriptType(ftype);
-
-            String scriptName =  propertyNames[j];
-            scriptName[0] = tolower(scriptName[0]);
+            String scriptName = prop->GetCasePropertyName();
 
             source_ += "      " + scriptName + ": " + scriptType + ";\n";
 
@@ -247,23 +269,21 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
     for (unsigned i = 0; i <enums.Size(); i++)
     {
-        JSBEnum* _enum =enums[i];
+        JSBEnum* _enum = enums[i];
 
-        source_ += "   export enum " + _enum->GetName();
-        source_ += " {\n\n";
+        // can't use a TS enum, so use a type alias
+
+        source_ += "\n   // enum " + _enum->GetName() + "\n";
+        source_ += "   export type " + _enum->GetName() + " = number;\n";
 
         Vector<String>& values = _enum->GetValues();
 
         for (unsigned j = 0; j < values.Size(); j++)
         {
-            source_ += "      " + values[j];
-            if (j !=  values.Size() - 1)
-                source_ += ",\n";
+            source_ += "   export var " + values[j] + ": " +  _enum->GetName() + ";\n";
         }
 
-        source_ += "\n\n   }\n\n";
-
-
+        source_ += "\n";
 
     }
 

@@ -4,7 +4,6 @@
 
 #include <stdint.h>
 
-#include "AtomicEditor.h"
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>

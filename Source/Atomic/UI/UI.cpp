@@ -11,7 +11,10 @@
 #include <TurboBadger/tb_message_window.h>
 #include <TurboBadger/tb_editfield.h>
 #include <TurboBadger/tb_select.h>
+#include <TurboBadger/tb_inline_select.h>
 #include <TurboBadger/tb_tab_container.h>
+#include <TurboBadger/tb_toggle_container.h>
+#include <TurboBadger/tb_scroll_container.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -30,6 +33,8 @@ using namespace tb;
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/VertexBuffer.h"
 
+#include "UIEvents.h"
+
 #include "UIRenderer.h"
 #include "UI.h"
 #include "UIButton.h"
@@ -44,6 +49,13 @@ using namespace tb;
 #include "UISkinImage.h"
 #include "UITabContainer.h"
 #include "UISceneView.h"
+#include "UIDragDrop.h"
+#include "UIContainer.h"
+#include "UISection.h"
+#include "UIInlineSelect.h"
+#include "UIScrollContainer.h"
+#include "UISeparator.h"
+#include "UIDimmer.h"
 
 namespace tb
 {
@@ -76,6 +88,8 @@ UI::~UI()
 {
     if (initialized_)
     {
+        tb::TBWidgetListener::RemoveGlobalListener(this);
+
         TBFile::SetReaderFunction(0);
         TBID::tbidRegisterCallback = 0;
 
@@ -126,6 +140,9 @@ void UI::Initialize(const String& languageFile)
     rootWidget_->SetSize(width, height);
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
+    // register the UIDragDrop subsystem
+    context_->RegisterSubsystem(new UIDragDrop(context_));
+
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
@@ -136,6 +153,8 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+
+    tb::TBWidgetListener::AddGlobalListener(this);
 
     initialized_ = true;
 
@@ -459,6 +478,55 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     // this is order dependent as we're using IsOfType which also works if a base class
 
+    if (widget->IsOfType<TBDimmer>())
+    {
+        UIDimmer* dimmer = new UIDimmer(context_, false);
+        dimmer->SetWidget(widget);
+        widgetWrap_[widget] = dimmer;
+        return dimmer;
+    }
+
+    if (widget->IsOfType<TBScrollContainer>())
+    {
+        UIScrollContainer* container = new UIScrollContainer(context_, false);
+        container->SetWidget(widget);
+        widgetWrap_[widget] = container;
+        return container;
+    }
+
+    if (widget->IsOfType<TBInlineSelect>())
+    {
+        UIInlineSelect* select = new UIInlineSelect(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
+    }
+
+    if (widget->IsOfType<TBSection>())
+    {
+        UISection* section = new UISection(context_, false);
+        section->SetWidget(widget);
+        widgetWrap_[widget] = section;
+        return section;
+    }
+
+    if (widget->IsOfType<TBSeparator>())
+    {
+        UISeparator* sep = new UISeparator(context_, false);
+        sep->SetWidget(widget);
+        widgetWrap_[widget] = sep;
+        return sep;
+    }
+
+
+    if (widget->IsOfType<TBContainer>())
+    {
+        UIContainer* container = new UIContainer(context_, false);
+        container->SetWidget(widget);
+        widgetWrap_[widget] = container;
+        return container;
+    }
+
     if (widget->IsOfType<TBButton>())
     {
         // don't wrap the close button of a TBWindow.close
@@ -553,7 +621,7 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     if (widget->IsOfType<TBLayout>())
     {
-        UILayout* layout = new UILayout(context_, false);
+        UILayout* layout = new UILayout(context_, (UI_AXIS) widget->GetAxis(), false);
         layout->SetWidget(widget);
         widgetWrap_[widget] = layout;
         return layout;
@@ -570,6 +638,17 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     return 0;
 }
+
+void UI::OnWidgetDelete(tb::TBWidget *widget)
+{
+
+}
+
+bool UI::OnWidgetDying(tb::TBWidget *widget)
+{
+    return false;
+}
+
 
 
 }

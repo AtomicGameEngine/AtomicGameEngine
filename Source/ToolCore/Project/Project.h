@@ -55,7 +55,7 @@ public:
     ProjectBuildSettings* GetBuildSettings() { return buildSettings_; }
     ProjectUserPrefs* GetUserPrefs() { return userPrefs_; }
 
-    const String& GetProjectPath() { return projectPath_; }
+    const String& GetProjectPath() const { return projectPath_; }
     const String& GetProjectFilePath() { return projectFilePath_; }
     String GetUserPrefsFullPath();
     String GetBuildSettingsFullPath();

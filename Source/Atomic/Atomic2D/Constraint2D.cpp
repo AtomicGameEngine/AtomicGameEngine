@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Atomic2D/Constraint2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Scene/Node.h"
+#include "../Scene/Scene.h"
+#include "../Atomic2D/Constraint2D.h"
 #include "../Atomic2D/PhysicsUtils2D.h"
 #include "../Atomic2D/RigidBody2D.h"
 #include "../Atomic2D/PhysicsWorld2D.h"
-#include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
 
@@ -126,9 +127,6 @@ void Constraint2D::OnNodeSet(Node* node)
 
     if (node)
     {
-        Scene* scene = GetScene();
-        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
-
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)
         {
@@ -136,6 +134,12 @@ void Constraint2D::OnNodeSet(Node* node)
             return;
         }
     }
+}
+
+void Constraint2D::OnSceneSet(Scene* scene)
+{
+    if (scene)
+        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
 }
 
 void Constraint2D::InitializeJointDef(b2JointDef* jointDef)

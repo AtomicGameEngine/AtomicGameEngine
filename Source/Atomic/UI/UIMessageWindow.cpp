@@ -1,7 +1,7 @@
 
 #include <TurboBadger/tb_widgets.h>
 #include <TurboBadger/tb_widgets_common.h>
-#include <TurboBadger/tb_message_window.h>
+
 
 #include "../IO/Log.h"
 
@@ -29,16 +29,17 @@ UIMessageWindow::~UIMessageWindow()
 
 }
 
-void UIMessageWindow::Show(const String &title, const String &message, int width, int height)
+void UIMessageWindow::Show(const String &title, const String &message, UI_MESSAGEWINDOW_SETTINGS settings, bool dimmer, int width, int height)
 {
     if (!widget_)
         return;
 
-    TBMessageWindowSettings settings;
-    settings.styling = true;
-    settings.dimmer = true;
+    TBMessageWindowSettings tbsettings;
+    tbsettings.msg = (TB_MSG) settings;
+    tbsettings.styling = true;
+    tbsettings.dimmer = dimmer;
 
-    ((TBMessageWindow*)widget_)->Show(title.CString(), message.CString(), &settings, width, height);
+    ((TBMessageWindow*)widget_)->Show(title.CString(), message.CString(), &tbsettings, width, height);
 
 }
 

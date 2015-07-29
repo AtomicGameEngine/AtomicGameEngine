@@ -44,7 +44,6 @@ public:
     bool ExecuteScript(const String& scriptPath);
 
     // Resources/Script/main.js
-    // Catches not requiring AtomicGame, etc
     bool ExecuteMain();
 
     bool ExecuteFunction(const String& functionName);
@@ -164,11 +163,6 @@ public:
     void SendJSErrorEvent(const String& filename = String::EMPTY);
 
 private:
-
-    bool GenerateComponent(const String& cname, const String& jsfilename, const String& csource);
-
-    void InitComponents();
-    void InitPackageComponents();
 
     void SubscribeToEvents();
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

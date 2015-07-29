@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Audio/Audio.h"
-#include "../Core/Context.h"
-#include "../Resource/ResourceCache.h"
 #include "../Audio/Sound.h"
 #include "../Audio/SoundSource.h"
 #include "../Audio/SoundStream.h"
-
-#include <cstring>
+#include "../Core/Context.h"
+#include "../Resource/ResourceCache.h"
 
 #include "../DebugNew.h"
 
@@ -107,6 +106,8 @@ SoundSource::SoundSource(Context* context) :
     panning_(0.0f),
     autoRemoveTimer_(0.0f),
     autoRemove_(false),
+    autoPlay_(false),
+    hasAutoPlayed_(false),
     position_(0),
     fractPosition_(0),
     timePosition_(0.0f),
@@ -116,7 +117,7 @@ SoundSource::SoundSource(Context* context) :
 
     if (audio_)
         audio_->AddSoundSource(this);
-    
+
     UpdateMasterGain();
 }
 
@@ -140,6 +141,8 @@ void SoundSource::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
     ATTRIBUTE("Autoremove on Stop", bool, autoRemove_, false, AM_FILE);
     ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
+
+    ATTRIBUTE("Autoplay", bool, autoPlay_, false, AM_FILE);
 }
 
 void SoundSource::Play(Sound* sound)
@@ -237,7 +240,7 @@ void SoundSource::SetSoundType(const String& type)
     soundType_ = type;
     soundTypeHash_ = StringHash(type);
     UpdateMasterGain();
-    
+
     MarkNetworkUpdate();
 }
 
@@ -294,6 +297,13 @@ void SoundSource::Update(float timeStep)
     if (!audio_->IsInitialized())
         MixNull(timeStep);
 
+    // check for autoPlay
+    if (autoPlay_ && sound_.NotNull() && !hasAutoPlayed_ && !context_->GetEditorContext())
+    {
+        hasAutoPlayed_ = true;
+        Play(sound_);
+    }
+
     // Free the stream if playback has stopped
     if (soundStream_ && !position_)
         StopLockless();
@@ -338,12 +348,12 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         position_ = streamBuffer_->GetStart();
 
         // Request new data from the stream
-        signed char* dest = streamBuffer_->GetStart() + unusedStreamSize_;
-        outBytes = neededSize ? soundStream_->GetData(dest, neededSize) : 0;
-        dest += outBytes;
+        signed char* destination = streamBuffer_->GetStart() + unusedStreamSize_;
+        outBytes = neededSize ? soundStream_->GetData(destination, (unsigned)neededSize) : 0;
+        destination += outBytes;
         // Zero-fill rest if stream did not produce enough data
         if (outBytes < neededSize)
-            memset(dest, 0, neededSize - outBytes);
+            memset(destination, 0, (size_t)(neededSize - outBytes));
 
         // Calculate amount of total bytes of data in stream buffer now, to know how much went unused after mixing
         streamFilledSize = neededSize + unusedStreamSize_;
@@ -397,7 +407,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
 
         unusedStreamSize_ = Max(streamFilledSize - (int)(size_t)(position_ - streamBuffer_->GetStart()), 0);
         if (unusedStreamSize_)
-            memcpy(streamBuffer_->GetStart(), (const void*)position_, unusedStreamSize_);
+            memcpy(streamBuffer_->GetStart(), (const void*)position_, (size_t)unusedStreamSize_);
 
         // If stream did not produce any data, stop if applicable
         if (!outBytes && soundStream_->GetStopAtEnd())
@@ -1233,6 +1243,11 @@ void SoundSource::MixNull(float timeStep)
             timePosition_ = 0.0f;
         }
     }
+}
+
+void SoundSource::SetSound(Sound* sound)
+{
+    if (sound) SetSoundAttr(GetResourceRef(sound, ""));
 }
 
 }

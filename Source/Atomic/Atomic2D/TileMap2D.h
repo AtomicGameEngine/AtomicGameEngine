@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,11 +54,13 @@ public:
 
     /// Return tmx file.
     TmxFile2D* GetTmxFile() const;
+
     /// Return information.
     const TileMapInfo2D& GetInfo() const { return info_; }
 
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
+
     /// Return tile map layer at index.
     TileMapLayer2D* GetLayer(unsigned index) const;
 
@@ -75,9 +77,6 @@ public:
     ResourceRef GetTmxFileAttr() const;
 
 private:
-    /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
-
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;
     /// Tile map information.

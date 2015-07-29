@@ -26,19 +26,33 @@ ToolEnvironment::~ToolEnvironment()
 
 }
 
-bool ToolEnvironment::InitFromJSON()
+bool ToolEnvironment::InitFromPackage()
 {
 
-#ifndef ATOMIC_DEV_BUILD
-    return false;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+	editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
 #else
+    editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
+#endif
+
+	String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
+	projectTemplatesDir_ = resourcesDir + "ProjectTemplates/";
+
+    return true;
+}
+
+bool ToolEnvironment::InitFromJSON(bool atomicTool)
+{
+
 
     // make sure config path is initialized
     GetDevConfigFilename();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    if (!fileSystem->FileExists(devConfigFilename_))
+    if (atomicTool || !fileSystem->FileExists(devConfigFilename_))
     {
         // default to build directories
 
@@ -79,8 +93,6 @@ bool ToolEnvironment::InitFromJSON()
 
     return true;
 
-#endif
-
 }
 
 
@@ -103,9 +115,11 @@ const String& ToolEnvironment::GetDevConfigFilename()
 void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 {
     rootSourceDir_ = AddTrailingSlash(sourceDir);
-    resourceCoreDataDir_ = rootSourceDir_ + "Data/AtomicPlayer/Resources/CoreData";
-    resourcePlayerDataDir_ = rootSourceDir_ + "Data/AtomicPlayer/Resources/PlayerData";
-    resourceEditorDataDir_ = rootSourceDir_ + "Data/AtomicEditor/Resources/EditorData";
+    resourceCoreDataDir_ = rootSourceDir_ + "Resources/CoreData";
+    resourcePlayerDataDir_ = rootSourceDir_ + "Resources/PlayerData";
+    resourceEditorDataDir_ = rootSourceDir_ + "Resources/EditorData";
+
+    projectTemplatesDir_ = rootSourceDir_ + "Data/AtomicEditor/ProjectTemplates/";
 }
 
 void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPaths)
@@ -144,6 +158,8 @@ void ToolEnvironment::Dump()
     LOGINFOF("Player Binary: %s", playerBinary_.CString());
     LOGINFOF("Tool Binary: %s", toolBinary_.CString());
 
+
+    LOGINFOF("Project Templates Dir: %s", projectTemplatesDir_.CString());
     LOGINFOF("Examples Dir: %s", examplesDir_.CString());
 
     LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());

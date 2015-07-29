@@ -2,12 +2,14 @@
 //--player --editor-resource-paths "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/PlayerData!/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources"
 
 #include "../IO/Log.h"
+#include "../Input/InputEvents.h"
 
 #include "UIEvents.h"
 #include "UI.h"
 #include "UIWidget.h"
 #include "UILayout.h"
 #include "UIFontDescription.h"
+#include "UIView.h"
 
 using namespace tb;
 
@@ -15,7 +17,8 @@ namespace Atomic
 {
 
 UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
-    widget_(0)
+    widget_(0),
+    preferredSize_(new UIPreferredSize())
 {    
     AddRef();
 
@@ -55,6 +58,17 @@ bool UIWidget::Load(const String& filename)
     return true;
 }
 
+UIPreferredSize* UIWidget::GetPreferredSize()
+{
+    // error
+    if (!widget_)
+        return preferredSize_;
+
+    preferredSize_->SetFromTBPreferredSize(widget_->GetPreferredSize());
+
+    return preferredSize_;
+}
+
 UIWidget* UIWidget::GetWidget(const String& id)
 {
     if (!widget_)
@@ -75,12 +89,47 @@ void UIWidget::SetWidget(tb::TBWidget* widget)
     widget_->SetDelegate(this);
 }
 
+/*
+enum SPECIAL_KEY
+{
+    TB_KEY_UNDEFINED = 0,
+    TB_KEY_UP, TB_KEY_DOWN, TB_KEY_LEFT, TB_KEY_RIGHT,
+    TB_KEY_PAGE_UP, TB_KEY_PAGE_DOWN, TB_KEY_HOME, TB_KEY_END,
+    TB_KEY_TAB, TB_KEY_BACKSPACE, TB_KEY_INSERT, TB_KEY_DELETE,
+    TB_KEY_ENTER, TB_KEY_ESC,
+    TB_KEY_F1, TB_KEY_F2, TB_KEY_F3, TB_KEY_F4, TB_KEY_F5, TB_KEY_F6,
+    TB_KEY_F7, TB_KEY_F8, TB_KEY_F9, TB_KEY_F10, TB_KEY_F11, TB_KEY_F12
+};
+*/
+
+
 void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
 {
     UI* ui = GetSubsystem<UI>();
-    String id;
 
-    ui->GetTBIDString(ev.ref_id, id);
+    String refid;
+
+    ui->GetTBIDString(ev.ref_id, refid);
+
+    int key = ev.key;
+
+    if (ev.special_key)
+    {
+        switch (ev.special_key)
+        {
+        case TB_KEY_ENTER:
+            key = KEY_RETURN;
+            break;
+        case TB_KEY_BACKSPACE:
+            key = KEY_BACKSPACE;
+            break;
+        case TB_KEY_DELETE:
+            key = KEY_DELETE;
+            break;
+        default:
+            break;
+        }
+    }
 
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
@@ -91,10 +140,10 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_DELTAX] = ev.delta_x;
     data[P_DELTAY] = ev.delta_y;
     data[P_COUNT] = ev.count;
-    data[P_KEY] = ev.key;
+    data[P_KEY] = key;
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
     data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
-    data[P_REFID] = id;
+    data[P_REFID] = refid;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
 
@@ -114,16 +163,36 @@ void UIWidget::OnDelete()
     eventData[WidgetDeleted::P_WIDGET] = this;
     SendEvent(E_WIDGETDELETED, eventData);
 
+    UnsubscribeFromAllEvents();
+
     ReleaseRef();
 }
 
 void UIWidget::AddChild(UIWidget* child)
 {
-    if (!widget_ || !child->widget_)
+    if (!widget_ || !child || !child->widget_)
         return;
 
     widget_->AddChild(child->widget_);
 }
+
+void UIWidget::AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference)
+{
+    if (!widget_ || !child || !child->widget_ || !reference || !reference->widget_)
+        return;
+
+    widget_->AddChildRelative(child->widget_, (WIDGET_Z_REL) z, reference->widget_);
+
+}
+
+String UIWidget::GetText()
+{
+    if (!widget_)
+        return "";
+
+    return widget_->GetText().CStr();
+}
+
 
 void UIWidget::SetText(const String& text)
 {
@@ -133,12 +202,21 @@ void UIWidget::SetText(const String& text)
     widget_->SetText(text.CString());
 }
 
-void UIWidget::SetGravity(/*WIDGET_GRAVITY*/ unsigned gravity)
+void UIWidget::SetGravity(UI_GRAVITY gravity)
 {
     if (!widget_)
         return;
 
     widget_->SetGravity((WIDGET_GRAVITY) gravity);
+
+}
+
+bool UIWidget::IsAncestorOf(UIWidget* widget)
+{
+    if (!widget_ || !widget || !widget->widget_)
+        return false;
+
+    return widget_->IsAncestorOf(widget->widget_);
 
 }
 
@@ -361,9 +439,26 @@ void UIWidget::SetFocus()
         return;
 
     widget_->SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
+
 }
 
-void UIWidget::SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility)
+bool UIWidget::GetFocus()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->GetIsFocused();
+}
+
+void UIWidget::SetFocusRecursive()
+{
+    if (!widget_)
+        return;
+
+    widget_->SetFocusRecursive(WIDGET_FOCUS_REASON_UNKNOWN);
+}
+
+void UIWidget::SetVisibility(UI_WIDGET_VISIBILITY visibility)
 {
 
     if (!widget_)
@@ -371,6 +466,14 @@ void UIWidget::SetVisibility(/*WIDGET_VISIBILITY*/ unsigned visibility)
 
     widget_->SetVisibilility((WIDGET_VISIBILITY) visibility);
 
+}
+
+UI_WIDGET_VISIBILITY UIWidget::GetVisibility()
+{
+    if (!widget_)
+        return UI_WIDGET_VISIBILITY_GONE;
+
+    return (UI_WIDGET_VISIBILITY) widget_->GetVisibility();
 }
 
 UIWidget* UIWidget::GetFirstChild()
@@ -436,13 +539,89 @@ void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
 
 }
 
+UIView* UIWidget::GetView()
+{
+    if (!widget_)
+        return 0;
 
+    if (GetType() == UIView::GetTypeStatic())
+        return (UIView*) this;
+
+    TBWidget* tbw = widget_->GetParent();
+    while(tbw)
+    {
+        TBWidgetDelegate* delegate = tbw->GetDelegate();
+        if (delegate)
+        {
+            UIWidget* d = (UIWidget*) delegate;
+            if (d->GetType() == UIView::GetTypeStatic())
+                return (UIView*) d;
+        }
+
+        tbw = tbw->GetParent();
+    }
+
+    return 0;
+}
+
+void UIWidget::OnFocusChanged(bool focused)
+{
+    using namespace WidgetFocusChanged;
+
+    VariantMap eventData;
+    eventData[P_WIDGET] = this;
+    eventData[P_FOCUSED] = focused;
+    SendEvent(E_WIDGETFOCUSCHANGED, eventData);
+
+}
 
 bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
     UI* ui = GetSubsystem<UI>();
 
-    if (ev.type == EVENT_TYPE_CHANGED)
+    if (ev.type == EVENT_TYPE_CHANGED || ev.type == EVENT_TYPE_KEY_UP)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
+    else if (ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
+    else if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
+    else if (ev.type == EVENT_TYPE_SHORTCUT)
     {
         if (!ev.target || ui->IsWidgetWrapped(ev.target))
         {

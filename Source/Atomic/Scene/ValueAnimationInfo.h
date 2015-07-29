@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "../Scene/AnimationDefs.h"
 #include "../Container/RefCounted.h"
+#include "../Scene/AnimationDefs.h"
 
 namespace Atomic
 {
@@ -47,17 +47,22 @@ public:
 
     /// Update. Return true when the animation is finished. No-op when the target object is not defined.
     bool Update(float timeStep);
+
     /// Set wrap mode.
     void SetWrapMode(WrapMode wrapMode) { wrapMode_ = wrapMode; }
+
     /// Set speed.
     void SetSpeed(float speed) { speed_ = speed; }
 
     /// Return target object.
     Object* GetTarget() const;
+
     /// Return animation.
     ValueAnimation* GetAnimation() const { return animation_; }
+
     /// Return wrap mode.
     WrapMode GetWrapMode() const { return wrapMode_; }
+
     /// Return speed.
     float GetSpeed() const { return speed_; }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../../Graphics/GraphicsDefs.h"
 #include "../../Container/RefCounted.h"
 #include "../../Container/Vector.h"
+#include "../../Graphics/GraphicsDefs.h"
 
 #include <d3d9.h>
 
@@ -57,16 +57,16 @@ public:
     VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
     /// Destruct.
     ~VertexDeclaration();
-    
+
     /// Return Direct3D vertex declaration.
     IDirect3DVertexDeclaration9* GetDeclaration() const { return declaration_; }
-    
+
 private:
     /// Create declaration.
     void Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements);
     /// Release declaration.
     void Release();
-    
+
     /// Direct3D vertex declaration.
     IDirect3DVertexDeclaration9* declaration_;
 };

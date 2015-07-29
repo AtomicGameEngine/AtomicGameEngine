@@ -6,12 +6,15 @@
 #include "Platform/PlatformWeb.h"
 #include "Platform/PlatformMac.h"
 #include "Platform/PlatformWindows.h"
+#include "Assets/AssetDatabase.h"
 #include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
 
+
 #include "ToolSystem.h"
 #include "ToolEnvironment.h"
+#include "ToolEvents.h"
 
 #include "Project/Project.h"
 
@@ -22,7 +25,7 @@ namespace ToolCore
 ToolSystem::ToolSystem(Context* context) : Object(context),
     cli_(false)
 {
-
+    context_->RegisterSubsystem(new AssetDatabase(context_));
     context_->RegisterSubsystem(new CurlManager(context_));
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));
@@ -40,7 +43,21 @@ ToolSystem::~ToolSystem()
 
 bool ToolSystem::LoadProject(const String& fullpath)
 {
-    String path = RemoveTrailingSlash(GetPath(AddTrailingSlash(fullpath)));
+
+    String pathName, fileName, ext;
+
+    SplitPath(fullpath, pathName, fileName, ext);
+
+    String path;
+
+    if (ext == ".atomic")
+    {
+        path = RemoveTrailingSlash(GetPath(AddTrailingSlash(pathName)));
+    }
+    else
+    {
+        path = RemoveTrailingSlash(GetPath(AddTrailingSlash(fullpath)));
+    }
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->AddResourceDir(path, 0);
@@ -53,6 +70,27 @@ bool ToolSystem::LoadProject(const String& fullpath)
     project_->SetResourcePath(resourcePath);
 
     return project_->Load(fullpath);
+}
+
+void ToolSystem::CloseProject()
+{
+    if (project_.Null())
+        return;
+
+    SendEvent(E_PROJECTUNLOADED);
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String projectPath = project_->GetProjectPath();
+    String resourcePath = project_->GetResourcePath();
+
+    project_ = 0;
+
+    cache->RemoveResourceDir(resourcePath);
+    cache->RemoveResourceDir(projectPath);
+
+    cache->ReleaseAllResources(true);
+
 }
 
 void ToolSystem::SetCurrentPlatform(PlatformID platform)

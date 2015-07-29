@@ -1,0 +1,11 @@
+{
+	"name" : "Javascript",
+	"sources" : ["Source/AtomicJS/Javascript"],
+	"classes" : ["JSComponent", "JSComponentFile", "JSEventHelper", "ScriptObject"],
+	"typescript_decl" : {
+
+		"JSComponent" : [
+		]
+	}
+
+}

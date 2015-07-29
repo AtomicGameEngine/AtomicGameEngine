@@ -7,10 +7,87 @@
 namespace Atomic
 {
 
-JSEventHelper::JSEventHelper(Context* context) :
-    Object(context),
-    currentData_((VariantMap&) Variant::emptyVariantMap)
+
+JSEventDispatcher::JSEventDispatcher(Context* context) :
+    Object(context)
 {
+
+}
+
+JSEventDispatcher::~JSEventDispatcher()
+{
+}
+
+void JSEventDispatcher::BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
+{
+}
+
+void JSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
+{
+    if (!jsEvents_.Contains(eventType))
+        return;
+
+    JSVM* vm = JSVM::GetJSVM(NULL);
+
+    if (!vm)
+        return;
+
+    duk_context* ctx = vm->GetJSContext();
+
+    duk_push_global_stash(ctx);
+    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_VARIANTMAP_CACHE);
+
+    duk_push_pointer(ctx, (void*) &eventData);
+    duk_get_prop(ctx, -2);
+
+
+    // If this issue is addressed, revisit this to simply remove
+    // the variantmap object from the cache, if the user explicitly
+    // keeps the event object alive in a local closure, that is allowed
+    // (though, will keep object properties from being GC'd)
+    // https://github.com/svaarala/duktape/issues/229
+
+    // Ok, this is unfortunate, in an event callback it is possible
+    // to capture the Proxy object which represents the event VariantMap
+    // in a function() {} closure, which will keep the event data alive
+    // until the function happens to be gc'd (it is a member of the eventhandler)
+    // which will leave things like scenes up if there was a P_SCENE event data
+    // member, etc
+    // So, we need to check if we have an object in the variant map cache
+    // and thense call it's delete property method on the Proxy, which will clear
+    // all the data (the proxy can still be alive as a captured local, though
+    // the members won't be held
+    // This all makes it that much more important that the pointer to eventData
+    // is consistent across entire event, otherwise references may be held
+
+    // see note above about: https://github.com/svaarala/duktape/issues/229
+
+    if (duk_is_object(ctx, -1))
+    {
+        // deletes all properties, thus freeing references, even if
+        // the variant map object is held onto by script (it will be invalid, post
+        // event send)
+        // see JSAPI.cpp variantmap_property_deleteproperty
+        duk_del_prop_index(ctx, -1, 0);
+
+        duk_push_pointer(ctx, (void*) &eventData);
+        duk_push_undefined(ctx);
+
+        // clear the variant map object from the cache
+        duk_put_prop(ctx, -4);
+
+    }
+
+    duk_pop_3(ctx);
+
+}
+
+JSEventHelper::JSEventHelper(Context* context, Object* object) :
+    Object(context),
+    object_(object)
+
+{
+
 }
 
 JSEventHelper::~JSEventHelper()
@@ -20,16 +97,25 @@ JSEventHelper::~JSEventHelper()
 
 void JSEventHelper::AddEventHandler(StringHash eventType)
 {
-    SubscribeToEvent(eventType, HANDLER(JSEventHelper, HandleEvent));
+    GetSubsystem<JSEventDispatcher>()->RegisterJSEvent(eventType);
+
+    // subscribe using object, so unsubscribing from object and not the event helper works
+    object_->SubscribeToEvent(eventType, HANDLER(JSEventHelper, HandleEvent));
 }
 
 void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
 {
-    SubscribeToEvent(sender, eventType, HANDLER(JSEventHelper, HandleEvent));
+    GetSubsystem<JSEventDispatcher>()->RegisterJSEvent(eventType);
+
+    // subscribe using object, so unsubscribing from object and not the event helper works
+    object_->SubscribeToEvent(sender, eventType, HANDLER(JSEventHelper, HandleEvent));
 }
 
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 {
+    if (object_.Null())
+        return;
+
     JSVM* vm = JSVM::GetJSVM(0);
     duk_context* ctx = vm->GetJSContext();
 
@@ -45,11 +131,29 @@ void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)
 
     if (duk_is_function(ctx, -1))
     {
-        currentData_ = (const VariantMap&) eventData;
+        // look in the variant map cache
+        duk_push_global_stash(ctx);
+        duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_VARIANTMAP_CACHE);
+        duk_push_pointer(ctx, (void*) &eventData);
+        duk_get_prop(ctx, -2);
 
-        // pass in event helper proxy
-        duk_get_prop_string(ctx, -3, "__eventHelperProxy");
-        assert(duk_is_object(ctx, -1));
+        if (!duk_is_object(ctx, -1))
+        {
+            // pop result
+            duk_pop(ctx);
+
+            // we need to push a new variant map and store to cache
+            // the cache object will be cleared at the send end in  the
+            // global listener above
+            js_push_variantmap(ctx, eventData);
+            duk_push_pointer(ctx, (void*) &eventData);
+            duk_dup(ctx, -2);
+            duk_put_prop(ctx, -4);
+
+        }
+
+        duk_remove(ctx, -2); // vmap cache
+        duk_remove(ctx, -2); // global stash
 
         if (duk_pcall(ctx, 1) != 0)
         {

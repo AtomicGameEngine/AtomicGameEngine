@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ class View;
 class ATOMIC_API Viewport : public Object
 {
     OBJECT(Viewport);
-    
+
 public:
     /// Construct with defaults.
     Viewport(Context* context);
@@ -51,7 +51,7 @@ public:
     Viewport(Context* context, Scene* scene, Camera* camera, const IntRect& rect, RenderPath* renderPath = 0);
     /// Destruct.
     ~Viewport();
-    
+
     /// Set scene.
     void SetScene(Scene* scene);
     /// Set camera.
@@ -64,33 +64,37 @@ public:
     void SetRenderPath(XMLFile* file);
     /// Set whether to render debug geometry. Default true.
     void SetDrawDebug(bool enable);
-    
+
     /// Return scene.
     Scene* GetScene() const;
     /// Return camera.
     Camera* GetCamera() const;
     /// Return the internal rendering structure. May be null if the viewport has not been rendered yet.
     View* GetView() const;
+
     /// Return rectangle.
     const IntRect& GetRect() const { return rect_; }
     /// Return the viewport width
     int GetWidth () const { return rect_.Width(); }
     /// Return the viewport height
     int GetHeight () const { return rect_.Height(); }
+
     /// Return rendering path.
     RenderPath* GetRenderPath() const;
+
     /// Return whether to draw debug geometry.
     bool GetDrawDebug() const { return drawDebug_; }
+
     /// Return ray corresponding to normalized screen coordinates.
     Ray GetScreenRay(int x, int y) const;
     // Convert a world space point to normalized screen coordinates.
     IntVector2 WorldToScreenPoint(const Vector3& worldPos) const;
     // Convert screen coordinates and depth to a world space point.
     Vector3 ScreenToWorldPoint(int x, int y, float depth) const;
-    
+
     /// Allocate the view structure. Called by Renderer.
     void AllocateView();
-    
+
 private:
     /// Scene pointer.
     WeakPtr<Scene> scene_;

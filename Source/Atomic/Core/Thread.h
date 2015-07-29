@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,17 +40,17 @@ public:
     Thread();
     /// Destruct. If running, stop and wait for thread to finish.
     virtual ~Thread();
-    
+
     /// The function to run in the thread.
     virtual void ThreadFunction() = 0;
-    
+
     /// Start running the thread. Return true if successful, or false if already running or if can not create the thread.
     bool Run();
     /// Set the running flag to false and wait for the thread to finish.
     void Stop();
     /// Set thread priority. The thread must have been started first.
     void SetPriority(int priority);
-    
+
     /// Return whether thread exists.
     bool IsStarted() const { return handle_ != 0; }
 
@@ -60,13 +60,13 @@ public:
     static ThreadID GetCurrentThreadID();
     /// Return whether is executing in the main thread.
     static bool IsMainThread();
-    
+
 protected:
     /// Thread handle.
     void* handle_;
     /// Running flag.
     volatile bool shouldRun_;
-    
+
     /// Main thread's thread ID.
     static ThreadID mainThreadID;
 };

@@ -26,6 +26,15 @@ UITextField::~UITextField()
 
 }
 
+void UITextField::SetTextAlign(UI_TEXT_ALIGN align)
+{
+    if (!widget_)
+        return;
+
+    ((TBTextField*)widget_)->SetTextAlign((TB_TEXT_ALIGN) align);
+
+}
+
 bool UITextField::OnEvent(const tb::TBWidgetEvent &ev)
 {
     return false;

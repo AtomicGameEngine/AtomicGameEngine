@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,8 @@ public:
     virtual ~Component();
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() {}
+    virtual void OnSetEnabled() { }
+
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
@@ -68,15 +69,15 @@ public:
 
     /// Return ID.
     unsigned GetID() const { return id_; }
+
     /// Return scene node.
     Node* GetNode() const { return node_; }
+
     /// Return the scene the node belongs to.
     Scene* GetScene() const;
+
     /// Return whether is enabled.
     bool IsEnabled() const { return enabled_; }
-
-    /// Return whether is enabled (so JS picks it up as a property);
-    bool GetEnabled() const { return enabled_; }
 
     /// Return whether is effectively enabled (node is also enabled.)
     bool IsEnabledEffective() const;
@@ -103,6 +104,8 @@ protected:
     virtual void OnAttributeAnimationRemoved();
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node);
+    /// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
+    virtual void OnSceneSet(Scene* scene);
     /// Handle scene node transform dirtied.
     virtual void OnMarkedDirty(Node* node);
     /// Handle scene node enabled status changing.
@@ -125,6 +128,10 @@ protected:
 };
 
 template <class T> T* Component::GetComponent() const { return static_cast<T*>(GetComponent(T::GetTypeStatic())); }
-template <class T> void Component::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }
+
+template <class T> void Component::GetComponents(PODVector<T*>& dest) const
+{
+    GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic());
+}
 
 }

@@ -24,6 +24,7 @@ public:
 
     bool LoadProject(const String& fullpath);
     Project* GetProject() { return project_; }
+    void CloseProject();
 
     const String& GetDataPath() { return dataPath_; }
     void SetDataPath(const String& path) { dataPath_ = path; }

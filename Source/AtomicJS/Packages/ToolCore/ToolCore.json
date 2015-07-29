@@ -1,7 +1,0 @@
-{
-	"name" : "ToolCore",
-	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command"],
-	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
-							 "PlatformWindows",
-							"Command", "PlayCmd"]
-}

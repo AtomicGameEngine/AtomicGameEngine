@@ -13,4 +13,9 @@ EVENT(E_PROJECTLOADED, ProjectLoaded)
     PARAM(P_PROJECTPATH, ProjectPath);    // string
 }
 
+EVENT(E_PROJECTUNLOADED, ProjectUnloaded)
+{
+}
+
+
 }

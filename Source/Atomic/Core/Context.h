@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,21 @@
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
 #include "../Container/HashSet.h"
+#include "../Resource/XMLElement.h"
 
 namespace Atomic
 {
+
+// ATOMIC BEGIN
+
+class GlobalEventListener
+{
+public:
+    virtual void BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
+    virtual void EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
+};
+
+// ATOMIC END
 
 /// Atomic execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class ATOMIC_API Context : public RefCounted
@@ -41,7 +53,7 @@ public:
     ~Context();
 
     /// Create an object by type hash. Return pointer to it or null if no factory found.
-    SharedPtr<Object> CreateObject(StringHash objectType);
+    SharedPtr<Object> CreateObject(StringHash objectType, const XMLElement &source = XMLElement::EMPTY);
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
     /// Register a factory for an object type and specify the object category.
@@ -78,16 +90,22 @@ public:
 
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
+
     /// Return all subsystems.
     const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
+
     /// Return all object factories.
     const HashMap<StringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+
     /// Return all object categories.
     const HashMap<String, Vector<StringHash> >& GetObjectCategories() const { return objectCategories_; }
+
     /// Return active event sender. Null outside event handling.
     Object* GetEventSender() const;
+
     /// Return active event handler. Set by Object. Null outside event handling.
     EventHandler* GetEventHandler() const { return eventHandler_; }
+
     /// Return object type name from hash, or empty if unknown.
     const String& GetTypeName(StringHash objectType) const;
     /// Return a specific attribute description for an object, or null if not found.
@@ -96,6 +114,8 @@ public:
     template <class T> T* GetSubsystem() const;
     /// Template version of returning a specific attribute description.
     template <class T> AttributeInfo* GetAttribute(const char* name);
+    /// Get whether an Editor Context
+    bool GetEditorContext() { return editorContext_; }
 
     /// Return attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes(StringHash type) const
@@ -134,6 +154,15 @@ public:
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
 
+    // ATOMIC BEGIN
+
+    // hook for listening into events
+    void SetGlobalEventListener(GlobalEventListener* listener) { globalEventListener_ = listener; }
+
+    /// Get whether an Editor Context
+    void SetEditorContext(bool editor) { editorContext_ = editor; }
+    // ATOMIC END
+
 private:
     /// Add event receiver.
     void AddEventReceiver(Object* receiver, StringHash eventType);
@@ -145,12 +174,15 @@ private:
     void RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType);
     /// Remove event receiver from non-specific events.
     void RemoveEventReceiver(Object* receiver, StringHash eventType);
+
     /// Set current event handler. Called by Object.
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
+
     /// Begin event send.
-    void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
+    void BeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) { if (globalEventListener_) globalEventListener_->BeginSendEvent(this, sender, eventType, eventData); eventSenders_.Push(sender); }
+
     /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent() { eventSenders_.Pop(); }
+    void EndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) { if (globalEventListener_) globalEventListener_->EndSendEvent(this, sender, eventType, eventData); eventSenders_.Pop(); }
 
     /// Object factories.
     HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;
@@ -172,16 +204,35 @@ private:
     EventHandler* eventHandler_;
     /// Object categories.
     HashMap<String, Vector<StringHash> > objectCategories_;
+
+    // ATOMIC BEGIN
+    GlobalEventListener* globalEventListener_;
+    bool editorContext_;
+    // ATOMIC END
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
-template <class T> void Context::RegisterFactory(const char* category) { RegisterFactory(new ObjectFactoryImpl<T>(this), category); }
+
+template <class T> void Context::RegisterFactory(const char* category)
+{
+    RegisterFactory(new ObjectFactoryImpl<T>(this), category);
+}
+
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
+
 template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
+
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
+
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
+
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
+
 template <class T> AttributeInfo* Context::GetAttribute(const char* name) { return GetAttribute(T::GetTypeStatic(), name); }
-template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue) { UpdateAttributeDefaultValue(T::GetTypeStatic(), name, defaultValue); }
+
+template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue)
+{
+    UpdateAttributeDefaultValue(T::GetTypeStatic(), name, defaultValue);
+}
 
 }

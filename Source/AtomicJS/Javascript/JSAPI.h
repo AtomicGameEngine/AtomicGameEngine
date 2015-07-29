@@ -12,6 +12,7 @@ typedef void* JS_HEAP_PTR;
 
 #define JS_GLOBALSTASH_INDEX_COMPONENTS 0
 #define JS_GLOBALSTASH_INDEX_NODE_REGISTRY 1
+#define JS_GLOBALSTASH_VARIANTMAP_CACHE 2
 
 // indexers for instance objects
 #define JS_INSTANCE_INDEX_FINALIZED 0
@@ -35,9 +36,13 @@ void js_constructor_basecall(duk_context* ctx, const char* package, const char* 
 void js_setup_prototype(JSVM* vm, const char* package, const char* classname, const char* basePackage, const char* basename, bool hasProperties = false);
 void js_class_push_propertyobject(JSVM* vm, const char* package, const char* classname);
 void js_class_get_prototype(duk_context* ctx, const char* package, const char *classname);
+void js_class_get_constructor(duk_context* ctx, const char* package, const char *classname);
 
 /// Pushes variant value or undefined if can't be pushed
 void js_push_variant(duk_context* ctx, const Variant &v);
+void js_push_variantmap(duk_context* ctx, const VariantMap &vmap);
+
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v);
 
 void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);
 

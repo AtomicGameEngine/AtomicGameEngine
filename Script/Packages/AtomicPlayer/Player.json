@@ -1,0 +1,5 @@
+{
+	"name" : "Player",
+	"sources" : ["Source/AtomicPlayer"],
+	"classes" : ["Player"]
+}

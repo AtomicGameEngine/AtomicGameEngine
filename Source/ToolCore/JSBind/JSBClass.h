@@ -36,6 +36,7 @@ public:
 
 class JSBProperty
 {
+
 public:
     String name_;
     JSBFunction* getter_;
@@ -44,6 +45,36 @@ public:
     JSBProperty() : getter_(0), setter_(0)
     {
 
+    }
+
+    // returns proper case for property name
+    // based on whether the Getter/Setter is all caps
+    // GetMyValue -> myValue;
+    // GetGUID -> guid
+    String GetCasePropertyName()
+    {
+        if (!name_.Length())
+            return name_;
+
+        bool allUpper = true;
+
+        for (unsigned k = 0; k < name_.Length(); k++)
+        {
+            if (!isupper(name_[k]))
+            {
+                allUpper = false;
+                break;
+            }
+        }
+
+        if (allUpper)
+        {
+            return name_.ToLower();
+        }
+
+        String name = name_;
+        name[0] = tolower(name[0]);
+        return name;
     }
 
 };

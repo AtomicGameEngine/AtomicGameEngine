@@ -7,6 +7,7 @@ using namespace tb;
 #include "../Input/InputEvents.h"
 
 #include "UI.h"
+#include "UIEvents.h"
 
 namespace Atomic
 {
@@ -185,8 +186,6 @@ static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modif
 #endif
     else if (upper_key == 'P')
         id = TBIDC("play");
-    else if (upper_key == 'I')
-        id = TBIDC("beautify");
     else if (special_key == TB_KEY_PAGE_UP)
         id = TBIDC("prev_doc");
     else if (special_key == TB_KEY_PAGE_DOWN)
@@ -197,7 +196,22 @@ static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modif
     TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
     ev.modifierkeys = modifierkeys;
     ev.ref_id = id;
-    return TBWidget::focused_widget->InvokeEvent(ev);
+
+    TBWidget* eventWidget = TBWidget::focused_widget;
+
+    if (id == TBIDC("save") || id == TBIDC("close")) {
+
+        while (eventWidget && !eventWidget->GetDelegate()) {
+
+            eventWidget = eventWidget->GetParent();
+        }
+
+    }
+
+    if (!eventWidget)
+        return false;
+
+    return eventWidget->InvokeEvent(ev);
 }
 
 static bool InvokeKey(TBWidget* root, unsigned int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool keydown)
@@ -334,6 +348,29 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     int scancode = eventData[P_SCANCODE].GetInt();
 
     HandleKey(true, keycode, scancode);
+
+    // Send Global Shortcut
+    Input* input = GetSubsystem<Input>();
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+    if (keycode == KEY_LCTRL || keycode == KEY_RCTRL)
+        superdown = false;
+#else
+    bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+
+    if (keycode == KEY_LGUI || keycode == KEY_RGUI)
+        superdown = false;
+#endif
+
+    if (!superdown)
+        return;
+
+    VariantMap shortcutData;
+    shortcutData[UIShortcut::P_KEY] = keycode;
+    shortcutData[UIShortcut::P_QUALIFIERS] = eventData[P_QUALIFIERS].GetInt();
+
+    SendEvent(E_UISHORTCUT, shortcutData);
 
 }
 

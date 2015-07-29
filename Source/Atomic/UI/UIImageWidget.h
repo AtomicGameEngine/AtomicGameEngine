@@ -16,6 +16,8 @@ public:
     UIImageWidget(Context* context, bool createWidget = true);
     virtual ~UIImageWidget();
 
+    void SetImage(const String& imagePath);
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

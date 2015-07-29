@@ -24,8 +24,6 @@
 // THE SOFTWARE.
 //
 
-#include "AtomicEditor.h"
-
 #include "Atomic/Core/StringUtils.h"
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Container/ArrayPtr.h>

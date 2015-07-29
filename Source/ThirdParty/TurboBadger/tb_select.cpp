@@ -14,7 +14,7 @@ namespace tb {
 
 // == Sort callback for sorting items ===================================================
 
-int select_list_sort_cb(TBSelectItemSource *source, const int *a, const int *b)
+static int select_list_sort_cb(TBSelectItemSource *source, const int *a, const int *b)
 {
 	int value = strcmp(source->GetItemString(*a), source->GetItemString(*b));
 	return source->GetSort() == TB_SORT_DESCENDING ? -value : value;
@@ -26,7 +26,8 @@ TBSelectList::TBSelectList()
 	: m_value(-1)
 	, m_list_is_invalid(false)
 	, m_scroll_to_current(false)
-	, m_header_lng_string_id(TBIDC("TBList.header"))
+    , m_header_lng_string_id(TBIDC("TBList.header"))
+    , m_sort_callback(select_list_sort_cb)
 {
 	SetSource(&m_default_source);
 	SetIsFocusable(true);
@@ -159,7 +160,7 @@ void TBSelectList::ValidateList()
 
 	// Sort
 	if (m_source->GetSort() != TB_SORT_NONE)
-		insertion_sort<TBSelectItemSource*, int>(sorted_index, num_sorted_items, m_source, select_list_sort_cb);
+        insertion_sort<TBSelectItemSource*, int>(sorted_index, num_sorted_items, m_source, m_sort_callback);
 
 	// Show header if we only show a subset of all items.
     // a single space filter is used as a dummy filter

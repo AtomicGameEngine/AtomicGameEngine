@@ -12,16 +12,23 @@ namespace Atomic
 class PipePair {
 
 public:
-    PipePair(bool inherit_fd2 = true);
-    IPCHandle fd1() const { return srv_; }
-    IPCHandle fd2() const { return cln_; }
+    PipePair();
 
-    static IPCHandle OpenPipeServer(const wchar_t* name, bool low_integrity = true);
-    static IPCHandle OpenPipeClient(const wchar_t* name, bool inherit, bool impersonate);
+    IPCHandle serverRead() const { return srvRead_; }
+    IPCHandle serverWrite() const { return srvWrite_; }
+
+	IPCHandle clientRead() const { return clnRead_; }
+	IPCHandle clientWrite() const { return clnWrite_; }
+
+    static IPCHandle OpenPipeServer(const wchar_t* name, bool read);
+    static IPCHandle OpenPipeClient(const wchar_t* name, bool read);
 
 private:
-    IPCHandle srv_;
-    IPCHandle cln_;
+    IPCHandle srvRead_;
+	IPCHandle srvWrite_;
+
+	IPCHandle clnRead_;
+	IPCHandle clnWrite_;
 };
 
 class PipeWin {
@@ -29,16 +36,17 @@ public:
     PipeWin();
     ~PipeWin();
 
-    bool OpenClient(IPCHandle pipe);
-    bool OpenServer(IPCHandle pipe, bool connect = false);
+    bool OpenClient(IPCHandle pipeRead, IPCHandle pipeWrite);
+    bool OpenServer(IPCHandle pipeRead, IPCHandle pipeWrite);
 
     bool Write(const void* buf, size_t sz);
     bool Read(void* buf, size_t* sz);
 
-    bool IsConnected() const { return pipe_ != INVALID_IPCHANDLE_VALUE; }
+    bool IsConnected() const { return pipeRead_ != INVALID_IPCHANDLE_VALUE && pipeWrite_ != INVALID_IPCHANDLE_VALUE; }
 
 private:
-    IPCHandle pipe_;
+    IPCHandle pipeRead_;
+	IPCHandle pipeWrite_;
 };
 
 
@@ -62,22 +70,22 @@ class IPCProcess : public Object
 
     public:
 
-    IPCProcess(Context* context, IPCHandle fd1, IPCHandle fd2, IPCHandle pid = INVALID_IPCHANDLE_VALUE);
+    IPCProcess(Context* context, IPCHandle clientRead, IPCHandle clientWrite, IPCHandle pid = INVALID_IPCHANDLE_VALUE);
 
     virtual ~IPCProcess();
 
     bool IsRunning();
 
-    IPCHandle fd1() const { return fd1_; }
-    IPCHandle fd2() const { return fd2_; }
+    IPCHandle clientRead() const { return clientRead_; }
+    IPCHandle clientWrite() const { return clientWrite_; }
 
     bool Launch(const String& command, const Vector<String>& args, const String& initialDirectory);
 
 private:
 
     IPCHandle pid_;
-    IPCHandle fd1_;
-    IPCHandle fd2_;
+    IPCHandle clientRead_;
+    IPCHandle clientWrite_;
 };
 
 }

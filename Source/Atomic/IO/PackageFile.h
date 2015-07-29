@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ struct PackageEntry
 class ATOMIC_API PackageFile : public Object
 {
     OBJECT(PackageFile);
-    
+
 public:
     /// Construct.
     PackageFile(Context* context);
@@ -50,37 +50,41 @@ public:
     PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.
     virtual ~PackageFile();
-    
+
     /// Open the package file. Return true if successful.
     bool Open(const String& fileName, unsigned startOffset = 0);
-    /// Check if a file exists within the package file.
+    /// Check if a file exists within the package file. This will be case-insensitive on Windows and case-sensitive on other platforms.
     bool Exists(const String& fileName) const;
-    /// Return the file entry corresponding to the name, or null if not found.
+    /// Return the file entry corresponding to the name, or null if not found. This will be case-insensitive on Windows and case-sensitive on other platforms.
     const PackageEntry* GetEntry(const String& fileName) const;
+
     /// Return all file entries.
     const HashMap<String, PackageEntry>& GetEntries() const { return entries_; }
+
     /// Return the package file name.
     const String& GetName() const { return fileName_; }
+
     /// Return hash of the package file name.
     StringHash GetNameHash() const { return nameHash_; }
+
     /// Return number of files.
     unsigned GetNumFiles() const { return entries_.Size(); }
+
     /// Return total size of the package file.
     unsigned GetTotalSize() const { return totalSize_; }
+
     /// Return checksum of the package file contents.
     unsigned GetChecksum() const { return checksum_; }
+
     /// Return whether the files are compressed.
     bool IsCompressed() const { return compressed_; }
-    /// Return list of entry names
+
+    /// Return list of file names in the package.
     const Vector<String> GetEntryNames() const { return entries_.Keys(); }
 
-    const Vector<String> GetCaseEntryNames() const { return caseEntries_.Keys(); }
-    
 private:
     /// File entries.
     HashMap<String, PackageEntry> entries_;
-    /// File entries with case preserved
-    HashMap<String, PackageEntry> caseEntries_;
     /// File name.
     String fileName_;
     /// Package file name hash.

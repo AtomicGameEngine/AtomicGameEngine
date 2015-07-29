@@ -5,8 +5,6 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "AtomicEditor.h"
-
 
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/UIBatch.h>
@@ -18,7 +16,9 @@
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Core/CoreEvents.h>
 
+#include "UIRenderer.h"
 #include "UISceneView.h"
+
 using namespace tb;
 
 namespace Atomic
@@ -30,6 +30,7 @@ UISceneView::UISceneView(Context* context, bool createWidget) : UIWidget(context
     size_(-1, -1),
     resizeRequired_(false)
 {
+    UI* ui= GetSubsystem<UI>();
 
     if (createWidget)
     {
@@ -42,12 +43,14 @@ UISceneView::UISceneView(Context* context, bool createWidget) : UIWidget(context
         widget_->SetGravity(WIDGET_GRAVITY_ALL);
         ((SceneViewWidget*)widget_)->sceneView_ = this;
 
-        GetSubsystem<UI>()->WrapWidget(this, widget_);
+        ui->WrapWidget(this, widget_);
 
 
     }
 
-   SubscribeToEvent(E_ENDFRAME, HANDLER(UISceneView, HandleEndFrame));
+    renderer_ = ui->GetRenderer();
+
+    SubscribeToEvent(E_ENDFRAME, HANDLER(UISceneView, HandleEndFrame));
 }
 
 UISceneView::~UISceneView()
@@ -64,7 +67,7 @@ UISceneView::~UISceneView()
 
 bool UISceneView::OnEvent(const TBWidgetEvent &ev)
 {
-    return false;
+    return UIWidget::OnEvent(ev);
 }
 
 void UISceneView::HandleEndFrame(StringHash eventType, VariantMap& eventData)
@@ -200,10 +203,24 @@ void SceneViewWidget::OnPaint(const PaintProps &paint_props)
         size.x_ = rect.w;
         size.y_ = rect.h;
         sceneView_->SetResizeRequired();
+        // early out here, responsible for flicker
+        // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/115
         return;
     }
 
     float* data = &vertexData_[0];
+
+    float color;
+    float fopacity = GetOpacity() * sceneView_->renderer_->GetOpacity();
+    unsigned char opacity = (unsigned char) (fopacity* 255.0f);
+    ((unsigned&)color) = (0x00FFFFFF + (((uint32)opacity) << 24));
+
+    data[3] = color;
+    data[9] = color;
+    data[15] = color;
+    data[21] = color;
+    data[27] = color;
+    data[33] = color;
 
     data[0] = rect.x;
     data[1] = rect.y;

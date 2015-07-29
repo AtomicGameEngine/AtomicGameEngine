@@ -20,15 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Graphics/GraphicsDefs.h"
-#include "../Math/StringHash.h"
 #include "../Math/Vector3.h"
 
 #include "../DebugNew.h"
 
 namespace Atomic
 {
+
+// The extern keyword is required when building Urho3D.dll for Windows platform
+// The keyword is not required for other platforms but it does no harm, aside from warning from static analyzer
 
 extern ATOMIC_API const StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 extern ATOMIC_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
@@ -49,7 +52,6 @@ extern ATOMIC_API const StringHash VSP_MODEL("Model");
 extern ATOMIC_API const StringHash VSP_VIEWPROJ("ViewProj");
 extern ATOMIC_API const StringHash VSP_UOFFSET("UOffset");
 extern ATOMIC_API const StringHash VSP_VOFFSET("VOffset");
-extern ATOMIC_API const StringHash VSP_LMOFFSET("LMOffset");
 extern ATOMIC_API const StringHash VSP_ZONE("Zone");
 extern ATOMIC_API const StringHash VSP_LIGHTMATRICES("LightMatrices");
 extern ATOMIC_API const StringHash VSP_SKINMATRICES("SkinMatrices");
@@ -67,7 +69,7 @@ extern ATOMIC_API const StringHash PSP_LIGHTDIR("LightDirPS");
 extern ATOMIC_API const StringHash PSP_LIGHTPOS("LightPosPS");
 extern ATOMIC_API const StringHash PSP_MATDIFFCOLOR("MatDiffColor");
 extern ATOMIC_API const StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
-extern ATOMIC_API const StringHash PSP_MATENVMAPECOLOR("MatEnvMapColor");
+extern ATOMIC_API const StringHash PSP_MATENVMAPCOLOR("MatEnvMapColor");
 extern ATOMIC_API const StringHash PSP_MATSPECCOLOR("MatSpecColor");
 extern ATOMIC_API const StringHash PSP_NEARCLIP("NearClipPS");
 extern ATOMIC_API const StringHash PSP_FARCLIP("FarClipPS");
