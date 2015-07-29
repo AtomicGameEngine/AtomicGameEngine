@@ -78,7 +78,7 @@ public:
     // BEGIN ATOMIC
 
     /// Return sound.
-    void SetSound(Sound* sound) { if (sound) SetSoundAttr(GetResourceRef(sound, "")); }
+    void SetSound(Sound* sound);
 
     // END ATOMIC
 

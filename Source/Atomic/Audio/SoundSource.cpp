@@ -1245,4 +1245,9 @@ void SoundSource::MixNull(float timeStep)
     }
 }
 
+void SoundSource::SetSound(Sound* sound)
+{
+    if (sound) SetSoundAttr(GetResourceRef(sound, ""));
+}
+
 }
