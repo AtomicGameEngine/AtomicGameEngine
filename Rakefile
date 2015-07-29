@@ -79,6 +79,12 @@ namespace :build  do
 
     end
 
+    # build the Atomic Editor
+    Dir.chdir("#{$RAKE_ROOT}/Script/AtomicEditor") do
+      sh "tsc"
+    end
+
+
   end
 
   task :linux do
@@ -223,7 +229,6 @@ namespace :package  do
     FileUtils.cp("#{CMAKE_WINDOWS_BUILD_FOLDER}/Source/AtomicEditor/Release/AtomicEditor.exe", "#{PACKAGE_FOLDER_WINDOWS}/AtomicEditor.exe" )
 
     #32 bit build for packaging!
-
 
     FileUtils.cp("#{$RAKE_ROOT}/Build/Windows/Binaries/x86/D3DCompiler_47.dll", "#{PACKAGE_FOLDER_WINDOWS}/D3DCompiler_47.dll" )
 
