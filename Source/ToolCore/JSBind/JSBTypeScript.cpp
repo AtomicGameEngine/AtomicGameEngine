@@ -16,7 +16,7 @@
 namespace ToolCore
 {
 
-static String GetScriptType(JSBFunctionType* ftype)
+static String GetScriptType(JSBFunctionType* ftype, JSBPackage* currentPackage)
 {
     String scriptType = "number";
 
@@ -32,18 +32,40 @@ static String GetScriptType(JSBFunctionType* ftype)
         scriptType = "string";
 
     if (ftype->type_->asEnumType())
-        scriptType = ftype->type_->asEnumType()->enum_->GetName();
-
-    if (ftype->type_->asEnumType())
-        scriptType = ftype->type_->asEnumType()->enum_->GetName();
+    {
+        JSBEnum* enumType = ftype->type_->asEnumType()->enum_;
+        if (NULL != currentPackage &&
+            enumType->GetPackage() != currentPackage)
+        {
+            scriptType = enumType->GetPackage()->GetName() + "." + enumType->GetName();
+        }
+        else
+        {
+            scriptType = enumType->GetName();
+        }
+    }
 
     if (ftype->type_->asClassType())
-        scriptType = ftype->type_->asClassType()->class_->GetName();
+    {
+        JSBClass* classType = ftype->type_->asClassType()->class_;
+        if (NULL != currentPackage &&
+            classType->GetPackage() != currentPackage)
+        {
+            scriptType = classType->GetPackage()->GetName() + "." + classType->GetName();
+        }
+        else
+        {
+            scriptType = classType->GetName();
+        }
+    }
 
     if (ftype->type_->asVectorType())
     {
         scriptType = "string[]";
     }
+
+    if (ftype->type_->asHeapPtrType())
+        scriptType = "any";
 
     return scriptType;
 
@@ -86,7 +108,7 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
     {
         JSBFunctionType* ftype = parameters.At(i);
 
-        String scriptType = GetScriptType(ftype);
+        String scriptType = GetScriptType(ftype, package_);
 
         if (scriptType == "Context")
             continue;
@@ -109,7 +131,7 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
         if (!function->GetReturnType())
             source_ += "): void;\n";
         else
-            source_ += "): " + GetScriptType(function->GetReturnType()) + ";\n";
+            source_ += "): " + GetScriptType(function->GetReturnType(), package_) + ";\n";
 
     }
 
@@ -170,7 +192,7 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
             if (!ftype)
                 continue;
 
-            String scriptType = GetScriptType(ftype);
+            String scriptType = GetScriptType(ftype, package_);
 
             String scriptName =  propertyNames[j];
             scriptName[0] = tolower(scriptName[0]);

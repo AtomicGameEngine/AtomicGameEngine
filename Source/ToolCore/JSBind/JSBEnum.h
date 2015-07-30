@@ -3,12 +3,13 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "JSBModule.h"
+
 using namespace Atomic;
 
 namespace ToolCore
 {
 
-class JSBModule;
 class JSBHeader;
 
 class JSBEnum : public Object
@@ -23,6 +24,8 @@ public:
 
     const String& GetName() { return name_; }
     JSBHeader* GetHeader() { return header_; }
+    JSBModule* GetModule() { return module_; }
+    JSBPackage* GetPackage() { return module_->GetPackage(); }
 
     Vector<String>& GetValues() { return values_; }
 
