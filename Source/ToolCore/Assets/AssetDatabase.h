@@ -46,6 +46,7 @@ private:
 
     void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
     void HandleProjectUnloaded(StringHash eventType, VariantMap& eventData);
+    void HandleFileChanged(StringHash eventType, VariantMap& eventData);
 
     void AddAsset(SharedPtr<Asset>& asset);
 

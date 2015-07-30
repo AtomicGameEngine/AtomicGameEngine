@@ -380,6 +380,8 @@ class MaterialInspector extends ScriptWidget {
         lp.width = 140;
         field.layoutParams = lp;
 
+        field.text = material.name;
+
         var texture = material.getTexture(Atomic.TU_DIFFUSE);
 
         if (texture)

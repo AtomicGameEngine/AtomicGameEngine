@@ -62,7 +62,7 @@ String Asset::GetRelativePath()
 
 bool Asset::CheckCacheFile()
 {
-    if (importer_.Null() || !importer_->RequiresCacheFile())
+    if (importer_.Null())
         return true;
 
     FileSystem* fs = GetSubsystem<FileSystem>();
@@ -71,8 +71,18 @@ bool Asset::CheckCacheFile()
 
     String cacheFile = cachePath + guid_;
 
-    if (!fs->FileExists(cacheFile) || fs->GetLastModifiedTime(cacheFile) < fs->GetLastModifiedTime(path_))
+    unsigned modifiedTime = fs->GetLastModifiedTime(path_);
+
+    if (importer_->RequiresCacheFile()) {
+
+        if (!fs->FileExists(cacheFile) || fs->GetLastModifiedTime(cacheFile) < modifiedTime)
+            return false;
+    }
+
+    if (fs->GetLastModifiedTime(GetDotAssetFilename()) < modifiedTime)
+    {
         return false;
+    }
 
     return true;
 }

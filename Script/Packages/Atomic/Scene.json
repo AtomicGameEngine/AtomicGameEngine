@@ -37,7 +37,12 @@
 			"getChildrenWithName(name:string, recursive?:boolean):Node[];",
 			"getChildrenWithComponent(componentType:string, recursive?:boolean):Node[];",
 			"getComponents(componentType?:string, recursive?:boolean):Component[];",
-			"getChildAtIndex(index:number):Node;"
+			"getChildAtIndex(index:number):Node;",
+			"createJSComponent(name:string, args?:{});",
+			"getJSComponent(name:string):JSComponent;"
+		],
+		"Scene" : [
+			"getMainCamera():Camera;"
 		]
 	}
 

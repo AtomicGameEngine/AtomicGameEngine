@@ -1799,6 +1799,8 @@ declare module Atomic {
       getChildrenWithComponent(componentType:string, recursive?:boolean):Node[];
       getComponents(componentType?:string, recursive?:boolean):Component[];
       getChildAtIndex(index:number):Node;
+      createJSComponent(name:string, args?:{});
+      getJSComponent(name:string):JSComponent;
 
    }
 
@@ -1936,6 +1938,7 @@ declare module Atomic {
       getVarNamesAttr(): string;
       // Prepare network update by comparing attributes and marking replication states dirty as necessary.
       prepareNetworkUpdate(): void;
+      getMainCamera():Camera;
 
    }
 
