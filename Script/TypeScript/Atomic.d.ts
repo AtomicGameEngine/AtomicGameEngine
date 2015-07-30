@@ -4398,6 +4398,7 @@ declare module Atomic {
       isInside(point: Vector3): boolean;
       // Determines if the given local space point is within the model geometry.
       isInsideLocal(point: Vector3): boolean;
+      setMaterialIndex(index:number, material:Material);
 
    }
 
