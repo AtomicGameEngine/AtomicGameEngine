@@ -71,3 +71,10 @@ if (TARGET_PROPERTIES)
 endif ()
 
 add_dependencies(AtomicEditor AtomicTool)
+
+GroupSources("Application")
+GroupSources("EditorMode")
+GroupSources("Editors")
+GroupSources("Javascript")
+GroupSources("PlayerMode")
+GroupSources("Utils")
