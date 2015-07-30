@@ -400,6 +400,11 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
 {
     project_ = GetSubsystem<ToolSystem>()->GetProject();
 
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (!fs->DirExists(GetCachePath()))
+        fs->CreateDir(GetCachePath());
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->AddResourceDir(GetCachePath());
 
