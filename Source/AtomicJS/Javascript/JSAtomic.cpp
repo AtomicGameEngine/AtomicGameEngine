@@ -21,6 +21,9 @@
 #include "JSCore.h"
 #include "JSFileSystem.h"
 #include "JSGraphics.h"
+#ifdef ATOMIC_3D
+#include "JSAtomic3D.h"
+#endif
 #include "JSIO.h"
 #include "JSUIAPI.h"
 #include "JSScene.h"
@@ -258,6 +261,9 @@ void jsapi_init_atomic(JSVM* vm)
     jsapi_init_network(vm);
 #endif
     jsapi_init_graphics(vm);
+#ifdef ATOMIC_3D
+    jsapi_init_atomic3d(vm);
+#endif
     jsapi_init_ui(vm);
     jsapi_init_scene(vm);
 

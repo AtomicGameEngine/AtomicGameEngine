@@ -53,6 +53,8 @@ public:
 
     bool Load(const String& assetPath);
 
+    const String& GetErrorMessage() { return errorMessage_; }
+
     void ExportModel(const String& outName, const String& animName = String::EMPTY, bool animationOnly = false);
 
     void SetImportNode(Node* node) { importNode_ = node; }
@@ -91,6 +93,8 @@ private:
     // void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
 
     void DumpNodes(aiNode* rootNode, unsigned level);
+
+    String errorMessage_;
 
     const aiScene* scene_;
     aiNode* rootNode_;

@@ -41,6 +41,8 @@ public:
 
     AssetImporter* GetImporter() { return importer_; }
 
+    void PostImportError(const String& message);
+
     Asset* GetParent();
 
     void SetDirty(bool dirty) { dirty_ = dirty; }
@@ -55,6 +57,7 @@ public:
     bool Load();
     // save .asset
     bool Save();
+
 
 private:
 

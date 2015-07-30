@@ -17,6 +17,13 @@
 			"AnimationState" : ["AnimatedModel", "Animation"]
 		}
 
+	},
+	"typescript_decl" : {
+
+		"StaticModel" : [
+			"setMaterialIndex(index:number, material:Material);"
+		]
 	}
+
 
 }
