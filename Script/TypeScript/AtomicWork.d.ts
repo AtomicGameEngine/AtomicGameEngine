@@ -192,6 +192,13 @@ declare module ToolCore {
 
     }
 
+    export interface AssetImportErrorEvent {
+
+        path:string;
+        guid:string;
+        error: string;
+
+    }
 
     export var toolEnvironment: ToolEnvironment;
     export var toolSystem: ToolSystem;

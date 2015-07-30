@@ -16,6 +16,7 @@
 #include "PrefabImporter.h"
 #include "JavascriptImporter.h"
 
+#include "AssetEvents.h"
 #include "Asset.h"
 
 namespace ToolCore
@@ -62,7 +63,7 @@ String Asset::GetRelativePath()
 
 bool Asset::CheckCacheFile()
 {
-    if (importer_.Null() || !importer_->RequiresCacheFile())
+    if (importer_.Null())
         return true;
 
     FileSystem* fs = GetSubsystem<FileSystem>();
@@ -71,8 +72,18 @@ bool Asset::CheckCacheFile()
 
     String cacheFile = cachePath + guid_;
 
-    if (!fs->FileExists(cacheFile) || fs->GetLastModifiedTime(cacheFile) < fs->GetLastModifiedTime(path_))
+    unsigned modifiedTime = fs->GetLastModifiedTime(path_);
+
+    if (importer_->RequiresCacheFile()) {
+
+        if (!fs->FileExists(cacheFile) || fs->GetLastModifiedTime(cacheFile) < modifiedTime)
+            return false;
+    }
+
+    if (fs->GetLastModifiedTime(GetDotAssetFilename()) < modifiedTime)
+    {
         return false;
+    }
 
     return true;
 }
@@ -93,6 +104,17 @@ bool Asset::Preload()
     // disabled preload for now, as this is on a background thread and causing init problems
     return true;
     //return importer_->Preload();
+}
+
+void Asset::PostImportError(const String& message)
+{
+    VariantMap eventData;
+    eventData[AssetImportError::P_PATH] = path_;
+    eventData[AssetImportError::P_GUID] = guid_;
+    eventData[AssetImportError::P_ERROR] = message;
+
+    SendEvent(E_ASSETIMPORTERROR, eventData);
+
 }
 
 // load .asset

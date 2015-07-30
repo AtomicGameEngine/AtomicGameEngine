@@ -95,6 +95,7 @@ ResourceEditor::~ResourceEditor()
 
 void ResourceEditor::HandleFileChanged(StringHash eventType, VariantMap& eventData)
 {
+    /*
     using namespace FileChanged;
     const String& fileName = eventData[P_FILENAME].GetString();
     const String& resourceName = eventData[P_RESOURCENAME].GetString();
@@ -105,6 +106,7 @@ void ResourceEditor::HandleFileChanged(StringHash eventType, VariantMap& eventDa
         if (!fs->FileExists(fullpath_))
             Close();
     }
+    */
 }
 
 void ResourceEditor::Close(bool navigateToAvailableResource)

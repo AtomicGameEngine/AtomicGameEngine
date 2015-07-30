@@ -6,6 +6,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Math/Random.h>
 
+#include <Atomic/Resource/ResourceEvents.h>
 #include <Atomic/Resource/ResourceCache.h>
 
 #include "../ToolEvents.h"
@@ -22,6 +23,7 @@ AssetDatabase::AssetDatabase(Context* context) : Object(context)
 {
     SubscribeToEvent(E_PROJECTLOADED, HANDLER(AssetDatabase, HandleProjectLoaded));
     SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));
+    SubscribeToEvent(E_FILECHANGED, HANDLER(AssetDatabase, HandleFileChanged));
 }
 
 AssetDatabase::~AssetDatabase()
@@ -398,6 +400,11 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
 {
     project_ = GetSubsystem<ToolSystem>()->GetProject();
 
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (!fs->DirExists(GetCachePath()))
+        fs->CreateDir(GetCachePath());
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     cache->AddResourceDir(GetCachePath());
 
@@ -411,6 +418,42 @@ void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& even
     assets_.Clear();
     usedGUID_.Clear();
     project_ = 0;
+}
+
+void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventData)
+{
+    using namespace FileChanged;
+    const String& fullPath = eventData[P_FILENAME].GetString();
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    String pathName, fileName, ext;
+
+    SplitPath(fullPath, pathName, fileName, ext);
+
+    Asset* asset = GetAssetByPath(fullPath);
+
+    if (!asset && fs->FileExists(fullPath))
+    {
+        Scan();
+        return;
+    }
+
+    if (asset)
+    {
+        if(!fs->FileExists(fullPath))
+        {
+            DeleteAsset(asset);
+        }
+        else
+        {
+            asset->SetDirty(true);
+            Scan();
+        }
+
+    }
+
+
 }
 
 
