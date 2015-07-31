@@ -74,7 +74,7 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
 
 }
 
-bool PrefabImporter::Import(const String& guid)
+bool PrefabImporter::Import()
 {
     FileSystem* fs = GetSubsystem<FileSystem>();
 

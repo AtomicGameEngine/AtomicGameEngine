@@ -19,9 +19,9 @@ public:
 
     bool IsComponentFile() { return isComponentFile_; }
 
-    bool Import(const String& guid);
-
 protected:
+
+    bool Import();
 
     bool isComponentFile_;
 

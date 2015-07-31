@@ -22,10 +22,11 @@ public:
 
     virtual void SetDefaults();
 
-    bool Import(const String& guid);
     virtual bool Preload();
 
 protected:
+
+    bool Import();
 
     virtual bool LoadSettingsInternal();
     virtual bool SaveSettingsInternal();

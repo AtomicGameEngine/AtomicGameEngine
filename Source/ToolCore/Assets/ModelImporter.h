@@ -65,9 +65,9 @@ public:
 
     AnimationImportInfo* GetAnimationInfo(unsigned index) { return animationInfo_[index]; }
 
-    bool Import(const String& guid);
-
 protected:
+
+    bool Import();
 
     bool ImportModel();
     bool ImportAnimations();

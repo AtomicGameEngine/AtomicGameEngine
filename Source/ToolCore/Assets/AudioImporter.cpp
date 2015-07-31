@@ -24,14 +24,8 @@ void AudioImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
-bool AudioImporter::Import(const String& guid)
+bool AudioImporter::Import()
 {
-    AssetDatabase* db = GetSubsystem<AssetDatabase>();
-    Asset* asset = db->GetAssetByGUID(guid);
-
-    if (!asset)
-        return false;
-
     return true;
 }
 
