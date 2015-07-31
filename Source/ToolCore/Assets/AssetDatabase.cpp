@@ -441,7 +441,7 @@ void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventDat
 
     if (asset)
     {
-        if(!fs->FileExists(fullPath))
+        if(!fs->Exists(fullPath))
         {
             DeleteAsset(asset);
         }
