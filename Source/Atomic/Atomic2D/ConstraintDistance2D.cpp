@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Atomic2D/ConstraintDistance2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Atomic2D/ConstraintDistance2D.h"
 #include "../Atomic2D/PhysicsUtils2D.h"
 #include "../Atomic2D/RigidBody2D.h"
 
@@ -46,7 +47,7 @@ ConstraintDistance2D::~ConstraintDistance2D()
 void ConstraintDistance2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<ConstraintDistance2D>();
-    
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

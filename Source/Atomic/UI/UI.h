@@ -1,13 +1,10 @@
 
 #pragma once
 
+#include <ThirdParty/TurboBadger/tb_widgets_listener.h>
+
 #include "../Core/Object.h"
 #include "../UI/UIBatch.h"
-
-namespace tb
-{
-class TBWidget;
-}
 
 namespace Atomic
 {
@@ -16,7 +13,7 @@ class VertexBuffer;
 class UIRenderer;
 class UIWidget;
 
-class UI : public Object
+class UI : public Object, private tb::TBWidgetListener
 {
     OBJECT(UI)
 
@@ -61,6 +58,8 @@ public:
 
     void GetTBIDString(unsigned id, String& value);
 
+    UIRenderer* GetRenderer() { return renderer_; }
+
 private:
 
     static WeakPtr<Context> uiContext_;
@@ -70,6 +69,10 @@ private:
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
+
+    // TBWidgetListener
+    void OnWidgetDelete(tb::TBWidget *widget);
+    bool OnWidgetDying(tb::TBWidget *widget);
 
     tb::TBWidget* rootWidget_;
     UIRenderer* renderer_;

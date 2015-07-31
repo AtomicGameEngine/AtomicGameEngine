@@ -15,7 +15,8 @@
 namespace Atomic
 {
 
-IPC::IPC(Context* context) : Object(context)
+IPC::IPC(Context* context) : Object(context),
+    workerChannelID_(0)
 {
     SubscribeToEvent(E_UPDATE, HANDLER(IPC, HandleUpdate));
 }
@@ -33,16 +34,21 @@ IPC::~IPC()
     worker_ = 0;
 }
 
-bool IPC::InitWorker(IPCHandle fd1, IPCHandle fd2)
+bool IPC::InitWorker(unsigned id, IPCHandle fd1, IPCHandle fd2)
 {
+    workerChannelID_ = id;
 
 #ifndef ATOMIC_PLATFORM_WINDOWS
     // close server fd
     close(fd1);
+	worker_ = new IPCWorker(context_, fd2, id);
+#else
+	worker_ = new IPCWorker(context_, fd1, fd2, id);
 #endif
 
-    worker_ = new IPCWorker(fd2, context_);
-    worker_->Run();
+    
+    
+	worker_->Run();
 
     SendEventToBroker(E_IPCWORKERSTART);
 
@@ -97,8 +103,8 @@ void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (!broker->Update())
         {
             VariantMap brokerData;
-            brokerData[WorkerExit::P_BROKER] = broker;
-            brokerData[WorkerExit::P_EXITCODE] = 0;
+            brokerData[IPCWorkerExit::P_BROKER] = broker;
+            brokerData[IPCWorkerExit::P_EXITCODE] = 0;
             broker->SendEvent(E_IPCWORKEREXIT, brokerData);
             remove.Push(broker);
         }
@@ -113,9 +119,27 @@ void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     for (List<QueuedEvent>::Iterator itr = queuedEvents_.Begin(); itr != queuedEvents_.End(); itr++)
     {
+        unsigned channelID = (*itr).channelID_;
         StringHash qeventType =  (*itr).eventType_;
         VariantMap& qeventData =  (*itr).eventData_;
-        SendEvent(qeventType, qeventData);
+
+        bool sent = false;
+
+        for (unsigned i = 0; i < brokers_.Size(); i++)
+        {
+            SharedPtr<IPCBroker>& broker = brokers_[i];
+            if (broker->GetID() == channelID) {
+
+                broker->SendEvent(qeventType, qeventData);
+                sent = true;
+                break;
+            }
+        }
+
+        if (!sent)
+            SendEvent(qeventType, qeventData);
+
+
     }
 
     queuedEvents_.Clear();
@@ -123,11 +147,12 @@ void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
     eventMutex_.Release();
 }
 
-void IPC::QueueEvent(StringHash eventType, VariantMap& eventData)
+void IPC::QueueEvent(unsigned id, StringHash eventType, VariantMap& eventData)
 {
     eventMutex_.Acquire();
 
     QueuedEvent event;
+    event.channelID_ = id;
     event.eventType_ = eventType;
     event.eventData_ = eventData;
     queuedEvents_.Push(event);

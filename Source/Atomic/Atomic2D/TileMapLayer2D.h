@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,12 +61,16 @@ public:
 
     /// Return tile map.
     TileMap2D* GetTileMap() const;
+
     /// Return tmx layer.
     const TmxLayer2D* GetTmxLayer() const { return tmxLayer_; }
+
     /// Return draw order.
     int GetDrawOrder() const { return drawOrder_; }
+
     /// Return visible.
     bool IsVisible() const { return visible_; }
+
     /// Return has property
     bool HasProperty(const String& name) const;
     /// Return property.

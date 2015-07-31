@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ATOMIC_API CollisionBox2D : public CollisionShape2D
 
 public:
     /// Construct.
-    CollisionBox2D(Context* scontext);
+    CollisionBox2D(Context* context);
     /// Destruct.
     virtual ~CollisionBox2D();
     /// Register object factory.
@@ -53,8 +53,10 @@ public:
 
     /// Return size.
     const Vector2& GetSize() const { return size_; }
+
     /// Return center.
     const Vector2& GetCenter() const { return center_; }
+
     /// Return angle.
     float GetAngle() const { return angle_; }
 

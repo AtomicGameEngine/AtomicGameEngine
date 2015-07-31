@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,12 +75,16 @@ public:
 
     /// Return model.
     Model* GetModel() const { return model_; }
+
     /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
+
     /// Return material by geometry index.
     Material* GetMaterial(unsigned index = 0) const;
+
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }
+
     /// Determines if the given world space point is within the model geometry.
     bool IsInside(const Vector3& point) const;
     /// Determines if the given local space point is within the model geometry.

@@ -6,7 +6,8 @@
 namespace Atomic
 {
 
-IPCChannel::IPCChannel(Context* context) : Object(context)
+IPCChannel::IPCChannel(Context* context, unsigned id) : Object(context),
+    id_(id)
 {
     ipc_ = GetSubsystem<IPC>();
     currentHeader_.messageType_ = IPC_MESSAGE_UNDEFINED;
@@ -20,9 +21,7 @@ IPCChannel::~IPCChannel()
 void IPCChannel::PostMessage(StringHash eventType, VariantMap &eventData)
 {
     IPCMessageEvent msgEvent;
-    msgEvent.DoSend(transport_, eventType, eventData);
-
-    LOGERRORF("Posting Message");
+    msgEvent.DoSend(transport_, id_, eventType, eventData);
 }
 
 bool IPCChannel::Receive()
@@ -65,8 +64,9 @@ bool IPCChannel::Receive()
             IPCMessageEvent event;
             StringHash eventType;
             VariantMap eventData;
-            event.DoRead(buffer, eventType, eventData);
-            ipc_->QueueEvent(eventType, eventData);
+            unsigned id;
+            event.DoRead(buffer, id, eventType, eventData);
+            ipc_->QueueEvent(id, eventType, eventData);
         }
 
         if (dataBuffer_.IsEof())

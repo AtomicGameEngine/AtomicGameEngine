@@ -6,6 +6,7 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
+#include <Atomic/Graphics/Camera.h>
 
 #include "JSScene.h"
 #include "JSComponent.h"
@@ -14,35 +15,66 @@
 namespace Atomic
 {
 
+void jsapi_init_scene_serializable(JSVM* vm);
+
 static int Node_CreateJSComponent(duk_context* ctx)
 {
+    String path = duk_require_string(ctx, 0);
+
+    bool hasArgs = false;
+    int argIdx = -1;
+    if (duk_get_top(ctx) > 1 && duk_is_object(ctx, 1))
+    {
+        hasArgs = true;
+        argIdx = 1;
+    }
+
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
-    JSComponent* jsc = node->CreateComponent<JSComponent>();
-    jsc->SetClassName(duk_to_string(ctx, 0));
+
+    ResourceCache* cache = node->GetContext()->GetSubsystem<ResourceCache>();    
+    JSComponentFile* file = cache->GetResource<JSComponentFile>(path);
+
+    if (!file)
+    {
+        LOGERRORF("Unable to load component file %s", path.CString());
+        duk_push_undefined(ctx);
+        return 1;
+    }
+
+    JSComponent* jsc = file->CreateJSComponent();
+
+    node->AddComponent(jsc, jsc->GetID(), LOCAL);
+
+    jsc->InitInstance(hasArgs, argIdx);
+
     js_push_class_object_instance(ctx, jsc, "JSComponent");
     return 1;
 }
 
 static int Node_GetJSComponent(duk_context* ctx)
 {
-	StringHash classNameHash = duk_to_string(ctx, 0);
-	duk_push_this(ctx);
-	Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+    String path = duk_require_string(ctx, 0);
 
-	PODVector<JSComponent*> jsComponents;
-	node->GetComponents<JSComponent>(jsComponents);
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
 
-	for (unsigned i = 0; i < jsComponents.Size(); i++)
-	{
-		if (StringHash(jsComponents[i]->GetClassName()) == classNameHash)
-		{
-			js_push_class_object_instance(ctx, jsComponents[i]);
-			break;
-		}
-	}
+    PODVector<JSComponent*> components;
+    node->GetComponents<JSComponent>(components, true);
 
-	return 1;
+    for (unsigned i = 0; i < components.Size(); i++)
+    {
+        JSComponent* component = components[i];
+        if (component->MatchScriptName(path)) {
+
+            js_push_class_object_instance(ctx, component, "Component");
+            return 1;
+
+        }
+
+    }
+    duk_push_null(ctx);
+    return 1;
 }
 
 static int Node_GetChildrenWithComponent(duk_context* ctx)
@@ -97,6 +129,71 @@ static int Node_GetChildrenWithName(duk_context* ctx)
     return 1;
 }
 
+static int Node_GetComponents(duk_context* ctx)
+{
+    bool recursive = false;
+    StringHash typeHash = Component::GetTypeStatic();
+
+
+    if (duk_get_top(ctx) > 0)
+    {
+        if (duk_is_string(ctx, 0) && strlen(duk_get_string(ctx, 0)))
+            typeHash = duk_get_string(ctx, 0);
+    }
+
+    if (duk_get_top(ctx) > 1)
+        recursive = duk_require_boolean(ctx, 1) ? true : false;
+
+
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    PODVector<Component*> dest;
+    node->GetComponents(dest, typeHash, recursive);
+
+    duk_push_array(ctx);
+
+    for (unsigned i = 0; i < dest.Size(); i++)
+    {
+        js_push_class_object_instance(ctx, dest[i], "Component");
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+}
+
+static int Node_GetChildAtIndex(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    unsigned idx = (unsigned) duk_to_number(ctx, 0);
+
+    if (node->GetNumChildren() <= idx)
+    {
+        duk_push_null(ctx);
+        return 1;
+    }
+
+    Node* child = node->GetChild(idx);
+    js_push_class_object_instance(ctx, child, "Node");
+
+    return 1;
+}
+
+static int Node_SaveXML(duk_context* ctx)
+{
+    File* file = js_to_class_instance<File>(ctx, 0, 0);
+
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    duk_push_boolean(ctx, node->SaveXML(*file) ? 1 : 0);
+
+    return 1;
+}
+
+
 static int Scene_LoadXML(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -128,25 +225,62 @@ static int Scene_LoadXML(duk_context* ctx)
 
 }
 
+static int Scene_GetMainCamera(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    Scene* scene = js_to_class_instance<Scene>(ctx, -1, 0);
+
+    PODVector<Node*> cameraNodes;
+    Camera* camera = 0;
+    scene->GetChildrenWithComponent(cameraNodes, Camera::GetTypeStatic(), true);
+    if (cameraNodes.Size())
+    {
+        camera = cameraNodes[0]->GetComponent<Camera>();
+    }
+
+    if (!camera)
+    {
+        duk_push_null(ctx);
+        return 1;
+    }
+
+    js_push_class_object_instance(ctx, camera, "Camera");
+
+    return 1;
+
+}
+
+
 
 void jsapi_init_scene(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
+
+    jsapi_init_scene_serializable(vm);
 
     js_class_get_prototype(ctx, "Atomic", "Node");
     duk_push_c_function(ctx, Node_GetChildrenWithComponent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "getChildrenWithComponent");
     duk_push_c_function(ctx, Node_GetChildrenWithName, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "getChildrenWithName");
-    duk_push_c_function(ctx, Node_CreateJSComponent, 1);
+    duk_push_c_function(ctx, Node_GetComponents, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "getComponents");
+    duk_push_c_function(ctx, Node_CreateJSComponent, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "createJSComponent");
-	duk_push_c_function(ctx, Node_GetJSComponent, 1);
-	duk_put_prop_string(ctx, -2, "getJSComponent");
-	duk_pop(ctx);
+    duk_push_c_function(ctx, Node_GetJSComponent, 1);
+    duk_put_prop_string(ctx, -2, "getJSComponent");
+    duk_push_c_function(ctx, Node_GetChildAtIndex, 1);
+    duk_put_prop_string(ctx, -2, "getChildAtIndex");
+    duk_push_c_function(ctx, Node_SaveXML, 1);
+    duk_put_prop_string(ctx, -2, "saveXML");
+
+    duk_pop(ctx);
 
     js_class_get_prototype(ctx, "Atomic", "Scene");
     duk_push_c_function(ctx, Scene_LoadXML, 1);
     duk_put_prop_string(ctx, -2, "loadXML");
+    duk_push_c_function(ctx, Scene_GetMainCamera, 0);
+    duk_put_prop_string(ctx, -2, "getMainCamera");
     duk_pop(ctx);
 
 }

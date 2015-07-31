@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
+#include "../Graphics/Texture2D.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
-#include "../Atomic2D/Sprite2D.h"
-#include "../Graphics/Texture2D.h"
-#include "../Atomic2D/TmxFile2D.h"
 #include "../Resource/XMLFile.h"
+#include "../Atomic2D/Sprite2D.h"
+#include "../Atomic2D/TmxFile2D.h"
 
 #include "../DebugNew.h"
 
@@ -107,7 +108,7 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     }
 
     XMLElement tileElem = dataElem.GetChild("tile");
-    tiles_.Resize(width_ * height_);
+    tiles_.Resize((unsigned)(width_ * height_));
 
     for (int y = 0; y < height_; ++y)
     {
@@ -352,7 +353,8 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
 
                 tsxXMLFiles_[source] = tsxXMLFile;
 
-                String textureFilePath = GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
+                String textureFilePath =
+                    GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
                 GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
             }
             else
@@ -362,7 +364,8 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
             }
         }
 
-        for (XMLElement imageLayerElem = rootElem.GetChild("imagelayer"); imageLayerElem; imageLayerElem = imageLayerElem.GetNext("imagelayer"))
+        for (XMLElement imageLayerElem = rootElem.GetChild("imagelayer"); imageLayerElem;
+             imageLayerElem = imageLayerElem.GetNext("imagelayer"))
         {
             String textureFilePath = GetParentPath(GetName()) + imageLayerElem.GetChild("image").GetAttribute("source");
             GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);

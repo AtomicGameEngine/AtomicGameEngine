@@ -11,33 +11,6 @@
 namespace Atomic
 {
 
-static int EventHandler_Property_Get(duk_context* ctx)
-{
-    // targ, key, recv
-
-    if (duk_is_string(ctx, 1))
-    {
-        const char* cstr = duk_to_string(ctx, 1);
-        StringHash key = cstr;
-
-        JSEventHelper* helper = js_to_class_instance<JSEventHelper>(ctx, 0, 0);
-        VariantMap& data = helper->GetCurrentData();
-
-        if (!data.Contains(key))
-        {
-            duk_push_undefined(ctx);
-            return 1;
-        }
-
-        js_push_variant(ctx, data[key]);
-        return 1;
-    }
-
-    duk_push_undefined(ctx);
-    return 1;
-
-}
-
 static int Object_SubscribeToEvent(duk_context* ctx)
 {
 
@@ -82,19 +55,7 @@ static int Object_SubscribeToEvent(duk_context* ctx)
         duk_pop(ctx); // pop null or undefined
 
         // construct a new event helper
-        js_push_class_object_instance(ctx, new JSEventHelper(object->GetContext()));
-
-        // proxy support
-        duk_get_global_string(ctx, "Proxy");
-
-        duk_dup(ctx, -2);
-
-        // setup property handler
-        duk_push_object(ctx);
-        duk_push_c_function(ctx, EventHandler_Property_Get, 3);
-        duk_put_prop_string(ctx, -2, "get");
-        duk_new(ctx, 2);
-        duk_put_prop_string(ctx, -2, "__eventHelperProxy");
+        js_push_class_object_instance(ctx, new JSEventHelper(object->GetContext(), object));
 
         duk_push_object(ctx);
         duk_put_prop_string(ctx, -2, "__eventHelperFunctions");
@@ -122,8 +83,6 @@ static int Object_SubscribeToEvent(duk_context* ctx)
     return 0;
 }
 
-// so we don't keep allocating these
-static VariantMap sendEventVMap;
 static int Object_SendEvent(duk_context* ctx)
 {
     int top = duk_get_top(ctx);
@@ -141,6 +100,7 @@ static int Object_SendEvent(duk_context* ctx)
     {
         if (duk_is_object(ctx, 1)) {
 
+            VariantMap sendEventVMap;
             js_object_to_variantmap(ctx, 1, sendEventVMap);
 
             sender->SendEvent(duk_to_string(ctx, 0), sendEventVMap);

@@ -1,7 +1,7 @@
-#ifdef __disabled
+#ifdef __DISABLED
 
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,24 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Engine/Console.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Core/CoreEvents.h"
+#include "../Engine/Console.h"
 #include "../Engine/EngineEvents.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
 #include "../Input/Input.h"
-#include "../Input/InputEvents.h"
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
+#include "../UI/DropDownList.h"
+#include "../UI/Font.h"
+#include "../UI/LineEdit.h"
+#include "../UI/ListView.h"
+#include "../UI/ScrollBar.h"
+#include "../UI/Text.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
 
@@ -117,7 +123,7 @@ void Console::SetDefaultStyle(XMLFile* style)
 
     closeButton_->SetDefaultStyle(style);
     closeButton_->SetStyle("CloseButton");
-    
+
     UpdateElements();
 }
 
@@ -199,7 +205,7 @@ void Console::SetNumRows(unsigned rows)
     displayedRows_ = rows;
     if (GetNumBufferedRows() < rows)
         SetNumBufferedRows(rows);
-    
+
     UpdateElements();
 }
 
@@ -223,7 +229,8 @@ void Console::UpdateElements()
     const IntRect& border = background_->GetLayoutBorder();
     const IntRect& panelBorder = rowContainer_->GetScrollPanel()->GetClipBorder();
     rowContainer_->SetFixedWidth(width - border.left_ - border.right_);
-    rowContainer_->SetFixedHeight(displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_ +
+    rowContainer_->SetFixedHeight(
+        displayedRows_ * rowContainer_->GetItem((unsigned)0)->GetHeight() + panelBorder.top_ + panelBorder.bottom_ +
         (rowContainer_->GetHorizontalScrollBar()->IsVisible() ? rowContainer_->GetHorizontalScrollBar()->GetHeight() : 0));
     background_->SetFixedWidth(width);
     background_->SetHeight(background_->GetMinHeight());
@@ -311,10 +318,10 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_COMMAND] = line;
-        eventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
-        SendEvent(E_CONSOLECOMMAND, eventData);
+        VariantMap& newEventData = GetEventDataMap();
+        newEventData[P_COMMAND] = line;
+        newEventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
+        SendEvent(E_CONSOLECOMMAND, newEventData);
 
         // Store to history, then clear the lineedit
         history_.Push(line);
@@ -355,6 +362,8 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             changed = true;
         }
         break;
+
+    default: break;
     }
 
     if (changed)
@@ -381,13 +390,13 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     // If printing a log message causes more messages to be logged (error accessing font), disregard them
     if (printing_)
         return;
-    
+
     using namespace LogMessage;
 
     int level = eventData[P_LEVEL].GetInt();
     // The message may be multi-line, so split to rows in that case
     Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
-    
+
     for (unsigned i = 0; i < rows.Size(); ++i)
         pendingRows_.Push(MakePair(level, rows[i]));
 
@@ -408,11 +417,11 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
     if (!rowContainer_->GetNumItems() || pendingRows_.Empty())
         return;
-    
+
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
-    
-    Text* text;
+
+    Text* text = 0;
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
         rowContainer_->RemoveItem((unsigned)0);
@@ -422,9 +431,9 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         text->SetStyle(pendingRows_[i].first_ == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
         rowContainer_->AddItem(text);
     }
-    
+
     pendingRows_.Clear();
-    
+
     rowContainer_->EnsureItemVisibility(text);
     rowContainer_->EnableLayoutUpdate();
     rowContainer_->UpdateLayout();

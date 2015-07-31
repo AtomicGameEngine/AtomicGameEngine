@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ATOMIC_API ConstraintGear2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintGear2D(Context* scontext);
+    ConstraintGear2D(Context* context);
     /// Destruct.
     virtual ~ConstraintGear2D();
     /// Register object factory.
@@ -49,8 +49,10 @@ public:
 
     /// Return owner constraint.
     Constraint2D* GetOwnerConstraint() const { return ownerConstraint_; }
+
     /// Return other constraint.
     Constraint2D* GetOtherConstraint() const { return otherConstraint_; }
+
     /// Return ratio.
     float GetRatio() const { return jointDef_.ratio; }
 

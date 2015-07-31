@@ -348,7 +348,7 @@ class TBWidgetDelegate
 {
 public:
     virtual bool OnEvent(const TBWidgetEvent &ev) = 0;
-
+    virtual void OnFocusChanged(bool focused) = 0;
     virtual void OnDelete() = 0;
 };
 
@@ -676,7 +676,7 @@ public:
 	virtual void OnFontChanged() {}
 
 	/** Called when the focus has changed. */
-	virtual void OnFocusChanged(bool focused) {}
+    virtual void OnFocusChanged(bool focused) { if (m_delegate) return m_delegate->OnFocusChanged(focused); }
 
 	/** Called when the visibility has changed.
 		Note: This is not called when combined visibility change, so it may change visibility

@@ -22,13 +22,14 @@ UILayoutParams::~UILayoutParams()
 }
 
 
-UILayout::UILayout(Context* context, bool createWidget) : UIWidget(context, false)
+UILayout::UILayout(Context* context, UI_AXIS axis, bool createWidget) : UIWidget(context, false)
 {
     if (createWidget)
     {
         widget_ = new TBLayout();
         widget_->SetDelegate(this);
         widget_->SetGravity(WIDGET_GRAVITY_ALL);
+        widget_->SetAxis((AXIS) axis);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 }
@@ -45,7 +46,7 @@ void UILayout::SetSpacing(int spacing)
     ((tb::TBLayout*)widget_)->SetSpacing(spacing);
 }
 
-void UILayout::SetLayoutPosition(/*LAYOUT_POSITION*/ unsigned position)
+void UILayout::SetLayoutPosition(UI_LAYOUT_POSITION position)
 {
     if (!widget_)
         return;
@@ -53,7 +54,7 @@ void UILayout::SetLayoutPosition(/*LAYOUT_POSITION*/ unsigned position)
     ((tb::TBLayout*)widget_)->SetLayoutPosition( (LAYOUT_POSITION) position);
 }
 
-void UILayout::SetLayoutDistributionPosition(/*LAYOUT_DISTRIBUTION_POSITION*/ unsigned distribution_pos)
+void UILayout::SetLayoutDistributionPosition(UI_LAYOUT_DISTRIBUTION_POSITION distribution_pos)
 {
     if (!widget_)
         return;
@@ -62,7 +63,7 @@ void UILayout::SetLayoutDistributionPosition(/*LAYOUT_DISTRIBUTION_POSITION*/ un
 
 }
 
-void UILayout::SetLayoutSize(unsigned size)
+void UILayout::SetLayoutSize(UI_LAYOUT_SIZE size)
 {
     if (!widget_)
         return;
@@ -71,7 +72,7 @@ void UILayout::SetLayoutSize(unsigned size)
 
 }
 
-void UILayout::SetAxis(unsigned axis)
+void UILayout::SetAxis(UI_AXIS axis)
 {
     if (!widget_)
         return;
@@ -79,7 +80,7 @@ void UILayout::SetAxis(unsigned axis)
     ((tb::TBLayout*)widget_)->SetAxis((AXIS) axis);
 }
 
-void UILayout::SetLayoutDistribution(/* LAYOUT_DISTRIBUTION */ unsigned distribution)
+void UILayout::SetLayoutDistribution(UI_LAYOUT_DISTRIBUTION distribution)
 {
     if (!widget_)
         return;

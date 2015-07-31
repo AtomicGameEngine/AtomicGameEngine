@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ struct ListNodeBase
         next_(0)
     {
     }
-    
+
     /// Previous node.
     ListNodeBase* prev_;
     /// Next node.
@@ -52,32 +52,33 @@ struct ListIteratorBase
         ptr_(0)
     {
     }
-    
+
     /// Construct with a node pointer.
     explicit ListIteratorBase(ListNodeBase* ptr) :
         ptr_(ptr)
     {
     }
-    
+
     /// Test for equality with another iterator.
-    bool operator == (const ListIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
+    bool operator ==(const ListIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
+
     /// Test for inequality with another iterator.
-    bool operator != (const ListIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
-    
+    bool operator !=(const ListIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
+
     /// Go to the next node.
     void GotoNext()
     {
         if (ptr_)
             ptr_ = ptr_->next_;
     }
-    
+
     /// Go to the previous node.
     void GotoPrev()
     {
         if (ptr_)
             ptr_ = ptr_->prev_;
     }
-    
+
     /// Node pointer.
     ListNodeBase* ptr_;
 };
@@ -92,7 +93,7 @@ public:
         size_(0)
     {
     }
-    
+
     /// Swap with another linked list.
     void Swap(ListBase& rhs)
     {
@@ -101,7 +102,7 @@ public:
         Atomic::Swap(allocator_, rhs.allocator_);
         Atomic::Swap(size_, rhs.size_);
     }
-    
+
 protected:
     /// Head node pointer.
     ListNodeBase* head_;

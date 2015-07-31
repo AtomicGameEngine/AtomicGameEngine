@@ -30,6 +30,7 @@ namespace Atomic
 class Drawable2D;
 class IndexBuffer;
 class Material;
+class Technique;
 class VertexBuffer;
 struct FrameInfo;
 struct SourceBatch2D;
@@ -60,7 +61,7 @@ struct ViewBatchInfo2D
     Vector<SharedPtr<Geometry> > geometries_;
 };
 
-/// 2D renderer components.
+/// 2D renderer component.
 class ATOMIC_API Renderer2D : public Drawable
 {
     OBJECT(Renderer2D);
@@ -110,7 +111,9 @@ private:
     /// Update view batch info.
     void UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* camera);
     /// Add view batch.
-    void AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
+    void AddViewBatch
+        (ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount, unsigned vertexStart,
+            unsigned vertexCount);
 
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
@@ -128,6 +131,8 @@ private:
     BoundingBox frustumBoundingBox_;
     /// Cached materials.
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
+    /// Cached techniques per blend mode.
+    HashMap<int, SharedPtr<Technique> > cachedTechniques_;
     /// Whether or not the renderer containts tris (default is quads)
     bool useTris_;
 };

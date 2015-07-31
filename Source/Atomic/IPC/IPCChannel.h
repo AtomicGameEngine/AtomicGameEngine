@@ -26,16 +26,20 @@ class IPCChannel : public Object, public Thread
 
 public:
 
-    IPCChannel(Context* context);
+    IPCChannel(Context* context, unsigned id);
     virtual ~IPCChannel();
 
     virtual void ThreadFunction() {}
+
+    unsigned GetID() { return id_; }
 
     bool Receive();
 
     void PostMessage(StringHash eventType, VariantMap& eventData);
 
 protected:
+
+    unsigned id_;
 
     // for access from thread
     WeakPtr<IPC> ipc_;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ATOMIC_API ConstraintFriction2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintFriction2D(Context* scontext);
+    ConstraintFriction2D(Context* context);
     /// Destruct.
     virtual ~ConstraintFriction2D();
     /// Register object factory.
@@ -49,8 +49,10 @@ public:
 
     /// Return anchor.
     const Vector2& GetAnchor() const { return anchor_; }
+
     /// Set max force.
     float GetMaxForce() const { return jointDef_.maxForce; }
+
     /// Set max torque.
     float GetMaxTorque() const { return jointDef_.maxTorque; }
 

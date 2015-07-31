@@ -79,6 +79,28 @@ String UISelectList::GetSelectedItemID()
 
 }
 
+String UISelectList::GetHoverItemID()
+{
+    if (!widget_)
+        return "";
+
+    if (!TBWidget::hovered_widget)
+        return "";
+
+    TBSelectList* select = (TBSelectList*) widget_;
+
+    if (!select->IsAncestorOf(TBWidget::hovered_widget))
+    {
+        return "";
+    }
+
+    String id_;
+    GetSubsystem<UI>()->GetTBIDString(TBWidget::hovered_widget->GetID(), id_);
+
+    return id_;
+
+}
+
 void UISelectList::SetSource(UISelectItemSource* source)
 {
     if (!widget_)

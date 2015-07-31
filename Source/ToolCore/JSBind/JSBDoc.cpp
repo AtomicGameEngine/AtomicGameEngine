@@ -159,9 +159,7 @@ void JSBDoc::ExportModuleClasses(JSBModule* module)
                 continue;
 
             String scriptType = GetScriptType(ftype);
-
-            String scriptName =  propertyNames[j];
-            scriptName[0] = tolower(scriptName[0]);
+            String scriptName = prop->GetCasePropertyName();
 
             if (desc.Length())
             {

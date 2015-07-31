@@ -29,6 +29,15 @@ UIImageWidget::~UIImageWidget()
 {
 }
 
+void UIImageWidget::SetImage(const String& imagePath)
+{
+    if (!widget_)
+        return;
+
+    ((TBImageWidget*) widget_)->SetImage(imagePath.CString());
+
+}
+
 bool UIImageWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
     return UIWidget::OnEvent(ev);

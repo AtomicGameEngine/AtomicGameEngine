@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Condition.h"
 
 #ifdef WIN32
@@ -33,6 +34,7 @@ namespace Atomic
 {
 
 #ifdef WIN32
+
 Condition::Condition() :
     event_(0)
 {
@@ -54,7 +56,9 @@ void Condition::Wait()
 {
     WaitForSingleObject((HANDLE)event_, INFINITE);
 }
+
 #else
+
 Condition::Condition() :
     mutex_(new pthread_mutex_t),
     event_(new pthread_cond_t)
@@ -67,7 +71,7 @@ Condition::~Condition()
 {
     pthread_cond_t* cond = (pthread_cond_t*)event_;
     pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
-    
+
     pthread_cond_destroy(cond);
     pthread_mutex_destroy(mutex);
     delete cond;
@@ -85,11 +89,12 @@ void Condition::Wait()
 {
     pthread_cond_t* cond = (pthread_cond_t*)event_;
     pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
-    
+
     pthread_mutex_lock(mutex);
     pthread_cond_wait(cond, mutex);
     pthread_mutex_unlock(mutex);
 }
+
 #endif
 
 }

@@ -18,7 +18,9 @@ public:
     UIMenuWindow(Context* context, UIWidget* target, const String& id);
     virtual ~UIMenuWindow();
 
-    void Show(UISelectItemSource* source);
+    void Show(UISelectItemSource* source, int x = -1, int y = -1);
+
+    void Close();
 
 protected:
 

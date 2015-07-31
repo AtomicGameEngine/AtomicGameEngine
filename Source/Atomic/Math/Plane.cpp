@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Math/Plane.h"
 
 namespace Atomic
@@ -51,7 +52,7 @@ Matrix3x4 Plane::ReflectionMatrix() const
         -2.0f * normal_.x_ * normal_.y_,
         -2.0f * normal_.x_ * normal_.z_,
         -2.0f * normal_.x_ * d_,
-        -2.0f * normal_.y_ * normal_.x_ ,
+        -2.0f * normal_.y_ * normal_.x_,
         -2.0f * normal_.y_ * normal_.y_ + 1.0f,
         -2.0f * normal_.y_ * normal_.z_,
         -2.0f * normal_.y_ * d_,

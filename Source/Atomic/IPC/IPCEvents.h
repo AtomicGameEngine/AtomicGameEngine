@@ -6,23 +6,29 @@ namespace Atomic
 {
 
 /// Worker start
-EVENT(E_IPCWORKERSTART, WorkerStart)
+EVENT(E_IPCWORKERSTART, IPCWorkerStart)
 {
 
 }
 
 /// Worker exited
-EVENT(E_IPCWORKEREXIT, WorkerExit)
+EVENT(E_IPCWORKEREXIT, IPCWorkerExit)
 {
     PARAM(P_BROKER, Broker);   // Broker*
     PARAM(P_EXITCODE, ExitCode);   // int
 }
 
-/// Worker start
-EVENT(E_IPCHELLOFROMBROKER, HelloFromBroker)
+/// broker -> worker start
+EVENT(E_IPCINITIALIZE, IPCInitialize)
 {
-    PARAM(P_HELLO, Hello);      // string
-    PARAM(P_LIFETHEUNIVERSEANDEVERYTHING, LifeTheUniverseAndEverything); // 42
+
+}
+
+/// Worker Log
+EVENT(E_IPCWORKERLOG, IPCWorkerLog)
+{
+    PARAM(P_LEVEL, Level);      // int log level
+    PARAM(P_MESSAGE, Message);  // string
 }
 
 

@@ -74,6 +74,7 @@ ResourceRef LMStaticModel::GetLightmapTextureAttr() const
 
 void LMStaticModel::UpdateBatches(const FrameInfo& frame)
 {
+    /*
     StaticModel::UpdateBatches(frame);
 
     if (batches_.Size() > 1)
@@ -95,6 +96,7 @@ void LMStaticModel::UpdateBatches(const FrameInfo& frame)
             batches_[0].material_ = lightmapMaterial_;
 
     }
+    */
 
 }
 

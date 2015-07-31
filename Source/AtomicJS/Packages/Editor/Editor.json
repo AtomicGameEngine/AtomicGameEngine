@@ -1,7 +1,0 @@
-{
-	"name" : "Editor",
-	"sources" : ["Source/AtomicEditorWork/JSTest", "Source/AtomicEditorWork/Editors", "Source/AtomicEditorWork/Editors/SceneEditor3D",
-		           "Source/AtomicEditorWork/Inspector"],
-	"classes" : ["MyJSClass", "ResourceEditor", "JSResourceEditor", "SceneEditor3D", "SceneView3D",
-								"InspectorFrame"]
-}

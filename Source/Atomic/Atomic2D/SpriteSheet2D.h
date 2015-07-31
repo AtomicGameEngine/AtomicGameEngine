@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,12 @@ public:
 
     /// Return texture.
     Texture2D* GetTexture() const { return texture_; }
+
     /// Return sprite.
     Sprite2D* GetSprite(const String& name) const;
     /// Define sprite.
-    void DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot = Vector2(0.5f, 0.5f), const IntVector2& offset = IntVector2::ZERO);
+    void DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot = Vector2(0.5f, 0.5f),
+        const IntVector2& offset = IntVector2::ZERO);
 
     /// Return sprite mapping.
     const HashMap<String, SharedPtr<Sprite2D> >& GetSpriteMapping() const { return spriteMapping_; }

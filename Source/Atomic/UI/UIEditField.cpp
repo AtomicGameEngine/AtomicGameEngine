@@ -27,6 +27,17 @@ UIEditField::~UIEditField()
 
 }
 
+void UIEditField::SetReadOnly(bool readonly)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetReadOnly(readonly);
+
+}
+
 void UIEditField::SetWrapping(bool wrap)
 {
     if (!widget_)
@@ -35,7 +46,6 @@ void UIEditField::SetWrapping(bool wrap)
     TBEditField* w = (TBEditField*) widget_;
 
     w->SetWrapping(wrap);
-
 }
 
 bool UIEditField::GetWrapping()
@@ -46,6 +56,42 @@ bool UIEditField::GetWrapping()
     TBEditField* w = (TBEditField*) widget_;
 
     return w->GetWrapping();
+
+}
+
+void UIEditField::SetEditType(UI_EDIT_TYPE type)
+{
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetEditType((tb::EDIT_TYPE) type);
+
+}
+
+void UIEditField::ScrollTo(int x, int y)
+{
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->ScrollTo(x, y);
+
+}
+
+void UIEditField::AppendText(const String& text)
+{
+    if (!widget_)
+        return;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->AppendText(text.CString());
 
 }
 
@@ -74,7 +120,7 @@ void UIEditField::SetTextAlign(TEXT_ALIGN align)
 
 bool UIEditField::OnEvent(const tb::TBWidgetEvent &ev)
 {
-    return false;
+    return UIWidget::OnEvent(ev);
 }
 
 }

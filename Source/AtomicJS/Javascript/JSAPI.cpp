@@ -35,6 +35,13 @@ void js_class_get_prototype(duk_context* ctx, const char* package, const char *c
     duk_remove(ctx, -2); // remove Atomic object
 }
 
+void js_class_get_constructor(duk_context* ctx, const char* package, const char *classname)
+{
+    duk_get_global_string(ctx, package);
+    duk_get_prop_string(ctx, -1, classname);
+    duk_remove(ctx, -2); // remove package
+}
+
 void js_constructor_basecall(duk_context* ctx, const char* package, const char* baseclass)
 {
     int top = duk_get_top(ctx);
@@ -207,18 +214,182 @@ void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
 
 }
 
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
+{
+    v.Clear();
+
+    // convert to abs index
+    if (variantIdx < 0)
+        variantIdx = duk_get_top(ctx) + variantIdx;
+
+    if (duk_is_boolean(ctx, variantIdx))
+    {
+        v = duk_to_boolean(ctx, variantIdx) ? true : false;
+        return;
+    }
+
+    if (duk_is_string(ctx, variantIdx))
+    {
+        v = duk_to_string(ctx, variantIdx);
+        return;
+    }
+
+    if (duk_is_number(ctx, variantIdx))
+    {
+        v = (float) duk_to_number(ctx, variantIdx);
+        return;
+    }
+
+    if (duk_is_pointer(ctx, variantIdx))
+    {
+        v = (RefCounted*) duk_get_pointer(ctx, variantIdx);
+        return;
+    }
+
+    if (duk_is_array(ctx, variantIdx))
+    {
+        if (duk_get_length(ctx, variantIdx) == 2)
+        {
+            Vector2 v2;
+            duk_get_prop_index(ctx, variantIdx, 0);
+            v2.x_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 1);
+            v2.y_ = duk_to_number(ctx, -1);
+            duk_pop_n(ctx, 2);
+            v = v2;
+            return;
+        }
+        else if (duk_get_length(ctx, variantIdx) == 3)
+        {
+            Vector3 v3;
+            duk_get_prop_index(ctx, variantIdx, 0);
+            v3.x_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 1);
+            v3.y_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 2);
+            v3.z_ = duk_to_number(ctx, -1);
+            duk_pop_n(ctx, 3);
+            v = v3;
+            return;
+        }
+        else if (duk_get_length(ctx, variantIdx) == 4)
+        {
+            Vector4 v4;
+            duk_get_prop_index(ctx, variantIdx, 0);
+            v4.x_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 1);
+            v4.y_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 2);
+            v4.z_ = duk_to_number(ctx, -1);
+            duk_get_prop_index(ctx, variantIdx, 3);
+            v4.w_ = duk_to_number(ctx, -1);
+            duk_pop_n(ctx, 4);
+            v = v4;
+            return;
+        }
+
+
+        return;
+    }
+
+}
+
+
+// variant map Proxy getter, so we can convert access to string based
+// member lookup, to string hash on the fly
+
+static int variantmap_property_get(duk_context* ctx)
+{
+    // targ, key, recv
+
+    if (duk_is_string(ctx, 1))
+    {
+        StringHash key = duk_to_string(ctx, 1);
+        duk_get_prop_index(ctx, 0, (unsigned) key.Value());
+        return 1;
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+
+}
+
+// removes all keys from the variant map proxy target, REGARDLESS of key given for delete
+// see (lengthy) note in JSEventDispatcher::EndSendEvent
+static int variantmap_property_deleteproperty(duk_context* ctx)
+{
+    // deleteProperty: function (targ, key)
+
+    duk_enum(ctx, 0, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+    while (duk_next(ctx, -1, 0)) {        
+        duk_del_prop(ctx, 0);
+    }
+
+    duk_push_boolean(ctx, 1);
+    return 1;
+
+}
+
+
+void js_push_variantmap(duk_context* ctx, const VariantMap &vmap)
+{
+
+    // setup proxy so we can map string
+    duk_get_global_string(ctx, "Proxy");
+
+    duk_push_object(ctx);
+
+    VariantMap::ConstIterator itr = vmap.Begin();
+
+    while (itr != vmap.End()) {
+
+        js_push_variant(ctx, itr->second_);
+
+
+        if (duk_is_undefined(ctx, -1)) {
+
+            duk_pop(ctx);
+        }
+        else
+        {
+            duk_put_prop_index(ctx, -2, (unsigned) itr->first_.Value());
+        }
+
+        itr++;
+
+    }
+
+    // setup property handler
+    duk_push_object(ctx);
+    duk_push_c_function(ctx, variantmap_property_get, 3);
+    duk_put_prop_string(ctx, -2, "get");
+    duk_push_c_function(ctx, variantmap_property_deleteproperty, 2);
+    duk_put_prop_string(ctx, -2, "deleteProperty");
+
+    duk_new(ctx, 2);
+
+
+}
+
 void js_push_variant(duk_context *ctx, const Variant& v)
 {
     VariantType type = v.GetType();
     RefCounted* ref;
     Object* object;
-    Vector2& vector2 = (Vector2&) Vector2::ZERO;
-    Vector3& vector3 = (Vector3&) Vector3::ZERO;
+    Vector2 vector2 = Vector2::ZERO;
+    Vector3 vector3 = Vector3::ZERO;
+    Vector4 vector4 = Vector4::ZERO;
+    Color color = Color::BLACK;
+
     void* uniqueClassID = NULL;
     const char* package = NULL;
 
     switch (type)
     {
+    case VAR_NONE:
+        duk_push_undefined(ctx);
+        break;
 
     case VAR_VOIDPTR:
         duk_push_null(ctx);
@@ -227,7 +398,7 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
         ref = v.GetPtr();
 
-        if (!ref || !ref->IsObject())
+        if (!ref || !ref->IsObject() || !ref->Refs())
         {
             duk_push_null(ctx);
             break;
@@ -277,19 +448,53 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         vector2 = v.GetVector2();
         duk_push_array(ctx);
         duk_push_number(ctx, vector2.x_);
-        duk_put_prop_index(ctx, -1, 0);
+        duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, vector2.y_);
-        duk_put_prop_index(ctx, -1, 1);
+        duk_put_prop_index(ctx, -2, 1);
         break;
     case VAR_VECTOR3:
         vector3 = v.GetVector3();
         duk_push_array(ctx);
         duk_push_number(ctx, vector3.x_);
-        duk_put_prop_index(ctx, -1, 0);
+        duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, vector3.y_);
-        duk_put_prop_index(ctx, -1, 1);
+        duk_put_prop_index(ctx, -2, 1);
         duk_push_number(ctx, vector3.z_);
-        duk_put_prop_index(ctx, -1, 1);
+        duk_put_prop_index(ctx, -2, 2);
+        break;
+    case VAR_QUATERNION:
+        vector3 = v.GetQuaternion().EulerAngles();
+        duk_push_array(ctx);
+        duk_push_number(ctx, vector3.x_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, vector3.y_);
+        duk_put_prop_index(ctx, -2, 1);
+        duk_push_number(ctx, vector3.z_);
+        duk_put_prop_index(ctx, -2, 2);
+        break;
+    case VAR_COLOR:
+        color = v.GetColor();
+        duk_push_array(ctx);
+        duk_push_number(ctx, color.r_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, color.g_);
+        duk_put_prop_index(ctx, -2, 1);
+        duk_push_number(ctx, color.b_);
+        duk_put_prop_index(ctx, -2, 2);
+        duk_push_number(ctx, color.a_);
+        duk_put_prop_index(ctx, -2, 3);
+        break;
+    case VAR_VECTOR4:
+        vector4 = v.GetVector4();
+        duk_push_array(ctx);
+        duk_push_number(ctx, vector4.x_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, vector4.y_);
+        duk_put_prop_index(ctx, -2, 1);
+        duk_push_number(ctx, vector4.z_);
+        duk_put_prop_index(ctx, -2, 2);
+        duk_push_number(ctx, vector4.w_);
+        duk_put_prop_index(ctx, -2, 3);
         break;
 
     default:

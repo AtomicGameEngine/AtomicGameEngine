@@ -23,7 +23,6 @@ JSBFunctionWriter::JSBFunctionWriter(JSBFunction *function) : function_(function
 void JSBFunctionWriter::WriteParameterMarshal(String& source)
 {
     // generate args
-
     Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     int cparam = 0;
@@ -438,6 +437,13 @@ void JSBFunctionWriter::WriteFunction(String& source)
             returnDeclared = true;
             source.AppendWithFormat("%s retValue = ", enumType->enum_->GetName().CString());
         }
+        else if (returnType->type_->asVectorType())
+        {
+            returnDeclared = true;
+            JSBVectorType* vtype = returnType->type_->asVectorType();
+            source.AppendWithFormat("const %s& retValue = ", vtype->ToString().CString());
+        }
+
     }
 
     source.AppendWithFormat("native->%s(", function_->name_.CString());
@@ -508,6 +514,14 @@ void JSBFunctionWriter::WriteFunction(String& source)
             returnDeclared = true;
             source.Append("duk_push_number(ctx, (double) retValue);\n");
         }
+        else if (returnType->type_->asVectorType())
+        {
+            source.Append("duk_push_array(ctx);\n");
+            source.Append("for (unsigned i = 0; i < retValue.Size(); i++)\n{\n");
+            source.Append("duk_push_string(ctx, retValue[i].CString());\n");
+            source.Append("duk_put_prop_index(ctx, -2, i);\n}\n");
+        }
+
 
 
         source += "return 1;\n";

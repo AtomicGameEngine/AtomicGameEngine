@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class ATOMIC_API ConstraintWeld2D : public Constraint2D
 
 public:
     /// Construct.
-    ConstraintWeld2D(Context* scontext);
+    ConstraintWeld2D(Context* context);
     /// Destruct.
     virtual ~ConstraintWeld2D();
     /// Register object factory.
@@ -49,8 +49,10 @@ public:
 
     /// Return anchor.
     const Vector2& GetAnchor() const { return anchor_; }
+
     /// Return frequency Hz.
     float GetFrequencyHz() const { return jointDef_.frequencyHz; }
+
     /// Return damping ratio.
     float GetDampingRatio() const { return jointDef_.dampingRatio; }
 

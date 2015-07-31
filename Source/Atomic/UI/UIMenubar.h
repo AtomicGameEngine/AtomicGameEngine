@@ -14,7 +14,7 @@ class UIMenuItem : public UISelectItem
 
 public:
 
-    UIMenuItem(Context* context, const String& str = String::EMPTY, const String& id = String::EMPTY, const String& shortcut = String::EMPTY);
+    UIMenuItem(Context* context, const String& str = String::EMPTY, const String& id = String::EMPTY, const String& shortcut = String::EMPTY, const String& skinBg = String::EMPTY);
     virtual ~UIMenuItem();
 
     tb::TBGenericStringItem* GetTBItem();
@@ -22,6 +22,7 @@ public:
 private:
 
     String shortcut_;
+    String skinBg_;
 
 };
 

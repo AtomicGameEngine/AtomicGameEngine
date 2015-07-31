@@ -100,10 +100,8 @@ void LicenseSystem::LicenseAgreementConfirmed()
     file->WriteInt(1);
     file->Close();
 
-    /*
-    UIModalOps* ops = GetSubsystem<UIModalOps>();
-    ops->ShowActivation();
-    */
+    if (!LoadLicense() || !key_.Length())
+        SendEvent(E_LICENSE_ACTIVATIONREQUIRED);
 }
 
 String LicenseSystem::GenerateMachineID()
@@ -339,18 +337,22 @@ void LicenseSystem::Activate(const String& key, const LicenseParse& parse)
     SaveLicense();
 }
 
-SharedPtr<CurlRequest>& LicenseSystem::Deactivate()
+bool LicenseSystem::Deactivate()
 {
     if (deactivate_.NotNull())
     {
-        LOGERROR("LicenseSystem::Deactivate - request already exists");
-        return deactivate_;
+        VariantMap eventData;
+        eventData[LicenseDeactivationError::P_MESSAGE] = "LicenseSystem::Deactivate - request already exists";
+        SendEvent(E_LICENSE_DEACTIVATIONERROR, eventData);
+        return false;
     }
 
     if (!key_.Length())
     {
-        LOGERROR("LicenseSystem::Deactivate - zero length key");
-        return deactivate_;
+        VariantMap eventData;
+        eventData[LicenseDeactivationError::P_MESSAGE] = "LicenseSystem::Deactivate - zero length key";
+        SendEvent(E_LICENSE_DEACTIVATIONERROR, eventData);
+        return false;
     }
 
     CurlManager* cm = GetSubsystem<CurlManager>();
@@ -362,7 +364,7 @@ SharedPtr<CurlRequest>& LicenseSystem::Deactivate()
 
     SubscribeToEvent(deactivate_, E_CURLCOMPLETE, HANDLER(LicenseSystem, HandleDeactivate));
 
-    return deactivate_;
+    return true;
 
 }
 
@@ -596,13 +598,10 @@ void LicenseSystem::RequestServerActivation(const String& key)
         LOGERROR("UIActivation::RequestServerActivation - request already exists");
         return;
     }
-
-    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
-
     key_ = key;
     CurlManager* cm = GetSubsystem<CurlManager>();
     String post;
-    String id = licenseSystem->GenerateMachineID();
+    String id = GenerateMachineID();
     post.AppendWithFormat("key=%s&id=%s", key.CString(), id.CString());
 
     // todo, this should be a verify url (shouldn't auto add id)

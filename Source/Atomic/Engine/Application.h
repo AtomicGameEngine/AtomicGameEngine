@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,26 +31,28 @@ namespace Atomic
 
 class Engine;
 
-/// Base class for creating applications which initialize the Atomic engine and run a main loop until exited.
+/// Base class for creating applications which initialize the Urho3D engine and run a main loop until exited.
 class ATOMIC_API Application : public Object
 {
     OBJECT(Application);
-    
+
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.
     Application(Context* context);
 
     /// Setup before engine initialization. This is a chance to eg. modify the engine parameters. Call ErrorExit() to terminate without initializing the engine. Called by Application.
-    virtual void Setup() {}
+    virtual void Setup() { }
+
     /// Setup after engine initialization and before running the main loop. Call ErrorExit() to terminate without running the main loop. Called by Application.
-    virtual void Start() {}
+    virtual void Start() { }
+
     /// Cleanup after the main loop. Called by Application.
-    virtual void Stop() {}
+    virtual void Stop() { }
 
     /// Initialize the engine and run the main loop, then return the application exit code. Catch out-of-memory exceptions while running.
     int Run();
     /// Show an error message (last log message if empty), terminate the main loop, and set failure exit code.
-    virtual void ErrorExit(const String& message = String::EMPTY);
+    void ErrorExit(const String& message = String::EMPTY);
 
 protected:
     /// Handle log message.
@@ -87,5 +89,5 @@ int RunApplication() \
 } \
 DEFINE_MAIN(RunApplication());
 #endif
-    
+
 }

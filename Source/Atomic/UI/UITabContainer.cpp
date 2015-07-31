@@ -58,8 +58,8 @@ void UITabContainer::SetCurrentPage(int page)
 }
 
 bool UITabContainer::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    return false;
+{    
+    return UIWidget::OnEvent(ev);
 }
 
 }

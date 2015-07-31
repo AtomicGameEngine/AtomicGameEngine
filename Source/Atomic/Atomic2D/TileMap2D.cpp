@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Scene/Node.h"
 #include "../Resource/ResourceCache.h"
+#include "../Scene/Node.h"
 #include "../Scene/Scene.h"
 #include "../Atomic2D/TileMap2D.h"
 #include "../Atomic2D/TileMapLayer2D.h"
@@ -52,7 +53,8 @@ void TileMap2D::RegisterObject(Context* context)
     context->RegisterFactory<TileMap2D>(ATOMIC2D_CATEGORY);
 
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
+        AM_DEFAULT);
 }
 
 void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -185,18 +187,6 @@ void TileMap2D::SetTmxFileAttr(const ResourceRef& value)
 ResourceRef TileMap2D::GetTmxFileAttr() const
 {
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
-}
-
-void TileMap2D::OnNodeSet(Node* node)
-{
-    if (!node)
-    {
-        if (rootNode_)
-            rootNode_->Remove();
-
-        rootNode_ = 0;
-        layers_.Clear();
-    }
 }
 
 }

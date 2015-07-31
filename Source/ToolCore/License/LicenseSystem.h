@@ -59,7 +59,9 @@ public:
     bool IsStandardLicense();
 
     void Activate(const String& key, const LicenseParse& parse);
-    SharedPtr<CurlRequest>& Deactivate();
+
+    /// Returns true if request to deactivate is made
+    bool Deactivate();
 
     void ResetLicense();
     bool LoadLicense();

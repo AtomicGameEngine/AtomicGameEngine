@@ -93,6 +93,7 @@ void JSMetrics::DumpJSComponents()
             classname = ((Object*) itr->second_)->GetTypeName();
         }
 
+        /*
         if (classname == "JSComponent")
         {
             JSComponent* jsc = (JSComponent*) itr->second_;
@@ -112,6 +113,7 @@ void JSMetrics::DumpJSComponents()
             else
                 jscomponents[classname]++;
         }
+        */
 
         itr++;
     }

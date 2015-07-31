@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ inline bool operator == (const b2Vec2& left, const b2Vec2& right)
 }
 */
 
-inline bool operator != (const b2Vec2& left, const b2Vec2& right)
+inline bool operator !=(const b2Vec2& left, const b2Vec2& right)
 {
     return left.x != right.x || left.y != right.y;
 }

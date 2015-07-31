@@ -52,6 +52,13 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UISkinImage"] = true;
     uiTypes_["UITabContainer"] = true;
     uiTypes_["UISceneView"] = true;
+    uiTypes_["UIContainer"] = true;
+    uiTypes_["UISection"] = true;
+    uiTypes_["UIInlineSelect"] = true;
+    uiTypes_["UITextureWidget"] = true;
+    uiTypes_["UIScrollContainer"] = true;
+    uiTypes_["UISeparator"] = true;
+    uiTypes_["UIDimmer"] = true;
 
 }
 
@@ -343,7 +350,7 @@ void JSUI::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
     }
 
     // specific event handlers
-    if (type == tb::EVENT_TYPE_CLICK)
+    if (type == tb::EVENT_TYPE_CLICK && handler == target)
     {
         int top = duk_get_top(ctx_);
         duk_push_heapptr(ctx_, handlerHeapPtr);

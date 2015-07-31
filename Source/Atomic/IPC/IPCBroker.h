@@ -8,6 +8,8 @@ namespace Atomic
 
 class IPCProcess;
 
+
+/// Server application held broker
 class IPCBroker : public IPCChannel
 {
     friend class IPC;
@@ -25,6 +27,8 @@ public:
     bool Update();
 
 private:
+
+    static unsigned idCounter_;
 
     bool SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory = "");
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Resource/JSONFile.h"
@@ -67,7 +68,7 @@ JSONValue::~JSONValue()
 {
 }
 
-JSONValue& JSONValue::operator = (const JSONValue& rhs)
+JSONValue& JSONValue::operator =(const JSONValue& rhs)
 {
     file_ = rhs.file_;
     value_ = rhs.value_;
@@ -106,6 +107,11 @@ JSONValue JSONValue::CreateChild(const String& name, JSONValueType valueType)
     return GetChild(name, valueType);
 }
 
+bool JSONValue::HasMember(const String& name) const
+{
+    return value_->HasMember(name.CString());
+}
+
 JSONValue JSONValue::GetChild(const String& name, JSONValueType valueType) const
 {
     assert(IsObject());
@@ -127,6 +133,13 @@ void JSONValue::SetInt(const String& name, int value)
     AddMember(name, jsonValue);
 }
 
+void JSONValue::SetUInt(const String& name, unsigned value)
+{
+    Value jsonValue;
+    jsonValue.SetUint(value);
+    AddMember(name, jsonValue);
+}
+
 void JSONValue::SetBool(const String& name, bool value)
 {
     Value jsonValue;
@@ -138,6 +151,13 @@ void JSONValue::SetFloat(const String& name, float value)
 {
     Value jsonValue;
     jsonValue.SetDouble((double)value);
+    AddMember(name, jsonValue);
+}
+
+void JSONValue::SetDouble(const String& name, double value)
+{
+    Value jsonValue;
+    jsonValue.SetDouble(value);
     AddMember(name, jsonValue);
 }
 
@@ -312,6 +332,11 @@ int JSONValue::GetInt(const String& name) const
     return GetMember(name).GetInt();
 }
 
+unsigned JSONValue::GetUInt(const String& name) const
+{
+    return GetMember(name).GetUint();
+}
+
 bool JSONValue::GetBool(const String& name) const
 {
     return GetMember(name).GetBool();
@@ -320,6 +345,11 @@ bool JSONValue::GetBool(const String& name) const
 float JSONValue::GetFloat(const String& name) const
 {
     return (float)GetMember(name).GetDouble();
+}
+
+double JSONValue::GetDouble(const String& name) const
+{
+    return GetMember(name).GetDouble();
 }
 
 Vector2 JSONValue::GetVector2(const String& name) const
@@ -377,7 +407,7 @@ bool JSONValue::GetBuffer(const String& name, void* dest, unsigned size) const
         return false;
 
     for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = ToInt(bytes[i]);
+        destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
 }
 
@@ -508,6 +538,13 @@ void JSONValue::AddFloat(float value)
 {
     Value jsonValue;
     jsonValue.SetDouble((double)value);
+    AddMember(jsonValue);
+}
+
+void JSONValue::AddDouble(double value)
+{
+    Value jsonValue;
+    jsonValue.SetDouble(value);
     AddMember(jsonValue);
 }
 
@@ -669,6 +706,11 @@ float JSONValue::GetFloat(unsigned index) const
     return (float)GetMember(index).GetDouble();
 }
 
+double JSONValue::GetDouble(unsigned index) const
+{
+    return GetMember(index).GetDouble();
+}
+
 Vector2 JSONValue::GetVector2(unsigned index) const
 {
     return ToVector2(GetCString(index));
@@ -724,7 +766,7 @@ bool JSONValue::GetBuffer(unsigned index, void* dest, unsigned size) const
         return false;
 
     for (unsigned i = 0; i < bytes.Size(); ++i)
-        destBytes[i] = ToInt(bytes[i]);
+        destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;
 }
 

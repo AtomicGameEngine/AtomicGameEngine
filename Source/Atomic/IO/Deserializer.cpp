@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../IO/Deserializer.h"
 
 #include "../DebugNew.h"
@@ -100,15 +101,19 @@ unsigned char Deserializer::ReadUByte()
 
 bool Deserializer::ReadBool()
 {
-    if (ReadUByte())
-        return true;
-    else
-        return false;
+    return ReadUByte() != 0;
 }
 
 float Deserializer::ReadFloat()
 {
     float ret;
+    Read(&ret, sizeof ret);
+    return ret;
+}
+
+double Deserializer::ReadDouble()
+{
+    double ret;
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -218,7 +223,7 @@ BoundingBox Deserializer::ReadBoundingBox()
 String Deserializer::ReadString()
 {
     String ret;
-    
+
     while (!IsEof())
     {
         char c = ReadByte();
@@ -227,7 +232,7 @@ String Deserializer::ReadString()
         else
             ret += c;
     }
-    
+
     return ret;
 }
 
@@ -282,67 +287,70 @@ Variant Deserializer::ReadVariant(VariantType type)
     {
     case VAR_INT:
         return Variant(ReadInt());
-        
+
     case VAR_BOOL:
         return Variant(ReadBool());
-        
+
     case VAR_FLOAT:
         return Variant(ReadFloat());
-        
+
     case VAR_VECTOR2:
         return Variant(ReadVector2());
-        
+
     case VAR_VECTOR3:
         return Variant(ReadVector3());
-        
+
     case VAR_VECTOR4:
         return Variant(ReadVector4());
-        
+
     case VAR_QUATERNION:
         return Variant(ReadQuaternion());
-        
+
     case VAR_COLOR:
         return Variant(ReadColor());
-        
+
     case VAR_STRING:
         return Variant(ReadString());
-        
+
     case VAR_BUFFER:
         return Variant(ReadBuffer());
-        
+
         // Deserializing pointers is not supported. Return null
     case VAR_VOIDPTR:
     case VAR_PTR:
         ReadUInt();
         return Variant((void*)0);
-        
+
     case VAR_RESOURCEREF:
         return Variant(ReadResourceRef());
-        
+
     case VAR_RESOURCEREFLIST:
         return Variant(ReadResourceRefList());
-        
+
     case VAR_VARIANTVECTOR:
         return Variant(ReadVariantVector());
-        
+
     case VAR_VARIANTMAP:
         return Variant(ReadVariantMap());
-        
+
     case VAR_INTRECT:
         return Variant(ReadIntRect());
-        
+
     case VAR_INTVECTOR2:
         return Variant(ReadIntVector2());
-        
+
     case VAR_MATRIX3:
         return Variant(ReadMatrix3());
-        
+
     case VAR_MATRIX3X4:
         return Variant(ReadMatrix3x4());
-        
+
     case VAR_MATRIX4:
         return Variant(ReadMatrix4());
         
+    case VAR_DOUBLE:
+        return Variant(ReadDouble());
+
     default:
         return Variant();
     }
@@ -360,13 +368,13 @@ VariantMap Deserializer::ReadVariantMap()
 {
     VariantMap ret;
     unsigned num = ReadVLE();
-    
+
     for (unsigned i = 0; i < num; ++i)
     {
         StringHash key = ReadStringHash();
         ret[key] = ReadVariant();
     }
-    
+
     return ret;
 }
 
@@ -374,22 +382,22 @@ unsigned Deserializer::ReadVLE()
 {
     unsigned ret;
     unsigned char byte;
-    
+
     byte = ReadUByte();
-    ret = byte & 0x7f;
+    ret = (unsigned)(byte & 0x7f);
     if (byte < 0x80)
         return ret;
-    
+
     byte = ReadUByte();
     ret |= ((unsigned)(byte & 0x7f)) << 7;
     if (byte < 0x80)
         return ret;
-    
+
     byte = ReadUByte();
     ret |= ((unsigned)(byte & 0x7f)) << 14;
     if (byte < 0x80)
         return ret;
-    
+
     byte = ReadUByte();
     ret |= ((unsigned)byte) << 21;
     return ret;
@@ -405,7 +413,7 @@ unsigned Deserializer::ReadNetID()
 String Deserializer::ReadLine()
 {
     String ret;
-    
+
     while (!IsEof())
     {
         char c = ReadByte();
@@ -422,10 +430,10 @@ String Deserializer::ReadLine()
             }
             break;
         }
-        
+
         ret += c;
     }
-    
+
     return ret;
 }
 

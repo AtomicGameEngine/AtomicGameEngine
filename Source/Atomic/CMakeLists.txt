@@ -52,7 +52,7 @@ endif()
 
 if (APPLE)
     if (NOT IOS)
-      set (PLATFORM_SOURCE IO/MacFileWatcher.mm)
+        set (PLATFORM_SOURCE IO/MacFileWatcher.mm UI/UIDragDropMac.mm)
     else()
     endif()
 endif()

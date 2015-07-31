@@ -8,6 +8,7 @@
 
 #include "../Import/JSONSceneImporter.h"
 #include "../Import/JSONSceneProcess.h"
+#include "../Import/OpenAssetImporter.h"
 
 #include "ImportCmd.h"
 
@@ -43,37 +44,49 @@ bool ImportCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Stri
         return false;
     }
 
-    sourceJSONFilename_ = value;
+    assetFilename_ = value;
 
     return true;
 }
 
 void ImportCmd::Run()
 {
+    //ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    //Project* project = tsystem->GetProject();
+    //String resourcePath = project->GetResourcePath();
 
-    Poco::File file(sourceJSONFilename_.CString());
+    String ext = GetExtension(assetFilename_);
 
-    if (!file.exists())
+    if (ext == ".json")
     {
-        Error(ToString("JSON source scene does not exist: %s", sourceJSONFilename_.CString()));
-        return;
+        Poco::File file(assetFilename_.CString());
+
+        if (!file.exists())
+        {
+            Error(ToString("JSON source scene does not exist: %s", assetFilename_.CString()));
+            return;
+        }
+
+        LOGRAWF("Importing JSON: %s", assetFilename_.CString());
+
+        SharedPtr<JSONSceneImporter> jimporter;
+        jimporter = new JSONSceneImporter(context_);
+        jimporter->Import(assetFilename_);
+
+        SharedPtr<JSONSceneProcess> sceneProcess;
+        sceneProcess = new JSONSceneProcess(context_, jimporter);
+        //sceneProcess->Process(resourcePath);
+        //sceneProcess->Write();
     }
+    else
+    {
+        SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
+        if (importer->Load(assetFilename_))
+        {
+            importer->ExportModel("/Users/josh/Desktop/ExportedModel.mdl");
+        }
 
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-    Project* project = tsystem->GetProject();
-
-    String resourcePath = project->GetResourcePath();
-
-    LOGRAWF("Importing: %s", sourceJSONFilename_.CString());
-
-    SharedPtr<JSONSceneImporter> jimporter;
-    jimporter = new JSONSceneImporter(context_);
-    jimporter->Import(sourceJSONFilename_);
-
-    SharedPtr<JSONSceneProcess> sceneProcess;
-    sceneProcess = new JSONSceneProcess(context_, jimporter);
-    sceneProcess->Process(resourcePath);
-    sceneProcess->Write();
+    }
 
     Finished();
 }

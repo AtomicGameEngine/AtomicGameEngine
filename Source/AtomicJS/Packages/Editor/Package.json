@@ -1,9 +1,0 @@
-
-{
-
-  "name" : "Editor",
-  "namespace" : "AtomicEditor",
-  "dependencies" : ["Source/AtomicJS/Packages/Atomic"],
-  "modules" : ["Editor"]
-
-}

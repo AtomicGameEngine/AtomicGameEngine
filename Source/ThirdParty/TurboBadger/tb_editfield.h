@@ -138,6 +138,8 @@ public:
 	void SetTextAlign(TB_TEXT_ALIGN align) { m_style_edit.SetAlign(align); }
 	TB_TEXT_ALIGN GetTextAlign() { return m_style_edit.align; }
 
+    void AppendText(const char *text, int32 len = TB_ALL_TO_TERMINATION, bool clear_undo_redo = false) { m_style_edit.AppendText(text, len, clear_undo_redo); }
+
 	virtual bool SetText(const char *text) { return m_style_edit.SetText(text, TB_CARET_POS_BEGINNING); }
 	virtual bool GetText(TBStr &text) { return m_style_edit.GetText(text); }
 	using TBWidget::GetText; ///< Make all versions in base class available.

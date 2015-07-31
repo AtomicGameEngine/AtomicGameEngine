@@ -20,13 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Atomic2D/Animation2D.h"
-#include "../Atomic2D/AnimationSet2D.h"
+#include "../Precompiled.h"
+
 #include "../Core/Context.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
+#include "../Atomic2D/Animation2D.h"
+#include "../Atomic2D/AnimationSet2D.h"
 #include "../Atomic2D/Sprite2D.h"
 #include "../Atomic2D/SpriteSheet2D.h"
 #include "../Resource/XMLFile.h"
@@ -102,7 +103,7 @@ Sprite2D* AnimationSet2D::GetSprite(const StringHash& hash) const
     return 0;
 }
 
-bool AnimationSet2D::BeginLoadSpriter(Deserializer &source)
+bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
 {
     spriterFile_ = new XMLFile(context_);
     if (!spriterFile_->Load(source))
@@ -150,7 +151,8 @@ bool AnimationSet2D::EndLoadSpriter()
         return false;
     }
 
-    for (XMLElement animationElem = entityElem.GetChild("animation"); animationElem; animationElem = animationElem.GetNext("animation"))
+    for (XMLElement animationElem = entityElem.GetChild("animation"); animationElem;
+         animationElem = animationElem.GetNext("animation"))
     {
         if (!LoadSpriterAnimation(animationElem))
         {
@@ -263,7 +265,7 @@ enum SpriterObjectType2D
 // Spriter timeline key.
 struct SpriterTimelineKey2D
 {
-    SpriterTimelineKey2D() : 
+    SpriterTimelineKey2D() :
         time_(0.0f),
         angle_(0.0f),
         spin_(1),
@@ -335,7 +337,8 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
     // Load timelines
     Vector<SpriterTimeline2D> timelines;
-    for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem; timelineElem = timelineElem.GetNext("timeline"))
+    for (XMLElement timelineElem = animationElem.GetChild("timeline"); timelineElem;
+         timelineElem = timelineElem.GetNext("timeline"))
     {
         SpriterTimeline2D timeline;
         timeline.name_ = timelineElem.GetAttribute("name");
@@ -348,7 +351,6 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
         {
             SpriterTimelineKey2D key;
             key.time_ = keyElem.GetFloat("time") * 0.001f;
-            highestKeyTime = Max(highestKeyTime, key.time_);
             if (keyElem.HasAttribute("spin"))
                 key.spin_ = keyElem.GetInt("spin");
 
@@ -359,7 +361,6 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
             key.angle_ = childElem.GetFloat("angle");
 
-            Vector2 scale(Vector2::ONE);
             if (childElem.HasAttribute("scale_x"))
                 key.scale_.x_ = childElem.GetFloat("scale_x");
 
@@ -370,7 +371,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             {
                 int folder = childElem.GetUInt("folder");
                 int file = childElem.GetUInt("file");
-                key.sprite_ = GetSprite(StringHash((folder << 16) + file));
+                key.sprite_ = GetSprite(StringHash((unsigned)((folder << 16) + file)));
                 if (!key.sprite_)
                 {
                     LOGERROR("Could not find sprite");
@@ -428,7 +429,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
         mainlineKeys.Push(mainlineKey);
     }
-    
+
     unsigned numTimelines = timelines.Size();
     unsigned numMainlineKeys = mainlineKeys.Size();
     if (numTimelines == 0 || numMainlineKeys == 0)
@@ -439,10 +440,6 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
 
     // Create animation
     SharedPtr<Animation2D> animation(new Animation2D(this));
-    // Crop animation length if longer than the last keyframe, prevents sprites vanishing in clamp mode, or occasional flashes
-    // when looped
-    if (length > highestKeyTime)
-        length = highestKeyTime;
     animation->SetName(name);
     animation->SetLength(length);
     animation->SetLooped(looped);
@@ -455,7 +452,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
     {
         SpriterTimeline2D& timeline = timelines[i];
         AnimationTrack2D& track = tracks[i];
-        
+
         track.name_ = timeline.name_;
         track.hasSprite_ = timeline.type_ == SOT_SPRITE;
 
@@ -468,6 +465,7 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
             AnimationKeyFrame2D& keyFrame = track.keyFrames_[j];
 
             keyFrame.time_ = timelineKey.time_;
+            highestKeyTime = Max(highestKeyTime, keyFrame.time_);
 
             // Set disabled
             keyFrame.enabled_ = false;
@@ -517,6 +515,12 @@ bool AnimationSet2D::LoadSpriterAnimation(const XMLElement& animationElem)
                 keyFrames.Push(keyFrame);
             }
         }
+    }
+    else
+    {
+        // Crop non-looped animation length if longer than the last keyframe
+        if (length > highestKeyTime)
+            animation->SetLength(highestKeyTime);
     }
 
     animations_.Push(animation);

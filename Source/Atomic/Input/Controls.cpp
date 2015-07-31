@@ -20,10 +20,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../Input/Controls.h"
+#include "../Precompiled.h"
 
-#include "../DebugNew.h"
+#include "../Input/Controls.h"
 
 namespace Atomic
 {

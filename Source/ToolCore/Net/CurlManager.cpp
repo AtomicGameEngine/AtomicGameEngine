@@ -2,13 +2,10 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
-#include "AtomicEditor.h"
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Core/Context.h>
 #include "CurlManager.h"
 #include <curl/curl.h>
-
-#include "AEEvents.h"
 
 namespace ToolCore
 {

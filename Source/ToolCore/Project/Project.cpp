@@ -104,8 +104,19 @@ bool Project::Load(const String& fullpath)
 {
     loading_ = true;
 
-    projectPath_ = GetPath(fullpath);
-    projectFilePath_ = fullpath;
+    if (fullpath.Contains(".atomic")) {
+
+        projectPath_ = AddTrailingSlash(GetPath(fullpath));
+        projectFilePath_ = fullpath;
+
+    }
+    else
+    {
+        projectPath_ = AddTrailingSlash(fullpath);
+        projectFilePath_ = projectPath_ + GetFileName(RemoveTrailingSlash(projectPath_)) + ".atomic";
+
+    }
+
 
     SharedPtr<ProjectFile> pfile(new ProjectFile(context_));
     bool result = pfile->Load(this);
@@ -117,7 +128,7 @@ bool Project::Load(const String& fullpath)
 
     if ( true /*result*/) {
         VariantMap data;
-        data[ProjectLoaded::P_PROJECTPATH] = projectPath_;
+        data[ProjectLoaded::P_PROJECTPATH] = projectFilePath_;
         SendEvent(E_PROJECTLOADED, data);
     }
 

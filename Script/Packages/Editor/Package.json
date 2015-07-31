@@ -1,0 +1,7 @@
+
+{
+  "name" : "Editor",
+  "namespace" : "AtomicEditor",
+  "dependencies" : ["Script/Packages/Atomic"],
+  "modules" : ["Editor"]
+}

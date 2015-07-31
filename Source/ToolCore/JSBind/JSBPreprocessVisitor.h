@@ -43,6 +43,10 @@ public:
 
     virtual bool visit(Enum *penum)
     {
+        // don't want enum's in classes
+        if (classes_.Size())
+            return true;
+
         JSBModule* module = header_->GetModule();
 
         JSBEnum* jenum = new JSBEnum(header_->GetContext(), module_, getNameString(penum->name()));
@@ -63,6 +67,8 @@ public:
 
     virtual bool visit(Class *klass)
     {
+        classes_.Push(klass);
+
         String name = getNameString(klass->name());
 
         JSBModule* module = header_->GetModule();
@@ -72,10 +78,20 @@ public:
         return true;
     }
 
+    void postVisit(Symbol *symbol)
+    {
+        if (symbol->asClass())
+        {
+            classes_.Remove((Class*) symbol);
+        }
+    }
+
 private:
 
     SharedPtr<JSBHeader> header_;
     SharedPtr<JSBModule> module_;
+
+    PODVector<Class*> classes_;
 
     Namespace* globalNamespace_;
 

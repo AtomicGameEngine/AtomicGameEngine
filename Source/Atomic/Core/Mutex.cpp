@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
+#include "../Precompiled.h"
+
 #include "../Core/Mutex.h"
 
 #ifdef WIN32
@@ -35,6 +36,7 @@ namespace Atomic
 {
 
 #ifdef WIN32
+
 Mutex::Mutex() :
     handle_(new CRITICAL_SECTION)
 {
@@ -58,7 +60,9 @@ void Mutex::Release()
 {
     LeaveCriticalSection((CRITICAL_SECTION*)handle_);
 }
+
 #else
+
 Mutex::Mutex() :
     handle_(new pthread_mutex_t)
 {
@@ -86,6 +90,7 @@ void Mutex::Release()
 {
     pthread_mutex_unlock((pthread_mutex_t*)handle_);
 }
+
 #endif
 
 MutexLock::MutexLock(Mutex& mutex) :

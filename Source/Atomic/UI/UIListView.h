@@ -22,12 +22,21 @@ public:
     virtual ~UIListView();
 
     unsigned AddRootItem(const String& text, const String& icon, const String& id);
+
     unsigned AddChildItem(unsigned parentItemID, const String& text, const String& icon, const String& id);
+
+
+    void SetItemText(const String& id, const String& text);
+    void SetItemIcon(const String& id, const String& icon);
+    void DeleteItemByID(const String& id);
 
     void SetExpanded(unsigned itemID, bool value);
 
     void DeleteAllItems();
     void SelectItemByID(const String& id);
+
+    String GetHoverItemID() { return rootList_.Null() ? "" : rootList_->GetHoverItemID(); }
+    String GetSelectedItemID() { return rootList_.Null() ? "" : rootList_->GetSelectedItemID(); }
 
     UISelectList* GetRootList() { return rootList_; }
 

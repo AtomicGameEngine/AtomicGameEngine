@@ -29,7 +29,7 @@
 #include "JSNetwork.h"
 #endif
 
-#include "JSAtomicGame.h"
+#include "JSAtomicPlayer.h"
 #include "JSAtomic.h"
 
 #include <Atomic/Scene/Scene.h>
@@ -101,14 +101,6 @@ static int js_assert(duk_context* ctx)
     }
     return 0;
 }
-
-static int js_atomic_GetVM(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
-    js_push_class_object_instance(ctx, vm);
-    return 1;
-}
-
 
 static int js_atomic_GetEngine(duk_context* ctx)
 {
@@ -211,19 +203,6 @@ static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = fal
     node->RemoveAllComponents();
     node->UnsubscribeFromAllEvents();
 
-    if (node->GetParent())
-    {
-        assert(node->Refs() >= 2);
-        node->Remove();
-    }
-
-    int top = duk_get_top(ctx);
-    duk_push_global_stash(ctx);
-    duk_get_prop_index(ctx, -1, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
-    duk_push_pointer(ctx, (void*) node);
-    duk_del_prop(ctx, -2);
-    duk_pop_2(ctx);
-    assert(top = duk_get_top(ctx));
 }
 
 static void js_atomic_destroy_scene(Scene* scene, duk_context* ctx)
@@ -282,12 +261,21 @@ void jsapi_init_atomic(JSVM* vm)
     jsapi_init_ui(vm);
     jsapi_init_scene(vm);
 
-    jsapi_init_atomicgame(vm);
+    jsapi_init_atomicplayer(vm);
 
     duk_context* ctx = vm->GetJSContext();
 
     // globals
     duk_push_global_object(ctx);
+
+    // console.log
+    duk_push_object(ctx);
+    duk_dup(ctx, -1);
+    duk_put_prop_string(ctx, -3, "console");
+    duk_push_c_function(ctx, js_print, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "log");
+    duk_pop(ctx);
+
     duk_push_c_function(ctx, js_print, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "print");
     duk_push_c_function(ctx, js_assert, 1);
@@ -298,6 +286,10 @@ void jsapi_init_atomic(JSVM* vm)
 
     // Atomic
     duk_get_global_string(ctx, "Atomic");
+
+    // Atomic.print
+    duk_push_c_function(ctx, js_print, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "print");
 
     String platform = GetPlatform();
     if (platform == "Mac OS X")
@@ -310,36 +302,60 @@ void jsapi_init_atomic(JSVM* vm)
     duk_push_global_stash(ctx);
     duk_push_object(ctx);
     duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_INDEX_NODE_REGISTRY);
+    duk_push_object(ctx);
+    duk_put_prop_index(ctx, -2, JS_GLOBALSTASH_VARIANTMAP_CACHE);
     duk_pop(ctx);
 
     duk_push_c_function(ctx, js_openConsoleWindow, 0);
     duk_put_prop_string(ctx, -2, "openConsoleWindow");
 
-    duk_push_c_function(ctx, js_atomic_GetVM, 0);
-    duk_put_prop_string(ctx, -2, "getVM");
+    // subsystems
 
     duk_push_c_function(ctx, js_atomic_GetEngine, 0);
     duk_put_prop_string(ctx, -2, "getEngine");
 
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Engine>(), "Engine");
+    duk_put_prop_string(ctx, -2, "engine");
+
     duk_push_c_function(ctx, js_atomic_GetGraphics, 0);
     duk_put_prop_string(ctx, -2, "getGraphics");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Graphics>(), "Graphics");
+    duk_put_prop_string(ctx, -2, "graphics");
 
     duk_push_c_function(ctx, js_atomic_GetRenderer, 0);
     duk_put_prop_string(ctx, -2, "getRenderer");
 
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Renderer>(), "Renderer");
+    duk_put_prop_string(ctx, -2, "renderer");
+
     duk_push_c_function(ctx, js_atomic_GetResourceCache, 0);
     duk_put_prop_string(ctx, -2, "getResourceCache");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<ResourceCache>(), "ResourceCache");
+    duk_put_prop_string(ctx, -2, "cache");
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
     duk_put_prop_string(ctx, -2, "getInput");
 
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Input>(), "Input");
+    duk_put_prop_string(ctx, -2, "input");
+
     duk_push_c_function(ctx, js_atomic_GetFileSystem, 0);
     duk_put_prop_string(ctx, -2, "getFileSystem");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<FileSystem>(), "FileSystem");
+    duk_put_prop_string(ctx, -2, "fileSystem");
 
 #ifdef ATOMIC_NETWORK
     duk_push_c_function(ctx, js_atomic_GetNetwork, 0);
     duk_put_prop_string(ctx, -2, "getNetwork");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Network>(), "Network");
+    duk_put_prop_string(ctx, -2, "network");
 #endif
+
+    // end filesystems
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");

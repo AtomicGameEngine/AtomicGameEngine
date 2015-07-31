@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,20 @@
 
 #pragma once
 
-#include "../Math/BoundingBox.h"
-#include "../Math/Rect.h"
 #include "../Container/Ptr.h"
 #include "../Core/Variant.h"
+#include "../Math/BoundingBox.h"
+#include "../Math/Rect.h"
 
 namespace rapidjson
 {
-    template<typename CharType> struct UTF8;
-    class CrtAllocator;
-    template <typename BaseAllocator> class MemoryPoolAllocator;
-    template <typename Encoding, typename Allocator> class GenericValue;
-    typedef GenericValue<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Value;
+
+template <typename CharType> struct UTF8;
+class CrtAllocator;
+template <typename BaseAllocator> class MemoryPoolAllocator;
+template <typename Encoding, typename Allocator> class GenericValue;
+typedef GenericValue<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Value;
+
 }
 
 namespace Atomic
@@ -66,14 +68,14 @@ public:
     ~JSONValue();
 
     /// Assignment operator.
-    JSONValue& operator = (const JSONValue& rhs);
+    JSONValue& operator =(const JSONValue& rhs);
 
     /// Return whether does not refer to JSON value.
     bool IsNull() const;
     /// Return whether refers to JSON value.
     bool NotNull() const;
     /// Return true if refers to JSON value.
-    operator bool () const;
+    operator bool() const;
 
     // JSON object value functions
     /// Create a child value.
@@ -82,10 +84,14 @@ public:
     JSONValue GetChild(const String& name, JSONValueType valueType = JSON_ANY) const;
     /// Set int.
     void SetInt(const String& name, int value);
+    /// Set unsigned int.
+    void SetUInt(const String& name, unsigned value);
     /// Set bool.
     void SetBool(const String& name, bool value);
     /// Set float.
     void SetFloat(const String& name, float value);
+    /// Set double.
+    void SetDouble(const String& name, double value);
     /// Set vector2.
     void SetVector2(const String& name, const Vector2& value);
     /// Set vector3.
@@ -125,16 +131,24 @@ public:
 
     /// Is object type.
     bool IsObject() const;
+
+    /// HasMember
+    bool HasMember(const String& name) const;
+
     /// Return child names (only object and array child name).
     Vector<String> GetChildNames() const;
     /// Return member value names.
     Vector<String> GetValueNames() const;
     /// Return int.
     int GetInt(const String& name) const;
+    /// Return unsigned int.
+    unsigned GetUInt(const String& name) const;
     /// Return bool.
     bool GetBool(const String& name) const;
     /// Return float.
     float GetFloat(const String& name) const;
+    /// Return double.
+    double GetDouble(const String& name) const;
     /// Return vector2.
     Vector2 GetVector2(const String& name) const;
     /// Return vector3.
@@ -185,6 +199,8 @@ public:
     void AddBool(bool value);
     /// Add float.
     void AddFloat(float value);
+    /// Add double.
+    void AddDouble(double value);
     /// Add vector2.
     void AddVector2(const Vector2& value);
     /// Add vector3.
@@ -231,6 +247,8 @@ public:
     bool GetBool(unsigned index) const;
     /// Return float.
     float GetFloat(unsigned index) const;
+    /// Return double.
+    double GetDouble(unsigned index) const;
     /// Return vector2.
     Vector2 GetVector2(unsigned index) const;
     /// Return vector3.
@@ -269,7 +287,7 @@ public:
     Variant GetVariant(unsigned index) const;
     /// Return variant.
     Variant GetVariantValue(unsigned index, VariantType type) const;
-    
+
     /// Empty JSONValue.
     static const JSONValue EMPTY;
 
@@ -281,7 +299,7 @@ private:
     /// Add JSON value to array type.
     void AddMember(rapidjson::Value& jsonValue);
     /// Return JSON value by index for array type.
-    rapidjson::Value&  GetMember(unsigned index) const;
+    rapidjson::Value& GetMember(unsigned index) const;
 
     /// JSON file.
     WeakPtr<JSONFile> file_;

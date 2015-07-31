@@ -24,6 +24,7 @@ if (NOT EMSCRIPTEN)
 endif()
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
+    add_subdirectory(Assimp)
     add_subdirectory(LibCpuId)
     add_subdirectory(SQLite)
     add_subdirectory(Poco)

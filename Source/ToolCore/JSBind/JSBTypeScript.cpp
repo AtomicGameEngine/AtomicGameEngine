@@ -16,7 +16,7 @@
 namespace ToolCore
 {
 
-static String GetScriptType(JSBFunctionType* ftype, JSBPackage* currentPackage)
+String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
 {
     String scriptType = "number";
 
@@ -34,29 +34,30 @@ static String GetScriptType(JSBFunctionType* ftype, JSBPackage* currentPackage)
     if (ftype->type_->asEnumType())
     {
         JSBEnum* enumType = ftype->type_->asEnumType()->enum_;
-        if (NULL != currentPackage &&
-            enumType->GetPackage() != currentPackage)
+
+        scriptType = enumType->GetName();
+
+        if (enumType->GetPackage()->GetName() != package_->GetName())
         {
+
             scriptType = enumType->GetPackage()->GetName() + "." + enumType->GetName();
-        }
-        else
-        {
-            scriptType = enumType->GetName();
+
         }
     }
 
     if (ftype->type_->asClassType())
     {
-        JSBClass* classType = ftype->type_->asClassType()->class_;
-        if (NULL != currentPackage &&
-            classType->GetPackage() != currentPackage)
+        JSBClass* klass = ftype->type_->asClassType()->class_;
+
+        scriptType = klass->GetName();
+
+        if (klass->GetPackage()->GetName() != package_->GetName())
         {
-            scriptType = classType->GetPackage()->GetName() + "." + classType->GetName();
+
+            scriptType = klass->GetPackage()->GetName() + "." + klass->GetName();
+
         }
-        else
-        {
-            scriptType = classType->GetName();
-        }
+
     }
 
     if (ftype->type_->asVectorType())
@@ -74,6 +75,12 @@ static String GetScriptType(JSBFunctionType* ftype, JSBPackage* currentPackage)
 void JSBTypeScript::Begin()
 {
     source_ += "//Atomic TypeScript Definitions\n\n\n";
+
+    if (package_->GetName() != "Atomic")
+    {
+        source_ += "/// <reference path=\"Atomic.d.ts\" />\n\n";
+    }
+
     source_ += "declare module "+ package_->GetName() + " {\n\n";
 }
 
@@ -108,12 +115,18 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
     {
         JSBFunctionType* ftype = parameters.At(i);
 
-        String scriptType = GetScriptType(ftype, package_);
+        String scriptType = GetScriptType(ftype);
 
-        if (scriptType == "Context")
+        if (scriptType == "Context" || scriptType == "Atomic.Context")
             continue;
 
-        source_ += ftype->name_;
+        String name = ftype->name_;
+
+        // TS doesn't like arguments named arguments
+        if (name == "arguments")
+            name = "args";
+
+        source_ += name;
 
         if (ftype->initializer_.Length())
             source_ += "?";
@@ -131,7 +144,7 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
         if (!function->GetReturnType())
             source_ += "): void;\n";
         else
-            source_ += "): " + GetScriptType(function->GetReturnType(), package_) + ";\n";
+            source_ += "): " + GetScriptType(function->GetReturnType()) + ";\n";
 
     }
 
@@ -192,10 +205,8 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
             if (!ftype)
                 continue;
 
-            String scriptType = GetScriptType(ftype, package_);
-
-            String scriptName =  propertyNames[j];
-            scriptName[0] = tolower(scriptName[0]);
+            String scriptType = GetScriptType(ftype);
+            String scriptName = prop->GetCasePropertyName();
 
             source_ += "      " + scriptName + ": " + scriptType + ";\n";
 
@@ -269,23 +280,21 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
     for (unsigned i = 0; i <enums.Size(); i++)
     {
-        JSBEnum* _enum =enums[i];
+        JSBEnum* _enum = enums[i];
 
-        source_ += "   export enum " + _enum->GetName();
-        source_ += " {\n\n";
+        // can't use a TS enum, so use a type alias
+
+        source_ += "\n   // enum " + _enum->GetName() + "\n";
+        source_ += "   export type " + _enum->GetName() + " = number;\n";
 
         Vector<String>& values = _enum->GetValues();
 
         for (unsigned j = 0; j < values.Size(); j++)
         {
-            source_ += "      " + values[j];
-            if (j !=  values.Size() - 1)
-                source_ += ",\n";
+            source_ += "   export var " + values[j] + ": " +  _enum->GetName() + ";\n";
         }
 
-        source_ += "\n\n   }\n\n";
-
-
+        source_ += "\n";
 
     }
 

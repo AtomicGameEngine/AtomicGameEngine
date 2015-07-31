@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2015 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "../IO/Log.h"
+#include "../Precompiled.h"
+
 #include "../Core/Profiler.h"
-#include "../Core/Thread.h"
+#include "../IO/Log.h"
 #include "../Resource/Resource.h"
 
 namespace Atomic
@@ -42,7 +42,7 @@ bool Resource::Load(Deserializer& source)
     // create a type name -based profile block here
 #ifdef ATOMIC_PROFILING
     String profileBlockName("Load" + GetTypeName());
-    
+
     Profiler* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->BeginBlock(profileBlockName.CString());

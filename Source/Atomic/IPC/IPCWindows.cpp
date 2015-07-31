@@ -17,48 +17,34 @@ namespace Atomic
     static const int kPipeBufferSz = 4 * 1024;
     static LONG g_pipe_seq = 0;
 
-    bool checkIntegritySupport()
-    {
-        OSVERSIONINFO osvi;
-
-        ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-        GetVersionEx(&osvi);
-
-        return osvi.dwMajorVersion > 5;
-    }
-
-    HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool low_integrity) {
-        SECURITY_ATTRIBUTES sa = { 0 };
-        SECURITY_ATTRIBUTES *psa = 0;
-
-        static const bool is_integrity_supported = false;// checkIntegritySupport();
-
-        if (is_integrity_supported && low_integrity) {
-            psa = &sa;
-            sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-            sa.bInheritHandle = TRUE;
-            if (!ConvertStringSecurityDescriptorToSecurityDescriptor(
-                TEXT("S:(ML;;NWNR;;;LW)"), SDDL_REVISION_1, &sa.lpSecurityDescriptor, NULL))
-                return INVALID_HANDLE_VALUE;
-        }
-
+    HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool read) 
+	{
         IPCWString pipename(kPipePrefix);
         pipename.append(name);
-        return ::CreateNamedPipeW(pipename.c_str(), PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
+
+		DWORD openMode = read ? PIPE_ACCESS_INBOUND : PIPE_ACCESS_OUTBOUND;
+
+        return ::CreateNamedPipeW(pipename.c_str(), openMode,
             PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
-            1, kPipeBufferSz, kPipeBufferSz, 200, psa);
+            1, kPipeBufferSz, kPipeBufferSz, 200, NULL);
     }
 
-    HANDLE PipePair::OpenPipeClient(const wchar_t* name, bool inherit, bool impersonate) {
+    HANDLE PipePair::OpenPipeClient(const wchar_t* name, bool read) 
+	{
         IPCWString pipename(kPipePrefix);
         pipename.append(name);
 
-        SECURITY_ATTRIBUTES sa = { sizeof(sa), NULL, inherit ? TRUE : FALSE };
+		SECURITY_ATTRIBUTES sa;
+		sa.bInheritHandle = TRUE;
+		sa.lpSecurityDescriptor = NULL;
+		sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+
+		DWORD accessMode = read ? GENERIC_READ : GENERIC_WRITE;
+
         for (;;) {
-            DWORD attributes = impersonate ? 0 : SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION;
-            HANDLE pipe = ::CreateFileW(pipename.c_str(), GENERIC_READ | GENERIC_WRITE, 0, &sa,
-                OPEN_EXISTING, attributes, NULL);
+           
+			HANDLE pipe = ::CreateFileW(pipename.c_str(), accessMode, 0, &sa,
+                OPEN_EXISTING, 0, NULL);
 
             if (INVALID_HANDLE_VALUE == pipe) {
                 if (ERROR_PIPE_BUSY != ::GetLastError()) {
@@ -74,92 +60,102 @@ namespace Atomic
         }
     }
 
-    PipePair::PipePair(bool inherit_fd2) :
-        srv_(INVALID_IPCHANDLE_VALUE),
-        cln_(INVALID_IPCHANDLE_VALUE)
+    PipePair::PipePair() :
+        srvRead_(INVALID_IPCHANDLE_VALUE),
+		srvWrite_(INVALID_IPCHANDLE_VALUE),
+		clnRead_(INVALID_IPCHANDLE_VALUE),
+		clnWrite_(INVALID_IPCHANDLE_VALUE)        
     {
         // Come up with a reasonable unique name.
-        const wchar_t kPipePattern[] = L"ko.%x.%x.%x";
-        
-        wchar_t name[8 * 3 + sizeof(kPipePattern)];
-        
-        ::wsprintfW(name, kPipePattern, ::GetCurrentProcessId(), ::GetTickCount(),
-            ::InterlockedIncrement(&g_pipe_seq));
-        
-        HANDLE server = OpenPipeServer(name);
-        
-        if (INVALID_HANDLE_VALUE == server) 
-        {
-            return;
-        }
-        
-        // Don't allow client impersonation.
-        HANDLE client = OpenPipeClient(name, inherit_fd2, false);
+        const wchar_t kPipePattern[] = L"ko.%x.%x.%x";        
 
+        wchar_t serverReadName[8 * 3 + sizeof(kPipePattern)];        
+        ::wsprintfW(serverReadName, kPipePattern, ::GetCurrentProcessId(), ::GetTickCount(),
+            ::InterlockedIncrement(&g_pipe_seq));
+
+		wchar_t serverWriteName[8 * 3 + sizeof(kPipePattern)];
+		::wsprintfW(serverWriteName, kPipePattern, ::GetCurrentProcessId(), ::GetTickCount() + 1,
+			::InterlockedIncrement(&g_pipe_seq));
+
+        srvRead_ = OpenPipeServer(serverReadName, true);
+		srvWrite_ = OpenPipeServer(serverWriteName, false);
+
+
+        // Don't allow client impersonation.
+        clnRead_ = OpenPipeClient(serverWriteName, true);
+		clnWrite_ = OpenPipeClient(serverReadName, false);
+
+		/*
         if (INVALID_HANDLE_VALUE == client) 
         {
             ::CloseHandle(server);
             return;
         }
-        if (!::ConnectNamedPipe(server, NULL)) 
+		*/
+        
+		if (!::ConnectNamedPipe(srvRead_, NULL))
         {
             if (ERROR_PIPE_CONNECTED != ::GetLastError()) 
             {
-                ::CloseHandle(server);
-                ::CloseHandle(client);
+               // ::CloseHandle(server);
+                //::CloseHandle(client);
                 return;
             }
         }
 
-        srv_ = server;
-        cln_ = client;
+		if (!::ConnectNamedPipe(srvWrite_, NULL))
+		{
+			if (ERROR_PIPE_CONNECTED != ::GetLastError())
+			{
+				// ::CloseHandle(server);
+				//::CloseHandle(client);
+				return;
+			}
+		}
 
     }
 
-    PipeWin::PipeWin() : pipe_(INVALID_IPCHANDLE_VALUE)
+    PipeWin::PipeWin() : pipeRead_(INVALID_IPCHANDLE_VALUE), pipeWrite_(INVALID_IPCHANDLE_VALUE)
     {
 
     }
 
     PipeWin::~PipeWin()
     {
-        if (pipe_ != INVALID_HANDLE_VALUE) 
+        if (pipeRead_ != INVALID_HANDLE_VALUE) 
         {
-            ::DisconnectNamedPipe(pipe_);  // $$$ disconect is valid on the server side.
-            ::CloseHandle(pipe_);
+            ::DisconnectNamedPipe(pipeRead_);  // $$$ disconect is valid on the server side.
+            ::CloseHandle(pipeRead_);
         }
+
+		if (pipeWrite_ != INVALID_HANDLE_VALUE)
+		{
+			::DisconnectNamedPipe(pipeWrite_);  // $$$ disconect is valid on the server side.
+			::CloseHandle(pipeWrite_);
+		}
+
     }
 
-    bool PipeWin::OpenClient(IPCHandle pipe)
+    bool PipeWin::OpenClient(IPCHandle pipeRead, IPCHandle pipeWrite)
     {
-        pipe_ = pipe;
+        pipeRead_ = pipeRead;
+		pipeWrite_ = pipeWrite;
         return true;
 
     }
 
-    bool PipeWin::OpenServer(IPCHandle pipe, bool connect)
+    bool PipeWin::OpenServer(IPCHandle pipeRead, IPCHandle pipeWrite)
     {
-        pipe_ = pipe;
-
-        if (connect) 
-        {
-            if (!::ConnectNamedPipe(pipe, NULL)) 
-            {
-                if (ERROR_PIPE_CONNECTED != ::GetLastError()) 
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
+		pipeRead_ = pipeRead;
+		pipeWrite_ = pipeWrite;
+		return true;
+	}
 
 
     bool PipeWin::Write(const void* buf, size_t sz)
     {
         DWORD written = 0;
-        if (TRUE == ::WriteFile(pipe_, buf, sz, &written, NULL))
+        if (TRUE == ::WriteFile(pipeWrite_, buf, sz, &written, NULL))
             return true;
 
         return false;
@@ -167,7 +163,7 @@ namespace Atomic
 
     bool PipeWin::Read(void* buf, size_t* sz)
     {
-        if (TRUE == ::ReadFile(pipe_, buf, *sz, reinterpret_cast<DWORD*>(sz), NULL))
+        if (TRUE == ::ReadFile(pipeRead_, buf, *sz, reinterpret_cast<DWORD*>(sz), NULL))
         {
             return true;
         }
@@ -192,10 +188,10 @@ namespace Atomic
     }
 
 
-    IPCProcess::IPCProcess(Context* context, IPCHandle fd1, IPCHandle fd2, IPCHandle pid) : Object(context),
+    IPCProcess::IPCProcess(Context* context, IPCHandle clientRead, IPCHandle clientWrite, IPCHandle pid) : Object(context),
         pid_(pid),
-        fd1_(fd1),
-        fd2_(fd2)
+        clientRead_(clientRead),
+        clientWrite_(clientWrite)
     {
     }
 
@@ -233,9 +229,6 @@ namespace Atomic
         pid_ = pi.hProcess;
         ::CloseHandle(pi.hThread);
         
-        // The client side of the pipe has been already duplicated into the worker process.
-        ::CloseHandle(fd2_);
-
         return true;
     }
 
