@@ -46,7 +46,7 @@ class ModelInspector extends InspectorWidget {
 
         }
 
-        this.importer.import(this.asset.guid);
+        this.asset.import();
         this.asset.save();
 
     }

@@ -14,6 +14,8 @@ class Asset;
 /// deals with .asset files
 class AssetImporter : public Object
 {
+    friend class Asset;
+
     OBJECT(AssetImporter);
 
 public:
@@ -28,8 +30,6 @@ public:
 
     virtual void SetDefaults();
 
-    /// Imports to cached data
-    virtual bool Import(const String& guid) = 0;
     virtual bool Preload() { return true; }
 
     Asset* GetAsset() { return asset_; }
@@ -37,6 +37,8 @@ public:
     bool RequiresCacheFile() const { return requiresCacheFile_; }
 
 protected:
+
+    virtual bool Import() { return true; }
 
     WeakPtr<Asset> asset_;
     JSONValue jsonRoot_;   

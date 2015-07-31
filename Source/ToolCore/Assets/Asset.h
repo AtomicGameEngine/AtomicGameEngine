@@ -48,6 +48,12 @@ public:
     void SetDirty(bool dirty) { dirty_ = dirty; }
     bool IsDirty() const { return dirty_; }
 
+    /// Get the last timestamp as seen by the AssetDatabase
+    unsigned GetFileTimestamp() { return fileTimestamp_; }
+
+    /// Sets the time stamp to the asset files current time
+    void UpdateFileTimestamp();
+
     // get the .asset filename
     String GetDotAssetFilename();
 
@@ -73,6 +79,12 @@ private:
 
     bool dirty_;
     bool isFolder_;
+
+    // the current timestamp of the asset as seen by the asset database
+    // used to catch when the asset needs to be marked dirty when notified
+    // that the file has changed (the resource system will send a changed file
+    // event when the resource is first added)
+    unsigned fileTimestamp_;
 
     SharedPtr<JSONFile> json_;
     SharedPtr<AssetImporter> importer_;

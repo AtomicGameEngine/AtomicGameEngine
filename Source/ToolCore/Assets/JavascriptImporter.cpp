@@ -27,7 +27,7 @@ void JavascriptImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
-bool JavascriptImporter::Import(const String& guid)
+bool JavascriptImporter::Import()
 {
     isComponentFile_ = false;
 

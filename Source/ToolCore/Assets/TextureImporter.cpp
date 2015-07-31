@@ -24,16 +24,12 @@ void TextureImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
-bool TextureImporter::Import(const String& guid)
+bool TextureImporter::Import()
 {
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
-    Asset* asset = db->GetAssetByGUID(guid);
-
-    if (!asset)
-        return false;
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<Image> image = cache->GetTempResource<Image>(asset->GetPath());
+    SharedPtr<Image> image = cache->GetTempResource<Image>(asset_->GetPath());
 
     if (image.Null())
         return false;
@@ -45,10 +41,10 @@ bool TextureImporter::Import(const String& guid)
 
     // not sure entirely what we want to do here, though if the cache file doesn't exist
     // will reimport
-    image->SavePNG(cachePath + asset->GetGUID());
+    image->SavePNG(cachePath + asset_->GetGUID());
 
     // save thumbnail
-    image->SavePNG(cachePath + asset->GetGUID() + "_thumbnail.png");
+    image->SavePNG(cachePath + asset_->GetGUID() + "_thumbnail.png");
 
     return true;
 }

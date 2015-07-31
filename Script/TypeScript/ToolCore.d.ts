@@ -249,6 +249,7 @@ declare module ToolCore {
       importer: AssetImporter;
       parent: Asset;
       dirty: boolean;
+      fileTimestamp: number;
       dotAssetFilename: string;
 
       // Construct.
@@ -270,6 +271,10 @@ declare module ToolCore {
       getParent(): Asset;
       setDirty(dirty: boolean): void;
       isDirty(): boolean;
+      // Get the last timestamp as seen by the AssetDatabase
+      getFileTimestamp(): number;
+      // Sets the time stamp to the asset files current time
+      updateFileTimestamp(): void;
       getDotAssetFilename(): string;
       isFolder(): boolean;
       load(): boolean;
@@ -306,8 +311,6 @@ declare module ToolCore {
       constructor(asset: Asset);
 
       setDefaults(): void;
-      // Imports to cached data
-      import(guid: string): boolean;
       preload(): boolean;
       getAsset(): Asset;
       requiresCacheFile(): boolean;
@@ -320,7 +323,6 @@ declare module ToolCore {
       constructor(asset: Asset);
 
       setDefaults(): void;
-      import(guid: string): boolean;
 
    }
 
@@ -331,7 +333,6 @@ declare module ToolCore {
 
       setDefaults(): void;
       isComponentFile(): boolean;
-      import(guid: string): boolean;
 
    }
 
@@ -341,7 +342,6 @@ declare module ToolCore {
       constructor(asset: Asset);
 
       setDefaults(): void;
-      import(guid: string): boolean;
       saveMaterial(): void;
 
    }
@@ -380,7 +380,6 @@ declare module ToolCore {
       getAnimationCount(): number;
       setAnimationCount(count: number): void;
       getAnimationInfo(index: number): AnimationImportInfo;
-      import(guid: string): boolean;
 
    }
 
@@ -390,7 +389,6 @@ declare module ToolCore {
       constructor(asset: Asset);
 
       setDefaults(): void;
-      import(guid: string): boolean;
       preload(): boolean;
 
    }
@@ -401,7 +399,6 @@ declare module ToolCore {
       constructor(asset: Asset);
 
       setDefaults(): void;
-      import(guid: string): boolean;
 
    }
 

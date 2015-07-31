@@ -12,7 +12,7 @@ namespace ToolCore
 
 MaterialImporter::MaterialImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
-
+    requiresCacheFile_ = false;
 }
 
 MaterialImporter::~MaterialImporter()
@@ -25,7 +25,7 @@ void MaterialImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
-bool MaterialImporter::Import(const String& guid)
+bool MaterialImporter::Import()
 {
     return true;
 }

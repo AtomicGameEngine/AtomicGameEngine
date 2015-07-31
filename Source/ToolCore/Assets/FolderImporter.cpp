@@ -21,14 +21,8 @@ void FolderImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
-bool FolderImporter::Import(const String& guid)
+bool FolderImporter::Import()
 {
-    AssetDatabase* db = GetSubsystem<AssetDatabase>();
-    Asset* asset = db->GetAssetByGUID(guid);
-
-    if (!asset)
-        return false;
-
     return true;
 }
 

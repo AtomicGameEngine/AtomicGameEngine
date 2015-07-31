@@ -21,14 +21,8 @@ void SceneImporter::SetDefaults()
     AssetImporter::SetDefaults();
 }
 
-bool SceneImporter::Import(const String& guid)
+bool SceneImporter::Import()
 {
-    AssetDatabase* db = GetSubsystem<AssetDatabase>();
-    Asset* asset = db->GetAssetByGUID(guid);
-
-    if (!asset)
-        return false;
-
     return true;
 }
 
