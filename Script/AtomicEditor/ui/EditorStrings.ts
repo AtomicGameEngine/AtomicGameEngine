@@ -33,15 +33,22 @@ export class EditorString {
 
         var lookup = EditorString.lookup;
 
-        var shortcutKey = "⌘";
+        var lookup = EditorString.lookup;
+
+        var shortcutKey;
+        if (Atomic.platform == "MacOSX") {
+            shortcutKey = "⌘";
+        } else { // Windows and Linux
+            shortcutKey = "CTRL + "
+        }
 
         lookup[StringID.RevealInFinder] = "Reveal in Finder";
-
-        // Mac
-        lookup[StringID.ShortcutRedo] = "⇧⌘Z";
-        lookup[StringID.ShortcutFindNext] = "⌘G";
-        lookup[StringID.ShortcutFindPrev] = "⇧⌘G";
-        lookup[StringID.ShortcutBuildSettings] = "⇧⌘B";
+        
+        // Mac, Windows and Linux
+        lookup[StringID.ShortcutRedo] = "⇧" + shortcutKey + "Z";
+        lookup[StringID.ShortcutFindNext] = shortcutKey + "G";
+        lookup[StringID.ShortcutFindPrev] = "⇧" + shortcutKey + "G";
+        lookup[StringID.ShortcutBuildSettings] = "⇧" + shortcutKey + "B";
 
         // General
         lookup[StringID.ShortcutUndo] = shortcutKey + "Z";
