@@ -4,7 +4,7 @@ Contributing to the Atomic Game Engine
 Contribution Copyrights and Licensing
 ------------------------
 
-Atomic Game Engine contribution copyrights are held by their authors.  Each author has a copyright to their contribution, and agrees to irrevocably license the contribution to THUNDERBEAST GAMES LLC under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`
+Atomic Game Engine contribution copyrights are held by their authors.  Each author has a copyright to their contribution, and agrees to irrevocably license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`
 
 To make a code contribution to the Atomic Game Engine
 --------------------------------------
@@ -20,7 +20,7 @@ To make a code contribution to the Atomic Game Engine
   - **You own the rights to the contribution**, or have the legal right to
     license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md` on behalf of the copyright owner(s).
 
-  - You, or the copyright owner(s), agree to **irrevocably license the contribution** to THUNDERBEAST GAMES LLC under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`
+  - You, or the copyright owner(s), agree to **irrevocably license the contribution** under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`
 
   - Please include a link to your GitHub profile to allow your contribution to be identified accurately.
 
