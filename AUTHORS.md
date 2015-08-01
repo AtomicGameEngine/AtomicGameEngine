@@ -9,6 +9,8 @@
 
 - marynate (https://github.com/marynate)
 
+- rsredsq (https://github.com/rsredsq)
+
 
 ### Contribution Copyright and Licensing
 
