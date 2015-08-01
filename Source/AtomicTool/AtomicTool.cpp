@@ -271,8 +271,8 @@ void AtomicTool::Start()
 
         if (!tsystem->LoadProject(projectFile))
         {
-            ErrorExit(ToString("Failed to load project: %s", projectFile.CString()));
-            return;
+            //ErrorExit(ToString("Failed to load project: %s", projectFile.CString()));
+            //return;
         }
 
         // Set the build path

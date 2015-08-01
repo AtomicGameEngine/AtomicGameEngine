@@ -326,6 +326,11 @@ class ComponentInspector extends Atomic.UISection {
 
         });
 
+        var numGeometries = staticModel.numGeometries;
+        if (typeName == "Skybox") {
+          numGeometries = 1;
+        }
+
         for (var x = 0; x < staticModel.numGeometries; x++) {
 
             this.createMaterialClosure(layout, staticModel, x);

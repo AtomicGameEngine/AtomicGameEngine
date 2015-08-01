@@ -81,8 +81,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
         aiProcess_Triangulate |
         aiProcess_GenSmoothNormals |
         aiProcess_LimitBoneWeights |
-        aiProcess_ImproveCacheLocality |
-        aiProcess_RemoveRedundantMaterials |
+        aiProcess_ImproveCacheLocality |        
         aiProcess_FixInfacingNormals |
         aiProcess_FindInvalidData |
         aiProcess_GenUVCoords |
