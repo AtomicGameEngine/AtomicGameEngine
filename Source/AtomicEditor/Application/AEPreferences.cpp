@@ -200,6 +200,13 @@ void AEPreferences::RegisterRecentProject(const String& fullpath)
 
 }
 
+void AEPreferences::DeleteRecentProjects() 
+{
+    if (recentProjects_.Size() <= 0) return;
+    recentProjects_.Clear();
+    UpdateRecentFiles(true);
+}
+
 bool AEPreferences::ReadStartupPrefs(Context *context, StartupPreferences& prefs)
 {
 

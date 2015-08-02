@@ -47,6 +47,7 @@ declare module Editor {
 
       registerRecentProject(fullpath: string): void;
       getRecentProjects(): string[];
+      deleteRecentProjects(): void;
       setAndroidSDKPath(path: string): void;
       setAntPath(path: string): void;
       setJDKRootPath(path: string): void;

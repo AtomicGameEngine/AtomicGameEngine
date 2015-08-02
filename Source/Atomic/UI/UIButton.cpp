@@ -39,13 +39,15 @@ void UIButton::SetSqueezable(bool value)
 
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
 {
-	if (ev.type == EVENT_TYPE_CLICK) {
-		String text = GetText();
-		if (text.StartsWith("http://") || text.StartsWith("https://")) {
-			FileSystem* fileSystem = GetSubsystem<FileSystem>();
-			fileSystem->SystemOpen(text);
-		}
-	}
+    if (ev.type == EVENT_TYPE_CLICK) 
+	{
+        String text = GetText();
+        if (text.StartsWith("http://") || text.StartsWith("https://")) 
+		{
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            fileSystem->SystemOpen(text);
+        }
+    }
     return UIWidget::OnEvent(ev);
 }
 
