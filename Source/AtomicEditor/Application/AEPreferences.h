@@ -33,6 +33,7 @@ public:
 
     void RegisterRecentProject(const String& fullpath);
     const Vector<String>& GetRecentProjects() { return recentProjects_; }
+    void DeleteRecentProjects();
 
     void SetAndroidSDKPath(const String& path) { androidSDKPath_ = path; Write(); }
     void SetAntPath(const String& path) { antPath_ = path; Write(); }

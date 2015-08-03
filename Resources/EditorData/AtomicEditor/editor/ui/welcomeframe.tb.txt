@@ -7,9 +7,8 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
 					text Open Project
 				TBButton: id: new project
 					text New Project
-			TBLayout: distribution: gravity, axis: y, position: left
+			TBLayout: distribution: gravity, axis: y, position: left, id: recentprojects
 				TBEditField: text: "<color #76D6FF>Recent Projects:</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
-				TBSelectList: gravity: all, id: recentprojects
 	TBLayout: distribution: gravity, size: available
 		TBLayout: distribution: gravity, axis: y, position: left
 			TBEditField: text: "<color #76D6FF>Welcome:</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
