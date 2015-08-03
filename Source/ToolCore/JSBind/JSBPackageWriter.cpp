@@ -103,14 +103,20 @@ void JSBPackageWriter::GenerateSource(String& sourceOut)
 
     source.AppendWithFormat("\n\nstatic void jsb_package_%s_preinit(JSVM* vm)\n{", packageLower.CString());
 
+
+    source.Append("\n    // Create the global package object\n");
+    source.Append("    duk_context* ctx = vm->GetJSContext();\n");
+    source.Append("    duk_push_object(ctx);\n");
+    source.AppendWithFormat("    duk_put_global_string(ctx, \"%s\");\n", package_->GetName().CString());
+
     for (unsigned i = 0; i < package_->modules_.Size(); i++)
     {
         JSBModule* module = package_->modules_.At(i);
 
-        String moduleLower = module->GetName().ToLower();
-
         if (module->Requires("3D"))
             source += "\n#ifdef ATOMIC_3D";
+
+        String moduleLower = module->GetName().ToLower();
 
         source.AppendWithFormat("\n   jsb_package_%s_preinit_%s(vm);", packageLower.CString(), moduleLower.CString());
 

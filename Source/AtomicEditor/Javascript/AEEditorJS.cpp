@@ -17,9 +17,6 @@ void jsapi_init_editor(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    duk_push_object(ctx);
-    duk_put_global_string(ctx, "Editor");
-
     jsb_package_editor_init(vm);
 
     duk_get_global_string(ctx, "Atomic");
