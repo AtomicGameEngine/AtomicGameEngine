@@ -5,7 +5,7 @@ import AssetImport = require("../assets/AssetImport");
 import PlayMode = require("../ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
-import Preferences = require("../utils/Preferences");
+import Preferences = require("./Preferences");
 
 class Editor extends Atomic.ScriptObject {
 

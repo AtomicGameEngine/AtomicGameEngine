@@ -2,7 +2,7 @@
 import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
 import ScriptWidget = require("./ScriptWidget");
-import Preferences = require("../utils/Preferences");
+import Preferences = require("../editor/Preferences");
 
 class WelcomeFrame extends ScriptWidget {
 
@@ -29,6 +29,7 @@ class WelcomeFrame extends ScriptWidget {
         this.subscribeToEvent(EditorEvents.CloseProject, () => {
             this.updateRecentProjects();
         });
+        
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
