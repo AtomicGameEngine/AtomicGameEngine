@@ -58,7 +58,6 @@ class Preferences {
         var jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
         if (!jsonFile.isOpen()) return;
         var prefs = <PreferencesFormat> JSON.parse(jsonFile.readText());
-        console.log(prefs);
         this._recentProjects = prefs.recentFiles;
         this._androidSDKPath = prefs.androidSdkPath;
         this._jdkRootPath = prefs.jdkRootPath;
