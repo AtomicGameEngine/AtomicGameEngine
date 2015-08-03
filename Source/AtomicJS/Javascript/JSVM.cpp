@@ -57,12 +57,12 @@ void JSVM::InitJSContext()
 {
     ctx_ = duk_create_heap_default();
 
-    // create root Atomic Object
-    duk_push_global_object(ctx_);
-    duk_push_object(ctx_);
+    jsapi_init_atomic(this);
+
+    // register whether we are in the editor
+    duk_get_global_string(ctx_, "Atomic");
     duk_push_boolean(ctx_, context_->GetEditorContext() ? 1 : 0);
     duk_put_prop_string(ctx_, -2, "editor");
-    duk_put_prop_string(ctx_, -2, "Atomic");
     duk_pop(ctx_);
 
     duk_push_global_stash(ctx_);
@@ -71,8 +71,7 @@ void JSVM::InitJSContext()
     duk_pop(ctx_);
 
     js_init_require(this);
-    js_init_jsplugin(this);
-    jsapi_init_atomic(this);
+    js_init_jsplugin(this);    
 
     ui_ = new JSUI(context_);
 
