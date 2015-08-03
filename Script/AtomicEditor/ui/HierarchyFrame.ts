@@ -236,7 +236,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             // create
             if (id == "menu create") {
-
+                if (!ToolCore.toolSystem.project) return;  
                 var src = MenuItemSources.getMenuItemSource("hierarchy create items");
                 var menu = new Atomic.UIMenuWindow(data.target, "create popup");
                 menu.show(src);

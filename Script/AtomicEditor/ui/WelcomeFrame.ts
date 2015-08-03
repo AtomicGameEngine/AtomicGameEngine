@@ -2,6 +2,7 @@
 import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
 import ScriptWidget = require("./ScriptWidget");
+import Preferences = require("../editor/Preferences");
 
 class WelcomeFrame extends ScriptWidget {
 
@@ -28,7 +29,7 @@ class WelcomeFrame extends ScriptWidget {
         this.subscribeToEvent(EditorEvents.CloseProject, () => {
             this.updateRecentProjects();
         });
-
+        
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -69,9 +70,9 @@ class WelcomeFrame extends ScriptWidget {
             }
 
             if (id == "recentProjectsContextMenu") {
-                var pref = Atomic.editorMode.getPreferences();
+                var prefs = Preferences.getInstance();
                 if (ev.refid == "clear recent projects") {
-                    pref.deleteRecentProjects();
+                    prefs.deleteRecentProjects();
                     this.updateRecentProjects();
                 }
             }
@@ -82,10 +83,10 @@ class WelcomeFrame extends ScriptWidget {
 
         this.recentList.deleteAllItems();
         
-        // prune any that don't exist
-        Atomic.editorMode.preferences.updateRecentFiles();
-
-        this.recent = Atomic.editorMode.getPreferences().getRecentProjects();
+        var prefs = Preferences.getInstance();
+        prefs.updateRecentProjects();
+        
+        this.recent = prefs.recentProjects;
 
         for (var i in this.recent) {
             this.recentList.addRootItem(this.recent[i], "Folder.icon", i);
