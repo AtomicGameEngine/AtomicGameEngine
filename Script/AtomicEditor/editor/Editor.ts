@@ -27,8 +27,7 @@ class Editor extends Atomic.ScriptObject {
 
         this.editorLicense = new EditorLicense();
 
-        var prefs = new Preferences();
-        prefs.read();
+        Preferences.getInstance().read();
 
         EditorUI.initialize();
 
@@ -45,7 +44,7 @@ class Editor extends Atomic.ScriptObject {
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
-            prefs.registerRecentProject(data.projectPath);
+            Preferences.getInstance().registerRecentProject(data.projectPath);
         })
 
         this.parseArguments();

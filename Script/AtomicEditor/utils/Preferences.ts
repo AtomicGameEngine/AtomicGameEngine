@@ -1,6 +1,10 @@
 
 class Preferences {
 
+    private static Ctor = (() => {
+        new Preferences();
+    })();
+
     private fileSystem: Atomic.FileSystem;
 
     private static instance: Preferences;
