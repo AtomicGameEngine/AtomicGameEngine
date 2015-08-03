@@ -9,7 +9,8 @@
 	},
 	"typescript_decl" : {
 		"File" : [
-			"readText():string;"
+			"readText():string;",
+            "writeString(text:string):void;"
 		],
 		"FileSystem" : [
 			"scanDir(pathName:string, filter:string, flags:number, recursive:boolean);"

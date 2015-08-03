@@ -13,8 +13,6 @@ namespace Atomic
 namespace AtomicEditor
 {
 
-class AEPreferences;
-
 class AEEditorApp : public AEEditorCommon
 {
     OBJECT(AEEditorApp);

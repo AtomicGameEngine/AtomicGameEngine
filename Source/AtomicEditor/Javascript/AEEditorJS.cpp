@@ -1,8 +1,6 @@
 
 #include <AtomicJS/Javascript/JSVM.h>
 
-#include "../Application/AEPreferences.h"
-
 #include "../EditorMode/AEEditorMode.h"
 
 using namespace Atomic;

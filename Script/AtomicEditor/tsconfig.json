@@ -57,6 +57,7 @@
         "./ui/modal/ResourceSelection.ts",
         "./ui/modal/UIResourceOps.ts",
         "./ui/playmode/PlayMode.ts",
-        "./ui/playmode/PlayerOutput.ts"
+        "./ui/playmode/PlayerOutput.ts",
+        "./utils/Preferences.ts"
     ]
 }

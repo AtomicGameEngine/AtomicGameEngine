@@ -5,6 +5,7 @@ import AssetImport = require("../assets/AssetImport");
 import PlayMode = require("../ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
+import Preferences = require("../utils/Preferences");
 
 class Editor extends Atomic.ScriptObject {
 
@@ -26,6 +27,9 @@ class Editor extends Atomic.ScriptObject {
 
         this.editorLicense = new EditorLicense();
 
+        var prefs = new Preferences();
+        prefs.read();
+
         EditorUI.initialize();
 
         this.playMode = new PlayMode();
@@ -41,14 +45,10 @@ class Editor extends Atomic.ScriptObject {
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
-
-            Atomic.editorMode.preferences.registerRecentProject(data.projectPath);
-
+            prefs.registerRecentProject(data.projectPath);
         })
 
         this.parseArguments();
-
-
     }
 
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
@@ -69,7 +69,6 @@ class Editor extends Atomic.ScriptObject {
     }
 
     handleEditorCloseProject(event) {
-
         var system = ToolCore.getToolSystem();
 
         if (system.project) {
@@ -110,7 +109,7 @@ class Editor extends Atomic.ScriptObject {
 
     // event handling
     handleExitRequested(data) {
-
+        Preferences.getInstance().write();
         EditorUI.shutdown();
 
     }

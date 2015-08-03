@@ -7797,6 +7797,7 @@ declare module Atomic {
       // Unlike FileSystem.Copy this copy works when the source file is in a package file
       copy(srcFile: File): boolean;
       readText():string;
+      writeString(text:string):void;
 
    }
 
