@@ -40,6 +40,8 @@ class EventHandler;
         virtual const Atomic::String& GetTypeName() const { return GetTypeNameStatic(); } \
         static Atomic::StringHash GetTypeStatic() { static const Atomic::StringHash typeStatic(#typeName); return typeStatic; } \
         static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic(#typeName); return typeNameStatic; } \
+        virtual ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
 #define BASEOBJECT(typeName) \
     public: \
@@ -111,6 +113,7 @@ public:
     const String& GetCategory() const;
 
     virtual bool IsObject() const { return true; }
+    static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
     static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic("Object"); return typeNameStatic; }
     
 protected:
@@ -136,6 +139,8 @@ template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetS
 /// Base class for object factories.
 class ATOMIC_API ObjectFactory : public RefCounted
 {
+    REFCOUNTED(ObjectFactory)
+
 public:
     /// Construct.
     ObjectFactory(Context* context) :

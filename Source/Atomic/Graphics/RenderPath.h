@@ -204,6 +204,8 @@ struct RenderPathCommand
 /// Rendering path definition.
 class ATOMIC_API RenderPath : public RefCounted
 {
+    REFCOUNTED(RenderPath)
+
 public:
     /// Construct.
     RenderPath();

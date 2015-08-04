@@ -103,9 +103,6 @@ void jsapi_init_toolcore(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    duk_push_object(ctx);
-    duk_put_global_string(ctx, "ToolCore");
-
     jsb_package_toolcore_init(vm);
 
     duk_get_global_string(ctx, "ToolCore");

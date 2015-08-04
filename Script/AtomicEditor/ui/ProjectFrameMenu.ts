@@ -63,6 +63,11 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "reveal_folder") {
+                var utils = new Editor.FileUtils();
+                utils.revealInFinder(path);
+                return true;
+            }
         }
 
     }

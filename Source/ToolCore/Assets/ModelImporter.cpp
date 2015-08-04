@@ -180,15 +180,9 @@ bool ModelImporter::ImportAnimations()
     return true;
 }
 
-bool ModelImporter::Import(const String& guid)
+bool ModelImporter::Import()
 {
-    AssetDatabase* db = GetSubsystem<AssetDatabase>();
-    Asset* asset = db->GetAssetByGUID(guid);
-
-    if (!asset)
-        return false;
-
-    String modelAssetFilename = asset->GetPath();
+    String modelAssetFilename = asset_->GetPath();
 
     importNode_ = new Node(context_);
 

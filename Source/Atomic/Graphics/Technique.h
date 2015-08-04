@@ -41,6 +41,8 @@ enum PassLightingMode
 /// %Material rendering pass, which defines shaders and render state.
 class ATOMIC_API Pass : public RefCounted
 {
+    REFCOUNTED(Pass)
+
 public:
     /// Construct.
     Pass(const String& passName);

@@ -2,6 +2,7 @@
 import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
 import ScriptWidget = require("./ScriptWidget");
+import Preferences = require("../editor/Preferences");
 
 class WelcomeFrame extends ScriptWidget {
 
@@ -11,9 +12,13 @@ class WelcomeFrame extends ScriptWidget {
 
         this.load("AtomicEditor/editor/ui/welcomeframe.tb.txt");
 
-        this.recentProjects = <Atomic.UISelectList> this.getWidget("recentprojects");
-        this.recentSource = new Atomic.UISelectItemSource();
+        var recentProjects = <Atomic.UILayout> this.getWidget("recentprojects");
         this.gravity = Atomic.UI_GRAVITY_ALL;
+
+        this.recentList = new Atomic.UIListView();
+        this.recentList.rootList.id = "recentList";
+
+        recentProjects.addChild(this.recentList);
 
         var container = <Atomic.UILayout> parent.getWidget("resourceviewcontainer");
 
@@ -21,27 +26,22 @@ class WelcomeFrame extends ScriptWidget {
 
         this.updateRecentProjects();
 
+        this.subscribeToEvent(EditorEvents.CloseProject, () => {
+            this.updateRecentProjects();
+        });
+        
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+        if (ev.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
+            if (ev.target.id == "recentList") {
+                this.openFrameMenu(ev.x, ev.y);
+            }
+        }
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
             var id = ev.target.id;
-
-            if (id == "recentprojects") {
-
-                var itemID = Number(this.recentProjects.selectedItemID);
-
-                if (itemID >= 0 && itemID < this.recent.length) {
-
-                    this.sendEvent(EditorEvents.LoadProject, { path: this.recent[itemID] });
-
-                }
-
-                return true;
-
-            }
 
             if (id == "open project") {
 
@@ -64,32 +64,45 @@ class WelcomeFrame extends ScriptWidget {
 
             }
 
-        }
+            if (id == "recentList") {
+                var path: string = this.recent[this.recentList.getSelectedItemID()];
+                this.sendEvent(EditorEvents.LoadProject, { path: path });
+            }
 
+            if (id == "recentProjectsContextMenu") {
+                var prefs = Preferences.getInstance();
+                if (ev.refid == "clear recent projects") {
+                    prefs.deleteRecentProjects();
+                    this.updateRecentProjects();
+                }
+            }
+        }
     }
 
     updateRecentProjects() {
 
-        this.recentSource.clear();
-
-        // prune any that don't exist
-        Atomic.editorMode.preferences.updateRecentFiles();
-
-        this.recent = Atomic.editorMode.preferences.recentProjects;
+        this.recentList.deleteAllItems();
+        
+        var prefs = Preferences.getInstance();
+        prefs.updateRecentProjects();
+        
+        this.recent = prefs.recentProjects;
 
         for (var i in this.recent) {
-
-            this.recentSource.addItem(new Atomic.UISelectItem(this.recent[i], i))
-
+            this.recentList.addRootItem(this.recent[i], "Folder.icon", i);
         }
-
-        this.recentProjects.source = this.recentSource;
 
     }
 
+    private openFrameMenu(x: number, y: number) {
+        var menu = new Atomic.UIMenuWindow(this, "recentProjectsContextMenu");
+        var menuButtons = new Atomic.UISelectItemSource();
+        menuButtons.addItem(new Atomic.UISelectItem("Clear Recent Projects", "clear recent projects"));
+        menu.show(menuButtons, x, y);
+    }
+
     recent: string[] = [];
-    recentProjects: Atomic.UISelectList;
-    recentSource: Atomic.UISelectItemSource;
+    recentList: Atomic.UIListView;
 
 }
 

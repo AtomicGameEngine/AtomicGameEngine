@@ -17,9 +17,9 @@ public:
 
     virtual void SetDefaults();
 
-    bool Import(const String& guid);
-
 protected:
+
+    bool Import();
 
     virtual bool LoadSettingsInternal();
     virtual bool SaveSettingsInternal();

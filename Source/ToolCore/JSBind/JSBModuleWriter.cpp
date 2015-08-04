@@ -52,11 +52,7 @@ void JSBModuleWriter::WriteClassDeclaration(String& source)
         if (klass->IsNumberArray())
             continue;
 
-        if (klass->IsObject())
-            source.AppendWithFormat("   js_class_declare<%s>(vm, \"%s\", \"%s\", jsb_constructor_%s);\n", klass->GetNativeName().CString(), packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
-        else
-            source.AppendWithFormat("   js_class_declare_internal(vm, NULL, \"%s\", \"%s\", jsb_constructor_%s);\n", packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
-
+        source.AppendWithFormat("   js_class_declare<%s>(vm, \"%s\", \"%s\", jsb_constructor_%s);\n", klass->GetNativeName().CString(), packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
 
         if (klass->HasProperties())
         {

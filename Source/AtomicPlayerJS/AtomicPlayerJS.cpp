@@ -19,10 +19,6 @@ void jsapi_init_atomicplayer(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
 
-    // setup the global AtomicPlayer object
-    duk_push_object(ctx);
-    duk_put_global_string(ctx, "AtomicPlayer");
-
     jsb_package_atomicplayer_init(vm);
 
     duk_get_global_string(ctx, "Atomic");

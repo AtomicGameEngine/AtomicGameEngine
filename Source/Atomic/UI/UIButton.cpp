@@ -3,6 +3,7 @@
 #include <TurboBadger/tb_widgets_common.h>
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include "UIEvents.h"
 #include "UI.h"
@@ -38,6 +39,15 @@ void UIButton::SetSqueezable(bool value)
 
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_CLICK) 
+	{
+        String text = GetText();
+        if (text.StartsWith("http://") || text.StartsWith("https://")) 
+		{
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            fileSystem->SystemOpen(text);
+        }
+    }
     return UIWidget::OnEvent(ev);
 }
 

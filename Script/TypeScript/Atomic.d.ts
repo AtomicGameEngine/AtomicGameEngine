@@ -890,7 +890,6 @@ declare module Atomic {
    export var SHADOW_MIN_PIXELS: number;
    export var INSTANCING_BUFFER_DEFAULT_SIZE: number;
    export var MAX_VIEWPORT_TEXTURES: number;
-   export var NUM_SCREEN_BUFFERS: number;
    export var MAX_TEXTURE_QUALITY_LEVELS: number;
 
 
@@ -3125,13 +3124,11 @@ declare module Atomic {
 
    export class Graphics extends AObject {
 
-      windowIcon: Image;
       windowTitle: string;
+      windowIcon: Image;
       srgb: boolean;
       flushGPU: boolean;
-      forceGL2: boolean;
       orientations: string;
-      textureForUpdate: Texture;
       defaultTextureFilterMode: TextureFilterMode;
       textureAnisotropy: number;
       viewport: IntRect;
@@ -3147,8 +3144,8 @@ declare module Atomic {
       height: number;
       multiSample: number;
       fullscreen: boolean;
-      borderless: boolean;
       resizable: boolean;
+      borderless: boolean;
       vSync: boolean;
       tripleBuffer: boolean;
       numPrimitives: number;
@@ -3159,7 +3156,6 @@ declare module Atomic {
       instancingSupport: boolean;
       lightPrepassSupport: boolean;
       deferredSupport: boolean;
-      anisotropySupport: boolean;
       hardwareShadowSupport: boolean;
       readableDepthSupport: boolean;
       sRGBSupport: boolean;
@@ -3168,7 +3164,6 @@ declare module Atomic {
       vertexShader: ShaderVariation;
       pixelShader: ShaderVariation;
       depthStencil: RenderSurface;
-      depthTexture: Texture2D;
       depthConstantBias: number;
       depthSlopeScaledBias: number;
       stencilTest: boolean;
@@ -3183,8 +3178,6 @@ declare module Atomic {
       stencilWriteMask: number;
       useClipPlane: boolean;
       renderTargetDimensions: IntVector2;
-      vbo: number;
-      ubo: number;
       alphaFormat: number;
       luminanceFormat: number;
       luminanceAlphaFormat: number;
@@ -3203,15 +3196,14 @@ declare module Atomic {
       readableDepthFormat: number;
       pixelUVOffset: Vector2;
       maxBones: number;
-      gL3Support: boolean;
 
       // Construct.
       constructor();
 
-      // Set window icon.
-      setWindowIcon(windowIcon: Image): void;
       // Set window title.
       setWindowTitle(windowTitle: string): void;
+      // Set window icon.
+      setWindowIcon(windowIcon: Image): void;
       // Set window size.
       setWindowSize(width: number, height: number): void;
       // Center window.
@@ -3220,10 +3212,8 @@ declare module Atomic {
       raiseWindow(): void;
       // Set whether the main window uses sRGB conversion on write.
       setSRGB(enable: boolean): void;
-      // Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
+      // Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Default off, may decrease performance if enabled.
       setFlushGPU(enable: boolean): void;
-      // Set forced use of OpenGL 2 even if OpenGL 3 is available. Must be called before setting the screen mode for the first time. Default false.
-      setForceGL2(enable: boolean): void;
       // Set allowed screen orientations as a space-separated list of "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Affects currently only iOS platform.
       setOrientations(orientations: string): void;
       // Toggle between full screen and windowed mode. Return true if successful.
@@ -3240,7 +3230,7 @@ declare module Atomic {
       clear(flags: number, color?: Color, depth?: number, stencil?: number): void;
       // Resolve multisampled backbuffer to a texture rendertarget. The texture's size should match the viewport size.
       resolveToTexture(destination: Texture2D, viewport: IntRect): boolean;
-      // Draw indexed, instanced geometry.
+      // Draw indexed, instanced geometry. An instancing vertex buffer must be set.
       drawInstanced(type: PrimitiveType, indexStart: number, indexCount: number, minVertex: number, vertexCount: number, instanceCount: number): void;
       // Set shaders.
       setShaders(vs: ShaderVariation, ps: ShaderVariation): void;
@@ -3256,14 +3246,10 @@ declare module Atomic {
       clearTransformSources(): void;
       // Set texture.
       setTexture(index: number, texture: Texture): void;
-      // Bind texture unit 0 for update. Called by Texture.
-      setTextureForUpdate(texture: Texture): void;
       // Set default texture filtering mode.
       setDefaultTextureFilterMode(mode: TextureFilterMode): void;
       // Set texture anisotropy.
       setTextureAnisotropy(level: number): void;
-      // Dirty texture parameters of all textures (when global settings change.)
-      setTextureParametersDirty(): void;
       // Reset all rendertargets, depth-stencil surface and viewport.
       resetRenderTargets(): void;
       // Reset specific rendertarget.
@@ -3308,43 +3294,39 @@ declare module Atomic {
       getMultiSample(): number;
       // Return whether window is fullscreen.
       getFullscreen(): boolean;
-      // Return whether window is borderless.
-      getBorderless(): boolean;
       // Return whether window is resizable.
       getResizable(): boolean;
+      // Return whether window is borderless.
+      getBorderless(): boolean;
       // Return whether vertical sync is on.
       getVSync(): boolean;
       // Return whether triple buffering is enabled.
       getTripleBuffer(): boolean;
       // Return whether the main window is using sRGB conversion on write.
       getSRGB(): boolean;
-      // Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
+      // Return whether the GPU command buffer is flushed each frame.
       getFlushGPU(): boolean;
-      // Return whether OpenGL 2 use is forced.
-      getForceGL2(): boolean;
       // Return allowed screen orientations.
       getOrientations(): string;
-      // Return whether device is lost, and can not yet render.
+      // Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
       isDeviceLost(): boolean;
       // Return number of primitives drawn this frame.
       getNumPrimitives(): number;
       // Return number of batches drawn this frame.
       getNumBatches(): number;
-      // Return dummy color texture format for shadow maps. 0 if not needed, may be nonzero on OS X to work around an Intel driver issue.
+      // Return dummy color texture format for shadow maps. Is "NULL" (consume no video memory) if supported.
       getDummyColorFormat(): number;
       // Return shadow map depth texture format, or 0 if not supported.
       getShadowMapFormat(): number;
       // Return 24-bit shadow map depth texture format, or 0 if not supported.
       getHiresShadowMapFormat(): number;
-      // Return whether hardware instancing is supported.
+      // Return whether hardware instancing is supported..
       getInstancingSupport(): boolean;
       // Return whether light pre-pass rendering is supported.
       getLightPrepassSupport(): boolean;
       // Return whether deferred rendering is supported.
       getDeferredSupport(): boolean;
-      // Return whether anisotropic texture filtering is supported.
-      getAnisotropySupport(): boolean;
-      // Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
+      // Return whether shadow map depth compare is done in hardware.
       getHardwareShadowSupport(): boolean;
       // Return whether a readable hardware depth format is available.
       getReadableDepthSupport(): boolean;
@@ -3356,24 +3338,22 @@ declare module Atomic {
       getDesktopResolution(): IntVector2;
       // Return a shader variation by name and defines.
       getShader(type: ShaderType, name: string, defines?: string): ShaderVariation;
-      // Return vertex shader.
+      // Return current vertex shader.
       getVertexShader(): ShaderVariation;
-      // Return pixel shader.
+      // Return current pixel shader.
       getPixelShader(): ShaderVariation;
       // Return texture unit index by name.
       getTextureUnit(name: string): TextureUnit;
       // Return texture unit name by index.
       getTextureUnitName(unit: TextureUnit): string;
-      // Return texture by texture unit index.
+      // Return current texture by texture unit index.
       getTexture(index: number): Texture;
       // Return default texture filtering mode.
       getDefaultTextureFilterMode(): TextureFilterMode;
-      // Return rendertarget by index.
+      // Return current rendertarget by index.
       getRenderTarget(index: number): RenderSurface;
-      // Return depth-stencil surface.
+      // Return current depth-stencil surface.
       getDepthStencil(): RenderSurface;
-      // Return readable depth-stencil texture. Not created automatically on OpenGL.
-      getDepthTexture(): Texture2D;
       // Return the viewport coordinates.
       getViewport(): IntRect;
       // Return texture anisotropy.
@@ -3422,26 +3402,14 @@ declare module Atomic {
       windowResized(): void;
       // Window was moved through user interaction. Called by Input subsystem.
       windowMoved(): void;
-      // Clean up too large scratch buffers.
-      cleanupScratchBuffers(): void;
-      // Clean up a render surface from all FBOs.
-      cleanupRenderSurface(surface: RenderSurface): void;
-      // Clean up shader programs when a shader variation is released or destroyed.
-      cleanupShaderPrograms(variation: ShaderVariation): void;
-      // Release/clear GPU objects and optionally close the window.
-      release(clearGPUObjects: boolean, closeWindow: boolean): void;
-      // Restore GPU objects and reinitialize state. Requires an open window.
-      restore(): void;
       // Maximize the Window.
       maximize(): void;
       // Minimize the Window.
       minimize(): void;
-      // Mark the FBO needing an update.
-      markFBODirty(): void;
-      // Bind a VBO, avoiding redundant operation.
-      setVBO(object: number): void;
-      // Bind a UBO, avoiding redundant operation.
-      setUBO(object: number): void;
+      // Clean up too large scratch buffers.
+      cleanupScratchBuffers(): void;
+      // Clean up shader programs when a shader variation is released or destroyed.
+      cleanupShaderPrograms(variation: ShaderVariation): void;
       // Return the API-specific alpha texture format.
       getAlphaFormat(): number;
       // Return the API-specific luminance texture format.
@@ -3478,8 +3446,6 @@ declare module Atomic {
       getPixelUVOffset(): Vector2;
       // Return maximum number of supported bones for skinning.
       getMaxBones(): number;
-      // Return whether is using an OpenGL 3 context.
-      getGL3Support(): boolean;
 
    }
 
@@ -3490,11 +3456,9 @@ declare module Atomic {
       linkedRenderTarget: RenderSurface;
       linkedDepthStencil: RenderSurface;
       parentTexture: Texture;
-      renderBuffer: number;
       width: number;
       height: number;
       usage: TextureUsage;
-      target: number;
 
       // Construct with parent texture.
       constructor(parentTexture: Texture);
@@ -3511,16 +3475,10 @@ declare module Atomic {
       setLinkedDepthStencil(depthStencil: RenderSurface): void;
       // Queue manual update of the viewport(s).
       queueUpdate(): void;
-      // Create a renderbuffer. Return true if successful.
-      createRenderBuffer(width: number, height: number, format: number): boolean;
-      // Handle device loss.
-      onDeviceLost(): void;
-      // Release renderbuffer if any.
+      // Release surface.
       release(): void;
       // Return parent texture.
       getParentTexture(): Texture;
-      // Return renderbuffer if created.
-      getRenderBuffer(): number;
       // Return width.
       getWidth(): number;
       // Return height.
@@ -3533,14 +3491,10 @@ declare module Atomic {
       getViewport(index: number): Viewport;
       // Return viewport update mode.
       getUpdateMode(): RenderSurfaceUpdateMode;
-      // Return linked color buffer.
+      // Return linked color rendertarget.
       getLinkedRenderTarget(): RenderSurface;
-      // Return linked depth buffer.
+      // Return linked depth-stencil surface.
       getLinkedDepthStencil(): RenderSurface;
-      // Set surface's OpenGL target.
-      setTarget(target: number): void;
-      // Return surface's OpenGL target.
-      getTarget(): number;
       // Clear update flag. Called by Renderer.
       wasUpdated(): void;
 
@@ -3558,8 +3512,6 @@ declare module Atomic {
       // Construct.
       constructor(owner: Shader, type: ShaderType);
 
-      // Mark the GPU resource destroyed on context destruction.
-      onDeviceLost(): void;
       // Release the shader.
       release(): void;
       // Compile the shader. Return true if successful.
@@ -3572,7 +3524,7 @@ declare module Atomic {
       getOwner(): Shader;
       // Return shader type.
       getShaderType(): ShaderType;
-      // Return name.
+      // Return shader name.
       getName(): string;
       // Return defines.
       getDefines(): string;
@@ -3580,6 +3532,10 @@ declare module Atomic {
       getFullName(): string;
       // Return compile error/warning string.
       getCompilerOutput(): string;
+      // Return whether uses a parameter.
+      hasParameter(param: string): boolean;
+      // Return whether uses a texture unit (only for pixel shaders.)
+      hasTextureUnit(unit: TextureUnit): boolean;
 
    }
 
@@ -3591,13 +3547,11 @@ declare module Atomic {
       borderColor: Color;
       srgb: boolean;
       backupTexture: Texture;
-      target: number;
       format: number;
       levels: number;
       width: number;
       height: number;
       depth: number;
-      parametersDirty: boolean;
       usage: TextureUsage;
       components: number;
       parameters: XMLFile;
@@ -3611,7 +3565,7 @@ declare module Atomic {
       setFilterMode(filter: TextureFilterMode): void;
       // Set addressing mode by texture coordinate.
       setAddressMode(coord: TextureCoordinate, address: TextureAddressMode): void;
-      // Set shadow compare mode.
+      // Set shadow compare mode. No-op on D3D9.
       setShadowCompare(enable: boolean): void;
       // Set border color for border addressing mode.
       setBorderColor(color: Color): void;
@@ -3621,12 +3575,6 @@ declare module Atomic {
       setBackupTexture(texture: Texture): void;
       // Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
       setMipsToSkip(quality: number, mips: number): void;
-      // Dirty the parameters.
-      setParametersDirty(): void;
-      // Update changed parameters to OpenGL. Called by Graphics when binding the texture.
-      updateParameters(): void;
-      // Return texture's OpenGL target.
-      getTarget(): number;
       // Return texture format.
       getFormat(): number;
       // Return whether the texture format is compressed.
@@ -3639,13 +3587,11 @@ declare module Atomic {
       getHeight(): number;
       // Return height.
       getDepth(): number;
-      // Return whether parameters are dirty.
-      getParametersDirty(): boolean;
       // Return filtering mode.
       getFilterMode(): TextureFilterMode;
       // Return addressing mode by texture coordinate.
       getAddressMode(coord: TextureCoordinate): TextureAddressMode;
-      // Return whether shadow compare is enabled.
+      // Return whether shadow compare is enabled. Always false on D3D9.
       getShadowCompare(): boolean;
       // Return border color.
       getBorderColor(): Color;
@@ -3667,14 +3613,8 @@ declare module Atomic {
       getRowDataSize(width: number): number;
       // Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
       getComponents(): number;
-      // Return the non-internal texture format corresponding to an OpenGL internal format.
-      getExternalFormat(format: number): number;
-      // Return the data type corresponding to an OpenGL internal format.
-      getDataType(format: number): number;
       // Set additional parameters from an XML file.
       setParameters(xml: XMLFile): void;
-      // Return the corresponding SRGB texture format if supported. If not supported, return format unchanged.
-      getSRGBFormat(format: number): number;
 
    }
 
@@ -3687,11 +3627,11 @@ declare module Atomic {
 
       // Finish resource loading. Always called from the main thread. Return true if successful.
       endLoad(): boolean;
-      // Mark the GPU resource destroyed on context destruction.
+      // Release default pool resources.
       onDeviceLost(): void;
-      // Recreate the GPU resource and restore data if applicable.
+      // Recreate default pool resources.
       onDeviceReset(): void;
-      // Release the texture.
+      // Release texture.
       release(): void;
       // Set size, format and usage. Zero size will follow application window size. Return true if successful.
       setSize(width: number, height: number, format: number, usage?: TextureUsage): boolean;
@@ -3709,11 +3649,11 @@ declare module Atomic {
 
       // Finish resource loading. Always called from the main thread. Return true if successful.
       endLoad(): boolean;
-      // Mark the GPU resource destroyed on context destruction.
+      // Release default pool resources.
       onDeviceLost(): void;
-      // Recreate the GPU resource and restore data if applicable.
+      // Recreate default pool resources.
       onDeviceReset(): void;
-      // Release the texture.
+      // Release texture.
       release(): void;
       // Set size, format and usage. Zero size will follow application window size. Return true if successful.
       setSize(width: number, height: number, depth: number, format: number, usage?: TextureUsage): boolean;
@@ -3729,11 +3669,11 @@ declare module Atomic {
 
       // Finish resource loading. Always called from the main thread. Return true if successful.
       endLoad(): boolean;
-      // Mark the GPU resource destroyed on context destruction.
+      // Release default pool resources.
       onDeviceLost(): void;
-      // Recreate the GPU resource and restore data if applicable.
+      // ReCreate default pool resources.
       onDeviceReset(): void;
-      // Release the texture.
+      // Release texture.
       release(): void;
       // Set size, format and usage. Return true if successful.
       setSize(size: number, format: number, usage?: TextureUsage): boolean;
@@ -7857,6 +7797,7 @@ declare module Atomic {
       // Unlike FileSystem.Copy this copy works when the source file is in a package file
       copy(srcFile: File): boolean;
       readText():string;
+      writeString(text:string):void;
 
    }
 
@@ -7924,6 +7865,8 @@ declare module Atomic {
       createDirs(root: string, subdirectory: string): boolean;
       // Copy a directory, directoryOut must not exist
       copyDir(directoryIn: string, directoryOut: string): boolean;
+      // Check if a file or directory exists at the specified path
+      exists(pathName: string): boolean;
       createDirsRecursive(directoryIn: string, directoryOut: string): boolean;
       scanDir(pathName:string, filter:string, flags:number, recursive:boolean);
 

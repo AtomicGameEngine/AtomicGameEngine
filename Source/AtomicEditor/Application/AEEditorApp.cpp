@@ -22,7 +22,6 @@
 #include "../EditorMode/AEEditorMode.h"
 
 #include "AEEditorApp.h"
-#include "AEPreferences.h"
 
 using namespace ToolCore;
 
@@ -89,8 +88,6 @@ void AEEditorApp::Start()
 void AEEditorApp::Setup()
 {
     context_->SetEditorContext(true);
-
-    context_->RegisterSubsystem(new AEPreferences(context_));
 
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);

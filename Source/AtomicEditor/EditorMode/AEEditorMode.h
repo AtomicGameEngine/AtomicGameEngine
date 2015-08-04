@@ -15,8 +15,6 @@ using namespace Atomic;
 namespace AtomicEditor
 {
 
-class AEPreferences;
-
 /// EditorMode subsystem
 class EditorMode : public Object
 {
@@ -29,10 +27,6 @@ public:
     virtual ~EditorMode();
 
     bool PlayProject();
-
-
-    AEPreferences* GetPreferences();
-
 
 private:
 

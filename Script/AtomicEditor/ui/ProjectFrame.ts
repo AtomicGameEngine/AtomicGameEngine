@@ -136,10 +136,10 @@ class ProjectFrame extends ScriptWidget {
 
             if (this.menu.handlePopupMenu(data.target, data.refid))
                 return true;
-
+            
             // create
             if (id == "menu create") {
-
+                if (!ToolCore.toolSystem.project) return;  
                 var src = MenuItemSources.getMenuItemSource("project create items");
                 var menu = new Atomic.UIMenuWindow(data.target, "create popup");
                 menu.show(src);
@@ -147,8 +147,6 @@ class ProjectFrame extends ScriptWidget {
 
             }
 
-            var system = ToolCore.getToolSystem();
-            var project = system.project;
             var db = ToolCore.getAssetDatabase();
             var fs = Atomic.getFileSystem();
 

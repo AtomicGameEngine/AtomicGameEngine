@@ -58,28 +58,28 @@ void js_class_declare_internal(JSVM* vm, void* uniqueClassID, const char* packag
 {
     duk_context* ctx = vm->GetJSContext();
 
-    // stash a lookup from the uniqueID to the package name
-    // (NULL) == non-object, so core "Atomic" package
+    // uniqueClassID must be non-null
+    assert(uniqueClassID);
 
-    if (uniqueClassID)
-    {
-        duk_push_heap_stash(ctx);
-        duk_push_pointer(ctx, uniqueClassID);
-        duk_push_string(ctx, package);
-        duk_put_prop(ctx, -3);
-        duk_pop(ctx);
-    }
-    
-    if (!duk_get_global_string(ctx, package))
-    {
-        // Failure leaves undefined on the stack
-        duk_pop(ctx);
-        // Create a new namespace object for the package
-        duk_push_object(ctx);
-        duk_put_global_string(ctx, package);
-        duk_get_global_string(ctx, package);
-    }
+    // stash a lookup from the uniqueID to the package and class name
 
+    duk_push_heap_stash(ctx);
+    duk_push_pointer(ctx, uniqueClassID);
+
+    duk_push_object(ctx);
+    duk_push_string(ctx, package);
+    duk_put_prop_index(ctx, -2, 0);
+    duk_push_string(ctx, classname);
+    duk_put_prop_index(ctx, -2, 1);
+
+    // store class object into uniqueClassID key
+    duk_put_prop(ctx, -3);
+
+    // pop heap stash
+    duk_pop(ctx);
+
+    // store the constructor
+    duk_get_global_string(ctx, package);
     duk_push_c_function(ctx, constructor, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, classname);
     duk_pop(ctx);
@@ -376,14 +376,10 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 {
     VariantType type = v.GetType();
     RefCounted* ref;
-    Object* object;
     Vector2 vector2 = Vector2::ZERO;
     Vector3 vector3 = Vector3::ZERO;
     Vector4 vector4 = Vector4::ZERO;
     Color color = Color::BLACK;
-
-    void* uniqueClassID = NULL;
-    const char* package = NULL;
 
     switch (type)
     {
@@ -398,38 +394,29 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
         ref = v.GetPtr();
 
-        if (!ref || !ref->IsObject() || !ref->Refs())
+        // if we're null or don't have any refs, return null
+        if (!ref || !ref->Refs())
         {
             duk_push_null(ctx);
             break;
         }
 
-        object = (Object*) ref;
-
-
         // check that class is supported
-        uniqueClassID = (void *) object->GetTypeName().CString();
         duk_push_heap_stash(ctx);
-        duk_push_pointer(ctx, uniqueClassID);
+        duk_push_pointer(ctx, (void*) ref->GetClassID());
         duk_get_prop(ctx, -2);
-        package = duk_to_string(ctx, -1);
-        duk_pop_2(ctx);
 
-        // check that class is supported
-        duk_get_global_string(ctx, package);
-
-        // will not handle renamed classes!
-        duk_get_prop_string(ctx, -1, object->GetTypeName().CString());
-
-        if (!duk_is_function(ctx, -1))
-            object = NULL;
-
-        duk_pop_n(ctx, 2);
-
-        if (object)
-            js_push_class_object_instance(ctx, object);
-        else
+        if (!duk_is_object(ctx, -1))
+        {
+            duk_pop_2(ctx);
             duk_push_undefined(ctx);
+        }
+        else
+        {
+            duk_pop_2(ctx);
+            js_push_class_object_instance(ctx, ref);
+        }
+
         break;
 
     case VAR_BOOL:

@@ -110,6 +110,9 @@ public:
     /// Copy a directory, directoryOut must not exist
     bool CopyDir(const String& directoryIn, const String& directoryOut);
 
+	/// Check if a file or directory exists at the specified path
+    bool Exists(const String& pathName) const { return FileExists(pathName) || DirExists(pathName); }
+
     bool CreateDirsRecursive(const String& directoryIn, const String& directoryOut);
     
 private:

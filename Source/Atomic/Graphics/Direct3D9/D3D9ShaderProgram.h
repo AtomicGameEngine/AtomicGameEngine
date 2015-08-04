@@ -31,6 +31,8 @@ namespace Atomic
 /// Combined information for specific vertex and pixel shaders.
 class ShaderProgram : public RefCounted
 {
+    REFCOUNTED(ShaderProgram)
+
 public:
     /// Construct.
     ShaderProgram(ShaderVariation* vertexShader, ShaderVariation* pixelShader)

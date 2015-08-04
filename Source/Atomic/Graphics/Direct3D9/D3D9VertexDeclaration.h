@@ -48,6 +48,8 @@ struct VertexDeclarationElement
 /// Vertex declaration.
 class ATOMIC_API VertexDeclaration : public RefCounted
 {
+    REFCOUNTED(VertexDeclaration)
+
 public:
     /// Construct with vertex element mask.
     VertexDeclaration(Graphics* graphics, unsigned elementMask);

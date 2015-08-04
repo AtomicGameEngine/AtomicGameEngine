@@ -28,6 +28,8 @@ class UIPreferredSize : public RefCounted
 {
     friend class UIWidget;
 
+    REFCOUNTED(UIPreferredSize)
+
 public:
 
     UIPreferredSize(int w = 0, int h = 0);

@@ -36,6 +36,8 @@ class VertexBuffer;
 /// Vertex declaration.
 class ATOMIC_API VertexDeclaration : public RefCounted
 {
+    REFCOUNTED(VertexDeclaration)
+
 public:
     /// Construct with vertex buffers and element masks to base declaration on.
     VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers, unsigned* elementMasks);

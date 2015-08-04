@@ -1,16 +1,26 @@
-## Atomic Game Engine
+## Atomic Game Engine™
 ------------------
 
-Please see [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md) for the **Atomic Game Engine Source Code EULA**
+#### THUNDERBEAST GAMES LLC:
 
-Credits:
+- Josh Engebretson (Technical Director)
 
-Josh Engebretson (Technical Director, THUNDERBEAST GAMES LLC)
+### Contributors:
 
-#### Urho3D - Website & Credits
+- marynate (https://github.com/marynate)
+
+- rsredsq (https://github.com/rsredsq)
+
+
+### Contribution Copyright and Licensing
+
+Atomic Game Engine contribution copyrights are held by their authors.  Each author has a copyright to their contribution, and agrees to irrevocably license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`.
+
 --------------------------
 
-The Atomic Game Engine started as a fork of the Urho3D project in November 2014
+##### Urho3D - Website & Credits
+
+The Atomic Game Engine began as a fork of the Urho3D project in November 2014
 
 Website:
 

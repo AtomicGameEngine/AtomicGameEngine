@@ -37,6 +37,8 @@ class XMLFile;
 /// Tmx layer.
 class TmxLayer2D : public RefCounted
 {
+    REFCOUNTED(TmxLayer2D)
+
 public:
     TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
     virtual ~TmxLayer2D();
@@ -90,6 +92,8 @@ protected:
 /// Tmx tile layer.
 class TmxTileLayer2D : public TmxLayer2D
 {
+    REFCOUNTED(TmxTileLayer2D)
+
 public:
     TmxTileLayer2D(TmxFile2D* tmxFile);
 
@@ -106,6 +110,8 @@ protected:
 /// Tmx image layer.
 class TmxObjectGroup2D : public TmxLayer2D
 {
+    REFCOUNTED(TmxObjectGroup2D)
+
 public:
     TmxObjectGroup2D(TmxFile2D* tmxFile);
 
@@ -126,6 +132,8 @@ private:
 /// Tmx image layer.
 class TmxImageLayer2D : public TmxLayer2D
 {
+    REFCOUNTED(TmxImageLayer2D)
+
 public:
     TmxImageLayer2D(TmxFile2D* tmxFile);
 

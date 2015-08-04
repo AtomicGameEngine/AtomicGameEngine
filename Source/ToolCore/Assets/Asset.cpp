@@ -25,7 +25,8 @@ namespace ToolCore
 Asset::Asset(Context* context) :
     Object(context),
     dirty_(false),
-    isFolder_(false)
+    isFolder_(false),
+    fileTimestamp_(0xffffffff)
 {
 
 }
@@ -33,6 +34,16 @@ Asset::Asset(Context* context) :
 Asset::~Asset()
 {
 
+}
+
+void Asset::UpdateFileTimestamp()
+{
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (fs->FileExists(path_))
+    {
+        fileTimestamp_ = fs->GetLastModifiedTime(path_);
+    }
 }
 
 Asset* Asset::GetParent()
@@ -90,10 +101,11 @@ bool Asset::CheckCacheFile()
 
 bool Asset::Import()
 {
+
     if (importer_.Null())
         return true;
 
-    return importer_->Import(guid_);
+    return importer_->Import();
 }
 
 bool Asset::Preload()

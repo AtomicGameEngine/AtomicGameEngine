@@ -22,8 +22,7 @@ namespace ToolCore
 AssetDatabase::AssetDatabase(Context* context) : Object(context)
 {
     SubscribeToEvent(E_PROJECTLOADED, HANDLER(AssetDatabase, HandleProjectLoaded));
-    SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));
-    SubscribeToEvent(E_FILECHANGED, HANDLER(AssetDatabase, HandleFileChanged));
+    SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));    
 }
 
 AssetDatabase::~AssetDatabase()
@@ -141,6 +140,13 @@ Asset* AssetDatabase::GetAssetByPath(const String& path)
 
 void AssetDatabase::PruneOrphanedDotAssetFiles()
 {
+
+    if (project_.Null())
+    {
+        LOGDEBUG("AssetDatabase::PruneOrphanedDotAssetFiles - called without project loaded");
+        return;
+    }
+
     FileSystem* fs = GetSubsystem<FileSystem>();
 
     const String& resourcePath = project_->GetResourcePath();
@@ -188,6 +194,9 @@ void AssetDatabase::AddAsset(SharedPtr<Asset>& asset)
     assert(!GetAssetByGUID(asset->GetGUID()));
 
     assets_.Push(asset);
+
+    // set to the current timestamp
+    asset->UpdateFileTimestamp();
 
     VariantMap eventData;
     eventData[ResourceAdded::P_GUID] = asset->GetGUID();
@@ -241,6 +250,7 @@ bool AssetDatabase::ImportDirtyAssets()
         assets[i]->Import();
         assets[i]->Save();
         assets[i]->dirty_ = false;
+        assets[i]->UpdateFileTimestamp();
     }
 
     return assets.Size() != 0;
@@ -409,6 +419,8 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
     cache->AddResourceDir(GetCachePath());
 
     Scan();
+
+    SubscribeToEvent(E_FILECHANGED, HANDLER(AssetDatabase, HandleFileChanged));
 }
 
 void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& eventData)
@@ -418,6 +430,8 @@ void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& even
     assets_.Clear();
     usedGUID_.Clear();
     project_ = 0;
+
+    UnsubscribeFromEvent(E_FILECHANGED);
 }
 
 void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventData)
@@ -431,6 +445,14 @@ void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventDat
 
     SplitPath(fullPath, pathName, fileName, ext);
 
+    // ignore changes in the Cache resource dir
+    if (fullPath == GetCachePath() || pathName.StartsWith(GetCachePath()))
+        return;
+
+    // don't care about directories and asset file changes
+    if (fs->DirExists(fullPath) || ext == ".asset")
+        return;
+
     Asset* asset = GetAssetByPath(fullPath);
 
     if (!asset && fs->FileExists(fullPath))
@@ -441,19 +463,19 @@ void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventDat
 
     if (asset)
     {
-        if(!fs->FileExists(fullPath))
+        if(!fs->Exists(fullPath))
         {
             DeleteAsset(asset);
         }
         else
         {
-            asset->SetDirty(true);
-            Scan();
+            if (asset->GetFileTimestamp() != fs->GetLastModifiedTime(asset->GetPath()))
+            {
+                asset->SetDirty(true);
+                Scan();
+            }
         }
-
     }
-
-
 }
 
 
