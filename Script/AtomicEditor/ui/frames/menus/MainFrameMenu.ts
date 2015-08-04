@@ -1,8 +1,8 @@
 
-import strings = require("./EditorStrings");
-import EditorEvents = require("../editor/EditorEvents");
-import EditorUI = require("./EditorUI");
-import MenuItemSources = require("./menus/MenuItemSources");
+import strings = require("ui/EditorStrings");
+import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
+import MenuItemSources = require("./MenuItemSources");
 
 class MainFrameMenu extends Atomic.ScriptObject {
 

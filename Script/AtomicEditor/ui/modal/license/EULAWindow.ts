@@ -1,7 +1,7 @@
 
-import EditorEvents = require("../../editor/EditorEvents");
-import EditorUI = require("../EditorUI");
-import ModalWindow = require("../modal/ModalWindow");
+import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
+import ModalWindow = require("../ModalWindow");
 
 class EULAWindow extends ModalWindow {
 

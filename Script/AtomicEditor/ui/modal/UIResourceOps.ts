@@ -1,7 +1,7 @@
-import EditorEvents = require("../../editor/EditorEvents");
+import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
-import ResourceOps = require("../../resources/ResourceOps");
+import ResourceOps = require("resources/ResourceOps");
 
 export class ResourceDelete extends ModalWindow {
 

@@ -1,7 +1,7 @@
 
-import strings = require("../EditorStrings");
-import EditorEvents = require("../../editor/EditorEvents");
-import EditorUI = require("../EditorUI");
+import strings = require("ui/EditorStrings");
+import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
 
 var UIMenuItemSource = Atomic.UIMenuItemSource;
 var UIMenuItem = Atomic.UIMenuItem;
