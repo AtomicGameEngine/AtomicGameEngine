@@ -70,6 +70,8 @@ struct TechniqueEntry
 /// Material's shader parameter animation instance.
 class ShaderParameterAnimationInfo : public ValueAnimationInfo
 {
+    REFCOUNTED(ShaderParameterAnimationInfo)
+
 public:
     /// Construct.
     ShaderParameterAnimationInfo

@@ -43,6 +43,8 @@ enum HttpRequestState
 /// An HTTP connection with response data stream.
 class HttpRequest : public RefCounted, public Deserializer, public Thread
 {
+    REFCOUNTED(HttpRequest)
+
 public:
     /// Construct with parameters.
     HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData);

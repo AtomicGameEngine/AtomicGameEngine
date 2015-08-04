@@ -40,6 +40,8 @@ class WorkerThread;
 /// Work queue item.
 struct WorkItem : public RefCounted
 {
+    REFCOUNTED(WorkItem)
+
     friend class WorkQueue;
 
 public:

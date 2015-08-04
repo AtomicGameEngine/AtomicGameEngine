@@ -30,6 +30,8 @@ namespace Atomic
 /// Base class for sound streams.
 class ATOMIC_API SoundStream : public RefCounted
 {
+    REFCOUNTED(SoundStream)
+
 public:
     /// Construct.
     SoundStream();

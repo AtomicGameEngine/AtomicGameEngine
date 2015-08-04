@@ -225,26 +225,22 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
         return true;
     }
 
-    // will not handle renamed classes
-    if (instance->IsObject())
-    {
-        Object *obj = (Object*) instance;
+    duk_push_heap_stash(ctx);
+    duk_push_pointer(ctx, (void*) instance->GetClassID());
+    duk_get_prop(ctx, -2);
 
-        void* uniqueClassID = (void *) obj->GetTypeName().CString();
-        duk_push_heap_stash(ctx);
-        duk_push_pointer(ctx, uniqueClassID);
-        duk_get_prop(ctx, -2);
-        const char* package = duk_require_string(ctx, -1);
-        duk_pop_2(ctx);
+    // if this is tripped, means the class hasn't been registered and shouldn't be trying to push it
+    assert(duk_is_object(ctx, -1));
 
-        duk_get_global_string(ctx, package);
-        duk_get_prop_string(ctx, -1, ((Object*)instance)->GetTypeName().CString());
-    }
-    else
-    {
-        duk_get_global_string(ctx, "Atomic");
-        duk_get_prop_string(ctx, -1, classname);
-    }
+    duk_get_prop_index(ctx, -1, 0);
+    const char* package = duk_require_string(ctx, -1);
+    duk_get_prop_index(ctx, -2, 1);
+    const char* jclassname = duk_require_string(ctx, -1);
+
+    duk_set_top(ctx, top);
+
+    duk_get_global_string(ctx, package);
+    duk_get_prop_string(ctx, -1, jclassname);
 
     duk_push_pointer(ctx, (void*) instance);
     duk_new(ctx, 1);
