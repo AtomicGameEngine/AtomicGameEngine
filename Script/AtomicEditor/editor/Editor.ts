@@ -1,7 +1,6 @@
 
 import EditorUI = require("ui/EditorUI");
 import UIEvents = require("ui/UIEvents");
-import AssetImport = require("utils/AssetImport");
 import PlayMode = require("ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
@@ -10,7 +9,6 @@ import Preferences = require("./Preferences");
 class Editor extends Atomic.ScriptObject {
 
     project: ToolCore.Project;
-    assetImport: AssetImport;
     editorLicense: EditorLicense;
     playMode: PlayMode;
 
@@ -34,8 +32,6 @@ class Editor extends Atomic.ScriptObject {
         this.playMode = new PlayMode();
 
         Atomic.getResourceCache().autoReloadResources = true;
-
-        this.assetImport = new AssetImport();
 
         this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
         this.subscribeToEvent(EditorEvents.CloseProject, (data) => this.handleEditorCloseProject(data));
