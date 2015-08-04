@@ -88,6 +88,17 @@ declare module ToolCore {
 
    }
 
+   export class ProjectFile extends Atomic.AObject {
+
+      // Construct.
+      constructor();
+
+      save(project: Project): void;
+      load(project: Project): boolean;
+      writeNewProject(fullpath: string): void;
+
+   }
+
    export class Project extends Atomic.AObject {
 
       resourcePath: string;
@@ -129,17 +140,6 @@ declare module ToolCore {
       loadBuildSettings(): boolean;
       saveUserPrefs(): void;
       loadUserPrefs(): boolean;
-
-   }
-
-   export class ProjectFile extends Atomic.AObject {
-
-      // Construct.
-      constructor();
-
-      save(project: Project): void;
-      load(project: Project): boolean;
-      writeNewProject(fullpath: string): void;
 
    }
 
@@ -237,6 +237,27 @@ declare module ToolCore {
 
    }
 
+   export class AssetDatabase extends Atomic.AObject {
+
+      cachePath: string;
+
+      // Construct.
+      constructor();
+
+      getAssetByGUID(guid: string): Asset;
+      getAssetByPath(path: string): Asset;
+      getAssetByCachePath(cachePath: string): Asset;
+      generateAssetGUID(): string;
+      registerGUID(guid: string): void;
+      getCachePath(): string;
+      deleteAsset(asset: Asset): void;
+      scan(): void;
+      getDotAssetFilename(path: string): string;
+      getFolderAssets(folder:string):ToolCore.Asset[];
+      getAssetsByImporterType(type:string):ToolCore.Asset[];
+
+   }
+
    export class Asset extends Atomic.AObject {
 
       guid: string;
@@ -279,27 +300,6 @@ declare module ToolCore {
       isFolder(): boolean;
       load(): boolean;
       save(): boolean;
-
-   }
-
-   export class AssetDatabase extends Atomic.AObject {
-
-      cachePath: string;
-
-      // Construct.
-      constructor();
-
-      getAssetByGUID(guid: string): Asset;
-      getAssetByPath(path: string): Asset;
-      getAssetByCachePath(cachePath: string): Asset;
-      generateAssetGUID(): string;
-      registerGUID(guid: string): void;
-      getCachePath(): string;
-      deleteAsset(asset: Asset): void;
-      scan(): void;
-      getDotAssetFilename(path: string): string;
-      getFolderAssets(folder:string):ToolCore.Asset[];
-      getAssetsByImporterType(type:string):ToolCore.Asset[];
 
    }
 

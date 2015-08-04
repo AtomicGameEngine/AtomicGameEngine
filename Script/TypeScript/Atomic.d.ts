@@ -494,19 +494,6 @@ declare module Atomic {
    export var OT_INVALID: TileMapObjectType2D;
 
 
-   // enum ShapeType
-   export type ShapeType = number;
-   export var SHAPE_BOX: ShapeType;
-   export var SHAPE_SPHERE: ShapeType;
-   export var SHAPE_STATICPLANE: ShapeType;
-   export var SHAPE_CYLINDER: ShapeType;
-   export var SHAPE_CAPSULE: ShapeType;
-   export var SHAPE_CONE: ShapeType;
-   export var SHAPE_TRIANGLEMESH: ShapeType;
-   export var SHAPE_CONVEXHULL: ShapeType;
-   export var SHAPE_TERRAIN: ShapeType;
-
-
    // enum ConstraintType
    export type ConstraintType = number;
    export var CONSTRAINT_POINT: ConstraintType;
@@ -520,6 +507,25 @@ declare module Atomic {
    export var COLLISION_NEVER: CollisionEventMode;
    export var COLLISION_ACTIVE: CollisionEventMode;
    export var COLLISION_ALWAYS: CollisionEventMode;
+
+
+   // enum ShapeType
+   export type ShapeType = number;
+   export var SHAPE_BOX: ShapeType;
+   export var SHAPE_SPHERE: ShapeType;
+   export var SHAPE_STATICPLANE: ShapeType;
+   export var SHAPE_CYLINDER: ShapeType;
+   export var SHAPE_CAPSULE: ShapeType;
+   export var SHAPE_CONE: ShapeType;
+   export var SHAPE_TRIANGLEMESH: ShapeType;
+   export var SHAPE_CONVEXHULL: ShapeType;
+   export var SHAPE_TERRAIN: ShapeType;
+
+
+   // enum NavmeshPartitionType
+   export type NavmeshPartitionType = number;
+   export var NAVMESH_PARTITION_WATERSHED: NavmeshPartitionType;
+   export var NAVMESH_PARTITION_MONOTONE: NavmeshPartitionType;
 
 
    // enum CrowdTargetState
@@ -552,12 +558,6 @@ declare module Atomic {
    export var PUSHINESS_LOW: NavigationPushiness;
    export var PUSHINESS_MEDIUM: NavigationPushiness;
    export var PUSHINESS_HIGH: NavigationPushiness;
-
-
-   // enum NavmeshPartitionType
-   export type NavmeshPartitionType = number;
-   export var NAVMESH_PARTITION_WATERSHED: NavmeshPartitionType;
-   export var NAVMESH_PARTITION_MONOTONE: NavmeshPartitionType;
 
 
    // enum MouseMode
@@ -625,14 +625,6 @@ declare module Atomic {
    export var UI_MESSAGEWINDOW_SETTINGS_OK: UI_MESSAGEWINDOW_SETTINGS;
    export var UI_MESSAGEWINDOW_SETTINGS_OK_CANCEL: UI_MESSAGEWINDOW_SETTINGS;
    export var UI_MESSAGEWINDOW_SETTINGS_YES_NO: UI_MESSAGEWINDOW_SETTINGS;
-
-
-   // enum UI_SIZE_DEP
-   export type UI_SIZE_DEP = number;
-   export var UI_SIZE_DEP_NONE: UI_SIZE_DEP;
-   export var UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT: UI_SIZE_DEP;
-   export var UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH: UI_SIZE_DEP;
-   export var UI_SIZE_DEP_BOTH: UI_SIZE_DEP;
 
 
    // enum UI_SCROLL_MODE
@@ -705,6 +697,14 @@ declare module Atomic {
    export var UI_WINDOW_SETTINGS_CLOSE_BUTTON: UI_WINDOW_SETTINGS;
    export var UI_WINDOW_SETTINGS_CAN_ACTIVATE: UI_WINDOW_SETTINGS;
    export var UI_WINDOW_SETTINGS_DEFAULT: UI_WINDOW_SETTINGS;
+
+
+   // enum UI_SIZE_DEP
+   export type UI_SIZE_DEP = number;
+   export var UI_SIZE_DEP_NONE: UI_SIZE_DEP;
+   export var UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT: UI_SIZE_DEP;
+   export var UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH: UI_SIZE_DEP;
+   export var UI_SIZE_DEP_BOTH: UI_SIZE_DEP;
 
 
    // enum CompressedFormat
@@ -1334,15 +1334,15 @@ declare module Atomic {
    export var PACKAGE_FRAGMENT_SIZE: number;
 
 
-   export var SCAN_FILES: number;
-   export var SCAN_DIRS: number;
-   export var SCAN_HIDDEN: number;
    export var LOG_RAW: number;
    export var LOG_DEBUG: number;
    export var LOG_INFO: number;
    export var LOG_WARNING: number;
    export var LOG_ERROR: number;
    export var LOG_NONE: number;
+   export var SCAN_FILES: number;
+   export var SCAN_DIRS: number;
+   export var SCAN_HIDDEN: number;
 
 
 //----------------------------------------------------
@@ -2513,89 +2513,6 @@ declare module Atomic {
 
    }
 
-   export class Material extends Resource {
-
-      numTechniques: number;
-      cullMode: CullMode;
-      shadowCullMode: CullMode;
-      fillMode: FillMode;
-      scene: Scene;
-      auxViewFrameNumber: number;
-      occlusion: boolean;
-      specular: boolean;
-      shaderParameterHash: number;
-
-      // Construct.
-      constructor();
-
-      // Finish resource loading. Always called from the main thread. Return true if successful.
-      endLoad(): boolean;
-      // Set number of techniques.
-      setNumTechniques(num: number): void;
-      // Set technique.
-      setTechnique(index: number, tech: Technique, qualityLevel?: number, lodDistance?: number): void;
-      setShaderParameterAnimation(name: string, animation: ValueAnimation, wrapMode?: WrapMode, speed?: number): void;
-      // Set shader parameter animation wrap mode.
-      setShaderParameterAnimationWrapMode(name: string, wrapMode: WrapMode): void;
-      // Set shader parameter animation speed.
-      setShaderParameterAnimationSpeed(name: string, speed: number): void;
-      // Set texture.
-      setTexture(unit: TextureUnit, texture: Texture): void;
-      // Set culling mode.
-      setCullMode(mode: CullMode): void;
-      // Set culling mode for shadows.
-      setShadowCullMode(mode: CullMode): void;
-      // Set polygon fill mode. Interacts with the camera's fill mode setting so that the "least filled" mode will be used.
-      setFillMode(mode: FillMode): void;
-      // Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
-      setScene(scene: Scene): void;
-      // Remove shader parameter.
-      removeShaderParameter(name: string): void;
-      // Reset all shader pointers.
-      releaseShaders(): void;
-      // Clone the material.
-      clone(cloneName?: string): Material;
-      // Ensure that material techniques are listed in correct order.
-      sortTechniques(): void;
-      // Mark material for auxiliary view rendering.
-      markForAuxView(frameNumber: number): void;
-      // Return number of techniques.
-      getNumTechniques(): number;
-      // Return technique by index.
-      getTechnique(index: number): Technique;
-      // Return pass by technique index and pass name.
-      getPass(index: number, passName: string): Pass;
-      // Return texture by unit.
-      getTexture(unit: TextureUnit): Texture;
-      // Return shader parameter animation.
-      getShaderParameterAnimation(name: string): ValueAnimation;
-      // Return shader parameter animation wrap mode.
-      getShaderParameterAnimationWrapMode(name: string): WrapMode;
-      // Return shader parameter animation speed.
-      getShaderParameterAnimationSpeed(name: string): number;
-      // Return normal culling mode.
-      getCullMode(): CullMode;
-      // Return culling mode for shadows.
-      getShadowCullMode(): CullMode;
-      // Return polygon fill mode.
-      getFillMode(): FillMode;
-      // Return last auxiliary view rendered frame number.
-      getAuxViewFrameNumber(): number;
-      // Return whether should render occlusion.
-      getOcclusion(): boolean;
-      // Return whether should render specular.
-      getSpecular(): boolean;
-      // Return the scene associated with the material for shader parameter animation updates.
-      getScene(): Scene;
-      // Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.
-      getShaderParameterHash(): number;
-      // Return name for texture unit.
-      getTextureUnitName(unit: TextureUnit): string;
-      static getTextureUnitName(unit:TextureUnit):string;
-      getShaderParameters():ShaderParameter[];
-
-   }
-
    export class Octree extends Component {
 
       numLevels: number;
@@ -2804,37 +2721,6 @@ declare module Atomic {
 
    }
 
-   export class RenderPath extends RefCounted {
-
-      numRenderTargets: number;
-      numCommands: number;
-
-      // Construct.
-      constructor();
-
-      // Clone the rendering path.
-      clone(): RenderPath;
-      // Clear existing data and load from an XML file. Return true if successful.
-      load(file: XMLFile): boolean;
-      // Append data from an XML file. Return true if successful.
-      append(file: XMLFile): boolean;
-      // Enable/disable commands and rendertargets by tag.
-      setEnabled(tag: string, active: boolean): void;
-      // Toggle enabled state of commands and rendertargets by tag.
-      toggleEnabled(tag: string): void;
-      // Remove rendertargets by tag name.
-      removeRenderTargets(tag: string): void;
-      // Remove a command by index.
-      removeCommand(index: number): void;
-      // Remove commands by tag name.
-      removeCommands(tag: string): void;
-      // Return number of rendertargets.
-      getNumRenderTargets(): number;
-      // Return number of commands.
-      getNumCommands(): number;
-
-   }
-
    export class Shader extends Resource {
 
       timeStamp: number;
@@ -2860,101 +2746,6 @@ declare module Atomic {
 
       // Collect a shader combination. Called by Graphics when shaders have been set.
       storeShaders(vs: ShaderVariation, ps: ShaderVariation): void;
-
-   }
-
-   export class Pass extends RefCounted {
-
-      blendMode: BlendMode;
-      depthTestMode: CompareMode;
-      lightingMode: PassLightingMode;
-      depthWrite: boolean;
-      alphaMask: boolean;
-      isDesktop: boolean;
-      vertexShader: string;
-      pixelShader: string;
-      vertexShaderDefines: string;
-      pixelShaderDefines: string;
-      name: string;
-      index: number;
-      shadersLoadedFrameNumber: number;
-
-      // Construct.
-      constructor(passName: string);
-
-      // Set blend mode.
-      setBlendMode(mode: BlendMode): void;
-      // Set depth compare mode.
-      setDepthTestMode(mode: CompareMode): void;
-      // Set pass lighting mode, affects what shader variations will be attempted to be loaded.
-      setLightingMode(mode: PassLightingMode): void;
-      // Set depth write on/off.
-      setDepthWrite(enable: boolean): void;
-      // Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
-      setAlphaMask(enable: boolean): void;
-      // Set whether requires desktop level hardware.
-      setIsDesktop(enable: boolean): void;
-      // Set vertex shader name.
-      setVertexShader(name: string): void;
-      // Set pixel shader name.
-      setPixelShader(name: string): void;
-      // Set vertex shader defines.
-      setVertexShaderDefines(defines: string): void;
-      // Set pixel shader defines.
-      setPixelShaderDefines(defines: string): void;
-      // Reset shader pointers.
-      releaseShaders(): void;
-      // Mark shaders loaded this frame.
-      markShadersLoaded(frameNumber: number): void;
-      // Return pass name.
-      getName(): string;
-      // Return pass index. This is used for optimal render-time pass queries that avoid map lookups.
-      getIndex(): number;
-      // Return blend mode.
-      getBlendMode(): BlendMode;
-      // Return depth compare mode.
-      getDepthTestMode(): CompareMode;
-      // Return pass lighting mode.
-      getLightingMode(): PassLightingMode;
-      // Return last shaders loaded frame number.
-      getShadersLoadedFrameNumber(): number;
-      // Return depth write mode.
-      getDepthWrite(): boolean;
-      // Return alpha masking hint.
-      getAlphaMask(): boolean;
-      // Return vertex shader name.
-      getVertexShader(): string;
-      // Return pixel shader name.
-      getPixelShader(): string;
-      // Return vertex shader defines.
-      getVertexShaderDefines(): string;
-      // Return pixel shader defines.
-      getPixelShaderDefines(): string;
-
-   }
-
-   export class Technique extends Resource {
-
-      isDesktop: boolean;
-      numPasses: number;
-
-      // Construct.
-      constructor();
-
-      // Set whether requires desktop level hardware.
-      setIsDesktop(enable: boolean): void;
-      // Create a new pass.
-      createPass(passName: string): Pass;
-      // Remove a pass.
-      removePass(passName: string): void;
-      // Reset shader pointers in all passes.
-      releaseShaders(): void;
-      // Return whether technique is supported by the current hardware.
-      isSupported(): boolean;
-      // Return number of passes.
-      getNumPasses(): number;
-      // Return a pass type index by name. Allocate new if not used yet.
-      getPassIndex(passName: string): number;
 
    }
 
@@ -3119,6 +2910,215 @@ declare module Atomic {
       getZoneTexture(): Texture;
       // Check whether a point is inside.
       isInside(point: Vector3): boolean;
+
+   }
+
+   export class Material extends Resource {
+
+      numTechniques: number;
+      cullMode: CullMode;
+      shadowCullMode: CullMode;
+      fillMode: FillMode;
+      scene: Scene;
+      auxViewFrameNumber: number;
+      occlusion: boolean;
+      specular: boolean;
+      shaderParameterHash: number;
+
+      // Construct.
+      constructor();
+
+      // Finish resource loading. Always called from the main thread. Return true if successful.
+      endLoad(): boolean;
+      // Set number of techniques.
+      setNumTechniques(num: number): void;
+      // Set technique.
+      setTechnique(index: number, tech: Technique, qualityLevel?: number, lodDistance?: number): void;
+      setShaderParameterAnimation(name: string, animation: ValueAnimation, wrapMode?: WrapMode, speed?: number): void;
+      // Set shader parameter animation wrap mode.
+      setShaderParameterAnimationWrapMode(name: string, wrapMode: WrapMode): void;
+      // Set shader parameter animation speed.
+      setShaderParameterAnimationSpeed(name: string, speed: number): void;
+      // Set texture.
+      setTexture(unit: TextureUnit, texture: Texture): void;
+      // Set culling mode.
+      setCullMode(mode: CullMode): void;
+      // Set culling mode for shadows.
+      setShadowCullMode(mode: CullMode): void;
+      // Set polygon fill mode. Interacts with the camera's fill mode setting so that the "least filled" mode will be used.
+      setFillMode(mode: FillMode): void;
+      // Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
+      setScene(scene: Scene): void;
+      // Remove shader parameter.
+      removeShaderParameter(name: string): void;
+      // Reset all shader pointers.
+      releaseShaders(): void;
+      // Clone the material.
+      clone(cloneName?: string): Material;
+      // Ensure that material techniques are listed in correct order.
+      sortTechniques(): void;
+      // Mark material for auxiliary view rendering.
+      markForAuxView(frameNumber: number): void;
+      // Return number of techniques.
+      getNumTechniques(): number;
+      // Return technique by index.
+      getTechnique(index: number): Technique;
+      // Return pass by technique index and pass name.
+      getPass(index: number, passName: string): Pass;
+      // Return texture by unit.
+      getTexture(unit: TextureUnit): Texture;
+      // Return shader parameter animation.
+      getShaderParameterAnimation(name: string): ValueAnimation;
+      // Return shader parameter animation wrap mode.
+      getShaderParameterAnimationWrapMode(name: string): WrapMode;
+      // Return shader parameter animation speed.
+      getShaderParameterAnimationSpeed(name: string): number;
+      // Return normal culling mode.
+      getCullMode(): CullMode;
+      // Return culling mode for shadows.
+      getShadowCullMode(): CullMode;
+      // Return polygon fill mode.
+      getFillMode(): FillMode;
+      // Return last auxiliary view rendered frame number.
+      getAuxViewFrameNumber(): number;
+      // Return whether should render occlusion.
+      getOcclusion(): boolean;
+      // Return whether should render specular.
+      getSpecular(): boolean;
+      // Return the scene associated with the material for shader parameter animation updates.
+      getScene(): Scene;
+      // Return shader parameter hash value. Used as an optimization to avoid setting shader parameters unnecessarily.
+      getShaderParameterHash(): number;
+      // Return name for texture unit.
+      getTextureUnitName(unit: TextureUnit): string;
+      static getTextureUnitName(unit:TextureUnit):string;
+      getShaderParameters():ShaderParameter[];
+
+   }
+
+   export class RenderPath extends RefCounted {
+
+      numRenderTargets: number;
+      numCommands: number;
+
+      // Construct.
+      constructor();
+
+      // Clone the rendering path.
+      clone(): RenderPath;
+      // Clear existing data and load from an XML file. Return true if successful.
+      load(file: XMLFile): boolean;
+      // Append data from an XML file. Return true if successful.
+      append(file: XMLFile): boolean;
+      // Enable/disable commands and rendertargets by tag.
+      setEnabled(tag: string, active: boolean): void;
+      // Toggle enabled state of commands and rendertargets by tag.
+      toggleEnabled(tag: string): void;
+      // Remove rendertargets by tag name.
+      removeRenderTargets(tag: string): void;
+      // Remove a command by index.
+      removeCommand(index: number): void;
+      // Remove commands by tag name.
+      removeCommands(tag: string): void;
+      // Return number of rendertargets.
+      getNumRenderTargets(): number;
+      // Return number of commands.
+      getNumCommands(): number;
+
+   }
+
+   export class Pass extends RefCounted {
+
+      blendMode: BlendMode;
+      depthTestMode: CompareMode;
+      lightingMode: PassLightingMode;
+      depthWrite: boolean;
+      alphaMask: boolean;
+      isDesktop: boolean;
+      vertexShader: string;
+      pixelShader: string;
+      vertexShaderDefines: string;
+      pixelShaderDefines: string;
+      name: string;
+      index: number;
+      shadersLoadedFrameNumber: number;
+
+      // Construct.
+      constructor(passName: string);
+
+      // Set blend mode.
+      setBlendMode(mode: BlendMode): void;
+      // Set depth compare mode.
+      setDepthTestMode(mode: CompareMode): void;
+      // Set pass lighting mode, affects what shader variations will be attempted to be loaded.
+      setLightingMode(mode: PassLightingMode): void;
+      // Set depth write on/off.
+      setDepthWrite(enable: boolean): void;
+      // Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
+      setAlphaMask(enable: boolean): void;
+      // Set whether requires desktop level hardware.
+      setIsDesktop(enable: boolean): void;
+      // Set vertex shader name.
+      setVertexShader(name: string): void;
+      // Set pixel shader name.
+      setPixelShader(name: string): void;
+      // Set vertex shader defines.
+      setVertexShaderDefines(defines: string): void;
+      // Set pixel shader defines.
+      setPixelShaderDefines(defines: string): void;
+      // Reset shader pointers.
+      releaseShaders(): void;
+      // Mark shaders loaded this frame.
+      markShadersLoaded(frameNumber: number): void;
+      // Return pass name.
+      getName(): string;
+      // Return pass index. This is used for optimal render-time pass queries that avoid map lookups.
+      getIndex(): number;
+      // Return blend mode.
+      getBlendMode(): BlendMode;
+      // Return depth compare mode.
+      getDepthTestMode(): CompareMode;
+      // Return pass lighting mode.
+      getLightingMode(): PassLightingMode;
+      // Return last shaders loaded frame number.
+      getShadersLoadedFrameNumber(): number;
+      // Return depth write mode.
+      getDepthWrite(): boolean;
+      // Return alpha masking hint.
+      getAlphaMask(): boolean;
+      // Return vertex shader name.
+      getVertexShader(): string;
+      // Return pixel shader name.
+      getPixelShader(): string;
+      // Return vertex shader defines.
+      getVertexShaderDefines(): string;
+      // Return pixel shader defines.
+      getPixelShaderDefines(): string;
+
+   }
+
+   export class Technique extends Resource {
+
+      isDesktop: boolean;
+      numPasses: number;
+
+      // Construct.
+      constructor();
+
+      // Set whether requires desktop level hardware.
+      setIsDesktop(enable: boolean): void;
+      // Create a new pass.
+      createPass(passName: string): Pass;
+      // Remove a pass.
+      removePass(passName: string): void;
+      // Reset shader pointers in all passes.
+      releaseShaders(): void;
+      // Return whether technique is supported by the current hardware.
+      isSupported(): boolean;
+      // Return number of passes.
+      getNumPasses(): number;
+      // Return a pass type index by name. Allocate new if not used yet.
+      getPassIndex(passName: string): number;
 
    }
 
@@ -3449,96 +3449,6 @@ declare module Atomic {
 
    }
 
-   export class RenderSurface extends RefCounted {
-
-      numViewports: number;
-      updateMode: RenderSurfaceUpdateMode;
-      linkedRenderTarget: RenderSurface;
-      linkedDepthStencil: RenderSurface;
-      parentTexture: Texture;
-      width: number;
-      height: number;
-      usage: TextureUsage;
-
-      // Construct with parent texture.
-      constructor(parentTexture: Texture);
-
-      // Set number of viewports.
-      setNumViewports(num: number): void;
-      // Set viewport.
-      setViewport(index: number, viewport: Viewport): void;
-      // Set viewport update mode. Default is to update when visible.
-      setUpdateMode(mode: RenderSurfaceUpdateMode): void;
-      // Set linked color rendertarget.
-      setLinkedRenderTarget(renderTarget: RenderSurface): void;
-      // Set linked depth-stencil surface.
-      setLinkedDepthStencil(depthStencil: RenderSurface): void;
-      // Queue manual update of the viewport(s).
-      queueUpdate(): void;
-      // Release surface.
-      release(): void;
-      // Return parent texture.
-      getParentTexture(): Texture;
-      // Return width.
-      getWidth(): number;
-      // Return height.
-      getHeight(): number;
-      // Return usage.
-      getUsage(): TextureUsage;
-      // Return number of viewports.
-      getNumViewports(): number;
-      // Return viewport by index.
-      getViewport(index: number): Viewport;
-      // Return viewport update mode.
-      getUpdateMode(): RenderSurfaceUpdateMode;
-      // Return linked color rendertarget.
-      getLinkedRenderTarget(): RenderSurface;
-      // Return linked depth-stencil surface.
-      getLinkedDepthStencil(): RenderSurface;
-      // Clear update flag. Called by Renderer.
-      wasUpdated(): void;
-
-   }
-
-   export class ShaderVariation extends RefCounted {
-
-      name: string;
-      defines: string;
-      owner: Shader;
-      shaderType: ShaderType;
-      fullName: string;
-      compilerOutput: string;
-
-      // Construct.
-      constructor(owner: Shader, type: ShaderType);
-
-      // Release the shader.
-      release(): void;
-      // Compile the shader. Return true if successful.
-      create(): boolean;
-      // Set name.
-      setName(name: string): void;
-      // Set defines.
-      setDefines(defines: string): void;
-      // Return the owner resource.
-      getOwner(): Shader;
-      // Return shader type.
-      getShaderType(): ShaderType;
-      // Return shader name.
-      getName(): string;
-      // Return defines.
-      getDefines(): string;
-      // Return full shader name.
-      getFullName(): string;
-      // Return compile error/warning string.
-      getCompilerOutput(): string;
-      // Return whether uses a parameter.
-      hasParameter(param: string): boolean;
-      // Return whether uses a texture unit (only for pixel shaders.)
-      hasTextureUnit(unit: TextureUnit): boolean;
-
-   }
-
    export class Texture extends Resource {
 
       numLevels: number;
@@ -3679,6 +3589,96 @@ declare module Atomic {
       setSize(size: number, format: number, usage?: TextureUsage): boolean;
       // Return render surface for one face.
       getRenderSurface(face: CubeMapFace): RenderSurface;
+
+   }
+
+   export class RenderSurface extends RefCounted {
+
+      numViewports: number;
+      updateMode: RenderSurfaceUpdateMode;
+      linkedRenderTarget: RenderSurface;
+      linkedDepthStencil: RenderSurface;
+      parentTexture: Texture;
+      width: number;
+      height: number;
+      usage: TextureUsage;
+
+      // Construct with parent texture.
+      constructor(parentTexture: Texture);
+
+      // Set number of viewports.
+      setNumViewports(num: number): void;
+      // Set viewport.
+      setViewport(index: number, viewport: Viewport): void;
+      // Set viewport update mode. Default is to update when visible.
+      setUpdateMode(mode: RenderSurfaceUpdateMode): void;
+      // Set linked color rendertarget.
+      setLinkedRenderTarget(renderTarget: RenderSurface): void;
+      // Set linked depth-stencil surface.
+      setLinkedDepthStencil(depthStencil: RenderSurface): void;
+      // Queue manual update of the viewport(s).
+      queueUpdate(): void;
+      // Release surface.
+      release(): void;
+      // Return parent texture.
+      getParentTexture(): Texture;
+      // Return width.
+      getWidth(): number;
+      // Return height.
+      getHeight(): number;
+      // Return usage.
+      getUsage(): TextureUsage;
+      // Return number of viewports.
+      getNumViewports(): number;
+      // Return viewport by index.
+      getViewport(index: number): Viewport;
+      // Return viewport update mode.
+      getUpdateMode(): RenderSurfaceUpdateMode;
+      // Return linked color rendertarget.
+      getLinkedRenderTarget(): RenderSurface;
+      // Return linked depth-stencil surface.
+      getLinkedDepthStencil(): RenderSurface;
+      // Clear update flag. Called by Renderer.
+      wasUpdated(): void;
+
+   }
+
+   export class ShaderVariation extends RefCounted {
+
+      name: string;
+      defines: string;
+      owner: Shader;
+      shaderType: ShaderType;
+      fullName: string;
+      compilerOutput: string;
+
+      // Construct.
+      constructor(owner: Shader, type: ShaderType);
+
+      // Release the shader.
+      release(): void;
+      // Compile the shader. Return true if successful.
+      create(): boolean;
+      // Set name.
+      setName(name: string): void;
+      // Set defines.
+      setDefines(defines: string): void;
+      // Return the owner resource.
+      getOwner(): Shader;
+      // Return shader type.
+      getShaderType(): ShaderType;
+      // Return shader name.
+      getName(): string;
+      // Return defines.
+      getDefines(): string;
+      // Return full shader name.
+      getFullName(): string;
+      // Return compile error/warning string.
+      getCompilerOutput(): string;
+      // Return whether uses a parameter.
+      hasParameter(param: string): boolean;
+      // Return whether uses a texture unit (only for pixel shaders.)
+      hasTextureUnit(unit: TextureUnit): boolean;
 
    }
 
@@ -3836,55 +3836,6 @@ declare module Atomic {
       addAnimationResource(animation: Animation): void;
       removeAnimationResource(animation: Animation): void;
       clearAnimationResources(): void;
-
-   }
-
-   export class AnimationState extends RefCounted {
-
-      looped: boolean;
-      weight: number;
-      time: number;
-      layer: number;
-      animation: Animation;
-      model: AnimatedModel;
-      node: Node;
-      length: number;
-
-      // Construct with animated model and animation pointers.
-      constructor(model: AnimatedModel, animation: Animation);
-
-      // Set looping enabled/disabled.
-      setLooped(looped: boolean): void;
-      // Set blending weight.
-      setWeight(weight: number): void;
-      // Set time position. Does not fire animation triggers.
-      setTime(time: number): void;
-      // Modify blending weight.
-      addWeight(delta: number): void;
-      // Modify time position. %Animation triggers will be fired.
-      addTime(delta: number): void;
-      // Set blending layer.
-      setLayer(layer: number): void;
-      // Return animation.
-      getAnimation(): Animation;
-      // Return animated model this state belongs to (model mode.)
-      getModel(): AnimatedModel;
-      // Return root scene node this state controls (node hierarchy mode.)
-      getNode(): Node;
-      // Return whether weight is nonzero.
-      isEnabled(): boolean;
-      // Return whether looped.
-      isLooped(): boolean;
-      // Return blending weight.
-      getWeight(): number;
-      // Return time position.
-      getTime(): number;
-      // Return animation length.
-      getLength(): number;
-      // Return blending layer.
-      getLayer(): number;
-      // Apply the animation at the current time position.
-      apply(): void;
 
    }
 
@@ -4542,6 +4493,55 @@ declare module Atomic {
 
    }
 
+   export class AnimationState extends RefCounted {
+
+      looped: boolean;
+      weight: number;
+      time: number;
+      layer: number;
+      animation: Animation;
+      model: AnimatedModel;
+      node: Node;
+      length: number;
+
+      // Construct with animated model and animation pointers.
+      constructor(model: AnimatedModel, animation: Animation);
+
+      // Set looping enabled/disabled.
+      setLooped(looped: boolean): void;
+      // Set blending weight.
+      setWeight(weight: number): void;
+      // Set time position. Does not fire animation triggers.
+      setTime(time: number): void;
+      // Modify blending weight.
+      addWeight(delta: number): void;
+      // Modify time position. %Animation triggers will be fired.
+      addTime(delta: number): void;
+      // Set blending layer.
+      setLayer(layer: number): void;
+      // Return animation.
+      getAnimation(): Animation;
+      // Return animated model this state belongs to (model mode.)
+      getModel(): AnimatedModel;
+      // Return root scene node this state controls (node hierarchy mode.)
+      getNode(): Node;
+      // Return whether weight is nonzero.
+      isEnabled(): boolean;
+      // Return whether looped.
+      isLooped(): boolean;
+      // Return blending weight.
+      getWeight(): number;
+      // Return time position.
+      getTime(): number;
+      // Return animation length.
+      getLength(): number;
+      // Return blending layer.
+      getLayer(): number;
+      // Apply the animation at the current time position.
+      apply(): void;
+
+   }
+
 
 
 //----------------------------------------------------
@@ -4583,36 +4583,6 @@ declare module Atomic {
       getRootNode(): Node;
       // Set animation by name.
       setAnimationAttr(name: string): void;
-
-   }
-
-   export class Animation2D extends RefCounted {
-
-      name: string;
-      length: number;
-      looped: boolean;
-      animationSet: AnimationSet2D;
-      numTracks: number;
-
-      // Construct.
-      constructor(animationSet: AnimationSet2D);
-
-      // Set name.
-      setName(name: string): void;
-      // Set length.
-      setLength(length: number): void;
-      // Set looped.
-      setLooped(looped: boolean): void;
-      // Return animation set.
-      getAnimationSet(): AnimationSet2D;
-      // Return name.
-      getName(): string;
-      // Return length.
-      getLength(): number;
-      // Return looped.
-      isLooped(): boolean;
-      // Return number of animation tracks.
-      getNumTracks(): number;
 
    }
 
@@ -5837,6 +5807,94 @@ declare module Atomic {
 
    }
 
+   export class TileMapLayer2D extends Component {
+
+      drawOrder: number;
+      visible: boolean;
+      tileMap: TileMap2D;
+      tmxLayer: TmxLayer2D;
+      layerType: TileMapLayerType2D;
+      width: number;
+      height: number;
+      numObjects: number;
+      imageNode: Node;
+      name: string;
+
+      // Construct.
+      constructor();
+
+      // Add debug geometry to the debug renderer.
+      drawDebugGeometry(debug: DebugRenderer, depthTest: boolean): void;
+      // Initialize with tile map and tmx layer.
+      initialize(tileMap: TileMap2D, tmxLayer: TmxLayer2D): void;
+      // Set draw order
+      setDrawOrder(drawOrder: number): void;
+      // Set visible.
+      setVisible(visible: boolean): void;
+      // Return tile map.
+      getTileMap(): TileMap2D;
+      // Return tmx layer.
+      getTmxLayer(): TmxLayer2D;
+      // Return draw order.
+      getDrawOrder(): number;
+      // Return visible.
+      isVisible(): boolean;
+      // Return has property
+      hasProperty(name: string): boolean;
+      // Return property.
+      getProperty(name: string): string;
+      // Return layer type.
+      getLayerType(): TileMapLayerType2D;
+      // Return width (for tile layer only).
+      getWidth(): number;
+      // Return height (for tile layer only).
+      getHeight(): number;
+      // Return tile node (for tile layer only).
+      getTileNode(x: number, y: number): Node;
+      // Return tile (for tile layer only).
+      getTile(x: number, y: number): Tile2D;
+      // Return number of tile map objects (for object group only).
+      getNumObjects(): number;
+      // Return tile map object (for object group only).
+      getObject(index: number): TileMapObject2D;
+      // Return object node (for object group only).
+      getObjectNode(index: number): Node;
+      // Return image node (for image layer only).
+      getImageNode(): Node;
+      getName(): string;
+
+   }
+
+   export class Animation2D extends RefCounted {
+
+      name: string;
+      length: number;
+      looped: boolean;
+      animationSet: AnimationSet2D;
+      numTracks: number;
+
+      // Construct.
+      constructor(animationSet: AnimationSet2D);
+
+      // Set name.
+      setName(name: string): void;
+      // Set length.
+      setLength(length: number): void;
+      // Set looped.
+      setLooped(looped: boolean): void;
+      // Return animation set.
+      getAnimationSet(): AnimationSet2D;
+      // Return name.
+      getName(): string;
+      // Return length.
+      getLength(): number;
+      // Return looped.
+      isLooped(): boolean;
+      // Return number of animation tracks.
+      getNumTracks(): number;
+
+   }
+
    export class PropertySet2D extends RefCounted {
 
       constructor();
@@ -5907,64 +5965,6 @@ declare module Atomic {
       getProperty(name: string): string;
       validCollisionShape(): boolean;
       createCollisionShape(node: Node): CollisionShape2D;
-
-   }
-
-   export class TileMapLayer2D extends Component {
-
-      drawOrder: number;
-      visible: boolean;
-      tileMap: TileMap2D;
-      tmxLayer: TmxLayer2D;
-      layerType: TileMapLayerType2D;
-      width: number;
-      height: number;
-      numObjects: number;
-      imageNode: Node;
-      name: string;
-
-      // Construct.
-      constructor();
-
-      // Add debug geometry to the debug renderer.
-      drawDebugGeometry(debug: DebugRenderer, depthTest: boolean): void;
-      // Initialize with tile map and tmx layer.
-      initialize(tileMap: TileMap2D, tmxLayer: TmxLayer2D): void;
-      // Set draw order
-      setDrawOrder(drawOrder: number): void;
-      // Set visible.
-      setVisible(visible: boolean): void;
-      // Return tile map.
-      getTileMap(): TileMap2D;
-      // Return tmx layer.
-      getTmxLayer(): TmxLayer2D;
-      // Return draw order.
-      getDrawOrder(): number;
-      // Return visible.
-      isVisible(): boolean;
-      // Return has property
-      hasProperty(name: string): boolean;
-      // Return property.
-      getProperty(name: string): string;
-      // Return layer type.
-      getLayerType(): TileMapLayerType2D;
-      // Return width (for tile layer only).
-      getWidth(): number;
-      // Return height (for tile layer only).
-      getHeight(): number;
-      // Return tile node (for tile layer only).
-      getTileNode(x: number, y: number): Node;
-      // Return tile (for tile layer only).
-      getTile(x: number, y: number): Tile2D;
-      // Return number of tile map objects (for object group only).
-      getNumObjects(): number;
-      // Return tile map object (for object group only).
-      getObject(index: number): TileMapObject2D;
-      // Return object node (for object group only).
-      getObjectNode(index: number): Node;
-      // Return image node (for image layer only).
-      getImageNode(): Node;
-      getName(): string;
 
    }
 
@@ -6180,91 +6180,6 @@ declare module Atomic {
 // MODULE: Physics
 //----------------------------------------------------
 
-
-   export class CollisionShape extends Component {
-
-      terrain: number;
-      shapeType: ShapeType;
-      size: Vector3;
-      position: Vector3;
-      rotation: Quaternion;
-      margin: number;
-      model: Model;
-      lodLevel: number;
-      physicsWorld: PhysicsWorld;
-      worldBoundingBox: BoundingBox;
-
-      // Construct.
-      constructor();
-
-      // Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-      applyAttributes(): void;
-      // Handle enabled/disabled state change.
-      onSetEnabled(): void;
-      // Visualize the component as debug geometry.
-      drawDebugGeometry(debug: DebugRenderer, depthTest: boolean): void;
-      // Set as a box.
-      setBox(size: Vector3, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a sphere.
-      setSphere(diameter: number, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a static plane.
-      setStaticPlane(position?: Vector3, rotation?: Quaternion): void;
-      // Set as a cylinder.
-      setCylinder(diameter: number, height: number, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a capsule.
-      setCapsule(diameter: number, height: number, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a cone.
-      setCone(diameter: number, height: number, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
-      setTriangleMesh(model: Model, lodLevel?: number, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a triangle mesh from CustomGeometry.
-      setCustomTriangleMesh(custom: CustomGeometry, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a convex hull from Model.
-      setConvexHull(model: Model, lodLevel?: number, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a convex hull from CustomGeometry.
-      setCustomConvexHull(custom: CustomGeometry, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
-      // Set as a terrain. Only works if the same scene node contains a Terrain component.
-      setTerrain(lodLevel?: number): void;
-      // Set shape type.
-      setShapeType(type: ShapeType): void;
-      // Set shape size.
-      setSize(size: Vector3): void;
-      // Set offset position.
-      setPosition(position: Vector3): void;
-      // Set offset rotation.
-      setRotation(rotation: Quaternion): void;
-      // Set offset transform.
-      setTransform(position: Vector3, rotation: Quaternion): void;
-      // Set collision margin.
-      setMargin(margin: number): void;
-      // Set triangle mesh / convex hull model.
-      setModel(model: Model): void;
-      // Set model LOD level.
-      setLodLevel(lodLevel: number): void;
-      // Return physics world.
-      getPhysicsWorld(): PhysicsWorld;
-      // Return shape type.
-      getShapeType(): ShapeType;
-      // Return shape size.
-      getSize(): Vector3;
-      // Return offset position.
-      getPosition(): Vector3;
-      // Return offset rotation.
-      getRotation(): Quaternion;
-      // Return collision margin.
-      getMargin(): number;
-      // Return triangle mesh / convex hull model.
-      getModel(): Model;
-      // Return model LOD level.
-      getLodLevel(): number;
-      // Return world-space bounding box.
-      getWorldBoundingBox(): BoundingBox;
-      // Update the new collision shape to the RigidBody.
-      notifyRigidBody(updateMass?: boolean): void;
-      // Release the collision shape.
-      releaseShape(): void;
-
-   }
 
    export class Constraint extends Component {
 
@@ -6623,26 +6538,97 @@ declare module Atomic {
 
    }
 
+   export class CollisionShape extends Component {
+
+      terrain: number;
+      shapeType: ShapeType;
+      size: Vector3;
+      position: Vector3;
+      rotation: Quaternion;
+      margin: number;
+      model: Model;
+      lodLevel: number;
+      physicsWorld: PhysicsWorld;
+      worldBoundingBox: BoundingBox;
+
+      // Construct.
+      constructor();
+
+      // Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+      applyAttributes(): void;
+      // Handle enabled/disabled state change.
+      onSetEnabled(): void;
+      // Visualize the component as debug geometry.
+      drawDebugGeometry(debug: DebugRenderer, depthTest: boolean): void;
+      // Set as a box.
+      setBox(size: Vector3, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a sphere.
+      setSphere(diameter: number, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a static plane.
+      setStaticPlane(position?: Vector3, rotation?: Quaternion): void;
+      // Set as a cylinder.
+      setCylinder(diameter: number, height: number, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a capsule.
+      setCapsule(diameter: number, height: number, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a cone.
+      setCone(diameter: number, height: number, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a triangle mesh from Model. If you update a model's geometry and want to reapply the shape, call physicsWorld->RemoveCachedGeometry(model) first.
+      setTriangleMesh(model: Model, lodLevel?: number, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a triangle mesh from CustomGeometry.
+      setCustomTriangleMesh(custom: CustomGeometry, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a convex hull from Model.
+      setConvexHull(model: Model, lodLevel?: number, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a convex hull from CustomGeometry.
+      setCustomConvexHull(custom: CustomGeometry, scale?: Vector3, position?: Vector3, rotation?: Quaternion): void;
+      // Set as a terrain. Only works if the same scene node contains a Terrain component.
+      setTerrain(lodLevel?: number): void;
+      // Set shape type.
+      setShapeType(type: ShapeType): void;
+      // Set shape size.
+      setSize(size: Vector3): void;
+      // Set offset position.
+      setPosition(position: Vector3): void;
+      // Set offset rotation.
+      setRotation(rotation: Quaternion): void;
+      // Set offset transform.
+      setTransform(position: Vector3, rotation: Quaternion): void;
+      // Set collision margin.
+      setMargin(margin: number): void;
+      // Set triangle mesh / convex hull model.
+      setModel(model: Model): void;
+      // Set model LOD level.
+      setLodLevel(lodLevel: number): void;
+      // Return physics world.
+      getPhysicsWorld(): PhysicsWorld;
+      // Return shape type.
+      getShapeType(): ShapeType;
+      // Return shape size.
+      getSize(): Vector3;
+      // Return offset position.
+      getPosition(): Vector3;
+      // Return offset rotation.
+      getRotation(): Quaternion;
+      // Return collision margin.
+      getMargin(): number;
+      // Return triangle mesh / convex hull model.
+      getModel(): Model;
+      // Return model LOD level.
+      getLodLevel(): number;
+      // Return world-space bounding box.
+      getWorldBoundingBox(): BoundingBox;
+      // Update the new collision shape to the RigidBody.
+      notifyRigidBody(updateMass?: boolean): void;
+      // Release the collision shape.
+      releaseShape(): void;
+
+   }
+
 
 
 //----------------------------------------------------
 // MODULE: Navigation
 //----------------------------------------------------
 
-
-   export class Navigable extends Component {
-
-      recursive: boolean;
-
-      // Construct.
-      constructor();
-
-      // Set whether geometry is automatically collected from child nodes. Default true.
-      setRecursive(enable: boolean): void;
-      // Return whether geometry is automatically collected from child nodes.
-      isRecursive(): boolean;
-
-   }
 
    export class NavigationMesh extends Component {
 
@@ -6809,6 +6795,20 @@ declare module Atomic {
 
    }
 
+   export class Navigable extends Component {
+
+      recursive: boolean;
+
+      // Construct.
+      constructor();
+
+      // Set whether geometry is automatically collected from child nodes. Default true.
+      setRecursive(enable: boolean): void;
+      // Return whether geometry is automatically collected from child nodes.
+      isRecursive(): boolean;
+
+   }
+
 
 
 //----------------------------------------------------
@@ -6954,6 +6954,46 @@ declare module Atomic {
 
    }
 
+   export class UIFontDescription extends AObject {
+
+      id: string;
+      size: number;
+
+      constructor();
+
+      setId(id: string): void;
+      setSize(size: number): void;
+
+   }
+
+   export class UISkinImage extends UIWidget {
+
+      constructor(bitmapID: string, createWidget?: boolean);
+
+
+   }
+
+   export class UITabContainer extends UIWidget {
+
+      numPages: number;
+      currentPage: number;
+      currentPageWidget: UIWidget;
+
+      constructor(createWidget?: boolean);
+
+      getNumPages(): number;
+      setCurrentPage(page: number): void;
+      getCurrentPageWidget(): UIWidget;
+
+   }
+
+   export class UIView extends UIWidget {
+
+      constructor();
+
+
+   }
+
    export class UIContainer extends UIWidget {
 
       constructor(createWidget?: boolean);
@@ -7005,18 +7045,6 @@ declare module Atomic {
       scrollTo(x: number, y: number): void;
       setWrapping(wrap: boolean): void;
       getWrapping(): boolean;
-
-   }
-
-   export class UIFontDescription extends AObject {
-
-      id: string;
-      size: number;
-
-      constructor();
-
-      setId(id: string): void;
-      setSize(size: number): void;
 
    }
 
@@ -7104,6 +7132,15 @@ declare module Atomic {
 
    }
 
+   export class UIMenuWindow extends UIWidget {
+
+      constructor(target: UIWidget, id: string);
+
+      show(source: UISelectItemSource, x?: number, y?: number): void;
+      close(): void;
+
+   }
+
    export class UIMenuItem extends UISelectItem {
 
       constructor(str?: string, id?: string, shortcut?: string, skinBg?: string);
@@ -7118,49 +7155,11 @@ declare module Atomic {
 
    }
 
-   export class UIMenuWindow extends UIWidget {
-
-      constructor(target: UIWidget, id: string);
-
-      show(source: UISelectItemSource, x?: number, y?: number): void;
-      close(): void;
-
-   }
-
    export class UIMessageWindow extends UIWindow {
 
       constructor(target: UIWidget, id: string, createWidget?: boolean);
 
       show(title: string, message: string, settings: UI_MESSAGEWINDOW_SETTINGS, dimmer: boolean, width: number, height: number): void;
-
-   }
-
-   export class UIPreferredSize extends RefCounted {
-
-      minWidth: number;
-      minHeight: number;
-      maxWidth: number;
-      maxHeight: number;
-      prefWidth: number;
-      prefHeight: number;
-      sizeDep: UI_SIZE_DEP;
-
-      constructor(w?: number, h?: number);
-
-      getMinWidth(): number;
-      getMinHeight(): number;
-      getMaxWidth(): number;
-      getMaxHeight(): number;
-      getPrefWidth(): number;
-      getPrefHeight(): number;
-      getSizeDep(): UI_SIZE_DEP;
-      setMinWidth(w: number): void;
-      setMinHeight(h: number): void;
-      setMaxWidth(w: number): void;
-      setMaxHeight(h: number): void;
-      setPrefWidth(w: number): void;
-      setPrefHeight(h: number): void;
-      setSizeDep(dep: UI_SIZE_DEP): void;
 
    }
 
@@ -7284,27 +7283,6 @@ declare module Atomic {
 
    }
 
-   export class UISkinImage extends UIWidget {
-
-      constructor(bitmapID: string, createWidget?: boolean);
-
-
-   }
-
-   export class UITabContainer extends UIWidget {
-
-      numPages: number;
-      currentPage: number;
-      currentPageWidget: UIWidget;
-
-      constructor(createWidget?: boolean);
-
-      getNumPages(): number;
-      setCurrentPage(page: number): void;
-      getCurrentPageWidget(): UIWidget;
-
-   }
-
    export class UITextField extends UIWidget {
 
       textAlign: UI_TEXT_ALIGN;
@@ -7323,13 +7301,6 @@ declare module Atomic {
 
       setTexture(texture: Texture): void;
       getTexture(): Texture;
-
-   }
-
-   export class UIView extends UIWidget {
-
-      constructor();
-
 
    }
 
@@ -7416,6 +7387,35 @@ declare module Atomic {
       resizeToFitContent(): void;
       addChild(child: UIWidget): void;
       close(): void;
+
+   }
+
+   export class UIPreferredSize extends RefCounted {
+
+      minWidth: number;
+      minHeight: number;
+      maxWidth: number;
+      maxHeight: number;
+      prefWidth: number;
+      prefHeight: number;
+      sizeDep: UI_SIZE_DEP;
+
+      constructor(w?: number, h?: number);
+
+      getMinWidth(): number;
+      getMinHeight(): number;
+      getMaxWidth(): number;
+      getMaxHeight(): number;
+      getPrefWidth(): number;
+      getPrefHeight(): number;
+      getSizeDep(): UI_SIZE_DEP;
+      setMinWidth(w: number): void;
+      setMinHeight(h: number): void;
+      setMaxWidth(w: number): void;
+      setMaxHeight(h: number): void;
+      setPrefWidth(w: number): void;
+      setPrefHeight(h: number): void;
+      setSizeDep(dep: UI_SIZE_DEP): void;
 
    }
 
@@ -7643,36 +7643,6 @@ declare module Atomic {
 //----------------------------------------------------
 
 
-   export class HttpRequest extends RefCounted {
-
-      url: string;
-      verb: string;
-      error: string;
-      state: HttpRequestState;
-      availableSize: number;
-
-      // Construct with parameters.
-      constructor(url: string, verb: string, headers: string[], postData: string);
-
-      // Process the connection in the worker thread until closed.
-      threadFunction(): void;
-      // Set position from the beginning of the stream. Not supported.
-      seek(position: number): number;
-      // Return URL used in the request.
-      getURL(): string;
-      // Return verb used in the request. Default GET if empty verb specified on construction.
-      getVerb(): string;
-      // Return error. Only non-empty in the error state.
-      getError(): string;
-      // Return connection state.
-      getState(): HttpRequestState;
-      // Return amount of bytes in the read buffer.
-      getAvailableSize(): number;
-      // Return whether connection is in the open state.
-      isOpen(): boolean;
-
-   }
-
    export class Network extends AObject {
 
       updateFps: number;
@@ -7753,6 +7723,36 @@ declare module Atomic {
 
    }
 
+   export class HttpRequest extends RefCounted {
+
+      url: string;
+      verb: string;
+      error: string;
+      state: HttpRequestState;
+      availableSize: number;
+
+      // Construct with parameters.
+      constructor(url: string, verb: string, headers: string[], postData: string);
+
+      // Process the connection in the worker thread until closed.
+      threadFunction(): void;
+      // Set position from the beginning of the stream. Not supported.
+      seek(position: number): number;
+      // Return URL used in the request.
+      getURL(): string;
+      // Return verb used in the request. Default GET if empty verb specified on construction.
+      getVerb(): string;
+      // Return error. Only non-empty in the error state.
+      getError(): string;
+      // Return connection state.
+      getState(): HttpRequestState;
+      // Return amount of bytes in the read buffer.
+      getAvailableSize(): number;
+      // Return whether connection is in the open state.
+      isOpen(): boolean;
+
+   }
+
 
 
 //----------------------------------------------------
@@ -7798,6 +7798,66 @@ declare module Atomic {
       copy(srcFile: File): boolean;
       readText():string;
       writeString(text:string):void;
+
+   }
+
+   export class FileWatcher extends AObject {
+
+      delay: number;
+      path: string;
+
+      // Construct.
+      constructor();
+
+      // Directory watching loop.
+      threadFunction(): void;
+      // Start watching a directory. Return true if successful.
+      startWatching(pathName: string, watchSubDirs: boolean): boolean;
+      // Stop watching the directory.
+      stopWatching(): void;
+      // Set the delay in seconds before file changes are notified. This (hopefully) avoids notifying when a file save is still in progress. Default 1 second.
+      setDelay(interval: number): void;
+      // Add a file change into the changes queue.
+      addChange(fileName: string): void;
+      // Return the path being watched, or empty if not watching.
+      getPath(): string;
+      // Return the delay in seconds for notifying file changes.
+      getDelay(): number;
+
+   }
+
+   export class Log extends AObject {
+
+      level: number;
+      timeStamp: boolean;
+      quiet: boolean;
+      lastMessage: string;
+
+      // Construct.
+      constructor();
+
+      // Open the log file.
+      open(fileName: string): void;
+      // Close the log file.
+      close(): void;
+      // Set logging level.
+      setLevel(level: number): void;
+      // Set whether to timestamp log messages.
+      setTimeStamp(enable: boolean): void;
+      // Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
+      setQuiet(quiet: boolean): void;
+      // Return logging level.
+      getLevel(): number;
+      // Return whether log messages are timestamped.
+      getTimeStamp(): boolean;
+      // Return last log message.
+      getLastMessage(): string;
+      // Return whether log is in quiet mode (only errors printed to standard error stream).
+      isQuiet(): boolean;
+      // Write to the log. If logging level is higher than the level of the message, the message is ignored.
+      write(level: number, message: string): void;
+      // Write raw output to the log.
+      writeRaw(message: string, error?: boolean): void;
 
    }
 
@@ -7869,66 +7929,6 @@ declare module Atomic {
       exists(pathName: string): boolean;
       createDirsRecursive(directoryIn: string, directoryOut: string): boolean;
       scanDir(pathName:string, filter:string, flags:number, recursive:boolean);
-
-   }
-
-   export class FileWatcher extends AObject {
-
-      delay: number;
-      path: string;
-
-      // Construct.
-      constructor();
-
-      // Directory watching loop.
-      threadFunction(): void;
-      // Start watching a directory. Return true if successful.
-      startWatching(pathName: string, watchSubDirs: boolean): boolean;
-      // Stop watching the directory.
-      stopWatching(): void;
-      // Set the delay in seconds before file changes are notified. This (hopefully) avoids notifying when a file save is still in progress. Default 1 second.
-      setDelay(interval: number): void;
-      // Add a file change into the changes queue.
-      addChange(fileName: string): void;
-      // Return the path being watched, or empty if not watching.
-      getPath(): string;
-      // Return the delay in seconds for notifying file changes.
-      getDelay(): number;
-
-   }
-
-   export class Log extends AObject {
-
-      level: number;
-      timeStamp: boolean;
-      quiet: boolean;
-      lastMessage: string;
-
-      // Construct.
-      constructor();
-
-      // Open the log file.
-      open(fileName: string): void;
-      // Close the log file.
-      close(): void;
-      // Set logging level.
-      setLevel(level: number): void;
-      // Set whether to timestamp log messages.
-      setTimeStamp(enable: boolean): void;
-      // Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
-      setQuiet(quiet: boolean): void;
-      // Return logging level.
-      getLevel(): number;
-      // Return whether log messages are timestamped.
-      getTimeStamp(): boolean;
-      // Return last log message.
-      getLastMessage(): string;
-      // Return whether log is in quiet mode (only errors printed to standard error stream).
-      isQuiet(): boolean;
-      // Write to the log. If logging level is higher than the level of the message, the message is ignored.
-      write(level: number, message: string): void;
-      // Write raw output to the log.
-      writeRaw(message: string, error?: boolean): void;
 
    }
 
@@ -8012,6 +8012,14 @@ declare module Atomic {
 //----------------------------------------------------
 
 
+   export class ScriptObject extends AObject {
+
+      // Construct.
+      constructor();
+
+
+   }
+
    export class JSComponent extends Component {
 
       componentFile: JSComponentFile;
@@ -8055,14 +8063,6 @@ declare module Atomic {
 
       // Construct.
       constructor(object: AObject);
-
-
-   }
-
-   export class ScriptObject extends AObject {
-
-      // Construct.
-      constructor();
 
 
    }
