@@ -28,8 +28,7 @@ void js_class_declare_internal(JSVM* vm, void* uniqueClassID, const char* packag
 template<typename T>
 void js_class_declare(JSVM* vm, const char* package, const char* classname, duk_c_function constructor)
 {
-    void* uniqueID = (void*) T::GetTypeNameStatic().CString();
-    js_class_declare_internal(vm, uniqueID, package, classname, constructor);
+    js_class_declare_internal(vm, (void*) T::GetClassIDStatic(), package, classname, constructor);
 }
 
 void js_constructor_basecall(duk_context* ctx, const char* package, const char* baseclass);

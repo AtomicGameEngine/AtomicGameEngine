@@ -62,11 +62,14 @@ enum ShapeType
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
+    REFCOUNTED(CollisionGeometryData)
 };
 
 /// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
 {
+    REFCOUNTED(TriangleMeshData)
+
     /// Construct from a model.
     TriangleMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -85,6 +88,8 @@ struct TriangleMeshData : public CollisionGeometryData
 /// Convex hull geometry data.
 struct ConvexData : public CollisionGeometryData
 {
+    REFCOUNTED(ConvexData)
+
     /// Construct from a model.
     ConvexData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -108,6 +113,8 @@ struct ConvexData : public CollisionGeometryData
 /// Heightfield geometry data.
 struct HeightfieldData : public CollisionGeometryData
 {
+    REFCOUNTED(HeightfieldData)
+
     /// Construct from a terrain.
     HeightfieldData(Terrain* terrain, unsigned lodLevel);
     /// Destruct. Free geometry data.

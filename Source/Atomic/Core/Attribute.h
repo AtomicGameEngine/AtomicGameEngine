@@ -52,6 +52,8 @@ class Serializable;
 /// Abstract base class for invoking attribute accessors.
 class ATOMIC_API AttributeAccessor : public RefCounted
 {
+    REFCOUNTED(AttributeAccessor)
+
 public:
     /// Get the attribute.
     virtual void Get(const Serializable* ptr, Variant& dest) const = 0;

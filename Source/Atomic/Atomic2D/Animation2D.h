@@ -101,6 +101,8 @@ struct AnimationTrack2D
 /// 2D Animation.
 class ATOMIC_API Animation2D : public RefCounted
 {
+    REFCOUNTED(Animation2D)
+
 public:
     /// Construct.
     Animation2D(AnimationSet2D* animationSet);

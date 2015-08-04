@@ -54,6 +54,8 @@ struct ShaderParameter
 /// Linked shader program on the GPU.
 class ATOMIC_API ShaderProgram : public RefCounted, public GPUObject
 {
+    REFCOUNTED(ShaderProgam)
+
 public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);

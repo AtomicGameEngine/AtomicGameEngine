@@ -25,6 +25,18 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+
+typedef const void* ClassID;
+
+/// Macro to be included in RefCounted derived classes for efficient RTTI
+#define REFCOUNTED(typeName) \
+    public: \
+        virtual ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
+
+// ATOMIC END
+
 /// Reference count structure.
 struct RefCount
 {
@@ -70,10 +82,15 @@ public:
     /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
 
+    // ATOMIC BEGIN
     virtual bool IsObject() const { return false; }
+
+    virtual ClassID GetClassID() const  = 0;
+    static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
     inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
+    // ATOMIC END
 
 private:
     /// Prevent copy construction.

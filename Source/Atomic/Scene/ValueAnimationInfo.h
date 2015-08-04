@@ -35,6 +35,8 @@ struct VAnimEventFrame;
 /// Base class for a value animation instance, which includes animation runtime information and updates the target object's value automatically.
 class ValueAnimationInfo : public RefCounted
 {
+    REFCOUNTED(ValueAnimationInfo)
+
 public:
     /// Construct without target object.
     ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed);
