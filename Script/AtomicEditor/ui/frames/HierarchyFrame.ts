@@ -1,7 +1,7 @@
 
-import HierarchyFrameMenu = require("./HierarchyFrameMenu");
+import HierarchyFrameMenu = require("./menus/HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
-import EditorEvents = require("../editor/EditorEvents");
+import EditorEvents = require("editor/EditorEvents");
 
 var IconTemporary = "ComponentBitmap";
 

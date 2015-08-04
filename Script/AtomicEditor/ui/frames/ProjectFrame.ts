@@ -1,9 +1,9 @@
 
 
-import ScriptWidget = require("./ScriptWidget");
-import Editor = require("../editor/Editor");
-import EditorEvents = require("../editor/EditorEvents");
-import ProjectFrameMenu = require("./ProjectFrameMenu");
+import ScriptWidget = require("ui/ScriptWidget");
+import Editor = require("editor/Editor");
+import EditorEvents = require("editor/EditorEvents");
+import ProjectFrameMenu = require("./menus/ProjectFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 
 class ProjectFrame extends ScriptWidget {

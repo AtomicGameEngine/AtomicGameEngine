@@ -3,13 +3,13 @@ import ResourceFrame = require("./ResourceFrame");
 import WelcomeFrame = require("./WelcomeFrame");
 import InspectorFrame = require("./inspector/InspectorFrame");
 import HierarchyFrame = require("./HierarchyFrame");
-import MainToolbar = require("./MainToolbar");
+import MainToolbar = require("ui//MainToolbar");
 
-import MessageModal = require("./modal/MessageModal");
-import UIEvents = require("./UIEvents");
+import MessageModal = require("../modal/MessageModal");
+import UIEvents = require("ui/UIEvents");
 
-import ScriptWidget = require("./ScriptWidget");
-import MainFrameMenu = require("./MainFrameMenu");
+import ScriptWidget = require("ui/ScriptWidget");
+import MainFrameMenu = require("./menus/MainFrameMenu");
 
 import MenuItemSources = require("./menus/MenuItemSources");
 

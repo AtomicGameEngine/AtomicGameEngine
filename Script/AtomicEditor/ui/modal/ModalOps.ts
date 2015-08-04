@@ -4,10 +4,10 @@ import About = require("./About");
 import NewProject = require("./NewProject");
 import CreateProject = require("./CreateProject");
 
-import EULAWindow = require("../license/EULAWindow");
-import ActivationWindow = require("../license/ActivationWindow");
-import ActivationSuccessWindow = require("../license/ActivationSuccessWindow");
-import ManageLicense = require("../license/ManageLicense");
+import EULAWindow = require("./license/EULAWindow");
+import ActivationWindow = require("./license/ActivationWindow");
+import ActivationSuccessWindow = require("./license/ActivationSuccessWindow");
+import ManageLicense = require("./license/ManageLicense");
 
 import ResourceSelection = require("./ResourceSelection");
 

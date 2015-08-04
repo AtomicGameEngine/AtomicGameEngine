@@ -1,8 +1,8 @@
 
-import EditorUI = require("../ui/EditorUI");
-import UIEvents = require("../ui/UIEvents");
-import AssetImport = require("../assets/AssetImport");
-import PlayMode = require("../ui/playmode/PlayMode");
+import EditorUI = require("ui/EditorUI");
+import UIEvents = require("ui/UIEvents");
+import AssetImport = require("utils/AssetImport");
+import PlayMode = require("ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
 import Preferences = require("./Preferences");

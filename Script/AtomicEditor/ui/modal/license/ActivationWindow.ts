@@ -1,8 +1,8 @@
 
-import EditorEvents = require("../../editor/EditorEvents");
-import EditorUI = require("../EditorUI");
-import ModalWindow = require("../modal/ModalWindow");
-import ProgressModal = require("../modal/ProgressModal");
+import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
+import ModalWindow = require("../ModalWindow");
+import ProgressModal = require("../ProgressModal");
 
 class ActivationWidow extends ModalWindow {
 

@@ -1,6 +1,6 @@
-import ScriptWidget = require("./ScriptWidget");
-import EditorEvents = require("../editor/EditorEvents");
-import UIEvents = require("./UIEvents");
+import ScriptWidget = require("ui/ScriptWidget");
+import EditorEvents = require("editor/EditorEvents");
+import UIEvents = require("ui/UIEvents");
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
 // so we can access the editor they belong to from the widget itself

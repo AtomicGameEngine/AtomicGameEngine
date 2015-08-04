@@ -1,6 +1,6 @@
 
-import EditorEvents = require("../editor/EditorEvents");
-import MainFrame = require("../ui/MainFrame");
+import EditorEvents = require("editor/EditorEvents");
+import MainFrame = require("./frames/MainFrame");
 import ModalOps = require("./modal/ModalOps");
 import Shortcuts = require("./Shortcuts");
 

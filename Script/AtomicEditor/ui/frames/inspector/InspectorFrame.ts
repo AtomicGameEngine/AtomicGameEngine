@@ -1,6 +1,6 @@
 
-import EditorEvents = require("../../editor/EditorEvents");
-import ScriptWidget = require("../ScriptWidget");
+import EditorEvents = require("editor/EditorEvents");
+import ScriptWidget = require("ui/ScriptWidget");
 import DataBinding = require("./DataBinding");
 
 // inspectors

@@ -1,5 +1,5 @@
 
-import ScriptWidget = require("../ScriptWidget");
+import ScriptWidget = require("ui/ScriptWidget");
 import ComponentInspector = require("./ComponentInspector");
 import DataBinding = require("./DataBinding");
 import CreateComponentButton = require("./CreateComponentButton");

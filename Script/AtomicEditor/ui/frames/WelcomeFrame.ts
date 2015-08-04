@@ -1,8 +1,8 @@
 
-import EditorEvents = require("../editor/EditorEvents");
-import EditorUI = require("./EditorUI");
-import ScriptWidget = require("./ScriptWidget");
-import Preferences = require("../editor/Preferences");
+import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
+import ScriptWidget = require("ui/ScriptWidget");
+import Preferences = require("editor/Preferences");
 
 class WelcomeFrame extends ScriptWidget {
 

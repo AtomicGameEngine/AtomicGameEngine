@@ -1,8 +1,8 @@
 
-import ScriptWidget = require("../ScriptWidget");
+import ScriptWidget = require("ui/ScriptWidget");
 import DataBinding = require("./DataBinding");
 import InspectorUtils = require("./InspectorUtils");
-import EditorUI = require("../EditorUI");
+import EditorUI = require("ui/EditorUI");
 
 class ComponentInspector extends Atomic.UISection {
 
