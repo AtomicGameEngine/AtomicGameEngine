@@ -66,6 +66,8 @@ struct ShaderParameter
 /// Vertex or pixel shader on the GPU.
 class ATOMIC_API ShaderVariation : public RefCounted, public GPUObject
 {
+    REFCOUNTED(ShaderVariation)
+
 public:
     /// Construct.
     ShaderVariation(Shader* owner, ShaderType type);
