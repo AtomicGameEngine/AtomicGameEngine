@@ -55,7 +55,7 @@ public:
 
     const String& GetErrorMessage() { return errorMessage_; }
 
-    void ExportModel(const String& outName, const String& animName = String::EMPTY, bool animationOnly = false);
+    bool ExportModel(const String& outName, const String& animName = String::EMPTY, bool animationOnly = false);
 
     void SetImportNode(Node* node) { importNode_ = node; }
     void SetStartTime(float startTime) { startTime_ = startTime; }
@@ -72,14 +72,14 @@ private:
     void ApplyScale();
     void ApplyScale(aiNode* node);
 
-    void BuildAndSaveModel(OutModel& model);
-    void BuildAndSaveAnimations(OutModel* model = 0, const String& animNameOverride = String::EMPTY);
+    bool BuildAndSaveModel(OutModel& model);
+    bool BuildAndSaveAnimations(OutModel* model = 0, const String& animNameOverride = String::EMPTY);
 
     void ExportMaterials(HashSet<String>& usedTextures);
-    void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
+    bool BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures);
 
     void CollectSceneModels(OutScene& scene, aiNode* node);
-    void CollectBones(OutModel& model, bool animationOnly = false);
+    bool CollectBones(OutModel& model, bool animationOnly = false);
     void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
     void BuildBoneCollisionInfo(OutModel& model);
     void CollectAnimations(OutModel* model = 0);

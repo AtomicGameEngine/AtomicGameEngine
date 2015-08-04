@@ -227,7 +227,7 @@ declare module ToolCore {
 
       load(assetPath: string): boolean;
       getErrorMessage(): string;
-      exportModel(outName: string, animName?: string, animationOnly?: boolean): void;
+      exportModel(outName: string, animName?: string, animationOnly?: boolean): boolean;
       setImportNode(node: Atomic.Node): void;
       setStartTime(startTime: number): void;
       setEndTime(endTime: number): void;
