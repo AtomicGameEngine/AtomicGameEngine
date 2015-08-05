@@ -134,6 +134,10 @@ class ComponentInspector extends Atomic.UISection {
             this.addSoundSourceUI(attrsVerticalLayout, component.typeName);
         }
 
+        if (component.typeName == "StaticSprite2D" || component.typeName == "AnimatedSprite2D") {
+            this.addSpriteUI(attrsVerticalLayout, component.typeName);
+        }
+
 
         var deleteButton = new Atomic.UIButton();
         deleteButton.text = "Delete Component";
@@ -328,7 +332,7 @@ class ComponentInspector extends Atomic.UISection {
 
         var numGeometries = staticModel.numGeometries;
         if (typeName == "Skybox") {
-          numGeometries = 1;
+            numGeometries = 1;
         }
 
         for (var x = 0; x < staticModel.numGeometries; x++) {
@@ -431,6 +435,51 @@ class ComponentInspector extends Atomic.UISection {
                     sndSource.sound = <Atomic.Sound> Atomic.cache.getResource("Sound", importer.asset.path);
                     if (sndSource.sound)
                         field.text = sndSource.sound.name;
+
+                }
+            }
+
+        });
+
+
+    }
+
+    addSpriteUI(layout: Atomic.UILayout, typeName: string) {
+
+        var spriteComponent = <Atomic.StaticSprite2D> this.component;
+
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Sprite", layout);
+        var field = o.editField;
+        field.readOnly = true;
+        field.text = spriteComponent.sprite ? spriteComponent.sprite.name : "";
+
+        var select = o.selectButton;
+
+        select.onClick = () => {
+
+            // this should allow selecting of sprite sheets as well
+            EditorUI.getModelOps().showResourceSelection("Select Sprite", "TextureImporter", function(asset: ToolCore.Asset) {
+
+                spriteComponent.sprite = <Atomic.Sprite2D> Atomic.cache.getResource("Sprite2D", asset.path);
+                if (spriteComponent.sprite)
+                    field.text = spriteComponent.sprite.name;
+
+            });
+
+        }
+
+        // handle dropping of component on field
+        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == field) {
+
+                var importer = this.acceptAssetDrag("TextureImporter", ev);
+
+                if (importer) {
+
+                  spriteComponent.sprite = <Atomic.Sprite2D> Atomic.cache.getResource("Sprite2D", importer.asset.path);
+                  if (spriteComponent.sprite)
+                      field.text = spriteComponent.sprite.name;
 
                 }
             }

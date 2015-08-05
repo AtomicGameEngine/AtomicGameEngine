@@ -155,8 +155,8 @@ static int Node_GetComponents(duk_context* ctx)
 
     for (unsigned i = 0; i < dest.Size(); i++)
     {
-        js_push_class_object_instance(ctx, dest[i], "Component");
-        duk_put_prop_index(ctx, -2, i);
+        if (js_push_class_object_instance(ctx, dest[i], "Component"))
+            duk_put_prop_index(ctx, -2, i);
     }
 
     return 1;

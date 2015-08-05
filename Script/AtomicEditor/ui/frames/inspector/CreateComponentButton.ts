@@ -8,6 +8,10 @@ audioCreateSource.addItem(new Atomic.UIMenuItem("SoundListener", "SoundListener"
 audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource", "SoundSource"));
 audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource3D", "SoundSource3D"));
 
+var _2DCreateSource = new Atomic.UIMenuItemSource();
+_2DCreateSource.addItem(new Atomic.UIMenuItem("StaticSprite2D", "StaticSprite2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("AnimatedSprite2D", "AnimatedSprite2D"));
+
 var geometryCreateSource = new Atomic.UIMenuItemSource();
 
 geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModel", "StaticModel"));
@@ -59,6 +63,7 @@ var componentCreateSource = new Atomic.UIMenuItemSource();
 
 var sources = {
     Audio: audioCreateSource,
+    "2D": _2DCreateSource,
     Geometry: geometryCreateSource,
     Logic: logicCreateSource,
     Navigation: navigationCreateSource,
