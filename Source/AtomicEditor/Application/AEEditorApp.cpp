@@ -71,13 +71,13 @@ void AEEditorApp::Start()
 
     if (file.Null())
     {
-        ErrorExit("Unable to load AtomicEditor/main.js");
+        ErrorExit("Unable to load AtomicEditor/out/main.js");
         return;
     }
 
     if (!vm_->ExecuteFile(file))
     {
-        ErrorExit("Error executing AtomicEditor/main.js");
+        ErrorExit("Error executing AtomicEditor/out/main.js");
         return;
     }
 
