@@ -248,12 +248,17 @@ void JSVM::SendJSErrorEvent(const String& filename)
 }
 
 int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
-    int realLineNumber = -1;
-    String map;
+    int realLineNumber = lineNumber;
     String path = fileName;
     if (!path.EndsWith(".js.map"))
         path += ".js.map";
     SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile(path));
+    //if there's no source map file, maybe you use a pure js, so give an error, or maybe forgot to generate source-maps :(
+    if (mapFile.Null()) 
+    {
+        return realLineNumber;
+    }    
+    String map;
     mapFile->ReadText(map);
     int top = duk_get_top(ctx_);
     duk_get_global_string(ctx_, "require");
