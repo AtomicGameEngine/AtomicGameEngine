@@ -650,7 +650,7 @@ static __inline__ unsigned long long duk_rdtsc(void) {
  * XXX: unsure about BCC correctness.
  */
 #if defined(DUK_F_X86) || defined(DUK_F_X32) || \
-    defined(DUK_F_BCC) || \
+    defined(DUK_F_BCC) || defined(ANDROID) || \
     (defined(__WORDSIZE) && (__WORDSIZE == 32))
 #define DUK_F_32BIT_PTRS
 #elif defined(DUK_F_X64) || \
