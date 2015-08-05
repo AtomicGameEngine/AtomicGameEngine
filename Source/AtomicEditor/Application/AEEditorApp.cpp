@@ -153,14 +153,14 @@ void AEEditorApp::HandleExitRequested(StringHash eventType, VariantMap& eventDat
 void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
 {
     using namespace JSError;
-    int errLineNumber = vm_->GetRealLineNumber(eventData);
     //String errName = eventData[P_ERRORNAME].GetString();
     String errMessage = eventData[P_ERRORMESSAGE].GetString();
     String errFilename = eventData[P_ERRORFILENAME].GetString();
     //String errStack = eventData[P_ERRORSTACK].GetString();
-    //int errLineNumber = eventData[P_ERRORLINENUMBER].GetInt();
+    int errLineNumber = eventData[P_ERRORLINENUMBER].GetInt();
+    int errRealLineNumber = vm_->GetRealLineNumber("AtomicEditor/out/" + errFilename, errLineNumber);
 
-    String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errLineNumber);
+    String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errRealLineNumber);
 
 
     ErrorExit(errorString);

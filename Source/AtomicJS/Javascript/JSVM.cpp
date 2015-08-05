@@ -247,29 +247,38 @@ void JSVM::SendJSErrorEvent(const String& filename)
 
 }
 
-int JSVM::GetRealLineNumber(VariantMap& eventData) {
-
-    SharedPtr<File> file(GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/utils/SourceMapHelper.js"));
-
-    String source;
-
-    file->ReadText(source);
-
-    duk_push_string(ctx_, source.CString());
-    duk_peval(ctx_);
-    duk_pop(ctx_);
-    String fileName = eventData[JSError::P_ERRORFILENAME].GetString();
+int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
+    int realLineNumber = -1;
     String map;
-    SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/out/" + fileName + ".js.map"));
+    String path = fileName;
+    if (!path.EndsWith(".js.map"))
+        path += ".js.map";
+    SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile(path));
     mapFile->ReadText(map);
-    int lineNumber = eventData[JSError::P_ERRORLINENUMBER].GetInt();
-    duk_push_global_object(ctx_);
-    duk_get_prop_string(ctx_, -1 /*index*/, "getSourceLine");
+    int top = duk_get_top(ctx_);
+    duk_get_global_string(ctx_, "require");
+    duk_push_string(ctx_, "AtomicEditor/Script/jsutils");
+    if (duk_pcall(ctx_, 1))
+    {
+        printf("Error: %s\n", duk_safe_to_string(ctx_, -1));
+        duk_set_top(ctx_, top);
+        return false;
+    }
+
+    duk_get_prop_string(ctx_, -1, "getRealLineNumber");
     duk_push_string(ctx_, map.CString());
     duk_push_int(ctx_, lineNumber);
-    duk_pcall(ctx_, 2 /*nargs*/);
-    int realLineNumber = duk_to_int(ctx_, -1);
-    duk_pop(ctx_);
+    bool ok = true;
+    if (duk_pcall(ctx_, 2))
+    {
+        ok = false;
+        printf("Error: %s\n", duk_safe_to_string(ctx_, -1));
+    }
+    else
+    {
+        realLineNumber = duk_to_int(ctx_, -1);
+    }
+    duk_set_top(ctx_, top);
 
     return realLineNumber;
 }

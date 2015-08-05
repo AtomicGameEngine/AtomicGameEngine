@@ -1,4 +1,5 @@
 function getSourceLine(map, line) {
+    console.log("ASDDDDDDDDDDD");
     var jsonMap = JSON.parse(map);
     var smc = new sourceMap.SourceMapConsumer(jsonMap);
     var pos = smc.originalPositionFor({line: line, column: 100000});
