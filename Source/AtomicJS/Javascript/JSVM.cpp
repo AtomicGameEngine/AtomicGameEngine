@@ -247,6 +247,33 @@ void JSVM::SendJSErrorEvent(const String& filename)
 
 }
 
+int JSVM::GetRealLineNumber(VariantMap& eventData) {
+
+    SharedPtr<File> file(GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/utils/SourceMapHelper.js"));
+
+    String source;
+
+    file->ReadText(source);
+
+    duk_push_string(ctx_, source.CString());
+    duk_peval(ctx_);
+    duk_pop(ctx_);
+    String fileName = eventData[JSError::P_ERRORFILENAME].GetString();
+    String map;
+    SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/out/" + fileName + ".js.map"));
+    mapFile->ReadText(map);
+    int lineNumber = eventData[JSError::P_ERRORLINENUMBER].GetInt();
+    duk_push_global_object(ctx_);
+    duk_get_prop_string(ctx_, -1 /*index*/, "getSourceLine");
+    duk_push_string(ctx_, map.CString());
+    duk_push_int(ctx_, lineNumber);
+    duk_pcall(ctx_, 2 /*nargs*/);
+    int realLineNumber = duk_to_int(ctx_, -1);
+    duk_pop(ctx_);
+
+    return realLineNumber;
+}
+
 bool JSVM::ExecuteScript(const String& scriptPath)
 {
     String path = scriptPath;
