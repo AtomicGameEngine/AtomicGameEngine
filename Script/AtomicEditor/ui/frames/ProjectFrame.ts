@@ -136,10 +136,10 @@ class ProjectFrame extends ScriptWidget {
 
             if (this.menu.handlePopupMenu(data.target, data.refid))
                 return true;
-            
+
             // create
             if (id == "menu create") {
-                if (!ToolCore.toolSystem.project) return;  
+                if (!ToolCore.toolSystem.project) return;
                 var src = MenuItemSources.getMenuItemSource("project create items");
                 var menu = new Atomic.UIMenuWindow(data.target, "create popup");
                 menu.show(src);
@@ -308,7 +308,7 @@ class ProjectFrame extends ScriptWidget {
 
         var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
         container.deleteAllChildren();
-        
+
     }
 
     private refreshContent(folder: ToolCore.Asset) {
@@ -391,7 +391,7 @@ class ProjectFrame extends ScriptWidget {
         button.id = asset.guid;
         button.layoutParams = lp;
         button.fontDescription = fd;
-        button.text = asset.name;
+        button.text = asset.name + asset.extension;
         button.skinBg = "TBButton.flat";
         blayout.addChild(button);
 

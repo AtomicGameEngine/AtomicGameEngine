@@ -7,7 +7,6 @@
 namespace Atomic
 {
 
-/// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
 class PrefabComponent : public Component
 {
     OBJECT(PrefabComponent);

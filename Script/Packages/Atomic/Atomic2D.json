@@ -14,7 +14,7 @@
 				 "Light2DGroup", "Light2D", "DirectionalLight2D", "PositionalLight2D", "PointLight2D"],
 	"overloads" : {
 		"AnimatedSprite2D" : {
-			"SetAnimation" : ["AnimationSet2D", "String", "LoopMode2D"]
+			"SetAnimation" : ["String", "LoopMode2D"]
 		},
 		"CollisionBox2D" : {
 			"SetSize" : ["Vector2"]
