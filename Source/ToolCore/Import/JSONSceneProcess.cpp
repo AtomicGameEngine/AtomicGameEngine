@@ -129,7 +129,7 @@ bool JSONSceneProcess::ProcessMaterials()
         SharedPtr<Material> material;
         material = new Material(context_);
 
-        material->SetName("Materials/" + jmaterial->GetName() + ".xml");
+        material->SetName("Materials/" + jmaterial->GetName() + ".material");
 
         Technique* _technique = cache->GetResource<Technique>("Techniques/" + technique);
         assert(_technique);
@@ -662,7 +662,7 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONTerrain* jterrain)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Image* heightMap = cache->GetResource<Image>(heightMapPath);
 
-    Material* material = cache->GetResource<Material>("Materials/DemoTerrain.xml");
+    Material* material = cache->GetResource<Material>("Materials/DemoTerrain.material");
 
     Terrain* terrain = node->CreateComponent<Terrain>();
 
@@ -962,7 +962,7 @@ bool JSONSceneProcess::Process(const String &resourcePath)
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
     zone->SetBoundingBox(BoundingBox(-10000.0f, 10000.f));
-    zone->SetAmbientColor(Color(1, 1, 1));
+    zone->SetAmbientColor(Color(.4f, .4f, .4f));
 
     ProcessTextures();
     ProcessLightmaps();

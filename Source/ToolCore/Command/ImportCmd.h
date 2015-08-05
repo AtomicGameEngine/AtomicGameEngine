@@ -20,7 +20,7 @@ public:
     bool Parse(const Vector<String>& arguments, unsigned startIndex, String& errorMsg);
     void Run();
 
-    bool RequiresProjectLoad() { return false; }
+    bool RequiresProjectLoad() { return true; }
 
 private:
 

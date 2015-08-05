@@ -207,6 +207,65 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
+    createMaterialClosure(layout: Atomic.UILayout, staticModel: Atomic.StaticModel, index: number) {
+
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Material " + index, layout);
+        var materialField = o.editField;
+        materialField.readOnly = true;
+
+        var select = o.selectButton;
+
+        select.onClick = () => {
+
+            EditorUI.getModelOps().showResourceSelection("Select Material", "MaterialImporter", function(asset: ToolCore.Asset) {
+
+                staticModel.setMaterialIndex(index, <Atomic.Material> Atomic.cache.getResource("Material", asset.path));
+
+                if (staticModel.getMaterial())
+                    materialField.text = staticModel.getMaterial().name;
+                else
+                    materialField.text = "";
+
+            });
+
+        }
+
+        var material = staticModel.getMaterial();
+
+        if (material) {
+
+            materialField.text = material.name;
+
+        }
+
+        // handle dropping of material on field
+        materialField.subscribeToEvent(materialField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == materialField) {
+
+                var importer = this.acceptAssetDrag("MaterialImporter", ev);
+
+                if (importer) {
+
+                    var materialImporter = <ToolCore.MaterialImporter> importer;
+                    var asset = materialImporter.asset;
+
+                    var material = <Atomic.Material> Atomic.cache.getResource("Material", asset.path);
+
+                    if (material) {
+
+                        staticModel.setMaterialIndex(index, material);
+                        ev.target.text = material.name;
+
+                    }
+                }
+            }
+
+        });
+
+
+    }
+
     addModelUI(layout: Atomic.UILayout, typeName: string) {
 
         var staticModel = <Atomic.StaticModel> this.component;
@@ -267,61 +326,17 @@ class ComponentInspector extends Atomic.UISection {
 
         });
 
-        // MATERIAL FIELD (single material, not multimaterial for now)
-
-        o = InspectorUtils.createAttrEditFieldWithSelectButton("Material", layout);
-        var materialField = o.editField;
-        materialField.readOnly = true;
-
-        select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select Material", "MaterialImporter", function(asset: ToolCore.Asset) {
-
-                staticModel.setMaterial(<Atomic.Material> Atomic.cache.getResource("Material", asset.path));
-
-                if (staticModel.getMaterial())
-                    materialField.text = staticModel.getMaterial().name;
-                else
-                    materialField.text = "";
-
-            });
-
+        var numGeometries = staticModel.numGeometries;
+        if (typeName == "Skybox") {
+          numGeometries = 1;
         }
 
-        var material = staticModel.getMaterial();
+        for (var x = 0; x < staticModel.numGeometries; x++) {
 
-        if (material) {
+            this.createMaterialClosure(layout, staticModel, x);
 
-            materialField.text = material.name;
 
         }
-
-        // handle dropping of material on field
-        materialField.subscribeToEvent(materialField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == materialField) {
-
-                var importer = this.acceptAssetDrag("MaterialImporter", ev);
-
-                if (importer) {
-
-                    var materialImporter = <ToolCore.MaterialImporter> importer;
-                    var asset = materialImporter.asset;
-
-                    var material = <Atomic.Material> Atomic.cache.getResource("Material", asset.path);
-
-                    if (material) {
-
-                        staticModel.material = material;
-                        ev.target.text = material.name;
-
-                    }
-                }
-            }
-
-        });
 
 
     }

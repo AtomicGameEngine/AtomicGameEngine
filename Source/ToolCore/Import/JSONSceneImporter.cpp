@@ -585,6 +585,8 @@ bool JSONSceneImporter::ParseMaterials(const rapidjson::Value& value)
                     else if (!strcmp(oitr->name.GetString(), "shader"))
                     {
                         shader = oitr->value.GetString();
+
+                        shader.Replace("Legacy Shaders/", "");
                     }
                     else if (!strcmp(oitr->name.GetString(), "mainTexture"))
                     {

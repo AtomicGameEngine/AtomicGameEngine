@@ -42,7 +42,10 @@ var techniqueLookup = {
     "Techniques/Diff.xml": "Diffuse",
     "Techniques/DiffEmissive.xml": "Diffuse Emissive",
     "Techniques/DiffNormal.xml": "Diffuse Normal",
-    "Techniques/DiffNormalSpec.xml": "Diffuse Normal Specular"
+    "Techniques/DiffNormalSpec.xml": "Diffuse Normal Specular",
+    "Techniques/DiffAlpha.xml": "Alpha",
+    "Techniques/DiffAlphaMask.xml": "Alpha Mask",
+    "Techniques/DiffAdd.xml": "Additive"
 }
 
 var techniqueReverseLookup = {};

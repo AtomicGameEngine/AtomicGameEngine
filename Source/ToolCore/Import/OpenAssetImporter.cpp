@@ -81,8 +81,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
         aiProcess_Triangulate |
         aiProcess_GenSmoothNormals |
         aiProcess_LimitBoneWeights |
-        aiProcess_ImproveCacheLocality |
-        aiProcess_RemoveRedundantMaterials |
+        aiProcess_ImproveCacheLocality |        
         aiProcess_FixInfacingNormals |
         aiProcess_FindInvalidData |
         aiProcess_GenUVCoords |
@@ -203,26 +202,34 @@ void OpenAssetImporter::ApplyScale()
 
 }
 
-void OpenAssetImporter::ExportModel(const String& outName, const String &animName, bool animationOnly)
+bool OpenAssetImporter::ExportModel(const String& outName, const String &animName, bool animationOnly)
 {
     if (outName.Empty())
-        ErrorExit("No output file defined");
+    {
+        errorMessage_ = "No output file defined";
+        return false;
+    }
 
     OutModel model;
     model.rootNode_ = rootNode_;
     model.outName_ = outName + ".mdl";
 
     CollectMeshes(scene_, model, model.rootNode_);
-    CollectBones(model, animationOnly);
+    if (!CollectBones(model, animationOnly))
+        return false;
     BuildBoneCollisionInfo(model);
 
     if (!animationOnly)
-        BuildAndSaveModel(model);
+    {
+        if (!BuildAndSaveModel(model))
+            return false;
+    }
 
     if (!noAnimations_)
     {
         CollectAnimations(&model);
-        BuildAndSaveAnimations(&model, animName);
+        if (!BuildAndSaveAnimations(&model, animName))
+            return false;
 
         // Save scene-global animations
         // CollectAnimations();
@@ -236,7 +243,10 @@ void OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     }
 
     if (importNode_.Null())
-        return;
+    {
+        errorMessage_ = "NULL importNode_";
+        return false;
+    }
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();    
     Model* mdl = cache->GetResource<Model>( model.outName_);
@@ -245,7 +255,10 @@ void OpenAssetImporter::ExportModel(const String& outName, const String &animNam
     cache->ReloadResource(mdl);
 
     if (!mdl)
-        return;
+    {
+        errorMessage_ = "Unable to load " + model.outName_ + " from Cache";
+        return false;
+    }
 
     StaticModel* modelComponent = 0;
 
@@ -274,15 +287,24 @@ void OpenAssetImporter::ExportModel(const String& outName, const String &animNam
         }
 
     }
+
+    return true;
 }
 
-void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
+bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
 {
     if (!model.rootNode_)
-        ErrorExit("Null root node for model");
+    {
+        errorMessage_ = "Null root node for model";
+        return false;
+    }
+
     String rootNodeName = FromAIString(model.rootNode_->mName);
     if (!model.meshes_.Size())
-        ErrorExit("No geometries found starting from node " + rootNodeName);
+    {
+        errorMessage_ = "No geometries found starting from node " + rootNodeName;
+        return false;
+    }
 
     //PrintLine("Writing model " + rootNodeName);
 
@@ -410,7 +432,10 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
         Vector<PODVector<float> > blendWeights;
         PODVector<unsigned> boneMappings;
         if (model.bones_.Size())
-            GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights, maxBones_);
+        {
+            if (!GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights, errorMessage_, maxBones_))
+                return false;
+        }
 
         float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
@@ -507,7 +532,11 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
 
     File outFile(context_);
     if (!outFile.Open(model.outName_, FILE_WRITE))
-        ErrorExit("Could not open output file " + model.outName_);
+    {
+        errorMessage_ = "Could not open output file " + model.outName_;
+        return false;
+    }
+
     outModel->Save(outFile);
 
     // If exporting materials, also save material list for use by the editor
@@ -525,6 +554,8 @@ void OpenAssetImporter::BuildAndSaveModel(OutModel& model)
             PrintLine("Warning: could not write material list file " + materialListName);
         }
     }
+
+    return true;
 }
 
 String OpenAssetImporter::GetMeshMaterialName(aiMesh* mesh)
@@ -635,7 +666,7 @@ void OpenAssetImporter::CollectSceneModels(OutScene& scene, aiNode* node)
         CollectSceneModels(scene, node->mChildren[i]);
 }
 
-void OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
+bool OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
 {
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
@@ -688,7 +719,11 @@ void OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
                 String boneName(FromAIString(bone->mName));
                 aiNode* boneNode = GetNode(boneName, scene_->mRootNode, true);
                 if (!boneNode)
-                    ErrorExit("Could not find scene node for bone " + boneName);
+                {
+                    errorMessage_ = "Could not find scene node for bone " + boneName;
+                    return false;
+                }
+
                 necessary.Insert(boneNode);
                 rootNode = boneNode;
 
@@ -716,7 +751,10 @@ void OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
             if (*i != commonParent)
             {
                 if (!commonParent || (*i)->mParent != commonParent)
-                    ErrorExit("Skeleton with multiple root nodes found, not supported");
+                {
+                    errorMessage_ = "Skeleton with multiple root nodes found, not supported";
+                    return false;
+                }
             }
         }
         rootNodes.Clear();
@@ -725,7 +763,7 @@ void OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
     }
 
     if (rootNodes.Empty())
-        return;
+        return true;
 
     model.rootBone_ = *rootNodes.Begin();
     CollectBonesFinal(model.bones_, necessary, model.rootBone_);
@@ -737,6 +775,8 @@ void OpenAssetImporter::CollectBones(OutModel& model, bool animationOnly)
         model.boneRadii_[i] = 0.0f;
         model.boneHitboxes_[i] = BoundingBox(0.0f, 0.0f);
     }
+
+    return true;
 }
 
 void OpenAssetImporter::CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node)
@@ -850,7 +890,7 @@ void OpenAssetImporter::BuildBoneCollisionInfo(OutModel& model)
     }
 }
 
-void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &animNameOverride)
+bool OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &animNameOverride)
 {
     const PODVector<aiAnimation*>& animations = model ? model->animations_ : sceneAnimations_;
 
@@ -1067,7 +1107,11 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &an
 
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))
-            ErrorExit("Could not open output file " + animOutName);
+        {
+            errorMessage_ = "Could not open output file " + animOutName;
+            return false;
+        }
+
         outAnim->Save(outFile);
 
         AnimationInfo info;
@@ -1075,6 +1119,8 @@ void OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &an
         info.cacheFilename_ = animOutName;
         animationInfos_.Push(info);
     }
+
+    return true;
 }
 
 // Materials
@@ -1089,7 +1135,7 @@ void OpenAssetImporter::ExportMaterials(HashSet<String>& usedTextures)
         BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
 }
 
-void OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
+bool OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 {
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
@@ -1234,15 +1280,21 @@ void OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<Strin
     if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
     {
         PrintLine("Skipping save of existing material " + matName);
-        return;
+        return true;
     }
 
     PrintLine("Writing material " + matName);
 
     File outFile(context_);
     if (!outFile.Open(outFileName, FILE_WRITE))
-        ErrorExit("Could not open output file " + outFileName);
+    {
+        errorMessage_ = "Could not open output file " + outFileName;
+        return false;
+    }
+
     outMaterial.Save(outFile);
+
+    return true;
 }
 
 void OpenAssetImporter::DumpNodes(aiNode* rootNode, unsigned level)
