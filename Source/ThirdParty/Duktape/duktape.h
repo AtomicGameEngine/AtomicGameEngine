@@ -5,7 +5,7 @@
  *  include guard.  Other parts of the header are Duktape
  *  internal and related to platform/compiler/feature detection.
  *
- *  Git commit b098f0423266f5dbfd7a67fc3a6146455df9b61c (v1.2.0-257-gb098f04).
+ *  Git commit b098f0423266f5dbfd7a67fc3a6146455df9b61c (v1.2.0-257-gb098f04-dirty).
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
  *  licensing information.
@@ -112,6 +112,13 @@
 
 #define DUK_SINGLE_FILE
 
+// ATOMIC BEGIN
+
+// ensure option is also enabled in Duktape's Makefile for building dist!
+#define DUK_OPT_NO_VOLUNTARY_GC
+
+// ATOMIC END
+
 /* External duk_config.h provides platform/compiler/OS dependent
  * typedefs and macros, and DUK_USE_xxx config options so that
  * the rest of Duktape doesn't need to do any feature detection.
@@ -212,7 +219,7 @@ struct duk_number_list_entry {
  * so that application code can easily log which Duktape snapshot was used.
  * Not available in the Ecmascript environment.
  */
-#define DUK_GIT_DESCRIBE                  "v1.2.0-257-gb098f04"
+#define DUK_GIT_DESCRIBE                  "v1.2.0-257-gb098f04-dirty"
 
 /* Duktape debug protocol version used by this build. */
 #define DUK_DEBUG_PROTOCOL_VERSION        1
