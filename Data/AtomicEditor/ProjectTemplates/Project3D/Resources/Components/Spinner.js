@@ -1,3 +1,4 @@
+
 "atomic component";
 
 var inspectorFields = {
@@ -8,7 +9,7 @@ module.exports = function(self) {
 
   self.update = function(timeStep) {
 
-    self.node.rotate2D(timeStep * 75 * self.speed);
+    self.node.yaw(timeStep * 75 * self.speed);
 
   }
 

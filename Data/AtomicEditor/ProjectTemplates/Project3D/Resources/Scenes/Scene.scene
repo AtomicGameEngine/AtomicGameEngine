@@ -5,8 +5,8 @@
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
 	<attribute name="Elapsed Time" value="0" />
-	<attribute name="Next Replicated Node ID" value="362" />
-	<attribute name="Next Replicated Component ID" value="1974" />
+	<attribute name="Next Replicated Node ID" value="364" />
+	<attribute name="Next Replicated Component ID" value="1977" />
 	<attribute name="Next Local Node ID" value="16778496" />
 	<attribute name="Next Local Component ID" value="16777216" />
 	<attribute name="Variables" />
@@ -47,12 +47,25 @@
 	<node id="361">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Camera" />
-		<attribute name="Position" value="0 0 -5" />
+		<attribute name="Position" value="0 0 -2" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
-		<component type="Camera" id="1973">
-			<attribute name="FOV" value="45" />
+		<component type="Camera" id="1973" />
+	</node>
+	<node id="363">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="Chest" />
+		<attribute name="Position" value="0 -0.374877 0" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="1975">
+			<attribute name="Model" value="Model;Cache/2788364e8ff6f81f4b566a9d58e3fb5b.mdl" />
+			<attribute name="Material" value="Material;Models/Materials/DefaultMaterial.material" />
+		</component>
+		<component type="JSComponent" id="1976">
+			<attribute name="ComponentFile" value="JSComponentFile;Components/Spinner.js" />
 		</component>
 	</node>
 </scene>
