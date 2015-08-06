@@ -390,7 +390,8 @@ void JSComponent::OnNodeSet(Node* node)
 {
     if (node)
     {
-
+        if (!context_->GetEditorContext())
+            UpdateReferences();
     }
     else
     {

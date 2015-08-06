@@ -53,7 +53,7 @@ public:
     virtual void UpdateVertices() {}
 
     void SetNumRays(int numRays);
-    unsigned GetNumRays() const { return rays_.Size(); }
+    int GetNumRays() const { return (int) rays_.Size(); }
 
     virtual void OnSetEnabled();
 
@@ -73,6 +73,8 @@ public:
 
 protected:
 
+    void OnSceneSet(Scene* scene);
+
     void CastRays();
 
     WeakPtr<Light2DGroup> lightgroup_;
@@ -82,6 +84,7 @@ protected:
     bool backtrace_;
     float softShadowLength_;
     PODVector<Light2DRay> rays_;
+    bool raysInitialized_;
     Vector<Vertex2D> vertices_;
     LightType2D lightType_;
 };
@@ -168,10 +171,11 @@ public:
     /// Register object factory. drawable2d must be registered first.
     static void RegisterObject(Context* context);
 
-    void SetPhysicsWorld(PhysicsWorld2D* physicsWorld);
     PhysicsWorld2D* GetPhysicsWorld() { return physicsWorld_; }
 
     void AddLight2D(Light2D* light);
+    void RemoveLight2D(Light2D* light);
+
     Vector<WeakPtr<Light2D> >& GetLights() { return lights_; }
 
     void SetDirty() { /*verticesDirty_ = true;*/ }
@@ -186,13 +190,12 @@ protected:
     /// Recalculate the world-space bounding box.
     void OnWorldBoundingBoxUpdate();
 
-    void OnNodeSet(Node* node);
+    void OnSceneSet(Scene* scene);
 
     /// Handle draw order changed.
     virtual void OnDrawOrderChanged();
     /// Update source batches.
     virtual void UpdateSourceBatches();
-
 
 private:
 
