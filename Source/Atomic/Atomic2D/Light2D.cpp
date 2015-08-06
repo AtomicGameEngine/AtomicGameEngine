@@ -498,6 +498,7 @@ void Light2DGroup::OnSceneSet(Scene* scene)
             SetAmbientColor(zone->GetAmbientColor());
 
         renderer_ = node_->GetOrCreateComponent<Renderer2D>();
+        renderer_->SetTemporary(true);
         renderer_->SetUseTris(true);
 
         if (light2DMaterial_.Null())
