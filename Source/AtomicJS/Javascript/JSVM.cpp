@@ -252,6 +252,9 @@ int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
     String path = fileName;
     if (!path.EndsWith(".js.map"))
         path += ".js.map";
+    if (path.EndsWith(".js")) {
+        return realLineNumber;
+    }
     SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile(path));
     //if there's no source map file, maybe you use a pure js, so give an error, or maybe forgot to generate source-maps :(
     if (mapFile.Null()) 
@@ -307,6 +310,9 @@ bool JSVM::ExecuteScript(const String& scriptPath)
     String source;
 
     file->ReadText(source);
+    //Appending a new line at the end of a script
+    source.AppendUTF8(0x0D);
+    source.AppendUTF8(0x0A);
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
@@ -332,6 +338,9 @@ bool JSVM::ExecuteFile(File *file)
     String source;
 
     file->ReadText(source);
+    //Appending a new line at the end of a script
+    source.AppendUTF8(0x0D);
+    source.AppendUTF8(0x0A);
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
