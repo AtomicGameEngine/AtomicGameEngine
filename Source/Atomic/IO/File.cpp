@@ -539,7 +539,7 @@ void File::ReadText(String& text)
 
     Read((void*)text.CString(), size_);
 
-    text[size_] = '\n';
+    text[size_] = '\0';
 }
 
 // ATOMIC BEGIN
