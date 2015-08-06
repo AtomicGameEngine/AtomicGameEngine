@@ -133,9 +133,6 @@ namespace Atomic
             vm->SetLastModuleSearchFile(jsfile->GetFullPath());
             String source;
             jsfile->ReadText(source);
-            //not sure if it's good solution
-            source.At(source.Length() - 1) = ' ';
-            source.Append("\n");
             duk_push_string(ctx, source.CString());
             return 1;
         }
