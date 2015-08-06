@@ -165,6 +165,9 @@ void JSComponent::SetUpdateEventMask(unsigned char mask)
 
 void JSComponent::UpdateReferences(bool remove)
 {
+    if (context_->GetEditorContext())
+        return;
+
     duk_context* ctx = vm_->GetJSContext();
 
     int top = duk_get_top(ctx);
@@ -390,7 +393,7 @@ void JSComponent::OnNodeSet(Node* node)
 {
     if (node)
     {
-
+        UpdateReferences();
     }
     else
     {

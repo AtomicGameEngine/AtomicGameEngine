@@ -9,8 +9,15 @@ audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource", "SoundSource"));
 audioCreateSource.addItem(new Atomic.UIMenuItem("SoundSource3D", "SoundSource3D"));
 
 var _2DCreateSource = new Atomic.UIMenuItemSource();
+_2DCreateSource.addItem(new Atomic.UIMenuItem("PhysicsWorld2D", "PhysicsWorld2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("StaticSprite2D", "StaticSprite2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("AnimatedSprite2D", "AnimatedSprite2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("PointLight2D", "PointLight2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("DirectionalLight2D", "DirectionalLight2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("RigidBody2D", "RigidBody2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("CollisionBox2D", "CollisionBox2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("CollisionCircle2D", "CollisionCircle2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("TileMap2D", "TileMap2D"));
 
 var geometryCreateSource = new Atomic.UIMenuItemSource();
 
@@ -51,7 +58,7 @@ var sceneCreateSource = new Atomic.UIMenuItemSource();
 
 sceneCreateSource.addItem(new Atomic.UIMenuItem("Camera", "Camera"));
 sceneCreateSource.addItem(new Atomic.UIMenuItem("Light", "Light"));
-sceneCreateSource.addItem(new Atomic.UIMenuItem("Zone", "create component"));
+sceneCreateSource.addItem(new Atomic.UIMenuItem("Zone", "Zone"));
 
 var subsystemCreateSource = new Atomic.UIMenuItemSource();
 

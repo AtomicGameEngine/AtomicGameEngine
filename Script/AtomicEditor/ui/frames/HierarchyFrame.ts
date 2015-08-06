@@ -58,6 +58,11 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent("TemporaryChanged", (ev: Atomic.TemporaryChangedEvent) => {
 
+            // this can happen on a temporary status change on a non-scripted class instance
+            if (!ev.serializable) {
+                return;
+            }
+
             if (ev.serializable.typeName == "Node") {
 
                 var node = <Atomic.Node> ev.serializable;
@@ -159,8 +164,8 @@ class HierarchyFrame extends Atomic.UIWidget {
                 var node = this.scene.getNode(selectedId);
                 if (node) {
 
-                  node.removeAllComponents();
-                  node.remove();
+                    node.removeAllComponents();
+                    node.remove();
 
                 }
 
@@ -236,7 +241,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             // create
             if (id == "menu create") {
-                if (!ToolCore.toolSystem.project) return;  
+                if (!ToolCore.toolSystem.project) return;
                 var src = MenuItemSources.getMenuItemSource("hierarchy create items");
                 var menu = new Atomic.UIMenuWindow(data.target, "create popup");
                 menu.show(src);

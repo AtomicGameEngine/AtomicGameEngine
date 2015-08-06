@@ -39,7 +39,8 @@
 			"getComponents(componentType?:string, recursive?:boolean):Component[];",
 			"getChildAtIndex(index:number):Node;",
 			"createJSComponent(name:string, args?:{});",
-			"getJSComponent(name:string):JSComponent;"
+			"getJSComponent(name:string):JSComponent;",
+			"createChildPrefab(childName:string, prefabPath:string);"
 		],
 		"Scene" : [
 			"getMainCamera():Camera;"

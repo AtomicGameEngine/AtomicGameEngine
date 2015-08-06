@@ -126,6 +126,11 @@ class ComponentInspector extends Atomic.UISection {
             this.addJSComponentUI(attrsVerticalLayout);
         }
 
+        if (component.typeName == "TileMap2D") {
+            this.addTilemap2DUI(attrsVerticalLayout);
+        }
+
+
         if (component.typeName == "StaticModel" || component.typeName == "AnimatedModel" || component.typeName == "Skybox") {
             this.addModelUI(attrsVerticalLayout, component.typeName);
         }
@@ -486,6 +491,49 @@ class ComponentInspector extends Atomic.UISection {
 
         });
 
+
+    }
+
+    addTilemap2DUI(layout: Atomic.UILayout) {
+
+        var tilemap = <Atomic.TileMap2D> this.component;
+
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("TMX File", layout);
+        var field = o.editField;
+        field.readOnly = true;
+        field.text = tilemap.tmxFile ? tilemap.tmxFile.name : "";
+
+        var select = o.selectButton;
+
+        select.onClick = () => {
+
+            // this should allow selecting of sprite sheets as well
+            EditorUI.getModelOps().showResourceSelection("Select TMX File", "TMXImporter", function(asset: ToolCore.Asset) {
+
+                tilemap.tmxFile = <Atomic.TmxFile2D> Atomic.cache.getResource("TmxFile2D", asset.path);
+                if (tilemap.tmxFile)
+                    field.text = tilemap.tmxFile.name;
+            });
+
+        }
+
+        // handle dropping of component on field
+        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == field) {
+
+                var importer = this.acceptAssetDrag("TextureImporter", ev);
+
+                if (importer) {
+
+                  tilemap.tmxFile = <Atomic.TmxFile2D> Atomic.cache.getResource("TmxFile2D", importer.asset.path);
+                  if (tilemap.tmxFile)
+                      field.text = tilemap.tmxFile.name;
+
+                }
+            }
+
+        });
 
     }
 

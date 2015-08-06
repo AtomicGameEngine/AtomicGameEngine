@@ -93,7 +93,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 100;
 
-            for (var i:any = 0; i < 3; i++) {
+            for (var i: any = 0; i < 3; i++) {
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);
                 select.fontDescription = fd;
@@ -114,12 +114,33 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 70;
 
-            for (var i:any = 0; i < 4; i++) {
+            for (var i: any = 0; i < 4; i++) {
 
                 var select = new Atomic.UIInlineSelect();
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.setLimits(-10000000, 10000000);
+                select.layoutParams = lp;
+                layout.addChild(select);
+            }
+
+        } else if (attrInfo.type == Atomic.VAR_VECTOR2) {
+            var layout = new Atomic.UILayout();
+            widget = layout;
+            layout.spacing = 0;
+
+            var lp = new Atomic.UILayoutParams();
+            lp.width = 100;
+
+            for (var i: any = 0; i < 2; i++) {
+                var select = new Atomic.UIInlineSelect();
+                select.id = String(i + 1);
+                select.fontDescription = fd;
+                select.skinBg = "InspectorVectorAttrName";
+                select.setLimits(-10000000, 10000000);
+                var editlp = new Atomic.UILayoutParams();
+                editlp.minWidth = 60;
+                select.editFieldLayoutParams = editlp;
                 select.layoutParams = lp;
                 layout.addChild(select);
             }
@@ -157,6 +178,18 @@ class DataBinding {
             var value = object.getAttribute(attrInfo.name);
 
             for (var i = 0; i < 3; i++) {
+
+                var select = widget.getWidget((i + 1).toString());
+                if (select)
+                    select.value = value[i];
+            }
+
+        }
+        else if (attrInfo.type == Atomic.VAR_VECTOR2) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            for (var i = 0; i < 2; i++) {
 
                 var select = widget.getWidget((i + 1).toString());
                 if (select)
@@ -254,7 +287,19 @@ class DataBinding {
 
             object.setAttribute(attrInfo.name, value);
 
-        } else if (type == Atomic.VAR_QUATERNION && srcWidget) {
+        } else if (type == Atomic.VAR_VECTOR2 && srcWidget) {
+
+            var value = object.getAttribute(attrInfo.name);
+
+            if (srcWidget.id == "1")
+                value[0] = srcWidget.value;
+            else if (srcWidget.id == "2")
+                value[1] = srcWidget.value;
+
+            object.setAttribute(attrInfo.name, value);
+
+        }
+        else if (type == Atomic.VAR_QUATERNION && srcWidget) {
 
             var value = object.getAttribute(attrInfo.name);
 
