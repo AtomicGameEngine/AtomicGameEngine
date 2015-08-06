@@ -162,6 +162,8 @@ public:
 
     void SendJSErrorEvent(const String& filename = String::EMPTY);
 
+    int GetRealLineNumber(const String& fileName, const int lineNumber);
+
 private:
 
     void SubscribeToEvents();

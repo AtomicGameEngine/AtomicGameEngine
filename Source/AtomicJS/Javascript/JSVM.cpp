@@ -247,6 +247,50 @@ void JSVM::SendJSErrorEvent(const String& filename)
 
 }
 
+int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
+    int realLineNumber = lineNumber;
+    String path = fileName;
+    if (!path.EndsWith(".js.map"))
+        path += ".js.map";
+    if (path.EndsWith(".js")) {
+        return realLineNumber;
+    }
+    SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile(path));
+    //if there's no source map file, maybe you use a pure js, so give an error, or maybe forgot to generate source-maps :(
+    if (mapFile.Null()) 
+    {
+        return realLineNumber;
+    }    
+    String map;
+    mapFile->ReadText(map);
+    int top = duk_get_top(ctx_);
+    duk_get_global_string(ctx_, "require");
+    duk_push_string(ctx_, "AtomicEditor/Script/jsutils");
+    if (duk_pcall(ctx_, 1))
+    {
+        printf("Error: %s\n", duk_safe_to_string(ctx_, -1));
+        duk_set_top(ctx_, top);
+        return false;
+    }
+
+    duk_get_prop_string(ctx_, -1, "getRealLineNumber");
+    duk_push_string(ctx_, map.CString());
+    duk_push_int(ctx_, lineNumber);
+    bool ok = true;
+    if (duk_pcall(ctx_, 2))
+    {
+        ok = false;
+        printf("Error: %s\n", duk_safe_to_string(ctx_, -1));
+    }
+    else
+    {
+        realLineNumber = duk_to_int(ctx_, -1);
+    }
+    duk_set_top(ctx_, top);
+
+    return realLineNumber;
+}
+
 bool JSVM::ExecuteScript(const String& scriptPath)
 {
     String path = scriptPath;
@@ -266,6 +310,7 @@ bool JSVM::ExecuteScript(const String& scriptPath)
     String source;
 
     file->ReadText(source);
+    source.Append('\n');
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
@@ -291,6 +336,7 @@ bool JSVM::ExecuteFile(File *file)
     String source;
 
     file->ReadText(source);
+    source.Append('\n');
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
