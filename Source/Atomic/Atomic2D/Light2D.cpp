@@ -28,16 +28,10 @@
 namespace Atomic
 {
 
-
-static Viewport* __fixmeViewport = NULL;
-void FixMeSetLight2DGroupViewport(Viewport *viewport)
-{
-    __fixmeViewport = viewport;
-}
-
 extern const char* ATOMIC2D_CATEGORY;
 
 Light2D::Light2D(Context* context) : Component(context),
+    lightgroupID_(0),
     color_(Color::WHITE),
     castShadows_(false),
     softShadows_(false),
@@ -63,17 +57,35 @@ void Light2D::OnSceneSet(Scene* scene)
 {
     if (scene)
     {
-        // FIXME: supporting one lightgroup atm
         PODVector<Light2DGroup*> lightgroups;
         scene->GetComponents<Light2DGroup>(lightgroups, true);
-        lightgroup_ = lightgroups.Size() ? lightgroups.At(0) : node_->CreateComponent<Light2DGroup>();
-        lightgroup_->SetTemporary(true);
-        lightgroup_->AddLight2D(this);
+
+        lightgroup_ = 0;
+        for (unsigned i = 0; i < lightgroups.Size(); i++)
+        {
+            Light2DGroup* lightgroup = lightgroups.At(i);
+            if (lightgroup->GetLightGroupID() == lightgroupID_)
+            {
+                lightgroup_ = lightgroup;
+                lightgroup_->AddLight2D(this);
+                break;
+            }
+        }
+
+        if (lightgroup_.Null())
+        {
+            lightgroup_ = node_->CreateComponent<Light2DGroup>();
+            lightgroup_->SetTemporary(true);
+            lightgroup_->AddLight2D(this);
+        }
     }
     else
     {
         if (lightgroup_)
+        {
             lightgroup_->RemoveLight2D(this);
+            lightgroup_ = 0;
+        }
 
     }
 }
@@ -102,8 +114,9 @@ void Light2D::RegisterObject(Context* context)
     context->RegisterFactory<Light2D>(ATOMIC2D_CATEGORY);
     COPY_BASE_ATTRIBUTES(Component);
 
+    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("LightGroup", GetLightGroupID, SetLightGroupID, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
-
     ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Num Rays", GetNumRays, SetNumRays, int, 32, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE("Soft Shadows", GetSoftShadows, SetSoftShadows, bool, false, AM_DEFAULT);
@@ -197,10 +210,11 @@ void DirectionalLight2D::RegisterObject(Context* context)
 
 void DirectionalLight2D::UpdateVertices()
 {
-    vertices_.Clear();
-
     if (!lightgroup_ || !enabled_ || context_->GetEditorContext())
+    {
+        vertices_.Clear();
         return;
+    }
 
     const BoundingBox& frustumBox = lightgroup_->GetFrustumBox();
 
@@ -262,36 +276,50 @@ void DirectionalLight2D::UpdateVertices()
     Vertex2D vertex3;
 
     vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
+    vertex0.uv_.x_ = 1.0f;
+    vertex2.uv_.x_ = 1.0 ;
+    vertex1.uv_.x_ = 1.0f;
+    vertex3.uv_.x_ = 1.0f;
+
+    int vertexCount = (rayNum - 1) * 6;
+
+    if (softShadows_ && castShadows_)
+        vertexCount *= 2;
+
+    if (vertices_.Size() != vertexCount)
+        vertices_.Resize(vertexCount);
+
+    Vertex2D* v = &vertices_[0];
 
     for (unsigned i = 0; i < rayNum - 1; i++) {
 
         Light2DRay& ray0 = rays_[i];
         Light2DRay& ray1 = rays_[i + 1];
 
-        vertex0.position_ = Vector3( ray0.start_.x_, ray0.start_.y_, 0.0f);
-        vertex1.position_ = Vector3( ray0.end_.x_, ray0.end_.y_, 0.0f);
-        vertex2.position_ = Vector3( ray1.start_.x_, ray1.start_.y_, 0.0f);
-        vertex3.position_ = Vector3( ray1.end_.x_, ray1.end_.y_, 0.0f);
+        vertex0.position_.x_ = ray0.start_.x_;
+        vertex0.position_.y_ = ray0.start_.y_;
 
-        vertex0.uv_.x_ = 1.0f;
-        vertex2.uv_.x_ = 1.0 ;
-        vertex1.uv_.x_ = 1.0f;
-        vertex3.uv_.x_ =  1.0f;
+        vertex1.position_.x_ = ray0.end_.x_;
+        vertex1.position_.y_ = ray0.end_.y_;
 
-        vertices_.Push(vertex0);
-        vertices_.Push(vertex1);
-        vertices_.Push(vertex3);
+        vertex2.position_.x_ = ray1.start_.x_;
+        vertex2.position_.y_ = ray1.start_.y_;
 
-        vertices_.Push(vertex0);
-        vertices_.Push(vertex3);
-        vertices_.Push(vertex2);
+        vertex3.position_.x_ = ray1.end_.x_;
+        vertex3.position_.y_ = ray1.end_.y_;
+
+        *v++ = vertex0;
+        *v++ = vertex1;
+        *v++ = vertex3;
+
+        *v++ = vertex0;
+        *v++ = vertex3;
+        *v++ = vertex2;
 
     }
 
     if (softShadows_ && castShadows_)
     {
-        unsigned uambient = lightgroup_->GetAmbientColor().ToUInt();
-
         // THIS CAN BE OPTIMIZED!
         for (unsigned i = 0; i < rays_.Size() - 1; i++) {
 
@@ -323,13 +351,13 @@ void DirectionalLight2D::UpdateVertices()
             vertex1.uv_.x_ = 1.0;
             vertex2.uv_.x_ = 1.0;
 
-            vertices_.Push(vertex0);
-            vertices_.Push(vertex1);
-            vertices_.Push(vertex2);
+            *v++ = vertex0;
+            *v++ = vertex1;
+            *v++ = vertex2;
 
-            vertices_.Push(vertex0);
-            vertices_.Push(vertex2);
-            vertices_.Push(vertex3);
+            *v++ = vertex0;
+            *v++ = vertex2;
+            *v++ = vertex3;
 
         }
 
@@ -355,10 +383,11 @@ void PositionalLight2D::RegisterObject(Context* context)
 
 void PositionalLight2D::UpdateVertices()
 {
-    vertices_.Clear();
-
     if (!lightgroup_ || !enabled_)
+    {
+        vertices_.Clear();
         return;
+    }
 
     CastRays();
 
@@ -369,22 +398,37 @@ void PositionalLight2D::UpdateVertices()
 
     vertex0.color_ = vertex1.color_ = vertex2.color_ = vertex3.color_ = color_.ToUInt();
 
+    int vertexCount = (rays_.Size() - 1 ) * 3;
+
+    if (softShadows_ && castShadows_)
+        vertexCount += (rays_.Size() - 1) * 6;
+
+    if (vertices_.Size() != vertexCount)
+        vertices_.Resize(vertexCount);
+
+    Vertex2D* v = &vertices_[0];
+
     for (unsigned i = 0; i < rays_.Size() - 1; i++) {
 
         Light2DRay& ray0 = rays_[i];
         Light2DRay& ray1 = rays_[i + 1];
 
-        vertex0.position_ = Vector3( ray0.start_.x_, ray0.start_.y_, 0.0f);
-        vertex1.position_ = Vector3( ray0.end_.x_, ray0.end_.y_, 0.0f);
-        vertex2.position_ = Vector3( ray1.end_.x_, ray1.end_.y_, 0.0f);
+        vertex0.position_.x_ = ray0.start_.x_;
+        vertex0.position_.y_ = ray0.start_.y_;
+
+        vertex1.position_.x_ = ray0.end_.x_;
+        vertex1.position_.y_ = ray0.end_.y_;
+
+        vertex2.position_.x_ = ray1.end_.x_;
+        vertex2.position_.y_ = ray1.end_.y_;
 
         vertex0.uv_.x_ = 1.0f;
         vertex1.uv_.x_ =  1.0f - ray0.fraction_;
         vertex2.uv_.x_ =  1.0f - ray1.fraction_;
 
-        vertices_.Push(vertex0);
-        vertices_.Push(vertex1);
-        vertices_.Push(vertex2);
+        *v++ = vertex0;
+        *v++ = vertex1;
+        *v++ = vertex2;
 
     }
 
@@ -399,16 +443,17 @@ void PositionalLight2D::UpdateVertices()
             float s0 = (1.0f - ray0.fraction_);
             float s1 = (1.0f - ray1.fraction_);
 
-            vertex0.position_ = Vector3( ray0.end_.x_, ray0.end_.y_, 0.0f);
+            vertex0.position_.x_ = ray0.end_.x_;
+            vertex0.position_.y_ = ray0.end_.y_;
 
-            vertex1.position_ = Vector3( ray0.end_.x_ + s0 * softShadowLength_ * ray0.cos_,
-                                         (ray0.end_.y_ + s0 * softShadowLength_ * ray0.sin_), 0.0f);
+            vertex1.position_.x_ = ray0.end_.x_ + s0 * softShadowLength_ * ray0.cos_;
+            vertex1.position_.y_ = ray0.end_.y_ + s0 * softShadowLength_ * ray0.sin_;
 
+            vertex2.position_.x_ = ray1.end_.x_ + s1 * softShadowLength_ * ray1.cos_;
+            vertex2.position_.y_ = ray1.end_.y_ + s1 * softShadowLength_ * ray1.sin_;
 
-            vertex2.position_ = Vector3( ray1.end_.x_ + s1 * softShadowLength_ * ray1.cos_,
-                                         (ray1.end_.y_ + s1 * softShadowLength_ * ray1.sin_), 0.0f);
-
-            vertex3.position_ = Vector3( ray1.end_.x_, ray1.end_.y_, 0.0f);
+            vertex3.position_.x_ = ray1.end_.x_;
+            vertex3.position_.y_ = ray1.end_.y_;
 
             vertex1.uv_.x_ = 0;
             vertex2.uv_.x_ = 0;
@@ -418,13 +463,13 @@ void PositionalLight2D::UpdateVertices()
             vertex0.uv_.x_ = s0 * .65f;
             vertex3.uv_.x_ = s1 * .65f;
 
-            vertices_.Push(vertex0);
-            vertices_.Push(vertex1);
-            vertices_.Push(vertex2);
+            *v++ = vertex0;
+            *v++ = vertex1;
+            *v++ = vertex2;
 
-            vertices_.Push(vertex0);
-            vertices_.Push(vertex2);
-            vertices_.Push(vertex3);
+            *v++ = vertex0;
+            *v++ = vertex2;
+            *v++ = vertex3;
 
         }
 
@@ -452,12 +497,13 @@ void PointLight2D::RegisterObject(Context* context)
 
 void PointLight2D::UpdateVertices()
 {
-    vertices_.Clear();
-
     const Node* lightNode = GetNode();
 
     if (!lightgroup_ || !enabled_ || !lightNode)
+    {
+        vertices_.Clear();
         return;
+    }
 
     Vector2 start = lightNode->GetWorldPosition2D();
 
@@ -473,6 +519,7 @@ void PointLight2D::UpdateVertices()
         ray.fraction_ = 1.0f;
     }
 
+    raysInitialized_ = true;
     PositionalLight2D::UpdateVertices();
 
 }
@@ -518,6 +565,7 @@ void Light2DGroup::OnSceneSet(Scene* scene)
 }
 
 Light2DGroup::Light2DGroup(Context* context) : Drawable2D(context),
+    lightgroupID_(0),
     ambientColor_(0, 0, 0, 0),
     frustum_(0)
 {
@@ -532,7 +580,7 @@ Light2DGroup::~Light2DGroup()
 
     if (renderer)
     {
-        Viewport* viewport = __fixmeViewport ? __fixmeViewport :  renderer->GetViewport(0);
+        Viewport* viewport = renderer->GetViewport(0);
         if (viewport)
         {
             RenderPath* renderpath = viewport->GetRenderPath();
@@ -541,8 +589,6 @@ Light2DGroup::~Light2DGroup()
         }
 
     }
-
-    __fixmeViewport = NULL;
 
 }
 
@@ -613,8 +659,6 @@ void Light2DGroup::AddLight2D(Light2D* light)
     if (itr != lights_.End())
         return;
 
-    light->SetLightGroup(this);
-
     lights_.Push(WeakPtr<Light2D>(light));
 
 }
@@ -641,7 +685,7 @@ void Light2DGroup::SetAmbientColor(const Color& color)
     // only on main viewport atm and viewport must first be set
     if (renderer)
     {
-        Viewport* viewport = __fixmeViewport ? __fixmeViewport :  renderer->GetViewport(0);
+        Viewport* viewport = renderer->GetViewport(0);
         if (viewport)
         {
             RenderPath* renderpath = viewport->GetRenderPath();
@@ -657,8 +701,7 @@ void Light2DGroup::CreateLight2DMaterial()
         return;
 
     Renderer* renderer = GetSubsystem<Renderer>();
-    // only on main viewport atm and viewport must first be set
-    Viewport* viewport = __fixmeViewport ? __fixmeViewport :  renderer->GetViewport(0);
+    Viewport* viewport = renderer->GetViewport(0);
     RenderPath* renderpath = viewport->GetRenderPath();
 
     RenderTargetInfo ntarget;

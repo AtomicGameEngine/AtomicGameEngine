@@ -42,13 +42,13 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
 
-    void SetLightGroup(Light2DGroup* group) { lightgroup_ = group; }
-    Light2DGroup* GetLightGroup() { return lightgroup_; }
+    void SetLightGroupID(int id) { lightgroupID_ = id; }
+    int GetLightGroupID() const { return lightgroupID_; }
 
     const Color& GetColor() const { return color_; }
     void SetColor(const Color& color) { color_ = color; }
 
-    void AddVertices(Vector<Vertex2D>& vertices);
+    void AddVertices(Vector<Vertex2D> &vertices);
 
     virtual void UpdateVertices() {}
 
@@ -77,7 +77,9 @@ protected:
 
     void CastRays();
 
+    int lightgroupID_;
     WeakPtr<Light2DGroup> lightgroup_;
+
     Color color_;
     bool castShadows_;
     bool softShadows_;
@@ -183,6 +185,9 @@ public:
     void SetAmbientColor(const Color& color);
     const Color& GetAmbientColor() { return ambientColor_; }
 
+    void SetLightGroupID(int id) { lightgroupID_ = id; }
+    int GetLightGroupID() const { return lightgroupID_; }
+
     const BoundingBox& GetFrustumBox() const { return frustumBoundingBox_; }
 
 protected:
@@ -199,11 +204,12 @@ protected:
 
 private:
 
-    Color ambientColor_;
     void HandleBeginRendering(StringHash eventType, VariantMap& eventData);
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
-
     void CreateLight2DMaterial();
+
+    int lightgroupID_;
+    Color ambientColor_;
 
     Vector<WeakPtr<Light2D> > lights_;
 
