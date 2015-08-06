@@ -310,9 +310,7 @@ bool JSVM::ExecuteScript(const String& scriptPath)
     String source;
 
     file->ReadText(source);
-    //Appending a new line at the end of a script
-    source.AppendUTF8(0x0D);
-    source.AppendUTF8(0x0A);
+    source.Append('\n');
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
@@ -338,9 +336,7 @@ bool JSVM::ExecuteFile(File *file)
     String source;
 
     file->ReadText(source);
-    //Appending a new line at the end of a script
-    source.AppendUTF8(0x0D);
-    source.AppendUTF8(0x0A);
+    source.Append('\n');
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
