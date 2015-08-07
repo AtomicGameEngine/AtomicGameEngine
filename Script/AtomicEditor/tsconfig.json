@@ -2,12 +2,13 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "declaration": false,
+        "declaration": true,
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
         "outDir": "out/",
-        "sourceMap": true
+        "sourceMap": true,
+        "out": "bin.js"
     },
     "filesGlob": [
         "./**/*.ts"

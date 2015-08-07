@@ -362,12 +362,12 @@ void JSVM::GC()
 
 bool JSVM::ExecuteMain()
 {
-    if (!GetSubsystem<ResourceCache>()->Exists("Scripts/main.js"))
+    if (!GetSubsystem<ResourceCache>()->Exists("out/main.js"))
         return true;
 
 
     duk_get_global_string(ctx_, "require");
-    duk_push_string(ctx_, "Scripts/main");
+    duk_push_string(ctx_, "out/main");
 
     if (duk_pcall(ctx_, 1) != 0)
     {

@@ -84,7 +84,7 @@ public:
     JSBFunction(JSBClass* klass) : class_(klass), returnType_(0),
                                    isConstructor_(false), isDestructor_(false),
                                    isGetter_(false), isSetter_(false),
-                                   isOverride_(false), skip_(false)
+                                   isOverload_(false), skip_(false), isVirtual_(false)
     {
 
     }
@@ -95,7 +95,8 @@ public:
     bool IsDestructor() { return isDestructor_; }
     bool IsSetter() { return isSetter_; }
     bool IsGetter() { return isGetter_; }
-    bool IsOverride() { return isOverride_; }
+    bool IsOverload() { return isOverload_; }
+    bool IsVirtual() { return isVirtual_; }
     bool Skip() { return skip_; }
 
     JSBClass* GetClass() { return class_; }
@@ -110,7 +111,8 @@ public:
     void SetDestructor(bool value = true) { isDestructor_ = value; }
     void SetSetter(bool value = true) { isSetter_ = value; }
     void SetGetter(bool value = true) { isGetter_ = value; }
-    void SetOverride(bool value = true) { isOverride_ = value; }
+    void SetOverload(bool value = true) { isOverload_ = value; }
+    void SetVirtual(bool value = true) { isVirtual_ = value; }
     void SetSkip(bool value) { skip_ = value; }
     void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
     void SetDocString(const String& docString) { docString_ = docString; }
@@ -180,7 +182,8 @@ private:
     bool isDestructor_;
     bool isGetter_;
     bool isSetter_;
-    bool isOverride_;
+    bool isOverload_;
+    bool isVirtual_;
     bool skip_;
 
 };
