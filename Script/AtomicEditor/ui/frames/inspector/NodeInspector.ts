@@ -230,9 +230,14 @@ class NodeInspector extends ScriptWidget {
 
         for (var i in components) {
 
+            var component = components[i];
+
+            if (component.isTemporary())
+              continue;
+
             var ci = new ComponentInspector();
 
-            ci.inspect(components[i]);
+            ci.inspect(component);
 
             nodeLayout.addChild(ci);
 

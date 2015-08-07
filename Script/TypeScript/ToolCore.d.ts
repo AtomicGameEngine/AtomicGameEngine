@@ -242,6 +242,7 @@ declare module ToolCore {
       guid: string;
       name: string;
       path: string;
+      extension: string;
       relativePath: string;
       cachePath: string;
       importerType: string;
@@ -261,6 +262,7 @@ declare module ToolCore {
       getGUID(): string;
       getName(): string;
       getPath(): string;
+      getExtension(): string;
       // Get the path relative to project
       getRelativePath(): string;
       getCachePath(): string;

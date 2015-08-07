@@ -3,10 +3,15 @@
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/XMLFile.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Graphics/Camera.h>
+
+#ifdef ATOMIC_3D
+#include <Atomic/Physics/RigidBody.h>
+#endif
 
 #include "JSScene.h"
 #include "JSComponent.h"
@@ -193,6 +198,40 @@ static int Node_SaveXML(duk_context* ctx)
     return 1;
 }
 
+static int Node_CreateChildPrefab(duk_context* ctx)
+{
+    const char* childName = duk_require_string(ctx, 0);
+    const char* prefabName = duk_require_string(ctx, 1);
+
+    duk_push_this(ctx);
+    Node* parent = js_to_class_instance<Node>(ctx, -1, 0);
+
+    Node* prefabNode = parent->CreateChild(childName);
+
+    ResourceCache* cache = parent->GetSubsystem<ResourceCache>();
+    XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabName);
+
+    prefabNode->LoadXML(xmlfile->GetRoot());
+    prefabNode->SetTemporary(true);
+
+    prefabNode->SetPosition(Vector3::ZERO);
+    prefabNode->SetRotation(Quaternion::IDENTITY);
+
+#ifdef ATOMIC_3D
+    PODVector<RigidBody*> bodies;
+    prefabNode->GetComponents<RigidBody>(bodies, true);
+    for (unsigned i = 0; i < bodies.Size(); i++)
+    {
+        RigidBody* body = bodies[i];
+        body->SetTransform(body->GetNode()->GetWorldPosition(), body->GetNode()->GetWorldRotation());
+    }
+#endif
+
+    js_push_class_object_instance(ctx, prefabNode, "Node");
+
+    return 1;
+
+}
 
 static int Scene_LoadXML(duk_context* ctx)
 {
@@ -250,8 +289,6 @@ static int Scene_GetMainCamera(duk_context* ctx)
 
 }
 
-
-
 void jsapi_init_scene(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -273,6 +310,8 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getChildAtIndex");
     duk_push_c_function(ctx, Node_SaveXML, 1);
     duk_put_prop_string(ctx, -2, "saveXML");
+    duk_push_c_function(ctx, Node_CreateChildPrefab, 2);
+    duk_put_prop_string(ctx, -2, "createChildPrefab");
 
     duk_pop(ctx);
 

@@ -39,11 +39,12 @@ namespace Atomic
 extern const char* ATOMIC2D_CATEGORY;
 static const BodyType2D DEFAULT_BODYTYPE = BT_STATIC;
 
+// ATOMIC: Make sure these match box2d order
 static const char* bodyTypeNames[] =
 {
     "Static",
-    "Dynamic",
     "Kinematic",
+    "Dynamic",
     0
 };
 

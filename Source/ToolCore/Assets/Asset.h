@@ -32,6 +32,7 @@ public:
     const String& GetGUID() const { return guid_; }
     const String& GetName() const { return name_; }
     const String& GetPath() const { return path_; }
+    String GetExtension() const;
     /// Get the path relative to project
     String GetRelativePath();
     String GetCachePath() const;
