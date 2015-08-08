@@ -2,22 +2,24 @@ package;
 
 
    // enum EditMode
-typedef EditMode = {
-    var EDIT_SELECT:Int;
-    var EDIT_MOVE:Int;
-    var EDIT_ROTATE:Int;
-    var EDIT_SCALE:Int;
-}
+typedef EditMode = Int;
 
    // enum AxisMode
-typedef AxisMode = {
-    var AXIS_WORLD:Int;
-    var AXIS_LOCAL:Int;
-}
+typedef AxisMode = Int;
 //Atomic Haxe Definitions
 
 extern class Editor {
 
+
+   // enum EditMode
+    public static var EDIT_SELECT:EditMode;
+    public static var EDIT_MOVE:EditMode;
+    public static var EDIT_ROTATE:EditMode;
+    public static var EDIT_SCALE:EditMode;
+
+   // enum AxisMode
+    public static var AXIS_WORLD:AxisMode;
+    public static var AXIS_LOCAL:AxisMode;
 
    public static var FINDTEXT_FLAG_NONE: Int;
    public static var FINDTEXT_FLAG_CASESENSITIVE: Int;

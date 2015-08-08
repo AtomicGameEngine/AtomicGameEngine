@@ -2,780 +2,862 @@ package;
 
 
    // enum FrustumPlane
-typedef FrustumPlane = {
-    var PLANE_NEAR:Int;
-    var PLANE_LEFT:Int;
-    var PLANE_RIGHT:Int;
-    var PLANE_UP:Int;
-    var PLANE_DOWN:Int;
-    var PLANE_FAR:Int;
-}
+typedef FrustumPlane = Int;
 
    // enum Intersection
-typedef Intersection = {
-    var OUTSIDE:Int;
-    var INTERSECTS:Int;
-    var INSIDE:Int;
-}
+typedef Intersection = Int;
 
    // enum InterpolationMode
-typedef InterpolationMode = {
-    var BEZIER_CURVE:Int;
-}
+typedef InterpolationMode = Int;
 
    // enum VariantType
-typedef VariantType = {
-    var VAR_NONE:Int;
-    var VAR_INT:Int;
-    var VAR_BOOL:Int;
-    var VAR_FLOAT:Int;
-    var VAR_VECTOR2:Int;
-    var VAR_VECTOR3:Int;
-    var VAR_VECTOR4:Int;
-    var VAR_QUATERNION:Int;
-    var VAR_COLOR:Int;
-    var VAR_STRING:Int;
-    var VAR_BUFFER:Int;
-    var VAR_VOIDPTR:Int;
-    var VAR_RESOURCEREF:Int;
-    var VAR_RESOURCEREFLIST:Int;
-    var VAR_VARIANTVECTOR:Int;
-    var VAR_VARIANTMAP:Int;
-    var VAR_INTRECT:Int;
-    var VAR_INTVECTOR2:Int;
-    var VAR_PTR:Int;
-    var VAR_MATRIX3:Int;
-    var VAR_MATRIX3X4:Int;
-    var VAR_MATRIX4:Int;
-    var VAR_DOUBLE:Int;
-    var MAX_VAR_TYPES:Int;
-}
+typedef VariantType = Int;
 
    // enum WrapMode
-typedef WrapMode = {
-    var WM_LOOP:Int;
-    var WM_ONCE:Int;
-    var WM_CLAMP:Int;
-}
+typedef WrapMode = Int;
 
    // enum CreateMode
-typedef CreateMode = {
-    var REPLICATED:Int;
-    var LOCAL:Int;
-}
+typedef CreateMode = Int;
 
    // enum TransformSpace
-typedef TransformSpace = {
-    var TS_LOCAL:Int;
-    var TS_PARENT:Int;
-    var TS_WORLD:Int;
-}
+typedef TransformSpace = Int;
 
    // enum LoadMode
-typedef LoadMode = {
-    var LOAD_RESOURCES_ONLY:Int;
-    var LOAD_SCENE:Int;
-    var LOAD_SCENE_AND_RESOURCES:Int;
-}
+typedef LoadMode = Int;
 
    // enum InterpMethod
-typedef InterpMethod = {
-    var IM_LINEAR:Int;
-    var IM_SPLINE:Int;
-}
+typedef InterpMethod = Int;
 
    // enum UpdateGeometryType
-typedef UpdateGeometryType = {
-    var UPDATE_NONE:Int;
-    var UPDATE_MAIN_THREAD:Int;
-    var UPDATE_WORKER_THREAD:Int;
-}
+typedef UpdateGeometryType = Int;
 
    // enum PrimitiveType
-typedef PrimitiveType = {
-    var TRIANGLE_LIST:Int;
-    var LINE_LIST:Int;
-    var POINT_LIST:Int;
-    var TRIANGLE_STRIP:Int;
-    var LINE_STRIP:Int;
-    var TRIANGLE_FAN:Int;
-}
+typedef PrimitiveType = Int;
 
    // enum GeometryType
-typedef GeometryType = {
-    var GEOM_STATIC:Int;
-    var GEOM_SKINNED:Int;
-    var GEOM_INSTANCED:Int;
-    var GEOM_BILLBOARD:Int;
-    var GEOM_STATIC_NOINSTANCING:Int;
-    var MAX_GEOMETRYTYPES:Int;
-}
+typedef GeometryType = Int;
 
    // enum BlendMode
-typedef BlendMode = {
-    var BLEND_REPLACE:Int;
-    var BLEND_ADD:Int;
-    var BLEND_MULTIPLY:Int;
-    var BLEND_ALPHA:Int;
-    var BLEND_ADDALPHA:Int;
-    var BLEND_PREMULALPHA:Int;
-    var BLEND_INVDESTALPHA:Int;
-    var BLEND_SUBTRACT:Int;
-    var BLEND_SUBTRACTALPHA:Int;
-    var MAX_BLENDMODES:Int;
-}
+typedef BlendMode = Int;
 
    // enum CompareMode
-typedef CompareMode = {
-    var CMP_ALWAYS:Int;
-    var CMP_EQUAL:Int;
-    var CMP_NOTEQUAL:Int;
-    var CMP_LESS:Int;
-    var CMP_LESSEQUAL:Int;
-    var CMP_GREATER:Int;
-    var CMP_GREATEREQUAL:Int;
-    var MAX_COMPAREMODES:Int;
-}
+typedef CompareMode = Int;
 
    // enum CullMode
-typedef CullMode = {
-    var CULL_NONE:Int;
-    var CULL_CCW:Int;
-    var CULL_CW:Int;
-    var MAX_CULLMODES:Int;
-}
+typedef CullMode = Int;
 
    // enum FillMode
-typedef FillMode = {
-    var FILL_SOLID:Int;
-    var FILL_WIREFRAME:Int;
-    var FILL_POINT:Int;
-}
+typedef FillMode = Int;
 
    // enum StencilOp
-typedef StencilOp = {
-    var OP_KEEP:Int;
-    var OP_ZERO:Int;
-    var OP_REF:Int;
-    var OP_INCR:Int;
-    var OP_DECR:Int;
-}
+typedef StencilOp = Int;
 
    // enum LockState
-typedef LockState = {
-    var LOCK_NONE:Int;
-    var LOCK_HARDWARE:Int;
-    var LOCK_SHADOW:Int;
-    var LOCK_SCRATCH:Int;
-}
+typedef LockState = Int;
 
    // enum VertexElement
-typedef VertexElement = {
-    var ELEMENT_POSITION:Int;
-    var ELEMENT_NORMAL:Int;
-    var ELEMENT_COLOR:Int;
-    var ELEMENT_TEXCOORD1:Int;
-    var ELEMENT_TEXCOORD2:Int;
-    var ELEMENT_CUBETEXCOORD1:Int;
-    var ELEMENT_CUBETEXCOORD2:Int;
-    var ELEMENT_TANGENT:Int;
-    var ELEMENT_BLENDWEIGHTS:Int;
-    var ELEMENT_BLENDINDICES:Int;
-    var ELEMENT_INSTANCEMATRIX1:Int;
-    var ELEMENT_INSTANCEMATRIX2:Int;
-    var ELEMENT_INSTANCEMATRIX3:Int;
-    var MAX_VERTEX_ELEMENTS:Int;
-}
+typedef VertexElement = Int;
 
    // enum TextureFilterMode
-typedef TextureFilterMode = {
-    var FILTER_NEAREST:Int;
-    var FILTER_BILINEAR:Int;
-    var FILTER_TRILINEAR:Int;
-    var FILTER_ANISOTROPIC:Int;
-    var FILTER_DEFAULT:Int;
-    var MAX_FILTERMODES:Int;
-}
+typedef TextureFilterMode = Int;
 
    // enum TextureAddressMode
-typedef TextureAddressMode = {
-    var ADDRESS_WRAP:Int;
-    var ADDRESS_MIRROR:Int;
-    var ADDRESS_CLAMP:Int;
-    var ADDRESS_BORDER:Int;
-    var MAX_ADDRESSMODES:Int;
-}
+typedef TextureAddressMode = Int;
 
    // enum TextureCoordinate
-typedef TextureCoordinate = {
-    var COORD_U:Int;
-    var COORD_V:Int;
-    var COORD_W:Int;
-    var MAX_COORDS:Int;
-}
+typedef TextureCoordinate = Int;
 
    // enum TextureUsage
-typedef TextureUsage = {
-    var TEXTURE_STATIC:Int;
-    var TEXTURE_DYNAMIC:Int;
-    var TEXTURE_RENDERTARGET:Int;
-    var TEXTURE_DEPTHSTENCIL:Int;
-}
+typedef TextureUsage = Int;
 
    // enum CubeMapFace
-typedef CubeMapFace = {
-    var FACE_POSITIVE_X:Int;
-    var FACE_NEGATIVE_X:Int;
-    var FACE_POSITIVE_Y:Int;
-    var FACE_NEGATIVE_Y:Int;
-    var FACE_POSITIVE_Z:Int;
-    var FACE_NEGATIVE_Z:Int;
-    var MAX_CUBEMAP_FACES:Int;
-}
+typedef CubeMapFace = Int;
 
    // enum CubeMapLayout
-typedef CubeMapLayout = {
-    var CML_HORIZONTAL:Int;
-    var CML_HORIZONTALNVIDIA:Int;
-    var CML_HORIZONTALCROSS:Int;
-    var CML_VERTICALCROSS:Int;
-    var CML_BLENDER:Int;
-}
+typedef CubeMapLayout = Int;
 
    // enum RenderSurfaceUpdateMode
-typedef RenderSurfaceUpdateMode = {
-    var SURFACE_MANUALUPDATE:Int;
-    var SURFACE_UPDATEVISIBLE:Int;
-    var SURFACE_UPDATEALWAYS:Int;
-}
+typedef RenderSurfaceUpdateMode = Int;
 
    // enum ShaderType
-typedef ShaderType = {
-    var VS:Int;
-    var PS:Int;
-}
+typedef ShaderType = Int;
 
    // enum ShaderParameterGroup
-typedef ShaderParameterGroup = {
-    var SP_FRAME:Int;
-    var SP_CAMERA:Int;
-    var SP_ZONE:Int;
-    var SP_LIGHT:Int;
-    var SP_MATERIAL:Int;
-    var SP_OBJECT:Int;
-    var SP_CUSTOM:Int;
-    var MAX_SHADER_PARAMETER_GROUPS:Int;
-}
+typedef ShaderParameterGroup = Int;
 
    // enum TextureUnit
-typedef TextureUnit = {
-    var TU_DIFFUSE:Int;
-    var TU_ALBEDOBUFFER:Int;
-    var TU_NORMAL:Int;
-    var TU_NORMALBUFFER:Int;
-    var TU_SPECULAR:Int;
-    var TU_EMISSIVE:Int;
-    var TU_ENVIRONMENT:Int;
-    var TU_VOLUMEMAP:Int;
-    var TU_CUSTOM1:Int;
-    var TU_CUSTOM2:Int;
-    var TU_LIGHTRAMP:Int;
-    var TU_LIGHTSHAPE:Int;
-    var TU_SHADOWMAP:Int;
-    var TU_FACESELECT:Int;
-    var TU_INDIRECTION:Int;
-    var TU_DEPTHBUFFER:Int;
-    var TU_LIGHTBUFFER:Int;
-    var TU_ZONE:Int;
-    var MAX_MATERIAL_TEXTURE_UNITS:Int;
-    var MAX_TEXTURE_UNITS:Int;
-}
+typedef TextureUnit = Int;
 
    // enum FaceCameraMode
-typedef FaceCameraMode = {
-    var FC_NONE:Int;
-    var FC_ROTATE_XYZ:Int;
-    var FC_ROTATE_Y:Int;
-    var FC_LOOKAT_XYZ:Int;
-    var FC_LOOKAT_Y:Int;
-}
+typedef FaceCameraMode = Int;
 
    // enum LightType
-typedef LightType = {
-    var LIGHT_DIRECTIONAL:Int;
-    var LIGHT_SPOT:Int;
-    var LIGHT_POINT:Int;
-}
+typedef LightType = Int;
 
    // enum RayQueryLevel
-typedef RayQueryLevel = {
-    var RAY_AABB:Int;
-    var RAY_OBB:Int;
-    var RAY_TRIANGLE:Int;
-    var RAY_TRIANGLE_UV:Int;
-}
+typedef RayQueryLevel = Int;
 
    // enum LightVSVariation
-typedef LightVSVariation = {
-    var LVS_DIR:Int;
-    var LVS_SPOT:Int;
-    var LVS_POINT:Int;
-    var LVS_SHADOW:Int;
-    var LVS_SPOTSHADOW:Int;
-    var LVS_POINTSHADOW:Int;
-    var MAX_LIGHT_VS_VARIATIONS:Int;
-}
+typedef LightVSVariation = Int;
 
    // enum VertexLightVSVariation
-typedef VertexLightVSVariation = {
-    var VLVS_NOLIGHTS:Int;
-    var VLVS_1LIGHT:Int;
-    var VLVS_2LIGHTS:Int;
-    var VLVS_3LIGHTS:Int;
-    var VLVS_4LIGHTS:Int;
-    var MAX_VERTEXLIGHT_VS_VARIATIONS:Int;
-}
+typedef VertexLightVSVariation = Int;
 
    // enum LightPSVariation
-typedef LightPSVariation = {
-    var LPS_NONE:Int;
-    var LPS_SPOT:Int;
-    var LPS_POINT:Int;
-    var LPS_POINTMASK:Int;
-    var LPS_SPEC:Int;
-    var LPS_SPOTSPEC:Int;
-    var LPS_POINTSPEC:Int;
-    var LPS_POINTMASKSPEC:Int;
-    var LPS_SHADOW:Int;
-    var LPS_SPOTSHADOW:Int;
-    var LPS_POINTSHADOW:Int;
-    var LPS_POINTMASKSHADOW:Int;
-    var LPS_SHADOWSPEC:Int;
-    var LPS_SPOTSHADOWSPEC:Int;
-    var LPS_POINTSHADOWSPEC:Int;
-    var LPS_POINTMASKSHADOWSPEC:Int;
-    var MAX_LIGHT_PS_VARIATIONS:Int;
-}
+typedef LightPSVariation = Int;
 
    // enum DeferredLightVSVariation
-typedef DeferredLightVSVariation = {
-    var DLVS_NONE:Int;
-    var DLVS_DIR:Int;
-    var DLVS_ORTHO:Int;
-    var DLVS_ORTHODIR:Int;
-    var MAX_DEFERRED_LIGHT_VS_VARIATIONS:Int;
-}
+typedef DeferredLightVSVariation = Int;
 
    // enum DeferredLightPSVariation
-typedef DeferredLightPSVariation = {
-    var DLPS_NONE:Int;
-    var DLPS_SPOT:Int;
-    var DLPS_POINT:Int;
-    var DLPS_POINTMASK:Int;
-    var DLPS_SPEC:Int;
-    var DLPS_SPOTSPEC:Int;
-    var DLPS_POINTSPEC:Int;
-    var DLPS_POINTMASKSPEC:Int;
-    var DLPS_SHADOW:Int;
-    var DLPS_SPOTSHADOW:Int;
-    var DLPS_POINTSHADOW:Int;
-    var DLPS_POINTMASKSHADOW:Int;
-    var DLPS_SHADOWSPEC:Int;
-    var DLPS_SPOTSHADOWSPEC:Int;
-    var DLPS_POINTSHADOWSPEC:Int;
-    var DLPS_POINTMASKSHADOWSPEC:Int;
-    var DLPS_ORTHO:Int;
-    var DLPS_ORTHOSPOT:Int;
-    var DLPS_ORTHOPOINT:Int;
-    var DLPS_ORTHOPOINTMASK:Int;
-    var DLPS_ORTHOSPEC:Int;
-    var DLPS_ORTHOSPOTSPEC:Int;
-    var DLPS_ORTHOPOINTSPEC:Int;
-    var DLPS_ORTHOPOINTMASKSPEC:Int;
-    var DLPS_ORTHOSHADOW:Int;
-    var DLPS_ORTHOSPOTSHADOW:Int;
-    var DLPS_ORTHOPOINTSHADOW:Int;
-    var DLPS_ORTHOPOINTMASKSHADOW:Int;
-    var DLPS_ORTHOSHADOWSPEC:Int;
-    var DLPS_ORTHOSPOTSHADOWSPEC:Int;
-    var DLPS_ORTHOPOINTSHADOWSPEC:Int;
-    var DLPS_ORTHOPOINTMASKSHADOWSPEC:Int;
-    var MAX_DEFERRED_LIGHT_PS_VARIATIONS:Int;
-}
+typedef DeferredLightPSVariation = Int;
 
    // enum RenderCommandType
-typedef RenderCommandType = {
-    var CMD_NONE:Int;
-    var CMD_CLEAR:Int;
-    var CMD_SCENEPASS:Int;
-    var CMD_QUAD:Int;
-    var CMD_FORWARDLIGHTS:Int;
-    var CMD_LIGHTVOLUMES:Int;
-    var CMD_RENDERUI:Int;
-}
+typedef RenderCommandType = Int;
 
    // enum RenderCommandSortMode
-typedef RenderCommandSortMode = {
-    var SORT_FRONTTOBACK:Int;
-    var SORT_BACKTOFRONT:Int;
-}
+typedef RenderCommandSortMode = Int;
 
    // enum RenderTargetSizeMode
-typedef RenderTargetSizeMode = {
-    var SIZE_ABSOLUTE:Int;
-    var SIZE_VIEWPORTDIVISOR:Int;
-    var SIZE_VIEWPORTMULTIPLIER:Int;
-}
+typedef RenderTargetSizeMode = Int;
 
    // enum PassLightingMode
-typedef PassLightingMode = {
-    var LIGHTING_UNLIT:Int;
-    var LIGHTING_PERVERTEX:Int;
-    var LIGHTING_PERPIXEL:Int;
-}
+typedef PassLightingMode = Int;
 
    // enum EmitterType
-typedef EmitterType = {
-    var EMITTER_SPHERE:Int;
-    var EMITTER_BOX:Int;
-}
+typedef EmitterType = Int;
 
    // enum LoopMode2D
-typedef LoopMode2D = {
-    var LM_DEFAULT:Int;
-    var LM_FORCE_LOOPED:Int;
-    var LM_FORCE_CLAMPED:Int;
-}
+typedef LoopMode2D = Int;
 
    // enum LightType2D
-typedef LightType2D = {
-    var LIGHT2D_DIRECTIONAL:Int;
-    var LIGHT2D_POINT:Int;
-}
+typedef LightType2D = Int;
 
    // enum EmitterType2D
-typedef EmitterType2D = {
-    var EMITTER_TYPE_GRAVITY:Int;
-    var EMITTER_TYPE_RADIAL:Int;
-}
+typedef EmitterType2D = Int;
 
    // enum BodyType2D
-typedef BodyType2D = {
-    var BT_STATIC:Int;
-    var BT_DYNAMIC:Int;
-    var BT_KINEMATIC:Int;
-}
+typedef BodyType2D = Int;
 
    // enum Orientation2D
-typedef Orientation2D = {
-    var O_ORTHOGONAL:Int;
-    var O_ISOMETRIC:Int;
-    var O_STAGGERED:Int;
-}
+typedef Orientation2D = Int;
 
    // enum TileMapLayerType2D
-typedef TileMapLayerType2D = {
-    var LT_TILE_LAYER:Int;
-    var LT_OBJECT_GROUP:Int;
-    var LT_IMAGE_LAYER:Int;
-    var LT_INVALID:Int;
-}
+typedef TileMapLayerType2D = Int;
 
    // enum TileMapObjectType2D
-typedef TileMapObjectType2D = {
-    var OT_RECTANGLE:Int;
-    var OT_ELLIPSE:Int;
-    var OT_POLYGON:Int;
-    var OT_POLYLINE:Int;
-    var OT_TILE:Int;
-    var OT_INVALID:Int;
-}
+typedef TileMapObjectType2D = Int;
 
    // enum ShapeType
-typedef ShapeType = {
-    var SHAPE_BOX:Int;
-    var SHAPE_SPHERE:Int;
-    var SHAPE_STATICPLANE:Int;
-    var SHAPE_CYLINDER:Int;
-    var SHAPE_CAPSULE:Int;
-    var SHAPE_CONE:Int;
-    var SHAPE_TRIANGLEMESH:Int;
-    var SHAPE_CONVEXHULL:Int;
-    var SHAPE_TERRAIN:Int;
-}
+typedef ShapeType = Int;
 
    // enum ConstraintType
-typedef ConstraintType = {
-    var CONSTRAINT_POINT:Int;
-    var CONSTRAINT_HINGE:Int;
-    var CONSTRAINT_SLIDER:Int;
-    var CONSTRAINT_CONETWIST:Int;
-}
+typedef ConstraintType = Int;
 
    // enum CollisionEventMode
-typedef CollisionEventMode = {
-    var COLLISION_NEVER:Int;
-    var COLLISION_ACTIVE:Int;
-    var COLLISION_ALWAYS:Int;
-}
+typedef CollisionEventMode = Int;
 
    // enum CrowdTargetState
-typedef CrowdTargetState = {
-    var CROWD_AGENT_TARGET_NONE:Int;
-    var CROWD_AGENT_TARGET_FAILED:Int;
-    var CROWD_AGENT_TARGET_VALID:Int;
-    var CROWD_AGENT_TARGET_REQUESTING:Int;
-    var CROWD_AGENT_TARGET_WAITINGFORQUEUE:Int;
-    var CROWD_AGENT_TARGET_WAITINGFORPATH:Int;
-    var CROWD_AGENT_TARGET_VELOCITY:Int;
-}
+typedef CrowdTargetState = Int;
 
    // enum CrowdAgentState
-typedef CrowdAgentState = {
-    var CROWD_AGENT_INVALID:Int;
-    var CROWD_AGENT_READY:Int;
-    var CROWD_AGENT_TRAVERSINGLINK:Int;
-}
+typedef CrowdAgentState = Int;
 
    // enum NavigationQuality
-typedef NavigationQuality = {
-    var NAVIGATIONQUALITY_LOW:Int;
-    var NAVIGATIONQUALITY_MEDIUM:Int;
-    var NAVIGATIONQUALITY_HIGH:Int;
-}
+typedef NavigationQuality = Int;
 
    // enum NavigationPushiness
-typedef NavigationPushiness = {
-    var PUSHINESS_LOW:Int;
-    var PUSHINESS_MEDIUM:Int;
-    var PUSHINESS_HIGH:Int;
-}
+typedef NavigationPushiness = Int;
 
    // enum NavmeshPartitionType
-typedef NavmeshPartitionType = {
-    var NAVMESH_PARTITION_WATERSHED:Int;
-    var NAVMESH_PARTITION_MONOTONE:Int;
-}
+typedef NavmeshPartitionType = Int;
 
    // enum MouseMode
-typedef MouseMode = {
-    var MM_ABSOLUTE:Int;
-    var MM_RELATIVE:Int;
-    var MM_WRAP:Int;
-}
+typedef MouseMode = Int;
 
    // enum TEXT_ALIGN
-typedef TEXT_ALIGN = {
-    var TEXT_ALIGN_LEFT:Int;
-    var TEXT_ALIGN_RIGHT:Int;
-    var TEXT_ALIGN_CENTER:Int;
-}
+typedef TEXT_ALIGN = Int;
 
    // enum UI_EDIT_TYPE
-typedef UI_EDIT_TYPE = {
-    var UI_EDIT_TYPE_TEXT:Int;
-    var UI_EDIT_TYPE_SEARCH:Int;
-    var UI_EDIT_TYPE_PASSWORD:Int;
-    var UI_EDIT_TYPE_EMAIL:Int;
-    var UI_EDIT_TYPE_PHONE:Int;
-    var UI_EDIT_TYPE_URL:Int;
-    var UI_EDIT_TYPE_NUMBER:Int;
-}
+typedef UI_EDIT_TYPE = Int;
 
    // enum UI_AXIS
-typedef UI_AXIS = {
-    var UI_AXIS_X:Int;
-    var UI_AXIS_Y:Int;
-}
+typedef UI_AXIS = Int;
 
    // enum UI_LAYOUT_SIZE
-typedef UI_LAYOUT_SIZE = {
-    var UI_LAYOUT_SIZE_GRAVITY:Int;
-    var UI_LAYOUT_SIZE_PREFERRED:Int;
-    var UI_LAYOUT_SIZE_AVAILABLE:Int;
-}
+typedef UI_LAYOUT_SIZE = Int;
 
    // enum UI_LAYOUT_DISTRIBUTION
-typedef UI_LAYOUT_DISTRIBUTION = {
-    var UI_LAYOUT_DISTRIBUTION_PREFERRED:Int;
-    var UI_LAYOUT_DISTRIBUTION_AVAILABLE:Int;
-    var UI_LAYOUT_DISTRIBUTION_GRAVITY:Int;
-}
+typedef UI_LAYOUT_DISTRIBUTION = Int;
 
    // enum UI_LAYOUT_POSITION
-typedef UI_LAYOUT_POSITION = {
-    var UI_LAYOUT_POSITION_CENTER:Int;
-    var UI_LAYOUT_POSITION_LEFT_TOP:Int;
-    var UI_LAYOUT_POSITION_RIGHT_BOTTOM:Int;
-    var UI_LAYOUT_POSITION_GRAVITY:Int;
-}
+typedef UI_LAYOUT_POSITION = Int;
 
    // enum UI_LAYOUT_DISTRIBUTION_POSITION
-typedef UI_LAYOUT_DISTRIBUTION_POSITION = {
-    var UI_LAYOUT_DISTRIBUTION_POSITION_CENTER:Int;
-    var UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP:Int;
-    var UI_LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM:Int;
-}
+typedef UI_LAYOUT_DISTRIBUTION_POSITION = Int;
 
    // enum UI_MESSAGEWINDOW_SETTINGS
-typedef UI_MESSAGEWINDOW_SETTINGS = {
-    var UI_MESSAGEWINDOW_SETTINGS_OK:Int;
-    var UI_MESSAGEWINDOW_SETTINGS_OK_CANCEL:Int;
-    var UI_MESSAGEWINDOW_SETTINGS_YES_NO:Int;
-}
+typedef UI_MESSAGEWINDOW_SETTINGS = Int;
 
    // enum UI_SIZE_DEP
-typedef UI_SIZE_DEP = {
-    var UI_SIZE_DEP_NONE:Int;
-    var UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT:Int;
-    var UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH:Int;
-    var UI_SIZE_DEP_BOTH:Int;
-}
+typedef UI_SIZE_DEP = Int;
 
    // enum UI_SCROLL_MODE
-typedef UI_SCROLL_MODE = {
-    var UI_SCROLL_MODE_X_Y:Int;
-    var UI_SCROLL_MODE_Y:Int;
-    var UI_SCROLL_MODE_Y_AUTO:Int;
-    var UI_SCROLL_MODE_X_AUTO_Y_AUTO:Int;
-    var UI_SCROLL_MODE_OFF:Int;
-}
+typedef UI_SCROLL_MODE = Int;
 
    // enum UI_TEXT_ALIGN
-typedef UI_TEXT_ALIGN = {
-    var UI_TEXT_ALIGN_LEFT:Int;
-    var UI_TEXT_ALIGN_RIGHT:Int;
-    var UI_TEXT_ALIGN_CENTER:Int;
-}
+typedef UI_TEXT_ALIGN = Int;
 
    // enum UI_WIDGET_VISIBILITY
-typedef UI_WIDGET_VISIBILITY = {
-    var UI_WIDGET_VISIBILITY_VISIBLE:Int;
-    var UI_WIDGET_VISIBILITY_INVISIBLE:Int;
-    var UI_WIDGET_VISIBILITY_GONE:Int;
-}
+typedef UI_WIDGET_VISIBILITY = Int;
 
    // enum UI_GRAVITY
-typedef UI_GRAVITY = {
-    var UI_GRAVITY_NONE:Int;
-    var UI_GRAVITY_LEFT:Int;
-    var UI_GRAVITY_RIGHT:Int;
-    var UI_GRAVITY_TOP:Int;
-    var UI_GRAVITY_BOTTOM:Int;
-    var UI_GRAVITY_LEFT_RIGHT:Int;
-    var UI_GRAVITY_TOP_BOTTOM:Int;
-    var UI_GRAVITY_ALL:Int;
-    var UI_GRAVITY_DEFAULT:Int;
-}
+typedef UI_GRAVITY = Int;
 
    // enum UI_EVENT_TYPE
-typedef UI_EVENT_TYPE = {
-    var UI_EVENT_TYPE_CLICK:Int;
-    var UI_EVENT_TYPE_LONG_CLICK:Int;
-    var UI_EVENT_TYPE_POINTER_DOWN:Int;
-    var UI_EVENT_TYPE_POINTER_UP:Int;
-    var UI_EVENT_TYPE_POINTER_MOVE:Int;
-    var UI_EVENT_TYPE_RIGHT_POINTER_DOWN:Int;
-    var UI_EVENT_TYPE_RIGHT_POINTER_UP:Int;
-    var UI_EVENT_TYPE_WHEEL:Int;
-    var UI_EVENT_TYPE_CHANGED:Int;
-    var UI_EVENT_TYPE_KEY_DOWN:Int;
-    var UI_EVENT_TYPE_KEY_UP:Int;
-    var UI_EVENT_TYPE_SHORTCUT:Int;
-    var UI_EVENT_TYPE_CONTEXT_MENU:Int;
-    var UI_EVENT_TYPE_FILE_DROP:Int;
-    var UI_EVENT_TYPE_TAB_CHANGED:Int;
-    var UI_EVENT_TYPE_CUSTOM:Int;
-}
+typedef UI_EVENT_TYPE = Int;
 
    // enum UI_WIDGET_Z_REL
-typedef UI_WIDGET_Z_REL = {
-    var UI_WIDGET_Z_REL_BEFORE:Int;
-    var UI_WIDGET_Z_REL_AFTER:Int;
-}
+typedef UI_WIDGET_Z_REL = Int;
 
    // enum UI_WINDOW_SETTINGS
-typedef UI_WINDOW_SETTINGS = {
-    var UI_WINDOW_SETTINGS_NONE:Int;
-    var UI_WINDOW_SETTINGS_TITLEBAR:Int;
-    var UI_WINDOW_SETTINGS_RESIZABLE:Int;
-    var UI_WINDOW_SETTINGS_CLOSE_BUTTON:Int;
-    var UI_WINDOW_SETTINGS_CAN_ACTIVATE:Int;
-    var UI_WINDOW_SETTINGS_DEFAULT:Int;
-}
+typedef UI_WINDOW_SETTINGS = Int;
 
    // enum CompressedFormat
-typedef CompressedFormat = {
-    var CF_NONE:Int;
-    var CF_RGBA:Int;
-    var CF_DXT1:Int;
-    var CF_DXT3:Int;
-    var CF_DXT5:Int;
-    var CF_ETC1:Int;
-    var CF_PVRTC_RGB_2BPP:Int;
-    var CF_PVRTC_RGBA_2BPP:Int;
-    var CF_PVRTC_RGB_4BPP:Int;
-    var CF_PVRTC_RGBA_4BPP:Int;
-}
+typedef CompressedFormat = Int;
 
    // enum JSONValueType
-typedef JSONValueType = {
-    var JSON_ANY:Int;
-    var JSON_OBJECT:Int;
-    var JSON_ARRAY:Int;
-}
+typedef JSONValueType = Int;
 
    // enum PListValueType
-typedef PListValueType = {
-    var PLVT_NONE:Int;
-    var PLVT_INT:Int;
-    var PLVT_BOOL:Int;
-    var PLVT_FLOAT:Int;
-    var PLVT_STRING:Int;
-    var PLVT_VALUEMAP:Int;
-    var PLVT_VALUEVECTOR:Int;
-}
+typedef PListValueType = Int;
 
    // enum AsyncLoadState
-typedef AsyncLoadState = {
-    var ASYNC_DONE:Int;
-    var ASYNC_QUEUED:Int;
-    var ASYNC_LOADING:Int;
-    var ASYNC_SUCCESS:Int;
-    var ASYNC_FAIL:Int;
-}
+typedef AsyncLoadState = Int;
 
    // enum ResourceRequest
-typedef ResourceRequest = {
-    var RESOURCE_CHECKEXISTS:Int;
-    var RESOURCE_GETFILE:Int;
-}
+typedef ResourceRequest = Int;
 
    // enum ObserverPositionSendMode
-typedef ObserverPositionSendMode = {
-    var OPSM_NONE:Int;
-    var OPSM_POSITION:Int;
-    var OPSM_POSITION_ROTATION:Int;
-}
+typedef ObserverPositionSendMode = Int;
 
    // enum HttpRequestState
-typedef HttpRequestState = {
-    var HTTP_INITIALIZING:Int;
-    var HTTP_ERROR:Int;
-    var HTTP_OPEN:Int;
-    var HTTP_CLOSED:Int;
-}
+typedef HttpRequestState = Int;
 
    // enum FileMode
-typedef FileMode = {
-    var FILE_READ:Int;
-    var FILE_WRITE:Int;
-    var FILE_READWRITE:Int;
-}
+typedef FileMode = Int;
 //Atomic Haxe Definitions
 
 extern class Atomic {
 
+
+   // enum FrustumPlane
+    public static var PLANE_NEAR:FrustumPlane;
+    public static var PLANE_LEFT:FrustumPlane;
+    public static var PLANE_RIGHT:FrustumPlane;
+    public static var PLANE_UP:FrustumPlane;
+    public static var PLANE_DOWN:FrustumPlane;
+    public static var PLANE_FAR:FrustumPlane;
+
+   // enum Intersection
+    public static var OUTSIDE:Intersection;
+    public static var INTERSECTS:Intersection;
+    public static var INSIDE:Intersection;
+
+   // enum InterpolationMode
+    public static var BEZIER_CURVE:InterpolationMode;
+
+   // enum VariantType
+    public static var VAR_NONE:VariantType;
+    public static var VAR_INT:VariantType;
+    public static var VAR_BOOL:VariantType;
+    public static var VAR_FLOAT:VariantType;
+    public static var VAR_VECTOR2:VariantType;
+    public static var VAR_VECTOR3:VariantType;
+    public static var VAR_VECTOR4:VariantType;
+    public static var VAR_QUATERNION:VariantType;
+    public static var VAR_COLOR:VariantType;
+    public static var VAR_STRING:VariantType;
+    public static var VAR_BUFFER:VariantType;
+    public static var VAR_VOIDPTR:VariantType;
+    public static var VAR_RESOURCEREF:VariantType;
+    public static var VAR_RESOURCEREFLIST:VariantType;
+    public static var VAR_VARIANTVECTOR:VariantType;
+    public static var VAR_VARIANTMAP:VariantType;
+    public static var VAR_INTRECT:VariantType;
+    public static var VAR_INTVECTOR2:VariantType;
+    public static var VAR_PTR:VariantType;
+    public static var VAR_MATRIX3:VariantType;
+    public static var VAR_MATRIX3X4:VariantType;
+    public static var VAR_MATRIX4:VariantType;
+    public static var VAR_DOUBLE:VariantType;
+    public static var MAX_VAR_TYPES:VariantType;
+
+   // enum WrapMode
+    public static var WM_LOOP:WrapMode;
+    public static var WM_ONCE:WrapMode;
+    public static var WM_CLAMP:WrapMode;
+
+   // enum CreateMode
+    public static var REPLICATED:CreateMode;
+    public static var LOCAL:CreateMode;
+
+   // enum TransformSpace
+    public static var TS_LOCAL:TransformSpace;
+    public static var TS_PARENT:TransformSpace;
+    public static var TS_WORLD:TransformSpace;
+
+   // enum LoadMode
+    public static var LOAD_RESOURCES_ONLY:LoadMode;
+    public static var LOAD_SCENE:LoadMode;
+    public static var LOAD_SCENE_AND_RESOURCES:LoadMode;
+
+   // enum InterpMethod
+    public static var IM_LINEAR:InterpMethod;
+    public static var IM_SPLINE:InterpMethod;
+
+   // enum UpdateGeometryType
+    public static var UPDATE_NONE:UpdateGeometryType;
+    public static var UPDATE_MAIN_THREAD:UpdateGeometryType;
+    public static var UPDATE_WORKER_THREAD:UpdateGeometryType;
+
+   // enum PrimitiveType
+    public static var TRIANGLE_LIST:PrimitiveType;
+    public static var LINE_LIST:PrimitiveType;
+    public static var POINT_LIST:PrimitiveType;
+    public static var TRIANGLE_STRIP:PrimitiveType;
+    public static var LINE_STRIP:PrimitiveType;
+    public static var TRIANGLE_FAN:PrimitiveType;
+
+   // enum GeometryType
+    public static var GEOM_STATIC:GeometryType;
+    public static var GEOM_SKINNED:GeometryType;
+    public static var GEOM_INSTANCED:GeometryType;
+    public static var GEOM_BILLBOARD:GeometryType;
+    public static var GEOM_STATIC_NOINSTANCING:GeometryType;
+    public static var MAX_GEOMETRYTYPES:GeometryType;
+
+   // enum BlendMode
+    public static var BLEND_REPLACE:BlendMode;
+    public static var BLEND_ADD:BlendMode;
+    public static var BLEND_MULTIPLY:BlendMode;
+    public static var BLEND_ALPHA:BlendMode;
+    public static var BLEND_ADDALPHA:BlendMode;
+    public static var BLEND_PREMULALPHA:BlendMode;
+    public static var BLEND_INVDESTALPHA:BlendMode;
+    public static var BLEND_SUBTRACT:BlendMode;
+    public static var BLEND_SUBTRACTALPHA:BlendMode;
+    public static var MAX_BLENDMODES:BlendMode;
+
+   // enum CompareMode
+    public static var CMP_ALWAYS:CompareMode;
+    public static var CMP_EQUAL:CompareMode;
+    public static var CMP_NOTEQUAL:CompareMode;
+    public static var CMP_LESS:CompareMode;
+    public static var CMP_LESSEQUAL:CompareMode;
+    public static var CMP_GREATER:CompareMode;
+    public static var CMP_GREATEREQUAL:CompareMode;
+    public static var MAX_COMPAREMODES:CompareMode;
+
+   // enum CullMode
+    public static var CULL_NONE:CullMode;
+    public static var CULL_CCW:CullMode;
+    public static var CULL_CW:CullMode;
+    public static var MAX_CULLMODES:CullMode;
+
+   // enum FillMode
+    public static var FILL_SOLID:FillMode;
+    public static var FILL_WIREFRAME:FillMode;
+    public static var FILL_POINT:FillMode;
+
+   // enum StencilOp
+    public static var OP_KEEP:StencilOp;
+    public static var OP_ZERO:StencilOp;
+    public static var OP_REF:StencilOp;
+    public static var OP_INCR:StencilOp;
+    public static var OP_DECR:StencilOp;
+
+   // enum LockState
+    public static var LOCK_NONE:LockState;
+    public static var LOCK_HARDWARE:LockState;
+    public static var LOCK_SHADOW:LockState;
+    public static var LOCK_SCRATCH:LockState;
+
+   // enum VertexElement
+    public static var ELEMENT_POSITION:VertexElement;
+    public static var ELEMENT_NORMAL:VertexElement;
+    public static var ELEMENT_COLOR:VertexElement;
+    public static var ELEMENT_TEXCOORD1:VertexElement;
+    public static var ELEMENT_TEXCOORD2:VertexElement;
+    public static var ELEMENT_CUBETEXCOORD1:VertexElement;
+    public static var ELEMENT_CUBETEXCOORD2:VertexElement;
+    public static var ELEMENT_TANGENT:VertexElement;
+    public static var ELEMENT_BLENDWEIGHTS:VertexElement;
+    public static var ELEMENT_BLENDINDICES:VertexElement;
+    public static var ELEMENT_INSTANCEMATRIX1:VertexElement;
+    public static var ELEMENT_INSTANCEMATRIX2:VertexElement;
+    public static var ELEMENT_INSTANCEMATRIX3:VertexElement;
+    public static var MAX_VERTEX_ELEMENTS:VertexElement;
+
+   // enum TextureFilterMode
+    public static var FILTER_NEAREST:TextureFilterMode;
+    public static var FILTER_BILINEAR:TextureFilterMode;
+    public static var FILTER_TRILINEAR:TextureFilterMode;
+    public static var FILTER_ANISOTROPIC:TextureFilterMode;
+    public static var FILTER_DEFAULT:TextureFilterMode;
+    public static var MAX_FILTERMODES:TextureFilterMode;
+
+   // enum TextureAddressMode
+    public static var ADDRESS_WRAP:TextureAddressMode;
+    public static var ADDRESS_MIRROR:TextureAddressMode;
+    public static var ADDRESS_CLAMP:TextureAddressMode;
+    public static var ADDRESS_BORDER:TextureAddressMode;
+    public static var MAX_ADDRESSMODES:TextureAddressMode;
+
+   // enum TextureCoordinate
+    public static var COORD_U:TextureCoordinate;
+    public static var COORD_V:TextureCoordinate;
+    public static var COORD_W:TextureCoordinate;
+    public static var MAX_COORDS:TextureCoordinate;
+
+   // enum TextureUsage
+    public static var TEXTURE_STATIC:TextureUsage;
+    public static var TEXTURE_DYNAMIC:TextureUsage;
+    public static var TEXTURE_RENDERTARGET:TextureUsage;
+    public static var TEXTURE_DEPTHSTENCIL:TextureUsage;
+
+   // enum CubeMapFace
+    public static var FACE_POSITIVE_X:CubeMapFace;
+    public static var FACE_NEGATIVE_X:CubeMapFace;
+    public static var FACE_POSITIVE_Y:CubeMapFace;
+    public static var FACE_NEGATIVE_Y:CubeMapFace;
+    public static var FACE_POSITIVE_Z:CubeMapFace;
+    public static var FACE_NEGATIVE_Z:CubeMapFace;
+    public static var MAX_CUBEMAP_FACES:CubeMapFace;
+
+   // enum CubeMapLayout
+    public static var CML_HORIZONTAL:CubeMapLayout;
+    public static var CML_HORIZONTALNVIDIA:CubeMapLayout;
+    public static var CML_HORIZONTALCROSS:CubeMapLayout;
+    public static var CML_VERTICALCROSS:CubeMapLayout;
+    public static var CML_BLENDER:CubeMapLayout;
+
+   // enum RenderSurfaceUpdateMode
+    public static var SURFACE_MANUALUPDATE:RenderSurfaceUpdateMode;
+    public static var SURFACE_UPDATEVISIBLE:RenderSurfaceUpdateMode;
+    public static var SURFACE_UPDATEALWAYS:RenderSurfaceUpdateMode;
+
+   // enum ShaderType
+    public static var VS:ShaderType;
+    public static var PS:ShaderType;
+
+   // enum ShaderParameterGroup
+    public static var SP_FRAME:ShaderParameterGroup;
+    public static var SP_CAMERA:ShaderParameterGroup;
+    public static var SP_ZONE:ShaderParameterGroup;
+    public static var SP_LIGHT:ShaderParameterGroup;
+    public static var SP_MATERIAL:ShaderParameterGroup;
+    public static var SP_OBJECT:ShaderParameterGroup;
+    public static var SP_CUSTOM:ShaderParameterGroup;
+    public static var MAX_SHADER_PARAMETER_GROUPS:ShaderParameterGroup;
+
+   // enum TextureUnit
+    public static var TU_DIFFUSE:TextureUnit;
+    public static var TU_ALBEDOBUFFER:TextureUnit;
+    public static var TU_NORMAL:TextureUnit;
+    public static var TU_NORMALBUFFER:TextureUnit;
+    public static var TU_SPECULAR:TextureUnit;
+    public static var TU_EMISSIVE:TextureUnit;
+    public static var TU_ENVIRONMENT:TextureUnit;
+    public static var TU_VOLUMEMAP:TextureUnit;
+    public static var TU_CUSTOM1:TextureUnit;
+    public static var TU_CUSTOM2:TextureUnit;
+    public static var TU_LIGHTRAMP:TextureUnit;
+    public static var TU_LIGHTSHAPE:TextureUnit;
+    public static var TU_SHADOWMAP:TextureUnit;
+    public static var TU_FACESELECT:TextureUnit;
+    public static var TU_INDIRECTION:TextureUnit;
+    public static var TU_DEPTHBUFFER:TextureUnit;
+    public static var TU_LIGHTBUFFER:TextureUnit;
+    public static var TU_ZONE:TextureUnit;
+    public static var MAX_MATERIAL_TEXTURE_UNITS:TextureUnit;
+    public static var MAX_TEXTURE_UNITS:TextureUnit;
+
+   // enum FaceCameraMode
+    public static var FC_NONE:FaceCameraMode;
+    public static var FC_ROTATE_XYZ:FaceCameraMode;
+    public static var FC_ROTATE_Y:FaceCameraMode;
+    public static var FC_LOOKAT_XYZ:FaceCameraMode;
+    public static var FC_LOOKAT_Y:FaceCameraMode;
+
+   // enum LightType
+    public static var LIGHT_DIRECTIONAL:LightType;
+    public static var LIGHT_SPOT:LightType;
+    public static var LIGHT_POINT:LightType;
+
+   // enum RayQueryLevel
+    public static var RAY_AABB:RayQueryLevel;
+    public static var RAY_OBB:RayQueryLevel;
+    public static var RAY_TRIANGLE:RayQueryLevel;
+    public static var RAY_TRIANGLE_UV:RayQueryLevel;
+
+   // enum LightVSVariation
+    public static var LVS_DIR:LightVSVariation;
+    public static var LVS_SPOT:LightVSVariation;
+    public static var LVS_POINT:LightVSVariation;
+    public static var LVS_SHADOW:LightVSVariation;
+    public static var LVS_SPOTSHADOW:LightVSVariation;
+    public static var LVS_POINTSHADOW:LightVSVariation;
+    public static var MAX_LIGHT_VS_VARIATIONS:LightVSVariation;
+
+   // enum VertexLightVSVariation
+    public static var VLVS_NOLIGHTS:VertexLightVSVariation;
+    public static var VLVS_1LIGHT:VertexLightVSVariation;
+    public static var VLVS_2LIGHTS:VertexLightVSVariation;
+    public static var VLVS_3LIGHTS:VertexLightVSVariation;
+    public static var VLVS_4LIGHTS:VertexLightVSVariation;
+    public static var MAX_VERTEXLIGHT_VS_VARIATIONS:VertexLightVSVariation;
+
+   // enum LightPSVariation
+    public static var LPS_NONE:LightPSVariation;
+    public static var LPS_SPOT:LightPSVariation;
+    public static var LPS_POINT:LightPSVariation;
+    public static var LPS_POINTMASK:LightPSVariation;
+    public static var LPS_SPEC:LightPSVariation;
+    public static var LPS_SPOTSPEC:LightPSVariation;
+    public static var LPS_POINTSPEC:LightPSVariation;
+    public static var LPS_POINTMASKSPEC:LightPSVariation;
+    public static var LPS_SHADOW:LightPSVariation;
+    public static var LPS_SPOTSHADOW:LightPSVariation;
+    public static var LPS_POINTSHADOW:LightPSVariation;
+    public static var LPS_POINTMASKSHADOW:LightPSVariation;
+    public static var LPS_SHADOWSPEC:LightPSVariation;
+    public static var LPS_SPOTSHADOWSPEC:LightPSVariation;
+    public static var LPS_POINTSHADOWSPEC:LightPSVariation;
+    public static var LPS_POINTMASKSHADOWSPEC:LightPSVariation;
+    public static var MAX_LIGHT_PS_VARIATIONS:LightPSVariation;
+
+   // enum DeferredLightVSVariation
+    public static var DLVS_NONE:DeferredLightVSVariation;
+    public static var DLVS_DIR:DeferredLightVSVariation;
+    public static var DLVS_ORTHO:DeferredLightVSVariation;
+    public static var DLVS_ORTHODIR:DeferredLightVSVariation;
+    public static var MAX_DEFERRED_LIGHT_VS_VARIATIONS:DeferredLightVSVariation;
+
+   // enum DeferredLightPSVariation
+    public static var DLPS_NONE:DeferredLightPSVariation;
+    public static var DLPS_SPOT:DeferredLightPSVariation;
+    public static var DLPS_POINT:DeferredLightPSVariation;
+    public static var DLPS_POINTMASK:DeferredLightPSVariation;
+    public static var DLPS_SPEC:DeferredLightPSVariation;
+    public static var DLPS_SPOTSPEC:DeferredLightPSVariation;
+    public static var DLPS_POINTSPEC:DeferredLightPSVariation;
+    public static var DLPS_POINTMASKSPEC:DeferredLightPSVariation;
+    public static var DLPS_SHADOW:DeferredLightPSVariation;
+    public static var DLPS_SPOTSHADOW:DeferredLightPSVariation;
+    public static var DLPS_POINTSHADOW:DeferredLightPSVariation;
+    public static var DLPS_POINTMASKSHADOW:DeferredLightPSVariation;
+    public static var DLPS_SHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_SPOTSHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_POINTSHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_POINTMASKSHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHO:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSPOT:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINT:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTMASK:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSPOTSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTMASKSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSHADOW:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSPOTSHADOW:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTSHADOW:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTMASKSHADOW:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOSPOTSHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTSHADOWSPEC:DeferredLightPSVariation;
+    public static var DLPS_ORTHOPOINTMASKSHADOWSPEC:DeferredLightPSVariation;
+    public static var MAX_DEFERRED_LIGHT_PS_VARIATIONS:DeferredLightPSVariation;
+
+   // enum RenderCommandType
+    public static var CMD_NONE:RenderCommandType;
+    public static var CMD_CLEAR:RenderCommandType;
+    public static var CMD_SCENEPASS:RenderCommandType;
+    public static var CMD_QUAD:RenderCommandType;
+    public static var CMD_FORWARDLIGHTS:RenderCommandType;
+    public static var CMD_LIGHTVOLUMES:RenderCommandType;
+    public static var CMD_RENDERUI:RenderCommandType;
+
+   // enum RenderCommandSortMode
+    public static var SORT_FRONTTOBACK:RenderCommandSortMode;
+    public static var SORT_BACKTOFRONT:RenderCommandSortMode;
+
+   // enum RenderTargetSizeMode
+    public static var SIZE_ABSOLUTE:RenderTargetSizeMode;
+    public static var SIZE_VIEWPORTDIVISOR:RenderTargetSizeMode;
+    public static var SIZE_VIEWPORTMULTIPLIER:RenderTargetSizeMode;
+
+   // enum PassLightingMode
+    public static var LIGHTING_UNLIT:PassLightingMode;
+    public static var LIGHTING_PERVERTEX:PassLightingMode;
+    public static var LIGHTING_PERPIXEL:PassLightingMode;
+
+   // enum EmitterType
+    public static var EMITTER_SPHERE:EmitterType;
+    public static var EMITTER_BOX:EmitterType;
+
+   // enum LoopMode2D
+    public static var LM_DEFAULT:LoopMode2D;
+    public static var LM_FORCE_LOOPED:LoopMode2D;
+    public static var LM_FORCE_CLAMPED:LoopMode2D;
+
+   // enum LightType2D
+    public static var LIGHT2D_DIRECTIONAL:LightType2D;
+    public static var LIGHT2D_POINT:LightType2D;
+
+   // enum EmitterType2D
+    public static var EMITTER_TYPE_GRAVITY:EmitterType2D;
+    public static var EMITTER_TYPE_RADIAL:EmitterType2D;
+
+   // enum BodyType2D
+    public static var BT_STATIC:BodyType2D;
+    public static var BT_DYNAMIC:BodyType2D;
+    public static var BT_KINEMATIC:BodyType2D;
+
+   // enum Orientation2D
+    public static var O_ORTHOGONAL:Orientation2D;
+    public static var O_ISOMETRIC:Orientation2D;
+    public static var O_STAGGERED:Orientation2D;
+
+   // enum TileMapLayerType2D
+    public static var LT_TILE_LAYER:TileMapLayerType2D;
+    public static var LT_OBJECT_GROUP:TileMapLayerType2D;
+    public static var LT_IMAGE_LAYER:TileMapLayerType2D;
+    public static var LT_INVALID:TileMapLayerType2D;
+
+   // enum TileMapObjectType2D
+    public static var OT_RECTANGLE:TileMapObjectType2D;
+    public static var OT_ELLIPSE:TileMapObjectType2D;
+    public static var OT_POLYGON:TileMapObjectType2D;
+    public static var OT_POLYLINE:TileMapObjectType2D;
+    public static var OT_TILE:TileMapObjectType2D;
+    public static var OT_INVALID:TileMapObjectType2D;
+
+   // enum ShapeType
+    public static var SHAPE_BOX:ShapeType;
+    public static var SHAPE_SPHERE:ShapeType;
+    public static var SHAPE_STATICPLANE:ShapeType;
+    public static var SHAPE_CYLINDER:ShapeType;
+    public static var SHAPE_CAPSULE:ShapeType;
+    public static var SHAPE_CONE:ShapeType;
+    public static var SHAPE_TRIANGLEMESH:ShapeType;
+    public static var SHAPE_CONVEXHULL:ShapeType;
+    public static var SHAPE_TERRAIN:ShapeType;
+
+   // enum ConstraintType
+    public static var CONSTRAINT_POINT:ConstraintType;
+    public static var CONSTRAINT_HINGE:ConstraintType;
+    public static var CONSTRAINT_SLIDER:ConstraintType;
+    public static var CONSTRAINT_CONETWIST:ConstraintType;
+
+   // enum CollisionEventMode
+    public static var COLLISION_NEVER:CollisionEventMode;
+    public static var COLLISION_ACTIVE:CollisionEventMode;
+    public static var COLLISION_ALWAYS:CollisionEventMode;
+
+   // enum CrowdTargetState
+    public static var CROWD_AGENT_TARGET_NONE:CrowdTargetState;
+    public static var CROWD_AGENT_TARGET_FAILED:CrowdTargetState;
+    public static var CROWD_AGENT_TARGET_VALID:CrowdTargetState;
+    public static var CROWD_AGENT_TARGET_REQUESTING:CrowdTargetState;
+    public static var CROWD_AGENT_TARGET_WAITINGFORQUEUE:CrowdTargetState;
+    public static var CROWD_AGENT_TARGET_WAITINGFORPATH:CrowdTargetState;
+    public static var CROWD_AGENT_TARGET_VELOCITY:CrowdTargetState;
+
+   // enum CrowdAgentState
+    public static var CROWD_AGENT_INVALID:CrowdAgentState;
+    public static var CROWD_AGENT_READY:CrowdAgentState;
+    public static var CROWD_AGENT_TRAVERSINGLINK:CrowdAgentState;
+
+   // enum NavigationQuality
+    public static var NAVIGATIONQUALITY_LOW:NavigationQuality;
+    public static var NAVIGATIONQUALITY_MEDIUM:NavigationQuality;
+    public static var NAVIGATIONQUALITY_HIGH:NavigationQuality;
+
+   // enum NavigationPushiness
+    public static var PUSHINESS_LOW:NavigationPushiness;
+    public static var PUSHINESS_MEDIUM:NavigationPushiness;
+    public static var PUSHINESS_HIGH:NavigationPushiness;
+
+   // enum NavmeshPartitionType
+    public static var NAVMESH_PARTITION_WATERSHED:NavmeshPartitionType;
+    public static var NAVMESH_PARTITION_MONOTONE:NavmeshPartitionType;
+
+   // enum MouseMode
+    public static var MM_ABSOLUTE:MouseMode;
+    public static var MM_RELATIVE:MouseMode;
+    public static var MM_WRAP:MouseMode;
+
+   // enum TEXT_ALIGN
+    public static var TEXT_ALIGN_LEFT:TEXT_ALIGN;
+    public static var TEXT_ALIGN_RIGHT:TEXT_ALIGN;
+    public static var TEXT_ALIGN_CENTER:TEXT_ALIGN;
+
+   // enum UI_EDIT_TYPE
+    public static var UI_EDIT_TYPE_TEXT:UI_EDIT_TYPE;
+    public static var UI_EDIT_TYPE_SEARCH:UI_EDIT_TYPE;
+    public static var UI_EDIT_TYPE_PASSWORD:UI_EDIT_TYPE;
+    public static var UI_EDIT_TYPE_EMAIL:UI_EDIT_TYPE;
+    public static var UI_EDIT_TYPE_PHONE:UI_EDIT_TYPE;
+    public static var UI_EDIT_TYPE_URL:UI_EDIT_TYPE;
+    public static var UI_EDIT_TYPE_NUMBER:UI_EDIT_TYPE;
+
+   // enum UI_AXIS
+    public static var UI_AXIS_X:UI_AXIS;
+    public static var UI_AXIS_Y:UI_AXIS;
+
+   // enum UI_LAYOUT_SIZE
+    public static var UI_LAYOUT_SIZE_GRAVITY:UI_LAYOUT_SIZE;
+    public static var UI_LAYOUT_SIZE_PREFERRED:UI_LAYOUT_SIZE;
+    public static var UI_LAYOUT_SIZE_AVAILABLE:UI_LAYOUT_SIZE;
+
+   // enum UI_LAYOUT_DISTRIBUTION
+    public static var UI_LAYOUT_DISTRIBUTION_PREFERRED:UI_LAYOUT_DISTRIBUTION;
+    public static var UI_LAYOUT_DISTRIBUTION_AVAILABLE:UI_LAYOUT_DISTRIBUTION;
+    public static var UI_LAYOUT_DISTRIBUTION_GRAVITY:UI_LAYOUT_DISTRIBUTION;
+
+   // enum UI_LAYOUT_POSITION
+    public static var UI_LAYOUT_POSITION_CENTER:UI_LAYOUT_POSITION;
+    public static var UI_LAYOUT_POSITION_LEFT_TOP:UI_LAYOUT_POSITION;
+    public static var UI_LAYOUT_POSITION_RIGHT_BOTTOM:UI_LAYOUT_POSITION;
+    public static var UI_LAYOUT_POSITION_GRAVITY:UI_LAYOUT_POSITION;
+
+   // enum UI_LAYOUT_DISTRIBUTION_POSITION
+    public static var UI_LAYOUT_DISTRIBUTION_POSITION_CENTER:UI_LAYOUT_DISTRIBUTION_POSITION;
+    public static var UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP:UI_LAYOUT_DISTRIBUTION_POSITION;
+    public static var UI_LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM:UI_LAYOUT_DISTRIBUTION_POSITION;
+
+   // enum UI_MESSAGEWINDOW_SETTINGS
+    public static var UI_MESSAGEWINDOW_SETTINGS_OK:UI_MESSAGEWINDOW_SETTINGS;
+    public static var UI_MESSAGEWINDOW_SETTINGS_OK_CANCEL:UI_MESSAGEWINDOW_SETTINGS;
+    public static var UI_MESSAGEWINDOW_SETTINGS_YES_NO:UI_MESSAGEWINDOW_SETTINGS;
+
+   // enum UI_SIZE_DEP
+    public static var UI_SIZE_DEP_NONE:UI_SIZE_DEP;
+    public static var UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT:UI_SIZE_DEP;
+    public static var UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH:UI_SIZE_DEP;
+    public static var UI_SIZE_DEP_BOTH:UI_SIZE_DEP;
+
+   // enum UI_SCROLL_MODE
+    public static var UI_SCROLL_MODE_X_Y:UI_SCROLL_MODE;
+    public static var UI_SCROLL_MODE_Y:UI_SCROLL_MODE;
+    public static var UI_SCROLL_MODE_Y_AUTO:UI_SCROLL_MODE;
+    public static var UI_SCROLL_MODE_X_AUTO_Y_AUTO:UI_SCROLL_MODE;
+    public static var UI_SCROLL_MODE_OFF:UI_SCROLL_MODE;
+
+   // enum UI_TEXT_ALIGN
+    public static var UI_TEXT_ALIGN_LEFT:UI_TEXT_ALIGN;
+    public static var UI_TEXT_ALIGN_RIGHT:UI_TEXT_ALIGN;
+    public static var UI_TEXT_ALIGN_CENTER:UI_TEXT_ALIGN;
+
+   // enum UI_WIDGET_VISIBILITY
+    public static var UI_WIDGET_VISIBILITY_VISIBLE:UI_WIDGET_VISIBILITY;
+    public static var UI_WIDGET_VISIBILITY_INVISIBLE:UI_WIDGET_VISIBILITY;
+    public static var UI_WIDGET_VISIBILITY_GONE:UI_WIDGET_VISIBILITY;
+
+   // enum UI_GRAVITY
+    public static var UI_GRAVITY_NONE:UI_GRAVITY;
+    public static var UI_GRAVITY_LEFT:UI_GRAVITY;
+    public static var UI_GRAVITY_RIGHT:UI_GRAVITY;
+    public static var UI_GRAVITY_TOP:UI_GRAVITY;
+    public static var UI_GRAVITY_BOTTOM:UI_GRAVITY;
+    public static var UI_GRAVITY_LEFT_RIGHT:UI_GRAVITY;
+    public static var UI_GRAVITY_TOP_BOTTOM:UI_GRAVITY;
+    public static var UI_GRAVITY_ALL:UI_GRAVITY;
+    public static var UI_GRAVITY_DEFAULT:UI_GRAVITY;
+
+   // enum UI_EVENT_TYPE
+    public static var UI_EVENT_TYPE_CLICK:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_LONG_CLICK:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_POINTER_DOWN:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_POINTER_UP:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_POINTER_MOVE:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_RIGHT_POINTER_DOWN:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_RIGHT_POINTER_UP:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_WHEEL:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_CHANGED:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_KEY_DOWN:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_KEY_UP:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_SHORTCUT:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_CONTEXT_MENU:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_FILE_DROP:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_TAB_CHANGED:UI_EVENT_TYPE;
+    public static var UI_EVENT_TYPE_CUSTOM:UI_EVENT_TYPE;
+
+   // enum UI_WIDGET_Z_REL
+    public static var UI_WIDGET_Z_REL_BEFORE:UI_WIDGET_Z_REL;
+    public static var UI_WIDGET_Z_REL_AFTER:UI_WIDGET_Z_REL;
+
+   // enum UI_WINDOW_SETTINGS
+    public static var UI_WINDOW_SETTINGS_NONE:UI_WINDOW_SETTINGS;
+    public static var UI_WINDOW_SETTINGS_TITLEBAR:UI_WINDOW_SETTINGS;
+    public static var UI_WINDOW_SETTINGS_RESIZABLE:UI_WINDOW_SETTINGS;
+    public static var UI_WINDOW_SETTINGS_CLOSE_BUTTON:UI_WINDOW_SETTINGS;
+    public static var UI_WINDOW_SETTINGS_CAN_ACTIVATE:UI_WINDOW_SETTINGS;
+    public static var UI_WINDOW_SETTINGS_DEFAULT:UI_WINDOW_SETTINGS;
+
+   // enum CompressedFormat
+    public static var CF_NONE:CompressedFormat;
+    public static var CF_RGBA:CompressedFormat;
+    public static var CF_DXT1:CompressedFormat;
+    public static var CF_DXT3:CompressedFormat;
+    public static var CF_DXT5:CompressedFormat;
+    public static var CF_ETC1:CompressedFormat;
+    public static var CF_PVRTC_RGB_2BPP:CompressedFormat;
+    public static var CF_PVRTC_RGBA_2BPP:CompressedFormat;
+    public static var CF_PVRTC_RGB_4BPP:CompressedFormat;
+    public static var CF_PVRTC_RGBA_4BPP:CompressedFormat;
+
+   // enum JSONValueType
+    public static var JSON_ANY:JSONValueType;
+    public static var JSON_OBJECT:JSONValueType;
+    public static var JSON_ARRAY:JSONValueType;
+
+   // enum PListValueType
+    public static var PLVT_NONE:PListValueType;
+    public static var PLVT_INT:PListValueType;
+    public static var PLVT_BOOL:PListValueType;
+    public static var PLVT_FLOAT:PListValueType;
+    public static var PLVT_STRING:PListValueType;
+    public static var PLVT_VALUEMAP:PListValueType;
+    public static var PLVT_VALUEVECTOR:PListValueType;
+
+   // enum AsyncLoadState
+    public static var ASYNC_DONE:AsyncLoadState;
+    public static var ASYNC_QUEUED:AsyncLoadState;
+    public static var ASYNC_LOADING:AsyncLoadState;
+    public static var ASYNC_SUCCESS:AsyncLoadState;
+    public static var ASYNC_FAIL:AsyncLoadState;
+
+   // enum ResourceRequest
+    public static var RESOURCE_CHECKEXISTS:ResourceRequest;
+    public static var RESOURCE_GETFILE:ResourceRequest;
+
+   // enum ObserverPositionSendMode
+    public static var OPSM_NONE:ObserverPositionSendMode;
+    public static var OPSM_POSITION:ObserverPositionSendMode;
+    public static var OPSM_POSITION_ROTATION:ObserverPositionSendMode;
+
+   // enum HttpRequestState
+    public static var HTTP_INITIALIZING:HttpRequestState;
+    public static var HTTP_ERROR:HttpRequestState;
+    public static var HTTP_OPEN:HttpRequestState;
+    public static var HTTP_CLOSED:HttpRequestState;
+
+   // enum FileMode
+    public static var FILE_READ:FileMode;
+    public static var FILE_WRITE:FileMode;
+    public static var FILE_READWRITE:FileMode;
 
    public static var QUICKSORT_THRESHOLD: Int;
    public static var CONVERSION_BUFFER_LENGTH: Int;
@@ -4595,8 +4677,8 @@ extern class AnimatedSprite2D extends StaticSprite2D {
     override function onSetEnabled(): Void;
       // Set speed.
     function setSpeed(speed: Float): Void;
-      // Set animation by animation set, name and loop mode.
-    function setAnimation(animationSet: AnimationSet2D, name: String, ?loopMode: LoopMode2D): Void;
+      // Set animation by name and loop mode.
+    function setAnimation(name: String, ?loopMode: LoopMode2D): Void;
       // Set animation set.
     function setAnimationSet(animationSet: AnimationSet2D): Void;
       // Set loop mode.
@@ -5261,7 +5343,7 @@ extern class Drawable2D extends Drawable {
 @:native("Atomic.Light2D")
 extern class Light2D extends Component {
 
-    var lightGroup: Light2DGroup;
+    var lightGroupID: Int;
     var color: Color;
     var numRays: Int;
     var lightType: LightType2D;
@@ -5273,8 +5355,8 @@ extern class Light2D extends Component {
       // Construct.
     function new();
 
-    function setLightGroup(group: Light2DGroup): Void;
-    function getLightGroup(): Light2DGroup;
+    function setLightGroupID(id: Int): Void;
+    function getLightGroupID(): Int;
     function getColor(): Color;
     function setColor(color: Color): Void;
     function updateVertices(): Void;
@@ -5340,17 +5422,20 @@ extern class Light2DGroup extends Drawable2D {
 
     var physicsWorld: PhysicsWorld2D;
     var ambientColor: Color;
+    var lightGroupID: Int;
     var frustumBox: BoundingBox;
 
       // Construct.
     function new();
 
-    function setPhysicsWorld(physicsWorld: PhysicsWorld2D): Void;
     function getPhysicsWorld(): PhysicsWorld2D;
     function addLight2D(light: Light2D): Void;
+    function removeLight2D(light: Light2D): Void;
     function setDirty(): Void;
     function setAmbientColor(color: Color): Void;
     function getAmbientColor(): Color;
+    function setLightGroupID(id: Int): Void;
+    function getLightGroupID(): Int;
     function getFrustumBox(): BoundingBox;
 
 }

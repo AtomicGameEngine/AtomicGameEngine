@@ -375,18 +375,18 @@ namespace ToolCore
         for (unsigned i = 0; i <enums.Size(); i++)
         {
             JSBEnum* _enum = enums[i];
-
+            //TODO: support for enums(for the first need to make support for enums in haxe2js compiler)
             source_ += "\n   // enum " + _enum->GetName() + "\n";
-            source_ += "typedef " + _enum->GetName() + " = {\n";
+            source_ += "typedef " + _enum->GetName() + " = Int;\n";
 
-            Vector<String>& values = _enum->GetValues();
+            //Vector<String>& values = _enum->GetValues();
 
-            for (unsigned j = 0; j < values.Size(); j++)
-            {
-                source_ += "    var " + values[j] + ":Int;\n";
-            }
+            //for (unsigned j = 0; j < values.Size(); j++)
+            //{
+            //    source_ += "var " + values[j] + ":" + _enum->GetName() +";\n";
+            //}
 
-            source_ += "}\n";
+            //source_ += "}\n";
 
         }
 
@@ -402,14 +402,14 @@ namespace ToolCore
             JSBEnum* _enum = enums[i];
 
             source_ += "\n   // enum " + _enum->GetName() + "\n";
-            source_ += "    public static var " + _enum->GetName() + ":" + _enum->GetName() + ";\n";
+            //source_ += "    public static var " + _enum->GetName() + ":" + _enum->GetName() + ";\n";
 
-            //Vector<String>& values = _enum->GetValues();
+            Vector<String>& values = _enum->GetValues();
 
-            //for (unsigned j = 0; j < values.Size(); j++)
-            //{
-            //    source_ += "    var " + values[j] + ":Int;\n";
-            //}
+            for (unsigned j = 0; j < values.Size(); j++)
+            {
+                source_ += "    public static var " + values[j] + ":" + _enum->GetName() + ";\n";
+            }
             //source_ += "}\n";
 
         }
@@ -433,7 +433,7 @@ namespace ToolCore
 
         Vector<SharedPtr<JSBModule>>& modules = package->GetModules();
 
-        source_ += "package;\n\n";
+        source_ += "package atomic;\n\n";
 
         for (unsigned i = 0; i < modules.Size(); i++)
         {
@@ -442,10 +442,10 @@ namespace ToolCore
 
         Begin();
 
-        //for (unsigned i = 0; i < modules.Size(); i++)
-        //{
-        //    RegisterEnums(modules[i]);
-        //}
+        for (unsigned i = 0; i < modules.Size(); i++)
+        {
+            RegisterEnums(modules[i]);
+        }
 
         for (unsigned i = 0; i < modules.Size(); i++)
         {

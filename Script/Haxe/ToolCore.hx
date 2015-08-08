@@ -2,18 +2,19 @@ package;
 
 
    // enum PlatformID
-typedef PlatformID = {
-    var PLATFORMID_UNDEFINED:Int;
-    var PLATFORMID_WINDOWS:Int;
-    var PLATFORMID_MAC:Int;
-    var PLATFORMID_ANDROID:Int;
-    var PLATFORMID_IOS:Int;
-    var PLATFORMID_WEB:Int;
-}
+typedef PlatformID = Int;
 //Atomic Haxe Definitions
 
 extern class ToolCore {
 
+
+   // enum PlatformID
+    public static var PLATFORMID_UNDEFINED:PlatformID;
+    public static var PLATFORMID_WINDOWS:PlatformID;
+    public static var PLATFORMID_MAC:PlatformID;
+    public static var PLATFORMID_ANDROID:PlatformID;
+    public static var PLATFORMID_IOS:PlatformID;
+    public static var PLATFORMID_WEB:PlatformID;
 
    public static var PROJECTFILE_VERSION: Int;
 
@@ -256,6 +257,7 @@ extern class Asset extends AObject {
     var guid: String;
     var name: String;
     var path: String;
+    var extension: String;
     var relativePath: String;
     var cachePath: String;
     var importerType: String;
@@ -275,6 +277,7 @@ extern class Asset extends AObject {
     function getGUID(): String;
     function getName(): String;
     function getPath(): String;
+    function getExtension(): String;
       // Get the path relative to project
     function getRelativePath(): String;
     function getCachePath(): String;
