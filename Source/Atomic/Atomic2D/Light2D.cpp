@@ -55,7 +55,7 @@ void Light2D::SetNumRays(int numRays)
 
 void Light2D::OnSceneSet(Scene* scene)
 {
-    if (scene)
+    if (scene && !context_->GetEditorContext())
     {
         PODVector<Light2DGroup*> lightgroups;
         scene->GetComponents<Light2DGroup>(lightgroups, true);
@@ -383,7 +383,7 @@ void PositionalLight2D::RegisterObject(Context* context)
 
 void PositionalLight2D::UpdateVertices()
 {
-    if (!lightgroup_ || !enabled_)
+    if (!lightgroup_ || !enabled_ || context_->GetEditorContext())
     {
         vertices_.Clear();
         return;
@@ -499,7 +499,7 @@ void PointLight2D::UpdateVertices()
 {
     const Node* lightNode = GetNode();
 
-    if (!lightgroup_ || !enabled_ || !lightNode)
+    if (!lightgroup_ || !enabled_ || !lightNode || context_->GetEditorContext())
     {
         vertices_.Clear();
         return;
@@ -536,7 +536,7 @@ void Light2DGroup::RegisterObject(Context* context)
 void Light2DGroup::OnSceneSet(Scene* scene)
 {
 
-    if (scene && node_)
+    if (scene && node_ && !context_->GetEditorContext())
     {
         physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
 

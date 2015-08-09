@@ -5,7 +5,7 @@
  *  include guard.  Other parts of the header are Duktape
  *  internal and related to platform/compiler/feature detection.
  *
- *  Git commit b098f0423266f5dbfd7a67fc3a6146455df9b61c (v1.2.0-257-gb098f04-dirty).
+ *  Git commit 281739096bf0c73d5c494069b3146e80dcbbde58 (v1.2.0-289-g2817390).
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
  *  licensing information.
@@ -16,21 +16,21 @@
  *  ===============
  *  Duktape license
  *  ===============
- *  
+ *
  *  (http://opensource.org/licenses/MIT)
- *  
+ *
  *  Copyright (c) 2013-2015 by Duktape authors (see AUTHORS.rst)
- *  
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in
  *  all copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,35 +45,36 @@
  *  ===============
  *  Duktape authors
  *  ===============
- *  
+ *
  *  Copyright
  *  =========
- *  
+ *
  *  Duktape copyrights are held by its authors.  Each author has a copyright
  *  to their contribution, and agrees to irrevocably license the contribution
  *  under the Duktape ``LICENSE.txt``.
- *  
+ *
  *  Authors
  *  =======
- *  
+ *
  *  Please include an e-mail address, a link to your GitHub profile, or something
  *  similar to allow your contribution to be identified accurately.
- *  
+ *
  *  The following people have contributed code and agreed to irrevocably license
  *  their contributions under the Duktape ``LICENSE.txt`` (in order of appearance):
- *  
+ *
  *  * Sami Vaarala <sami.vaarala@iki.fi>
  *  * Niki Dobrev
  *  * Andreas \u00d6man <andreas@lonelycoder.com>
  *  * L\u00e1szl\u00f3 Lang\u00f3 <llango.u-szeged@partner.samsung.com>
  *  * Legimet <legimet.calc@gmail.com>
- *  
+ *  * Karl Skomski <karl@skomski.com>
+ *
  *  Other contributions
  *  ===================
- *  
+ *
  *  The following people have contributed something other than code (e.g. reported
  *  bugs, provided ideas, etc; roughly in order of appearance):
- *  
+ *
  *  * Greg Burns
  *  * Anthony Rabine
  *  * Carlos Costa
@@ -102,7 +103,7 @@
  *  * https://github.com/Kelledin
  *  * https://github.com/sstruchtrup
  *  * Michael Drake (https://github.com/tlsa)
- *  
+ *
  *  If you are accidentally missing from this list, send me an e-mail
  *  (``sami.vaarala@iki.fi``) and I'll fix the omission.
  */
@@ -114,8 +115,16 @@
 
 // ATOMIC BEGIN
 
-// ensure option is also enabled in Duktape's Makefile for building dist!
-#define DUK_OPT_NO_VOLUNTARY_GC
+// Disabling this 8/8/2015, if having problems with GC (objects being rescued
+// during finalization), reenable and make sure option is also enabled when
+// building Duktape's dist
+// #define DUK_OPT_NO_VOLUNTARY_GC
+
+// enable JSON string fast path which requires fast int
+// https://github.com/svaarala/duktape/issues/204
+#define DUK_USE_JSON_STRINGIFY_FASTPATH
+#define DUK_USE_FASTINT
+#define DUK_OPT_FASTINT
 
 // ATOMIC END
 
@@ -219,7 +228,7 @@ struct duk_number_list_entry {
  * so that application code can easily log which Duktape snapshot was used.
  * Not available in the Ecmascript environment.
  */
-#define DUK_GIT_DESCRIBE                  "v1.2.0-257-gb098f04-dirty"
+#define DUK_GIT_DESCRIBE                  "v1.2.0-289-g2817390"
 
 /* Duktape debug protocol version used by this build. */
 #define DUK_DEBUG_PROTOCOL_VERSION        1
