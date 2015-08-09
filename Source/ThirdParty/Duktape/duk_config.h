@@ -1994,11 +1994,11 @@ typedef FILE duk_file;
  *  Apply to function definition only (not declaration).
  */
 
-#if defined(DUK_F_CLANG)
+#if defined(DUK_F_CLANG) && (defined(DUK_F_C99) || defined(DUK_F_CPP11))
 #define DUK_NOINLINE        __attribute__((noinline))
 #define DUK_INLINE          inline
 #define DUK_ALWAYS_INLINE   inline __attribute__((always_inline))
-#elif defined(DUK_F_GCC) && defined(DUK_F_GCC_VERSION)
+#elif defined(DUK_F_GCC) && defined(DUK_F_GCC_VERSION) && (defined(DUK_F_C99) || defined(DUK_F_CPP11))
 #if (DUK_F_GCC_VERSION >= 30101)
 #define DUK_NOINLINE        __attribute__((noinline))
 #define DUK_INLINE          inline
@@ -3060,7 +3060,7 @@ DUK_INTERNAL_DECL duk_bool_t duk_bi_date_format_parts_strftime(duk_context *ctx,
 #define DUK_USE_JSON_DECSTRING_FASTPATH
 #define DUK_USE_JSON_EATWHITE_FASTPATH
 #define DUK_USE_JSON_QUOTESTRING_FASTPATH
-#undef DUK_USE_JSON_STRINGIFY_FASTPATH
+// #undef DUK_USE_JSON_STRINGIFY_FASTPATH
 
 /*
  *  Alternative customization header
