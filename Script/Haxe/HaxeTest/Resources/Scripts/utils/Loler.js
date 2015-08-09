@@ -1,12 +1,10 @@
 var __extends = (this && this.__extends) || function (d, b) {for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];function __() { this.constructor = d; };__.prototype = b.prototype;d.prototype = new __();};
-var Main = (function(_super) {
-__extends(Main, _super);
-function Main(){};
-Main.main = function() {
-	Atomic.player.loadScene("Scenes/Scene.scene");
+var Loler = (function(_super) {
+__extends(Loler, _super);
+function Loler(lol) {
+	if(lol == "lol") console.log("LOL!"); else console.log("NOT LOL :(");
 };
-Main.main();
 ;
-return Main;
+return Loler;
 })(Object);
-module.exports = Main;
+module.exports = Loler;

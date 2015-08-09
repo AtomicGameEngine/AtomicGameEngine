@@ -4,9 +4,11 @@ var Star = (function(_super) {
 __extends(Star, _super);
 function Star() {
 	Atomic.JSComponent.call(this);
+	this.speed = 1;
 };
+Star.prototype.speed = null;
 Star.prototype.update = function(timeStep) {
-	this.node.rotate2D(timeStep * 75);
+	this.node.rotate2D(this.speed);
 	this.node.rotateAround2D([1,1],timeStep * 50,Atomic.TS_WORLD);
 };
 ;

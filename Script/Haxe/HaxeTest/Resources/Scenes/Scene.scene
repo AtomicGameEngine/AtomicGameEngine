@@ -5,8 +5,8 @@
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
 	<attribute name="Elapsed Time" value="0" />
-	<attribute name="Next Replicated Node ID" value="368" />
-	<attribute name="Next Replicated Component ID" value="1982" />
+	<attribute name="Next Replicated Node ID" value="371" />
+	<attribute name="Next Replicated Component ID" value="1985" />
 	<attribute name="Next Local Node ID" value="16778496" />
 	<attribute name="Next Local Component ID" value="16777216" />
 	<attribute name="Variables" />
@@ -39,7 +39,7 @@
 			<attribute name="Sprite" value="Sprite2D;Sprites/star.png" />
 		</component>
 		<component type="JSComponent" id="1977">
-			<attribute name="ComponentFile" value="JSComponentFile;Components/Star.js" />
+			<attribute name="ComponentFile" value="JSComponentFile;Components/addit/MegaStar.js" />
 		</component>
 	</node>
 </scene>
