@@ -1,4 +1,4 @@
-package;
+package atomic;
 
 //Atomic Haxe Definitions
 
