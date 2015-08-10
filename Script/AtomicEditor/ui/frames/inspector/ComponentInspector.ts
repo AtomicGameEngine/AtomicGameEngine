@@ -173,29 +173,6 @@ class ComponentInspector extends Atomic.UISection {
 
     addPrefabUI(layout: Atomic.UILayout) {
 
-        // expand prefab
-        this.value = 1;
-
-        var fd = new Atomic.UIFontDescription();
-        fd.id = "Vera";
-        fd.size = 11;
-
-        var selectButton = new Atomic.UIButton();
-        selectButton.text = "Select Prefab";
-        selectButton.fontDescription = fd;
-
-        selectButton.onClick = () => {
-
-            var node = (<Atomic.PrefabComponent> this.component).getPrefabNode();
-
-            this.sendEvent("EditorActiveNodeChange", { node: node });
-
-            return true;
-
-        }
-
-        layout.addChild(selectButton);
-
     }
 
     acceptAssetDrag(importerTypeName: string, ev: Atomic.DragEndedEvent): ToolCore.AssetImporter {

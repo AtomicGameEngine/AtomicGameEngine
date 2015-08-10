@@ -35,8 +35,8 @@ class NodeInspector extends ScriptWidget {
 
     getPrefabComponent(node: Atomic.Node): Atomic.PrefabComponent {
 
-        if (node.parent && node.parent.getComponent("PrefabComponent"))
-            return <Atomic.PrefabComponent> node.parent.getComponent("PrefabComponent");
+        if (node.getComponent("PrefabComponent"))
+            return <Atomic.PrefabComponent> node.getComponent("PrefabComponent");
 
         if (node.parent)
             return this.getPrefabComponent(node.parent);
@@ -47,7 +47,7 @@ class NodeInspector extends ScriptWidget {
 
     detectPrefab(node: Atomic.Node): boolean {
 
-        if (node.parent && node.parent.getComponent("PrefabComponent"))
+        if (node.getComponent("PrefabComponent"))
             return true;
 
         if (node.parent)
@@ -232,8 +232,8 @@ class NodeInspector extends ScriptWidget {
 
             var component = components[i];
 
-            if (component.isTemporary())
-              continue;
+            //if (component.isTemporary())
+            //  continue;
 
             var ci = new ComponentInspector();
 

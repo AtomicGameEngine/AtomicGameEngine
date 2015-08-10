@@ -204,6 +204,7 @@ static int Node_CreateChildPrefab(duk_context* ctx)
     const char* prefabName = duk_require_string(ctx, 1);
 
     duk_push_this(ctx);
+
     Node* parent = js_to_class_instance<Node>(ctx, -1, 0);
 
     Node* prefabNode = parent->CreateChild(childName);
