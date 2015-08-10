@@ -143,12 +143,6 @@ declare module Atomic {
 
     }
 
-    export interface ComponentRemovedEvent {
-
-        serializable: Atomic.Serializable;
-
-    }
-
     export interface IPCJSErrorEvent {
 
         errorName: string;
