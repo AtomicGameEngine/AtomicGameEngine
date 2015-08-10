@@ -61,6 +61,7 @@ public:
     }
 
     void UpdateText(const String& text);
+    void UpdateTextSkin(const String& skin);
     void UpdateIcon(const String& icon);
 
     ListViewItemSource* source_;
@@ -69,6 +70,7 @@ public:
     PODVector<ListViewItem*> children_;
     ListViewItemWidget* widget_;
     String icon_;
+    String textSkin_;
 };
 
 class ListViewItemWidget : public TBLayout
@@ -87,6 +89,12 @@ public:
     {
         if (icon_)
             icon_->SetSkinBg(TBIDC(icon.CString()));
+    }
+
+    void UpdateTextSkin(const String& skin)
+    {
+        if (textField_)
+            textField_->SetSkinBg(TBIDC(skin.CString()));
     }
 
 
@@ -125,6 +133,14 @@ void ListViewItem::UpdateIcon(const String& icon)
     if (widget_)
         widget_->UpdateIcon(icon);
 }
+
+void ListViewItem::UpdateTextSkin(const String& skin)
+{
+    textSkin_ = skin;
+    if (widget_)
+        widget_->UpdateTextSkin(skin);
+}
+
 
 ListViewItem* ListViewItem::AddChild(const char *text, const char* icon, const TBID &id)
 {
@@ -237,7 +253,8 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
 
     TBTextField* tfield = textField_ = new TBTextField();
     tfield->SetIgnoreInput(true);
-    tfield->SetSkinBg(TBIDC("Folder"));
+
+    tfield->SetSkinBg(item->textSkin_.Length() ? TBIDC(item->textSkin_.CString()) : TBIDC("Folder"));
     tfield->SetText(item->str);
     tfield->SetFontDescription(fd);
 
@@ -379,6 +396,22 @@ void UIListView::SetItemText(const String& id, const String& text)
         {
             ListViewItem* item = source_->GetItem(i);
             item->UpdateText(text);
+            return;
+        }
+    }
+
+}
+
+void UIListView::SetItemTextSkin(const String& id, const String& skin)
+{
+    TBID tbid(id.CString());
+
+    for (int i = 0; i <  source_->GetNumItems(); i++)
+    {
+        if (source_->GetItemID(i) == tbid)
+        {
+            ListViewItem* item = source_->GetItem(i);
+            item->UpdateTextSkin(skin);
             return;
         }
     }

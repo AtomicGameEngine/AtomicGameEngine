@@ -49,15 +49,68 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
     if (component->GetPrefabGUID() != asset_->GetGUID())
         return;
 
-    Node* node = component->GetPrefabNode();
+    Node* node = component->GetNode();
+
+    if (!node)
+        return;
+
+    // flip temporary root children and components to not be temporary for save
+    const Vector<SharedPtr<Component>>& rootComponents = node->GetComponents();
+    const Vector<SharedPtr<Node> >& children = node->GetChildren();
+
+    Vector<SharedPtr<Component>> tempComponents;
+    Vector<SharedPtr<Node>> tempChildren;
+
+    for (unsigned i = 0; i < rootComponents.Size(); i++)
+    {
+        if (rootComponents[i]->IsTemporary())
+        {
+            rootComponents[i]->SetTemporary(false);
+            tempComponents.Push(rootComponents[i]);
+        }
+    }
+
+    for (unsigned i = 0; i < children.Size(); i++)
+    {
+        if (children[i]->IsTemporary())
+        {
+            children[i]->SetTemporary(false);
+            tempChildren.Push(children);
+        }
+    }
+
+    // store original transform
+    Vector3 pos = node->GetPosition();
+    Quaternion rot = node->GetRotation();
+    Vector3 scale = node->GetScale();
 
     node->SetPosition(Vector3::ZERO);
     node->SetRotation(Quaternion::IDENTITY);
     node->SetScale(Vector3::ONE);
 
+    component->SetTemporary(true);
+
     SharedPtr<File> file(new File(context_, asset_->GetPath(), FILE_WRITE));
     node->SaveXML(*file);
     file->Close();
+
+    component->SetTemporary(false);
+
+    // restore
+    node->SetPosition(pos);
+    node->SetRotation(rot);
+    node->SetScale(scale);
+
+    for (unsigned i = 0; i < tempComponents.Size(); i++)
+    {
+        tempComponents[i]->SetTemporary(true);
+    }
+
+    for (unsigned i = 0; i < tempChildren.Size(); i++)
+    {
+        tempChildren[i]->SetTemporary(true);
+    }
+
 
     FileSystem* fs = GetSubsystem<FileSystem>();
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());

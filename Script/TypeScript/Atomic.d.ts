@@ -1800,7 +1800,8 @@ declare module Atomic {
       getChildAtIndex(index:number):Node;
       createJSComponent(name:string, args?:{});
       getJSComponent(name:string):JSComponent;
-      createChildPrefab(childName:string, prefabPath:string);
+      createChildPrefab(childName:string, prefabPath:string):Node;
+      loadPrefab(prefabPath:string):boolean;
 
    }
 
@@ -1825,7 +1826,6 @@ declare module Atomic {
    export class PrefabComponent extends Component {
 
       prefabGUID: string;
-      prefabNode: Node;
 
       // Construct.
       constructor();
@@ -1835,7 +1835,6 @@ declare module Atomic {
       savePrefab(): boolean;
       undoPrefab(): void;
       breakPrefab(): void;
-      getPrefabNode(): Node;
 
    }
 
@@ -7098,6 +7097,7 @@ declare module Atomic {
       addRootItem(text: string, icon: string, id: string): number;
       addChildItem(parentItemID: number, text: string, icon: string, id: string): number;
       setItemText(id: string, text: string): void;
+      setItemTextSkin(id: string, skin: string): void;
       setItemIcon(id: string, icon: string): void;
       deleteItemByID(id: string): void;
       setExpanded(itemID: number, value: boolean): void;

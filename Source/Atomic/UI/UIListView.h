@@ -27,7 +27,8 @@ public:
 
 
     void SetItemText(const String& id, const String& text);
-    void SetItemIcon(const String& id, const String& icon);
+    void SetItemTextSkin(const String& id, const String& skin);
+    void SetItemIcon(const String& id, const String& icon);    
     void DeleteItemByID(const String& id);
 
     void SetExpanded(unsigned itemID, bool value);
