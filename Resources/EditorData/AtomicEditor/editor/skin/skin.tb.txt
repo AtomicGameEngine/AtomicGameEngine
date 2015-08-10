@@ -178,3 +178,8 @@ elements
 		text-color #aaaaaa
 		min-width 140
 		max-width 140
+
+	HierarchyPrefabText
+		text-color #11aaaa
+	HierarchyPrefabText.selected
+		text-color #11ffff
