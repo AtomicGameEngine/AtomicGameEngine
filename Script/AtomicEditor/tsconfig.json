@@ -7,8 +7,7 @@
         "removeComments": true,
         "noLib": false,
         "outDir": "out/",
-        "sourceMap": true,
-        "out": "bin.js"
+        "sourceMap": true
     },
     "filesGlob": [
         "./**/*.ts"
