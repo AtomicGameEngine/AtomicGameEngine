@@ -9,17 +9,19 @@ class Star extends JSComponent {
 	function new() {
 		super();
 		speed = 1;
+		var type:Stars = Stars.RandomStar;
 	}
-	
+
 	function update(timeStep:Float):Void {
 		this.node.rotate2D(speed);
 		this.node.rotateAround2D([1, 1], timeStep * 50, Atomic.TS_WORLD);
 	}
 }
 
+//Enums are not working yet
 enum Stars {
-  SuperStar;
-  NotSuperStar;
-  RandomStar;
-  Star(x:Int, y:Int);
+	RandomStar;
+	JustAStar;
+	SimpleStar;
+	NotAStar;
 }

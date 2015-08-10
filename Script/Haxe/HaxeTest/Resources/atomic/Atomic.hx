@@ -249,7 +249,14 @@ typedef FileMode = Int;
 //Atomic Haxe Definitions
 
 extern class Atomic {
-
+	
+	public static var engine: Engine;
+    public static var graphics: Graphics;
+    public static var renderer: Renderer;
+    public static var cache: ResourceCache;
+    public static var input: Input;
+    public static var fileSystem: FileSystem;
+    public static var network: Network;
 
    // enum FrustumPlane
     public static var PLANE_NEAR:FrustumPlane;

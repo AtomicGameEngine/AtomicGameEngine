@@ -7,7 +7,7 @@ import components.SuperStar;
 import components.addit.MegaStar;
 
 class Main {
-	
+
 	static inline function main() {
 		untyped Atomic.player.loadScene("Scenes/Scene.scene");
 	}

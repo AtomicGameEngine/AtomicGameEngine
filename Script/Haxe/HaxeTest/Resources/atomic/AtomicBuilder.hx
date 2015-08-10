@@ -15,8 +15,9 @@ class AtomicBuilder {
 	var inits : List<TypedExpr>;
 	var statics : List<{ c : ClassType, f : ClassField }>;
 	var requirements: Map<String, Array<String>>;
-	var currClass:ClassType;
+	var currClass:BaseType;
 	var components:List<ClassType>;
+	var enums:List<EnumType>;
 	
 	function new(api:JSGenApi) {
 		this.api = api;
@@ -25,6 +26,7 @@ class AtomicBuilder {
 		this.statics = new List();
 		this.requirements = new Map();
 		this.components = new List();
+		this.enums = new List();
 		api.setTypeAccessor(getType);
 		build();
 	}
@@ -32,16 +34,17 @@ class AtomicBuilder {
 	function getType( t : Type ) {
 		return switch(t) {
 			case TInst(c, _):
-				getPath(c.get());
+				getPath(c.get(), 0);
 			case TEnum(e, _): 
-				getPath(e.get());
+				getPath(e.get(), 1);
 			case TAbstract(a, _): 
-				getPath(a.get());
+				getPath(a.get(), 2);
 			default: throw "assert";
 		};
 	}
 	
-	function getPath( t : BaseType ) {
+	//n is a type, 0 - inst, 1 - enum, 2 - abstract
+	function getPath(t : BaseType, ?n: Int) {
 		var s:Array<String> = t.module.split(".");
 		if (s[0].toLowerCase() == "atomic") {
 			if (StringTools.startsWith(t.name, "Atomic")) {
@@ -51,8 +54,11 @@ class AtomicBuilder {
 		}
 		//skip to do not require itself
 		if (t.name == currClass.name) return t.name;
-		
 		var mod = t.module.split(".");
+		//it it's enum
+		if (n == 1) {
+			addReq("./" + t.name);
+		}
 		if (mod[0].toLowerCase() == "scripts") {
 			var n = "";
 			for (pa in mod) {
@@ -102,13 +108,16 @@ class AtomicBuilder {
 		switch( t ) {
 		case TInst(c, _):
 			var c = c.get();
-			if( c.init != null )
+			if ( c.init != null ) {
+				//trace("Adding init: " + c.name);
 				inits.add(c.init);
-			if( !c.isExtern ) genClass(c);
+			}
+			if ( !c.isExtern ) 
+				genClass(c);
 		//Enum is not really supported yet
 		case TEnum(r, _):
 			var e = r.get();
-			//if( !e.isExtern ) genEnum(e);
+			if( !e.isExtern ) genEnum(e);
 		default:
 		}
 	}
@@ -142,19 +151,19 @@ class AtomicBuilder {
 		return out;
 	}
 	
-	//https://github.com/HaxeFoundation/haxe/issues/3560
 	function checkRequires(c: ClassType):Void {
 		var arr = requirements.get(currClass.name);
 		if (arr == null || arr.length == 0) return;
 		for (req in requirements.get(currClass.name)) {
 			var a = req.split("/");
 			var name = a[a.length - 1];
+			//TODO fix that check
+			if (name == currClass.name) continue;
 			prepend("var " + name + " = require(\"" + req + "\");\n");
 		}
 	}
 	
 	function genClass(c:ClassType):Void {
-		//if (c.name == "Std") return;
 		if (c.pack.length > 0 && c.pack[0].toLowerCase() == "components") {
 			components.add(c);
 		} else {
@@ -165,25 +174,21 @@ class AtomicBuilder {
 	function genConstructor(c: ClassType):Void {
 		if (c.constructor != null) {
 			var constructor = getExpr(c.constructor.get().expr());
-			constructor = StringTools.replace(constructor, "function(", "function " + c.name + "(");
+			constructor = StringTools.replace(constructor, "function(", 'function ${c.name} (');
 			print(constructor);
 			newline();
 		} else {
-			print("function " + c.name + "(){}");
+			print('function ${c.name} (){}');
 			newline();
 		}
 	}
 	
-	function genScript(c: ClassType):Void {
-		//If pack length equals 0, so it's probably a haxe's class, so, require a HxOverrides
-		//if (c.pack.length == 0) {
-		//	print("var HxOverrides = require(\"./HxOverrides\");\n");
-		//}
+	function genClassBoody(c: ClassType):Void {
 		api.setCurrentClass(c);
 		currClass = c;
 		printExtend__();
-		print("var " + c.name + " = (function(_super) {\n");
-		print("__extends(" + c.name + ", _super);\n");
+		print('var ${c.name} = (function(_super) {\n');
+		print('__extends(${c.name}, _super);\n');
 		genConstructor(c);
 		for( f in c.statics.get() )
 			genStaticField(c, f);
@@ -191,10 +196,14 @@ class AtomicBuilder {
 			genClassField(c, f);
 		}
 		newline();
-		print("return " + c.name + ";\n");
+		print('return ${c.name};\n');
 		print("})(" + (c.superClass == null ? "Object" : getPath(c.superClass.t.get())) +");\n");
-		print("module.exports = " + c.name + ";\n");
+		print('module.exports = ${c.name};\n');
 		checkRequires(c);
+	}
+	
+	function genScript(c: ClassType):Void {
+		genClassBoody(c);
 		var p = "";
 		//script path
 		if (c.pack.length > 0 && c.pack[0].toLowerCase() == "scripts") {
@@ -210,29 +219,29 @@ class AtomicBuilder {
 	}
 	
 	function genComponent(c: ClassType):Void {
-		api.setCurrentClass(c);
-		currClass = c;
-		printExtend__();
-		print("\"atomic component\"");
-		newline();
-		print("var " + c.name + " = (function(_super) {\n");
-		print("__extends(" + c.name + ", _super);\n");
-		genConstructor(c);
-		for( f in c.statics.get() )
-			genStaticField(c, f);
-		for( f in c.fields.get() ) {
-			genClassField(c, f);
-		}
-		newline();
-		print("return " + c.name + ";\n");
-		print("})(" + (c.superClass == null ? "Object" : getPath(c.superClass.t.get())) +");\n");
-		print("module.exports = " + getPath(c) + ";\n");
-		checkRequires(c);
+		genClassBoody(c);
 		var p = "";
 		for (pa in c.pack) {
 			p += pa + "/";
 		}
 		p += c.name + ".js";
+		File.saveContent(p, buf.toString());
+		buf = new StringBuf();
+	}
+	
+	function genEnum( e : EnumType ) {
+		currClass = e;
+		//api.setCurrentClass(e);
+		print('var ${e.name}');
+		newline();
+		print('(function (${e.name}) {\n');
+		//TODO generate enum statements
+		print('})(${e.name} || (${e.name} = {}));');
+		var p = "";
+		for (pa in e.pack) {
+			p += pa + "/";
+		}
+		p += e.name + ".js";
 		File.saveContent(p, buf.toString());
 		buf = new StringBuf();
 	}
