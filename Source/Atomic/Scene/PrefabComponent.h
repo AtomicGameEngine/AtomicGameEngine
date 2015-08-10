@@ -28,8 +28,6 @@ public:
     void UndoPrefab();
     void BreakPrefab();
 
-    Node* GetPrefabNode() { return prefabNode_; }
-
 protected:
 
     /// Handle scene node being assigned at creation.
@@ -42,7 +40,6 @@ private:
 
     void LoadPrefabNode();
 
-    SharedPtr<Node> prefabNode_;
     String prefabGUID_;
 
 };

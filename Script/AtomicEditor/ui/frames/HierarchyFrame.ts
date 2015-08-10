@@ -56,6 +56,37 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         });
 
+        this.subscribeToEvent("ComponentAdded", (ev: Atomic.ComponentAddedEvent) => {
+
+            if (!ev.component || ev.component.typeName != "PrefabComponent") return;
+
+            var node = ev.node;
+
+            var itemID = this.nodeIDToItemID[node.id];
+
+            if (itemID) {
+
+                this.hierList.setItemTextSkin(node.id.toString(), "HierarchyPrefabText");
+
+            }
+
+        });
+
+        this.subscribeToEvent("ComponentRemoved", (ev: Atomic.ComponentRemovedEvent) => {
+
+            if (!ev.component || ev.component.typeName != "PrefabComponent") return;
+
+            var node = ev.node;
+
+            var itemID = this.nodeIDToItemID[node.id];
+
+            if (itemID) {
+
+                this.hierList.setItemTextSkin(node.id.toString(), "Folder");
+            }
+
+        });
+
         this.subscribeToEvent("TemporaryChanged", (ev: Atomic.TemporaryChangedEvent) => {
 
             // this can happen on a temporary status change on a non-scripted class instance
@@ -298,6 +329,12 @@ class HierarchyFrame extends Atomic.UIWidget {
             icon = IconTemporary;
 
         var childItemID = this.hierList.addChildItem(parentID, name, icon, node.id.toString());
+
+        if (node.getComponent("PrefabComponent")) {
+
+            this.hierList.setItemTextSkin(node.id.toString(), "HierarchyPrefabText");
+
+        }
 
         this.nodeIDToItemID[node.id] = childItemID;
 
