@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/Resource/Resource.h>
 
 #include "AssetImporter.h"
 
@@ -36,6 +37,8 @@ public:
     /// Get the path relative to project
     String GetRelativePath();
     String GetCachePath() const;
+
+    Resource* GetResource();
 
     const StringHash GetImporterType() { return importer_.Null() ? String::EMPTY : importer_->GetType(); }
     const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }

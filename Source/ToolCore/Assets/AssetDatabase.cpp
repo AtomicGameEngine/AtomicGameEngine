@@ -484,6 +484,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
     if (resourceTypeToImporterType_.Empty())
     {
         resourceTypeToImporterType_["Sound"] = "AudioImporter";
+        resourceTypeToImporterType_["Model"] = "ModelImporter";
     }
 
     if (!resourceTypeToImporterType_.Contains(resourceTypeName))

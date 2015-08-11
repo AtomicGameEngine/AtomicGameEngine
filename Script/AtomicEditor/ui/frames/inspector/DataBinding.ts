@@ -176,11 +176,21 @@ class DataBinding {
 
                     EditorUI.getModelOps().showResourceSelection("Select " + attrInfo.resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
 
-                        var resource = Atomic.cache.getResource(attrInfo.resourceTypeName, asset.path);
+                        var resource = asset.resource;
 
                         object.setAttribute(attrInfo.name, resource);
-                        if (resource)
-                            o.editField.text = resource.name;
+
+                        if (resource) {
+
+                            // use the asset name instead of the cache name
+                            if (asset.importer.requiresCacheFile())
+                                o.editField.text = asset.name;
+                            else
+                                o.editField.text = resource.name;
+                        }
+                        else
+                            o.editField.text = "";
+
 
                     });
 
@@ -207,10 +217,17 @@ class DataBinding {
 
                         if (importer) {
 
-                            var resource = Atomic.cache.getResource(attrInfo.resourceTypeName, importer.asset.path);
+                            var resource = asset.resource;
                             object.setAttribute(attrInfo.name, resource);
-                            if (resource)
-                                o.editField.text = resource.name;
+                            if (resource) {
+                                // use the asset name instead of the cache name
+                                if (asset.importer.requiresCacheFile())
+                                    o.editField.text = asset.name;
+                                else
+                                    o.editField.text = resource.name;
+                            }
+                            else
+                                o.editField.text = "";
 
                         }
                     }
@@ -315,12 +332,16 @@ class DataBinding {
 
         } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
 
+            // for cached resources, use the asset name, otherwise use the resource path name
             var resource = <Atomic.Resource> object.getAttribute(attrInfo.name);
+            var text = "";
+            if (resource) {
+                text = resource.name;
+                var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                text = asset.name;
+            }
 
-            if (resource)
-                widget["editField"].text = resource.name;
-            else
-                widget["editField"].text = "";
+            widget["editField"].text = text;
 
         }
 
