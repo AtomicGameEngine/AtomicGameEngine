@@ -498,7 +498,7 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
         }
         else if (importerType == ModelImporter::GetTypeNameStatic())
         {
-            dragNode_ = scene_->CreateChild(asset->GetName());
+            dragNode_ = scene_->CreateChild();
 
             SharedPtr<File> file(new File(context_, asset->GetCachePath()));
             SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -507,6 +507,7 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
                 return;
 
             dragNode_->LoadXML(xml->GetRoot());
+            dragNode_->SetName(asset->GetName());
         }
         else if (importerType == SpriterImporter::GetTypeNameStatic())
         {
