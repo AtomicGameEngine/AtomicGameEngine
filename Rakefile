@@ -58,6 +58,10 @@ namespace :build  do
     end
 
     Dir.chdir(CMAKE_WINDOWS_BUILD_FOLDER) do
+      # ensure VS commandline tools are on the path
+      VSCOMNTOOLS = ENV['VS140COMNTOOLS']
+
+      sh "\"#{VSCOMNTOOLS}vsvars32.bat\""
 
       sh "cmake ../../ -G \"Visual Studio 14 2015\""
 
