@@ -9,19 +9,29 @@ class Star extends JSComponent {
 	function new() {
 		super();
 		speed = 1;
-		var type:Stars = Stars.RandomStar;
-	}
+		var color = getColor();
+		switch (color) {
+		  case Red: trace("Color was red");
+		  case Green: trace("Color was green");
+		  case Blue: trace("Color was blue");
+		  case Rgb(r, g, b): trace('r: $r, g: $g, b: $b');
+		}
+	  }
+
+	  static function getColor():Color {
+		return Color.Rgb(255, 0, 255);
+	  }
 
 	function update(timeStep:Float):Void {
 		this.node.rotate2D(speed);
-		this.node.rotateAround2D([1, 1], timeStep * 50, Atomic.TS_WORLD);
+		this.node.rotateAround2D([1, 1], timeStep * 50, TransformSpace.TS_WORLD);
 	}
 }
 
-//Enums are not working yet
-enum Stars {
-	RandomStar;
-	JustAStar;
-	SimpleStar;
-	NotAStar;
+//Just a test of enums
+enum Color {
+  Red;
+  Green;
+  Blue;
+  Rgb(r:Int, g:Int, b:Int);
 }

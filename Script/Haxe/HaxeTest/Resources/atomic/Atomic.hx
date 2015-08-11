@@ -1,251 +1,695 @@
 package atomic;
 
-
-   // enum FrustumPlane
-typedef FrustumPlane = Int;
-
-   // enum Intersection
-typedef Intersection = Int;
-
-   // enum InterpolationMode
-typedef InterpolationMode = Int;
-
-   // enum VariantType
-typedef VariantType = Int;
-
-   // enum WrapMode
-typedef WrapMode = Int;
-
-   // enum CreateMode
-typedef CreateMode = Int;
-
-   // enum TransformSpace
-typedef TransformSpace = Int;
-
-   // enum LoadMode
-typedef LoadMode = Int;
-
-   // enum InterpMethod
-typedef InterpMethod = Int;
-
-   // enum UpdateGeometryType
-typedef UpdateGeometryType = Int;
-
-   // enum PrimitiveType
-typedef PrimitiveType = Int;
-
-   // enum GeometryType
-typedef GeometryType = Int;
-
-   // enum BlendMode
-typedef BlendMode = Int;
-
-   // enum CompareMode
-typedef CompareMode = Int;
-
-   // enum CullMode
-typedef CullMode = Int;
-
-   // enum FillMode
-typedef FillMode = Int;
-
-   // enum StencilOp
-typedef StencilOp = Int;
-
-   // enum LockState
-typedef LockState = Int;
-
-   // enum VertexElement
-typedef VertexElement = Int;
-
-   // enum TextureFilterMode
-typedef TextureFilterMode = Int;
-
-   // enum TextureAddressMode
-typedef TextureAddressMode = Int;
-
-   // enum TextureCoordinate
-typedef TextureCoordinate = Int;
-
-   // enum TextureUsage
-typedef TextureUsage = Int;
-
-   // enum CubeMapFace
-typedef CubeMapFace = Int;
-
-   // enum CubeMapLayout
-typedef CubeMapLayout = Int;
-
-   // enum RenderSurfaceUpdateMode
-typedef RenderSurfaceUpdateMode = Int;
-
-   // enum ShaderType
-typedef ShaderType = Int;
-
-   // enum ShaderParameterGroup
-typedef ShaderParameterGroup = Int;
-
-   // enum TextureUnit
-typedef TextureUnit = Int;
-
-   // enum FaceCameraMode
-typedef FaceCameraMode = Int;
-
-   // enum LightType
-typedef LightType = Int;
-
-   // enum RayQueryLevel
-typedef RayQueryLevel = Int;
-
-   // enum LightVSVariation
-typedef LightVSVariation = Int;
-
-   // enum VertexLightVSVariation
-typedef VertexLightVSVariation = Int;
-
-   // enum LightPSVariation
-typedef LightPSVariation = Int;
-
-   // enum DeferredLightVSVariation
-typedef DeferredLightVSVariation = Int;
-
-   // enum DeferredLightPSVariation
-typedef DeferredLightPSVariation = Int;
-
-   // enum RenderCommandType
-typedef RenderCommandType = Int;
-
-   // enum RenderCommandSortMode
-typedef RenderCommandSortMode = Int;
-
-   // enum RenderTargetSizeMode
-typedef RenderTargetSizeMode = Int;
-
-   // enum PassLightingMode
-typedef PassLightingMode = Int;
-
-   // enum EmitterType
-typedef EmitterType = Int;
-
-   // enum LoopMode2D
-typedef LoopMode2D = Int;
-
-   // enum LightType2D
-typedef LightType2D = Int;
-
-   // enum EmitterType2D
-typedef EmitterType2D = Int;
-
-   // enum BodyType2D
-typedef BodyType2D = Int;
-
-   // enum Orientation2D
-typedef Orientation2D = Int;
-
-   // enum TileMapLayerType2D
-typedef TileMapLayerType2D = Int;
-
-   // enum TileMapObjectType2D
-typedef TileMapObjectType2D = Int;
-
-   // enum ShapeType
-typedef ShapeType = Int;
-
-   // enum ConstraintType
-typedef ConstraintType = Int;
-
-   // enum CollisionEventMode
-typedef CollisionEventMode = Int;
-
-   // enum CrowdTargetState
-typedef CrowdTargetState = Int;
-
-   // enum CrowdAgentState
-typedef CrowdAgentState = Int;
-
-   // enum NavigationQuality
-typedef NavigationQuality = Int;
-
-   // enum NavigationPushiness
-typedef NavigationPushiness = Int;
-
-   // enum NavmeshPartitionType
-typedef NavmeshPartitionType = Int;
-
-   // enum MouseMode
-typedef MouseMode = Int;
-
-   // enum TEXT_ALIGN
-typedef TEXT_ALIGN = Int;
-
-   // enum UI_EDIT_TYPE
-typedef UI_EDIT_TYPE = Int;
-
-   // enum UI_AXIS
-typedef UI_AXIS = Int;
-
-   // enum UI_LAYOUT_SIZE
-typedef UI_LAYOUT_SIZE = Int;
-
-   // enum UI_LAYOUT_DISTRIBUTION
-typedef UI_LAYOUT_DISTRIBUTION = Int;
-
-   // enum UI_LAYOUT_POSITION
-typedef UI_LAYOUT_POSITION = Int;
-
-   // enum UI_LAYOUT_DISTRIBUTION_POSITION
-typedef UI_LAYOUT_DISTRIBUTION_POSITION = Int;
-
-   // enum UI_MESSAGEWINDOW_SETTINGS
-typedef UI_MESSAGEWINDOW_SETTINGS = Int;
-
-   // enum UI_SIZE_DEP
-typedef UI_SIZE_DEP = Int;
-
-   // enum UI_SCROLL_MODE
-typedef UI_SCROLL_MODE = Int;
-
-   // enum UI_TEXT_ALIGN
-typedef UI_TEXT_ALIGN = Int;
-
-   // enum UI_WIDGET_VISIBILITY
-typedef UI_WIDGET_VISIBILITY = Int;
-
-   // enum UI_GRAVITY
-typedef UI_GRAVITY = Int;
-
-   // enum UI_EVENT_TYPE
-typedef UI_EVENT_TYPE = Int;
-
-   // enum UI_WIDGET_Z_REL
-typedef UI_WIDGET_Z_REL = Int;
-
-   // enum UI_WINDOW_SETTINGS
-typedef UI_WINDOW_SETTINGS = Int;
-
-   // enum CompressedFormat
-typedef CompressedFormat = Int;
-
-   // enum JSONValueType
-typedef JSONValueType = Int;
-
-   // enum PListValueType
-typedef PListValueType = Int;
-
-   // enum AsyncLoadState
-typedef AsyncLoadState = Int;
-
-   // enum ResourceRequest
-typedef ResourceRequest = Int;
-
-   // enum ObserverPositionSendMode
-typedef ObserverPositionSendMode = Int;
-
-   // enum HttpRequestState
-typedef HttpRequestState = Int;
-
-   // enum FileMode
-typedef FileMode = Int;
+@:native("Atomic")
+extern enum FrustumPlane {
+    PLANE_NEAR;
+    PLANE_LEFT;
+    PLANE_RIGHT;
+    PLANE_UP;
+    PLANE_DOWN;
+    PLANE_FAR;
+}
+@:native("Atomic")
+extern enum Intersection {
+    OUTSIDE;
+    INTERSECTS;
+    INSIDE;
+}
+@:native("Atomic")
+extern enum InterpolationMode {
+    BEZIER_CURVE;
+}
+@:native("Atomic")
+extern enum VariantType {
+    VAR_NONE;
+    VAR_INT;
+    VAR_BOOL;
+    VAR_FLOAT;
+    VAR_VECTOR2;
+    VAR_VECTOR3;
+    VAR_VECTOR4;
+    VAR_QUATERNION;
+    VAR_COLOR;
+    VAR_STRING;
+    VAR_BUFFER;
+    VAR_VOIDPTR;
+    VAR_RESOURCEREF;
+    VAR_RESOURCEREFLIST;
+    VAR_VARIANTVECTOR;
+    VAR_VARIANTMAP;
+    VAR_INTRECT;
+    VAR_INTVECTOR2;
+    VAR_PTR;
+    VAR_MATRIX3;
+    VAR_MATRIX3X4;
+    VAR_MATRIX4;
+    VAR_DOUBLE;
+    MAX_VAR_TYPES;
+}
+@:native("Atomic")
+extern enum WrapMode {
+    WM_LOOP;
+    WM_ONCE;
+    WM_CLAMP;
+}
+@:native("Atomic")
+extern enum CreateMode {
+    REPLICATED;
+    LOCAL;
+}
+@:native("Atomic")
+extern enum TransformSpace {
+    TS_LOCAL;
+    TS_PARENT;
+    TS_WORLD;
+}
+@:native("Atomic")
+extern enum LoadMode {
+    LOAD_RESOURCES_ONLY;
+    LOAD_SCENE;
+    LOAD_SCENE_AND_RESOURCES;
+}
+@:native("Atomic")
+extern enum InterpMethod {
+    IM_LINEAR;
+    IM_SPLINE;
+}
+@:native("Atomic")
+extern enum UpdateGeometryType {
+    UPDATE_NONE;
+    UPDATE_MAIN_THREAD;
+    UPDATE_WORKER_THREAD;
+}
+@:native("Atomic")
+extern enum PrimitiveType {
+    TRIANGLE_LIST;
+    LINE_LIST;
+    POINT_LIST;
+    TRIANGLE_STRIP;
+    LINE_STRIP;
+    TRIANGLE_FAN;
+}
+@:native("Atomic")
+extern enum GeometryType {
+    GEOM_STATIC;
+    GEOM_SKINNED;
+    GEOM_INSTANCED;
+    GEOM_BILLBOARD;
+    GEOM_STATIC_NOINSTANCING;
+    MAX_GEOMETRYTYPES;
+}
+@:native("Atomic")
+extern enum BlendMode {
+    BLEND_REPLACE;
+    BLEND_ADD;
+    BLEND_MULTIPLY;
+    BLEND_ALPHA;
+    BLEND_ADDALPHA;
+    BLEND_PREMULALPHA;
+    BLEND_INVDESTALPHA;
+    BLEND_SUBTRACT;
+    BLEND_SUBTRACTALPHA;
+    MAX_BLENDMODES;
+}
+@:native("Atomic")
+extern enum CompareMode {
+    CMP_ALWAYS;
+    CMP_EQUAL;
+    CMP_NOTEQUAL;
+    CMP_LESS;
+    CMP_LESSEQUAL;
+    CMP_GREATER;
+    CMP_GREATEREQUAL;
+    MAX_COMPAREMODES;
+}
+@:native("Atomic")
+extern enum CullMode {
+    CULL_NONE;
+    CULL_CCW;
+    CULL_CW;
+    MAX_CULLMODES;
+}
+@:native("Atomic")
+extern enum FillMode {
+    FILL_SOLID;
+    FILL_WIREFRAME;
+    FILL_POINT;
+}
+@:native("Atomic")
+extern enum StencilOp {
+    OP_KEEP;
+    OP_ZERO;
+    OP_REF;
+    OP_INCR;
+    OP_DECR;
+}
+@:native("Atomic")
+extern enum LockState {
+    LOCK_NONE;
+    LOCK_HARDWARE;
+    LOCK_SHADOW;
+    LOCK_SCRATCH;
+}
+@:native("Atomic")
+extern enum VertexElement {
+    ELEMENT_POSITION;
+    ELEMENT_NORMAL;
+    ELEMENT_COLOR;
+    ELEMENT_TEXCOORD1;
+    ELEMENT_TEXCOORD2;
+    ELEMENT_CUBETEXCOORD1;
+    ELEMENT_CUBETEXCOORD2;
+    ELEMENT_TANGENT;
+    ELEMENT_BLENDWEIGHTS;
+    ELEMENT_BLENDINDICES;
+    ELEMENT_INSTANCEMATRIX1;
+    ELEMENT_INSTANCEMATRIX2;
+    ELEMENT_INSTANCEMATRIX3;
+    MAX_VERTEX_ELEMENTS;
+}
+@:native("Atomic")
+extern enum TextureFilterMode {
+    FILTER_NEAREST;
+    FILTER_BILINEAR;
+    FILTER_TRILINEAR;
+    FILTER_ANISOTROPIC;
+    FILTER_DEFAULT;
+    MAX_FILTERMODES;
+}
+@:native("Atomic")
+extern enum TextureAddressMode {
+    ADDRESS_WRAP;
+    ADDRESS_MIRROR;
+    ADDRESS_CLAMP;
+    ADDRESS_BORDER;
+    MAX_ADDRESSMODES;
+}
+@:native("Atomic")
+extern enum TextureCoordinate {
+    COORD_U;
+    COORD_V;
+    COORD_W;
+    MAX_COORDS;
+}
+@:native("Atomic")
+extern enum TextureUsage {
+    TEXTURE_STATIC;
+    TEXTURE_DYNAMIC;
+    TEXTURE_RENDERTARGET;
+    TEXTURE_DEPTHSTENCIL;
+}
+@:native("Atomic")
+extern enum CubeMapFace {
+    FACE_POSITIVE_X;
+    FACE_NEGATIVE_X;
+    FACE_POSITIVE_Y;
+    FACE_NEGATIVE_Y;
+    FACE_POSITIVE_Z;
+    FACE_NEGATIVE_Z;
+    MAX_CUBEMAP_FACES;
+}
+@:native("Atomic")
+extern enum CubeMapLayout {
+    CML_HORIZONTAL;
+    CML_HORIZONTALNVIDIA;
+    CML_HORIZONTALCROSS;
+    CML_VERTICALCROSS;
+    CML_BLENDER;
+}
+@:native("Atomic")
+extern enum RenderSurfaceUpdateMode {
+    SURFACE_MANUALUPDATE;
+    SURFACE_UPDATEVISIBLE;
+    SURFACE_UPDATEALWAYS;
+}
+@:native("Atomic")
+extern enum ShaderType {
+    VS;
+    PS;
+}
+@:native("Atomic")
+extern enum ShaderParameterGroup {
+    SP_FRAME;
+    SP_CAMERA;
+    SP_ZONE;
+    SP_LIGHT;
+    SP_MATERIAL;
+    SP_OBJECT;
+    SP_CUSTOM;
+    MAX_SHADER_PARAMETER_GROUPS;
+}
+@:native("Atomic")
+extern enum TextureUnit {
+    TU_DIFFUSE;
+    TU_ALBEDOBUFFER;
+    TU_NORMAL;
+    TU_NORMALBUFFER;
+    TU_SPECULAR;
+    TU_EMISSIVE;
+    TU_ENVIRONMENT;
+    TU_VOLUMEMAP;
+    TU_CUSTOM1;
+    TU_CUSTOM2;
+    TU_LIGHTRAMP;
+    TU_LIGHTSHAPE;
+    TU_SHADOWMAP;
+    TU_FACESELECT;
+    TU_INDIRECTION;
+    TU_DEPTHBUFFER;
+    TU_LIGHTBUFFER;
+    TU_ZONE;
+    MAX_MATERIAL_TEXTURE_UNITS;
+    MAX_TEXTURE_UNITS;
+}
+@:native("Atomic")
+extern enum FaceCameraMode {
+    FC_NONE;
+    FC_ROTATE_XYZ;
+    FC_ROTATE_Y;
+    FC_LOOKAT_XYZ;
+    FC_LOOKAT_Y;
+}
+@:native("Atomic")
+extern enum LightType {
+    LIGHT_DIRECTIONAL;
+    LIGHT_SPOT;
+    LIGHT_POINT;
+}
+@:native("Atomic")
+extern enum RayQueryLevel {
+    RAY_AABB;
+    RAY_OBB;
+    RAY_TRIANGLE;
+    RAY_TRIANGLE_UV;
+}
+@:native("Atomic")
+extern enum LightVSVariation {
+    LVS_DIR;
+    LVS_SPOT;
+    LVS_POINT;
+    LVS_SHADOW;
+    LVS_SPOTSHADOW;
+    LVS_POINTSHADOW;
+    MAX_LIGHT_VS_VARIATIONS;
+}
+@:native("Atomic")
+extern enum VertexLightVSVariation {
+    VLVS_NOLIGHTS;
+    VLVS_1LIGHT;
+    VLVS_2LIGHTS;
+    VLVS_3LIGHTS;
+    VLVS_4LIGHTS;
+    MAX_VERTEXLIGHT_VS_VARIATIONS;
+}
+@:native("Atomic")
+extern enum LightPSVariation {
+    LPS_NONE;
+    LPS_SPOT;
+    LPS_POINT;
+    LPS_POINTMASK;
+    LPS_SPEC;
+    LPS_SPOTSPEC;
+    LPS_POINTSPEC;
+    LPS_POINTMASKSPEC;
+    LPS_SHADOW;
+    LPS_SPOTSHADOW;
+    LPS_POINTSHADOW;
+    LPS_POINTMASKSHADOW;
+    LPS_SHADOWSPEC;
+    LPS_SPOTSHADOWSPEC;
+    LPS_POINTSHADOWSPEC;
+    LPS_POINTMASKSHADOWSPEC;
+    MAX_LIGHT_PS_VARIATIONS;
+}
+@:native("Atomic")
+extern enum DeferredLightVSVariation {
+    DLVS_NONE;
+    DLVS_DIR;
+    DLVS_ORTHO;
+    DLVS_ORTHODIR;
+    MAX_DEFERRED_LIGHT_VS_VARIATIONS;
+}
+@:native("Atomic")
+extern enum DeferredLightPSVariation {
+    DLPS_NONE;
+    DLPS_SPOT;
+    DLPS_POINT;
+    DLPS_POINTMASK;
+    DLPS_SPEC;
+    DLPS_SPOTSPEC;
+    DLPS_POINTSPEC;
+    DLPS_POINTMASKSPEC;
+    DLPS_SHADOW;
+    DLPS_SPOTSHADOW;
+    DLPS_POINTSHADOW;
+    DLPS_POINTMASKSHADOW;
+    DLPS_SHADOWSPEC;
+    DLPS_SPOTSHADOWSPEC;
+    DLPS_POINTSHADOWSPEC;
+    DLPS_POINTMASKSHADOWSPEC;
+    DLPS_ORTHO;
+    DLPS_ORTHOSPOT;
+    DLPS_ORTHOPOINT;
+    DLPS_ORTHOPOINTMASK;
+    DLPS_ORTHOSPEC;
+    DLPS_ORTHOSPOTSPEC;
+    DLPS_ORTHOPOINTSPEC;
+    DLPS_ORTHOPOINTMASKSPEC;
+    DLPS_ORTHOSHADOW;
+    DLPS_ORTHOSPOTSHADOW;
+    DLPS_ORTHOPOINTSHADOW;
+    DLPS_ORTHOPOINTMASKSHADOW;
+    DLPS_ORTHOSHADOWSPEC;
+    DLPS_ORTHOSPOTSHADOWSPEC;
+    DLPS_ORTHOPOINTSHADOWSPEC;
+    DLPS_ORTHOPOINTMASKSHADOWSPEC;
+    MAX_DEFERRED_LIGHT_PS_VARIATIONS;
+}
+@:native("Atomic")
+extern enum RenderCommandType {
+    CMD_NONE;
+    CMD_CLEAR;
+    CMD_SCENEPASS;
+    CMD_QUAD;
+    CMD_FORWARDLIGHTS;
+    CMD_LIGHTVOLUMES;
+    CMD_RENDERUI;
+}
+@:native("Atomic")
+extern enum RenderCommandSortMode {
+    SORT_FRONTTOBACK;
+    SORT_BACKTOFRONT;
+}
+@:native("Atomic")
+extern enum RenderTargetSizeMode {
+    SIZE_ABSOLUTE;
+    SIZE_VIEWPORTDIVISOR;
+    SIZE_VIEWPORTMULTIPLIER;
+}
+@:native("Atomic")
+extern enum PassLightingMode {
+    LIGHTING_UNLIT;
+    LIGHTING_PERVERTEX;
+    LIGHTING_PERPIXEL;
+}
+@:native("Atomic")
+extern enum EmitterType {
+    EMITTER_SPHERE;
+    EMITTER_BOX;
+}
+@:native("Atomic")
+extern enum LoopMode2D {
+    LM_DEFAULT;
+    LM_FORCE_LOOPED;
+    LM_FORCE_CLAMPED;
+}
+@:native("Atomic")
+extern enum LightType2D {
+    LIGHT2D_DIRECTIONAL;
+    LIGHT2D_POINT;
+}
+@:native("Atomic")
+extern enum EmitterType2D {
+    EMITTER_TYPE_GRAVITY;
+    EMITTER_TYPE_RADIAL;
+}
+@:native("Atomic")
+extern enum BodyType2D {
+    BT_STATIC;
+    BT_DYNAMIC;
+    BT_KINEMATIC;
+}
+@:native("Atomic")
+extern enum Orientation2D {
+    O_ORTHOGONAL;
+    O_ISOMETRIC;
+    O_STAGGERED;
+}
+@:native("Atomic")
+extern enum TileMapLayerType2D {
+    LT_TILE_LAYER;
+    LT_OBJECT_GROUP;
+    LT_IMAGE_LAYER;
+    LT_INVALID;
+}
+@:native("Atomic")
+extern enum TileMapObjectType2D {
+    OT_RECTANGLE;
+    OT_ELLIPSE;
+    OT_POLYGON;
+    OT_POLYLINE;
+    OT_TILE;
+    OT_INVALID;
+}
+@:native("Atomic")
+extern enum ShapeType {
+    SHAPE_BOX;
+    SHAPE_SPHERE;
+    SHAPE_STATICPLANE;
+    SHAPE_CYLINDER;
+    SHAPE_CAPSULE;
+    SHAPE_CONE;
+    SHAPE_TRIANGLEMESH;
+    SHAPE_CONVEXHULL;
+    SHAPE_TERRAIN;
+}
+@:native("Atomic")
+extern enum ConstraintType {
+    CONSTRAINT_POINT;
+    CONSTRAINT_HINGE;
+    CONSTRAINT_SLIDER;
+    CONSTRAINT_CONETWIST;
+}
+@:native("Atomic")
+extern enum CollisionEventMode {
+    COLLISION_NEVER;
+    COLLISION_ACTIVE;
+    COLLISION_ALWAYS;
+}
+@:native("Atomic")
+extern enum CrowdTargetState {
+    CROWD_AGENT_TARGET_NONE;
+    CROWD_AGENT_TARGET_FAILED;
+    CROWD_AGENT_TARGET_VALID;
+    CROWD_AGENT_TARGET_REQUESTING;
+    CROWD_AGENT_TARGET_WAITINGFORQUEUE;
+    CROWD_AGENT_TARGET_WAITINGFORPATH;
+    CROWD_AGENT_TARGET_VELOCITY;
+}
+@:native("Atomic")
+extern enum CrowdAgentState {
+    CROWD_AGENT_INVALID;
+    CROWD_AGENT_READY;
+    CROWD_AGENT_TRAVERSINGLINK;
+}
+@:native("Atomic")
+extern enum NavigationQuality {
+    NAVIGATIONQUALITY_LOW;
+    NAVIGATIONQUALITY_MEDIUM;
+    NAVIGATIONQUALITY_HIGH;
+}
+@:native("Atomic")
+extern enum NavigationPushiness {
+    PUSHINESS_LOW;
+    PUSHINESS_MEDIUM;
+    PUSHINESS_HIGH;
+}
+@:native("Atomic")
+extern enum NavmeshPartitionType {
+    NAVMESH_PARTITION_WATERSHED;
+    NAVMESH_PARTITION_MONOTONE;
+}
+@:native("Atomic")
+extern enum MouseMode {
+    MM_ABSOLUTE;
+    MM_RELATIVE;
+    MM_WRAP;
+}
+@:native("Atomic")
+extern enum TEXT_ALIGN {
+    TEXT_ALIGN_LEFT;
+    TEXT_ALIGN_RIGHT;
+    TEXT_ALIGN_CENTER;
+}
+@:native("Atomic")
+extern enum UI_EDIT_TYPE {
+    UI_EDIT_TYPE_TEXT;
+    UI_EDIT_TYPE_SEARCH;
+    UI_EDIT_TYPE_PASSWORD;
+    UI_EDIT_TYPE_EMAIL;
+    UI_EDIT_TYPE_PHONE;
+    UI_EDIT_TYPE_URL;
+    UI_EDIT_TYPE_NUMBER;
+}
+@:native("Atomic")
+extern enum UI_AXIS {
+    UI_AXIS_X;
+    UI_AXIS_Y;
+}
+@:native("Atomic")
+extern enum UI_LAYOUT_SIZE {
+    UI_LAYOUT_SIZE_GRAVITY;
+    UI_LAYOUT_SIZE_PREFERRED;
+    UI_LAYOUT_SIZE_AVAILABLE;
+}
+@:native("Atomic")
+extern enum UI_LAYOUT_DISTRIBUTION {
+    UI_LAYOUT_DISTRIBUTION_PREFERRED;
+    UI_LAYOUT_DISTRIBUTION_AVAILABLE;
+    UI_LAYOUT_DISTRIBUTION_GRAVITY;
+}
+@:native("Atomic")
+extern enum UI_LAYOUT_POSITION {
+    UI_LAYOUT_POSITION_CENTER;
+    UI_LAYOUT_POSITION_LEFT_TOP;
+    UI_LAYOUT_POSITION_RIGHT_BOTTOM;
+    UI_LAYOUT_POSITION_GRAVITY;
+}
+@:native("Atomic")
+extern enum UI_LAYOUT_DISTRIBUTION_POSITION {
+    UI_LAYOUT_DISTRIBUTION_POSITION_CENTER;
+    UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+    UI_LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM;
+}
+@:native("Atomic")
+extern enum UI_MESSAGEWINDOW_SETTINGS {
+    UI_MESSAGEWINDOW_SETTINGS_OK;
+    UI_MESSAGEWINDOW_SETTINGS_OK_CANCEL;
+    UI_MESSAGEWINDOW_SETTINGS_YES_NO;
+}
+@:native("Atomic")
+extern enum UI_SIZE_DEP {
+    UI_SIZE_DEP_NONE;
+    UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT;
+    UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH;
+    UI_SIZE_DEP_BOTH;
+}
+@:native("Atomic")
+extern enum UI_SCROLL_MODE {
+    UI_SCROLL_MODE_X_Y;
+    UI_SCROLL_MODE_Y;
+    UI_SCROLL_MODE_Y_AUTO;
+    UI_SCROLL_MODE_X_AUTO_Y_AUTO;
+    UI_SCROLL_MODE_OFF;
+}
+@:native("Atomic")
+extern enum UI_TEXT_ALIGN {
+    UI_TEXT_ALIGN_LEFT;
+    UI_TEXT_ALIGN_RIGHT;
+    UI_TEXT_ALIGN_CENTER;
+}
+@:native("Atomic")
+extern enum UI_WIDGET_VISIBILITY {
+    UI_WIDGET_VISIBILITY_VISIBLE;
+    UI_WIDGET_VISIBILITY_INVISIBLE;
+    UI_WIDGET_VISIBILITY_GONE;
+}
+@:native("Atomic")
+extern enum UI_GRAVITY {
+    UI_GRAVITY_NONE;
+    UI_GRAVITY_LEFT;
+    UI_GRAVITY_RIGHT;
+    UI_GRAVITY_TOP;
+    UI_GRAVITY_BOTTOM;
+    UI_GRAVITY_LEFT_RIGHT;
+    UI_GRAVITY_TOP_BOTTOM;
+    UI_GRAVITY_ALL;
+    UI_GRAVITY_DEFAULT;
+}
+@:native("Atomic")
+extern enum UI_EVENT_TYPE {
+    UI_EVENT_TYPE_CLICK;
+    UI_EVENT_TYPE_LONG_CLICK;
+    UI_EVENT_TYPE_POINTER_DOWN;
+    UI_EVENT_TYPE_POINTER_UP;
+    UI_EVENT_TYPE_POINTER_MOVE;
+    UI_EVENT_TYPE_RIGHT_POINTER_DOWN;
+    UI_EVENT_TYPE_RIGHT_POINTER_UP;
+    UI_EVENT_TYPE_WHEEL;
+    UI_EVENT_TYPE_CHANGED;
+    UI_EVENT_TYPE_KEY_DOWN;
+    UI_EVENT_TYPE_KEY_UP;
+    UI_EVENT_TYPE_SHORTCUT;
+    UI_EVENT_TYPE_CONTEXT_MENU;
+    UI_EVENT_TYPE_FILE_DROP;
+    UI_EVENT_TYPE_TAB_CHANGED;
+    UI_EVENT_TYPE_CUSTOM;
+}
+@:native("Atomic")
+extern enum UI_WIDGET_Z_REL {
+    UI_WIDGET_Z_REL_BEFORE;
+    UI_WIDGET_Z_REL_AFTER;
+}
+@:native("Atomic")
+extern enum UI_WINDOW_SETTINGS {
+    UI_WINDOW_SETTINGS_NONE;
+    UI_WINDOW_SETTINGS_TITLEBAR;
+    UI_WINDOW_SETTINGS_RESIZABLE;
+    UI_WINDOW_SETTINGS_CLOSE_BUTTON;
+    UI_WINDOW_SETTINGS_CAN_ACTIVATE;
+    UI_WINDOW_SETTINGS_DEFAULT;
+}
+@:native("Atomic")
+extern enum CompressedFormat {
+    CF_NONE;
+    CF_RGBA;
+    CF_DXT1;
+    CF_DXT3;
+    CF_DXT5;
+    CF_ETC1;
+    CF_PVRTC_RGB_2BPP;
+    CF_PVRTC_RGBA_2BPP;
+    CF_PVRTC_RGB_4BPP;
+    CF_PVRTC_RGBA_4BPP;
+}
+@:native("Atomic")
+extern enum JSONValueType {
+    JSON_ANY;
+    JSON_OBJECT;
+    JSON_ARRAY;
+}
+@:native("Atomic")
+extern enum PListValueType {
+    PLVT_NONE;
+    PLVT_INT;
+    PLVT_BOOL;
+    PLVT_FLOAT;
+    PLVT_STRING;
+    PLVT_VALUEMAP;
+    PLVT_VALUEVECTOR;
+}
+@:native("Atomic")
+extern enum AsyncLoadState {
+    ASYNC_DONE;
+    ASYNC_QUEUED;
+    ASYNC_LOADING;
+    ASYNC_SUCCESS;
+    ASYNC_FAIL;
+}
+@:native("Atomic")
+extern enum ResourceRequest {
+    RESOURCE_CHECKEXISTS;
+    RESOURCE_GETFILE;
+}
+@:native("Atomic")
+extern enum ObserverPositionSendMode {
+    OPSM_NONE;
+    OPSM_POSITION;
+    OPSM_POSITION_ROTATION;
+}
+@:native("Atomic")
+extern enum HttpRequestState {
+    HTTP_INITIALIZING;
+    HTTP_ERROR;
+    HTTP_OPEN;
+    HTTP_CLOSED;
+}
+@:native("Atomic")
+extern enum FileMode {
+    FILE_READ;
+    FILE_WRITE;
+    FILE_READWRITE;
+}
 //Atomic Haxe Definitions
 
 extern class Atomic {
@@ -258,1181 +702,573 @@ extern class Atomic {
     public static var fileSystem: FileSystem;
     public static var network: Network;
 
-   // enum FrustumPlane
-    public static var PLANE_NEAR:FrustumPlane;
-    public static var PLANE_LEFT:FrustumPlane;
-    public static var PLANE_RIGHT:FrustumPlane;
-    public static var PLANE_UP:FrustumPlane;
-    public static var PLANE_DOWN:FrustumPlane;
-    public static var PLANE_FAR:FrustumPlane;
-
-   // enum Intersection
-    public static var OUTSIDE:Intersection;
-    public static var INTERSECTS:Intersection;
-    public static var INSIDE:Intersection;
-
-   // enum InterpolationMode
-    public static var BEZIER_CURVE:InterpolationMode;
-
-   // enum VariantType
-    public static var VAR_NONE:VariantType;
-    public static var VAR_INT:VariantType;
-    public static var VAR_BOOL:VariantType;
-    public static var VAR_FLOAT:VariantType;
-    public static var VAR_VECTOR2:VariantType;
-    public static var VAR_VECTOR3:VariantType;
-    public static var VAR_VECTOR4:VariantType;
-    public static var VAR_QUATERNION:VariantType;
-    public static var VAR_COLOR:VariantType;
-    public static var VAR_STRING:VariantType;
-    public static var VAR_BUFFER:VariantType;
-    public static var VAR_VOIDPTR:VariantType;
-    public static var VAR_RESOURCEREF:VariantType;
-    public static var VAR_RESOURCEREFLIST:VariantType;
-    public static var VAR_VARIANTVECTOR:VariantType;
-    public static var VAR_VARIANTMAP:VariantType;
-    public static var VAR_INTRECT:VariantType;
-    public static var VAR_INTVECTOR2:VariantType;
-    public static var VAR_PTR:VariantType;
-    public static var VAR_MATRIX3:VariantType;
-    public static var VAR_MATRIX3X4:VariantType;
-    public static var VAR_MATRIX4:VariantType;
-    public static var VAR_DOUBLE:VariantType;
-    public static var MAX_VAR_TYPES:VariantType;
-
-   // enum WrapMode
-    public static var WM_LOOP:WrapMode;
-    public static var WM_ONCE:WrapMode;
-    public static var WM_CLAMP:WrapMode;
-
-   // enum CreateMode
-    public static var REPLICATED:CreateMode;
-    public static var LOCAL:CreateMode;
-
-   // enum TransformSpace
-    public static var TS_LOCAL:TransformSpace;
-    public static var TS_PARENT:TransformSpace;
-    public static var TS_WORLD:TransformSpace;
-
-   // enum LoadMode
-    public static var LOAD_RESOURCES_ONLY:LoadMode;
-    public static var LOAD_SCENE:LoadMode;
-    public static var LOAD_SCENE_AND_RESOURCES:LoadMode;
-
-   // enum InterpMethod
-    public static var IM_LINEAR:InterpMethod;
-    public static var IM_SPLINE:InterpMethod;
-
-   // enum UpdateGeometryType
-    public static var UPDATE_NONE:UpdateGeometryType;
-    public static var UPDATE_MAIN_THREAD:UpdateGeometryType;
-    public static var UPDATE_WORKER_THREAD:UpdateGeometryType;
-
-   // enum PrimitiveType
-    public static var TRIANGLE_LIST:PrimitiveType;
-    public static var LINE_LIST:PrimitiveType;
-    public static var POINT_LIST:PrimitiveType;
-    public static var TRIANGLE_STRIP:PrimitiveType;
-    public static var LINE_STRIP:PrimitiveType;
-    public static var TRIANGLE_FAN:PrimitiveType;
-
-   // enum GeometryType
-    public static var GEOM_STATIC:GeometryType;
-    public static var GEOM_SKINNED:GeometryType;
-    public static var GEOM_INSTANCED:GeometryType;
-    public static var GEOM_BILLBOARD:GeometryType;
-    public static var GEOM_STATIC_NOINSTANCING:GeometryType;
-    public static var MAX_GEOMETRYTYPES:GeometryType;
-
-   // enum BlendMode
-    public static var BLEND_REPLACE:BlendMode;
-    public static var BLEND_ADD:BlendMode;
-    public static var BLEND_MULTIPLY:BlendMode;
-    public static var BLEND_ALPHA:BlendMode;
-    public static var BLEND_ADDALPHA:BlendMode;
-    public static var BLEND_PREMULALPHA:BlendMode;
-    public static var BLEND_INVDESTALPHA:BlendMode;
-    public static var BLEND_SUBTRACT:BlendMode;
-    public static var BLEND_SUBTRACTALPHA:BlendMode;
-    public static var MAX_BLENDMODES:BlendMode;
-
-   // enum CompareMode
-    public static var CMP_ALWAYS:CompareMode;
-    public static var CMP_EQUAL:CompareMode;
-    public static var CMP_NOTEQUAL:CompareMode;
-    public static var CMP_LESS:CompareMode;
-    public static var CMP_LESSEQUAL:CompareMode;
-    public static var CMP_GREATER:CompareMode;
-    public static var CMP_GREATEREQUAL:CompareMode;
-    public static var MAX_COMPAREMODES:CompareMode;
-
-   // enum CullMode
-    public static var CULL_NONE:CullMode;
-    public static var CULL_CCW:CullMode;
-    public static var CULL_CW:CullMode;
-    public static var MAX_CULLMODES:CullMode;
-
-   // enum FillMode
-    public static var FILL_SOLID:FillMode;
-    public static var FILL_WIREFRAME:FillMode;
-    public static var FILL_POINT:FillMode;
-
-   // enum StencilOp
-    public static var OP_KEEP:StencilOp;
-    public static var OP_ZERO:StencilOp;
-    public static var OP_REF:StencilOp;
-    public static var OP_INCR:StencilOp;
-    public static var OP_DECR:StencilOp;
-
-   // enum LockState
-    public static var LOCK_NONE:LockState;
-    public static var LOCK_HARDWARE:LockState;
-    public static var LOCK_SHADOW:LockState;
-    public static var LOCK_SCRATCH:LockState;
-
-   // enum VertexElement
-    public static var ELEMENT_POSITION:VertexElement;
-    public static var ELEMENT_NORMAL:VertexElement;
-    public static var ELEMENT_COLOR:VertexElement;
-    public static var ELEMENT_TEXCOORD1:VertexElement;
-    public static var ELEMENT_TEXCOORD2:VertexElement;
-    public static var ELEMENT_CUBETEXCOORD1:VertexElement;
-    public static var ELEMENT_CUBETEXCOORD2:VertexElement;
-    public static var ELEMENT_TANGENT:VertexElement;
-    public static var ELEMENT_BLENDWEIGHTS:VertexElement;
-    public static var ELEMENT_BLENDINDICES:VertexElement;
-    public static var ELEMENT_INSTANCEMATRIX1:VertexElement;
-    public static var ELEMENT_INSTANCEMATRIX2:VertexElement;
-    public static var ELEMENT_INSTANCEMATRIX3:VertexElement;
-    public static var MAX_VERTEX_ELEMENTS:VertexElement;
-
-   // enum TextureFilterMode
-    public static var FILTER_NEAREST:TextureFilterMode;
-    public static var FILTER_BILINEAR:TextureFilterMode;
-    public static var FILTER_TRILINEAR:TextureFilterMode;
-    public static var FILTER_ANISOTROPIC:TextureFilterMode;
-    public static var FILTER_DEFAULT:TextureFilterMode;
-    public static var MAX_FILTERMODES:TextureFilterMode;
-
-   // enum TextureAddressMode
-    public static var ADDRESS_WRAP:TextureAddressMode;
-    public static var ADDRESS_MIRROR:TextureAddressMode;
-    public static var ADDRESS_CLAMP:TextureAddressMode;
-    public static var ADDRESS_BORDER:TextureAddressMode;
-    public static var MAX_ADDRESSMODES:TextureAddressMode;
-
-   // enum TextureCoordinate
-    public static var COORD_U:TextureCoordinate;
-    public static var COORD_V:TextureCoordinate;
-    public static var COORD_W:TextureCoordinate;
-    public static var MAX_COORDS:TextureCoordinate;
-
-   // enum TextureUsage
-    public static var TEXTURE_STATIC:TextureUsage;
-    public static var TEXTURE_DYNAMIC:TextureUsage;
-    public static var TEXTURE_RENDERTARGET:TextureUsage;
-    public static var TEXTURE_DEPTHSTENCIL:TextureUsage;
-
-   // enum CubeMapFace
-    public static var FACE_POSITIVE_X:CubeMapFace;
-    public static var FACE_NEGATIVE_X:CubeMapFace;
-    public static var FACE_POSITIVE_Y:CubeMapFace;
-    public static var FACE_NEGATIVE_Y:CubeMapFace;
-    public static var FACE_POSITIVE_Z:CubeMapFace;
-    public static var FACE_NEGATIVE_Z:CubeMapFace;
-    public static var MAX_CUBEMAP_FACES:CubeMapFace;
-
-   // enum CubeMapLayout
-    public static var CML_HORIZONTAL:CubeMapLayout;
-    public static var CML_HORIZONTALNVIDIA:CubeMapLayout;
-    public static var CML_HORIZONTALCROSS:CubeMapLayout;
-    public static var CML_VERTICALCROSS:CubeMapLayout;
-    public static var CML_BLENDER:CubeMapLayout;
-
-   // enum RenderSurfaceUpdateMode
-    public static var SURFACE_MANUALUPDATE:RenderSurfaceUpdateMode;
-    public static var SURFACE_UPDATEVISIBLE:RenderSurfaceUpdateMode;
-    public static var SURFACE_UPDATEALWAYS:RenderSurfaceUpdateMode;
-
-   // enum ShaderType
-    public static var VS:ShaderType;
-    public static var PS:ShaderType;
-
-   // enum ShaderParameterGroup
-    public static var SP_FRAME:ShaderParameterGroup;
-    public static var SP_CAMERA:ShaderParameterGroup;
-    public static var SP_ZONE:ShaderParameterGroup;
-    public static var SP_LIGHT:ShaderParameterGroup;
-    public static var SP_MATERIAL:ShaderParameterGroup;
-    public static var SP_OBJECT:ShaderParameterGroup;
-    public static var SP_CUSTOM:ShaderParameterGroup;
-    public static var MAX_SHADER_PARAMETER_GROUPS:ShaderParameterGroup;
-
-   // enum TextureUnit
-    public static var TU_DIFFUSE:TextureUnit;
-    public static var TU_ALBEDOBUFFER:TextureUnit;
-    public static var TU_NORMAL:TextureUnit;
-    public static var TU_NORMALBUFFER:TextureUnit;
-    public static var TU_SPECULAR:TextureUnit;
-    public static var TU_EMISSIVE:TextureUnit;
-    public static var TU_ENVIRONMENT:TextureUnit;
-    public static var TU_VOLUMEMAP:TextureUnit;
-    public static var TU_CUSTOM1:TextureUnit;
-    public static var TU_CUSTOM2:TextureUnit;
-    public static var TU_LIGHTRAMP:TextureUnit;
-    public static var TU_LIGHTSHAPE:TextureUnit;
-    public static var TU_SHADOWMAP:TextureUnit;
-    public static var TU_FACESELECT:TextureUnit;
-    public static var TU_INDIRECTION:TextureUnit;
-    public static var TU_DEPTHBUFFER:TextureUnit;
-    public static var TU_LIGHTBUFFER:TextureUnit;
-    public static var TU_ZONE:TextureUnit;
-    public static var MAX_MATERIAL_TEXTURE_UNITS:TextureUnit;
-    public static var MAX_TEXTURE_UNITS:TextureUnit;
-
-   // enum FaceCameraMode
-    public static var FC_NONE:FaceCameraMode;
-    public static var FC_ROTATE_XYZ:FaceCameraMode;
-    public static var FC_ROTATE_Y:FaceCameraMode;
-    public static var FC_LOOKAT_XYZ:FaceCameraMode;
-    public static var FC_LOOKAT_Y:FaceCameraMode;
-
-   // enum LightType
-    public static var LIGHT_DIRECTIONAL:LightType;
-    public static var LIGHT_SPOT:LightType;
-    public static var LIGHT_POINT:LightType;
-
-   // enum RayQueryLevel
-    public static var RAY_AABB:RayQueryLevel;
-    public static var RAY_OBB:RayQueryLevel;
-    public static var RAY_TRIANGLE:RayQueryLevel;
-    public static var RAY_TRIANGLE_UV:RayQueryLevel;
-
-   // enum LightVSVariation
-    public static var LVS_DIR:LightVSVariation;
-    public static var LVS_SPOT:LightVSVariation;
-    public static var LVS_POINT:LightVSVariation;
-    public static var LVS_SHADOW:LightVSVariation;
-    public static var LVS_SPOTSHADOW:LightVSVariation;
-    public static var LVS_POINTSHADOW:LightVSVariation;
-    public static var MAX_LIGHT_VS_VARIATIONS:LightVSVariation;
-
-   // enum VertexLightVSVariation
-    public static var VLVS_NOLIGHTS:VertexLightVSVariation;
-    public static var VLVS_1LIGHT:VertexLightVSVariation;
-    public static var VLVS_2LIGHTS:VertexLightVSVariation;
-    public static var VLVS_3LIGHTS:VertexLightVSVariation;
-    public static var VLVS_4LIGHTS:VertexLightVSVariation;
-    public static var MAX_VERTEXLIGHT_VS_VARIATIONS:VertexLightVSVariation;
-
-   // enum LightPSVariation
-    public static var LPS_NONE:LightPSVariation;
-    public static var LPS_SPOT:LightPSVariation;
-    public static var LPS_POINT:LightPSVariation;
-    public static var LPS_POINTMASK:LightPSVariation;
-    public static var LPS_SPEC:LightPSVariation;
-    public static var LPS_SPOTSPEC:LightPSVariation;
-    public static var LPS_POINTSPEC:LightPSVariation;
-    public static var LPS_POINTMASKSPEC:LightPSVariation;
-    public static var LPS_SHADOW:LightPSVariation;
-    public static var LPS_SPOTSHADOW:LightPSVariation;
-    public static var LPS_POINTSHADOW:LightPSVariation;
-    public static var LPS_POINTMASKSHADOW:LightPSVariation;
-    public static var LPS_SHADOWSPEC:LightPSVariation;
-    public static var LPS_SPOTSHADOWSPEC:LightPSVariation;
-    public static var LPS_POINTSHADOWSPEC:LightPSVariation;
-    public static var LPS_POINTMASKSHADOWSPEC:LightPSVariation;
-    public static var MAX_LIGHT_PS_VARIATIONS:LightPSVariation;
-
-   // enum DeferredLightVSVariation
-    public static var DLVS_NONE:DeferredLightVSVariation;
-    public static var DLVS_DIR:DeferredLightVSVariation;
-    public static var DLVS_ORTHO:DeferredLightVSVariation;
-    public static var DLVS_ORTHODIR:DeferredLightVSVariation;
-    public static var MAX_DEFERRED_LIGHT_VS_VARIATIONS:DeferredLightVSVariation;
-
-   // enum DeferredLightPSVariation
-    public static var DLPS_NONE:DeferredLightPSVariation;
-    public static var DLPS_SPOT:DeferredLightPSVariation;
-    public static var DLPS_POINT:DeferredLightPSVariation;
-    public static var DLPS_POINTMASK:DeferredLightPSVariation;
-    public static var DLPS_SPEC:DeferredLightPSVariation;
-    public static var DLPS_SPOTSPEC:DeferredLightPSVariation;
-    public static var DLPS_POINTSPEC:DeferredLightPSVariation;
-    public static var DLPS_POINTMASKSPEC:DeferredLightPSVariation;
-    public static var DLPS_SHADOW:DeferredLightPSVariation;
-    public static var DLPS_SPOTSHADOW:DeferredLightPSVariation;
-    public static var DLPS_POINTSHADOW:DeferredLightPSVariation;
-    public static var DLPS_POINTMASKSHADOW:DeferredLightPSVariation;
-    public static var DLPS_SHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_SPOTSHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_POINTSHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_POINTMASKSHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHO:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSPOT:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINT:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTMASK:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSPOTSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTMASKSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSHADOW:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSPOTSHADOW:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTSHADOW:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTMASKSHADOW:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOSPOTSHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTSHADOWSPEC:DeferredLightPSVariation;
-    public static var DLPS_ORTHOPOINTMASKSHADOWSPEC:DeferredLightPSVariation;
-    public static var MAX_DEFERRED_LIGHT_PS_VARIATIONS:DeferredLightPSVariation;
-
-   // enum RenderCommandType
-    public static var CMD_NONE:RenderCommandType;
-    public static var CMD_CLEAR:RenderCommandType;
-    public static var CMD_SCENEPASS:RenderCommandType;
-    public static var CMD_QUAD:RenderCommandType;
-    public static var CMD_FORWARDLIGHTS:RenderCommandType;
-    public static var CMD_LIGHTVOLUMES:RenderCommandType;
-    public static var CMD_RENDERUI:RenderCommandType;
-
-   // enum RenderCommandSortMode
-    public static var SORT_FRONTTOBACK:RenderCommandSortMode;
-    public static var SORT_BACKTOFRONT:RenderCommandSortMode;
-
-   // enum RenderTargetSizeMode
-    public static var SIZE_ABSOLUTE:RenderTargetSizeMode;
-    public static var SIZE_VIEWPORTDIVISOR:RenderTargetSizeMode;
-    public static var SIZE_VIEWPORTMULTIPLIER:RenderTargetSizeMode;
-
-   // enum PassLightingMode
-    public static var LIGHTING_UNLIT:PassLightingMode;
-    public static var LIGHTING_PERVERTEX:PassLightingMode;
-    public static var LIGHTING_PERPIXEL:PassLightingMode;
-
-   // enum EmitterType
-    public static var EMITTER_SPHERE:EmitterType;
-    public static var EMITTER_BOX:EmitterType;
-
-   // enum LoopMode2D
-    public static var LM_DEFAULT:LoopMode2D;
-    public static var LM_FORCE_LOOPED:LoopMode2D;
-    public static var LM_FORCE_CLAMPED:LoopMode2D;
-
-   // enum LightType2D
-    public static var LIGHT2D_DIRECTIONAL:LightType2D;
-    public static var LIGHT2D_POINT:LightType2D;
-
-   // enum EmitterType2D
-    public static var EMITTER_TYPE_GRAVITY:EmitterType2D;
-    public static var EMITTER_TYPE_RADIAL:EmitterType2D;
-
-   // enum BodyType2D
-    public static var BT_STATIC:BodyType2D;
-    public static var BT_DYNAMIC:BodyType2D;
-    public static var BT_KINEMATIC:BodyType2D;
-
-   // enum Orientation2D
-    public static var O_ORTHOGONAL:Orientation2D;
-    public static var O_ISOMETRIC:Orientation2D;
-    public static var O_STAGGERED:Orientation2D;
-
-   // enum TileMapLayerType2D
-    public static var LT_TILE_LAYER:TileMapLayerType2D;
-    public static var LT_OBJECT_GROUP:TileMapLayerType2D;
-    public static var LT_IMAGE_LAYER:TileMapLayerType2D;
-    public static var LT_INVALID:TileMapLayerType2D;
-
-   // enum TileMapObjectType2D
-    public static var OT_RECTANGLE:TileMapObjectType2D;
-    public static var OT_ELLIPSE:TileMapObjectType2D;
-    public static var OT_POLYGON:TileMapObjectType2D;
-    public static var OT_POLYLINE:TileMapObjectType2D;
-    public static var OT_TILE:TileMapObjectType2D;
-    public static var OT_INVALID:TileMapObjectType2D;
-
-   // enum ShapeType
-    public static var SHAPE_BOX:ShapeType;
-    public static var SHAPE_SPHERE:ShapeType;
-    public static var SHAPE_STATICPLANE:ShapeType;
-    public static var SHAPE_CYLINDER:ShapeType;
-    public static var SHAPE_CAPSULE:ShapeType;
-    public static var SHAPE_CONE:ShapeType;
-    public static var SHAPE_TRIANGLEMESH:ShapeType;
-    public static var SHAPE_CONVEXHULL:ShapeType;
-    public static var SHAPE_TERRAIN:ShapeType;
-
-   // enum ConstraintType
-    public static var CONSTRAINT_POINT:ConstraintType;
-    public static var CONSTRAINT_HINGE:ConstraintType;
-    public static var CONSTRAINT_SLIDER:ConstraintType;
-    public static var CONSTRAINT_CONETWIST:ConstraintType;
-
-   // enum CollisionEventMode
-    public static var COLLISION_NEVER:CollisionEventMode;
-    public static var COLLISION_ACTIVE:CollisionEventMode;
-    public static var COLLISION_ALWAYS:CollisionEventMode;
-
-   // enum CrowdTargetState
-    public static var CROWD_AGENT_TARGET_NONE:CrowdTargetState;
-    public static var CROWD_AGENT_TARGET_FAILED:CrowdTargetState;
-    public static var CROWD_AGENT_TARGET_VALID:CrowdTargetState;
-    public static var CROWD_AGENT_TARGET_REQUESTING:CrowdTargetState;
-    public static var CROWD_AGENT_TARGET_WAITINGFORQUEUE:CrowdTargetState;
-    public static var CROWD_AGENT_TARGET_WAITINGFORPATH:CrowdTargetState;
-    public static var CROWD_AGENT_TARGET_VELOCITY:CrowdTargetState;
-
-   // enum CrowdAgentState
-    public static var CROWD_AGENT_INVALID:CrowdAgentState;
-    public static var CROWD_AGENT_READY:CrowdAgentState;
-    public static var CROWD_AGENT_TRAVERSINGLINK:CrowdAgentState;
-
-   // enum NavigationQuality
-    public static var NAVIGATIONQUALITY_LOW:NavigationQuality;
-    public static var NAVIGATIONQUALITY_MEDIUM:NavigationQuality;
-    public static var NAVIGATIONQUALITY_HIGH:NavigationQuality;
-
-   // enum NavigationPushiness
-    public static var PUSHINESS_LOW:NavigationPushiness;
-    public static var PUSHINESS_MEDIUM:NavigationPushiness;
-    public static var PUSHINESS_HIGH:NavigationPushiness;
-
-   // enum NavmeshPartitionType
-    public static var NAVMESH_PARTITION_WATERSHED:NavmeshPartitionType;
-    public static var NAVMESH_PARTITION_MONOTONE:NavmeshPartitionType;
-
-   // enum MouseMode
-    public static var MM_ABSOLUTE:MouseMode;
-    public static var MM_RELATIVE:MouseMode;
-    public static var MM_WRAP:MouseMode;
-
-   // enum TEXT_ALIGN
-    public static var TEXT_ALIGN_LEFT:TEXT_ALIGN;
-    public static var TEXT_ALIGN_RIGHT:TEXT_ALIGN;
-    public static var TEXT_ALIGN_CENTER:TEXT_ALIGN;
-
-   // enum UI_EDIT_TYPE
-    public static var UI_EDIT_TYPE_TEXT:UI_EDIT_TYPE;
-    public static var UI_EDIT_TYPE_SEARCH:UI_EDIT_TYPE;
-    public static var UI_EDIT_TYPE_PASSWORD:UI_EDIT_TYPE;
-    public static var UI_EDIT_TYPE_EMAIL:UI_EDIT_TYPE;
-    public static var UI_EDIT_TYPE_PHONE:UI_EDIT_TYPE;
-    public static var UI_EDIT_TYPE_URL:UI_EDIT_TYPE;
-    public static var UI_EDIT_TYPE_NUMBER:UI_EDIT_TYPE;
-
-   // enum UI_AXIS
-    public static var UI_AXIS_X:UI_AXIS;
-    public static var UI_AXIS_Y:UI_AXIS;
-
-   // enum UI_LAYOUT_SIZE
-    public static var UI_LAYOUT_SIZE_GRAVITY:UI_LAYOUT_SIZE;
-    public static var UI_LAYOUT_SIZE_PREFERRED:UI_LAYOUT_SIZE;
-    public static var UI_LAYOUT_SIZE_AVAILABLE:UI_LAYOUT_SIZE;
-
-   // enum UI_LAYOUT_DISTRIBUTION
-    public static var UI_LAYOUT_DISTRIBUTION_PREFERRED:UI_LAYOUT_DISTRIBUTION;
-    public static var UI_LAYOUT_DISTRIBUTION_AVAILABLE:UI_LAYOUT_DISTRIBUTION;
-    public static var UI_LAYOUT_DISTRIBUTION_GRAVITY:UI_LAYOUT_DISTRIBUTION;
-
-   // enum UI_LAYOUT_POSITION
-    public static var UI_LAYOUT_POSITION_CENTER:UI_LAYOUT_POSITION;
-    public static var UI_LAYOUT_POSITION_LEFT_TOP:UI_LAYOUT_POSITION;
-    public static var UI_LAYOUT_POSITION_RIGHT_BOTTOM:UI_LAYOUT_POSITION;
-    public static var UI_LAYOUT_POSITION_GRAVITY:UI_LAYOUT_POSITION;
-
-   // enum UI_LAYOUT_DISTRIBUTION_POSITION
-    public static var UI_LAYOUT_DISTRIBUTION_POSITION_CENTER:UI_LAYOUT_DISTRIBUTION_POSITION;
-    public static var UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP:UI_LAYOUT_DISTRIBUTION_POSITION;
-    public static var UI_LAYOUT_DISTRIBUTION_POSITION_RIGHT_BOTTOM:UI_LAYOUT_DISTRIBUTION_POSITION;
-
-   // enum UI_MESSAGEWINDOW_SETTINGS
-    public static var UI_MESSAGEWINDOW_SETTINGS_OK:UI_MESSAGEWINDOW_SETTINGS;
-    public static var UI_MESSAGEWINDOW_SETTINGS_OK_CANCEL:UI_MESSAGEWINDOW_SETTINGS;
-    public static var UI_MESSAGEWINDOW_SETTINGS_YES_NO:UI_MESSAGEWINDOW_SETTINGS;
-
-   // enum UI_SIZE_DEP
-    public static var UI_SIZE_DEP_NONE:UI_SIZE_DEP;
-    public static var UI_SIZE_DEP_WIDTH_DEPEND_ON_HEIGHT:UI_SIZE_DEP;
-    public static var UI_SIZE_DEP_HEIGHT_DEPEND_ON_WIDTH:UI_SIZE_DEP;
-    public static var UI_SIZE_DEP_BOTH:UI_SIZE_DEP;
-
-   // enum UI_SCROLL_MODE
-    public static var UI_SCROLL_MODE_X_Y:UI_SCROLL_MODE;
-    public static var UI_SCROLL_MODE_Y:UI_SCROLL_MODE;
-    public static var UI_SCROLL_MODE_Y_AUTO:UI_SCROLL_MODE;
-    public static var UI_SCROLL_MODE_X_AUTO_Y_AUTO:UI_SCROLL_MODE;
-    public static var UI_SCROLL_MODE_OFF:UI_SCROLL_MODE;
-
-   // enum UI_TEXT_ALIGN
-    public static var UI_TEXT_ALIGN_LEFT:UI_TEXT_ALIGN;
-    public static var UI_TEXT_ALIGN_RIGHT:UI_TEXT_ALIGN;
-    public static var UI_TEXT_ALIGN_CENTER:UI_TEXT_ALIGN;
-
-   // enum UI_WIDGET_VISIBILITY
-    public static var UI_WIDGET_VISIBILITY_VISIBLE:UI_WIDGET_VISIBILITY;
-    public static var UI_WIDGET_VISIBILITY_INVISIBLE:UI_WIDGET_VISIBILITY;
-    public static var UI_WIDGET_VISIBILITY_GONE:UI_WIDGET_VISIBILITY;
-
-   // enum UI_GRAVITY
-    public static var UI_GRAVITY_NONE:UI_GRAVITY;
-    public static var UI_GRAVITY_LEFT:UI_GRAVITY;
-    public static var UI_GRAVITY_RIGHT:UI_GRAVITY;
-    public static var UI_GRAVITY_TOP:UI_GRAVITY;
-    public static var UI_GRAVITY_BOTTOM:UI_GRAVITY;
-    public static var UI_GRAVITY_LEFT_RIGHT:UI_GRAVITY;
-    public static var UI_GRAVITY_TOP_BOTTOM:UI_GRAVITY;
-    public static var UI_GRAVITY_ALL:UI_GRAVITY;
-    public static var UI_GRAVITY_DEFAULT:UI_GRAVITY;
-
-   // enum UI_EVENT_TYPE
-    public static var UI_EVENT_TYPE_CLICK:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_LONG_CLICK:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_POINTER_DOWN:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_POINTER_UP:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_POINTER_MOVE:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_RIGHT_POINTER_DOWN:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_RIGHT_POINTER_UP:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_WHEEL:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_CHANGED:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_KEY_DOWN:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_KEY_UP:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_SHORTCUT:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_CONTEXT_MENU:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_FILE_DROP:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_TAB_CHANGED:UI_EVENT_TYPE;
-    public static var UI_EVENT_TYPE_CUSTOM:UI_EVENT_TYPE;
-
-   // enum UI_WIDGET_Z_REL
-    public static var UI_WIDGET_Z_REL_BEFORE:UI_WIDGET_Z_REL;
-    public static var UI_WIDGET_Z_REL_AFTER:UI_WIDGET_Z_REL;
-
-   // enum UI_WINDOW_SETTINGS
-    public static var UI_WINDOW_SETTINGS_NONE:UI_WINDOW_SETTINGS;
-    public static var UI_WINDOW_SETTINGS_TITLEBAR:UI_WINDOW_SETTINGS;
-    public static var UI_WINDOW_SETTINGS_RESIZABLE:UI_WINDOW_SETTINGS;
-    public static var UI_WINDOW_SETTINGS_CLOSE_BUTTON:UI_WINDOW_SETTINGS;
-    public static var UI_WINDOW_SETTINGS_CAN_ACTIVATE:UI_WINDOW_SETTINGS;
-    public static var UI_WINDOW_SETTINGS_DEFAULT:UI_WINDOW_SETTINGS;
-
-   // enum CompressedFormat
-    public static var CF_NONE:CompressedFormat;
-    public static var CF_RGBA:CompressedFormat;
-    public static var CF_DXT1:CompressedFormat;
-    public static var CF_DXT3:CompressedFormat;
-    public static var CF_DXT5:CompressedFormat;
-    public static var CF_ETC1:CompressedFormat;
-    public static var CF_PVRTC_RGB_2BPP:CompressedFormat;
-    public static var CF_PVRTC_RGBA_2BPP:CompressedFormat;
-    public static var CF_PVRTC_RGB_4BPP:CompressedFormat;
-    public static var CF_PVRTC_RGBA_4BPP:CompressedFormat;
-
-   // enum JSONValueType
-    public static var JSON_ANY:JSONValueType;
-    public static var JSON_OBJECT:JSONValueType;
-    public static var JSON_ARRAY:JSONValueType;
-
-   // enum PListValueType
-    public static var PLVT_NONE:PListValueType;
-    public static var PLVT_INT:PListValueType;
-    public static var PLVT_BOOL:PListValueType;
-    public static var PLVT_FLOAT:PListValueType;
-    public static var PLVT_STRING:PListValueType;
-    public static var PLVT_VALUEMAP:PListValueType;
-    public static var PLVT_VALUEVECTOR:PListValueType;
-
-   // enum AsyncLoadState
-    public static var ASYNC_DONE:AsyncLoadState;
-    public static var ASYNC_QUEUED:AsyncLoadState;
-    public static var ASYNC_LOADING:AsyncLoadState;
-    public static var ASYNC_SUCCESS:AsyncLoadState;
-    public static var ASYNC_FAIL:AsyncLoadState;
-
-   // enum ResourceRequest
-    public static var RESOURCE_CHECKEXISTS:ResourceRequest;
-    public static var RESOURCE_GETFILE:ResourceRequest;
-
-   // enum ObserverPositionSendMode
-    public static var OPSM_NONE:ObserverPositionSendMode;
-    public static var OPSM_POSITION:ObserverPositionSendMode;
-    public static var OPSM_POSITION_ROTATION:ObserverPositionSendMode;
-
-   // enum HttpRequestState
-    public static var HTTP_INITIALIZING:HttpRequestState;
-    public static var HTTP_ERROR:HttpRequestState;
-    public static var HTTP_OPEN:HttpRequestState;
-    public static var HTTP_CLOSED:HttpRequestState;
-
-   // enum FileMode
-    public static var FILE_READ:FileMode;
-    public static var FILE_WRITE:FileMode;
-    public static var FILE_READWRITE:FileMode;
-
-   public static var QUICKSORT_THRESHOLD: Int;
-   public static var CONVERSION_BUFFER_LENGTH: Int;
-   public static var MATRIX_CONVERSION_BUFFER_LENGTH: Int;
-
-
-   public static var NUM_FRUSTUM_PLANES: Int;
-   public static var NUM_FRUSTUM_VERTICES: Int;
-   public static var M_PI: Int;
-   public static var M_HALF_PI: Int;
-   public static var M_MIN_INT: Int;
-   public static var M_MAX_INT: Int;
-   public static var M_MIN_UNSIGNED: Int;
-   public static var M_MAX_UNSIGNED: Int;
-   public static var M_EPSILON: Int;
-   public static var M_LARGE_EPSILON: Int;
-   public static var M_MIN_NEARCLIP: Int;
-   public static var M_MAX_FOV: Int;
-   public static var M_LARGE_VALUE: Int;
-   public static var M_INFINITY: Int;
-   public static var M_DEGTORAD: Int;
-   public static var M_DEGTORAD_2: Int;
-   public static var M_RADTODEG: Int;
-
-
-   public static var AM_EDIT: Int;
-   public static var AM_FILE: Int;
-   public static var AM_NET: Int;
-   public static var AM_DEFAULT: Int;
-   public static var AM_LATESTDATA: Int;
-   public static var AM_NOEDIT: Int;
-   public static var AM_NODEID: Int;
-   public static var AM_COMPONENTID: Int;
-   public static var AM_NODEIDVECTOR: Int;
-
-
-   public static var USE_UPDATE: Int;
-   public static var USE_POSTUPDATE: Int;
-   public static var USE_FIXEDUPDATE: Int;
-   public static var USE_FIXEDPOSTUPDATE: Int;
-   public static var MAX_NETWORK_ATTRIBUTES: Int;
-   public static var FIRST_REPLICATED_ID: Int;
-   public static var LAST_REPLICATED_ID: Int;
-   public static var FIRST_LOCAL_ID: Int;
-   public static var LAST_LOCAL_ID: Int;
-   public static var SMOOTH_NONE: Int;
-   public static var SMOOTH_POSITION: Int;
-   public static var SMOOTH_ROTATION: Int;
-
-
-   public static var DEFAULT_NEARCLIP: Int;
-   public static var DEFAULT_FARCLIP: Int;
-   public static var DEFAULT_CAMERA_FOV: Int;
-   public static var DEFAULT_ORTHOSIZE: Int;
-   public static var VO_NONE: Int;
-   public static var VO_LOW_MATERIAL_QUALITY: Int;
-   public static var VO_DISABLE_SHADOWS: Int;
-   public static var VO_DISABLE_OCCLUSION: Int;
-   public static var DRAWABLE_GEOMETRY: Int;
-   public static var DRAWABLE_LIGHT: Int;
-   public static var DRAWABLE_ZONE: Int;
-   public static var DRAWABLE_GEOMETRY2D: Int;
-   public static var DRAWABLE_ANY: Int;
-   public static var DEFAULT_VIEWMASK: Int;
-   public static var DEFAULT_LIGHTMASK: Int;
-   public static var DEFAULT_SHADOWMASK: Int;
-   public static var DEFAULT_ZONEMASK: Int;
-   public static var MAX_VERTEX_LIGHTS: Int;
-   public static var ANIMATION_LOD_BASESCALE: Int;
-   public static var QUALITY_LOW: Int;
-   public static var QUALITY_MEDIUM: Int;
-   public static var QUALITY_HIGH: Int;
-   public static var QUALITY_MAX: Int;
-   public static var SHADOWQUALITY_LOW_16BIT: Int;
-   public static var SHADOWQUALITY_LOW_24BIT: Int;
-   public static var SHADOWQUALITY_HIGH_16BIT: Int;
-   public static var SHADOWQUALITY_HIGH_24BIT: Int;
-   public static var CLEAR_COLOR: Int;
-   public static var CLEAR_DEPTH: Int;
-   public static var CLEAR_STENCIL: Int;
-   public static var MASK_NONE: Int;
-   public static var MASK_POSITION: Int;
-   public static var MASK_NORMAL: Int;
-   public static var MASK_COLOR: Int;
-   public static var MASK_TEXCOORD1: Int;
-   public static var MASK_TEXCOORD2: Int;
-   public static var MASK_CUBETEXCOORD1: Int;
-   public static var MASK_CUBETEXCOORD2: Int;
-   public static var MASK_TANGENT: Int;
-   public static var MASK_BLENDWEIGHTS: Int;
-   public static var MASK_BLENDINDICES: Int;
-   public static var MASK_INSTANCEMATRIX1: Int;
-   public static var MASK_INSTANCEMATRIX2: Int;
-   public static var MASK_INSTANCEMATRIX3: Int;
-   public static var MASK_DEFAULT: Int;
-   public static var NO_ELEMENT: Int;
-   public static var MAX_RENDERTARGETS: Int;
-   public static var MAX_VERTEX_STREAMS: Int;
-   public static var MAX_CONSTANT_REGISTERS: Int;
-   public static var BITS_PER_COMPONENT: Int;
-   public static var SHADOW_MIN_QUANTIZE: Int;
-   public static var SHADOW_MIN_VIEW: Int;
-   public static var MAX_LIGHT_SPLITS: Int;
-   public static var MAX_CASCADE_SPLITS: Int;
-   public static var OCCLUSION_MIN_SIZE: Int;
-   public static var OCCLUSION_DEFAULT_MAX_TRIANGLES: Int;
-   public static var OCCLUSION_RELATIVE_BIAS: Int;
-   public static var OCCLUSION_FIXED_BIAS: Int;
-   public static var OCCLUSION_X_SCALE: Int;
-   public static var OCCLUSION_Z_SCALE: Int;
-   public static var NUM_OCTANTS: Int;
-   public static var ROOT_INDEX: Int;
-   public static var SHADOW_MIN_PIXELS: Int;
-   public static var INSTANCING_BUFFER_DEFAULT_SIZE: Int;
-   public static var MAX_VIEWPORT_TEXTURES: Int;
-   public static var MAX_TEXTURE_QUALITY_LEVELS: Int;
-
-
-   public static var CHANNEL_POSITION: Int;
-   public static var CHANNEL_ROTATION: Int;
-   public static var CHANNEL_SCALE: Int;
-   public static var MAX_BILLBOARDS: Int;
-   public static var DEFAULT_NUM_PARTICLES: Int;
-   public static var BONECOLLISION_NONE: Int;
-   public static var BONECOLLISION_SPHERE: Int;
-   public static var BONECOLLISION_BOX: Int;
-
-
-   public static var PIXEL_SIZE: Int;
-
-
-   public static var STREAM_BUFFER_LENGTH: Int;
-
-
-   public static var DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY: Int;
-
-
-   public static var MOUSEB_LEFT: Int;
-   public static var MOUSEB_MIDDLE: Int;
-   public static var MOUSEB_RIGHT: Int;
-   public static var MOUSEB_X1: Int;
-   public static var MOUSEB_X2: Int;
-   public static var QUAL_SHIFT: Int;
-   public static var QUAL_CTRL: Int;
-   public static var QUAL_ALT: Int;
-   public static var QUAL_ANY: Int;
-   public static var KEY_A: Int;
-   public static var KEY_B: Int;
-   public static var KEY_C: Int;
-   public static var KEY_D: Int;
-   public static var KEY_E: Int;
-   public static var KEY_F: Int;
-   public static var KEY_G: Int;
-   public static var KEY_H: Int;
-   public static var KEY_I: Int;
-   public static var KEY_J: Int;
-   public static var KEY_K: Int;
-   public static var KEY_L: Int;
-   public static var KEY_M: Int;
-   public static var KEY_N: Int;
-   public static var KEY_O: Int;
-   public static var KEY_P: Int;
-   public static var KEY_Q: Int;
-   public static var KEY_R: Int;
-   public static var KEY_S: Int;
-   public static var KEY_T: Int;
-   public static var KEY_U: Int;
-   public static var KEY_V: Int;
-   public static var KEY_W: Int;
-   public static var KEY_X: Int;
-   public static var KEY_Y: Int;
-   public static var KEY_Z: Int;
-   public static var KEY_0: Int;
-   public static var KEY_1: Int;
-   public static var KEY_2: Int;
-   public static var KEY_3: Int;
-   public static var KEY_4: Int;
-   public static var KEY_5: Int;
-   public static var KEY_6: Int;
-   public static var KEY_7: Int;
-   public static var KEY_8: Int;
-   public static var KEY_9: Int;
-   public static var KEY_BACKSPACE: Int;
-   public static var KEY_TAB: Int;
-   public static var KEY_RETURN: Int;
-   public static var KEY_RETURN2: Int;
-   public static var KEY_KP_ENTER: Int;
-   public static var KEY_SHIFT: Int;
-   public static var KEY_CTRL: Int;
-   public static var KEY_ALT: Int;
-   public static var KEY_GUI: Int;
-   public static var KEY_PAUSE: Int;
-   public static var KEY_CAPSLOCK: Int;
-   public static var KEY_ESC: Int;
-   public static var KEY_SPACE: Int;
-   public static var KEY_PAGEUP: Int;
-   public static var KEY_PAGEDOWN: Int;
-   public static var KEY_END: Int;
-   public static var KEY_HOME: Int;
-   public static var KEY_LEFT: Int;
-   public static var KEY_UP: Int;
-   public static var KEY_RIGHT: Int;
-   public static var KEY_DOWN: Int;
-   public static var KEY_SELECT: Int;
-   public static var KEY_PRINTSCREEN: Int;
-   public static var KEY_INSERT: Int;
-   public static var KEY_DELETE: Int;
-   public static var KEY_LGUI: Int;
-   public static var KEY_RGUI: Int;
-   public static var KEY_APPLICATION: Int;
-   public static var KEY_KP_0: Int;
-   public static var KEY_KP_1: Int;
-   public static var KEY_KP_2: Int;
-   public static var KEY_KP_3: Int;
-   public static var KEY_KP_4: Int;
-   public static var KEY_KP_5: Int;
-   public static var KEY_KP_6: Int;
-   public static var KEY_KP_7: Int;
-   public static var KEY_KP_8: Int;
-   public static var KEY_KP_9: Int;
-   public static var KEY_KP_MULTIPLY: Int;
-   public static var KEY_KP_PLUS: Int;
-   public static var KEY_KP_MINUS: Int;
-   public static var KEY_KP_PERIOD: Int;
-   public static var KEY_KP_DIVIDE: Int;
-   public static var KEY_F1: Int;
-   public static var KEY_F2: Int;
-   public static var KEY_F3: Int;
-   public static var KEY_F4: Int;
-   public static var KEY_F5: Int;
-   public static var KEY_F6: Int;
-   public static var KEY_F7: Int;
-   public static var KEY_F8: Int;
-   public static var KEY_F9: Int;
-   public static var KEY_F10: Int;
-   public static var KEY_F11: Int;
-   public static var KEY_F12: Int;
-   public static var KEY_F13: Int;
-   public static var KEY_F14: Int;
-   public static var KEY_F15: Int;
-   public static var KEY_F16: Int;
-   public static var KEY_F17: Int;
-   public static var KEY_F18: Int;
-   public static var KEY_F19: Int;
-   public static var KEY_F20: Int;
-   public static var KEY_F21: Int;
-   public static var KEY_F22: Int;
-   public static var KEY_F23: Int;
-   public static var KEY_F24: Int;
-   public static var KEY_NUMLOCKCLEAR: Int;
-   public static var KEY_SCROLLLOCK: Int;
-   public static var KEY_LSHIFT: Int;
-   public static var KEY_RSHIFT: Int;
-   public static var KEY_LCTRL: Int;
-   public static var KEY_RCTRL: Int;
-   public static var KEY_LALT: Int;
-   public static var KEY_RALT: Int;
-   public static var SCANCODE_UNKNOWN: Int;
-   public static var SCANCODE_CTRL: Int;
-   public static var SCANCODE_SHIFT: Int;
-   public static var SCANCODE_ALT: Int;
-   public static var SCANCODE_GUI: Int;
-   public static var SCANCODE_A: Int;
-   public static var SCANCODE_B: Int;
-   public static var SCANCODE_C: Int;
-   public static var SCANCODE_D: Int;
-   public static var SCANCODE_E: Int;
-   public static var SCANCODE_F: Int;
-   public static var SCANCODE_G: Int;
-   public static var SCANCODE_H: Int;
-   public static var SCANCODE_I: Int;
-   public static var SCANCODE_J: Int;
-   public static var SCANCODE_K: Int;
-   public static var SCANCODE_L: Int;
-   public static var SCANCODE_M: Int;
-   public static var SCANCODE_N: Int;
-   public static var SCANCODE_O: Int;
-   public static var SCANCODE_P: Int;
-   public static var SCANCODE_Q: Int;
-   public static var SCANCODE_R: Int;
-   public static var SCANCODE_S: Int;
-   public static var SCANCODE_T: Int;
-   public static var SCANCODE_U: Int;
-   public static var SCANCODE_V: Int;
-   public static var SCANCODE_W: Int;
-   public static var SCANCODE_X: Int;
-   public static var SCANCODE_Y: Int;
-   public static var SCANCODE_Z: Int;
-   public static var SCANCODE_1: Int;
-   public static var SCANCODE_2: Int;
-   public static var SCANCODE_3: Int;
-   public static var SCANCODE_4: Int;
-   public static var SCANCODE_5: Int;
-   public static var SCANCODE_6: Int;
-   public static var SCANCODE_7: Int;
-   public static var SCANCODE_8: Int;
-   public static var SCANCODE_9: Int;
-   public static var SCANCODE_0: Int;
-   public static var SCANCODE_RETURN: Int;
-   public static var SCANCODE_ESCAPE: Int;
-   public static var SCANCODE_BACKSPACE: Int;
-   public static var SCANCODE_TAB: Int;
-   public static var SCANCODE_SPACE: Int;
-   public static var SCANCODE_MINUS: Int;
-   public static var SCANCODE_EQUALS: Int;
-   public static var SCANCODE_LEFTBRACKET: Int;
-   public static var SCANCODE_RIGHTBRACKET: Int;
-   public static var SCANCODE_BACKSLASH: Int;
-   public static var SCANCODE_NONUSHASH: Int;
-   public static var SCANCODE_SEMICOLON: Int;
-   public static var SCANCODE_APOSTROPHE: Int;
-   public static var SCANCODE_GRAVE: Int;
-   public static var SCANCODE_COMMA: Int;
-   public static var SCANCODE_PERIOD: Int;
-   public static var SCANCODE_SLASH: Int;
-   public static var SCANCODE_CAPSLOCK: Int;
-   public static var SCANCODE_F1: Int;
-   public static var SCANCODE_F2: Int;
-   public static var SCANCODE_F3: Int;
-   public static var SCANCODE_F4: Int;
-   public static var SCANCODE_F5: Int;
-   public static var SCANCODE_F6: Int;
-   public static var SCANCODE_F7: Int;
-   public static var SCANCODE_F8: Int;
-   public static var SCANCODE_F9: Int;
-   public static var SCANCODE_F10: Int;
-   public static var SCANCODE_F11: Int;
-   public static var SCANCODE_F12: Int;
-   public static var SCANCODE_PRINTSCREEN: Int;
-   public static var SCANCODE_SCROLLLOCK: Int;
-   public static var SCANCODE_PAUSE: Int;
-   public static var SCANCODE_INSERT: Int;
-   public static var SCANCODE_HOME: Int;
-   public static var SCANCODE_PAGEUP: Int;
-   public static var SCANCODE_DELETE: Int;
-   public static var SCANCODE_END: Int;
-   public static var SCANCODE_PAGEDOWN: Int;
-   public static var SCANCODE_RIGHT: Int;
-   public static var SCANCODE_LEFT: Int;
-   public static var SCANCODE_DOWN: Int;
-   public static var SCANCODE_UP: Int;
-   public static var SCANCODE_NUMLOCKCLEAR: Int;
-   public static var SCANCODE_KP_DIVIDE: Int;
-   public static var SCANCODE_KP_MULTIPLY: Int;
-   public static var SCANCODE_KP_MINUS: Int;
-   public static var SCANCODE_KP_PLUS: Int;
-   public static var SCANCODE_KP_ENTER: Int;
-   public static var SCANCODE_KP_1: Int;
-   public static var SCANCODE_KP_2: Int;
-   public static var SCANCODE_KP_3: Int;
-   public static var SCANCODE_KP_4: Int;
-   public static var SCANCODE_KP_5: Int;
-   public static var SCANCODE_KP_6: Int;
-   public static var SCANCODE_KP_7: Int;
-   public static var SCANCODE_KP_8: Int;
-   public static var SCANCODE_KP_9: Int;
-   public static var SCANCODE_KP_0: Int;
-   public static var SCANCODE_KP_PERIOD: Int;
-   public static var SCANCODE_NONUSBACKSLASH: Int;
-   public static var SCANCODE_APPLICATION: Int;
-   public static var SCANCODE_POWER: Int;
-   public static var SCANCODE_KP_EQUALS: Int;
-   public static var SCANCODE_F13: Int;
-   public static var SCANCODE_F14: Int;
-   public static var SCANCODE_F15: Int;
-   public static var SCANCODE_F16: Int;
-   public static var SCANCODE_F17: Int;
-   public static var SCANCODE_F18: Int;
-   public static var SCANCODE_F19: Int;
-   public static var SCANCODE_F20: Int;
-   public static var SCANCODE_F21: Int;
-   public static var SCANCODE_F22: Int;
-   public static var SCANCODE_F23: Int;
-   public static var SCANCODE_F24: Int;
-   public static var SCANCODE_EXECUTE: Int;
-   public static var SCANCODE_HELP: Int;
-   public static var SCANCODE_MENU: Int;
-   public static var SCANCODE_SELECT: Int;
-   public static var SCANCODE_STOP: Int;
-   public static var SCANCODE_AGAIN: Int;
-   public static var SCANCODE_UNDO: Int;
-   public static var SCANCODE_CUT: Int;
-   public static var SCANCODE_COPY: Int;
-   public static var SCANCODE_PASTE: Int;
-   public static var SCANCODE_FIND: Int;
-   public static var SCANCODE_MUTE: Int;
-   public static var SCANCODE_VOLUMEUP: Int;
-   public static var SCANCODE_VOLUMEDOWN: Int;
-   public static var SCANCODE_KP_COMMA: Int;
-   public static var SCANCODE_KP_EQUALSAS400: Int;
-   public static var SCANCODE_INTERNATIONAL1: Int;
-   public static var SCANCODE_INTERNATIONAL2: Int;
-   public static var SCANCODE_INTERNATIONAL3: Int;
-   public static var SCANCODE_INTERNATIONAL4: Int;
-   public static var SCANCODE_INTERNATIONAL5: Int;
-   public static var SCANCODE_INTERNATIONAL6: Int;
-   public static var SCANCODE_INTERNATIONAL7: Int;
-   public static var SCANCODE_INTERNATIONAL8: Int;
-   public static var SCANCODE_INTERNATIONAL9: Int;
-   public static var SCANCODE_LANG1: Int;
-   public static var SCANCODE_LANG2: Int;
-   public static var SCANCODE_LANG3: Int;
-   public static var SCANCODE_LANG4: Int;
-   public static var SCANCODE_LANG5: Int;
-   public static var SCANCODE_LANG6: Int;
-   public static var SCANCODE_LANG7: Int;
-   public static var SCANCODE_LANG8: Int;
-   public static var SCANCODE_LANG9: Int;
-   public static var SCANCODE_ALTERASE: Int;
-   public static var SCANCODE_SYSREQ: Int;
-   public static var SCANCODE_CANCEL: Int;
-   public static var SCANCODE_CLEAR: Int;
-   public static var SCANCODE_PRIOR: Int;
-   public static var SCANCODE_RETURN2: Int;
-   public static var SCANCODE_SEPARATOR: Int;
-   public static var SCANCODE_OUT: Int;
-   public static var SCANCODE_OPER: Int;
-   public static var SCANCODE_CLEARAGAIN: Int;
-   public static var SCANCODE_CRSEL: Int;
-   public static var SCANCODE_EXSEL: Int;
-   public static var SCANCODE_KP_00: Int;
-   public static var SCANCODE_KP_000: Int;
-   public static var SCANCODE_THOUSANDSSEPARATOR: Int;
-   public static var SCANCODE_DECIMALSEPARATOR: Int;
-   public static var SCANCODE_CURRENCYUNIT: Int;
-   public static var SCANCODE_CURRENCYSUBUNIT: Int;
-   public static var SCANCODE_KP_LEFTPAREN: Int;
-   public static var SCANCODE_KP_RIGHTPAREN: Int;
-   public static var SCANCODE_KP_LEFTBRACE: Int;
-   public static var SCANCODE_KP_RIGHTBRACE: Int;
-   public static var SCANCODE_KP_TAB: Int;
-   public static var SCANCODE_KP_BACKSPACE: Int;
-   public static var SCANCODE_KP_A: Int;
-   public static var SCANCODE_KP_B: Int;
-   public static var SCANCODE_KP_C: Int;
-   public static var SCANCODE_KP_D: Int;
-   public static var SCANCODE_KP_E: Int;
-   public static var SCANCODE_KP_F: Int;
-   public static var SCANCODE_KP_XOR: Int;
-   public static var SCANCODE_KP_POWER: Int;
-   public static var SCANCODE_KP_PERCENT: Int;
-   public static var SCANCODE_KP_LESS: Int;
-   public static var SCANCODE_KP_GREATER: Int;
-   public static var SCANCODE_KP_AMPERSAND: Int;
-   public static var SCANCODE_KP_DBLAMPERSAND: Int;
-   public static var SCANCODE_KP_VERTICALBAR: Int;
-   public static var SCANCODE_KP_DBLVERTICALBAR: Int;
-   public static var SCANCODE_KP_COLON: Int;
-   public static var SCANCODE_KP_HASH: Int;
-   public static var SCANCODE_KP_SPACE: Int;
-   public static var SCANCODE_KP_AT: Int;
-   public static var SCANCODE_KP_EXCLAM: Int;
-   public static var SCANCODE_KP_MEMSTORE: Int;
-   public static var SCANCODE_KP_MEMRECALL: Int;
-   public static var SCANCODE_KP_MEMCLEAR: Int;
-   public static var SCANCODE_KP_MEMADD: Int;
-   public static var SCANCODE_KP_MEMSUBTRACT: Int;
-   public static var SCANCODE_KP_MEMMULTIPLY: Int;
-   public static var SCANCODE_KP_MEMDIVIDE: Int;
-   public static var SCANCODE_KP_PLUSMINUS: Int;
-   public static var SCANCODE_KP_CLEAR: Int;
-   public static var SCANCODE_KP_CLEARENTRY: Int;
-   public static var SCANCODE_KP_BINARY: Int;
-   public static var SCANCODE_KP_OCTAL: Int;
-   public static var SCANCODE_KP_DECIMAL: Int;
-   public static var SCANCODE_KP_HEXADECIMAL: Int;
-   public static var SCANCODE_LCTRL: Int;
-   public static var SCANCODE_LSHIFT: Int;
-   public static var SCANCODE_LALT: Int;
-   public static var SCANCODE_LGUI: Int;
-   public static var SCANCODE_RCTRL: Int;
-   public static var SCANCODE_RSHIFT: Int;
-   public static var SCANCODE_RALT: Int;
-   public static var SCANCODE_RGUI: Int;
-   public static var SCANCODE_MODE: Int;
-   public static var SCANCODE_AUDIONEXT: Int;
-   public static var SCANCODE_AUDIOPREV: Int;
-   public static var SCANCODE_AUDIOSTOP: Int;
-   public static var SCANCODE_AUDIOPLAY: Int;
-   public static var SCANCODE_AUDIOMUTE: Int;
-   public static var SCANCODE_MEDIASELECT: Int;
-   public static var SCANCODE_WWW: Int;
-   public static var SCANCODE_MAIL: Int;
-   public static var SCANCODE_CALCULATOR: Int;
-   public static var SCANCODE_COMPUTER: Int;
-   public static var SCANCODE_AC_SEARCH: Int;
-   public static var SCANCODE_AC_HOME: Int;
-   public static var SCANCODE_AC_BACK: Int;
-   public static var SCANCODE_AC_FORWARD: Int;
-   public static var SCANCODE_AC_STOP: Int;
-   public static var SCANCODE_AC_REFRESH: Int;
-   public static var SCANCODE_AC_BOOKMARKS: Int;
-   public static var SCANCODE_BRIGHTNESSDOWN: Int;
-   public static var SCANCODE_BRIGHTNESSUP: Int;
-   public static var SCANCODE_DISPLAYSWITCH: Int;
-   public static var SCANCODE_KBDILLUMTOGGLE: Int;
-   public static var SCANCODE_KBDILLUMDOWN: Int;
-   public static var SCANCODE_KBDILLUMUP: Int;
-   public static var SCANCODE_EJECT: Int;
-   public static var SCANCODE_SLEEP: Int;
-   public static var SCANCODE_APP1: Int;
-   public static var SCANCODE_APP2: Int;
-   public static var HAT_CENTER: Int;
-   public static var HAT_UP: Int;
-   public static var HAT_RIGHT: Int;
-   public static var HAT_DOWN: Int;
-   public static var HAT_LEFT: Int;
-   public static var CONTROLLER_BUTTON_A: Int;
-   public static var CONTROLLER_BUTTON_B: Int;
-   public static var CONTROLLER_BUTTON_X: Int;
-   public static var CONTROLLER_BUTTON_Y: Int;
-   public static var CONTROLLER_BUTTON_BACK: Int;
-   public static var CONTROLLER_BUTTON_GUIDE: Int;
-   public static var CONTROLLER_BUTTON_START: Int;
-   public static var CONTROLLER_BUTTON_LEFTSTICK: Int;
-   public static var CONTROLLER_BUTTON_RIGHTSTICK: Int;
-   public static var CONTROLLER_BUTTON_LEFTSHOULDER: Int;
-   public static var CONTROLLER_BUTTON_RIGHTSHOULDER: Int;
-   public static var CONTROLLER_BUTTON_DPAD_UP: Int;
-   public static var CONTROLLER_BUTTON_DPAD_DOWN: Int;
-   public static var CONTROLLER_BUTTON_DPAD_LEFT: Int;
-   public static var CONTROLLER_BUTTON_DPAD_RIGHT: Int;
-   public static var CONTROLLER_AXIS_LEFTX: Int;
-   public static var CONTROLLER_AXIS_LEFTY: Int;
-   public static var CONTROLLER_AXIS_RIGHTX: Int;
-   public static var CONTROLLER_AXIS_RIGHTY: Int;
-   public static var CONTROLLER_AXIS_TRIGGERLEFT: Int;
-   public static var CONTROLLER_AXIS_TRIGGERRIGHT: Int;
-
-
-   public static var UI_VERTEX_SIZE: Int;
-
-
-   public static var COLOR_LUT_SIZE: Int;
-   public static var PRIORITY_LAST: Int;
-
-
-   public static var MSG_IDENTITY: Int;
-   public static var MSG_CONTROLS: Int;
-   public static var MSG_SCENELOADED: Int;
-   public static var MSG_REQUESTPACKAGE: Int;
-   public static var MSG_PACKAGEDATA: Int;
-   public static var MSG_LOADSCENE: Int;
-   public static var MSG_SCENECHECKSUMERROR: Int;
-   public static var MSG_CREATENODE: Int;
-   public static var MSG_NODEDELTAUPDATE: Int;
-   public static var MSG_NODELATESTDATA: Int;
-   public static var MSG_REMOVENODE: Int;
-   public static var MSG_CREATECOMPONENT: Int;
-   public static var MSG_COMPONENTDELTAUPDATE: Int;
-   public static var MSG_COMPONENTLATESTDATA: Int;
-   public static var MSG_REMOVECOMPONENT: Int;
-   public static var MSG_REMOTEEVENT: Int;
-   public static var MSG_REMOTENODEEVENT: Int;
-   public static var MSG_PACKAGEINFO: Int;
-   public static var CONTROLS_CONTENT_ID: Int;
-   public static var PACKAGE_FRAGMENT_SIZE: Int;
-
-
-   public static var SCAN_FILES: Int;
-   public static var SCAN_DIRS: Int;
-   public static var SCAN_HIDDEN: Int;
-   public static var LOG_RAW: Int;
-   public static var LOG_DEBUG: Int;
-   public static var LOG_INFO: Int;
-   public static var LOG_WARNING: Int;
-   public static var LOG_ERROR: Int;
-   public static var LOG_NONE: Int;
+    public static var QUICKSORT_THRESHOLD: Int;
+    public static var CONVERSION_BUFFER_LENGTH: Int;
+    public static var MATRIX_CONVERSION_BUFFER_LENGTH: Int;
+
+
+    public static var NUM_FRUSTUM_PLANES: Int;
+    public static var NUM_FRUSTUM_VERTICES: Int;
+    public static var M_PI: Int;
+    public static var M_HALF_PI: Int;
+    public static var M_MIN_INT: Int;
+    public static var M_MAX_INT: Int;
+    public static var M_MIN_UNSIGNED: Int;
+    public static var M_MAX_UNSIGNED: Int;
+    public static var M_EPSILON: Int;
+    public static var M_LARGE_EPSILON: Int;
+    public static var M_MIN_NEARCLIP: Int;
+    public static var M_MAX_FOV: Int;
+    public static var M_LARGE_VALUE: Int;
+    public static var M_INFINITY: Int;
+    public static var M_DEGTORAD: Int;
+    public static var M_DEGTORAD_2: Int;
+    public static var M_RADTODEG: Int;
+
+
+    public static var AM_EDIT: Int;
+    public static var AM_FILE: Int;
+    public static var AM_NET: Int;
+    public static var AM_DEFAULT: Int;
+    public static var AM_LATESTDATA: Int;
+    public static var AM_NOEDIT: Int;
+    public static var AM_NODEID: Int;
+    public static var AM_COMPONENTID: Int;
+    public static var AM_NODEIDVECTOR: Int;
+
+
+    public static var USE_UPDATE: Int;
+    public static var USE_POSTUPDATE: Int;
+    public static var USE_FIXEDUPDATE: Int;
+    public static var USE_FIXEDPOSTUPDATE: Int;
+    public static var MAX_NETWORK_ATTRIBUTES: Int;
+    public static var FIRST_REPLICATED_ID: Int;
+    public static var LAST_REPLICATED_ID: Int;
+    public static var FIRST_LOCAL_ID: Int;
+    public static var LAST_LOCAL_ID: Int;
+    public static var SMOOTH_NONE: Int;
+    public static var SMOOTH_POSITION: Int;
+    public static var SMOOTH_ROTATION: Int;
+
+
+    public static var DEFAULT_NEARCLIP: Int;
+    public static var DEFAULT_FARCLIP: Int;
+    public static var DEFAULT_CAMERA_FOV: Int;
+    public static var DEFAULT_ORTHOSIZE: Int;
+    public static var VO_NONE: Int;
+    public static var VO_LOW_MATERIAL_QUALITY: Int;
+    public static var VO_DISABLE_SHADOWS: Int;
+    public static var VO_DISABLE_OCCLUSION: Int;
+    public static var DRAWABLE_GEOMETRY: Int;
+    public static var DRAWABLE_LIGHT: Int;
+    public static var DRAWABLE_ZONE: Int;
+    public static var DRAWABLE_GEOMETRY2D: Int;
+    public static var DRAWABLE_ANY: Int;
+    public static var DEFAULT_VIEWMASK: Int;
+    public static var DEFAULT_LIGHTMASK: Int;
+    public static var DEFAULT_SHADOWMASK: Int;
+    public static var DEFAULT_ZONEMASK: Int;
+    public static var MAX_VERTEX_LIGHTS: Int;
+    public static var ANIMATION_LOD_BASESCALE: Int;
+    public static var QUALITY_LOW: Int;
+    public static var QUALITY_MEDIUM: Int;
+    public static var QUALITY_HIGH: Int;
+    public static var QUALITY_MAX: Int;
+    public static var SHADOWQUALITY_LOW_16BIT: Int;
+    public static var SHADOWQUALITY_LOW_24BIT: Int;
+    public static var SHADOWQUALITY_HIGH_16BIT: Int;
+    public static var SHADOWQUALITY_HIGH_24BIT: Int;
+    public static var CLEAR_COLOR: Int;
+    public static var CLEAR_DEPTH: Int;
+    public static var CLEAR_STENCIL: Int;
+    public static var MASK_NONE: Int;
+    public static var MASK_POSITION: Int;
+    public static var MASK_NORMAL: Int;
+    public static var MASK_COLOR: Int;
+    public static var MASK_TEXCOORD1: Int;
+    public static var MASK_TEXCOORD2: Int;
+    public static var MASK_CUBETEXCOORD1: Int;
+    public static var MASK_CUBETEXCOORD2: Int;
+    public static var MASK_TANGENT: Int;
+    public static var MASK_BLENDWEIGHTS: Int;
+    public static var MASK_BLENDINDICES: Int;
+    public static var MASK_INSTANCEMATRIX1: Int;
+    public static var MASK_INSTANCEMATRIX2: Int;
+    public static var MASK_INSTANCEMATRIX3: Int;
+    public static var MASK_DEFAULT: Int;
+    public static var NO_ELEMENT: Int;
+    public static var MAX_RENDERTARGETS: Int;
+    public static var MAX_VERTEX_STREAMS: Int;
+    public static var MAX_CONSTANT_REGISTERS: Int;
+    public static var BITS_PER_COMPONENT: Int;
+    public static var SHADOW_MIN_QUANTIZE: Int;
+    public static var SHADOW_MIN_VIEW: Int;
+    public static var MAX_LIGHT_SPLITS: Int;
+    public static var MAX_CASCADE_SPLITS: Int;
+    public static var OCCLUSION_MIN_SIZE: Int;
+    public static var OCCLUSION_DEFAULT_MAX_TRIANGLES: Int;
+    public static var OCCLUSION_RELATIVE_BIAS: Int;
+    public static var OCCLUSION_FIXED_BIAS: Int;
+    public static var OCCLUSION_X_SCALE: Int;
+    public static var OCCLUSION_Z_SCALE: Int;
+    public static var NUM_OCTANTS: Int;
+    public static var ROOT_INDEX: Int;
+    public static var SHADOW_MIN_PIXELS: Int;
+    public static var INSTANCING_BUFFER_DEFAULT_SIZE: Int;
+    public static var MAX_VIEWPORT_TEXTURES: Int;
+    public static var MAX_TEXTURE_QUALITY_LEVELS: Int;
+
+
+    public static var CHANNEL_POSITION: Int;
+    public static var CHANNEL_ROTATION: Int;
+    public static var CHANNEL_SCALE: Int;
+    public static var MAX_BILLBOARDS: Int;
+    public static var DEFAULT_NUM_PARTICLES: Int;
+    public static var BONECOLLISION_NONE: Int;
+    public static var BONECOLLISION_SPHERE: Int;
+    public static var BONECOLLISION_BOX: Int;
+
+
+    public static var PIXEL_SIZE: Int;
+
+
+    public static var STREAM_BUFFER_LENGTH: Int;
+
+
+    public static var DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY: Int;
+
+
+    public static var MOUSEB_LEFT: Int;
+    public static var MOUSEB_MIDDLE: Int;
+    public static var MOUSEB_RIGHT: Int;
+    public static var MOUSEB_X1: Int;
+    public static var MOUSEB_X2: Int;
+    public static var QUAL_SHIFT: Int;
+    public static var QUAL_CTRL: Int;
+    public static var QUAL_ALT: Int;
+    public static var QUAL_ANY: Int;
+    public static var KEY_A: Int;
+    public static var KEY_B: Int;
+    public static var KEY_C: Int;
+    public static var KEY_D: Int;
+    public static var KEY_E: Int;
+    public static var KEY_F: Int;
+    public static var KEY_G: Int;
+    public static var KEY_H: Int;
+    public static var KEY_I: Int;
+    public static var KEY_J: Int;
+    public static var KEY_K: Int;
+    public static var KEY_L: Int;
+    public static var KEY_M: Int;
+    public static var KEY_N: Int;
+    public static var KEY_O: Int;
+    public static var KEY_P: Int;
+    public static var KEY_Q: Int;
+    public static var KEY_R: Int;
+    public static var KEY_S: Int;
+    public static var KEY_T: Int;
+    public static var KEY_U: Int;
+    public static var KEY_V: Int;
+    public static var KEY_W: Int;
+    public static var KEY_X: Int;
+    public static var KEY_Y: Int;
+    public static var KEY_Z: Int;
+    public static var KEY_0: Int;
+    public static var KEY_1: Int;
+    public static var KEY_2: Int;
+    public static var KEY_3: Int;
+    public static var KEY_4: Int;
+    public static var KEY_5: Int;
+    public static var KEY_6: Int;
+    public static var KEY_7: Int;
+    public static var KEY_8: Int;
+    public static var KEY_9: Int;
+    public static var KEY_BACKSPACE: Int;
+    public static var KEY_TAB: Int;
+    public static var KEY_RETURN: Int;
+    public static var KEY_RETURN2: Int;
+    public static var KEY_KP_ENTER: Int;
+    public static var KEY_SHIFT: Int;
+    public static var KEY_CTRL: Int;
+    public static var KEY_ALT: Int;
+    public static var KEY_GUI: Int;
+    public static var KEY_PAUSE: Int;
+    public static var KEY_CAPSLOCK: Int;
+    public static var KEY_ESC: Int;
+    public static var KEY_SPACE: Int;
+    public static var KEY_PAGEUP: Int;
+    public static var KEY_PAGEDOWN: Int;
+    public static var KEY_END: Int;
+    public static var KEY_HOME: Int;
+    public static var KEY_LEFT: Int;
+    public static var KEY_UP: Int;
+    public static var KEY_RIGHT: Int;
+    public static var KEY_DOWN: Int;
+    public static var KEY_SELECT: Int;
+    public static var KEY_PRINTSCREEN: Int;
+    public static var KEY_INSERT: Int;
+    public static var KEY_DELETE: Int;
+    public static var KEY_LGUI: Int;
+    public static var KEY_RGUI: Int;
+    public static var KEY_APPLICATION: Int;
+    public static var KEY_KP_0: Int;
+    public static var KEY_KP_1: Int;
+    public static var KEY_KP_2: Int;
+    public static var KEY_KP_3: Int;
+    public static var KEY_KP_4: Int;
+    public static var KEY_KP_5: Int;
+    public static var KEY_KP_6: Int;
+    public static var KEY_KP_7: Int;
+    public static var KEY_KP_8: Int;
+    public static var KEY_KP_9: Int;
+    public static var KEY_KP_MULTIPLY: Int;
+    public static var KEY_KP_PLUS: Int;
+    public static var KEY_KP_MINUS: Int;
+    public static var KEY_KP_PERIOD: Int;
+    public static var KEY_KP_DIVIDE: Int;
+    public static var KEY_F1: Int;
+    public static var KEY_F2: Int;
+    public static var KEY_F3: Int;
+    public static var KEY_F4: Int;
+    public static var KEY_F5: Int;
+    public static var KEY_F6: Int;
+    public static var KEY_F7: Int;
+    public static var KEY_F8: Int;
+    public static var KEY_F9: Int;
+    public static var KEY_F10: Int;
+    public static var KEY_F11: Int;
+    public static var KEY_F12: Int;
+    public static var KEY_F13: Int;
+    public static var KEY_F14: Int;
+    public static var KEY_F15: Int;
+    public static var KEY_F16: Int;
+    public static var KEY_F17: Int;
+    public static var KEY_F18: Int;
+    public static var KEY_F19: Int;
+    public static var KEY_F20: Int;
+    public static var KEY_F21: Int;
+    public static var KEY_F22: Int;
+    public static var KEY_F23: Int;
+    public static var KEY_F24: Int;
+    public static var KEY_NUMLOCKCLEAR: Int;
+    public static var KEY_SCROLLLOCK: Int;
+    public static var KEY_LSHIFT: Int;
+    public static var KEY_RSHIFT: Int;
+    public static var KEY_LCTRL: Int;
+    public static var KEY_RCTRL: Int;
+    public static var KEY_LALT: Int;
+    public static var KEY_RALT: Int;
+    public static var SCANCODE_UNKNOWN: Int;
+    public static var SCANCODE_CTRL: Int;
+    public static var SCANCODE_SHIFT: Int;
+    public static var SCANCODE_ALT: Int;
+    public static var SCANCODE_GUI: Int;
+    public static var SCANCODE_A: Int;
+    public static var SCANCODE_B: Int;
+    public static var SCANCODE_C: Int;
+    public static var SCANCODE_D: Int;
+    public static var SCANCODE_E: Int;
+    public static var SCANCODE_F: Int;
+    public static var SCANCODE_G: Int;
+    public static var SCANCODE_H: Int;
+    public static var SCANCODE_I: Int;
+    public static var SCANCODE_J: Int;
+    public static var SCANCODE_K: Int;
+    public static var SCANCODE_L: Int;
+    public static var SCANCODE_M: Int;
+    public static var SCANCODE_N: Int;
+    public static var SCANCODE_O: Int;
+    public static var SCANCODE_P: Int;
+    public static var SCANCODE_Q: Int;
+    public static var SCANCODE_R: Int;
+    public static var SCANCODE_S: Int;
+    public static var SCANCODE_T: Int;
+    public static var SCANCODE_U: Int;
+    public static var SCANCODE_V: Int;
+    public static var SCANCODE_W: Int;
+    public static var SCANCODE_X: Int;
+    public static var SCANCODE_Y: Int;
+    public static var SCANCODE_Z: Int;
+    public static var SCANCODE_1: Int;
+    public static var SCANCODE_2: Int;
+    public static var SCANCODE_3: Int;
+    public static var SCANCODE_4: Int;
+    public static var SCANCODE_5: Int;
+    public static var SCANCODE_6: Int;
+    public static var SCANCODE_7: Int;
+    public static var SCANCODE_8: Int;
+    public static var SCANCODE_9: Int;
+    public static var SCANCODE_0: Int;
+    public static var SCANCODE_RETURN: Int;
+    public static var SCANCODE_ESCAPE: Int;
+    public static var SCANCODE_BACKSPACE: Int;
+    public static var SCANCODE_TAB: Int;
+    public static var SCANCODE_SPACE: Int;
+    public static var SCANCODE_MINUS: Int;
+    public static var SCANCODE_EQUALS: Int;
+    public static var SCANCODE_LEFTBRACKET: Int;
+    public static var SCANCODE_RIGHTBRACKET: Int;
+    public static var SCANCODE_BACKSLASH: Int;
+    public static var SCANCODE_NONUSHASH: Int;
+    public static var SCANCODE_SEMICOLON: Int;
+    public static var SCANCODE_APOSTROPHE: Int;
+    public static var SCANCODE_GRAVE: Int;
+    public static var SCANCODE_COMMA: Int;
+    public static var SCANCODE_PERIOD: Int;
+    public static var SCANCODE_SLASH: Int;
+    public static var SCANCODE_CAPSLOCK: Int;
+    public static var SCANCODE_F1: Int;
+    public static var SCANCODE_F2: Int;
+    public static var SCANCODE_F3: Int;
+    public static var SCANCODE_F4: Int;
+    public static var SCANCODE_F5: Int;
+    public static var SCANCODE_F6: Int;
+    public static var SCANCODE_F7: Int;
+    public static var SCANCODE_F8: Int;
+    public static var SCANCODE_F9: Int;
+    public static var SCANCODE_F10: Int;
+    public static var SCANCODE_F11: Int;
+    public static var SCANCODE_F12: Int;
+    public static var SCANCODE_PRINTSCREEN: Int;
+    public static var SCANCODE_SCROLLLOCK: Int;
+    public static var SCANCODE_PAUSE: Int;
+    public static var SCANCODE_INSERT: Int;
+    public static var SCANCODE_HOME: Int;
+    public static var SCANCODE_PAGEUP: Int;
+    public static var SCANCODE_DELETE: Int;
+    public static var SCANCODE_END: Int;
+    public static var SCANCODE_PAGEDOWN: Int;
+    public static var SCANCODE_RIGHT: Int;
+    public static var SCANCODE_LEFT: Int;
+    public static var SCANCODE_DOWN: Int;
+    public static var SCANCODE_UP: Int;
+    public static var SCANCODE_NUMLOCKCLEAR: Int;
+    public static var SCANCODE_KP_DIVIDE: Int;
+    public static var SCANCODE_KP_MULTIPLY: Int;
+    public static var SCANCODE_KP_MINUS: Int;
+    public static var SCANCODE_KP_PLUS: Int;
+    public static var SCANCODE_KP_ENTER: Int;
+    public static var SCANCODE_KP_1: Int;
+    public static var SCANCODE_KP_2: Int;
+    public static var SCANCODE_KP_3: Int;
+    public static var SCANCODE_KP_4: Int;
+    public static var SCANCODE_KP_5: Int;
+    public static var SCANCODE_KP_6: Int;
+    public static var SCANCODE_KP_7: Int;
+    public static var SCANCODE_KP_8: Int;
+    public static var SCANCODE_KP_9: Int;
+    public static var SCANCODE_KP_0: Int;
+    public static var SCANCODE_KP_PERIOD: Int;
+    public static var SCANCODE_NONUSBACKSLASH: Int;
+    public static var SCANCODE_APPLICATION: Int;
+    public static var SCANCODE_POWER: Int;
+    public static var SCANCODE_KP_EQUALS: Int;
+    public static var SCANCODE_F13: Int;
+    public static var SCANCODE_F14: Int;
+    public static var SCANCODE_F15: Int;
+    public static var SCANCODE_F16: Int;
+    public static var SCANCODE_F17: Int;
+    public static var SCANCODE_F18: Int;
+    public static var SCANCODE_F19: Int;
+    public static var SCANCODE_F20: Int;
+    public static var SCANCODE_F21: Int;
+    public static var SCANCODE_F22: Int;
+    public static var SCANCODE_F23: Int;
+    public static var SCANCODE_F24: Int;
+    public static var SCANCODE_EXECUTE: Int;
+    public static var SCANCODE_HELP: Int;
+    public static var SCANCODE_MENU: Int;
+    public static var SCANCODE_SELECT: Int;
+    public static var SCANCODE_STOP: Int;
+    public static var SCANCODE_AGAIN: Int;
+    public static var SCANCODE_UNDO: Int;
+    public static var SCANCODE_CUT: Int;
+    public static var SCANCODE_COPY: Int;
+    public static var SCANCODE_PASTE: Int;
+    public static var SCANCODE_FIND: Int;
+    public static var SCANCODE_MUTE: Int;
+    public static var SCANCODE_VOLUMEUP: Int;
+    public static var SCANCODE_VOLUMEDOWN: Int;
+    public static var SCANCODE_KP_COMMA: Int;
+    public static var SCANCODE_KP_EQUALSAS400: Int;
+    public static var SCANCODE_INTERNATIONAL1: Int;
+    public static var SCANCODE_INTERNATIONAL2: Int;
+    public static var SCANCODE_INTERNATIONAL3: Int;
+    public static var SCANCODE_INTERNATIONAL4: Int;
+    public static var SCANCODE_INTERNATIONAL5: Int;
+    public static var SCANCODE_INTERNATIONAL6: Int;
+    public static var SCANCODE_INTERNATIONAL7: Int;
+    public static var SCANCODE_INTERNATIONAL8: Int;
+    public static var SCANCODE_INTERNATIONAL9: Int;
+    public static var SCANCODE_LANG1: Int;
+    public static var SCANCODE_LANG2: Int;
+    public static var SCANCODE_LANG3: Int;
+    public static var SCANCODE_LANG4: Int;
+    public static var SCANCODE_LANG5: Int;
+    public static var SCANCODE_LANG6: Int;
+    public static var SCANCODE_LANG7: Int;
+    public static var SCANCODE_LANG8: Int;
+    public static var SCANCODE_LANG9: Int;
+    public static var SCANCODE_ALTERASE: Int;
+    public static var SCANCODE_SYSREQ: Int;
+    public static var SCANCODE_CANCEL: Int;
+    public static var SCANCODE_CLEAR: Int;
+    public static var SCANCODE_PRIOR: Int;
+    public static var SCANCODE_RETURN2: Int;
+    public static var SCANCODE_SEPARATOR: Int;
+    public static var SCANCODE_OUT: Int;
+    public static var SCANCODE_OPER: Int;
+    public static var SCANCODE_CLEARAGAIN: Int;
+    public static var SCANCODE_CRSEL: Int;
+    public static var SCANCODE_EXSEL: Int;
+    public static var SCANCODE_KP_00: Int;
+    public static var SCANCODE_KP_000: Int;
+    public static var SCANCODE_THOUSANDSSEPARATOR: Int;
+    public static var SCANCODE_DECIMALSEPARATOR: Int;
+    public static var SCANCODE_CURRENCYUNIT: Int;
+    public static var SCANCODE_CURRENCYSUBUNIT: Int;
+    public static var SCANCODE_KP_LEFTPAREN: Int;
+    public static var SCANCODE_KP_RIGHTPAREN: Int;
+    public static var SCANCODE_KP_LEFTBRACE: Int;
+    public static var SCANCODE_KP_RIGHTBRACE: Int;
+    public static var SCANCODE_KP_TAB: Int;
+    public static var SCANCODE_KP_BACKSPACE: Int;
+    public static var SCANCODE_KP_A: Int;
+    public static var SCANCODE_KP_B: Int;
+    public static var SCANCODE_KP_C: Int;
+    public static var SCANCODE_KP_D: Int;
+    public static var SCANCODE_KP_E: Int;
+    public static var SCANCODE_KP_F: Int;
+    public static var SCANCODE_KP_XOR: Int;
+    public static var SCANCODE_KP_POWER: Int;
+    public static var SCANCODE_KP_PERCENT: Int;
+    public static var SCANCODE_KP_LESS: Int;
+    public static var SCANCODE_KP_GREATER: Int;
+    public static var SCANCODE_KP_AMPERSAND: Int;
+    public static var SCANCODE_KP_DBLAMPERSAND: Int;
+    public static var SCANCODE_KP_VERTICALBAR: Int;
+    public static var SCANCODE_KP_DBLVERTICALBAR: Int;
+    public static var SCANCODE_KP_COLON: Int;
+    public static var SCANCODE_KP_HASH: Int;
+    public static var SCANCODE_KP_SPACE: Int;
+    public static var SCANCODE_KP_AT: Int;
+    public static var SCANCODE_KP_EXCLAM: Int;
+    public static var SCANCODE_KP_MEMSTORE: Int;
+    public static var SCANCODE_KP_MEMRECALL: Int;
+    public static var SCANCODE_KP_MEMCLEAR: Int;
+    public static var SCANCODE_KP_MEMADD: Int;
+    public static var SCANCODE_KP_MEMSUBTRACT: Int;
+    public static var SCANCODE_KP_MEMMULTIPLY: Int;
+    public static var SCANCODE_KP_MEMDIVIDE: Int;
+    public static var SCANCODE_KP_PLUSMINUS: Int;
+    public static var SCANCODE_KP_CLEAR: Int;
+    public static var SCANCODE_KP_CLEARENTRY: Int;
+    public static var SCANCODE_KP_BINARY: Int;
+    public static var SCANCODE_KP_OCTAL: Int;
+    public static var SCANCODE_KP_DECIMAL: Int;
+    public static var SCANCODE_KP_HEXADECIMAL: Int;
+    public static var SCANCODE_LCTRL: Int;
+    public static var SCANCODE_LSHIFT: Int;
+    public static var SCANCODE_LALT: Int;
+    public static var SCANCODE_LGUI: Int;
+    public static var SCANCODE_RCTRL: Int;
+    public static var SCANCODE_RSHIFT: Int;
+    public static var SCANCODE_RALT: Int;
+    public static var SCANCODE_RGUI: Int;
+    public static var SCANCODE_MODE: Int;
+    public static var SCANCODE_AUDIONEXT: Int;
+    public static var SCANCODE_AUDIOPREV: Int;
+    public static var SCANCODE_AUDIOSTOP: Int;
+    public static var SCANCODE_AUDIOPLAY: Int;
+    public static var SCANCODE_AUDIOMUTE: Int;
+    public static var SCANCODE_MEDIASELECT: Int;
+    public static var SCANCODE_WWW: Int;
+    public static var SCANCODE_MAIL: Int;
+    public static var SCANCODE_CALCULATOR: Int;
+    public static var SCANCODE_COMPUTER: Int;
+    public static var SCANCODE_AC_SEARCH: Int;
+    public static var SCANCODE_AC_HOME: Int;
+    public static var SCANCODE_AC_BACK: Int;
+    public static var SCANCODE_AC_FORWARD: Int;
+    public static var SCANCODE_AC_STOP: Int;
+    public static var SCANCODE_AC_REFRESH: Int;
+    public static var SCANCODE_AC_BOOKMARKS: Int;
+    public static var SCANCODE_BRIGHTNESSDOWN: Int;
+    public static var SCANCODE_BRIGHTNESSUP: Int;
+    public static var SCANCODE_DISPLAYSWITCH: Int;
+    public static var SCANCODE_KBDILLUMTOGGLE: Int;
+    public static var SCANCODE_KBDILLUMDOWN: Int;
+    public static var SCANCODE_KBDILLUMUP: Int;
+    public static var SCANCODE_EJECT: Int;
+    public static var SCANCODE_SLEEP: Int;
+    public static var SCANCODE_APP1: Int;
+    public static var SCANCODE_APP2: Int;
+    public static var HAT_CENTER: Int;
+    public static var HAT_UP: Int;
+    public static var HAT_RIGHT: Int;
+    public static var HAT_DOWN: Int;
+    public static var HAT_LEFT: Int;
+    public static var CONTROLLER_BUTTON_A: Int;
+    public static var CONTROLLER_BUTTON_B: Int;
+    public static var CONTROLLER_BUTTON_X: Int;
+    public static var CONTROLLER_BUTTON_Y: Int;
+    public static var CONTROLLER_BUTTON_BACK: Int;
+    public static var CONTROLLER_BUTTON_GUIDE: Int;
+    public static var CONTROLLER_BUTTON_START: Int;
+    public static var CONTROLLER_BUTTON_LEFTSTICK: Int;
+    public static var CONTROLLER_BUTTON_RIGHTSTICK: Int;
+    public static var CONTROLLER_BUTTON_LEFTSHOULDER: Int;
+    public static var CONTROLLER_BUTTON_RIGHTSHOULDER: Int;
+    public static var CONTROLLER_BUTTON_DPAD_UP: Int;
+    public static var CONTROLLER_BUTTON_DPAD_DOWN: Int;
+    public static var CONTROLLER_BUTTON_DPAD_LEFT: Int;
+    public static var CONTROLLER_BUTTON_DPAD_RIGHT: Int;
+    public static var CONTROLLER_AXIS_LEFTX: Int;
+    public static var CONTROLLER_AXIS_LEFTY: Int;
+    public static var CONTROLLER_AXIS_RIGHTX: Int;
+    public static var CONTROLLER_AXIS_RIGHTY: Int;
+    public static var CONTROLLER_AXIS_TRIGGERLEFT: Int;
+    public static var CONTROLLER_AXIS_TRIGGERRIGHT: Int;
+
+
+    public static var UI_VERTEX_SIZE: Int;
+
+
+    public static var COLOR_LUT_SIZE: Int;
+    public static var PRIORITY_LAST: Int;
+
+
+    public static var MSG_IDENTITY: Int;
+    public static var MSG_CONTROLS: Int;
+    public static var MSG_SCENELOADED: Int;
+    public static var MSG_REQUESTPACKAGE: Int;
+    public static var MSG_PACKAGEDATA: Int;
+    public static var MSG_LOADSCENE: Int;
+    public static var MSG_SCENECHECKSUMERROR: Int;
+    public static var MSG_CREATENODE: Int;
+    public static var MSG_NODEDELTAUPDATE: Int;
+    public static var MSG_NODELATESTDATA: Int;
+    public static var MSG_REMOVENODE: Int;
+    public static var MSG_CREATECOMPONENT: Int;
+    public static var MSG_COMPONENTDELTAUPDATE: Int;
+    public static var MSG_COMPONENTLATESTDATA: Int;
+    public static var MSG_REMOVECOMPONENT: Int;
+    public static var MSG_REMOTEEVENT: Int;
+    public static var MSG_REMOTENODEEVENT: Int;
+    public static var MSG_PACKAGEINFO: Int;
+    public static var CONTROLS_CONTENT_ID: Int;
+    public static var PACKAGE_FRAGMENT_SIZE: Int;
+
+
+    public static var SCAN_FILES: Int;
+    public static var SCAN_DIRS: Int;
+    public static var SCAN_HIDDEN: Int;
+    public static var LOG_RAW: Int;
+    public static var LOG_DEBUG: Int;
+    public static var LOG_INFO: Int;
+    public static var LOG_WARNING: Int;
+    public static var LOG_ERROR: Int;
+    public static var LOG_NONE: Int;
 
 
 }
@@ -1883,7 +1719,6 @@ extern class ObjectAnimation extends Resource {
 extern class PrefabComponent extends Component {
 
     var prefabGUID: String;
-    var prefabNode: Node;
 
       // Construct.
     function new();
@@ -1893,7 +1728,6 @@ extern class PrefabComponent extends Component {
     function savePrefab(): Bool;
     function undoPrefab(): Void;
     function breakPrefab(): Void;
-    function getPrefabNode(): Node;
 
 }
 
@@ -7307,6 +7141,7 @@ extern class UIListView extends UIWidget {
     function addRootItem(text: String, icon: String, id: String): Int;
     function addChildItem(parentItemID: Int, text: String, icon: String, id: String): Int;
     function setItemText(id: String, text: String): Void;
+    function setItemTextSkin(id: String, skin: String): Void;
     function setItemIcon(id: String, icon: String): Void;
     function deleteItemByID(id: String): Void;
     function setExpanded(itemID: Int, value: Bool): Void;

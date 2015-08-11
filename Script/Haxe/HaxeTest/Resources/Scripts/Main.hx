@@ -5,6 +5,7 @@ import atomic.Atomic;
 import components.Star;
 import components.SuperStar;
 import components.addit.MegaStar;
+import components.Player;
 
 class Main {
 

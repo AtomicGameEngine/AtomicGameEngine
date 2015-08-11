@@ -66,13 +66,6 @@ namespace ToolCore
     {
         source_ += "//Atomic Haxe Definitions\n\n";
 
-        //if (package_->GetName() != "Atomic")
-        //{
-        //    source_ += "/// <reference path=\"Atomic.d.ts\" />\n\n";
-        //}
-
-        //source_ += "package;\n\n";
-
         source_ += "extern class " + package_->GetName() + " {\n\n";
     }
 
@@ -360,7 +353,7 @@ namespace ToolCore
         {
             const String& cname = constants.At(i);
 
-            source_ += "   public static var " + cname + ": Int;\n";
+            source_ += "    public static var " + cname + ": Int;\n";
         }
 
         source_ += "\n";
@@ -375,43 +368,18 @@ namespace ToolCore
         for (unsigned i = 0; i <enums.Size(); i++)
         {
             JSBEnum* _enum = enums[i];
-            //TODO: support for enums(for the first need to make support for enums in haxe2js compiler)
-            source_ += "\n   // enum " + _enum->GetName() + "\n";
-            source_ += "typedef " + _enum->GetName() + " = Int;\n";
 
-            //Vector<String>& values = _enum->GetValues();
-
-            //for (unsigned j = 0; j < values.Size(); j++)
-            //{
-            //    source_ += "var " + values[j] + ":" + _enum->GetName() +";\n";
-            //}
-
-            //source_ += "}\n";
-
-        }
-
-    }
-
-    void JSBHaxe::RegisterEnums(JSBModule* module)
-    {
-
-        Vector<SharedPtr<JSBEnum>> enums = module->GetEnums();
-
-        for (unsigned i = 0; i <enums.Size(); i++)
-        {
-            JSBEnum* _enum = enums[i];
-
-            source_ += "\n   // enum " + _enum->GetName() + "\n";
-            //source_ += "    public static var " + _enum->GetName() + ":" + _enum->GetName() + ";\n";
+            source_ += "@:native(\"Atomic\")\n";
+            source_ += "extern enum " + _enum->GetName() + " {\n";
 
             Vector<String>& values = _enum->GetValues();
 
             for (unsigned j = 0; j < values.Size(); j++)
             {
-                source_ += "    public static var " + values[j] + ":" + _enum->GetName() + ";\n";
+                source_ += "    " + values[j] + ";\n";
             }
-            //source_ += "}\n";
 
+            source_ += "}\n";
         }
 
     }
@@ -442,10 +410,10 @@ namespace ToolCore
 
         Begin();
 
-        for (unsigned i = 0; i < modules.Size(); i++)
-        {
-            RegisterEnums(modules[i]);
-        }
+        //for (unsigned i = 0; i < modules.Size(); i++)
+        //{
+        //    RegisterEnums(modules[i]);
+        //}
 
         for (unsigned i = 0; i < modules.Size(); i++)
         {

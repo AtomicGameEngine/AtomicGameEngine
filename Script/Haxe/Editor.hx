@@ -1,34 +1,30 @@
 package atomic;
 
-
-   // enum EditMode
-typedef EditMode = Int;
-
-   // enum AxisMode
-typedef AxisMode = Int;
+@:native("Atomic")
+extern enum EditMode {
+    EDIT_SELECT;
+    EDIT_MOVE;
+    EDIT_ROTATE;
+    EDIT_SCALE;
+}
+@:native("Atomic")
+extern enum AxisMode {
+    AXIS_WORLD;
+    AXIS_LOCAL;
+}
 //Atomic Haxe Definitions
 
 extern class Editor {
 
 
-   // enum EditMode
-    public static var EDIT_SELECT:EditMode;
-    public static var EDIT_MOVE:EditMode;
-    public static var EDIT_ROTATE:EditMode;
-    public static var EDIT_SCALE:EditMode;
-
-   // enum AxisMode
-    public static var AXIS_WORLD:AxisMode;
-    public static var AXIS_LOCAL:AxisMode;
-
-   public static var FINDTEXT_FLAG_NONE: Int;
-   public static var FINDTEXT_FLAG_CASESENSITIVE: Int;
-   public static var FINDTEXT_FLAG_WHOLEWORD: Int;
-   public static var FINDTEXT_FLAG_WRAP: Int;
-   public static var FINDTEXT_FLAG_NEXT: Int;
-   public static var FINDTEXT_FLAG_PREV: Int;
-   public static var EDITOR_MODALERROR: Int;
-   public static var EDITOR_MODALINFO: Int;
+    public static var FINDTEXT_FLAG_NONE: Int;
+    public static var FINDTEXT_FLAG_CASESENSITIVE: Int;
+    public static var FINDTEXT_FLAG_WHOLEWORD: Int;
+    public static var FINDTEXT_FLAG_WRAP: Int;
+    public static var FINDTEXT_FLAG_NEXT: Int;
+    public static var FINDTEXT_FLAG_PREV: Int;
+    public static var EDITOR_MODALERROR: Int;
+    public static var EDITOR_MODALINFO: Int;
 
 
 }

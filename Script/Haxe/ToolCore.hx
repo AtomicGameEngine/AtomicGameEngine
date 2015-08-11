@@ -1,22 +1,20 @@
 package atomic;
 
-
-   // enum PlatformID
-typedef PlatformID = Int;
+@:native("Atomic")
+extern enum PlatformID {
+    PLATFORMID_UNDEFINED;
+    PLATFORMID_WINDOWS;
+    PLATFORMID_MAC;
+    PLATFORMID_ANDROID;
+    PLATFORMID_IOS;
+    PLATFORMID_WEB;
+}
 //Atomic Haxe Definitions
 
 extern class ToolCore {
 
 
-   // enum PlatformID
-    public static var PLATFORMID_UNDEFINED:PlatformID;
-    public static var PLATFORMID_WINDOWS:PlatformID;
-    public static var PLATFORMID_MAC:PlatformID;
-    public static var PLATFORMID_ANDROID:PlatformID;
-    public static var PLATFORMID_IOS:PlatformID;
-    public static var PLATFORMID_WEB:PlatformID;
-
-   public static var PROJECTFILE_VERSION: Int;
+    public static var PROJECTFILE_VERSION: Int;
 
 
 }

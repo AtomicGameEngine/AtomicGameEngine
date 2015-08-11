@@ -38,7 +38,6 @@ namespace ToolCore
         JSBFunction* findFunctionInBase(JSBFunction* function);
 
         void ExportEnums(JSBModule* moduleName);
-        void RegisterEnums(JSBModule* moduleName);
         void ExportModuleConstants(JSBModule*  moduleName);
         void ExportModuleClasses(JSBModule*  moduleName);
 

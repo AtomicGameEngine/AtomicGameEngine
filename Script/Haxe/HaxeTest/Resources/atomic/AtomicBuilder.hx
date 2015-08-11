@@ -1,12 +1,11 @@
 package atomic;
 
 import haxe.macro.Compiler;
-import haxe.macro.Context;
 import haxe.macro.ExampleJSGenerator;
 import haxe.macro.JSGenApi;
-import haxe.macro.PositionTools;
 import haxe.macro.Type;
 import haxe.macro.Expr;
+import sys.FileSystem;
 import sys.io.File;
 
 class AtomicBuilder {
@@ -16,8 +15,11 @@ class AtomicBuilder {
 	var statics : List<{ c : ClassType, f : ClassField }>;
 	var requirements: Map<String, Array<String>>;
 	var currClass:BaseType;
+	var isEnum:Bool;
 	var components:List<ClassType>;
 	var enums:List<EnumType>;
+	static var reservedWords:Array<String> = ['Math', 'Array', 'Date', 'Enum', 'Class', 'Dynamic', 'Bool', 'Float', 'Int', 'String', 'Error'];
+	
 	
 	function new(api:JSGenApi) {
 		this.api = api;
@@ -44,7 +46,7 @@ class AtomicBuilder {
 	}
 	
 	//n is a type, 0 - inst, 1 - enum, 2 - abstract
-	function getPath(t : BaseType, ?n: Int) {
+	function getPath(t : BaseType, ?nt: Int) {
 		var s:Array<String> = t.module.split(".");
 		if (s[0].toLowerCase() == "atomic") {
 			if (StringTools.startsWith(t.name, "Atomic")) {
@@ -55,22 +57,22 @@ class AtomicBuilder {
 		//skip to do not require itself
 		if (t.name == currClass.name) return t.name;
 		var mod = t.module.split(".");
+		var n = "";
 		//it it's enum
-		if (n == 1) {
-			addReq("./" + t.name);
+		//if it's an enum inside of class
+		if (nt == 1) {
+			//var i = 0;
+			//for (i in 0...(mod.length - 1)) {
+			//	n += mod[i] + "/"; 
+			//}
+			
+			addReq("modules/" + t.name);
+			return t.name;
 		}
-		if (mod[0].toLowerCase() == "scripts") {
-			var n = "";
-			for (pa in mod) {
-				if (mod[0] == pa) {
-					n += pa;
-					continue;
-				}
-				n += "/" + pa;
-			}
-			addReq(n);
-		} else if (mod[0].toLowerCase() == "components") {
-			var n = "";
+		//check if it's a script or a component
+		//probably I should rework it, to make components and scripts works with metadata, such like:
+		//@:AtomicComponent or @:AtomicScript
+		if (mod[0] == "scripts" || mod[0] == "components") {	
 			for (pa in mod) {
 				if (mod[0] == pa) {
 					n += pa;
@@ -80,7 +82,7 @@ class AtomicBuilder {
 			}
 			addReq(n);
 		} else {
-			addReq("Modules/" + t.name);
+			addReq("modules/" + t.name);
 		}
 		return t.name;
 	}
@@ -159,6 +161,8 @@ class AtomicBuilder {
 			var name = a[a.length - 1];
 			//TODO fix that check
 			if (name == currClass.name) continue;
+			//exclude reservedWords
+			if (reservedWords.indexOf(name) >= 0) continue;
 			prepend("var " + name + " = require(\"" + req + "\");\n");
 		}
 	}
@@ -204,46 +208,39 @@ class AtomicBuilder {
 	
 	function genScript(c: ClassType):Void {
 		genClassBoody(c);
-		var p = "";
-		//script path
-		if (c.pack.length > 0 && c.pack[0].toLowerCase() == "scripts") {
-			for (pa in c.pack) {
-				p += pa + "/";
-			}
-			p += c.name + ".js";
-		} else {
-			p = "Modules/" + c.name + ".js";
-		}
-		File.saveContent(p, buf.toString());
-		buf = new StringBuf();
+		writeFile();
 	}
 	
 	function genComponent(c: ClassType):Void {
+		print("\"atomic component\"");
+		newline();
 		genClassBoody(c);
-		var p = "";
-		for (pa in c.pack) {
-			p += pa + "/";
-		}
-		p += c.name + ".js";
-		File.saveContent(p, buf.toString());
-		buf = new StringBuf();
+		writeFile();
 	}
 	
-	function genEnum( e : EnumType ) {
+	function genEnum(e: EnumType) {
 		currClass = e;
-		//api.setCurrentClass(e);
+		isEnum = true;
+		var p = getPath(e);
 		print('var ${e.name}');
 		newline();
 		print('(function (${e.name}) {\n');
-		//TODO generate enum statements
-		print('})(${e.name} || (${e.name} = {}));');
-		var p = "";
-		for (pa in e.pack) {
-			p += pa + "/";
+		var constructs = e.names.map(api.quoteString).join(",");
+		for( c in e.constructs.keys() ) {
+			var c = e.constructs.get(c);
+			var f = c.name;
+			print('$p.$f = ');
+			switch( c.type ) {
+			case TFun(args, _):
+				var sargs = args.map(function(a) return a.name).join(",");
+				print('function($sargs) { var $$me = ["${c.name}",${c.index},$sargs]; return $$me; };\n');
+			default:
+				print("[" + api.quoteString(c.name) + "," + c.index + "];\n");
+			}
 		}
-		p += e.name + ".js";
-		File.saveContent(p, buf.toString());
-		buf = new StringBuf();
+		print('})(${e.name} || (${e.name} = {}));\n');
+		print('module.exports = ${e.name};\n');
+		writeFile();
 	}
 	
 	function genStaticField(c: ClassType, f: ClassField):Void {
@@ -280,6 +277,25 @@ class AtomicBuilder {
 			genExpr(e);
 		}
 		newline();
+	}
+	
+	//saves current buffer to file and then clears buffer
+	function writeFile():Void {
+		var path = "";
+		if (currClass.pack.length > 0 && (currClass.pack[0].toLowerCase() == "scripts" || currClass.pack[0].toLowerCase() == "components") && !isEnum) {
+			for (p in currClass.pack) {
+				path += p + "/";
+			}
+		} else {
+			path = "modules/";
+		}
+		if (!FileSystem.exists(path)) {
+			FileSystem.createDirectory(path);
+		}
+		path += currClass.name + ".js";
+		File.saveContent(path, buf.toString());
+		buf = new StringBuf();
+		isEnum = false;
 	}
 	
 	static function use() {
