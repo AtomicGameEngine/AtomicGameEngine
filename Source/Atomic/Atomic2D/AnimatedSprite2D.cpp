@@ -32,7 +32,6 @@
 #include "../Atomic2D/Sprite2D.h"
 
 #include "../DebugNew.h"
-!*&!(!(&))
 
 namespace Atomic
 {
