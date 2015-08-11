@@ -259,7 +259,7 @@ class ProjectFrame extends ScriptWidget {
 
             if (prefabComponent) {
 
-              prefabComponent.savePrefab();
+                prefabComponent.savePrefab();
 
             }
             else {
@@ -273,41 +273,41 @@ class ProjectFrame extends ScriptWidget {
 
             this.rescan(asset);
 
-            return;
+                return;
 
         }
 
         // dropped some files?
-        var filenames = dragObject.filenames;
+                filenames = dragObject.filenames;
 
-        if (!filenames.length)
+                !filenames.length)
             return;
 
         var fileSystem = Atomic.getFileSystem();
 
 
-        for (var i in filenames) {
+                (var i in filenames) {
 
-            var srcFilename = filenames[i];
+                var srcFilename = filenames[i];
 
-            var pathInfo = Atomic.splitPath(srcFilename);
+                var pathInfo = Atomic.splitPath(srcFilename);
 
-            var destFilename = Atomic.addTrailingSlash(asset.path);
+                var destFilename = Atomic.addTrailingSlash(asset.path);
 
-            destFilename += pathInfo.fileName + pathInfo.ext;
+                destFilename += pathInfo.fileName + pathInfo.ext;
 
-            fileSystem.copy(srcFilename, destFilename);
+                fileSystem.copy(srcFilename, destFilename);
+
+            }
+
+            this.rescan(asset);
 
         }
 
-        this.rescan(asset);
+            leProjectLoaded(data) {
 
-    }
-
-    handleProjectLoaded(data) {
-
-        this.folderList.rootList.value = 0;
-        this.folderList.setExpanded(this.resourcesID, true);
+            this.folderList.rootList.value = 0;
+            this.folderList.setExpanded(this.resourcesID, true);
         this.sendEvent(EditorEvents.ContentFolderChanged, { path: ToolCore.toolSystem.project.resourcePath });
 
     }
