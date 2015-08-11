@@ -92,6 +92,9 @@ Asset* AssetDatabase::GetAssetByCachePath(const String& cachePath)
 {
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
 
+    if (!cachePath.StartsWith("Cache/"))
+        return 0;
+
     String cacheFilename = GetFileName(cachePath);
 
     while (itr != assets_.End())
@@ -485,6 +488,9 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
     {
         resourceTypeToImporterType_["Sound"] = "AudioImporter";
         resourceTypeToImporterType_["Model"] = "ModelImporter";
+        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";
+
+
     }
 
     if (!resourceTypeToImporterType_.Contains(resourceTypeName))

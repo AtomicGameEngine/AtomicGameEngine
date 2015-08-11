@@ -251,72 +251,15 @@ class ComponentInspector extends Atomic.UISection {
     addModelUI(layout: Atomic.UILayout, typeName: string) {
 
         var staticModel = <Atomic.StaticModel> this.component;
-        var cacheModel = staticModel.model;
-
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Model", layout);
-        var field = o.editField;
-        field.readOnly = true;
-
-        var select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select Model", "ModelImporter", function(asset: ToolCore.Asset) {
-
-                staticModel.model = <Atomic.Model> Atomic.cache.getResource("Model", asset.cachePath + ".mdl");
-                field.text = asset.name;
-
-            });
-
-        }
-
-        if (cacheModel) {
-
-            var asset = ToolCore.assetDatabase.getAssetByCachePath(cacheModel.name);
-
-            if (asset) {
-
-                field.text = asset.name;
-
-            }
-
-        }
-
-        // handle dropping of model on field
-        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == field) {
-
-                var importer = this.acceptAssetDrag("ModelImporter", ev);
-
-                if (importer) {
-
-                    var modelImporter = <ToolCore.ModelImporter> importer;
-                    var asset = modelImporter.asset;
-
-                    // the model itself, not the node XML
-                    var model = <Atomic.Model> Atomic.cache.getResource("Model", asset.cachePath + ".mdl");
-
-                    if (model) {
-
-                        staticModel.model = model;
-                        ev.target.text = asset.name;
-
-                    }
-                }
-            }
-
-        });
 
         var numGeometries = staticModel.numGeometries;
         if (typeName == "Skybox") {
             numGeometries = 1;
         }
 
-        for (var x = 0; x < staticModel.numGeometries; x++) {
+        for (var x = 0; x < numGeometries; x++) {
 
             this.createMaterialClosure(layout, staticModel, x);
-
 
         }
 

@@ -338,7 +338,8 @@ class DataBinding {
             if (resource) {
                 text = resource.name;
                 var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                text = asset.name;
+                if (asset)
+                  text = asset.name;
             }
 
             widget["editField"].text = text;
