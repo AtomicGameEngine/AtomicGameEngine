@@ -186,6 +186,37 @@ class DataBinding {
 
                 }
 
+                // handle dropping of component on field
+                o.editField.subscribeToEvent(o.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+                    if (ev.target == o.editField) {
+
+                        var dragObject = ev.dragObject;
+
+                        var importer;
+
+                        if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+                            var asset = <ToolCore.Asset> dragObject.object;
+
+                            if (asset.importerTypeName == importerName) {
+                                importer = asset.importer;
+                            }
+
+                        }
+
+                        if (importer) {
+
+                            var resource = Atomic.cache.getResource(attrInfo.resourceTypeName, importer.asset.path);
+                            object.setAttribute(attrInfo.name, resource);
+                            if (resource)
+                                o.editField.text = resource.name;
+
+                        }
+                    }
+
+                });
+
                 widget = parent;
             }
 
@@ -384,6 +415,7 @@ class DataBinding {
         this.objectLocked = false;
 
     }
+
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
