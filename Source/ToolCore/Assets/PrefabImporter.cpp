@@ -4,6 +4,7 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/PrefabEvents.h>
 #include <Atomic/Scene/PrefabComponent.h>
+#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 #include <Atomic/IO/FileSystem.h>
 
 #include "Asset.h"
@@ -58,8 +59,9 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
     const Vector<SharedPtr<Component>>& rootComponents = node->GetComponents();
     const Vector<SharedPtr<Node> >& children = node->GetChildren();
 
-    Vector<SharedPtr<Component>> tempComponents;
-    Vector<SharedPtr<Node>> tempChildren;
+    PODVector<Component*> tempComponents;
+    PODVector<Node*> tempChildren;
+    PODVector<Node*> filterNodes;
 
     for (unsigned i = 0; i < rootComponents.Size(); i++)
     {
@@ -67,15 +69,29 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
         {
             rootComponents[i]->SetTemporary(false);
             tempComponents.Push(rootComponents[i]);
+
+            // Animated sprites contain a temporary node we don't want to save in the prefab
+            // it would be nice if this was general purpose because have to test this when
+            // breaking node as well
+            if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
+            {
+                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
+                if (asprite->GetRootNode())
+                    filterNodes.Push(asprite->GetRootNode());
+            }
+
         }
     }
 
     for (unsigned i = 0; i < children.Size(); i++)
     {
+        if (filterNodes.Contains(children[i].Get()))
+            continue;
+
         if (children[i]->IsTemporary())
         {
             children[i]->SetTemporary(false);
-            tempChildren.Push(children);
+            tempChildren.Push(children[i]);
         }
     }
 

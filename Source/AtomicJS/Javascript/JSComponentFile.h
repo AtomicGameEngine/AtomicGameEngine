@@ -44,6 +44,7 @@ public:
     static void RegisterObject(Context* context);
 
     const HashMap<String, VariantType>& GetFields() const { return fields_; }
+    const VariantMap& GetDefaultFieldValues() const { return defaultFieldValues_; }
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);

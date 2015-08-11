@@ -285,7 +285,7 @@ void CollisionShape2D::OnNodeSet(Node* node)
             rigidBody_->AddCollisionShape2D(this);
         }
         else
-            LOGERROR("No right body component in node, can not create collision shape");
+            LOGERROR("No rigid body component in node, can not create collision shape");
     }
 }
 

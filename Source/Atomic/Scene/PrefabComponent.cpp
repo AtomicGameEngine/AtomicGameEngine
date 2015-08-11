@@ -6,6 +6,7 @@
 #include <Atomic/Resource/ResourceEvents.h>
 
 #include <Atomic/Physics/RigidBody.h>
+#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 
 #include "PrefabEvents.h"
 #include "PrefabComponent.h"
@@ -114,18 +115,31 @@ void PrefabComponent::BreakPrefab()
     // flip temporary root children and components to break prefab
     const Vector<SharedPtr<Component>>& rootComponents = node_->GetComponents();
     const Vector<SharedPtr<Node> >& children = node_->GetChildren();
+    PODVector<Node*> filterNodes;
 
     for (unsigned i = 0; i < rootComponents.Size(); i++)
     {
         if (rootComponents[i]->IsTemporary())
         {
             rootComponents[i]->SetTemporary(false);
+
+            // Animated sprites contain a temporary node we don't want to save in the prefab
+            // it would be nice if this was general purpose because have to test this when
+            // saving a prefab as well
+
+            if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
+            {
+                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
+                if (asprite->GetRootNode())
+                    filterNodes.Push(asprite->GetRootNode());
+            }
+
         }
     }
 
     for (unsigned i = 0; i < children.Size(); i++)
     {
-        if (children[i]->IsTemporary())
+        if (children[i]->IsTemporary() && !filterNodes.Contains(children[i].Get()))
         {
             children[i]->SetTemporary(false);
         }

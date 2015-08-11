@@ -2,6 +2,9 @@
 // Please see LICENSE.md in repository root for license information
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
+#include <Atomic/Core/Context.h>
+#include <Atomic/Resource/ResourceCache.h>
+
 #include "JSAPI.h"
 #include "JSVM.h"
 
@@ -246,6 +249,14 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
         return;
     }
 
+    if (duk_is_object(ctx, variantIdx))
+    {
+        RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
+        if (o)
+            v = o;
+        return;
+    }
+
     if (duk_is_array(ctx, variantIdx))
     {
         if (duk_get_length(ctx, variantIdx) == 2)
@@ -380,6 +391,9 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     Vector3 vector3 = Vector3::ZERO;
     Vector4 vector4 = Vector4::ZERO;
     Color color = Color::BLACK;
+    Resource* resource = NULL;
+    ResourceCache* cache = NULL;
+    ResourceRef resourceRef;
 
     switch (type)
     {
@@ -417,6 +431,13 @@ void js_push_variant(duk_context *ctx, const Variant& v)
             js_push_class_object_instance(ctx, ref);
         }
 
+        break;
+
+    case VAR_RESOURCEREF:
+        resourceRef = v.GetResourceRef();
+        cache = JSVM::GetJSVM(ctx)->GetContext()->GetSubsystem<ResourceCache>();
+        resource = cache->GetResource(resourceRef.type_, resourceRef.name_);
+        js_push_class_object_instance(ctx, resource);
         break;
 
     case VAR_BOOL:

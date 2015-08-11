@@ -36,6 +36,8 @@ public:
 
     void GetFolderAssets(String folder, PODVector<Asset*>& assets) const;
 
+    String GetResourceImporterName(const String& resourceTypeName);
+
     void GetAssetsByImporterType(StringHash type, PODVector<Asset*>& assets) const;
 
     void GetDirtyAssets(PODVector<Asset*>& assets);
@@ -59,6 +61,8 @@ private:
 
     SharedPtr<Project> project_;
     List<SharedPtr<Asset>> assets_;
+
+    HashMap<StringHash, String> resourceTypeToImporterType_;
 
     Vector<String> usedGUID_;
 

@@ -254,12 +254,22 @@ class ProjectFrame extends ScriptWidget {
         if (dragObject.object && dragObject.object.typeName == "Node") {
 
             var node = <Atomic.Node> dragObject.object;
-            var destFilename = Atomic.addTrailingSlash(asset.path);
-            destFilename += node.name + ".prefab";
 
-            var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
-            node.saveXML(file);
-            file.close();
+            var prefabComponent = <Atomic.PrefabComponent> node.getComponent("PrefabComponent");
+
+            if (prefabComponent) {
+
+              prefabComponent.savePrefab();
+
+            }
+            else {
+                var destFilename = Atomic.addTrailingSlash(asset.path);
+                destFilename += node.name + ".prefab";
+
+                var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
+                node.saveXML(file);
+                file.close();
+            }
 
             this.rescan(asset);
 

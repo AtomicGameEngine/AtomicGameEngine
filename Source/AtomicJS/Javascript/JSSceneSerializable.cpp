@@ -108,6 +108,22 @@ static int Serializable_SetAttribute(duk_context* ctx)
     {
         v = (int) v.GetFloat();
     }
+    else if (variantType == VAR_RESOURCEREF)
+    {
+        RefCounted* ref = v.GetPtr();
+
+        if (ref && ref->IsObject())
+        {
+            Object* o = (Object*) ref;
+
+            // TODO: calling code must ensure we are a resource, can this be done here?
+            Resource* resource = (Resource*) o;
+
+            v = ResourceRef(resource->GetType(), resource->GetName());
+
+        }
+
+    }
 
     if (isAttr)
     {
@@ -182,6 +198,25 @@ static int Serializable_GetAttribute(duk_context* ctx)
     return 1;
 }
 
+static const String& GetResourceRefClassName(Context* context, const ResourceRef& ref)
+{
+    const HashMap<StringHash, SharedPtr<ObjectFactory>>& factories = context->GetObjectFactories();
+
+    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator itr = factories.Begin();
+
+    while (itr != factories.End())
+    {
+        if (itr->first_ == ref.type_)
+        {
+            return itr->second_->GetTypeName();
+        }
+
+        itr++;
+    }
+
+    return String::EMPTY;
+}
+
 
 static int Serializable_GetAttributes(duk_context* ctx)
 {
@@ -217,6 +252,22 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
             duk_push_number(ctx, (double) attr->type_);
             duk_put_prop_string(ctx, -2, "type");
+
+            if (attr->type_ == VAR_RESOURCEREF)
+            {
+                if (attr->defaultValue_.GetType() == VAR_RESOURCEREF)
+                {
+                    const ResourceRef& ref = attr->defaultValue_.GetResourceRef();
+                    const String& typeName = GetResourceRefClassName(serial->GetContext(), ref);
+
+                    if (typeName.Length())
+                    {
+                        duk_push_string(ctx, typeName.CString());
+                        duk_put_prop_string(ctx, -2, "resourceTypeName");
+
+                    }
+                }
+            }
 
             duk_push_string(ctx, attr->name_.CString());
             duk_put_prop_string(ctx, -2, "name");
@@ -260,6 +311,8 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
         if (file)
         {
+
+            const VariantMap& defaultFieldValues = file->GetDefaultFieldValues();
             const HashMap<String, VariantType>& fields =  file->GetFields();
 
             if (fields.Size())
@@ -271,6 +324,22 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
                     duk_push_number(ctx, (double) itr->second_);
                     duk_put_prop_string(ctx, -2, "type");
+
+                    if (itr->second_ == VAR_RESOURCEREF && defaultFieldValues.Contains(itr->first_))
+                    {
+                        if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
+                        {
+                            const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
+                            const String& typeName = GetResourceRefClassName(serial->GetContext(), ref);
+
+                            if (typeName.Length())
+                            {
+                                duk_push_string(ctx, typeName.CString());
+                                duk_put_prop_string(ctx, -2, "resourceTypeName");
+
+                            }
+                        }
+                    }
 
                     duk_push_string(ctx, itr->first_.CString());
                     duk_put_prop_string(ctx, -2, "name");

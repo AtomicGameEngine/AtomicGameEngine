@@ -123,7 +123,8 @@ class ComponentInspector extends Atomic.UISection {
 
 
         if (component.typeName == "JSComponent") {
-            this.addJSComponentUI(attrsVerticalLayout);
+            // auto expand JSComponents
+            this.value = 1;
         }
 
         if (component.typeName == "TileMap2D") {
@@ -133,10 +134,6 @@ class ComponentInspector extends Atomic.UISection {
 
         if (component.typeName == "StaticModel" || component.typeName == "AnimatedModel" || component.typeName == "Skybox") {
             this.addModelUI(attrsVerticalLayout, component.typeName);
-        }
-
-        if (component.typeName == "SoundSource" || component.typeName == "SoundSource3D") {
-            this.addSoundSourceUI(attrsVerticalLayout, component.typeName);
         }
 
         if (component.typeName == "StaticSprite2D" || component.typeName == "AnimatedSprite2D") {
@@ -255,176 +252,21 @@ class ComponentInspector extends Atomic.UISection {
     addModelUI(layout: Atomic.UILayout, typeName: string) {
 
         var staticModel = <Atomic.StaticModel> this.component;
-        var cacheModel = staticModel.model;
-
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Model", layout);
-        var field = o.editField;
-        field.readOnly = true;
-
-        var select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select Model", "ModelImporter", function(asset: ToolCore.Asset) {
-
-                staticModel.model = <Atomic.Model> Atomic.cache.getResource("Model", asset.cachePath + ".mdl");
-                field.text = asset.name;
-
-            });
-
-        }
-
-        if (cacheModel) {
-
-            var asset = ToolCore.assetDatabase.getAssetByCachePath(cacheModel.name);
-
-            if (asset) {
-
-                field.text = asset.name;
-
-            }
-
-        }
-
-        // handle dropping of model on field
-        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == field) {
-
-                var importer = this.acceptAssetDrag("ModelImporter", ev);
-
-                if (importer) {
-
-                    var modelImporter = <ToolCore.ModelImporter> importer;
-                    var asset = modelImporter.asset;
-
-                    // the model itself, not the node XML
-                    var model = <Atomic.Model> Atomic.cache.getResource("Model", asset.cachePath + ".mdl");
-
-                    if (model) {
-
-                        staticModel.model = model;
-                        ev.target.text = asset.name;
-
-                    }
-                }
-            }
-
-        });
 
         var numGeometries = staticModel.numGeometries;
         if (typeName == "Skybox") {
             numGeometries = 1;
         }
 
-        for (var x = 0; x < staticModel.numGeometries; x++) {
+        for (var x = 0; x < numGeometries; x++) {
 
             this.createMaterialClosure(layout, staticModel, x);
 
-
         }
 
 
     }
 
-    addJSComponentUI(layout: Atomic.UILayout) {
-
-        var js = <Atomic.JSComponent> this.component;
-
-        // expand prefab
-        this.value = 1;
-
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Script", layout);
-        var field = o.editField;
-        field.readOnly = true;
-        field.text = js.componentFile ? js.componentFile.name : "";
-
-        var select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select JSComponent Script", "JavascriptImporter", function(asset: ToolCore.Asset) {
-
-                js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", asset.path);
-
-                if (js.componentFile)
-                    field.text = js.componentFile.name;
-
-            });
-
-        }
-
-        // handle dropping of component on field
-        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == field) {
-
-                var importer = this.acceptAssetDrag("JavascriptImporter", ev);
-
-                if (importer) {
-
-                    var jsImporter = <ToolCore.JavascriptImporter> importer;
-
-                    if (jsImporter.isComponentFile()) {
-
-                        js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", importer.asset.path);
-                        if (js.componentFile)
-                            ev.target.text = js.componentFile.name;
-
-                    }
-
-                }
-            }
-
-        });
-
-
-    }
-
-
-    addSoundSourceUI(layout: Atomic.UILayout, typeName: string) {
-
-        var sndSource = <Atomic.SoundSource> this.component;
-
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Sound", layout);
-        var field = o.editField;
-        field.readOnly = true;
-        field.text = sndSource.sound ? sndSource.sound.name : "";
-
-        var select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select Sound", "AudioImporter", function(asset: ToolCore.Asset) {
-
-                sndSource.sound = <Atomic.Sound> Atomic.cache.getResource("Sound", asset.path);
-                if (sndSource.sound)
-                    field.text = sndSource.sound.name;
-
-            });
-
-        }
-
-        // handle dropping of component on field
-        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == field) {
-
-                var importer = this.acceptAssetDrag("AudioImporter", ev);
-
-                if (importer) {
-
-                    sndSource.sound = <Atomic.Sound> Atomic.cache.getResource("Sound", importer.asset.path);
-                    if (sndSource.sound)
-                        field.text = sndSource.sound.name;
-
-                }
-            }
-
-        });
-
-
-    }
 
     addSpriteUI(layout: Atomic.UILayout, typeName: string) {
 

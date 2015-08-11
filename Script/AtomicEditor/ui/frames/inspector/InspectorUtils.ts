@@ -84,8 +84,10 @@ class InspectorUtils {
     var attrLayout = new Atomic.UILayout();
     attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
 
-    var _name = InspectorUtils.createAttrName(name);
-    attrLayout.addChild(_name);
+    if (name) {
+      var _name = InspectorUtils.createAttrName(name);
+      attrLayout.addChild(_name);
+    }
 
     var fieldLayout = new Atomic.UILayout();
     fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;

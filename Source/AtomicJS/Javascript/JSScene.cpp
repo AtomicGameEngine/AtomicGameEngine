@@ -222,10 +222,13 @@ static int Node_CreateChildPrefab(duk_context* ctx)
     duk_push_this(ctx);
     Node* parent = js_to_class_instance<Node>(ctx, -1, 0);
 
-    Node* node = parent->CreateChild(childName);
+    Node* node = parent->CreateChild();
 
     PrefabComponent* prefabComponent = node->CreateComponent<PrefabComponent>();
     prefabComponent->SetPrefabGUID(prefabName);
+
+    // override what node name is in prefab
+    node->SetName(childName);
 
     js_push_class_object_instance(ctx, node, "Node");
 
