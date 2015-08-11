@@ -157,6 +157,11 @@ class DataBinding {
                 var parent = new Atomic.UILayout();
                 var o = InspectorUtils.createAttrEditFieldWithSelectButton("", parent);
 
+                parent.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+                parent.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+                parent.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+
                 var lp = new Atomic.UILayoutParams();
                 lp.width = 140;
                 o.editField.layoutParams = lp;

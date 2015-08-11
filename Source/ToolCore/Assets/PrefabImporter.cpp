@@ -4,6 +4,7 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/PrefabEvents.h>
 #include <Atomic/Scene/PrefabComponent.h>
+#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 #include <Atomic/IO/FileSystem.h>
 
 #include "Asset.h"
@@ -60,6 +61,7 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
 
     Vector<SharedPtr<Component>> tempComponents;
     Vector<SharedPtr<Node>> tempChildren;
+    Vector<SharedPtr<Node>> filterNodes;
 
     for (unsigned i = 0; i < rootComponents.Size(); i++)
     {
@@ -67,11 +69,23 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
         {
             rootComponents[i]->SetTemporary(false);
             tempComponents.Push(rootComponents[i]);
+
+            // Animated sprites contain a temporary node we don't want to save in the prefab
+            if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
+            {
+                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
+                if (asprite->GetNode())
+                    filterNodes.Push(SharedPtr<Node>(asprite->GetNode()));
+            }
+
         }
     }
 
     for (unsigned i = 0; i < children.Size(); i++)
     {
+        if (filterNodes.Contains(children[i]))
+            continue;
+
         if (children[i]->IsTemporary())
         {
             children[i]->SetTemporary(false);
