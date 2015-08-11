@@ -299,6 +299,7 @@ declare module ToolCore {
       getCachePath(): string;
       deleteAsset(asset: Asset): void;
       scan(): void;
+      getResourceImporterName(resourceTypeName: string): string;
       getDotAssetFilename(path: string): string;
       getFolderAssets(folder:string):ToolCore.Asset[];
       getAssetsByImporterType(type:string):ToolCore.Asset[];

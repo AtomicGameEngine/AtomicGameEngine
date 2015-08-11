@@ -478,5 +478,20 @@ void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventDat
     }
 }
 
+String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
+{
+    // TODO: have resource type register themselves
+    if (resourceTypeToImporterType_.Empty())
+    {
+        resourceTypeToImporterType_["Sound"] = "AudioImporter";
+    }
+
+    if (!resourceTypeToImporterType_.Contains(resourceTypeName))
+        return String::EMPTY;
+
+    return resourceTypeToImporterType_[resourceTypeName];
+
+}
+
 
 }

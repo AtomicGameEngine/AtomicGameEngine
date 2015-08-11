@@ -1,3 +1,6 @@
+import InspectorUtils = require("./InspectorUtils");
+import EditorUI = require("ui/EditorUI");
+
 class DataBinding {
 
     constructor(object: Atomic.Serializable, attrInfo: Atomic.AttributeInfo, widget: Atomic.UIWidget) {
@@ -145,6 +148,42 @@ class DataBinding {
                 layout.addChild(select);
             }
 
+        } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
+
+            var importerName = ToolCore.assetDatabase.getResourceImporterName(attrInfo.resourceTypeName);
+
+            if (importerName) {
+
+                var parent = new Atomic.UILayout();
+                var o = InspectorUtils.createAttrEditFieldWithSelectButton("", parent);
+
+                var lp = new Atomic.UILayoutParams();
+                lp.width = 140;
+                o.editField.layoutParams = lp;
+                o.editField.readOnly = true;
+
+                // stuff editfield in so can be reference
+                parent["editField"] = o.editField;
+
+                var selectButton = o.selectButton;
+
+                selectButton.onClick = () => {
+
+                    EditorUI.getModelOps().showResourceSelection("Select " + attrInfo.resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
+
+                        var resource = Atomic.cache.getResource(attrInfo.resourceTypeName, asset.path);
+
+                        object.setAttribute(attrInfo.name, resource);
+                        if (resource)
+                            o.editField.text = resource.name;
+
+                    });
+
+                }
+
+                widget = parent;
+            }
+
         }
 
         if (widget) {
@@ -237,6 +276,15 @@ class DataBinding {
                 if (select)
                     select.value = value[i];
             }
+
+        } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
+
+            var resource = <Atomic.Resource> object.getAttribute(attrInfo.name);
+
+            if (resource)
+                widget["editField"].text = resource.name;
+            else
+                widget["editField"].text = "";
 
         }
 

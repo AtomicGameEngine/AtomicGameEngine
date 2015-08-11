@@ -160,6 +160,7 @@ declare module Atomic {
         mode: number; // AM_*
         defaultValue: string;
         enumNames: string[];
+        resourceTypeName: string;
 
     }
 
