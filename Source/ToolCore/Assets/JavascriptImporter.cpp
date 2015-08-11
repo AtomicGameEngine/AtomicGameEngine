@@ -4,9 +4,12 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
 
+#include <AtomicJS/Javascript/JSComponentFile.h>
+
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "JavascriptImporter.h"
+
 
 namespace ToolCore
 {
@@ -75,6 +78,20 @@ bool JavascriptImporter::SaveSettingsInternal()
 
     return true;
 }
+
+Resource* JavascriptImporter::GetResource()
+{
+    if (!isComponentFile_)
+        return 0;
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    JSComponentFile* jsc = cache->GetResource<JSComponentFile>(asset_->GetPath());
+
+    return jsc;
+
+}
+
 
 
 }

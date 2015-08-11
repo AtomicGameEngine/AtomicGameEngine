@@ -335,11 +335,14 @@ declare module ToolCore {
 
    export class JavascriptImporter extends AssetImporter {
 
+      resource: Atomic.Resource;
+
       // Construct.
       constructor(asset: Asset);
 
       setDefaults(): void;
       isComponentFile(): boolean;
+      getResource(): Atomic.Resource;
 
    }
 

@@ -123,7 +123,8 @@ class ComponentInspector extends Atomic.UISection {
 
 
         if (component.typeName == "JSComponent") {
-            this.addJSComponentUI(attrsVerticalLayout);
+            // auto expand JSComponents
+            this.value = 1;
         }
 
         if (component.typeName == "TileMap2D") {
@@ -262,60 +263,6 @@ class ComponentInspector extends Atomic.UISection {
             this.createMaterialClosure(layout, staticModel, x);
 
         }
-
-
-    }
-
-    addJSComponentUI(layout: Atomic.UILayout) {
-
-        var js = <Atomic.JSComponent> this.component;
-
-        // expand prefab
-        this.value = 1;
-
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Script", layout);
-        var field = o.editField;
-        field.readOnly = true;
-        field.text = js.componentFile ? js.componentFile.name : "";
-
-        var select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select JSComponent Script", "JavascriptImporter", function(asset: ToolCore.Asset) {
-
-                js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", asset.path);
-
-                if (js.componentFile)
-                    field.text = js.componentFile.name;
-
-            });
-
-        }
-
-        // handle dropping of component on field
-        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == field) {
-
-                var importer = this.acceptAssetDrag("JavascriptImporter", ev);
-
-                if (importer) {
-
-                    var jsImporter = <ToolCore.JavascriptImporter> importer;
-
-                    if (jsImporter.isComponentFile()) {
-
-                        js.componentFile = <Atomic.JSComponentFile> Atomic.cache.getResource("JSComponentFile", importer.asset.path);
-                        if (js.componentFile)
-                            ev.target.text = js.componentFile.name;
-
-                    }
-
-                }
-            }
-
-        });
 
 
     }
