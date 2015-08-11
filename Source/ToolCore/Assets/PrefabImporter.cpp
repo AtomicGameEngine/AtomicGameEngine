@@ -59,9 +59,9 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
     const Vector<SharedPtr<Component>>& rootComponents = node->GetComponents();
     const Vector<SharedPtr<Node> >& children = node->GetChildren();
 
-    Vector<SharedPtr<Component>> tempComponents;
-    Vector<SharedPtr<Node>> tempChildren;
-    Vector<SharedPtr<Node>> filterNodes;
+    PODVector<Component*> tempComponents;
+    PODVector<Node*> tempChildren;
+    PODVector<Node*> filterNodes;
 
     for (unsigned i = 0; i < rootComponents.Size(); i++)
     {
@@ -71,11 +71,13 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
             tempComponents.Push(rootComponents[i]);
 
             // Animated sprites contain a temporary node we don't want to save in the prefab
+            // it would be nice if this was general purpose because have to test this when
+            // breaking node as well
             if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
             {
                 AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
-                if (asprite->GetNode())
-                    filterNodes.Push(SharedPtr<Node>(asprite->GetNode()));
+                if (asprite->GetRootNode())
+                    filterNodes.Push(asprite->GetRootNode());
             }
 
         }
@@ -83,13 +85,13 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
 
     for (unsigned i = 0; i < children.Size(); i++)
     {
-        if (filterNodes.Contains(children[i]))
+        if (filterNodes.Contains(children[i].Get()))
             continue;
 
         if (children[i]->IsTemporary())
         {
             children[i]->SetTemporary(false);
-            tempChildren.Push(children);
+            tempChildren.Push(children[i]);
         }
     }
 
