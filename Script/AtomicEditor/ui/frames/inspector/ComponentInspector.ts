@@ -135,10 +135,6 @@ class ComponentInspector extends Atomic.UISection {
             this.addModelUI(attrsVerticalLayout, component.typeName);
         }
 
-        if (component.typeName == "SoundSource" || component.typeName == "SoundSource3D") {
-            this.addSoundSourceUI(attrsVerticalLayout, component.typeName);
-        }
-
         if (component.typeName == "StaticSprite2D" || component.typeName == "AnimatedSprite2D") {
             this.addSpriteUI(attrsVerticalLayout, component.typeName);
         }
@@ -381,50 +377,6 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
-
-    addSoundSourceUI(layout: Atomic.UILayout, typeName: string) {
-
-        var sndSource = <Atomic.SoundSource> this.component;
-
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Sound", layout);
-        var field = o.editField;
-        field.readOnly = true;
-        field.text = sndSource.sound ? sndSource.sound.name : "";
-
-        var select = o.selectButton;
-
-        select.onClick = () => {
-
-            EditorUI.getModelOps().showResourceSelection("Select Sound", "AudioImporter", function(asset: ToolCore.Asset) {
-
-                sndSource.sound = <Atomic.Sound> Atomic.cache.getResource("Sound", asset.path);
-                if (sndSource.sound)
-                    field.text = sndSource.sound.name;
-
-            });
-
-        }
-
-        // handle dropping of component on field
-        field.subscribeToEvent(field, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-            if (ev.target == field) {
-
-                var importer = this.acceptAssetDrag("AudioImporter", ev);
-
-                if (importer) {
-
-                    sndSource.sound = <Atomic.Sound> Atomic.cache.getResource("Sound", importer.asset.path);
-                    if (sndSource.sound)
-                        field.text = sndSource.sound.name;
-
-                }
-            }
-
-        });
-
-
-    }
 
     addSpriteUI(layout: Atomic.UILayout, typeName: string) {
 
