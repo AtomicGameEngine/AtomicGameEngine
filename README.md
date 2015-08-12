@@ -4,6 +4,10 @@
 
 They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript Examples</a>
 
+###### Looking for Atomic-Haxe? 
+
+It's here: <a href="https://github.com/rsredsq/atomic-haxe">Atomic-Haxe</a>  <sup>(Community Supported)</sup>
+
 ##### Website
 
 <a href="http://atomicgameengine.com">http://www.AtomicGameEngine.com</a>
