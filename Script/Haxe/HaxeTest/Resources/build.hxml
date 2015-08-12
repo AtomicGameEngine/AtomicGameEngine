@@ -1,5 +1,0 @@
--js out/main.js
--cp .
--main scripts.Main
---macro atomic.AtomicBuilder.use()
-#-cmd "C:/Users/rsred/Documents/GitHub/AtomicGameEngine-build/Source/AtomicEditor/Debug/AtomicEditor.exe --player --project C:\Users\rsred\Documents\AtomicProjects\HaxeTest1 --log-std"
