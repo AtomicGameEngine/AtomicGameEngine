@@ -5,6 +5,7 @@
 
 import Editor = require("editor/Editor");
 
+//Main is still evaling for now, need to have it done through requiring it
 class Main {
     static Editor:Editor;
 
@@ -14,5 +15,3 @@ class Main {
 }
 
 Main.main();
-
-export = Main;
