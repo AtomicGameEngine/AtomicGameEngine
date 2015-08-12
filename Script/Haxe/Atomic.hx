@@ -816,6 +816,7 @@ extern class Atomic {
     public static var SHADOW_MIN_PIXELS: Int;
     public static var INSTANCING_BUFFER_DEFAULT_SIZE: Int;
     public static var MAX_VIEWPORT_TEXTURES: Int;
+    public static var NUM_SCREEN_BUFFERS: Int;
     public static var MAX_TEXTURE_QUALITY_LEVELS: Int;
 
 
@@ -3055,11 +3056,13 @@ extern class Zone extends Drawable {
 @:native("Atomic.Graphics")
 extern class Graphics extends AObject {
 
-    var windowTitle: String;
     var windowIcon: Image;
+    var windowTitle: String;
     var srgb: Bool;
     var flushGPU: Bool;
+    var forceGL2: Bool;
     var orientations: String;
+    var textureForUpdate: Texture;
     var defaultTextureFilterMode: TextureFilterMode;
     var textureAnisotropy: Int;
     var viewport: IntRect;
@@ -3075,8 +3078,8 @@ extern class Graphics extends AObject {
     var height: Int;
     var multiSample: Int;
     var fullscreen: Bool;
-    var resizable: Bool;
     var borderless: Bool;
+    var resizable: Bool;
     var vSync: Bool;
     var tripleBuffer: Bool;
     var numPrimitives: Int;
@@ -3087,6 +3090,7 @@ extern class Graphics extends AObject {
     var instancingSupport: Bool;
     var lightPrepassSupport: Bool;
     var deferredSupport: Bool;
+    var anisotropySupport: Bool;
     var hardwareShadowSupport: Bool;
     var readableDepthSupport: Bool;
     var sRGBSupport: Bool;
@@ -3095,6 +3099,7 @@ extern class Graphics extends AObject {
     var vertexShader: ShaderVariation;
     var pixelShader: ShaderVariation;
     var depthStencil: RenderSurface;
+    var depthTexture: Texture2D;
     var depthConstantBias: Float;
     var depthSlopeScaledBias: Float;
     var stencilTest: Bool;
@@ -3109,6 +3114,8 @@ extern class Graphics extends AObject {
     var stencilWriteMask: Int;
     var useClipPlane: Bool;
     var renderTargetDimensions: IntVector2;
+    var vbo: Int;
+    var ubo: Int;
     var alphaFormat: Int;
     var luminanceFormat: Int;
     var luminanceAlphaFormat: Int;
@@ -3127,14 +3134,15 @@ extern class Graphics extends AObject {
     var readableDepthFormat: Int;
     var pixelUVOffset: Vector2;
     var maxBones: Int;
+    var gL3Support: Bool;
 
       // Construct.
     function new();
 
-      // Set window title.
-    function setWindowTitle(windowTitle: String): Void;
       // Set window icon.
     function setWindowIcon(windowIcon: Image): Void;
+      // Set window title.
+    function setWindowTitle(windowTitle: String): Void;
       // Set window size.
     function setWindowSize(width: Int, height: Int): Void;
       // Center window.
@@ -3143,8 +3151,10 @@ extern class Graphics extends AObject {
     function raiseWindow(): Void;
       // Set whether the main window uses sRGB conversion on write.
     function setSRGB(enable: Bool): Void;
-      // Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Default off, may decrease performance if enabled.
+      // Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Not yet implemented on OpenGL.
     function setFlushGPU(enable: Bool): Void;
+      // Set forced use of OpenGL 2 even if OpenGL 3 is available. Must be called before setting the screen mode for the first time. Default false.
+    function setForceGL2(enable: Bool): Void;
       // Set allowed screen orientations as a space-separated list of "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Affects currently only iOS platform.
     function setOrientations(orientations: String): Void;
       // Toggle between full screen and windowed mode. Return true if successful.
@@ -3161,7 +3171,7 @@ extern class Graphics extends AObject {
     function clear(flags: Int, ?color: Color, ?depth: Float, ?stencil: Int): Void;
       // Resolve multisampled backbuffer to a texture rendertarget. The texture's size should match the viewport size.
     function resolveToTexture(destination: Texture2D, viewport: IntRect): Bool;
-      // Draw indexed, instanced geometry. An instancing vertex buffer must be set.
+      // Draw indexed, instanced geometry.
     function drawInstanced(type: PrimitiveType, indexStart: Int, indexCount: Int, minVertex: Int, vertexCount: Int, instanceCount: Int): Void;
       // Set shaders.
     function setShaders(vs: ShaderVariation, ps: ShaderVariation): Void;
@@ -3177,10 +3187,14 @@ extern class Graphics extends AObject {
     function clearTransformSources(): Void;
       // Set texture.
     function setTexture(index: Int, texture: Texture): Void;
+      // Bind texture unit 0 for update. Called by Texture.
+    function setTextureForUpdate(texture: Texture): Void;
       // Set default texture filtering mode.
     function setDefaultTextureFilterMode(mode: TextureFilterMode): Void;
       // Set texture anisotropy.
     function setTextureAnisotropy(level: Int): Void;
+      // Dirty texture parameters of all textures (when global settings change.)
+    function setTextureParametersDirty(): Void;
       // Reset all rendertargets, depth-stencil surface and viewport.
     function resetRenderTargets(): Void;
       // Reset specific rendertarget.
@@ -3225,39 +3239,43 @@ extern class Graphics extends AObject {
     function getMultiSample(): Int;
       // Return whether window is fullscreen.
     function getFullscreen(): Bool;
-      // Return whether window is resizable.
-    function getResizable(): Bool;
       // Return whether window is borderless.
     function getBorderless(): Bool;
+      // Return whether window is resizable.
+    function getResizable(): Bool;
       // Return whether vertical sync is on.
     function getVSync(): Bool;
       // Return whether triple buffering is enabled.
     function getTripleBuffer(): Bool;
       // Return whether the main window is using sRGB conversion on write.
     function getSRGB(): Bool;
-      // Return whether the GPU command buffer is flushed each frame.
+      // Return whether the GPU command buffer is flushed each frame. Not yet implemented on OpenGL.
     function getFlushGPU(): Bool;
+      // Return whether OpenGL 2 use is forced.
+    function getForceGL2(): Bool;
       // Return allowed screen orientations.
     function getOrientations(): String;
-      // Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
+      // Return whether device is lost, and can not yet render.
     function isDeviceLost(): Bool;
       // Return number of primitives drawn this frame.
     function getNumPrimitives(): Int;
       // Return number of batches drawn this frame.
     function getNumBatches(): Int;
-      // Return dummy color texture format for shadow maps. Is "NULL" (consume no video memory) if supported.
+      // Return dummy color texture format for shadow maps. 0 if not needed, may be nonzero on OS X to work around an Intel driver issue.
     function getDummyColorFormat(): Int;
       // Return shadow map depth texture format, or 0 if not supported.
     function getShadowMapFormat(): Int;
       // Return 24-bit shadow map depth texture format, or 0 if not supported.
     function getHiresShadowMapFormat(): Int;
-      // Return whether hardware instancing is supported..
+      // Return whether hardware instancing is supported.
     function getInstancingSupport(): Bool;
       // Return whether light pre-pass rendering is supported.
     function getLightPrepassSupport(): Bool;
       // Return whether deferred rendering is supported.
     function getDeferredSupport(): Bool;
-      // Return whether shadow map depth compare is done in hardware.
+      // Return whether anisotropic texture filtering is supported.
+    function getAnisotropySupport(): Bool;
+      // Return whether shadow map depth compare is done in hardware. Always true on OpenGL.
     function getHardwareShadowSupport(): Bool;
       // Return whether a readable hardware depth format is available.
     function getReadableDepthSupport(): Bool;
@@ -3269,22 +3287,24 @@ extern class Graphics extends AObject {
     function getDesktopResolution(): IntVector2;
       // Return a shader variation by name and defines.
     function getShader(type: ShaderType, name: String, ?defines: String): ShaderVariation;
-      // Return current vertex shader.
+      // Return vertex shader.
     function getVertexShader(): ShaderVariation;
-      // Return current pixel shader.
+      // Return pixel shader.
     function getPixelShader(): ShaderVariation;
       // Return texture unit index by name.
     function getTextureUnit(name: String): TextureUnit;
       // Return texture unit name by index.
     function getTextureUnitName(unit: TextureUnit): String;
-      // Return current texture by texture unit index.
+      // Return texture by texture unit index.
     function getTexture(index: Int): Texture;
       // Return default texture filtering mode.
     function getDefaultTextureFilterMode(): TextureFilterMode;
-      // Return current rendertarget by index.
+      // Return rendertarget by index.
     function getRenderTarget(index: Int): RenderSurface;
-      // Return current depth-stencil surface.
+      // Return depth-stencil surface.
     function getDepthStencil(): RenderSurface;
+      // Return readable depth-stencil texture. Not created automatically on OpenGL.
+    function getDepthTexture(): Texture2D;
       // Return the viewport coordinates.
     function getViewport(): IntRect;
       // Return texture anisotropy.
@@ -3333,14 +3353,26 @@ extern class Graphics extends AObject {
     function windowResized(): Void;
       // Window was moved through user interaction. Called by Input subsystem.
     function windowMoved(): Void;
+      // Clean up too large scratch buffers.
+    function cleanupScratchBuffers(): Void;
+      // Clean up a render surface from all FBOs.
+    function cleanupRenderSurface(surface: RenderSurface): Void;
+      // Clean up shader programs when a shader variation is released or destroyed.
+    function cleanupShaderPrograms(variation: ShaderVariation): Void;
+      // Release/clear GPU objects and optionally close the window.
+    function release(clearGPUObjects: Bool, closeWindow: Bool): Void;
+      // Restore GPU objects and reinitialize state. Requires an open window.
+    function restore(): Void;
       // Maximize the Window.
     function maximize(): Void;
       // Minimize the Window.
     function minimize(): Void;
-      // Clean up too large scratch buffers.
-    function cleanupScratchBuffers(): Void;
-      // Clean up shader programs when a shader variation is released or destroyed.
-    function cleanupShaderPrograms(variation: ShaderVariation): Void;
+      // Mark the FBO needing an update.
+    function markFBODirty(): Void;
+      // Bind a VBO, avoiding redundant operation.
+    function setVBO(object: Int): Void;
+      // Bind a UBO, avoiding redundant operation.
+    function setUBO(object: Int): Void;
       // Return the API-specific alpha texture format.
     function getAlphaFormat(): Int;
       // Return the API-specific luminance texture format.
@@ -3377,6 +3409,8 @@ extern class Graphics extends AObject {
     function getPixelUVOffset(): Vector2;
       // Return maximum number of supported bones for skinning.
     function getMaxBones(): Int;
+      // Return whether is using an OpenGL 3 context.
+    function getGL3Support(): Bool;
 
 }
 
@@ -3388,9 +3422,11 @@ extern class RenderSurface extends RefCounted {
     var linkedRenderTarget: RenderSurface;
     var linkedDepthStencil: RenderSurface;
     var parentTexture: Texture;
+    var renderBuffer: Int;
     var width: Int;
     var height: Int;
     var usage: TextureUsage;
+    var target: Int;
 
       // Construct with parent texture.
     function new(parentTexture: Texture);
@@ -3407,10 +3443,16 @@ extern class RenderSurface extends RefCounted {
     function setLinkedDepthStencil(depthStencil: RenderSurface): Void;
       // Queue manual update of the viewport(s).
     function queueUpdate(): Void;
-      // Release surface.
+      // Create a renderbuffer. Return true if successful.
+    function createRenderBuffer(width: Int, height: Int, format: Int): Bool;
+      // Handle device loss.
+    function onDeviceLost(): Void;
+      // Release renderbuffer if any.
     function release(): Void;
       // Return parent texture.
     function getParentTexture(): Texture;
+      // Return renderbuffer if created.
+    function getRenderBuffer(): Int;
       // Return width.
     function getWidth(): Int;
       // Return height.
@@ -3423,10 +3465,14 @@ extern class RenderSurface extends RefCounted {
     function getViewport(index: Int): Viewport;
       // Return viewport update mode.
     function getUpdateMode(): RenderSurfaceUpdateMode;
-      // Return linked color rendertarget.
+      // Return linked color buffer.
     function getLinkedRenderTarget(): RenderSurface;
-      // Return linked depth-stencil surface.
+      // Return linked depth buffer.
     function getLinkedDepthStencil(): RenderSurface;
+      // Set surface's OpenGL target.
+    function setTarget(target: Int): Void;
+      // Return surface's OpenGL target.
+    function getTarget(): Int;
       // Clear update flag. Called by Renderer.
     function wasUpdated(): Void;
 
@@ -3445,6 +3491,8 @@ extern class ShaderVariation extends RefCounted {
       // Construct.
     function new(owner: Shader, type: ShaderType);
 
+      // Mark the GPU resource destroyed on context destruction.
+    function onDeviceLost(): Void;
       // Release the shader.
     function release(): Void;
       // Compile the shader. Return true if successful.
@@ -3457,7 +3505,7 @@ extern class ShaderVariation extends RefCounted {
     function getOwner(): Shader;
       // Return shader type.
     function getShaderType(): ShaderType;
-      // Return shader name.
+      // Return name.
     function getName(): String;
       // Return defines.
     function getDefines(): String;
@@ -3465,10 +3513,6 @@ extern class ShaderVariation extends RefCounted {
     function getFullName(): String;
       // Return compile error/warning string.
     function getCompilerOutput(): String;
-      // Return whether uses a parameter.
-    function hasParameter(param: String): Bool;
-      // Return whether uses a texture unit (only for pixel shaders.)
-    function hasTextureUnit(unit: TextureUnit): Bool;
 
 }
 
@@ -3481,11 +3525,13 @@ extern class Texture extends Resource {
     var borderColor: Color;
     var srgb: Bool;
     var backupTexture: Texture;
+    var target: Int;
     var format: Int;
     var levels: Int;
     var width: Int;
     var height: Int;
     var depth: Int;
+    var parametersDirty: Bool;
     var usage: TextureUsage;
     var components: Int;
     var parameters: XMLFile;
@@ -3499,7 +3545,7 @@ extern class Texture extends Resource {
     function setFilterMode(filter: TextureFilterMode): Void;
       // Set addressing mode by texture coordinate.
     function setAddressMode(coord: TextureCoordinate, address: TextureAddressMode): Void;
-      // Set shadow compare mode. No-op on D3D9.
+      // Set shadow compare mode.
     function setShadowCompare(enable: Bool): Void;
       // Set border color for border addressing mode.
     function setBorderColor(color: Color): Void;
@@ -3509,6 +3555,12 @@ extern class Texture extends Resource {
     function setBackupTexture(texture: Texture): Void;
       // Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
     function setMipsToSkip(quality: Int, mips: Int): Void;
+      // Dirty the parameters.
+    function setParametersDirty(): Void;
+      // Update changed parameters to OpenGL. Called by Graphics when binding the texture.
+    function updateParameters(): Void;
+      // Return texture's OpenGL target.
+    function getTarget(): Int;
       // Return texture format.
     function getFormat(): Int;
       // Return whether the texture format is compressed.
@@ -3521,11 +3573,13 @@ extern class Texture extends Resource {
     function getHeight(): Int;
       // Return height.
     function getDepth(): Int;
+      // Return whether parameters are dirty.
+    function getParametersDirty(): Bool;
       // Return filtering mode.
     function getFilterMode(): TextureFilterMode;
       // Return addressing mode by texture coordinate.
     function getAddressMode(coord: TextureCoordinate): TextureAddressMode;
-      // Return whether shadow compare is enabled. Always false on D3D9.
+      // Return whether shadow compare is enabled.
     function getShadowCompare(): Bool;
       // Return border color.
     function getBorderColor(): Color;
@@ -3547,8 +3601,14 @@ extern class Texture extends Resource {
     function getRowDataSize(width: Int): Int;
       // Return number of image components required to receive pixel data from GetData(), or 0 for compressed images.
     function getComponents(): Int;
+      // Return the non-internal texture format corresponding to an OpenGL internal format.
+    function getExternalFormat(format: Int): Int;
+      // Return the data type corresponding to an OpenGL internal format.
+    function getDataType(format: Int): Int;
       // Set additional parameters from an XML file.
     function setParameters(xml: XMLFile): Void;
+      // Return the corresponding SRGB texture format if supported. If not supported, return format unchanged.
+    function getSRGBFormat(format: Int): Int;
 
 }
 
@@ -3563,11 +3623,11 @@ extern class Texture2D extends Texture {
       // Finish resource loading. Always called from the main thread. Return true if successful.
     @:overload(function(): Bool{})
     override function endLoad(): Bool;
-      // Release default pool resources.
+      // Mark the GPU resource destroyed on context destruction.
     function onDeviceLost(): Void;
-      // Recreate default pool resources.
+      // Recreate the GPU resource and restore data if applicable.
     function onDeviceReset(): Void;
-      // Release texture.
+      // Release the texture.
     function release(): Void;
       // Set size, format and usage. Zero size will follow application window size. Return true if successful.
     function setSize(width: Int, height: Int, format: Int, ?usage: TextureUsage): Bool;
@@ -3587,11 +3647,11 @@ extern class Texture3D extends Texture {
       // Finish resource loading. Always called from the main thread. Return true if successful.
     @:overload(function(): Bool{})
     override function endLoad(): Bool;
-      // Release default pool resources.
+      // Mark the GPU resource destroyed on context destruction.
     function onDeviceLost(): Void;
-      // Recreate default pool resources.
+      // Recreate the GPU resource and restore data if applicable.
     function onDeviceReset(): Void;
-      // Release texture.
+      // Release the texture.
     function release(): Void;
       // Set size, format and usage. Zero size will follow application window size. Return true if successful.
     function setSize(width: Int, height: Int, depth: Int, format: Int, ?usage: TextureUsage): Bool;
@@ -3609,11 +3669,11 @@ extern class TextureCube extends Texture {
       // Finish resource loading. Always called from the main thread. Return true if successful.
     @:overload(function(): Bool{})
     override function endLoad(): Bool;
-      // Release default pool resources.
+      // Mark the GPU resource destroyed on context destruction.
     function onDeviceLost(): Void;
-      // ReCreate default pool resources.
+      // Recreate the GPU resource and restore data if applicable.
     function onDeviceReset(): Void;
-      // Release texture.
+      // Release the texture.
     function release(): Void;
       // Set size, format and usage. Return true if successful.
     function setSize(size: Int, format: Int, ?usage: TextureUsage): Bool;
