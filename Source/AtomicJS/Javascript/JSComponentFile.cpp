@@ -203,8 +203,8 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
     if (!InitModule())
         return false;
 
-    // TODO: cache these for player builds
-    // FIXME: this won't work with obfusication or minimization
+    // TODO: move the inspector field parsing to the JavascriptImporter
+    // which will work with obfusication, minimization, or bytecode dumps
 
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
@@ -234,7 +234,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
             if (line.StartsWith("inspectorFields"))
             {
-                eval = line;
+                eval = line + "\n";
                 if (line.Contains("}"))
                 {
                     valid = true;
@@ -243,7 +243,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
             }
             else if (line.StartsWith("this.inspectorFields"))
             {
-                eval = line.Substring(5);
+                eval = line.Substring(5) + "\n";
                 if (line.Contains("}"))
                 {
                     valid = true;
@@ -252,7 +252,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
             }
             else if (line.StartsWith("var inspectorFields"))
             {
-                eval = line.Substring(4);
+                eval = line.Substring(4) + "\n";
                 if (line.Contains("}"))
                 {
                     valid = true;
@@ -263,7 +263,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
         }
         else
         {
-            eval += line;
+            eval += line + "\n";
         }
 
         if (line.Contains("}") && eval.Length())
@@ -321,23 +321,54 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
                     }
                     else if (duk_is_array(ctx, -1))
                     {
-                        if (duk_get_length(ctx, -1) > 0)
+                        int length = duk_get_length(ctx, -1);
+
+                        if (length > 0)
                         {
+
                             duk_get_prop_index(ctx, -1, 0);
 
-                            // TODO: class types
-                            variantType = (VariantType) ((int)duk_require_number(ctx, -1));
+                            // resource ref detection
+                            if (duk_is_string(ctx, -1))
+                            {
+                                const char* classname = duk_to_string(ctx, -1);
 
-                            duk_pop(ctx);
-                        }
+                                duk_pop(ctx);
 
-                        if (duk_get_length(ctx, -1) > 1)
-                        {
-                            duk_get_prop_index(ctx, -1, 1);
-                            // default value
-                            js_to_variant(ctx, -1, defaultValue);
+                                const char* name = NULL;
 
-                            duk_pop(ctx);
+                                if (length > 1)
+                                {
+                                    duk_get_prop_index(ctx, -1, 1);
+                                    name = duk_require_string(ctx, -1);
+                                    duk_pop(ctx);
+
+                                }
+
+                                ResourceRef resourceRef(classname);
+                                if (name)
+                                    resourceRef.name_ = name;
+
+                                variantType = VAR_RESOURCEREF;
+                                defaultValue = resourceRef;
+
+                            }
+                            else
+                            {
+                                variantType = (VariantType) ((int)duk_require_number(ctx, -1));
+
+                                duk_pop(ctx);
+
+                                if (length > 1)
+                                {
+                                    duk_get_prop_index(ctx, -1, 1);
+                                    // default value
+                                    js_to_variant(ctx, -1, defaultValue);
+                                    duk_pop(ctx);
+                                }
+
+                            }
+
                         }
 
                     }

@@ -1,3 +1,6 @@
+import InspectorUtils = require("./InspectorUtils");
+import EditorUI = require("ui/EditorUI");
+
 class DataBinding {
 
     constructor(object: Atomic.Serializable, attrInfo: Atomic.AttributeInfo, widget: Atomic.UIWidget) {
@@ -145,6 +148,95 @@ class DataBinding {
                 layout.addChild(select);
             }
 
+        } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
+
+            var importerName = ToolCore.assetDatabase.getResourceImporterName(attrInfo.resourceTypeName);
+
+            if (importerName) {
+
+                var parent = new Atomic.UILayout();
+                var o = InspectorUtils.createAttrEditFieldWithSelectButton("", parent);
+
+                parent.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+                parent.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+                parent.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+
+                var lp = new Atomic.UILayoutParams();
+                lp.width = 140;
+                o.editField.layoutParams = lp;
+                o.editField.readOnly = true;
+
+                // stuff editfield in so can be reference
+                parent["editField"] = o.editField;
+
+                var selectButton = o.selectButton;
+
+                selectButton.onClick = () => {
+
+                    EditorUI.getModelOps().showResourceSelection("Select " + attrInfo.resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
+
+                        var resource = asset.resource;
+
+                        object.setAttribute(attrInfo.name, resource);
+
+                        if (resource) {
+
+                            // use the asset name instead of the cache name
+                            if (asset.importer.requiresCacheFile())
+                                o.editField.text = asset.name;
+                            else
+                                o.editField.text = resource.name;
+                        }
+                        else
+                            o.editField.text = "";
+
+
+                    });
+
+                }
+
+                // handle dropping of component on field
+                o.editField.subscribeToEvent(o.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+                    if (ev.target == o.editField) {
+
+                        var dragObject = ev.dragObject;
+
+                        var importer;
+
+                        if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+                            var asset = <ToolCore.Asset> dragObject.object;
+
+                            if (asset.importerTypeName == importerName) {
+                                importer = asset.importer;
+                            }
+
+                        }
+
+                        if (importer) {
+
+                            var resource = asset.resource;
+                            object.setAttribute(attrInfo.name, resource);
+                            if (resource) {
+                                // use the asset name instead of the cache name
+                                if (asset.importer.requiresCacheFile())
+                                    o.editField.text = asset.name;
+                                else
+                                    o.editField.text = resource.name;
+                            }
+                            else
+                                o.editField.text = "";
+
+                        }
+                    }
+
+                });
+
+                widget = parent;
+            }
+
         }
 
         if (widget) {
@@ -237,6 +329,20 @@ class DataBinding {
                 if (select)
                     select.value = value[i];
             }
+
+        } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
+
+            // for cached resources, use the asset name, otherwise use the resource path name
+            var resource = <Atomic.Resource> object.getAttribute(attrInfo.name);
+            var text = "";
+            if (resource) {
+                text = resource.name;
+                var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                if (asset)
+                  text = asset.name;
+            }
+
+            widget["editField"].text = text;
 
         }
 
@@ -331,6 +437,7 @@ class DataBinding {
         this.objectLocked = false;
 
     }
+
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 

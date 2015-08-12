@@ -7,6 +7,7 @@
 
 #include <Atomic/Atomic3D/AnimationController.h>
 #include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Atomic3D/Model.h>
 
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -292,6 +293,16 @@ bool ModelImporter::SaveSettingsInternal()
     }
 
     return true;
+}
+
+Resource* ModelImporter::GetResource()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    Model* model = cache->GetResource<Model>(asset_->GetCachePath() + ".mdl");
+
+    return model;
+
 }
 
 

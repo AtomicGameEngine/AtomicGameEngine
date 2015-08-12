@@ -343,4 +343,12 @@ bool Asset::SetPath(const String& path)
 
 }
 
+Resource* Asset::GetResource()
+{
+    if (importer_)
+        return importer_->GetResource();
+
+    return 0;
+}
+
 }

@@ -19,6 +19,8 @@ public:
 
     bool IsComponentFile() { return isComponentFile_; }
 
+    Resource* GetResource();
+
 protected:
 
     bool Import();
