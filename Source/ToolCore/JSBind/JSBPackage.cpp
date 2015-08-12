@@ -10,6 +10,7 @@
 #include "JSBPackageWriter.h"
 #include "JSBDoc.h"
 #include "JSBTypeScript.h"
+#include "JSBHaxe.h"
 
 namespace ToolCore
 {
@@ -82,6 +83,9 @@ void JSBPackage::GenerateSource(const String &outPath)
 
     JSBTypeScript ts;
     ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");
+
+    JSBHaxe hx;
+    hx.Emit(this, jsbind->GetSourceRootFolder() + "Script/Haxe/" + name_ + ".hx");
 }
 
 JSBClass* JSBPackage::GetClass(const String& name)

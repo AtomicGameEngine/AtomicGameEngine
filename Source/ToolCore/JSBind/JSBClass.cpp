@@ -267,7 +267,7 @@ void JSBClass::Process()
         }
 
 
-        if (function->IsOverride())
+        if (function->IsOverload())
             continue;
 
         for (unsigned k = 0; k < functions_.Size(); k++)
@@ -279,8 +279,8 @@ void JSBClass::Process()
 
             if (function->GetName() == function2->GetName())
             {
-                function->SetOverride();
-                function2->SetOverride();
+                function->SetOverload();
+                function2->SetOverload();
                 // initially set all overridden functions to skip
                 function->SetSkip(true);
                 function2->SetSkip(true);
@@ -295,7 +295,7 @@ void JSBClass::Process()
     {
         JSBFunction* function = functions_[j];
 
-        if (function->IsOverride())
+        if (function->IsOverload())
         {
             for (unsigned k = 0; k < overrides_.Size(); k++)
             {                

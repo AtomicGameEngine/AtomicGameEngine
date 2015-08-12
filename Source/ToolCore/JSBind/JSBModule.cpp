@@ -66,7 +66,7 @@ void JSBModule::VisitHeaders()
     ProcessOverloads();
     ProcessExcludes();
     ProcessTypeScriptDecl();
-
+    ProcessHaxeDecl();
 }
 
 void JSBModule::PreprocessClasses()
@@ -227,6 +227,39 @@ void JSBModule::ProcessTypeScriptDecl()
             for (unsigned k = 0; k < classdecl.GetSize(); k++)
             {
                 klass->AddTypeScriptDecl(classdecl.GetString(k));
+            }
+        }
+    }
+}
+
+void JSBModule::ProcessHaxeDecl()
+{
+    // Haxe declarations
+
+    JSONValue root = moduleJSON_->GetRoot();
+
+    JSONValue decl = root.GetChild("haxe_decl");
+
+    if (decl.IsObject())
+    {
+        Vector<String> childNames = decl.GetChildNames();
+
+        for (unsigned j = 0; j < childNames.Size(); j++)
+        {
+            String classname = childNames.At(j);
+
+            JSBClass* klass = GetClass(classname);
+
+            if (!klass)
+            {
+                ErrorExit("Bad Haxe decl class");
+            }
+
+            JSONValue classdecl = decl.GetChild(classname);
+
+            for (unsigned k = 0; k < classdecl.GetSize(); k++)
+            {
+                klass->AddHaxeDecl(classdecl.GetString(k));
             }
         }
     }

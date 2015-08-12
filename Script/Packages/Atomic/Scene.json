@@ -46,6 +46,23 @@
 		"Scene" : [
 			"getMainCamera():Camera;"
 		]
+	},
+	"haxe_decl" : {
+		
+		"Node" : [
+			"function saveXML(file:File):Bool;",
+			"function getChildrenWithName(name:String, ?recursive:Bool):Array<Node>;",
+			"function getChildrenWithComponent(componentType:String, ?recursive:Bool):Array<Node>;",
+			"function getComponents(?componentType:String, ?recursive:Bool):Array<Component>;",
+			"function getChildAtIndex(index:UInt):Node;",
+			"function createJSComponent(name:String, ?args:Dynamic):JSComponent;",
+			"function getJSComponent(name:String):JSComponent;",
+			"function createChildPrefab(childName:String, prefabPath:String):Node;",
+			"function loadPrefab(prefabPath:String):Bool;"
+		],
+		"Scene" : [
+			"function getMainCamera():Camera;"
+		]
 	}
 
 }

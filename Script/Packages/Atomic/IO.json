@@ -13,7 +13,17 @@
             "writeString(text:string):void;"
 		],
 		"FileSystem" : [
-			"scanDir(pathName:string, filter:string, flags:number, recursive:boolean);"
+			"scanDir(pathName:string, filter:string, flags:number, recursive:boolean):Array<string>;"
+		]
+	},
+	
+	"haxe_decl" : {
+		"File" : [
+			"function readText():String;",
+            "function writeString(text:String):Void;"
+		],
+		"FileSystem" : [
+			"function scanDir(pathName:String, filter:String, flags:UInt, recursive:Bool):Array<String>;"
 		]
 	}
 }
