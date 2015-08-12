@@ -249,14 +249,6 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
         return;
     }
 
-    if (duk_is_object(ctx, variantIdx))
-    {
-        RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
-        if (o)
-            v = o;
-        return;
-    }
-
     if (duk_is_array(ctx, variantIdx))
     {
         if (duk_get_length(ctx, variantIdx) == 2)
@@ -302,6 +294,16 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
 
         return;
     }
+
+    // object check after array
+    if (duk_is_object(ctx, variantIdx))
+    {
+        RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
+        if (o)
+            v = o;
+        return;
+    }
+
 
 }
 
