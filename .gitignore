@@ -1,4 +1,6 @@
 
+*.ps3
+*.vs3
 *.user
 *.log
 Bin/*.d.ts
