@@ -303,8 +303,8 @@ void GetPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot,
     scale = ToVector3(aiScale);
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
-    blendIndices, Vector<PODVector<float> >& blendWeights, unsigned maxBones)
+bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+    blendIndices, Vector<PODVector<float> >& blendWeights, String& errorMessage, unsigned maxBones)
 {
     blendIndices.Resize(mesh->mNumVertices);
     blendWeights.Resize(mesh->mNumVertices);
@@ -315,10 +315,11 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
     {
         if (mesh->mNumBones > maxBones)
         {
-            ErrorExit(
+            errorMessage =
                 "Geometry (submesh) has over " + String(maxBones) + " bone influences. Try splitting to more submeshes\n"
-                "that each stay at " + String(maxBones) + " bones or below."
-            );
+                "that each stay at " + String(maxBones) + " bones or below.";
+
+             return false;
         }
         boneMappings.Resize(mesh->mNumBones);
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
@@ -347,17 +348,25 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             String boneName = FromAIString(bone->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
-                ErrorExit("Bone " + boneName + " not found");
+            {
+                errorMessage = "Bone " + boneName + " not found";
+                return false;
+            }
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
                 blendIndices[vertex].Push(globalIndex);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
                 if (blendWeights[vertex].Size() > 4)
-                    ErrorExit("More than 4 bone influences on vertex");
+                {
+                    errorMessage = "More than 4 bone influences on vertex";
+                    return false;
+                }
             }
         }
     }
+
+    return true;
 }
 
 String FromAIString(const aiString& str)

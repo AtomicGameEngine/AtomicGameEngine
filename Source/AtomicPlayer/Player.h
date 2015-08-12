@@ -23,7 +23,14 @@ public:
 
     Scene* LoadScene(const String& filename, Camera* camera = NULL);
 
+    Scene* GetCurrentScene() { return currentScene_; }
+
 private:
+
+    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
+
+    // Strong reference
+    SharedPtr<Scene> currentScene_;
 
     SharedPtr<Viewport> viewport_;
 

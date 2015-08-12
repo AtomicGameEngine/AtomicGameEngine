@@ -88,17 +88,6 @@ declare module ToolCore {
 
    }
 
-   export class ProjectFile extends Atomic.AObject {
-
-      // Construct.
-      constructor();
-
-      save(project: Project): void;
-      load(project: Project): boolean;
-      writeNewProject(fullpath: string): void;
-
-   }
-
    export class Project extends Atomic.AObject {
 
       resourcePath: string;
@@ -140,6 +129,17 @@ declare module ToolCore {
       loadBuildSettings(): boolean;
       saveUserPrefs(): void;
       loadUserPrefs(): boolean;
+
+   }
+
+   export class ProjectFile extends Atomic.AObject {
+
+      // Construct.
+      constructor();
+
+      save(project: Project): void;
+      load(project: Project): boolean;
+      writeNewProject(fullpath: string): void;
 
    }
 
@@ -227,7 +227,7 @@ declare module ToolCore {
 
       load(assetPath: string): boolean;
       getErrorMessage(): string;
-      exportModel(outName: string, animName?: string, animationOnly?: boolean): void;
+      exportModel(outName: string, animName?: string, animationOnly?: boolean): boolean;
       setImportNode(node: Atomic.Node): void;
       setStartTime(startTime: number): void;
       setEndTime(endTime: number): void;
@@ -237,34 +237,15 @@ declare module ToolCore {
 
    }
 
-   export class AssetDatabase extends Atomic.AObject {
-
-      cachePath: string;
-
-      // Construct.
-      constructor();
-
-      getAssetByGUID(guid: string): Asset;
-      getAssetByPath(path: string): Asset;
-      getAssetByCachePath(cachePath: string): Asset;
-      generateAssetGUID(): string;
-      registerGUID(guid: string): void;
-      getCachePath(): string;
-      deleteAsset(asset: Asset): void;
-      scan(): void;
-      getDotAssetFilename(path: string): string;
-      getFolderAssets(folder:string):ToolCore.Asset[];
-      getAssetsByImporterType(type:string):ToolCore.Asset[];
-
-   }
-
    export class Asset extends Atomic.AObject {
 
       guid: string;
       name: string;
       path: string;
+      extension: string;
       relativePath: string;
       cachePath: string;
+      resource: Atomic.Resource;
       importerType: string;
       importerTypeName: string;
       importer: AssetImporter;
@@ -282,9 +263,11 @@ declare module ToolCore {
       getGUID(): string;
       getName(): string;
       getPath(): string;
+      getExtension(): string;
       // Get the path relative to project
       getRelativePath(): string;
       getCachePath(): string;
+      getResource(): Atomic.Resource;
       getImporterType(): string;
       getImporterTypeName(): string;
       getImporter(): AssetImporter;
@@ -303,9 +286,32 @@ declare module ToolCore {
 
    }
 
+   export class AssetDatabase extends Atomic.AObject {
+
+      cachePath: string;
+
+      // Construct.
+      constructor();
+
+      getAssetByGUID(guid: string): Asset;
+      getAssetByPath(path: string): Asset;
+      getAssetByCachePath(cachePath: string): Asset;
+      generateAssetGUID(): string;
+      registerGUID(guid: string): void;
+      getCachePath(): string;
+      deleteAsset(asset: Asset): void;
+      scan(): void;
+      getResourceImporterName(resourceTypeName: string): string;
+      getDotAssetFilename(path: string): string;
+      getFolderAssets(folder:string):ToolCore.Asset[];
+      getAssetsByImporterType(type:string):ToolCore.Asset[];
+
+   }
+
    export class AssetImporter extends Atomic.AObject {
 
       asset: Asset;
+      resource: Atomic.Resource;
 
       // Construct.
       constructor(asset: Asset);
@@ -313,6 +319,7 @@ declare module ToolCore {
       setDefaults(): void;
       preload(): boolean;
       getAsset(): Asset;
+      getResource(): Atomic.Resource;
       requiresCacheFile(): boolean;
 
    }
@@ -328,11 +335,14 @@ declare module ToolCore {
 
    export class JavascriptImporter extends AssetImporter {
 
+      resource: Atomic.Resource;
+
       // Construct.
       constructor(asset: Asset);
 
       setDefaults(): void;
       isComponentFile(): boolean;
+      getResource(): Atomic.Resource;
 
    }
 
@@ -368,6 +378,7 @@ declare module ToolCore {
       scale: number;
       importAnimations: boolean;
       animationCount: number;
+      resource: Atomic.Resource;
 
       // Construct.
       constructor(asset: Asset);
@@ -379,6 +390,7 @@ declare module ToolCore {
       setImportAnimations(importAnimations: boolean): void;
       getAnimationCount(): number;
       setAnimationCount(count: number): void;
+      getResource(): Atomic.Resource;
       getAnimationInfo(index: number): AnimationImportInfo;
 
    }

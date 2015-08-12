@@ -51,9 +51,9 @@ bool ImportCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Stri
 
 void ImportCmd::Run()
 {
-    //ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-    //Project* project = tsystem->GetProject();
-    //String resourcePath = project->GetResourcePath();
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+    String resourcePath = project->GetResourcePath();
 
     String ext = GetExtension(assetFilename_);
 
@@ -75,8 +75,8 @@ void ImportCmd::Run()
 
         SharedPtr<JSONSceneProcess> sceneProcess;
         sceneProcess = new JSONSceneProcess(context_, jimporter);
-        //sceneProcess->Process(resourcePath);
-        //sceneProcess->Write();
+        sceneProcess->Process(resourcePath);
+        sceneProcess->Write();
     }
     else
     {

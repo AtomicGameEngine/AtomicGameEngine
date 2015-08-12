@@ -1800,6 +1800,8 @@ declare module Atomic {
       getChildAtIndex(index:number):Node;
       createJSComponent(name:string, args?:{});
       getJSComponent(name:string):JSComponent;
+      createChildPrefab(childName:string, prefabPath:string):Node;
+      loadPrefab(prefabPath:string):boolean;
 
    }
 
@@ -1824,7 +1826,6 @@ declare module Atomic {
    export class PrefabComponent extends Component {
 
       prefabGUID: string;
-      prefabNode: Node;
 
       // Construct.
       constructor();
@@ -1834,7 +1835,6 @@ declare module Atomic {
       savePrefab(): boolean;
       undoPrefab(): void;
       breakPrefab(): void;
-      getPrefabNode(): Node;
 
    }
 
@@ -4292,6 +4292,7 @@ declare module Atomic {
       isInside(point: Vector3): boolean;
       // Determines if the given local space point is within the model geometry.
       isInsideLocal(point: Vector3): boolean;
+      setMaterialIndex(index:number, material:Material);
 
    }
 
@@ -4565,8 +4566,8 @@ declare module Atomic {
       onSetEnabled(): void;
       // Set speed.
       setSpeed(speed: number): void;
-      // Set animation by animation set, name and loop mode.
-      setAnimation(animationSet: AnimationSet2D, name: string, loopMode?: LoopMode2D): void;
+      // Set animation by name and loop mode.
+      setAnimation(name: string, loopMode?: LoopMode2D): void;
       // Set animation set.
       setAnimationSet(animationSet: AnimationSet2D): void;
       // Set loop mode.
@@ -5175,7 +5176,7 @@ declare module Atomic {
 
    export class Light2D extends Component {
 
-      lightGroup: Light2DGroup;
+      lightGroupID: number;
       color: Color;
       numRays: number;
       lightType: LightType2D;
@@ -5187,8 +5188,8 @@ declare module Atomic {
       // Construct.
       constructor();
 
-      setLightGroup(group: Light2DGroup): void;
-      getLightGroup(): Light2DGroup;
+      setLightGroupID(id: number): void;
+      getLightGroupID(): number;
       getColor(): Color;
       setColor(color: Color): void;
       updateVertices(): void;
@@ -5246,17 +5247,20 @@ declare module Atomic {
 
       physicsWorld: PhysicsWorld2D;
       ambientColor: Color;
+      lightGroupID: number;
       frustumBox: BoundingBox;
 
       // Construct.
       constructor();
 
-      setPhysicsWorld(physicsWorld: PhysicsWorld2D): void;
       getPhysicsWorld(): PhysicsWorld2D;
       addLight2D(light: Light2D): void;
+      removeLight2D(light: Light2D): void;
       setDirty(): void;
       setAmbientColor(color: Color): void;
       getAmbientColor(): Color;
+      setLightGroupID(id: number): void;
+      getLightGroupID(): number;
       getFrustumBox(): BoundingBox;
 
    }
@@ -7121,6 +7125,7 @@ declare module Atomic {
       addRootItem(text: string, icon: string, id: string): number;
       addChildItem(parentItemID: number, text: string, icon: string, id: string): number;
       setItemText(id: string, text: string): void;
+      setItemTextSkin(id: string, skin: string): void;
       setItemIcon(id: string, icon: string): void;
       deleteItemByID(id: string): void;
       setExpanded(itemID: number, value: boolean): void;

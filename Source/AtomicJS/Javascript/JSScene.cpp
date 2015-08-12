@@ -3,10 +3,16 @@
 // https://github.com/AtomicGameEngine/AtomicGameEngine
 
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/XMLFile.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
+#include <Atomic/Scene/PrefabComponent.h>
 #include <Atomic/Graphics/Camera.h>
+
+#ifdef ATOMIC_3D
+#include <Atomic/Physics/RigidBody.h>
+#endif
 
 #include "JSScene.h"
 #include "JSComponent.h"
@@ -155,8 +161,8 @@ static int Node_GetComponents(duk_context* ctx)
 
     for (unsigned i = 0; i < dest.Size(); i++)
     {
-        js_push_class_object_instance(ctx, dest[i], "Component");
-        duk_put_prop_index(ctx, -2, i);
+        if (js_push_class_object_instance(ctx, dest[i], "Component"))
+            duk_put_prop_index(ctx, -2, i);
     }
 
     return 1;
@@ -191,6 +197,43 @@ static int Node_SaveXML(duk_context* ctx)
     duk_push_boolean(ctx, node->SaveXML(*file) ? 1 : 0);
 
     return 1;
+}
+
+static int Node_LoadPrefab(duk_context* ctx)
+{
+    const char* prefabName = duk_require_string(ctx, 0);
+
+    duk_push_this(ctx);
+    Node* node = js_to_class_instance<Node>(ctx, -1, 0);
+
+    PrefabComponent* prefabComponent = node->CreateComponent<PrefabComponent>();
+    prefabComponent->SetPrefabGUID(prefabName);
+
+    duk_push_boolean(ctx, 1);
+    return 1;
+
+}
+
+static int Node_CreateChildPrefab(duk_context* ctx)
+{
+    const char* childName = duk_require_string(ctx, 0);
+    const char* prefabName = duk_require_string(ctx, 1);
+
+    duk_push_this(ctx);
+    Node* parent = js_to_class_instance<Node>(ctx, -1, 0);
+
+    Node* node = parent->CreateChild();
+
+    PrefabComponent* prefabComponent = node->CreateComponent<PrefabComponent>();
+    prefabComponent->SetPrefabGUID(prefabName);
+
+    // override what node name is in prefab
+    node->SetName(childName);
+
+    js_push_class_object_instance(ctx, node, "Node");
+
+    return 1;
+
 }
 
 
@@ -250,8 +293,6 @@ static int Scene_GetMainCamera(duk_context* ctx)
 
 }
 
-
-
 void jsapi_init_scene(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -273,7 +314,10 @@ void jsapi_init_scene(JSVM* vm)
     duk_put_prop_string(ctx, -2, "getChildAtIndex");
     duk_push_c_function(ctx, Node_SaveXML, 1);
     duk_put_prop_string(ctx, -2, "saveXML");
-
+    duk_push_c_function(ctx, Node_LoadPrefab, 1);
+    duk_put_prop_string(ctx, -2, "loadPrefab");
+    duk_push_c_function(ctx, Node_CreateChildPrefab, 2);
+    duk_put_prop_string(ctx, -2, "createChildPrefab");
     duk_pop(ctx);
 
     js_class_get_prototype(ctx, "Atomic", "Scene");

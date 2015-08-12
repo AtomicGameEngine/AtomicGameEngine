@@ -1,16 +1,15 @@
-var game = Atomic.game;
-var node = self.node;
+"atomic component";
 
-function start() {
-
-	var sprite2D = node.createComponent("StaticSprite2D");
-	sprite2D.sprite = game.getSprite2D("Sprites/star.png");
-	sprite2D.blendMode = Atomic.BLEND_ALPHA;
-	
+var inspectorFields = {
+  speed: 1.0
 }
 
-function update(timeStep) {	
+module.exports = function(self) {
 
-	node.roll(timeStep * 100);
+  self.update = function(timeStep) {
+
+    self.node.rotate2D(timeStep * 75 * self.speed);
+
+  }
 
 }

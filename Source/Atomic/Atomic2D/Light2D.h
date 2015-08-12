@@ -42,18 +42,18 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
 
-    void SetLightGroup(Light2DGroup* group) { lightgroup_ = group; }
-    Light2DGroup* GetLightGroup() { return lightgroup_; }
+    void SetLightGroupID(int id) { lightgroupID_ = id; }
+    int GetLightGroupID() const { return lightgroupID_; }
 
     const Color& GetColor() const { return color_; }
     void SetColor(const Color& color) { color_ = color; }
 
-    void AddVertices(Vector<Vertex2D>& vertices);
+    void AddVertices(Vector<Vertex2D> &vertices);
 
     virtual void UpdateVertices() {}
 
     void SetNumRays(int numRays);
-    unsigned GetNumRays() const { return rays_.Size(); }
+    int GetNumRays() const { return (int) rays_.Size(); }
 
     virtual void OnSetEnabled();
 
@@ -73,15 +73,20 @@ public:
 
 protected:
 
+    void OnSceneSet(Scene* scene);
+
     void CastRays();
 
+    int lightgroupID_;
     WeakPtr<Light2DGroup> lightgroup_;
+
     Color color_;
     bool castShadows_;
     bool softShadows_;
     bool backtrace_;
     float softShadowLength_;
     PODVector<Light2DRay> rays_;
+    bool raysInitialized_;
     Vector<Vertex2D> vertices_;
     LightType2D lightType_;
 };
@@ -168,16 +173,20 @@ public:
     /// Register object factory. drawable2d must be registered first.
     static void RegisterObject(Context* context);
 
-    void SetPhysicsWorld(PhysicsWorld2D* physicsWorld);
     PhysicsWorld2D* GetPhysicsWorld() { return physicsWorld_; }
 
     void AddLight2D(Light2D* light);
+    void RemoveLight2D(Light2D* light);
+
     Vector<WeakPtr<Light2D> >& GetLights() { return lights_; }
 
     void SetDirty() { /*verticesDirty_ = true;*/ }
 
     void SetAmbientColor(const Color& color);
     const Color& GetAmbientColor() { return ambientColor_; }
+
+    void SetLightGroupID(int id) { lightgroupID_ = id; }
+    int GetLightGroupID() const { return lightgroupID_; }
 
     const BoundingBox& GetFrustumBox() const { return frustumBoundingBox_; }
 
@@ -186,21 +195,21 @@ protected:
     /// Recalculate the world-space bounding box.
     void OnWorldBoundingBoxUpdate();
 
-    void OnNodeSet(Node* node);
+    void OnSceneSet(Scene* scene);
 
     /// Handle draw order changed.
     virtual void OnDrawOrderChanged();
     /// Update source batches.
     virtual void UpdateSourceBatches();
 
-
 private:
 
-    Color ambientColor_;
     void HandleBeginRendering(StringHash eventType, VariantMap& eventData);
     void HandleBeginViewUpdate(StringHash eventType, VariantMap& eventData);
-
     void CreateLight2DMaterial();
+
+    int lightgroupID_;
+    Color ambientColor_;
 
     Vector<WeakPtr<Light2D> > lights_;
 

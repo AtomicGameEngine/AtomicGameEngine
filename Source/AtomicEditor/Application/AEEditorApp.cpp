@@ -47,7 +47,7 @@ void AEEditorApp::Start()
 
     context_->RegisterSubsystem(new EditorMode(context_));
 
-    vm_->SetModuleSearchPaths("AtomicEditor");
+    vm_->SetModuleSearchPaths("AtomicEditor/out");
 
     // Do not create bone structure by default when in the editor
     // this can be toggled temporarily, for example to setup an animation preview
@@ -67,17 +67,17 @@ void AEEditorApp::Start()
     jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
 
-    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/main.js"));
+    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/out/main.js"));
 
     if (file.Null())
     {
-        ErrorExit("Unable to load AtomicEditor/main.js");
+        ErrorExit("Unable to load AtomicEditor/out/main.js");
         return;
     }
 
     if (!vm_->ExecuteFile(file))
     {
-        ErrorExit("Error executing AtomicEditor/main.js");
+        ErrorExit("Error executing AtomicEditor/out/main.js");
         return;
     }
 
@@ -157,10 +157,10 @@ void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
     String errMessage = eventData[P_ERRORMESSAGE].GetString();
     String errFilename = eventData[P_ERRORFILENAME].GetString();
     //String errStack = eventData[P_ERRORSTACK].GetString();
-    int errLineNumber = eventData[P_ERRORLINENUMBER].GetInt();
+    int errLineNumber = vm_->GetRealLineNumber("AtomicEditor/out/" + errFilename, eventData[P_ERRORLINENUMBER].GetInt());
+    
+    String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errLineNumber);
 
-    String errorString = ToString("%s - %s - Line: %i",
-                                  errFilename.CString(), errMessage.CString(), errLineNumber);
 
     ErrorExit(errorString);
 

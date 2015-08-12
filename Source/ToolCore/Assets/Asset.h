@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Atomic/Core/Object.h>
+#include <Atomic/Resource/Resource.h>
 
 #include "AssetImporter.h"
 
@@ -32,9 +33,12 @@ public:
     const String& GetGUID() const { return guid_; }
     const String& GetName() const { return name_; }
     const String& GetPath() const { return path_; }
+    String GetExtension() const;
     /// Get the path relative to project
     String GetRelativePath();
     String GetCachePath() const;
+
+    Resource* GetResource();
 
     const StringHash GetImporterType() { return importer_.Null() ? String::EMPTY : importer_->GetType(); }
     const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }

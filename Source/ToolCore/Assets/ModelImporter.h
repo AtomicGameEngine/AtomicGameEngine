@@ -63,6 +63,8 @@ public:
     unsigned GetAnimationCount();
     void SetAnimationCount(unsigned count);
 
+    Resource* GetResource();
+
     AnimationImportInfo* GetAnimationInfo(unsigned index) { return animationInfo_[index]; }
 
 protected:

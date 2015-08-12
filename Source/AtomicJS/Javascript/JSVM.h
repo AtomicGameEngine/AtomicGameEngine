@@ -162,6 +162,8 @@ public:
 
     void SendJSErrorEvent(const String& filename = String::EMPTY);
 
+    int GetRealLineNumber(const String& fileName, const int lineNumber);
+
 private:
 
     void SubscribeToEvents();
@@ -229,8 +231,13 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
     duk_push_pointer(ctx, (void*) instance->GetClassID());
     duk_get_prop(ctx, -2);
 
-    // if this is tripped, means the class hasn't been registered and shouldn't be trying to push it
-    assert(duk_is_object(ctx, -1));
+    // if not an object, this instance isn't not a scriptable class
+    // reset top and return false
+    if (!duk_is_object(ctx, -1))
+    {
+        duk_set_top(ctx, top);
+        return false;
+    }
 
     duk_get_prop_index(ctx, -1, 0);
     const char* package = duk_require_string(ctx, -1);

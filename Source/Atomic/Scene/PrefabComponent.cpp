@@ -6,6 +6,7 @@
 #include <Atomic/Resource/ResourceEvents.h>
 
 #include <Atomic/Physics/RigidBody.h>
+#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 
 #include "PrefabEvents.h"
 #include "PrefabComponent.h"
@@ -51,15 +52,53 @@ void PrefabComponent::LoadPrefabNode()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabGUID_);
 
-    prefabNode_->LoadXML(xmlfile->GetRoot());
-    prefabNode_->SetTemporary(true);
+    if (!xmlfile || !node_)
+        return;
 
-    prefabNode_->SetPosition(Vector3::ZERO);
-    prefabNode_->SetRotation(Quaternion::IDENTITY);
-    // prefabNode_->SetScale(Vector3::ONE);
+    bool temporary = IsTemporary();
+    unsigned id = GetID();
 
+    // We're going to be removed, so keep ourselves alive and
+    // a reference to node_ as we'll readd
+    SharedPtr<PrefabComponent> keepAlive(this);
+    SharedPtr<Node> node(node_);
+
+    // store original transform
+    Vector3 pos = node->GetPosition();
+    Quaternion rot = node->GetRotation();
+    Vector3 scale = node->GetScale();
+
+    node->LoadXML(xmlfile->GetRoot());
+
+    node->SetPosition(pos);
+    node->SetRotation(rot);
+    node->SetScale(scale);
+
+    // Get the root components of the load node
+    const Vector<SharedPtr<Component>>& rootComponents = node->GetComponents();
+
+    // set all loaded components to be temporary, set all loaded root components and
+    // direct children to temporary
+    for (unsigned i = 0; i < rootComponents.Size(); i++)
+    {
+        rootComponents.At(i)->SetTemporary(true);
+    }
+
+    const Vector<SharedPtr<Node> >& children = node->GetChildren();
+
+    for (unsigned i = 0; i < children.Size(); i++)
+    {
+        children.At(i)->SetTemporary(true);
+    }
+
+    // readd via stored node, which is the same as node_ after this add
+    this->SetTemporary(temporary);
+    node->AddComponent(this, id, REPLICATED);
+
+    // Get all the rigid bodies of the load node
     PODVector<RigidBody*> bodies;
-    prefabNode_->GetComponents<RigidBody>(bodies, true);
+    node_->GetComponents<RigidBody>(bodies, true);
+
     for (unsigned i = 0; i < bodies.Size(); i++)
     {
         RigidBody* body = bodies[i];
@@ -73,13 +112,40 @@ void PrefabComponent::BreakPrefab()
     if (!node_ || !node_->GetScene())
         return;
 
-    SharedPtr<PrefabComponent> keepAlive(this);
+    // flip temporary root children and components to break prefab
+    const Vector<SharedPtr<Component>>& rootComponents = node_->GetComponents();
+    const Vector<SharedPtr<Node> >& children = node_->GetChildren();
+    PODVector<Node*> filterNodes;
 
-    if (prefabNode_.NotNull())
-        prefabNode_->SetTemporary(false);
+    for (unsigned i = 0; i < rootComponents.Size(); i++)
+    {
+        if (rootComponents[i]->IsTemporary())
+        {
+            rootComponents[i]->SetTemporary(false);
+
+            // Animated sprites contain a temporary node we don't want to save in the prefab
+            // it would be nice if this was general purpose because have to test this when
+            // saving a prefab as well
+
+            if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
+            {
+                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
+                if (asprite->GetRootNode())
+                    filterNodes.Push(asprite->GetRootNode());
+            }
+
+        }
+    }
+
+    for (unsigned i = 0; i < children.Size(); i++)
+    {
+        if (children[i]->IsTemporary() && !filterNodes.Contains(children[i].Get()))
+        {
+            children[i]->SetTemporary(false);
+        }
+    }
 
     node_->RemoveComponent(this);
-
 
 }
 
@@ -96,14 +162,7 @@ void PrefabComponent::HandlePrefabChanged(StringHash eventType, VariantMap& even
 
 void PrefabComponent::SetPrefabGUID(const String& guid)
 {
-    assert(prefabNode_.Null());
-
-    // ensure to use node_->CreateChild() so in scene, this may be fixed
-    // with update on https://github.com/urho3d/Urho3D/issues/748
-    assert(node_);
-
     prefabGUID_ = guid;
-    prefabNode_ = node_->CreateChild();
 
     if (prefabGUID_.Length())
     {
@@ -115,16 +174,6 @@ void PrefabComponent::SetPrefabGUID(const String& guid)
 void PrefabComponent::OnNodeSet(Node* node)
 {
     Component::OnNodeSet(node);
-
-
-    if (!node && prefabNode_.NotNull())
-    {
-        // a prefab node might not be temporary is prefab is broken{
-        if (prefabNode_->IsTemporary())
-            prefabNode_->Remove();
-
-        prefabNode_ = NULL;
-    }
 }
 
 }

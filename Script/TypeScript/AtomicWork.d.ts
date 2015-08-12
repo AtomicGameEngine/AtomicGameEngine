@@ -127,6 +127,22 @@ declare module Atomic {
 
     }
 
+    export interface ComponentAddedEvent {
+
+        scene: Atomic.Scene;
+        node: Atomic.Node;
+        component: Atomic.Component;
+
+    }
+
+    export interface ComponentRemovedEvent {
+
+        scene: Atomic.Scene;
+        node: Atomic.Node;
+        component: Atomic.Component;
+
+    }
+
     export interface IPCJSErrorEvent {
 
         errorName: string;
@@ -144,6 +160,7 @@ declare module Atomic {
         mode: number; // AM_*
         defaultValue: string;
         enumNames: string[];
+        resourceTypeName: string;
 
     }
 

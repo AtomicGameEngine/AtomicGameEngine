@@ -15,6 +15,8 @@
 #include "TextureImporter.h"
 #include "PrefabImporter.h"
 #include "JavascriptImporter.h"
+#include "SpriterImporter.h"
+#include "TMXImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -230,7 +232,7 @@ bool Asset::CreateImporter()
     }
     else
     {
-        String ext = GetExtension(path_);
+        String ext = Atomic::GetExtension(path_);
 
         name_ = GetFileName(path_);
 
@@ -265,6 +267,14 @@ bool Asset::CreateImporter()
         {
             importer_ = new MaterialImporter(context_, this);
         }
+        else if (ext == ".scml")
+        {
+            importer_ = new SpriterImporter(context_, this);
+        }
+        else if (ext == ".tmx")
+        {
+            importer_ = new TMXImporter(context_, this);
+        }
         else if (textureFormats.Contains(ext))
         {
             importer_ = new TextureImporter(context_, this);
@@ -287,6 +297,12 @@ String Asset::GetCachePath() const
     return cachePath;
 }
 
+String Asset::GetExtension() const
+{
+
+    return Atomic::GetExtension(path_);
+
+}
 
 bool Asset::SetPath(const String& path)
 {
@@ -325,6 +341,14 @@ bool Asset::SetPath(const String& path)
 
     return true;
 
+}
+
+Resource* Asset::GetResource()
+{
+    if (importer_)
+        return importer_->GetResource();
+
+    return 0;
 }
 
 }

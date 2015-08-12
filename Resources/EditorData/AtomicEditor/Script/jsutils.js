@@ -1,5 +1,6 @@
 __atomic_acorn = require('./acorn');
 __atomic_beautify = require('./beautify');
+__atomic_sourcemap = require('./source-map');
 
 exports.parseToJSON = function (source) {
 
@@ -37,7 +38,6 @@ exports.parseErrorCheck = function(source) {
 
 
 	try {
-
 		__atomic_acorn.parse( source, {
 	    	ranges: true,
 	    	locations: true,
@@ -64,4 +64,11 @@ exports.jsBeautify = function (source) {
 
 	return __atomic_beautify.js_beautify(source);
 
+}
+
+exports.getRealLineNumber = function (map, line) {
+    var jsonMap = JSON.parse(map);
+    var smc = new __atomic_sourcemap.SourceMapConsumer(jsonMap);
+    var pos = smc.originalPositionFor({line: line, column: 100000});
+    return pos.line;
 }
