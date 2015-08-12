@@ -258,6 +258,7 @@ extern class Asset extends AObject {
     var extension: String;
     var relativePath: String;
     var cachePath: String;
+    var resource: Atomic.Resource;
     var importerType: String;
     var importerTypeName: String;
     var importer: AssetImporter;
@@ -279,6 +280,7 @@ extern class Asset extends AObject {
       // Get the path relative to project
     function getRelativePath(): String;
     function getCachePath(): String;
+    function getResource(): Atomic.Resource;
     function getImporterType(): String;
     function getImporterTypeName(): String;
     function getImporter(): AssetImporter;
@@ -313,6 +315,7 @@ extern class AssetDatabase extends AObject {
     function getCachePath(): String;
     function deleteAsset(asset: Asset): Void;
     function scan(): Void;
+    function getResourceImporterName(resourceTypeName: String): String;
     function getDotAssetFilename(path: String): String;
 
 }
@@ -321,6 +324,7 @@ extern class AssetDatabase extends AObject {
 extern class AssetImporter extends AObject {
 
     var asset: Asset;
+    var resource: Atomic.Resource;
 
       // Construct.
     function new(asset: Asset);
@@ -328,6 +332,7 @@ extern class AssetImporter extends AObject {
     function setDefaults(): Void;
     function preload(): Bool;
     function getAsset(): Asset;
+    function getResource(): Atomic.Resource;
     function requiresCacheFile(): Bool;
 
 }
@@ -346,12 +351,15 @@ extern class AudioImporter extends AssetImporter {
 @:native("Atomic.JavascriptImporter")
 extern class JavascriptImporter extends AssetImporter {
 
+
       // Construct.
     function new(asset: Asset);
 
     @:overload(function(): Void{})
     override function setDefaults(): Void;
     function isComponentFile(): Bool;
+    @:overload(function(): Atomic.Resource{})
+    override function getResource(): Atomic.Resource;
 
 }
 
@@ -403,6 +411,8 @@ extern class ModelImporter extends AssetImporter {
     function setImportAnimations(importAnimations: Bool): Void;
     function getAnimationCount(): Int;
     function setAnimationCount(count: Int): Void;
+    @:overload(function(): Atomic.Resource{})
+    override function getResource(): Atomic.Resource;
     function getAnimationInfo(index: Int): AnimationImportInfo;
 
 }

@@ -4341,7 +4341,7 @@ declare module Atomic {
       isInside(point: Vector3): boolean;
       // Determines if the given local space point is within the model geometry.
       isInsideLocal(point: Vector3): boolean;
-      setMaterialIndex(index:number, material:Material);
+      function setMaterialIndex(index:number, material:Material);
 
    }
 
@@ -7873,7 +7873,7 @@ declare module Atomic {
       // Check if a file or directory exists at the specified path
       exists(pathName: string): boolean;
       createDirsRecursive(directoryIn: string, directoryOut: string): boolean;
-      scanDir(pathName:string, filter:string, flags:number, recursive:boolean);
+      scanDir(pathName:string, filter:string, flags:number, recursive:boolean):Array<string>;
 
    }
 

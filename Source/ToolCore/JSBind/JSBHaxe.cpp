@@ -67,6 +67,17 @@ namespace ToolCore
         source_ += "//Atomic Haxe Definitions\n\n";
 
         source_ += "extern class " + package_->GetName() + " {\n\n";
+
+        if (package_->GetName() == "Atomic") {
+            //hand written data
+            source_ += "    public static var engine : Engine;\n";
+            source_ += "    public static var graphics: Graphics;\n";
+            source_ += "    public static var renderer: Renderer;\n";
+            source_ += "    public static var cache: ResourceCache;\n";
+            source_ += "    public static var input: Input;\n";
+            source_ += "    public static var fileSystem: FileSystem;\n";
+            source_ += "    public static var network: Network;\n";
+        }
     }
 
     void JSBHaxe::End()
@@ -409,11 +420,6 @@ namespace ToolCore
         }
 
         Begin();
-
-        //for (unsigned i = 0; i < modules.Size(); i++)
-        //{
-        //    RegisterEnums(modules[i]);
-        //}
 
         for (unsigned i = 0; i < modules.Size(); i++)
         {

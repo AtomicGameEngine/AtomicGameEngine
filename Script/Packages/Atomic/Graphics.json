@@ -30,6 +30,15 @@
 			"setShadowCascadeParameter(index:number, value:number);"
 		]
 
+	},
+	
+	"haxe_decl" : {
+		"Light" : [
+			"function getShadowCascade():Array<Float>;",
+			"function setShadowCascade(args:Array<Float>):Void;",
+			"function setShadowCascadeParameter(index:Int, value:Float):Void;"
+		]
+
 	}
 
 }

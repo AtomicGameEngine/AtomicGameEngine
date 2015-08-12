@@ -694,6 +694,13 @@ extern enum FileMode {
 
 extern class Atomic {
 
+    public static var engine : Engine;
+    public static var graphics: Graphics;
+    public static var renderer: Renderer;
+    public static var cache: ResourceCache;
+    public static var input: Input;
+    public static var fileSystem: FileSystem;
+    public static var network: Network;
 
     public static var QUICKSORT_THRESHOLD: Int;
     public static var CONVERSION_BUFFER_LENGTH: Int;
@@ -1377,6 +1384,9 @@ extern class AObject extends RefCounted {
     @:overload(function(): Bool{})
     override function isObject(): Bool;
     function getTypeNameStatic(): String;
+      function sendEvent(eventType:String, ?data:Dynamic):Void;
+      @:overload(function(sender:AObject, eventType:String, callback:Dynamic->Void):Void{})
+      function subscribeToEvent(eventType:String, callback:Dynamic->Void):Void;
 
 }
 
@@ -1686,6 +1696,15 @@ extern class Node extends Animatable {
     function setScaleSilent(scale: Vector3): Void;
       // Set local transform silently without marking the node & child nodes dirty. Used by animation code.
     function setTransformSilent(position: Vector3, rotation: Quaternion, scale: Vector3): Void;
+      function saveXML(file:File):Bool;
+      function getChildrenWithName(name:String, ?recursive:Bool):Array<Node>;
+      function getChildrenWithComponent(componentType:String, ?recursive:Bool):Array<Node>;
+      function getComponents(?componentType:String, ?recursive:Bool):Array<Component>;
+      function getChildAtIndex(index:UInt):Node;
+      function createJSComponent(name:String, ?args:Dynamic):JSComponent;
+      function getJSComponent(name:String):JSComponent;
+      function createChildPrefab(childName:String, prefabPath:String):Node;
+      function loadPrefab(prefabPath:String):Bool;
 
 }
 
@@ -1825,6 +1844,7 @@ extern class Scene extends Node {
       // Prepare network update by comparing attributes and marking replication states dirty as necessary.
     @:overload(function(): Void{})
     override function prepareNetworkUpdate(): Void;
+      function getMainCamera():Camera;
 
 }
 
@@ -2406,6 +2426,9 @@ extern class Light extends Drawable {
     function isNegative(): Bool;
       // Return a divisor value based on intensity for calculating the sort value.
     function getIntensityDivisor(?attenuation: Float): Float;
+      function getShadowCascade():Array<Float>;
+      function setShadowCascade(args:Array<Float>):Void;
+      function setShadowCascadeParameter(index:Int, value:Float):Void;
 
 }
 
@@ -4279,6 +4302,7 @@ extern class StaticModel extends Drawable {
     function isInside(point: Vector3): Bool;
       // Determines if the given local space point is within the model geometry.
     function isInsideLocal(point: Vector3): Bool;
+      function setMaterialIndex(index:UInt, material:Material):Void;
 
 }
 
@@ -7869,6 +7893,8 @@ extern class File extends AObject {
     function getFullPath(): String;
       // Unlike FileSystem.Copy this copy works when the source file is in a package file
     function copy(srcFile: File): Bool;
+      function readText():String;
+      function writeString(text:String):Void;
 
 }
 
@@ -7940,6 +7966,7 @@ extern class FileSystem extends AObject {
       // Check if a file or directory exists at the specified path
     function exists(pathName: String): Bool;
     function createDirsRecursive(directoryIn: String, directoryOut: String): Bool;
+      function scanDir(pathName:String, filter:String, flags:UInt, recursive:Bool):Array<String>;
 
 }
 

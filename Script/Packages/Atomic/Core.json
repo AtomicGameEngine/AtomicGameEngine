@@ -17,5 +17,13 @@
 			"subscribeToEvent(eventType:string, callback:(data:any)=>void);",
 			"subscribeToEvent(sender:AObject, eventType:string, callback:(data:any)=>void);"
 		]
+	},
+	"haxe_decl" : {
+
+		"Object" : [
+			"function sendEvent(eventType:String, ?data:Dynamic):Void;",
+			"@:overload(function(sender:AObject, eventType:String, callback:Dynamic->Void):Void{})",
+			"function subscribeToEvent(eventType:String, callback:Dynamic->Void):Void;"
+		]
 	}
 }
