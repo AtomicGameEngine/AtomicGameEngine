@@ -21,10 +21,10 @@
 	"typescript_decl" : {
 
 		"StaticModel" : [
-			"function setMaterialIndex(index:number, material:Material);"
+			"setMaterialIndex(index:number, material:Material);"
 		]
 	},
-	
+
 	"haxe_decl" : {
 		"StaticModel" : [
 			"function setMaterialIndex(index:UInt, material:Material):Void;"
