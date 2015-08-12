@@ -269,6 +269,7 @@ class ComponentInspector extends Atomic.UISection {
 
 
     addSpriteUI(layout: Atomic.UILayout, typeName: string) {
+      
 
         var spriteComponent = <Atomic.StaticSprite2D> this.component;
 
