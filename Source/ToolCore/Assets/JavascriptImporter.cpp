@@ -49,7 +49,7 @@ bool JavascriptImporter::Import()
 
     file->Close();
 
-    if (strstr(buffer, "\"atomic component\";"))
+    if (strstr(buffer, "\"atomic component\"") || strstr(buffer, "'atomic component'"))
         isComponentFile_ = true;
 
     return true;
