@@ -335,12 +335,16 @@ bool JSVM::ExecuteFile(File *file)
 
     String source;
 
-    duk_get_global_string(ctx_, "require");
-    duk_push_string(ctx_, "main");
+    file->ReadText(source);
+    source.Append('\n');
 
-    if (duk_pcall(ctx_, 1) != 0)
+    duk_push_string(ctx_, file->GetFullPath().CString());
+    if (duk_eval_raw(ctx_, source.CString(), 0,
+        DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
-        SendJSErrorEvent();
+        SendJSErrorEvent(file->GetFullPath());
+
+        duk_pop(ctx_);
         return false;
     }
 
