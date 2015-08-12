@@ -88,6 +88,17 @@ declare module ToolCore {
 
    }
 
+   export class ProjectFile extends Atomic.AObject {
+
+      // Construct.
+      constructor();
+
+      save(project: Project): void;
+      load(project: Project): boolean;
+      writeNewProject(fullpath: string): void;
+
+   }
+
    export class Project extends Atomic.AObject {
 
       resourcePath: string;
@@ -129,17 +140,6 @@ declare module ToolCore {
       loadBuildSettings(): boolean;
       saveUserPrefs(): void;
       loadUserPrefs(): boolean;
-
-   }
-
-   export class ProjectFile extends Atomic.AObject {
-
-      // Construct.
-      constructor();
-
-      save(project: Project): void;
-      load(project: Project): boolean;
-      writeNewProject(fullpath: string): void;
 
    }
 
@@ -237,6 +237,44 @@ declare module ToolCore {
 
    }
 
+   export class AudioImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+
+   }
+
+   export class MaterialImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+      saveMaterial(): void;
+
+   }
+
+   export class PrefabImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+      preload(): boolean;
+
+   }
+
+   export class TextureImporter extends AssetImporter {
+
+      // Construct.
+      constructor(asset: Asset);
+
+      setDefaults(): void;
+
+   }
+
    export class Asset extends Atomic.AObject {
 
       guid: string;
@@ -324,15 +362,6 @@ declare module ToolCore {
 
    }
 
-   export class AudioImporter extends AssetImporter {
-
-      // Construct.
-      constructor(asset: Asset);
-
-      setDefaults(): void;
-
-   }
-
    export class JavascriptImporter extends AssetImporter {
 
       resource: Atomic.Resource;
@@ -343,16 +372,6 @@ declare module ToolCore {
       setDefaults(): void;
       isComponentFile(): boolean;
       getResource(): Atomic.Resource;
-
-   }
-
-   export class MaterialImporter extends AssetImporter {
-
-      // Construct.
-      constructor(asset: Asset);
-
-      setDefaults(): void;
-      saveMaterial(): void;
 
    }
 
@@ -392,25 +411,6 @@ declare module ToolCore {
       setAnimationCount(count: number): void;
       getResource(): Atomic.Resource;
       getAnimationInfo(index: number): AnimationImportInfo;
-
-   }
-
-   export class PrefabImporter extends AssetImporter {
-
-      // Construct.
-      constructor(asset: Asset);
-
-      setDefaults(): void;
-      preload(): boolean;
-
-   }
-
-   export class TextureImporter extends AssetImporter {
-
-      // Construct.
-      constructor(asset: Asset);
-
-      setDefaults(): void;
 
    }
 
