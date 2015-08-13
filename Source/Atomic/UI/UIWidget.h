@@ -187,7 +187,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     virtual void AddChild(UIWidget* child);
 
     /// Add the child to this widget. See AddChild for adding a child to the top or bottom.
-    /// This takes a relative Z and insert the child before or after the given reference widget.*/
+    /// This takes a relative Z and insert the child before or after the given reference widget.
     void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
 
 

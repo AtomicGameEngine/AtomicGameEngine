@@ -38,7 +38,7 @@ public:
     void SetAdaptToContentSize(bool adapt);
     bool GetAdaptToContentSize();
 
-    /// Set to true if the content should adapt to the available size of this container when it's larger than the preferred size. */
+    /// Set to true if the content should adapt to the available size of this container when it's larger than the preferred size.
     void SetAdaptContentSize(bool adapt);
     bool GetAdaptContentSize();
 
