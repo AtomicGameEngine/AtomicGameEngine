@@ -1,6 +1,6 @@
 
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/Resource/Image.h>
+#include <Atomic/Audio/Sound.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"
@@ -47,6 +47,14 @@ bool AudioImporter::SaveSettingsInternal()
     JSONValue import = jsonRoot_.CreateChild("AudioImporter");
 
     return true;
+}
+
+
+Resource* AudioImporter::GetResource()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Sound* sound = cache->GetResource<Sound>(asset_->GetPath());
+    return sound;
 }
 
 

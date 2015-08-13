@@ -17,6 +17,8 @@ public:
 
     virtual void SetDefaults();
 
+    Resource* GetResource();
+
 protected:
 
     bool Import();
