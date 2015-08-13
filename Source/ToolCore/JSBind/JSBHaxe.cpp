@@ -22,7 +22,9 @@ namespace ToolCore
             JSBPrimitiveType* ptype = ftype->type_->asPrimitiveType();
             if (ptype->kind_ == JSBPrimitiveType::Bool)
                 scriptType = "Bool";
-            if (ptype->kind_ == JSBPrimitiveType::Int)
+            if (ptype->kind_ == JSBPrimitiveType::Int && ptype->isUnsigned_)
+                scriptType = "UInt";
+            else if (ptype->kind_ == JSBPrimitiveType::Int)
                 scriptType = "Int";
             if (ptype->kind_ == JSBPrimitiveType::Float)
                 scriptType = "Float";
@@ -30,9 +32,6 @@ namespace ToolCore
 
         if (ftype->type_->asStringHashType() || ftype->type_->asStringType())
             scriptType = "String";
-
-        if (ftype->type_->asEnumType())
-            scriptType = ftype->type_->asEnumType()->enum_->GetName();
 
         if (ftype->type_->asEnumType())
             scriptType = ftype->type_->asEnumType()->enum_->GetName();
