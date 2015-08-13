@@ -53,8 +53,15 @@ class Preferences {
 
     read(): void {
         var filePath = this.getPreferencesFullPath();
-        var jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
-        if (!jsonFile.isOpen()) return;
+        var jsonFile;
+        //check if file doesn't exists, create an empty JSON file
+        if (!this.fileSystem.fileExists(filePath)) {
+            jsonFile = new Atomic.File(filePath, Atomic.FILE_WRITE);
+            jsonFile.writeString("{}");
+            jsonFile.close();
+        }
+        //Read file
+        jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
         var prefs = <PreferencesFormat> JSON.parse(jsonFile.readText());
         if (prefs) {
             if(!prefs.recentProjects) prefs.recentProjects = [""];
