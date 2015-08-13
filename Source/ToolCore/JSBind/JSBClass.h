@@ -140,6 +140,10 @@ public:
     unsigned GetNumTypeScriptDecl() { return typeScriptDecls_.Size(); }
     const String& GetTypeScriptDecl(unsigned idx) { return typeScriptDecls_[idx]; }
 
+    void AddHaxeDecl(const String& decl) { haxeDecls_.Push(decl); }
+    unsigned GetNumHaxeDecl() { return haxeDecls_.Size(); }
+    const String& GetHaxeDecl(unsigned idx) { return haxeDecls_[idx]; }
+
     void Preprocess();
     void Process();
     void PostProcess();
@@ -163,6 +167,7 @@ private:
     PODVector<JSBFunctionSignature*> excludes_;
 
     Vector<String> typeScriptDecls_;
+    Vector<String> haxeDecls_;
 
     bool isAbstract_;
     bool isObject_;

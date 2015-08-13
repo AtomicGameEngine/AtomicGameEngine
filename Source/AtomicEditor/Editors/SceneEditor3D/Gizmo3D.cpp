@@ -11,6 +11,7 @@
 
 #include <Atomic/Input/Input.h>
 
+#include "SceneEditor3DEvents.h"
 #include "Gizmo3D.h"
 
 namespace AtomicEditor
@@ -133,8 +134,6 @@ void Gizmo3D::Update(Vector<Node *> &editNodes)
 
     Use();
     Position();
-
-
 }
 
 void Gizmo3D::CalculateGizmoAxes()
@@ -343,6 +342,8 @@ void Gizmo3D::Moved()
     gizmoAxisX_.Moved();
     gizmoAxisY_.Moved();
     gizmoAxisZ_.Moved();
+
+    SendEvent(E_GIZMOMOVED);
 }
 
 

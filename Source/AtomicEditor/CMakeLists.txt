@@ -54,10 +54,21 @@ target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS ToolCoreJS P
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
     target_link_libraries(AtomicEditor curl)
+
+    # compile the editor scripts
+    add_custom_command (TARGET AtomicEditor POST_BUILD
+    COMMAND "${CMAKE_SOURCE_DIR}/Build/Mac/node/node" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicEditor)
+
 elseif(LINUX)
     target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
 else()
     target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
+
+    # compile the editor scripts
+    add_custom_command (TARGET AtomicEditor POST_BUILD
+    COMMAND "${CMAKE_SOURCE_DIR}/Build/Windows/node/node.exe" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicEditor)
 
     # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
     add_custom_command (TARGET AtomicEditor POST_BUILD

@@ -36,7 +36,19 @@ class ComponentInspector extends Atomic.UISection {
     inspect(component: Atomic.Component) {
 
         this.component = component;
-        this.text = component.getTypeName();
+        this.text = component.typeName;
+
+        // For JSComponents append the filename
+        if (component.typeName == "JSComponent") {
+
+            var jsc = <Atomic.JSComponent> component;
+
+            if (jsc.componentFile) {
+              var pathInfo = Atomic.splitPath( jsc.componentFile.name);
+              this.text = "JS - " + pathInfo.fileName;
+            }
+
+        }
 
         // don't expand by default
         this.value = 0;

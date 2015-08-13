@@ -3,6 +3,15 @@
 /// <reference path="../TypeScript/Editor.d.ts" />
 /// <reference path="../TypeScript/AtomicWork.d.ts" />
 
-import __Editor = require("./editor/Editor");
+import Editor = require("editor/Editor");
 
-var TheEditor = new __Editor();
+class Main {
+
+    static Editor:Editor;
+
+    static main() {
+        Main.Editor = new Editor();
+    }
+}
+
+Main.main();

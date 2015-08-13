@@ -10,7 +10,59 @@ class NodeInspector extends ScriptWidget {
 
         super();
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+        this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
+        this.subscribeToEvent("GizmoMoved", (ev) => this.handleGizmoModed(ev));
+        this.subscribeToEvent("Update", (ev) => this.handleUpdate(ev));
+
+    }
+
+    handleUpdate(ev) {
+
+        // to keep from spamming UI update we have a little delta on the gizmo updates
+        if (!this.node) {
+            this.gizmoMoved = false;
+            return;
+        }
+
+        if (this.gizmoMoved) {
+
+            if (this.updateDelta > 1.0) {
+
+                this.updateDelta = 0.0;
+
+            }
+            else {
+
+                this.updateDelta -= ev.timeStep;
+
+            }
+
+            if (this.updateDelta <= 0) {
+
+                for (var i in this.bindings) {
+
+                    this.bindings[i].setWidgetValueFromObject();
+
+                }
+
+                this.gizmoMoved = false;
+                this.updateDelta = 0;
+
+            }
+
+
+        }
+
+    }
+
+
+    handleGizmoModed(ev) {
+
+        if (!this.node) return;
+
+        this.gizmoMoved = true;
+
+        this.updateDelta += .3;
 
     }
 
@@ -260,7 +312,8 @@ class NodeInspector extends ScriptWidget {
     node: Atomic.Node;
     nodeLayout: Atomic.UILayout;
     bindings: Array<DataBinding>;
-
+    gizmoMoved = false;
+    updateDelta = 0;
 
 }
 

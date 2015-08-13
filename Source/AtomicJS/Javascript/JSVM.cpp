@@ -340,7 +340,7 @@ bool JSVM::ExecuteFile(File *file)
 
     duk_push_string(ctx_, file->GetFullPath().CString());
     if (duk_eval_raw(ctx_, source.CString(), 0,
-                     DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
+        DUK_COMPILE_EVAL | DUK_COMPILE_SAFE | DUK_COMPILE_NOSOURCE | DUK_COMPILE_STRLEN) != 0)
     {
         SendJSErrorEvent(file->GetFullPath());
 

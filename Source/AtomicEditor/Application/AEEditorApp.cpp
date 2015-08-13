@@ -67,19 +67,14 @@ void AEEditorApp::Start()
     jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
 
-    SharedPtr<File> file (GetSubsystem<ResourceCache>()->GetFile("AtomicEditor/out/main.js"));
-
-    if (file.Null())
+    duk_get_global_string(vm_->GetJSContext(), "require");
+    duk_push_string(vm_->GetJSContext(), "main");
+    if (duk_pcall(vm_->GetJSContext(), 1) != 0)
     {
-        ErrorExit("Unable to load AtomicEditor/out/main.js");
-        return;
+        vm_->SendJSErrorEvent();
+        ErrorExit("Error executing main.js");
     }
 
-    if (!vm_->ExecuteFile(file))
-    {
-        ErrorExit("Error executing AtomicEditor/out/main.js");
-        return;
-    }
 
     GetSubsystem<LicenseSystem>()->Initialize();
 

@@ -4,7 +4,7 @@ Contributing to the Atomic Game Engine
 Contribution Copyrights and Licensing
 ------------------------
 
-Atomic Game Engine contribution copyrights are held by their authors.  Each author has a copyright to their contribution, and agrees to irrevocably license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`
+Atomic Game Engine contributors retain the copyright to their contribution and agree to irrevocably license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md` (MIT)
 
 To make a code contribution to the Atomic Game Engine
 --------------------------------------
