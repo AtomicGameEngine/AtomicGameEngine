@@ -34,9 +34,6 @@ String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
     if (ftype->type_->asEnumType())
         scriptType = ftype->type_->asEnumType()->enum_->GetName();
 
-    if (ftype->type_->asEnumType())
-        scriptType = ftype->type_->asEnumType()->enum_->GetName();
-
     if (ftype->type_->asClassType())
     {
         JSBClass* klass = ftype->type_->asClassType()->class_;
