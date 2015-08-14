@@ -38,7 +38,7 @@ public:
     String GetRelativePath();
     String GetCachePath() const;
 
-    Resource* GetResource();
+    Resource* GetResource(const String& typeName = String::EMPTY);
 
     const StringHash GetImporterType() { return importer_.Null() ? String::EMPTY : importer_->GetType(); }
     const String& GetImporterTypeName() { return importer_.Null() ? String::EMPTY : importer_->GetTypeName(); }

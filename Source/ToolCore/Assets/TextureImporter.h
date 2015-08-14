@@ -17,6 +17,8 @@ public:
 
     virtual void SetDefaults();
 
+    Resource* GetResource(const String& typeName = String::EMPTY);
+
 protected:
 
     bool Import();

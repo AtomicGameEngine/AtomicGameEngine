@@ -176,7 +176,7 @@ class DataBinding {
 
                     EditorUI.getModelOps().showResourceSelection("Select " + attrInfo.resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
 
-                        var resource = asset.resource;
+                        var resource = asset.getResource(attrInfo.resourceTypeName);
 
                         object.setAttribute(attrInfo.name, resource);
 
@@ -217,7 +217,7 @@ class DataBinding {
 
                         if (importer) {
 
-                            var resource = asset.resource;
+                            var resource = asset.getResource(attrInfo.resourceTypeName);
                             object.setAttribute(attrInfo.name, resource);
                             if (resource) {
                                 // use the asset name instead of the cache name

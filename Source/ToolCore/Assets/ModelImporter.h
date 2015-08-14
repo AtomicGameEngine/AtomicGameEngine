@@ -63,7 +63,7 @@ public:
     unsigned GetAnimationCount();
     void SetAnimationCount(unsigned count);
 
-    Resource* GetResource();
+    Resource* GetResource(const String& typeName = String::EMPTY);
 
     AnimationImportInfo* GetAnimationInfo(unsigned index) { return animationInfo_[index]; }
 

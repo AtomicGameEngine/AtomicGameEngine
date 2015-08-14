@@ -295,7 +295,7 @@ bool ModelImporter::SaveSettingsInternal()
     return true;
 }
 
-Resource* ModelImporter::GetResource()
+Resource* ModelImporter::GetResource(const String& typeName)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 

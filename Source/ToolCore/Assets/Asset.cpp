@@ -343,10 +343,10 @@ bool Asset::SetPath(const String& path)
 
 }
 
-Resource* Asset::GetResource()
+Resource* Asset::GetResource(const String &typeName)
 {
     if (importer_)
-        return importer_->GetResource();
+        return importer_->GetResource(typeName);
 
     return 0;
 }

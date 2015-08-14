@@ -24,6 +24,7 @@
 
 #include <Atomic/Resource/Resource.h>
 #include <Atomic/Container/ArrayPtr.h>
+#include <Atomic/Container/List.h>
 
 namespace Atomic
 {
@@ -36,6 +37,19 @@ class ATOMIC_API JSComponentFile : public Resource
     OBJECT(JSComponentFile);
 
 public:
+
+    struct EnumInfo
+    {
+        EnumInfo(const String& name = String::EMPTY, const Variant& v = Variant::EMPTY)
+        {
+            name_ = name;
+            value_ = v;
+        }
+
+        String name_;
+        Variant value_;
+    };
+
     /// Construct.
     JSComponentFile(Context* context);
     /// Destruct.
@@ -43,8 +57,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    const HashMap<String, VariantType>& GetFields() const { return fields_; }
+    const HashMap<String, VariantType>& GetFields() const { return fields_; }    
     const VariantMap& GetDefaultFieldValues() const { return defaultFieldValues_; }
+    const HashMap<String, Vector<EnumInfo>>& GetEnums() const { return enums_; }
+    void GetDefaultFieldValue(const String& name, Variant& v);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
@@ -55,7 +71,6 @@ public:
 
     JSComponent* CreateJSComponent();
     bool PushModule();
-    void GetDefaultFieldValue(const String& name, Variant& v);
 
 private:
 
@@ -63,6 +78,7 @@ private:
 
     bool scriptClass_;
     HashMap<String, VariantType> fields_;
+    HashMap<String, Vector<EnumInfo>> enums_;
     VariantMap defaultFieldValues_;
 
 };
