@@ -217,7 +217,7 @@ class HierarchyFrame extends Atomic.UIWidget {
                     this.hierList.rootList.dragObject = dragObject;
 
                     // handle dropping on hierarchy, moving node
-                    this.subscribeToEvent(dragObject, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+                    this.subscribeToEvent(this.hierList.rootList, "DragEnded", (ev: Atomic.DragEndedEvent) => {
 
                         var dragNode = <Atomic.Node> ev.dragObject.object;
 
