@@ -50,7 +50,7 @@ bool AudioImporter::SaveSettingsInternal()
 }
 
 
-Resource* AudioImporter::GetResource()
+Resource* AudioImporter::GetResource(const String &typeName)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sound* sound = cache->GetResource<Sound>(asset_->GetPath());

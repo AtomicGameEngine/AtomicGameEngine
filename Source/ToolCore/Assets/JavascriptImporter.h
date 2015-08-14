@@ -19,7 +19,7 @@ public:
 
     bool IsComponentFile() { return isComponentFile_; }
 
-    Resource* GetResource();
+    Resource* GetResource(const String& typeName = String::EMPTY);
 
 protected:
 

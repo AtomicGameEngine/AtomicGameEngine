@@ -69,5 +69,15 @@ bool TextureImporter::SaveSettingsInternal()
     return true;
 }
 
+Resource* TextureImporter::GetResource(const String& typeName)
+{
+    if (!typeName.Length())
+        return 0;
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    return cache->GetResource(typeName, asset_->GetPath());
+
+}
+
 
 }

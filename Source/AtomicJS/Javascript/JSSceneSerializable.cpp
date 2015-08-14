@@ -77,11 +77,24 @@ static int Serializable_SetAttribute(duk_context* ctx)
             if (file)
             {
                 const HashMap<String, VariantType>& fields = file->GetFields();
+                const HashMap<String, Vector<JSComponentFile::EnumInfo>>& enums = file->GetEnums();
 
                 if (fields.Contains(name))
                 {
                     HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
                     variantType = itr->second_;
+
+                    if (enums.Contains(name))
+                    {
+                        int idx = (int) v.GetFloat();
+
+                        if (idx > 0 && idx < enums[name]->Size())
+                        {
+                            VariantMap& values = jsc->GetFieldValues();
+                            values[name] = enums[name]->At(idx).value_;
+                            return 0;
+                        }
+                    }
                 }
             }
         }
@@ -314,6 +327,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
             const VariantMap& defaultFieldValues = file->GetDefaultFieldValues();
             const HashMap<String, VariantType>& fields =  file->GetFields();
+            const HashMap<String, Vector<JSComponentFile::EnumInfo>>& enums = file->GetEnums();
 
             if (fields.Size())
             {
@@ -354,6 +368,21 @@ static int Serializable_GetAttributes(duk_context* ctx)
                     duk_put_prop_string(ctx, -2, "field");
 
                     duk_push_array(ctx);
+
+                    if (enums.Contains(itr->first_))
+                    {
+                        unsigned enumCount = 0;
+                        const Vector<JSComponentFile::EnumInfo>* infos = enums[itr->first_];
+                        Vector<JSComponentFile::EnumInfo>::ConstIterator eitr = infos->Begin();
+
+                        while (eitr != infos->End())
+                        {
+                            duk_push_string(ctx, eitr->name_.CString());
+                            duk_put_prop_index(ctx, -2, enumCount++);
+                            eitr++;
+                        }
+
+                    }
 
                     duk_put_prop_string(ctx, -2, "enumNames");
 

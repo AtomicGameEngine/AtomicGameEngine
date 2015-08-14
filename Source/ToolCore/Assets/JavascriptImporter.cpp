@@ -79,7 +79,7 @@ bool JavascriptImporter::SaveSettingsInternal()
     return true;
 }
 
-Resource* JavascriptImporter::GetResource()
+Resource* JavascriptImporter::GetResource(const String& typeName)
 {
     if (!isComponentFile_)
         return 0;

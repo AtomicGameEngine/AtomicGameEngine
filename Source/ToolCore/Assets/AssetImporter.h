@@ -34,7 +34,7 @@ public:
 
     Asset* GetAsset() { return asset_; }
 
-    virtual Resource* GetResource() { return 0; }
+    virtual Resource* GetResource(const String& typeName = String::EMPTY) { return 0; }
 
     bool RequiresCacheFile() const { return requiresCacheFile_; }
 

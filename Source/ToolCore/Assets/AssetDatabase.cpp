@@ -488,9 +488,9 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
     {
         resourceTypeToImporterType_["Sound"] = "AudioImporter";
         resourceTypeToImporterType_["Model"] = "ModelImporter";
+        resourceTypeToImporterType_["Texture2D"] = "TextureImporter";
+        resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";
-
-
     }
 
     if (!resourceTypeToImporterType_.Contains(resourceTypeName))

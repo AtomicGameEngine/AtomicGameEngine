@@ -101,10 +101,10 @@ bool JSComponentFile::PushModule()
     String pathName, fileName, ext;
     SplitPath(path, pathName, fileName, ext);
 
-	if (path.Contains('/') || path.Contains('\\'))
-		pathName += "/" + fileName;
-	else
-		pathName = fileName;
+    if (path.Contains('/') || path.Contains('\\'))
+        pathName += "/" + fileName;
+    else
+        pathName = fileName;
 
     duk_get_global_string(ctx, "require");
     duk_push_string(ctx, pathName.CString());
@@ -224,9 +224,13 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
     String eval;
     bool valid = false;
+    int leftBracketCount = 0;
+    int rightBracketCount = 0;
     for (unsigned i = 0; i < lines.Size(); i++)
     {
         String line = lines[i];
+
+        bool added = false;
 
         if (!eval.Length())
         {
@@ -234,39 +238,42 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
             if (line.StartsWith("inspectorFields"))
             {
+                added = true;
                 eval = line + "\n";
-                if (line.Contains("}"))
-                {
-                    valid = true;
-                    break;
-                }
             }
             else if (line.StartsWith("this.inspectorFields"))
             {
+                added = true;
                 eval = line.Substring(5) + "\n";
-                if (line.Contains("}"))
-                {
-                    valid = true;
-                    break;
-                }
             }
             else if (line.StartsWith("var inspectorFields"))
             {
+                added = true;
                 eval = line.Substring(4) + "\n";
-                if (line.Contains("}"))
-                {
-                    valid = true;
-                    break;
-                }
             }
 
         }
         else
         {
+            added = true;
             eval += line + "\n";
         }
 
-        if (line.Contains("}") && eval.Length())
+        if (added) {
+
+            for (unsigned j = 0; j < line.Length(); j++)
+            {
+                if (line.At(j) == '{')
+                    leftBracketCount++;
+
+                else if (line.At(j) == '}')
+                    rightBracketCount++;
+
+            }
+
+        }
+
+        if (eval.Length() && leftBracketCount && leftBracketCount == rightBracketCount)
         {
             valid = true;
             break;
@@ -359,7 +366,46 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
                                 duk_pop(ctx);
 
-                                if (length > 1)
+                                // detect int enum
+                                if (length > 1 && (variantType == VAR_INT || variantType == VAR_FLOAT
+                                                   || variantType == VAR_DOUBLE))
+                                {
+                                    duk_get_prop_index(ctx, -1, 1);
+
+                                    if (duk_is_number(ctx, -1))
+                                    {
+                                        js_to_variant(ctx, -1, defaultValue);
+                                    }
+                                    else if (duk_is_object(ctx, -1))
+                                    {
+                                        duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
+
+                                        while (duk_next(ctx, -1, 1)) {
+
+                                            Variant enumValue = (float) duk_to_number(ctx, -2);
+                                            String enumName = duk_get_string(ctx, -1);
+
+                                            enums_[name].Push(EnumInfo(enumName, enumValue));
+
+                                            duk_pop_2(ctx);  // pop key value
+                                        }
+
+                                        duk_pop(ctx);  // pop enum object
+
+                                    }
+
+                                    duk_pop(ctx);
+
+                                    if (length > 2)
+                                    {
+                                        duk_get_prop_index(ctx, -1, 2);
+                                        // default value
+                                        js_to_variant(ctx, -1, defaultValue);
+                                        duk_pop(ctx);
+                                    }
+
+                                }
+                                else if (length > 1)
                                 {
                                     duk_get_prop_index(ctx, -1, 1);
                                     // default value

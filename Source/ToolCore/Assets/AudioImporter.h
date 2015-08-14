@@ -17,7 +17,7 @@ public:
 
     virtual void SetDefaults();
 
-    Resource* GetResource();
+    Resource* GetResource(const String& typeName = String::EMPTY);
 
 protected:
 
