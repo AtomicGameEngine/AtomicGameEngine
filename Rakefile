@@ -63,7 +63,7 @@ namespace :build  do
 
       sh "\"#{VSCOMNTOOLS}vsvars32.bat\""
 
-      sh "cmake ../../ -DATOMIC_DEV_BUILD=0 -G \"Visual Studio 14 2015\""
+      sh "cmake ../../ #{$CMAKE_DEV_BUILD} -G \"Visual Studio 14 2015\""
 
       # specify 32 bit
       sh "msbuild /m Atomic.sln /p:Configuration=Release /p:Platform=Win32"
