@@ -26,7 +26,9 @@ namespace Atomic
 
         if (handle == NULL)
         {
-            errorMsg = ToString("Native Plugin: Unable to load %s", pluginLibrary.CString());
+            errorMsg = ToString("Native Plugin: Unable to load %s with error %s", 
+                pluginLibrary.CString(),
+                SDL_GetError());
             return false;
         }
 
@@ -86,7 +88,9 @@ namespace Atomic
         if (duk_pcall(ctx, 1) != DUK_EXEC_SUCCESS)
         {
             success = false;
-            LOGERRORF("Native Plugin: error calling atomic_plugin_init %s", pluginLibrary.CString());
+            LOGERRORF("Native Plugin: error calling atomic_plugin_init %s with error %s", 
+                pluginLibrary.CString(), 
+                duk_safe_to_string(ctx, -1));
         }
         else
         {

@@ -40,8 +40,8 @@ class EventHandler;
         virtual const Atomic::String& GetTypeName() const { return GetTypeNameStatic(); } \
         static Atomic::StringHash GetTypeStatic() { static const Atomic::StringHash typeStatic(#typeName); return typeStatic; } \
         static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic(#typeName); return typeNameStatic; } \
-        virtual ClassID GetClassID() const { return GetClassIDStatic(); } \
-        static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
+        virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
 
 #define BASEOBJECT(typeName) \
     public: \

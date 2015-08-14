@@ -32,8 +32,8 @@ typedef const void* ClassID;
 /// Macro to be included in RefCounted derived classes for efficient RTTI
 #define REFCOUNTED(typeName) \
     public: \
-        virtual ClassID GetClassID() const { return GetClassIDStatic(); } \
-        static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
+        virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
 
 // ATOMIC END
 

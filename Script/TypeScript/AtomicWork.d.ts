@@ -180,6 +180,16 @@ declare module Atomic {
     export function getGraphics(): Graphics;
     export function getFileSystem(): FileSystem;
     export function getResourceCache(): ResourceCache;
+    export function getRenderer(): Atomic.Renderer;
+    export function getNetwork(): Atomic.Network;
+
+    export function assert();
+    export function js_module_read_file(path: string);
+    export function openConsoleWindow();
+    export function script(script: string): boolean;
+    export function destroy(node: Atomic.Node): boolean;
+    export function destroy(scene: Atomic.Scene): boolean;
+    export function destroy(component: Atomic.JSComponent): boolean;
 
     export function getParentPath(path: string): string;
     export function addTrailingSlash(path: string): string;

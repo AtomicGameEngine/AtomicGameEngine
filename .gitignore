@@ -1,4 +1,6 @@
 
+*.ps3
+*.vs3
 *.user
 *.log
 Bin/*.d.ts
@@ -7,6 +9,7 @@ Bin/*.pak
 Bin/NativePluginSDK/*
 Source/Atomic/Javascript/Modules/*
 Data/AtomicPlayer/Resources/CoreData/Shaders/HLSL/Cache
+Resources/CoreData/Shaders/HLSL/Cache
 Artifacts/*
 Build/Source/*
 Docs/out/*
