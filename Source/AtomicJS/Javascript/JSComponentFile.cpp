@@ -376,21 +376,17 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
                                     {
                                         js_to_variant(ctx, -1, defaultValue);
                                     }
-                                    else if (duk_is_object(ctx, -1))
+                                    else if (duk_is_array(ctx, -1))
                                     {
-                                        duk_enum(ctx, -1, DUK_ENUM_OWN_PROPERTIES_ONLY);
+                                        int enumLength = duk_get_length(ctx, -1);
 
-                                        while (duk_next(ctx, -1, 1)) {
-
-                                            Variant enumValue = (float) duk_to_number(ctx, -2);
-                                            String enumName = duk_get_string(ctx, -1);
-
-                                            enums_[name].Push(EnumInfo(enumName, enumValue));
-
-                                            duk_pop_2(ctx);  // pop key value
+                                        for (unsigned i = 0; i < enumLength; i++)
+                                        {
+                                            duk_get_prop_index(ctx, -1, i);
+                                            String enumName = duk_require_string(ctx, -1);
+                                            enums_[name].Push(EnumInfo(enumName, Variant(float(i))));
+                                            duk_pop(ctx);
                                         }
-
-                                        duk_pop(ctx);  // pop enum object
 
                                     }
 
