@@ -175,21 +175,23 @@ bool JSComponentFile::InitModule()
     if (!PushModule())
         return false;
 
-    if (!duk_is_function(ctx, -1))
+    if (duk_is_function(ctx, -1))
     {
-        LOGERRORF("Component file does not export a function: %s", GetName().CString());
-        duk_set_top(ctx, top);
-        return false;
-    }
-
-    // detect a script class vs a simple "flat" javascript component
-    // this means that if a script component class defines a constructor,
-    // it must take 0 arguments (which makes sense as when it is new'd from
-    // serialization, etc there will be no args to pass it
-
-    if (duk_get_length(ctx, -1) == 0)
-    {
+        // constructor export
         scriptClass_ = true;
+    }
+    else if (duk_is_object(ctx, -1))
+    {
+        duk_get_prop_string(ctx, -1, "component");
+
+        if (!duk_is_function(ctx, -1))
+        {
+            LOGERRORF("Component file export object does not export a key \"component\" function: %s", GetName().CString());
+            duk_set_top(ctx, top);
+            return false;
+        }
+
+        scriptClass_ = false;
     }
 
     duk_set_top(ctx, top);
