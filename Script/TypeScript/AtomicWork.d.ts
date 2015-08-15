@@ -18,6 +18,7 @@ declare module Atomic {
     export var input: Input;
     export var fileSystem: FileSystem;
     export var network: Network;
+    export var ui: UI;
 
     export var editorMode: Editor.EditorMode;
 
@@ -182,6 +183,7 @@ declare module Atomic {
     export function getResourceCache(): ResourceCache;
     export function getRenderer(): Atomic.Renderer;
     export function getNetwork(): Atomic.Network;
+    export function getUI(): Atomic.UI;
 
     export function assert();
     export function js_module_read_file(path: string);

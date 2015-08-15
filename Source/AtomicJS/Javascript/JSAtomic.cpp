@@ -10,6 +10,7 @@
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Engine/Engine.h>
+#include <Atomic/UI/UI.h>
 
 #ifdef ATOMIC_NETWORK
 #include <Atomic/Network/Network.h>
@@ -155,6 +156,14 @@ static int js_atomic_GetNetwork(duk_context* ctx)
     return 1;
 }
 #endif
+
+static int js_atomic_GetUI(duk_context* ctx)
+{
+    JSVM* vm = JSVM::GetJSVM(ctx);
+    js_push_class_object_instance(ctx, vm->GetSubsystem<UI>());
+    return 1;
+}
+
 
 static int js_atomic_script(duk_context* ctx)
 {
@@ -361,7 +370,13 @@ void jsapi_init_atomic(JSVM* vm)
     duk_put_prop_string(ctx, -2, "network");
 #endif
 
-    // end filesystems
+    duk_push_c_function(ctx, js_atomic_GetUI, 0);
+    duk_put_prop_string(ctx, -2, "getUI");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<UI>(), "UI");
+    duk_put_prop_string(ctx, -2, "ui");
+
+    // end subsystems
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");
