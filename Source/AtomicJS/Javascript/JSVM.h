@@ -258,6 +258,8 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
     duk_get_global_string(ctx, package);
     duk_get_prop_string(ctx, -1, jclassname);
 
+    assert(duk_is_function(ctx, -1));
+
     duk_push_pointer(ctx, (void*) instance);
     duk_new(ctx, 1);
     duk_remove(ctx, -2); // remove Atomic object

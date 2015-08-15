@@ -492,6 +492,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";
+        resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
     }
 
     if (!resourceTypeToImporterType_.Contains(resourceTypeName))

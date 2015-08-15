@@ -30,6 +30,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
+#include <Atomic/UI/UI.h>
 
 // Move me
 #include <Atomic/Environment/Environment.h>
@@ -149,6 +150,10 @@ void AEPlayerApplication::Setup()
 void AEPlayerApplication::Start()
 {
     AEEditorCommon::Start();
+
+    UI* ui = GetSubsystem<UI>();
+    ui->Initialize("DefaultUI/language/lng_en.tb.txt");
+    ui->LoadDefaultPlayerSkin();
 
     context_->RegisterSubsystem(new PlayerMode(context_));
     PlayerMode* playerMode = GetSubsystem<PlayerMode>();

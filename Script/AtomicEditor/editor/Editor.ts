@@ -23,6 +23,8 @@ class Editor extends Atomic.ScriptObject {
 
         Editor.instance = this;
 
+        this.initUI();
+
         this.editorLicense = new EditorLicense();
 
         Preferences.getInstance().read();
@@ -44,6 +46,16 @@ class Editor extends Atomic.ScriptObject {
         })
 
         this.parseArguments();
+    }
+
+    initUI() {
+
+      var ui = Atomic.ui;
+      ui.loadSkin("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
+      ui.addFont("AtomicEditor/resources/vera.ttf", "Vera");
+      ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
+      ui.setDefaultFont("Vera", 12);
+
     }
 
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {

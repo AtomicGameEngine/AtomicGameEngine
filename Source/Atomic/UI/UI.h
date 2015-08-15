@@ -39,6 +39,10 @@ public:
     void Shutdown();
 
     void LoadSkin(const String& skin, const String& overrideSkin = String::EMPTY);
+    bool GetSkinLoaded() { return skinLoaded_; }
+    void LoadDefaultPlayerSkin();
+
+
     void AddFont(const String& fontFile, const String &name);
     void SetDefaultFont(const String& name, int size);
 
@@ -91,6 +95,7 @@ private:
     bool inputDisabled_;
     bool keyboardDisabled_;
     bool initialized_;
+    bool skinLoaded_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);

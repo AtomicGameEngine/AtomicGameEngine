@@ -3,7 +3,7 @@
 	"sources" : ["Source/Atomic/UI"],
 	"includes" : ["<Atomic/Graphics/Material.h>", "<Atomic/Scene/Node.h>", "<Atomic/Scene/Scene.h>", "<Atomic/Graphics/Texture2D.h>",
 								"<Atomic/UI/UIBatch.h>"],
-	"classes" : ["UIWidget", "UILayout", "UIView", "UIWindow", "UIButton", "UITextField",
+	"classes" : ["UI", "UIWidget", "UILayout", "UIView", "UIWindow", "UIButton", "UITextField",
 								"UISelectItem", "UISelectItemSource", "UIMenuWindow", "UIEditField",
 								"UIImageWidget", "UIClickLabel", "UICheckBox", "UIMenuItem", "UIMenuItemSource",
 								"UISelectList", "UIListView", "UIMessageWindow", "UILayoutParams", "UIFontDescription",

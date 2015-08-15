@@ -12,6 +12,7 @@ var _2DCreateSource = new Atomic.UIMenuItemSource();
 _2DCreateSource.addItem(new Atomic.UIMenuItem("PhysicsWorld2D", "PhysicsWorld2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("StaticSprite2D", "StaticSprite2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("AnimatedSprite2D", "AnimatedSprite2D"));
+_2DCreateSource.addItem(new Atomic.UIMenuItem("ParticleEmitter2D", "ParticleEmitter2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("PointLight2D", "PointLight2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("DirectionalLight2D", "DirectionalLight2D"));
 _2DCreateSource.addItem(new Atomic.UIMenuItem("RigidBody2D", "RigidBody2D"));

@@ -56,10 +56,6 @@ void AEEditorApp::Start()
     // move UI initialization to JS
     UI* ui = GetSubsystem<UI>();
     ui->Initialize("AtomicEditor/resources/language/lng_en.tb.txt");
-    ui->LoadSkin("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
-    ui->AddFont("AtomicEditor/resources/vera.ttf", "Vera");
-    ui->AddFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-    ui->SetDefaultFont("Vera", 12);
 
     SubscribeToEvent(E_JSERROR, HANDLER(AEEditorApp, HandleJSError));
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(AEEditorApp, HandleExitRequested));
