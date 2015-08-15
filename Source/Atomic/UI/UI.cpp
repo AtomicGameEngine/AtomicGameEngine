@@ -79,7 +79,8 @@ UI::UI(Context* context) :
     rootWidget_(0),
     inputDisabled_(false),
     keyboardDisabled_(false),
-    initialized_(false)
+    initialized_(false),
+    skinLoaded_(false)
 {
 
 }
@@ -163,8 +164,16 @@ void UI::Initialize(const String& languageFile)
 
 void UI::LoadSkin(const String& skin, const String& overrideSkin)
 {
-    // Load the default skin, and override skin
+    // Load the default skin, and override skin (if any)
     tb::g_tb_skin->Load(skin.CString(), overrideSkin.CString());
+    skinLoaded_ = true;
+}
+
+void UI::LoadDefaultPlayerSkin()
+{
+    LoadSkin("DefaultUI/skin/skin.tb.txt");
+    AddFont("DefaultUI/fonts/vera.ttf", "Vera");
+    SetDefaultFont("Vera", 12);
 }
 
 void UI::SetDefaultFont(const String& name, int size)

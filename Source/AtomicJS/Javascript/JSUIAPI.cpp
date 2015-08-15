@@ -147,21 +147,6 @@ int UI_DebugShowSettingsWindow(duk_context* ctx)
     return 0;
 }
 
-int UI_Init(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
-    UI* ui = vm->GetSubsystem<UI>();
-
-    // TODO: take a config object
-    ui->Initialize("DefaultUI/language/lng_en.tb.txt");
-    ui->LoadSkin("DefaultUI/skin/skin.tb.txt", "Skin/skin.ui.txt");
-    ui->AddFont("DefaultUI/fonts/vera.ttf", "Vera");
-
-    ui->SetDefaultFont("Vera", 12);
-
-    return 0;
-}
-
 void jsapi_init_ui(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -169,9 +154,6 @@ void jsapi_init_ui(JSVM* vm)
     // UI class object
     duk_get_global_string(ctx, "Atomic");
     duk_get_prop_string(ctx, -1, "UI");
-
-    duk_push_c_function(ctx, UI_Init, DUK_VARARGS);
-    duk_put_prop_string(ctx, -2, "__init");
 
     duk_push_c_function(ctx, UI_DebugGetWrappedWidgetCount, 0);
     duk_put_prop_string(ctx, -2, "debugGetWrappedWidgetCount");
