@@ -65,8 +65,10 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     // Set debug draw
     world_->SetDebugDraw(this);
 
-    world_->SetContinuousPhysics(true);
-    world_->SetSubStepping(true);
+    // BEGIN ATOMIC: These should be false, as per the attribute defaults
+    world_->SetContinuousPhysics(false);
+    world_->SetSubStepping(false);
+    // END ATOMIC
 }
 
 PhysicsWorld2D::~PhysicsWorld2D()
