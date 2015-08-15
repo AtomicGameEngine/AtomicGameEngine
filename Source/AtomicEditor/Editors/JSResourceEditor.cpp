@@ -576,7 +576,7 @@ bool JSResourceEditor::BeautifyJavascript(const char* source, String& output)
     output.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/modules/jsutils");
+    duk_push_string(ctx, "AtomicEditor/Script/jsutils");
 
     if (duk_pcall(ctx, 1))
     {
