@@ -2,6 +2,8 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
 
+#include <Atomic/Atomic2D/AnimationSet2D.h>
+
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "SpriterImporter.h"
@@ -11,7 +13,7 @@ namespace ToolCore
 
 SpriterImporter::SpriterImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
 {
-
+    requiresCacheFile_ = false;
 }
 
 SpriterImporter::~SpriterImporter()
@@ -48,6 +50,17 @@ bool SpriterImporter::SaveSettingsInternal()
 
     return true;
 }
+
+Resource* SpriterImporter::GetResource(const String& typeName)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    AnimationSet2D* animSet = cache->GetResource<AnimationSet2D>(asset_->GetPath());
+
+    return animSet;
+
+}
+
 
 
 }

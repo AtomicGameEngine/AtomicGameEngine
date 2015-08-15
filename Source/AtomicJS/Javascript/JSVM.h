@@ -235,6 +235,15 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
     // reset top and return false
     if (!duk_is_object(ctx, -1))
     {
+        if (instance->IsObject())
+        {
+            LOGERRORF("Unable to push class object instance due to missing ClassID: %s", ((Object*)instance)->GetTypeName().CString());
+        }
+        else
+        {
+            LOGERROR("Unable to push RefCounted instance due to missing ClassID");
+        }
+
         duk_set_top(ctx, top);
         return false;
     }
