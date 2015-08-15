@@ -43,29 +43,34 @@ Scene* Player::LoadScene(const String& filename, Camera *camera)
         return 0;
     }
 
-    SharedPtr<Scene> scene(new Scene(context_));
+    Scene* scene = new Scene(context_);
 
     if (!scene->LoadXML(*file))
     {
+        scene->ReleaseRef();
         return 0;
     }
 
-    currentScene_ = scene;
-
-    if(!camera)
+    if (currentScene_.Null())
     {
-        PODVector<Node*> cameraNodes;
-        scene->GetChildrenWithComponent(cameraNodes, Camera::GetTypeStatic(), true);
-        if (cameraNodes.Size())
+        currentScene_ = scene;
+
+        if(!camera)
         {
-            camera = cameraNodes[0]->GetComponent<Camera>();
+            PODVector<Node*> cameraNodes;
+            scene->GetChildrenWithComponent(cameraNodes, Camera::GetTypeStatic(), true);
+            if (cameraNodes.Size())
+            {
+                camera = cameraNodes[0]->GetComponent<Camera>();
+            }
         }
+
+        viewport_->SetScene(scene);
+
+        if (camera)
+            viewport_->SetCamera(camera);
+
     }
-
-    viewport_->SetScene(scene);
-
-    if (camera)
-        viewport_->SetCamera(camera);
 
     return scene;
 }
