@@ -435,7 +435,7 @@ void PositionalLight2D::UpdateVertices()
     if (softShadows_ && castShadows_)
     {
         // THIS CAN BE OPTIMIZED!
-        for (unsigned i = 0; i < rays_.Size(); i++) {
+        for (unsigned i = 0; i < rays_.Size() - 1; i++) {
 
             Light2DRay& ray0 = rays_[i];
             Light2DRay& ray1 = rays_[i + 1 == rays_.Size() ? 0 : i + 1];
