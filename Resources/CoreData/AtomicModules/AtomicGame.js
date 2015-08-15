@@ -16,11 +16,6 @@ function Game() {
       this.renderer.shadowQuality = Atomic.SHADOWQUALITY_LOW_16BIT;
   }
 
-	// initialize the UI subsystem
-	// TODO: this needs to take a config with default font
-	// skin, etc
-	Atomic.UI.__init();
-
 	// root view
 	this.uiView = new Atomic.UIView();
 
