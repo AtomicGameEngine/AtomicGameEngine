@@ -7,6 +7,7 @@
 
 #include <Atomic/Atomic3D/AnimationController.h>
 #include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Atomic3D/Model.h>
 
 #include <Atomic/Resource/ResourceCache.h>
@@ -43,9 +44,12 @@ void ModelImporter::SetDefaults()
 
 bool ModelImporter::ImportModel()
 {
+
+    LOGDEBUGF("Importing Model: %s", asset_->GetPath().CString());
+
     SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
 
-    //importer->SetVerboseLog(true);
+    importer->SetVerboseLog(true);
 
     importer->SetScale(scale_);
     importer->SetExportAnimations(false);
@@ -183,22 +187,56 @@ bool ModelImporter::ImportAnimations()
 
 bool ModelImporter::Import()
 {
+
+    String ext = asset_->GetExtension();
     String modelAssetFilename = asset_->GetPath();
 
     importNode_ = new Node(context_);
 
-    // skip external animations, they will be brought in when importing their
-    // corresponding model
-    if (!modelAssetFilename.Contains("@"))
+    if (ext == ".mdl")
     {
-        ImportModel();
+        FileSystem* fs = GetSubsystem<FileSystem>();
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-        if (importAnimations_)
+        // mdl files are native file format that doesn't need to be converted
+        // doesn't allow scale, animations legacy primarily for ToonTown
+
+        if (!fs->Copy(asset_->GetPath(), asset_->GetCachePath() + ".mdl"))
         {
-            ImportAnimations();
+            importNode_= 0;
+            return false;
+        }
+
+        Model* mdl = cache->GetResource<Model>( asset_->GetCachePath() + ".mdl");
+
+        if (!mdl)
+        {
+            importNode_= 0;
+            return false;
+        }
+
+        // Force a reload, though file watchers will catch this delayed and load again
+        cache->ReloadResource(mdl);
+
+        importNode_->CreateComponent<StaticModel>()->SetModel(mdl);
+    }
+    else
+    {
+        // skip external animations, they will be brought in when importing their
+        // corresponding model
+        if (!modelAssetFilename.Contains("@"))
+        {
+            ImportModel();
+
+            if (importAnimations_)
+            {
+                //ImportAnimations();
+            }
+
         }
 
     }
+
 
     File outFile(context_);
 
