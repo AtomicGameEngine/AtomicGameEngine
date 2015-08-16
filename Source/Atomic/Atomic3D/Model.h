@@ -29,6 +29,8 @@
 #include "../Math/BoundingBox.h"
 #include "../Resource/Resource.h"
 
+#include "Animation.h"
+
 namespace Atomic
 {
 
@@ -103,6 +105,12 @@ struct GeometryDesc
     /// Index count.
     unsigned indexCount_;
 };
+
+// ATOMIC BEGIN
+
+static const unsigned MODEL_VERSION = 1;
+
+// ATOMIC END
 
 /// 3D model resource.
 class ATOMIC_API Model : public Resource
@@ -201,6 +209,16 @@ public:
     /// Return vertex buffer morph range vertex count.
     unsigned GetMorphRangeCount(unsigned bufferIndex) const;
 
+    // ATOMIC BEGIN
+
+    void AddAnimationResource(Animation* animation);
+    void RemoveAnimationResource(Animation* animation);
+    void ClearAnimationResources();
+    unsigned GetAnimationCount() const { return animationsResources_.Size(); }
+    const Vector<SharedPtr<Animation>>& GetAnimationResources() { return animationsResources_; }
+
+    // ATOMIC END
+
 private:
     /// Bounding box.
     BoundingBox boundingBox_;
@@ -228,6 +246,13 @@ private:
     Vector<IndexBufferDesc> loadIBData_;
     /// Geometry definitions for asynchronous loading.
     Vector<PODVector<GeometryDesc> > loadGeometries_;
+
+    // ATOMIC BEGIN
+
+    /// animation resources
+    Vector<SharedPtr<Animation> > animationsResources_;
+
+    // ATOMIC END
 };
 
 }

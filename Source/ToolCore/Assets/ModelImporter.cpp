@@ -5,7 +5,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Scene/Node.h>
 
-#include <Atomic/Atomic3D/AnimationController.h>
+#include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/Animation.h>
 #include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Atomic3D/Model.h>
@@ -96,13 +96,19 @@ bool ModelImporter::ImportAnimation(const String& filename, const String& name, 
 
             ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-            AnimationController* controller = importNode_->GetComponent<AnimationController>();
+            AnimatedModel* animatedModel = importNode_->GetComponent<AnimatedModel>();
 
-            if (controller)
+            if (animatedModel)
             {
-                SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
-                if (animation)
-                    controller->AddAnimationResource(animation);
+                Model* model = animatedModel->GetModel();
+
+                if (model)
+                {
+                    SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
+                    if (animation)
+                        model->AddAnimationResource(animation);
+                }
+
             }
 
             LOGINFOF("Import Info: %s : %s", info.name_.CString(), fileName.CString());
@@ -224,17 +230,35 @@ bool ModelImporter::Import()
     {
         // skip external animations, they will be brought in when importing their
         // corresponding model
+
         if (!modelAssetFilename.Contains("@"))
         {
             ImportModel();
 
             if (importAnimations_)
             {
-                //ImportAnimations();
+                ImportAnimations();
             }
 
-        }
+            AnimatedModel* animatedModel = importNode_->GetComponent<AnimatedModel>();
+            if (animatedModel)
+            {
+                Model* model = animatedModel->GetModel();
+                if (model && model->GetAnimationCount())
+                {
+                    // resave with animation info
 
+                    File mdlFile(context_);
+                    if (!mdlFile.Open(asset_->GetCachePath() + ".mdl", FILE_WRITE))
+                    {
+                        ErrorExit("Could not open output file " + asset_->GetCachePath() + ".mdl");
+                        return false;
+                    }
+
+                    model->Save(mdlFile);
+                }
+            }
+        }
     }
 
 
