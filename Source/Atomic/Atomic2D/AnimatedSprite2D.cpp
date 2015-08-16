@@ -322,6 +322,8 @@ void AnimatedSprite2D::SetAnimation(Animation2D* animation, LoopMode2D loopMode)
             staticSprite->SetLayer(layer_);
             staticSprite->SetBlendMode(blendMode_);
             staticSprite->SetFlip(flipX_, flipY_);
+            //use color of that object, animations doesn't have color
+            staticSprite->SetColor(color_);
             staticSprite->SetUseHotSpot(true);
         }
 
@@ -451,6 +453,8 @@ void AnimatedSprite2D::UpdateAnimation(float timeStep)
                     staticSprite->SetAlpha(nodeInfo.value.alpha_);
                     staticSprite->SetUseHotSpot(nodeInfo.value.useHotSpot_);
                     staticSprite->SetHotSpot(nodeInfo.value.hotSpot_);
+                    //use color of that object, animations doesn't have color
+                    staticSprite->SetColor(color_);
                 }
             }
         }
