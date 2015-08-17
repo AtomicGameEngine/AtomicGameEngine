@@ -216,7 +216,7 @@ void JSBDoc::ExportModuleClasses(JSBModule* module)
 void JSBDoc::ExportModuleConstants(JSBModule* module)
 {
 
-    Vector<String>& constants = module->GetConstants().Keys();
+    const Vector<String>& constants = module->GetConstants().Keys();
 
     if (!constants.Size())
         return;
