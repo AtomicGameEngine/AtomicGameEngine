@@ -23,6 +23,7 @@ namespace ToolCore
 {
 
 class JSBHeader;
+class JSBPrimitiveType;
 
 
 class JSBHeaderVisitor : public SymbolVisitor
@@ -402,7 +403,14 @@ public:
             return true;
         }
 
-        module_->RegisterConstant(getNameString(decl->name()).CString());
+        if (type->isIntegerType())
+        {
+            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Int);
+        }
+        else
+        {
+            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Float);
+        }
 
         return true;
 

@@ -195,10 +195,12 @@ void JSBModuleWriter::WriteModulePreInit(String& source)
     }
     source += "// constants\n";
 
-    for (unsigned i = 0; i < module_->constants_.Size(); i++)
+    Vector<String> constants = module_->constants_.Keys();
+
+    for (unsigned i = 0; i < constants.Size(); i++)
     {
-        source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n",  module_->constants_.At(i).CString());
-        source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",  module_->constants_.At(i).CString());
+        source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", constants.At(i).CString());
+        source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n", constants.At(i).CString());
     }
 
     source += "duk_pop(ctx);\n";

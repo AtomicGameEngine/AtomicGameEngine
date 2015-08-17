@@ -12,6 +12,7 @@
 #include "JSBClass.h"
 #include "JSBEnum.h"
 #include "JSBModuleWriter.h"
+#include "JSBType.h"
 
 namespace ToolCore
 {
@@ -354,7 +355,7 @@ bool JSBModule::ContainsConstant(const String& constantName)
     return constants_.Contains(constantName);
 }
 
-void JSBModule::RegisterConstant(const String& constantName)
+void JSBModule::RegisterConstant(const String& constantName, unsigned type)
 {
     // MAX_CASCADE_SPLITS is defined differently for desktop/mobile
     if (constantName == "MAX_CASCADE_SPLITS" && JSBPackage::ContainsConstantAllPackages(constantName))
@@ -367,8 +368,7 @@ void JSBModule::RegisterConstant(const String& constantName)
         ErrorExit(ToString("Constant collision: %s", constantName.CString()));
     }
 
-    constants_.Push(constantName);
-
+    constants_[constantName] = new JSBPrimitiveType(type);
 }
 
 bool JSBModule::Load(const String& jsonFilename)
