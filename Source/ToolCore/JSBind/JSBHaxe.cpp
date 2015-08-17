@@ -361,7 +361,7 @@ namespace ToolCore
     {
         HashMap<String, JSBPrimitiveType*>& constants = module->GetConstants();
 
-        Vector<String>& constantsName = constants.Keys();
+        const Vector<String>& constantsName = constants.Keys();
 
         if (!constants.Size())
             return;
