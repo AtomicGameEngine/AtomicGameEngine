@@ -17,6 +17,7 @@ class JSBPackage;
 class JSBHeader;
 class JSBClass;
 class JSBEnum;
+class JSBPrimitiveType;
 
 class JSBModule : public Object
 {
@@ -35,7 +36,7 @@ public:
     JSBClass* GetClass(const String& name);
     Vector<SharedPtr<JSBClass>> GetClasses();
     Vector<SharedPtr<JSBEnum>> GetEnums();
-    Vector<String>& GetConstants() { return constants_; }
+    HashMap<String, JSBPrimitiveType*>& GetConstants() { return constants_; }
 
     void RegisterClass(String name);
 
@@ -43,7 +44,7 @@ public:
     void RegisterEnum(JSBEnum* jenum);       
 
     bool ContainsConstant(const String& constantName);
-    void RegisterConstant(const String& constantName);
+    void RegisterConstant(const String& constantName, unsigned type);
 
     bool Requires(const String& requirement) { return requirements_.Contains(requirement); }
 
@@ -81,7 +82,7 @@ private:
     // native name -> JSBClass
     HashMap<StringHash, SharedPtr<JSBClass> > classes_;
     HashMap<StringHash, SharedPtr<JSBEnum> > enums_;
-    Vector<String> constants_;
+    HashMap<String, JSBPrimitiveType*> constants_;
     Vector<String> requirements_;
 
     SharedPtr<JSONFile> moduleJSON_;

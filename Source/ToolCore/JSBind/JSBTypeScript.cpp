@@ -241,7 +241,7 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
 void JSBTypeScript::ExportModuleConstants(JSBModule* module)
 {
-    Vector<String>& constants = module->GetConstants();
+    const Vector<String>& constants = module->GetConstants().Keys();
 
     if (!constants.Size())
         return;

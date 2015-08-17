@@ -32,6 +32,7 @@ namespace ToolCore
         void ExportFunction(JSBFunction* function);
 
         String GetScriptType(JSBFunctionType* ftype);
+        String GetPrimitiveType(JSBPrimitiveType* ptype);
 
         bool checkV(JSBClass* clazz, const String name, const String type);
         bool IsOverride(JSBFunction* function);
