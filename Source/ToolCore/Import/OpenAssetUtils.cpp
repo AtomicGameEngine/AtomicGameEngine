@@ -328,7 +328,7 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
             {
-                errorMsg = "Bone " + boneName + " not found";
+                errorMessage = "Bone " + boneName + " not found";
                 return false;
             }
             boneMappings[i] = globalIndex;
@@ -349,7 +349,7 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
             {
-                errorMsg = "Bone " + boneName + " not found";
+                errorMessage = "Bone " + boneName + " not found";
                 return false;
             }
 
