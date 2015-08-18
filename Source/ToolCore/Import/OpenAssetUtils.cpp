@@ -315,11 +315,10 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
     {
         if (mesh->mNumBones > maxBones)
         {
-            errorMessage =
-                "Geometry (submesh) has over " + String(maxBones) + " bone influences. Try splitting to more submeshes\n"
+            errorMessage = "Geometry (submesh) has over " + String(maxBones) + " bone influences. Try splitting to more submeshes\n"
                 "that each stay at " + String(maxBones) + " bones or below.";
 
-             return false;
+            return false;
         }
         boneMappings.Resize(mesh->mNumBones);
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
@@ -335,11 +334,6 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 unsigned vertex = bone->mWeights[j].mVertexId;
                 blendIndices[vertex].Push(i);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].Size() > 4)
-                {
-                    errorMessage = "More than 4 bone influences on vertex";
-                    return false;
-                }
             }
         }
     }
@@ -351,27 +345,40 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             String boneName = FromAIString(bone->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
-            {
-                errorMessage = "Bone " + boneName + " not found";
-                return false;
-            }
+                ErrorExit("Bone " + boneName + " not found");
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
                 blendIndices[vertex].Push(globalIndex);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].Size() > 4)
-                {
-                    errorMessage = "More than 4 bone influences on vertex";
-                    return false;
-                }
             }
         }
     }
 
-    // Normalize weights now if necessary
+    // Normalize weights now if necessary, also remove too many influences
     for (unsigned i = 0; i < blendWeights.Size(); ++i)
     {
+        if (blendWeights[i].Size() > 4)
+        {
+            PrintLine("Warning: more than 4 bone influences in vertex " + String(i));
+
+            while (blendWeights[i].Size() > 4)
+            {
+                unsigned lowestIndex = 0;
+                float lowest = M_INFINITY;
+                for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+                {
+                    if (blendWeights[i][j] < lowest)
+                    {
+                        lowest = blendWeights[i][j];
+                        lowestIndex = j;
+                    }
+                }
+                blendWeights[i].Erase(lowestIndex);
+                blendIndices[i].Erase(lowestIndex);
+            }
+        }
+
         float sum = 0.0f;
         for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
             sum += blendWeights[i][j];
@@ -381,7 +388,6 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 blendWeights[i][j] /= sum;
         }
     }
-
 
     return true;
 }
