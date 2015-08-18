@@ -336,7 +336,10 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 blendIndices[vertex].Push(i);
                 blendWeights[vertex].Push(bone->mWeights[j].mWeight);
                 if (blendWeights[vertex].Size() > 4)
-                    ErrorExit("More than 4 bone influences on vertex");
+                {
+                    errorMessage = "More than 4 bone influences on vertex";
+                    return false;
+                }
             }
         }
     }
@@ -365,6 +368,20 @@ bool GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             }
         }
     }
+
+    // Normalize weights now if necessary
+    for (unsigned i = 0; i < blendWeights.Size(); ++i)
+    {
+        float sum = 0.0f;
+        for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+            sum += blendWeights[i][j];
+        if (sum != 1.0f && sum != 0.0f)
+        {
+            for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
+                blendWeights[i][j] /= sum;
+        }
+    }
+
 
     return true;
 }
