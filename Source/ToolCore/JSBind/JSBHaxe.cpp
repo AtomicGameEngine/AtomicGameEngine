@@ -372,7 +372,7 @@ namespace ToolCore
         {
             const String& cname = constantsName.At(i);
 
-            source_ += "    public static inline var " + cname + ": " + GetPrimitiveType(constants[cname]) + ";\n";
+            source_ += "    public static var " + cname + ": " + GetPrimitiveType(constants[cname]) + ";\n";
         }
 
         source_ += "\n";
