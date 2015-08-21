@@ -188,6 +188,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
 
+            // node deletion
             if (data.key == Atomic.KEY_DELETE || data.key == Atomic.KEY_BACKSPACE) {
 
                 var selectedId = Number(this.hierList.rootList.selectedItemID);
@@ -202,9 +203,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             }
 
-        }
-
-        if (data.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
+        } else if (data.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
 
             if (data.target == this.hierList.rootList) {
 
@@ -254,9 +253,11 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             }
 
-        }
+        } else if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
-        if (data.type == Atomic.UI_EVENT_TYPE_CLICK) {
+            if (this.menu.handleNodeContextMenu(data.target, data.refid)) {
+                return true;
+            }
 
             var id = data.target.id;
 
@@ -264,7 +265,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var selectedId = Number(this.hierList.rootList.selectedItemID);
                 var node = this.scene.getNode(selectedId);
-
                 if (this.menu.handlePopupMenu(data.target, data.refid, node))
                     return true;
 
@@ -290,7 +290,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 if (node) {
 
-
                     this.sendEvent("EditorActiveNodeChange", { node: node });
 
                 }
@@ -298,6 +297,26 @@ class HierarchyFrame extends Atomic.UIWidget {
                 return false;
 
             }
+        } else if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
+
+            var id = data.target.id;
+            var db = ToolCore.getAssetDatabase();
+            var node: Atomic.Node;
+
+            if (id == "hierList_")
+                node = this.scene.getNode(Number(this.hierList.hoverItemID));
+            else
+                node = this.scene.getNode(Number(id));
+
+            if (node) {
+
+                this.menu.createNodeContextMenu(this, node, data.x, data.y);
+
+            }
+
+
+
+
         }
 
         return false;

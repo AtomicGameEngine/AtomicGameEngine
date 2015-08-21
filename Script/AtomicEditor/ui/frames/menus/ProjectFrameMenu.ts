@@ -20,7 +20,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    handleAssetContextMenu(target: Atomic.UIWidget, refid: string) {
+    handleAssetContextMenu(target: Atomic.UIWidget, refid: string):boolean {
 
         if (target.id == "asset context menu" || target.id == "create popup") {
 
@@ -69,6 +69,8 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
         }
+
+        return false;
 
     }
 
