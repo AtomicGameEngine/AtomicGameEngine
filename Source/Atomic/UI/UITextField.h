@@ -6,14 +6,6 @@
 namespace Atomic
 {
 
-/// TB_TEXT_ALIGN specifies horizontal text alignment
-enum UI_TEXT_ALIGN
-{
-    UI_TEXT_ALIGN_LEFT = tb::TB_TEXT_ALIGN_LEFT,
-    UI_TEXT_ALIGN_RIGHT = tb::TB_TEXT_ALIGN_RIGHT,
-    UI_TEXT_ALIGN_CENTER = tb::TB_TEXT_ALIGN_CENTER
-};
-
 class UITextField : public UIWidget
 {
     OBJECT(UITextField)
