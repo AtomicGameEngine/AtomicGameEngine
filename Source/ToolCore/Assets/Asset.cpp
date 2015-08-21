@@ -18,6 +18,7 @@
 #include "SpriterImporter.h"
 #include "TMXImporter.h"
 #include "PEXImporter.h"
+#include "TextImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -279,6 +280,10 @@ bool Asset::CreateImporter()
         else if (ext == ".pex")
         {
             importer_ = new PEXImporter(context_, this);
+        }
+        else if (ext == ".txt")
+        {
+            importer_ = new TextImporter(context_, this);
         }
         else if (textureFormats.Contains(ext))
         {

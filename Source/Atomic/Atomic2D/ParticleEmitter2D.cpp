@@ -362,8 +362,26 @@ bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAn
     particle.size_ = startSize;
     particle.sizeDelta_ = (finishSize - startSize) * invLifespan;
 
-    particle.color_ = effect_->GetStartColor() + effect_->GetStartColorVariance() * Random(-1.0f, 1.0f);
-    Color endColor = effect_->GetFinishColor() + effect_->GetFinishColorVariance() * Random(-1.0f, 1.0f);
+    // ATOMIC BEGIN
+
+    const Color& startColor = effect_->GetStartColor();
+    const Color& startColorVariance = effect_->GetStartColorVariance();
+    const Color& finishColor = effect_->GetFinishColor();
+    const Color& finishColorVariance = effect_->GetFinishColorVariance();
+
+    particle.color_.r_  = startColor.r_ + startColorVariance.r_ * Random(-1.0f, 1.0f);
+    particle.color_.g_  = startColor.g_ + startColorVariance.g_ * Random(-1.0f, 1.0f);
+    particle.color_.b_  = startColor.b_ + startColorVariance.b_ * Random(-1.0f, 1.0f);
+    particle.color_.a_  = startColor.a_ + startColorVariance.a_ * Random(-1.0f, 1.0f);
+
+    Color endColor;
+    endColor.r_ = finishColor.r_ + finishColorVariance.r_ * Random(-1.0f, 1.0f);
+    endColor.g_ = finishColor.g_ + finishColorVariance.g_ * Random(-1.0f, 1.0f);
+    endColor.b_ = finishColor.b_ + finishColorVariance.b_ * Random(-1.0f, 1.0f);
+    endColor.a_ = finishColor.a_ + finishColorVariance.a_ * Random(-1.0f, 1.0f);
+
+    // ATOMIC END
+
     particle.colorDelta_ = (endColor - particle.color_) * invLifespan;
 
     particle.rotation_ = worldAngle + effect_->GetRotationStart() + effect_->GetRotationStartVariance() * Random(-1.0f, 1.0f);

@@ -11,6 +11,7 @@ class ProjectFrame extends ScriptWidget {
     folderList: Atomic.UIListView;
     menu: ProjectFrameMenu;
     currentFolder: ToolCore.Asset;
+    resourceFolder: ToolCore.Asset;
     assetGUIDToItemID = {};
     resourcesID: number = -1;
 
@@ -90,6 +91,7 @@ class ProjectFrame extends ScriptWidget {
                 var id = folderList.addRootItem(asset.name, "Folder.icon", asset.guid);
                 this.resourcesID = id;
                 this.assetGUIDToItemID[asset.guid] = id;
+                this.resourceFolder = asset;
 
             } else {
                 var parentItemID = this.assetGUIDToItemID[parent.guid];
@@ -308,13 +310,14 @@ class ProjectFrame extends ScriptWidget {
 
         this.folderList.rootList.value = 0;
         this.folderList.setExpanded(this.resourcesID, true);
-        this.sendEvent(EditorEvents.ContentFolderChanged, { path: ToolCore.toolSystem.project.resourcePath });
+        this.refreshContent(this.resourceFolder);
 
     }
 
     handleProjectUnloaded(data) {
 
         this.folderList.deleteAllItems();
+        this.resourceFolder = null;
 
         var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
         container.deleteAllChildren();

@@ -101,6 +101,14 @@ enum UI_WIDGET_Z_REL {
     UI_WIDGET_Z_REL_AFTER = tb::WIDGET_Z_REL_AFTER			///< After the reference widget (visually above reference).
 };
 
+/// TB_TEXT_ALIGN specifies horizontal text alignment
+enum UI_TEXT_ALIGN
+{
+    UI_TEXT_ALIGN_LEFT = tb::TB_TEXT_ALIGN_LEFT,
+    UI_TEXT_ALIGN_RIGHT = tb::TB_TEXT_ALIGN_RIGHT,
+    UI_TEXT_ALIGN_CENTER = tb::TB_TEXT_ALIGN_CENTER
+};
+
 class UIView;
 class UILayoutParams;
 class UIFontDescription;
