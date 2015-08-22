@@ -99,7 +99,7 @@ namespace('package', function() {
 
   cmakeDevBuild = false;
 
-  task('macosx', [] /*['clean:all', 'build:macosx']*/, function() {
+  task('macosx', ['clean:all', 'build:macosx'], function() {
 
     jake.mkdirP(macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
 
