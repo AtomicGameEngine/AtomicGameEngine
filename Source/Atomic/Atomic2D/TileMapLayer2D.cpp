@@ -352,7 +352,7 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
         const TileMapObject2D* object = objectGroup->GetObject(i);
 
         // Create dummy node for all object
-        SharedPtr<Node> objectNode(GetNode()->CreateChild("Object"));
+        SharedPtr<Node> objectNode(GetNode()->CreateChild(object->GetName()));
         objectNode->SetTemporary(true);
         objectNode->SetPosition(object->GetPosition());
 
