@@ -56,24 +56,19 @@ class ResourceSelection extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
+        if(ev.count >= 2) {
+            var id = ev.target.id;
+            if(id == this.folderList.rootList.id) {
+                this.selectFile();
+            }
+        }
 
+        if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
             var id = ev.target.id;
 
             if (id == "select") {
 
-                var id = this.folderList.selectedItemID;
-
-                if (id.length) {
-
-                  this.callback(ToolCore.assetDatabase.getAssetByGUID(id), this.args);
-
-                }
-
-
-                this.hide();
-
-                return true;
+                return this.selectFile();
 
             }
 
@@ -86,6 +81,16 @@ class ResourceSelection extends ModalWindow {
 
         }
 
+    }
+
+    selectFile():boolean {
+        var id = this.folderList.selectedItemID;
+        if(id.length) {
+            this.callback(ToolCore.assetDatabase.getAssetByGUID(id), this.args);
+            this.hide();
+            return true;
+        }
+        return false;
     }
 }
 
