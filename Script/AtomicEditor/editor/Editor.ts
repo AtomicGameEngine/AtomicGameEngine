@@ -37,13 +37,17 @@ class Editor extends Atomic.ScriptObject {
 
         this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
         this.subscribeToEvent(EditorEvents.CloseProject, (data) => this.handleEditorCloseProject(data));
-        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
+        this.subscribeToEvent("ProjectUnloaded", (data) => {
+            Atomic.graphics.windowTitle = "AtomicEditor";
+            this.handleProjectUnloaded(data)
+        });
         this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
+            Atomic.graphics.windowTitle = "AtomicEditor - " + data.projectPath;
             Preferences.getInstance().registerRecentProject(data.projectPath);
-        })
+        });
 
         this.parseArguments();
     }
@@ -61,7 +65,6 @@ class Editor extends Atomic.ScriptObject {
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
 
         var system = ToolCore.getToolSystem();
-
         if (system.project) {
 
             this.sendEvent(UIEvents.MessageModalEvent,
@@ -70,9 +73,7 @@ class Editor extends Atomic.ScriptObject {
             return false;
 
         }
-
         return system.loadProject(event.path);
-
     }
 
     handleEditorCloseProject(event) {
