@@ -33,6 +33,9 @@
 
 #include "../DebugNew.h"
 
+#include "Animation.h"
+#include "../Resource/ResourceCache.h"
+
 namespace Atomic
 {
 
@@ -73,7 +76,13 @@ void Model::RegisterObject(Context* context)
 bool Model::BeginLoad(Deserializer& source)
 {
     // Check ID
-    if (source.ReadFileID() != "UMDL")
+
+    String id = source.ReadFileID();
+    bool umdl = false;
+    if (id == "UMDL") // we only support UMDL for some current legacy mdl's (ToonTown)
+        umdl = true;
+
+    if (!umdl && id != "AMDL")
     {
         LOGERROR(source.GetName() + " is not a valid model file");
         return false;
@@ -284,6 +293,25 @@ bool Model::BeginLoad(Deserializer& source)
         geometryCenters_.Push(Vector3::ZERO);
     memoryUse += sizeof(Vector3) * geometries_.Size();
 
+    if (umdl)
+    {
+        SetMemoryUse(memoryUse);
+        return true;
+    }
+
+    // MODEL_VERSION
+    unsigned version = source.ReadUInt();
+
+    ResourceRefList animList = source.ReadResourceRefList();
+
+    animationsResources_.Clear();
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    for (unsigned i = 0; i < animList.names_.Size(); ++i)
+    {
+        AddAnimationResource(cache->GetResource<Animation>(animList.names_[i]));
+    }
+
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -338,7 +366,7 @@ bool Model::EndLoad()
 bool Model::Save(Serializer& dest) const
 {
     // Write ID
-    if (!dest.WriteFileID("UMDL"))
+    if (!dest.WriteFileID("AMDL")) // atomic model specifier
         return false;
 
     // Write vertex buffers
@@ -422,6 +450,21 @@ bool Model::Save(Serializer& dest) const
     // Write geometry centers
     for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
         dest.WriteVector3(geometryCenters_[i]);
+
+    // ATOMIC BEGIN
+
+    dest.WriteUInt(MODEL_VERSION);
+
+    // animation resources
+
+    ResourceRefList animList(Animation::GetTypeStatic());
+    animList.names_.Resize(animationsResources_.Size());
+    for (unsigned i = 0; i < animationsResources_.Size(); ++i)
+        animList.names_[i] = GetResourceName(animationsResources_[i]);
+    dest.WriteResourceRefList(animList);
+
+    // ATOMIC END
+
 
     return true;
 }
@@ -723,5 +766,34 @@ unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
 {
     return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
 }
+
+// ATOMIC BEGIN
+
+void Model::AddAnimationResource(Animation* animation)
+{
+    if (!animation)
+        return;
+
+    SharedPtr<Animation> anim(animation);
+
+    if (!animationsResources_.Contains(anim))
+        animationsResources_.Push(anim);
+}
+
+void Model::RemoveAnimationResource(Animation* animation)
+{
+    if (!animation)
+        return;
+
+    animationsResources_.Remove(SharedPtr<Animation>(animation));
+
+}
+
+void Model::ClearAnimationResources()
+{
+    animationsResources_.Clear();
+}
+
+// ATOMIC END
 
 }

@@ -51,8 +51,7 @@ static const unsigned MAX_NODE_ANIMATION_STATES = 256;
 extern const char* LOGIC_CATEGORY;
 
 AnimationController::AnimationController(Context* context) :
-    Component(context),
-    animationsResourcesAttr_(Animation::GetTypeStatic())
+    Component(context)
 {
 }
 
@@ -71,8 +70,6 @@ void AnimationController::RegisterObject(Context* context)
         Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-
-    ACCESSOR_ATTRIBUTE("Animation Resources", GetAnimationResourcesAttr, SetAnimationResourcesAttr, ResourceRefList, ResourceRefList(Animation::GetTypeStatic()), AM_FILE | AM_NOEDIT);
 
 }
 
@@ -894,25 +891,25 @@ void AnimationController::ClearAnimationResources()
     animationsResources_.Clear();
 }
 
-void AnimationController::SetAnimationResourcesAttr(const ResourceRefList& value)
+void AnimationController::ApplyAttributes()
 {
-    animationsResources_.Clear();
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < value.names_.Size(); ++i)
-    {
-        AddAnimationResource(cache->GetResource<Animation>(value.names_[i]));
-    }
+    // This currently requires that the AnimationController is after the AnimatedModel
+    // component on the node, look into removing the requirement
+
+    AnimatedModel* animatedModel = GetComponent<AnimatedModel>();
+
+    if (!animatedModel)
+        return;
+
+    Model* model = animatedModel->GetModel();
+
+    if (!model)
+        return;
+
+    animationsResources_ = model->GetAnimationResources();
+
+
 }
-
-const ResourceRefList& AnimationController::GetAnimationResourcesAttr() const
-{
-    animationsResourcesAttr_.names_.Resize(animationsResources_.Size());
-    for (unsigned i = 0; i < animationsResources_.Size(); ++i)
-        animationsResourcesAttr_.names_[i] = GetResourceName(animationsResources_[i]);
-
-    return animationsResourcesAttr_;
-}
-
 
 }
