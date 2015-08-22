@@ -5,7 +5,7 @@ var jakeRoot = __dirname;
 var artifactsFolder = jakeRoot + "/Artifacts";
 
 // cmake
-var cmakeDevBuild = true;
+var cmakeDevBuild = false;
 
 // build folder
 var windowsBuildFolder = artifactsFolder + "/Windows_Build";
@@ -91,13 +91,28 @@ namespace('build', function() {
       printStdout: true
     });
 
+  }); // end build:macosx
+
+  task('windows', {async:true}, function() {
+
+    if (!fs.existsSync(windowsBuildFolder)) {
+      jake.mkdirP(windowsBuildFolder);
+    }
+
+    process.chdir(windowsBuildFolder);
+
+    jake.exec(jakeRoot + "/Build/Windows/Compile.bat", function() {
+      complete();
+    }, {
+      printStdout: true
+    });
+
   });
 
-});
+}); // end build namespace
+
 
 namespace('package', function() {
-
-  cmakeDevBuild = false;
 
   task('macosx', ['clean:all', 'build:macosx'], function() {
 
@@ -119,5 +134,28 @@ namespace('package', function() {
     jake.cpR(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
 
   });
+
+  task('windows', ['clean:all', 'build:windows'], function() {
+
+
+    jake.mkdirP(windowsPackageFolder + "/Resources");
+
+    jake.cpR(windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe", windowsPackageFolder + "/AtomicEditor.exe" )
+
+    // 32 bit build for packaging!
+
+    jake.cpR(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll" )
+
+    // copy resources
+
+    jake.cpR(jakeRoot + "/Resources/CoreData",  windowsPackageFolder + "/Resources");
+    jake.cpR(jakeRoot + "/Resources/EditorData", windowsPackageFolder + "/Resources");
+    jake.cpR(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources");
+    jake.cpR(jakeRoot + "/Script", windowsPackageFolder + "/Resources");
+    jake.cpR(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", windowsPackageFolder + "/Resources");
+
+
+  });
+
 
 });
