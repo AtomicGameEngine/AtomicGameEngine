@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "../Graphics/Texture.h"
-#include "../Resource/Image.h"
-#include "../UI/BorderImage.h"
+#include "../../Graphics/Texture.h"
+#include "../../Resource/Image.h"
+#include "BorderImage.h"
 
-#include <SDL/SDL_mouse.h>
+#include <SDL/include/SDL_mouse.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Cursor shapes recognized by the UI subsystem.
@@ -50,7 +50,7 @@ enum CursorShape
 };
 
 /// %Cursor image and hotspot information.
-struct URHO3D_API CursorShapeInfo
+struct ATOMIC_API CursorShapeInfo
 {
     /// Construct with defaults.
     CursorShapeInfo() :
@@ -89,7 +89,7 @@ struct URHO3D_API CursorShapeInfo
 };
 
 /// Mouse cursor %UI element.
-class URHO3D_API Cursor : public BorderImage
+class ATOMIC_API Cursor : public BorderImage
 {
     OBJECT(Cursor);
 

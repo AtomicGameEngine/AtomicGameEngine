@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include "../Container/ArrayPtr.h"
-#include "../Resource/Resource.h"
+#include "../../Container/ArrayPtr.h"
+#include "../../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class FontFace;
@@ -43,7 +43,7 @@ enum FONT_TYPE
 };
 
 /// %Font resource.
-class URHO3D_API Font : public Resource
+class ATOMIC_API Font : public Resource
 {
     OBJECT(Font);
 

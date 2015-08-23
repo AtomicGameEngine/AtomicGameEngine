@@ -22,17 +22,17 @@
 
 #pragma once
 
-#include "../Graphics/GraphicsDefs.h"
-#include "../UI/UIElement.h"
+#include "../../Graphics/GraphicsDefs.h"
+#include "UIElement.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Texture;
 class Texture2D;
 
 /// %Image %UI element with optional border.
-class URHO3D_API BorderImage : public UIElement
+class ATOMIC_API BorderImage : public UIElement
 {
     OBJECT(BorderImage);
 

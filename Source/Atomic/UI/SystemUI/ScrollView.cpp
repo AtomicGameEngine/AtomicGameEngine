@@ -20,20 +20,18 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Input/InputEvents.h"
+#include "BorderImage.h"
+#include "ScrollBar.h"
+#include "ScrollView.h"
+#include "Slider.h"
+#include "UI.h"
+#include "UIEvents.h"
 
-#include "../Core/Context.h"
-#include "../Input/InputEvents.h"
-#include "../UI/BorderImage.h"
-#include "../UI/ScrollBar.h"
-#include "../UI/ScrollView.h"
-#include "../UI/Slider.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 static const float STEP_FACTOR = 300.0f;

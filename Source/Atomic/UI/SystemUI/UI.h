@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "../Core/Object.h"
-#include "../UI/Cursor.h"
-#include "../UI/UIBatch.h"
+#include "../../Core/Object.h"
+#include "Cursor.h"
+#include "UIBatch.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Cursor;
@@ -40,7 +40,7 @@ class XMLElement;
 class XMLFile;
 
 /// %UI subsystem. Manages the graphical user interface.
-class URHO3D_API UI : public Object
+class ATOMIC_API UI : public Object
 {
     OBJECT(UI);
 
@@ -334,6 +334,6 @@ private:
 };
 
 /// Register UI library objects.
-void URHO3D_API RegisterUILibrary(Context* context);
+void ATOMIC_API RegisterUILibrary(Context* context);
 
 }

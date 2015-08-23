@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "../UI/FontFace.h"
+#include "FontFace.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class FreeTypeLibrary;
 class Texture2D;
 
 /// Free type font face description.
-class URHO3D_API FontFaceFreeType : public FontFace
+class ATOMIC_API FontFaceFreeType : public FontFace
 {
 public:
     /// Construct.

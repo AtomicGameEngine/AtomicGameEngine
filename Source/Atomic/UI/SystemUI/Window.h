@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../UI/BorderImage.h"
+#include "BorderImage.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Window movement and resizing modes.
@@ -43,7 +43,7 @@ enum WindowDragMode
 };
 
 /// %Window %UI element that can optionally by moved or resized.
-class URHO3D_API Window : public BorderImage
+class ATOMIC_API Window : public BorderImage
 {
     OBJECT(Window);
 

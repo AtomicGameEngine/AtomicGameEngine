@@ -20,18 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Input/Input.h"
+#include "LineEdit.h"
+#include "Text.h"
+#include "UI.h"
+#include "UIEvents.h"
 
-#include "../Core/Context.h"
-#include "../Input/Input.h"
-#include "../UI/LineEdit.h"
-#include "../UI/Text.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 StringHash VAR_DRAGDROPCONTENT("DragDropContent");

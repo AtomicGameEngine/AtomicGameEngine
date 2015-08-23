@@ -20,18 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../IO/Log.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../Resource/Image.h"
+#include "Font.h"
+#include "FontFace.h"
 
-#include "../Core/Context.h"
-#include "../IO/Log.h"
-#include "../Graphics/Texture2D.h"
-#include "../Resource/Image.h"
-#include "../UI/Font.h"
-#include "../UI/FontFace.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 FontGlyph::FontGlyph() :

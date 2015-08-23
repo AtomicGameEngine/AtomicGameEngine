@@ -20,23 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../IO/File.h"
+#include "../../IO/FileSystem.h"
+#include "../../IO/Log.h"
+#include "../../IO/MemoryBuffer.h"
+#include "../../Resource/ResourceCache.h"
+#include "Font.h"
+#include "FontFaceBitmap.h"
+#include "UI.h"
 
-#include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Texture2D.h"
-#include "../IO/File.h"
-#include "../IO/FileSystem.h"
-#include "../IO/Log.h"
-#include "../IO/MemoryBuffer.h"
-#include "../Resource/ResourceCache.h"
-#include "../UI/Font.h"
-#include "../UI/FontFaceBitmap.h"
-#include "../UI/UI.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 FontFaceBitmap::FontFaceBitmap(Font* font) :

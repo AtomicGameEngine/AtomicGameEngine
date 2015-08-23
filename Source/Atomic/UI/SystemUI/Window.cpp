@@ -20,18 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Input/InputEvents.h"
+#include "Cursor.h"
+#include "UI.h"
+#include "UIEvents.h"
+#include "Window.h"
 
-#include "../Core/Context.h"
-#include "../Input/InputEvents.h"
-#include "../UI/Cursor.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
-#include "../UI/Window.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 static const int DEFAULT_RESIZE_BORDER = 4;

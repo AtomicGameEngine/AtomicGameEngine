@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include "../Math/Matrix3x4.h"
-#include "../UI/UIElement.h"
+#include "../../Math/Matrix3x4.h"
+#include "UIElement.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %UI element which allows sub-pixel positioning and size, as well as rotation. Only other Sprites should be added as child elements.
-class URHO3D_API Sprite : public UIElement
+class ATOMIC_API Sprite : public UIElement
 {
     OBJECT(Sprite);
 

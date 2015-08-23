@@ -20,49 +20,44 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Core/CoreEvents.h"
+#include "../../Core/Profiler.h"
+#include "../../Container/Sort.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsEvents.h"
+#include "../../Graphics/Shader.h"
+#include "../../Graphics/ShaderVariation.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../Graphics/VertexBuffer.h"
+#include "../../Input/Input.h"
+#include "../../Input/InputEvents.h"
+#include "../../IO/Log.h"
+#include "../../Math/Matrix3x4.h"
+#include "../../Resource/ResourceCache.h"
+#include "CheckBox.h"
+#include "Cursor.h"
+#include "DropDownList.h"
+#include "Font.h"
+#include "LineEdit.h"
+#include "ListView.h"
+#include "MessageBox.h"
+#include "ScrollBar.h"
+#include "Slider.h"
+#include "Sprite.h"
+#include "Text.h"
+#include "ToolTip.h"
+#include "UI.h"
+#include "UIEvents.h"
+#include "Window.h"
 
-#include "../Core/Context.h"
-#include "../Core/CoreEvents.h"
-#include "../Core/Profiler.h"
-#include "../Container/Sort.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsEvents.h"
-#include "../Graphics/Shader.h"
-#include "../Graphics/ShaderVariation.h"
-#include "../Graphics/Texture2D.h"
-#include "../Graphics/VertexBuffer.h"
-#include "../Input/Input.h"
-#include "../Input/InputEvents.h"
-#include "../IO/Log.h"
-#include "../Math/Matrix3x4.h"
-#include "../Resource/ResourceCache.h"
-#include "../UI/CheckBox.h"
-#include "../UI/Cursor.h"
-#include "../UI/DropDownList.h"
-#include "../UI/FileSelector.h"
-#include "../UI/Font.h"
-#include "../UI/LineEdit.h"
-#include "../UI/ListView.h"
-#include "../UI/MessageBox.h"
-#include "../UI/ScrollBar.h"
-#include "../UI/Slider.h"
-#include "../UI/Sprite.h"
-#include "../UI/Text.h"
-#include "../UI/Text3D.h"
-#include "../UI/ToolTip.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
-#include "../UI/Window.h"
-#include "../UI/View3D.h"
+#include <SDL/include/SDL.h>
 
-#include <SDL/SDL.h>
-
-#include "../DebugNew.h"
+#include "../../DebugNew.h"
 
 #define TOUCHID_MASK(id) (1 << id)
 
-namespace Urho3D
+namespace Atomic
 {
 
 StringHash VAR_ORIGIN("Origin");
@@ -1778,9 +1773,7 @@ void RegisterUILibrary(Context* context)
     CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);
     Text::RegisterObject(context);
-    Text3D::RegisterObject(context);
     Window::RegisterObject(context);
-    View3D::RegisterObject(context);
     LineEdit::RegisterObject(context);
     Slider::RegisterObject(context);
     ScrollBar::RegisterObject(context);
@@ -1788,7 +1781,6 @@ void RegisterUILibrary(Context* context)
     ListView::RegisterObject(context);
     Menu::RegisterObject(context);
     DropDownList::RegisterObject(context);
-    FileSelector::RegisterObject(context);
     MessageBox::RegisterObject(context);
     ToolTip::RegisterObject(context);
 }

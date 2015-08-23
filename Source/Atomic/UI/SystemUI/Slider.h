@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "../UI/BorderImage.h"
+#include "BorderImage.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Slider bar %UI element.
-class URHO3D_API Slider : public BorderImage
+class ATOMIC_API Slider : public BorderImage
 {
     OBJECT(Slider);
 

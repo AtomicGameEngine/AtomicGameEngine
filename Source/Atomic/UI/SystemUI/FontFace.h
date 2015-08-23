@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "../Container/ArrayPtr.h"
-#include "../Container/List.h"
-#include "../Math/AreaAllocator.h"
+#include "../../Container/ArrayPtr.h"
+#include "../../Container/List.h"
+#include "../../Math/AreaAllocator.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Font;
@@ -60,9 +60,11 @@ struct FontGlyph
 };
 
 /// %Font face description.
-class URHO3D_API FontFace : public RefCounted
+class ATOMIC_API FontFace : public RefCounted
 {
     friend class Font;
+
+    REFCOUNTED(FontFace)
 
 public:
     /// Construct.

@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include "../Graphics/GraphicsDefs.h"
-#include "../UI/UIElement.h"
+#include "../../Graphics/GraphicsDefs.h"
+#include "UIElement.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Tooltip %UI element.
-class URHO3D_API ToolTip : public UIElement
+class ATOMIC_API ToolTip : public UIElement
 {
     OBJECT(ToolTip)
 

@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include "../Math/Color.h"
-#include "../Math/Rect.h"
-#include "../Graphics/GraphicsDefs.h"
+#include "../../Math/Color.h"
+#include "../../Math/Rect.h"
+#include "../../Graphics/GraphicsDefs.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class PixelShader;
@@ -38,7 +38,7 @@ class UIElement;
 static const unsigned UI_VERTEX_SIZE = 6;
 
 /// %UI rendering draw call.
-class URHO3D_API UIBatch
+class ATOMIC_API UIBatch
 {
 public:
     /// Construct with defaults.

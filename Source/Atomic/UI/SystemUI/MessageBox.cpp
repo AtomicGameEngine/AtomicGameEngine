@@ -20,21 +20,19 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Graphics/Graphics.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Resource/XMLFile.h"
+#include "Button.h"
+#include "MessageBox.h"
+#include "Text.h"
+#include "UI.h"
+#include "UIEvents.h"
+#include "Window.h"
 
-#include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../Resource/XMLFile.h"
-#include "../UI/Button.h"
-#include "../UI/MessageBox.h"
-#include "../UI/Text.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
-#include "../UI/Window.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile,

@@ -20,18 +20,16 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../Input/Input.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "UI.h"
 
-#include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
-#include "../Input/Input.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../UI/UI.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 static const char* shapeNames[] =

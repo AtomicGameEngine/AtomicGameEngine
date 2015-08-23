@@ -20,16 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Input/InputEvents.h"
+#include "Button.h"
+#include "ScrollBar.h"
+#include "Slider.h"
+#include "UIEvents.h"
 
-#include "../Core/Context.h"
-#include "../Input/InputEvents.h"
-#include "../UI/Button.h"
-#include "../UI/ScrollBar.h"
-#include "../UI/Slider.h"
-#include "../UI/UIEvents.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 static const float DEFAULT_SCROLL_STEP = 0.1f;

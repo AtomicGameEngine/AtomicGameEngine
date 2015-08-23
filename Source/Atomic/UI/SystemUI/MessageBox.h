@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Core/Object.h"
+#include "../../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Button;
@@ -33,7 +33,7 @@ class UIElement;
 class XMLFile;
 
 /// Message box dialog.
-class URHO3D_API MessageBox : public Object
+class ATOMIC_API MessageBox : public Object
 {
     OBJECT(MessageBox);
 

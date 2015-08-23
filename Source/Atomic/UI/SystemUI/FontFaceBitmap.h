@@ -22,17 +22,19 @@
 
 #pragma once
 
-#include "../UI/FontFace.h"
+#include "FontFace.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Image;
 class Serializer;
 
 /// Bitmap font face description.
-class URHO3D_API FontFaceBitmap : public FontFace
+class ATOMIC_API FontFaceBitmap : public FontFace
 {
+    REFCOUNTED(FontFaceBitmap)
+
 public:
     /// Construct.
     FontFaceBitmap(Font* font);

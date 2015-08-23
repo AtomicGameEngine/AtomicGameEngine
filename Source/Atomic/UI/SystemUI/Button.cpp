@@ -20,17 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Input/InputEvents.h"
+#include "Button.h"
+#include "UI.h"
+#include "UIEvents.h"
 
-#include "../Core/Context.h"
-#include "../Input/InputEvents.h"
-#include "../UI/Button.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* UI_CATEGORY;

@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "../UI/UIElement.h"
+#include "UIElement.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Button;
 class Slider;
 
 /// Scroll bar %UI element with forward and back buttons.
-class URHO3D_API ScrollBar : public UIElement
+class ATOMIC_API ScrollBar : public UIElement
 {
     OBJECT(ScrollBar);
 

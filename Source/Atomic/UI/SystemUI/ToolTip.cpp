@@ -20,13 +20,11 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "ToolTip.h"
+#include "UI.h"
 
-#include "../Core/Context.h"
-#include "../UI/ToolTip.h"
-#include "../UI/UI.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* UI_CATEGORY;

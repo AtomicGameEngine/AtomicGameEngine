@@ -20,16 +20,14 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../Resource/ResourceCache.h"
+#include "BorderImage.h"
 
-#include "../Core/Context.h"
-#include "../Graphics/Texture2D.h"
-#include "../Resource/ResourceCache.h"
-#include "../UI/BorderImage.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* blendModeNames[];

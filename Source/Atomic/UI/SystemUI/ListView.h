@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../UI/ScrollView.h"
+#include "ScrollView.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %ListView selection highlight mode.
@@ -39,7 +39,7 @@ enum HighlightMode
 };
 
 /// Scrollable list %UI element.
-class URHO3D_API ListView : public ScrollView
+class ATOMIC_API ListView : public ScrollView
 {
     OBJECT(ListView);
 

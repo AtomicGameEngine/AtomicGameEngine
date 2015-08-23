@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../UI/Menu.h"
+#include "Menu.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ListView;
 
 /// %Menu %UI element that displays a popup list view.
-class URHO3D_API DropDownList : public Menu
+class ATOMIC_API DropDownList : public Menu
 {
     OBJECT(DropDownList)
 

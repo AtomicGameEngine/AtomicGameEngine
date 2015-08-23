@@ -20,22 +20,20 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Core/Profiler.h"
+#include "../../Graphics/Texture2D.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "Font.h"
+#include "FontFace.h"
+#include "Text.h"
+//#include "../../Resource/Localization.h"
+#include "../../Resource/ResourceEvents.h"
 
-#include "../Core/Context.h"
-#include "../Core/Profiler.h"
-#include "../Graphics/Texture2D.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../UI/Font.h"
-#include "../UI/FontFace.h"
-#include "../UI/Text.h"
-#include "../Resource/Localization.h"
-#include "../Resource/ResourceEvents.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 const char* textEffects[] =
@@ -262,6 +260,7 @@ void Text::DecodeToUnicode()
 
 void Text::SetText(const String& text)
 {
+    /*
     if (autoLocalizable_)
     {
         stringId_ = text;
@@ -269,9 +268,11 @@ void Text::SetText(const String& text)
         text_ = l10n->Get(stringId_);
     }
     else
-    {
+    {*/
         text_ = text;
+    /*
     }
+    */
 
     DecodeToUnicode();
     ValidateSelection();
@@ -307,6 +308,7 @@ void Text::SetWordwrap(bool enable)
 
 void Text::SetAutoLocalizable(bool enable)
 {
+    /*
     if (enable != autoLocalizable_)
     {
         autoLocalizable_ = enable;
@@ -327,15 +329,18 @@ void Text::SetAutoLocalizable(bool enable)
         ValidateSelection();
         UpdateText();
     }
+    */
 }
 
 void Text::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
+    /*
     Localization* l10n = GetSubsystem<Localization>();
     text_ = l10n->Get(stringId_);
     DecodeToUnicode();
     ValidateSelection();
     UpdateText();
+    */
 }
 
 void Text::SetSelection(unsigned start, unsigned length)

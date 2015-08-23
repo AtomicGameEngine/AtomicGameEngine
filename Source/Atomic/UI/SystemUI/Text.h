@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../UI/UIElement.h"
+#include "UIElement.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int DEFAULT_FONT_SIZE = 12;
@@ -70,7 +70,7 @@ struct GlyphLocation
 };
 
 /// %Text %UI element.
-class URHO3D_API Text : public UIElement
+class ATOMIC_API Text : public UIElement
 {
     OBJECT(Text);
 

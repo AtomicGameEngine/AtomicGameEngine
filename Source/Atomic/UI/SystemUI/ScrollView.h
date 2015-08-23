@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "../UI/UIElement.h"
+#include "UIElement.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BorderImage;
 class ScrollBar;
 
 /// Scrollable %UI element for showing a (possibly large) child element.
-class URHO3D_API ScrollView : public UIElement
+class ATOMIC_API ScrollView : public UIElement
 {
     OBJECT(ScrollView);
 

@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "../UI/BorderImage.h"
+#include "BorderImage.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %UI element that can be toggled between unchecked and checked state.
-class URHO3D_API CheckBox : public BorderImage
+class ATOMIC_API CheckBox : public BorderImage
 {
     OBJECT(CheckBox);
 

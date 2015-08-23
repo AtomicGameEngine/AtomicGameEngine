@@ -22,16 +22,16 @@
 
 #pragma once
 
-#include "../UI/BorderImage.h"
+#include "BorderImage.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Font;
 class Text;
 
 /// Single-line text editor %UI element.
-class URHO3D_API LineEdit : public BorderImage
+class ATOMIC_API LineEdit : public BorderImage
 {
     OBJECT(LineEdit);
 

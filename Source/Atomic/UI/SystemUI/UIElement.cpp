@@ -20,23 +20,21 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Core/CoreEvents.h"
+#include "../../Container/HashSet.h"
+#include "../../Container/Sort.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Scene/ObjectAnimation.h"
+#include "Cursor.h"
+#include "UI.h"
+#include "UIElement.h"
+#include "UIEvents.h"
 
-#include "../Core/Context.h"
-#include "../Core/CoreEvents.h"
-#include "../Container/HashSet.h"
-#include "../Container/Sort.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../Scene/ObjectAnimation.h"
-#include "../UI/Cursor.h"
-#include "../UI/UI.h"
-#include "../UI/UIElement.h"
-#include "../UI/UIEvents.h"
+#include "../../DebugNew.h"
 
-#include "../DebugNew.h"
-
-namespace Urho3D
+namespace Atomic
 {
 
 const char* horizontalAlignments[] =

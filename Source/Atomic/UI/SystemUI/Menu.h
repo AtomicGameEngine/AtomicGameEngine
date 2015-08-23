@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "../UI/Button.h"
+#include "Button.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Menu %UI element that optionally shows a popup.
-class URHO3D_API Menu : public Button
+class ATOMIC_API Menu : public Button
 {
     OBJECT(Menu);
 

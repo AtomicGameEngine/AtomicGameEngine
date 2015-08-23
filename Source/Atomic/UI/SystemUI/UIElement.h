@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "../Math/Vector2.h"
-#include "../Resource/XMLFile.h"
-#include "../Scene/Animatable.h"
-#include "../UI/UIBatch.h"
+#include "../../Math/Vector2.h"
+#include "../../Resource/XMLFile.h"
+#include "../../Scene/Animatable.h"
+#include "UIBatch.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %UI element horizontal alignment.
@@ -109,7 +109,7 @@ class Cursor;
 class ResourceCache;
 
 /// Base class for %UI elements.
-class URHO3D_API UIElement : public Animatable
+class ATOMIC_API UIElement : public Animatable
 {
     OBJECT(UIElement);
     BASEOBJECT(UIElement);

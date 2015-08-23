@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include "../UI/BorderImage.h"
+#include "BorderImage.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Push button %UI element.
-class URHO3D_API Button : public BorderImage
+class ATOMIC_API Button : public BorderImage
 {
     OBJECT(Button);
 
