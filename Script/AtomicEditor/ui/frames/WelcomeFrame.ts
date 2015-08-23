@@ -107,7 +107,7 @@ class WelcomeFrame extends ScriptWidget {
 
         lp.height = 42;
 
-        lp.width = image.imageWidth/2;
+        lp.width = image.imageWidth / 2;
 
         descField.layoutParams = lp;
 
@@ -130,6 +130,8 @@ class WelcomeFrame extends ScriptWidget {
         var exampleJsonFile = this.exampleInfoDir + "Examples.json";
 
         var jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
+        if (!jsonFile.isOpen())
+            return;
         var examples = <ExamplesFormat>JSON.parse(jsonFile.readText());
 
         for (var i in examples.examples) {
