@@ -37,6 +37,7 @@ public:
     void SetEditType(UI_EDIT_TYPE type);
 
     void SetReadOnly(bool readonly);
+    void SetStyling(bool styling);
     void SetMultiline(bool multiline);
 
     void ScrollTo(int x, int y);

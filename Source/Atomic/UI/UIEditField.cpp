@@ -38,6 +38,17 @@ void UIEditField::SetReadOnly(bool readonly)
 
 }
 
+void UIEditField::SetStyling(bool styling)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetStyling(styling);
+
+}
+
 void UIEditField::SetMultiline(bool multiline)
 {
     if (!widget_)

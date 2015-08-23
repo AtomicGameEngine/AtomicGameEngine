@@ -1,5 +1,5 @@
 {
-	"Examples" : [
+	"examples" : [
 			{
 				"name": "Physics Platformer 2D",
 				"desc" : "Moving platforms, vines, and neat 2D lighting",
@@ -13,7 +13,7 @@
 				"screenshot" : "ToonTown.png",
 				"folder" : "ToonTown",
 				"module" : "3D"
-			},			
+			},
 			{
 				"name": "SpaceGame",
 				"desc" : "A 2D Arcade Space Game",
@@ -28,14 +28,14 @@
 				"screenshot" : "Roboman3D.png",
 				"folder" : "RoboMan3D",
 				"module" : "3D"
-			},			
+			},
 			{
 				"name": "Character Animation 2D",
 				"desc" : "Example of controlling a Spriter animated character",
 				"screenshot" : "CharacterAnimation2D.png",
 				"folder" : "CharacterAnimation2D",
 				"module" : "2D"
-			},			
+			},
 			{
 				"name": "Character Animation 3D",
 				"desc" : "Example of controlling a skeletally animated character",
@@ -58,5 +58,5 @@
 				"module" : "2D"
 			}
 
-	] 
+	]
 }
