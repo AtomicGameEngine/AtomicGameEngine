@@ -125,7 +125,7 @@ EventLoop.removeTimerById = function (timer_id, isImmediate) {
             // Timer on active list: mark removed (not really necessary, but
             // nice for dumping), and remove from active list.
             t.removed = true;
-            this.timers.splice(i /*start*/ , 1 /*deleteCount*/ );
+            timers.splice(i /*start*/ , 1 /*deleteCount*/ );
             return;
         }
     }
@@ -223,9 +223,6 @@ EventLoop.processImmediates = function () {
      *  The way we handle this is that if any setImmediates adds another setImmediate to the
      *  list, it will wait until the end of the next cycle..not sure this is the best way to handle
      *  this, but if not you could easily implement a DOS where the update handler never gets returned to
-     *
-     *  TODO: need to figure out how to yield between calls to setImmediate.
-     *
      */
 
     while (sanity-- > 0) {
@@ -237,8 +234,6 @@ EventLoop.processImmediates = function () {
             //print('exit requested, exit');
             break;
         }
-
-        // Timers to expire?
 
         if (timers.length <= 0) {
             break;
@@ -336,14 +331,13 @@ function clearTimeout(timer_id) {
 }
 
 /**
- * schedules a function to be called after the end of the current update cycle
+ * schedules a function to be called after the end of the current update cycle.  SetImmediate timers are processed FIFO
  * @method
  * @param {function} func the Function to call
  * @param {any} [parameters] A comma separated list of parameters to pass to func
  * @returns {int} the id of the setImmediate function to be used in clearImmediate in order to cancel it.
  */
 function setImmediate(func) {
-
     var cb_func;
     var bind_args;
     var timer_id;
@@ -377,20 +371,6 @@ function setImmediate(func) {
 
 /**
  * stops a previously queued setImmediate callback.
- * @method
- * @param {int} timer_id the id of the timer that was created via setImmediate
- */
-function clearImmediate(timer_id) {
-    var evloop = EventLoop;
-
-    if (typeof timer_id !== 'number') {
-        throw new TypeError('timer ID is not a number');
-    }
-    evloop.removeTimerById(timer_id, true);
-}
-
-/**
- * stops a previously queued immediate function from executing
  * @method
  * @param {int} timer_id the id of the timer that was created via setImmediate
  */
@@ -478,7 +458,7 @@ Atomic.engine.subscribeToEvent('Update', function updateTimer() {
 
 // Hook into the postUpdate event of the engine and process all the setImmediate calls
 Atomic.engine.subscribeToEvent('PostUpdate', function updateImmediates() {
-   EventLoop.processImmediates();
+    EventLoop.processImmediates();
 });
 
 // Load up the global methods .  This module doesn't export anything, it just sets up the global methods.
@@ -488,9 +468,8 @@ Atomic.engine.subscribeToEvent('PostUpdate', function updateImmediates() {
     global.setTimeout = global.setTimeout || setTimeout;
     global.clearTimeout = global.clearTimeout || clearTimeout;
     global.setImmediate = global.setImmediate || setImmediate;
-    global.clearImmedeate = global.clearImmediate || clearImmediate;
+    global.clearImmediate = global.clearImmediate || clearImmediate;
 
     global.requestEventLoopExit = global.requestEventLoopExit || requestEventLoopExit;
 })(new Function('return this')());
 
-module.exports = EventLoop;
