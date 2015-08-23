@@ -42,13 +42,13 @@ class UIElement;
 static const unsigned UI_VERTEX_SIZE = 6;
 
 /// %UI rendering draw call.
-class ATOMIC_API UIBatch
+class ATOMIC_API SystemUIBatch
 {
 public:
     /// Construct with defaults.
-    UIBatch();
+    SystemUIBatch();
     /// Construct.
-    UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
+    SystemUIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
 
     /// Set new color for the batch. Overrides gradient.
     void SetColor(const Color& color, bool overrideAlpha = false);
@@ -62,12 +62,12 @@ public:
     /// Add a quad with tiled texture.
     void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Merge with another batch.
-    bool Merge(const UIBatch& batch);
+    bool Merge(const SystemUIBatch& batch);
     /// Return an interpolated color for the UI element.
     unsigned GetInterpolatedColor(int x, int y);
 
     /// Add or merge a batch.
-    static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
+    static void AddOrMerge(const SystemUIBatch& batch, PODVector<SystemUIBatch>& batches);
 
     /// Element this batch represents.
     UIElement* element_;

@@ -25,7 +25,7 @@
 #include "../../Math/Vector2.h"
 #include "../../Resource/XMLFile.h"
 #include "../../Scene/Animatable.h"
-#include "UIBatch.h"
+#include "SystemUIBatch.h"
 
 namespace Atomic
 {
@@ -144,9 +144,9 @@ public:
     /// Update and return screen position.
     virtual const IntVector2& GetScreenPosition() const;
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// Return UI rendering batches for debug draw.
-    virtual void GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetDebugDrawBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
@@ -550,7 +550,7 @@ public:
     void AdjustScissor(IntRect& currentScissor);
     /// Get UI rendering batches with a specified offset. Also recurse to child elements.
     void
-        GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
+        GetBatchesWithOffset(IntVector2& offset, PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
 
     /// Return color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }

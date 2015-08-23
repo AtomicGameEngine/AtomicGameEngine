@@ -90,7 +90,7 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to resize.
     virtual void OnResize();
     /// React to indent change.
@@ -204,7 +204,7 @@ protected:
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
     void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0,
+        (SystemUIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0,
             float depthBias = 0.0f);
 
     /// Used in Text3D.

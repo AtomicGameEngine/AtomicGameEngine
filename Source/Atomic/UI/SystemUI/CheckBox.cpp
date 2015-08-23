@@ -24,7 +24,7 @@
 #include "../../Core/Context.h"
 #include "../../Input/InputEvents.h"
 #include "CheckBox.h"
-#include "UIEvents.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 
@@ -60,7 +60,7 @@ void CheckBox::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Checked Image Offset", GetCheckedOffset, SetCheckedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
-void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void CheckBox::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
     if (hovering_ || selected_ || HasFocus())

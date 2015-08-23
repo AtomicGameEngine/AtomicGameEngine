@@ -66,7 +66,7 @@ void BorderImage::RegisterObject(Context* context)
     ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, 0, AM_FILE);
 }
 
-void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void BorderImage::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     GetBatches(batches, vertexData, currentScissor, hovering_ || selected_ || HasFocus() ? hoverOffset_ : IntVector2::ZERO);
 }
@@ -126,7 +126,7 @@ void BorderImage::SetTiled(bool enable)
     tiled_ = enable;
 }
 
-void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor,
+void BorderImage::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor,
     const IntVector2& offset)
 {
     bool allOpaque = true;
@@ -134,7 +134,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
         color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
 
-    UIBatch
+    SystemUIBatch
         batch(this, blendMode_ == BLEND_REPLACE && !allOpaque ? BLEND_ALPHA : blendMode_, currentScissor, texture_, &vertexData);
 
     // Calculate size of the inner rect, and texture dimensions of the inner rect
@@ -194,7 +194,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
                 uvBorder.bottom_);
     }
 
-    UIBatch::AddOrMerge(batch, batches);
+    SystemUIBatch::AddOrMerge(batch, batches);
 
     // Reset hovering for next frame
     hovering_ = false;

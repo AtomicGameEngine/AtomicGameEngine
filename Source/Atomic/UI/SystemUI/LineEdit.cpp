@@ -24,8 +24,8 @@
 #include "../../Input/Input.h"
 #include "LineEdit.h"
 #include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 
@@ -221,7 +221,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             unsigned length = text_->GetSelectionLength();
 
             if (text_->GetSelectionLength())
-                GetSubsystem<UI>()->SetClipboardText(line_.SubstringUTF8(start, length));
+                GetSubsystem<SystemUI>()->SetClipboardText(line_.SubstringUTF8(start, length));
 
             if (key == 'X' && editable_)
             {
@@ -239,7 +239,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case 'V':
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
-            const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();
+            const String& clipBoard = GetSubsystem<SystemUI>()->GetClipboardText();
             if (!clipBoard.Empty())
             {
                 // Remove selected text first
@@ -407,7 +407,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case KEY_KP_ENTER:
         {
             // If using the on-screen keyboard, defocus this element to hide it now
-            if (GetSubsystem<UI>()->GetUseScreenKeyboard() && HasFocus())
+            if (GetSubsystem<SystemUI>()->GetUseScreenKeyboard() && HasFocus())
                 SetFocus(false);
 
             using namespace TextFinished;
@@ -647,7 +647,7 @@ void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
     }
     UpdateCursor();
 
-    if (GetSubsystem<UI>()->GetUseScreenKeyboard())
+    if (GetSubsystem<SystemUI>()->GetUseScreenKeyboard())
         GetSubsystem<Input>()->SetScreenKeyboardVisible(true);
 }
 
@@ -655,7 +655,7 @@ void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 {
     text_->ClearSelection();
 
-    if (GetSubsystem<UI>()->GetUseScreenKeyboard())
+    if (GetSubsystem<SystemUI>()->GetUseScreenKeyboard())
         GetSubsystem<Input>()->SetScreenKeyboardVisible(false);
 }
 

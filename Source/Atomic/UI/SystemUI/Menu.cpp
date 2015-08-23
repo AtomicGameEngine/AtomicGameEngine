@@ -24,8 +24,8 @@
 #include "../../Input/InputEvents.h"
 #include "../../IO/Log.h"
 #include "Menu.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 #include "Window.h"
 
 #include "../../DebugNew.h"
@@ -432,7 +432,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         eventData[P_REPEAT].GetBool() == false)
     {
         // Ignore if UI has modal element
-        if (GetSubsystem<UI>()->HasModalElement())
+        if (GetSubsystem<SystemUI>()->HasModalElement())
             return;
 
         HandlePressedReleased(eventType, eventData);

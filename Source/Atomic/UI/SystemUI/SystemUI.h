@@ -24,7 +24,7 @@
 
 #include "../../Core/Object.h"
 #include "Cursor.h"
-#include "UIBatch.h"
+#include "SystemUIBatch.h"
 
 namespace Atomic
 {
@@ -40,19 +40,19 @@ namespace SystemUI
 {
 
 class Cursor;
-class UIBatch;
+class SystemUIBatch;
 class UIElement;
 
 /// %UI subsystem. Manages the graphical user interface.
-class ATOMIC_API UI : public Object
+class ATOMIC_API SystemUI : public Object
 {
-    OBJECT(UI);
+    OBJECT(SystemUI);
 
 public:
     /// Construct.
-    UI(Context* context);
+    SystemUI(Context* context);
     /// Destruct.
-    virtual ~UI();
+    virtual ~SystemUI();
 
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
@@ -166,7 +166,7 @@ public:
     bool HasModalElement() const;
 
     /// Return whether a drag is in progress.
-    bool IsDragging() const { return dragConfirmedCount_ > 0; };
+    bool IsDragging() const { return dragConfirmedCount_ > 0; }
 
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData
@@ -194,7 +194,7 @@ private:
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
     /// Render UI batches. Geometry must have been uploaded first.
     void Render
-        (bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
+        (bool resetRenderTargets, VertexBuffer* buffer, const PODVector<SystemUIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     /// Generate batches from an UI element recursively. Skip the cursor element.
     void GetBatches(UIElement* element, IntRect currentScissor);
     /// Return UI element at screen position recursively.
@@ -219,7 +219,7 @@ private:
         bool cursorVisible);
     /// Send a UI element drag or hover begin event.
     void SendDragOrHoverEvent
-        (StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, UI::DragData* dragData);
+        (StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos, SystemUI::DragData* dragData);
     /// Send a UI click or double click event.
     void SendClickEvent
         (StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button, int buttons,
@@ -257,7 +257,7 @@ private:
     /// Handle clean up on a drag cancel.
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.
-    IntVector2 SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos);
+    IntVector2 SumTouchPositions(SystemUI::DragData* dragData, const IntVector2& oldSendPos);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -270,11 +270,11 @@ private:
     /// Currently focused element.
     WeakPtr<UIElement> focusElement_;
     /// UI rendering batches.
-    PODVector<UIBatch> batches_;
+    PODVector<SystemUIBatch> batches_;
     /// UI rendering vertex data.
     PODVector<float> vertexData_;
     /// UI rendering batches for debug draw.
-    PODVector<UIBatch> debugDrawBatches_;
+    PODVector<SystemUIBatch> debugDrawBatches_;
     /// UI rendering vertex data for debug draw.
     PODVector<float> debugVertexData_;
     /// UI vertex buffer.

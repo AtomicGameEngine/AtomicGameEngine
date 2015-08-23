@@ -28,7 +28,7 @@
 #include "../../IO/MemoryBuffer.h"
 #include "Font.h"
 #include "FontFaceFreeType.h"
-#include "UI.h"
+#include "SystemUI.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -99,7 +99,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     // Ensure the FreeType library is kept alive as long as TTF font resources exist
     freeType_ = freeType;
 
-    UI* ui = font_->GetSubsystem<UI>();
+    SystemUI* ui = font_->GetSubsystem<SystemUI>();
     int maxTextureSize = ui->GetMaxFontTextureSize();
 
     FT_Face face;

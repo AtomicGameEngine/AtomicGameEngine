@@ -28,9 +28,9 @@
 #include "../../Resource/ResourceCache.h"
 #include "../../Scene/ObjectAnimation.h"
 #include "Cursor.h"
-#include "UI.h"
+#include "SystemUI.h"
 #include "UIElement.h"
-#include "UIEvents.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 
@@ -370,15 +370,15 @@ void UIElement::Update(float timeStep)
 {
 }
 
-void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void UIElement::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     // Reset hovering for next frame
     hovering_ = false;
 }
 
-void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void UIElement::GetDebugDrawBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+    SystemUIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
 
     int horizontalThickness = 1;
     int verticalThickness = 1;
@@ -409,7 +409,7 @@ void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float
     // Bottom
     batch.AddQuad(0, size_.y_ - verticalThickness, size_.x_, verticalThickness, 0, 0);
 
-    UIBatch::AddOrMerge(batch, batches);
+    SystemUIBatch::AddOrMerge(batch, batches);
 }
 
 bool UIElement::IsWithinScissor(const IntRect& currentScissor)
@@ -887,7 +887,7 @@ void UIElement::SetFocus(bool enable)
     if (focusMode_ < FM_FOCUSABLE || !IsVisibleEffective())
         enable = false;
 
-    UI* ui = GetSubsystem<UI>();
+    SystemUI* ui = GetSubsystem<SystemUI>();
     if (enable)
     {
         if (ui->GetFocusElement() != this)
@@ -925,7 +925,7 @@ void UIElement::SetVisible(bool enable)
         // If the focus element becomes effectively hidden, clear focus
         if (!enable)
         {
-            UIElement* focusElement = GetSubsystem<UI>()->GetFocusElement();
+            UIElement* focusElement = GetSubsystem<SystemUI>()->GetFocusElement();
             if (focusElement && !focusElement->IsVisibleEffective())
                 focusElement->SetFocus(false);
         }
@@ -1424,7 +1424,7 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    return GetSubsystem<UI>()->GetFocusElement() == this;
+    return GetSubsystem<SystemUI>()->GetFocusElement() == this;
 }
 
 bool UIElement::IsVisibleEffective() const
@@ -1661,7 +1661,7 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData,
+void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData,
     IntRect currentScissor)
 {
     Vector2 floatOffset((float)offset.x_, (float)offset.y_);

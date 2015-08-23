@@ -23,8 +23,8 @@
 #include "../../Core/Context.h"
 #include "../../Input/InputEvents.h"
 #include "Cursor.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 #include "Window.h"
 
 #include "../../DebugNew.h"
@@ -84,7 +84,7 @@ void Window::RegisterObject(Context* context)
     // Instead it should be set false in code when needed
 }
 
-void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Window::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     if (modal_)
     {
@@ -93,23 +93,23 @@ void Window::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
         {
             UIElement* rootElement = GetRoot();
             const IntVector2& rootSize = rootElement->GetSize();
-            UIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
+            SystemUIBatch batch(rootElement, BLEND_ALPHA, IntRect(0, 0, rootSize.x_, rootSize.y_), 0, &vertexData);
             batch.SetColor(modalShadeColor_);
             batch.AddQuad(0, 0, rootSize.x_, rootSize.y_, 0, 0);
-            UIBatch::AddOrMerge(batch, batches);
+            SystemUIBatch::AddOrMerge(batch, batches);
         }
 
         // Modal frame
         if (modalFrameColor_ != Color::TRANSPARENT && modalFrameSize_ != IntVector2::ZERO)
         {
-            UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+            SystemUIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
             int x = GetIndentWidth();
             IntVector2 size = GetSize();
             size.x_ -= x;
             batch.SetColor(modalFrameColor_);
             batch.AddQuad(x - modalFrameSize_.x_, -modalFrameSize_.y_, size.x_ + 2 * modalFrameSize_.x_,
                 size.y_ + 2 * modalFrameSize_.y_, 0, 0);
-            UIBatch::AddOrMerge(batch, batches);
+            SystemUIBatch::AddOrMerge(batch, batches);
         }
     }
 
@@ -281,7 +281,7 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    if (GetSubsystem<UI>()->SetModalElement(this, modal))
+    if (GetSubsystem<SystemUI>()->SetModalElement(this, modal))
     {
         modal_ = modal;
 

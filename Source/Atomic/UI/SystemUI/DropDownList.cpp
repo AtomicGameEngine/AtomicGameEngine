@@ -26,8 +26,8 @@
 #include "DropDownList.h"
 #include "ListView.h"
 #include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 #include "Window.h"
 
 #include "../../DebugNew.h"
@@ -86,7 +86,7 @@ void DropDownList::ApplyAttributes()
     SetSelection(selectionAttr_);
 }
 
-void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void DropDownList::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     Menu::GetBatches(batches, vertexData, currentScissor);
 
@@ -134,7 +134,7 @@ void DropDownList::OnShowPopup()
     SetPopupOffset(0, showAbove ? -popup_->GetHeight() : GetHeight());
 
     // Focus the ListView to allow making the selection with keys
-    GetSubsystem<UI>()->SetFocusElement(listView_);
+    GetSubsystem<SystemUI>()->SetFocusElement(listView_);
 }
 
 void DropDownList::OnHidePopup()
@@ -327,7 +327,7 @@ void DropDownList::HandleItemClicked(StringHash eventType, VariantMap& eventData
 
     // Close and defocus the popup. This will actually send the selection forward
     if (listView_->HasFocus())
-        GetSubsystem<UI>()->SetFocusElement(focusMode_ < FM_FOCUSABLE ? 0 : this);
+        GetSubsystem<SystemUI>()->SetFocusElement(focusMode_ < FM_FOCUSABLE ? 0 : this);
     ShowPopup(false);
 }
 

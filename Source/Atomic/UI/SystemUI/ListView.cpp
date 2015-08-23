@@ -26,8 +26,8 @@
 #include "CheckBox.h"
 #include "ListView.h"
 #include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 
@@ -898,7 +898,7 @@ void ListView::CopySelectedItemsToClipboard() const
             selectedText.Append(text->GetText()).Append("\n");
     }
 
-    GetSubsystem<UI>()->SetClipboardText(selectedText);
+    GetSubsystem<SystemUI>()->SetClipboardText(selectedText);
 }
 
 bool ListView::IsSelected(unsigned index) const
@@ -996,7 +996,7 @@ void ListView::EnsureItemVisibility(UIElement* item)
 void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
     // Disregard the click end if a drag is going on
-    if (selectOnClickEnd_ && GetSubsystem<UI>()->IsDragging())
+    if (selectOnClickEnd_ && GetSubsystem<SystemUI>()->IsDragging())
         return;
 
     int button = eventData[UIMouseClick::P_BUTTON].GetInt();

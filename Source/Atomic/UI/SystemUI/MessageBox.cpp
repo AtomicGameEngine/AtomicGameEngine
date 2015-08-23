@@ -28,8 +28,8 @@
 #include "Button.h"
 #include "MessageBox.h"
 #include "Text.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 #include "Window.h"
 
 namespace Atomic
@@ -55,7 +55,7 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
             return;         // Note: windowless MessageBox should not be used!
     }
 
-    UI* ui = GetSubsystem<UI>();
+    SystemUI* ui = GetSubsystem<SystemUI>();
     window_ = ui->LoadLayout(layoutFile, styleFile);
     if (!window_)   // Error is already logged
         return;

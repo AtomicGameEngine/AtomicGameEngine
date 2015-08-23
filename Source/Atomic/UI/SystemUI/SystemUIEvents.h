@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 /// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
@@ -374,6 +377,8 @@ EVENT(E_UIDROPFILE, UIDropFile)
     PARAM(P_Y, Y);                          // int
     PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
     PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
+}
+
 }
 
 }

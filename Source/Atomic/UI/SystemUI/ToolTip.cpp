@@ -22,7 +22,7 @@
 
 #include "../../Core/Context.h"
 #include "ToolTip.h"
-#include "UI.h"
+#include "SystemUI.h"
 
 namespace Atomic
 {
@@ -71,7 +71,7 @@ void ToolTip::Update(float timeStep)
 
     if (target_->IsHovering())
     {
-        float effectiveDelay = delay_ > 0.0f ? delay_ : GetSubsystem<UI>()->GetDefaultToolTipDelay();
+        float effectiveDelay = delay_ > 0.0f ? delay_ : GetSubsystem<SystemUI>()->GetDefaultToolTipDelay();
 
         if (!parentHovered_)
         {

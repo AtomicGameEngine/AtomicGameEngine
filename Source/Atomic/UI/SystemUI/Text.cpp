@@ -111,7 +111,7 @@ void Text::ApplyAttributes()
     UpdateText();
 }
 
-void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Text::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     FontFace* face = font_ ? font_->GetFace(fontSize_) : (FontFace*)0;
     if (!face)
@@ -134,17 +134,17 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
         bool both = hovering_ && selected_ && hoverColor_.a_ > 0.0 && selectionColor_.a_ > 0.0f;
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+        SystemUIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
         batch.SetColor(both ? selectionColor_.Lerp(hoverColor_, 0.5f) :
             (selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ : hoverColor_));
         batch.AddQuad(0, 0, GetWidth(), GetHeight(), 0, 0);
-        UIBatch::AddOrMerge(batch, batches);
+        SystemUIBatch::AddOrMerge(batch, batches);
     }
 
     // Partial selection batch
     if (!selected_ && selectionLength_ && charLocations_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
-        UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+        SystemUIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
         batch.SetColor(selectionColor_);
 
         IntVector2 currentStart = charLocations_[selectionStart_].position_;
@@ -173,7 +173,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             batch.AddQuad(currentStart.x_, currentStart.y_, currentEnd.x_ - currentStart.x_, currentEnd.y_ - currentStart.y_, 0, 0);
         }
 
-        UIBatch::AddOrMerge(batch, batches);
+        SystemUIBatch::AddOrMerge(batch, batches);
     }
 
     // Text batch
@@ -182,7 +182,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     for (unsigned n = 0; n < textures.Size() && n < pageGlyphLocations_.Size(); ++n)
     {
         // One batch per texture/page
-        UIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
+        SystemUIBatch pageBatch(this, BLEND_ALPHA, currentScissor, textures[n], &vertexData);
 
         const PODVector<GlyphLocation>& pageGlyphLocation = pageGlyphLocations_[n];
 
@@ -210,7 +210,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             break;
         }
 
-        UIBatch::AddOrMerge(pageBatch, batches);
+        SystemUIBatch::AddOrMerge(pageBatch, batches);
     }
 
     // Reset hovering for next frame
@@ -739,7 +739,7 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
     return ret;
 }
 
-void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx, int dy, Color* color,
+void Text::ConstructBatch(SystemUIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx, int dy, Color* color,
     float depthBias)
 {
     unsigned startDataSize = pageBatch.vertexData_->Size();

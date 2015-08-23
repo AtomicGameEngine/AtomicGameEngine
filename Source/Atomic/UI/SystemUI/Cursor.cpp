@@ -25,7 +25,7 @@
 #include "../../Input/Input.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
-#include "UI.h"
+#include "SystemUI.h"
 
 #include "../../DebugNew.h"
 
@@ -108,7 +108,7 @@ void Cursor::RegisterObject(Context* context)
     MIXED_ACCESSOR_ATTRIBUTE("Shapes", GetShapesAttr, SetShapesAttr, VariantVector, Variant::emptyVariantVector, AM_FILE);
 }
 
-void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Cursor::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     unsigned initialSize = vertexData.Size();
     const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
@@ -256,7 +256,7 @@ void Cursor::ApplyOSCursorShape()
 {
     // Mobile platforms do not support applying OS cursor shapes: comment out to avoid log error messages
 #if !defined(ANDROID) && !defined(IOS)
-    if (!osShapeDirty_ || !GetSubsystem<Input>()->IsMouseVisible() || GetSubsystem<UI>()->GetCursor() != this)
+    if (!osShapeDirty_ || !GetSubsystem<Input>()->IsMouseVisible() || GetSubsystem<SystemUI>()->GetCursor() != this)
         return;
 
     CursorShapeInfo& info = shapeInfos_[shape_];

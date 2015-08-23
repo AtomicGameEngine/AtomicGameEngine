@@ -24,7 +24,7 @@
 #include "../../Input/InputEvents.h"
 #include "../../IO/Log.h"
 #include "Slider.h"
-#include "UIEvents.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 

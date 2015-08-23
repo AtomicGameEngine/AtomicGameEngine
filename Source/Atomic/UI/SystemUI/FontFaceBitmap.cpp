@@ -30,7 +30,7 @@
 #include "../../Resource/ResourceCache.h"
 #include "Font.h"
 #include "FontFaceBitmap.h"
-#include "UI.h"
+#include "SystemUI.h"
 
 #include "../../DebugNew.h"
 
@@ -188,7 +188,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     rowHeight_ = fontFace->rowHeight_;
 
     unsigned numPages = 1;
-    int maxTextureSize = font_->GetSubsystem<UI>()->GetMaxFontTextureSize();
+    int maxTextureSize = font_->GetSubsystem<SystemUI>()->GetMaxFontTextureSize();
     AreaAllocator allocator(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, maxTextureSize, maxTextureSize);
 
     for (HashMap<unsigned, FontGlyph>::ConstIterator i = fontFace->glyphMapping_.Begin(); i != fontFace->glyphMapping_.End(); ++i)

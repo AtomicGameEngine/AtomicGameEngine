@@ -26,8 +26,8 @@
 #include "ScrollBar.h"
 #include "ScrollView.h"
 #include "Slider.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 
@@ -126,9 +126,9 @@ void ScrollView::Update(float timeStep)
         return;
     }
 
-    if (GetSubsystem<UI>()->IsDragging())
+    if (GetSubsystem<SystemUI>()->IsDragging())
     {
-        Vector<UIElement*> dragElements = GetSubsystem<UI>()->GetDragElements();
+        Vector<UIElement*> dragElements = GetSubsystem<SystemUI>()->GetDragElements();
 
         for (unsigned i = 0; i < dragElements.Size(); i++)
         {

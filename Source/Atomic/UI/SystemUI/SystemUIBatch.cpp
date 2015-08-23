@@ -32,9 +32,9 @@ namespace Atomic
 namespace SystemUI
 {
 
-Vector3 UIBatch::posAdjust(0.0f, 0.0f, 0.0f);
+Vector3 SystemUIBatch::posAdjust(0.0f, 0.0f, 0.0f);
 
-UIBatch::UIBatch() :
+SystemUIBatch::SystemUIBatch() :
     element_(0),
     blendMode_(BLEND_REPLACE),
     texture_(0),
@@ -46,7 +46,7 @@ UIBatch::UIBatch() :
     SetDefaultColor();
 }
 
-UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
+SystemUIBatch::SystemUIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData) :
     element_(element),
     blendMode_(blendMode),
     scissor_(scissor),
@@ -59,7 +59,7 @@ UIBatch::UIBatch(UIElement* element, BlendMode blendMode, const IntRect& scissor
     SetDefaultColor();
 }
 
-void UIBatch::SetColor(const Color& color, bool overrideAlpha)
+void SystemUIBatch::SetColor(const Color& color, bool overrideAlpha)
 {
     if (!element_)
         overrideAlpha = true;
@@ -69,7 +69,7 @@ void UIBatch::SetColor(const Color& color, bool overrideAlpha)
         overrideAlpha ? color.ToUInt() : Color(color.r_, color.g_, color.b_, color.a_ * element_->GetDerivedOpacity()).ToUInt();
 }
 
-void UIBatch::SetDefaultColor()
+void SystemUIBatch::SetDefaultColor()
 {
     if (element_)
     {
@@ -83,7 +83,7 @@ void UIBatch::SetDefaultColor()
     }
 }
 
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+void SystemUIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
@@ -166,7 +166,7 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     dest[35] = bottomUV;
 }
 
-void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
+void SystemUIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY,
     int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
@@ -248,7 +248,7 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
     dest[35] = bottomUV;
 }
 
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled)
+void SystemUIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled)
 {
     if (!(element_->HasColorGradient() || element_->GetDerivedColor().ToUInt() & 0xff000000))
         return; // No gradient and alpha is 0, so do not add the quad
@@ -282,7 +282,7 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     }
 }
 
-bool UIBatch::Merge(const UIBatch& batch)
+bool SystemUIBatch::Merge(const SystemUIBatch& batch)
 {
     if (batch.blendMode_ != blendMode_ ||
         batch.scissor_ != scissor_ ||
@@ -295,7 +295,7 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-unsigned UIBatch::GetInterpolatedColor(int x, int y)
+unsigned SystemUIBatch::GetInterpolatedColor(int x, int y)
 {
     const IntVector2& size = element_->GetSize();
 
@@ -318,7 +318,7 @@ unsigned UIBatch::GetInterpolatedColor(int x, int y)
     }
 }
 
-void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
+void SystemUIBatch::AddOrMerge(const SystemUIBatch& batch, PODVector<SystemUIBatch>& batches)
 {
     if (batch.vertexEnd_ == batch.vertexStart_)
         return;

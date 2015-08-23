@@ -47,8 +47,8 @@
 #include "Sprite.h"
 #include "Text.h"
 #include "ToolTip.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 #include "Window.h"
 
 #include <SDL/include/SDL.h>
@@ -76,7 +76,7 @@ const int DEFAULT_FONT_TEXTURE_MAX_SIZE = 2048;
 
 const char* UI_CATEGORY = "UI";
 
-UI::UI(Context* context) :
+SystemUI::SystemUI(Context* context) :
     Object(context),
     rootElement_(new UIElement(context)),
     rootModalElement_(new UIElement(context)),
@@ -114,27 +114,27 @@ UI::UI(Context* context) :
     // Register UI library object factories
     RegisterUILibrary(context_);
 
-    SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UI, HandleMouseWheel));
-    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(UI, HandleTouchEnd));
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
-    SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
-    SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
-    SubscribeToEvent(E_DROPFILE, HANDLER(UI, HandleDropFile));
+    SubscribeToEvent(E_SCREENMODE, HANDLER(SystemUI, HandleScreenMode));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(SystemUI, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(SystemUI, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, HANDLER(SystemUI, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEWHEEL, HANDLER(SystemUI, HandleMouseWheel));
+    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(SystemUI, HandleTouchBegin));
+    SubscribeToEvent(E_TOUCHEND, HANDLER(SystemUI, HandleTouchEnd));
+    SubscribeToEvent(E_TOUCHMOVE, HANDLER(SystemUI, HandleTouchMove));
+    SubscribeToEvent(E_KEYDOWN, HANDLER(SystemUI, HandleKeyDown));
+    SubscribeToEvent(E_TEXTINPUT, HANDLER(SystemUI, HandleTextInput));
+    SubscribeToEvent(E_DROPFILE, HANDLER(SystemUI, HandleDropFile));
 
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
 }
 
-UI::~UI()
+SystemUI::~SystemUI()
 {
 }
 
-void UI::SetCursor(Cursor* cursor)
+void SystemUI::SetCursor(Cursor* cursor)
 {
     // Remove old cursor (if any) and set new
     if (cursor_)
@@ -155,7 +155,7 @@ void UI::SetCursor(Cursor* cursor)
     }
 }
 
-void UI::SetFocusElement(UIElement* element, bool byKey)
+void SystemUI::SetFocusElement(UIElement* element, bool byKey)
 {
     using namespace FocusChanged;
 
@@ -211,7 +211,7 @@ void UI::SetFocusElement(UIElement* element, bool byKey)
     SendEvent(E_FOCUSCHANGED, eventData);
 }
 
-bool UI::SetModalElement(UIElement* modalElement, bool enable)
+bool SystemUI::SetModalElement(UIElement* modalElement, bool enable)
 {
     if (!modalElement)
         return false;
@@ -285,7 +285,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
     }
 }
 
-void UI::Clear()
+void SystemUI::Clear()
 {
     rootElement_->RemoveAllChildren();
     rootModalElement_->RemoveAllChildren();
@@ -293,7 +293,7 @@ void UI::Clear()
         rootElement_->AddChild(cursor_);
 }
 
-void UI::Update(float timeStep)
+void SystemUI::Update(float timeStep)
 {
     assert(rootElement_ && rootModalElement_);
 
@@ -313,10 +313,10 @@ void UI::Update(float timeStep)
     // Drag begin based on time
     if (dragElementsCount_ > 0 && !mouseGrabbed)
     {
-        for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+        for (HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
         {
             WeakPtr<UIElement> dragElement = i->first_;
-            UI::DragData* dragData = i->second_;
+            SystemUI::DragData* dragData = i->second_;
 
             if (!dragElement)
             {
@@ -387,7 +387,7 @@ void UI::Update(float timeStep)
     Update(timeStep, rootModalElement_);
 }
 
-void UI::RenderUpdate()
+void SystemUI::RenderUpdate()
 {
     assert(rootElement_ && rootModalElement_ && graphics_);
 
@@ -421,7 +421,7 @@ void UI::RenderUpdate()
     }
 }
 
-void UI::Render(bool resetRenderTargets)
+void SystemUI::Render(bool resetRenderTargets)
 {
     // Perform the default render only if not rendered yet
     if (resetRenderTargets && uiRendered_)
@@ -451,7 +451,7 @@ void UI::Render(bool resetRenderTargets)
     uiRendered_ = true;
 }
 
-void UI::DebugDraw(UIElement* element)
+void SystemUI::DebugDraw(UIElement* element)
 {
     if (element)
     {
@@ -460,7 +460,7 @@ void UI::DebugDraw(UIElement* element)
     }
 }
 
-SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile)
+SharedPtr<UIElement> SystemUI::LoadLayout(Deserializer& source, XMLFile* styleFile)
 {
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
@@ -469,7 +469,7 @@ SharedPtr<UIElement> UI::LoadLayout(Deserializer& source, XMLFile* styleFile)
         return LoadLayout(xml, styleFile);
 }
 
-SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
+SharedPtr<UIElement> SystemUI::LoadLayout(XMLFile* file, XMLFile* styleFile)
 {
     PROFILE(LoadUILayout);
 
@@ -512,41 +512,41 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     return root;
 }
 
-bool UI::SaveLayout(Serializer& dest, UIElement* element)
+bool SystemUI::SaveLayout(Serializer& dest, UIElement* element)
 {
     PROFILE(SaveUILayout);
 
     return element && element->SaveXML(dest);
 }
 
-void UI::SetClipboardText(const String& text)
+void SystemUI::SetClipboardText(const String& text)
 {
     clipBoard_ = text;
     if (useSystemClipboard_)
         SDL_SetClipboardText(text.CString());
 }
 
-void UI::SetDoubleClickInterval(float interval)
+void SystemUI::SetDoubleClickInterval(float interval)
 {
     doubleClickInterval_ = Max(interval, 0.0f);
 }
 
-void UI::SetDragBeginInterval(float interval)
+void SystemUI::SetDragBeginInterval(float interval)
 {
     dragBeginInterval_ = Max(interval, 0.0f);
 }
 
-void UI::SetDragBeginDistance(int pixels)
+void SystemUI::SetDragBeginDistance(int pixels)
 {
     dragBeginDistance_ = Max(pixels, 0);
 }
 
-void UI::SetDefaultToolTipDelay(float delay)
+void SystemUI::SetDefaultToolTipDelay(float delay)
 {
     defaultToolTipDelay_ = Max(delay, 0.0f);
 }
 
-void UI::SetMaxFontTextureSize(int size)
+void SystemUI::SetMaxFontTextureSize(int size)
 {
     if (IsPowerOfTwo((unsigned)size) && size >= FONT_TEXTURE_MIN_SIZE)
     {
@@ -558,22 +558,22 @@ void UI::SetMaxFontTextureSize(int size)
     }
 }
 
-void UI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
+void SystemUI::SetNonFocusedMouseWheel(bool nonFocusedMouseWheel)
 {
     nonFocusedMouseWheel_ = nonFocusedMouseWheel;
 }
 
-void UI::SetUseSystemClipboard(bool enable)
+void SystemUI::SetUseSystemClipboard(bool enable)
 {
     useSystemClipboard_ = enable;
 }
 
-void UI::SetUseScreenKeyboard(bool enable)
+void SystemUI::SetUseScreenKeyboard(bool enable)
 {
     useScreenKeyboard_ = enable;
 }
 
-void UI::SetUseMutableGlyphs(bool enable)
+void SystemUI::SetUseMutableGlyphs(bool enable)
 {
     if (enable != useMutableGlyphs_)
     {
@@ -582,7 +582,7 @@ void UI::SetUseMutableGlyphs(bool enable)
     }
 }
 
-void UI::SetForceAutoHint(bool enable)
+void SystemUI::SetForceAutoHint(bool enable)
 {
     if (enable != forceAutoHint_)
     {
@@ -591,24 +591,24 @@ void UI::SetForceAutoHint(bool enable)
     }
 }
 
-IntVector2 UI::GetCursorPosition() const
+IntVector2 SystemUI::GetCursorPosition() const
 {
     return cursor_ ? cursor_->GetPosition() : GetSubsystem<Input>()->GetMousePosition();
 }
 
-UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
+UIElement* SystemUI::GetElementAt(const IntVector2& position, bool enabledOnly)
 {
     UIElement* result = 0;
     GetElementAt(result, HasModalElement() ? rootModalElement_ : rootElement_, position, enabledOnly);
     return result;
 }
 
-UIElement* UI::GetElementAt(int x, int y, bool enabledOnly)
+UIElement* SystemUI::GetElementAt(int x, int y, bool enabledOnly)
 {
     return GetElementAt(IntVector2(x, y), enabledOnly);
 }
 
-UIElement* UI::GetFrontElement() const
+UIElement* SystemUI::GetFrontElement() const
 {
     const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
@@ -631,16 +631,16 @@ UIElement* UI::GetFrontElement() const
     return front;
 }
 
-const Vector<UIElement*> UI::GetDragElements()
+const Vector<UIElement*> SystemUI::GetDragElements()
 {
     // Do not return the element until drag begin event has actually been posted
     if (!dragElementsConfirmed_.Empty())
         return dragElementsConfirmed_;
 
-    for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+    for (HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
     {
         WeakPtr<UIElement> dragElement = i->first_;
-        UI::DragData* dragData = i->second_;
+        SystemUI::DragData* dragData = i->second_;
 
         if (!dragElement)
         {
@@ -657,7 +657,7 @@ const Vector<UIElement*> UI::GetDragElements()
     return dragElementsConfirmed_;
 }
 
-UIElement* UI::GetDragElement(unsigned index)
+UIElement* SystemUI::GetDragElement(unsigned index)
 {
     GetDragElements();
     if (index >= dragElementsConfirmed_.Size())
@@ -666,7 +666,7 @@ UIElement* UI::GetDragElement(unsigned index)
     return dragElementsConfirmed_[index];
 }
 
-const String& UI::GetClipboardText() const
+const String& SystemUI::GetClipboardText() const
 {
     if (useSystemClipboard_)
     {
@@ -679,12 +679,12 @@ const String& UI::GetClipboardText() const
     return clipBoard_;
 }
 
-bool UI::HasModalElement() const
+bool SystemUI::HasModalElement() const
 {
     return rootModalElement_->GetNumChildren() > 0;
 }
 
-void UI::Initialize()
+void SystemUI::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
 
@@ -694,7 +694,7 @@ void UI::Initialize()
     PROFILE(InitUI);
 
     graphics_ = graphics;
-    UIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
+    SystemUIBatch::posAdjust = Vector3(Graphics::GetPixelUVOffset(), 0.0f);
 
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     rootModalElement_->SetSize(rootElement_->GetSize());
@@ -704,14 +704,14 @@ void UI::Initialize()
 
     initialized_ = true;
 
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(UI, HandleBeginFrame));
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate));
-    SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(SystemUI, HandleBeginFrame));
+    SubscribeToEvent(E_POSTUPDATE, HANDLER(SystemUI, HandlePostUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(SystemUI, HandleRenderUpdate));
 
     LOGINFO("Initialized user interface");
 }
 
-void UI::Update(float timeStep, UIElement* element)
+void SystemUI::Update(float timeStep, UIElement* element)
 {
     // Keep a weak pointer to the element in case it destroys itself on update
     WeakPtr<UIElement> elementWeak(element);
@@ -726,7 +726,7 @@ void UI::Update(float timeStep, UIElement* element)
         Update(timeStep, children[i]);
 }
 
-void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
+void SystemUI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
 {
     if (vertexData.Empty())
         return;
@@ -740,7 +740,7 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
     dest->SetData(&vertexData[0]);
 }
 
-void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart,
+void SystemUI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<SystemUIBatch>& batches, unsigned batchStart,
     unsigned batchEnd)
 {
     // Engine does not render when window is closed or device is lost
@@ -784,7 +784,7 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
 
     for (unsigned i = batchStart; i < batchEnd; ++i)
     {
-        const UIBatch& batch = batches[i];
+        const SystemUIBatch& batch = batches[i];
         if (batch.vertexStart_ == batch.vertexEnd_)
             continue;
 
@@ -825,7 +825,7 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     }
 }
 
-void UI::GetBatches(UIElement* element, IntRect currentScissor)
+void SystemUI::GetBatches(UIElement* element, IntRect currentScissor)
 {
     // Set clipping scissor for child elements. No need to draw if zero size
     element->AdjustScissor(currentScissor);
@@ -878,7 +878,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     }
 }
 
-void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly)
+void SystemUI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly)
 {
     if (!current)
         return;
@@ -947,7 +947,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     }
 }
 
-UIElement* UI::GetFocusableElement(UIElement* element)
+UIElement* SystemUI::GetFocusableElement(UIElement* element)
 {
     while (element)
     {
@@ -958,7 +958,7 @@ UIElement* UI::GetFocusableElement(UIElement* element)
     return element;
 }
 
-void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
+void SystemUI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
 {
     // Prefer software cursor then OS-specific cursor
     if (cursor_ && cursor_->IsVisible())
@@ -979,13 +979,13 @@ void UI::GetCursorPositionAndVisible(IntVector2& pos, bool& visible)
     }
 }
 
-void UI::SetCursorShape(CursorShape shape)
+void SystemUI::SetCursorShape(CursorShape shape)
 {
     if (cursor_)
         cursor_->SetShape(shape);
 }
 
-void UI::ReleaseFontFaces()
+void SystemUI::ReleaseFontFaces()
 {
     LOGDEBUG("Reloading font faces");
 
@@ -996,14 +996,14 @@ void UI::ReleaseFontFaces()
         fonts[i]->ReleaseFaces();
 }
 
-void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor)
+void SystemUI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor)
 {
     WeakPtr<UIElement> element(GetElementAt(cursorPos));
 
-    for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+    for (HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
     {
         WeakPtr<UIElement> dragElement = i->first_;
-        UI::DragData* dragData = i->second_;
+        SystemUI::DragData* dragData = i->second_;
 
         if (!dragElement)
         {
@@ -1084,7 +1084,7 @@ void UI::ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, 
     }
 }
 
-void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+void SystemUI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
 {
     if (cursorVisible)
     {
@@ -1161,17 +1161,17 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
     }
 }
 
-void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
+void SystemUI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, int qualifiers, Cursor* cursor, bool cursorVisible)
 {
     if (cursorVisible)
     {
         WeakPtr<UIElement> element(GetElementAt(cursorPos));
 
         // Handle end of drag
-        for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+        for (HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
         {
             WeakPtr<UIElement> dragElement = i->first_;
-            UI::DragData* dragData = i->second_;
+            SystemUI::DragData* dragData = i->second_;
 
             if (!dragElement)
             {
@@ -1227,17 +1227,17 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
     }
 }
 
-void UI::ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor,
+void SystemUI::ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaPos, int buttons, int qualifiers, Cursor* cursor,
     bool cursorVisible)
 {
     if (cursorVisible && dragElementsCount_ > 0 && buttons)
     {
         Input* input = GetSubsystem<Input>();
         bool mouseGrabbed = input->IsMouseGrabbed();
-        for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+        for (HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
         {
             WeakPtr<UIElement> dragElement = i->first_;
-            UI::DragData* dragData = i->second_;
+            SystemUI::DragData* dragData = i->second_;
 
             if (!dragElement)
             {
@@ -1305,8 +1305,8 @@ void UI::ProcessMove(const IntVector2& cursorPos, const IntVector2& cursorDeltaP
     }
 }
 
-void UI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos,
-    UI::DragData* dragData)
+void SystemUI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const IntVector2& screenPos, const IntVector2& deltaPos,
+    SystemUI::DragData* dragData)
 {
     if (!element)
         return;
@@ -1337,7 +1337,7 @@ void UI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const In
     element->SendEvent(eventType, eventData);
 }
 
-void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button,
+void SystemUI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement* endElement, const IntVector2& pos, int button,
     int buttons, int qualifiers)
 {
     VariantMap& eventData = GetEventDataMap();
@@ -1355,7 +1355,7 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
     SendEvent(eventType, eventData);
 }
 
-void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScreenMode;
 
@@ -1368,7 +1368,7 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonDown;
 
@@ -1389,7 +1389,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         ProcessClickBegin(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
-void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseButtonUp;
 
@@ -1403,7 +1403,7 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     ProcessClickEnd(cursorPos, eventData[P_BUTTON].GetInt(), mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
-void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
@@ -1445,7 +1445,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     ProcessMove(cursorPos, DeltaP, mouseButtons_, qualifiers_, cursor_, cursorVisible);
 }
 
-void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
     if (input->IsMouseGrabbed())
@@ -1493,7 +1493,7 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
     if (input->IsMouseGrabbed())
@@ -1516,7 +1516,7 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         ProcessClickBegin(pos, touchId, touchId, 0, 0, true);
 }
 
-void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
 {
     using namespace TouchEnd;
 
@@ -1544,7 +1544,7 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     ProcessClickEnd(pos, touchId, 0, 0, 0, true);
 }
 
-void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace TouchMove;
 
@@ -1557,7 +1557,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     ProcessMove(pos, deltaPos, touchId, 0, 0, true);
 }
 
-void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace KeyDown;
 
@@ -1632,7 +1632,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextInput;
 
@@ -1644,7 +1644,7 @@ void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
         element->OnTextInput(eventData[P_TEXT].GetString(), mouseButtons_, qualifiers_);
 }
 
-void UI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // If have a cursor, and a drag is not going on, reset the cursor shape. Application logic that wants to apply
     // custom shapes can do it after this, but needs to do it each frame
@@ -1652,19 +1652,19 @@ void UI::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
         cursor_->SetShape(CS_NORMAL);
 }
 
-void UI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace PostUpdate;
 
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
-void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     RenderUpdate();
 }
 
-void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
+void SystemUI::HandleDropFile(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
 
@@ -1693,7 +1693,7 @@ void UI::HandleDropFile(StringHash eventType, VariantMap& eventData)
     }
 }
 
-HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator UI::DragElementErase(HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i)
+HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator SystemUI::DragElementErase(HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i)
 {
     // If running the engine frame in response to an event (re-entering UI frame logic) the dragElements_ may already be empty
     if (dragElements_.Empty())
@@ -1712,7 +1712,7 @@ HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator UI::DragElementErase(HashMa
     return i;
 }
 
-void UI::ProcessDragCancel()
+void SystemUI::ProcessDragCancel()
 {
     // How to tell difference between drag cancel and new selection on multi-touch?
     if (usingTouchInput_)
@@ -1722,10 +1722,10 @@ void UI::ProcessDragCancel()
     bool cursorVisible;
     GetCursorPositionAndVisible(cursorPos, cursorVisible);
 
-    for (HashMap<WeakPtr<UIElement>, UI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
+    for (HashMap<WeakPtr<UIElement>, SystemUI::DragData*>::Iterator i = dragElements_.Begin(); i != dragElements_.End();)
     {
         WeakPtr<UIElement> dragElement = i->first_;
-        UI::DragData* dragData = i->second_;
+        SystemUI::DragData* dragData = i->second_;
 
         if (dragElement && dragElement->IsEnabled() && dragElement->IsVisible() && !dragData->dragBeginPending)
         {
@@ -1739,7 +1739,7 @@ void UI::ProcessDragCancel()
     }
 }
 
-IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos)
+IntVector2 SystemUI::SumTouchPositions(SystemUI::DragData* dragData, const IntVector2& oldSendPos)
 {
     IntVector2 sendPos = oldSendPos;
     if (usingTouchInput_)

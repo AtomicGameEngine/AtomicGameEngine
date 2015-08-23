@@ -23,8 +23,8 @@
 #include "../../Core/Context.h"
 #include "../../Input/InputEvents.h"
 #include "Button.h"
-#include "UI.h"
-#include "UIEvents.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
 
 #include "../../DebugNew.h"
 
@@ -89,7 +89,7 @@ void Button::Update(float timeStep)
     }
 }
 
-void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
+void Button::GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
     if (hovering_ || HasFocus())

@@ -48,7 +48,7 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to the popup being shown.
     virtual void OnShowPopup();
     /// React to the popup being hidden.

@@ -48,7 +48,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
 
     /// Set texture.
     void SetTexture(Texture* texture);
@@ -98,7 +98,7 @@ public:
 protected:
     /// Return UI rendering batches with offset to image rectangle.
     void GetBatches
-        (PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
+        (PODVector<SystemUIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor, const IntVector2& offset);
 
     /// Texture.
     SharedPtr<Texture> texture_;
