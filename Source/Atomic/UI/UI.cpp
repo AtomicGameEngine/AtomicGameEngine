@@ -58,6 +58,9 @@ using namespace tb;
 #include "UIDimmer.h"
 
 #include "SystemUI/SystemUI.h"
+#include "SystemUI/SystemUIEvents.h"
+#include "SystemUI/DebugHud.h"
+#include "SystemUI/Console.h"
 
 namespace tb
 {
@@ -82,7 +85,8 @@ UI::UI(Context* context) :
     inputDisabled_(false),
     keyboardDisabled_(false),
     initialized_(false),
-    skinLoaded_(false)
+    skinLoaded_(false),
+    consoleVisible_(false)
 {
 
 }
@@ -154,6 +158,7 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_KEYUP, HANDLER(UI, HandleKeyUp));
     SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
+    SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
 
@@ -666,6 +671,54 @@ bool UI::OnWidgetDying(tb::TBWidget *widget)
     return false;
 }
 
+void UI::ShowDebugHud(bool value)
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
 
+    if (!hud)
+        return;
+
+    if (value)
+        hud->SetMode(SystemUI::DEBUGHUD_SHOW_ALL);
+    else
+        hud->SetMode(SystemUI::DEBUGHUD_SHOW_NONE);
+}
+
+void UI::ToggleDebugHud()
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (!hud)
+        return;
+
+    hud->ToggleAll();
+}
+
+void UI::ShowConsole(bool value)
+{
+    SystemUI::Console* console = GetSubsystem<SystemUI::Console>();
+
+    if (!console)
+        return;
+
+    console->SetVisible(value);
+    consoleVisible_ = console->IsVisible();
+}
+
+void UI::ToggleConsole()
+{
+    SystemUI::Console* console = GetSubsystem<SystemUI::Console>();
+
+    if (!console)
+        return;
+
+    console->Toggle();
+    consoleVisible_ = console->IsVisible();
+}
+
+void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
+{
+    consoleVisible_ = false;
+}
 
 }

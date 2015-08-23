@@ -377,6 +377,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 void Console::HandleCloseButtonPressed(StringHash eventType, VariantMap& eventData)
 {
     SetVisible(false);
+    SendEvent(E_CONSOLECLOSED);
 }
 
 void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)

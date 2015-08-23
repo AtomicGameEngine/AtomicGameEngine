@@ -1785,8 +1785,6 @@ void SystemUI::CreateConsoleAndDebugHud()
     context_->RegisterSubsystem(console);
     context_->RegisterSubsystem(debugHud);
 
-    console->Toggle();
-    debugHud->ToggleAll();
 }
 
 void RegisterSystemUILibrary(Context* context)

@@ -379,6 +379,11 @@ EVENT(E_UIDROPFILE, UIDropFile)
     PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
 }
 
+EVENT(E_CONSOLECLOSED, ConsoleClosed)
+{
+
+}
+
 }
 
 }

@@ -33,7 +33,7 @@ static int toupr_ascii(int ascii)
 
 void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_)
+    if (inputDisabled_ || consoleVisible_)
         return;
 
     using namespace MouseButtonDown;
@@ -77,7 +77,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_)
+    if (inputDisabled_ || consoleVisible_)
         return;
 
     using namespace MouseButtonUp;
@@ -109,7 +109,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace MouseMove;
 
-    if (inputDisabled_)
+    if (inputDisabled_ || consoleVisible_)
         return;
 
     int px = eventData[P_X].GetInt();
@@ -122,7 +122,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_)
+    if (inputDisabled_ || consoleVisible_)
         return;
 
     using namespace MouseWheel;
@@ -339,7 +339,7 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || keyboardDisabled_)
+    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
         return;
 
     using namespace KeyDown;
@@ -376,7 +376,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || keyboardDisabled_)
+    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
         return;
 
     using namespace KeyUp;
@@ -390,7 +390,7 @@ void UI::HandleKeyUp(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 {
-    if (inputDisabled_ || keyboardDisabled_)
+    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
         return;
 
     using namespace TextInput;
