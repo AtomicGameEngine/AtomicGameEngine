@@ -27,6 +27,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 /// %UI element that can be toggled between unchecked and checked state.
 class ATOMIC_API CheckBox : public BorderImage
 {
@@ -67,5 +71,7 @@ protected:
     /// Current checked state.
     bool checked_;
 };
+
+}
 
 }

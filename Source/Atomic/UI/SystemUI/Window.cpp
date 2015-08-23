@@ -32,6 +32,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 static const int DEFAULT_RESIZE_BORDER = 4;
 
 extern const char* UI_CATEGORY;
@@ -417,6 +420,8 @@ bool Window::CheckAlignment() const
         return true;
     else
         return false;
+}
+
 }
 
 }

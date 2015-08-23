@@ -30,6 +30,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 static const float DEFAULT_SCROLL_STEP = 0.1f;
 static const float DEFAULT_REPEAT_DELAY = 0.4f;
 static const float DEFAULT_REPEAT_RATE = 20.0f;
@@ -318,6 +322,8 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
             forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
                 MOUSEB_LEFT, 0, 0, 0, forwardButton_);
     }
+}
+
 }
 
 }

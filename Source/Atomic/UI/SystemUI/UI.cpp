@@ -60,6 +60,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 StringHash VAR_ORIGIN("Origin");
 const StringHash VAR_ORIGINAL_PARENT("OriginalParent");
 const StringHash VAR_ORIGINAL_CHILD_INDEX("OriginalChildIndex");
@@ -1783,6 +1786,8 @@ void RegisterUILibrary(Context* context)
     DropDownList::RegisterObject(context);
     MessageBox::RegisterObject(context);
     ToolTip::RegisterObject(context);
+}
+
 }
 
 }

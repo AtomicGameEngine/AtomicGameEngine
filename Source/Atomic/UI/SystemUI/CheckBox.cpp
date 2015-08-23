@@ -31,6 +31,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 extern const char* UI_CATEGORY;
 
 CheckBox::CheckBox(Context* context) :
@@ -107,6 +110,8 @@ void CheckBox::SetCheckedOffset(const IntVector2& offset)
 void CheckBox::SetCheckedOffset(int x, int y)
 {
     checkedOffset_ = IntVector2(x, y);
+}
+
 }
 
 }

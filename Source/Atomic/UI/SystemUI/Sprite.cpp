@@ -30,6 +30,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 extern const char* blendModeNames[];
 extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
@@ -276,6 +279,8 @@ void Sprite::SetTextureAttr(const ResourceRef& value)
 ResourceRef Sprite::GetTextureAttr() const
 {
     return GetResourceRef(texture_, Texture2D::GetTypeStatic());
+}
+
 }
 
 }

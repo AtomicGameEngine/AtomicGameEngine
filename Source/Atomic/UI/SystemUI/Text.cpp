@@ -36,6 +36,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 const char* textEffects[] =
 {
     "None",
@@ -760,6 +763,8 @@ void Text::ConstructBatch(UIBatch& pageBatch, const PODVector<GlyphLocation>& pa
         for (unsigned i = startDataSize; i < dataSize; i += UI_VERTEX_SIZE)
             pageBatch.vertexData_->At(i + 2) += depthBias;
     }
+}
+
 }
 
 }

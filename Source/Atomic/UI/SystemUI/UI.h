@@ -29,15 +29,19 @@
 namespace Atomic
 {
 
-class Cursor;
 class Graphics;
 class ResourceCache;
 class Timer;
-class UIBatch;
-class UIElement;
 class VertexBuffer;
 class XMLElement;
 class XMLFile;
+
+namespace SystemUI
+{
+
+class Cursor;
+class UIBatch;
+class UIElement;
 
 /// %UI subsystem. Manages the graphical user interface.
 class ATOMIC_API UI : public Object
@@ -335,5 +339,7 @@ private:
 
 /// Register UI library objects.
 void ATOMIC_API RegisterUILibrary(Context* context);
+
+}
 
 }

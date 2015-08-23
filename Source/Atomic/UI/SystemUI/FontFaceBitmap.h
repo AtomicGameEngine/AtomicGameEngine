@@ -30,6 +30,10 @@ namespace Atomic
 class Image;
 class Serializer;
 
+namespace SystemUI
+{
+
+
 /// Bitmap font face description.
 class ATOMIC_API FontFaceBitmap : public FontFace
 {
@@ -58,5 +62,7 @@ private:
     /// Blit.
     void Blit(Image* dest, int x, int y, int width, int height, Image* source, int sourceX, int sourceY, int components);
 };
+
+}
 
 }

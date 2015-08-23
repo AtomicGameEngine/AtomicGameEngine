@@ -32,6 +32,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 static const char* shapeNames[] =
 {
     "Normal",
@@ -302,6 +305,8 @@ void Cursor::ApplyOSCursorShape()
 void Cursor::HandleMouseVisibleChanged(StringHash eventType, VariantMap& eventData)
 {
     ApplyOSCursorShape();
+}
+
 }
 
 }

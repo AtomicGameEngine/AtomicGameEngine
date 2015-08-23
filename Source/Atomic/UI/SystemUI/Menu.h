@@ -27,6 +27,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 /// %Menu %UI element that optionally shows a popup.
 class ATOMIC_API Menu : public Button
 {
@@ -107,5 +111,7 @@ private:
     /// Auto popup flag.
     bool autoPopup_;
 };
+
+}
 
 }

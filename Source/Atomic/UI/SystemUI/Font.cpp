@@ -37,6 +37,10 @@
 namespace Atomic
 {
 
+
+namespace SystemUI
+{
+
 static const int MIN_POINT_SIZE = 1;
 static const int MAX_POINT_SIZE = 96;
 
@@ -225,6 +229,8 @@ FontFace* Font::GetFaceBitmap(int pointSize)
 
     faces_[pointSize] = newFace;
     return newFace;
+}
+
 }
 
 }

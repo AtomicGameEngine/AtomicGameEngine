@@ -31,6 +31,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 const char* orientations[] =
 {
     "Horizontal",
@@ -277,6 +280,8 @@ void Slider::Page(const IntVector2& position, bool pressed)
     eventData[P_PRESSED] = pressed;
 
     SendEvent(E_SLIDERPAGED, eventData);
+}
+
 }
 
 }

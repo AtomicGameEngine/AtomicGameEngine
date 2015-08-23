@@ -31,6 +31,9 @@ namespace Atomic
 class Texture;
 class Texture2D;
 
+namespace SystemUI
+{
+
 /// %Image %UI element with optional border.
 class ATOMIC_API BorderImage : public UIElement
 {
@@ -112,5 +115,7 @@ protected:
     /// Tiled flag.
     bool tiled_;
 };
+
+}
 
 }

@@ -30,6 +30,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 extern const char* blendModeNames[];
 extern const char* UI_CATEGORY;
 
@@ -206,6 +209,8 @@ void BorderImage::SetTextureAttr(const ResourceRef& value)
 ResourceRef BorderImage::GetTextureAttr() const
 {
     return GetResourceRef(texture_, Texture2D::GetTypeStatic());
+}
+
 }
 
 }

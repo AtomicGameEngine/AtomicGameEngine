@@ -32,6 +32,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 FontGlyph::FontGlyph() :
     page_(M_MAX_UNSIGNED),
     used_(false)
@@ -119,6 +123,8 @@ SharedPtr<Texture2D> FontFace::LoadFaceTexture(SharedPtr<Image> image)
         return SharedPtr<Texture2D>();
     }
     return texture;
+}
+
 }
 
 }

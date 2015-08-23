@@ -28,6 +28,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 /// Tooltip %UI element.
 class ATOMIC_API ToolTip : public UIElement
 {
@@ -62,5 +65,7 @@ private:
     /// Original offset position to the parent.
     IntVector2 originalPosition_;
 };
+
+}
 
 }

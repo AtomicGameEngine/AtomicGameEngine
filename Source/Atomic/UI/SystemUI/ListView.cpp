@@ -34,6 +34,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 static const char* highlightModes[] =
 {
     "Never",
@@ -1133,6 +1137,8 @@ void ListView::UpdateUIClickSubscription()
     UnsubscribeFromEvent(E_UIMOUSECLICK);
     UnsubscribeFromEvent(E_UIMOUSECLICKEND);
     SubscribeToEvent(selectOnClickEnd_ ? E_UIMOUSECLICKEND : E_UIMOUSECLICK, HANDLER(ListView, HandleUIMouseClick));
+}
+
 }
 
 }

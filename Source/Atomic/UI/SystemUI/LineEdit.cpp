@@ -32,6 +32,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 StringHash VAR_DRAGDROPCONTENT("DragDropContent");
 
 extern const char* UI_CATEGORY;
@@ -658,6 +662,8 @@ void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 void LineEdit::HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)
 {
     UpdateCursor();
+}
+
 }
 
 }

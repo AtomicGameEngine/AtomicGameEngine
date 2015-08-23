@@ -27,8 +27,12 @@
 namespace Atomic
 {
 
-class FreeTypeLibrary;
 class Texture2D;
+
+namespace SystemUI
+{
+
+class FreeTypeLibrary;
 
 /// Free type font face description.
 class ATOMIC_API FontFaceFreeType : public FontFace
@@ -68,5 +72,7 @@ private:
     /// Glyph area allocator.
     AreaAllocator allocator_;
 };
+
+}
 
 }

@@ -29,6 +29,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 Vector3 UIBatch::posAdjust(0.0f, 0.0f, 0.0f);
 
 UIBatch::UIBatch() :
@@ -324,6 +327,8 @@ void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
         return;
 
     batches.Push(batch);
+}
+
 }
 
 }

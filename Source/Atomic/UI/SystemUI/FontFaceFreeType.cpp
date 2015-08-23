@@ -39,6 +39,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 /// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
@@ -448,6 +452,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     glyphMapping_[charCode] = fontGlyph;
 
     return true;
+}
+
 }
 
 }

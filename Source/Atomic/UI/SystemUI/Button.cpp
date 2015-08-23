@@ -31,6 +31,10 @@
 namespace Atomic
 {
 
+
+namespace SystemUI
+{
+
 extern const char* UI_CATEGORY;
 
 Button::Button(Context* context) :
@@ -184,6 +188,8 @@ void Button::SetPressed(bool enable)
 {
     pressed_ = enable;
     SetChildOffset(pressed_ ? pressedChildOffset_ : IntVector2::ZERO);
+}
+
 }
 
 }

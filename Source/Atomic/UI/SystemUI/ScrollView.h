@@ -27,6 +27,10 @@
 namespace Atomic
 {
 
+
+namespace SystemUI
+{
+
 class BorderImage;
 class ScrollBar;
 
@@ -189,5 +193,7 @@ private:
     /// Handle the scroll smoothing.
     void ScrollSmooth(float timeStep);
 };
+
+}
 
 }

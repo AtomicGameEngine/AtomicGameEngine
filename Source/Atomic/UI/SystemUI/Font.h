@@ -28,6 +28,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 class FontFace;
 
 static const int FONT_TEXTURE_MIN_SIZE = 128;
@@ -105,5 +108,7 @@ private:
     /// Signed distance field font flag.
     bool sdfFont_;
 };
+
+}
 
 }

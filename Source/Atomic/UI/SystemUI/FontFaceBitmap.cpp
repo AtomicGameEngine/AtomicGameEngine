@@ -37,6 +37,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 FontFaceBitmap::FontFaceBitmap(Font* font) :
     FontFace(font)
 {
@@ -380,6 +384,8 @@ void FontFaceBitmap::Blit(Image* dest, int x, int y, int width, int height, Imag
         destData += dest->GetWidth() * components;
         sourceData += source->GetWidth() * components;
     }
+}
+
 }
 
 }

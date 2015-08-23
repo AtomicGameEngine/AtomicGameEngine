@@ -33,6 +33,10 @@ class PixelShader;
 class Graphics;
 class Matrix3x4;
 class Texture;
+
+namespace SystemUI
+{
+
 class UIElement;
 
 static const unsigned UI_VERTEX_SIZE = 6;
@@ -89,5 +93,7 @@ public:
     /// Position adjustment vector for pixel-perfect rendering. Initialized by UI.
     static Vector3 posAdjust;
 };
+
+}
 
 }

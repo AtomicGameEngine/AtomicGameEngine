@@ -34,6 +34,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 static const float STEP_FACTOR = 300.0f;
 
 extern const char* UI_CATEGORY;
@@ -699,6 +702,8 @@ void ScrollView::ScrollSmooth(float timeStep)
         else
             touchScrollSpeed_.y_ = 0;
     }
+}
+
 }
 
 }

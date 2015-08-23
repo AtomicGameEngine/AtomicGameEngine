@@ -31,6 +31,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 /// %Cursor shapes recognized by the UI subsystem.
 enum CursorShape
 {
@@ -141,5 +145,7 @@ protected:
     /// OS cursor shape needs update flag.
     bool osShapeDirty_;
 };
+
+}
 
 }

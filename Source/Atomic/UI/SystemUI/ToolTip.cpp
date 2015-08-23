@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 extern const char* UI_CATEGORY;
 
 ToolTip::ToolTip(Context* context) :
@@ -103,6 +106,8 @@ void ToolTip::Update(float timeStep)
 void ToolTip::SetDelay(float delay)
 {
     delay_ = delay;
+}
+
 }
 
 }

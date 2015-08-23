@@ -29,9 +29,13 @@
 namespace Atomic
 {
 
-class Font;
 class Image;
 class Texture2D;
+
+namespace SystemUI
+{
+
+class Font;
 
 /// %Font glyph description.
 struct FontGlyph
@@ -114,5 +118,7 @@ protected:
     /// Row height.
     int rowHeight_;
 };
+
+}
 
 }

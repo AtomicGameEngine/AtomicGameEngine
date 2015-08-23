@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 /// Push button %UI element.
 class ATOMIC_API Button : public BorderImage
 {
@@ -105,5 +108,7 @@ protected:
     /// Current pressed state.
     bool pressed_;
 };
+
+}
 
 }

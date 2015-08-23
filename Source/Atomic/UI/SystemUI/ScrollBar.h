@@ -27,6 +27,10 @@
 namespace Atomic
 {
 
+
+namespace SystemUI
+{
+
 class Button;
 class Slider;
 
@@ -127,5 +131,7 @@ private:
     /// Handle slider touch and click on "paging" area.
     void HandleSliderPaged(StringHash eventType, VariantMap& eventData);
 };
+
+}
 
 }

@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 static const int DEFAULT_FONT_SIZE = 12;
 
 class Font;
@@ -259,5 +262,7 @@ protected:
     /// UTF8 to Unicode.
     void DecodeToUnicode();
 };
+
+}
 
 }

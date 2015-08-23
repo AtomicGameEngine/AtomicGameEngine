@@ -37,6 +37,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 const char* horizontalAlignments[] =
 {
     "Left",
@@ -2024,6 +2027,8 @@ void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     using namespace PostUpdate;
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+}
+
 }
 
 }

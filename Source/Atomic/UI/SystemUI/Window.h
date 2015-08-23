@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 /// %Window movement and resizing modes.
 enum WindowDragMode
 {
@@ -164,5 +167,7 @@ protected:
     /// Modal frame size, used when modal flag is set.
     IntVector2 modalFrameSize_;
 };
+
+}
 
 }

@@ -27,10 +27,14 @@
 namespace Atomic
 {
 
+class XMLFile;
+
+namespace SystemUI
+{
+
 class Button;
 class Text;
 class UIElement;
-class XMLFile;
 
 /// Message box dialog.
 class ATOMIC_API MessageBox : public Object
@@ -72,5 +76,7 @@ private:
     /// OK button element.
     Button* okButton_;
 };
+
+}
 
 }

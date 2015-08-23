@@ -35,6 +35,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 extern const char* UI_CATEGORY;
 
 DropDownList::DropDownList(Context* context) :
@@ -336,6 +339,8 @@ void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData
     int key = eventData[P_KEY].GetInt();
     if (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER)
         HandleItemClicked(eventType, eventData);
+}
+
 }
 
 }

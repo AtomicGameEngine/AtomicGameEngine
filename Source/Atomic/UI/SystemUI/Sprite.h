@@ -28,6 +28,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 /// %UI element which allows sub-pixel positioning and size, as well as rotation. Only other Sprites should be added as child elements.
 class ATOMIC_API Sprite : public UIElement
 {
@@ -121,5 +124,7 @@ protected:
     /// Transform matrix.
     mutable Matrix3x4 transform_;
 };
+
+}
 
 }

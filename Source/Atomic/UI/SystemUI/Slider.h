@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 /// %Slider bar %UI element.
 class ATOMIC_API Slider : public BorderImage
 {
@@ -117,5 +120,7 @@ protected:
     /// Paging minimum repeat timer.
     Timer repeatTimer_;
 };
+
+}
 
 }

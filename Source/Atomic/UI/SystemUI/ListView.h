@@ -27,6 +27,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 /// %ListView selection highlight mode.
 enum HighlightMode
 {
@@ -185,5 +189,7 @@ private:
     /// Update subscription to UI click events
     void UpdateUIClickSubscription();
 };
+
+}
 
 }

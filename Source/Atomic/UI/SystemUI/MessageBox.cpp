@@ -35,6 +35,10 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
+
 MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile,
     XMLFile* styleFile) :
     Object(context),
@@ -139,6 +143,8 @@ void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eve
     SendEvent(E_MESSAGEACK, newEventData);
 
     this->ReleaseRef();
+}
+
 }
 
 }

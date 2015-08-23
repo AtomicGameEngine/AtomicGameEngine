@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 class Font;
 class Text;
 
@@ -163,5 +166,7 @@ private:
     /// Handle the element layout having been updated.
     void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData);
 };
+
+}
 
 }

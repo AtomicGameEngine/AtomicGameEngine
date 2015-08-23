@@ -33,6 +33,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 const StringHash VAR_SHOW_POPUP("ShowPopup");
 extern StringHash VAR_ORIGIN;
 
@@ -434,6 +437,8 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
         HandlePressedReleased(eventType, eventData);
     }
+}
+
 }
 
 }

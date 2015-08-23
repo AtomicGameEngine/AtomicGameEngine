@@ -30,6 +30,11 @@
 namespace Atomic
 {
 
+class ResourceCache;
+
+namespace SystemUI
+{
+
 /// %UI element horizontal alignment.
 enum HorizontalAlignment
 {
@@ -106,7 +111,6 @@ static const unsigned DD_TARGET = 0x2;
 static const unsigned DD_SOURCE_AND_TARGET = 0x3;
 
 class Cursor;
-class ResourceCache;
 
 /// Base class for %UI elements.
 class ATOMIC_API UIElement : public Animatable
@@ -711,6 +715,8 @@ private:
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index)
 {
     return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index));
+}
+
 }
 
 }

@@ -27,6 +27,9 @@
 namespace Atomic
 {
 
+namespace SystemUI
+{
+
 class ListView;
 
 /// %Menu %UI element that displays a popup list view.
@@ -118,5 +121,7 @@ private:
     /// Selected item index attribute.
     unsigned selectionAttr_;
 };
+
+}
 
 }
