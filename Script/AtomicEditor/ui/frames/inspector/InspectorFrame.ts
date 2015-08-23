@@ -117,7 +117,7 @@ class InspectorFrame extends ScriptWidget {
         if (this.inspectingNode != ev.node)
             return;
 
-        this.inspectNode = null;
+        this.inspectingNode = null;
 
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
