@@ -23,6 +23,7 @@ endif()
 file (GLOB ATOMIC2D_SOURCE Atomic2D/*.cpp Atomic2D/*.h)
 file (GLOB SCENE_SOURCE Scene/*.cpp Scene/*.h)
 file (GLOB UI_SOURCE UI/*.cpp UI/*.h)
+file (GLOB SYSTEM_UI_SOURCE UI/SystemUI/*.cpp UI/SystemUI/*.h)
 
 if (NOT ATOMIC_BUILD_2D)
   file (GLOB ATOMIC3D_SOURCE Atomic3D/*.cpp Atomic3D/*.h)
@@ -34,11 +35,11 @@ endif()
 file (GLOB GRAPHICS_SOURCE Graphics/*.cpp Graphics/*.h)
 
 if (MSVC)
-    if (ATOMIC_D3D11)  
+    if (ATOMIC_D3D11)
       file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D11/*.cpp Graphics/Direct3D11/*.h)
     else()
       file (GLOB GRAPHICS_IMPL_SOURCE Graphics/Direct3D9/*.cpp Graphics/Direct3D9/*.h)
-    endif()  
+    endif()
 else()
 
 # for kNet
@@ -67,7 +68,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
-                  ${SCENE_SOURCE} ${UI_SOURCE}
+                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
                   ${PLATFORM_SOURCE})
 
 if (NOT EMSCRIPTEN)

@@ -1,5 +1,3 @@
-#ifdef __DISABLED
-
 //
 // Copyright (c) 2008-2015 the Urho3D project.
 //
@@ -22,30 +20,31 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/Context.h"
+#include "../../Core/CoreEvents.h"
+#include "../../Engine/EngineEvents.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/GraphicsEvents.h"
+#include "../../Input/Input.h"
+#include "../../IO/IOEvents.h"
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "DropDownList.h"
+#include "Font.h"
+#include "LineEdit.h"
+#include "ListView.h"
+#include "ScrollBar.h"
+#include "Text.h"
+#include "SystemUI.h"
+#include "SystemUIEvents.h"
+#include "Console.h"
 
-#include "../Core/Context.h"
-#include "../Core/CoreEvents.h"
-#include "../Engine/Console.h"
-#include "../Engine/EngineEvents.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/GraphicsEvents.h"
-#include "../Input/Input.h"
-#include "../IO/IOEvents.h"
-#include "../IO/Log.h"
-#include "../Resource/ResourceCache.h"
-#include "../UI/DropDownList.h"
-#include "../UI/Font.h"
-#include "../UI/LineEdit.h"
-#include "../UI/ListView.h"
-#include "../UI/ScrollBar.h"
-#include "../UI/Text.h"
-#include "../UI/UI.h"
-#include "../UI/UIEvents.h"
-
-#include "../DebugNew.h"
+#include "../../DebugNew.h"
 
 namespace Atomic
+{
+
+namespace SystemUI
 {
 
 static const int DEFAULT_CONSOLE_ROWS = 16;
@@ -58,7 +57,7 @@ Console::Console(Context* context) :
     historyPosition_(0),
     printing_(false)
 {
-    UI* ui = GetSubsystem<UI>();
+    SystemUI* ui = GetSubsystem<SystemUI>();
     UIElement* uiRoot = ui->GetRoot();
 
     // By default prevent the automatic showing of the screen keyboard
@@ -138,7 +137,7 @@ void Console::SetVisible(bool enable)
         bool hasInterpreter = PopulateInterpreter();
         commandLine_->SetVisible(hasInterpreter);
         if (hasInterpreter && focusOnShow_)
-            GetSubsystem<UI>()->SetFocusElement(lineEdit_);
+            GetSubsystem<SystemUI>()->SetFocusElement(lineEdit_);
 
         // Ensure the background has no empty space when shown without the lineedit
         background_->SetHeight(background_->GetMinHeight());
@@ -378,6 +377,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 void Console::HandleCloseButtonPressed(StringHash eventType, VariantMap& eventData)
 {
     SetVisible(false);
+    SendEvent(E_CONSOLECLOSED);
 }
 
 void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
@@ -409,7 +409,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     // Ensure UI-elements are not detached
     if (!background_->GetParent())
     {
-        UI* ui = GetSubsystem<UI>();
+        SystemUI* ui = GetSubsystem<SystemUI>();
         UIElement* uiRoot = ui->GetRoot();
         uiRoot->AddChild(background_);
         uiRoot->AddChild(closeButton_);
@@ -443,4 +443,4 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-#endif
+}

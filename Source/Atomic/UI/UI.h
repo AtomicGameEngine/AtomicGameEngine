@@ -62,6 +62,12 @@ public:
 
     void GetTBIDString(unsigned id, String& value);
 
+    void ShowDebugHud(bool value);
+    void ToggleDebugHud();
+
+    void ShowConsole(bool value);
+    void ToggleConsole();
+
     UIRenderer* GetRenderer() { return renderer_; }
 
 private:
@@ -96,6 +102,7 @@ private:
     bool keyboardDisabled_;
     bool initialized_;
     bool skinLoaded_;
+    bool consoleVisible_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -108,6 +115,7 @@ private:
     void HandleKey(bool keydown, int keycode, int scancode);
     void HandleTextInput(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
 
 
 };
