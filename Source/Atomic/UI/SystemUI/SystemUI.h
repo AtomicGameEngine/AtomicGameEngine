@@ -185,6 +185,8 @@ public:
         IntVector2 dragBeginSumPos;
     };
 
+    void CreateConsoleAndDebugHud();
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
@@ -338,7 +340,7 @@ private:
 };
 
 /// Register UI library objects.
-void ATOMIC_API RegisterUILibrary(Context* context);
+void ATOMIC_API RegisterSystemUILibrary(Context* context);
 
 }
 

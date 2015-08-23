@@ -51,6 +51,9 @@
 #include "SystemUIEvents.h"
 #include "Window.h"
 
+#include "Console.h"
+#include "DebugHud.h"
+
 #include <SDL/include/SDL.h>
 
 #include "../../DebugNew.h"
@@ -112,7 +115,7 @@ SystemUI::SystemUI(Context* context) :
     rootModalElement_->SetTraversalMode(TM_DEPTH_FIRST);
 
     // Register UI library object factories
-    RegisterUILibrary(context_);
+    RegisterSystemUILibrary(context_);
 
     SubscribeToEvent(E_SCREENMODE, HANDLER(SystemUI, HandleScreenMode));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(SystemUI, HandleMouseButtonDown));
@@ -708,7 +711,7 @@ void SystemUI::Initialize()
     SubscribeToEvent(E_POSTUPDATE, HANDLER(SystemUI, HandlePostUpdate));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(SystemUI, HandleRenderUpdate));
 
-    LOGINFO("Initialized user interface");
+    LOGINFO("Initialized system user interface");
 }
 
 void SystemUI::Update(float timeStep, UIElement* element)
@@ -1765,7 +1768,28 @@ IntVector2 SystemUI::SumTouchPositions(SystemUI::DragData* dragData, const IntVe
     return sendPos;
 }
 
-void RegisterUILibrary(Context* context)
+void SystemUI::CreateConsoleAndDebugHud()
+{
+    // Get default style
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+
+    Console* console = new Console(context_);
+    console->SetDefaultStyle(xmlFile);
+    console->GetBackground()->SetOpacity(0.8f);
+
+    DebugHud* debugHud = new DebugHud(context_);
+    debugHud->SetDefaultStyle(xmlFile);
+
+    // Create console & debug hud
+    context_->RegisterSubsystem(console);
+    context_->RegisterSubsystem(debugHud);
+
+    console->Toggle();
+    debugHud->ToggleAll();
+}
+
+void RegisterSystemUILibrary(Context* context)
 {
     Font::RegisterObject(context);
 

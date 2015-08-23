@@ -30,10 +30,11 @@
 namespace Atomic
 {
 
+extern const char* blendModeNames[];
+
 namespace SystemUI
 {
 
-extern const char* blendModeNames[];
 extern const char* horizontalAlignments[];
 extern const char* verticalAlignments[];
 extern const char* UI_CATEGORY;

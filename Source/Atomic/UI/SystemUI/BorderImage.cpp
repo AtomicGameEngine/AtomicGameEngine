@@ -30,10 +30,12 @@
 namespace Atomic
 {
 
+extern const char* blendModeNames[];
+
+
 namespace SystemUI
 {
 
-extern const char* blendModeNames[];
 extern const char* UI_CATEGORY;
 
 BorderImage::BorderImage(Context* context) :

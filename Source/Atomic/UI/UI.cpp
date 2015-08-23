@@ -57,6 +57,8 @@ using namespace tb;
 #include "UISeparator.h"
 #include "UIDimmer.h"
 
+#include "SystemUI/SystemUI.h"
+
 namespace tb
 {
 
@@ -158,6 +160,10 @@ void UI::Initialize(const String& languageFile)
     tb::TBWidgetListener::AddGlobalListener(this);
 
     initialized_ = true;
+
+    SystemUI::SystemUI* systemUI = new SystemUI::SystemUI(context_);
+    context_->RegisterSubsystem(systemUI);
+    systemUI->CreateConsoleAndDebugHud();
 
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 }
@@ -299,6 +305,8 @@ void UI::Render(bool resetRenderTargets)
 {
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
+
+    GetSubsystem<SystemUI::SystemUI>()->Render();
 }
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)

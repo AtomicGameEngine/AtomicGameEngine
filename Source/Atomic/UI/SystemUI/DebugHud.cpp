@@ -1,5 +1,3 @@
-#ifdef __DISABLED
-
 //
 // Copyright (c) 2008-2015 the Urho3D project.
 //
@@ -22,19 +20,23 @@
 // THE SOFTWARE.
 //
 
-#include "../Precompiled.h"
+#include "../../Core/CoreEvents.h"
+#include "../../Core/Profiler.h"
+#include "../../Engine/Engine.h"
+#include "../../Graphics/Graphics.h"
+#include "../../Graphics/Renderer.h"
+#include "../../IO/Log.h"
+#include "Font.h"
+#include "Text.h"
+#include "SystemUI.h"
+#include "DebugHud.h"
 
-#include "../Core/CoreEvents.h"
-#include "../Core/Profiler.h"
-#include "../Engine/DebugHud.h"
-#include "../Engine/Engine.h"
-#include "../Graphics/Graphics.h"
-#include "../Graphics/Renderer.h"
-#include "../IO/Log.h"
-
-#include "../DebugNew.h"
+#include "../../DebugNew.h"
 
 namespace Atomic
+{
+
+namespace SystemUI
 {
 
 static const char* qualityTexts[] =
@@ -59,7 +61,7 @@ DebugHud::DebugHud(Context* context) :
     useRendererStats_(false),
     mode_(DEBUGHUD_SHOW_NONE)
 {
-    UI* ui = GetSubsystem<UI>();
+    SystemUI* ui = GetSubsystem<SystemUI>();
     UIElement* uiRoot = ui->GetRoot();
 
     statsText_ = new Text(context_);
@@ -100,7 +102,7 @@ void DebugHud::Update()
     // Ensure UI-elements are not detached
     if (!statsText_->GetParent())
     {
-        UI* ui = GetSubsystem<UI>();
+        SystemUI* ui = GetSubsystem<SystemUI>();
         UIElement* uiRoot = ui->GetRoot();
         uiRoot->AddChild(statsText_);
         uiRoot->AddChild(modeText_);
@@ -264,5 +266,4 @@ void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-
-#endif
+}
