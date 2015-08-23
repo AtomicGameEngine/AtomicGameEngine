@@ -71,7 +71,8 @@ class WelcomeFrame extends ScriptWidget {
         nameField.skinBg = "ImageCaption";
         nameField.text = example.name;
 
-        var nameRect = [0, image.imageHeight / 2 - 16, image.imageWidth / 2, 16];
+        var nameRect = [0, image.imageHeight / 2 - 16, image.imageWidth / 2, image.imageHeight / 2];
+
         nameField.rect = nameRect;
 
         nameField.gravity = Atomic.UI_GRAVITY_BOTTOM;
@@ -104,9 +105,10 @@ class WelcomeFrame extends ScriptWidget {
 
         descField.adaptToContentSize = true;
 
-        lp.minWidth /= 2;
-        lp.maxHeight = lp.minHeight;
-        lp.maxWidth = lp.minWidth;
+        lp.height = 42;
+
+        lp.width = image.imageWidth/2;
+
         descField.layoutParams = lp;
 
         exampleLayout.addChild(descField);
@@ -128,7 +130,7 @@ class WelcomeFrame extends ScriptWidget {
         var exampleJsonFile = this.exampleInfoDir + "Examples.json";
 
         var jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
-        var examples = <ExamplesFormat> JSON.parse(jsonFile.readText());
+        var examples = <ExamplesFormat>JSON.parse(jsonFile.readText());
 
         for (var i in examples.examples) {
 
