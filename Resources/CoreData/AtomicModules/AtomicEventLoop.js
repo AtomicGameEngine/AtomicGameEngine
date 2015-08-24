@@ -35,8 +35,6 @@ EventLoop = {
     expiring: null, // set to timer being expired (needs special handling in clearTimeout/clearInterval/clearImmediate)
     nextTimerId: 1,
     minimumDelay: 1,
-    minimumWait: 1,
-    maximumWait: 60000,
     maxExpirys: 10,
 
     // misc
@@ -209,6 +207,18 @@ EventLoop.processTimers = function () {
             // 'removed' above.
             this.insertTimer(t);
         }
+    }
+    // see if there are any events left over for this cycle
+    n = timers.length;
+    if (timers.length <= 0) {
+        return false;
+    }
+    t = timers[n - 1];
+    if (now > t.target) {
+        // we have more timers that need to be handled.  Let the driver know that we should pick them up in the next cycle
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -451,14 +461,32 @@ function requestEventLoopExit() {
     EventLoop.requestExit();
 }
 
-// Hook into the update event of the engine and process all the timers
-Atomic.engine.subscribeToEvent('Update', function updateTimer() {
-    EventLoop.processTimers();
-});
+// Create a closure that will throttle the EventLoop.processTimers function from being executed too often
+function throttleProcessTimers(ms) {
+    var deltaTimer = 0;
+    var pendingOps = false;
 
-// Hook into the postUpdate event of the engine and process all the setImmediate calls
-Atomic.engine.subscribeToEvent('PostUpdate', function updateImmediates() {
-    EventLoop.processImmediates();
+    function doThrottle(eventData) {
+        deltaTimer += eventData.timeStep * 1000;
+        if (deltaTimer > ms || pendingOps) {
+            deltaTimer -= ms;
+            // double check to see if we have more timers that expire during this sim
+            // if we do, then we want to process them in the next update, and not 
+            // wait 100ms
+            pendingOps = EventLoop.processTimers();
+        }
+    }
+    return doThrottle;
+}
+
+// Hook into the update event of the engine and process all the timers.  These
+// will be throttled to only run every 100ms
+Atomic.engine.subscribeToEvent('Update', throttleProcessTimers(100));
+
+// Hook into the postUpdate event of the engine and process all the setImmediate calls.  These should
+// really process once the current update loop is completed.
+Atomic.engine.subscribeToEvent('PostUpdate', function () {
+    EventLoop.processImmediates;
 });
 
 // Load up the global methods .  This module doesn't export anything, it just sets up the global methods.
@@ -472,4 +500,3 @@ Atomic.engine.subscribeToEvent('PostUpdate', function updateImmediates() {
 
     global.requestEventLoopExit = global.requestEventLoopExit || requestEventLoopExit;
 })(new Function('return this')());
-
