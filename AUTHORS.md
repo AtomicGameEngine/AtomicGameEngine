@@ -11,6 +11,7 @@
 
 - rsredsq (https://github.com/rsredsq)
 
+- Shaddock Heath (https://github.com/shaddockh)
 
 ### Contribution Copyright and Licensing
 
