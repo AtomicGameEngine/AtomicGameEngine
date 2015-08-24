@@ -25,6 +25,7 @@ using namespace tb;
 
 #include "../Core/CoreEvents.h"
 #include "../IO/Log.h"
+#include "../IO/FileSystem.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 #include "../Resource/ResourceCache.h"
@@ -182,9 +183,35 @@ void UI::LoadSkin(const String& skin, const String& overrideSkin)
 
 void UI::LoadDefaultPlayerSkin()
 {
-    LoadSkin("DefaultUI/skin/skin.tb.txt");
-    AddFont("DefaultUI/fonts/vera.ttf", "Vera");
-    SetDefaultFont("Vera", 12);
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String skin = "DefaultUI/skin/skin.tb.txt";
+    String overrideSkin;
+
+    // see if we have an override skin
+    SharedPtr<File> skinFile = cache->GetFile("UI/Skin/skin.ui.txt", false);
+    if (skinFile.NotNull())
+    {
+        skinFile->Close();
+        skin = "UI/Skin/skin.ui.txt";
+    }
+
+    // see if we have an override skin
+    SharedPtr<File> overrideFile = cache->GetFile("UI/Skin/Override/skin.ui.txt", false);
+
+    if (overrideFile.NotNull())
+    {
+        overrideFile->Close();
+        overrideSkin = "UI/Skin/Override/skin.ui.txt";
+    }
+
+    LoadSkin(skin, overrideSkin);
+
+    if (skin == "DefaultUI/skin/skin.tb.txt")
+    {
+        AddFont("DefaultUI/fonts/vera.ttf", "Vera");
+        SetDefaultFont("Vera", 12);
+    }
 }
 
 void UI::SetDefaultFont(const String& name, int size)

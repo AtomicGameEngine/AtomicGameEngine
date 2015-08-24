@@ -40,6 +40,9 @@ public:
 
     void LoadSkin(const String& skin, const String& overrideSkin = String::EMPTY);
     bool GetSkinLoaded() { return skinLoaded_; }
+
+    /// Load the default skin, will also look in resoures for UI/Skin/skin.ui.txt and
+    /// UI/Skin/Override/skin.ui.txt for base skin and possible override (TODO: baked in UI setting for load from project)
     void LoadDefaultPlayerSkin();
 
 

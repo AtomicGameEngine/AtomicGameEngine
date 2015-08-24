@@ -214,6 +214,7 @@ static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = fal
 
     node->RemoveAllComponents();
     node->UnsubscribeFromAllEvents();
+    node->Remove();
 
 }
 

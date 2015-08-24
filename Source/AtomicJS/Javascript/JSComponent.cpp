@@ -314,6 +314,9 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
 
 void JSComponent::CallScriptMethod(const String& name, bool passValue, float value)
 {
+    if (destroyed_ || !node_ || !node_->GetScene())
+        return;
+
     void* heapptr = JSGetHeapPtr();
 
     if (!heapptr)
