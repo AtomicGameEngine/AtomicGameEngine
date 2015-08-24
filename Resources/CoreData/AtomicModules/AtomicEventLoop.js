@@ -485,8 +485,8 @@ Atomic.engine.subscribeToEvent('Update', throttleProcessTimers(100));
 
 // Hook into the postUpdate event of the engine and process all the setImmediate calls.  These should
 // really process once the current update loop is completed.
-Atomic.engine.subscribeToEvent('PostUpdate', function () {
-    EventLoop.processImmediates;
+Atomic.engine.subscribeToEvent('PostUpdate', function (eventData) {
+    EventLoop.processImmediates();
 });
 
 // Load up the global methods .  This module doesn't export anything, it just sets up the global methods.
