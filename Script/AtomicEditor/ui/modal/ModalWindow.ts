@@ -3,9 +3,12 @@ import EditorUI = require("../EditorUI");
 
 class ModalWindow extends Atomic.UIWindow {
 
-    constructor() {
+    constructor(disableClose:boolean = false) {
 
         super();
+
+        if (disableClose)
+          this.settings = Atomic.UI_WINDOW_SETTINGS_DEFAULT & ~Atomic.UI_WINDOW_SETTINGS_CLOSE_BUTTON;
 
         var view = EditorUI.getView();
         view.addChild(this);

@@ -610,6 +610,16 @@ void LicenseSystem::RequestServerActivation(const String& key)
     SubscribeToEvent(serverActivation_, E_CURLCOMPLETE, HANDLER(LicenseSystem, HandleActivationResult));
 }
 
+bool LicenseSystem::GetSourceBuild()
+{
+
+#ifdef ATOMIC_SOURCE_BUILD
+    return true;
+#else
+    return false;
+#endif
+}
+
 }
 
 // END LICENSE MANAGEMENT
