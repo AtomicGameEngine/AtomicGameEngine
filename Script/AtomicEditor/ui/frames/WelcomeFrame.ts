@@ -34,6 +34,14 @@ class WelcomeFrame extends ScriptWidget {
 
     }
 
+    handleClickedExample(example: ExampleFormat) {
+
+      var ops = EditorUI.getModelOps();
+      var env = ToolCore.toolEnvironment;
+      ops.showCreateProject(env.toolDataDir + "AtomicExamples/" + example.folder + "/", this.exampleInfoDir + example.screenshot);
+
+    }
+
     addExample(example: ExampleFormat) {
 
         var exlayout = <Atomic.UILayout>this.getWidget("examples_layout");
@@ -60,6 +68,12 @@ class WelcomeFrame extends ScriptWidget {
         button.skinBg = "StarButton";
         button.id = id;
         var image = new Atomic.UIImageWidget();
+
+        button.onClick = () => {
+
+          this.handleClickedExample(example);
+
+        }
 
         image.image = this.exampleInfoDir + example.screenshot;
         image.skinBg = "ImageFrame";
@@ -125,13 +139,16 @@ class WelcomeFrame extends ScriptWidget {
 
     initExampleBrowser() {
 
-        this.exampleInfoDir = "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicEditor/ExampleInfo/";
+        var env = ToolCore.toolEnvironment;
+
+        this.exampleInfoDir =env.toolDataDir + "ExampleInfo/";
 
         var exampleJsonFile = this.exampleInfoDir + "Examples.json";
 
         var jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
         if (!jsonFile.isOpen())
             return;
+
         var examples = <ExamplesFormat>JSON.parse(jsonFile.readText());
 
         for (var i in examples.examples) {
@@ -142,6 +159,7 @@ class WelcomeFrame extends ScriptWidget {
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+
         if (ev.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
             if (ev.target.id == "recentList") {
                 this.openFrameMenu(ev.x, ev.y);
@@ -214,6 +232,7 @@ class WelcomeFrame extends ScriptWidget {
     exampleInfoDir: string;
     exampleCount = 0;
     currentExampleLayout: Atomic.UILayout;
+    exampleInfos:[ExampleFormat];
 
     recent: string[] = [];
     recentList: Atomic.UIListView;
