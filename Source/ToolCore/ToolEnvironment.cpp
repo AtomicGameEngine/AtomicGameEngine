@@ -33,11 +33,12 @@ bool ToolEnvironment::InitFromPackage()
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 	editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
+    String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
 #else
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
+    String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
 #endif
 
-	String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
     toolDataDir_ =  resourcesDir + "ToolData/";
 
     return true;
