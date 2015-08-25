@@ -48,6 +48,8 @@ public:
 
     void Initialize();
 
+    bool GetSourceBuild();
+
     bool LicenseWindows() { return licenseWindows_; }
     bool LicenseMac() { return licenseMac_; }
     bool LicenseAndroid() { return licenseAndroid_; }

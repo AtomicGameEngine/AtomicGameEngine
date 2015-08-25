@@ -9,6 +9,7 @@ class EditorLicense extends Atomic.ScriptObject {
 
         this.subscribeToEvent("LicenseEulaRequired", (eventData) => this.handleLicenseEulaRequired(eventData));
         this.subscribeToEvent("LicenseActivationRequired", (eventData) => this.handleLicenseActivationRequired(eventData));
+        this.subscribeToEvent("LicenseSuccess", (eventData) => this.handleLicenseSuccess(eventData));
 
     }
 
@@ -26,6 +27,16 @@ class EditorLicense extends Atomic.ScriptObject {
 
     }
 
+    handleLicenseSuccess(eventData) {
+
+        if (ToolCore.licenseSystem.sourceBuild && ToolCore.licenseSystem.isStandardLicense()) {
+
+          var ops = EditorUI.getModelOps();
+          ops.showProWindow("AtomicEditor/editor/ui/sourceinfo.tb.txt");
+
+        }
+
+    }
 
 }
 

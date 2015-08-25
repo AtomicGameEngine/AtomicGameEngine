@@ -19,6 +19,7 @@ if (ATOMIC_DEV_BUILD)
     add_definitions("-DATOMIC_DEV_BUILD=1")
 endif()
 
+add_definitions("-DATOMIC_SOURCE_BUILD=1")
 
 # this is here as QtCreator is having trouble picking up #include <Atomic/*> without it
 include_directories(${CMAKE_SOURCE_DIR}/Source ${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)
