@@ -19,6 +19,7 @@ declare module Atomic {
     export var fileSystem: FileSystem;
     export var network: Network;
     export var ui: UI;
+    export var audio: Audio;
 
     export var editorMode: Editor.EditorMode;
 
