@@ -13,6 +13,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu atomic editor", editorItems);
         MenuItemSources.createMenuItemSource("menu edit", editItems);
         MenuItemSources.createMenuItemSource("menu file", fileItems);
+        MenuItemSources.createMenuItemSource("menu build", buildItems);
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
     }
@@ -137,10 +138,18 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+        } else if (target.id == "menu build popup") {
+
+            if (refid == "build build") {
+                var buildNotification = new Atomic.UIMessageWindow(EditorUI.getMainFrame(), "build_notify");
+                buildNotification.show("Build Notification", "Building is currently unavailable in this development snapshot.", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 300, 140);
+
+                return true;
+            }
+
         }
 
     }
-
 
 }
 
@@ -184,6 +193,13 @@ var toolsItems = {
     "Toggle Profiler": ["tools toggle profiler"]
 
 }
+
+var buildItems = {
+
+    "Build": ["build build"]
+
+}
+
 
 var developerItems = {
 
