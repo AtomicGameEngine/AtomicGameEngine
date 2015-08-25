@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path'); 
 
 var jakeRoot = __dirname;
 
@@ -131,7 +132,7 @@ namespace('package', function() {
     jake.cpR(jakeRoot + "/Resources/EditorData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
     jake.cpR(jakeRoot + "/Resources/PlayerData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
     jake.cpR(jakeRoot + "/Script", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
-    jake.cpR(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
+    jake.cpR(jakeRoot + "/Data/AtomicEditor/", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/");
 
   });
 
@@ -152,6 +153,7 @@ namespace('package', function() {
     jake.cpR(jakeRoot + "/Resources/EditorData", windowsPackageFolder + "/Resources");
     jake.cpR(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources");
     jake.cpR(jakeRoot + "/Script", windowsPackageFolder + "/Resources");
+    jake.cpR(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData/");
     jake.cpR(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", windowsPackageFolder + "/Resources");
 
 
