@@ -38,14 +38,13 @@ bool ToolEnvironment::InitFromPackage()
 #endif
 
 	String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
-	projectTemplatesDir_ = resourcesDir + "ProjectTemplates/";
+    toolDataDir_ =  resourcesDir + "ToolData/";
 
     return true;
 }
 
 bool ToolEnvironment::InitFromJSON(bool atomicTool)
 {
-
 
     // make sure config path is initialized
     GetDevConfigFilename();
@@ -119,7 +118,7 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
     resourcePlayerDataDir_ = rootSourceDir_ + "Resources/PlayerData";
     resourceEditorDataDir_ = rootSourceDir_ + "Resources/EditorData";
 
-    projectTemplatesDir_ = rootSourceDir_ + "Data/AtomicEditor/ProjectTemplates/";
+    toolDataDir_ = rootSourceDir_ + "Data/AtomicEditor/";
 }
 
 void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPaths)
@@ -166,8 +165,7 @@ void ToolEnvironment::Dump()
     LOGINFOF("Tool Binary: %s", toolBinary_.CString());
 
 
-    LOGINFOF("Project Templates Dir: %s", projectTemplatesDir_.CString());
-    LOGINFOF("Examples Dir: %s", examplesDir_.CString());
+    LOGINFOF("Tool Data Dir: %s", toolDataDir_.CString());
 
     LOGINFOF("Deployment Data Dir: %s", deploymentDataDir_.CString());
 

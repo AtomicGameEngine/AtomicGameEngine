@@ -37,8 +37,8 @@ class NewProject extends ModalWindow {
 
             if (projectType) {
 
-                var env = ToolCore.getToolEnvironment();
-                var projectTemplateFolder = env.projectTemplatesDir + projectType;
+                var env = ToolCore.toolEnvironment;
+                var projectTemplateFolder = env.toolDataDir + "ProjectTemplates/" + projectType;
 
                 this.hide();
 

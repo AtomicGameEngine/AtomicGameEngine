@@ -48,8 +48,7 @@ public:
     /// Data directories
     const String& GetDeploymentDataDir() { return toolBinary_; }
 
-    const String& GetProjectTemplatesDir() { return projectTemplatesDir_; }
-    const String& GetExamplesDir() { return examplesDir_; }
+    const String& GetToolDataDir() { return toolDataDir_; }
 
     const String& GetDevConfigFilename();
 
@@ -72,11 +71,7 @@ private:
     // path to the AtomicTool command line binary
     String toolBinary_;
 
-    // examples directory
-    String examplesDir_;
-
-    // project templates directory
-    String projectTemplatesDir_;
+    String toolDataDir_;
 
     // resources
     String resourceCoreDataDir_;
