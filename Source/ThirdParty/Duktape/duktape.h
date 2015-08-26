@@ -5,7 +5,7 @@
  *  include guard.  Other parts of the header are Duktape
  *  internal and related to platform/compiler/feature detection.
  *
- *  Git commit de0a9aa6126e92054d0f36393371e26562f8b9ec (v1.2.0-373-gde0a9aa-dirty).
+ *  Git commit 50171d671af34f2c403acf61c6dc83f2d2561e24 (v1.2.0-398-g50171d6).
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
  *  licensing information.
@@ -114,21 +114,6 @@
 
 #define DUK_SINGLE_FILE
 
-// ATOMIC BEGIN
-
-// Disabling Voluntary GC as there is a finalization issue
-// and this seems to smooth out framerate
-// https://github.com/svaarala/duktape/issues/108
-#define DUK_OPT_NO_VOLUNTARY_GC
-
-// enable JSON string fast path which requires fast int
-// https://github.com/svaarala/duktape/issues/204
-#define DUK_USE_JSON_STRINGIFY_FASTPATH
-#define DUK_USE_FASTINT
-#define DUK_OPT_FASTINT
-
-// ATOMIC END
-
 /* External duk_config.h provides platform/compiler/OS dependent
  * typedefs and macros, and DUK_USE_xxx config options so that
  * the rest of Duktape doesn't need to do any feature detection.
@@ -229,7 +214,7 @@ struct duk_number_list_entry {
  * so that application code can easily log which Duktape snapshot was used.
  * Not available in the Ecmascript environment.
  */
-#define DUK_GIT_DESCRIBE                  "v1.2.0-373-gde0a9aa-dirty"
+#define DUK_GIT_DESCRIBE                  "v1.2.0-398-g50171d6"
 
 /* Duktape debug protocol version used by this build. */
 #define DUK_DEBUG_PROTOCOL_VERSION        1
