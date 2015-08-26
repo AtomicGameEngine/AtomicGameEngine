@@ -5,6 +5,8 @@
 
 - Josh Engebretson (Technical Director)
 
+- Lara Engebretson
+
 ### Contributors:
 
 - marynate (https://github.com/marynate)
