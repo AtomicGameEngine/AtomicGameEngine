@@ -172,5 +172,12 @@ bool PrefabImporter::SaveSettingsInternal()
     return true;
 }
 
+Node* PrefabImporter::InstantiateNode(Node* parent, const String& name)
+{
+    Node* node = parent->CreateChild(asset_->GetName());
+    PrefabComponent* pc = node->CreateComponent<PrefabComponent>();
+    pc->SetPrefabGUID(asset_->GetGUID());
+    return node;
+}
 
 }

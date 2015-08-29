@@ -3,6 +3,7 @@
 
 #include <Atomic/Core/Object.h>
 #include <Atomic/Resource/Resource.h>
+#include <Atomic/Scene/Node.h>
 
 #include "AssetImporter.h"
 
@@ -67,6 +68,9 @@ public:
     bool Load();
     // save .asset
     bool Save();
+
+    /// Instantiate a node from the asset
+    Node* InstantiateNode(Node* parent, const String& name);
 
 
 private:

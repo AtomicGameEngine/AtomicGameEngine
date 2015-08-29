@@ -143,7 +143,7 @@ TBImage TBImageManager::GetImage(const char *filename)
 			m_frag_manager.FreeFragment(fragment);
 			image_rep = nullptr;
 		}
-		TBDebugOut(image_rep ? "TBImageManager - Loaded new image.\n" : "TBImageManager - Loading image failed.\n");
+        // TBDebugOut(image_rep ? "TBImageManager - Loaded new image.\n" : "TBImageManager - Loading image failed.\n");
 	}
 	return TBImage(image_rep);
 }
@@ -158,7 +158,7 @@ void TBImageManager::RemoveImageRep(TBImageRep *image_rep)
 	}
 	m_image_rep_hash.Remove(image_rep->hash_key);
 	image_rep->image_manager = nullptr;
-	TBDebugOut("TBImageManager - Removed image.\n");
+    //TBDebugOut("TBImageManager - Removed image.\n");
 }
 
 void TBImageManager::OnContextLost()

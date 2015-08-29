@@ -17,7 +17,9 @@ public:
 
     virtual void SetDefaults();
 
-    Resource* GetResource(const String& typeName);
+    Resource* GetResource(const String& typeName = String::EMPTY);
+
+    Node* InstantiateNode(Node* parent, const String& name);
 
 protected:
 

@@ -361,4 +361,16 @@ Resource* Asset::GetResource(const String &typeName)
     return 0;
 }
 
+Node* Asset::InstantiateNode(Node* parent, const String& name)
+{
+    if (!parent)
+        return 0;
+
+    if (importer_)
+        return importer_->InstantiateNode(parent, name);
+
+    return 0;
+
+}
+
 }
