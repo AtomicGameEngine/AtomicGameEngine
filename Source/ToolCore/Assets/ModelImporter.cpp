@@ -11,6 +11,7 @@
 #include <Atomic/Atomic3D/Model.h>
 
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/XMLFile.h>
 
 #include "../Import/OpenAssetImporter.h"
 
@@ -367,5 +368,20 @@ Resource* ModelImporter::GetResource(const String& typeName)
 
 }
 
+Node* ModelImporter::InstantiateNode(Node* parent, const String& name)
+{
+    SharedPtr<File> file(new File(context_, asset_->GetCachePath()));
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+
+    if (!xml->Load(*file))
+        return 0;
+
+    Node* node = parent->CreateChild(name);
+
+    node->LoadXML(xml->GetRoot());
+    node->SetName(asset_->GetName());
+
+    return node;
+}
 
 }

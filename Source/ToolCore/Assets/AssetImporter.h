@@ -3,6 +3,7 @@
 
 #include <Atomic/Core/Object.h>
 #include <Atomic/Resource/JSONFile.h>
+#include <Atomic/Scene/Node.h>
 
 using namespace Atomic;
 
@@ -37,6 +38,9 @@ public:
     virtual Resource* GetResource(const String& typeName = String::EMPTY) { return 0; }
 
     bool RequiresCacheFile() const { return requiresCacheFile_; }
+
+    /// Instantiate a node from the asset
+    virtual Node* InstantiateNode(Node* parent, const String& name) { return 0; }
 
 protected:
 

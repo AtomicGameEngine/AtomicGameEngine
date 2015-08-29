@@ -1,6 +1,8 @@
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
+#include <Atomic/Atomic2D/Sprite2D.h>
+#include <Atomic/Atomic2D/StaticSprite2D.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"
@@ -78,6 +80,22 @@ Resource* TextureImporter::GetResource(const String& typeName)
     return cache->GetResource(typeName, asset_->GetPath());
 
 }
+
+Node* TextureImporter::InstantiateNode(Node* parent, const String& name)
+{
+
+    Node* node = parent->CreateChild(name);
+
+    Sprite2D* spriteGraphic = GetSubsystem<ResourceCache>()->GetResource<Sprite2D>(asset_->GetPath());
+
+    StaticSprite2D* sprite = node->CreateComponent<StaticSprite2D>();
+
+    sprite->SetSprite(spriteGraphic);
+
+    return node;
+
+}
+
 
 
 }

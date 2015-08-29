@@ -44,6 +44,9 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent(EditorEvents.ActiveSceneChange, (data) => this.handleActiveSceneChanged(data));
 
+        // handle dropping on hierarchy, moving node, dropping prefabs, etc
+        this.subscribeToEvent(this.hierList.rootList, "DragEnded", (data) => this.handleDragEnded(data));
+
         this.subscribeToEvent(EditorEvents.SceneClosed, (ev: EditorEvents.SceneClosedEvent) => {
 
             if (ev.scene == this.scene) {
@@ -96,7 +99,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             if (ev.serializable.typeName == "Node") {
 
-                var node = <Atomic.Node> ev.serializable;
+                var node = <Atomic.Node>ev.serializable;
 
                 var itemID = this.nodeIDToItemID[node.id];
 
@@ -166,7 +169,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         // clear selected node
         this.sendEvent(EditorEvents.ActiveNodeChange, { node: null });
 
-        this.scene = <Atomic.Scene> data.scene;
+        this.scene = <Atomic.Scene>data.scene;
 
         this.populate();
 
@@ -215,40 +218,6 @@ class HierarchyFrame extends Atomic.UIWidget {
                     var dragObject = new Atomic.UIDragObject(node, node.name.length ? "Node: " + node.name : "Node: (Anonymous)");
                     this.hierList.rootList.dragObject = dragObject;
 
-                    // handle dropping on hierarchy, moving node
-                    this.subscribeToEvent(this.hierList.rootList, "DragEnded", (ev: Atomic.DragEndedEvent) => {
-
-                        var dragNode = <Atomic.Node> ev.dragObject.object;
-
-                        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
-
-                        if (!dropNode) {
-                            return;
-                        }
-
-                        // can't drop on self
-                        if (dragNode == dropNode) {
-                            return;
-                        }
-
-                        // check if dropping on child of ourselves
-                        var parent = dropNode.parent;
-
-                        while (parent) {
-
-                            if (parent == dragNode) {
-                                return;
-                            }
-
-                            parent = parent.parent;
-
-                        }
-
-                        // move it
-                        dropNode.addChild(dragNode);
-
-                    });
-
                 }
 
             }
@@ -283,7 +252,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             if (id == "hierList_") {
 
-                var list = <Atomic.UISelectList> data.target;
+                var list = <Atomic.UISelectList>data.target;
 
                 var selectedId = Number(list.selectedItemID);
                 var node = this.scene.getNode(selectedId);
@@ -387,6 +356,52 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.hierList.rootList.value = 0;
         this.hierList.setExpanded(parentID, true);
+
+    }
+
+    handleDragEnded(ev: Atomic.DragEndedEvent) {
+
+        var typeName = ev.dragObject.object.typeName;
+
+        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
+
+        if (!dropNode) return;
+
+        if (typeName == "Node") {
+
+            var dragNode = <Atomic.Node>ev.dragObject.object;
+
+            if (dragNode.scene != this.scene) {
+                return;
+            }
+
+            // can't drop on self
+            if (dragNode == dropNode) {
+                return;
+            }
+
+            // check if dropping on child of ourselves
+            var parent = dropNode.parent;
+
+            while (parent) {
+
+                if (parent == dragNode) {
+                    return;
+                }
+
+                parent = parent.parent;
+
+            }
+
+            // move it
+            dropNode.addChild(dragNode);
+
+        } else if (typeName == "Asset") {
+
+            var asset = <ToolCore.Asset>ev.dragObject.object;
+            asset.instantiateNode(dropNode, asset.name);
+
+        }
 
     }
 
