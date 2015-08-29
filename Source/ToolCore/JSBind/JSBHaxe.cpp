@@ -83,6 +83,8 @@ namespace ToolCore
             source_ += "    public static var input: Input;\n";
             source_ += "    public static var fileSystem: FileSystem;\n";
             source_ += "    public static var network: Network;\n";
+            source_ += "    public static var ui: UI;\n";
+            source_ += "    public static var audio: Audio;\n";
         }
     }
 

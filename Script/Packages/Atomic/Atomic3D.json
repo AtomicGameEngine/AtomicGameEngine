@@ -15,18 +15,26 @@
 		},
 		"AnimationState" : {
 			"AnimationState" : ["AnimatedModel", "Animation"]
+		},
+		"CustomGeometry" : {
+			"SetMaterial" : ["Material"]
 		}
 
 	},
 	"typescript_decl" : {
-
 		"StaticModel" : [
+			"setMaterialIndex(index:number, material:Material);"
+		],
+		"CustomGeometry" : [
 			"setMaterialIndex(index:number, material:Material);"
 		]
 	},
 
 	"haxe_decl" : {
 		"StaticModel" : [
+			"function setMaterialIndex(index:UInt, material:Material):Void;"
+		],
+		"CustomGeometry" : [
 			"function setMaterialIndex(index:UInt, material:Material):Void;"
 		]
 	}
