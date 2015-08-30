@@ -72,6 +72,7 @@ void BuildWeb::Build(const String& buildPath)
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.js", buildPath_ + "/AtomicPlayer.js");
     fileSystem->Copy(buildSourceDir + "/AtomicLoader.js", buildPath_ + "/AtomicLoader.js");
     fileSystem->Copy(buildSourceDir + "/index.html", buildPath_ + "/index.html");
+    fileSystem->Copy(buildSourceDir + "/Atomic_Logo_Header.png", buildPath_ + "/Atomic_Logo_Header.png");
 
     File file(context_, buildSourceDir + "/AtomicResources_js.template", FILE_READ);
     unsigned size = file.GetSize();
