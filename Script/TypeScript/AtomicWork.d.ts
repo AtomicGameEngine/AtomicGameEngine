@@ -230,6 +230,13 @@ declare module ToolCore {
 
     }
 
+    export interface PlatformChangedEvent {
+
+        platform:ToolCore.Platform;
+
+    }
+
+
     export var toolEnvironment: ToolEnvironment;
     export var toolSystem: ToolSystem;
     export var assetDatabase: AssetDatabase;

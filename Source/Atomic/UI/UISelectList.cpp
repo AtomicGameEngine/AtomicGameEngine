@@ -111,7 +111,7 @@ void UISelectList::SetSource(UISelectItemSource* source)
 
 bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
 {
-    return false;
+    return UIWidget::OnEvent(ev);
 }
 
 }

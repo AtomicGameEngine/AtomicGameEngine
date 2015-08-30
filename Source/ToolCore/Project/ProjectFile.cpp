@@ -87,31 +87,45 @@ bool ProjectFile::Load(Project* project)
     String fullpath = project->GetProjectFilePath();
 
     SharedPtr<File> file(new File(context_, fullpath, FILE_READ));
-    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    if (!jsonFile->BeginLoad(*file))
-        return false;
-
-    JSONValue root = jsonFile->GetRoot();
-
-    int version = root.GetInt("version");
-
-    if (version != PROJECTFILE_VERSION)
-        return false;
-
-    // project object
-    JSONValue jproject = root.GetChild("project");
-
-    if (jproject.IsObject())
+    if (file->GetSize() != 0)
     {
-        String pversion = jproject.GetString("version");
-        project_->SetVersion(pversion);
+
+        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+        if (!jsonFile->BeginLoad(*file))
+            return false;
+
+        JSONValue root = jsonFile->GetRoot();
+
+        int version = root.GetInt("version");
+
+        if (version != PROJECTFILE_VERSION)
+            return false;
+
+        // project object
+        JSONValue jproject = root.GetChild("project");
+
+        if (jproject.IsObject())
+        {
+            String pversion = jproject.GetString("version");
+            project_->SetVersion(pversion);
+        }
+
+        JSONValue platforms = root.GetChild("platforms");
+        if (!platforms.IsArray())
+            return false;
     }
 
-    JSONValue platforms = root.GetChild("platforms");
-    if (!platforms.IsArray())
-        return false;
+    // for now, every project gets all platforms
 
+    project_->AddPlatform(PLATFORMID_WINDOWS);
+    project_->AddPlatform(PLATFORMID_MAC);
+    project_->AddPlatform(PLATFORMID_ANDROID);
+    project_->AddPlatform(PLATFORMID_IOS);
+    project_->AddPlatform(PLATFORMID_WEB);
+
+    /*
     for (unsigned i = 0; i < platforms.GetSize(); i++)
     {
         String jplatform = platforms.GetString(i);
@@ -119,6 +133,7 @@ bool ProjectFile::Load(Project* project)
         if (platform)
             project_->AddPlatform(platform->GetPlatformID());
     }
+    */
 
     return true;
 

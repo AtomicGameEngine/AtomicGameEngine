@@ -145,7 +145,15 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 buildNotification.show("Build Notification", "Building is currently unavailable in this development snapshot.", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 300, 140);
 
                 return true;
+
+            } else if (refid == "build settings") {
+
+              EditorUI.getModelOps().showBuildSettings();
+
+              return true;
+
             }
+
 
         }
 
@@ -196,8 +204,8 @@ var toolsItems = {
 
 var buildItems = {
 
-    "Build": ["build build"]
-
+    "Build": ["build build", StringID.ShortcutBuild],
+    "Build Settings": ["build settings", StringID.ShortcutBuildSettings]
 }
 
 

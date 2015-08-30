@@ -10,6 +10,8 @@ import ActivationSuccessWindow = require("./license/ActivationSuccessWindow");
 import ManageLicense = require("./license/ManageLicense");
 import ProWindow = require("./license/ProWindow");
 
+import BuildSettingsWindow = require("./build/BuildSettingsWindow");
+
 import ResourceSelection = require("./ResourceSelection");
 
 import UIResourceOps = require("./UIResourceOps");
@@ -164,6 +166,15 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
+    showBuildSettings() {
+
+        if (this.show()) {
+
+            this.opWindow = new BuildSettingsWindow();
+
+        }
+
+    }
 
     showActivationSuccessWindow() {
 

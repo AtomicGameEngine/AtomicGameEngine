@@ -3,9 +3,10 @@
 	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
 							 "Source/ToolCore/Import", "Source/ToolCore/Assets", "Source/ToolCore/License"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
-							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter",
+							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
-							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem"],
+							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem",
+						 	 "ProjectUserPrefs", "ProjectBuildSettings"],
 	"typescript_decl" : {
 
 		"AssetDatabase" : [
