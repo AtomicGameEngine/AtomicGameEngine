@@ -76,17 +76,20 @@ class BuildSettingsWindow extends ModalWindow {
 
             if (ev.target.id == "build") {
 
-              var buildSystem = ToolCore.buildSystem;
-              var toolSystem = ToolCore.toolSystem;
+                var buildSystem = ToolCore.buildSystem;
+                var toolSystem = ToolCore.toolSystem;
 
-              buildSystem.buildPath = "/Users/josh/Desktop/MyBuilds/";
+                if (Atomic.platform == "Windows")
+                    buildSystem.buildPath = "C:/Users/Josh/Desktop/MyBuilds/";
+                else
+                    buildSystem.buildPath = "/Users/josh/Desktop/MyBuilds/";
+                    
+                var project = toolSystem.project;
+                var platform = toolSystem.currentPlatform;
 
-              var project = toolSystem.project;
-              var platform = toolSystem.currentPlatform;
-
-              var buildBase = platform.newBuild(project);
-              buildSystem.queueBuild(buildBase);
-              buildSystem.startNextBuild();
+                var buildBase = platform.newBuild(project);
+                buildSystem.queueBuild(buildBase);
+                buildSystem.startNextBuild();
 
             }
 

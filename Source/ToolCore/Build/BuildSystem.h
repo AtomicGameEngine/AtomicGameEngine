@@ -26,6 +26,8 @@ public:
 
     void SetBuildPath(const String& path) { buildPath_ = path; }
 
+    const String& GetBuildPath() const { return buildPath_; }
+
     void QueueBuild(BuildBase* buildBase);
 
     bool StartNextBuild();
