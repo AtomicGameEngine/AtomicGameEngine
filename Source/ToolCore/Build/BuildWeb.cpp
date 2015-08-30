@@ -7,6 +7,7 @@
 #include <Atomic/IO/File.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEnvironment.h"
 #include "../Project/Project.h"
 #include "BuildSystem.h"
 #include "BuildWeb.h"
@@ -27,20 +28,27 @@ BuildWeb::~BuildWeb()
 void BuildWeb::Initialize()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
     Project* project = tsystem->GetProject();
 
-    String dataPath = tsystem->GetDataPath();
+    Vector<String> defaultResourcePaths;
+    GetDefaultResourcePaths(defaultResourcePaths);
     String projectResources = project->GetResourcePath();
-    String coreDataFolder = dataPath + "CoreData/";
 
-    AddResourceDir(coreDataFolder);
+    for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
+    {
+        AddResourceDir(defaultResourcePaths[i]);
+    }
+
+    // TODO: smart filtering of cache
+    AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
     BuildResourceEntries();
 }
 void BuildWeb::Build(const String& buildPath)
 {
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
@@ -50,7 +58,7 @@ void BuildWeb::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
-    String dataPath = tsystem->GetDataPath();
+    String dataPath = tenv->GetToolDataDir();
 
     String buildSourceDir  = dataPath + "Deployment/Web";
 
@@ -62,6 +70,7 @@ void BuildWeb::Build(const String& buildPath)
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.html", buildPath_ + "/AtomicPlayer.html");
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.html.mem", buildPath_ + "/AtomicPlayer.html.mem");
     fileSystem->Copy(buildSourceDir + "/AtomicPlayer.js", buildPath_ + "/AtomicPlayer.js");
+    fileSystem->Copy(buildSourceDir + "/AtomicLoader.js", buildPath_ + "/AtomicLoader.js");
 
     File file(context_, buildSourceDir + "/AtomicResources_js.template", FILE_READ);
     unsigned size = file.GetSize();

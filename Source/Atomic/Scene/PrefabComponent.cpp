@@ -101,6 +101,8 @@ void PrefabComponent::LoadPrefabNode()
     this->SetTemporary(temporary);
     node->AddComponent(this, id, REPLICATED);
 
+#ifdef ATOMIC_3D
+
     // Get all the rigid bodies of the load node
     PODVector<RigidBody*> bodies;
     node_->GetComponents<RigidBody>(bodies, true);
@@ -110,6 +112,8 @@ void PrefabComponent::LoadPrefabNode()
         RigidBody* body = bodies[i];
         body->SetTransform(body->GetNode()->GetWorldPosition(), body->GetNode()->GetWorldRotation());
     }
+
+#endif
 
 }
 
