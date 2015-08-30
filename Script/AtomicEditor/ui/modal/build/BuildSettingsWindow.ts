@@ -45,16 +45,25 @@ class BuildSettingsWindow extends ModalWindow {
 
         platformcontainer.addChild(platformSelect);
 
-        this.addPlatformWidget("WINDOWS", new WindowsSettingsWidget(), 0);
-        this.addPlatformWidget("MAC", new MacSettingsWidget(), 1);
-        this.addPlatformWidget("ANDROID", new AndroidSettingsWidget(), 2);
-        this.addPlatformWidget("IOS", new IOSSettingsWidget(), 3);
-        this.addPlatformWidget("WEB", new WebSettingsWidget(), 4);
+        this.addPlatformWidget("WINDOWS", new WindowsSettingsWidget(), "LogoWindows", 0);
+        this.addPlatformWidget("MAC", new MacSettingsWidget(), "LogoMac", 1);
+        this.addPlatformWidget("ANDROID", new AndroidSettingsWidget(), "LogoAndroid", 2);
+        this.addPlatformWidget("IOS", new IOSSettingsWidget(), "LogoIOS", 3);
+        this.addPlatformWidget("WEB", new WebSettingsWidget(), "LogoHTML5", 4);
 
-        this.setDisplayPlatform(ToolCore.toolSystem.currentPlatform);
+        var currentPlatform = ToolCore.toolSystem.currentPlatform;
+        this.setDisplayPlatform(currentPlatform);
+
+        this.platformIndicator.skinBg = this.platformInfo[currentPlatform.name].logo;
 
         this.resizeToFitContent();
         this.center();
+
+        this.subscribeToEvent("PlatformChanged", (ev: ToolCore.PlatformChangedEvent) => {
+
+            this.platformIndicator.skinBg = this.platformInfo[ev.platform.name].logo;
+
+        });
 
         this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
     }
@@ -64,24 +73,46 @@ class BuildSettingsWindow extends ModalWindow {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
+            var toolSystem = ToolCore.toolSystem;
+
+            if (ev.target.id == "set_current_platform") {
+
+                var index = this.platformSelect.value;
+
+                for (var name in this.platformInfo) {
+
+                    var info: { widget: Atomic.UIWidget, index: number, logo: string } = this.platformInfo[name];
+
+                    if (info.index == index) {
+
+                        toolSystem.setCurrentPlatform(toolSystem.getPlatformByName(name).platformID);
+
+                        return true;
+                    }
+
+                }
+
+                return true;
+            }
+
             if (ev.refid == "WindowsBuildSettings") {
-                this.setDisplayPlatform(ToolCore.toolSystem.getPlatformByName("WINDOWS"));
+                this.setDisplayPlatform(toolSystem.getPlatformByName("WINDOWS"));
                 return true;
             }
             if (ev.refid == "MacBuildSettings") {
-                this.setDisplayPlatform(ToolCore.toolSystem.getPlatformByName("MAC"));
+                this.setDisplayPlatform(toolSystem.getPlatformByName("MAC"));
                 return true;
             }
             if (ev.refid == "AndroidBuildSettings") {
-                this.setDisplayPlatform(ToolCore.toolSystem.getPlatformByName("ANDROID"));
+                this.setDisplayPlatform(toolSystem.getPlatformByName("ANDROID"));
                 return true;
             }
             if (ev.refid == "iOSBuildSettings") {
-                this.setDisplayPlatform(ToolCore.toolSystem.getPlatformByName("IOS"));
+                this.setDisplayPlatform(toolSystem.getPlatformByName("IOS"));
                 return true;
             }
             if (ev.refid == "WebGLBuildSettings") {
-                this.setDisplayPlatform(ToolCore.toolSystem.getPlatformByName("WEB"));
+                this.setDisplayPlatform(toolSystem.getPlatformByName("WEB"));
                 return true;
             }
 
@@ -92,31 +123,31 @@ class BuildSettingsWindow extends ModalWindow {
 
     }
 
-    addPlatformWidget(name: string, widget: Atomic.UIWidget, index: number) {
+    addPlatformWidget(name: string, widget: Atomic.UIWidget, logo: string, index: number) {
 
-        this.allPlatformWidgets[name] = { widget: widget, index: index };
+        this.platformInfo[name] = { widget: widget, index: index, logo: logo };
         this.settingsContainer.addChild(widget);
 
     }
 
     setDisplayPlatform(platform: ToolCore.Platform) {
 
-        for (var name in this.allPlatformWidgets) {
+        for (var name in this.platformInfo) {
 
-            this.allPlatformWidgets[name].widget.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.platformInfo[name].widget.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
 
         }
 
         if (!platform) return;
 
-        var info: { widget: Atomic.UIWidget, index: number } = this.allPlatformWidgets[platform.name];
+        var info: { widget: Atomic.UIWidget, index: number, logo: string } = this.platformInfo[platform.name];
         info.widget.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
         if (this.platformSelect.value != info.index)
             this.platformSelect.value = info.index;
 
     }
 
-    allPlatformWidgets: {} = {};
+    platformInfo: {} = {};
 
     settingsContainer: Atomic.UILayout;
     platformSelect: Atomic.UISelectList;
