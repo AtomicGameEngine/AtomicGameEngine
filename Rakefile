@@ -150,14 +150,16 @@ namespace :build  do
 
       Dir.chdir(CMAKE_WEB_BUILD_FOLDER) do
         sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/Atomic/ WEB"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/AtomicPlayer/ WEB"
         sh "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
         sh "make -j4"
       end
 
-      #Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer") do
-      #  sh "mv AtomicPlayer AtomicPlayer.bc"
-      #  sh "emcc -O3 -s ASM_JS=1 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
-      #end
+      # -s ERROR_ON_UNDEFINED_SYMBOLS=1 (disabled for pthread errors currently on incoming)
+      Dir.chdir("#{CMAKE_WEB_BUILD_FOLDER}/Source/AtomicPlayer/Application") do
+        sh "mv AtomicPlayer AtomicPlayer.bc"
+        sh "emcc -O3 -s USE_PTHREADS=0 -s ASM_JS=1 -s VERBOSE=0 -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_EXIT_RUNTIME=1 ./AtomicPlayer.bc -o  ./AtomicPlayer.html"
+      end
 
   end
 
