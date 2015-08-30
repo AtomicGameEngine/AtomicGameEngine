@@ -24,16 +24,23 @@
 
 #include <Atomic/Engine/Application.h>
 
+namespace Atomic
+{
+    class JSVM;
+}
+
 using namespace Atomic;
 
-/// AtomicPlayer application runs a script specified on the command line.
-class AtomicPlayer : public Application
+namespace AtomicPlayer
 {
-    OBJECT(AtomicPlayer);
+
+class AtomicPlayerApp : public Application
+{
+    OBJECT(AtomicPlayerApp);
 
 public:
     /// Construct.
-    AtomicPlayer(Context* context);
+    AtomicPlayerApp(Context* context);
 
     /// Setup before engine initialization. Verify that a script file has been specified.
     virtual void Setup();
@@ -43,14 +50,20 @@ public:
     virtual void Stop();
 
 private:
+
+    SharedPtr<JSVM> vm_;
+
     /// Handle reload start of the script file.
     void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
     /// Handle reload success of the script file.
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-    
-    /// Script file.
-    SharedPtr<File> jsFile_;
+
+    void HandleJSError(StringHash eventType, VariantMap& eventData);
+
+    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
 
 };
+
+}

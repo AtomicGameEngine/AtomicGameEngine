@@ -5,6 +5,7 @@
 #include <Atomic/IO/FileSystem.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEnvironment.h"
 #include "../Project/Project.h"
 #include "BuildMac.h"
 #include "BuildSystem.h"
@@ -37,6 +38,8 @@ void BuildMac::Initialize()
         AddResourceDir(defaultResourcePaths[i]);
     }
 
+    // TODO: smart filtering of cache
+    AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
     BuildResourceEntries();
@@ -46,6 +49,7 @@ void BuildMac::Initialize()
 void BuildMac::Build(const String& buildPath)
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
@@ -57,9 +61,7 @@ void BuildMac::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
-    String dataPath = tsystem->GetDataPath();
-
-    String appSrcPath = dataPath + "Deployment/MacOS/AtomicPlayer.app";
+    String appSrcPath = tenv->GetPlayerAppFolder();
 
     fileSystem->CreateDir(buildPath_);
 

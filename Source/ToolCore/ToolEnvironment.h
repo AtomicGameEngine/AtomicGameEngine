@@ -52,6 +52,9 @@ public:
 
     const String& GetDevConfigFilename();
 
+    // OSX
+    const String& GetPlayerAppFolder() { return playerAppFolder_; }
+
     void Dump();
 
 private:
@@ -67,6 +70,9 @@ private:
 
     // path to Atomic player binary used when running content from the editor or cli
     String playerBinary_;
+
+    // path to Atomic player app (OSX)
+    String playerAppFolder_;
 
     // path to the AtomicTool command line binary
     String toolBinary_;

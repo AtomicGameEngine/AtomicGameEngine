@@ -70,10 +70,25 @@ class BuildSettingsWindow extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
-
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
             var toolSystem = ToolCore.toolSystem;
+
+            if (ev.target.id == "build") {
+
+              var buildSystem = ToolCore.buildSystem;
+              var toolSystem = ToolCore.toolSystem;
+
+              buildSystem.buildPath = "/Users/josh/Desktop/MyBuilds/";
+
+              var project = toolSystem.project;
+              var platform = toolSystem.currentPlatform;
+
+              var buildBase = platform.newBuild(project);
+              buildSystem.queueBuild(buildBase);
+              buildSystem.startNextBuild();
+
+            }
 
             if (ev.target.id == "set_current_platform") {
 

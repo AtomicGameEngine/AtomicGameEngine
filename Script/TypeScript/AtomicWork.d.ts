@@ -241,6 +241,7 @@ declare module ToolCore {
     export var toolSystem: ToolSystem;
     export var assetDatabase: AssetDatabase;
     export var licenseSystem: LicenseSystem;
+    export var buildSystem: BuildSystem;
 
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;

@@ -70,6 +70,7 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
         for (unsigned j = 0; j < resourceEntries_.Size(); j++)
         {
             const BuildResourceEntry* entry = resourceEntries_[j];
+
             if (entry->packagePath_ == filename)
             {
                 BuildWarn(ToString("Resource Path: %s already exists", filename.CString()));
@@ -91,10 +92,16 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
 // END LICENSE MANAGEMENT
 
         newEntry->absolutePath_ = resourceDir + filename;
-        newEntry->packagePath_ = filename;
         newEntry->resourceDir_ = resourceDir;
 
+        if (resourceDir.EndsWith("/Cache/"))
+            newEntry->packagePath_ = "Cache/" + filename;
+        else
+            newEntry->packagePath_ = filename;
+
         resourceEntries_.Push(newEntry);
+
+        //LOGINFOF("Adding resource: %s : %s", newEntry->absolutePath_.CString(), newEntry->packagePath_.CString());
     }
 }
 

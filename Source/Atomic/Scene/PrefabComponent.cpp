@@ -50,7 +50,7 @@ void PrefabComponent::RegisterObject(Context* context)
 void PrefabComponent::LoadPrefabNode()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabGUID_);
+    XMLFile* xmlfile = cache->GetResource<XMLFile>("Cache/" + prefabGUID_);
 
     if (!xmlfile || !node_)
         return;

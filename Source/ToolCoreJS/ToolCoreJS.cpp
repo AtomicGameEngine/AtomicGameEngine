@@ -5,6 +5,7 @@
 #include <ToolCore/Assets/AssetDatabase.h>
 #include <ToolCore/Project/Project.h>
 #include <ToolCore/License/LicenseSystem.h>
+#include <ToolCore/Build/BuildSystem.h>
 
 using namespace Atomic;
 
@@ -118,6 +119,9 @@ void jsapi_init_toolcore(JSVM* vm)
 
     js_push_class_object_instance(ctx, vm->GetSubsystem<ToolSystem>(), "ToolSystem");
     duk_put_prop_string(ctx, -2, "toolSystem");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<BuildSystem>(), "BuildSystem");
+    duk_put_prop_string(ctx, -2, "buildSystem");
 
     duk_push_c_function(ctx, js_atomic_GetLicenseSystem, 0);
     duk_put_prop_string(ctx, -2, "getLicenseSystem");
