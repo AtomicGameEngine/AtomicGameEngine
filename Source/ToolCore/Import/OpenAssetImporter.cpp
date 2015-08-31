@@ -81,7 +81,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
         aiProcess_Triangulate |
         aiProcess_GenSmoothNormals |
         aiProcess_LimitBoneWeights |
-        aiProcess_ImproveCacheLocality |        
+        aiProcess_ImproveCacheLocality |
         aiProcess_FixInfacingNormals |
         aiProcess_FindInvalidData |
         aiProcess_GenUVCoords |
@@ -248,7 +248,7 @@ bool OpenAssetImporter::ExportModel(const String& outName, const String &animNam
         return false;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();    
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     Model* mdl = cache->GetResource<Model>( model.outName_);
 
     // Force a reload, though file watchers will catch this delayed and load again
@@ -1320,4 +1320,3 @@ void OpenAssetImporter::DumpNodes(aiNode* rootNode, unsigned level)
 }
 
 }
-

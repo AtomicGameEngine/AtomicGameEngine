@@ -9,7 +9,7 @@ include(AtomicUtils)
 
 add_definitions(-DATOMIC_ROOT_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -DATOMIC_ROOT_BUILD_DIR="${CMAKE_BINARY_DIR}")
 
-add_definitions( -DATOMIC_API= -DATOMIC_STATIC_DEFINE -DATOMIC_ATOMIC2D -DATOMIC_LOGGING)
+add_definitions( -DATOMIC_API= -DATOMIC_STATIC_DEFINE -DATOMIC_ATOMIC2D -DATOMIC_LOGGING -DATOMIC_PROFILING)
 
 if (NOT DEFINED ATOMIC_DEV_BUILD)
     set(ATOMIC_DEV_BUILD 1)
@@ -19,6 +19,7 @@ if (ATOMIC_DEV_BUILD)
     add_definitions("-DATOMIC_DEV_BUILD=1")
 endif()
 
+add_definitions("-DATOMIC_SOURCE_BUILD=1")
 
 # this is here as QtCreator is having trouble picking up #include <Atomic/*> without it
 include_directories(${CMAKE_SOURCE_DIR}/Source ${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)

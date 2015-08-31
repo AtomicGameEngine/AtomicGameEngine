@@ -8,13 +8,6 @@
 namespace Atomic
 {
 
-enum TEXT_ALIGN
-{
-    TEXT_ALIGN_LEFT,		///< Aligned left
-    TEXT_ALIGN_RIGHT,	///< Aligned right
-    TEXT_ALIGN_CENTER	///< Aligned center
-};
-
 enum UI_EDIT_TYPE {
     UI_EDIT_TYPE_TEXT = tb::EDIT_TYPE_TEXT,
     UI_EDIT_TYPE_SEARCH = tb::EDIT_TYPE_SEARCH,
@@ -36,11 +29,16 @@ public:
 
     void AppendText(const String& text);
 
-    void SetTextAlign(TEXT_ALIGN align);
+    void SetTextAlign(UI_TEXT_ALIGN align);
+
+    void SetAdaptToContentSize(bool adapt);
+    bool GetAdaptToContentSize() const;
 
     void SetEditType(UI_EDIT_TYPE type);
 
     void SetReadOnly(bool readonly);
+    void SetStyling(bool styling);
+    void SetMultiline(bool multiline);
 
     void ScrollTo(int x, int y);
 

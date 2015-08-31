@@ -10,6 +10,7 @@
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Engine/Engine.h>
+#include <Atomic/Audio/Audio.h>
 #include <Atomic/UI/UI.h>
 
 #ifdef ATOMIC_NETWORK
@@ -214,6 +215,7 @@ static void js_atomic_destroy_node(Node* node, duk_context* ctx, bool root = fal
 
     node->RemoveAllComponents();
     node->UnsubscribeFromAllEvents();
+    node->Remove();
 
 }
 
@@ -352,6 +354,9 @@ void jsapi_init_atomic(JSVM* vm)
 
     duk_push_c_function(ctx, js_atomic_GetInput, 0);
     duk_put_prop_string(ctx, -2, "getInput");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Audio>(), "Audio");
+    duk_put_prop_string(ctx, -2, "audio");
 
     js_push_class_object_instance(ctx, vm->GetSubsystem<Input>(), "Input");
     duk_put_prop_string(ctx, -2, "input");

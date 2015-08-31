@@ -67,6 +67,9 @@ public:
 
     AnimationImportInfo* GetAnimationInfo(unsigned index) { return animationInfo_[index]; }
 
+    /// Instantiate a node from the asset
+    Node* InstantiateNode(Node* parent, const String& name);
+
 protected:
 
     bool Import();

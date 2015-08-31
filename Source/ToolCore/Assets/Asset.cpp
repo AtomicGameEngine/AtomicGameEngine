@@ -18,6 +18,7 @@
 #include "SpriterImporter.h"
 #include "TMXImporter.h"
 #include "PEXImporter.h"
+#include "TextImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -244,7 +245,7 @@ bool Asset::CreateImporter()
         textureFormats.Push(".dds");
 
         // todo, externalize recognizers
-        if (ext == ".fbx" || ext == ".blend" || ext == ".dae")
+        if (ext == ".fbx" || ext == ".blend" || ext == ".dae" || ext == ".mdl")
         {
             importer_ = new ModelImporter(context_, this);
         }
@@ -279,6 +280,10 @@ bool Asset::CreateImporter()
         else if (ext == ".pex")
         {
             importer_ = new PEXImporter(context_, this);
+        }
+        else if (ext == ".txt")
+        {
+            importer_ = new TextImporter(context_, this);
         }
         else if (textureFormats.Contains(ext))
         {
@@ -354,6 +359,18 @@ Resource* Asset::GetResource(const String &typeName)
         return importer_->GetResource(typeName);
 
     return 0;
+}
+
+Node* Asset::InstantiateNode(Node* parent, const String& name)
+{
+    if (!parent)
+        return 0;
+
+    if (importer_)
+        return importer_->InstantiateNode(parent, name);
+
+    return 0;
+
 }
 
 }

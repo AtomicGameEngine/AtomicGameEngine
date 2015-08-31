@@ -24,6 +24,9 @@ public:
 
     virtual bool Preload();
 
+    /// Instantiate a node from the asset
+    Node* InstantiateNode(Node* parent, const String& name);
+
 protected:
 
     bool Import();

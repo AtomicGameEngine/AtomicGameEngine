@@ -178,11 +178,14 @@ public:
     void AddAnimationResource(Animation* animation);
     void RemoveAnimationResource(Animation* animation);
     void ClearAnimationResources();
-    void SetAnimationResourcesAttr(const ResourceRefList& value);
-    const ResourceRefList& GetAnimationResourcesAttr() const;
+
 protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
+
+    // ATOMIC BEGIN
+    void ApplyAttributes();
+    // ATOMIC END
 
 private:
     /// Add an animation state either to AnimatedModel or as a node animation.
@@ -203,10 +206,6 @@ private:
 
     /// animation resources
     Vector<SharedPtr<Animation> > animationsResources_;
-
-    /// Material list attribute.
-    mutable ResourceRefList animationsResourcesAttr_;
-    ;
 };
 
 }

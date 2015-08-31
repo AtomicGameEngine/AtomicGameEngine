@@ -25,6 +25,7 @@ using namespace tb;
 
 #include "../Core/CoreEvents.h"
 #include "../IO/Log.h"
+#include "../IO/FileSystem.h"
 #include "../Input/Input.h"
 #include "../Input/InputEvents.h"
 #include "../Resource/ResourceCache.h"
@@ -57,6 +58,11 @@ using namespace tb;
 #include "UISeparator.h"
 #include "UIDimmer.h"
 
+#include "SystemUI/SystemUI.h"
+#include "SystemUI/SystemUIEvents.h"
+#include "SystemUI/DebugHud.h"
+#include "SystemUI/Console.h"
+
 namespace tb
 {
 
@@ -80,7 +86,8 @@ UI::UI(Context* context) :
     inputDisabled_(false),
     keyboardDisabled_(false),
     initialized_(false),
-    skinLoaded_(false)
+    skinLoaded_(false),
+    consoleVisible_(false)
 {
 
 }
@@ -152,12 +159,17 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_KEYUP, HANDLER(UI, HandleKeyUp));
     SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
+    SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
 
     tb::TBWidgetListener::AddGlobalListener(this);
 
     initialized_ = true;
+
+    SystemUI::SystemUI* systemUI = new SystemUI::SystemUI(context_);
+    context_->RegisterSubsystem(systemUI);
+    systemUI->CreateConsoleAndDebugHud();
 
     //TB_DEBUG_SETTING(LAYOUT_BOUNDS) = 1;
 }
@@ -171,9 +183,35 @@ void UI::LoadSkin(const String& skin, const String& overrideSkin)
 
 void UI::LoadDefaultPlayerSkin()
 {
-    LoadSkin("DefaultUI/skin/skin.tb.txt");
-    AddFont("DefaultUI/fonts/vera.ttf", "Vera");
-    SetDefaultFont("Vera", 12);
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String skin = "DefaultUI/skin/skin.tb.txt";
+    String overrideSkin;
+
+    // see if we have an override skin
+    SharedPtr<File> skinFile = cache->GetFile("UI/Skin/skin.ui.txt", false);
+    if (skinFile.NotNull())
+    {
+        skinFile->Close();
+        skin = "UI/Skin/skin.ui.txt";
+    }
+
+    // see if we have an override skin
+    SharedPtr<File> overrideFile = cache->GetFile("UI/Skin/Override/skin.ui.txt", false);
+
+    if (overrideFile.NotNull())
+    {
+        overrideFile->Close();
+        overrideSkin = "UI/Skin/Override/skin.ui.txt";
+    }
+
+    LoadSkin(skin, overrideSkin);
+
+    if (skin == "DefaultUI/skin/skin.tb.txt")
+    {
+        AddFont("DefaultUI/fonts/vera.ttf", "Vera");
+        SetDefaultFont("Vera", 12);
+    }
 }
 
 void UI::SetDefaultFont(const String& name, int size)
@@ -299,6 +337,8 @@ void UI::Render(bool resetRenderTargets)
 {
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
+
+    GetSubsystem<SystemUI::SystemUI>()->Render();
 }
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -658,6 +698,54 @@ bool UI::OnWidgetDying(tb::TBWidget *widget)
     return false;
 }
 
+void UI::ShowDebugHud(bool value)
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
 
+    if (!hud)
+        return;
+
+    if (value)
+        hud->SetMode(SystemUI::DEBUGHUD_SHOW_ALL);
+    else
+        hud->SetMode(SystemUI::DEBUGHUD_SHOW_NONE);
+}
+
+void UI::ToggleDebugHud()
+{
+    SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
+
+    if (!hud)
+        return;
+
+    hud->ToggleAll();
+}
+
+void UI::ShowConsole(bool value)
+{
+    SystemUI::Console* console = GetSubsystem<SystemUI::Console>();
+
+    if (!console)
+        return;
+
+    console->SetVisible(value);
+    consoleVisible_ = console->IsVisible();
+}
+
+void UI::ToggleConsole()
+{
+    SystemUI::Console* console = GetSubsystem<SystemUI::Console>();
+
+    if (!console)
+        return;
+
+    console->Toggle();
+    consoleVisible_ = console->IsVisible();
+}
+
+void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
+{
+    consoleVisible_ = false;
+}
 
 }

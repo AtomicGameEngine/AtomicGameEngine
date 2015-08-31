@@ -40,6 +40,9 @@ public:
 
     void LoadSkin(const String& skin, const String& overrideSkin = String::EMPTY);
     bool GetSkinLoaded() { return skinLoaded_; }
+
+    /// Load the default skin, will also look in resoures for UI/Skin/skin.ui.txt and
+    /// UI/Skin/Override/skin.ui.txt for base skin and possible override (TODO: baked in UI setting for load from project)
     void LoadDefaultPlayerSkin();
 
 
@@ -61,6 +64,12 @@ public:
     void PruneUnreachableWidgets();
 
     void GetTBIDString(unsigned id, String& value);
+
+    void ShowDebugHud(bool value);
+    void ToggleDebugHud();
+
+    void ShowConsole(bool value);
+    void ToggleConsole();
 
     UIRenderer* GetRenderer() { return renderer_; }
 
@@ -96,6 +105,7 @@ private:
     bool keyboardDisabled_;
     bool initialized_;
     bool skinLoaded_;
+    bool consoleVisible_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -108,6 +118,7 @@ private:
     void HandleKey(bool keydown, int keycode, int scancode);
     void HandleTextInput(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
 
 
 };

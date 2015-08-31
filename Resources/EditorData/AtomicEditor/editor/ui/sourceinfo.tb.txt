@@ -1,0 +1,16 @@
+TBLayout: axis: y, distribution: gravity
+	TBImageWidget: filename: "AtomicEditor/editor/images/source_header.jpg"
+		lp: width: 512, height: 167
+	TBEditField: multiline: 1, styling: 1, gravity: all, id: info, readonly: 1, scroll-mode: off
+		font: size: 14
+		text: "\nAtomic Pro is required for <color #76D6FF>GitHub development snapshots</color> and <color #76D6FF>custom engine builds</color>.\n\n" \
+		"\nPlease download the binary release or <color #D4FB79>upgrade to Atomic Pro</color>.\n\n"
+		lp: min-width: 480, min-height: 160
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout:
+		TBButton: text: Quit, id: quit
+			lp: min-width: 64, min-height: 64	
+		TBButton: text: Download Binary, id: download
+			lp: min-width: 128, min-height: 64
+		TBButton: text: Get Pro for Full Source, id: purchase, skin: TBButton.greentext
+			lp: min-width: 128, min-height: 64

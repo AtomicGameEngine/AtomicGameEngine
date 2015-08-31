@@ -11,6 +11,8 @@
 
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
+#include <Atomic/UI/SystemUI/DebugHud.h>
+
 #include "AEEditorMode.h"
 
 using namespace ToolCore;
@@ -32,6 +34,10 @@ EditorMode::~EditorMode()
 void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
     VariantMap startupData;
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
+    startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
+
     playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
 
     SendEvent("EditorPlayerStarted");

@@ -35,14 +35,6 @@
 
 #include <ToolCore/Assets/Asset.h>
 #include <ToolCore/Assets/AssetDatabase.h>
-#include <ToolCore/Assets/ModelImporter.h>
-#include <ToolCore/Assets/PrefabImporter.h>
-#include <ToolCore/Assets/SpriterImporter.h>
-#include <ToolCore/Assets/TextureImporter.h>
-
-#include <Atomic/Atomic2D/Sprite2D.h>
-#include <Atomic/Atomic2D/AnimationSet2D.h>
-#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 
 #include "../../EditorMode/AEEditorEvents.h"
 
@@ -483,64 +475,7 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
     if (object->GetType() == Asset::GetTypeStatic())
     {
         Asset* asset = (Asset*) object;
-        AssetImporter* importer = asset->GetImporter();
-
-        if (!importer)
-            return;
-
-        StringHash importerType = importer->GetType();
-
-        if (importerType == PrefabImporter::GetTypeStatic())
-        {
-            dragNode_ = scene_->CreateChild(asset->GetName());
-            PrefabComponent* pc = dragNode_->CreateComponent<PrefabComponent>();
-            pc->SetPrefabGUID(asset->GetGUID());
-        }
-        else if (importerType == ModelImporter::GetTypeNameStatic())
-        {
-            dragNode_ = scene_->CreateChild();
-
-            SharedPtr<File> file(new File(context_, asset->GetCachePath()));
-            SharedPtr<XMLFile> xml(new XMLFile(context_));
-
-            if (!xml->Load(*file))
-                return;
-
-            dragNode_->LoadXML(xml->GetRoot());
-            dragNode_->SetName(asset->GetName());
-        }
-        else if (importerType == SpriterImporter::GetTypeNameStatic())
-        {
-            AnimationSet2D* animationSet = GetSubsystem<ResourceCache>()->GetResource<AnimationSet2D>(asset->GetPath());
-
-            String animationName;
-
-            if (animationSet && animationSet->GetNumAnimations())
-            {
-                animationName = animationSet->GetAnimation(0)->GetName();
-            }
-
-            dragNode_ = scene_->CreateChild(asset->GetName());
-
-            AnimatedSprite2D* sprite = dragNode_->CreateComponent<AnimatedSprite2D>();
-
-            if (!animationName.Length())
-                sprite->SetAnimationSet(animationSet);
-            else
-                sprite->SetAnimation(animationSet, animationName);
-
-        }
-        else if (importerType == TextureImporter::GetTypeNameStatic())
-        {
-            dragNode_ = scene_->CreateChild(asset->GetName());
-
-            Sprite2D* spriteGraphic = GetSubsystem<ResourceCache>()->GetResource<Sprite2D>(asset->GetPath());
-
-            StaticSprite2D* sprite = dragNode_->CreateComponent<StaticSprite2D>();
-
-            sprite->SetSprite(spriteGraphic);
-        }
-
+        dragNode_ = asset->InstantiateNode(scene_, asset->GetName());
 
         if (dragNode_.NotNull())
         {
@@ -548,8 +483,6 @@ void SceneView3D::HandleDragEnterWidget(StringHash eventType, VariantMap& eventD
             IntVector2 pos = input->GetMousePosition();
             UpdateDragNode(pos.x_, pos.y_);
         }
-
-
 
         //LOGINFOF("Dropped %s : %s on SceneView3D", asset->GetPath().CString(), asset->GetGUID().CString());
     }

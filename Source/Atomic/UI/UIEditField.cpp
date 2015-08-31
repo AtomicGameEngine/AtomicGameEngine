@@ -38,6 +38,28 @@ void UIEditField::SetReadOnly(bool readonly)
 
 }
 
+void UIEditField::SetStyling(bool styling)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetStyling(styling);
+
+}
+
+void UIEditField::SetMultiline(bool multiline)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetMultiline(multiline);
+
+}
+
 void UIEditField::SetWrapping(bool wrap)
 {
     if (!widget_)
@@ -95,7 +117,31 @@ void UIEditField::AppendText(const String& text)
 
 }
 
-void UIEditField::SetTextAlign(TEXT_ALIGN align)
+void UIEditField::SetAdaptToContentSize(bool adapt)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+
+    w->SetAdaptToContentSize(adapt);
+
+}
+
+bool UIEditField::GetAdaptToContentSize() const
+{
+    if (!widget_)
+        return false;
+
+    // safe cast?
+    TBEditField* w = (TBEditField*) widget_;
+
+    return w->GetAdaptToContentSize();
+
+}
+
+
+void UIEditField::SetTextAlign(UI_TEXT_ALIGN align)
 {
     if (!widget_)
         return;
@@ -105,13 +151,13 @@ void UIEditField::SetTextAlign(TEXT_ALIGN align)
 
     switch (align)
     {
-        case TEXT_ALIGN_CENTER:
+        case UI_TEXT_ALIGN_CENTER:
             w->SetTextAlign(TB_TEXT_ALIGN_CENTER);
             break;
-        case TEXT_ALIGN_LEFT:
+        case UI_TEXT_ALIGN_LEFT:
             w->SetTextAlign(TB_TEXT_ALIGN_LEFT);
             break;
-        case TEXT_ALIGN_RIGHT:
+        case UI_TEXT_ALIGN_RIGHT:
             w->SetTextAlign(TB_TEXT_ALIGN_RIGHT);
             break;
     }

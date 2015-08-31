@@ -4,39 +4,61 @@ import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
 
-class ActivationWidow extends ModalWindow {
+class ActivationWindow extends ModalWindow {
 
     constructor() {
 
-        super();
+        super(true);
 
         this.init("Product Activation", "AtomicEditor/editor/ui/activation.tb.txt");
 
-        this.licenseKeyEdit = <Atomic.UIEditField> this.getWidget("license_key");
+        this.licenseKeyEdit = <Atomic.UIEditField>this.getWidget("license_key");
 
         this.subscribeToEvent("LicenseActivationError", (eventData) => this.handleLicenseActivationError(eventData));
         this.subscribeToEvent("LicenseActivationSuccess", (eventData) => this.handleLicenseActivationSuccess(eventData));
 
         this.progressModal = new ProgressModal("Activation", "Activating, please wait...");
 
+        if (ToolCore.licenseSystem.sourceBuild) {
+
+            var button = <Atomic.UIButton>this.getWidget("get_key");
+            button.text = "Get Pro Key";
+
+            var message = "\nAtomic Pro is required for <color #76D6FF>GitHub development snapshots</color> and <color #76D6FF>custom engine builds</color>.\n\n";
+            message += "Press OK to activate or acquire your Atomic Pro license";
+            new Atomic.UIMessageWindow(this, "modal_error").show("Atomic Pro Required", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+
+        }
+
+
+
     }
 
     handleLicenseActivationError(ev) {
 
-      this.progressModal.hide();
+        this.progressModal.hide();
 
-      EditorUI.showModalError("Activation Error",
-          ev.message);
+        EditorUI.showModalError("Activation Error",
+            ev.message);
 
     }
 
     handleLicenseActivationSuccess(ev) {
 
-      this.progressModal.hide();
+        this.progressModal.hide();
 
-      this.hide();
+        this.hide();
 
-      EditorUI.getModelOps().showActivationSuccessWindow();
+        if (ToolCore.licenseSystem.sourceBuild && ToolCore.licenseSystem.isStandardLicense()) {
+
+            // show pro window
+            EditorUI.getModelOps().showProWindow("AtomicEditor/editor/ui/sourceinfo.tb.txt");
+
+        } else {
+
+            EditorUI.getModelOps().showActivationSuccessWindow();
+
+        }
 
     }
 
@@ -78,8 +100,8 @@ class ActivationWidow extends ModalWindow {
         }
 
     }
-    progressModal:ProgressModal;
+    progressModal: ProgressModal;
     licenseKeyEdit: Atomic.UIEditField;
 }
 
-export = ActivationWidow;
+export = ActivationWindow;

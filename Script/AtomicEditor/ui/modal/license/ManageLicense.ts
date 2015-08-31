@@ -28,32 +28,29 @@ class ManageLicense extends ModalWindow {
                 return true;
             }
 
-            if (ev.target.id == "confirm_license_return") {
+            if (ev.refid == "TBMessageWindow.ok") {
 
-                if (ev.refid == "TBMessageWindow.ok") {
+                if (ToolCore.licenseSystem.deactivate()) {
 
-                    if (ToolCore.licenseSystem.deactivate()) {
+                    this.progressModal.show();
 
-                        this.progressModal.show();
+                    this.subscribeToEvent("LicenseDeactivationSuccess", (ev) => {
 
-                        this.subscribeToEvent("LicenseDeactivationSuccess", (ev) => {
+                        this.progressModal.hide();
+                        this.hide();
 
-                            this.progressModal.hide();
-                            this.hide();
+                        EditorUI.getModelOps().showActivationWindow();
 
-                            EditorUI.getModelOps().showActivationWindow();
+                    });
 
-                        });
+                    this.subscribeToEvent("LicenseDeactivationError", (ev: ToolCore.LicenseDeactivationErrorEvent) => {
 
-                        this.subscribeToEvent("LicenseDeactivationError", (ev: ToolCore.LicenseDeactivationErrorEvent) => {
+                        this.progressModal.hide();
 
-                            this.progressModal.hide();
+                        EditorUI.showModalError("Deactivation Error", ev.message);
 
-                            EditorUI.showModalError("Deactivation Error", ev.message);
+                    });
 
-                        });
-
-                    }
                 }
 
                 return true;

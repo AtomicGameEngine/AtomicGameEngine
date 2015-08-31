@@ -2,7 +2,9 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
 
+#include <Atomic/Atomic2D/Sprite2D.h>
 #include <Atomic/Atomic2D/AnimationSet2D.h>
+#include <Atomic/Atomic2D/AnimatedSprite2D.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"
@@ -61,6 +63,32 @@ Resource* SpriterImporter::GetResource(const String& typeName)
 
 }
 
+Node* SpriterImporter::InstantiateNode(Node* parent, const String& name)
+{
 
+    AnimationSet2D* animationSet = (AnimationSet2D*) GetResource();
+
+    if (!animationSet)
+        return 0;
+
+    String animationName;
+
+    if (animationSet->GetNumAnimations())
+    {
+        animationName = animationSet->GetAnimation(0)->GetName();
+    }
+
+    Node* node = parent->CreateChild(name);
+
+    AnimatedSprite2D* sprite = node->CreateComponent<AnimatedSprite2D>();
+
+    if (!animationName.Length())
+        sprite->SetAnimationSet(animationSet);
+    else
+        sprite->SetAnimation(animationSet, animationName);
+
+    return node;
+
+}
 
 }

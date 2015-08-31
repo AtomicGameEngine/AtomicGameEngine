@@ -3,6 +3,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/UI/SystemUI/DebugHud.h>
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCWorker.h>
 
@@ -44,6 +45,10 @@ void PlayerMode::HandleIPCInitialize(StringHash eventType, VariantMap& eventData
     {
         SendEvent(E_EXITREQUESTED);
     }
+
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+    if (debugHud)
+        debugHud->SetMode(eventData["debugHudMode"].GetUInt());
 
 }
 

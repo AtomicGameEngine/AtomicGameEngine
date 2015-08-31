@@ -161,6 +161,8 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
 
         if (objectElem.HasAttribute("name"))
             object->name_ = objectElem.GetAttribute("name");
+        else
+            object->name_ = "Object";
         if (objectElem.HasAttribute("type"))
             object->type_ = objectElem.GetAttribute("type");
 

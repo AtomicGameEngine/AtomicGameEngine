@@ -13,6 +13,9 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu atomic editor", editorItems);
         MenuItemSources.createMenuItemSource("menu edit", editItems);
         MenuItemSources.createMenuItemSource("menu file", fileItems);
+        MenuItemSources.createMenuItemSource("menu build", buildItems);
+        MenuItemSources.createMenuItemSource("menu tools", toolsItems);
+        MenuItemSources.createMenuItemSource("menu developer", developerItems);
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -28,9 +31,9 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "manage license") {
 
-              EditorUI.getModelOps().showManageLicense();
+                EditorUI.getModelOps().showManageLicense();
 
-              return true;
+                return true;
 
             }
 
@@ -119,12 +122,34 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
-
             return false;
+
+        } else if (target.id == "menu developer popup") {
+
+            if (refid == "developer show console") {
+                Atomic.ui.showConsole(true);
+                return true;
+            }
+
+        } else if (target.id == "menu tools popup") {
+
+            if (refid == "tools toggle profiler") {
+                Atomic.ui.toggleDebugHud();
+                return true;
+            }
+
+        } else if (target.id == "menu build popup") {
+
+            if (refid == "build build") {
+                var buildNotification = new Atomic.UIMessageWindow(EditorUI.getMainFrame(), "build_notify");
+                buildNotification.show("Build Notification", "Building is currently unavailable in this development snapshot.", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 300, 140);
+
+                return true;
+            }
+
         }
 
     }
-
 
 }
 
@@ -162,6 +187,25 @@ var editItems = {
     "Play": ["edit play", StringID.ShortcutPlay]
 
 };
+
+var toolsItems = {
+
+    "Toggle Profiler": ["tools toggle profiler"]
+
+}
+
+var buildItems = {
+
+    "Build": ["build build"]
+
+}
+
+
+var developerItems = {
+
+    "Show Console": ["developer show console"]
+
+}
 
 var fileItems = {
 

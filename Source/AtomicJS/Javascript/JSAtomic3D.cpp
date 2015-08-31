@@ -1,5 +1,6 @@
 
 #include <Atomic/Atomic3D/StaticModel.h>
+#include <Atomic/Atomic3D/CustomGeometry.h>
 
 #include "JSAtomic3D.h"
 
@@ -24,6 +25,22 @@ static int StaticModel_SetMaterialIndex(duk_context* ctx) {
     return 0;
 }
 
+static int CustomGeometry_SetMaterialIndex(duk_context* ctx) {
+
+    unsigned index = (unsigned)duk_require_number(ctx, 0);
+    Material* material = js_to_class_instance<Material>(ctx, 1, 0);
+
+    duk_push_this(ctx);
+
+    // event receiver
+    CustomGeometry* geometry = js_to_class_instance<CustomGeometry>(ctx, -1, 0);
+
+
+    geometry->SetMaterial(index, material);
+
+    return 0;
+}
+
 void jsapi_init_atomic3d(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -33,6 +50,10 @@ void jsapi_init_atomic3d(JSVM* vm)
     duk_put_prop_string(ctx, -2, "setMaterialIndex");
     duk_pop(ctx); // pop AObject prototype
 
+    js_class_get_prototype(ctx, "Atomic", "CustomGeometry");
+    duk_push_c_function(ctx, CustomGeometry_SetMaterialIndex, 2);
+    duk_put_prop_string(ctx, -2, "setMaterialIndex");
+    duk_pop(ctx); // pop AObject prototype
 }
 
 }

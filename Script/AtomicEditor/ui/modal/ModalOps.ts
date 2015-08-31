@@ -8,6 +8,7 @@ import EULAWindow = require("./license/EULAWindow");
 import ActivationWindow = require("./license/ActivationWindow");
 import ActivationSuccessWindow = require("./license/ActivationSuccessWindow");
 import ManageLicense = require("./license/ManageLicense");
+import ProWindow = require("./license/ProWindow");
 
 import ResourceSelection = require("./ResourceSelection");
 
@@ -23,11 +24,11 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateFolder: string) {
+    showCreateProject(projectTemplateFolder: string, imagePath:string = "") {
 
         if (this.show()) {
 
-            this.opWindow = new CreateProject(projectTemplateFolder);
+            this.opWindow = new CreateProject(projectTemplateFolder, imagePath);
 
         }
 
@@ -143,6 +144,15 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
+    showProWindow(uiPath:string) {
+
+        if (this.show()) {
+
+            this.opWindow = new ProWindow(uiPath);
+
+        }
+
+    }
 
     showAbout() {
 

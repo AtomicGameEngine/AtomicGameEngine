@@ -18,6 +18,9 @@ public:
 
     void SetImage(const String& imagePath);
 
+    int GetImageWidth() const;
+    int GetImageHeight() const;
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

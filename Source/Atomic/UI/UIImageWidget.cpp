@@ -29,6 +29,24 @@ UIImageWidget::~UIImageWidget()
 {
 }
 
+int UIImageWidget::GetImageWidth() const
+{
+    if (!widget_)
+        return 0;
+
+    return ((TBImageWidget*) widget_)->GetImageWidth();
+
+}
+
+int UIImageWidget::GetImageHeight() const
+{
+    if (!widget_)
+        return 0;
+
+    return ((TBImageWidget*) widget_)->GetImageHeight();
+
+}
+
 void UIImageWidget::SetImage(const String& imagePath)
 {
     if (!widget_)

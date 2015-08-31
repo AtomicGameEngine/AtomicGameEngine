@@ -23,7 +23,8 @@ _2DCreateSource.addItem(new Atomic.UIMenuItem("TileMap2D", "TileMap2D"));
 var geometryCreateSource = new Atomic.UIMenuItemSource();
 
 geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModel", "StaticModel"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimatedModel", "create component"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimatedModel", "AnimatedModel"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "AnimationController"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("BillboardSet", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("CustomGeometry", "create component"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("ParticleEmitter", "create component"));

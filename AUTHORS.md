@@ -5,12 +5,15 @@
 
 - Josh Engebretson (Technical Director)
 
+- Lara Engebretson
+
 ### Contributors:
 
 - marynate (https://github.com/marynate)
 
 - rsredsq (https://github.com/rsredsq)
 
+- Shaddock Heath (https://github.com/shaddockh)
 
 ### Contribution Copyright and Licensing
 
