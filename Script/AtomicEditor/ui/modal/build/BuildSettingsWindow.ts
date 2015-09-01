@@ -4,11 +4,11 @@ import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
 
-import WindowsSettingsWidget = require("./WindowsSettingsWidget");
-import MacSettingsWidget = require("./MacSettingsWidget");
-import AndroidSettingsWidget = require("./AndroidSettingsWidget");
-import IOSSettingsWidget = require("./IOSSettingsWidget");
-import WebSettingsWidget = require("./WebSettingsWidget");
+import WindowsSettingsWidget = require("./platforms/WindowsSettingsWidget");
+import MacSettingsWidget = require("./platforms/MacSettingsWidget");
+import AndroidSettingsWidget = require("./platforms/AndroidSettingsWidget");
+import IOSSettingsWidget = require("./platforms/IOSSettingsWidget");
+import WebSettingsWidget = require("./platforms/WebSettingsWidget");
 
 class BuildSettingsWindow extends ModalWindow {
 
@@ -74,20 +74,21 @@ class BuildSettingsWindow extends ModalWindow {
 
             var toolSystem = ToolCore.toolSystem;
 
+            if (ev.target.id == "cancel") {
+                this.hide();
+                return true;
+            }
+
+            if (ev.target.id == "ok") {
+                this.hide();
+                return true;
+            }
+
             if (ev.target.id == "build") {
 
-              var buildSystem = ToolCore.buildSystem;
-              var toolSystem = ToolCore.toolSystem;
-
-              buildSystem.buildPath = "/Users/josh/Desktop/MyBuilds/";
-
-              var project = toolSystem.project;
-              var platform = toolSystem.currentPlatform;
-
-              var buildBase = platform.newBuild(project);
-              buildSystem.queueBuild(buildBase);
-              buildSystem.startNextBuild();
-
+                this.hide();
+                EditorUI.getModelOps().showBuild();
+                return true;
             }
 
             if (ev.target.id == "set_current_platform") {

@@ -23,6 +23,7 @@ public:
 
     String OpenProjectFileDialog();
     String NewProjectFileDialog();
+    String GetBuildPath(const String& defaultPath);
     void RevealInFinder(const String& fullpath);
 
 private:

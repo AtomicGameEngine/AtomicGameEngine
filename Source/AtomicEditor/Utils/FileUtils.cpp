@@ -82,6 +82,31 @@ String FileUtils::NewProjectFileDialog()
 
 }
 
+String FileUtils::GetBuildPath(const String& defaultPath)
+{
+    String buildPath;
+
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_ChooseDirectory( "Please choose the build folder",
+                                defaultPath.Length() ? defaultPath.CString() : NULL,
+                                &outPath);
+
+    if (outPath && result == NFD_OKAY)
+    {
+        buildPath = outPath;
+    }
+
+    if (outPath)
+        free(outPath);
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    return GetInternalPath(buildPath);
+
+}
+
+
 void FileUtils::RevealInFinder(const String& fullpath)
 {
     FileSystem* fs = GetSubsystem<FileSystem>();
