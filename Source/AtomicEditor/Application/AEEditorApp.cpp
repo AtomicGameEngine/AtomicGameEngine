@@ -147,7 +147,7 @@ void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
     String errMessage = eventData[P_ERRORMESSAGE].GetString();
     String errFilename = eventData[P_ERRORFILENAME].GetString();
     //String errStack = eventData[P_ERRORSTACK].GetString();
-    int errLineNumber = vm_->GetRealLineNumber("AtomicEditor/out/" + errFilename, eventData[P_ERRORLINENUMBER].GetInt());
+    int errLineNumber = vm_->GetRealLineNumber(errFilename, eventData[P_ERRORLINENUMBER].GetInt());
     
     String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errLineNumber);
 
