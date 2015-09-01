@@ -7,7 +7,7 @@
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
-						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb"],
+						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows"],
 	"typescript_decl" : {
 
 		"AssetDatabase" : [

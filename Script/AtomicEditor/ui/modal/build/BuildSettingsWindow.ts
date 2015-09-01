@@ -89,6 +89,7 @@ class BuildSettingsWindow extends ModalWindow {
                 this.hide();
                 EditorUI.getModelOps().showBuild();
                 return true;
+                
             }
 
             if (ev.target.id == "set_current_platform") {
