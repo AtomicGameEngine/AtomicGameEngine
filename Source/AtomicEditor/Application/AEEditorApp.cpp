@@ -47,7 +47,7 @@ void AEEditorApp::Start()
 
     context_->RegisterSubsystem(new EditorMode(context_));
 
-    vm_->SetModuleSearchPaths("AtomicEditor/out");
+    vm_->SetModuleSearchPaths("AtomicEditor");
 
     // Do not create bone structure by default when in the editor
     // this can be toggled temporarily, for example to setup an animation preview
@@ -70,7 +70,6 @@ void AEEditorApp::Start()
         vm_->SendJSErrorEvent();
         ErrorExit("Error executing main.js");
     }
-
 
     GetSubsystem<LicenseSystem>()->Initialize();
 
@@ -113,7 +112,7 @@ void AEEditorApp::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
     engineParameters_["ResourcePrefixPath"] = "";
-    String ScriptPath = env->GetRootSourceDir() + "Script";
+    String ScriptPath = env->GetRootSourceDir() + "Artifacts/Script";
     String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir() + ";" + ScriptPath;
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
@@ -139,6 +138,7 @@ void AEEditorApp::Stop()
 
 void AEEditorApp::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 {
+
 }
 
 void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)

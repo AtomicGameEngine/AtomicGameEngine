@@ -23,7 +23,10 @@ class BuildWindow extends ModalWindow {
 
         var currentPlatform = ToolCore.toolSystem.currentPlatform;
 
-        this.buildPathField.text = "/Users/josh/Desktop/MyBuilds/";
+        if (Atomic.platform == "Windows")
+            this.buildPathField.text = "C:/Users/Josh/Desktop/MyBuilds/";
+        else
+            this.buildPathField.text = "/Users/josh/Desktop/MyBuilds/";
 
         switch (currentPlatform.name) {
 

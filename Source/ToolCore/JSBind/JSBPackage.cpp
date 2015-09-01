@@ -79,7 +79,7 @@ void JSBPackage::GenerateSource(const String &outPath)
     JSBind* jsbind = GetSubsystem<JSBind>();
 
     JSBDoc jdoc;
-    jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Bin/" + name_ + ".js");
+    jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Artifacts/JSDoc/" + name_ + ".js");
 
     JSBTypeScript ts;
     ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");

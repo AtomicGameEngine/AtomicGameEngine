@@ -57,8 +57,8 @@ if (APPLE)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD
-    COMMAND "${CMAKE_SOURCE_DIR}/Build/Mac/node/node" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicEditor)
+    COMMAND "${CMAKE_SOURCE_DIR}/Build/Mac/node/node" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 elseif(LINUX)
     target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
@@ -67,8 +67,8 @@ else()
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD
-    COMMAND "${CMAKE_SOURCE_DIR}/Build/Windows/node/node.exe" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicEditor)
+    COMMAND "${CMAKE_SOURCE_DIR}/Build/Windows/node/node.exe" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
     # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
     add_custom_command (TARGET AtomicEditor POST_BUILD
