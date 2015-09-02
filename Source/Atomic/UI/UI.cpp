@@ -57,6 +57,7 @@ using namespace tb;
 #include "UIScrollContainer.h"
 #include "UISeparator.h"
 #include "UIDimmer.h"
+#include "UISelectDropdown.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -574,6 +575,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         container->SetWidget(widget);
         widgetWrap_[widget] = container;
         return container;
+    }
+
+    if (widget->IsOfType<TBSelectDropdown>())
+    {
+        UISelectDropdown* select = new UISelectDropdown(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
     }
 
     if (widget->IsOfType<TBButton>())

@@ -7,6 +7,8 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
         this.load("AtomicEditor/editor/ui/buildsettings_android.tb.txt");
 
+        this.sdkTargetSelect = <Atomic.UISelectDropdown>this.getWidget("sdk_target_select");
+
         this.refreshWidgets();
 
         this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
@@ -37,11 +39,42 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
                 return true;
 
+            } else if (ev.target.id == "refresh_sdk_targets") {
+
+                this.refreshAndroidTargets();
+
             }
 
         }
 
         return false;
+    }
+
+    refreshAndroidTargets() {
+
+        var platform = <ToolCore.PlatformAndroid>ToolCore.toolSystem.getPlatformByName("ANDROID");
+
+        platform.refreshAndroidTargets();
+
+        this.subscribeToEvent(platform, "AndroidTargetsRefreshed", (ev) => {
+
+          this.sdkTargetSource.clear();
+
+          var targets:string[] = platform.androidTargets;
+
+          for (var i in targets) {
+
+              this.sdkTargetSource.addItem(new Atomic.UISelectItem(targets[i]));
+          }
+
+          this.sdkTargetSelect.source = this.sdkTargetSource;
+
+          // force a refresh
+          this.sdkTargetSelect.value = -1;
+          this.sdkTargetSelect.value = 0;
+
+        });
+
     }
 
     refreshWidgets() {
@@ -69,6 +102,9 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
     storeValues() {
 
     }
+
+    sdkTargetSource:Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
+    sdkTargetSelect:Atomic.UISelectDropdown;
 
 }
 

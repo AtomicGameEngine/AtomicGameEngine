@@ -2,13 +2,24 @@
 #pragma once
 
 #include "Platform.h"
+#include "../Subprocess/Subprocess.h"
 
 namespace ToolCore
 {
 
+EVENT(E_ANDROIDTARGETSREFRESHED, AndroidTargetsRefreshed)
+{
+
+}
+
 class PlatformAndroid : public Platform
 {
     OBJECT(PlatformAndroid);
+
+    struct AndroidTarget
+    {
+        unsigned id;
+    };
 
 public:
 
@@ -20,9 +31,19 @@ public:
 
     String GetAndroidCommand() const;
 
+    void RefreshAndroidTargets();
+    const Vector<String>& GetAndroidTargets() { return androidTargets_; }
+
     BuildBase* NewBuild(Project* project);
 
 private:
+
+    void HandleRefreshAndroidTargetsEvent(StringHash eventType, VariantMap& eventData);
+
+    SharedPtr<Subprocess> refreshAndroidTargetsProcess_;
+    String targetOutput_;
+
+    Vector<String> androidTargets_;
 
     void PrependAndroidCommandArgs(Vector<String> args);
 
