@@ -15,11 +15,11 @@ class MacSettingsWidget extends Atomic.UIWidget {
         this.productNameEdit = <Atomic.UIEditField>this.getWidget("product_name");
         this.companyNameEdit = <Atomic.UIEditField>this.getWidget("company_name");
 
-        this.refreshWidgetsFromSettings();
+        this.refreshWidgets();
 
     }
 
-    refreshWidgetsFromSettings() {
+    refreshWidgets() {
 
         this.appNameEdit.text = this.settings.appName;
         this.packageNameEdit.text = this.settings.packageName;

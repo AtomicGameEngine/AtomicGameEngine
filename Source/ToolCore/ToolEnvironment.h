@@ -3,6 +3,8 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "ToolPrefs.h"
+
 using namespace Atomic;
 
 namespace ToolCore
@@ -31,6 +33,10 @@ public:
     /// Root source and build directories for development source tree builds
     void SetRootSourceDir(const String& sourceDir);
     void SetRootBuildDir(const String& buildDir, bool setBinaryPaths = false);
+
+    ToolPrefs* GetToolPrefs() { return toolPrefs_; }
+    void SaveToolPrefs() { toolPrefs_->Save(); }
+    void LoadToolPrefs() { toolPrefs_->Load(); }
 
     const String& GetRootSourceDir() { return rootSourceDir_; }
     const String& GetRootBuildDir() { return rootBuildDir_; }
@@ -101,6 +107,8 @@ private:
     String webBuildDir_;
 
     String devConfigFilename_;
+
+    SharedPtr<ToolPrefs> toolPrefs_;
 };
 
 }

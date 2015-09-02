@@ -2,7 +2,7 @@
 	"name" : "ToolCore",
 	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
 							 "Source/ToolCore/Import", "Source/ToolCore/Assets", "Source/ToolCore/License", "Source/ToolCore/Build"],
-	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
+	"classes" : ["ToolEnvironment", "ToolSystem", "ToolPrefs", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
 							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem",

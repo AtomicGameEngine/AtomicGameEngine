@@ -16,7 +16,8 @@ using namespace rapidjson;
 namespace ToolCore
 {
 
-ToolEnvironment::ToolEnvironment(Context* context) : Object(context)
+ToolEnvironment::ToolEnvironment(Context* context) : Object(context),
+    toolPrefs_(new ToolPrefs(context))
 {
 
 }
@@ -28,6 +29,7 @@ ToolEnvironment::~ToolEnvironment()
 
 bool ToolEnvironment::InitFromPackage()
 {
+    toolPrefs_->Load();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -46,6 +48,8 @@ bool ToolEnvironment::InitFromPackage()
 
 bool ToolEnvironment::InitFromJSON(bool atomicTool)
 {
+
+    toolPrefs_->Load();
 
     // make sure config path is initialized
     GetDevConfigFilename();

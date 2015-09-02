@@ -106,6 +106,31 @@ String FileUtils::GetBuildPath(const String& defaultPath)
 
 }
 
+String FileUtils::GetAndroidSDKPath(const String& defaultPath)
+{
+    String sdkPath;
+
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_ChooseDirectory( "Please choose the root folder of your Android SDK",
+                                defaultPath.Length() ? defaultPath.CString() : NULL,
+                                &outPath);
+
+    if (outPath && result == NFD_OKAY)
+    {
+        sdkPath = outPath;
+    }
+
+    if (outPath)
+        free(outPath);
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    return GetInternalPath(sdkPath);
+
+}
+
+
 
 void FileUtils::RevealInFinder(const String& fullpath)
 {

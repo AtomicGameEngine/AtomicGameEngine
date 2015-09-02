@@ -18,7 +18,13 @@ public:
     String GetName() { return "ANDROID"; }
     PlatformID GetPlatformID() { return PLATFORMID_ANDROID; }
 
+    String GetAndroidCommand() const;
+
     BuildBase* NewBuild(Project* project);
+
+private:
+
+    void PrependAndroidCommandArgs(Vector<String> args);
 
 };
 
