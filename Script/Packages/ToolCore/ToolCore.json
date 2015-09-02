@@ -10,7 +10,7 @@
 							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
 						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows",
-						 	 "ProjectBuildSettings", "MacBuildSettings"],
+						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "MacBuildSettings"],
 	"typescript_decl" : {
 
 		"AssetDatabase" : [

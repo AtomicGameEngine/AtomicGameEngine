@@ -7,7 +7,13 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
         this.load("AtomicEditor/editor/ui/buildsettings_android.tb.txt");
 
+        this.settings = ToolCore.toolSystem.project.buildSettings.androidBuildSettings;
+
         this.sdkTargetSelect = <Atomic.UISelectDropdown>this.getWidget("sdk_target_select");
+        this.appNameEdit = <Atomic.UIEditField>this.getWidget("app_name");
+        this.packageNameEdit = <Atomic.UIEditField>this.getWidget("app_package");
+        this.productNameEdit = <Atomic.UIEditField>this.getWidget("product_name");
+        this.companyNameEdit = <Atomic.UIEditField>this.getWidget("company_name");
 
         this.refreshWidgets();
 
@@ -58,20 +64,20 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
         this.subscribeToEvent(platform, "AndroidTargetsRefreshed", (ev) => {
 
-          this.sdkTargetSource.clear();
+            this.sdkTargetSource.clear();
 
-          var targets:string[] = platform.androidTargets;
+            var targets: string[] = platform.androidTargets;
 
-          for (var i in targets) {
+            for (var i in targets) {
 
-              this.sdkTargetSource.addItem(new Atomic.UISelectItem(targets[i]));
-          }
+                this.sdkTargetSource.addItem(new Atomic.UISelectItem(targets[i]));
+            }
 
-          this.sdkTargetSelect.source = this.sdkTargetSource;
+            this.sdkTargetSelect.source = this.sdkTargetSource;
 
-          // force a refresh
-          this.sdkTargetSelect.value = -1;
-          this.sdkTargetSelect.value = 0;
+            // force a refresh
+            this.sdkTargetSelect.value = -1;
+            this.sdkTargetSelect.value = 0;
 
         });
 
@@ -89,22 +95,35 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
         antPathEdit.text = toolPrefs.antPath;
         jdkRootEdit.text = toolPrefs.jDKRootPath;
 
-        /*
-        appNameEdit_->SetText(settings.appName.CString());
-        appPackageEdit_->SetText(settings.package.CString());
-        productNameEdit_->SetText(settings.productName.CString());
-        companyNameEdit_->SetText(settings.companyName.CString());
-        sdkTargetSelect_->SetText(settings.targetSDKVersion.CString());
-        */
+        this.appNameEdit.text = this.settings.appName;
+        this.packageNameEdit.text = this.settings.packageName;
+        this.productNameEdit.text = this.settings.productName;
+        this.companyNameEdit.text = this.settings.companyName;
+
+        this.sdkTargetSelect.text = this.settings.sDKVersion;
 
     }
 
     storeValues() {
 
+      this.settings.appName = this.appNameEdit.text;
+      this.settings.packageName = this.packageNameEdit.text;
+      this.settings.productName = this.productNameEdit.text;
+      this.settings.companyName = this.companyNameEdit.text;
+      
+      this.settings.sDKVersion = this.sdkTargetSelect.text;
+
     }
 
-    sdkTargetSource:Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
-    sdkTargetSelect:Atomic.UISelectDropdown;
+    settings: ToolCore.AndroidBuildSettings;
+    sdkTargetSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
+    sdkTargetSelect: Atomic.UISelectDropdown;
+
+    appNameEdit: Atomic.UIEditField;
+    packageNameEdit: Atomic.UIEditField;
+    productNameEdit: Atomic.UIEditField;
+    companyNameEdit: Atomic.UIEditField;
+
 
 }
 
