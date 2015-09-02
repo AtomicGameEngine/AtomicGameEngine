@@ -102,7 +102,9 @@ bool Shader::BeginLoad(Deserializer& source)
 #ifdef ATOMIC_OPENGL
     vsSourceCode_.Replace("void VS(", "void main(");
     psSourceCode_.Replace("void PS(", "void main(");
+    // ATOMIC BEGIN - reported shader compiler error here: https://github.com/urho3d/Urho3D/issues/870
     psSourceCode_.Replace("attribute ", "// attribute ");
+    // ATOMIC END
 #endif
 
     RefreshMemoryUse();
