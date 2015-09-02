@@ -38,6 +38,66 @@ private:
     String productName_;
 };
 
+class WebBuildSettings : public RefCounted
+{
+    REFCOUNTED(WebBuildSettings)
+
+public:
+
+    WebBuildSettings() {}
+
+    const String& GetAppName() const { return appName_; }
+    const String& GetPackageName() const { return packageName_; }
+    const String& GetCompanyName() const { return companyName_; }
+    const String& GetProductName() const { return productName_; }
+
+    void SetAppName(const String& name) { appName_ = name; }
+    void SetPackageName(const String& packageName) { packageName_ = packageName; }
+    void SetCompanyName(const String& companyName) { companyName_ = companyName; }
+    void SetProductName(const String& productName) { productName_ = productName; }
+
+    void Write(JSONValue& parent);
+    void Read(JSONValue& parent);
+
+private:
+
+    String appName_;
+    String packageName_;
+    String companyName_;
+    String productName_;
+};
+
+class WindowsBuildSettings : public RefCounted
+{
+    REFCOUNTED(WindowsBuildSettings)
+
+public:
+
+    WindowsBuildSettings() {}
+
+    const String& GetAppName() const { return appName_; }
+    const String& GetPackageName() const { return packageName_; }
+    const String& GetCompanyName() const { return companyName_; }
+    const String& GetProductName() const { return productName_; }
+
+    void SetAppName(const String& name) { appName_ = name; }
+    void SetPackageName(const String& packageName) { packageName_ = packageName; }
+    void SetCompanyName(const String& companyName) { companyName_ = companyName; }
+    void SetProductName(const String& productName) { productName_ = productName; }
+
+    void Write(JSONValue& parent);
+    void Read(JSONValue& parent);
+
+private:
+
+    String appName_;
+    String packageName_;
+    String companyName_;
+    String productName_;
+};
+
+
+
 
 class ProjectBuildSettings : public Object
 {
@@ -57,6 +117,8 @@ public:
 private:
 
     SharedPtr<MacBuildSettings> macBuildSettings_;
+    SharedPtr<WindowsBuildSettings> windowsBuildSettings_;
+    SharedPtr<WebBuildSettings> webBuildSettings_;
 
 };
 

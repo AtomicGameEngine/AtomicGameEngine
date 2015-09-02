@@ -34,8 +34,62 @@ void MacBuildSettings::Read(JSONValue& parent)
 
 }
 
+void WindowsBuildSettings::Write(JSONValue& parent)
+{
+    JSONValue json = parent.CreateChild("WindowsBuildSettings");
+
+    json.SetString("appName", appName_);
+    json.SetString("packageName", packageName_);
+    json.SetString("companyName", companyName_);
+    json.SetString("productName", productName_);
+
+}
+
+void WindowsBuildSettings::Read(JSONValue& parent)
+{
+    JSONValue json = parent.GetChild("WindowsBuildSettings");
+
+    if (json == JSONValue::EMPTY)
+        return;
+
+    appName_ = json.GetString("appName");
+    packageName_ = json.GetString("packageName");
+    companyName_ = json.GetString("companyName");
+    productName_ = json.GetString("productName");
+
+}
+
+
+void WebBuildSettings::Write(JSONValue& parent)
+{
+    JSONValue json = parent.CreateChild("WebBuildSettings");
+
+    json.SetString("appName", appName_);
+    json.SetString("packageName", packageName_);
+    json.SetString("companyName", companyName_);
+    json.SetString("productName", productName_);
+
+}
+
+void WebBuildSettings::Read(JSONValue& parent)
+{
+    JSONValue json = parent.GetChild("WebBuildSettings");
+
+    if (json == JSONValue::EMPTY)
+        return;
+
+    appName_ = json.GetString("appName");
+    packageName_ = json.GetString("packageName");
+    companyName_ = json.GetString("companyName");
+    productName_ = json.GetString("productName");
+
+}
+
+
 ProjectBuildSettings::ProjectBuildSettings(Context* context) : Object(context),
-    macBuildSettings_(new MacBuildSettings())
+    macBuildSettings_(new MacBuildSettings()),
+    windowsBuildSettings_(new WindowsBuildSettings()),
+    webBuildSettings_(new WebBuildSettings())
 {
 
 
@@ -62,6 +116,8 @@ bool ProjectBuildSettings::Load(const String& path)
         return false;
 
     macBuildSettings_->Read(root);
+    windowsBuildSettings_->Read(root);
+    webBuildSettings_->Read(root);
 
     return result;
 }
@@ -75,6 +131,8 @@ void ProjectBuildSettings::Save(const String& path)
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
 
     macBuildSettings_->Write(root);
+    windowsBuildSettings_->Write(root);
+    webBuildSettings_->Write(root);
 
     jsonFile->Save(*file, String("   "));
 
