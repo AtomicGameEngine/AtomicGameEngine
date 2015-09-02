@@ -10,6 +10,10 @@ class WebSettingsWidget extends Atomic.UIWidget {
 
     }
 
+    storeValues() {
+      
+    }
+
 }
 
 export = WebSettingsWidget;

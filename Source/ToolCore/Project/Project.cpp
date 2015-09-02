@@ -62,11 +62,12 @@ bool Project::LoadUserPrefs()
 
 void Project::SaveBuildSettings()
 {
-
+    buildSettings_->Save(GetProjectPath() + "BuildSettings.json");
 }
 
 bool Project::LoadBuildSettings()
 {
+    buildSettings_->Load(GetProjectPath() + "BuildSettings.json");
     return true;
 }
 

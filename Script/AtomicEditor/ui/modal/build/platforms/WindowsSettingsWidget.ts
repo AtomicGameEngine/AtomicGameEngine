@@ -10,6 +10,10 @@ class WindowsSettingsWidget extends Atomic.UIWidget {
 
     }
 
+    storeValues() {
+      
+    }
+
 }
 
 export = WindowsSettingsWidget;

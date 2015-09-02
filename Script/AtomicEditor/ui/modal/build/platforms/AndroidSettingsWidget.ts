@@ -10,6 +10,9 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
     }
 
+    storeValues() {
+    }
+
 }
 
 export = AndroidSettingsWidget;

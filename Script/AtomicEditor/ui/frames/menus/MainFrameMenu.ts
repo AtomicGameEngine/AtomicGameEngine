@@ -141,16 +141,16 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu build popup") {
 
             if (refid == "build build") {
-                var buildNotification = new Atomic.UIMessageWindow(EditorUI.getMainFrame(), "build_notify");
-                buildNotification.show("Build Notification", "Building is currently unavailable in this development snapshot.", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 300, 140);
+
+                EditorUI.getModelOps().showBuild();
 
                 return true;
 
             } else if (refid == "build settings") {
 
-              EditorUI.getModelOps().showBuildSettings();
+                EditorUI.getModelOps().showBuildSettings();
 
-              return true;
+                return true;
 
             }
 

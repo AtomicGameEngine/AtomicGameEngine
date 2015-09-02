@@ -10,6 +10,12 @@ import AndroidSettingsWidget = require("./platforms/AndroidSettingsWidget");
 import IOSSettingsWidget = require("./platforms/IOSSettingsWidget");
 import WebSettingsWidget = require("./platforms/WebSettingsWidget");
 
+interface BuildSettingsWidget {
+
+    storeValues();
+
+}
+
 class BuildSettingsWindow extends ModalWindow {
 
     constructor() {
@@ -80,6 +86,14 @@ class BuildSettingsWindow extends ModalWindow {
             }
 
             if (ev.target.id == "ok") {
+
+                for (var name in this.platformInfo) {
+
+                    <BuildSettingsWidget>(this.platformInfo[name].widget).storeValues();
+                }
+
+                ToolCore.toolSystem.project.saveBuildSettings();
+
                 this.hide();
                 return true;
             }
@@ -89,7 +103,7 @@ class BuildSettingsWindow extends ModalWindow {
                 this.hide();
                 EditorUI.getModelOps().showBuild();
                 return true;
-                
+
             }
 
             if (ev.target.id == "set_current_platform") {

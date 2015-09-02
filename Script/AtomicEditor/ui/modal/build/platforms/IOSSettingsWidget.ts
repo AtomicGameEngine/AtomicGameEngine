@@ -10,6 +10,9 @@ class IOSSettingsWidget extends Atomic.UIWidget {
 
     }
 
+    storeValues() {
+    }
+
 }
 
 export = IOSSettingsWidget;
