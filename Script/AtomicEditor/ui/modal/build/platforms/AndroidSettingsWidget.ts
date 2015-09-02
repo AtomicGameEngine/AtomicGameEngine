@@ -15,6 +15,21 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
         this.productNameEdit = <Atomic.UIEditField>this.getWidget("product_name");
         this.companyNameEdit = <Atomic.UIEditField>this.getWidget("company_name");
 
+        this.jdkRootText = <Atomic.UITextField>this.getWidget("jdk_root_text");
+        this.jdkRootChooseButton = <Atomic.UIButton>this.getWidget("choose_jdk_root");
+        this.jdkRootEdit = <Atomic.UIEditField>this.getWidget("jdk_root");
+
+        this.antPathEdit = <Atomic.UIEditField>this.getWidget("ant_path");
+
+
+
+        if (Atomic.platform == "MacOSX") {
+
+            this.jdkRootText.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.jdkRootChooseButton.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            this.jdkRootEdit.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        }
+
         this.refreshWidgets();
 
         this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
@@ -106,18 +121,27 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
     storeValues() {
 
-      this.settings.appName = this.appNameEdit.text;
-      this.settings.packageName = this.packageNameEdit.text;
-      this.settings.productName = this.productNameEdit.text;
-      this.settings.companyName = this.companyNameEdit.text;
-      
-      this.settings.sDKVersion = this.sdkTargetSelect.text;
+        this.settings.appName = this.appNameEdit.text;
+        this.settings.packageName = this.packageNameEdit.text;
+        this.settings.productName = this.productNameEdit.text;
+        this.settings.companyName = this.companyNameEdit.text;
+
+        if (this.antPathEdit.text.length && this.antPathEdit.text != ToolCore.toolEnvironment.toolPrefs.antPath)
+            ToolCore.toolEnvironment.toolPrefs.antPath = this.antPathEdit.text;
+
+        this.settings.sDKVersion = this.sdkTargetSelect.text;
 
     }
 
     settings: ToolCore.AndroidBuildSettings;
     sdkTargetSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
     sdkTargetSelect: Atomic.UISelectDropdown;
+
+    jdkRootText: Atomic.UITextField;
+    jdkRootChooseButton: Atomic.UIButton;
+    jdkRootEdit: Atomic.UIEditField;
+
+    antPathEdit: Atomic.UIEditField;
 
     appNameEdit: Atomic.UIEditField;
     packageNameEdit: Atomic.UIEditField;
