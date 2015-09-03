@@ -19,16 +19,15 @@ class BuildOutput extends ModalWindow {
 
         this.subscribeToEvent(buildBase, "BuildOutput", (ev:ToolCore.BuildOutputEvent) => {
 
-          console.log(ev.text);
-          this.text += ev.text;
-          this.outputField.text = this.text;
+          this.textOutput += ev.text;
+          this.outputField.text = this.textOutput;
           this.outputField.scrollTo(0, 0xffffff);
 
         });
 
     }
 
-    text:string;
+    textOutput:string;
     buildBase:ToolCore.BuildBase;
     outputField:Atomic.UIEditField;
 
