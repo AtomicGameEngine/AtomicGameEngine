@@ -351,11 +351,6 @@ void BuildAndroid::Build(const String& buildPath)
 
     RunAntDebug();
 
-    //BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-    //buildSystem->BuildComplete(PLATFORMID_ANDROID, buildPath_);
-
-    //fileSystem->SystemCommandAsync("/Applications/Firefox.app/Contents/MacOS/firefox");
-
 }
 
 }
