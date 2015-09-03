@@ -4,6 +4,7 @@
 
 #include "../ToolEnvironment.h"
 #include "../Subprocess/SubprocessSystem.h"
+#include "../Build/BuildAndroid.h"
 
 #include "PlatformAndroid.h"
 
@@ -22,7 +23,7 @@ PlatformAndroid::~PlatformAndroid()
 
 BuildBase* PlatformAndroid::NewBuild(Project *project)
 {
-    return 0;
+    return new BuildAndroid(context_, project);
 }
 
 void PlatformAndroid::PrependAndroidCommandArgs(Vector<String> args)

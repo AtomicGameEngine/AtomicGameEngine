@@ -67,7 +67,7 @@ void AtomicPlayerApp::Setup()
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
-    engineParameters_["ResourcePaths"] = "CoreData;AtomicResources";
+    engineParameters_["ResourcePaths"] = "CoreData;PlayerData;Cache;AtomicResources";
 #elif ATOMIC_PLATFORM_WEB
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";

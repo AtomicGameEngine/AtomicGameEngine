@@ -136,6 +136,7 @@ namespace :build  do
       Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
 
         sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/Atomic/ ANDROID"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/AtomicPlayer/ ANDROID"
         sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
         sh "make -j4"
       end

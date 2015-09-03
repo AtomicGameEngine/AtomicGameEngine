@@ -9,7 +9,7 @@
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
-						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows",
+						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid",
 						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "MacBuildSettings"],
 	"typescript_decl" : {
 
