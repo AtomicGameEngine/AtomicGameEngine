@@ -8,11 +8,13 @@
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
+#include "../Subprocess/SubprocessSystem.h"
 #include "../Project/Project.h"
 
 #include "AndroidProjectGenerator.h"
 
 #include "BuildSystem.h"
+#include "BuildEvents.h"
 #include "BuildAndroid.h"
 
 namespace ToolCore
@@ -25,6 +27,58 @@ BuildAndroid::BuildAndroid(Context* context, Project* project) : BuildBase(conte
 
 BuildAndroid::~BuildAndroid()
 {
+
+}
+
+void BuildAndroid::SendBuildFailure(const String& message)
+{
+
+    VariantMap buildError;
+    buildError[BuildFailed::P_PLATFORMID] = PLATFORMID_ANDROID;
+    buildError[BuildFailed::P_MESSAGE] = message;
+    SendEvent(E_BUILDFAILED, buildError);
+
+}
+
+void BuildAndroid::RunAntDebug()
+{
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
+    ToolPrefs* tprefs = tenv->GetToolPrefs();
+
+    Poco::Process::Env env;
+
+#ifdef ATOMIC_PLATFORM_OSX
+    String antCommand = tprefs->GetAntPath();
+    Vector<String> args;
+    args.Push("debug");
+#else
+    // C:\ProgramData\Oracle\Java\javapath;
+    Vector<String> args;
+    String antCommand = "cmd";
+    String antPath = prefs->GetAntPath() + "/ant.bat";
+    env["JAVA_HOME"] = prefs->GetJDKRootPath().CString();
+    // ant is a batch file on windows, so have to run with cmd /c
+    args.Push("/c");
+    args.Push("\"" + antPath + "\"");
+    args.Push("debug");
+#endif
+
+    currentBuildPhase_ = AntBuildDebug;
+    Subprocess* subprocess = subs->Launch(antCommand, args, buildPath_, env);
+
+    if (!subprocess)
+    {
+        SendBuildFailure("BuildFailed::RunAntDebug");
+        return;
+    }
+
+    VariantMap buildOutput;
+    buildOutput[BuildOutput::P_TEXT] = "<color #D4FB79>Starting Android Deployment</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
+
+    //SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildAndroid, HandleEvent));
+    SubscribeToEvent(subprocess, E_SUBPROCESSOUTPUT, HANDLER(BuildBase, HandleSubprocessOutputEvent));
 
 }
 
@@ -48,6 +102,7 @@ void BuildAndroid::Initialize()
 
     BuildResourceEntries();
 }
+
 void BuildAndroid::Build(const String& buildPath)
 {
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
@@ -102,11 +157,14 @@ void BuildAndroid::Build(const String& buildPath)
 
     if (!gen.Generate())
     {
+        SendBuildFailure(gen.GetErrorText());
         return;
     }
 
-    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-    buildSystem->BuildComplete(PLATFORMID_ANDROID, buildPath_);
+    RunAntDebug();
+
+    //BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+    //buildSystem->BuildComplete(PLATFORMID_ANDROID, buildPath_);
 
     //fileSystem->SystemCommandAsync("/Applications/Firefox.app/Contents/MacOS/firefox");
 

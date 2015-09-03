@@ -18,7 +18,7 @@ public:
 
     const String& GetAndroidSDKPath() { return androidSDKPath_; }
     const String& GetJDKRootPath() { return jdkRootPath_; }
-    const String& GetAntPath() { return antPath_; }
+    const String& GetAntPath();
 
     void SetAndroidSDKPath(const String& path) { androidSDKPath_ = path; }
     void SetJDKRootPath(const String& path) { jdkRootPath_ = path; }

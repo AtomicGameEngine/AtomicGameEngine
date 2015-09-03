@@ -26,8 +26,22 @@ public:
 
 protected:
 
-    void Initialize();
+    enum BuildPhase
+    {
+        AndroidUpdateProject,
+        AntBuildDebug,
+        ADBListDevices,
+        ADBInstall,
+        ADBStartActivity
+    };
 
+    void RunAntDebug();
+
+    void SendBuildFailure(const String& message);
+
+    BuildPhase currentBuildPhase_;
+
+    void Initialize();
 
 };
 

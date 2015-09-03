@@ -51,8 +51,8 @@ class BuildWindow extends ModalWindow {
             }
 
             if (ev.target.id == "build") {
-                this.build();
                 this.hide();
+                this.build();
                 return true;
             }
 
@@ -76,7 +76,7 @@ class BuildWindow extends ModalWindow {
         var buildSystem = ToolCore.buildSystem;
         var toolSystem = ToolCore.toolSystem;
 
-        toolSystem.setCurrentPlatform(toolSystem.getPlatformByName("WEB").platformID);
+        toolSystem.setCurrentPlatform(toolSystem.getPlatformByName("ANDROID").platformID);
 
         buildSystem.buildPath = "/Users/josh/Desktop/MyBuilds/";
 
@@ -84,6 +84,9 @@ class BuildWindow extends ModalWindow {
         var platform = toolSystem.currentPlatform;
 
         var buildBase = platform.newBuild(project);
+
+        EditorUI.getModelOps().showBuildOutput(buildBase);
+
         buildSystem.queueBuild(buildBase);
         buildSystem.startNextBuild();
 

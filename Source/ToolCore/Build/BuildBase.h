@@ -39,6 +39,9 @@ public:
     void BuildWarn(const String& warning);
     void BuildError(const String& error);
 
+    /// Converts subprocess output event to a buildoutput event
+    void HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData);
+
 protected:
 
     void GenerateResourcePackage(const String& resourcePackagePath);

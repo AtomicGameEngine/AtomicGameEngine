@@ -236,6 +236,24 @@ declare module ToolCore {
 
     }
 
+    export interface BuildOutputEvent {
+
+        text:string;
+
+    }
+
+    export interface BuildCompleteEvent {
+
+        platformID:number;
+
+    }
+
+    export interface BuildFailedEvent {
+
+        platformID:number;
+        message:string;
+
+    }
 
     export var toolEnvironment: ToolEnvironment;
     export var toolSystem: ToolSystem;

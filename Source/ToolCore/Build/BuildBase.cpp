@@ -5,9 +5,11 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include "../Subprocess/SubprocessSystem.h"
 #include "../Project/Project.h"
 #include "../ToolEnvironment.h"
 
+#include "BuildEvents.h"
 #include "BuildBase.h"
 #include "ResourcePackager.h"
 
@@ -44,6 +46,17 @@ void BuildBase::BuildWarn(const String& warning)
 void BuildBase::BuildError(const String& error)
 {
     buildErrors_.Push(error);
+}
+
+void BuildBase::HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData)
+{
+    // E_SUBPROCESSOUTPUT
+    const String& text = eventData[SubprocessOutput::P_TEXT].GetString();
+
+    // convert to a build output event and forward to subscribers
+    VariantMap buildOutputData;
+    buildOutputData[BuildOutput::P_TEXT] = text;
+    SendEvent(E_BUILDOUTPUT, buildOutputData);
 }
 
 void BuildBase::GetDefaultResourcePaths(Vector<String>& paths)

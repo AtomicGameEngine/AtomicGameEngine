@@ -16,6 +16,11 @@ EVENT(E_BUILDCOMPLETE, BuildComplete)
     PARAM(P_PLATFORMID, PlatformID); // unsigned (PLATFORMID)
 }
 
+EVENT(E_BUILDOUTPUT, BuildOutput)
+{
+    PARAM(P_TEXT, Text); // string
+}
+
 EVENT(E_BUILDFAILED, BuildFailed)
 {
     PARAM(P_PLATFORMID, PlatformID); // unsigned (PLATFORMID)

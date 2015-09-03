@@ -11,6 +11,7 @@ import ManageLicense = require("./license/ManageLicense");
 import ProWindow = require("./license/ProWindow");
 
 import BuildWindow = require("./build/BuildWindow");
+import BuildOutput= require("./build/BuildOutput");
 import BuildSettingsWindow = require("./build/BuildSettingsWindow");
 
 import ResourceSelection = require("./ResourceSelection");
@@ -187,6 +188,17 @@ class ModalOps extends Atomic.ScriptObject {
         }
 
     }
+
+    showBuildOutput(buildBase:ToolCore.BuildBase) {
+
+        if (this.show()) {
+
+            this.opWindow = new BuildOutput(buildBase);
+
+        }
+
+    }
+
 
     showActivationSuccessWindow() {
 

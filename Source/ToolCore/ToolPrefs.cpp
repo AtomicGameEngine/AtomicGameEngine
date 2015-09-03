@@ -20,6 +20,18 @@ ToolPrefs::~ToolPrefs()
 
 }
 
+const String& ToolPrefs::GetAntPath()
+{
+#ifdef ATOMIC_PLATFORM_OSX
+    static String defaultAntPath("/usr/local/bin/ant");
+    if (!antPath_.Length())
+        return defaultAntPath;
+    return antPath_;
+#else
+    return antPath_;
+#endif
+}
+
 String ToolPrefs::GetPrefsPath()
 {
     FileSystem* fs = GetSubsystem<FileSystem>();
