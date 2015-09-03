@@ -30,6 +30,7 @@ public:
     PlatformID GetPlatformID() { return PLATFORMID_ANDROID; }
 
     String GetAndroidCommand() const;
+    String GetADBCommand() const;
 
     void RefreshAndroidTargets();
     const Vector<String>& GetAndroidTargets() { return androidTargets_; }

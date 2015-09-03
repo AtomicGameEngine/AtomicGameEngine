@@ -11,6 +11,8 @@ namespace ToolCore
 
 class Project;
 
+class PlatformAndroid;
+
 class BuildAndroid : public BuildBase
 {
     OBJECT(BuildAndroid);
@@ -36,12 +38,26 @@ protected:
     };
 
     void RunAntDebug();
+    void HandleAntDebugComplete(StringHash eventType, VariantMap& eventData);
+
+    void RunADBListDevices();
+    void HandleADBListDevicesOutputEvent(StringHash eventType, VariantMap& eventData);
+    void HandleADBListDevicesComplete(StringHash eventType, VariantMap& eventData);
+
+    void RunADBInstall();
+    void HandleRunADBInstallComplete(StringHash eventType, VariantMap& eventData);
+
+    void RunADBStartActivity();
+    void HandleADBStartActivityComplete(StringHash eventType, VariantMap& eventData);
 
     void SendBuildFailure(const String& message);
 
     BuildPhase currentBuildPhase_;
 
     void Initialize();
+
+    PlatformAndroid* platformAndroid_;
+    String deviceListText_;
 
 };
 

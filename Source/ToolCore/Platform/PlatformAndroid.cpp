@@ -99,6 +99,22 @@ void PlatformAndroid::RefreshAndroidTargets()
 
 }
 
+String PlatformAndroid::GetADBCommand() const
+{
+    ToolPrefs* prefs = GetSubsystem<ToolEnvironment>()->GetToolPrefs();
+
+    String adbCommand = prefs->GetAndroidSDKPath();
+
+#ifdef ATOMIC_PLATFORM_OSX
+    adbCommand += "/platform-tools/adb";
+#else
+    adbCommand += "/platform-tools/adb.exe";
+#endif
+
+    return adbCommand;
+
+}
+
 String PlatformAndroid::GetAndroidCommand() const
 {
     ToolPrefs* prefs = GetSubsystem<ToolEnvironment>()->GetToolPrefs();
