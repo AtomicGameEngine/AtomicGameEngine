@@ -130,6 +130,30 @@ String FileUtils::GetAndroidSDKPath(const String& defaultPath)
 
 }
 
+String FileUtils::GetMobileProvisionPath()
+{
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_OpenDialog( "mobileprovision",
+                                NULL,
+                                &outPath);
+
+    String fullpath;
+
+    if (outPath && result == NFD_OKAY)
+    {
+         fullpath = outPath;
+    }
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    if (outPath)
+        free(outPath);
+
+    return fullpath;
+
+}
+
 
 
 void FileUtils::RevealInFinder(const String& fullpath)

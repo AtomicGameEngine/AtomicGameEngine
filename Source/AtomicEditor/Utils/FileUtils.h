@@ -21,6 +21,7 @@ public:
 
     bool CreateDirs(const String& folder);
 
+    String GetMobileProvisionPath();
     String GetAndroidSDKPath(const String& defaultPath);
     String OpenProjectFileDialog();
     String NewProjectFileDialog();

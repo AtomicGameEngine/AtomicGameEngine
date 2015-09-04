@@ -20,6 +20,8 @@ public:
 
     BuildBase* NewBuild(Project* project);
 
+    String ParseProvisionAppIdentifierPrefix(const String& provisionFile);
+
 };
 
 }

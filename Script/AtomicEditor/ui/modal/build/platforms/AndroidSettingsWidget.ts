@@ -21,8 +21,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
 
         this.antPathEdit = <Atomic.UIEditField>this.getWidget("ant_path");
 
-
-
         if (Atomic.platform == "MacOSX") {
 
             this.jdkRootText.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
@@ -43,7 +41,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
             if (ev.target.id == "choose_sdk_path") {
 
                 var fileUtils = new Editor.FileUtils();
-
                 var path = fileUtils.getAndroidSDKPath("");
 
                 if (path.length) {
