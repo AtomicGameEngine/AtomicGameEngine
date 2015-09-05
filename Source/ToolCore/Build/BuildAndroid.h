@@ -48,9 +48,7 @@ protected:
     void HandleRunADBInstallComplete(StringHash eventType, VariantMap& eventData);
 
     void RunADBStartActivity();
-    void HandleADBStartActivityComplete(StringHash eventType, VariantMap& eventData);
-
-    void SendBuildFailure(const String& message);
+    void HandleADBStartActivityComplete(StringHash eventType, VariantMap& eventData);    
 
     BuildPhase currentBuildPhase_;
 

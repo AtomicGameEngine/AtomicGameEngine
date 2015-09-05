@@ -15,7 +15,7 @@
 namespace ToolCore
 {
 
-BuildWeb::BuildWeb(Context* context, Project* project) : BuildBase(context, project)
+BuildWeb::BuildWeb(Context* context, Project* project) : BuildBase(context, project, PLATFORMID_WEB)
 {
 
 }

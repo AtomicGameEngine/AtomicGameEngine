@@ -16,7 +16,9 @@
 namespace ToolCore
 {
 
-BuildBase::BuildBase(Context * context, Project* project) : Object(context), containsMDL_(false)
+BuildBase::BuildBase(Context * context, Project* project, PlatformID platform) : Object(context),
+    platformID_(platform),
+    containsMDL_(false)
 {
     if (UseResourcePackager())
         resourcePackager_ = new ResourcePackager(context, this);
@@ -47,6 +49,17 @@ void BuildBase::BuildError(const String& error)
 {
     buildErrors_.Push(error);
 }
+
+void BuildBase::SendBuildFailure(const String& message)
+{
+
+    VariantMap buildError;
+    buildError[BuildFailed::P_PLATFORMID] = platformID_;
+    buildError[BuildFailed::P_MESSAGE] = message;
+    SendEvent(E_BUILDFAILED, buildError);
+
+}
+
 
 void BuildBase::HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData)
 {

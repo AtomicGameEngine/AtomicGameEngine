@@ -158,6 +158,11 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
 
 }
 
+String ToolEnvironment::GetIOSDeployBinary()
+{
+    return GetToolDataDir() + "Tools/IOSDeploy/ios-deploy";
+}
+
 void ToolEnvironment::Dump()
 {
     LOGINFOF("Root Source Dir: %s", rootSourceDir_.CString());

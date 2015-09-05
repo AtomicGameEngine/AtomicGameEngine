@@ -23,7 +23,7 @@
 namespace ToolCore
 {
 
-BuildAndroid::BuildAndroid(Context* context, Project* project) : BuildBase(context, project)
+BuildAndroid::BuildAndroid(Context* context, Project* project) : BuildBase(context, project, PLATFORMID_ANDROID)
 {
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
     // this cast isn't great
@@ -33,16 +33,6 @@ BuildAndroid::BuildAndroid(Context* context, Project* project) : BuildBase(conte
 
 BuildAndroid::~BuildAndroid()
 {
-
-}
-
-void BuildAndroid::SendBuildFailure(const String& message)
-{
-
-    VariantMap buildError;
-    buildError[BuildFailed::P_PLATFORMID] = PLATFORMID_ANDROID;
-    buildError[BuildFailed::P_MESSAGE] = message;
-    SendEvent(E_BUILDFAILED, buildError);
 
 }
 

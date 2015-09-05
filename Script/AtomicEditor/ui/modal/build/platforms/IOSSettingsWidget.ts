@@ -55,9 +55,7 @@ class IOSSettingsWidget extends Atomic.UIWidget {
                     this.provisionPathEdit.text = path;
                     this.appIDPrefixField.text = prefix;
 
-                  }
-
-                  this.refreshWidgets();
+                  }                  
 
               }
 

@@ -26,7 +26,28 @@ public:
 
 protected:
 
+    enum BuildPhase
+    {
+        ConvertPList,
+        CodeSign,
+        Deploy
+    };
+
+    void RunConvertPList();
+    void HandleConvertPListComplete(StringHash eventType, VariantMap& eventData);
+
+    void RunCodeSign();
+    void HandleCodeSignComplete(StringHash eventType, VariantMap& eventData);
+
+    void RunDeploy();
+    void HandleDeployComplete(StringHash eventType, VariantMap& eventData);
+
+    String GenerateInfoPlist();
+    String GenerateEntitlements();
+
     void Initialize();
+
+    BuildPhase currentBuildPhase_;
 
 
 };

@@ -118,6 +118,7 @@ namespace :build  do
 
       Dir.chdir(CMAKE_IOS_BUILD_FOLDER) do
         sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/Atomic/ IOS"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/AtomicPlayer/ IOS"
         sh "cmake -DIOS=1 -DCMAKE_BUILD_TYPE=Release -G Xcode ../../"
         # the -s option adds $KEYCHAIN to the search scope, while the -d option adds $KEYCHAIN to the system domain; both are needed
         sh "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain"

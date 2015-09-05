@@ -1,7 +1,7 @@
 
 #include <ThirdParty/PugiXml/src/pugixml.hpp>
 
-#include "../Build/BuildWeb.h"
+#include "../Build/BuildIOS.h"
 #include "PlatformIOS.h"
 
 #ifdef ATOMIC_PLATFORM_OSX
@@ -79,7 +79,7 @@ String PlatformIOS::ParseProvisionAppIdentifierPrefix(const String& provisionFil
 
 BuildBase* PlatformIOS::NewBuild(Project *project)
 {
-    return 0;
+    return new BuildIOS(context_, project);
 }
 
 

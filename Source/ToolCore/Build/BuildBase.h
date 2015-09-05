@@ -6,6 +6,7 @@
 
 #include <Atomic/Core/Object.h>
 #include "BuildTypes.h"
+#include "../Platform/Platform.h"
 
 using namespace Atomic;
 
@@ -21,7 +22,7 @@ class BuildBase : public Object
 
 public:
 
-    BuildBase(Context* context, Project* project);
+    BuildBase(Context* context, Project* project, PlatformID platform);
     virtual ~BuildBase();
 
     virtual void Build(const String& buildPath) = 0;
@@ -44,6 +45,8 @@ public:
 
 protected:
 
+    void SendBuildFailure(const String& message);
+
     void GenerateResourcePackage(const String& resourcePackagePath);
 
     void BuildResourceEntries();
@@ -56,6 +59,8 @@ protected:
     bool containsMDL_;
 
 private:
+
+    PlatformID platformID_;
 
     Vector<String> buildLog_;
     Vector<String> buildWarnings_;

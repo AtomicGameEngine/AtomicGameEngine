@@ -61,6 +61,9 @@ public:
     // OSX
     const String& GetPlayerAppFolder() { return playerAppFolder_; }
 
+    // iOS
+    String GetIOSDeployBinary();
+
     void Dump();
 
 private:

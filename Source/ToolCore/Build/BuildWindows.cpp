@@ -13,7 +13,7 @@
 namespace ToolCore
 {
 
-BuildWindows::BuildWindows(Context * context, Project *project) : BuildBase(context, project)
+BuildWindows::BuildWindows(Context * context, Project *project) : BuildBase(context, project, PLATFORMID_WINDOWS)
 {
 
 }

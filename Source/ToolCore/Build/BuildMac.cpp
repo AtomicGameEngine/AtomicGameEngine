@@ -13,7 +13,7 @@
 namespace ToolCore
 {
 
-BuildMac::BuildMac(Context * context, Project *project) : BuildBase(context, project)
+BuildMac::BuildMac(Context * context, Project *project) : BuildBase(context, project, PLATFORMID_MAC)
 {
 
 }
