@@ -16,6 +16,8 @@ var iosBuildFolder = artifactsFolder + "/IOS_Build";
 var webBuildFolder = artifactsFolder + "/Web_Build";
 var linuxBuildFolder = artifactsFolder + "/Linux_Build";
 
+var atomictool = macOSXBuildFolder + "/Source/AtomicTool/Release/AtomicTool"
+
 var allBuildFolders = [
   windowsBuildFolder,
   macOSXBuildFolder,
@@ -72,6 +74,29 @@ namespace('clean', function() {
 
 namespace('build', function() {
 
+  task('macosx_atomictool', {async:true}, function() {
+
+    if (!fs.existsSync(macOSXBuildFolder)) {
+      jake.mkdirP(macOSXBuildFolder);
+    }
+
+    var cmds = [
+      'cmake ../../ -G Xcode ' + getAtomicDevBuildDefine(),
+      'xcodebuild -target AtomicTool -configuration Release'
+    ]
+
+    process.chdir(macOSXBuildFolder);
+
+    jake.exec(cmds, function() {
+      console.log("Built MacOSX");
+      complete();
+    }, {
+      printStdout: true
+    });
+
+  }); // end build:macosx_atomictool
+
+
   task('macosx', {async:true}, function() {
 
     if (!fs.existsSync(macOSXBuildFolder)) {
@@ -109,6 +134,49 @@ namespace('build', function() {
     });
 
   });
+
+  task('android', ['macosx_atomictool'], {async:true}, function() {
+
+    if (!fs.existsSync(androidBuildFolder)) {
+      jake.mkdirP(androidBuildFolder);
+    }
+
+    process.chdir(androidBuildFolder);
+
+    var cmds = [
+      atomictool + " bind " + jakeRoot + " Script/Packages/Atomic/ ANDROID",
+      atomictool + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ ANDROID",
+      "cmake -DCMAKE_TOOLCHAIN_FILE=" + jakeRoot + "/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../",
+      "make -j4"
+    ]
+
+    jake.exec(cmds, function() {
+      console.log("Built Android");
+      complete();
+    }, {
+      printStdout: true
+    });
+
+  });
+
+/*
+  task :android =>  "build:macosx_atomictool" do
+
+      if !Dir.exists?("#{CMAKE_ANDROID_BUILD_FOLDER}")
+        FileUtils.mkdir_p(CMAKE_ANDROID_BUILD_FOLDER)
+      end
+
+      Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
+
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/Atomic/ ANDROID"
+        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/AtomicPlayer/ ANDROID"
+        sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
+        sh "make -j4"
+      end
+
+  end
+*/
+
 
 }); // end build namespace
 
