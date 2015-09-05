@@ -151,7 +151,7 @@ namespace('build', function() {
     ]
 
     jake.exec(cmds, function() {
-      console.log("Built Android");
+      console.log("Built Android Player");
       complete();
     }, {
       printStdout: true
@@ -159,23 +159,29 @@ namespace('build', function() {
 
   });
 
-/*
-  task :android =>  "build:macosx_atomictool" do
+  task('ios', ['macosx_atomictool'], {async:true}, function() {
 
-      if !Dir.exists?("#{CMAKE_ANDROID_BUILD_FOLDER}")
-        FileUtils.mkdir_p(CMAKE_ANDROID_BUILD_FOLDER)
-      end
+    if (!fs.existsSync(iosBuildFolder)) {
+      jake.mkdirP(iosBuildFolder);
+    }
 
-      Dir.chdir(CMAKE_ANDROID_BUILD_FOLDER) do
+    process.chdir(iosBuildFolder);
 
-        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/Atomic/ ANDROID"
-        sh "#{ATOMICTOOL_BIN_MACOSX} bind #{$RAKE_ROOT} Script/Packages/AtomicPlayer/ ANDROID"
-        sh "cmake -DCMAKE_TOOLCHAIN_FILE=#{$RAKE_ROOT}/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../"
-        sh "make -j4"
-      end
+    var cmds = [
+      atomictool + " bind " + jakeRoot + " Script/Packages/Atomic/ IOS",
+      atomictool + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ IOS",
+      "cmake -DIOS=1 -G Xcode ../../",
+      "xcodebuild -configuration Release"
+    ]
 
-  end
-*/
+    jake.exec(cmds, function() {
+      console.log("Built iOS Player");
+      complete();
+    }, {
+      printStdout: true
+    });
+
+  });
 
 
 }); // end build namespace
