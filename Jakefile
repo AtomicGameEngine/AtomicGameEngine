@@ -28,6 +28,7 @@ var windowsBuildFolder = artifactsFolder + "/Windows_Build";
 var macOSXBuildFolder = artifactsFolder + "/MacOSX_Build";
 var androidBuildFolder = artifactsFolder + "/Android_Build";
 var iosBuildFolder = artifactsFolder + "/IOS_Build";
+var iosDeployBuildFolder = artifactsFolder + "/ios-deploy";
 var webBuildFolder = artifactsFolder + "/Web_Build";
 var linuxBuildFolder = artifactsFolder + "/Linux_Build";
 
@@ -50,6 +51,7 @@ var allBuildFolders = [
   macOSXBuildFolder,
   androidBuildFolder,
   iosBuildFolder,
+  iosDeployBuildFolder,
   webBuildFolder,
   linuxBuildFolder
 ];
@@ -170,8 +172,10 @@ namespace('build', function() {
     if (deployments.android)
       fs.copySync(platformBinariesFolder + "/Android/libAtomicPlayer.so", deployRoot + "/Android/libs/armeabi-v7a/libAtomicPlayer.so");
 
-    if (deployments.ios)
+    if (deployments.ios) {
+      fs.copySync(artifactsFolder + "/ios-deploy/ios-deploy/ios-deploy", deployRoot + "/IOS/ios-deploy/ios-deploy");
       fs.copySync(platformBinariesFolder + "/IOS/AtomicPlayer", deployRoot + "/IOS/AtomicPlayer.app/AtomicPlayer");
+    }
 
     if (deployments.web) {
       fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.js", deployRoot + "/Web/AtomicPlayer.js");
@@ -181,6 +185,25 @@ namespace('build', function() {
     complete();
 
   });
+
+  task('ios_deploy', {
+    async: true
+  }, function() {
+
+    if (!fs.existsSync(iosDeployBuildFolder)) {
+      jake.mkdirP(iosDeployBuildFolder);
+    }
+
+    process.chdir(iosDeployBuildFolder);
+
+    if (!fs.existsSync(iosDeployBuildFolder + "/ios-deploy")) {
+      jake.exec("git clone https://github.com/AtomicGameEngine/ios-deploy && cd ios-deploy && make ios-deploy");
+    }
+
+    complete();
+
+  });
+
 
   task('macosx', deps, {
     async: true
@@ -258,7 +281,7 @@ namespace('build', function() {
 
   });
 
-  task('ios', ['macosx_atomictool'], {
+  task('ios', ['macosx_atomictool', 'ios_deploy'], {
     async: true
   }, function() {
 
