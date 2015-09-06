@@ -1,6 +1,13 @@
-var fs = require('fs');
-var path = require('path');
 
+// patch in our local node_modules
+process.env.NODE_PATH = __dirname + "/Build/node_modules";
+require('module').Module._initPaths();
+
+var fs = require('fs-extra');
+var path = require('path');
+var os = require('os');
+
+var host = os.platform();
 var jakeRoot = __dirname;
 
 var artifactsFolder = jakeRoot + "/Artifacts";
@@ -16,7 +23,18 @@ var iosBuildFolder = artifactsFolder + "/IOS_Build";
 var webBuildFolder = artifactsFolder + "/Web_Build";
 var linuxBuildFolder = artifactsFolder + "/Linux_Build";
 
-var atomictool = macOSXBuildFolder + "/Source/AtomicTool/Release/AtomicTool"
+// binaries
+
+if (host == "darwin") {
+  var atomicToolBinary = macOSXBuildFolder + "/Source/AtomicTool/Release/AtomicTool"
+  var atomicEditorBinary = macOSXBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.app/Contents/MacOS/AtomicEditor"
+  var atomicPlayerBinary = macOSXBuildFolder + "/Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer"
+}
+
+var androidPlayerBinary = androidBuildFolder + "/Source/AtomicPlayer/Application/libAtomicPlayer.so";
+var iosPlayerBinary = iosBuildFolder + "/Source/AtomicPlayer/Application/Release-iphoneos/AtomicPlayer.app/AtomicPlayer"
+var webPlayerBinary = webBuildFolder + "/Source/AtomicPlayer/Application/AtomicPlayer.js"
+var webPlayerMemFile = webBuildFolder + "/Source/AtomicPlayer/Application/AtomicPlayer.html.mem"
 
 var allBuildFolders = [
   windowsBuildFolder,
@@ -28,12 +46,14 @@ var allBuildFolders = [
 ];
 
 // packaging
+var platformBinariesFolder = artifactsFolder + "/Platform_Binaries";
 var windowsPackageFolder = artifactsFolder + "/Windows_Package";
 var macOSXPackageFolder = artifactsFolder + "/MacOSX_Package";
 
 var allPackageFolders = [
   windowsPackageFolder,
-  macOSXPackageFolder
+  macOSXPackageFolder,
+  platformBinariesFolder
 ];
 
 function getAtomicDevBuildDefine() {
@@ -88,11 +108,16 @@ namespace('build', function() {
     process.chdir(macOSXBuildFolder);
 
     jake.exec(cmds, function() {
-      console.log("Built MacOSX");
+
+      fs.copySync(atomicToolBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicToolBinary));
+      console.log("Built MacOSX AtomicTool");
       complete();
     }, {
       printStdout: true
     });
+
+
+
 
   }); // end build:macosx_atomictool
 
@@ -111,6 +136,8 @@ namespace('build', function() {
     process.chdir(macOSXBuildFolder);
 
     jake.exec(cmds, function() {
+      fs.copySync(atomicEditorBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicEditorBinary));
+      fs.copySync(atomicPlayerBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicPlayerBinary));
       console.log("Built MacOSX");
       complete();
     }, {
@@ -144,13 +171,14 @@ namespace('build', function() {
     process.chdir(androidBuildFolder);
 
     var cmds = [
-      atomictool + " bind " + jakeRoot + " Script/Packages/Atomic/ ANDROID",
-      atomictool + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ ANDROID",
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/Atomic/ ANDROID",
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ ANDROID",
       "cmake -DCMAKE_TOOLCHAIN_FILE=" + jakeRoot + "/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../",
       "make -j4"
     ]
 
     jake.exec(cmds, function() {
+      fs.copySync(androidPlayerBinary, platformBinariesFolder + "/Android/" + path.basename(androidPlayerBinary));
       console.log("Built Android Player");
       complete();
     }, {
@@ -168,13 +196,14 @@ namespace('build', function() {
     process.chdir(iosBuildFolder);
 
     var cmds = [
-      atomictool + " bind " + jakeRoot + " Script/Packages/Atomic/ IOS",
-      atomictool + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ IOS",
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/Atomic/ IOS",
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ IOS",
       "cmake -DIOS=1 -G Xcode ../../",
       "xcodebuild -configuration Release"
     ]
 
     jake.exec(cmds, function() {
+      fs.copySync(iosPlayerBinary, platformBinariesFolder + "/IOS/" + path.basename(iosPlayerBinary));
       console.log("Built iOS Player");
       complete();
     }, {
@@ -193,8 +222,8 @@ namespace('build', function() {
     process.chdir(webBuildFolder);
 
     var cmds = [
-      atomictool + " bind " + jakeRoot + " Script/Packages/Atomic/ WEB",
-      atomictool + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ WEB",
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/Atomic/ WEB",
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ WEB",
       "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=" + jakeRoot + "/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../",
       "make -j4",
       "cd ./Source/AtomicPlayer/Application && mv ./AtomicPlayer ./AtomicPlayer.bc && " +
@@ -204,6 +233,8 @@ namespace('build', function() {
     ]
 
     jake.exec(cmds, function() {
+      fs.copySync(webPlayerBinary, platformBinariesFolder + "/Web/" + path.basename(webPlayerBinary));
+      fs.copySync(webPlayerMemFile, platformBinariesFolder + "/Web/" + path.basename(webPlayerMemFile));
       console.log("Built Web Player");
       complete();
     }, {
@@ -214,7 +245,6 @@ namespace('build', function() {
 
 
 }); // end build namespace
-
 
 namespace('package', function() {
 
