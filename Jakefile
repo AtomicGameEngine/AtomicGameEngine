@@ -1,4 +1,3 @@
-
 // patch in our local node_modules
 process.env.NODE_PATH = __dirname + "/Build/node_modules";
 require('module').Module._initPaths();
@@ -14,6 +13,15 @@ var artifactsFolder = jakeRoot + "/Artifacts";
 
 // cmake
 var cmakeDevBuild = false;
+
+var includeDeployments = true;
+var deployments = {
+  osx: true,
+  android: true,
+  windows: true,
+  ios: true,
+  web: true
+}
 
 // build folder
 var windowsBuildFolder = artifactsFolder + "/Windows_Build";
@@ -31,6 +39,7 @@ if (host == "darwin") {
   var atomicPlayerBinary = macOSXBuildFolder + "/Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer"
 }
 
+// source files
 var androidPlayerBinary = androidBuildFolder + "/Source/AtomicPlayer/Application/libAtomicPlayer.so";
 var iosPlayerBinary = iosBuildFolder + "/Source/AtomicPlayer/Application/Release-iphoneos/AtomicPlayer.app/AtomicPlayer"
 var webPlayerBinary = webBuildFolder + "/Source/AtomicPlayer/Application/AtomicPlayer.js"
@@ -77,7 +86,9 @@ function testRemoveDir(path) {
 
 namespace('clean', function() {
 
-  task('all', {async:true}, function() {
+  task('all', {
+    async: true
+  }, function() {
 
     for (var i in allBuildFolders) {
       testRemoveDir(allBuildFolders[i]);
@@ -94,7 +105,9 @@ namespace('clean', function() {
 
 namespace('build', function() {
 
-  task('macosx_atomictool', {async:true}, function() {
+  task('macosx_atomictool', {
+    async: true
+  }, function() {
 
     if (!fs.existsSync(macOSXBuildFolder)) {
       jake.mkdirP(macOSXBuildFolder);
@@ -121,8 +134,57 @@ namespace('build', function() {
 
   }); // end build:macosx_atomictool
 
+  var deps = [];
 
-  task('macosx', {async:true}, function() {
+  if (includeDeployments) {
+
+    if (host == 'darwin') {
+
+      deps = ['macosx_atomictool'];
+
+      if (deployments.ios)
+        deps.push("build:ios");
+
+      if (deployments.android)
+        deps.push("build:android");
+
+      if (deployments.web)
+        deps.push("build:web");
+
+    }
+
+  }
+
+  task('install_deployments', {
+    async: true
+  }, function() {
+
+    console.log("Installing Deployments");
+
+    // deployment root for local dev builds
+    var deployRoot = jakeRoot + "/Data/AtomicEditor/Deployment";
+
+    if (deployments.osx)
+      fs.copySync(platformBinariesFolder + "/MacOSX/AtomicPlayer", deployRoot + "/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
+
+    if (deployments.android)
+      fs.copySync(platformBinariesFolder + "/Android/libAtomicPlayer.so", deployRoot + "/Android/libs/armeabi-v7a/libAtomicPlayer.so");
+
+    if (deployments.ios)
+      fs.copySync(platformBinariesFolder + "/IOS/AtomicPlayer", deployRoot + "/IOS/AtomicPlayer.app/AtomicPlayer");
+
+    if (deployments.web) {
+      fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.js", deployRoot + "/Web/AtomicPlayer.js");
+      fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.html.mem", deployRoot + "/Web/AtomicPlayer.html.mem");
+    }
+
+    complete();
+
+  });
+
+  task('macosx', deps, {
+    async: true
+  }, function() {
 
     if (!fs.existsSync(macOSXBuildFolder)) {
       jake.mkdirP(macOSXBuildFolder);
@@ -138,6 +200,11 @@ namespace('build', function() {
     jake.exec(cmds, function() {
       fs.copySync(atomicEditorBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicEditorBinary));
       fs.copySync(atomicPlayerBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicPlayerBinary));
+
+      if (includeDeployments) {
+        jake.Task['build:install_deployments'].invoke();
+      }
+
       console.log("Built MacOSX");
       complete();
     }, {
@@ -146,7 +213,9 @@ namespace('build', function() {
 
   }); // end build:macosx
 
-  task('windows', {async:true}, function() {
+  task('windows', {
+    async: true
+  }, function() {
 
     if (!fs.existsSync(windowsBuildFolder)) {
       jake.mkdirP(windowsBuildFolder);
@@ -162,7 +231,9 @@ namespace('build', function() {
 
   });
 
-  task('android', ['macosx_atomictool'], {async:true}, function() {
+  task('android', ['macosx_atomictool'], {
+    async: true
+  }, function() {
 
     if (!fs.existsSync(androidBuildFolder)) {
       jake.mkdirP(androidBuildFolder);
@@ -187,7 +258,9 @@ namespace('build', function() {
 
   });
 
-  task('ios', ['macosx_atomictool'], {async:true}, function() {
+  task('ios', ['macosx_atomictool'], {
+    async: true
+  }, function() {
 
     if (!fs.existsSync(iosBuildFolder)) {
       jake.mkdirP(iosBuildFolder);
@@ -213,7 +286,9 @@ namespace('build', function() {
   });
 
 
-  task('web', ['macosx_atomictool'], {async:true}, function() {
+  task('web', ['macosx_atomictool'], {
+    async: true
+  }, function() {
 
     if (!fs.existsSync(webBuildFolder)) {
       jake.mkdirP(webBuildFolder);
@@ -273,15 +348,15 @@ namespace('package', function() {
 
     jake.mkdirP(windowsPackageFolder + "/Resources");
 
-    jake.cpR(windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe", windowsPackageFolder + "/AtomicEditor.exe" )
+    jake.cpR(windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe", windowsPackageFolder + "/AtomicEditor.exe")
 
     // 32 bit build for packaging!
 
-    jake.cpR(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll" )
+    jake.cpR(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll")
 
     // copy resources
 
-    jake.cpR(jakeRoot + "/Resources/CoreData",  windowsPackageFolder + "/Resources");
+    jake.cpR(jakeRoot + "/Resources/CoreData", windowsPackageFolder + "/Resources");
     jake.cpR(jakeRoot + "/Resources/EditorData", windowsPackageFolder + "/Resources");
     jake.cpR(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources");
     jake.cpR(jakeRoot + "/Script", windowsPackageFolder + "/Resources");
