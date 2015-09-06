@@ -5,7 +5,6 @@ import InspectorFrame = require("./inspector/InspectorFrame");
 import HierarchyFrame = require("./HierarchyFrame");
 import MainToolbar = require("ui//MainToolbar");
 
-import MessageModal = require("../modal/MessageModal");
 import UIEvents = require("ui/UIEvents");
 
 import ScriptWidget = require("ui/ScriptWidget");

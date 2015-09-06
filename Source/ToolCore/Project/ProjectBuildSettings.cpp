@@ -177,6 +177,9 @@ bool ProjectBuildSettings::Load(const String& path)
     bool result = jsonFile->Load(*file);
     file->Close();
 
+    if (!result)
+        return false;
+
     JSONValue root = jsonFile->GetRoot();
     if (root == JSONValue::EMPTY)
         return false;
@@ -187,7 +190,7 @@ bool ProjectBuildSettings::Load(const String& path)
     androidBuildSettings_->Read(root);
     iosBuildSettings_->Read(root);
 
-    return result;
+    return true;
 }
 
 void ProjectBuildSettings::Save(const String& path)

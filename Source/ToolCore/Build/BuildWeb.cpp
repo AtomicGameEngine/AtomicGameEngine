@@ -9,6 +9,8 @@
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Project/Project.h"
+
+#include "BuildEvents.h"
 #include "BuildSystem.h"
 #include "BuildWeb.h"
 
@@ -51,6 +53,10 @@ void BuildWeb::Build(const String& buildPath)
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
+
+    VariantMap buildOutput;
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Web Deployment</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     Initialize();
 
@@ -98,6 +104,10 @@ void BuildWeb::Build(const String& buildPath)
     file.Open(buildPath_ + "/AtomicResources.js", FILE_WRITE);
     file.Write(resourcejs.CString(), resourcejs.Length());
     file.Close();
+
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Web Deployment Complete</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
+
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
     buildSystem->BuildComplete(PLATFORMID_WEB, buildPath_);

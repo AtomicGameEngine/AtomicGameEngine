@@ -223,7 +223,7 @@ var fileItems = {
     "-1": null,
     "Close Project": ["file close project"],
     "-2": null,
-    "Save File": ["file save file"],
+    "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
-    "Close File": ["file close file"]
+    "Close File": ["file close file", StringID.ShortcutCloseFile]
 }

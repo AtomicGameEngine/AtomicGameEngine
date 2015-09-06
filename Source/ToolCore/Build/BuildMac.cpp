@@ -7,8 +7,10 @@
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Project/Project.h"
-#include "BuildMac.h"
+
+#include "BuildEvents.h"
 #include "BuildSystem.h"
+#include "BuildMac.h"
 
 namespace ToolCore
 {
@@ -48,10 +50,13 @@ void BuildMac::Initialize()
 
 void BuildMac::Build(const String& buildPath)
 {
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
+
+    VariantMap buildOutput;
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Mac Deployment</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     Initialize();
 
@@ -87,6 +92,9 @@ void BuildMac::Build(const String& buildPath)
     args.Push(buildPath_ + "/Contents/MacOS/AtomicPlayer");
     fileSystem->SystemRun("chmod", args);
 #endif
+
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Mac Deployment Complete</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     buildPath_ = buildPath + "/Mac-Build";    
     buildSystem->BuildComplete(PLATFORMID_MAC, buildPath_);

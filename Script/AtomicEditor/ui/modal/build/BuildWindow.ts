@@ -3,6 +3,7 @@ import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
+import UIEvents = require("../../UIEvents");
 
 import WindowsSettingsWidget = require("./platforms/WindowsSettingsWidget");
 import MacSettingsWidget = require("./platforms/MacSettingsWidget");
@@ -23,10 +24,7 @@ class BuildWindow extends ModalWindow {
 
         var currentPlatform = ToolCore.toolSystem.currentPlatform;
 
-        if (Atomic.platform == "Windows")
-            this.buildPathField.text = "C:/Users/Josh/Desktop/MyBuilds/";
-        else
-            this.buildPathField.text = "/Users/josh/Desktop/MyBuilds/";
+        this.buildPathField.text = ToolCore.toolSystem.project.userPrefs.lastBuildPath;
 
         switch (currentPlatform.name) {
 
@@ -51,6 +49,23 @@ class BuildWindow extends ModalWindow {
             }
 
             if (ev.target.id == "build") {
+
+              var toolSystem = ToolCore.toolSystem;
+              var userPrefs = ToolCore.toolSystem.project.userPrefs;
+
+              if (this.buildPathField.text != userPrefs.lastBuildPath) {
+
+                  userPrefs.lastBuildPath = this.buildPathField.text;
+                  ToolCore.toolSystem.project.saveUserPrefs();
+
+              }
+
+              if (!userPrefs.lastBuildPath.length || !Atomic.fileSystem.dirExists(userPrefs.lastBuildPath)) {
+
+                  new Atomic.UIMessageWindow(this, "modal_error").show("Build Folder","Please select an existing build folder", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 480, 240);
+                  return true;
+              }
+
                 this.hide();
                 this.build();
                 return true;
@@ -75,10 +90,9 @@ class BuildWindow extends ModalWindow {
 
         var buildSystem = ToolCore.buildSystem;
         var toolSystem = ToolCore.toolSystem;
+        var userPrefs = ToolCore.toolSystem.project.userPrefs;
 
-        toolSystem.setCurrentPlatform(toolSystem.getPlatformByName("ANDROID").platformID);
-
-        buildSystem.buildPath = "/Users/josh/Desktop/MyBuilds/";
+        buildSystem.buildPath = userPrefs.lastBuildPath;
 
         var project = toolSystem.project;
         var platform = toolSystem.currentPlatform;
