@@ -39,6 +39,12 @@ bool ToolEnvironment::InitFromPackage()
 #else
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
     String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
+    //TODO: move this to deployment stuff
+    playerAppFolder_ = resourcesDir + "ToolData/Deployment/MacOS/AtomicPlayer.app/";
+
+    resourceCoreDataDir_ = resourcesDir + "CoreData";
+    resourcePlayerDataDir_ = resourcesDir + "PlayerData";
+
 #endif
 
     toolDataDir_ =  resourcesDir + "ToolData/";
@@ -160,7 +166,7 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
 
 String ToolEnvironment::GetIOSDeployBinary()
 {
-    return GetToolDataDir() + "Tools/IOSDeploy/ios-deploy";
+    return GetToolDataDir() + "Deployment/IOS/ios-deploy/ios-deploy";
 }
 
 void ToolEnvironment::Dump()

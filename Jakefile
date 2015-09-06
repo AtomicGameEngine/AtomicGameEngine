@@ -352,17 +352,14 @@ namespace('package', function() {
 
     var editorAppSourceFolder = macOSXBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.app";
 
-    // copy app (using cp here as jake.cpR seems to strip executable flag)
-    jake.exec("cp -r " + editorAppSourceFolder + " " + macOSXPackageFolder, {
-      printStdout: true
-    });
+    fs.copySync(editorAppSourceFolder, macOSXPackageFolder + "/AtomicEditor.app");
 
     // copy resources
 
-    jake.cpR(jakeRoot + "/Resources/CoreData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
-    jake.cpR(jakeRoot + "/Resources/EditorData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
-    jake.cpR(jakeRoot + "/Resources/PlayerData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
-    jake.cpR(jakeRoot + "/Data/AtomicEditor/", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/");
+    fs.copySync(jakeRoot + "/Resources/CoreData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/CoreData");
+    fs.copySync(jakeRoot + "/Resources/EditorData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/EditorData");
+    fs.copySync(jakeRoot + "/Resources/PlayerData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/PlayerData");
+    fs.copySync(jakeRoot + "/Data/AtomicEditor/", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/");
 
   });
 
@@ -371,20 +368,20 @@ namespace('package', function() {
 
     jake.mkdirP(windowsPackageFolder + "/Resources");
 
-    jake.cpR(windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe", windowsPackageFolder + "/AtomicEditor.exe")
+    fs.copySync(windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe", windowsPackageFolder + "/AtomicEditor.exe")
 
     // 32 bit build for packaging!
 
-    jake.cpR(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll")
+    fs.copySync(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll")
 
     // copy resources
 
-    jake.cpR(jakeRoot + "/Resources/CoreData", windowsPackageFolder + "/Resources");
-    jake.cpR(jakeRoot + "/Resources/EditorData", windowsPackageFolder + "/Resources");
-    jake.cpR(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources");
-    jake.cpR(jakeRoot + "/Script", windowsPackageFolder + "/Resources");
-    jake.cpR(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData/");
-    jake.cpR(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", windowsPackageFolder + "/Resources");
+    fs.copySync(jakeRoot + "/Resources/CoreData", windowsPackageFolder + "/Resources/CoreData");
+    fs.copySync(jakeRoot + "/Resources/EditorData", windowsPackageFolder + "/Resources/EditorData");
+    fs.copySync(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources/PlayerData");
+    fs.copySync(jakeRoot + "/Script", windowsPackageFolder + "/Resources/Script");
+    fs.copySync(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData/");
+    fs.copySync(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", windowsPackageFolder + "/Resources/ProjectTemplates");
 
 
   });
