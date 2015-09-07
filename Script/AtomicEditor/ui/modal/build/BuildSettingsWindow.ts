@@ -74,6 +74,18 @@ class BuildSettingsWindow extends ModalWindow {
         this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
     }
 
+    commitBuildSettings() {
+
+      for (var name in this.platformInfo) {
+
+          <BuildSettingsWidget>(this.platformInfo[name].widget).storeValues();
+      }
+
+        ToolCore.toolSystem.project.saveBuildSettings();
+
+
+    }
+
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
@@ -87,19 +99,14 @@ class BuildSettingsWindow extends ModalWindow {
 
             if (ev.target.id == "ok") {
 
-                for (var name in this.platformInfo) {
-
-                    <BuildSettingsWidget>(this.platformInfo[name].widget).storeValues();
-                }
-
-                ToolCore.toolSystem.project.saveBuildSettings();
-
+                this.commitBuildSettings();
                 this.hide();
                 return true;
             }
 
             if (ev.target.id == "build") {
 
+                this.commitBuildSettings();
                 this.hide();
                 EditorUI.getModelOps().showBuild();
                 return true;

@@ -32,7 +32,7 @@ public:
 
     bool StartNextBuild();
 
-    void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, bool fail3D = false);
+    void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, const String& buildMessage = String::EMPTY);
 
 private:
 

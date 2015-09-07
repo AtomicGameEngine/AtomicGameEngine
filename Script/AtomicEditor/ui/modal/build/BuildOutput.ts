@@ -1,6 +1,7 @@
 
 import EditorUI = require("../../EditorUI");
 import ModalWindow = require("../ModalWindow");
+import BuildComplete = require("./BuildComplete");
 
 class BuildOutput extends ModalWindow {
 
@@ -22,6 +23,12 @@ class BuildOutput extends ModalWindow {
             this.textOutput += ev.text;
             this.outputField.text = this.textOutput;
             this.outputField.scrollTo(0, 0xffffff);
+
+        });
+
+        this.subscribeToEvent("BuildComplete", (ev: ToolCore.BuildCompleteEvent) => {
+
+            new BuildComplete(this, ev);
 
         });
 

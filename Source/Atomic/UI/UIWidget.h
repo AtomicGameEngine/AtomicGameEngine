@@ -109,6 +109,20 @@ enum UI_TEXT_ALIGN
     UI_TEXT_ALIGN_CENTER = tb::TB_TEXT_ALIGN_CENTER
 };
 
+enum UI_WIDGET_STATE {
+
+    UI_WIDGET_STATE_NONE = tb::WIDGET_STATE_NONE,
+    UI_WIDGET_STATE_DISABLED = tb::WIDGET_STATE_DISABLED,
+    UI_WIDGET_STATE_FOCUSED = tb::WIDGET_STATE_FOCUSED,
+    UI_WIDGET_STATE_PRESSED = tb::WIDGET_STATE_PRESSED,
+    UI_WIDGET_STATE_SELECTED = tb::WIDGET_STATE_SELECTED,
+    UI_WIDGET_STATE_HOVERED = tb::WIDGET_STATE_HOVERED,
+
+    UI_WIDGET_STATE_ALL = tb::WIDGET_STATE_ALL
+
+};
+
+
 class UIView;
 class UILayoutParams;
 class UIFontDescription;
@@ -165,14 +179,14 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetFocusRecursive();
     void OnFocusChanged(bool focused);
 
-    void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
-    bool GetState(/*WIDGET_STATE*/ unsigned state);
+    void SetState(UI_WIDGET_STATE state, bool on);
+    bool GetState(UI_WIDGET_STATE state);
 
     void SetVisibility(UI_WIDGET_VISIBILITY visibility);
     UI_WIDGET_VISIBILITY GetVisibility();
 
-    void SetStateRaw(/*WIDGET_STATE*/ unsigned state);
-    /*WIDGET_STATE*/ unsigned GetStateRaw();
+    void SetStateRaw(UI_WIDGET_STATE state);
+   UI_WIDGET_STATE GetStateRaw();
 
     void Invalidate();
     void Die();

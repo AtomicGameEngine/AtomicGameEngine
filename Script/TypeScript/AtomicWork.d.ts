@@ -244,14 +244,10 @@ declare module ToolCore {
 
     export interface BuildCompleteEvent {
 
-        platformID:number;
-
-    }
-
-    export interface BuildFailedEvent {
-
-        platformID:number;
-        message:string;
+      platformID:number;
+      message:string;
+      success:boolean;
+      buildFolder:string;
 
     }
 

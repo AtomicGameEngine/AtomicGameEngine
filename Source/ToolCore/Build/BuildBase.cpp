@@ -54,9 +54,9 @@ void BuildBase::SendBuildFailure(const String& message)
 {
 
     VariantMap buildError;
-    buildError[BuildFailed::P_PLATFORMID] = platformID_;
-    buildError[BuildFailed::P_MESSAGE] = message;
-    SendEvent(E_BUILDFAILED, buildError);
+    buildError[BuildComplete::P_PLATFORMID] = platformID_;
+    buildError[BuildComplete::P_MESSAGE] = message;
+    SendEvent(E_BUILDCOMPLETE, buildError);
 
 }
 

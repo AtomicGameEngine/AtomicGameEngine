@@ -284,10 +284,14 @@ void UIWidget::Center()
     if (!widget_)
         return;
 
-    // this should center on parent widget, not root
-    UI* ui = GetSubsystem<UI>();
     TBRect rect = widget_->GetRect();
-    TBWidget* root = ui->GetRootWidget();
+    TBWidget* root = widget_->GetParent();
+    if (!root)
+    {
+        UI* ui = GetSubsystem<UI>();
+        ui->GetRootWidget();
+    }
+
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
     widget_->SetRect(rect.CenterIn(bounds).MoveIn(bounds).Clip(bounds));
 
@@ -425,7 +429,7 @@ void UIWidget::SetId(const String& id)
 
 }
 
-void UIWidget::SetState(/*WIDGET_STATE*/ unsigned state, bool on)
+void UIWidget::SetState(UI_WIDGET_STATE state, bool on)
 {
     if (!widget_)
         return;
@@ -512,7 +516,7 @@ double UIWidget::GetValue()
 }
 
 
-bool UIWidget::GetState(/*WIDGET_STATE*/ unsigned state)
+bool UIWidget::GetState(UI_WIDGET_STATE state)
 {
     if (!widget_)
         return false;
@@ -521,7 +525,7 @@ bool UIWidget::GetState(/*WIDGET_STATE*/ unsigned state)
 
 }
 
-void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
+void UIWidget::SetStateRaw(UI_WIDGET_STATE state)
 {
     if (!widget_)
         return;
@@ -530,12 +534,12 @@ void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
 
 }
 
-/*WIDGET_STATE*/ unsigned UIWidget::GetStateRaw()
+UI_WIDGET_STATE UIWidget::GetStateRaw()
 {
     if (!widget_)
-        return false;
+        return UI_WIDGET_STATE_NONE;
 
-    return (unsigned) widget_->GetStateRaw();
+    return (UI_WIDGET_STATE) widget_->GetStateRaw();
 
 }
 
