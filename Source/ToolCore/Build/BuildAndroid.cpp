@@ -235,8 +235,8 @@ void BuildAndroid::RunAntDebug()
     // C:\ProgramData\Oracle\Java\javapath;
     Vector<String> args;
     String antCommand = "cmd";
-    String antPath = prefs->GetAntPath() + "/ant.bat";
-    env["JAVA_HOME"] = prefs->GetJDKRootPath().CString();
+    String antPath = tprefs->GetAntPath() + "/ant.bat";
+    env["JAVA_HOME"] = tprefs->GetJDKRootPath().CString();
     // ant is a batch file on windows, so have to run with cmd /c
     args.Push("/c");
     args.Push("\"" + antPath + "\"");
