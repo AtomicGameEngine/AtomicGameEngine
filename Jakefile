@@ -65,11 +65,13 @@ var allBuildFolders = [
 var platformBinariesFolder = artifactsFolder + "/Platform_Binaries";
 var windowsPackageFolder = artifactsFolder + "/Windows_Package";
 var macOSXPackageFolder = artifactsFolder + "/MacOSX_Package";
+var distFolder = artifactsFolder + "/Dist";
 
 var allPackageFolders = [
   windowsPackageFolder,
   macOSXPackageFolder,
-  platformBinariesFolder
+  platformBinariesFolder,
+  distFolder
 ];
 
 function getAtomicDevBuildDefine() {
@@ -379,6 +381,10 @@ namespace('package', function() {
 
   task('macosx', ['clean:all', 'build:macosx'], function() {
 
+    if (!fs.existsSync(distFolder)) {
+      jake.mkdirP(distFolder);
+    }
+
     jake.mkdirP(macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
 
     var editorAppSourceFolder = macOSXBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.app";
@@ -392,9 +398,17 @@ namespace('package', function() {
     fs.copySync(jakeRoot + "/Resources/PlayerData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/PlayerData");
     fs.copySync(jakeRoot + "/Data/AtomicEditor/", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/");
 
+    if (jenkinsBuild) {
+      jake.exec("rev=`git rev-parse HEAD` && cd " + macOSXPackageFolder + " && zip -r -X " + distFolder + "/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app", function() {});
+    }
+
   });
 
   task('windows', ['clean:all', 'build:windows'], function() {
+
+    if (!fs.existsSync(distFolder)) {
+      jake.mkdirP(distFolder);
+    }
 
     console.log("Packaging Windows Editor");
 
