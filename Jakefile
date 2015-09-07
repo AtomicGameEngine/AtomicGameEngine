@@ -317,6 +317,8 @@ namespace('build', function() {
       atomicToolBinary + " bind " + jakeRoot + " Script/Packages/Atomic/ IOS",
       atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ IOS",
       "cmake -DIOS=1 -G Xcode ../../",
+      "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain", // TODO: only if jenkins
+      "security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain", // TODO: only if jenkins
       "xcodebuild -configuration Release"
     ]
 
@@ -368,7 +370,7 @@ namespace('build', function() {
 
 namespace('package', function() {
 
-  task('macosx', ['clean:all', 'build:macosx'], function() {
+  task('macosx', ['build:ios'], function() {
 
     jake.mkdirP(macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
 
