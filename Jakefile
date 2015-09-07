@@ -38,6 +38,10 @@ if (host == "darwin") {
   var atomicToolBinary = macOSXBuildFolder + "/Source/AtomicTool/Release/AtomicTool"
   var atomicEditorBinary = macOSXBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.app/Contents/MacOS/AtomicEditor"
   var atomicPlayerBinary = macOSXBuildFolder + "/Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer"
+} else if (host == "win32") {
+  var atomicToolBinary = windowsBuildFolder + "/Source/AtomicTool/Release/AtomicTool.exe"
+  var atomicEditorBinary = windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe"
+  var atomicPlayerBinary = windowsBuildFolder + "/Source/AtomicPlayer/Application/Release/AtomicPlayer.exe"
 }
 
 // source files
@@ -166,20 +170,30 @@ namespace('build', function() {
     // deployment root for local dev builds
     var deployRoot = jakeRoot + "/Data/AtomicEditor/Deployment";
 
-    if (deployments.osx)
-      fs.copySync(platformBinariesFolder + "/MacOSX/AtomicPlayer", deployRoot + "/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
+    if (host == "darwin") {
 
-    if (deployments.android)
-      fs.copySync(platformBinariesFolder + "/Android/libAtomicPlayer.so", deployRoot + "/Android/libs/armeabi-v7a/libAtomicPlayer.so");
+      if (deployments.osx)
+        fs.copySync(platformBinariesFolder + "/MacOSX/AtomicPlayer", deployRoot + "/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
 
-    if (deployments.ios) {
-      fs.copySync(artifactsFolder + "/ios-deploy/ios-deploy/ios-deploy", deployRoot + "/IOS/ios-deploy/ios-deploy");
-      fs.copySync(platformBinariesFolder + "/IOS/AtomicPlayer", deployRoot + "/IOS/AtomicPlayer.app/AtomicPlayer");
-    }
+      if (deployments.android)
+        fs.copySync(platformBinariesFolder + "/Android/libAtomicPlayer.so", deployRoot + "/Android/libs/armeabi-v7a/libAtomicPlayer.so");
 
-    if (deployments.web) {
-      fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.js", deployRoot + "/Web/AtomicPlayer.js");
-      fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.html.mem", deployRoot + "/Web/AtomicPlayer.html.mem");
+      if (deployments.ios) {
+        fs.copySync(artifactsFolder + "/ios-deploy/ios-deploy/ios-deploy", deployRoot + "/IOS/ios-deploy/ios-deploy");
+        fs.copySync(platformBinariesFolder + "/IOS/AtomicPlayer", deployRoot + "/IOS/AtomicPlayer.app/AtomicPlayer");
+      }
+
+      if (deployments.web) {
+        fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.js", deployRoot + "/Web/AtomicPlayer.js");
+        fs.copySync(platformBinariesFolder + "/Web/AtomicPlayer.html.mem", deployRoot + "/Web/AtomicPlayer.html.mem");
+      }
+
+    } else if (host == "win32") {
+
+      if (deployments.windows) {
+        fs.copySync(platformBinariesFolder + "/Win32/AtomicPlayer.exe", deployRoot + "/Windows/x86/AtomicPlayer.exe");
+      }
+
     }
 
     complete();
@@ -247,6 +261,14 @@ namespace('build', function() {
     process.chdir(windowsBuildFolder);
 
     jake.exec(jakeRoot + "/Build/Windows/Compile.bat", function() {
+
+      fs.copySync(atomicEditorBinary, platformBinariesFolder + "/Win32/" + path.basename(atomicEditorBinary));
+      fs.copySync(atomicPlayerBinary, platformBinariesFolder + "/Win32/" + path.basename(atomicPlayerBinary));
+
+      if (includeDeployments) {
+        jake.Task['build:install_deployments'].invoke();
+      }
+
       complete();
     }, {
       printStdout: true
@@ -365,6 +387,7 @@ namespace('package', function() {
 
   task('windows', ['clean:all', 'build:windows'], function() {
 
+    console.log("Packaging Windows Editor");
 
     jake.mkdirP(windowsPackageFolder + "/Resources");
 
@@ -379,10 +402,10 @@ namespace('package', function() {
     fs.copySync(jakeRoot + "/Resources/CoreData", windowsPackageFolder + "/Resources/CoreData");
     fs.copySync(jakeRoot + "/Resources/EditorData", windowsPackageFolder + "/Resources/EditorData");
     fs.copySync(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources/PlayerData");
-    fs.copySync(jakeRoot + "/Script", windowsPackageFolder + "/Resources/Script");
-    fs.copySync(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData/");
-    fs.copySync(jakeRoot + "/Data/AtomicEditor/ProjectTemplates", windowsPackageFolder + "/Resources/ProjectTemplates");
+    fs.copySync(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData");
 
+    // 32 bit!
+    fs.copySync(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/Resources/ToolData/Deployment/Windows/x86/D3DCompiler_47.dll");
 
   });
 
