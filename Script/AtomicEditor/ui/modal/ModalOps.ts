@@ -11,7 +11,7 @@ import ManageLicense = require("./license/ManageLicense");
 import ProWindow = require("./license/ProWindow");
 
 import BuildWindow = require("./build/BuildWindow");
-import BuildOutput= require("./build/BuildOutput");
+import BuildOutput = require("./build/BuildOutput");
 import BuildSettingsWindow = require("./build/BuildSettingsWindow");
 
 import ResourceSelection = require("./ResourceSelection");
@@ -28,7 +28,7 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateFolder: string, imagePath:string = "") {
+    showCreateProject(projectTemplateFolder: string, imagePath: string = "") {
 
         if (this.show()) {
 
@@ -148,7 +148,7 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showProWindow(uiPath:string) {
+    showProWindow(uiPath: string) {
 
         if (this.show()) {
 
@@ -170,6 +170,9 @@ class ModalOps extends Atomic.ScriptObject {
 
     showBuild() {
 
+        if (!ToolCore.toolSystem.project)
+            return;
+
         if (this.show()) {
 
             this.opWindow = new BuildWindow();
@@ -181,6 +184,9 @@ class ModalOps extends Atomic.ScriptObject {
 
     showBuildSettings() {
 
+        if (!ToolCore.toolSystem.project)
+            return;
+
         if (this.show()) {
 
             this.opWindow = new BuildSettingsWindow();
@@ -189,7 +195,7 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showBuildOutput(buildBase:ToolCore.BuildBase) {
+    showBuildOutput(buildBase: ToolCore.BuildBase) {
 
         if (this.show()) {
 
