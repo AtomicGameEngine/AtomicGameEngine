@@ -8,6 +8,7 @@ var os = require('os');
 
 var host = os.platform();
 var jakeRoot = __dirname;
+var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1
 
 var artifactsFolder = jakeRoot + "/Artifacts";
 
@@ -316,11 +317,17 @@ namespace('build', function() {
     var cmds = [
       atomicToolBinary + " bind " + jakeRoot + " Script/Packages/Atomic/ IOS",
       atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ IOS",
-      "cmake -DIOS=1 -G Xcode ../../",
-      "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain", // TODO: only if jenkins
-      "security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain", // TODO: only if jenkins
-      "xcodebuild -configuration Release"
+      "cmake -DIOS=1 -G Xcode ../../"
     ]
+
+    if (jenkinsBuild) {
+
+      cmds.push("security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain");
+      cmds.push("security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain");
+
+    }
+
+    cmds.push("xcodebuild -configuration Release");
 
     jake.exec(cmds, function() {
       fs.copySync(iosPlayerBinary, platformBinariesFolder + "/IOS/" + path.basename(iosPlayerBinary));
@@ -370,7 +377,7 @@ namespace('build', function() {
 
 namespace('package', function() {
 
-  task('macosx', ['build:ios'], function() {
+  task('macosx', ['clean:all', 'build:macosx'], function() {
 
     jake.mkdirP(macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/");
 
