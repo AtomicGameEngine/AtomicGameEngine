@@ -444,7 +444,7 @@ namespace('package', function() {
       }
 
       cmds = ["git clone https://github.com/AtomicGameEngine/AtomicExamples " + toolDataDir + "AtomicExamples && rm -rf " + toolDataDir + "AtomicExamples/.git",
-        "rev=`git rev-parse HEAD` && cd " + macOSXPackageFolder + " && zip -r -X " + distFolder + "/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app"
+        "cd " + macOSXPackageFolder + " && zip -r -X " + distFolder + "/AtomicEditor_MacOSX.zip ./AtomicEditor.app"
       ];
 
       jake.exec(cmds, function() {});
@@ -485,6 +485,66 @@ namespace('package', function() {
       jake.exec(cmds, function() {});
 
     }
+
+  });
+
+  // We have the windows and mac editors builds, now we need to merge them
+  task('merge_editor_data', [], function() {
+
+    var mergeFolder = distFolder + "/EditorMerge";
+
+    if (!fs.existsSync(mergeFolder)) {
+      jake.mkdirP(mergeFolder);
+    }
+
+    if (!fs.existsSync(mergeFolder + "/snapshots")) {
+      jake.mkdirP(mergeFolder + "/snapshots");
+    }
+
+    fs.copySync(distFolder + "/AtomicEditor_MacOSX.zip", mergeFolder + "/AtomicEditor_MacOSX.zip");
+    fs.copySync(windowsPackageFolder + "/Artifacts/Dist/AtomicEditor_Windows.zip", mergeFolder + "/AtomicEditor_Windows.zip");
+
+    process.chdir(mergeFolder);
+
+    cmds = ["unzip ./AtomicEditor_MacOSX.zip && unzip ./AtomicEditor_Windows.zip"]
+
+    jake.exec(cmds, function() {
+
+      var winRoot = mergeFolder + "/Windows_Package/Resources";
+      var macRoot = mergeFolder + "/AtomicEditor.app/Contents/Resources";
+
+      var filenames = [
+        "/ToolData/Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so",
+        "/ToolData/Deployment/MacOS/AtomicPlayer.app",
+        "/ToolData/Deployment/Web/AtomicPlayer.js",
+        "/ToolData/Deployment/Web/AtomicPlayer.html.mem",
+        "/ToolData/AtomicExamples",
+        "/ToolData/Docs",
+      ];
+
+      // Mac Editor -> Windows Editor
+      for (var i in filenames) {
+          fs.copySync(macRoot + filenames[i], winRoot + filenames[i]);
+      }
+
+      // Windows Editor ->Mac Editor
+      filenames = ["/ToolData/Deployment/Windows/x86/D3DCompiler_47.dll",
+        "/ToolData/Deployment/Windows/x86/AtomicPlayer.exe",
+      ];
+
+      for (var i in filenames) {
+          fs.copySync(winRoot + filenames[i], macRoot + filenames[i]);
+      }
+
+      zipcmds = [
+        "rev=`git rev-parse HEAD` && zip -r -X ./snapshots/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app",
+        "rev=`git rev-parse HEAD` && zip -r -X ./snapshots/AtomicEditor_Win32_DevSnapshot_$rev.zip ./Windows_Package",
+        "cp ./snapshots/*.zip /Users/jenge/Share/Temp/AtomicEditor_DevSnapshots/"
+      ]
+
+      jake.exec(zipcmds, function() {});
+
+    });
 
   });
 
