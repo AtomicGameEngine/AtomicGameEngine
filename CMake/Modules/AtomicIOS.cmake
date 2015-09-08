@@ -14,7 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -std=gnu++0x")
 #    set (IOS_ARCH x86_64)
 #endif (${IOS_PLATFORM} STREQUAL "OS")
 
-set (CMAKE_OSX_ARCHITECTURES arm64)
+set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_INCLUDING_64_BIT))
 set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
 
 # Set Base SDK to "Latest iOS"
