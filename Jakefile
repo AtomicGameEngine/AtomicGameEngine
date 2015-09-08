@@ -478,7 +478,7 @@ namespace('package', function() {
     // 32 bit!
     fs.copySync(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/Resources/ToolData/Deployment/Windows/x86/D3DCompiler_47.dll");
 
-    if (!jenkinsBuild) {
+    if (jenkinsBuild) {
 
       cmds = [jakeRoot + "/Build/Windows/7z/7z.exe a -tzip " + distFolder + "/AtomicEditor_Windows.zip " + windowsPackageFolder]
 
