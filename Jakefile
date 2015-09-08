@@ -386,6 +386,11 @@ namespace('package', function() {
     async: true
   }, function() {
 
+    if (!jenkinsBuild || !generateJSDoc) {
+      complete();
+      return;
+    }
+
     console.log("Generating JSDocs");
 
     fs.copySync(jakeRoot + "/Docs/Readme.md", jsDocFolder + "/Readme.md");
@@ -398,10 +403,6 @@ namespace('package', function() {
 
     jake.exec(cmds, function() {
 
-      var toolDataDir = macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/";
-
-      fs.copySync(jsDocFolder + "/out", toolDataDir + "Docs/JSDocs");
-
       complete();
 
     }, {
@@ -410,7 +411,7 @@ namespace('package', function() {
 
   });
 
-  task('macosx', ['clean:all', 'build:macosx'], function() {
+  task('macosx', ['clean:all', 'build:macosx', 'package:genjsdocs'], function() {
 
     if (!fs.existsSync(distFolder)) {
       jake.mkdirP(distFolder);
@@ -434,10 +435,13 @@ namespace('package', function() {
 
     if (jenkinsBuild) {
 
-      if (generateJSDoc)
-        jake.Task['package:genjsdocs'].invoke();
-
       console.log("Exporting AtomicExamples Repo (master) & Generating Dist");
+
+      if (generateJSDoc) {
+
+        fs.copySync(jsDocFolder + "/out", toolDataDir + "Docs/JSDocs");
+
+      }
 
       cmds = ["git clone https://github.com/AtomicGameEngine/AtomicExamples " + toolDataDir + "AtomicExamples && rm -rf " + toolDataDir + "AtomicExamples/.git",
         "rev=`git rev-parse HEAD` && cd " + macOSXPackageFolder + " && zip -r -X " + distFolder + "/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app"
