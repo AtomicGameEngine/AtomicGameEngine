@@ -9,6 +9,7 @@ var os = require('os');
 var host = os.platform();
 var jakeRoot = __dirname;
 var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1
+var generateJSDoc = true;
 
 var artifactsFolder = jakeRoot + "/Artifacts";
 
@@ -32,6 +33,7 @@ var iosBuildFolder = artifactsFolder + "/IOS_Build";
 var iosDeployBuildFolder = artifactsFolder + "/ios-deploy";
 var webBuildFolder = artifactsFolder + "/Web_Build";
 var linuxBuildFolder = artifactsFolder + "/Linux_Build";
+var jsDocFolder = artifactsFolder + "/JSDoc";
 
 // binaries
 
@@ -58,7 +60,8 @@ var allBuildFolders = [
   iosBuildFolder,
   iosDeployBuildFolder,
   webBuildFolder,
-  linuxBuildFolder
+  linuxBuildFolder,
+  jsDocFolder
 ];
 
 // packaging
@@ -379,6 +382,34 @@ namespace('build', function() {
 
 namespace('package', function() {
 
+  task('genjsdocs', {
+    async: true
+  }, function() {
+
+    console.log("Generating JSDocs");
+
+    fs.copySync(jakeRoot + "/Docs/Readme.md", jsDocFolder + "/Readme.md");
+    fs.copySync(jakeRoot + "/Docs/jsdoc.conf", jsDocFolder + "/jsdoc.conf");
+
+    cmds = ["cd " + jsDocFolder + " && npm install git+https://github.com/jsdoc3/jsdoc",
+      "cd " + jsDocFolder + " && git clone https://github.com/AtomicGameEngine/jaguarjs-jsdoc && cd jaguarjs-jsdoc && git checkout atomic_master",
+      "cd " + jsDocFolder + " && ./node_modules/.bin/jsdoc ./Atomic.js -t ./jaguarjs-jsdoc/ -c ./jsdoc.conf Readme.md",
+    ];
+
+    jake.exec(cmds, function() {
+
+      var toolDataDir = macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/";
+
+      fs.copySync(jsDocFolder + "/out", toolDataDir + "Docs/JSDocs");
+
+      complete();
+
+    }, {
+      printStdout: true
+    });
+
+  });
+
   task('macosx', ['clean:all', 'build:macosx'], function() {
 
     if (!fs.existsSync(distFolder)) {
@@ -396,10 +427,23 @@ namespace('package', function() {
     fs.copySync(jakeRoot + "/Resources/CoreData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/CoreData");
     fs.copySync(jakeRoot + "/Resources/EditorData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/EditorData");
     fs.copySync(jakeRoot + "/Resources/PlayerData", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/PlayerData");
-    fs.copySync(jakeRoot + "/Data/AtomicEditor/", macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/");
+
+    var toolDataDir = macOSXPackageFolder + "/AtomicEditor.app/Contents/Resources/ToolData/";
+
+    fs.copySync(jakeRoot + "/Data/AtomicEditor/", toolDataDir);
 
     if (jenkinsBuild) {
-      jake.exec("rev=`git rev-parse HEAD` && cd " + macOSXPackageFolder + " && zip -r -X " + distFolder + "/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app", function() {});
+
+      if (generateJSDoc)
+        jake.Task['package:genjsdocs'].invoke();
+
+      console.log("Exporting AtomicExamples Repo (master) & Generating Dist");
+
+      cmds = ["git clone https://github.com/AtomicGameEngine/AtomicExamples " + toolDataDir + "AtomicExamples && rm -rf " + toolDataDir + "AtomicExamples/.git",
+        "rev=`git rev-parse HEAD` && cd " + macOSXPackageFolder + " && zip -r -X " + distFolder + "/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app"
+      ];
+
+      jake.exec(cmds, function() {});
     }
 
   });
