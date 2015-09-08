@@ -16,6 +16,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu build", buildItems);
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
+        MenuItemSources.createMenuItemSource("menu help", helpItems);
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -146,14 +147,24 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
                 return true;
 
-            } else if (refid == "build settings") {
-
-                EditorUI.getModelOps().showBuildSettings();
-
-                return true;
-
             }
 
+        } else if (target.id == "menu help popup") {
+
+            if (refid == "help forums") {
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/")
+                return true;
+            } else if (refid == "help chat") {
+                Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/")
+                return true;
+            } else if (refid == "help github") {
+                Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/")
+                return true;
+            } else if (refid == "help api") {
+                var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/Atomic.html";
+                Atomic.fileSystem.systemOpen(url);
+                return true;
+            }
 
         }
 
@@ -226,4 +237,14 @@ var fileItems = {
     "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
     "Close File": ["file close file", StringID.ShortcutCloseFile]
+}
+
+var helpItems = {
+
+    "API Documentation": ["help api"],
+    "-1": null,
+    "Atomic Chat": ["help chat"],
+    "Atomic Forums": ["help forums"],
+    "-2": null,
+    "Atomic Game Engine on GitHub": ["help github"]
 }
