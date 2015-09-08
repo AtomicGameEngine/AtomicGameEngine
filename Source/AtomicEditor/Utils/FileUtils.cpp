@@ -130,6 +130,59 @@ String FileUtils::GetAndroidSDKPath(const String& defaultPath)
 
 }
 
+String FileUtils::GetAntPath(const String& defaultPath)
+{
+    String antPath;
+
+    nfdchar_t *outPath = NULL;
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    String msg = "Please select the folder which contains ant.bat";
+#else
+    String msg = "Please select the folder which contains the ant executable";
+#endif
+
+    nfdresult_t result = NFD_ChooseDirectory(msg.CString(),
+        defaultPath.Length() ? defaultPath.CString() : NULL,
+        &outPath);
+
+    if (outPath && result == NFD_OKAY)
+    {
+        antPath = outPath;
+    }
+
+    if (outPath)
+        free(outPath);
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    return GetInternalPath(antPath);
+}
+
+String FileUtils::GetJDKRootPath(const String& defaultPath)
+{
+    String jdkPath;
+
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_ChooseDirectory("Please choose the root folder of your JDK",
+        defaultPath.Length() ? defaultPath.CString() : NULL,
+        &outPath);
+
+    if (outPath && result == NFD_OKAY)
+    {
+        jdkPath = outPath;
+    }
+
+    if (outPath)
+        free(outPath);
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    return GetInternalPath(jdkPath);
+
+}
+
 String FileUtils::GetMobileProvisionPath()
 {
     nfdchar_t *outPath = NULL;

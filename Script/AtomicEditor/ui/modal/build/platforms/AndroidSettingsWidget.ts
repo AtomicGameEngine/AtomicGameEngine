@@ -15,18 +15,27 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
         this.productNameEdit = <Atomic.UIEditField>this.getWidget("product_name");
         this.companyNameEdit = <Atomic.UIEditField>this.getWidget("company_name");
 
-        this.jdkRootText = <Atomic.UITextField>this.getWidget("jdk_root_text");
+
         this.jdkRootChooseButton = <Atomic.UIButton>this.getWidget("choose_jdk_root");
         this.jdkRootEdit = <Atomic.UIEditField>this.getWidget("jdk_root");
 
-        this.antPathEdit = <Atomic.UIEditField>this.getWidget("ant_path");
+        var jdkRootText = <Atomic.UITextField>this.getWidget("jdk_root_text");
+        var antPathText = <Atomic.UITextField>this.getWidget("ant_path_text");
 
-        if (Atomic.platform == "MacOSX") {
+        if (Atomic.platform == "Windows") {
 
-            this.jdkRootText.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            jdkRootText.text = "JDK Root: (Ex. C:\\Program Files\\Java\\jdk1.8.0_31)";
+            antPathText.text = "Ant Path: (The folder that contains ant.bat)";
+
+        } else {
+
+            jdkRootText.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
             this.jdkRootChooseButton.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
             this.jdkRootEdit.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+
         }
+
+        this.antPathEdit = <Atomic.UIEditField>this.getWidget("ant_path");
 
         this.refreshWidgets();
 
@@ -48,6 +57,44 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
                     var toolPrefs = ToolCore.toolEnvironment.toolPrefs;
                     if (toolPrefs.androidSDKPath != path) {
                         toolPrefs.androidSDKPath = path;
+                        toolPrefs.save();
+                    }
+
+                    this.refreshWidgets();
+
+                }
+
+                return true;
+
+            } else if (ev.target.id == "choose_ant_path") {
+
+                var fileUtils = new Editor.FileUtils();
+                var path = fileUtils.getAntPath("");
+
+                if (path.length) {
+
+                    var toolPrefs = ToolCore.toolEnvironment.toolPrefs;
+                    if (toolPrefs.antPath != path) {
+                        toolPrefs.antPath = path;
+                        toolPrefs.save();
+                    }
+
+                    this.refreshWidgets();
+
+                }
+
+                return true;
+
+            }  else if (ev.target.id == "choose_jdk_root") {
+
+                var fileUtils = new Editor.FileUtils();
+                var path = fileUtils.getJDKRootPath("");
+
+                if (path.length) {
+
+                    var toolPrefs = ToolCore.toolEnvironment.toolPrefs;
+                    if (toolPrefs.jDKRootPath != path) {
+                        toolPrefs.jDKRootPath = path;
                         toolPrefs.save();
                     }
 
@@ -134,7 +181,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget {
     sdkTargetSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
     sdkTargetSelect: Atomic.UISelectDropdown;
 
-    jdkRootText: Atomic.UITextField;
     jdkRootChooseButton: Atomic.UIButton;
     jdkRootEdit: Atomic.UIEditField;
 
