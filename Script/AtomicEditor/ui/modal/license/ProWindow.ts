@@ -30,7 +30,7 @@ class ProWindow extends ModalWindow {
 
             } else if (id == "quit") {
 
-                this.sendEvent(EditorEvents.Quit);
+                Atomic.ui.requestExit();
 
             }
 

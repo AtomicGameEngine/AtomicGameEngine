@@ -289,7 +289,7 @@ void UIWidget::Center()
     if (!root)
     {
         UI* ui = GetSubsystem<UI>();
-        ui->GetRootWidget();
+        root = ui->GetRootWidget();
     }
 
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);

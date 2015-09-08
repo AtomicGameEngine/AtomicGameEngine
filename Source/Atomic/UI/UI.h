@@ -71,6 +71,9 @@ public:
     void ShowConsole(bool value);
     void ToggleConsole();
 
+    /// request exit on next frame
+    void RequestExit() { exitRequested_ = true; inputDisabled_ = true; }
+
     UIRenderer* GetRenderer() { return renderer_; }
 
 private:
@@ -106,6 +109,7 @@ private:
     bool initialized_;
     bool skinLoaded_;
     bool consoleVisible_;
+    bool exitRequested_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -119,7 +123,6 @@ private:
     void HandleTextInput(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
-
 
 };
 

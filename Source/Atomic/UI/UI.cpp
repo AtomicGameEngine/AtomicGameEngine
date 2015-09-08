@@ -88,7 +88,8 @@ UI::UI(Context* context) :
     keyboardDisabled_(false),
     initialized_(false),
     skinLoaded_(false),
-    consoleVisible_(false)
+    consoleVisible_(false),
+    exitRequested_(false)
 {
 
 }
@@ -465,6 +466,11 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (exitRequested_) {
+        SendEvent(E_EXITREQUESTED);
+        exitRequested_ = false;
+        return;
+    }
     TBMessageHandler::ProcessMessages();
 }
 

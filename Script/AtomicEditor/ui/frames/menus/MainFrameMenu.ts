@@ -40,7 +40,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "quit") {
 
-                this.sendEvent(EditorEvents.Quit);
+                Atomic.ui.requestExit();
                 return true;
 
             }
