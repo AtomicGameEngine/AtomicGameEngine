@@ -102,7 +102,6 @@ bool Shader::BeginLoad(Deserializer& source)
 #ifdef ATOMIC_OPENGL
     vsSourceCode_.Replace("void VS(", "void main(");
     psSourceCode_.Replace("void PS(", "void main(");
-    psSourceCode_.Replace("attribute ", "// attribute ");
 #endif
 
     RefreshMemoryUse();

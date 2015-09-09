@@ -78,14 +78,17 @@ void JSBPackage::GenerateSource(const String &outPath)
 
     JSBind* jsbind = GetSubsystem<JSBind>();
 
-    JSBDoc jdoc;
-    jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Bin/" + name_ + ".js");
+    if (jsbind->GetPlatform() == "MACOSX" || jsbind->GetPlatform() == "WINDOWS" || jsbind->GetPlatform() == "LINUX")
+    {
+        JSBDoc jdoc;
+        jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Artifacts/JSDoc/" + name_ + ".js");
 
-    JSBTypeScript ts;
-    ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");
+        JSBTypeScript ts;
+        ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");
 
-    JSBHaxe hx;
-    hx.Emit(this, jsbind->GetSourceRootFolder() + "Script/Haxe/" + name_ + ".hx");
+        JSBHaxe hx;
+        hx.Emit(this, jsbind->GetSourceRootFolder() + "Script/Haxe/" + name_ + ".hx");
+    }
 }
 
 JSBClass* JSBPackage::GetClass(const String& name)

@@ -3,6 +3,8 @@
 
 #include <Atomic/Core/Object.h>
 
+#include "ToolPrefs.h"
+
 using namespace Atomic;
 
 namespace ToolCore
@@ -32,6 +34,10 @@ public:
     void SetRootSourceDir(const String& sourceDir);
     void SetRootBuildDir(const String& buildDir, bool setBinaryPaths = false);
 
+    ToolPrefs* GetToolPrefs() { return toolPrefs_; }
+    void SaveToolPrefs() { toolPrefs_->Save(); }
+    void LoadToolPrefs() { toolPrefs_->Load(); }
+
     const String& GetRootSourceDir() { return rootSourceDir_; }
     const String& GetRootBuildDir() { return rootBuildDir_; }
 
@@ -52,6 +58,12 @@ public:
 
     const String& GetDevConfigFilename();
 
+    // OSX
+    const String& GetPlayerAppFolder() { return playerAppFolder_; }
+
+    // iOS
+    String GetIOSDeployBinary();
+
     void Dump();
 
 private:
@@ -67,6 +79,9 @@ private:
 
     // path to Atomic player binary used when running content from the editor or cli
     String playerBinary_;
+
+    // path to Atomic player app (OSX)
+    String playerAppFolder_;
 
     // path to the AtomicTool command line binary
     String toolBinary_;
@@ -95,6 +110,8 @@ private:
     String webBuildDir_;
 
     String devConfigFilename_;
+
+    SharedPtr<ToolPrefs> toolPrefs_;
 };
 
 }

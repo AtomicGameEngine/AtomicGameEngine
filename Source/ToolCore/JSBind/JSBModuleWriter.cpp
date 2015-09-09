@@ -175,8 +175,7 @@ void JSBModuleWriter::WriteModulePreInit(String& source)
     // register enums and constants
     source += "// enums and constants\n";
     source += "duk_context* ctx = vm->GetJSContext();\n";
-    source += "duk_get_global_string(ctx, \"Atomic\");\n";
-
+    source.AppendWithFormat("duk_get_global_string(ctx, \"%s\");\n", module_->package_->GetName().CString());
     source += "// enums\n";
 
     Vector<SharedPtr<JSBEnum>> enums = module_->enums_.Values();

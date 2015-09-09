@@ -5,6 +5,8 @@
 #include <Atomic/IPC/IPC.h>
 #include <Atomic/IPC/IPCTypes.h>
 
+#include <Atomic/UI/SystemUI/MessageBox.h>
+
 using namespace Atomic;
 
 namespace AtomicEditor
@@ -32,6 +34,13 @@ private:
     void HandleJSError(StringHash eventType, VariantMap& eventData);
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
     void HandleIPCInitialize(StringHash eventType, VariantMap& eventData);
+    void HandleViewRender(StringHash eventType, VariantMap& eventData);
+
+// BEGIN LICENSE MANAGEMENT
+    void HandleMessageAck(StringHash eventType, VariantMap& eventData);
+    bool licenseModule3D_;
+    SharedPtr<SystemUI::MessageBox> messageBox_;
+// END LICENSE MANAGEMENT
 
     IPCHandle fd_[2];
     WeakPtr<IPC> ipc_;

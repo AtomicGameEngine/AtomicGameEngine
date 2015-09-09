@@ -30,6 +30,8 @@ public:
     Platform(Context* context);
     virtual ~Platform();
 
+    virtual bool GetLicense() = 0;
+
     virtual String GetName() = 0;
     virtual PlatformID GetPlatformID() = 0;
 

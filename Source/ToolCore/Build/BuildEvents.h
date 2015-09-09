@@ -14,12 +14,14 @@ namespace ToolCore
 EVENT(E_BUILDCOMPLETE, BuildComplete)
 {
     PARAM(P_PLATFORMID, PlatformID); // unsigned (PLATFORMID)
+    PARAM(P_BUILDFOLDER, BuildFolder); // String
+    PARAM(P_MESSAGE, Message); // String
+    PARAM(P_SUCCESS, Success); // Bool
 }
 
-EVENT(E_BUILDFAILED, BuildFailed)
+EVENT(E_BUILDOUTPUT, BuildOutput)
 {
-    PARAM(P_PLATFORMID, PlatformID); // unsigned (PLATFORMID)
-    PARAM(P_MESSAGE, Message); // String
+    PARAM(P_TEXT, Text); // string
 }
 
 }

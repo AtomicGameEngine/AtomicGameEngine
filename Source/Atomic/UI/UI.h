@@ -13,6 +13,11 @@ class VertexBuffer;
 class UIRenderer;
 class UIWidget;
 
+namespace SystemUI
+{
+    class MessageBox;
+}
+
 class UI : public Object, private tb::TBWidgetListener
 {
     OBJECT(UI)
@@ -65,11 +70,15 @@ public:
 
     void GetTBIDString(unsigned id, String& value);
 
+    SystemUI::MessageBox *ShowSystemMessageBox(const String& title, const String& message);
     void ShowDebugHud(bool value);
     void ToggleDebugHud();
 
     void ShowConsole(bool value);
     void ToggleConsole();
+
+    /// request exit on next frame
+    void RequestExit() { exitRequested_ = true; inputDisabled_ = true; }
 
     UIRenderer* GetRenderer() { return renderer_; }
 
@@ -106,6 +115,7 @@ private:
     bool initialized_;
     bool skinLoaded_;
     bool consoleVisible_;
+    bool exitRequested_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
@@ -119,7 +129,6 @@ private:
     void HandleTextInput(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
-
 
 };
 

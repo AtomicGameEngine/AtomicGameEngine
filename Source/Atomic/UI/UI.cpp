@@ -57,11 +57,13 @@ using namespace tb;
 #include "UIScrollContainer.h"
 #include "UISeparator.h"
 #include "UIDimmer.h"
+#include "UISelectDropdown.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
 #include "SystemUI/DebugHud.h"
 #include "SystemUI/Console.h"
+#include "SystemUI/MessageBox.h"
 
 namespace tb
 {
@@ -87,7 +89,8 @@ UI::UI(Context* context) :
     keyboardDisabled_(false),
     initialized_(false),
     skinLoaded_(false),
-    consoleVisible_(false)
+    consoleVisible_(false),
+    exitRequested_(false)
 {
 
 }
@@ -464,6 +467,11 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (exitRequested_) {
+        SendEvent(E_EXITREQUESTED);
+        exitRequested_ = false;
+        return;
+    }
     TBMessageHandler::ProcessMessages();
 }
 
@@ -574,6 +582,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         container->SetWidget(widget);
         widgetWrap_[widget] = container;
         return container;
+    }
+
+    if (widget->IsOfType<TBSelectDropdown>())
+    {
+        UISelectDropdown* select = new UISelectDropdown(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
     }
 
     if (widget->IsOfType<TBButton>())
@@ -746,6 +762,19 @@ void UI::ToggleConsole()
 void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
 {
     consoleVisible_ = false;
+}
+
+SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String& message)
+{
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+
+    SystemUI::MessageBox* messageBox = new SystemUI::MessageBox(context_, message, title, 0, xmlFile);
+
+    return messageBox;
+
+
 }
 
 }

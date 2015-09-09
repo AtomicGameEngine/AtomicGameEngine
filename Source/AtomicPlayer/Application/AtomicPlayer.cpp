@@ -24,45 +24,50 @@
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/IOEvents.h>
+#include <Atomic/Input/InputEvents.h>
 #include <Atomic/Core/Main.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
+#include <Atomic/UI/UI.h>
 
 // Move me
 #include <Atomic/Environment/Environment.h>
 
 #include <AtomicJS/Javascript/Javascript.h>
 
+#include <AtomicPlayer/Player.h>
+
 #include "AtomicPlayer.h"
 
 #include <Atomic/DebugNew.h>
 
-#include <Atomic/UI/UI.h>
+#ifdef __APPLE__
+#include <unistd.h>
+#endif
 
-DEFINE_APPLICATION_MAIN(AtomicPlayer);
+DEFINE_APPLICATION_MAIN(AtomicPlayer::AtomicPlayerApp)
 
-// fixme
-static JSVM* vm = NULL;
-static Javascript* javascript = NULL;
+namespace AtomicPlayer
+{
 
-AtomicPlayer::AtomicPlayer(Context* context) :
+extern void jsapi_init_atomicplayer(JSVM* vm);
+
+AtomicPlayerApp::AtomicPlayerApp(Context* context) :
     Application(context)
 {
-#ifdef ATOMIC_3D
-    RegisterEnvironmentLibrary(context_);
-#endif
 }
 
-void AtomicPlayer::Setup()
+void AtomicPlayerApp::Setup()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
-    
+
     engineParameters_["WindowTitle"] = "AtomicPlayer";
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
-    engineParameters_["ResourcePaths"] = "CoreData;AtomicResources";
+    engineParameters_["ResourcePaths"] = "CoreData;PlayerData;Cache;AtomicResources";
 #elif ATOMIC_PLATFORM_WEB
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";
@@ -72,10 +77,10 @@ void AtomicPlayer::Setup()
     engineParameters_["FullScreen"] = false;
     engineParameters_["ResourcePaths"] = "AtomicResources";
 #else
-    engineParameters_["ResourcePaths"] = "AtomicResources";
     engineParameters_["FullScreen"] = false;
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
+    engineParameters_["ResourcePaths"] = "AtomicResources";
 #endif
 
 #if ATOMIC_PLATFORM_WINDOWS
@@ -96,11 +101,9 @@ void AtomicPlayer::Setup()
             String argument = arguments[i].ToLower();
             String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
 
-            if (argument == "--editor-resource-paths" && value.Length())
+            if (argument == "--log-std")
             {
-                engineParameters_["ResourcePrefixPath"] = "";
-                value.Replace("!", ";");
-                engineParameters_["ResourcePaths"] = value;
+                SubscribeToEvent(E_LOGMESSAGE, HANDLER(AtomicPlayerApp, HandleLogMessage));
             }
         }
     }
@@ -109,39 +112,101 @@ void AtomicPlayer::Setup()
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
 }
 
-void AtomicPlayer::Start()
+void AtomicPlayerApp::Start()
 {
+    Application::Start();
+
     // Instantiate and register the Javascript subsystem
-    javascript = new Javascript(context_);
+    Javascript* javascript = new Javascript(context_);
     context_->RegisterSubsystem(javascript);
 
-    vm = javascript->InstantiateVM("MainVM");
-    vm->InitJSContext();
+    vm_ = javascript->InstantiateVM("MainVM");
+    vm_->InitJSContext();
 
-    vm->SetModuleSearchPaths("Modules");
+    UI* ui = GetSubsystem<UI>();
+    ui->Initialize("DefaultUI/language/lng_en.tb.txt");
+    ui->LoadDefaultPlayerSkin();
+
+    SubscribeToEvent(E_JSERROR, HANDLER(AtomicPlayerApp, HandleJSError));
+
+    vm_->SetModuleSearchPaths("Modules");
+
+    // Instantiate and register the Player subsystem
+    context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
+    AtomicPlayer::jsapi_init_atomicplayer(vm_);
+
+    JSVM* vm = JSVM::GetJSVM(0);
 
     if (!vm->ExecuteMain())
     {
-        ErrorExit("Error executing Scripts/main.js");
+        SendEvent(E_EXITREQUESTED);
     }
 
     return;
 }
 
-void AtomicPlayer::Stop()
+void AtomicPlayerApp::Stop()
 {
+
+    vm_ = 0;
     context_->RemoveSubsystem<Javascript>();
+    // make sure JSVM is really down and no outstanding refs
+    // as if not, will hold on engine subsystems, which is bad
+    assert(!JSVM::GetJSVM(0));
+
+    Application::Stop();
+
+
 }
 
-void AtomicPlayer::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
+void AtomicPlayerApp::HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData)
 {
 }
 
-void AtomicPlayer::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
+void AtomicPlayerApp::HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData)
 {
 }
 
-void AtomicPlayer::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
+void AtomicPlayerApp::HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData)
 {
     ErrorExit();
+}
+
+void AtomicPlayerApp::HandleLogMessage(StringHash eventType, VariantMap& eventData)
+{
+    using namespace LogMessage;
+
+    int level = eventData[P_LEVEL].GetInt();
+    // The message may be multi-line, so split to rows in that case
+    Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
+
+    for (unsigned i = 0; i < rows.Size(); ++i)
+    {
+        if (level == LOG_ERROR)
+        {
+            fprintf(stderr, "%s\n", rows[i].CString());
+        }
+        else
+        {
+            fprintf(stdout, "%s\n", rows[i].CString());
+        }
+    }
+
+}
+
+void AtomicPlayerApp::HandleJSError(StringHash eventType, VariantMap& eventData)
+{
+    using namespace JSError;
+    //String errName = eventData[P_ERRORNAME].GetString();
+    //String errStack = eventData[P_ERRORSTACK].GetString();
+    String errMessage = eventData[P_ERRORMESSAGE].GetString();
+    String errFilename = eventData[P_ERRORFILENAME].GetString();
+    int errLineNumber = eventData[P_ERRORLINENUMBER].GetInt();
+
+    String errorString = ToString("%s - %s - Line: %i",
+                                  errFilename.CString(), errMessage.CString(), errLineNumber);
+
+}
+
+
 }

@@ -16,7 +16,8 @@ using namespace rapidjson;
 namespace ToolCore
 {
 
-ToolEnvironment::ToolEnvironment(Context* context) : Object(context)
+ToolEnvironment::ToolEnvironment(Context* context) : Object(context),
+    toolPrefs_(new ToolPrefs(context))
 {
 
 }
@@ -28,6 +29,7 @@ ToolEnvironment::~ToolEnvironment()
 
 bool ToolEnvironment::InitFromPackage()
 {
+    toolPrefs_->Load();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -39,6 +41,13 @@ bool ToolEnvironment::InitFromPackage()
     String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
 #endif
 
+    //TODO: move this to deployment stuff
+    playerAppFolder_ = resourcesDir + "ToolData/Deployment/MacOS/AtomicPlayer.app/";
+    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x86/AtomicPlayer.exe";
+
+    resourceCoreDataDir_ = resourcesDir + "CoreData";
+    resourcePlayerDataDir_ = resourcesDir + "PlayerData";
+
     toolDataDir_ =  resourcesDir + "ToolData/";
 
     return true;
@@ -46,6 +55,8 @@ bool ToolEnvironment::InitFromPackage()
 
 bool ToolEnvironment::InitFromJSON(bool atomicTool)
 {
+
+    toolPrefs_->Load();
 
     // make sure config path is initialized
     GetDevConfigFilename();
@@ -131,25 +142,34 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
 #ifdef _DEBUG
-        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Debug/AtomicPlayer.exe";
+        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Debug/AtomicPlayer.exe";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Debug/AtomicEditor.exe";
 #else
-        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Release/AtomicPlayer.exe";
+        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Release/AtomicEditor.exe";
 #endif
+
+        playerAppFolder_ = rootSourceDir_ + "Data/AtomicEditor/Deployment/MacOS/AtomicPlayer.app";
+
 #elif ATOMIC_PLATFORM_OSX
 
 #ifdef ATOMIC_XCODE
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/" + CMAKE_INTDIR + "/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/" + CMAKE_INTDIR + "/AtomicEditor.app/Contents/MacOS/AtomicEditor";
 #else
-        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
+        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
+        playerAppFolder_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.app/";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.app/Contents/MacOS/AtomicEditor";
 #endif
         
 #endif
     }
 
+}
+
+String ToolEnvironment::GetIOSDeployBinary()
+{
+    return GetToolDataDir() + "Deployment/IOS/ios-deploy/ios-deploy";
 }
 
 void ToolEnvironment::Dump()

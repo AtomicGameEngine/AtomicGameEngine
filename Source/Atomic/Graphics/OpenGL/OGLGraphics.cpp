@@ -1465,8 +1465,13 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                         glDisable(textureTypes_[index]);
                 }
 
+// ATOMIC BEGIN - glEnable GL_TEXTURE_2D is invalid, should check this on ES2 as well
+#ifndef EMSCRIPTEN
                 if (!gl3Support)
                     glEnable(glType);
+#endif
+// ATOMIC END
+
                 textureTypes_[index] = glType;
             }
 

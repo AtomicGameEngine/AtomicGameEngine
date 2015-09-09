@@ -1,1 +1,1 @@
-./node_modules/.bin/jsdoc ../Bin/Atomic.js -t ./jaguarjs-jsdoc/ -c ./jsdoc.conf Readme.md
+./node_modules/.bin/jsdoc ../Artifacts/JSDoc/Atomic.js -t ./jaguarjs-jsdoc/ -c ./jsdoc.conf Readme.md

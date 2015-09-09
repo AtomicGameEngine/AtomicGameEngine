@@ -155,6 +155,13 @@ declare module Atomic {
 
     }
 
+
+    export interface IPCMessageEvent {
+
+        message: string;
+        value: number;
+    }
+
     export interface AttributeInfo {
 
         type: VariantType;
@@ -230,10 +237,32 @@ declare module ToolCore {
 
     }
 
+    export interface PlatformChangedEvent {
+
+        platform:ToolCore.Platform;
+
+    }
+
+    export interface BuildOutputEvent {
+
+        text:string;
+
+    }
+
+    export interface BuildCompleteEvent {
+
+      platformID:number;
+      message:string;
+      success:boolean;
+      buildFolder:string;
+
+    }
+
     export var toolEnvironment: ToolEnvironment;
     export var toolSystem: ToolSystem;
     export var assetDatabase: AssetDatabase;
     export var licenseSystem: LicenseSystem;
+    export var buildSystem: BuildSystem;
 
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;

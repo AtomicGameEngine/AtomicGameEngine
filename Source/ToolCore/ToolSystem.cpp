@@ -6,10 +6,14 @@
 #include "Platform/PlatformWeb.h"
 #include "Platform/PlatformMac.h"
 #include "Platform/PlatformWindows.h"
+#include "Platform/PlatformAndroid.h"
+#include "Platform/PlatformIOS.h"
+
 #include "Assets/AssetDatabase.h"
 #include "Net/CurlManager.h"
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
+#include "Subprocess/SubprocessSystem.h"
 
 
 #include "ToolSystem.h"
@@ -17,7 +21,7 @@
 #include "ToolEvents.h"
 
 #include "Project/Project.h"
-
+#include "Project/ProjectUserPrefs.h"
 
 namespace ToolCore
 {
@@ -29,11 +33,14 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     context_->RegisterSubsystem(new CurlManager(context_));
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));
+    context_->RegisterSubsystem(new SubprocessSystem(context_));
 
     // platform registration
     RegisterPlatform(new PlatformMac(context));
     RegisterPlatform(new PlatformWeb(context));
     RegisterPlatform(new PlatformWindows(context));
+    RegisterPlatform(new PlatformIOS(context));
+    RegisterPlatform(new PlatformAndroid(context));
 }
 
 ToolSystem::~ToolSystem()
@@ -69,7 +76,15 @@ bool ToolSystem::LoadProject(const String& fullpath)
     project_ = new Project(context_);
     project_->SetResourcePath(resourcePath);
 
-    return project_->Load(fullpath);
+    bool result = project_->Load(fullpath);
+
+    if (result)
+    {
+        // TODO: persistent platform setting
+        SetCurrentPlatform(project_->GetUserPrefs()->GetDefaultPlatform());
+    }
+
+    return result;
 }
 
 void ToolSystem::CloseProject()
@@ -95,9 +110,13 @@ void ToolSystem::CloseProject()
 
 void ToolSystem::SetCurrentPlatform(PlatformID platform)
 {
+    VariantMap eventData;
+
     if (platform == PLATFORMID_UNDEFINED)
     {
         currentPlatform_ = NULL;
+        eventData[PlatformChanged::P_PLATFORM] = (Platform*) 0;
+        SendEvent(E_PLATFORMCHANGED, eventData);
         return;
     }
 
@@ -105,6 +124,8 @@ void ToolSystem::SetCurrentPlatform(PlatformID platform)
         return;
 
     currentPlatform_ = platforms_[(unsigned)platform];
+    eventData[PlatformChanged::P_PLATFORM] = currentPlatform_;
+    SendEvent(E_PLATFORMCHANGED, eventData);
 
 }
 

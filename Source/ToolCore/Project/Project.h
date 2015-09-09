@@ -44,7 +44,6 @@ public:
     bool IsScriptsDirOrFile(const String& fullPath);
     bool IsModulesDirOrFile(const String& fullPath);
 
-
     void AddPlatform(PlatformID platformID);
     bool ContainsPlatform(PlatformID platformID);
     void RemovePlatform(PlatformID platformID);

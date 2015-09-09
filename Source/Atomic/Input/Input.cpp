@@ -207,8 +207,8 @@ Input::Input(Context* context) :
     mouseMoveWheel_(0),
     windowID_(0),
     toggleFullscreen_(true),
-    mouseVisible_(false),
-    lastMouseVisible_(false),
+    mouseVisible_(true), // ATOMIC: default mouse visible
+    lastMouseVisible_(true),
     mouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
 #ifdef EMSCRIPTEN

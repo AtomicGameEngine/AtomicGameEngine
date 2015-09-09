@@ -43,12 +43,19 @@ Project::~Project()
 
 void Project::SaveUserPrefs()
 {
+    String path = GetProjectPath() + "UserPrefs.json";
+
+    userPrefs_->Save(path);
 
 }
 
 bool Project::LoadUserPrefs()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+
+    String path = GetProjectPath() + "UserPrefs.json";
+
+    userPrefs_->Load(path);
 
     // If we're in CLI mode, the Build folder is always relative to project
     if (tsystem->IsCLI())
@@ -62,11 +69,12 @@ bool Project::LoadUserPrefs()
 
 void Project::SaveBuildSettings()
 {
-
+    buildSettings_->Save(GetProjectPath() + "BuildSettings.json");
 }
 
 bool Project::LoadBuildSettings()
 {
+    buildSettings_->Load(GetProjectPath() + "BuildSettings.json");
     return true;
 }
 

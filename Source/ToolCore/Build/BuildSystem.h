@@ -26,11 +26,13 @@ public:
 
     void SetBuildPath(const String& path) { buildPath_ = path; }
 
+    const String& GetBuildPath() const { return buildPath_; }
+
     void QueueBuild(BuildBase* buildBase);
 
     bool StartNextBuild();
 
-    void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, bool fail3D = false);
+    void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, const String& buildMessage = String::EMPTY);
 
 private:
 

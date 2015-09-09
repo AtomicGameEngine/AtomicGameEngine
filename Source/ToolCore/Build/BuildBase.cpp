@@ -5,16 +5,20 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include "../Subprocess/SubprocessSystem.h"
 #include "../Project/Project.h"
 #include "../ToolEnvironment.h"
 
+#include "BuildEvents.h"
 #include "BuildBase.h"
 #include "ResourcePackager.h"
 
 namespace ToolCore
 {
 
-BuildBase::BuildBase(Context * context, Project* project) : Object(context), containsMDL_(false)
+BuildBase::BuildBase(Context * context, Project* project, PlatformID platform) : Object(context),
+    platformID_(platform),
+    containsMDL_(false)
 {
     if (UseResourcePackager())
         resourcePackager_ = new ResourcePackager(context, this);
@@ -46,6 +50,28 @@ void BuildBase::BuildError(const String& error)
     buildErrors_.Push(error);
 }
 
+void BuildBase::SendBuildFailure(const String& message)
+{
+
+    VariantMap buildError;
+    buildError[BuildComplete::P_PLATFORMID] = platformID_;
+    buildError[BuildComplete::P_MESSAGE] = message;
+    SendEvent(E_BUILDCOMPLETE, buildError);
+
+}
+
+
+void BuildBase::HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData)
+{
+    // E_SUBPROCESSOUTPUT
+    const String& text = eventData[SubprocessOutput::P_TEXT].GetString();
+
+    // convert to a build output event and forward to subscribers
+    VariantMap buildOutputData;
+    buildOutputData[BuildOutput::P_TEXT] = text;
+    SendEvent(E_BUILDOUTPUT, buildOutputData);
+}
+
 void BuildBase::GetDefaultResourcePaths(Vector<String>& paths)
 {
     paths.Clear();
@@ -70,6 +96,7 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
         for (unsigned j = 0; j < resourceEntries_.Size(); j++)
         {
             const BuildResourceEntry* entry = resourceEntries_[j];
+
             if (entry->packagePath_ == filename)
             {
                 BuildWarn(ToString("Resource Path: %s already exists", filename.CString()));
@@ -91,10 +118,16 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
 // END LICENSE MANAGEMENT
 
         newEntry->absolutePath_ = resourceDir + filename;
-        newEntry->packagePath_ = filename;
         newEntry->resourceDir_ = resourceDir;
 
+        if (resourceDir.EndsWith("/Cache/"))
+            newEntry->packagePath_ = "Cache/" + filename;
+        else
+            newEntry->packagePath_ = filename;
+
         resourceEntries_.Push(newEntry);
+
+        //LOGINFOF("Adding resource: %s : %s", newEntry->absolutePath_.CString(), newEntry->packagePath_.CString());
     }
 }
 

@@ -6,10 +6,11 @@
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "outDir": "out/",
+        "outDir": "../Resources/EditorData/AtomicEditor/EditorScripts",
         "sourceMap": true
     },
     "filesGlob": [
-        "./**/*.ts"
+        "./ToolCore/**/*.ts",
+        "./AtomicEditor/**/*.ts"
     ]
 }

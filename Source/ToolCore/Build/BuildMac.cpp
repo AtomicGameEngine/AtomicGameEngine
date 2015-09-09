@@ -5,14 +5,17 @@
 #include <Atomic/IO/FileSystem.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEnvironment.h"
 #include "../Project/Project.h"
-#include "BuildMac.h"
+
+#include "BuildEvents.h"
 #include "BuildSystem.h"
+#include "BuildMac.h"
 
 namespace ToolCore
 {
 
-BuildMac::BuildMac(Context * context, Project *project) : BuildBase(context, project)
+BuildMac::BuildMac(Context * context, Project *project) : BuildBase(context, project, PLATFORMID_MAC)
 {
 
 }
@@ -37,6 +40,8 @@ void BuildMac::Initialize()
         AddResourceDir(defaultResourcePaths[i]);
     }
 
+    // TODO: smart filtering of cache
+    AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
     BuildResourceEntries();
@@ -45,9 +50,13 @@ void BuildMac::Initialize()
 
 void BuildMac::Build(const String& buildPath)
 {
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
+
+    VariantMap buildOutput;
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Mac Deployment</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     Initialize();
 
@@ -57,9 +66,7 @@ void BuildMac::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
-    String dataPath = tsystem->GetDataPath();
-
-    String appSrcPath = dataPath + "Deployment/MacOS/AtomicPlayer.app";
+    String appSrcPath = tenv->GetPlayerAppFolder();
 
     fileSystem->CreateDir(buildPath_);
 
@@ -85,6 +92,9 @@ void BuildMac::Build(const String& buildPath)
     args.Push(buildPath_ + "/Contents/MacOS/AtomicPlayer");
     fileSystem->SystemRun("chmod", args);
 #endif
+
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Mac Deployment Complete</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     buildPath_ = buildPath + "/Mac-Build";    
     buildSystem->BuildComplete(PLATFORMID_MAC, buildPath_);

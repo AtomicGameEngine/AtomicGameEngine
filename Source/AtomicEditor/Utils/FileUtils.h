@@ -21,8 +21,13 @@ public:
 
     bool CreateDirs(const String& folder);
 
+    String GetMobileProvisionPath();
+    String GetAndroidSDKPath(const String& defaultPath);
+    String GetAntPath(const String& defaultPath);
+    String GetJDKRootPath(const String& defaultPath);
     String OpenProjectFileDialog();
     String NewProjectFileDialog();
+    String GetBuildPath(const String& defaultPath);
     void RevealInFinder(const String& fullpath);
 
 private:

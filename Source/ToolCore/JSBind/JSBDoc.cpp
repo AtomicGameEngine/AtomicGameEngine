@@ -4,6 +4,7 @@
 
 #include <Atomic/Atomic.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -262,6 +263,13 @@ void JSBDoc::ExportModuleEnums(JSBModule* module)
 }
 void JSBDoc::WriteToFile(const String &path)
 {
+    FileSystem* fs = package_->GetSubsystem<FileSystem>();
+
+    String jsDocPath = GetPath(path);
+
+    if (!fs->DirExists(jsDocPath))
+        fs->CreateDir(jsDocPath);
+
     File file(package_->GetContext());
     file.Open(path, FILE_WRITE);
 

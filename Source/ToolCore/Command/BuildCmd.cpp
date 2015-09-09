@@ -48,12 +48,13 @@ bool BuildCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Strin
 
 void BuildCmd::HandleBuildComplete(StringHash eventType, VariantMap& eventData)
 {
-    Finished();
-}
+    if (!eventData[BuildComplete::P_SUCCESS].GetBool())
+    {
+        Error("Build Failed");
+    }
+    else
+        Finished();
 
-void BuildCmd::HandleBuildFailed(StringHash eventType, VariantMap& eventData)
-{
-    Error("Build Failed");
 }
 
 void BuildCmd::Run()
@@ -88,7 +89,6 @@ void BuildCmd::Run()
     buildSystem->QueueBuild(buildBase);
 
     SubscribeToEvent(E_BUILDCOMPLETE, HANDLER(BuildCmd, HandleBuildComplete));
-    SubscribeToEvent(E_BUILDFAILED, HANDLER(BuildCmd, HandleBuildFailed));
 
     // TODO: parallel/serial builds
     buildSystem->StartNextBuild();

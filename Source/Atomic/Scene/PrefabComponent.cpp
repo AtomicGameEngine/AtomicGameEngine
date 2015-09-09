@@ -50,7 +50,13 @@ void PrefabComponent::RegisterObject(Context* context)
 void PrefabComponent::LoadPrefabNode()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* xmlfile = cache->GetResource<XMLFile>(prefabGUID_);
+
+    // first look in cache
+    XMLFile* xmlfile = cache->GetResource<XMLFile>("Cache/" + prefabGUID_, false);
+
+    // if not found, could be loading a specific prefab
+    if (!xmlfile)
+        xmlfile = cache->GetResource<XMLFile>(prefabGUID_, false);
 
     if (!xmlfile || !node_)
         return;
@@ -95,6 +101,8 @@ void PrefabComponent::LoadPrefabNode()
     this->SetTemporary(temporary);
     node->AddComponent(this, id, REPLICATED);
 
+#ifdef ATOMIC_3D
+
     // Get all the rigid bodies of the load node
     PODVector<RigidBody*> bodies;
     node_->GetComponents<RigidBody>(bodies, true);
@@ -104,6 +112,8 @@ void PrefabComponent::LoadPrefabNode()
         RigidBody* body = bodies[i];
         body->SetTransform(body->GetNode()->GetWorldPosition(), body->GetNode()->GetWorldRotation());
     }
+
+#endif
 
 }
 

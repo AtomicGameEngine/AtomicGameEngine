@@ -248,24 +248,51 @@ void JSVM::SendJSErrorEvent(const String& filename)
 }
 
 int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
+
     int realLineNumber = lineNumber;
-    String path = fileName;
-    if (!path.EndsWith(".js.map"))
-        path += ".js.map";
-    if (path.EndsWith(".js")) {
+
+    String mapPath = fileName;
+
+    if (!mapPath.EndsWith(".js.map"))
+        mapPath += ".js.map";
+
+    if (mapPath.EndsWith(".js")) {
         return realLineNumber;
     }
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String path;
+    const Vector<String>& searchPaths = GetModuleSearchPaths();
+    for (unsigned i = 0; i < searchPaths.Size(); i++)
+    {
+        String checkPath = searchPaths[i] + mapPath;
+
+        if (cache->Exists(checkPath))
+        {
+            path = checkPath;
+            break;
+        }
+
+    }
+
+    if (!path.Length())
+        return realLineNumber;
+
+
     SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile(path));
+
     //if there's no source map file, maybe you use a pure js, so give an error, or maybe forgot to generate source-maps :(
     if (mapFile.Null()) 
     {
         return realLineNumber;
     }    
+
     String map;
     mapFile->ReadText(map);
     int top = duk_get_top(ctx_);
     duk_get_global_string(ctx_, "require");
-    duk_push_string(ctx_, "AtomicEditor/Script/jsutils");
+    duk_push_string(ctx_, "AtomicEditor/EditorScripts/Lib/jsutils");
     if (duk_pcall(ctx_, 1))
     {
         printf("Error: %s\n", duk_safe_to_string(ctx_, -1));

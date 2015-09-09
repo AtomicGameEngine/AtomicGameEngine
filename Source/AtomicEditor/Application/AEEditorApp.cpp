@@ -47,7 +47,7 @@ void AEEditorApp::Start()
 
     context_->RegisterSubsystem(new EditorMode(context_));
 
-    vm_->SetModuleSearchPaths("AtomicEditor/out");
+    vm_->SetModuleSearchPaths("AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");
 
     // Do not create bone structure by default when in the editor
     // this can be toggled temporarily, for example to setup an animation preview
@@ -70,7 +70,6 @@ void AEEditorApp::Start()
         vm_->SendJSErrorEvent();
         ErrorExit("Error executing main.js");
     }
-
 
     GetSubsystem<LicenseSystem>()->Initialize();
 
@@ -113,8 +112,7 @@ void AEEditorApp::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
     engineParameters_["ResourcePrefixPath"] = "";
-    String ScriptPath = env->GetRootSourceDir() + "Script";
-    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir() + ";" + ScriptPath;
+    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir();
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
 
@@ -125,7 +123,7 @@ void AEEditorApp::Setup()
 	engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
 #endif
 
-	engineParameters_["ResourcePaths"] = "CoreData;EditorData;Script";
+    engineParameters_["ResourcePaths"] = "CoreData;EditorData";
 
 #endif // ATOMIC_DEV_BUILD
 
@@ -139,6 +137,7 @@ void AEEditorApp::Stop()
 
 void AEEditorApp::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 {
+
 }
 
 void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
@@ -148,7 +147,7 @@ void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
     String errMessage = eventData[P_ERRORMESSAGE].GetString();
     String errFilename = eventData[P_ERRORFILENAME].GetString();
     //String errStack = eventData[P_ERRORSTACK].GetString();
-    int errLineNumber = vm_->GetRealLineNumber("AtomicEditor/out/" + errFilename, eventData[P_ERRORLINENUMBER].GetInt());
+    int errLineNumber = vm_->GetRealLineNumber(errFilename, eventData[P_ERRORLINENUMBER].GetInt());
     
     String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errLineNumber);
 

@@ -17,5 +17,10 @@ EVENT(E_PROJECTUNLOADED, ProjectUnloaded)
 {
 }
 
+EVENT(E_PLATFORMCHANGED, PlatformChanged)
+{
+    PARAM(P_PLATFORM, Platform);    // Platform Ptr
+}
+
 
 }

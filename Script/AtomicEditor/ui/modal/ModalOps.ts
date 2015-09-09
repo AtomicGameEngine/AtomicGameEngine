@@ -8,7 +8,12 @@ import EULAWindow = require("./license/EULAWindow");
 import ActivationWindow = require("./license/ActivationWindow");
 import ActivationSuccessWindow = require("./license/ActivationSuccessWindow");
 import ManageLicense = require("./license/ManageLicense");
-import ProWindow = require("./license/ProWindow");
+import Pro3DWindow = require("./license/Pro3DWindow");
+import ProPlatformWindow = require("./license/ProPlatformWindow");
+
+import BuildWindow = require("./build/BuildWindow");
+import BuildOutput = require("./build/BuildOutput");
+import BuildSettingsWindow = require("./build/BuildSettingsWindow");
 
 import ResourceSelection = require("./ResourceSelection");
 
@@ -24,7 +29,7 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateFolder: string, imagePath:string = "") {
+    showCreateProject(projectTemplateFolder: string, imagePath: string = "") {
 
         if (this.show()) {
 
@@ -144,21 +149,69 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showProWindow(uiPath:string) {
+    showPro3DWindow() {
 
         if (this.show()) {
 
-            this.opWindow = new ProWindow(uiPath);
+            this.opWindow = new Pro3DWindow();
 
         }
 
     }
+
+    showProPlatformWindow() {
+
+        if (this.show()) {
+
+            this.opWindow = new ProPlatformWindow();
+
+        }
+
+    }
+
 
     showAbout() {
 
         if (this.show()) {
 
             this.opWindow = new About();
+
+        }
+
+    }
+
+    showBuild() {
+
+        if (!ToolCore.toolSystem.project)
+            return;
+
+        if (this.show()) {
+
+            this.opWindow = new BuildWindow();
+
+        }
+
+    }
+
+
+    showBuildSettings() {
+
+        if (!ToolCore.toolSystem.project)
+            return;
+
+        if (this.show()) {
+
+            this.opWindow = new BuildSettingsWindow();
+
+        }
+
+    }
+
+    showBuildOutput(buildBase: ToolCore.BuildBase) {
+
+        if (this.show()) {
+
+            this.opWindow = new BuildOutput(buildBase);
 
         }
 
