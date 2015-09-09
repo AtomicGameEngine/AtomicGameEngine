@@ -125,7 +125,7 @@ class BuildSettingsWindow extends ModalWindow {
 
                         var platform = toolSystem.getPlatformByName(name);
 
-                        if (platform.license) {
+                        if (!platform.license) {
                             this.hide();
                             EditorUI.getModelOps().showProPlatformWindow();
                             return true;
