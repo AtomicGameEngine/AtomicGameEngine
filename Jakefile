@@ -16,7 +16,7 @@ var artifactsFolder = jakeRoot + "/Artifacts";
 // cmake
 var cmakeDevBuild = false;
 
-var includeDeployments = true;
+var includeDeployments = jenkinsBuild;
 var deployments = {
   osx: true,
   android: true,
