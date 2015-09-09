@@ -40,6 +40,8 @@ public:
     void SetStyling(bool styling);
     void SetMultiline(bool multiline);
 
+    void Reformat(bool update_fragments = false);
+
     void ScrollTo(int x, int y);
 
     void SetWrapping(bool wrap);

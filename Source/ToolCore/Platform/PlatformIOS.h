@@ -22,6 +22,8 @@ public:
 
     String ParseProvisionAppIdentifierPrefix(const String& provisionFile);
 
+    bool GetLicense();
+
 };
 
 }

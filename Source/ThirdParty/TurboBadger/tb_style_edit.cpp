@@ -2139,7 +2139,7 @@ bool TBStyleEdit::SetText(const char *text, int text_len, TB_CARET_POS pos)
 	ScrollIfNeeded(true, false);
 
 	if (pos == TB_CARET_POS_END)
-		caret.Place(blocks.GetLast(), blocks.GetLast()->str_len);
+        caret.Place(blocks.GetLast(), blocks.GetLast()->str_len);
 
 	listener->OnChange();
 	return true;

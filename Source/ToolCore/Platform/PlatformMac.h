@@ -20,6 +20,8 @@ public:
 
     BuildBase* NewBuild(Project* project);
 
+    virtual bool GetLicense() { return true; }
+
 };
 
 }

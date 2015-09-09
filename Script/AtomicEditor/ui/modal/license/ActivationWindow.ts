@@ -49,16 +49,8 @@ class ActivationWindow extends ModalWindow {
 
         this.hide();
 
-        if (ToolCore.licenseSystem.sourceBuild && ToolCore.licenseSystem.isStandardLicense()) {
+        EditorUI.getModelOps().showActivationSuccessWindow();
 
-            // show pro window
-            EditorUI.getModelOps().showProWindow("AtomicEditor/editor/ui/sourceinfo.tb.txt");
-
-        } else {
-
-            EditorUI.getModelOps().showActivationSuccessWindow();
-
-        }
 
     }
 

@@ -140,6 +140,15 @@ bool UIEditField::GetAdaptToContentSize() const
 
 }
 
+void UIEditField::Reformat(bool update_fragments)
+{
+    if (!widget_)
+        return;
+
+    TBEditField* w = (TBEditField*) widget_;
+    w->Reformat(update_fragments);
+}
+
 
 void UIEditField::SetTextAlign(UI_TEXT_ALIGN align)
 {

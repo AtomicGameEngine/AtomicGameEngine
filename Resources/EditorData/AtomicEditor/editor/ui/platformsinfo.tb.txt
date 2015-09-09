@@ -1,13 +1,10 @@
 TBLayout: axis: y, distribution: gravity
 	TBImageWidget: filename: "AtomicEditor/editor/images/platforms_header.png"
-		lp: width: 512, height: 167
-	TBEditField: multiline: 1, styling: 1, gravity: all, id: info, readonly: 1
+		lp: width: 512, height: 167, min-width: 512, min-height: 167
+	TBEditField: multiline: 1, styling: 1, gravity: all, id: info, readonly: 1, adapt-to-content: 0
 		font: size: 14
-		text: "Atomic Game Engine Pro is required to deploy apps to this platform.\n\n" \
-				"<color #76D6FF>Available platform licenses:</color>\n\n" \
-				"<widget TBSkinImage: skin: 'LogoHTML5-Small'> <widget TBSkinImage: skin: 'LogoAndroid-Small'> " \
-				"<widget TBSkinImage: skin: 'LogoIOS-Small'>"
-		lp: min-width: 480, min-height: 160
+		lp: min-width: 480, min-height: 280
+		text: "..."
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:
 		TBButton: text: OK, id: ok

@@ -142,7 +142,9 @@ void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eve
     newEventData[P_OK] = eventData[Released::P_ELEMENT] == okButton_;
     SendEvent(E_MESSAGEACK, newEventData);
 
-    this->ReleaseRef();
+    // ATOMIC BEGIN
+    // this->ReleaseRef();
+    // ATOMIC END
 }
 
 }

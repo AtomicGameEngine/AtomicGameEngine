@@ -31,5 +31,12 @@ EVENT(E_IPCWORKERLOG, IPCWorkerLog)
     PARAM(P_MESSAGE, Message);  // string
 }
 
+/// Worker Log
+EVENT(E_IPCMESSAGE, IPCMessage)
+{
+    PARAM(P_MESSAGE, Message);  // string
+    PARAM(P_VALUE, Value);  // int
+}
+
 
 }

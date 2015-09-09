@@ -690,4 +690,14 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
     return false;
 }
 
+void UIWidget::InvalidateLayout()
+{
+    if (!widget_)
+        return;
+
+    widget_->InvalidateLayout(tb::TBWidget::INVALIDATE_LAYOUT_TARGET_ONLY);
+
+}
+
+
 }

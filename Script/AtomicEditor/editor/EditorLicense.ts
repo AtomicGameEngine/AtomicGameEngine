@@ -11,6 +11,19 @@ class EditorLicense extends Atomic.ScriptObject {
         this.subscribeToEvent("LicenseActivationRequired", (eventData) => this.handleLicenseActivationRequired(eventData));
         this.subscribeToEvent("LicenseSuccess", (eventData) => this.handleLicenseSuccess(eventData));
 
+        this.subscribeToEvent("IPCMessage", (eventData:Atomic.IPCMessageEvent) => this.handleIPCMessage(eventData));
+
+    }
+
+    handleIPCMessage(eventData:Atomic.IPCMessageEvent) {
+
+      if (eventData.message == "3D Module License Required") {
+
+        var ops = EditorUI.getModelOps();
+        ops.showPro3DWindow();
+
+      }
+
     }
 
     handleLicenseEulaRequired(eventData) {
@@ -29,12 +42,6 @@ class EditorLicense extends Atomic.ScriptObject {
 
     handleLicenseSuccess(eventData) {
 
-        if (ToolCore.licenseSystem.sourceBuild && ToolCore.licenseSystem.isStandardLicense()) {
-
-          var ops = EditorUI.getModelOps();
-          ops.showProWindow("AtomicEditor/editor/ui/sourceinfo.tb.txt");
-
-        }
 
     }
 

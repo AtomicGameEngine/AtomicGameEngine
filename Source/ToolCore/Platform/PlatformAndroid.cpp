@@ -4,6 +4,7 @@
 
 #include "../ToolEnvironment.h"
 #include "../Subprocess/SubprocessSystem.h"
+#include "../License/LicenseSystem.h"
 #include "../Build/BuildAndroid.h"
 
 #include "PlatformAndroid.h"
@@ -139,5 +140,11 @@ String PlatformAndroid::GetAndroidCommand() const
 
 }
 
+bool PlatformAndroid::GetLicense()
+{
+// BEGIN LICENSE MANAGEMENT
+    return GetSubsystem<LicenseSystem>()->GetLicenseAndroid();
+// END LICENSE MANAGEMENT
+}
 
 }

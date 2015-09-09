@@ -175,6 +175,8 @@ public:
 
 	virtual PreferredSize OnCalculatePreferredContentSize(const SizeConstraints &constraints);
 
+    void Reformat(bool update_fragments) { m_style_edit.Reformat(update_fragments); }
+
 	virtual void OnMessageReceived(TBMessage *msg);
 private:
 	TBScrollBar m_scrollbar_x;

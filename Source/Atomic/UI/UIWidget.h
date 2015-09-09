@@ -212,6 +212,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     /// This takes a relative Z and insert the child before or after the given reference widget.
     void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
 
+    void InvalidateLayout();
 
     tb::TBWidget* GetInternalWidget() { return widget_; }
 

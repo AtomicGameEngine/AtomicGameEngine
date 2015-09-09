@@ -50,12 +50,12 @@ public:
 
     bool GetSourceBuild();
 
-    bool LicenseWindows() { return licenseWindows_; }
-    bool LicenseMac() { return licenseMac_; }
-    bool LicenseAndroid() { return licenseAndroid_; }
-    bool LicenseIOS() { return licenseIOS_; }
-    bool LicenseHTML5() { return licenseHTML5_; }
-    bool LicenseModule3D() { return licenseModule3D_; }
+    bool GetLicenseWindows() { return licenseWindows_; }
+    bool GetLicenseMac() { return licenseMac_; }
+    bool GetLicenseAndroid() { return licenseAndroid_; }
+    bool GetLicenseIOS() { return licenseIOS_; }
+    bool GetLicenseHTML5() { return licenseHTML5_; }
+    bool GetLicenseModule3D() { return licenseModule3D_; }
 
     /// Returns whether there are any platform licenses available
     bool IsStandardLicense();

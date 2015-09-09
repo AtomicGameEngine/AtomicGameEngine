@@ -155,6 +155,13 @@ declare module Atomic {
 
     }
 
+
+    export interface IPCMessageEvent {
+
+        message: string;
+        value: number;
+    }
+
     export interface AttributeInfo {
 
         type: VariantType;

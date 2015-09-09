@@ -2,6 +2,7 @@
 #include <ThirdParty/PugiXml/src/pugixml.hpp>
 
 #include "../Build/BuildIOS.h"
+#include "../License/LicenseSystem.h"
 #include "PlatformIOS.h"
 
 #ifdef ATOMIC_PLATFORM_OSX
@@ -80,6 +81,13 @@ String PlatformIOS::ParseProvisionAppIdentifierPrefix(const String& provisionFil
 BuildBase* PlatformIOS::NewBuild(Project *project)
 {
     return new BuildIOS(context_, project);
+}
+
+bool PlatformIOS::GetLicense()
+{
+// BEGIN LICENSE MANAGEMENT
+    return GetSubsystem<LicenseSystem>()->GetLicenseIOS();
+// END LICENSE MANAGEMENT
 }
 
 

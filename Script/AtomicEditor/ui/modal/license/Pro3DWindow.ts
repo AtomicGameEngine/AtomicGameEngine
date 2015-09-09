@@ -4,13 +4,13 @@ import EditorUI = require("ui/EditorUI");
 import ModalWindow = require("../ModalWindow");
 import ProgressModal = require("../ProgressModal");
 
-class ProWindow extends ModalWindow {
+class Pro3DWindow extends ModalWindow {
 
-    constructor(uiPath: string) {
+    constructor() {
 
-        super(true);
+        super(false);
 
-        this.init("Atomic Pro Required", uiPath);
+        this.init("3D Module License Required", "AtomicEditor/editor/ui/infomodule3d.tb.txt");
 
     }
 
@@ -24,17 +24,7 @@ class ProWindow extends ModalWindow {
 
                 Atomic.fileSystem.systemOpen("https://store.atomicgameengine.com/site");
 
-            } else if (id == "download") {
-
-                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/download");
-
-            } else if (id == "quit") {
-
-                Atomic.ui.requestExit();
-
-            }
-
-            if (id == "ok") {
+            } else if (id == "ok") {
 
                 this.hide();
 
@@ -48,4 +38,4 @@ class ProWindow extends ModalWindow {
 
 }
 
-export = ProWindow;
+export = Pro3DWindow;

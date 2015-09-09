@@ -26,6 +26,8 @@ public:
     PlatformAndroid(Context* context);
     virtual ~PlatformAndroid();
 
+    virtual bool GetLicense();
+
     String GetName() { return "ANDROID"; }
     PlatformID GetPlatformID() { return PLATFORMID_ANDROID; }
 

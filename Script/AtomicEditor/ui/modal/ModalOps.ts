@@ -8,7 +8,8 @@ import EULAWindow = require("./license/EULAWindow");
 import ActivationWindow = require("./license/ActivationWindow");
 import ActivationSuccessWindow = require("./license/ActivationSuccessWindow");
 import ManageLicense = require("./license/ManageLicense");
-import ProWindow = require("./license/ProWindow");
+import Pro3DWindow = require("./license/Pro3DWindow");
+import ProPlatformWindow = require("./license/ProPlatformWindow");
 
 import BuildWindow = require("./build/BuildWindow");
 import BuildOutput = require("./build/BuildOutput");
@@ -148,15 +149,26 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showProWindow(uiPath: string) {
+    showPro3DWindow() {
 
         if (this.show()) {
 
-            this.opWindow = new ProWindow(uiPath);
+            this.opWindow = new Pro3DWindow();
 
         }
 
     }
+
+    showProPlatformWindow() {
+
+        if (this.show()) {
+
+            this.opWindow = new ProPlatformWindow();
+
+        }
+
+    }
+
 
     showAbout() {
 

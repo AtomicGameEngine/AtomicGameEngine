@@ -63,6 +63,7 @@ using namespace tb;
 #include "SystemUI/SystemUIEvents.h"
 #include "SystemUI/DebugHud.h"
 #include "SystemUI/Console.h"
+#include "SystemUI/MessageBox.h"
 
 namespace tb
 {
@@ -761,6 +762,19 @@ void UI::ToggleConsole()
 void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
 {
     consoleVisible_ = false;
+}
+
+SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String& message)
+{
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+
+    SystemUI::MessageBox* messageBox = new SystemUI::MessageBox(context_, message, title, 0, xmlFile);
+
+    return messageBox;
+
+
 }
 
 }

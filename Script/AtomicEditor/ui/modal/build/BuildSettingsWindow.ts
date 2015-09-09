@@ -76,10 +76,10 @@ class BuildSettingsWindow extends ModalWindow {
 
     commitBuildSettings() {
 
-      for (var name in this.platformInfo) {
+        for (var name in this.platformInfo) {
 
-          <BuildSettingsWidget>(this.platformInfo[name].widget).storeValues();
-      }
+            <BuildSettingsWidget>(this.platformInfo[name].widget).storeValues();
+        }
 
         ToolCore.toolSystem.project.saveBuildSettings();
 
@@ -123,7 +123,15 @@ class BuildSettingsWindow extends ModalWindow {
 
                     if (info.index == index) {
 
-                        toolSystem.setCurrentPlatform(toolSystem.getPlatformByName(name).platformID);
+                        var platform = toolSystem.getPlatformByName(name);
+
+                        if (platform.license) {
+                            this.hide();
+                            EditorUI.getModelOps().showProPlatformWindow();
+                            return true;
+                        }
+
+                        toolSystem.setCurrentPlatform(platform.platformID);
 
                         return true;
                     }
