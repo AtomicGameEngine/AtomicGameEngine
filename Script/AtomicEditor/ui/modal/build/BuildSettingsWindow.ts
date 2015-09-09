@@ -125,6 +125,18 @@ class BuildSettingsWindow extends ModalWindow {
 
                         var platform = toolSystem.getPlatformByName(name);
 
+                        if (platform.platformID == ToolCore.PLATFORMID_IOS) {
+
+                            if (Atomic.platform == "Windows") {
+
+                                var message = "\niOS Deployment requires running the Atomic Editor on MacOSX\n\n";
+                                new Atomic.UIMessageWindow(this, "modal_error").show("MacOSX Required", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+                                return true;
+
+                            }
+
+                        }
+
                         if (!platform.license) {
                             this.hide();
                             EditorUI.getModelOps().showProPlatformWindow();
