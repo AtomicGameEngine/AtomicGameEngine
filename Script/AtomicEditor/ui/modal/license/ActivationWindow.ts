@@ -21,16 +21,11 @@ class ActivationWindow extends ModalWindow {
 
         if (ToolCore.licenseSystem.sourceBuild) {
 
-            var button = <Atomic.UIButton>this.getWidget("get_key");
-            button.text = "Get Pro Key";
-
-            var message = "\nAtomic Pro is required for <color #76D6FF>GitHub development snapshots</color> and <color #76D6FF>custom engine builds</color>.\n\n";
-            message += "Press OK to activate or acquire your Atomic Pro license";
-            new Atomic.UIMessageWindow(this, "modal_error").show("Atomic Pro Required", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+            var message = "\nThis is a <color #76D6FF>development snapshot</color> of the Atomic Editor intended for testing new features.\n\n";
+            message += "Please report issues to the Atomic Forums or GitHub issue tracker.";
+            new Atomic.UIMessageWindow(this, "modal_error").show("Atomic Editor - Development Snapshot", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
 
         }
-
-
 
     }
 
