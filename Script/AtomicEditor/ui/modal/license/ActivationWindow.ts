@@ -21,7 +21,7 @@ class ActivationWindow extends ModalWindow {
 
         if (ToolCore.licenseSystem.sourceBuild) {
 
-            var message = "\nThis is <color #76D6FF>development snapshot</color> of the Atomic Editor intended for testing new features.\n\n";
+            var message = "\nThis is a <color #76D6FF>development snapshot</color> of the Atomic Editor intended for testing new features.\n\n";
             message += "Please report issues to the Atomic Forums or GitHub issue tracker.";
             new Atomic.UIMessageWindow(this, "modal_error").show("Atomic Editor - Development Snapshot", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
 
