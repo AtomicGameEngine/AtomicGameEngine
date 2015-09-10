@@ -73,7 +73,8 @@ AnimatedModel::AnimatedModel(Context* context) :
     boneBoundingBoxDirty_(true),
     isMaster_(true),
     loading_(false),
-    assignBonesPending_(false)
+    assignBonesPending_(false),
+    forceAnimationUpdate_(false)
 {
 }
 
@@ -211,9 +212,17 @@ void AnimatedModel::Update(const FrameInfo& frame)
     // If headless, retain the current animation distance (should be 0)
     if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
     {
-        // First check for no update at all when invisible
+        // First check for no update at all when invisible. In that case reset LOD timer to ensure update
+        // next time the model is in view
         if (!updateInvisible_)
+        {
+            if (animationDirty_)
+            {
+                animationLodTimer_ = -1.0f;
+                forceAnimationUpdate_ = true;
+            }
             return;
+        }
         float distance = frame.camera_->GetDistance(node_->GetWorldPosition());
         // If distance is greater than draw distance, no need to update at all
         if (drawDistance_ > 0.0f && distance > drawDistance_)
@@ -268,6 +277,13 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
+    // Late update in case the model came into view and animation was dirtied in the meanwhile
+    if (forceAnimationUpdate_)
+    {
+        UpdateAnimation(frame);
+        forceAnimationUpdate_ = false;
+    }
+
     if (morphsDirty_)
         UpdateMorphs();
 
@@ -277,7 +293,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType AnimatedModel::GetUpdateGeometryType()
 {
-    if (morphsDirty_)
+    if (morphsDirty_ || forceAnimationUpdate_)
         return UPDATE_MAIN_THREAD;
     else if (skinningDirty_)
         return UPDATE_WORKER_THREAD;
@@ -1150,7 +1166,7 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     // If using animation LOD, accumulate time and see if it is time to update
     if (animationLodBias_ > 0.0f && animationLodDistance_ > 0.0f)
     {
-        // Check for first time update
+        // Perform the first update always regardless of LOD timer
         if (animationLodTimer_ >= 0.0f)
         {
             animationLodTimer_ += animationLodBias_ * frame.timeStep_ * ANIMATION_LOD_BASESCALE;

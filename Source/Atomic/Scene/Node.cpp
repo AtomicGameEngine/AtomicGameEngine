@@ -37,6 +37,10 @@
 
 #include "../DebugNew.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:6293)
+#endif
+
 namespace Atomic
 {
 
@@ -289,9 +293,17 @@ void Node::SetScale(float scale)
 
 void Node::SetScale(const Vector3& scale)
 {
-    scale_ = scale.Abs();
-    MarkDirty();
+    scale_ = scale;
+    // Prevent exact zero scale e.g. from momentary edits as this may cause division by zero
+    // when decomposing the world transform matrix
+    if (scale_.x_ == 0.0f)
+        scale_.x_ = M_EPSILON;
+    if (scale_.y_ == 0.0f)
+        scale_.y_ = M_EPSILON;
+    if (scale_.z_ == 0.0f)
+        scale_.z_ = M_EPSILON;
 
+    MarkDirty();
     MarkNetworkUpdate();
 }
 
@@ -797,11 +809,6 @@ void Node::RemoveComponent(StringHash type)
     }
 }
 
-void Node::RemoveAllComponents()
-{
-    RemoveComponents(true, true);
-}
-
 void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
 {
     unsigned numRemoved = 0;
@@ -826,6 +833,29 @@ void Node::RemoveComponents(bool removeReplicated, bool removeLocal)
     // Mark node dirty in all replication states
     if (numRemoved)
         MarkReplicationDirty();
+}
+
+void Node::RemoveComponents(StringHash type)
+{
+    unsigned numRemoved = 0;
+
+    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
+    {
+        if (components_[i]->GetType() == type)
+        {
+            RemoveComponent(components_.Begin() + i);
+            ++numRemoved;
+        }
+    }
+
+    // Mark node dirty in all replication states
+    if (numRemoved)
+        MarkReplicationDirty();
+}
+
+void Node::RemoveAllComponents()
+{
+    RemoveComponents(true, true);
 }
 
 Node* Node::Clone(CreateMode mode)
@@ -1063,13 +1093,24 @@ const Variant& Node::GetVar(StringHash key) const
     return i != vars_.End() ? i->second_ : Variant::EMPTY;
 }
 
-Component* Node::GetComponent(StringHash type) const
+Component* Node::GetComponent(StringHash type, bool recursive) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if ((*i)->GetType() == type)
             return *i;
     }
+
+    if (recursive)
+    {
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            Component* component = (*i)->GetComponent(type, true);
+            if (component)
+                return component;
+        }
+    }
+
     return 0;
 }
 

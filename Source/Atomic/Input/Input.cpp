@@ -80,7 +80,7 @@ UIElement* TouchState::GetTouchedElement()
 #define EM_TRUE 1
 
 /// Glue between Urho Input and Emscripten HTML5
-/** HTML5 (Emscripten) is limited in the way it handles input. The EmscriptenInput class attempts to provide the glue between Urho3D Input behavior and HTML5, where SDL currently fails to do so.
+/** HTML5 (Emscripten) is limited in the way it handles input. The EmscriptenInput class attempts to provide the glue between Atomic Input behavior and HTML5, where SDL currently fails to do so.
  *
  * Mouse Input:
  * - The OS mouse cursor position can't be set.
@@ -1178,7 +1178,7 @@ void Input::ResetJoysticks()
     joysticks_.Clear();
 
     // Open each detected joystick automatically on startup
-    int size = SDL_NumJoysticks();
+    unsigned size = static_cast<unsigned>(SDL_NumJoysticks());
     for (unsigned i = 0; i < size; ++i)
         OpenJoystick(i);
 }

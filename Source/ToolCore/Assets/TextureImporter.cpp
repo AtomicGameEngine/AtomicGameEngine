@@ -51,22 +51,23 @@ bool TextureImporter::Import()
     return true;
 }
 
-bool TextureImporter::LoadSettingsInternal()
+bool TextureImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("TextureImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("TextureImporter");
 
     return true;
 }
 
-bool TextureImporter::SaveSettingsInternal()
+bool TextureImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("TextureImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("TextureImporter", import);
 
     return true;
 }

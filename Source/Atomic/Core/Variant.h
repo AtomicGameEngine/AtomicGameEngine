@@ -59,10 +59,11 @@ enum VariantType
     VAR_MATRIX3X4,
     VAR_MATRIX4,
     VAR_DOUBLE,
+    VAR_STRINGVECTOR,
     MAX_VAR_TYPES
 };
 
-/// Union for the possible variant values. Also stores non-POD objects such as String which must not exceed 16 bytes in size.
+/// Union for the possible variant values. Also stores non-POD objects such as String and math objects (excluding Matrix) which must not exceed 16 bytes in size. Objects exceeding 16 bytes size are stored in the heap pointed by _ptr.
 struct VariantValue
 {
     union
@@ -94,6 +95,18 @@ struct VariantValue
         void* ptr4_;
     };
 };
+
+class Variant;
+class VectorBuffer;
+
+/// Vector of variants.
+typedef Vector<Variant> VariantVector;
+
+/// Vector of strings.
+typedef Vector<String> StringVector;
+
+/// Map of variants.
+typedef HashMap<StringHash, Variant> VariantMap;
 
 /// Typed resource reference.
 struct ATOMIC_API ResourceRef
@@ -150,7 +163,7 @@ struct ATOMIC_API ResourceRefList
     }
 
     /// Construct with type and id list.
-    ResourceRefList(StringHash type, const Vector<String>& names) :
+    ResourceRefList(StringHash type, const StringVector& names) :
         type_(type),
         names_(names)
     {
@@ -159,7 +172,7 @@ struct ATOMIC_API ResourceRefList
     /// Object type.
     StringHash type_;
     /// List of object names.
-    Vector<String> names_;
+    StringVector names_;
 
     /// Test for equality with another reference list.
     bool operator ==(const ResourceRefList& rhs) const { return type_ == rhs.type_ && names_ == rhs.names_; }
@@ -167,14 +180,6 @@ struct ATOMIC_API ResourceRefList
     /// Test for inequality with another reference list.
     bool operator !=(const ResourceRefList& rhs) const { return type_ != rhs.type_ || names_ != rhs.names_; }
 };
-
-class Variant;
-
-/// Vector of variants.
-typedef Vector<Variant> VariantVector;
-
-/// Map of variants.
-typedef HashMap<StringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types.
 class ATOMIC_API Variant
@@ -284,6 +289,13 @@ public:
         *this = value;
     }
 
+    /// Construct from a %VectorBuffer and store as a buffer.
+    Variant(const VectorBuffer& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
     /// Construct from a pointer.
     Variant(void* value) :
         type_(VAR_NONE)
@@ -315,6 +327,13 @@ public:
     /// Construct from a variant map.
     Variant(const VariantMap& value) :
         type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
+    /// Construct from a string vector.
+    Variant(const StringVector& value) :
+        type_ (VAR_NONE)
     {
         *this = value;
     }
@@ -523,6 +542,9 @@ public:
         return *this;
     }
 
+    /// Assign from a %VectorBuffer and store as a buffer.
+    Variant& operator =(const VectorBuffer& rhs);
+
     /// Assign from a void pointer.
     Variant& operator =(void* rhs)
     {
@@ -552,6 +574,14 @@ public:
     {
         SetType(VAR_VARIANTVECTOR);
         *(reinterpret_cast<VariantVector*>(&value_)) = rhs;
+        return *this;
+    }
+
+    // Assign from a string vector.
+    Variant& operator =(const StringVector& rhs)
+    {
+        SetType(VAR_STRINGVECTOR);
+        *(reinterpret_cast<StringVector*>(&value_)) = rhs;
         return *this;
     }
 
@@ -666,10 +696,9 @@ public:
     }
 
     /// Test for equality with a buffer. To return true, both the type and value must match.
-    bool operator ==(const PODVector<unsigned char>& rhs) const
-    {
-        return type_ == VAR_BUFFER ? *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == rhs : false;
-    }
+    bool operator ==(const PODVector<unsigned char>& rhs) const;
+    /// Test for equality with a %VectorBuffer. To return true, both the type and value must match.
+    bool operator ==(const VectorBuffer& rhs) const;
 
     /// Test for equality with a void pointer. To return true, both the type and value must match, with the exception that a RefCounted pointer is also allowed.
     bool operator ==(void* rhs) const
@@ -698,6 +727,12 @@ public:
     bool operator ==(const VariantVector& rhs) const
     {
         return type_ == VAR_VARIANTVECTOR ? *(reinterpret_cast<const VariantVector*>(&value_)) == rhs : false;
+    }
+
+    /// Test for equality with a string vector. To return true, both the type and value must match.
+    bool operator ==(const StringVector& rhs) const
+    {
+        return type_ == VAR_STRINGVECTOR ? *(reinterpret_cast<const StringVector*>(&value_)) == rhs : false;
     }
 
     /// Test for equality with a variant map. To return true, both the type and value must match.
@@ -786,6 +821,9 @@ public:
     /// Test for inequality with a buffer.
     bool operator !=(const PODVector<unsigned char>& rhs) const { return !(*this == rhs); }
 
+    /// Test for inequality with a %VectorBuffer.
+    bool operator !=(const VectorBuffer& rhs) const { return !(*this == rhs); }
+
     /// Test for inequality with a pointer.
     bool operator !=(void* rhs) const { return !(*this == rhs); }
 
@@ -797,6 +835,9 @@ public:
 
     /// Test for inequality with a variant vector.
     bool operator !=(const VariantVector& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with a string vector.
+    bool operator !=(const StringVector& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a variant map.
     bool operator !=(const VariantMap& rhs) const { return !(*this == rhs); }
@@ -833,11 +874,31 @@ public:
     /// Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
 
-    /// Return int or zero on type mismatch.
-    int GetInt() const { return type_ == VAR_INT ? value_.int_ : 0; }
+    /// Return int or zero on type mismatch. Floats and doubles are converted.
+    int GetInt() const
+    {
+        if (type_ == VAR_INT)
+            return value_.int_;
+        else if (type_ == VAR_FLOAT)
+            return (int)value_.float_;
+        else if (type_ == VAR_DOUBLE)
+            return (int)*reinterpret_cast<const double*>(&value_);
+        else
+            return 0;
+    }
 
-    /// Return unsigned int or zero on type mismatch.
-    unsigned GetUInt() const { return type_ == VAR_INT ? (unsigned)value_.int_ : 0; }
+    /// Return unsigned int or zero on type mismatch. Floats and doubles are converted.
+    unsigned GetUInt() const
+    {
+        if (type_ == VAR_INT)
+            return value_.int_;
+        else if (type_ == VAR_FLOAT)
+            return (unsigned)value_.float_;
+        else if (type_ == VAR_DOUBLE)
+            return (unsigned)*reinterpret_cast<const double*>(&value_);
+        else
+            return 0;
+    }
 
     /// Return StringHash or zero on type mismatch.
     StringHash GetStringHash() const { return StringHash(GetUInt()); }
@@ -845,11 +906,31 @@ public:
     /// Return bool or false on type mismatch.
     bool GetBool() const { return type_ == VAR_BOOL ? value_.bool_ : false; }
 
-    /// Return float or zero on type mismatch.
-    float GetFloat() const { return type_ == VAR_FLOAT ? value_.float_ : 0.0f; }
+    /// Return float or zero on type mismatch. Ints and doubles are converted.
+    float GetFloat() const
+    {
+        if (type_ == VAR_FLOAT)
+            return value_.float_;
+        else if (type_ == VAR_DOUBLE)
+            return (float)*reinterpret_cast<const double*>(&value_);
+        else if (type_ == VAR_INT)
+            return (float)value_.int_;
+        else
+            return 0.0f;
+    }
 
-    /// Return double or zero on type mismatch.
-    double GetDouble() const { return type_ == VAR_DOUBLE ? *reinterpret_cast<const double*>(&value_) : 0.0; }
+    /// Return double or zero on type mismatch. Ints and floats are converted.
+    double GetDouble() const
+    {
+        if (type_ == VAR_DOUBLE)
+            return *reinterpret_cast<const double*>(&value_);
+        else if (type_ == VAR_FLOAT)
+            return (double)value_.float_;
+        else if (type_ == VAR_INT)
+            return (double)value_.int_;
+        else
+            return 0.0;
+    }
 
     /// Return Vector2 or zero on type mismatch.
     const Vector2& GetVector2() const { return type_ == VAR_VECTOR2 ? *reinterpret_cast<const Vector2*>(&value_) : Vector2::ZERO; }
@@ -878,6 +959,9 @@ public:
         return type_ == VAR_BUFFER ? *reinterpret_cast<const PODVector<unsigned char>*>(&value_) : emptyBuffer;
     }
 
+    /// Return %VectorBuffer containing the buffer or empty on type mismatch.
+    const VectorBuffer GetVectorBuffer() const;
+
     /// Return void pointer or null on type mismatch. RefCounted pointer will be converted.
     void* GetVoidPtr() const
     {
@@ -905,6 +989,12 @@ public:
     const VariantVector& GetVariantVector() const
     {
         return type_ == VAR_VARIANTVECTOR ? *reinterpret_cast<const VariantVector*>(&value_) : emptyVariantVector;
+    }
+
+    /// Return a string vector or empty on type mismatch.
+    const StringVector& GetStringVector() const
+    {
+        return type_ == VAR_STRINGVECTOR ? *reinterpret_cast<const StringVector*>(&value_) : emptyStringVector;
     }
 
     /// Return a variant map or empty on type mismatch.
@@ -971,6 +1061,9 @@ public:
     /// Return a pointer to a modifiable variant vector or null on type mismatch.
     VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? reinterpret_cast<VariantVector*>(&value_) : 0; }
 
+    /// Return a pointer to a modifiable string vector or null on type mismatch.
+    StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? reinterpret_cast<StringVector*>(&value_) : 0; }
+
     /// Return a pointer to a modifiable variant map or null on type mismatch.
     VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? reinterpret_cast<VariantMap*>(&value_) : 0; }
 
@@ -993,6 +1086,8 @@ public:
     static const VariantMap emptyVariantMap;
     /// Empty variant vector.
     static const VariantVector emptyVariantVector;
+    /// Empty string vector.
+    static const StringVector emptyStringVector;
 
 private:
     /// Set new type and allocate/deallocate memory as necessary.
@@ -1039,6 +1134,8 @@ template <> inline VariantType GetVariantType<ResourceRef>() { return VAR_RESOUR
 template <> inline VariantType GetVariantType<ResourceRefList>() { return VAR_RESOURCEREFLIST; }
 
 template <> inline VariantType GetVariantType<VariantVector>() { return VAR_VARIANTVECTOR; }
+
+template <> inline VariantType GetVariantType<StringVector >() { return VAR_STRINGVECTOR; }
 
 template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
 

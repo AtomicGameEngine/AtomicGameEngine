@@ -363,7 +363,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         return true;
     }
 
-    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. 
+    // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size.
     // If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
@@ -2036,16 +2036,16 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
 #ifdef GL_ES_VERSION_2_0
     case CF_ETC1:
         return etcTextureSupport_ ? GL_ETC1_RGB8_OES : 0;
-        
+
     case CF_PVRTC_RGB_2BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_2BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGB_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGB_PVRTC_4BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGBA_2BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_2BPPV1_IMG : 0;
-        
+
     case CF_PVRTC_RGBA_4BPP:
         return pvrtcTextureSupport_ ? COMPRESSED_RGBA_PVRTC_4BPPV1_IMG : 0;
 #endif

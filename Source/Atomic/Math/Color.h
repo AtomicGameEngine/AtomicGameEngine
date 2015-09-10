@@ -90,6 +90,16 @@ public:
     {
     }
 
+    /// Assign from another color.
+    Color& operator =(const Color& rhs)
+    {
+        r_ = rhs.r_;
+        g_ = rhs.g_;
+        b_ = rhs.b_;
+        a_ = rhs.a_;
+        return *this;
+    }
+
     /// Test for equality with another color without epsilon.
     bool operator ==(const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }
 
@@ -101,6 +111,9 @@ public:
 
     /// Add a color.
     Color operator +(const Color& rhs) const { return Color(r_ + rhs.r_, g_ + rhs.g_, b_ + rhs.b_, a_ + rhs.a_); }
+
+    /// Return negation.
+    Color operator -() const { return Color(-r_, -g_, -b_, -a_); }
 
     /// Substract a color.
     Color operator -(const Color& rhs) const { return Color(r_ - rhs.r_, g_ - rhs.g_, b_ - rhs.b_, a_ - rhs.a_); }

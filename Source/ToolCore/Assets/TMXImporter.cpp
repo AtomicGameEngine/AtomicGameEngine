@@ -29,22 +29,25 @@ bool TMXImporter::Import()
     return true;
 }
 
-bool TMXImporter::LoadSettingsInternal()
+bool TMXImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("TMXImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("TMXImporter");
 
     return true;
 }
 
-bool TMXImporter::SaveSettingsInternal()
+bool TMXImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("TMXImporter");
+    JSONValue import(JSONValue::emptyObject);
+
+
+    jsonRoot.Set("TMXImporter", import);
 
     return true;
 }

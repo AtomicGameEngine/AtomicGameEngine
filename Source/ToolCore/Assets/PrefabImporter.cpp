@@ -152,22 +152,23 @@ bool PrefabImporter::Import()
     return true;
 }
 
-bool PrefabImporter::LoadSettingsInternal()
+bool PrefabImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("PrefabImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("PrefabImporter");
 
     return true;
 }
 
-bool PrefabImporter::SaveSettingsInternal()
+bool PrefabImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("PrefabImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("PrefabImporter", import);
 
     return true;
 }

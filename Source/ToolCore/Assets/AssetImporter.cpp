@@ -26,24 +26,22 @@ void AssetImporter::SetDefaults()
 
 bool AssetImporter::LoadSettings(JSONValue& root)
 {
-    jsonRoot_ = root;
-    LoadSettingsInternal();
+    LoadSettingsInternal(root);
     return true;
 }
 
-bool AssetImporter::LoadSettingsInternal()
+bool AssetImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
     return true;
 }
 
 bool AssetImporter::SaveSettings(JSONValue& root)
 {
-    jsonRoot_ = root;
-    SaveSettingsInternal();
+    SaveSettingsInternal(root);
     return true;
 }
 
-bool AssetImporter::SaveSettingsInternal()
+bool AssetImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
     return true;
 }

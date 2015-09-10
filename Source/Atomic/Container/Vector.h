@@ -28,6 +28,11 @@
 #include <cstring>
 #include <new>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:6293)
+#endif
+
 namespace Atomic
 {
 
@@ -170,7 +175,17 @@ public:
     }
 
     /// Add an element at the end.
+#ifndef COVERITY_SCAN_MODEL
     void Push(const T& value) { Resize(size_ + 1, &value); }
+#else
+    // FIXME: Attempt had been made to use this model in the Coverity-Scan model file without any success
+    // Probably because the model had generated a different mangled name than the one used by static analyzer
+    void Push(const T& value)
+    {
+        T array[] = {value};
+        Resize(size_ + 1, array);
+    }
+#endif
 
     /// Add another vector at the end.
     void Push(const Vector<T>& vector) { Resize(size_ + vector.size_, vector.Buffer()); }
@@ -948,3 +963,7 @@ template <class T> typename Atomic::PODVector<T>::Iterator begin(Atomic::PODVect
 template <class T> typename Atomic::PODVector<T>::Iterator end(Atomic::PODVector<T>& v) { return v.End(); }
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

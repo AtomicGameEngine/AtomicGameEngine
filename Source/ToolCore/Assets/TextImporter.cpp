@@ -29,22 +29,23 @@ bool TextImporter::Import()
     return true;
 }
 
-bool TextImporter::LoadSettingsInternal()
+bool TextImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("TextImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("TextImporter");
 
     return true;
 }
 
-bool TextImporter::SaveSettingsInternal()
+bool TextImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("TextImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("TextImporter", import);
 
     return true;
 }
