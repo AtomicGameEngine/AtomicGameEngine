@@ -77,6 +77,8 @@ void AEEditorApp::Start()
 
 void AEEditorApp::Setup()
 {
+    AEEditorCommon::Setup();
+
     context_->SetEditorContext(true);
 
     ToolEnvironment* env = new ToolEnvironment(context_);

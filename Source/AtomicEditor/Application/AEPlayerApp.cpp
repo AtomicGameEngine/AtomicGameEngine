@@ -64,6 +64,8 @@ AEPlayerApplication::AEPlayerApplication(Context* context) :
 
 void AEPlayerApplication::Setup()
 {
+    AEEditorCommon::Setup();
+
     FileSystem* filesystem = GetSubsystem<FileSystem>();
 
     engineParameters_["WindowTitle"] = "AtomicPlayer";
@@ -84,6 +86,8 @@ void AEPlayerApplication::Setup()
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
 #endif
+
+    engineParameters_["LogLevel"] = LOG_DEBUG;
 
 #if ATOMIC_PLATFORM_WINDOWS
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
