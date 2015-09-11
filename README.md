@@ -1,5 +1,9 @@
 ####Atomic Game Engine™ Editor and Player Source Repository
 
+##### Website
+
+<a href="http://atomicgameengine.com">http://www.AtomicGameEngine.com</a>
+
 ###### Looking for the Javascript examples?
 
 They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript Examples</a>
@@ -7,10 +11,6 @@ They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples"
 ###### Looking for Atomic-Haxe?
 
 It's here: <a href="https://github.com/rsredsq/atomic-haxe">Atomic-Haxe</a>  <sup>(Community Supported)</sup>
-
-##### Website
-
-<a href="http://atomicgameengine.com">http://www.AtomicGameEngine.com</a>
 
 ##### Chat
 
