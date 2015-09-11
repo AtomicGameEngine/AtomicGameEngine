@@ -61,6 +61,11 @@ AtomicPlayerApp::AtomicPlayerApp(Context* context) :
 
 void AtomicPlayerApp::Setup()
 {
+
+#ifdef ATOMIC_3D
+    RegisterEnvironmentLibrary(context_);
+#endif
+
     FileSystem* filesystem = GetSubsystem<FileSystem>();
 
     engineParameters_["WindowTitle"] = "AtomicPlayer";
