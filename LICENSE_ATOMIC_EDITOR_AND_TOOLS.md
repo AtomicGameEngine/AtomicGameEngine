@@ -6,7 +6,7 @@ Custom builds of the Atomic Game Engine Editor require product activation and pl
 
 For **supported binary releases** and to acquire **product activation keys** or **platform deployment licenses** please visit: http://www.AtomicGameEngine.com
 
-**IMPORTANT:** The Atomic Game Engine contains third party technology available under permissive Open Source licenses. The THIRDPARTY_LICENSE.md file describes the copyrights and licenses associated with these technologies.
+**IMPORTANT:** The Atomic Game Engine contains third party technology available under permissive Open Source licenses. The LICENSE_THIRDPARTY.md file describes the copyrights and licenses associated with these technologies.
 
 ####LICENSE
 
@@ -29,7 +29,7 @@ The use of the Atomic Game Engine is governed by this license agreement ("Agreem
 
     (c) Licensee may install the Engine on a primary and secondary computer solely for use by the Licensee.
 
-3. RESTRICTIONS.  The following restrictions apply to the use of this Engine: 
+3. RESTRICTIONS.  The following restrictions apply to the use of this Engine:
 
     (a) Licensee may not:  (i) **use the Engine to create derivative game creation software including but not limited to game editors and game engines;** (ii) redistribute, encumber, sell, rent, lease, sublicense, or otherwise transfer rights to the Engine;  (iii) remove or alter any trademark, logo, copyright or other proprietary notices, legends, symbols or labels in the Engine; or (iv) use the Engine for any illegal purpose.
 

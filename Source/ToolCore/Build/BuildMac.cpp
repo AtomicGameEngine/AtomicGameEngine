@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/FileSystem.h>
 
@@ -96,7 +99,7 @@ void BuildMac::Build(const String& buildPath)
     buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Mac Deployment Complete</color>\n\n";
     SendEvent(E_BUILDOUTPUT, buildOutput);
 
-    buildPath_ = buildPath + "/Mac-Build";    
+    buildPath_ = buildPath + "/Mac-Build";
     buildSystem->BuildComplete(PLATFORMID_MAC, buildPath_);
 
 }

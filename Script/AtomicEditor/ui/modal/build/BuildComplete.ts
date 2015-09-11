@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 
 class BuildComplete extends Atomic.UIWindow {
@@ -22,7 +28,7 @@ class BuildComplete extends Atomic.UIWindow {
             reveal.setState(Atomic.UI_WIDGET_STATE_DISABLED, true);
 
 
-        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));    
+        this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
     }
 

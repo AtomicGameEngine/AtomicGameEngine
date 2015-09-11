@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -40,7 +43,7 @@ public:
     virtual JSASTExpression* visit(JSASTNewExpression* expr) = 0;
     virtual JSASTExpression* visit(JSASTUnaryExpression* expr) = 0;
     virtual JSASTExpression* visit(JSASTUpdateExpression* expr) = 0;
-    virtual JSASTExpression* visit(JSASTVariableDeclarator* expr) = 0;    
+    virtual JSASTExpression* visit(JSASTVariableDeclarator* expr) = 0;
 
     virtual JSASTProperty* visit(JSASTProperty* property) = 0;
     virtual JSASTStatement*  visit(JSASTLabeledStatement* property) = 0;
@@ -378,5 +381,3 @@ public:
 
 
 }
-
-

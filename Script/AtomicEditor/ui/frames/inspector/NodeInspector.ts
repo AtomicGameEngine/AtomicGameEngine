@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import ScriptWidget = require("ui/ScriptWidget");
 import ComponentInspector = require("./ComponentInspector");
@@ -12,7 +18,7 @@ class NodeInspector extends ScriptWidget {
 
         this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
         this.subscribeToEvent("GizmoMoved", (ev) => this.handleGizmoModed(ev));
-        this.subscribeToEvent("Update", (ev) => this.handleUpdate(ev));        
+        this.subscribeToEvent("Update", (ev) => this.handleUpdate(ev));
 
     }
 
