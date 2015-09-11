@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,41 +81,41 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
     // If alpha is 0, nothing will be rendered, so do not add the quad
     if (!(color_ & 0xff000000))
         return;
-            
+
     //const IntVector2& screenPos = element_->GetScreenPosition();
    IntVector2 screenPos(0, 0);
-    
+
     float left = (float)(x + screenPos.x_) - posAdjust;
     float right = left + (float)width;
     float top = (float)(y + screenPos.y_) - posAdjust;
     float bottom = top + (float)height;
-    
+
     float leftUV = texOffsetX * invTextureSize_.x_;
     float topUV = texOffsetY * invTextureSize_.y_;
     float rightUV = (texOffsetX + (texWidth ? texWidth : width)) * invTextureSize_.x_;
     float bottomUV = (texOffsetY + (texHeight ? texHeight : height)) * invTextureSize_.y_;
-    
+
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
     float* dest = &(vertexData_->At(begin));
     vertexEnd_ = vertexData_->Size();
-    
+
     dest[0] = left; dest[1] = top; dest[2] = 0.0f;
     ((unsigned&)dest[3]) = color_;
     dest[4] = leftUV; dest[5] = topUV;
-    
+
     dest[6] = right; dest[7] = top; dest[8] = 0.0f;
     ((unsigned&)dest[9]) = color_;
     dest[10] = rightUV; dest[11] = topUV;
-    
+
     dest[12] = left; dest[13] = bottom; dest[14] = 0.0f;
     ((unsigned&)dest[15]) = color_;
     dest[16] = leftUV; dest[17] = bottomUV;
-    
+
     dest[18] = right; dest[19] = top; dest[20] = 0.0f;
     ((unsigned&)dest[21]) = color_;
     dest[22] = rightUV; dest[23] = topUV;
-    
+
     dest[24] = right; dest[25] = bottom; dest[26] = 0.0f;
     ((unsigned&)dest[27]) = color_;
     dest[28] = rightUV; dest[29] = bottomUV;
@@ -133,12 +134,12 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
     Vector3 v2 = (transform * Vector3((float)x + (float)width, (float)y, 0.0f)) - posAdjustVec;
     Vector3 v3 = (transform * Vector3((float)x, (float)y + (float)height, 0.0f)) - posAdjustVec;
     Vector3 v4 = (transform * Vector3((float)x + (float)width, (float)y + (float)height, 0.0f)) - posAdjustVec;
-    
+
     float leftUV = ((float)texOffsetX) * invTextureSize_.x_;
     float topUV = ((float)texOffsetY) * invTextureSize_.y_;
     float rightUV = ((float)(texOffsetX + (texWidth ? texWidth : width))) * invTextureSize_.x_;
     float bottomUV = ((float)(texOffsetY + (texHeight ? texHeight : height))) * invTextureSize_.y_;
-    
+
     unsigned begin = vertexData_->Size();
     vertexData_->Resize(begin + 6 * UI_VERTEX_SIZE);
     float* dest = &(vertexData_->At(begin));
@@ -147,19 +148,19 @@ void UIBatch::AddQuad(const Matrix3x4& transform, int x, int y, int width, int h
     dest[0] = v1.x_; dest[1] = v1.y_; dest[2] = 0.0f;
     ((unsigned&)dest[3]) = color_;
     dest[4] = leftUV; dest[5] = topUV;
-    
+
     dest[6] = v2.x_; dest[7] = v2.y_; dest[8] = 0.0f;
     ((unsigned&)dest[9]) = color_;
     dest[10] = rightUV; dest[11] = topUV;
-    
+
     dest[12] = v3.x_; dest[13] = v3.y_; dest[14] = 0.0f;
     ((unsigned&)dest[15]) = color_;
     dest[16] = leftUV; dest[17] = bottomUV;
-    
+
     dest[18] = v2.x_; dest[19] = v2.y_; dest[20] = 0.0f;
     ((unsigned&)dest[21]) = color_;
     dest[22] = rightUV; dest[23] = topUV;
-    
+
     dest[24] = v4.x_; dest[25] = v4.y_; dest[26] = 0.0f;
     ((unsigned&)dest[27]) = color_;
     dest[28] = rightUV; dest[29] = bottomUV;
@@ -177,26 +178,26 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
         AddQuad(x, y, width, height, texOffsetX, texOffsetY, texWidth, texHeight);
         return;
     }
-    
+
     int tileX = 0;
     int tileY = 0;
     int tileW = 0;
     int tileH = 0;
-    
+
     while (tileY < height)
     {
         tileX = 0;
         tileH = Min(height - tileY, texHeight);
-        
+
         while (tileX < width)
         {
             tileW = Min(width - tileX, texWidth);
-            
+
             AddQuad(x + tileX, y + tileY, tileW, tileH, texOffsetX, texOffsetY, tileW, tileH);
-            
+
             tileX += tileW;
         }
-        
+
         tileY += tileH;
     }
 }
@@ -209,7 +210,7 @@ bool UIBatch::Merge(const UIBatch& batch)
         batch.vertexData_ != vertexData_ ||
         batch.vertexStart_ != vertexEnd_)
         return false;
-    
+
     vertexEnd_ = batch.vertexEnd_;
     return true;
 }
@@ -218,10 +219,10 @@ void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
 {
     if (batch.vertexEnd_ == batch.vertexStart_)
         return;
-    
+
     if (!batches.Empty() && batches.Back().Merge(batch))
         return;
-    
+
     batches.Push(batch);
 }
 

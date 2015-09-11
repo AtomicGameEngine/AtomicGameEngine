@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    const HashMap<String, VariantType>& GetFields() const { return fields_; }    
+    const HashMap<String, VariantType>& GetFields() const { return fields_; }
     const VariantMap& GetDefaultFieldValues() const { return defaultFieldValues_; }
     const HashMap<String, Vector<EnumInfo>>& GetEnums() const { return enums_; }
     void GetDefaultFieldValue(const String& name, Variant& v);

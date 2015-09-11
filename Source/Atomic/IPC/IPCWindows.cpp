@@ -1,3 +1,25 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
 #include <Windows.h>
@@ -17,7 +39,7 @@ namespace Atomic
     static const int kPipeBufferSz = 4 * 1024;
     static LONG g_pipe_seq = 0;
 
-    HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool read) 
+    HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool read)
 	{
         IPCWString pipename(kPipePrefix);
         pipename.append(name);
@@ -29,7 +51,7 @@ namespace Atomic
             1, kPipeBufferSz, kPipeBufferSz, 200, NULL);
     }
 
-    HANDLE PipePair::OpenPipeClient(const wchar_t* name, bool read) 
+    HANDLE PipePair::OpenPipeClient(const wchar_t* name, bool read)
 	{
         IPCWString pipename(kPipePrefix);
         pipename.append(name);
@@ -42,7 +64,7 @@ namespace Atomic
 		DWORD accessMode = read ? GENERIC_READ : GENERIC_WRITE;
 
         for (;;) {
-           
+
 			HANDLE pipe = ::CreateFileW(pipename.c_str(), accessMode, 0, &sa,
                 OPEN_EXISTING, 0, NULL);
 
@@ -64,12 +86,12 @@ namespace Atomic
         srvRead_(INVALID_IPCHANDLE_VALUE),
 		srvWrite_(INVALID_IPCHANDLE_VALUE),
 		clnRead_(INVALID_IPCHANDLE_VALUE),
-		clnWrite_(INVALID_IPCHANDLE_VALUE)        
+		clnWrite_(INVALID_IPCHANDLE_VALUE)
     {
         // Come up with a reasonable unique name.
-        const wchar_t kPipePattern[] = L"ko.%x.%x.%x";        
+        const wchar_t kPipePattern[] = L"ko.%x.%x.%x";
 
-        wchar_t serverReadName[8 * 3 + sizeof(kPipePattern)];        
+        wchar_t serverReadName[8 * 3 + sizeof(kPipePattern)];
         ::wsprintfW(serverReadName, kPipePattern, ::GetCurrentProcessId(), ::GetTickCount(),
             ::InterlockedIncrement(&g_pipe_seq));
 
@@ -86,16 +108,16 @@ namespace Atomic
 		clnWrite_ = OpenPipeClient(serverReadName, false);
 
 		/*
-        if (INVALID_HANDLE_VALUE == client) 
+        if (INVALID_HANDLE_VALUE == client)
         {
             ::CloseHandle(server);
             return;
         }
 		*/
-        
+
 		if (!::ConnectNamedPipe(srvRead_, NULL))
         {
-            if (ERROR_PIPE_CONNECTED != ::GetLastError()) 
+            if (ERROR_PIPE_CONNECTED != ::GetLastError())
             {
                // ::CloseHandle(server);
                 //::CloseHandle(client);
@@ -122,7 +144,7 @@ namespace Atomic
 
     PipeWin::~PipeWin()
     {
-        if (pipeRead_ != INVALID_HANDLE_VALUE) 
+        if (pipeRead_ != INVALID_HANDLE_VALUE)
         {
             ::DisconnectNamedPipe(pipeRead_);  // $$$ disconect is valid on the server side.
             ::CloseHandle(pipeRead_);
@@ -173,14 +195,14 @@ namespace Atomic
 
     char* PipeTransport::Receive(size_t* size)
     {
-        if (buf_.Size() < kBufferSz) 
+        if (buf_.Size() < kBufferSz)
         {
             buf_.Resize(kBufferSz);
         }
 
         *size = kBufferSz;
 
-        if (!Read(&buf_[0], size)) 
+        if (!Read(&buf_[0], size))
         {
             return NULL;
         }
@@ -228,7 +250,7 @@ namespace Atomic
 
         pid_ = pi.hProcess;
         ::CloseHandle(pi.hThread);
-        
+
         return true;
     }
 
