@@ -37,7 +37,7 @@ namespace Atomic
 #ifdef ANDROID
 extern const char* APK;
 
-#define ASSET_DIR_INDICATOR _
+#define ASSET_DIR_INDICATOR "_"
 
 // Macro for checking if a given pathname is inside APK's assets directory
 #define IS_ASSET(p) p.StartsWith(APK)
