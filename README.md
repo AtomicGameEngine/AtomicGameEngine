@@ -4,7 +4,7 @@
 
 They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript Examples</a>
 
-###### Looking for Atomic-Haxe? 
+###### Looking for Atomic-Haxe?
 
 It's here: <a href="https://github.com/rsredsq/atomic-haxe">Atomic-Haxe</a>  <sup>(Community Supported)</sup>
 
@@ -28,7 +28,7 @@ It's here: <a href="https://github.com/rsredsq/atomic-haxe">Atomic-Haxe</a>  <su
 
 ![alt text][WelcomeScreen]
 
-This repository contains the full source code to the Atomic Game Engine Runtime and Editor
+This repository contains the **full source code** to the Atomic Game Engine Runtime, Atomic Editor, Atomic CLI, and other tools.
 
 The source code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** available for [DOWNLOAD](http://atomicgameengine.com/download) on our website.
 
@@ -38,8 +38,18 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 ### Licensing Information
 
-[Atomic Game Engine™ EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE.md)  
-[Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/THIRDPARTY_LICENSE.md)
+##### [The Atomic Game Engine™ Runtime EULA (MIT)](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
+
+> The full source code to the Atomic Player for end user apps, games, simulations, and visualizations is available under the permissive **MIT license**
+
+##### [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
+
+> The full source code to the Atomic Editor and other tooling is available under the terms of the [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
+
+**[Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_THIRDPARTY.md)**
+
+> The Atomic Game Engine contains third party technology available under permissive Open Source licenses.
+
 
 ### Building the Atomic Editor from Source
 
@@ -48,4 +58,3 @@ Please see [Building the Atomic Editor from Source](https://github.com/AtomicGam
 ### Website
 
 Visit http://www.AtomicGameEngine.com for all the latest news and downloads of the Atomic Game Engine
-
