@@ -2,10 +2,9 @@
 
 **IMPORTANT:**
 
-The Atomic Game Engine™ Runtime EULA applies to the source code compiled
-into the binary of end user games, simulations, and visualizations.  
-The Atomic Editor, Atomic CLI, and other tooling is under the
-Atomic Game Engine™ Editor and Tool EULA.  Please see the LICENSE_ATOMIC_EDITOR_AND_TOOLS.md file which contains this license.
+The Atomic Game Engine™ Runtime EULA applies to the source code of the redistributable binary of end user games, simulations, and visualizations.
+
+The Atomic Editor, Atomic CLI, and other tooling is under the Atomic Game Engine™ Editor and Tool EULA.  Please see the LICENSE_ATOMIC_EDITOR_AND_TOOLS.md file which contains this license.
 
 The Atomic Game Engine contains third party technology available under permissive Open Source licenses. The LICENSE_THIRDPARTY.md file describes the copyrights and licenses associated with these technologies.
 

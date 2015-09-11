@@ -40,7 +40,7 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 ##### [The Atomic Game Engine™ Runtime EULA (MIT)](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
 
-> The full source code to the Atomic Player for end user apps, games, simulations, and visualizations is available under the permissive **MIT license**
+> The full source code to the Atomic Runtime used by end user apps, games, simulations, and visualizations is available under the permissive **MIT license**
 
 ##### [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
 
