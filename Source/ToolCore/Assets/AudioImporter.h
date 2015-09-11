@@ -23,8 +23,8 @@ protected:
 
     bool Import();
 
-    virtual bool LoadSettingsInternal();
-    virtual bool SaveSettingsInternal();
+    virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
+    virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
 };
 

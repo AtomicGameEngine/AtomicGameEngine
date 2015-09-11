@@ -24,6 +24,8 @@
 
 #include "../Math/Random.h"
 
+#include "../DebugNew.h"
+
 namespace Atomic
 {
 

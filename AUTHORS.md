@@ -25,12 +25,14 @@ Atomic Game Engine contribution copyrights are held by their authors.  Each auth
 
 The Atomic Game Engine began as a fork of the Urho3D project in November 2014
 
-Website:
+### Urho3D Website
 
-http://urho3d.github.io/
+Main website: [http://urho3d.github.io/](http://urho3d.github.io/)
 
-Credits:
+##License
+Licensed under the MIT license, see [License.txt](https://github.com/urho3d/Urho3D/blob/master/License.txt) for details.
 
+##Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
 - Wei Tjong Yao
@@ -40,6 +42,7 @@ Urho3D development, contributions and bugfixes by:
 - Danny Boisvert
 - Carlo Carollo
 - Pete Chown
+- Christian Clavet
 - Sebastian Delatorre (primitivewaste)
 - Josh Engebretson
 - Chris Friesen
@@ -50,6 +53,7 @@ Urho3D development, contributions and bugfixes by:
 - Gunnar Kriik
 - Ali Kämäräinen
 - Pete Leigh
+- Thorbjørn Lindeijer
 - Jonne Nauha
 - Paul Noome
 - David Palacios
@@ -57,7 +61,9 @@ Urho3D development, contributions and bugfixes by:
 - Jordan Patterson
 - Vladimir Pobedinsky
 - Nick Royer
+- Jonathan Sandusky
 - Miika Santala
+- James Thomas
 - Joshua Tippetts
 - Daniel Wiberg
 - Steven Zhang
@@ -66,22 +72,31 @@ Urho3D development, contributions and bugfixes by:
 - Firegorilla
 - Magic.Lixin
 - Mike3D
+- Modanung
+- MonkeyFirst
 - OvermindDL1
+- Skrylar
+- 1vanK
 - andmar1x
 - amadeus_osa
 - atship
 - att
 - celeron55
+- cosmy1
+- feltech
 - hdunderscore
+- marynate
 - mightyCelu
 - nemerle
 - ninjastone
+- raould
 - rasteron
 - reattiva
 - rifai
 - skaiware
 - szamq
 - thebluefish
+- yushli
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
@@ -119,15 +134,18 @@ Urho3D uses the following third-party libraries:
 - LuaJIT 2.0.3 (http://www.luajit.org)
 - LZ4 (http://code.google.com/p/lz4/)
 - MojoShader (http://icculus.org/mojoshader/)
+- nanodbc 2.2.2 (http://lexicalunit.github.io/nanodbc/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
-- pugixml 1.0 (http://pugixml.org/)
+- pugixml 1.5 (http://pugixml.org/)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson/)
 - Recast/Detour (https://github.com/memononen/recastnavigation/)
 - SDL 2.0.3 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/
   john-ratcliffs-code-suppository-blog.html)
-- stb_image 1.29 (http://nothings.org/)
-- stb_vorbis 0.99996 (http://nothings.org/)
+- stb_image 2.05 (http://nothings.org/)
+- stb_image_write 0.98 (http://nothings.org/)
+- stb_vorbis 1.05 (http://nothings.org/)
+- SQLite 3.8.10.2 (https://www.sqlite.org/)
 - tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong

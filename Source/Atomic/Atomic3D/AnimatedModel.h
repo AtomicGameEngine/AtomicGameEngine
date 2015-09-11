@@ -255,6 +255,8 @@ private:
     bool assignBonesPending_;
     /// Whether bone creation is enabled, globally
     static bool boneCreationEnabled_;
+    /// Force animation update after becoming visible flag.
+    bool forceAnimationUpdate_;
 };
 
 }

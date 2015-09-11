@@ -30,22 +30,24 @@ bool PEXImporter::Import()
     return true;
 }
 
-bool PEXImporter::LoadSettingsInternal()
+bool PEXImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("PEXImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("PEXImporter");
 
     return true;
 }
 
-bool PEXImporter::SaveSettingsInternal()
+bool PEXImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("PEXImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("PEXImporter", import);
+
 
     return true;
 }

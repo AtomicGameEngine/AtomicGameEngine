@@ -78,8 +78,8 @@ protected:
     bool ImportAnimations();
     bool ImportAnimation(const String &filename, const String& name, float startTime=-1.0f, float endTime=-1.0f);
 
-    virtual bool LoadSettingsInternal();
-    virtual bool SaveSettingsInternal();
+    virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
+    virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
 
     float scale_;

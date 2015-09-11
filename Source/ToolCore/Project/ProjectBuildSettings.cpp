@@ -11,144 +11,152 @@ namespace ToolCore
 
 void MacBuildSettings::Write(JSONValue& parent)
 {
-    JSONValue json = parent.CreateChild("MacBuildSettings");
+    JSONValue json;
 
-    json.SetString("appName", appName_);
-    json.SetString("packageName", packageName_);
-    json.SetString("companyName", companyName_);
-    json.SetString("productName", productName_);
+    json.Set("appName", appName_);
+    json.Set("packageName", packageName_);
+    json.Set("companyName", companyName_);
+    json.Set("productName", productName_);
 
+    parent.Set("MacBuildSettings", json);
 }
 
 void MacBuildSettings::Read(JSONValue& parent)
 {
-    JSONValue json = parent.GetChild("MacBuildSettings");
+    JSONValue json = parent.Get("MacBuildSettings");
 
-    if (json == JSONValue::EMPTY)
+    if (!json.IsObject())
         return;
 
-    appName_ = json.GetString("appName");
-    packageName_ = json.GetString("packageName");
-    companyName_ = json.GetString("companyName");
-    productName_ = json.GetString("productName");
+    appName_ = json.Get("appName").GetString();
+    packageName_ = json.Get("packageName").GetString();
+    companyName_ = json.Get("companyName").GetString();
+    productName_ = json.Get("productName").GetString();
 
 }
 
 void WindowsBuildSettings::Write(JSONValue& parent)
 {
-    JSONValue json = parent.CreateChild("WindowsBuildSettings");
+    JSONValue json;
 
-    json.SetString("appName", appName_);
-    json.SetString("packageName", packageName_);
-    json.SetString("companyName", companyName_);
-    json.SetString("productName", productName_);
+    json.Set("appName", appName_);
+    json.Set("packageName", packageName_);
+    json.Set("companyName", companyName_);
+    json.Set("productName", productName_);
+
+    parent.Set("WindowsBuildSettings", json);
 
 }
 
 void WindowsBuildSettings::Read(JSONValue& parent)
 {
-    JSONValue json = parent.GetChild("WindowsBuildSettings");
+    JSONValue json = parent.Get("WindowsBuildSettings");
 
-    if (json == JSONValue::EMPTY)
+    if (!json.IsObject())
         return;
 
-    appName_ = json.GetString("appName");
-    packageName_ = json.GetString("packageName");
-    companyName_ = json.GetString("companyName");
-    productName_ = json.GetString("productName");
+    appName_ = json.Get("appName").GetString();
+    packageName_ = json.Get("packageName").GetString();
+    companyName_ = json.Get("companyName").GetString();
+    productName_ = json.Get("productName").GetString();
 
 }
 
 
 void WebBuildSettings::Write(JSONValue& parent)
 {
-    JSONValue json = parent.CreateChild("WebBuildSettings");
+    JSONValue json;
 
-    json.SetString("appName", appName_);
-    json.SetString("packageName", packageName_);
-    json.SetString("companyName", companyName_);
-    json.SetString("productName", productName_);
+    json.Set("appName", appName_);
+    json.Set("packageName", packageName_);
+    json.Set("companyName", companyName_);
+    json.Set("productName", productName_);
+
+    parent.Set("WebBuildSettings", json);
 
 }
 
 void WebBuildSettings::Read(JSONValue& parent)
 {
-    JSONValue json = parent.GetChild("WebBuildSettings");
+    JSONValue json = parent.Get("WebBuildSettings");
 
-    if (json == JSONValue::EMPTY)
+    if (!json.IsObject())
         return;
 
-    appName_ = json.GetString("appName");
-    packageName_ = json.GetString("packageName");
-    companyName_ = json.GetString("companyName");
-    productName_ = json.GetString("productName");
+    appName_ = json.Get("appName").GetString();
+    packageName_ = json.Get("packageName").GetString();
+    companyName_ = json.Get("companyName").GetString();
+    productName_ = json.Get("productName").GetString();
 
 }
 
 void AndroidBuildSettings::Write(JSONValue& parent)
 {
-    JSONValue json = parent.CreateChild("AndroidBuildSettings");
+    JSONValue json;
 
-    json.SetString("appName", appName_);
-    json.SetString("packageName", packageName_);
-    json.SetString("companyName", companyName_);
-    json.SetString("productName", productName_);
+    json.Set("appName", appName_);
+    json.Set("packageName", packageName_);
+    json.Set("companyName", companyName_);
+    json.Set("productName", productName_);
 
-    json.SetString("targetSDKVersion", targetSDKVersion_);
-    json.SetString("minSDKVersion", minSDKVersion_);
-    json.SetString("activityName", activityName_);
+    json.Set("targetSDKVersion", targetSDKVersion_);
+    json.Set("minSDKVersion", minSDKVersion_);
+    json.Set("activityName", activityName_);
+
+    parent.Set("AndroidBuildSettings", json);
 
 
 }
 
 void AndroidBuildSettings::Read(JSONValue& parent)
 {
-    JSONValue json = parent.GetChild("AndroidBuildSettings");
+    JSONValue json = parent.Get("AndroidBuildSettings");
 
-    if (json == JSONValue::EMPTY)
+    if (!json.IsObject())
         return;
 
-    appName_ = json.GetString("appName");
-    packageName_ = json.GetString("packageName");
-    companyName_ = json.GetString("companyName");
-    productName_ = json.GetString("productName");
+    appName_ = json.Get("appName").GetString();
+    packageName_ = json.Get("packageName").GetString();
+    companyName_ = json.Get("companyName").GetString();
+    productName_ = json.Get("productName").GetString();
 
-    targetSDKVersion_ = json.GetString("targetSDKVersion");
-    minSDKVersion_ = json.GetString("minSDKVersion");
-    activityName_ = json.GetString("activityName");
+    targetSDKVersion_ = json.Get("targetSDKVersion").GetString();
+    minSDKVersion_ = json.Get("minSDKVersion").GetString();
+    activityName_ = json.Get("activityName").GetString();
 
 }
 
 
 void IOSBuildSettings::Write(JSONValue& parent)
 {
-    JSONValue json = parent.CreateChild("IOSBuildSettings");
+    JSONValue json;
 
-    json.SetString("appName", appName_);
-    json.SetString("packageName", packageName_);
-    json.SetString("companyName", companyName_);
-    json.SetString("productName", productName_);
+    json.Set("appName", appName_);
+    json.Set("packageName", packageName_);
+    json.Set("companyName", companyName_);
+    json.Set("productName", productName_);
 
-    json.SetString("provisionFile", provisionFile_);
-    json.SetString("appIDPrefix", appidPrefix_);
+    json.Set("provisionFile", provisionFile_);
+    json.Set("appIDPrefix", appidPrefix_);
 
+    parent.Set("IOSBuildSettings", json);
 
 }
 
 void IOSBuildSettings::Read(JSONValue& parent)
 {
-    JSONValue json = parent.GetChild("IOSBuildSettings");
+    JSONValue json = parent.Get("IOSBuildSettings");
 
-    if (json == JSONValue::EMPTY)
+    if (!json.IsObject())
         return;
 
-    appName_ = json.GetString("appName");
-    packageName_ = json.GetString("packageName");
-    companyName_ = json.GetString("companyName");
-    productName_ = json.GetString("productName");
+    appName_ = json.Get("appName").GetString();
+    packageName_ = json.Get("packageName").GetString();
+    companyName_ = json.Get("companyName").GetString();
+    productName_ = json.Get("productName").GetString();
 
-    provisionFile_ = json.GetString("provisionFile");
-    appidPrefix_ = json.GetString("appIDPrefix");
+    provisionFile_ = json.Get("provisionFile").GetString();;
+    appidPrefix_ = json.Get("appIDPrefix").GetString();;
 
 }
 
@@ -181,7 +189,7 @@ bool ProjectBuildSettings::Load(const String& path)
         return false;
 
     JSONValue root = jsonFile->GetRoot();
-    if (root == JSONValue::EMPTY)
+    if (!root.IsObject())
         return false;
 
     macBuildSettings_->Read(root);
@@ -197,7 +205,7 @@ void ProjectBuildSettings::Save(const String& path)
 {
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->CreateRoot();
+    JSONValue& root = jsonFile->GetRoot();
 
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
 

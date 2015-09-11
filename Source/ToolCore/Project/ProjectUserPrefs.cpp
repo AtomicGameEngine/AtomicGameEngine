@@ -35,10 +35,10 @@ bool ProjectUserPrefs::Load(const String& path)
         return false;
 
     JSONValue root = jsonFile->GetRoot();
-    if (root == JSONValue::EMPTY)
+    if (!root.IsObject())
         return false;
 
-    lastBuildPath_ = root.GetString("lastBuildPath");
+    lastBuildPath_ = root.Get("lastBuildPath").GetString();
 
     return true;
 }
@@ -48,11 +48,11 @@ void ProjectUserPrefs::Save(const String& path)
 
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->CreateRoot();
+    JSONValue root = jsonFile->GetRoot();
 
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
 
-    root.SetString("lastBuildPath", lastBuildPath_);
+    root.Set("lastBuildPath", JSONValue(lastBuildPath_));
 
     jsonFile->Save(*file, String("   "));
 

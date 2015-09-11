@@ -29,22 +29,23 @@ bool AudioImporter::Import()
     return true;
 }
 
-bool AudioImporter::LoadSettingsInternal()
+bool AudioImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("AudioImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("AudioImporter");
 
     return true;
 }
 
-bool AudioImporter::SaveSettingsInternal()
+bool AudioImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("AudioImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("AudioImporter", import);
 
     return true;
 }

@@ -26,22 +26,23 @@ bool SceneImporter::Import()
     return true;
 }
 
-bool SceneImporter::LoadSettingsInternal()
+bool SceneImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("SceneImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("SceneImporter");
 
     return true;
 }
 
-bool SceneImporter::SaveSettingsInternal()
+bool SceneImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("SceneImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("SceneImporter", import);
 
     return true;
 }

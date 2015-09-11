@@ -114,6 +114,8 @@ public:
 
     /// Return whether all work with at least the specified priority is finished.
     bool IsCompleted(unsigned priority) const;
+    /// Return whether the queue is currently completing work in the main thread.
+    bool IsCompleting() const { return completing_; }
 
     /// Return the pool tolerance.
     int GetTolerance() const { return tolerance_; }
@@ -149,6 +151,8 @@ private:
     volatile bool pausing_;
     /// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
     bool paused_;
+    /// Completing work in the main thread flag.
+    bool completing_;
     /// Tolerance for the shared pool before it begins to deallocate.
     int tolerance_;
     /// Last size of the shared pool.

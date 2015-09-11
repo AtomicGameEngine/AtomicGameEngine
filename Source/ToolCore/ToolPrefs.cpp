@@ -58,16 +58,16 @@ void ToolPrefs::Load()
         return;
 
     JSONValue root = jsonFile->GetRoot();
-    if (root == JSONValue::EMPTY)
+    if (!root.IsObject())
         return;
 
-    JSONValue androidRoot = root.GetChild("android");
+    JSONValue androidRoot = root.Get("android");
 
     if (androidRoot.IsObject()) {
 
-        androidSDKPath_ = androidRoot.GetString("androidSDKPath");
-        jdkRootPath_ = androidRoot.GetString("jdkRootPath");
-        antPath_ = androidRoot.GetString("antPath");
+        androidSDKPath_ = androidRoot.Get("androidSDKPath").GetString();
+        jdkRootPath_ = androidRoot.Get("jdkRootPath").GetString();
+        antPath_ = androidRoot.Get("antPath").GetString();
     }
 
 }
@@ -78,14 +78,15 @@ void ToolPrefs::Save()
 
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->CreateRoot();
+    JSONValue root = jsonFile->GetRoot();
 
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
 
-    JSONValue androidRoot = root.CreateChild("android");
-    androidRoot.SetString("androidSDKPath", androidSDKPath_);
-    androidRoot.SetString("jdkRootPath", jdkRootPath_);
-    androidRoot.SetString("antPath", antPath_);
+    JSONValue androidRoot;
+    androidRoot.Set("androidSDKPath", androidSDKPath_);
+    androidRoot.Set("jdkRootPath", jdkRootPath_);
+    androidRoot.Set("antPath", antPath_);
+    root.Set("android", androidRoot);
 
     jsonFile->Save(*file, String("   "));
 

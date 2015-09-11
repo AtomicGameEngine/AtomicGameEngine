@@ -26,16 +26,18 @@ void ProjectFile::WriteNewProject(const String& fullpath)
 {
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->CreateRoot();
+    JSONValue root = jsonFile->GetRoot();
 
-    root.SetInt("version", PROJECTFILE_VERSION);
+    root.Set("version", PROJECTFILE_VERSION);
 
     // project object
-    JSONValue jproject = root.CreateChild("project");
-    jproject.SetString("version", "1.0.0");
+    JSONValue jproject;
+    jproject.Set("version", "1.0.0");
+    root.Set("project", jproject);
 
     // platforms
-    root.CreateChild("platforms", JSON_ARRAY);
+    JSONValue platforms(JSONValue::emptyArray);
+    root.Set("platforms", platforms);
 
     SharedPtr<File> file(new File(context_, fullpath, FILE_WRITE));
     jsonFile->Save(*file, String("   "));
@@ -52,25 +54,28 @@ void ProjectFile::Save(Project* project)
 
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    JSONValue root = jsonFile->CreateRoot();
+    JSONValue root = jsonFile->GetRoot();
 
-    root.SetInt("version", PROJECTFILE_VERSION);
+    root.Set("version", PROJECTFILE_VERSION);
 
     // project object
-    JSONValue jproject = root.CreateChild("project");
-    jproject.SetString("version", project_->GetVersion());
+    JSONValue jproject;
+    jproject.Set("version", project_->GetVersion());
+    root.Set("project", jproject);
 
     // platforms
-    JSONValue platforms = root.CreateChild("platforms", JSON_ARRAY);
+    JSONArray platforms;
 
     for (List<PlatformID>::ConstIterator i = project_->platforms_.Begin(); i != project_->platforms_.End(); ++i)
     {
         Platform* platform = tsystem->GetPlatformByID(*i);
         if (platform)
         {
-            platforms.AddString(platform->GetName().ToLower());
+            platforms.Push(JSONValue(platform->GetName().ToLower()));
         }
     }
+
+    root.Set("platforms", platforms);
 
     // Save to file
     SharedPtr<File> file(new File(context_, fullpath, FILE_WRITE));
@@ -98,21 +103,21 @@ bool ProjectFile::Load(Project* project)
 
         JSONValue root = jsonFile->GetRoot();
 
-        int version = root.GetInt("version");
+        int version = root.Get("version").GetInt();
 
         if (version != PROJECTFILE_VERSION)
             return false;
 
         // project object
-        JSONValue jproject = root.GetChild("project");
+        JSONValue jproject = root.Get("project");
 
         if (jproject.IsObject())
         {
-            String pversion = jproject.GetString("version");
+            String pversion = jproject.Get("version").GetString();
             project_->SetVersion(pversion);
         }
 
-        JSONValue platforms = root.GetChild("platforms");
+        JSONValue platforms = root.Get("platforms");
         if (!platforms.IsArray())
             return false;
     }

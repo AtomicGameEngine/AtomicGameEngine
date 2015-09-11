@@ -329,9 +329,9 @@ void AssetDatabase::Scan()
 
             JSONValue root = json->GetRoot();
 
-            assert(root.GetInt("version") == ASSET_VERSION);
+            assert(root.Get("version").GetInt() == ASSET_VERSION);
 
-            String guid = root.GetString("guid");
+            String guid = root.Get("guid").GetString();
 
             if (!GetAssetByGUID(guid))
             {

@@ -187,13 +187,13 @@ bool JSBPackage::Load(const String& packageFolder)
     JSONValue root = packageJSON->GetRoot();
 
     // first load dependencies
-    JSONValue deps = root.GetChild("dependencies");
+    JSONValue deps = root.Get("dependencies");
 
     if (deps.IsArray())
     {
-        for (unsigned i = 0; i < deps.GetSize(); i++)
+        for (unsigned i = 0; i < deps.GetArray().Size(); i++)
         {
-            String dpackageFolder = AddTrailingSlash(deps.GetString(i));
+            String dpackageFolder = AddTrailingSlash(deps.GetArray()[i].GetString());
 
             SharedPtr<JSBPackage> depPackage (new JSBPackage(context_));
 
@@ -207,11 +207,11 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
-    JSONValue jmodulesExclude = root.GetChild("moduleExclude");
+    JSONValue jmodulesExclude = root.Get("moduleExclude");
 
     if (jmodulesExclude.IsObject())
     {
-        Vector<String> platforms = jmodulesExclude.GetChildNames();
+        Vector<String> platforms = jmodulesExclude.GetObject().Keys();
 
         for (unsigned i = 0; i < platforms.Size(); i++)
         {
@@ -222,14 +222,14 @@ bool JSBPackage::Load(const String& packageFolder)
                 moduleExcludes_[platform] = Vector<String>();
             }
 
-            JSONValue mods = jmodulesExclude.GetChild(platform);
+            JSONValue mods = jmodulesExclude.Get(platform);
 
             if (mods.IsArray())
             {
 
-                for (unsigned j = 0; j < mods.GetSize(); j++)
+                for (unsigned j = 0; j < mods.GetArray().Size(); j++)
                 {
-                    moduleExcludes_[platform].Push(mods.GetString(j));
+                    moduleExcludes_[platform].Push(mods.GetArray()[j].GetString());
                 }
 
             }
@@ -238,14 +238,14 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
-    name_ = root.GetString("name");
-    namespace_ = root.GetString("namespace");
+    name_ = root.Get("name").GetString();
+    namespace_ = root.Get("namespace").GetString();
 
-    JSONValue modules = root.GetChild("modules");
+    JSONValue modules = root.Get("modules");
 
-    for (unsigned i = 0; i < modules.GetSize(); i++)
+    for (unsigned i = 0; i < modules.GetArray().Size(); i++)
     {
-        String moduleName = modules.GetString(i);
+        String moduleName = modules.GetArray()[i].GetString();
 
         if (moduleExcludes_.Contains(jsbind->GetPlatform()))
         {

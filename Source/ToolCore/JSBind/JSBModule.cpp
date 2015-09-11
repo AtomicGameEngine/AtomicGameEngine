@@ -106,11 +106,11 @@ void JSBModule::ProcessOverloads()
 
     JSONValue root = moduleJSON_->GetRoot();
 
-    JSONValue overloads = root.GetChild("overloads");
+    JSONValue overloads = root.Get("overloads");
 
     if (overloads.IsObject())
     {
-        Vector<String> childNames = overloads.GetChildNames();
+        Vector<String> childNames = overloads.GetObject().Keys();
 
         for (unsigned j = 0; j < childNames.Size(); j++)
         {
@@ -123,23 +123,25 @@ void JSBModule::ProcessOverloads()
                 ErrorExit("Bad overload klass");
             }
 
-            JSONValue classoverloads = overloads.GetChild(classname);
+            JSONValue classoverloads = overloads.Get(classname);
 
-            Vector<String> functionNames = classoverloads.GetChildNames();
+            Vector<String> functionNames = classoverloads.GetObject().Keys();
 
             for (unsigned k = 0; k < functionNames.Size(); k++)
             {
-                JSONValue sig = classoverloads.GetChild(functionNames[k]);
+                JSONValue _sig = classoverloads.Get(functionNames[k]);
 
-                if (!sig.IsArray())
+                if (!_sig.IsArray())
                 {
                     ErrorExit("Bad overload defintion");
                 }
 
+                JSONArray sig = _sig.GetArray();
+
                 Vector<String> values;
-                for (unsigned x = 0; x < sig.GetSize(); x++)
+                for (unsigned x = 0; x < sig.Size(); x++)
                 {
-                    values.Push(sig.GetString(x));
+                    values.Push(sig[x].GetString());
                 }
 
                 JSBFunctionSignature* fo = new JSBFunctionSignature(functionNames[k], values);
@@ -156,11 +158,11 @@ void JSBModule::ProcessExcludes()
 
     JSONValue root = moduleJSON_->GetRoot();
 
-    JSONValue excludes = root.GetChild("excludes");
+    JSONValue excludes = root.Get("excludes");
 
     if (excludes.IsObject())
     {
-        Vector<String> childNames = excludes.GetChildNames();
+        Vector<String> childNames = excludes.GetObject().Keys();
 
         for (unsigned j = 0; j < childNames.Size(); j++)
         {
@@ -173,23 +175,25 @@ void JSBModule::ProcessExcludes()
                 ErrorExit("Bad exclude klass");
             }
 
-            JSONValue classexcludes = excludes.GetChild(classname);
+            JSONValue classexcludes = excludes.Get(classname);
 
-            Vector<String> functionNames = classexcludes.GetChildNames();
+            Vector<String> functionNames = classexcludes.GetObject().Keys();
 
             for (unsigned k = 0; k < functionNames.Size(); k++)
             {
-                JSONValue sig = classexcludes.GetChild(functionNames[k]);
+                JSONValue _sig = classexcludes.Get(functionNames[k]);
 
-                if (!sig.IsArray())
+                if (!_sig.IsArray())
                 {
                     ErrorExit("Bad exclude defintion");
                 }
 
+                JSONArray sig = _sig.GetArray();
+
                 Vector<String> values;
-                for (unsigned x = 0; x < sig.GetSize(); x++)
+                for (unsigned x = 0; x < sig.Size(); x++)
                 {
-                    values.Push(sig.GetString(x));
+                    values.Push(sig[x].GetString());
                 }
 
                 JSBFunctionSignature* fe = new JSBFunctionSignature(functionNames[k], values);
@@ -206,11 +210,11 @@ void JSBModule::ProcessTypeScriptDecl()
 
     JSONValue root = moduleJSON_->GetRoot();
 
-    JSONValue decl = root.GetChild("typescript_decl");
+    JSONValue decl = root.Get("typescript_decl");
 
     if (decl.IsObject())
     {
-        Vector<String> childNames = decl.GetChildNames();
+        Vector<String> childNames = decl.GetObject().Keys();
 
         for (unsigned j = 0; j < childNames.Size(); j++)
         {
@@ -223,11 +227,11 @@ void JSBModule::ProcessTypeScriptDecl()
                 ErrorExit("Bad TypeScript decl klass");
             }
 
-            JSONValue classdecl = decl.GetChild(classname);
+            JSONArray classdecl = decl.Get(classname).GetArray();
 
-            for (unsigned k = 0; k < classdecl.GetSize(); k++)
+            for (unsigned k = 0; k < classdecl.Size(); k++)
             {
-                klass->AddTypeScriptDecl(classdecl.GetString(k));
+                klass->AddTypeScriptDecl(classdecl[k].GetString());
             }
         }
     }
@@ -239,11 +243,11 @@ void JSBModule::ProcessHaxeDecl()
 
     JSONValue root = moduleJSON_->GetRoot();
 
-    JSONValue decl = root.GetChild("haxe_decl");
+    JSONValue decl = root.Get("haxe_decl");
 
     if (decl.IsObject())
     {
-        Vector<String> childNames = decl.GetChildNames();
+        Vector<String> childNames = decl.GetObject().Keys();
 
         for (unsigned j = 0; j < childNames.Size(); j++)
         {
@@ -256,11 +260,11 @@ void JSBModule::ProcessHaxeDecl()
                 ErrorExit("Bad Haxe decl class");
             }
 
-            JSONValue classdecl = decl.GetChild(classname);
+            JSONArray classdecl = decl.Get(classname).GetArray();
 
-            for (unsigned k = 0; k < classdecl.GetSize(); k++)
+            for (unsigned k = 0; k < classdecl.Size(); k++)
             {
-                klass->AddHaxeDecl(classdecl.GetString(k));
+                klass->AddHaxeDecl(classdecl[k].GetString());
             }
         }
     }
@@ -395,58 +399,56 @@ bool JSBModule::Load(const String& jsonFilename)
 
     JSONValue root = moduleJSON_->GetRoot();
 
-    name_ = root.GetString("name");
+    name_ = root.Get("name").GetString();
 
-    JSONValue requires = root.GetChild("requires");
+    JSONValue requires = root.Get("requires");
 
     if (requires.IsArray())
     {
-        for (unsigned j = 0; j < requires.GetSize(); j++)
+        for (unsigned j = 0; j < requires.GetArray().Size(); j++)
         {
-            requirements_.Push(requires.GetString(j));
+            requirements_.Push(requires[j].GetString());
         }
 
     }
 
-    JSONValue classes = root.GetChild("classes");
+    JSONArray classes = root.Get("classes").GetArray();
 
-    for (unsigned i = 0; i < classes.GetSize(); i++)
+    for (unsigned i = 0; i < classes.Size(); i++)
     {
-        classnames_.Push(classes.GetString(i));
+        classnames_.Push(classes[i].GetString());
     }
 
-    JSONValue classes_rename = root.GetChild("classes_rename");
+    JSONValue classes_rename = root.Get("classes_rename");
 
     if (classes_rename.IsObject())
     {
-        Vector<String> childNames = classes_rename.GetValueNames();
+        Vector<String> childNames = classes_rename.GetObject().Keys();
         for (unsigned j = 0; j < childNames.Size(); j++)
         {
             String classname = childNames.At(j);
-            String crename = classes_rename.GetString(classname);
-
+            String crename = classes_rename.Get(classname).GetString();
             classRenames_[classname] = crename;
-
         }
 
     }
 
-    JSONValue includes = root.GetChild("includes");
+    JSONValue includes = root.Get("includes");
 
     if (includes.IsArray())
     {
-        for (unsigned j = 0; j < includes.GetSize(); j++)
+        for (unsigned j = 0; j < includes.GetArray().Size(); j++)
         {
-            includes_.Push(includes.GetString(j));
+            includes_.Push(includes.GetArray()[j].GetString());
 
         }
     }
 
-    JSONValue sources = root.GetChild("sources");
+    JSONValue sources = root.Get("sources");
 
-    for (unsigned i = 0; i < sources.GetSize(); i++)
+    for (unsigned i = 0; i < sources.GetArray().Size(); i++)
     {
-        sourceDirs_.Push(sources.GetString(i));
+        sourceDirs_.Push(sources.GetArray()[i].GetString());
     }
 
     if (name_ == "Graphics")

@@ -28,6 +28,10 @@
 
 #include "../DebugNew.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:6293)
+#endif
+
 namespace Atomic
 {
 
@@ -559,7 +563,7 @@ Vector<String> String::Split(char separator) const
     return Split(CString(), separator);
 }
 
-void String::Join(const Vector<String>& subStrings, String glue)
+void String::Join(const Vector<String>& subStrings, const String& glue)
 {
     *this = Joined(subStrings, glue);
 }
@@ -1009,9 +1013,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 {
     if (src == 0)
         return 0;
-    
+
     unsigned short word1 = *src;
-    
+
     // Check if we are at a low surrogate
     word1 = *src++;
     if (word1 >= 0xdc00 && word1 < 0xe000)
@@ -1020,7 +1024,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             ++src;
         return '?';
     }
-    
+
     if (word1 < 0xd800 || word1 >= 0xe00)
         return word1;
     else
@@ -1085,7 +1089,7 @@ Vector<String> String::Split(const char* str, char separator)
     return ret;
 }
 
-String String::Joined(const Vector<String>& subStrings, String glue)
+String String::Joined(const Vector<String>& subStrings, const String& glue)
 {
     if (subStrings.Empty())
         return String();
@@ -1261,7 +1265,7 @@ WString::WString(const String& str) :
 #ifdef WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
-    
+
     unsigned byteOffset = 0;
     while (byteOffset < str.Length())
     {
@@ -1269,9 +1273,9 @@ WString::WString(const String& str) :
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
         neededSize += dest - temp;
     }
-    
+
     Resize(neededSize);
-    
+
     byteOffset = 0;
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())

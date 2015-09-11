@@ -148,9 +148,9 @@ bool Asset::Load()
 
     JSONValue root = json_->GetRoot();
 
-    assert(root.GetInt("version") == ASSET_VERSION);
+    assert(root.Get("version").GetInt() == ASSET_VERSION);
 
-    guid_ = root.GetString("guid");
+    guid_ = root.Get("guid").GetString();
 
     db->RegisterGUID(guid_);
 
@@ -180,10 +180,10 @@ bool Asset::Save()
 
     json_ = new JSONFile(context_);
 
-    JSONValue root = json_->CreateRoot();
+    JSONValue& root = json_->GetRoot();
 
-    root.SetInt("version", ASSET_VERSION);
-    root.SetString("guid", guid_);
+    root.Set("version", JSONValue(ASSET_VERSION));
+    root.Set("guid", JSONValue(guid_));
 
     // handle import
 

@@ -235,6 +235,15 @@ bool XMLElement::SetValue(const char* value)
         return false;
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+
+    // Search for existing value first
+    for (pugi::xml_node child = node.first_child(); child; child = child.next_sibling())
+    {
+        if (child.type() == pugi::node_pcdata)
+            return const_cast<pugi::xml_node&>(child).set_value(value);
+    }
+
+    // If no previous value found, append new
     return const_cast<pugi::xml_node&>(node).append_child(pugi::node_pcdata).set_value(value);
 }
 
@@ -368,6 +377,9 @@ bool XMLElement::SetVariantValue(const Variant& value)
     case VAR_VARIANTVECTOR:
         return SetVariantVector(value.GetVariantVector());
 
+    case VAR_STRINGVECTOR:
+        return SetStringVector(value.GetStringVector());
+
     case VAR_VARIANTMAP:
         return SetVariantMap(value.GetVariantMap());
 
@@ -417,6 +429,22 @@ bool XMLElement::SetVariantVector(const VariantVector& value)
         if (!variantElem)
             return false;
         variantElem.SetVariant(*i);
+    }
+
+    return true;
+}
+
+bool XMLElement::SetStringVector(const StringVector& value)
+{
+    if (!RemoveChildren("string"))
+        return false;
+
+    for (StringVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
+    {
+        XMLElement stringElem = CreateChild("string");
+        if (!stringElem)
+            return false;
+        stringElem.SetAttribute("value", *i);
     }
 
     return true;
@@ -765,6 +793,8 @@ Variant XMLElement::GetVariantValue(VariantType type) const
         ret = GetResourceRefList();
     else if (type == VAR_VARIANTVECTOR)
         ret = GetVariantVector();
+    else if (type == VAR_STRINGVECTOR)
+        ret = GetStringVector();
     else if (type == VAR_VARIANTMAP)
         ret = GetVariantMap();
     else
@@ -812,6 +842,20 @@ VariantVector XMLElement::GetVariantVector() const
     {
         ret.Push(variantElem.GetVariant());
         variantElem = variantElem.GetNext("variant");
+    }
+
+    return ret;
+}
+
+StringVector XMLElement::GetStringVector() const
+{
+    StringVector ret;
+
+    XMLElement stringElem = GetChild("string");
+    while (stringElem)
+    {
+        ret.Push(stringElem.GetAttributeCString("value"));
+        stringElem = stringElem.GetNext("string");
     }
 
     return ret;
