@@ -14,5 +14,5 @@ pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 list (APPEND ATOMIC_LINK_LIBRARIES pthread GLEW GL dl)
 
 
-add_definitions(-DATOMIC_PLATFORM_WEB)
+add_definitions(-DATOMIC_PLATFORM_LINUX)
 add_definitions(-DATOMIC_OPENGL -Wno-warn-absolute-paths -DATOMIC_TBUI)

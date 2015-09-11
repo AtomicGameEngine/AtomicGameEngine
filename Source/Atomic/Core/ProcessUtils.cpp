@@ -24,6 +24,8 @@
 
 #include "../Core/ProcessUtils.h"
 
+#include <SDL/include/SDL.h>
+
 #include <cstdio>
 #include <fcntl.h>
 
@@ -73,8 +75,6 @@ inline void SetFPUState(unsigned control)
 }
 
 #endif
-
-#include <SDL/include/SDL.h>
 
 #include "../DebugNew.h"
 
