@@ -8,7 +8,7 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 **IMPORTANT:**
 
-The Atomic Editor, Atomic CLI, and other tooling is under the **Atomic Game Engine™ Editor and Tool EULA** which is contained in this file.
+The Atomic Editor, Atomic CLI, and other tooling is under the **Atomic Game Engine™ Editor and Tools EULA** which is contained in this file.
 
 The **Atomic Game Engine™ Runtime EULA** applies to the source code of the redistributable binary of end user games, simulations, and visualizations. Please see the LICENSE_ATOMIC_RUNTIME.md file which contains this license.
 
