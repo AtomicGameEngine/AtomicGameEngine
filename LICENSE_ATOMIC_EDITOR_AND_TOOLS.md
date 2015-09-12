@@ -1,4 +1,4 @@
-### Atomic Game Engine™ End User License Agreement (EULA)
+### Atomic Game Engine™ Editor and Tools End User License Agreement (EULA)
 
 The Atomic Game Engine Source Code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** available for download at our website.
 
