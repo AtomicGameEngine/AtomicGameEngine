@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Atomic.h>
 #include <Atomic/IO/Log.h>
@@ -141,7 +147,7 @@ namespace ToolCore
         //Add @:overload annotation
         if (IsOverride(function))
         {
-            //if (function->IsOverload()) 
+            //if (function->IsOverload())
             {
                 source_ += "    @:overload(function(";
                 Vector<JSBFunctionType*>& parameters = function->GetParameters();
@@ -173,7 +179,7 @@ namespace ToolCore
                     source_ += "): " + GetScriptType(function->GetReturnType()) + "{})\n";
             }
             source_ += "    override function ";
-        } 
+        }
         else
         {
             source_ += "    function ";

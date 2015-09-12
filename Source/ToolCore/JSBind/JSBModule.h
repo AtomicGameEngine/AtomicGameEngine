@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -41,7 +47,7 @@ public:
     void RegisterClass(String name);
 
     JSBEnum* GetEnum(const String& name);
-    void RegisterEnum(JSBEnum* jenum);       
+    void RegisterEnum(JSBEnum* jenum);
 
     bool ContainsConstant(const String& constantName);
     void RegisterConstant(const String& constantName, unsigned type);

@@ -1,3 +1,24 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <assert.h>
 
@@ -68,9 +89,9 @@ namespace Atomic
     }
 */
 
-    // see http://duktape.org/guide.html#modules   
+    // see http://duktape.org/guide.html#modules
     static int js_module_search(duk_context* ctx)
-    {       
+    {
         JSVM* vm = JSVM::GetJSVM(ctx);
         FileSystem* fs = vm->GetSubsystem<FileSystem>();
         ResourceCache* cache = vm->GetSubsystem<ResourceCache>();
@@ -86,14 +107,14 @@ namespace Atomic
             // require function
             assert(duk_is_function(ctx, 1));
         }
-        
+
         if (top > 2)
         {
             // exports
             assert(duk_is_object(ctx, 2));
         }
 
-        if (top > 3)        
+        if (top > 3)
         {
             // module (module.id == a resolved absolute identifier for the module being loaded)
             assert(duk_is_object(ctx, 3));
@@ -148,7 +169,7 @@ namespace Atomic
              String pluginLibrary;
 
              // TODO: proper platform folder detection
-#ifdef ATOMIC_PLATFORM_WINDOWS              
+#ifdef ATOMIC_PLATFORM_WINDOWS
               pluginLibrary = resourceDirs.At(i) + "Plugins/Windows/x64/" + moduleID + ".dll";
 #elif ATOMIC_PLATFORM_OSX
              pluginLibrary = resourceDirs.At(i) + "Plugins/Mac/x64/lib" + moduleID + ".dylib";

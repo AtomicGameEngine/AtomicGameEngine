@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/Log.h>
 
@@ -23,7 +29,7 @@ namespace AtomicEditor
 
 EditorMode::EditorMode(Context* context) :
     Object(context)
-{    
+{
     SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
 }
 
@@ -116,7 +122,7 @@ bool EditorMode::PlayProject()
     playerBroker_ = ipc->SpawnWorker(editorBinary, vargs);
 
     if (playerBroker_)
-    {        
+    {
         SubscribeToEvent(playerBroker_, E_IPCJSERROR, HANDLER(EditorMode, HandleIPCJSError));
         SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, HANDLER(EditorMode, HandleIPCWorkerExit));
         SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, HANDLER(EditorMode, HandleIPCWorkerLog));

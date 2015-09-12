@@ -1,3 +1,24 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #ifndef ATOMIC_PLATFORM_WINDOWS
 #include <unistd.h>
@@ -16,7 +37,7 @@ namespace Atomic
 unsigned IPCBroker::idCounter_ = 1;
 
 IPCBroker::IPCBroker(Context* context) : IPCChannel(context, idCounter_)
-{    
+{
     idCounter_++;
 }
 
@@ -35,7 +56,7 @@ void IPCBroker::ThreadFunction()
         }
 
         if (!Receive())
-        {            
+        {
             break;
         }
     }
@@ -82,7 +103,7 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
 
     wchar_t pipe_num[10];
     _i64tow_s(reinterpret_cast<__int64>(pp_.clientWrite()), pipe_num, sizeof(pipe_num)/sizeof(pipe_num[0]), 10);
-    
+
     String cpipe;
     cpipe.SetUTF8FromWChar(pipe_num);
 
@@ -99,7 +120,7 @@ bool IPCBroker::SpawnWorker(const String& command, const Vector<String>& args, c
 
 #else
     pargs.Push(ToString("--ipc-server=%i", pp_.fd1()));
-    pargs.Push(ToString("--ipc-client=%i", pp_.fd2()));    
+    pargs.Push(ToString("--ipc-client=%i", pp_.fd2()));
 #endif
 
     pargs.Push(ToString("--ipc-id=%i", id_));

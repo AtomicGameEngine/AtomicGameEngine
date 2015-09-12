@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Core/Context.h>
@@ -15,7 +18,7 @@ SubprocessSystem::SubprocessSystem(Context* context) :
     Object(context),
     updateTimer_(0.0f)
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(SubprocessSystem, HandleUpdate));    
+    SubscribeToEvent(E_UPDATE, HANDLER(SubprocessSystem, HandleUpdate));
 }
 
 SubprocessSystem::~SubprocessSystem()
@@ -70,4 +73,3 @@ void SubprocessSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 
 }
-

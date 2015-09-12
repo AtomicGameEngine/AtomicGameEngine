@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/Engine/Engine.h>
@@ -120,7 +123,7 @@ void AEEditorApp::Setup()
 
 #ifdef ATOMIC_PLATFORM_OSX
     engineParameters_["ResourcePrefixPath"] = "../Resources";
-    
+
 #else
 	engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
 #endif
@@ -150,7 +153,7 @@ void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
     String errFilename = eventData[P_ERRORFILENAME].GetString();
     //String errStack = eventData[P_ERRORSTACK].GetString();
     int errLineNumber = vm_->GetRealLineNumber(errFilename, eventData[P_ERRORLINENUMBER].GetInt());
-    
+
     String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errLineNumber);
 
 
