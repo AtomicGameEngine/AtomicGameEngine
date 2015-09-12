@@ -7,7 +7,7 @@ Please see the The Atomic Game Engine™ Runtime EULA & Atomic Game Engine™ Ed
 
 #### [The Atomic Game Engine™ Runtime EULA (MIT)](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
 
-#### [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_ATOMIC_RUNTIME.md)
+#### [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE_ATOMIC_EDITOR_AND_TOOLS.md)
 
 ### Third Party Licenses
 -------------------------------------------------------------------
