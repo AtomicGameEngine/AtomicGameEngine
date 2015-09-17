@@ -62,6 +62,27 @@ if (APPLE)
 
 elseif(LINUX)
     target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
+
+    # check for nodejs install
+    # look for either 'node' or 'nodejs' ( debian uses both names )
+    set(NODEJS_CMD node)
+    find_program( SYS_NODE ${NODEJS_CMD}  PATHS /usr/bin/ /bin ENV PATH)
+
+    if(NOT SYS_NODE)
+        set(NODEJS_CMD nodejs)
+        find_program( SYS_NODE ${NODEJS_CMD}  PATHS /usr/bin/ /bin ENV PATH)
+    endif()
+
+    if( NOT SYS_NODE)
+        message(SEND_WARNING " WARNING: Could not find Nodejs, editor's TypeScript will not be compiled!")
+    endif()
+
+    if(SYS_NODE)
+        # compile the editor scripts
+        add_custom_command (TARGET AtomicEditor POST_BUILD
+        COMMAND  ${NODEJS_CMD} "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    endif() 
 else()
     target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
 
