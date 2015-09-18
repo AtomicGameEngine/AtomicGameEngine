@@ -324,13 +324,14 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
 
     for (Vector<SharedPtr<Billboard>>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
     {
-        i->Get()->position_ = value[index++].GetVector3();
-        i->Get()->size_ = value[index++].GetVector2();
+        Billboard *bb = i->Get();
+        bb->position_ = value[index++].GetVector3();
+        bb->size_ = value[index++].GetVector2();
         Vector4 uv = value[index++].GetVector4();
-        i->Get()->uv_ = Rect(uv.x_, uv.y_, uv.z_, uv.w_);
-        i->Get()->color_ = value[index++].GetColor();
-        i->Get()->rotation_ = value[index++].GetFloat();
-        i->Get()->enabled_ = value[index++].GetBool();
+        bb->uv_ = Rect(uv.x_, uv.y_, uv.z_, uv.w_);
+        bb->color_ = value[index++].GetColor();
+        bb->rotation_ = value[index++].GetFloat();
+        bb->enabled_ = value[index++].GetBool();
     }
 
     Commit();
@@ -344,12 +345,13 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
 
     for (Vector<SharedPtr<Billboard>>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        i->Get()->position_ = buf.ReadVector3();
-        i->Get()->size_ = buf.ReadVector2();
-        i->Get()->uv_ = buf.ReadRect();
-        i->Get()->color_ = buf.ReadColor();
-        i->Get()->rotation_ = buf.ReadFloat();
-        i->Get()->enabled_ = buf.ReadBool();
+        Billboard *bb = i->Get();
+        bb->position_ = buf.ReadVector3();
+        bb->size_ = buf.ReadVector2();
+        bb->uv_ = buf.ReadRect();
+        bb->color_ = buf.ReadColor();
+        bb->rotation_ = buf.ReadFloat();
+        bb->enabled_ = buf.ReadBool();
     }
 
     Commit();
@@ -368,12 +370,13 @@ VariantVector BillboardSet::GetBillboardsAttr() const
 
     for (Vector<SharedPtr<Billboard>>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        ret.Push(i->Get()->position_);
-        ret.Push(i->Get()->size_);
-        ret.Push(Vector4(i->Get()->uv_.min_.x_, i->Get()->uv_.min_.y_, i->Get()->uv_.max_.x_, i->Get()->uv_.max_.y_));
-        ret.Push(i->Get()->color_);
-        ret.Push(i->Get()->rotation_);
-        ret.Push(i->Get()->enabled_);
+        Billboard *bb = i->Get();
+        ret.Push(bb->position_);
+        ret.Push(bb->size_);
+        ret.Push(Vector4(bb->uv_.min_.x_, bb->uv_.min_.y_, bb->uv_.max_.x_, bb->uv_.max_.y_));
+        ret.Push(bb->color_);
+        ret.Push(bb->rotation_);
+        ret.Push(bb->enabled_);
     }
 
     return ret;
@@ -386,12 +389,13 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
 
     for (Vector<SharedPtr<Billboard>>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        attrBuffer_.WriteVector3(i->Get()->position_);
-        attrBuffer_.WriteVector2(i->Get()->size_);
-        attrBuffer_.WriteRect(i->Get()->uv_);
-        attrBuffer_.WriteColor(i->Get()->color_);
-        attrBuffer_.WriteFloat(i->Get()->rotation_);
-        attrBuffer_.WriteBool(i->Get()->enabled_);
+        Billboard *bb = i->Get();
+        attrBuffer_.WriteVector3(bb->position_);
+        attrBuffer_.WriteVector2(bb->size_);
+        attrBuffer_.WriteRect(bb->uv_);
+        attrBuffer_.WriteColor(bb->color_);
+        attrBuffer_.WriteFloat(bb->rotation_);
+        attrBuffer_.WriteBool(bb->enabled_);
     }
 
     return attrBuffer_.GetBuffer();

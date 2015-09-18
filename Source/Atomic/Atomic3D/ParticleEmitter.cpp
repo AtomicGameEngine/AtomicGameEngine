@@ -402,12 +402,13 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
 
     for (Vector<SharedPtr<Billboard>>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        ret.Push(i->Get()->position_);
-        ret.Push(i->Get()->size_);
-        ret.Push(Vector4(i->Get()->uv_.min_.x_, i->Get()->uv_.min_.y_, i->Get()->uv_.max_.x_, i->Get()->uv_.max_.y_));
-        ret.Push(i->Get()->color_);
-        ret.Push(i->Get()->rotation_);
-        ret.Push(i->Get()->enabled_);
+        Billboard *bb = i->Get();
+        ret.Push(bb->position_);
+        ret.Push(bb->size_);
+        ret.Push(Vector4(bb->uv_.min_.x_, bb->uv_.min_.y_, bb->uv_.max_.x_, bb->uv_.max_.y_));
+        ret.Push(bb->color_);
+        ret.Push(bb->rotation_);
+        ret.Push(bb->enabled_);
     }
 
     return ret;
