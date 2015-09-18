@@ -22,6 +22,7 @@
 
 #include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Atomic3D/CustomGeometry.h>
+#include <Atomic/Atomic3D/BillboardSet.h>
 
 #include "JSAtomic3D.h"
 
@@ -62,6 +63,21 @@ static int CustomGeometry_SetMaterialIndex(duk_context* ctx) {
     return 0;
 }
 
+static int BillboardSet_GetBillboard(duk_context* ctx) 
+{
+    duk_push_this(ctx);
+
+    BillboardSet* billboardSet = js_to_class_instance<BillboardSet>(ctx, -1, 0);
+
+    unsigned index = (unsigned)duk_to_number(ctx, 0);
+    
+    Billboard* billboard = billboardSet->GetBillboard(index);
+
+    js_push_class_object_instance(ctx, billboard, "Billboard");
+
+    return 1;
+}
+
 void jsapi_init_atomic3d(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -74,6 +90,11 @@ void jsapi_init_atomic3d(JSVM* vm)
     js_class_get_prototype(ctx, "Atomic", "CustomGeometry");
     duk_push_c_function(ctx, CustomGeometry_SetMaterialIndex, 2);
     duk_put_prop_string(ctx, -2, "setMaterialIndex");
+    duk_pop(ctx); // pop AObject prototype
+
+    js_class_get_prototype(ctx, "Atomic", "BillboardSet");
+    duk_push_c_function(ctx, BillboardSet_GetBillboard, 1);
+    duk_put_prop_string(ctx, -2, "getBillboard");
     duk_pop(ctx); // pop AObject prototype
 }
 

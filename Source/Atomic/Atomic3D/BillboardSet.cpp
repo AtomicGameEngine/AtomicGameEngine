@@ -58,7 +58,17 @@ const char* faceCameraModeNames[] =
 
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 {
-    return lhs->sortDistance_ > rhs->sortDistance_;
+    return lhs->GetSortDistance() > rhs->GetSortDistance();
+}
+
+Billboard::Billboard() 
+{
+
+}
+
+Billboard::~Billboard() 
+{
+
 }
 
 BillboardSet::BillboardSet(Context* context) :
@@ -134,12 +144,12 @@ void BillboardSet::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
 
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
-        if (!billboards_[i].enabled_)
+        if (!billboards_[i]->enabled_)
             continue;
 
         // Approximate the billboards as spheres for raycasting
-        float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
-        Vector3 center = billboardTransform * billboards_[i].position_;
+        float size = INV_SQRT_TWO * (billboards_[i]->size_.x_ * billboardScale.x_ + billboards_[i]->size_.y_ * billboardScale.y_);
+        Vector3 center = billboardTransform * billboards_[i]->position_;
         Sphere billboardSphere(center, size);
 
         float distance = query.ray_.HitDistance(billboardSphere);
@@ -240,12 +250,14 @@ void BillboardSet::SetNumBillboards(unsigned num)
     // Set default values to new billboards
     for (unsigned i = oldNum; i < num; ++i)
     {
-        billboards_[i].position_ = Vector3::ZERO;
-        billboards_[i].size_ = Vector2::ONE;
-        billboards_[i].uv_ = Rect::POSITIVE;
-        billboards_[i].color_ = Color(1.0f, 1.0f, 1.0f);
-        billboards_[i].rotation_ = 0.0f;
-        billboards_[i].enabled_ = false;
+        SharedPtr<Billboard> bb(new Billboard());
+        bb->position_ = Vector3::ZERO;
+        bb->size_ = Vector2::ONE;
+        bb->uv_ = Rect::POSITIVE;
+        bb->color_ = Color(1.0f, 1.0f, 1.0f);
+        bb->rotation_ = 0.0f;
+        bb->enabled_ = false;
+        billboards_[i] = bb;
     }
 
     bufferSizeDirty_ = true;
@@ -295,7 +307,7 @@ Material* BillboardSet::GetMaterial() const
 
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
-    return index < billboards_.Size() ? &billboards_[index] : (Billboard*)0;
+    return index < billboards_.Size() ? billboards_[index] : (Billboard*)0;
 }
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)
@@ -310,15 +322,16 @@ void BillboardSet::SetBillboardsAttr(const VariantVector& value)
     unsigned numBillboards = index < value.Size() ? value[index++].GetUInt() : 0;
     SetNumBillboards(numBillboards);
 
-    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
+    for (Vector<SharedPtr<Billboard>>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
     {
-        i->position_ = value[index++].GetVector3();
-        i->size_ = value[index++].GetVector2();
+        Billboard *bb = i->Get();
+        bb->position_ = value[index++].GetVector3();
+        bb->size_ = value[index++].GetVector2();
         Vector4 uv = value[index++].GetVector4();
-        i->uv_ = Rect(uv.x_, uv.y_, uv.z_, uv.w_);
-        i->color_ = value[index++].GetColor();
-        i->rotation_ = value[index++].GetFloat();
-        i->enabled_ = value[index++].GetBool();
+        bb->uv_ = Rect(uv.x_, uv.y_, uv.z_, uv.w_);
+        bb->color_ = value[index++].GetColor();
+        bb->rotation_ = value[index++].GetFloat();
+        bb->enabled_ = value[index++].GetBool();
     }
 
     Commit();
@@ -330,14 +343,15 @@ void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
     unsigned numBillboards = buf.ReadVLE();
     SetNumBillboards(numBillboards);
 
-    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<SharedPtr<Billboard>>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        i->position_ = buf.ReadVector3();
-        i->size_ = buf.ReadVector2();
-        i->uv_ = buf.ReadRect();
-        i->color_ = buf.ReadColor();
-        i->rotation_ = buf.ReadFloat();
-        i->enabled_ = buf.ReadBool();
+        Billboard *bb = i->Get();
+        bb->position_ = buf.ReadVector3();
+        bb->size_ = buf.ReadVector2();
+        bb->uv_ = buf.ReadRect();
+        bb->color_ = buf.ReadColor();
+        bb->rotation_ = buf.ReadFloat();
+        bb->enabled_ = buf.ReadBool();
     }
 
     Commit();
@@ -354,14 +368,15 @@ VariantVector BillboardSet::GetBillboardsAttr() const
     ret.Reserve(billboards_.Size() * 6 + 1);
     ret.Push(billboards_.Size());
 
-    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<SharedPtr<Billboard>>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        ret.Push(i->position_);
-        ret.Push(i->size_);
-        ret.Push(Vector4(i->uv_.min_.x_, i->uv_.min_.y_, i->uv_.max_.x_, i->uv_.max_.y_));
-        ret.Push(i->color_);
-        ret.Push(i->rotation_);
-        ret.Push(i->enabled_);
+        Billboard *bb = i->Get();
+        ret.Push(bb->position_);
+        ret.Push(bb->size_);
+        ret.Push(Vector4(bb->uv_.min_.x_, bb->uv_.min_.y_, bb->uv_.max_.x_, bb->uv_.max_.y_));
+        ret.Push(bb->color_);
+        ret.Push(bb->rotation_);
+        ret.Push(bb->enabled_);
     }
 
     return ret;
@@ -372,14 +387,15 @@ const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
     attrBuffer_.Clear();
     attrBuffer_.WriteVLE(billboards_.Size());
 
-    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<SharedPtr<Billboard>>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        attrBuffer_.WriteVector3(i->position_);
-        attrBuffer_.WriteVector2(i->size_);
-        attrBuffer_.WriteRect(i->uv_);
-        attrBuffer_.WriteColor(i->color_);
-        attrBuffer_.WriteFloat(i->rotation_);
-        attrBuffer_.WriteBool(i->enabled_);
+        Billboard *bb = i->Get();
+        attrBuffer_.WriteVector3(bb->position_);
+        attrBuffer_.WriteVector2(bb->size_);
+        attrBuffer_.WriteRect(bb->uv_);
+        attrBuffer_.WriteColor(bb->color_);
+        attrBuffer_.WriteFloat(bb->rotation_);
+        attrBuffer_.WriteBool(bb->enabled_);
     }
 
     return attrBuffer_.GetBuffer();
@@ -395,11 +411,11 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
 
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
-        if (!billboards_[i].enabled_)
+        if (!billboards_[i]->enabled_)
             continue;
 
-        float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
-        Vector3 center = billboardTransform * billboards_[i].position_;
+        float size = INV_SQRT_TWO * (billboards_[i]->size_.x_ * billboardScale.x_ + billboards_[i]->size_.y_ * billboardScale.y_);
+        Vector3 center = billboardTransform * billboards_[i]->position_;
         Vector3 edge = Vector3::ONE * size;
         worldBox.Merge(BoundingBox(center - edge, center + edge));
 
@@ -476,7 +492,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)
     {
-        if (billboards_[i].enabled_)
+        if (billboards_[i]->enabled_)
             ++enabledBillboards;
     }
 
@@ -486,12 +502,12 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     // Then set initial sort order and distances
     for (unsigned i = 0; i < numBillboards; ++i)
     {
-        Billboard& billboard = billboards_[i];
-        if (billboard.enabled_)
+        SharedPtr<Billboard> billboard = billboards_[i];
+        if (billboard->enabled_)
         {
-            sortedBillboards_[index++] = &billboard;
+            sortedBillboards_[index++] = billboard;
             if (sorted_)
-                billboard.sortDistance_ = frame.camera_->GetDistanceSquared(billboardTransform * billboards_[i].position_);
+                billboard->sortDistance_ = frame.camera_->GetDistanceSquared(billboardTransform * billboards_[i]->position_);
         }
     }
 
