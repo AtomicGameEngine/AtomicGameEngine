@@ -1,5 +1,10 @@
 {
 	"name" : "Resource",
 	"sources" : ["Source/Atomic/Resource"],
-	"classes" : ["Resource", "ResourceCache", "XMLFile", "PListFile", "JSONFile", "Image"]
+	"classes" : ["Resource", "ResourceCache", "XMLFile", "PListFile", "JSONFile", "Image"],
+	"overloads": {
+		"Image": {
+			"GetPixel": ["int", "int"]
+		}
+	}
 }

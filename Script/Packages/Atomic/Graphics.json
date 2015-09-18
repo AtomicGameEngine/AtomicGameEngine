@@ -26,7 +26,7 @@
 		],
 		"Light" : [
 			"getShadowCascade():Number[];",
-			"setShadowCascade(args:Number[]);",
+			"setShadowCascade(split1:number, split2:number, split3:number, split4:number, fadeStart:number, biasAutoAdjust?:number);",
 			"setShadowCascadeParameter(index:number, value:number);"
 		]
 
@@ -35,7 +35,7 @@
 	"haxe_decl" : {
 		"Light" : [
 			"function getShadowCascade():Array<Float>;",
-			"function setShadowCascade(args:Array<Float>):Void;",
+			"function setShadowCascade(split1:Float, split2:Float, split3:Float, split4:Float, fadeStart:Float, ?biasAutoAdjust:Float):Void;",
 			"function setShadowCascadeParameter(index:Int, value:Float):Void;"
 		]
 
