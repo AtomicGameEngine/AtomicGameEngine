@@ -43,7 +43,7 @@ void ModelImporter::SetDefaults()
 {
     AssetImporter::SetDefaults();
 
-    scale_ = 1.0f;
+    scale_ = 1.0;
     importAnimations_ = false;
     animationInfo_.Clear();
 
@@ -314,7 +314,7 @@ bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
     SetDefaults();
 
     if (import.Get("scale").IsNumber())
-        scale_ = import.Get("scale").GetFloat();
+        scale_ = import.Get("scale").GetDouble();
 
     if (import.Get("importAnimations").IsBool())
         importAnimations_ = import.Get("importAnimations").GetBool();
