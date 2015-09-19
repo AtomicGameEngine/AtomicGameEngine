@@ -34,6 +34,8 @@ public:
 
 private:
 
+    void GenNativeFunctionSignature(String& sig);
+
     void WriteFunction(String& source);
     void WriteConstructor(String& source);
     void WriteParameterMarshal(String& source);

@@ -45,18 +45,26 @@ bool JSBind::GenerateCSharpBindings()
     String modulesFolder = "Build/Source/Generated/" + platform_ + "/CSharp/Packages/";
     modulesFolder += package_->GetName() + "/";
 
-    String outputFolder = sourceRootFolder_ + "/" + modulesFolder;
+    String nativeOutputFolder = sourceRootFolder_ + "/" + modulesFolder + "Native/";
+    String managedOutputFolder = sourceRootFolder_ + "/" + modulesFolder + "Managed/";
 
     FileSystem* fs = GetSubsystem<FileSystem>();
 
-    if (!fs->CreateDirs(sourceRootFolder_, modulesFolder) || !fs->DirExists(outputFolder))
+    if (!fs->CreateDirs(sourceRootFolder_, modulesFolder + "Native/") || !fs->DirExists(nativeOutputFolder))
     {
-        String error = "Unable to create bindings output folder: " + outputFolder;
+        String error = "Unable to create bindings native output folder: " + nativeOutputFolder;
         ErrorExit(error.CString());
     }
 
-    destScriptFolder_ = outputFolder;
-    destNativeFolder_ = outputFolder;
+    if (!fs->CreateDirs(sourceRootFolder_, modulesFolder + "Managed/") || !fs->DirExists(managedOutputFolder))
+    {
+        String error = "Unable to create bindings managed output folder: " + managedOutputFolder;
+        ErrorExit(error.CString());
+    }
+
+
+    destScriptFolder_ = managedOutputFolder;
+    destNativeFolder_ = nativeOutputFolder;
 
     CSPackageWriter writer(package_);
     package_->GenerateSource(writer);

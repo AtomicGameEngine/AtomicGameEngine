@@ -36,7 +36,6 @@ void JSFunctionWriter::WriteParameterMarshal(String& source)
         {
             JSBFunctionType * ptype = parameters.At(i);
 
-
             // ignore "Context" parameters
             if (ptype->type_->asClassType())
             {
@@ -103,7 +102,6 @@ void JSFunctionWriter::WriteParameterMarshal(String& source)
                     {
                         source.AppendWithFormat("%s __arg%i(arrayData%i);\n", klass->GetNativeName().CString(), cparam, cparam);
                     }
-
 
                 }
 

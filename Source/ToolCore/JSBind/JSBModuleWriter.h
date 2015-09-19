@@ -28,7 +28,6 @@ protected:
     JSBModuleWriter(JSBModule* module);
 
     JSBModule* module_;
-    String source_;
 
 };
 

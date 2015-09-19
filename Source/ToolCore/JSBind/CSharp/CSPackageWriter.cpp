@@ -37,13 +37,6 @@ void CSPackageWriter::GenerateNativeSource()
     file.Open(filepath, FILE_WRITE);
     file.Write(source.CString(), source.Length());
     file.Close();
-
-    for (unsigned i = 0; i < package_->modules_.Size(); i++)
-    {
-        CSModuleWriter writer(package_->modules_[i]);
-        writer.GenerateSource();
-    }
-
 }
 
 void CSPackageWriter::GenerateManagedSource()
@@ -56,6 +49,12 @@ void CSPackageWriter::GenerateSource()
 
     GenerateNativeSource();
     GenerateManagedSource();
+
+    for (unsigned i = 0; i < package_->modules_.Size(); i++)
+    {
+        CSModuleWriter writer(package_->modules_[i]);
+        writer.GenerateSource();
+    }
 
 }
 

@@ -25,7 +25,6 @@ CSClassWriter::CSClassWriter(JSBClass *klass) : JSBClassWriter(klass)
 
 }
 
-
 void CSClassWriter::WriteFunctions(String& source)
 {
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)

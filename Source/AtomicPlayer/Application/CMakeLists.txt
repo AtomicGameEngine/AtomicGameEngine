@@ -52,7 +52,7 @@ else()
       XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES NO
     )
 
-	set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/CMake/Modules/iOSBundleInfo.plist.template)
+    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/CMake/Modules/iOSBundleInfo.plist.template)
 
 endif()
 endif(APPLE)
