@@ -60,6 +60,7 @@ public:
     static bool ContainsConstantAllPackages(const String& constantName);
 
     void GenerateSource(const String& outPath);
+    void GenerateCSharpSource(const String &outPath);
 
 private:
 

@@ -28,6 +28,7 @@ class JSBPrimitiveType;
 class JSBModule : public Object
 {
     friend class JSBModuleWriter;
+    friend class CSBModuleWriter;
 
     OBJECT(JSBModule)
 
@@ -63,6 +64,8 @@ public:
     void PostProcessClasses();
 
     void GenerateSource(const String& outPath);
+    void GenerateCSharpSource(const String& outPath);
+
     const String& GetSource();
 
 private:

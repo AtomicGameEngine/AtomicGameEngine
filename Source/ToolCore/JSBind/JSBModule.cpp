@@ -21,6 +21,8 @@
 #include "JSBModuleWriter.h"
 #include "JSBType.h"
 
+#include "CSharp/CSBModuleWriter.h"
+
 namespace ToolCore
 {
 
@@ -495,5 +497,19 @@ void JSBModule::GenerateSource(const String& outPath)
     file.Write(source_.CString(), source_.Length());
     file.Close();
 }
+
+void JSBModule::GenerateCSharpSource(const String& outPath)
+{
+    CSBModuleWriter writer(this);
+    writer.GenerateSource(source_);
+
+    String filepath = outPath + "/CSModule" + name_ + ".cpp";
+    File file(context_);
+    file.Open(filepath, FILE_WRITE);
+    file.Write(source_.CString(), source_.Length());
+    file.Close();
+
+}
+
 
 }

@@ -32,7 +32,7 @@ void JSBPackageWriter::WriteProtoTypeRecursive(String &source, JSBClass* klass, 
 
     Vector<JSBClass*>::Iterator itr = baseClasses.End() - 1 ;
 
-    while (itr !=baseClasses.Begin() - 1)
+    while (itr != baseClasses.Begin() - 1)
     {
         WriteProtoTypeRecursive(source, (*itr), written);
         itr--;

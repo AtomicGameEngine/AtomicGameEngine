@@ -81,6 +81,7 @@ public:
 class JSBFunction : public JSBSymbol
 {
     friend class JSBFunctionWriter;
+    friend class CSBFunctionWriter;
 
 public:
 

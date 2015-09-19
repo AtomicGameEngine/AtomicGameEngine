@@ -14,7 +14,8 @@
 namespace ToolCore
 {
 
-JSBind::JSBind(Context* context) : Object(context)
+JSBind::JSBind(Context* context) : Object(context),
+    package_(new JSBPackage(context))
 {
 
 }
@@ -24,18 +25,16 @@ JSBind::~JSBind()
 
 }
 
-bool JSBind::GenerateBindings(const String& sourceRootFolder, const String& packageFolder, const String& platform)
+bool JSBind::GenerateCSharpBindings(const String& sourceRootFolder, const String& packageFolder, const String& platform)
 {
     sourceRootFolder_ = sourceRootFolder;
     packageFolder_ = packageFolder;
     platform_ = platform;
 
-    SharedPtr<JSBPackage> package (new JSBPackage(context_));
+    package_->Load(sourceRootFolder_ + packageFolder_);
 
-    package->Load(sourceRootFolder_ + packageFolder_);
-
-    String modulesFolder = "Build/Source/Generated/" + platform + "/Javascript/Packages/";
-    modulesFolder += package->GetName() + "/";
+    String modulesFolder = "Build/Source/Generated/" + platform + "/CSharp/Packages/";
+    modulesFolder += package_->GetName() + "/";
 
     String outputFolder = sourceRootFolder + "/" + modulesFolder;
 
@@ -47,7 +46,32 @@ bool JSBind::GenerateBindings(const String& sourceRootFolder, const String& pack
         ErrorExit(error.CString());
     }
 
-    package->GenerateSource(outputFolder);
+    package_->GenerateCSharpSource(outputFolder);
+
+    return true;
+}
+
+
+bool JSBind::GenerateBindings(const String& sourceRootFolder, const String& packageFolder, const String& platform)
+{
+    sourceRootFolder_ = sourceRootFolder;
+    packageFolder_ = packageFolder;
+    platform_ = platform;
+
+    String modulesFolder = "Build/Source/Generated/" + platform + "/Javascript/Packages/";
+    modulesFolder += package_->GetName() + "/";
+
+    String outputFolder = sourceRootFolder + "/" + modulesFolder;
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (!fs->CreateDirs(sourceRootFolder, modulesFolder) || !fs->DirExists(outputFolder))
+    {
+        String error = "Unable to create bindings output folder: " + outputFolder;
+        ErrorExit(error.CString());
+    }
+
+    package_->GenerateSource(outputFolder);
 
     return true;
 }

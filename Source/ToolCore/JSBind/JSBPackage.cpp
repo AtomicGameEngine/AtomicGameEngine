@@ -14,10 +14,12 @@
 #include "JSBModule.h"
 #include "JSBPackage.h"
 
-#include "JSBPackageWriter.h"
 #include "JSBDoc.h"
-#include "JSBTypeScript.h"
-#include "JSBHaxe.h"
+
+#include "JSBPackageWriter.h" // Atomic JavaScript
+#include "JSBTypeScript.h" // Atomic TypeScript
+#include "JSBHaxe.h" // Atomic Haxe
+#include "CSharp/CSBPackageWriter.h" // Atomic C#
 
 namespace ToolCore
 {
@@ -64,6 +66,24 @@ void JSBPackage::ProcessModules()
         modules_[i]->PostProcessClasses();
     }
 
+}
+
+void JSBPackage::GenerateCSharpSource(const String &outPath)
+{
+    CSBPackageWriter writer(this);
+    writer.GenerateSource(source_);
+
+    String filepath = outPath + "/CSPackage" + name_ + ".cpp";
+
+    File file(context_);
+    file.Open(filepath, FILE_WRITE);
+    file.Write(source_.CString(), source_.Length());
+    file.Close();
+
+    for (unsigned i = 0; i < modules_.Size(); i++)
+    {
+        modules_[i]->GenerateCSharpSource(outPath);
+    }
 }
 
 void JSBPackage::GenerateSource(const String &outPath)
