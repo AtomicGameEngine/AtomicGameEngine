@@ -4,6 +4,9 @@ include(AtomicDesktop)
 
 set (JAVASCRIPT_BINDINGS_PLATFORM "MACOSX")
 
+# only have 32 bit mono installed, fix this
+set (CMAKE_OSX_ARCHITECTURES i386)
+
 add_definitions(-DATOMIC_PLATFORM_OSX -DATOMIC_OPENGL -DKNET_UNIX)
 
 if (CMAKE_GENERATOR STREQUAL "Xcode")
