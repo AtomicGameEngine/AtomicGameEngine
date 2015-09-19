@@ -14,33 +14,33 @@
 #include "../JSBClass.h"
 #include "../JSBFunction.h"
 
-#include "CSBFunctionWriter.h"
+#include "CSFunctionWriter.h"
 
 namespace ToolCore
 {
 
-CSBFunctionWriter::CSBFunctionWriter(JSBFunction *function) : function_(function)
+CSFunctionWriter::CSFunctionWriter(JSBFunction *function) : JSBFunctionWriter(function)
 {
 
 }
 
-void CSBFunctionWriter::WriteParameterMarshal(String& source)
+void CSFunctionWriter::WriteParameterMarshal(String& source)
 {
 
 }
 
 
-void CSBFunctionWriter::WriteConstructor(String& source)
+void CSFunctionWriter::WriteConstructor(String& source)
 {
 
 }
 
-void CSBFunctionWriter::WriteFunction(String& source)
+void CSFunctionWriter::WriteFunction(String& source)
 {
 
 }
 
-void CSBFunctionWriter::GenerateSource(String& sourceOut)
+void CSFunctionWriter::GenerateSource(String& sourceOut)
 {
     String source = "";
 

@@ -22,15 +22,16 @@ class JSBFunctionWriter
 
 public:
 
+    virtual void GenerateSource(String& sourceOut);
+
+protected:
     JSBFunctionWriter(JSBFunction* function);
 
-    void GenerateSource(String& sourceOut);
+protected:
 
-private:
-
-    void WriteFunction(String& source);
-    void WriteConstructor(String& source);
-    void WriteParameterMarshal(String& source);
+    virtual void WriteFunction(String& source);
+    virtual void WriteConstructor(String& source);
+    virtual void WriteParameterMarshal(String& source);
 
     JSBFunction* function_;
 

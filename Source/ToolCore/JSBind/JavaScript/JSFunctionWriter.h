@@ -9,28 +9,30 @@
 
 #include <Atomic/Container/Str.h>
 
+#include "../JSBFunctionWriter.h"
+
 using namespace Atomic;
 
 namespace ToolCore
 {
 
 class JSBPackage;
-class JSBClass;
+class JSBFunction;
 
-class JSBPackageWriter
+class JSFunctionWriter : public JSBFunctionWriter
 {
 
 public:
 
-    virtual void GenerateSource();
+    JSFunctionWriter(JSBFunction* function);
 
-    virtual void PostProcess() {}
+    void GenerateSource(String& sourceOut);
 
-protected:
+private:
 
-    JSBPackageWriter(JSBPackage* package);
-
-    JSBPackage* package_;
+    void WriteFunction(String& source);
+    void WriteConstructor(String& source);
+    void WriteParameterMarshal(String& source);
 
 };
 

@@ -88,8 +88,8 @@ public:
 
 class JSBClass : public Object
 {
-    friend class JSBClassWriter;
-    friend class CSBClassWriter;
+    friend class JSClassWriter;
+    friend class CSClassWriter;
 
     OBJECT(JSBClass)
 

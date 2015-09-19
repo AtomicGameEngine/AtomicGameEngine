@@ -9,30 +9,31 @@
 
 #include <Atomic/Container/Str.h>
 
+#include "../JSBModuleWriter.h"
+
 using namespace Atomic;
 
 namespace ToolCore
 {
 
-class JSBPackage;
-class JSBFunction;
+class JSBModule;
 
-class CSBFunctionWriter
+class CSModuleWriter : public JSBModuleWriter
 {
 
 public:
 
-    CSBFunctionWriter(JSBFunction* function);
+    CSModuleWriter(JSBModule* module);
 
-    void GenerateSource(String& sourceOut);
+    void GenerateSource();
+
+    void GenerateNativeSource();
+    void GenerateManagedSource();
+
 
 private:
 
-    void WriteFunction(String& source);
-    void WriteConstructor(String& source);
-    void WriteParameterMarshal(String& source);
-
-    JSBFunction* function_;
+    void WriteIncludes(String& source);
 
 };
 

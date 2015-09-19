@@ -76,10 +76,14 @@ void BindCmd::Run()
 
     context_->RegisterSubsystem(jsbind);
 
-    LOGINFOF("Generating JS Bindings");
+    LOGINFOF("Loading Package");
+    jsbind->LoadPackage(sourceRootFolder_, packageFolder_, bindPlatform_);
 
-    jsbind->GenerateBindings(sourceRootFolder_, packageFolder_, bindPlatform_);
-    jsbind->GenerateCSharpBindings(sourceRootFolder_, packageFolder_, bindPlatform_);
+    LOGINFOF("Generating JS Bindings");
+    jsbind->GenerateJavaScriptBindings();
+
+    LOGINFOF("Generating C# Bindings");
+    jsbind->GenerateCSharpBindings();
 
     Finished();
 

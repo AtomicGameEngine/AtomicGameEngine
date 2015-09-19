@@ -9,6 +9,8 @@
 
 #include <Atomic/Container/Str.h>
 
+#include "../JSBModuleWriter.h"
+
 using namespace Atomic;
 
 namespace ToolCore
@@ -16,21 +18,24 @@ namespace ToolCore
 
 class JSBModule;
 
-class CSBModuleWriter
+class JSModuleWriter : public JSBModuleWriter
 {
 
 public:
 
-    CSBModuleWriter(JSBModule* module);
+    JSModuleWriter(JSBModule* module);
 
-    void GenerateSource(String& sourceOut);
+    void GenerateSource();
 
 private:
 
     void WriteIncludes(String& source);
+    void WriteForwardDeclarations(String& source);
+    void WriteClassDeclaration(String& source);
 
-    JSBModule* module_;
-    String source_;
+    void WriteClassDefine(String& source);
+    void WriteModulePreInit(String& source);
+    void WriteModuleInit(String& source);
 
 };
 

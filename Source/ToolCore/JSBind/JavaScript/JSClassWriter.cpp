@@ -14,19 +14,19 @@
 #include "../JSBClass.h"
 #include "../JSBFunction.h"
 
-#include "CSBClassWriter.h"
-#include "CSBFunctionWriter.h"
+#include "JSClassWriter.h"
+#include "JSFunctionWriter.h"
 
 namespace ToolCore
 {
 
-CSBClassWriter::CSBClassWriter(JSBClass *klass) : klass_(klass)
+JSClassWriter::JSClassWriter(JSBClass *klass) : JSBClassWriter(klass)
 {
 
 }
 
 
-void CSBClassWriter::WriteFunctions(String& source)
+void JSClassWriter::WriteFunctions(String& source)
 {
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)
     {
@@ -38,13 +38,13 @@ void CSBClassWriter::WriteFunctions(String& source)
         if (function->IsDestructor())
             continue;
 
-        CSBFunctionWriter writer(function);
+        JSFunctionWriter writer(function);
         writer.GenerateSource(source);
     }
 
 }
 
-void CSBClassWriter::GenerateSource(String& sourceOut)
+void JSClassWriter::GenerateSource(String& sourceOut)
 {
     String source = "";
 

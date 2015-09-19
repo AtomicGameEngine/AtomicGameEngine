@@ -21,7 +21,8 @@
 #include "JSBModuleWriter.h"
 #include "JSBType.h"
 
-#include "CSharp/CSBModuleWriter.h"
+#include "JavaScript/JSModuleWriter.h"
+#include "CSharp/CSModuleWriter.h"
 
 namespace ToolCore
 {
@@ -485,31 +486,5 @@ bool JSBModule::Load(const String& jsonFilename)
 
     return true;
 }
-
-void JSBModule::GenerateSource(const String& outPath)
-{
-    JSBModuleWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/JSModule" + name_ + ".cpp";
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
-}
-
-void JSBModule::GenerateCSharpSource(const String& outPath)
-{
-    CSBModuleWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/CSModule" + name_ + ".cpp";
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
-
-}
-
 
 }

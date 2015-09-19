@@ -11,6 +11,9 @@
 #include "JSBPackage.h"
 #include "JSBind.h"
 
+#include "JavaScript/JSPackageWriter.h"
+#include "CSharp/CSPackageWriter.h"
+
 namespace ToolCore
 {
 
@@ -25,7 +28,7 @@ JSBind::~JSBind()
 
 }
 
-bool JSBind::GenerateCSharpBindings(const String& sourceRootFolder, const String& packageFolder, const String& platform)
+bool JSBind::LoadPackage(const String& sourceRootFolder, const String& packageFolder, const String& platform)
 {
     sourceRootFolder_ = sourceRootFolder;
     packageFolder_ = packageFolder;
@@ -33,45 +36,55 @@ bool JSBind::GenerateCSharpBindings(const String& sourceRootFolder, const String
 
     package_->Load(sourceRootFolder_ + packageFolder_);
 
-    String modulesFolder = "Build/Source/Generated/" + platform + "/CSharp/Packages/";
+    return true;
+}
+
+bool JSBind::GenerateCSharpBindings()
+{
+
+    String modulesFolder = "Build/Source/Generated/" + platform_ + "/CSharp/Packages/";
     modulesFolder += package_->GetName() + "/";
 
-    String outputFolder = sourceRootFolder + "/" + modulesFolder;
+    String outputFolder = sourceRootFolder_ + "/" + modulesFolder;
 
     FileSystem* fs = GetSubsystem<FileSystem>();
 
-    if (!fs->CreateDirs(sourceRootFolder, modulesFolder) || !fs->DirExists(outputFolder))
+    if (!fs->CreateDirs(sourceRootFolder_, modulesFolder) || !fs->DirExists(outputFolder))
     {
         String error = "Unable to create bindings output folder: " + outputFolder;
         ErrorExit(error.CString());
     }
 
-    package_->GenerateCSharpSource(outputFolder);
+    destScriptFolder_ = outputFolder;
+    destNativeFolder_ = outputFolder;
+
+    CSPackageWriter writer(package_);
+    package_->GenerateSource(writer);
 
     return true;
 }
 
 
-bool JSBind::GenerateBindings(const String& sourceRootFolder, const String& packageFolder, const String& platform)
+bool JSBind::GenerateJavaScriptBindings()
 {
-    sourceRootFolder_ = sourceRootFolder;
-    packageFolder_ = packageFolder;
-    platform_ = platform;
-
-    String modulesFolder = "Build/Source/Generated/" + platform + "/Javascript/Packages/";
+    String modulesFolder = "Build/Source/Generated/" + platform_ + "/Javascript/Packages/";
     modulesFolder += package_->GetName() + "/";
 
-    String outputFolder = sourceRootFolder + "/" + modulesFolder;
+    String outputFolder = sourceRootFolder_ + "/" + modulesFolder;
 
     FileSystem* fs = GetSubsystem<FileSystem>();
 
-    if (!fs->CreateDirs(sourceRootFolder, modulesFolder) || !fs->DirExists(outputFolder))
+    if (!fs->CreateDirs(sourceRootFolder_, modulesFolder) || !fs->DirExists(outputFolder))
     {
         String error = "Unable to create bindings output folder: " + outputFolder;
         ErrorExit(error.CString());
     }
 
-    package_->GenerateSource(outputFolder);
+    destScriptFolder_ = String::EMPTY;
+    destNativeFolder_ = outputFolder;
+
+    JSPackageWriter writer(package_);
+    package_->GenerateSource(writer);
 
     return true;
 }

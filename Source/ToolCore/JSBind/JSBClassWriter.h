@@ -22,13 +22,13 @@ class JSBClassWriter
 
 public:
 
+    virtual void GenerateSource(String& sourceOut);
+
+protected:
+
     JSBClassWriter(JSBClass* klass);
 
-    void GenerateSource(String& sourceOut);
-
-private:
-
-    void WriteFunctions(String& source);
+    virtual void WriteFunctions(String& source);
 
     JSBClass* klass_;
 

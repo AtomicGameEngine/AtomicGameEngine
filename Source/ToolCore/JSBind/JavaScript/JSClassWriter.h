@@ -9,6 +9,8 @@
 
 #include <Atomic/Container/Str.h>
 
+#include "../JSBClassWriter.h"
+
 using namespace Atomic;
 
 namespace ToolCore
@@ -17,20 +19,18 @@ namespace ToolCore
 class JSBPackage;
 class JSBClass;
 
-class JSBPackageWriter
+class JSClassWriter : public JSBClassWriter
 {
 
 public:
 
-    virtual void GenerateSource();
+    JSClassWriter(JSBClass* klass);
 
-    virtual void PostProcess() {}
+    void GenerateSource(String& sourceOut);
 
-protected:
+private:
 
-    JSBPackageWriter(JSBPackage* package);
-
-    JSBPackage* package_;
+    void WriteFunctions(String& source);
 
 };
 

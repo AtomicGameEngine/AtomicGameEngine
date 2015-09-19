@@ -27,8 +27,8 @@ class JSBPrimitiveType;
 
 class JSBModule : public Object
 {
-    friend class JSBModuleWriter;
-    friend class CSBModuleWriter;
+    friend class JSModuleWriter;
+    friend class CSModuleWriter;
 
     OBJECT(JSBModule)
 
@@ -63,11 +63,6 @@ public:
     void ProcessClasses();
     void PostProcessClasses();
 
-    void GenerateSource(const String& outPath);
-    void GenerateCSharpSource(const String& outPath);
-
-    const String& GetSource();
-
 private:
 
     void ProcessOverloads();
@@ -95,8 +90,6 @@ private:
     Vector<String> requirements_;
 
     SharedPtr<JSONFile> moduleJSON_;
-
-    String source_;
 
 };
 

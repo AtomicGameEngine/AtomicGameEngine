@@ -13,13 +13,7 @@
 #include "JSBind.h"
 #include "JSBModule.h"
 #include "JSBPackage.h"
-
-#include "JSBDoc.h"
-
-#include "JSBPackageWriter.h" // Atomic JavaScript
-#include "JSBTypeScript.h" // Atomic TypeScript
-#include "JSBHaxe.h" // Atomic Haxe
-#include "CSharp/CSBPackageWriter.h" // Atomic C#
+#include "JSBPackageWriter.h"
 
 namespace ToolCore
 {
@@ -68,54 +62,10 @@ void JSBPackage::ProcessModules()
 
 }
 
-void JSBPackage::GenerateCSharpSource(const String &outPath)
+void JSBPackage::GenerateSource(JSBPackageWriter& packageWriter)
 {
-    CSBPackageWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/CSPackage" + name_ + ".cpp";
-
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
-
-    for (unsigned i = 0; i < modules_.Size(); i++)
-    {
-        modules_[i]->GenerateCSharpSource(outPath);
-    }
-}
-
-void JSBPackage::GenerateSource(const String &outPath)
-{
-    JSBPackageWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/JSPackage" + name_ + ".cpp";
-
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
-
-    for (unsigned i = 0; i < modules_.Size(); i++)
-    {
-        modules_[i]->GenerateSource(outPath);
-    }
-
-    JSBind* jsbind = GetSubsystem<JSBind>();
-
-    if (jsbind->GetPlatform() == "MACOSX" || jsbind->GetPlatform() == "WINDOWS" || jsbind->GetPlatform() == "LINUX")
-    {
-        JSBDoc jdoc;
-        jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Artifacts/JSDoc/" + name_ + ".js");
-
-        JSBTypeScript ts;
-        ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");
-
-        JSBHaxe hx;
-        hx.Emit(this, jsbind->GetSourceRootFolder() + "Script/Haxe/" + name_ + ".hx");
-    }
+    packageWriter.GenerateSource();
+    packageWriter.PostProcess();
 }
 
 JSBClass* JSBPackage::GetClass(const String& name)
