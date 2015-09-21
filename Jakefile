@@ -17,6 +17,7 @@ var artifactsFolder = jakeRoot + "/Artifacts";
 var cmakeDevBuild = false;
 
 var includeDeployments = jenkinsBuild;
+
 var deployments = {
   osx: true,
   android: true,
@@ -117,34 +118,53 @@ namespace('clean', function() {
 
 namespace('build', function() {
 
-  task('macosx_atomictool', {
+  task('atomictool', {
     async: true
   }, function() {
 
-    if (!fs.existsSync(macOSXBuildFolder)) {
-      jake.mkdirP(macOSXBuildFolder);
+    if (host == "darwin") {
+
+      if (!fs.existsSync(macOSXBuildFolder)) {
+        jake.mkdirP(macOSXBuildFolder);
+      }
+
+      var cmds = [
+        'cmake ../../ -G Xcode ' + getAtomicDevBuildDefine(),
+        'xcodebuild -target AtomicTool -configuration Release'
+      ]
+
+      process.chdir(macOSXBuildFolder);
+
+      jake.exec(cmds, function() {
+
+        fs.copySync(atomicToolBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicToolBinary));
+        console.log("Built MacOSX AtomicTool");
+        complete();
+      }, {
+        printStdout: true
+      });
+
+  } else {
+
+    if (!fs.existsSync(windowsBuildFolder)) {
+      jake.mkdirP(windowsBuildFolder);
     }
 
-    var cmds = [
-      'cmake ../../ -G Xcode ' + getAtomicDevBuildDefine(),
-      'xcodebuild -target AtomicTool -configuration Release'
-    ]
+    process.chdir(windowsBuildFolder);
 
-    process.chdir(macOSXBuildFolder);
+    jake.exec(jakeRoot + "/Build/Windows/CompileAtomicTool.bat", function() {
 
-    jake.exec(cmds, function() {
-
-      fs.copySync(atomicToolBinary, platformBinariesFolder + "/MacOSX/" + path.basename(atomicToolBinary));
-      console.log("Built MacOSX AtomicTool");
+      fs.copySync(atomicToolBinary, platformBinariesFolder + "/Win32/" + path.basename(atomicToolBinary));
+      console.log("Built Windows AtomicTool");
       complete();
+
     }, {
       printStdout: true
     });
 
+  }
 
-
-
-  }); // end build:macosx_atomictool
+  }); // end build:atomictool
 
   var deps = [];
 
@@ -152,7 +172,7 @@ namespace('build', function() {
 
     if (host == 'darwin') {
 
-      deps = ['macosx_atomictool'];
+      deps = ['atomictool'];
 
       if (deployments.ios)
         deps.push("build:ios");
@@ -276,13 +296,14 @@ namespace('build', function() {
       }
 
       complete();
+
     }, {
       printStdout: true
     });
 
   });
 
-  task('android', ['macosx_atomictool'], {
+  task('android', ['atomictool'], {
     async: true
   }, function() {
 
@@ -294,22 +315,45 @@ namespace('build', function() {
 
     var cmds = [
       atomicToolBinary + " bind " + jakeRoot + " Script/Packages/Atomic/ ANDROID",
-      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ ANDROID",
-      "cmake -DCMAKE_TOOLCHAIN_FILE=" + jakeRoot + "/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../",
-      "make -j4"
-    ]
+      atomicToolBinary + " bind " + jakeRoot + " Script/Packages/AtomicPlayer/ ANDROID"
+    ];
 
-    jake.exec(cmds, function() {
-      fs.copySync(androidPlayerBinary, platformBinariesFolder + "/Android/" + path.basename(androidPlayerBinary));
-      console.log("Built Android Player");
-      complete();
-    }, {
-      printStdout: true
-    });
+    if (host == "darwin") {
+
+      cmds.push("cmake -G \"Unix Makefiles\" -DCMAKE_TOOLCHAIN_FILE=" + jakeRoot + "/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../");
+      cmds.push("make -j4");
+
+      jake.exec(cmds, function() {
+        fs.copySync(androidPlayerBinary, platformBinariesFolder + "/Android/" + path.basename(androidPlayerBinary));
+        console.log("Built Android Player");
+        complete();
+      }, {
+        printStdout: true
+      });
+    } else {
+
+      cmds.push(jakeRoot + "/Build/Windows/CompileAndroid.bat");
+
+      jake.exec(cmds, function() {
+
+        fs.copySync(androidPlayerBinary, platformBinariesFolder + "/Android/" + path.basename(androidPlayerBinary));
+
+        // sneak this in here, need to sort deployments for local dev builds
+        var deployRoot = jakeRoot + "/Data/AtomicEditor/Deployment";
+        fs.copySync(androidPlayerBinary, deployRoot + "/Android/libs/armeabi-v7a/libAtomicPlayer.so");
+
+        console.log("Built Android Player");
+        complete();
+
+      }, {
+        printStdout: true
+      });
+
+    }
 
   });
 
-  task('ios', ['macosx_atomictool', 'ios_deploy'], {
+  task('ios', ['atomictool', 'ios_deploy'], {
     async: true
   }, function() {
 
@@ -345,7 +389,7 @@ namespace('build', function() {
   });
 
 
-  task('web', ['macosx_atomictool'], {
+  task('web', ['atomictool'], {
     async: true
   }, function() {
 
