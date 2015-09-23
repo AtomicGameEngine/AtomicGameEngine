@@ -351,26 +351,70 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
     JSBClass* klass = function_->GetClass();
     JSBPackage* package = klass->GetPackage();
 
-    line = ToString("private static extern IntPtr csb_%s_%s_%s(IntPtr self);\n",
-                    package->GetName().CString(), klass->GetName().CString(), function_->GetName().CString());
+    String returnType = CSTypeHelper::GetNativeTypeString(function_->GetReturnType());
 
-    source += IndentLine(line);
+    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
-    source += "\n";
+    Vector<String> args;
 
-}
+    if (!function_->IsConstructor())
+    {
+        args.Push("IntPtr self");
+    }
 
-void CSFunctionWriter::WriteManagedPInvokeConstructorSignature(String& source)
-{
-    source += "\n";
+    if (parameters.Size())
+    {
+        for (unsigned int i = 0; i < parameters.Size(); i++)
+        {
+            JSBFunctionType* ptype = parameters.At(i);
 
-    String line = "[DllImport (LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
-    source += IndentLine(line);
-    JSBClass* klass = function_->GetClass();
-    JSBPackage* package = klass->GetPackage();
+            // ignore "Context" parameters
+            if (ptype->type_->asClassType())
+            {
+                JSBClassType* classType = ptype->type_->asClassType();
+                JSBClass* klass = classType->class_;
+                if (klass->GetName() == "Context")
+                {
+                    continue;
+                }
 
-    line = ToString("private static extern IntPtr csb_%s_%s_Constructor(IntPtr self);\n",
-                    package->GetName().CString(), klass->GetName().CString());
+                if (klass->IsNumberArray())
+                {
+                    args.Push("ref " + klass->GetName() + " " + ptype->name_);
+                }
+                else
+                {
+                    args.Push("IntPtr " + ptype->name_);
+                }
+            }
+            else
+            {
+                args.Push(CSTypeHelper::GetNativeTypeString(ptype) + " " + ptype->name_);
+            }
+
+        }
+    }
+
+    if (function_->GetReturnType())
+    {
+        if (function_->GetReturnType()->type_->asClassType())
+        {
+            JSBClass* retClass = function_->GetReturnType()->type_->asClassType()->class_;
+            if (retClass->IsNumberArray())
+            {
+                args.Push("ref " + retClass->GetName() + " retValue");
+            }
+
+        }
+    }
+
+    String pstring;
+    pstring.Join(args, ", ");
+
+    String fname = function_->IsConstructor() ? "Constructor" : function_->GetName();
+    line = ToString("private static extern %s csb_%s_%s_%s(%s);\n",
+                    returnType.CString(), package->GetName().CString(), klass->GetName().CString(),
+                    fname.CString(), pstring.CString());
 
     source += IndentLine(line);
 
@@ -412,18 +456,49 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
 void CSFunctionWriter::WriteManagedConstructor(String& source)
 {
     JSBClass* klass = function_->GetClass();
+    JSBPackage* package = klass->GetPackage();
+
+    // wrapping constructor
+
+    String line;
+
+    if (klass->GetName() != "RefCounted")
+    {
+        line = ToString("public %s (IntPtr native) : base (native)\n", klass->GetName().CString());
+        source += IndentLine(line);
+        source += IndentLine("{\n");
+        source += IndentLine("}\n\n");
+    }
 
     String sig;
     GenManagedFunctionParameters(sig);
 
-    String line = ToString("public %s (%s)\n", klass->GetName().CString(), sig.CString());
+    line = ToString("public %s (%s)\n", klass->GetName().CString(), sig.CString());
 
     source += IndentLine(line);
 
-    source += IndentLine("{");
+    source += IndentLine("{\n");
 
+    Indent();
 
-    source+= "\n";
+    source += IndentLine("if (nativeInstance == IntPtr.Zero)");
+    source += IndentLine("{\n");
+
+    Indent();
+
+    String callSig;
+    GenPInvokeCallParameters(callSig);
+
+    line = ToString("nativeInstance = NativeCore.RegisterNative (csb_%s_%s_Constructor(%s), this);\n",
+                     package->GetName().CString(), klass->GetName().CString(), callSig.CString());
+
+    source += IndentLine(line);
+
+    Dedent();
+
+    source += IndentLine("}\n");
+
+    Dedent();
 
     source += IndentLine("}\n");
 }
@@ -580,10 +655,7 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
     else
         WriteManagedFunction(source);
 
-    if (function_->IsConstructor())
-        WriteManagedPInvokeConstructorSignature(source);
-    else
-        WriteManagedPInvokeFunctionSignature(source);
+    WriteManagedPInvokeFunctionSignature(source);
 
     // data marshaller
     if (function_->GetReturnType() && !CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))

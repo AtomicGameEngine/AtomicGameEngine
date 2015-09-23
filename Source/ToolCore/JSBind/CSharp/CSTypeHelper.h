@@ -27,6 +27,9 @@ public:
 
     static String GetManagedPrimitiveType(JSBPrimitiveType* ptype);
 
+    static String GetNativeTypeString(JSBType* type);
+    static String GetNativeTypeString(JSBFunctionType* ftype);
+
     static String GetManagedTypeString(JSBType* type);
     static String GetManagedTypeString(JSBFunctionType* ftype);
 

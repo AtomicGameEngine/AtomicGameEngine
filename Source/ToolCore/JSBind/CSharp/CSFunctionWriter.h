@@ -48,7 +48,6 @@ private:
     void WriteManagedConstructor(String& source);
     void WriteManagedFunction(String& source);
 
-    void WriteManagedPInvokeConstructorSignature(String& source);
     void WriteManagedPInvokeFunctionSignature(String& source);
 
 };

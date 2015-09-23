@@ -36,7 +36,7 @@ String CSTypeHelper::GetManagedTypeString(JSBType* type)
     }
     else if (type->asStringType() || type->asStringHashType())
     {
-        value = "String";
+        value = "string";
     }
     else if (type->asEnumType())
     {
@@ -71,6 +71,51 @@ String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype)
     }
 
     return parameter;
+
+}
+
+String CSTypeHelper::GetNativeTypeString(JSBType* type)
+{
+    String value;
+
+    if (type->asClassType())
+    {
+        JSBClassType* classType = type->asClassType();
+        if (classType->class_->IsNumberArray())
+            value = "void";
+        else
+            value = "IntPtr";
+    }
+    else if (type->asStringType() || type->asStringHashType())
+    {
+        value = "string";
+    }
+    else if (type->asEnumType())
+    {
+        value = type->asEnumType()->enum_->GetName();
+    }
+    else if (type->asPrimitiveType())
+    {
+        value = GetManagedPrimitiveType(type->asPrimitiveType());
+    }
+    else if (type->asVectorType())
+    {
+        JSBVectorType* vectorType = type->asVectorType();
+
+        value = GetManagedTypeString(vectorType->vectorType_) + "[]";
+    }
+
+    return value;
+}
+
+String CSTypeHelper::GetNativeTypeString(JSBFunctionType* ftype)
+{
+    if (!ftype)
+        return "void";
+
+    String value = GetNativeTypeString(ftype->type_);
+
+    return value;
 
 }
 
