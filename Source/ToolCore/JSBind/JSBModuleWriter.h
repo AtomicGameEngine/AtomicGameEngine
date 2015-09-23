@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include <Atomic/Container/Str.h>
-
-using namespace Atomic;
+#include "JSBSourceWriter.h"
 
 namespace ToolCore
 {
 
 class JSBModule;
 
-class JSBModuleWriter
+class JSBModuleWriter : public JSBSourceWriter
 {
 
 public:

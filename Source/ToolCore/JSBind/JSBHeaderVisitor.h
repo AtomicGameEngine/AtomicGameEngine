@@ -406,13 +406,22 @@ public:
             return true;
         }
 
-        if (type->isIntegerType())
+        String value;
+
+        const StringLiteral* init = decl->getInitializer();
+        if (init)
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Int);
+            if (init->chars())
+                value = init->chars();
+        }
+
+        if (type->isIntegerType() || _unsigned)
+        {            
+            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Int, _unsigned);
         }
         else
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Float);
+            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Float);
         }
 
         return true;

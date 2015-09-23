@@ -94,20 +94,15 @@ void CSModuleWriter::GenerateNativeSource()
         source += "#ifdef ATOMIC_3D\n";
     }
 
-    source += "#include <Duktape/duktape.h>\n";
-    source += "#include <AtomicJS/Javascript/JSVM.h>\n";
-    source += "#include <AtomicJS/Javascript/JSAPI.h>\n";
-
     WriteIncludes(source);
+
+    source += "\n#include <AtomicSharp/AtomicSharp.h>\n";
 
     String ns = module_->GetPackage()->GetNamespace();
 
-    if (ns != "Atomic")
-    {
-        source += "\n\nusing namespace " + ns + ";\n\n";
-    }
+    source += "\n\nusing namespace " + ns + ";\n\n";
 
-    source += "\n\nnamespace Atomic\n{\n \n";
+    source += "\n\nextern \"C\" \n{\n \n";
 
     source += "// Begin Class Declarations\n";
 
@@ -144,12 +139,144 @@ void CSModuleWriter::GenerateNativeSource()
 
 }
 
+String CSModuleWriter::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
+{
+    if (ptype->kind_ == JSBPrimitiveType::Bool)
+        return "bool";
+    if (ptype->kind_ == JSBPrimitiveType::Int && ptype->isUnsigned_)
+        return "uint";
+    else if (ptype->kind_ == JSBPrimitiveType::Int)
+        return "int";
+    if (ptype->kind_ == JSBPrimitiveType::Float)
+        return "float";
+
+    return "int";
+}
+
+
+void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
+{
+    Vector<SharedPtr<JSBEnum>> enums = module_->enums_.Values();
+
+    Indent();
+
+    for (unsigned i = 0; i < enums.Size(); i++)
+    {
+        JSBEnum* jenum = enums[i];
+
+        source += "\n";
+        String line = "public enum " + jenum->GetName() + "\n";
+        source += IndentLine(line);
+        source += IndentLine("{\n");
+
+        HashMap<String, String>& values = jenum->GetValues();
+
+        HashMap<String, String>::ConstIterator itr = values.Begin();
+
+        Indent();
+
+        while (itr != values.End())
+        {
+            String name = (*itr).first_;
+            String value = (*itr).second_;
+
+            if (value.Length())
+            {
+                line = name + " = " + value;
+            }
+            else
+            {
+                line = name;
+            }
+
+            itr++;
+
+            if (itr != values.End())
+                line += ",";
+
+            line += "\n";
+
+            source += IndentLine(line);
+
+        }
+
+        source += "\n";
+
+        Dedent();
+
+        source += IndentLine("}\n");
+
+    }
+
+    // constants
+
+    HashMap<String, JSBModule::Constant>& constants = module_->GetConstants();
+
+    if (constants.Size())
+    {
+
+        source += "\n";
+
+        String line = "public static class Constants\n";
+        source += IndentLine(line);
+        source += IndentLine("{\n");
+
+        const Vector<String>& constantsName = constants.Keys();
+
+        Indent();
+
+        for (unsigned i = 0; i < constantsName.Size(); i++)
+        {
+            const String& cname = constantsName.At(i);
+
+            JSBModule::Constant& constant = constants[cname];
+
+            String managedType = GetManagedPrimitiveType(constant.type);
+
+            String value = constant.value;
+            //static const unsigned M_MIN_UNSIGNED = 0x00000000;
+//            /static const unsigned M_MAX_UNSIGNED = 0xffffffff;
+
+            if (value == "M_MAX_UNSIGNED")
+                value = "0xffffffff";
+
+            String line = "public static " + managedType + " " + cname + " = " + value;
+
+            if (managedType == "float" && !line.EndsWith("f"))
+                line += "f";
+
+            line += ";\n";
+
+            source += IndentLine(line);
+
+        }
+
+        Dedent();
+
+        source += "\n";
+        line = "}\n";
+        source += IndentLine(line);
+
+    }
+
+
+    Dedent();
+
+}
+
 void CSModuleWriter::GenerateManagedSource()
 {
-    String source = "// Hello C#!";
+    String source;
+
+    source += "namespace " + module_->GetPackage()->GetName() + "\n";
+    source += "{\n";
+
+    GenerateManagedEnumsAndConstants(source);
+
+    source += "}\n";
+
 
     JSBind* jsbind = module_->GetSubsystem<JSBind>();
-
     String filepath = jsbind->GetDestScriptFolder() + "/CSModule" + module_->name_ + ".cs";
 
     File file(module_->GetContext());

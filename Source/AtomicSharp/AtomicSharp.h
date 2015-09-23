@@ -1,5 +1,4 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,49 +22,33 @@
 
 #pragma once
 
-#include <Atomic/Engine/Application.h>
+#include <Atomic/Core/Context.h>
+#include <Atomic/Core/Object.h>
 
 namespace Atomic
 {
-    class JSVM;
-}
 
-using namespace Atomic;
-
-namespace AtomicPlayer
+class ATOMIC_API AtomicSharp : public Object
 {
 
-class AtomicPlayerApp : public Application
-{
-    OBJECT(AtomicPlayerApp);
+    OBJECT(AtomicSharp);
 
 public:
     /// Construct.
-    AtomicPlayerApp(Context* context);
+    AtomicSharp(Context* context);
+    /// Destruct.
+    virtual ~AtomicSharp();
 
-    /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual void Setup();
-    /// Setup after engine initialization. Load the script and execute its start function.
-    virtual void Start();
-    /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual void Stop();
-
-    int Initialize();
-    bool RunFrame();
-    int Shutdown();
+    /// We access this directly in binding code, where there isn't a context
+    /// to get a reference from
+    static inline Context* GetContext() { return instance_->csContext_; }
 
 private:
 
-    SharedPtr<JSVM> vm_;
+    /// weak local context ref, so avoid recursion in static GetContext call
+    static WeakPtr<Context> csContext_;
 
-    /// Handle reload start of the script file.
-    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
-    /// Handle reload success of the script file.
-    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
-    /// Handle reload failure of the script file.
-    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
-
-    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
+    static WeakPtr<AtomicSharp> instance_;
 
 };
 

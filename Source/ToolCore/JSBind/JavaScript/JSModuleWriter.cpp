@@ -193,12 +193,16 @@ void JSModuleWriter::WriteModulePreInit(String& source)
     {
         JSBEnum* jenum = enums[i];
 
-        Vector<String>& values = jenum->GetValues();
+        HashMap<String, String>& values = jenum->GetValues();
 
-        for (unsigned k = 0; k < values.Size(); k++)
+        HashMap<String, String>::ConstIterator itr = values.Begin();
+
+        while (itr != values.End())
         {
-            source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", values[k].CString());
-            source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",values[k].CString());
+            String name = (*itr).first_;
+            source.AppendWithFormat("duk_push_number(ctx, (double) %s);\n", name.CString());
+            source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n",name.CString());
+            itr++;
         }
     }
     source += "// constants\n";

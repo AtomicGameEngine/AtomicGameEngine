@@ -88,6 +88,7 @@ public:
     virtual ClassID GetClassID() const  = 0;
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
+    /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
     inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
     // ATOMIC END

@@ -247,34 +247,6 @@ void JSFunctionWriter::WriteConstructor(String& source)
     // Constructor
     source.AppendWithFormat("duk_ret_t jsb_constructor_%s(duk_context* ctx)\n{\n", klass->GetName().CString());
 
-    /*
-
-duk_ret_t jsb_constructor_MyJSClass(duk_context* ctx)
-{
-    JSVM* vm = JSVM::GetJSVM(ctx);
-    duk_push_this(ctx);
-    void *ptr = duk_get_heapptr(ctx, -1);
-    duk_pop(ctx);
-
-    if (!vm->GetObjectPtr(ptr, true))
-    {
-        if (!duk_get_top(ctx) || !duk_is_pointer(ctx, 0))
-        {
-            MyJSClass* native = new MyJSClass(JSVM::GetJSVM(ctx)->GetContext());
-            vm->AddObject(ptr, native);
-        }
-        else if (duk_is_pointer(ctx, 0))
-        {
-            vm->AddObject(ptr, (RefCounted*) duk_get_pointer(ctx, 0));
-        }
-    }
-
-    js_constructor_basecall(ctx, "Atomic", "AObject");
-    return 0;
-}
-
-     */
-
     source.Append( "\nJSVM* vm = JSVM::GetJSVM(ctx);\n" \
                    "duk_push_this(ctx);\n" \
                    "void *ptr = duk_get_heapptr(ctx, -1);\n" \

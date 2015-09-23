@@ -30,13 +30,13 @@ public:
     const String& GetName() { return name_; }
     JSBHeader* GetHeader() { return header_; }
 
-    Vector<String>& GetValues() { return values_; }
+    HashMap<String, String>& GetValues() { return values_; }
 
     void SetHeader(JSBHeader* header) { header_ = header; }
 
     void Preprocess();
 
-    void AddValue(const String& value) { values_.Push(value); }
+    void AddValue(const String& name, const String& constantValue = String::EMPTY) { values_[name] = constantValue; }
 
 private:
 
@@ -44,7 +44,7 @@ private:
 
     SharedPtr<JSBModule> module_;
 
-    Vector<String> values_;
+    HashMap<String, String> values_;
 
     JSBHeader* header_;
 

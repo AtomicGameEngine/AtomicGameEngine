@@ -367,7 +367,7 @@ namespace ToolCore
 
     void JSBHaxe::ExportModuleConstants(JSBModule* module)
     {
-        HashMap<String, JSBPrimitiveType*>& constants = module->GetConstants();
+        HashMap<String, JSBModule::Constant>& constants = module->GetConstants();
 
         const Vector<String>& constantsName = constants.Keys();
 
@@ -380,7 +380,9 @@ namespace ToolCore
         {
             const String& cname = constantsName.At(i);
 
-            source_ += "    public static var " + cname + ": " + GetPrimitiveType(constants[cname]) + ";\n";
+            JSBModule::Constant& constant = constants[cname];
+
+            source_ += "    public static var " + cname + ": " + GetPrimitiveType(constant.type) + ";\n";
         }
 
         source_ += "\n";
@@ -398,11 +400,17 @@ namespace ToolCore
             source_ += "@:native(\"Atomic\")\n";
             source_ += "extern enum " + _enum->GetName() + " {\n";
 
-            Vector<String>& values = _enum->GetValues();
+            HashMap<String, String>& values = _enum->GetValues();
 
-            for (unsigned j = 0; j < values.Size(); j++)
+            HashMap<String, String>::ConstIterator itr = values.Begin();
+
+            while (itr != values.End())
             {
-                source_ += "    " + values[j] + ";\n";
+                String name = (*itr).first_;
+
+                source_ += "    " + name + ";\n";
+
+                itr++;
             }
 
             source_ += "}\n";

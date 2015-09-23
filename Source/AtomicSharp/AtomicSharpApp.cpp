@@ -41,6 +41,7 @@
 
 #include <AtomicPlayer/Player.h>
 
+#include "AtomicSharp.h"
 #include "AtomicSharpApp.h"
 
 #include <Atomic/DebugNew.h>
@@ -85,9 +86,9 @@ namespace AtomicPlayer
         engineParameters_["ResourcePaths"] = "AtomicResources";
 #else
         engineParameters_["FullScreen"] = false;
-        engineParameters_["WindowWidth"] = 1280;
-        engineParameters_["WindowHeight"] = 720;
-        engineParameters_["ResourcePaths"] = "/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/CoreData;/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/PlayerData";
+        engineParameters_["WindowWidth"] = 1280 * .55f;
+        engineParameters_["WindowHeight"] = 720 * .55f;
+        engineParameters_["ResourcePaths"] = "/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/CoreData;/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/PlayerData;/Users/josh/Dev/atomic/AtomicExamples/Basic3D/Resources;/Users/josh/Dev/atomic/AtomicExamples/Basic3D/";
 #endif
 
 #if ATOMIC_PLATFORM_WINDOWS
@@ -123,12 +124,32 @@ namespace AtomicPlayer
     {
         Application::Start();
 
+        // Instantiate and register AtomicSharp subsystem
+        context_->RegisterSubsystem(new AtomicSharp(context_));
+
+        // Instantiate and register the Javascript subsystem
+        Javascript* javascript = new Javascript(context_);
+        context_->RegisterSubsystem(javascript);
+
+        vm_ = javascript->InstantiateVM("MainVM");
+        vm_->InitJSContext();
+
         UI* ui = GetSubsystem<UI>();
         ui->Initialize("DefaultUI/language/lng_en.tb.txt");
         ui->LoadDefaultPlayerSkin();
 
+        vm_->SetModuleSearchPaths("Modules");
+
         // Instantiate and register the Player subsystem
         context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
+        AtomicPlayer::jsapi_init_atomicplayer(vm_);
+
+        JSVM* vm = JSVM::GetJSVM(0);
+
+        if (!vm->ExecuteMain())
+        {
+            SendEvent(E_EXITREQUESTED);
+        }
 
 
         return;
@@ -235,6 +256,14 @@ static SharedPtr<Atomic::Context> sContext;
 static SharedPtr<AtomicPlayer::AtomicPlayerApp> sApplication;
 
 extern "C" {
+
+void atomicsharp_hrmph(Vector3* in, Vector3* out)
+{
+    out->x_ = in->x_ + 1;
+    out->y_ = in->y_ + 2;
+    out->z_ = in->z_ + 3;
+
+}
 
 int atomicsharp_initialize()
 {

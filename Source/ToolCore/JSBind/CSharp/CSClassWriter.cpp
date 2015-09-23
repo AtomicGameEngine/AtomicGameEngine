@@ -50,6 +50,9 @@ void CSClassWriter::GenerateSource(String& sourceOut)
     if (klass_->IsNumberArray())
         return;
 
+    source.AppendWithFormat("ClassID csb_%s_GetClassID()\n{\n", klass_->GetNativeName().CString());
+    source.AppendWithFormat("return %s::GetClassIDStatic();\n}\n", klass_->GetNativeName().CString());
+
     WriteFunctions(source);
 
     sourceOut += source;

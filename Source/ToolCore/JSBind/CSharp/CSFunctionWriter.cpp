@@ -16,6 +16,84 @@
 
 #include "CSFunctionWriter.h"
 
+/*
+ *
+ C# getters/setters
+ local instance storage so we're not constantly creating managed Vector3, etc
+ Vector2/Vector3/BoundingBox, etc C# structs so assign by value
+ Object lifetime
+
+ C# enum of module types for type info?
+ C# version of push class instance?
+
+ new instance from C# needs constructor
+ wrapping does not, wrapping doesn't use constructors at all (JS needs this for prototype)
+
+ Store GCHandle to keep an object alive (Component, UI) C# side?
+
+ typedef const void* ClassID;
+ which changed based on address, so need register at startup
+ so at package startup time, need to setup mapping between
+ IntPtr and C# class, we also need to be able to new a class
+ instance with existing native or create a native when new'ing from C#
+
+ IntPtr to RefCounted native side is the "ID", like JSHeapPtr
+
+ Lifetime:
+
+ // you cannot derive from native engine classes, other than script components
+
+ a C# instance can be new'd, handed to native, stored in native, the C# side could be GC'd
+ future access to this instance would be a new instance
+
+*/
+
+
+/*
+
+// struct marshal Vector2, Vector3, BoundingBox, etc
+// RefCounted*
+// primitive bool, int, uint, float, double
+// String
+
+RefCounted* csb_Node_Constructor()
+{
+    return new Node(AtomicSharp::GetContext());
+}
+
+void csb_Node_GetPosition(Node* self, Vector3* out)
+{
+    *out = self->GetPosition();
+}
+
+void csb_Node_SetPosition(Node* self, Vector3*__arg0)
+{
+    self->SetPosition(*__arg0);
+}
+
+void csb_Node_SetPosition(Node* self, Vector3*__arg0)
+{
+    self->SetPosition(*__arg0);
+}
+
+bool csb_Audio_Play(Audio* self)
+{
+    bool retValue = self->Play();
+    return retValue;
+}
+
+const RefCounted* csb_Node_GetParent(Node* self)
+{
+    const RefCounted* retValue = self->GetParent();
+    return RefCounted;
+}
+
+RefCounted* csb_ObjectAnimation_Constructor()
+{
+    return new ObjectAnimation(AtomicSharp::GetContext());
+}
+
+*/
 namespace ToolCore
 {
 
@@ -31,6 +109,25 @@ void CSFunctionWriter::WriteParameterMarshal(String& source)
 
 void CSFunctionWriter::WriteConstructor(String& source)
 {
+    JSBClass* klass = function_->class_;
+
+    if (klass->IsAbstract())
+        return;
+
+    // just object for now, as constructor takes a context
+    if (!klass->IsObject())
+        return;
+
+    // more than context arg, don't marshal yet
+    if (function_->GetParameters().Size() > 1)
+    {
+        return;
+    }
+
+
+    source.AppendWithFormat("RefCounted* csb_%s_Constructor()\n{\nreturn new %s(AtomicSharp::GetContext());\n}\n",
+                            klass->GetName().CString(), klass->GetNativeName().CString());
+
 
 }
 
@@ -137,7 +234,7 @@ void CSFunctionWriter::WriteFunction(String& source)
     {
         if (returnType->type_->asStringType())
         {
-            rTypeString = "String";
+            rTypeString = "const String&";
         }
         else if (returnType->type_->asPrimitiveType())
         {
@@ -186,7 +283,7 @@ void CSFunctionWriter::WriteFunction(String& source)
 
 
 
-    source.AppendWithFormat("%s csb_%s_%s(%s* self%s)\n{\n", rTypeString == "String" ? "const char*" : rTypeString.CString(), klass->GetName().CString(),
+    source.AppendWithFormat("%s csb_%s_%s(%s* self%s)\n{\n", rTypeString == "const String&" ? "const char*" : rTypeString.CString(), klass->GetName().CString(),
                             function_->name_.CString(), klass->GetNativeName().CString(), sig.Length() ? (", " + sig).CString() : "");
 
     if (rTypeString != "void")
@@ -215,7 +312,7 @@ void CSFunctionWriter::WriteFunction(String& source)
 
     if (rTypeString != "void")
     {
-        if (rTypeString == "String")
+        if (rTypeString == "const String&")
             source.AppendWithFormat("\nreturn retValue.CString();\n");
         else
             source.AppendWithFormat("\nreturn retValue;\n");

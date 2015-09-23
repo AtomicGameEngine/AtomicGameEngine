@@ -33,6 +33,10 @@ public:
 
 private:
 
+    String GetManagedPrimitiveType(JSBPrimitiveType* ptype);
+    void GenerateManagedEnumsAndConstants(String& source);
+
+
     void WriteIncludes(String& source);
 
 };

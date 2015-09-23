@@ -276,11 +276,17 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         source_ += "\n   // enum " + _enum->GetName() + "\n";
         source_ += "   export type " + _enum->GetName() + " = number;\n";
 
-        Vector<String>& values = _enum->GetValues();
+        HashMap<String, String>& values = _enum->GetValues();
 
-        for (unsigned j = 0; j < values.Size(); j++)
+        HashMap<String, String>::ConstIterator itr = values.Begin();
+
+        while (itr != values.End())
         {
-            source_ += "   export var " + values[j] + ": " +  _enum->GetName() + ";\n";
+            String name = (*itr).first_;
+
+            source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
+
+            itr++;
         }
 
         source_ += "\n";
