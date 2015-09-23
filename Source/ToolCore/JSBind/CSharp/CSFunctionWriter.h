@@ -28,17 +28,28 @@ public:
 
     void GenerateSource(String& sourceOut);
 
-    void GenerateNativeSource();
-    void GenerateManagedSource();
+    void GenerateNativeSource(String& sourceOut);
+    void GenerateManagedSource(String& sourceOut);
 
 
 private:
 
     void GenNativeFunctionSignature(String& sig);
 
-    void WriteFunction(String& source);
-    void WriteConstructor(String& source);
-    void WriteParameterMarshal(String& source);
+    void WriteNativeFunction(String& source);
+    void WriteNativeConstructor(String& source);
+    void WriteNativeParameterMarshal(String& source);
+
+
+    void GenManagedFunctionParameters(String& sig);
+
+    void GenPInvokeCallParameters(String& sig);
+
+    void WriteManagedConstructor(String& source);
+    void WriteManagedFunction(String& source);
+
+    void WriteManagedPInvokeConstructorSignature(String& source);
+    void WriteManagedPInvokeFunctionSignature(String& source);
 
 };
 

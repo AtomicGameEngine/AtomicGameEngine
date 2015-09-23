@@ -115,7 +115,7 @@ void CSModuleWriter::GenerateNativeSource()
     for (unsigned i = 0; i < classes.Size(); i++)
     {
         CSClassWriter clsWriter(classes[i]);
-        clsWriter.GenerateSource(source);
+        clsWriter.GenerateNativeSource(source);
     }
 
     source += "// End Classes\n\n";
@@ -153,6 +153,24 @@ String CSModuleWriter::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
     return "int";
 }
 
+void CSModuleWriter::GenerateManagedClasses(String& source)
+{
+
+    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+
+    for (unsigned i = 0; i < classes.Size(); i++)
+    {
+        JSBClass* klass = classes.At(i);
+
+        if (klass->IsNumberArray())
+            continue;
+
+        CSClassWriter clsWriter(klass);
+        clsWriter.GenerateManagedSource(source);
+
+    }
+
+}
 
 void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
 {
@@ -200,8 +218,6 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
 
         }
 
-        source += "\n";
-
         Dedent();
 
         source += IndentLine("}\n");
@@ -240,7 +256,7 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
             if (value == "M_MAX_UNSIGNED")
                 value = "0xffffffff";
 
-            String line = "public static " + managedType + " " + cname + " = " + value;
+            String line = "public static const " + managedType + " " + cname + " = " + value;
 
             if (managedType == "float" && !line.EndsWith("f"))
                 line += "f";
@@ -272,6 +288,7 @@ void CSModuleWriter::GenerateManagedSource()
     source += "{\n";
 
     GenerateManagedEnumsAndConstants(source);
+    GenerateManagedClasses(source);
 
     source += "}\n";
 

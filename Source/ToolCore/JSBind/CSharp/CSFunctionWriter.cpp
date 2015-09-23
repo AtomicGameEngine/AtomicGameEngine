@@ -14,6 +14,7 @@
 #include "../JSBClass.h"
 #include "../JSBFunction.h"
 
+#include "CSTypeHelper.h"
 #include "CSFunctionWriter.h"
 
 /*
@@ -102,12 +103,12 @@ CSFunctionWriter::CSFunctionWriter(JSBFunction *function) : JSBFunctionWriter(fu
 
 }
 
-void CSFunctionWriter::WriteParameterMarshal(String& source)
+void CSFunctionWriter::WriteNativeParameterMarshal(String& source)
 {
 
 }
 
-void CSFunctionWriter::WriteConstructor(String& source)
+void CSFunctionWriter::WriteNativeConstructor(String& source)
 {
     JSBClass* klass = function_->class_;
 
@@ -216,7 +217,7 @@ void CSFunctionWriter::GenNativeFunctionSignature(String& sig)
 
 }
 
-void CSFunctionWriter::WriteFunction(String& source)
+void CSFunctionWriter::WriteNativeFunction(String& source)
 {
     JSBClass* klass = function_->class_;
 
@@ -322,20 +323,298 @@ void CSFunctionWriter::WriteFunction(String& source)
 
 }
 
-void CSFunctionWriter::GenerateSource(String& sourceOut)
+void CSFunctionWriter::GenerateNativeSource(String& sourceOut)
 {
     String source = "";
 
     if (function_->IsConstructor())
     {
-        WriteConstructor(source);
+        WriteNativeConstructor(source);
     }
     else
     {
-        WriteFunction(source);
+        WriteNativeFunction(source);
     }
 
     sourceOut += source;
+
+}
+
+// MANAGED----------------------------------------------------------------------------------------
+
+void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
+{
+    source += "\n";
+
+    String line = "[DllImport (LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
+    source += IndentLine(line);
+    JSBClass* klass = function_->GetClass();
+    JSBPackage* package = klass->GetPackage();
+
+    line = ToString("private static extern IntPtr csb_%s_%s_%s(IntPtr self);\n",
+                    package->GetName().CString(), klass->GetName().CString(), function_->GetName().CString());
+
+    source += IndentLine(line);
+
+    source += "\n";
+
+}
+
+void CSFunctionWriter::WriteManagedPInvokeConstructorSignature(String& source)
+{
+    source += "\n";
+
+    String line = "[DllImport (LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
+    source += IndentLine(line);
+    JSBClass* klass = function_->GetClass();
+    JSBPackage* package = klass->GetPackage();
+
+    line = ToString("private static extern IntPtr csb_%s_%s_Constructor(IntPtr self);\n",
+                    package->GetName().CString(), klass->GetName().CString());
+
+    source += IndentLine(line);
+
+    source += "\n";
+
+}
+
+
+void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
+{
+    // generate args
+    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
+    if (parameters.Size())
+    {
+        for (unsigned int i = 0; i < parameters.Size(); i++)
+        {
+            JSBFunctionType* ptype = parameters.At(i);
+
+            // ignore "Context" parameters
+            if (ptype->type_->asClassType())
+            {
+                JSBClassType* classType = ptype->type_->asClassType();
+                JSBClass* klass = classType->class_;
+                if (klass->GetName() == "Context")
+                {
+                    continue;
+                }
+            }
+
+            sig += CSTypeHelper::GetManagedTypeString(ptype);
+
+            if (i + 1 != parameters.Size())
+                sig += ", ";
+        }
+    }
+}
+
+void CSFunctionWriter::WriteManagedConstructor(String& source)
+{
+    JSBClass* klass = function_->GetClass();
+
+    String sig;
+    GenManagedFunctionParameters(sig);
+
+    String line = ToString("public %s (%s)\n", klass->GetName().CString(), sig.CString());
+
+    source += IndentLine(line);
+
+    source += IndentLine("{");
+
+
+    source+= "\n";
+
+    source += IndentLine("}\n");
+}
+
+void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
+{
+    // generate args
+    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
+    if (parameters.Size())
+    {
+        for (unsigned int i = 0; i < parameters.Size(); i++)
+        {
+            JSBFunctionType* ptype = parameters.At(i);
+
+            // ignore "Context" parameters
+            if (ptype->type_->asClassType())
+            {
+                JSBClassType* classType = ptype->type_->asClassType();
+                JSBClass* klass = classType->class_;
+                if (klass->GetName() == "Context")
+                {
+                    continue;
+                }
+            }
+
+            if (ptype->type_->asClassType())
+            {
+                JSBClass* pclass = ptype->type_->asClassType()->class_;
+                if (pclass->IsNumberArray())
+                {
+                    sig += "ref " + ptype->name_;
+                }
+                else
+                {
+                    sig += ptype->name_ + " == null ? IntPtr.Zero : " + ptype->name_+ ".nativeInstance";
+                }
+
+            }
+            else
+            {
+                sig += ptype->name_;
+            }
+
+            if (i + 1 != parameters.Size())
+                sig += ", ";
+        }
+    }
+
+    // data marshaller
+    if (function_->GetReturnType() && !CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
+    {
+        if (function_->GetReturnType()->type_->asClassType()->class_->IsNumberArray())
+        {
+            if (sig.Length())
+                sig += ", ";
+
+            JSBClass* klass = function_->GetClass();
+            sig += ToString("ref %s%sReturnValue", klass->GetName().CString(), function_->GetName().CString());
+        }
+    }
+
+
+}
+
+void CSFunctionWriter::WriteManagedFunction(String& source)
+{
+    JSBClass* klass = function_->GetClass();
+    JSBPackage* package = klass->GetPackage();
+
+    String sig;
+    String returnType = CSTypeHelper::GetManagedTypeString(function_->GetReturnType());
+
+    GenManagedFunctionParameters(sig);
+
+    String line = ToString("public %s %s (%s)\n", returnType.CString(), function_->GetName().CString(), sig.CString());
+
+    source += IndentLine(line);
+
+    source += IndentLine("{\n");
+
+    Indent();
+
+    line.Clear();
+
+    if (function_->GetReturnType())
+    {
+        if (CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
+            line += "return ";
+        else
+        {
+            if (function_->GetReturnType()->type_->asClassType())
+            {
+                if (!function_->GetReturnType()->type_->asClassType()->class_->IsNumberArray())
+                    line += "IntPtr retNativeInstance = ";
+            }
+        }
+    }
+
+    String callSig;
+    GenPInvokeCallParameters(callSig);
+
+    line += ToString("csb_%s_%s_%s(nativeInstance",
+                     package->GetName().CString(), klass->GetName().CString(), function_->GetName().CString());
+
+    if (callSig.Length())
+    {
+        line += ", " + callSig;
+    }
+
+    line += ");\n";
+
+    source += IndentLine(line);
+
+    if (function_->GetReturnType() && !CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
+    {
+        if (function_->GetReturnType()->type_->asClassType())
+        {
+            JSBClass* retClass = function_->GetReturnType()->type_->asClassType()->class_;
+            JSBClass* klass = function_->GetClass();
+
+            if (retClass->IsNumberArray())
+            {
+                line = ToString("return %s%sReturnValue;", klass->GetName().CString(), function_->GetName().CString());
+            }
+            else
+            {
+                line = ToString("return retNativeInstance == IntPtr.Zero ? null :  NativeCore.WrapNative<%s> (retNativeInstance);", retClass->GetName().CString());
+            }
+
+            source += IndentLine(line);
+        }
+    }
+
+    source+= "\n";
+
+    Dedent();
+
+    source += IndentLine("}\n");
+
+}
+
+void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
+{
+
+    String source = "";
+
+    Indent();
+    Indent();
+    Indent();
+
+    if (function_->IsConstructor())
+        WriteManagedConstructor(source);
+    else
+        WriteManagedFunction(source);
+
+    if (function_->IsConstructor())
+        WriteManagedPInvokeConstructorSignature(source);
+    else
+        WriteManagedPInvokeFunctionSignature(source);
+
+    // data marshaller
+    if (function_->GetReturnType() && !CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
+    {
+        if (function_->GetReturnType()->type_->asClassType())
+        {
+            JSBClass* retClass = function_->GetReturnType()->type_->asClassType()->class_;
+            if (retClass->IsNumberArray())
+            {
+                JSBClass* klass = function_->GetClass();
+                String managedType = CSTypeHelper::GetManagedTypeString(function_->GetReturnType());
+                String marshal = "private " + managedType + " ";
+
+                marshal += ToString("%s%sReturnValue = new %s();\n", klass->GetName().CString(), function_->GetName().CString(), managedType.CString());
+
+                sourceOut += IndentLine(marshal);
+            }
+        }
+
+    }
+
+    Dedent();
+    Dedent();
+    Dedent();
+
+    sourceOut += source;
+}
+
+
+void CSFunctionWriter::GenerateSource(String& sourceOut)
+{
 
 }
 

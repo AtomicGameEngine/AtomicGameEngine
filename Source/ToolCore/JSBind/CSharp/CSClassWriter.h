@@ -28,13 +28,13 @@ public:
 
     void GenerateSource(String& sourceOut);
 
-    void GenerateNativeSource();
-    void GenerateManagedSource();
+    void GenerateNativeSource(String& sourceOut);
+    void GenerateManagedSource(String& sourceOut);
 
 private:
 
-    void WriteFunctions(String& source);
-
+    void WriteNativeFunctions(String& source);
+    void WriteManagedFunctions(String& source);
 };
 
 }
