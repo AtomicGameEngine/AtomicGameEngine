@@ -158,6 +158,12 @@ namespace AtomicPlayer
     void AtomicPlayerApp::Stop()
     {
 
+        vm_ = 0;
+        context_->RemoveSubsystem<Javascript>();
+        // make sure JSVM is really down and no outstanding refs
+        // as if not, will hold on engine subsystems, which is bad
+        assert(!JSVM::GetJSVM(0));
+
         Application::Stop();
 
 

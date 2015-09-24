@@ -337,6 +337,9 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 
     String returnType = CSTypeHelper::GetPInvokeTypeString(function_->GetReturnType());
 
+    if (returnType == "string")
+        returnType = "IntPtr";
+
     if (function_->IsConstructor())
         returnType = "IntPtr";
 
@@ -584,7 +587,11 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
 
     if (function_->GetReturnType())
     {
-        if (CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
+        if (function_->GetReturnType()->type_->asStringType() || function_->GetReturnType()->type_->asStringHashType())
+        {
+            line += "return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(";
+        }
+        else if (CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
             line += "return ";
         else
         {
@@ -605,6 +612,12 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
     if (callSig.Length())
     {
         line += ", " + callSig;
+    }
+
+    if (function_->GetReturnType())
+    {
+        if (function_->GetReturnType()->type_->asStringType() || function_->GetReturnType()->type_->asStringHashType())
+            line += ")";
     }
 
     line += ");\n";
