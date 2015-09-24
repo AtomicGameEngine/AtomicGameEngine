@@ -83,6 +83,8 @@ public:
         case Short:
             return "short";
         case Int:
+            if (isUnsigned_)
+                return "unsigned";
             return "int";
         case Long:
             return "long";

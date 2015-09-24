@@ -35,6 +35,7 @@ private:
 
     String GetManagedPrimitiveType(JSBPrimitiveType* ptype);
 
+    void GenerateManagedModuleClass(String& sourceOut);
     void GenerateManagedClasses(String& source);
     void GenerateManagedEnumsAndConstants(String& source);
 

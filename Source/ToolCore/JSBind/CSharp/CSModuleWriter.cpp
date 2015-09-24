@@ -275,9 +275,68 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
 
     }
 
+    source += "\n";
 
     Dedent();
 
+}
+
+void CSModuleWriter::GenerateManagedModuleClass(String& sourceOut)
+{
+    Indent();
+
+    String source;
+    String line = ToString("public static partial class %sModule\n", module_->GetName().CString());
+
+    source += IndentLine(line);
+
+    source += IndentLine("{\n");
+
+    Indent();
+
+    source += IndentLine("public static void Initialize()\n");
+
+    source += IndentLine("{\n");
+
+    Indent();
+
+    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+
+    for (unsigned i = 0; i < classes.Size(); i++)
+    {
+        JSBClass* klass = classes.At(i);
+        JSBPackage* package = module_->GetPackage();
+
+        if (klass->IsNumberArray() || klass->IsAbstract())
+            continue;
+
+
+        line = ToString("NativeCore.nativeClassIDToManagedConstructor [ %s.csb_%s_%s_GetClassID ()] = (IntPtr x) => {\n",
+                        klass->GetName().CString(), package->GetName().CString(), klass->GetName().CString());
+
+        source += IndentLine(line);
+
+        Indent();
+
+        source += IndentLine(ToString("return new %s (x);\n", klass->GetName().CString()));
+
+        Dedent();
+
+        source += IndentLine("};\n");
+
+    }
+
+    Dedent();
+
+    source += IndentLine("}\n");
+
+    Dedent();
+
+    source += IndentLine("}\n");
+
+    sourceOut += source;
+
+    Dedent();
 }
 
 void CSModuleWriter::GenerateManagedSource()
@@ -294,6 +353,7 @@ void CSModuleWriter::GenerateManagedSource()
     source += "{\n";
 
     GenerateManagedEnumsAndConstants(source);
+    GenerateManagedModuleClass(source);
     GenerateManagedClasses(source);
 
     source += "}\n";

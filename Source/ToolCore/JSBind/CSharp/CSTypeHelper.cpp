@@ -66,7 +66,17 @@ String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype, bool addName)
     if (ftype->name_.Length())
     {
         if (addName)
-            parameter += " " + ftype->name_;
+        {
+            if (ftype->name_ == "object")
+            {
+                parameter += " _object";
+            }
+            else
+            {
+                parameter += " " + ftype->name_;
+            }
+
+        }
 
         /*
         if (ftype->initializer_.Length())
@@ -79,6 +89,51 @@ String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype, bool addName)
 }
 
 String CSTypeHelper::GetNativeTypeString(JSBType* type)
+{
+    String value;
+
+    if (type->asClassType())
+    {
+        JSBClassType* classType = type->asClassType();
+        if (classType->class_->IsNumberArray())
+            value = ToString("%s*", classType->class_->GetNativeName().CString());
+    }
+    else if (type->asStringType())
+    {
+        value = "const char*";
+    }
+    else if (type->asStringHashType())
+    {
+        value = "const char*";
+    }
+    else if (type->asEnumType())
+    {
+        value = type->asEnumType()->enum_->GetName();
+    }
+    else if (type->asPrimitiveType())
+    {
+        value = type->asPrimitiveType()->ToString();
+    }
+    else if (type->asVectorType())
+    {
+        assert(0);
+    }
+
+    return value;
+}
+
+String CSTypeHelper::GetNativeTypeString(JSBFunctionType* ftype)
+{
+    if (!ftype)
+        return "void";
+
+    String value = GetNativeTypeString(ftype->type_);
+
+    return value;
+
+}
+
+String CSTypeHelper::GetPInvokeTypeString(JSBType* type)
 {
     String value;
 
@@ -112,12 +167,12 @@ String CSTypeHelper::GetNativeTypeString(JSBType* type)
     return value;
 }
 
-String CSTypeHelper::GetNativeTypeString(JSBFunctionType* ftype)
+String CSTypeHelper::GetPInvokeTypeString(JSBFunctionType* ftype)
 {
     if (!ftype)
         return "void";
 
-    String value = GetNativeTypeString(ftype->type_);
+    String value = GetPInvokeTypeString(ftype->type_);
 
     return value;
 

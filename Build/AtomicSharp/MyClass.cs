@@ -7,20 +7,40 @@ namespace AtomicSharp
 
 	public class MyClass
 	{
-		void DoSomething()
+		Light CreateLight()
 		{
 			var light = new Light ();
-			light.SetLightType(LightType.
+			light.LightType = LightType.LIGHT_DIRECTIONAL;
+			return light;
 		}
 	}
 
+	public static class AtomicSharp
+	{
+		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
+		private static extern int atomicsharp_initialize ();
+
+		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
+		private static extern bool atomicsharp_runframe ();
 
 
-	
+		public static bool RunFrame()
+		{
+			return atomicsharp_runframe ();
+		}
 
+		public static void Initialize()
+		{
+			ContainerModule.Initialize ();
+			CoreModule.Initialize ();
+			IOModule.Initialize ();
+			ResourceModule.Initialize ();
+			GraphicsModule.Initialize ();
+			SceneModule.Initialize ();		
 
-
-
+			atomicsharp_initialize ();
+		}
+	}
 
 	public static partial class Constants
 	{

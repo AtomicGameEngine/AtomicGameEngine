@@ -34,6 +34,7 @@ public:
 
 private:
 
+    void GenNativeCallParameters(String& sig);
     void GenNativeFunctionSignature(String& sig);
 
     void WriteNativeFunction(String& source);

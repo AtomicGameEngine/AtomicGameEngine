@@ -18,6 +18,7 @@ namespace ToolCore
 
 class JSBPackage;
 class JSBClass;
+class JSBFunction;
 
 class CSClassWriter : public JSBClassWriter
 {
@@ -33,6 +34,7 @@ public:
 
 private:
 
+    bool OmitFunction(JSBFunction* function);
 
     void WriteNativeFunctions(String& source);
 

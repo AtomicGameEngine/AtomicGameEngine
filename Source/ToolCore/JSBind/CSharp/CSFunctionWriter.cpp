@@ -110,39 +110,22 @@ void CSFunctionWriter::WriteNativeParameterMarshal(String& source)
 
 void CSFunctionWriter::WriteNativeConstructor(String& source)
 {
-    JSBClass* klass = function_->class_;
-
-    if (klass->IsAbstract())
-        return;
-
-    // just object for now, as constructor takes a context
-    if (!klass->IsObject())
-        return;
-
-    // more than context arg, don't marshal yet
-    if (function_->GetParameters().Size() > 1)
-    {
-        return;
-    }
-
-
-    source.AppendWithFormat("RefCounted* csb_%s_Constructor()\n{\nreturn new %s(AtomicSharp::GetContext());\n}\n",
-                            klass->GetName().CString(), klass->GetNativeName().CString());
-
 
 }
 
-void CSFunctionWriter::GenNativeFunctionSignature(String& sig)
+void CSFunctionWriter::GenNativeCallParameters(String& sig)
 {
-    // generate args
+    JSBClass* klass = function_->GetClass();
+
     Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
-    int cparam = 0;
+    Vector<String> args;
+
     if (parameters.Size())
     {
-        for (unsigned int i = 0; i < parameters.Size(); i++, cparam++)
+        for (unsigned int i = 0; i < parameters.Size(); i++)
         {
-            JSBFunctionType * ptype = parameters.At(i);
+            JSBFunctionType* ptype = parameters.At(i);
 
             // ignore "Context" parameters
             if (ptype->type_->asClassType())
@@ -151,175 +134,183 @@ void CSFunctionWriter::GenNativeFunctionSignature(String& sig)
                 JSBClass* klass = classType->class_;
                 if (klass->GetName() == "Context")
                 {
-                    cparam--;
                     continue;
                 }
-            }
 
-            String pstring = ptype->ToArgString(cparam);
-
-            if (ptype->type_->asClassType())
-            {
-                JSBClassType* classType = ptype->type_->asClassType();
-
-                JSBClass* klass = classType->class_;
-
-                if (!klass->IsNumberArray())
-                {
-                    sig.AppendWithFormat("%s", pstring.CString());
-                }
+                if (klass->IsNumberArray())
+                    args.Push(ToString("*%s", ptype->name_.CString()));
                 else
-                {
-                    sig.AppendWithFormat("%s __arg%i", klass->GetNativeName().CString(), cparam);
-                }
-            }
-            else if (ptype->type_->asStringType() || ptype->type_->asStringHashType())
-            {
-                sig.AppendWithFormat("char* __arg%i", cparam);
-            }
-            else if (ptype->type_->asHeapPtrType())
-            {
-                assert(0);
-            }
-            else if (ptype->type_->asPrimitiveType())
-            {
-                JSBPrimitiveType* prtype = ptype->type_->asPrimitiveType();
-                sig.AppendWithFormat("%s __arg%i", prtype->ToString().CString(), cparam);
-            }
-            else if (ptype->type_->asEnumType())
-            {
-                JSBEnumType* etype = ptype->type_->asEnumType();
+                    args.Push(ToString("%s", ptype->name_.CString()));
 
-                sig.AppendWithFormat("%s __arg%i", etype->enum_->GetName().CString(), cparam);
-
-            }
-            else if (ptype->type_->asVectorType())
-            {
-                // read only vector arguments
-                if (ptype->isConst_)
-                {
-                    JSBVectorType* vtype = ptype->type_->asVectorType();
-                    sig.AppendWithFormat("%s __arg%i", vtype->ToString().CString(), cparam);
-                }
             }
             else
             {
-                assert(0);
+                args.Push(ToString("%s", ptype->name_.CString()));
             }
-
-            sig += ", ";
 
         }
     }
 
-    if (sig.EndsWith(", "))
-        sig = sig.Substring(0, sig.Length() - 2);
+    sig.Join(args, ", ");
+}
+
+void CSFunctionWriter::GenNativeFunctionSignature(String& sig)
+{
+    JSBClass* klass = function_->GetClass();
+
+    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
+
+    Vector<String> args;
+
+    if (!function_->IsConstructor())
+    {
+        args.Push(ToString("%s* self", klass->GetNativeName().CString()));
+    }
+
+    if (parameters.Size())
+    {
+        for (unsigned int i = 0; i < parameters.Size(); i++)
+        {
+            JSBFunctionType* ptype = parameters.At(i);
+
+            // ignore "Context" parameters
+            if (ptype->type_->asClassType())
+            {
+                JSBClassType* classType = ptype->type_->asClassType();
+                JSBClass* klass = classType->class_;
+                if (klass->GetName() == "Context")
+                {
+                    continue;
+                }
+
+                args.Push(ToString("%s* %s", klass->GetNativeName().CString(), ptype->name_.CString()));
+            }
+            else
+            {
+                args.Push(CSTypeHelper::GetNativeTypeString(ptype) + " " + ptype->name_);
+            }
+
+        }
+    }
+
+    if (function_->GetReturnClass() && function_->GetReturnClass()->IsNumberArray())
+    {
+        args.Push(ToString("%s* returnValue", function_->GetReturnClass()->GetNativeName().CString()));
+    }
+
+    sig.Join(args, ", ");
 
 }
 
 void CSFunctionWriter::WriteNativeFunction(String& source)
 {
-    JSBClass* klass = function_->class_;
+    JSBClass* klass = function_->GetClass();
+    JSBPackage* package = klass->GetPackage();
+    String fname = function_->IsConstructor() ? "Constructor" : function_->GetName();
 
+    String returnType = "void";
+
+    bool simpleReturn = true;
+
+    if (function_->IsConstructor())
+    {
+        returnType = "RefCounted*";
+    }
+    else if (function_->GetReturnType())
+    {
+        if (function_->IsConstructor())
+        {
+            returnType = ToString("%s*", klass->GetNativeName().CString());
+        }
+        else if (function_->GetReturnClass())
+        {
+            if (!function_->GetReturnClass()->IsNumberArray())
+            {
+                returnType = ToString("const %s*", function_->GetReturnClass()->GetNativeName().CString());
+            }
+        }
+        else if (function_->GetReturnType()->type_->asStringHashType())
+        {
+            returnType = "unsigned";
+        }
+        else
+        {
+            returnType = ToString("%s", CSTypeHelper::GetNativeTypeString(function_->GetReturnType()).CString());
+        }
+    }
+
+    String line;
     String sig;
-
     GenNativeFunctionSignature(sig);
 
-    JSBFunctionType* returnType = function_->returnType_;
-    String rTypeString = "void";
-    // if the marshalling local variable type is differnt
-    // for example SharedPtr ->Object *
-    String rMarshalTypeString;
+    line = ToString("%s csb_%s_%s_%s(%s)\n",
+                    returnType.CString(), package->GetName().CString(), klass->GetName().CString(),
+                    fname.CString(), sig.CString());
 
-    if (returnType)
+    source += IndentLine(line);
+
+    source += IndentLine("{\n");
+
+    Indent();
+
+    bool returnValue = false;
+
+    String returnStatement;
+
+    if (returnType == "const char*")
     {
-        if (returnType->type_->asStringType())
+        returnValue = true;
+        source += IndentLine("static String returnValue;\n");
+        returnStatement = "returnValue = ";
+    }
+    else if (function_->GetReturnClass() && function_->GetReturnClass()->IsNumberArray())
+    {
+        returnStatement = "*returnValue = ";
+    }
+    else
+    {
+        if (returnType != "void")
         {
-            rTypeString = "const String&";
+            if (simpleReturn)
+                returnStatement = "return ";
         }
-        else if (returnType->type_->asPrimitiveType())
+    }
+
+    String callSig;
+    GenNativeCallParameters(callSig);
+    if (!function_->isConstructor_)
+        line = ToString("%sself->%s(%s);\n", returnStatement.CString(), function_->GetName().CString(), callSig.CString());
+    else
+    {
+        if (klass->IsAbstract())
         {
-            JSBPrimitiveType* prtype = returnType->type_->asPrimitiveType();
-            rTypeString = prtype->ToString();
+            line = "return 0; // Abstract Class\n";
         }
-        else if (returnType->type_->asClassType())
+        else if (klass->IsObject())
         {
-            JSBClassType* klassType = returnType->type_->asClassType();
-
-            if (returnType->isTemplate_)
-            {
-                if (klassType->class_->IsObject())
-                    rTypeString = "const Object*";
-                else
-                    rTypeString = "const RefCounted*";
-
-                rMarshalTypeString.AppendWithFormat("SharedPtr<%s>", klassType->class_->GetNativeName().CString());
-            }
-            else if (klassType->class_->IsObject())
-            {
-                rTypeString = "const Object*";
-            }
-            else if (klassType->class_->IsNumberArray())
-            {
-                rTypeString = klassType->class_->GetName().CString();
-            }
+            if (callSig.Length())
+                line = ToString("return new %s(AtomicSharp::GetContext(), %s);\n", klass->GetNativeName().CString(), callSig.CString());
             else
-            {
-                rTypeString = "const RefCounted*";
-            }
+                line = ToString("return new %s(AtomicSharp::GetContext());\n", klass->GetNativeName().CString());
         }
-        else if (returnType->type_->asEnumType())
-        {
-            JSBEnumType* enumType = returnType->type_->asEnumType();
-            rTypeString = enumType->enum_->GetName().CString();
-        }
-        else if (returnType->type_->asVectorType())
-        {
-            JSBVectorType* vtype = returnType->type_->asVectorType();
-            rTypeString = "";
-            rTypeString.AppendWithFormat("%s", vtype->ToString().CString());
-        }
-
-    }
-
-
-
-    source.AppendWithFormat("%s csb_%s_%s(%s* self%s)\n{\n", rTypeString == "const String&" ? "const char*" : rTypeString.CString(), klass->GetName().CString(),
-                            function_->name_.CString(), klass->GetNativeName().CString(), sig.Length() ? (", " + sig).CString() : "");
-
-    if (rTypeString != "void")
-    {
-        source.AppendWithFormat("%s retValue = ", rMarshalTypeString.Length()? rMarshalTypeString.CString() : rTypeString.CString());
-    }
-
-    // call
-
-    source.AppendWithFormat("self->%s(", function_->name_.CString());
-
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
-
-    for (unsigned int i = 0; i < parameters.Size(); i++)
-    {
-        source.AppendWithFormat("__arg%i",  i);
-
-        if (i != parameters.Size() - 1)
-        {
-            source += ", ";
-        }
-    }
-
-    source += ");\n";
-
-
-    if (rTypeString != "void")
-    {
-        if (rTypeString == "const String&")
-            source.AppendWithFormat("\nreturn retValue.CString();\n");
         else
-            source.AppendWithFormat("\nreturn retValue;\n");
+        {
+            line = ToString("return new %s(%s);\n", klass->GetNativeName().CString(), callSig.CString());
+        }
     }
 
-    source.AppendWithFormat("}\n\n");
+    source += IndentLine(line);
+
+    if (returnType == "const char*")
+    {
+        source += IndentLine("return returnValue.CString();\n");
+    }
+
+    Dedent();
+
+    source += IndentLine("}\n");
+
+    source += "\n";
 
 }
 
@@ -327,14 +318,7 @@ void CSFunctionWriter::GenerateNativeSource(String& sourceOut)
 {
     String source = "";
 
-    if (function_->IsConstructor())
-    {
-        WriteNativeConstructor(source);
-    }
-    else
-    {
-        WriteNativeFunction(source);
-    }
+    WriteNativeFunction(source);
 
     sourceOut += source;
 
@@ -351,7 +335,7 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
     JSBClass* klass = function_->GetClass();
     JSBPackage* package = klass->GetPackage();
 
-    String returnType = CSTypeHelper::GetNativeTypeString(function_->GetReturnType());
+    String returnType = CSTypeHelper::GetPInvokeTypeString(function_->GetReturnType());
 
     if (function_->IsConstructor())
         returnType = "IntPtr";
@@ -371,6 +355,11 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
         {
             JSBFunctionType* ptype = parameters.At(i);
 
+            String name = ptype->name_;
+
+            if (name == "object")
+                name = "_object";
+
             // ignore "Context" parameters
             if (ptype->type_->asClassType())
             {
@@ -383,32 +372,29 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 
                 if (klass->IsNumberArray())
                 {
-                    args.Push("ref " + klass->GetName() + " " + ptype->name_);
+                    args.Push("ref " + klass->GetName() + " " + name);
                 }
                 else
                 {
-                    args.Push("IntPtr " + ptype->name_);
+                    args.Push("IntPtr " + name);
                 }
             }
             else
             {
-                args.Push(CSTypeHelper::GetNativeTypeString(ptype) + " " + ptype->name_);
+                args.Push(CSTypeHelper::GetPInvokeTypeString(ptype) + " " + name);
             }
 
         }
     }
 
-    if (function_->GetReturnType())
+    if (function_->GetReturnClass())
     {
-        if (function_->GetReturnType()->type_->asClassType())
+        JSBClass* retClass = function_->GetReturnClass();
+        if (retClass->IsNumberArray())
         {
-            JSBClass* retClass = function_->GetReturnType()->type_->asClassType()->class_;
-            if (retClass->IsNumberArray())
-            {
-                args.Push("ref " + retClass->GetName() + " retValue");
-            }
-
+            args.Push("ref " + retClass->GetName() + " retValue");
         }
+
     }
 
     String pstring;
@@ -450,6 +436,10 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
 
             sig += CSTypeHelper::GetManagedTypeString(ptype);
 
+            // hack for Drawable as this causes a compilation error (need to add default params)
+            if (sig.EndsWith("drawableFlags"))
+                sig += " = '\\0'";
+
             if (i + 1 != parameters.Size())
                 sig += ", ";
         }
@@ -484,7 +474,7 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
 
     Indent();
 
-    source += IndentLine("if (nativeInstance == IntPtr.Zero)");
+    source += IndentLine(ToString("if (typeof(%s) == this.GetType())\n", klass->GetName().CString()));
     source += IndentLine("{\n");
 
     Indent();
@@ -528,22 +518,27 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
                 }
             }
 
+            String name = ptype->name_;
+
+            if (name == "object")
+                name = "_object";
+
             if (ptype->type_->asClassType())
             {
                 JSBClass* pclass = ptype->type_->asClassType()->class_;
                 if (pclass->IsNumberArray())
                 {
-                    sig += "ref " + ptype->name_;
+                    sig += "ref " + name;
                 }
                 else
                 {
-                    sig += ptype->name_ + " == null ? IntPtr.Zero : " + ptype->name_+ ".nativeInstance";
+                    sig += name + " == null ? IntPtr.Zero : " + name + ".nativeInstance";
                 }
 
             }
             else
             {
-                sig += ptype->name_;
+                sig += name;
             }
 
             if (i + 1 != parameters.Size())
@@ -554,7 +549,7 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
     // data marshaller
     if (function_->GetReturnType() && !CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
     {
-        if (function_->GetReturnType()->type_->asClassType()->class_->IsNumberArray())
+        if (function_->GetReturnClass()->IsNumberArray())
         {
             if (sig.Length())
                 sig += ", ";
@@ -593,9 +588,9 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
             line += "return ";
         else
         {
-            if (function_->GetReturnType()->type_->asClassType())
+            if (function_->GetReturnClass())
             {
-                if (!function_->GetReturnType()->type_->asClassType()->class_->IsNumberArray())
+                if (!function_->GetReturnClass()->IsNumberArray())
                     line += "IntPtr retNativeInstance = ";
             }
         }
@@ -620,7 +615,7 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
     {
         if (function_->GetReturnType()->type_->asClassType())
         {
-            JSBClass* retClass = function_->GetReturnType()->type_->asClassType()->class_;
+            JSBClass* retClass = function_->GetReturnClass();
             JSBClass* klass = function_->GetClass();
 
             if (retClass->IsNumberArray())
@@ -663,9 +658,9 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
     // data marshaller
     if (function_->GetReturnType() && !CSTypeHelper::IsSimpleReturn(function_->GetReturnType()))
     {
-        if (function_->GetReturnType()->type_->asClassType())
+        if (function_->GetReturnClass())
         {
-            JSBClass* retClass = function_->GetReturnType()->type_->asClassType()->class_;
+            JSBClass* retClass = function_->GetReturnClass();
             if (retClass->IsNumberArray())
             {
                 JSBClass* klass = function_->GetClass();

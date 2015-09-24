@@ -30,6 +30,9 @@ public:
     static String GetNativeTypeString(JSBType* type);
     static String GetNativeTypeString(JSBFunctionType* ftype);
 
+    static String GetPInvokeTypeString(JSBType* type);
+    static String GetPInvokeTypeString(JSBFunctionType* ftype);
+
     static String GetManagedTypeString(JSBType* type);
     static String GetManagedTypeString(JSBFunctionType* ftype, bool addName = true);
 

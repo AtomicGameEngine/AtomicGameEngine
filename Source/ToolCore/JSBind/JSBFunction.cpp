@@ -54,4 +54,17 @@ void JSBFunction::Process()
         class_->AddPropertyFunction(this);
 
 }
+
+JSBClass* JSBFunction::GetReturnClass()
+{
+    if (!returnType_)
+        return 0;
+
+    if (!returnType_->type_->asClassType())
+        return 0;
+
+    return returnType_->type_->asClassType()->class_;
+
+}
+
 }

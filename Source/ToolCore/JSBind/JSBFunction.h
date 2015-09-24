@@ -106,6 +106,10 @@ public:
     JSBClass* GetClass() { return class_; }
     const String& GetPropertyName() { return propertyName_; }
     JSBFunctionType* GetReturnType() { return returnType_; }
+
+    /// Get class return type or null
+    JSBClass* GetReturnClass();
+
     Vector<JSBFunctionType*>& GetParameters() { return parameters_; }
 
     const String& GetDocString() { return docString_; }

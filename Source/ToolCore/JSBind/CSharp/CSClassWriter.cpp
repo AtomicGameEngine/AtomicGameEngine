@@ -38,6 +38,9 @@ void CSClassWriter::WriteNativeFunctions(String& source)
         if (function->IsDestructor())
             continue;
 
+        if (OmitFunction(function))
+            continue;
+
         CSFunctionWriter writer(function);
         writer.GenerateNativeSource(source);
     }
@@ -51,8 +54,10 @@ void CSClassWriter::GenerateNativeSource(String& sourceOut)
     if (klass_->IsNumberArray())
         return;
 
-    source.AppendWithFormat("ClassID csb_%s_GetClassID()\n{\n", klass_->GetNativeName().CString());
-    source.AppendWithFormat("return %s::GetClassIDStatic();\n}\n", klass_->GetNativeName().CString());
+    JSBPackage* package = klass_->GetPackage();
+
+    source.AppendWithFormat("ClassID csb_%s_%s_GetClassID()\n{\n", package->GetName().CString(),klass_->GetName().CString());
+    source.AppendWithFormat("   return %s::GetClassIDStatic();\n}\n\n", klass_->GetNativeName().CString());
 
     WriteNativeFunctions(source);
 
@@ -77,6 +82,9 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
             JSBFunctionType* getType = NULL;
             JSBFunctionType* setType = NULL;
 
+            if (OmitFunction(prop->getter_) || OmitFunction(prop->setter_))
+                continue;
+
             if (prop->getter_ && !prop->getter_->Skip())
             {
                 fType = getType = prop->getter_->GetReturnType();
@@ -87,7 +95,12 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
 
                 if (!fType)
                     fType = setType;
+                //else if (fType->type_ != setType->type_)
+                //    continue;
             }
+
+            if (!fType)
+                continue;
 
             String type = CSTypeHelper::GetManagedTypeString(fType, false);
             String line = ToString("public %s %s\n", type.CString(), prop->name_.CString());
@@ -136,6 +149,30 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
 
 }
 
+bool CSClassWriter::OmitFunction(JSBFunction* function)
+{
+    if (!function)
+        return false;
+
+    // We need to rename GetType
+    if (function->GetName() == "GetType")
+        return true;
+
+    // avoid vector type for now
+    if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
+        return true;
+
+    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+
+    for (unsigned i = 0; i < parameters.Size(); i++)
+    {
+        if (parameters[i]->type_->asVectorType())
+            return true;
+    }
+
+    return false;
+}
+
 void CSClassWriter::GenerateManagedSource(String& sourceOut)
 {
     String source = "";
@@ -161,6 +198,15 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
 
     WriteManagedProperties(source);
 
+    Indent();
+    JSBPackage* package = klass_->GetPackage();
+    line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
+    source += IndentLine(line);
+    line = ToString("public static extern IntPtr csb_%s_%s_GetClassID();\n", package->GetName().CString(),klass_->GetName().CString());
+    source += IndentLine(line);
+    source += "\n";
+    Dedent();
+
     // managed functions
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)
     {
@@ -170,6 +216,9 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
             continue;
 
         if (function->IsDestructor())
+            continue;
+
+        if (OmitFunction(function))
             continue;
 
         CSFunctionWriter fwriter(function);
