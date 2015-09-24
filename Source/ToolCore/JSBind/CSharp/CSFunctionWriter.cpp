@@ -346,12 +346,15 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 {
     source += "\n";
 
-    String line = "[DllImport (LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
+    String line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
     source += IndentLine(line);
     JSBClass* klass = function_->GetClass();
     JSBPackage* package = klass->GetPackage();
 
     String returnType = CSTypeHelper::GetNativeTypeString(function_->GetReturnType());
+
+    if (function_->IsConstructor())
+        returnType = "IntPtr";
 
     Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 

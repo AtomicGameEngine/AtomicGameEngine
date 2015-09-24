@@ -31,7 +31,7 @@ public:
     static String GetNativeTypeString(JSBFunctionType* ftype);
 
     static String GetManagedTypeString(JSBType* type);
-    static String GetManagedTypeString(JSBFunctionType* ftype);
+    static String GetManagedTypeString(JSBFunctionType* ftype, bool addName = true);
 
 };
 

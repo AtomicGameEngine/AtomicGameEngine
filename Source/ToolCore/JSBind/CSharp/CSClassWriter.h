@@ -33,7 +33,10 @@ public:
 
 private:
 
+
     void WriteNativeFunctions(String& source);
+
+    void WriteManagedProperties(String& sourceOut);
     void WriteManagedFunctions(String& source);
 };
 

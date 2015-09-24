@@ -56,7 +56,7 @@ String CSTypeHelper::GetManagedTypeString(JSBType* type)
     return value;
 }
 
-String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype)
+String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype, bool addName)
 {
     if (!ftype)
         return "void";
@@ -65,9 +65,13 @@ String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype)
 
     if (ftype->name_.Length())
     {
-        parameter += " " + ftype->name_;
+        if (addName)
+            parameter += " " + ftype->name_;
+
+        /*
         if (ftype->initializer_.Length())
             parameter += " = " + ftype->initializer_;
+        */
     }
 
     return parameter;
