@@ -31,7 +31,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleContainer.cs">
       <Link>CSModuleContainer.cs</Link>
@@ -54,6 +53,7 @@
     <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\AtomicPlayer\Managed\CSModulePlayer.cs">
       <Link>CSModulePlayer.cs</Link>
     </Compile>
+    <Compile Include="AtomicEngine.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Atomic
+using AtomicPlayer;
+
+namespace AtomicEngine
 {
 
-	public static class AtomicSharp
+	public static class Atomic
 	{
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
 		private static extern int atomicsharp_initialize ();
@@ -13,7 +15,9 @@ namespace Atomic
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
 		private static extern bool atomicsharp_runframe ();
 
-
+		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		private static extern IntPtr csb_AtomicEngine_GetSubsystem(string name);
+					
 		public static bool RunFrame()
 		{
 			GC.Collect();
@@ -36,7 +40,27 @@ namespace Atomic
 			AtomicPlayer.PlayerModule.Initialize ();
 
 			atomicsharp_initialize ();
+
+			initSubsystems ();
 		}
+
+		static Dictionary<Type, RefCounted> subSystems = new Dictionary<Type, RefCounted>();
+
+		static private void registerSubsystem (RefCounted subsystem)
+		{
+			subSystems[subsystem.GetType()] = subsystem;
+		}
+
+		static public T GetSubsystem<T>() where T : RefCounted
+		{
+			return (T) subSystems [typeof(T)];
+		}
+
+		static private void initSubsystems()
+		{
+			registerSubsystem (NativeCore.WrapNative<Player> (csb_AtomicEngine_GetSubsystem("Player")));	
+		}
+
 	}
 
 	public static partial class Constants

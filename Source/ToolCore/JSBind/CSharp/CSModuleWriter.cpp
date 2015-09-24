@@ -347,9 +347,12 @@ void CSModuleWriter::GenerateManagedSource()
 
     source += "\nusing System;\nusing System.Collections.Generic;\nusing System.Runtime.InteropServices;\n";
 
-    if (moduleName != "Atomic")
+    if (moduleName == "Atomic")
+        moduleName = "AtomicEngine";
+
+    if (moduleName != "AtomicEngine")
     {
-        source += "using Atomic;\n";
+        source += "using AtomicEngine;\n";
     }
 
     source += "\n\n";

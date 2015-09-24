@@ -26,4 +26,10 @@ ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
     return refCounted->GetClassID();
 }
 
+RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
+{
+    return AtomicSharp::GetContext()->GetSubsystem(name);
+}
+
+
 }
