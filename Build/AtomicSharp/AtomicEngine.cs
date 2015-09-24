@@ -108,6 +108,14 @@ namespace AtomicEngine
 
 	}
 
+	public partial class Node : Animatable
+	{
+		public T GetComponent<T> (bool recursive  = false) where T:Component
+		{
+			return (T) GetComponent (typeof(T).Name, recursive);
+		}
+		
+	}
 
 	static class NativeCore
 	{
@@ -222,6 +230,19 @@ namespace AtomicEngine
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 	public struct Color
 	{
+		public Color (float r, float g, float b, float a = 1.0f)
+		{
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.a = a;
+		}
+
+		public float r;
+		public float g;
+		public float b;
+		public float a;
+
 	}
 
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]

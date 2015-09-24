@@ -10,6 +10,12 @@ class MyGame
 
 		player.LoadScene ("Scenes/Scene.scene");		
 
+		var scene = player.CurrentScene;
+
+		var zone = scene.GetComponent <Zone> (true);
+
+		zone.SetAmbientColor( new Color(1, 0, 0) );
+
 		Atomic.Run ();
 
 	}
