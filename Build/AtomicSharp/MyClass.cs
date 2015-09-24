@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace AtomicSharp
+namespace Atomic
 {
 
 	public static class AtomicSharp
@@ -32,6 +32,8 @@ namespace AtomicSharp
 			ResourceModule.Initialize ();
 			GraphicsModule.Initialize ();
 			SceneModule.Initialize ();		
+
+			AtomicPlayer.PlayerModule.Initialize ();
 
 			atomicsharp_initialize ();
 		}
@@ -92,7 +94,6 @@ namespace AtomicSharp
 				if (entry.Value.Target == null || !entry.Value.IsAlive) {										
 					released.Add (entry.Key);
 
-					Console.WriteLine("Not Alive");
 				} else {
 					
 				}

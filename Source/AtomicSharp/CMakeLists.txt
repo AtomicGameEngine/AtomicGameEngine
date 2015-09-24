@@ -20,9 +20,21 @@ set (CSFILES CSModuleAtomic2D.cpp;CSModuleAtomic3D.cpp;CSModuleAudio.cpp;CSModul
              CSModuleNetwork.cpp;CSModulePhysics.cpp;CSModuleResource.cpp;CSPackageAtomic.cpp;
              CSModuleScene.cpp;CSModuleUI.cpp)
 
+set (CSATOMICPLAYERFILES CSModulePlayer.cpp)
+
 foreach(CSFILE ${CSFILES})
 
-  set (CSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/Atomic/Native/${JSFILE}")
+  set (CSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/Atomic/Native/${CSFILE}")
+
+  if (NOT EXISTS ${CSFILEPATH})
+    file(WRITE "${CSFILEPATH}" "// will be created by JSBind")
+  endif()
+
+endforeach()
+
+foreach(CSFILE ${CSATOMICPLAYERFILES})
+
+  set (CSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicPlayer/Native/${CSFILE}")
 
   if (NOT EXISTS ${CSFILEPATH})
     file(WRITE "${CSFILEPATH}" "// will be created by JSBind")
@@ -33,7 +45,9 @@ endforeach()
 
 file (GLOB CSHARP_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/Atomic/Native/*.cpp)
 
-set (SOURCE_FILES ${CSHARP_SOURCES} ${CSHARP_BINDINGS_SOURCE})
+file (GLOB CSHARPATOMICPLAYER_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicPlayer/Native/*.cpp)
+
+set (SOURCE_FILES ${CSHARP_SOURCES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE})
 
 add_library(AtomicSharp SHARED ${SOURCE_FILES})
 

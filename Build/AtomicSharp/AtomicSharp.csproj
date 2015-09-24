@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AtomicSharp</RootNamespace>
+    <RootNamespace>Atomic</RootNamespace>
     <AssemblyName>AtomicSharp</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -50,6 +50,9 @@
     </Compile>
     <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleIO.cs">
       <Link>CSModuleIO.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\AtomicPlayer\Managed\CSModulePlayer.cs">
+      <Link>CSModulePlayer.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

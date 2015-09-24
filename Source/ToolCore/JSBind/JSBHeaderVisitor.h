@@ -167,6 +167,7 @@ public:
                         FullySpecifiedType pfst = tnid->templateArgumentAt(0);
                         type = pfst.type();
                         isTemplate = true;
+                        isSharedPtr = true;
                     }
                 }
             }

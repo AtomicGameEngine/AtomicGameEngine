@@ -254,6 +254,7 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     Indent();
 
     bool returnValue = false;
+    bool sharedPtrReturn = false;
 
     String returnStatement;
 
@@ -266,6 +267,11 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     else if (function_->GetReturnClass() && function_->GetReturnClass()->IsNumberArray())
     {
         returnStatement = "*returnValue = ";
+    }
+    else if (function_->GetReturnClass() && function_->GetReturnType()->isSharedPtr_)
+    {
+        returnStatement = ToString("SharedPtr<%s> returnValue = ", function_->GetReturnClass()->GetNativeName().CString());
+        sharedPtrReturn = true;
     }
     else
     {
@@ -301,7 +307,12 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
     source += IndentLine(line);
 
-    if (returnType == "const char*")
+    if (sharedPtrReturn)
+    {
+        source += IndentLine("returnValue->AddRef();\n");
+        source += IndentLine("return returnValue;\n");
+    }
+    else if (returnType == "const char*")
     {
         source += IndentLine("return returnValue.CString();\n");
     }
