@@ -157,6 +157,64 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
 }
 
+//Touch Input
+void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+{
+    if (inputDisabled_ || consoleVisible_)
+        return;
+
+    Input* input = GetSubsystem<Input>();
+    using namespace TouchBegin;
+    int x = eventData[P_X].GetInt();
+    int y = eventData[P_Y].GetInt();
+
+    IntVector2 pos = IntVector2(x, y);
+    
+    static double last_time = 0;
+    static int counter = 1;
+
+    Time* t = GetSubsystem<Time>();
+
+    double time = t->GetElapsedTime() * 1000;
+    if (time < last_time + 600)
+        counter++;
+    else
+        counter = 1;
+
+    last_time = time;
+    rootWidget_->InvokePointerDown(pos.x_, pos.y_, counter, TB_MODIFIER_NONE, true);
+}
+
+void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
+{
+    if (inputDisabled_ || consoleVisible_)
+        return;
+
+    Input* input = GetSubsystem<Input>();
+    using namespace TouchMove;
+    int x = eventData[P_X].GetInt();
+    int y = eventData[P_Y].GetInt();
+
+    IntVector2 pos = IntVector2(x, y);
+
+    rootWidget_->InvokePointerMove(pos.x_, pos.y_, TB_MODIFIER_NONE, true);
+}
+
+void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
+{
+    if (inputDisabled_ || consoleVisible_)
+        return;
+
+    Input* input = GetSubsystem<Input>();
+    using namespace TouchEnd;
+    int x = eventData[P_X].GetInt();
+    int y = eventData[P_Y].GetInt();
+
+    IntVector2 pos = IntVector2(x, y);
+
+    rootWidget_->InvokePointerUp(pos.x_, pos.y_, TB_MODIFIER_NONE, true);
+}
+
 static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool down)
 {
 #ifdef __APPLE__

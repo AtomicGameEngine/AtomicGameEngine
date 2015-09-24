@@ -2018,4 +2018,25 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
 
 }
 
+void Input::BindButton(UIButton* touchButton, int button)
+{
+    touchButton->SetEmulationButton(button);
+}
+
+void Input::FakeButtonDown(int button)
+{
+    SDL_Event evt;
+    evt.type = SDL_KEYDOWN;
+    evt.key.keysym.sym = button;
+    HandleSDLEvent(&evt);
+}
+
+void Input::FakeButtonUp(int button)
+{
+    SDL_Event evt;
+    evt.type = SDL_KEYUP;
+    evt.key.keysym.sym = button;
+    HandleSDLEvent(&evt);
+}
+
 }

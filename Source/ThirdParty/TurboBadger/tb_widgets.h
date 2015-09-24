@@ -985,6 +985,12 @@ public:
 		by GetCalculatedFontDescription) */
 	TBFontFace *GetFont() const;
 
+    void SetCapturing(bool capturing) { capturing_ = capturing; }
+
+    bool GetCapturing() { return capturing_; }
+
+    bool capturing_;
+
 private:
 	friend class TBWidgetListener;	///< It does iteration of m_listeners for us.
 	TBWidget *m_parent;				///< The parent of this widget

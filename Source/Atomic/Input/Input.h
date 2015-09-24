@@ -27,6 +27,7 @@
 #include "../Core/Object.h"
 #include "../Container/List.h"
 #include "../Input/InputEvents.h"
+#include "../UI/UIButton.h"
 
 namespace Atomic
 {
@@ -44,6 +45,7 @@ class Graphics;
 class Serializer;
 class UIElement;
 class XMLFile;
+class UIButton;
 
 const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
@@ -289,6 +291,12 @@ public:
 
     /// Return whether application window is minimized.
     bool IsMinimized() const;
+
+    /// Binds UIButton element to the given button
+    void BindButton(UIButton* touchButton, int button);
+
+    void FakeButtonDown(int button);
+    void FakeButtonUp(int button);
 
 private:
     /// Initialize when screen mode initially set.

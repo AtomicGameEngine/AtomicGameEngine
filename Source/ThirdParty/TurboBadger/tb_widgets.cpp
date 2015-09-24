@@ -73,6 +73,7 @@ TBWidget::TBWidget()
     , m_long_click_timer(nullptr)
     , m_delegate(nullptr)
 	, m_packed_init(0)
+    , capturing_(true)
 {
 #ifdef TB_RUNTIME_DEBUG_INFO
 	last_measure_time = 0;
@@ -1274,9 +1275,10 @@ void TBWidget::StopLongClickTimer()
 
 void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys, bool touch)
 {
-	if (!captured_widget)
+    TBWidget* down_widget = GetWidgetAt(x, y, true);
+	if (!captured_widget && down_widget->capturing_)
 	{
-		SetCapturedWidget(GetWidgetAt(x, y, true));
+		SetCapturedWidget(down_widget);
 		SetHoveredWidget(captured_widget, touch);
 		//captured_button = button;
 
@@ -1320,27 +1322,29 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 			focus_target = focus_target->m_parent;
 		}
 	}
-	if (captured_widget)
+	if (down_widget)
 	{
-		captured_widget->ConvertFromRoot(x, y);
+		down_widget->ConvertFromRoot(x, y);
 		pointer_move_widget_x = pointer_down_widget_x = x;
 		pointer_move_widget_y = pointer_down_widget_y = y;
 		TBWidgetEvent ev(EVENT_TYPE_POINTER_DOWN, x, y, touch, modifierkeys);
 		ev.count = click_count;
-		captured_widget->InvokeEvent(ev);
+		down_widget->InvokeEvent(ev);
 	}
 }
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch)
 {
-	if (captured_widget)
+    TBWidget* down_widget = GetWidgetAt(x, y, true);
+	if (down_widget)
 	{
-		captured_widget->ConvertFromRoot(x, y);
+        down_widget->OnCaptureChanged(false);
+		down_widget->ConvertFromRoot(x, y);
 		TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
 		TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
-		captured_widget->InvokeEvent(ev_up);
-		if (!cancel_click && captured_widget && captured_widget->GetHitStatus(x, y))
-			captured_widget->InvokeEvent(ev_click);
+		down_widget->InvokeEvent(ev_up);
+		if (!cancel_click && down_widget->GetHitStatus(x, y))
+			down_widget->InvokeEvent(ev_click);
 		if (captured_widget) // && button == captured_button
 			captured_widget->ReleaseCapture();
 	}
