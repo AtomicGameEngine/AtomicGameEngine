@@ -17,7 +17,23 @@ namespace AtomicEngine
 
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
 		private static extern IntPtr csb_AtomicEngine_GetSubsystem(string name);
-					
+			
+
+		static Atomic()
+		{
+			Initialize ();
+		}
+
+		public static void Run()
+		{
+			
+			while (Atomic.RunFrame ()) {
+
+
+			}
+
+		}
+
 		public static bool RunFrame()
 		{
 			GC.Collect();

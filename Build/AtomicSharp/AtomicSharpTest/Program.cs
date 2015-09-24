@@ -1,23 +1,18 @@
-﻿using System;
+﻿
 using AtomicEngine;
 using AtomicPlayer;
 
-namespace AtomicSharpTest
-{
-	class MainClass
-	{				
-		public static void Main (string[] args)
-		{
-			Atomic.Initialize ();
+class MyGame
+{				
+	public static void Main (string[] args)
+	{
+		var player = Atomic.GetSubsystem<Player> ();
 
-			var player = Atomic.GetSubsystem<Player> ();
+		player.LoadScene ("Scenes/Scene.scene");		
 
-			player.LoadScene ("Scenes/Scene.scene", null);		
+		Atomic.Run ();
 
-			while (Atomic.RunFrame ()) {
-						
-				
-			}
-		}
 	}
 }
+
+
