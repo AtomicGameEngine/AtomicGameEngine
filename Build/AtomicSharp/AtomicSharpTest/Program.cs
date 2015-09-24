@@ -20,19 +20,36 @@ namespace AtomicSharpTest
 
 		}
 
+		static private Node parent;
+		static private Node child;
+
+		static void setup()
+		{
+			parent = CreateNode ();
+			AddLight (parent);
+			parent.Name = "MyNode";
+
+			child = parent.CreateChild ("Child", CreateMode.REPLICATED, 0);
+
+			child = null;
+
+		}
+
 		public static void Main (string[] args)
 		{
 			AtomicSharp.AtomicSharp.Initialize ();
 
-			var node = CreateNode ();
-			AddLight (node);
-
-			node.Name = "MyNode";
-
-			if (node.HasComponent("Light"))
-				Console.Write (node.Name + " has a light");
+			setup ();
 
 			while (AtomicSharp.AtomicSharp.RunFrame ()) {
+
+				child = parent.GetChild ("Child", false);
+
+				if (child.Parent.HasComponent("Light"))
+					Console.Write (child.Parent.Name + " has a light\n");
+
+				child = null;
+			
 				
 			}
 		}

@@ -18,4 +18,12 @@ using namespace Atomic;
 extern "C"
 {
 
+ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
+{
+    if (!refCounted)
+        return 0;
+
+    return refCounted->GetClassID();
+}
+
 }

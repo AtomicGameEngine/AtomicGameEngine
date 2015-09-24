@@ -47,6 +47,7 @@ private:
     void GenPInvokeCallParameters(String& sig);
 
     void WriteManagedConstructor(String& source);
+    void WriteManagedDestructor(String& source);
     void WriteManagedFunction(String& source);
 
     void WriteManagedPInvokeFunctionSignature(String& source);

@@ -311,7 +311,7 @@ void CSModuleWriter::GenerateManagedModuleClass(String& sourceOut)
             continue;
 
 
-        line = ToString("NativeCore.nativeClassIDToManagedConstructor [ %s.csb_%s_%s_GetClassID ()] = (IntPtr x) => {\n",
+        line = ToString("NativeCore.nativeClassIDToManagedConstructor [ %s.csb_%s_%s_GetClassIDStatic ()] = (IntPtr x) => {\n",
                         klass->GetName().CString(), package->GetName().CString(), klass->GetName().CString());
 
         source += IndentLine(line);

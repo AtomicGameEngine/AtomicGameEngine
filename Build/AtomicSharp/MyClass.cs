@@ -5,16 +5,6 @@ using System.Runtime.InteropServices;
 namespace AtomicSharp
 {
 
-	public class MyClass
-	{
-		Light CreateLight()
-		{
-			var light = new Light ();
-			light.LightType = LightType.LIGHT_DIRECTIONAL;
-			return light;
-		}
-	}
-
 	public static class AtomicSharp
 	{
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl)]
@@ -26,6 +16,11 @@ namespace AtomicSharp
 
 		public static bool RunFrame()
 		{
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();				
+			NativeCore.ReleaseExpiredNativeReferences ();
+
 			return atomicsharp_runframe ();
 		}
 
@@ -53,7 +48,7 @@ namespace AtomicSharp
 		{
 			nativeInstance = native;
 		}
-
+			
 		public IntPtr nativeInstance;
 
 		static public void _AddRef(IntPtr native)
@@ -96,6 +91,7 @@ namespace AtomicSharp
 
 				if (entry.Value.Target == null || !entry.Value.IsAlive) {										
 					released.Add (entry.Key);
+
 					Console.WriteLine("Not Alive");
 				} else {
 					

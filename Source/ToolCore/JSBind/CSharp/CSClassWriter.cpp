@@ -56,7 +56,7 @@ void CSClassWriter::GenerateNativeSource(String& sourceOut)
 
     JSBPackage* package = klass_->GetPackage();
 
-    source.AppendWithFormat("ClassID csb_%s_%s_GetClassID()\n{\n", package->GetName().CString(),klass_->GetName().CString());
+    source.AppendWithFormat("ClassID csb_%s_%s_GetClassIDStatic()\n{\n", package->GetName().CString(),klass_->GetName().CString());
     source.AppendWithFormat("   return %s::GetClassIDStatic();\n}\n\n", klass_->GetNativeName().CString());
 
     WriteNativeFunctions(source);
@@ -202,7 +202,7 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     JSBPackage* package = klass_->GetPackage();
     line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
     source += IndentLine(line);
-    line = ToString("public static extern IntPtr csb_%s_%s_GetClassID();\n", package->GetName().CString(),klass_->GetName().CString());
+    line = ToString("public static extern IntPtr csb_%s_%s_GetClassIDStatic();\n", package->GetName().CString(),klass_->GetName().CString());
     source += IndentLine(line);
     source += "\n";
     Dedent();
