@@ -684,7 +684,7 @@ public:
 	virtual void OnVisibilityChanged() {}
 
 	/** Called when the capture has changed. */
-	virtual void OnCaptureChanged(bool captured) {}
+    virtual void OnCaptureChanged(bool captured) { SetCaptured(captured); }
 
 	/** Called when a child widget has been added to this widget (before calling OnAdded on child). */
 	virtual void OnChildAdded(TBWidget *child) {}
@@ -985,11 +985,17 @@ public:
 		by GetCalculatedFontDescription) */
 	TBFontFace *GetFont() const;
 
-    void SetCapturing(bool capturing) { capturing_ = capturing; }
+    void SetCapturing(bool needCapturing) { needCapturing_ = needCapturing; }
 
-    bool GetCapturing() { return capturing_; }
+    bool GetCapturing() { return needCapturing_; }
 
-    bool capturing_;
+    void SetCaptured(bool captured) { captured_ = captured; }
+
+    bool IsCaptured() { return captured_; }
+
+    bool needCapturing_;
+
+    bool captured_;
 
 private:
 	friend class TBWidgetListener;	///< It does iteration of m_listeners for us.

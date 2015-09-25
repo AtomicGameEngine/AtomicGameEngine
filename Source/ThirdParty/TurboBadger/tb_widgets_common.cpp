@@ -171,6 +171,7 @@ void TBButton::OnCaptureChanged(bool captured)
 		if (TBMessage *msg = GetMessageByID(TBIDC("auto_click")))
 			DeleteMessage(msg);
 	}
+    SetCaptured(captured);
 }
 
 void TBButton::OnSkinChanged()

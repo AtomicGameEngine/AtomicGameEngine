@@ -73,7 +73,8 @@ TBWidget::TBWidget()
     , m_long_click_timer(nullptr)
     , m_delegate(nullptr)
 	, m_packed_init(0)
-    , capturing_(true)
+    , needCapturing_(true)
+    , captured_(false)
 {
 #ifdef TB_RUNTIME_DEBUG_INFO
 	last_measure_time = 0;
@@ -210,7 +211,7 @@ void TBWidget::SetState(WIDGET_STATE state, bool on)
 WIDGET_STATE TBWidget::GetAutoState() const
 {
 	WIDGET_STATE state = m_state;
-	bool add_pressed_state = !cancel_click && this == captured_widget && this == hovered_widget;
+	bool add_pressed_state = !cancel_click && (captured_ || this == captured_widget);
 	if (add_pressed_state)
 		state |= WIDGET_STATE_PRESSED;
 	if (this == hovered_widget && (!m_packed.no_automatic_hover_state || add_pressed_state))
@@ -1276,7 +1277,7 @@ void TBWidget::StopLongClickTimer()
 void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys, bool touch)
 {
     TBWidget* down_widget = GetWidgetAt(x, y, true);
-	if (!captured_widget && down_widget->capturing_)
+	if (!captured_widget && down_widget->needCapturing_)
 	{
 		SetCapturedWidget(down_widget);
 		SetHoveredWidget(captured_widget, touch);
@@ -1324,6 +1325,9 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 	}
 	if (down_widget)
 	{
+        down_widget->Invalidate();
+        down_widget->InvalidateSkinStates();
+        down_widget->OnCaptureChanged(true);
 		down_widget->ConvertFromRoot(x, y);
 		pointer_move_widget_x = pointer_down_widget_x = x;
 		pointer_move_widget_y = pointer_down_widget_y = y;
@@ -1338,6 +1342,8 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
     TBWidget* down_widget = GetWidgetAt(x, y, true);
 	if (down_widget)
 	{
+        down_widget->Invalidate();
+        down_widget->InvalidateSkinStates();
         down_widget->OnCaptureChanged(false);
 		down_widget->ConvertFromRoot(x, y);
 		TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
