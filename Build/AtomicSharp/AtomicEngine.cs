@@ -21,8 +21,15 @@ namespace AtomicEngine
 
 		static Atomic()
 		{
-			Initialize ();
-		}
+            try { 
+			    Initialize ();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
+        }
 
 		public static void Run()
 		{

@@ -263,22 +263,21 @@ static SharedPtr<AtomicPlayer::AtomicPlayerApp> sApplication;
 
 extern "C" {
 
-void atomicsharp_hrmph(Vector3* in, Vector3* out)
-{
-    out->x_ = in->x_ + 1;
-    out->y_ = in->y_ + 2;
-    out->z_ = in->z_ + 3;
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#pragma warning(disable: 4244) // possible loss of data
+#define ATOMIC_EXPORT_API __declspec(dllexport)
+#else
+#define ATOMIC_EXPORT_API
+#endif
 
-}
-
-int atomicsharp_initialize()
+ATOMIC_EXPORT_API int atomicsharp_initialize()
 {
     sContext = new Atomic::Context();
     sApplication = new AtomicPlayer::AtomicPlayerApp(sContext);
     return sApplication->Initialize();
 }
 
-bool atomicsharp_runframe()
+ATOMIC_EXPORT_API bool atomicsharp_runframe()
 {
     if (!sApplication->RunFrame())
     {

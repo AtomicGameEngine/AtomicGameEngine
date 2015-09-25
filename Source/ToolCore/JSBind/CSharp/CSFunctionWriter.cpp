@@ -243,7 +243,7 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     String sig;
     GenNativeFunctionSignature(sig);
 
-    line = ToString("%s csb_%s_%s_%s(%s)\n",
+    line = ToString("ATOMIC_EXPORT_API %s csb_%s_%s_%s(%s)\n",
                     returnType.CString(), package->GetName().CString(), klass->GetName().CString(),
                     fname.CString(), sig.CString());
 

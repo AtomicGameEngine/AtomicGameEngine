@@ -13,12 +13,19 @@
 
 #include "AtomicSharp.h"
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#pragma warning(disable: 4244) // possible loss of data
+#define ATOMIC_EXPORT_API __declspec(dllexport)
+#else
+#define ATOMIC_EXPORT_API
+#endif
+
 using namespace Atomic;
 
 extern "C"
 {
 
-ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
+ATOMIC_EXPORT_API ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
 {
     if (!refCounted)
         return 0;
@@ -26,7 +33,7 @@ ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
     return refCounted->GetClassID();
 }
 
-RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
+ATOMIC_EXPORT_API RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
 {
     return AtomicSharp::GetContext()->GetSubsystem(name);
 }

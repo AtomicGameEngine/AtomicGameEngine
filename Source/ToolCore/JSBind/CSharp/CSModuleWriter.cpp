@@ -87,6 +87,12 @@ void CSModuleWriter::GenerateNativeSource()
 
     source += "#pragma warning(disable: 4244) // possible loss of data\n";
 
+    source += "#define ATOMIC_EXPORT_API __declspec(dllexport)\n";
+
+    source += "#else\n";
+
+    source += "#define ATOMIC_EXPORT_API\n";
+
     source += "#endif\n";
 
     if (module_->Requires("3D"))
