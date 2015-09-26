@@ -995,10 +995,6 @@ public:
 
     void ReleaseAllDownWidgets(TBWidget* widget, int x, int y, bool touch);
 
-    bool needCapturing_;
-
-    bool captured_;
-
 private:
 	friend class TBWidgetListener;	///< It does iteration of m_listeners for us.
 	TBWidget *m_parent;				///< The parent of this widget
@@ -1021,6 +1017,8 @@ private:
 	TBScroller *m_scroller;
 	TBLongClickTimer *m_long_click_timer;
     TBWidgetDelegate* m_delegate;
+    bool needCapturing_; //if ours widget need capturing
+    bool captured_; //if ours widget is currently captured
 	union {
 		struct {
 			uint16 is_group_root : 1;

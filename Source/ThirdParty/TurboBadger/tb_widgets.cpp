@@ -1442,7 +1442,7 @@ void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool 
 		// The move event was not handled, so handle panning of scrollable widgets.
 		HandlePanningOnMove(x, y);
     }
-        ReleaseAllDownWidgets(this, x, y, touch);
+    ReleaseAllDownWidgets(this, x, y, touch);
 }
 
 void TBWidget::HandlePanningOnMove(int x, int y)
