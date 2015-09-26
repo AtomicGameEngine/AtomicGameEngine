@@ -2023,7 +2023,7 @@ void Input::BindButton(UIButton* touchButton, int button)
     touchButton->SetEmulationButton(button);
 }
 
-void Input::FakeButtonDown(int button)
+void Input::SimulateButtonDown(int button)
 {
     SDL_Event evt;
     evt.type = SDL_KEYDOWN;
@@ -2031,7 +2031,7 @@ void Input::FakeButtonDown(int button)
     HandleSDLEvent(&evt);
 }
 
-void Input::FakeButtonUp(int button)
+void Input::SimulateButtonUp(int button)
 {
     SDL_Event evt;
     evt.type = SDL_KEYUP;

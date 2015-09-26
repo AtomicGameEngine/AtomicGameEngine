@@ -295,8 +295,8 @@ public:
     /// Binds UIButton element to the given button
     void BindButton(UIButton* touchButton, int button);
 
-    void FakeButtonDown(int button);
-    void FakeButtonUp(int button);
+    void SimulateButtonDown(int button);
+    void SimulateButtonUp(int button);
 
 private:
     /// Initialize when screen mode initially set.

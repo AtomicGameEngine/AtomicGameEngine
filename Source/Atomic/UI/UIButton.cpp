@@ -76,11 +76,11 @@ bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
     }
     if (ev.type == EVENT_TYPE_POINTER_DOWN && emulationButton_ >= 0)
     {
-        GetSubsystem<Input>()->FakeButtonDown(emulationButton_);
+        GetSubsystem<Input>()->SimulateButtonDown(emulationButton_);
     }
     if (ev.type == EVENT_TYPE_POINTER_UP && emulationButton_ >= 0)
     {
-        GetSubsystem<Input>()->FakeButtonUp(emulationButton_);
+        GetSubsystem<Input>()->SimulateButtonUp(emulationButton_);
     }
     return UIWidget::OnEvent(ev);
 }
