@@ -993,6 +993,8 @@ public:
 
     bool IsCaptured() { return captured_; }
 
+    void ReleaseAllDownWidgets(TBWidget* widget, int x, int y, bool touch);
+
     bool needCapturing_;
 
     bool captured_;

@@ -1406,11 +1406,30 @@ void TBWidget::MaybeInvokeLongClickOrContextMenu(bool touch)
 	}
 }
 
+void TBWidget::ReleaseAllDownWidgets(TBWidget* widget, int x, int y, bool touch)
+{
+    for (TBWidget *child = widget->GetFirstChild(); child; child = child->GetNext())
+    {
+        if (child->IsCaptured() && !child->GetHitStatus(x, y))
+        {
+            child->Invalidate();
+            child->InvalidateSkinStates();
+            child->OnCaptureChanged(false);
+            TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, false, TB_MODIFIER_NONE);
+            child->InvokeEvent(ev_up);
+        }
+        if (child->GetFirstChild())
+        {
+            ReleaseAllDownWidgets(child, x, y, touch);
+        }
+    }
+}
+
 void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool touch)
 {
 	SetHoveredWidget(GetWidgetAt(x, y, true), touch);
 	TBWidget *target = captured_widget ? captured_widget : hovered_widget;
-	if (target)
+    if (target)
 	{
 		target->ConvertFromRoot(x, y);
 		pointer_move_widget_x = x;
@@ -1422,7 +1441,8 @@ void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool 
 
 		// The move event was not handled, so handle panning of scrollable widgets.
 		HandlePanningOnMove(x, y);
-	}
+    }
+        ReleaseAllDownWidgets(this, x, y, touch);
 }
 
 void TBWidget::HandlePanningOnMove(int x, int y)
