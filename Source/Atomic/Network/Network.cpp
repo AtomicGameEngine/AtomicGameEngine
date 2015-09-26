@@ -36,6 +36,7 @@
 #include "../Network/NetworkEvents.h"
 #include "../Network/NetworkPriority.h"
 #include "../Network/Protocol.h"
+#include "../Network/WebSocket.h"
 #include "../Scene/Scene.h"
 
 #include <kNet/include/kNet.h>
@@ -409,6 +410,15 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
     // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<HttpRequest> request(new HttpRequest(url, verb, headers, postData));
     return request;
+}
+
+SharedPtr<WebSocket> Network::MakeWebSocket(const String& url)
+{
+  PROFILE(MakeWebSocket);
+
+  // The initialization of the WebSocket will take time, can not know at this point if it has an error or not
+  SharedPtr<WebSocket> webSocket(new WebSocket(url));
+  return webSocket;
 }
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const

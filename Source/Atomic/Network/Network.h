@@ -36,6 +36,7 @@ namespace Atomic
 class HttpRequest;
 class MemoryBuffer;
 class Scene;
+class WebSocket;
 
 /// MessageConnection hash function.
 template <class T> unsigned MakeHash(kNet::MessageConnection* value)
@@ -105,6 +106,8 @@ public:
     SharedPtr<HttpRequest> MakeHttpRequest
         (const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(),
             const String& postData = String::EMPTY);
+    /// Perform an WebSocket request to the specified URL. Return a WebSocket object which can be used to comunicate with the server.
+    SharedPtr<WebSocket> MakeWebSocket(const String& url);
 
     /// Return network update FPS.
     int GetUpdateFps() const { return updateFps_; }
