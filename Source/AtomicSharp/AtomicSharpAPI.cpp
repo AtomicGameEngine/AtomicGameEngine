@@ -12,6 +12,7 @@
 //
 
 #include "AtomicSharp.h"
+#include "AtomicSharpAPI.h"
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #pragma warning(disable: 4244) // possible loss of data
@@ -24,6 +25,49 @@ using namespace Atomic;
 
 extern "C"
 {
+
+typedef void (*CSComponentCreatePtr)(const char* csComponentTypeName, CSComponent* instance);
+CSComponentCreatePtr _CSComponentCreate = 0;
+ATOMIC_EXPORT_API void csb_AtomicEngine_AtomicInterop_Set_CSComponentCreate(CSComponentCreatePtr method)
+{
+    _CSComponentCreate = method;
+}
+
+void CSComponentCreate(String name, CSComponent* instance)
+{
+    assert(_CSComponentCreate);
+    _CSComponentCreate(name.CString(), instance);
+}
+
+
+typedef void (*CSComponentCallMethodPtr)(unsigned id, CSComponentMethod method, float value);
+CSComponentCallMethodPtr _CSComponentCallMethod = 0;
+ATOMIC_EXPORT_API void csb_AtomicEngine_AtomicInterop_Set_CSComponentCallMethod(CSComponentCallMethodPtr method)
+{
+    _CSComponentCallMethod = method;
+}
+
+void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value)
+{
+    assert(_CSComponentCreate);
+    _CSComponentCallMethod(id, methodID, value);
+}
+
+// Instance methods
+
+ATOMIC_EXPORT_API RefCounted* csb_Atomic_CSComponent_Constructor()
+{
+   return new CSComponent(AtomicSharp::GetContext());
+}
+
+ATOMIC_EXPORT_API void csb_Atomic_CSComponent_SetManagedID(CSComponent* self, unsigned id)
+{
+   if (!self)
+       return;
+
+    self->SetManagedID(id);
+}
+
 
 ATOMIC_EXPORT_API ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
 {

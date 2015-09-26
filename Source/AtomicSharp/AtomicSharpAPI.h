@@ -10,3 +10,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+#pragma once
+
+#include "CSComponent.h"
+
+namespace Atomic
+{
+
+extern "C"
+{
+
+void CSComponentCreate(String name, CSComponent* instance);
+
+void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
+
+}
+
+}
