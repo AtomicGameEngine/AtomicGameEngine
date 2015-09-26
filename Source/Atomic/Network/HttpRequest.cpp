@@ -26,9 +26,16 @@
 #include "../IO/Log.h"
 #include "../Network/HttpRequest.h"
 
+#include "../DebugNew.h"
+
+#ifdef EMSCRIPTEN
+
+// Add code to use an XMLHttpRequest or ActiveX XMLHttpRequest here.
+
+#else
+
 #include <Civetweb/include/civetweb.h>
 
-#include "../DebugNew.h"
 
 namespace Atomic
 {
@@ -110,16 +117,18 @@ void HttpRequest::ThreadFunction()
     if (postData_.Empty())
     {
         connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
-            "%s %s HTTP/1.0\r\n"
+            "%s %s HTTP/1.1\r\n"
             "Host: %s\r\n"
+            "Connection: close\r\n"
             "%s"
             "\r\n", verb_.CString(), path.CString(), host.CString(), headersStr.CString());
     }
     else
     {
         connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),
-            "%s %s HTTP/1.0\r\n"
+            "%s %s HTTP/1.1\r\n"
             "Host: %s\r\n"
+            "Connection: close\r\n"
             "%s"
             "Content-Length: %d\r\n"
             "\r\n"
@@ -282,3 +291,5 @@ unsigned HttpRequest::CheckEofAndAvailableSize()
 }
 
 }
+
+#endif
