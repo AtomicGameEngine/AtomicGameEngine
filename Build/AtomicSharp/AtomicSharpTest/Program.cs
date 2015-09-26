@@ -7,6 +7,12 @@ class MyComponent : CSComponent
 {
 	public float Speed = 1.0f;
 
+	override public void Start()
+	{
+		Console.Write ("I Started!");
+
+	}
+
 	override public void Update(float timeStep)
 	{
 		Node.Yaw (timeStep * 75 * Speed, TransformSpace.TS_LOCAL);

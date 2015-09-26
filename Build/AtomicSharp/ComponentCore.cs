@@ -35,6 +35,10 @@ namespace AtomicEngine
 
 				switch (method) {
 
+				case CSComponentMethod.Start:
+					component.Start ();
+					break;
+
 				case CSComponentMethod.Update:
 					component.Update (value);
 					break;

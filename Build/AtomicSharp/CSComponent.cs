@@ -25,6 +25,11 @@ namespace AtomicEngine
 
 		}
 
+		virtual public void Start()
+		{
+
+		}
+
 		virtual public void Update(float timeStep)
 		{
 			
