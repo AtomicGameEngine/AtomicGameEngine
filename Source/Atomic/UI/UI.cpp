@@ -185,6 +185,10 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
     SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
 
+    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));
+    SubscribeToEvent(E_TOUCHEND, HANDLER(UI, HandleTouchEnd));
+    SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
+
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
 
     tb::TBWidgetListener::AddGlobalListener(this);

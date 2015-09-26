@@ -237,6 +237,16 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     tb::TBWidget* GetInternalWidget() { return widget_; }
 
+    void SetDelegate(UIWidget* widget) { widget_->SetDelegate(widget); }
+
+    void SetMultiTouch(bool multiTouch) { multiTouch_ = multiTouch; }
+
+    bool IsMultiTouch() { return multiTouch_; }
+
+    void SetCapturing(bool capturing) { widget_->SetCapturing(capturing); }
+
+    bool GetCapturing() { return widget_->GetCapturing(); }
+
 protected:
 
     void ConvertEvent(UIWidget* handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
@@ -252,6 +262,9 @@ protected:
     SharedPtr<UIPreferredSize> preferredSize_;
 
     SharedPtr<UIDragObject> dragObject_;
+
+
+    bool multiTouch_;
 
 };
 

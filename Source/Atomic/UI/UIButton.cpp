@@ -35,7 +35,7 @@ using namespace tb;
 namespace Atomic
 {
 
-UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, false)
+UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, false), emulationButton_(-1)
 {
     if (createWidget)
     {
@@ -58,6 +58,11 @@ void UIButton::SetSqueezable(bool value)
     ((TBButton*)widget_)->SetSqueezable(value);
 }
 
+void UIButton::SetEmulationButton(int emulationButton)
+{
+    emulationButton_ = emulationButton;
+}
+
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CLICK)
@@ -68,6 +73,14 @@ bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
             FileSystem* fileSystem = GetSubsystem<FileSystem>();
             fileSystem->SystemOpen(text);
         }
+    }
+    if (ev.type == EVENT_TYPE_POINTER_DOWN && emulationButton_ >= 0)
+    {
+        GetSubsystem<Input>()->SimulateButtonDown(emulationButton_);
+    }
+    if (ev.type == EVENT_TYPE_POINTER_UP && emulationButton_ >= 0)
+    {
+        GetSubsystem<Input>()->SimulateButtonUp(emulationButton_);
     }
     return UIWidget::OnEvent(ev);
 }

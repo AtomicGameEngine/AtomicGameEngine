@@ -150,7 +150,10 @@ private:
     void HandleTextInput(StringHash eventType, VariantMap& eventData);
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
-
+    //Touch Input
+    void HandleTouchBegin(StringHash eventType, VariantMap& eventData);
+    void HandleTouchMove(StringHash eventType, VariantMap& eventData);
+    void HandleTouchEnd(StringHash eventType, VariantMap& eventData);
 };
 
 }

@@ -24,6 +24,8 @@
 
 #include "UIWidget.h"
 
+#include "../Input/Input.h"
+
 namespace Atomic
 {
 
@@ -39,12 +41,14 @@ public:
 
     void SetSqueezable(bool value);
 
+    void SetEmulationButton(int button);
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
 private:
-
+    int emulationButton_;
 };
 
 }
