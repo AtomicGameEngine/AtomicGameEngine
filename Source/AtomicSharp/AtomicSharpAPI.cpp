@@ -13,6 +13,7 @@
 
 #include "AtomicSharp.h"
 #include "AtomicSharpAPI.h"
+#include "CSScriptObject.h"
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #pragma warning(disable: 4244) // possible loss of data
@@ -74,6 +75,17 @@ ATOMIC_EXPORT_API RefCounted* csb_Atomic_CSComponent_Constructor()
 {
    return new CSComponent(AtomicSharp::GetContext());
 }
+
+ATOMIC_EXPORT_API RefCounted* csb_Atomic_CSScriptObject_Constructor()
+{
+   return new CSScriptObject(AtomicSharp::GetContext());
+}
+
+ATOMIC_EXPORT_API void csb_Atomic_AObject_SendEvent(Object* object, const char* eventType)
+{
+   object->SendEvent(eventType);
+}
+
 
 ATOMIC_EXPORT_API ClassID csb_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
 {

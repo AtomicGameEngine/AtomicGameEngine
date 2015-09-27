@@ -3,16 +3,28 @@ using System;
 using AtomicEngine;
 using AtomicPlayer;
 
+class MyObject : ScriptObject
+{
+	
+}
+
 class Spinner : CSComponent
 {
 	public float Speed = 1.0f;
 
 	override public void Start()
 	{
-		//var renderer = Atomic.GetSubsystem<Renderer> ();
-		//SubscribeToEvent (renderer, "BeginViewUpdate", handleEvent);
+		myObject = new MyObject ();
 
-		SubscribeToEvent ("BeginViewUpdate", handleEvent);
+		SubscribeToEvent (myObject, "MyEvent", handleMyObjectEvent);
+
+		var renderer = Atomic.GetSubsystem<Renderer> ();
+		SubscribeToEvent (renderer, "BeginViewUpdate", handleEvent);
+	}
+
+	void handleMyObjectEvent(VariantMap eventData)
+	{
+		Console.WriteLine ("Got My Event");		
 	}
 
 	void handleEvent(VariantMap eventData)
@@ -20,6 +32,8 @@ class Spinner : CSComponent
 		View view = eventData.Get<View> ("view");
 		view.Camera.Zoom = zoom;
 		zoom += .01f;
+
+		myObject.SendEvent ("MyEvent");
 	}
 
 	override public void Update(float timeStep)
@@ -28,6 +42,8 @@ class Spinner : CSComponent
 	}
 
 	float zoom = 1.0f;
+
+	MyObject myObject;
 
 }
 	
@@ -51,11 +67,12 @@ class MyGame
 
 		var name = zone.Node.Name;
 
+		/*
 		var chestNode = scene.GetChild ("Chest", true);
 		var c = chestNode.AddComponent <Spinner> ();
 		c.Speed = 10.0f;
-
 		c.Destroy ();
+		*/
 
 		zone.SetAmbientColor( new Color(1, 0, 0) );
 

@@ -67,7 +67,13 @@ namespace AtomicEngine
 		static Dictionary<uint, List<uint> > eventSubscribers = new Dictionary<uint, List<uint>>();
 
 		static Dictionary<uint, Dictionary<uint, Subscription> > subscriptions = new Dictionary<uint, Dictionary<uint, Subscription> >();
-		
+
+
+		public static void SendEvent(AObject sender, string eventType)
+		{
+			csb_Atomic_AObject_SendEvent (sender.nativeInstance, eventType);	
+		}
+
 		public static void SubscribeToEvent(AObject subscriber, AObject sender, string eventType, AtomicEventDelegate function)
 		{
 			var eventTypeID = Atomic.StringToStringHash (eventType);			
@@ -146,6 +152,10 @@ namespace AtomicEngine
 			vmap.Invalidate ();
 
 		}
+
+		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		private static extern void csb_Atomic_AObject_SendEvent(IntPtr self, string eventType);
+
 	}
 }
 

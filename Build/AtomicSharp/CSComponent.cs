@@ -40,12 +40,7 @@ namespace AtomicEngine
 		{
 			EventCore.SubscribeToEvent (this, null, eventType, function);
 		}
-
-		void handleEvent(string eventType, Dictionary<uint, object> eventData)
-		{
-
-		}
-			
+						
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
 		private static extern IntPtr csb_Atomic_CSComponent_Constructor();
 

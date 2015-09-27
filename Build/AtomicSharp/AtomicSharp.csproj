@@ -60,6 +60,7 @@
     <Compile Include="AtomicInterop.cs" />
     <Compile Include="NativeCore.cs" />
     <Compile Include="EventCore.cs" />
+    <Compile Include="ScriptObject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
