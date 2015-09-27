@@ -174,6 +174,18 @@ TBWidget *TBWidget::GetWidgetByIDInternal(const TBID &id, const TB_TYPE_ID type_
 	return nullptr;
 }
 
+TBWidget *TBWidget::GetWidgetByTouchId(unsigned touchId)
+{
+    if (IsCaptured() && touchId_ == touchId)
+        return this;
+    for (TBWidget *child = GetFirstChild(); child; child = child->GetNext())
+    {
+        if (TBWidget *sub_child = child->GetWidgetByTouchId(touchId))
+            return sub_child;
+    }
+    return nullptr;
+}
+
 TBStr TBWidget::GetTextByID(const TBID &id)
 {
 	if (TBWidget *widget = GetWidgetByID(id))
@@ -1274,10 +1286,10 @@ void TBWidget::StopLongClickTimer()
 	m_long_click_timer = nullptr;
 }
 
-void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys, bool touch)
+void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
     TBWidget* down_widget = GetWidgetAt(x, y, true);
-	if (!captured_widget && down_widget->needCapturing_)
+	if (!captured_widget && down_widget && down_widget->needCapturing_)
 	{
 		SetCapturedWidget(down_widget);
 		SetHoveredWidget(captured_widget, touch);
@@ -1328,6 +1340,7 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
         down_widget->Invalidate();
         down_widget->InvalidateSkinStates();
         down_widget->OnCaptureChanged(true);
+        down_widget->SetTouchId(touchId);
 		down_widget->ConvertFromRoot(x, y);
 		pointer_move_widget_x = pointer_down_widget_x = x;
 		pointer_move_widget_y = pointer_down_widget_y = y;
@@ -1337,10 +1350,10 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 	}
 }
 
-void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch)
+void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
     TBWidget* down_widget = GetWidgetAt(x, y, true);
-	if (down_widget)
+	if (down_widget && down_widget->touchId_ == touchId)
 	{
         down_widget->Invalidate();
         down_widget->InvalidateSkinStates();
@@ -1406,27 +1419,21 @@ void TBWidget::MaybeInvokeLongClickOrContextMenu(bool touch)
 	}
 }
 
-void TBWidget::ReleaseAllDownWidgets(TBWidget* widget, int x, int y, bool touch)
+void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
-    for (TBWidget *child = widget->GetFirstChild(); child; child = child->GetNext())
+    TBWidget* move = GetWidgetByTouchId(touchId);
+    if (move && move->IsCaptured())
     {
-        if (child->IsCaptured() && !child->GetHitStatus(x, y))
+        move->ConvertFromRoot(x, y);
+        if (move->GetHitStatus(x, y)<=0)
         {
-            child->Invalidate();
-            child->InvalidateSkinStates();
-            child->OnCaptureChanged(false);
-            TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, false, TB_MODIFIER_NONE);
-            child->InvokeEvent(ev_up);
-        }
-        if (child->GetFirstChild())
-        {
-            ReleaseAllDownWidgets(child, x, y, touch);
+            move->Invalidate();
+            move->InvalidateSkinStates();
+            move->OnCaptureChanged(false);
+            TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, true, TB_MODIFIER_NONE);
+            move->InvokeEvent(ev_up);
         }
     }
-}
-
-void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool touch)
-{
 	SetHoveredWidget(GetWidgetAt(x, y, true), touch);
 	TBWidget *target = captured_widget ? captured_widget : hovered_widget;
     if (target)
@@ -1442,7 +1449,6 @@ void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool 
 		// The move event was not handled, so handle panning of scrollable widgets.
 		HandlePanningOnMove(x, y);
     }
-    ReleaseAllDownWidgets(this, x, y, touch);
 }
 
 void TBWidget::HandlePanningOnMove(int x, int y)
