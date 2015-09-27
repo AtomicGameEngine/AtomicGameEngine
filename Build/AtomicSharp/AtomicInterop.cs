@@ -30,10 +30,24 @@ namespace AtomicEngine
 			ComponentCore.CallComponentMethod (componentID, method, value);
 		}
 
+		// Events
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		delegate void CSBeginSendEventDelegate (uint senderRefId, uint eventType, IntPtr eventData);
+
+		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		private static extern void csb_AtomicEngine_AtomicInterop_Set_CSBeginSendEvent(CSBeginSendEventDelegate method);	
+
+		static void CSBeginSendEvent(uint senderRefId, uint eventType, IntPtr eventData)
+		{
+			EventCore.BeginSendEvent (senderRefId, eventType, eventData);
+		}
+
 		public static void Initialize()
 		{
 			csb_AtomicEngine_AtomicInterop_Set_CSComponentCreate (CSComponentCreate);	
 			csb_AtomicEngine_AtomicInterop_Set_CSComponentCallMethod (CSComponentCallMethod);
+			csb_AtomicEngine_AtomicInterop_Set_CSBeginSendEvent (CSBeginSendEvent);
 		}
 
 	}

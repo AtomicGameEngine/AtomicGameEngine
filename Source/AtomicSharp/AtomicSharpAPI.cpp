@@ -53,6 +53,21 @@ void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value)
     _CSComponentCallMethod(id, methodID, value);
 }
 
+// Event Handling
+
+typedef void (*CSBeginSendEventPtr)(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
+CSBeginSendEventPtr _CSBeginSendEvent = 0;
+ATOMIC_EXPORT_API void csb_AtomicEngine_AtomicInterop_Set_CSBeginSendEvent(CSBeginSendEventPtr method)
+{
+    _CSBeginSendEvent = method;
+}
+
+void CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData)
+{
+    assert(_CSBeginSendEvent);
+    _CSBeginSendEvent(senderRefID, eventType, eventData);
+}
+
 // Instance methods
 
 ATOMIC_EXPORT_API RefCounted* csb_Atomic_CSComponent_Constructor()
@@ -60,7 +75,7 @@ ATOMIC_EXPORT_API RefCounted* csb_Atomic_CSComponent_Constructor()
    return new CSComponent(AtomicSharp::GetContext());
 }
 
-ATOMIC_EXPORT_API ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
+ATOMIC_EXPORT_API ClassID csb_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
 {
     if (!refCounted)
         return 0;
@@ -71,6 +86,35 @@ ATOMIC_EXPORT_API ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
 ATOMIC_EXPORT_API RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
 {
     return AtomicSharp::GetContext()->GetSubsystem(name);
+}
+
+ATOMIC_EXPORT_API void csb_Atomic_RefCounted_SafeAddRef(unsigned id)
+{
+    RefCounted* ref = RefCounted::GetByID(id);
+    if (ref)
+        ref->AddRef();
+
+}
+
+ATOMIC_EXPORT_API void csb_Atomic_RefCounted_SafeReleaseRef(unsigned id)
+{
+    RefCounted* ref = RefCounted::GetByID(id);
+    if (ref)
+        ref->ReleaseRef();
+
+}
+
+ATOMIC_EXPORT_API unsigned csb_Atomic_StringToStringHash(const char* stringValue)
+{
+    StringHash hash = stringValue;
+    return hash.Value();
+}
+
+// Variant Map
+
+ATOMIC_EXPORT_API RefCounted* csb_Atomic_VariantMap_GetInstance(VariantMap& vmap, const char* key)
+{
+    return vmap[key].GetPtr();
 }
 
 

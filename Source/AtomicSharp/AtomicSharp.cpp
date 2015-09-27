@@ -1,4 +1,5 @@
 
+#include "CSEventHelper.h"
 #include "CSComponent.h"
 #include "AtomicSharp.h"
 
@@ -20,10 +21,18 @@ AtomicSharp::AtomicSharp(Context* context) :
     assert(!instance_);
     instance_ = this;
     csContext_ = context;
+
+    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
+    context_->RegisterSubsystem(dispatcher);
+    context_->AddGlobalEventListener(dispatcher);
+
 }
 
 AtomicSharp::~AtomicSharp()
 {
+    context_->RemoveGlobalEventListener(context_->GetSubsystem<CSEventDispatcher>());
+    context_->RemoveSubsystem(CSEventDispatcher::GetTypeStatic());
+
     instance_ = NULL;
 }
 

@@ -25,6 +25,10 @@ CSComponent* CSComponentCreate(String name);
 
 void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
 
+void CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
+
+void CSEndSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
+
 }
 
 }

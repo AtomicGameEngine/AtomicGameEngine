@@ -164,8 +164,9 @@ namespace AtomicPlayer
         // as if not, will hold on engine subsystems, which is bad
         assert(!JSVM::GetJSVM(0));
 
-        Application::Stop();
+        context_->RemoveSubsystem<AtomicSharp>();
 
+        Application::Stop();
 
     }
 

@@ -19,6 +19,7 @@ namespace AtomicEngine
 	{
 		static Dictionary<String, Type> componentTypes = new Dictionary<String, Type>();
 
+		// holds a reference
 		static Dictionary<uint, CSComponent> liveComponents = new Dictionary<uint, CSComponent>();
 
 		public static IntPtr CurrentCSComponentNativeInstance = default(IntPtr);
@@ -46,10 +47,20 @@ namespace AtomicEngine
 
 		public static void RegisterCSComponent(CSComponent component)
 		{
-			// register
+			// register (holds a reference)
 			liveComponents [component.RefID] = component;
 		}
 
+		public static void DestroyComponent(Component component)
+		{
+			var c = component as CSComponent;
+
+			if (c != null) {
+
+				liveComponents.Remove (c.RefID);
+			}
+		}
+			
 		// native create CSComponent
 		public static IntPtr CreateCSComponent(string name) 
 		{
@@ -59,7 +70,6 @@ namespace AtomicEngine
 
 				// create an instance of the component type
 				var component = (CSComponent) Activator.CreateInstance(type);
-				RegisterCSComponent (component);
 
 				return component.nativeInstance;
 

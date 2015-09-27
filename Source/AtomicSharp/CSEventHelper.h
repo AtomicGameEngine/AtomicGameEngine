@@ -38,17 +38,14 @@ public:
     /// Destruct.
     virtual ~CSEventDispatcher();
 
-    void RegisterCSEvent(StringHash hash) { csEvents_[hash] = true; }
-
 private:
 
     void BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData);
     void EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData);
 
-    HashMap<StringHash, bool> csEvents_;
-
 };
 
+/*
 class ATOMIC_API CSEventHelper : public Object
 {
     OBJECT(CSEventHelper);
@@ -69,6 +66,7 @@ private:
     WeakPtr<Object> object_;
 
 };
+*/
 
 
 }

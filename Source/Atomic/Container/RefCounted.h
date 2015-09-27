@@ -91,6 +91,7 @@ public:
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
     inline unsigned GetRefID() const { return refID_; }
+    inline static RefCounted* GetByID(unsigned id) { if (!refLookup_.Contains(id)) return 0; return refLookup_[id]; }
 
     /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
@@ -109,9 +110,9 @@ private:
 
     // ATOMIC BEGIN
 
-    HashMap<unsigned, RefCounted*> refLookup_;
     unsigned refID_;
     static unsigned refIDCounter_;
+    static HashMap<unsigned, RefCounted*> refLookup_;
 
     void* jsHeapPtr_;
 

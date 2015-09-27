@@ -18,7 +18,8 @@
 			"GetChild" : ["String", "bool"],
 			"SetScale" : ["Vector3"],
 			"SetPosition2D" : ["Vector2"],
-			"SetScale2D" : ["Vector2"]
+			"SetScale2D" : ["Vector2"],
+			"RemoveComponent" : ["Component"]
 		},
 		"ValueAnimationInfo" : {
 			"ValueAnimationInfo" : ["ValueAnimation", "WrapMode", "float"]
@@ -49,7 +50,7 @@
 		]
 	},
 	"haxe_decl" : {
-		
+
 		"Node" : [
 			"function saveXML(file:File):Bool;",
 			"function getChildrenWithName(name:String, ?recursive:Bool):Array<Node>;",

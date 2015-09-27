@@ -31,6 +31,7 @@ namespace Atomic
 
 // ATOMIC BEGIN
 unsigned RefCounted::refIDCounter_ = 1;
+HashMap<unsigned, RefCounted*> RefCounted::refLookup_;
 // ATOMIC END
 
 RefCounted::RefCounted() :
