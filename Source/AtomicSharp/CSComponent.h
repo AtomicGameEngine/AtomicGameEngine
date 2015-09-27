@@ -79,7 +79,6 @@ public:
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
 
     void SetDestroyed() { destroyed_ = true; }
-    void SetManagedID(unsigned id) { managedID_ = id; }
 
 protected:
     /// Handle scene node being assigned at creation.
@@ -132,8 +131,6 @@ private:
     bool delayedStartCalled_;
 
     bool loading_;
-
-    unsigned managedID_;
 
 };
 

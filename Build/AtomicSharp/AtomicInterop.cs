@@ -6,11 +6,11 @@ namespace AtomicEngine
 	internal static class AtomicInterop
 	{
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-		delegate void CSComponentCreateDelegate (string name, IntPtr nativeCSComponent);
+		delegate IntPtr CSComponentCreateDelegate (string name);
 
-		static void CSComponentCreate(string name, IntPtr nativeCSComponent)
+		static IntPtr CSComponentCreate(string name)
 		{
-			ComponentCore.CreateCSComponent (name, nativeCSComponent);
+			return ComponentCore.CreateCSComponent (name);
 		}
 
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]

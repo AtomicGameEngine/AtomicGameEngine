@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace AtomicEngine
@@ -9,20 +10,8 @@ namespace AtomicEngine
 
 		public CSComponent ()
 		{	
-			// component being created native side
-			if (ComponentCore.CurrentCSComponentNativeInstance != IntPtr.Zero) {
-
-				nativeInstance = ComponentCore.CurrentCSComponentNativeInstance;
-				NativeCore.RegisterNative (nativeInstance, this);
-				ComponentCore.CurrentCSComponentNativeInstance = IntPtr.Zero;
-				
-			} else {
-				
-				nativeInstance = NativeCore.RegisterNative (csb_Atomic_CSComponent_Constructor(), this);	
-				ComponentCore.RegisterCSComponent (this);
-			
-			}
-
+			nativeInstance = NativeCore.RegisterNative (csb_Atomic_CSComponent_Constructor(), this);	
+			ComponentCore.RegisterCSComponent (this);
 		}
 
 		virtual public void Start()
@@ -34,12 +23,31 @@ namespace AtomicEngine
 		{
 			
 		}
-
-		public void SetManagedID(uint id)
+			
+		public void SendEvent(string eventType, Dictionary<string, object> eventData = null)
 		{
-			csb_Atomic_CSComponent_SetManagedID (nativeInstance, id);
+
 		}
 
+		// function would be a C# method, and all classes other than component and uiwidget are sealed
+		// so basically, not having inheritance means no local state for native classes
+		// allowing inheritance, neans need to GCHandle the object as can have local state
+		// and can't regenerate it, comes down to components and UI?
+		public void SubscribeToEvent(AObject sender, string eventType, object function)
+		{
+
+		}
+
+		public void SubscribeToEvent(string eventType, object function)
+		{
+
+		}
+
+		void handleEvent(string eventType, Dictionary<uint, object> eventData)
+		{
+
+		}
+			
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
 		private static extern IntPtr csb_Atomic_CSComponent_Constructor();
 

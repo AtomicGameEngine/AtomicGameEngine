@@ -3,20 +3,20 @@ using System;
 using AtomicEngine;
 using AtomicPlayer;
 
-class MyComponent : CSComponent
+class Spinner : CSComponent
 {
 	public float Speed = 1.0f;
 
 	override public void Start()
 	{
-		Console.Write ("I Started!");
-
+		
 	}
 
 	override public void Update(float timeStep)
 	{
 		Node.Yaw (timeStep * 75 * Speed, TransformSpace.TS_LOCAL);
 	}
+
 }
 	
 class MyGame
@@ -37,7 +37,7 @@ class MyGame
 		var name = zone.Node.Name;
 
 		var chestNode = scene.GetChild ("Chest", true);
-		var c = chestNode.AddComponent <MyComponent> ();
+		var c = chestNode.AddComponent <Spinner> ();
 		c.Speed = 10.0f;
 
 		zone.SetAmbientColor( new Color(1, 0, 0) );

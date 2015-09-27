@@ -64,7 +64,6 @@ void CSClassWriter::GenerateNativeSource(String& sourceOut)
     sourceOut += source;
 }
 
-
 void CSClassWriter::WriteManagedProperties(String& sourceOut)
 {
     String source;

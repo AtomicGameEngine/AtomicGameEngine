@@ -26,17 +26,17 @@ using namespace Atomic;
 extern "C"
 {
 
-typedef void (*CSComponentCreatePtr)(const char* csComponentTypeName, CSComponent* instance);
+typedef CSComponent* (*CSComponentCreatePtr)(const char* csComponentTypeName);
 CSComponentCreatePtr _CSComponentCreate = 0;
 ATOMIC_EXPORT_API void csb_AtomicEngine_AtomicInterop_Set_CSComponentCreate(CSComponentCreatePtr method)
 {
     _CSComponentCreate = method;
 }
 
-void CSComponentCreate(String name, CSComponent* instance)
+CSComponent* CSComponentCreate(String name)
 {
     assert(_CSComponentCreate);
-    _CSComponentCreate(name.CString(), instance);
+    return _CSComponentCreate(name.CString());
 }
 
 
@@ -59,15 +59,6 @@ ATOMIC_EXPORT_API RefCounted* csb_Atomic_CSComponent_Constructor()
 {
    return new CSComponent(AtomicSharp::GetContext());
 }
-
-ATOMIC_EXPORT_API void csb_Atomic_CSComponent_SetManagedID(CSComponent* self, unsigned id)
-{
-   if (!self)
-       return;
-
-    self->SetManagedID(id);
-}
-
 
 ATOMIC_EXPORT_API ClassID csb_RefCounted_GetClassID(RefCounted* refCounted)
 {

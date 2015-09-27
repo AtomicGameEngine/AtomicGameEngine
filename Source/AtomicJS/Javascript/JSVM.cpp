@@ -57,14 +57,15 @@ JSVM::JSVM(Context* context) :
 
     metrics_ = new JSMetrics(context, this);
 
-    context_->RegisterSubsystem(new JSEventDispatcher(context_));
-    context_->SetGlobalEventListener(context_->GetSubsystem<JSEventDispatcher>());
+    SharedPtr<JSEventDispatcher> dispatcher(new JSEventDispatcher(context_));
+    context_->RegisterSubsystem(dispatcher);
+    context_->AddGlobalEventListener(dispatcher);
 
 }
 
 JSVM::~JSVM()
 {
-    context_->SetGlobalEventListener(0);
+    context_->RemoveGlobalEventListener(context_->GetSubsystem<JSEventDispatcher>());
     context_->RemoveSubsystem(JSEventDispatcher::GetTypeStatic());
 
     duk_destroy_heap(ctx_);

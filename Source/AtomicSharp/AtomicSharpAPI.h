@@ -21,7 +21,7 @@ namespace Atomic
 extern "C"
 {
 
-void CSComponentCreate(String name, CSComponent* instance);
+CSComponent* CSComponentCreate(String name);
 
 void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
 

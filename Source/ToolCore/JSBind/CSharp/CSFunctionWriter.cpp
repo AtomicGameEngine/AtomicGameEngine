@@ -465,17 +465,17 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
     JSBClass* klass = function_->GetClass();
     JSBPackage* package = klass->GetPackage();
 
+    if (klass->GetName() == "RefCounted")
+        return;
+
     // wrapping constructor
 
     String line;
 
-    if (klass->GetName() != "RefCounted")
-    {
-        line = ToString("public %s (IntPtr native) : base (native)\n", klass->GetName().CString());
-        source += IndentLine(line);
-        source += IndentLine("{\n");
-        source += IndentLine("}\n\n");
-    }
+    line = ToString("public %s (IntPtr native) : base (native)\n", klass->GetName().CString());
+    source += IndentLine(line);
+    source += IndentLine("{\n");
+    source += IndentLine("}\n\n");
 
     String sig;
     GenManagedFunctionParameters(sig);
@@ -488,7 +488,11 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
 
     Indent();
 
-    source += IndentLine(ToString("if (typeof(%s) == this.GetType())\n", klass->GetName().CString()));
+    line = ToString("if (typeof(%s) == this.GetType()", klass->GetName().CString());
+    line += ToString(" || (this.GetType().BaseType == typeof(%s) && !NativeCore.GetNativeType(this.GetType())))\n", klass->GetName().CString());
+
+    source += IndentLine(line);
+
     source += IndentLine("{\n");
 
     Indent();

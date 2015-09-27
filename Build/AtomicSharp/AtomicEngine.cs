@@ -98,20 +98,21 @@ namespace AtomicEngine
 	{
 		public const string LIBNAME = "/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicSharp/AtomicSharp";
 	}
-
-	public partial class Node
-	{
-		public T AddComponent<T> () where T:Component, new()
-		{
-			T component = new T ();
-			AddComponent( component, 0, CreateMode.REPLICATED);
-			return component;
-		}
-//		/new MyComponent (), 0, CreateMode.REPLICATED
-	}
-
+		
 	public partial class RefCounted
-	{
+	{		
+		public RefCounted()
+		{
+			// if we're not a native type, we need to not be kept alive
+			// as we need to save managed state, native types don't 
+			// save local state
+			if (!NativeCore.GetNativeType (this.GetType ())) {
+
+				handle = GCHandle.Alloc (this);
+			}
+		
+		}
+
 		protected RefCounted (IntPtr native)
 		{
 			nativeInstance = native;
@@ -130,19 +131,31 @@ namespace AtomicEngine
 		}
 
 		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-		public static extern IntPtr csb_RefCounted_GetClassID (IntPtr self);	
+		public static extern IntPtr csb_RefCounted_GetClassID (IntPtr self);
+
+		GCHandle handle;
 
 	}
 
+	public partial class AObject
+	{
+	}
+		
 	public partial class Node : Animatable
 	{
 		public T GetComponent<T> (bool recursive  = false) where T:Component
 		{
 			return (T) GetComponent (typeof(T).Name, recursive);
 		}
+
+		public T AddComponent<T> () where T:Component, new()
+		{
+			T component = new T ();
+			AddComponent( component, 0, CreateMode.REPLICATED);
+			return component;
+		}
+
 		
 	}
-
-
-
+		
 }

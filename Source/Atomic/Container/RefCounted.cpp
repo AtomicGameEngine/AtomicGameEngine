@@ -29,10 +29,17 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+unsigned RefCounted::refIDCounter_ = 1;
+// ATOMIC END
+
 RefCounted::RefCounted() :
     refCount_(new RefCount()),
     jsHeapPtr_(0)
 {
+    refID_ = refIDCounter_++;
+    refLookup_[refID_] = this;
+
     // Hold a weak ref to self to avoid possible double delete of the refcount
     (refCount_->weakRefs_)++;
 }
@@ -63,7 +70,10 @@ void RefCounted::ReleaseRef()
     assert(refCount_->refs_ > 0);
     (refCount_->refs_)--;
     if (!refCount_->refs_)
+    {
+        refLookup_.Erase(refID_);
         delete this;
+    }
 }
 
 int RefCounted::Refs() const

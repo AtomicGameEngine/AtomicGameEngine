@@ -54,8 +54,7 @@ void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attribute
 
 Context::Context() :
     eventHandler_(0),
-    editorContext_(false),
-    globalEventListener_(0)
+    editorContext_(false)
 {
 #ifdef ANDROID
     // Always reset the random seed on Android, as the Urho3D library might not be unloaded between runs

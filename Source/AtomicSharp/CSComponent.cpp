@@ -87,11 +87,7 @@ public:
 
         if (managedClass.Length())
         {
-            CSComponent* csc = new CSComponent(context_);
-            CSComponentCreate(managedClass, csc);
-            assert(csc->managedID_);
-            ptr = csc;
-
+            ptr = CSComponentCreate(managedClass);
         }
 
         if (ptr.Null())
@@ -112,8 +108,7 @@ CSComponent::CSComponent(Context* context) :
     destroyed_(false),
     scriptClassInstance_(false),
     delayedStartCalled_(false),
-    loading_(false),
-    managedID_(0)
+    loading_(false)
 {
 
 }
@@ -149,10 +144,10 @@ void CSComponent::ApplyAttributes()
 
 void CSComponent::CallScriptMethod(CSComponentMethod method, float value)
 {
-    if (!managedID_ || destroyed_ || !node_ || !node_->GetScene())
+    if (destroyed_ || !node_ || !node_->GetScene())
         return;
 
-    CSComponentCallMethod(managedID_, method, value);
+    CSComponentCallMethod(GetRefID(), method, value);
 
 }
 
