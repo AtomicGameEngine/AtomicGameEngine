@@ -164,11 +164,6 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         return;
 
     Input* input = GetSubsystem<Input>();
-    using namespace TouchBegin;
-    int x = eventData[P_X].GetInt();
-    int y = eventData[P_Y].GetInt();
-
-    IntVector2 pos = IntVector2(x, y);
     
     static double last_time = 0;
     static int counter = 1;
@@ -182,7 +177,15 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
         counter = 1;
 
     last_time = time;
-    rootWidget_->InvokePointerDown(pos.x_, pos.y_, counter, TB_MODIFIER_NONE, true);
+    unsigned numTouches = input->GetNumTouches();
+
+    for (unsigned i = 0; i < numTouches; i++)
+    {
+        TouchState* touch = input->GetTouch(i);
+        int px = touch->position_.x_;
+        int py = touch->position_.y_;
+        rootWidget_->InvokePointerDown(px, py, counter, TB_MODIFIER_NONE, true, touch->touchID_);
+    }
 }
 
 void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
@@ -191,13 +194,16 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
         return;
 
     Input* input = GetSubsystem<Input>();
-    using namespace TouchMove;
-    int x = eventData[P_X].GetInt();
-    int y = eventData[P_Y].GetInt();
 
-    IntVector2 pos = IntVector2(x, y);
+    unsigned numTouches = input->GetNumTouches();
 
-    rootWidget_->InvokePointerMove(pos.x_, pos.y_, TB_MODIFIER_NONE, true);
+    for (unsigned i = 0; i < numTouches; i++)
+    {
+        TouchState* touch = input->GetTouch(i);
+        int px = touch->position_.x_;
+        int py = touch->position_.y_;
+        rootWidget_->InvokePointerMove(px, py, TB_MODIFIER_NONE, true, touch->touchID_);
+    }
 }
 
 void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
@@ -206,13 +212,15 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
         return;
 
     Input* input = GetSubsystem<Input>();
-    using namespace TouchEnd;
-    int x = eventData[P_X].GetInt();
-    int y = eventData[P_Y].GetInt();
+    unsigned numTouches = input->GetNumTouches();
 
-    IntVector2 pos = IntVector2(x, y);
-
-    rootWidget_->InvokePointerUp(pos.x_, pos.y_, TB_MODIFIER_NONE, true);
+    for (unsigned i = 0; i < numTouches; i++)
+    {
+        TouchState* touch = input->GetTouch(i);
+        int px = touch->position_.x_;
+        int py = touch->position_.y_;
+        rootWidget_->InvokePointerUp(px, py, TB_MODIFIER_NONE, true, touch->touchID_);
+    }
 }
 
 static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool down)
