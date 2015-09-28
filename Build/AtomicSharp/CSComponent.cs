@@ -28,7 +28,7 @@ namespace AtomicEngine
 			
 		public void SendEvent(string eventType, Dictionary<string, object> eventData = null)
 		{
-
+			EventCore.SendEvent (this, eventType);
 		}
 
 		public void SubscribeToEvent(AObject sender, string eventType, AtomicEventDelegate function)

@@ -184,7 +184,12 @@ public:
 
 
         if (!jtype)
+        {
             jtype = processTypeConversion(type);
+            if (fst.isUnsigned() && jtype->asPrimitiveType())
+                jtype->asPrimitiveType()->isUnsigned_ = true;
+
+        }
 
         if (!jtype)
             return NULL;

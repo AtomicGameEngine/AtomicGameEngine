@@ -15,7 +15,9 @@ String CSTypeHelper::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
         return "int";
     if (ptype->kind_ == JSBPrimitiveType::Float)
         return "float";
-    if (ptype->kind_ == JSBPrimitiveType::Char)
+    if (ptype->kind_ == JSBPrimitiveType::Char && ptype->isUnsigned_)
+        return "byte";
+    else if (ptype->kind_ == JSBPrimitiveType::Char)
         return "char";
     if (ptype->kind_ == JSBPrimitiveType::Short)
         return "short";

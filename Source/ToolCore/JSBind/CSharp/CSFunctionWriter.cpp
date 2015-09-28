@@ -337,6 +337,23 @@ void CSFunctionWriter::GenerateNativeSource(String& sourceOut)
 
 // MANAGED----------------------------------------------------------------------------------------
 
+void CSFunctionWriter::WriteDefaultStructParameters(String& source)
+{
+
+    for (unsigned i = 0; i < defaultStructParameters_.Size(); i++)
+    {
+        const DefaultStructParameter& dparm = defaultStructParameters_[i];
+
+        String line = ToString("if (default(%s).Equals(%s)) %s = %s;\n",
+                               dparm.type.CString(), dparm.parameterName.CString(), dparm.parameterName.CString(),
+                               dparm.assignment.CString());
+
+        source += IndentLine(line);
+
+    }
+
+}
+
 void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 {
     source += "\n";
@@ -426,6 +443,7 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 }
 
 
+
 void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
 {
     // generate args
@@ -450,9 +468,15 @@ void CSFunctionWriter::GenManagedFunctionParameters(String& sig)
 
             sig += CSTypeHelper::GetManagedTypeString(ptype);
 
-            // hack for Drawable as this causes a compilation error (need to add default params)
-            if (sig.EndsWith("drawableFlags"))
-                sig += " = '\\0'";
+            String init = ptype->initializer_;
+
+            if (init.Length())
+            {
+                init = MapDefaultParameter(ptype);
+                if (init.Length())
+                    sig += " = " + init;
+
+            }
 
             if (i + 1 != parameters.Size())
                 sig += ", ";
@@ -487,6 +511,8 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
     source += IndentLine("{\n");
 
     Indent();
+
+    WriteDefaultStructParameters(source);
 
     line = ToString("if (typeof(%s) == this.GetType()", klass->GetName().CString());
     line += ToString(" || (this.GetType().BaseType == typeof(%s) && !NativeCore.GetNativeType(this.GetType())))\n", klass->GetName().CString());
@@ -597,6 +623,8 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
     source += IndentLine("{\n");
 
     Indent();
+
+    WriteDefaultStructParameters(source);
 
     line.Clear();
 
@@ -714,6 +742,104 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
 void CSFunctionWriter::GenerateSource(String& sourceOut)
 {
 
+}
+
+String CSFunctionWriter::MapDefaultParameter(JSBFunctionType* parameter)
+{
+
+    String init = parameter->initializer_;
+
+    if (!init.Length())
+        return init;
+
+    if (parameter->type_->asClassType())
+    {
+        if (init == "0")
+            return "null";
+    }
+
+    if (parameter->type_->asEnumType())
+    {
+        return parameter->type_->asEnumType()->enum_->GetName() + "." + init;
+    }
+
+    if (function_->class_->GetPackage()->ContainsConstant(init))
+        return "Constants." + init;
+
+    if (init == "true" || init == "false")
+        return init;
+
+    if (init == "0.0f")
+        return init;
+
+    if (init == "1.0f")
+        return init;
+
+    if (init == "0.1f")
+        return init;
+
+    if (init == "0")
+        return init;
+
+    if (init == "-1")
+        return init;
+
+    if (init == "\"\\t\"")
+        return init;
+
+    if (init == "NULL")
+        return "null";
+
+    if (init == "M_MAX_UNSIGNED")
+        return "0xffffffff";
+
+    if (init == "String::EMPTY")
+        return "\"\"";
+
+    // this kind of sucks, can't define const structs
+    // and default parameters need to be const :/
+
+    DefaultStructParameter dparm;
+
+    dparm.parameterName = parameter->name_;
+
+    if (init == "Vector3::ZERO")
+    {
+        dparm.type = "Vector3";
+        dparm.assignment = "Vector3.Zero";
+        defaultStructParameters_.Push(dparm);
+
+        return "default(Vector3)";
+    }
+
+    if (init == "Vector3::ONE")
+    {
+        dparm.type = "Vector3";
+        dparm.assignment = "Vector3.One";
+        defaultStructParameters_.Push(dparm);
+
+        return "default(Vector3)";
+    }
+
+    if (init == "Vector3::UP")
+    {
+        dparm.type = "Vector3";
+        dparm.assignment = "Vector3.Up";
+        defaultStructParameters_.Push(dparm);
+
+        return "default(Vector3)";
+    }
+
+    if (init == "IntVector2::ZERO")
+        return "IntVector2.Zero";
+
+    if (init == "Quaternion::IDENTITY")
+        return "Quaternion.Identity";
+
+
+    LOGINFOF("HEY! %s", init.CString());
+
+    return String::EMPTY;
 }
 
 }

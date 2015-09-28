@@ -20,11 +20,20 @@ class Spinner : CSComponent
 
 		var renderer = Atomic.GetSubsystem<Renderer> ();
 		SubscribeToEvent (renderer, "BeginViewUpdate", handleEvent);
+
+		SubscribeToEvent (this, "SelfEvent", handleSelfEvent);
+
+		SendEvent ("SelfEvent");
 	}
 
+	void handleSelfEvent(VariantMap eventData)
+	{
+		Console.WriteLine ("Got Self Event");		
+	}
+		
 	void handleMyObjectEvent(VariantMap eventData)
 	{
-		Console.WriteLine ("Got My Event");		
+		//Console.WriteLine ("Got My Event");		
 	}
 
 	void handleEvent(VariantMap eventData)
@@ -38,7 +47,7 @@ class Spinner : CSComponent
 
 	override public void Update(float timeStep)
 	{
-		Node.Yaw (timeStep * 75 * Speed, TransformSpace.TS_LOCAL);
+		Node.Yaw (timeStep * 75 * Speed);
 	}
 
 	float zoom = 1.0f;

@@ -34,6 +34,17 @@ public:
 
 private:
 
+    struct DefaultStructParameter
+    {
+        String type;
+        String parameterName;
+        String assignment;
+    };
+
+    Vector<DefaultStructParameter> defaultStructParameters_;
+
+    void WriteDefaultStructParameters(String& source);
+
     void GenNativeCallParameters(String& sig);
     void GenNativeFunctionSignature(String& sig);
 
@@ -41,6 +52,8 @@ private:
     void WriteNativeConstructor(String& source);
     void WriteNativeParameterMarshal(String& source);
 
+
+    String MapDefaultParameter(JSBFunctionType* parameter);
 
     void GenManagedFunctionParameters(String& sig);
 

@@ -94,8 +94,8 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
 
                 if (!fType)
                     fType = setType;
-                //else if (fType->type_ != setType->type_)
-                //    continue;
+                else if (fType->type_->ToString() != setType->type_->ToString())
+                    continue;
             }
 
             if (!fType)

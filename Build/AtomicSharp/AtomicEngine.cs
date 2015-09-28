@@ -105,6 +105,8 @@ namespace AtomicEngine
 	public static partial class Constants
 	{
 		public const string LIBNAME = "/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicSharp/AtomicSharp";
+
+		public const uint M_MAX_UNSIGNED = 0xffffffff;
 	}
 		
 	public partial class RefCounted
