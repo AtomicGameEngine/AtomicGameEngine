@@ -65,6 +65,9 @@
       <Link>CSModuleInput.cs</Link>
     </Compile>
     <Compile Include="SDLConsts.cs" />
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAtomic2D.cs">
+      <Link>CSModuleAtomic2D.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -831,7 +831,13 @@ String CSFunctionWriter::MapDefaultParameter(JSBFunctionType* parameter)
     }
 
     if (init == "IntVector2::ZERO")
-        return "IntVector2.Zero";
+    {
+        dparm.type = "IntVector2";
+        dparm.assignment = "IntVector2.Zero";
+        defaultStructParameters_.Push(dparm);
+        return "default(IntVector2)";
+    }
+
 
     if (init == "Quaternion::IDENTITY")
         return "Quaternion.Identity";

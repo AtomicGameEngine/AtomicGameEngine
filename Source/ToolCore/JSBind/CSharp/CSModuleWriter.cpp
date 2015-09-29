@@ -256,6 +256,10 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
             String managedType = GetManagedPrimitiveType(constant.type);
 
             String value = constant.value;
+
+            if (!value.Length())
+                continue;
+
             //static const unsigned M_MIN_UNSIGNED = 0x00000000;
 //            /static const unsigned M_MAX_UNSIGNED = 0xffffffff;
 
