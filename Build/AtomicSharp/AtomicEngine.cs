@@ -67,10 +67,21 @@ namespace AtomicEngine
 		{
 			ContainerModule.Initialize ();
 			CoreModule.Initialize ();
+			MathModule.Initialize ();
+			EngineModule.Initialize ();
+			InputModule.Initialize ();
 			IOModule.Initialize ();
 			ResourceModule.Initialize ();
+			AudioModule.Initialize ();
 			GraphicsModule.Initialize ();
-			SceneModule.Initialize ();		
+			SceneModule.Initialize ();	
+			Atomic2DModule.Initialize ();
+			Atomic3DModule.Initialize ();
+			NavigationModule.Initialize ();
+			NetworkModule.Initialize ();
+			PhysicsModule.Initialize ();
+			EnvironmentModule.Initialize ();
+			UIModule.Initialize ();
 
 			AtomicPlayer.PlayerModule.Initialize ();
 
@@ -98,6 +109,7 @@ namespace AtomicEngine
 			registerSubsystem (NativeCore.WrapNative<Player> (csb_AtomicEngine_GetSubsystem("Player")));	
 			registerSubsystem (NativeCore.WrapNative<Graphics> (csb_AtomicEngine_GetSubsystem("Graphics")));	
 			registerSubsystem (NativeCore.WrapNative<Renderer> (csb_AtomicEngine_GetSubsystem("Renderer")));	
+			registerSubsystem (NativeCore.WrapNative<ResourceCache> (csb_AtomicEngine_GetSubsystem("ResourceCache")));	
 		}
 
 	}
@@ -105,8 +117,6 @@ namespace AtomicEngine
 	public static partial class Constants
 	{
 		public const string LIBNAME = "/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicSharp/AtomicSharp";
-
-		public const uint M_MAX_UNSIGNED = 0xffffffff;
 	}
 		
 	public partial class RefCounted

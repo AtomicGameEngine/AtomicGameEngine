@@ -88,7 +88,7 @@ namespace AtomicPlayer
         engineParameters_["FullScreen"] = false;
         engineParameters_["WindowWidth"] = 1280 * .55f;
         engineParameters_["WindowHeight"] = 720 * .55f;
-        engineParameters_["ResourcePaths"] = "/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/CoreData;/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/PlayerData;/Users/josh/Dev/atomic/AtomicExamples/Basic3D/Resources;/Users/josh/Dev/atomic/AtomicExamples/Basic3D/";
+        engineParameters_["ResourcePaths"] = "/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/CoreData;/Users/josh/Dev/atomic/AtomicGameEngineSharp/Resources/PlayerData;/Users/josh/Dev/atomic/AtomicExamples/BunnyMark/Resources;/Users/josh/Dev/atomic/AtomicExamples/BunnyMark/";
 #endif
 
 #if ATOMIC_PLATFORM_WINDOWS

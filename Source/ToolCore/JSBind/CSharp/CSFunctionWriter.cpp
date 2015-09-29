@@ -390,6 +390,10 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 
             if (name == "object")
                 name = "_object";
+            else if (name == "readonly")
+                name = "readOnly";
+            else if (name == "params")
+                name = "parameters";
 
             // ignore "Context" parameters
             if (ptype->type_->asClassType())
@@ -566,6 +570,10 @@ void CSFunctionWriter::GenPInvokeCallParameters(String& sig)
 
             if (name == "object")
                 name = "_object";
+            else if (name == "readonly")
+                name = "readOnly";
+            else if (name == "params")
+                name = "parameters";
 
             if (ptype->type_->asClassType())
             {
@@ -838,9 +846,13 @@ String CSFunctionWriter::MapDefaultParameter(JSBFunctionType* parameter)
         return "default(IntVector2)";
     }
 
-
     if (init == "Quaternion::IDENTITY")
-        return "Quaternion.Identity";
+    {
+        dparm.type = "Quaternion";
+        dparm.assignment = "Quaternion.Identity";
+        defaultStructParameters_.Push(dparm);
+        return "default(Quaternion)";
+    }
 
 
     LOGINFOF("HEY! %s", init.CString());

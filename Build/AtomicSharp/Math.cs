@@ -50,11 +50,40 @@ namespace AtomicEngine
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 	public struct Vector2
 	{
+		public Vector2 (float x, float y)
+		{
+			this.x = x;
+			this.y = y;
+		}
+			
+		public float x;
+		public float y;
+
 	}
 
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 	public struct Quaternion
 	{
+		public Quaternion (float w = 1.0f, float x = 0.0f, float y = 0.0f, float z = 0.0f)
+		{
+			this.w = w;
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+
+		public override string ToString()
+		{
+			return x + ", " + y + ", " + z;
+		}
+
+		public float w;
+		public float x;
+		public float y;
+		public float z;
+			
+		static public readonly Quaternion Identity = new Quaternion();
+
 	}
 
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]

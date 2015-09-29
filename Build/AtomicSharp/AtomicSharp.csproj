@@ -68,6 +68,33 @@
     <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAtomic2D.cs">
       <Link>CSModuleAtomic2D.cs</Link>
     </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAtomic3D.cs">
+      <Link>CSModuleAtomic3D.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAudio.cs">
+      <Link>CSModuleAudio.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleEngine.cs">
+      <Link>CSModuleEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleEnvironment.cs">
+      <Link>CSModuleEnvironment.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleMath.cs">
+      <Link>CSModuleMath.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleNavigation.cs">
+      <Link>CSModuleNavigation.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleNetwork.cs">
+      <Link>CSModuleNetwork.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModulePhysics.cs">
+      <Link>CSModulePhysics.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleUI.cs">
+      <Link>CSModuleUI.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

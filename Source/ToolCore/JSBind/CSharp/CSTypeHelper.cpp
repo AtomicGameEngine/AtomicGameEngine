@@ -73,6 +73,14 @@ String CSTypeHelper::GetManagedTypeString(JSBFunctionType* ftype, bool addName)
             {
                 parameter += " _object";
             }
+            else if (ftype->name_ == "readonly")
+            {
+                parameter += " readOnly";
+            }
+            else if (ftype->name_ == "params")
+            {
+                parameter += " parameters";
+            }
             else
             {
                 parameter += " " + ftype->name_;
