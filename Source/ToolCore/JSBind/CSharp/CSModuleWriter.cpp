@@ -262,6 +262,40 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
             if (value == "M_MAX_UNSIGNED")
                 value = "0xffffffff";
 
+            // Input stuff
+
+            if (module_->GetName() == "Input")
+            {
+                if (cname.StartsWith("KEY_"))
+                {
+                    if (value.Length() == 1 && (IsAlpha(value[0]) || IsDigit(value[0])))
+                        value = "'" + value + "'";
+                }
+
+                // https://raw.githubusercontent.com/flibitijibibo/SDL2-CS/master/src/SDL2.cs
+
+                if (value.StartsWith("SDL_BUTTON_") || value.StartsWith("SDL_HAT_"))
+                {
+                    value = "(int) SDL." + value;
+                }
+                else if (value.StartsWith("SDLK_"))
+                {
+                    value = "(int) SDL.SDL_Keycode." + value;
+                }
+                else if (value.StartsWith("SDL_SCANCODE_"))
+                {
+                    value = "(int) SDL.SDL_Scancode." + value;
+                }
+                else if (value.StartsWith("SDL_CONTROLLER_BUTTON_"))
+                {
+                    value = "(int) SDL.SDL_GameControllerButton." + value;
+                }
+                else if (value.StartsWith("SDL_CONTROLLER_AXIS_"))
+                {
+                    value = "(int) SDL.SDL_GameControllerAxis." + value;
+                }
+            }
+
             String line = "public const " + managedType + " " + cname + " = " + value;
 
             if (managedType == "float" && !line.EndsWith("f"))

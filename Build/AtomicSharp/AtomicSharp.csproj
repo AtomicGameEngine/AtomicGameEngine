@@ -61,6 +61,10 @@
     <Compile Include="NativeCore.cs" />
     <Compile Include="EventCore.cs" />
     <Compile Include="ScriptObject.cs" />
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleInput.cs">
+      <Link>CSModuleInput.cs</Link>
+    </Compile>
+    <Compile Include="SDLConsts.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
