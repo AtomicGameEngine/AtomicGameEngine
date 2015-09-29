@@ -712,6 +712,13 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
     Indent();
     Indent();
 
+    if (function_->GetDocString().Length())
+    {
+        source += IndentLine("/// <summary>\n");
+        source += IndentLine("/// " + function_->GetDocString() + "\n");
+        source += IndentLine("/// </summary>\n");
+    }
+
     if (function_->IsConstructor())
         WriteManagedConstructor(source);
     else
