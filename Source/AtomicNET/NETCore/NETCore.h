@@ -45,6 +45,7 @@ public:
 
 private:
 
+    bool InitCoreCLRDLL(String &errorMsg);
     void GenerateTPAList(String& tpaList);
 
     String coreCLRFilesAbsPath_;

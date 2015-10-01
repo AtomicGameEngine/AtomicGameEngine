@@ -10,6 +10,11 @@
 namespace Atomic
 {
 
+/*
+mcs /nostdlib /noconfig /r:System.Console.dll /r:System.Runtime.dll /r:System.IO.dll /r:System.IO.FileSystem.dll /r:mscorlib.dll HelloWorld.cs
+*/
+
+
 #ifdef ATOMIC_PLATFORM_OSX
 static const char * const sCoreClrDll = "libcoreclr.dylib";
 #else
@@ -40,8 +45,17 @@ typedef int (*ExecuteAssemblyFunction)(
             const char* managedAssemblyPath,
             unsigned int* exitCode);
 
+typedef int (*CreateDelegateFunction)(
+            void* hostHandle,
+            unsigned int domainId,
+            const char* entryPointAssemblyName,
+            const char* entryPointTypeName,
+            const char* entryPointMethodName,
+            void** delegate);
+
 static InitializeCoreCLRFunction sInitializeCoreCLR = 0;
 static ExecuteAssemblyFunction sExecuteAssembly = 0;
+static CreateDelegateFunction sCreateDelegate = 0;
 static ShutdownCoreCLRFunction sShutdownCoreCLR = 0;
 
 NETCore::NETCore(Context* context) :
@@ -73,10 +87,12 @@ void NETCore::GenerateTPAList(String& tpaList)
         const String& assembly = results[i];
 
         // TODO: apply filtering if necessary
-        trustedAssemblies.Push(coreCLRFilesAbsPath_ + "/" + assembly);
+        trustedAssemblies.Push(coreCLRFilesAbsPath_ + assembly);
     }
 
     tpaList.Join(trustedAssemblies, ":");
+
+    // LOGINFOF("NetCore:: TPALIST - %s", tpaList.CString());
 
 }
 
@@ -97,14 +113,14 @@ void NETCore::Shutdown()
     domainId_ = 0;
     sInitializeCoreCLR = 0;
     sExecuteAssembly = 0;
+    sCreateDelegate = 0;
     sShutdownCoreCLR = 0;
 
 }
 
-bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
+bool NETCore::InitCoreCLRDLL(String& errorMsg)
 {
-    coreCLRFilesAbsPath_ = coreCLRFilesAbsPath;
-    String coreClrDllPath = AddTrailingSlash(coreCLRFilesAbsPath) + sCoreClrDll;
+    String coreClrDllPath = AddTrailingSlash(coreCLRFilesAbsPath_) + sCoreClrDll;
 
     coreCLRDLLHandle_ = SDL_LoadObject(coreClrDllPath.CString());
 
@@ -132,6 +148,14 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         return false;
     }
 
+    sCreateDelegate = (CreateDelegateFunction) SDL_LoadFunction(coreCLRDLLHandle_, "coreclr_create_delegate");
+
+    if (!sCreateDelegate)
+    {
+        errorMsg = ToString("NETCore: Unable to get coreclr_create_delegate entry point in %s", coreClrDllPath.CString());
+        return false;
+    }
+
     sExecuteAssembly = (ExecuteAssemblyFunction) SDL_LoadFunction(coreCLRDLLHandle_, "coreclr_execute_assembly");
 
     if (!sExecuteAssembly)
@@ -140,8 +164,18 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         return false;
     }
 
-    String tpaList;
-    GenerateTPAList(tpaList);
+    return true;
+}
+
+bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
+{
+    coreCLRFilesAbsPath_ = AddTrailingSlash(coreCLRFilesAbsPath);
+
+    if (!InitCoreCLRDLL(errorMsg))
+    {
+        Shutdown();
+        return false;
+    }
 
     // Allowed property names:
     // APPBASE
@@ -168,7 +202,10 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         "AppDomainCompatSwitch"
     };
 
-    String appPath = "";
+    String tpaList;
+    GenerateTPAList(tpaList);
+
+    String appPath = "/Users/josh/Desktop/OSX.x64.Debug/";
     Vector<String> nativeSearch;
     nativeSearch.Push(coreCLRFilesAbsPath_);
     nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicNET/NETRuntime");
@@ -190,7 +227,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     };
 
     int st = sInitializeCoreCLR(
-                "", // "/Users/josh/Desktop/OSX.x64.Debug/HelloWorld.exe",
+                "/Users/josh/Desktop/OSX.x64.Debug/HelloWorld.exe",
                 "NETCore",
                 sizeof(propertyKeys) / sizeof(propertyKeys[0]),
                 propertyKeys,
@@ -200,11 +237,29 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 
     if (st < 0)
     {
+        Shutdown();
         errorMsg = ToString("NETCore: coreclr_initialize failed - status: 0x%08x\n", st);
         return false;
     }
 
     /*
+    void* hm;
+
+    st = sCreateDelegate(hostHandle_,
+                    domainId_,
+                    "HelloWorld",
+                    "Hello1",
+                    "CallFromNative",
+                    &hm);
+
+    if (st >= 0)
+    {
+        typedef void (*Hm)(const char* value);
+        ((Hm)hm)("Hello From Native");
+    }
+    */
+
+/*
     unsigned int exitCode;
 
     st = sExecuteAssembly(
@@ -214,8 +269,8 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
             0,
             "/Users/josh/Desktop/OSX.x64.Debug/HelloWorld.exe",
             (unsigned int*)&exitCode);
-    */
 
+*/
     return true;
 
 }
