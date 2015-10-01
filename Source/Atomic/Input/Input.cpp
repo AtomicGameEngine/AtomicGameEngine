@@ -71,11 +71,6 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
-UIElement* TouchState::GetTouchedElement()
-{
-    return touchedElement_.Get();
-}
-
 #ifdef EMSCRIPTEN
 #define EM_TRUE 1
 
@@ -1614,6 +1609,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 #endif
             state.delta_ = IntVector2::ZERO;
             state.pressure_ = evt.tfinger.pressure;
+            state.touchedWidget_ = GetSubsystem<UI>()->GetWidgetAt(state.position_.x_, state.position_.y_, true);
 
             using namespace TouchBegin;
 

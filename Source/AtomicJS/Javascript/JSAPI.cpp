@@ -408,6 +408,7 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     VariantType type = v.GetType();
     RefCounted* ref;
     Vector2 vector2 = Vector2::ZERO;
+    IntVector2 intVector2 = IntVector2::ZERO;
     Vector3 vector3 = Vector3::ZERO;
     Vector4 vector4 = Vector4::ZERO;
     Color color = Color::BLACK;
@@ -478,6 +479,14 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         duk_push_number(ctx, vector2.x_);
         duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, vector2.y_);
+        duk_put_prop_index(ctx, -2, 1);
+        break;
+    case VAR_INTVECTOR2:
+        intVector2 = v.GetIntVector2();
+        duk_push_array(ctx);
+        duk_push_number(ctx, intVector2.x_);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_number(ctx, intVector2.y_);
         duk_put_prop_index(ctx, -2, 1);
         break;
     case VAR_VECTOR3:

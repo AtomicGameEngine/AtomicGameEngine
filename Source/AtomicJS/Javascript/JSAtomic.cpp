@@ -45,6 +45,7 @@
 #include "JSAtomic3D.h"
 #endif
 #include "JSIO.h"
+#include "JSInput.h"
 #include "JSUIAPI.h"
 #include "JSScene.h"
 
@@ -293,6 +294,7 @@ void jsapi_init_atomic(JSVM* vm)
 #ifdef ATOMIC_3D
     jsapi_init_atomic3d(vm);
 #endif
+    jsapi_init_input(vm);
     jsapi_init_ui(vm);
     jsapi_init_scene(vm);
 
