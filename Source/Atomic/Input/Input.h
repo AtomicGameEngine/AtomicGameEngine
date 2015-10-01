@@ -52,9 +52,6 @@ const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 /// %Input state for a finger touch.
 struct TouchState
 {
-    /// Return last touched UI element, used by scripting integration.
-    UIElement* GetTouchedElement();
-
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.
@@ -66,7 +63,7 @@ struct TouchState
     /// Finger pressure.
     float pressure_;
     /// Last touched UI element from screen joystick.
-    WeakPtr<UIElement> touchedElement_;
+    UIWidget* touchedWidget_;
 };
 
 /// %Input state for a joystick.

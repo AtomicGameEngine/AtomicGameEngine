@@ -4,7 +4,8 @@
 	"classes" : ["Input"],
 	"overloads" : {
 		"Input" : {
-			"BindButton" : ["UIButton", "int"]
+			"BindButton" : ["UIButton", "int"],
+			"GetTouch" : ["unsigned"]
 		}
 	}
 
