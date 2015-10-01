@@ -4,9 +4,20 @@
 	"classes" : ["Input"],
 	"overloads" : {
 		"Input" : {
-			"BindButton" : ["UIButton", "int"],
-			"GetTouch" : ["unsigned"]
+			"BindButton" : ["UIButton", "int"]
 		}
+	},
+   	"typescript_decl" : {
+		"Input" : [
+		     "getTouch(index:number):any;"
+        ]
+	},
+    
+   	"haxe_decl" : {
+		"Input" : [
+		     "getTouch(index:number):Dynamic;"
+        ]
 	}
+
 
 }

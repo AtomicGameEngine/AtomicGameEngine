@@ -63,7 +63,7 @@ struct TouchState
     /// Finger pressure.
     float pressure_;
     /// Last touched UI element from screen joystick.
-    UIWidget* touchedWidget_;
+    WeakPtr<UIWidget> touchedWidget_;
 };
 
 /// %Input state for a joystick.
