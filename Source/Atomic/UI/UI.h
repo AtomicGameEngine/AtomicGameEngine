@@ -103,6 +103,8 @@ public:
 
     UIRenderer* GetRenderer() { return renderer_; }
 
+    UIWidget* GetWidgetAt(int x, int y, bool include_children);
+
 private:
 
     static WeakPtr<Context> uiContext_;

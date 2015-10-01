@@ -1,7 +1,7 @@
 {
 	"name" : "Input",
 	"sources" : ["Source/Atomic/Input"],
-	"classes" : ["Input"],
+	"classes" : ["Input", "TouchState"],
 	"overloads" : {
 		"Input" : {
 			"BindButton" : ["UIButton", "int"]

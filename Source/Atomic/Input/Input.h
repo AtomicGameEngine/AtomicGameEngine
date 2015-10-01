@@ -50,11 +50,26 @@ class UIButton;
 const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
 /// %Input state for a finger touch.
-struct TouchState
+struct ATOMIC_API TouchState : public RefCounted
 {
-    /// Return last touched UI element, used by scripting integration.
-    UIElement* GetTouchedElement();
-
+    friend class Input;
+    REFCOUNTED(TouchState);
+public:
+    TouchState();
+    virtual ~TouchState();
+    /// Touch (finger) ID.
+    int GetTouchID() { return touchID_; }
+    /// Position in screen coordinates.
+    IntVector2 GetPosition() { return position_; }
+    /// Last position in screen coordinates.
+    IntVector2 GetLastPosition() { return lastPosition_; }
+    /// Movement since last frame.
+    IntVector2 GetDelta() { return delta_; }
+    /// Finger pressure.
+    float GetPressure() { return pressure_; }
+    /// Touched UI element
+    UIWidget* GetTouchedWidget() { return touchedWidget_; }
+private:
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.
@@ -65,8 +80,8 @@ struct TouchState
     IntVector2 delta_;
     /// Finger pressure.
     float pressure_;
-    /// Last touched UI element from screen joystick.
-    WeakPtr<UIElement> touchedElement_;
+    /// Touched UI element
+    UIWidget* touchedWidget_;
 };
 
 /// %Input state for a joystick.
@@ -355,7 +370,7 @@ private:
     /// Key pressed state by scancode.
     HashSet<int> scancodePress_;
     /// Active finger touches.
-    HashMap<int, TouchState> touches_;
+    HashMap<int, SharedPtr<TouchState>> touches_;
     /// List that maps between event touch IDs and normalised touch IDs
     List<int> availableTouchIDs_;
     /// Mapping of touch indices
