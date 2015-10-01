@@ -53,7 +53,7 @@ target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS ToolCoreJS P
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
-    target_link_libraries(AtomicEditor curl)
+    target_link_libraries(AtomicEditor NETCore curl)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD

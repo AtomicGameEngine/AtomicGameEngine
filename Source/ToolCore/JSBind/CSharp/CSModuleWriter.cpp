@@ -102,7 +102,7 @@ void CSModuleWriter::GenerateNativeSource()
 
     WriteIncludes(source);
 
-    source += "\n#include <AtomicSharp/AtomicSharp.h>\n";
+    source += "\n#include <AtomicNET/NETRuntime/AtomicSharp.h>\n";
 
     String ns = module_->GetPackage()->GetNamespace();
 

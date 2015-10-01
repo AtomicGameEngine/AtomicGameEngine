@@ -210,5 +210,14 @@ namespace AtomicEngine
 
 		
 	}
-		
+
+	public class InspectorAttribute : Attribute
+	{
+		public InspectorAttribute(string defaultValue = "")
+		{
+			DefaultValue = defaultValue;
+		}
+
+		public string DefaultValue;
+	}		
 }

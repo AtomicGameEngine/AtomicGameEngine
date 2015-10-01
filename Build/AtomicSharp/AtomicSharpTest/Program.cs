@@ -45,6 +45,7 @@ class BunnyMark : ScriptObject
 		var bunny5 = sheet.GetSprite ("bunny5");
 
 		bunnyTextures = new Sprite2D[] { bunny1, bunny2, bunny3, bunny4, bunny5 };
+
 		bunnyType = 2;
 		currentTexture = bunnyTextures [bunnyType];
 
@@ -168,6 +169,32 @@ class BunnyMark : ScriptObject
 	float minX;
 	float maxY;
 	float minY;
+
+}
+	
+enum MyEnum
+{
+	Peaceful,
+	Friendly,
+	Aggressive
+}
+
+class Spinner : CSComponent
+{
+	[Inspector]
+	public int MyField = 42;
+
+	[Inspector("Sprites/star.png")]
+	public Sprite2D MySprite;
+
+	[Inspector]
+	public Vector3 Vector3Field = new Vector3(1, 2, 3);
+
+	[Inspector]
+	public MyEnum Attitude = MyEnum.Friendly;
+
+	[Inspector]
+	public Sprite2D[] SpritesField;
 
 }
 

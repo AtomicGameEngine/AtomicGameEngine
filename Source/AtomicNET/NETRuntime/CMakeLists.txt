@@ -49,17 +49,16 @@ file (GLOB CSHARPATOMICPLAYER_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/G
 
 set (SOURCE_FILES ${CSHARP_SOURCES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE})
 
-add_library(AtomicSharp SHARED ${SOURCE_FILES})
+add_library(AtomicNETRuntime SHARED ${SOURCE_FILES})
 
-target_link_libraries(AtomicSharp AtomicJS AtomicPlayerLib AtomicPlayerJS ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicNETRuntime AtomicJS AtomicPlayerLib AtomicPlayerJS ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
 
-target_link_libraries(AtomicSharp "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
+target_link_libraries(AtomicNETRuntime "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
 
 endif()
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-    add_dependencies(AtomicSharp AtomicTool)
+    add_dependencies(AtomicNETRuntime AtomicTool)
 endif()
-

@@ -714,6 +714,8 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
 
     if (function_->GetDocString().Length())
     {
+        // monodocer -assembly:AtomicSharp.dll -path:en -pretty
+        // mdoc export-html -o htmldocs en
         source += IndentLine("/// <summary>\n");
         source += IndentLine("/// " + function_->GetDocString() + "\n");
         source += IndentLine("/// </summary>\n");

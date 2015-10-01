@@ -15,6 +15,10 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
+#ifdef ATOMIC_DOTNET
+#include <AtomicNET/NETCore/NETCore.h>
+#endif
+
 #include "AEEditorCommon.h"
 
 namespace AtomicEditor
@@ -37,6 +41,21 @@ void AEEditorCommon::Start()
     // Instantiate and register the Javascript subsystem
     Javascript* javascript = new Javascript(context_);
     context_->RegisterSubsystem(javascript);
+
+#ifdef ATOMIC_DOTNET
+    // Instantiate and register the AtomicNET subsystem
+    SharedPtr<NETCore> netCore (new NETCore(context_));
+    String netCoreErrorMsg;
+    if (!netCore->Initialize("/Users/josh/Desktop/OSX.x64.Debug/", netCoreErrorMsg))
+    {
+        LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
+    }
+    else
+    {
+        context_->RegisterSubsystem(netCore);
+    }
+#endif
+
 
     vm_ = javascript->InstantiateVM("MainVM");
     vm_->InitJSContext();
@@ -62,6 +81,15 @@ void AEEditorCommon::Stop()
     // make sure JSVM is really down and no outstanding refs
     // as if not, will hold on engine subsystems, which is bad
     assert(!JSVM::GetJSVM(0));
+
+#ifdef ATOMIC_DOTNET
+    NETCore* netCore = GetSubsystem<NETCore>();
+    if (netCore)
+    {
+        netCore->Shutdown();
+        context_->RemoveSubsystem<NETCore>();
+    }
+#endif
 }
 
 }
