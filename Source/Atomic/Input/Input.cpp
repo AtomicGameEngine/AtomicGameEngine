@@ -1607,16 +1607,16 @@ void Input::HandleSDLEvent(void* sdlEvent)
         {
             int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
             SharedPtr<TouchState> state(new TouchState());
-            touches_[touchID] = state;
             state->touchID_ = touchID;
 #ifndef EMSCRIPTEN
             state->lastPosition_ = state->position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
 #else
-            state.position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
+            state->position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
 #endif
             state->delta_ = IntVector2::ZERO;
             state->pressure_ = evt.tfinger.pressure;
+            state->touchedWidget_ = GetSubsystem<UI>()->GetWidgetAt(state->position_.x_, state->position_.y_, true);
 
             using namespace TouchBegin;
 
@@ -1630,6 +1630,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
             // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
             if (!mouseVisible_)
                 suppressNextMouseMove_ = true;
+
+            touches_[touchID] = state;
         }
         break;
 
@@ -1637,7 +1639,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
-            TouchState *state = touches_[touchID];
+            TouchState* state = touches_[touchID];
 
             using namespace TouchEnd;
 
@@ -1663,13 +1665,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
             // We don't want this event to create a new touches_ event if it doesn't exist (touchEmulation)
             if (touchEmulation_ && !touches_.Contains(touchID))
                 break;
-            TouchState *state = touches_[touchID];
+            TouchState* state = touches_[touchID];
             state->touchID_ = touchID;
 #ifndef EMSCRIPTEN
             state->position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
 #else
-            state.position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
+            state->position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
 #endif
             state->delta_ = state->position_ - state->lastPosition_;
             state->pressure_ = evt.tfinger.pressure;

@@ -67,6 +67,8 @@ public:
     IntVector2 GetDelta() { return delta_; }
     /// Finger pressure.
     float GetPressure() { return pressure_; }
+    /// Touched UI element
+    UIWidget* GetTouchedWidget() { return touchedWidget_; }
 private:
     /// Touch (finger) ID.
     int touchID_;
@@ -78,6 +80,8 @@ private:
     IntVector2 delta_;
     /// Finger pressure.
     float pressure_;
+    /// Touched UI element
+    UIWidget* touchedWidget_;
 };
 
 /// %Input state for a joystick.
