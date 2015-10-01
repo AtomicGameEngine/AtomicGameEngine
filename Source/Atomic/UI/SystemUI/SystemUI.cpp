@@ -363,7 +363,7 @@ void SystemUI::Update(float timeStep)
     for (unsigned i = 0; i < numTouches; ++i)
     {
         TouchState* touch = input->GetTouch(i);
-        ProcessHover(touch->position_, TOUCHID_MASK(touch->touchID_), 0, 0);
+        ProcessHover(touch->GetPosition(), TOUCHID_MASK(touch->GetTouchID()), 0, 0);
     }
 
     // End hovers that expired without refreshing
@@ -1757,7 +1757,7 @@ IntVector2 SystemUI::SumTouchPositions(SystemUI::DragData* dragData, const IntVe
                 TouchState* ts = input->GetTouch((unsigned)i);
                 if (!ts)
                     break;
-                IntVector2 pos = ts->position_;
+                IntVector2 pos = ts->GetPosition();
                 dragData->sumPos.x_ += pos.x_;
                 dragData->sumPos.y_ += pos.y_;
             }

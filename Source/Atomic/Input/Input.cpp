@@ -71,11 +71,13 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
-UIElement* TouchState::GetTouchedElement()
+TouchState::TouchState()
 {
-    return touchedElement_.Get();
 }
 
+TouchState::~TouchState()
+{
+}
 #ifdef EMSCRIPTEN
 #define EM_TRUE 1
 
@@ -264,11 +266,11 @@ void Input::Update()
     }
 
     // Reset touch delta movement
-    for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
+    for (HashMap<int, SharedPtr<TouchState>>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
-        TouchState& state = i->second_;
-        state.lastPosition_ = state.position_;
-        state.delta_ = IntVector2::ZERO;
+        TouchState *state = i->second_;
+        state->lastPosition_ = state->position_;
+        state->delta_ = IntVector2::ZERO;
     }
 
     SDL_Event evt;
@@ -1083,11 +1085,11 @@ TouchState* Input::GetTouch(unsigned index) const
     if (index >= touches_.Size())
         return 0;
 
-    HashMap<int, TouchState>::ConstIterator i = touches_.Begin();
+    HashMap<int, SharedPtr<TouchState>>::ConstIterator i = touches_.Begin();
     while (index--)
         ++i;
 
-    return const_cast<TouchState*>(&i->second_);
+    return i->second_;
 }
 
 JoystickState* Input::GetJoystickByIndex(unsigned index)
@@ -1253,16 +1255,16 @@ void Input::ResetState()
 
 void Input::ResetTouches()
 {
-    for (HashMap<int, TouchState>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
+    for (HashMap<int, SharedPtr<TouchState>>::Iterator i = touches_.Begin(); i != touches_.End(); ++i)
     {
-        TouchState& state = i->second_;
+        TouchState *state = i->second_;
 
         using namespace TouchEnd;
 
         VariantMap& eventData = GetEventDataMap();
-        eventData[P_TOUCHID] = state.touchID_;
-        eventData[P_X] = state.position_.x_;
-        eventData[P_Y] = state.position_.y_;
+        eventData[P_TOUCHID] = state->touchID_;
+        eventData[P_X] = state->position_.x_;
+        eventData[P_Y] = state->position_.y_;
         SendEvent(E_TOUCHEND, eventData);
     }
 
@@ -1604,24 +1606,25 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
-            TouchState& state = touches_[touchID];
-            state.touchID_ = touchID;
+            SharedPtr<TouchState> state(new TouchState());
+            touches_[touchID] = state;
+            state->touchID_ = touchID;
 #ifndef EMSCRIPTEN
-            state.lastPosition_ = state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
+            state->lastPosition_ = state->position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
 #else
             state.position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
 #endif
-            state.delta_ = IntVector2::ZERO;
-            state.pressure_ = evt.tfinger.pressure;
+            state->delta_ = IntVector2::ZERO;
+            state->pressure_ = evt.tfinger.pressure;
 
             using namespace TouchBegin;
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_TOUCHID] = touchID;
-            eventData[P_X] = state.position_.x_;
-            eventData[P_Y] = state.position_.y_;
-            eventData[P_PRESSURE] = state.pressure_;
+            eventData[P_X] = state->position_.x_;
+            eventData[P_Y] = state->position_.y_;
+            eventData[P_PRESSURE] = state->pressure_;
             SendEvent(E_TOUCHBEGIN, eventData);
 
             // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
@@ -1634,7 +1637,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         if (evt.tfinger.touchId != SDL_TOUCH_MOUSEID)
         {
             int touchID = GetTouchIndexFromID(evt.tfinger.fingerId & 0x7ffffff);
-            TouchState& state = touches_[touchID];
+            TouchState *state = touches_[touchID];
 
             using namespace TouchEnd;
 
@@ -1642,8 +1645,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
             // Do not trust the position in the finger up event. Instead use the last position stored in the
             // touch structure
             eventData[P_TOUCHID] = touchID;
-            eventData[P_X] = state.position_.x_;
-            eventData[P_Y] = state.position_.y_;
+            eventData[P_X] = state->position_.x_;
+            eventData[P_Y] = state->position_.y_;
             SendEvent(E_TOUCHEND, eventData);
 
             // Add touch index back to list of available touch Ids
@@ -1660,23 +1663,23 @@ void Input::HandleSDLEvent(void* sdlEvent)
             // We don't want this event to create a new touches_ event if it doesn't exist (touchEmulation)
             if (touchEmulation_ && !touches_.Contains(touchID))
                 break;
-            TouchState& state = touches_[touchID];
-            state.touchID_ = touchID;
+            TouchState *state = touches_[touchID];
+            state->touchID_ = touchID;
 #ifndef EMSCRIPTEN
-            state.position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
+            state->position_ = IntVector2((int)(evt.tfinger.x * graphics_->GetWidth()),
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
 #else
             state.position_ = IntVector2((int)(evt.tfinger.x), (int)(evt.tfinger.y));
 #endif
-            state.delta_ = state.position_ - state.lastPosition_;
-            state.pressure_ = evt.tfinger.pressure;
+            state->delta_ = state->position_ - state->lastPosition_;
+            state->pressure_ = evt.tfinger.pressure;
 
             using namespace TouchMove;
 
             VariantMap& eventData = GetEventDataMap();
             eventData[P_TOUCHID] = touchID;
-            eventData[P_X] = state.position_.x_;
-            eventData[P_Y] = state.position_.y_;
+            eventData[P_X] = state->position_.x_;
+            eventData[P_Y] = state->position_.y_;
 #ifndef EMSCRIPTEN
             eventData[P_DX] = (int)(evt.tfinger.dx * graphics_->GetWidth());
             eventData[P_DY] = (int)(evt.tfinger.dy * graphics_->GetHeight());
@@ -1684,7 +1687,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             eventData[P_DX] = (int)(evt.tfinger.dx);
             eventData[P_DY] = (int)(evt.tfinger.dy);
 #endif
-            eventData[P_PRESSURE] = state.pressure_;
+            eventData[P_PRESSURE] = state->pressure_;
             SendEvent(E_TOUCHMOVE, eventData);
 
             // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
