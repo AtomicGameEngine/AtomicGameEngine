@@ -54,9 +54,8 @@ class Shortcuts extends Atomic.ScriptObject {
 
     // global shortcut handler
     handleUIShortcut(ev: Atomic.UIShortcutEvent) {
-
-        // global shortcuts without qualifiers
-        if (!ev.qualifiers) {
+        // global shortcuts with qualifiers
+        if (ev.qualifiers == Atomic.QUAL_CTRL) {
 
             if (ev.key == Atomic.KEY_S) {
                 this.invokeFileSave();
@@ -67,11 +66,19 @@ class Shortcuts extends Atomic.ScriptObject {
             else if (ev.key == Atomic.KEY_I) {
                 this.invokeFormatCode();
             }
-
             else if (ev.key == Atomic.KEY_P) {
                 this.invokePlay();
             }
+            else if (ev.key == Atomic.KEY_B) {
+                EditorUI.getModelOps().showBuild();
+            }
 
+        }
+
+        if (ev.qualifiers == (Atomic.QUAL_CTRL | Atomic.QUAL_SHIFT)) {
+            if (ev.key == Atomic.KEY_B) {
+                EditorUI.getModelOps().showBuildSettings();
+            }
         }
 
     }
