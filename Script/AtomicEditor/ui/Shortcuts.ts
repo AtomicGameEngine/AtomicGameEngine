@@ -54,8 +54,14 @@ class Shortcuts extends Atomic.ScriptObject {
 
     // global shortcut handler
     handleUIShortcut(ev: Atomic.UIShortcutEvent) {
-        // global shortcuts with qualifiers
-        if (ev.qualifiers == Atomic.QUAL_CTRL) {
+        var cmdKey;
+        if(Atomic.platform == "MacOSX") {
+            cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LGUI) || Atomic.input.getKeyDown(Atomic.KEY_RGUI));
+        } else {
+            cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LCTRL) || Atomic.input.getKeyDown(Atomic.KEY_RCTRL));
+        }
+
+        if (cmdKey) {
 
             if (ev.key == Atomic.KEY_S) {
                 this.invokeFileSave();
@@ -68,17 +74,15 @@ class Shortcuts extends Atomic.ScriptObject {
             }
             else if (ev.key == Atomic.KEY_P) {
                 this.invokePlay();
-            }
-            else if (ev.key == Atomic.KEY_B) {
+            //if shift is pressed
+            } else if (ev.qualifiers & Atomic.QUAL_SHIFT) {
+                if (ev.key == Atomic.KEY_B) {
+                    EditorUI.getModelOps().showBuildSettings();
+                }
+            } else if (ev.key == Atomic.KEY_B) {
                 EditorUI.getModelOps().showBuild();
             }
 
-        }
-
-        if (ev.qualifiers == (Atomic.QUAL_CTRL | Atomic.QUAL_SHIFT)) {
-            if (ev.key == Atomic.KEY_B) {
-                EditorUI.getModelOps().showBuildSettings();
-            }
         }
 
     }
