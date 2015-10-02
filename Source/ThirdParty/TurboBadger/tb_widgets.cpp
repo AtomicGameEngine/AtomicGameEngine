@@ -1424,13 +1424,15 @@ void TBWidget::InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool 
     TBWidget* move = GetWidgetByTouchId(touchId);
     if (move && move->IsCaptured())
     {
-        move->ConvertFromRoot(x, y);
-        if (move->GetHitStatus(x, y)<=0)
+        int cx = x;
+        int cy = y;
+        move->ConvertFromRoot(cx, cy);
+        if (!move->GetHitStatus(cx, cy))
         {
             move->Invalidate();
             move->InvalidateSkinStates();
             move->OnCaptureChanged(false);
-            TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, true, TB_MODIFIER_NONE);
+            TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, cx, cy, touch, TB_MODIFIER_NONE);
             move->InvokeEvent(ev_up);
         }
     }
