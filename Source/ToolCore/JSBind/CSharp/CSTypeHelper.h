@@ -24,7 +24,7 @@ public:
 
     static void GenNativeFunctionParameterSignature(JSBFunction* function, String& sig);
 
-    static String GetNativeFunctionSignature(JSBFunction* function, String& returnType, bool thunk = false);
+    static String GetNativeFunctionSignature(JSBFunction* function, String& returnType);
 
     static bool IsSimpleReturn(JSBType* type);
     static bool IsSimpleReturn(JSBFunctionType* ftype);

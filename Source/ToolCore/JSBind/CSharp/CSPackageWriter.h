@@ -30,10 +30,7 @@ public:
     void GenerateSource();
 
     void GenNativeFunctionSignature(JSBFunction* function, String& sig);
-    void GenerateNativeFunctionTypeDefs(String& sourceOut);
-    void GenerateNativeFunctionThunk(String& sourceOut);
 
-    void GenerateNativeThunkInit(String& sourceOut);
     void GenerateNativeHeader();
     void GenerateNativeSource();
     void GenerateManagedSource();

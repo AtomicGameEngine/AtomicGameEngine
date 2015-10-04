@@ -1,6 +1,7 @@
 
 #include <ThirdParty/SDL/include/SDL.h>
 
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/StringUtils.h>
@@ -9,13 +10,14 @@
 #include "CSComponent.h"
 #include "NETCore.h"
 #include "NETManaged.h"
-#include "NETCoreThunk.h"
 
 namespace Atomic
 {
 
 /*
 mcs /nostdlib /noconfig /r:System.Console.dll /r:System.Runtime.dll /r:System.IO.dll /r:System.IO.FileSystem.dll /r:mscorlib.dll HelloWorld.cs
+
+export PAL_DBG_CHANNELS="+all.all"
 */
 
 
@@ -76,8 +78,6 @@ NETCore::NETCore(Context* context) :
 {
     RegisterNETCoreLibrary(context_);
 
-    NetCoreThunkInit();
-
     assert(!instance_);
     instance_ = this;
     csContext_ = context;
@@ -88,6 +88,8 @@ NETCore::NETCore(Context* context) :
     SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
     context_->RegisterSubsystem(dispatcher);
     context_->AddGlobalEventListener(dispatcher);
+
+    SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
 
 }
 
@@ -118,6 +120,8 @@ void NETCore::GenerateTPAList(String& tpaList)
         trustedAssemblies.Push(coreCLRFilesAbsPath_ + assembly);
     }
 
+    trustedAssemblies.Push(coreCLRFilesAbsPath_ + "HelloWorld.exe");
+
     tpaList.Join(trustedAssemblies, ":");
 
     // LOGINFOF("NetCore:: TPALIST - %s", tpaList.CString());
@@ -126,6 +130,8 @@ void NETCore::GenerateTPAList(String& tpaList)
 
 void NETCore::Shutdown()
 {
+    RefCounted::SetRefCountedDeletedFunction(0);
+
     if (sShutdownCoreCLR && hostHandle_)
     {
         sShutdownCoreCLR(hostHandle_, domainId_);
@@ -203,13 +209,35 @@ extern "C"
 // pinvoke is faster than [UnmanagedFunctionPointer] :/
 // [SuppressUnmanagedCodeSecurity] <--- add this attribute, in any event
 
-void csb_Atomic_Test(unsigned id)
+int csb_Atomic_Test(unsigned id)
 {
-  LOGINFOF("%u", id);
+  printf("Flibberty Gibbets %u", id);
+  return id;
 }
 
+ClassID csb_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
+{
+    if (!refCounted)
+        return 0;
+
+    return refCounted->GetClassID();
 }
 
+RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
+{
+    return NETCore::GetContext()->GetSubsystem(name);
+}
+
+void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
+{
+    if (!ref)
+        return;
+
+    ref->ReleaseRef();
+}
+
+
+}
 
 bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 {
@@ -249,10 +277,11 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     String tpaList;
     GenerateTPAList(tpaList);
 
-    String appPath = "/Users/josh/Desktop/OSX.x64.Debug/";
+    String appPath = "/Users/josh/Desktop/";
     Vector<String> nativeSearch;
     nativeSearch.Push(coreCLRFilesAbsPath_);
     nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicNET/NETNative");
+    nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicEditor/AtomicEditor.app/Contents/MacOS");
 
     String nativeDllSearchDirs;
     nativeDllSearchDirs.Join(nativeSearch, ":");
@@ -271,7 +300,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     };
 
     int st = sInitializeCoreCLR(
-                "",
+                "AtomicEditor",
                 "NETCore",
                 sizeof(propertyKeys) / sizeof(propertyKeys[0]),
                 propertyKeys,
@@ -286,26 +315,75 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         return false;
     }
 
+    // Reflection only load, may be useful when bringing into editor for component inspector values
+    // http://shazwazza.com/post/how-to-inspect-assemblies-before-including-them-in-your-application-with-reflection/
 
-    /*
-    void* hm;
+    // It’s best to execute all of this logic in a separate AppDomain because once assemblies are loaded
+    // in to a context, they cannot be unloaded and since we are loading in from files, those files will
+    // remain locked until the AppDomain is shutdown.
+
+    typedef void (*StartupFunction)();
+    StartupFunction startup;
+
+    // The coreclr binding model will become locked upon loading the first assembly that is not on the TPA list, or
+    // upon initializing the default context for the first time. For this test, test assemblies are located alongside
+    // corerun, and hence will be on the TPA list. So, we should be able to set the default context once successfully,
+    // and fail on the second try.
 
     st = sCreateDelegate(hostHandle_,
                     domainId_,
-                    "HelloWorld",
-                    "Hello1",
-                    "CallFromNative",
-                    &hm);
+                    "AtomicNETBootstrap",
+                    "AtomicLoadContext",
+                    "Startup",
+                    (void**) &startup);
 
     if (st >= 0)
     {
-        typedef void (*Hm)(const char* value);
-        ((Hm)hm)("Hello From Native");
+        startup();
     }
-    */
+
+    st = sCreateDelegate(hostHandle_,
+                    domainId_,
+                    "AtomicNETRuntime",
+                    "AtomicEngine.AtomicNETRuntime",
+                    "Startup",
+                    (void**) &startup);
+
+    if (st >= 0)
+    {
+        startup();
+    }
+
+    RefCountedDeletedFunction rcdFunction;
+
+    st = sCreateDelegate(hostHandle_,
+                    domainId_,
+                    "AtomicNETRuntime",
+                    "AtomicEngine.NativeCore",
+                    "RefCountedDeleted",
+                    (void**) &rcdFunction);
+
+    if (st >= 0)
+    {
+        RefCounted::SetRefCountedDeletedFunction(rcdFunction);
+    }
+
+    NETUpdateFunctionPtr updateFunction;
+
+    st = sCreateDelegate(hostHandle_,
+                    domainId_,
+                    "AtomicNETRuntime",
+                    "AtomicEngine.NativeCore",
+                    "NETUpdate",
+                    (void**) &updateFunction);
+
+    if (st >= 0)
+    {
+        GetSubsystem<NETManaged>()->SetNETUpdate(updateFunction);
+    }
 
 
-/*
+    /*
     unsigned int exitCode;
 
     st = sExecuteAssembly(
@@ -315,11 +393,19 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
             0,
             "/Users/josh/Desktop/OSX.x64.Debug/HelloWorld.exe",
             (unsigned int*)&exitCode);
+    */
 
-*/
     return true;
 
 }
+
+void NETCore::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace Update;
+
+    GetSubsystem<NETManaged>()->NETUpdate(eventData[P_TIMESTEP].GetFloat());
+}
+
 
 void RegisterNETCoreLibrary(Context* context)
 {

@@ -5,16 +5,16 @@ using System.Runtime.InteropServices;
 namespace AtomicEngine
 {
 	public delegate void AtomicEventDelegate (VariantMap eventData);
-	
-	public class CSComponent : Component
+
+	public partial class CSComponent : Component
 	{
 		public uint ManagedID;
 
-		public CSComponent ()
-		{	
-			nativeInstance = NativeCore.RegisterNative (csb_Atomic_CSComponent_Constructor(), this);	
-			ComponentCore.RegisterCSComponent (this);
-		}
+		//public CSComponent ()
+		//{
+		//	nativeInstance = NativeCore.RegisterNative (csb_Atomic_CSComponent_Constructor(), this);
+//			ComponentCore.RegisterCSComponent (this);
+	//	}
 
 		virtual public void Start()
 		{
@@ -23,9 +23,9 @@ namespace AtomicEngine
 
 		virtual public void Update(float timeStep)
 		{
-			
+
 		}
-			
+
 		public void SendEvent(string eventType, Dictionary<string, object> eventData = null)
 		{
 			EventCore.SendEvent (this, eventType);
@@ -40,10 +40,9 @@ namespace AtomicEngine
 		{
 			EventCore.SubscribeToEvent (this, null, eventType, function);
 		}
-						
-		[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-		private static extern IntPtr csb_Atomic_CSComponent_Constructor();
+
+		//[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		//private static extern IntPtr csb_Atomic_CSComponent_Constructor();
 
 	}
 }
-

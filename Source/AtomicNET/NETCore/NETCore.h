@@ -48,6 +48,7 @@ public:
 
 private:
 
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
     bool InitCoreCLRDLL(String &errorMsg);
     void GenerateTPAList(String& tpaList);
 

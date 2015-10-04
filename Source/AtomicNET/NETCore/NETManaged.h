@@ -25,10 +25,16 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/Object.h>
 
-#include "NETCoreThunk.h"
+#include "CSComponent.h"
 
 namespace Atomic
 {
+
+typedef void (*NETUpdateFunctionPtr)(float timeStep);
+
+typedef CSComponent* (*CSComponentCreateFunctionPtr)(const char* csComponentTypeName);
+typedef void (*CSComponentCallMethodFunctionPtr)(unsigned id, CSComponentMethod method, float value);
+typedef void (*CSBeginSendEventFunctionPtr)(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 
 class ATOMIC_API NETManaged : public Object
 {
@@ -40,9 +46,13 @@ public:
     /// Destruct.
     virtual ~NETManaged();
 
+    void SetNETUpdate(NETUpdateFunctionPtr ptr);
+
     void SetCSComponentCreate(CSComponentCreateFunctionPtr ptr);
     void SetCSComponentCallMethod(CSComponentCallMethodFunctionPtr ptr);
     void SetCSBeginSendEvent(CSBeginSendEventFunctionPtr ptr);
+
+    void NETUpdate(float timeStep);
 
     CSComponent* CSComponentCreate(const String& componentName);
     void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
@@ -53,6 +63,7 @@ private:
     CSComponentCreateFunctionPtr CSComponentCreate_;
     CSComponentCallMethodFunctionPtr CSComponentCallMethod_;
     CSBeginSendEventFunctionPtr CSBeginSendEvent_;
+    NETUpdateFunctionPtr NETUpdate_;
 
 };
 

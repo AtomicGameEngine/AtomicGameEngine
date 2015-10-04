@@ -29,6 +29,8 @@ namespace Atomic
 
 // ATOMIC BEGIN
 
+class RefCounted;
+typedef void (*RefCountedDeletedFunction)(RefCounted*);
 typedef const void* ClassID;
 
 /// Macro to be included in RefCounted derived classes for efficient RTTI
@@ -90,12 +92,11 @@ public:
     virtual ClassID GetClassID() const  = 0;
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
-    inline unsigned GetRefID() const { return refID_; }
-    inline static RefCounted* GetByID(unsigned id) { if (!refLookup_.Contains(id)) return 0; return refLookup_[id]; }
-
     /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
     inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
+
+    static void SetRefCountedDeletedFunction(RefCountedDeletedFunction function) { refCountedDeletedFunction_ = function; }
 
     // ATOMIC END
 
@@ -109,13 +110,8 @@ private:
     RefCount* refCount_;
 
     // ATOMIC BEGIN
-
-    unsigned refID_;
-    static unsigned refIDCounter_;
-    static HashMap<unsigned, RefCounted*> refLookup_;
-
     void* jsHeapPtr_;
-
+    static RefCountedDeletedFunction refCountedDeletedFunction_;
     // ATOMIC END
 
 

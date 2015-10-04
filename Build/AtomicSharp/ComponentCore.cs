@@ -5,16 +5,6 @@ using System.Reflection;
 
 namespace AtomicEngine
 {
-	internal enum CSComponentMethod
-	{
-		Start,
-		DelayedStart,
-		Update,
-		PostUpdate,
-		FixedUpdate,
-		PostFixedUpdate
-	};
-
 	static internal class ComponentCore
 	{
 		static Dictionary<String, Type> componentTypes = new Dictionary<String, Type>();
@@ -32,17 +22,17 @@ namespace AtomicEngine
 
 				switch (method) {
 
-				case CSComponentMethod.Start:
-					component.Start ();
-					break;
+				//case CSComponentMethod.Start:
+				//	component.Start ();
+				//	break;
 
-				case CSComponentMethod.Update:
-					component.Update (value);
-					break;
+				//case CSComponentMethod.Update:
+				//	component.Update (value);
+				//	break;
 				}
-					
+
 			}
-			
+
 		}
 
 		public static void RegisterCSComponent(CSComponent component)
@@ -60,9 +50,9 @@ namespace AtomicEngine
 				liveComponents.Remove (c.RefID);
 			}
 		}
-			
+
 		// native create CSComponent
-		public static IntPtr CreateCSComponent(string name) 
+		public static IntPtr CreateCSComponent(string name)
 		{
 			Type type;
 
@@ -82,7 +72,7 @@ namespace AtomicEngine
 		static void RegisterComponentType(Type componentType)
 		{
 			// TODO: Check for name clash, we don't want to use assembly qualified names, etc to keep it simple
-			componentTypes [componentType.Name] = componentType;			
+			componentTypes [componentType.Name] = componentType;
 		}
 
 		public static void RegisterAssemblyComponents(Assembly assembly)
@@ -92,15 +82,15 @@ namespace AtomicEngine
 
 			List<Type> componentTypes = new List<Type> ();
 
-			foreach (Type type in types)				
+			foreach (Type type in types)
 			{
 				for (var current = type.BaseType; current != null; current = current.BaseType) {
 
 					if (current == csComponentType) {
 						componentTypes.Add(type);
-						break;						
+						break;
 					}
-				}				
+				}
 			}
 
 			foreach (Type type in componentTypes) {
@@ -113,4 +103,3 @@ namespace AtomicEngine
 
 	}
 }
-

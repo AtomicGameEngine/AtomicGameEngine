@@ -54,7 +54,7 @@ void CSTypeHelper::GenNativeFunctionParameterSignature(JSBFunction* function, St
 
 }
 
-String CSTypeHelper::GetNativeFunctionSignature(JSBFunction* function, String& returnType, bool thunk)
+String CSTypeHelper::GetNativeFunctionSignature(JSBFunction* function, String& returnType)
 {
 
     if (function->Skip())
@@ -103,19 +103,9 @@ String CSTypeHelper::GetNativeFunctionSignature(JSBFunction* function, String& r
     String sig;
     GenNativeFunctionParameterSignature(function, sig);
 
-    String functionSig;
-    if (!thunk)
-    {
-        functionSig = ToString("csb_%s_%s_%s(%s)",
-                    package->GetName().CString(), klass->GetName().CString(),
-                    fname.CString(), sig.CString());
-    }
-    else
-    {
-        functionSig = ToString("typedef %s (*%s_%s_%s_Function)(%s)",
-                    returnType.CString(), package->GetName().CString(), klass->GetName().CString(),
-                    fname.CString(), sig.CString());
-    }
+    String functionSig = ToString("csb_%s_%s_%s(%s)",
+                package->GetName().CString(), klass->GetName().CString(),
+                fname.CString(), sig.CString());
 
     return functionSig;
 }

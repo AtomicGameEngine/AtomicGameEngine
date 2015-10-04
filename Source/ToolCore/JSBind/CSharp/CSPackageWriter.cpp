@@ -28,59 +28,6 @@ CSPackageWriter::CSPackageWriter(JSBPackage *package) : JSBPackageWriter(package
 
 }
 
-void CSPackageWriter::GenerateNativeFunctionThunk(String& sourceOut)
-{
-    String source, line;
-
-    source += IndentLine(ToString("\n\ntypedef struct AtomicNET%sThunk_s\n", package_->GetName().CString()));
-
-    source += IndentLine("{\n");
-
-    Indent();
-
-    PODVector<JSBClass*>& allClasses = package_->GetAllClasses();
-    for (unsigned i = 0; i < allClasses.Size(); i++)
-    {
-        JSBClass* cls = allClasses[i];
-
-        PODVector<JSBFunction*>& functions = cls->GetFunctions();
-
-        for (unsigned j = 0; j < functions.Size(); j++)
-        {
-            JSBFunction* function = functions[j];
-
-            if (!CSTypeHelper::OmitFunction(function))
-            {
-                JSBClass* cls = function->GetClass();
-                JSBPackage* package = cls->GetPackage();
-
-                line = ToString("%s_%s_%s_Function ", package->GetName().CString(),
-                                cls->GetName().CString(),
-                                function->IsConstructor() ? "Constructor" : function->GetName().CString());
-
-                line += ToString("__%s_%s_%s;\n", package->GetName().CString(),
-                                cls->GetName().CString(),
-                                function->IsConstructor() ? "Constructor" : function->GetName().CString());
-
-                source += IndentLine(line);
-
-            }
-        }
-    }
-
-    Dedent();
-
-    const char* packageName = package_->GetName().CString();
-
-    source += IndentLine(ToString("\n} AtomicNET%sThunk_t;\n",packageName));
-
-    source += IndentLine(ToString("extern AtomicNET%sThunk_t AtomicNET%sThunk;\n", packageName, packageName));
-
-    source += IndentLine(ToString("extern bool AtomicNET%sThunkEnabled;\n", packageName));
-
-    sourceOut += source;
-}
-
 void CSPackageWriter::GenNativeFunctionSignature(JSBFunction* function, String& sig)
 {
     JSBClass* klass = function->GetClass();
@@ -126,41 +73,6 @@ void CSPackageWriter::GenNativeFunctionSignature(JSBFunction* function, String& 
     }
 
     sig.Join(args, ", ");
-
-}
-
-void CSPackageWriter::GenerateNativeFunctionTypeDefs(String& sourceOut)
-{
-    // call typedefs
-
-    Indent();
-
-    String source, line;
-
-    PODVector<JSBClass*>& allClasses = package_->GetAllClasses();
-    for (unsigned i = 0; i < allClasses.Size(); i++)
-    {
-        JSBClass* cls = allClasses[i];
-
-        PODVector<JSBFunction*>& functions = cls->GetFunctions();
-
-        for (unsigned j = 0; j < functions.Size(); j++)
-        {
-            JSBFunction* function = functions[j];
-            String returnType;
-            line = CSTypeHelper::GetNativeFunctionSignature(function, returnType, true);
-            if (line.Length())
-            {
-                line += ";\n";
-                source += IndentLine(line);
-            }
-        }
-
-    }
-
-    Indent();
-
-    sourceOut += source;
 
 }
 
@@ -221,9 +133,6 @@ void CSPackageWriter::GenerateNativeHeader()
 
     Dedent();
 
-    GenerateNativeFunctionTypeDefs(source);
-    GenerateNativeFunctionThunk(source);
-
     source += "\n}\n";
 
     JSBind* jsbind = package_->GetSubsystem<JSBind>();
@@ -237,53 +146,6 @@ void CSPackageWriter::GenerateNativeHeader()
 
 }
 
-
-void CSPackageWriter::GenerateNativeThunkInit(String& sourceOut)
-{
-    const char* packageName = package_->GetName().CString();
-
-    String source, line;
-
-    for (unsigned i = 0; i < package_->modules_.Size(); i++)
-    {
-        JSBModule* module = package_->modules_[i];
-        const char* moduleName = module->GetName().CString();
-        source.AppendWithFormat("extern \"C\" void csb_package_%s_init_%s_thunk ();\n", packageName, moduleName);
-    }
-
-    source.AppendWithFormat("\nvoid csb_package_init_%s_thunk ()\n{\n\n", packageName);
-
-    Indent();
-
-    for (unsigned i = 0; i < package_->modules_.Size(); i++)
-    {
-        JSBModule* module = package_->modules_[i];
-        const char* moduleName = module->GetName().CString();
-        line = ToString("csb_package_%s_init_%s_thunk ();\n", packageName, moduleName);
-        source += IndentLine(line);
-    }
-
-    Dedent();
-
-    source.Append("\n}\n");
-
-    // Thunk Setter
-
-    String thunkType = ToString("AtomicNET%sThunk_t", packageName);
-    source += ToString("extern \"C\" void csb_package_set_%s_thunk (const %s *thunkIn)\n{\n", packageName, thunkType.CString());
-
-    Indent();
-
-    source += IndentLine(ToString("AtomicNET%sThunk = *thunkIn;\n", packageName));
-    source += IndentLine(ToString("AtomicNET%sThunkEnabled = true;\n", packageName));
-
-    Dedent();
-
-    source += ToString("\n}\n");
-
-    sourceOut += source;
-
-}
 void CSPackageWriter::GenerateNativeSource()
 {
     GenerateNativeHeader();
@@ -304,14 +166,8 @@ void CSPackageWriter::GenerateNativeSource()
 
     source += ToString("namespace %s\n{\n", packageName);
 
-    // thunk
-    source += ToString("AtomicNET%sThunk_t AtomicNET%sThunk;\n", packageName, packageName);
-    source += ToString("bool AtomicNET%sThunkEnabled = false;\n", packageName);
-
     // end of namespace
     source += "\n}\n";
-
-    GenerateNativeThunkInit(source);
 
     JSBind* jsbind = package_->GetSubsystem<JSBind>();
 

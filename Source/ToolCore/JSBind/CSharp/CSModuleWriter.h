@@ -33,8 +33,6 @@ public:
 
 private:
 
-    void GenerateNativeThunkInit(String& sourceOut);
-
     String GetManagedPrimitiveType(JSBPrimitiveType* ptype);
 
     void GenerateManagedModuleClass(String& sourceOut);

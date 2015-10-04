@@ -154,48 +154,6 @@ void CSFunctionWriter::GenNativeCallParameters(String& sig)
     sig.Join(args, ", ");
 }
 
-void CSFunctionWriter::GenNativeThunkCallParameters(String& sig)
-{
-    Vector<JSBFunctionType*>& parameters = function_->GetParameters();
-
-    Vector<String> args;
-
-    if (!function_->IsConstructor())
-        args.Push("self");
-
-    if (parameters.Size())
-    {
-        for (unsigned int i = 0; i < parameters.Size(); i++)
-        {
-            JSBFunctionType* ptype = parameters.At(i);
-
-            // ignore "Context" parameters
-            if (ptype->type_->asClassType())
-            {
-                JSBClassType* classType = ptype->type_->asClassType();
-                JSBClass* klass = classType->class_;
-                if (klass->GetName() == "Context")
-                {
-                    continue;
-                }
-
-                args.Push(ToString("%s", ptype->name_.CString()));
-
-            }
-            else
-            {
-                args.Push(ToString("%s", ptype->name_.CString()));
-            }
-
-        }
-    }
-
-    if (function_->GetReturnClass() && function_->GetReturnClass()->IsNumberArray())
-        args.Push("returnValue");
-
-    sig.Join(args, ", ");
-}
-
 void CSFunctionWriter::WriteNativeFunction(String& source)
 {
     JSBClass* klass = function_->GetClass();
@@ -218,36 +176,6 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
 
     source += "\n";
-
-    line = ToString("if ( AtomicNET%sThunkEnabled )\n", package->GetName().CString());
-
-    source += IndentLine(line);
-
-    source += IndentLine("{\n");
-
-    Indent();
-
-    // write the thunk
-
-    line = returnType == "void" ? "" : "return ";
-
-    String thunkCallSig;
-    GenNativeThunkCallParameters(thunkCallSig);
-
-    line += ToString("AtomicNET%sThunk.__%s_%s_%s(%s);\n", package->GetName().CString(), package->GetName().CString(), klass->GetName().CString(),
-                     fname.CString(), thunkCallSig.CString());
-
-    source += IndentLine(line);
-
-    Dedent();
-
-    source += IndentLine("}\n");
-
-    source += IndentLine("else\n");
-
-    source += IndentLine("{\n");
-
-    Indent();
 
     bool returnValue = false;
     bool sharedPtrReturn = false;
@@ -311,10 +239,6 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     {
         source += IndentLine("return returnValue.CString();\n");
     }
-
-    Dedent();
-
-    source += IndentLine("}\n");
 
     Dedent();
 

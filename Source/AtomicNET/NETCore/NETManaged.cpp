@@ -17,13 +17,27 @@ NETManaged::NETManaged(Context* context) :
     Object(context),
     CSComponentCreate_(0),
     CSComponentCallMethod_(0),
-    CSBeginSendEvent_(0)
+    CSBeginSendEvent_(0),
+    NETUpdate_(0)
 {
 }
 
 NETManaged::~NETManaged()
 {
 
+}
+
+void NETManaged::SetNETUpdate(NETUpdateFunctionPtr ptr)
+{
+    NETUpdate_ = ptr;
+}
+
+void NETManaged::NETUpdate(float timeStep)
+{
+    if (!NETUpdate_)
+        return;
+
+    NETUpdate_(timeStep);
 }
 
 CSComponent* NETManaged::CSComponentCreate(const String& componentName)
