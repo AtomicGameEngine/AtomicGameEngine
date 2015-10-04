@@ -1,7 +1,9 @@
-include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog)
-
+include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog )
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
@@ -21,6 +23,8 @@ endforeach()
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
+
+set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE})
 
 if (APPLE)
 
@@ -82,7 +86,7 @@ elseif(LINUX)
         add_custom_command (TARGET AtomicEditor POST_BUILD
         COMMAND  ${NODEJS_CMD} "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    endif() 
+    endif()
 else()
     target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
 

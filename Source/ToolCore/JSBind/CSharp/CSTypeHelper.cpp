@@ -1,9 +1,124 @@
 
 
+#include "../JSBPackage.h"
 #include "CSTypeHelper.h"
 
 namespace ToolCore
 {
+
+void CSTypeHelper::GenNativeFunctionParameterSignature(JSBFunction* function, String& sig)
+{
+    JSBClass* klass = function->GetClass();
+
+    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+
+    Vector<String> args;
+
+    if (!function->IsConstructor())
+    {
+        args.Push(ToString("%s* self", klass->GetNativeName().CString()));
+    }
+
+    if (parameters.Size())
+    {
+        for (unsigned int i = 0; i < parameters.Size(); i++)
+        {
+            JSBFunctionType* ptype = parameters.At(i);
+
+            // ignore "Context" parameters
+            if (ptype->type_->asClassType())
+            {
+                JSBClassType* classType = ptype->type_->asClassType();
+                JSBClass* klass = classType->class_;
+                if (klass->GetName() == "Context")
+                {
+                    continue;
+                }
+
+                args.Push(ToString("%s* %s", klass->GetNativeName().CString(), ptype->name_.CString()));
+            }
+            else
+            {
+                args.Push(CSTypeHelper::GetNativeTypeString(ptype) + " " + ptype->name_);
+            }
+
+        }
+    }
+
+    if (function->GetReturnClass() && function->GetReturnClass()->IsNumberArray())
+    {
+        args.Push(ToString("%s* returnValue", function->GetReturnClass()->GetNativeName().CString()));
+    }
+
+    sig.Join(args, ", ");
+
+}
+
+String CSTypeHelper::GetNativeFunctionSignature(JSBFunction* function, String& returnType, bool thunk)
+{
+
+    if (function->Skip())
+        return String::EMPTY;
+
+    if (function->IsDestructor())
+        return String::EMPTY;
+
+    if (OmitFunction(function))
+        return String::EMPTY;
+
+    JSBClass* klass = function->GetClass();
+    JSBPackage* package = klass->GetPackage();
+    String fname = function->IsConstructor() ? "Constructor" : function->GetName();
+
+    returnType = "void";
+
+    if (function->IsConstructor())
+    {
+        returnType = "RefCounted*";
+    }
+    else if (function->GetReturnType())
+    {
+        if (function->IsConstructor())
+        {
+            returnType = ToString("%s*", klass->GetNativeName().CString());
+        }
+        else if (function->GetReturnClass())
+        {
+            if (!function->GetReturnClass()->IsNumberArray())
+            {
+                returnType = ToString("const %s*", function->GetReturnClass()->GetNativeName().CString());
+            }
+        }
+        else if (function->GetReturnType()->type_->asStringHashType())
+        {
+            returnType = "unsigned";
+        }
+        else
+        {
+            returnType = ToString("%s", CSTypeHelper::GetNativeTypeString(function->GetReturnType()).CString());
+        }
+    }
+
+
+    String sig;
+    GenNativeFunctionParameterSignature(function, sig);
+
+    String functionSig;
+    if (!thunk)
+    {
+        functionSig = ToString("csb_%s_%s_%s(%s)",
+                    package->GetName().CString(), klass->GetName().CString(),
+                    fname.CString(), sig.CString());
+    }
+    else
+    {
+        functionSig = ToString("typedef %s (*%s_%s_%s_Function)(%s)",
+                    returnType.CString(), package->GetName().CString(), klass->GetName().CString(),
+                    fname.CString(), sig.CString());
+    }
+
+    return functionSig;
+}
 
 String CSTypeHelper::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
 {
@@ -222,5 +337,36 @@ bool CSTypeHelper::IsSimpleReturn(JSBFunctionType* ftype)
     return IsSimpleReturn(ftype->type_);
 
 }
+
+bool CSTypeHelper::OmitFunction(JSBFunction* function)
+{
+    if (!function)
+        return false;
+
+    if (function->Skip())
+        return true;
+
+    if (function->IsDestructor())
+        return true;
+
+    // We need to rename GetType
+    if (function->GetName() == "GetType")
+        return true;
+
+    // avoid vector type for now
+    if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
+        return true;
+
+    Vector<JSBFunctionType*>& parameters = function->GetParameters();
+
+    for (unsigned i = 0; i < parameters.Size(); i++)
+    {
+        if (parameters[i]->type_->asVectorType())
+            return true;
+    }
+
+    return false;
+}
+
 
 }

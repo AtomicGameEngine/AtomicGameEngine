@@ -23,7 +23,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/UI/UIEvents.h>
 
-#include "AtomicSharpAPI.h"
+//#include "AtomicSharpAPI.h"
 #include "CSEventHelper.h"
 
 namespace Atomic
@@ -42,7 +42,8 @@ CSEventDispatcher::~CSEventDispatcher()
 
 void CSEventDispatcher::BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
 {
-    CSBeginSendEvent(sender->GetRefID(), eventType.ToHash(), &eventData);
+    // change to setting a callback
+    // CSBeginSendEvent(sender->GetRefID(), eventType.ToHash(), &eventData);
 }
 
 void CSEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)

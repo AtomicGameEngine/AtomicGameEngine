@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "CSComponent.h"
+#include <AtomicNET/NETCore/CSComponent.h>
 
 namespace Atomic
 {

@@ -5,7 +5,11 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/StringUtils.h>
 
+#include "CSEventHelper.h"
+#include "CSComponent.h"
 #include "NETCore.h"
+#include "NETManaged.h"
+#include "NETCoreThunk.h"
 
 namespace Atomic
 {
@@ -58,18 +62,42 @@ static ExecuteAssemblyFunction sExecuteAssembly = 0;
 static CreateDelegateFunction sCreateDelegate = 0;
 static ShutdownCoreCLRFunction sShutdownCoreCLR = 0;
 
+/// Register NETCore library objects.
+void ATOMIC_API RegisterNETCoreLibrary(Context* context);
+
+WeakPtr<Context> NETCore::csContext_;
+WeakPtr<NETCore> NETCore::instance_;
+
 NETCore::NETCore(Context* context) :
     Object(context),
     coreCLRDLLHandle_(0),
     hostHandle_(0),
     domainId_(0)
 {
+    RegisterNETCoreLibrary(context_);
+
+    NetCoreThunkInit();
+
+    assert(!instance_);
+    instance_ = this;
+    csContext_ = context;
+
+    SharedPtr<NETManaged> managed(new NETManaged(context_));
+    context_->RegisterSubsystem(managed);
+
+    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
+    context_->RegisterSubsystem(dispatcher);
+    context_->AddGlobalEventListener(dispatcher);
 
 }
 
 NETCore::~NETCore()
 {
+    context_->RemoveGlobalEventListener(context_->GetSubsystem<CSEventDispatcher>());
+    context_->RemoveSubsystem(CSEventDispatcher::GetTypeStatic());
+    context_->RemoveSubsystem(NETManaged::GetTypeStatic());
 
+    instance_ = NULL;
 }
 
 void NETCore::GenerateTPAList(String& tpaList)
@@ -167,6 +195,22 @@ bool NETCore::InitCoreCLRDLL(String& errorMsg)
     return true;
 }
 
+
+extern "C"
+{
+
+// http://ybeernet.blogspot.com/2011/03/techniques-of-calling-unmanaged-code.html
+// pinvoke is faster than [UnmanagedFunctionPointer] :/
+// [SuppressUnmanagedCodeSecurity] <--- add this attribute, in any event
+
+void csb_Atomic_Test(unsigned id)
+{
+  LOGINFOF("%u", id);
+}
+
+}
+
+
 bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 {
     coreCLRFilesAbsPath_ = AddTrailingSlash(coreCLRFilesAbsPath);
@@ -208,7 +252,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     String appPath = "/Users/josh/Desktop/OSX.x64.Debug/";
     Vector<String> nativeSearch;
     nativeSearch.Push(coreCLRFilesAbsPath_);
-    nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicNET/NETRuntime");
+    nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicNET/NETNative");
 
     String nativeDllSearchDirs;
     nativeDllSearchDirs.Join(nativeSearch, ":");
@@ -227,7 +271,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     };
 
     int st = sInitializeCoreCLR(
-                "/Users/josh/Desktop/OSX.x64.Debug/HelloWorld.exe",
+                "",
                 "NETCore",
                 sizeof(propertyKeys) / sizeof(propertyKeys[0]),
                 propertyKeys,
@@ -241,6 +285,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         errorMsg = ToString("NETCore: coreclr_initialize failed - status: 0x%08x\n", st);
         return false;
     }
+
 
     /*
     void* hm;
@@ -259,6 +304,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     }
     */
 
+
 /*
     unsigned int exitCode;
 
@@ -274,6 +320,12 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     return true;
 
 }
+
+void RegisterNETCoreLibrary(Context* context)
+{
+    CSComponent::RegisterObject(context);
+}
+
 
 }
 

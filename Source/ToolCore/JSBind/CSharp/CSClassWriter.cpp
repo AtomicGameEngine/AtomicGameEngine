@@ -38,7 +38,7 @@ void CSClassWriter::WriteNativeFunctions(String& source)
         if (function->IsDestructor())
             continue;
 
-        if (OmitFunction(function))
+        if (CSTypeHelper::OmitFunction(function))
             continue;
 
         CSFunctionWriter writer(function);
@@ -81,7 +81,7 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
             JSBFunctionType* getType = NULL;
             JSBFunctionType* setType = NULL;
 
-            if (OmitFunction(prop->getter_) || OmitFunction(prop->setter_))
+            if (CSTypeHelper::OmitFunction(prop->getter_) || CSTypeHelper::OmitFunction(prop->setter_))
                 continue;
 
             if (prop->getter_ && !prop->getter_->Skip())
@@ -148,30 +148,6 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
 
 }
 
-bool CSClassWriter::OmitFunction(JSBFunction* function)
-{
-    if (!function)
-        return false;
-
-    // We need to rename GetType
-    if (function->GetName() == "GetType")
-        return true;
-
-    // avoid vector type for now
-    if (function->GetReturnType() && function->GetReturnType()->type_->asVectorType())
-        return true;
-
-    Vector<JSBFunctionType*>& parameters = function->GetParameters();
-
-    for (unsigned i = 0; i < parameters.Size(); i++)
-    {
-        if (parameters[i]->type_->asVectorType())
-            return true;
-    }
-
-    return false;
-}
-
 void CSClassWriter::GenerateManagedSource(String& sourceOut)
 {
     String source = "";
@@ -217,7 +193,7 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         if (function->IsDestructor())
             continue;
 
-        if (OmitFunction(function))
+        if (CSTypeHelper::OmitFunction(function))
             continue;
 
         CSFunctionWriter fwriter(function);

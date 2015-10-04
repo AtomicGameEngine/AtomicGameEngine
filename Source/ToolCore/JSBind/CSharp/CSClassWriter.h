@@ -34,8 +34,6 @@ public:
 
 private:
 
-    bool OmitFunction(JSBFunction* function);
-
     void WriteNativeFunctions(String& source);
 
     void WriteManagedProperties(String& sourceOut);

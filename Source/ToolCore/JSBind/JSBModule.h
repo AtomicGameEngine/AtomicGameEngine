@@ -70,6 +70,9 @@ public:
     void ProcessClasses();
     void PostProcessClasses();
 
+    void SetDotNetModule(bool value) { dotNetModule_ = value; }
+    bool GetDotNetModule() { return dotNetModule_; }
+
 private:
 
     void ProcessOverloads();
@@ -99,6 +102,8 @@ private:
     Vector<String> requirements_;
 
     SharedPtr<JSONFile> moduleJSON_;
+
+    bool dotNetModule_;
 
 };
 

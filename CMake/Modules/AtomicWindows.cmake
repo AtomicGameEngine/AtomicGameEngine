@@ -3,8 +3,9 @@ include(AtomicDesktop)
 
 set (JAVASCRIPT_BINDINGS_PLATFORM "WINDOWS")
 
-#set (CMAKE_DEBUG_POSTFIX _d)
+include(AtomicNET)
 
+#set (CMAKE_DEBUG_POSTFIX _d)
 
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     set (D3DCOMPILER_47_DLL ${CMAKE_SOURCE_DIR}/Build/Windows/Binaries/x64/D3DCompiler_47.dll)

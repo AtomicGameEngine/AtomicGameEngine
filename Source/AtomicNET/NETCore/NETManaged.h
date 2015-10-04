@@ -25,30 +25,34 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/Object.h>
 
+#include "NETCoreThunk.h"
+
 namespace Atomic
 {
 
-class ATOMIC_API AtomicSharp : public Object
+class ATOMIC_API NETManaged : public Object
 {
-
-    OBJECT(AtomicSharp);
+    OBJECT(NETManaged);
 
 public:
     /// Construct.
-    AtomicSharp(Context* context);
+    NETManaged(Context* context);
     /// Destruct.
-    virtual ~AtomicSharp();
+    virtual ~NETManaged();
 
-    /// We access this directly in binding code, where there isn't a context
-    /// to get a reference from
-    static inline Context* GetContext() { return instance_->csContext_; }
+    void SetCSComponentCreate(CSComponentCreateFunctionPtr ptr);
+    void SetCSComponentCallMethod(CSComponentCallMethodFunctionPtr ptr);
+    void SetCSBeginSendEvent(CSBeginSendEventFunctionPtr ptr);
+
+    CSComponent* CSComponentCreate(const String& componentName);
+    void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
+    void CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 
 private:
 
-    /// weak local context ref, so avoid recursion in static GetContext call
-    static WeakPtr<Context> csContext_;
-
-    static WeakPtr<AtomicSharp> instance_;
+    CSComponentCreateFunctionPtr CSComponentCreate_;
+    CSComponentCallMethodFunctionPtr CSComponentCallMethod_;
+    CSBeginSendEventFunctionPtr CSBeginSendEvent_;
 
 };
 

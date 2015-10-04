@@ -34,7 +34,7 @@
 #include <Atomic/Scene/SceneEvents.h>
 
 #include "CSComponent.h"
-#include "AtomicSharpAPI.h"
+//#include "AtomicSharpAPI.h"
 
 namespace Atomic
 {
@@ -87,7 +87,8 @@ public:
 
         if (managedClass.Length())
         {
-            ptr = CSComponentCreate(managedClass);
+            // change to callback
+            //ptr = CSComponentCreate(managedClass);
         }
 
         if (ptr.Null())
@@ -147,7 +148,8 @@ void CSComponent::CallScriptMethod(CSComponentMethod method, float value)
     if (destroyed_ || !node_ || !node_->GetScene())
         return;
 
-    CSComponentCallMethod(GetRefID(), method, value);
+    // Change to callback
+    //CSComponentCallMethod(GetRefID(), method, value);
 
 }
 

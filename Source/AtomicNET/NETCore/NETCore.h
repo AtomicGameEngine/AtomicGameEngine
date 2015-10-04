@@ -40,8 +40,11 @@ public:
     virtual ~NETCore();
 
     bool Initialize(const String& coreCLRFilesAbsPath, String &errorMsg);
-
     void Shutdown();
+
+    /// We access this directly in binding code, where there isn't a context
+    /// to get a reference from
+    static inline Context* GetContext() { return instance_->csContext_; }
 
 private:
 
@@ -53,6 +56,10 @@ private:
     void* hostHandle_;
     unsigned domainId_;
 
+    /// weak local context ref, so avoid recursion in static GetContext call
+    static WeakPtr<Context> csContext_;
+
+    static WeakPtr<NETCore> instance_;
 
 };
 

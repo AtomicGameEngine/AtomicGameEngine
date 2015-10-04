@@ -46,7 +46,8 @@ private:
     void WriteDefaultStructParameters(String& source);
 
     void GenNativeCallParameters(String& sig);
-    void GenNativeFunctionSignature(String& sig);
+    void GenNativeThunkCallParameters(String& sig);
+
 
     void WriteNativeFunction(String& source);
     void WriteNativeConstructor(String& source);

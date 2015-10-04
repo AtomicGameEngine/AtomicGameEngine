@@ -41,7 +41,7 @@
 
 #include <AtomicPlayer/Player.h>
 
-#include "AtomicSharp.h"
+#include <AtomicNET/NETCore/NETCore.h>
 #include "AtomicSharpApp.h"
 
 #include <Atomic/DebugNew.h>
@@ -124,8 +124,8 @@ namespace AtomicPlayer
     {
         Application::Start();
 
-        // Instantiate and register AtomicSharp subsystem
-        context_->RegisterSubsystem(new AtomicSharp(context_));
+        // Instantiate and register NETCore subsystem
+        context_->RegisterSubsystem(new NETCore(context_));
 
         // Instantiate and register the Javascript subsystem
         Javascript* javascript = new Javascript(context_);
@@ -164,7 +164,7 @@ namespace AtomicPlayer
         // as if not, will hold on engine subsystems, which is bad
         assert(!JSVM::GetJSVM(0));
 
-        context_->RemoveSubsystem<AtomicSharp>();
+        context_->RemoveSubsystem<NETCore>();
 
         Application::Stop();
 

@@ -59,7 +59,7 @@
 
 RefCounted* csb_Node_Constructor()
 {
-    return new Node(AtomicSharp::GetContext());
+    return new Node(NETCore::GetContext());
 }
 
 void csb_Node_GetPosition(Node* self, Vector3* out)
@@ -91,7 +91,7 @@ const RefCounted* csb_Node_GetParent(Node* self)
 
 RefCounted* csb_ObjectAnimation_Constructor()
 {
-    return new ObjectAnimation(AtomicSharp::GetContext());
+    return new ObjectAnimation(NETCore::GetContext());
 }
 
 */
@@ -154,18 +154,14 @@ void CSFunctionWriter::GenNativeCallParameters(String& sig)
     sig.Join(args, ", ");
 }
 
-void CSFunctionWriter::GenNativeFunctionSignature(String& sig)
+void CSFunctionWriter::GenNativeThunkCallParameters(String& sig)
 {
-    JSBClass* klass = function_->GetClass();
-
     Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
     Vector<String> args;
 
     if (!function_->IsConstructor())
-    {
-        args.Push(ToString("%s* self", klass->GetNativeName().CString()));
-    }
+        args.Push("self");
 
     if (parameters.Size())
     {
@@ -183,23 +179,21 @@ void CSFunctionWriter::GenNativeFunctionSignature(String& sig)
                     continue;
                 }
 
-                args.Push(ToString("%s* %s", klass->GetNativeName().CString(), ptype->name_.CString()));
+                args.Push(ToString("%s", ptype->name_.CString()));
+
             }
             else
             {
-                args.Push(CSTypeHelper::GetNativeTypeString(ptype) + " " + ptype->name_);
+                args.Push(ToString("%s", ptype->name_.CString()));
             }
 
         }
     }
 
     if (function_->GetReturnClass() && function_->GetReturnClass()->IsNumberArray())
-    {
-        args.Push(ToString("%s* returnValue", function_->GetReturnClass()->GetNativeName().CString()));
-    }
+        args.Push("returnValue");
 
     sig.Join(args, ", ");
-
 }
 
 void CSFunctionWriter::WriteNativeFunction(String& source)
@@ -208,46 +202,48 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     JSBPackage* package = klass->GetPackage();
     String fname = function_->IsConstructor() ? "Constructor" : function_->GetName();
 
-    String returnType = "void";
-
-    bool simpleReturn = true;
-
-    if (function_->IsConstructor())
-    {
-        returnType = "RefCounted*";
-    }
-    else if (function_->GetReturnType())
-    {
-        if (function_->IsConstructor())
-        {
-            returnType = ToString("%s*", klass->GetNativeName().CString());
-        }
-        else if (function_->GetReturnClass())
-        {
-            if (!function_->GetReturnClass()->IsNumberArray())
-            {
-                returnType = ToString("const %s*", function_->GetReturnClass()->GetNativeName().CString());
-            }
-        }
-        else if (function_->GetReturnType()->type_->asStringHashType())
-        {
-            returnType = "unsigned";
-        }
-        else
-        {
-            returnType = ToString("%s", CSTypeHelper::GetNativeTypeString(function_->GetReturnType()).CString());
-        }
-    }
+    String returnType;
+    String functionSig = CSTypeHelper::GetNativeFunctionSignature(function_, returnType);
 
     String line;
-    String sig;
-    GenNativeFunctionSignature(sig);
 
-    line = ToString("ATOMIC_EXPORT_API %s csb_%s_%s_%s(%s)\n",
-                    returnType.CString(), package->GetName().CString(), klass->GetName().CString(),
-                    fname.CString(), sig.CString());
+    line = ToString("ATOMIC_EXPORT_API %s %s\n",
+                    returnType.CString(), functionSig.CString());
 
     source += IndentLine(line);
+
+    source += IndentLine("{\n");
+
+    Indent();
+
+
+    source += "\n";
+
+    line = ToString("if ( AtomicNET%sThunkEnabled )\n", package->GetName().CString());
+
+    source += IndentLine(line);
+
+    source += IndentLine("{\n");
+
+    Indent();
+
+    // write the thunk
+
+    line = returnType == "void" ? "" : "return ";
+
+    String thunkCallSig;
+    GenNativeThunkCallParameters(thunkCallSig);
+
+    line += ToString("AtomicNET%sThunk.__%s_%s_%s(%s);\n", package->GetName().CString(), package->GetName().CString(), klass->GetName().CString(),
+                     fname.CString(), thunkCallSig.CString());
+
+    source += IndentLine(line);
+
+    Dedent();
+
+    source += IndentLine("}\n");
+
+    source += IndentLine("else\n");
 
     source += IndentLine("{\n");
 
@@ -277,8 +273,7 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     {
         if (returnType != "void")
         {
-            if (simpleReturn)
-                returnStatement = "return ";
+            returnStatement = "return ";
         }
     }
 
@@ -295,9 +290,9 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
         else if (klass->IsObject())
         {
             if (callSig.Length())
-                line = ToString("return new %s(AtomicSharp::GetContext(), %s);\n", klass->GetNativeName().CString(), callSig.CString());
+                line = ToString("return new %s(NETCore::GetContext(), %s);\n", klass->GetNativeName().CString(), callSig.CString());
             else
-                line = ToString("return new %s(AtomicSharp::GetContext());\n", klass->GetNativeName().CString());
+                line = ToString("return new %s(NETCore::GetContext());\n", klass->GetNativeName().CString());
         }
         else
         {
@@ -316,6 +311,10 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
     {
         source += IndentLine("return returnValue.CString();\n");
     }
+
+    Dedent();
+
+    source += IndentLine("}\n");
 
     Dedent();
 
@@ -714,7 +713,7 @@ void CSFunctionWriter::GenerateManagedSource(String& sourceOut)
 
     if (function_->GetDocString().Length())
     {
-        // monodocer -assembly:AtomicSharp.dll -path:en -pretty
+        // monodocer -assembly:NETCore.dll -path:en -pretty
         // mdoc export-html -o htmldocs en
         source += IndentLine("/// <summary>\n");
         source += IndentLine("/// " + function_->GetDocString() + "\n");

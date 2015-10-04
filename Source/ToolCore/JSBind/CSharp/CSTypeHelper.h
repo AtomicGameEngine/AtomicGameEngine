@@ -22,6 +22,10 @@ public:
 
     //JSBFunctionType*
 
+    static void GenNativeFunctionParameterSignature(JSBFunction* function, String& sig);
+
+    static String GetNativeFunctionSignature(JSBFunction* function, String& returnType, bool thunk = false);
+
     static bool IsSimpleReturn(JSBType* type);
     static bool IsSimpleReturn(JSBFunctionType* ftype);
 
@@ -35,6 +39,8 @@ public:
 
     static String GetManagedTypeString(JSBType* type);
     static String GetManagedTypeString(JSBFunctionType* ftype, bool addName = true);
+
+    static bool OmitFunction(JSBFunction* function);
 
 };
 

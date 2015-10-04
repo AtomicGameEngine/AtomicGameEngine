@@ -5,8 +5,8 @@
 
 	"modules" : ["Container", "Math", "Core", "Scene", "Graphics", "Atomic3D", "Atomic2D", "Audio",
 	"Physics", "Navigation", "Input", "UI", "Resource", "Network", "IO",
-	"Engine", "Javascript", "Environment", "Web"],
-
+	"Engine", "Javascript", "Environment", "Web", "AtomicNET"],
+	"dotnetModules" : ["AtomicNET"],
 	"moduleExclude" : {
 		"WEB" : ["Network", "Navigation"]
 	}

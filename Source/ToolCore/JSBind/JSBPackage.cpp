@@ -215,6 +215,18 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
+    JSONValue dnmodules = root.Get("dotnetModules");
+    Vector<String> dotNetModules;
+    if (dnmodules.IsArray())
+    {
+        for (unsigned i = 0; i < dnmodules.GetArray().Size(); i++)
+        {
+            String moduleName = dnmodules.GetArray()[i].GetString();
+            dotNetModules.Push(moduleName);
+        }
+    }
+
+
     name_ = root.Get("name").GetString();
     namespace_ = root.Get("namespace").GetString();
 
@@ -236,6 +248,11 @@ bool JSBPackage::Load(const String& packageFolder)
         {
             LOGERRORF("Unable to load module json: %s", (packageFolder + moduleName + ".json").CString());
             return false;
+        }
+
+        if (dotNetModules.Contains(moduleName))
+        {
+            module->SetDotNetModule(true);
         }
 
         modules_.Push(module);

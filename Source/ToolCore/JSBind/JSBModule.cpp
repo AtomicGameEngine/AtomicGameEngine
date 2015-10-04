@@ -28,7 +28,8 @@ namespace ToolCore
 {
 
 JSBModule::JSBModule(Context* context, JSBPackage* package) : Object(context),
-    package_(package)
+    package_(package),
+    dotNetModule_(false)
 {
 
 }

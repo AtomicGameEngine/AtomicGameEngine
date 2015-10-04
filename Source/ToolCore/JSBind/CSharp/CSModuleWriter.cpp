@@ -15,6 +15,7 @@
 #include "../JSBClass.h"
 #include "../JSBFunction.h"
 
+#include "CSTypeHelper.h"
 #include "CSClassWriter.h"
 #include "CSModuleWriter.h"
 
@@ -76,8 +77,57 @@ void CSModuleWriter::WriteIncludes(String& source)
         included.Push(header);
     }
 
+    source += ToString("\n#include \"CSPackage%s.h\"\n", module_->GetPackage()->GetName().CString());
+
 }
 
+void CSModuleWriter::GenerateNativeThunkInit(String& sourceOut)
+{
+    const char* packageName = module_->GetPackage()->GetName().CString();
+    const char* moduleName = module_->GetName().CString();
+
+    String source, line;
+    String thunkName = ToString("AtomicNET%sThunk",packageName);
+
+    source.AppendWithFormat("\nvoid csb_package_%s_init_%s_thunk ()\n{\n\n", packageName, moduleName);
+
+    Vector<SharedPtr<JSBClass>> classes = module_->classes_.Values();
+
+    Indent();
+
+    for (unsigned i = 0; i < classes.Size(); i++)
+    {
+        JSBClass* cls = classes[i];
+
+        if (cls->IsNumberArray())
+            continue;
+
+        PODVector<JSBFunction*> functions = cls->GetFunctions();
+        for (unsigned j = 0; j < functions.Size(); j++)
+        {
+            JSBFunction* function = functions[j];
+            if (CSTypeHelper::OmitFunction(function))
+                continue;
+
+             line = ToString("%s.__%s_%s_%s = ", thunkName.CString(), packageName, cls->GetName().CString(),
+                             function->IsConstructor() ? "Constructor" : function->GetName().CString());
+
+             line += ToString("csb_%s_%s_%s;\n", packageName, cls->GetName().CString(),
+                             function->IsConstructor() ? "Constructor" : function->GetName().CString());
+
+             source += IndentLine(line);
+
+        }
+
+    }
+
+    Dedent();
+
+    source += "\n}\n";
+
+    sourceOut += source;
+
+}
 
 void CSModuleWriter::GenerateNativeSource()
 {
@@ -102,7 +152,7 @@ void CSModuleWriter::GenerateNativeSource()
 
     WriteIncludes(source);
 
-    source += "\n#include <AtomicNET/NETRuntime/AtomicSharp.h>\n";
+    source += "\n#include <AtomicNET/NETCore/NETCore.h>\n";
 
     String ns = module_->GetPackage()->GetNamespace();
 
@@ -125,6 +175,8 @@ void CSModuleWriter::GenerateNativeSource()
     }
 
     source += "// End Classes\n\n";
+
+    GenerateNativeThunkInit(source);
 
     // end Atomic namespace
     source += "\n}\n";

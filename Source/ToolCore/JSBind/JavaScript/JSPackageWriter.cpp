@@ -34,6 +34,9 @@ void JSPackageWriter::WriteProtoTypeRecursive(String &source, JSBClass* klass,  
     if (written.Contains(klass))
         return;
 
+    if (klass->GetModule()->GetDotNetModule())
+        return;
+
     PODVector<JSBClass*>& baseClasses = klass->GetBaseClasses();
 
     Vector<JSBClass*>::Iterator itr = baseClasses.End() - 1 ;
@@ -96,6 +99,9 @@ void JSPackageWriter::GenerateSource()
     {
         JSBModule* module = package_->modules_.At(i);
 
+        if (module->GetDotNetModule())
+            continue;
+
         String moduleLower = module->GetName().ToLower();
 
         source.AppendWithFormat("\nextern void jsb_package_%s_preinit_%s (JSVM* vm);", packageLower.CString(), moduleLower.CString());
@@ -123,6 +129,9 @@ void JSPackageWriter::GenerateSource()
     {
         JSBModule* module = package_->modules_.At(i);
 
+        if (module->GetDotNetModule())
+            continue;
+
         if (module->Requires("3D"))
             source += "\n#ifdef ATOMIC_3D";
 
@@ -145,6 +154,9 @@ void JSPackageWriter::GenerateSource()
     for (unsigned i = 0; i < package_->modules_.Size(); i++)
     {
         JSBModule* module = package_->modules_.At(i);
+
+        if (module->GetDotNetModule())
+            continue;
 
         String moduleLower = module->GetName().ToLower();
 
@@ -171,6 +183,9 @@ void JSPackageWriter::GenerateSource()
 
     for (unsigned i = 0; i < package_->modules_.Size(); i++)
     {
+        if (package_->modules_[i]->GetDotNetModule())
+            continue;
+
         JSModuleWriter writer(package_->modules_[i]);
         writer.GenerateSource();
     }
