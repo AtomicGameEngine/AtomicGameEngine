@@ -125,4 +125,11 @@ void ResourceEditor::Close(bool navigateToAvailableResource)
     SendEvent("EditorCloseResource", data);
 }
 
+void ResourceEditor::InvokeShortcut(const String& shortcut)
+{
+    TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
+    ev.ref_id = TBIDC(shortcut.CString());
+    OnEvent(ev);
+}
+
 }

@@ -247,6 +247,8 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     bool GetCapturing() { return widget_->GetCapturing(); }
 
+    void InvokeShortcut(const String& shortcut);
+
 protected:
 
     void ConvertEvent(UIWidget* handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);

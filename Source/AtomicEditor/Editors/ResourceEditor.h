@@ -50,6 +50,8 @@ public:
 
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }
 
+    void InvokeShortcut(const String& shortcut);
+
 protected:
 
     String fullpath_;

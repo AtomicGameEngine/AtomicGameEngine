@@ -5,9 +5,9 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
-import strings = require("ui/EditorStrings");
-import EditorEvents = require("editor/EditorEvents");
-import EditorUI = require("ui/EditorUI");
+import strings = require("../../EditorStrings");
+import EditorEvents = require("../../../editor/EditorEvents");
+import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 
 class MainFrameMenu extends Atomic.ScriptObject {
@@ -60,6 +60,36 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "edit format code") {
                 EditorUI.getShortcuts().invokeFormatCode();
+                return true;
+            }
+
+            if (refid == "edit undo") {
+                EditorUI.getShortcuts().invokeUndo();
+                return true;
+            }
+
+            if (refid == "edit redo") {
+                EditorUI.getShortcuts().invokeRedo();
+                return true;
+            }
+
+            if (refid == "edit cut") {
+                EditorUI.getShortcuts().invokeCut();
+                return true;
+            }
+
+            if (refid == "edit copy") {
+                EditorUI.getShortcuts().invokeCopy();
+                return true;
+            }
+
+            if (refid == "edit paste") {
+                EditorUI.getShortcuts().invokePaste();
+                return true;
+            }
+
+            if (refid == "edit select all") {
+                EditorUI.getShortcuts().invokeSelectAll();
                 return true;
             }
 

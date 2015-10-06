@@ -720,5 +720,12 @@ void UIWidget::InvalidateLayout()
 
 }
 
+void UIWidget::InvokeShortcut(const String& shortcut)
+{
+    TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
+    ev.ref_id = TBIDC(shortcut.CString());
+    widget_->OnEvent(ev);
+}
+
 
 }

@@ -51,6 +51,37 @@ class Shortcuts extends Atomic.ScriptObject {
         this.sendEvent(EditorEvents.SaveResource);
     }
 
+    invokeUndo() {
+        this.invokeResourceFrameShortcut("undo");
+    }
+
+    invokeRedo() {
+        this.invokeResourceFrameShortcut("redo");
+    }
+
+    invokeCut() {
+        this.invokeResourceFrameShortcut("cut");
+    }
+
+    invokeCopy() {
+        this.invokeResourceFrameShortcut("copy");
+    }
+
+    invokePaste() {
+        this.invokeResourceFrameShortcut("paste");
+    }
+
+    invokeSelectAll() {
+        this.invokeResourceFrameShortcut("selectall");
+    }
+
+    invokeResourceFrameShortcut(shortcut:string) {
+        if (!ToolCore.toolSystem.project) return;
+        var resourceFrame = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+        if(resourceFrame) {
+            resourceFrame.invokeShortcut(shortcut);
+        }
+    }
 
     // global shortcut handler
     handleUIShortcut(ev: Atomic.UIShortcutEvent) {
