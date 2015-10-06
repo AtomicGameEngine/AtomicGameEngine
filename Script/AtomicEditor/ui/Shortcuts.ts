@@ -51,12 +51,48 @@ class Shortcuts extends Atomic.ScriptObject {
         this.sendEvent(EditorEvents.SaveResource);
     }
 
+    invokeUndo() {
+        this.invokeResourceFrameShortcut("undo");
+    }
+
+    invokeRedo() {
+        this.invokeResourceFrameShortcut("redo");
+    }
+
+    invokeCut() {
+        this.invokeResourceFrameShortcut("cut");
+    }
+
+    invokeCopy() {
+        this.invokeResourceFrameShortcut("copy");
+    }
+
+    invokePaste() {
+        this.invokeResourceFrameShortcut("paste");
+    }
+
+    invokeSelectAll() {
+        this.invokeResourceFrameShortcut("selectall");
+    }
+
+    invokeResourceFrameShortcut(shortcut:string) {
+        if (!ToolCore.toolSystem.project) return;
+        var resourceFrame = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+        if(resourceFrame) {
+            resourceFrame.invokeShortcut(shortcut);
+        }
+    }
 
     // global shortcut handler
     handleUIShortcut(ev: Atomic.UIShortcutEvent) {
+        var cmdKey;
+        if(Atomic.platform == "MacOSX") {
+            cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LGUI) || Atomic.input.getKeyDown(Atomic.KEY_RGUI));
+        } else {
+            cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LCTRL) || Atomic.input.getKeyDown(Atomic.KEY_RCTRL));
+        }
 
-        // global shortcuts without qualifiers
-        if (!ev.qualifiers) {
+        if (cmdKey) {
 
             if (ev.key == Atomic.KEY_S) {
                 this.invokeFileSave();
@@ -67,9 +103,15 @@ class Shortcuts extends Atomic.ScriptObject {
             else if (ev.key == Atomic.KEY_I) {
                 this.invokeFormatCode();
             }
-
             else if (ev.key == Atomic.KEY_P) {
                 this.invokePlay();
+            //if shift is pressed
+            } else if (ev.qualifiers & Atomic.QUAL_SHIFT) {
+                if (ev.key == Atomic.KEY_B) {
+                    EditorUI.getModelOps().showBuildSettings();
+                }
+            } else if (ev.key == Atomic.KEY_B) {
+                EditorUI.getModelOps().showBuild();
             }
 
         }
