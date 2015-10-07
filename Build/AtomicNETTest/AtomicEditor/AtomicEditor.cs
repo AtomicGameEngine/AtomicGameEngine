@@ -24,9 +24,9 @@ namespace AtomicEditor
 
 			try {
 
-				var inspector = new AssemblyInspector();
-				inspector.Inspect(pathToAssembly);
-				Console.WriteLine(inspector.DumpToJSON());
+				var inspector = new AssemblyInspector ();
+				inspector.Inspect (pathToAssembly);
+				Console.WriteLine (inspector.DumpToJSON ());
 
 			} catch (Exception ex) {
 				Console.WriteLine (ex.Message);

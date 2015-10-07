@@ -4,11 +4,11 @@ using System;
 
 namespace AtomicNETTest
 {
-    public enum MyEnum
+    public enum BehaviorState
     {
-      One,
-      Two = 10,
-      Three
+      Friendly,
+      Aggressive = 10,
+      Neutral
     }
 
     public class MyComponent : CSComponent
@@ -25,18 +25,17 @@ namespace AtomicNETTest
         [Inspector]
         public Quaternion MyQuaternionValue = new Quaternion(1, 1, 1, 1);
 
-        [Inspector("HeyHeyMyMy", Value2 = "one")]
+        [Inspector(Value1 = "This is a", Value2 = "test")]
         public float MyFloatValue = 42.0f;
 
         [Inspector]
         public string MyStringValue = "Hey!";
 
         [Inspector]
-        public MyEnum MyEnumValue = MyEnum.Three;
+        public BehaviorState State = BehaviorState.Neutral;
 
         [Inspector("Sprites/star.png")]
         public Sprite2D sprite2D;
-
 
     }
 
