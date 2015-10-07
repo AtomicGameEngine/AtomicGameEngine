@@ -387,7 +387,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     st = sCreateDelegate(hostHandle_,
                     domainId_,
                     "AtomicEditor",
-                    "AtomicEditor.AssemblyInspector",
+                    "AtomicEditor.AtomicEditor",
                     "InspectAssembly",
                     (void**) &inspectAssembly);
 

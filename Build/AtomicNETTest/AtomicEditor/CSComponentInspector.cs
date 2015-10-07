@@ -14,6 +14,8 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 
+// References
+
 //https://github.com/Microsoft/dotnetsamples/tree/master/System.Reflection.Metadata
 //https://github.com/dotnet/corefx/tree/master/src/System.Reflection.Metadata/tests
 //http://www.cnetion.com/getting-field-values-using-mono-cecil-qq-AUvBjRFgivICeoL1jxJy.php
@@ -31,54 +33,24 @@ using System.Reflection.PortableExecutable;
 
 namespace AtomicEditor
 {
-
-	public class InspectorField
-	{
-		public string TypeName;
-
-		// the Name of the InspectorField
-		public string Name;
-		// The DefaultValue if supplied
-		public string DefaultValue;
-
-		// custom attributes, positional and named
-		public List<string> CustomAttrPositionalArgs = new List<string> ();
-		public Dictionary<string, string> CustomAttrNamedArgs = new Dictionary<string, string> ();
-	}
-
+	
 	public class CSComponentInspector
 	{
 
-		public Dictionary<string, InspectorField> InspectorFields = new Dictionary<string, InspectorField> ();
+		InspectorComponent _inspectorComponent;
 
 		public CSComponentInspector (TypeDefinition typeDef, PEReader peFile, MetadataReader metaReader)
 		{
 			this.typeDef = typeDef;
 			this.peFile = peFile;
 			this.metaReader = metaReader;
+
+			this._inspectorComponent = new InspectorComponent();
+			this._inspectorComponent.Name = metaReader.GetString(typeDef.Name);
 		}
 
-		public void Dump ()
-		{
-			foreach (var entry in InspectorFields) {
-				var field = entry.Value;
-
-				Console.WriteLine ("Inspector Field: {0}", field.Name);
-
-				Console.WriteLine ("   Type Name: {0}", field.TypeName);
-				Console.WriteLine ("   Default Value: {0}", field.DefaultValue);
-
-				Console.WriteLine ("   Positional Custom Attr:");
-				foreach (var p in field.CustomAttrPositionalArgs)
-					if (p.Length != 0)
-						Console.WriteLine ("      {0}", p);
-				Console.WriteLine ("   Named Custom Attr:");
-				foreach (var nentry in field.CustomAttrNamedArgs)
-					Console.WriteLine ("      {0}:{1}", nentry.Key, nentry.Value);
-			}
-		}
-
-		public bool Inspect ()
+		// Inspect a CSComponent derived class
+		internal InspectorComponent Inspect ()
 		{
 
 			var fields = typeDef.GetFields ();
@@ -115,6 +87,7 @@ namespace AtomicEditor
 
 								// can store local enum typedefs
 								// enum initializers are stored as constant value in the IL
+
 								var typeDef = metaReader.GetTypeDefinition ((TypeDefinitionHandle)token);
 
 								var baseTypeToken = typeDef.BaseType;
@@ -127,7 +100,8 @@ namespace AtomicEditor
 								if (metaReader.GetString (baseTypeRef.Name) != "Enum")
 									continue;
 
-								Console.WriteLine ("Enum TypeDef {0}", metaReader.GetString (typeDef.Name));
+								inspectorField.IsEnum = true;
+								typeName = metaReader.GetString (typeDef.Name);
 
 							} else if (tokenType == HandleKind.TypeReference) {
 
@@ -145,7 +119,7 @@ namespace AtomicEditor
 
 						inspectorField.TypeName = typeName;
 						inspectorField.Name = metaReader.GetString (fieldDef.Name);
-						InspectorFields [inspectorField.Name] = inspectorField;
+						_inspectorComponent.Fields[inspectorField.Name] = inspectorField;
 
 						break;
 					}
@@ -157,6 +131,7 @@ namespace AtomicEditor
 			var methods = typeDef.GetMethods ();
 
 			foreach (var methodHandle in methods) {
+
 				var methodDef = metaReader.GetMethodDefinition (methodHandle);
 
 				if (metaReader.GetString (methodDef.Name) == ".ctor") {
@@ -169,9 +144,9 @@ namespace AtomicEditor
 
 			}
 
-			Dump ();
+			//Dump ();
 
-			return true;
+			return _inspectorComponent;
 
 		}
 
@@ -248,7 +223,7 @@ namespace AtomicEditor
 
 				// support string custom attr for now to simplify things
 				if (paramTypeCode != SignatureTypeCode.String)
-					return false;
+				return false;
 
 				string value;
 
@@ -264,6 +239,7 @@ namespace AtomicEditor
 			short namedParamCount = argsReader.ReadInt16 ();
 
 			for (short i = 0; i < namedParamCount; i++) {
+
 				// Ecma-335 23.3 - A NamedArg is simply a FixedArg preceded by information to identify which field or
 				// property it represents. [Note: Recall that the CLI allows fields and properties to have the same name; so
 				// we require a means to disambiguate such situations. end note] FIELD is the single byte 0x53. PROPERTY is
@@ -281,22 +257,24 @@ namespace AtomicEditor
 
 				// support string custom attr for now to simplify things
 				if (typeCode != SerializationTypeCode.String)
-					return false;
+				return false;
 
 				string name;
+
 				if (!CrackStringInAttributeValue (out name, ref argsReader))
-					return false;
+				return false;
 
 				string value;
-				if (!CrackStringInAttributeValue (out value, ref argsReader))
-					return false;
 
+				if (!CrackStringInAttributeValue (out value, ref argsReader))
+				return false;
 
 				inspectorField.CustomAttrNamedArgs [name] = value;
 
 			}
 
 			return true;
+
 		}
 
 		internal static bool CrackStringInAttributeValue (out string value, ref BlobReader sig)
@@ -324,11 +302,11 @@ namespace AtomicEditor
 		}
 
 		public void InspectILBlock (
-			ImmutableArray<byte> ilBytes,
-			int length,
-			IReadOnlyList<HandlerSpan> spans = null,
-			int blockOffset = 0,
-			IReadOnlyDictionary<int, string> markers = null)
+		ImmutableArray<byte> ilBytes,
+		int length,
+		IReadOnlyList<HandlerSpan> spans = null,
+		int blockOffset = 0,
+		IReadOnlyDictionary<int, string> markers = null)
 		{
 			if (ilBytes == null) {
 				return;
@@ -339,14 +317,14 @@ namespace AtomicEditor
 		}
 
 		private int InspectILBlock (
-			ImmutableArray<byte> ilBytes,
-			int length,
-			IReadOnlyList<HandlerSpan> spans,
-			int blockOffset,
-			int curIndex,
-			int spanIndex,
-			IReadOnlyDictionary<int, string> markers,
-			out int nextSpanIndex)
+		ImmutableArray<byte> ilBytes,
+		int length,
+		IReadOnlyList<HandlerSpan> spans,
+		int blockOffset,
+		int curIndex,
+		int spanIndex,
+		IReadOnlyDictionary<int, string> markers,
+		out int nextSpanIndex)
 		{
 			int lastSpanIndex = spanIndex - 1;
 
@@ -392,7 +370,7 @@ namespace AtomicEditor
 
 					switch (opCode.OperandType) {
 
-					case OperandType.InlineField:
+						case OperandType.InlineField:
 
 						// read token
 						uint fieldToken = ReadUInt32 (ilBytes, ref curIndex);
@@ -411,7 +389,7 @@ namespace AtomicEditor
 
 							InspectorField inspectorField;
 
-							if (InspectorFields.TryGetValue (fieldName, out inspectorField)) {
+							if (_inspectorComponent.Fields.TryGetValue (fieldName, out inspectorField)) {
 								inspectorField.DefaultValue = String.Join (" ", loadedValues.ToArray ());
 							}
 
@@ -420,169 +398,169 @@ namespace AtomicEditor
 						loadedValues.Clear ();
 
 						break;
-					case OperandType.InlineMethod:
+						case OperandType.InlineMethod:
 
 						// new Vector3, etc
 						if (opCode.ToString () == "newobj") {
 
-						} else
+							} else
 							loadedValues.Clear ();
 
-						break;
-					case OperandType.InlineTok:
-					case OperandType.InlineType:
-						ReadUInt32 (ilBytes, ref curIndex);
-						loadedValues.Clear ();
-						break;
+							break;
+							case OperandType.InlineTok:
+							case OperandType.InlineType:
+							ReadUInt32 (ilBytes, ref curIndex);
+							loadedValues.Clear ();
+							break;
 
-					case OperandType.InlineSig: // signature (calli), not emitted by C#/VB
-						ReadUInt32 (ilBytes, ref curIndex);
-						loadedValues.Clear ();
-						break;
+							case OperandType.InlineSig: // signature (calli), not emitted by C#/VB
+							ReadUInt32 (ilBytes, ref curIndex);
+							loadedValues.Clear ();
+							break;
 
-					case OperandType.InlineString:
-                          //sb.Append(" 391 ");
-                          //sb.Append(VisualizeUserString());
+							case OperandType.InlineString:
+							//sb.Append(" 391 ");
+							//sb.Append(VisualizeUserString());
 
-						uint stringToken = ReadUInt32 (ilBytes, ref curIndex);
+							uint stringToken = ReadUInt32 (ilBytes, ref curIndex);
 
-                          // get the kind
-                          //uint tokenKind = stringToken & TokenTypeIds.TokenTypeMask;
-                          // and the rowId
-                          //uint rowId = stringToken & TokenTypeIds.RIDMask;
+							// get the kind
+							//uint tokenKind = stringToken & TokenTypeIds.TokenTypeMask;
+							// and the rowId
+							//uint rowId = stringToken & TokenTypeIds.RIDMask;
 
 
-						UserStringHandle handle = MetadataTokens.UserStringHandle ((int)stringToken);
-						loadedValues.Add (metaReader.GetUserString (handle));
+							UserStringHandle handle = MetadataTokens.UserStringHandle ((int)stringToken);
+							loadedValues.Add (metaReader.GetUserString (handle));
 
-						break;
+							break;
 
-					case OperandType.InlineNone:
+							case OperandType.InlineNone:
 
-						if (opCode == OpCodes.Ldc_I4_0)
+							if (opCode == OpCodes.Ldc_I4_0)
 							loadedValues.Add ("0");
-						else if (opCode == OpCodes.Ldc_I4_1)
+							else if (opCode == OpCodes.Ldc_I4_1)
 							loadedValues.Add ("1");
-						else if (opCode == OpCodes.Ldc_I4_2)
+							else if (opCode == OpCodes.Ldc_I4_2)
 							loadedValues.Add ("2");
-						else if (opCode == OpCodes.Ldc_I4_3)
+							else if (opCode == OpCodes.Ldc_I4_3)
 							loadedValues.Add ("3");
-						else if (opCode == OpCodes.Ldc_I4_4)
+							else if (opCode == OpCodes.Ldc_I4_4)
 							loadedValues.Add ("4");
-						else if (opCode == OpCodes.Ldc_I4_5)
+							else if (opCode == OpCodes.Ldc_I4_5)
 							loadedValues.Add ("5");
-						else if (opCode == OpCodes.Ldc_I4_6)
+							else if (opCode == OpCodes.Ldc_I4_6)
 							loadedValues.Add ("6");
-						else if (opCode == OpCodes.Ldc_I4_7)
+							else if (opCode == OpCodes.Ldc_I4_7)
 							loadedValues.Add ("7");
-						else if (opCode == OpCodes.Ldc_I4_8)
+							else if (opCode == OpCodes.Ldc_I4_8)
 							loadedValues.Add ("8");
-						else if (opCode == OpCodes.Ldc_I4_M1)
+							else if (opCode == OpCodes.Ldc_I4_M1)
 							loadedValues.Add ("-1");
 
-						break;
+							break;
 
-					case OperandType.ShortInlineI:
-						loadedValues.Add (ReadSByte (ilBytes, ref curIndex).ToString ());
-						break;
+							case OperandType.ShortInlineI:
+							loadedValues.Add (ReadSByte (ilBytes, ref curIndex).ToString ());
+							break;
 
-					case OperandType.ShortInlineVar:
-						loadedValues.Add (ReadByte (ilBytes, ref curIndex).ToString ());
-						break;
+							case OperandType.ShortInlineVar:
+							loadedValues.Add (ReadByte (ilBytes, ref curIndex).ToString ());
+							break;
 
-					case OperandType.InlineVar:
-						loadedValues.Add (ReadUInt16 (ilBytes, ref curIndex).ToString ());
-						break;
+							case OperandType.InlineVar:
+							loadedValues.Add (ReadUInt16 (ilBytes, ref curIndex).ToString ());
+							break;
 
-					case OperandType.InlineI:
-						loadedValues.Add (ReadUInt32 (ilBytes, ref curIndex).ToString ());
-						break;
+							case OperandType.InlineI:
+							loadedValues.Add (ReadUInt32 (ilBytes, ref curIndex).ToString ());
+							break;
 
-					case OperandType.InlineI8:
-						loadedValues.Add (ReadUInt64 (ilBytes, ref curIndex).ToString ());
-						break;
+							case OperandType.InlineI8:
+							loadedValues.Add (ReadUInt64 (ilBytes, ref curIndex).ToString ());
+							break;
 
-					case OperandType.ShortInlineR:
-						{
-							loadedValues.Add (ReadSingle (ilBytes, ref curIndex).ToString ());
+							case OperandType.ShortInlineR:
+							{
+								loadedValues.Add (ReadSingle (ilBytes, ref curIndex).ToString ());
+							}
+							break;
+
+							case OperandType.InlineR:
+							{
+								loadedValues.Add (ReadDouble (ilBytes, ref curIndex).ToString ());
+							}
+							break;
+
+							case OperandType.ShortInlineBrTarget:
+							loadedValues.Clear ();
+							var sbyteValue = ReadSByte (ilBytes, ref curIndex) + curIndex + blockOffset;
+							break;
+
+							case OperandType.InlineBrTarget:
+							loadedValues.Clear ();
+							var int32value = ReadInt32 (ilBytes, ref curIndex) + curIndex + blockOffset;
+							break;
+
+							case OperandType.InlineSwitch:
+							loadedValues.Clear ();
+							int labelCount = ReadInt32 (ilBytes, ref curIndex);
+							int instrEnd = curIndex + labelCount * 4;
+							for (int i = 0; i < labelCount; i++) {
+								var int32LabelValue = ReadInt32 (ilBytes, ref curIndex) + instrEnd + blockOffset;
+								//sb.AppendLine((i == labelCount - 1) ? ")" : ",");
+							}
+							break;
+
+							default:
+							throw new InvalidOperationException ();
+							//throw ExceptionUtilities.UnexpectedValue(opCode.OperandType);
 						}
-						break;
 
-					case OperandType.InlineR:
-						{
-							loadedValues.Add (ReadDouble (ilBytes, ref curIndex).ToString ());
-						}
-						break;
-
-					case OperandType.ShortInlineBrTarget:
-						loadedValues.Clear ();
-						var sbyteValue = ReadSByte (ilBytes, ref curIndex) + curIndex + blockOffset;
-						break;
-
-					case OperandType.InlineBrTarget:
-						loadedValues.Clear ();
-						var int32value = ReadInt32 (ilBytes, ref curIndex) + curIndex + blockOffset;
-						break;
-
-					case OperandType.InlineSwitch:
-						loadedValues.Clear ();
-						int labelCount = ReadInt32 (ilBytes, ref curIndex);
-						int instrEnd = curIndex + labelCount * 4;
-						for (int i = 0; i < labelCount; i++) {
-							var int32LabelValue = ReadInt32 (ilBytes, ref curIndex) + instrEnd + blockOffset;
-							//sb.AppendLine((i == labelCount - 1) ? ")" : ",");
-						}
-						break;
-
-					default:
-						throw new InvalidOperationException ();
-					//throw ExceptionUtilities.UnexpectedValue(opCode.OperandType);
+						//sb.AppendLine();
 					}
 
-					//sb.AppendLine();
+					if (EndsSpan (spans, lastSpanIndex, curIndex + blockOffset)) {
+						break;
+					}
 				}
 
-				if (EndsSpan (spans, lastSpanIndex, curIndex + blockOffset)) {
-					break;
+				nextSpanIndex = spanIndex;
+				return curIndex;
+			}
+
+			TypeDefinition typeDef;
+			PEReader peFile;
+			MetadataReader metaReader;
+
+			private static readonly OpCode[] s_oneByteOpCodes;
+			private static readonly OpCode[] s_twoByteOpCodes;
+
+			static CSComponentInspector ()
+			{
+				s_oneByteOpCodes = new OpCode[0x100];
+				s_twoByteOpCodes = new OpCode[0x100];
+
+				var typeOfOpCode = typeof(OpCode);
+
+				foreach (FieldInfo fi in typeof(OpCodes).GetTypeInfo().DeclaredFields) {
+					if (fi.FieldType != typeOfOpCode) {
+						continue;
+					}
+
+					OpCode opCode = (OpCode)fi.GetValue (null);
+					var value = unchecked((ushort)opCode.Value);
+					if (value < 0x100) {
+						s_oneByteOpCodes [value] = opCode;
+					} else if ((value & 0xff00) == 0xfe00) {
+						s_twoByteOpCodes [value & 0xff] = opCode;
+					}
 				}
 			}
 
-			nextSpanIndex = spanIndex;
-			return curIndex;
-		}
-
-		TypeDefinition typeDef;
-		PEReader peFile;
-		MetadataReader metaReader;
-
-		private static readonly OpCode[] s_oneByteOpCodes;
-		private static readonly OpCode[] s_twoByteOpCodes;
-
-		static CSComponentInspector ()
-		{
-			s_oneByteOpCodes = new OpCode[0x100];
-			s_twoByteOpCodes = new OpCode[0x100];
-
-			var typeOfOpCode = typeof(OpCode);
-
-			foreach (FieldInfo fi in typeof(OpCodes).GetTypeInfo().DeclaredFields) {
-				if (fi.FieldType != typeOfOpCode) {
-					continue;
-				}
-
-				OpCode opCode = (OpCode)fi.GetValue (null);
-				var value = unchecked((ushort)opCode.Value);
-				if (value < 0x100) {
-					s_oneByteOpCodes [value] = opCode;
-				} else if ((value & 0xff00) == 0xfe00) {
-					s_twoByteOpCodes [value & 0xff] = opCode;
-				}
-			}
-		}
-
-		private static ulong ReadUInt64 (ImmutableArray<byte> buffer, ref int pos)
-		{
-			ulong result =
+			private static ulong ReadUInt64 (ImmutableArray<byte> buffer, ref int pos)
+			{
+				ulong result =
 				buffer [pos] |
 				(ulong)buffer [pos + 1] << 8 |
 				(ulong)buffer [pos + 2] << 16 |
@@ -592,216 +570,238 @@ namespace AtomicEditor
 				(ulong)buffer [pos + 6] << 48 |
 				(ulong)buffer [pos + 7] << 56;
 
-			pos += sizeof(ulong);
-			return result;
-		}
-
-		private static uint ReadUInt32 (ImmutableArray<byte> buffer, ref int pos)
-		{
-			uint result = buffer [pos] | (uint)buffer [pos + 1] << 8 | (uint)buffer [pos + 2] << 16 | (uint)buffer [pos + 3] << 24;
-			pos += sizeof(uint);
-			return result;
-		}
-
-		private static int ReadInt32 (ImmutableArray<byte> buffer, ref int pos)
-		{
-			return unchecked((int)ReadUInt32 (buffer, ref pos));
-		}
-
-		private static ushort ReadUInt16 (ImmutableArray<byte> buffer, ref int pos)
-		{
-			ushort result = (ushort)(buffer [pos] | buffer [pos + 1] << 8);
-			pos += sizeof(ushort);
-			return result;
-		}
-
-		private static byte ReadByte (ImmutableArray<byte> buffer, ref int pos)
-		{
-			byte result = buffer [pos];
-			pos += sizeof(byte);
-			return result;
-		}
-
-		private static sbyte ReadSByte (ImmutableArray<byte> buffer, ref int pos)
-		{
-			sbyte result = unchecked((sbyte)buffer [pos]);
-			pos += 1;
-			return result;
-		}
-
-		private unsafe static float ReadSingle (ImmutableArray<byte> buffer, ref int pos)
-		{
-			uint value = ReadUInt32 (buffer, ref pos);
-			return *(float*)&value;
-		}
-
-		private unsafe static double ReadDouble (ImmutableArray<byte> buffer, ref int pos)
-		{
-			ulong value = ReadUInt64 (buffer, ref pos);
-			return *(double*)&value;
-		}
-
-		public enum HandlerKind
-		{
-			Try,
-			Catch,
-			Filter,
-			Finally,
-			Fault
-		}
-
-		public struct HandlerSpan : IComparable<HandlerSpan>
-		{
-			public readonly HandlerKind Kind;
-			public readonly object ExceptionType;
-			public readonly int StartOffset;
-			public readonly int FilterHandlerStart;
-			public readonly int EndOffset;
-
-			public HandlerSpan (HandlerKind kind, object exceptionType, int startOffset, int endOffset, int filterHandlerStart = 0)
-			{
-				this.Kind = kind;
-				this.ExceptionType = exceptionType;
-				this.StartOffset = startOffset;
-				this.EndOffset = endOffset;
-				this.FilterHandlerStart = filterHandlerStart;
+				pos += sizeof(ulong);
+				return result;
 			}
 
-			public int CompareTo (HandlerSpan other)
+			private static uint ReadUInt32 (ImmutableArray<byte> buffer, ref int pos)
 			{
-				int result = this.StartOffset - other.StartOffset;
-				if (result == 0) {
-					// Both blocks have same start. Order larger (outer) before smaller (inner).
-					result = other.EndOffset - this.EndOffset;
+				uint result = buffer [pos] | (uint)buffer [pos + 1] << 8 | (uint)buffer [pos + 2] << 16 | (uint)buffer [pos + 3] << 24;
+				pos += sizeof(uint);
+				return result;
+			}
+
+			private static int ReadInt32 (ImmutableArray<byte> buffer, ref int pos)
+			{
+				return unchecked((int)ReadUInt32 (buffer, ref pos));
+			}
+
+			private static ushort ReadUInt16 (ImmutableArray<byte> buffer, ref int pos)
+			{
+				ushort result = (ushort)(buffer [pos] | buffer [pos + 1] << 8);
+				pos += sizeof(ushort);
+				return result;
+			}
+
+			private static byte ReadByte (ImmutableArray<byte> buffer, ref int pos)
+			{
+				byte result = buffer [pos];
+				pos += sizeof(byte);
+				return result;
+			}
+
+			private static sbyte ReadSByte (ImmutableArray<byte> buffer, ref int pos)
+			{
+				sbyte result = unchecked((sbyte)buffer [pos]);
+				pos += 1;
+				return result;
+			}
+
+			private unsafe static float ReadSingle (ImmutableArray<byte> buffer, ref int pos)
+			{
+				uint value = ReadUInt32 (buffer, ref pos);
+				return *(float*)&value;
+			}
+
+			private unsafe static double ReadDouble (ImmutableArray<byte> buffer, ref int pos)
+			{
+				ulong value = ReadUInt64 (buffer, ref pos);
+				return *(double*)&value;
+			}
+
+			public enum HandlerKind
+			{
+				Try,
+				Catch,
+				Filter,
+				Finally,
+				Fault
+			}
+
+			public struct HandlerSpan : IComparable<HandlerSpan>
+			{
+				public readonly HandlerKind Kind;
+				public readonly object ExceptionType;
+				public readonly int StartOffset;
+				public readonly int FilterHandlerStart;
+				public readonly int EndOffset;
+
+				public HandlerSpan (HandlerKind kind, object exceptionType, int startOffset, int endOffset, int filterHandlerStart = 0)
+				{
+					this.Kind = kind;
+					this.ExceptionType = exceptionType;
+					this.StartOffset = startOffset;
+					this.EndOffset = endOffset;
+					this.FilterHandlerStart = filterHandlerStart;
+				}
+
+				public int CompareTo (HandlerSpan other)
+				{
+					int result = this.StartOffset - other.StartOffset;
+					if (result == 0) {
+						// Both blocks have same start. Order larger (outer) before smaller (inner).
+						result = other.EndOffset - this.EndOffset;
+					}
+
+					return result;
+				}
+
+				public string ToString (CSComponentInspector visualizer)
+				{
+					switch (this.Kind) {
+						default:
+						return ".try";
+						case HandlerKind.Catch:
+						return "catch **exceptiontype**";// + visualizer.VisualizeLocalType(this.ExceptionType);
+						case HandlerKind.Filter:
+						return "filter";
+						case HandlerKind.Finally:
+						return "finally";
+						case HandlerKind.Fault:
+						return "fault";
+					}
+				}
+
+				public override string ToString ()
+				{
+					throw new NotSupportedException ("Use ToString(CSComponentInspector)");
+				}
+			}
+
+			private static bool StartsSpan (IReadOnlyList<HandlerSpan> spans, int spanIndex, int curIndex)
+			{
+				return spans != null && spanIndex < spans.Count && spans [spanIndex].StartOffset == (uint)curIndex;
+			}
+
+			private static bool EndsSpan (IReadOnlyList<HandlerSpan> spans, int spanIndex, int curIndex)
+			{
+				return spans != null && spanIndex >= 0 && spans [spanIndex].EndOffset == (uint)curIndex;
+			}
+
+			private static bool StartsFilterHandler (IReadOnlyList<HandlerSpan> spans, int spanIndex, int curIndex)
+			{
+				return spans != null &&
+				spanIndex < spans.Count &&
+				spans [spanIndex].Kind == HandlerKind.Filter &&
+				spans [spanIndex].FilterHandlerStart == (uint)curIndex;
+			}
+
+			public static IReadOnlyList<HandlerSpan> GetHandlerSpans (ImmutableArray<ExceptionRegion> entries)
+			{
+				if (entries.Length == 0) {
+					return new HandlerSpan[0];
+				}
+
+				var result = new List<HandlerSpan> ();
+				foreach (ExceptionRegion entry in entries) {
+					int tryStartOffset = entry.TryOffset;
+					int tryEndOffset = entry.TryOffset + entry.TryLength;
+					var span = new HandlerSpan (HandlerKind.Try, null, tryStartOffset, tryEndOffset);
+
+					if (result.Count == 0 || span.CompareTo (result [result.Count - 1]) != 0) {
+						result.Add (span);
+					}
+				}
+
+				foreach (ExceptionRegion entry in entries) {
+					int handlerStartOffset = entry.HandlerOffset;
+					int handlerEndOffset = entry.HandlerOffset + entry.HandlerLength;
+
+					HandlerSpan span;
+					switch (entry.Kind) {
+						case ExceptionRegionKind.Catch:
+						span = new HandlerSpan (HandlerKind.Catch, MetadataTokens.GetToken (entry.CatchType), handlerStartOffset, handlerEndOffset);
+						break;
+
+						case ExceptionRegionKind.Fault:
+						span = new HandlerSpan (HandlerKind.Fault, null, handlerStartOffset, handlerEndOffset);
+						break;
+
+						case ExceptionRegionKind.Filter:
+						span = new HandlerSpan (HandlerKind.Filter, null, handlerStartOffset, handlerEndOffset, entry.FilterOffset);
+						break;
+
+						case ExceptionRegionKind.Finally:
+						span = new HandlerSpan (HandlerKind.Finally, null, handlerStartOffset, handlerEndOffset);
+						break;
+
+						default:
+						throw new InvalidOperationException ();
+					}
+
+					result.Add (span);
 				}
 
 				return result;
 			}
 
-			public string ToString (CSComponentInspector visualizer)
+			public void Dump ()
 			{
-				switch (this.Kind) {
-				default:
-					return ".try";
-				case HandlerKind.Catch:
-					return "catch **exceptiontype**";// + visualizer.VisualizeLocalType(this.ExceptionType);
-				case HandlerKind.Filter:
-					return "filter";
-				case HandlerKind.Finally:
-					return "finally";
-				case HandlerKind.Fault:
-					return "fault";
+				/*
+				foreach (var entry in InspectorFields) {
+					var field = entry.Value;
+
+					Console.WriteLine ("Inspector Field: {0}", field.Name);
+
+					Console.WriteLine ("   Type Name: {0}", field.TypeName);
+					Console.WriteLine ("   Default Value: {0}", field.DefaultValue);
+
+					Console.WriteLine ("   Positional Custom Attr:");
+					foreach (var p in field.CustomAttrPositionalArgs)
+					if (p.Length != 0)
+					Console.WriteLine ("      {0}", p);
+					Console.WriteLine ("   Named Custom Attr:");
+					foreach (var nentry in field.CustomAttrNamedArgs)
+					Console.WriteLine ("      {0}:{1}", nentry.Key, nentry.Value);
 				}
+				*/
 			}
 
-			public override string ToString ()
-			{
-				throw new NotSupportedException ("Use ToString(CSComponentInspector)");
-			}
 		}
 
-		private static bool StartsSpan (IReadOnlyList<HandlerSpan> spans, int spanIndex, int curIndex)
+		internal static class TokenTypeIds
 		{
-			return spans != null && spanIndex < spans.Count && spans [spanIndex].StartOffset == (uint)curIndex;
+			internal const uint Module = 0x00000000;
+			internal const uint TypeRef = 0x01000000;
+			internal const uint TypeDef = 0x02000000;
+			internal const uint FieldDef = 0x04000000;
+			internal const uint MethodDef = 0x06000000;
+			internal const uint ParamDef = 0x08000000;
+			internal const uint InterfaceImpl = 0x09000000;
+			internal const uint MemberRef = 0x0a000000;
+			internal const uint CustomAttribute = 0x0c000000;
+			internal const uint Permission = 0x0e000000;
+			internal const uint Signature = 0x11000000;
+			internal const uint Event = 0x14000000;
+			internal const uint Property = 0x17000000;
+			internal const uint ModuleRef = 0x1a000000;
+			internal const uint TypeSpec = 0x1b000000;
+			internal const uint Assembly = 0x20000000;
+			internal const uint AssemblyRef = 0x23000000;
+			internal const uint File = 0x26000000;
+			internal const uint ExportedType = 0x27000000;
+			internal const uint ManifestResource = 0x28000000;
+			internal const uint GenericParam = 0x2a000000;
+			internal const uint MethodSpec = 0x2b000000;
+			internal const uint GenericParamConstraint = 0x2c000000;
+			internal const uint String = 0x70000000;
+			internal const uint Name = 0x71000000;
+			internal const uint BaseType = 0x72000000;
+			// Leave this on the high end value. This does not correspond to metadata table???
+
+			internal const uint RIDMask = 0x00FFFFFF;
+			internal const uint TokenTypeMask = 0xFF000000;
 		}
 
-		private static bool EndsSpan (IReadOnlyList<HandlerSpan> spans, int spanIndex, int curIndex)
-		{
-			return spans != null && spanIndex >= 0 && spans [spanIndex].EndOffset == (uint)curIndex;
-		}
-
-		private static bool StartsFilterHandler (IReadOnlyList<HandlerSpan> spans, int spanIndex, int curIndex)
-		{
-			return spans != null &&
-			spanIndex < spans.Count &&
-			spans [spanIndex].Kind == HandlerKind.Filter &&
-			spans [spanIndex].FilterHandlerStart == (uint)curIndex;
-		}
-
-		public static IReadOnlyList<HandlerSpan> GetHandlerSpans (ImmutableArray<ExceptionRegion> entries)
-		{
-			if (entries.Length == 0) {
-				return new HandlerSpan[0];
-			}
-
-			var result = new List<HandlerSpan> ();
-			foreach (ExceptionRegion entry in entries) {
-				int tryStartOffset = entry.TryOffset;
-				int tryEndOffset = entry.TryOffset + entry.TryLength;
-				var span = new HandlerSpan (HandlerKind.Try, null, tryStartOffset, tryEndOffset);
-
-				if (result.Count == 0 || span.CompareTo (result [result.Count - 1]) != 0) {
-					result.Add (span);
-				}
-			}
-
-			foreach (ExceptionRegion entry in entries) {
-				int handlerStartOffset = entry.HandlerOffset;
-				int handlerEndOffset = entry.HandlerOffset + entry.HandlerLength;
-
-				HandlerSpan span;
-				switch (entry.Kind) {
-				case ExceptionRegionKind.Catch:
-					span = new HandlerSpan (HandlerKind.Catch, MetadataTokens.GetToken (entry.CatchType), handlerStartOffset, handlerEndOffset);
-					break;
-
-				case ExceptionRegionKind.Fault:
-					span = new HandlerSpan (HandlerKind.Fault, null, handlerStartOffset, handlerEndOffset);
-					break;
-
-				case ExceptionRegionKind.Filter:
-					span = new HandlerSpan (HandlerKind.Filter, null, handlerStartOffset, handlerEndOffset, entry.FilterOffset);
-					break;
-
-				case ExceptionRegionKind.Finally:
-					span = new HandlerSpan (HandlerKind.Finally, null, handlerStartOffset, handlerEndOffset);
-					break;
-
-				default:
-					throw new InvalidOperationException ();
-				}
-
-				result.Add (span);
-			}
-
-			return result;
-		}
 
 	}
-
-	internal static class TokenTypeIds
-	{
-		internal const uint Module = 0x00000000;
-		internal const uint TypeRef = 0x01000000;
-		internal const uint TypeDef = 0x02000000;
-		internal const uint FieldDef = 0x04000000;
-		internal const uint MethodDef = 0x06000000;
-		internal const uint ParamDef = 0x08000000;
-		internal const uint InterfaceImpl = 0x09000000;
-		internal const uint MemberRef = 0x0a000000;
-		internal const uint CustomAttribute = 0x0c000000;
-		internal const uint Permission = 0x0e000000;
-		internal const uint Signature = 0x11000000;
-		internal const uint Event = 0x14000000;
-		internal const uint Property = 0x17000000;
-		internal const uint ModuleRef = 0x1a000000;
-		internal const uint TypeSpec = 0x1b000000;
-		internal const uint Assembly = 0x20000000;
-		internal const uint AssemblyRef = 0x23000000;
-		internal const uint File = 0x26000000;
-		internal const uint ExportedType = 0x27000000;
-		internal const uint ManifestResource = 0x28000000;
-		internal const uint GenericParam = 0x2a000000;
-		internal const uint MethodSpec = 0x2b000000;
-		internal const uint GenericParamConstraint = 0x2c000000;
-		internal const uint String = 0x70000000;
-		internal const uint Name = 0x71000000;
-		internal const uint BaseType = 0x72000000;
-		// Leave this on the high end value. This does not correspond to metadata table???
-
-		internal const uint RIDMask = 0x00FFFFFF;
-		internal const uint TokenTypeMask = 0xFF000000;
-	}
-
-
-}
