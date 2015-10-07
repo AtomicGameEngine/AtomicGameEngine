@@ -4,13 +4,15 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
-// This must be in TPA list
-public class AtomicLoadContext : AssemblyLoadContext
+namespace Atomic.Bootstrap
 {
 
+// This must be in TPA list
+public class AtomicLoadContext : LoadContext
+{
     public static void Startup()
     {
-      AssemblyLoadContext.InitializeDefaultContext(new AtomicLoadContext());
+      LoadContext.InitializeDefaultContext(new AtomicLoadContext());
       Console.WriteLine("Bootstrap Startup");
     }
 
@@ -26,23 +28,31 @@ public class AtomicLoadContext : AssemblyLoadContext
       }
 
       // do we need to walk paths here?
+      Console.WriteLine("LoadUnmanagedDll: " + unmanagedDllName);
       return dlopen(unmanagedDllName, 1 /*RTLD_LAZY*/);
     }
 
-    protected override Assembly Load(AssemblyName assemblyName)
+    public override Assembly LoadAssembly(AssemblyName assemblyName)
     {
 
       Console.WriteLine(assemblyName.Name);
       Assembly assembly = null;
       try {
-        assembly = LoadFromAssemblyPath("/Users/josh/Desktop/" + assemblyName.Name + ".dll");
+            assembly = LoadFromAssemblyPath("/Users/josh/Desktop/" + assemblyName.Name + ".dll");
       } catch (Exception e)
       {
         Console.WriteLine(e.Message);
       }
+
+      if (assembly == null)
+        assembly = LoadFromAssemblyPath("/Users/josh/Desktop/OSX.x64.Debug/" + assemblyName.Name + ".dll");
+
       Console.WriteLine("Assembly: " + assembly);
       return assembly;
 
     }
+
+
+}
 
 }

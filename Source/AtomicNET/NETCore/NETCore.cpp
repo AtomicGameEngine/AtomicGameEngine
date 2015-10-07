@@ -315,25 +315,23 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         return false;
     }
 
-    // Reflection only load, may be useful when bringing into editor for component inspector values
-    // http://shazwazza.com/post/how-to-inspect-assemblies-before-including-them-in-your-application-with-reflection/
-
-    // It’s best to execute all of this logic in a separate AppDomain because once assemblies are loaded
-    // in to a context, they cannot be unloaded and since we are loading in from files, those files will
-    // remain locked until the AppDomain is shutdown.
-
     typedef void (*StartupFunction)();
     StartupFunction startup;
 
     // The coreclr binding model will become locked upon loading the first assembly that is not on the TPA list, or
     // upon initializing the default context for the first time. For this test, test assemblies are located alongside
     // corerun, and hence will be on the TPA list. So, we should be able to set the default context once successfully,
-    // and fail on the second try.
+    // and fail on the second try.    
+
+    // AssemblyLoadContext
+    // https://github.com/dotnet/corefx/issues/3054
+    // dnx loader
+    // https://github.com/aspnet/dnx/tree/dev/src/Microsoft.Dnx.Loader
 
     st = sCreateDelegate(hostHandle_,
                     domainId_,
                     "AtomicNETBootstrap",
-                    "AtomicLoadContext",
+                    "Atomic.Bootstrap.AtomicLoadContext",
                     "Startup",
                     (void**) &startup);
 
@@ -380,6 +378,33 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     if (st >= 0)
     {
         GetSubsystem<NETManaged>()->SetNETUpdate(updateFunction);
+    }
+
+    typedef void (*InpectAssemblyFuctionPtr)(const char* path);
+
+    InpectAssemblyFuctionPtr inspectAssembly;
+
+    //https://github.com/Microsoft/dotnetsamples/tree/master/System.Reflection.Metadata
+    //https://github.com/dotnet/corefx/tree/master/src/System.Reflection.Metadata/tests
+    //http://www.cnetion.com/getting-field-values-using-mono-cecil-qq-AUvBjRFgivICeoL1jxJy.php
+
+    // https://github.com/Reactive-Extensions/IL2JS/blob/master/CCI2/PeReader/ILReader.cs
+
+    // https://github.com/Reactive-Extensions/IL2JS
+
+    // custom attr loading: https://github.com/Reactive-Extensions/IL2JS/blob/a4570f9c69b6c40d001e7539b952266d67609ca9/CST/PELoader.cs#L2352
+    // custom attr: https://www.simple-talk.com/blogs/2011/06/03/anatomy-of-a-net-assembly-custom-attribute-encoding/
+    // custom attr: https://github.com/jbevain/cecil/blob/67a2569688a13a6cb487f9af5c3418f7a8f43e3c/Mono.Cecil/AssemblyReader.cs
+    st = sCreateDelegate(hostHandle_,
+                    domainId_,
+                    "AtomicEditor",
+                    "AtomicEditor.AssemblyInspector",
+                    "InspectAssembly",
+                    (void**) &inspectAssembly);
+
+    if (st >= 0)
+    {
+        inspectAssembly("/Users/josh/Desktop/AtomicNETTest.dll");
     }
 
 

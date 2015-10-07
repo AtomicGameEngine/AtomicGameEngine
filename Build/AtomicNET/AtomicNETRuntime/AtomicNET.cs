@@ -62,9 +62,6 @@ public static class Atomic
     registerSubsystem (NativeCore.WrapNative<Graphics> (csb_AtomicEngine_GetSubsystem("Graphics")));
     registerSubsystem (NativeCore.WrapNative<Renderer> (csb_AtomicEngine_GetSubsystem("Renderer")));
     registerSubsystem (NativeCore.WrapNative<ResourceCache> (csb_AtomicEngine_GetSubsystem("ResourceCache")));
-
-    var zone = GetSubsystem<Renderer>().GetDefaultZone();
-    Console.WriteLine("Allocated: " + zone.nativeInstance);
   }
 
   [DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -122,37 +119,65 @@ static class NativeCore
 
   public static void ReleaseExpiredNativeReferences()
   {
-    List<IntPtr> released = new List<IntPtr> ();
+    List<IntPtr> released = null;
 
     foreach(KeyValuePair<IntPtr, WeakReference> entry in nativeLookup)
     {
 
       if (entry.Value.Target == null || !entry.Value.IsAlive)
       {
+        if (released == null)
+          released = new List<IntPtr> ();
+
         released.Add (entry.Key);
       }
 
     }
 
+    if (released == null)
+      return;
+
     foreach (IntPtr native in released) {
       nativeLookup.Remove (native);
       csb_AtomicEngine_ReleaseRef(native);
+      //Console.WriteLine("Released: " + test);
     }
 
   }
 
+  static IntPtr test = IntPtr.Zero;
+
   // called by native code
   public static void NETUpdate (float timeStep)
   {
+
     GC.Collect();
     GC.WaitForPendingFinalizers();
     GC.Collect();
     ReleaseExpiredNativeReferences();
+
+    if (test == IntPtr.Zero || !nativeLookup.ContainsKey(test))
+    {
+      test = Atomic.GetSubsystem<Renderer>().GetDefaultZone().nativeInstance;
+      //Console.WriteLine("Allocated: " + test);
+    }
+
   }
 
   // called by native code for every refcounted deleted
   public static void RefCountedDeleted (IntPtr native)
   {
+    // native side deleted, immediate remove, if we have a script reference still this is an error
+
+    WeakReference w;
+
+    if (nativeLookup.TryGetValue (native, out w)) {
+
+        if ( w != null && w.IsAlive) {
+          throw new System.InvalidOperationException("Native Refcounted was deleted with live managed instance");
+        }
+    }
+
     nativeLookup.Remove(native);
   }
 
@@ -210,5 +235,16 @@ static class NativeCore
   }
 
 }
+
+public class InspectorAttribute : Attribute
+{
+  public InspectorAttribute(string defaultValue = "")
+  {
+    DefaultValue = defaultValue;
+  }
+
+  public string DefaultValue;
+}
+
 
 }
