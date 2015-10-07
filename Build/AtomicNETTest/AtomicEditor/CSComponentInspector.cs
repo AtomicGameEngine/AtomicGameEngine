@@ -14,19 +14,68 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 
+//https://github.com/Microsoft/dotnetsamples/tree/master/System.Reflection.Metadata
+//https://github.com/dotnet/corefx/tree/master/src/System.Reflection.Metadata/tests
+//http://www.cnetion.com/getting-field-values-using-mono-cecil-qq-AUvBjRFgivICeoL1jxJy.php
+
+// https://github.com/Reactive-Extensions/IL2JS/blob/master/CCI2/PeReader/ILReader.cs
+
+// https://github.com/Reactive-Extensions/IL2JS
+
+// custom attr loading: https://github.com/Reactive-Extensions/IL2JS/blob/a4570f9c69b6c40d001e7539b952266d67609ca9/CST/PELoader.cs#L2352
+// custom attr: https://www.simple-talk.com/blogs/2011/06/03/anatomy-of-a-net-assembly-custom-attribute-encoding/
+// custom attr: https://github.com/jbevain/cecil/blob/67a2569688a13a6cb487f9af5c3418f7a8f43e3c/Mono.Cecil/AssemblyReader.cs
+
+// https://github.com/dotnet/roslyn/tree/master/src/Compilers/Core/Portable/MetadataReader
+
+
 namespace AtomicEditor
 {
 
+	public class InspectorField
+	{
+		public string TypeName;
+
+		// the Name of the InspectorField
+		public string Name;
+		// The DefaultValue if supplied
+		public string DefaultValue;
+
+		// custom attributes, positional and named
+		public List<string> CustomAttrPositionalArgs = new List<string> ();
+		public Dictionary<string, string> CustomAttrNamedArgs = new Dictionary<string, string> ();
+	}
 
 	public class CSComponentInspector
 	{
-		private List<string> inspectorFieldNames = new List<string> ();
+
+		public Dictionary<string, InspectorField> InspectorFields = new Dictionary<string, InspectorField> ();
 
 		public CSComponentInspector (TypeDefinition typeDef, PEReader peFile, MetadataReader metaReader)
 		{
 			this.typeDef = typeDef;
 			this.peFile = peFile;
 			this.metaReader = metaReader;
+		}
+
+		public void Dump ()
+		{
+			foreach (var entry in InspectorFields) {
+				var field = entry.Value;
+
+				Console.WriteLine ("Inspector Field: {0}", field.Name);
+
+				Console.WriteLine ("   Type Name: {0}", field.TypeName);
+				Console.WriteLine ("   Default Value: {0}", field.DefaultValue);
+
+				Console.WriteLine ("   Positional Custom Attr:");
+				foreach (var p in field.CustomAttrPositionalArgs)
+					if (p.Length != 0)
+						Console.WriteLine ("      {0}", p);
+				Console.WriteLine ("   Named Custom Attr:");
+				foreach (var nentry in field.CustomAttrNamedArgs)
+					Console.WriteLine ("      {0}:{1}", nentry.Key, nentry.Value);
+			}
 		}
 
 		public bool Inspect ()
@@ -36,71 +85,242 @@ namespace AtomicEditor
 
 			foreach (var fieldHandle in fields) {
 
+				var inspectorField = new InspectorField ();
+
 				var fieldDef = metaReader.GetFieldDefinition (fieldHandle);
 
 				var customAttr = fieldDef.GetCustomAttributes ();
 
 				foreach (var caHandle in customAttr) {
 
-					var ca = metaReader.GetCustomAttribute (caHandle);
+					// Look for InspectorAttribute
+					if (DecodeCustomAttribute (caHandle, inspectorField)) {
 
-					// MethodDefinitionHandle or MemberReferenceHandle
-					if (ca.Constructor.Kind == HandleKind.MemberReference) {
+						BlobReader sigReader = metaReader.GetBlobReader (fieldDef.Signature);
+						SignatureHeader header = sigReader.ReadSignatureHeader ();
 
-						var memberRef = metaReader.GetMemberReference ((MemberReferenceHandle)ca.Constructor);
+						if (header.Kind != SignatureKind.Field)
+							continue;
 
-						var parent = memberRef.Parent;
+						var typeCode = sigReader.ReadSignatureTypeCode ();
 
-						if (parent.Kind == HandleKind.TypeReference) {
+						string typeName = typeCode.ToString ();
 
-							var parentTypeRef = metaReader.GetTypeReference ((TypeReferenceHandle)parent);
+						if (typeCode == SignatureTypeCode.TypeHandle) {
 
-							var attrName = metaReader.GetString (parentTypeRef.Name);
+							EntityHandle token = sigReader.ReadTypeHandle ();
+							HandleKind tokenType = token.Kind;
 
-							if (attrName == "InspectorAttribute") {
+							if (tokenType == HandleKind.TypeDefinition) {
 
-								var fieldName = metaReader.GetString (fieldDef.Name);
-								inspectorFieldNames.Add (fieldName);
-								Console.WriteLine ("Found inspector field: {0}", fieldName);
+								// can store local enum typedefs
+								// enum initializers are stored as constant value in the IL
+								var typeDef = metaReader.GetTypeDefinition ((TypeDefinitionHandle)token);
 
-								var blobReader =  metaReader.GetBlobReader( (BlobHandle) ca.Value);
+								var baseTypeToken = typeDef.BaseType;
 
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
+								if (baseTypeToken.Kind != HandleKind.TypeReference)
+									continue;
 
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
-								Console.WriteLine("Blob: {0}", blobReader.ReadByte());
+								var baseTypeRef = metaReader.GetTypeReference ((TypeReferenceHandle)baseTypeToken);
 
-								//Console.WriteLine("Blob: {0}", blobReader.ReadSerializedString());
-								//Console.WriteLine("Blob: {0}", blobReader.ReadUInt16());
-								//Console.WriteLine("Blob: {0}", blobReader.ReadSerializedString());
+								if (metaReader.GetString (baseTypeRef.Name) != "Enum")
+									continue;
 
+								Console.WriteLine ("Enum TypeDef {0}", metaReader.GetString (typeDef.Name));
+
+							} else if (tokenType == HandleKind.TypeReference) {
+
+								// TypeReference, ok
+								var typeRef = metaReader.GetTypeReference ((TypeReferenceHandle)token);
+
+								typeName = metaReader.GetString (typeRef.Name);
+
+							} else {
+								// ???
+								continue;
 							}
 
-							//Console.WriteLine("CustomAttr MemberReference {0} {1}", , metaReader.GetString(memberRef.Name));
-
 						}
+
+						inspectorField.TypeName = typeName;
+						inspectorField.Name = metaReader.GetString (fieldDef.Name);
+						InspectorFields [inspectorField.Name] = inspectorField;
+
+						break;
 					}
 				}
 			}
 
+			// There is no way to get the initializer value of a field
+			// other than to inspect the IL code of the constructor
 			var methods = typeDef.GetMethods ();
 
 			foreach (var methodHandle in methods) {
 				var methodDef = metaReader.GetMethodDefinition (methodHandle);
 
 				if (metaReader.GetString (methodDef.Name) == ".ctor") {
+
 					var body = peFile.GetMethodBody (methodDef.RelativeVirtualAddress);
+					var ilBytes = body.GetILContent ();
+
+					InspectILBlock (ilBytes, ilBytes.Length);
 				}
 
 			}
 
+			Dump ();
+
 			return true;
 
+		}
+
+		private bool DecodeCustomAttribute (CustomAttributeHandle caHandle, InspectorField inspectorField)
+		{
+
+			// GetCustomAttribute: https://github.com/dotnet/roslyn/blob/master/src/Compilers/Core/Portable/MetadataReader/MetadataDecoder.cs#L1370
+
+			// Custom Attribute
+			var ca = metaReader.GetCustomAttribute (caHandle);
+
+			// MethodDefinitionHandle or MemberReferenceHandle
+			if (ca.Constructor.Kind != HandleKind.MemberReference) {
+				Console.WriteLine ("ca.Constructor.Kind != HandleKind.MemberReference");
+				return false;
+			}
+
+			// constructor of the custom attr which contains the signature
+			var memberRef = metaReader.GetMemberReference ((MemberReferenceHandle)ca.Constructor);
+
+			// parent of the constructor is the TypeReference
+			var parent = memberRef.Parent;
+
+			if (parent.Kind != HandleKind.TypeReference) {
+				Console.WriteLine ("parent.Kind != HandleKind.TypeReference");
+				return false;
+			}
+
+			var parentTypeRef = metaReader.GetTypeReference ((TypeReferenceHandle)parent);
+
+			// check whether we have an InspectorAttribute
+			if (metaReader.GetString (parentTypeRef.Name) != "InspectorAttribute") {
+				Console.WriteLine ("parentTypeRef != InspectorAttribute");
+				return false;
+			}
+
+			// args
+			var argsReader = metaReader.GetBlobReader ((BlobHandle)ca.Value);
+
+			uint prolog = argsReader.ReadUInt16 ();
+
+			if (prolog != 1) {
+				Console.WriteLine ("prolog != 1");
+				return false;
+			}
+
+			// sig reader is on constructor
+			BlobReader sigReader = metaReader.GetBlobReader (memberRef.Signature);
+			SignatureHeader header = sigReader.ReadSignatureHeader ();
+
+			// Get the type parameter count.
+			if (header.IsGeneric && sigReader.ReadCompressedInteger () != 0) {
+				Console.WriteLine ("header.IsGeneric && sigReader.ReadCompressedInteger() != 0");
+				return false;
+			}
+
+			// Get the parameter count
+			int paramCount = sigReader.ReadCompressedInteger ();
+
+			// Get the type return type.
+			var returnTypeCode = sigReader.ReadSignatureTypeCode ();
+
+			if (returnTypeCode != SignatureTypeCode.Void) {
+				Console.WriteLine ("returnTypeCode != SignatureTypeCode.Void");
+				return false;
+			}
+
+			List<SignatureTypeCode> sigTypeCodes = new List<SignatureTypeCode> ();
+
+			// position args
+			for (int i = 0; i < paramCount; i++) {
+
+				SignatureTypeCode paramTypeCode = sigReader.ReadSignatureTypeCode ();
+
+				// support string custom attr for now to simplify things
+				if (paramTypeCode != SignatureTypeCode.String)
+					return false;
+
+				string value;
+
+				if (CrackStringInAttributeValue (out value, ref argsReader)) {
+					inspectorField.CustomAttrPositionalArgs.Add (value);
+				}
+
+				sigTypeCodes.Add (paramTypeCode);
+			}
+
+			// named args
+
+			short namedParamCount = argsReader.ReadInt16 ();
+
+			for (short i = 0; i < namedParamCount; i++) {
+				// Ecma-335 23.3 - A NamedArg is simply a FixedArg preceded by information to identify which field or
+				// property it represents. [Note: Recall that the CLI allows fields and properties to have the same name; so
+				// we require a means to disambiguate such situations. end note] FIELD is the single byte 0x53. PROPERTY is
+				// the single byte 0x54.
+
+				// https://github.com/dotnet/roslyn/blob/master/src/Compilers/Core/Portable/MetadataReader/MetadataDecoder.cs#L1305
+
+				var kind = (CustomAttributeNamedArgumentKind)argsReader.ReadCompressedInteger ();
+
+				if (kind != CustomAttributeNamedArgumentKind.Field && kind != CustomAttributeNamedArgumentKind.Property) {
+					return false;
+				}
+
+				var typeCode = argsReader.ReadSerializationTypeCode ();
+
+				// support string custom attr for now to simplify things
+				if (typeCode != SerializationTypeCode.String)
+					return false;
+
+				string name;
+				if (!CrackStringInAttributeValue (out name, ref argsReader))
+					return false;
+
+				string value;
+				if (!CrackStringInAttributeValue (out value, ref argsReader))
+					return false;
+
+
+				inspectorField.CustomAttrNamedArgs [name] = value;
+
+			}
+
+			return true;
+		}
+
+		internal static bool CrackStringInAttributeValue (out string value, ref BlobReader sig)
+		{
+			try {
+				int strLen;
+				if (sig.TryReadCompressedInteger (out strLen) && sig.RemainingBytes >= strLen) {
+					value = sig.ReadUTF8 (strLen);
+
+					// Trim null characters at the end to mimic native compiler behavior.
+					// There are libraries that have them and leaving them in breaks tests.
+					value = value.TrimEnd ('\0');
+
+					return true;
+				}
+
+				value = null;
+
+				// Strings are stored as UTF8, but 0xFF means NULL string.
+				return sig.RemainingBytes >= 1 && sig.ReadByte () == 0xFF;
+			} catch (BadImageFormatException) {
+				value = null;
+				return false;
+			}
 		}
 
 		public void InspectILBlock (
@@ -130,7 +350,10 @@ namespace AtomicEditor
 		{
 			int lastSpanIndex = spanIndex - 1;
 
+			List<string> loadedValues = new List<string> ();
+
 			while (curIndex < length) {
+
 				if (lastSpanIndex > 0 && StartsFilterHandler (spans, lastSpanIndex, curIndex + blockOffset)) {
 
 				}
@@ -138,6 +361,7 @@ namespace AtomicEditor
 				if (StartsSpan (spans, spanIndex, curIndex + blockOffset)) {
 					curIndex = InspectILBlock (ilBytes, length, spans, blockOffset, curIndex, spanIndex + 1, markers, out spanIndex);
 				} else {
+
 					int ilOffset = curIndex + blockOffset;
 					string marker;
 					if (markers != null && markers.TryGetValue (ilOffset, out marker)) {
@@ -163,31 +387,57 @@ namespace AtomicEditor
 					}
 
 					//sb.Append("  ");
-					//sb.AppendFormat(opCode.OperandType == OperandType.InlineNone ? "{0}" : "{0,-10}", opCode);
+
+					// Console.WriteLine (opCode.OperandType == OperandType.InlineNone ? "{0} {1}" : "{0,-10} {1}", opCode, opCode.OperandType);
 
 					switch (opCode.OperandType) {
+
 					case OperandType.InlineField:
 
-                          // read token
+						// read token
 						uint fieldToken = ReadUInt32 (ilBytes, ref curIndex);
-                          // get the kind
+						// get the kind
 						uint tokenKind = fieldToken & TokenTypeIds.TokenTypeMask;
-                          // and the rowId
+						// and the rowId
 						uint rowId = fieldToken & TokenTypeIds.RIDMask;
 
 						var fieldHandle = MetadataTokens.FieldDefinitionHandle ((int)rowId);
 
 						var fieldDef = metaReader.GetFieldDefinition (fieldHandle);
 
+						var fieldName = metaReader.GetString (fieldDef.Name);
+
+						if (opCode.ToString () == "stfld") {
+
+							InspectorField inspectorField;
+
+							if (InspectorFields.TryGetValue (fieldName, out inspectorField)) {
+								inspectorField.DefaultValue = String.Join (" ", loadedValues.ToArray ());
+							}
+
+						}
+
+						loadedValues.Clear ();
+
 						break;
 					case OperandType.InlineMethod:
+
+						// new Vector3, etc
+						if (opCode.ToString () == "newobj") {
+
+						} else
+							loadedValues.Clear ();
+
+						break;
 					case OperandType.InlineTok:
 					case OperandType.InlineType:
 						ReadUInt32 (ilBytes, ref curIndex);
+						loadedValues.Clear ();
 						break;
 
 					case OperandType.InlineSig: // signature (calli), not emitted by C#/VB
 						ReadUInt32 (ilBytes, ref curIndex);
+						loadedValues.Clear ();
 						break;
 
 					case OperandType.InlineString:
@@ -203,69 +453,79 @@ namespace AtomicEditor
 
 
 						UserStringHandle handle = MetadataTokens.UserStringHandle ((int)stringToken);
-						string stringValue = metaReader.GetUserString (handle);
-
-                          //sb.AppendFormat("\"{0}\"", );
-
+						loadedValues.Add (metaReader.GetUserString (handle));
 
 						break;
 
 					case OperandType.InlineNone:
-                          // ldc.i4.1 // load 1 for instance
-                          //sb.AppendFormat(" InlineNone");
+
+						if (opCode == OpCodes.Ldc_I4_0)
+							loadedValues.Add ("0");
+						else if (opCode == OpCodes.Ldc_I4_1)
+							loadedValues.Add ("1");
+						else if (opCode == OpCodes.Ldc_I4_2)
+							loadedValues.Add ("2");
+						else if (opCode == OpCodes.Ldc_I4_3)
+							loadedValues.Add ("3");
+						else if (opCode == OpCodes.Ldc_I4_4)
+							loadedValues.Add ("4");
+						else if (opCode == OpCodes.Ldc_I4_5)
+							loadedValues.Add ("5");
+						else if (opCode == OpCodes.Ldc_I4_6)
+							loadedValues.Add ("6");
+						else if (opCode == OpCodes.Ldc_I4_7)
+							loadedValues.Add ("7");
+						else if (opCode == OpCodes.Ldc_I4_8)
+							loadedValues.Add ("8");
+						else if (opCode == OpCodes.Ldc_I4_M1)
+							loadedValues.Add ("-1");
+
 						break;
 
 					case OperandType.ShortInlineI:
-						ReadSByte (ilBytes, ref curIndex);
+						loadedValues.Add (ReadSByte (ilBytes, ref curIndex).ToString ());
 						break;
 
 					case OperandType.ShortInlineVar:
-						ReadByte (ilBytes, ref curIndex);
+						loadedValues.Add (ReadByte (ilBytes, ref curIndex).ToString ());
 						break;
 
 					case OperandType.InlineVar:
-						ReadUInt16 (ilBytes, ref curIndex);
+						loadedValues.Add (ReadUInt16 (ilBytes, ref curIndex).ToString ());
 						break;
 
 					case OperandType.InlineI:
-						ReadUInt32 (ilBytes, ref curIndex);
+						loadedValues.Add (ReadUInt32 (ilBytes, ref curIndex).ToString ());
 						break;
 
 					case OperandType.InlineI8:
-						ReadUInt64 (ilBytes, ref curIndex);
+						loadedValues.Add (ReadUInt64 (ilBytes, ref curIndex).ToString ());
 						break;
 
 					case OperandType.ShortInlineR:
 						{
-							var value = ReadSingle (ilBytes, ref curIndex);
-							if (value == 0 && 1 / value < 0) {
-								//sb.Append(" 423 -0.0");
-							} else {
-								//sb.AppendFormat("477 {0}", value.ToString(CultureInfo.InvariantCulture));
-							}
+							loadedValues.Add (ReadSingle (ilBytes, ref curIndex).ToString ());
 						}
 						break;
 
 					case OperandType.InlineR:
 						{
-							var value = ReadDouble (ilBytes, ref curIndex);
-							if (value == 0 && 1 / value < 0) {
-								//sb.Append("437 -0.0");
-							} else {
-								//sb.AppendFormat("441 {0}", value.ToString(CultureInfo.InvariantCulture));
-							}
+							loadedValues.Add (ReadDouble (ilBytes, ref curIndex).ToString ());
 						}
 						break;
 
 					case OperandType.ShortInlineBrTarget:
+						loadedValues.Clear ();
 						var sbyteValue = ReadSByte (ilBytes, ref curIndex) + curIndex + blockOffset;
 						break;
 
 					case OperandType.InlineBrTarget:
+						loadedValues.Clear ();
 						var int32value = ReadInt32 (ilBytes, ref curIndex) + curIndex + blockOffset;
 						break;
 
 					case OperandType.InlineSwitch:
+						loadedValues.Clear ();
 						int labelCount = ReadInt32 (ilBytes, ref curIndex);
 						int instrEnd = curIndex + labelCount * 4;
 						for (int i = 0; i < labelCount; i++) {

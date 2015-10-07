@@ -19,6 +19,32 @@ namespace AtomicEditor
 	class AssemblyInspector
 	{
 
+		public static bool ParseEnum(TypeDefinition enumTypeDef, PEReader peFile, MetadataReader metaReader)
+		{
+
+			// TODO: verify that int32 is the enums storage type for constant read below
+
+			var fields = enumTypeDef.GetFields ();
+
+			foreach (var fieldHandle in fields) {
+
+				var inspectorField = new InspectorField ();
+
+				var fieldDef = metaReader.GetFieldDefinition (fieldHandle);
+
+				if ( (fieldDef.Attributes & FieldAttributes.HasDefault) != 0)
+				{
+					 	var constantHandle = fieldDef.GetDefaultValue();
+						var constant = metaReader.GetConstant(constantHandle);
+						BlobReader constantReader = metaReader.GetBlobReader (constant.Value);
+						Console.WriteLine("{0} {1}", metaReader.GetString(fieldDef.Name), constantReader.ReadInt32());
+				}
+			}
+
+			return true;
+
+		}
+
 		public static void InspectAssembly (String pathToAssembly)
 		{
 
@@ -37,6 +63,13 @@ namespace AtomicEditor
 							if (baseTypeHandle.Kind == HandleKind.TypeReference)
 							{
 									var typeRef = reader.GetTypeReference((TypeReferenceHandle)baseTypeHandle);
+
+									if (reader.GetString(typeRef.Name) == "Enum")
+									{
+
+										ParseEnum(typeDef, peFile, reader);
+
+									}
 
 									// TODO: validate assembly of CSComponent typeref
 									if (reader.GetString(typeRef.Name) != "CSComponent")

@@ -238,12 +238,13 @@ static class NativeCore
 
 public class InspectorAttribute : Attribute
 {
-  public InspectorAttribute(string defaultValue = "")
+  public InspectorAttribute(string DefaultValue = "", string Value1 = "", string Value2 = "")
   {
-    DefaultValue = defaultValue;
   }
 
   public string DefaultValue;
+  public string Value1;
+  public string Value2;
 }
 
 
