@@ -27,6 +27,8 @@
 #include <Atomic/Container/ArrayPtr.h>
 #include <Atomic/Container/List.h>
 
+#include <Atomic/Script/Script.h>
+
 namespace Atomic
 {
 
@@ -47,6 +49,7 @@ public:
 
     bool ParseAssemblyJSON(const JSONValue& json);
 
+    const HashMap<String, Vector<EnumInfo>>& GetEnums() const { return enums_; }
     NETComponentClass* GetComponentClass(const String& name);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
@@ -59,6 +62,7 @@ public:
 
 private:
 
+    HashMap<String, Vector<EnumInfo>> enums_;
     HashMap<StringHash, SharedPtr<NETComponentClass>> componentClasses_;
 
 };

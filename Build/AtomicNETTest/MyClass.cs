@@ -7,7 +7,7 @@ namespace AtomicNETTest
     public enum BehaviorState
     {
       Friendly,
-      Aggressive = 10,
+      Aggressive,
       Neutral
     }
 
@@ -23,7 +23,7 @@ namespace AtomicNETTest
         public Vector3 MyVector3Value = new Vector3(1, 1, 1);
 
         [Inspector]
-        public Quaternion MyQuaternionValue = new Quaternion(1, 1, 1, 1);
+        public Quaternion MyQuaternionValue = new Quaternion(1, 0, 0, 0);
 
         [Inspector(Value1 = "This is a", Value2 = "test")]
         public float MyFloatValue = 42.0f;

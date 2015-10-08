@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/IO/Log.h>
+#include "NETAssemblyFile.h"
 #include "NETComponentClass.h"
 
 /*
@@ -46,8 +47,9 @@ namespace Atomic
 
 HashMap<String, VariantType> NETComponentClass::typeMap_;
 
-NETComponentClass::NETComponentClass(Context* context) :
-    Object(context)
+NETComponentClass::NETComponentClass(Context* context, NETAssemblyFile* assemblyFile) :
+    Object(context),
+    assemblyFile_(assemblyFile)
 {
 
 }
@@ -118,6 +120,10 @@ bool NETComponentClass::ParseJSON(const JSONValue& json)
     if (!typeMap_.Size())
         InitTypeMap();
 
+    const HashMap<String, Vector<EnumInfo>>& fileEnums = assemblyFile_->GetEnums();
+
+    enums_.Clear();
+
     name_ = json.Get("name").GetString();
 
     const JSONValue& jfields = json.Get("fields");
@@ -137,7 +143,26 @@ bool NETComponentClass::ParseJSON(const JSONValue& json)
 
             if (isEnum)
             {
-                varType = typeMap_["Enum"];
+                if (fileEnums.Contains(typeName))
+                {
+                    Vector<EnumInfo> values;
+
+                    for (unsigned i = 0; i < fileEnums[typeName]->Size(); i++)
+                    {
+                        values.Push(fileEnums[typeName]->At(i));
+                    }
+
+                    enums_[fieldName] = values;
+
+                    varType = typeMap_["Enum"];
+
+                    fields_[fieldName] = varType;
+
+                    Variant value;
+                    value.FromString(varType, defaultValue);
+                    defaultFieldValues_[fieldName] = value;
+                }
+
             }
             else
             {

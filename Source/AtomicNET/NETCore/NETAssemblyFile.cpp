@@ -33,6 +33,20 @@
 namespace Atomic
 {
 
+/*
+
+"enums":[
+      {
+         "name":"BehaviorState",
+         "values":{
+            "Friendly":0,
+            "Aggressive":10,
+            "Neutral":11
+         }
+      }
+   ],
+
+*/
 NETAssemblyFile::NETAssemblyFile(Context* context) :
     Resource(context)
 {
@@ -56,6 +70,33 @@ NETComponentClass* NETAssemblyFile::GetComponentClass(const String& name)
 bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
 {
     componentClasses_.Clear();
+    enums_.Clear();
+
+    const JSONArray& enums = json.Get("enums").GetArray();
+
+    for (unsigned i = 0; i < enums.Size(); i++)
+    {
+        const JSONValue& ejson = enums.At(i);
+
+        String enumName = ejson.Get("name").GetString();
+
+        const JSONObject& evalues = ejson.Get("values").GetObject();
+
+        JSONObject::ConstIterator itr = evalues.Begin();
+
+        Vector<EnumInfo> values;
+
+        while(itr != evalues.End())
+        {
+            EnumInfo info;
+            info.name_ = itr->first_;
+            info.value_ = itr->second_.GetInt();
+            values.Push(info);
+            itr++;
+        }
+
+        enums_[enumName] = values;
+    }
 
     const JSONArray& components = json.Get("components").GetArray();
 
@@ -63,7 +104,7 @@ bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
     {
         const JSONValue& cjson = components.At(i);
 
-        SharedPtr<NETComponentClass> c(new NETComponentClass(context_));
+        SharedPtr<NETComponentClass> c(new NETComponentClass(context_, this));
 
         if (c->ParseJSON(cjson))
             componentClasses_[c->GetName()] = c;

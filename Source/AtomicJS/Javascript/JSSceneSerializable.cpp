@@ -148,7 +148,7 @@ static int Serializable_SetAttribute(duk_context* ctx)
 
                             if (idx > 0 && idx < enums[name]->Size())
                             {
-                                VariantMap& values = jsc->GetFieldValues();
+                                VariantMap& values = csc->GetFieldValues();
                                 values[name] = enums[name]->At(idx).value_;
                                 return 0;
                             }

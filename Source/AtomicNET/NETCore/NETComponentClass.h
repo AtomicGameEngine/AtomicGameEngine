@@ -31,6 +31,8 @@
 namespace Atomic
 {
 
+class NETAssemblyFile;
+
 /// NET Assembly resource.
 class ATOMIC_API NETComponentClass : public Object
 {
@@ -39,7 +41,7 @@ class ATOMIC_API NETComponentClass : public Object
 public:
 
     /// Construct.
-    NETComponentClass(Context* context);
+    NETComponentClass(Context* context, NETAssemblyFile* assemblyFile);
     /// Destruct.
     virtual ~NETComponentClass();
 
@@ -53,6 +55,8 @@ public:
     void GetDefaultFieldValue(const String& name, Variant& v);
 
 private:
+
+    WeakPtr<NETAssemblyFile> assemblyFile_;
 
     static void InitTypeMap();
 
