@@ -120,7 +120,7 @@ void NETCore::GenerateTPAList(String& tpaList)
         trustedAssemblies.Push(coreCLRFilesAbsPath_ + assembly);
     }
 
-    trustedAssemblies.Push(coreCLRFilesAbsPath_ + "HelloWorld.exe");
+    // trustedAssemblies.Push(coreCLRFilesAbsPath_ + "HelloWorld.exe");
 
     tpaList.Join(trustedAssemblies, ":");
 
