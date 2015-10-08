@@ -40,12 +40,26 @@ bool NETAssemblyImporter::Import()
 {
     NETToolSystem* tools = GetSubsystem<NETToolSystem>();
 
-    JSONValue assemblyJSON;
+    assemblyJSON_.SetType(JSON_NULL);
 
-    if (tools->InspectAssembly(asset_->GetPath(), assemblyJSON))
+    if (tools->InspectAssembly(asset_->GetPath(), assemblyJSON_))
     {
-        if (assemblyJSON.IsObject())
+        if (!assemblyJSON_.IsObject())
         {
+            assemblyJSON_.SetType(JSON_NULL);
+        }
+        else
+        {
+            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            NETAssemblyFile* assemblyFile = cache->GetResource<NETAssemblyFile>(asset_->GetPath());
+            if (assemblyFile)
+                assemblyFile->ParseAssemblyJSON(assemblyJSON_);
+        }
+
+
+        //if (assemblyJSON.IsObject())
+        //{
+            /*
             const JSONValue& enums = assemblyJSON.Get("enums");
 
             const JSONArray& components = assemblyJSON.Get("components").GetArray();
@@ -58,9 +72,9 @@ bool NETAssemblyImporter::Import()
 
                 LOGINFOF("Found NET Component %s", componentName.CString());
             }
+            */
 
-        }
-
+         //}
     }
 
     return true;
@@ -73,7 +87,19 @@ bool NETAssemblyImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 
     JSONValue import = jsonRoot.Get("NETAssemblyImporter");
 
-    //isComponentFile_ = import.Get("IsComponentFile").GetBool();
+    assemblyJSON_.SetType(JSON_NULL);
+
+    const JSONValue& ajson = import.Get("AssemblyJSON");
+
+    if (ajson.IsObject())
+    {
+        assemblyJSON_ = ajson.GetObject();
+
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        NETAssemblyFile* assemblyFile = cache->GetResource<NETAssemblyFile>(asset_->GetPath());
+        if (assemblyFile)
+            assemblyFile->ParseAssemblyJSON(assemblyJSON_);
+    }
 
     return true;
 }
@@ -84,7 +110,8 @@ bool NETAssemblyImporter::SaveSettingsInternal(JSONValue& jsonRoot)
         return false;
 
     JSONValue import;
-    //import.Set("IsComponentFile", JSONValue(isComponentFile_));
+    import.SetType(JSON_OBJECT);
+    import.Set("AssemblyJSON", assemblyJSON_);
     jsonRoot.Set("NETAssemblyImporter", import);
 
     return true;

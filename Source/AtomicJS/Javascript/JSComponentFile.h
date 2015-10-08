@@ -26,6 +26,8 @@
 #include <Atomic/Container/ArrayPtr.h>
 #include <Atomic/Container/List.h>
 
+#include <Atomic/Script/Script.h>
+
 namespace Atomic
 {
 
@@ -37,18 +39,6 @@ class ATOMIC_API JSComponentFile : public Resource
     OBJECT(JSComponentFile);
 
 public:
-
-    struct EnumInfo
-    {
-        EnumInfo(const String& name = String::EMPTY, const Variant& v = Variant::EMPTY)
-        {
-            name_ = name;
-            value_ = v;
-        }
-
-        String name_;
-        Variant value_;
-    };
 
     /// Construct.
     JSComponentFile(Context* context);

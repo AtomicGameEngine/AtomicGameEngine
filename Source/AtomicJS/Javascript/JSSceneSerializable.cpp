@@ -29,6 +29,11 @@
 #include "JSComponent.h"
 #include "JSVM.h"
 
+// Refactor so we don't need to include AtomicNET here
+#include <AtomicNET/NETCore/CSComponent.h>
+#include <AtomicNET/NETCore/NETAssemblyFile.h>
+#include <AtomicNET/NETCore/NETComponentClass.h>
+
 namespace Atomic
 {
 
@@ -83,6 +88,7 @@ static int Serializable_SetAttribute(duk_context* ctx)
     }
 
     JSComponent* jsc = NULL;
+    CSComponent* csc = NULL;
 
     // check dynamic
     if (!isAttr)
@@ -95,7 +101,7 @@ static int Serializable_SetAttribute(duk_context* ctx)
             if (file)
             {
                 const HashMap<String, VariantType>& fields = file->GetFields();
-                const HashMap<String, Vector<JSComponentFile::EnumInfo>>& enums = file->GetEnums();
+                const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums();
 
                 if (fields.Contains(name))
                 {
@@ -116,6 +122,42 @@ static int Serializable_SetAttribute(duk_context* ctx)
                 }
             }
         }
+        else if (serial->GetType() == CSComponent::GetTypeStatic())
+        {
+            csc = (CSComponent*) serial;
+            NETAssemblyFile* afile = csc->GetAssemblyFile();
+
+            if (afile)
+            {
+                NETComponentClass* componentClass = afile->GetComponentClass(csc->GetComponentClassName());
+
+                if (componentClass)
+                {
+
+                    const HashMap<String, VariantType>& fields = componentClass->GetFields();
+                    const HashMap<String, Vector<EnumInfo>>& enums = componentClass->GetEnums();
+
+                    if (fields.Contains(name))
+                    {
+                        HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
+                        variantType = itr->second_;
+
+                        if (enums.Contains(name))
+                        {
+                            int idx = (int) v.GetFloat();
+
+                            if (idx > 0 && idx < enums[name]->Size())
+                            {
+                                VariantMap& values = jsc->GetFieldValues();
+                                values[name] = enums[name]->At(idx).value_;
+                                return 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     if (variantType == VAR_NONE)
@@ -168,6 +210,13 @@ static int Serializable_SetAttribute(duk_context* ctx)
         VariantMap& values = jsc->GetFieldValues();
         values[name] = v;
     }
+
+    if (csc)
+    {
+        VariantMap& values = csc->GetFieldValues();
+        values[name] = v;
+    }
+
 
     return 0;
 }
@@ -225,6 +274,43 @@ static int Serializable_GetAttribute(duk_context* ctx)
         }
     }
 
+    if (serial->GetType() == CSComponent::GetTypeStatic())
+    {
+        CSComponent* csc = (CSComponent*) serial;
+        NETAssemblyFile* afile = csc->GetAssemblyFile();
+
+        if (afile)
+        {
+            NETComponentClass* componentClass = afile->GetComponentClass(csc->GetComponentClassName());
+
+            if (componentClass)
+            {
+                const HashMap<String, VariantType>& fields =  componentClass->GetFields();
+
+                if (fields.Contains(name))
+                {
+                    VariantMap& values = csc->GetFieldValues();
+
+                    if (values.Contains(name))
+                    {
+                        js_push_variant(ctx,  values[name]);
+                        return 1;
+                    }
+                    else
+                    {
+                        Variant v;
+                        componentClass->GetDefaultFieldValue(name, v);
+                        js_push_variant(ctx,  v);
+                        return 1;
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
     duk_push_undefined(ctx);
     return 1;
 }
@@ -247,6 +333,76 @@ static const String& GetResourceRefClassName(Context* context, const ResourceRef
 
     return String::EMPTY;
 }
+
+static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const VariantMap& defaultFieldValues,
+                                 const HashMap<String, VariantType>& fields,
+                                 const HashMap<String, Vector<EnumInfo>>& enums)
+{
+    if (fields.Size())
+    {
+        HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
+        while (itr != fields.End())
+        {
+            duk_push_object(ctx);
+
+            duk_push_number(ctx, (double) itr->second_);
+            duk_put_prop_string(ctx, -2, "type");
+
+            if (itr->second_ == VAR_RESOURCEREF && defaultFieldValues.Contains(itr->first_))
+            {
+                if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
+                {
+                    const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
+                    const String& typeName = GetResourceRefClassName(JSVM::GetJSVM(ctx)->GetContext(), ref);
+
+                    if (typeName.Length())
+                    {
+                        duk_push_string(ctx, typeName.CString());
+                        duk_put_prop_string(ctx, -2, "resourceTypeName");
+
+                    }
+                }
+            }
+
+            duk_push_string(ctx, itr->first_.CString());
+            duk_put_prop_string(ctx, -2, "name");
+
+            duk_push_number(ctx, (double) AM_DEFAULT);
+            duk_put_prop_string(ctx, -2, "mode");
+
+            duk_push_string(ctx,"");
+            duk_put_prop_string(ctx, -2, "defaultValue");
+
+            duk_push_boolean(ctx, 1);
+            duk_put_prop_string(ctx, -2, "field");
+
+            duk_push_array(ctx);
+
+            if (enums.Contains(itr->first_))
+            {
+                unsigned enumCount = 0;
+                const Vector<EnumInfo>* infos = enums[itr->first_];
+                Vector<EnumInfo>::ConstIterator eitr = infos->Begin();
+
+                while (eitr != infos->End())
+                {
+                    duk_push_string(ctx, eitr->name_.CString());
+                    duk_put_prop_index(ctx, -2, enumCount++);
+                    eitr++;
+                }
+
+            }
+
+            duk_put_prop_string(ctx, -2, "enumNames");
+
+            // store attr object
+            duk_put_prop_index(ctx, -2, count++);
+
+            itr++;
+        }
+    }
+}
+
 
 
 static int Serializable_GetAttributes(duk_context* ctx)
@@ -345,70 +501,26 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
             const VariantMap& defaultFieldValues = file->GetDefaultFieldValues();
             const HashMap<String, VariantType>& fields =  file->GetFields();
-            const HashMap<String, Vector<JSComponentFile::EnumInfo>>& enums = file->GetEnums();
+            const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums();
 
-            if (fields.Size())
+            GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
+        }
+    }
+    else if (serial->GetType() == CSComponent::GetTypeStatic())
+    {
+        CSComponent* csc = (CSComponent*) serial;
+        NETAssemblyFile* afile = csc->GetAssemblyFile();
+
+        if (afile)
+        {
+            NETComponentClass* componentClass = afile->GetComponentClass(csc->GetComponentClassName());
+
+            if (componentClass)
             {
-                HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
-                while (itr != fields.End())
-                {
-                    duk_push_object(ctx);
-
-                    duk_push_number(ctx, (double) itr->second_);
-                    duk_put_prop_string(ctx, -2, "type");
-
-                    if (itr->second_ == VAR_RESOURCEREF && defaultFieldValues.Contains(itr->first_))
-                    {
-                        if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
-                        {
-                            const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
-                            const String& typeName = GetResourceRefClassName(serial->GetContext(), ref);
-
-                            if (typeName.Length())
-                            {
-                                duk_push_string(ctx, typeName.CString());
-                                duk_put_prop_string(ctx, -2, "resourceTypeName");
-
-                            }
-                        }
-                    }
-
-                    duk_push_string(ctx, itr->first_.CString());
-                    duk_put_prop_string(ctx, -2, "name");
-
-                    duk_push_number(ctx, (double) AM_DEFAULT);
-                    duk_put_prop_string(ctx, -2, "mode");
-
-                    duk_push_string(ctx,"");
-                    duk_put_prop_string(ctx, -2, "defaultValue");
-
-                    duk_push_boolean(ctx, 1);
-                    duk_put_prop_string(ctx, -2, "field");
-
-                    duk_push_array(ctx);
-
-                    if (enums.Contains(itr->first_))
-                    {
-                        unsigned enumCount = 0;
-                        const Vector<JSComponentFile::EnumInfo>* infos = enums[itr->first_];
-                        Vector<JSComponentFile::EnumInfo>::ConstIterator eitr = infos->Begin();
-
-                        while (eitr != infos->End())
-                        {
-                            duk_push_string(ctx, eitr->name_.CString());
-                            duk_put_prop_index(ctx, -2, enumCount++);
-                            eitr++;
-                        }
-
-                    }
-
-                    duk_put_prop_string(ctx, -2, "enumNames");
-
-                    // store attr object
-                    duk_put_prop_index(ctx, -2, count++);
-
-                    itr++;
-                }
+                const VariantMap& defaultFieldValues = componentClass->GetDefaultFieldValues();
+                const HashMap<String, VariantType>& fields =  componentClass->GetFields();
+                const HashMap<String, Vector<EnumInfo>>& enums = componentClass->GetEnums();
+                GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
             }
         }
     }

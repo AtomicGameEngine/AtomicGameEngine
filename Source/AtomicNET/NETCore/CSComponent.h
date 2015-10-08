@@ -75,14 +75,21 @@ public:
     /// Set what update events should be subscribed to. Use this for optimization: by default all are in use. Note that this is not an attribute and is not saved or network-serialized, therefore it should always be called eg. in the subclass constructor.
     void SetUpdateEventMask(unsigned char mask);
 
-    /// Return what update events are subscribed to.
+    VariantMap& GetFieldValues() { return fieldValues_; }
+    const String& GetComponentClassName() const { return componentClassName_; }
+
+    /// Return what update events are subscribed to.    
     unsigned char GetUpdateEventMask() const { return updateEventMask_; }
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
 
     void SetDestroyed() { destroyed_ = true; }
 
+    void SetComponentClassName(const String& name) { componentClassName_ = name; }
+
+    NETAssemblyFile* GetAssemblyFile() { return assemblyFile_; }
     void SetAssemblyFile(NETAssemblyFile* assemblyFile);
+
     ResourceRef GetAssemblyFileAttr() const;
     void SetAssemblyFileAttr(const ResourceRef& value);
 
@@ -138,7 +145,9 @@ private:
 
     bool loading_;
 
+    String componentClassName_;
     SharedPtr<NETAssemblyFile> assemblyFile_;
+    VariantMap fieldValues_;
 
 };
 

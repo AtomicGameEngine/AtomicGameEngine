@@ -22,44 +22,48 @@
 
 #pragma once
 
-#include <Atomic/Resource/Resource.h>
+#include <Atomic/Container/HashMap.h>
+#include <Atomic/Core/Variant.h>
 #include <Atomic/Resource/JSONValue.h>
-#include <Atomic/Container/ArrayPtr.h>
-#include <Atomic/Container/List.h>
+
+#include <Atomic/Script/Script.h>
 
 namespace Atomic
 {
 
-class NETComponentClass;
-
-// At runtime we need to load the assembly, in the editor we use metadata
 /// NET Assembly resource.
-class ATOMIC_API NETAssemblyFile : public Resource
+class ATOMIC_API NETComponentClass : public Object
 {
-    OBJECT(NETAssemblyFile);
+    OBJECT(NETComponentClass);
 
 public:
 
     /// Construct.
-    NETAssemblyFile(Context* context);
+    NETComponentClass(Context* context);
     /// Destruct.
-    virtual ~NETAssemblyFile();
+    virtual ~NETComponentClass();
 
-    bool ParseAssemblyJSON(const JSONValue& json);
+    const String& GetName() { return name_; }
 
-    NETComponentClass* GetComponentClass(const String& name);
+    bool ParseJSON(const JSONValue& json);
 
-    /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
-    /// Save resource
-    virtual bool Save(Serializer& dest) const;
-
-    /// Register object factory.
-    static void RegisterObject(Context* context);
+    const HashMap<String, VariantType>& GetFields() const { return fields_; }
+    const VariantMap& GetDefaultFieldValues() const { return defaultFieldValues_; }
+    const HashMap<String, Vector<EnumInfo>>& GetEnums() const { return enums_; }
+    void GetDefaultFieldValue(const String& name, Variant& v);
 
 private:
 
-    HashMap<StringHash, SharedPtr<NETComponentClass>> componentClasses_;
+    static void InitTypeMap();
+
+    String name_;
+
+    static HashMap<String, VariantType> typeMap_;
+
+    HashMap<String, VariantType> fields_;
+    VariantMap defaultFieldValues_;
+    HashMap<String, Vector<EnumInfo>> enums_;
+
 
 };
 

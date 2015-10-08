@@ -124,9 +124,11 @@ void CSComponent::RegisterObject(Context* context)
     context->RegisterFactory(new CSComponentFactory(context), LOGIC_CATEGORY);
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 
-    //ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
+    ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
 
     MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(NETAssemblyFile::GetTypeStatic()), AM_DEFAULT);
+
+    ACCESSOR_ATTRIBUTE("Class", GetComponentClassName, SetComponentClassName, String, String::EMPTY, AM_DEFAULT);
 
 }
 

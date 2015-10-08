@@ -27,6 +27,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/Serializer.h>
 
+#include "NETComponentClass.h"
 #include "NETAssemblyFile.h"
 
 namespace Atomic
@@ -41,6 +42,34 @@ NETAssemblyFile::NETAssemblyFile(Context* context) :
 NETAssemblyFile::~NETAssemblyFile()
 {
 
+}
+
+NETComponentClass* NETAssemblyFile::GetComponentClass(const String& name)
+{
+    if (!componentClasses_.Contains(name))
+        return 0;
+
+    return componentClasses_[name];
+
+}
+
+bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
+{
+    componentClasses_.Clear();
+
+    const JSONArray& components = json.Get("components").GetArray();
+
+    for (unsigned i = 0; i < components.Size(); i++)
+    {
+        const JSONValue& cjson = components.At(i);
+
+        SharedPtr<NETComponentClass> c(new NETComponentClass(context_));
+
+        if (c->ParseJSON(cjson))
+            componentClasses_[c->GetName()] = c;
+    }
+
+    return true;
 }
 
 void NETAssemblyFile::RegisterObject(Context* context)
