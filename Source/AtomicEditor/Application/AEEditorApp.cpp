@@ -80,9 +80,9 @@ void AEEditorApp::Start()
 
 void AEEditorApp::Setup()
 {
-    AEEditorCommon::Setup();
-
     context_->SetEditorContext(true);
+
+    AEEditorCommon::Setup();
 
     ToolEnvironment* env = new ToolEnvironment(context_);
     context_->RegisterSubsystem(env);

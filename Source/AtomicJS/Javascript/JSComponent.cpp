@@ -140,7 +140,6 @@ void JSComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory(new JSComponentFactory(context), LOGIC_CATEGORY);
 
-
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
     MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetScriptAttr, SetScriptAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);

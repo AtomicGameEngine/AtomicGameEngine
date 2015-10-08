@@ -10,6 +10,7 @@
 #include "CSComponent.h"
 #include "NETCore.h"
 #include "NETManaged.h"
+#include "NETAssemblyFile.h"
 
 namespace Atomic
 {
@@ -89,8 +90,10 @@ NETCore::NETCore(Context* context) :
     context_->RegisterSubsystem(dispatcher);
     context_->AddGlobalEventListener(dispatcher);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
-
+    if (!context_->GetEditorContext())
+    {
+        SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
+    }
 }
 
 NETCore::~NETCore()
@@ -239,6 +242,29 @@ void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
 
 }
 
+bool NETCore::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
+{
+    if (!sCreateDelegate)
+        return false;
+
+    *funcOut = 0;
+
+    // TODO: wrap in SharedPtr to control delegate lifetime?
+    int st = sCreateDelegate(hostHandle_,
+                    domainId_,
+                    assemblyName.CString(),
+                    qualifiedClassName.CString(),
+                    methodName.CString(),
+                    funcOut);
+
+    // ensure ptr isn't uninitialized
+    if (st < 0)
+        *funcOut = 0;
+
+    return st >= 0;
+
+}
+
 bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 {
     coreCLRFilesAbsPath_ = AddTrailingSlash(coreCLRFilesAbsPath);
@@ -280,8 +306,8 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     String appPath = "/Users/josh/Desktop/";
     Vector<String> nativeSearch;
     nativeSearch.Push(coreCLRFilesAbsPath_);
-    nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicNET/NETNative");
-    nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngineSharp-build/Source/AtomicEditor/AtomicEditor.app/Contents/MacOS");
+    //nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicNET/NETNative");
+    //nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicEditor/AtomicEditor.app/Contents/MacOS");
 
     String nativeDllSearchDirs;
     nativeDllSearchDirs.Join(nativeSearch, ":");
@@ -340,11 +366,13 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         startup();
     }
 
+    /*
+
     st = sCreateDelegate(hostHandle_,
                     domainId_,
-                    "AtomicNETRuntime",
-                    "AtomicEngine.AtomicNETRuntime",
-                    "Startup",
+                    "AtomicNETEngine",
+                    "AtomicEngine.Atomic",
+                    "Initialize",
                     (void**) &startup);
 
     if (st >= 0)
@@ -356,7 +384,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 
     st = sCreateDelegate(hostHandle_,
                     domainId_,
-                    "AtomicNETRuntime",
+                    "AtomicNETEngine",
                     "AtomicEngine.NativeCore",
                     "RefCountedDeleted",
                     (void**) &rcdFunction);
@@ -370,7 +398,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 
     st = sCreateDelegate(hostHandle_,
                     domainId_,
-                    "AtomicNETRuntime",
+                    "AtomicNETEngine",
                     "AtomicEngine.NativeCore",
                     "NETUpdate",
                     (void**) &updateFunction);
@@ -393,8 +421,9 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 
     if (st >= 0)
     {
-        inspectAssembly("/Users/josh/Desktop/AtomicNETTest.dll");
+        //inspectAssembly("/Users/josh/Desktop/AtomicNETTest.dll");
     }
+    */
 
 
     /*
@@ -423,6 +452,7 @@ void NETCore::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void RegisterNETCoreLibrary(Context* context)
 {
+    NETAssemblyFile::RegisterObject(context);
     CSComponent::RegisterObject(context);
 }
 

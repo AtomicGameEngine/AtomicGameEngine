@@ -123,6 +123,11 @@ void CSComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory(new CSComponentFactory(context), LOGIC_CATEGORY);
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+
+    //ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
+
+    MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(NETAssemblyFile::GetTypeStatic()), AM_DEFAULT);
+
 }
 
 void CSComponent::OnSetEnabled()
@@ -353,5 +358,22 @@ bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
 
     return success;
 }
+
+void CSComponent::SetAssemblyFile(NETAssemblyFile* assemblyFile)
+{
+    assemblyFile_ = assemblyFile;
+}
+
+ResourceRef CSComponent::GetAssemblyFileAttr() const
+{
+    return GetResourceRef(assemblyFile_, NETAssemblyFile::GetTypeStatic());
+}
+
+void CSComponent::SetAssemblyFileAttr(const ResourceRef& value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetAssemblyFile(cache->GetResource<NETAssemblyFile>(value.name_));
+}
+
 
 }

@@ -5,20 +5,6 @@ using System.Collections.Generic;
 namespace AtomicEngine
 {
 
-public class AtomicNETRuntime
-{
-  [DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-  public static extern int csb_Atomic_Test (int id);
-
-  public static void Startup()
-  {
-    //Console.WriteLine("AtomicNETRuntime Startup:" + csb_Atomic_Test(42));
-
-    Atomic.Initialize();
-
-  }
-}
-
 public static class Atomic
 {
 

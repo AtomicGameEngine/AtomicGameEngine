@@ -14,7 +14,7 @@ using AtomicEngine;
 
 using File = System.IO.File;
 
-namespace AtomicEditor
+namespace AtomicTools
 {
 
 	class AssemblyInspector

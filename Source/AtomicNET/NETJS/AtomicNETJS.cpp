@@ -20,51 +20,28 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include <AtomicJS/Javascript/JSVM.h>
+#include <AtomicPlayer/Player.h>
 
-#include <Atomic/Core/Context.h>
-#include <Atomic/Core/Object.h>
+using namespace Atomic;
+using namespace AtomicPlayer;
 
 namespace Atomic
 {
 
-class ATOMIC_API NETCore : public Object
+extern void jsb_package_atomicnet_init(JSVM* vm);
+
+void jsapi_init_atomicnet(JSVM* vm)
 {
+    duk_context* ctx = vm->GetJSContext();
 
-    OBJECT(NETCore);
+    jsb_package_atomicnet_init(vm);
 
-public:
-    /// Construct.
-    NETCore(Context* context);
-    /// Destruct.
-    virtual ~NETCore();
+    //duk_get_global_string(ctx, "Atomic");
+    //js_push_class_object_instance(ctx, vm->GetSubsystem<Player>(), "Player");
+    //duk_put_prop_string(ctx, -2, "player");
+    //duk_pop(ctx);
 
-    bool Initialize(const String& coreCLRFilesAbsPath, String &errorMsg);
-    void Shutdown();
-
-    bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
-
-    /// We access this directly in binding code, where there isn't a context
-    /// to get a reference from
-    static inline Context* GetContext() { return instance_->csContext_; }
-
-private:
-
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
-    bool InitCoreCLRDLL(String &errorMsg);
-    void GenerateTPAList(String& tpaList);
-
-    String coreCLRFilesAbsPath_;
-    void* coreCLRDLLHandle_;
-    void* hostHandle_;
-    unsigned domainId_;
-
-    /// weak local context ref, so avoid recursion in static GetContext call
-    static WeakPtr<Context> csContext_;
-
-    static WeakPtr<NETCore> instance_;
-
-};
+}
 
 }

@@ -22,48 +22,36 @@
 
 #pragma once
 
-#include <Atomic/Core/Context.h>
-#include <Atomic/Core/Object.h>
+#include <Atomic/Resource/Resource.h>
+#include <Atomic/Container/ArrayPtr.h>
+#include <Atomic/Container/List.h>
 
 namespace Atomic
 {
 
-class ATOMIC_API NETCore : public Object
-{
+// At runtime we need to load the assembly, in the editor we use metadata
 
-    OBJECT(NETCore);
+/// NET Assembly resource.
+class ATOMIC_API NETAssemblyFile : public Resource
+{
+    OBJECT(NETAssemblyFile);
 
 public:
+
     /// Construct.
-    NETCore(Context* context);
+    NETAssemblyFile(Context* context);
     /// Destruct.
-    virtual ~NETCore();
+    virtual ~NETAssemblyFile();
 
-    bool Initialize(const String& coreCLRFilesAbsPath, String &errorMsg);
-    void Shutdown();
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Save resource
+    virtual bool Save(Serializer& dest) const;
 
-    bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
-
-    /// We access this directly in binding code, where there isn't a context
-    /// to get a reference from
-    static inline Context* GetContext() { return instance_->csContext_; }
+    /// Register object factory.
+    static void RegisterObject(Context* context);
 
 private:
-
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
-    bool InitCoreCLRDLL(String &errorMsg);
-    void GenerateTPAList(String& tpaList);
-
-    String coreCLRFilesAbsPath_;
-    void* coreCLRDLLHandle_;
-    void* hostHandle_;
-    unsigned domainId_;
-
-    /// weak local context ref, so avoid recursion in static GetContext call
-    static WeakPtr<Context> csContext_;
-
-    static WeakPtr<NETCore> instance_;
 
 };
 

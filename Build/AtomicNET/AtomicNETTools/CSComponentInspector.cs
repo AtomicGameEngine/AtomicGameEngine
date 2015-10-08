@@ -31,7 +31,7 @@ using System.Reflection.PortableExecutable;
 // https://github.com/dotnet/roslyn/tree/master/src/Compilers/Core/Portable/MetadataReader
 
 
-namespace AtomicEditor
+namespace AtomicTools
 {
 
 	public class CSComponentInspector

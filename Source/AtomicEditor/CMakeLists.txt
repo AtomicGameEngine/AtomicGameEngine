@@ -53,7 +53,7 @@ endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS AtomicNETJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)

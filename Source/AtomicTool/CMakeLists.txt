@@ -6,7 +6,7 @@ endif()
 
 add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
-target_link_libraries(AtomicTool ToolCore Poco ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicTool ToolCore NETCore Poco ${ATOMIC_LINK_LIBRARIES})
 
 # add_dependencies(AtomicTool AtomicEditor)
 
@@ -29,4 +29,5 @@ add_custom_command(TARGET AtomicTool POST_BUILD
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicPlayer/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Editor/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
+                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicNET/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMENT "Generating Javascript Bindings")

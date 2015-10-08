@@ -22,6 +22,7 @@ add_library(ToolCore ${SOURCE_FILES})
 target_link_libraries(ToolCore Assimp Poco)
 
 GroupSources("Assets")
+GroupSources("AtomicNET")
 GroupSources("Build")
 GroupSources("Command")
 GroupSources("Import")

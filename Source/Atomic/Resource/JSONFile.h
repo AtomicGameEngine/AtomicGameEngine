@@ -53,6 +53,12 @@ public:
     /// Return root value.
     const JSONValue& GetRoot() const { return root_; }
 
+    // ATOMIC BEGIN
+
+    static bool ParseJSON(const String& json, JSONValue& value);
+
+    // ATOMIC END
+
 private:
     /// JSON root value.
     JSONValue root_;

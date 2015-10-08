@@ -14,24 +14,25 @@ using AtomicEngine;
 
 using File = System.IO.File;
 
-namespace AtomicEditor
+namespace AtomicTools
 {
-	class AtomicEditor
+	class AtomicTools
 	{
 
-		public static void InspectAssembly (String pathToAssembly)
+		public static String InspectAssembly (String pathToAssembly)
 		{
 
 			try {
 
 				var inspector = new AssemblyInspector ();
 				inspector.Inspect (pathToAssembly);
-				Console.WriteLine (inspector.DumpToJSON ());
+				return inspector.DumpToJSON();
 
 			} catch (Exception ex) {
 				Console.WriteLine (ex.Message);
 			}
 
+			return "";
 
 		}
 

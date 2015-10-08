@@ -145,6 +145,12 @@ class ComponentInspector extends Atomic.UISection {
             this.value = 1;
         }
 
+        if (component.typeName == "CSComponent") {
+            // auto expand CSComponents
+            this.value = 1;
+        }
+
+
         if (component.typeName == "TileMap2D") {
             this.addTilemap2DUI(attrsVerticalLayout);
         }

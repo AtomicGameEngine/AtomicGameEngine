@@ -21,6 +21,11 @@
 
 #include "AEEditorCommon.h"
 
+namespace Atomic
+{
+    void jsapi_init_atomicnet(JSVM* vm);
+}
+
 namespace AtomicEditor
 {
 
@@ -35,6 +40,23 @@ void AEEditorCommon::Start()
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
+    Javascript* javascript = GetSubsystem<Javascript>();
+    vm_ = javascript->InstantiateVM("MainVM");
+    vm_->InitJSContext();
+
+#ifdef ATOMIC_DOTNET
+    jsapi_init_atomicnet(vm_);
+#endif
+
+}
+
+void AEEditorCommon::Setup()
+{
+
+#ifdef ATOMIC_3D
+    RegisterEnvironmentLibrary(context_);
+#endif
+
     // Register IPC system
     context_->RegisterSubsystem(new IPC(context_));
 
@@ -43,6 +65,7 @@ void AEEditorCommon::Start()
     context_->RegisterSubsystem(javascript);
 
 #ifdef ATOMIC_DOTNET
+
     // Instantiate and register the AtomicNET subsystem
     SharedPtr<NETCore> netCore (new NETCore(context_));
     String netCoreErrorMsg;
@@ -56,18 +79,6 @@ void AEEditorCommon::Start()
     }
 #endif
 
-
-    vm_ = javascript->InstantiateVM("MainVM");
-    vm_->InitJSContext();
-
-}
-
-void AEEditorCommon::Setup()
-{
-
-#ifdef ATOMIC_3D
-    RegisterEnvironmentLibrary(context_);
-#endif
 
 }
 

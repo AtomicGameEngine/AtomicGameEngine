@@ -1,0 +1,6 @@
+{
+	"name" : "AtomicNET",
+	"sources" : ["Source/AtomicNET/NETCore"],
+	"classes" : ["NETCore", "NETManaged", "NETAssemblyFile", "CSScriptObject", "CSComponent", "CSScriptObject"]
+
+}

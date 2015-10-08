@@ -1,6 +1,0 @@
-{
-	"name" : "AtomicNET",
-	"sources" : ["Source/AtomicNET/NETCore"],
-	"classes" : ["NETCore", "NETManaged", "CSComponent", "CSScriptObject"]
-
-}

@@ -25,6 +25,8 @@
 
 #include <Atomic/Scene/Component.h>
 
+#include "NETAssemblyFile.h"
+
 namespace Atomic
 {
 
@@ -80,6 +82,10 @@ public:
 
     void SetDestroyed() { destroyed_ = true; }
 
+    void SetAssemblyFile(NETAssemblyFile* assemblyFile);
+    ResourceRef GetAssemblyFileAttr() const;
+    void SetAssemblyFileAttr(const ResourceRef& value);
+
 protected:
     /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node);
@@ -131,6 +137,8 @@ private:
     bool delayedStartCalled_;
 
     bool loading_;
+
+    SharedPtr<NETAssemblyFile> assemblyFile_;
 
 };
 

@@ -1,3 +1,3 @@
 
 add_subdirectory(NETCore)
-add_subdirectory(NETNative)
+add_subdirectory(NETJS)

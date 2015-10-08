@@ -38,6 +38,8 @@ class ATOMIC_API JSComponent : public Component
     friend class JSComponentFactory;
     friend class JSComponentFile;
 
+    OBJECT(JSComponent);
+
     enum EventFlags
     {
         USE_UPDATE = 0x1,
@@ -47,8 +49,6 @@ class ATOMIC_API JSComponent : public Component
     };
 
 public:
-
-    OBJECT(JSComponent);
 
     /// Construct.
     JSComponent(Context* context);

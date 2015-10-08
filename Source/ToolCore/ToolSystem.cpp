@@ -20,6 +20,7 @@
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
 #include "Subprocess/SubprocessSystem.h"
+#include "NETTools/NETToolSystem.h"
 
 
 #include "ToolSystem.h"
@@ -40,6 +41,7 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));
     context_->RegisterSubsystem(new SubprocessSystem(context_));
+    context_->RegisterSubsystem(new NETToolSystem(context_));
 
     // platform registration
     RegisterPlatform(new PlatformMac(context));
