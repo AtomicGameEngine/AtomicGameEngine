@@ -41,6 +41,9 @@
 #ifdef ATOMIC_NETWORK
 #include "../Network/Network.h"
 #endif
+#ifdef ATOMIC_WEB
+#include "../Web/Web.h"
+#endif
 #ifdef ATOMIC_DATABASE
 #include "../Database/Database.h"
 #endif
@@ -129,6 +132,9 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Localization(context_));
 #ifdef ATOMIC_NETWORK
     context_->RegisterSubsystem(new Network(context_));
+#endif
+#ifdef ATOMIC_WEB
+    context_->RegisterSubsystem(new Web(context_));
 #endif
 #ifdef ATOMIC_DATABASE
     context_->RegisterSubsystem(new Database(context_));

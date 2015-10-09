@@ -1,10 +1,13 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
+                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/WebSocketPP/include
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
-                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D)
+                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D
+                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty/ASIO/include)
 
 file (GLOB CONTAINER_SOURCE Container/*.cpp Container/*.h)
 file (GLOB CORE_SOURCE Core/*.cpp Core/*.h)
@@ -15,6 +18,7 @@ file (GLOB IO_SOURCE IO/*.cpp IO/*.h)
 file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
+file (GLOB WEB_SOURCE Web/*.cpp Web/*.h)
 
 if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
   file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
@@ -68,7 +72,7 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
-                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
+                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE} ${WEB_SOURCE}
                   ${PLATFORM_SOURCE})
 
 if (NOT EMSCRIPTEN)
@@ -93,5 +97,6 @@ GroupSources("Physics")
 GroupSources("Resource")
 GroupSources("Scene")
 GroupSources("UI")
+GroupSources("Web")
 
 add_library(Atomic ${SOURCE_FILES})

@@ -35,6 +35,10 @@
 #include <Atomic/Network/Network.h>
 #endif
 
+#ifdef ATOMIC_WEB
+#include <Atomic/Web/Web.h>
+#endif
+
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSComponent.h"
@@ -174,6 +178,15 @@ static int js_atomic_GetNetwork(duk_context* ctx)
     JSVM* vm = JSVM::GetJSVM(ctx);
     js_push_class_object_instance(ctx, vm->GetSubsystem<Network>());
     return 1;
+}
+#endif
+
+#ifdef ATOMIC_WEB
+static int js_atomic_GetWeb(duk_context* ctx)
+{
+  JSVM* vm = JSVM::GetJSVM(ctx);
+  js_push_class_object_instance(ctx, vm->GetSubsystem<Web>());
+  return 1;
 }
 #endif
 
@@ -393,6 +406,14 @@ void jsapi_init_atomic(JSVM* vm)
 
     js_push_class_object_instance(ctx, vm->GetSubsystem<Network>(), "Network");
     duk_put_prop_string(ctx, -2, "network");
+#endif
+
+#ifdef ATOMIC_WEB
+    duk_push_c_function(ctx, js_atomic_GetWeb, 0);
+    duk_put_prop_string(ctx, -2, "getWeb");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Web>(), "Web");
+    duk_put_prop_string(ctx, -2, "web");
 #endif
 
     duk_push_c_function(ctx, js_atomic_GetUI, 0);
