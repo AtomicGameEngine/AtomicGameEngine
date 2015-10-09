@@ -30,10 +30,7 @@
 #include "../Web/WebSocket.h"
 
 #ifndef EMSCRIPTEN
-// !!! Should go in an ASIOConfig.h file.
-#define ASIO_STANDALONE
-#define ASIO_HAS_STD_ARRAY
-#define ASIO_HAS_CSTDINT
+#include "../Web/WebInternalConfig.h"
 #include <asio/io_service.hpp>
 #endif
 
@@ -64,8 +61,10 @@ Web::~Web()
 
 void Web::internalUpdate(StringHash eventType, VariantMap& eventData)
 {
+#ifndef EMSCRIPTEN
     d->service.reset();
     d->service.poll();
+#endif
 }
 
 SharedPtr<WebRequest> Web::MakeWebRequest(const String& url, const String& verb, const Vector<String>& headers,
@@ -84,7 +83,9 @@ SharedPtr<WebSocket> Web::MakeWebSocket(const String& url)
 
   // The initialization of the WebSocket will take time, can not know at this point if it has an error or not
   SharedPtr<WebSocket> webSocket(new WebSocket(context_, url));
+#ifndef EMSCRIPTEN
   webSocket->setup(&d->service);
+#endif
   return webSocket;
 }
 
