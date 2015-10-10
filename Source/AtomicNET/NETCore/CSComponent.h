@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <Atomic/Scene/Component.h>
+#include <Atomic/Script/ScriptComponent.h>
 
 #include "NETAssemblyFile.h"
 
@@ -41,7 +41,7 @@ enum CSComponentMethod
 };
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
-class ATOMIC_API CSComponent : public Component
+class ATOMIC_API CSComponent : public ScriptComponent
 {
     friend class CSComponentFactory;
 
@@ -53,9 +53,10 @@ class ATOMIC_API CSComponent : public Component
         USE_FIXEDPOSTUPDATE = 0x8
     };
 
-public:
-
     OBJECT(CSComponent);
+    BASEOBJECT(ScriptComponent);
+
+public:
 
     /// Construct.
     CSComponent(Context* context);
@@ -76,7 +77,6 @@ public:
     void SetUpdateEventMask(unsigned char mask);
 
     VariantMap& GetFieldValues() { return fieldValues_; }
-    const String& GetComponentClassName() const { return componentClassName_; }
 
     /// Return what update events are subscribed to.    
     unsigned char GetUpdateEventMask() const { return updateEventMask_; }
@@ -86,6 +86,10 @@ public:
     void SetDestroyed() { destroyed_ = true; }
 
     void SetComponentClassName(const String& name) { componentClassName_ = name; }
+
+    const String& GetComponentClassName() const { return componentClassName_; }
+
+    virtual ScriptComponentFile* GetComponentFile() { return assemblyFile_; }
 
     NETAssemblyFile* GetAssemblyFile() { return assemblyFile_; }
     void SetAssemblyFile(NETAssemblyFile* assemblyFile);

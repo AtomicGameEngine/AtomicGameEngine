@@ -19,6 +19,7 @@ file (GLOB RESOURCE_SOURCE Resource/*.cpp Resource/*.h)
 file (GLOB AUDIO_SOURCE Audio/*.cpp Audio/*.h)
 file (GLOB NETWORK_SOURCE Network/*.cpp Network/*.h)
 file (GLOB WEB_SOURCE Web/*.cpp Web/*.h)
+file (GLOB SCRIPT_SOURCE Script/*.cpp Script/*.h)
 
 if (NOT EMSCRIPTEN AND NOT IOS AND NOT ANDROID)
   file (GLOB IPC_SOURCE IPC/*.cpp IPC/*.h)
@@ -72,7 +73,8 @@ set (SOURCE_FILES ${CONTAINER_SOURCE} ${CORE_SOURCE} ${ENGINE_SOURCE} ${INPUT_SO
                   ${GRAPHICS_SOURCE} ${GRAPHICS_IMPL_SOURCE}
                   ${ATOMIC3D_SOURCE}
                   ${ATOMIC2D_SOURCE} ${ENVIRONMENT_SOURCE}
-                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE} ${WEB_SOURCE}
+                  ${SCENE_SOURCE} ${UI_SOURCE} ${SYSTEM_UI_SOURCE}
+                  ${WEB_SOURCE} ${SCRIPT_SOURCE}
                   ${PLATFORM_SOURCE})
 
 if (NOT EMSCRIPTEN)

@@ -13,6 +13,7 @@
 // Move me to Engine
 #include <Atomic/Environment/Environment.h>
 
+#include <Atomic/Script/ScriptSystem.h>
 #include <AtomicJS/Javascript/Javascript.h>
 
 #ifdef ATOMIC_DOTNET
@@ -59,6 +60,8 @@ void AEEditorCommon::Setup()
 
     // Register IPC system
     context_->RegisterSubsystem(new IPC(context_));
+
+    context_->RegisterSubsystem(new ScriptSystem(context_));
 
     // Instantiate and register the Javascript subsystem
     Javascript* javascript = new Javascript(context_);

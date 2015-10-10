@@ -101,7 +101,7 @@ public:
 
 
 CSComponent::CSComponent(Context* context) :
-    Component(context),
+    ScriptComponent(context),
     updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
     currentEventMask_(0),
     instanceInitialized_(false),

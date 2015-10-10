@@ -27,18 +27,17 @@
 #include <Atomic/Container/ArrayPtr.h>
 #include <Atomic/Container/List.h>
 
-#include <Atomic/Script/Script.h>
+#include <Atomic/Script/ScriptComponentFile.h>
 
 namespace Atomic
 {
 
-class NETComponentClass;
-
 // At runtime we need to load the assembly, in the editor we use metadata
 /// NET Assembly resource.
-class ATOMIC_API NETAssemblyFile : public Resource
+class ATOMIC_API NETAssemblyFile : public ScriptComponentFile
 {
     OBJECT(NETAssemblyFile);
+    BASEOBJECT(ScriptComponentFile);
 
 public:
 
@@ -48,9 +47,6 @@ public:
     virtual ~NETAssemblyFile();
 
     bool ParseAssemblyJSON(const JSONValue& json);
-
-    const HashMap<String, Vector<EnumInfo>>& GetEnums() const { return enums_; }
-    NETComponentClass* GetComponentClass(const String& name);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
@@ -62,8 +58,12 @@ public:
 
 private:
 
-    HashMap<String, Vector<EnumInfo>> enums_;
-    HashMap<StringHash, SharedPtr<NETComponentClass>> componentClasses_;
+    static void InitTypeMap();
+
+    bool ParseComponentClassJSON(const JSONValue& json);
+
+    HashMap<String, Vector<EnumInfo>> assemblyEnums_;
+    static HashMap<StringHash, VariantType> typeMap_;
 
 };
 

@@ -26,7 +26,7 @@
 #include <Atomic/Container/ArrayPtr.h>
 #include <Atomic/Container/List.h>
 
-#include <Atomic/Script/Script.h>
+#include <Atomic/Script/ScriptComponentFile.h>
 
 namespace Atomic
 {
@@ -34,7 +34,7 @@ namespace Atomic
 class JSComponent;
 
 /// Script document resource.
-class ATOMIC_API JSComponentFile : public Resource
+class ATOMIC_API JSComponentFile : public ScriptComponentFile
 {
     OBJECT(JSComponentFile);
 
@@ -46,11 +46,6 @@ public:
     virtual ~JSComponentFile();
     /// Register object factory.
     static void RegisterObject(Context* context);
-
-    const HashMap<String, VariantType>& GetFields() const { return fields_; }
-    const VariantMap& GetDefaultFieldValues() const { return defaultFieldValues_; }
-    const HashMap<String, Vector<EnumInfo>>& GetEnums() const { return enums_; }
-    void GetDefaultFieldValue(const String& name, Variant& v);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);
@@ -67,9 +62,6 @@ private:
     bool InitModule();
 
     bool scriptClass_;
-    HashMap<String, VariantType> fields_;
-    HashMap<String, Vector<EnumInfo>> enums_;
-    VariantMap defaultFieldValues_;
 
 };
 

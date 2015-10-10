@@ -1,0 +1,5 @@
+{
+	"name" : "Script",
+	"sources" : ["Source/Atomic/Script"],
+	"classes" : ["ScriptComponent", "ScriptComponentFile"]
+}

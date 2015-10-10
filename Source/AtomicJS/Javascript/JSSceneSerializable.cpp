@@ -25,14 +25,14 @@
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
 
-#include "JSScene.h"
-#include "JSComponent.h"
-#include "JSVM.h"
+// These serialization functions need to operate on various script classes
+// including JS and C#, so use the base classes and avoid bringing in derived specifics
+#include <Atomic/Script/ScriptComponent.h>
+#include <Atomic/Script/ScriptComponentFile.h>
 
-// Refactor so we don't need to include AtomicNET here
-#include <AtomicNET/NETCore/CSComponent.h>
-#include <AtomicNET/NETCore/NETAssemblyFile.h>
-#include <AtomicNET/NETCore/NETComponentClass.h>
+#include "JSScene.h"
+
+#include "JSVM.h"
 
 namespace Atomic
 {
@@ -87,26 +87,27 @@ static int Serializable_SetAttribute(duk_context* ctx)
         }
     }
 
-    JSComponent* jsc = NULL;
-    CSComponent* csc = NULL;
+    ScriptComponent* jsc = NULL;
 
     // check dynamic
     if (!isAttr)
     {
-        if (serial->GetType() == JSComponent::GetTypeStatic())
+        if (serial->GetBaseType() == ScriptComponent::GetTypeStatic())
         {
-            jsc = (JSComponent*) serial;
-            JSComponentFile* file = jsc->GetComponentFile();
+
+            jsc = (ScriptComponent*) serial;
+            ScriptComponentFile* file = jsc->GetComponentFile();
 
             if (file)
             {
-                const HashMap<String, VariantType>& fields = file->GetFields();
-                const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums();
+                const String& className = jsc->GetComponentClassName();
 
-                if (fields.Contains(name))
+                const HashMap<String, VariantType>& fields = file->GetFields(className);
+                const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums(className);
+
+                if (VariantType *fvType = fields[name])
                 {
-                    HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
-                    variantType = itr->second_;
+                    variantType = *fvType;
 
                     if (enums.Contains(name))
                     {
@@ -122,42 +123,6 @@ static int Serializable_SetAttribute(duk_context* ctx)
                 }
             }
         }
-        else if (serial->GetType() == CSComponent::GetTypeStatic())
-        {
-            csc = (CSComponent*) serial;
-            NETAssemblyFile* afile = csc->GetAssemblyFile();
-
-            if (afile)
-            {
-                NETComponentClass* componentClass = afile->GetComponentClass(csc->GetComponentClassName());
-
-                if (componentClass)
-                {
-
-                    const HashMap<String, VariantType>& fields = componentClass->GetFields();
-                    const HashMap<String, Vector<EnumInfo>>& enums = componentClass->GetEnums();
-
-                    if (fields.Contains(name))
-                    {
-                        HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
-                        variantType = itr->second_;
-
-                        if (enums.Contains(name))
-                        {
-                            int idx = (int) v.GetFloat();
-
-                            if (idx > 0 && idx < enums[name]->Size())
-                            {
-                                VariantMap& values = csc->GetFieldValues();
-                                values[name] = enums[name]->At(idx).value_;
-                                return 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     if (variantType == VAR_NONE)
@@ -211,13 +176,6 @@ static int Serializable_SetAttribute(duk_context* ctx)
         values[name] = v;
     }
 
-    if (csc)
-    {
-        VariantMap& values = csc->GetFieldValues();
-        values[name] = v;
-    }
-
-
     return 0;
 }
 
@@ -244,15 +202,16 @@ static int Serializable_GetAttribute(duk_context* ctx)
         }
     }
 
-    if (serial->GetType() == JSComponent::GetTypeStatic())
+    if (serial->GetBaseType() == ScriptComponent::GetTypeStatic())
     {
-        JSComponent* jsc = (JSComponent*) serial;
-        JSComponentFile* file = jsc->GetComponentFile();
+        ScriptComponent* jsc = (ScriptComponent*) serial;
+        ScriptComponentFile* file = jsc->GetComponentFile();
 
         if (file)
         {
+            const String& componentClassName = jsc->GetComponentClassName();
 
-            const HashMap<String, VariantType>& fields = file->GetFields();
+            const HashMap<String, VariantType>& fields = file->GetFields(componentClassName);
 
             if (fields.Contains(name))
             {
@@ -266,50 +225,13 @@ static int Serializable_GetAttribute(duk_context* ctx)
                 else
                 {
                     Variant v;
-                    file->GetDefaultFieldValue(name, v);
+                    file->GetDefaultFieldValue(name, v, componentClassName);
                     js_push_variant(ctx,  v);
                     return 1;
                 }
             }
         }
     }
-
-    if (serial->GetType() == CSComponent::GetTypeStatic())
-    {
-        CSComponent* csc = (CSComponent*) serial;
-        NETAssemblyFile* afile = csc->GetAssemblyFile();
-
-        if (afile)
-        {
-            NETComponentClass* componentClass = afile->GetComponentClass(csc->GetComponentClassName());
-
-            if (componentClass)
-            {
-                const HashMap<String, VariantType>& fields =  componentClass->GetFields();
-
-                if (fields.Contains(name))
-                {
-                    VariantMap& values = csc->GetFieldValues();
-
-                    if (values.Contains(name))
-                    {
-                        js_push_variant(ctx,  values[name]);
-                        return 1;
-                    }
-                    else
-                    {
-                        Variant v;
-                        componentClass->GetDefaultFieldValue(name, v);
-                        js_push_variant(ctx,  v);
-                        return 1;
-                    }
-                }
-
-            }
-        }
-
-    }
-
 
     duk_push_undefined(ctx);
     return 1;
@@ -415,7 +337,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
     duk_get_prop_index(ctx, -1, type);
 
     // return cached array of attrinfo, unless JSComponent which has dynamic fields
-    if (serial->GetType() != JSComponent::GetTypeStatic() && duk_is_object(ctx, -1))
+    if (serial->GetBaseType() != ScriptComponent::GetTypeStatic() && duk_is_object(ctx, -1))
         return 1;
 
     const Vector<AttributeInfo>* attrs = serial->GetAttributes();
@@ -491,37 +413,20 @@ static int Serializable_GetAttributes(duk_context* ctx)
     }
 
     // dynamic script fields
-    if (serial->GetType() == JSComponent::GetTypeStatic())
+    if (serial->GetBaseType() == ScriptComponent::GetTypeStatic())
     {
-        JSComponent* jsc = (JSComponent*) serial;
-        JSComponentFile* file = jsc->GetComponentFile();
+        ScriptComponent* jsc = (ScriptComponent*) serial;
+        ScriptComponentFile* file = jsc->GetComponentFile();
 
         if (file)
         {
 
-            const VariantMap& defaultFieldValues = file->GetDefaultFieldValues();
-            const HashMap<String, VariantType>& fields =  file->GetFields();
-            const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums();
+            const String& className = jsc->GetComponentClassName();
+            const VariantMap& defaultFieldValues = file->GetDefaultFieldValues(className);
+            const HashMap<String, VariantType>& fields =  file->GetFields(className);
+            const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums(className);
 
             GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
-        }
-    }
-    else if (serial->GetType() == CSComponent::GetTypeStatic())
-    {
-        CSComponent* csc = (CSComponent*) serial;
-        NETAssemblyFile* afile = csc->GetAssemblyFile();
-
-        if (afile)
-        {
-            NETComponentClass* componentClass = afile->GetComponentClass(csc->GetComponentClassName());
-
-            if (componentClass)
-            {
-                const VariantMap& defaultFieldValues = componentClass->GetDefaultFieldValues();
-                const HashMap<String, VariantType>& fields =  componentClass->GetFields();
-                const HashMap<String, Vector<EnumInfo>>& enums = componentClass->GetEnums();
-                GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
-            }
         }
     }
 

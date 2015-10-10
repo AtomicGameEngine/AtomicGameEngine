@@ -27,28 +27,15 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/Serializer.h>
 
-#include "NETComponentClass.h"
 #include "NETAssemblyFile.h"
 
 namespace Atomic
 {
 
-/*
+HashMap<StringHash, VariantType> NETAssemblyFile::typeMap_;
 
-"enums":[
-      {
-         "name":"BehaviorState",
-         "values":{
-            "Friendly":0,
-            "Aggressive":10,
-            "Neutral":11
-         }
-      }
-   ],
-
-*/
 NETAssemblyFile::NETAssemblyFile(Context* context) :
-    Resource(context)
+    ScriptComponentFile(context)
 {
 
 }
@@ -58,22 +45,89 @@ NETAssemblyFile::~NETAssemblyFile()
 
 }
 
-NETComponentClass* NETAssemblyFile::GetComponentClass(const String& name)
+void NETAssemblyFile::InitTypeMap()
 {
-    if (!componentClasses_.Contains(name))
-        return 0;
+    typeMap_["Boolean"] = VAR_BOOL;
+    typeMap_["Int32"] = VAR_INT;
+    typeMap_["Single"] = VAR_FLOAT;
+    typeMap_["Double"] = VAR_DOUBLE;
+    typeMap_["String"] = VAR_STRING;
+    typeMap_["Vector2"] = VAR_VECTOR2;
+    typeMap_["Vector3"] = VAR_VECTOR3;
+    typeMap_["Vector4"] = VAR_VECTOR4;
+    typeMap_["Quaternion"] = VAR_QUATERNION;
 
-    return componentClasses_[name];
+}
 
+bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
+{
+    if (!typeMap_.Size())
+        InitTypeMap();
+
+    String className = json.Get("name").GetString();
+
+    const JSONValue& jfields = json.Get("fields");
+
+    PODVector<StringHash> enumsAdded;
+
+    if (jfields.IsArray())
+    {
+        for (unsigned i = 0; i < jfields.GetArray().Size(); i++)
+        {
+            const JSONValue& jfield = jfields.GetArray().At(i);
+
+            VariantType varType = VAR_NONE;
+
+            bool isEnum = jfield.Get("isEnum").GetBool();
+            String typeName = jfield.Get("typeName").GetString();
+            String fieldName = jfield.Get("name").GetString();
+            String defaultValue = jfield.Get("defaultValue").GetString();
+
+            if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(typeName))
+            {
+                varType = VAR_INT;
+                enumsAdded.Push(typeName);
+                const Vector<EnumInfo>& einfos = assemblyEnums_[typeName];
+                for (unsigned i = 0; i < einfos.Size(); i++)
+                    AddEnum(typeName, einfos[i], className);
+            }
+
+            if (varType == VAR_NONE && typeMap_.Contains(typeName))
+                varType = typeMap_[typeName];
+
+            if (varType == VAR_NONE)
+            {
+                LOGERRORF("Component Class %s contains unmappable type %s in field %s",
+                          className.CString(), typeName.CString(), fieldName.CString());
+
+                continue;
+            }
+
+            if (defaultValue.Length())
+            {
+                Variant value;
+                value.FromString(varType, defaultValue);
+
+                AddDefaultValue(fieldName, value, className);
+            }
+
+            AddField(fieldName, varType, className);
+
+        }
+
+    }
+
+    return true;
 }
 
 bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
 {
-    componentClasses_.Clear();
-    enums_.Clear();
+    Clear();
+    assemblyEnums_.Clear();
 
     const JSONArray& enums = json.Get("enums").GetArray();
 
+    // parse to all enums hash
     for (unsigned i = 0; i < enums.Size(); i++)
     {
         const JSONValue& ejson = enums.At(i);
@@ -95,7 +149,7 @@ bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
             itr++;
         }
 
-        enums_[enumName] = values;
+        assemblyEnums_[enumName] = values;
     }
 
     const JSONArray& components = json.Get("components").GetArray();
@@ -104,10 +158,7 @@ bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
     {
         const JSONValue& cjson = components.At(i);
 
-        SharedPtr<NETComponentClass> c(new NETComponentClass(context_, this));
-
-        if (c->ParseJSON(cjson))
-            componentClasses_[c->GetName()] = c;
+        ParseComponentClassJSON(cjson);
     }
 
     return true;
