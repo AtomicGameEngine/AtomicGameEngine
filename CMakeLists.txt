@@ -36,6 +36,8 @@ if (NOT EMSCRIPTEN)
     set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} SDL Civetweb Recast Detour DetourCrowd DetourTileCache kNet )
 endif()
 
+add_definitions( -DATOMIC_WEB )
+
 if (MSVC)
 
     include(AtomicWindows)

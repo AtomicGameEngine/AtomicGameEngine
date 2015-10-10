@@ -20,7 +20,7 @@ set (JSFILES JSModuleAtomic2D.cpp;JSModuleAtomic3D.cpp;JSModuleAudio.cpp;JSModul
              JSModuleEngine.cpp;JSModuleEnvironment.cpp;JSModuleGraphics.cpp;JSModuleInput.cpp;
              JSModuleIO.cpp;JSModuleJavascript.cpp;JSModuleMath.cpp;JSModuleNavigation.cpp;
              JSModuleNetwork.cpp;JSModulePhysics.cpp;JSModuleResource.cpp;JSPackageAtomic.cpp;
-             JSModuleScene.cpp;JSModuleUI.cpp)
+             JSModuleScene.cpp;JSModuleUI.cpp;JSModuleWeb.cpp)
 
 foreach(JSFILE ${JSFILES})
 
