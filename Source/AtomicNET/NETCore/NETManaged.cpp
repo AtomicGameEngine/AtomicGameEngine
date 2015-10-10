@@ -5,9 +5,11 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/StringUtils.h>
 
+#include "NETCore.h"
+#include "NETManaged.h"
+
 #include "CSEventHelper.h"
 #include "CSComponent.h"
-#include "NETManaged.h"
 
 namespace Atomic
 {
@@ -20,11 +22,21 @@ NETManaged::NETManaged(Context* context) :
     CSBeginSendEvent_(0),
     NETUpdate_(0)
 {
+
 }
 
 NETManaged::~NETManaged()
 {
 
+}
+
+bool NETManaged::Initialize()
+{
+    NETCore* core = GetSubsystem<NETCore>();
+    core->CreateDelegate("AtomicNETEngine", "AtomicEngine.ComponentCore", "CSComponentCreate", (void**) &CSComponentCreate_);
+    core->CreateDelegate("AtomicNETEngine", "AtomicEngine.NativeCore", "NETUpdate", (void**) &NETUpdate_);
+
+    return true;
 }
 
 void NETManaged::SetNETUpdate(NETUpdateFunctionPtr ptr)
@@ -40,12 +52,12 @@ void NETManaged::NETUpdate(float timeStep)
     NETUpdate_(timeStep);
 }
 
-CSComponent* NETManaged::CSComponentCreate(const String& componentName)
+CSComponent* NETManaged::CSComponentCreate(const String& assemblyName, const String& componentName)
 {
     if (!CSComponentCreate_)
         return 0;
 
-    return CSComponentCreate_(componentName.CString());
+    return CSComponentCreate_(assemblyName.CString(), componentName.CString());
 
 }
 

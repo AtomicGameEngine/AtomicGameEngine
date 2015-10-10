@@ -30,9 +30,11 @@
 namespace Atomic
 {
 
+class NETCore;
+
 typedef void (*NETUpdateFunctionPtr)(float timeStep);
 
-typedef CSComponent* (*CSComponentCreateFunctionPtr)(const char* csComponentTypeName);
+typedef CSComponent* (*CSComponentCreateFunctionPtr)(const char* assemblyName, const char* csComponentTypeName);
 typedef void (*CSComponentCallMethodFunctionPtr)(unsigned id, CSComponentMethod method, float value);
 typedef void (*CSBeginSendEventFunctionPtr)(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 
@@ -46,6 +48,8 @@ public:
     /// Destruct.
     virtual ~NETManaged();
 
+    bool Initialize();
+
     void SetNETUpdate(NETUpdateFunctionPtr ptr);
 
     void SetCSComponentCreate(CSComponentCreateFunctionPtr ptr);
@@ -54,7 +58,7 @@ public:
 
     void NETUpdate(float timeStep);
 
-    CSComponent* CSComponentCreate(const String& componentName);
+    CSComponent* CSComponentCreate(const String& assemblyName, const String& componentName);
     void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
     void CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 

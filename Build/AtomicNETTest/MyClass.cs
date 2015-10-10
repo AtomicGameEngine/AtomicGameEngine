@@ -13,6 +13,13 @@ namespace AtomicNETTest
 
     public class MyComponent : CSComponent
     {
+
+        public override void Update(float timeStep)
+        {
+            Node.Yaw(timeStep * 75);
+            //Console.WriteLine("TICK! : {0}", nativeInstance);
+        }
+
         [Inspector]
         public bool MyBoolValue = true;
 
@@ -25,7 +32,7 @@ namespace AtomicNETTest
         [Inspector]
         public Quaternion MyQuaternionValue = new Quaternion(1, 0, 0, 0);
 
-        [Inspector(Value1 = "This is a", Value2 = "test")]
+        [Inspector()]
         public float MyFloatValue = 42.0f;
 
         [Inspector]

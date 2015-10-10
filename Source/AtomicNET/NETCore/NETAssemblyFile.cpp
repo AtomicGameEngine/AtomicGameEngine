@@ -23,10 +23,12 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/IO/Deserializer.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Core/Profiler.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/Serializer.h>
 
+#include "NETManaged.h"
 #include "NETAssemblyFile.h"
 
 namespace Atomic
@@ -57,6 +59,19 @@ void NETAssemblyFile::InitTypeMap()
     typeMap_["Vector4"] = VAR_VECTOR4;
     typeMap_["Quaternion"] = VAR_QUATERNION;
 
+}
+
+CSComponent* NETAssemblyFile::CreateCSComponent(const String& classname)
+{
+    const String& name = GetName();
+
+    // TODO: cache this
+    String pathName, fileName, ext;
+    SplitPath(name, pathName, fileName, ext);
+
+    NETManaged* managed = GetSubsystem<NETManaged>();
+
+    return managed->CSComponentCreate(fileName, classname);
 }
 
 bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)

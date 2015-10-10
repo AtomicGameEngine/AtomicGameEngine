@@ -82,18 +82,6 @@ NETCore::NETCore(Context* context) :
     assert(!instance_);
     instance_ = this;
     csContext_ = context;
-
-    SharedPtr<NETManaged> managed(new NETManaged(context_));
-    context_->RegisterSubsystem(managed);
-
-    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
-    context_->RegisterSubsystem(dispatcher);
-    context_->AddGlobalEventListener(dispatcher);
-
-    if (!context_->GetEditorContext())
-    {
-        SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
-    }
 }
 
 NETCore::~NETCore()
@@ -366,8 +354,6 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
         startup();
     }
 
-    /*
-
     st = sCreateDelegate(hostHandle_,
                     domainId_,
                     "AtomicNETEngine",
@@ -379,6 +365,9 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     {
         startup();
     }
+
+    /*
+
 
     RefCountedDeletedFunction rcdFunction;
 
@@ -437,6 +426,20 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
             "/Users/josh/Desktop/OSX.x64.Debug/HelloWorld.exe",
             (unsigned int*)&exitCode);
     */
+
+    SharedPtr<NETManaged> managed(new NETManaged(context_));
+    context_->RegisterSubsystem(managed);
+
+    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
+    context_->RegisterSubsystem(dispatcher);
+    context_->AddGlobalEventListener(dispatcher);
+
+    if (!context_->GetEditorContext())
+    {
+        SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
+    }
+
+    managed->Initialize();
 
     return true;
 

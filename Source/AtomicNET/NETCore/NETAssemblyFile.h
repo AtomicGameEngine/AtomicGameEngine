@@ -32,6 +32,8 @@
 namespace Atomic
 {
 
+class CSComponent;
+
 // At runtime we need to load the assembly, in the editor we use metadata
 /// NET Assembly resource.
 class ATOMIC_API NETAssemblyFile : public ScriptComponentFile
@@ -47,6 +49,8 @@ public:
     virtual ~NETAssemblyFile();
 
     bool ParseAssemblyJSON(const JSONValue& json);
+
+    CSComponent* CreateCSComponent(const String& classname);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
     virtual bool BeginLoad(Deserializer& source);

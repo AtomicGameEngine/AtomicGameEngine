@@ -27,8 +27,9 @@ public static class Atomic
     PhysicsModule.Initialize ();
     EnvironmentModule.Initialize ();
     UIModule.Initialize ();
+    AtomicNETModule.Initialize();
     AtomicPlayer.PlayerModule.Initialize ();
-    initSubsystems();
+    //initSubsystems();
   }
 
   static Dictionary<Type, RefCounted> subSystems = new Dictionary<Type, RefCounted>();
@@ -72,7 +73,7 @@ public partial class RefCounted
     nativeInstance = native;
   }
 
-  public IntPtr nativeInstance;
+  public IntPtr nativeInstance = IntPtr.Zero;
 
   [DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
   public static extern IntPtr csb_Atomic_RefCounted_GetClassID (IntPtr self);
@@ -142,11 +143,7 @@ static class NativeCore
     GC.Collect();
     ReleaseExpiredNativeReferences();
 
-    if (test == IntPtr.Zero || !nativeLookup.ContainsKey(test))
-    {
-      test = Atomic.GetSubsystem<Renderer>().GetDefaultZone().nativeInstance;
-      //Console.WriteLine("Allocated: " + test);
-    }
+    ComponentCore.Update(timeStep);
 
   }
 
@@ -224,13 +221,11 @@ static class NativeCore
 
 public class InspectorAttribute : Attribute
 {
-  public InspectorAttribute(string DefaultValue = "", string Value1 = "", string Value2 = "")
+  public InspectorAttribute(string DefaultValue = "")
   {
   }
 
   public string DefaultValue;
-  public string Value1;
-  public string Value2;
 }
 
 

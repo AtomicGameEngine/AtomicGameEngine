@@ -162,7 +162,7 @@ void CSPackageWriter::GenerateNativeSource()
         source += "using namespace Atomic;\n";
 
     // begin namespace
-    source += ToString("using namespace %s;\n", packageName);
+    // source += ToString("using namespace %s;\n", packageName);
 
     source += ToString("namespace %s\n{\n", packageName);
 

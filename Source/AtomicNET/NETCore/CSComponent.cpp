@@ -66,6 +66,7 @@ public:
         // At runtime, a XML CSComponent may refer to a managed component
 
         String managedClass;
+        String assemblyRef;
 
         if (source != XMLElement::EMPTY)
         {
@@ -73,22 +74,40 @@ public:
 
             while (attrElem)
             {
-                if (attrElem.GetAttribute("name") == "ManagedClass")
+                if (attrElem.GetAttribute("name") == "Assembly")
+                {
+                    assemblyRef = attrElem.GetAttribute("value");
+                }
+                else if (attrElem.GetAttribute("name") == "Class")
                 {
                     managedClass = attrElem.GetAttribute("value");
-                    break;
                 }
+
+                if (assemblyRef.Length() && managedClass.Length())
+                    break;
 
                 attrElem = attrElem.GetNext("attribute");
             }
-        }
+        }               
 
         SharedPtr<Object> ptr;
 
-        if (managedClass.Length())
+        if (assemblyRef.Length())
         {
-            // change to callback
-            //ptr = CSComponentCreate(managedClass);
+            Vector<String> split = assemblyRef.Split(';');
+
+            if (split.Size() == 2)
+            {
+                ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
+                NETAssemblyFile* componentFile = cache->GetResource<NETAssemblyFile>(split[1]);
+                if (componentFile)
+                    ptr = componentFile->CreateCSComponent(managedClass);
+                else
+                {
+                    LOGERRORF("Unable to load component file %s", split[1].CString());
+                }
+            }
+
         }
 
         if (ptr.Null())

@@ -71,14 +71,16 @@ void AEEditorCommon::Setup()
 
     // Instantiate and register the AtomicNET subsystem
     SharedPtr<NETCore> netCore (new NETCore(context_));
+    context_->RegisterSubsystem(netCore);
     String netCoreErrorMsg;
     if (!netCore->Initialize("/Users/josh/Desktop/OSX.x64.Debug/", netCoreErrorMsg))
     {
         LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
+        context_->RemoveSubsystem(NETCore::GetTypeStatic());
     }
     else
     {
-        context_->RegisterSubsystem(netCore);
+
     }
 #endif
 
