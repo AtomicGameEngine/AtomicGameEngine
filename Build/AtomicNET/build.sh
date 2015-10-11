@@ -22,3 +22,5 @@ mcs /out:/Users/josh/Dev/atomic/AtomicExamples/NET/Basic3D/Resources/Assemblies/
 /r:System.Console.dll /r:System.Runtime.dll /r:System.IO.dll /r:System.IO.FileSystem.dll /r:mscorlib.dll \
 /r:/Users/josh/Desktop/AtomicNETEngine.dll \
 /Users/josh/Dev/atomic/AtomicGameEngine/Build/AtomicNETTest/MyClass.cs
+
+cp /Users/josh/Dev/atomic/AtomicExamples/NET/Basic3D/Resources/Assemblies/AtomicNETTest.dll /Users/josh/Desktop/AtomicNETTest.dll
