@@ -31,10 +31,13 @@ namespace Atomic
 {
 
 class NETCore;
+class NETVariantMap;
 
 typedef void (*NETUpdateFunctionPtr)(float timeStep);
 
 typedef CSComponent* (*CSComponentCreateFunctionPtr)(const char* assemblyName, const char* csComponentTypeName);
+typedef void (*CSComponentApplyFieldsPtr)(CSComponent* componentPtr, NETVariantMap* fieldMapPtr);
+
 typedef void (*CSComponentCallMethodFunctionPtr)(unsigned id, CSComponentMethod method, float value);
 typedef void (*CSBeginSendEventFunctionPtr)(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 
@@ -50,21 +53,19 @@ public:
 
     bool Initialize();
 
-    void SetNETUpdate(NETUpdateFunctionPtr ptr);
-
-    void SetCSComponentCreate(CSComponentCreateFunctionPtr ptr);
-    void SetCSComponentCallMethod(CSComponentCallMethodFunctionPtr ptr);
-    void SetCSBeginSendEvent(CSBeginSendEventFunctionPtr ptr);
-
     void NETUpdate(float timeStep);
 
     CSComponent* CSComponentCreate(const String& assemblyName, const String& componentName);
+    void CSComponentApplyFields(CSComponent* component, NETVariantMap* fieldMapPtr);
+
+
     void CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value = 0.0f);
     void CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 
 private:
 
     CSComponentCreateFunctionPtr CSComponentCreate_;
+    CSComponentApplyFieldsPtr CSComponentApplyFields_;
     CSComponentCallMethodFunctionPtr CSComponentCallMethod_;
     CSBeginSendEventFunctionPtr CSBeginSendEvent_;
     NETUpdateFunctionPtr NETUpdate_;

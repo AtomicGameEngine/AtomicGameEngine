@@ -211,15 +211,15 @@ static int Serializable_GetAttribute(duk_context* ctx)
         {
             const String& componentClassName = jsc->GetComponentClassName();
 
-            const HashMap<String, VariantType>& fields = file->GetFields(componentClassName);
+            const FieldMap& fields = file->GetFields(componentClassName);
 
             if (fields.Contains(name))
             {
-                VariantMap& values = jsc->GetFieldValues();
+                const VariantMap& values = jsc->GetFieldValues();
 
-                if (values.Contains(name))
+                if (Variant* vptr = values[name])
                 {
-                    js_push_variant(ctx,  values[name]);
+                    js_push_variant(ctx,  *vptr);
                     return 1;
                 }
                 else
@@ -257,8 +257,8 @@ static const String& GetResourceRefClassName(Context* context, const ResourceRef
 }
 
 static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const VariantMap& defaultFieldValues,
-                                 const HashMap<String, VariantType>& fields,
-                                 const HashMap<String, Vector<EnumInfo>>& enums)
+                                 const FieldMap& fields,
+                                 const EnumMap& enums)
 {
     if (fields.Size())
     {
@@ -423,8 +423,8 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
             const String& className = jsc->GetComponentClassName();
             const VariantMap& defaultFieldValues = file->GetDefaultFieldValues(className);
-            const HashMap<String, VariantType>& fields =  file->GetFields(className);
-            const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums(className);
+            const FieldMap& fields =  file->GetFields(className);
+            const EnumMap& enums = file->GetEnums(className);
 
             GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
         }

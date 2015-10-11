@@ -33,6 +33,7 @@ namespace Atomic
 {
 
 class CSComponent;
+class NETVariantMap;
 
 // At runtime we need to load the assembly, in the editor we use metadata
 /// NET Assembly resource.

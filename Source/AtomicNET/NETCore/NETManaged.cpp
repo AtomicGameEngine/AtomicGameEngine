@@ -18,6 +18,7 @@ namespace Atomic
 NETManaged::NETManaged(Context* context) :
     Object(context),
     CSComponentCreate_(0),
+    CSComponentApplyFields_(0),
     CSComponentCallMethod_(0),
     CSBeginSendEvent_(0),
     NETUpdate_(0)
@@ -34,14 +35,10 @@ bool NETManaged::Initialize()
 {
     NETCore* core = GetSubsystem<NETCore>();
     core->CreateDelegate("AtomicNETEngine", "AtomicEngine.ComponentCore", "CSComponentCreate", (void**) &CSComponentCreate_);
+    core->CreateDelegate("AtomicNETEngine", "AtomicEngine.ComponentCore", "CSComponentApplyFields", (void**) &CSComponentApplyFields_);
     core->CreateDelegate("AtomicNETEngine", "AtomicEngine.NativeCore", "NETUpdate", (void**) &NETUpdate_);
 
     return true;
-}
-
-void NETManaged::SetNETUpdate(NETUpdateFunctionPtr ptr)
-{
-    NETUpdate_ = ptr;
 }
 
 void NETManaged::NETUpdate(float timeStep)
@@ -61,6 +58,15 @@ CSComponent* NETManaged::CSComponentCreate(const String& assemblyName, const Str
 
 }
 
+void NETManaged::CSComponentApplyFields(CSComponent* component, NETVariantMap* fieldMapPtr)
+{
+    if (!CSComponentApplyFields_ || !component || !fieldMapPtr)
+        return;
+
+    CSComponentApplyFields_(component, fieldMapPtr);
+
+}
+
 void NETManaged::CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value)
 {
     if (!CSComponentCallMethod_)
@@ -77,21 +83,6 @@ void NETManaged::CSBeginSendEvent(unsigned senderRefID, unsigned eventType, Vari
 
     CSBeginSendEvent_(senderRefID, eventType, eventData);
 
-}
-
-void NETManaged::SetCSComponentCreate(CSComponentCreateFunctionPtr ptr)
-{
-    CSComponentCreate_ = ptr;
-}
-
-void NETManaged::SetCSComponentCallMethod(CSComponentCallMethodFunctionPtr ptr)
-{
-    CSComponentCallMethod_ = ptr;
-}
-
-void NETManaged::SetCSBeginSendEvent(CSBeginSendEventFunctionPtr ptr)
-{
-    CSBeginSendEvent_ = ptr;
 }
 
 }

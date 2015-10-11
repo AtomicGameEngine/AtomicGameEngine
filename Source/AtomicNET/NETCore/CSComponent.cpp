@@ -33,8 +33,10 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/SceneEvents.h>
 
+#include "NETVariant.h"
+#include "NETManaged.h"
 #include "CSComponent.h"
-//#include "AtomicSharpAPI.h"
+
 
 namespace Atomic
 {
@@ -120,15 +122,7 @@ public:
 
 
 CSComponent::CSComponent(Context* context) :
-    ScriptComponent(context),
-    updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
-    currentEventMask_(0),
-    instanceInitialized_(false),
-    started_(false),
-    destroyed_(false),
-    scriptClassInstance_(false),
-    delayedStartCalled_(false),
-    loading_(false)
+    ScriptComponent(context)
 {
 
 }
@@ -153,69 +147,24 @@ void CSComponent::RegisterObject(Context* context)
 
 void CSComponent::OnSetEnabled()
 {
-    UpdateEventSubscription();
-}
-
-void CSComponent::SetUpdateEventMask(unsigned char mask)
-{
-    if (updateEventMask_ != mask)
-    {
-        updateEventMask_ = mask;
-        UpdateEventSubscription();
-    }
 }
 
 void CSComponent::ApplyAttributes()
 {
 }
 
-void CSComponent::CallScriptMethod(CSComponentMethod method, float value)
+void CSComponent::ApplyFieldValues()
 {
-    if (destroyed_ || !node_ || !node_->GetScene())
+    if (!fieldValues_.Size())
         return;
 
-    // Change to callback
-    //CSComponentCallMethod(GetRefID(), method, value);
+    SharedPtr<NETVariantMap> vmap(new NETVariantMap());
+    vmap->CopySourceVariantMap(fieldValues_);
 
-}
+    NETManaged* managed = GetSubsystem<NETManaged>();
 
-void CSComponent::Start()
-{
-    CallScriptMethod(CSComponentMethod_Start);
-}
+    managed->CSComponentApplyFields(this, vmap);
 
-void CSComponent::DelayedStart()
-{
-    CallScriptMethod(CSComponentMethod_DelayedStart);
-}
-
-void CSComponent::Update(float timeStep)
-{
-    //if (!instanceInitialized_)
-    //    InitInstance();
-
-    if (!started_)
-    {
-        started_ = true;
-        Start();
-    }
-
-    CallScriptMethod(CSComponentMethod_Update, timeStep);
-}
-
-void CSComponent::PostUpdate(float timeStep)
-{
-    CallScriptMethod(CSComponentMethod_PostUpdate, timeStep);
-}
-
-void CSComponent::FixedUpdate(float timeStep)
-{
-    CallScriptMethod(CSComponentMethod_FixedUpdate, timeStep);
-}
-
-void CSComponent::FixedPostUpdate(float timeStep)
-{
-    CallScriptMethod(CSComponentMethod_PostFixedUpdate, timeStep);
 }
 
 void CSComponent::OnNodeSet(Node* node)
@@ -228,155 +177,23 @@ void CSComponent::OnNodeSet(Node* node)
     {
         // We are being detached from a node: execute user-defined stop function and prepare for destruction
         //UpdateReferences(true);
-        Stop();
+        //Stop();
     }
 }
 
 void CSComponent::OnSceneSet(Scene* scene)
 {
-    if (scene)
-        UpdateEventSubscription();
-    else
-    {
-        UnsubscribeFromEvent(E_SCENEUPDATE);
-        UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
-#ifdef ATOMIC_PHYSICS
-        UnsubscribeFromEvent(E_PHYSICSPRESTEP);
-        UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
-#endif
-        currentEventMask_ = 0;
-    }
 }
-
-void CSComponent::UpdateEventSubscription()
-{
-    Scene* scene = GetScene();
-    if (!scene)
-        return;
-
-    bool enabled = IsEnabledEffective();
-
-    bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
-    if (needUpdate && !(currentEventMask_ & USE_UPDATE))
-    {
-        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(CSComponent, HandleSceneUpdate));
-        currentEventMask_ |= USE_UPDATE;
-    }
-    else if (!needUpdate && (currentEventMask_ & USE_UPDATE))
-    {
-        UnsubscribeFromEvent(scene, E_SCENEUPDATE);
-        currentEventMask_ &= ~USE_UPDATE;
-    }
-
-    bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
-    if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
-    {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(CSComponent, HandleScenePostUpdate));
-        currentEventMask_ |= USE_POSTUPDATE;
-    }
-    else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
-    {
-        UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-        currentEventMask_ &= ~USE_POSTUPDATE;
-    }
-
-#ifdef ATOMIC_PHYSICS
-    PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
-    if (!world)
-        return;
-
-    bool needFixedUpdate = enabled && (updateEventMask_ & USE_FIXEDUPDATE);
-    if (needFixedUpdate && !(currentEventMask_ & USE_FIXEDUPDATE))
-    {
-        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(CSComponent, HandlePhysicsPreStep));
-        currentEventMask_ |= USE_FIXEDUPDATE;
-    }
-    else if (!needFixedUpdate && (currentEventMask_ & USE_FIXEDUPDATE))
-    {
-        UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
-        currentEventMask_ &= ~USE_FIXEDUPDATE;
-    }
-
-    bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
-    if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
-    {
-        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(CSComponent, HandlePhysicsPostStep));
-        currentEventMask_ |= USE_FIXEDPOSTUPDATE;
-    }
-    else if (!needFixedPostUpdate && (currentEventMask_ & USE_FIXEDPOSTUPDATE))
-    {
-        UnsubscribeFromEvent(world, E_PHYSICSPOSTSTEP);
-        currentEventMask_ &= ~USE_FIXEDPOSTUPDATE;
-    }
-#endif
-}
-
-void CSComponent::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace SceneUpdate;
-
-    assert(!destroyed_);
-
-    // Execute user-defined delayed start function before first update
-    if (!delayedStartCalled_)
-    {
-        DelayedStart();
-        delayedStartCalled_ = true;
-
-        // If did not need actual update events, unsubscribe now
-        if (!(updateEventMask_ & USE_UPDATE))
-        {
-            UnsubscribeFromEvent(GetScene(), E_SCENEUPDATE);
-            currentEventMask_ &= ~USE_UPDATE;
-            return;
-        }
-    }
-
-    // Then execute user-defined update function
-    Update(eventData[P_TIMESTEP].GetFloat());
-}
-
-void CSComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace ScenePostUpdate;
-
-    // Execute user-defined post-update function
-    PostUpdate(eventData[P_TIMESTEP].GetFloat());
-}
-
-#ifdef ATOMIC_PHYSICS
-void CSComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
-{
-    using namespace PhysicsPreStep;
-
-    // Execute user-defined fixed update function
-    FixedUpdate(eventData[P_TIMESTEP].GetFloat());
-}
-
-void CSComponent::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
-{
-    using namespace PhysicsPostStep;
-
-    // Execute user-defined fixed post-update function
-    FixedPostUpdate(eventData[P_TIMESTEP].GetFloat());
-}
-#endif
 
 bool CSComponent::Load(Deserializer& source, bool setInstanceDefault)
 {
-    loading_ = true;
     bool success = Component::Load(source, setInstanceDefault);
-    loading_ = false;
-
     return success;
 }
 
 bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
-    loading_ = true;
     bool success = Component::LoadXML(source, setInstanceDefault);
-    loading_ = false;
-
     return success;
 }
 

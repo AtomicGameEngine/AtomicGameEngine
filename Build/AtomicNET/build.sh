@@ -6,6 +6,7 @@ mcs /out:/Users/josh/Desktop/OSX.x64.Debug/AtomicNETBootstrap.dll /nostdlib /noc
 
 mcs /out:/Users/josh/Desktop/AtomicNETEngine.dll /nostdlib /noconfig /t:library /w:0 /lib:/Users/josh/Desktop/OSX.x64.Debug \
 /r:System.Console.dll /r:System.Runtime.dll /r:System.IO.dll /r:System.IO.FileSystem.dll /r:mscorlib.dll \
+/r:System.Linq.dll \
 /Users/josh/Dev/atomic/AtomicGameEngine/Build/Source/Generated/MACOSX/CSharp/Packages/Atomic/Managed/*.cs \
 /Users/josh/Dev/atomic/AtomicGameEngine/Build/Source/Generated/MACOSX/CSharp/Packages/AtomicNET/Managed/*.cs \
 /Users/josh/Dev/atomic/AtomicGameEngine/Build/Source/Generated/MACOSX/CSharp/Packages/AtomicPlayer/Managed/*.cs \

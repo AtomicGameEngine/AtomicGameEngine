@@ -25,7 +25,7 @@ void ScriptComponentFile::RegisterObject(Context* context)
 
 void ScriptComponentFile::AddEnum(const String& enumName, const EnumInfo& enumInfo, const String& classname)
 {
-    EnumMap enums = classEnums_[classname];
+    EnumMap& enums = classEnums_[classname];
     Vector<EnumInfo>& enumValues = enums[enumName];
     enumValues.Push(enumInfo);
 }

@@ -98,13 +98,13 @@ bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
             String fieldName = jfield.Get("name").GetString();
             String defaultValue = jfield.Get("defaultValue").GetString();
 
-            if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(typeName))
+            if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(fieldName))
             {
                 varType = VAR_INT;
-                enumsAdded.Push(typeName);
+                enumsAdded.Push(fieldName);
                 const Vector<EnumInfo>& einfos = assemblyEnums_[typeName];
                 for (unsigned i = 0; i < einfos.Size(); i++)
-                    AddEnum(typeName, einfos[i], className);
+                    AddEnum(/*typeName*/fieldName, einfos[i], className);
             }
 
             if (varType == VAR_NONE && typeMap_.Contains(typeName))
