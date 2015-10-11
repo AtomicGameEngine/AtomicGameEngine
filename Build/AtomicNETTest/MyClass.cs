@@ -17,7 +17,7 @@ namespace AtomicNETTest
         public override void Update(float timeStep)
         {
             Node.Yaw(timeStep * 75);
-            //Console.WriteLine("TICK! : {0}", nativeInstance);
+            Console.WriteLine("TICK! : {0}", MySprite2DValue.Texture.Name);
         }
 
         [Inspector]
@@ -25,6 +25,9 @@ namespace AtomicNETTest
 
         [Inspector]
         public int MyIntValue = 5;
+
+        [Inspector]
+        public int MyOtherIntValue = 101;
 
         [Inspector]
         public Vector3 MyVector3Value = new Vector3(1, 1, 1);
@@ -42,7 +45,7 @@ namespace AtomicNETTest
         public BehaviorState State = BehaviorState.Neutral;
 
         [Inspector("Sprites/star.png")]
-        public Sprite2D sprite2D;
+        public Sprite2D MySprite2DValue;
 
     }
 

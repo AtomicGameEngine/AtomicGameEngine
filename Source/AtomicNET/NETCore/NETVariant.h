@@ -2,6 +2,9 @@
 #pragma once
 
 #include <Atomic/Core/Variant.h>
+#include <Atomic/Resource/ResourceCache.h>
+
+#include "NETCore.h"
 
 namespace Atomic
 {
@@ -110,6 +113,25 @@ public:
             return VAR_NONE;
 
         return variant->GetType();
+    }
+
+    Resource* GetResourceFromRef(StringHash key) const
+    {
+        Variant* variant = vmap_[key];
+
+        if (variant && variant->GetType() == VAR_RESOURCEREF)
+        {
+            const ResourceRef& ref = variant->GetResourceRef();
+
+            if (!ref.name_.Length())
+                return 0;
+
+            return NETCore::GetContext()->GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_);
+
+        }
+
+        return 0;
+
     }
 
 

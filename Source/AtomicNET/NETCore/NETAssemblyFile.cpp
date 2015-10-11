@@ -112,16 +112,50 @@ bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
 
             if (varType == VAR_NONE)
             {
-                LOGERRORF("Component Class %s contains unmappable type %s in field %s",
+                // FIXME: We need to be able to test if a type is a ResourceRef, this isn't really the way to achieve that
+                const HashMap<StringHash, SharedPtr<ObjectFactory>>& factories = context_->GetObjectFactories();
+                HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator itr = factories.Begin();
+
+                while (itr != factories.End())
+                {
+                    if ( itr->second_->GetTypeName() == typeName)
+                    {
+                        varType = VAR_RESOURCEREF;
+                        break;
+                    }
+
+                    itr++;
+                }
+
+                if (varType == VAR_NONE)
+                {
+                    LOGERRORF("Component Class %s contains unmappable type %s in field %s",
                           className.CString(), typeName.CString(), fieldName.CString());
 
-                continue;
+                    continue;
+                }
+
             }
 
-            if (defaultValue.Length())
+            if (!defaultValue.Length() && varType == VAR_RESOURCEREF)
+            {
+                // We still need a default value for ResourceRef's so we know the classtype
+                AddDefaultValue(fieldName, ResourceRef(typeName), className);
+            }
+            else
             {
                 Variant value;
-                value.FromString(varType, defaultValue);
+
+                if (varType == VAR_RESOURCEREF)
+                {
+                    ResourceRef rref(typeName);
+                    rref.name_ = defaultValue;
+                    value = rref;
+                }
+                else
+                {
+                    value.FromString(varType, defaultValue);
+                }
 
                 AddDefaultValue(fieldName, value, className);
             }

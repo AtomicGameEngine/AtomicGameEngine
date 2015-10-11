@@ -111,6 +111,10 @@ public static class ComponentCore
                   {
                     field.SetValue(component, fieldMap.GetQuaternion(field.Name));
                   }
+                  else if (fieldType.IsSubclassOf(typeof(Resource)))
+                  {
+                      field.SetValue(component, fieldMap.GetResourceFromRef(field.Name));
+                  }
                   else if (fieldType.IsSubclassOf(typeof(RefCounted)))
                   {
                       field.SetValue(component, fieldMap.GetPtr(field.Name));
