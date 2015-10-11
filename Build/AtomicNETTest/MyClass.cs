@@ -11,13 +11,28 @@ namespace AtomicNETTest
       Neutral
     }
 
+
+    public class Spinner : CSComponent
+    {
+
+        [Inspector]
+        float speed = 1.0f;
+
+        public override void Update(float timeStep)
+        {
+          Node.Yaw(timeStep * speed * 75.0f);
+
+          Console.WriteLine("TICK! : {0}", speed);
+        }
+    }
+
     public class MyComponent : CSComponent
     {
 
         public override void Update(float timeStep)
         {
-            Node.Yaw(timeStep * 75);
-            Console.WriteLine("TICK! : {0}", MySprite2DValue.Texture.Name);
+            //Node.Yaw(timeStep * 75);
+
         }
 
         [Inspector]
@@ -44,8 +59,12 @@ namespace AtomicNETTest
         [Inspector]
         public BehaviorState State = BehaviorState.Neutral;
 
-        [Inspector("Sprites/star.png")]
+        [Inspector("Textures/chest.png")]
         public Sprite2D MySprite2DValue;
+
+        [Inspector(DefaultValue = "Textures/chest.png")]
+        public Sprite2D MyOtherSprite2DValue;
+
 
     }
 

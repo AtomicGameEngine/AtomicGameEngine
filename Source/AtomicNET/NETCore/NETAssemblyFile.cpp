@@ -98,6 +98,20 @@ bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
             String fieldName = jfield.Get("name").GetString();
             String defaultValue = jfield.Get("defaultValue").GetString();
 
+            if (!defaultValue.Length())
+            {
+                JSONArray caPos = jfield.Get("caPos").GetArray();
+                if (caPos.Size())
+                    defaultValue = caPos[0].GetString();
+            }
+
+            if (!defaultValue.Length())
+            {
+                JSONObject caNamed = jfield.Get("caNamed").GetObject();
+                if (caNamed.Contains("DefaultValue"))
+                    defaultValue = caNamed["DefaultValue"].GetString();
+            }
+
             if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(fieldName))
             {
                 varType = VAR_INT;

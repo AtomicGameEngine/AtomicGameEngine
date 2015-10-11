@@ -141,7 +141,7 @@ public static class ComponentCore
 
     if (!componentClassFields.ContainsKey(type))
     {
-      var fields = type.GetFields()
+      var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
           .Where(field => field.IsDefined(typeof(InspectorAttribute), true));
 
       componentClassFields[type] = fields.ToArray<FieldInfo>();
