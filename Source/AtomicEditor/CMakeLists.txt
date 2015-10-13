@@ -88,7 +88,7 @@ elseif(LINUX)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     endif()
 else()
-    target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
+    target_link_libraries(AtomicEditor NETCore libcurl Iphlpapi Wldap32)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD

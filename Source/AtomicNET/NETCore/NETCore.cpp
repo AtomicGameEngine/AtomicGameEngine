@@ -12,6 +12,11 @@
 #include "NETManaged.h"
 #include "NETAssemblyFile.h"
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#include "Platforms/Windows/NETHostWindows.h"
+#else
+#endif
+
 namespace Atomic
 {
 
@@ -24,6 +29,8 @@ export PAL_DBG_CHANNELS="+all.all"
 
 #ifdef ATOMIC_PLATFORM_OSX
 static const char * const sCoreClrDll = "libcoreclr.dylib";
+#elif ATOMIC_PLATFORM_WINDOWS
+static const char * const sCoreClrDll = "coreclr.dll";
 #else
 static const char * const sCoreClrDll = "libcoreclr.so";
 #endif
@@ -202,7 +209,7 @@ extern "C"
 
 int csb_Atomic_Test(unsigned id)
 {
-  printf("Flibberty Gibbets %u", id);
+  //printf("Flibberty Gibbets %u", id);
   return id;
 }
 
@@ -257,6 +264,15 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 {
     coreCLRFilesAbsPath_ = AddTrailingSlash(coreCLRFilesAbsPath);
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    netHost_ = new NETHostWindows(context_);
+#else
+#endif
+
+    netHost_->Initialize(coreCLRFilesAbsPath_);
+
+#ifdef disabled
+
     if (!InitCoreCLRDLL(errorMsg))
     {
         Shutdown();
@@ -291,7 +307,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     String tpaList;
     GenerateTPAList(tpaList);
 
-    String appPath = "/Users/josh/Desktop/";
+    String appPath = coreCLRFilesAbsPath_;// "/Users/josh/Desktop/";
     Vector<String> nativeSearch;
     nativeSearch.Push(coreCLRFilesAbsPath_);
     //nativeSearch.Push("/Users/josh/Dev/atomic/AtomicGameEngine-build/Source/AtomicNET/NETNative");
@@ -314,7 +330,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     };
 
     int st = sInitializeCoreCLR(
-                "AtomicEditor",
+                "AtomicEditor.exe",
                 "NETCore",
                 sizeof(propertyKeys) / sizeof(propertyKeys[0]),
                 propertyKeys,
@@ -440,6 +456,8 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
     }
 
     managed->Initialize();
+
+#endif
 
     return true;
 

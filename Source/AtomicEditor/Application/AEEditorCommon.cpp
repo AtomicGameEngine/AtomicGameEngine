@@ -73,7 +73,14 @@ void AEEditorCommon::Setup()
     SharedPtr<NETCore> netCore (new NETCore(context_));
     context_->RegisterSubsystem(netCore);
     String netCoreErrorMsg;
-    if (!netCore->Initialize("/Users/josh/Desktop/OSX.x64.Debug/", netCoreErrorMsg))
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    String coreCLRAbsPath = "C:/Dev/coreclr/x64/";
+#else
+    String coreCLRAbsPath = "/Users/josh/Desktop/OSX.x64.Debug/";
+#endif
+
+    if (!netCore->Initialize(coreCLRAbsPath, netCoreErrorMsg))
     {
         LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
         context_->RemoveSubsystem(NETCore::GetTypeStatic());

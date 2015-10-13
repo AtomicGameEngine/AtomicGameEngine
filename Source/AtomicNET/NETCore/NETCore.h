@@ -28,6 +28,8 @@
 namespace Atomic
 {
 
+class NETHost;
+
 class ATOMIC_API NETCore : public Object
 {
 
@@ -59,6 +61,8 @@ private:
     void* coreCLRDLLHandle_;
     void* hostHandle_;
     unsigned domainId_;
+
+    SharedPtr<NETHost> netHost_;
 
     /// weak local context ref, so avoid recursion in static GetContext call
     static WeakPtr<Context> csContext_;
