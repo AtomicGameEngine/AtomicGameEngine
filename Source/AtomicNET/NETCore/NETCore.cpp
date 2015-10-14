@@ -239,6 +239,24 @@ ATOMIC_EXPORT_API void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
 
 }
 
+void NETCore::AddAssemblyLoadPath(const String& assemblyPath)
+{
+    typedef void (*AddAssemblyLoadPathFunction)(const char* assemblyPath);
+    AddAssemblyLoadPathFunction addAssemblyLoadPath;
+
+    bool result = CreateDelegate(
+                    "AtomicNETBootstrap",
+                    "Atomic.Bootstrap.AtomicLoadContext",
+                    "AddAssemblyLoadPath",
+                    (void**) &addAssemblyLoadPath);
+
+    if (result)
+    {
+        addAssemblyLoadPath(assemblyPath.CString());
+    }
+
+}
+
 bool NETCore::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
 {
 
@@ -267,7 +285,7 @@ bool NETCore::CreateDelegate(const String& assemblyName, const String& qualified
 
 }
 
-bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
+bool NETCore::Initialize(const String &coreCLRFilesAbsPath, const String &assemblyLoadPaths, String& errorMsg)
 {
     coreCLRFilesAbsPath_ = AddTrailingSlash(coreCLRFilesAbsPath);
 
@@ -276,7 +294,7 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 #else
 #endif
 
-    netHost_->Initialize(coreCLRFilesAbsPath_);
+    netHost_->Initialize(coreCLRFilesAbsPath_, assemblyLoadPaths);
 
     SharedPtr<NETManaged> managed(new NETManaged(context_));
     context_->RegisterSubsystem(managed);

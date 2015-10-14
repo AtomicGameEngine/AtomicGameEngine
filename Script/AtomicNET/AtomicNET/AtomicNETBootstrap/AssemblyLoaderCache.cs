@@ -12,7 +12,6 @@ namespace Atomic.Bootstrap
 
         public Assembly GetOrAdd(AssemblyName name, Func<AssemblyName, Assembly> factory)
         {
-            Console.WriteLine("AssemblyLoaderCache:GetOrAdd {0}", name.Name);
             // If the assembly was already loaded use it
             Assembly assembly;
             if (_assemblyCache.TryGetValue(name, out assembly))

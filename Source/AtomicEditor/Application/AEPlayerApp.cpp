@@ -22,6 +22,10 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
+#ifdef ATOMIC_DOTNET
+#include <AtomicNET/NETCore/NETCore.h>
+#endif
+
 
 #include "../PlayerMode/AEPlayerMode.h"
 #include <AtomicPlayer/Player.h>
@@ -109,6 +113,11 @@ void AEPlayerApplication::Setup()
 
                 String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%s/;%s/Resources;%s;%sCache",
                          ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
+
+#ifdef ATOMIC_DOTNET
+                String assemblyLoadPath = GetNativePath(ToString("%sResources/Assemblies/", value.CString()));
+                GetSubsystem<NETCore>()->AddAssemblyLoadPath(assemblyLoadPath);
+#endif
 
 #else
 

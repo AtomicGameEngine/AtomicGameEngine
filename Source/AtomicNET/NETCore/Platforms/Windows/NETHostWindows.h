@@ -63,7 +63,8 @@ public:
     /// Destruct.
     virtual ~NETHostWindows();
 
-    bool Initialize(const String& coreCLRFilesAbsPath);
+    bool Initialize(const String& coreCLRFilesAbsPath, const String& assemblyLoadPaths);
+
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
 
 private:

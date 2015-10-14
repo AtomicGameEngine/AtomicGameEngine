@@ -1,6 +1,8 @@
 
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
@@ -10,10 +12,19 @@ namespace Atomic.Bootstrap
 // This must be in TPA list
 public class AtomicLoadContext : LoadContext
 {
-    public static void Startup()
+
+    static List<string> assemblyLoadPaths = new List<string>();
+
+    public static void Startup(string _assemblyLoadPaths)
     {
       LoadContext.InitializeDefaultContext(new AtomicLoadContext());
-      Console.WriteLine("Bootstrap Startup");
+      assemblyLoadPaths = _assemblyLoadPaths.Split(';').ToList();
+      Console.WriteLine("Bootstrap Startup paths: {0}", _assemblyLoadPaths);
+    }
+
+    public static void AddAssemblyLoadPath(string path)
+    {
+      assemblyLoadPaths.Add(path);
     }
 
     [DllImport("kernel32.dll")]
@@ -50,19 +61,23 @@ public class AtomicLoadContext : LoadContext
     public override Assembly LoadAssembly(AssemblyName assemblyName)
     {
 
-      Console.WriteLine(assemblyName.Name);
       Assembly assembly = null;
-      try {
-            assembly = LoadFromAssemblyPath("C:\\Users\\Josh/Desktop\\" + assemblyName.Name + ".dll");
-      } catch (Exception e)
+
+      foreach (var path in assemblyLoadPaths)
       {
-        Console.WriteLine(e.Message);
+        try
+        {
+            Console.WriteLine("Assembly Load Attempt: {0}", path + assemblyName.Name + ".dll");
+            assembly = LoadFromAssemblyPath(path + assemblyName.Name + ".dll");
+            break;
+        }
+        catch (Exception e)
+        {
+          //Console.WriteLine(e.Message);
+        }
+
       }
 
-      if (assembly == null)
-        assembly = LoadFromAssemblyPath("C:\\Dev\\coreclr\\x64\\" + assemblyName.Name + ".dll");
-
-      Console.WriteLine("Assembly: " + assembly);
       return assembly;
 
     }

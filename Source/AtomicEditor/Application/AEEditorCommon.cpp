@@ -74,13 +74,20 @@ void AEEditorCommon::Setup()
     context_->RegisterSubsystem(netCore);
     String netCoreErrorMsg;
 
+#ifdef ATOMIC_DEV_BUILD
+
 #ifdef ATOMIC_PLATFORM_WINDOWS
-    String coreCLRAbsPath = "C:\\Dev\\coreclr\\x64\\";
+    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/x64/", ATOMIC_ROOT_SOURCE_DIR));
+    String  assemblyLoadPaths = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
 #else
-    String coreCLRAbsPath = "/Users/josh/Desktop/OSX.x64.Debug/";
+    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/x64/", ATOMIC_ROOT_SOURCE_DIR);
 #endif
 
-    if (!netCore->Initialize(coreCLRAbsPath, netCoreErrorMsg))
+#else
+    assert(0);
+#endif
+
+    if (!netCore->Initialize(coreCLRAbsPath, assemblyLoadPaths,  netCoreErrorMsg))
     {
         LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
         context_->RemoveSubsystem(NETCore::GetTypeStatic());

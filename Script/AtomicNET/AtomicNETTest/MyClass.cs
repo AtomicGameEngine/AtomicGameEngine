@@ -22,7 +22,7 @@ namespace AtomicNETTest
         {
           Node.Yaw(timeStep * speed * 75.0f);
 
-          Console.WriteLine("TICK! : {0}", speed);
+          //Console.WriteLine("TICK! : {0}", speed);
         }
     }
 

@@ -42,7 +42,7 @@ bool NETHostWindows::CreateDelegate(const String& assemblyName, const String& qu
     return true;
 }
 
-bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath)
+bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath, const String &assemblyLoadPaths)
 {
     // It is very important that this is the native path "\\" vs "/" as find files will return "/" or "\" depending
     // on what you give it, which will result in the domain failing to initialize as coreclr can't handle "/" on init
@@ -58,7 +58,7 @@ bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath)
         return false;
 
     // MOVE THIS!
-    typedef void (*StartupFunction)();
+    typedef void (*StartupFunction)(const char* assemblyLoadPaths);
     StartupFunction startup;
 
     // The coreclr binding model will become locked upon loading the first assembly that is not on the TPA list, or
@@ -79,19 +79,31 @@ bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath)
 
     if (result)
     {
-        startup();
+        startup(assemblyLoadPaths.CString());
     }
+
+    // MOVE THIS!
+    typedef void (*InitializeFunction)();
+    InitializeFunction init;
 
     result = CreateDelegate(
                     "AtomicNETEngine",
                     "AtomicEngine.Atomic",
                     "Initialize",
-                    (void**) &startup);
+                    (void**) &init);
 
     if (result)
     {
-        startup();
+        init();
     }
+
+
+    /*
+    while (!IsDebuggerPresent())
+    {
+        Sleep(100);
+    }
+    */
 
 
     return true;
@@ -125,9 +137,10 @@ bool NETHostWindows::LoadCLRDLL()
 
 bool NETHostWindows::CreateAppDomain()
 {
-
-    wchar_t appPath[MAX_LONGPATH] = W("C:\\Dev\\coreclr\\x64\\");
+    wchar_t appPath[MAX_LONGPATH] = W("C:\\Dev\\atomic\\AtomicGameEngine\\Artifacts\\AtomicNET\\");
     wchar_t appNiPath[MAX_LONGPATH * 2] = W("");
+
+    //wcscpy_s(appPath, WString(coreCLRFilesAbsPath_).CString());
 
     wcscpy_s(appNiPath, appPath);
     wcscat_s(appNiPath, MAX_LONGPATH * 2, W(";"));
@@ -400,6 +413,17 @@ bool NETHostWindows::GenerateTPAList()
     };
 
     AddFilesFromDirectoryToTPAList(WString(coreCLRFilesAbsPath_).CString(), rgTPAExtensions, _countof(rgTPAExtensions));
+
+#ifdef ATOMIC_DEV_BUILD
+
+    WString  tpaAbsPath(GetNativePath(ToString("%s/Submodules/CoreCLR/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
+    WString  atomicTPAAbsPath(GetNativePath(ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
+#else
+    assert(0);
+#endif
+
+    AddFilesFromDirectoryToTPAList(tpaAbsPath.CString(), rgTPAExtensions, _countof(rgTPAExtensions));
+    AddFilesFromDirectoryToTPAList(atomicTPAAbsPath.CString(), rgTPAExtensions, _countof(rgTPAExtensions));
 
     return true;
 

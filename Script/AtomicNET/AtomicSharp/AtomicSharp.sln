@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicSharp", "AtomicSharp.csproj", "{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicSharpTest", "AtomicSharpTest\AtomicSharpTest.csproj", "{DBD98CE5-11DE-47F8-BF9A-83BF8576794E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicSharpTool", "AtomicSharpTool\AtomicSharpTool.csproj", "{BA7825F5-7175-4486-8B06-BB88167246F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtomicEditor", "AtomicEditor\AtomicEditor.csproj", "{91790BBE-7726-4B21-A746-0A4998F5BC7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91790BBE-7726-4B21-A746-0A4998F5BC7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91790BBE-7726-4B21-A746-0A4998F5BC7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91790BBE-7726-4B21-A746-0A4998F5BC7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91790BBE-7726-4B21-A746-0A4998F5BC7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA7825F5-7175-4486-8B06-BB88167246F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA7825F5-7175-4486-8B06-BB88167246F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA7825F5-7175-4486-8B06-BB88167246F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA7825F5-7175-4486-8B06-BB88167246F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBD98CE5-11DE-47F8-BF9A-83BF8576794E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBD98CE5-11DE-47F8-BF9A-83BF8576794E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBD98CE5-11DE-47F8-BF9A-83BF8576794E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBD98CE5-11DE-47F8-BF9A-83BF8576794E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
