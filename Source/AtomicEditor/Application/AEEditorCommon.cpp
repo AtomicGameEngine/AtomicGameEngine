@@ -75,7 +75,7 @@ void AEEditorCommon::Setup()
     String netCoreErrorMsg;
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-    String coreCLRAbsPath = "C:/Dev/coreclr/x64/";
+    String coreCLRAbsPath = "C:\\Dev\\coreclr\\x64\\";
 #else
     String coreCLRAbsPath = "/Users/josh/Desktop/OSX.x64.Debug/";
 #endif

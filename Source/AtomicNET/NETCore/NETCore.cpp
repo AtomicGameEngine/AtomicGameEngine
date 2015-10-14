@@ -207,13 +207,15 @@ extern "C"
 // pinvoke is faster than [UnmanagedFunctionPointer] :/
 // [SuppressUnmanagedCodeSecurity] <--- add this attribute, in any event
 
-int csb_Atomic_Test(unsigned id)
-{
-  //printf("Flibberty Gibbets %u", id);
-  return id;
-}
 
-ClassID csb_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#pragma warning(disable: 4244) // possible loss of data
+#define ATOMIC_EXPORT_API __declspec(dllexport)
+#else
+#define ATOMIC_EXPORT_API
+#endif
+
+ATOMIC_EXPORT_API ClassID csb_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
 {
     if (!refCounted)
         return 0;
@@ -221,12 +223,12 @@ ClassID csb_Atomic_RefCounted_GetClassID(RefCounted* refCounted)
     return refCounted->GetClassID();
 }
 
-RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
+ATOMIC_EXPORT_API RefCounted* csb_AtomicEngine_GetSubsystem(const char* name)
 {
     return NETCore::GetContext()->GetSubsystem(name);
 }
 
-void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
+ATOMIC_EXPORT_API void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
 {
     if (!ref)
         return;
@@ -239,6 +241,10 @@ void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
 
 bool NETCore::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
 {
+
+    return netHost_->CreateDelegate(assemblyName, qualifiedClassName, methodName, funcOut);
+
+    /*
     if (!sCreateDelegate)
         return false;
 
@@ -257,6 +263,7 @@ bool NETCore::CreateDelegate(const String& assemblyName, const String& qualified
         *funcOut = 0;
 
     return st >= 0;
+    */
 
 }
 
@@ -270,6 +277,21 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
 #endif
 
     netHost_->Initialize(coreCLRFilesAbsPath_);
+
+    SharedPtr<NETManaged> managed(new NETManaged(context_));
+    context_->RegisterSubsystem(managed);
+
+    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
+    context_->RegisterSubsystem(dispatcher);
+    context_->AddGlobalEventListener(dispatcher);
+
+    if (!context_->GetEditorContext())
+    {
+        SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
+    }
+
+    managed->Initialize();
+
 
 #ifdef disabled
 
@@ -443,19 +465,6 @@ bool NETCore::Initialize(const String &coreCLRFilesAbsPath, String& errorMsg)
             (unsigned int*)&exitCode);
     */
 
-    SharedPtr<NETManaged> managed(new NETManaged(context_));
-    context_->RegisterSubsystem(managed);
-
-    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
-    context_->RegisterSubsystem(dispatcher);
-    context_->AddGlobalEventListener(dispatcher);
-
-    if (!context_->GetEditorContext())
-    {
-        SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
-    }
-
-    managed->Initialize();
 
 #endif
 

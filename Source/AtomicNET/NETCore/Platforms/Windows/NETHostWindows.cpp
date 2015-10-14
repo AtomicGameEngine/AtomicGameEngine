@@ -16,7 +16,8 @@ namespace Atomic
 NETHostWindows::NETHostWindows(Context* context) :
     NETHost(context),
     clrRuntimeHost_(0),
-    clrModule_(0)
+    clrModule_(0),
+    appDomainID_(0)
 {
 
 }
@@ -24,6 +25,21 @@ NETHostWindows::NETHostWindows(Context* context) :
 NETHostWindows::~NETHostWindows()
 {
 
+}
+
+bool NETHostWindows::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
+{
+    if (!clrRuntimeHost_)
+        return false;
+
+    HRESULT hr = clrRuntimeHost_->CreateDelegate(appDomainID_, WString(assemblyName).CString(), WString(qualifiedClassName).CString(), WString(methodName).CString(), (INT_PTR *)funcOut);
+
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath)
@@ -40,6 +56,43 @@ bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath)
 
     if (!CreateAppDomain())
         return false;
+
+    // MOVE THIS!
+    typedef void (*StartupFunction)();
+    StartupFunction startup;
+
+    // The coreclr binding model will become locked upon loading the first assembly that is not on the TPA list, or
+    // upon initializing the default context for the first time. For this test, test assemblies are located alongside
+    // corerun, and hence will be on the TPA list. So, we should be able to set the default context once successfully,
+    // and fail on the second try.
+
+    // AssemblyLoadContext
+    // https://github.com/dotnet/corefx/issues/3054
+    // dnx loader
+    // https://github.com/aspnet/dnx/tree/dev/src/Microsoft.Dnx.Loader
+
+    bool result = CreateDelegate(
+                    "AtomicNETBootstrap",
+                    "Atomic.Bootstrap.AtomicLoadContext",
+                    "Startup",
+                    (void**) &startup);
+
+    if (result)
+    {
+        startup();
+    }
+
+    result = CreateDelegate(
+                    "AtomicNETEngine",
+                    "AtomicEngine.Atomic",
+                    "Initialize",
+                    (void**) &startup);
+
+    if (result)
+    {
+        startup();
+    }
+
 
     return true;
 }
@@ -131,10 +184,8 @@ bool NETHostWindows::CreateAppDomain()
         W("UseLatestBehaviorWhenTFMNotSpecified")
     };
 
-    DWORD domainId;
-
     HRESULT hr  = clrRuntimeHost_->CreateAppDomainWithManager(
-                W("HelloWorld.exe"),   // The friendly name of the AppDomain
+                W("AtomicNETDomain"),   // The friendly name of the AppDomain
                 // Flags:
                 // APPDOMAIN_ENABLE_PLATFORM_SPECIFIC_APPS
                 // - By default CoreCLR only allows platform neutral assembly to be run. To allow
@@ -157,13 +208,12 @@ bool NETHostWindows::CreateAppDomain()
                 sizeof(property_keys)/sizeof(wchar_t*),  // The number of properties
                 property_keys,
                 property_values,
-                &domainId);
+                &appDomainID_);
 
     if (FAILED(hr)) {
         LOGERRORF("Failed call to CreateAppDomainWithManager. ERRORCODE:%u ",  hr);
         return false;
     }
-
 
     return true;
 }

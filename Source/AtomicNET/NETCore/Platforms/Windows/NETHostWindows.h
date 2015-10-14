@@ -64,6 +64,7 @@ public:
     virtual ~NETHostWindows();
 
     bool Initialize(const String& coreCLRFilesAbsPath);
+    bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
 
 private:
 
@@ -81,6 +82,7 @@ private:
 
     ICLRRuntimeHost2* clrRuntimeHost_;
     HMODULE clrModule_;
+    DWORD appDomainID_;
 
     TPAStringBuffer tpaList_;
 
