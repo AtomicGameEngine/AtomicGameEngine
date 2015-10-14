@@ -19,6 +19,7 @@ public:
 
     virtual bool Initialize(const String& coreCLRFilesAbsPath, const String& assemblyLoadPaths) = 0;
     virtual bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut) = 0;
+    virtual void WaitForDebuggerConnect() = 0;
 
 };
 

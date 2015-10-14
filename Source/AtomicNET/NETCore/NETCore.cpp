@@ -239,6 +239,11 @@ ATOMIC_EXPORT_API void csb_AtomicEngine_ReleaseRef(RefCounted* ref)
 
 }
 
+void NETCore::WaitForDebuggerConnect()
+{
+    netHost_->WaitForDebuggerConnect();
+}
+
 void NETCore::AddAssemblyLoadPath(const String& assemblyPath)
 {
     typedef void (*AddAssemblyLoadPathFunction)(const char* assemblyPath);

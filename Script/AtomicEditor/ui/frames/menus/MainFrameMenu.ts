@@ -58,6 +58,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "edit play debug") {
+                EditorUI.getShortcuts().invokePlayDebug();
+                return true;
+            }
+
             if (refid == "edit format code") {
                 EditorUI.getShortcuts().invokeFormatCode();
                 return true;
@@ -244,7 +249,8 @@ var editItems = {
     "-3": null,
     "Format Code": ["edit format code", StringID.ShortcutBeautify],
     "-4": null,
-    "Play": ["edit play", StringID.ShortcutPlay]
+    "Play": ["edit play", StringID.ShortcutPlay],
+    "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug]
 
 };
 

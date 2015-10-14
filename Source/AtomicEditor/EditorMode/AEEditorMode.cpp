@@ -87,7 +87,7 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool EditorMode::PlayProject()
+bool EditorMode::PlayProject(bool debug)
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -117,6 +117,9 @@ bool EditorMode::PlayProject()
 
     vargs = args.Split(' ');
 
+    if (debug)
+        vargs.Insert(0, "--debug");
+
     String dump;
     dump.Join(vargs, " ");
     LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
@@ -133,6 +136,11 @@ bool EditorMode::PlayProject()
 
     return playerBroker_.NotNull();
 
+}
+
+bool EditorMode::PlayProjectDebug()
+{
+    return PlayProject(true);
 }
 
 }

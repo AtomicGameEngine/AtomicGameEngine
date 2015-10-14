@@ -46,6 +46,7 @@ public:
 
     void AddAssemblyLoadPath(const String& assemblyPath);
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
+    void WaitForDebuggerConnect();
 
     /// We access this directly in binding code, where there isn't a context
     /// to get a reference from

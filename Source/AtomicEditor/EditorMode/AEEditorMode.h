@@ -32,7 +32,8 @@ public:
     /// Destruct.
     virtual ~EditorMode();
 
-    bool PlayProject();
+    bool PlayProject(bool debug = false);
+    bool PlayProjectDebug();
 
 private:
 

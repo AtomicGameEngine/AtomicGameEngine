@@ -98,15 +98,15 @@ bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath, const String 
     }
 
 
-    /*
+    return true;
+}
+
+void NETHostWindows::WaitForDebuggerConnect()
+{
     while (!IsDebuggerPresent())
     {
         Sleep(100);
     }
-    */
-
-
-    return true;
 }
 
 bool NETHostWindows::LoadCLRDLL()

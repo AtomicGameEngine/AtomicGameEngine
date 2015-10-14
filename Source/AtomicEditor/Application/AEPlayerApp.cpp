@@ -47,7 +47,8 @@ namespace AtomicEditor
 {
 
 AEPlayerApplication::AEPlayerApplication(Context* context) :
-    AEEditorCommon(context)
+    AEEditorCommon(context),
+    debugPlayer_(false)
 {
 }
 
@@ -100,6 +101,10 @@ void AEPlayerApplication::Setup()
             {
                 SubscribeToEvent(E_LOGMESSAGE, HANDLER(AEPlayerApplication, HandleLogMessage));
             }
+            else if (argument == "--debug")
+            {
+                debugPlayer_ = true;
+            }
             else if (argument == "--project" && value.Length())
             {
                 engineParameters_["ResourcePrefixPath"] = "";
@@ -115,8 +120,10 @@ void AEPlayerApplication::Setup()
                          ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
 
 #ifdef ATOMIC_DOTNET
+                NETCore* netCore = GetSubsystem<NETCore>();
                 String assemblyLoadPath = GetNativePath(ToString("%sResources/Assemblies/", value.CString()));
-                GetSubsystem<NETCore>()->AddAssemblyLoadPath(assemblyLoadPath);
+                netCore->AddAssemblyLoadPath(assemblyLoadPath);
+
 #endif
 
 #else
@@ -158,6 +165,13 @@ void AEPlayerApplication::Start()
     playerMode->ProcessArguments();
 
     SubscribeToEvent(E_JSERROR, HANDLER(AEPlayerApplication, HandleJSError));
+
+#ifdef ATOMIC_DOTNET
+        if (debugPlayer_)
+        {
+           GetSubsystem<NETCore>()->WaitForDebuggerConnect();
+        }
+#endif
 
     vm_->SetModuleSearchPaths("Modules");
 

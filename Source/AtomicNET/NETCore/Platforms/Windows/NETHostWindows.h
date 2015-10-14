@@ -67,6 +67,8 @@ public:
 
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
 
+    void WaitForDebuggerConnect();
+
 private:
 
     bool LoadCLRDLL();

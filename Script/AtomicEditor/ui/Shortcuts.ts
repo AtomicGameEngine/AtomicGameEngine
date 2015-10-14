@@ -26,6 +26,14 @@ class Shortcuts extends Atomic.ScriptObject {
 
     }
 
+    invokePlayDebug() {
+
+        this.sendEvent(EditorEvents.SaveAllResources);
+        Atomic.editorMode.playProjectDebug();
+
+    }
+
+
     invokeFormatCode() {
 
         var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
