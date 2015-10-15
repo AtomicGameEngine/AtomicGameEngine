@@ -35,6 +35,7 @@ var iosDeployBuildFolder = artifactsFolder + "/ios-deploy";
 var webBuildFolder = artifactsFolder + "/Web_Build";
 var linuxBuildFolder = artifactsFolder + "/Linux_Build";
 var jsDocFolder = artifactsFolder + "/JSDoc";
+var atomicNETFolder = artifactsFolder + "/AtomicNET";
 
 // binaries
 
@@ -62,7 +63,8 @@ var allBuildFolders = [
   iosDeployBuildFolder,
   webBuildFolder,
   linuxBuildFolder,
-  jsDocFolder
+  jsDocFolder,
+  atomicNETFolder
 ];
 
 // packaging
@@ -217,7 +219,7 @@ namespace('build', function() {
     } else if (host == "win32") {
 
       if (deployments.windows) {
-        fs.copySync(platformBinariesFolder + "/Win32/AtomicPlayer.exe", deployRoot + "/Windows/x86/AtomicPlayer.exe");
+        fs.copySync(platformBinariesFolder + "/Win32/AtomicPlayer.exe", deployRoot + "/Windows/x64/AtomicPlayer.exe");
       }
 
     }

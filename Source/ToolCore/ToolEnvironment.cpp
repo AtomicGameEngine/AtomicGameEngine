@@ -49,7 +49,7 @@ bool ToolEnvironment::InitFromPackage()
 
     //TODO: move this to deployment stuff
     playerAppFolder_ = resourcesDir + "ToolData/Deployment/MacOS/AtomicPlayer.app/";
-    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x86/AtomicPlayer.exe";
+    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x64/AtomicPlayer.exe";
 
     resourceCoreDataDir_ = resourcesDir + "CoreData";
     resourcePlayerDataDir_ = resourcesDir + "PlayerData";
