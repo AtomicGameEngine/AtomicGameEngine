@@ -119,13 +119,6 @@ void AEPlayerApplication::Setup()
                 String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%s/;%s/Resources;%s;%sCache",
                          ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
 
-#ifdef ATOMIC_DOTNET
-                NETCore* netCore = GetSubsystem<NETCore>();
-                String assemblyLoadPath = GetNativePath(ToString("%sResources/Assemblies/", value.CString()));
-                netCore->AddAssemblyLoadPath(assemblyLoadPath);
-
-#endif
-
 #else
 
 #ifdef __APPLE__
@@ -141,6 +134,12 @@ void AEPlayerApplication::Setup()
                 LOGINFOF("Adding ResourcePaths: %s", resourcePaths.CString());
 
                 engineParameters_["ResourcePaths"] = resourcePaths;
+
+#ifdef ATOMIC_DOTNET
+                NETCore* netCore = GetSubsystem<NETCore>();
+                String assemblyLoadPath = GetNativePath(ToString("%sResources/Assemblies/", value.CString()));
+                netCore->AddAssemblyLoadPath(assemblyLoadPath);
+#endif
 
             }
         }

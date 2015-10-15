@@ -56,6 +56,17 @@ bool ToolEnvironment::InitFromPackage()
 
     toolDataDir_ =  resourcesDir + "ToolData/";
 
+    // AtomicNET
+    netAssemblyLoadPaths_ = GetNativePath(ToString("%sAtomicNET/Windows/Atomic/", resourcesDir.CString()));
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
+    netTPAPaths_ = ToString("%sAtomicNET/Windows/AnyCPU/TPA/", resourcesDir.CString());
+    netTPAPaths_ += ToString(";%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
+#else
+    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
+#endif
+
     return true;
 }
 
