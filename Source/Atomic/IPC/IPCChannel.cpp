@@ -60,7 +60,7 @@ bool IPCChannel::Receive()
         return true;
 
     dataBuffer_.Seek(dataBuffer_.GetSize());
-    dataBuffer_.Write(data, sz);
+    dataBuffer_.Write(data, (unsigned) sz);
     dataBuffer_.Seek(0);
 
     while (true)

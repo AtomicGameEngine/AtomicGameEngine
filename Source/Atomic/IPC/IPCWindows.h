@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "../Core/Mutex.h"
+#include "../Core/Thread.h"
 #include "../Core/Object.h"
 #include "IPCTypes.h"
 
@@ -38,18 +40,18 @@ public:
     IPCHandle serverRead() const { return srvRead_; }
     IPCHandle serverWrite() const { return srvWrite_; }
 
-	IPCHandle clientRead() const { return clnRead_; }
-	IPCHandle clientWrite() const { return clnWrite_; }
+    IPCHandle clientRead() const { return clnRead_; }
+    IPCHandle clientWrite() const { return clnWrite_; }
 
     static IPCHandle OpenPipeServer(const wchar_t* name, bool read);
     static IPCHandle OpenPipeClient(const wchar_t* name, bool read);
 
 private:
     IPCHandle srvRead_;
-	IPCHandle srvWrite_;
+    IPCHandle srvWrite_;
 
-	IPCHandle clnRead_;
-	IPCHandle clnWrite_;
+    IPCHandle clnRead_;
+    IPCHandle clnWrite_;
 };
 
 class PipeWin {
@@ -66,8 +68,30 @@ public:
     bool IsConnected() const { return pipeRead_ != INVALID_IPCHANDLE_VALUE && pipeWrite_ != INVALID_IPCHANDLE_VALUE; }
 
 private:
+
+    class ReaderThread : public Thread
+    {
+    public:
+
+        ReaderThread(PipeWin* pipeWin) : pipeWin_(pipeWin), readSize_(0)
+        {
+            buf_.Resize(4096);
+        }
+
+        void Kill();
+        void ThreadFunction();
+
+        Mutex mutex_;
+        PipeWin* pipeWin_;
+        PODVector<char> buf_;
+        unsigned readSize_;
+    };
+
     IPCHandle pipeRead_;
-	IPCHandle pipeWrite_;
+    IPCHandle pipeWrite_;
+
+    ReaderThread readerThread_;
+
 };
 
 
@@ -91,7 +115,7 @@ class IPCProcess : public Object
 
     public:
 
-    IPCProcess(Context* context, IPCHandle clientRead, IPCHandle clientWrite, IPCHandle pid = INVALID_IPCHANDLE_VALUE);
+        IPCProcess(Context* context, IPCHandle clientRead, IPCHandle clientWrite, IPCHandle pid = INVALID_IPCHANDLE_VALUE);
 
     virtual ~IPCProcess();
 

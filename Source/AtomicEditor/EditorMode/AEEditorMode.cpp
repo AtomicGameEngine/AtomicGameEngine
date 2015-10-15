@@ -62,6 +62,9 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
 {
     //SendEvent(E_EDITORPLAYSTOP);
+
+    if ( eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
+        playerBroker_ = 0;
 }
 
 void EditorMode::HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData)

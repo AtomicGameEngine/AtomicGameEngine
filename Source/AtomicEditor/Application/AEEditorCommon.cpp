@@ -54,6 +54,9 @@ void AEEditorCommon::Setup()
 
 void AEEditorCommon::Stop()
 {
+
+    context_->RemoveSubsystem<IPC>();
+
     vm_ = 0;
     context_->RemoveSubsystem<Javascript>();
     // make sure JSVM is really down and no outstanding refs
