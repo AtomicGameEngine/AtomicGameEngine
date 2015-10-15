@@ -33,7 +33,7 @@ csc /unsafe /out:../../../Artifacts/AtomicNET/AtomicNETTools.dll /nostdlib+ /noc
 /r:../../../Artifacts/AtomicNET/AtomicNETEngine.dll ^
 AtomicNETTools/*.cs
 
-csc /out:C:/Dev/atomic/AtomicExamples/AtomicNET/Basic3D/Resources/Assemblies/AtomicNETTest.dll ^
+csc /out:../../../Artifacts/AtomicNET/AtomicNETTestCompile.dll ^
 /debug+ /nostdlib+ /noconfig /t:library /w:0 ^
 /lib:../../../Submodules/CoreCLR/Windows/Release/x64/;../../../Submodules/CoreCLR/Windows/Release/x64/ ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Runtime.dll ^

@@ -160,19 +160,27 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 
 void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPaths)
 {
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
     rootBuildDir_ = AddTrailingSlash(buildDir);
+
 
     if (setBinaryPaths)
     {
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
 #ifdef _DEBUG
-        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.exe";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.exe";
+        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Debug/AtomicPlayer.exe";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Debug/AtomicEditor.exe";
 #else
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Release/AtomicEditor.exe";
 #endif
+
+        // some build tools like ninja don't use Release/Debug folders
+        if (!fileSystem->FileExists(playerBinary_))
+                playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.exe";
+        if (!fileSystem->FileExists(editorBinary_))
+                editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.exe";
 
         playerAppFolder_ = rootSourceDir_ + "Data/AtomicEditor/Deployment/MacOS/AtomicPlayer.app";
 
