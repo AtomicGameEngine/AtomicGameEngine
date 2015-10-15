@@ -47,6 +47,7 @@ namespace AtomicTools
 
 			this._inspectorComponent = new InspectorComponent ();
 			this._inspectorComponent.Name = metaReader.GetString (typeDef.Name);
+			this._inspectorComponent.Namespace = metaReader.GetString (typeDef.Namespace);
 		}
 
 		// Inspect a CSComponent derived class

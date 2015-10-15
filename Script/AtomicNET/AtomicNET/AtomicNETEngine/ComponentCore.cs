@@ -9,40 +9,40 @@ namespace AtomicEngine
 {
 
 
-public partial class CSComponent : ScriptComponent
-{
-
-  public void StartInternal()
+  public partial class CSComponent : ScriptComponent
   {
-    ApplyFieldValues();
-    Start();
+
+    public void StartInternal()
+    {
+      ApplyFieldValues();
+      Start();
+    }
+
+    public virtual void Start()
+    {
+
+    }
+
+
+    public virtual void Update(float timeStep)
+    {
+
+    }
+
+
+
   }
 
-  public virtual void Start()
+  public static class ComponentCore
   {
 
-  }
+    static List<CSComponent> startQueue = new List<CSComponent>();
 
+    // holds a reference
+    static Dictionary<IntPtr, CSComponent> liveComponents = new Dictionary<IntPtr, CSComponent>();
 
-  public virtual void Update(float timeStep)
-  {
-
-  }
-
-
-
-}
-
-public static class ComponentCore
-{
-
-  static List<CSComponent> startQueue = new List<CSComponent>();
-
-  // holds a reference
-  static Dictionary<IntPtr, CSComponent> liveComponents = new Dictionary<IntPtr, CSComponent>();
-
-  public static void Update (float timeStep)
-  {
+    public static void Update (float timeStep)
+    {
 
       List<CSComponent> _startQueue = new List<CSComponent>(startQueue);
       startQueue.Clear();
@@ -54,23 +54,23 @@ public static class ComponentCore
 
       foreach (var c in liveComponents.Values)
       {
-            c.Update(timeStep);
+        c.Update(timeStep);
       }
-  }
+    }
 
-  // This will need to be optimized
-  public static void CSComponentApplyFields(IntPtr componentPtr, IntPtr fieldMapPtr)
-  {
-    NETVariantMap fieldMap = NativeCore.WrapNative<NETVariantMap>(fieldMapPtr);;
-    CSComponent component = NativeCore.WrapNative<CSComponent>(componentPtr);;
-
-    if (fieldMap == null || component == null)
-        return;
-
-    FieldInfo[] fields = componentClassFields[component.GetType()];
-
-    foreach (var field in fields)
+    // This will need to be optimized
+    public static void CSComponentApplyFields(IntPtr componentPtr, IntPtr fieldMapPtr)
     {
+      NETVariantMap fieldMap = NativeCore.WrapNative<NETVariantMap>(fieldMapPtr);;
+      CSComponent component = NativeCore.WrapNative<CSComponent>(componentPtr);;
+
+      if (fieldMap == null || component == null)
+      return;
+
+      FieldInfo[] fields = componentClassFields[component.GetType()];
+
+      foreach (var field in fields)
+      {
         if (fieldMap.Contains(field.Name))
         {
           //Console.WriteLine("Applying: {0} {1}", field.Name, field.FieldType.Name);
@@ -79,83 +79,110 @@ public static class ComponentCore
 
           if (fieldType.IsEnum)
           {
-              field.SetValue(component, fieldMap.GetInt(field.Name));
-              continue;
+            field.SetValue(component, fieldMap.GetInt(field.Name));
+            continue;
           }
 
           switch (Type.GetTypeCode(fieldType))
           {
             case TypeCode.Boolean:
-                field.SetValue(component, fieldMap.GetBool(field.Name));
-                break;
+            field.SetValue(component, fieldMap.GetBool(field.Name));
+            break;
 
-              case TypeCode.Int32:
-                  field.SetValue(component, fieldMap.GetInt(field.Name));
-                  break;
+            case TypeCode.Int32:
+            field.SetValue(component, fieldMap.GetInt(field.Name));
+            break;
 
-              case TypeCode.Single:
-                  field.SetValue(component, fieldMap.GetFloat(field.Name));
-                  break;
+            case TypeCode.Single:
+            field.SetValue(component, fieldMap.GetFloat(field.Name));
+            break;
 
-              case TypeCode.String:
-                  field.SetValue(component, fieldMap.GetString(field.Name));
-                  break;
+            case TypeCode.String:
+            field.SetValue(component, fieldMap.GetString(field.Name));
+            break;
 
-              default:
+            default:
 
-                  if (fieldType == typeof(Vector3))
-                  {
-                    field.SetValue(component, fieldMap.GetVector3(field.Name));
-                  }
-                  else if (fieldType == typeof(Quaternion))
-                  {
-                    field.SetValue(component, fieldMap.GetQuaternion(field.Name));
-                  }
-                  else if (fieldType.IsSubclassOf(typeof(Resource)))
-                  {
-                      field.SetValue(component, fieldMap.GetResourceFromRef(field.Name));
-                  }
-                  else if (fieldType.IsSubclassOf(typeof(RefCounted)))
-                  {
-                      field.SetValue(component, fieldMap.GetPtr(field.Name));
-                  }
+            if (fieldType == typeof(Vector3))
+            {
+              field.SetValue(component, fieldMap.GetVector3(field.Name));
+            }
+            else if (fieldType == typeof(Quaternion))
+            {
+              field.SetValue(component, fieldMap.GetQuaternion(field.Name));
+            }
+            else if (fieldType.IsSubclassOf(typeof(Resource)))
+            {
+              field.SetValue(component, fieldMap.GetResourceFromRef(field.Name));
+            }
+            else if (fieldType.IsSubclassOf(typeof(RefCounted)))
+            {
+              field.SetValue(component, fieldMap.GetPtr(field.Name));
+            }
 
-                  break;
+            break;
           }
         }
+      }
     }
-  }
 
-  static Dictionary<Type, FieldInfo[] > componentClassFields = new Dictionary<Type, FieldInfo[]>();
+    static Dictionary<Type, FieldInfo[] > componentClassFields = new Dictionary<Type, FieldInfo[]>();
 
-  public static IntPtr CSComponentCreate(string assemblyName, string classTypeName)
-  {
+    static Dictionary<string, Dictionary<string, Type>> componentTypeLookup = new Dictionary<string, Dictionary<string, Type>>();
 
-    Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));
-
-    Type type = assembly.GetType("AtomicNETTest."  + classTypeName);
-
-    // TODO: check type is derived from CSComponent
-
-    var component = (CSComponent) Activator.CreateInstance(type);
-
-    if (!componentClassFields.ContainsKey(type))
+    public static IntPtr CSComponentCreate(string assemblyName, string classTypeName)
     {
-      var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-          .Where(field => field.IsDefined(typeof(InspectorAttribute), true));
 
-      componentClassFields[type] = fields.ToArray<FieldInfo>();
+      Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName(assemblyName));
+
+      string classNamespace = "";
+      if (!componentTypeLookup.ContainsKey(assemblyName))
+      {
+        componentTypeLookup[assemblyName] = new Dictionary<string, Type>();
+      }
+
+      var lookup = componentTypeLookup[assemblyName];
+
+      Type type = null;
+
+      if (!lookup.TryGetValue(classTypeName, out type))
+      {
+        var types = assembly.GetTypes();
+        foreach (var atype in types)
+        {
+          if (atype.Name == classTypeName)
+          {
+            lookup[classTypeName] = atype;
+            type = atype;
+            break;
+          }
+        }
+      }
+
+      if (type == null)
+      return IntPtr.Zero;
+
+      // TODO: check type is derived from CSComponent
+
+      var component = (CSComponent) Activator.CreateInstance(type);
+
+      if (!componentClassFields.ContainsKey(type))
+      {
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+        .Where(field => field.IsDefined(typeof(InspectorAttribute), true));
+
+        componentClassFields[type] = fields.ToArray<FieldInfo>();
+
+      }
+
+      startQueue.Add(component);
+
+      liveComponents[component.nativeInstance] = component;
+
+      return component.nativeInstance;
 
     }
 
-    startQueue.Add(component);
-
-    liveComponents[component.nativeInstance] = component;
-
-    return component.nativeInstance;
-
   }
-
-}
 
 }

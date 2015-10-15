@@ -163,6 +163,7 @@ namespace AtomicTools
 	internal class InspectorComponent
 	{
 		public String Name;
+		public String Namespace;
 		public Dictionary<string, InspectorField> Fields = new Dictionary<string, InspectorField> ();
 
 		public Dictionary<string, object> GetJSONDict ()
@@ -170,6 +171,8 @@ namespace AtomicTools
 			var dict = new Dictionary<string,object> ();
 
 			dict ["name"] = Name;
+			dict ["namespace"] = Namespace;
+
 			var fieldList = new List<object> ();
 
 			foreach (var entry in Fields) {
