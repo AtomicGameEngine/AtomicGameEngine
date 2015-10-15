@@ -76,11 +76,12 @@ void AEEditorCommon::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/x64/", ATOMIC_ROOT_SOURCE_DIR));
     String  assemblyLoadPaths = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
 #else
-    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/x64/", ATOMIC_ROOT_SOURCE_DIR);
+    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
 #endif
 
 #else

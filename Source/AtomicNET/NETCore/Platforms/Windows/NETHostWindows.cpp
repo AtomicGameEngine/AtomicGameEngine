@@ -415,8 +415,7 @@ bool NETHostWindows::GenerateTPAList()
     AddFilesFromDirectoryToTPAList(WString(coreCLRFilesAbsPath_).CString(), rgTPAExtensions, _countof(rgTPAExtensions));
 
 #ifdef ATOMIC_DEV_BUILD
-
-    WString  tpaAbsPath(GetNativePath(ToString("%s/Submodules/CoreCLR/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
+    WString  tpaAbsPath(GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Debug/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
     WString  atomicTPAAbsPath(GetNativePath(ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
 #else
     assert(0);
