@@ -61,8 +61,7 @@ bool ToolEnvironment::InitFromPackage()
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
-    netTPAPaths_ = ToString("%sAtomicNET/Windows/AnyCPU/TPA/", resourcesDir.CString());
-    netTPAPaths_ += ToString(";%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
+    netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
 #else
     String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
 #endif
@@ -168,8 +167,8 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
 #ifdef _DEBUG
-        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Debug/AtomicPlayer.exe";
-        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Debug/AtomicEditor.exe";
+        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.exe";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.exe";
 #else
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Release/AtomicEditor.exe";
