@@ -265,6 +265,12 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
             //static const unsigned M_MIN_UNSIGNED = 0x00000000;
 //            /static const unsigned M_MAX_UNSIGNED = 0xffffffff;
 
+            if (cname == "M_MIN_INT")
+                value = "int.MinValue";
+
+            if (cname == "M_INFINITY")
+                value = "float.MaxValue";
+
             if (value == "M_MAX_UNSIGNED")
                 value = "0xffffffff";
 
@@ -304,7 +310,7 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
 
             String line = "public const " + managedType + " " + cname + " = " + value;
 
-            if (managedType == "float" && !line.EndsWith("f"))
+            if (managedType == "float" && !line.EndsWith("f") && IsDigit(line[line.Length()-1]))
                 line += "f";
 
             line += ";\n";

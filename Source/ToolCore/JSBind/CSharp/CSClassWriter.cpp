@@ -183,6 +183,7 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
     Dedent();
 
     // managed functions
+    bool wroteConstructor = false;
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)
     {
         JSBFunction* function = klass_->functions_.At(i);
@@ -196,11 +197,25 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         if (CSTypeHelper::OmitFunction(function))
             continue;
 
+        if (function->IsConstructor())
+            wroteConstructor = true;
+
         CSFunctionWriter fwriter(function);
         fwriter.GenerateManagedSource(source);
 
     }
 
+    // There are some constructors being skipped (like HTTPRequest as it uses a vector of strings in args)
+    // Make sure we have at least a IntPtr version
+    if (!wroteConstructor)
+    {
+        LOGINFOF("WARNING: %s class didn't write a constructor, filling in generated native constructor");
+
+        line = ToString("public %s (IntPtr native) : base (native)\n", klass_->GetName().CString());
+        source += IndentLine(line);
+        source += IndentLine("{\n");
+        source += IndentLine("}\n\n");
+    }
 
     Dedent();
 

@@ -17,7 +17,6 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
-#include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/License/LicenseEvents.h>
 #include <ToolCore/License/LicenseSystem.h>
@@ -27,11 +26,6 @@
 #include "AEEditorApp.h"
 
 using namespace ToolCore;
-
-namespace ToolCore
-{
-    extern void jsapi_init_toolcore(JSVM* vm);
-}
 
 namespace AtomicEditor
 {
@@ -63,7 +57,6 @@ void AEEditorApp::Start()
     SubscribeToEvent(E_JSERROR, HANDLER(AEEditorApp, HandleJSError));
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(AEEditorApp, HandleExitRequested));
 
-    jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
 
     duk_get_global_string(vm_->GetJSContext(), "require");
@@ -84,24 +77,7 @@ void AEEditorApp::Setup()
 
     AEEditorCommon::Setup();
 
-    ToolEnvironment* env = new ToolEnvironment(context_);
-    context_->RegisterSubsystem(env);
-
-    ToolSystem* system = new ToolSystem(context_);
-    context_->RegisterSubsystem(system);
-
-#ifdef ATOMIC_DEV_BUILD
-
-    if (!env->InitFromJSON())
-    {
-        ErrorExit(ToString("Unable to initialize tool environment from %s", env->GetDevConfigFilename().CString()));
-        return;
-    }
-#else
-
-    env->InitFromPackage();
-
-#endif
+    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
 
     engineParameters_["WindowTitle"] = "AtomicEditor";
     engineParameters_["WindowResizable"] = true;

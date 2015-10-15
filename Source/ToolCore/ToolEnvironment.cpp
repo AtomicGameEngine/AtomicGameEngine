@@ -76,6 +76,16 @@ bool ToolEnvironment::InitFromJSON(bool atomicTool)
         SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
         SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR, true);
 
+        netAssemblyLoadPaths_ = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
+        netTPAPaths_ = ToString("%s/Submodules/CoreCLR/Windows/Debug/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR);
+        netTPAPaths_ += ToString(";%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
+#else
+        String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
+#endif
+
         return true;
     }
 

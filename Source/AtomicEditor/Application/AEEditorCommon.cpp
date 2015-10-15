@@ -16,6 +16,9 @@
 #include <Atomic/Script/ScriptSystem.h>
 #include <AtomicJS/Javascript/Javascript.h>
 
+#include <ToolCore/ToolSystem.h>
+#include <ToolCore/ToolEnvironment.h>
+
 #ifdef ATOMIC_DOTNET
 #include <AtomicNET/NETCore/NETHost.h>
 #include <AtomicNET/NETCore/NETCore.h>
@@ -27,6 +30,14 @@ namespace Atomic
 {
     void jsapi_init_atomicnet(JSVM* vm);
 }
+
+using namespace ToolCore;
+
+namespace ToolCore
+{
+    extern void jsapi_init_toolcore(JSVM* vm);
+}
+
 
 namespace AtomicEditor
 {
@@ -45,6 +56,8 @@ void AEEditorCommon::Start()
     Javascript* javascript = GetSubsystem<Javascript>();
     vm_ = javascript->InstantiateVM("MainVM");
     vm_->InitJSContext();
+
+    jsapi_init_toolcore(vm_);
 
 #ifdef ATOMIC_DOTNET
     jsapi_init_atomicnet(vm_);
@@ -68,6 +81,22 @@ void AEEditorCommon::Setup()
     Javascript* javascript = new Javascript(context_);
     context_->RegisterSubsystem(javascript);
 
+    ToolEnvironment* env = new ToolEnvironment(context_);
+    context_->RegisterSubsystem(env);
+
+#ifdef ATOMIC_DEV_BUILD
+
+    if (!env->InitFromJSON())
+    {
+        ErrorExit(ToString("Unable to initialize tool environment from %s", env->GetDevConfigFilename().CString()));
+        return;
+    }
+#else
+
+    env->InitFromPackage();
+
+#endif
+
 #ifdef ATOMIC_DOTNET
 
     // Instantiate and register the AtomicNET subsystem
@@ -75,27 +104,9 @@ void AEEditorCommon::Setup()
     context_->RegisterSubsystem(netCore);
     String netCoreErrorMsg;
 
-#ifdef ATOMIC_DEV_BUILD
-
-    String  assemblyLoadPaths = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
-    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
-    String coreCLRTPAPaths = ToString("%s/Submodules/CoreCLR/Windows/Debug/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR);
-    coreCLRTPAPaths += ToString(";%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
-
-#else
-    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
-#endif
-
-#else
-    assert(0);
-#endif
-
-    NETHost::SetCoreCLRFilesAbsPath(coreCLRAbsPath);
-    NETHost::SetCoreCLRTPAPaths(coreCLRTPAPaths);
-    NETHost::SetCoreCLRAssemblyLoadPaths(assemblyLoadPaths);
+    NETHost::SetCoreCLRFilesAbsPath(env->GetNETCoreCLRAbsPath());
+    NETHost::SetCoreCLRTPAPaths(env->GetNETTPAPaths());
+    NETHost::SetCoreCLRAssemblyLoadPaths(env->GetNETAssemblyLoadPaths());
 
     if (!netCore->Initialize(netCoreErrorMsg))
     {
@@ -108,6 +119,8 @@ void AEEditorCommon::Setup()
     }
 #endif
 
+    ToolSystem* system = new ToolSystem(context_);
+    context_->RegisterSubsystem(system);
 
 }
 
