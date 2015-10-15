@@ -41,10 +41,11 @@ public:
     /// Destruct.
     virtual ~NETCore();
 
-    bool Initialize(const String& coreCLRFilesAbsPath, const String& assemblyLoadPaths, String &errorMsg);
+    bool Initialize(String &errorMsg);
     void Shutdown();
 
     void AddAssemblyLoadPath(const String& assemblyPath);
+
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
     void WaitForDebuggerConnect();
 
@@ -59,7 +60,6 @@ private:
     bool InitCoreCLRDLL(String &errorMsg);
     void GenerateTPAList(String& tpaList);
 
-    String coreCLRFilesAbsPath_;
     void* coreCLRDLLHandle_;
     void* hostHandle_;
     unsigned domainId_;

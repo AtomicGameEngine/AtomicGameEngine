@@ -63,7 +63,7 @@ public:
     /// Destruct.
     virtual ~NETHostWindows();
 
-    bool Initialize(const String& coreCLRFilesAbsPath, const String& assemblyLoadPaths);
+    bool Initialize();
 
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
 
@@ -79,9 +79,6 @@ private:
     void AddFilesFromDirectoryToTPAList(const wchar_t* targetPath, wchar_t** rgTPAExtensions, int countExtensions);
     bool GenerateTPAList();
     bool CreateAppDomain();
-
-    // this path MUST use "\" and not "/" as CoreCLR requires "\" usage in init
-    String coreCLRFilesAbsPath_;
 
     ICLRRuntimeHost2* clrRuntimeHost_;
     HMODULE clrModule_;

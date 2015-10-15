@@ -102,6 +102,7 @@ NETCore::~NETCore()
 
 void NETCore::GenerateTPAList(String& tpaList)
 {
+#ifdef disabled
     tpaList = String::EMPTY;
 
     FileSystem* fs = GetSubsystem<FileSystem>();
@@ -123,6 +124,7 @@ void NETCore::GenerateTPAList(String& tpaList)
     tpaList.Join(trustedAssemblies, ":");
 
     // LOGINFOF("NetCore:: TPALIST - %s", tpaList.CString());
+#endif
 
 }
 
@@ -152,6 +154,7 @@ void NETCore::Shutdown()
 
 bool NETCore::InitCoreCLRDLL(String& errorMsg)
 {
+#ifdef disabled
     String coreClrDllPath = AddTrailingSlash(coreCLRFilesAbsPath_) + sCoreClrDll;
 
     coreCLRDLLHandle_ = SDL_LoadObject(coreClrDllPath.CString());
@@ -195,6 +198,7 @@ bool NETCore::InitCoreCLRDLL(String& errorMsg)
         errorMsg = ToString("NETCore: Unable to get coreclr_execute_assembly entry point in %s", coreClrDllPath.CString());
         return false;
     }
+#endif
 
     return true;
 }
@@ -290,16 +294,14 @@ bool NETCore::CreateDelegate(const String& assemblyName, const String& qualified
 
 }
 
-bool NETCore::Initialize(const String &coreCLRFilesAbsPath, const String &assemblyLoadPaths, String& errorMsg)
+bool NETCore::Initialize(String& errorMsg)
 {
-    coreCLRFilesAbsPath_ = AddTrailingSlash(coreCLRFilesAbsPath);
-
 #ifdef ATOMIC_PLATFORM_WINDOWS
     netHost_ = new NETHostWindows(context_);
 #else
 #endif
 
-    netHost_->Initialize(coreCLRFilesAbsPath_, assemblyLoadPaths);
+    netHost_->Initialize();
 
     SharedPtr<NETManaged> managed(new NETManaged(context_));
     context_->RegisterSubsystem(managed);

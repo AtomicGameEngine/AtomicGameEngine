@@ -17,6 +17,7 @@
 #include <AtomicJS/Javascript/Javascript.h>
 
 #ifdef ATOMIC_DOTNET
+#include <AtomicNET/NETCore/NETHost.h>
 #include <AtomicNET/NETCore/NETCore.h>
 #endif
 
@@ -79,7 +80,11 @@ void AEEditorCommon::Setup()
     String  assemblyLoadPaths = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
+
     String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
+    String coreCLRTPAPaths = ToString("%s/Submodules/CoreCLR/Windows/Debug/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR);
+    coreCLRTPAPaths += ToString(";%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
+
 #else
     String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
 #endif
@@ -88,7 +93,11 @@ void AEEditorCommon::Setup()
     assert(0);
 #endif
 
-    if (!netCore->Initialize(coreCLRAbsPath, assemblyLoadPaths,  netCoreErrorMsg))
+    NETHost::SetCoreCLRFilesAbsPath(coreCLRAbsPath);
+    NETHost::SetCoreCLRTPAPaths(coreCLRTPAPaths);
+    NETHost::SetCoreCLRAssemblyLoadPaths(assemblyLoadPaths);
+
+    if (!netCore->Initialize(netCoreErrorMsg))
     {
         LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
         context_->RemoveSubsystem(NETCore::GetTypeStatic());

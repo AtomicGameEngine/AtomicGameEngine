@@ -42,11 +42,19 @@ bool NETHostWindows::CreateDelegate(const String& assemblyName, const String& qu
     return true;
 }
 
-bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath, const String &assemblyLoadPaths)
+bool NETHostWindows::Initialize()
 {
     // It is very important that this is the native path "\\" vs "/" as find files will return "/" or "\" depending
     // on what you give it, which will result in the domain failing to initialize as coreclr can't handle "/" on init
-    coreCLRFilesAbsPath_ = GetNativePath(AddTrailingSlash(coreCLRFilesAbsPath));
+
+    if (!coreCLRFilesAbsPath_.Length())
+        return false;
+
+    if (!coreCLRTPAPaths_.Length())
+        return false;
+
+    if (!coreCLRAssemblyLoadPaths_.Length())
+        return false;
 
     if (!LoadCLRDLL())
         return false;
@@ -79,7 +87,7 @@ bool NETHostWindows::Initialize(const String& coreCLRFilesAbsPath, const String 
 
     if (result)
     {
-        startup(assemblyLoadPaths.CString());
+        startup(coreCLRAssemblyLoadPaths_.CString());
     }
 
     // MOVE THIS!
@@ -137,7 +145,7 @@ bool NETHostWindows::LoadCLRDLL()
 
 bool NETHostWindows::CreateAppDomain()
 {
-    wchar_t appPath[MAX_LONGPATH] = W("C:\\Dev\\atomic\\AtomicGameEngine\\Artifacts\\AtomicNET\\");
+    wchar_t appPath[MAX_LONGPATH] = W("");
     wchar_t appNiPath[MAX_LONGPATH * 2] = W("");
 
     //wcscpy_s(appPath, WString(coreCLRFilesAbsPath_).CString());
@@ -414,15 +422,11 @@ bool NETHostWindows::GenerateTPAList()
 
     AddFilesFromDirectoryToTPAList(WString(coreCLRFilesAbsPath_).CString(), rgTPAExtensions, _countof(rgTPAExtensions));
 
-#ifdef ATOMIC_DEV_BUILD
-    WString  tpaAbsPath(GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Debug/AnyCPU/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
-    WString  atomicTPAAbsPath(GetNativePath(ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR)));
-#else
-    assert(0);
-#endif
-
-    AddFilesFromDirectoryToTPAList(tpaAbsPath.CString(), rgTPAExtensions, _countof(rgTPAExtensions));
-    AddFilesFromDirectoryToTPAList(atomicTPAAbsPath.CString(), rgTPAExtensions, _countof(rgTPAExtensions));
+    Vector<String> paths = coreCLRTPAPaths_.Split(';');
+    for (unsigned i = 0; i < paths.Size(); i++)
+    {
+        AddFilesFromDirectoryToTPAList(WString(GetNativePath(paths[i])).CString(), rgTPAExtensions, _countof(rgTPAExtensions));
+    }
 
     return true;
 
