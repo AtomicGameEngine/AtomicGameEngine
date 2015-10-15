@@ -30,4 +30,18 @@ add_custom_command(TARGET AtomicTool POST_BUILD
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Editor/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicNET/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMENT "Generating Javascript Bindings")
+                   COMMENT "Generating Script Bindings")
+
+if (MSVC)
+
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
+  file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
+endif()
+
+add_custom_command(TARGET AtomicTool POST_BUILD
+                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNET/
+                   COMMAND  ${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNET/build.cmd
+                   COMMENT "Compiling AtomicNET Assemblies")
+else()
+
+endif()
