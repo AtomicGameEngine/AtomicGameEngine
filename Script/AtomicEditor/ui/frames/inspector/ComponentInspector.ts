@@ -9,6 +9,7 @@ import ScriptWidget = require("ui/ScriptWidget");
 import DataBinding = require("./DataBinding");
 import InspectorUtils = require("./InspectorUtils");
 import EditorUI = require("ui/EditorUI");
+import CSComponentClassSelector = require("./CSComponentClassSelector");
 
 class ComponentInspector extends Atomic.UISection {
 
@@ -47,11 +48,11 @@ class ComponentInspector extends Atomic.UISection {
         // For JSComponents append the filename
         if (component.typeName == "JSComponent") {
 
-            var jsc = <Atomic.JSComponent> component;
+            var jsc = <Atomic.JSComponent>component;
 
             if (jsc.componentFile) {
-              var pathInfo = Atomic.splitPath( jsc.componentFile.name);
-              this.text = "JS - " + pathInfo.fileName;
+                var pathInfo = Atomic.splitPath(jsc.componentFile.name);
+                this.text = "JS - " + pathInfo.fileName;
             }
 
         }
@@ -82,7 +83,7 @@ class ComponentInspector extends Atomic.UISection {
 
         for (var i in attrs) {
 
-            var attr = <Atomic.AttributeInfo> attrs[i];
+            var attr = <Atomic.AttributeInfo>attrs[i];
 
             if (attr.mode & Atomic.AM_NOEDIT)
                 continue;
@@ -148,6 +149,7 @@ class ComponentInspector extends Atomic.UISection {
         if (component.typeName == "CSComponent") {
             // auto expand CSComponents
             this.value = 1;
+            this.addCSComponentUI(attrsVerticalLayout);
         }
 
 
@@ -202,7 +204,7 @@ class ComponentInspector extends Atomic.UISection {
 
         if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-            var asset = <ToolCore.Asset> dragObject.object;
+            var asset = <ToolCore.Asset>dragObject.object;
 
             if (asset.importerTypeName == importerTypeName) {
                 return asset.importer;
@@ -226,7 +228,7 @@ class ComponentInspector extends Atomic.UISection {
 
             EditorUI.getModelOps().showResourceSelection("Select Material", "MaterialImporter", function(asset: ToolCore.Asset) {
 
-                staticModel.setMaterialIndex(index, <Atomic.Material> Atomic.cache.getResource("Material", asset.path));
+                staticModel.setMaterialIndex(index, <Atomic.Material>Atomic.cache.getResource("Material", asset.path));
 
                 if (staticModel.getMaterial())
                     materialField.text = staticModel.getMaterial().name;
@@ -254,10 +256,10 @@ class ComponentInspector extends Atomic.UISection {
 
                 if (importer) {
 
-                    var materialImporter = <ToolCore.MaterialImporter> importer;
+                    var materialImporter = <ToolCore.MaterialImporter>importer;
                     var asset = materialImporter.asset;
 
-                    var material = <Atomic.Material> Atomic.cache.getResource("Material", asset.path);
+                    var material = <Atomic.Material>Atomic.cache.getResource("Material", asset.path);
 
                     if (material) {
 
@@ -275,7 +277,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addModelUI(layout: Atomic.UILayout, typeName: string) {
 
-        var staticModel = <Atomic.StaticModel> this.component;
+        var staticModel = <Atomic.StaticModel>this.component;
 
         var numGeometries = staticModel.numGeometries;
         if (typeName == "Skybox") {
@@ -294,7 +296,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addSpriteUI(layout: Atomic.UILayout, typeName: string) {
 
-        var spriteComponent = <Atomic.StaticSprite2D> this.component;
+        var spriteComponent = <Atomic.StaticSprite2D>this.component;
 
         var o = InspectorUtils.createAttrEditFieldWithSelectButton("Sprite", layout);
         var field = o.editField;
@@ -308,7 +310,7 @@ class ComponentInspector extends Atomic.UISection {
             // this should allow selecting of sprite sheets as well
             EditorUI.getModelOps().showResourceSelection("Select Sprite", "TextureImporter", function(asset: ToolCore.Asset) {
 
-                spriteComponent.sprite = <Atomic.Sprite2D> Atomic.cache.getResource("Sprite2D", asset.path);
+                spriteComponent.sprite = <Atomic.Sprite2D>Atomic.cache.getResource("Sprite2D", asset.path);
                 if (spriteComponent.sprite)
                     field.text = spriteComponent.sprite.name;
 
@@ -325,9 +327,9 @@ class ComponentInspector extends Atomic.UISection {
 
                 if (importer) {
 
-                  spriteComponent.sprite = <Atomic.Sprite2D> Atomic.cache.getResource("Sprite2D", importer.asset.path);
-                  if (spriteComponent.sprite)
-                      field.text = spriteComponent.sprite.name;
+                    spriteComponent.sprite = <Atomic.Sprite2D>Atomic.cache.getResource("Sprite2D", importer.asset.path);
+                    if (spriteComponent.sprite)
+                        field.text = spriteComponent.sprite.name;
 
                 }
             }
@@ -339,7 +341,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addTilemap2DUI(layout: Atomic.UILayout) {
 
-        var tilemap = <Atomic.TileMap2D> this.component;
+        var tilemap = <Atomic.TileMap2D>this.component;
 
         var o = InspectorUtils.createAttrEditFieldWithSelectButton("TMX File", layout);
         var field = o.editField;
@@ -353,7 +355,7 @@ class ComponentInspector extends Atomic.UISection {
             // this should allow selecting of sprite sheets as well
             EditorUI.getModelOps().showResourceSelection("Select TMX File", "TMXImporter", function(asset: ToolCore.Asset) {
 
-                tilemap.tmxFile = <Atomic.TmxFile2D> Atomic.cache.getResource("TmxFile2D", asset.path);
+                tilemap.tmxFile = <Atomic.TmxFile2D>Atomic.cache.getResource("TmxFile2D", asset.path);
                 if (tilemap.tmxFile)
                     field.text = tilemap.tmxFile.name;
             });
@@ -369,9 +371,9 @@ class ComponentInspector extends Atomic.UISection {
 
                 if (importer) {
 
-                  tilemap.tmxFile = <Atomic.TmxFile2D> Atomic.cache.getResource("TmxFile2D", importer.asset.path);
-                  if (tilemap.tmxFile)
-                      field.text = tilemap.tmxFile.name;
+                    tilemap.tmxFile = <Atomic.TmxFile2D>Atomic.cache.getResource("TmxFile2D", importer.asset.path);
+                    if (tilemap.tmxFile)
+                        field.text = tilemap.tmxFile.name;
 
                 }
             }
@@ -382,7 +384,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addLightCascadeParametersUI(layout: Atomic.UILayout) {
 
-        var light = <Atomic.Light> this.component;
+        var light = <Atomic.Light>this.component;
 
         var cascadeInfo = light.getShadowCascade();
 
@@ -434,7 +436,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addCollisionShapeUI(layout: Atomic.UILayout) {
 
-        var shape = <Atomic.CollisionShape> this.component;
+        var shape = <Atomic.CollisionShape>this.component;
 
         var button = new Atomic.UIButton();
         button.fontDescription = InspectorUtils.attrFontDesc;
@@ -443,7 +445,7 @@ class ComponentInspector extends Atomic.UISection {
 
         button.onClick = () => {
 
-            var model = <Atomic.Drawable> shape.node.getComponent("StaticModel");
+            var model = <Atomic.Drawable>shape.node.getComponent("StaticModel");
             if (model) {
                 var box = model.boundingBox;
                 shape.setBox([box[3] - box[0], box[4] - box[1], box[5] - box[2]]);
@@ -455,6 +457,34 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
+    addCSComponentUI(layout: Atomic.UILayout) {
+
+        for (var i in this.bindings) {
+
+            var binding = this.bindings[i];
+
+            // replace the Class widget with a editfield + select button
+            if (binding.attrInfo.name == "Class") {
+
+                var parent = binding.widget.parent;
+                var text = binding.widget.text;
+                binding.widget.parent.removeChild(binding.widget);
+                var o = InspectorUtils.createAttrEditFieldWithSelectButton("", parent);
+                o.editField.text = text;
+                binding.widget = o.editField;
+
+                o.selectButton.onClick = () => {
+
+                  var cscomponent = <AtomicNET.CSComponent> this.component;
+                  if (cscomponent.assemblyFile) {
+                    var selector = new CSComponentClassSelector(o.editField, cscomponent);
+                  }
+                }
+
+                break;
+            }
+        }
+    }
 
     component: Atomic.Component;
     bindings: Array<DataBinding> = new Array();
