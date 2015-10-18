@@ -179,6 +179,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetLayoutParams(UILayoutParams* params);
     void SetFontDescription(UIFontDescription* fd);
 
+    void Remove();
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
     void DeleteAllChildren();
@@ -228,6 +229,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     UIView* GetView();
 
     virtual void AddChild(UIWidget* child);
+
+    void AddChildAfter(UIWidget* child, UIWidget* otherChild);
+    void AddChildBefore(UIWidget* child, UIWidget* otherChild);
 
     /// Add the child to this widget. See AddChild for adding a child to the top or bottom.
     /// This takes a relative Z and insert the child before or after the given reference widget.

@@ -209,6 +209,17 @@ declare module Atomic {
 
 }
 
+declare module AtomicNET {
+
+    export interface CSComponentClassChangedEvent {
+
+      cscomponent: CSComponent;
+      classname: string;
+
+    }
+
+}
+
 declare module ToolCore {
 
     export interface ResourceAddedEvent {

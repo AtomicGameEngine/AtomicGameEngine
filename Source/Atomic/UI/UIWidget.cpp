@@ -189,6 +189,24 @@ void UIWidget::OnDelete()
     ReleaseRef();
 }
 
+void UIWidget::AddChildAfter(UIWidget* child, UIWidget* otherChild)
+{
+    if (!widget_ || !child || !child->widget_ || !otherChild || !otherChild->widget_)
+        return;
+
+    widget_->AddChildRelative(child->widget_, tb::WIDGET_Z_REL_AFTER, otherChild->widget_);
+
+}
+
+void UIWidget::AddChildBefore(UIWidget* child, UIWidget* otherChild)
+{
+    if (!widget_ || !child || !child->widget_ || !otherChild || !otherChild->widget_)
+        return;
+
+    widget_->AddChildRelative(child->widget_, tb::WIDGET_Z_REL_BEFORE, otherChild->widget_);
+
+}
+
 void UIWidget::AddChild(UIWidget* child)
 {
     if (!widget_ || !child || !child->widget_)
@@ -395,6 +413,15 @@ void UIWidget::SetSkinBg(const String& id)
         return;
 
     widget_->SetSkinBg(TBIDC(id.CString()));
+
+}
+
+void UIWidget::Remove()
+{
+    if (!widget_ || !widget_->GetParent())
+        return;
+
+    widget_->GetParent()->RemoveChild(widget_);
 
 }
 

@@ -76,7 +76,7 @@ public:
     void ApplyFieldValues();
     VariantMap& GetFieldValues() { return fieldValues_; }
 
-    void SetComponentClassName(const String& name) { componentClassName_ = name; }
+    void SetComponentClassName(const String& name);
     const String& GetComponentClassName() const { return componentClassName_; }
 
     virtual ScriptComponentFile* GetComponentFile() { return assemblyFile_; }

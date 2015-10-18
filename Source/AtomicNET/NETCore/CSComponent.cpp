@@ -33,6 +33,7 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/SceneEvents.h>
 
+#include "NETEvents.h"
 #include "NETVariant.h"
 #include "NETManaged.h"
 #include "CSComponent.h"
@@ -165,6 +166,20 @@ void CSComponent::ApplyFieldValues()
 
     managed->CSComponentApplyFields(this, vmap);
 
+}
+
+void CSComponent::SetComponentClassName(const String& name)
+{
+    componentClassName_ = name;
+
+    if (assemblyFile_ && assemblyFile_->GetClassNames().Contains(name))
+    {
+        using namespace CSComponentClassChanged;
+        VariantMap eventData;
+        eventData[P_CSCOMPONENT] = this;
+        eventData[P_CLASSNAME] = name;
+        SendEvent(E_CSCOMPONENTCLASSCHANGED, eventData);
+    }
 }
 
 void CSComponent::OnNodeSet(Node* node)
