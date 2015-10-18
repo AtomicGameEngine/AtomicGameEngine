@@ -36,6 +36,7 @@ public class AtomicLoadContext : LoadContext
     protected override IntPtr LoadUnmanagedDll(String unmanagedDllName)
     {
 
+      /*
       if (unmanagedDllName == "__Internal")
       {
         IntPtr result = GetModuleHandle(null);
@@ -45,17 +46,19 @@ public class AtomicLoadContext : LoadContext
       // do we need to walk paths here?
       Console.WriteLine("LoadUnmanagedDll: " + unmanagedDllName);
       return GetModuleHandle(unmanagedDllName); //RTLD_LAZY
+      */
 
-      /*
+
       if (unmanagedDllName == "__Internal")
       {
-        return dlopen(null, 1); //RTLD_LAZY
+        IntPtr result = dlopen(null, 1); //RTLD_LAZY
+        return result;
       }
 
       // do we need to walk paths here?
       Console.WriteLine("LoadUnmanagedDll: " + unmanagedDllName);
       return dlopen(unmanagedDllName, 1 ); //RTLD_LAZY
-      */
+
     }
 
     public override Assembly LoadAssembly(AssemblyName assemblyName)
@@ -71,7 +74,7 @@ public class AtomicLoadContext : LoadContext
             assembly = LoadFromAssemblyPath(path + assemblyName.Name + ".dll");
             break;
         }
-        catch (Exception e)
+        catch //(Exception e)
         {
           //Console.WriteLine(e.Message);
         }

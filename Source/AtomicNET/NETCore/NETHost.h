@@ -25,9 +25,12 @@ public:
     // ; (semicolon) delimited list of paths to trusted platform assemblies
     static void SetCoreCLRTPAPaths(const String& path) { coreCLRTPAPaths_ = path; }
 
+    static const String& GetCoreCLRAssemblyLoadPaths() { return coreCLRAssemblyLoadPaths_; }
+
     virtual bool Initialize() = 0;
     virtual bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut) = 0;
     virtual void WaitForDebuggerConnect() = 0;
+    virtual void Shutdown() = 0;
 
 protected:
 

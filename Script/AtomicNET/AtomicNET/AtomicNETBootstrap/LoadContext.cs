@@ -13,7 +13,7 @@ namespace Atomic.Bootstrap
     public abstract class LoadContext : AssemblyLoadContext, IAssemblyLoadContext
     {
         private readonly AssemblyLoaderCache _cache = new AssemblyLoaderCache();
-        private readonly string _friendlyName;
+        //private readonly string _friendlyName;
 
         public LoadContext()
         {
@@ -21,7 +21,7 @@ namespace Atomic.Bootstrap
 
         public LoadContext(string friendlyName)
         {
-            _friendlyName = friendlyName;
+            //_friendlyName = friendlyName;
         }
 
         protected override Assembly Load(AssemblyName assemblyName)

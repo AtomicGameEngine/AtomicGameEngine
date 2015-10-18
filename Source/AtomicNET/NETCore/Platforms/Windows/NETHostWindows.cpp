@@ -65,46 +65,6 @@ bool NETHostWindows::Initialize()
     if (!CreateAppDomain())
         return false;
 
-    // MOVE THIS!
-    typedef void (*StartupFunction)(const char* assemblyLoadPaths);
-    StartupFunction startup;
-
-    // The coreclr binding model will become locked upon loading the first assembly that is not on the TPA list, or
-    // upon initializing the default context for the first time. For this test, test assemblies are located alongside
-    // corerun, and hence will be on the TPA list. So, we should be able to set the default context once successfully,
-    // and fail on the second try.
-
-    // AssemblyLoadContext
-    // https://github.com/dotnet/corefx/issues/3054
-    // dnx loader
-    // https://github.com/aspnet/dnx/tree/dev/src/Microsoft.Dnx.Loader
-
-    bool result = CreateDelegate(
-                    "AtomicNETBootstrap",
-                    "Atomic.Bootstrap.AtomicLoadContext",
-                    "Startup",
-                    (void**) &startup);
-
-    if (result)
-    {
-        startup(coreCLRAssemblyLoadPaths_.CString());
-    }
-
-    // MOVE THIS!
-    typedef void (*InitializeFunction)();
-    InitializeFunction init;
-
-    result = CreateDelegate(
-                    "AtomicNETEngine",
-                    "AtomicEngine.Atomic",
-                    "Initialize",
-                    (void**) &init);
-
-    if (result)
-    {
-        init();
-    }
-
 
     return true;
 }

@@ -1,6 +1,6 @@
 
 csc /out:../../../Artifacts/AtomicNET/TPA/AtomicNETBootstrap.dll /nostdlib+ /noconfig /t:library ^
-/lib:../../../Submodules/CoreCLR/Windows/Release/x64/;../../../Submodules/CoreCLR/Windows/Release/x64/ ^
+/lib:../../../Submodules/CoreCLR/Windows/Release/x64/ ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Collections.Concurrent.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Runtime.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Linq.dll ^
@@ -9,7 +9,7 @@ csc /out:../../../Artifacts/AtomicNET/TPA/AtomicNETBootstrap.dll /nostdlib+ /noc
 AtomicNETBootstrap/*.cs
 
 csc /out:../../../Artifacts/AtomicNET/AtomicNETEngine.dll /nostdlib+ /noconfig /t:library /w:0 ^
-/lib:../../../Submodules/CoreCLR/Windows/Release/x64/;../../../Submodules/CoreCLR/Windows/Release/x64/ ^
+/lib:../../../Submodules/CoreCLR/Windows/Release/x64/ ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Runtime.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.IO.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.IO.FileSystem.dll ^
@@ -21,7 +21,7 @@ csc /out:../../../Artifacts/AtomicNET/AtomicNETEngine.dll /nostdlib+ /noconfig /
 AtomicNETEngine/*.cs
 
 csc /unsafe /out:../../../Artifacts/AtomicNET/AtomicNETTools.dll /nostdlib+ /noconfig /t:library /w:0 ^
-/lib:../../../Submodules/CoreCLR/Windows/Release/x64/;../../../Submodules/CoreCLR/Windows/Release/x64/ ^
+/lib:../../../Submodules/CoreCLR/Windows/Release/x64/ ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Runtime.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.IO.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Linq.dll ^
@@ -35,7 +35,7 @@ AtomicNETTools/*.cs
 
 csc /out:../../../Artifacts/AtomicNET/AtomicNETTestCompile.dll ^
 /debug+ /nostdlib+ /noconfig /t:library /w:0 ^
-/lib:../../../Submodules/CoreCLR/Windows/Release/x64/;../../../Submodules/CoreCLR/Windows/Release/x64/ ^
+/lib:../../../Submodules/CoreCLR/Windows/Release/x64/ ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.Runtime.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.IO.dll ^
 /r:../../../Submodules/CoreCLR/Windows/Release/x64/System.IO.FileSystem.dll ^

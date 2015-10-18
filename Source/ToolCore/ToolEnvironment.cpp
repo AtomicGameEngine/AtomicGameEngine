@@ -63,7 +63,8 @@ bool ToolEnvironment::InitFromPackage()
     netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
     netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
 #else
-    String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
+    netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
+    netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
 #endif
 
     return true;
@@ -92,7 +93,8 @@ bool ToolEnvironment::InitFromJSON(bool atomicTool)
         netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Release/x64/", ATOMIC_ROOT_SOURCE_DIR));
         netTPAPaths_ = ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
 #else
-        String  coreCLRAbsPath = GetNativePath(ToString("%s/Submodules/CoreCLR/OSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR);
+        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/MacOSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
+        netTPAPaths_ = ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
 #endif
 
         return true;

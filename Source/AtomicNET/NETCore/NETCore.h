@@ -57,13 +57,6 @@ private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
-    bool InitCoreCLRDLL(String &errorMsg);
-    void GenerateTPAList(String& tpaList);
-
-    void* coreCLRDLLHandle_;
-    void* hostHandle_;
-    unsigned domainId_;
-
     SharedPtr<NETHost> netHost_;
 
     /// weak local context ref, so avoid recursion in static GetContext call

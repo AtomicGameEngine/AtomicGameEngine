@@ -165,6 +165,8 @@ void AtomicPlayerApp::Start()
 
 #else
 
+    String rootNETDir = fileSystem->GetProgramDir() + "AtomicPlayer_Resources/AtomicNET/";
+
 #endif
 
     NETHost::SetCoreCLRFilesAbsPath(GetNativePath(rootNETDir + "CoreCLR/"));
