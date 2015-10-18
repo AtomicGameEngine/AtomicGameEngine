@@ -81,6 +81,8 @@ bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
 
     String className = json.Get("name").GetString();
 
+    classNames_.Push(className);
+
     const JSONValue& jfields = json.Get("fields");
 
     PODVector<StringHash> enumsAdded;
@@ -187,6 +189,7 @@ bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
 {
     Clear();
     assemblyEnums_.Clear();
+    classNames_.Clear();
 
     const JSONArray& enums = json.Get("enums").GetArray();
 

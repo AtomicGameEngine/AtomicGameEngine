@@ -14,8 +14,10 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+class JSBPackage;
 class JSBModule;
 class JSBHeader;
+
 
 class JSBEnum : public Object
 {
@@ -29,6 +31,8 @@ public:
 
     const String& GetName() { return name_; }
     JSBHeader* GetHeader() { return header_; }
+
+    JSBPackage* GetPackage();
 
     HashMap<String, String>& GetValues() { return values_; }
 

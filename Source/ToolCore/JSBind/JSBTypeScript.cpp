@@ -35,7 +35,19 @@ String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
         scriptType = "string";
 
     if (ftype->type_->asEnumType())
-        scriptType = ftype->type_->asEnumType()->enum_->GetName();
+    {
+        JSBEnum* jenum = ftype->type_->asEnumType()->enum_;
+
+        scriptType = jenum->GetName();
+
+        if (jenum->GetPackage()->GetName() != package_->GetName())
+        {
+
+            scriptType =jenum->GetPackage()->GetName() + "." + scriptType;
+
+        }
+
+    }
 
     if (ftype->type_->asClassType())
     {

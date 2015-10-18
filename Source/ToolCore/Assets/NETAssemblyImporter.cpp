@@ -56,25 +56,6 @@ bool NETAssemblyImporter::Import()
                 assemblyFile->ParseAssemblyJSON(assemblyJSON_);
         }
 
-
-        //if (assemblyJSON.IsObject())
-        //{
-            /*
-            const JSONValue& enums = assemblyJSON.Get("enums");
-
-            const JSONArray& components = assemblyJSON.Get("components").GetArray();
-
-            for (unsigned i = 0; i < components.Size(); i++)
-            {
-                const JSONValue& c = components.At(i);
-
-                String componentName = c.Get("name").GetString();
-
-                LOGINFOF("Found NET Component %s", componentName.CString());
-            }
-            */
-
-         //}
     }
 
     return true;

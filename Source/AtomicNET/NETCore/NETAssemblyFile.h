@@ -61,11 +61,17 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Only valid in editor, as we don't inspect assembly at runtime
+    const Vector<String>& GetClassNames() { return classNames_; }
+
 private:
 
     static void InitTypeMap();
 
     bool ParseComponentClassJSON(const JSONValue& json);
+
+    // only valid in editor
+    Vector<String> classNames_;
 
     HashMap<String, Vector<EnumInfo>> assemblyEnums_;
     static HashMap<StringHash, VariantType> typeMap_;

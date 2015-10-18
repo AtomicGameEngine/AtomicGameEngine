@@ -27,6 +27,11 @@ JSBEnum::~JSBEnum()
 
 }
 
+JSBPackage* JSBEnum::GetPackage()
+{
+    return module_->GetPackage();
+}
+
 void JSBEnum::Preprocess()
 {
     // TextureUnit is a special case as uses preprocessor for values depending on

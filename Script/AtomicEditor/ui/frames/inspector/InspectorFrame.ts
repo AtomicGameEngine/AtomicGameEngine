@@ -14,6 +14,7 @@ import DataBinding = require("./DataBinding");
 import MaterialInspector = require("./MaterialInspector");
 import ModelInspector = require("./ModelInspector");
 import NodeInspector = require("./NodeInspector");
+import AssemblyInspector = require("./AssemblyInspector");
 
 class InspectorFrame extends ScriptWidget {
 
@@ -96,7 +97,6 @@ class InspectorFrame extends ScriptWidget {
 
             inspector.inspect(asset);
 
-
         }
 
         if (asset.importerTypeName == "MaterialImporter") {
@@ -113,8 +113,17 @@ class InspectorFrame extends ScriptWidget {
             container.addChild(materialInspector);
 
             materialInspector.inspect(asset, material);
+        }
+
+        if (asset.importerTypeName == "NETAssemblyImporter") {
+
+            var assemblyInspector = new AssemblyInspector();
+            container.addChild(assemblyInspector);
+
+            assemblyInspector.inspect(asset);
 
         }
+
 
     }
 
