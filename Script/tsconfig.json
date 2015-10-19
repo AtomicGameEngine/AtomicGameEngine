@@ -7,8 +7,8 @@
         "removeComments": true,
         "noLib": false,
         "outDir": "../Resources/EditorData/AtomicEditor/EditorScripts",
-        "sourceMap": true,
-        "moduleResolution": “classic”
+        "moduleResolution": "classic",
+        "sourceMap": true
     },
     "filesGlob": [
         "./ToolCore/**/*.ts",
