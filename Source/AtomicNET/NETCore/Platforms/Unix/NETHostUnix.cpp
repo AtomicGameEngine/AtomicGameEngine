@@ -67,6 +67,28 @@ bool NETHostUnix::Initialize()
     return true;
 }
 
+int NETHostUnix::ExecAssembly(const String& assemblyName, const Vector<String>& args)
+{
+    //void* hostHandle,
+    //unsigned int domainId,
+    //int argc,
+    //const char** argv,
+    //const char* managedAssemblyPath,
+    //unsigned int* exitCode);
+
+    const char** _argv { 0 };
+
+    PODVector<const char*> argv;
+    for (unsigned i = 0; i < args.Size(); i++)
+        argv.Push(args[i].CString());
+
+    unsigned int exitCode = 0;
+
+    ExecuteAssembly_(hostHandle_, domainId_, (int) argv.Size(), argv.Size() ? &argv[0] : _argv, assemblyName.CString(), &exitCode);
+
+    return (int) exitCode;
+}
+
 bool NETHostUnix::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
 {
 

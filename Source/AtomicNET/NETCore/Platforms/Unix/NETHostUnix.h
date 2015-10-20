@@ -56,6 +56,8 @@ public:
     void WaitForDebuggerConnect();
     void Shutdown();
 
+    int ExecAssembly(const String& assemblyName, const Vector<String>& args);
+
 private:
 
     bool LoadCLRDLL(String& errorMsg);

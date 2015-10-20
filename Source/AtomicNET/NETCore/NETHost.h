@@ -30,6 +30,7 @@ public:
     virtual bool Initialize() = 0;
     virtual bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut) = 0;
     virtual void WaitForDebuggerConnect() = 0;
+    virtual int ExecAssembly(const String& assemblyName, const Vector<String>& args) = 0;
     virtual void Shutdown() = 0;
 
 protected:

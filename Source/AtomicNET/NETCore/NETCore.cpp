@@ -107,6 +107,11 @@ void NETCore::AddAssemblyLoadPath(const String& assemblyPath)
 
 }
 
+int NETCore::ExecAssembly(const String& assemblyName, const Vector<String>& args)
+{
+    return netHost_->ExecAssembly(assemblyName, args);
+}
+
 bool NETCore::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
 {
     return netHost_->CreateDelegate(assemblyName, qualifiedClassName, methodName, funcOut);

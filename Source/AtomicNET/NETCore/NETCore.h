@@ -46,6 +46,8 @@ public:
 
     void AddAssemblyLoadPath(const String& assemblyPath);
 
+    int ExecAssembly(const String& assemblyName, const Vector<String>& args);
+
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
     void WaitForDebuggerConnect();
 
