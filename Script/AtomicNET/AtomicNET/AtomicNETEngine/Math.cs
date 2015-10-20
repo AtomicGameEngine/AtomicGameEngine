@@ -55,7 +55,7 @@ namespace AtomicEngine
 			this.x = x;
 			this.y = y;
 		}
-			
+
 		public float x;
 		public float y;
 
@@ -81,7 +81,7 @@ namespace AtomicEngine
 		public float x;
 		public float y;
 		public float z;
-			
+
 		static public readonly Quaternion Identity = new Quaternion();
 
 	}
@@ -107,6 +107,15 @@ namespace AtomicEngine
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 	public struct IntRect
 	{
+		/// Left coordinate.
+    int left;
+    /// Top coordinate.
+    int top;
+    /// Right coordinate.
+    int right;
+    /// Bottom coordinate.
+    int bottom;
+
 	}
 
 	[StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -135,4 +144,3 @@ namespace AtomicEngine
 	public struct Rect
 	{
 	}}
-

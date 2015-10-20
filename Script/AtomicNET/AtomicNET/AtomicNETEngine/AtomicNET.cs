@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
@@ -29,7 +30,41 @@ public static class Atomic
     UIModule.Initialize ();
     AtomicNETModule.Initialize();
     AtomicPlayer.PlayerModule.Initialize ();
-    //initSubsystems();
+  }
+
+  static public void Start()
+  {
+    initSubsystems();
+  }
+
+  static public void ExecMainAssembly()
+  {
+      Assembly assembly = null;
+
+      try
+      {
+        assembly = Assembly.Load("Main");
+      }
+      catch (Exception e)
+      {
+          Console.WriteLine("Failed to exec main assembly {0}", e.Message );
+          return;
+      }
+
+      if (assembly == null)
+        return;
+
+      // a project assembly may define an AtomicMain which will be run
+      foreach (var type in assembly.GetTypes())
+      {
+        MethodInfo main = type.GetMethod("Main", BindingFlags.Public | BindingFlags.Static);
+
+        if (main == null || main.GetParameters().Length != 0)
+          continue;
+
+        main.Invoke(null, null);
+
+      }
   }
 
   static Dictionary<Type, RefCounted> subSystems = new Dictionary<Type, RefCounted>();

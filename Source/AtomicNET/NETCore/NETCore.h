@@ -42,6 +42,7 @@ public:
     virtual ~NETCore();
 
     bool Initialize(String &errorMsg);
+    bool Start();
     void Shutdown();
 
     void AddAssemblyLoadPath(const String& assemblyPath);

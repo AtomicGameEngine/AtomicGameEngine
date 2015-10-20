@@ -71,6 +71,7 @@ namespace AtomicTools
 		{
 
 			foreach (var handle in metaReader.TypeDefinitions) {
+
 				var typeDef = metaReader.GetTypeDefinition (handle);
 
 				var baseTypeHandle = typeDef.BaseType;
@@ -96,6 +97,7 @@ namespace AtomicTools
 		void ParseEnums ()
 		{
 			foreach (var handle in metaReader.TypeDefinitions) {
+
 				var typeDef = metaReader.GetTypeDefinition (handle);
 
 				var baseTypeHandle = typeDef.BaseType;

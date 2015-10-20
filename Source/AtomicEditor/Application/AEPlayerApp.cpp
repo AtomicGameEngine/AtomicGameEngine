@@ -116,8 +116,8 @@ void AEPlayerApplication::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
 
-                String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%s/;%s/Resources;%s;%sCache",
-                         ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
+                String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%sResources;%s;%sCache",
+                         ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString());
 
 #else
 
@@ -188,6 +188,13 @@ void AEPlayerApplication::Start()
         }
 
     }
+
+#ifdef ATOMIC_DOTNET
+    NETCore* netCore = GetSubsystem<NETCore>();
+    if (netCore)
+        netCore->Start();
+#endif
+
     return;
 }
 

@@ -1,8 +1,9 @@
 
+#include <Atomic/Core/StringUtils.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
-#include <Atomic/Core/StringUtils.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include "CSEventHelper.h"
 #include "CSComponent.h"
@@ -122,6 +123,49 @@ void NETCore::AddAssemblyLoadPath(const String& assemblyPath)
 bool NETCore::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
 {
     return netHost_->CreateDelegate(assemblyName, qualifiedClassName, methodName, funcOut);
+}
+
+bool NETCore::Start()
+{
+    if (context_->GetEditorContext())
+        return true;
+
+    typedef void (*StartFunction)();
+    StartFunction start;
+
+    bool result = netHost_->CreateDelegate(
+                    "AtomicNETEngine",
+                    "AtomicEngine.Atomic",
+                    "Start",
+                    (void**) &start);
+
+    if (!result)
+        return false;
+
+    if (result)
+    {
+        start();
+
+        // Load Project Assemblies
+
+        typedef void (*ExecMainAssemblyFunction)();
+        ExecMainAssemblyFunction execMainAssembly;
+
+        result = netHost_->CreateDelegate(
+                        "AtomicNETEngine",
+                        "AtomicEngine.Atomic",
+                        "ExecMainAssembly",
+                        (void**) &execMainAssembly);
+
+        if (!result)
+            return false;
+
+        execMainAssembly();
+
+    }
+
+    return true;
+
 }
 
 bool NETCore::Initialize(String& errorMsg)
