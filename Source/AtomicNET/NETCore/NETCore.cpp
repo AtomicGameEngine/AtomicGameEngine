@@ -5,11 +5,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Resource/ResourceCache.h>
 
-#include "CSEventHelper.h"
-#include "CSComponent.h"
 #include "NETCore.h"
-#include "NETManaged.h"
-#include "NETAssemblyFile.h"
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #include "Platforms/Windows/NETHostWindows.h"
@@ -20,17 +16,12 @@
 namespace Atomic
 {
 
-/// Register NETCore library objects.
-void ATOMIC_API RegisterNETCoreLibrary(Context* context);
-
 WeakPtr<Context> NETCore::csContext_;
 WeakPtr<NETCore> NETCore::instance_;
 
 NETCore::NETCore(Context* context) :
     Object(context)
 {
-    RegisterNETCoreLibrary(context_);
-
     assert(!instance_);
     instance_ = this;
     csContext_ = context;
@@ -39,10 +30,6 @@ NETCore::NETCore(Context* context) :
 NETCore::~NETCore()
 {
     Shutdown();
-    context_->RemoveGlobalEventListener(context_->GetSubsystem<CSEventDispatcher>());
-    context_->RemoveSubsystem(CSEventDispatcher::GetTypeStatic());
-    context_->RemoveSubsystem(NETManaged::GetTypeStatic());
-
     instance_ = NULL;
 }
 
@@ -125,49 +112,6 @@ bool NETCore::CreateDelegate(const String& assemblyName, const String& qualified
     return netHost_->CreateDelegate(assemblyName, qualifiedClassName, methodName, funcOut);
 }
 
-bool NETCore::Start()
-{
-    if (context_->GetEditorContext())
-        return true;
-
-    typedef void (*StartFunction)();
-    StartFunction start;
-
-    bool result = netHost_->CreateDelegate(
-                    "AtomicNETEngine",
-                    "AtomicEngine.Atomic",
-                    "Start",
-                    (void**) &start);
-
-    if (!result)
-        return false;
-
-    if (result)
-    {
-        start();
-
-        // Load Project Assemblies
-
-        typedef void (*ExecMainAssemblyFunction)();
-        ExecMainAssemblyFunction execMainAssembly;
-
-        result = netHost_->CreateDelegate(
-                        "AtomicNETEngine",
-                        "AtomicEngine.Atomic",
-                        "ExecMainAssembly",
-                        (void**) &execMainAssembly);
-
-        if (!result)
-            return false;
-
-        execMainAssembly();
-
-    }
-
-    return true;
-
-}
-
 bool NETCore::Initialize(String& errorMsg)
 {
 
@@ -203,39 +147,12 @@ bool NETCore::Initialize(String& errorMsg)
                     "Startup",
                     (void**) &startup);
 
-    if (result)
-    {
-        startup(netHost_->GetCoreCLRAssemblyLoadPaths().CString());
-    }
+    if (!result)
+        return false;
 
-    // MOVE THIS!
-    typedef void (*InitializeFunction)();
-    InitializeFunction init;
+    startup(netHost_->GetCoreCLRAssemblyLoadPaths().CString());
 
-    result = netHost_->CreateDelegate(
-                    "AtomicNETEngine",
-                    "AtomicEngine.Atomic",
-                    "Initialize",
-                    (void**) &init);
-
-    if (result)
-    {
-        init();
-    }
-
-    SharedPtr<NETManaged> managed(new NETManaged(context_));
-    context_->RegisterSubsystem(managed);
-
-    SharedPtr<CSEventDispatcher> dispatcher(new CSEventDispatcher(context_));
-    context_->RegisterSubsystem(dispatcher);
-    context_->AddGlobalEventListener(dispatcher);
-
-    if (!context_->GetEditorContext())
-    {
-        SubscribeToEvent(E_UPDATE, HANDLER(NETCore, HandleUpdate));
-    }
-
-    return managed->Initialize();
+    return true;
 
 }
 
@@ -243,14 +160,7 @@ void NETCore::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
-    GetSubsystem<NETManaged>()->NETUpdate(eventData[P_TIMESTEP].GetFloat());
-}
-
-
-void RegisterNETCoreLibrary(Context* context)
-{
-    NETAssemblyFile::RegisterObject(context);
-    CSComponent::RegisterObject(context);
+    //GetSubsystem<NETManaged>()->NETUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
 

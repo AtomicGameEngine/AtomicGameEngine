@@ -33,11 +33,10 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/SceneEvents.h>
 
-#include "NETEvents.h"
-#include "NETVariant.h"
-#include "NETManaged.h"
+#include "../NETCore/NETVariant.h"
+#include "NETScriptEvents.h"
+#include "CSManaged.h"
 #include "CSComponent.h"
-
 
 namespace Atomic
 {
@@ -102,7 +101,7 @@ public:
             if (split.Size() == 2)
             {
                 ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
-                NETAssemblyFile* componentFile = cache->GetResource<NETAssemblyFile>(split[1]);
+                CSComponentAssembly* componentFile = cache->GetResource<CSComponentAssembly>(split[1]);
                 if (componentFile)
                     ptr = componentFile->CreateCSComponent(managedClass);
                 else
@@ -140,7 +139,7 @@ void CSComponent::RegisterObject(Context* context)
 
     ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
 
-    MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(NETAssemblyFile::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("Assembly", GetAssemblyFileAttr, SetAssemblyFileAttr, ResourceRef, ResourceRef(CSComponentAssembly::GetTypeStatic()), AM_DEFAULT);
 
     ACCESSOR_ATTRIBUTE("Class", GetComponentClassName, SetComponentClassName, String, String::EMPTY, AM_DEFAULT);
 
@@ -162,7 +161,7 @@ void CSComponent::ApplyFieldValues()
     SharedPtr<NETVariantMap> vmap(new NETVariantMap());
     vmap->CopySourceVariantMap(fieldValues_);
 
-    NETManaged* managed = GetSubsystem<NETManaged>();
+    CSManaged* managed = GetSubsystem<CSManaged>();
 
     managed->CSComponentApplyFields(this, vmap);
 
@@ -212,20 +211,20 @@ bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
     return success;
 }
 
-void CSComponent::SetAssemblyFile(NETAssemblyFile* assemblyFile)
+void CSComponent::SetAssemblyFile(CSComponentAssembly* assemblyFile)
 {
     assemblyFile_ = assemblyFile;
 }
 
 ResourceRef CSComponent::GetAssemblyFileAttr() const
 {
-    return GetResourceRef(assemblyFile_, NETAssemblyFile::GetTypeStatic());
+    return GetResourceRef(assemblyFile_, CSComponentAssembly::GetTypeStatic());
 }
 
 void CSComponent::SetAssemblyFileAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetAssemblyFile(cache->GetResource<NETAssemblyFile>(value.name_));
+    SetAssemblyFile(cache->GetResource<CSComponentAssembly>(value.name_));
 }
 
 

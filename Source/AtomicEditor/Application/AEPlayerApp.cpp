@@ -24,6 +24,7 @@
 
 #ifdef ATOMIC_DOTNET
 #include <AtomicNET/NETCore/NETCore.h>
+#include <AtomicNET/NETScript/NETScript.h>
 #endif
 
 
@@ -186,14 +187,16 @@ void AEPlayerApplication::Start()
         {
             SendEvent(E_EXITREQUESTED);
         }
-
     }
 
 #ifdef ATOMIC_DOTNET
-    NETCore* netCore = GetSubsystem<NETCore>();
-    if (netCore)
-        netCore->Start();
+    // Initialize Scripting Subsystem
+    NETScript* netScript = new NETScript(context_);
+    context_->RegisterSubsystem(netScript);
+    netScript->Initialize();
+    netScript->ExecMainAssembly();
 #endif
+
 
     return;
 }

@@ -37,17 +37,17 @@ class NETVariantMap;
 
 // At runtime we need to load the assembly, in the editor we use metadata
 /// NET Assembly resource.
-class ATOMIC_API NETAssemblyFile : public ScriptComponentFile
+class ATOMIC_API CSComponentAssembly : public ScriptComponentFile
 {
-    OBJECT(NETAssemblyFile);
-    BASEOBJECT(ScriptComponentFile);
+    OBJECT(CSComponentAssembly);
+    BASEOBJECT(CSComponentAssembly);
 
 public:
 
     /// Construct.
-    NETAssemblyFile(Context* context);
+    CSComponentAssembly(Context* context);
     /// Destruct.
-    virtual ~NETAssemblyFile();
+    virtual ~CSComponentAssembly();
 
     bool ParseAssemblyJSON(const JSONValue& json);
 

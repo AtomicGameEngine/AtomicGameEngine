@@ -22,6 +22,7 @@
 #ifdef ATOMIC_DOTNET
 #include <AtomicNET/NETCore/NETHost.h>
 #include <AtomicNET/NETCore/NETCore.h>
+#include <AtomicNET/NETScript/NETScript.h>
 #endif
 
 #include "AEEditorCommon.h"
@@ -71,6 +72,8 @@ void AEEditorCommon::Setup()
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);
 #endif
+
+    RegisterNETScriptLibrary(context_);
 
     // Register IPC system
     context_->RegisterSubsystem(new IPC(context_));

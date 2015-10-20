@@ -28,26 +28,26 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/Serializer.h>
 
-#include "NETManaged.h"
-#include "NETAssemblyFile.h"
+#include "CSManaged.h"
+#include "CSComponentAssembly.h"
 
 namespace Atomic
 {
 
-HashMap<StringHash, VariantType> NETAssemblyFile::typeMap_;
+HashMap<StringHash, VariantType> CSComponentAssembly::typeMap_;
 
-NETAssemblyFile::NETAssemblyFile(Context* context) :
+CSComponentAssembly::CSComponentAssembly(Context* context) :
     ScriptComponentFile(context)
 {
 
 }
 
-NETAssemblyFile::~NETAssemblyFile()
+CSComponentAssembly::~CSComponentAssembly()
 {
 
 }
 
-void NETAssemblyFile::InitTypeMap()
+void CSComponentAssembly::InitTypeMap()
 {
     typeMap_["Boolean"] = VAR_BOOL;
     typeMap_["Int32"] = VAR_INT;
@@ -61,7 +61,7 @@ void NETAssemblyFile::InitTypeMap()
 
 }
 
-CSComponent* NETAssemblyFile::CreateCSComponent(const String& classname)
+CSComponent* CSComponentAssembly::CreateCSComponent(const String& classname)
 {
     const String& name = GetName();
 
@@ -69,12 +69,12 @@ CSComponent* NETAssemblyFile::CreateCSComponent(const String& classname)
     String pathName, fileName, ext;
     SplitPath(name, pathName, fileName, ext);
 
-    NETManaged* managed = GetSubsystem<NETManaged>();
+    CSManaged* managed = GetSubsystem<CSManaged>();
 
     return managed->CSComponentCreate(fileName, classname);
 }
 
-bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
+bool CSComponentAssembly::ParseComponentClassJSON(const JSONValue& json)
 {
     if (!typeMap_.Size())
         InitTypeMap();
@@ -185,7 +185,7 @@ bool NETAssemblyFile::ParseComponentClassJSON(const JSONValue& json)
     return true;
 }
 
-bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
+bool CSComponentAssembly::ParseAssemblyJSON(const JSONValue& json)
 {
     Clear();
     assemblyEnums_.Clear();
@@ -230,17 +230,17 @@ bool NETAssemblyFile::ParseAssemblyJSON(const JSONValue& json)
     return true;
 }
 
-void NETAssemblyFile::RegisterObject(Context* context)
+void CSComponentAssembly::RegisterObject(Context* context)
 {
-    context->RegisterFactory<NETAssemblyFile>();
+    context->RegisterFactory<CSComponentAssembly>();
 }
 
-bool NETAssemblyFile::BeginLoad(Deserializer& source)
+bool CSComponentAssembly::BeginLoad(Deserializer& source)
 {
     return true;
 }
 
-bool NETAssemblyFile::Save(Serializer& dest) const
+bool CSComponentAssembly::Save(Serializer& dest) const
 {
     return true;
 }

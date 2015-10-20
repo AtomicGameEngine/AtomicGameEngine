@@ -25,7 +25,7 @@
 
 #include <Atomic/Script/ScriptComponent.h>
 
-#include "NETAssemblyFile.h"
+#include "CSComponentAssembly.h"
 
 namespace Atomic
 {
@@ -81,8 +81,8 @@ public:
 
     virtual ScriptComponentFile* GetComponentFile() { return assemblyFile_; }
 
-    NETAssemblyFile* GetAssemblyFile() { return assemblyFile_; }
-    void SetAssemblyFile(NETAssemblyFile* assemblyFile);
+    CSComponentAssembly* GetAssemblyFile() { return assemblyFile_; }
+    void SetAssemblyFile(CSComponentAssembly* assemblyFile);
 
     ResourceRef GetAssemblyFileAttr() const;
     void SetAssemblyFileAttr(const ResourceRef& value);
@@ -96,7 +96,7 @@ protected:
 private:
 
     String componentClassName_;
-    SharedPtr<NETAssemblyFile> assemblyFile_;
+    SharedPtr<CSComponentAssembly> assemblyFile_;
 
 };
 

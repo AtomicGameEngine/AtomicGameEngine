@@ -28,7 +28,8 @@ public static class Atomic
     PhysicsModule.Initialize ();
     EnvironmentModule.Initialize ();
     UIModule.Initialize ();
-    AtomicNETModule.Initialize();
+    NETCoreModule.Initialize();
+    NETScriptModule.Initialize();
     AtomicPlayer.PlayerModule.Initialize ();
   }
 

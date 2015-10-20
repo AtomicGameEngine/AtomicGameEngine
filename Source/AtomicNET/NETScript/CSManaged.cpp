@@ -5,17 +5,16 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/StringUtils.h>
 
-#include "NETCore.h"
-#include "NETManaged.h"
+#include "../NETCore/NETCore.h"
 
-#include "CSEventHelper.h"
+#include "CSManaged.h"
 #include "CSComponent.h"
 
 namespace Atomic
 {
 
 
-NETManaged::NETManaged(Context* context) :
+CSManaged::CSManaged(Context* context) :
     Object(context),
     CSComponentCreate_(0),
     CSComponentApplyFields_(0),
@@ -26,12 +25,12 @@ NETManaged::NETManaged(Context* context) :
 
 }
 
-NETManaged::~NETManaged()
+CSManaged::~CSManaged()
 {
 
 }
 
-bool NETManaged::Initialize()
+bool CSManaged::Initialize()
 {
     NETCore* core = GetSubsystem<NETCore>();
     core->CreateDelegate("AtomicNETEngine", "AtomicEngine.ComponentCore", "CSComponentCreate", (void**) &CSComponentCreate_);
@@ -41,7 +40,7 @@ bool NETManaged::Initialize()
     return true;
 }
 
-void NETManaged::NETUpdate(float timeStep)
+void CSManaged::NETUpdate(float timeStep)
 {
     if (!NETUpdate_)
         return;
@@ -49,7 +48,7 @@ void NETManaged::NETUpdate(float timeStep)
     NETUpdate_(timeStep);
 }
 
-CSComponent* NETManaged::CSComponentCreate(const String& assemblyName, const String& componentName)
+CSComponent* CSManaged::CSComponentCreate(const String& assemblyName, const String& componentName)
 {
     if (!CSComponentCreate_)
         return 0;
@@ -58,7 +57,7 @@ CSComponent* NETManaged::CSComponentCreate(const String& assemblyName, const Str
 
 }
 
-void NETManaged::CSComponentApplyFields(CSComponent* component, NETVariantMap* fieldMapPtr)
+void CSManaged::CSComponentApplyFields(CSComponent* component, NETVariantMap* fieldMapPtr)
 {
     if (!CSComponentApplyFields_ || !component || !fieldMapPtr)
         return;
@@ -67,7 +66,7 @@ void NETManaged::CSComponentApplyFields(CSComponent* component, NETVariantMap* f
 
 }
 
-void NETManaged::CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value)
+void CSManaged::CSComponentCallMethod(unsigned id, CSComponentMethod methodID, float value)
 {
     if (!CSComponentCallMethod_)
         return;
@@ -76,7 +75,7 @@ void NETManaged::CSComponentCallMethod(unsigned id, CSComponentMethod methodID, 
 
 }
 
-void NETManaged::CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData)
+void CSManaged::CSBeginSendEvent(unsigned senderRefID, unsigned eventType, VariantMap* eventData)
 {
     if (!CSBeginSendEvent_)
         return;

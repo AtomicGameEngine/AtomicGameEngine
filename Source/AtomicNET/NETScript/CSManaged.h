@@ -41,15 +41,15 @@ typedef void (*CSComponentApplyFieldsPtr)(CSComponent* componentPtr, NETVariantM
 typedef void (*CSComponentCallMethodFunctionPtr)(unsigned id, CSComponentMethod method, float value);
 typedef void (*CSBeginSendEventFunctionPtr)(unsigned senderRefID, unsigned eventType, VariantMap* eventData);
 
-class ATOMIC_API NETManaged : public Object
+class ATOMIC_API CSManaged : public Object
 {
-    OBJECT(NETManaged);
+    OBJECT(CSManaged);
 
 public:
     /// Construct.
-    NETManaged(Context* context);
+    CSManaged(Context* context);
     /// Destruct.
-    virtual ~NETManaged();
+    virtual ~CSManaged();
 
     bool Initialize();
 

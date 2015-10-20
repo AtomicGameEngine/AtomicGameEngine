@@ -47,7 +47,7 @@ if (APPLE)
 
 if (NOT IOS)
 
-    target_link_libraries(AtomicPlayer NETCore)
+    target_link_libraries(AtomicPlayer NETCore NETScript)
 
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
 

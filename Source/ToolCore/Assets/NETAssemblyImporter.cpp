@@ -10,7 +10,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
 
-#include <AtomicNET/NETCore/NETAssemblyFile.h>
+#include <AtomicNET/NETScript/CSComponentAssembly.h>
 
 #include "../NETTools/NETToolSystem.h"
 
@@ -51,7 +51,7 @@ bool NETAssemblyImporter::Import()
         else
         {
             ResourceCache* cache = GetSubsystem<ResourceCache>();
-            NETAssemblyFile* assemblyFile = cache->GetResource<NETAssemblyFile>(asset_->GetPath());
+            CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
             if (assemblyFile)
                 assemblyFile->ParseAssemblyJSON(assemblyJSON_);
         }
@@ -77,7 +77,7 @@ bool NETAssemblyImporter::LoadSettingsInternal(JSONValue& jsonRoot)
         assemblyJSON_ = ajson.GetObject();
 
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        NETAssemblyFile* assemblyFile = cache->GetResource<NETAssemblyFile>(asset_->GetPath());
+        CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
         if (assemblyFile)
             assemblyFile->ParseAssemblyJSON(assemblyJSON_);
     }
@@ -102,7 +102,7 @@ Resource* NETAssemblyImporter::GetResource(const String& typeName)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    NETAssemblyFile* assemblyFile = cache->GetResource<NETAssemblyFile>(asset_->GetPath());
+    CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
 
     return assemblyFile;
 

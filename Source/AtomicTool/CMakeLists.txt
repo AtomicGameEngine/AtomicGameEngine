@@ -6,7 +6,7 @@ endif()
 
 add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
-target_link_libraries(AtomicTool ToolCore NETCore Poco ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicTool ToolCore NETCore NETScript Poco ${ATOMIC_LINK_LIBRARIES})
 
 # add_dependencies(AtomicTool AtomicEditor)
 

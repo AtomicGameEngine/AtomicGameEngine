@@ -24,7 +24,7 @@ file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
 
-set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
+set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE} ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (APPLE)
 
@@ -57,7 +57,8 @@ target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS AtomicNETJS 
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
-    target_link_libraries(AtomicEditor NETCore curl)
+
+    target_link_libraries(AtomicEditor NETCore NETScript curl)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD
@@ -88,7 +89,7 @@ elseif(LINUX)
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     endif()
 else()
-    target_link_libraries(AtomicEditor NETCore libcurl Iphlpapi Wldap32)
+    target_link_libraries(AtomicEditor NETCore NETScript libcurl Iphlpapi Wldap32)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD

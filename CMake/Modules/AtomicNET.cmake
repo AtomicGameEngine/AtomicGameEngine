@@ -3,6 +3,7 @@ set (CSATOMICPLAYERNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVAS
 set (CSATOMICNETNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicNET/Native")
 
 # Create the JSBind files ahead of time, so they are picked up with glob
+
 set (CSFILES CSModuleAtomic2D.cpp;CSModuleAtomic3D.cpp;CSModuleAudio.cpp;CSModuleContainer.cpp;CSModuleCore.cpp;
              CSModuleEngine.cpp;CSModuleEnvironment.cpp;CSModuleGraphics.cpp;CSModuleInput.cpp;
              CSModuleIO.cpp;CSModuleJavascript.cpp;CSModuleMath.cpp;CSModuleNavigation.cpp;
@@ -11,7 +12,7 @@ set (CSFILES CSModuleAtomic2D.cpp;CSModuleAtomic3D.cpp;CSModuleAudio.cpp;CSModul
 
 set (CSATOMICPLAYERFILES CSModulePlayer.cpp;CSPackageAtomicPlayer.cpp;CSPackageAtomicPlayer.h)
 
-set (CSATOMICNETFILES CSModuleAtomicNET.cpp;CSPackageAtomicNET.cpp;CSPackageAtomicNET.h)
+set (CSATOMICNETFILES CSModuleNETCore.cpp;CSModuleNETScript.cpp;CSPackageAtomicNET.cpp;CSPackageAtomicNET.h)
 
 foreach(CSFILE ${CSFILES})
 

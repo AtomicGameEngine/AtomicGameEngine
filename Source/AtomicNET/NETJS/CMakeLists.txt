@@ -3,7 +3,7 @@ include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty)
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
 # Create the JSBind files ahead of time, so they are picked up with glob
-set (JSFILES JSPackageAtomicNET.cpp;JSModuleAtomicNET.cpp)
+set (JSFILES JSPackageAtomicNET.cpp;JSModuleNETCore.cpp;JSModuleNETScript.cpp)
 
 foreach(JSFILE ${JSFILES})
 
