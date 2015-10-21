@@ -12,8 +12,7 @@
       "assemblyName" : "AtomicNETBootstrap",
       "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/TPA/",
       "references" : [
-        "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
-        "System.Collections", "System.Collections.Concurrent", "System.Linq"
+        "System.Runtime", "System.Collections", "System.Collections.Concurrent", "System.Linq"
       ],
       "sources" : [
         "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETBootstrap/"
@@ -27,8 +26,7 @@
       "assemblyName" : "AtomicNETEngine",
       "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
       "references" : [
-        "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
-        "System.Linq"
+        "System.Runtime" , "System.Linq"
       ],
       "sources" : [
         "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETEngine/",
@@ -44,11 +42,12 @@
       "rootNamespace" : "AtomicTools",
       "assemblyName" : "AtomicNETTools",
       "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
+      "assemblySearchPaths" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
       "references" : [
-        "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
+        "System.Runtime" , "System.IO",
         "System.Reflection.Metadata", "System.Reflection.Primitives", "System.Collections.Immutable",
         "System.Linq",
-        "$ATOMIC_ROOT$/Artifacts/AtomicNET/AtomicNETEngine"
+        "AtomicNETEngine"
       ],
       "sources" : [
         "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETTools/"

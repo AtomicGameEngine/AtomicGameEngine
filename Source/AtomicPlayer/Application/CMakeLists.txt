@@ -39,7 +39,7 @@ if (MSVC)
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicPlayer>/D3DCompiler_47.dll\")
 
-    target_link_libraries(AtomicPlayer NETCore)
+    target_link_libraries(AtomicPlayer NETCore NETScript)
 
 endif()
 

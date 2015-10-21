@@ -60,6 +60,7 @@ private:
     void CreateMainPropertyGroup(XMLElement &projectRoot);
     void CreateDebugPropertyGroup(XMLElement &projectRoot);
     void CreateReleasePropertyGroup(XMLElement &projectRoot);
+    void GetAssemblySearchPaths(String& paths);
 
     String name_;
     String projectGuid_;
@@ -67,6 +68,7 @@ private:
     String rootNamespace_;
     String assemblyName_;
     String assemblyOutputPath_;
+    String assemblySearchPaths_;
 
     XMLElement xmlRoot_;
 

@@ -27,6 +27,16 @@ NETHostWindows::~NETHostWindows()
 
 }
 
+int NETHostWindows::ExecAssembly(const String& assemblyName, const Vector<String>& args)
+{
+    return 0;
+}
+
+void NETHostWindows::Shutdown()
+{
+
+}
+
 bool NETHostWindows::CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut)
 {
     if (!clrRuntimeHost_)

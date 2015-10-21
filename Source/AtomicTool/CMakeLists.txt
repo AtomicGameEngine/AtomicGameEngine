@@ -50,8 +50,6 @@ elseif(APPLE)
 
 if (NOT IOS)
 
-
-
 add_custom_command(TARGET AtomicTool POST_BUILD
                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build/
                    COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" MACOSX

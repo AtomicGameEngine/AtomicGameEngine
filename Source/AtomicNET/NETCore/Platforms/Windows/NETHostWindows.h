@@ -64,10 +64,11 @@ public:
     virtual ~NETHostWindows();
 
     bool Initialize();
-
     bool CreateDelegate(const String& assemblyName, const String& qualifiedClassName, const String& methodName, void** funcOut);
-
     void WaitForDebuggerConnect();
+
+    int ExecAssembly(const String& assemblyName, const Vector<String>& args);
+    void Shutdown();
 
 private:
 

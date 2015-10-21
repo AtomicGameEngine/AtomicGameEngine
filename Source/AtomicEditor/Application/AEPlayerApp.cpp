@@ -179,6 +179,14 @@ void AEPlayerApplication::Start()
     context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
     AtomicPlayer::jsapi_init_atomicplayer(vm_);
 
+#ifdef ATOMIC_DOTNET
+    // Initialize Scripting Subsystem
+    NETScript* netScript = new NETScript(context_);
+    context_->RegisterSubsystem(netScript);
+    netScript->Initialize();
+    netScript->ExecMainAssembly();
+#endif
+
     if (!playerMode->launchedByEditor())
     {
         JSVM* vm = JSVM::GetJSVM(0);
@@ -188,15 +196,6 @@ void AEPlayerApplication::Start()
             SendEvent(E_EXITREQUESTED);
         }
     }
-
-#ifdef ATOMIC_DOTNET
-    // Initialize Scripting Subsystem
-    NETScript* netScript = new NETScript(context_);
-    context_->RegisterSubsystem(netScript);
-    netScript->Initialize();
-    netScript->ExecMainAssembly();
-#endif
-
 
     return;
 }

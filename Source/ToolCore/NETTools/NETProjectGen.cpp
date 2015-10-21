@@ -108,6 +108,22 @@ void NETCSProject::CreateReferencesItemGroup(XMLElement &projectRoot)
     }
 }
 
+void NETCSProject::GetAssemblySearchPaths(String& paths)
+{
+    paths.Clear();
+
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
+
+    Vector<String> searchPaths;
+    searchPaths.Push(coreCLRAbsPath);
+
+    if (assemblySearchPaths_.Length())
+        searchPaths.Push(assemblySearchPaths_);
+
+    paths.Join(searchPaths, ";");
+}
+
 void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
 {
     XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
@@ -124,9 +140,10 @@ void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
     pgroup.CreateChild("NoConfig").SetValue("true");
     pgroup.CreateChild("NoCompilerStandardLib").SetValue("true");
 
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
-    pgroup.CreateChild("AssemblySearchPaths").SetValue(coreCLRAbsPath);
+    String assemblySearchPaths;
+    GetAssemblySearchPaths(assemblySearchPaths);
+    pgroup.CreateChild("AssemblySearchPaths").SetValue(assemblySearchPaths);
+
 }
 
 void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
@@ -147,9 +164,9 @@ void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
     pgroup.CreateChild("NoConfig").SetValue("true");
     pgroup.CreateChild("NoCompilerStandardLib").SetValue("true");
 
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
-    pgroup.CreateChild("AssemblySearchPaths").SetValue(coreCLRAbsPath);
+    String assemblySearchPaths;
+    GetAssemblySearchPaths(assemblySearchPaths);
+    pgroup.CreateChild("AssemblySearchPaths").SetValue(assemblySearchPaths);
 
 }
 
@@ -205,6 +222,10 @@ bool NETCSProject::Generate()
 
     project.CreateChild("Import").SetAttribute("Project", "$(MSBuildBinPath)\\Microsoft.CSharp.targets");
 
+    // on msbuild this seems to stop referencing of framework assemblies
+    project.CreateChild("Target").SetAttribute("Name", "GetReferenceAssemblyPaths");
+    project.CreateChild("Target").SetAttribute("Name", "GetFrameworkPaths");
+
     String projectSource = xmlFile_->ToString();
 
     NETSolution* solution = projectGen_->GetSolution();
@@ -227,6 +248,9 @@ bool NETCSProject::Load(const JSONValue& root)
     assemblyName_ = root["assemblyName"].GetString();
     assemblyOutputPath_ = root["assemblyOutputPath"].GetString();
     ReplacePathStrings(assemblyOutputPath_);
+
+    assemblySearchPaths_ = root["assemblyOutputPath"].GetString();
+    ReplacePathStrings(assemblySearchPaths_);
 
     const JSONArray& references = root["references"].GetArray();
 
