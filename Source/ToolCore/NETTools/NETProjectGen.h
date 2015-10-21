@@ -112,6 +112,8 @@ public:
     const String& GetScriptPlatform() { return scriptPlatform_; }
 
     NETSolution* GetSolution() { return solution_; }
+    bool GetMonoBuild() { return monoBuild_; }
+
     const Vector<SharedPtr<NETCSProject>>& GetCSProjects() { return projects_; }
 
     void SetScriptPlatform(const String& platform) { scriptPlatform_ = platform; }
@@ -124,6 +126,8 @@ public:
 private:
 
     String scriptPlatform_;
+
+    bool monoBuild_;
 
     SharedPtr<NETSolution> solution_;
     Vector<SharedPtr<NETCSProject>> projects_;

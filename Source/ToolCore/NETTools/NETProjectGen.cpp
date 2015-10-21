@@ -261,6 +261,15 @@ bool NETCSProject::Load(const JSONValue& root)
         references_.Push(reference);
     }
 
+    // msvc doesn't like including these
+    if (projectGen_->GetMonoBuild())
+    {
+        references_.Push("System.Console");
+        references_.Push("System.IO");
+        references_.Push("System.IO.FileSystem");
+
+    }
+
     const JSONArray& sources = root["sources"].GetArray();
 
     for (unsigned i = 0; i < sources.Size(); i++)
@@ -353,8 +362,13 @@ bool NETSolution::Load(const JSONValue& root)
     return true;
 }
 
-NETProjectGen::NETProjectGen(Context* context) : Object(context)
+NETProjectGen::NETProjectGen(Context* context) : Object(context),
+    monoBuild_(false)
 {
+
+#ifndef ATOMIC_PLATFORM_WINDOWS
+    monoBuild_ = true;
+#endif
 
 }
 
