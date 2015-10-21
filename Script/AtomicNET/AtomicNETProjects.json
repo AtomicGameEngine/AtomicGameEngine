@@ -1,0 +1,26 @@
+{
+  "solution" : {
+    "name" : "AtomicNET",
+    "outputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/Build/"
+  },
+  "projects" : [
+    {
+      "name": "AtomicNETEngine",
+      "projectGuid": "9821AC3B-E926-4FBB-90EC-BC4EBCD43FBC",
+      "outputType" : "Library",
+      "rootNamespace" : "AtomicEngine",
+      "assemblyName" : "AtomicNETEngine",
+      "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
+      "references" : [
+        "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
+        "System.Linq", "System.Linq.Expressions" 
+      ],
+      "sources" : [
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETEngine/",
+        "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/Atomic/Managed/",
+        "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/AtomicNET/Managed/",
+        "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/AtomicPlayer/Managed/"
+      ]
+    }
+  ]
+}
