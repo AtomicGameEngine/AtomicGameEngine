@@ -10,6 +10,8 @@
 #include <Atomic/IO/FileSystem.h>
 
 #include "../ToolEnvironment.h"
+#include "../ToolSystem.h"
+#include "../Project/Project.h"
 #include "NETProjectGen.h"
 
 namespace ToolCore
@@ -29,12 +31,20 @@ NETProjectBase::~NETProjectBase()
 void NETProjectBase::ReplacePathStrings(String& path)
 {
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    ToolSystem* tsys = GetSubsystem<ToolSystem>();
 
     const String& atomicRoot = tenv->GetRootSourceDir();
     const String& scriptPlatform = projectGen_->GetScriptPlatform();
 
     path.Replace("$ATOMIC_ROOT$", atomicRoot, false);
     path.Replace("$SCRIPT_PLATFORM$", scriptPlatform, false);
+
+    Project* project = tsys->GetProject();
+    if (project)
+    {
+        path.Replace("$PROJECT_ROOT$", project->GetProjectPath(), false);
+    }
+
 }
 
 NETCSProject::NETCSProject(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen)
@@ -240,16 +250,39 @@ bool NETCSProject::Generate()
 
 bool NETCSProject::Load(const JSONValue& root)
 {
+    bool gameBuild = projectGen_->GetGameBuild();
 
     name_ = root["name"].GetString();
     projectGuid_ = root["projectGuid"].GetString();
-    outputType_ = root["outputType"].GetString();
+
+    if (gameBuild)
+        outputType_ = "Library";
+    else
+        outputType_ = root["outputType"].GetString();
+
     rootNamespace_ = root["rootNamespace"].GetString();
     assemblyName_ = root["assemblyName"].GetString();
     assemblyOutputPath_ = root["assemblyOutputPath"].GetString();
     ReplacePathStrings(assemblyOutputPath_);
 
-    assemblySearchPaths_ = root["assemblyOutputPath"].GetString();
+    assemblySearchPaths_ = root["assemblySearchPaths"].GetString();
+
+    if (gameBuild)
+    {
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+        const String& engineAssemblyPath = tenv->GetAtomicNETEngineAssemblyPath();
+        if (assemblySearchPaths_.Length())
+        {
+            assemblySearchPaths_ += ";";
+            assemblySearchPaths_ += engineAssemblyPath;
+        }
+        else
+        {
+            assemblySearchPaths_ = engineAssemblyPath;
+        }
+
+    }
+
     ReplacePathStrings(assemblySearchPaths_);
 
     const JSONArray& references = root["references"].GetArray();
@@ -261,13 +294,17 @@ bool NETCSProject::Load(const JSONValue& root)
         references_.Push(reference);
     }
 
+    if (gameBuild)
+    {
+        references_.Push("AtomicNETEngine");
+    }
+
     // msvc doesn't like including these
     if (projectGen_->GetMonoBuild())
     {
         references_.Push("System.Console");
         references_.Push("System.IO");
         references_.Push("System.IO.FileSystem");
-
     }
 
     const JSONArray& sources = root["sources"].GetArray();
@@ -363,7 +400,7 @@ bool NETSolution::Load(const JSONValue& root)
 }
 
 NETProjectGen::NETProjectGen(Context* context) : Object(context),
-    monoBuild_(false)
+    monoBuild_(false), gameBuild_(false)
 {
 
 #ifndef ATOMIC_PLATFORM_WINDOWS
@@ -389,9 +426,10 @@ bool NETProjectGen::Generate()
     return true;
 }
 
-bool NETProjectGen::LoadProject(const JSONValue &root)
+bool NETProjectGen::LoadProject(const JSONValue &root, bool gameBuild)
 {
 
+    gameBuild_ = gameBuild;
     solution_ = new NETSolution(context_, this);
 
     solution_->Load(root["solution"]);
@@ -420,7 +458,7 @@ bool NETProjectGen::LoadProject(const JSONValue &root)
     return true;
 }
 
-bool NETProjectGen::LoadProject(const String& projectPath)
+bool NETProjectGen::LoadProject(const String& projectPath, bool gameBuild)
 {
     SharedPtr<File> file(new File(context_));
 
@@ -435,7 +473,7 @@ bool NETProjectGen::LoadProject(const String& projectPath)
     if (!JSONFile::ParseJSON(json, jvalue))
         return false;
 
-    return LoadProject(jvalue);
+    return LoadProject(jvalue, gameBuild);
 }
 
 }

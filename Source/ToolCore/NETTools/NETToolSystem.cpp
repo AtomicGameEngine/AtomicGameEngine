@@ -6,9 +6,14 @@
 //
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <AtomicNET/NETCore/NETCore.h>
 
+#include "../ToolEvents.h"
+#include "../ToolEnvironment.h"
+
 #include "NETToolSystem.h"
+#include "NETProjectGen.h"
 
 namespace ToolCore
 {
@@ -22,11 +27,43 @@ NETToolSystem::NETToolSystem(Context* context) : Object(context)
         {
             LOGERROR("NETToolSystem::NETToolSystem - Unable to resolve delagate AtomicNETTools.InspectAssembly");
         }
+
+        SubscribeToEvent(E_PROJECTLOADED, HANDLER(NETToolSystem, HandleProjectLoaded));
     }
+
 }
 
 NETToolSystem::~NETToolSystem()
 {
+
+}
+
+void NETToolSystem::HandleProjectLoaded(StringHash eventType, VariantMap& eventData)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    String projectPath = eventData[ProjectLoaded::P_PROJECTPATH].GetString();
+
+    String pathName, fileName, ext;
+
+    SplitPath(projectPath, pathName, fileName, ext);
+
+    String netJSONPath = AddTrailingSlash(pathName) + "AtomicNET.json";
+
+    if (fileSystem->FileExists(netJSONPath))
+    {
+        SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
+
+#ifdef ATOMIC_PLATFORM_OSX
+        gen->SetScriptPlatform("MACOSX");
+#else
+        gen->SetScriptPlatform("WINDOWS");
+#endif
+        gen->LoadProject(netJSONPath, true);
+
+        gen->Generate();
+
+    }
 
 }
 

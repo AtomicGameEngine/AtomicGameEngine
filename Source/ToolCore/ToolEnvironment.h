@@ -61,6 +61,7 @@ public:
     const String& GetNETCoreCLRAbsPath() { return netCoreCLRAbsPath_; }
     const String& GetNETAssemblyLoadPaths() { return netAssemblyLoadPaths_; }
     const String& GetNETTPAPaths() { return netTPAPaths_; }
+    const String& GetAtomicNETEngineAssemblyPath() { return netAtomicNETEngineAssemblyPath_; }
 
     /// Data directories
     const String& GetDeploymentDataDir() { return toolBinary_; }
@@ -103,6 +104,7 @@ private:
     String netCoreCLRAbsPath_;
     String netAssemblyLoadPaths_;
     String netTPAPaths_;
+    String netAtomicNETEngineAssemblyPath_;
 
     // resources
     String resourceCoreDataDir_;

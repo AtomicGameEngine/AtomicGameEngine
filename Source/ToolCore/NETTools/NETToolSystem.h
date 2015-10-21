@@ -29,6 +29,8 @@ public:
 
 private:
 
+    void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
+
     typedef const char* (*InpectAssemblyFuctionPtr)(const char* path);
     InpectAssemblyFuctionPtr inspectAssemblyFunction_;
 

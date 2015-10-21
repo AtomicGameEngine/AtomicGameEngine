@@ -112,7 +112,9 @@ public:
     const String& GetScriptPlatform() { return scriptPlatform_; }
 
     NETSolution* GetSolution() { return solution_; }
+
     bool GetMonoBuild() { return monoBuild_; }
+    bool GetGameBuild() { return gameBuild_; }
 
     const Vector<SharedPtr<NETCSProject>>& GetCSProjects() { return projects_; }
 
@@ -120,14 +122,15 @@ public:
 
     bool Generate();
 
-    bool LoadProject(const JSONValue& root);
-    bool LoadProject(const String& projectPath);
+    bool LoadProject(const JSONValue& root, bool gameBuild = false);
+    bool LoadProject(const String& projectPath, bool gameBuild = false);
 
 private:
 
     String scriptPlatform_;
 
     bool monoBuild_;
+    bool gameBuild_;
 
     SharedPtr<NETSolution> solution_;
     Vector<SharedPtr<NETCSProject>> projects_;
