@@ -121,6 +121,12 @@ void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
     pgroup.CreateChild("ConsolePause").SetValue("false");
     pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
     pgroup.CreateChild("NoStdLib").SetValue("true");
+    pgroup.CreateChild("NoConfig").SetValue("true");
+    pgroup.CreateChild("NoCompilerStandardLib").SetValue("true");
+
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
+    pgroup.CreateChild("AssemblySearchPaths").SetValue(coreCLRAbsPath);
 }
 
 void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
@@ -138,6 +144,13 @@ void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
     pgroup.CreateChild("ConsolePause").SetValue("false");
     pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
     pgroup.CreateChild("NoStdLib").SetValue("true");
+    pgroup.CreateChild("NoConfig").SetValue("true");
+    pgroup.CreateChild("NoCompilerStandardLib").SetValue("true");
+
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
+    pgroup.CreateChild("AssemblySearchPaths").SetValue(coreCLRAbsPath);
+
 }
 
 void NETCSProject::CreateMainPropertyGroup(XMLElement& projectRoot)

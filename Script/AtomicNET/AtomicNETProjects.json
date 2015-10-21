@@ -5,6 +5,21 @@
   },
   "projects" : [
     {
+      "name": "AtomicNETBootstrap",
+      "projectGuid": "9821AC3A-E926-4FBB-90EC-BD4EBCD43FBE",
+      "outputType" : "Library",
+      "rootNamespace" : "Atomic.Bootstrap",
+      "assemblyName" : "AtomicNETBootstrap",
+      "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/TPA/",
+      "references" : [
+        "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
+        "System.Collections", "System.Collections.Concurrent", "System.Linq"
+      ],
+      "sources" : [
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETBootstrap/"
+      ]
+    },
+    {
       "name": "AtomicNETEngine",
       "projectGuid": "9821AC3B-E926-4FBB-90EC-BC4EBCD43FBC",
       "outputType" : "Library",
@@ -13,13 +28,30 @@
       "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
       "references" : [
         "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
-        "System.Linq", "System.Linq.Expressions" 
+        "System.Linq"
       ],
       "sources" : [
         "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETEngine/",
         "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/Atomic/Managed/",
         "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/AtomicNET/Managed/",
         "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/AtomicPlayer/Managed/"
+      ]
+    },
+    {
+      "name": "AtomicNETTools",
+      "projectGuid": "9821DC3B-E926-5EBC-90FD-BC4EBCD43FBC",
+      "outputType" : "Library",
+      "rootNamespace" : "AtomicTools",
+      "assemblyName" : "AtomicNETTools",
+      "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
+      "references" : [
+        "System.Console", "System.Runtime" , "System.IO",  "System.IO.FileSystem",
+        "System.Reflection.Metadata", "System.Reflection.Primitives", "System.Collections.Immutable",
+        "System.Linq",
+        "$ATOMIC_ROOT$/Artifacts/AtomicNET/AtomicNETEngine"
+      ],
+      "sources" : [
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETTools/"
       ]
     }
   ]

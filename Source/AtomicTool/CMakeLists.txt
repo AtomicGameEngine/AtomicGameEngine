@@ -36,6 +36,10 @@ if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
  file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
 endif()
 
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build)
+ file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build)
+endif()
+
 if (MSVC)
 
 add_custom_command(TARGET AtomicTool POST_BUILD
@@ -45,9 +49,13 @@ add_custom_command(TARGET AtomicTool POST_BUILD
 elseif(APPLE)
 
 if (NOT IOS)
+
+
+
 add_custom_command(TARGET AtomicTool POST_BUILD
-                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNET/
-                   COMMAND  ${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNET/build.sh
+                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build/
+                   COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" MACOSX
+                   COMMAND /usr/local/bin/xbuild
                    COMMENT "Compiling AtomicNET Assemblies")
 endif()
 
