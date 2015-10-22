@@ -5,6 +5,9 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+#include <Poco/UUID.h>
+#include <Poco/UUIDGenerator.h>
+
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
@@ -222,7 +225,6 @@ void NETCSProject::CreateMainPropertyGroup(XMLElement& projectRoot)
     platform.SetValue("AnyCPU");
 
     // ProjectGuid
-    // Look into Poco::UUIDGenerator
     XMLElement guid = pgroup.CreateChild("ProjectGuid");
     guid.SetValue(projectGuid_);
 
@@ -281,7 +283,8 @@ bool NETCSProject::Load(const JSONValue& root)
     bool gameBuild = projectGen_->GetGameBuild();
 
     name_ = root["name"].GetString();
-    projectGuid_ = root["projectGuid"].GetString();
+
+    projectGuid_ = projectGen_->GenerateUUID();
 
     if (gameBuild)
         outputType_ = "Library";
@@ -369,7 +372,6 @@ bool NETSolution::Generate()
 
 void NETSolution::GenerateXamarinStudio(const String &slnPath)
 {
-
     String source = "Microsoft Visual Studio Solution File, Format Version 12.00\n";
     source += "# Visual Studio 2012\n";
 
@@ -502,6 +504,13 @@ bool NETProjectGen::LoadProject(const String& projectPath, bool gameBuild)
         return false;
 
     return LoadProject(jvalue, gameBuild);
+}
+
+String NETProjectGen::GenerateUUID()
+{
+    Poco::UUIDGenerator& generator = Poco::UUIDGenerator::defaultGenerator();
+    Poco::UUID uuid(generator.create()); // time based
+    return String(uuid.toString().c_str()).ToUpper();
 }
 
 }

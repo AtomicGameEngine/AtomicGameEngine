@@ -6,7 +6,6 @@
   "projects" : [
     {
       "name": "AtomicNETBootstrap",
-      "projectGuid": "9821AC3A-E926-4FBB-90EC-BD4EBCD43FBE",
       "outputType" : "Library",
       "rootNamespace" : "Atomic.Bootstrap",
       "assemblyName" : "AtomicNETBootstrap",
@@ -20,7 +19,6 @@
     },
     {
       "name": "AtomicNETEngine",
-      "projectGuid": "9821AC3B-E926-4FBB-90EC-BC4EBCD43FBC",
       "outputType" : "Library",
       "rootNamespace" : "AtomicEngine",
       "assemblyName" : "AtomicNETEngine",
@@ -37,7 +35,6 @@
     },
     {
       "name": "AtomicNETTools",
-      "projectGuid": "9821DC3B-E926-5EBC-90FD-BC4EBCD43FBC",
       "outputType" : "Library",
       "rootNamespace" : "AtomicTools",
       "assemblyName" : "AtomicNETTools",

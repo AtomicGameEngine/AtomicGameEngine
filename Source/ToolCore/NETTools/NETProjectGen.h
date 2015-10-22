@@ -122,6 +122,8 @@ public:
 
     bool Generate();
 
+    String GenerateUUID();
+
     bool LoadProject(const JSONValue& root, bool gameBuild = false);
     bool LoadProject(const String& projectPath, bool gameBuild = false);
 
