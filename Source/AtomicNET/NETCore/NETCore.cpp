@@ -48,11 +48,6 @@ void NETCore::Shutdown()
 extern "C"
 {
 
-// http://ybeernet.blogspot.com/2011/03/techniques-of-calling-unmanaged-code.html
-// pinvoke is faster than [UnmanagedFunctionPointer] :/
-// [SuppressUnmanagedCodeSecurity] <--- add this attribute, in any event
-
-
 #ifdef ATOMIC_PLATFORM_WINDOWS
 #pragma warning(disable: 4244) // possible loss of data
 #define ATOMIC_EXPORT_API __declspec(dllexport)

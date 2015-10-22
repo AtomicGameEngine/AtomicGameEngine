@@ -125,7 +125,7 @@ public:
     bool LoadProject(const JSONValue& root, bool gameBuild = false);
     bool LoadProject(const String& projectPath, bool gameBuild = false);
 
-private:
+private:    
 
     String scriptPlatform_;
 

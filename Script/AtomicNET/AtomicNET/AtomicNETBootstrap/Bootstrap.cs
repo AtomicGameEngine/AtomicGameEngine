@@ -19,7 +19,7 @@ public class AtomicLoadContext : LoadContext
     {
       LoadContext.InitializeDefaultContext(new AtomicLoadContext());
       assemblyLoadPaths = _assemblyLoadPaths.Split(';').ToList();
-      Console.WriteLine("Bootstrap Startup paths: {0}", _assemblyLoadPaths);
+      //Console.WriteLine("Bootstrap Startup paths: {0}", _assemblyLoadPaths);
     }
 
     public static void AddAssemblyLoadPath(string path)
@@ -70,7 +70,7 @@ public class AtomicLoadContext : LoadContext
       {
         try
         {
-            Console.WriteLine("Assembly Load Attempt: {0}", path + assemblyName.Name + ".dll");
+            //Console.WriteLine("Assembly Load Attempt: {0}", path + assemblyName.Name + ".dll");
             assembly = LoadFromAssemblyPath(path + assemblyName.Name + ".dll");
             break;
         }

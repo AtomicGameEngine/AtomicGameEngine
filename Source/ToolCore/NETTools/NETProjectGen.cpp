@@ -72,7 +72,15 @@ void NETCSProject::CreateCompileItemGroup(XMLElement &projectRoot)
 
         for (unsigned j = 0; j < result.Size(); j++)
         {
-            igroup.CreateChild("Compile").SetAttribute("Include", sourceFolder + result[j]);
+            XMLElement compile = igroup.CreateChild("Compile");
+
+            compile.SetAttribute("Include", sourceFolder + result[j]);
+
+            // put generated files into generated folder
+            if (sourceFolder.Contains("Generated") && sourceFolder.Contains("CSharp") && sourceFolder.Contains("Packages") )
+            {
+                compile.CreateChild("Link").SetValue("Generated\\" + result[j]);
+            }
 
         }
 
@@ -154,6 +162,15 @@ void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
     GetAssemblySearchPaths(assemblySearchPaths);
     pgroup.CreateChild("AssemblySearchPaths").SetValue(assemblySearchPaths);
 
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    const String& editorBinary = tenv->GetEditorBinary();
+
+    if (!projectGen_->GetGameBuild())
+    {
+        XMLElement command = pgroup.CreateChild("CustomCommands").CreateChild("CustomCommands").CreateChild("Command");
+        command.SetAttribute("type", "Execute");
+        command.SetAttribute("command", editorBinary.CString());
+    }
 }
 
 void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
@@ -178,6 +195,16 @@ void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
     GetAssemblySearchPaths(assemblySearchPaths);
     pgroup.CreateChild("AssemblySearchPaths").SetValue(assemblySearchPaths);
 
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    const String& editorBinary = tenv->GetEditorBinary();
+
+    if (!projectGen_->GetGameBuild())
+    {
+        XMLElement command = pgroup.CreateChild("CustomCommands").CreateChild("CustomCommands").CreateChild("Command");
+        command.SetAttribute("type", "Execute");
+        command.SetAttribute("command", editorBinary.CString());
+    }
+
 }
 
 void NETCSProject::CreateMainPropertyGroup(XMLElement& projectRoot)
@@ -195,6 +222,7 @@ void NETCSProject::CreateMainPropertyGroup(XMLElement& projectRoot)
     platform.SetValue("AnyCPU");
 
     // ProjectGuid
+    // Look into Poco::UUIDGenerator
     XMLElement guid = pgroup.CreateChild("ProjectGuid");
     guid.SetValue(projectGuid_);
 

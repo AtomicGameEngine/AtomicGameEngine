@@ -175,6 +175,12 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
 
     Indent();
     JSBPackage* package = klass_->GetPackage();
+
+    // CoreCLR has pinvoke security demand code commented out, so we do not (currently) need this optimization:
+    // https://github.com/dotnet/coreclr/issues/1605
+    // line = "[SuppressUnmanagedCodeSecurity]\n";
+    // source += IndentLine(line);
+
     line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
     source += IndentLine(line);
     line = ToString("public static extern IntPtr csb_%s_%s_GetClassIDStatic();\n", package->GetName().CString(),klass_->GetName().CString());

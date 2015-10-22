@@ -281,6 +281,11 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 {
     source += "\n";
 
+    // CoreCLR has pinvoke security demand code commented out, so we do not (currently) need this optimization:
+    // https://github.com/dotnet/coreclr/issues/1605
+    // line = "[SuppressUnmanagedCodeSecurity]\n";
+    // source += IndentLine(line);
+
     String line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
     source += IndentLine(line);
     JSBClass* klass = function_->GetClass();
