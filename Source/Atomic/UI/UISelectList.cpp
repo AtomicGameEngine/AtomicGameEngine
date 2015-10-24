@@ -68,12 +68,12 @@ void UISelectList::SetValue(int value)
 
 }
 
-int UISelectList::GetValue()
+double UISelectList::GetValue()
 {
     if (!widget_)
         return 0;
 
-    return ((TBSelectList*)widget_)->GetValue();
+    return (double) ((TBSelectList*)widget_)->GetValue();
 
 }
 

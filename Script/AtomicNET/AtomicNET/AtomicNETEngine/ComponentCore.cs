@@ -8,31 +8,6 @@ using System.Linq;
 namespace AtomicEngine
 {
 
-
-  public partial class CSComponent : ScriptComponent
-  {
-
-    public void StartInternal()
-    {
-      ApplyFieldValues();
-      Start();
-    }
-
-    public virtual void Start()
-    {
-
-    }
-
-
-    public virtual void Update(float timeStep)
-    {
-
-    }
-
-
-
-  }
-
   public static class ComponentCore
   {
 

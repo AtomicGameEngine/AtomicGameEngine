@@ -552,7 +552,27 @@ void CSFunctionWriter::WriteManagedFunction(String& source)
 
     GenManagedFunctionParameters(sig);
 
-    String line = ToString("public %s %s (%s)\n", returnType.CString(), function_->GetName().CString(), sig.CString());
+    String line = "public ";
+
+    bool marked = false;
+    JSBClass* baseClass = klass->GetBaseClass();
+    if (baseClass)
+    {
+        JSBFunction* override = baseClass->MatchFunction(function_, true);
+        if (override)
+        {
+            marked = true;
+            if (override->IsVirtual())
+                line += "override ";
+            else
+                line += "new ";
+        }
+    }
+
+    if (!marked && function_->IsVirtual())
+        line += "virtual ";
+
+    line += ToString("%s %s (%s)\n", returnType.CString(), function_->GetName().CString(), sig.CString());
 
     source += IndentLine(line);
 

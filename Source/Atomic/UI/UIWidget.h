@@ -191,7 +191,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetGravity(UI_GRAVITY gravity);
 
     void SetValue(double value);
-    double GetValue();
+    virtual double GetValue();
 
     void SetFocus();
     bool GetFocus();

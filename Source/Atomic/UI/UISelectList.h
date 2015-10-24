@@ -48,7 +48,7 @@ public:
     void InvalidateList();
 
     void SetValue(int value);
-    int GetValue();
+    double GetValue();
 
     String GetHoverItemID();
     String GetSelectedItemID();

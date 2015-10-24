@@ -101,8 +101,20 @@ void CSClassWriter::WriteManagedProperties(String& sourceOut)
             if (!fType)
                 continue;
 
+            String line = "public ";
+
+            JSBClass* baseClass = klass_->GetBaseClass();
+            if (baseClass)
+            {
+                if (baseClass->MatchProperty(prop, true))
+                {
+                    // always new so we don't have to deal with virtual/override on properties
+                    line += "new ";
+                }
+            }
+
             String type = CSTypeHelper::GetManagedTypeString(fType, false);
-            String line = ToString("public %s %s\n", type.CString(), prop->name_.CString());
+            line += ToString("%s %s\n", type.CString(), prop->name_.CString());
             source += IndentLine(line);
             source += IndentLine("{\n");
 

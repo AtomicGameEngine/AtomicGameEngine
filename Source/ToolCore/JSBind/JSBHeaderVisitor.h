@@ -278,7 +278,7 @@ public:
         if (name.StartsWith("~"))
             jfunction->SetDestructor();
 
-        if (function->isOverride())
+        if (function->isVirtual())
             jfunction->SetVirtual(true);
 
         // see if we support return type

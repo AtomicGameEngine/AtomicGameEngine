@@ -55,6 +55,36 @@ void JSBFunction::Process()
 
 }
 
+bool JSBFunction::Match(JSBFunction* func)
+{
+    if (func->Skip() || func->GetName() != name_)
+        return false;
+
+    if (!returnType_)
+    {
+        if (func->GetReturnType())
+            return false;
+    }
+    else
+    {
+        if (!returnType_->Match(func->GetReturnType()))
+            return false;
+    }
+
+    Vector<JSBFunctionType*>& fparams = func->GetParameters();
+
+    if (parameters_.Size() != fparams.Size())
+        return false;
+
+    for ( unsigned j = 0; j < fparams.Size(); j++)
+    {
+        if (!parameters_[j]->Match(fparams[j]))
+            return false;
+    }
+
+    return true;
+}
+
 JSBClass* JSBFunction::GetReturnClass()
 {
     if (!returnType_)

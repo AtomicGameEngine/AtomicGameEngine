@@ -91,39 +91,6 @@ public static class Atomic
   private static extern IntPtr csb_AtomicEngine_GetSubsystem(string name);
 
 }
-
-public static partial class Constants
-{
-    public const string LIBNAME = "__Internal";
-}
-
-public partial class RefCounted
-{
-
-  public RefCounted()
-  {
-  }
-
-  protected RefCounted (IntPtr native)
-  {
-    nativeInstance = native;
-  }
-
-  public IntPtr nativeInstance = IntPtr.Zero;
-
-  [DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-  public static extern IntPtr csb_Atomic_RefCounted_GetClassID (IntPtr self);
-
-}
-
-public class InspectorAttribute : Attribute
-{
-  public InspectorAttribute(string DefaultValue = "")
-  {
-  }
-
-  public string DefaultValue;
-}
-
+				
 
 }
