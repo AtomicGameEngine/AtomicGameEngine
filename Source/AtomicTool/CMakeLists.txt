@@ -2,7 +2,7 @@ set (ATOMIC_TOOL_SOURCES AtomicTool.cpp AtomicTool.h)
 
 if (MSVC)
     add_definitions(-DATOMIC_WIN32_CONSOLE)
-endif()
+endif(MSVC)
 
 add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
@@ -63,10 +63,8 @@ add_custom_command(TARGET AtomicTool POST_BUILD
                    COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" MACOSX
                    COMMAND /usr/local/bin/xbuild
                    COMMENT "Compiling AtomicNET Assemblies")
-endif(IOS)
-
-endif(APPLE)
-
-endif(MSVC)
+endif(xbuild)
+endif(NOT IOS)
+endif()
 
 endif(ATOMIC_DOTNET_DEV)
