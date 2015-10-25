@@ -73,7 +73,9 @@ void AEEditorCommon::Setup()
     RegisterEnvironmentLibrary(context_);
 #endif
 
+#ifdef ATOMIC_DOTNET
     RegisterNETScriptLibrary(context_);
+#endif
 
     // Register IPC system
     context_->RegisterSubsystem(new IPC(context_));

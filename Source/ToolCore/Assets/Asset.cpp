@@ -295,7 +295,9 @@ bool Asset::CreateImporter()
         else if (ext == ".dll")
         {
             // TODO: check for native dll
+#ifdef ATOMIC_DOTNET
             importer_ = new NETAssemblyImporter(context_, this);
+#endif
         }
         else if (textureFormats.Contains(ext))
         {

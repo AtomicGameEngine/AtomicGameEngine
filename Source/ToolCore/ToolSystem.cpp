@@ -20,8 +20,6 @@
 #include "License/LicenseSystem.h"
 #include "Build/BuildSystem.h"
 #include "Subprocess/SubprocessSystem.h"
-#include "NETTools/NETToolSystem.h"
-
 
 #include "ToolSystem.h"
 #include "ToolEnvironment.h"
@@ -29,6 +27,10 @@
 
 #include "Project/Project.h"
 #include "Project/ProjectUserPrefs.h"
+
+#ifdef ATOMIC_DOTNET
+#include "NETTools/NETToolSystem.h"
+#endif
 
 namespace ToolCore
 {
@@ -41,7 +43,10 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     context_->RegisterSubsystem(new LicenseSystem(context_));
     context_->RegisterSubsystem(new BuildSystem(context_));
     context_->RegisterSubsystem(new SubprocessSystem(context_));
+
+#ifdef ATOMIC_DOTNET
     context_->RegisterSubsystem(new NETToolSystem(context_));
+#endif
 
     // platform registration
     RegisterPlatform(new PlatformMac(context));

@@ -497,9 +497,13 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Texture2D"] = "TextureImporter";
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
-        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";
-        resourceTypeToImporterType_["CSComponentAssembly"] = "NETAssemblyImporter";
+        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
         resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
+
+#ifdef ATOMIC_DOTNET
+        resourceTypeToImporterType_["CSComponentAssembly"] = "NETAssemblyImporter";
+#endif
+
     }
 
     if (!resourceTypeToImporterType_.Contains(resourceTypeName))

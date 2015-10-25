@@ -1,8 +1,11 @@
+
+# add_definitions ( -DATOMIC_DOTNET )
+
 set (CSATOMICNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/Atomic/Native")
 set (CSATOMICPLAYERNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicPlayer/Native")
 set (CSATOMICNETNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicNET/Native")
 
-# Create the JSBind files ahead of time, so they are picked up with glob
+# Create the binding files ahead of time, so they are picked up with glob
 
 set (CSFILES CSModuleAtomic2D.cpp;CSModuleAtomic3D.cpp;CSModuleAudio.cpp;CSModuleContainer.cpp;CSModuleCore.cpp;
              CSModuleEngine.cpp;CSModuleEnvironment.cpp;CSModuleGraphics.cpp;CSModuleInput.cpp;
