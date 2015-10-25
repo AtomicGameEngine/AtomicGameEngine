@@ -66,7 +66,7 @@ if (APPLE)
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 elseif(LINUX)
-    target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
+    target_link_libraries(AtomicEditor NETCore NETScript curl nativefiledialog ${GTK3_LIBRARIES})
 
     # check for nodejs install
     # look for either 'node' or 'nodejs' ( debian uses both names )
