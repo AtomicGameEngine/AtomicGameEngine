@@ -32,6 +32,9 @@ add_custom_command(TARGET AtomicTool POST_BUILD
                    COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicNET/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
                    COMMENT "Generating Script Bindings")
 
+
+if (ATOMIC_DOTNET_DEV)
+
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
  file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
 endif()
@@ -43,8 +46,9 @@ endif()
 if (MSVC)
 
 add_custom_command(TARGET AtomicTool POST_BUILD
-                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNET/
-                   COMMAND  ${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNET/build.cmd
+                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build/
+                   COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" WINDOWS
+                   COMMAND msbuild
                    COMMENT "Compiling AtomicNET Assemblies")
 elseif(APPLE)
 
@@ -59,8 +63,10 @@ add_custom_command(TARGET AtomicTool POST_BUILD
                    COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" MACOSX
                    COMMAND /usr/local/bin/xbuild
                    COMMENT "Compiling AtomicNET Assemblies")
-endif()
+endif(IOS)
 
-endif()
+endif(APPLE)
 
-endif()
+endif(MSVC)
+
+endif(ATOMIC_DOTNET_DEV)

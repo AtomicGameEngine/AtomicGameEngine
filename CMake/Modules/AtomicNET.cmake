@@ -1,5 +1,7 @@
 
-# add_definitions ( -DATOMIC_DOTNET )
+if (ATOMIC_DOTNET_DEV)
+add_definitions ( -DATOMIC_DOTNET )
+endif ()
 
 set (CSATOMICNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/Atomic/Native")
 set (CSATOMICPLAYERNATIVEDIR "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicPlayer/Native")
