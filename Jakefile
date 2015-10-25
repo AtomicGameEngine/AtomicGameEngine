@@ -522,8 +522,8 @@ namespace('package', function() {
     fs.copySync(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData");
 
     // AtomicNET
-    fs.copySync(jakeRoot + "/Submodules/CoreCLR/Windows/Release", windowsPackageFolder + "/Resources/AtomicNET/Windows/");
-    fs.copySync(jakeRoot + "/Artifacts/AtomicNET", windowsPackageFolder + "/Resources/AtomicNET/Windows/Atomic");
+    // fs.copySync(jakeRoot + "/Submodules/CoreCLR/Windows/Release", windowsPackageFolder + "/Resources/AtomicNET/Windows/");
+    // fs.copySync(jakeRoot + "/Artifacts/AtomicNET", windowsPackageFolder + "/Resources/AtomicNET/Windows/Atomic");
 
     fs.copySync(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/Resources/ToolData/Deployment/Windows/x86/D3DCompiler_47.dll");
     fs.copySync(jakeRoot + "/Build/Windows/Binaries/x64/D3DCompiler_47.dll", windowsPackageFolder + "/Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
