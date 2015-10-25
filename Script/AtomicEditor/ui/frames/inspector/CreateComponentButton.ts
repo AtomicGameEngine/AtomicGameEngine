@@ -42,6 +42,7 @@ geometryCreateSource.addItem(new Atomic.UIMenuItem("Water", "create component"))
 var logicCreateSource = new Atomic.UIMenuItemSource();
 
 logicCreateSource.addItem(new Atomic.UIMenuItem("JSComponent", "JSComponent"));
+logicCreateSource.addItem(new Atomic.UIMenuItem("CSComponent", "CSComponent"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "create component"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "create component"));
 

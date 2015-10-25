@@ -1,5 +1,5 @@
 
-add_definitions(-DHAVE_STDINT_H -DPOCO_STATIC)
+add_definitions(-DHAVE_STDINT_H )
 
 set (SOURCE_FILES
     Foundation/src/Pipe.cpp

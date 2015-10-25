@@ -1,9 +1,15 @@
 
 include_directories(${CMAKE_SOURCE_DIR}/Source)
-include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty)
+include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
+                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
+                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+                              ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D )
 
 # Define source files
 file (GLOB SOURCE_FILES *.cpp *.h )
+
+set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (MSVC)
     set (EXE_TYPE WIN32)
@@ -32,11 +38,16 @@ if (MSVC)
   add_custom_command (TARGET AtomicPlayer POST_BUILD
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicPlayer>/D3DCompiler_47.dll\")
+
+    target_link_libraries(AtomicPlayer NETCore NETScript)
+
 endif()
 
 if (APPLE)
 
 if (NOT IOS)
+
+    target_link_libraries(AtomicPlayer NETCore NETScript)
 
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
 
@@ -52,7 +63,7 @@ else()
       XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES NO
     )
 
-	set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/CMake/Modules/iOSBundleInfo.plist.template)
+    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/CMake/Modules/iOSBundleInfo.plist.template)
 
 endif()
 endif(APPLE)

@@ -6,6 +6,7 @@
 //
 
 /// <reference path="../TypeScript/Atomic.d.ts" />
+/// <reference path="../TypeScript/AtomicNET.d.ts" />
 /// <reference path="../TypeScript/ToolCore.d.ts" />
 /// <reference path="../TypeScript/Editor.d.ts" />
 /// <reference path="../TypeScript/AtomicWork.d.ts" />

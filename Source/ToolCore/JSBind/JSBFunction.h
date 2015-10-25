@@ -30,6 +30,36 @@ public:
         isConst_ = false;
     }
 
+    // returns true if the types match
+    bool Match(const JSBFunctionType* other)
+    {
+        if (!other)
+            return false;
+
+        if (isSharedPtr_ != other->isSharedPtr_)
+            return false;
+        if (isPointer_ != other->isPointer_)
+            return false;
+        if (isReference_ != other->isReference_)
+            return false;
+        if (isTemplate_ != other->isTemplate_)
+            return false;
+        if (isConst_ != other->isConst_)
+            return false;
+
+        if (name_ != other->name_)
+            return false;
+
+        if (!type_ && !other->type_)
+            return true;
+
+        if (!type_ || !other->type_)
+            return false;
+
+        return type_->Match(other->type_);
+
+    }
+
     bool isSharedPtr_;
     bool isPointer_;
     bool isReference_;
@@ -80,7 +110,8 @@ public:
 
 class JSBFunction : public JSBSymbol
 {
-    friend class JSBFunctionWriter;
+    friend class JSFunctionWriter;
+    friend class CSFunctionWriter;
 
 public:
 
@@ -94,6 +125,8 @@ public:
 
     const String& GetName() { return name_; }
 
+    bool Match(JSBFunction* func);
+
     bool IsConstructor() { return isConstructor_; }
     bool IsDestructor() { return isDestructor_; }
     bool IsSetter() { return isSetter_; }
@@ -105,6 +138,10 @@ public:
     JSBClass* GetClass() { return class_; }
     const String& GetPropertyName() { return propertyName_; }
     JSBFunctionType* GetReturnType() { return returnType_; }
+
+    /// Get class return type or null
+    JSBClass* GetReturnClass();
+
     Vector<JSBFunctionType*>& GetParameters() { return parameters_; }
 
     const String& GetDocString() { return docString_; }

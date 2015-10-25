@@ -35,6 +35,7 @@ var iosDeployBuildFolder = artifactsFolder + "/ios-deploy";
 var webBuildFolder = artifactsFolder + "/Web_Build";
 var linuxBuildFolder = artifactsFolder + "/Linux_Build";
 var jsDocFolder = artifactsFolder + "/JSDoc";
+var atomicNETFolder = artifactsFolder + "/AtomicNET";
 
 // binaries
 
@@ -62,7 +63,8 @@ var allBuildFolders = [
   iosDeployBuildFolder,
   webBuildFolder,
   linuxBuildFolder,
-  jsDocFolder
+  jsDocFolder,
+  atomicNETFolder
 ];
 
 // packaging
@@ -217,7 +219,7 @@ namespace('build', function() {
     } else if (host == "win32") {
 
       if (deployments.windows) {
-        fs.copySync(platformBinariesFolder + "/Win32/AtomicPlayer.exe", deployRoot + "/Windows/x86/AtomicPlayer.exe");
+        fs.copySync(platformBinariesFolder + "/Win32/AtomicPlayer.exe", deployRoot + "/Windows/x64/AtomicPlayer.exe");
       }
 
     }
@@ -496,7 +498,7 @@ namespace('package', function() {
 
   });
 
-  task('windows', ['clean:all', 'build:windows'], function() {
+  task('windows', ['clean:all','build:windows'], function() {
 
     if (!fs.existsSync(distFolder)) {
       jake.mkdirP(distFolder);
@@ -508,9 +510,9 @@ namespace('package', function() {
 
     fs.copySync(windowsBuildFolder + "/Source/AtomicEditor/Release/AtomicEditor.exe", windowsPackageFolder + "/AtomicEditor.exe")
 
-    // 32 bit build for packaging!
+    // 64 bit build for packaging!
 
-    fs.copySync(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll")
+    fs.copySync(jakeRoot + "/Build/Windows/Binaries/x64/D3DCompiler_47.dll", windowsPackageFolder + "/D3DCompiler_47.dll")
 
     // copy resources
 
@@ -519,8 +521,12 @@ namespace('package', function() {
     fs.copySync(jakeRoot + "/Resources/PlayerData", windowsPackageFolder + "/Resources/PlayerData");
     fs.copySync(jakeRoot + "/Data/AtomicEditor/", windowsPackageFolder + "/Resources/ToolData");
 
-    // 32 bit!
+    // AtomicNET
+    fs.copySync(jakeRoot + "/Submodules/CoreCLR/Windows/Release", windowsPackageFolder + "/Resources/AtomicNET/Windows/");
+    fs.copySync(jakeRoot + "/Artifacts/AtomicNET", windowsPackageFolder + "/Resources/AtomicNET/Windows/Atomic");
+
     fs.copySync(jakeRoot + "/Build/Windows/Binaries/x86/D3DCompiler_47.dll", windowsPackageFolder + "/Resources/ToolData/Deployment/Windows/x86/D3DCompiler_47.dll");
+    fs.copySync(jakeRoot + "/Build/Windows/Binaries/x64/D3DCompiler_47.dll", windowsPackageFolder + "/Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
 
     if (jenkinsBuild) {
 

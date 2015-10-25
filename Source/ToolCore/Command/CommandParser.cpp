@@ -14,6 +14,7 @@
 #include "PlayCmd.h"
 #include "EditCmd.h"
 #include "BindCmd.h"
+#include "NETProjectGenCmd.h"
 
 namespace ToolCore
 {
@@ -66,6 +67,10 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             {
                 cmd = new BindCmd(context_);
             }
+            else if (argument == "net-projectgen")
+            {
+                cmd = new NETProjectGenCmd(context_);
+            }
 
         }
 
@@ -74,7 +79,6 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             if (cmd->Parse(arguments, i, errorMsg_))
                 return cmd;
 
-            cmd->ReleaseRef();
             break;
         }
 

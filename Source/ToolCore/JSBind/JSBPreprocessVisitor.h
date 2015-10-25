@@ -57,7 +57,23 @@ public:
         for (unsigned i = 0; i < penum->memberCount(); i++)
         {
             Symbol* symbol = penum->memberAt(i);
-            jenum->AddValue(getNameString(symbol->name()));
+
+            String name = getNameString(symbol->name());
+            String value = "";
+
+            Declaration* decl = symbol->asDeclaration();
+            if (decl)
+            {
+                EnumeratorDeclaration* enumDecl = decl->asEnumeratorDeclarator();
+                const StringLiteral* constantValue = enumDecl->constantValue();
+                if (constantValue)
+                {
+                    value = constantValue->chars();
+                }
+            }
+
+            jenum->AddValue(name);
+
         }
 
         jenum->Preprocess();

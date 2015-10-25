@@ -1,4 +1,4 @@
 TBContainer: skin: AEContainer, gravity: all, id: mainframecontainer
-	lp: min-width: 310
+	lp: min-width: 318
 	TBScrollContainer: scroll-mode: y, id: inspectorcontainerscroll, gravity: all
 		TBLayout: distribution: gravity, id: inspectorcontainer, gravity: all

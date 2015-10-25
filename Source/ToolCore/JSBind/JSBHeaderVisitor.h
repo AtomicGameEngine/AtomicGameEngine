@@ -167,6 +167,7 @@ public:
                         FullySpecifiedType pfst = tnid->templateArgumentAt(0);
                         type = pfst.type();
                         isTemplate = true;
+                        isSharedPtr = true;
                     }
                 }
             }
@@ -183,7 +184,12 @@ public:
 
 
         if (!jtype)
+        {
             jtype = processTypeConversion(type);
+            if (fst.isUnsigned() && jtype->asPrimitiveType())
+                jtype->asPrimitiveType()->isUnsigned_ = true;
+
+        }
 
         if (!jtype)
             return NULL;
@@ -272,7 +278,7 @@ public:
         if (name.StartsWith("~"))
             jfunction->SetDestructor();
 
-        if (function->isOverride())
+        if (function->isVirtual())
             jfunction->SetVirtual(true);
 
         // see if we support return type
@@ -406,13 +412,22 @@ public:
             return true;
         }
 
-        if (type->isIntegerType())
+        String value;
+
+        const StringLiteral* init = decl->getInitializer();
+        if (init)
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Int);
+            if (init->chars())
+                value = init->chars();
+        }
+
+        if (type->isIntegerType() || _unsigned)
+        {            
+            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Int, _unsigned);
         }
         else
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Float);
+            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Float);
         }
 
         return true;

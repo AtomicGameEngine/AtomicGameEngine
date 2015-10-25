@@ -21,11 +21,15 @@
 #include "JSBModuleWriter.h"
 #include "JSBType.h"
 
+#include "JavaScript/JSModuleWriter.h"
+#include "CSharp/CSModuleWriter.h"
+
 namespace ToolCore
 {
 
 JSBModule::JSBModule(Context* context, JSBPackage* package) : Object(context),
-    package_(package)
+    package_(package),
+    dotNetModule_(false)
 {
 
 }
@@ -366,7 +370,7 @@ bool JSBModule::ContainsConstant(const String& constantName)
     return constants_.Contains(constantName);
 }
 
-void JSBModule::RegisterConstant(const String& constantName, unsigned type)
+void JSBModule::RegisterConstant(const String& constantName, const String& value, unsigned type, bool isUnsigned)
 {
     // MAX_CASCADE_SPLITS is defined differently for desktop/mobile
     if (constantName == "MAX_CASCADE_SPLITS" && JSBPackage::ContainsConstantAllPackages(constantName))
@@ -379,7 +383,10 @@ void JSBModule::RegisterConstant(const String& constantName, unsigned type)
         ErrorExit(ToString("Constant collision: %s", constantName.CString()));
     }
 
-    constants_[constantName] = new JSBPrimitiveType(type);
+    Constant c;
+    c.type = new JSBPrimitiveType(type, isUnsigned);
+    c.value = value;
+    constants_[constantName] = c;
 }
 
 bool JSBModule::Load(const String& jsonFilename)
@@ -482,18 +489,6 @@ bool JSBModule::Load(const String& jsonFilename)
     ScanHeaders();
 
     return true;
-}
-
-void JSBModule::GenerateSource(const String& outPath)
-{
-    JSBModuleWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/JSModule" + name_ + ".cpp";
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
 }
 
 }

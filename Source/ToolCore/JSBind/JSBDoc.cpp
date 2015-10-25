@@ -249,14 +249,21 @@ void JSBDoc::ExportModuleEnums(JSBModule* module)
 
         source_ += " var " + _enum->GetName() + " =  {\n";
 
-        Vector<String>& values = _enum->GetValues();
+        HashMap<String, String>& values = _enum->GetValues();
 
-        for (unsigned j = 0; j < values.Size(); j++)
+        HashMap<String, String>::ConstIterator itr = values.Begin();
+
+        while (itr != values.End())
         {
-            source_ += "    " + values[j] + " : undefined";
+            String name = (*itr).first_;
 
-            if (j !=  values.Size() - 1)
+            source_ += "    " + name + " : undefined";
+
+            itr++;
+
+            if (itr !=  values.End())
                 source_ += ",\n";
+
         }
 
         source_ += "\n\n};\n\n";

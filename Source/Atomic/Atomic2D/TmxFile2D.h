@@ -40,7 +40,7 @@ class TmxLayer2D : public RefCounted
     REFCOUNTED(TmxLayer2D)
 
 public:
-    TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
+    TmxLayer2D(TmxFile2D* tmxFile = 0, TileMapLayerType2D type = LT_TILE_LAYER);
     virtual ~TmxLayer2D();
 
     /// Return tmx file.
@@ -95,7 +95,7 @@ class TmxTileLayer2D : public TmxLayer2D
     REFCOUNTED(TmxTileLayer2D)
 
 public:
-    TmxTileLayer2D(TmxFile2D* tmxFile);
+    TmxTileLayer2D(TmxFile2D* tmxFile = 0);
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);

@@ -49,12 +49,23 @@ bool ToolEnvironment::InitFromPackage()
 
     //TODO: move this to deployment stuff
     playerAppFolder_ = resourcesDir + "ToolData/Deployment/MacOS/AtomicPlayer.app/";
-    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x86/AtomicPlayer.exe";
+    playerBinary_ = resourcesDir + "ToolData/Deployment/Windows/x64/AtomicPlayer.exe";
 
     resourceCoreDataDir_ = resourcesDir + "CoreData";
     resourcePlayerDataDir_ = resourcesDir + "PlayerData";
 
     toolDataDir_ =  resourcesDir + "ToolData/";
+
+    // AtomicNET
+    netAssemblyLoadPaths_ = GetNativePath(ToString("%sAtomicNET/Windows/Atomic/", resourcesDir.CString()));
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
+    netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
+#else
+    netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
+    netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
+#endif
 
     return true;
 }
@@ -75,6 +86,17 @@ bool ToolEnvironment::InitFromJSON(bool atomicTool)
 
         SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
         SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR, true);
+
+        netAssemblyLoadPaths_ = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
+        netAtomicNETEngineAssemblyPath_ = ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR);
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Release/x64/", ATOMIC_ROOT_SOURCE_DIR));
+#else
+        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/MacOSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
+#endif
+
+        netTPAPaths_ = ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
 
         return true;
     }
@@ -107,6 +129,7 @@ bool ToolEnvironment::InitFromJSON(bool atomicTool)
         SetRootBuildDir(rootBuildDir->value.GetString(), true);
     else
         return false;
+
 
     return true;
 
@@ -141,7 +164,9 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 
 void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPaths)
 {
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
     rootBuildDir_ = AddTrailingSlash(buildDir);
+
 
     if (setBinaryPaths)
     {
@@ -154,6 +179,12 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
         playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/Release/AtomicEditor.exe";
 #endif
+
+        // some build tools like ninja don't use Release/Debug folders
+        if (!fileSystem->FileExists(playerBinary_))
+                playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.exe";
+        if (!fileSystem->FileExists(editorBinary_))
+                editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.exe";
 
         playerAppFolder_ = rootSourceDir_ + "Data/AtomicEditor/Deployment/MacOS/AtomicPlayer.app";
 

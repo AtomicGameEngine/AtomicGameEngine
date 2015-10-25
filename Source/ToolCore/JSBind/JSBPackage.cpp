@@ -13,11 +13,7 @@
 #include "JSBind.h"
 #include "JSBModule.h"
 #include "JSBPackage.h"
-
 #include "JSBPackageWriter.h"
-#include "JSBDoc.h"
-#include "JSBTypeScript.h"
-#include "JSBHaxe.h"
 
 namespace ToolCore
 {
@@ -66,36 +62,10 @@ void JSBPackage::ProcessModules()
 
 }
 
-void JSBPackage::GenerateSource(const String &outPath)
+void JSBPackage::GenerateSource(JSBPackageWriter& packageWriter)
 {
-    JSBPackageWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/JSPackage" + name_ + ".cpp";
-
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
-
-    for (unsigned i = 0; i < modules_.Size(); i++)
-    {
-        modules_[i]->GenerateSource(outPath);
-    }
-
-    JSBind* jsbind = GetSubsystem<JSBind>();
-
-    if (jsbind->GetPlatform() == "MACOSX" || jsbind->GetPlatform() == "WINDOWS" || jsbind->GetPlatform() == "LINUX")
-    {
-        JSBDoc jdoc;
-        jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Artifacts/JSDoc/" + name_ + ".js");
-
-        JSBTypeScript ts;
-        ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");
-
-        JSBHaxe hx;
-        hx.Emit(this, jsbind->GetSourceRootFolder() + "Script/Haxe/" + name_ + ".hx");
-    }
+    packageWriter.GenerateSource();
+    packageWriter.PostProcess();
 }
 
 JSBClass* JSBPackage::GetClass(const String& name)
@@ -245,6 +215,18 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
+    JSONValue dnmodules = root.Get("dotnetModules");
+    Vector<String> dotNetModules;
+    if (dnmodules.IsArray())
+    {
+        for (unsigned i = 0; i < dnmodules.GetArray().Size(); i++)
+        {
+            String moduleName = dnmodules.GetArray()[i].GetString();
+            dotNetModules.Push(moduleName);
+        }
+    }
+
+
     name_ = root.Get("name").GetString();
     namespace_ = root.Get("namespace").GetString();
 
@@ -266,6 +248,11 @@ bool JSBPackage::Load(const String& packageFolder)
         {
             LOGERRORF("Unable to load module json: %s", (packageFolder + moduleName + ".json").CString());
             return false;
+        }
+
+        if (dotNetModules.Contains(moduleName))
+        {
+            module->SetDotNetModule(true);
         }
 
         modules_.Push(module);

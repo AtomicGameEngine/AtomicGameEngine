@@ -20,7 +20,7 @@ set (JSFILES JSModuleAtomic2D.cpp;JSModuleAtomic3D.cpp;JSModuleAudio.cpp;JSModul
              JSModuleEngine.cpp;JSModuleEnvironment.cpp;JSModuleGraphics.cpp;JSModuleInput.cpp;
              JSModuleIO.cpp;JSModuleJavascript.cpp;JSModuleMath.cpp;JSModuleNavigation.cpp;
              JSModuleNetwork.cpp;JSModulePhysics.cpp;JSModuleResource.cpp;JSPackageAtomic.cpp;
-             JSModuleScene.cpp;JSModuleUI.cpp;JSModuleWeb.cpp)
+             JSModuleScene.cpp;JSModuleUI.cpp;JSModuleWeb.cpp;JSModuleScript.cpp)
 
 foreach(JSFILE ${JSFILES})
 
@@ -35,7 +35,7 @@ endforeach()
 
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Atomic/*.cpp)
 
-set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE} )
+set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE})
 
 add_library(AtomicJS ${SOURCE_FILES})
 

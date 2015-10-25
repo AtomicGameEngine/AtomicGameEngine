@@ -140,6 +140,21 @@ bool JSONFile::BeginLoad(Deserializer& source)
     return true;
 }
 
+bool JSONFile::ParseJSON(const String& json, JSONValue& value)
+{
+    rapidjson::Document document;
+    if (document.Parse<0>(json.CString()).HasParseError())
+    {
+        LOGERROR("Could not parse JSON data from string");
+        return false;
+    }
+
+    ToJSONValue(value, document);
+
+    return true;
+
+}
+
 static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& jsonValue, rapidjson::MemoryPoolAllocator<>& allocator)
 {
     switch (jsonValue.GetValueType())

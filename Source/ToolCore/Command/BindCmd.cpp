@@ -70,17 +70,20 @@ void BindCmd::Run()
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
 
-    //bindPlatform_ = "MACOSX";
     sourceRootFolder_ = env->GetRootSourceDir();
-    //packageFolder_ = "Source/AtomicJS/Packages/Atomic/";
 
     SharedPtr<JSBind> jsbind(new JSBind(context_));
 
     context_->RegisterSubsystem(jsbind);
 
-    LOGINFOF("Generating JS Bindings");
+    LOGINFOF("Loading Package");
+    jsbind->LoadPackage(sourceRootFolder_, packageFolder_, bindPlatform_);
 
-    jsbind->GenerateBindings(sourceRootFolder_, packageFolder_, bindPlatform_);
+    LOGINFOF("Generating JS Bindings");
+    jsbind->GenerateJavaScriptBindings();
+
+    LOGINFOF("Generating C# Bindings");
+    jsbind->GenerateCSharpBindings();
 
     Finished();
 

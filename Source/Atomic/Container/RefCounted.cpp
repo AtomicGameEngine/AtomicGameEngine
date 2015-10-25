@@ -29,6 +29,8 @@
 namespace Atomic
 {
 
+RefCountedDeletedFunction RefCounted::refCountedDeletedFunction_ = 0;
+
 RefCounted::RefCounted() :
     refCount_(new RefCount()),
     jsHeapPtr_(0)
@@ -42,6 +44,9 @@ RefCounted::~RefCounted()
     assert(refCount_);
     assert(refCount_->refs_ == 0);
     assert(refCount_->weakRefs_ > 0);
+
+    if (refCountedDeletedFunction_)
+        refCountedDeletedFunction_(this);
 
     // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
     refCount_->refs_ = -1;
@@ -63,7 +68,9 @@ void RefCounted::ReleaseRef()
     assert(refCount_->refs_ > 0);
     (refCount_->refs_)--;
     if (!refCount_->refs_)
+    {
         delete this;
+    }
 }
 
 int RefCounted::Refs() const

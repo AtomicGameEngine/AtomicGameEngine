@@ -27,11 +27,19 @@ class JSBPrimitiveType;
 
 class JSBModule : public Object
 {
-    friend class JSBModuleWriter;
+    friend class JSModuleWriter;
+    friend class CSModuleWriter;
 
     OBJECT(JSBModule)
 
 public:
+
+    struct Constant
+    {
+        JSBPrimitiveType* type;
+        String value;
+    };
+
 
     JSBModule(Context* context, JSBPackage* package);
     virtual ~JSBModule();
@@ -42,7 +50,7 @@ public:
     JSBClass* GetClass(const String& name);
     Vector<SharedPtr<JSBClass>> GetClasses();
     Vector<SharedPtr<JSBEnum>> GetEnums();
-    HashMap<String, JSBPrimitiveType*>& GetConstants() { return constants_; }
+    HashMap<String, Constant>& GetConstants() { return constants_; }
 
     void RegisterClass(String name);
 
@@ -50,7 +58,7 @@ public:
     void RegisterEnum(JSBEnum* jenum);
 
     bool ContainsConstant(const String& constantName);
-    void RegisterConstant(const String& constantName, unsigned type);
+    void RegisterConstant(const String& constantName, const String& value, unsigned type, bool isUnsigned = false);
 
     bool Requires(const String& requirement) { return requirements_.Contains(requirement); }
 
@@ -62,8 +70,8 @@ public:
     void ProcessClasses();
     void PostProcessClasses();
 
-    void GenerateSource(const String& outPath);
-    const String& GetSource();
+    void SetDotNetModule(bool value) { dotNetModule_ = value; }
+    bool GetDotNetModule() { return dotNetModule_; }
 
 private:
 
@@ -88,12 +96,14 @@ private:
     // native name -> JSBClass
     HashMap<StringHash, SharedPtr<JSBClass> > classes_;
     HashMap<StringHash, SharedPtr<JSBEnum> > enums_;
-    HashMap<String, JSBPrimitiveType*> constants_;
+
+    HashMap<String, Constant> constants_;
+
     Vector<String> requirements_;
 
     SharedPtr<JSONFile> moduleJSON_;
 
-    String source_;
+    bool dotNetModule_;
 
 };
 

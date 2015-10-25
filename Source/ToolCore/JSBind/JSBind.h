@@ -14,6 +14,8 @@ using namespace Atomic;
 namespace ToolCore
 {
 
+class JSBPackage;
+
 class JSBind : public Object
 {
 
@@ -24,17 +26,28 @@ public:
     JSBind(Context* context);
     virtual ~JSBind();
 
-    bool GenerateBindings(const String& sourceRootFolder, const String& packageFolder, const String& platform);
+    bool LoadPackage(const String& sourceRootFolder, const String& packageFolder, const String& platform);
+
+    bool GenerateJavaScriptBindings();
+    bool GenerateCSharpBindings();
 
     const String& GetSourceRootFolder() { return sourceRootFolder_; }
     const String& GetPackageFolder() { return packageFolder_; }
     const String& GetPlatform() { return platform_; }
 
+    const String& GetDestScriptFolder() { return destScriptFolder_; }
+    const String& GetDestNativeFolder() { return destNativeFolder_; }
+
 private:
+
+    SharedPtr<JSBPackage> package_;
 
     String sourceRootFolder_;
     String packageFolder_;
     String platform_;
+
+    String destScriptFolder_;
+    String destNativeFolder_;
 
 };
 

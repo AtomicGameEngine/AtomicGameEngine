@@ -1,10 +1,9 @@
 
-include(AtomicDesktop)
-
 set (JAVASCRIPT_BINDINGS_PLATFORM "WINDOWS")
 
-#set (CMAKE_DEBUG_POSTFIX _d)
+include(AtomicDesktop)
 
+#set (CMAKE_DEBUG_POSTFIX _d)
 
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     set (D3DCOMPILER_47_DLL ${CMAKE_SOURCE_DIR}/Build/Windows/Binaries/x64/D3DCompiler_47.dll)
@@ -12,7 +11,7 @@ else()
     set (D3DCOMPILER_47_DLL ${CMAKE_SOURCE_DIR}/Build/Windows/Binaries/x86/D3DCompiler_47.dll)
 endif()
 
-add_definitions(-DATOMIC_PLATFORM_WINDOWS -D_CRT_SECURE_NO_WARNINGS -DATOMIC_TBUI)
+add_definitions(-DATOMIC_PLATFORM_WINDOWS -D_CRT_SECURE_NO_WARNINGS -DATOMIC_TBUI )
 
 list (APPEND ATOMIC_LINK_LIBRARIES MojoShader user32 gdi32 winmm imm32 ole32 oleaut32 version uuid Ws2_32)
 

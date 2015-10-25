@@ -1,7 +1,9 @@
-include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog)
-
+include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog )
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
@@ -21,6 +23,8 @@ endforeach()
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
+
+set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE} ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (APPLE)
 
@@ -49,11 +53,12 @@ endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS AtomicNETJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
-    target_link_libraries(AtomicEditor curl)
+
+    target_link_libraries(AtomicEditor NETCore NETScript curl)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD
@@ -61,7 +66,7 @@ if (APPLE)
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 elseif(LINUX)
-    target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
+    target_link_libraries(AtomicEditor NETCore NETScript curl nativefiledialog ${GTK3_LIBRARIES})
 
     # check for nodejs install
     # look for either 'node' or 'nodejs' ( debian uses both names )
@@ -82,9 +87,9 @@ elseif(LINUX)
         add_custom_command (TARGET AtomicEditor POST_BUILD
         COMMAND  ${NODEJS_CMD} "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    endif() 
+    endif()
 else()
-    target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
+    target_link_libraries(AtomicEditor NETCore NETScript libcurl Iphlpapi Wldap32)
 
     # compile the editor scripts
     add_custom_command (TARGET AtomicEditor POST_BUILD

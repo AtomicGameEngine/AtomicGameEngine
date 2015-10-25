@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3A4C776B-61D6-412E-B1E9-7A1C84CD6B5B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>AtomicEngine</RootNamespace>
+    <AssemblyName>AtomicSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleContainer.cs">
+      <Link>CSModuleContainer.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleCore.cs">
+      <Link>CSModuleCore.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleScene.cs">
+      <Link>CSModuleScene.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleResource.cs">
+      <Link>CSModuleResource.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleGraphics.cs">
+      <Link>CSModuleGraphics.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleIO.cs">
+      <Link>CSModuleIO.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\AtomicPlayer\Managed\CSModulePlayer.cs">
+      <Link>CSModulePlayer.cs</Link>
+    </Compile>
+    <Compile Include="AtomicEngine.cs" />
+    <Compile Include="ComponentCore.cs" />
+    <Compile Include="Math.cs" />
+    <Compile Include="CSComponent.cs" />
+    <Compile Include="AtomicInterop.cs" />
+    <Compile Include="NativeCore.cs" />
+    <Compile Include="EventCore.cs" />
+    <Compile Include="ScriptObject.cs" />
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleInput.cs">
+      <Link>CSModuleInput.cs</Link>
+    </Compile>
+    <Compile Include="SDLConsts.cs" />
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAtomic2D.cs">
+      <Link>CSModuleAtomic2D.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAtomic3D.cs">
+      <Link>CSModuleAtomic3D.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleAudio.cs">
+      <Link>CSModuleAudio.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleEngine.cs">
+      <Link>CSModuleEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleEnvironment.cs">
+      <Link>CSModuleEnvironment.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleMath.cs">
+      <Link>CSModuleMath.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleNavigation.cs">
+      <Link>CSModuleNavigation.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleNetwork.cs">
+      <Link>CSModuleNetwork.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModulePhysics.cs">
+      <Link>CSModulePhysics.cs</Link>
+    </Compile>
+    <Compile Include="..\Source\Generated\MACOSX\CSharp\Packages\Atomic\Managed\CSModuleUI.cs">
+      <Link>CSModuleUI.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -35,7 +35,7 @@ class IndexBuffer;
 class VertexBuffer;
 
 /// One billboard in the billboard set.
-struct ATOMIC_API Billboard : public RefCounted
+class ATOMIC_API Billboard : public RefCounted
 {
     friend class BillboardSet;
     friend class ParticleEmitter;

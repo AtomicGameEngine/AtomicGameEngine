@@ -31,6 +31,10 @@ protected:
 
     void Initialize();
 
+private:
+
+    void BuildAtomicNET();
+
 };
 
 }

@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <Atomic/Scene/Component.h>
+#include <Atomic/Script/ScriptComponent.h>
 
 #include "JSComponentFile.h"
 
@@ -32,11 +32,14 @@ namespace Atomic
 
 class JSVM;
 
-/// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
-class ATOMIC_API JSComponent : public Component
+/// JavaScript component
+class ATOMIC_API JSComponent : public ScriptComponent
 {
     friend class JSComponentFactory;
     friend class JSComponentFile;
+
+    OBJECT(JSComponent);
+    BASEOBJECT(ScriptComponent);
 
     enum EventFlags
     {
@@ -47,8 +50,6 @@ class ATOMIC_API JSComponent : public Component
     };
 
 public:
-
-    OBJECT(JSComponent);
 
     /// Construct.
     JSComponent(Context* context);
@@ -61,11 +62,6 @@ public:
     bool Load(Deserializer& source, bool setInstanceDefault);
     bool LoadXML(const XMLElement& source, bool setInstanceDefault);
     void ApplyAttributes();
-
-    /// Get script attribute
-    VariantMap& GetFieldValues() { return fieldValues_; }
-    ResourceRef GetScriptAttr() const;
-    JSComponentFile* GetComponentFile() { return componentFile_; }
 
     /// Match script name
     bool MatchScriptName(const String& path);
@@ -81,13 +77,21 @@ public:
     /// Return whether the DelayedStart() function has been called.
     bool IsDelayedStartCalled() const { return delayedStartCalled_; }
 
-    /// Set script attribute.
-    void SetScriptAttr(const ResourceRef& value);
-    void SetComponentFile(JSComponentFile* cfile);
-
     void SetDestroyed() { destroyed_ = true; }
 
     void InitInstance(bool hasArgs = false, int argIdx = 0);
+
+    /// Get script attribute
+    ResourceRef GetComponentFileAttr() const;
+    ScriptComponentFile* GetComponentFile() { return componentFile_; }
+
+    /// Set script attribute.
+    void SetComponentFile(JSComponentFile* cfile) { componentFile_ = cfile; }
+    void SetComponentFileAttr(const ResourceRef& value);
+
+    // a JSComponentFile only holds one class, so no classname to look up in it
+    const String& GetComponentClassName() const { return String::EMPTY; }
+
 
 protected:
     /// Handle scene node being assigned at creation.
@@ -141,13 +145,9 @@ private:
     /// Flag for delayed start.
     bool delayedStartCalled_;
 
-
-
     bool loading_;
     WeakPtr<JSVM> vm_;
     SharedPtr<JSComponentFile> componentFile_;
-
-    VariantMap fieldValues_;
 
 };
 
