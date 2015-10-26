@@ -9,6 +9,7 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/PrefabComponent.h>
 #include <Atomic/Graphics/Camera.h>
@@ -96,6 +97,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
+
+    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneView3D, HandleNodeRemoved));
 
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
 
@@ -424,6 +427,13 @@ void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap&
 {
     Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
     SelectNode(node);
+}
+
+void SceneView3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
+    if (node == selectedNode_)
+        SelectNode(0);
 }
 
 void SceneView3D::UpdateDragNode(int mouseX, int mouseY)

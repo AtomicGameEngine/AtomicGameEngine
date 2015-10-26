@@ -7,6 +7,7 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Graphics/Camera.h>
 
@@ -93,6 +94,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
 
+    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
+
 }
 
 SceneEditor3D::~SceneEditor3D()
@@ -173,7 +176,21 @@ void SceneEditor3D::SetFocus()
 void SceneEditor3D::SelectNode(Node* node)
 {
     selectedNode_ = node;
+    if (!node)
+        gizmo3D_->Hide();
+    else
+        gizmo3D_->Show();
+
+
 }
+
+void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
+    if (node == selectedNode_)
+        SelectNode(0);
+}
+
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {

@@ -41,6 +41,11 @@ Gizmo3D::Gizmo3D(Context* context) : Object(context)
 
     editMode_ = EDIT_MOVE;
     lastEditMode_ = EDIT_SELECT;
+
+    gizmo_->SetMaterial(0, cache->GetResource<Material>("AtomicEditor/Materials/RedUnlit.xml"));
+    gizmo_->SetMaterial(1, cache->GetResource<Material>("AtomicEditor/Materials/GreenUnlit.xml"));
+    gizmo_->SetMaterial(2, cache->GetResource<Material>("AtomicEditor/Materials/BlueUnlit.xml"));
+
 }
 
 Gizmo3D::~Gizmo3D()
