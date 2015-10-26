@@ -80,11 +80,16 @@ static int Node_GetJSComponent(duk_context* ctx)
 {
     String path = duk_require_string(ctx, 0);
 
+    bool recursive = false;
+    if (duk_get_top(ctx) == 2)
+        if (duk_get_boolean(ctx, 1))
+            recursive = true;
+
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
 
     PODVector<JSComponent*> components;
-    node->GetComponents<JSComponent>(components, true);
+    node->GetComponents<JSComponent>(components, recursive);
 
     for (unsigned i = 0; i < components.Size(); i++)
     {
