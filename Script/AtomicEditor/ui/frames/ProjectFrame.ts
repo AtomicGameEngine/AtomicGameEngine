@@ -315,7 +315,9 @@ class ProjectFrame extends ScriptWidget {
 
             dragAsset.move(destPath + dragAsset.name + dragAsset.extension);
 
-            return false;
+            this.refreshContent(this.currentFolder);
+
+            return true;
         }
 
         // dropped some files?
