@@ -255,8 +255,11 @@ class ProjectFrame extends ScriptWidget {
 
             if (data.target.id == "contentcontainerscroll" || container.isAncestorOf(data.target)) {
 
-                asset = this.currentFolder;
+                if (data.target["asset"])
+                  asset = <ToolCore.Asset> data.target["asset"];
 
+                if (!asset || !asset.isFolder)
+                  asset = this.currentFolder;
             }
 
         }
@@ -279,6 +282,7 @@ class ProjectFrame extends ScriptWidget {
             return;
 
         var dragObject = data.dragObject;
+
         if (dragObject.object && dragObject.object.typeName == "Node") {
 
             var node = <Atomic.Node>dragObject.object;
@@ -293,7 +297,6 @@ class ProjectFrame extends ScriptWidget {
             else {
                 var destFilename = Atomic.addTrailingSlash(asset.path);
                 destFilename += node.name + ".prefab";
-
                 var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
                 node.saveXML(file);
                 file.close();
@@ -303,6 +306,16 @@ class ProjectFrame extends ScriptWidget {
 
             return;
 
+        } else if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+            var dragAsset = <ToolCore.Asset> dragObject.object;
+
+            // get the folder we dragged on
+            var destPath = Atomic.addTrailingSlash(asset.path);
+
+            dragAsset.move(destPath + dragAsset.name + dragAsset.extension);
+
+            return false;
         }
 
         // dropped some files?
@@ -426,12 +439,14 @@ class ProjectFrame extends ScriptWidget {
         image.rect = [0, 0, 12, 12];
         image.gravity = Atomic.UI_GRAVITY_RIGHT;
         blayout.addChild(image);
+        image["asset"] = asset;
 
         button.id = asset.guid;
         button.layoutParams = lp;
         button.fontDescription = fd;
         button.text = asset.name + asset.extension;
         button.skinBg = "TBButton.flat";
+        button["asset"] = asset;
         blayout['assetButton'] = button;
         blayout.addChild(button);
 

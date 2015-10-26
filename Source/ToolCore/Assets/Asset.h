@@ -73,6 +73,9 @@ public:
     /// Rename the asset, which depending on the asset type may be nontrivial
     bool Rename(const String& newName);
 
+    /// Move the asset, which depending on the asset type may be nontrivial
+    bool Move(const String& newPath);
+
     bool IsFolder() const { return isFolder_; }
 
     // load .asset

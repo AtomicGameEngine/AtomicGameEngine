@@ -53,6 +53,50 @@ bool AssetImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     return true;
 }
 
+bool AssetImporter::Move(const String& newPath)
+{
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    if (newPath == asset_->path_)
+        return false;
+
+    String oldPath = asset_->path_;
+    String oldName = asset_->name_;
+
+    String pathName, newName, ext;
+
+    SplitPath(newPath, pathName, newName, ext);
+
+    // rename asset first, ahead of the filesystem watcher, so the assetdatabase doesn't see a new asset
+    asset_->name_ = newName;
+    asset_->path_ = newPath;
+
+    // first rename the .asset file
+    if (!fs->Rename(oldPath + ".asset", newPath + ".asset"))
+    {
+        asset_->name_ = oldName;
+        asset_->path_ = oldPath;
+
+        LOGERRORF("Unable to rename asset: %s to %s", GetNativePath(oldPath + ".asset").CString(), GetNativePath(newPath + ".asset").CString());
+        return false;
+    }
+
+    // now rename the asset file itself
+    if (!fs->Rename(oldPath, newPath))
+    {
+        asset_->name_ = oldName;
+        asset_->path_ = oldPath;
+
+        // restore .asset
+        fs->Rename(newPath + ".asset", oldPath + ".asset");
+
+        LOGERRORF("Unable to rename: %s to %s", GetNativePath(oldPath).CString(), GetNativePath(newPath).CString());
+        return false;
+    }
+
+    return true;
+}
+
 bool AssetImporter::Rename(const String& newName)
 {
     String pathName, fileName, ext;
@@ -66,30 +110,7 @@ bool AssetImporter::Rename(const String& newName)
     if (fs->FileExists(newPath) || fs->DirExists(newPath))
         return false;
 
-    // rename asset first, ahead of the filesystem watcher
-    String oldPath = asset_->path_;
-
-    asset_->name_ = newName;
-    asset_->path_ = newPath;
-
-    // first rename the .asset file
-    if (!fs->Rename(oldPath + ".asset", newPath + ".asset"))
-    {
-        LOGERRORF("Unable to rename asset: %s to %s", GetNativePath(oldPath + ".asset").CString(), GetNativePath(newPath + ".asset").CString());
-        return false;
-    }
-
-    // now rename the asset file itself
-    if (!fs->Rename(oldPath, newPath))
-    {
-        // restore .asset
-        fs->Rename(newPath + ".asset", oldPath + ".asset");
-
-        LOGERRORF("Unable to rename: %s to %s", GetNativePath(oldPath).CString(), GetNativePath(newPath).CString());
-        return false;
-    }
-
-    return true;
+    return Move(newPath);
 
 }
 

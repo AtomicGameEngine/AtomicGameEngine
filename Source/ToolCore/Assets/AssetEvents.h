@@ -33,4 +33,11 @@ EVENT(E_ASSETRENAMED, AssetRenamed)
     PARAM(P_ASSET, Asset);                  // asset ptr
 }
 
+EVENT(E_ASSETMOVED, AssetMoved)
+{
+    PARAM(P_ASSET, Asset);                  // asset ptr
+    PARAM(P_OLDPATH, OldPath);                  // string
+
+}
+
 }

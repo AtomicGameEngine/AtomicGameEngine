@@ -49,6 +49,7 @@ public:
     virtual Node* InstantiateNode(Node* parent, const String& name) { return 0; }
 
     virtual bool Rename(const String& newName);
+    virtual bool Move(const String& newPath);
 
 protected:
 

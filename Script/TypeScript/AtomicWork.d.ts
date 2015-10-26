@@ -253,6 +253,13 @@ declare module ToolCore {
 
     }
 
+    export interface AssetMovedEvent {
+
+        asset: Asset;
+        oldPath: string;
+
+    }
+
 
     export interface PlatformChangedEvent {
 
