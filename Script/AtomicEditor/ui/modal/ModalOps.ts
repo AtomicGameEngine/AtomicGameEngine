@@ -107,6 +107,17 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
+    showRenameAsset(asset: ToolCore.Asset) {
+
+        if (this.show()) {
+
+            this.opWindow = new UIResourceOps.RenameAsset(asset);
+
+        }
+
+    }
+
+
     showResourceSelection(windowText: string, importerType: string, callback: (asset: ToolCore.Asset, args: any) => void, args: any = undefined) {
 
         if (this.show()) {
