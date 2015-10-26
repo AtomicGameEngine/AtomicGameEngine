@@ -39,6 +39,11 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 path = this.contentFolder;
             }
 
+            if (refid == "rename_asset") {
+                EditorUI.getModelOps().showRenameAsset(asset);
+                return true;
+            }
+
             if (refid == "delete_asset") {
                 EditorUI.getModelOps().showResourceDelete(asset);
                 return true;
@@ -127,6 +132,7 @@ export = ProjectFrameMenus;
 var StringID = strings.StringID;
 
 var assetGeneralContextItems = {
+    "Rename": ["rename_asset", undefined, ""],
     "Reveal in Finder": ["reveal_folder", undefined, ""],
     "-1": null,
     "Delete": ["delete_asset", undefined, ""]

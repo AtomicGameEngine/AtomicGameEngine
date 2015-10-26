@@ -367,6 +367,44 @@ bool Asset::SetPath(const String& path)
 
 }
 
+bool Asset::Move(const String& newPath)
+{
+    if (importer_.Null())
+        return false;
+
+    String oldPath = path_;
+
+    bool result = importer_->Move(newPath);
+
+    if (result)
+    {
+        VariantMap eventData;
+        eventData[AssetMoved::P_ASSET] = this;
+        eventData[AssetMoved::P_OLDPATH] = oldPath;
+        SendEvent(E_ASSETMOVED, eventData);
+    }
+
+    return result;
+
+}
+
+bool Asset::Rename(const String& newName)
+{
+    if (importer_.Null())
+        return false;
+
+    bool result = importer_->Rename(newName);
+
+    if (result)
+    {
+        VariantMap eventData;
+        eventData[AssetRenamed::P_ASSET] = this;
+        SendEvent(E_ASSETRENAMED, eventData);
+    }
+
+    return result;
+}
+
 Resource* Asset::GetResource(const String &typeName)
 {
     if (importer_)
