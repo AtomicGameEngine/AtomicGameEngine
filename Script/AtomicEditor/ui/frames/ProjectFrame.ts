@@ -71,7 +71,10 @@ class ProjectFrame extends ScriptWidget {
             if (widget.id == ev.asset.guid) {
 
                 if (widget['assetButton'])
+                {
                     widget['assetButton'].text = ev.asset.name + ev.asset.extension;
+                    widget['assetButton'].dragObject = new Atomic.UIDragObject(ev.asset, ev.asset.name);
+                }
 
                 break;
             }
