@@ -49,6 +49,7 @@ class ProjectFrame extends ScriptWidget {
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
+        this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
 
         // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
@@ -61,12 +62,29 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    handleAssetRenamed(ev: ToolCore.AssetRenamedEvent) {
+
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
+
+        for (var widget = container.firstChild; widget; widget = widget.next) {
+
+            if (widget.id == ev.asset.guid) {
+
+                if (widget['assetButton'])
+                    widget['assetButton'].text = ev.asset.name + ev.asset.extension;
+
+                break;
+            }
+        }
+
+    }
+
     handleResourceRemoved(ev: ToolCore.ResourceRemovedEvent) {
 
         var folderList = this.folderList;
         folderList.deleteItemByID(ev.guid);
 
-        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
 
         for (var widget = container.firstChild; widget; widget = widget.next) {
 
@@ -106,7 +124,7 @@ class ProjectFrame extends ScriptWidget {
 
         } else if (parent == this.currentFolder) {
 
-            var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+            var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
             container.addChild(this.createButtonLayout(asset));
 
         }
@@ -161,7 +179,7 @@ class ProjectFrame extends ScriptWidget {
 
                 if (id == "folderList_") {
 
-                    var list = <Atomic.UISelectList> data.target;
+                    var list = <Atomic.UISelectList>data.target;
 
                     var selectedId = list.selectedItemID;
 
@@ -230,7 +248,7 @@ class ProjectFrame extends ScriptWidget {
 
         if (data.target) {
 
-            var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+            var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
 
             if (data.target.id == "contentcontainerscroll" || container.isAncestorOf(data.target)) {
 
@@ -260,13 +278,13 @@ class ProjectFrame extends ScriptWidget {
         var dragObject = data.dragObject;
         if (dragObject.object && dragObject.object.typeName == "Node") {
 
-            var node = <Atomic.Node> dragObject.object;
+            var node = <Atomic.Node>dragObject.object;
 
-            var prefabComponent = <Atomic.PrefabComponent> node.getComponent("PrefabComponent");
+            var prefabComponent = <Atomic.PrefabComponent>node.getComponent("PrefabComponent");
 
             if (prefabComponent) {
 
-              prefabComponent.savePrefab();
+                prefabComponent.savePrefab();
 
             }
             else {
@@ -324,7 +342,7 @@ class ProjectFrame extends ScriptWidget {
         this.folderList.deleteAllItems();
         this.resourceFolder = null;
 
-        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
         container.deleteAllChildren();
 
     }
@@ -341,7 +359,7 @@ class ProjectFrame extends ScriptWidget {
 
         var db = ToolCore.getAssetDatabase();
 
-        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
         container.deleteAllChildren();
 
         var assets = db.getFolderAssets(folder.path);
@@ -411,6 +429,7 @@ class ProjectFrame extends ScriptWidget {
         button.fontDescription = fd;
         button.text = asset.name + asset.extension;
         button.skinBg = "TBButton.flat";
+        blayout['assetButton'] = button;
         blayout.addChild(button);
 
         return blayout;

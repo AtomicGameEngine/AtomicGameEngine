@@ -48,6 +48,8 @@ public:
     /// Instantiate a node from the asset
     virtual Node* InstantiateNode(Node* parent, const String& name) { return 0; }
 
+    virtual bool Rename(const String& newName);
+
 protected:
 
     virtual bool Import() { return true; }

@@ -213,8 +213,8 @@ declare module AtomicNET {
 
     export interface CSComponentClassChangedEvent {
 
-      cscomponent: CSComponent;
-      classname: string;
+        cscomponent: CSComponent;
+        classname: string;
 
     }
 
@@ -242,30 +242,36 @@ declare module ToolCore {
 
     export interface AssetImportErrorEvent {
 
-        path:string;
-        guid:string;
+        path: string;
+        guid: string;
         error: string;
+    }
+
+    export interface AssetRenamedEvent {
+
+        asset: Asset;
 
     }
 
+
     export interface PlatformChangedEvent {
 
-        platform:ToolCore.Platform;
+        platform: ToolCore.Platform;
 
     }
 
     export interface BuildOutputEvent {
 
-        text:string;
+        text: string;
 
     }
 
     export interface BuildCompleteEvent {
 
-      platformID:number;
-      message:string;
-      success:boolean;
-      buildFolder:string;
+        platformID: number;
+        message: string;
+        success: boolean;
+        buildFolder: string;
 
     }
 

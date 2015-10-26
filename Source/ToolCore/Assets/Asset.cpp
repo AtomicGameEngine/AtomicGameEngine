@@ -367,6 +367,23 @@ bool Asset::SetPath(const String& path)
 
 }
 
+bool Asset::Rename(const String& newName)
+{
+    if (importer_.Null())
+        return false;
+
+    bool result = importer_->Rename(newName);
+
+    if (result)
+    {
+        VariantMap eventData;
+        eventData[AssetRenamed::P_ASSET] = this;
+        SendEvent(E_ASSETRENAMED, eventData);
+    }
+
+    return result;
+}
+
 Resource* Asset::GetResource(const String &typeName)
 {
     if (importer_)

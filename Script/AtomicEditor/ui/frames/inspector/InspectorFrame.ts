@@ -15,6 +15,7 @@ import MaterialInspector = require("./MaterialInspector");
 import ModelInspector = require("./ModelInspector");
 import NodeInspector = require("./NodeInspector");
 import AssemblyInspector = require("./AssemblyInspector");
+import PrefabInspector = require("./PrefabInspector");
 
 class InspectorFrame extends ScriptWidget {
 
@@ -124,6 +125,13 @@ class InspectorFrame extends ScriptWidget {
 
         }
 
+        if (asset.importerTypeName == "PrefabImporter") {
+
+            var prefabInspector = new PrefabInspector();
+            container.addChild(prefabInspector);
+            
+            prefabInspector.inspect(asset);
+        }
 
     }
 
