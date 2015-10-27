@@ -41,7 +41,7 @@
 			"getComponents(componentType?:string, recursive?:boolean):Component[];",
 			"getChildAtIndex(index:number):Node;",
 			"createJSComponent(name:string, args?:{});",
-			"getJSComponent(name:string):JSComponent;",
+			"getJSComponent(name:string, recursive?:boolean):JSComponent;",
 			"createChildPrefab(childName:string, prefabPath:string):Node;",
 			"loadPrefab(prefabPath:string):boolean;"
 		],
@@ -58,7 +58,7 @@
 			"function getComponents(?componentType:String, ?recursive:Bool):Array<Component>;",
 			"function getChildAtIndex(index:UInt):Node;",
 			"function createJSComponent(name:String, ?args:Dynamic):JSComponent;",
-			"function getJSComponent(name:String):JSComponent;",
+			"function getJSComponent(name:String, ?recursive:Bool):JSComponent;",
 			"function createChildPrefab(childName:String, prefabPath:String):Node;",
 			"function loadPrefab(prefabPath:String):Bool;"
 		],
