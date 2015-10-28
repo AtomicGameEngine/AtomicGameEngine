@@ -6,7 +6,7 @@ var buildDir = bcommon.artifactsRoot + "Build/IOS/";
 
 namespace('build', function() {
 
-  task('ios_player', ["build:atomictool"], {
+  task('ios_player', {
     async: true
   }, function() {
 

@@ -23,20 +23,6 @@ else()
     target_link_libraries(AtomicTool curl)
 endif()
 
-
-if (NOT ATOMICTOOL_NOGEN)
-
-add_custom_command(TARGET AtomicTool POST_BUILD
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Atomic/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicPlayer/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Editor/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicNET/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMENT "Generating Script Bindings")
-
-endif(ATOMICTOOL_NOGEN)                   
-
-
 if (ATOMIC_DOTNET_DEV)
 
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)

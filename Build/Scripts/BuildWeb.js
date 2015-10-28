@@ -6,7 +6,7 @@ var buildDir = bcommon.artifactsRoot + "Build/Web/";
 
 namespace('build', function() {
 
-  task('web_player', ["build:atomictool"], {
+  task('web_player', {
     async: true
   }, function() {
 

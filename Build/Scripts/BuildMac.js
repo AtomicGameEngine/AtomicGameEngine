@@ -6,7 +6,7 @@ var buildDir = bcommon.artifactsRoot + "Build/Mac/";
 
 namespace('build', function() {
 
-  task('mac_player', ["build:atomictool"], {
+  task('mac_player', {
     async: true
   }, function() {
 

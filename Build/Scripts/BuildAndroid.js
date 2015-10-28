@@ -7,7 +7,7 @@ var playerBuildDir = buildDir + "AtomicPlayer/";
 
 namespace('build', function() {
 
-  task('android_player', ["build:atomictool"], {
+  task('android_player', {
     async: true
   }, function() {
 
