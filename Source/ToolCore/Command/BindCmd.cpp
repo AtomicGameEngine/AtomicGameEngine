@@ -68,10 +68,6 @@ bool BindCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String
 
 void BindCmd::Run()
 {
-    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
-
-    sourceRootFolder_ = env->GetRootSourceDir();
-
     SharedPtr<JSBind> jsbind(new JSBind(context_));
 
     context_->RegisterSubsystem(jsbind);

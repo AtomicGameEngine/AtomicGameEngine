@@ -77,7 +77,7 @@ void AtomicTool::Setup()
     engineParameters_["Headless"] = true;
     engineParameters_["LogLevel"] = LOG_INFO;
 
-    // no default resources (will be initialized later)
+    // no default resources, AtomicTool may be run outside of source tree
     engineParameters_["ResourcePaths"] = "";
 }
 
@@ -219,10 +219,6 @@ void AtomicTool::Start()
     }
 
 //#endif
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    cache->AddResourceDir(env->GetCoreDataDir());
-    cache->AddResourceDir(env->GetPlayerDataDir());
 
     tsystem->SetCLI();
     tsystem->SetDataPath(cliDataPath_);

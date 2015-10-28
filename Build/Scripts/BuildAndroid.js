@@ -27,10 +27,10 @@ namespace('build', function() {
 
     jake.exec(cmds, function() {
 
-      console.log("Built Android Player");
-
       var androidPlayerBinary = playerBuildDir + "Source/AtomicPlayer/Application/libAtomicPlayer.so";
       fs.copySync(androidPlayerBinary, buildDir + "Bin/libAtomicPlayer.so");
+
+      console.log("Built Android Player");
 
       complete();
 
