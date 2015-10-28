@@ -24,7 +24,7 @@ namespace('build', function() {
       "cmake -DIOS=1 -G Xcode ../../../../"
     ];
 
-    if (false) {
+    if (bcommon.jenkinsBuild) {
 
       cmds.push("security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain");
       cmds.push("security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain");
