@@ -8,8 +8,11 @@ var os = require('os');
 
 var host = os.platform();
 var jakeRoot = __dirname;
-var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1
+var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1;
 var generateJSDoc = true;
+var buildSHA = process.env.ATOMIC_BUILD_SHA;
+
+console.log("ATOMIC BUILD SHA is", buildSHA);
 
 var artifactsFolder = jakeRoot + "/Artifacts";
 
@@ -146,25 +149,25 @@ namespace('build', function() {
         printStdout: true
       });
 
-  } else {
+    } else {
 
-    if (!fs.existsSync(windowsBuildFolder)) {
-      jake.mkdirP(windowsBuildFolder);
+      if (!fs.existsSync(windowsBuildFolder)) {
+        jake.mkdirP(windowsBuildFolder);
+      }
+
+      process.chdir(windowsBuildFolder);
+
+      jake.exec(jakeRoot + "/Build/Windows/CompileAtomicTool.bat", function() {
+
+        fs.copySync(atomicToolBinary, platformBinariesFolder + "/Win32/" + path.basename(atomicToolBinary));
+        console.log("Built Windows AtomicTool");
+        complete();
+
+      }, {
+        printStdout: true
+      });
+
     }
-
-    process.chdir(windowsBuildFolder);
-
-    jake.exec(jakeRoot + "/Build/Windows/CompileAtomicTool.bat", function() {
-
-      fs.copySync(atomicToolBinary, platformBinariesFolder + "/Win32/" + path.basename(atomicToolBinary));
-      console.log("Built Windows AtomicTool");
-      complete();
-
-    }, {
-      printStdout: true
-    });
-
-  }
 
   }); // end build:atomictool
 
@@ -498,7 +501,7 @@ namespace('package', function() {
 
   });
 
-  task('windows', ['clean:all','build:windows'], function() {
+  task('windows', ['clean:all', 'build:windows'], function() {
 
     if (!fs.existsSync(distFolder)) {
       jake.mkdirP(distFolder);
@@ -530,11 +533,64 @@ namespace('package', function() {
 
     if (jenkinsBuild) {
 
-      cmds = [jakeRoot + "/Build/Windows/7z/7z.exe a -tzip " + distFolder + "/AtomicEditor_Windows.zip " + windowsPackageFolder]
+      var pfxFile = process.env.ATOMIC_PFX_FILE;
+      var pfxPW = process.env.ATOMIC_PFX_PW;
+
+      var signCmd = "signtool.exe sign /f " + pfxFile;
+      signCmd += " /p " + pfxPW;
+      signCmd += " /t http://timestamp.verisign.com/scripts/timestamp.dll";
+      signCmd += " /v " + windowsPackageFolder + "/AtomicEditor.exe";
+
+      var zipCmd = jakeRoot + "/Build/Windows/7z/7z.exe a -tzip " + distFolder + "/AtomicEditor_Windows.zip " + windowsPackageFolder;
+
+      cmds = [signCmd, zipCmd];
 
       jake.exec(cmds, function() {});
 
     }
+
+  });
+
+  task('create_windows_installer', [], function() {
+
+    console.log("Unpacking Windows Editor");
+
+    var installerSourceFolder = distFolder + "/AtomicEditorInstallerSourceFiles";
+
+    if (!fs.existsSync(installerSourceFolder)) {
+      jake.mkdirP(installerSourceFolder);
+    }
+
+    process.chdir(installerSourceFolder);
+
+    var zipCmd = jakeRoot + "/Build/Windows/7z/7z.exe x " + jakeRoot + "/Artifacts/Windows_Package.zip"
+
+    var cmds = [zipCmd];
+
+    jake.exec(cmds, function() {
+
+      var nsisDefines = "/DATOMIC_ROOT=" + jakeRoot;
+      nsisDefines += " /DEDITOR_VERSION=1";
+
+      var makeNSISCmd = jakeRoot + "\\Build\\Windows\\CreateInstaller.bat";
+
+      makeNSISCmd += " " + nsisDefines + " " + jakeRoot + "/Build/Windows/Installer/AtomicEditor.nsi";
+
+      var pfxFile = process.env.ATOMIC_PFX_FILE;
+      var pfxPW = process.env.ATOMIC_PFX_PW;
+
+      var signCmd = "signtool.exe sign /f " + pfxFile;
+      signCmd += " /p " + pfxPW;
+      signCmd += " /t http://timestamp.verisign.com/scripts/timestamp.dll";
+      signCmd += " /v " + jakeRoot + "/Artifacts/Windows_Installer/AtomicEditorSetup.exe";
+
+      var cmds = [makeNSISCmd, signCmd];
+
+      console.log("Creating Windows Installer");
+
+      jake.exec(cmds, function() {});
+
+    });
 
   });
 

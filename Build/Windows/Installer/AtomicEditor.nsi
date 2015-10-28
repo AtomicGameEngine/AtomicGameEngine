@@ -2,9 +2,17 @@
 ;Atomic Editor NSIS Installation Script
 ;--------------------------------
 
+!ifndef ATOMIC_ROOT
+!error "ATOMIC_ROOT NOT DEFINED"
+!endif
+
+!ifndef EDITOR_VERSION
+!error "EDITOR_VERSION NOT DEFINED"
+!endif
+
 !define prodname "Atomic Editor"
 !define coname "THUNDERBEAST GAMES LLC"
-!define outfile "C:\Dev\atomic\AtomicGameEngine\Artifacts\Windows_Installer\AtomicEditorSetup.exe"
+!define outfile "${ATOMIC_ROOT}\Artifacts\Windows_Installer\AtomicEditorSetup.exe"
 !define appexe "AtomicEditor.exe"
 !define produrl "http://www.atomicgameengine.com/"
 
@@ -60,7 +68,7 @@ Section "${prodname}" SecMain
 
 	SetOutPath "$INSTDIR"
 
-  File /r "C:\Dev\atomic\AtomicGameEngine\Artifacts\Windows_Package\*.*"
+  File /r "${ATOMIC_ROOT}\Artifacts\Dist\AtomicEditorInstallerSourceFiles\Windows_Package\*.*"
 
 	;Store installation folder
 	WriteRegStr HKLM "Software\${coname}\InstallDir" "${prodname}" $INSTDIR
