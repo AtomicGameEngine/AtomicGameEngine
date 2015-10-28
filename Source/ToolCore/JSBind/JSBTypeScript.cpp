@@ -93,7 +93,12 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
     if (function->GetDocString().Length())
         source_ += "      //" + function->GetDocString() + "\n";
 
-    source_ += "      " + scriptName + "(";
+    source_ += "      ";
+
+    if (function->IsStatic())
+        source_ += "static ";
+
+    source_ += scriptName + "(";
 
     Vector<JSBFunctionType*>& parameters = function->GetParameters();
 

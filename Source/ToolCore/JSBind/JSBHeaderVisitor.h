@@ -272,6 +272,9 @@ public:
         if (function->isOverride())
             jfunction->SetVirtual(true);
 
+        if (function->isStatic())
+            jfunction->SetStatic(true);
+
         // see if we support return type
         if (function->hasReturnType() && !function->returnType().type()->isVoidType())
         {
