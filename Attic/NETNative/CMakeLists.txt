@@ -27,7 +27,3 @@ if (APPLE)
 target_link_libraries(AtomicNETNative "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework ForceFeedback -framework IOKit -framework OpenGL -framework CoreServices -framework Security")
 
 endif()
-
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
-    add_dependencies(AtomicNETNative AtomicTool)
-endif()
