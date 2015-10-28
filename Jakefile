@@ -19,7 +19,7 @@ var artifactsFolder = jakeRoot + "/Artifacts";
 // cmake
 var cmakeDevBuild = false;
 
-var includeDeployments = jenkinsBuild;
+var includeDeployments = false;//jenkinsBuild;
 
 var deployments = {
   osx: true,
@@ -643,8 +643,8 @@ namespace('package', function() {
       }
 
       zipcmds = [
-        "rev=`git rev-parse HEAD` && zip -r -X ./snapshots/AtomicEditor_MacOSX_DevSnapshot_$rev.zip ./AtomicEditor.app",
-        "rev=`git rev-parse HEAD` && zip -r -X ./snapshots/AtomicEditor_Win32_DevSnapshot_$rev.zip ./Windows_Package",
+        "zip -r -X ./snapshots/AtomicEditor_MacOSX_DevSnapshot_" + buildSHA + ".zip ./AtomicEditor.app",
+        "zip -r -X ./snapshots/AtomicEditor_Win32_DevSnapshot_" + buildSHA + ".zip ./Windows_Package",
         "cp ./snapshots/*.zip /Users/jenge/Share/Temp/AtomicEditor_DevSnapshots/"
       ]
 
