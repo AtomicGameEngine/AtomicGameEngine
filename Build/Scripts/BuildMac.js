@@ -4,80 +4,71 @@ var host = require("./Host");
 
 var buildDir = bcommon.artifactsRoot + "Build/Mac/";
 
-function BuildMacPlayer() {
-
-  var atomicTool = host.getAtomicToolBinary();
-
-  var playerBuildDir = buildDir + "AtomicPlayer/";
-
-  bcommon.cleanCreateDir(playerBuildDir);
-
-  process.chdir(playerBuildDir);
-
-  var cmds = [
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ MACOSX",
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ MACOSX",
-    "cmake -DATOMICTOOL_NOGEN=1 -G Xcode ../../../../",
-    "xcodebuild -target AtomicPlayer -configuration Release"
-  ];
-
-  jake.exec(cmds, function() {
-    var macPlayerBinary = playerBuildDir + "Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
-    fs.copySync(macPlayerBinary, buildDir + "Bin/AtomicPlayer");
-    console.log("Built Mac Player");
-    complete();
-
-  }, {
-    printStdout: true
-  });
-
-}
-
-function BuildMacEditor() {
-
-  var atomicTool = host.getAtomicToolBinary();
-
-  var editorBuildDir = buildDir + "AtomicEditor/";
-
-  bcommon.cleanCreateDir(editorBuildDir);
-
-  process.chdir(editorBuildDir);
-
-  var cmds = [
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ MACOSX",
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ MACOSX",
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/ToolCore/ MACOSX",
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Editor/ MACOSX",
-    atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNET/ MACOSX",
-    "cmake -DATOMICTOOL_NOGEN=1 -G Xcode ../../../../",
-    "xcodebuild -target AtomicEditor -configuration Release"
-  ];
-
-  jake.exec(cmds, function() {
-    var macEditorBinary = editorBuildDir + "Source/AtomicEditor/Release/AtomicEditor.app/Contents/MacOS/AtomicEditor";
-    fs.copySync(macEditorBinary, buildDir + "Bin/AtomicEditor");
-    console.log("Built Mac Editor");
-    complete();
-
-  }, {
-    printStdout: true
-  });
-
-}
-
 namespace('build', function() {
 
-  task('mac_player', {
+  task('mac_player', ["build:atomictool"], {
     async: true
   }, function() {
-    BuildMacPlayer();
+
+    var atomicTool = host.getAtomicToolBinary();
+
+    var playerBuildDir = buildDir + "AtomicPlayer/";
+
+    bcommon.cleanCreateDir(playerBuildDir);
+
+    process.chdir(playerBuildDir);
+
+    var cmds = [
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ MACOSX",
+      "cmake -DATOMICTOOL_NOGEN=1 -G Xcode ../../../../",
+      "xcodebuild -target AtomicPlayer -configuration Release"
+    ];
+
+    jake.exec(cmds, function() {
+      var macPlayerBinary = playerBuildDir + "Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
+      fs.copySync(macPlayerBinary, buildDir + "Bin/AtomicPlayer");
+      console.log("Built Mac Player");
+      complete();
+
+    }, {
+      printStdout: true
+    });
+
   });
 
-  task('mac_editor', {
+  task('mac_editor', ["build:atomictool"], {
     async: true
   }, function() {
-    BuildMacEditor();
-  });
 
+    var atomicTool = host.getAtomicToolBinary();
+
+    var editorBuildDir = buildDir + "AtomicEditor/";
+
+    bcommon.cleanCreateDir(editorBuildDir);
+
+    process.chdir(editorBuildDir);
+
+    var cmds = [
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/ToolCore/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Editor/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNET/ MACOSX",
+      "cmake -DATOMICTOOL_NOGEN=1 -G Xcode ../../../../",
+      "xcodebuild -target AtomicEditor -configuration Release"
+    ];
+
+    jake.exec(cmds, function() {
+      var macEditorBinary = editorBuildDir + "Source/AtomicEditor/Release/AtomicEditor.app/Contents/MacOS/AtomicEditor";
+      fs.copySync(macEditorBinary, buildDir + "Bin/AtomicEditor");
+      console.log("Built Mac Editor");
+      complete();
+
+    }, {
+      printStdout: true
+    });
+
+  });
 
 }); // end of build namespace
