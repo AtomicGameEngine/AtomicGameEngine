@@ -37,7 +37,7 @@ namespace('build', function() {
 
   });
 
-  task('mac_editor', ["build:atomictool"], {
+  task('mac_editor', {
     async: true
   }, function() {
 

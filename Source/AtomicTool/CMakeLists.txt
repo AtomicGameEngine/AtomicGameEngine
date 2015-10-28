@@ -8,8 +8,6 @@ add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
 target_link_libraries(AtomicTool ToolCore NETCore NETScript Poco ${ATOMIC_LINK_LIBRARIES})
 
-# add_dependencies(AtomicTool AtomicEditor)
-
 if (MSVC)
     target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
 
