@@ -17,6 +17,8 @@ namespace('build', function() {
       var editorAppFolder = dstDir + "AtomicEditor.app";
 
       cmds = [
+      "chmod +x " + editorAppFolder + "/Contents/MacOS/AtomicEditor",
+      "chmod +x " + editorAppFolder + "/Contents/Resources/ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer",
       "security unlock-keychain -p \"jenkins\" /Users/jenkins/Library/Keychains/login.keychain",
       "codesign -s \"THUNDERBEAST GAMES LLC\" -f -v " + editorAppFolder,
       "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
@@ -41,36 +43,43 @@ namespace('build', function() {
 
     bcommon.cleanCreateDir(dstDir);
 
-    console.log("Generating Mac App Bundle");
+    cmds = ["unzip " + srcDir + "EditorData.zip -d " + srcDir];
 
-    var editorAppFolder = dstDir + "AtomicEditor.app/Contents/";
+    jake.exec(cmds, function() {
 
-    fs.copySync(srcDir + "MacApps/EditorApp",
-      editorAppFolder);
+      console.log("Generating Mac App Bundle");
 
-    fs.copySync(srcDir + "EditorBinaries/Mac/AtomicEditor",
-      editorAppFolder + "MacOS/AtomicEditor");
+      var editorAppFolder = dstDir + "AtomicEditor.app/Contents/";
 
-    fs.copySync(srcDir + "Resources/CoreData",
-      editorAppFolder + "Resources/CoreData");
+      fs.copySync(srcDir + "MacApps/EditorApp",
+        editorAppFolder);
 
-    fs.copySync(srcDir + "Resources/EditorData",
-      editorAppFolder + "Resources/EditorData");
+      fs.copySync(srcDir + "EditorBinaries/Mac/AtomicEditor",
+        editorAppFolder + "MacOS/AtomicEditor");
 
-    fs.copySync(srcDir + "Resources/PlayerData",
-      editorAppFolder + "Resources/PlayerData");
+      fs.copySync(srcDir + "Resources/CoreData",
+        editorAppFolder + "Resources/CoreData");
 
-    fs.copySync(srcDir + "Resources/ToolData",
-      editorAppFolder + "Resources/ToolData");
+      fs.copySync(srcDir + "Resources/EditorData",
+        editorAppFolder + "Resources/EditorData");
 
-    fs.copySync(srcDir + "AtomicExamples",
-      editorAppFolder + "Resources/ToolData/AtomicExamples");
+      fs.copySync(srcDir + "Resources/PlayerData",
+        editorAppFolder + "Resources/PlayerData");
 
-    fs.copySync(srcDir + "Docs",
-      editorAppFolder + "Resources/ToolData/Docs/JSDocs");
+      fs.copySync(srcDir + "Resources/ToolData",
+        editorAppFolder + "Resources/ToolData");
 
-    complete();
+      fs.copySync(srcDir + "AtomicExamples",
+        editorAppFolder + "Resources/ToolData/AtomicExamples");
 
+      fs.copySync(srcDir + "Docs",
+        editorAppFolder + "Resources/ToolData/Docs/JSDocs");
+
+      complete();
+
+    }, {
+      printStdout: true
+    });
 
   });
 
