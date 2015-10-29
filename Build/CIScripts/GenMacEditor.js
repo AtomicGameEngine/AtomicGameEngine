@@ -12,6 +12,8 @@ namespace('build', function() {
     async: true
   }, function() {
 
+      bcommon.cleanCreateDir(dstDir + "MacEditorInstaller");
+
       var editorAppFolder = dstDir + "AtomicEditor.app";
 
       cmds = [
