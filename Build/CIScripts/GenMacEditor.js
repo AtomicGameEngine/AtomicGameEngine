@@ -16,7 +16,7 @@ namespace('build', function() {
 
       cmds = [
       "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain",
-      "security -v unlock-keychain -p "" /Users/jenkins/Library/Keychains/codesign.keychain",
+      "security -v unlock-keychain -p \"\" /Users/jenkins/Library/Keychains/codesign.keychain",
       "codesign -s \"THUNDERBEAST GAMES LLC\" \"" + editorAppFolder +  "\"",
       "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
 
