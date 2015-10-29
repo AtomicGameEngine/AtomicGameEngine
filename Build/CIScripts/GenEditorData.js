@@ -86,9 +86,44 @@ namespace('build', function() {
 
   });
 
-  task('geneditordata', ["build:gendocs", "build:ios_deploy"], {
+  task('compileeditorscripts', ["build:genscriptbindings"],{
     async: true
   }, function() {
+
+    console.log("compiling Editor Scripts");
+
+    var scriptFolder = atomicRoot + "Resources/EditorData/AtomicEditor/EditorScripts/";
+
+    process.chdir(atomicRoot);
+
+    cmds = [
+      atomicRoot + "Build/Mac/node/node " + atomicRoot + "/Build/TypeScript/tsc.js -p ./Script"
+    ];
+
+    jake.exec(cmds, function() {
+
+      // will be copied when editor resources are copied
+
+      complete();
+
+    }, {
+      printStdout: true
+    });
+
+
+  });
+
+  task('geneditordata', ["build:compileeditorscripts", "build:ios_deploy", "build:gendocs"], {
+    async: true
+  }, function() {
+
+    // Mac App
+
+    fs.copySync(atomicRoot + "Build/CIScripts/Mac/EditorApp",
+      buildDir + "MacApps/EditorApp");
+
+    fs.copySync(atomicRoot + "Build/CIScripts/Mac/PlayerApp/",
+      buildDir + "MacApps/PlayerApp/");
 
     // Editor Binaries
 
