@@ -92,6 +92,7 @@ Section "${prodname}" SecMain
 	WriteRegStr HKLM "Software\${coname}\InstallDir" "${prodname}" $INSTDIR
 
 	; Create shortcut
+	CreateShortCut "$DESKTOP\${prodname}.lnk" "$INSTDIR\AtomicEditor\${appexe}"
 	CreateShortCut "$SMPROGRAMS\${prodname}.lnk" "$INSTDIR\AtomicEditor\${appexe}"
 
 	; Update Add/Remove Programs
