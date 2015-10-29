@@ -17,8 +17,8 @@ namespace('build', function() {
       var editorAppFolder = dstDir + "AtomicEditor.app";
 
       cmds = [
-      "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/THUNDERBEAST.keychain",
-      "security -v unlock-keychain -p \"1234XYZ\" /Users/jenkins/Library/Keychains/THUNDERBEAST.keychain",
+      "security list-keychains -d system -s /Users/jenkins/Library/Keychains/THUNDERBEAST.keychain",
+      "security unlock-keychain /Users/jenkins/Library/Keychains/THUNDERBEAST.keychain -p 1234XYZ",
       "codesign -s \"THUNDERBEAST GAMES LLC\" -f -v " + editorAppFolder,
       "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
     ];
