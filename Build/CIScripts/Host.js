@@ -8,6 +8,7 @@ if (os.platform() == "darwin") {
   require("./BuildWeb");
   require("./BuildAndroid");
   require("./GenEditorData");
+  require("./GenMacEditor");
 
 } else if (os.platform() == "win32") {
   module.exports = require("./HostWindows");

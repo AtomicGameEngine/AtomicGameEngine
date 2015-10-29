@@ -90,7 +90,7 @@ namespace('build', function() {
     async: true
   }, function() {
 
-    console.log("compiling Editor Scripts");
+    console.log("Compiling Editor Scripts");
 
     var scriptFolder = atomicRoot + "Resources/EditorData/AtomicEditor/EditorScripts/";
 
