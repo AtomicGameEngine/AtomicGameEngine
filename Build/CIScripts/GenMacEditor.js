@@ -8,6 +8,33 @@ var dstDir = bcommon.artifactsRoot + "Build/MacEditor/";
 
 namespace('build', function() {
 
+  task('genmaceditorinstaller', ["genmaceditor"], {
+    async: true
+  }, function() {
+
+      var editorAppFolder = dstDir + "AtomicEditor.app";
+
+      cmds = [
+      "security -v list-keychains -d system -s /Users/jenkins/Library/Keychains/codesign.keychain",
+      "security -v unlock-keychain /Users/jenkins/Library/Keychains/codesign.keychain",
+      "codesign -s \"THUNDERBEAST GAMES LLC\" \"" + editorAppFolder +  "\"",
+      "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
+
+    ];
+
+    jake.exec(cmds, function() {
+
+      console.log("Built Mac Editor");
+
+      complete();
+
+    }, {
+      printStdout: true
+    });
+
+
+  });
+
   task('genmaceditor', {
     async: true
   }, function() {
