@@ -56,6 +56,12 @@ namespace('build', function() {
 
     bcommon.cleanCreateDir(dstDir);
 
+    process.chdir(srcDir);
+
+    cmds = [ atomicRoot + "Build/Windows/7z/7z.exe x -y EditorData.zip"];
+
+    jake.exec(cmds, function() {
+
     console.log("Generating Windows Editor");
 
     var editorAppFolder = dstDir + "AtomicEditor/";
@@ -84,8 +90,11 @@ namespace('build', function() {
     fs.copySync(srcDir + "Docs",
       editorAppFolder + "Resources/ToolData/Docs/JSDocs");
 
-    complete();
+      complete();
 
+    }, {
+      printStdout: true
+    });
 
   });
 

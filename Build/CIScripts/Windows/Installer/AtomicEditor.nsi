@@ -26,6 +26,13 @@
 
 !include "MUI.nsh"
 
+!define MUI_HEADERIMAGE
+!define MUI_HEADERIMAGE_RIGHT
+!define MUI_HEADERIMAGE_BITMAP "Windows_Installer_Header.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "Windows_Installer_LeftImage.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "Windows_Installer_Header.bmp"
+!define MUI_HEADER_TRANSPARENT_TEXT
+
 ;--------------------------------
 ;General
 ;--------------------------------
@@ -50,8 +57,15 @@ InstallDirRegKey HKLM "Software\${coname}\InstallDir" "${prodname}"
 ;Pages
 ;--------------------------------
 
+!insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+	; These indented statements modify settings for MUI_PAGE_FINISH
+	!define MUI_FINISHPAGE_NOAUTOCLOSE
+	!define MUI_FINISHPAGE_RUN "$INSTDIR\AtomicEditor\${appexe}"
+	!define MUI_FINISHPAGE_RUN_CHECKED
+	!define MUI_FINISHPAGE_RUN_TEXT "Launch the Atomic Editor"
+!insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
