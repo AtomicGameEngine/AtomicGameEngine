@@ -12,8 +12,8 @@ namespace('build', function() {
     async: true
   }, function() {
 
-    //bcommon.cleanCreateDir(buildDir);
-    //bcommon.cleanCreateDir(atomicRoot + "Build/Source/Generated");
+    bcommon.cleanCreateDir(buildDir);
+    bcommon.cleanCreateDir(atomicRoot + "Build/Source/Generated");
 
     process.chdir(buildDir);
 
