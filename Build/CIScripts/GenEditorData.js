@@ -177,7 +177,6 @@ namespace('build', function() {
 
     complete();
 
-    /*
     process.chdir(buildDir);
 
     var cmds = ["zip -r -X ./EditorData.zip ./"];
@@ -188,8 +187,6 @@ namespace('build', function() {
       }, {
         printStdout: true
       });
-
-    */
 
   });
 
