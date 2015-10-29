@@ -179,7 +179,7 @@ namespace('build', function() {
 
     process.chdir(buildDir);
 
-    var cmds = ["zip -r -X ./EditorData.zip ./"];
+    var cmds = ["zip -r ./EditorData.zip ./"];
 
     jake.exec(cmds,
       function() {
