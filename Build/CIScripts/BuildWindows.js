@@ -20,13 +20,13 @@ namespace('build', function() {
     var bindCmd = atomicToolBinary + " bind \"" + atomicRoot + "\" ";
 
     var cmds = [
-      atomicRoot + "/Build/Scripts/Windows/CompileAtomicTool.bat",
+      atomicRoot + "/Build/CIScripts/Windows/CompileAtomicTool.bat",
       bindCmd + "Script/Packages/Atomic/ WINDOWS",
       bindCmd + "Script/Packages/AtomicPlayer/ WINDOWS",
       bindCmd + "Script/Packages/ToolCore/ WINDOWS",
       bindCmd + "Script/Packages/Editor/ WINDOWS",
       bindCmd + "Script/Packages/AtomicNET/ WINDOWS",
-      atomicRoot + "/Build/Scripts/Windows/CompileAtomic.bat",
+      atomicRoot + "/Build/CIScripts/Windows/CompileAtomic.bat",
     ]
 
     jake.exec(cmds, function() {

@@ -13,4 +13,5 @@ if (os.platform() == "darwin") {
 } else if (os.platform() == "win32") {
   module.exports = require("./HostWindows");
   require("./BuildWindows");
+  require("./GenWindowsEditor");
 }
