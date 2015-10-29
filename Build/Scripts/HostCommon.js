@@ -9,10 +9,6 @@ process.env.NODE_PATH = atomicRoot + "Build/node_modules/";
 require('module').Module._initPaths();
 var fs = require('fs-extra');
 
-var artifactsRoot = atomicRoot + "/Artifacts/";
-var jenkinsBuild = process.env.ATOMIC_JENKINS_BUILD == 1;
-var buildSHA = process.env.ATOMIC_BUILD_SHA;
-
 function cleanCreateDir(directory) {
 
   testRemoveDir(directory);
@@ -45,15 +41,8 @@ function testRemoveDir(path) {
   }
 }
 
-function cloneRepo(repoUrl, destPath) {
-
-}
-
-exports.jenkinsBuild = jenkinsBuild;
-exports.buildSHA = buildSHA;
 exports.atomicRoot = atomicRoot;
-exports.artifactsRoot = artifactsRoot;
-exports.testRemoveDir = testRemoveDir;
-exports.testCreateDir = testCreateDir;
-exports.cloneRepo = cloneRepo;
+exports.artifactsRoot = atomicRoot + "Artifacts/";
 exports.cleanCreateDir = cleanCreateDir;
+exports.testCreateDir = testCreateDir;
+exports.testRemoveDir = testRemoveDir;
