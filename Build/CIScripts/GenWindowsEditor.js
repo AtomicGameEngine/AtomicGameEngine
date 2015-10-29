@@ -8,6 +8,31 @@ var dstDir = bcommon.artifactsRoot + "Build/WindowsEditor/";
 
 namespace('build', function() {
 
+  task('genwindowsinstaller', ["build:genwindowseditor"], {
+    async: true
+  }, function() {
+
+    console.log("Creating Windows Installer");
+
+    bcommon.cleanCreateDir(bcommon.artifactsRoot + "Build/WindowsInstaller");
+
+    var nsisDefines = "/DATOMIC_ROOT=" + atomicRoot;
+    nsisDefines += " /DEDITOR_VERSION=1";
+
+    var makeNSISCmd = atomicRoot + "\\Build\\CIScripts\\Windows\\CreateInstaller.bat";
+
+    makeNSISCmd += " " + nsisDefines + " " + atomicRoot + "/Build/CIScripts/Windows/Installer/AtomicEditor.nsi";
+
+    var cmds = [makeNSISCmd];
+
+    jake.exec(cmds, function() {
+      complete();
+    }, {
+      printStdout: true
+    });
+
+  });
+
   task('genwindowseditor', {
     async: true
   }, function() {

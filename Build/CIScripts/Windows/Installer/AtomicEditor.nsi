@@ -12,7 +12,7 @@
 
 !define prodname "Atomic Editor"
 !define coname "THUNDERBEAST GAMES LLC"
-!define outfile "${ATOMIC_ROOT}\Artifacts\Windows_Installer\AtomicEditorSetup.exe"
+!define outfile "${ATOMIC_ROOT}\Artifacts\Build\WindowsInstaller\AtomicEditorSetup.exe"
 !define appexe "AtomicEditor.exe"
 !define produrl "http://www.atomicgameengine.com/"
 
@@ -68,20 +68,20 @@ Section "${prodname}" SecMain
 
 	SetOutPath "$INSTDIR"
 
-  File /r "${ATOMIC_ROOT}\Artifacts\Dist\AtomicEditorInstallerSourceFiles\Windows_Package\*.*"
+  File /r "${ATOMIC_ROOT}\Artifacts\Build\WindowsEditor\*.*"
 
 	;Store installation folder
 	WriteRegStr HKLM "Software\${coname}\InstallDir" "${prodname}" $INSTDIR
 
 	; Create shortcut
-	CreateShortCut "$SMPROGRAMS\${prodname}.lnk" "$INSTDIR\${appexe}"
+	CreateShortCut "$SMPROGRAMS\${prodname}.lnk" "$INSTDIR\AtomicEditor\${appexe}"
 
 	; Update Add/Remove Programs
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "DisplayName" "${prodname}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "UninstallString" "$INSTDIR\Uninstall.exe"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "InstallLocation" "$INSTDIR"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "DisplayIcon" "$INSTDIR\${appexe},0"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "DisplayIcon" "$INSTDIR\AtomicEditor\${appexe},0"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "Publisher" "${coname}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "URLInfoAbout" "${produrl}"
 	WriteRegDWord HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${prodname}" "NoRepair" 1
