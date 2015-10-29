@@ -109,9 +109,9 @@ namespace('build', function() {
     fs.copySync(atomicRoot + "/Data/AtomicEditor", buildDir + "Resources/ToolData");
 
     // root deployment
-    var deployRoot = atomicRoot + "/Data/AtomicEditor/Deployment/";
+    var deployRoot = buildDir + "Deployment/";
 
-    fs.copySync(deployRoot, buildDir + "Deployment");
+    fs.copySync(atomicRoot + "/Data/AtomicEditor/Deployment/", deployRoot);
 
     // Android
     fs.copySync(bcommon.artifactsRoot + "Build/Android/Bin/libAtomicPlayer.so",
@@ -139,6 +139,10 @@ namespace('build', function() {
     fs.copySync(bcommon.artifactsRoot + "Build/Windows/Bin/D3DCompiler_47.dll",
       deployRoot + "Windows/x64/D3DCompiler_47.dll");
 
+
+    complete();
+
+    /*
     process.chdir(buildDir);
 
     var cmds = ["zip -r -X ./EditorData.zip ./"];
@@ -149,6 +153,8 @@ namespace('build', function() {
       }, {
         printStdout: true
       });
+
+    */
 
   });
 
