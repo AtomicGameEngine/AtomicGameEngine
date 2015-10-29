@@ -27,6 +27,9 @@ namespace('build', function() {
     fs.copySync(srcDir + "Resources/CoreData",
       editorAppFolder + "Resources/CoreData");
 
+    fs.copySync(srcDir + "Resources/EditorData",
+      editorAppFolder + "Resources/EditorData");
+
     fs.copySync(srcDir + "Resources/PlayerData",
       editorAppFolder + "Resources/PlayerData");
 
