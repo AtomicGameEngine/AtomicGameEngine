@@ -16,14 +16,31 @@ namespace('build', function() {
 
     bcommon.cleanCreateDir(bcommon.artifactsRoot + "Build/WindowsInstaller");
 
+    var installerName = "AtomicEditorSetup_" + bcommon.buildSHA + ".exe";
+    var installerPath = bcommon.artifactsRoot + "Build/WindowsInstaller/" + installerName;
+
     var nsisDefines = "/DATOMIC_ROOT=" + atomicRoot;
     nsisDefines += " /DEDITOR_VERSION=1";
+    nsisDefines += " /DINSTALLER_NAME=" + installerName;
 
     var makeNSISCmd = atomicRoot + "\\Build\\CIScripts\\Windows\\CreateInstaller.bat";
 
     makeNSISCmd += " " + nsisDefines + " " + atomicRoot + "/Build/CIScripts/Windows/Installer/AtomicEditor.nsi";
 
-    var cmds = [makeNSISCmd];
+    var editorExe = dstDir + "AtomicEditor/AtomicEditor.exe";
+
+    var pfxFile = process.env.ATOMIC_PFX_FILE;
+    var pfxPW = process.env.ATOMIC_PFX_PW;
+
+    var signBaseCmd = "signtool.exe sign /f " + pfxFile;
+    signBaseCmd += " /p " + pfxPW;
+    signBaseCmd += " /t http://timestamp.verisign.com/scripts/timestamp.dll";
+    signBaseCmd += " /v ";
+
+    var signEditorCmd = signBaseCmd + editorExe;
+    var signInstallerCmd = signBaseCmd + installerPath;
+
+    var cmds = [signEditorCmd, makeNSISCmd, signInstallerCmd];
 
     jake.exec(cmds, function() {
       complete();

@@ -10,9 +10,13 @@
 !error "EDITOR_VERSION NOT DEFINED"
 !endif
 
+!ifndef INSTALLER_NAME
+!error "INSTALLER_NAME NOT DEFINED"
+!endif
+
 !define prodname "Atomic Editor"
 !define coname "THUNDERBEAST GAMES LLC"
-!define outfile "${ATOMIC_ROOT}\Artifacts\Build\WindowsInstaller\AtomicEditorSetup.exe"
+!define outfile "${ATOMIC_ROOT}\Artifacts\Build\WindowsInstaller\${INSTALLER_NAME}"
 !define appexe "AtomicEditor.exe"
 !define produrl "http://www.atomicgameengine.com/"
 
