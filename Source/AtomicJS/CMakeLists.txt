@@ -20,7 +20,3 @@ file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated
 set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE})
 
 add_library(AtomicJS ${SOURCE_FILES})
-
-add_custom_command (TARGET AtomicJS POST_BUILD
-COMMAND ${CMAKE_COMMAND}
-ARGS -E copy_if_different \"${CMAKE_SOURCE_DIR}/Script/JSPlugin/AtomicPlugin.h\" \"${CMAKE_SOURCE_DIR}/Bin/NativePluginSDK/AtomicPlugin.h\")
