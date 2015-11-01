@@ -21,6 +21,20 @@ else()
     target_link_libraries(AtomicTool curl)
 endif()
 
+
+add_custom_command (TARGET AtomicTool POST_BUILD
+COMMAND ${CMAKE_COMMAND}
+ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicTool>/D3DCompiler_47.dll\")
+
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool)
+ file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool)
+endif()
+
+add_custom_command( TARGET AtomicTool POST_BUILD
+                   COMMAND ${CMAKE_COMMAND}
+                   ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\"
+                   COMMENT "Copying AtomicTool to Build Artifacts" )
+
 if (ATOMIC_DOTNET_DEV)
 
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)

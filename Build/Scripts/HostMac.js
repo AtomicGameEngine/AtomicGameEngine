@@ -11,7 +11,7 @@ var atomicToolBinary = buildDir + "Source/AtomicTool/Debug/AtomicTool";
 
 namespace('build', function() {
 
-  task('atomic', {
+  task('atomiceditor', {
     async: true
   }, function() {
 

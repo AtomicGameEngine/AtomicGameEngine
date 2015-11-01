@@ -44,8 +44,8 @@ namespace('build', function() {
 
     console.log("Generating Examples & JSDocs");
 
-    fs.copySync(atomicRoot + "/Docs/Readme.md", jsDocFolder + "/Readme.md");
-    fs.copySync(atomicRoot + "/Docs/jsdoc.conf", jsDocFolder + "/jsdoc.conf");
+    fs.copySync(atomicRoot + "Build/Docs/Readme.md", jsDocFolder + "/Readme.md");
+    fs.copySync(atomicRoot + "Build/Docs/jsdoc.conf", jsDocFolder + "/jsdoc.conf");
 
     cmds = [
       "git clone https://github.com/AtomicGameEngine/AtomicExamples " + buildDir + "AtomicExamples && rm -rf " + buildDir + "AtomicExamples/.git",

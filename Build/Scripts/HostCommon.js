@@ -9,6 +9,15 @@ process.env.NODE_PATH = atomicRoot + "Build/node_modules/";
 require('module').Module._initPaths();
 var fs = require('fs-extra');
 
+function getScriptPackages() {
+
+    var srcpath = atomicRoot + "Script/Packages/";
+
+    return fs.readdirSync(srcpath).filter(function(file) {
+      return fs.statSync(path.join(srcpath, file)).isDirectory();
+    });
+}
+
 function cleanCreateDir(directory) {
 
   testRemoveDir(directory);
@@ -46,3 +55,4 @@ exports.artifactsRoot = atomicRoot + "Artifacts/";
 exports.cleanCreateDir = cleanCreateDir;
 exports.testCreateDir = testCreateDir;
 exports.testRemoveDir = testRemoveDir;
+exports.getScriptPackages = getScriptPackages;
