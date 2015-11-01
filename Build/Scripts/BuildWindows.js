@@ -13,24 +13,19 @@ namespace('build', function() {
   }, function() {
 
     // Clean build
-    common.cleanCreateDir(buildDir);
-    common.cleanCreateDir(editorAppFolder);
+    var cleanBuild = true;
+    if (cleanBuild) {
+      common.cleanCreateDir(buildDir);
+      common.cleanCreateDir(editorAppFolder);
+      common.cleanCreateDir(host.getGenScriptRootDir("WINDOWS"));
+    }
+
+    // create the generated script files, so they will be picked up by cmake
+    host.createGenScriptFiles("WINDOWS");
 
     process.chdir(buildDir);
 
     var cmds = [];
-
-    // Build the AtomicTool
-    cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicTool.bat");
-
-    // Generate bindings for each script package
-
-    var scriptPackages = host.getScriptPackages();
-    var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
-
-    for (var i in scriptPackages) {
-      cmds.push(bindCmd + "Script/Packages/" + scriptPackages[i] + "/ WINDOWS")
-    }
 
     // Build the AtomicEditor
     cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditor.bat");

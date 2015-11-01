@@ -35,6 +35,12 @@ add_custom_command( TARGET AtomicTool POST_BUILD
                    ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\"
                    COMMENT "Copying AtomicTool to Build Artifacts" )
 
+add_custom_target ( GenerateScriptBindings
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                    COMMENT "${ATOMIC_NODE_JAKE} build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]"
+                    COMMAND ${ATOMIC_NODE_JAKE} build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]
+                    DEPENDS AtomicTool )
+
 if (ATOMIC_DOTNET_DEV)
 
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)

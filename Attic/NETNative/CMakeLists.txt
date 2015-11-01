@@ -7,8 +7,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D )
 
 
-# ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/Atomic/Native)                    
-
 file (GLOB CSHARP_SOURCES *.cpp *.h)
 
 if (NOT MSVC)

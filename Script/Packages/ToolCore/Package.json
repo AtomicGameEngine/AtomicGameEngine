@@ -3,5 +3,6 @@
   "name" : "ToolCore",
   "namespace" : "ToolCore",
   "dependencies" : ["Script/Packages/Atomic"],
-  "modules" : ["ToolCore"]
+  "modules" : ["ToolCore"],
+  "platforms" : ["WINDOWS", "MACOSX", "LINUX"]
 }

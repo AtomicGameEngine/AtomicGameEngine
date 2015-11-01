@@ -11,7 +11,6 @@ Source/Atomic/Javascript/Modules/*
 Data/AtomicPlayer/Resources/CoreData/Shaders/HLSL/Cache
 Resources/CoreData/Shaders/HLSL/Cache
 Artifacts/*
-Build/Source/*
 Docs/out/*
 Docs/node_modules/*
 Data/AtomicEditor/Deployment/Web/AtomicPlayer.js

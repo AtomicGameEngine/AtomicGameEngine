@@ -13,12 +13,12 @@ set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER
 
 if (MSVC)
     set (EXE_TYPE WIN32)
-    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
+    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
 elseif(APPLE)
     #ICNS
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
 if (NOT IOS)
-    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
+    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
 endif()
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set (EXE_TYPE MACOSX_BUNDLE)
@@ -63,7 +63,7 @@ else()
       XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES NO
     )
 
-    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/CMake/Modules/iOSBundleInfo.plist.template)
+    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/iOSBundleInfo.plist.template)
 
 endif()
 endif(APPLE)

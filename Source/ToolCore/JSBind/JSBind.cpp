@@ -42,7 +42,7 @@ bool JSBind::LoadPackage(const String& sourceRootFolder, const String& packageFo
 bool JSBind::GenerateCSharpBindings()
 {
 
-    String modulesFolder = "Build/Source/Generated/" + platform_ + "/CSharp/Packages/";
+    String modulesFolder = "Artifacts/Build/Source/Generated/" + platform_ + "/CSharp/Packages/";
     modulesFolder += package_->GetName() + "/";
 
     String nativeOutputFolder = sourceRootFolder_ + "/" + modulesFolder + "Native/";
@@ -75,7 +75,7 @@ bool JSBind::GenerateCSharpBindings()
 
 bool JSBind::GenerateJavaScriptBindings()
 {
-    String modulesFolder = "Build/Source/Generated/" + platform_ + "/Javascript/Packages/";
+    String modulesFolder = "Artifacts/Build/Source/Generated/" + platform_ + "/Javascript/Packages/";
     modulesFolder += package_->GetName() + "/";
 
     String outputFolder = sourceRootFolder_ + "/" + modulesFolder;
