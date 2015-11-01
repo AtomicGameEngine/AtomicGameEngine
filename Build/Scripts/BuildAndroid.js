@@ -19,12 +19,12 @@ namespace('build', function() {
 
     var cmds = [];
 
-    // Generate bindings for each script package
-    var scriptPackages = ["Atomic", "AtomicPlayer"];
+    var scriptModules = host.getScriptModules("ANDROID");
     var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
 
-    for (var i in scriptPackages) {
-      cmds.push(bindCmd + "Script/Packages/" + scriptPackages[i] + "/ ANDROID")
+    // Generate bindings for each script package
+    for (var pkgName in scriptModules) {
+      cmds.push(bindCmd + "Script/Packages/" + pkgName + "/ ANDROID")
     }
 
     // Build the Android Player
