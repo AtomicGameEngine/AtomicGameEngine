@@ -93,8 +93,8 @@ namespace('build', function() {
           complete();
         });
 
-      task.invoke();
-      
+      task.invoke("WINDOWS");
+
     }, {
       printStdout: true
     });
