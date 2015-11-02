@@ -2,20 +2,7 @@ include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty ${CMAKE_SOURCE_DIR}/S
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
-# Create the JSBind files ahead of time, so they are picked up with glob
-set (JSFILES JSPackageToolCore.cpp;JSModuleToolCore.cpp)
-
-foreach(JSFILE ${JSFILES})
-
-  set (JSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/ToolCore/${JSFILE}")
-
-  if (NOT EXISTS ${JSFILEPATH})
-    file(WRITE "${JSFILEPATH}" "// will be created by JSBind")
-  endif()
-
-endforeach()
-
-file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/ToolCore/*.cpp)
+file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/ToolCore/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE} )
 

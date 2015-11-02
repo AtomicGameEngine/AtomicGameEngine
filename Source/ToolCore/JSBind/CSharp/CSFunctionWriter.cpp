@@ -811,9 +811,6 @@ String CSFunctionWriter::MapDefaultParameter(JSBFunctionType* parameter)
         return "default(Quaternion)";
     }
 
-
-    LOGINFOF("HEY! %s", init.CString());
-
     return String::EMPTY;
 }
 

@@ -44,7 +44,7 @@ void AEEditorApp::Start()
 
     context_->RegisterSubsystem(new EditorMode(context_));
 
-    vm_->SetModuleSearchPaths("AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");
+    vm_->SetModuleSearchPaths("AtomicEditor/JavaScript;AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");
 
     // Do not create bone structure by default when in the editor
     // this can be toggled temporarily, for example to setup an animation preview
@@ -94,6 +94,8 @@ void AEEditorApp::Setup()
 #ifdef ATOMIC_DEV_BUILD
     engineParameters_["ResourcePrefixPath"] = "";
     String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir();
+    // for dev builds, add the compile editor scripts from artifacts
+    resourcePaths += ";" + env->GetRootSourceDir() + "Artifacts/Build/Resources/EditorData/";
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
 

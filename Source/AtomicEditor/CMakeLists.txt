@@ -7,20 +7,7 @@ include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
-# Create the JSBind files ahead of time, so they are picked up with glob
-set (JSFILES JSPackageEditor.cpp;JSModuleEditor.cpp)
-
-foreach(JSFILE ${JSFILES})
-
-  set (JSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/${JSFILE}")
-
-  if (NOT EXISTS ${JSFILEPATH})
-    file(WRITE "${JSFILEPATH}" "// will be created by JSBind")
-  endif()
-
-endforeach()
-
-file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
+file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
 
@@ -35,7 +22,7 @@ if (APPLE)
 
     #ICNS
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
-    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
+    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 elseif(LINUX)
@@ -48,7 +35,7 @@ else()
     #set (EXE_TYPE WIN32)
     add_definitions(-DATOMIC_WIN32_CONSOLE)
 
-    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
+    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
 endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
@@ -60,41 +47,11 @@ if (APPLE)
 
     target_link_libraries(AtomicEditor NETCore NETScript curl)
 
-    # compile the editor scripts
-    add_custom_command (TARGET AtomicEditor POST_BUILD
-    COMMAND "${CMAKE_SOURCE_DIR}/Build/Mac/node/node" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
 elseif(LINUX)
     target_link_libraries(AtomicEditor NETCore NETScript curl nativefiledialog ${GTK3_LIBRARIES})
 
-    # check for nodejs install
-    # look for either 'node' or 'nodejs' ( debian uses both names )
-    set(NODEJS_CMD node)
-    find_program( SYS_NODE ${NODEJS_CMD}  PATHS /usr/bin/ /bin ENV PATH)
-
-    if(NOT SYS_NODE)
-        set(NODEJS_CMD nodejs)
-        find_program( SYS_NODE ${NODEJS_CMD}  PATHS /usr/bin/ /bin ENV PATH)
-    endif()
-
-    if( NOT SYS_NODE)
-        message(SEND_WARNING " WARNING: Could not find Nodejs, editor's TypeScript will not be compiled!")
-    endif()
-
-    if(SYS_NODE)
-        # compile the editor scripts
-        add_custom_command (TARGET AtomicEditor POST_BUILD
-        COMMAND  ${NODEJS_CMD} "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    endif()
 else()
     target_link_libraries(AtomicEditor NETCore NETScript libcurl Iphlpapi Wldap32)
-
-    # compile the editor scripts
-    add_custom_command (TARGET AtomicEditor POST_BUILD
-    COMMAND "${CMAKE_SOURCE_DIR}/Build/Windows/node/node.exe" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js" "-p" "./Script"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
     # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
     add_custom_command (TARGET AtomicEditor POST_BUILD
@@ -106,8 +63,6 @@ endif()
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
-
-add_dependencies(AtomicEditor AtomicTool)
 
 GroupSources("Application")
 GroupSources("EditorMode")

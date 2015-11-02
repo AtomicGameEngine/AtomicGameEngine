@@ -200,7 +200,7 @@ void JSPackageWriter::PostProcess()
     if (jsbind->GetPlatform() == "MACOSX" || jsbind->GetPlatform() == "WINDOWS" || jsbind->GetPlatform() == "LINUX")
     {
         JSBDoc jdoc;
-        jdoc.Emit(package_, jsbind->GetSourceRootFolder() + "Artifacts/JSDoc/" + package_->GetName() + ".js");
+        jdoc.Emit(package_, jsbind->GetSourceRootFolder() + "Artifacts/Build/JSDoc/" + package_->GetName() + ".js");
 
         JSBTypeScript ts;
         ts.Emit(package_, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + package_->GetName() + ".d.ts");

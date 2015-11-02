@@ -1,5 +1,6 @@
 
 set (JAVASCRIPT_BINDINGS_PLATFORM "MACOSX")
+set (ATOMIC_NODE_JAKE Build/Mac/node/node Build/node_modules/jake/bin/cli.js  -f  Build/Scripts/Bootstrap.js)
 
 include (BundleUtilities)
 include(AtomicDesktop)

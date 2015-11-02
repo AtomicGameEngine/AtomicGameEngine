@@ -542,7 +542,7 @@ bool JSResourceEditor::ParseJavascriptToJSON(const char* source, String& json, b
     json.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/EditorScripts/Lib/jsutils");
+    duk_push_string(ctx, "AtomicEditor/JavaScript/Lib/jsutils");
     if (duk_pcall(ctx, 1))
     {
         printf("Error: %s\n", duk_safe_to_string(ctx, -1));
@@ -579,7 +579,7 @@ bool JSResourceEditor::BeautifyJavascript(const char* source, String& output)
     output.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/EditorScripts/Lib/jsutils");
+    duk_push_string(ctx, "AtomicEditor/JavaScript/Lib/jsutils");
 
     if (duk_pcall(ctx, 1))
     {

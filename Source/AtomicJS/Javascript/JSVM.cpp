@@ -311,7 +311,7 @@ int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
     mapFile->ReadText(map);
     int top = duk_get_top(ctx_);
     duk_get_global_string(ctx_, "require");
-    duk_push_string(ctx_, "AtomicEditor/EditorScripts/Lib/jsutils");
+    duk_push_string(ctx_, "AtomicEditor/JavaScript/Lib/jsutils");
     if (duk_pcall(ctx_, 1))
     {
         printf("Error: %s\n", duk_safe_to_string(ctx_, -1));

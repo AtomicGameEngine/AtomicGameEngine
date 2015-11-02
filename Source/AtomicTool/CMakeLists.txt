@@ -8,8 +8,6 @@ add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
 target_link_libraries(AtomicTool ToolCore NETCore NETScript Poco ${ATOMIC_LINK_LIBRARIES})
 
-# add_dependencies(AtomicTool AtomicEditor)
-
 if (MSVC)
     target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
 
@@ -23,15 +21,26 @@ else()
     target_link_libraries(AtomicTool curl)
 endif()
 
+add_custom_command( TARGET AtomicTool POST_BUILD
+                   COMMAND ${CMAKE_COMMAND}
+                   ARGS -E make_directory ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool
+                   COMMAND ${CMAKE_COMMAND}
+                   ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\"
+                   COMMAND ${CMAKE_COMMAND} )
 
-add_custom_command(TARGET AtomicTool POST_BUILD
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Atomic/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicPlayer/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/ToolCore/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/Editor/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMAND $<TARGET_FILE:AtomicTool> bind "\"${CMAKE_SOURCE_DIR}\"" "Script/Packages/AtomicNET/" "${JAVASCRIPT_BINDINGS_PLATFORM}"
-                   COMMENT "Generating Script Bindings")
+if (MSVC)
 
+# Copy the D3D shader compiler
+add_custom_command( TARGET AtomicTool POST_BUILD
+                    ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/D3DCompiler_47.dll\"
+                    COMMENT "Copying AtomicTool to Build Artifacts" )
+
+endif(MSVC)
+
+add_custom_target ( GenerateScriptBindings
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]
+                    DEPENDS AtomicTool )
 
 if (ATOMIC_DOTNET_DEV)
 
