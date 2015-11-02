@@ -40,6 +40,7 @@
 ;Name and file
 Name "${prodname}"
 OutFile "${outfile}"
+RequestExecutionLevel admin
 
 ;Default installation folder
 InstallDir "$PROGRAMFILES64\${prodname}"
@@ -121,6 +122,7 @@ Section "Uninstall"
 
 	; Remove short cut
 	Delete "$SMPROGRAMS\${prodname}.lnk"
+	Delete "$DESKTOP\${prodname}.lnk"
 
 	; Remove installation folder
   RMDir /r $INSTDIR
