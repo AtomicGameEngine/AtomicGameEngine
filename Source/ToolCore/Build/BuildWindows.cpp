@@ -11,8 +11,10 @@
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Project/Project.h"
+
 #include "BuildWindows.h"
 #include "BuildSystem.h"
+#include "BuildEvents.h"
 
 namespace ToolCore
 {
@@ -121,6 +123,10 @@ void BuildWindows::Build(const String& buildPath)
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
+    VariantMap buildOutput;
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Windows Deployment</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
+
     Initialize();
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
@@ -143,7 +149,16 @@ void BuildWindows::Build(const String& buildPath)
     fileSystem->Copy(playerBinary, buildPath_ + "/AtomicPlayer.exe");
     fileSystem->Copy(d3d9dll, buildPath_ + "/D3DCompiler_47.dll");
 
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Building AtomicNET</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
+
     BuildAtomicNET();
+
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Building AtomicNET Complete</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
+
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Windows Deployment Complete</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     buildSystem->BuildComplete(PLATFORMID_WINDOWS, buildPath_);
 
