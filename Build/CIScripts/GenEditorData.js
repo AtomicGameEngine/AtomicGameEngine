@@ -143,6 +143,9 @@ namespace('build', function() {
     fs.copySync(atomicRoot + "Resources/PlayerData", buildDir + "Resources/PlayerData");
     fs.copySync(atomicRoot + "/Data/AtomicEditor", buildDir + "Resources/ToolData");
 
+    fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
+      buildDir + "Resources/EditorData/AtomicEditor/EditorScripts");
+
     // root deployment
     var deployRoot = buildDir + "Deployment/";
 

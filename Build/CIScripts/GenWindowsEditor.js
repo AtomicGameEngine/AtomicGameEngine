@@ -78,9 +78,6 @@ namespace('build', function() {
     fs.copySync(srcDir + "Resources/EditorData",
       editorAppFolder + "Resources/EditorData");
 
-    fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
-      editorAppFolder + "Resources/EditorData/AtomicEditor/EditorScripts");
-
     fs.copySync(srcDir + "Resources/PlayerData",
       editorAppFolder + "Resources/PlayerData");
 
