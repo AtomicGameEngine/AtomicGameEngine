@@ -5,7 +5,7 @@ include(AtomicDesktop)
 
 #set (CMAKE_DEBUG_POSTFIX _d)
 
-set (ATOMIC_NODE_JAKE Build/Windows/node/node.exe Build/node_modules/jake/bin/cli.js -f Build\\Scripts\\Bootstrap.js)
+set (ATOMIC_NODE_JAKE Build/Windows/node/node.exe Build/node_modules/jake/bin/cli.js  -f  Build\\Scripts\\Bootstrap.js)
 
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
     set (D3DCOMPILER_47_DLL ${CMAKE_SOURCE_DIR}/Build/Windows/Binaries/x64/D3DCompiler_47.dll)

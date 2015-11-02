@@ -30,6 +30,9 @@ namespace('build', function() {
     // Build the AtomicEditor
     cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditor.bat");
 
+    // Compile the Editor Scripts
+    cmds.push(atomicRoot + "Build/Windows/node/node.exe " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
+
     jake.exec(cmds, function() {
 
       // Copy the Editor binaries
@@ -42,14 +45,51 @@ namespace('build', function() {
       fs.copySync(atomicRoot + "Resources/CoreData",
         editorAppFolder + "Resources/CoreData");
 
-      fs.copySync(atomicRoot + "Resources/EditorData",
-        editorAppFolder + "Resources/EditorData");
-
       fs.copySync(atomicRoot + "Resources/PlayerData",
         editorAppFolder + "Resources/PlayerData");
 
       fs.copySync(atomicRoot + "Data/AtomicEditor",
         editorAppFolder + "Resources/ToolData");
+
+      fs.copySync(atomicRoot + "Resources/EditorData",
+        editorAppFolder + "Resources/EditorData");
+
+      fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
+        editorAppFolder + "Resources/EditorData/AtomicEditor/EditorScripts");
+
+      console.log("Atomic Editor build to ", editorAppFolder);
+
+      complete();
+
+    }, {
+      printStdout: true
+    });
+
+  });
+
+  // Generate a Visual Studio 2015 solution
+  task('genvs2015', {
+    async: true
+  }, function() {
+
+    var slnRoot = path.resolve(atomicRoot, "") + "-Build\\";
+
+    if (!fs.existsSync(slnRoot)) {
+        jake.mkdirP(slnRoot);
+    }
+
+    // create the generated script files, so they will be picked up by cmake
+    host.createGenScriptFiles("WINDOWS");
+
+    process.chdir(slnRoot);
+
+    var cmds = [];
+
+    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat");
+
+    jake.exec(cmds, function() {
+
+      console.log("\n\nVisual Studio Solution generated in ", slnRoot);
 
       complete();
 

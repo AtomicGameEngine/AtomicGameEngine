@@ -6,7 +6,7 @@
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "outDir": "../Resources/EditorData/AtomicEditor/EditorScripts",
+        "outDir": "../Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
         "moduleResolution": "classic",
         "sourceMap": true
     },
@@ -15,6 +15,7 @@
         "./AtomicEditor/**/*.ts"
     ],
     "files": [
+        "./ToolCore/build/BuildSettings.ts",
         "./AtomicEditor/editor/Editor.ts",
         "./AtomicEditor/editor/EditorEvents.ts",
         "./AtomicEditor/editor/EditorLicense.ts",
@@ -25,8 +26,10 @@
         "./AtomicEditor/ui/EditorUI.ts",
         "./AtomicEditor/ui/frames/HierarchyFrame.ts",
         "./AtomicEditor/ui/frames/inspector/ArrayEditWidget.ts",
+        "./AtomicEditor/ui/frames/inspector/AssemblyInspector.ts",
         "./AtomicEditor/ui/frames/inspector/ComponentInspector.ts",
         "./AtomicEditor/ui/frames/inspector/CreateComponentButton.ts",
+        "./AtomicEditor/ui/frames/inspector/CSComponentClassSelector.ts",
         "./AtomicEditor/ui/frames/inspector/DataBinding.ts",
         "./AtomicEditor/ui/frames/inspector/InspectorFrame.ts",
         "./AtomicEditor/ui/frames/inspector/InspectorUtils.ts",
@@ -34,6 +37,7 @@
         "./AtomicEditor/ui/frames/inspector/MaterialInspector.ts",
         "./AtomicEditor/ui/frames/inspector/ModelInspector.ts",
         "./AtomicEditor/ui/frames/inspector/NodeInspector.ts",
+        "./AtomicEditor/ui/frames/inspector/PrefabInspector.ts",
         "./AtomicEditor/ui/frames/inspector/TextureSelector.ts",
         "./AtomicEditor/ui/frames/MainFrame.ts",
         "./AtomicEditor/ui/frames/menus/HierarchyFrameMenu.ts",
@@ -72,7 +76,6 @@
         "./AtomicEditor/ui/playmode/PlayMode.ts",
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
-        "./AtomicEditor/ui/UIEvents.ts",
-        "./ToolCore/build/BuildSettings.ts"
+        "./AtomicEditor/ui/UIEvents.ts"
     ]
 }

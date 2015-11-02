@@ -21,24 +21,18 @@ else()
     target_link_libraries(AtomicTool curl)
 endif()
 
-
-add_custom_command (TARGET AtomicTool POST_BUILD
-COMMAND ${CMAKE_COMMAND}
-ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicTool>/D3DCompiler_47.dll\")
-
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool)
- file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool)
-endif()
-
 add_custom_command( TARGET AtomicTool POST_BUILD
                    COMMAND ${CMAKE_COMMAND}
+                   ARGS -E make_directory ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool
+                   COMMAND ${CMAKE_COMMAND}
                    ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\"
+                   COMMAND ${CMAKE_COMMAND}
+                   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/D3DCompiler_47.dll\"
                    COMMENT "Copying AtomicTool to Build Artifacts" )
 
 add_custom_target ( GenerateScriptBindings
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                    COMMENT "${ATOMIC_NODE_JAKE} build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]"
-                    COMMAND ${ATOMIC_NODE_JAKE} build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]
                     DEPENDS AtomicTool )
 
 if (ATOMIC_DOTNET_DEV)
