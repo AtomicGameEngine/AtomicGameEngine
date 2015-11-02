@@ -139,9 +139,11 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());
 
     // reload it immediately so it is ready for use
-    // TODO: The resource cache is reloading after this reload due to catching the file cache
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     XMLFile* xmlfile = cache->GetResource<XMLFile>(asset_->GetGUID());
+    cache->ReloadResource(xmlfile);
+    // reload cache file
+    xmlfile = cache->GetResource<XMLFile>("Cache/" + asset_->GetGUID());
     cache->ReloadResource(xmlfile);
 
     VariantMap changedData;
