@@ -40,7 +40,7 @@
 ;Name and file
 Name "${prodname}"
 OutFile "${outfile}"
-RequestExecutionLevel user
+RequestExecutionLevel admin
 
 ;Default installation folder
 InstallDir "$PROGRAMFILES64\${prodname}"
