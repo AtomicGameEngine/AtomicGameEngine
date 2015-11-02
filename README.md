@@ -46,7 +46,7 @@ For **supported binary releases** and to acquire **product activation keys** or 
 
 > The full source code to the Atomic Editor and other tooling is available under the terms of the [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/Licenses/LICENSE_ATOMIC_EDITOR_AND_TOOLS.md)
 
-**[Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/LICENSE_THIRDPARTY.md)**
+**[Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/Licenses/LICENSE_THIRDPARTY.md)**
 
 > The Atomic Game Engine contains third party technology available under permissive Open Source licenses.
 
