@@ -8,6 +8,7 @@ var editorAppFolder = host.artifactsRoot + "AtomicEditor/";
 
 namespace('build', function() {
 
+  // Builds a standalone Atomic Editor, which can be distributed out of build tree
   task('atomiceditor', {
     async: true
   }, function() {
