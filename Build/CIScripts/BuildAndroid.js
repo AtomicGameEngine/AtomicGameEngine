@@ -12,6 +12,7 @@ namespace('build', function() {
   }, function() {
 
     bcommon.cleanCreateDir(playerBuildDir);
+    bcommon.cleanCreateDir(bcommon.getGenScriptRootDir("ANDROID"));
 
     var atomicTool = host.getAtomicToolBinary();
 

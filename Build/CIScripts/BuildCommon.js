@@ -45,6 +45,13 @@ function testRemoveDir(path) {
   }
 }
 
+function getGenScriptRootDir(platform) {
+
+  return atomicRoot + "Artifacts/Build/Source/Generated/" + platform + "/";
+
+}
+
+
 function cloneRepo(repoUrl, destPath) {
 
 }
@@ -57,3 +64,4 @@ exports.testRemoveDir = testRemoveDir;
 exports.testCreateDir = testCreateDir;
 exports.cloneRepo = cloneRepo;
 exports.cleanCreateDir = cleanCreateDir;
+exports.getGenScriptRootDir = getGenScriptRootDir;
