@@ -69,7 +69,7 @@ namespace('build', function() {
     async: true
   }, function() {
 
-    var slnRoot = path.resolve(atomicRoot, "") + "-Build\\";
+    var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
 
     if (!fs.existsSync(slnRoot)) {
         jake.mkdirP(slnRoot);

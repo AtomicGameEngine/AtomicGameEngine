@@ -5,6 +5,7 @@ if (os.platform() == "win32") {
   require("./BuildWindows");
 } else if (os.platform() == "darwin") {
   module.exports = require("./HostMac");
+  require("./BuildMac");
 }
 
 require("./BuildCommon");

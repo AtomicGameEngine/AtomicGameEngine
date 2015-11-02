@@ -26,9 +26,16 @@ add_custom_command( TARGET AtomicTool POST_BUILD
                    ARGS -E make_directory ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool
                    COMMAND ${CMAKE_COMMAND}
                    ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\"
-                   COMMAND ${CMAKE_COMMAND}
-                   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/D3DCompiler_47.dll\"
-                   COMMENT "Copying AtomicTool to Build Artifacts" )
+                   COMMAND ${CMAKE_COMMAND} )
+
+if (MSVC)
+
+# Copy the D3D shader compiler
+add_custom_command( TARGET AtomicTool POST_BUILD
+                    ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/D3DCompiler_47.dll\"
+                    COMMENT "Copying AtomicTool to Build Artifacts" )
+
+endif(MSVC)
 
 add_custom_target ( GenerateScriptBindings
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
