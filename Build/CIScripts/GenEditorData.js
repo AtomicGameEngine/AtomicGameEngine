@@ -92,8 +92,6 @@ namespace('build', function() {
 
     console.log("Compiling Editor Scripts");
 
-    var scriptFolder = atomicRoot + "Resources/EditorData/AtomicEditor/EditorScripts/";
-
     process.chdir(atomicRoot);
 
     cmds = [
