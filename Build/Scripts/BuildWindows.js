@@ -86,10 +86,15 @@ namespace('build', function() {
 
     jake.exec(cmds, function() {
 
-      console.log("\n\nVisual Studio Solution generated in ", slnRoot);
+      var task = jake.Task['build:genscripts']
 
-      complete();
+      task.addListener('complete', function () {
+          console.log("\n\nVisual Studio Solution generated in ", slnRoot);
+          complete();
+        });
 
+      task.invoke();
+      
     }, {
       printStdout: true
     });

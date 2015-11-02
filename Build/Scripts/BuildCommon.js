@@ -10,6 +10,8 @@ namespace('build', function() {
     async: true
   }, function(platform) {
 
+        process.chdir(atomicRoot);
+
         var modules = host.getScriptModules(platform);
         var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
 
@@ -18,7 +20,7 @@ namespace('build', function() {
             cmds.push(bindCmd + "Script/Packages/" + pkgName + "/ " + platform);
         }
 
-        // Compile the Editor Scripts        
+        // Compile the Editor Scripts
         if (os.platform() == "win32")
           cmds.push(atomicRoot + "Build/Windows/node/node.exe " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
         else if (os.platform() == "darwin")
