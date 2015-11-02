@@ -13,7 +13,7 @@ namespace('build', function() {
   }, function() {
 
     bcommon.cleanCreateDir(buildDir);
-    bcommon.cleanCreateDir(atomicRoot + "Build/Source/Generated");
+    bcommon.cleanCreateDir(bcommon.getGenScriptRootDir("WINDOWS"));
 
     process.chdir(buildDir);
 
