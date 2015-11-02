@@ -28,8 +28,7 @@ namespace('build', function() {
       bindCmd + "Script/Packages/AtomicPlayer/ MACOSX",
       bindCmd + "Script/Packages/ToolCore/ MACOSX",
       bindCmd + "Script/Packages/Editor/ MACOSX",
-      bindCmd + "Script/Packages/AtomicNET/ MACOSX",
-      atomicRoot + "Build/Mac/node/node " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script",
+      bindCmd + "Script/Packages/AtomicNET/ MACOSX",      
       "cmake ../../../ -DATOMIC_DEV_BUILD=1 -G Xcode",
       "xcodebuild -configuration Debug"
     ]

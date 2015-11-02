@@ -30,9 +30,6 @@ namespace('build', function() {
     // Build the AtomicEditor
     cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAtomicEditor.bat");
 
-    // Compile the Editor Scripts
-    cmds.push(atomicRoot + "Build/Windows/node/node.exe " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
-
     jake.exec(cmds, function() {
 
       // Copy the Editor binaries
