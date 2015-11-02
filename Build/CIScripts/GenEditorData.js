@@ -3,7 +3,7 @@ var bcommon = require("./BuildCommon");
 var host = require("./Host");
 
 var buildDir = bcommon.artifactsRoot + "Build/EditorData/";
-var jsDocFolder = bcommon.artifactsRoot + "JSDoc/";
+var jsDocFolder = bcommon.artifactsRoot + "Build/JSDoc/";
 var atomicRoot = bcommon.atomicRoot;
 var atomicTool = host.getAtomicToolBinary();
 
