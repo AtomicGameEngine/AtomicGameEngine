@@ -5,8 +5,9 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+import BuildSettingsWindow = require("../BuildSettingsWindow");
 
-class WebSettingsWidget extends Atomic.UIWidget {
+class WebSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.BuildSettingsWidget {
 
   constructor() {
 

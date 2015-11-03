@@ -219,7 +219,7 @@ class ModalOps extends Atomic.ScriptObject {
 
         if (this.show()) {
 
-            this.opWindow = new BuildSettingsWindow();
+            this.opWindow = new BuildSettingsWindow.BuildSettingsWindow();
 
         }
 
