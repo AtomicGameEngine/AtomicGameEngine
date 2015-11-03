@@ -80,7 +80,12 @@ bool ToolSystem::LoadProject(const String& fullpath)
     }
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    cache->AddResourceDir(path, 0);
+
+    // Do NOT add the root project path as a resource path, otherwise
+    // it will introduce a situation where there are nested resource paths
+    // which will confuse the ResourceCache and can cause resources referenced
+    // by various paths to be seen as unique resources
+    //cache->AddResourceDir(path, 0);
 
     String resourcePath = path;
     resourcePath += "/Resources";
