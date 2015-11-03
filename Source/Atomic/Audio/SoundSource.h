@@ -79,6 +79,10 @@ public:
 
     /// Return sound.
     void SetSound(Sound* sound);
+    /// Return if sound is looping.
+    bool IsLooping() const;
+    /// Set sound loop on/off.
+    void SetLooping(bool looping);
 
     // END ATOMIC
 
