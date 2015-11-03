@@ -54,6 +54,11 @@ task('atomiceditor', {
     fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
       resourceDest + "EditorData/AtomicEditor/EditorScripts");
 
+    // copy the mac player binary to deployment
+    var playerBinary =  buildDir +  "Source/AtomicPlayer/Application/Release/AtomicPlayer.app/Contents/MacOS/AtomicPlayer";
+
+    fs.copySync(playerBinary,
+      resourceDest + "ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer");
 
     console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
 
