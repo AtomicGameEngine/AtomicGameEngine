@@ -143,6 +143,7 @@ void SoundSource::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
 
     ATTRIBUTE("Autoplay", bool, autoPlay_, false, AM_FILE);
+    ACCESSOR_ATTRIBUTE("Looping", IsLooping, SetLooping, bool, false, AM_FILE);
 }
 
 void SoundSource::Play(Sound* sound)
@@ -1248,6 +1249,17 @@ void SoundSource::MixNull(float timeStep)
 void SoundSource::SetSound(Sound* sound)
 {
     if (sound) SetSoundAttr(GetResourceRef(sound, ""));
+}
+
+bool SoundSource::IsLooping() const
+{
+    if (sound_) return sound_->IsLooped();
+    else return false;
+}
+
+void SoundSource::SetLooping(bool looped)
+{
+    if (sound_) sound_->SetLooped(looped);
 }
 
 }
