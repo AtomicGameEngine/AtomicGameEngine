@@ -5,8 +5,9 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+import BuildSettingsWindow = require("../BuildSettingsWindow");
 
-class MacSettingsWidget extends Atomic.UIWidget {
+class MacSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.BuildSettingsWidget {
 
     constructor() {
 

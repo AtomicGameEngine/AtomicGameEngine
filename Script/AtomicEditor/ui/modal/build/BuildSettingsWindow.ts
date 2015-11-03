@@ -16,13 +16,13 @@ import AndroidSettingsWidget = require("./platforms/AndroidSettingsWidget");
 import IOSSettingsWidget = require("./platforms/IOSSettingsWidget");
 import WebSettingsWidget = require("./platforms/WebSettingsWidget");
 
-interface BuildSettingsWidget {
+export interface BuildSettingsWidget {
 
     storeValues();
 
 }
 
-class BuildSettingsWindow extends ModalWindow {
+export class BuildSettingsWindow extends ModalWindow {
 
     constructor() {
 
@@ -218,5 +218,3 @@ class BuildSettingsWindow extends ModalWindow {
     platformIndicator: Atomic.UISkinImage;
 
 }
-
-export = BuildSettingsWindow;
