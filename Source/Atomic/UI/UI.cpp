@@ -114,17 +114,22 @@ UI::UI(Context* context) :
     exitRequested_(false)
 {
 
+    SubscribeToEvent(E_EXITREQUESTED, HANDLER(UI, HandleExitRequested));
+
 }
 
 UI::~UI()
 {
     if (initialized_)
     {
+        initialized_ = false;
+
+        tb::TBAnimationManager::AbortAllAnimations();
         tb::TBWidgetListener::RemoveGlobalListener(this);
 
         TBFile::SetReaderFunction(0);
         TBID::tbidRegisterCallback = 0;
-
+        
         tb::TBWidgetsAnimationManager::Shutdown();
 
         widgetWrap_.Clear();
@@ -135,6 +140,12 @@ UI::~UI()
     }
 
     uiContext_ = 0;
+
+}
+
+void UI::HandleExitRequested(StringHash eventType, VariantMap& eventData)
+{
+    Shutdown();
 }
 
 void UI::Shutdown()

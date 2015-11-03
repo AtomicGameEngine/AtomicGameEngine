@@ -112,6 +112,8 @@ private:
     static void TBIDRegisterStringCallback(unsigned id, const char* value);
 
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
+
     void Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd);
     void SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData);
 
