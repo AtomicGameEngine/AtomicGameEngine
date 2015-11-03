@@ -31,6 +31,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/ResourceEvents.h>
+#include <Atomic/Script/ScriptSystem.h>
 #include <Atomic/UI/UI.h>
 
 // Move me
@@ -73,6 +74,7 @@ void AtomicPlayerApp::Setup()
 #endif
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
+    context_->RegisterSubsystem(new ScriptSystem(context_));
 
     engineParameters_["WindowTitle"] = "AtomicPlayer";
 
