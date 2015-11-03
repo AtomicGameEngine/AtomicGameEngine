@@ -1,10 +1,10 @@
 var fs = require('fs-extra');
 var path = require("path");
 var host = require("./Host");
+var os = require('os');
 var atomicRoot = host.atomicRoot;
 
 var buildDir = host.artifactsRoot + "Build/Android/";
-var editorAppFolder = host.artifactsRoot + "AtomicEditor/";
 
 namespace('build', function() {
 
@@ -27,10 +27,17 @@ namespace('build', function() {
       cmds.push(bindCmd + "Script/Packages/" + pkgName + "/ ANDROID")
     }
 
-    // Build the Android Player
-    cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAndroid.bat");
+    if (os.platform() == "win32") {
+      cmds.push(atomicRoot + "Build/Scripts/Windows/CompileAndroid.bat");
+    }
+    else {
+      cmds.push("cmake -G \"Unix Makefiles\" -DCMAKE_TOOLCHAIN_FILE=../../../Build/CMake/Toolchains/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../");
+      cmds.push("make -j4");
+    }
 
     jake.exec(cmds, function() {
+
+      var editorAppFolder = host.artifactsRoot + (os.platform() == "win32" ? "AtomicEditor/" : "AtomicEditor/AtomicEditor.app/");
 
       // Install Deployment
       fs.copySync(buildDir + "Source/AtomicPlayer/Application/libAtomicPlayer.so",
