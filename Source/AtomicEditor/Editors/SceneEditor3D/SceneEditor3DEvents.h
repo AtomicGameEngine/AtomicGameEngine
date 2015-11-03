@@ -18,6 +18,11 @@ EVENT(E_GIZMOEDITMODECHANGED, GizmoEditModeChanged)
     PARAM(P_MODE, MODE);            // int
 }
 
+EVENT(E_GIZMOAXISMODECHANGED, GizmoAxisModeChanged)
+{
+    PARAM(P_MODE, MODE);            // int
+}
+
 EVENT(E_GIZMOMOVED, GizmoMoved)
 {
 

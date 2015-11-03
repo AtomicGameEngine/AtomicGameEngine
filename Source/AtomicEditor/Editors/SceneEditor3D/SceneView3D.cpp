@@ -161,25 +161,10 @@ void SceneView3D::MoveCamera(float timeStep)
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
         pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-        // Not working on OSX
-        //input->SetMouseMode(MM_RELATIVE);
     }
-    else
-    {
-        // Not working on OSX
-        /*
-        if (input->GetMouseMode() != MM_ABSOLUTE)
-            input->SetMouseMode(MM_ABSOLUTE);
-        */
-    }
-
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
-
-    //Vector3 pos = cameraNode_->GetWorldPosition();
-    //Quaternion q = cameraNode_->GetWorldRotation();
-    //LOGINFOF("%f %f %f : %f %f %f %f", pos.x_, pos.y_, pos.z_, q.x_, q.y_, q.z_, q.w_ );
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
@@ -187,7 +172,7 @@ void SceneView3D::MoveCamera(float timeStep)
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
 #endif
 
-    if (!superdown) {
+    if (!superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
 
         // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
         // Use the Translate() function (default local space) to move relative to the node's orientation.

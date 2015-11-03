@@ -109,7 +109,8 @@ public:
 
     void SetView(SceneView3D* view3D);
 
-    void SetEditMode(EditMode);
+    void SetAxisMode(AxisMode mode);
+    void SetEditMode(EditMode mode);
 
     bool Selected()
     {

@@ -416,6 +416,11 @@ void Gizmo3D::Drag()
 
 }
 
+void Gizmo3D::SetAxisMode(AxisMode mode)
+{
+    axisMode_ = mode;
+}
+
 void Gizmo3D::SetEditMode(EditMode mode)
 {
     editMode_ = mode;
