@@ -309,7 +309,7 @@ bool Model::BeginLoad(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < animList.names_.Size(); ++i)
     {
-        AddAnimationResource(cache->GetResource<Animation>("Cache/" + animList.names_[i]));
+        AddAnimationResource(cache->GetResource<Animation>(animList.names_[i]));
     }
 
     SetMemoryUse(memoryUse);

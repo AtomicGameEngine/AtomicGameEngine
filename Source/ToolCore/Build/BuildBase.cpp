@@ -123,10 +123,7 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
         newEntry->absolutePath_ = resourceDir + filename;
         newEntry->resourceDir_ = resourceDir;
 
-        if (resourceDir.EndsWith("/Cache/"))
-            newEntry->packagePath_ = "Cache/" + filename;
-        else
-            newEntry->packagePath_ = filename;
+        newEntry->packagePath_ = filename;
 
         resourceEntries_.Push(newEntry);
 
