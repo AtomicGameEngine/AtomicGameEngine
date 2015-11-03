@@ -55,6 +55,12 @@ namespace('build', function() {
       fs.copySync(atomicRoot + "Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
         editorAppFolder + "Resources/EditorData/AtomicEditor/EditorScripts");
 
+      fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/AtomicPlayer.exe",
+        editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/AtomicPlayer.exe");
+
+      fs.copySync(buildDir +  "Source/AtomicPlayer/Application/Release/D3DCompiler_47.dll",
+        editorAppFolder + "Resources/ToolData/Deployment/Windows/x64/D3DCompiler_47.dll");
+
       console.log("Atomic Editor build to ", editorAppFolder);
 
       complete();
