@@ -64,7 +64,7 @@ declare module Atomic {
         qualifiers: number;
         // mouse buttons down
         buttons:number;
-              
+
     }
 
     export interface UIShortcutEvent {
@@ -240,6 +240,18 @@ declare module AtomicNET {
 
     }
 
+}
+
+declare module Editor {
+
+  export interface GizmoEditModeChangedEvent {
+    mode:EditMode;
+  }
+
+  export interface GizmoAxisModeChangedEvent {
+    mode:AxisMode;
+  }
+  
 }
 
 declare module ToolCore {

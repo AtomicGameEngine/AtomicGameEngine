@@ -85,6 +85,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
 
     SubscribeToEvent(E_GIZMOEDITMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
+    SubscribeToEvent(E_GIZMOAXISMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoAxisModeChanged));
 
     // FIXME: Set the size at the end of setup, so all children are updated accordingly
     // future size changes will be handled automatically
@@ -222,6 +223,13 @@ void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap&
     EditMode mode = (EditMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
     gizmo3D_->SetEditMode(mode);
 }
+
+void SceneEditor3D::HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData)
+{
+    AxisMode mode = (AxisMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
+    gizmo3D_->SetAxisMode(mode);
+}
+
 
 void SceneEditor3D::Close(bool navigateToAvailableResource)
 {

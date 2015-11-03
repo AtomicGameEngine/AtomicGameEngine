@@ -85,21 +85,15 @@ class Shortcuts extends Atomic.ScriptObject {
         this.invokeResourceFrameShortcut("selectall");
     }
 
-    invokeGizmoMode3DTranslate() {
+    invokeGizmoEditModeChanged(mode:Editor.EditMode) {
 
-        this.sendEvent("GizmoEditModeChanged", { mode: 1 });
-
-    }
-
-    invokeGizmoMode3DRotate() {
-
-        this.sendEvent("GizmoEditModeChanged", { mode: 2 });
+        this.sendEvent("GizmoEditModeChanged", { mode: mode });
 
     }
 
-    invokeGizmoMode3DScale() {
+    invokeGizmoAxisModeChanged(mode:Editor.AxisMode) {
 
-        this.sendEvent("GizmoEditModeChanged", { mode: 3 });
+        this.sendEvent("GizmoAxisModeChanged", { mode: mode });
 
     }
 
@@ -119,11 +113,11 @@ class Shortcuts extends Atomic.ScriptObject {
             // TODO: Make these customizable
 
             if (ev.key == Atomic.KEY_W) {
-                this.invokeGizmoMode3DTranslate();
+                this.invokeGizmoEditModeChanged(Editor.EDIT_MOVE);
             } else if (ev.key == Atomic.KEY_E) {
-                this.invokeGizmoMode3DRotate();
+              this.invokeGizmoEditModeChanged(Editor.EDIT_ROTATE);
             } else if (ev.key == Atomic.KEY_R) {
-                this.invokeGizmoMode3DScale();
+                this.invokeGizmoEditModeChanged(Editor.EDIT_SCALE);
             }
 
         }

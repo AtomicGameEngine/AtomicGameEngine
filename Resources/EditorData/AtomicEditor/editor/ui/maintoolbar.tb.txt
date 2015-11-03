@@ -19,3 +19,7 @@ TBLayout: distribution: gravity, spacing: 4
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DScaleBitmap
 		id 3d_scale
+	TBButton: toggle-mode: 1
+		lp: width: 64
+		text: "Local"
+		id 3d_axismode

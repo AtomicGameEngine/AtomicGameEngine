@@ -67,6 +67,13 @@ class MainToolbar extends Atomic.UIWidget {
 
                 return true;
 
+            } else if (ev.target.id == "3d_axismode") {
+
+                ev.target.text = ev.target.value ? "World" : "Local";
+
+                EditorUI.getShortcuts().invokeGizmoAxisModeChanged( ev.target.value ? Editor.AXIS_WORLD :  Editor.AXIS_LOCAL);
+                return true;
+
             } else if (ev.target.id == "maintoolbar_play") {
 
                 EditorUI.getShortcuts().invokePlay();
