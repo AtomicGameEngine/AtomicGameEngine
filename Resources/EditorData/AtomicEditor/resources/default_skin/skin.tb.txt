@@ -53,6 +53,22 @@ elements
 		bitmap button_flat_pressed.png
 		cut 8
 
+	TBButton.uniformflat
+		text-color #fefefe
+		padding 4 4
+		children
+			element TBButton.uniformflat.hovered
+				state hovered
+			element TBButton.uniformflat.pressed
+				state pressed
+	TBButton.uniformflat.hovered
+		bitmap button_flat_outline.png
+		cut 15
+		expand 6
+	TBButton.uniformflat.pressed
+		bitmap button_flat_pressed.png
+		cut 8		
+
 	TBButton.link
 		text-color #73FDFF
 		padding 6 8

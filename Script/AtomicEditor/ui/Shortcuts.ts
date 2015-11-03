@@ -16,6 +16,8 @@ class Shortcuts extends Atomic.ScriptObject {
 
         this.subscribeToEvent("UIShortcut", (ev: Atomic.UIShortcutEvent) => this.handleUIShortcut(ev));
 
+        this.subscribeToEvent("KeyDown", (ev: Atomic.KeyDownEvent) => this.handleKeyDown(ev));
+
 
     }
 
@@ -83,18 +85,56 @@ class Shortcuts extends Atomic.ScriptObject {
         this.invokeResourceFrameShortcut("selectall");
     }
 
-    invokeResourceFrameShortcut(shortcut:string) {
+    invokeGizmoMode3DTranslate() {
+
+        this.sendEvent("GizmoEditModeChanged", { mode: 1 });
+
+    }
+
+    invokeGizmoMode3DRotate() {
+
+        this.sendEvent("GizmoEditModeChanged", { mode: 2 });
+
+    }
+
+    invokeGizmoMode3DScale() {
+
+        this.sendEvent("GizmoEditModeChanged", { mode: 3 });
+
+    }
+
+    invokeResourceFrameShortcut(shortcut: string) {
         if (!ToolCore.toolSystem.project) return;
         var resourceFrame = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
-        if(resourceFrame) {
+        if (resourceFrame) {
             resourceFrame.invokeShortcut(shortcut);
         }
     }
 
+    handleKeyDown(ev: Atomic.KeyDownEvent) {
+
+        // if the right mouse buttons isn't down
+        if (!(ev.buttons & Atomic.MOUSEB_RIGHT)) {
+
+            // TODO: Make these customizable
+
+            if (ev.key == Atomic.KEY_W) {
+                this.invokeGizmoMode3DTranslate();
+            } else if (ev.key == Atomic.KEY_E) {
+                this.invokeGizmoMode3DRotate();
+            } else if (ev.key == Atomic.KEY_R) {
+                this.invokeGizmoMode3DScale();
+            }
+
+        }
+
+    }
+
     // global shortcut handler
     handleUIShortcut(ev: Atomic.UIShortcutEvent) {
+
         var cmdKey;
-        if(Atomic.platform == "MacOSX") {
+        if (Atomic.platform == "MacOSX") {
             cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LGUI) || Atomic.input.getKeyDown(Atomic.KEY_RGUI));
         } else {
             cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LCTRL) || Atomic.input.getKeyDown(Atomic.KEY_RCTRL));
@@ -113,7 +153,7 @@ class Shortcuts extends Atomic.ScriptObject {
             }
             else if (ev.key == Atomic.KEY_P) {
                 this.invokePlay();
-            //if shift is pressed
+                //if shift is pressed
             } else if (ev.qualifiers & Atomic.QUAL_SHIFT) {
                 if (ev.key == Atomic.KEY_B) {
                     EditorUI.getModelOps().showBuildSettings();

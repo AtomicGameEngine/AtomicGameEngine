@@ -9,6 +9,9 @@ import EditorUI = require("./EditorUI");
 
 class MainToolbar extends Atomic.UIWidget {
 
+    translateButton: Atomic.UIButton;
+    rotateButton: Atomic.UIButton;
+    scaleButton: Atomic.UIButton;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -16,9 +19,36 @@ class MainToolbar extends Atomic.UIWidget {
 
         this.load("AtomicEditor/editor/ui/maintoolbar.tb.txt");
 
+        this.translateButton = <Atomic.UIButton>this.getWidget("3d_translate");
+        this.rotateButton = <Atomic.UIButton>this.getWidget("3d_rotate");
+        this.scaleButton = <Atomic.UIButton>this.getWidget("3d_scale");
+
+        this.translateButton.value = 1;
+
         parent.addChild(this);
 
+        this.subscribeToEvent("GizmoEditModeChanged", (ev) => this.handleGizmoEditModeChanged(ev));
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+    }
+
+    handleGizmoEditModeChanged(ev) {
+
+        this.translateButton.value = 0;
+        this.rotateButton.value = 0;
+        this.scaleButton.value = 0;
+
+        switch (ev.mode) {
+            case 1:
+                this.translateButton.value = 1;
+                break;
+            case 2:
+                this.rotateButton.value = 1;
+                break;
+            case 3:
+                this.scaleButton.value = 1;
+                break;
+        }
+
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {

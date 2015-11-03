@@ -147,11 +147,11 @@ elements
 		background-color #23241f
 
 	3DScaleBitmap
-		bitmap 3d_scale.png		
+		bitmap 3d_scale.png
 	3DTranslateBitmap
-		bitmap 3d_translate.png		
+		bitmap 3d_translate.png
 	3DRotateBitmap
-		bitmap 3d_rotate.png		
+		bitmap 3d_rotate.png
 
 	DarkGrayText
 		text-color #aaaaaa

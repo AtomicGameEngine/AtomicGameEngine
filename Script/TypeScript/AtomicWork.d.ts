@@ -44,6 +44,28 @@ declare module Atomic {
 
     }
 
+    export interface KeyDownEvent {
+
+        // keycode
+        key: number;
+        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
+        qualifiers: number;
+
+        // mouse buttons down
+        buttons:number;
+
+    }
+
+    export interface KeyUpEvent {
+
+        // keycode
+        key: number;
+        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
+        qualifiers: number;
+        // mouse buttons down
+        buttons:number;
+              
+    }
 
     export interface UIShortcutEvent {
 
