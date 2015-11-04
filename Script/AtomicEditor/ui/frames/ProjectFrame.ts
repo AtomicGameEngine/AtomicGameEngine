@@ -1,4 +1,9 @@
-
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import ScriptWidget = require("ui/ScriptWidget");
 import Editor = require("editor/Editor");
@@ -44,6 +49,7 @@ class ProjectFrame extends ScriptWidget {
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
+        this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
 
         // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
@@ -56,12 +62,32 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    handleAssetRenamed(ev: ToolCore.AssetRenamedEvent) {
+
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
+
+        for (var widget = container.firstChild; widget; widget = widget.next) {
+
+            if (widget.id == ev.asset.guid) {
+
+                if (widget['assetButton'])
+                {
+                    widget['assetButton'].text = ev.asset.name + ev.asset.extension;
+                    widget['assetButton'].dragObject = new Atomic.UIDragObject(ev.asset, ev.asset.name);
+                }
+
+                break;
+            }
+        }
+
+    }
+
     handleResourceRemoved(ev: ToolCore.ResourceRemovedEvent) {
 
         var folderList = this.folderList;
         folderList.deleteItemByID(ev.guid);
 
-        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
 
         for (var widget = container.firstChild; widget; widget = widget.next) {
 
@@ -101,7 +127,7 @@ class ProjectFrame extends ScriptWidget {
 
         } else if (parent == this.currentFolder) {
 
-            var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+            var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
             container.addChild(this.createButtonLayout(asset));
 
         }
@@ -156,7 +182,7 @@ class ProjectFrame extends ScriptWidget {
 
                 if (id == "folderList_") {
 
-                    var list = <Atomic.UISelectList> data.target;
+                    var list = <Atomic.UISelectList>data.target;
 
                     var selectedId = list.selectedItemID;
 
@@ -225,12 +251,15 @@ class ProjectFrame extends ScriptWidget {
 
         if (data.target) {
 
-            var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+            var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
 
             if (data.target.id == "contentcontainerscroll" || container.isAncestorOf(data.target)) {
 
-                asset = this.currentFolder;
+                if (data.target["asset"])
+                  asset = <ToolCore.Asset> data.target["asset"];
 
+                if (!asset || !asset.isFolder)
+                  asset = this.currentFolder;
             }
 
         }
@@ -253,21 +282,21 @@ class ProjectFrame extends ScriptWidget {
             return;
 
         var dragObject = data.dragObject;
+
         if (dragObject.object && dragObject.object.typeName == "Node") {
 
-            var node = <Atomic.Node> dragObject.object;
+            var node = <Atomic.Node>dragObject.object;
 
-            var prefabComponent = <Atomic.PrefabComponent> node.getComponent("PrefabComponent");
+            var prefabComponent = <Atomic.PrefabComponent>node.getComponent("PrefabComponent");
 
             if (prefabComponent) {
 
-              prefabComponent.savePrefab();
+                prefabComponent.savePrefab();
 
             }
             else {
                 var destFilename = Atomic.addTrailingSlash(asset.path);
                 destFilename += node.name + ".prefab";
-
                 var file = new Atomic.File(destFilename, Atomic.FILE_WRITE);
                 node.saveXML(file);
                 file.close();
@@ -277,6 +306,18 @@ class ProjectFrame extends ScriptWidget {
 
             return;
 
+        } else if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+            var dragAsset = <ToolCore.Asset> dragObject.object;
+
+            // get the folder we dragged on
+            var destPath = Atomic.addTrailingSlash(asset.path);
+
+            dragAsset.move(destPath + dragAsset.name + dragAsset.extension);
+
+            this.refreshContent(this.currentFolder);
+
+            return true;
         }
 
         // dropped some files?
@@ -319,7 +360,7 @@ class ProjectFrame extends ScriptWidget {
         this.folderList.deleteAllItems();
         this.resourceFolder = null;
 
-        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
         container.deleteAllChildren();
 
     }
@@ -336,7 +377,7 @@ class ProjectFrame extends ScriptWidget {
 
         var db = ToolCore.getAssetDatabase();
 
-        var container: Atomic.UILayout = <Atomic.UILayout> this.getWidget("contentcontainer");
+        var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
         container.deleteAllChildren();
 
         var assets = db.getFolderAssets(folder.path);
@@ -400,12 +441,15 @@ class ProjectFrame extends ScriptWidget {
         image.rect = [0, 0, 12, 12];
         image.gravity = Atomic.UI_GRAVITY_RIGHT;
         blayout.addChild(image);
+        image["asset"] = asset;
 
         button.id = asset.guid;
         button.layoutParams = lp;
         button.fontDescription = fd;
         button.text = asset.name + asset.extension;
         button.skinBg = "TBButton.flat";
+        button["asset"] = asset;
+        blayout['assetButton'] = button;
         blayout.addChild(button);
 
         return blayout;

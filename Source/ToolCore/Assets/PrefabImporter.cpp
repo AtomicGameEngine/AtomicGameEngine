@@ -1,3 +1,10 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/XMLFile.h>
@@ -152,22 +159,23 @@ bool PrefabImporter::Import()
     return true;
 }
 
-bool PrefabImporter::LoadSettingsInternal()
+bool PrefabImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("PrefabImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("PrefabImporter");
 
     return true;
 }
 
-bool PrefabImporter::SaveSettingsInternal()
+bool PrefabImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("PrefabImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("PrefabImporter", import);
 
     return true;
 }

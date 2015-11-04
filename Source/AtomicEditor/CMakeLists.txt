@@ -1,26 +1,17 @@
-include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog)
-
+include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog )
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
-# Create the JSBind files ahead of time, so they are picked up with glob
-set (JSFILES JSPackageEditor.cpp;JSModuleEditor.cpp)
-
-foreach(JSFILE ${JSFILES})
-
-  set (JSFILEPATH "${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/${JSFILE}")
-
-  if (NOT EXISTS ${JSFILEPATH})
-    file(WRITE "${JSFILEPATH}" "// will be created by JSBind")
-  endif()
-
-endforeach()
-
-file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
+file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
+
+set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE} ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (APPLE)
 
@@ -31,7 +22,7 @@ if (APPLE)
 
     #ICNS
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
-    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.icns)
+    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 elseif(LINUX)
@@ -44,31 +35,23 @@ else()
     #set (EXE_TYPE WIN32)
     add_definitions(-DATOMIC_WIN32_CONSOLE)
 
-    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/CMake/Modules/Atomic.rc)
+    set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
 endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
 
-target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS AtomicNETJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
-    target_link_libraries(AtomicEditor curl)
 
-    # compile the editor scripts
-    add_custom_command (TARGET AtomicEditor POST_BUILD
-    COMMAND "${CMAKE_SOURCE_DIR}/Build/Mac/node/node" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicEditor)
+    target_link_libraries(AtomicEditor NETCore NETScript curl)
 
 elseif(LINUX)
-    target_link_libraries(AtomicEditor curl nativefiledialog ${GTK3_LIBRARIES})
-else()
-    target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
+    target_link_libraries(AtomicEditor NETCore NETScript curl nativefiledialog ${GTK3_LIBRARIES})
 
-    # compile the editor scripts
-    add_custom_command (TARGET AtomicEditor POST_BUILD
-    COMMAND "${CMAKE_SOURCE_DIR}/Build/Windows/node/node.exe" "${CMAKE_SOURCE_DIR}/Build/TypeScript/tsc.js"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Script/AtomicEditor)
+else()
+    target_link_libraries(AtomicEditor NETCore NETScript libcurl Iphlpapi Wldap32)
 
     # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
     add_custom_command (TARGET AtomicEditor POST_BUILD
@@ -80,8 +63,6 @@ endif()
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
-
-add_dependencies(AtomicEditor AtomicTool)
 
 GroupSources("Application")
 GroupSources("EditorMode")

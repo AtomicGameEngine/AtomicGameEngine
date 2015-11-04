@@ -41,11 +41,18 @@
 #ifdef ATOMIC_NETWORK
 #include "../Network/Network.h"
 #endif
+#ifdef ATOMIC_WEB
+#include "../Web/Web.h"
+#endif
+#ifdef ATOMIC_DATABASE
+#include "../Database/Database.h"
+#endif
 #ifdef ATOMIC_PHYSICS
 #include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Resource/XMLFile.h"
 #include "../Resource/ResourceCache.h"
+#include "../Resource/Localization.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
 #include "../UI/UI.h"
@@ -55,6 +62,7 @@
 #ifdef ATOMIC_3D
 #include "../Atomic3D/Atomic3D.h"
 #endif
+
 
 #if defined(EMSCRIPTEN) && defined(ATOMIC_TESTING)
 #include <emscripten.h>
@@ -121,8 +129,15 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(new Log(context_));
 #endif
     context_->RegisterSubsystem(new ResourceCache(context_));
+    context_->RegisterSubsystem(new Localization(context_));
 #ifdef ATOMIC_NETWORK
     context_->RegisterSubsystem(new Network(context_));
+#endif
+#ifdef ATOMIC_WEB
+    context_->RegisterSubsystem(new Web(context_));
+#endif
+#ifdef ATOMIC_DATABASE
+    context_->RegisterSubsystem(new Database(context_));
 #endif
     context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new Audio(context_));

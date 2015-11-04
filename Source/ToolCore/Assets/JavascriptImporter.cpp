@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
@@ -55,26 +61,26 @@ bool JavascriptImporter::Import()
     return true;
 }
 
-bool JavascriptImporter::LoadSettingsInternal()
+bool JavascriptImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("JavascriptImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("JavascriptImporter");
 
-    isComponentFile_ = import.GetBool("IsComponentFile");
+    isComponentFile_ = import.Get("IsComponentFile").GetBool();
 
     return true;
 }
 
-bool JavascriptImporter::SaveSettingsInternal()
+bool JavascriptImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("JavascriptImporter");
-
-    import.SetBool("IsComponentFile", isComponentFile_);
+    JSONValue import;
+    import.Set("IsComponentFile", JSONValue(isComponentFile_));
+    jsonRoot.Set("JavascriptImporter", import);
 
     return true;
 }

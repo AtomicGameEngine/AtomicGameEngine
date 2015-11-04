@@ -1,11 +1,17 @@
 {
 	"name" : "ToolCore",
 	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
-							 "Source/ToolCore/Import", "Source/ToolCore/Assets", "Source/ToolCore/License"],
-	"classes" : ["ToolEnvironment", "ToolSystem", "Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
-							 "PlatformWindows", "Command", "PlayCmd", "OpenAssetImporter",
+							 "Source/ToolCore/Import", "Source/ToolCore/Assets", "Source/ToolCore/License", "Source/ToolCore/Build",
+						 	 "Source/ToolCore/Subprocess"],
+	"classes" : ["ToolEnvironment", "ToolSystem", "ToolPrefs", "SubprocessSystem", "Subprocess",
+								"Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
+							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
-							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "LicenseSystem"],
+							 "PrefabImporter", "JavascriptImporter", "TextureImporter", "SpriterImporter", "PEXImporter", "NETAssemblyImporter",
+							 "LicenseSystem",
+						 	 "ProjectUserPrefs", "ProjectBuildSettings",
+						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS",
+						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "IOSBuildSettings"],
 	"typescript_decl" : {
 
 		"AssetDatabase" : [

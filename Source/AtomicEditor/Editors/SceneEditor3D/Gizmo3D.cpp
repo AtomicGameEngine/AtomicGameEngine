@@ -1,8 +1,11 @@
 // Portions Copyright (c) 2008-2015 the Urho3D project.
 
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Atomic3D/Model.h>
 #include <Atomic/Graphics/Material.h>
@@ -38,6 +41,11 @@ Gizmo3D::Gizmo3D(Context* context) : Object(context)
 
     editMode_ = EDIT_MOVE;
     lastEditMode_ = EDIT_SELECT;
+
+    gizmo_->SetMaterial(0, cache->GetResource<Material>("AtomicEditor/Materials/RedUnlit.xml"));
+    gizmo_->SetMaterial(1, cache->GetResource<Material>("AtomicEditor/Materials/GreenUnlit.xml"));
+    gizmo_->SetMaterial(2, cache->GetResource<Material>("AtomicEditor/Materials/BlueUnlit.xml"));
+
 }
 
 Gizmo3D::~Gizmo3D()
@@ -406,6 +414,11 @@ void Gizmo3D::Drag()
         //needGizmoUndo = true;
     }
 
+}
+
+void Gizmo3D::SetAxisMode(AxisMode mode)
+{
+    axisMode_ = mode;
 }
 
 void Gizmo3D::SetEditMode(EditMode mode)

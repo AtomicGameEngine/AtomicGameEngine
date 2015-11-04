@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/StringUtils.h>
@@ -46,22 +49,15 @@ void BuildSystem::QueueBuild(BuildBase* buildBase)
     queuedBuilds_.Push(SharedPtr<BuildBase>(buildBase));
 }
 
-void BuildSystem::BuildComplete(PlatformID platform, const String &buildFolder, bool success, bool fail3D)
+void BuildSystem::BuildComplete(PlatformID platform, const String &buildFolder, bool success, const String& buildMessage)
 {
     VariantMap eventData;
 
-    if (success)
-    {
-        eventData[BuildComplete::P_PLATFORMID] = (unsigned) platform;
-        SendEvent(E_BUILDCOMPLETE, eventData);
-        LOGINFOF("Build Success");
-    }
-    else
-    {
-        eventData[BuildFailed::P_PLATFORMID] = (unsigned) platform;
-        SendEvent(E_BUILDFAILED, eventData);
-        LOGINFOF("Build Failed");
-    }
+    eventData[BuildComplete::P_PLATFORMID] = (unsigned) platform;
+    eventData[BuildComplete::P_BUILDFOLDER] = buildFolder;
+    eventData[BuildComplete::P_SUCCESS] = success;
+    eventData[BuildComplete::P_MESSAGE] = buildMessage;
+    SendEvent(E_BUILDCOMPLETE, eventData);
 
     currentBuild_ = 0;
 }

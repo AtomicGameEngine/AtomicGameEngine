@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
@@ -33,22 +39,23 @@ bool SpriterImporter::Import()
     return true;
 }
 
-bool SpriterImporter::LoadSettingsInternal()
+bool SpriterImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("SpriterImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("SpriterImporter");
 
     return true;
 }
 
-bool SpriterImporter::SaveSettingsInternal()
+bool SpriterImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.CreateChild("SpriterImporter");
+    JSONValue import(JSONValue::emptyObject);
+    jsonRoot.Set("SpriterImporter", import);
 
     return true;
 }

@@ -1,9 +1,13 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Graphics/Camera.h>
 
@@ -81,6 +85,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
 
     SubscribeToEvent(E_GIZMOEDITMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
+    SubscribeToEvent(E_GIZMOAXISMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoAxisModeChanged));
 
     // FIXME: Set the size at the end of setup, so all children are updated accordingly
     // future size changes will be handled automatically
@@ -89,6 +94,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
+
+    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
 
 }
 
@@ -170,10 +177,24 @@ void SceneEditor3D::SetFocus()
 void SceneEditor3D::SelectNode(Node* node)
 {
     selectedNode_ = node;
+    if (!node)
+        gizmo3D_->Hide();
+    else
+        gizmo3D_->Show();
+
+
 }
 
+void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
+    if (node == selectedNode_)
+        SelectNode(0);
+}
+
+
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
-{    
+{
     Vector<Node*> editNodes;
     if (selectedNode_.NotNull())
         editNodes.Push(selectedNode_);
@@ -202,6 +223,13 @@ void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap&
     EditMode mode = (EditMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
     gizmo3D_->SetEditMode(mode);
 }
+
+void SceneEditor3D::HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData)
+{
+    AxisMode mode = (AxisMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
+    gizmo3D_->SetAxisMode(mode);
+}
+
 
 void SceneEditor3D::Close(bool navigateToAvailableResource)
 {

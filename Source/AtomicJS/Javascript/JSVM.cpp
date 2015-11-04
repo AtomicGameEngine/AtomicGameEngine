@@ -1,6 +1,24 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <Duktape/duktape.h>
 
@@ -39,14 +57,15 @@ JSVM::JSVM(Context* context) :
 
     metrics_ = new JSMetrics(context, this);
 
-    context_->RegisterSubsystem(new JSEventDispatcher(context_));
-    context_->SetGlobalEventListener(context_->GetSubsystem<JSEventDispatcher>());
+    SharedPtr<JSEventDispatcher> dispatcher(new JSEventDispatcher(context_));
+    context_->RegisterSubsystem(dispatcher);
+    context_->AddGlobalEventListener(dispatcher);
 
 }
 
 JSVM::~JSVM()
 {
-    context_->SetGlobalEventListener(0);
+    context_->RemoveGlobalEventListener(context_->GetSubsystem<JSEventDispatcher>());
     context_->RemoveSubsystem(JSEventDispatcher::GetTypeStatic());
 
     duk_destroy_heap(ctx_);
@@ -71,7 +90,7 @@ void JSVM::InitJSContext()
     duk_pop(ctx_);
 
     js_init_require(this);
-    js_init_jsplugin(this);    
+    js_init_jsplugin(this);
 
     ui_ = new JSUI(context_);
 
@@ -248,24 +267,51 @@ void JSVM::SendJSErrorEvent(const String& filename)
 }
 
 int JSVM::GetRealLineNumber(const String& fileName, const int lineNumber) {
+
     int realLineNumber = lineNumber;
-    String path = fileName;
-    if (!path.EndsWith(".js.map"))
-        path += ".js.map";
-    if (path.EndsWith(".js")) {
+
+    String mapPath = fileName;
+
+    if (!mapPath.EndsWith(".js.map"))
+        mapPath += ".js.map";
+
+    if (mapPath.EndsWith(".js")) {
         return realLineNumber;
     }
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    String path;
+    const Vector<String>& searchPaths = GetModuleSearchPaths();
+    for (unsigned i = 0; i < searchPaths.Size(); i++)
+    {
+        String checkPath = searchPaths[i] + mapPath;
+
+        if (cache->Exists(checkPath))
+        {
+            path = checkPath;
+            break;
+        }
+
+    }
+
+    if (!path.Length())
+        return realLineNumber;
+
+
     SharedPtr<File> mapFile(GetSubsystem<ResourceCache>()->GetFile(path));
+
     //if there's no source map file, maybe you use a pure js, so give an error, or maybe forgot to generate source-maps :(
-    if (mapFile.Null()) 
+    if (mapFile.Null())
     {
         return realLineNumber;
-    }    
+    }
+
     String map;
     mapFile->ReadText(map);
     int top = duk_get_top(ctx_);
     duk_get_global_string(ctx_, "require");
-    duk_push_string(ctx_, "AtomicEditor/Script/jsutils");
+    duk_push_string(ctx_, "AtomicEditor/JavaScript/Lib/jsutils");
     if (duk_pcall(ctx_, 1))
     {
         printf("Error: %s\n", duk_safe_to_string(ctx_, -1));

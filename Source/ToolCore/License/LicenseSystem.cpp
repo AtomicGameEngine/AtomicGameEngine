@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 // BEGIN LICENSE MANAGEMENT
 
@@ -106,7 +109,7 @@ void LicenseSystem::LicenseAgreementConfirmed()
 
 String LicenseSystem::GenerateMachineID()
 {
-#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_LINUX) 
+#if defined(ATOMIC_PLATFORM_OSX) || defined(ATOMIC_PLATFORM_LINUX)
     String path = getenv("HOME");
 #else
     wchar_t pathName[MAX_PATH];

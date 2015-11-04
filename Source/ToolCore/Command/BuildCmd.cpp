@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/Log.h>
@@ -48,12 +54,13 @@ bool BuildCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Strin
 
 void BuildCmd::HandleBuildComplete(StringHash eventType, VariantMap& eventData)
 {
-    Finished();
-}
+    if (!eventData[BuildComplete::P_SUCCESS].GetBool())
+    {
+        Error("Build Failed");
+    }
+    else
+        Finished();
 
-void BuildCmd::HandleBuildFailed(StringHash eventType, VariantMap& eventData)
-{
-    Error("Build Failed");
 }
 
 void BuildCmd::Run()
@@ -88,7 +95,6 @@ void BuildCmd::Run()
     buildSystem->QueueBuild(buildBase);
 
     SubscribeToEvent(E_BUILDCOMPLETE, HANDLER(BuildCmd, HandleBuildComplete));
-    SubscribeToEvent(E_BUILDFAILED, HANDLER(BuildCmd, HandleBuildFailed));
 
     // TODO: parallel/serial builds
     buildSystem->StartNextBuild();

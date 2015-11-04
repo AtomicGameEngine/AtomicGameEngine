@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -26,11 +29,13 @@ public:
 
     void SetBuildPath(const String& path) { buildPath_ = path; }
 
+    const String& GetBuildPath() const { return buildPath_; }
+
     void QueueBuild(BuildBase* buildBase);
 
     bool StartNextBuild();
 
-    void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, bool fail3D = false);
+    void BuildComplete(PlatformID platform, const String& buildFolder, bool success = true, const String& buildMessage = String::EMPTY);
 
 private:
 

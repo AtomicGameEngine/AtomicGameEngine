@@ -65,6 +65,13 @@
 				"module" : "2D"
 			},
 			{
+				"name": "Breakout",
+				"desc" : "2D Breakout game with touch controls",
+				"screenshot" : "Breakout.png",
+				"folder" : "Breakout",
+				"module" : "2D"
+			},
+			{
 				"name": "Render to Texture",
 				"desc" : "An example of a scene rendered onto a 3D object",
 				"screenshot" : "RenderToTexture.png",
@@ -93,18 +100,18 @@
 				"module" : "2D"
 			},
 			{
-				"name": "Basic 3D",
-				"desc" : "An example of a 3D object in a scene",
-				"screenshot" : "Basic3D.png",
-				"folder" : "Basic3D",
-				"module" : "3D"
-			},
-			{
 				"name": "Basic 2D",
 				"desc" : "An example of a 2D sprite in a scene",
 				"screenshot" : "Basic2D.png",
 				"folder" : "Basic2D",
 				"module" : "2D"
+			},
+			{
+				"name": "Basic 3D",
+				"desc" : "An example of a 3D object in a scene",
+				"screenshot" : "Basic3D.png",
+				"folder" : "Basic3D",
+				"module" : "3D"
 			},
 			{
 				"name": "Event Loop",

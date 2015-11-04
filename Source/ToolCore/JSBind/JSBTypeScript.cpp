@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Atomic.h>
 #include <Atomic/IO/Log.h>
@@ -32,7 +35,19 @@ String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
         scriptType = "string";
 
     if (ftype->type_->asEnumType())
-        scriptType = ftype->type_->asEnumType()->enum_->GetName();
+    {
+        JSBEnum* jenum = ftype->type_->asEnumType()->enum_;
+
+        scriptType = jenum->GetName();
+
+        if (jenum->GetPackage()->GetName() != package_->GetName())
+        {
+
+            scriptType =jenum->GetPackage()->GetName() + "." + scriptType;
+
+        }
+
+    }
 
     if (ftype->type_->asClassType())
     {
@@ -278,11 +293,17 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
         source_ += "\n   // enum " + _enum->GetName() + "\n";
         source_ += "   export type " + _enum->GetName() + " = number;\n";
 
-        Vector<String>& values = _enum->GetValues();
+        HashMap<String, String>& values = _enum->GetValues();
 
-        for (unsigned j = 0; j < values.Size(); j++)
+        HashMap<String, String>::ConstIterator itr = values.Begin();
+
+        while (itr != values.End())
         {
-            source_ += "   export var " + values[j] + ": " +  _enum->GetName() + ";\n";
+            String name = (*itr).first_;
+
+            source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
+
+            itr++;
         }
 
         source_ += "\n";

@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <TurboBadger/tb_tab_container.h>
 
@@ -120,6 +123,13 @@ void ResourceEditor::Close(bool navigateToAvailableResource)
     data["Editor"] = this;
     data["NavigateToAvailableResource"] = navigateToAvailableResource;
     SendEvent("EditorCloseResource", data);
+}
+
+void ResourceEditor::InvokeShortcut(const String& shortcut)
+{
+    TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
+    ev.ref_id = TBIDC(shortcut.CString());
+    OnEvent(ev);
 }
 
 }

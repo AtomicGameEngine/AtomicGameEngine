@@ -1,18 +1,25 @@
 definitions
 	menubutton		
 		lp: height: 28, width: 28
-		skin TBButton.flat
-TBLayout: distribution: gravity
+		skin TBButton.uniformflat
+TBLayout: distribution: gravity, spacing: 4
 	TBButton 
 		@include definitions>menubutton
 		TBSkinImage: skin: PlayButton
 		id maintoolbar_play
-	TBButton: skin: TBButton.flat
+	TBButton: toggle-mode: 1
+		@include definitions>menubutton
 		TBSkinImage: skin: 3DTranslateBitmap
 		id 3d_translate
-	TBButton: skin: TBButton.flat
+	TBButton: toggle-mode: 1
+		@include definitions>menubutton
 		TBSkinImage: skin: 3DRotateBitmap
 		id 3d_rotate
-	TBButton: skin: TBButton.flat
+	TBButton: toggle-mode: 1
+		@include definitions>menubutton
 		TBSkinImage: skin: 3DScaleBitmap
 		id 3d_scale
+	TBButton: toggle-mode: 1
+		lp: width: 64
+		text: "Local"
+		id 3d_axismode

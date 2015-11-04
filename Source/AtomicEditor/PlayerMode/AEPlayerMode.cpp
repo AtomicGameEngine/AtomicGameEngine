@@ -1,9 +1,19 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/IOEvents.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Graphics/GraphicsEvents.h>
+#include <Atomic/Graphics/Camera.h>
 #include <Atomic/UI/SystemUI/DebugHud.h>
+#include <Atomic/UI/SystemUI/SystemUIEvents.h>
+#include <Atomic/UI/UI.h>
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCWorker.h>
 
@@ -19,7 +29,8 @@ namespace AtomicEditor
 PlayerMode::PlayerMode(Context* context) :
     Object(context),
     brokerActive_(false),
-    launchedByEditor_(false)
+    launchedByEditor_(false),
+    licenseModule3D_(false)
 {
     fd_[0] = INVALID_IPCHANDLE_VALUE;
     fd_[1] = INVALID_IPCHANDLE_VALUE;
@@ -28,6 +39,10 @@ PlayerMode::PlayerMode(Context* context) :
 
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(PlayerMode, HandleLogMessage));
     SubscribeToEvent(E_JSERROR, HANDLER(PlayerMode, HandleJSError));
+
+    // BEGIN LICENSE MANAGEMENT
+    SubscribeToEvent(E_BEGINVIEWRENDER, HANDLER(PlayerMode, HandleViewRender));
+    // END LICENSE MANAGEMENT
 }
 
 PlayerMode::~PlayerMode()
@@ -45,6 +60,12 @@ void PlayerMode::HandleIPCInitialize(StringHash eventType, VariantMap& eventData
     {
         SendEvent(E_EXITREQUESTED);
     }
+
+    // BEGIN LICENSE MANAGEMENT
+
+    licenseModule3D_ = eventData["license3D"].GetBool();
+
+    // END LICENSE MANAGEMENT
 
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
     if (debugHud)
@@ -70,7 +91,7 @@ void PlayerMode::ProcessArguments() {
                 Vector<String> idc = argument.Split(argument.CString(), '=');
                 if (idc.Size() == 2)
 
-                id = ToInt(idc[1].CString());
+                    id = ToInt(idc[1].CString());
             }
 
             else if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
@@ -84,7 +105,7 @@ void PlayerMode::ProcessArguments() {
                     if (argument.StartsWith("--ipc-server="))
                     {
 #ifdef ATOMIC_PLATFORM_WINDOWS
-						// clientRead
+                        // clientRead
                         WString wipc(ipc[1]);
                         HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
                         fd_[0] = pipe;
@@ -96,7 +117,7 @@ void PlayerMode::ProcessArguments() {
                     else
                     {
 #ifdef ATOMIC_PLATFORM_WINDOWS
-						// clientWrite
+                        // clientWrite
                         WString wipc(ipc[1]);
                         HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
                         fd_[1] = pipe;
@@ -114,7 +135,7 @@ void PlayerMode::ProcessArguments() {
     }
 
     if (id > 0 && fd_[0] != INVALID_IPCHANDLE_VALUE && fd_[1] != INVALID_IPCHANDLE_VALUE)
-    {        
+    {
         launchedByEditor_ = true;
         SubscribeToEvent(E_IPCINITIALIZE, HANDLER(PlayerMode, HandleIPCInitialize));
         ipc_->InitWorker((unsigned) id, fd_[0], fd_[1]);
@@ -165,6 +186,48 @@ void PlayerMode::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         logEvent[IPCWorkerLog::P_MESSAGE] = eventData[P_MESSAGE].GetString();
         ipc_->SendEventToBroker(E_IPCWORKERLOG, logEvent);
     }
+
+}
+
+void PlayerMode::HandleMessageAck(StringHash eventType, VariantMap& eventData)
+{
+    messageBox_ = 0;
+    GetSubsystem<UI>()->RequestExit();
+}
+
+void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
+{
+// BEGIN LICENSE MANAGEMENT
+    static bool done = false;
+
+    if (licenseModule3D_)
+        return;
+
+    Camera* camera = static_cast<Camera*>(eventData[BeginViewRender::P_CAMERA].GetPtr());
+
+    if (!camera || camera->IsOrthographic())
+        return;
+
+    if (!done) {
+
+        done = true;
+
+        messageBox_ = GetSubsystem<UI>()->ShowSystemMessageBox("3D Module License Required", "A 3D Module License is required to display 3D content.\n\nUpgrade to Atomic Pro for all features and platforms.");
+        SubscribeToEvent(messageBox_, SystemUI::E_MESSAGEACK, HANDLER(PlayerMode, HandleMessageAck));
+
+        if (brokerActive_)
+        {
+
+            if (ipc_.Null())
+                return;
+
+            VariantMap msgEvent;
+            msgEvent[IPCMessage::P_MESSAGE] = String("3D Module License Required");
+            ipc_->SendEventToBroker(E_IPCMESSAGE, msgEvent);
+        }
+    }
+
+// END LICENSE MANAGEMENT
 
 }
 

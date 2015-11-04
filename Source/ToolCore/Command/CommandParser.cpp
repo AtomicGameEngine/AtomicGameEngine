@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include "CommandParser.h"
 
@@ -8,6 +14,7 @@
 #include "PlayCmd.h"
 #include "EditCmd.h"
 #include "BindCmd.h"
+#include "NETProjectGenCmd.h"
 
 namespace ToolCore
 {
@@ -60,6 +67,10 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             {
                 cmd = new BindCmd(context_);
             }
+            else if (argument == "net-projectgen")
+            {
+                cmd = new NETProjectGenCmd(context_);
+            }
 
         }
 
@@ -68,7 +79,6 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             if (cmd->Parse(arguments, i, errorMsg_))
                 return cmd;
 
-            cmd->ReleaseRef();
             break;
         }
 
@@ -78,4 +88,3 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
 }
 
 }
-

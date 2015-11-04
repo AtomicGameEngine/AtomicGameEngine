@@ -1,7 +1,15 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
 #include <Atomic/Core/Object.h>
+
+#include "ToolPrefs.h"
 
 using namespace Atomic;
 
@@ -32,6 +40,10 @@ public:
     void SetRootSourceDir(const String& sourceDir);
     void SetRootBuildDir(const String& buildDir, bool setBinaryPaths = false);
 
+    ToolPrefs* GetToolPrefs() { return toolPrefs_; }
+    void SaveToolPrefs() { toolPrefs_->Save(); }
+    void LoadToolPrefs() { toolPrefs_->Load(); }
+
     const String& GetRootSourceDir() { return rootSourceDir_; }
     const String& GetRootBuildDir() { return rootBuildDir_; }
 
@@ -45,12 +57,24 @@ public:
     const String& GetPlayerDataDir() { return resourcePlayerDataDir_; }
     const String& GetEditorDataDir() { return resourceEditorDataDir_; }
 
+    /// AtomicNET
+    const String& GetNETCoreCLRAbsPath() { return netCoreCLRAbsPath_; }
+    const String& GetNETAssemblyLoadPaths() { return netAssemblyLoadPaths_; }
+    const String& GetNETTPAPaths() { return netTPAPaths_; }
+    const String& GetAtomicNETEngineAssemblyPath() { return netAtomicNETEngineAssemblyPath_; }
+
     /// Data directories
     const String& GetDeploymentDataDir() { return toolBinary_; }
 
     const String& GetToolDataDir() { return toolDataDir_; }
 
     const String& GetDevConfigFilename();
+
+    // OSX
+    const String& GetPlayerAppFolder() { return playerAppFolder_; }
+
+    // iOS
+    String GetIOSDeployBinary();
 
     void Dump();
 
@@ -68,10 +92,19 @@ private:
     // path to Atomic player binary used when running content from the editor or cli
     String playerBinary_;
 
+    // path to Atomic player app (OSX)
+    String playerAppFolder_;
+
     // path to the AtomicTool command line binary
     String toolBinary_;
 
     String toolDataDir_;
+
+    // AtomicNET
+    String netCoreCLRAbsPath_;
+    String netAssemblyLoadPaths_;
+    String netTPAPaths_;
+    String netAtomicNETEngineAssemblyPath_;
 
     // resources
     String resourceCoreDataDir_;
@@ -95,6 +128,8 @@ private:
     String webBuildDir_;
 
     String devConfigFilename_;
+
+    SharedPtr<ToolPrefs> toolPrefs_;
 };
 
 }

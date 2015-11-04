@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -26,6 +29,9 @@ class JSBType
 {
 
 public:
+
+    // returns true if the types match
+    virtual bool Match (JSBType* other) = 0;
 
     virtual JSBPrimitiveType* asPrimitiveType() { return 0; }
     virtual JSBClassType* asClassType() { return 0; }
@@ -66,6 +72,21 @@ public:
 
     }
 
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        const JSBPrimitiveType* pother = other->asPrimitiveType();
+
+        if (!pother)
+            return false;
+
+        return (kind_ == pother->kind_ && isUnsigned_ == pother->isUnsigned_);
+
+        return true;
+    }
+
     String ToString()
     {
         switch (kind_)
@@ -80,6 +101,8 @@ public:
         case Short:
             return "short";
         case Int:
+            if (isUnsigned_)
+                return "unsigned";
             return "int";
         case Long:
             return "long";
@@ -107,6 +130,15 @@ public:
 
     String ToString() { return "String"; }
 
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        return other->asStringType() == 0 ? false : true;
+    }
+
+
 };
 
 class JSBStringHashType : public JSBType
@@ -117,6 +149,14 @@ public:
 
     String ToString() { return "StringHash"; }
 
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        return other->asStringHashType() == 0 ? false : true;
+    }
+
 };
 
 class JSBHeapPtrType : public JSBType
@@ -126,6 +166,14 @@ public:
     virtual JSBHeapPtrType* asHeapPtrType() { return this; }
 
     String ToString() { return "JS_HEAP_PTR"; }
+
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        return other->asHeapPtrType() == 0 ? false : true;
+    }
 
 };
 
@@ -142,6 +190,19 @@ public:
 
     String ToString() { return enum_->GetName(); }
 
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        JSBEnumType* pother = other->asEnumType();
+
+        if (!pother || pother->enum_ != enum_)
+            return false;
+
+        return true;
+    }
+
 };
 
 class JSBVectorType : public JSBType
@@ -156,6 +217,20 @@ public:
     virtual JSBVectorType* asVectorType() { return this; }
 
     String ToString() { return "Vector<" + vectorType_->ToString() + ">"; }
+
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        JSBVectorType* pother = other->asVectorType();
+
+        if (!pother || !vectorType_->Match(pother->vectorType_))
+            return false;
+
+        return true;
+    }
+
 };
 
 
@@ -177,6 +252,20 @@ public:
     {
         return class_->GetNativeName();
     }
+
+    virtual bool Match (JSBType* other)
+    {
+        if (!other)
+            return false;
+
+        JSBClassType* pother = other->asClassType();
+
+        if (!pother || class_ != pother->class_)
+            return false;
+
+        return true;
+    }
+
 
 };
 

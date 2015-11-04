@@ -35,8 +35,38 @@ class IndexBuffer;
 class VertexBuffer;
 
 /// One billboard in the billboard set.
-struct ATOMIC_API Billboard
+class ATOMIC_API Billboard : public RefCounted
 {
+    friend class BillboardSet;
+    friend class ParticleEmitter;
+    REFCOUNTED(Billboard);
+
+public:
+    Billboard();
+    virtual ~Billboard();
+
+    Vector3 GetPosition() { return position_; }
+    void SetPosition(Vector3 &position) { position_ = position; }
+
+    Vector3 GetSize() { return size_; }
+    void SetSize(Vector2 &size) { size_ = size; }
+
+    Rect GetUV() { return uv_; }
+    void SetUV(Rect &uv) { uv_ = uv; }
+
+    Color GetColor() { return color_; }
+    void SetColor(Color &color) { color_ = color; }
+
+    float GetRotation() { return rotation_; }
+    void SetRotation(float rotation) { rotation_ = rotation; }
+
+    bool IsEnabled() { return enabled_; }
+    void SetEnabled(bool enabled) { enabled_ = enabled; }
+
+    float GetSortDistance() { return sortDistance_; }
+    void SetSortDistance(float sortDistance) { sortDistance_ = sortDistance; }
+
+private:
     /// Position.
     Vector3 position_;
     /// Two-dimensional size.
@@ -101,7 +131,7 @@ public:
     unsigned GetNumBillboards() const { return billboards_.Size(); }
 
     /// Return all billboards.
-    PODVector<Billboard>& GetBillboards() { return billboards_; }
+    Vector<SharedPtr<Billboard>>& GetBillboards() { return billboards_; }
 
     /// Return billboard by index.
     Billboard* GetBillboard(unsigned index);
@@ -141,7 +171,7 @@ protected:
     void MarkPositionsDirty();
 
     /// Billboards.
-    PODVector<Billboard> billboards_;
+    Vector<SharedPtr<Billboard>> billboards_;
     /// Coordinate axes on which camera facing is done.
     Vector3 faceCameraAxes_;
     /// Animation LOD bias.

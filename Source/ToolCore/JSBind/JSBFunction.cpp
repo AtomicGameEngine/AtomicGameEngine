@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include "JSBFunction.h"
 
@@ -48,4 +54,47 @@ void JSBFunction::Process()
         class_->AddPropertyFunction(this);
 
 }
+
+bool JSBFunction::Match(JSBFunction* func)
+{
+    if (func->Skip() || func->GetName() != name_)
+        return false;
+
+    if (!returnType_)
+    {
+        if (func->GetReturnType())
+            return false;
+    }
+    else
+    {
+        if (!returnType_->Match(func->GetReturnType()))
+            return false;
+    }
+
+    Vector<JSBFunctionType*>& fparams = func->GetParameters();
+
+    if (parameters_.Size() != fparams.Size())
+        return false;
+
+    for ( unsigned j = 0; j < fparams.Size(); j++)
+    {
+        if (!parameters_[j]->Match(fparams[j]))
+            return false;
+    }
+
+    return true;
+}
+
+JSBClass* JSBFunction::GetReturnClass()
+{
+    if (!returnType_)
+        return 0;
+
+    if (!returnType_->type_->asClassType())
+        return 0;
+
+    return returnType_->type_->asClassType()->class_;
+
+}
+
 }

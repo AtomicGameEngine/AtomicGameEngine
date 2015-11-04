@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -12,10 +18,13 @@ class JSBModule;
 class JSBClass;
 class JSBEnum;
 
+class JSBPackageWriter;
+
 class JSBPackage : public Object
 {
 
-    friend class JSBPackageWriter;
+    friend class JSPackageWriter;
+    friend class CSPackageWriter;
 
     OBJECT(JSBPackage)
 
@@ -53,7 +62,7 @@ public:
 
     static bool ContainsConstantAllPackages(const String& constantName);
 
-    void GenerateSource(const String& outPath);
+    void GenerateSource(JSBPackageWriter& packageWriter);
 
 private:
 
@@ -71,8 +80,6 @@ private:
     PODVector<JSBClass*> allClasses_;
 
     static Vector<SharedPtr<JSBPackage> > allPackages_;
-
-    String source_;
 
 };
 

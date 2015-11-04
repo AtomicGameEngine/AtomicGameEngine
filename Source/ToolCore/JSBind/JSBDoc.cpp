@@ -1,9 +1,13 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Atomic.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -245,14 +249,21 @@ void JSBDoc::ExportModuleEnums(JSBModule* module)
 
         source_ += " var " + _enum->GetName() + " =  {\n";
 
-        Vector<String>& values = _enum->GetValues();
+        HashMap<String, String>& values = _enum->GetValues();
 
-        for (unsigned j = 0; j < values.Size(); j++)
+        HashMap<String, String>::ConstIterator itr = values.Begin();
+
+        while (itr != values.End())
         {
-            source_ += "    " + values[j] + " : undefined";
+            String name = (*itr).first_;
 
-            if (j !=  values.Size() - 1)
+            source_ += "    " + name + " : undefined";
+
+            itr++;
+
+            if (itr !=  values.End())
                 source_ += ",\n";
+
         }
 
         source_ += "\n\n};\n\n";
@@ -262,6 +273,13 @@ void JSBDoc::ExportModuleEnums(JSBModule* module)
 }
 void JSBDoc::WriteToFile(const String &path)
 {
+    FileSystem* fs = package_->GetSubsystem<FileSystem>();
+
+    String jsDocPath = GetPath(path);
+
+    if (!fs->DirExists(jsDocPath))
+        fs->CreateDir(jsDocPath);
+
     File file(package_->GetContext());
     file.Open(path, FILE_WRITE);
 

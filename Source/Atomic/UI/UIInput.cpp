@@ -1,3 +1,25 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
 #include <TurboBadger/tb_widgets.h>
 
 using namespace tb;
@@ -133,6 +155,62 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
     rootWidget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, delta > 0 ? -1 : 1, tb::TB_MODIFIER_NONE);
 
+}
+
+//Touch Input
+void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+{
+    if (inputDisabled_ || consoleVisible_)
+        return;
+
+    using namespace TouchBegin;
+    
+    int touchId = eventData[P_TOUCHID].GetInt();
+    int px = eventData[P_X].GetInt();
+    int py = eventData[P_Y].GetInt();
+    
+    static double last_time = 0;
+    static int counter = 1;
+
+    Time* t = GetSubsystem<Time>();
+
+    double time = t->GetElapsedTime() * 1000;
+    if (time < last_time + 600)
+        counter++;
+    else
+        counter = 1;
+
+    last_time = time;
+    
+    rootWidget_->InvokePointerDown(px, py, counter, TB_MODIFIER_NONE, true, touchId);
+}
+
+void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
+{
+    if (inputDisabled_ || consoleVisible_)
+        return;
+    
+    using namespace TouchMove;
+    
+    int touchId = eventData[P_TOUCHID].GetInt();
+    int px = eventData[P_X].GetInt();
+    int py = eventData[P_Y].GetInt();
+
+    rootWidget_->InvokePointerMove(px, py, TB_MODIFIER_NONE, true, touchId);
+}
+
+void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
+{
+    if (inputDisabled_ || consoleVisible_)
+        return;
+
+    using namespace TouchEnd;
+
+    int touchId = eventData[P_TOUCHID].GetInt();
+    int px = eventData[P_X].GetInt();
+    int py = eventData[P_Y].GetInt();
+
+    rootWidget_->InvokePointerUp(px, py, TB_MODIFIER_NONE, true, touchId);
 }
 
 static bool InvokeShortcut(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifierkeys, bool down)

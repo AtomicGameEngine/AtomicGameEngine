@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -13,6 +19,7 @@ namespace ToolCore
 
 class JSBPackage;
 class JSBFunction;
+class JSBFunctionType;
 class JSBType;
 
 // chosen function overrides
@@ -82,7 +89,8 @@ public:
 
 class JSBClass : public Object
 {
-    friend class JSBClassWriter;
+    friend class JSClassWriter;
+    friend class CSClassWriter;
 
     OBJECT(JSBClass)
 
@@ -114,6 +122,8 @@ public:
         return properties_[name];
     }
 
+    JSBFunction* MatchFunction(JSBFunction* function, bool includeBases = false);
+    bool MatchProperty(JSBProperty* property, bool includeBases = false);
 
     JSBHeader* GetHeader() { return header_; }
     JSBModule* GetModule() { return module_; }

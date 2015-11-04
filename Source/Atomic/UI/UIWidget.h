@@ -1,3 +1,24 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #pragma once
 
@@ -109,6 +130,20 @@ enum UI_TEXT_ALIGN
     UI_TEXT_ALIGN_CENTER = tb::TB_TEXT_ALIGN_CENTER
 };
 
+enum UI_WIDGET_STATE {
+
+    UI_WIDGET_STATE_NONE = tb::WIDGET_STATE_NONE,
+    UI_WIDGET_STATE_DISABLED = tb::WIDGET_STATE_DISABLED,
+    UI_WIDGET_STATE_FOCUSED = tb::WIDGET_STATE_FOCUSED,
+    UI_WIDGET_STATE_PRESSED = tb::WIDGET_STATE_PRESSED,
+    UI_WIDGET_STATE_SELECTED = tb::WIDGET_STATE_SELECTED,
+    UI_WIDGET_STATE_HOVERED = tb::WIDGET_STATE_HOVERED,
+
+    UI_WIDGET_STATE_ALL = tb::WIDGET_STATE_ALL
+
+};
+
+
 class UIView;
 class UILayoutParams;
 class UIFontDescription;
@@ -144,6 +179,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetLayoutParams(UILayoutParams* params);
     void SetFontDescription(UIFontDescription* fd);
 
+    void Remove();
     void RemoveChild(UIWidget* child, bool cleanup = true);
 
     void DeleteAllChildren();
@@ -155,7 +191,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetGravity(UI_GRAVITY gravity);
 
     void SetValue(double value);
-    double GetValue();
+    virtual double GetValue();
 
     void SetFocus();
     bool GetFocus();
@@ -165,14 +201,14 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetFocusRecursive();
     void OnFocusChanged(bool focused);
 
-    void SetState(/*WIDGET_STATE*/ unsigned state, bool on);
-    bool GetState(/*WIDGET_STATE*/ unsigned state);
+    void SetState(UI_WIDGET_STATE state, bool on);
+    bool GetState(UI_WIDGET_STATE state);
 
     void SetVisibility(UI_WIDGET_VISIBILITY visibility);
     UI_WIDGET_VISIBILITY GetVisibility();
 
-    void SetStateRaw(/*WIDGET_STATE*/ unsigned state);
-    /*WIDGET_STATE*/ unsigned GetStateRaw();
+    void SetStateRaw(UI_WIDGET_STATE state);
+   UI_WIDGET_STATE GetStateRaw();
 
     void Invalidate();
     void Die();
@@ -194,12 +230,28 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     virtual void AddChild(UIWidget* child);
 
+    void AddChildAfter(UIWidget* child, UIWidget* otherChild);
+    void AddChildBefore(UIWidget* child, UIWidget* otherChild);
+
     /// Add the child to this widget. See AddChild for adding a child to the top or bottom.
     /// This takes a relative Z and insert the child before or after the given reference widget.
     void AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* reference);
 
+    void InvalidateLayout();
 
     tb::TBWidget* GetInternalWidget() { return widget_; }
+
+    void SetDelegate(UIWidget* widget) { widget_->SetDelegate(widget); }
+
+    void SetMultiTouch(bool multiTouch) { multiTouch_ = multiTouch; }
+
+    bool IsMultiTouch() { return multiTouch_; }
+
+    void SetCapturing(bool capturing) { widget_->SetCapturing(capturing); }
+
+    bool GetCapturing() { return widget_->GetCapturing(); }
+
+    void InvokeShortcut(const String& shortcut);
 
 protected:
 
@@ -216,6 +268,9 @@ protected:
     SharedPtr<UIPreferredSize> preferredSize_;
 
     SharedPtr<UIDragObject> dragObject_;
+
+
+    bool multiTouch_;
 
 };
 

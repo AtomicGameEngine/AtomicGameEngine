@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/Engine/Engine.h>
@@ -14,7 +17,6 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
-#include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/License/LicenseEvents.h>
 #include <ToolCore/License/LicenseSystem.h>
@@ -24,11 +26,6 @@
 #include "AEEditorApp.h"
 
 using namespace ToolCore;
-
-namespace ToolCore
-{
-    extern void jsapi_init_toolcore(JSVM* vm);
-}
 
 namespace AtomicEditor
 {
@@ -47,7 +44,7 @@ void AEEditorApp::Start()
 
     context_->RegisterSubsystem(new EditorMode(context_));
 
-    vm_->SetModuleSearchPaths("AtomicEditor/out");
+    vm_->SetModuleSearchPaths("AtomicEditor/JavaScript;AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");
 
     // Do not create bone structure by default when in the editor
     // this can be toggled temporarily, for example to setup an animation preview
@@ -60,7 +57,6 @@ void AEEditorApp::Start()
     SubscribeToEvent(E_JSERROR, HANDLER(AEEditorApp, HandleJSError));
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(AEEditorApp, HandleExitRequested));
 
-    jsapi_init_toolcore(vm_);
     jsapi_init_editor(vm_);
 
     duk_get_global_string(vm_->GetJSContext(), "require");
@@ -71,7 +67,6 @@ void AEEditorApp::Start()
         ErrorExit("Error executing main.js");
     }
 
-
     GetSubsystem<LicenseSystem>()->Initialize();
 
 }
@@ -80,24 +75,9 @@ void AEEditorApp::Setup()
 {
     context_->SetEditorContext(true);
 
-    ToolEnvironment* env = new ToolEnvironment(context_);
-    context_->RegisterSubsystem(env);
+    AEEditorCommon::Setup();
 
-    ToolSystem* system = new ToolSystem(context_);
-    context_->RegisterSubsystem(system);
-
-#ifdef ATOMIC_DEV_BUILD
-
-    if (!env->InitFromJSON())
-    {
-        ErrorExit(ToString("Unable to initialize tool environment from %s", env->GetDevConfigFilename().CString()));
-        return;
-    }
-#else
-
-    env->InitFromPackage();
-
-#endif
+    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
 
     engineParameters_["WindowTitle"] = "AtomicEditor";
     engineParameters_["WindowResizable"] = true;
@@ -113,19 +93,20 @@ void AEEditorApp::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
     engineParameters_["ResourcePrefixPath"] = "";
-    String ScriptPath = env->GetRootSourceDir() + "Script";
-    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir() + ";" + ScriptPath;
+    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir();
+    // for dev builds, add the compile editor scripts from artifacts
+    resourcePaths += ";" + env->GetRootSourceDir() + "Artifacts/Build/Resources/EditorData/";
     engineParameters_["ResourcePaths"] = resourcePaths;
 #else
 
 #ifdef ATOMIC_PLATFORM_OSX
     engineParameters_["ResourcePrefixPath"] = "../Resources";
-    
+
 #else
 	engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
 #endif
 
-	engineParameters_["ResourcePaths"] = "CoreData;EditorData;Script";
+    engineParameters_["ResourcePaths"] = "CoreData;EditorData";
 
 #endif // ATOMIC_DEV_BUILD
 
@@ -139,6 +120,7 @@ void AEEditorApp::Stop()
 
 void AEEditorApp::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 {
+
 }
 
 void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
@@ -148,8 +130,8 @@ void AEEditorApp::HandleJSError(StringHash eventType, VariantMap& eventData)
     String errMessage = eventData[P_ERRORMESSAGE].GetString();
     String errFilename = eventData[P_ERRORFILENAME].GetString();
     //String errStack = eventData[P_ERRORSTACK].GetString();
-    int errLineNumber = vm_->GetRealLineNumber("AtomicEditor/out/" + errFilename, eventData[P_ERRORLINENUMBER].GetInt());
-    
+    int errLineNumber = vm_->GetRealLineNumber(errFilename, eventData[P_ERRORLINENUMBER].GetInt());
+
     String errorString = ToString("%s - %s - Line: %i", errFilename.CString(), errMessage.CString(), errLineNumber);
 
 

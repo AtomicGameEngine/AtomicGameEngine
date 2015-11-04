@@ -1,7 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
-
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -55,7 +57,23 @@ public:
         for (unsigned i = 0; i < penum->memberCount(); i++)
         {
             Symbol* symbol = penum->memberAt(i);
-            jenum->AddValue(getNameString(symbol->name()));
+
+            String name = getNameString(symbol->name());
+            String value = "";
+
+            Declaration* decl = symbol->asDeclaration();
+            if (decl)
+            {
+                EnumeratorDeclaration* enumDecl = decl->asEnumeratorDeclarator();
+                const StringLiteral* constantValue = enumDecl->constantValue();
+                if (constantValue)
+                {
+                    value = constantValue->chars();
+                }
+            }
+
+            jenum->AddValue(name);
+
         }
 
         jenum->Preprocess();

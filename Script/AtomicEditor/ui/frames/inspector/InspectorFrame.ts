@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import EditorEvents = require("editor/EditorEvents");
 import ScriptWidget = require("ui/ScriptWidget");
@@ -8,6 +14,8 @@ import DataBinding = require("./DataBinding");
 import MaterialInspector = require("./MaterialInspector");
 import ModelInspector = require("./ModelInspector");
 import NodeInspector = require("./NodeInspector");
+import AssemblyInspector = require("./AssemblyInspector");
+import PrefabInspector = require("./PrefabInspector");
 
 class InspectorFrame extends ScriptWidget {
 
@@ -90,7 +98,6 @@ class InspectorFrame extends ScriptWidget {
 
             inspector.inspect(asset);
 
-
         }
 
         if (asset.importerTypeName == "MaterialImporter") {
@@ -107,7 +114,23 @@ class InspectorFrame extends ScriptWidget {
             container.addChild(materialInspector);
 
             materialInspector.inspect(asset, material);
+        }
 
+        if (asset.importerTypeName == "NETAssemblyImporter") {
+
+            var assemblyInspector = new AssemblyInspector();
+            container.addChild(assemblyInspector);
+
+            assemblyInspector.inspect(asset);
+
+        }
+
+        if (asset.importerTypeName == "PrefabImporter") {
+
+            var prefabInspector = new PrefabInspector();
+            container.addChild(prefabInspector);
+            
+            prefabInspector.inspect(asset);
         }
 
     }

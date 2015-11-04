@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ namespace Atomic
 {
 
 JSComponentFile::JSComponentFile(Context* context) :
-    Resource(context),
+    ScriptComponentFile(context),
     scriptClass_(false)
 {
 }
@@ -50,43 +50,6 @@ void JSComponentFile::RegisterObject(Context* context)
     context->RegisterFactory<JSComponentFile>();
 }
 
-void JSComponentFile::GetDefaultFieldValue(const String& name, Variant& v)
-{
-    v = Variant::EMPTY;
-
-    VariantMap::ConstIterator itr = defaultFieldValues_.Find(name);
-
-    if (itr == defaultFieldValues_.End())
-    {
-        HashMap<String, VariantType>::ConstIterator citr = fields_.Find(name);
-        if (citr == fields_.End())
-            return;
-
-        switch (citr->second_)
-        {
-        case VAR_BOOL:
-            v = false;
-            break;
-        case VAR_STRING:
-            v = "";
-            break;
-        case VAR_FLOAT:
-            v = 0.0f;
-            break;
-        case VAR_VECTOR3:
-            v = Vector3::ZERO;
-            break;
-        default:
-            break;
-        }
-
-        return;
-
-    }
-
-    v = itr->second_;
-
-}
 
 bool JSComponentFile::PushModule()
 {
@@ -386,7 +349,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
                                         {
                                             duk_get_prop_index(ctx, -1, i);
                                             String enumName = duk_require_string(ctx, -1);
-                                            enums_[name].Push(EnumInfo(enumName, Variant(float(i))));
+                                            AddEnum(name, EnumInfo(enumName, Variant(float(i))));
                                             duk_pop(ctx);
                                         }
 
@@ -425,12 +388,14 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
 
                     if (defaultValue.GetType() != VAR_NONE)
                     {
-                        defaultFieldValues_[name] = defaultValue;
+                        AddDefaultValue(name, defaultValue);
 
                     }
 
                     if (variantType != VAR_NONE)
-                        fields_[name] = variantType;
+                    {
+                        AddField(name, variantType);
+                    }
 
                     duk_pop_2(ctx);  // pop key value
                 }

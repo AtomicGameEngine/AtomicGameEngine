@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
@@ -37,7 +43,7 @@ void ModelImporter::SetDefaults()
 {
     AssetImporter::SetDefaults();
 
-    scale_ = 1.0f;
+    scale_ = 1.0;
     importAnimations_ = false;
     animationInfo_.Clear();
 
@@ -298,33 +304,33 @@ void ModelImporter::SetAnimationCount(unsigned count)
 
 }
 
-bool ModelImporter::LoadSettingsInternal()
+bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::LoadSettingsInternal())
+    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import = jsonRoot_.GetChild("ModelImporter", JSON_OBJECT);
+    JSONValue import = jsonRoot.Get("ModelImporter");
 
     SetDefaults();
 
-    if (import.HasMember("scale"))
-        scale_ = import.GetFloat("scale");
+    if (import.Get("scale").IsNumber())
+        scale_ = import.Get("scale").GetDouble();
 
-    if (import.HasMember("importAnimations"))
-        importAnimations_ = import.GetBool("importAnimations");
+    if (import.Get("importAnimations").IsBool())
+        importAnimations_ = import.Get("importAnimations").GetBool();
 
-    if (import.HasMember("animInfo"))
+    if (import.Get("animInfo").IsArray())
     {
-        JSONValue animInfo = import.GetChild("animInfo");
-        for (unsigned i = 0; i < animInfo.GetSize(); i++)
+        JSONArray animInfo = import.Get("animInfo").GetArray();
+        for (unsigned i = 0; i < animInfo.Size(); i++)
         {
-            JSONValue anim = animInfo.GetChild(i);
+            JSONValue anim = animInfo[i];
 
             SharedPtr<AnimationImportInfo> info(new AnimationImportInfo(context_));
 
-            info->name_ = anim.GetString("name");
-            info->SetStartTime(anim.GetFloat("startTime"));
-            info->SetEndTime(anim.GetFloat("endTime"));
+            info->name_ = anim.Get("name").GetString();
+            info->SetStartTime(anim.Get("startTime").GetFloat());
+            info->SetEndTime(anim.Get("endTime").GetFloat());
 
             animationInfo_.Push(info);
 
@@ -334,26 +340,30 @@ bool ModelImporter::LoadSettingsInternal()
     return true;
 }
 
-bool ModelImporter::SaveSettingsInternal()
+bool ModelImporter::SaveSettingsInternal(JSONValue& jsonRoot)
 {
-    if (!AssetImporter::SaveSettingsInternal())
+    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue save = jsonRoot_.CreateChild("ModelImporter");
+    JSONValue save;
+    save.Set("scale", scale_);
+    save.Set("importAnimations", importAnimations_);
 
-    save.SetFloat("scale", scale_);
-    save.SetBool("importAnimations", importAnimations_);
-
-    JSONValue animInfo = save.CreateChild("animInfo", JSON_ARRAY);
+    JSONArray animInfo;
 
     for (unsigned i = 0; i < animationInfo_.Size(); i++)
     {
         const SharedPtr<AnimationImportInfo>& info = animationInfo_[i];
-        JSONValue jinfo = animInfo.CreateChild();
-        jinfo.SetString("name", info->GetName());
-        jinfo.SetFloat("startTime", info->GetStartTime());
-        jinfo.SetFloat("endTime", info->GetEndTime());
+        JSONValue jinfo;
+        jinfo.Set("name", info->GetName());
+        jinfo.Set("startTime", info->GetStartTime());
+        jinfo.Set("endTime", info->GetEndTime());
+        animInfo.Push(jinfo);
     }
+
+   save.Set("animInfo", animInfo);
+
+   jsonRoot.Set("ModelImporter", save);
 
     return true;
 }

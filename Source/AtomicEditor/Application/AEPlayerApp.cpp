@@ -1,23 +1,8 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
 #include <Atomic/Atomic.h>
@@ -36,6 +21,11 @@
 #include <Atomic/Environment/Environment.h>
 
 #include <AtomicJS/Javascript/Javascript.h>
+
+#ifdef ATOMIC_DOTNET
+#include <AtomicNET/NETCore/NETCore.h>
+#include <AtomicNET/NETScript/NETScript.h>
+#endif
 
 
 #include "../PlayerMode/AEPlayerMode.h"
@@ -58,12 +48,15 @@ namespace AtomicEditor
 {
 
 AEPlayerApplication::AEPlayerApplication(Context* context) :
-    AEEditorCommon(context)
+    AEEditorCommon(context),
+    debugPlayer_(false)
 {
 }
 
 void AEPlayerApplication::Setup()
 {
+    AEEditorCommon::Setup();
+
     FileSystem* filesystem = GetSubsystem<FileSystem>();
 
     engineParameters_["WindowTitle"] = "AtomicPlayer";
@@ -84,6 +77,8 @@ void AEPlayerApplication::Setup()
     engineParameters_["WindowWidth"] = 1280;
     engineParameters_["WindowHeight"] = 720;
 #endif
+
+    engineParameters_["LogLevel"] = LOG_DEBUG;
 
 #if ATOMIC_PLATFORM_WINDOWS
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
@@ -107,6 +102,10 @@ void AEPlayerApplication::Setup()
             {
                 SubscribeToEvent(E_LOGMESSAGE, HANDLER(AEPlayerApplication, HandleLogMessage));
             }
+            else if (argument == "--debug")
+            {
+                debugPlayer_ = true;
+            }
             else if (argument == "--project" && value.Length())
             {
                 engineParameters_["ResourcePrefixPath"] = "";
@@ -118,8 +117,8 @@ void AEPlayerApplication::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
 
-                String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%s/;%s/Resources;%s;%sCache",
-                         ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString(), value.CString());
+                String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%sResources;%s;%sCache",
+                         ATOMIC_ROOT_SOURCE_DIR, ATOMIC_ROOT_SOURCE_DIR, value.CString(), value.CString(), value.CString());
 
 #else
 
@@ -136,6 +135,12 @@ void AEPlayerApplication::Setup()
                 LOGINFOF("Adding ResourcePaths: %s", resourcePaths.CString());
 
                 engineParameters_["ResourcePaths"] = resourcePaths;
+
+#ifdef ATOMIC_DOTNET
+                NETCore* netCore = GetSubsystem<NETCore>();
+                String assemblyLoadPath = GetNativePath(ToString("%sResources/Assemblies/", value.CString()));
+                netCore->AddAssemblyLoadPath(assemblyLoadPath);
+#endif
 
             }
         }
@@ -161,11 +166,26 @@ void AEPlayerApplication::Start()
 
     SubscribeToEvent(E_JSERROR, HANDLER(AEPlayerApplication, HandleJSError));
 
+#ifdef ATOMIC_DOTNET
+        if (debugPlayer_)
+        {
+           GetSubsystem<NETCore>()->WaitForDebuggerConnect();
+        }
+#endif
+
     vm_->SetModuleSearchPaths("Modules");
 
     // Instantiate and register the Player subsystem
     context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
     AtomicPlayer::jsapi_init_atomicplayer(vm_);
+
+#ifdef ATOMIC_DOTNET
+    // Initialize Scripting Subsystem
+    NETScript* netScript = new NETScript(context_);
+    context_->RegisterSubsystem(netScript);
+    netScript->Initialize();
+    netScript->ExecMainAssembly();
+#endif
 
     if (!playerMode->launchedByEditor())
     {
@@ -175,8 +195,8 @@ void AEPlayerApplication::Start()
         {
             SendEvent(E_EXITREQUESTED);
         }
-
     }
+
     return;
 }
 

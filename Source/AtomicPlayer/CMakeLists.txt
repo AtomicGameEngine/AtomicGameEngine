@@ -4,4 +4,6 @@ include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
 
 file (GLOB SOURCE_FILES *.cpp *.h)
 
-add_library(AtomicPlayer ${SOURCE_FILES})
+add_library(AtomicPlayerLib ${SOURCE_FILES})
+
+add_subdirectory(Application)

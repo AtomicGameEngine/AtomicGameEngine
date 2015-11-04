@@ -1,3 +1,24 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <Atomic/IO/Log.h>
 
@@ -9,9 +30,9 @@
 
 namespace Atomic
 {
-    
+
     typedef bool(*atomic_plugin_validate_function)(int version, void *jsvmImports, size_t jsvmImportsSize);
- 
+
     static void jsplugin_bind_jsvmexports();
     static JSVMImports gJSVMExports;
 
@@ -26,7 +47,7 @@ namespace Atomic
 
         if (handle == NULL)
         {
-            errorMsg = ToString("Native Plugin: Unable to load %s with error %s", 
+            errorMsg = ToString("Native Plugin: Unable to load %s with error %s",
                 pluginLibrary.CString(),
                 SDL_GetError());
             return false;
@@ -88,8 +109,8 @@ namespace Atomic
         if (duk_pcall(ctx, 1) != DUK_EXEC_SUCCESS)
         {
             success = false;
-            LOGERRORF("Native Plugin: error calling atomic_plugin_init %s with error %s", 
-                pluginLibrary.CString(), 
+            LOGERRORF("Native Plugin: error calling atomic_plugin_init %s with error %s",
+                pluginLibrary.CString(),
                 duk_safe_to_string(ctx, -1));
         }
         else

@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Poco/MD5Engine.h>
 
@@ -22,7 +28,7 @@ namespace ToolCore
 AssetDatabase::AssetDatabase(Context* context) : Object(context)
 {
     SubscribeToEvent(E_PROJECTLOADED, HANDLER(AssetDatabase, HandleProjectLoaded));
-    SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));    
+    SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));
 }
 
 AssetDatabase::~AssetDatabase()
@@ -329,9 +335,9 @@ void AssetDatabase::Scan()
 
             JSONValue root = json->GetRoot();
 
-            assert(root.GetInt("version") == ASSET_VERSION);
+            assert(root.Get("version").GetInt() == ASSET_VERSION);
 
-            String guid = root.GetString("guid");
+            String guid = root.Get("guid").GetString();
 
             if (!GetAssetByGUID(guid))
             {
@@ -491,8 +497,13 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Texture2D"] = "TextureImporter";
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
-        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";
+        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
         resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
+
+#ifdef ATOMIC_DOTNET
+        resourceTypeToImporterType_["CSComponentAssembly"] = "NETAssemblyImporter";
+#endif
+
     }
 
     if (!resourceTypeToImporterType_.Contains(resourceTypeName))

@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Atomic.h>
 #include <Atomic/IO/Log.h>
@@ -141,7 +147,7 @@ namespace ToolCore
         //Add @:overload annotation
         if (IsOverride(function))
         {
-            //if (function->IsOverload()) 
+            //if (function->IsOverload())
             {
                 source_ += "    @:overload(function(";
                 Vector<JSBFunctionType*>& parameters = function->GetParameters();
@@ -173,7 +179,7 @@ namespace ToolCore
                     source_ += "): " + GetScriptType(function->GetReturnType()) + "{})\n";
             }
             source_ += "    override function ";
-        } 
+        }
         else
         {
             source_ += "    function ";
@@ -361,7 +367,7 @@ namespace ToolCore
 
     void JSBHaxe::ExportModuleConstants(JSBModule* module)
     {
-        HashMap<String, JSBPrimitiveType*>& constants = module->GetConstants();
+        HashMap<String, JSBModule::Constant>& constants = module->GetConstants();
 
         const Vector<String>& constantsName = constants.Keys();
 
@@ -374,7 +380,9 @@ namespace ToolCore
         {
             const String& cname = constantsName.At(i);
 
-            source_ += "    public static var " + cname + ": " + GetPrimitiveType(constants[cname]) + ";\n";
+            JSBModule::Constant& constant = constants[cname];
+
+            source_ += "    public static var " + cname + ": " + GetPrimitiveType(constant.type) + ";\n";
         }
 
         source_ += "\n";
@@ -392,11 +400,17 @@ namespace ToolCore
             source_ += "@:native(\"Atomic\")\n";
             source_ += "extern enum " + _enum->GetName() + " {\n";
 
-            Vector<String>& values = _enum->GetValues();
+            HashMap<String, String>& values = _enum->GetValues();
 
-            for (unsigned j = 0; j < values.Size(); j++)
+            HashMap<String, String>::ConstIterator itr = values.Begin();
+
+            while (itr != values.End())
             {
-                source_ += "    " + values[j] + ";\n";
+                String name = (*itr).first_;
+
+                source_ += "    " + name + ";\n";
+
+                itr++;
             }
 
             source_ += "}\n";

@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Core/Context.h>
 #include <Atomic/Core/StringUtils.h>
@@ -62,19 +68,18 @@ bool BindCmd::Parse(const Vector<String>& arguments, unsigned startIndex, String
 
 void BindCmd::Run()
 {
-    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
-
-    //bindPlatform_ = "MACOSX";
-    sourceRootFolder_ = env->GetRootSourceDir();
-    //packageFolder_ = "Source/AtomicJS/Packages/Atomic/";
-
     SharedPtr<JSBind> jsbind(new JSBind(context_));
 
     context_->RegisterSubsystem(jsbind);
 
-    LOGINFOF("Generating JS Bindings");
+    LOGINFOF("Loading Package");
+    jsbind->LoadPackage(sourceRootFolder_, packageFolder_, bindPlatform_);
 
-    jsbind->GenerateBindings(sourceRootFolder_, packageFolder_, bindPlatform_);
+    LOGINFOF("Generating JS Bindings");
+    jsbind->GenerateJavaScriptBindings();
+
+    LOGINFOF("Generating C# Bindings");
+    jsbind->GenerateCSharpBindings();
 
     Finished();
 

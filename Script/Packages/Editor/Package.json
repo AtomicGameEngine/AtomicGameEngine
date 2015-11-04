@@ -3,5 +3,6 @@
   "name" : "Editor",
   "namespace" : "AtomicEditor",
   "dependencies" : ["Script/Packages/Atomic"],
-  "modules" : ["Editor"]
+  "modules" : ["Editor"],
+  "platforms" : ["WINDOWS", "MACOSX", "LINUX"]
 }

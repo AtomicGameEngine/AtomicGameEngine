@@ -1,18 +1,24 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/FileSystem.h>
 
 #include "../ToolSystem.h"
+#include "../ToolEnvironment.h"
 #include "../Project/Project.h"
-#include "BuildMac.h"
+
+#include "BuildEvents.h"
 #include "BuildSystem.h"
+#include "BuildMac.h"
 
 namespace ToolCore
 {
 
-BuildMac::BuildMac(Context * context, Project *project) : BuildBase(context, project)
+BuildMac::BuildMac(Context * context, Project *project) : BuildBase(context, project, PLATFORMID_MAC)
 {
 
 }
@@ -37,6 +43,8 @@ void BuildMac::Initialize()
         AddResourceDir(defaultResourcePaths[i]);
     }
 
+    // TODO: smart filtering of cache
+    AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
     BuildResourceEntries();
@@ -45,9 +53,13 @@ void BuildMac::Initialize()
 
 void BuildMac::Build(const String& buildPath)
 {
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
+
+    VariantMap buildOutput;
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Mac Deployment</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
 
     Initialize();
 
@@ -57,9 +69,7 @@ void BuildMac::Build(const String& buildPath)
     if (fileSystem->DirExists(buildPath_))
         fileSystem->RemoveDir(buildPath_, true);
 
-    String dataPath = tsystem->GetDataPath();
-
-    String appSrcPath = dataPath + "Deployment/MacOS/AtomicPlayer.app";
+    String appSrcPath = tenv->GetPlayerAppFolder();
 
     fileSystem->CreateDir(buildPath_);
 
@@ -86,7 +96,10 @@ void BuildMac::Build(const String& buildPath)
     fileSystem->SystemRun("chmod", args);
 #endif
 
-    buildPath_ = buildPath + "/Mac-Build";    
+    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Mac Deployment Complete</color>\n\n";
+    SendEvent(E_BUILDOUTPUT, buildOutput);
+
+    buildPath_ = buildPath + "/Mac-Build";
     buildSystem->BuildComplete(PLATFORMID_MAC, buildPath_);
 
 }

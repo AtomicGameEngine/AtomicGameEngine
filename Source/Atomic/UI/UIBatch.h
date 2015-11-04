@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +45,7 @@ public:
     UIBatch();
     /// Construct.
     UIBatch(BlendMode blendMode, const IntRect& scissor, Texture* texture, PODVector<float>* vertexData);
-    
+
     /// Set new color for the batch. Overrides gradient.
     void SetColor(const Color& color, bool overrideAlpha = false);
     /// Restore UI element's default color.
@@ -57,10 +58,10 @@ public:
     void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, bool tiled);
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
-    
+
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
-    
+
     /// Blending mode.
     BlendMode blendMode_;
     /// Scissor rectangle.

@@ -1,3 +1,10 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
@@ -6,11 +13,7 @@
 #include "JSBind.h"
 #include "JSBModule.h"
 #include "JSBPackage.h"
-
 #include "JSBPackageWriter.h"
-#include "JSBDoc.h"
-#include "JSBTypeScript.h"
-#include "JSBHaxe.h"
 
 namespace ToolCore
 {
@@ -59,33 +62,10 @@ void JSBPackage::ProcessModules()
 
 }
 
-void JSBPackage::GenerateSource(const String &outPath)
+void JSBPackage::GenerateSource(JSBPackageWriter& packageWriter)
 {
-    JSBPackageWriter writer(this);
-    writer.GenerateSource(source_);
-
-    String filepath = outPath + "/JSPackage" + name_ + ".cpp";
-
-    File file(context_);
-    file.Open(filepath, FILE_WRITE);
-    file.Write(source_.CString(), source_.Length());
-    file.Close();
-
-    for (unsigned i = 0; i < modules_.Size(); i++)
-    {
-        modules_[i]->GenerateSource(outPath);
-    }
-
-    JSBind* jsbind = GetSubsystem<JSBind>();
-
-    JSBDoc jdoc;
-    jdoc.Emit(this, jsbind->GetSourceRootFolder() + "Bin/" + name_ + ".js");
-
-    JSBTypeScript ts;
-    ts.Emit(this, jsbind->GetSourceRootFolder() + "Script/TypeScript/" + name_ + ".d.ts");
-
-    JSBHaxe hx;
-    hx.Emit(this, jsbind->GetSourceRootFolder() + "Script/Haxe/" + name_ + ".hx");
+    packageWriter.GenerateSource();
+    packageWriter.PostProcess();
 }
 
 JSBClass* JSBPackage::GetClass(const String& name)
@@ -184,13 +164,13 @@ bool JSBPackage::Load(const String& packageFolder)
     JSONValue root = packageJSON->GetRoot();
 
     // first load dependencies
-    JSONValue deps = root.GetChild("dependencies");
+    JSONValue deps = root.Get("dependencies");
 
     if (deps.IsArray())
     {
-        for (unsigned i = 0; i < deps.GetSize(); i++)
+        for (unsigned i = 0; i < deps.GetArray().Size(); i++)
         {
-            String dpackageFolder = AddTrailingSlash(deps.GetString(i));
+            String dpackageFolder = AddTrailingSlash(deps.GetArray()[i].GetString());
 
             SharedPtr<JSBPackage> depPackage (new JSBPackage(context_));
 
@@ -204,11 +184,11 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
-    JSONValue jmodulesExclude = root.GetChild("moduleExclude");
+    JSONValue jmodulesExclude = root.Get("moduleExclude");
 
     if (jmodulesExclude.IsObject())
     {
-        Vector<String> platforms = jmodulesExclude.GetChildNames();
+        Vector<String> platforms = jmodulesExclude.GetObject().Keys();
 
         for (unsigned i = 0; i < platforms.Size(); i++)
         {
@@ -219,14 +199,14 @@ bool JSBPackage::Load(const String& packageFolder)
                 moduleExcludes_[platform] = Vector<String>();
             }
 
-            JSONValue mods = jmodulesExclude.GetChild(platform);
+            JSONValue mods = jmodulesExclude.Get(platform);
 
             if (mods.IsArray())
             {
 
-                for (unsigned j = 0; j < mods.GetSize(); j++)
+                for (unsigned j = 0; j < mods.GetArray().Size(); j++)
                 {
-                    moduleExcludes_[platform].Push(mods.GetString(j));
+                    moduleExcludes_[platform].Push(mods.GetArray()[j].GetString());
                 }
 
             }
@@ -235,14 +215,26 @@ bool JSBPackage::Load(const String& packageFolder)
 
     }
 
-    name_ = root.GetString("name");
-    namespace_ = root.GetString("namespace");
-
-    JSONValue modules = root.GetChild("modules");
-
-    for (unsigned i = 0; i < modules.GetSize(); i++)
+    JSONValue dnmodules = root.Get("dotnetModules");
+    Vector<String> dotNetModules;
+    if (dnmodules.IsArray())
     {
-        String moduleName = modules.GetString(i);
+        for (unsigned i = 0; i < dnmodules.GetArray().Size(); i++)
+        {
+            String moduleName = dnmodules.GetArray()[i].GetString();
+            dotNetModules.Push(moduleName);
+        }
+    }
+
+
+    name_ = root.Get("name").GetString();
+    namespace_ = root.Get("namespace").GetString();
+
+    JSONValue modules = root.Get("modules");
+
+    for (unsigned i = 0; i < modules.GetArray().Size(); i++)
+    {
+        String moduleName = modules.GetArray()[i].GetString();
 
         if (moduleExcludes_.Contains(jsbind->GetPlatform()))
         {
@@ -256,6 +248,11 @@ bool JSBPackage::Load(const String& packageFolder)
         {
             LOGERRORF("Unable to load module json: %s", (packageFolder + moduleName + ".json").CString());
             return false;
+        }
+
+        if (dotNetModules.Contains(moduleName))
+        {
+            module->SetDotNetModule(true);
         }
 
         modules_.Push(module);

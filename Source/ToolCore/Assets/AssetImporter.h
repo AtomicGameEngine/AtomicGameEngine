@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -42,17 +48,19 @@ public:
     /// Instantiate a node from the asset
     virtual Node* InstantiateNode(Node* parent, const String& name) { return 0; }
 
+    virtual bool Rename(const String& newName);
+    virtual bool Move(const String& newPath);
+
 protected:
 
     virtual bool Import() { return true; }
 
     WeakPtr<Asset> asset_;
-    JSONValue jsonRoot_;   
     bool requiresCacheFile_;
 
 
-    virtual bool LoadSettingsInternal();
-    virtual bool SaveSettingsInternal();
+    virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
+    virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
 };
 

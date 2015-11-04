@@ -1,8 +1,15 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import ScriptWidget = require("ui/ScriptWidget");
 import DataBinding = require("./DataBinding");
 import InspectorUtils = require("./InspectorUtils");
 import EditorUI = require("ui/EditorUI");
+import CSComponentClassSelector = require("./CSComponentClassSelector");
 
 class ComponentInspector extends Atomic.UISection {
 
@@ -33,6 +40,57 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
+    addAttr(attr: Atomic.AttributeInfo, before: Atomic.UIWidget = null, after: Atomic.UIWidget = null): Atomic.UILayout {
+
+        if (attr.mode & Atomic.AM_NOEDIT)
+            return null;
+
+        var binding = DataBinding.createBinding(this.component, attr);
+
+        if (!binding)
+            return null;
+
+        var attrLayout = new Atomic.UILayout();
+
+        attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        var name = new Atomic.UITextField();
+        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+        name.skinBg = "InspectorTextAttrName";
+        name.layoutParams = this.atlp;
+
+        if (attr.type == Atomic.VAR_VECTOR3 || attr.type == Atomic.VAR_COLOR ||
+            attr.type == Atomic.VAR_QUATERNION) {
+            attrLayout.axis = Atomic.UI_AXIS_Y;
+            attrLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+            attrLayout.skinBg = "InspectorVectorAttrLayout";
+        }
+
+        var bname = attr.name;
+
+        if (bname == "Is Enabled")
+            bname = "Enabled";
+
+        name.text = bname;
+        name.fontDescription = this.fd;
+
+        attrLayout.addChild(name);
+
+        attrLayout.addChild(binding.widget);
+
+        if (before)
+            this.attrsVerticalLayout.addChildBefore(attrLayout, before);
+        else if (after)
+            this.attrsVerticalLayout.addChildAfter(attrLayout, after);
+        else
+            this.attrsVerticalLayout.addChild(attrLayout);
+
+
+        this.bindings.push(binding);
+
+        return attrLayout;
+    }
+
     inspect(component: Atomic.Component) {
 
         this.component = component;
@@ -41,31 +99,41 @@ class ComponentInspector extends Atomic.UISection {
         // For JSComponents append the filename
         if (component.typeName == "JSComponent") {
 
-            var jsc = <Atomic.JSComponent> component;
+            var jsc = <Atomic.JSComponent>component;
 
             if (jsc.componentFile) {
-              var pathInfo = Atomic.splitPath( jsc.componentFile.name);
-              this.text = "JS - " + pathInfo.fileName;
+                var pathInfo = Atomic.splitPath(jsc.componentFile.name);
+                this.text = "JS - " + pathInfo.fileName;
             }
 
+        }
+
+        // For CSComponents append the classname
+        if (component.typeName == "CSComponent") {
+
+            var csc = <AtomicNET.CSComponent>component;
+
+            if (csc.componentClassName) {
+                this.text = "CS - " + csc.componentClassName;
+            }
         }
 
         // don't expand by default
         this.value = 0;
 
-        var fd = new Atomic.UIFontDescription();
+        var fd = this.fd = new Atomic.UIFontDescription();
         fd.id = "Vera";
         fd.size = 11;
 
-        var nlp = new Atomic.UILayoutParams();
+        var nlp = this.nlp = new Atomic.UILayoutParams();
         nlp.width = 304;
 
         // atttribute name layout param
-        var atlp = new Atomic.UILayoutParams();
+        var atlp = this.atlp = new Atomic.UILayoutParams();
         atlp.width = 100;
 
 
-        var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
+        var attrsVerticalLayout = this.attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
         attrsVerticalLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
         attrsVerticalLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
@@ -75,49 +143,7 @@ class ComponentInspector extends Atomic.UISection {
         var attrs = component.getAttributes();
 
         for (var i in attrs) {
-
-            var attr = <Atomic.AttributeInfo> attrs[i];
-
-            if (attr.mode & Atomic.AM_NOEDIT)
-                continue;
-
-            var binding = DataBinding.createBinding(component, attr);
-
-            if (!binding)
-                continue;
-
-            var attrLayout = new Atomic.UILayout();
-
-            attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-
-            var name = new Atomic.UITextField();
-            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-            name.skinBg = "InspectorTextAttrName";
-            name.layoutParams = atlp;
-
-            if (attr.type == Atomic.VAR_VECTOR3 || attr.type == Atomic.VAR_COLOR ||
-                attr.type == Atomic.VAR_QUATERNION) {
-                attrLayout.axis = Atomic.UI_AXIS_Y;
-                attrLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-                attrLayout.skinBg = "InspectorVectorAttrLayout";
-            }
-
-            var bname = attr.name;
-
-            if (bname == "Is Enabled")
-                bname = "Enabled";
-
-            name.text = bname;
-            name.fontDescription = fd;
-
-            attrLayout.addChild(name);
-
-            attrLayout.addChild(binding.widget);
-
-            attrsVerticalLayout.addChild(attrLayout);
-
-            this.bindings.push(binding);
-
+            this.addAttr(attrs[i]);
         }
 
         // custom component UI
@@ -139,6 +165,27 @@ class ComponentInspector extends Atomic.UISection {
             this.value = 1;
         }
 
+        if (component.typeName == "CSComponent") {
+            // auto expand CSComponents
+            this.value = 1;
+            this.addCSComponentUI(attrsVerticalLayout);
+
+            var csc = <AtomicNET.CSComponent>this.component;
+            var currentClassName = csc.componentClassName;
+
+            this.subscribeToEvent(component, "CSComponentClassChanged", (ev: AtomicNET.CSComponentClassChangedEvent) => {
+
+                if (currentClassName != ev.classname) {
+                    //console.log("CSComponent Class Name Changed ", currentClassName, " ", ev.classname);
+                    this.text = "CS - " + ev.classname;
+                    currentClassName = ev.classname;
+                    this.updateDataBindings();
+                }
+
+            });
+        }
+
+
         if (component.typeName == "TileMap2D") {
             this.addTilemap2DUI(attrsVerticalLayout);
         }
@@ -153,7 +200,7 @@ class ComponentInspector extends Atomic.UISection {
         }
 
 
-        var deleteButton = new Atomic.UIButton();
+        var deleteButton = this.deleteButton = new Atomic.UIButton();
         deleteButton.text = "Delete Component";
         deleteButton.fontDescription = fd;
 
@@ -178,6 +225,74 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
+    updateDataBindings() {
+
+        var newBindings: Array<DataBinding> = new Array();
+        var foundAttr: Array<Atomic.AttributeInfo> = new Array();
+
+        var attrs = this.component.getAttributes();
+
+        // run through current attr bindings looking for ones to preserve
+        for (var i in this.bindings) {
+
+            var binding = this.bindings[i];
+
+            for (var j in attrs) {
+
+                var attr = <Atomic.AttributeInfo>attrs[j];
+
+                if (attr.name == binding.attrInfo.name && attr.type == binding.attrInfo.type) {
+
+                    newBindings.push(binding);
+                    foundAttr.push(attr);
+                    break;
+
+                }
+
+            }
+
+        }
+
+        // remove bindings that no longer exist
+        for (var i in this.bindings) {
+
+            var binding = this.bindings[i];
+
+            if (newBindings.indexOf(binding) == -1) {
+
+                binding.widget.parent.remove();
+
+            }
+
+        }
+
+        // set new bindings, additional bindings may be added below
+        this.bindings = newBindings;
+
+        // add new attr
+        var curAttrLayout:Atomic.UILayout = null;
+        for (var i in attrs) {
+
+            var attr = attrs[i];
+
+            if (foundAttr.indexOf(attr) == -1) {
+
+                if (!curAttrLayout)
+                  curAttrLayout = this.addAttr(attr, this.deleteButton);
+                else
+                  curAttrLayout = this.addAttr(attr, null, curAttrLayout);
+
+            }
+
+        }
+
+        for (var i in this.bindings) {
+            this.bindings[i].setWidgetValueFromObject();
+            this.bindings[i].objectLocked = false;
+        }
+
+    }
+
     // Move these to a mixing class
 
     addPrefabUI(layout: Atomic.UILayout) {
@@ -190,7 +305,7 @@ class ComponentInspector extends Atomic.UISection {
 
         if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-            var asset = <ToolCore.Asset> dragObject.object;
+            var asset = <ToolCore.Asset>dragObject.object;
 
             if (asset.importerTypeName == importerTypeName) {
                 return asset.importer;
@@ -214,7 +329,7 @@ class ComponentInspector extends Atomic.UISection {
 
             EditorUI.getModelOps().showResourceSelection("Select Material", "MaterialImporter", function(asset: ToolCore.Asset) {
 
-                staticModel.setMaterialIndex(index, <Atomic.Material> Atomic.cache.getResource("Material", asset.path));
+                staticModel.setMaterialIndex(index, <Atomic.Material>Atomic.cache.getResource("Material", asset.path));
 
                 if (staticModel.getMaterial())
                     materialField.text = staticModel.getMaterial().name;
@@ -242,10 +357,10 @@ class ComponentInspector extends Atomic.UISection {
 
                 if (importer) {
 
-                    var materialImporter = <ToolCore.MaterialImporter> importer;
+                    var materialImporter = <ToolCore.MaterialImporter>importer;
                     var asset = materialImporter.asset;
 
-                    var material = <Atomic.Material> Atomic.cache.getResource("Material", asset.path);
+                    var material = <Atomic.Material>Atomic.cache.getResource("Material", asset.path);
 
                     if (material) {
 
@@ -263,7 +378,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addModelUI(layout: Atomic.UILayout, typeName: string) {
 
-        var staticModel = <Atomic.StaticModel> this.component;
+        var staticModel = <Atomic.StaticModel>this.component;
 
         var numGeometries = staticModel.numGeometries;
         if (typeName == "Skybox") {
@@ -282,7 +397,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addSpriteUI(layout: Atomic.UILayout, typeName: string) {
 
-        var spriteComponent = <Atomic.StaticSprite2D> this.component;
+        var spriteComponent = <Atomic.StaticSprite2D>this.component;
 
         var o = InspectorUtils.createAttrEditFieldWithSelectButton("Sprite", layout);
         var field = o.editField;
@@ -296,7 +411,7 @@ class ComponentInspector extends Atomic.UISection {
             // this should allow selecting of sprite sheets as well
             EditorUI.getModelOps().showResourceSelection("Select Sprite", "TextureImporter", function(asset: ToolCore.Asset) {
 
-                spriteComponent.sprite = <Atomic.Sprite2D> Atomic.cache.getResource("Sprite2D", asset.path);
+                spriteComponent.sprite = <Atomic.Sprite2D>Atomic.cache.getResource("Sprite2D", asset.path);
                 if (spriteComponent.sprite)
                     field.text = spriteComponent.sprite.name;
 
@@ -313,9 +428,9 @@ class ComponentInspector extends Atomic.UISection {
 
                 if (importer) {
 
-                  spriteComponent.sprite = <Atomic.Sprite2D> Atomic.cache.getResource("Sprite2D", importer.asset.path);
-                  if (spriteComponent.sprite)
-                      field.text = spriteComponent.sprite.name;
+                    spriteComponent.sprite = <Atomic.Sprite2D>Atomic.cache.getResource("Sprite2D", importer.asset.path);
+                    if (spriteComponent.sprite)
+                        field.text = spriteComponent.sprite.name;
 
                 }
             }
@@ -327,7 +442,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addTilemap2DUI(layout: Atomic.UILayout) {
 
-        var tilemap = <Atomic.TileMap2D> this.component;
+        var tilemap = <Atomic.TileMap2D>this.component;
 
         var o = InspectorUtils.createAttrEditFieldWithSelectButton("TMX File", layout);
         var field = o.editField;
@@ -341,7 +456,7 @@ class ComponentInspector extends Atomic.UISection {
             // this should allow selecting of sprite sheets as well
             EditorUI.getModelOps().showResourceSelection("Select TMX File", "TMXImporter", function(asset: ToolCore.Asset) {
 
-                tilemap.tmxFile = <Atomic.TmxFile2D> Atomic.cache.getResource("TmxFile2D", asset.path);
+                tilemap.tmxFile = <Atomic.TmxFile2D>Atomic.cache.getResource("TmxFile2D", asset.path);
                 if (tilemap.tmxFile)
                     field.text = tilemap.tmxFile.name;
             });
@@ -357,9 +472,9 @@ class ComponentInspector extends Atomic.UISection {
 
                 if (importer) {
 
-                  tilemap.tmxFile = <Atomic.TmxFile2D> Atomic.cache.getResource("TmxFile2D", importer.asset.path);
-                  if (tilemap.tmxFile)
-                      field.text = tilemap.tmxFile.name;
+                    tilemap.tmxFile = <Atomic.TmxFile2D>Atomic.cache.getResource("TmxFile2D", importer.asset.path);
+                    if (tilemap.tmxFile)
+                        field.text = tilemap.tmxFile.name;
 
                 }
             }
@@ -370,7 +485,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addLightCascadeParametersUI(layout: Atomic.UILayout) {
 
-        var light = <Atomic.Light> this.component;
+        var light = <Atomic.Light>this.component;
 
         var cascadeInfo = light.getShadowCascade();
 
@@ -422,7 +537,7 @@ class ComponentInspector extends Atomic.UISection {
 
     addCollisionShapeUI(layout: Atomic.UILayout) {
 
-        var shape = <Atomic.CollisionShape> this.component;
+        var shape = <Atomic.CollisionShape>this.component;
 
         var button = new Atomic.UIButton();
         button.fontDescription = InspectorUtils.attrFontDesc;
@@ -431,7 +546,7 @@ class ComponentInspector extends Atomic.UISection {
 
         button.onClick = () => {
 
-            var model = <Atomic.Drawable> shape.node.getComponent("StaticModel");
+            var model = <Atomic.Drawable>shape.node.getComponent("StaticModel");
             if (model) {
                 var box = model.boundingBox;
                 shape.setBox([box[3] - box[0], box[4] - box[1], box[5] - box[2]]);
@@ -443,9 +558,48 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
+    addCSComponentUI(layout: Atomic.UILayout) {
+
+        for (var i in this.bindings) {
+
+            var binding = this.bindings[i];
+
+            // replace the Class widget with a editfield + select button
+            if (binding.attrInfo.name == "Class") {
+
+                var parent = binding.widget.parent;
+                var text = binding.widget.text;
+                binding.widget.parent.removeChild(binding.widget);
+                var o = InspectorUtils.createAttrEditFieldWithSelectButton("", parent);
+                o.editField.text = text;
+                binding.widget = o.editField;
+
+                o.selectButton.onClick = () => {
+
+                    var cscomponent = <AtomicNET.CSComponent>this.component;
+                    if (cscomponent.assemblyFile) {
+                        var selector = new CSComponentClassSelector(o.editField, cscomponent);
+                    }
+                }
+
+                break;
+            }
+        }
+    }
 
     component: Atomic.Component;
     bindings: Array<DataBinding> = new Array();
+
+    fd: Atomic.UIFontDescription;
+
+    nlp: Atomic.UILayoutParams;
+
+    // atttribute name layout param
+    atlp: Atomic.UILayoutParams;
+
+    attrsVerticalLayout: Atomic.UILayout;
+
+    deleteButton: Atomic.UIButton;
 
 
 }

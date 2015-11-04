@@ -1,3 +1,10 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Resource/JSONFile.h>
@@ -20,6 +27,11 @@ JSBEnum::~JSBEnum()
 
 }
 
+JSBPackage* JSBEnum::GetPackage()
+{
+    return module_->GetPackage();
+}
+
 void JSBEnum::Preprocess()
 {
     // TextureUnit is a special case as uses preprocessor for values depending on
@@ -31,13 +43,13 @@ void JSBEnum::Preprocess()
     {
         values_.Clear();
 
-        values_.Push("TU_DIFFUSE");
-        values_.Push("TU_ALBEDOBUFFER");
-        values_.Push("TU_NORMAL");
-        values_.Push("TU_NORMALBUFFER");
-        values_.Push("TU_SPECULAR");
-        values_.Push("TU_EMISSIVE");
-        values_.Push("TU_ENVIRONMENT");
+        values_["TU_DIFFUSE"] = "0";
+        values_["TU_ALBEDOBUFFER"] = "0";
+        values_["TU_NORMAL"] = "1";
+        values_["TU_NORMALBUFFER"] = "1";
+        values_["TU_SPECULAR"] = "2";
+        values_["TU_EMISSIVE"] = "3";
+        values_["TU_ENVIRONMENT"] = "4";
 
         String platform = jsbind->GetPlatform();
 
@@ -45,27 +57,28 @@ void JSBEnum::Preprocess()
 
         if (mobile)
         {
-            values_.Push("TU_LIGHTRAMP");
-            values_.Push("TU_LIGHTSHAPE");
-            values_.Push("TU_SHADOWMAP");
-            values_.Push("MAX_MATERIAL_TEXTURE_UNITS");
-            values_.Push("MAX_TEXTURE_UNITS");
+            values_["TU_LIGHTRAMP"] = "5";
+            values_["TU_LIGHTSHAPE"] = "6";
+            values_["TU_SHADOWMAP"] = "7";
+            values_["MAX_MATERIAL_TEXTURE_UNITS"] = "5";
+            values_["MAX_TEXTURE_UNITS"] = "8";
         }
         else
         {
-            values_.Push("TU_VOLUMEMAP");
-            values_.Push("TU_CUSTOM1");
-            values_.Push("TU_CUSTOM2");
-            values_.Push("TU_LIGHTRAMP");
-            values_.Push("TU_LIGHTSHAPE");
-            values_.Push("TU_SHADOWMAP");
-            values_.Push("TU_FACESELECT");
-            values_.Push("TU_INDIRECTION");
-            values_.Push("TU_DEPTHBUFFER");
-            values_.Push("TU_LIGHTBUFFER");
-            values_.Push("TU_ZONE");
-            values_.Push("MAX_MATERIAL_TEXTURE_UNITS");
-            values_.Push("MAX_TEXTURE_UNITS");
+            values_["TU_VOLUMEMAP"] = "5";
+            values_["TU_CUSTOM1"] = "6";
+            values_["TU_CUSTOM2"] = "7";
+            values_["TU_LIGHTRAMP"] = "8";
+            values_["TU_LIGHTSHAPE"] = "9";
+            values_["TU_SHADOWMAP"] = "10";
+            values_["TU_FACESELECT"] = "11";
+            values_["TU_INDIRECTION"] = "12";
+            values_["TU_DEPTHBUFFER"] = "13";
+            values_["TU_LIGHTBUFFER"] = "14";
+            values_["TU_ZONE"] = "15";
+            values_["MAX_MATERIAL_TEXTURE_UNITS"] = "8";
+            values_["MAX_TEXTURE_UNITS"] = "16";
+
         }
 
     }

@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -54,8 +60,8 @@ public:
 
     virtual void SetDefaults();
 
-    float GetScale() { return scale_; }
-    void SetScale(float scale) {scale_ = scale; }
+    double GetScale() { return scale_; }
+    void SetScale(double scale) {scale_ = scale; }
 
     bool GetImportAnimations() { return importAnimations_; }
     void SetImportAnimations(bool importAnimations) { importAnimations_ = importAnimations; }
@@ -78,11 +84,11 @@ protected:
     bool ImportAnimations();
     bool ImportAnimation(const String &filename, const String& name, float startTime=-1.0f, float endTime=-1.0f);
 
-    virtual bool LoadSettingsInternal();
-    virtual bool SaveSettingsInternal();
+    virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
+    virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
 
-    float scale_;
+    double scale_;
     bool importAnimations_;
     Vector<SharedPtr<AnimationImportInfo>> animationInfo_;
 

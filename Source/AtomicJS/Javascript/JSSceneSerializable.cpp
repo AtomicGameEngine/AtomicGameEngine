@@ -1,14 +1,37 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
 
+// These serialization functions need to operate on various script classes
+// including JS and C#, so use the base classes and avoid bringing in derived specifics
+#include <Atomic/Script/ScriptComponent.h>
+#include <Atomic/Script/ScriptComponentFile.h>
+
 #include "JSScene.h"
-#include "JSComponent.h"
+
 #include "JSVM.h"
 
 namespace Atomic
@@ -64,25 +87,27 @@ static int Serializable_SetAttribute(duk_context* ctx)
         }
     }
 
-    JSComponent* jsc = NULL;
+    ScriptComponent* jsc = NULL;
 
     // check dynamic
     if (!isAttr)
     {
-        if (serial->GetType() == JSComponent::GetTypeStatic())
+        if (serial->GetBaseType() == ScriptComponent::GetTypeStatic())
         {
-            jsc = (JSComponent*) serial;
-            JSComponentFile* file = jsc->GetComponentFile();
+
+            jsc = (ScriptComponent*) serial;
+            ScriptComponentFile* file = jsc->GetComponentFile();
 
             if (file)
             {
-                const HashMap<String, VariantType>& fields = file->GetFields();
-                const HashMap<String, Vector<JSComponentFile::EnumInfo>>& enums = file->GetEnums();
+                const String& className = jsc->GetComponentClassName();
 
-                if (fields.Contains(name))
+                const HashMap<String, VariantType>& fields = file->GetFields(className);
+                const HashMap<String, Vector<EnumInfo>>& enums = file->GetEnums(className);
+
+                if (VariantType *fvType = fields[name])
                 {
-                    HashMap<String, VariantType>::ConstIterator itr = fields.Find(name);
-                    variantType = itr->second_;
+                    variantType = *fvType;
 
                     if (enums.Contains(name))
                     {
@@ -177,29 +202,30 @@ static int Serializable_GetAttribute(duk_context* ctx)
         }
     }
 
-    if (serial->GetType() == JSComponent::GetTypeStatic())
+    if (serial->GetBaseType() == ScriptComponent::GetTypeStatic())
     {
-        JSComponent* jsc = (JSComponent*) serial;
-        JSComponentFile* file = jsc->GetComponentFile();
+        ScriptComponent* jsc = (ScriptComponent*) serial;
+        ScriptComponentFile* file = jsc->GetComponentFile();
 
         if (file)
         {
+            const String& componentClassName = jsc->GetComponentClassName();
 
-            const HashMap<String, VariantType>& fields = file->GetFields();
+            const FieldMap& fields = file->GetFields(componentClassName);
 
             if (fields.Contains(name))
             {
-                VariantMap& values = jsc->GetFieldValues();
+                const VariantMap& values = jsc->GetFieldValues();
 
-                if (values.Contains(name))
+                if (Variant* vptr = values[name])
                 {
-                    js_push_variant(ctx,  values[name]);
+                    js_push_variant(ctx,  *vptr);
                     return 1;
                 }
                 else
                 {
                     Variant v;
-                    file->GetDefaultFieldValue(name, v);
+                    file->GetDefaultFieldValue(name, v, componentClassName);
                     js_push_variant(ctx,  v);
                     return 1;
                 }
@@ -230,6 +256,76 @@ static const String& GetResourceRefClassName(Context* context, const ResourceRef
     return String::EMPTY;
 }
 
+static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const VariantMap& defaultFieldValues,
+                                 const FieldMap& fields,
+                                 const EnumMap& enums)
+{
+    if (fields.Size())
+    {
+        HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
+        while (itr != fields.End())
+        {
+            duk_push_object(ctx);
+
+            duk_push_number(ctx, (double) itr->second_);
+            duk_put_prop_string(ctx, -2, "type");
+
+            if (itr->second_ == VAR_RESOURCEREF && defaultFieldValues.Contains(itr->first_))
+            {
+                if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
+                {
+                    const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
+                    const String& typeName = GetResourceRefClassName(JSVM::GetJSVM(ctx)->GetContext(), ref);
+
+                    if (typeName.Length())
+                    {
+                        duk_push_string(ctx, typeName.CString());
+                        duk_put_prop_string(ctx, -2, "resourceTypeName");
+
+                    }
+                }
+            }
+
+            duk_push_string(ctx, itr->first_.CString());
+            duk_put_prop_string(ctx, -2, "name");
+
+            duk_push_number(ctx, (double) AM_DEFAULT);
+            duk_put_prop_string(ctx, -2, "mode");
+
+            duk_push_string(ctx,"");
+            duk_put_prop_string(ctx, -2, "defaultValue");
+
+            duk_push_boolean(ctx, 1);
+            duk_put_prop_string(ctx, -2, "field");
+
+            duk_push_array(ctx);
+
+            if (enums.Contains(itr->first_))
+            {
+                unsigned enumCount = 0;
+                const Vector<EnumInfo>* infos = enums[itr->first_];
+                Vector<EnumInfo>::ConstIterator eitr = infos->Begin();
+
+                while (eitr != infos->End())
+                {
+                    duk_push_string(ctx, eitr->name_.CString());
+                    duk_put_prop_index(ctx, -2, enumCount++);
+                    eitr++;
+                }
+
+            }
+
+            duk_put_prop_string(ctx, -2, "enumNames");
+
+            // store attr object
+            duk_put_prop_index(ctx, -2, count++);
+
+            itr++;
+        }
+    }
+}
+
+
 
 static int Serializable_GetAttributes(duk_context* ctx)
 {
@@ -241,7 +337,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
     duk_get_prop_index(ctx, -1, type);
 
     // return cached array of attrinfo, unless JSComponent which has dynamic fields
-    if (serial->GetType() != JSComponent::GetTypeStatic() && duk_is_object(ctx, -1))
+    if (serial->GetBaseType() != ScriptComponent::GetTypeStatic() && duk_is_object(ctx, -1))
         return 1;
 
     const Vector<AttributeInfo>* attrs = serial->GetAttributes();
@@ -317,81 +413,20 @@ static int Serializable_GetAttributes(duk_context* ctx)
     }
 
     // dynamic script fields
-    if (serial->GetType() == JSComponent::GetTypeStatic())
+    if (serial->GetBaseType() == ScriptComponent::GetTypeStatic())
     {
-        JSComponent* jsc = (JSComponent*) serial;
-        JSComponentFile* file = jsc->GetComponentFile();
+        ScriptComponent* jsc = (ScriptComponent*) serial;
+        ScriptComponentFile* file = jsc->GetComponentFile();
 
         if (file)
         {
 
-            const VariantMap& defaultFieldValues = file->GetDefaultFieldValues();
-            const HashMap<String, VariantType>& fields =  file->GetFields();
-            const HashMap<String, Vector<JSComponentFile::EnumInfo>>& enums = file->GetEnums();
+            const String& className = jsc->GetComponentClassName();
+            const VariantMap& defaultFieldValues = file->GetDefaultFieldValues(className);
+            const FieldMap& fields =  file->GetFields(className);
+            const EnumMap& enums = file->GetEnums(className);
 
-            if (fields.Size())
-            {
-                HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
-                while (itr != fields.End())
-                {
-                    duk_push_object(ctx);
-
-                    duk_push_number(ctx, (double) itr->second_);
-                    duk_put_prop_string(ctx, -2, "type");
-
-                    if (itr->second_ == VAR_RESOURCEREF && defaultFieldValues.Contains(itr->first_))
-                    {
-                        if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
-                        {
-                            const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
-                            const String& typeName = GetResourceRefClassName(serial->GetContext(), ref);
-
-                            if (typeName.Length())
-                            {
-                                duk_push_string(ctx, typeName.CString());
-                                duk_put_prop_string(ctx, -2, "resourceTypeName");
-
-                            }
-                        }
-                    }
-
-                    duk_push_string(ctx, itr->first_.CString());
-                    duk_put_prop_string(ctx, -2, "name");
-
-                    duk_push_number(ctx, (double) AM_DEFAULT);
-                    duk_put_prop_string(ctx, -2, "mode");
-
-                    duk_push_string(ctx,"");
-                    duk_put_prop_string(ctx, -2, "defaultValue");
-
-                    duk_push_boolean(ctx, 1);
-                    duk_put_prop_string(ctx, -2, "field");
-
-                    duk_push_array(ctx);
-
-                    if (enums.Contains(itr->first_))
-                    {
-                        unsigned enumCount = 0;
-                        const Vector<JSComponentFile::EnumInfo>* infos = enums[itr->first_];
-                        Vector<JSComponentFile::EnumInfo>::ConstIterator eitr = infos->Begin();
-
-                        while (eitr != infos->End())
-                        {
-                            duk_push_string(ctx, eitr->name_.CString());
-                            duk_put_prop_index(ctx, -2, enumCount++);
-                            eitr++;
-                        }
-
-                    }
-
-                    duk_put_prop_string(ctx, -2, "enumNames");
-
-                    // store attr object
-                    duk_put_prop_index(ctx, -2, count++);
-
-                    itr++;
-                }
-            }
+            GetDynamicAttributes(ctx, count, defaultFieldValues, fields, enums);
         }
     }
 

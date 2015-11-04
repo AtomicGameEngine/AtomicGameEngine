@@ -1,7 +1,13 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
-import strings = require("ui/EditorStrings");
-import EditorEvents = require("editor/EditorEvents");
-import EditorUI = require("ui/EditorUI");
+import strings = require("../../EditorStrings");
+import EditorEvents = require("../../../editor/EditorEvents");
+import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 
 class MainFrameMenu extends Atomic.ScriptObject {
@@ -16,6 +22,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu build", buildItems);
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
+        MenuItemSources.createMenuItemSource("menu help", helpItems);
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -39,7 +46,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "quit") {
 
-                this.sendEvent(EditorEvents.Quit);
+                Atomic.ui.requestExit();
                 return true;
 
             }
@@ -51,8 +58,43 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "edit play debug") {
+                EditorUI.getShortcuts().invokePlayDebug();
+                return true;
+            }
+
             if (refid == "edit format code") {
                 EditorUI.getShortcuts().invokeFormatCode();
+                return true;
+            }
+
+            if (refid == "edit undo") {
+                EditorUI.getShortcuts().invokeUndo();
+                return true;
+            }
+
+            if (refid == "edit redo") {
+                EditorUI.getShortcuts().invokeRedo();
+                return true;
+            }
+
+            if (refid == "edit cut") {
+                EditorUI.getShortcuts().invokeCut();
+                return true;
+            }
+
+            if (refid == "edit copy") {
+                EditorUI.getShortcuts().invokeCopy();
+                return true;
+            }
+
+            if (refid == "edit paste") {
+                EditorUI.getShortcuts().invokePaste();
+                return true;
+            }
+
+            if (refid == "edit select all") {
+                EditorUI.getShortcuts().invokeSelectAll();
                 return true;
             }
 
@@ -141,9 +183,32 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu build popup") {
 
             if (refid == "build build") {
-                var buildNotification = new Atomic.UIMessageWindow(EditorUI.getMainFrame(), "build_notify");
-                buildNotification.show("Build Notification", "Building is currently unavailable in this development snapshot.", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 300, 140);
 
+                EditorUI.getModelOps().showBuild();
+
+                return true;
+
+            } else if (refid == "build settings") {
+
+                EditorUI.getModelOps().showBuildSettings();
+                return true;
+
+            }
+
+        } else if (target.id == "menu help popup") {
+
+            if (refid == "help forums") {
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/")
+                return true;
+            } else if (refid == "help chat") {
+                Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/")
+                return true;
+            } else if (refid == "help github") {
+                Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/")
+                return true;
+            } else if (refid == "help api") {
+                var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/Atomic.html";
+                Atomic.fileSystem.systemOpen(url);
                 return true;
             }
 
@@ -184,7 +249,8 @@ var editItems = {
     "-3": null,
     "Format Code": ["edit format code", StringID.ShortcutBeautify],
     "-4": null,
-    "Play": ["edit play", StringID.ShortcutPlay]
+    "Play": ["edit play", StringID.ShortcutPlay],
+    "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug]
 
 };
 
@@ -196,8 +262,8 @@ var toolsItems = {
 
 var buildItems = {
 
-    "Build": ["build build"]
-
+    "Build": ["build build", StringID.ShortcutBuild],
+    "Build Settings": ["build settings", StringID.ShortcutBuildSettings]
 }
 
 
@@ -215,7 +281,17 @@ var fileItems = {
     "-1": null,
     "Close Project": ["file close project"],
     "-2": null,
-    "Save File": ["file save file"],
+    "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
-    "Close File": ["file close file"]
+    "Close File": ["file close file", StringID.ShortcutCloseFile]
+}
+
+var helpItems = {
+
+    "API Documentation": ["help api"],
+    "-1": null,
+    "Atomic Chat": ["help chat"],
+    "Atomic Forums": ["help forums"],
+    "-2": null,
+    "Atomic Game Engine on GitHub": ["help github"]
 }

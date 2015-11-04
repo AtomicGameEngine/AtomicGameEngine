@@ -1,3 +1,24 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 //--player --editor-resource-paths "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/PlayerData!/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources"
 
@@ -19,7 +40,7 @@ namespace Atomic
 UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
     widget_(0),
     preferredSize_(new UIPreferredSize())
-{    
+{
     AddRef();
 
     if (createWidget)
@@ -168,6 +189,24 @@ void UIWidget::OnDelete()
     ReleaseRef();
 }
 
+void UIWidget::AddChildAfter(UIWidget* child, UIWidget* otherChild)
+{
+    if (!widget_ || !child || !child->widget_ || !otherChild || !otherChild->widget_)
+        return;
+
+    widget_->AddChildRelative(child->widget_, tb::WIDGET_Z_REL_AFTER, otherChild->widget_);
+
+}
+
+void UIWidget::AddChildBefore(UIWidget* child, UIWidget* otherChild)
+{
+    if (!widget_ || !child || !child->widget_ || !otherChild || !otherChild->widget_)
+        return;
+
+    widget_->AddChildRelative(child->widget_, tb::WIDGET_Z_REL_BEFORE, otherChild->widget_);
+
+}
+
 void UIWidget::AddChild(UIWidget* child)
 {
     if (!widget_ || !child || !child->widget_)
@@ -284,10 +323,14 @@ void UIWidget::Center()
     if (!widget_)
         return;
 
-    // this should center on parent widget, not root
-    UI* ui = GetSubsystem<UI>();
     TBRect rect = widget_->GetRect();
-    TBWidget* root = ui->GetRootWidget();
+    TBWidget* root = widget_->GetParent();
+    if (!root)
+    {
+        UI* ui = GetSubsystem<UI>();
+        root = ui->GetRootWidget();
+    }
+
     TBRect bounds(0, 0, root->GetRect().w, root->GetRect().h);
     widget_->SetRect(rect.CenterIn(bounds).MoveIn(bounds).Clip(bounds));
 
@@ -373,6 +416,15 @@ void UIWidget::SetSkinBg(const String& id)
 
 }
 
+void UIWidget::Remove()
+{
+    if (!widget_ || !widget_->GetParent())
+        return;
+
+    widget_->GetParent()->RemoveChild(widget_);
+
+}
+
 void UIWidget::RemoveChild(UIWidget* child, bool cleanup)
 {
     if (!widget_ || !child)
@@ -425,7 +477,7 @@ void UIWidget::SetId(const String& id)
 
 }
 
-void UIWidget::SetState(/*WIDGET_STATE*/ unsigned state, bool on)
+void UIWidget::SetState(UI_WIDGET_STATE state, bool on)
 {
     if (!widget_)
         return;
@@ -512,7 +564,7 @@ double UIWidget::GetValue()
 }
 
 
-bool UIWidget::GetState(/*WIDGET_STATE*/ unsigned state)
+bool UIWidget::GetState(UI_WIDGET_STATE state)
 {
     if (!widget_)
         return false;
@@ -521,7 +573,7 @@ bool UIWidget::GetState(/*WIDGET_STATE*/ unsigned state)
 
 }
 
-void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
+void UIWidget::SetStateRaw(UI_WIDGET_STATE state)
 {
     if (!widget_)
         return;
@@ -530,12 +582,12 @@ void UIWidget::SetStateRaw(/*WIDGET_STATE*/ unsigned state)
 
 }
 
-/*WIDGET_STATE*/ unsigned UIWidget::GetStateRaw()
+UI_WIDGET_STATE UIWidget::GetStateRaw()
 {
     if (!widget_)
-        return false;
+        return UI_WIDGET_STATE_NONE;
 
-    return (unsigned) widget_->GetStateRaw();
+    return (UI_WIDGET_STATE) widget_->GetStateRaw();
 
 }
 
@@ -685,5 +737,22 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 
     return false;
 }
+
+void UIWidget::InvalidateLayout()
+{
+    if (!widget_)
+        return;
+
+    widget_->InvalidateLayout(tb::TBWidget::INVALIDATE_LAYOUT_TARGET_ONLY);
+
+}
+
+void UIWidget::InvokeShortcut(const String& shortcut)
+{
+    TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
+    ev.ref_id = TBIDC(shortcut.CString());
+    widget_->OnEvent(ev);
+}
+
 
 }

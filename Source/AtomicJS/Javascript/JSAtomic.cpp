@@ -1,6 +1,24 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/FileSystem.h>
@@ -17,6 +35,10 @@
 #include <Atomic/Network/Network.h>
 #endif
 
+#ifdef ATOMIC_WEB
+#include <Atomic/Web/Web.h>
+#endif
+
 #include "JSEvents.h"
 #include "JSVM.h"
 #include "JSComponent.h"
@@ -27,6 +49,7 @@
 #include "JSAtomic3D.h"
 #endif
 #include "JSIO.h"
+#include "JSInput.h"
 #include "JSUIAPI.h"
 #include "JSScene.h"
 
@@ -158,6 +181,15 @@ static int js_atomic_GetNetwork(duk_context* ctx)
 }
 #endif
 
+#ifdef ATOMIC_WEB
+static int js_atomic_GetWeb(duk_context* ctx)
+{
+  JSVM* vm = JSVM::GetJSVM(ctx);
+  js_push_class_object_instance(ctx, vm->GetSubsystem<Web>());
+  return 1;
+}
+#endif
+
 static int js_atomic_GetUI(duk_context* ctx)
 {
     JSVM* vm = JSVM::GetJSVM(ctx);
@@ -275,6 +307,7 @@ void jsapi_init_atomic(JSVM* vm)
 #ifdef ATOMIC_3D
     jsapi_init_atomic3d(vm);
 #endif
+    jsapi_init_input(vm);
     jsapi_init_ui(vm);
     jsapi_init_scene(vm);
 
@@ -373,6 +406,14 @@ void jsapi_init_atomic(JSVM* vm)
 
     js_push_class_object_instance(ctx, vm->GetSubsystem<Network>(), "Network");
     duk_put_prop_string(ctx, -2, "network");
+#endif
+
+#ifdef ATOMIC_WEB
+    duk_push_c_function(ctx, js_atomic_GetWeb, 0);
+    duk_put_prop_string(ctx, -2, "getWeb");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<Web>(), "Web");
+    duk_put_prop_string(ctx, -2, "web");
 #endif
 
     duk_push_c_function(ctx, js_atomic_GetUI, 0);

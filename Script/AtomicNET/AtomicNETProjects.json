@@ -1,0 +1,54 @@
+{
+  "solution" : {
+    "name" : "AtomicNET",
+    "outputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/Build/"
+  },
+  "projects" : [
+    {
+      "name": "AtomicNETBootstrap",
+      "outputType" : "Library",
+      "rootNamespace" : "Atomic.Bootstrap",
+      "assemblyName" : "AtomicNETBootstrap",
+      "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/TPA/",
+      "references" : [
+        "System.Runtime", "System.Collections", "System.Collections.Concurrent", "System.Linq"
+      ],
+      "sources" : [
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETBootstrap/"
+      ]
+    },
+    {
+      "name": "AtomicNETEngine",
+      "outputType" : "Library",
+      "rootNamespace" : "AtomicEngine",
+      "assemblyName" : "AtomicNETEngine",
+      "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
+      "references" : [
+        "System.Runtime" , "System.Linq"
+      ],
+      "sources" : [
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETEngine/",
+        "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/Atomic/Managed/",
+        "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/AtomicNET/Managed/",
+        "$ATOMIC_ROOT$/Build/Source/Generated/$SCRIPT_PLATFORM$/CSharp/Packages/AtomicPlayer/Managed/"
+      ]
+    },
+    {
+      "name": "AtomicNETTools",
+      "outputType" : "Library",
+      "rootNamespace" : "AtomicTools",
+      "assemblyName" : "AtomicNETTools",
+      "assemblyOutputPath" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
+      "assemblySearchPaths" : "$ATOMIC_ROOT$/Artifacts/AtomicNET/",
+      "references" : [
+        "System.Runtime" , "System.IO",
+        "System.Reflection.Metadata", "System.Reflection.Primitives", "System.Collections.Immutable",
+        "System.Linq",
+        "AtomicNETEngine"
+      ],
+      "sources" : [
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicNET/AtomicNETTools/"
+      ]
+    }
+  ]
+}

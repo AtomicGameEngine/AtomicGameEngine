@@ -12,11 +12,21 @@ endif()
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 
+if (APPLE)
+    file (GLOB_RECURSE OBJC_FILES *.mm )
+    set (SOURCE_FILES ${SOURCE_FILES} ${OBJC_FILES})
+endif()
+
 add_library(ToolCore ${SOURCE_FILES})
 
 target_link_libraries(ToolCore Assimp Poco)
 
+if (LINUX)
+    target_link_libraries(ToolCore NETCore NETScript)
+endif()
+
 GroupSources("Assets")
+GroupSources("AtomicNET")
 GroupSources("Build")
 GroupSources("Command")
 GroupSources("Import")

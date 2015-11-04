@@ -1,3 +1,24 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <TurboBadger/tb_core.h>
 #include <TurboBadger/tb_system.h>
@@ -57,11 +78,13 @@ using namespace tb;
 #include "UIScrollContainer.h"
 #include "UISeparator.h"
 #include "UIDimmer.h"
+#include "UISelectDropdown.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
 #include "SystemUI/DebugHud.h"
 #include "SystemUI/Console.h"
+#include "SystemUI/MessageBox.h"
 
 namespace tb
 {
@@ -87,8 +110,11 @@ UI::UI(Context* context) :
     keyboardDisabled_(false),
     initialized_(false),
     skinLoaded_(false),
-    consoleVisible_(false)
+    consoleVisible_(false),
+    exitRequested_(false)
 {
+
+    SubscribeToEvent(E_EXITREQUESTED, HANDLER(UI, HandleExitRequested));
 
 }
 
@@ -96,11 +122,14 @@ UI::~UI()
 {
     if (initialized_)
     {
+        initialized_ = false;
+
+        tb::TBAnimationManager::AbortAllAnimations();
         tb::TBWidgetListener::RemoveGlobalListener(this);
 
         TBFile::SetReaderFunction(0);
         TBID::tbidRegisterCallback = 0;
-
+        
         tb::TBWidgetsAnimationManager::Shutdown();
 
         widgetWrap_.Clear();
@@ -111,6 +140,12 @@ UI::~UI()
     }
 
     uiContext_ = 0;
+
+}
+
+void UI::HandleExitRequested(StringHash eventType, VariantMap& eventData)
+{
+    Shutdown();
 }
 
 void UI::Shutdown()
@@ -160,6 +195,10 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
     SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
+
+    SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));
+    SubscribeToEvent(E_TOUCHEND, HANDLER(UI, HandleTouchEnd));
+    SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
 
@@ -258,7 +297,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     graphics_->SetColorWrite(true);
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetDepthTest(CMP_ALWAYS);
-    graphics_->SetDepthWrite(false);    
+    graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
 
@@ -464,6 +503,11 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (exitRequested_) {
+        SendEvent(E_EXITREQUESTED);
+        exitRequested_ = false;
+        return;
+    }
     TBMessageHandler::ProcessMessages();
 }
 
@@ -574,6 +618,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         container->SetWidget(widget);
         widgetWrap_[widget] = container;
         return container;
+    }
+
+    if (widget->IsOfType<TBSelectDropdown>())
+    {
+        UISelectDropdown* select = new UISelectDropdown(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
     }
 
     if (widget->IsOfType<TBButton>())
@@ -746,6 +798,25 @@ void UI::ToggleConsole()
 void UI::HandleConsoleClosed(StringHash eventType, VariantMap& eventData)
 {
     consoleVisible_ = false;
+}
+
+SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String& message)
+{
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* xmlFile = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
+
+    SystemUI::MessageBox* messageBox = new SystemUI::MessageBox(context_, message, title, 0, xmlFile);
+
+    return messageBox;
+
+
+}
+
+
+UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
+{
+    return WrapWidget(rootWidget_->GetWidgetAt(x, y, include_children));
 }
 
 }

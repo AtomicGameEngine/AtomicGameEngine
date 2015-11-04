@@ -1,11 +1,15 @@
 // Portions Copyright (c) 2008-2015 the Urho3D project.
 
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
+#include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/PrefabComponent.h>
 #include <Atomic/Graphics/Camera.h>
@@ -94,6 +98,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
 
+    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneView3D, HandleNodeRemoved));
+
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
 
     SubscribeToEvent(this, E_DRAGENTERWIDGET, HANDLER(SceneView3D, HandleDragEnterWidget));
@@ -155,25 +161,10 @@ void SceneView3D::MoveCamera(float timeStep)
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
         pitch_ += MOUSE_SENSITIVITY * mouseMove.y_;
         pitch_ = Clamp(pitch_, -90.0f, 90.0f);
-        // Not working on OSX
-        //input->SetMouseMode(MM_RELATIVE);
     }
-    else
-    {
-        // Not working on OSX
-        /*
-        if (input->GetMouseMode() != MM_ABSOLUTE)
-            input->SetMouseMode(MM_ABSOLUTE);
-        */
-    }
-
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
-
-    //Vector3 pos = cameraNode_->GetWorldPosition();
-    //Quaternion q = cameraNode_->GetWorldRotation();
-    //LOGINFOF("%f %f %f : %f %f %f %f", pos.x_, pos.y_, pos.z_, q.x_, q.y_, q.z_, q.w_ );
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
@@ -181,7 +172,7 @@ void SceneView3D::MoveCamera(float timeStep)
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
 #endif
 
-    if (!superdown) {
+    if (!superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
 
         // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
         // Use the Translate() function (default local space) to move relative to the node's orientation.
@@ -421,6 +412,13 @@ void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap&
 {
     Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
     SelectNode(node);
+}
+
+void SceneView3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
+    if (node == selectedNode_)
+        SelectNode(0);
 }
 
 void SceneView3D::UpdateDragNode(int mouseX, int mouseY)

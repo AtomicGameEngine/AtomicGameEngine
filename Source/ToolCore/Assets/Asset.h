@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -17,6 +23,7 @@ namespace ToolCore
 class Asset : public Object
 {
     friend class AssetDatabase;
+    friend class AssetImporter;
 
     OBJECT(Asset);
 
@@ -34,6 +41,7 @@ public:
     const String& GetGUID() const { return guid_; }
     const String& GetName() const { return name_; }
     const String& GetPath() const { return path_; }
+
     String GetExtension() const;
     /// Get the path relative to project
     String GetRelativePath();
@@ -61,6 +69,12 @@ public:
 
     // get the .asset filename
     String GetDotAssetFilename();
+
+    /// Rename the asset, which depending on the asset type may be nontrivial
+    bool Rename(const String& newName);
+
+    /// Move the asset, which depending on the asset type may be nontrivial
+    bool Move(const String& newPath);
 
     bool IsFolder() const { return isFolder_; }
 

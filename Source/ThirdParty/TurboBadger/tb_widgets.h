@@ -684,7 +684,7 @@ public:
 	virtual void OnVisibilityChanged() {}
 
 	/** Called when the capture has changed. */
-	virtual void OnCaptureChanged(bool captured) {}
+    virtual void OnCaptureChanged(bool captured) { SetCaptured(captured); }
 
 	/** Called when a child widget has been added to this widget (before calling OnAdded on child). */
 	virtual void OnChildAdded(TBWidget *child) {}
@@ -937,9 +937,9 @@ public:
 		this call and are not sure what the event will cause, use TBWidgetSafePointer to detect self deletion. */
 	bool InvokeEvent(TBWidgetEvent &ev);
 
-	void InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys, bool touch);
-	void InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch);
-	void InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool touch);
+	void InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys, bool touch, int touchId = 0);
+	void InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId = 0);
+	void InvokePointerMove(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId = 0);
 	void InvokeWheel(int x, int y, int delta_x, int delta_y, MODIFIER_KEYS modifierkeys);
 
         void InvokeRightPointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys);
@@ -985,6 +985,20 @@ public:
 		by GetCalculatedFontDescription) */
 	TBFontFace *GetFont() const;
 
+    void SetCapturing(bool needCapturing) { needCapturing_ = needCapturing; }
+
+    bool GetCapturing() { return needCapturing_; }
+
+    void SetCaptured(bool captured) { captured_ = captured; }
+
+    bool IsCaptured() { return captured_; }
+
+    void SetTouchId(unsigned touchId) { touchId_ = touchId; }
+
+    unsigned GetTouchId() { return touchId_; }
+
+    TBWidget *GetWidgetByTouchId(unsigned touchId);
+
 private:
 	friend class TBWidgetListener;	///< It does iteration of m_listeners for us.
 	TBWidget *m_parent;				///< The parent of this widget
@@ -1007,6 +1021,9 @@ private:
 	TBScroller *m_scroller;
 	TBLongClickTimer *m_long_click_timer;
     TBWidgetDelegate* m_delegate;
+    bool needCapturing_; //if ours widget need capturing
+    bool captured_; //if ours widget is currently captured
+    unsigned touchId_;
 	union {
 		struct {
 			uint16 is_group_root : 1;

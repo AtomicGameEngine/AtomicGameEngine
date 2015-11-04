@@ -11,7 +11,13 @@ vec2 Noise(vec2 coord)
 // Adapted: http://callumhay.blogspot.com/2010/09/gaussian-blur-shader-glsl.html
 vec4 GaussianBlur(int blurKernelSize, vec2 blurDir, vec2 blurRadius, float sigma, sampler2D texSampler, vec2 texCoord)
 {
+
+#if defined(GL_ES)
+    // hardcoded for GL_ES to avoid loop comparison issue below
+    const int blurKernelSizeHalfSize = 3 / 2;
+#else
     int blurKernelSizeHalfSize = blurKernelSize / 2;
+#endif
 
     // Incremental Gaussian Coefficent Calculation (See GPU Gems 3 pp. 877 - 889)
     vec3 gaussCoeff;
@@ -64,6 +70,7 @@ vec3 Uncharted2Tonemap(vec3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
+#ifndef GL_ES
 vec3 ColorCorrection(vec3 color, sampler3D lut)
 {
     float lutSize = 16.0;
@@ -71,6 +78,7 @@ vec3 ColorCorrection(vec3 color, sampler3D lut)
     float offset = 1.0 / (2.0 * lutSize);
     return texture3D(lut, clamp(color, 0.0, 1.0) * scale + offset).rgb;
 }
+#endif
 
 const float Gamma = 2.2;
 const float InverseGamma = 1.0 / 2.2;

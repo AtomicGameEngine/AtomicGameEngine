@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 class Preferences {
 
@@ -62,11 +68,12 @@ class Preferences {
         }
         //Read file
         jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
-        var prefs = <PreferencesFormat> JSON.parse(jsonFile.readText());
+        var prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
         if (prefs) {
-            if(!prefs.recentProjects) prefs.recentProjects = [""];
+            if (!prefs.recentProjects) prefs.recentProjects = [""];
             this._prefs = prefs;
         }
+
     }
 
     write(): void {
@@ -88,33 +95,6 @@ class Preferences {
         return this._prefs.recentProjects;
     }
 
-    get androidSDKPath(): string {
-        return Atomic.addTrailingSlash(this._prefs.androidSDKPath);
-    }
-
-    set androidSDKPath(path: string) {
-        this._prefs.androidSDKPath = path;
-        this.write()
-    }
-
-    get jdkRootPath(): string {
-        return Atomic.addTrailingSlash(this._prefs.jdkRootPath);
-    }
-
-    set jdkRootPath(path: string) {
-        this._prefs.jdkRootPath = path;
-        this.write();
-    }
-
-    get antPath(): string {
-        return Atomic.addTrailingSlash(this._prefs.antPath);
-    }
-
-    set antPath(path: string) {
-        this._prefs.antPath = path;
-        this.write();
-    }
-
     static getInstance(): Preferences {
         return Preferences.instance;
     }
@@ -122,9 +102,6 @@ class Preferences {
 
 class PreferencesFormat {
     recentProjects: [string];
-    androidSDKPath: string;
-    jdkRootPath: string;
-    antPath: string;
     window: { x: number, y: number, width: number, height: number };
 }
 

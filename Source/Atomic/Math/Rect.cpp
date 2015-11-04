@@ -26,6 +26,8 @@
 
 #include <cstdio>
 
+#include "../DebugNew.h"
+
 namespace Atomic
 {
 

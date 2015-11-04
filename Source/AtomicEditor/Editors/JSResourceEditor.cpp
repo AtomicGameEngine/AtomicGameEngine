@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/Container/ArrayPtr.h>
 #include <Atomic/UI/UI.h>
@@ -539,7 +542,7 @@ bool JSResourceEditor::ParseJavascriptToJSON(const char* source, String& json, b
     json.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/Script/jsutils");
+    duk_push_string(ctx, "AtomicEditor/JavaScript/Lib/jsutils");
     if (duk_pcall(ctx, 1))
     {
         printf("Error: %s\n", duk_safe_to_string(ctx, -1));
@@ -576,7 +579,7 @@ bool JSResourceEditor::BeautifyJavascript(const char* source, String& output)
     output.Clear();
 
     duk_get_global_string(ctx, "require");
-    duk_push_string(ctx, "AtomicEditor/Script/jsutils");
+    duk_push_string(ctx, "AtomicEditor/JavaScript/Lib/jsutils");
 
     if (duk_pcall(ctx, 1))
     {

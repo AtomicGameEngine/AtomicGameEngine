@@ -71,16 +71,11 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_toupper(keySym);
 }
 
-UIElement* TouchState::GetTouchedElement()
-{
-    return touchedElement_.Get();
-}
-
 #ifdef EMSCRIPTEN
 #define EM_TRUE 1
 
 /// Glue between Urho Input and Emscripten HTML5
-/** HTML5 (Emscripten) is limited in the way it handles input. The EmscriptenInput class attempts to provide the glue between Urho3D Input behavior and HTML5, where SDL currently fails to do so.
+/** HTML5 (Emscripten) is limited in the way it handles input. The EmscriptenInput class attempts to provide the glue between Atomic Input behavior and HTML5, where SDL currently fails to do so.
  *
  * Mouse Input:
  * - The OS mouse cursor position can't be set.
@@ -207,8 +202,8 @@ Input::Input(Context* context) :
     mouseMoveWheel_(0),
     windowID_(0),
     toggleFullscreen_(true),
-    mouseVisible_(false),
-    lastMouseVisible_(false),
+    mouseVisible_(true), // ATOMIC: default mouse visible
+    lastMouseVisible_(true),
     mouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
 #ifdef EMSCRIPTEN
@@ -1178,7 +1173,7 @@ void Input::ResetJoysticks()
     joysticks_.Clear();
 
     // Open each detected joystick automatically on startup
-    int size = SDL_NumJoysticks();
+    unsigned size = static_cast<unsigned>(SDL_NumJoysticks());
     for (unsigned i = 0; i < size; ++i)
         OpenJoystick(i);
 }
@@ -1614,6 +1609,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 #endif
             state.delta_ = IntVector2::ZERO;
             state.pressure_ = evt.tfinger.pressure;
+            state.touchedWidget_ = GetSubsystem<UI>()->GetWidgetAt(state.position_.x_, state.position_.y_, true);
 
             using namespace TouchBegin;
 
@@ -2016,6 +2012,27 @@ void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventData)
 {
 
+}
+
+void Input::BindButton(UIButton* touchButton, int button)
+{
+    touchButton->SetEmulationButton(button);
+}
+
+void Input::SimulateButtonDown(int button)
+{
+    SDL_Event evt;
+    evt.type = SDL_KEYDOWN;
+    evt.key.keysym.sym = button;
+    HandleSDLEvent(&evt);
+}
+
+void Input::SimulateButtonUp(int button)
+{
+    SDL_Event evt;
+    evt.type = SDL_KEYUP;
+    evt.key.keysym.sym = button;
+    HandleSDLEvent(&evt);
 }
 
 }

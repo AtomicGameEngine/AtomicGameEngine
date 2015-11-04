@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
@@ -164,6 +167,7 @@ public:
                         FullySpecifiedType pfst = tnid->templateArgumentAt(0);
                         type = pfst.type();
                         isTemplate = true;
+                        isSharedPtr = true;
                     }
                 }
             }
@@ -180,7 +184,12 @@ public:
 
 
         if (!jtype)
+        {
             jtype = processTypeConversion(type);
+            if (fst.isUnsigned() && jtype->asPrimitiveType())
+                jtype->asPrimitiveType()->isUnsigned_ = true;
+
+        }
 
         if (!jtype)
             return NULL;
@@ -269,7 +278,7 @@ public:
         if (name.StartsWith("~"))
             jfunction->SetDestructor();
 
-        if (function->isOverride())
+        if (function->isVirtual())
             jfunction->SetVirtual(true);
 
         if (function->isStatic())
@@ -406,13 +415,22 @@ public:
             return true;
         }
 
-        if (type->isIntegerType())
+        String value;
+
+        const StringLiteral* init = decl->getInitializer();
+        if (init)
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Int);
+            if (init->chars())
+                value = init->chars();
+        }
+
+        if (type->isIntegerType() || _unsigned)
+        {            
+            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Int, _unsigned);
         }
         else
         {
-            module_->RegisterConstant(getNameString(decl->name()).CString(), JSBPrimitiveType::Float);
+            module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Float);
         }
 
         return true;

@@ -85,8 +85,6 @@ struct ScenePassInfo
     bool allowInstancing_;
     /// Mark to stencil flag.
     bool markToStencil_;
-    /// Light scissor optimization flag.
-    bool useScissor_;
     /// Vertex light flag.
     bool vertexLights_;
     /// Batch queue.
@@ -163,6 +161,9 @@ public:
 
     /// Return light batch queues.
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+
+    /// Return the last used software occlusion buffer.
+    OcclusionBuffer* GetOcclusionBuffer() const { return occlusionBuffer_; }
 
     /// Set global (per-frame) shader parameters. Called by Batch and internally by View.
     void SetGlobalShaderParameters();
@@ -374,7 +375,7 @@ private:
     /// Intermediate light processing results.
     Vector<LightQueryResult> lightQueryResults_;
     /// Info for scene render passes defined by the renderpath.
-    Vector<ScenePassInfo> scenePasses_;
+    PODVector<ScenePassInfo> scenePasses_;
     /// Per-pixel light queues.
     Vector<LightBatchQueue> lightQueues_;
     /// Per-vertex light queues.

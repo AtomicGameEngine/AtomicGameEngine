@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
@@ -19,6 +25,7 @@
 #include "TMXImporter.h"
 #include "PEXImporter.h"
 #include "TextImporter.h"
+#include "NETAssemblyImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -148,9 +155,9 @@ bool Asset::Load()
 
     JSONValue root = json_->GetRoot();
 
-    assert(root.GetInt("version") == ASSET_VERSION);
+    assert(root.Get("version").GetInt() == ASSET_VERSION);
 
-    guid_ = root.GetString("guid");
+    guid_ = root.Get("guid").GetString();
 
     db->RegisterGUID(guid_);
 
@@ -180,10 +187,10 @@ bool Asset::Save()
 
     json_ = new JSONFile(context_);
 
-    JSONValue root = json_->CreateRoot();
+    JSONValue& root = json_->GetRoot();
 
-    root.SetInt("version", ASSET_VERSION);
-    root.SetString("guid", guid_);
+    root.Set("version", JSONValue(ASSET_VERSION));
+    root.Set("guid", JSONValue(guid_));
 
     // handle import
 
@@ -285,6 +292,13 @@ bool Asset::CreateImporter()
         {
             importer_ = new TextImporter(context_, this);
         }
+        else if (ext == ".dll")
+        {
+            // TODO: check for native dll
+#ifdef ATOMIC_DOTNET
+            importer_ = new NETAssemblyImporter(context_, this);
+#endif
+        }
         else if (textureFormats.Contains(ext))
         {
             importer_ = new TextureImporter(context_, this);
@@ -351,6 +365,44 @@ bool Asset::SetPath(const String& path)
 
     return true;
 
+}
+
+bool Asset::Move(const String& newPath)
+{
+    if (importer_.Null())
+        return false;
+
+    String oldPath = path_;
+
+    bool result = importer_->Move(newPath);
+
+    if (result)
+    {
+        VariantMap eventData;
+        eventData[AssetMoved::P_ASSET] = this;
+        eventData[AssetMoved::P_OLDPATH] = oldPath;
+        SendEvent(E_ASSETMOVED, eventData);
+    }
+
+    return result;
+
+}
+
+bool Asset::Rename(const String& newName)
+{
+    if (importer_.Null())
+        return false;
+
+    bool result = importer_->Rename(newName);
+
+    if (result)
+    {
+        VariantMap eventData;
+        eventData[AssetRenamed::P_ASSET] = this;
+        SendEvent(E_ASSETRENAMED, eventData);
+    }
+
+    return result;
 }
 
 Resource* Asset::GetResource(const String &typeName)

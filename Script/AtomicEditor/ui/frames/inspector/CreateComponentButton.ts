@@ -1,6 +1,11 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import ComponentInspector = require("./ComponentInspector");
-
 
 var audioCreateSource = new Atomic.UIMenuItemSource();
 
@@ -37,6 +42,7 @@ geometryCreateSource.addItem(new Atomic.UIMenuItem("Water", "create component"))
 var logicCreateSource = new Atomic.UIMenuItemSource();
 
 logicCreateSource.addItem(new Atomic.UIMenuItem("JSComponent", "JSComponent"));
+logicCreateSource.addItem(new Atomic.UIMenuItem("CSComponent", "CSComponent"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "create component"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "create component"));
 

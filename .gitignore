@@ -11,13 +11,15 @@ Source/Atomic/Javascript/Modules/*
 Data/AtomicPlayer/Resources/CoreData/Shaders/HLSL/Cache
 Resources/CoreData/Shaders/HLSL/Cache
 Artifacts/*
-Build/Source/*
 Docs/out/*
 Docs/node_modules/*
 Data/AtomicEditor/Deployment/Web/AtomicPlayer.js
+Data/AtomicEditor/Deployment/Web/AtomicPlayer.html.mem
 Data/AtomicEditor/Deployment/IOS/AtomicPlayer.app/AtomicPlayer
 node_modules/*
 /.project
 Script/TypeScript/*
 !Script/TypeScript/AtomicWork.d.ts
 Script/Haxe/*
+
+Submodules/*

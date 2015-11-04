@@ -27,6 +27,7 @@
 #include "../Core/Object.h"
 #include "../Container/List.h"
 #include "../Input/InputEvents.h"
+#include "../UI/UIButton.h"
 
 namespace Atomic
 {
@@ -44,15 +45,13 @@ class Graphics;
 class Serializer;
 class UIElement;
 class XMLFile;
+class UIButton;
 
 const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 
 /// %Input state for a finger touch.
 struct TouchState
 {
-    /// Return last touched UI element, used by scripting integration.
-    UIElement* GetTouchedElement();
-
     /// Touch (finger) ID.
     int touchID_;
     /// Position in screen coordinates.
@@ -64,7 +63,7 @@ struct TouchState
     /// Finger pressure.
     float pressure_;
     /// Last touched UI element from screen joystick.
-    WeakPtr<UIElement> touchedElement_;
+    WeakPtr<UIWidget> touchedWidget_;
 };
 
 /// %Input state for a joystick.
@@ -289,6 +288,12 @@ public:
 
     /// Return whether application window is minimized.
     bool IsMinimized() const;
+
+    /// Binds UIButton element to the given button
+    void BindButton(UIButton* touchButton, int button);
+
+    void SimulateButtonDown(int button);
+    void SimulateButtonUp(int button);
 
 private:
     /// Initialize when screen mode initially set.

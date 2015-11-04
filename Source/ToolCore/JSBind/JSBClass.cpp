@@ -1,8 +1,16 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Resource/JSONFile.h>
 
+#include "JSBType.h"
 #include "JSBModule.h"
 #include "JSBClass.h"
 #include "JSBFunction.h"
@@ -182,6 +190,42 @@ void JSBClass::SetSkipFunction(const String& name, bool skip)
     }
 
 }
+
+bool JSBClass::MatchProperty(JSBProperty* property, bool includeBases)
+{
+
+    HashMap<String, JSBProperty*>::Iterator itr;
+    for (itr = properties_.Begin(); itr != properties_.End(); itr++)
+    {
+        if (itr->first_ != property->name_)
+            continue;
+
+        return true;
+    }
+
+    if (!includeBases || !baseClasses_.Size())
+        return 0;
+
+    return baseClasses_[0]->MatchProperty(property, true);
+}
+
+JSBFunction* JSBClass::MatchFunction(JSBFunction *function, bool includeBases)
+{
+    for (unsigned i = 0; i < functions_.Size(); i++)
+    {
+        JSBFunction* func = functions_[i];
+
+        if (func->Match(function))
+            return func;
+    }
+
+    if (!includeBases || !baseClasses_.Size())
+        return 0;
+
+    return baseClasses_[0]->MatchFunction(function, true);
+
+}
+
 void JSBClass::SetBaseClass(JSBClass *baseClass)
 {
     // we can't hook up chain here, as base class may not have been visited yet
@@ -298,7 +342,7 @@ void JSBClass::Process()
         if (function->IsOverload())
         {
             for (unsigned k = 0; k < overrides_.Size(); k++)
-            {                
+            {
                 JSBFunctionSignature* override =  overrides_[k];
 
                 if (!override->Match(function))

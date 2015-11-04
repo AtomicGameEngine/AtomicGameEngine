@@ -22,11 +22,15 @@
 
 #pragma once
 
+#include "HashMap.h"
+
 namespace Atomic
 {
 
 // ATOMIC BEGIN
 
+class RefCounted;
+typedef void (*RefCountedDeletedFunction)(RefCounted*);
 typedef const void* ClassID;
 
 /// Macro to be included in RefCounted derived classes for efficient RTTI
@@ -88,8 +92,12 @@ public:
     virtual ClassID GetClassID() const  = 0;
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
+    /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
     inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
+
+    static void SetRefCountedDeletedFunction(RefCountedDeletedFunction function) { refCountedDeletedFunction_ = function; }
+
     // ATOMIC END
 
 private:
@@ -101,7 +109,10 @@ private:
     /// Pointer to the reference count structure.
     RefCount* refCount_;
 
+    // ATOMIC BEGIN
     void* jsHeapPtr_;
+    static RefCountedDeletedFunction refCountedDeletedFunction_;
+    // ATOMIC END
 
 
 };

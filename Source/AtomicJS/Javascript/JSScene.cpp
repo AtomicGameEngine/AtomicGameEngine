@@ -1,6 +1,24 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/XMLFile.h>
@@ -38,7 +56,7 @@ static int Node_CreateJSComponent(duk_context* ctx)
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
 
-    ResourceCache* cache = node->GetContext()->GetSubsystem<ResourceCache>();    
+    ResourceCache* cache = node->GetContext()->GetSubsystem<ResourceCache>();
     JSComponentFile* file = cache->GetResource<JSComponentFile>(path);
 
     if (!file)
@@ -62,11 +80,16 @@ static int Node_GetJSComponent(duk_context* ctx)
 {
     String path = duk_require_string(ctx, 0);
 
+    bool recursive = false;
+    if (duk_get_top(ctx) == 2)
+        if (duk_get_boolean(ctx, 1))
+            recursive = true;
+
     duk_push_this(ctx);
     Node* node = js_to_class_instance<Node>(ctx, -1, 0);
 
     PODVector<JSComponent*> components;
-    node->GetComponents<JSComponent>(components, true);
+    node->GetComponents<JSComponent>(components, recursive);
 
     for (unsigned i = 0; i < components.Size(); i++)
     {

@@ -44,6 +44,28 @@ declare module Atomic {
 
     }
 
+    export interface KeyDownEvent {
+
+        // keycode
+        key: number;
+        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
+        qualifiers: number;
+
+        // mouse buttons down
+        buttons:number;
+
+    }
+
+    export interface KeyUpEvent {
+
+        // keycode
+        key: number;
+        //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
+        qualifiers: number;
+        // mouse buttons down
+        buttons:number;
+
+    }
 
     export interface UIShortcutEvent {
 
@@ -155,6 +177,13 @@ declare module Atomic {
 
     }
 
+
+    export interface IPCMessageEvent {
+
+        message: string;
+        value: number;
+    }
+
     export interface AttributeInfo {
 
         type: VariantType;
@@ -202,6 +231,29 @@ declare module Atomic {
 
 }
 
+declare module AtomicNET {
+
+    export interface CSComponentClassChangedEvent {
+
+        cscomponent: CSComponent;
+        classname: string;
+
+    }
+
+}
+
+declare module Editor {
+
+  export interface GizmoEditModeChangedEvent {
+    mode:EditMode;
+  }
+
+  export interface GizmoAxisModeChangedEvent {
+    mode:AxisMode;
+  }
+  
+}
+
 declare module ToolCore {
 
     export interface ResourceAddedEvent {
@@ -224,9 +276,43 @@ declare module ToolCore {
 
     export interface AssetImportErrorEvent {
 
-        path:string;
-        guid:string;
+        path: string;
+        guid: string;
         error: string;
+    }
+
+    export interface AssetRenamedEvent {
+
+        asset: Asset;
+
+    }
+
+    export interface AssetMovedEvent {
+
+        asset: Asset;
+        oldPath: string;
+
+    }
+
+
+    export interface PlatformChangedEvent {
+
+        platform: ToolCore.Platform;
+
+    }
+
+    export interface BuildOutputEvent {
+
+        text: string;
+
+    }
+
+    export interface BuildCompleteEvent {
+
+        platformID: number;
+        message: string;
+        success: boolean;
+        buildFolder: string;
 
     }
 
@@ -234,6 +320,7 @@ declare module ToolCore {
     export var toolSystem: ToolSystem;
     export var assetDatabase: AssetDatabase;
     export var licenseSystem: LicenseSystem;
+    export var buildSystem: BuildSystem;
 
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;

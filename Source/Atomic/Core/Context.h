@@ -159,7 +159,8 @@ public:
     // ATOMIC BEGIN
 
     // hook for listening into events
-    void SetGlobalEventListener(GlobalEventListener* listener) { globalEventListener_ = listener; }
+    void AddGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Push(listener); }
+    void RemoveGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Erase(globalEventListeners_.Find(listener)); }
 
     /// Get whether an Editor Context
     void SetEditorContext(bool editor) { editorContext_ = editor; }
@@ -181,10 +182,18 @@ private:
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
 
     /// Begin event send.
-    void BeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) { if (globalEventListener_) globalEventListener_->BeginSendEvent(this, sender, eventType, eventData); eventSenders_.Push(sender); }
+    void BeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
+        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
+            globalEventListeners_[i]->BeginSendEvent(this, sender, eventType, eventData);
+        eventSenders_.Push(sender);
+    }
 
     /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) { if (globalEventListener_) globalEventListener_->EndSendEvent(this, sender, eventType, eventData); eventSenders_.Pop(); }
+    void EndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
+        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
+            globalEventListeners_[i]->EndSendEvent(this, sender, eventType, eventData);
+        eventSenders_.Pop();
+    }
 
     /// Object factories.
     HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;
@@ -208,7 +217,7 @@ private:
     HashMap<String, Vector<StringHash> > objectCategories_;
 
     // ATOMIC BEGIN
-    GlobalEventListener* globalEventListener_;
+    PODVector<GlobalEventListener*> globalEventListeners_;
     bool editorContext_;
     // ATOMIC END
 };

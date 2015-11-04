@@ -60,13 +60,17 @@
 #include <mach-o/dyld.h>
 #endif
 
+extern "C"
+{
 #ifdef ANDROID
-extern "C" const char* SDL_Android_GetFilesDir();
+const char* SDL_Android_GetFilesDir();
+char** SDL_Android_GetFileList(const char* path, int* count);
+void SDL_Android_FreeFileList(char*** array, int* count);
+#elif IOS
+const char* SDL_IOS_GetResourceDir();
+const char* SDL_IOS_GetDocumentsDir();
 #endif
-#ifdef IOS
-extern "C" const char* SDL_IOS_GetResourceDir();
-extern "C" const char* SDL_IOS_GetDocumentsDir();
-#endif
+}
 
 #include "../DebugNew.h"
 
@@ -81,7 +85,7 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
-    char* prefPath = SDL_GetPrefPath("urho3d", "temp");
+    char* prefPath = SDL_GetPrefPath("atomicgameengine", "temp");
     if (prefPath)
     {
         stderrFilename = String(prefPath) + "command-stderr";
@@ -559,12 +563,10 @@ bool FileSystem::FileExists(const String& fileName) const
     if (!CheckAccess(GetPath(fileName)))
         return false;
 
-    String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
-
 #ifdef ANDROID
-    if (fixedName.StartsWith("/apk/"))
+    if (IS_ASSET(fileName))
     {
-        SDL_RWops* rwOps = SDL_RWFromFile(fileName.Substring(5).CString(), "rb");
+        SDL_RWops* rwOps = SDL_RWFromFile(ASSET(fileName), "rb");
         if (rwOps)
         {
             SDL_RWclose(rwOps);
@@ -574,6 +576,8 @@ bool FileSystem::FileExists(const String& fileName) const
             return false;
     }
 #endif
+
+    String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
 
 #ifdef WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
@@ -602,9 +606,31 @@ bool FileSystem::DirExists(const String& pathName) const
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
 
 #ifdef ANDROID
-    /// \todo Actually check for existence, now true is always returned for directories within the APK
-    if (fixedName.StartsWith("/apk/"))
-        return true;
+    if (IS_ASSET(fixedName))
+    {
+        // Split the pathname into two components: the longest parent directory path and the last name component
+        String assetPath(ASSET((fixedName + '/')));
+        String parentPath;
+        unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
+        if (pos != String::NPOS)
+        {
+            parentPath = assetPath.Substring(0, pos - 1);
+            assetPath = assetPath.Substring(pos + 1);
+        }
+        assetPath.Resize(assetPath.Length() - 1);
+
+        bool exist = false;
+        int count;
+        char** list = SDL_Android_GetFileList(parentPath.CString(), &count);
+        for (int i = 0; i < count; ++i)
+        {
+            exist = assetPath == list[i];
+            if (exist)
+                break;
+        }
+        SDL_Android_FreeFileList(&list, &count);
+        return exist;
+    }
 #endif
 
 #ifdef WIN32
@@ -640,7 +666,7 @@ String FileSystem::GetProgramDir() const
 #if defined(ANDROID)
     // This is an internal directory specifier pointing to the assets in the .apk
     // Files from this directory will be opened using special handling
-    programDir_ = "/apk/";
+    programDir_ = APK;
     return programDir_;
 #elif defined(IOS)
     programDir_ = AddTrailingSlash(SDL_IOS_GetResourceDir());
@@ -744,69 +770,6 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
 #endif
 }
 
-#if defined(ANDROID)
-
-// the android asset manager is quite limited, so use a manifest instead
-static Vector<String> _atomicManifest;
-
-void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
-    const String& filter, unsigned flags, bool recursive) const
-{
-
-    if (!_atomicManifest.Size())
-    {
-        File file(context_, "/apk/AtomicManifest", FILE_READ);
-        if (!file.IsOpen())
-        {
-            LOGERRORF("Unabled to open AtomicManifest");
-            return;
-        }
-
-        String manifest = file.ReadString();
-        _atomicManifest = manifest.Split(';');
-    }
-
-    if (path.StartsWith("/apk/"))
-        path = path.Substring(5);
-
-    path.Replace(String("//"), String("/"));
-    path = RemoveTrailingSlash(path);
-
-    // first path is the CoreData/AtomicResources folder
-    path = path.Substring(path.Find('/') + 1) + "/";
-
-    String filterExtension = filter.Substring(filter.Find('.'));
-    if (filterExtension.Contains('*'))
-        filterExtension.Clear();
-
-    for (unsigned i = 0; i < _atomicManifest.Size(); i++ )
-    {
-        const String& file = _atomicManifest[i];
-        String filePath = GetPath(file);
-        String filename = GetFileNameAndExtension(file);
-
-        //LOGINFOF("%s : %s : %s", path.CString(), filePath.CString(), filename.CString());
-
-        if (filePath.StartsWith(path))
-        {
-            if (flags & SCAN_FILES)
-            {
-                if (filterExtension.Empty() || filename.EndsWith(filterExtension))
-                {
-                    String deltaPath;
-
-                    if (path.Length() > startPath.Length())
-                        deltaPath = path.Substring(startPath.Length());
-
-                    result.Push(deltaPath + GetFileNameAndExtension(file));
-                }
-            }
-        }
-    }
-}
-
-#else
-
 void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
     const String& filter, unsigned flags, bool recursive) const
 {
@@ -819,6 +782,41 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
+#ifdef ANDROID
+    if (IS_ASSET(path))
+    {
+        String assetPath(ASSET(path));
+        assetPath.Resize(assetPath.Length() - 1);       // AssetManager.list() does not like trailing slash
+        int count;
+        char** list = SDL_Android_GetFileList(assetPath.CString(), &count);
+        for (int i = 0; i < count; ++i)
+        {
+            String fileName(list[i]);
+            if (!(flags & SCAN_HIDDEN) && fileName.StartsWith("."))
+                continue;
+
+#ifdef ASSET_DIR_INDICATOR
+            // Patch the directory name back after retrieving the directory flag
+            bool isDirectory = fileName.EndsWith(ASSET_DIR_INDICATOR);
+            if (isDirectory)
+            {
+                fileName.Resize(fileName.Length() - sizeof(ASSET_DIR_INDICATOR) / sizeof(char) + 1);
+                if (flags & SCAN_DIRS)
+                    result.Push(deltaPath + fileName);
+                if (recursive)
+                    ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
+            }
+            else if (flags & SCAN_FILES)
+#endif
+            {              
+                if (filterExtension.Empty() || fileName.EndsWith(filterExtension))
+                    result.Push(deltaPath + fileName);
+            }
+        }
+        SDL_Android_FreeFileList(&list, &count);
+        return;
+    }
+#endif
 #ifdef WIN32
     WIN32_FIND_DATAW info;
     HANDLE handle = FindFirstFileW(WString(path + "*").CString(), &info);
@@ -844,11 +842,11 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                         result.Push(deltaPath + fileName);
                 }
             }
-        } while (FindNextFileW(handle, &info));
+        }
+        while (FindNextFileW(handle, &info));
 
         FindClose(handle);
     }
-}
 #else
     DIR* dir;
     struct dirent* de;
@@ -882,10 +880,9 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         }
         closedir(dir);
     }
-}
 #endif
 
-#endif
+}
 
 bool FileSystem::CreateDirs(const String& root, const String& subdirectory)
 {

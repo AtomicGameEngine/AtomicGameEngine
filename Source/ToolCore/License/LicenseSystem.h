@@ -1,6 +1,9 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 // BEGIN LICENSE MANAGEMENT
 
@@ -50,12 +53,12 @@ public:
 
     bool GetSourceBuild();
 
-    bool LicenseWindows() { return licenseWindows_; }
-    bool LicenseMac() { return licenseMac_; }
-    bool LicenseAndroid() { return licenseAndroid_; }
-    bool LicenseIOS() { return licenseIOS_; }
-    bool LicenseHTML5() { return licenseHTML5_; }
-    bool LicenseModule3D() { return licenseModule3D_; }
+    bool GetLicenseWindows() { return licenseWindows_; }
+    bool GetLicenseMac() { return licenseMac_; }
+    bool GetLicenseAndroid() { return licenseAndroid_; }
+    bool GetLicenseIOS() { return licenseIOS_; }
+    bool GetLicenseHTML5() { return licenseHTML5_; }
+    bool GetLicenseModule3D() { return licenseModule3D_; }
 
     /// Returns whether there are any platform licenses available
     bool IsStandardLicense();

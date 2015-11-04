@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #include <Atomic/IO/Log.h>
 
@@ -7,6 +13,7 @@
 
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/ToolSystem.h>
+#include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/Project/Project.h>
 
 #include <AtomicJS/Javascript/JSIPCEvents.h>
@@ -22,7 +29,7 @@ namespace AtomicEditor
 
 EditorMode::EditorMode(Context* context) :
     Object(context)
-{    
+{
     SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
 }
 
@@ -33,8 +40,16 @@ EditorMode::~EditorMode()
 
 void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
 {
+    LicenseSystem* licenseSystem = GetSubsystem<LicenseSystem>();
+
     VariantMap startupData;
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+
+// BEGIN LICENSE MANAGEMENT
+
+    startupData["license3D"] = licenseSystem->GetLicenseModule3D();
+
+// END LICENSE MANAGEMENT
 
     startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
 
@@ -47,6 +62,9 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
 {
     //SendEvent(E_EDITORPLAYSTOP);
+
+    if ( eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
+        playerBroker_ = 0;
 }
 
 void EditorMode::HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData)
@@ -69,7 +87,7 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool EditorMode::PlayProject()
+bool EditorMode::PlayProject(bool debug)
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -99,6 +117,9 @@ bool EditorMode::PlayProject()
 
     vargs = args.Split(' ');
 
+    if (debug)
+        vargs.Insert(0, "--debug");
+
     String dump;
     dump.Join(vargs, " ");
     LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
@@ -107,7 +128,7 @@ bool EditorMode::PlayProject()
     playerBroker_ = ipc->SpawnWorker(editorBinary, vargs);
 
     if (playerBroker_)
-    {        
+    {
         SubscribeToEvent(playerBroker_, E_IPCJSERROR, HANDLER(EditorMode, HandleIPCJSError));
         SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, HANDLER(EditorMode, HandleIPCWorkerExit));
         SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, HANDLER(EditorMode, HandleIPCWorkerLog));
@@ -115,6 +136,11 @@ bool EditorMode::PlayProject()
 
     return playerBroker_.NotNull();
 
+}
+
+bool EditorMode::PlayProjectDebug()
+{
+    return PlayProject(true);
 }
 
 }

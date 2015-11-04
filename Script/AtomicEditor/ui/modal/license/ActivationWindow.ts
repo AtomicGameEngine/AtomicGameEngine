@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
@@ -21,16 +27,11 @@ class ActivationWindow extends ModalWindow {
 
         if (ToolCore.licenseSystem.sourceBuild) {
 
-            var button = <Atomic.UIButton>this.getWidget("get_key");
-            button.text = "Get Pro Key";
-
-            var message = "\nAtomic Pro is required for <color #76D6FF>GitHub development snapshots</color> and <color #76D6FF>custom engine builds</color>.\n\n";
-            message += "Press OK to activate or acquire your Atomic Pro license";
-            new Atomic.UIMessageWindow(this, "modal_error").show("Atomic Pro Required", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
+            var message = "\nThis is a <color #76D6FF>development snapshot</color> of the Atomic Editor intended for testing new features.\n\n";
+            message += "Please report issues to the Atomic Forums or GitHub issue tracker.";
+            new Atomic.UIMessageWindow(this, "modal_error").show("Atomic Editor - Development Snapshot", message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 260);
 
         }
-
-
 
     }
 
@@ -49,16 +50,8 @@ class ActivationWindow extends ModalWindow {
 
         this.hide();
 
-        if (ToolCore.licenseSystem.sourceBuild && ToolCore.licenseSystem.isStandardLicense()) {
+        EditorUI.getModelOps().showActivationSuccessWindow();
 
-            // show pro window
-            EditorUI.getModelOps().showProWindow("AtomicEditor/editor/ui/sourceinfo.tb.txt");
-
-        } else {
-
-            EditorUI.getModelOps().showActivationSuccessWindow();
-
-        }
 
     }
 

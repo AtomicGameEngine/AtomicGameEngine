@@ -1891,6 +1891,19 @@ bool Bind::visit(SimpleDeclarationAST *ast)
                 decl->setInitializer(asStringLiteral(startOfExpression, endOfExpression));
             }
         }
+        else
+        {
+            // ATOMIC BEGIN
+            // store initializer
+            const ExpressionAST *initializer = it->value->initializer;
+            if (initializer)
+            {
+                unsigned startOfExpression = initializer->firstToken();
+                unsigned endOfExpression = initializer->lastToken();
+                decl->setInitializer(asStringLiteral(startOfExpression, endOfExpression));
+            }
+            // ATOMIC END
+        }
 
         if (_scope->isClass()) {
             decl->setVisibility(_visibility);

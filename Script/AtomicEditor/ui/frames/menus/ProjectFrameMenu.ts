@@ -1,3 +1,9 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 import strings = require("ui/EditorStrings");
 import EditorEvents = require("editor/EditorEvents");
@@ -31,6 +37,11 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 path = asset.path;
             } else {
                 path = this.contentFolder;
+            }
+
+            if (refid == "rename_asset") {
+                EditorUI.getModelOps().showRenameAsset(asset);
+                return true;
             }
 
             if (refid == "delete_asset") {
@@ -121,6 +132,7 @@ export = ProjectFrameMenus;
 var StringID = strings.StringID;
 
 var assetGeneralContextItems = {
+    "Rename": ["rename_asset", undefined, ""],
     "Reveal in Finder": ["reveal_folder", undefined, ""],
     "-1": null,
     "Delete": ["delete_asset", undefined, ""]

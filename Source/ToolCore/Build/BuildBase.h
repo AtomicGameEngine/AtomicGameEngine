@@ -1,11 +1,15 @@
+//
 // Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
 
 #pragma once
 
 #include <Atomic/Core/Object.h>
 #include "BuildTypes.h"
+#include "../Platform/Platform.h"
 
 using namespace Atomic;
 
@@ -21,7 +25,7 @@ class BuildBase : public Object
 
 public:
 
-    BuildBase(Context* context, Project* project);
+    BuildBase(Context* context, Project* project, PlatformID platform);
     virtual ~BuildBase();
 
     virtual void Build(const String& buildPath) = 0;
@@ -39,7 +43,12 @@ public:
     void BuildWarn(const String& warning);
     void BuildError(const String& error);
 
+    /// Converts subprocess output event to a buildoutput event
+    void HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData);
+
 protected:
+
+    void SendBuildFailure(const String& message);
 
     void GenerateResourcePackage(const String& resourcePackagePath);
 
@@ -53,6 +62,8 @@ protected:
     bool containsMDL_;
 
 private:
+
+    PlatformID platformID_;
 
     Vector<String> buildLog_;
     Vector<String> buildWarnings_;

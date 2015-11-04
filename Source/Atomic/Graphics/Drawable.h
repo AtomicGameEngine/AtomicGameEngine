@@ -106,7 +106,7 @@ class ATOMIC_API Drawable : public Component
 
 public:
     /// Construct.
-    Drawable(Context* context, unsigned char drawableFlags);
+    Drawable(Context* context, unsigned char drawableFlags = 0);
     /// Destruct.
     virtual ~Drawable();
     /// Register object attributes. Drawable must be registered first.

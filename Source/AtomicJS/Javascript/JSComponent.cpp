@@ -1,5 +1,6 @@
 //
 // Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,10 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// Please see LICENSE.md in repository root for license information
-// https://github.com/AtomicGameEngine/AtomicGameEngine
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
@@ -121,7 +118,7 @@ public:
 
 
 JSComponent::JSComponent(Context* context) :
-    Component(context),
+    ScriptComponent(context),
     updateEventMask_(USE_UPDATE | USE_POSTUPDATE | USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE),
     currentEventMask_(0),
     instanceInitialized_(false),
@@ -142,11 +139,8 @@ JSComponent::~JSComponent()
 void JSComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory(new JSComponentFactory(context), LOGIC_CATEGORY);
-
-
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
-    MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetScriptAttr, SetScriptAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
+    MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetComponentFileAttr, SetComponentFileAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
+    COPY_BASE_ATTRIBUTES(ScriptComponent);
 }
 
 void JSComponent::OnSetEnabled()
@@ -221,14 +215,14 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
 
     // apply fields
 
-    const HashMap<String, VariantType>& fields =  componentFile_->GetFields();
+    const FieldMap& fields = componentFile_->GetFields();
 
     if (fields.Size())
     {
         // push self
         js_push_class_object_instance(ctx, this, "JSComponent");
 
-        HashMap<String, VariantType>::ConstIterator itr = fields.Begin();
+        FieldMap::ConstIterator itr = fields.Begin();
         while (itr != fields.End())
         {
             if (fieldValues_.Contains(itr->first_))
@@ -586,17 +580,12 @@ bool JSComponent::MatchScriptName(const String& path)
 
 }
 
-void JSComponent::SetComponentFile(JSComponentFile* cfile)
-{
-    componentFile_ = cfile;
-}
-
-ResourceRef JSComponent::GetScriptAttr() const
+ResourceRef JSComponent::GetComponentFileAttr() const
 {
     return GetResourceRef(componentFile_, JSComponentFile::GetTypeStatic());
 }
 
-void JSComponent::SetScriptAttr(const ResourceRef& value)
+void JSComponent::SetComponentFileAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SetComponentFile(cache->GetResource<JSComponentFile>(value.name_));

@@ -3,7 +3,7 @@ project (Atomic)
 
 cmake_minimum_required (VERSION 2.8)
 
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Build/CMake/Modules)
 
 include(AtomicUtils)
 
@@ -35,6 +35,8 @@ if (NOT EMSCRIPTEN)
     add_definitions( -DATOMIC_NETWORK)
     set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} SDL Civetweb Recast Detour DetourCrowd DetourTileCache kNet )
 endif()
+
+add_definitions( -DATOMIC_WEB )
 
 if (MSVC)
 
