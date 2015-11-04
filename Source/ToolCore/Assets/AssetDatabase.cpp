@@ -98,9 +98,6 @@ Asset* AssetDatabase::GetAssetByCachePath(const String& cachePath)
 {
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
 
-    if (!cachePath.StartsWith("Cache/"))
-        return 0;
-
     String cacheFilename = GetFileName(cachePath);
 
     while (itr != assets_.End())
