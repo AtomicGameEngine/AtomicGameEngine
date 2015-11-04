@@ -21,6 +21,7 @@ class ResourceFrame extends ScriptWidget {
     resourceLayout: Atomic.UILayout;
     resourceViewContainer: Atomic.UILayout;
     currentResourceEditor: Editor.ResourceEditor;
+    wasClosed: boolean;
 
     // editors have a rootCotentWidget which is what is a child of the tab container
 
@@ -93,6 +94,7 @@ class ResourceFrame extends ScriptWidget {
     }
 
     navigateToResource(fullpath: string, lineNumber = -1, tokenPos: number = -1) {
+        if (this.wasClosed) return;
 
         if (!this.editors[fullpath]) {
             return;
@@ -133,7 +135,7 @@ class ResourceFrame extends ScriptWidget {
     }
 
     handleCloseResource(ev: EditorEvents.CloseResourceEvent) {
-
+        this.wasClosed = false;
         var editor = ev.editor;
         var navigate = ev.navigateToAvailableResource;
 
@@ -154,6 +156,7 @@ class ResourceFrame extends ScriptWidget {
         root.removeChild(editor.rootContentWidget);
 
         if (editor != this.currentResourceEditor) {
+            this.wasClosed = true;
             return;
         } else {
             this.currentResourceEditor = null;
@@ -199,6 +202,10 @@ class ResourceFrame extends ScriptWidget {
 
             }
 
+        }
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_UP) {
+            this.wasClosed = false;
         }
 
         // bubble
