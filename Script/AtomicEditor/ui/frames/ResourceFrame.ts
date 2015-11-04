@@ -140,10 +140,11 @@ class ResourceFrame extends ScriptWidget {
         if (!editor)
             return;
 
-        if (this.currentResourceEditor == editor)
-            this.currentResourceEditor = null;
-
         editor.unsubscribeFromAllEvents();
+
+        var editors = Object.keys(this.editors);
+
+        var closedIndex = editors.indexOf(editor.fullPath);
 
         // remove from lookup
         delete this.editors[editor.fullPath];
@@ -152,18 +153,20 @@ class ResourceFrame extends ScriptWidget {
 
         root.removeChild(editor.rootContentWidget);
 
-        this.tabcontainer.currentPage = -1;
+        if (editor != this.currentResourceEditor) {
+            return;
+        } else {
+            this.currentResourceEditor = null;
+            this.tabcontainer.currentPage = -1;
+        }
 
         if (navigate) {
-
-            var keys = Object.keys(this.editors);
-
-            if (keys.length) {
-
-                this.navigateToResource(keys[keys.length - 1]);
-
+            var nextEditor = editors[closedIndex+1];
+            if (nextEditor) {
+                this.navigateToResource(nextEditor);
+            } else {
+                this.navigateToResource(editors[closedIndex-1]);
             }
-
         }
 
     }
