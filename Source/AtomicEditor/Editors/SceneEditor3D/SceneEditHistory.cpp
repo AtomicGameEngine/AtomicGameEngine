@@ -43,6 +43,8 @@ void SceneEditHistory::AddUndoOp(SceneHistoryOp* op)
         delete redoHistory_[i];
     }
 
+    redoHistory_.Clear();
+
     if (activeNode_.NotNull())
     {
         if (op->type_ == SCENEHISTORYOP_NODECHANGED)
@@ -61,7 +63,6 @@ void SceneEditHistory::AddUndoOp(SceneHistoryOp* op)
         }
     }
 
-    redoHistory_.Clear();
 }
 
 void SceneEditHistory::HandleHistoryNodeAdded(StringHash eventType, VariantMap& eventData)
@@ -85,6 +86,7 @@ void SceneEditHistory::HandleHistoryNodeChanged(StringHash eventType, VariantMap
         return;
 
     Scene* scene = static_cast<Scene*>(eventData[HistoryNodeChanged::P_SCENE].GetPtr());
+
     if (scene != scene_)
         return;
 
@@ -215,6 +217,8 @@ void SceneEditHistory::Redo()
 
     op->Redo();
 
+    undoHistory_.Push(op);
+
     VariantMap eventData;
     if (op->type_ == SCENEHISTORYOP_NODECHANGED)
     {
@@ -229,7 +233,7 @@ void SceneEditHistory::Redo()
         ccop->component_->SendEvent(E_HISTORYCOMPONENTCHANGEDUNDOREDO, eventData);
     }
 
-    undoHistory_.Push(op);
+
 
 }
 
