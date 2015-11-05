@@ -750,6 +750,18 @@ bool UI::OnWidgetDying(tb::TBWidget *widget)
     return false;
 }
 
+void UI::OnWidgetFocusChanged(TBWidget *widget, bool focused)
+{
+    if (widgetWrap_.Contains(widget))
+    {
+        VariantMap evData;
+        UIWidget* uiWidget = widgetWrap_[widget];
+        evData[UIWidgetFocusChanged::P_WIDGET]  = uiWidget;
+        evData[UIWidgetFocusChanged::P_FOCUSED]  = focused;
+        uiWidget->SendEvent(E_UIWIDGETFOCUSCHANGED, evData);
+    }
+}
+
 void UI::ShowDebugHud(bool value)
 {
     SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();

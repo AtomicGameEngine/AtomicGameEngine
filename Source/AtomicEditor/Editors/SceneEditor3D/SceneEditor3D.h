@@ -30,6 +30,8 @@ class Octree;
 namespace AtomicEditor
 {
 
+class SceneEditHistory;
+
 class SceneEditor3D: public ResourceEditor
 {
     OBJECT(SceneEditor3D);
@@ -56,6 +58,9 @@ public:
 
 private:
 
+    void Undo();
+    void Redo();
+
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
     void HandlePlayStarted(StringHash eventType, VariantMap& eventData);
@@ -73,6 +78,8 @@ private:
 
     WeakPtr<Node> selectedNode_;
     SharedPtr<Node> clipboardNode_;
+
+    SharedPtr<SceneEditHistory> editHistory_;
 
 };
 

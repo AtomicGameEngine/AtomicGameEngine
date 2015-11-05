@@ -28,4 +28,42 @@ EVENT(E_GIZMOMOVED, GizmoMoved)
 
 }
 
+EVENT(E_HISTORYNODEADDED, HistoryNodeAdded)
+{
+    PARAM(P_SCENE, Scene);            // Scene
+    PARAM(P_NODE, Node);            // Node
+}
+
+EVENT(E_HISTORYNODEREMOVED, HistoryNodeRemoved)
+{
+    PARAM(P_SCENE, Scene);            // Scene
+    PARAM(P_NODE, Node);             // Node
+}
+
+EVENT(E_HISTORYNODECHANGED, HistoryNodeChanged)
+{
+    PARAM(P_SCENE, Scene);            // Scene
+    PARAM(P_NODE, Node);              // Node
+}
+
+EVENT(E_HISTORYCOMPONENTCHANGED, HistoryComponentChanged)
+{
+    PARAM(P_SCENE, Scene);            // Scene
+    PARAM(P_COMPONENT, Component);    // Component
+}
+
+EVENT(E_HISTORYNODECHANGEDUNDOREDO, HistoryNodeChangedUndoRedo)
+{
+    PARAM(P_SCENE, Scene);            // Scene
+    PARAM(P_NODE, Node);    // Node
+}
+
+EVENT(E_HISTORYCOMPONENTCHANGEDUNDOREDO, HistoryComponentChangedUndoRedo)
+{
+    PARAM(P_SCENE, Scene);            // Scene
+    PARAM(P_COMPONENT, Component);    // Component
+}
+
+
+
 }

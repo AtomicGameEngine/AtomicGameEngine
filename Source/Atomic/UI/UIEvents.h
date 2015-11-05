@@ -103,4 +103,11 @@ EVENT(E_UISHORTCUT, UIShortcut)
 
 }
 
+EVENT(E_UIWIDGETFOCUSCHANGED, UIWidgetFocusChanged)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+    PARAM(P_FOCUSED, Focused);             // bool
+}
+
+
 }

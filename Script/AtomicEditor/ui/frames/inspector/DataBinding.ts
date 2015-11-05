@@ -26,6 +26,8 @@ class DataBinding {
         fd.id = "Vera";
         fd.size = 11;
 
+        var editFields: Array<Atomic.UIEditField> = [];
+
         var enumSource = null;
 
         if (attrInfo.type == Atomic.VAR_BOOL) {
@@ -66,6 +68,8 @@ class DataBinding {
                 lp.width = 140;
                 field.layoutParams = lp;
 
+                editFields.push(field);
+
                 widget = field;
             }
 
@@ -80,6 +84,8 @@ class DataBinding {
             lp.width = 140;
             field.layoutParams = lp;
 
+            editFields.push(field);
+
             widget = field;
 
         }
@@ -92,6 +98,8 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
+
+            editFields.push(field);
 
             widget = field;
         }
@@ -135,6 +143,7 @@ class DataBinding {
             }
 
         } else if (attrInfo.type == Atomic.VAR_VECTOR2) {
+
             var layout = new Atomic.UILayout();
             widget = layout;
             layout.spacing = 0;
@@ -167,7 +176,6 @@ class DataBinding {
                 parent.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
                 parent.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
                 parent.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-
 
                 var lp = new Atomic.UILayoutParams();
                 lp.width = 140;
@@ -214,7 +222,7 @@ class DataBinding {
 
                         if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-                            var asset = <ToolCore.Asset> dragObject.object;
+                            var asset = <ToolCore.Asset>dragObject.object;
 
                             if (asset.importerTypeName == importerName) {
                                 importer = asset.importer;
@@ -250,6 +258,11 @@ class DataBinding {
 
             var binding = new DataBinding(object, attrInfo, widget);
             binding.enumSource = enumSource;
+
+            for (var i in editFields) {
+                binding.subscribeToFocusChange(field);
+            }
+
             return binding;
 
         }
@@ -259,6 +272,7 @@ class DataBinding {
     }
 
     setWidgetValueFromObject() {
+
         if (this.widgetLocked)
             return;
 
@@ -340,13 +354,13 @@ class DataBinding {
         } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
 
             // for cached resources, use the asset name, otherwise use the resource path name
-            var resource = <Atomic.Resource> object.getAttribute(attrInfo.name);
+            var resource = <Atomic.Resource>object.getAttribute(attrInfo.name);
             var text = "";
             if (resource) {
                 text = resource.name;
                 var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
                 if (asset)
-                  text = asset.name;
+                    text = asset.name;
             }
 
             widget["editField"].text = text;
@@ -445,6 +459,37 @@ class DataBinding {
 
     }
 
+    subscribeToFocusChange(widget: Atomic.UIWidget) {
+
+        widget.subscribeToEvent(widget, "UIWidgetFocusChanged", (ev) => this.handleUIWidgetFocusChangedEvent(ev));
+
+    }
+
+    handleUIWidgetFocusChangedEvent(ev: Atomic.UIWidgetFocusChangedEvent) {
+
+        // does our object have a scene property? (Node/Component)
+        var scene = this.object["scene"];
+
+        if (!scene)
+            return;
+
+        if (ev.focused) {
+
+            // gaining focus, save initial value
+            this.initalEditValue = ev.widget.text;
+
+        } else {
+
+            if (this.initalEditValue != ev.widget.text) {
+
+                // focus changed, with value change record in history
+                this.createHistorySnapshot();
+
+            }
+
+        }
+
+    }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
@@ -459,6 +504,7 @@ class DataBinding {
 
                 this.object.setAttribute(this.attrInfo.name, Number(ev.refid) - 1);
                 this.setWidgetValueFromObject();
+                this.createHistorySnapshot();
 
             }
 
@@ -474,18 +520,34 @@ class DataBinding {
 
             }
 
-
         }
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+
             if (this.widget == ev.target || this.widget.isAncestorOf(ev.target)) {
                 //EditorUI.getCurrentResourceEditor().setModified(true);
                 this.setObjectValueFromWidget(ev.target);
+
+                // create a history snapshot, UIEditFields handle this when losing focus
+                if (ev.target.getTypeName() != "UIEditField") {
+                    this.createHistorySnapshot();
+                }
+
                 return true;
             }
         }
 
         return false;
+
+    }
+
+    createHistorySnapshot() {
+
+        if (this.object.getTypeName() == "Node") {
+            this.object.sendEvent("HistoryNodeChanged", { scene: this.object["scene"], node: this.object });
+        } else if (this.object["node"]) { // TODO: need better component detection
+            this.object.sendEvent("HistoryComponentChanged", { scene: this.object["scene"], component: this.object });
+        }
 
     }
 
@@ -495,6 +557,8 @@ class DataBinding {
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
     enumSource: Atomic.UISelectItemSource;
+
+    initalEditValue: string;
 
 }
 

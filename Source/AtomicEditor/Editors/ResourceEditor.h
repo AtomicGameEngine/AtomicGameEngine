@@ -46,6 +46,9 @@ public:
 
     const String& GetFullPath() { return fullpath_; }
 
+    virtual void Undo() {}
+    virtual void Redo() {}
+
     virtual bool Save() { return true; }
 
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }

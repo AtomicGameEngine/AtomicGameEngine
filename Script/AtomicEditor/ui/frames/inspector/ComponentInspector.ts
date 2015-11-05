@@ -18,7 +18,6 @@ class ComponentInspector extends Atomic.UISection {
         super();
 
         this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
-
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -95,6 +94,8 @@ class ComponentInspector extends Atomic.UISection {
 
         this.component = component;
         this.text = component.typeName;
+
+        this.subscribeToEvent(component, "HistoryComponentChangedUndoRedo", (ev) => this.handleHistoryComponentChangedUndoRedo(ev));
 
         // For JSComponents append the filename
         if (component.typeName == "JSComponent") {
@@ -586,6 +587,23 @@ class ComponentInspector extends Atomic.UISection {
             }
         }
     }
+
+    handleHistoryComponentChangedUndoRedo(ev) {
+
+      for (var i in this.bindings) {
+          this.bindings[i].objectLocked = true;
+      }
+
+      for (var i in this.bindings) {
+          this.bindings[i].setWidgetValueFromObject();
+      }
+
+      for (var i in this.bindings) {
+          this.bindings[i].objectLocked = false;
+      }
+
+    }
+
 
     component: Atomic.Component;
     bindings: Array<DataBinding> = new Array();

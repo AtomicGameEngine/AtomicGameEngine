@@ -44,6 +44,7 @@
 
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
+#include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
 
@@ -107,7 +108,6 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(this, E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
     SetIsFocusable(true);
-
 
 }
 
@@ -516,6 +516,11 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
+        VariantMap heventData;
+        heventData[HistoryNodeAdded::P_NODE] = dragNode_;
+        heventData[HistoryNodeAdded::P_SCENE] = scene_;
+        SendEvent(E_HISTORYNODEADDED, heventData);
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())

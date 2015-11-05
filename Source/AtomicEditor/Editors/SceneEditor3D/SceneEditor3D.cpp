@@ -29,6 +29,7 @@
 #include "../../EditorMode/AEEditorEvents.h"
 
 #include "SceneEditor3D.h"
+#include "SceneEditHistory.h"
 #include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
@@ -97,6 +98,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
 
+    editHistory_ = new SceneEditHistory(context_, scene_);
+
 }
 
 SceneEditor3D::~SceneEditor3D()
@@ -145,6 +148,14 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
             //Don't check for unsaved changes yet
             Close();
             //RequestClose();
+        }
+        else if (ev.ref_id == TBIDC("undo"))
+        {
+            Undo();
+        }
+        else if (ev.ref_id == TBIDC("redo"))
+        {
+            Redo();
         }
     }
 
@@ -262,5 +273,16 @@ bool SceneEditor3D::Save()
     return true;
 
 }
+
+void SceneEditor3D::Undo()
+{
+    editHistory_->Undo();
+}
+
+void SceneEditor3D::Redo()
+{
+    editHistory_->Redo();
+}
+
 
 }
