@@ -96,6 +96,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
 
+    SubscribeToEvent(scene_, E_NODEADDED, HANDLER(SceneEditor3D, HandleNodeAdded));
     SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
 
     editHistory_ = new SceneEditHistory(context_, scene_);
@@ -115,7 +116,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         {
             if (selectedNode_)
             {
-                selectedNode_->RemoveAllComponents();
+                VariantMap editData;
+                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+                editData[SceneEditNodeAddedRemoved::P_NODE] = selectedNode_;
+                editData[SceneEditNodeAddedRemoved::P_ADDED] = false;
+                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+
                 selectedNode_->Remove();
                 selectedNode_ = 0;
             }
@@ -141,6 +147,13 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
                 VariantMap eventData;
                 eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
                 SendEvent(E_EDITORACTIVENODECHANGE, eventData);
+
+                VariantMap editData;
+                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+                editData[SceneEditNodeAddedRemoved::P_NODE] = pasteNode;
+                editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+
+                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
             }
         } 
         else if (ev.ref_id == TBIDC("close"))
@@ -204,13 +217,21 @@ void SceneEditor3D::SelectNode(Node* node)
 
 }
 
+void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
+{
+    // Node does not have values set here
+
+    //Node* node =  static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
+    //LOGINFOF("Node Added: %s", node->GetName().CString());
+}
+
+
 void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
     if (node == selectedNode_)
         SelectNode(0);
 }
-
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {

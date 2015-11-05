@@ -19,6 +19,7 @@ SceneEditHistory::SceneEditHistory(Context* context, Scene* scene) :
     scene_(scene)
 {
     SubscribeToEvent(scene_, E_SCENEEDITSERIALIZABLE, HANDLER(SceneEditHistory, HandleSceneEditSerializable));    
+    SubscribeToEvent(scene_, E_SCENEEDITNODEADDEDREMOVED, HANDLER(SceneEditHistory, HandleSceneEditNodeAddedRemoved));
 }
 
 SceneEditHistory::~SceneEditHistory()
@@ -46,6 +47,14 @@ void SceneEditHistory::HandleSceneEditSerializableUndoRedo(StringHash eventType,
     {
         editStates_[serial] = eventData[SceneEditSerializableUndoRedo::P_STATE].GetVectorBuffer();
     }
+}
+
+void SceneEditHistory::HandleSceneEditNodeAddedRemoved(StringHash eventType, VariantMap& eventData)
+{
+    bool added = eventData[SceneEditNodeAddedRemoved::P_ADDED].GetBool();
+    Node* node = static_cast<Node*>(eventData[SceneEditNodeAddedRemoved::P_NODE].GetPtr());
+    NodeAddedRemovedOp* op = new NodeAddedRemovedOp(node, added);
+    AddUndoOp(op);
 }
 
 void SceneEditHistory::HandleSceneEditSerializable(StringHash eventType, VariantMap& eventData)

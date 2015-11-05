@@ -219,8 +219,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var node = this.scene.getNode(selectedId);
                 if (node) {
-
-                    node.removeAllComponents();
+                    this.scene.sendEvent("SceneEditNodeAddedRemoved", { scene:this.scene, node:node, added:false});
                     node.remove();
 
                 }

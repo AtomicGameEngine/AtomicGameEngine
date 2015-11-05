@@ -40,6 +40,7 @@ private:
 
     void HandleSceneEditSerializable(StringHash eventType, VariantMap& eventData);
     void HandleSceneEditSerializableUndoRedo(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeAddedRemoved(StringHash eventType, VariantMap& eventData);
 
     void AddUndoOp(SceneEditOp* op);
 

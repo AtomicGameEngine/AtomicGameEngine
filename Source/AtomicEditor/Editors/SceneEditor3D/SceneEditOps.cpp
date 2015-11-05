@@ -26,11 +26,29 @@ NodeAddedRemovedOp::NodeAddedRemovedOp(Node* node, bool added) : NodeEditOp(node
 
 bool NodeAddedRemovedOp::Undo()
 {
+    if (added_)
+    {
+        node_->Remove();
+    }
+    else
+    {
+        parent_->AddChild(node_);
+    }
+
     return true;
 }
 
 bool NodeAddedRemovedOp::Redo()
 {
+    if (added_)
+    {
+        parent_->AddChild(node_);
+    }
+    else
+    {
+        node_->Remove();
+    }
+
     return true;
 }
 

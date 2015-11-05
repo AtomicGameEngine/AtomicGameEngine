@@ -442,6 +442,7 @@ void Gizmo3D::SetEditMode(EditMode mode)
 
 void Gizmo3D::Hide()
 {
+    gizmoAxisX_.selected_ = gizmoAxisY_.selected_ = gizmoAxisZ_.selected_ = false;
     gizmo_->SetEnabled(false);
 }
 

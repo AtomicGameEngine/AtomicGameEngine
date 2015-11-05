@@ -67,6 +67,8 @@ private:
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
     void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
     void HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData);
+
+    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<Scene> scene_;

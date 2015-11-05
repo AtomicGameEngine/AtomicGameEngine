@@ -308,7 +308,8 @@ static bool InvokeKey(UI* ui, TBWidget* root, unsigned int key, SPECIAL_KEY spec
 
 void UI::HandleKey(bool keydown, int keycode, int scancode)
 {
-    if (keydown && keycode == KEY_ESC && TBWidget::focused_widget)
+    if (keydown && (keycode == KEY_ESC || keycode == KEY_RETURN || keycode == KEY_RETURN2 || keycode == KEY_KP_ENTER)
+            && TBWidget::focused_widget)
     {
         SendEvent(E_UIWIDGETFOCUSESCAPED);
     }

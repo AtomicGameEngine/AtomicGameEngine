@@ -542,6 +542,13 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
+        VariantMap editData;
+        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+        editData[SceneEditNodeAddedRemoved::P_NODE] = dragNode_;
+        editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())
