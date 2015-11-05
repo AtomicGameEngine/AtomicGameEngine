@@ -38,7 +38,6 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     autocomplete_(0),
     textDirty_(true),
     textDelta_(0.0f),
-    modified_(false),
     currentFindPos_(-1)
 {
 
@@ -270,19 +269,7 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.ref_id == TBIDC("close"))
         {
-            if (modified_)
-            {
-                TBMessageWindow *msg_win = new TBMessageWindow(container_->GetInternalWidget(), TBIDC("unsaved_jsmodifications_dialog"));
-                TBMessageWindowSettings settings(TB_MSG_OK_CANCEL, TBID(uint32(0)));
-                settings.dimmer = true;
-                settings.styling = true;
-                msg_win->Show("Unsaved Modifications", "There are unsaved modications.\nDo you wish to discard them and close?", &settings, 640, 360);
-            }
-            else
-            {
-                Close();
-            }
-
+            RequestClose();
         }
 
         if (ev.ref_id == TBIDC("find"))
@@ -316,24 +303,6 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
         {
             editField_->OnEvent(ev);
         }
-    }
-
-    if (ev.type == EVENT_TYPE_CLICK)
-    {
-        if (ev.target->GetID() == TBIDC("unsaved_jsmodifications_dialog"))
-        {
-            if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
-            {
-                Close();
-            }
-            else
-            {
-                SetFocus();
-            }
-
-            return true;
-        }
-
     }
 
     return false;
@@ -523,12 +492,6 @@ void JSResourceEditor::GotoLineNumber(int lineNumber)
 
     styleEdit_->SetScrollPos(styleEdit_->scroll_x, newy);
 
-}
-
-
-bool JSResourceEditor::HasUnsavedModifications()
-{
-    return modified_;
 }
 
 bool JSResourceEditor::ParseJavascriptToJSON(const char* source, String& json, bool loose)

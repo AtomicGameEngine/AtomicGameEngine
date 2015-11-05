@@ -49,12 +49,7 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     invokeFileClose() {
-
-        // pretty gross
-        var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
-        if (!editor) return;
-        editor.close(true);
-
+        this.invokeResourceFrameShortcut("close");
     }
 
     invokeFileSave() {
