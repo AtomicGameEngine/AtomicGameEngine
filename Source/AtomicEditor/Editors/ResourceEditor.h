@@ -54,6 +54,8 @@ public:
 
     void RequestClose();
 
+    virtual void SetModified(bool modified) { modified_ = modified; };
+
 protected:
 
     String fullpath_;

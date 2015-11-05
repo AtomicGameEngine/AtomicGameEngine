@@ -54,6 +54,8 @@ public:
     void Close(bool navigateToAvailableResource = true);
     bool Save();
 
+    void SetModified(bool modified);
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

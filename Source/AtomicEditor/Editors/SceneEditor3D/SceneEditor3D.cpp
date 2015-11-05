@@ -139,6 +139,10 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
                 eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
                 SendEvent(E_EDITORACTIVENODECHANGE, eventData);
             }
+        } 
+        else if (ev.ref_id == TBIDC("close"))
+        {
+            RequestClose();
         }
     }
 
@@ -253,6 +257,15 @@ bool SceneEditor3D::Save()
 
     return true;
 
+}
+
+void SceneEditor3D::SetModified(bool modified)
+{
+    ResourceEditor::SetModified(modified);
+
+    String filename = GetFileNameAndExtension(fullpath_);
+    filename += "*";
+    button_->SetText(filename.CString());
 }
 
 }
