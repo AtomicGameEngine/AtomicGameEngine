@@ -152,10 +152,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         else if (ev.ref_id == TBIDC("undo"))
         {
             Undo();
+            return true;
         }
         else if (ev.ref_id == TBIDC("redo"))
         {
             Redo();
+            return true;
         }
     }
 
