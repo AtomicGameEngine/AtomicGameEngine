@@ -255,6 +255,8 @@ bool SceneEditor3D::Save()
         file.Close();
     }
 
+    SetModified(false);
+
     return true;
 
 }
@@ -263,9 +265,18 @@ void SceneEditor3D::SetModified(bool modified)
 {
     ResourceEditor::SetModified(modified);
 
-    String filename = GetFileNameAndExtension(fullpath_);
-    filename += "*";
-    button_->SetText(filename.CString());
+    if (modified)
+    {
+        String filename = GetFileNameAndExtension(fullpath_);
+        filename += "*";
+        button_->SetText(filename.CString());
+    }
+    else
+    {
+        String filename = GetFileNameAndExtension(fullpath_);
+        button_->SetText(filename.CString());
+    }
+
 }
 
 }

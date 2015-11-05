@@ -211,7 +211,8 @@ class ComponentInspector extends Atomic.UISection {
 
             // refresh entire inspector, fix this...
             this.sendEvent("EditorActiveNodeChange", { node: node });
-
+            this.sendEvent("ComponentRemoved");
+            
             return true;
 
         }

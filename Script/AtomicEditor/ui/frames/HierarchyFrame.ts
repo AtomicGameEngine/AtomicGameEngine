@@ -8,6 +8,7 @@
 import HierarchyFrameMenu = require("./menus/HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
 
 var IconTemporary = "ComponentBitmap";
 
@@ -67,6 +68,11 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent("ComponentAdded", (ev: Atomic.ComponentAddedEvent) => {
 
+            var resourceEditor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+            if (resourceEditor) {
+                resourceEditor.setModified(true);
+            }
+
             if (!ev.component || ev.component.typeName != "PrefabComponent") return;
 
             var node = ev.node;
@@ -82,6 +88,11 @@ class HierarchyFrame extends Atomic.UIWidget {
         });
 
         this.subscribeToEvent("ComponentRemoved", (ev: Atomic.ComponentRemovedEvent) => {
+
+            var resourceEditor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+            if (resourceEditor) {
+                resourceEditor.setModified(true);
+            }
 
             if (!ev.component || ev.component.typeName != "PrefabComponent") return;
 
@@ -131,6 +142,8 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (!node.parent || node.scene != this.scene)
             return;
 
+        EditorUI.getMainFrame().resourceframe.currentResourceEditor.setModified(true);
+
         var parentID = this.nodeIDToItemID[node.parent.id];
 
         var childItemID = this.recursiveAddNode(parentID, node);
@@ -144,6 +157,8 @@ class HierarchyFrame extends Atomic.UIWidget {
         // on close
         if (!this.scene)
             return;
+
+        EditorUI.getMainFrame().resourceframe.currentResourceEditor.setModified(true);
 
         var node = ev.node;
 

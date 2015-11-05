@@ -37,8 +37,9 @@ class ResourceFrame extends ScriptWidget {
 
     handleSaveResource(ev: EditorEvents.SaveResourceEvent) {
 
-        if (this.currentResourceEditor)
+        if (this.currentResourceEditor){
             this.currentResourceEditor.save();
+        }
 
     }
 

@@ -42,7 +42,7 @@ public:
             TBMessageWindowSettings settings(TB_MSG_OK_CANCEL, TBID(uint32(0)));
             settings.dimmer = true;
             settings.styling = true;
-            msg_win->Show("Unsaved Modifications", "There are unsaved modications.\nDo you wish to discard them and close?", &settings, 640, 360);
+            msg_win->Show("Unsaved Modifications", "There are unsaved modifications.\nDo you wish to discard them and close?", &settings, 640, 360);
         }
         else
         {
