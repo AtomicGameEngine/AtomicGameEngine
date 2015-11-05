@@ -16,6 +16,7 @@ namespace Atomic
 class Scene;
 class Node;
 class Component;
+class Serializable;
 
 }
 
@@ -24,32 +25,30 @@ using namespace Atomic;
 namespace AtomicEditor
 {
 
-enum SceneHistoryOpType
+enum SceneEditType
 {
-    SCENEHISTORYOP_UNKNOWN = 0,
-    SCENEHISTORYOP_NODEADDED,
-    SCENEHISTORYOP_NODEREMOVED,
-    SCENEHISTORYOP_NODECHANGED,
-
-    SCENEHISTORYOP_COMPONENTCHANGED
+    SCENEEDIT_UNKNOWN = 0,
+    SCENEEDIT_NODE_ADDED_REMOVED,
+    SCENEEDIT_COMPONENT_ADDED_REMOVED,
+    SCENEEDIT_SERIALIZABLE_EDIT,
 };
 
-class SceneHistoryOp
+class SceneEditOp
 {
 
 public:
 
-    SceneHistoryOp() { type_ = SCENEHISTORYOP_UNKNOWN; }
-    virtual ~SceneHistoryOp() { }
+    SceneEditOp() { type_ = SCENEEDIT_UNKNOWN; }
+    virtual ~SceneEditOp() { }
 
     virtual bool Undo() = 0;
     virtual bool Redo() = 0;
 
-    SceneHistoryOpType type_;
+    SceneEditType type_;
 
 };
 
-class NodeEditOp : public SceneHistoryOp
+class NodeEditOp : public SceneEditOp
 {
 protected:
 
@@ -62,33 +61,20 @@ public:
 
 };
 
-class NodeAddedOp : public NodeEditOp
+class NodeAddedRemovedOp : public NodeEditOp
 {
 
 public:
 
-    NodeAddedOp(Node* node);
+    NodeAddedRemovedOp(Node* node, bool added);
+
+    bool added_;
 
     bool Undo();
     bool Redo();
 };
 
-class NodeChangedOp : public NodeEditOp
-{
-
-public:
-
-    NodeChangedOp(Node* node, const VectorBuffer& prevState);
-
-    bool Undo();
-    bool Redo();
-
-    VectorBuffer prevState_;
-    VectorBuffer newState_;
-
-};
-
-class ComponentEditOp : public SceneHistoryOp
+class ComponentEditOp : public SceneEditOp
 {
 protected:
 
@@ -100,19 +86,32 @@ public:
 
 };
 
-class ComponentChangedOp : public ComponentEditOp
+class ComponentAddedRemovedOp : public ComponentEditOp
 {
 
 public:
 
-    ComponentChangedOp(Component* component, const VectorBuffer& prevState);
+    ComponentAddedRemovedOp(Node* node, bool added);
+
+    bool added_;
 
     bool Undo();
     bool Redo();
+};
 
-    VectorBuffer prevState_;
-    VectorBuffer newState_;
+class SerializableEditOp : public SceneEditOp
+{
 
+public:
+
+    SerializableEditOp(Serializable* serializable, const VectorBuffer& beginState, const VectorBuffer& endState);
+
+    SharedPtr<Serializable> serializable_;
+    VectorBuffer beginState_;
+    VectorBuffer endState_;
+
+    bool Undo();
+    bool Redo();
 };
 
 

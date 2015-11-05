@@ -93,9 +93,11 @@ class ComponentInspector extends Atomic.UISection {
     inspect(component: Atomic.Component) {
 
         this.component = component;
+
         this.text = component.typeName;
 
-        this.subscribeToEvent(component, "HistoryComponentChangedUndoRedo", (ev) => this.handleHistoryComponentChangedUndoRedo(ev));
+        component.scene.sendEvent("SceneEditSerializable", { serializable: component, operation: 0});
+        this.subscribeToEvent(component, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));
 
         // For JSComponents append the filename
         if (component.typeName == "JSComponent") {
@@ -291,6 +293,16 @@ class ComponentInspector extends Atomic.UISection {
             this.bindings[i].setWidgetValueFromObject();
             this.bindings[i].objectLocked = false;
         }
+
+    }
+
+    handleSceneEditSerializableUndoRedoEvent(ev) {
+
+      for (var i in this.bindings) {
+          this.bindings[i].objectLocked = true;
+          this.bindings[i].setWidgetValueFromObject();
+          this.bindings[i].objectLocked = false;
+      }
 
     }
 
@@ -587,23 +599,6 @@ class ComponentInspector extends Atomic.UISection {
             }
         }
     }
-
-    handleHistoryComponentChangedUndoRedo(ev) {
-
-      for (var i in this.bindings) {
-          this.bindings[i].objectLocked = true;
-      }
-
-      for (var i in this.bindings) {
-          this.bindings[i].setWidgetValueFromObject();
-      }
-
-      for (var i in this.bindings) {
-          this.bindings[i].objectLocked = false;
-      }
-
-    }
-
 
     component: Atomic.Component;
     bindings: Array<DataBinding> = new Array();

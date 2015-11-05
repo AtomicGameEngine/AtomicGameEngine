@@ -516,11 +516,6 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
-
-        VariantMap heventData;
-        heventData[HistoryNodeAdded::P_NODE] = dragNode_;
-        heventData[HistoryNodeAdded::P_SCENE] = scene_;
-        SendEvent(E_HISTORYNODEADDED, heventData);
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())

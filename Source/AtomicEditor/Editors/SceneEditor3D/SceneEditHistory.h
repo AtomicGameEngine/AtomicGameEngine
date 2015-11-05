@@ -13,16 +13,15 @@ using namespace Atomic;
 namespace Atomic
 {
 
+class Serializable;
 class Scene;
-class Node;
-class Component;
 
 }
 
 namespace AtomicEditor
 {
 
-class SceneHistoryOp;
+class SceneEditOp;
 
 /// Simple scene history to support undo/redo via snapshots of scene state
 class SceneEditHistory: public Object
@@ -37,35 +36,19 @@ public:
     void Undo();
     void Redo();
 
-    void Lock() { locked_ = true; }
-    void Unlock() { locked_ = false; }
-
 private:
 
-    void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditSerializable(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditSerializableUndoRedo(StringHash eventType, VariantMap& eventData);
 
-    void HandleHistoryNodeAdded(StringHash eventType, VariantMap& eventData);
-    void HandleHistoryNodeRemoved(StringHash eventType, VariantMap& eventData);
-    void HandleHistoryNodeChanged(StringHash eventType, VariantMap& eventData);
-
-    void HandleHistoryComponentChanged(StringHash eventType, VariantMap& eventData);
-
-
-    void AddUndoOp(SceneHistoryOp* op);
-
-    void BeginUndoRedo();
-    void EndUndoRedo();
+    void AddUndoOp(SceneEditOp* op);
 
     WeakPtr<Scene> scene_;
 
-    WeakPtr<Node> activeNode_;
-    VectorBuffer activeNodeCurrentState_;
+    HashMap< SharedPtr<Serializable>, VectorBuffer > editStates_;
 
-    HashMap<Component*, VectorBuffer> currentComponentStates_;
-
-    bool locked_;
-    PODVector<SceneHistoryOp*> undoHistory_;
-    PODVector<SceneHistoryOp*> redoHistory_;
+    PODVector<SceneEditOp*> undoHistory_;
+    PODVector<SceneEditOp*> redoHistory_;
 
 };
 

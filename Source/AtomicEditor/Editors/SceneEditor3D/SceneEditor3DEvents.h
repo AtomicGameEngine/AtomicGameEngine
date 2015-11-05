@@ -28,42 +28,32 @@ EVENT(E_GIZMOMOVED, GizmoMoved)
 
 }
 
-EVENT(E_HISTORYNODEADDED, HistoryNodeAdded)
+EVENT(E_SCENEEDITNODEADDEDREMOVED, SceneEditNodeAddedRemoved)
 {
-    PARAM(P_SCENE, Scene);            // Scene
-    PARAM(P_NODE, Node);            // Node
+    PARAM(P_SCENE, Scene);             // Scene
+    PARAM(P_NODE, Node);               // Node
+    PARAM(P_ADDED, Added);             // bool
 }
 
-EVENT(E_HISTORYNODEREMOVED, HistoryNodeRemoved)
+EVENT(E_SCENEEDITCOMPONENTADDEDREMOVED, SceneEditComponentAddedRemoved)
 {
-    PARAM(P_SCENE, Scene);            // Scene
-    PARAM(P_NODE, Node);             // Node
+    PARAM(P_SCENE, Scene);             // Scene
+    PARAM(P_COMPONENT, Component);     // Component
+    PARAM(P_ADDED, Added);             // bool
 }
 
-EVENT(E_HISTORYNODECHANGED, HistoryNodeChanged)
+EVENT(E_SCENEEDITSERIALIZABLE, SceneEditSerializable)
 {
-    PARAM(P_SCENE, Scene);            // Scene
-    PARAM(P_NODE, Node);              // Node
+    PARAM(P_SERIALIZABLE, Serializable);     // Serializable
+    PARAM(P_OPERATION, Operation);           // int (0: begin, 1: change, 2: end)
 }
 
-EVENT(E_HISTORYCOMPONENTCHANGED, HistoryComponentChanged)
+EVENT(E_SCENEEDITSERIALIZABLEUNDOREDO, SceneEditSerializableUndoRedo)
 {
-    PARAM(P_SCENE, Scene);            // Scene
-    PARAM(P_COMPONENT, Component);    // Component
+    PARAM(P_SERIALIZABLE, Serializable);     // Serializable
+    PARAM(P_STATE, State);                   // State (VectorBuffer);
+    PARAM(P_UNDO, Undo);                     // bool (true: undo, false: redo)
 }
-
-EVENT(E_HISTORYNODECHANGEDUNDOREDO, HistoryNodeChangedUndoRedo)
-{
-    PARAM(P_SCENE, Scene);            // Scene
-    PARAM(P_NODE, Node);    // Node
-}
-
-EVENT(E_HISTORYCOMPONENTCHANGEDUNDOREDO, HistoryComponentChangedUndoRedo)
-{
-    PARAM(P_SCENE, Scene);            // Scene
-    PARAM(P_COMPONENT, Component);    // Component
-}
-
 
 
 }

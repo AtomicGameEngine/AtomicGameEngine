@@ -120,9 +120,10 @@ class NodeInspector extends ScriptWidget {
 
         this.bindings = new Array();
 
-        this.subscribeToEvent(node, "HistoryNodeChangedUndoRedo", (ev) => this.handleHistoryNodeChangedUndoRedo(ev));        
-
         this.node = node;
+
+        node.scene.sendEvent("SceneEditSerializable", { serializable: node, operation: 0});
+        this.subscribeToEvent(node, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));        
 
         this.isPrefab = this.detectPrefab(node);
 
@@ -316,21 +317,16 @@ class NodeInspector extends ScriptWidget {
 
     }
 
-    handleHistoryNodeChangedUndoRedo(ev) {
+    handleSceneEditSerializableUndoRedoEvent(ev) {
 
       for (var i in this.bindings) {
           this.bindings[i].objectLocked = true;
-      }
-
-      for (var i in this.bindings) {
           this.bindings[i].setWidgetValueFromObject();
-      }
-
-      for (var i in this.bindings) {
           this.bindings[i].objectLocked = false;
       }
 
     }
+
 
     isPrefab: boolean;
     node: Atomic.Node;

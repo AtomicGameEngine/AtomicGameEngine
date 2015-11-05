@@ -1,11 +1,14 @@
 
+#include <Atomic/IO/Log.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Component.h>
 
 #include "SceneEditOps.h"
+#include "SceneEditor3DEvents.h"
 
 namespace AtomicEditor
 {
+
 
 NodeEditOp::NodeEditOp(Node* node)
 {
@@ -15,78 +18,74 @@ NodeEditOp::NodeEditOp(Node* node)
     parent_ = node->GetParent();
 }
 
-NodeAddedOp::NodeAddedOp(Node* node) : NodeEditOp(node)
+NodeAddedRemovedOp::NodeAddedRemovedOp(Node* node, bool added) : NodeEditOp(node),
+    added_(added)
 {
-    type_ = SCENEHISTORYOP_NODEADDED;
-
+    type_ = SCENEEDIT_NODE_ADDED_REMOVED;
 }
 
-bool NodeAddedOp::Undo()
+bool NodeAddedRemovedOp::Undo()
 {
-    node_->Remove();
     return true;
 }
 
-bool NodeAddedOp::Redo()
+bool NodeAddedRemovedOp::Redo()
 {
-    parent_->AddChild(node_);
     return true;
 }
 
-NodeChangedOp::NodeChangedOp(Node* node, const VectorBuffer& prevState) : NodeEditOp(node)
+SerializableEditOp::SerializableEditOp(Serializable* serializable, const VectorBuffer& beginState, const VectorBuffer& endState) : SceneEditOp(),
+    serializable_(serializable),
+    beginState_(beginState),
+    endState_(endState)
 {
-    type_ = SCENEHISTORYOP_NODECHANGED;
+    type_ = SCENEEDIT_SERIALIZABLE_EDIT;
 
-    prevState_ = prevState;
-    node->Animatable::Save(newState_);
-    newState_.Seek(0);
+    if (!beginState_.GetSize())
+    {
+        LOGERRORF("Zero size beginState");
+    }
+
+    if (!endState_.GetSize())
+    {
+        LOGERRORF("Zero size endState");
+    }
 }
 
-bool NodeChangedOp::Undo()
-{
-    node_->Animatable::Load(prevState_);
-    prevState_.Seek(0);
+bool SerializableEditOp::Undo()
+{    
+    if (!serializable_->Serializable::Load(beginState_))
+    {
+        LOGERRORF("Error loading beginState");
+    }
+    beginState_.Seek(0);
+
+    VariantMap eventData;
+    eventData[SceneEditSerializableUndoRedo::P_SERIALIZABLE] = serializable_;
+    eventData[SceneEditSerializableUndoRedo::P_UNDO] = true;
+    eventData[SceneEditSerializableUndoRedo::P_STATE] = beginState_;
+    serializable_->SendEvent(E_SCENEEDITSERIALIZABLEUNDOREDO, eventData);
+
     return true;
 }
 
-bool NodeChangedOp::Redo()
+bool SerializableEditOp::Redo()
 {
-    node_->Animatable::Load(newState_);
-    newState_.Seek(0);
+
+    if (!serializable_->Serializable::Load(endState_))
+    {
+        LOGERRORF("Error loading endState");
+    }
+
+    endState_.Seek(0);
+
+    VariantMap eventData;
+    eventData[SceneEditSerializableUndoRedo::P_SERIALIZABLE] = serializable_;
+    eventData[SceneEditSerializableUndoRedo::P_UNDO] = false;
+    eventData[SceneEditSerializableUndoRedo::P_STATE] = endState_;
+    serializable_->SendEvent(E_SCENEEDITSERIALIZABLEUNDOREDO, eventData);
+
     return true;
 }
-
-//------------ Component Ops
-
-ComponentEditOp::ComponentEditOp(Component* component)
-{
-    component_ = component;
-
-}
-
-ComponentChangedOp::ComponentChangedOp(Component* component, const VectorBuffer& prevState) : ComponentEditOp(component)
-{
-    type_ = SCENEHISTORYOP_COMPONENTCHANGED;
-
-    prevState_ = prevState;
-    component_->Animatable::Save(newState_);
-    newState_.Seek(0);
-}
-
-bool ComponentChangedOp::Undo()
-{
-    component_->Animatable::Load(prevState_);
-    prevState_.Seek(0);
-    return true;
-}
-
-bool ComponentChangedOp::Redo()
-{
-    component_->Animatable::Load(newState_);
-    newState_.Seek(0);
-    return true;
-}
-
-
 
 }

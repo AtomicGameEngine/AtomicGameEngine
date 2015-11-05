@@ -152,6 +152,7 @@ private:
     AxisMode axisMode_;
 
     Vector<Node *> *editNodes_;
+    bool dragging_;
 
 };
 

@@ -67,9 +67,7 @@ class DataBinding {
                 var lp = new Atomic.UILayoutParams();
                 lp.width = 140;
                 field.layoutParams = lp;
-
                 editFields.push(field);
-
                 widget = field;
             }
 
@@ -83,7 +81,6 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
-
             editFields.push(field);
 
             widget = field;
@@ -98,9 +95,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
-
             editFields.push(field);
-
             widget = field;
         }
         else if (attrInfo.type == Atomic.VAR_VECTOR3 || attrInfo.type == Atomic.VAR_QUATERNION) {
@@ -143,7 +138,6 @@ class DataBinding {
             }
 
         } else if (attrInfo.type == Atomic.VAR_VECTOR2) {
-
             var layout = new Atomic.UILayout();
             widget = layout;
             layout.spacing = 0;
@@ -176,6 +170,7 @@ class DataBinding {
                 parent.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
                 parent.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
                 parent.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
 
                 var lp = new Atomic.UILayoutParams();
                 lp.width = 140;
@@ -272,7 +267,6 @@ class DataBinding {
     }
 
     setWidgetValueFromObject() {
-
         if (this.widgetLocked)
             return;
 
@@ -467,7 +461,7 @@ class DataBinding {
 
     handleUIWidgetFocusChangedEvent(ev: Atomic.UIWidgetFocusChangedEvent) {
 
-        // does our object have a scene property? (Node/Component)
+        // TODO: once new base class stuff is in, should be able to check for type
         var scene = this.object["scene"];
 
         if (!scene)
@@ -483,7 +477,7 @@ class DataBinding {
             if (this.initalEditValue != ev.widget.text) {
 
                 // focus changed, with value change record in history
-                this.createHistorySnapshot();
+                scene.sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
 
             }
 
@@ -504,7 +498,6 @@ class DataBinding {
 
                 this.object.setAttribute(this.attrInfo.name, Number(ev.refid) - 1);
                 this.setWidgetValueFromObject();
-                this.createHistorySnapshot();
 
             }
 
@@ -520,6 +513,7 @@ class DataBinding {
 
             }
 
+
         }
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
@@ -528,9 +522,11 @@ class DataBinding {
                 //EditorUI.getCurrentResourceEditor().setModified(true);
                 this.setObjectValueFromWidget(ev.target);
 
-                // create a history snapshot, UIEditFields handle this when losing focus
-                if (ev.target.getTypeName() != "UIEditField") {
-                    this.createHistorySnapshot();
+                if (ev.target.getTypeName() != "UIEditField" && ev.target.getTypeName() != "UIInlineSelect") {
+
+                    // TODO: once new base class stuff is in, should be able to check for type
+                    if (this.object["scene"])
+                        this.object["scene"].sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
                 }
 
                 return true;
@@ -541,23 +537,12 @@ class DataBinding {
 
     }
 
-    createHistorySnapshot() {
-
-        if (this.object.getTypeName() == "Node") {
-            this.object.sendEvent("HistoryNodeChanged", { scene: this.object["scene"], node: this.object });
-        } else if (this.object["node"]) { // TODO: need better component detection
-            this.object.sendEvent("HistoryComponentChanged", { scene: this.object["scene"], component: this.object });
-        }
-
-    }
-
     object: Atomic.Serializable;
     objectLocked: boolean = true;
     widgetLocked: boolean = false;
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
     enumSource: Atomic.UISelectItemSource;
-
     initalEditValue: string;
 
 }

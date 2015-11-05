@@ -21,7 +21,8 @@ namespace AtomicEditor
 {
 
 
-Gizmo3D::Gizmo3D(Context* context) : Object(context)
+Gizmo3D::Gizmo3D(Context* context) : Object(context),
+    dragging_(false)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
@@ -169,7 +170,18 @@ void Gizmo3D::Use()
     // Recalculate axes only when not left-dragging
     bool drag = input->GetMouseButtonDown(MOUSEB_LEFT);// && (Abs(input->GetMouseMoveX()) > 3 || Abs(input->GetMouseMoveY()) > 3);
     if (!drag)
+    {
+        if (dragging_)
+        {
+            VariantMap eventData;
+            eventData[SceneEditSerializable::P_SERIALIZABLE] = editNodes_->At(0);
+            eventData[SceneEditSerializable::P_OPERATION] = 1;
+            scene_->SendEvent(E_SCENEEDITSERIALIZABLE, eventData);
+            dragging_ = false;
+        }
+
         CalculateGizmoAxes();
+    }
 
     gizmoAxisX_.Update(cameraRay, scale, drag, camera_->GetNode());
     gizmoAxisY_.Update(cameraRay, scale, drag, camera_->GetNode());
@@ -209,7 +221,7 @@ void Gizmo3D::Use()
         gizmoAxisZ_.lastSelected_ = gizmoAxisZ_.selected_;
     }
 
-    if (drag)
+    if (drag && Selected())
         Drag();
 
 }
@@ -358,6 +370,8 @@ void Gizmo3D::Moved()
 void Gizmo3D::Drag()
 {
     bool moved = false;
+
+    dragging_ = true;
 
     float scale = gizmoNode_->GetScale().x_;
 
