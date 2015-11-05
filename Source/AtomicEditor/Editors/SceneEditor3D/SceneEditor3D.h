@@ -56,10 +56,10 @@ public:
     void Close(bool navigateToAvailableResource = true);
     bool Save();
 
-private:
-
     void Undo();
     void Redo();
+
+private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);

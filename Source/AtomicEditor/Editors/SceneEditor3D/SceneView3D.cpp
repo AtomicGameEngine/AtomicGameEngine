@@ -107,6 +107,9 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(this, E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
     SubscribeToEvent(this, E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
+    SubscribeToEvent(E_UIUNHANDLEDSHORTCUT, HANDLER(SceneView3D, HandleUIUnhandledShortcut));
+    SubscribeToEvent(E_UIWIDGETFOCUSESCAPED, HANDLER(SceneView3D, HandleUIWidgetFocusEscaped));
+
     SetIsFocusable(true);
 
 }
@@ -260,6 +263,29 @@ bool SceneView3D::MouseInView()
 
 }
 
+void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData)
+{
+    if (!enabled_)
+        return;
+
+    unsigned id = eventData[UIUnhandledShortcut::P_REFID].GetUInt();
+
+    if (id == TBIDC("undo"))
+        sceneEditor_->Undo();
+    else if (id == TBIDC("redo"))
+        sceneEditor_->Redo();
+
+    return;
+
+}
+
+void SceneView3D::HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData)
+{
+    if (!enabled_)
+        return;
+
+    SetFocus();
+}
 
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {

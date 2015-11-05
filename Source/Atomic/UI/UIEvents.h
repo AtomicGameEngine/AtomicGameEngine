@@ -108,6 +108,13 @@ EVENT(E_UIWIDGETFOCUSCHANGED, UIWidgetFocusChanged)
     PARAM(P_WIDGET, Widget);             // UIWidget pointer
     PARAM(P_FOCUSED, Focused);             // bool
 }
+EVENT(E_UIWIDGETFOCUSESCAPED, UIWidgetFocusEscaped)
+{
+}
 
+EVENT(E_UIUNHANDLEDSHORTCUT, UIUnhandledShortcut)
+{
+    PARAM(P_REFID, RefID); // string tbid
+}
 
 }
