@@ -21,6 +21,7 @@ class ResourceFrame extends ScriptWidget {
     resourceLayout: Atomic.UILayout;
     resourceViewContainer: Atomic.UILayout;
     currentResourceEditor: Editor.ResourceEditor;
+    wasClosed: boolean;
 
     // editors have a rootCotentWidget which is what is a child of the tab container
 
@@ -93,6 +94,7 @@ class ResourceFrame extends ScriptWidget {
     }
 
     navigateToResource(fullpath: string, lineNumber = -1, tokenPos: number = -1) {
+        if (this.wasClosed) return;
 
         if (!this.editors[fullpath]) {
             return;
@@ -133,17 +135,18 @@ class ResourceFrame extends ScriptWidget {
     }
 
     handleCloseResource(ev: EditorEvents.CloseResourceEvent) {
-
+        this.wasClosed = false;
         var editor = ev.editor;
         var navigate = ev.navigateToAvailableResource;
 
         if (!editor)
             return;
 
-        if (this.currentResourceEditor == editor)
-            this.currentResourceEditor = null;
-
         editor.unsubscribeFromAllEvents();
+
+        var editors = Object.keys(this.editors);
+
+        var closedIndex = editors.indexOf(editor.fullPath);
 
         // remove from lookup
         delete this.editors[editor.fullPath];
@@ -152,18 +155,21 @@ class ResourceFrame extends ScriptWidget {
 
         root.removeChild(editor.rootContentWidget);
 
-        this.tabcontainer.currentPage = -1;
+        if (editor != this.currentResourceEditor) {
+            this.wasClosed = true;
+            return;
+        } else {
+            this.currentResourceEditor = null;
+            this.tabcontainer.currentPage = -1;
+        }
 
         if (navigate) {
-
-            var keys = Object.keys(this.editors);
-
-            if (keys.length) {
-
-                this.navigateToResource(keys[keys.length - 1]);
-
+            var nextEditor = editors[closedIndex+1];
+            if (nextEditor) {
+                this.navigateToResource(nextEditor);
+            } else {
+                this.navigateToResource(editors[closedIndex-1]);
             }
-
         }
 
     }
@@ -196,6 +202,10 @@ class ResourceFrame extends ScriptWidget {
 
             }
 
+        }
+
+        if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_UP) {
+            this.wasClosed = false;
         }
 
         // bubble
