@@ -28,6 +28,11 @@ EVENT(E_GIZMOMOVED, GizmoMoved)
 
 }
 
+EVENT(E_SCENEEDITSCENEMODIFIED, SceneEditSceneModified)
+{
+
+}
+
 EVENT(E_SCENEEDITNODEADDEDREMOVED, SceneEditNodeAddedRemoved)
 {
     PARAM(P_SCENE, Scene);             // Scene

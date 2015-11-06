@@ -31,6 +31,8 @@ void SceneEditHistory::AddUndoOp(SceneEditOp* op)
 {
     undoHistory_.Push(op);
 
+    scene_->SendEvent(E_SCENEEDITSCENEMODIFIED);
+
     for (unsigned i = 0; i < redoHistory_.Size(); i++)
     {
         delete redoHistory_[i];
@@ -45,6 +47,7 @@ void SceneEditHistory::HandleSceneEditSerializableUndoRedo(StringHash eventType,
 
     if (editStates_.Contains(serial))
     {
+        scene_->SendEvent(E_SCENEEDITSCENEMODIFIED);
         editStates_[serial] = eventData[SceneEditSerializableUndoRedo::P_STATE].GetVectorBuffer();
     }
 }

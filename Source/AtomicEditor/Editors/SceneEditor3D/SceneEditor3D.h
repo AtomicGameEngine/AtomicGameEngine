@@ -71,6 +71,8 @@ private:
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
+    void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
+
     SharedPtr<Scene> scene_;
 
     // TODO: multiple views

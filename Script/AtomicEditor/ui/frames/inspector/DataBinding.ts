@@ -537,7 +537,7 @@ class DataBinding {
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
 
             if (this.widget == ev.target || this.widget.isAncestorOf(ev.target)) {
-                //EditorUI.getCurrentResourceEditor().setModified(true);
+              
                 this.setObjectValueFromWidget(ev.target);
 
                 if (ev.target.getTypeName() != "UIEditField" && ev.target.getTypeName() != "UIInlineSelect") {

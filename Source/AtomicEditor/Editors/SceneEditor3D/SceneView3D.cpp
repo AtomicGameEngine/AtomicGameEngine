@@ -390,6 +390,12 @@ void SceneView3D::SelectNode(Node* node)
 
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        if (ev.ref_id == TBIDC("close"))
+            return false;
+    }
+
     return sceneEditor_->OnEvent(ev);
 }
 
