@@ -139,6 +139,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
                 eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
                 SendEvent(E_EDITORACTIVENODECHANGE, eventData);
             }
+        } 
+        else if (ev.ref_id == TBIDC("close"))
+        {
+            //Don't check for unsaved changes yet
+            Close();
+            //RequestClose();
         }
     }
 
@@ -250,6 +256,8 @@ bool SceneEditor3D::Save()
         scene_->SaveXML(file);
         file.Close();
     }
+
+    SetModified(false);
 
     return true;
 

@@ -10,6 +10,8 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceEvents.h>
 
+#include <TurboBadger/tb_message_window.h>
+
 #include "ResourceEditor.h"
 
 //#include "../UI/UIMainFrame.h"
@@ -32,17 +34,50 @@ public:
         button_->SetValue(value);
     }
 
+    bool RequestClose()
+    {
+        if (editor_->HasUnsavedModifications())
+        {
+            TBMessageWindow *msg_win = new TBMessageWindow(this, TBIDC("unsaved_modifications_dialog"));
+            TBMessageWindowSettings settings(TB_MSG_OK_CANCEL, TBID(uint32(0)));
+            settings.dimmer = true;
+            settings.styling = true;
+            msg_win->Show("Unsaved Modifications", "There are unsaved modifications.\nDo you wish to discard them and close?", &settings, 640, 360);
+            return false;
+        }
+        else
+        {
+            editor_->Close();
+            return true;
+        }
+    }
+
     bool OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.type == EVENT_TYPE_CLICK || ev.type == EVENT_TYPE_POINTER_DOWN)
         {
-            if (ev.target->GetID() == TBIDC("tabclose"))
+            if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
             {
-                container_->OnEvent(ev);
-                editor_->Close();
+                if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
+                {
+                    container_->OnEvent(ev);
+                    editor_->Close();
+                }
+                else
+                {
+                    SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
+                }
                 return true;
             }
-            else
+            if (ev.target->GetID() == TBIDC("tabclose"))
+            {
+                if (RequestClose())
+                {
+                    container_->OnEvent(ev);
+                    return true;
+                }
+            }
+            else 
             {
                 TBWidgetEvent nevent = ev;
                 nevent.target = this;
@@ -56,7 +91,7 @@ public:
 
 ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabContainer *container):
     Object(context), fullpath_(fullpath), container_(container),
-    editorTabLayout_(0), rootContentWidget_(0), button_(0)
+    editorTabLayout_(0), rootContentWidget_(0), button_(0), modified_(false)
 {
 
     String filename = GetFileNameAndExtension(fullpath_);
@@ -112,6 +147,11 @@ void ResourceEditor::HandleFileChanged(StringHash eventType, VariantMap& eventDa
     */
 }
 
+void ResourceEditor::RequestClose()
+{
+    editorTabLayout_->RequestClose();
+}
+
 void ResourceEditor::Close(bool navigateToAvailableResource)
 {
     // keep us alive through the close
@@ -130,6 +170,21 @@ void ResourceEditor::InvokeShortcut(const String& shortcut)
     TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
     ev.ref_id = TBIDC(shortcut.CString());
     OnEvent(ev);
+}
+
+void ResourceEditor::SetModified(bool modified)
+{
+    if (modified)
+    {
+        String filename = GetFileNameAndExtension(fullpath_);
+        filename += "*";
+        button_->SetText(filename.CString());
+    }
+    else
+    {
+        String filename = GetFileNameAndExtension(fullpath_);
+        button_->SetText(filename.CString());
+    }
 }
 
 }
