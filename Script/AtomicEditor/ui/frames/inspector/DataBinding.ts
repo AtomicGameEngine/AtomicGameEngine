@@ -512,6 +512,10 @@ class DataBinding {
 
                 this.object.setAttribute(this.attrInfo.name, Number(ev.refid) - 1);
                 this.setWidgetValueFromObject();
+                // TODO: once new base class stuff is in, should be able to check for type
+                if (this.object["scene"])
+                    this.object["scene"].sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+
 
             }
 
