@@ -112,6 +112,10 @@ EVENT(E_UIWIDGETFOCUSESCAPED, UIWidgetFocusEscaped)
 {
 }
 
+EVENT(E_UIWIDGETEDITCOMPLETE, UIWidgetEditComplete)
+{
+}
+
 EVENT(E_UIUNHANDLEDSHORTCUT, UIUnhandledShortcut)
 {
     PARAM(P_REFID, RefID); // string tbid

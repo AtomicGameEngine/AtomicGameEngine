@@ -19,7 +19,7 @@ namespace tb {
 	FIX: Should also be possible to set a list of strings that will be
 		shown instead of numbers.
 */
-class TBInlineSelect : public TBWidget
+class TBInlineSelect : public TBWidget, private TBWidgetListener
 {
 public:
 	// For safe typecasting
@@ -53,8 +53,17 @@ protected:
 	TBEditField m_editfield;
     double m_value;
     double m_min, m_max;
+    bool m_modified;
 
     void SetValueInternal(double value, bool update_text);
+
+private:
+
+    TBStr m_initial_edit_value;
+
+    void InvokeModifiedEvent();
+    void OnWidgetFocusChanged(TBWidget *widget, bool focused);
+    bool OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev);
 };
 
 }; // namespace tb

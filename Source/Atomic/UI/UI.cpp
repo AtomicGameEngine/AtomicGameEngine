@@ -825,10 +825,15 @@ SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String
 
 }
 
-
 UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
 {
     return WrapWidget(rootWidget_->GetWidgetAt(x, y, include_children));
 }
+
+bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
+{
+    return false;
+}
+
 
 }

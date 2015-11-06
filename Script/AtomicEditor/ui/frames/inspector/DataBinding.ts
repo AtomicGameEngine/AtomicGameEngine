@@ -27,6 +27,7 @@ class DataBinding {
         fd.size = 11;
 
         var editFields: Array<Atomic.UIEditField> = [];
+        var inlineSelects: Array<Atomic.UIInlineSelect> = [];
 
         var enumSource = null;
 
@@ -108,6 +109,7 @@ class DataBinding {
 
             for (var i: any = 0; i < 3; i++) {
                 var select = new Atomic.UIInlineSelect();
+                inlineSelects.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.skinBg = "InspectorVectorAttrName";
@@ -130,6 +132,7 @@ class DataBinding {
             for (var i: any = 0; i < 4; i++) {
 
                 var select = new Atomic.UIInlineSelect();
+                inlineSelects.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.setLimits(-10000000, 10000000);
@@ -147,6 +150,7 @@ class DataBinding {
 
             for (var i: any = 0; i < 2; i++) {
                 var select = new Atomic.UIInlineSelect();
+                inlineSelects.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.skinBg = "InspectorVectorAttrName";
@@ -255,7 +259,10 @@ class DataBinding {
             binding.enumSource = enumSource;
 
             for (var i in editFields) {
-                binding.subscribeToFocusChange(field);
+                editFields[i].subscribeToEvent(editFields[i], "UIWidgetFocusChanged", (ev) => binding.handleUIWidgetFocusChangedEvent(ev));
+            }
+            for (var i in inlineSelects) {
+                inlineSelects[i].subscribeToEvent(inlineSelects[i], "UIWidgetEditComplete", (ev) => binding.handleUIWidgetEditCompleteEvent(ev));
             }
 
             return binding;
@@ -453,12 +460,19 @@ class DataBinding {
 
     }
 
-    subscribeToFocusChange(widget: Atomic.UIWidget) {
+    handleUIWidgetEditCompleteEvent(ev) {
 
-        widget.subscribeToEvent(widget, "UIWidgetFocusChanged", (ev) => this.handleUIWidgetFocusChangedEvent(ev));
+      // TODO: once new base class stuff is in, should be able to check for type
+      var scene = this.object["scene"];
+
+      if (!scene)
+          return;
+
+      scene.sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
 
     }
 
+    // event for text field edits
     handleUIWidgetFocusChangedEvent(ev: Atomic.UIWidgetFocusChangedEvent) {
 
         // TODO: once new base class stuff is in, should be able to check for type

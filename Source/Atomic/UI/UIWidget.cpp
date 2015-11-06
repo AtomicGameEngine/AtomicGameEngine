@@ -39,7 +39,8 @@ namespace Atomic
 
 UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
     widget_(0),
-    preferredSize_(new UIPreferredSize())
+    preferredSize_(new UIPreferredSize()),
+    multiTouch_(false)
 {
     AddRef();
 
@@ -737,6 +738,24 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 
     return false;
 }
+
+bool UIWidget::GetCaptured()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->IsCaptured();
+
+}
+
+void UIWidget::SetCapturing(bool capturing)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetCapturing(capturing);
+}
+
 
 void UIWidget::InvalidateLayout()
 {
