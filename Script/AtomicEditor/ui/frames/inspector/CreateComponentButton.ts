@@ -138,7 +138,6 @@ class CreateComponentButton extends Atomic.UIButton {
 
               this.parent.addChildRelative(ci, Atomic.UI_WIDGET_Z_REL_BEFORE, this);
 
-              this.sendEvent("ComponentAdded");
             }
 
             return true;

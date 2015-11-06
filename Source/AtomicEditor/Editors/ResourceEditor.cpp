@@ -43,11 +43,12 @@ public:
             settings.dimmer = true;
             settings.styling = true;
             msg_win->Show("Unsaved Modifications", "There are unsaved modifications.\nDo you wish to discard them and close?", &settings, 640, 360);
+            return false;
         }
         else
         {
             editor_->Close();
-            return false;
+            return true;
         }
     }
 
@@ -169,6 +170,21 @@ void ResourceEditor::InvokeShortcut(const String& shortcut)
     TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
     ev.ref_id = TBIDC(shortcut.CString());
     OnEvent(ev);
+}
+
+void ResourceEditor::SetModified(bool modified)
+{
+    if (modified)
+    {
+        String filename = GetFileNameAndExtension(fullpath_);
+        filename += "*";
+        button_->SetText(filename.CString());
+    }
+    else
+    {
+        String filename = GetFileNameAndExtension(fullpath_);
+        button_->SetText(filename.CString());
+    }
 }
 
 }

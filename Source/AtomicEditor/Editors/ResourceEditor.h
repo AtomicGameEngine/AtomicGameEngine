@@ -54,7 +54,7 @@ public:
 
     void RequestClose();
 
-    virtual void SetModified(bool modified) { modified_ = modified; };
+    void SetModified(bool modified);
 
 protected:
 

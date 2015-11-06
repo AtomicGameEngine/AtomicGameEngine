@@ -142,7 +142,9 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         } 
         else if (ev.ref_id == TBIDC("close"))
         {
-            RequestClose();
+            //Don't check for unsaved changes yet
+            Close();
+            //RequestClose();
         }
     }
 
@@ -258,24 +260,6 @@ bool SceneEditor3D::Save()
     SetModified(false);
 
     return true;
-
-}
-
-void SceneEditor3D::SetModified(bool modified)
-{
-    ResourceEditor::SetModified(modified);
-
-    if (modified)
-    {
-        String filename = GetFileNameAndExtension(fullpath_);
-        filename += "*";
-        button_->SetText(filename.CString());
-    }
-    else
-    {
-        String filename = GetFileNameAndExtension(fullpath_);
-        button_->SetText(filename.CString());
-    }
 
 }
 

@@ -222,9 +222,7 @@ void JSResourceEditor::OnChange(TBStyleEdit* styleEdit)
     textDirty_ = true;
     modified_ = true;
 
-    String filename = GetFileNameAndExtension(fullpath_);
-    filename += "*";
-    button_->SetText(filename.CString());
+    SetModified(true);
 
     autocomplete_->Hide();
 
@@ -584,9 +582,7 @@ bool JSResourceEditor::Save()
     file.Write((void*) text.CStr(), text.Length());
     file.Close();
 
-    String filename = GetFileNameAndExtension(fullpath_);
-    button_->SetText(filename.CString());
-    modified_ = false;
+    SetModified(false);
 
     return true;
 
