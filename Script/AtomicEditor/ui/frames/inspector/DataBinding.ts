@@ -26,8 +26,7 @@ class DataBinding {
         fd.id = "Vera";
         fd.size = 11;
 
-        var editFields: Array<Atomic.UIEditField> = [];
-        var inlineSelects: Array<Atomic.UIInlineSelect> = [];
+        var editWidgets: Array<Atomic.UIWidget> = [];
 
         var enumSource = null;
 
@@ -68,7 +67,7 @@ class DataBinding {
                 var lp = new Atomic.UILayoutParams();
                 lp.width = 140;
                 field.layoutParams = lp;
-                editFields.push(field);
+                editWidgets.push(field);
                 widget = field;
             }
 
@@ -82,7 +81,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
-            editFields.push(field);
+            editWidgets.push(field);
 
             widget = field;
 
@@ -96,7 +95,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
-            editFields.push(field);
+            editWidgets.push(field);
             widget = field;
         }
         else if (attrInfo.type == Atomic.VAR_VECTOR3 || attrInfo.type == Atomic.VAR_QUATERNION) {
@@ -109,7 +108,7 @@ class DataBinding {
 
             for (var i: any = 0; i < 3; i++) {
                 var select = new Atomic.UIInlineSelect();
-                inlineSelects.push(select);
+                editWidgets.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.skinBg = "InspectorVectorAttrName";
@@ -132,7 +131,7 @@ class DataBinding {
             for (var i: any = 0; i < 4; i++) {
 
                 var select = new Atomic.UIInlineSelect();
-                inlineSelects.push(select);
+                editWidgets.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.setLimits(-10000000, 10000000);
@@ -150,7 +149,7 @@ class DataBinding {
 
             for (var i: any = 0; i < 2; i++) {
                 var select = new Atomic.UIInlineSelect();
-                inlineSelects.push(select);
+                editWidgets.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.skinBg = "InspectorVectorAttrName";
@@ -258,11 +257,8 @@ class DataBinding {
             var binding = new DataBinding(object, attrInfo, widget);
             binding.enumSource = enumSource;
 
-            for (var i in editFields) {
-                editFields[i].subscribeToEvent(editFields[i], "UIWidgetFocusChanged", (ev) => binding.handleUIWidgetFocusChangedEvent(ev));
-            }
-            for (var i in inlineSelects) {
-                inlineSelects[i].subscribeToEvent(inlineSelects[i], "UIWidgetEditComplete", (ev) => binding.handleUIWidgetEditCompleteEvent(ev));
+            for (var i in editWidgets) {
+                editWidgets[i].subscribeToEvent(editWidgets[i], "UIWidgetEditComplete", (ev) => binding.handleUIWidgetEditCompleteEvent(ev));
             }
 
             return binding;
@@ -472,33 +468,6 @@ class DataBinding {
 
     }
 
-    // event for text field edits
-    handleUIWidgetFocusChangedEvent(ev: Atomic.UIWidgetFocusChangedEvent) {
-
-        // TODO: once new base class stuff is in, should be able to check for type
-        var scene = this.object["scene"];
-
-        if (!scene)
-            return;
-
-        if (ev.focused) {
-
-            // gaining focus, save initial value
-            this.initalEditValue = ev.widget.text;
-
-        } else {
-
-            if (this.initalEditValue != ev.widget.text) {
-
-                // focus changed, with value change record in history
-                scene.sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
-
-            }
-
-        }
-
-    }
-
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
         if (this.objectLocked)
@@ -537,9 +506,11 @@ class DataBinding {
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
 
             if (this.widget == ev.target || this.widget.isAncestorOf(ev.target)) {
-              
+
                 this.setObjectValueFromWidget(ev.target);
 
+                // UIEditField and UIInline select changes are handled by edit complete event
+                // Otherwise, we would get multiple edit snapshots
                 if (ev.target.getTypeName() != "UIEditField" && ev.target.getTypeName() != "UIInlineSelect") {
 
                     // TODO: once new base class stuff is in, should be able to check for type
@@ -561,7 +532,6 @@ class DataBinding {
     attrInfo: Atomic.AttributeInfo;
     widget: Atomic.UIWidget;
     enumSource: Atomic.UISelectItemSource;
-    initalEditValue: string;
 
 }
 

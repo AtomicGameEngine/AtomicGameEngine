@@ -310,8 +310,7 @@ void SceneEditor3D::Redo()
 
 void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
 {
-    SetModified(true);
-    modified_ = true;
+    SetModified(true);    
 }
 
 }

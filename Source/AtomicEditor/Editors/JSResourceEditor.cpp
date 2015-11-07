@@ -220,7 +220,6 @@ void JSResourceEditor::OnChange(TBStyleEdit* styleEdit)
 {
     textDelta_ = 0.25f;
     textDirty_ = true;
-    modified_ = true;
 
     SetModified(true);
 
