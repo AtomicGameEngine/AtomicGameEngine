@@ -68,11 +68,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.subscribeToEvent("ComponentAdded", (ev: Atomic.ComponentAddedEvent) => {
 
-            //var resourceEditor = EditorUI.getCurrentResourceEditor();
-            //if (resourceEditor) {
-            //    resourceEditor.setModified(true);
-            //}
-
             if (!ev.component || ev.component.typeName != "PrefabComponent") return;
 
             var node = ev.node;
@@ -88,11 +83,6 @@ class HierarchyFrame extends Atomic.UIWidget {
         });
 
         this.subscribeToEvent("ComponentRemoved", (ev: Atomic.ComponentRemovedEvent) => {
-
-            //var resourceEditor = EditorUI.getCurrentResourceEditor();
-            //if (resourceEditor) {
-            //    resourceEditor.setModified(true);
-            //}
 
             if (!ev.component || ev.component.typeName != "PrefabComponent") return;
 
@@ -142,8 +132,6 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (!node.parent || node.scene != this.scene)
             return;
 
-        //EditorUI.getCurrentResourceEditor().setModified(true);
-
         var parentID = this.nodeIDToItemID[node.parent.id];
 
         var childItemID = this.recursiveAddNode(parentID, node);
@@ -157,8 +145,6 @@ class HierarchyFrame extends Atomic.UIWidget {
         // on close
         if (!this.scene)
             return;
-
-        //EditorUI.getCurrentResourceEditor().setModified(true);
 
         var node = ev.node;
 
@@ -219,8 +205,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var node = this.scene.getNode(selectedId);
                 if (node) {
-
-                    node.removeAllComponents();
+                    this.scene.sendEvent("SceneEditNodeAddedRemoved", { scene:this.scene, node:node, added:false});
                     node.remove();
 
                 }

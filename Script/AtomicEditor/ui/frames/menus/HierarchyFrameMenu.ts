@@ -38,6 +38,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                 if (node) {
 
                     child = node.createChild("Node");
+                    node.scene.sendEvent("SceneEditNodeAddedRemoved", { scene:node.scene, node:node, added:true});
 
                 }
 

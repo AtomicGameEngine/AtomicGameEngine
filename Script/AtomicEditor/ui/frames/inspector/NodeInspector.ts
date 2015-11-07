@@ -122,6 +122,9 @@ class NodeInspector extends ScriptWidget {
 
         this.node = node;
 
+        node.scene.sendEvent("SceneEditSerializable", { serializable: node, operation: 0});
+        this.subscribeToEvent(node, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));        
+
         this.isPrefab = this.detectPrefab(node);
 
         var fd = new Atomic.UIFontDescription();
@@ -313,6 +316,17 @@ class NodeInspector extends ScriptWidget {
         }
 
     }
+
+    handleSceneEditSerializableUndoRedoEvent(ev) {
+
+      for (var i in this.bindings) {
+          this.bindings[i].objectLocked = true;
+          this.bindings[i].setWidgetValueFromObject();
+          this.bindings[i].objectLocked = false;
+      }
+
+    }
+
 
     isPrefab: boolean;
     node: Atomic.Node;

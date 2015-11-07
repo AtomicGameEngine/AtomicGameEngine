@@ -67,6 +67,9 @@ private:
     void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
+    void HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData);
+    void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);
+
     void DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode = true);
 
     void MoveCamera(float timeStep);

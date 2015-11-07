@@ -357,6 +357,27 @@ void TBEditField::OnFocusChanged(bool focused)
 {
 	m_style_edit.Focus(focused);
 
+    if (focused)
+    {
+        if (!m_style_edit.packed.styling_on)
+            GetText(m_initial_edit_text);
+    }
+    else
+    {
+        if (!m_style_edit.packed.styling_on)
+        {
+            TBStr curText;
+            GetText(curText);
+            if (!curText.Equals(m_initial_edit_text))
+            {
+                TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
+                ev.ref_id = TBIDC("edit_complete");
+                // forward to delegate
+                TBWidget::OnEvent(ev);
+            }
+        }
+    }
+
     TBWidget::OnFocusChanged(focused);
 }
 

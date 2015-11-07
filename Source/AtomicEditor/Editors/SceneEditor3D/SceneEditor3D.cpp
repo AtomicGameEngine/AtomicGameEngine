@@ -29,6 +29,7 @@
 #include "../../EditorMode/AEEditorEvents.h"
 
 #include "SceneEditor3D.h"
+#include "SceneEditHistory.h"
 #include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
@@ -56,11 +57,11 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     // EARLY ACCESS
     if (fullpath.Find(String("ToonTown")) != String::NPOS)
     {
-          sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073f, 76.1121f, 16.47763f));
-          Quaternion q(0.55f, 0.14f,  0.8f, -0.2f);
-          sceneView_->SetYaw(q.YawAngle());
-          sceneView_->SetPitch(q.PitchAngle());
-          sceneView_->GetCameraNode()->SetWorldRotation(q);
+        sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073f, 76.1121f, 16.47763f));
+        Quaternion q(0.55f, 0.14f,  0.8f, -0.2f);
+        sceneView_->SetYaw(q.YawAngle());
+        sceneView_->SetPitch(q.PitchAngle());
+        sceneView_->GetCameraNode()->SetWorldRotation(q);
     }
     else
     {
@@ -95,7 +96,12 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
 
+    SubscribeToEvent(scene_, E_NODEADDED, HANDLER(SceneEditor3D, HandleNodeAdded));
     SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
+
+    SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
+
+    editHistory_ = new SceneEditHistory(context_, scene_);
 
 }
 
@@ -112,7 +118,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         {
             if (selectedNode_)
             {
-                selectedNode_->RemoveAllComponents();
+                VariantMap editData;
+                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+                editData[SceneEditNodeAddedRemoved::P_NODE] = selectedNode_;
+                editData[SceneEditNodeAddedRemoved::P_ADDED] = false;
+                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+
                 selectedNode_->Remove();
                 selectedNode_ = 0;
             }
@@ -138,13 +149,29 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
                 VariantMap eventData;
                 eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
                 SendEvent(E_EDITORACTIVENODECHANGE, eventData);
+
+                VariantMap editData;
+                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+                editData[SceneEditNodeAddedRemoved::P_NODE] = pasteNode;
+                editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+
+                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
             }
-        } 
+        }
         else if (ev.ref_id == TBIDC("close"))
         {
-            //Don't check for unsaved changes yet
-            Close();
-            //RequestClose();
+            RequestClose();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("undo"))
+        {
+            Undo();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("redo"))
+        {
+            Redo();
+            return true;
         }
     }
 
@@ -191,13 +218,21 @@ void SceneEditor3D::SelectNode(Node* node)
 
 }
 
+void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
+{
+    // Node does not have values set here
+
+    //Node* node =  static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
+    //LOGINFOF("Node Added: %s", node->GetName().CString());
+}
+
+
 void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
     if (node == selectedNode_)
         SelectNode(0);
 }
-
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -261,6 +296,21 @@ bool SceneEditor3D::Save()
 
     return true;
 
+}
+
+void SceneEditor3D::Undo()
+{
+    editHistory_->Undo();
+}
+
+void SceneEditor3D::Redo()
+{
+    editHistory_->Redo();
+}
+
+void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
+{
+    SetModified(true);    
 }
 
 }

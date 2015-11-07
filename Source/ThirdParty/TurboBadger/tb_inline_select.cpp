@@ -18,7 +18,8 @@ namespace tb {
 TBInlineSelect::TBInlineSelect()
 	: m_value(0)
 	, m_min(0)
-	, m_max(100)
+    , m_max(100)
+    , m_modified(false)
 {
 	SetSkinBg(TBIDC("TBInlineSelect"));
 	AddChild(&m_layout);
@@ -41,10 +42,15 @@ TBInlineSelect::TBInlineSelect()
 	m_editfield.SetTextAlign(TB_TEXT_ALIGN_CENTER);
 	m_editfield.SetEditType(EDIT_TYPE_NUMBER);
 	m_editfield.SetText("0");
+
+    m_editfield.AddListener(this);
+
 }
 
 TBInlineSelect::~TBInlineSelect()
 {
+    m_editfield.RemoveListener(this);
+
 	m_layout.RemoveChild(&m_buttons[1]);
 	m_layout.RemoveChild(&m_editfield);
 	m_layout.RemoveChild(&m_buttons[0]);
@@ -87,8 +93,8 @@ void TBInlineSelect::SetValueInternal(double value, bool update_text)
 		m_editfield.SetText(strval);
 	}
 
-	TBWidgetEvent ev(EVENT_TYPE_CHANGED);
-	InvokeEvent(ev);
+    TBWidgetEvent ev(EVENT_TYPE_CHANGED);
+    InvokeEvent(ev);
 
 	// Warning: Do nothing here since the event might have deleted us.
 	//          If needed, check if we are alive using a safe pointer first.
@@ -126,7 +132,55 @@ bool TBInlineSelect::OnEvent(const TBWidgetEvent &ev)
 		m_editfield.GetText(text);
         SetValueInternal((double) atof(text), false);
 	}
+
+    // catch mouse up/mouse down on buttons for modifications
+    if (ev.target == &m_buttons[0] || ev.target == &m_buttons[1])
+    {
+        if (ev.type == EVENT_TYPE_POINTER_DOWN)
+        {
+            m_modified = true;
+        }
+        else if (ev.type == EVENT_TYPE_POINTER_UP)
+        {
+            if (m_modified)
+                InvokeModifiedEvent();
+        }
+    }
+
 	return false;
+}
+
+void TBInlineSelect::InvokeModifiedEvent()
+{
+    TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
+    ev.ref_id = TBIDC("edit_complete");
+    // forward to delegate
+    TBWidget::OnEvent(ev);
+    m_modified = false;
+    m_editfield.GetText(m_initial_edit_value);
+}
+
+bool TBInlineSelect::OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev)
+{
+    return false;
+}
+
+void TBInlineSelect::OnWidgetFocusChanged(TBWidget *widget, bool focused)
+{
+    if (widget == &m_editfield)
+    {
+        if (focused)
+            m_editfield.GetText(m_initial_edit_value);
+        else
+        {
+            TBStr editvalue;
+            m_editfield.GetText(editvalue);
+            if (m_modified || !editvalue.Equals(m_initial_edit_value.CStr()))
+            {
+                InvokeModifiedEvent();
+            }
+        }
+    }
 }
 
 }; // namespace tb

@@ -44,6 +44,7 @@
 
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
+#include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
 
@@ -106,8 +107,10 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(this, E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
     SubscribeToEvent(this, E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
-    SetIsFocusable(true);
+    SubscribeToEvent(E_UIUNHANDLEDSHORTCUT, HANDLER(SceneView3D, HandleUIUnhandledShortcut));
+    SubscribeToEvent(E_UIWIDGETFOCUSESCAPED, HANDLER(SceneView3D, HandleUIWidgetFocusEscaped));
 
+    SetIsFocusable(true);
 
 }
 
@@ -260,6 +263,29 @@ bool SceneView3D::MouseInView()
 
 }
 
+void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData)
+{
+    if (!enabled_)
+        return;
+
+    unsigned id = eventData[UIUnhandledShortcut::P_REFID].GetUInt();
+
+    if (id == TBIDC("undo"))
+        sceneEditor_->Undo();
+    else if (id == TBIDC("redo"))
+        sceneEditor_->Redo();
+
+    return;
+
+}
+
+void SceneView3D::HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData)
+{
+    if (!enabled_)
+        return;
+
+    SetFocus();
+}
 
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -364,6 +390,12 @@ void SceneView3D::SelectNode(Node* node)
 
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        if (ev.ref_id == TBIDC("close"))
+            return false;
+    }
+
     return sceneEditor_->OnEvent(ev);
 }
 
@@ -516,6 +548,13 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
+        VariantMap editData;
+        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+        editData[SceneEditNodeAddedRemoved::P_NODE] = dragNode_;
+        editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())

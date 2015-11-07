@@ -30,6 +30,8 @@ class Octree;
 namespace AtomicEditor
 {
 
+class SceneEditHistory;
+
 class SceneEditor3D: public ResourceEditor
 {
     OBJECT(SceneEditor3D);
@@ -54,6 +56,9 @@ public:
     void Close(bool navigateToAvailableResource = true);
     bool Save();
 
+    void Undo();
+    void Redo();
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -62,7 +67,11 @@ private:
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
     void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
     void HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData);
+
+    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
+
+    void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<Scene> scene_;
 
@@ -73,6 +82,8 @@ private:
 
     WeakPtr<Node> selectedNode_;
     SharedPtr<Node> clipboardNode_;
+
+    SharedPtr<SceneEditHistory> editHistory_;
 
 };
 

@@ -174,6 +174,7 @@ void ResourceEditor::InvokeShortcut(const String& shortcut)
 
 void ResourceEditor::SetModified(bool modified)
 {
+    modified_ = modified;
     if (modified)
     {
         String filename = GetFileNameAndExtension(fullpath_);
