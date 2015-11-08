@@ -247,7 +247,7 @@ namespace Atomic
         gJSVMExports.duk_is_callable = duk_is_callable;
         gJSVMExports.duk_is_dynamic_buffer = duk_is_dynamic_buffer;
         gJSVMExports.duk_is_fixed_buffer = duk_is_fixed_buffer;
-        gJSVMExports.duk_is_primitive = duk_is_primitive;
+        //gJSVMExports.duk_is_primitive = duk_is_primitive;
         gJSVMExports.duk_get_error_code = duk_get_error_code;
 
         gJSVMExports.duk_get_boolean = duk_get_boolean;

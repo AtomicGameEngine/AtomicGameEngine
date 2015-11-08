@@ -23,6 +23,10 @@
 
 #include "AEPlayerMode.h"
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#include <windows.h>
+#endif
+
 namespace AtomicEditor
 {
 
