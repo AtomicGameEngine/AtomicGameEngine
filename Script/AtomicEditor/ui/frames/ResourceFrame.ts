@@ -135,7 +135,7 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
-    handleCloseResource(ev: EditorEvents.CloseResourceEvent) {
+    handleCloseResource(ev: EditorEvents.EditorCloseResourceEvent) {
         this.wasClosed = false;
         var editor = ev.editor;
         var navigate = ev.navigateToAvailableResource;
@@ -219,7 +219,7 @@ class ResourceFrame extends ScriptWidget {
         // on exit close all open editors
         for (var path in this.editors) {
 
-            this.sendEvent(EditorEvents.CloseResource, { editor: this.editors[path], navigateToAvailableResource: false });
+            this.sendEvent(EditorEvents.EditorResourceClose, { editor: this.editors[path], navigateToAvailableResource: false });
 
         }
 
@@ -251,7 +251,7 @@ class ResourceFrame extends ScriptWidget {
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
         this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));
-        this.subscribeToEvent(EditorEvents.CloseResource, (ev: EditorEvents.CloseResourceEvent) => this.handleCloseResource(ev));
+        this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 

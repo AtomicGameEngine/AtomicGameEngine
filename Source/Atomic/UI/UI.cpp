@@ -150,7 +150,7 @@ void UI::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void UI::Shutdown()
 {
-    SetInputDisabled(true);
+
 }
 
 void UI::Initialize(const String& languageFile)

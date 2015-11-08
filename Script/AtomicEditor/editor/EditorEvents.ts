@@ -5,8 +5,6 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
-export const Quit = "EditorEventQuit";
-
 export const ModalError = "ModalError";
 export interface ModalErrorEvent {
 
@@ -62,8 +60,8 @@ export interface SaveResourceEvent {
 
 }
 
-export const CloseResource = "EditorCloseResource";
-export interface CloseResourceEvent {
+export const EditorResourceClose = "EditorResourceClose";
+export interface EditorCloseResourceEvent {
 
   editor:Editor.ResourceEditor;
   navigateToAvailableResource:boolean;

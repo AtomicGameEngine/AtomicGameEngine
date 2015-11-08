@@ -20,12 +20,17 @@ class Editor extends Atomic.ScriptObject {
 
     static instance: Editor;
 
+    projectCloseRequested: boolean;
+    exitRequested: boolean;
+
     constructor() {
 
         super();
 
         // limit the framerate to limit CPU usage
         Atomic.getEngine().maxFps = 60;
+
+        Atomic.getEngine().autoExit = false;
 
         Editor.instance = this;
 
@@ -47,12 +52,20 @@ class Editor extends Atomic.ScriptObject {
             Atomic.graphics.windowTitle = "AtomicEditor";
             this.handleProjectUnloaded(data)
         });
-        this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
+
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
             Atomic.graphics.windowTitle = "AtomicEditor - " + data.projectPath;
             Preferences.getInstance().registerRecentProject(data.projectPath);
+        });
+
+        this.subscribeToEvent("EditorResourceCloseCanceled", (data) => {
+            //if user canceled closing the resource, then user has changes that he doesn't want to lose
+            //so cancel exit/project close request and unsubscribe from event to avoid closing all the editors again
+            this.exitRequested = false;
+            this.projectCloseRequested = false;
+            this.unsubscribeFromEvent(EditorEvents.EditorResourceClose);
         });
 
         this.parseArguments();
@@ -82,7 +95,29 @@ class Editor extends Atomic.ScriptObject {
         return system.loadProject(event.path);
     }
 
+    closeAllResourceEditors() {
+        var editor = EditorUI.getCurrentResourceEditor();
+        if (!editor) {
+          if (this.exitRequested) {
+              this.exit();
+          } else if (this.projectCloseRequested) {
+              this.closeProject();
+          }
+          return;
+        }
+        //wait when we close resource editor to check another resource editor for unsaved changes and close it
+        this.subscribeToEvent(EditorEvents.EditorResourceClose, (data) => {
+            this.closeAllResourceEditors();
+        });
+        editor.requestClose();
+    }
+
     handleEditorCloseProject(event) {
+        this.projectCloseRequested = true;
+        this.closeAllResourceEditors();
+    }
+
+    closeProject() {
         var system = ToolCore.getToolSystem();
 
         if (system.project) {
@@ -90,7 +125,6 @@ class Editor extends Atomic.ScriptObject {
             system.closeProject();
 
         }
-
     }
 
     handleProjectUnloaded(event) {
@@ -123,15 +157,14 @@ class Editor extends Atomic.ScriptObject {
 
     // event handling
     handleExitRequested(data) {
-        Preferences.getInstance().write();
-        EditorUI.shutdown();
-
+        this.exitRequested = true;
+        this.closeAllResourceEditors();
     }
 
-    handleEditorEventQuit(data) {
-
-        this.sendEvent("ExitRequested");
-
+    exit() {
+        Preferences.getInstance().write();
+        EditorUI.shutdown();
+        Atomic.getEngine().exit();
     }
 
 

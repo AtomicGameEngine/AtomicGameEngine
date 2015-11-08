@@ -46,7 +46,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "quit") {
 
-                Atomic.ui.requestExit();
+                this.sendEvent("ExitRequested");
                 return true;
 
             }

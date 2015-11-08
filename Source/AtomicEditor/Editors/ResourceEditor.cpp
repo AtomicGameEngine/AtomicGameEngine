@@ -12,6 +12,8 @@
 
 #include <TurboBadger/tb_message_window.h>
 
+#include "ResourceEditorEvents.h"
+
 #include "ResourceEditor.h"
 
 //#include "../UI/UIMainFrame.h"
@@ -47,7 +49,7 @@ public:
         }
         else
         {
-            editor_->Close();
+            editor_->Close(container_->GetNumPages()>1);
             return true;
         }
     }
@@ -61,10 +63,11 @@ public:
                 if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
                 {
                     container_->OnEvent(ev);
-                    editor_->Close();
+                    editor_->Close(container_->GetNumPages()>1);
                 }
                 else
                 {
+                    editor_->SendEvent(E_EDITORRESOURCECLOSECANCELED);
                     SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
                 }
                 return true;
@@ -160,9 +163,9 @@ void ResourceEditor::Close(bool navigateToAvailableResource)
     ((TBTabContainer*)container_->GetInternalWidget())->GetTabLayout()->RemoveChild(editorTabLayout_);
 
     VariantMap data;
-    data["Editor"] = this;
-    data["NavigateToAvailableResource"] = navigateToAvailableResource;
-    SendEvent("EditorCloseResource", data);
+    data[EditorResourceClose::P_EDITOR] = this;
+    data[EditorResourceClose::P_NAVIGATE] = navigateToAvailableResource;
+    SendEvent(E_EDITORRESOURCECLOSE, data);
 }
 
 void ResourceEditor::InvokeShortcut(const String& shortcut)
