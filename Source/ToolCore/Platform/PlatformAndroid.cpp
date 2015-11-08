@@ -7,6 +7,7 @@
 
 #include <Atomic/IO/MemoryBuffer.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/IO/Log.h>
 
 #include "../ToolEnvironment.h"
 #include "../Subprocess/SubprocessSystem.h"
@@ -82,6 +83,17 @@ void PlatformAndroid::RefreshAndroidTargets()
 {
     if (refreshAndroidTargetsProcess_.NotNull())
         return;
+
+    ToolPrefs* prefs = GetSubsystem<ToolEnvironment>()->GetToolPrefs();
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    String androidSDKPath = prefs->GetAndroidSDKPath();
+
+    if (!fileSystem->DirExists(androidSDKPath))
+    {
+        LOGERRORF("The Android SDK path %s does not exist", androidSDKPath.CString());
+        return;
+    }
 
     SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
 
