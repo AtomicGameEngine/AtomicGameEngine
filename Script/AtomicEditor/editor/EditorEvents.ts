@@ -5,8 +5,6 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
-export const Quit = "EditorEventQuit";
-
 export const ModalError = "ModalError";
 export interface ModalErrorEvent {
 

@@ -12,6 +12,8 @@
 
 #include <TurboBadger/tb_message_window.h>
 
+#include "ResourceEditorEvents.h"
+
 #include "ResourceEditor.h"
 
 //#include "../UI/UIMainFrame.h"
@@ -47,7 +49,6 @@ public:
         }
         else
         {
-            editor_->Close();
             return true;
         }
     }
@@ -60,8 +61,12 @@ public:
             {
                 if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
                 {
+                    SharedPtr<ResourceEditor> keepalive(editor_);
                     container_->OnEvent(ev);
                     editor_->Close();
+                    VariantMap editorClosedEvent;
+                    editorClosedEvent[ResourceEditorClosed::P_RESOURCEEDITOR] = editor_;
+                    editor_->SendEvent(E_RESOURCEEDITORCLOSED, editorClosedEvent);
                 }
                 else
                 {
@@ -74,6 +79,7 @@ public:
                 if (RequestClose())
                 {
                     container_->OnEvent(ev);
+                    editor_->Close();
                     return true;
                 }
             }

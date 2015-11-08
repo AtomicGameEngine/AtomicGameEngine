@@ -27,6 +27,8 @@ class Editor extends Atomic.ScriptObject {
         // limit the framerate to limit CPU usage
         Atomic.getEngine().maxFps = 60;
 
+        Atomic.getEngine().autoExit = false;
+
         Editor.instance = this;
 
         this.initUI();
@@ -47,7 +49,7 @@ class Editor extends Atomic.ScriptObject {
             Atomic.graphics.windowTitle = "AtomicEditor";
             this.handleProjectUnloaded(data)
         });
-        this.subscribeToEvent(EditorEvents.Quit, (data) => this.handleEditorEventQuit(data));
+
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
@@ -82,15 +84,29 @@ class Editor extends Atomic.ScriptObject {
         return system.loadProject(event.path);
     }
 
-    handleEditorCloseProject(event) {
-        var system = ToolCore.getToolSystem();
-
-        if (system.project) {
-
-            system.closeProject();
-
+    checkIfEverythingClosed() {
+        var editor = EditorUI.getCurrentResourceEditor();
+        if (!editor) {
+            this.sendEvent("AllResourceEditorsClosed");
+            return;
         }
+        this.subscribeToEvent("ResourceEditorClosed", (data) => {
+            this.checkIfEverythingClosed();
+        });
+        editor.requestClose();
+    }
 
+    handleEditorCloseProject(event) {
+        this.subscribeToEvent("AllResourceEditorsClosed", (_) => {
+            var system = ToolCore.getToolSystem();
+
+            if (system.project) {
+
+                system.closeProject();
+
+            }
+        });
+        this.checkIfEverythingClosed();
     }
 
     handleProjectUnloaded(event) {
@@ -123,15 +139,12 @@ class Editor extends Atomic.ScriptObject {
 
     // event handling
     handleExitRequested(data) {
-        Preferences.getInstance().write();
-        EditorUI.shutdown();
-
-    }
-
-    handleEditorEventQuit(data) {
-
-        this.sendEvent("ExitRequested");
-
+      this.subscribeToEvent("AllResourceEditorsClosed", (_) => {
+          Preferences.getInstance().write();
+          EditorUI.shutdown();
+          Atomic.getEngine().exit();
+      });
+      this.checkIfEverythingClosed();
     }
 
 

@@ -63,7 +63,7 @@ class ActivationWindow extends ModalWindow {
 
             if (id == "quit") {
 
-                this.sendEvent(EditorEvents.Quit);
+                this.sendEvent("ExitRequested");
                 return true;
 
             } else if (id == "get_key") {
