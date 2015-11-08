@@ -147,9 +147,7 @@ void UISelectList::ScrollToSelectedItem()
 
 void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
 {
-    TBSelectList* select = (TBSelectList*) widget_;
-
-    if (!select)
+    if (!widget_)
         return;
 
     // if we have a drag and drop item, auto scroll if top/bottom
@@ -158,6 +156,7 @@ void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
 
     if (dragDrop->GetDraggingObject())
     {
+        TBSelectList* select = (TBSelectList*) widget_;
         Input* input = GetSubsystem<Input>();
         IntVector2 pos = input->GetMousePosition();
         select->ConvertFromRoot(pos.x_, pos.y_);
@@ -177,14 +176,15 @@ void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
             int speed = 0;
 
             if (value <= 16)
-                speed = 2;
+                speed = -2;
             if (value < 8)
-                speed = 4;
+                speed = -4;
 
-            if (pos.y_ <= 12)
+            if (pos.y_ > 16)
                 speed = -speed;
 
-            select->GetScrollContainer()->ScrollBy(0, speed);
+            if (speed)
+                select->GetScrollContainer()->ScrollBy(0, speed);
 
         }
 
