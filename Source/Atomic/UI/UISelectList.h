@@ -53,9 +53,13 @@ public:
     String GetHoverItemID();
     String GetSelectedItemID();
 
+    void ScrollToSelectedItem();
+
     tb::TBSelectList* GetTBSelectList();
 
 protected:
+
+    void HandleUIUpdate(StringHash eventType, VariantMap& eventData);
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 

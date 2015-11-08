@@ -27,6 +27,12 @@
 namespace Atomic
 {
 
+// UIUpdate event
+EVENT(E_UIUPDATE, UIUpdate)
+{
+
+}
+
 EVENT(E_WIDGETEVENT, WidgetEvent)
 {
     PARAM(P_HANDLER, Handler);           // UIWidget pointer of widget's OnEvent we are in

@@ -52,6 +52,8 @@ public:
     void SetItemIcon(const String& id, const String& icon);
     void DeleteItemByID(const String& id);
 
+    void ScrollToSelectedItem();
+
     void SetExpanded(unsigned itemID, bool value);
 
     void DeleteAllItems();
