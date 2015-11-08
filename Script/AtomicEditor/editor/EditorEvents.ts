@@ -60,8 +60,8 @@ export interface SaveResourceEvent {
 
 }
 
-export const CloseResource = "EditorCloseResource";
-export interface CloseResourceEvent {
+export const EditorResourceClose = "EditorResourceClose";
+export interface EditorCloseResourceEvent {
 
   editor:Editor.ResourceEditor;
   navigateToAvailableResource:boolean;

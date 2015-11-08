@@ -163,9 +163,9 @@ void ResourceEditor::Close(bool navigateToAvailableResource)
     ((TBTabContainer*)container_->GetInternalWidget())->GetTabLayout()->RemoveChild(editorTabLayout_);
 
     VariantMap data;
-    data[EditorCloseResource::P_EDITOR] = this;
-    data[EditorCloseResource::P_NAVIGATE] = navigateToAvailableResource;
-    SendEvent(E_EDITORCLOSERESOURCE, data);
+    data[EditorResourceClose::P_EDITOR] = this;
+    data[EditorResourceClose::P_NAVIGATE] = navigateToAvailableResource;
+    SendEvent(E_EDITORRESOURCECLOSE, data);
 }
 
 void ResourceEditor::InvokeShortcut(const String& shortcut)

@@ -12,7 +12,7 @@
 namespace AtomicEditor
 {
 
-EVENT(E_EDITORCLOSERESOURCE, EditorCloseResource)
+EVENT(E_EDITORRESOURCECLOSE, EditorResourceClose)
 {
 PARAM(P_EDITOR, Editor);            // ResourceEditor
 PARAM(P_NAVIGATE, NavigateToAvailableResource); // bool

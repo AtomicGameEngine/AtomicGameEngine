@@ -65,7 +65,7 @@ class Editor extends Atomic.ScriptObject {
             //so cancel exit/project close request and unsubscribe from event to avoid closing all the editors again
             this.exitRequested = false;
             this.projectCloseRequested = false;
-            this.unsubscribeFromEvent("EditorCloseResource");
+            this.unsubscribeFromEvent(EditorEvents.EditorResourceClose);
         });
 
         this.parseArguments();
@@ -99,14 +99,14 @@ class Editor extends Atomic.ScriptObject {
         var editor = EditorUI.getCurrentResourceEditor();
         if (!editor) {
           if (this.exitRequested) {
-              Editor.Exit();
-          } else if(this.projectCloseRequested) {
+              this.exit();
+          } else if (this.projectCloseRequested) {
               this.closeProject();
           }
           return;
         }
         //wait when we close resource editor to check another resource editor for unsaved changes and close it
-        this.subscribeToEvent("EditorCloseResource", (data) => {
+        this.subscribeToEvent(EditorEvents.EditorResourceClose, (data) => {
             this.closeAllResourceEditors();
         });
         editor.requestClose();
@@ -161,7 +161,7 @@ class Editor extends Atomic.ScriptObject {
         this.closeAllResourceEditors();
     }
 
-    static Exit() {
+    exit() {
         Preferences.getInstance().write();
         EditorUI.shutdown();
         Atomic.getEngine().exit();
