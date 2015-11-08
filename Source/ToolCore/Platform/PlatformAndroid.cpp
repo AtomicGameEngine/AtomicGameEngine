@@ -91,7 +91,7 @@ void PlatformAndroid::RefreshAndroidTargets()
 
     if (!fileSystem->DirExists(androidSDKPath))
     {
-        LOGERRORF("Android path not exists");
+        LOGERRORF("The Android SDK path %s does not exist", androidSDKPath.CString());
         return;
     }
 
