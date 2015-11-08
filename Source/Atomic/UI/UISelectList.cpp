@@ -130,6 +130,15 @@ void UISelectList::SetSource(UISelectItemSource* source)
     ((TBSelectList*)widget_)->SetSource(source ? source->GetTBItemSource() : NULL);
 }
 
+void UISelectList::ScrollToSelectedItem()
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->ScrollToSelectedItem();
+
+}
+
 bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
 {
     return UIWidget::OnEvent(ev);

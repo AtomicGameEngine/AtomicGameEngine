@@ -137,7 +137,6 @@ class HierarchyFrame extends Atomic.UIWidget {
         var childItemID = this.recursiveAddNode(parentID, node);
 
         this.nodeIDToItemID[node.id] = childItemID;
-
     }
 
     handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {

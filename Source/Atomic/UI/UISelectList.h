@@ -53,6 +53,8 @@ public:
     String GetHoverItemID();
     String GetSelectedItemID();
 
+    void ScrollToSelectedItem();
+
     tb::TBSelectList* GetTBSelectList();
 
 protected:
