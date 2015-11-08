@@ -125,8 +125,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
     refreshAndroidTargets() {
 
-        if (ToolCore.toolEnvironment.toolPrefs.androidSDKPath.length <= 0) return;
-
         var platform = <ToolCore.PlatformAndroid>ToolCore.toolSystem.getPlatformByName("ANDROID");
 
         platform.refreshAndroidTargets();
