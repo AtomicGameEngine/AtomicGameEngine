@@ -508,6 +508,8 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         exitRequested_ = false;
         return;
     }
+
+    SendEvent(E_UIUPDATE);
     TBMessageHandler::ProcessMessages();
 }
 

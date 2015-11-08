@@ -48,6 +48,9 @@ public:
     void FileDragAddFile(const String& filename);
     void FileDragConclude();
 
+    /// Returns true when dragging an object
+    bool GetDraggingObject() { return dragObject_.NotNull(); }
+
 private:
 
     void HandleMouseDown(StringHash eventType, VariantMap& eventData);

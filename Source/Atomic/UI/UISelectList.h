@@ -59,6 +59,8 @@ public:
 
 protected:
 
+    void HandleUIUpdate(StringHash eventType, VariantMap& eventData);
+
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
 private:

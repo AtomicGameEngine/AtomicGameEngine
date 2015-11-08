@@ -22,8 +22,12 @@
 
 #include <TurboBadger/tb_select.h>
 
+#include "../Atomic/IO/Log.h"
+#include "../Atomic/Input/Input.h"
+
 #include "UI.h"
 #include "UIEvents.h"
+#include "UIDragDrop.h"
 #include "UISelectList.h"
 
 using namespace tb;
@@ -39,6 +43,8 @@ UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(conte
         widget_->SetDelegate(this);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
+
+    SubscribeToEvent(E_UIUPDATE, HANDLER(UISelectList, HandleUIUpdate));
 }
 
 UISelectList::~UISelectList()
@@ -136,6 +142,53 @@ void UISelectList::ScrollToSelectedItem()
         return;
 
     ((TBSelectList*)widget_)->ScrollToSelectedItem();
+
+}
+
+void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
+{
+    TBSelectList* select = (TBSelectList*) widget_;
+
+    if (!select)
+        return;
+
+    // if we have a drag and drop item, auto scroll if top/bottom
+
+    UIDragDrop* dragDrop = GetSubsystem<UIDragDrop>();
+
+    if (dragDrop->GetDraggingObject())
+    {
+        Input* input = GetSubsystem<Input>();
+        IntVector2 pos = input->GetMousePosition();
+        select->ConvertFromRoot(pos.x_, pos.y_);
+
+        if ((select->GetHitStatus(pos.x_, pos.y_) != WIDGET_HIT_STATUS_NO_HIT))
+        {
+
+            // Adjust speed based on pixel distance from top and bottom
+            int value = pos.y_;
+
+            if (value > 16)
+                value = select->GetRect().h - pos.y_;
+
+            if (value > 16)
+                return;
+
+            int speed = 0;
+
+            if (value <= 16)
+                speed = 2;
+            if (value < 8)
+                speed = 4;
+
+            if (pos.y_ <= 12)
+                speed = -speed;
+
+            select->GetScrollContainer()->ScrollBy(0, speed);
+
+        }
+
+    }
 
 }
 
