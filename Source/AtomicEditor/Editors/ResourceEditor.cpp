@@ -12,8 +12,6 @@
 
 #include <TurboBadger/tb_message_window.h>
 
-#include "ResourceEditorEvents.h"
-
 #include "ResourceEditor.h"
 
 //#include "../UI/UIMainFrame.h"
@@ -67,6 +65,7 @@ public:
                 }
                 else
                 {
+                    editor_->SendEvent("EditorResourceCloseCanceled");
                     SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
                 }
                 return true;
@@ -165,11 +164,6 @@ void ResourceEditor::Close(bool navigateToAvailableResource)
     data["Editor"] = this;
     data["NavigateToAvailableResource"] = navigateToAvailableResource;
     SendEvent("EditorCloseResource", data);
-
-
-    VariantMap editorClosedEvent;
-    editorClosedEvent[ResourceEditorClosed::P_RESOURCEEDITOR] = this;
-    SendEvent(E_RESOURCEEDITORCLOSED, editorClosedEvent);
 }
 
 void ResourceEditor::InvokeShortcut(const String& shortcut)

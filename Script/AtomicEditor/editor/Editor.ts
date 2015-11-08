@@ -57,6 +57,10 @@ class Editor extends Atomic.ScriptObject {
             Preferences.getInstance().registerRecentProject(data.projectPath);
         });
 
+        this.subscribeToEvent("EditorResourceCloseCanceled", (_) => {
+            this.unsubscribeFromEvent("AllResourceEditorsClosed");
+        });
+
         this.parseArguments();
     }
 
@@ -90,7 +94,7 @@ class Editor extends Atomic.ScriptObject {
             this.sendEvent("AllResourceEditorsClosed");
             return;
         }
-        this.subscribeToEvent("ResourceEditorClosed", (data) => {
+        this.subscribeToEvent("EditorCloseResource", (data) => {
             this.checkIfEverythingClosed();
         });
         editor.requestClose();
