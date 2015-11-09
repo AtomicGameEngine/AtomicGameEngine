@@ -198,6 +198,16 @@ void SceneView3D::MoveCamera(float timeStep)
             SetFocus();
             cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
         }
+        if (input->GetKeyDown('Q'))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
+        }
+        if (input->GetKeyDown('E'))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
+        }
 
     }
 }
