@@ -148,6 +148,18 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
         case TB_KEY_DELETE:
             key = KEY_DELETE;
             break;
+        case TB_KEY_DOWN:
+            key = KEY_DOWN;
+            break;
+        case TB_KEY_UP:
+            key = KEY_UP;
+            break;
+        case TB_KEY_LEFT:
+            key = KEY_LEFT;
+            break;
+        case TB_KEY_RIGHT:
+            key = KEY_RIGHT;
+            break;
         default:
             break;
         }

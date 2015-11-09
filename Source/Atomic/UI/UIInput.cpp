@@ -427,7 +427,7 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
     }
     else
     {
-        InvokeKey(this, rootWidget_, keycode, specialKey, mod, keydown);
+        InvokeKey(this, rootWidget_, 0, specialKey, mod, keydown);
     }
 
 }
