@@ -204,7 +204,7 @@ void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
 // BEGIN LICENSE MANAGEMENT
     static bool done = false;
 
-    if (licenseModule3D_)
+    if (!launchedByEditor_ || licenseModule3D_)
         return;
 
     Camera* camera = static_cast<Camera*>(eventData[BeginViewRender::P_CAMERA].GetPtr());
