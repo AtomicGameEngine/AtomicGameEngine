@@ -136,6 +136,22 @@ class ProjectFrame extends ScriptWidget {
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
+        if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+
+            if (data.key == Atomic.KEY_DOWN || data.key == Atomic.KEY_UP) {
+
+                var selectedId = this.folderList.selectedItemID;
+
+                if (selectedId != "0") {
+                    var db = ToolCore.getAssetDatabase();
+
+                    var asset = db.getAssetByGUID(selectedId);
+
+                    if (asset.isFolder)
+                        this.refreshContent(asset);
+                }
+            }
+        }
         if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
 
             var id = data.target.id;
