@@ -19,7 +19,9 @@ class ModelInspector extends InspectorWidget {
 
     }
 
-    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent):boolean {
+
+      return false;
 
     }
 
