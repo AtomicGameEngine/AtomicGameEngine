@@ -133,7 +133,9 @@ class InspectorWidget extends ScriptWidget {
 
     }
 
-    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent):boolean {
+
+      return false;
 
     }
 

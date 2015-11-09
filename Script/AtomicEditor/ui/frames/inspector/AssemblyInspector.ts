@@ -19,7 +19,9 @@ class AssemblyInspector extends InspectorWidget {
 
     }
 
-    handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent):boolean {
+
+      return false;
 
     }
 
