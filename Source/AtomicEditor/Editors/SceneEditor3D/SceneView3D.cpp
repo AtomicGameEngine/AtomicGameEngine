@@ -147,22 +147,33 @@ bool SceneView3D::GetOrbitting()
     return framedNode_.NotNull() && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
 }
 
+bool SceneView3D::GetZooming()
+{
+    Input* input = GetSubsystem<Input>();
+    return MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseMoveWheel();
+}
+
+
 void SceneView3D::MoveCamera(float timeStep)
 {    
     if (!enabled_ && !GetFocus())
         return;
 
     Input* input = GetSubsystem<Input>();
+    bool shiftDown = false;
+    if (input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT))
+        shiftDown = true;
 
     bool mouseInView = MouseInView();
     bool orbitting = GetOrbitting();
+    bool zooming = GetZooming();
 
     // Movement speed as world units per second
     float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.2f;
 
-    if (input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT))
+    if (shiftDown)
         MOVE_SPEED *= 3.0f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
@@ -177,7 +188,9 @@ void SceneView3D::MoveCamera(float timeStep)
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     Quaternion q(pitch_, yaw_, 0.0f);
-    cameraNode_->SetRotation(q);
+
+    if (!zooming)
+        cameraNode_->SetRotation(q);
 
     if (orbitting)
     {
@@ -190,6 +203,14 @@ void SceneView3D::MoveCamera(float timeStep)
             cameraNode_->SetWorldPosition(centerPoint - q * Vector3(0.0, 0.0, d.Length()));
 
         }
+    }
+
+    if (zooming)
+    {
+        Ray ray = GetCameraRay();
+        Vector3 wpos = cameraNode_->GetWorldPosition();
+        wpos += ray.direction_ * (float (input->GetMouseMoveWheel()) * (shiftDown ? 0.6f : 0.2f));
+        cameraNode_->SetWorldPosition(wpos);
     }
 
 

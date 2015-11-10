@@ -57,6 +57,7 @@ private:
 
     bool MouseInView();
     bool GetOrbitting();
+    bool GetZooming();
 
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
