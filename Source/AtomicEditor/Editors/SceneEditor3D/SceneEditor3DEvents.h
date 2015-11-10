@@ -15,12 +15,14 @@ namespace AtomicEditor
 /// Variable timestep scene update.
 EVENT(E_GIZMOEDITMODECHANGED, GizmoEditModeChanged)
 {
-    PARAM(P_MODE, MODE);            // int
+    PARAM(P_MODE, Mode);            // int
 }
 
 EVENT(E_GIZMOAXISMODECHANGED, GizmoAxisModeChanged)
 {
-    PARAM(P_MODE, MODE);            // int
+    PARAM(P_MODE, Mode);            // int
+    PARAM(P_TOGGLE, Toggle);            // bool
+
 }
 
 EVENT(E_GIZMOMOVED, GizmoMoved)

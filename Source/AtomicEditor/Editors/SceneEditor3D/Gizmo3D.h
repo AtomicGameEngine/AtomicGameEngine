@@ -110,6 +110,8 @@ public:
     void SetView(SceneView3D* view3D);
 
     void SetAxisMode(AxisMode mode);
+    AxisMode GetAxisMode() const { return axisMode_; }
+
     void SetEditMode(EditMode mode);
 
     bool Selected()

@@ -260,15 +260,24 @@ void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventDat
 }
 
 void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData)
-{
-    EditMode mode = (EditMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
+{    
+    EditMode mode = (EditMode) (eventData[GizmoEditModeChanged::P_MODE].GetInt());
     gizmo3D_->SetEditMode(mode);
 }
 
 void SceneEditor3D::HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData)
 {
-    AxisMode mode = (AxisMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
-    gizmo3D_->SetAxisMode(mode);
+    AxisMode mode = (AxisMode) (eventData[GizmoAxisModeChanged::P_MODE].GetInt());
+    bool toggle = eventData[GizmoAxisModeChanged::P_TOGGLE].GetBool();
+    if (toggle)
+    {
+        AxisMode mode = gizmo3D_->GetAxisMode() == AXIS_WORLD ? AXIS_LOCAL : AXIS_WORLD;
+        VariantMap neventData;
+        neventData[GizmoAxisModeChanged::P_MODE] = (int) mode;
+        SendEvent(E_GIZMOAXISMODECHANGED, neventData);
+    }
+    else
+        gizmo3D_->SetAxisMode(mode);
 }
 
 
@@ -311,6 +320,34 @@ void SceneEditor3D::Redo()
 void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
 {
     SetModified(true);    
+}
+
+void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
+{
+    bbox.Clear();
+
+    if (selectedNode_.Null())
+        return;
+
+    // TODO: Adjust once multiple selection is in
+    if (selectedNode_.Null())
+        return;
+
+    // Get all the drawables, which define the bounding box of the selection
+    PODVector<Drawable*> drawables;
+    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
+
+    if (!drawables.Size())
+        return;
+
+    // Calculate the combined bounding box of all drawables
+    for (unsigned i = 0; i < drawables.Size(); i++  )
+    {
+        Drawable* drawable = drawables[i];
+        bbox.Merge(drawable->GetWorldBoundingBox());
+    }
+
+
 }
 
 }

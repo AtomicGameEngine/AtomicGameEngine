@@ -255,6 +255,7 @@ declare module Editor {
 
   export interface GizmoAxisModeChangedEvent {
     mode:AxisMode;
+    toggle:boolean;
   }
 
 }

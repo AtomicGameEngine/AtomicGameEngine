@@ -46,6 +46,8 @@ public:
     void SetPitch(float pitch) { pitch_ = pitch; }
     void SetYaw(float yaw) { yaw_ = yaw; }
 
+    void FrameSelection();
+
     void Enable();
     void Disable();
     bool IsEnabled() { return enabled_; }
@@ -53,6 +55,8 @@ public:
 private:
 
     bool MouseInView();
+    bool GetOrbitting();
+    bool GetZooming();
 
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
@@ -82,12 +86,18 @@ private:
     bool mouseLeftDown_;
     bool mouseMoved_;
 
-    bool enabled_;
+    bool enabled_;    
+
+    bool cameraMove_;
+    float cameraMoveTime_;
+    Vector3 cameraMoveStart_;
+    Vector3 cameraMoveTarget_;
 
     SharedPtr<Camera> camera_;
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
     SharedPtr<Node> selectedNode_;
+    WeakPtr<Node> framedNode_;
 
     SharedPtr<Scene> preloadResourceScene_;
     String dragAssetGUID_;
