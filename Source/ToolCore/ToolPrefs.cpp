@@ -51,6 +51,11 @@ void ToolPrefs::Load()
 {
     String path = GetPrefsPath();
 
+    // Check that the tool prefs file exists
+    FileSystem* fs = GetSubsystem<FileSystem>();
+    if (!fs->FileExists(path))
+        return;
+
     SharedPtr<File> file(new File(context_, path));
 
     if (!file->IsOpen())
