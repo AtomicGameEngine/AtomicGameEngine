@@ -201,4 +201,20 @@ bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
     return UIWidget::OnEvent(ev);
 }
 
+void UISelectList::SelectNextItem()
+{
+    if (!widget_)
+        return;
+    
+    ((TBSelectList*)widget_)->ChangeValue(TB_KEY_DOWN);
+}
+
+void UISelectList::SelectPreviousItem()
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->ChangeValue(TB_KEY_UP);
+}
+
 }

@@ -518,6 +518,23 @@ void UIListView::SetExpanded(unsigned itemID, bool value)
 
 }
 
+bool UIListView::GetExpanded(unsigned itemID)
+{
+    if (!itemLookup_.Contains(itemID))
+        return false;
+
+    return itemLookup_[itemID]->GetExpanded();
+
+}
+
+bool UIListView::GetExpandable(unsigned itemID)
+{
+    if (!itemLookup_.Contains(itemID))
+        return false;
+
+    return itemLookup_[itemID]->children_.Size() > 0;
+}
+
 
 void UIListView::DeleteAllItems()
 {

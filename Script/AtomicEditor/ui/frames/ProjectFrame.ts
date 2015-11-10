@@ -138,7 +138,41 @@ class ProjectFrame extends ScriptWidget {
 
         if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
 
-            if (data.key == Atomic.KEY_DOWN || data.key == Atomic.KEY_UP) {
+          if (data.key == Atomic.KEY_RIGHT) {
+              var selectedId = this.folderList.selectedItemID;
+              var itemAssetId = this.assetGUIDToItemID[selectedId];
+
+              if (selectedId != "0") {
+                  if (!this.folderList.getExpanded(itemAssetId) && this.folderList.getExpandable(itemAssetId)) {
+                      this.folderList.setExpanded(itemAssetId, true);
+                      this.folderList.rootList.invalidateList();
+                  } else {
+                      this.folderList.rootList.selectNextItem();
+                  }
+              }
+
+
+          } else if (data.key == Atomic.KEY_LEFT) {
+              var selectedId = this.folderList.selectedItemID;
+              var itemAssetId = this.assetGUIDToItemID[selectedId];
+              if (selectedId != "0") {
+                  if (this.folderList.getExpanded(itemAssetId)) {
+                      this.folderList.setExpanded(itemAssetId, false);
+                      this.folderList.rootList.invalidateList();
+                  } else {
+                      var db = ToolCore.getAssetDatabase();
+
+                      var asset = db.getAssetByGUID(selectedId);
+
+                      var parentAsset = asset.parent;
+                      if (parentAsset) {
+                         this.folderList.selectItemByID(parentAsset.guid.toString());
+                      }
+                  }
+              }
+          }
+
+            if (data.key == Atomic.KEY_DOWN || data.key == Atomic.KEY_UP || data.key == Atomic.KEY_LEFT || data.key == Atomic.KEY_RIGHT) {
 
                 var selectedId = this.folderList.selectedItemID;
 
