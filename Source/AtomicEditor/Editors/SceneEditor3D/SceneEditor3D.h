@@ -27,6 +27,13 @@ class Octree;
 
 }
 
+namespace ToolCore
+{
+    class ProjectUserPrefs;
+}
+
+using namespace ToolCore;
+
 namespace AtomicEditor
 {
 
@@ -60,6 +67,8 @@ public:
     void Undo();
     void Redo();
 
+    ProjectUserPrefs* GetUserPrefs();
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -69,10 +78,14 @@ private:
     void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
     void HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData);
 
+    void HandleUserPrefSaved(StringHash eventType, VariantMap& eventData);
+
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
+
+    void UpdateGizmoSnapSettings();
 
     SharedPtr<Scene> scene_;
 
@@ -85,6 +98,8 @@ private:
     SharedPtr<Node> clipboardNode_;
 
     SharedPtr<SceneEditHistory> editHistory_;
+
+    WeakPtr<ProjectUserPrefs> userPrefs_;
 
 };
 

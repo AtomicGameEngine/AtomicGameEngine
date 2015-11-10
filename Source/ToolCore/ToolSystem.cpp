@@ -26,6 +26,7 @@
 #include "ToolEvents.h"
 
 #include "Project/Project.h"
+#include "Project/ProjectEvents.h"
 #include "Project/ProjectUserPrefs.h"
 
 #ifdef ATOMIC_DOTNET

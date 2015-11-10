@@ -18,6 +18,7 @@
 #include "../ToolEvents.h"
 #include "../Platform/Platform.h"
 
+#include "ProjectEvents.h"
 #include "ProjectFile.h"
 #include "ProjectBuildSettings.h"
 #include "ProjectUserPrefs.h"
