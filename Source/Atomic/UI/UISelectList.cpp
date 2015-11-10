@@ -194,7 +194,27 @@ void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
 
 bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    {
+        GetTBSelectList()->SetFocus(WIDGET_FOCUS_REASON_POINTER);
+    }
     return UIWidget::OnEvent(ev);
+}
+
+void UISelectList::SelectNextItem()
+{
+    if (!widget_)
+        return;
+    
+    ((TBSelectList*)widget_)->ChangeValue(TB_KEY_DOWN);
+}
+
+void UISelectList::SelectPreviousItem()
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->ChangeValue(TB_KEY_UP);
 }
 
 }

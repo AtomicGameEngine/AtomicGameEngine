@@ -295,6 +295,8 @@ bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_POINTER_DOWN || ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
     {
+        SetFocus(WIDGET_FOCUS_REASON_POINTER);
+
         TBWidget* parent = GetParent();
 
         while (parent)
@@ -514,6 +516,23 @@ void UIListView::SetExpanded(unsigned itemID, bool value)
 
     itemLookup_[itemID]->SetExpanded(value);
 
+}
+
+bool UIListView::GetExpanded(unsigned itemID)
+{
+    if (!itemLookup_.Contains(itemID))
+        return false;
+
+    return itemLookup_[itemID]->GetExpanded();
+
+}
+
+bool UIListView::GetExpandable(unsigned itemID)
+{
+    if (!itemLookup_.Contains(itemID))
+        return false;
+
+    return itemLookup_[itemID]->children_.Size() > 0;
 }
 
 

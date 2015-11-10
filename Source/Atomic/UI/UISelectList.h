@@ -57,6 +57,9 @@ public:
 
     tb::TBSelectList* GetTBSelectList();
 
+    void SelectNextItem();
+    void SelectPreviousItem();
+
 protected:
 
     void HandleUIUpdate(StringHash eventType, VariantMap& eventData);
