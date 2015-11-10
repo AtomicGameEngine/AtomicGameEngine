@@ -125,6 +125,18 @@ public:
 
     Node* GetGizmoNode() { return gizmoNode_; }
 
+    float GetSnapTranslationX() const;
+    float GetSnapTranslationY() const;
+    float GetSnapTranslationZ() const;
+    float GetSnapRotation() const;
+    float GetSnapScale() const;
+
+    void SetSnapTranslationX(float value);
+    void SetSnapTranslationY(float value);
+    void SetSnapTranslationZ(float value);
+    void SetSnapRotation(float value);
+    void SetSnapScale(float value);
+
 private:
 
     void Position();
@@ -155,6 +167,12 @@ private:
 
     Vector<Node *> *editNodes_;
     bool dragging_;
+
+    float snapTranslationX_;
+    float snapTranslationY_;
+    float snapTranslationZ_;
+    float snapRotation_;
+    float snapScale_;
 
 };
 

@@ -34,6 +34,18 @@ public:
     const String& GetLastBuildPath() { return lastBuildPath_; }
     void SetLastBuildPath(const String& path) { lastBuildPath_ = path; }
 
+    float GetSnapTranslationX() const;
+    float GetSnapTranslationY() const;
+    float GetSnapTranslationZ() const;
+    float GetSnapRotation() const;
+    float GetSnapScale() const;
+
+    void SetSnapTranslationX(float value);
+    void SetSnapTranslationY(float value);
+    void SetSnapTranslationZ(float value);
+    void SetSnapRotation(float value);
+    void SetSnapScale(float value);
+
 private:
 
     bool Load(const String& path);
@@ -41,6 +53,12 @@ private:
 
     PlatformID defaultPlatform_;
     String lastBuildPath_;
+
+    float snapTranslationX_;
+    float snapTranslationY_;
+    float snapTranslationZ_;
+    float snapRotation_;
+    float snapScale_;
 
 };
 

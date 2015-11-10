@@ -188,6 +188,13 @@ void TBEditField::OnInflate(const INFLATE_INFO &info)
 		else if (stristr(type, "url"))		SetEditType(EDIT_TYPE_URL);
 		else if (stristr(type, "number"))	SetEditType(EDIT_TYPE_NUMBER);
 	}
+    if (const char *text_align = info.node->GetValueString("text-align", nullptr))
+    {
+        if (!strcmp(text_align, "left"))		SetTextAlign(TB_TEXT_ALIGN_LEFT);
+        else if (!strcmp(text_align, "center"))	SetTextAlign(TB_TEXT_ALIGN_CENTER);
+        else if (!strcmp(text_align, "right"))	SetTextAlign(TB_TEXT_ALIGN_RIGHT);
+    }
+
 	TBWidget::OnInflate(info);
 }
 

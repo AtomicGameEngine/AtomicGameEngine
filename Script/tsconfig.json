@@ -71,6 +71,7 @@
         "./AtomicEditor/ui/modal/NewProject.ts",
         "./AtomicEditor/ui/modal/ProgressModal.ts",
         "./AtomicEditor/ui/modal/ResourceSelection.ts",
+        "./AtomicEditor/ui/modal/SnapSettingsWindow.ts",
         "./AtomicEditor/ui/modal/UIResourceOps.ts",
         "./AtomicEditor/ui/playmode/PlayerOutput.ts",
         "./AtomicEditor/ui/playmode/PlayMode.ts",

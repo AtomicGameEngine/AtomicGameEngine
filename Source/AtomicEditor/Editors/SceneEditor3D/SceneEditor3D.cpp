@@ -23,8 +23,13 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/UI/UI.h>
 
+#include <ToolCore/ToolSystem.h>
+#include <ToolCore/Project/Project.h>
+#include <ToolCore/Project/ProjectEvents.h>
+#include <ToolCore/Project/ProjectUserPrefs.h>
 #include <ToolCore/Assets/AssetDatabase.h>
 #include <ToolCore/Assets/Asset.h>
+
 
 #include "../../EditorMode/AEEditorEvents.h"
 
@@ -40,6 +45,12 @@ namespace AtomicEditor
 SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabContainer *container) :
     ResourceEditor(context, fullpath, container)
 {
+
+    // store a local reference to user project prefs
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+    userPrefs_ = project->GetUserPrefs();
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
@@ -81,6 +92,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     gizmo3D_ = new Gizmo3D(context_);
     gizmo3D_->SetView(sceneView_);
     gizmo3D_->Show();
+    UpdateGizmoSnapSettings();
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
@@ -92,6 +104,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     // future size changes will be handled automatically
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
+
+    SubscribeToEvent(E_PROJECTUSERPREFSAVED, HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
@@ -322,6 +336,11 @@ void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMa
     SetModified(true);    
 }
 
+void SceneEditor3D::HandleUserPrefSaved(StringHash eventType, VariantMap& eventData)
+{
+    UpdateGizmoSnapSettings();
+}
+
 void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
 {
     bbox.Clear();
@@ -347,6 +366,16 @@ void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
         bbox.Merge(drawable->GetWorldBoundingBox());
     }
 
+
+}
+
+void SceneEditor3D::UpdateGizmoSnapSettings()
+{
+    gizmo3D_->SetSnapTranslationX(userPrefs_->GetSnapTranslationX());
+    gizmo3D_->SetSnapTranslationY(userPrefs_->GetSnapTranslationY());
+    gizmo3D_->SetSnapTranslationZ(userPrefs_->GetSnapTranslationZ());
+    gizmo3D_->SetSnapRotation(userPrefs_->GetSnapRotation());
+    gizmo3D_->SetSnapScale(userPrefs_->GetSnapScale());
 
 }
 

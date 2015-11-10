@@ -9,7 +9,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <AtomicNET/NETCore/NETCore.h>
 
-#include "../ToolEvents.h"
+#include "../Project/ProjectEvents.h"
 #include "../ToolEnvironment.h"
 
 #include "NETToolSystem.h"

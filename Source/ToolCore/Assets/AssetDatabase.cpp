@@ -18,6 +18,7 @@
 #include "../ToolEvents.h"
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
+#include "../Project/ProjectEvents.h"
 #include "AssetEvents.h"
 #include "AssetDatabase.h"
 

@@ -26,6 +26,8 @@ import ResourceSelection = require("./ResourceSelection");
 
 import UIResourceOps = require("./UIResourceOps");
 
+import SnapSettingsWindow = require("./SnapSettingsWindow");
+
 class ModalOps extends Atomic.ScriptObject {
 
     constructor() {
@@ -241,6 +243,20 @@ class ModalOps extends Atomic.ScriptObject {
         if (this.show()) {
 
             this.opWindow = new ActivationSuccessWindow();
+
+        }
+
+    }
+
+    showSnapSettings() {
+
+        // only show snap settings if we have a project loaded
+        if (!ToolCore.toolSystem.project)
+          return;
+
+        if (this.show()) {
+
+            this.opWindow = new SnapSettingsWindow();
 
         }
 

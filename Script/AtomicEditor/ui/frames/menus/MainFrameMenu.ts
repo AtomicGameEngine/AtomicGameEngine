@@ -98,6 +98,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "edit snap settings") {
+                EditorUI.getModelOps().showSnapSettings();
+                return true;
+            }
+
             return false;
 
         } else if (target.id == "menu file popup") {
@@ -250,7 +255,9 @@ var editItems = {
     "Format Code": ["edit format code", StringID.ShortcutBeautify],
     "-4": null,
     "Play": ["edit play", StringID.ShortcutPlay],
-    "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug]
+    "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug],
+    "-5": null,
+    "Snap Settings": ["edit snap settings"]
 
 };
 

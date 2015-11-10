@@ -230,19 +230,27 @@ bool Gizmo3D::MoveEditNodes(Vector3 adjust)
 {
     bool moved = false;
 
+    Input* input = GetSubsystem<Input>();
+
+#ifdef ATOMIC_PLATFORM_OSX
+    bool moveSnap = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#else
+    bool moveSnap = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#endif
+
     if (adjust.Length() > M_EPSILON)
     {
         for (unsigned i = 0; i < editNodes_->Size(); ++i)
         {
-            /*
             if (moveSnap)
             {
-                float moveStepScaled = moveStep * snapScale;
-                adjust.x = Floor(adjust.x / moveStepScaled + 0.5) * moveStepScaled;
-                adjust.y = Floor(adjust.y / moveStepScaled + 0.5) * moveStepScaled;
-                adjust.z = Floor(adjust.z / moveStepScaled + 0.5) * moveStepScaled;
+                float moveStepScaled = snapTranslationX_;
+                adjust.x_ = floorf(adjust.x_ / moveStepScaled + 0.5) * moveStepScaled;
+                moveStepScaled = snapTranslationY_;
+                adjust.y_ = floorf(adjust.y_ / moveStepScaled + 0.5) * moveStepScaled;
+                moveStepScaled = snapTranslationZ_;
+                adjust.z_ = floorf(adjust.z_ / moveStepScaled + 0.5) * moveStepScaled;
             }
-            */
 
             Node* node = editNodes_->At(i);
             Vector3 nodeAdjust = adjust;
@@ -273,15 +281,21 @@ bool Gizmo3D::RotateEditNodes(Vector3 adjust)
 {
     bool moved = false;
 
-    /*
+    Input* input = GetSubsystem<Input>();
+
+#ifdef ATOMIC_PLATFORM_OSX
+    bool rotateSnap = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#else
+    bool rotateSnap = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#endif
+
     if (rotateSnap)
     {
-        float rotateStepScaled = rotateStep * snapScale;
-        adjust.x = Floor(adjust.x / rotateStepScaled + 0.5) * rotateStepScaled;
-        adjust.y = Floor(adjust.y / rotateStepScaled + 0.5) * rotateStepScaled;
-        adjust.z = Floor(adjust.z / rotateStepScaled + 0.5) * rotateStepScaled;
+        float rotateStepScaled = snapRotation_;
+        adjust.x_ = floorf(adjust.x_ / rotateStepScaled + 0.5) * rotateStepScaled;
+        adjust.y_ = floorf(adjust.y_ / rotateStepScaled + 0.5) * rotateStepScaled;
+        adjust.z_ = floorf(adjust.z_ / rotateStepScaled + 0.5) * rotateStepScaled;
     }
-    */
 
     if (adjust.Length() > M_EPSILON)
     {
@@ -314,6 +328,15 @@ bool Gizmo3D::ScaleEditNodes(Vector3 adjust)
 {
     bool moved = false;
 
+    Input* input = GetSubsystem<Input>();
+
+#ifdef ATOMIC_PLATFORM_OSX
+    bool scaleSnap = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+#else
+    bool scaleSnap = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
+#endif
+
+
     if (adjust.Length() > M_EPSILON)
     {
         for (unsigned i = 0; i < editNodes_->Size(); ++i)
@@ -323,28 +346,26 @@ bool Gizmo3D::ScaleEditNodes(Vector3 adjust)
             Vector3 scale = node->GetScale();
             Vector3 oldScale = scale;
 
-            if (true)//!scaleSnap)
+            if (!scaleSnap)
                 scale += adjust;
             else
             {
-                /*
-                float scaleStepScaled = scaleStep * snapScale;
-                if (adjust.x != 0)
+                float scaleStepScaled = snapScale_;
+                if (adjust.x_ != 0)
                 {
-                    scale.x += adjust.x * scaleStepScaled;
-                    scale.x = Floor(scale.x / scaleStepScaled + 0.5) * scaleStepScaled;
+                    scale.x_ += adjust.x_ * scaleStepScaled;
+                    scale.x_ = floorf(scale.x_ / scaleStepScaled + 0.5) * scaleStepScaled;
                 }
-                if (adjust.y != 0)
+                if (adjust.y_ != 0)
                 {
-                    scale.y += adjust.y * scaleStepScaled;
-                    scale.y = Floor(scale.y / scaleStepScaled + 0.5) * scaleStepScaled;
+                    scale.y_ += adjust.y_ * scaleStepScaled;
+                    scale.y_ = floorf(scale.y_ / scaleStepScaled + 0.5) * scaleStepScaled;
                 }
-                if (adjust.z != 0)
+                if (adjust.z_ != 0)
                 {
-                    scale.z += adjust.z * scaleStepScaled;
-                    scale.z = Floor(scale.z / scaleStepScaled + 0.5) * scaleStepScaled;
+                    scale.z_ += adjust.z_ * scaleStepScaled;
+                    scale.z_ = floorf(scale.z_ / scaleStepScaled + 0.5) * scaleStepScaled;
                 }
-                */
             }
 
             if (scale != oldScale)
@@ -459,6 +480,56 @@ void Gizmo3D::Show()
 
     octree->AddManualDrawable(gizmo_);
 
+}
+
+float Gizmo3D::GetSnapTranslationX() const
+{
+    return snapTranslationX_;
+}
+
+float Gizmo3D::GetSnapTranslationY() const
+{
+    return snapTranslationY_;
+}
+
+float Gizmo3D::GetSnapTranslationZ() const
+{
+    return snapTranslationZ_;
+}
+
+float Gizmo3D::GetSnapRotation() const
+{
+    return snapRotation_;
+}
+
+float Gizmo3D::GetSnapScale() const
+{
+    return snapScale_;
+}
+
+void Gizmo3D::SetSnapTranslationX(float value)
+{
+    snapTranslationX_ = value;
+}
+
+void Gizmo3D::SetSnapTranslationY(float value)
+{
+    snapTranslationY_ = value;
+}
+
+void Gizmo3D::SetSnapTranslationZ(float value)
+{
+    snapTranslationZ_ = value;
+}
+
+void Gizmo3D::SetSnapRotation(float value)
+{
+    snapRotation_ = value;
+}
+
+void Gizmo3D::SetSnapScale(float value)
+{
+    snapScale_ = value;
 }
 
 }

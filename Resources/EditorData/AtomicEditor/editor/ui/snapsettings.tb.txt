@@ -1,0 +1,30 @@
+TBLayout: axis: y, distribution: gravity, position: left
+	TBLayout: distribution: gravity
+		TBTextField: text: "Translate X:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: trans_x, autofocus: 1, text-align: center
+				lp: min-width: 100
+	TBLayout: distribution: gravity
+		TBTextField: text: "Translate Y:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: trans_y, text-align: center
+				lp: min-width: 100
+	TBLayout: distribution: gravity
+		TBTextField: text: "Translate Z:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: trans_z, text-align: center
+				lp: min-width: 100
+	TBLayout: distribution: gravity
+		TBTextField: text: "Rotation:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: rotation, text-align: center
+				lp: min-width: 100
+	TBLayout: distribution: gravity
+		TBTextField: text: "Scale:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: scale, text-align: center
+				lp: min-width: 100
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: 
+		TBButton: text: Apply, id: apply
+		TBButton: text: Cancel, id: cancel
