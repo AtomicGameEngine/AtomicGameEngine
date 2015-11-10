@@ -141,14 +141,21 @@ void SceneView3D::Disable()
 
 }
 
-void SceneView3D::MoveCamera(float timeStep)
+bool SceneView3D::GetOrbitting()
 {
+    Input* input = GetSubsystem<Input>();
+    return framedNode_.NotNull() && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
+}
+
+void SceneView3D::MoveCamera(float timeStep)
+{    
     if (!enabled_ && !GetFocus())
         return;
 
     Input* input = GetSubsystem<Input>();
 
     bool mouseInView = MouseInView();
+    bool orbitting = GetOrbitting();
 
     // Movement speed as world units per second
     float MOVE_SPEED = 20.0f;
@@ -159,9 +166,8 @@ void SceneView3D::MoveCamera(float timeStep)
         MOVE_SPEED *= 3.0f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    if (mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT))
+    if ((mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT)) || orbitting)
     {
-
         SetFocus();
         IntVector2 mouseMove = input->GetMouseMove();
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
@@ -170,7 +176,22 @@ void SceneView3D::MoveCamera(float timeStep)
     }
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    Quaternion q(pitch_, yaw_, 0.0f);
+    cameraNode_->SetRotation(q);
+
+    if (orbitting)
+    {
+        BoundingBox bbox;
+        sceneEditor_->GetSelectionBoundingBox(bbox);
+        if (bbox.defined_)
+        {
+            Vector3 centerPoint = bbox.Center();
+            Vector3 d = cameraNode_->GetWorldPosition() - centerPoint;
+            cameraNode_->SetWorldPosition(centerPoint - q * Vector3(0.0, 0.0, d.Length()));
+
+        }
+    }
+
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
@@ -178,7 +199,7 @@ void SceneView3D::MoveCamera(float timeStep)
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
 #endif
 
-    if (mouseInView && !superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
+    if (!orbitting && mouseInView && !superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
 
         // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
         // Use the Translate() function (default local space) to move relative to the node's orientation.
@@ -332,7 +353,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
     }
 
-    if (!MouseInView())
+    if (!MouseInView() || GetOrbitting())
         return;
 
     Input* input = GetSubsystem<Input>();
@@ -633,30 +654,19 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
 void SceneView3D::FrameSelection()
 {
-    // TODO: Adjust once multiple selection is in
-    if (selectedNode_.Null())
-        return;
-
-    // Get all the drawables, which define the bounding box of the selection
-    PODVector<Drawable*> drawables;
-    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
-
-    if (!drawables.Size())
-        return;
-
-    // Calculate the combined bounding box of all drawables
     BoundingBox bbox;
-    for (unsigned i = 0; i < drawables.Size(); i++  )
-    {
-        Drawable* drawable = drawables[i];
-        bbox.Merge(drawable->GetWorldBoundingBox());
-    }
+
+    sceneEditor_->GetSelectionBoundingBox(bbox);
+
+    if (!bbox.defined_)
+        return;
 
     Sphere sphere(bbox);
 
     if (sphere.radius_ < .01f || sphere.radius_ > 512)
         return;
 
+    framedNode_ = selectedNode_;
     cameraMoveStart_ = cameraNode_->GetWorldPosition();
     cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
     cameraMoveTime_ = 0.0f;

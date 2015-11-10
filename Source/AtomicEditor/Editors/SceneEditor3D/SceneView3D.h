@@ -56,6 +56,7 @@ public:
 private:
 
     bool MouseInView();
+    bool GetOrbitting();
 
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
@@ -85,7 +86,7 @@ private:
     bool mouseLeftDown_;
     bool mouseMoved_;
 
-    bool enabled_;
+    bool enabled_;    
 
     bool cameraMove_;
     float cameraMoveTime_;
@@ -96,6 +97,7 @@ private:
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
     SharedPtr<Node> selectedNode_;
+    WeakPtr<Node> framedNode_;
 
     SharedPtr<Scene> preloadResourceScene_;
     String dragAssetGUID_;

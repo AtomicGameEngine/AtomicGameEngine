@@ -322,4 +322,32 @@ void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMa
     SetModified(true);    
 }
 
+void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
+{
+    bbox.Clear();
+
+    if (selectedNode_.Null())
+        return;
+
+    // TODO: Adjust once multiple selection is in
+    if (selectedNode_.Null())
+        return;
+
+    // Get all the drawables, which define the bounding box of the selection
+    PODVector<Drawable*> drawables;
+    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
+
+    if (!drawables.Size())
+        return;
+
+    // Calculate the combined bounding box of all drawables
+    for (unsigned i = 0; i < drawables.Size(); i++  )
+    {
+        Drawable* drawable = drawables[i];
+        bbox.Merge(drawable->GetWorldBoundingBox());
+    }
+
+
+}
+
 }

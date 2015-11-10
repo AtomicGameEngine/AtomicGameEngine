@@ -45,6 +45,7 @@ public:
     bool OnEvent(const TBWidgetEvent &ev);
 
     void SelectNode(Node* node);
+    void GetSelectionBoundingBox(BoundingBox& bbox);
 
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
