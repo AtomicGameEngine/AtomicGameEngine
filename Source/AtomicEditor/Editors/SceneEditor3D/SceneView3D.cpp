@@ -639,7 +639,7 @@ void SceneView3D::FrameSelection()
 
     // Get all the drawables, which define the bounding box of the selection
     PODVector<Drawable*> drawables;
-    selectedNode_->GetDerivedComponents<Drawable>(drawables);
+    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
 
     if (!drawables.Size())
         return;
@@ -671,17 +671,19 @@ void SceneView3D::FrameSelection()
     // Calculate screen rect which will be used to accept projected position
     int vwidth = viewport_->GetWidth();
     int vheight = viewport_->GetHeight();
-    Rect screenRect(vwidth/6, vheight/6, vwidth - vwidth/6, vheight - vheight/6);
+
+
+    Rect screenRect(vwidth/5, vheight/5, vwidth - vwidth/5, vheight - vheight/5);
 
     // given the target selection's world position, offset by the camera node's world direction
     // keep backing up until bounding box is entirely contained in the target screen rect
-    float factor = .01f;
+    float factor = 1.0f;
     while (true)
     {
         // We don't rotate the camera during framing, otherwise this would be jarring
         Vector3 dir = cameraNode_->GetWorldDirection();
         dir *= factor;
-        Vector3 dest = selectedNode_->GetWorldPosition() - dir;
+        Vector3 dest = bbox.Center() - dir;
         cameraNode_->SetWorldPosition(dest);
 
         unsigned i;
@@ -700,7 +702,10 @@ void SceneView3D::FrameSelection()
             break;
         }
 
-        factor += 0.01f;
+        factor += 1.0f;
+
+        if (factor > 500)
+            break;
     }
 
     cameraNode_->SetWorldPosition(cameraMoveStart_);
