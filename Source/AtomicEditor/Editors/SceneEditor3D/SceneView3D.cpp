@@ -652,64 +652,15 @@ void SceneView3D::FrameSelection()
         bbox.Merge(drawable->GetWorldBoundingBox());
     }
 
-    if (bbox.Size().x_ < .01f || bbox.Size().y_ < .01f || bbox.Size().z_ < .01f)
+    Sphere sphere(bbox);
+
+    if (sphere.radius_ < .01f || sphere.radius_ > 512)
         return;
 
-    // Generate vertices for all 8 corners
-    Vector3 vertices[8];
-    vertices[0] = bbox.min_;
-    vertices[1] = Vector3(bbox.max_.x_, bbox.min_.y_, bbox.min_.z_);
-    vertices[2] = Vector3(bbox.min_.x_, bbox.max_.y_, bbox.min_.z_);
-    vertices[3] = Vector3(bbox.max_.x_, bbox.max_.y_, bbox.min_.z_);
-    vertices[4] = Vector3(bbox.min_.x_, bbox.min_.y_, bbox.max_.z_);
-    vertices[5] = Vector3(bbox.max_.x_, bbox.min_.y_, bbox.max_.z_);
-    vertices[6] = Vector3(bbox.min_.x_, bbox.max_.y_, bbox.max_.z_);
-    vertices[7] = bbox.max_;
-
     cameraMoveStart_ = cameraNode_->GetWorldPosition();
-
-    // Calculate screen rect which will be used to accept projected position
-    int vwidth = viewport_->GetWidth();
-    int vheight = viewport_->GetHeight();
-
-
-    Rect screenRect(vwidth/5, vheight/5, vwidth - vwidth/5, vheight - vheight/5);
-
-    // given the target selection's world position, offset by the camera node's world direction
-    // keep backing up until bounding box is entirely contained in the target screen rect
-    float factor = 1.0f;
-    while (true)
-    {
-        // We don't rotate the camera during framing, otherwise this would be jarring
-        Vector3 dir = cameraNode_->GetWorldDirection();
-        dir *= factor;
-        Vector3 dest = bbox.Center() - dir;
-        cameraNode_->SetWorldPosition(dest);
-
-        unsigned i;
-        for (i = 0; i < 8; i++)
-        {
-            IntVector2 screenPoint = viewport_->WorldToScreenPoint(vertices[i]);
-            if (!screenRect.IsInside(Vector2(screenPoint.x_, screenPoint.y_)))
-                break;
-        }
-
-        if (i == 8)
-        {
-            cameraMoveTarget_ = dest;
-            cameraMoveTime_ = 0.0f;
-            cameraMove_ = true;
-            break;
-        }
-
-        factor += 1.0f;
-
-        if (factor > 500)
-            break;
-    }
-
-    cameraNode_->SetWorldPosition(cameraMoveStart_);
-
+    cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
+    cameraMoveTime_ = 0.0f;
+    cameraMove_ = true;
 
 }
 
