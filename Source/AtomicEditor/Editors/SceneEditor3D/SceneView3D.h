@@ -22,7 +22,6 @@ class Node;
 class Camera;
 class DebugRenderer;
 class Octree;
-class SmoothedTransform;
 }
 
 namespace AtomicEditor
