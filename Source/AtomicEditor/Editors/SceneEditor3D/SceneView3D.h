@@ -22,6 +22,7 @@ class Node;
 class Camera;
 class DebugRenderer;
 class Octree;
+class SmoothedTransform;
 }
 
 namespace AtomicEditor
@@ -45,6 +46,8 @@ public:
 
     void SetPitch(float pitch) { pitch_ = pitch; }
     void SetYaw(float yaw) { yaw_ = yaw; }
+
+    void FrameSelection();
 
     void Enable();
     void Disable();
@@ -83,6 +86,11 @@ private:
     bool mouseMoved_;
 
     bool enabled_;
+
+    bool cameraMove_;
+    float cameraMoveTime_;
+    Vector3 cameraMoveStart_;
+    Vector3 cameraMoveTarget_;
 
     SharedPtr<Camera> camera_;
     SharedPtr<DebugRenderer> debugRenderer_;

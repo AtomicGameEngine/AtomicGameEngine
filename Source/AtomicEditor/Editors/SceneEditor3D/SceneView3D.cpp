@@ -57,7 +57,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     pitch_(0.0f),
     mouseLeftDown_(false),
     mouseMoved_(false),
-    enabled_(true)
+    enabled_(true),
+    cameraMove_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -147,6 +148,8 @@ void SceneView3D::MoveCamera(float timeStep)
 
     Input* input = GetSubsystem<Input>();
 
+    bool mouseInView = MouseInView();
+
     // Movement speed as world units per second
     float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
@@ -156,7 +159,7 @@ void SceneView3D::MoveCamera(float timeStep)
         MOVE_SPEED *= 3.0f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    if (input->GetMouseButtonDown(MOUSEB_RIGHT))
+    if (mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT))
     {
 
         SetFocus();
@@ -175,39 +178,61 @@ void SceneView3D::MoveCamera(float timeStep)
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
 #endif
 
-    if (!superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
+    if (mouseInView && !superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
 
         // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
         // Use the Translate() function (default local space) to move relative to the node's orientation.
-        if (input->GetKeyDown('W'))
+        if (input->GetKeyDown(KEY_W))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('S'))
+        if (input->GetKeyDown(KEY_S))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('A'))
+        if (input->GetKeyDown(KEY_A))
         {   SetFocus();
             cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('D'))
+        if (input->GetKeyDown(KEY_D))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('Q'))
+        if (input->GetKeyDown(KEY_Q))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('E'))
+        if (input->GetKeyDown(KEY_E))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
         }
+    }
+    else if (!superdown)
+    {
+        if (input->GetKeyPress(KEY_F))
+        {
+            FrameSelection();
+        }
+    }
+
+    if (cameraMove_)
+    {
+
+        cameraMoveTime_ += timeStep * 3.0f;
+
+        if (cameraMoveTime_ > 1.0f)
+        {
+            cameraMove_ = false;
+            cameraMoveTime_ = 1.0f;
+        }
+
+        Vector3 pos = cameraMoveStart_.Lerp(cameraMoveTarget_, cameraMoveTime_);
+        cameraNode_->SetWorldPosition(pos);
 
     }
 }
@@ -416,8 +441,7 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 
-    if (MouseInView())
-        MoveCamera(timeStep);
+    MoveCamera(timeStep);
 
     QueueUpdate();
 
@@ -607,6 +631,81 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
     dragNode_ = 0;
 }
 
+void SceneView3D::FrameSelection()
+{
+    // TODO: Adjust once multiple selection is in
+    if (selectedNode_.Null())
+        return;
 
+    // Get all the drawables, which define the bounding box of the selection
+    PODVector<Drawable*> drawables;
+    selectedNode_->GetDerivedComponents<Drawable>(drawables);
+
+    if (!drawables.Size())
+        return;
+
+    // Calculate the combined bounding box of all drawables
+    BoundingBox bbox;
+    for (unsigned i = 0; i < drawables.Size(); i++  )
+    {
+        Drawable* drawable = drawables[i];
+        bbox.Merge(drawable->GetWorldBoundingBox());
+    }
+
+    if (bbox.Size().x_ < .01f || bbox.Size().y_ < .01f || bbox.Size().z_ < .01f)
+        return;
+
+    // Generate vertices for all 8 corners
+    Vector3 vertices[8];
+    vertices[0] = bbox.min_;
+    vertices[1] = Vector3(bbox.max_.x_, bbox.min_.y_, bbox.min_.z_);
+    vertices[2] = Vector3(bbox.min_.x_, bbox.max_.y_, bbox.min_.z_);
+    vertices[3] = Vector3(bbox.max_.x_, bbox.max_.y_, bbox.min_.z_);
+    vertices[4] = Vector3(bbox.min_.x_, bbox.min_.y_, bbox.max_.z_);
+    vertices[5] = Vector3(bbox.max_.x_, bbox.min_.y_, bbox.max_.z_);
+    vertices[6] = Vector3(bbox.min_.x_, bbox.max_.y_, bbox.max_.z_);
+    vertices[7] = bbox.max_;
+
+    cameraMoveStart_ = cameraNode_->GetWorldPosition();
+
+    // Calculate screen rect which will be used to accept projected position
+    int vwidth = viewport_->GetWidth();
+    int vheight = viewport_->GetHeight();
+    Rect screenRect(vwidth/6, vheight/6, vwidth - vwidth/6, vheight - vheight/6);
+
+    // given the target selection's world position, offset by the camera node's world direction
+    // keep backing up until bounding box is entirely contained in the target screen rect
+    float factor = .01f;
+    while (true)
+    {
+        // We don't rotate the camera during framing, otherwise this would be jarring
+        Vector3 dir = cameraNode_->GetWorldDirection();
+        dir *= factor;
+        Vector3 dest = selectedNode_->GetWorldPosition() - dir;
+        cameraNode_->SetWorldPosition(dest);
+
+        unsigned i;
+        for (i = 0; i < 8; i++)
+        {
+            IntVector2 screenPoint = viewport_->WorldToScreenPoint(vertices[i]);
+            if (!screenRect.IsInside(Vector2(screenPoint.x_, screenPoint.y_)))
+                break;
+        }
+
+        if (i == 8)
+        {
+            cameraMoveTarget_ = dest;
+            cameraMoveTime_ = 0.0f;
+            cameraMove_ = true;
+            break;
+        }
+
+        factor += 0.01f;
+    }
+
+    cameraNode_->SetWorldPosition(cameraMoveStart_);
+
+
+}
 
 }
