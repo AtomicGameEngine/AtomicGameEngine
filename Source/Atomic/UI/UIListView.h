@@ -59,7 +59,7 @@ public:
     bool GetExpandable(unsigned itemID);
 
     void DeleteAllItems();
-    void SelectItemByID(const String& id);
+    void SelectItemByID(const String& id, bool selected = true, bool focus = true);
 
     String GetHoverItemID() { return rootList_.Null() ? "" : rootList_->GetHoverItemID(); }
     String GetSelectedItemID() { return rootList_.Null() ? "" : rootList_->GetSelectedItemID(); }

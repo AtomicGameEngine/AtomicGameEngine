@@ -20,6 +20,8 @@ import PrefabInspector = require("./PrefabInspector");
 class InspectorFrame extends ScriptWidget {
 
     nodeInspector: NodeInspector;
+    scene: Atomic.Scene = null;
+    sceneEditor: Editor.SceneEditor3D;
 
     constructor() {
 
@@ -32,12 +34,48 @@ class InspectorFrame extends ScriptWidget {
         var container = this.getWidget("inspectorcontainer");
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
-        this.subscribeToEvent(EditorEvents.ActiveNodeChange, (data) => this.handleActiveNodeChange(data));
         this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent("NodeRemoved", (ev: Atomic.NodeRemovedEvent) => this.handleNodeRemoved(ev));
 
+        this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
 
     }
+
+    handleActiveSceneEditorChanged(event: EditorEvents.ActiveSceneEditorChangeEvent) {
+
+        if (this.scene)
+            this.unsubscribeFromEvents(this.scene);
+
+        this.sceneEditor = null;
+        this.scene = null;
+
+        if (!event.sceneEditor)
+            return;
+
+        this.sceneEditor = event.sceneEditor;
+        this.scene = event.sceneEditor.scene;
+
+        if (this.scene) {
+
+            this.subscribeToEvent(this.scene, "SceneNodeSelected", (event: Editor.SceneNodeSelectedEvent) => this.handleSceneNodeSelected(event));
+
+        }
+
+    }
+
+    handleSceneNodeSelected(ev: Editor.SceneNodeSelectedEvent) {
+
+        var selection = this.sceneEditor.selection;
+
+        if (selection.selectedNodeCount == 1) {
+            this.inspectNode(selection.getSelectedNode(0));
+        } else {
+            this.closeNodeInspector();
+        }
+
+        return;
+    }
+
 
     handleProjectUnloaded(data) {
 
@@ -62,35 +100,21 @@ class InspectorFrame extends ScriptWidget {
 
     }
 
-    handleActiveNodeChange(data) {
-
-        var node = <Atomic.Node> data.node;
-
-        if (!node) {
-
-            this.closeNodeInspector();
-            return;
-        }
-
-        this.inspectNode(node);
-
-    }
-
     closeNodeInspector() {
 
-      if (this.nodeInspector) {
-          this.nodeInspector.saveState();
-          var container = this.getWidget("inspectorcontainer");
-          container.deleteAllChildren();
-          this.nodeInspector = null;
-      }
+        if (this.nodeInspector) {
+            this.nodeInspector.saveState();
+            var container = this.getWidget("inspectorcontainer");
+            container.deleteAllChildren();
+            this.nodeInspector = null;
+        }
 
     }
 
 
     inspectAsset(asset: ToolCore.Asset) {
 
-        this.sendEvent(EditorEvents.ActiveNodeChange, {node:null});
+        this.sendEvent(EditorEvents.ActiveNodeChange, { node: null });
 
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
@@ -108,7 +132,7 @@ class InspectorFrame extends ScriptWidget {
 
             var cache = Atomic.getResourceCache();
 
-            var material = <Atomic.Material> cache.getResource("Material", asset.path);
+            var material = <Atomic.Material>cache.getResource("Material", asset.path);
 
             if (!material) {
                 return;

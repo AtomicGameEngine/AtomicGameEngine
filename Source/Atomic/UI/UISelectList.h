@@ -51,9 +51,17 @@ public:
     double GetValue();
 
     String GetHoverItemID();
+
     String GetSelectedItemID();
 
     void ScrollToSelectedItem();
+
+    String GetItemID(int index);
+    bool GetItemSelected(int index);
+
+    int GetNumItems() const;
+
+    void SelectItem(int index, bool selected = true);
 
     tb::TBSelectList* GetTBSelectList();
 

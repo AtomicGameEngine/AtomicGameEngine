@@ -543,7 +543,7 @@ void UIListView::DeleteAllItems()
 }
 
 
-void UIListView::SelectItemByID(const String& id)
+void UIListView::SelectItemByID(const String& id, bool selected, bool focus)
 {
     TBID tid = TBIDC(id.CString());
 
@@ -553,9 +553,11 @@ void UIListView::SelectItemByID(const String& id)
 
         if (tid == item->id)
         {
-            //item->SetExpanded(true);
-            rootList_->SetValue(i);
-            rootList_->InvalidateList();
+            if (selected && focus)
+                rootList_->SetValue(i);
+            else
+                rootList_->SelectItem(i, selected);
+
             return;
         }
 

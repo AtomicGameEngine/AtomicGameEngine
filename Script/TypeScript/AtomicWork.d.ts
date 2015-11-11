@@ -249,6 +249,13 @@ declare module AtomicNET {
 
 declare module Editor {
 
+  export interface SceneNodeSelectedEvent {
+    scene: Atomic.Scene;
+    node: Atomic.Node;
+    selected: boolean;
+  }
+
+
   export interface GizmoEditModeChangedEvent {
     mode:EditMode;
   }

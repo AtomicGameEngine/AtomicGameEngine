@@ -35,6 +35,7 @@
 
 #include "SceneEditor3D.h"
 #include "SceneEditHistory.h"
+#include "SceneSelection.h"
 #include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
@@ -63,6 +64,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     scene_->SetUpdateEnabled(false);
 
+    selection_ = new SceneSelection(context, this);
     sceneView_ = new SceneView3D(context_, this);
 
     // EARLY ACCESS
@@ -130,17 +132,7 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.special_key == TB_KEY_DELETE || ev.special_key == TB_KEY_BACKSPACE)
         {
-            if (selectedNode_)
-            {
-                VariantMap editData;
-                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-                editData[SceneEditNodeAddedRemoved::P_NODE] = selectedNode_;
-                editData[SceneEditNodeAddedRemoved::P_ADDED] = false;
-                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
-
-                selectedNode_->Remove();
-                selectedNode_ = 0;
-            }
+            selection_->Delete();
         }
 
     }
@@ -149,28 +141,11 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.ref_id == TBIDC("copy"))
         {
-            if (selectedNode_.NotNull())
-            {
-                clipboardNode_ = selectedNode_;
-            }
+            selection_->Copy();
         }
         else if (ev.ref_id == TBIDC("paste"))
         {
-            if (clipboardNode_.NotNull() && selectedNode_.NotNull())
-            {
-                SharedPtr<Node> pasteNode(clipboardNode_->Clone());
-
-                VariantMap eventData;
-                eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
-                SendEvent(E_EDITORACTIVENODECHANGE, eventData);
-
-                VariantMap editData;
-                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-                editData[SceneEditNodeAddedRemoved::P_NODE] = pasteNode;
-                editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
-
-                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
-            }
+            selection_->Paste();
         }
         else if (ev.ref_id == TBIDC("close"))
         {
@@ -223,13 +198,13 @@ void SceneEditor3D::SetFocus()
 
 void SceneEditor3D::SelectNode(Node* node)
 {
+    /*
     selectedNode_ = node;
     if (!node)
         gizmo3D_->Hide();
     else
         gizmo3D_->Show();
-
-
+    */
 }
 
 void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
@@ -244,16 +219,15 @@ void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
+    /*
     if (node == selectedNode_)
         SelectNode(0);
+    */
 }
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    Vector<Node*> editNodes;
-    if (selectedNode_.NotNull())
-        editNodes.Push(selectedNode_);
-    gizmo3D_->Update(editNodes);
+    gizmo3D_->Update();
 }
 
 void SceneEditor3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
@@ -339,34 +313,6 @@ void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMa
 void SceneEditor3D::HandleUserPrefSaved(StringHash eventType, VariantMap& eventData)
 {
     UpdateGizmoSnapSettings();
-}
-
-void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
-{
-    bbox.Clear();
-
-    if (selectedNode_.Null())
-        return;
-
-    // TODO: Adjust once multiple selection is in
-    if (selectedNode_.Null())
-        return;
-
-    // Get all the drawables, which define the bounding box of the selection
-    PODVector<Drawable*> drawables;
-    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
-
-    if (!drawables.Size())
-        return;
-
-    // Calculate the combined bounding box of all drawables
-    for (unsigned i = 0; i < drawables.Size(); i++  )
-    {
-        Drawable* drawable = drawables[i];
-        bbox.Merge(drawable->GetWorldBoundingBox());
-    }
-
-
 }
 
 void SceneEditor3D::UpdateGizmoSnapSettings()

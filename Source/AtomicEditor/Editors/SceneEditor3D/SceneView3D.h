@@ -52,6 +52,9 @@ public:
     void Disable();
     bool IsEnabled() { return enabled_; }
 
+    DebugRenderer* GetDebugRenderer() { return debugRenderer_; }
+    SceneEditor3D* GetSceneEditor3D() { return sceneEditor_; }
+
 private:
 
     bool MouseInView();
@@ -72,9 +75,7 @@ private:
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData);
-    void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);
-
-    void DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode = true);
+    void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);    
 
     void MoveCamera(float timeStep);
 
@@ -96,7 +97,7 @@ private:
     SharedPtr<Camera> camera_;
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
-    SharedPtr<Node> selectedNode_;
+
     WeakPtr<Node> framedNode_;
 
     SharedPtr<Scene> preloadResourceScene_;

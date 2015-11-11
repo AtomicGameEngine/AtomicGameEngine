@@ -206,7 +206,6 @@ void TBSelectList::SetValue(int value)
 	if (value == m_value)
 		return;
 
-	SelectItem(m_value, false);
 	m_value = value;
 	SelectItem(m_value, true);
 	ScrollToSelectedItem();
@@ -215,6 +214,23 @@ void TBSelectList::SetValue(int value)
 	if (TBWidget *widget = GetItemWidget(m_value))
 		ev.ref_id = widget->GetID();
 	InvokeEvent(ev);
+}
+
+TBID TBSelectList::GetItemID(int index) const
+{
+    if (!m_source)
+        return TBID();
+
+    return m_source->GetItemID(index);
+
+}
+
+int TBSelectList::GetNumItems() const
+{
+    if (!m_source)
+        return 0;
+
+    return m_source->GetNumItems();
 }
 
 TBID TBSelectList::GetSelectedItemID()
@@ -227,7 +243,17 @@ TBID TBSelectList::GetSelectedItemID()
 void TBSelectList::SelectItem(int index, bool selected)
 {
 	if (TBWidget *widget = GetItemWidget(index))
+    {
+        bool changed = widget->GetState(WIDGET_STATE_SELECTED) != selected;
 		widget->SetState(WIDGET_STATE_SELECTED, selected);
+        if (changed)
+        {
+            TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
+            ev.ref_id = TBIDC("select_list_selection_changed");
+            // forward to delegate
+            TBWidget::OnEvent(ev);
+        }
+    }
 }
 
 TBWidget *TBSelectList::GetItemWidget(int index)
@@ -279,7 +305,23 @@ bool TBSelectList::OnEvent(const TBWidgetEvent &ev)
 		TBWidgetSafePointer this_widget(this);
 
 		int index = ev.target->data.GetInt();
-		SetValue(index);
+
+        if (ev.modifierkeys & TB_SHIFT || ev.modifierkeys & TB_CTRL || ev.modifierkeys & TB_SUPER)
+        {
+            if (GetItemSelected(index))
+            {
+                SelectItem(index, false);
+            }
+            else
+            {
+               SetValue(index);
+            }
+        }
+        else
+        {
+            SelectAllItems(false);
+            SetValue(index);
+        }
 
 		// If we're still around, invoke the click event too.
 		if (this_widget.Get())
@@ -352,10 +394,35 @@ bool TBSelectList::ChangeValue(SPECIAL_KEY key)
 	// Select and focus what we found
 	if (current)
 	{
+        SelectAllItems(false);
 		SetValue(current->data.GetInt());
 		return true;
 	}
 	return false;
+}
+
+bool TBSelectList::GetItemSelected(int index)
+{
+    if (TBWidget *widget = GetItemWidget(index))
+        return widget->GetState(WIDGET_STATE_SELECTED);
+
+    return false;
+
+}
+
+void TBSelectList::SelectAllItems(bool select)
+{
+    if (!m_source)
+        return;
+
+    for (int i = 0; i < m_source->GetNumItems(); i++)
+    {
+        SelectItem(i, select);
+    }
+
+    if (!select)
+        m_value = -1;
+
 }
 
 // == TBSelectDropdown ==========================================
@@ -470,4 +537,4 @@ bool TBSelectDropdown::OnEvent(const TBWidgetEvent &ev)
 	return false;
 }
 
-}; // namespace tb
+} // namespace tb

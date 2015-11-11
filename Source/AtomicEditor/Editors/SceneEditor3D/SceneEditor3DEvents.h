@@ -30,6 +30,13 @@ EVENT(E_GIZMOMOVED, GizmoMoved)
 
 }
 
+EVENT(E_SCENENODESELECTED, SceneNodeSelected)
+{
+    PARAM(P_SCENE, Scene);             // Scene
+    PARAM(P_NODE, Node);               // Node
+    PARAM(P_SELECTED, Selected);       // bool
+}
+
 EVENT(E_SCENEEDITSCENEMODIFIED, SceneEditSceneModified)
 {
 

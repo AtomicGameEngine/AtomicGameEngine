@@ -38,6 +38,7 @@ namespace AtomicEditor
 {
 
 class SceneEditHistory;
+class SceneSelection;
 
 class SceneEditor3D: public ResourceEditor
 {
@@ -52,7 +53,9 @@ public:
     bool OnEvent(const TBWidgetEvent &ev);
 
     void SelectNode(Node* node);
-    void GetSelectionBoundingBox(BoundingBox& bbox);
+
+    SceneSelection* GetSelection() { return selection_; }
+    SceneView3D* GetSceneView3D() { return sceneView_; }
 
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
@@ -94,7 +97,8 @@ private:
 
     SharedPtr<Gizmo3D> gizmo3D_;
 
-    WeakPtr<Node> selectedNode_;
+    SharedPtr<SceneSelection> selection_;
+
     SharedPtr<Node> clipboardNode_;
 
     SharedPtr<SceneEditHistory> editHistory_;

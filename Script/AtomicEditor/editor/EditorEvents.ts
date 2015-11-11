@@ -23,7 +23,14 @@ export interface PlayerLogEvent {
 }
 
 
-export const ActiveSceneChange = "EditorActiveSceneChange";
+export const ActiveSceneEditorChange = "EditorActiveSceneEditorChange";
+export interface ActiveSceneEditorChangeEvent {
+
+  sceneEditor: Editor.SceneEditor3D;
+
+}
+
+
 export const ActiveNodeChange = "EditorActiveNodeChange";
 export const SceneClosed = "EditorSceneClosed";
 export interface SceneClosedEvent {

@@ -20,7 +20,6 @@
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Material.h>
 
-#include <Atomic/Atomic3D/Terrain.h>
 #include <Atomic/Atomic3D/Model.h>
 #include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Atomic3D/AnimatedModel.h>
@@ -45,6 +44,7 @@
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
 #include "SceneEditor3DEvents.h"
+#include "SceneSelection.h"
 
 using namespace ToolCore;
 
@@ -72,6 +72,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     if (debugRenderer_.Null())
     {
         debugRenderer_ = scene_->CreateComponent<DebugRenderer>();
+        debugRenderer_->SetTemporary(true);
     }
 
     octree_ = scene_->GetComponent<Octree>();
@@ -195,7 +196,7 @@ void SceneView3D::MoveCamera(float timeStep)
     if (orbitting)
     {
         BoundingBox bbox;
-        sceneEditor_->GetSelectionBoundingBox(bbox);
+        sceneEditor_->GetSelection()->GetBounds(bbox);
         if (bbox.defined_)
         {
             Vector3 centerPoint = bbox.Center();
@@ -299,27 +300,6 @@ Ray SceneView3D::GetCameraRay()
                                   float(cpos.y_ - y) / rect.Height());
 }
 
-void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
-{
-    if (drawNode)
-        debug->AddNode(node, 1.0, false);
-
-    // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
-    // components can have a large performance hit. Also do not draw terrain child nodes due to their large amount
-    // (TerrainPatch component itself draws nothing as debug geometry)
-    if (node != scene_ && !node->GetComponent<Terrain>())
-    {
-        const Vector<SharedPtr<Component> >& components = node->GetComponents();
-
-        for (unsigned j = 0; j < components.Size(); ++j)
-            components[j]->DrawDebugGeometry(debug, false);
-
-        // To avoid cluttering the view, do not draw the node axes for child nodes
-        for (unsigned k = 0; k < node->GetNumChildren(); ++k)
-            DrawNodeDebug(node->GetChild(k), debug, false);
-    }
-}
-
 bool SceneView3D::MouseInView()
 {
     if (!GetInternalWidget())
@@ -367,19 +347,13 @@ void SceneView3D::HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& e
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
 
-    // Visualize the currently selected nodes
-    if (selectedNode_.NotNull())
-    {
-        DrawNodeDebug(selectedNode_, debugRenderer_);
-
-    }
-
     if (!MouseInView() || GetOrbitting())
         return;
 
     Input* input = GetSubsystem<Input>();
 
     mouseLeftDown_ = false;
+    bool shiftDown = input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT);
 
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
     {
@@ -409,8 +383,14 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
                     if (node->IsTemporary())
                         node = node->GetParent();
 
-                    neventData[EditorActiveNodeChange::P_NODE] = node;
-                    SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+                    if (sceneEditor_->GetSelection()->Contains(node) && shiftDown)
+                    {
+                        sceneEditor_->GetSelection()->RemoveNode(node);
+                    }
+                    else
+                    {
+                        sceneEditor_->GetSelection()->AddNode(node, !shiftDown);
+                    }
 
                 }
             }
@@ -462,7 +442,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
 void SceneView3D::SelectNode(Node* node)
 {
-    selectedNode_ = node;
+    //selectedNode_ = node;
 }
 
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
@@ -525,8 +505,8 @@ void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap&
 void SceneView3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
-    if (node == selectedNode_)
-        SelectNode(0);
+    //if (node == selectedNode_)
+    //    SelectNode(0);
 }
 
 void SceneView3D::UpdateDragNode(int mouseX, int mouseY)
@@ -676,8 +656,7 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 void SceneView3D::FrameSelection()
 {
     BoundingBox bbox;
-
-    sceneEditor_->GetSelectionBoundingBox(bbox);
+    sceneEditor_->GetSelection()->GetBounds(bbox);
 
     if (!bbox.defined_)
         return;
@@ -687,7 +666,7 @@ void SceneView3D::FrameSelection()
     if (sphere.radius_ < .01f || sphere.radius_ > 512)
         return;
 
-    framedNode_ = selectedNode_;
+    //framedNode_ = selectedNode_;
     cameraMoveStart_ = cameraNode_->GetWorldPosition();
     cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
     cameraMoveTime_ = 0.0f;
