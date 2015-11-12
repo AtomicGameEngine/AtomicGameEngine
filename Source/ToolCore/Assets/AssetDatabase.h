@@ -55,6 +55,7 @@ private:
     void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
     void HandleProjectUnloaded(StringHash eventType, VariantMap& eventData);
     void HandleFileChanged(StringHash eventType, VariantMap& eventData);
+    void HandleResourceLoadFailed(StringHash eventType, VariantMap& eventData);
 
     void AddAsset(SharedPtr<Asset>& asset);
 
@@ -69,6 +70,9 @@ private:
     List<SharedPtr<Asset>> assets_;
 
     HashMap<StringHash, String> resourceTypeToImporterType_;
+
+    /// Hash value of times, so we don't spam import errors
+    HashMap<StringHash, unsigned> assetImportErrorTimes_;
 
     Vector<String> usedGUID_;
 
