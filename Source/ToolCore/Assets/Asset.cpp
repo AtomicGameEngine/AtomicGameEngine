@@ -21,6 +21,7 @@
 #include "TextureImporter.h"
 #include "PrefabImporter.h"
 #include "JavascriptImporter.h"
+#include "JSONImporter.h"
 #include "SpriterImporter.h"
 #include "TMXImporter.h"
 #include "PEXImporter.h"
@@ -267,6 +268,10 @@ bool Asset::CreateImporter()
         else if (ext == ".js")
         {
             importer_ = new JavascriptImporter(context_, this);
+        }
+        else if (ext == ".json")
+        {
+            importer_ = new JSONImporter(context_, this);
         }
         else if (ext == ".scene")
         {
