@@ -249,7 +249,9 @@ void TBSelectList::SelectItem(int index, bool selected)
         if (changed)
         {
             TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
-            ev.ref_id = TBIDC("select_list_selection_changed");
+            // TBIDC does not register the string with the UI system
+            TBID refid("select_list_selection_changed");
+            ev.ref_id = refid;
             // forward to delegate
             TBWidget::OnEvent(ev);
         }
@@ -315,6 +317,7 @@ bool TBSelectList::OnEvent(const TBWidgetEvent &ev)
             else
             {
                SetValue(index);
+               SelectItem(index, true);
             }
         }
         else

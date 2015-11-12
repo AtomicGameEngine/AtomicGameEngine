@@ -153,7 +153,9 @@ bool TBInlineSelect::OnEvent(const TBWidgetEvent &ev)
 void TBInlineSelect::InvokeModifiedEvent()
 {
     TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
-    ev.ref_id = TBIDC("edit_complete");
+    // TBIDC does not register the TBID with the UI system, so do it this way
+    TBID refid("edit_complete");
+    ev.ref_id = refid;
     // forward to delegate
     TBWidget::OnEvent(ev);
     m_modified = false;
