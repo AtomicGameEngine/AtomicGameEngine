@@ -9,15 +9,18 @@
 
 #include <Atomic/Core/Object.h>
 
-using namespace Atomic;
-
-namespace ToolCore
+namespace AtomicEditor
 {
 
-EVENT(E_PLATFORMCHANGED, PlatformChanged)
+EVENT(E_EDITORRESOURCECLOSE, EditorResourceClose)
 {
-    PARAM(P_PLATFORM, Platform);    // Platform Ptr
+PARAM(P_EDITOR, Editor);            // ResourceEditor
+PARAM(P_NAVIGATE, NavigateToAvailableResource); // bool
 }
 
+EVENT(E_EDITORRESOURCECLOSECANCELED, EditorResourceCloseCanceled)
+{
+
+}
 
 }

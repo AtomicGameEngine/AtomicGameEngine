@@ -22,8 +22,12 @@
 
 #include <TurboBadger/tb_select.h>
 
+#include "../Atomic/IO/Log.h"
+#include "../Atomic/Input/Input.h"
+
 #include "UI.h"
 #include "UIEvents.h"
+#include "UIDragDrop.h"
 #include "UISelectList.h"
 
 using namespace tb;
@@ -39,6 +43,8 @@ UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(conte
         widget_->SetDelegate(this);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
+
+    SubscribeToEvent(E_UIUPDATE, HANDLER(UISelectList, HandleUIUpdate));
 }
 
 UISelectList::~UISelectList()
@@ -130,9 +136,85 @@ void UISelectList::SetSource(UISelectItemSource* source)
     ((TBSelectList*)widget_)->SetSource(source ? source->GetTBItemSource() : NULL);
 }
 
+void UISelectList::ScrollToSelectedItem()
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->ScrollToSelectedItem();
+
+}
+
+void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (!widget_)
+        return;
+
+    // if we have a drag and drop item, auto scroll if top/bottom
+
+    UIDragDrop* dragDrop = GetSubsystem<UIDragDrop>();
+
+    if (dragDrop->GetDraggingObject())
+    {
+        TBSelectList* select = (TBSelectList*) widget_;
+        Input* input = GetSubsystem<Input>();
+        IntVector2 pos = input->GetMousePosition();
+        select->ConvertFromRoot(pos.x_, pos.y_);
+
+        if ((select->GetHitStatus(pos.x_, pos.y_) != WIDGET_HIT_STATUS_NO_HIT))
+        {
+
+            // Adjust speed based on pixel distance from top and bottom
+            int value = pos.y_;
+
+            if (value > 16)
+                value = select->GetRect().h - pos.y_;
+
+            if (value > 16)
+                return;
+
+            int speed = 0;
+
+            if (value <= 16)
+                speed = -2;
+            if (value < 8)
+                speed = -4;
+
+            if (pos.y_ > 16)
+                speed = -speed;
+
+            if (speed)
+                select->GetScrollContainer()->ScrollBy(0, speed);
+
+        }
+
+    }
+
+}
+
 bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_POINTER_DOWN)
+    {
+        GetTBSelectList()->SetFocus(WIDGET_FOCUS_REASON_POINTER);
+    }
     return UIWidget::OnEvent(ev);
+}
+
+void UISelectList::SelectNextItem()
+{
+    if (!widget_)
+        return;
+    
+    ((TBSelectList*)widget_)->ChangeValue(TB_KEY_DOWN);
+}
+
+void UISelectList::SelectPreviousItem()
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->ChangeValue(TB_KEY_UP);
 }
 
 }

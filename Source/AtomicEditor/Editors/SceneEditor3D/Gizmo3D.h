@@ -110,6 +110,8 @@ public:
     void SetView(SceneView3D* view3D);
 
     void SetAxisMode(AxisMode mode);
+    AxisMode GetAxisMode() const { return axisMode_; }
+
     void SetEditMode(EditMode mode);
 
     bool Selected()
@@ -122,6 +124,18 @@ public:
     void Update(Vector<Node*>& editNodes);
 
     Node* GetGizmoNode() { return gizmoNode_; }
+
+    float GetSnapTranslationX() const;
+    float GetSnapTranslationY() const;
+    float GetSnapTranslationZ() const;
+    float GetSnapRotation() const;
+    float GetSnapScale() const;
+
+    void SetSnapTranslationX(float value);
+    void SetSnapTranslationY(float value);
+    void SetSnapTranslationZ(float value);
+    void SetSnapRotation(float value);
+    void SetSnapScale(float value);
 
 private:
 
@@ -152,6 +166,13 @@ private:
     AxisMode axisMode_;
 
     Vector<Node *> *editNodes_;
+    bool dragging_;
+
+    float snapTranslationX_;
+    float snapTranslationY_;
+    float snapTranslationZ_;
+    float snapRotation_;
+    float snapScale_;
 
 };
 

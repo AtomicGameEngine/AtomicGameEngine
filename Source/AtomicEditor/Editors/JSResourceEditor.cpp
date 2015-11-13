@@ -38,7 +38,6 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     autocomplete_(0),
     textDirty_(true),
     textDelta_(0.0f),
-    modified_(false),
     currentFindPos_(-1)
 {
 
@@ -221,11 +220,8 @@ void JSResourceEditor::OnChange(TBStyleEdit* styleEdit)
 {
     textDelta_ = 0.25f;
     textDirty_ = true;
-    modified_ = true;
 
-    String filename = GetFileNameAndExtension(fullpath_);
-    filename += "*";
-    button_->SetText(filename.CString());
+    SetModified(true);
 
     autocomplete_->Hide();
 
@@ -270,19 +266,7 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.ref_id == TBIDC("close"))
         {
-            if (modified_)
-            {
-                TBMessageWindow *msg_win = new TBMessageWindow(container_->GetInternalWidget(), TBIDC("unsaved_jsmodifications_dialog"));
-                TBMessageWindowSettings settings(TB_MSG_OK_CANCEL, TBID(uint32(0)));
-                settings.dimmer = true;
-                settings.styling = true;
-                msg_win->Show("Unsaved Modifications", "There are unsaved modications.\nDo you wish to discard them and close?", &settings, 640, 360);
-            }
-            else
-            {
-                Close();
-            }
-
+            RequestClose();
         }
 
         if (ev.ref_id == TBIDC("find"))
@@ -316,24 +300,6 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
         {
             editField_->OnEvent(ev);
         }
-    }
-
-    if (ev.type == EVENT_TYPE_CLICK)
-    {
-        if (ev.target->GetID() == TBIDC("unsaved_jsmodifications_dialog"))
-        {
-            if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
-            {
-                Close();
-            }
-            else
-            {
-                SetFocus();
-            }
-
-            return true;
-        }
-
     }
 
     return false;
@@ -525,12 +491,6 @@ void JSResourceEditor::GotoLineNumber(int lineNumber)
 
 }
 
-
-bool JSResourceEditor::HasUnsavedModifications()
-{
-    return modified_;
-}
-
 bool JSResourceEditor::ParseJavascriptToJSON(const char* source, String& json, bool loose)
 {
 
@@ -621,9 +581,7 @@ bool JSResourceEditor::Save()
     file.Write((void*) text.CStr(), text.Length());
     file.Close();
 
-    String filename = GetFileNameAndExtension(fullpath_);
-    button_->SetText(filename.CString());
-    modified_ = false;
+    SetModified(false);
 
     return true;
 

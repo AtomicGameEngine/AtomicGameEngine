@@ -19,7 +19,7 @@ import PrefabInspector = require("./PrefabInspector");
 
 class InspectorFrame extends ScriptWidget {
 
-    inspectingNode: Atomic.Node;
+    nodeInspector: NodeInspector;
 
     constructor() {
 
@@ -41,10 +41,9 @@ class InspectorFrame extends ScriptWidget {
 
     handleProjectUnloaded(data) {
 
-        this.inspectingNode = null;
+        this.closeNodeInspector();
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
-
     }
 
 
@@ -69,14 +68,7 @@ class InspectorFrame extends ScriptWidget {
 
         if (!node) {
 
-            if (this.inspectingNode) {
-
-                this.inspectingNode = null;
-                var container = this.getWidget("inspectorcontainer");
-                container.deleteAllChildren();
-
-            }
-
+            this.closeNodeInspector();
             return;
         }
 
@@ -84,10 +76,22 @@ class InspectorFrame extends ScriptWidget {
 
     }
 
+    closeNodeInspector() {
+
+      if (this.nodeInspector) {
+          this.nodeInspector.saveState();
+          var container = this.getWidget("inspectorcontainer");
+          container.deleteAllChildren();
+          this.nodeInspector = null;
+      }
+
+    }
+
 
     inspectAsset(asset: ToolCore.Asset) {
 
-        this.inspectingNode = null;
+        this.sendEvent(EditorEvents.ActiveNodeChange, {node:null});
+
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
 
@@ -129,7 +133,7 @@ class InspectorFrame extends ScriptWidget {
 
             var prefabInspector = new PrefabInspector();
             container.addChild(prefabInspector);
-            
+
             prefabInspector.inspect(asset);
         }
 
@@ -137,13 +141,10 @@ class InspectorFrame extends ScriptWidget {
 
     handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
 
-        if (this.inspectingNode != ev.node)
+        if (this.nodeInspector && this.nodeInspector.node != ev.node)
             return;
 
-        this.inspectingNode = null;
-
-        var container = this.getWidget("inspectorcontainer");
-        container.deleteAllChildren();
+        this.closeNodeInspector();
 
     }
 
@@ -151,6 +152,8 @@ class InspectorFrame extends ScriptWidget {
     inspectNode(node: Atomic.Node) {
 
         if (!node) return;
+
+        this.closeNodeInspector();
 
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
@@ -160,7 +163,7 @@ class InspectorFrame extends ScriptWidget {
 
         inspector.inspect(node);
 
-        this.inspectingNode = node;
+        this.nodeInspector = inspector;
 
     }
 

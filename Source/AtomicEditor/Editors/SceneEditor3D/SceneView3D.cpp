@@ -44,6 +44,7 @@
 
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
+#include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
 
@@ -56,7 +57,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     pitch_(0.0f),
     mouseLeftDown_(false),
     mouseMoved_(false),
-    enabled_(true)
+    enabled_(true),
+    cameraMove_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -106,8 +108,10 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SubscribeToEvent(this, E_DRAGEXITWIDGET, HANDLER(SceneView3D, HandleDragExitWidget));
     SubscribeToEvent(this, E_DRAGENDED, HANDLER(SceneView3D, HandleDragEnded));
 
-    SetIsFocusable(true);
+    SubscribeToEvent(E_UIUNHANDLEDSHORTCUT, HANDLER(SceneView3D, HandleUIUnhandledShortcut));
+    SubscribeToEvent(E_UIWIDGETFOCUSESCAPED, HANDLER(SceneView3D, HandleUIWidgetFocusEscaped));
 
+    SetIsFocusable(true);
 
 }
 
@@ -137,25 +141,44 @@ void SceneView3D::Disable()
 
 }
 
-void SceneView3D::MoveCamera(float timeStep)
+bool SceneView3D::GetOrbitting()
 {
+    Input* input = GetSubsystem<Input>();
+    return framedNode_.NotNull() && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
+}
+
+bool SceneView3D::GetZooming()
+{
+    Input* input = GetSubsystem<Input>();
+    return MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseMoveWheel();
+}
+
+
+void SceneView3D::MoveCamera(float timeStep)
+{    
     if (!enabled_ && !GetFocus())
         return;
 
     Input* input = GetSubsystem<Input>();
+    bool shiftDown = false;
+    if (input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT))
+        shiftDown = true;
+
+    bool mouseInView = MouseInView();
+    bool orbitting = GetOrbitting();
+    bool zooming = GetZooming();
 
     // Movement speed as world units per second
     float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.2f;
 
-    if (input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT))
+    if (shiftDown)
         MOVE_SPEED *= 3.0f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    if (input->GetMouseButtonDown(MOUSEB_RIGHT))
+    if ((mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT)) || orbitting)
     {
-
         SetFocus();
         IntVector2 mouseMove = input->GetMouseMove();
         yaw_ += MOUSE_SENSITIVITY * mouseMove.x_;
@@ -164,7 +187,32 @@ void SceneView3D::MoveCamera(float timeStep)
     }
 
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
+    Quaternion q(pitch_, yaw_, 0.0f);
+
+    if (!zooming)
+        cameraNode_->SetRotation(q);
+
+    if (orbitting)
+    {
+        BoundingBox bbox;
+        sceneEditor_->GetSelectionBoundingBox(bbox);
+        if (bbox.defined_)
+        {
+            Vector3 centerPoint = bbox.Center();
+            Vector3 d = cameraNode_->GetWorldPosition() - centerPoint;
+            cameraNode_->SetWorldPosition(centerPoint - q * Vector3(0.0, 0.0, d.Length()));
+
+        }
+    }
+
+    if (zooming)
+    {
+        Ray ray = GetCameraRay();
+        Vector3 wpos = cameraNode_->GetWorldPosition();
+        wpos += ray.direction_ * (float (input->GetMouseMoveWheel()) * (shiftDown ? 0.6f : 0.2f));
+        cameraNode_->SetWorldPosition(wpos);
+    }
+
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
@@ -172,29 +220,61 @@ void SceneView3D::MoveCamera(float timeStep)
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
 #endif
 
-    if (!superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
+    if (!orbitting && mouseInView && !superdown && input->GetMouseButtonDown(MOUSEB_RIGHT)) {
 
         // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
         // Use the Translate() function (default local space) to move relative to the node's orientation.
-        if (input->GetKeyDown('W'))
+        if (input->GetKeyDown(KEY_W))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('S'))
+        if (input->GetKeyDown(KEY_S))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('A'))
+        if (input->GetKeyDown(KEY_A))
         {   SetFocus();
             cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
         }
-        if (input->GetKeyDown('D'))
+        if (input->GetKeyDown(KEY_D))
         {
             SetFocus();
             cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
         }
+        if (input->GetKeyDown(KEY_Q))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
+        }
+        if (input->GetKeyDown(KEY_E))
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
+        }
+    }
+    else if (!superdown)
+    {
+        if (input->GetKeyPress(KEY_F))
+        {
+            FrameSelection();
+        }
+    }
+
+    if (cameraMove_)
+    {
+
+        cameraMoveTime_ += timeStep * 3.0f;
+
+        if (cameraMoveTime_ > 1.0f)
+        {
+            cameraMove_ = false;
+            cameraMoveTime_ = 1.0f;
+        }
+
+        Vector3 pos = cameraMoveStart_.Lerp(cameraMoveTarget_, cameraMoveTime_);
+        cameraNode_->SetWorldPosition(pos);
 
     }
 }
@@ -260,6 +340,29 @@ bool SceneView3D::MouseInView()
 
 }
 
+void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData)
+{
+    if (!enabled_)
+        return;
+
+    unsigned id = eventData[UIUnhandledShortcut::P_REFID].GetUInt();
+
+    if (id == TBIDC("undo"))
+        sceneEditor_->Undo();
+    else if (id == TBIDC("redo"))
+        sceneEditor_->Redo();
+
+    return;
+
+}
+
+void SceneView3D::HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData)
+{
+    if (!enabled_)
+        return;
+
+    SetFocus();
+}
 
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -271,7 +374,7 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
     }
 
-    if (!MouseInView())
+    if (!MouseInView() || GetOrbitting())
         return;
 
     Input* input = GetSubsystem<Input>();
@@ -364,6 +467,12 @@ void SceneView3D::SelectNode(Node* node)
 
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        if (ev.ref_id == TBIDC("close"))
+            return false;
+    }
+
     return sceneEditor_->OnEvent(ev);
 }
 
@@ -374,8 +483,7 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 
-    if (MouseInView())
-        MoveCamera(timeStep);
+    MoveCamera(timeStep);
 
     QueueUpdate();
 
@@ -516,6 +624,13 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+
+        VariantMap editData;
+        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+        editData[SceneEditNodeAddedRemoved::P_NODE] = dragNode_;
+        editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())
@@ -558,6 +673,26 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
     dragNode_ = 0;
 }
 
+void SceneView3D::FrameSelection()
+{
+    BoundingBox bbox;
 
+    sceneEditor_->GetSelectionBoundingBox(bbox);
+
+    if (!bbox.defined_)
+        return;
+
+    Sphere sphere(bbox);
+
+    if (sphere.radius_ < .01f || sphere.radius_ > 512)
+        return;
+
+    framedNode_ = selectedNode_;
+    cameraMoveStart_ = cameraNode_->GetWorldPosition();
+    cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
+    cameraMoveTime_ = 0.0f;
+    cameraMove_ = true;
+
+}
 
 }

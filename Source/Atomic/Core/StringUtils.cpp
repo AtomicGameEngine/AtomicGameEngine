@@ -647,7 +647,7 @@ String ToString(const char* formatString, ...)
     return ret;
 }
 
-String ToString(const char* formatString, va_list args)
+String ToStringVariadic(const char* formatString, va_list args)
 {
     String ret;
     ret.AppendWithFormatArgs(formatString, args);

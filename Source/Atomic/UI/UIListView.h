@@ -52,7 +52,11 @@ public:
     void SetItemIcon(const String& id, const String& icon);
     void DeleteItemByID(const String& id);
 
+    void ScrollToSelectedItem();
+
     void SetExpanded(unsigned itemID, bool value);
+    bool GetExpanded(unsigned itemID);
+    bool GetExpandable(unsigned itemID);
 
     void DeleteAllItems();
     void SelectItemByID(const String& id);

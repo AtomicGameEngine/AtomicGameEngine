@@ -18,7 +18,6 @@ class ComponentInspector extends Atomic.UISection {
         super();
 
         this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
-
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -94,7 +93,11 @@ class ComponentInspector extends Atomic.UISection {
     inspect(component: Atomic.Component) {
 
         this.component = component;
+
         this.text = component.typeName;
+
+        component.scene.sendEvent("SceneEditSerializable", { serializable: component, operation: 0});
+        this.subscribeToEvent(component, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));
 
         // For JSComponents append the filename
         if (component.typeName == "JSComponent") {
@@ -211,7 +214,7 @@ class ComponentInspector extends Atomic.UISection {
 
             // refresh entire inspector, fix this...
             this.sendEvent("EditorActiveNodeChange", { node: node });
-
+            
             return true;
 
         }
@@ -290,6 +293,16 @@ class ComponentInspector extends Atomic.UISection {
             this.bindings[i].setWidgetValueFromObject();
             this.bindings[i].objectLocked = false;
         }
+
+    }
+
+    handleSceneEditSerializableUndoRedoEvent(ev) {
+
+      for (var i in this.bindings) {
+          this.bindings[i].objectLocked = true;
+          this.bindings[i].setWidgetValueFromObject();
+          this.bindings[i].objectLocked = false;
+      }
 
     }
 

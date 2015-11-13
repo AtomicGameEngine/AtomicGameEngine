@@ -39,7 +39,8 @@ namespace Atomic
 
 UIWidget::UIWidget(Context* context, bool createWidget) : Object(context),
     widget_(0),
-    preferredSize_(new UIPreferredSize())
+    preferredSize_(new UIPreferredSize()),
+    multiTouch_(false)
 {
     AddRef();
 
@@ -146,6 +147,18 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
             break;
         case TB_KEY_DELETE:
             key = KEY_DELETE;
+            break;
+        case TB_KEY_DOWN:
+            key = KEY_DOWN;
+            break;
+        case TB_KEY_UP:
+            key = KEY_UP;
+            break;
+        case TB_KEY_LEFT:
+            key = KEY_LEFT;
+            break;
+        case TB_KEY_RIGHT:
+            key = KEY_RIGHT;
             break;
         default:
             break;
@@ -737,6 +750,24 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 
     return false;
 }
+
+bool UIWidget::GetCaptured()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->IsCaptured();
+
+}
+
+void UIWidget::SetCapturing(bool capturing)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetCapturing(capturing);
+}
+
 
 void UIWidget::InvalidateLayout()
 {

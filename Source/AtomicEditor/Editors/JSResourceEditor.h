@@ -18,7 +18,7 @@ using namespace tb;
 namespace AtomicEditor
 {
 
-class JSAutocomplete;
+class JSAutocomplete; 
 
 class JSResourceEditor: public ResourceEditor, public TBStyleEditTextChangeListener
 {
@@ -45,8 +45,6 @@ public:
 
     void SetFocus();
 
-    bool HasUnsavedModifications();
-
     bool Save();
 
 private:
@@ -63,8 +61,6 @@ private:
 
     float textDelta_;
     bool textDirty_;
-
-    bool modified_;
 
     int currentFindPos_;
 

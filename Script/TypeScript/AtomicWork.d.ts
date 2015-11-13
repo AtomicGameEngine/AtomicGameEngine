@@ -116,6 +116,11 @@ declare module Atomic {
         touch: boolean;
     }
 
+    export interface UIWidgetFocusChangedEvent {
+        widget: UIWidget;
+        focused: boolean;
+    }
+
     export interface UIWidgetDeletedEvent {
 
         widget: UIWidget;
@@ -250,8 +255,9 @@ declare module Editor {
 
   export interface GizmoAxisModeChangedEvent {
     mode:AxisMode;
+    toggle:boolean;
   }
-  
+
 }
 
 declare module ToolCore {

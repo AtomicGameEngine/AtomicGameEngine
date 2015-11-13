@@ -70,6 +70,11 @@ void UIInlineSelect::SetLimits(double minimum, double maximum)
 
 bool UIInlineSelect::OnEvent(const tb::TBWidgetEvent &ev)
 {
+    if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
+    {
+        SendEvent(E_UIWIDGETEDITCOMPLETE);
+        return true;
+    }
     return UIWidget::OnEvent(ev);
 }
 

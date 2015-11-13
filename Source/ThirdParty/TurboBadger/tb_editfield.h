@@ -190,6 +190,8 @@ private:
 	int m_virtual_width;
 	void UpdateScrollbarVisibility(bool multiline);
 
+    TBStr m_initial_edit_text;
+
 	// == TBStyleEditListener =======================
 	virtual void OnChange();
 	virtual bool OnEnter();

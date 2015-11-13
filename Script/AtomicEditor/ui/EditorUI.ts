@@ -48,6 +48,10 @@ export function showModalError(windowText:string, message:string) {
   editorUI.showModalError(windowText, message);
 }
 
+export function getCurrentResourceEditor():Editor.ResourceEditor {
+    return getMainFrame().resourceframe.currentResourceEditor;
+}
+
 
 class EditorUI extends Atomic.ScriptObject {
 

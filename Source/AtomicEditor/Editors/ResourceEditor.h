@@ -32,7 +32,7 @@ public:
 
     UIButton* GetButton() { return button_; }
 
-    virtual bool HasUnsavedModifications() { return false; }
+    virtual bool HasUnsavedModifications() { return modified_; }
 
     virtual void SetFocus() {}
     virtual void Close(bool navigateToAvailableResource = true);
@@ -46,15 +46,24 @@ public:
 
     const String& GetFullPath() { return fullpath_; }
 
+    virtual void Undo() {}
+    virtual void Redo() {}
+
     virtual bool Save() { return true; }
 
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }
 
     void InvokeShortcut(const String& shortcut);
 
+    void RequestClose();
+
+    void SetModified(bool modified);
+
 protected:
 
     String fullpath_;
+
+    bool modified_;
 
     EditorTabLayout* editorTabLayout_;
 

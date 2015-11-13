@@ -49,12 +49,7 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     invokeFileClose() {
-
-        // pretty gross
-        var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
-        if (!editor) return;
-        editor.close(true);
-
+        this.invokeResourceFrameShortcut("close");
     }
 
     invokeFileSave() {
@@ -91,9 +86,9 @@ class Shortcuts extends Atomic.ScriptObject {
 
     }
 
-    invokeGizmoAxisModeChanged(mode:Editor.AxisMode) {
+    invokeGizmoAxisModeChanged(mode:Editor.AxisMode, toggle:boolean = false) {
 
-        this.sendEvent("GizmoAxisModeChanged", { mode: mode });
+        this.sendEvent("GizmoAxisModeChanged", { mode: mode, toggle: toggle });
 
     }
 
@@ -118,6 +113,8 @@ class Shortcuts extends Atomic.ScriptObject {
               this.invokeGizmoEditModeChanged(Editor.EDIT_ROTATE);
             } else if (ev.key == Atomic.KEY_R) {
                 this.invokeGizmoEditModeChanged(Editor.EDIT_SCALE);
+            } else if (ev.key == Atomic.KEY_X) {
+                this.invokeGizmoAxisModeChanged(Editor.AXIS_WORLD, true);
             }
 
         }

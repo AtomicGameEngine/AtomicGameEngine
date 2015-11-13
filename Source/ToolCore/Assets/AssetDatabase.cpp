@@ -18,6 +18,7 @@
 #include "../ToolEvents.h"
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
+#include "../Project/ProjectEvents.h"
 #include "AssetEvents.h"
 #include "AssetDatabase.h"
 
@@ -27,6 +28,7 @@ namespace ToolCore
 
 AssetDatabase::AssetDatabase(Context* context) : Object(context)
 {
+    SubscribeToEvent(E_LOADFAILED, HANDLER(AssetDatabase, HandleResourceLoadFailed));
     SubscribeToEvent(E_PROJECTLOADED, HANDLER(AssetDatabase, HandleProjectLoaded));
     SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));
 }
@@ -97,9 +99,6 @@ void AssetDatabase::Import(const String& path)
 Asset* AssetDatabase::GetAssetByCachePath(const String& cachePath)
 {
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
-
-    if (!cachePath.StartsWith("Cache/"))
-        return 0;
 
     String cacheFilename = GetFileName(cachePath);
 
@@ -438,9 +437,46 @@ void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& even
     cache->RemoveResourceDir(GetCachePath());
     assets_.Clear();
     usedGUID_.Clear();
+    assetImportErrorTimes_.Clear();
     project_ = 0;
 
     UnsubscribeFromEvent(E_FILECHANGED);
+}
+
+void AssetDatabase::HandleResourceLoadFailed(StringHash eventType, VariantMap& eventData)
+{
+
+    if (project_.Null())
+        return;
+
+    String path = eventData[LoadFailed::P_RESOURCENAME].GetString();
+
+    Asset* asset = GetAssetByPath(path);
+
+    if (!asset)
+        asset = GetAssetByPath(project_->GetResourcePath() + path);
+
+    if (!asset)
+        return;
+
+    Time* time = GetSubsystem<Time>();
+
+    unsigned ctime = time->GetSystemTime();
+
+    // if less than 5 seconds since last report, stifle report
+    if (assetImportErrorTimes_.Contains(asset->guid_))
+        if (ctime - assetImportErrorTimes_[asset->guid_] < 5000)
+            return;
+
+    assetImportErrorTimes_[asset->guid_] = ctime;
+
+    VariantMap evData;
+    evData[AssetImportError::P_PATH] = asset->path_;
+    evData[AssetImportError::P_GUID] = asset->guid_;
+    evData[AssetImportError::P_ERROR] = ToString("Asset %s Failed to Load", asset->path_.CString());
+    SendEvent(E_ASSETIMPORTERROR, evData);
+
+
 }
 
 void AssetDatabase::HandleFileChanged(StringHash eventType, VariantMap& eventData)
@@ -498,7 +534,9 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
+        resourceTypeToImporterType_["JSONFile"] = "JSONImporter";
         resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
+
 
 #ifdef ATOMIC_DOTNET
         resourceTypeToImporterType_["CSComponentAssembly"] = "NETAssemblyImporter";

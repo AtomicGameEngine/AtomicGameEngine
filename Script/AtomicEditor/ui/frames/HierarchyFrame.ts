@@ -8,6 +8,7 @@
 import HierarchyFrameMenu = require("./menus/HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import EditorEvents = require("editor/EditorEvents");
+import EditorUI = require("ui/EditorUI");
 
 var IconTemporary = "ComponentBitmap";
 
@@ -136,7 +137,6 @@ class HierarchyFrame extends Atomic.UIWidget {
         var childItemID = this.recursiveAddNode(parentID, node);
 
         this.nodeIDToItemID[node.id] = childItemID;
-
     }
 
     handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
@@ -197,6 +197,44 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
 
+            if (data.key == Atomic.KEY_DOWN || data.key == Atomic.KEY_UP || data.key == Atomic.KEY_LEFT || data.key == Atomic.KEY_RIGHT) {
+                var selectedId = Number(this.hierList.selectedItemID);
+                var node = this.scene.getNode(selectedId);
+
+                if (node) {
+
+                    this.sendEvent("EditorActiveNodeChange", { node: node });
+
+                }
+            }
+            if (data.key == Atomic.KEY_RIGHT) {
+                var selectedId = Number(this.hierList.selectedItemID);
+                var itemNodeId = this.nodeIDToItemID[selectedId];
+
+                if (!this.hierList.getExpanded(itemNodeId) && this.hierList.getExpandable(itemNodeId)) {
+                    this.hierList.setExpanded(itemNodeId, true);
+                    this.hierList.rootList.invalidateList();
+                } else {
+                    this.hierList.rootList.selectNextItem();
+                }
+
+            } else if (data.key == Atomic.KEY_LEFT) {
+                var selectedId = Number(this.hierList.selectedItemID);
+                var itemNodeId = this.nodeIDToItemID[selectedId];
+
+                if (this.hierList.getExpanded(itemNodeId)) {
+                    this.hierList.setExpanded(itemNodeId, false);
+                    this.hierList.rootList.invalidateList();
+                } else {
+                    var node = this.scene.getNode(selectedId);
+                    var parentNode = node.getParent();
+                    if (parentNode) {
+                        this.hierList.selectItemByID(parentNode.id.toString());
+                    }
+                }
+
+            }
+
             // node deletion
             if (data.key == Atomic.KEY_DELETE || data.key == Atomic.KEY_BACKSPACE) {
 
@@ -204,8 +242,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var node = this.scene.getNode(selectedId);
                 if (node) {
-
-                    node.removeAllComponents();
+                    this.scene.sendEvent("SceneEditNodeAddedRemoved", { scene:this.scene, node:node, added:false});
                     node.remove();
 
                 }

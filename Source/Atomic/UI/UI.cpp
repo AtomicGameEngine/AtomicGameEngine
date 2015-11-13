@@ -150,7 +150,7 @@ void UI::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void UI::Shutdown()
 {
-    SetInputDisabled(true);
+
 }
 
 void UI::Initialize(const String& languageFile)
@@ -508,6 +508,8 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         exitRequested_ = false;
         return;
     }
+
+    SendEvent(E_UIUPDATE);
     TBMessageHandler::ProcessMessages();
 }
 
@@ -750,6 +752,18 @@ bool UI::OnWidgetDying(tb::TBWidget *widget)
     return false;
 }
 
+void UI::OnWidgetFocusChanged(TBWidget *widget, bool focused)
+{
+    if (widgetWrap_.Contains(widget))
+    {
+        VariantMap evData;
+        UIWidget* uiWidget = widgetWrap_[widget];
+        evData[UIWidgetFocusChanged::P_WIDGET]  = uiWidget;
+        evData[UIWidgetFocusChanged::P_FOCUSED]  = focused;
+        uiWidget->SendEvent(E_UIWIDGETFOCUSCHANGED, evData);
+    }
+}
+
 void UI::ShowDebugHud(bool value)
 {
     SystemUI::DebugHud* hud = GetSubsystem<SystemUI::DebugHud>();
@@ -813,10 +827,15 @@ SystemUI::MessageBox* UI::ShowSystemMessageBox(const String& title, const String
 
 }
 
-
 UIWidget* UI::GetWidgetAt(int x, int y, bool include_children)
 {
     return WrapWidget(rootWidget_->GetWidgetAt(x, y, include_children));
 }
+
+bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
+{
+    return false;
+}
+
 
 }

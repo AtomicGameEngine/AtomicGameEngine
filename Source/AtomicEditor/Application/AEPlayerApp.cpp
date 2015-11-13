@@ -115,6 +115,13 @@ void AEPlayerApplication::Setup()
 
                 value = AddTrailingSlash(value);
 
+                // check that cache exists
+                if (!filesystem->DirExists(value + "Cache"))
+                {
+                    ErrorExit("Project cache folder does not exist, projects must be loaded into the Atomic Editor at least once before using the --player command line mode");
+                    return;
+                }
+
 #ifdef ATOMIC_DEV_BUILD
 
                 String resourcePaths = ToString("%s/Resources/CoreData;%s/Resources/PlayerData;%sResources;%s;%sCache",

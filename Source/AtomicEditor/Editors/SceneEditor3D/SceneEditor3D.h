@@ -27,8 +27,17 @@ class Octree;
 
 }
 
+namespace ToolCore
+{
+    class ProjectUserPrefs;
+}
+
+using namespace ToolCore;
+
 namespace AtomicEditor
 {
+
+class SceneEditHistory;
 
 class SceneEditor3D: public ResourceEditor
 {
@@ -43,6 +52,7 @@ public:
     bool OnEvent(const TBWidgetEvent &ev);
 
     void SelectNode(Node* node);
+    void GetSelectionBoundingBox(BoundingBox& bbox);
 
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
@@ -54,6 +64,11 @@ public:
     void Close(bool navigateToAvailableResource = true);
     bool Save();
 
+    void Undo();
+    void Redo();
+
+    ProjectUserPrefs* GetUserPrefs();
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -62,7 +77,15 @@ private:
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
     void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
     void HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData);
+
+    void HandleUserPrefSaved(StringHash eventType, VariantMap& eventData);
+
+    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
+
+    void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
+
+    void UpdateGizmoSnapSettings();
 
     SharedPtr<Scene> scene_;
 
@@ -73,6 +96,10 @@ private:
 
     WeakPtr<Node> selectedNode_;
     SharedPtr<Node> clipboardNode_;
+
+    SharedPtr<SceneEditHistory> editHistory_;
+
+    WeakPtr<ProjectUserPrefs> userPrefs_;
 
 };
 

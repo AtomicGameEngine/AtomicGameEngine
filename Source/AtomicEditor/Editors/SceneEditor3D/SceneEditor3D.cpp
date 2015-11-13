@@ -23,12 +23,18 @@
 #include <Atomic/Input/Input.h>
 #include <Atomic/UI/UI.h>
 
+#include <ToolCore/ToolSystem.h>
+#include <ToolCore/Project/Project.h>
+#include <ToolCore/Project/ProjectEvents.h>
+#include <ToolCore/Project/ProjectUserPrefs.h>
 #include <ToolCore/Assets/AssetDatabase.h>
 #include <ToolCore/Assets/Asset.h>
+
 
 #include "../../EditorMode/AEEditorEvents.h"
 
 #include "SceneEditor3D.h"
+#include "SceneEditHistory.h"
 #include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
@@ -39,6 +45,12 @@ namespace AtomicEditor
 SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabContainer *container) :
     ResourceEditor(context, fullpath, container)
 {
+
+    // store a local reference to user project prefs
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+    userPrefs_ = project->GetUserPrefs();
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
@@ -56,11 +68,11 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     // EARLY ACCESS
     if (fullpath.Find(String("ToonTown")) != String::NPOS)
     {
-          sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073f, 76.1121f, 16.47763f));
-          Quaternion q(0.55f, 0.14f,  0.8f, -0.2f);
-          sceneView_->SetYaw(q.YawAngle());
-          sceneView_->SetPitch(q.PitchAngle());
-          sceneView_->GetCameraNode()->SetWorldRotation(q);
+        sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073f, 76.1121f, 16.47763f));
+        Quaternion q(0.55f, 0.14f,  0.8f, -0.2f);
+        sceneView_->SetYaw(q.YawAngle());
+        sceneView_->SetPitch(q.PitchAngle());
+        sceneView_->GetCameraNode()->SetWorldRotation(q);
     }
     else
     {
@@ -80,6 +92,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     gizmo3D_ = new Gizmo3D(context_);
     gizmo3D_->SetView(sceneView_);
     gizmo3D_->Show();
+    UpdateGizmoSnapSettings();
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
     SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
@@ -92,10 +105,17 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
 
+    SubscribeToEvent(E_PROJECTUSERPREFSAVED, HANDLER(SceneEditor3D, HandleUserPrefSaved));
+
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
 
+    SubscribeToEvent(scene_, E_NODEADDED, HANDLER(SceneEditor3D, HandleNodeAdded));
     SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
+
+    SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
+
+    editHistory_ = new SceneEditHistory(context_, scene_);
 
 }
 
@@ -112,7 +132,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         {
             if (selectedNode_)
             {
-                selectedNode_->RemoveAllComponents();
+                VariantMap editData;
+                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+                editData[SceneEditNodeAddedRemoved::P_NODE] = selectedNode_;
+                editData[SceneEditNodeAddedRemoved::P_ADDED] = false;
+                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+
                 selectedNode_->Remove();
                 selectedNode_ = 0;
             }
@@ -138,7 +163,29 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
                 VariantMap eventData;
                 eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
                 SendEvent(E_EDITORACTIVENODECHANGE, eventData);
+
+                VariantMap editData;
+                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
+                editData[SceneEditNodeAddedRemoved::P_NODE] = pasteNode;
+                editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+
+                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
             }
+        }
+        else if (ev.ref_id == TBIDC("close"))
+        {
+            RequestClose();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("undo"))
+        {
+            Undo();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("redo"))
+        {
+            Redo();
+            return true;
         }
     }
 
@@ -185,13 +232,21 @@ void SceneEditor3D::SelectNode(Node* node)
 
 }
 
+void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
+{
+    // Node does not have values set here
+
+    //Node* node =  static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
+    //LOGINFOF("Node Added: %s", node->GetName().CString());
+}
+
+
 void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
     if (node == selectedNode_)
         SelectNode(0);
 }
-
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
@@ -219,15 +274,24 @@ void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventDat
 }
 
 void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData)
-{
-    EditMode mode = (EditMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
+{    
+    EditMode mode = (EditMode) (eventData[GizmoEditModeChanged::P_MODE].GetInt());
     gizmo3D_->SetEditMode(mode);
 }
 
 void SceneEditor3D::HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData)
 {
-    AxisMode mode = (AxisMode) ((int)eventData[GizmoEditModeChanged::P_MODE].GetFloat());
-    gizmo3D_->SetAxisMode(mode);
+    AxisMode mode = (AxisMode) (eventData[GizmoAxisModeChanged::P_MODE].GetInt());
+    bool toggle = eventData[GizmoAxisModeChanged::P_TOGGLE].GetBool();
+    if (toggle)
+    {
+        AxisMode mode = gizmo3D_->GetAxisMode() == AXIS_WORLD ? AXIS_LOCAL : AXIS_WORLD;
+        VariantMap neventData;
+        neventData[GizmoAxisModeChanged::P_MODE] = (int) mode;
+        SendEvent(E_GIZMOAXISMODECHANGED, neventData);
+    }
+    else
+        gizmo3D_->SetAxisMode(mode);
 }
 
 
@@ -251,7 +315,67 @@ bool SceneEditor3D::Save()
         file.Close();
     }
 
+    SetModified(false);
+
     return true;
+
+}
+
+void SceneEditor3D::Undo()
+{
+    editHistory_->Undo();
+}
+
+void SceneEditor3D::Redo()
+{
+    editHistory_->Redo();
+}
+
+void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
+{
+    SetModified(true);    
+}
+
+void SceneEditor3D::HandleUserPrefSaved(StringHash eventType, VariantMap& eventData)
+{
+    UpdateGizmoSnapSettings();
+}
+
+void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
+{
+    bbox.Clear();
+
+    if (selectedNode_.Null())
+        return;
+
+    // TODO: Adjust once multiple selection is in
+    if (selectedNode_.Null())
+        return;
+
+    // Get all the drawables, which define the bounding box of the selection
+    PODVector<Drawable*> drawables;
+    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
+
+    if (!drawables.Size())
+        return;
+
+    // Calculate the combined bounding box of all drawables
+    for (unsigned i = 0; i < drawables.Size(); i++  )
+    {
+        Drawable* drawable = drawables[i];
+        bbox.Merge(drawable->GetWorldBoundingBox());
+    }
+
+
+}
+
+void SceneEditor3D::UpdateGizmoSnapSettings()
+{
+    gizmo3D_->SetSnapTranslationX(userPrefs_->GetSnapTranslationX());
+    gizmo3D_->SetSnapTranslationY(userPrefs_->GetSnapTranslationY());
+    gizmo3D_->SetSnapTranslationZ(userPrefs_->GetSnapTranslationZ());
+    gizmo3D_->SetSnapRotation(userPrefs_->GetSnapRotation());
+    gizmo3D_->SetSnapScale(userPrefs_->GetSnapScale());
 
 }
 

@@ -26,6 +26,8 @@ class DataBinding {
         fd.id = "Vera";
         fd.size = 11;
 
+        var editWidgets: Array<Atomic.UIWidget> = [];
+
         var enumSource = null;
 
         if (attrInfo.type == Atomic.VAR_BOOL) {
@@ -65,7 +67,7 @@ class DataBinding {
                 var lp = new Atomic.UILayoutParams();
                 lp.width = 140;
                 field.layoutParams = lp;
-
+                editWidgets.push(field);
                 widget = field;
             }
 
@@ -79,6 +81,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
+            editWidgets.push(field);
 
             widget = field;
 
@@ -92,7 +95,7 @@ class DataBinding {
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
             field.layoutParams = lp;
-
+            editWidgets.push(field);
             widget = field;
         }
         else if (attrInfo.type == Atomic.VAR_VECTOR3 || attrInfo.type == Atomic.VAR_QUATERNION) {
@@ -105,6 +108,7 @@ class DataBinding {
 
             for (var i: any = 0; i < 3; i++) {
                 var select = new Atomic.UIInlineSelect();
+                editWidgets.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.skinBg = "InspectorVectorAttrName";
@@ -127,6 +131,7 @@ class DataBinding {
             for (var i: any = 0; i < 4; i++) {
 
                 var select = new Atomic.UIInlineSelect();
+                editWidgets.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.setLimits(-10000000, 10000000);
@@ -144,6 +149,7 @@ class DataBinding {
 
             for (var i: any = 0; i < 2; i++) {
                 var select = new Atomic.UIInlineSelect();
+                editWidgets.push(select);
                 select.id = String(i + 1);
                 select.fontDescription = fd;
                 select.skinBg = "InspectorVectorAttrName";
@@ -214,7 +220,7 @@ class DataBinding {
 
                         if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-                            var asset = <ToolCore.Asset> dragObject.object;
+                            var asset = <ToolCore.Asset>dragObject.object;
 
                             if (asset.importerTypeName == importerName) {
                                 importer = asset.importer;
@@ -250,6 +256,11 @@ class DataBinding {
 
             var binding = new DataBinding(object, attrInfo, widget);
             binding.enumSource = enumSource;
+
+            for (var i in editWidgets) {
+                editWidgets[i].subscribeToEvent(editWidgets[i], "UIWidgetEditComplete", (ev) => binding.handleUIWidgetEditCompleteEvent(ev));
+            }
+
             return binding;
 
         }
@@ -340,13 +351,13 @@ class DataBinding {
         } else if (attrInfo.type == Atomic.VAR_RESOURCEREF && attrInfo.resourceTypeName) {
 
             // for cached resources, use the asset name, otherwise use the resource path name
-            var resource = <Atomic.Resource> object.getAttribute(attrInfo.name);
+            var resource = <Atomic.Resource>object.getAttribute(attrInfo.name);
             var text = "";
             if (resource) {
                 text = resource.name;
                 var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
                 if (asset)
-                  text = asset.name;
+                    text = asset.name;
             }
 
             widget["editField"].text = text;
@@ -445,6 +456,17 @@ class DataBinding {
 
     }
 
+    handleUIWidgetEditCompleteEvent(ev) {
+
+      // TODO: once new base class stuff is in, should be able to check for type
+      var scene = this.object["scene"];
+
+      if (!scene)
+          return;
+
+      scene.sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+
+    }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
 
@@ -459,6 +481,10 @@ class DataBinding {
 
                 this.object.setAttribute(this.attrInfo.name, Number(ev.refid) - 1);
                 this.setWidgetValueFromObject();
+                // TODO: once new base class stuff is in, should be able to check for type
+                if (this.object["scene"])
+                    this.object["scene"].sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+
 
             }
 
@@ -478,8 +504,20 @@ class DataBinding {
         }
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+
             if (this.widget == ev.target || this.widget.isAncestorOf(ev.target)) {
+
                 this.setObjectValueFromWidget(ev.target);
+
+                // UIEditField and UIInline select changes are handled by edit complete event
+                // Otherwise, we would get multiple edit snapshots
+                if (ev.target.getTypeName() != "UIEditField" && ev.target.getTypeName() != "UIInlineSelect") {
+
+                    // TODO: once new base class stuff is in, should be able to check for type
+                    if (this.object["scene"])
+                        this.object["scene"].sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+                }
+
                 return true;
             }
         }

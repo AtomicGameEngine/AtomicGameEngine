@@ -247,8 +247,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     bool IsMultiTouch() { return multiTouch_; }
 
-    void SetCapturing(bool capturing) { widget_->SetCapturing(capturing); }
+    bool GetCaptured();
 
+    void SetCapturing(bool capturing);
     bool GetCapturing() { return widget_->GetCapturing(); }
 
     void InvokeShortcut(const String& shortcut);
@@ -268,7 +269,6 @@ protected:
     SharedPtr<UIPreferredSize> preferredSize_;
 
     SharedPtr<UIDragObject> dragObject_;
-
 
     bool multiTouch_;
 

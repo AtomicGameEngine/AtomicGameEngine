@@ -230,6 +230,7 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
     SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP);
     SetPaintOverflowFadeout(false);
+    SetCapturing(false);
 
     item_->widget_ = this;
 
@@ -294,6 +295,8 @@ bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
 
     if (ev.type == EVENT_TYPE_POINTER_DOWN || ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
     {
+        SetFocus(WIDGET_FOCUS_REASON_POINTER);
+
         TBWidget* parent = GetParent();
 
         while (parent)
@@ -515,6 +518,23 @@ void UIListView::SetExpanded(unsigned itemID, bool value)
 
 }
 
+bool UIListView::GetExpanded(unsigned itemID)
+{
+    if (!itemLookup_.Contains(itemID))
+        return false;
+
+    return itemLookup_[itemID]->GetExpanded();
+
+}
+
+bool UIListView::GetExpandable(unsigned itemID)
+{
+    if (!itemLookup_.Contains(itemID))
+        return false;
+
+    return itemLookup_[itemID]->children_.Size() > 0;
+}
+
 
 void UIListView::DeleteAllItems()
 {
@@ -540,6 +560,14 @@ void UIListView::SelectItemByID(const String& id)
         }
 
     }
+}
+
+void UIListView::ScrollToSelectedItem()
+{
+    if (rootList_.Null())
+        return;
+
+    rootList_->ScrollToSelectedItem();
 }
 
 

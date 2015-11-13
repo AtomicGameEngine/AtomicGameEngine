@@ -46,7 +46,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "quit") {
 
-                Atomic.ui.requestExit();
+                this.sendEvent("ExitRequested");
                 return true;
 
             }
@@ -95,6 +95,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             if (refid == "edit select all") {
                 EditorUI.getShortcuts().invokeSelectAll();
+                return true;
+            }
+
+            if (refid == "edit snap settings") {
+                EditorUI.getModelOps().showSnapSettings();
                 return true;
             }
 
@@ -250,7 +255,9 @@ var editItems = {
     "Format Code": ["edit format code", StringID.ShortcutBeautify],
     "-4": null,
     "Play": ["edit play", StringID.ShortcutPlay],
-    "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug]
+    "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug],
+    "-5": null,
+    "Snap Settings": ["edit snap settings"]
 
 };
 

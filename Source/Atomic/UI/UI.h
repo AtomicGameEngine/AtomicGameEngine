@@ -119,7 +119,10 @@ private:
 
     // TBWidgetListener
     void OnWidgetDelete(tb::TBWidget *widget);
-    bool OnWidgetDying(tb::TBWidget *widget);
+    bool OnWidgetDying(tb::TBWidget *widget);    
+    void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
+    bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
+
 
     tb::TBWidget* rootWidget_;
     UIRenderer* renderer_;

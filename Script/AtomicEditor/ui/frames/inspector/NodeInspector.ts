@@ -10,6 +10,19 @@ import ComponentInspector = require("./ComponentInspector");
 import DataBinding = require("./DataBinding");
 import CreateComponentButton = require("./CreateComponentButton");
 
+interface ComponentState {
+
+    expanded: boolean;
+
+}
+
+interface NodeState {
+
+    expanded: boolean;
+    componentStates: { [id: number]: ComponentState };
+
+}
+
 class NodeInspector extends ScriptWidget {
 
     constructor() {
@@ -94,7 +107,7 @@ class NodeInspector extends ScriptWidget {
     getPrefabComponent(node: Atomic.Node): Atomic.PrefabComponent {
 
         if (node.getComponent("PrefabComponent"))
-            return <Atomic.PrefabComponent> node.getComponent("PrefabComponent");
+            return <Atomic.PrefabComponent>node.getComponent("PrefabComponent");
 
         if (node.parent)
             return this.getPrefabComponent(node.parent);
@@ -115,12 +128,14 @@ class NodeInspector extends ScriptWidget {
 
     }
 
-
     inspect(node: Atomic.Node) {
 
         this.bindings = new Array();
 
         this.node = node;
+
+        node.scene.sendEvent("SceneEditSerializable", { serializable: node, operation: 0 });
+        this.subscribeToEvent(node, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));
 
         this.isPrefab = this.detectPrefab(node);
 
@@ -142,6 +157,7 @@ class NodeInspector extends ScriptWidget {
         // node attr layout
 
         var nodeSection = new Atomic.UISection();
+        nodeSection.id = "node_section";
         nodeSection.text = "Node";
         nodeSection.value = 1;
         nodeLayout.addChild(nodeSection);
@@ -157,7 +173,7 @@ class NodeInspector extends ScriptWidget {
 
         for (var i in attrs) {
 
-            var attr = <Atomic.AttributeInfo> attrs[i];
+            var attr = <Atomic.AttributeInfo>attrs[i];
 
             if (attr.mode & Atomic.AM_NOEDIT)
                 continue;
@@ -266,6 +282,8 @@ class NodeInspector extends ScriptWidget {
 
                     prefabComponent.breakPrefab();
 
+                    this.sendEvent("EditorActiveNodeChange", { node: this.node });
+
                     return true;
 
                 }
@@ -294,6 +312,7 @@ class NodeInspector extends ScriptWidget {
             //  continue;
 
             var ci = new ComponentInspector();
+            ci.id = "component_section_" + component.id;
 
             ci.inspect(component);
 
@@ -312,7 +331,110 @@ class NodeInspector extends ScriptWidget {
             this.bindings[i].objectLocked = false;
         }
 
+        this.loadState();
+
     }
+
+    handleSceneEditSerializableUndoRedoEvent(ev) {
+
+        for (var i in this.bindings) {
+            this.bindings[i].objectLocked = true;
+            this.bindings[i].setWidgetValueFromObject();
+            this.bindings[i].objectLocked = false;
+        }
+
+    }
+
+    saveState() {
+
+        var node = this.node;
+
+        if (!node.scene)
+            return;
+
+        var nodeStates = NodeInspector.nodeStates[node.scene.id];
+
+        if (!nodeStates)
+            return;
+
+        var state = nodeStates[node.id];
+
+        if (!state) {
+
+            state = nodeStates[node.id] = { expanded: true, componentStates: {} };
+
+        }
+
+        var section: Atomic.UISection = <Atomic.UISection>this.nodeLayout.getWidget("node_section");
+
+        state.expanded = section.value ? true : false;
+
+        var components = node.getComponents();
+
+        for (var i in components) {
+
+            var component = components[i];
+            var cstate = state.componentStates[component.id];
+
+            if (!cstate) {
+                cstate = state.componentStates[component.id] = { expanded: false };
+            }
+
+            section = <Atomic.UISection>this.nodeLayout.getWidget("component_section_" + component.id);
+
+            if (section)
+                cstate.expanded = section.value ? true : false;
+
+        }
+
+    }
+
+    loadState() {
+
+        var node = this.node;
+
+        // lookup in node states via scene id
+        var nodeStates = NodeInspector.nodeStates[node.scene.id];
+
+        if (!nodeStates) {
+            nodeStates = NodeInspector.nodeStates[node.scene.id] = {};
+        }
+
+        // lookup by node id
+        var state = nodeStates[node.id];
+
+        if (!state) {
+
+            // we don't have a state, so save default state
+            this.saveState();
+
+        } else {
+
+            var section: Atomic.UISection = <Atomic.UISection>this.nodeLayout.getWidget("node_section");
+
+            section.value = state.expanded ? 1 : 0;
+
+            var components = node.getComponents();
+
+            for (var i in components) {
+
+                var component = components[i];
+
+                var cstate = state.componentStates[component.id];
+                section = <Atomic.UISection>this.nodeLayout.getWidget("component_section_" + component.id);
+
+                if (cstate && section) {
+
+                    section.value = cstate.expanded ? 1 : 0;
+
+                }
+
+            }
+
+        }
+
+    }
+
 
     isPrefab: boolean;
     node: Atomic.Node;
@@ -320,6 +442,8 @@ class NodeInspector extends ScriptWidget {
     bindings: Array<DataBinding>;
     gizmoMoved = false;
     updateDelta = 0;
+
+    static nodeStates: { [sceneID: number]: { [nodeId: number]: NodeState } } = {};
 
 }
 

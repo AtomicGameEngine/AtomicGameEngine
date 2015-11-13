@@ -10,6 +10,11 @@
 			"SendEvent" : ["StringHash"]
 		}
 	},
+	"overloads" : {
+		"Object" : {
+			"UnsubscribeFromEvent" : ["StringHash"]
+		}
+	},
 	"typescript_decl" : {
 
 		"Object" : [

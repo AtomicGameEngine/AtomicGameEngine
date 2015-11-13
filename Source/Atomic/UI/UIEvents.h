@@ -27,6 +27,12 @@
 namespace Atomic
 {
 
+// UIUpdate event
+EVENT(E_UIUPDATE, UIUpdate)
+{
+
+}
+
 EVENT(E_WIDGETEVENT, WidgetEvent)
 {
     PARAM(P_HANDLER, Handler);           // UIWidget pointer of widget's OnEvent we are in
@@ -101,6 +107,24 @@ EVENT(E_UISHORTCUT, UIShortcut)
     PARAM(P_KEY, Key);                    // int
     PARAM(P_QUALIFIERS, Qualifiers);        // int
 
+}
+
+EVENT(E_UIWIDGETFOCUSCHANGED, UIWidgetFocusChanged)
+{
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
+    PARAM(P_FOCUSED, Focused);             // bool
+}
+EVENT(E_UIWIDGETFOCUSESCAPED, UIWidgetFocusEscaped)
+{
+}
+
+EVENT(E_UIWIDGETEDITCOMPLETE, UIWidgetEditComplete)
+{
+}
+
+EVENT(E_UIUNHANDLEDSHORTCUT, UIUnhandledShortcut)
+{
+    PARAM(P_REFID, RefID); // string tbid
 }
 
 }
