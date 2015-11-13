@@ -37,8 +37,8 @@ using namespace ToolCore;
 namespace AtomicEditor
 {
 
-class SceneEditHistory;
 class SceneSelection;
+class SceneEditHistory;
 
 class SceneEditor3D: public ResourceEditor
 {
@@ -98,10 +98,9 @@ private:
     SharedPtr<Gizmo3D> gizmo3D_;
 
     SharedPtr<SceneSelection> selection_;
+    SharedPtr<SceneEditHistory> editHistory_;
 
     SharedPtr<Node> clipboardNode_;
-
-    SharedPtr<SceneEditHistory> editHistory_;
 
     WeakPtr<ProjectUserPrefs> userPrefs_;
 

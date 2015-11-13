@@ -34,8 +34,8 @@
 #include "../../EditorMode/AEEditorEvents.h"
 
 #include "SceneEditor3D.h"
-#include "SceneEditHistory.h"
 #include "SceneSelection.h"
+#include "SceneEditHistory.h"
 #include "SceneEditor3DEvents.h"
 
 using namespace ToolCore;
@@ -66,6 +66,7 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     selection_ = new SceneSelection(context, this);
     sceneView_ = new SceneView3D(context_, this);
+    editHistory_ = new SceneEditHistory(context, this);
 
     // EARLY ACCESS
     if (fullpath.Find(String("ToonTown")) != String::NPOS)
@@ -116,8 +117,6 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
 
     SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
-
-    editHistory_ = new SceneEditHistory(context_, scene_);
 
 }
 

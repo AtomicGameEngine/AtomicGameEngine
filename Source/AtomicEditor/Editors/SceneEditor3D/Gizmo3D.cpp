@@ -175,10 +175,7 @@ void Gizmo3D::Use()
     {
         if (dragging_)
         {
-            VariantMap eventData;
-            eventData[SceneEditSerializable::P_SERIALIZABLE] = editNodes[0];
-            eventData[SceneEditSerializable::P_OPERATION] = 1;
-            scene_->SendEvent(E_SCENEEDITSERIALIZABLE, eventData);
+            scene_->SendEvent(E_SCENEEDITEND);
             dragging_ = false;
         }
 

@@ -601,6 +601,7 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
     if (dragNode_.NotNull())
     {
+        /*
         VariantMap neventData;
         neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
         SendEvent(E_EDITORACTIVENODECHANGE, neventData);
@@ -610,6 +611,7 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
         editData[SceneEditNodeAddedRemoved::P_NODE] = dragNode_;
         editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
         scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+        */
 
     }
 
