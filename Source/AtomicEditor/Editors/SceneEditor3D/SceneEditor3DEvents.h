@@ -48,6 +48,16 @@ EVENT(E_SCENEEDITEND, SceneEditEnd)
     PARAM(P_SCENE, Scene);             // Scene
 }
 
+EVENT(E_SCENEEDITSTATECHANGE, SceneEditStateChange)
+{
+    PARAM(P_SERIALIZABLE, Serializable);     // Serializable
+}
+
+EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
+{
+    PARAM(P_END, End);       // bool
+}
+
 EVENT(E_SCENEEDITSCENEMODIFIED, SceneEditSceneModified)
 {
 

@@ -464,7 +464,7 @@ class DataBinding {
       if (!scene)
           return;
 
-      scene.sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+      scene.sendEvent("SceneEditEnd");
 
     }
 
@@ -483,7 +483,7 @@ class DataBinding {
                 this.setWidgetValueFromObject();
                 // TODO: once new base class stuff is in, should be able to check for type
                 if (this.object["scene"])
-                    this.object["scene"].sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+                    this.object["scene"].sendEvent("SceneEditEnd");
 
 
             }
@@ -515,7 +515,7 @@ class DataBinding {
 
                     // TODO: once new base class stuff is in, should be able to check for type
                     if (this.object["scene"])
-                        this.object["scene"].sendEvent("SceneEditSerializable", { serializable: this.object, operation: 1 });
+                        this.object["scene"].sendEvent("SceneEditEnd");
                 }
 
                 return true;

@@ -38,6 +38,18 @@ public:
     virtual bool Undo() = 0;
     virtual bool Redo() = 0;
 
+    /// Returns true if the states are identical
+    bool CompareStates(const VectorBuffer& stateOne, const VectorBuffer& stateTwo) const
+    {
+        if (stateOne.GetSize() != stateTwo.GetSize())
+            return false;
+
+        if (memcmp(stateOne.GetData(), stateTwo.GetData(), stateOne.GetSize()))
+            return false;
+
+        return true;
+    }
+
     SceneEditType type_;
 
 };
@@ -47,13 +59,20 @@ class SelectionEditOp : public SceneEditOp
 
 public:
 
-    SelectionEditOp(Vector<SharedPtr<Node>>& nodes);
+    SelectionEditOp();
     ~SelectionEditOp();
 
     bool Undo();
     bool Redo();
 
     void RegisterEdit();
+
+    void SetNodes(Vector<SharedPtr<Node>>& nodes);
+
+    void AddNode(Node* node);
+
+    void NodeAdded(Node* node, Node* parent);
+    void NodeRemoved(Node* node, Node* parent);
 
     bool Commit();
 

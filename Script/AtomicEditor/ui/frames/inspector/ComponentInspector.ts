@@ -97,7 +97,7 @@ class ComponentInspector extends Atomic.UISection {
         this.text = component.typeName;
 
         component.scene.sendEvent("SceneEditSerializable", { serializable: component, operation: 0});
-        this.subscribeToEvent(component, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));
+        this.subscribeToEvent(component, "SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
 
         // For JSComponents append the filename
         if (component.typeName == "JSComponent") {
@@ -214,7 +214,7 @@ class ComponentInspector extends Atomic.UISection {
 
             // refresh entire inspector, fix this...
             this.sendEvent("EditorActiveNodeChange", { node: node });
-            
+
             return true;
 
         }
@@ -296,7 +296,7 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
-    handleSceneEditSerializableUndoRedoEvent(ev) {
+    handleSceneEditStateChangeEvent(ev) {
 
       for (var i in this.bindings) {
           this.bindings[i].objectLocked = true;

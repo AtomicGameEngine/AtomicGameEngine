@@ -135,7 +135,7 @@ class NodeInspector extends ScriptWidget {
         this.node = node;
 
         node.scene.sendEvent("SceneEditSerializable", { serializable: node, operation: 0 });
-        this.subscribeToEvent(node, "SceneEditSerializableUndoRedo", (data) => this.handleSceneEditSerializableUndoRedoEvent(data));
+        this.subscribeToEvent(node, "SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
 
         this.isPrefab = this.detectPrefab(node);
 
@@ -335,7 +335,7 @@ class NodeInspector extends ScriptWidget {
 
     }
 
-    handleSceneEditSerializableUndoRedoEvent(ev) {
+    handleSceneEditStateChangeEvent(ev) {
 
         for (var i in this.bindings) {
             this.bindings[i].objectLocked = true;

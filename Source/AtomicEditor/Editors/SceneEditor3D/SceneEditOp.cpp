@@ -2,51 +2,16 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Component.h>
+#include <Atomic/Scene/Scene.h>
 
 #include "SceneEditOp.h"
+#include "SceneEditor3DEvents.h"
 
 namespace AtomicEditor
 {
 
-SelectionEditOp::SelectionEditOp(Vector<SharedPtr<Node>>& nodes) : SceneEditOp(SCENEEDIT_SELECTION)
+SelectionEditOp::SelectionEditOp() : SceneEditOp(SCENEEDIT_SELECTION)
 {
-    // Generate initial snapshot
-    for (unsigned i = 0; i < nodes.Size(); i++)
-    {
-        Node* node = nodes[i];
-
-        if (node->IsTemporary())
-            continue;
-
-        EditNode* enode = new EditNode();
-        enode->node_ = node;
-        enode->parentBegin_ = enode->parentEnd_ = node->GetParent();
-        node->Serializable::Save(enode->stateBegin_);
-        enode->stateBegin_.Seek(0);
-        enode->stateEnd_ = enode->stateBegin_;
-
-        const Vector<SharedPtr<Component>>& components = node->GetComponents();
-
-        for (unsigned j = 0; j < components.Size(); j++)
-        {
-            Component* component = components[j];
-
-            if (component->IsTemporary())
-                continue;
-
-            EditComponent* ecomponent = new EditComponent();
-            ecomponent->component_ = component;
-            ecomponent->nodeBegin_ = ecomponent->nodeEnd_ = node;
-            component->Serializable::Save(ecomponent->stateBegin_);
-            ecomponent->stateBegin_.Seek(0);
-            ecomponent->stateEnd_ = ecomponent->stateBegin_;
-
-            enode->components_.Push(ecomponent);
-        }
-
-        editNodes_.Push(enode);
-
-    }
 }
 
 SelectionEditOp::~SelectionEditOp()
@@ -62,6 +27,82 @@ SelectionEditOp::~SelectionEditOp()
 
 }
 
+void SelectionEditOp::AddNode(Node* node)
+{
+
+    for (unsigned i = 0; i < editNodes_.Size(); i++)
+    {
+        if (editNodes_[i]->node_ == node)
+            return;
+    }
+
+    EditNode* enode = new EditNode();
+    enode->node_ = node;
+    enode->parentBegin_ = enode->parentEnd_ = node->GetParent();
+    node->Serializable::Save(enode->stateBegin_);
+    enode->stateBegin_.Seek(0);
+    enode->stateEnd_ = enode->stateBegin_;
+
+    const Vector<SharedPtr<Component>>& components = node->GetComponents();
+
+    for (unsigned j = 0; j < components.Size(); j++)
+    {
+        Component* component = components[j];
+
+        EditComponent* ecomponent = new EditComponent();
+        ecomponent->component_ = component;
+        ecomponent->nodeBegin_ = ecomponent->nodeEnd_ = node;
+        component->Serializable::Save(ecomponent->stateBegin_);
+        ecomponent->stateBegin_.Seek(0);
+        ecomponent->stateEnd_ = ecomponent->stateBegin_;
+
+        enode->components_.Push(ecomponent);
+    }
+
+    editNodes_.Push(enode);
+
+}
+
+void SelectionEditOp::NodeAdded(Node* node, Node* parent)
+{
+    AddNode(node);
+
+    for (unsigned i = 0; i < editNodes_.Size(); i++)
+    {
+        if (editNodes_[i]->node_ == node)
+        {
+            editNodes_[i]->parentBegin_ = 0;
+            editNodes_[i]->parentEnd_ = parent;
+            return;
+        }
+    }
+}
+
+void SelectionEditOp::NodeRemoved(Node* node, Node* parent)
+{
+    AddNode(node);
+
+    for (unsigned i = 0; i < editNodes_.Size(); i++)
+    {
+        if (editNodes_[i]->node_ == node)
+        {
+            editNodes_[i]->parentBegin_ = parent;
+            editNodes_[i]->parentEnd_ = 0;
+            return;
+        }
+    }
+}
+
+void SelectionEditOp::SetNodes(Vector<SharedPtr<Node> > &nodes)
+{
+    // Generate initial snapshot
+    for (unsigned i = 0; i < nodes.Size(); i++)
+    {
+        AddNode(nodes[i]);
+
+    }
+}
+
 bool SelectionEditOp::Commit()
 {
     // See if any nodes, components have been edited
@@ -72,21 +113,15 @@ bool SelectionEditOp::Commit()
         if (enode->parentBegin_ != enode->parentEnd_)
             return true;
 
-        if (enode->stateBegin_.GetSize() != enode->stateEnd_.GetSize() ||
-                memcmp(enode->stateBegin_.GetData(), enode->stateEnd_.GetData(), enode->stateBegin_.GetSize()))
-        {
+        if (!CompareStates(enode->stateBegin_, enode->stateEnd_))
             return true;
-        }
 
         for (unsigned j = 0; j < enode->components_.Size(); j++)
         {
             EditComponent* ecomponent = enode->components_[j];
 
-            if (ecomponent->stateBegin_.GetSize() != ecomponent->stateEnd_.GetSize() ||
-                    memcmp(ecomponent->stateBegin_.GetData(), ecomponent->stateEnd_.GetData(), ecomponent->stateBegin_.GetSize()))
-            {
+            if (!CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_))
                 return true;
-            }
         }
 
     }
@@ -127,10 +162,18 @@ bool SelectionEditOp::Undo()
 
         Node* node = enode->node_;
 
-        if (!node->Serializable::Load(enode->stateBegin_))
+        bool changed = !CompareStates(enode->stateBegin_, enode->stateEnd_);
+        if (changed && !node->Serializable::Load(enode->stateBegin_))
         {
             LOGERRORF("Unable to Undo node serializable");
             return false;
+        }
+
+        if (changed)
+        {
+            VariantMap eventData;
+            eventData[SceneEditStateChange::P_SERIALIZABLE] = node;
+            node->SendEvent(E_SCENEEDITSTATECHANGE, eventData);
         }
 
         enode->stateBegin_.Seek(0);
@@ -147,11 +190,20 @@ bool SelectionEditOp::Undo()
             EditComponent* ecomponent = enode->components_[j];
             Component* component = ecomponent->component_;
 
-            if (!component->Serializable::Load(ecomponent->stateBegin_))
+            changed = !CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_);
+            if (changed && !component->Serializable::Load(ecomponent->stateBegin_))
             {
                 LOGERRORF("Unable to Undo component serializable");
                 return false;
             }
+
+            if (changed)
+            {
+                VariantMap eventData;
+                eventData[SceneEditStateChange::P_SERIALIZABLE] = component;
+                component->SendEvent(E_SCENEEDITSTATECHANGE, eventData);
+            }
+
 
             ecomponent->stateBegin_.Seek(0);
 
@@ -177,13 +229,21 @@ bool SelectionEditOp::Redo()
 
         Node* node = enode->node_;
 
-        if (!node->Serializable::Load(enode->stateEnd_))
+        bool changed = !CompareStates(enode->stateBegin_, enode->stateEnd_);
+        if ( changed && !node->Serializable::Load(enode->stateEnd_))
         {
             LOGERRORF("Unable to Redo node serializable");
             return false;
         }
 
         enode->stateEnd_.Seek(0);
+
+        if (changed)
+        {
+            VariantMap eventData;
+            eventData[SceneEditStateChange::P_SERIALIZABLE] = node;
+            node->SendEvent(E_SCENEEDITSTATECHANGE, eventData);
+        }
 
         if (node->GetParent() != enode->parentEnd_)
         {
@@ -197,13 +257,21 @@ bool SelectionEditOp::Redo()
             EditComponent* ecomponent = enode->components_[j];
             Component* component = ecomponent->component_;
 
-            if (!component->Serializable::Load(ecomponent->stateEnd_))
+            changed = !CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_);
+            if ( changed && !component->Serializable::Load(ecomponent->stateEnd_))
             {
                 LOGERRORF("Unable to Redo component serializable");
                 return false;
             }
 
             ecomponent->stateEnd_.Seek(0);
+
+            if (changed)
+            {
+                VariantMap eventData;
+                eventData[SceneEditStateChange::P_SERIALIZABLE] = component;
+                component->SendEvent(E_SCENEEDITSTATECHANGE, eventData);
+            }
 
             if (component->GetNode() != ecomponent->nodeEnd_)
             {

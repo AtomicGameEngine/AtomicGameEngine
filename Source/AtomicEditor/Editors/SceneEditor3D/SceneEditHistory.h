@@ -11,6 +11,11 @@
 
 using namespace Atomic;
 
+namespace Atomic
+{
+class Node;
+}
+
 namespace AtomicEditor
 {
 
@@ -27,7 +32,7 @@ public:
     virtual ~SceneEditHistory();
 
     void BeginSelectionEdit();
-    void EndSelectionEdit();
+    void EndSelectionEdit(bool begin = true);
 
     void Undo();
     void Redo();
@@ -37,6 +42,9 @@ private:
     void HandleSceneNodeSelected(StringHash eventType, VariantMap& eventData);
     void HandleSceneEditBegin(StringHash eventType, VariantMap& eventData);
     void HandleSceneEditEnd(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditAddRemoveNodes(StringHash eventType, VariantMap& eventData);
+    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
+    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void AddUndoOp(SelectionEditOp* op);
 
@@ -46,6 +54,8 @@ private:
 
     PODVector<SelectionEditOp*> undoHistory_;
     PODVector<SelectionEditOp*> redoHistory_;
+
+    bool addingRemovingNodes_;
 
 };
 

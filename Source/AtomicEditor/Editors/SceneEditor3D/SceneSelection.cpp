@@ -1,4 +1,5 @@
 
+#include <Atomic/IO/Log.h>
 #include <Atomic/Core/CoreEvents.h>
 
 #include <Atomic/Graphics/Graphics.h>
@@ -134,24 +135,18 @@ void SceneSelection::Delete()
 
     Clear();
 
+    VariantMap eventData;
+    eventData[SceneEditAddRemoveNodes::P_END] = false;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
     for (unsigned i = 0; i < nodes.Size(); i++)
     {
         nodes[i]->Remove();
     }
 
-    /*
-    if (selectedNode_)
-    {
-        VariantMap editData;
-        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-        editData[SceneEditNodeAddedRemoved::P_NODE] = selectedNode_;
-        editData[SceneEditNodeAddedRemoved::P_ADDED] = false;
-        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+    eventData[SceneEditAddRemoveNodes::P_END] = true;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
 
-        selectedNode_->Remove();
-        selectedNode_ = 0;
-    }
-    */
 }
 
 void SceneSelection::GetBounds(BoundingBox& bbox)

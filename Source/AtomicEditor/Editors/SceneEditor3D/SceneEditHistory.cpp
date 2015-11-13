@@ -1,4 +1,7 @@
 
+#include <Atomic/IO/Log.h>
+#include <Atomic/Scene/SceneEvents.h>
+
 #include "SceneEditor3D.h"
 
 #include "SceneEditor3DEvents.h"
@@ -11,12 +14,18 @@ namespace AtomicEditor
 
 SceneEditHistory::SceneEditHistory(Context* context, SceneEditor3D* sceneEditor) : Object(context),
     sceneEditor_(sceneEditor),
-    curSelEditOp_(0)
+    curSelEditOp_(0),
+    addingRemovingNodes_(false)
 {
     SubscribeToEvent(sceneEditor_->GetScene(), E_SCENENODESELECTED, HANDLER(SceneEditHistory, HandleSceneNodeSelected));
 
     SubscribeToEvent(sceneEditor_->GetScene(), E_SCENEEDITBEGIN, HANDLER(SceneEditHistory, HandleSceneEditBegin));
     SubscribeToEvent(sceneEditor_->GetScene(), E_SCENEEDITEND, HANDLER(SceneEditHistory, HandleSceneEditEnd));
+
+    SubscribeToEvent(sceneEditor_->GetScene(), E_SCENEEDITADDREMOVENODES, HANDLER(SceneEditHistory, HandleSceneEditAddRemoveNodes));
+
+    SubscribeToEvent(sceneEditor_->GetScene(), E_NODEADDED, HANDLER(SceneEditHistory, HandleNodeAdded));
+    SubscribeToEvent(sceneEditor_->GetScene(), E_NODEREMOVED, HANDLER(SceneEditHistory, HandleNodeRemoved));
 
 }
 
@@ -36,15 +45,47 @@ void SceneEditHistory::HandleSceneEditEnd(StringHash eventType, VariantMap& even
     EndSelectionEdit();
 }
 
-void SceneEditHistory::BeginSelectionEdit()
+void SceneEditHistory::HandleSceneEditAddRemoveNodes(StringHash eventType, VariantMap& eventData)
 {
-    assert(!curSelEditOp_);
 
-    Vector<SharedPtr<Node>>& nodes = sceneEditor_->GetSelection()->GetNodes();
-    if (!nodes.Size())
+    bool end = eventData[SceneEditAddRemoveNodes::P_END].GetBool();
+
+    if (end)
+    {
+        addingRemovingNodes_ = false;
+
+        EndSelectionEdit(true);
+    }
+    else
+    {
+        addingRemovingNodes_ = true;
+        EndSelectionEdit(false);
+
+        curSelEditOp_ = new SelectionEditOp();
+
+    }
+}
+
+void SceneEditHistory::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
+{
+    if (!addingRemovingNodes_)
         return;
 
-    curSelEditOp_ = new SelectionEditOp(nodes);
+    Node* node = static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
+    Node* parent = static_cast<Node*>(eventData[NodeAdded::P_PARENT].GetPtr());
+
+    curSelEditOp_->NodeAdded(node, parent);
+}
+
+void SceneEditHistory::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+{
+    if (!addingRemovingNodes_)
+        return;
+
+    Node* node = static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
+    Node* parent = static_cast<Node*>(eventData[NodeAdded::P_PARENT].GetPtr());
+
+    curSelEditOp_->NodeRemoved(node, parent);
 }
 
 void SceneEditHistory::AddUndoOp(SelectionEditOp* op)
@@ -61,7 +102,19 @@ void SceneEditHistory::AddUndoOp(SelectionEditOp* op)
     redoHistory_.Clear();
 }
 
-void SceneEditHistory::EndSelectionEdit()
+void SceneEditHistory::BeginSelectionEdit()
+{
+    assert(!curSelEditOp_);
+
+    Vector<SharedPtr<Node>>& nodes = sceneEditor_->GetSelection()->GetNodes();
+    if (!nodes.Size())
+        return;
+
+    curSelEditOp_ = new SelectionEditOp();
+    curSelEditOp_->SetNodes(nodes);
+}
+
+void SceneEditHistory::EndSelectionEdit(bool begin)
 {
     if (!curSelEditOp_)
         return;
@@ -79,7 +132,8 @@ void SceneEditHistory::EndSelectionEdit()
 
     curSelEditOp_ = 0;
 
-    BeginSelectionEdit();
+    if (begin)
+        BeginSelectionEdit();
 
 }
 
