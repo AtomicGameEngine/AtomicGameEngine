@@ -113,6 +113,8 @@ ATOMIC_API unsigned GetStringListIndex(const char* value, const String* strings,
 ATOMIC_API unsigned GetStringListIndex(const char* value, const char** strings, unsigned defaultIndex, bool caseSensitive = false);
 /// Return a formatted string.
 ATOMIC_API String ToString(const char* formatString, ...);
+/// Return a formatted string.
+ATOMIC_API String ToString(const char* formatString, va_list args);
 /// Return whether a char is an alphabet letter.
 ATOMIC_API bool IsAlpha(unsigned ch);
 /// Return whether a char is a digit.

@@ -647,6 +647,13 @@ String ToString(const char* formatString, ...)
     return ret;
 }
 
+String ToString(const char* formatString, va_list args)
+{
+    String ret;
+    ret.AppendWithFormatArgs(formatString, args);
+    return ret;
+}
+
 bool IsAlpha(unsigned ch)
 {
     return ch < 256 ? isalpha(ch) != 0 : false;
