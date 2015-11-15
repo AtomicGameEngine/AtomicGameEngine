@@ -308,7 +308,6 @@ class HierarchyFrame extends Atomic.UIWidget {
     handleSceneNodeSelected(ev: Editor.SceneNodeSelectedEvent) {
 
         this.hierList.selectItemByID(ev.node.id.toString(), ev.selected);
-        this.hierList.scrollToSelectedItem();
 
     }
 
