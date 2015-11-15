@@ -141,10 +141,12 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
         if (ev.ref_id == TBIDC("copy"))
         {
             selection_->Copy();
+            return true;
         }
         else if (ev.ref_id == TBIDC("paste"))
         {
             selection_->Paste();
+            return true;
         }
         else if (ev.ref_id == TBIDC("close"))
         {
