@@ -57,6 +57,9 @@ public:
     SceneSelection* GetSelection() { return selection_; }
     SceneView3D* GetSceneView3D() { return sceneView_; }
 
+    void RegisterNode(Node* node);
+    void RegisterNodes(const PODVector<Node*>& nodes);
+
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
 

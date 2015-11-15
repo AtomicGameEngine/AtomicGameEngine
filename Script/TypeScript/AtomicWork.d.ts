@@ -76,6 +76,13 @@ declare module Atomic {
 
     }
 
+    export interface UIListViewSelectionChangedEvent {
+
+        refid: string;
+        selected: boolean;
+        
+    }
+
     export interface NodeAddedEvent {
 
         scene: Atomic.Scene;
@@ -255,6 +262,28 @@ declare module Editor {
     selected: boolean;
   }
 
+  export interface SceneEditAddRemoveNodesEvent {
+
+      end: boolean;
+
+  }
+
+
+  export interface SceneEditNodeAddedEvent {
+
+      scene: Atomic.Scene;
+      parent: Atomic.Node;
+      node: Atomic.Node;
+
+  }
+
+  export interface SceneEditNodeRemovedEvent {
+
+      scene: Atomic.Scene;
+      parent: Atomic.Node;
+      node: Atomic.Node;
+
+  }
 
   export interface GizmoEditModeChangedEvent {
     mode:EditMode;

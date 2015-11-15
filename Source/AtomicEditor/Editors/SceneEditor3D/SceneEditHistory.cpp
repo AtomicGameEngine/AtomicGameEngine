@@ -24,8 +24,8 @@ SceneEditHistory::SceneEditHistory(Context* context, SceneEditor3D* sceneEditor)
 
     SubscribeToEvent(sceneEditor_->GetScene(), E_SCENEEDITADDREMOVENODES, HANDLER(SceneEditHistory, HandleSceneEditAddRemoveNodes));
 
-    SubscribeToEvent(sceneEditor_->GetScene(), E_NODEADDED, HANDLER(SceneEditHistory, HandleNodeAdded));
-    SubscribeToEvent(sceneEditor_->GetScene(), E_NODEREMOVED, HANDLER(SceneEditHistory, HandleNodeRemoved));
+    SubscribeToEvent(sceneEditor_->GetScene(), E_SCENEEDITNODEADDED, HANDLER(SceneEditHistory, HandleSceneEditNodeAdded));
+    SubscribeToEvent(sceneEditor_->GetScene(), E_SCENEEDITNODEREMOVED, HANDLER(SceneEditHistory, HandleSceneEditNodeRemoved));
 
 }
 
@@ -61,15 +61,17 @@ void SceneEditHistory::HandleSceneEditAddRemoveNodes(StringHash eventType, Varia
         addingRemovingNodes_ = true;
         EndSelectionEdit(false);
 
-        curSelEditOp_ = new SelectionEditOp();
+        curSelEditOp_ = new SelectionEditOp(sceneEditor_->GetScene());
 
     }
 }
 
-void SceneEditHistory::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
+void SceneEditHistory::HandleSceneEditNodeAdded(StringHash eventType, VariantMap& eventData)
 {
     if (!addingRemovingNodes_)
         return;
+
+    assert(curSelEditOp_);
 
     Node* node = static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
     Node* parent = static_cast<Node*>(eventData[NodeAdded::P_PARENT].GetPtr());
@@ -77,10 +79,12 @@ void SceneEditHistory::HandleNodeAdded(StringHash eventType, VariantMap& eventDa
     curSelEditOp_->NodeAdded(node, parent);
 }
 
-void SceneEditHistory::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+void SceneEditHistory::HandleSceneEditNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     if (!addingRemovingNodes_)
         return;
+
+    assert(curSelEditOp_);
 
     Node* node = static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
     Node* parent = static_cast<Node*>(eventData[NodeAdded::P_PARENT].GetPtr());
@@ -110,7 +114,7 @@ void SceneEditHistory::BeginSelectionEdit()
     if (!nodes.Size())
         return;
 
-    curSelEditOp_ = new SelectionEditOp();
+    curSelEditOp_ = new SelectionEditOp(sceneEditor_->GetScene());
     curSelEditOp_->SetNodes(nodes);
 }
 
@@ -146,6 +150,7 @@ void SceneEditHistory::Undo()
     undoHistory_.Pop();
 
     op->Undo();
+    sceneEditor_->GetScene()->SendEvent(E_SCENEEDITSCENEMODIFIED);
 
     redoHistory_.Push(op);
 
@@ -168,6 +173,7 @@ void SceneEditHistory::Redo()
     redoHistory_.Pop();
 
     op->Redo();
+    sceneEditor_->GetScene()->SendEvent(E_SCENEEDITSCENEMODIFIED);
 
     undoHistory_.Push(op);
 

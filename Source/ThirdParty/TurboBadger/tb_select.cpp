@@ -187,6 +187,13 @@ void TBSelectList::ValidateList()
 
 	// FIX: Should not scroll just because we update the list. Only automatically first time!
 	m_scroll_to_current = true;
+
+    TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
+    // TBIDC does not register the string with the UI system
+    TBID refid("select_list_validation_end");
+    ev.ref_id = refid;
+    InvokeEvent(ev);
+
 }
 
 TBWidget *TBSelectList::CreateAndAddItemAfter(int index, TBWidget *reference)
@@ -242,20 +249,10 @@ TBID TBSelectList::GetSelectedItemID()
 
 void TBSelectList::SelectItem(int index, bool selected)
 {
-	if (TBWidget *widget = GetItemWidget(index))
-    {
-        bool changed = widget->GetState(WIDGET_STATE_SELECTED) != selected;
-		widget->SetState(WIDGET_STATE_SELECTED, selected);
-        if (changed)
-        {
-            TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
-            // TBIDC does not register the string with the UI system
-            TBID refid("select_list_selection_changed");
-            ev.ref_id = refid;
-            // forward to delegate
-            TBWidget::OnEvent(ev);
-        }
-    }
+    //if (TBWidget *widget = GetItemWidget(index))
+    //{
+    //    widget->SetState(WIDGET_STATE_SELECTED, selected);
+    //}
 }
 
 TBWidget *TBSelectList::GetItemWidget(int index)
@@ -308,22 +305,15 @@ bool TBSelectList::OnEvent(const TBWidgetEvent &ev)
 
 		int index = ev.target->data.GetInt();
 
-        if (ev.modifierkeys & TB_SHIFT || ev.modifierkeys & TB_CTRL || ev.modifierkeys & TB_SUPER)
+        if (TBWidget *widget = GetItemWidget(index))
         {
-            if (GetItemSelected(index))
-            {
-                SelectItem(index, false);
-            }
-            else
-            {
-               SetValue(index);
-               SelectItem(index, true);
-            }
-        }
-        else
-        {
-            SelectAllItems(false);
-            SetValue(index);
+            TBWidgetEvent change_ev(EVENT_TYPE_CUSTOM);
+            // TBIDC does not register the string with the UI system
+            TBID refid("select_list_selection_changed");
+            change_ev.ref_id = refid;
+            change_ev.modifierkeys = ev.modifierkeys;
+            // forward to delegate
+            widget->InvokeEvent(change_ev);
         }
 
 		// If we're still around, invoke the click event too.

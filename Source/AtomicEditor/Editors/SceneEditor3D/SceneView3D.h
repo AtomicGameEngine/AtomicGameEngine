@@ -98,7 +98,7 @@ private:
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
 
-    WeakPtr<Node> framedNode_;
+    BoundingBox framedBBox_;
 
     SharedPtr<Scene> preloadResourceScene_;
     String dragAssetGUID_;

@@ -39,7 +39,7 @@ public:
 
     /// Add a node to the selection, if clear specified removes current nodes first
     void AddNode(Node* node, bool clear = false);
-    void RemoveNode(Node* node);
+    void RemoveNode(Node* node, bool quiet = false);
     void GetBounds(BoundingBox& bbox);
 
     bool Contains(Node* node);
@@ -58,6 +58,8 @@ private:
 
     WeakPtr<SceneEditor3D> sceneEditor3D_;
     WeakPtr<Scene> scene_;
+
+    Vector<SharedPtr<Node>> clipBoardNodes_;
     Vector<SharedPtr<Node>> nodes_;
 
 };

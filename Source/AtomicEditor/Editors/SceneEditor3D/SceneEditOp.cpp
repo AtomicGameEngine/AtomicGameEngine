@@ -10,7 +10,7 @@
 namespace AtomicEditor
 {
 
-SelectionEditOp::SelectionEditOp() : SceneEditOp(SCENEEDIT_SELECTION)
+SelectionEditOp::SelectionEditOp(Scene *scene) : SceneEditOp(scene, SCENEEDIT_SELECTION)
 {
 }
 
@@ -180,9 +180,28 @@ bool SelectionEditOp::Undo()
 
         if (node->GetParent() != enode->parentBegin_)
         {
-            node->Remove();
             if(enode->parentBegin_.NotNull())
+            {
+                node->Remove();
                 enode->parentBegin_->AddChild(node);
+
+                VariantMap nodeAddedEventData;
+                nodeAddedEventData[SceneEditNodeAdded::P_NODE] = node;
+                nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = enode->parentBegin_;
+                nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+                scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
+
+            }
+            else
+            {
+                VariantMap nodeRemovedEventData;
+                nodeRemovedEventData[SceneEditNodeRemoved::P_NODE] = node;
+                nodeRemovedEventData[SceneEditNodeRemoved::P_PARENT] =  enode->parentEnd_;
+                nodeRemovedEventData[SceneEditNodeRemoved::P_SCENE] = scene_;
+                scene_->SendEvent(E_SCENEEDITNODEREMOVED, nodeRemovedEventData);
+                node->Remove();
+            }
+
         }
 
         for (unsigned j = 0; j < enode->components_.Size(); j++)
@@ -247,9 +266,31 @@ bool SelectionEditOp::Redo()
 
         if (node->GetParent() != enode->parentEnd_)
         {
-            node->Remove();
+
+
+
             if(enode->parentEnd_.NotNull())
+            {
+                node->Remove();
                 enode->parentEnd_->AddChild(node);
+
+                VariantMap nodeAddedEventData;
+                nodeAddedEventData[SceneEditNodeAdded::P_NODE] = node;
+                nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = enode->parentEnd_;
+                nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+                scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
+
+            }
+            else
+            {
+                VariantMap nodeRemovedEventData;
+                nodeRemovedEventData[SceneEditNodeRemoved::P_NODE] = node;
+                nodeRemovedEventData[SceneEditNodeRemoved::P_PARENT] = enode->parentBegin_;
+                nodeRemovedEventData[SceneEditNodeRemoved::P_SCENE] = scene_;
+                scene_->SendEvent(E_SCENEEDITNODEREMOVED, nodeRemovedEventData);
+                node->Remove();
+            }
+
         }
 
         for (unsigned j = 0; j < enode->components_.Size(); j++)

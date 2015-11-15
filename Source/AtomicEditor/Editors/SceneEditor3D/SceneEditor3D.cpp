@@ -294,6 +294,48 @@ bool SceneEditor3D::Save()
 
 }
 
+void SceneEditor3D::RegisterNode(Node * node)
+{
+    VariantMap eventData;
+    eventData[SceneEditAddRemoveNodes::P_END] = false;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+    // generate scene edit event
+
+    VariantMap nodeAddedEventData;
+    nodeAddedEventData[SceneEditNodeAdded::P_NODE] = node;
+    nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = node->GetParent();
+    nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+    scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
+
+    eventData[SceneEditAddRemoveNodes::P_END] = true;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+}
+
+void SceneEditor3D::RegisterNodes(const PODVector<Node*>& nodes)
+{
+    VariantMap eventData;
+    eventData[SceneEditAddRemoveNodes::P_END] = false;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+    // generate scene edit event
+
+    for (unsigned i = 0; i < nodes.Size(); i++)
+    {
+        Node* node = nodes[i];
+        VariantMap nodeAddedEventData;
+        nodeAddedEventData[SceneEditNodeAdded::P_NODE] = node;
+        nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = node->GetParent();
+        nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+        scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
+    }
+
+    eventData[SceneEditAddRemoveNodes::P_END] = true;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+}
+
 void SceneEditor3D::Undo()
 {
     editHistory_->Undo();

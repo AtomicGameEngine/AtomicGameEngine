@@ -36,9 +36,10 @@ class HierarchyFrame extends Atomic.UIWidget {
         hierarchycontainer = this.getWidget("hierarchycontainer");
 
         var hierList = this.hierList = new Atomic.UIListView();
+        hierList.multiSelect = true;
         hierList.rootList.id = "hierList_";
 
-        hierList.subscribeToEvent("WidgetEvent", (event: Atomic.UIWidgetEvent) => this.handleHierListWidgetEvent(event));
+        hierList.subscribeToEvent("UIListViewSelectionChanged", (event: Atomic.UIListViewSelectionChangedEvent) => this.handleHierListSelectionChangedEvent(event));
 
         hierarchycontainer.addChild(hierList);
 
@@ -117,24 +118,20 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     }
 
-    handleNodeAdded(ev: Atomic.NodeAddedEvent) {
+    handleSceneEditNodeAdded(ev: Editor.SceneEditNodeAddedEvent) {
 
         var node = ev.node;
 
         if (this.filterNode(node))
             return;
 
-        if (!node.parent || node.scene != this.scene)
-            return;
-
         var parentID = this.nodeIDToItemID[node.parent.id];
-
         var childItemID = this.recursiveAddNode(parentID, node);
 
         this.nodeIDToItemID[node.id] = childItemID;
     }
 
-    handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
+    handleSceneEditNodeRemoved(ev: Editor.SceneEditNodeRemovedEvent) {
 
         // on close
         if (!this.scene)
@@ -146,9 +143,6 @@ class HierarchyFrame extends Atomic.UIWidget {
             return;
 
         delete this.nodeIDToItemID[node.id];
-
-        if (!node.parent || node.scene != this.scene)
-            return;
 
         this.hierList.deleteItemByID(node.id.toString());
 
@@ -173,8 +167,8 @@ class HierarchyFrame extends Atomic.UIWidget {
         if (this.scene) {
 
             this.subscribeToEvent(this.scene, "SceneNodeSelected", (event: Editor.SceneNodeSelectedEvent) => this.handleSceneNodeSelected(event));
-            this.subscribeToEvent(this.scene, "NodeAdded", (ev: Atomic.NodeAddedEvent) => this.handleNodeAdded(ev));
-            this.subscribeToEvent(this.scene, "NodeRemoved", (ev: Atomic.NodeRemovedEvent) => this.handleNodeRemoved(ev));
+            this.subscribeToEvent(this.scene, "SceneEditNodeAdded", (ev: Editor.SceneEditNodeAddedEvent) => this.handleSceneEditNodeAdded(ev));
+            this.subscribeToEvent(this.scene, "SceneEditNodeRemoved", (ev: Editor.SceneEditNodeRemovedEvent) => this.handleSceneEditNodeRemoved(ev));
             this.subscribeToEvent(this.scene, "NodeNameChanged", (ev: Atomic.NodeNameChangedEvent) => {
 
                 this.hierList.setItemText(ev.node.id.toString(), ev.node.name);
@@ -287,88 +281,57 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             }
 
+            this.scene.sendEvent("SceneEditAddRemoveNodes", {end: false});
+
+            this.scene.sendEvent("SceneEditNodeRemoved", {scene: this.scene, node:dragNode, parent:dragNode.parent});
+
             // move it
             dropNode.addChild(dragNode);
+
+            this.scene.sendEvent("SceneEditNodeAdded", {scene: this.scene, node:dragNode, dropNode});
+
+            this.scene.sendEvent("SceneEditAddRemoveNodes", {end: true});
 
         } else if (typeName == "Asset") {
 
             var asset = <ToolCore.Asset>ev.dragObject.object;
-            asset.instantiateNode(dropNode, asset.name);
-
+            var newNode = asset.instantiateNode(dropNode, asset.name);
+            if (newNode) {
+                this.sceneEditor.registerNode(newNode);
+                // getting a click event after this (I think) which
+                // is causing the dropNode to be selected
+                this.sceneEditor.selection.addNode(newNode, true);
+            }
         }
-
     }
 
     handleSceneNodeSelected(ev: Editor.SceneNodeSelectedEvent) {
 
-        if (ev.selected) {
-            this.hierList.selectItemByID(ev.node.id.toString(), true, true);
-        } else {
-            this.hierList.selectItemByID(ev.node.id.toString(), false, true);
-        }
-
+        this.hierList.selectItemByID(ev.node.id.toString(), ev.selected);
         this.hierList.scrollToSelectedItem();
 
     }
 
-    handleHierListWidgetEvent(event: Atomic.UIWidgetEvent): boolean {
+    handleHierListSelectionChangedEvent(event: Atomic.UIListViewSelectionChangedEvent) {
 
-        if (event.type == Atomic.UI_EVENT_TYPE_CUSTOM) {
+        if (!this.scene)
+            return;
 
-            var hierList = this.hierList;
-            if (event.refid == "select_list_selection_changed") {
+        var node = this.scene.getNode(Number(event.refid));
 
-                for (var i = 0; i < hierList.rootList.numItems; i++) {
+        if (node) {
 
-                    var selected = hierList.rootList.getItemSelected(i);
-                    var id = hierList.rootList.getItemID(i);
-                    var node = this.scene.getNode(Number(id));
-                    if (node) {
+            if (event.selected)
+                this.sceneEditor.selection.addNode(node);
+            else
+                this.sceneEditor.selection.removeNode(node);
 
-                        if (selected)
-                            this.sceneEditor.selection.addNode(node);
-                        else
-                            this.sceneEditor.selection.removeNode(node);
-                    }
-                }
-            }
         }
-
-        return false;
-
     }
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
         if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
-
-            if (data.key == Atomic.KEY_RIGHT) {
-                var selectedId = Number(this.hierList.selectedItemID);
-                var itemNodeId = this.nodeIDToItemID[selectedId];
-
-                if (!this.hierList.getExpanded(itemNodeId) && this.hierList.getExpandable(itemNodeId)) {
-                    this.hierList.setExpanded(itemNodeId, true);
-                    this.hierList.rootList.invalidateList();
-                } else {
-                    this.hierList.rootList.selectNextItem();
-                }
-
-            } else if (data.key == Atomic.KEY_LEFT) {
-                var selectedId = Number(this.hierList.selectedItemID);
-                var itemNodeId = this.nodeIDToItemID[selectedId];
-
-                if (this.hierList.getExpanded(itemNodeId)) {
-                    this.hierList.setExpanded(itemNodeId, false);
-                    this.hierList.rootList.invalidateList();
-                } else {
-                    var node = this.scene.getNode(selectedId);
-                    var parentNode = node.getParent();
-                    if (parentNode) {
-                        this.hierList.selectItemByID(parentNode.id.toString());
-                    }
-                }
-
-            }
 
             // node deletion
             if (data.key == Atomic.KEY_DELETE || data.key == Atomic.KEY_BACKSPACE) {

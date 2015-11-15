@@ -43,8 +43,8 @@ private:
     void HandleSceneEditBegin(StringHash eventType, VariantMap& eventData);
     void HandleSceneEditEnd(StringHash eventType, VariantMap& eventData);
     void HandleSceneEditAddRemoveNodes(StringHash eventType, VariantMap& eventData);
-    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
-    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeAdded(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void AddUndoOp(SelectionEditOp* op);
 

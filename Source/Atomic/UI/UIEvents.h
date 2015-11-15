@@ -127,4 +127,11 @@ EVENT(E_UIUNHANDLEDSHORTCUT, UIUnhandledShortcut)
     PARAM(P_REFID, RefID); // string tbid
 }
 
+EVENT(E_UILISTVIEWSELECTIONCHANGED, UIListViewSelectionChanged)
+{
+    PARAM(P_REFID, RefID); // string tbid
+    PARAM(P_SELECTED, Selected);        // bool
+}
+
+
 }

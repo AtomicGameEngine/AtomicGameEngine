@@ -53,6 +53,23 @@ EVENT(E_SCENEEDITSTATECHANGE, SceneEditStateChange)
     PARAM(P_SERIALIZABLE, Serializable);     // Serializable
 }
 
+/// A child node has been added to a parent node.
+EVENT(E_SCENEEDITNODEADDED, SceneEditNodeAdded)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_PARENT, Parent);                // Node pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+/// A child node is about to be removed from a parent node.
+EVENT(E_SCENEEDITNODEREMOVED, SceneEditNodeRemoved)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_PARENT, Parent);                // Node pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+
 EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
 {
     PARAM(P_END, End);       // bool

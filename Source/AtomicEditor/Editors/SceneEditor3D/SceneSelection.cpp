@@ -64,7 +64,7 @@ void SceneSelection::AddNode(Node* node, bool clear)
     }
 }
 
-void SceneSelection::RemoveNode(Node* node)
+void SceneSelection::RemoveNode(Node* node, bool quiet)
 {    
     SharedPtr<Node> _node(node);
     if(!nodes_.Contains(_node))
@@ -72,13 +72,14 @@ void SceneSelection::RemoveNode(Node* node)
 
     nodes_.Remove(_node);
 
+    if (quiet)
+        return;
+
     VariantMap eventData;
     eventData[SceneNodeSelected::P_SCENE] = scene_;
     eventData[SceneNodeSelected::P_NODE] = node;
     eventData[SceneNodeSelected::P_SELECTED] = false;    
     scene_->SendEvent(E_SCENENODESELECTED, eventData);
-
-
 
 }
 
@@ -95,37 +96,98 @@ void SceneSelection::Clear()
 
 void SceneSelection::Paste()
 {
-    /*
-    if (clipboardNode_.NotNull() && selectedNode_.NotNull())
+
+    if (!clipBoardNodes_.Size())
+        return;
+
+    Vector<SharedPtr<Node>> newClipBoardNodes;
+
+    Node* parent = scene_;
+
+    if (nodes_.Size() == 1)
+        parent = nodes_[0];
+
+    Clear();
+
+    VariantMap eventData;
+    eventData[SceneEditAddRemoveNodes::P_END] = false;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+    for (unsigned i = 0; i < clipBoardNodes_.Size(); i++)
     {
-        SharedPtr<Node> pasteNode(clipboardNode_->Clone());
+        // Nodes must have a parent to clone, so first parent
+        Node* clipNode = clipBoardNodes_[i];
 
-        VariantMap eventData;
-        eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
-        SendEvent(E_EDITORACTIVENODECHANGE, eventData);
+        Matrix3x4 transform = clipNode->GetWorldTransform();
 
-        VariantMap editData;
-        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-        editData[SceneEditNodeAddedRemoved::P_NODE] = pasteNode;
-        editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
+        parent->AddChild(clipNode);
+        clipNode->SetWorldTransform(transform.Translation(), transform.Rotation(), transform.Scale());
 
-        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
+        // clone
+        newClipBoardNodes.Push(SharedPtr<Node>(clipNode->Clone()));
+        // remove from parent
+        newClipBoardNodes.Back()->Remove();
+        newClipBoardNodes.Back()->SetWorldTransform(transform.Translation(), transform.Rotation(), transform.Scale());
+
+        // generate scene edit event
+        VariantMap nodeAddedEventData;
+        nodeAddedEventData[SceneEditNodeAdded::P_NODE] = clipNode;
+        nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = parent;
+        nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+        scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
     }
-    */
+
+    eventData[SceneEditAddRemoveNodes::P_END] = true;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+    for (unsigned i = 0; i < clipBoardNodes_.Size(); i++)
+    {
+        AddNode(clipBoardNodes_[i], false);
+    }
+
+    clipBoardNodes_ = newClipBoardNodes;
 
 }
 
 
 void SceneSelection::Copy()
 {
-    /*
+    clipBoardNodes_.Clear();
 
-    if (selectedNode_.NotNull())
+    for (unsigned i = 0; i < nodes_.Size(); i++)
     {
-        clipboardNode_ = selectedNode_;
-    }
+        Node* node = nodes_[i];
 
-    */
+        if (!node->GetParent())
+        {
+            clipBoardNodes_.Clear();
+            LOGERROR("SceneSelection::Copy - unable to copy node to clipboard (no parent)");
+            return;
+        }
+
+        for (unsigned j = 0; j < nodes_.Size(); j++)
+        {
+            if ( i == j )
+                continue;
+
+            PODVector<Node*> children;
+            nodes_[j]->GetChildren(children, true);
+            if (children.Contains(node))
+            {
+                node = 0;
+                break;
+            }
+
+        }
+
+        if (node)
+        {
+            SharedPtr<Node> clipNode(node->Clone());
+            clipNode->Remove();
+            clipBoardNodes_.Push(clipNode);
+        }
+
+    }
 }
 
 void SceneSelection::Delete()
@@ -141,7 +203,15 @@ void SceneSelection::Delete()
 
     for (unsigned i = 0; i < nodes.Size(); i++)
     {
+        // generate scene edit event
+        VariantMap nodeRemovedEventData;
+        nodeRemovedEventData[SceneEditNodeAdded::P_NODE] = nodes[i];
+        nodeRemovedEventData[SceneEditNodeAdded::P_PARENT] = nodes[i]->GetParent();
+        nodeRemovedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+        scene_->SendEvent(E_SCENEEDITNODEREMOVED, nodeRemovedEventData);
+
         nodes[i]->Remove();
+
     }
 
     eventData[SceneEditAddRemoveNodes::P_END] = true;
@@ -202,7 +272,7 @@ void SceneSelection::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNo
 void SceneSelection::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
-    RemoveNode(node);
+    RemoveNode(node, true);
 }
 
 

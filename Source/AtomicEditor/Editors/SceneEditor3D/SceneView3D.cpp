@@ -145,7 +145,7 @@ void SceneView3D::Disable()
 bool SceneView3D::GetOrbitting()
 {
     Input* input = GetSubsystem<Input>();
-    return framedNode_.NotNull() && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
+    return framedBBox_.defined_ && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
 }
 
 bool SceneView3D::GetZooming()
@@ -601,18 +601,10 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
     if (dragNode_.NotNull())
     {
-        /*
-        VariantMap neventData;
-        neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
-        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
-
-        VariantMap editData;
-        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-        editData[SceneEditNodeAddedRemoved::P_NODE] = dragNode_;
-        editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
-        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
-        */
-
+        PODVector<Node*> nodes;
+        nodes.Push(dragNode_);
+        sceneEditor_->RegisterNodes(nodes);
+        sceneEditor_->GetSelection()->AddNode(dragNode_, true);
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())
@@ -668,7 +660,7 @@ void SceneView3D::FrameSelection()
     if (sphere.radius_ < .01f || sphere.radius_ > 512)
         return;
 
-    //framedNode_ = selectedNode_;
+    framedBBox_ = bbox;
     cameraMoveStart_ = cameraNode_->GetWorldPosition();
     cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
     cameraMoveTime_ = 0.0f;

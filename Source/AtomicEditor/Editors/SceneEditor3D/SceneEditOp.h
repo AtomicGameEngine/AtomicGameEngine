@@ -32,7 +32,7 @@ class SceneEditOp
 
 public:
 
-    SceneEditOp(SceneEditType type) { type_ = type; }
+    SceneEditOp(Scene* scene, SceneEditType type) { type_ = type; scene_ = scene;}
     virtual ~SceneEditOp() { }
 
     virtual bool Undo() = 0;
@@ -50,6 +50,7 @@ public:
         return true;
     }
 
+    SharedPtr<Scene> scene_;
     SceneEditType type_;
 
 };
@@ -59,7 +60,7 @@ class SelectionEditOp : public SceneEditOp
 
 public:
 
-    SelectionEditOp();
+    SelectionEditOp(Scene* scene);
     ~SelectionEditOp();
 
     bool Undo();
