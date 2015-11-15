@@ -226,6 +226,8 @@ bool TBScrollContainer::OnEvent(const TBWidgetEvent &ev)
 	}
     else if (ev.type == EVENT_TYPE_KEY_DOWN && !m_ignore_scroll_events)
 	{
+        // ATOMIC: Disabling arrow key scroll
+        /*
 		if (ev.special_key == TB_KEY_LEFT && m_scrollbar_x.CanScrollNegative())
 			ScrollBySmooth(-TBSystem::GetPixelsPerLine(), 0);
 		else if (ev.special_key == TB_KEY_RIGHT && m_scrollbar_x.CanScrollPositive())
@@ -234,7 +236,7 @@ bool TBScrollContainer::OnEvent(const TBWidgetEvent &ev)
 			ScrollBySmooth(0, -TBSystem::GetPixelsPerLine());
 		else if (ev.special_key == TB_KEY_DOWN && m_scrollbar_y.CanScrollPositive())
 			ScrollBySmooth(0, TBSystem::GetPixelsPerLine());
-		else if (ev.special_key == TB_KEY_PAGE_UP && m_scrollbar_y.CanScrollNegative())
+        else*/ if (ev.special_key == TB_KEY_PAGE_UP && m_scrollbar_y.CanScrollNegative())
 			ScrollBySmooth(0, -GetPaddingRect().h);
 		else if (ev.special_key == TB_KEY_PAGE_DOWN && m_scrollbar_y.CanScrollPositive())
 			ScrollBySmooth(0, GetPaddingRect().h);

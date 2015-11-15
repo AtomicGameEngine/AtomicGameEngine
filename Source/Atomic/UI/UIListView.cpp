@@ -606,20 +606,9 @@ void UIListView::SelectItemByID(const String& id, bool selected)
 
 void UIListView::UpdateItemVisibility()
 {
-    UI* ui = GetSubsystem<UI>();
-    VariantMap eventData;
-
     for (int i = 0; i < source_->GetNumItems(); i++)
     {
         ListViewItem* item = source_->GetItem(i);
-
-        String refid;
-        ui->GetTBIDString(item->id, refid);
-
-        eventData[UIListViewSelectionChanged::P_REFID] = refid;
-        eventData[UIListViewSelectionChanged::P_SELECTED] = item->GetSelected();
-
-        this->SendEvent(E_UILISTVIEWSELECTIONCHANGED, eventData);
 
         if (!item->widget_)
             continue;
@@ -682,14 +671,49 @@ void UIListView::SetValueFirstSelected()
 
 void UIListView::SelectSingleItem(ListViewItem* item, bool expand)
 {
-    SelectAllItems(false);
+
+    bool dirty = !item->GetSelected();
+
+    if (!dirty)
+    {
+        for (unsigned i = 0; i < source_->GetNumItems(); i++)
+        {
+            ListViewItem* sitem = source_->GetItem(i);
+
+            if (sitem != item && sitem->GetSelected())
+            {
+                dirty = true;
+                break;
+            }
+        }
+    }
+
+    if (!dirty)
+        return;
+
+    for (unsigned i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* sitem = source_->GetItem(i);
+
+        if (sitem->GetSelected())
+        {
+            sitem->SetSelected(false);
+            SendItemSelectedChanged(sitem);
+        }
+
+    }
+
     if (expand)
         item->SetExpanded(true);
+
     item->SetSelected(true);
     UpdateItemVisibility();
 
     SetValueFirstSelected();
     ScrollToSelectedItem();
+
+    SendItemSelectedChanged(item);
+
 }
 
 void UIListView::Move(tb::SPECIAL_KEY key)
@@ -780,6 +804,21 @@ void UIListView::Move(tb::SPECIAL_KEY key)
 
 }
 
+void UIListView::SendItemSelectedChanged(ListViewItem* item)
+{
+    UI* ui = GetSubsystem<UI>();
+
+    VariantMap eventData;
+    String refid;
+
+    ui->GetTBIDString(item->id, refid);
+
+    eventData[UIListViewSelectionChanged::P_REFID] = refid;
+    eventData[UIListViewSelectionChanged::P_SELECTED] = item->GetSelected();
+    this->SendEvent(E_UILISTVIEWSELECTIONCHANGED, eventData);
+
+}
+
 bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
 {
 
@@ -816,11 +855,16 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
                     {
                         item->SetSelected(false);
                         UpdateItemVisibility();
+
+                        SendItemSelectedChanged(item);
                     }
-                    else                   {
+                    else
+                    {
 
                         item->SetSelected(true);
                         UpdateItemVisibility();
+
+                        SendItemSelectedChanged(item);
                     }
 
                     SetValueFirstSelected();

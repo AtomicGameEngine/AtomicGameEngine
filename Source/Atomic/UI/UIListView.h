@@ -79,6 +79,8 @@ protected:
 
 private:
 
+    void SendItemSelectedChanged(ListViewItem* item);
+
     void SelectSingleItem(ListViewItem* item, bool expand = true);
     void SetValueFirstSelected();
     void Move(tb::SPECIAL_KEY key);
