@@ -28,6 +28,7 @@ TBSelectList::TBSelectList()
 	, m_scroll_to_current(false)
     , m_header_lng_string_id(TBIDC("TBList.header"))
     , m_sort_callback(select_list_sort_cb)
+    , m_ui_list_view(false)
 {
 	SetSource(&m_default_source);
 	SetIsFocusable(true);
@@ -213,6 +214,9 @@ void TBSelectList::SetValue(int value)
 	if (value == m_value)
 		return;
 
+    if (!m_ui_list_view)
+        SelectItem(m_value, false);
+
 	m_value = value;
 	SelectItem(m_value, true);
 	ScrollToSelectedItem();
@@ -249,10 +253,11 @@ TBID TBSelectList::GetSelectedItemID()
 
 void TBSelectList::SelectItem(int index, bool selected)
 {
-    //if (TBWidget *widget = GetItemWidget(index))
-    //{
-    //    widget->SetState(WIDGET_STATE_SELECTED, selected);
-    //}
+    if (!m_ui_list_view)
+    {
+        if (TBWidget *widget = GetItemWidget(index))
+            widget->SetState(WIDGET_STATE_SELECTED, selected);
+    }
 }
 
 TBWidget *TBSelectList::GetItemWidget(int index)
@@ -305,15 +310,20 @@ bool TBSelectList::OnEvent(const TBWidgetEvent &ev)
 
 		int index = ev.target->data.GetInt();
 
-        if (TBWidget *widget = GetItemWidget(index))
+        if (!m_ui_list_view)
+            SetValue(index);
+        else
         {
-            TBWidgetEvent change_ev(EVENT_TYPE_CUSTOM);
-            // TBIDC does not register the string with the UI system
-            TBID refid("select_list_selection_changed");
-            change_ev.ref_id = refid;
-            change_ev.modifierkeys = ev.modifierkeys;
-            // forward to delegate
-            widget->InvokeEvent(change_ev);
+            if (TBWidget *widget = GetItemWidget(index))
+            {
+                TBWidgetEvent change_ev(EVENT_TYPE_CUSTOM);
+                // TBIDC does not register the string with the UI system
+                TBID refid("select_list_selection_changed");
+                change_ev.ref_id = refid;
+                change_ev.modifierkeys = ev.modifierkeys;
+                // forward to delegate
+                widget->InvokeEvent(change_ev);
+            }
         }
 
 		// If we're still around, invoke the click event too.
@@ -357,7 +367,7 @@ bool TBSelectList::OnEvent(const TBWidgetEvent &ev)
 
 bool TBSelectList::ChangeValue(SPECIAL_KEY key)
 {
-	if (!m_source || !m_layout.GetContentRoot()->GetFirstChild())
+    if (m_ui_list_view || !m_source || !m_layout.GetContentRoot()->GetFirstChild())
 		return false;
 
 	bool forward;
@@ -387,7 +397,6 @@ bool TBSelectList::ChangeValue(SPECIAL_KEY key)
 	// Select and focus what we found
 	if (current)
 	{
-        SelectAllItems(false);
 		SetValue(current->data.GetInt());
 		return true;
 	}

@@ -254,6 +254,8 @@ class ProjectFrame extends ScriptWidget {
             var db = ToolCore.getAssetDatabase();
 
             var asset = db.getAssetByGUID(selectedId);
+            if (!asset)
+                return;
 
             if (asset.isFolder)
                 this.refreshContent(asset);

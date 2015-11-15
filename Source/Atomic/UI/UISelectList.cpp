@@ -83,7 +83,6 @@ void UISelectList::SelectItem(int index, bool selected)
 
 }
 
-
 void UISelectList::SetValue(int value)
 {
     if (!widget_)
@@ -257,5 +256,15 @@ void UISelectList::SelectPreviousItem()
 
     ((TBSelectList*)widget_)->ChangeValue(TB_KEY_UP);
 }
+
+void UISelectList::SetUIListView(bool value)
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->SetUIListView(value);
+
+}
+
 
 }

@@ -72,6 +72,8 @@ public:
 
     void Undo();
     void Redo();
+    void Copy();
+    void Paste();
 
     ProjectUserPrefs* GetUserPrefs();
 

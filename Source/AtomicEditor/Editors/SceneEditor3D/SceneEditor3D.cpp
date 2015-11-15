@@ -346,6 +346,17 @@ void SceneEditor3D::Redo()
     editHistory_->Redo();
 }
 
+void SceneEditor3D::Copy()
+{
+    selection_->Copy();
+}
+
+void SceneEditor3D::Paste()
+{
+    selection_->Paste();
+}
+
+
 void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
 {
     SetModified(true);    

@@ -68,6 +68,8 @@ public:
     void SelectNextItem();
     void SelectPreviousItem();
 
+    void SetUIListView(bool value);
+
 protected:
 
     void HandleUIUpdate(StringHash eventType, VariantMap& eventData);

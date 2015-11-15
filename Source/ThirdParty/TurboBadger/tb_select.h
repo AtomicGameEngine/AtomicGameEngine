@@ -88,6 +88,8 @@ public:
     TBID GetItemID(int index) const;
     int GetNumItems() const;
 
+    void SetUIListView(bool value) { m_ui_list_view = value; }
+
 	virtual void OnInflate(const INFLATE_INFO &info);
 	virtual void OnSkinChanged();
 	virtual void OnProcess();
@@ -108,6 +110,7 @@ protected:
 	TBStr m_filter;
 	bool m_list_is_invalid;
 	bool m_scroll_to_current;
+    bool m_ui_list_view;
 	TBID m_header_lng_string_id;
 private:
     TBSelectListSortCallback m_sort_callback;

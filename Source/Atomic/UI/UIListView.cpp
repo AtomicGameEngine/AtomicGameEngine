@@ -403,6 +403,7 @@ UIListView::UIListView(Context* context, bool createWidget) :
     source_(0), itemLookupId_(0), multiSelect_(false)
 {
     rootList_ = new UISelectList(context);
+    rootList_->SetUIListView(true);
 
     // dummy filter so filter is called
     rootList_->SetFilter(" ");
@@ -834,7 +835,12 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
             }
 
         }
-}
+    }
+
+    if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        return false;
+    }
 
     return UIWidget::OnEvent(ev);
 }
