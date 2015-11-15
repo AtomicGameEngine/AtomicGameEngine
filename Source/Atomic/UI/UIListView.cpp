@@ -583,7 +583,8 @@ void UIListView::SelectItemByID(const String& id, bool selected)
                     return;
 
                 item->SetSelected(selected);
-                item->SetExpanded(true);
+                if (item->parent_)
+                    item->parent_->SetExpanded(true);
                 SetValueFirstSelected();
                 UpdateItemVisibility();
                 ScrollToSelectedItem();
@@ -872,7 +873,7 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
                 }
                 else
                 {
-                    SelectSingleItem(item);
+                    SelectSingleItem(item, false);
                 }
 
                 return true;
