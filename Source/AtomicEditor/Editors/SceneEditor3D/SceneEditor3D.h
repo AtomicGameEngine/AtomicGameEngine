@@ -52,8 +52,6 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
-    void SelectNode(Node* node);
-
     SceneSelection* GetSelection() { return selection_; }
     SceneView3D* GetSceneView3D() { return sceneView_; }
 
@@ -80,16 +78,12 @@ public:
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
     void HandlePlayStarted(StringHash eventType, VariantMap& eventData);
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
     void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
     void HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData);
 
     void HandleUserPrefSaved(StringHash eventType, VariantMap& eventData);
-
-    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
-    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
 

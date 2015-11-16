@@ -98,7 +98,6 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     UpdateGizmoSnapSettings();
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
-    SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
 
     SubscribeToEvent(E_GIZMOEDITMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
     SubscribeToEvent(E_GIZMOAXISMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoAxisModeChanged));
@@ -112,10 +111,6 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
-
-    SubscribeToEvent(scene_, E_NODEADDED, HANDLER(SceneEditor3D, HandleNodeAdded));
-    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
-
     SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
 
 }
@@ -197,44 +192,9 @@ void SceneEditor3D::SetFocus()
     sceneView_->SetFocus();
 }
 
-void SceneEditor3D::SelectNode(Node* node)
-{
-    /*
-    selectedNode_ = node;
-    if (!node)
-        gizmo3D_->Hide();
-    else
-        gizmo3D_->Show();
-    */
-}
-
-void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
-{
-    // Node does not have values set here
-
-    //Node* node =  static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
-    //LOGINFOF("Node Added: %s", node->GetName().CString());
-}
-
-
-void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
-    /*
-    if (node == selectedNode_)
-        SelectNode(0);
-    */
-}
-
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     gizmo3D_->Update();
-}
-
-void SceneEditor3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
-    SelectNode(node);
 }
 
 void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)

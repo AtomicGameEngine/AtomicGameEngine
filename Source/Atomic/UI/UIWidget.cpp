@@ -654,7 +654,7 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
     UI* ui = GetSubsystem<UI>();
 
-    if (ev.type == EVENT_TYPE_CHANGED || ev.type == EVENT_TYPE_KEY_UP)
+    if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)
     {
         if (!ev.target || ui->IsWidgetWrapped(ev.target))
         {

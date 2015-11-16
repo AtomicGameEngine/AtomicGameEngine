@@ -114,8 +114,6 @@ class InspectorFrame extends ScriptWidget {
 
     inspectAsset(asset: ToolCore.Asset) {
 
-        this.sendEvent(EditorEvents.ActiveNodeChange, { node: null });
-
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
 

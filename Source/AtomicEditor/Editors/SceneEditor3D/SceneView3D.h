@@ -37,7 +37,6 @@ public:
 
     SceneView3D(Context* context, SceneEditor3D* sceneEditor);
     virtual ~SceneView3D();
-    void SelectNode(Node* node);
 
     Ray GetCameraRay();
 
@@ -71,8 +70,6 @@ private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
-    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData);
     void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);    

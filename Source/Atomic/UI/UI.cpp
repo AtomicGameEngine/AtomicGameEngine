@@ -111,7 +111,8 @@ UI::UI(Context* context) :
     initialized_(false),
     skinLoaded_(false),
     consoleVisible_(false),
-    exitRequested_(false)
+    exitRequested_(false),
+    changedEventsBlocked_(false)
 {
 
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(UI, HandleExitRequested));

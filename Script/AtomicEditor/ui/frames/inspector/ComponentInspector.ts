@@ -212,8 +212,7 @@ class ComponentInspector extends Atomic.UISection {
             var node = this.component.node;
             this.component.remove();
 
-            // refresh entire inspector, fix this...
-            this.sendEvent("EditorActiveNodeChange", { node: node });
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
 
             return true;
 
@@ -296,13 +295,19 @@ class ComponentInspector extends Atomic.UISection {
 
     }
 
-    handleSceneEditStateChangeEvent(ev) {
+    updateWidgetValues() {
 
       for (var i in this.bindings) {
           this.bindings[i].objectLocked = true;
           this.bindings[i].setWidgetValueFromObject();
           this.bindings[i].objectLocked = false;
-      }
+      }      
+
+    }
+
+    handleSceneEditStateChangeEvent(ev) {
+
+      this.updateWidgetValues();
 
     }
 

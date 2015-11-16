@@ -31,7 +31,6 @@ export interface ActiveSceneEditorChangeEvent {
 }
 
 
-export const ActiveNodeChange = "EditorActiveNodeChange";
 export const SceneClosed = "EditorSceneClosed";
 export interface SceneClosedEvent {
 
@@ -80,5 +79,12 @@ export interface EditResourceEvent {
 
   // The full path to the resource to edit
   path: string;
+
+}
+
+export const SceneEditStateChange = "SceneEditStateChange";
+export interface SceneEditStateChangeEvent {
+
+  serializable: Atomic.Serializable;
 
 }

@@ -98,10 +98,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SetAutoUpdate(false);
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
-    SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
-
-    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneView3D, HandleNodeRemoved));
 
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
 
@@ -444,11 +441,6 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
 }
 
-void SceneView3D::SelectNode(Node* node)
-{
-    //selectedNode_ = node;
-}
-
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_SHORTCUT)
@@ -500,18 +492,6 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
-    SelectNode(node);
-}
-
-void SceneView3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
-    //if (node == selectedNode_)
-    //    SelectNode(0);
-}
 
 void SceneView3D::UpdateDragNode(int mouseX, int mouseY)
 {

@@ -105,6 +105,9 @@ public:
 
     UIWidget* GetWidgetAt(int x, int y, bool include_children);
 
+    bool GetBlockChangedEvents() const { return changedEventsBlocked_; }
+    void SetBlockChangedEvents(bool blocked) { changedEventsBlocked_ = blocked; }
+
 private:
 
     static WeakPtr<Context> uiContext_;
@@ -138,6 +141,7 @@ private:
     HashMap<tb::TBWidget*, SharedPtr<UIWidget> > widgetWrap_;
     HashMap<unsigned, String> tbidToString_;
 
+    bool changedEventsBlocked_;
     bool inputDisabled_;
     bool keyboardDisabled_;
     bool initialized_;

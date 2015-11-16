@@ -9,6 +9,7 @@ import ScriptWidget = require("ui/ScriptWidget");
 import ComponentInspector = require("./ComponentInspector");
 import DataBinding = require("./DataBinding");
 import CreateComponentButton = require("./CreateComponentButton");
+import EditorEvents = require("editor/EditorEvents");
 
 interface ComponentState {
 
@@ -242,8 +243,6 @@ class NodeInspector extends ScriptWidget {
 
                     prefabComponent.savePrefab();
 
-                    this.sendEvent("EditorActiveNodeChange", { node: this.node });
-
                     return true;
 
                 }
@@ -262,7 +261,8 @@ class NodeInspector extends ScriptWidget {
 
                     prefabComponent.undoPrefab();
 
-                    this.sendEvent("EditorActiveNodeChange", { node: this.node });
+                    // our components are now recreated
+                    // need to handle this
 
                     return true;
 
@@ -282,7 +282,7 @@ class NodeInspector extends ScriptWidget {
 
                     prefabComponent.breakPrefab();
 
-                    this.sendEvent("EditorActiveNodeChange", { node: this.node });
+                    prefabLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
 
                     return true;
 
@@ -312,6 +312,7 @@ class NodeInspector extends ScriptWidget {
             //  continue;
 
             var ci = new ComponentInspector();
+            this.componentInspectors.push(ci);
             ci.id = "component_section_" + component.id;
 
             ci.inspect(component);
@@ -335,13 +336,29 @@ class NodeInspector extends ScriptWidget {
 
     }
 
-    handleSceneEditStateChangeEvent(ev) {
+    updateWidgetValues(components: boolean = false) {
 
         for (var i in this.bindings) {
             this.bindings[i].objectLocked = true;
             this.bindings[i].setWidgetValueFromObject();
             this.bindings[i].objectLocked = false;
         }
+
+        if (components) {
+
+            for (var i in this.componentInspectors) {
+
+                this.componentInspectors[i].updateWidgetValues();
+
+            }
+
+        }
+
+    }
+
+    handleSceneEditStateChangeEvent(ev) {
+
+        this.updateWidgetValues();
 
     }
 
@@ -442,6 +459,7 @@ class NodeInspector extends ScriptWidget {
     bindings: Array<DataBinding>;
     gizmoMoved = false;
     updateDelta = 0;
+    componentInspectors: Array<ComponentInspector> = [];
 
     static nodeStates: { [sceneID: number]: { [nodeId: number]: NodeState } } = {};
 

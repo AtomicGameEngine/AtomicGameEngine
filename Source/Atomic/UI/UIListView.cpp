@@ -24,6 +24,7 @@
 #include <TurboBadger/tb_select.h>
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/Core/Timer.h>
 
 #include "UI.h"
 #include "UIEvents.h"
@@ -400,7 +401,7 @@ static int select_list_sort_cb(TBSelectItemSource *_source, const int *a, const 
 
 UIListView::UIListView(Context* context, bool createWidget) :
     UIWidget(context, createWidget),
-    source_(0), itemLookupId_(0), multiSelect_(false)
+    source_(0), itemLookupId_(0), multiSelect_(false), moveDelta_(0.0f)
 {
     rootList_ = new UISelectList(context);
     rootList_->SetUIListView(true);
@@ -673,6 +674,9 @@ void UIListView::SetValueFirstSelected()
 void UIListView::SelectSingleItem(ListViewItem* item, bool expand)
 {
 
+    if (!item)
+        return;
+
     bool dirty = !item->GetSelected();
 
     if (!dirty)
@@ -719,6 +723,18 @@ void UIListView::SelectSingleItem(ListViewItem* item, bool expand)
 
 void UIListView::Move(tb::SPECIAL_KEY key)
 {
+    const float delta = 0.015f;
+    if (moveDelta_)
+    {
+        Time* time = GetSubsystem<Time>();
+        moveDelta_ -= time->GetTimeStep();
+        if (moveDelta_ < 0.0f)
+            moveDelta_ = 0.0f;
+    }
+
+    if (moveDelta_ > 0.0f)
+        return;
+
     // selected index
     int index = -1;
 
@@ -743,10 +759,17 @@ void UIListView::Move(tb::SPECIAL_KEY key)
         {
             item->SetExpanded(false);
             UpdateItemVisibility();
+            moveDelta_ = delta;
+            return;
         }
         else
         {
-            key = TB_KEY_UP;
+            if (!item->parent_)
+                return;
+
+            SelectSingleItem(item->parent_, false);
+            moveDelta_ = delta;
+            return;
         }
     }
 
@@ -757,10 +780,18 @@ void UIListView::Move(tb::SPECIAL_KEY key)
         {
             item->SetExpanded(true);
             UpdateItemVisibility();
+            moveDelta_ = delta;
+            return;
         }
         else
         {
-            key = TB_KEY_DOWN;
+            if (!item->children_.Size())
+                return;
+
+            SelectSingleItem(source_->GetItem(index + 1), false);
+            moveDelta_ = delta;
+            return;
+
         }
     }
 
@@ -777,6 +808,7 @@ void UIListView::Move(tb::SPECIAL_KEY key)
             if (item->widget_ && item->widget_->GetVisibility() == WIDGET_VISIBILITY_VISIBLE)
             {
                 SelectSingleItem(item, false);
+                moveDelta_ = delta;
                 return;
             }
 
@@ -796,6 +828,7 @@ void UIListView::Move(tb::SPECIAL_KEY key)
             if (item->widget_ && item->widget_->GetVisibility() == WIDGET_VISIBILITY_VISIBLE)
             {
                 SelectSingleItem(item, false);
+                moveDelta_ = delta;
                 return;
             }
 
@@ -822,8 +855,12 @@ void UIListView::SendItemSelectedChanged(ListViewItem* item)
 
 bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
 {
-
     if (ev.type == EVENT_TYPE_KEY_UP )
+    {
+        moveDelta_ = 0.0f;
+    }
+
+    if (ev.type == EVENT_TYPE_KEY_DOWN )
     {
         if (ev.special_key == TB_KEY_DOWN || ev.special_key == TB_KEY_UP || ev.special_key == TB_KEY_LEFT || ev.special_key == TB_KEY_RIGHT)
         {

@@ -87,6 +87,8 @@ private:
 
     bool multiSelect_;
 
+    float moveDelta_;
+
     SharedPtr<UISelectList> rootList_;
     ListViewItemSource* source_;
 

@@ -100,11 +100,6 @@ EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
 }
 
 
-EVENT(E_EDITORACTIVENODECHANGE, EditorActiveNodeChange)
-{
-    PARAM(P_NODE, Node);      // Node*
-}
-
 EVENT(E_PLAYERERROR, PlayerError)
 {
     PARAM(P_TEXT, Text);      // string

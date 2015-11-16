@@ -275,6 +275,8 @@ class DataBinding {
 
         this.widgetLocked = true;
 
+        Atomic.ui.blockChangedEvents = true;
+
         var attrInfo = this.attrInfo;
         var object = this.object;
         var widget = this.widget;
@@ -364,6 +366,7 @@ class DataBinding {
 
         }
 
+        Atomic.ui.blockChangedEvents = false;
         this.widgetLocked = false;
 
     }
