@@ -31,6 +31,8 @@ public:
 private:
 
     void WriteFunctions(String& source);
+    void GenerateStaticFunctionsSource(String& source, String& packageName);
+    void GenerateNonStaticFunctionsSource(String& source, String& packageName);
 
 };
 

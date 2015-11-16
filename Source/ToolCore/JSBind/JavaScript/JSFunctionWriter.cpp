@@ -349,8 +349,11 @@ void JSFunctionWriter::WriteFunction(String& source)
 
     WriteParameterMarshal(source);
 
-    source.Append("duk_push_this(ctx);\n");
-    source.AppendWithFormat("%s* native = js_to_class_instance<%s>(ctx, -1, 0);\n", klass->GetNativeName().CString(), klass->GetNativeName().CString());
+    if (!function_->IsStatic())
+    {
+        source.Append("duk_push_this(ctx);\n");
+        source.AppendWithFormat("%s* native = js_to_class_instance<%s>(ctx, -1, 0);\n", klass->GetNativeName().CString(), klass->GetNativeName().CString());
+    }
 
     // declare return value;
     bool returnDeclared = false;
@@ -420,7 +423,14 @@ void JSFunctionWriter::WriteFunction(String& source)
 
     }
 
-    source.AppendWithFormat("native->%s(", function_->name_.CString());
+    if (function_->IsStatic())
+    {
+        source.AppendWithFormat("%s::%s(", klass->GetNativeName().CString(), function_->name_.CString());
+    }
+    else
+    {
+        source.AppendWithFormat("native->%s(", function_->name_.CString());
+    }
 
     Vector<JSBFunctionType*>& parameters = function_->GetParameters();
 
