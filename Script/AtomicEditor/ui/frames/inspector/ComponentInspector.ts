@@ -96,7 +96,6 @@ class ComponentInspector extends Atomic.UISection {
 
         this.text = component.typeName;
 
-        component.scene.sendEvent("SceneEditSerializable", { serializable: component, operation: 0});
         this.subscribeToEvent(component, "SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
 
         // For JSComponents append the filename
@@ -301,7 +300,7 @@ class ComponentInspector extends Atomic.UISection {
           this.bindings[i].objectLocked = true;
           this.bindings[i].setWidgetValueFromObject();
           this.bindings[i].objectLocked = false;
-      }      
+      }
 
     }
 

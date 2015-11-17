@@ -35,7 +35,6 @@ class InspectorFrame extends ScriptWidget {
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
-        this.subscribeToEvent("NodeRemoved", (ev: Atomic.NodeRemovedEvent) => this.handleNodeRemoved(ev));
 
         this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
 
@@ -160,16 +159,6 @@ class InspectorFrame extends ScriptWidget {
         }
 
     }
-
-    handleNodeRemoved(ev: Atomic.NodeRemovedEvent) {
-
-        if (this.nodeInspector && this.nodeInspector.node != ev.node)
-            return;
-
-        this.closeNodeInspector();
-
-    }
-
 
     inspectNode(node: Atomic.Node) {
 
