@@ -89,7 +89,7 @@ namespace('build', function() {
 
     var cmds = [];
 
-    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat");
+    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot);
 
     jake.exec(cmds, function() {
 
