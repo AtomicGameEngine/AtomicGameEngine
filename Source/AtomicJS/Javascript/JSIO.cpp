@@ -196,7 +196,7 @@ static int Deserializer_Read(duk_context* ctx)
         case IO_MAGIC_BINARY:
             length = deserial->GetSize() - deserial->GetPosition();
             duk_push_fixed_buffer(ctx, length);
-            duk_push_buffer_object(ctx, -1, 0, 8, DUK_BUFOBJ_UINT8ARRAY);
+            duk_push_buffer_object(ctx, -1, 0, length, DUK_BUFOBJ_UINT8ARRAY);
             duk_replace(ctx, -2);
             data = (char*) duk_require_buffer_data(ctx, 0, &length);
             success = deserial->Read(data, length);
