@@ -157,7 +157,8 @@ bool EditorMode::PlayProjectDebug()
 void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData)
 {
     if (!playerBroker_) return;
-    playerBroker_->PostMessage(E_IPCPLAYERQUIT, VariantMap());
+    VariantMap noEventData;
+    playerBroker_->PostMessage(E_IPCPLAYERQUIT, noEventData);
 }
 
 bool EditorMode::IsPlayerEnabled()
