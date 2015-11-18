@@ -922,10 +922,10 @@ public:
     /// Return whether vector is empty.
     bool Empty() const { return size_ == 0; }
 
-private:
     /// Return the buffer with right type.
     T* Buffer() const { return reinterpret_cast<T*>(buffer_); }
 
+private:
     /// Move a range of elements within the vector.
     void MoveRange(unsigned dest, unsigned src, unsigned count)
     {

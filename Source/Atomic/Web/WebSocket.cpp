@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Profiler.h"
+#include "../IO/BufferQueue.h"
 #include "../IO/Log.h"
 #include "../Web/WebSocket.h"
 
@@ -38,9 +39,6 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 #include <iostream>
-
-#include "../Core/Thread.h"
-
 #include "../DebugNew.h"
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
@@ -56,164 +54,181 @@ namespace Atomic
 
 struct WebSocketInternalState
 {
-  /// The work queue.
-  asio::io_service service;
-  /// The WebSocket external state.
-  WebSocket &es;
-  /// URL.
-  String url;
-  /// Error string. Empty if no error.
-  String error;
-  /// Connection state.
-  WebSocketState state;
-  /// WebSocket client.
-  client c;
-  /// WebSocket connection.
-  client::connection_ptr con;
+    /// The WebSocket external state.
+    WebSocket *es;
+    /// URL.
+    String url;
+    /// Error string. Empty if no error.
+    String error;
+    /// Connection state.
+    WebSocketState state;
+    /// WebSocket client.
+    client c;
+    /// WebSocket connection.
+    client::connection_ptr con;
 
-  WebSocketInternalState(WebSocket &es_)
-    : es(es_)
-  {
-  }
-
-  ~WebSocketInternalState()
-  {
-  }
-
-  void OnOpen(websocketpp::connection_hdl hdl)
-  {
-    state = WS_OPEN;
-    LOGDEBUG("WebSocket CONNECTED to: " + url);
-    es.SendEvent("open");
-  }
-
-  void OnClose(websocketpp::connection_hdl hdl)
-  {
-    state = WS_CLOSED;
-    LOGDEBUG("WebSocket DISCONNECTED from: " + url);
-    es.SendEvent("close");
-  }
-
-  void OnFail(websocketpp::connection_hdl hdl)
-  {
-    state = WS_FAIL_TO_CONNECT;
-    LOGDEBUG("WebSocket FAILED to connect to: " + url);
-    es.SendEvent("fail_to_connect");
-  }
-
-  void OnMessage(websocketpp::connection_hdl hdl, message_ptr msg)
-  {
-    VariantMap eventData;
-    const std::string &payload(msg->get_payload());
-
-    eventData.Insert(MakePair(StringHash("type"), Variant(int(msg->get_opcode()))));
-
-    switch (msg->get_opcode())
+    WebSocketInternalState(WebSocket *es_)
+        : es(es_)
     {
-      case websocketpp::frame::opcode::text:
-        eventData.Insert(MakePair(StringHash("data"), Variant(String(payload.data(), payload.length()))));
-        es.SendEvent("message", eventData);
-        break;
-
-      case websocketpp::frame::opcode::binary:
-        eventData.Insert(MakePair(StringHash("data"), Variant(PODVector<unsigned char>((const unsigned char *)payload.data(), payload.length()))));
-        es.SendEvent("message", eventData);
-        break;
-
-      default:
-        eventData.Insert(MakePair(StringHash("data"), Variant(String(payload.data(), payload.length()))));
-        LOGWARNING("Unsupported WebSocket message type: " + String(int(msg->get_opcode())));
-        break;
+        LOGDEBUG("Create WebSocketInternalState");
     }
-  }
 
-  void MakeConnection()
-  {
-    websocketpp::lib::error_code ec;
-    con = c.get_connection(url.CString(), ec);
-    if (ec)
+    ~WebSocketInternalState()
     {
-      state = WS_INVALID;
-      error = ec.message().c_str();
-      LOGDEBUG("WebSocket error: " + error);
-      es.SendEvent("invalid");
-      return;
+        LOGDEBUG("Destroy WebSocketInternalState");
     }
-    c.connect(con);
-  }
+
+    void OnOpen(websocketpp::connection_hdl hdl)
+    {
+        state = WS_OPEN;
+        LOGDEBUG("WebSocket CONNECTED to: " + url);
+        if (es)
+        {
+            es->SendEvent("open");
+        }
+    }
+
+    void OnClose(websocketpp::connection_hdl hdl)
+    {
+        state = WS_CLOSED;
+        LOGDEBUG("WebSocket DISCONNECTED from: " + url);
+        if (es)
+        {
+            es->SendEvent("close");
+        }
+    }
+
+    void OnFail(websocketpp::connection_hdl hdl)
+    {
+        state = WS_FAIL_TO_CONNECT;
+        LOGDEBUG("WebSocket FAILED to connect to: " + url);
+        if (es)
+        {
+            es->SendEvent("fail_to_connect");
+        }
+    }
+
+    void OnMessage(websocketpp::connection_hdl hdl, message_ptr msg)
+    {
+        if (!es)
+        {
+            return;
+        }
+        VariantMap eventData;
+        const std::string& payload(msg->get_payload());
+        SharedPtr<BufferQueue> message(new BufferQueue(es->GetContext()));
+        message->Write((const void*)payload.data(), (unsigned)payload.size());
+
+        eventData.Insert(MakePair(StringHash("type"), Variant(int(msg->get_opcode()))));
+        eventData.Insert(MakePair(StringHash("message"), Variant(message)));
+        es->SendEvent("message", eventData);
+    }
+
+    void MakeConnection()
+    {
+        websocketpp::lib::error_code ec;
+        con = c.get_connection(url.CString(), ec);
+        if (ec)
+        {
+            state = WS_INVALID;
+            error = ec.message().c_str();
+            LOGDEBUG("WebSocket error: " + error);
+            if (es)
+            {
+                es->SendEvent("invalid");
+            }
+            return;
+        }
+        c.connect(con);
+    }
 };
 
 WebSocket::WebSocket(Context* context, const String& url) :
-  Object(context),
-  is_(new WebSocketInternalState(*this))
+    Object(context),
+    is_(new WebSocketInternalState(this))
 {
-  is_->url = url.Trimmed();
-  is_->state = WS_CONNECTING;
+    is_->url = url.Trimmed();
+    is_->state = WS_CONNECTING;
 
-  is_->c.clear_access_channels(websocketpp::log::alevel::all);
-  is_->c.clear_error_channels(websocketpp::log::elevel::all);
+    is_->c.clear_access_channels(websocketpp::log::alevel::all);
+    is_->c.clear_error_channels(websocketpp::log::elevel::all);
 }
 
 void WebSocket::setup(asio::io_service *service)
 {
-  websocketpp::lib::error_code ec;
-  is_->c.init_asio(service, ec);
-  if (ec)
-  {
-    is_->state = WS_INVALID;
-    is_->error = ec.message().c_str();
-    LOGDEBUG("WebSocket error: " + is_->error);
-    SendEvent("invalid");
-    return;
-  }
-  is_->c.set_open_handler(bind(&WebSocketInternalState::OnOpen, is_, ::_1));
-  is_->c.set_close_handler(bind(&WebSocketInternalState::OnClose, is_, ::_1));
-  is_->c.set_fail_handler(bind(&WebSocketInternalState::OnFail, is_, ::_1));
-  is_->c.set_message_handler(bind(&WebSocketInternalState::OnMessage, is_, ::_1, ::_2));
+    LOGDEBUG("Create WebSocket");
+    websocketpp::lib::error_code ec;
+    is_->c.init_asio(service, ec);
+    if (ec)
+    {
+        is_->state = WS_INVALID;
+        is_->error = ec.message().c_str();
+        LOGDEBUG("WebSocket error: " + is_->error);
+        SendEvent("invalid");
+        return;
+    }
+    is_->c.set_open_handler(bind(&WebSocketInternalState::OnOpen, is_, ::_1));
+    is_->c.set_close_handler(bind(&WebSocketInternalState::OnClose, is_, ::_1));
+    is_->c.set_fail_handler(bind(&WebSocketInternalState::OnFail, is_, ::_1));
+    is_->c.set_message_handler(bind(&WebSocketInternalState::OnMessage, is_, ::_1, ::_2));
 
-  LOGDEBUG("WebSocket request to URL " + is_->url);
+    LOGDEBUG("WebSocket request to URL " + is_->url);
 
-  is_->MakeConnection();
+    is_->MakeConnection();
 }
 
 WebSocket::~WebSocket()
 {
-  delete is_;
+    std::error_code ec;
+    is_->es = nullptr;
+    is_->con->terminate(ec);
+    is_->c.set_open_handler(nullptr);
+    is_->c.set_close_handler(nullptr);
+    is_->c.set_fail_handler(nullptr);
+    is_->c.set_message_handler(nullptr);
+    is_->con.reset();
+    is_.reset();
+    LOGDEBUG("Destroy WebSocket");
 }
 
 const String& WebSocket::GetURL() const
 {
-  return is_->url;
+    return is_->url;
 }
 
 String WebSocket::GetError() const
 {
-  return is_->error;
+    return is_->error;
 }
 
 WebSocketState WebSocket::GetState() const
 {
-  return is_->state;
+    return is_->state;
 }
 
-void WebSocket::Send(String message)
+void WebSocket::Send(const String& message)
 {
-  is_->c.send(is_->con, message.CString(), message.Length(), websocketpp::frame::opcode::text);
+    is_->c.send(is_->con, message.CString(), message.Length(), websocketpp::frame::opcode::text);
+}
+
+void WebSocket::SendBinary(const PODVector<unsigned char>& message)
+{
+    is_->c.send(is_->con, message.Buffer(), message.Size(), websocketpp::frame::opcode::binary);
 }
 
 void  WebSocket::Close()
 {
-  is_->state = WS_CLOSING;
-  websocketpp::lib::error_code ec;
-  LOGDEBUG("WebSocket atempting to close URL " + is_->url);
-  is_->con->terminate(ec);
+    is_->state = WS_CLOSING;
+    websocketpp::lib::error_code ec;
+    LOGDEBUG("WebSocket atempting to close URL " + is_->url);
+    is_->con->terminate(ec);
 }
 
 void WebSocket::OpenAgain()
 {
-  is_->state = WS_CONNECTING;
-  LOGDEBUG("WebSocket request (again) to URL " + is_->url);
-  is_->MakeConnection();
+    is_->state = WS_CONNECTING;
+    LOGDEBUG("WebSocket request (again) to URL " + is_->url);
+    is_->MakeConnection();
 }
 
 }

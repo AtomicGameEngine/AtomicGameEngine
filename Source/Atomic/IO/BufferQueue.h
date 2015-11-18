@@ -23,38 +23,50 @@
 #pragma once
 
 #include "../Core/Object.h"
+#include "../Core/Mutex.h"
 #include "../Container/ArrayPtr.h"
-#include "../IO/VectorBuffer.h"
+#include "../Container/List.h"
+#include "../Container/Pair.h"
+#include "../IO/Deserializer.h"
+#include "../IO/Serializer.h"
 
 namespace Atomic
 {
 
-class WebRequest;
-class WebSocket;
-
-class WebPrivate;
-
-/// %Web subsystem. Manages HTTP requests and WebSocket communications.
-class ATOMIC_API Web : public Object
+/// %Act as a continuous byte buffer which can be appened indefinatly.
+class ATOMIC_API BufferQueue : public Object, public Deserializer, public Serializer
 {
-    OBJECT(Web);
+    OBJECT(BufferQueue)
 
 public:
     /// Construct.
-    Web(Context* context);
+    BufferQueue(Context* context);
     /// Destruct.
-    ~Web();
+    virtual ~BufferQueue();
 
-    /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
-    SharedPtr<WebRequest> MakeWebRequest
-        (const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(),
-            const String& postData = String::EMPTY);
-    /// Perform an WebSocket request to the specified URL. Return a WebSocket object which can be used to comunicate with the server.
-    SharedPtr<WebSocket> MakeWebSocket(const String& url);
+    /// Seek operation is not supported for a BufferQueue.
+    virtual unsigned Seek(unsigned position) { return 0; }
+
+    /// Produce data into destination. Return number of bytes produced.
+    virtual unsigned Read(void* dest, unsigned numBytes);
+
+    /// Buffer data. Makes a copy of it. Returns size passed in.
+    virtual unsigned Write(const void* data, unsigned size);
+    /// Buffer data by taking ownership of it.
+    void Write(SharedArrayPtr<signed char> data, unsigned numBytes);
+    /// Buffer data by taking ownership of it.
+    void Write(SharedArrayPtr<unsigned char> data, unsigned numBytes);
+
+    /// Remove all buffered data.
+    void Clear();
 
 private:
-    void internalUpdate(StringHash eventType, VariantMap& eventData);
-    WebPrivate *d;
+    /// Buffers and their sizes.
+    List<Pair<SharedArrayPtr<signed char>, unsigned> > buffers_;
+    /// Byte position in the front most buffer.
+    unsigned position_;
+    /// Mutex for buffer data.
+    mutable Mutex bufferMutex_;
 };
 
 }
