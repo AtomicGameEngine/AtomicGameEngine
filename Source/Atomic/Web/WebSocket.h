@@ -24,7 +24,9 @@
 
 #include "../Core/Object.h"
 #include "../Container/Str.h"
-#include "../IO/Deserializer.h"
+#include "../Container/Vector.h"
+
+#include <memory>
 
 namespace asio
 {
@@ -43,6 +45,26 @@ enum WebSocketState
     WS_CLOSED,           // WebSocket is closed or was disconnected
     WS_INVALID,          // Invalid state
     WS_FAIL_TO_CONNECT   // WebSocket attempted to open, but the server refused
+};
+
+enum WebSocketMessageType
+{
+    WSMT_CONTINUATION = 0x0,
+    WSMT_TEXT = 0x1,
+    WSMT_BINARY = 0x2,
+    WSMT_RSV3 = 0x3,
+    WSMT_RSV4 = 0x4,
+    WSMT_RSV5 = 0x5,
+    WSMT_RSV6 = 0x6,
+    WSMT_RSV7 = 0x7,
+    WSMT_CLOSE = 0x8,
+    WSMT_PING = 0x9,
+    WSMT_PONG = 0xA,
+    WSMT_CONTROL_RSVB = 0xB,
+    WSMT_CONTROL_RSVC = 0xC,
+    WSMT_CONTROL_RSVD = 0xD,
+    WSMT_CONTROL_RSVE = 0xE,
+    WSMT_CONTROL_RSVF = 0xF
 };
 
 struct WebSocketInternalState;
@@ -69,7 +91,10 @@ public:
     WebSocketState GetState() const;
 
     /// Send a message.
-    void Send(String message);
+    void Send(const String& message);
+
+    /// Send a binary message.
+    void SendBinary(const PODVector<unsigned char>& message);
 
     /// Disconnect the WebSocket.
     void Close();
@@ -82,7 +107,7 @@ public:
 
 private:
     void setup(asio::io_service *service);
-    WebSocketInternalState* is_;
+    std::shared_ptr<WebSocketInternalState> is_;
 };
 
 }

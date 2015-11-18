@@ -1,7 +1,7 @@
 {
 	"name" : "IO",
 	"sources" : ["Source/Atomic/IO"],
-	"classes" : ["Log", "File", "FileSystem", "FileWatcher"],
+	"classes" : ["Log", "File", "FileSystem", "FileWatcher", "BufferQueue"],
 	"overloads" : {
 		"File" : {
 			"File" : ["Context", "String", "FileMode"]
