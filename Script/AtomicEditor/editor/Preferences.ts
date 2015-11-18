@@ -15,6 +15,7 @@ class Preferences {
 
     private static instance: Preferences;
     private _prefs: PreferencesFormat;
+    private _configCorrupted: boolean;
 
     constructor() {
         this.fileSystem = Atomic.getFileSystem();
@@ -68,7 +69,15 @@ class Preferences {
         }
         //Read file
         jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
-        var prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
+        var prefs;
+        try {
+          prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
+        } catch (e){
+          console.log("Config file is corrupted");
+          prefs = null;
+          this._configCorrupted = true;
+          this.useDefaultConfig();
+        }
         if (prefs) {
             if (!prefs.recentProjects) prefs.recentProjects = [""];
             this._prefs = prefs;
@@ -77,6 +86,7 @@ class Preferences {
     }
 
     write(): void {
+        if (this._configCorrupted) return;
         var filePath = this.getPreferencesFullPath();
         var jsonFile = new Atomic.File(filePath, Atomic.FILE_WRITE);
         if (!jsonFile.isOpen()) return;
@@ -87,8 +97,24 @@ class Preferences {
             width = graphics.getWidth();
             height = graphics.getHeight();
         }
-        this._prefs.window = { x: pos[0], y: pos[1], width: width, height: height };
+        this._prefs.editorWindow = { x: pos[0], y: pos[1], width: width, height: height, fullscreen: graphics.getFullscreen()};
         jsonFile.writeString(JSON.stringify(this._prefs, null, 2));
+    }
+
+    savePlayerWindowData(x, y, width, height) {
+        this._prefs.playerWindow = {x: x, y: y, width: width, height: height, fullscreen: false};
+    }
+
+    useDefaultConfig():void {
+        this._prefs = new PreferencesFormat();
+    }
+
+    get editorWindow():WindowData {
+        return this._prefs.editorWindow;
+    }
+
+    get playerWindow():WindowData {
+        return this._prefs.playerWindow;
     }
 
     get recentProjects(): [string] {
@@ -100,9 +126,18 @@ class Preferences {
     }
 }
 
+class WindowData {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fullscreen: boolean;
+}
+
 class PreferencesFormat {
     recentProjects: [string];
-    window: { x: number, y: number, width: number, height: number };
+    editorWindow: WindowData;
+    playerWindow: WindowData;
 }
 
 export = Preferences;

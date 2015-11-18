@@ -20,6 +20,8 @@
 
 #include <Atomic/UI/SystemUI/DebugHud.h>
 
+#include "../PlayerMode/AEPlayerEvents.h"
+
 #include "AEEditorMode.h"
 
 using namespace ToolCore;
@@ -31,6 +33,7 @@ EditorMode::EditorMode(Context* context) :
     Object(context)
 {
     SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
+    SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
 }
 
 EditorMode::~EditorMode()
@@ -57,14 +60,19 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 
     SendEvent("EditorPlayerStarted");
 
+    playerEnabled_ = true;
+
 }
 
 void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
 {
     //SendEvent(E_EDITORPLAYSTOP);
 
-    if ( eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
+    if (eventData[IPCWorkerExit::P_BROKER] == playerBroker_) 
+    {
         playerBroker_ = 0;
+        playerEnabled_ = false;
+    }
 }
 
 void EditorMode::HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData)
@@ -87,7 +95,7 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool EditorMode::PlayProject(bool debug)
+bool EditorMode::PlayProject(String addArgs, bool debug)
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -120,6 +128,9 @@ bool EditorMode::PlayProject(bool debug)
     if (debug)
         vargs.Insert(0, "--debug");
 
+    if (addArgs.Length() > 0)
+        vargs.Insert(0, addArgs);
+
     String dump;
     dump.Join(vargs, " ");
     LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
@@ -140,7 +151,18 @@ bool EditorMode::PlayProject(bool debug)
 
 bool EditorMode::PlayProjectDebug()
 {
-    return PlayProject(true);
+    return PlayProject("", true);
+}
+
+void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (!playerBroker_) return;
+    playerBroker_->PostMessage(E_IPCPLAYERQUIT, VariantMap());
+}
+
+bool EditorMode::IsPlayerEnabled()
+{
+    return playerEnabled_;
 }
 
 }

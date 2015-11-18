@@ -7,6 +7,7 @@
 
 import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
+import Preferences = require("editor/Preferences")
 
 class Shortcuts extends Atomic.ScriptObject {
 
@@ -21,17 +22,31 @@ class Shortcuts extends Atomic.ScriptObject {
 
     }
 
+    //this should be moved somewhere else...
     invokePlay() {
 
         this.sendEvent(EditorEvents.SaveAllResources);
-        Atomic.editorMode.playProject();
 
+        var playerWindow = Preferences.getInstance().playerWindow;
+        if (playerWindow) {
+            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height;
+            Atomic.editorMode.playProject(args, false);
+        } else {
+            Atomic.editorMode.playProject("");
+        }
     }
 
     invokePlayDebug() {
 
         this.sendEvent(EditorEvents.SaveAllResources);
-        Atomic.editorMode.playProjectDebug();
+
+        var playerWindow = Preferences.getInstance().playerWindow;
+        if (playerWindow) {
+            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height;
+            Atomic.editorMode.playProject(args, true);
+        } else {
+          Atomic.editorMode.playProjectDebug();
+        }
 
     }
 

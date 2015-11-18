@@ -15,6 +15,9 @@
 		},
 		"Camera" : {
 			"SetOrthoSize" : ["float"]
+		},
+		"Graphics" : {
+			"SetWindowPosition" : ["int", "int"]
 		}
 
 	},
@@ -31,7 +34,7 @@
 		]
 
 	},
-	
+
 	"haxe_decl" : {
 		"Light" : [
 			"function getShadowCascade():Array<Float>;",

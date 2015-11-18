@@ -32,8 +32,9 @@ public:
     /// Destruct.
     virtual ~EditorMode();
 
-    bool PlayProject(bool debug = false);
+    bool PlayProject(String addArgs = "", bool debug = false);
     bool PlayProjectDebug();
+    bool IsPlayerEnabled();
 
 private:
 
@@ -41,8 +42,11 @@ private:
     void HandleIPCJSError(StringHash eventType, VariantMap& eventData);
     void HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData);
     void HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData);
+    void HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<IPCBroker> playerBroker_;
+
+    bool playerEnabled_ = false;
 
 };
 
