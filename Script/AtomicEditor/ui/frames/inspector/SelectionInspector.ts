@@ -1,14 +1,21 @@
 
+import CreateComponentButton = require("./CreateComponentButton");
 import ScriptWidget = require("ui/ScriptWidget");
 import EditorEvents = require("editor/EditorEvents");
 import SerializableEditType = require("./SerializableEditType");
 import SelectionSection = require("./SelectionSection");
+import SelectionPrefabWidget = require("./SelectionPrefabWidget");
 
 class NodeSection extends SelectionSection {
+
+    prefabWidget: SelectionPrefabWidget;
 
     constructor(editType: SerializableEditType) {
 
         super(editType);
+
+        this.prefabWidget = new SelectionPrefabWidget();
+        this.attrLayout.addChild(this.prefabWidget);
 
     }
 
@@ -27,6 +34,9 @@ class ComponentSection extends SelectionSection {
 // Node Inspector + Component Inspectors
 
 class SelectionInspector extends ScriptWidget {
+
+    createComponentButton: CreateComponentButton;
+    nodeSection: NodeSection;
 
     constructor(sceneEditor: Editor.SceneEditor3D) {
 
@@ -47,9 +57,14 @@ class SelectionInspector extends ScriptWidget {
 
         this.addChild(mainLayout);
 
+        this.createComponentButton = new CreateComponentButton();
+        mainLayout.addChild(this.createComponentButton);
+
         this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesBegin", (data) => this.handleSceneEditStateChangesBeginEvent());
         this.subscribeToEvent("SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
         this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesEnd", (data) => this.handleSceneEditStateChangesEndEvent());
+
+        this.subscribeToEvent(this.createComponentButton, "SelectionCreateComponent", (data) => this.handleSelectionCreateComponent(data));
 
     }
 
@@ -128,6 +143,10 @@ class SelectionInspector extends ScriptWidget {
 
         }
 
+        if (this.nodeSection) {
+            this.nodeSection.prefabWidget.updateSelection(this.nodes);
+        }
+
         Atomic.ui.blockChangedEvents = false;
 
     }
@@ -138,7 +157,13 @@ class SelectionInspector extends ScriptWidget {
 
         if (editType.typeName == "Node") {
 
-            section = new NodeSection(editType);
+            this.nodeSection = new NodeSection(editType);
+            section = this.nodeSection;
+
+            this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabSave", (data) => this.handleSelectionPrefabSave());
+            this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabUndo", (data) => this.handleSelectionPrefabUndo());
+            this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabBreak", (data) => this.handleSelectionPrefabBreak());
+
 
         } else {
 
@@ -146,7 +171,14 @@ class SelectionInspector extends ScriptWidget {
 
         }
 
+
+        this.mainLayout.removeChild(this.createComponentButton, false);
+
         this.mainLayout.addChild(section);
+
+        // move the create component button down
+        this.mainLayout.addChild(this.createComponentButton);
+
         this.sections.push(section);
 
     }
@@ -266,15 +298,93 @@ class SelectionInspector extends ScriptWidget {
 
     }
 
+    handleSelectionCreateComponent(ev) {
+
+        for (var i in this.nodes) {
+
+            var node = this.nodes[i];
+
+            var c = node.createComponent(ev.componentTypeName);
+
+            if (!c) {
+                console.log("ERROR: unable to create component ", ev.componentTypeName);
+                return;
+            }
+
+            var editType = this.addSerializable(c);
+            editType.addNode(node);
+
+        }
+
+        this.refresh();
+
+    }
+
 
     handleSceneEditStateChangeEvent(ev: Editor.SceneEditStateChangeEvent) {
 
         if (!this.stateChangesInProgress)
-          return;
+            return;
 
         if (this.stateChanges.indexOf(ev.serializable) == -1) {
             this.stateChanges.push(ev.serializable);
         }
+
+    }
+
+    getPrefabComponent(node: Atomic.Node): Atomic.PrefabComponent {
+
+        if (node.getComponent("PrefabComponent"))
+            return <Atomic.PrefabComponent>node.getComponent("PrefabComponent");
+
+        if (node.parent)
+            return this.getPrefabComponent(node.parent);
+
+        return null;
+
+    }
+
+    handleSelectionPrefabSave() {
+
+        if (this.nodes.length != 1)
+            return;
+
+        var c = this.getPrefabComponent(this.nodes[0]);
+        if (!c)
+            return;
+
+        c.savePrefab();
+
+    }
+
+    handleSelectionPrefabBreak() {
+
+        if (this.nodes.length != 1)
+            return;
+
+        var c = this.getPrefabComponent(this.nodes[0]);
+        if (!c)
+            return;
+
+        c.breakPrefab();
+        this.refresh();
+
+    }
+
+    handleSelectionPrefabUndo() {
+
+        if (this.nodes.length != 1)
+            return;
+
+        var c = this.getPrefabComponent(this.nodes[0]);
+        if (!c)
+            return;
+
+        c.undoPrefab();
+
+        var node = this.nodes[0];
+        this.removeNode(node);
+        this.addNode(node);
 
     }
 
@@ -319,7 +429,7 @@ class SelectionInspector extends ScriptWidget {
     sections: SelectionSection[] = [];
 
 
-    stateChangesInProgress:boolean =  false;
+    stateChangesInProgress: boolean = false;
     stateChanges: Atomic.Serializable[] = [];
 
     // ------------------------------------

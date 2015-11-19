@@ -99,11 +99,9 @@ for (var sub in sources) {
 
 class CreateComponentButton extends Atomic.UIButton {
 
-    constructor(node: Atomic.Node) {
+    constructor() {
 
         super();
-
-        this.node = node;
 
         this.fd.id = "Vera";
         this.fd.size = 11;
@@ -129,16 +127,7 @@ class CreateComponentButton extends Atomic.UIButton {
 
         if (ev.target && ev.target.id == "create component popup") {
 
-            var c = this.node.createComponent(ev.refid);
-
-            if (c) {
-
-              var ci = new ComponentInspector();
-              ci.inspect(c);
-
-              this.parent.addChildRelative(ci, Atomic.UI_WIDGET_Z_REL_BEFORE, this);
-
-            }
+            this.sendEvent("SelectionCreateComponent", { componentTypeName : ev.refid});
 
             return true;
 
@@ -146,7 +135,6 @@ class CreateComponentButton extends Atomic.UIButton {
 
     }
 
-    node: Atomic.Node;
     fd: Atomic.UIFontDescription = new Atomic.UIFontDescription();
 
 }
