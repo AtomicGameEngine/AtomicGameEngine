@@ -1,4 +1,6 @@
 
+import EditorUI = require("ui/EditorUI");
+import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
 
 class AttributeInfoEdit extends Atomic.UILayout {
@@ -14,12 +16,14 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
     }
 
-    initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo) {
+    initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
 
         this.editType = editType;
         this.attrInfo = attrInfo;
 
         this.createLayout();
+
+        return true;
 
     }
 
@@ -95,7 +99,8 @@ class AttributeInfoEdit extends Atomic.UILayout {
             return null;
 
         var attrEdit = new type();
-        attrEdit.initialize(editType, attrInfo);
+        if (!attrEdit.initialize(editType, attrInfo))
+            return null;
 
         return attrEdit;
 
@@ -410,9 +415,19 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
 }
 
-class Vector3AttributeEdit extends AttributeInfoEdit {
+class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
     selects: Atomic.UIInlineSelect[] = [];
+
+    private numElements: number;
+
+    constructor(numElements: number) {
+
+        super();
+
+        this.numElements = numElements;
+
+    }
 
     createEditWidget() {
 
@@ -422,9 +437,9 @@ class Vector3AttributeEdit extends AttributeInfoEdit {
         layout.spacing = 0;
 
         var lp = new Atomic.UILayoutParams();
-        lp.width = 100;
+        lp.width = this.numElements != 4 ? 100 : 70;
 
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < this.numElements; i++) {
 
             var select = new Atomic.UIInlineSelect();
             this.selects.push(select);
@@ -433,9 +448,11 @@ class Vector3AttributeEdit extends AttributeInfoEdit {
             select.fontDescription = AttributeInfoEdit.fontDesc;
             select.skinBg = "InspectorVectorAttrName";
             select.setLimits(-10000000, 10000000);
-            var editlp = new Atomic.UILayoutParams();
-            editlp.minWidth = 60;
-            select.editFieldLayoutParams = editlp;
+            if (this.numElements != 4) {
+                var editlp = new Atomic.UILayoutParams();
+                editlp.minWidth = 60;
+                select.editFieldLayoutParams = editlp;
+            }
             select.layoutParams = lp;
             layout.addChild(select);
 
@@ -502,11 +519,180 @@ class Vector3AttributeEdit extends AttributeInfoEdit {
 
 }
 
+class Vector2AttributeEdit extends NumberArrayAttributeEdit {
+
+    constructor() {
+
+        super(2);
+
+    }
+
+}
+
+
+class Vector3AttributeEdit extends NumberArrayAttributeEdit {
+
+    constructor() {
+
+        super(3);
+
+    }
+
+}
+
+class QuaternionAttributeEdit extends NumberArrayAttributeEdit {
+
+    constructor() {
+
+        super(3);
+
+    }
+
+}
+
+class ColorAttributeEdit extends NumberArrayAttributeEdit {
+
+    constructor() {
+
+        super(4);
+
+    }
+
+}
+
+class ResourceRefAttributeEdit extends AttributeInfoEdit {
+
+    editField: Atomic.UIEditField;
+
+    initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
+
+        if (!attrInfo.resourceTypeName)
+            return false;
+
+        var importerName = ToolCore.assetDatabase.getResourceImporterName(attrInfo.resourceTypeName);
+
+        if (!importerName)
+            return false;
+
+        return super.initialize(editType, attrInfo);
+    }
+
+    refresh() {
+
+        var uniform = this.editType.getUniformValue(this.attrInfo);
+
+        if (uniform) {
+
+            var object = this.editType.getFirstObject();
+
+            if (object) {
+
+                // for cached resources, use the asset name, otherwise use the resource path name
+                var resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+                var text = "";
+                if (resource) {
+                    text = resource.name;
+                    var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                    if (asset)
+                        text = asset.name;
+                }
+                this.editField.text = text;
+            }
+
+
+        } else {
+            this.editField.text = "--";
+        }
+
+    }
+
+    createEditWidget() {
+
+        var layout = new Atomic.UILayout();
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("", layout);
+        this.editField = o.editField;
+
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 140;
+        o.editField.layoutParams = lp;
+        o.editField.readOnly = true;
+
+        this.editWidget = layout;
+
+        // stuff editfield in so can be reference
+        layout["editField"] = o.editField;
+
+        var selectButton = o.selectButton;
+
+        var resourceTypeName = this.attrInfo.resourceTypeName;
+        var importerName = ToolCore.assetDatabase.getResourceImporterName(resourceTypeName);
+
+        selectButton.onClick = () => {
+
+            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
+
+                var resource = asset.getResource(resourceTypeName);
+
+                this.editType.onAttributeInfoEdited(this.attrInfo, resource);
+                this.refresh();
+
+            }.bind(this));
+
+        }
+
+        // handle dropping of component on field
+        this.editField.subscribeToEvent(this.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == o.editField) {
+
+                var dragObject = ev.dragObject;
+
+                var importer;
+
+                if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+                    var asset = <ToolCore.Asset>dragObject.object;
+
+                    if (asset.importerTypeName == importerName) {
+                        importer = asset.importer;
+                    }
+
+                }
+
+                if (importer) {
+
+                    var resource = asset.getResource(resourceTypeName);
+
+                    this.editType.onAttributeInfoEdited(this.attrInfo, resource);
+                    this.refresh();
+                    
+
+                }
+            }
+
+        });
+
+    }
+
+}
+
+
+
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_BOOL] = BoolAttributeEdit;
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_INT] = IntAttributeEdit;
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_FLOAT] = FloatAttributeEdit;
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_STRING] = StringAttributeEdit;
 
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_VECTOR2] = Vector2AttributeEdit;
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_VECTOR3] = Vector3AttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_QUATERNION] = QuaternionAttributeEdit;
+
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_COLOR] = ColorAttributeEdit;
+
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_RESOURCEREF] = ResourceRefAttributeEdit;
 
 export = AttributeInfoEdit;
