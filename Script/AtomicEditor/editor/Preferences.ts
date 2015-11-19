@@ -15,7 +15,6 @@ class Preferences {
 
     private static instance: Preferences;
     private _prefs: PreferencesFormat;
-    private _configCorrupted: boolean;
 
     constructor() {
         this.fileSystem = Atomic.getFileSystem();
@@ -73,9 +72,8 @@ class Preferences {
         try {
           prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
         } catch (e){
-          console.log("Config file is corrupted");
+          console.log("Editor preference file invalid, regenerating default configuration");
           prefs = null;
-          this._configCorrupted = true;
           this.useDefaultConfig();
         }
         if (prefs) {
@@ -86,7 +84,6 @@ class Preferences {
     }
 
     write(): void {
-        if (this._configCorrupted) return;
         var filePath = this.getPreferencesFullPath();
         var jsonFile = new Atomic.File(filePath, Atomic.FILE_WRITE);
         if (!jsonFile.isOpen()) return;
@@ -126,12 +123,12 @@ class Preferences {
     }
 }
 
-class WindowData {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  fullscreen: boolean;
+interface WindowData {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fullscreen?: boolean;
 }
 
 class PreferencesFormat {

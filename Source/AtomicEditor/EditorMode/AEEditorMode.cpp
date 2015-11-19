@@ -151,11 +151,6 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
 }
 
-bool EditorMode::PlayProjectDebug()
-{
-    return PlayProject("", true);
-}
-
 void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData)
 {
     if (!playerBroker_) return;

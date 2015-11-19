@@ -33,7 +33,6 @@ public:
     virtual ~EditorMode();
 
     bool PlayProject(String addArgs = "", bool debug = false);
-    bool PlayProjectDebug();
     bool IsPlayerEnabled();
 
 private:

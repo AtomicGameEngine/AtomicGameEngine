@@ -29,10 +29,10 @@ class Shortcuts extends Atomic.ScriptObject {
 
         var playerWindow = Preferences.getInstance().playerWindow;
         if (playerWindow) {
-            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height;
+            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
             Atomic.editorMode.playProject(args, false);
         } else {
-            Atomic.editorMode.playProject("");
+            Atomic.editorMode.playProject("", false);
         }
     }
 
@@ -42,10 +42,10 @@ class Shortcuts extends Atomic.ScriptObject {
 
         var playerWindow = Preferences.getInstance().playerWindow;
         if (playerWindow) {
-            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height;
+            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
             Atomic.editorMode.playProject(args, true);
         } else {
-          Atomic.editorMode.playProjectDebug();
+            Atomic.editorMode.playProject("", true);
         }
 
     }

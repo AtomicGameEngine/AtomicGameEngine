@@ -170,6 +170,10 @@ void AEPlayerApplication::Setup()
             {
                 engineParameters_["WindowHeight"] = atoi(value.CString());
             }
+            else if (argument == "--resizable") 
+            {
+                engineParameters_["WindowResizable"] = true;
+            }
         }
     }
 
