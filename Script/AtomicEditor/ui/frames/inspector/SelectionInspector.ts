@@ -23,9 +23,22 @@ class NodeSection extends SelectionSection {
 
 class ComponentSection extends SelectionSection {
 
-    constructor(editType: SerializableEditType) {
+    constructor(editType: SerializableEditType, inspector: SelectionInspector) {
 
         super(editType);
+
+        var deleteButton = new Atomic.UIButton();
+        deleteButton.text = "Delete Component";
+        deleteButton.fontDescription = SelectionSection.fontDesc;
+
+        deleteButton.onClick = () => {
+
+            inspector.onComponentDelete(editType);
+            return true;
+
+        }
+
+        this.attrLayout.addChild(deleteButton);;
 
     }
 
@@ -167,7 +180,7 @@ class SelectionInspector extends ScriptWidget {
 
         } else {
 
-            section = new ComponentSection(editType);
+            section = new ComponentSection(editType, this);
 
         }
 
@@ -297,6 +310,41 @@ class SelectionInspector extends ScriptWidget {
         this.stateChangesInProgress = true;
 
     }
+
+    onComponentDelete(editType: SerializableEditType) {
+
+        var removed: Atomic.Component[] = [];
+
+        for (var i in editType.objects) {
+
+            var c = <Atomic.Component>editType.objects[i];
+            removed.push(c);
+
+        }
+
+        for (var i in removed) {
+
+            var c = removed[i];
+
+            var node = c.node;
+            c.remove();
+            this.removeSerializable(removed[i]);
+
+            var index = editType.nodes.indexOf(node);
+            if (index != -1) {
+                editType.nodes.splice(index, 1);
+            }
+
+        }
+
+        if (removed.length) {
+
+            this.refresh();
+
+        }
+
+    }
+
 
     handleSelectionCreateComponent(ev) {
 
