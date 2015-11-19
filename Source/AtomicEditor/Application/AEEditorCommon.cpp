@@ -19,6 +19,7 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 
+#include <Atomic/IO/File.h>
 #include <Atomic/Resource/JSONFile.h>
 
 #ifdef ATOMIC_DOTNET
