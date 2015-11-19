@@ -1,7 +1,9 @@
 
 import SerializableEditType = require("./SerializableEditType");
 import AttributeInfoEdit = require("./AttributeInfoEdit");
-import "./ComponentSectionUI";
+import SelectionSectionUI = require("./SelectionSectionUI");
+
+import "./ComponentAttributeUI";
 
 abstract class SelectionSection extends Atomic.UISection {
 
@@ -28,7 +30,7 @@ abstract class SelectionSection extends Atomic.UISection {
 
         for (var name in this.attrEdits) {
 
-          this.attrEdits[name].refresh();
+            this.attrEdits[name].refresh();
 
         }
 
@@ -76,9 +78,26 @@ abstract class SelectionSection extends Atomic.UISection {
 
         }
 
+        if (SelectionSection.customSectionUI[this.editType.typeName]) {
+
+            var ui = new SelectionSection.customSectionUI[this.editType.typeName]();
+            ui.createUI(this.editType);
+            attrLayout.addChild(ui);
+
+        }
+
     }
 
     static fontDesc: Atomic.UIFontDescription;
+
+    static customSectionUI: { [typeName: string]: typeof SelectionSectionUI } = {};
+
+    static registerCustomSectionUI(typeName: string, ui: typeof SelectionSectionUI) {
+
+        SelectionSection.customSectionUI[typeName] = ui;
+
+    }
+
 
     private static Ctor = (() => {
 

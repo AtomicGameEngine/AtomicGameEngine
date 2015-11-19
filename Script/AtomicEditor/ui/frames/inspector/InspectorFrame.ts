@@ -19,6 +19,7 @@ import PrefabInspector = require("./PrefabInspector");
 import SelectionInspector = require("./SelectionInspector");
 // make sure these are hooked in
 import "./SelectionEditTypes";
+import "./SelectionSectionCoreUI";
 
 
 class InspectorFrame extends ScriptWidget {
