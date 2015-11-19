@@ -18,6 +18,7 @@ solidSource.addItem(new Atomic.UIMenuItem("Diffuse", "Diffuse"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Emissive", "Diffuse Emissive"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Normal", "Diffuse Normal"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Normal Specular", "Diffuse Normal Specular"));
+solidSource.addItem(new Atomic.UIMenuItem("Diffuse Unlit", "Diffuse Unlit"));
 
 var tranSource = new Atomic.UIMenuItemSource();
 tranSource.addItem(new Atomic.UIMenuItem("Alpha", "Alpha"));
@@ -49,6 +50,7 @@ var techniqueLookup = {
     "Techniques/DiffEmissive.xml": "Diffuse Emissive",
     "Techniques/DiffNormal.xml": "Diffuse Normal",
     "Techniques/DiffNormalSpec.xml": "Diffuse Normal Specular",
+    "Techniques/DiffUnlit.xml": "Diffuse Unlit",
     "Techniques/DiffAlpha.xml": "Alpha",
     "Techniques/DiffAlphaMask.xml": "Alpha Mask",
     "Techniques/DiffAdd.xml": "Additive"
