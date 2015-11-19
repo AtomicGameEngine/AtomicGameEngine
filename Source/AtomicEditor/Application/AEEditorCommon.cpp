@@ -153,10 +153,10 @@ void AEEditorCommon::Stop()
 }
 
 
-bool AEEditorCommon::ReadPreferences(String path, JSONValue* prefs, String object)
+bool AEEditorCommon::ReadPreferences(String& path, JSONValue& prefs, const String& propertyName)
 {
     if (!path.EndsWith(".json"))
-        path += ".json";
+        path.Append(".json");
 
     SharedPtr<File> file(new File(context_, path, FILE_READ));
 
@@ -167,16 +167,16 @@ bool AEEditorCommon::ReadPreferences(String path, JSONValue* prefs, String objec
 
     JSONValue root = jsonFile->GetRoot();
 
-    if (object.Length() > 0)
+    if (propertyName.Length() > 0)
     {
-        if (root.Contains(object)) 
+        if (root.Contains(propertyName))
         {
-            *prefs = root.Get(object);
+            prefs = root.Get(propertyName);
         }
     }
     else
     {
-        *prefs = root;
+        prefs = root;
     }
 
     file->Close();

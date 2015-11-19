@@ -94,12 +94,12 @@ class Preferences {
             width = graphics.getWidth();
             height = graphics.getHeight();
         }
-        this._prefs.editorWindow = { x: pos[0], y: pos[1], width: width, height: height, fullscreen: graphics.getFullscreen()};
+        this._prefs.editorWindow = { x: pos[0], y: pos[1], width: width, height: height };
         jsonFile.writeString(JSON.stringify(this._prefs, null, 2));
     }
 
     savePlayerWindowData(x, y, width, height) {
-        this._prefs.playerWindow = {x: x, y: y, width: width, height: height, fullscreen: false};
+        this._prefs.playerWindow = { x: x, y: y, width: width, height: height };
     }
 
     useDefaultConfig():void {
@@ -128,7 +128,6 @@ interface WindowData {
     y: number;
     width: number;
     height: number;
-    fullscreen?: boolean;
 }
 
 class PreferencesFormat {
