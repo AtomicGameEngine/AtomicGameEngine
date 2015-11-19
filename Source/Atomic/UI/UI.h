@@ -105,8 +105,9 @@ public:
 
     UIWidget* GetWidgetAt(int x, int y, bool include_children);
 
-    bool GetBlockChangedEvents() const { return changedEventsBlocked_; }
-    void SetBlockChangedEvents(bool blocked) { changedEventsBlocked_ = blocked; }
+    bool GetBlockChangedEvents() const { return changedEventsBlocked_ > 0; }
+
+    void SetBlockChangedEvents(bool blocked = true);
 
 private:
 
@@ -141,7 +142,8 @@ private:
     HashMap<tb::TBWidget*, SharedPtr<UIWidget> > widgetWrap_;
     HashMap<unsigned, String> tbidToString_;
 
-    bool changedEventsBlocked_;
+    int changedEventsBlocked_;
+
     bool inputDisabled_;
     bool keyboardDisabled_;
     bool initialized_;

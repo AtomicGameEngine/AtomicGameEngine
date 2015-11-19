@@ -112,7 +112,7 @@ UI::UI(Context* context) :
     skinLoaded_(false),
     consoleVisible_(false),
     exitRequested_(false),
-    changedEventsBlocked_(false)
+    changedEventsBlocked_(0)
 {
 
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(UI, HandleExitRequested));
@@ -151,6 +151,23 @@ void UI::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void UI::Shutdown()
 {
+
+}
+
+void UI::SetBlockChangedEvents(bool blocked)
+{
+    if (blocked)
+        changedEventsBlocked_++;
+    else
+    {
+        changedEventsBlocked_--;
+
+        if (changedEventsBlocked_ < 0)
+        {
+            LOGERROR("UI::BlockChangedEvents - mismatched block calls, setting to 0");
+            changedEventsBlocked_ = 0;
+        }
+    }
 
 }
 

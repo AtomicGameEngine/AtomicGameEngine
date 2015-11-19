@@ -156,6 +156,8 @@ void SelectionEditOp::RegisterEdit()
 bool SelectionEditOp::Undo()
 {
 
+    scene_->SendEvent(E_SCENEEDITSTATECHANGESBEGIN);
+
     for (unsigned i = 0; i < editNodes_.Size(); i++)
     {
         EditNode* enode = editNodes_[i];
@@ -237,11 +239,15 @@ bool SelectionEditOp::Undo()
 
     }
 
+    scene_->SendEvent(E_SCENEEDITSTATECHANGESEND);
+
     return true;
 }
 
 bool SelectionEditOp::Redo()
 {
+    scene_->SendEvent(E_SCENEEDITSTATECHANGESBEGIN);
+
     for (unsigned i = 0; i < editNodes_.Size(); i++)
     {
         EditNode* enode = editNodes_[i];
@@ -327,6 +333,8 @@ bool SelectionEditOp::Redo()
         }
 
     }
+
+    scene_->SendEvent(E_SCENEEDITSTATECHANGESEND);
 
     return true;
 }

@@ -80,7 +80,7 @@ declare module Atomic {
 
         refid: string;
         selected: boolean;
-        
+
     }
 
     export interface NodeAddedEvent {
@@ -126,6 +126,10 @@ declare module Atomic {
     export interface UIWidgetFocusChangedEvent {
         widget: UIWidget;
         focused: boolean;
+    }
+
+    export interface UIWidgetEditCompleteEvent {
+        widget: UIWidget;
     }
 
     export interface UIWidgetDeletedEvent {
@@ -282,6 +286,12 @@ declare module Editor {
       scene: Atomic.Scene;
       parent: Atomic.Node;
       node: Atomic.Node;
+
+  }
+
+  export interface SceneEditStateChangeEvent {
+
+    serializable:Atomic.Serializable;
 
   }
 

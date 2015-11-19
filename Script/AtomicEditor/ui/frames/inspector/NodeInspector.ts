@@ -135,6 +135,9 @@ class NodeInspector extends ScriptWidget {
 
         this.node = node;
 
+        return;
+
+        /*
         this.subscribeToEvent(node, "SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
 
         this.isPrefab = this.detectPrefab(node);
@@ -332,6 +335,7 @@ class NodeInspector extends ScriptWidget {
         }
 
         this.loadState();
+        */
 
     }
 

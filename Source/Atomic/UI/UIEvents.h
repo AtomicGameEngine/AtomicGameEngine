@@ -120,6 +120,7 @@ EVENT(E_UIWIDGETFOCUSESCAPED, UIWidgetFocusEscaped)
 
 EVENT(E_UIWIDGETEDITCOMPLETE, UIWidgetEditComplete)
 {
+    PARAM(P_WIDGET, Widget);             // UIWidget pointer
 }
 
 EVENT(E_UIUNHANDLEDSHORTCUT, UIUnhandledShortcut)
