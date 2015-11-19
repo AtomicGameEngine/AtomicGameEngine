@@ -1,6 +1,7 @@
 
 import SerializableEditType = require("./SerializableEditType");
 import AttributeInfoEdit = require("./AttributeInfoEdit");
+import "./ComponentSectionUI";
 
 abstract class SelectionSection extends Atomic.UISection {
 

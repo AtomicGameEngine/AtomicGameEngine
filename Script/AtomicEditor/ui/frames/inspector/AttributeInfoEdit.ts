@@ -114,6 +114,16 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
     static customAttrEditTypes: { [typeName: string]: { [name: string]: typeof AttributeInfoEdit } } = {};
 
+    static registerCustomAttr(typeName: string, attrName: string, edit: typeof AttributeInfoEdit) {
+
+        if (!AttributeInfoEdit.customAttrEditTypes[typeName]) {
+            AttributeInfoEdit.customAttrEditTypes[typeName] = {};
+        }
+
+        AttributeInfoEdit.customAttrEditTypes[typeName][attrName] = edit;
+
+    }
+
     private static Ctor = (() => {
 
         var attrNameLP = AttributeInfoEdit.attrNameLP = new Atomic.UILayoutParams();
@@ -669,7 +679,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource);
                     this.refresh();
-                    
+
 
                 }
             }
