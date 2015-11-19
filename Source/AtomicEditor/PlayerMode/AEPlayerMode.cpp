@@ -242,13 +242,13 @@ void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
 void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
-    using namespace IPCPlayerWindow;
+    using namespace IPCPlayerWindowChanged;
     VariantMap data;
     data[P_POSX] = graphics->GetWindowPosition().x_;
     data[P_POSY] = graphics->GetWindowPosition().y_;
     data[P_WIDTH] = graphics->GetWidth();
     data[P_HEIGHT] = graphics->GetHeight();
-    ipc_->SendEventToBroker(E_IPCPLAYERWINDOW, data);
+    ipc_->SendEventToBroker(E_IPCPLAYERWINDOWCHANGED, data);
     ipc_->SendEventToBroker(E_IPCPLAYERQUIT);
     SendEvent(E_IPCPLAYERQUIT);
 }

@@ -19,6 +19,8 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 
+#include <Atomic/Resource/JSONFile.h>
+
 #ifdef ATOMIC_DOTNET
 #include <AtomicNET/NETCore/NETHost.h>
 #include <AtomicNET/NETCore/NETCore.h>
@@ -127,6 +129,8 @@ void AEEditorCommon::Setup()
     ToolSystem* system = new ToolSystem(context_);
     context_->RegisterSubsystem(system);
 
+    ReadPreferences();
+
 }
 
 void AEEditorCommon::Stop()
@@ -148,6 +152,40 @@ void AEEditorCommon::Stop()
         context_->RemoveSubsystem<NETCore>();
     }
 #endif
+}
+
+
+bool AEEditorCommon::ReadPreferences()
+{
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    String preferencesPath = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+    preferencesPath += "prefs.json";
+
+    SharedPtr<File> file(new File(context_, preferencesPath, FILE_READ));
+
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    if (!jsonFile->BeginLoad(*file))
+        return false;
+
+    JSONValue root = jsonFile->GetRoot();
+
+    JSONValue editorWindow = root.Get("editorWindow");
+
+    if (!editorWindow.IsObject())
+        return false;
+
+    engineParameters_["WindowPositionX"] = editorWindow.Get("x").GetUInt();
+    engineParameters_["WindowPositionY"] = editorWindow.Get("y").GetUInt();
+    engineParameters_["WindowWidth"] = editorWindow.Get("width").GetUInt();
+    engineParameters_["WindowHeight"] = editorWindow.Get("height").GetUInt();
+    engineParameters_["FullScreen"] = editorWindow.Get("fullscreen").GetBool();
+
+    file->Close();
+
+    return true;
 }
 
 }

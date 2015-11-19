@@ -36,13 +36,6 @@ class Editor extends Atomic.ScriptObject {
 
         Preferences.getInstance().read();
 
-        var editorWindow = Preferences.getInstance().editorWindow;
-
-        if (editorWindow) {
-            Atomic.graphics.setWindowSize(editorWindow.width, editorWindow.height);
-            Atomic.graphics.setWindowPosition(editorWindow.x, editorWindow.y);
-        }
-
         this.initUI();
 
         this.editorLicense = new EditorLicense();

@@ -40,6 +40,7 @@ protected:
 
 private:
 
+    bool ReadPreferences();
 
 };
 
