@@ -11,6 +11,8 @@
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCBroker.h>
 
+#include <Atomic/Input/InputEvents.h>
+
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/License/LicenseSystem.h>
@@ -158,7 +160,7 @@ void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& ev
 {
     if (!playerBroker_) return;
     VariantMap noEventData;
-    playerBroker_->PostMessage(E_IPCPLAYERQUIT, noEventData);
+    playerBroker_->PostMessage(E_EXITREQUESTED, noEventData);
 }
 
 bool EditorMode::IsPlayerEnabled()

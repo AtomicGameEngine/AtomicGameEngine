@@ -36,7 +36,7 @@ class MainToolbar extends Atomic.UIWidget {
         this.subscribeToEvent("GizmoAxisModeChanged", (ev) => this.handleGizmoAxisModeChanged(ev));
         this.subscribeToEvent("GizmoEditModeChanged", (ev) => this.handleGizmoEditModeChanged(ev));
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
-        this.subscribeToEvent("IPCPlayerExitRequest", (data) => {
+        this.subscribeToEvent("IPCPlayerQuit", (data) => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
         });
