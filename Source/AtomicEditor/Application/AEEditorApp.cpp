@@ -92,7 +92,7 @@ void AEEditorApp::Setup()
 
 #ifdef ATOMIC_DEV_BUILD
     engineParameters_["ResourcePrefixPath"] = "";
-    String resourcePaths = env->GetCoreDataDir() + ";" +  env->GetEditorDataDir();
+    String resourcePaths = env->GetCoreDataDir() + ";" + env->GetEditorDataDir();
     // for dev builds, add the compile editor scripts from artifacts
     resourcePaths += ";" + env->GetRootSourceDir() + "Artifacts/Build/Resources/EditorData/";
     engineParameters_["ResourcePaths"] = resourcePaths;
@@ -102,14 +102,29 @@ void AEEditorApp::Setup()
     engineParameters_["ResourcePrefixPath"] = "../Resources";
 
 #else
-	engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
+    engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
 #endif
 
     engineParameters_["ResourcePaths"] = "CoreData;EditorData";
 
 #endif // ATOMIC_DEV_BUILD
 
+    String prefsPath = filesystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+    prefsPath += "prefs.json";
 
+    JSONValue editorWindow;
+
+    if (ReadPreferences(prefsPath, &editorWindow, "editorWindow"))
+    {
+        if (editorWindow.IsObject())
+        {
+            engineParameters_["WindowPositionX"] = editorWindow.Get("x").GetUInt();
+            engineParameters_["WindowPositionY"] = editorWindow.Get("y").GetUInt();
+            engineParameters_["WindowWidth"] = editorWindow.Get("width").GetUInt();
+            engineParameters_["WindowHeight"] = editorWindow.Get("height").GetUInt();
+            engineParameters_["FullScreen"] = editorWindow.Get("fullscreen").GetBool();
+        }
+    }
 }
 
 void AEEditorApp::Stop()
