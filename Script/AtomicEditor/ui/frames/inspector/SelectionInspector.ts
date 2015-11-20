@@ -403,6 +403,10 @@ class SelectionInspector extends ScriptWidget {
 
         c.savePrefab();
 
+        var node = this.nodes[0];
+        this.removeNode(node);
+        this.addNode(node);
+        
     }
 
     handleSelectionPrefabBreak() {
@@ -415,7 +419,10 @@ class SelectionInspector extends ScriptWidget {
             return;
 
         c.breakPrefab();
-        this.refresh();
+
+        var node = this.nodes[0];
+        this.removeNode(node);
+        this.addNode(node);
 
     }
 
