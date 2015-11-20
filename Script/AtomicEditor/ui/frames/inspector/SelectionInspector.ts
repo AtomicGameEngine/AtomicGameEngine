@@ -5,10 +5,15 @@ import EditorEvents = require("editor/EditorEvents");
 import SerializableEditType = require("./SerializableEditType");
 import SelectionSection = require("./SelectionSection");
 import SelectionPrefabWidget = require("./SelectionPrefabWidget");
+import AttributeInfoEdit = require("./AttributeInfoEdit");
 
 class NodeSection extends SelectionSection {
 
     prefabWidget: SelectionPrefabWidget;
+
+    transformEdits: AttributeInfoEdit[] = [];
+
+    updateDelta: number = 0.0;
 
     constructor(editType: SerializableEditType) {
 
@@ -17,7 +22,35 @@ class NodeSection extends SelectionSection {
         this.prefabWidget = new SelectionPrefabWidget();
         this.attrLayout.addChild(this.prefabWidget);
 
+        this.transformEdits.push(this.attrEdits["Position"]);
+        this.transformEdits.push(this.attrEdits["Rotation"]);
+        this.transformEdits.push(this.attrEdits["Scale"]);
+
+        this.subscribeToEvent("Update", (ev) => this.handleUpdate(ev));
+
     }
+
+    handleUpdate(ev) {
+
+        this.updateDelta -= ev.timeStep;
+
+        if (this.updateDelta < 0.0) {
+
+            this.updateDelta = 0.1;
+
+            Atomic.ui.blockChangedEvents = true;
+
+            for (var i in this.transformEdits) {
+                this.transformEdits[i].refresh();
+            }
+
+            Atomic.ui.blockChangedEvents = false;
+
+        }
+
+
+    }
+
 
 }
 
@@ -184,6 +217,7 @@ class SelectionInspector extends ScriptWidget {
 
         }
 
+        section.value = SelectionInspector.sectionStates[editType.typeName] ? 1 : 0;
 
         this.mainLayout.removeChild(this.createComponentButton, false);
 
@@ -197,6 +231,8 @@ class SelectionInspector extends ScriptWidget {
     }
 
     removeSection(section: SelectionSection) {
+
+        SelectionInspector.sectionStates[section.editType.typeName] = section.value ? true : false;        
 
         var index = this.sections.indexOf(section);
         this.sections.splice(index, 1);
@@ -406,7 +442,7 @@ class SelectionInspector extends ScriptWidget {
         var node = this.nodes[0];
         this.removeNode(node);
         this.addNode(node);
-        
+
     }
 
     handleSelectionPrefabBreak() {
@@ -495,7 +531,15 @@ class SelectionInspector extends ScriptWidget {
 
     }
 
+    private static sectionStates: { [typeName: string]: boolean } = {};
     private static _editTypes: { [typeName: string]: typeof SerializableEditType } = {};
+
+    private static Ctor = (() => {
+
+          SelectionInspector.sectionStates["Node"] = true;
+
+    })();
+
 }
 
 export = SelectionInspector;

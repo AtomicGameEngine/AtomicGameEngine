@@ -472,6 +472,10 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
             select.layoutParams = lp;
             layout.addChild(select);
 
+            select["_edit"] = select.getWidget("edit");
+            select["_dec"] = select.getWidget("dec");
+            select["_inc"] = select.getWidget("inc");
+
             select.subscribeToEvent(select, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
             select.subscribeToEvent(select, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
         }
@@ -485,7 +489,8 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
         for (var i in this.selects) {
 
             var select = this.selects[i];
-            var edit = select.getWidget("edit");
+            if (select["_edit"].focus || select["_dec"].captured || select["_inc"].captured)
+                continue;
 
             var uniform = this.editType.getUniformValue(this.attrInfo, i);
 
@@ -502,7 +507,7 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
             } else {
 
-                edit.text = "--";
+                select["_edit"].text = "--";
 
             }
 
@@ -523,9 +528,24 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
 
-            var index = Number(ev.target.id) - 1;
-            this.editType.onAttributeInfoEdited(this.attrInfo, ev.target.value, index, false);
+            var captured = false;
+            for (var i in this.selects) {
+                var select = this.selects[i];
+                if (select["_dec"].captured || select["_inc"].captured) {
 
+                    captured = true;
+                    break;
+
+                }
+            }
+
+            if (captured) {
+
+              var index = Number(ev.target.id) - 1;
+              this.editType.onAttributeInfoEdited(this.attrInfo, ev.target.value, index, false);
+
+            }
+            
             return true;
         }
 

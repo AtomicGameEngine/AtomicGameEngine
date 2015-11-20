@@ -21,7 +21,6 @@ abstract class SelectionSection extends Atomic.UISection {
         this.editType = editType;
 
         this.text = editType.typeName;
-        this.value = 1;
 
         this.createUI();
 
