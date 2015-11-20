@@ -131,7 +131,7 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
         vargs.Insert(0, "--debug");
 
     if (addArgs.Length() > 0)
-        vargs.Insert(0, addArgs);
+        vargs.Insert(0, addArgs.Split(' '));
 
     String dump;
     dump.Join(vargs, " ");
