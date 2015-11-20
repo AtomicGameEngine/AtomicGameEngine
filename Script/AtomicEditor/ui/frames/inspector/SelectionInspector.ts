@@ -1,4 +1,5 @@
 
+import EditorUI = require("../../EditorUI");
 import CreateComponentButton = require("./CreateComponentButton");
 import ScriptWidget = require("ui/ScriptWidget");
 import EditorEvents = require("editor/EditorEvents");
@@ -232,7 +233,7 @@ class SelectionInspector extends ScriptWidget {
 
     removeSection(section: SelectionSection) {
 
-        SelectionInspector.sectionStates[section.editType.typeName] = section.value ? true : false;        
+        SelectionInspector.sectionStates[section.editType.typeName] = section.value ? true : false;
 
         var index = this.sections.indexOf(section);
         this.sections.splice(index, 1);
@@ -381,8 +382,28 @@ class SelectionInspector extends ScriptWidget {
 
     }
 
-
     handleSelectionCreateComponent(ev) {
+
+        var valid = true;
+
+        if (ev.componentTypeName != "JSComponent") {
+
+            for (var i in this.nodes) {
+
+                var node = this.nodes[i];
+                if (node.getComponent(ev.componentTypeName, false)) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+
+        if (!valid) {
+
+            EditorUI.showModalError("Component Create", "Unable to create component, a node with an existing " + ev.componentTypeName + " component is selected");
+            return;
+
+        }
 
         for (var i in this.nodes) {
 
@@ -536,7 +557,7 @@ class SelectionInspector extends ScriptWidget {
 
     private static Ctor = (() => {
 
-          SelectionInspector.sectionStates["Node"] = true;
+        SelectionInspector.sectionStates["Node"] = true;
 
     })();
 

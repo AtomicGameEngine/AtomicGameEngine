@@ -68,11 +68,19 @@ class InspectorFrame extends ScriptWidget {
 
     }
 
+    closeSelectionInspector() {
 
+        if (!this.selectionInspector)
+            return;
+
+        var container = this.getWidget("inspectorcontainer");
+        container.deleteAllChildren();
+
+        this.selectionInspector = null;
+
+    }
 
     handleSceneNodeSelected(ev: Editor.SceneNodeSelectedEvent) {
-
-        var selection = this.sceneEditor.selection;
 
         if (this.selectionInspector) {
 
@@ -81,23 +89,30 @@ class InspectorFrame extends ScriptWidget {
             } else {
                 this.selectionInspector.removeNode(ev.node);
             }
+
         } else if (ev.selected) {
 
-          var container = this.getWidget("inspectorcontainer");
-          container.deleteAllChildren();
+            var container = this.getWidget("inspectorcontainer");
+            container.deleteAllChildren();
 
-          var inspector = this.selectionInspector = new SelectionInspector(this.sceneEditor);
-          inspector.addNode(ev.node);
-          container.addChild(inspector);
+            var inspector = this.selectionInspector = new SelectionInspector(this.sceneEditor);
+            inspector.addNode(ev.node);
+            container.addChild(inspector);
 
         }
 
-        return;
+        var selection = this.sceneEditor.selection;
+
+        if (!selection.selectedNodeCount) {
+            this.closeSelectionInspector();
+        }
+
     }
 
 
     handleProjectUnloaded(data) {
 
+        this.closeSelectionInspector();
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
     }
@@ -120,6 +135,8 @@ class InspectorFrame extends ScriptWidget {
 
 
     inspectAsset(asset: ToolCore.Asset) {
+
+        this.closeSelectionInspector();
 
         var container = this.getWidget("inspectorcontainer");
         container.deleteAllChildren();
