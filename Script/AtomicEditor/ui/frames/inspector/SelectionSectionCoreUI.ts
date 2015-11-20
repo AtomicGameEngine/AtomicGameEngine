@@ -1,5 +1,5 @@
 
-
+import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SelectionSection = require("./SelectionSection");
 import SelectionSectionUI = require("./SelectionSectionUI");
@@ -7,8 +7,6 @@ import SerializableEditType = require("./SerializableEditType");
 
 
 class CollisionShapeSectionUI extends SelectionSectionUI {
-
-    editType: SerializableEditType;
 
     createUI(editType: SerializableEditType) {
 

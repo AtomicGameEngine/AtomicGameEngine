@@ -5,6 +5,10 @@ class SelectionSectionUI extends Atomic.UILayout {
 
     editType: SerializableEditType;
 
+    refresh() {
+      
+    }
+
     createUI(editType: SerializableEditType) {
 
       this.editType = editType;

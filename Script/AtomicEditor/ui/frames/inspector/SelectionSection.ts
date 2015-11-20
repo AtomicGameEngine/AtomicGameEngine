@@ -10,6 +10,7 @@ abstract class SelectionSection extends Atomic.UISection {
     editType: SerializableEditType;
     attrLayout: Atomic.UILayout;
     suppressed: boolean = false;
+    customUI:SelectionSectionUI;
 
     attrEdits: { [name: string]: AttributeInfoEdit } = {};
 
@@ -33,6 +34,9 @@ abstract class SelectionSection extends Atomic.UISection {
             this.attrEdits[name].refresh();
 
         }
+
+        if (this.customUI)
+          this.customUI.refresh();
 
     }
 
@@ -80,9 +84,9 @@ abstract class SelectionSection extends Atomic.UISection {
 
         if (SelectionSection.customSectionUI[this.editType.typeName]) {
 
-            var ui = new SelectionSection.customSectionUI[this.editType.typeName]();
-            ui.createUI(this.editType);
-            attrLayout.addChild(ui);
+            this.customUI = new SelectionSection.customSectionUI[this.editType.typeName]();
+            this.customUI.createUI(this.editType);
+            attrLayout.addChild(this.customUI);
 
         }
 

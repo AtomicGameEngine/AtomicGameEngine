@@ -25,6 +25,8 @@ public:
 
     void SaveMaterial();
 
+    Resource* GetResource(const String& typeName = String::EMPTY);
+
 protected:
 
     bool Import();

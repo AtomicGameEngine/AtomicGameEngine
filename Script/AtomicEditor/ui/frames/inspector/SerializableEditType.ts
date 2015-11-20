@@ -2,6 +2,7 @@
 class SerializableEditType {
 
     constructor(serial: Atomic.Serializable) {
+
         this.typeName = serial.typeName;
         this.attrInfos = serial.getAttributes();
         this.addSerializable(serial);
@@ -27,14 +28,29 @@ class SerializableEditType {
             if (i == 0) {
 
                 value = object.getAttribute(attrInfo.name);
-                if (index >= 0)
-                    value = value[index];
+                if (index >= 0) {
+
+                    if (attrInfo.type == Atomic.VAR_RESOURCEREFLIST) {
+
+                        value = value.resources[index];
+
+                    } else {
+                        value = value[index];
+                    }
+                }
 
             } else {
 
                 var value2 = object.getAttribute(attrInfo.name);
-                if (index >= 0)
-                    value2 = value2[index];
+                if (index >= 0) {
+                    if (attrInfo.type == Atomic.VAR_RESOURCEREFLIST) {
+
+                        value2 = value2.resources[index];
+
+                    } else {
+                        value2 = value2[index];
+                    }
+                }
 
                 if (value != value2)
                     return false;
@@ -57,8 +73,18 @@ class SerializableEditType {
             if (index >= 0) {
 
                 var idxValue = object.getAttribute(attrInfo.name);
-                idxValue[index] = value;
-                object.setAttribute(attrInfo.name, idxValue);
+
+                if (attrInfo.type == Atomic.VAR_RESOURCEREFLIST) {
+
+                    idxValue.resources[index] = value;
+                    object.setAttribute(attrInfo.name, idxValue);
+
+                } else {
+
+                    idxValue[index] = value;
+                    object.setAttribute(attrInfo.name, idxValue);
+
+                }
 
             } else {
 

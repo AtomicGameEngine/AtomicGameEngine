@@ -572,6 +572,16 @@ class ColorAttributeEdit extends NumberArrayAttributeEdit {
 
 class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
+    refListIndex: number;
+
+    constructor(refListIndex: number = -1) {
+
+        super();
+
+        this.refListIndex = refListIndex;
+
+    }
+
     editField: Atomic.UIEditField;
 
     initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
@@ -589,7 +599,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
     refresh() {
 
-        var uniform = this.editType.getUniformValue(this.attrInfo);
+        var uniform = this.editType.getUniformValue(this.attrInfo, this.refListIndex);
 
         if (uniform) {
 
@@ -598,8 +608,15 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
             if (object) {
 
                 // for cached resources, use the asset name, otherwise use the resource path name
-                var resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+                var resource: Atomic.Resource;
+                if (this.refListIndex != -1) {
+                    resource = object.getAttribute(this.attrInfo.name).resources[this.refListIndex];
+                } else {
+                    resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+                }
+
                 var text = "";
+
                 if (resource) {
                     text = resource.name;
                     var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
@@ -646,8 +663,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
             EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
 
                 var resource = asset.getResource(resourceTypeName);
-
-                this.editType.onAttributeInfoEdited(this.attrInfo, resource);
+                this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
                 this.refresh();
 
             }.bind(this));
@@ -677,7 +693,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                     var resource = asset.getResource(resourceTypeName);
 
-                    this.editType.onAttributeInfoEdited(this.attrInfo, resource);
+                    this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
                     this.refresh();
 
 
@@ -688,6 +704,111 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
     }
 
+}
+
+class ResourceRefListAttributeEdit extends AttributeInfoEdit {
+
+    layout: Atomic.UILayout;
+    refEdits: ResourceRefAttributeEdit[] = [];
+
+    initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
+
+        return super.initialize(editType, attrInfo);
+
+    }
+
+    createRefEdit(index: number) {
+
+        var refEdit = new ResourceRefAttributeEdit(index);
+
+        refEdit.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        refEdit.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        refEdit.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        refEdit.initialize(this.editType, this.attrInfo);
+
+        this.layout.addChild(refEdit);
+
+        this.refEdits.push(refEdit);
+
+    }
+
+    createEditWidget() {
+
+        var layout = this.layout = new Atomic.UILayout();
+
+        layout.axis = Atomic.UI_AXIS_Y;
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        this.editWidget = layout;
+
+    }
+
+    createLayout() {
+
+        this.createEditWidget();
+
+        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
+        this.addChild(this.editWidget);
+
+    }
+
+    refresh() {
+
+        var editType = this.editType;
+
+        var object = this.editType.getFirstObject();
+
+        if (!object) {
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            return;
+        }
+
+        this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+
+        var maxLength = -1;
+        var i;
+        for (i in editType.objects) {
+
+            object = editType.objects[i];
+            var value = object.getAttribute(this.attrInfo.name);
+            if (value.resources.length > maxLength) {
+
+                maxLength = value.resources.length;
+
+            }
+
+        }
+
+        if (maxLength == -1) {
+            this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            return;
+        }
+
+        for (i = this.refEdits.length; i < maxLength; i++) {
+
+            this.createRefEdit(i);
+
+        }
+
+        for (i = 0; i < this.refEdits.length; i++) {
+
+            var refEdit = this.refEdits[i];
+
+            if (i < maxLength) {
+                refEdit.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+                refEdit.refresh();
+            }
+            else {
+                refEdit.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+            }
+
+        }
+
+    }
 }
 
 
@@ -704,5 +825,6 @@ AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_QUATERNION] = QuaternionAttri
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_COLOR] = ColorAttributeEdit;
 
 AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_RESOURCEREF] = ResourceRefAttributeEdit;
+AttributeInfoEdit.standardAttrEditTypes[Atomic.VAR_RESOURCEREFLIST] = ResourceRefListAttributeEdit;
 
 export = AttributeInfoEdit;

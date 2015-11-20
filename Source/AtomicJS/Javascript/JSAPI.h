@@ -59,7 +59,7 @@ void js_class_get_constructor(duk_context* ctx, const char* package, const char 
 void js_push_variant(duk_context* ctx, const Variant &v);
 void js_push_variantmap(duk_context* ctx, const VariantMap &vmap);
 
-void js_to_variant(duk_context* ctx, int variantIdx, Variant &v);
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v, VariantType variantType = VAR_NONE);
 
 void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);
 
