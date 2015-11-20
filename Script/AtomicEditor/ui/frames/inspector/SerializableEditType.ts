@@ -109,7 +109,7 @@ class SerializableEditType {
 
     }
 
-    compareTypes(otherType: SerializableEditType): boolean {
+    compareTypes(otherType: SerializableEditType, multiSelect:boolean = false): boolean {
 
         return this.typeName == otherType.typeName;
 

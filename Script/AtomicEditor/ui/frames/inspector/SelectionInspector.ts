@@ -283,7 +283,7 @@ class SelectionInspector extends ScriptWidget {
 
             var e = section.editType;
 
-            if (e.compareTypes(editType)) {
+            if (e.compareTypes(editType, this.nodes.length > 1)) {
                 e.addSerializable(serial);
                 return e;
             }

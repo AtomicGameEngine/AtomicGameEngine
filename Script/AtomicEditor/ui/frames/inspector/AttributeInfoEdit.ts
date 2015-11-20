@@ -392,11 +392,8 @@ class FloatAttributeEdit extends AttributeInfoEdit {
             var object = this.editType.getFirstObject();
             if (object) {
 
-                var value = object.getAttribute(this.attrInfo.name);
-
                 var widget = this.editWidget;
                 var attrInfo = this.attrInfo;
-
                 var value = object.getAttribute(attrInfo.name);
                 widget.text = parseFloat(value.toFixed(5)).toString();
 
@@ -541,11 +538,11 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
             if (captured) {
 
-              var index = Number(ev.target.id) - 1;
-              this.editType.onAttributeInfoEdited(this.attrInfo, ev.target.value, index, false);
+                var index = Number(ev.target.id) - 1;
+                this.editType.onAttributeInfoEdited(this.attrInfo, ev.target.value, index, false);
 
             }
-            
+
             return true;
         }
 
