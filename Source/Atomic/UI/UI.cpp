@@ -194,6 +194,7 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_KEYUP, HANDLER(UI, HandleKeyUp));
     SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
+    SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
 
     SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));
