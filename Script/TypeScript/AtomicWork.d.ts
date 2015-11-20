@@ -289,6 +289,14 @@ declare module Editor {
 
   }
 
+  export interface SceneEditComponentAddedRemovedEvent {
+
+      scene: Atomic.Scene;
+      node: Atomic.Node;
+      component: Atomic.Component;
+      removed:boolean;
+  }
+
   export interface SceneEditStateChangeEvent {
 
     serializable:Atomic.Serializable;

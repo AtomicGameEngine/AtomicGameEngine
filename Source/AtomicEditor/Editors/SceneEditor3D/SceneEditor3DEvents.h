@@ -81,6 +81,17 @@ EVENT(E_SCENEEDITNODEREMOVED, SceneEditNodeRemoved)
 }
 
 
+/// A child node has been added to a parent node.
+EVENT(E_SCENEEDITCOMPONENTADDEDREMOVED, SceneEditComponentAddedRemoved)
+{
+    PARAM(P_SCENE, Scene);                  // Scene pointer
+    PARAM(P_NODE, Node);                    // Node pointer
+    PARAM(P_COMPONENT, Component);          // Component pointer
+    PARAM(P_REMOVED, Removed);          // bool
+
+}
+
+
 EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
 {
     PARAM(P_END, End);       // bool

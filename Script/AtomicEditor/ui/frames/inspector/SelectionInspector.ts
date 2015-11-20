@@ -82,9 +82,6 @@ class ComponentSection extends SelectionSection {
 
 class SelectionInspector extends ScriptWidget {
 
-    createComponentButton: CreateComponentButton;
-    nodeSection: NodeSection;
-
     constructor(sceneEditor: Editor.SceneEditor3D) {
 
         super();
@@ -110,6 +107,8 @@ class SelectionInspector extends ScriptWidget {
         this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesBegin", (data) => this.handleSceneEditStateChangesBeginEvent());
         this.subscribeToEvent("SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
         this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesEnd", (data) => this.handleSceneEditStateChangesEndEvent());
+
+        this.subscribeToEvent(sceneEditor.scene, "SceneEditComponentAddedRemoved", (ev) => this.handleSceneEditComponentAddedRemovedEvent(ev));
 
         this.subscribeToEvent(this.createComponentButton, "SelectionCreateComponent", (data) => this.handleSelectionCreateComponent(data));
 
@@ -222,19 +221,34 @@ class SelectionInspector extends ScriptWidget {
 
         this.mainLayout.removeChild(this.createComponentButton, false);
 
-        this.mainLayout.addChild(section);
+        // sort it in alphabetically
+
+        this.sections.push(section);
+
+        this.sections.sort(function(a, b) {
+            if (a.editType.typeName == "Node")
+                return -1;
+            if (b.editType.typeName == "Node")
+                return 1;
+            return a.editType.typeName.localeCompare(b.editType.typeName);
+        });
+
+        var idx = this.sections.indexOf(section);
+
+        if (idx == this.sections.length - 1)
+            this.mainLayout.addChild(section);
+        else {
+            this.mainLayout.addChildAfter(section, this.sections[idx - 1]);
+        }
 
         // move the create component button down
         this.mainLayout.addChild(this.createComponentButton);
-
-        this.sections.push(section);
 
     }
 
     removeSection(section: SelectionSection) {
 
         SelectionInspector.sectionStates[section.editType.typeName] = section.value ? true : false;
-
         var index = this.sections.indexOf(section);
         this.sections.splice(index, 1);
         this.mainLayout.removeChild(section);
@@ -300,6 +314,7 @@ class SelectionInspector extends ScriptWidget {
 
         var typeName = serial.typeName;
 
+
         if (SelectionInspector._editTypes[typeName]) {
             return new SelectionInspector._editTypes[typeName](serial);
         }
@@ -348,6 +363,40 @@ class SelectionInspector extends ScriptWidget {
 
     }
 
+    handleSceneEditComponentAddedRemovedEvent(ev: Editor.SceneEditComponentAddedRemovedEvent) {
+
+        if (!ev.removed) {
+
+            editType = this.addSerializable(ev.component);
+            editType.addNode(ev.node);
+
+        } else {
+
+            for (var i in this.sections) {
+
+                var section = this.sections[i];
+                var editType = section.editType;
+
+                var index = editType.objects.indexOf(ev.component);
+                if (index != -1) {
+
+                    editType.objects.splice(index, 1);
+                    index = editType.nodes.indexOf(ev.node);
+                    if (index != -1) {
+                        editType.nodes.splice(index, 1);
+                    }
+                    break;
+
+                }
+
+            }
+
+        }
+
+        this.refresh();
+
+    }
+
     onComponentDelete(editType: SerializableEditType) {
 
         var removed: Atomic.Component[] = [];
@@ -365,6 +414,7 @@ class SelectionInspector extends ScriptWidget {
 
             var node = c.node;
             c.remove();
+
             this.removeSerializable(removed[i]);
 
             var index = editType.nodes.indexOf(node);
@@ -376,6 +426,7 @@ class SelectionInspector extends ScriptWidget {
 
         if (removed.length) {
 
+            this.sceneEditor.scene.sendEvent("SceneEditEnd");
             this.refresh();
 
         }
@@ -540,6 +591,8 @@ class SelectionInspector extends ScriptWidget {
     nodes: Atomic.Node[] = [];
     sections: SelectionSection[] = [];
 
+    createComponentButton: CreateComponentButton;
+    nodeSection: NodeSection;
 
     stateChangesInProgress: boolean = false;
     stateChanges: Atomic.Serializable[] = [];

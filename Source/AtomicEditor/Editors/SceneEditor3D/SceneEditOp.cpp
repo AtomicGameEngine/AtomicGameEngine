@@ -120,8 +120,12 @@ bool SelectionEditOp::Commit()
         {
             EditComponent* ecomponent = enode->components_[j];
 
+            if (ecomponent->nodeBegin_ != ecomponent->nodeEnd_)
+                return true;
+
             if (!CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_))
                 return true;
+
         }
 
     }
@@ -231,8 +235,24 @@ bool SelectionEditOp::Undo()
             if (component->GetNode() != ecomponent->nodeBegin_)
             {
                 component->Remove();
+
+                VariantMap caData;
+                caData[SceneEditComponentAddedRemoved::P_SCENE] = scene_;
+                caData[SceneEditComponentAddedRemoved::P_COMPONENT] = component;
+
                 if (ecomponent->nodeBegin_.NotNull())
+                {
                     ecomponent->nodeBegin_->AddComponent(component, 0, REPLICATED);
+                    caData[SceneEditComponentAddedRemoved::P_NODE] = ecomponent->nodeBegin_;
+                    caData[SceneEditComponentAddedRemoved::P_REMOVED] = false;
+                }
+                else
+                {
+                    caData[SceneEditComponentAddedRemoved::P_NODE] = ecomponent->nodeEnd_;
+                    caData[SceneEditComponentAddedRemoved::P_REMOVED] = true;
+                }
+
+                scene_->SendEvent(E_SCENEEDITCOMPONENTADDEDREMOVED, caData);
             }
 
         }
@@ -323,10 +343,24 @@ bool SelectionEditOp::Redo()
             if (component->GetNode() != ecomponent->nodeEnd_)
             {
                 component->Remove();
+
+                VariantMap caData;
+                caData[SceneEditComponentAddedRemoved::P_SCENE] = scene_;
+                caData[SceneEditComponentAddedRemoved::P_COMPONENT] = component;
+
                 if (ecomponent->nodeEnd_.NotNull())
                 {
                     ecomponent->nodeEnd_->AddComponent(component, 0, REPLICATED);
+                    caData[SceneEditComponentAddedRemoved::P_NODE] = ecomponent->nodeEnd_;
+                    caData[SceneEditComponentAddedRemoved::P_REMOVED] = false;
                 }
+                else
+                {
+                    caData[SceneEditComponentAddedRemoved::P_NODE] = ecomponent->nodeBegin_;
+                    caData[SceneEditComponentAddedRemoved::P_REMOVED] = true;
+                }
+
+                scene_->SendEvent(E_SCENEEDITCOMPONENTADDEDREMOVED, caData);
 
             }
 
