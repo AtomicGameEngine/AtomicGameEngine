@@ -78,6 +78,16 @@ class ComponentSection extends SelectionSection {
 
 }
 
+class SceneSection extends SelectionSection {
+
+    constructor(editType: SerializableEditType) {
+
+        super(editType);
+
+    }
+
+}
+
 // Node Inspector + Component Inspectors
 
 class SelectionInspector extends ScriptWidget {
@@ -128,6 +138,18 @@ class SelectionInspector extends ScriptWidget {
                 continue;
             }
 
+            if (editType.typeName == "Scene") {
+                var gotone = false;
+                for (var j in this.nodes) {
+                    if (this.nodes[j].typeName == "Scene") {
+                        gotone = true;
+                        break;
+                    }
+                }
+                if (gotone)
+                    continue;
+            }
+
             if (!editType.nodes.length) {
 
                 remove.push(section);
@@ -157,7 +179,7 @@ class SelectionInspector extends ScriptWidget {
             var section = this.sections[i];
             var editType = section.editType;
 
-            if (editType.typeName == "Node") {
+            if (editType.typeName == "Node" || editType.typeName == "Scene") {
                 continue;
             }
 
@@ -211,6 +233,10 @@ class SelectionInspector extends ScriptWidget {
             this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabBreak", (data) => this.handleSelectionPrefabBreak());
 
 
+        } else if (editType.typeName == "Scene") {
+
+            section = new SceneSection(editType);
+
         } else {
 
             section = new ComponentSection(editType, this);
@@ -226,17 +252,36 @@ class SelectionInspector extends ScriptWidget {
         this.sections.push(section);
 
         this.sections.sort(function(a, b) {
-            if (a.editType.typeName == "Node")
+
+            if (a.editType.typeName == "Node" && b.editType.typeName == "Scene")
                 return -1;
-            if (b.editType.typeName == "Node")
+
+            if (a.editType.typeName == "Scene" && b.editType.typeName == "Node")
                 return 1;
+
+            if (a.editType.typeName == "Node" || a.editType.typeName == "Scene")
+                return -1;
+
+            if (b.editType.typeName == "Node" || b.editType.typeName == "Scene")
+                return 1;
+
             return a.editType.typeName.localeCompare(b.editType.typeName);
         });
 
         var idx = this.sections.indexOf(section);
 
-        if (idx == this.sections.length - 1)
+        if (idx == 0) {
+
+            if (this.sections.length == 1) {
+                this.mainLayout.addChild(section);
+            } else {
+                this.mainLayout.addChildBefore(section, this.sections[1]);
+            }
+        }
+        else if (idx == this.sections.length - 1) {
+
             this.mainLayout.addChild(section);
+        }
         else {
             this.mainLayout.addChildAfter(section, this.sections[idx - 1]);
         }
