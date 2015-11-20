@@ -11,6 +11,12 @@ class JSComponentEditType extends SerializableEditType {
             return false;
         }
 
+        if (!otherType.objects.length || !this.objects.length) {
+
+          return false;
+
+        }
+
         var jsc1 = <Atomic.JSComponent>(otherType.objects[0]);
         var jsc2 = <Atomic.JSComponent>(this.objects[0]);
 

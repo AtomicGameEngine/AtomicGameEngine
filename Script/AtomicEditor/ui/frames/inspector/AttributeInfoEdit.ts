@@ -10,6 +10,8 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
     editWidget: Atomic.UIWidget;
 
+    nameOverride: string;
+
     constructor() {
 
         super();
@@ -61,7 +63,11 @@ class AttributeInfoEdit extends Atomic.UILayout {
         if (bname == "Is Enabled")
             bname = "Enabled";
 
-        name.text = bname;
+        if (this.nameOverride)
+            name.text = this.nameOverride;
+        else
+            name.text = bname;
+
         name.fontDescription = AttributeInfoEdit.fontDesc;
 
         this.addChild(name);
@@ -589,6 +595,9 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
         if (!attrInfo.resourceTypeName)
             return false;
 
+        if (this.refListIndex >= 0)
+            this.nameOverride = attrInfo.resourceTypeName + " " + this.refListIndex;
+
         var importerName = ToolCore.assetDatabase.getResourceImporterName(attrInfo.resourceTypeName);
 
         if (!importerName)
@@ -721,10 +730,6 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         var refEdit = new ResourceRefAttributeEdit(index);
 
-        refEdit.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
-        refEdit.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
-        refEdit.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-
         refEdit.initialize(this.editType, this.attrInfo);
 
         this.layout.addChild(refEdit);
@@ -735,12 +740,21 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
     createEditWidget() {
 
+        this.spacing = 0;
+
         var layout = this.layout = new Atomic.UILayout();
 
         layout.axis = Atomic.UI_AXIS_Y;
+        layout.spacing = 2;
         layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
         layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
         layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 304;
+
+        layout.layoutParams = lp;
+
 
         this.editWidget = layout;
 
