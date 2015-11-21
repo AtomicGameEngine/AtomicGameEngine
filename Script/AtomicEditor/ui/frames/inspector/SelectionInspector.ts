@@ -88,6 +88,41 @@ class SceneSection extends SelectionSection {
 
 }
 
+interface AttributeEditResourceChangedEvent {
+
+    attrInfoEdit: AttributeInfoEdit;
+    resource: Atomic.Resource;
+
+}
+
+class JSComponentSection extends ComponentSection {
+
+    constructor(editType: SerializableEditType, inspector: SelectionInspector) {
+
+        super(editType, inspector);
+
+        this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
+
+    }
+
+    private handleAttributeEditResourceChanged(ev: AttributeEditResourceChangedEvent) {
+
+        var jsc = <Atomic.JSComponent>this.editType.getFirstObject();
+
+        if (!jsc)
+            return;
+
+        var attrInfos = jsc.getAttributes();
+
+        this.updateDynamicAttrInfos(attrInfos);
+
+        //console.log("Resource Changed:", this.editType.typeName, ev.attrInfoEdit.attrInfo.name, ev.resource.name);
+
+    }
+
+}
+
+
 // Node Inspector + Component Inspectors
 
 class SelectionInspector extends ScriptWidget {
@@ -237,7 +272,10 @@ class SelectionInspector extends ScriptWidget {
 
             section = new SceneSection(editType);
 
-        } else {
+        } else if (editType.typeName == "JSComponent") {
+            section = new JSComponentSection(editType, this);
+        }
+        else {
 
             section = new ComponentSection(editType, this);
 

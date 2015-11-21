@@ -208,6 +208,7 @@ declare module Atomic {
         defaultValue: string;
         enumNames: string[];
         resourceTypeName: string;
+        dynamic:boolean;
 
     }
 

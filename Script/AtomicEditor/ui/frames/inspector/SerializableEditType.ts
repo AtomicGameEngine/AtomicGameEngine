@@ -134,7 +134,6 @@ class SerializableEditType {
     }
 
     typeName: string;
-    typeWidget: Atomic.UIWidget;
     attrInfos: Atomic.AttributeInfo[];
 
     nodes: Atomic.Node[] = [];

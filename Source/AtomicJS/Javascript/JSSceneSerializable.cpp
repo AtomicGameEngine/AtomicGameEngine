@@ -279,7 +279,7 @@ static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const Varian
             duk_put_prop_string(ctx, -2, "defaultValue");
 
             duk_push_boolean(ctx, 1);
-            duk_put_prop_string(ctx, -2, "field");
+            duk_put_prop_string(ctx, -2, "dynamic");
 
             duk_push_array(ctx);
 
@@ -390,7 +390,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
             duk_put_prop_string(ctx, -2, "defaultValue");
 
             duk_push_boolean(ctx, 0);
-            duk_put_prop_string(ctx, -2, "field");
+            duk_put_prop_string(ctx, -2, "dynamic");
 
             duk_push_array(ctx);
 

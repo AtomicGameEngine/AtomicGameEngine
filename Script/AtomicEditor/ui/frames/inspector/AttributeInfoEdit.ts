@@ -596,6 +596,7 @@ class ColorAttributeEdit extends NumberArrayAttributeEdit {
 class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
     refListIndex: number;
+    editField: Atomic.UIEditField;
 
     constructor(refListIndex: number = -1) {
 
@@ -605,7 +606,27 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
     }
 
-    editField: Atomic.UIEditField;
+    onResourceChanged(resource: Atomic.Resource) {
+
+        var parent = this.parent;
+
+        while (parent) {
+
+            if (parent.typeName == "UISection") {
+                break;
+            }
+
+            parent = parent.parent;
+
+        }
+
+        if (parent) {
+
+          parent.sendEvent("AttributeEditResourceChanged", { attrInfoEdit: this, resource: resource});
+
+        }
+
+    }
 
     initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
 
@@ -676,9 +697,6 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         this.editWidget = layout;
 
-        // stuff editfield in so can be reference
-        layout["editField"] = o.editField;
-
         var selectButton = o.selectButton;
 
         var resourceTypeName = this.attrInfo.resourceTypeName;
@@ -690,6 +708,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                 var resource = asset.getResource(resourceTypeName);
                 this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
+                this.onResourceChanged(resource);
                 this.refresh();
 
             }.bind(this));
@@ -720,6 +739,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                     var resource = asset.getResource(resourceTypeName);
 
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
+                    this.onResourceChanged(resource);
                     this.refresh();
 
 

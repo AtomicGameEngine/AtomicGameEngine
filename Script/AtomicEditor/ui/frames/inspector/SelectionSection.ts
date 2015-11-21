@@ -10,7 +10,7 @@ abstract class SelectionSection extends Atomic.UISection {
     editType: SerializableEditType;
     attrLayout: Atomic.UILayout;
     suppressed: boolean = false;
-    customUI:SelectionSectionUI;
+    customUI: SelectionSectionUI;
 
     attrEdits: { [name: string]: AttributeInfoEdit } = {};
 
@@ -35,7 +35,7 @@ abstract class SelectionSection extends Atomic.UISection {
         }
 
         if (this.customUI)
-          this.customUI.refresh();
+            this.customUI.refresh();
 
     }
 
@@ -51,6 +51,71 @@ abstract class SelectionSection extends Atomic.UISection {
         } else {
             this.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
         }
+
+    }
+
+    updateDynamicAttrInfos(attrInfos: Atomic.AttributeInfo[]) {
+
+        Atomic.ui.blockChangedEvents = true;
+
+        this.editType.attrInfos = attrInfos;
+
+        var attrEdit: AttributeInfoEdit;
+        var remove: AttributeInfoEdit[] = [];
+
+        var addWidget: Atomic.UIWidget;
+
+        for (var name in this.attrEdits) {
+
+            attrEdit = this.attrEdits[name];
+
+            if (attrEdit.attrInfo.dynamic) {
+                remove.push(attrEdit);
+            } else {
+                addWidget = attrEdit;
+            }
+
+        }
+
+        for (var i in remove) {
+
+            var attrEdit = remove[i];
+            attrEdit.remove();
+            delete this.attrEdits[attrEdit.attrInfo.name];
+
+        }
+
+        for (var i in attrInfos) {
+
+            var attr = attrInfos[i];
+
+            if (!attr.dynamic) {
+                continue;
+            }
+
+            if (attr.mode & Atomic.AM_NOEDIT)
+                continue;
+
+            var attrEdit = AttributeInfoEdit.createAttrEdit(this.editType, attr);
+
+            if (!attrEdit)
+                continue;
+
+            this.attrEdits[attr.name] = attrEdit;
+
+            if (!addWidget) {
+                this.attrLayout.addChild(attrEdit);
+                addWidget = attrEdit;
+            } else {
+                this.attrLayout.addChildAfter(attrEdit, addWidget);
+                addWidget = attrEdit;
+            }
+
+        }
+
+        this.refresh();
+
+        Atomic.ui.blockChangedEvents = false;
 
     }
 
