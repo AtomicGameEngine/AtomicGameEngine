@@ -151,6 +151,20 @@ class SelectionInspector extends ScriptWidget {
 
         this.addChild(mainLayout);
 
+        var noticeLayout = this.multipleSelectNotice = new Atomic.UILayout();
+        noticeLayout.axis = Atomic.UI_AXIS_Y;
+        noticeLayout.layoutParams = lp;
+        var noticeText = new Atomic.UITextField();
+        noticeText.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
+        noticeText.skinBg = "InspectorTextAttrName";
+        noticeText.text = "Multiple Selection - Some components are hidden";
+        noticeText.fontDescription = SelectionSection.fontDesc;
+        noticeText.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        noticeText.layoutParams = lp;
+        noticeLayout.addChild(noticeText);
+        noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+        mainLayout.addChild(noticeLayout);
+
         this.createComponentButton = new CreateComponentButton();
         mainLayout.addChild(this.createComponentButton);
 
@@ -214,6 +228,8 @@ class SelectionInspector extends ScriptWidget {
 
     suppressSections() {
 
+        this.multipleSelectNotice.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
+
         for (var i in this.sections) {
 
             var section = this.sections[i];
@@ -231,6 +247,9 @@ class SelectionInspector extends ScriptWidget {
                     break;
                 }
             }
+
+            if (suppressed)
+                this.multipleSelectNotice.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
 
             section.suppress(suppressed);
 
@@ -289,6 +308,7 @@ class SelectionInspector extends ScriptWidget {
         section.value = SelectionInspector.sectionStates[editType.typeName] ? 1 : 0;
 
         this.mainLayout.removeChild(this.createComponentButton, false);
+        this.mainLayout.removeChild(this.multipleSelectNotice, false);
 
         // sort it in alphabetically
 
@@ -330,6 +350,8 @@ class SelectionInspector extends ScriptWidget {
         }
 
         // move the create component button down
+
+        this.mainLayout.addChild(this.multipleSelectNotice);
         this.mainLayout.addChild(this.createComponentButton);
 
     }
@@ -710,6 +732,8 @@ class SelectionInspector extends ScriptWidget {
 
 
     mainLayout: Atomic.UILayout;
+
+    multipleSelectNotice: Atomic.UILayout;
 
     sceneEditor: Editor.SceneEditor3D;
     nodes: Atomic.Node[] = [];
