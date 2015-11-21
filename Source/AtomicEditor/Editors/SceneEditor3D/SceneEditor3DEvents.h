@@ -63,6 +63,12 @@ EVENT(E_SCENEEDITSTATECHANGESEND, SceneEditStateChangesEnd)
 
 }
 
+/// A child node has been added to a parent node.
+EVENT(E_SCENEEDITNODECREATED, SceneEditNodeCreated)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
 
 /// A child node has been added to a parent node.
 EVENT(E_SCENEEDITNODEADDED, SceneEditNodeAdded)

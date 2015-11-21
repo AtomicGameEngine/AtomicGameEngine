@@ -109,6 +109,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(E_PROJECTUSERPREFSAVED, HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
+    SubscribeToEvent(scene_, E_SCENEEDITNODECREATED, HANDLER(SceneEditor3D, HandleSceneEditNodeCreated));
+
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
     SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
@@ -318,6 +320,13 @@ void SceneEditor3D::Paste()
     selection_->Paste();
 }
 
+void SceneEditor3D::HandleSceneEditNodeCreated(StringHash eventType, VariantMap& eventData)
+{
+    PODVector<Node*> nodes;
+    nodes.Push(static_cast<Node*>(eventData[SceneEditNodeCreated::P_NODE].GetPtr()));
+    RegisterNodes(nodes);
+    selection_->AddNode(nodes[0], true);
+}
 
 void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
 {

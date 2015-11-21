@@ -585,10 +585,9 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
     if (dragNode_.NotNull())
     {
-        PODVector<Node*> nodes;
-        nodes.Push(dragNode_);
-        sceneEditor_->RegisterNodes(nodes);
-        sceneEditor_->GetSelection()->AddNode(dragNode_, true);
+        VariantMap nodeCreatedEvent;
+        nodeCreatedEvent[SceneEditNodeCreated::P_NODE] = dragNode_;
+        scene_->SendEvent(E_SCENEEDITNODECREATED, nodeCreatedEvent);
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())

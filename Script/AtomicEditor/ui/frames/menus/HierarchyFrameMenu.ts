@@ -53,6 +53,10 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
             }
 
+            if (child) {
+                child.scene.sendEvent("SceneEditNodeCreated", { node : child});
+            }
+
             return true;
 
         }

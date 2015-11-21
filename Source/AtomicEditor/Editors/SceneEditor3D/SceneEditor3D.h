@@ -86,6 +86,7 @@ private:
     void HandleUserPrefSaved(StringHash eventType, VariantMap& eventData);
 
     void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeCreated(StringHash eventType, VariantMap& eventData);
 
     void UpdateGizmoSnapSettings();
 
