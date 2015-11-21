@@ -143,7 +143,6 @@ class HierarchyFrame extends Atomic.UIWidget {
             return;
 
         delete this.nodeIDToItemID[node.id];
-
         this.hierList.deleteItemByID(node.id.toString());
 
     }
@@ -174,6 +173,21 @@ class HierarchyFrame extends Atomic.UIWidget {
                 this.hierList.setItemText(ev.node.id.toString(), ev.node.name);
 
             });
+
+            this.subscribeToEvent(this.scene, "SceneEditNodeReparent", (ev) => {
+
+                if (!ev.added) {
+                    delete this.nodeIDToItemID[ev.node.id];
+                    this.hierList.deleteItemByID(ev.node.id.toString());
+                } else {
+                  var parentID = this.nodeIDToItemID[ev.node.parent.id];
+                  var childItemID = this.recursiveAddNode(parentID, ev.node);
+                  this.nodeIDToItemID[ev.node.id] = childItemID;
+
+                }
+
+            });
+
 
         }
 
@@ -259,38 +273,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             var dragNode = <Atomic.Node>ev.dragObject.object;
 
-            if (dragNode.scene != this.scene) {
-                return;
-            }
-
-            // can't drop on self
-            if (dragNode == dropNode) {
-                return;
-            }
-
-            // check if dropping on child of ourselves
-            var parent = dropNode.parent;
-
-            while (parent) {
-
-                if (parent == dragNode) {
-                    return;
-                }
-
-                parent = parent.parent;
-
-            }
-
-            this.scene.sendEvent("SceneEditAddRemoveNodes", {end: false});
-
-            this.scene.sendEvent("SceneEditNodeRemoved", {scene: this.scene, node:dragNode, parent:dragNode.parent});
-
-            // move it
-            dropNode.addChild(dragNode);
-
-            this.scene.sendEvent("SceneEditNodeAdded", {scene: this.scene, node:dragNode, dropNode});
-
-            this.scene.sendEvent("SceneEditAddRemoveNodes", {end: true});
+            this.sceneEditor.reparentNode(dragNode, dropNode);
 
         } else if (typeName == "Asset") {
 

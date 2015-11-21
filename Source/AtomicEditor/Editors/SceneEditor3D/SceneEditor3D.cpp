@@ -348,4 +348,66 @@ void SceneEditor3D::UpdateGizmoSnapSettings()
 
 }
 
+void SceneEditor3D::ReparentNode(Node* node, Node* newParent)
+{
+    // can't parent to self
+    if (node == newParent)
+        return;
+
+    // already parented
+    Node* oldParent = node->GetParent();
+    if (oldParent == newParent)
+        return;
+
+    // must be in same scene
+    if (node->GetScene() != newParent->GetScene())
+    {
+        return;
+    }
+
+    // check if dropping on child of ourselves
+
+    Node* parent = newParent;
+
+    while (parent)
+    {
+        if (parent == node)
+        {
+            return;
+        }
+
+        parent = parent->GetParent();
+    }
+
+    selection_->AddNode(node, true);
+
+    Matrix3x4 transform = node->GetWorldTransform();
+
+    newParent->AddChild(node);
+
+    node->SetWorldTransform(transform.Translation(), transform.Rotation(), transform.Scale());
+
+    scene_->SendEvent(E_SCENEEDITEND);
+
+    PODVector<Node*> nodes;
+    node->GetChildren(nodes, true);
+    nodes.Insert(0, node);
+
+    VariantMap evData;
+    for (unsigned i = 0; i < nodes.Size(); i++)
+    {
+        evData[SceneEditNodeReparent::P_NODE] = nodes[i];
+        evData[SceneEditNodeReparent::P_ADDED] = false;
+        scene_->SendEvent(E_SCENEEDITNODEREPARENT, evData);
+    }
+
+    evData[SceneEditNodeReparent::P_NODE] = node;
+    evData[SceneEditNodeReparent::P_ADDED] = true;
+    scene_->SendEvent(E_SCENEEDITNODEREPARENT, evData);
+
+    selection_->AddNode(node, true);
+
+
+}
+
 }

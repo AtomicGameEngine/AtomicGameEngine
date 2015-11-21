@@ -43,6 +43,13 @@ EVENT(E_SCENEEDITBEGIN, SceneEditBegin)
 
 }
 
+EVENT(E_SCENEEDITNODEREPARENT, SceneEditNodeReparent)
+{
+    PARAM(P_NODE, Node);             // Node
+    PARAM(P_ADDED, Added);             // Boolean
+}
+
+
 EVENT(E_SCENEEDITEND, SceneEditEnd)
 {
     PARAM(P_SCENE, Scene);             // Scene

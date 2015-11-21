@@ -58,6 +58,8 @@ public:
     void RegisterNode(Node* node);
     void RegisterNodes(const PODVector<Node*>& nodes);
 
+    void ReparentNode(Node* node, Node* newParent);
+
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
 

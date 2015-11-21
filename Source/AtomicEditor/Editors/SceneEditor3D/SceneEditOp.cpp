@@ -194,6 +194,17 @@ bool SelectionEditOp::Undo()
         {
             if(enode->parentBegin_.NotNull())
             {
+                // moving back to original parent
+
+                if (node->GetParent())
+                {
+                    VariantMap nodeRemovedEventData;
+                    nodeRemovedEventData[SceneEditNodeRemoved::P_NODE] = node;
+                    nodeRemovedEventData[SceneEditNodeRemoved::P_PARENT] =  node->GetParent();
+                    nodeRemovedEventData[SceneEditNodeRemoved::P_SCENE] = scene_;
+                    scene_->SendEvent(E_SCENEEDITNODEREMOVED, nodeRemovedEventData);
+                }
+
                 node->Remove();
                 enode->parentBegin_->AddChild(node);
 
@@ -299,10 +310,17 @@ bool SelectionEditOp::Redo()
         if (node->GetParent() != enode->parentEnd_)
         {
 
-
-
             if(enode->parentEnd_.NotNull())
             {
+                if (node->GetParent())
+                {
+                    VariantMap nodeRemovedEventData;
+                    nodeRemovedEventData[SceneEditNodeRemoved::P_NODE] = node;
+                    nodeRemovedEventData[SceneEditNodeRemoved::P_PARENT] =  node->GetParent();
+                    nodeRemovedEventData[SceneEditNodeRemoved::P_SCENE] = scene_;
+                    scene_->SendEvent(E_SCENEEDITNODEREMOVED, nodeRemovedEventData);
+                }
+
                 node->Remove();
                 enode->parentEnd_->AddChild(node);
 
