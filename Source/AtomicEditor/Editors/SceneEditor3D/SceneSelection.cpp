@@ -104,8 +104,11 @@ void SceneSelection::Paste()
 
     Node* parent = scene_;
 
-    if (nodes_.Size() == 1)
-        parent = nodes_[0];
+    if (nodes_.Size() >= 1)
+        parent = nodes_[0]->GetParent();
+
+    if (!parent)
+        parent = scene_;
 
     Clear();
 
@@ -120,8 +123,9 @@ void SceneSelection::Paste()
 
         Matrix3x4 transform = clipNode->GetWorldTransform();
 
-        parent->AddChild(clipNode);
         clipNode->SetWorldTransform(transform.Translation(), transform.Rotation(), transform.Scale());
+        parent->AddChild(clipNode);
+
 
         // clone
         newClipBoardNodes.Push(SharedPtr<Node>(clipNode->Clone()));
