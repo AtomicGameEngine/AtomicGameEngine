@@ -395,7 +395,15 @@ class FloatAttributeEdit extends AttributeInfoEdit {
                 var widget = this.editWidget;
                 var attrInfo = this.attrInfo;
                 var value = object.getAttribute(attrInfo.name);
-                widget.text = parseFloat(value.toFixed(5)).toString();
+
+                if (value == undefined) {
+
+                  console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
+                  widget.text = "???";
+
+                } else {
+                  widget.text = parseFloat(value.toFixed(5)).toString();
+                }
 
             }
 

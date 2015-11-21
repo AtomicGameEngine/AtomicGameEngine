@@ -7,6 +7,7 @@ import "./ComponentAttributeUI";
 
 abstract class SelectionSection extends Atomic.UISection {
 
+    hasDynamicAttr: boolean = false;
     editType: SerializableEditType;
     attrLayout: Atomic.UILayout;
     suppressed: boolean = false;

@@ -101,6 +101,8 @@ class JSComponentSection extends ComponentSection {
 
         super(editType, inspector);
 
+        this.hasDynamicAttr = true;
+
         this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
 
     }
@@ -113,10 +115,7 @@ class JSComponentSection extends ComponentSection {
             return;
 
         var attrInfos = jsc.getAttributes();
-
         this.updateDynamicAttrInfos(attrInfos);
-
-        //console.log("Resource Changed:", this.editType.typeName, ev.attrInfoEdit.attrInfo.name, ev.resource.name);
 
     }
 
@@ -654,6 +653,16 @@ class SelectionInspector extends ScriptWidget {
                 if (section.editType.objects.indexOf(serial) != -1) {
 
                     sections.push(section);
+
+                    if (section.hasDynamicAttr) {
+
+                        var object = section.editType.getFirstObject();
+                        if (object) {
+                            var attrInfos = object.getAttributes();
+                            section.updateDynamicAttrInfos(attrInfos);
+                        }
+                    }
+
                     section.refresh();
                 }
 
