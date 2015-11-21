@@ -5,8 +5,6 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
-import ComponentInspector = require("./ComponentInspector");
-
 var audioCreateSource = new Atomic.UIMenuItemSource();
 
 audioCreateSource.addItem(new Atomic.UIMenuItem("SoundListener", "SoundListener"));

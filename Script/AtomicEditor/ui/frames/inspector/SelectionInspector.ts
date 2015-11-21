@@ -417,7 +417,7 @@ class SelectionInspector extends ScriptWidget {
 
                 if (this.filterComponent(components[i]))
                     continue;
-                    
+
                 var editType = this.addSerializable(components[i]);
                 editType.addNode(node);
             }
@@ -559,6 +559,14 @@ class SelectionInspector extends ScriptWidget {
 
             var editType = this.addSerializable(c);
             editType.addNode(node);
+
+            for (var i in this.sections) {
+                if (this.sections[i].editType == editType) {
+                    this.sections[i].value = 1;
+                    break;
+                }
+
+            }
 
         }
 
