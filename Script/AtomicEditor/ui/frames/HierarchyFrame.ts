@@ -348,6 +348,8 @@ class HierarchyFrame extends Atomic.UIWidget {
 
                 var selectedId = Number(this.hierList.rootList.selectedItemID);
                 var node = this.scene.getNode(selectedId);
+                if (!node)
+                    node = this.scene;
                 if (this.menu.handlePopupMenu(data.target, data.refid, node))
                     return true;
 
