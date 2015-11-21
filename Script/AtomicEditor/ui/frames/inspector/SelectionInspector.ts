@@ -414,6 +414,10 @@ class SelectionInspector extends ScriptWidget {
             this.addSerializable(node);
             var components = node.getComponents();
             for (var i in components) {
+
+                if (this.filterComponent(components[i]))
+                    continue;
+                    
                 var editType = this.addSerializable(components[i]);
                 editType.addNode(node);
             }
@@ -431,6 +435,10 @@ class SelectionInspector extends ScriptWidget {
             this.removeSerializable(node);
             var components = node.getComponents();
             for (var i in components) {
+
+                if (this.filterComponent(components[i]))
+                    continue;
+
                 this.removeSerializable(components[i]);
             }
 
@@ -630,6 +638,16 @@ class SelectionInspector extends ScriptWidget {
         var node = this.nodes[0];
         this.removeNode(node);
         this.addNode(node);
+
+    }
+
+    filterComponent(component: Atomic.Component): boolean {
+
+        if (component.typeName == "PrefabComponent") {
+            return true;
+        }
+
+        return false;
 
     }
 
