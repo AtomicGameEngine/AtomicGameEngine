@@ -8,6 +8,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Component.h>
+#include <Atomic/Scene/PrefabComponent.h>
 #include <Atomic/Scene/Scene.h>
 
 #include "SceneEditOp.h"
@@ -58,6 +59,7 @@ void SelectionEditOp::AddNode(Node* node)
         EditComponent* ecomponent = new EditComponent();
         ecomponent->component_ = component;
         ecomponent->nodeBegin_ = ecomponent->nodeEnd_ = node;
+        ecomponent->temporaryBegin_ = ecomponent->temporaryEnd_ = component->IsTemporary();
         component->Serializable::Save(ecomponent->stateBegin_);
         ecomponent->stateBegin_.Seek(0);
         ecomponent->stateEnd_ = ecomponent->stateBegin_;
@@ -129,6 +131,9 @@ bool SelectionEditOp::Commit()
             if (ecomponent->nodeBegin_ != ecomponent->nodeEnd_)
                 return true;
 
+            if (ecomponent->temporaryBegin_ != ecomponent->temporaryEnd_)
+                return true;
+
             if (!CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_))
                 return true;
 
@@ -157,6 +162,7 @@ void SelectionEditOp::RegisterEdit()
             ecomponent->component_->Serializable::Save(ecomponent->stateEnd_);
             ecomponent->stateEnd_.Seek(0);
             ecomponent->nodeEnd_ = ecomponent->component_->GetNode();
+            ecomponent->temporaryEnd_ = ecomponent->component_->IsTemporary();
         }
 
     }
@@ -249,15 +255,19 @@ bool SelectionEditOp::Undo()
 
             ecomponent->stateBegin_.Seek(0);
 
-            if (component->GetNode() != ecomponent->nodeBegin_)
+            if (component->GetNode() != ecomponent->nodeBegin_ || component->IsTemporary() != ecomponent->temporaryBegin_)
             {
                 component->Remove();
+
+                bool add = ecomponent->nodeBegin_.NotNull();
+
+                component->SetTemporary(ecomponent->temporaryBegin_);
 
                 VariantMap caData;
                 caData[SceneEditComponentAddedRemoved::P_SCENE] = scene_;
                 caData[SceneEditComponentAddedRemoved::P_COMPONENT] = component;
 
-                if (ecomponent->nodeBegin_.NotNull())
+                if (add)
                 {
                     ecomponent->nodeBegin_->AddComponent(component, 0, REPLICATED);
                     caData[SceneEditComponentAddedRemoved::P_NODE] = ecomponent->nodeBegin_;
@@ -364,15 +374,19 @@ bool SelectionEditOp::Redo()
                 component->SendEvent(E_SCENEEDITSTATECHANGE, eventData);
             }
 
-            if (component->GetNode() != ecomponent->nodeEnd_)
+            if (component->GetNode() != ecomponent->nodeEnd_ || component->IsTemporary() != ecomponent->temporaryEnd_)
             {
                 component->Remove();
+
+                bool add = ecomponent->nodeEnd_.NotNull();
+
+                component->SetTemporary(ecomponent->temporaryEnd_);
 
                 VariantMap caData;
                 caData[SceneEditComponentAddedRemoved::P_SCENE] = scene_;
                 caData[SceneEditComponentAddedRemoved::P_COMPONENT] = component;
 
-                if (ecomponent->nodeEnd_.NotNull())
+                if (add)
                 {
                     ecomponent->nodeEnd_->AddComponent(component, 0, REPLICATED);
                     caData[SceneEditComponentAddedRemoved::P_NODE] = ecomponent->nodeEnd_;

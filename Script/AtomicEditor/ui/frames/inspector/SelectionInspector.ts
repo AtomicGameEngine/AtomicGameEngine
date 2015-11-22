@@ -172,6 +172,7 @@ class SelectionInspector extends ScriptWidget {
         this.subscribeToEvent("SceneEditStateChange", (data) => this.handleSceneEditStateChangeEvent(data));
         this.subscribeToEvent(sceneEditor.scene, "SceneEditStateChangesEnd", (data) => this.handleSceneEditStateChangesEndEvent());
 
+        this.subscribeToEvent(sceneEditor.scene, "SceneEditNodeRemoved", (ev: Editor.SceneEditNodeRemovedEvent) => this.handleSceneEditNodeRemoved(ev));
         this.subscribeToEvent(sceneEditor.scene, "SceneEditComponentAddedRemoved", (ev) => this.handleSceneEditComponentAddedRemovedEvent(ev));
 
         this.subscribeToEvent(this.createComponentButton, "SelectionCreateComponent", (data) => this.handleSelectionCreateComponent(data));
@@ -481,7 +482,19 @@ class SelectionInspector extends ScriptWidget {
 
     }
 
+    handleSceneEditNodeRemoved(ev: Editor.SceneEditNodeRemovedEvent) {
+
+        this.removeNode(ev.node);
+
+    }
+
     handleSceneEditComponentAddedRemovedEvent(ev: Editor.SceneEditComponentAddedRemovedEvent) {
+
+        if (this.filterComponent(ev.component)) {
+            // still refresh as may affect UI (for example PrefabComponents)
+            this.refresh();
+            return;
+        }
 
         if (!ev.removed) {
 
@@ -653,6 +666,8 @@ class SelectionInspector extends ScriptWidget {
             return;
 
         c.breakPrefab();
+
+        this.sceneEditor.scene.sendEvent("SceneEditEnd");
 
         var node = this.nodes[0];
         this.removeNode(node);

@@ -86,6 +86,8 @@ private:
         SharedPtr<Node> nodeEnd_;
         VectorBuffer stateBegin_;
         VectorBuffer stateEnd_;
+        bool temporaryBegin_;
+        bool temporaryEnd_;
     };
 
     struct EditNode
