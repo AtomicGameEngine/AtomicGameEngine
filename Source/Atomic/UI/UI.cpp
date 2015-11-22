@@ -154,6 +154,14 @@ void UI::Shutdown()
 
 }
 
+bool UI::GetFocusedWidget()
+{
+    if (!TBWidget::focused_widget)
+        return false;
+
+    return TBWidget::focused_widget->IsOfType<TBEditField>();
+}
+
 void UI::SetBlockChangedEvents(bool blocked)
 {
     if (blocked)

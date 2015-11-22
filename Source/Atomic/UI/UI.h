@@ -98,6 +98,8 @@ public:
     void ShowConsole(bool value);
     void ToggleConsole();
 
+    bool GetFocusedWidget();
+
     /// request exit on next frame
     void RequestExit() { exitRequested_ = true; inputDisabled_ = true; }
 

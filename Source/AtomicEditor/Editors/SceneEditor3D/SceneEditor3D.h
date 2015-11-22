@@ -77,6 +77,8 @@ public:
 
     ProjectUserPrefs* GetUserPrefs();
 
+    void InvokeShortcut(const String& shortcut);
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);

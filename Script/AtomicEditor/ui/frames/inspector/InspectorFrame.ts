@@ -54,7 +54,10 @@ class InspectorFrame extends ScriptWidget {
         this.scene = null;
 
         if (!event.sceneEditor)
+        {
+            this.closeSelectionInspector();
             return;
+        }
 
         this.sceneEditor = event.sceneEditor;
         this.scene = event.sceneEditor.scene;

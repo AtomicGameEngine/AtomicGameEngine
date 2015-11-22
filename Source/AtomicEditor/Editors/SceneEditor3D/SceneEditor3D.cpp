@@ -348,6 +348,17 @@ void SceneEditor3D::UpdateGizmoSnapSettings()
 
 }
 
+void SceneEditor3D::InvokeShortcut(const String& shortcut)
+{
+    if (shortcut == "frameselected")
+    {
+        sceneView_->FrameSelection();
+        return;
+    }
+
+    ResourceEditor::InvokeShortcut(shortcut);
+}
+
 void SceneEditor3D::ReparentNode(Node* node, Node* newParent)
 {
     // can't parent to self

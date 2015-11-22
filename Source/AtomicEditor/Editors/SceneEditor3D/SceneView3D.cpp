@@ -252,13 +252,6 @@ void SceneView3D::MoveCamera(float timeStep)
             cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
         }
     }
-    else if (!superdown)
-    {
-        if (input->GetKeyPress(KEY_F))
-        {
-            FrameSelection();
-        }
-    }
 
     if (cameraMove_)
     {

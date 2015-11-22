@@ -53,7 +53,7 @@ public:
 
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }
 
-    void InvokeShortcut(const String& shortcut);
+    virtual void InvokeShortcut(const String& shortcut);
 
     void RequestClose();
 

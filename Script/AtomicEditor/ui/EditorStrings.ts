@@ -23,7 +23,8 @@ export enum StringID {
     ShortcutPlay,
     ShortcutPlayDebug,
     ShortcutBuild,
-    ShortcutBuildSettings
+    ShortcutBuildSettings,
+    ShortcutFrameSelected
 }
 
 export class EditorString {
@@ -64,7 +65,10 @@ export class EditorString {
         lookup[StringID.ShortcutCopy] = shortcutKey + "C";
         lookup[StringID.ShortcutPaste] = shortcutKey + "V";
         lookup[StringID.ShortcutSelectAll] = shortcutKey + "A";
+
         lookup[StringID.ShortcutFind] = shortcutKey + "F";
+
+        lookup[StringID.ShortcutFrameSelected] = "F";
 
         lookup[StringID.ShortcutBeautify] = shortcutKey + "I";
 
