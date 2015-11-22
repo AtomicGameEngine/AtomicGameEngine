@@ -235,6 +235,42 @@ void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
 
 }
 
+duk_bool_t js_check_is_buffer_and_get_data(duk_context* ctx, duk_idx_t idx, void** data, duk_size_t* size)
+{
+    void* temp;
+    if (duk_is_buffer(ctx, idx))
+    {
+        temp = duk_get_buffer_data(ctx, idx, size);
+        if (data)
+        {
+            *data = temp;
+        }
+        return true;
+    }
+    if (!(duk_is_object(ctx, idx) &&
+        duk_has_prop_string(ctx, idx, "length") &&
+        duk_has_prop_string(ctx, idx, "byteLength") &&
+        duk_has_prop_string(ctx, idx, "byteOffset") &&
+        duk_has_prop_string(ctx, idx, "BYTES_PER_ELEMENT")))
+    {
+        if (data)
+        {
+            *data = nullptr;
+        }
+        if (size)
+        {
+            *size = 0;
+        }
+        return false;
+    }
+    temp = duk_require_buffer_data(ctx, idx, size);
+    if (data)
+    {
+        *data = temp;
+    }
+    return true;
+}
+
 void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
 {
     v.Clear();
@@ -313,7 +349,18 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
         return;
     }
 
-    // object check after array
+    {
+        void* bufferData;
+        duk_size_t bufferSize;
+        if (js_check_is_buffer_and_get_data(ctx, variantIdx, &bufferData, &bufferSize))
+        {
+            // copy the buffer into the variant
+            v.SetBuffer(bufferData, (unsigned)bufferSize);
+            return;
+        }
+    }
+
+    // object check after array and buffer object check
     if (duk_is_object(ctx, variantIdx))
     {
         RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
@@ -473,6 +520,15 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     case VAR_STRING:
         duk_push_string(ctx, v.GetString().CString());
         break;
+    case VAR_BUFFER:
+    {
+        const PODVector<unsigned char>& buffer(v.GetBuffer()); // The braces are to scope this reference.
+        duk_push_fixed_buffer(ctx, buffer.Size());
+        duk_push_buffer_object(ctx, -1, 0, buffer.Size(), DUK_BUFOBJ_UINT8ARRAY);
+        duk_replace(ctx, -2);
+        unsigned char* data((unsigned char*)duk_require_buffer_data(ctx, -1, (duk_size_t*)nullptr));
+        memcpy(data, buffer.Buffer(), buffer.Size());
+    }   break;
     case VAR_VECTOR2:
         vector2 = v.GetVector2();
         duk_push_array(ctx);

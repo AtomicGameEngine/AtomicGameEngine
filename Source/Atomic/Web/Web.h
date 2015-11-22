@@ -32,7 +32,7 @@ namespace Atomic
 class WebRequest;
 class WebSocket;
 
-class WebPrivate;
+struct WebPrivate;
 
 /// %Web subsystem. Manages HTTP requests and WebSocket communications.
 class ATOMIC_API Web : public Object
