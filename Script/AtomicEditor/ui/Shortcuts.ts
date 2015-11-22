@@ -112,7 +112,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
             // TODO: Make these customizable
 
-            if (!Atomic.ui.focusedWidget) {
+            if (!Atomic.ui.focusedWidget && !this.cmdKeyDown()) {
 
                 if (ev.key == Atomic.KEY_W) {
                     this.invokeGizmoEditModeChanged(Editor.EDIT_MOVE);
@@ -131,8 +131,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     }
 
-    // global shortcut handler
-    handleUIShortcut(ev: Atomic.UIShortcutEvent) {
+    cmdKeyDown(): boolean {
 
         var cmdKey;
         if (Atomic.platform == "MacOSX") {
@@ -140,6 +139,16 @@ class Shortcuts extends Atomic.ScriptObject {
         } else {
             cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LCTRL) || Atomic.input.getKeyDown(Atomic.KEY_RCTRL));
         }
+
+        return cmdKey;
+
+
+    }
+
+    // global shortcut handler
+    handleUIShortcut(ev: Atomic.UIShortcutEvent) {
+
+        var cmdKey = this.cmdKeyDown();
 
         if (cmdKey) {
 

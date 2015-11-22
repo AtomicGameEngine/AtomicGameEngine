@@ -310,6 +310,11 @@ void SceneEditor3D::Redo()
     editHistory_->Redo();
 }
 
+void SceneEditor3D::Cut()
+{
+    selection_->Cut();
+}
+
 void SceneEditor3D::Copy()
 {
     selection_->Copy();

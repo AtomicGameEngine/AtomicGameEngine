@@ -79,13 +79,11 @@ void SceneSelection::RemoveNode(Node* node, bool quiet)
 
     nodes_.Remove(_node);
 
-    if (quiet)
-        return;
-
     VariantMap eventData;
     eventData[SceneNodeSelected::P_SCENE] = scene_;
     eventData[SceneNodeSelected::P_NODE] = node;
     eventData[SceneNodeSelected::P_SELECTED] = false;    
+    eventData[SceneNodeSelected::P_QUIET] = quiet;
     scene_->SendEvent(E_SCENENODESELECTED, eventData);
 
 }
@@ -159,6 +157,11 @@ void SceneSelection::Paste()
 
 }
 
+void SceneSelection::Cut()
+{
+    Copy();
+    Delete();
+}
 
 void SceneSelection::Copy()
 {
@@ -284,6 +287,7 @@ void SceneSelection::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNo
 void SceneSelection::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
+
     RemoveNode(node, true);
 }
 

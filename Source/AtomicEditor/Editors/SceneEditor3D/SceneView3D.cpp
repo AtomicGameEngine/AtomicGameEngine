@@ -323,6 +323,8 @@ void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& ev
         sceneEditor_->Redo();
     else if (id == TBIDC("copy"))
         sceneEditor_->Copy();
+    else if (id == TBIDC("cut"))
+        sceneEditor_->Cut();
     else if (id == TBIDC("paste"))
         sceneEditor_->Paste();
 

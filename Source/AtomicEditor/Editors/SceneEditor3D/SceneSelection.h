@@ -33,6 +33,7 @@ public:
 
     Vector<SharedPtr<Node>>& GetNodes() { return nodes_; }
 
+    void Cut();
     void Copy();
     void Paste();
     void Delete();

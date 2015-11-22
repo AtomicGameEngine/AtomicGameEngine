@@ -197,6 +197,10 @@ void SceneEditHistory::Redo()
 
 void SceneEditHistory::HandleSceneNodeSelected(StringHash eventType, VariantMap& eventData)
 {
+
+    if (eventData[SceneNodeSelected::P_QUIET].GetBool())
+        return;
+
     if (curSelEditOp_)
     {
         EndSelectionEdit();

@@ -74,7 +74,7 @@ class InspectorFrame extends ScriptWidget {
 
             for (var i = 0; i < selection.getSelectedNodeCount(); i++) {
 
-                this.handleSceneNodeSelected( { node: selection.getSelectedNode(i),  scene: this.scene, selected: true} );
+                this.handleSceneNodeSelected( { node: selection.getSelectedNode(i),  scene: this.scene, selected: true, quiet: true} );
 
             }
 
@@ -96,6 +96,8 @@ class InspectorFrame extends ScriptWidget {
 
     handleSceneNodeSelected(ev: Editor.SceneNodeSelectedEvent) {
 
+        var selection = this.sceneEditor.selection;
+
         if (this.selectionInspector) {
 
             if (ev.selected) {
@@ -115,8 +117,7 @@ class InspectorFrame extends ScriptWidget {
 
         }
 
-        var selection = this.sceneEditor.selection;
-
+        // close last, so state is saved
         if (!selection.selectedNodeCount) {
             this.closeSelectionInspector();
         }

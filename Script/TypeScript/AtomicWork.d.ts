@@ -265,6 +265,7 @@ declare module Editor {
         scene: Atomic.Scene;
         node: Atomic.Node;
         selected: boolean;
+        quiet: boolean;
     }
 
     export interface SceneEditAddRemoveNodesEvent {

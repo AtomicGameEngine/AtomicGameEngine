@@ -35,6 +35,7 @@ EVENT(E_SCENENODESELECTED, SceneNodeSelected)
     PARAM(P_SCENE, Scene);             // Scene
     PARAM(P_NODE, Node);               // Node
     PARAM(P_SELECTED, Selected);       // bool
+    PARAM(P_QUIET, Quiet);             // bool (don't record edit event)
 }
 
 EVENT(E_SCENEEDITBEGIN, SceneEditBegin)
