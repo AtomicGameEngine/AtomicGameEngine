@@ -33,6 +33,12 @@ abstract class SelectionSection extends Atomic.UISection {
 
     }
 
+    contains(serial:Atomic.Serializable):boolean {
+
+        return this.editType.objects.indexOf(serial) == -1;
+
+    }
+
     refresh() {
 
         for (var name in this.attrEdits) {

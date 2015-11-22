@@ -498,6 +498,19 @@ class SelectionInspector extends ScriptWidget {
 
         if (!ev.removed) {
 
+            for (var i in this.sections) {
+
+                var section = this.sections[i];
+
+                if (section.contains(ev.component)) {
+
+                    // this happens on a prefab break/unbreak
+                    // when only temporary is changing
+                    return;
+
+                }
+            }
+
             editType = this.addSerializable(ev.component);
             editType.addNode(ev.node);
 
