@@ -30,6 +30,9 @@ class Shortcuts extends Atomic.ScriptObject {
         } else {
             var playerWindow = Preferences.getInstance().playerWindow;
             if (playerWindow) {
+                var desktopResolution = Atomic.graphics.getDesktopResolution();
+                if (playerWindow.width > desktopResolution[0]) playerWindow.width = desktopResolution[0];
+                if (playerWindow.height > desktopResolution[1]) playerWindow.height = desktopResolution[1];
                 if ((playerWindow.monitor + 1) > Atomic.graphics.getMonitorsNumber()) {
                     var args = "--windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
                     Atomic.editorMode.playProject(args, debug);
