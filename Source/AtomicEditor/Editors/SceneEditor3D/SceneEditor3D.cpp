@@ -111,8 +111,8 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(scene_, E_SCENEEDITNODECREATED, HANDLER(SceneEditor3D, HandleSceneEditNodeCreated));
 
-    SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
-    SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
+    SubscribeToEvent(E_EDITORPLAYERSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
+    SubscribeToEvent(E_EDITORPLAYERSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
     SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
 
 }

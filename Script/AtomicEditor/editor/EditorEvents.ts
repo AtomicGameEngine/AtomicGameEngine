@@ -14,6 +14,7 @@ export interface ModalErrorEvent {
 }
 
 export const PlayerStarted = "EditorPlayerStarted";
+export const PlayerStopped = "EditorPlayerStopped";
 export const PlayerLog = "EditorPlayerLog";
 export interface PlayerLogEvent {
 

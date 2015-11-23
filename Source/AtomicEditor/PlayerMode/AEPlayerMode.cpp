@@ -10,6 +10,7 @@
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Graphics/GraphicsEvents.h>
+#include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Camera.h>
 #include <Atomic/UI/SystemUI/DebugHud.h>
 #include <Atomic/UI/SystemUI/SystemUIEvents.h>
@@ -20,6 +21,8 @@
 #include <AtomicJS/Javascript/JSVM.h>
 #include <AtomicJS/Javascript/JSEvents.h>
 #include <AtomicJS/Javascript/JSIPCEvents.h>
+
+#include "AEPlayerEvents.h"
 
 #include "AEPlayerMode.h"
 
@@ -43,6 +46,7 @@ PlayerMode::PlayerMode(Context* context) :
 
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(PlayerMode, HandleLogMessage));
     SubscribeToEvent(E_JSERROR, HANDLER(PlayerMode, HandleJSError));
+    SubscribeToEvent(E_EXITREQUESTED, HANDLER(PlayerMode, HandleExitRequest));
 
     // BEGIN LICENSE MANAGEMENT
     SubscribeToEvent(E_BEGINVIEWRENDER, HANDLER(PlayerMode, HandleViewRender));
@@ -235,5 +239,18 @@ void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
 
 }
 
+void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    using namespace IPCPlayerWindowChanged;
+    VariantMap data;
+    data[P_POSX] = graphics->GetWindowPosition().x_;
+    data[P_POSY] = graphics->GetWindowPosition().y_;
+    data[P_WIDTH] = graphics->GetWidth();
+    data[P_HEIGHT] = graphics->GetHeight();
+    data[P_MONITOR] = graphics->GetCurrentMonitor();
+    ipc_->SendEventToBroker(E_IPCPLAYERWINDOWCHANGED, data);
+    SendEvent(E_PLAYERQUIT);
+}
 
 }

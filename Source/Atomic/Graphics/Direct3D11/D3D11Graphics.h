@@ -499,6 +499,13 @@ public:
     /// Return maximum number of supported bones for skinning.
     static unsigned GetMaxBones() { return 128; }
 
+    // ATOMIC BEGIN
+    /// Return the current monitor number
+    int GetCurrentMonitor();
+    /// Return the available monitors number
+    int GetMonitorsNumber();
+    // ATOMIC END
+
 private:
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable, bool borderless);

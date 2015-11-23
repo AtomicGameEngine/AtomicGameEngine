@@ -78,6 +78,9 @@ elements
 	PlayButton
 		bitmap play.png
 
+	StopButton
+		bitmap stop.png
+
 	PowerOffButton
 		bitmap power_off.png
 
@@ -171,7 +174,7 @@ elements
 	InspectorVectorAttrName
 		text-color #aaaaaa
 		min-width 140
-		max-width 140		
+		max-width 140
 
 	InspectorTextAttrName
 		padding 4

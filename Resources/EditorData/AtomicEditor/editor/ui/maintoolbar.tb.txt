@@ -1,11 +1,11 @@
 definitions
-	menubutton		
+	menubutton
 		lp: height: 28, width: 28
 		skin TBButton.uniformflat
 TBLayout: distribution: gravity, spacing: 4
-	TBButton 
+	TBButton
 		@include definitions>menubutton
-		TBSkinImage: skin: PlayButton
+		TBSkinImage: skin: PlayButton, id: skin_image
 		id maintoolbar_play
 	TBButton: toggle-mode: 1
 		@include definitions>menubutton

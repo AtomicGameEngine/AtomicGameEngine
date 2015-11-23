@@ -11,6 +11,8 @@
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCBroker.h>
 
+#include <Atomic/Input/InputEvents.h>
+
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/License/LicenseSystem.h>
@@ -19,6 +21,8 @@
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
 #include <Atomic/UI/SystemUI/DebugHud.h>
+
+#include "../PlayerMode/AEPlayerEvents.h"
 
 #include "AEEditorMode.h"
 
@@ -31,6 +35,7 @@ EditorMode::EditorMode(Context* context) :
     Object(context)
 {
     SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
+    SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
 }
 
 EditorMode::~EditorMode()
@@ -55,7 +60,9 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 
     playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
 
-    SendEvent("EditorPlayerStarted");
+    SendEvent(E_EDITORPLAYERSTARTED);
+
+    playerEnabled_ = true;
 
 }
 
@@ -63,8 +70,12 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
 {
     //SendEvent(E_EDITORPLAYSTOP);
 
-    if ( eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
+    if (eventData[IPCWorkerExit::P_BROKER] == playerBroker_) 
+    {
         playerBroker_ = 0;
+        playerEnabled_ = false;
+        SendEvent(E_EDITORPLAYERSTOPPED);
+    }
 }
 
 void EditorMode::HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData)
@@ -87,7 +98,7 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool EditorMode::PlayProject(bool debug)
+bool EditorMode::PlayProject(String addArgs, bool debug)
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -120,6 +131,9 @@ bool EditorMode::PlayProject(bool debug)
     if (debug)
         vargs.Insert(0, "--debug");
 
+    if (addArgs.Length() > 0)
+        vargs.Insert(0, addArgs.Split(' '));
+
     String dump;
     dump.Join(vargs, " ");
     LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
@@ -138,9 +152,16 @@ bool EditorMode::PlayProject(bool debug)
 
 }
 
-bool EditorMode::PlayProjectDebug()
+void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData)
 {
-    return PlayProject(true);
+    if (!playerBroker_) return;
+    VariantMap noEventData;
+    playerBroker_->PostMessage(E_EXITREQUESTED, noEventData);
+}
+
+bool EditorMode::IsPlayerEnabled()
+{
+    return playerEnabled_;
 }
 
 }

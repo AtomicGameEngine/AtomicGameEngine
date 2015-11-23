@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Atomic/Engine/Application.h>
+#include <Atomic/Resource/JSONFile.h>
 
 using namespace Atomic;
 
@@ -36,10 +37,11 @@ public:
 
 protected:
 
+    bool ReadPreferences(String& path, JSONValue& prefs, const String& propertyName = "");
+    
     SharedPtr<JSVM> vm_;
 
 private:
-
 
 };
 

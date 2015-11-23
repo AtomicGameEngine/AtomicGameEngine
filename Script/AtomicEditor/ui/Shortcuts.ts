@@ -7,6 +7,7 @@
 
 import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
+import Preferences = require("editor/Preferences")
 
 class Shortcuts extends Atomic.ScriptObject {
 
@@ -21,20 +22,27 @@ class Shortcuts extends Atomic.ScriptObject {
 
     }
 
-    invokePlay() {
-
+    //this should be moved somewhere else...
+    invokePlayOrStopPlayer(debug:boolean = false) {
         this.sendEvent(EditorEvents.SaveAllResources);
-        Atomic.editorMode.playProject();
-
+        if (Atomic.editorMode.isPlayerEnabled()) {
+            this.sendEvent("IPCPlayerExitRequest");
+        } else {
+            var playerWindow = Preferences.getInstance().playerWindow;
+            if (playerWindow) {
+                if ((playerWindow.monitor + 1) > Atomic.graphics.getMonitorsNumber()) {
+                    //will use default settings if monitor is not available
+                    var args = "--resizable";
+                    Atomic.editorMode.playProject(args, debug);
+                } else {
+                    var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
+                    Atomic.editorMode.playProject(args, debug);
+                }
+            } else {
+                Atomic.editorMode.playProject("", debug);
+            }
+        }
     }
-
-    invokePlayDebug() {
-
-        this.sendEvent(EditorEvents.SaveAllResources);
-        Atomic.editorMode.playProjectDebug();
-
-    }
-
 
     invokeFormatCode() {
 
@@ -162,7 +170,7 @@ class Shortcuts extends Atomic.ScriptObject {
                 this.invokeFormatCode();
             }
             else if (ev.key == Atomic.KEY_P) {
-                this.invokePlay();
+                this.invokePlayOrStopPlayer();
                 //if shift is pressed
             } else if (ev.qualifiers & Atomic.QUAL_SHIFT) {
                 if (ev.key == Atomic.KEY_B) {
