@@ -53,6 +53,7 @@ public:
     bool OnEvent(const TBWidgetEvent &ev);
 
     SceneSelection* GetSelection() { return selection_; }
+    SceneEditHistory* GetEditHistory() { return editHistory_; }
     SceneView3D* GetSceneView3D() { return sceneView_; }
 
     void RegisterNode(Node* node);

@@ -105,6 +105,21 @@ EVENT(E_SCENEEDITCOMPONENTADDEDREMOVED, SceneEditComponentAddedRemoved)
 
 }
 
+EVENT(E_SCENEEDITPREFABSAVE, SceneEditPrefabSave)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+EVENT(E_SCENEEDITPREFABREVERT, SceneEditPrefabRevert)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+
+EVENT(E_SCENEEDITPREFABBREAK, SceneEditPrefabBreak)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
 
 EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
 {

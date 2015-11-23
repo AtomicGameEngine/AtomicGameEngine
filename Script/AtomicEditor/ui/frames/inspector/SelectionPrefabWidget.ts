@@ -10,6 +10,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
     widgetLayout: Atomic.UILayout;
     noticeLayout: Atomic.UILayout;
+    node: Atomic.Node;
 
     constructor() {
 
@@ -38,17 +39,17 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         saveButton.onClick = () => {
 
-            this.sendEvent("SelectionPrefabSave");
+            this.node.scene.sendEvent("SceneEditPrefabSave", {node : this.node});
             return true;
         }
 
         var undoButton = new Atomic.UIButton();
-        undoButton.text = "Undo";
+        undoButton.text = "Revert";
         undoButton.fontDescription = fd;
 
         undoButton.onClick = () => {
 
-            this.sendEvent("SelectionPrefabUndo");
+            this.node.scene.sendEvent("SceneEditPrefabRevert", {node : this.node});
             return true;
 
         }
@@ -59,7 +60,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         breakButton.onClick = () => {
 
-            this.sendEvent("SelectionPrefabBreak");
+            this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
             return true;
         }
 
@@ -106,6 +107,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
     updateSelection(nodes: Atomic.Node[]) {
 
         var hasPrefab = false;
+        this.node = null;
 
         for (var i in nodes) {
 
@@ -132,6 +134,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
         this.noticeLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         this.widgetLayout.visibility = Atomic.UI_WIDGET_VISIBILITY_VISIBLE;
+        this.node = nodes[0];
 
     }
 

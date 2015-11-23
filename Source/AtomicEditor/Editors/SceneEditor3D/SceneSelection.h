@@ -57,6 +57,10 @@ private:
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
+    void HandleSceneEditPrefabSave(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditPrefabRevert(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditPrefabBreak(StringHash eventType, VariantMap& eventData);
+
     WeakPtr<SceneEditor3D> sceneEditor3D_;
     WeakPtr<Scene> scene_;
 

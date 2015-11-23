@@ -17,10 +17,12 @@
 #include <Atomic/Scene/SceneEvents.h>
 #include <Atomic/Scene/Node.h>
 #include <Atomic/Scene/Scene.h>
+#include <Atomic/Scene/PrefabComponent.h>
 
 #include "SceneEditor3D.h"
 #include "SceneEditor3DEvents.h"
 #include "SceneSelection.h"
+#include "SceneEditHistory.h"
 
 namespace AtomicEditor
 {
@@ -32,6 +34,10 @@ SceneSelection::SceneSelection(Context* context, SceneEditor3D *sceneEditor) : O
 
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneSelection, HandlePostRenderUpdate));
     SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneSelection, HandleNodeRemoved));
+
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABSAVE, HANDLER(SceneSelection, HandleSceneEditPrefabSave));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABREVERT, HANDLER(SceneSelection, HandleSceneEditPrefabRevert));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABBREAK, HANDLER(SceneSelection, HandleSceneEditPrefabBreak));
 }
 
 SceneSelection::~SceneSelection()
@@ -305,6 +311,71 @@ void SceneSelection::HandlePostRenderUpdate(StringHash eventType, VariantMap& ev
     {
         DrawNodeDebug(nodes_[i], debugRenderer);
     }
+
+}
+
+void SceneSelection::HandleSceneEditPrefabSave(StringHash eventType, VariantMap& eventData)
+{
+
+    Node* node = static_cast<Node*> ( eventData[SceneEditPrefabSave::P_NODE].GetPtr());
+
+    PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
+    if (!prefab)
+    {
+        LOGERRORF("Prefab Save: Unable to get prefab component for node: %s", node->GetName().CString());
+        return;
+    }
+
+    prefab->SavePrefab();
+
+    AddNode(node, true);
+}
+
+void SceneSelection::HandleSceneEditPrefabRevert(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = static_cast<Node*> ( eventData[SceneEditPrefabRevert::P_NODE].GetPtr());
+
+    PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
+    if (!prefab)
+    {
+        LOGERRORF("Prefab Revert: Unable to get prefab component for node: %s", node->GetName().CString());
+        return;
+    }
+
+    prefab->UndoPrefab();
+
+    AddNode(node, true);
+}
+
+void SceneSelection::HandleSceneEditPrefabBreak(StringHash eventType, VariantMap& eventData)
+{
+    Node* node = static_cast<Node*> ( eventData[SceneEditPrefabBreak::P_NODE].GetPtr());
+
+    PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
+    if (!prefab)
+    {
+        LOGERRORF("Prefab Break: Unable to get prefab component for node: %s", node->GetName().CString());
+        return;
+    }
+
+    Clear();
+
+    prefab->BreakPrefab();
+
+    PODVector<Node*> nodes;
+    node->GetChildren(nodes, true);
+    nodes.Insert(0, node);
+
+    SceneEditHistory* editHistory = sceneEditor3D_->GetEditHistory();
+
+    for (unsigned i = 0; i < nodes.Size(); i++)
+    {
+        editHistory->RemoveNode(nodes[i]);
+    }
+
+    AddNode(node, true);
+
+    scene_->SendEvent(E_SCENEEDITSCENEMODIFIED);
 
 }
 

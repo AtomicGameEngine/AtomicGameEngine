@@ -75,6 +75,9 @@ public:
     void NodeAdded(Node* node, Node* parent);
     void NodeRemoved(Node* node, Node* parent);
 
+    // Erases a node from the edit op, return true if no other nodes in the operation
+    bool EraseNode(Node *node);
+
     bool Commit();
 
 private:
@@ -86,8 +89,6 @@ private:
         SharedPtr<Node> nodeEnd_;
         VectorBuffer stateBegin_;
         VectorBuffer stateEnd_;
-        bool temporaryBegin_;
-        bool temporaryEnd_;
     };
 
     struct EditNode

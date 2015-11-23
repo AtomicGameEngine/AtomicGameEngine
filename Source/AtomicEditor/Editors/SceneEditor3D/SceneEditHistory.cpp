@@ -209,6 +209,55 @@ void SceneEditHistory::HandleSceneNodeSelected(StringHash eventType, VariantMap&
         BeginSelectionEdit();
 }
 
+void SceneEditHistory::RemoveNode(Node *node)
+{
+    PODVector<SelectionEditOp*> remove;
+
+    for (unsigned i = 0; i < undoHistory_.Size(); i++)
+    {
+
+        SelectionEditOp* op = undoHistory_[i];
+
+        if (op->EraseNode(node))
+        {
+            assert(!remove.Contains(op));
+            remove.Push(op);
+        }
+
+    }
+
+    for (unsigned i = 0; i < redoHistory_.Size(); i++)
+    {
+
+        SelectionEditOp* op = redoHistory_[i];
+
+        if (op->EraseNode(node))
+        {
+            assert(!remove.Contains(op));
+            remove.Push(op);
+        }
+
+    }
+
+    for (unsigned i = 0; i < remove.Size(); i++)
+    {
+        PODVector<SelectionEditOp*>::Iterator itr = undoHistory_.Find(remove[i]);
+
+        if (itr != undoHistory_.End())
+        {
+            delete *itr;
+            undoHistory_.Erase(itr);
+        }
+        else
+        {
+            itr = redoHistory_.Find(remove[i]);
+            delete *itr;
+            redoHistory_.Erase(itr);
+        }
+    }
+
+
+}
 
 }
 

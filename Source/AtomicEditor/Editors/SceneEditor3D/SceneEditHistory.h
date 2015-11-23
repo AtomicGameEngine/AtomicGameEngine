@@ -34,6 +34,9 @@ public:
     void BeginSelectionEdit();
     void EndSelectionEdit(bool begin = true);
 
+    /// Removes a node from the edit history
+    void RemoveNode(Node* node);
+
     void Undo();
     void Redo();
 

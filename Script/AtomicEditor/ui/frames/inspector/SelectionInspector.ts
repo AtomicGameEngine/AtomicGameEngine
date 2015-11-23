@@ -288,11 +288,6 @@ class SelectionInspector extends ScriptWidget {
             this.nodeSection = new NodeSection(editType);
             section = this.nodeSection;
 
-            this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabSave", (data) => this.handleSelectionPrefabSave());
-            this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabUndo", (data) => this.handleSelectionPrefabUndo());
-            this.subscribeToEvent(this.nodeSection.prefabWidget, "SelectionPrefabBreak", (data) => this.handleSelectionPrefabBreak());
-
-
         } else if (editType.typeName == "Scene") {
 
             section = new SceneSection(editType);
@@ -653,59 +648,6 @@ class SelectionInspector extends ScriptWidget {
             return this.getPrefabComponent(node.parent);
 
         return null;
-
-    }
-
-    handleSelectionPrefabSave() {
-
-        if (this.nodes.length != 1)
-            return;
-
-        var c = this.getPrefabComponent(this.nodes[0]);
-        if (!c)
-            return;
-
-        c.savePrefab();
-
-        var node = this.nodes[0];
-        this.removeNode(node);
-        this.addNode(node);
-
-    }
-
-    handleSelectionPrefabBreak() {
-
-        if (this.nodes.length != 1)
-            return;
-
-        var c = this.getPrefabComponent(this.nodes[0]);
-        if (!c)
-            return;
-
-        c.breakPrefab();
-
-        this.sceneEditor.scene.sendEvent("SceneEditEnd");
-
-        var node = this.nodes[0];
-        this.removeNode(node);
-        this.addNode(node);
-
-    }
-
-    handleSelectionPrefabUndo() {
-
-        if (this.nodes.length != 1)
-            return;
-
-        var c = this.getPrefabComponent(this.nodes[0]);
-        if (!c)
-            return;
-
-        c.undoPrefab();
-
-        var node = this.nodes[0];
-        this.removeNode(node);
-        this.addNode(node);
 
     }
 

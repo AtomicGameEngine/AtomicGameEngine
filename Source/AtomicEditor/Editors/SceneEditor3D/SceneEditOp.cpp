@@ -34,6 +34,28 @@ SelectionEditOp::~SelectionEditOp()
 
 }
 
+bool SelectionEditOp::EraseNode(Node *node)
+{
+    PODVector<EditNode*>::Iterator itr = editNodes_.Begin();
+
+    while (itr != editNodes_.End())
+    {
+        if ((*itr)->node_ == node)
+        {
+            for (unsigned j = 0; j < (*itr)->components_.Size(); j++)
+                delete (*itr)->components_[j];
+
+            delete *itr;
+            editNodes_.Erase(itr);
+            break;
+        }
+
+        itr++;
+    }
+
+    return editNodes_.Size() == 0;
+}
+
 void SelectionEditOp::AddNode(Node* node)
 {
 
@@ -59,7 +81,6 @@ void SelectionEditOp::AddNode(Node* node)
         EditComponent* ecomponent = new EditComponent();
         ecomponent->component_ = component;
         ecomponent->nodeBegin_ = ecomponent->nodeEnd_ = node;
-        ecomponent->temporaryBegin_ = ecomponent->temporaryEnd_ = component->IsTemporary();
         component->Serializable::Save(ecomponent->stateBegin_);
         ecomponent->stateBegin_.Seek(0);
         ecomponent->stateEnd_ = ecomponent->stateBegin_;
@@ -131,9 +152,6 @@ bool SelectionEditOp::Commit()
             if (ecomponent->nodeBegin_ != ecomponent->nodeEnd_)
                 return true;
 
-            if (ecomponent->temporaryBegin_ != ecomponent->temporaryEnd_)
-                return true;
-
             if (!CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_))
                 return true;
 
@@ -162,7 +180,6 @@ void SelectionEditOp::RegisterEdit()
             ecomponent->component_->Serializable::Save(ecomponent->stateEnd_);
             ecomponent->stateEnd_.Seek(0);
             ecomponent->nodeEnd_ = ecomponent->component_->GetNode();
-            ecomponent->temporaryEnd_ = ecomponent->component_->IsTemporary();
         }
 
     }
@@ -255,13 +272,11 @@ bool SelectionEditOp::Undo()
 
             ecomponent->stateBegin_.Seek(0);
 
-            if (component->GetNode() != ecomponent->nodeBegin_ || component->IsTemporary() != ecomponent->temporaryBegin_)
+            if (component->GetNode() != ecomponent->nodeBegin_)
             {
                 component->Remove();
 
                 bool add = ecomponent->nodeBegin_.NotNull();
-
-                component->SetTemporary(ecomponent->temporaryBegin_);
 
                 VariantMap caData;
                 caData[SceneEditComponentAddedRemoved::P_SCENE] = scene_;
@@ -374,13 +389,11 @@ bool SelectionEditOp::Redo()
                 component->SendEvent(E_SCENEEDITSTATECHANGE, eventData);
             }
 
-            if (component->GetNode() != ecomponent->nodeEnd_ || component->IsTemporary() != ecomponent->temporaryEnd_)
+            if (component->GetNode() != ecomponent->nodeEnd_)
             {
                 component->Remove();
 
                 bool add = ecomponent->nodeEnd_.NotNull();
-
-                component->SetTemporary(ecomponent->temporaryEnd_);
 
                 VariantMap caData;
                 caData[SceneEditComponentAddedRemoved::P_SCENE] = scene_;
