@@ -271,7 +271,7 @@ duk_bool_t js_check_is_buffer_and_get_data(duk_context* ctx, duk_idx_t idx, void
     return true;
 }
 
-void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v, VariantType variantType)
 {
     v.Clear();
 
@@ -363,15 +363,53 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
     // object check after array and buffer object check
     if (duk_is_object(ctx, variantIdx))
     {
-        RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
-        if (o)
-            v = o;
+        if (variantType == VAR_RESOURCEREFLIST)
+        {
+            ResourceRefList refList;
+
+            duk_get_prop_string(ctx, variantIdx, "typeName");
+            refList.type_ = duk_to_string(ctx, -1);
+
+            duk_get_prop_string(ctx, variantIdx, "resources");
+            int length = duk_get_length(ctx, -1);
+
+            for (int i = 0; i < length; i++) {
+
+                duk_get_prop_index(ctx, -1, i);
+
+                Resource* resource = NULL;
+
+                if (duk_is_object(ctx, -1))
+                {
+                     resource = js_to_class_instance<Resource>(ctx, -1, 0);
+
+                }
+
+                if (resource) {
+                    refList.names_.Push(resource->GetName());
+                }
+                else
+                    refList.names_.Push(String::EMPTY);
+
+                duk_pop(ctx);
+            }
+
+            duk_pop_n(ctx, 2);
+
+            v = refList;
+        }
+        else
+        {
+            RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
+            if (o)
+                v = o;
+        }
+
         return;
     }
 
 
 }
-
 
 // variant map Proxy getter, so we can convert access to string based
 // member lookup, to string hash on the fly
@@ -498,6 +536,31 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         Resource* resource = cache->GetResource(resourceRef.type_, resourceRef.name_);
         js_push_class_object_instance(ctx, resource);
     }   break;
+
+    case VAR_RESOURCEREFLIST:
+    {
+
+        const ResourceRefList& resourceRefList(v.GetResourceRefList());
+        const Context* context = JSVM::GetJSVM(ctx)->GetContext();
+
+        duk_push_object(ctx);
+        duk_push_string(ctx, context->GetTypeName(resourceRefList.type_).CString());
+        duk_put_prop_string(ctx, -2, "typeName");
+
+        duk_push_array(ctx);
+
+        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+
+        for (unsigned i = 0; i < resourceRefList.names_.Size(); i++) {
+
+            Resource* resource = cache->GetResource(resourceRefList.type_, resourceRefList.names_[i]);
+            js_push_class_object_instance(ctx, resource);
+            duk_put_prop_index(ctx, -2, i);
+        }
+
+        duk_put_prop_string(ctx, -2, "resources");
+
+    } break;
 
     case VAR_BOOL:
         duk_push_boolean(ctx, v.GetBool() ? 1 : 0);

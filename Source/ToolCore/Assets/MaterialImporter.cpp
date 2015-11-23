@@ -70,5 +70,16 @@ bool MaterialImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     return true;
 }
 
+Resource* MaterialImporter::GetResource(const String& typeName)
+{
+    if (!typeName.Length())
+        return 0;
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    return cache->GetResource(typeName, asset_->GetPath());
+
+}
+
+
 
 }

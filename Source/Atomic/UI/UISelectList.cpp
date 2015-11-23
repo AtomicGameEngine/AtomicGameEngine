@@ -65,6 +65,24 @@ void UISelectList::SetFilter(const String& filter)
     ((TBSelectList*)widget_)->SetFilter(filter.CString());
 }
 
+int UISelectList::GetNumItems() const
+{
+    if (!widget_)
+        return 0;
+
+    return ((TBSelectList*)widget_)->GetNumItems();
+
+}
+
+void UISelectList::SelectItem(int index, bool selected)
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->SelectItem(index, selected);
+
+}
+
 void UISelectList::SetValue(int value)
 {
     if (!widget_)
@@ -103,6 +121,28 @@ String UISelectList::GetSelectedItemID()
     GetSubsystem<UI>()->GetTBIDString(id, id_);
 
     return id_;
+}
+
+bool UISelectList::GetItemSelected(int index)
+{
+    if (!widget_)
+        return false;
+
+    return ((TBSelectList*)widget_)->GetItemSelected(index);
+}
+
+String UISelectList::GetItemID(int index)
+{
+    if (!widget_)
+        return "";
+
+    String _id;
+
+    TBID id = ((TBSelectList*)widget_)->GetItemID(index);
+
+    GetSubsystem<UI>()->GetTBIDString(id, _id);
+
+    return _id;
 
 }
 
@@ -216,5 +256,15 @@ void UISelectList::SelectPreviousItem()
 
     ((TBSelectList*)widget_)->ChangeValue(TB_KEY_UP);
 }
+
+void UISelectList::SetUIListView(bool value)
+{
+    if (!widget_)
+        return;
+
+    ((TBSelectList*)widget_)->SetUIListView(value);
+
+}
+
 
 }

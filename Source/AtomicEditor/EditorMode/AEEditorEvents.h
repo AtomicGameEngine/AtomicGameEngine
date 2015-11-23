@@ -94,14 +94,9 @@ EVENT(E_EDITORMODAL, EditorModal)
     PARAM(P_MESSAGE, Message);    // for modal errors, error text
 }
 
-EVENT(E_EDITORACTIVESCENECHANGE, EditorActiveSceneChange)
+EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
 {
-    PARAM(P_SCENE, Scene);      // Scene*
-}
-
-EVENT(E_EDITORACTIVENODECHANGE, EditorActiveNodeChange)
-{
-    PARAM(P_NODE, Node);      // Node*
+    PARAM(P_SCENEEDITOR, SceneEditor);
 }
 
 

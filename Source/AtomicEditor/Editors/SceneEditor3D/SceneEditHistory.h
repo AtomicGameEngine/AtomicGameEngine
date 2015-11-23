@@ -10,47 +10,57 @@
 #include <Atomic/Core/Object.h>
 
 using namespace Atomic;
+
 namespace Atomic
 {
-
-class Serializable;
-class Scene;
-
+class Node;
 }
 
 namespace AtomicEditor
 {
 
-class SceneEditOp;
+class SceneEditor3D;
+class SelectionEditOp;
 
-/// Simple scene history to support undo/redo via snapshots of scene state
 class SceneEditHistory: public Object
 {
     OBJECT(SceneEditHistory);
 
 public:
 
-    SceneEditHistory(Context* context, Scene* scene);
+    SceneEditHistory(Context* context, SceneEditor3D* sceneEditor);
     virtual ~SceneEditHistory();
+
+    void BeginSelectionEdit();
+    void EndSelectionEdit(bool begin = true);
+
+    /// Removes a node from the edit history
+    void RemoveNode(Node* node);
 
     void Undo();
     void Redo();
 
 private:
 
-    void HandleSceneEditSerializable(StringHash eventType, VariantMap& eventData);
-    void HandleSceneEditSerializableUndoRedo(StringHash eventType, VariantMap& eventData);
-    void HandleSceneEditNodeAddedRemoved(StringHash eventType, VariantMap& eventData);
+    void HandleSceneNodeSelected(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditBegin(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditEnd(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditAddRemoveNodes(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeAdded(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeRemoved(StringHash eventType, VariantMap& eventData);
 
-    void AddUndoOp(SceneEditOp* op);
+    void AddUndoOp(SelectionEditOp* op);
 
-    WeakPtr<Scene> scene_;
+    SharedPtr<SceneEditor3D> sceneEditor_;
 
-    HashMap< SharedPtr<Serializable>, VectorBuffer > editStates_;
+    SelectionEditOp* curSelEditOp_;
 
-    PODVector<SceneEditOp*> undoHistory_;
-    PODVector<SceneEditOp*> redoHistory_;
+    PODVector<SelectionEditOp*> undoHistory_;
+    PODVector<SelectionEditOp*> redoHistory_;
+
+    bool addingRemovingNodes_;
 
 };
 
 }
+

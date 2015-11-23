@@ -34,6 +34,7 @@
 #include "../../EditorMode/AEEditorEvents.h"
 
 #include "SceneEditor3D.h"
+#include "SceneSelection.h"
 #include "SceneEditHistory.h"
 #include "SceneEditor3DEvents.h"
 
@@ -63,7 +64,9 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     scene_->SetUpdateEnabled(false);
 
+    selection_ = new SceneSelection(context, this);
     sceneView_ = new SceneView3D(context_, this);
+    editHistory_ = new SceneEditHistory(context, this);
 
     // EARLY ACCESS
     if (fullpath.Find(String("ToonTown")) != String::NPOS)
@@ -95,7 +98,6 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     UpdateGizmoSnapSettings();
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
-    SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneEditor3D, HandleEditorActiveNodeChange));
 
     SubscribeToEvent(E_GIZMOEDITMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
     SubscribeToEvent(E_GIZMOAXISMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoAxisModeChanged));
@@ -107,15 +109,11 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
 
     SubscribeToEvent(E_PROJECTUSERPREFSAVED, HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
+    SubscribeToEvent(scene_, E_SCENEEDITNODECREATED, HANDLER(SceneEditor3D, HandleSceneEditNodeCreated));
+
     SubscribeToEvent(E_EDITORPLAYSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
-
-    SubscribeToEvent(scene_, E_NODEADDED, HANDLER(SceneEditor3D, HandleNodeAdded));
-    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneEditor3D, HandleNodeRemoved));
-
     SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
-
-    editHistory_ = new SceneEditHistory(context_, scene_);
 
 }
 
@@ -130,17 +128,7 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.special_key == TB_KEY_DELETE || ev.special_key == TB_KEY_BACKSPACE)
         {
-            if (selectedNode_)
-            {
-                VariantMap editData;
-                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-                editData[SceneEditNodeAddedRemoved::P_NODE] = selectedNode_;
-                editData[SceneEditNodeAddedRemoved::P_ADDED] = false;
-                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
-
-                selectedNode_->Remove();
-                selectedNode_ = 0;
-            }
+            selection_->Delete();
         }
 
     }
@@ -149,28 +137,13 @@ bool SceneEditor3D::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.ref_id == TBIDC("copy"))
         {
-            if (selectedNode_.NotNull())
-            {
-                clipboardNode_ = selectedNode_;
-            }
+            selection_->Copy();
+            return true;
         }
         else if (ev.ref_id == TBIDC("paste"))
         {
-            if (clipboardNode_.NotNull() && selectedNode_.NotNull())
-            {
-                SharedPtr<Node> pasteNode(clipboardNode_->Clone());
-
-                VariantMap eventData;
-                eventData[EditorActiveNodeChange::P_NODE] = pasteNode;
-                SendEvent(E_EDITORACTIVENODECHANGE, eventData);
-
-                VariantMap editData;
-                editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-                editData[SceneEditNodeAddedRemoved::P_NODE] = pasteNode;
-                editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
-
-                scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
-            }
+            selection_->Paste();
+            return true;
         }
         else if (ev.ref_id == TBIDC("close"))
         {
@@ -221,45 +194,9 @@ void SceneEditor3D::SetFocus()
     sceneView_->SetFocus();
 }
 
-void SceneEditor3D::SelectNode(Node* node)
-{
-    selectedNode_ = node;
-    if (!node)
-        gizmo3D_->Hide();
-    else
-        gizmo3D_->Show();
-
-
-}
-
-void SceneEditor3D::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
-{
-    // Node does not have values set here
-
-    //Node* node =  static_cast<Node*>(eventData[NodeAdded::P_NODE].GetPtr());
-    //LOGINFOF("Node Added: %s", node->GetName().CString());
-}
-
-
-void SceneEditor3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
-    if (node == selectedNode_)
-        SelectNode(0);
-}
-
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    Vector<Node*> editNodes;
-    if (selectedNode_.NotNull())
-        editNodes.Push(selectedNode_);
-    gizmo3D_->Update(editNodes);
-}
-
-void SceneEditor3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
-    SelectNode(node);
+    gizmo3D_->Update();
 }
 
 void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
@@ -321,6 +258,48 @@ bool SceneEditor3D::Save()
 
 }
 
+void SceneEditor3D::RegisterNode(Node * node)
+{
+    VariantMap eventData;
+    eventData[SceneEditAddRemoveNodes::P_END] = false;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+    // generate scene edit event
+
+    VariantMap nodeAddedEventData;
+    nodeAddedEventData[SceneEditNodeAdded::P_NODE] = node;
+    nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = node->GetParent();
+    nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+    scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
+
+    eventData[SceneEditAddRemoveNodes::P_END] = true;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+}
+
+void SceneEditor3D::RegisterNodes(const PODVector<Node*>& nodes)
+{
+    VariantMap eventData;
+    eventData[SceneEditAddRemoveNodes::P_END] = false;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+    // generate scene edit event
+
+    for (unsigned i = 0; i < nodes.Size(); i++)
+    {
+        Node* node = nodes[i];
+        VariantMap nodeAddedEventData;
+        nodeAddedEventData[SceneEditNodeAdded::P_NODE] = node;
+        nodeAddedEventData[SceneEditNodeAdded::P_PARENT] = node->GetParent();
+        nodeAddedEventData[SceneEditNodeAdded::P_SCENE] = scene_;
+        scene_->SendEvent(E_SCENEEDITNODEADDED, nodeAddedEventData);
+    }
+
+    eventData[SceneEditAddRemoveNodes::P_END] = true;
+    scene_->SendEvent(E_SCENEEDITADDREMOVENODES, eventData);
+
+}
+
 void SceneEditor3D::Undo()
 {
     editHistory_->Undo();
@@ -329,6 +308,29 @@ void SceneEditor3D::Undo()
 void SceneEditor3D::Redo()
 {
     editHistory_->Redo();
+}
+
+void SceneEditor3D::Cut()
+{
+    selection_->Cut();
+}
+
+void SceneEditor3D::Copy()
+{
+    selection_->Copy();
+}
+
+void SceneEditor3D::Paste()
+{
+    selection_->Paste();
+}
+
+void SceneEditor3D::HandleSceneEditNodeCreated(StringHash eventType, VariantMap& eventData)
+{
+    PODVector<Node*> nodes;
+    nodes.Push(static_cast<Node*>(eventData[SceneEditNodeCreated::P_NODE].GetPtr()));
+    RegisterNodes(nodes);
+    selection_->AddNode(nodes[0], true);
 }
 
 void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
@@ -341,34 +343,6 @@ void SceneEditor3D::HandleUserPrefSaved(StringHash eventType, VariantMap& eventD
     UpdateGizmoSnapSettings();
 }
 
-void SceneEditor3D::GetSelectionBoundingBox(BoundingBox& bbox)
-{
-    bbox.Clear();
-
-    if (selectedNode_.Null())
-        return;
-
-    // TODO: Adjust once multiple selection is in
-    if (selectedNode_.Null())
-        return;
-
-    // Get all the drawables, which define the bounding box of the selection
-    PODVector<Drawable*> drawables;
-    selectedNode_->GetDerivedComponents<Drawable>(drawables, true);
-
-    if (!drawables.Size())
-        return;
-
-    // Calculate the combined bounding box of all drawables
-    for (unsigned i = 0; i < drawables.Size(); i++  )
-    {
-        Drawable* drawable = drawables[i];
-        bbox.Merge(drawable->GetWorldBoundingBox());
-    }
-
-
-}
-
 void SceneEditor3D::UpdateGizmoSnapSettings()
 {
     gizmo3D_->SetSnapTranslationX(userPrefs_->GetSnapTranslationX());
@@ -376,6 +350,79 @@ void SceneEditor3D::UpdateGizmoSnapSettings()
     gizmo3D_->SetSnapTranslationZ(userPrefs_->GetSnapTranslationZ());
     gizmo3D_->SetSnapRotation(userPrefs_->GetSnapRotation());
     gizmo3D_->SetSnapScale(userPrefs_->GetSnapScale());
+
+}
+
+void SceneEditor3D::InvokeShortcut(const String& shortcut)
+{
+    if (shortcut == "frameselected")
+    {
+        sceneView_->FrameSelection();
+        return;
+    }
+
+    ResourceEditor::InvokeShortcut(shortcut);
+}
+
+void SceneEditor3D::ReparentNode(Node* node, Node* newParent)
+{
+    // can't parent to self
+    if (node == newParent)
+        return;
+
+    // already parented
+    Node* oldParent = node->GetParent();
+    if (oldParent == newParent)
+        return;
+
+    // must be in same scene
+    if (node->GetScene() != newParent->GetScene())
+    {
+        return;
+    }
+
+    // check if dropping on child of ourselves
+
+    Node* parent = newParent;
+
+    while (parent)
+    {
+        if (parent == node)
+        {
+            return;
+        }
+
+        parent = parent->GetParent();
+    }
+
+    selection_->AddNode(node, true);
+
+    Matrix3x4 transform = node->GetWorldTransform();
+
+    newParent->AddChild(node);
+
+    node->SetWorldTransform(transform.Translation(), transform.Rotation(), transform.Scale());
+
+    scene_->SendEvent(E_SCENEEDITEND);
+
+    PODVector<Node*> nodes;
+    node->GetChildren(nodes, true);
+    nodes.Insert(0, node);
+
+    VariantMap evData;
+    for (unsigned i = 0; i < nodes.Size(); i++)
+    {
+        evData[SceneEditNodeReparent::P_NODE] = nodes[i];
+        evData[SceneEditNodeReparent::P_ADDED] = false;
+        scene_->SendEvent(E_SCENEEDITNODEREPARENT, evData);
+    }
+
+    evData[SceneEditNodeReparent::P_NODE] = node;
+    evData[SceneEditNodeReparent::P_ADDED] = true;
+    scene_->SendEvent(E_SCENEEDITNODEREPARENT, evData);
+
+    selection_->AddNode(node, true);
+
 
 }
 

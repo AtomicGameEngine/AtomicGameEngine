@@ -129,9 +129,7 @@ class Editor extends Atomic.ScriptObject {
 
     handleProjectUnloaded(event) {
 
-        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: null });
-
-
+        this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: null });
 
     }
 

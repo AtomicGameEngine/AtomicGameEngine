@@ -23,6 +23,11 @@
 #include <TurboBadger/tb_menu_window.h>
 #include <TurboBadger/tb_select.h>
 
+#include <Atomic/IO/Log.h>
+#include <Atomic/Core/Timer.h>
+
+#include "UI.h"
+#include "UIEvents.h"
 #include "UIListView.h"
 
 using namespace tb;
@@ -33,66 +38,6 @@ namespace Atomic
 class ListViewItemSource;
 class ListViewItemWidget;
 
-class ListViewItem : public TBGenericStringItem
-{
-    bool expanded_;
-
-public:
-    ListViewItem(const char *str, const TBID &id, const char* icon,  ListViewItemSource* source)
-        : TBGenericStringItem(str, id), source_(source), parent_(0),
-          depth_(0), widget_(0), expanded_(false), icon_(icon)
-    {
-
-    }
-
-    ListViewItem* AddChild(const char* text, const char* icon, const TBID &id);
-
-    bool GetExpanded() { return expanded_; }
-
-    void GetChildren(PODVector<ListViewItem*>& children, bool recursive = false)
-    {
-        children += children_;
-
-        if (recursive)
-        {
-            for (unsigned i = 0; i < children_.Size(); i++)
-            {
-                children_[i]->GetChildren(children, recursive);
-            }
-        }
-    }
-
-    void SetExpanded(bool expanded)
-    {
-        expanded_ = expanded;
-        if (!expanded_)
-        {
-            for (unsigned i = 0; i < children_.Size(); i ++)
-                children_[i]->SetExpanded(expanded);
-        }
-        else
-        {
-            ListViewItem* p = parent_;
-            while (p)
-            {
-                p->expanded_ = true;
-                p = p->parent_;
-            }
-        }
-    }
-
-    void UpdateText(const String& text);
-    void UpdateTextSkin(const String& skin);
-    void UpdateIcon(const String& icon);
-
-    ListViewItemSource* source_;
-    ListViewItem* parent_;
-    int depth_;
-    PODVector<ListViewItem*> children_;
-    ListViewItemWidget* widget_;
-    String icon_;
-    String textSkin_;
-};
 
 class ListViewItemWidget : public TBLayout
 {
@@ -118,6 +63,13 @@ public:
             textField_->SetSkinBg(TBIDC(skin.CString()));
     }
 
+    void SetExpanded(bool expanded)
+    {
+        if (expandBox_)
+            expandBox_->SetValue(expanded ? 1 : 0);
+
+    }
+
 
 private:
     TBCheckBox* expandBox_;
@@ -129,11 +81,81 @@ private:
     ListViewItem* item_;
 };
 
+
+class ListViewItem : public TBGenericStringItem
+{
+    bool expanded_;
+    bool selected_;
+
+public:
+    ListViewItem(const char *str, const TBID &id, const char* icon,  ListViewItemSource* source)
+        : TBGenericStringItem(str, id), source_(source), parent_(0),
+          depth_(0), widget_(0), expanded_(false), icon_(icon), selected_(false)
+    {
+
+    }
+
+    ListViewItem* AddChild(const char* text, const char* icon, const TBID &id);
+
+    bool GetSelected() { return selected_; }
+    void SetSelected(bool value)
+    {
+        selected_ = value;
+    }
+
+    bool GetExpanded() { return expanded_; }
+
+    void GetChildren(PODVector<ListViewItem*>& children, bool recursive = false)
+    {
+        children += children_;
+
+        if (recursive)
+        {
+            for (unsigned i = 0; i < children_.Size(); i++)
+            {
+                children_[i]->GetChildren(children, recursive);
+            }
+        }
+    }
+
+    void SetExpanded(bool expanded)
+    {
+        if (widget_)
+            widget_->SetExpanded(expanded);
+
+        expanded_ = expanded;
+
+        if (!expanded_)
+        {
+            //for (unsigned i = 0; i < children_.Size(); i ++)
+            //    children_[i]->SetExpanded(expanded);
+        }
+        else
+        {
+            if (parent_)
+                parent_->SetExpanded(expanded_);
+        }
+    }
+
+    void UpdateText(const String& text);
+    void UpdateTextSkin(const String& skin);
+    void UpdateIcon(const String& icon);
+
+    ListViewItemSource* source_;
+    ListViewItem* parent_;
+    int depth_;
+    PODVector<ListViewItem*> children_;
+    ListViewItemWidget* widget_;
+    String icon_;
+    String textSkin_;
+};
+
+
 class ListViewItemSource : public TBSelectItemSourceList<ListViewItem>
 {
 public:
-    TBSelectList* list_;
-    ListViewItemSource(TBSelectList* list) : list_(list) {}
+    UIListView* uiListView_;
+    ListViewItemSource(UIListView* list) : uiListView_(list) {}
     virtual ~ListViewItemSource() {}
     virtual bool Filter(int index, const char *filter);
     virtual TBWidget *CreateItemWidget(int index, TBSelectItemViewer *viewer);
@@ -320,7 +342,7 @@ bool ListViewItemWidget::OnEvent(const TBWidgetEvent &ev)
     {
         item_->SetExpanded(!item_->GetExpanded());
 
-        source_->list_->InvalidateList();
+        source_->uiListView_->UpdateItemVisibility();
 
         // want to bubble
         return false;
@@ -340,7 +362,7 @@ bool ListViewItemSource::Filter(int index, const char *filter)
     if (item->parent_->GetExpanded())
         return true;
 
-    return false;
+    return true;
 
 }
 
@@ -379,9 +401,10 @@ static int select_list_sort_cb(TBSelectItemSource *_source, const int *a, const 
 
 UIListView::UIListView(Context* context, bool createWidget) :
     UIWidget(context, createWidget),
-    source_(0), itemLookupId_(0)
+    source_(0), itemLookupId_(0), multiSelect_(false), moveDelta_(0.0f)
 {
     rootList_ = new UISelectList(context);
+    rootList_->SetUIListView(true);
 
     // dummy filter so filter is called
     rootList_->SetFilter(" ");
@@ -389,7 +412,7 @@ UIListView::UIListView(Context* context, bool createWidget) :
     widget_->SetGravity(WIDGET_GRAVITY_ALL);
     rootList_->SetGravity(UI_GRAVITY_ALL);
 
-    source_ = new ListViewItemSource(rootList_->GetTBSelectList());
+    source_ = new ListViewItemSource(this);
 
     rootList_->GetTBSelectList()->SetSource(source_);
 
@@ -489,6 +512,8 @@ void UIListView::DeleteItemByID(const String& id)
 
             source_->DeleteItem(i);
 
+            rootList_->InvalidateList();
+
             return;
         }
     }
@@ -543,7 +568,7 @@ void UIListView::DeleteAllItems()
 }
 
 
-void UIListView::SelectItemByID(const String& id)
+void UIListView::SelectItemByID(const String& id, bool selected)
 {
     TBID tid = TBIDC(id.CString());
 
@@ -553,13 +578,61 @@ void UIListView::SelectItemByID(const String& id)
 
         if (tid == item->id)
         {
-            //item->SetExpanded(true);
-            rootList_->SetValue(i);
-            rootList_->InvalidateList();
+            if (selected)
+            {
+                if (item->GetSelected())
+                    return;
+
+                item->SetSelected(selected);
+                if (item->parent_)
+                    item->parent_->SetExpanded(true);
+                SetValueFirstSelected();
+                UpdateItemVisibility();
+                ScrollToSelectedItem();
+            }
+            else
+            {
+                if (!item->GetSelected())
+                    return;
+
+                item->SetSelected(false);
+                UpdateItemVisibility();
+
+            }
+
             return;
         }
 
     }
+}
+
+void UIListView::UpdateItemVisibility()
+{
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* item = source_->GetItem(i);
+
+        if (!item->widget_)
+            continue;
+
+        item->widget_->SetVisibilility(WIDGET_VISIBILITY_VISIBLE);
+        item->widget_->SetState(WIDGET_STATE_SELECTED, item->GetSelected());
+
+        ListViewItem* parent = item->parent_;
+        while (parent)
+        {
+            if (!parent->GetExpanded())
+                break;
+
+            parent = parent->parent_;
+        }
+
+        if (parent)
+            item->widget_->SetVisibilility(WIDGET_VISIBILITY_GONE);
+    }
+
+    tb::TBScrollContainer* scroll = (tb::TBScrollContainer*) rootList_->GetInternalWidget()->GetFirstChild();
+    scroll->OnProcess();
 }
 
 void UIListView::ScrollToSelectedItem()
@@ -570,5 +643,288 @@ void UIListView::ScrollToSelectedItem()
     rootList_->ScrollToSelectedItem();
 }
 
+void UIListView::SelectAllItems(bool select)
+{
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* item = source_->GetItem(i);
+        item->SetSelected(select);
+    }
+
+}
+
+void UIListView::SetValueFirstSelected()
+{
+    int index = -1;
+
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* item = source_->GetItem(i);
+        if (item->GetSelected())
+        {
+            index = i;
+            break;
+        }
+    }
+
+    rootList_->SetValue(index);
+
+}
+
+void UIListView::SelectSingleItem(ListViewItem* item, bool expand)
+{
+
+    if (!item)
+        return;
+
+    bool dirty = !item->GetSelected();
+
+    if (!dirty)
+    {
+        for (unsigned i = 0; i < source_->GetNumItems(); i++)
+        {
+            ListViewItem* sitem = source_->GetItem(i);
+
+            if (sitem != item && sitem->GetSelected())
+            {
+                dirty = true;
+                break;
+            }
+        }
+    }
+
+    if (!dirty)
+        return;
+
+    for (unsigned i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* sitem = source_->GetItem(i);
+
+        if (sitem->GetSelected())
+        {
+            sitem->SetSelected(false);
+            SendItemSelectedChanged(sitem);
+        }
+
+    }
+
+    if (expand)
+        item->SetExpanded(true);
+
+    item->SetSelected(true);
+    UpdateItemVisibility();
+
+    SetValueFirstSelected();
+    ScrollToSelectedItem();
+
+    SendItemSelectedChanged(item);
+
+}
+
+void UIListView::Move(tb::SPECIAL_KEY key)
+{
+    const float delta = 0.015f;
+    if (moveDelta_)
+    {
+        Time* time = GetSubsystem<Time>();
+        moveDelta_ -= time->GetTimeStep();
+        if (moveDelta_ < 0.0f)
+            moveDelta_ = 0.0f;
+    }
+
+    if (moveDelta_ > 0.0f)
+        return;
+
+    // selected index
+    int index = -1;
+
+    for (int i = 0; i < source_->GetNumItems(); i++)
+    {
+        ListViewItem* item = source_->GetItem(i);
+        if (item->GetSelected())
+        {
+            index = i;
+            break;
+        }
+    }
+
+    // nothing selected
+    if (index == -1)
+        return;
+
+    if (key == TB_KEY_LEFT)
+    {
+        ListViewItem* item = source_->GetItem(index);
+        if (item->children_.Size() > 0 && item->GetExpanded())
+        {
+            item->SetExpanded(false);
+            UpdateItemVisibility();
+            moveDelta_ = delta;
+            return;
+        }
+        else
+        {
+            if (!item->parent_)
+                return;
+
+            SelectSingleItem(item->parent_, false);
+            moveDelta_ = delta;
+            return;
+        }
+    }
+
+    if (key == TB_KEY_RIGHT)
+    {
+        ListViewItem* item = source_->GetItem(index);
+        if (item->children_.Size() > 0 && !item->GetExpanded())
+        {
+            item->SetExpanded(true);
+            UpdateItemVisibility();
+            moveDelta_ = delta;
+            return;
+        }
+        else
+        {
+            if (!item->children_.Size())
+                return;
+
+            SelectSingleItem(source_->GetItem(index + 1), false);
+            moveDelta_ = delta;
+            return;
+
+        }
+    }
+
+
+    if (key == TB_KEY_UP)
+    {
+        // can't go any further up list
+        if (index == 0)
+            return;
+
+        for (int i = (int) (index - 1 ); i >= 0; i--)
+        {
+            ListViewItem* item = source_->GetItem(i);
+            if (item->widget_ && item->widget_->GetVisibility() == WIDGET_VISIBILITY_VISIBLE)
+            {
+                SelectSingleItem(item, false);
+                moveDelta_ = delta;
+                return;
+            }
+
+        }
+
+    }
+
+    if (key == TB_KEY_DOWN)
+    {
+        // can't go any further down list
+        if (index == source_->GetNumItems() - 1)
+            return;
+
+        for (int i = index + 1; i < source_->GetNumItems(); i++)
+        {
+            ListViewItem* item = source_->GetItem(i);
+            if (item->widget_ && item->widget_->GetVisibility() == WIDGET_VISIBILITY_VISIBLE)
+            {
+                SelectSingleItem(item, false);
+                moveDelta_ = delta;
+                return;
+            }
+
+        }
+
+    }
+
+}
+
+void UIListView::SendItemSelectedChanged(ListViewItem* item)
+{
+    UI* ui = GetSubsystem<UI>();
+
+    VariantMap eventData;
+    String refid;
+
+    ui->GetTBIDString(item->id, refid);
+
+    eventData[UIListViewSelectionChanged::P_REFID] = refid;
+    eventData[UIListViewSelectionChanged::P_SELECTED] = item->GetSelected();
+    this->SendEvent(E_UILISTVIEWSELECTIONCHANGED, eventData);
+
+}
+
+bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_KEY_UP )
+    {
+        moveDelta_ = 0.0f;
+    }
+
+    if (ev.type == EVENT_TYPE_KEY_DOWN )
+    {
+        if (ev.special_key == TB_KEY_DOWN || ev.special_key == TB_KEY_UP || ev.special_key == TB_KEY_LEFT || ev.special_key == TB_KEY_RIGHT)
+        {
+            Move(ev.special_key);
+            return true;
+        }
+    }
+
+    if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("select_list_validation_end"))
+    {
+        UpdateItemVisibility();
+        return true;
+    }
+
+    if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("select_list_selection_changed"))
+    {
+        for (int i = 0; i < source_->GetNumItems(); i++)
+        {
+            ListViewItem* item = source_->GetItem(i);
+
+            if (item->id == ev.target->GetID())
+            {
+                bool multi = false;
+                if (multiSelect_ && (ev.modifierkeys & TB_SHIFT || ev.modifierkeys & TB_CTRL || ev.modifierkeys & TB_SUPER))
+                    multi = true;
+
+                if (multi)
+                {
+                    if (item->GetSelected())
+                    {
+                        item->SetSelected(false);
+                        UpdateItemVisibility();
+
+                        SendItemSelectedChanged(item);
+                    }
+                    else
+                    {
+
+                        item->SetSelected(true);
+                        UpdateItemVisibility();
+
+                        SendItemSelectedChanged(item);
+                    }
+
+                    SetValueFirstSelected();
+
+                }
+                else
+                {
+                    SelectSingleItem(item, false);
+                }
+
+                return true;
+            }
+
+        }
+    }
+
+    if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        return false;
+    }
+
+    return UIWidget::OnEvent(ev);
+}
 
 }

@@ -60,8 +60,6 @@ namespace Atomic
 static int Serializable_SetAttribute(duk_context* ctx)
 {
     const char* name = duk_to_string(ctx, 0);
-    Variant v;
-    js_to_variant(ctx, 1, v);
 
     duk_push_this(ctx);
     Serializable* serial = js_to_class_instance<Serializable>(ctx, -1, 0);
@@ -86,6 +84,10 @@ static int Serializable_SetAttribute(duk_context* ctx)
             }
         }
     }
+
+
+    Variant v;
+    js_to_variant(ctx, 1, v, variantType);
 
     ScriptComponent* jsc = NULL;
 
@@ -161,7 +163,7 @@ static int Serializable_SetAttribute(duk_context* ctx)
 
         }
 
-    }
+    }    
 
     if (isAttr)
     {
@@ -237,25 +239,6 @@ static int Serializable_GetAttribute(duk_context* ctx)
     return 1;
 }
 
-static const String& GetResourceRefClassName(Context* context, const ResourceRef& ref)
-{
-    const HashMap<StringHash, SharedPtr<ObjectFactory>>& factories = context->GetObjectFactories();
-
-    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator itr = factories.Begin();
-
-    while (itr != factories.End())
-    {
-        if (itr->first_ == ref.type_)
-        {
-            return itr->second_->GetTypeName();
-        }
-
-        itr++;
-    }
-
-    return String::EMPTY;
-}
-
 static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const VariantMap& defaultFieldValues,
                                  const FieldMap& fields,
                                  const EnumMap& enums)
@@ -275,7 +258,7 @@ static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const Varian
                 if (defaultFieldValues[itr->first_]->GetType() == VAR_RESOURCEREF)
                 {
                     const ResourceRef& ref = defaultFieldValues[itr->first_]->GetResourceRef();
-                    const String& typeName = GetResourceRefClassName(JSVM::GetJSVM(ctx)->GetContext(), ref);
+                    const String& typeName = JSVM::GetJSVM(ctx)->GetContext()->GetTypeName(ref.type_);
 
                     if (typeName.Length())
                     {
@@ -296,7 +279,7 @@ static void GetDynamicAttributes(duk_context* ctx, unsigned& count, const Varian
             duk_put_prop_string(ctx, -2, "defaultValue");
 
             duk_push_boolean(ctx, 1);
-            duk_put_prop_string(ctx, -2, "field");
+            duk_put_prop_string(ctx, -2, "dynamic");
 
             duk_push_array(ctx);
 
@@ -367,7 +350,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
                 if (attr->defaultValue_.GetType() == VAR_RESOURCEREF)
                 {
                     const ResourceRef& ref = attr->defaultValue_.GetResourceRef();
-                    const String& typeName = GetResourceRefClassName(serial->GetContext(), ref);
+                    const String& typeName = serial->GetContext()->GetTypeName(ref.type_);
 
                     if (typeName.Length())
                     {
@@ -376,7 +359,26 @@ static int Serializable_GetAttributes(duk_context* ctx)
 
                     }
                 }
+
             }
+
+            if (attr->type_ == VAR_RESOURCEREFLIST)
+            {
+                if (attr->defaultValue_.GetType() == VAR_RESOURCEREFLIST)
+                {
+                    const ResourceRefList& ref = attr->defaultValue_.GetResourceRefList();
+                    const String& typeName = serial->GetContext()->GetTypeName(ref.type_);
+
+                    if (typeName.Length())
+                    {
+                        duk_push_string(ctx, typeName.CString());
+                        duk_put_prop_string(ctx, -2, "resourceTypeName");
+
+                    }
+                }
+
+            }
+
 
             duk_push_string(ctx, attr->name_.CString());
             duk_put_prop_string(ctx, -2, "name");
@@ -388,7 +390,7 @@ static int Serializable_GetAttributes(duk_context* ctx)
             duk_put_prop_string(ctx, -2, "defaultValue");
 
             duk_push_boolean(ctx, 0);
-            duk_put_prop_string(ctx, -2, "field");
+            duk_put_prop_string(ctx, -2, "dynamic");
 
             duk_push_array(ctx);
 

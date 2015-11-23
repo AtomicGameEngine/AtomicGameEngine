@@ -371,7 +371,9 @@ void TBEditField::OnFocusChanged(bool focused)
             if (!curText.Equals(m_initial_edit_text))
             {
                 TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
-                ev.ref_id = TBIDC("edit_complete");
+                // TBIDC does not register the TBID with the UI system, so do it this way
+                TBID refid("edit_complete");
+                ev.ref_id = refid;
                 // forward to delegate
                 TBWidget::OnEvent(ev);
             }

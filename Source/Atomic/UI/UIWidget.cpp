@@ -165,6 +165,15 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
         }
     }
 
+    unsigned modifierKeys = 0;
+
+    if( ev.special_key && TB_SHIFT)
+        modifierKeys |= QUAL_SHIFT;
+    if( ev.special_key && TB_CTRL)
+        modifierKeys |= QUAL_CTRL;
+    if( ev.special_key && TB_ALT)
+        modifierKeys |= QUAL_ALT;
+
     using namespace WidgetEvent;
     data[P_HANDLER] = handler;
     data[P_TARGET] = target;
@@ -175,8 +184,9 @@ void UIWidget::ConvertEvent(UIWidget *handler, UIWidget* target, const tb::TBWid
     data[P_DELTAY] = ev.delta_y;
     data[P_COUNT] = ev.count;
     data[P_KEY] = key;
+
     data[P_SPECIALKEY] = (unsigned) ev.special_key;
-    data[P_MODIFIERKEYS] = (unsigned) ev.modifierkeys;
+    data[P_MODIFIERKEYS] = modifierKeys;
     data[P_REFID] = refid;
     data[P_TOUCH] = (unsigned) ev.touch;
 }
@@ -644,7 +654,7 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 {
     UI* ui = GetSubsystem<UI>();
 
-    if (ev.type == EVENT_TYPE_CHANGED || ev.type == EVENT_TYPE_KEY_UP)
+    if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)
     {
         if (!ev.target || ui->IsWidgetWrapped(ev.target))
         {
@@ -747,6 +757,21 @@ bool UIWidget::OnEvent(const tb::TBWidgetEvent &ev)
         }
 
     }
+    if (ev.type == EVENT_TYPE_CUSTOM)
+    {
+        if (!ev.target || ui->IsWidgetWrapped(ev.target))
+        {
+            VariantMap eventData;
+            ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+            SendEvent(E_WIDGETEVENT, eventData);
+
+            if (eventData[WidgetEvent::P_HANDLED].GetBool())
+                return true;
+
+        }
+
+    }
+
 
     return false;
 }

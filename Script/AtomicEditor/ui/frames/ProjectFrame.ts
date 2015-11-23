@@ -51,6 +51,8 @@ class ProjectFrame extends ScriptWidget {
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
         this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
 
+        folderList.subscribeToEvent("UIListViewSelectionChanged", (event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event));
+
         // this.subscribeToEvent(EditorEvents.ResourceFolderCreated, (ev: EditorEvents.ResourceFolderCreatedEvent) => this.handleResourceFolderCreated(ev));
 
         // this uses FileWatcher which doesn't catch subfolder creation
@@ -70,8 +72,7 @@ class ProjectFrame extends ScriptWidget {
 
             if (widget.id == ev.asset.guid) {
 
-                if (widget['assetButton'])
-                {
+                if (widget['assetButton']) {
                     widget['assetButton'].text = ev.asset.name + ev.asset.extension;
                     widget['assetButton'].dragObject = new Atomic.UIDragObject(ev.asset, ev.asset.name);
                 }
@@ -136,56 +137,6 @@ class ProjectFrame extends ScriptWidget {
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
-        if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
-
-          if (data.key == Atomic.KEY_RIGHT) {
-              var selectedId = this.folderList.selectedItemID;
-              var itemAssetId = this.assetGUIDToItemID[selectedId];
-
-              if (selectedId != "0") {
-                  if (!this.folderList.getExpanded(itemAssetId) && this.folderList.getExpandable(itemAssetId)) {
-                      this.folderList.setExpanded(itemAssetId, true);
-                      this.folderList.rootList.invalidateList();
-                  } else {
-                      this.folderList.rootList.selectNextItem();
-                  }
-              }
-
-
-          } else if (data.key == Atomic.KEY_LEFT) {
-              var selectedId = this.folderList.selectedItemID;
-              var itemAssetId = this.assetGUIDToItemID[selectedId];
-              if (selectedId != "0") {
-                  if (this.folderList.getExpanded(itemAssetId)) {
-                      this.folderList.setExpanded(itemAssetId, false);
-                      this.folderList.rootList.invalidateList();
-                  } else {
-                      var db = ToolCore.getAssetDatabase();
-
-                      var asset = db.getAssetByGUID(selectedId);
-
-                      var parentAsset = asset.parent;
-                      if (parentAsset) {
-                         this.folderList.selectItemByID(parentAsset.guid.toString());
-                      }
-                  }
-              }
-          }
-
-            if (data.key == Atomic.KEY_DOWN || data.key == Atomic.KEY_UP || data.key == Atomic.KEY_LEFT || data.key == Atomic.KEY_RIGHT) {
-
-                var selectedId = this.folderList.selectedItemID;
-
-                if (selectedId != "0") {
-                    var db = ToolCore.getAssetDatabase();
-
-                    var asset = db.getAssetByGUID(selectedId);
-
-                    if (asset.isFolder)
-                        this.refreshContent(asset);
-                }
-            }
-        }
         if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
 
             var id = data.target.id;
@@ -295,6 +246,22 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    handleFolderListSelectionChangedEvent(event: Atomic.UIListViewSelectionChangedEvent) {
+
+        var selectedId = this.folderList.selectedItemID;
+
+        if (selectedId != "0") {
+            var db = ToolCore.getAssetDatabase();
+
+            var asset = db.getAssetByGUID(selectedId);
+            if (!asset)
+                return;
+
+            if (asset.isFolder)
+                this.refreshContent(asset);
+        }
+    }
+
     handleDragEnded(data: Atomic.DragEndedEvent) {
 
         var asset: ToolCore.Asset;
@@ -306,10 +273,10 @@ class ProjectFrame extends ScriptWidget {
             if (data.target.id == "contentcontainerscroll" || container.isAncestorOf(data.target)) {
 
                 if (data.target["asset"])
-                  asset = <ToolCore.Asset> data.target["asset"];
+                    asset = <ToolCore.Asset>data.target["asset"];
 
                 if (!asset || !asset.isFolder)
-                  asset = this.currentFolder;
+                    asset = this.currentFolder;
             }
 
         }
@@ -358,7 +325,7 @@ class ProjectFrame extends ScriptWidget {
 
         } else if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-            var dragAsset = <ToolCore.Asset> dragObject.object;
+            var dragAsset = <ToolCore.Asset>dragObject.object;
 
             // get the folder we dragged on
             var destPath = Atomic.addTrailingSlash(asset.path);

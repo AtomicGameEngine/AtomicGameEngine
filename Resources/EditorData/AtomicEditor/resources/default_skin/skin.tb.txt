@@ -400,6 +400,18 @@ elements
 		expand 7
 		type Image
 
+	TBGreyCheckBoxNonUniform
+		clone TBCheckBox
+		children
+			element TBGreyCheckBoxNonUniform.selected
+				state selected
+
+	TBGreyCheckBoxNonUniform.selected
+		bitmap checkbox_mark_nonuniform.png
+		expand 7
+		type Image
+
+
 	TBRadioButton
 		bitmap radio.png
 		cut 19
