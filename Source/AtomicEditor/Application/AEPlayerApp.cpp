@@ -228,7 +228,7 @@ void AEPlayerApplication::Start()
         }
     }
 
-    SubscribeToEvent(E_IPCPLAYERQUIT, HANDLER(AEPlayerApplication, HandleQuit));
+    SubscribeToEvent(E_PLAYERQUIT, HANDLER(AEPlayerApplication, HandleQuit));
 
     return;
 }

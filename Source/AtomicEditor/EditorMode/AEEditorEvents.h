@@ -63,13 +63,13 @@ EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
 
 
 // emitted once play has started
-EVENT(E_EDITORPLAYSTARTED, EditorPlayStarted)
+EVENT(E_EDITORPLAYERSTARTED, EditorPlayerStarted)
 {
     PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
 }
 
 // emitted once play has stopped
-EVENT(E_EDITORPLAYSTOPPED, EditorPlayStopped)
+EVENT(E_EDITORPLAYERSTOPPED, EditorPlayerStopped)
 {
 
 }

@@ -60,7 +60,7 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 
     playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
 
-    SendEvent("EditorPlayerStarted");
+    SendEvent(E_EDITORPLAYERSTARTED);
 
     playerEnabled_ = true;
 
@@ -74,6 +74,7 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
     {
         playerBroker_ = 0;
         playerEnabled_ = false;
+        SendEvent(E_EDITORPLAYERSTOPPED);
     }
 }
 

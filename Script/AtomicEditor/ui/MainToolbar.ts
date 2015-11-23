@@ -6,6 +6,7 @@
 //
 
 import EditorUI = require("./EditorUI");
+import EditorEvents = require("../editor/EditorEvents");
 
 class MainToolbar extends Atomic.UIWidget {
 
@@ -35,8 +36,14 @@ class MainToolbar extends Atomic.UIWidget {
 
         this.subscribeToEvent("GizmoAxisModeChanged", (ev) => this.handleGizmoAxisModeChanged(ev));
         this.subscribeToEvent("GizmoEditModeChanged", (ev) => this.handleGizmoEditModeChanged(ev));
+
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
-        this.subscribeToEvent("IPCPlayerQuit", (data) => {
+
+        this.subscribeToEvent(EditorEvents.PlayerStarted, (data) => {
+            var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
+            skin.setSkinBg("StopButton");
+        });
+        this.subscribeToEvent(EditorEvents.PlayerStopped, (data) => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
         });
@@ -98,16 +105,8 @@ class MainToolbar extends Atomic.UIWidget {
                 return true;
 
             } else if (ev.target.id == "maintoolbar_play") {
-                var editorMode = <Editor.EditorMode> this.getSubsystem("EditorMode");
-                if (editorMode.isPlayerEnabled()) {
-                    this.sendEvent("IPCPlayerExitRequest");
-                } else {
-                    EditorUI.getShortcuts().invokePlay();
-                    var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
-                    skin.setSkinBg("StopButton");
-                }
+                EditorUI.getShortcuts().invokePlayOrStopPlayer();
                 return true;
-
             }
 
         }

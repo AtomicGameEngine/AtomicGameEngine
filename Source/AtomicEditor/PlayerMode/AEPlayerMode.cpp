@@ -249,8 +249,7 @@ void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
     data[P_WIDTH] = graphics->GetWidth();
     data[P_HEIGHT] = graphics->GetHeight();
     ipc_->SendEventToBroker(E_IPCPLAYERWINDOWCHANGED, data);
-    ipc_->SendEventToBroker(E_IPCPLAYERQUIT);
-    SendEvent(E_IPCPLAYERQUIT);
+    SendEvent(E_PLAYERQUIT);
 }
 
 }

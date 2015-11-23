@@ -54,12 +54,12 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu edit popup") {
 
             if (refid == "edit play") {
-                EditorUI.getShortcuts().invokePlay();
+                EditorUI.getShortcuts().invokePlayOrStopPlayer();
                 return true;
             }
 
             if (refid == "edit play debug") {
-                EditorUI.getShortcuts().invokePlayDebug();
+                EditorUI.getShortcuts().invokePlayOrStopPlayer(true);
                 return true;
             }
 

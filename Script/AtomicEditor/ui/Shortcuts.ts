@@ -23,33 +23,20 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     //this should be moved somewhere else...
-    invokePlay() {
-
+    invokePlayOrStopPlayer(debug:boolean = false) {
         this.sendEvent(EditorEvents.SaveAllResources);
-
-        var playerWindow = Preferences.getInstance().playerWindow;
-        if (playerWindow) {
-            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
-            Atomic.editorMode.playProject(args, false);
+        if (Atomic.editorMode.isPlayerEnabled()) {
+            this.sendEvent("IPCPlayerExitRequest");
         } else {
-            Atomic.editorMode.playProject("", false);
+            var playerWindow = Preferences.getInstance().playerWindow;
+            if (playerWindow) {
+                var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
+                Atomic.editorMode.playProject(args, debug);
+            } else {
+                Atomic.editorMode.playProject("", debug);
+            }
         }
     }
-
-    invokePlayDebug() {
-
-        this.sendEvent(EditorEvents.SaveAllResources);
-
-        var playerWindow = Preferences.getInstance().playerWindow;
-        if (playerWindow) {
-            var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
-            Atomic.editorMode.playProject(args, true);
-        } else {
-            Atomic.editorMode.playProject("", true);
-        }
-
-    }
-
 
     invokeFormatCode() {
 
@@ -158,7 +145,7 @@ class Shortcuts extends Atomic.ScriptObject {
                 this.invokeFormatCode();
             }
             else if (ev.key == Atomic.KEY_P) {
-                this.invokePlay();
+                this.invokePlayOrStopPlayer();
                 //if shift is pressed
             } else if (ev.qualifiers & Atomic.QUAL_SHIFT) {
                 if (ev.key == Atomic.KEY_B) {
