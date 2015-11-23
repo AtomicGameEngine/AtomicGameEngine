@@ -474,6 +474,10 @@ class SelectionInspector extends ScriptWidget {
             this.refresh();
         }
 
+        // save node section state
+        if (!this.nodes.length && this.nodeSection)
+            SelectionInspector.sectionStates["Node"] = this.nodeSection.value ? true : false;
+
     }
 
     handleSceneEditStateChangesBeginEvent() {
