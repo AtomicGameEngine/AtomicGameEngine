@@ -72,7 +72,10 @@ bool UIInlineSelect::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
     {
-        SendEvent(E_UIWIDGETEDITCOMPLETE);
+        VariantMap eventData;
+        eventData[UIWidgetEditComplete::P_WIDGET] = this;
+        SendEvent(E_UIWIDGETEDITCOMPLETE, eventData);
+
         return true;
     }
     return UIWidget::OnEvent(ev);

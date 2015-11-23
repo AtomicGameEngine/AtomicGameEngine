@@ -84,17 +84,22 @@ class Shortcuts extends Atomic.ScriptObject {
         this.invokeResourceFrameShortcut("paste");
     }
 
+    invokeFrameSelected() {
+        this.invokeResourceFrameShortcut("frameselected");
+    }
+
+
     invokeSelectAll() {
         this.invokeResourceFrameShortcut("selectall");
     }
 
-    invokeGizmoEditModeChanged(mode:Editor.EditMode) {
+    invokeGizmoEditModeChanged(mode: Editor.EditMode) {
 
         this.sendEvent("GizmoEditModeChanged", { mode: mode });
 
     }
 
-    invokeGizmoAxisModeChanged(mode:Editor.AxisMode, toggle:boolean = false) {
+    invokeGizmoAxisModeChanged(mode: Editor.AxisMode, toggle: boolean = false) {
 
         this.sendEvent("GizmoAxisModeChanged", { mode: mode, toggle: toggle });
 
@@ -115,22 +120,26 @@ class Shortcuts extends Atomic.ScriptObject {
 
             // TODO: Make these customizable
 
-            if (ev.key == Atomic.KEY_W) {
-                this.invokeGizmoEditModeChanged(Editor.EDIT_MOVE);
-            } else if (ev.key == Atomic.KEY_E) {
-              this.invokeGizmoEditModeChanged(Editor.EDIT_ROTATE);
-            } else if (ev.key == Atomic.KEY_R) {
-                this.invokeGizmoEditModeChanged(Editor.EDIT_SCALE);
-            } else if (ev.key == Atomic.KEY_X) {
-                this.invokeGizmoAxisModeChanged(Editor.AXIS_WORLD, true);
+            if (!Atomic.ui.focusedWidget && !this.cmdKeyDown()) {
+
+                if (ev.key == Atomic.KEY_W) {
+                    this.invokeGizmoEditModeChanged(Editor.EDIT_MOVE);
+                } else if (ev.key == Atomic.KEY_E) {
+                    this.invokeGizmoEditModeChanged(Editor.EDIT_ROTATE);
+                } else if (ev.key == Atomic.KEY_R) {
+                    this.invokeGizmoEditModeChanged(Editor.EDIT_SCALE);
+                } else if (ev.key == Atomic.KEY_X) {
+                    this.invokeGizmoAxisModeChanged(Editor.AXIS_WORLD, true);
+                } else if (ev.key == Atomic.KEY_F) {
+                    this.invokeFrameSelected();
+                }
             }
 
         }
 
     }
 
-    // global shortcut handler
-    handleUIShortcut(ev: Atomic.UIShortcutEvent) {
+    cmdKeyDown(): boolean {
 
         var cmdKey;
         if (Atomic.platform == "MacOSX") {
@@ -138,6 +147,16 @@ class Shortcuts extends Atomic.ScriptObject {
         } else {
             cmdKey = (Atomic.input.getKeyDown(Atomic.KEY_LCTRL) || Atomic.input.getKeyDown(Atomic.KEY_RCTRL));
         }
+
+        return cmdKey;
+
+
+    }
+
+    // global shortcut handler
+    handleUIShortcut(ev: Atomic.UIShortcutEvent) {
+
+        var cmdKey = this.cmdKeyDown();
 
         if (cmdKey) {
 

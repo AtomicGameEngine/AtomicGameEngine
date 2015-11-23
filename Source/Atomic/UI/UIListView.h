@@ -58,15 +58,36 @@ public:
     bool GetExpanded(unsigned itemID);
     bool GetExpandable(unsigned itemID);
 
+    bool GetMultiSelect() const { return multiSelect_; }
+    void SetMultiSelect(bool value) { multiSelect_ = value; }
+
     void DeleteAllItems();
-    void SelectItemByID(const String& id);
+    void SelectItemByID(const String& id, bool selected = true);
 
     String GetHoverItemID() { return rootList_.Null() ? "" : rootList_->GetHoverItemID(); }
     String GetSelectedItemID() { return rootList_.Null() ? "" : rootList_->GetSelectedItemID(); }
 
     UISelectList* GetRootList() { return rootList_; }
 
+    void UpdateItemVisibility();
+
+    void SelectAllItems(bool select = true);
+
+protected:
+
+    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
+
 private:
+
+    void SendItemSelectedChanged(ListViewItem* item);
+
+    void SelectSingleItem(ListViewItem* item, bool expand = true);
+    void SetValueFirstSelected();
+    void Move(tb::SPECIAL_KEY key);
+
+    bool multiSelect_;
+
+    float moveDelta_;
 
     SharedPtr<UISelectList> rootList_;
     ListViewItemSource* source_;

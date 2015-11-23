@@ -22,6 +22,7 @@
 
 #include "JSIO.h"
 #include "JSVM.h"
+#include <Atomic/IO/BufferQueue.h>
 #include <Atomic/IO/File.h>
 
 namespace Atomic
@@ -34,7 +35,8 @@ enum IO_MAGIC_TYPE
     IO_MAGIC_BOOL,
     IO_MAGIC_FLOAT,
     IO_MAGIC_STRING,
-    IO_MAGIC_ZEROSTRING
+    IO_MAGIC_ZEROSTRING,
+    IO_MAGIC_BINARY
 };
 
 
@@ -46,11 +48,17 @@ static Serializer* CastToSerializer(duk_context* ctx, int index)
     if (!o)
         return NULL;
 
-    // type check! file supported for now
-    if (o->GetType() == File::GetTypeStatic())
+    // Type check! Only File and BufferQueue are supported for now.
+    StringHash type(o->GetType());
+    if (type == File::GetTypeStatic())
     {
-        // cast it!
-        serial = (Serializer*) ((File*)o);
+        // Cast it!
+        serial = (Serializer*)((File*)o);
+    }
+    else if (type == BufferQueue::GetTypeStatic())
+    {
+        // Cast it!
+        serial = (Serializer*)((BufferQueue*)o);
     }
 
     return serial;
@@ -65,11 +73,17 @@ static Deserializer* CastToDeserializer(duk_context* ctx, int index)
     if (!o)
         return NULL;
 
-    // type check! file supported for now
-    if (o->GetType() == File::GetTypeStatic())
+    // Type check! Only File and BufferQueue are supported for now.
+    StringHash type(o->GetType());
+    if (type == File::GetTypeStatic())
     {
-        // cast it!
-        deserial = (Deserializer*) ((File*)o);
+        // Cast it!
+        deserial = (Deserializer*)((File*)o);
+    }
+    else if (type == BufferQueue::GetTypeStatic())
+    {
+        // Cast it!
+        deserial = (Deserializer*)((BufferQueue*)o);
     }
 
     return deserial;
@@ -125,6 +139,10 @@ static int Serializer_Write(duk_context* ctx)
         case IO_MAGIC_ZEROSTRING:
             success = serial->WriteString(duk_require_string(ctx, 0));
             break;
+        case IO_MAGIC_BINARY:
+            str = (const char*) duk_require_buffer_data(ctx, 0, &length);
+            success = serial->Write(str, length);
+            break;
         default:
             break;
     }
@@ -152,7 +170,7 @@ static int Deserializer_Read(duk_context* ctx)
         return 1;
     }
 
-    PODVector<unsigned char> buffer;
+    char* data;
     String str;
     size_t length;
 
@@ -175,6 +193,14 @@ static int Deserializer_Read(duk_context* ctx)
         case IO_MAGIC_ZEROSTRING:
             success = duk_push_string(ctx, deserial->ReadString().CString());
             return 1;
+        case IO_MAGIC_BINARY:
+            length = deserial->GetSize() - deserial->GetPosition();
+            duk_push_fixed_buffer(ctx, length);
+            duk_push_buffer_object(ctx, -1, 0, length, DUK_BUFOBJ_UINT8ARRAY);
+            duk_replace(ctx, -2);
+            data = (char*) duk_require_buffer_data(ctx, 0, &length);
+            success = deserial->Read(data, length);
+            return 1;
         default:
             break;
     }
@@ -183,6 +209,25 @@ static int Deserializer_Read(duk_context* ctx)
 
     return 1;
 
+}
+
+static int Deserializer_GetSize(duk_context* ctx)
+{
+    duk_push_this(ctx);
+
+    // safe cast based on type check above
+    Deserializer* deserial = CastToDeserializer(ctx, duk_get_top_index(ctx));
+
+    duk_pop(ctx);
+
+    if (!deserial)
+    {
+        duk_push_boolean(ctx, 0);
+        return 1;
+    }
+
+    duk_push_number(ctx, (double)deserial->GetSize());
+    return 1;
 }
 
 static void AddSerializerMixin(duk_context* ctx, const String& package, const String& classname)
@@ -201,8 +246,11 @@ static void AddSerializerMixin(duk_context* ctx, const String& package, const St
     duk_set_magic(ctx, -1, (unsigned) IO_MAGIC_ZEROSTRING);
     duk_put_prop_string(ctx, -2, "writeZeroString");
 
-    duk_pop(ctx);
+    duk_push_c_function(ctx, Serializer_Write, 1);
+    duk_set_magic(ctx, -1, (unsigned)IO_MAGIC_BINARY);
+    duk_put_prop_string(ctx, -2, "writeBinary");
 
+    duk_pop(ctx);
 }
 
 static void AddDeserializerMixin(duk_context* ctx, const String& package, const String& classname)
@@ -221,8 +269,14 @@ static void AddDeserializerMixin(duk_context* ctx, const String& package, const 
     duk_set_magic(ctx, -1, (unsigned) IO_MAGIC_ZEROSTRING);
     duk_put_prop_string(ctx, -2, "readZeroString");
 
-    duk_pop(ctx);
+    duk_push_c_function(ctx, Deserializer_Read, 0);
+    duk_set_magic(ctx, -1, (unsigned)IO_MAGIC_BINARY);
+    duk_put_prop_string(ctx, -2, "readBinary");
 
+    duk_push_c_function(ctx, Deserializer_GetSize, 0);
+    duk_put_prop_string(ctx, -2, "getSize");
+
+    duk_pop(ctx);
 }
 
 
@@ -250,6 +304,9 @@ void jsapi_init_io(JSVM* vm)
 
     AddSerializerMixin(ctx, "Atomic", "File");
     AddDeserializerMixin(ctx, "Atomic", "File");
+
+    AddSerializerMixin(ctx, "Atomic", "BufferQueue");
+    AddDeserializerMixin(ctx, "Atomic", "BufferQueue");
 
 }
 

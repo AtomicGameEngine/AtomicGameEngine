@@ -76,6 +76,7 @@ public:
 		to unselect the previously selected item, use SetValue. */
 	void SelectItem(int index, bool selected);
 	TBWidget *GetItemWidget(int index);
+    bool GetItemSelected(int index);
 
 	/** Scroll to the current selected item. The scroll may be delayed until
 		the items has been layouted if the layout is currently invalid. */
@@ -83,6 +84,11 @@ public:
 
 	/** Return the scrollcontainer used in this list. */
 	TBScrollContainer *GetScrollContainer() { return &m_container; }
+
+    TBID GetItemID(int index) const;
+    int GetNumItems() const;
+
+    void SetUIListView(bool value) { m_ui_list_view = value; }
 
 	virtual void OnInflate(const INFLATE_INFO &info);
 	virtual void OnSkinChanged();
@@ -104,10 +110,15 @@ protected:
 	TBStr m_filter;
 	bool m_list_is_invalid;
 	bool m_scroll_to_current;
+    bool m_ui_list_view;
 	TBID m_header_lng_string_id;
 private:
     TBSelectListSortCallback m_sort_callback;
 	TBWidget *CreateAndAddItemAfter(int index, TBWidget *reference);
+
+    void SelectAllItems(bool select = false);
+
+
 };
 
 /** TBSelectDropdown shows a button that opens a popup with a TBSelectList with items

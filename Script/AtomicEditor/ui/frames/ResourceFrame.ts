@@ -76,8 +76,7 @@ class ResourceFrame extends ScriptWidget {
 
             var sceneEditor3D = new Editor.SceneEditor3D(path, this.tabcontainer);
             editor = sceneEditor3D;
-
-            this.sendEvent(EditorEvents.ActiveSceneChange, { scene: sceneEditor3D.scene });
+            this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: sceneEditor3D });
 
         }
 
@@ -149,6 +148,13 @@ class ResourceFrame extends ScriptWidget {
 
         var closedIndex = editors.indexOf(editor.fullPath);
 
+        if (editor.typeName == "SceneEditor3D") {
+
+            this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: (<Editor.SceneEditor3D> null) });
+
+        }
+
+
         // remove from lookup
         delete this.editors[editor.fullPath];
 
@@ -193,7 +199,7 @@ class ResourceFrame extends ScriptWidget {
 
                     if (w.editor.typeName == "SceneEditor3D") {
 
-                        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: (<Editor.SceneEditor3D> w.editor).scene });
+                        this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: (<Editor.SceneEditor3D> w.editor) });
 
                     }
 

@@ -15,6 +15,8 @@
 #include <Atomic/Input/Input.h>
 
 #include "SceneEditor3DEvents.h"
+#include "SceneSelection.h"
+#include "SceneEditor3D.h"
 #include "Gizmo3D.h"
 
 namespace AtomicEditor
@@ -59,6 +61,7 @@ void Gizmo3D::SetView(SceneView3D* view3D)
     view3D_ = view3D;
     scene_ = view3D->GetScene();
     camera_ = view3D->GetCameraNode()->GetComponent<Camera>();
+    selection_ = view3D_->GetSceneEditor3D()->GetSelection();
     assert(camera_.NotNull());
 }
 
@@ -67,30 +70,32 @@ void Gizmo3D::Position()
     Vector3 center(0, 0, 0);
     bool containsScene = false;
 
-    for (unsigned i = 0; i < editNodes_->Size(); ++i)
+    Vector<SharedPtr<Node>>& editNodes = selection_->GetNodes();
+
+    for (unsigned i = 0; i < editNodes.Size(); ++i)
     {
         // Scene's transform should not be edited, so hide gizmo if it is included
-        if (editNodes_->At(i) == scene_)
+        if (editNodes[i] == scene_)
         {
             containsScene = true;
             break;
         }
-        center += editNodes_->At(i)->GetWorldPosition();
+        center += editNodes[i]->GetWorldPosition();
     }
 
-    if (editNodes_->Empty() || containsScene)
+    if (editNodes.Empty() || containsScene)
     {
         Hide();
         return;
     }
 
-    center /= editNodes_->Size();
+    center /= editNodes.Size();
     gizmoNode_->SetPosition(center);
 
-    if (axisMode_ == AXIS_WORLD || editNodes_->Size() > 1)
+    if (axisMode_ == AXIS_WORLD || editNodes.Size() > 1)
         gizmoNode_->SetRotation(Quaternion());
     else
-        gizmoNode_->SetRotation(editNodes_->At(0)->GetWorldRotation());
+        gizmoNode_->SetRotation(editNodes[0]->GetWorldRotation());
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
@@ -137,10 +142,8 @@ void Gizmo3D::Position()
     }
 }
 
-void Gizmo3D::Update(Vector<Node *> &editNodes)
+void Gizmo3D::Update()
 {
-    editNodes_ = &editNodes;
-
     Use();
     Position();
 }
@@ -156,14 +159,13 @@ void Gizmo3D::Use()
 {
     if (gizmo_.Null() || !gizmo_->IsEnabled() || editMode_ == EDIT_SELECT)
     {
-        //StoreGizmoEditActions();
-        //previousGizmoDrag = false;
         return;
     }
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Input* input = GetSubsystem<Input>();
 
+    Vector<SharedPtr<Node>>& editNodes = selection_->GetNodes();
     Ray cameraRay = view3D_->GetCameraRay();
     float scale = gizmoNode_->GetScale().x_;
 
@@ -173,10 +175,7 @@ void Gizmo3D::Use()
     {
         if (dragging_)
         {
-            VariantMap eventData;
-            eventData[SceneEditSerializable::P_SERIALIZABLE] = editNodes_->At(0);
-            eventData[SceneEditSerializable::P_OPERATION] = 1;
-            scene_->SendEvent(E_SCENEEDITSERIALIZABLE, eventData);
+            scene_->SendEvent(E_SCENEEDITEND);
             dragging_ = false;
         }
 
@@ -187,7 +186,7 @@ void Gizmo3D::Use()
     gizmoAxisY_.Update(cameraRay, scale, drag, camera_->GetNode());
     gizmoAxisZ_.Update(cameraRay, scale, drag, camera_->GetNode());
 
-    if (!editNodes_->Size() || editNodes_->At(0) == scene_)
+    if (!editNodes.Size() || editNodes[0] == scene_)
     {
         gizmoAxisX_.selected_ = gizmoAxisY_.selected_ = gizmoAxisZ_.selected_ = false;
         // this just forces an update
@@ -238,9 +237,11 @@ bool Gizmo3D::MoveEditNodes(Vector3 adjust)
     bool moveSnap = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #endif
 
+    Vector<SharedPtr<Node>>& editNodes = selection_->GetNodes();
+
     if (adjust.Length() > M_EPSILON)
     {
-        for (unsigned i = 0; i < editNodes_->Size(); ++i)
+        for (unsigned i = 0; i < editNodes.Size(); ++i)
         {
             if (moveSnap)
             {
@@ -252,9 +253,9 @@ bool Gizmo3D::MoveEditNodes(Vector3 adjust)
                 adjust.z_ = floorf(adjust.z_ / moveStepScaled + 0.5) * moveStepScaled;
             }
 
-            Node* node = editNodes_->At(i);
+            Node* node = editNodes[i];
             Vector3 nodeAdjust = adjust;
-            if (axisMode_ == AXIS_LOCAL && editNodes_->Size() == 1)
+            if (axisMode_ == AXIS_LOCAL && editNodes.Size() == 1)
                 nodeAdjust = node->GetWorldRotation() * nodeAdjust;
 
             Vector3 worldPos = node->GetWorldPosition();
@@ -289,6 +290,8 @@ bool Gizmo3D::RotateEditNodes(Vector3 adjust)
     bool rotateSnap = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #endif
 
+    Vector<SharedPtr<Node>>& editNodes = selection_->GetNodes();
+
     if (rotateSnap)
     {
         float rotateStepScaled = snapRotation_;
@@ -301,11 +304,12 @@ bool Gizmo3D::RotateEditNodes(Vector3 adjust)
     {
         moved = true;
 
-        for (unsigned i = 0; i < editNodes_->Size(); ++i)
+        for (unsigned i = 0; i < editNodes.Size(); ++i)
         {
-            Node* node = editNodes_->At(i);
+            Node* node = editNodes[i];
+
             Quaternion rotQuat(adjust.x_, adjust.y_, adjust.z_);
-            if (axisMode_ == AXIS_LOCAL && editNodes_->Size() == 1)
+            if (axisMode_ == AXIS_LOCAL && editNodes.Size() == 1)
                 node->SetRotation(node->GetRotation() * rotQuat);
             else
             {
@@ -336,12 +340,13 @@ bool Gizmo3D::ScaleEditNodes(Vector3 adjust)
     bool scaleSnap = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
 #endif
 
+    Vector<SharedPtr<Node>>& editNodes = selection_->GetNodes();
 
     if (adjust.Length() > M_EPSILON)
     {
-        for (unsigned i = 0; i < editNodes_->Size(); ++i)
+        for (unsigned i = 0; i < editNodes.Size(); ++i)
         {
-            Node* node = editNodes_->At(i);
+            Node* node = editNodes[i];
 
             Vector3 scale = node->GetScale();
             Vector3 oldScale = scale;

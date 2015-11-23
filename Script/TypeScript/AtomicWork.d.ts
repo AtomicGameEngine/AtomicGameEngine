@@ -52,7 +52,7 @@ declare module Atomic {
         qualifiers: number;
 
         // mouse buttons down
-        buttons:number;
+        buttons: number;
 
     }
 
@@ -63,7 +63,7 @@ declare module Atomic {
         //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
         qualifiers: number;
         // mouse buttons down
-        buttons:number;
+        buttons: number;
 
     }
 
@@ -73,6 +73,13 @@ declare module Atomic {
         key: number;
         //  Atomic.QUAL_SHIFT, Atomic.QUAL_CTRL, Atomic.QUAL_ALT, Atomic.QUAL_ANY
         qualifiers: number;
+
+    }
+
+    export interface UIListViewSelectionChangedEvent {
+
+        refid: string;
+        selected: boolean;
 
     }
 
@@ -119,6 +126,10 @@ declare module Atomic {
     export interface UIWidgetFocusChangedEvent {
         widget: UIWidget;
         focused: boolean;
+    }
+
+    export interface UIWidgetEditCompleteEvent {
+        widget: UIWidget;
     }
 
     export interface UIWidgetDeletedEvent {
@@ -197,6 +208,7 @@ declare module Atomic {
         defaultValue: string;
         enumNames: string[];
         resourceTypeName: string;
+        dynamic: boolean;
 
     }
 
@@ -249,14 +261,62 @@ declare module AtomicNET {
 
 declare module Editor {
 
-  export interface GizmoEditModeChangedEvent {
-    mode:EditMode;
-  }
+    export interface SceneNodeSelectedEvent {
+        scene: Atomic.Scene;
+        node: Atomic.Node;
+        selected: boolean;
+        quiet: boolean;
+    }
 
-  export interface GizmoAxisModeChangedEvent {
-    mode:AxisMode;
-    toggle:boolean;
-  }
+    export interface SceneEditAddRemoveNodesEvent {
+
+        end: boolean;
+
+    }
+
+
+    export interface SceneEditNodeAddedEvent {
+
+        scene: Atomic.Scene;
+        parent: Atomic.Node;
+        node: Atomic.Node;
+
+    }
+
+    export interface SceneEditNodeRemovedEvent {
+
+        scene: Atomic.Scene;
+        parent: Atomic.Node;
+        node: Atomic.Node;
+
+    }
+
+    export interface SceneEditComponentAddedRemovedEvent {
+
+        scene: Atomic.Scene;
+        node: Atomic.Node;
+        component: Atomic.Component;
+        removed: boolean;
+    }
+
+    export interface SceneEditStateChangeEvent {
+
+        serializable: Atomic.Serializable;
+
+    }
+
+    export interface SceneEditNodeCreatedEvent {
+        node: Atomic.Node;
+    }
+
+    export interface GizmoEditModeChangedEvent {
+        mode: EditMode;
+    }
+
+    export interface GizmoAxisModeChangedEvent {
+        mode: AxisMode;
+        toggle: boolean;
+    }
 
 }
 

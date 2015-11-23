@@ -24,8 +24,14 @@ export interface PlayerLogEvent {
 }
 
 
-export const ActiveSceneChange = "EditorActiveSceneChange";
-export const ActiveNodeChange = "EditorActiveNodeChange";
+export const ActiveSceneEditorChange = "EditorActiveSceneEditorChange";
+export interface ActiveSceneEditorChangeEvent {
+
+  sceneEditor: Editor.SceneEditor3D;
+
+}
+
+
 export const SceneClosed = "EditorSceneClosed";
 export interface SceneClosedEvent {
 
@@ -74,5 +80,12 @@ export interface EditResourceEvent {
 
   // The full path to the resource to edit
   path: string;
+
+}
+
+export const SceneEditStateChange = "SceneEditStateChange";
+export interface SceneEditStateChangeEvent {
+
+  serializable: Atomic.Serializable;
 
 }

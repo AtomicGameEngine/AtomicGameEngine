@@ -31,6 +31,8 @@ namespace Atomic
 namespace AtomicEditor
 {
 
+class SceneSelection;
+
 class Gizmo3DAxis
 {
 public:
@@ -121,7 +123,7 @@ public:
 
     void Show();
     void Hide();
-    void Update(Vector<Node*>& editNodes);
+    void Update();
 
     Node* GetGizmoNode() { return gizmoNode_; }
 
@@ -155,6 +157,7 @@ private:
     WeakPtr<Scene> scene_;
     WeakPtr<Camera> camera_;
     WeakPtr<StaticModel> gizmo_;
+    WeakPtr<SceneSelection> selection_;
 
     Gizmo3DAxis gizmoAxisX_;
     Gizmo3DAxis gizmoAxisY_;
@@ -165,9 +168,9 @@ private:
 
     AxisMode axisMode_;
 
-    Vector<Node *> *editNodes_;
     bool dragging_;
 
+    // snap settings
     float snapTranslationX_;
     float snapTranslationY_;
     float snapTranslationZ_;

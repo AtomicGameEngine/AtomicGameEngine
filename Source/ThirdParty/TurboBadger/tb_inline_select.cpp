@@ -39,7 +39,8 @@ TBInlineSelect::TBInlineSelect()
 	m_buttons[1].SetID(TBIDC("inc"));
 	m_buttons[0].SetAutoRepeat(true);
 	m_buttons[1].SetAutoRepeat(true);
-	m_editfield.SetTextAlign(TB_TEXT_ALIGN_CENTER);
+    m_editfield.SetID(TBIDC("edit"));
+    m_editfield.SetTextAlign(TB_TEXT_ALIGN_CENTER);
 	m_editfield.SetEditType(EDIT_TYPE_NUMBER);
 	m_editfield.SetText("0");
 
@@ -119,11 +120,23 @@ bool TBInlineSelect::OnEvent(const TBWidgetEvent &ev)
 	else if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("dec"))
 	{
         SetValueDouble(GetValueDouble() - 1);
+        if (!ev.target->IsCaptured()) {
+
+            InvokeModifiedEvent();
+
+        }
 		return true;
 	}
 	else if (ev.type == EVENT_TYPE_CLICK && ev.target->GetID() == TBIDC("inc"))
 	{
         SetValueDouble(GetValueDouble() + 1);
+
+        if (!ev.target->IsCaptured()) {
+
+            InvokeModifiedEvent();
+
+        }
+
 		return true;
 	}
 	else if (ev.type == EVENT_TYPE_CHANGED && ev.target == &m_editfield)
@@ -132,19 +145,9 @@ bool TBInlineSelect::OnEvent(const TBWidgetEvent &ev)
 		m_editfield.GetText(text);
         SetValueInternal((double) atof(text), false);
 	}
-
-    // catch mouse up/mouse down on buttons for modifications
-    if (ev.target == &m_buttons[0] || ev.target == &m_buttons[1])
+    else if (ev.type == EVENT_TYPE_CHANGED && ev.target == this)
     {
-        if (ev.type == EVENT_TYPE_POINTER_DOWN)
-        {
-            m_modified = true;
-        }
-        else if (ev.type == EVENT_TYPE_POINTER_UP)
-        {
-            if (m_modified)
-                InvokeModifiedEvent();
-        }
+        return TBWidget::OnEvent(ev);
     }
 
 	return false;
@@ -153,7 +156,9 @@ bool TBInlineSelect::OnEvent(const TBWidgetEvent &ev)
 void TBInlineSelect::InvokeModifiedEvent()
 {
     TBWidgetEvent ev(EVENT_TYPE_CUSTOM);
-    ev.ref_id = TBIDC("edit_complete");
+    // TBIDC does not register the TBID with the UI system, so do it this way
+    TBID refid("edit_complete");
+    ev.ref_id = refid;
     // forward to delegate
     TBWidget::OnEvent(ev);
     m_modified = false;

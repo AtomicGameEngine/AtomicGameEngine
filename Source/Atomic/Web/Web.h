@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Core/Object.h"
+#include "../Container/ArrayPtr.h"
 #include "../IO/VectorBuffer.h"
 
 namespace Atomic
@@ -31,7 +32,7 @@ namespace Atomic
 class WebRequest;
 class WebSocket;
 
-class WebPrivate;
+struct WebPrivate;
 
 /// %Web subsystem. Manages HTTP requests and WebSocket communications.
 class ATOMIC_API Web : public Object
