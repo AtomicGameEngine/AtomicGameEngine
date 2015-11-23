@@ -65,4 +65,5 @@ void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);
 
 /// Returns true if the item is a buffer, and if data and size are passed, they are given values to access the buffer data.
 duk_bool_t js_check_is_buffer_and_get_data(duk_context* ctx, duk_idx_t idx, void** data, duk_size_t* size);
+
 }
