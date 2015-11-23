@@ -3296,4 +3296,16 @@ void RegisterGraphicsLibrary(Context* context)
     Zone::RegisterObject(context);
 }
 
+// ATOMIC BEGIN
+int Graphics::GetCurrentMonitor()
+{
+    return SDL_GetWindowDisplayIndex((SDL_Window*) this->GetSDLWindow());
+}
+
+int Graphics::GetMonitorsNumber()
+{
+    return SDL_GetNumVideoDisplays();
+}
+// ATOMIC END
+
 }

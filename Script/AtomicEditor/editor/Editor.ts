@@ -54,7 +54,7 @@ class Editor extends Atomic.ScriptObject {
         });
 
         this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {
-            Preferences.getInstance().savePlayerWindowData(data.posX, data.posY, data.width, data.height);
+            Preferences.getInstance().savePlayerWindowData(data.posX, data.posY, data.width, data.height, data.monitor);
         });
 
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));

@@ -30,8 +30,13 @@ class Shortcuts extends Atomic.ScriptObject {
         } else {
             var playerWindow = Preferences.getInstance().playerWindow;
             if (playerWindow) {
-                var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
-                Atomic.editorMode.playProject(args, debug);
+                if ((playerWindow.monitor + 1) > Atomic.graphics.getMonitorsNumber()) {
+                    var args = "--windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
+                    Atomic.editorMode.playProject(args, debug);
+                } else {
+                    var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
+                    Atomic.editorMode.playProject(args, debug);
+                }
             } else {
                 Atomic.editorMode.playProject("", debug);
             }
