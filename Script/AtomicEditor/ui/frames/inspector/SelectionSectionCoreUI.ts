@@ -11,6 +11,8 @@ import SelectionSection = require("./SelectionSection");
 import SelectionSectionUI = require("./SelectionSectionUI");
 import SerializableEditType = require("./SerializableEditType");
 
+import ProgressModal = require("ui/modal/ProgressModal");
+
 
 class CollisionShapeSectionUI extends SelectionSectionUI {
 
@@ -45,4 +47,75 @@ class CollisionShapeSectionUI extends SelectionSectionUI {
 
 }
 
+class CubemapGeneratorSectionUI extends SelectionSectionUI {
+
+    createUI(editType: SerializableEditType) {
+
+        this.editType = editType;
+
+        var button = new Atomic.UIButton();
+        button.fontDescription = InspectorUtils.attrFontDesc;
+        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.text = "Render Cubemap";
+
+        button.onClick = () => {
+
+            var scene = null;
+            var count = 0;
+            var progressModal = new ProgressModal("Rendering Cubemaps", "Rendering Cubemaps, please wait...");
+
+            for (var i in this.editType.objects) {
+
+                var gen = <Editor.CubemapGenerator>this.editType.objects[i];
+
+                if (!scene) {
+
+                    scene = gen.scene;
+
+                    this.subscribeToEvent(scene, "CubemapRenderBegin", () => {
+
+                        count++;
+
+                    })
+
+                    this.subscribeToEvent(scene, "CubemapRenderEnd", () => {
+
+                        count--;
+
+                        if (!count)
+                            progressModal.hide();
+
+                    })
+
+
+                }
+
+                if (!gen.render()) {
+
+                    //TODO: Cancel other renders if any and report better error information
+
+                    EditorUI.showModalError("Render Cubemaps",
+                        "There was an error rendering cubemaps, please see the application log");
+
+                    scene = null;
+                    break;
+
+                }
+            }
+
+            if (scene) {
+
+                progressModal.show();
+
+            }
+
+        };
+
+        this.addChild(button);
+
+    }
+
+}
+
 SelectionSection.registerCustomSectionUI("CollisionShape", CollisionShapeSectionUI);
+SelectionSection.registerCustomSectionUI("CubemapGenerator", CubemapGeneratorSectionUI);
