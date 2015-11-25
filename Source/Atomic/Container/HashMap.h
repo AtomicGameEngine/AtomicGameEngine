@@ -364,9 +364,12 @@ public:
     Iterator InsertNew(const T& key, const U& value)
     {
         unsigned hashKey = Hash(key);
-        Node* node = FindNode(key, hashKey);
-        if (node)
-            return Iterator(node);
+        if (ptrs_) 
+        {
+            Node* node = FindNode(key, hashKey);
+            if (node)
+                return Iterator(node);
+        }
 
         return InsertNode(key, value, false);
     }
