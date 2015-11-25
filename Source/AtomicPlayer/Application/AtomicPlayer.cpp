@@ -76,35 +76,35 @@ void AtomicPlayerApp::Setup()
     FileSystem* filesystem = GetSubsystem<FileSystem>();
     context_->RegisterSubsystem(new ScriptSystem(context_));
 
-    engineParameters_["WindowTitle"] = "AtomicPlayer";
+    engineParameters_.InsertNew("WindowTitle", "AtomicPlayer");
 
 #if (ATOMIC_PLATFORM_ANDROID)
-    engineParameters_["FullScreen"] = true;
-    engineParameters_["ResourcePaths"] = "CoreData;PlayerData;Cache;AtomicResources";
+    engineParameters_.InsertNew("FullScreen", true);
+    engineParameters_.InsertNew("ResourcePaths", "CoreData;PlayerData;Cache;AtomicResources");
 #elif ATOMIC_PLATFORM_WEB
-    engineParameters_["FullScreen"] = false;
-    engineParameters_["ResourcePaths"] = "AtomicResources";
-    // engineParameters_["WindowWidth"] = 1280;
-    // engineParameters_["WindowHeight"] = 720;
+    engineParameters_.InsertNew("FullScreen", false);
+    engineParameters_.InsertNew("ResourcePaths", "AtomicResources");
+    // engineParameters_.InsertNew("WindowWidth", 1280);
+    // engineParameters_.InsertNew("WindowHeight", 720);
 #elif ATOMIC_PLATFORM_IOS
-    engineParameters_["FullScreen"] = false;
-    engineParameters_["ResourcePaths"] = "AtomicResources";
+    engineParameters_.InsertNew("FullScreen", false);
+    engineParameters_.InsertNew("ResourcePaths", "AtomicResources");
 #else
-    engineParameters_["FullScreen"] = false;
-    engineParameters_["WindowWidth"] = 1280;
-    engineParameters_["WindowHeight"] = 720;
-    engineParameters_["ResourcePaths"] = "AtomicResources";
+    engineParameters_.InsertNew("FullScreen", false);
+    engineParameters_.InsertNew("WindowWidth", 1280);
+    engineParameters_.InsertNew("WindowHeight", 720);
+    engineParameters_.InsertNew("ResourcePaths", "AtomicResources");
 #endif
 
 #if ATOMIC_PLATFORM_WINDOWS
 
-    engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
-    engineParameters_["ResourcePrefixPath"] = "AtomicPlayer_Resources";
+    engineParameters_.InsertNew("WindowIcon", "Images/AtomicLogo32.png");
+    engineParameters_.InsertNew("ResourcePrefixPath", "AtomicPlayer_Resources");
 
 #elif ATOMIC_PLATFORM_ANDROID
-    //engineParameters_["ResourcePrefixPath"] = "assets";
+    //engineParameters_.InsertNew("ResourcePrefixPath"], "assets");
 #elif ATOMIC_PLATFORM_OSX
-    engineParameters_["ResourcePrefixPath"] = "../Resources";
+    engineParameters_.InsertNew("ResourcePrefixPath", "../Resources");
 #endif
 
     const Vector<String>& arguments = GetArguments();
@@ -124,7 +124,7 @@ void AtomicPlayerApp::Setup()
     }
 
     // Use the script file name as the base name for the log file
-    engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
+    engineParameters_.InsertNew("LogName", filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log");
 }
 
 void AtomicPlayerApp::Start()

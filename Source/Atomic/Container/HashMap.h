@@ -358,6 +358,21 @@ public:
             InsertNode(*it++);
     }
 
+    // ATOMIC BEGIN
+
+    /// Insert a pair only if a corresponding key does not already exist.
+    Iterator InsertNew(const T& key, const U& value)
+    {
+        unsigned hashKey = Hash(key);
+        Node* node = FindNode(key, hashKey);
+        if (node)
+            return Iterator(node);
+
+        return InsertNode(key, value, false);
+    }
+
+    // ATOMIC END
+
     /// Erase a pair by key. Return true if was found.
     bool Erase(const T& key)
     {
