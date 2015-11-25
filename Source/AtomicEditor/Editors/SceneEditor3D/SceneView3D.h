@@ -72,7 +72,7 @@ private:
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
 
     void HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData);
-    void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);    
+    void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);
 
     void MoveCamera(float timeStep);
 

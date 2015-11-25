@@ -27,6 +27,8 @@
 #include <AtomicNET/NETScript/NETScript.h>
 #endif
 
+#include "../Components/EditorComponents.h"
+
 #include "AEEditorCommon.h"
 
 namespace Atomic
@@ -74,6 +76,8 @@ void AEEditorCommon::Setup()
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);
 #endif
+
+    RegisterEditorComponentLibrary(context_);
 
 #ifdef ATOMIC_DOTNET
     RegisterNETScriptLibrary(context_);

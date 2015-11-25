@@ -72,6 +72,11 @@ subsystemCreateSource.addItem(new Atomic.UIMenuItem("DebugRenderer", "create com
 subsystemCreateSource.addItem(new Atomic.UIMenuItem("Octree", "create component"));
 subsystemCreateSource.addItem(new Atomic.UIMenuItem("PhysicsWorld", "create component"));
 
+var editorCreateSource = new Atomic.UIMenuItemSource();
+
+editorCreateSource.addItem(new Atomic.UIMenuItem("CubemapGenerator", "CubemapGenerator"));
+
+
 var componentCreateSource = new Atomic.UIMenuItemSource();
 
 var sources = {
@@ -84,6 +89,7 @@ var sources = {
     Physics: physicsCreateSource,
     Scene: sceneCreateSource,
     SubSystem: subsystemCreateSource,
+    Editor : editorCreateSource
 }
 
 for (var sub in sources) {

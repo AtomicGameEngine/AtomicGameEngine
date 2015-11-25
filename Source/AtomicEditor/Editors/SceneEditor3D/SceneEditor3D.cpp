@@ -43,8 +43,11 @@ using namespace ToolCore;
 namespace AtomicEditor
 {
 
-SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabContainer *container) :
-    ResourceEditor(context, fullpath, container)
+Vector<WeakPtr<SceneEditor3D>> SceneEditor3D::sceneEditors_;
+
+SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabContainer *container) :
+    ResourceEditor(context, fullpath, container),
+    cubemapRenderCount_(0)
 {
 
     // store a local reference to user project prefs
@@ -114,6 +117,11 @@ SceneEditor3D ::SceneEditor3D(Context* context, const String &fullpath, UITabCon
     SubscribeToEvent(E_EDITORPLAYERSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
     SubscribeToEvent(E_EDITORPLAYERSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
     SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
+
+    SubscribeToEvent(scene_, E_CUBEMAPRENDERBEGIN, HANDLER(SceneEditor3D, HandleCubemapRenderBegin));
+    SubscribeToEvent(scene_, E_CUBEMAPRENDEREND, HANDLER(SceneEditor3D, HandleCubemapRenderEnd));
+
+    RegisterSceneEditor();
 
 }
 
@@ -196,7 +204,8 @@ void SceneEditor3D::SetFocus()
 
 void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    gizmo3D_->Update();
+    if (!cubemapRenderCount_)
+        gizmo3D_->Update();
 }
 
 void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
@@ -335,7 +344,7 @@ void SceneEditor3D::HandleSceneEditNodeCreated(StringHash eventType, VariantMap&
 
 void SceneEditor3D::HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData)
 {
-    SetModified(true);    
+    SetModified(true);
 }
 
 void SceneEditor3D::HandleUserPrefSaved(StringHash eventType, VariantMap& eventData)
@@ -425,5 +434,66 @@ void SceneEditor3D::ReparentNode(Node* node, Node* newParent)
 
 
 }
+
+void SceneEditor3D::RegisterSceneEditor()
+{
+    // prune released scene editors
+    for (Vector<WeakPtr<SceneEditor3D> >::Iterator i = sceneEditors_.Begin(); i != sceneEditors_.End();)
+    {
+        if (*i)
+        {
+            ++i;
+        }
+        else
+        {
+            i = sceneEditors_.Erase(i);
+        }
+    }
+
+    sceneEditors_.Push(WeakPtr<SceneEditor3D>(this));
+
+}
+
+SceneEditor3D* SceneEditor3D::GetSceneEditor(Scene* scene)
+{
+
+    for (Vector<WeakPtr<SceneEditor3D> >::Iterator i = sceneEditors_.Begin(); i != sceneEditors_.End();)
+    {
+        if (*i && scene == (*i)->GetScene())
+            return *i;
+
+        i++;
+    }
+
+    return NULL;
+
+}
+
+void SceneEditor3D::HandleCubemapRenderBegin(StringHash eventType, VariantMap& eventData)
+{
+    cubemapRenderCount_++;
+
+    if (cubemapRenderCount_ == 1)
+    {
+        // first time
+        sceneView_->GetDebugRenderer()->SetEnabled(false);
+        gizmo3D_->Hide();
+    }
+
+}
+
+void SceneEditor3D::HandleCubemapRenderEnd(StringHash eventType, VariantMap& eventData)
+{
+    cubemapRenderCount_--;
+
+    if (cubemapRenderCount_ == 0)
+    {
+        // last one
+        sceneView_->GetDebugRenderer()->SetEnabled(true);
+        gizmo3D_->Show();
+    }
+
+}
+
 
 }

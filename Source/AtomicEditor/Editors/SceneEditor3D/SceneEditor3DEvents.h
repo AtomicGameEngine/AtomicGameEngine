@@ -131,4 +131,14 @@ EVENT(E_SCENEEDITSCENEMODIFIED, SceneEditSceneModified)
 
 }
 
+EVENT(E_CUBEMAPRENDERBEGIN, CubemapRenderBegin)
+{
+
+}
+
+EVENT(E_CUBEMAPRENDEREND, CubemapRenderEnd)
+{
+
+}
+
 }

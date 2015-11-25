@@ -45,4 +45,32 @@ class CollisionShapeSectionUI extends SelectionSectionUI {
 
 }
 
+class CubemapGeneratorSectionUI extends SelectionSectionUI {
+
+    createUI(editType: SerializableEditType) {
+
+        this.editType = editType;
+
+        var button = new Atomic.UIButton();
+        button.fontDescription = InspectorUtils.attrFontDesc;
+        button.gravity = Atomic.UI_GRAVITY_RIGHT;
+        button.text = "Render Cubemap";
+
+        button.onClick = () => {
+
+            for (var i in this.editType.objects) {
+
+                var gen = <Editor.CubemapGenerator>this.editType.objects[i];
+                gen.render();
+            }
+
+        };
+
+        this.addChild(button);
+
+    }
+
+}
+
 SelectionSection.registerCustomSectionUI("CollisionShape", CollisionShapeSectionUI);
+SelectionSection.registerCustomSectionUI("CubemapGenerator", CubemapGeneratorSectionUI);

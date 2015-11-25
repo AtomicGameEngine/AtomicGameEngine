@@ -81,6 +81,8 @@ public:
 
     void InvokeShortcut(const String& shortcut);
 
+    static SceneEditor3D* GetSceneEditor(Scene* scene);
+
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
@@ -93,6 +95,9 @@ private:
 
     void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
     void HandleSceneEditNodeCreated(StringHash eventType, VariantMap& eventData);
+
+    void HandleCubemapRenderBegin(StringHash eventType, VariantMap& eventData);
+    void HandleCubemapRenderEnd(StringHash eventType, VariantMap& eventData);
 
     void UpdateGizmoSnapSettings();
 
@@ -109,6 +114,12 @@ private:
     SharedPtr<Node> clipboardNode_;
 
     WeakPtr<ProjectUserPrefs> userPrefs_;
+
+    void RegisterSceneEditor();
+
+    static Vector<WeakPtr<SceneEditor3D>> sceneEditors_;
+
+    int cubemapRenderCount_;
 
 };
 
