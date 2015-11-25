@@ -42,7 +42,7 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    void Render();
+    bool Render();
 
     int GetImageSize() const { return imageSize_; }
     void SetImageSize(int size) { imageSize_ = size; }

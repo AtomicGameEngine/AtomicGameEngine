@@ -35,7 +35,7 @@ namespace AtomicEditor
 
 CubemapGenerator::CubemapGenerator(Context *context) : EditorComponent(context),
     updateCycle_(0),
-    imageSize_(256),
+    imageSize_(512),
     namePrefix_("Cubemap")
 {
 
@@ -46,18 +46,20 @@ CubemapGenerator::~CubemapGenerator()
 
 }
 
-void CubemapGenerator::Render()
+bool CubemapGenerator::Render()
 {
 
     if(!InitRender())
     {
         LOGERRORF("Unable to init render");
-        return;
+        return false;
     }
 
     GetScene()->SendEvent(E_CUBEMAPRENDERBEGIN);    
     SubscribeToEvent(E_BEGINFRAME, HANDLER(CubemapGenerator, HandleBeginFrame));
     SubscribeToEvent(E_ENDFRAME, HANDLER(CubemapGenerator, HandleEndFrame));
+
+    return true;
 
 }
 
