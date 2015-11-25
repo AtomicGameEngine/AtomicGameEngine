@@ -17,7 +17,9 @@
 #include <Atomic/Graphics/Camera.h>
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Graphics/Texture2D.h>
+#include <Atomic/Graphics/TextureCube.h>
 
+#include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/XMLFile.h>
 
 #include <Atomic/Scene/Node.h>
@@ -161,6 +163,12 @@ void CubemapGenerator::SaveCubemapXML()
     SharedPtr<File> file(new File(context_, xmlPath, FILE_WRITE));
     xmlFile->Save(*file, "    ");
     file->Close();
+
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    TextureCube* texcube = cache->GetResource<TextureCube>(resourcePath_ + namePrefix_ + ".xml");
+    if (texcube)
+        cache->ReloadResource(texcube);
+
 }
 
 void CubemapGenerator::EndRender()
