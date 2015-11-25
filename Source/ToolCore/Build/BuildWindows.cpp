@@ -7,6 +7,7 @@
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
@@ -143,7 +144,7 @@ void BuildWindows::Build(const String& buildPath)
     fileSystem->CreateDir(buildPath_);
     fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources");
 
-    String resourcePackagePath = buildPath_ + "/AtomicPlayer_Resources/AtomicResources.pak";
+    String resourcePackagePath = buildPath_ + "/AtomicPlayer_Resources/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
 
     fileSystem->Copy(playerBinary, buildPath_ + "/AtomicPlayer.exe");
