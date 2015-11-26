@@ -63,13 +63,13 @@ EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
 
 
 // emitted once play has started
-EVENT(E_EDITORPLAYSTARTED, EditorPlayStarted)
+EVENT(E_EDITORPLAYERSTARTED, EditorPlayerStarted)
 {
     PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
 }
 
 // emitted once play has stopped
-EVENT(E_EDITORPLAYSTOPPED, EditorPlayStopped)
+EVENT(E_EDITORPLAYERSTOPPED, EditorPlayerStopped)
 {
 
 }
@@ -94,14 +94,9 @@ EVENT(E_EDITORMODAL, EditorModal)
     PARAM(P_MESSAGE, Message);    // for modal errors, error text
 }
 
-EVENT(E_EDITORACTIVESCENECHANGE, EditorActiveSceneChange)
+EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
 {
-    PARAM(P_SCENE, Scene);      // Scene*
-}
-
-EVENT(E_EDITORACTIVENODECHANGE, EditorActiveNodeChange)
-{
-    PARAM(P_NODE, Node);      // Node*
+    PARAM(P_SCENEEDITOR, SceneEditor);
 }
 
 

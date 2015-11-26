@@ -525,6 +525,13 @@ public:
     /// Return whether is using an OpenGL 3 context.
     static bool GetGL3Support() { return gl3Support; }
 
+    // ATOMIC BEGIN
+    /// Return the current monitor number
+    int GetCurrentMonitor();
+    /// Return the available monitors number
+    int GetMonitorsNumber();
+    // ATOMIC END
+
 private:
     /// Create the application window icon.
     void CreateWindowIcon();

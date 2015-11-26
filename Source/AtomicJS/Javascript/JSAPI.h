@@ -59,8 +59,11 @@ void js_class_get_constructor(duk_context* ctx, const char* package, const char 
 void js_push_variant(duk_context* ctx, const Variant &v);
 void js_push_variantmap(duk_context* ctx, const VariantMap &vmap);
 
-void js_to_variant(duk_context* ctx, int variantIdx, Variant &v);
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v, VariantType variantType = VAR_NONE);
 
 void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v);
+
+/// Returns true if the item is a buffer, and if data and size are passed, they are given values to access the buffer data.
+duk_bool_t js_check_is_buffer_and_get_data(duk_context* ctx, duk_idx_t idx, void** data, duk_size_t* size);
 
 }

@@ -20,7 +20,6 @@
 #include <Atomic/Graphics/Octree.h>
 #include <Atomic/Graphics/Material.h>
 
-#include <Atomic/Atomic3D/Terrain.h>
 #include <Atomic/Atomic3D/Model.h>
 #include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Atomic3D/AnimatedModel.h>
@@ -45,6 +44,7 @@
 #include "SceneView3D.h"
 #include "SceneEditor3D.h"
 #include "SceneEditor3DEvents.h"
+#include "SceneSelection.h"
 
 using namespace ToolCore;
 
@@ -72,6 +72,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     if (debugRenderer_.Null())
     {
         debugRenderer_ = scene_->CreateComponent<DebugRenderer>();
+        debugRenderer_->SetTemporary(true);
     }
 
     octree_ = scene_->GetComponent<Octree>();
@@ -97,10 +98,7 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     SetAutoUpdate(false);
 
     SubscribeToEvent(E_UPDATE, HANDLER(SceneView3D, HandleUpdate));
-    SubscribeToEvent(E_EDITORACTIVENODECHANGE, HANDLER(SceneView3D, HandleEditorActiveNodeChange));
     SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(SceneView3D, HandlePostRenderUpdate));
-
-    SubscribeToEvent(scene_, E_NODEREMOVED, HANDLER(SceneView3D, HandleNodeRemoved));
 
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(SceneView3D,HandleMouseMove));
 
@@ -144,7 +142,7 @@ void SceneView3D::Disable()
 bool SceneView3D::GetOrbitting()
 {
     Input* input = GetSubsystem<Input>();
-    return framedNode_.NotNull() && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
+    return framedBBox_.defined_ && MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseButtonDown(MOUSEB_LEFT);
 }
 
 bool SceneView3D::GetZooming()
@@ -195,7 +193,7 @@ void SceneView3D::MoveCamera(float timeStep)
     if (orbitting)
     {
         BoundingBox bbox;
-        sceneEditor_->GetSelectionBoundingBox(bbox);
+        sceneEditor_->GetSelection()->GetBounds(bbox);
         if (bbox.defined_)
         {
             Vector3 centerPoint = bbox.Center();
@@ -254,13 +252,6 @@ void SceneView3D::MoveCamera(float timeStep)
             cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
         }
     }
-    else if (!superdown)
-    {
-        if (input->GetKeyPress(KEY_F))
-        {
-            FrameSelection();
-        }
-    }
 
     if (cameraMove_)
     {
@@ -299,27 +290,6 @@ Ray SceneView3D::GetCameraRay()
                                   float(cpos.y_ - y) / rect.Height());
 }
 
-void SceneView3D::DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode)
-{
-    if (drawNode)
-        debug->AddNode(node, 1.0, false);
-
-    // Exception for the scene to avoid bringing the editor to its knees: drawing either the whole hierarchy or the subsystem-
-    // components can have a large performance hit. Also do not draw terrain child nodes due to their large amount
-    // (TerrainPatch component itself draws nothing as debug geometry)
-    if (node != scene_ && !node->GetComponent<Terrain>())
-    {
-        const Vector<SharedPtr<Component> >& components = node->GetComponents();
-
-        for (unsigned j = 0; j < components.Size(); ++j)
-            components[j]->DrawDebugGeometry(debug, false);
-
-        // To avoid cluttering the view, do not draw the node axes for child nodes
-        for (unsigned k = 0; k < node->GetNumChildren(); ++k)
-            DrawNodeDebug(node->GetChild(k), debug, false);
-    }
-}
-
 bool SceneView3D::MouseInView()
 {
     if (!GetInternalWidget())
@@ -351,6 +321,12 @@ void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& ev
         sceneEditor_->Undo();
     else if (id == TBIDC("redo"))
         sceneEditor_->Redo();
+    else if (id == TBIDC("copy"))
+        sceneEditor_->Copy();
+    else if (id == TBIDC("cut"))
+        sceneEditor_->Cut();
+    else if (id == TBIDC("paste"))
+        sceneEditor_->Paste();
 
     return;
 
@@ -367,19 +343,13 @@ void SceneView3D::HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& e
 void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
 
-    // Visualize the currently selected nodes
-    if (selectedNode_.NotNull())
-    {
-        DrawNodeDebug(selectedNode_, debugRenderer_);
-
-    }
-
     if (!MouseInView() || GetOrbitting())
         return;
 
     Input* input = GetSubsystem<Input>();
 
     mouseLeftDown_ = false;
+    bool shiftDown = input->GetKeyDown(KEY_LSHIFT) || input->GetKeyDown(KEY_RSHIFT);
 
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
     {
@@ -409,8 +379,14 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
                     if (node->IsTemporary())
                         node = node->GetParent();
 
-                    neventData[EditorActiveNodeChange::P_NODE] = node;
-                    SendEvent(E_EDITORACTIVENODECHANGE, neventData);
+                    if (sceneEditor_->GetSelection()->Contains(node) && shiftDown)
+                    {
+                        sceneEditor_->GetSelection()->RemoveNode(node);
+                    }
+                    else
+                    {
+                        sceneEditor_->GetSelection()->AddNode(node, !shiftDown);
+                    }
 
                 }
             }
@@ -458,11 +434,6 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
         }
     }
 
-}
-
-void SceneView3D::SelectNode(Node* node)
-{
-    selectedNode_ = node;
 }
 
 bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
@@ -516,18 +487,6 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 }
 
-void SceneView3D::HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[EditorActiveNodeChange::P_NODE].GetPtr());
-    SelectNode(node);
-}
-
-void SceneView3D::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
-{
-    Node* node = (Node*) (eventData[NodeRemoved::P_NODE].GetPtr());
-    if (node == selectedNode_)
-        SelectNode(0);
-}
 
 void SceneView3D::UpdateDragNode(int mouseX, int mouseY)
 {
@@ -621,16 +580,9 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 
     if (dragNode_.NotNull())
     {
-        VariantMap neventData;
-        neventData[EditorActiveNodeChange::P_NODE] = dragNode_;
-        SendEvent(E_EDITORACTIVENODECHANGE, neventData);
-
-        VariantMap editData;
-        editData[SceneEditNodeAddedRemoved::P_SCENE] = scene_;
-        editData[SceneEditNodeAddedRemoved::P_NODE] = dragNode_;
-        editData[SceneEditNodeAddedRemoved::P_ADDED] = true;
-        scene_->SendEvent(E_SCENEEDITNODEADDEDREMOVED, editData);
-
+        VariantMap nodeCreatedEvent;
+        nodeCreatedEvent[SceneEditNodeCreated::P_NODE] = dragNode_;
+        scene_->SendEvent(E_SCENEEDITNODECREATED, nodeCreatedEvent);
     }
 
     if (dragObject && dragObject->GetObject()->GetType() == ToolCore::Asset::GetTypeStatic())
@@ -676,8 +628,7 @@ void SceneView3D::HandleDragEnded(StringHash eventType, VariantMap& eventData)
 void SceneView3D::FrameSelection()
 {
     BoundingBox bbox;
-
-    sceneEditor_->GetSelectionBoundingBox(bbox);
+    sceneEditor_->GetSelection()->GetBounds(bbox);
 
     if (!bbox.defined_)
         return;
@@ -687,12 +638,13 @@ void SceneView3D::FrameSelection()
     if (sphere.radius_ < .01f || sphere.radius_ > 512)
         return;
 
-    framedNode_ = selectedNode_;
+    framedBBox_ = bbox;
     cameraMoveStart_ = cameraNode_->GetWorldPosition();
     cameraMoveTarget_ = bbox.Center() - (cameraNode_->GetWorldDirection() * sphere.radius_ * 3);
     cameraMoveTime_ = 0.0f;
     cameraMove_ = true;
 
 }
+
 
 }

@@ -493,6 +493,13 @@ public:
     /// Return maximum number of supported bones for skinning.
     static unsigned GetMaxBones() { return 64; }
 
+    // ATOMIC BEGIN
+    /// Return the current monitor number
+    int GetCurrentMonitor();
+    /// Return the available monitors number
+    int GetMonitorsNumber();
+    // ATOMIC END
+
 private:
     /// Set vertex buffer stream frequency.
     void SetStreamFrequency(unsigned index, unsigned frequency);

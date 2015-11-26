@@ -54,12 +54,12 @@ class MainFrameMenu extends Atomic.ScriptObject {
         } else if (target.id == "menu edit popup") {
 
             if (refid == "edit play") {
-                EditorUI.getShortcuts().invokePlay();
+                EditorUI.getShortcuts().invokePlayOrStopPlayer();
                 return true;
             }
 
             if (refid == "edit play debug") {
-                EditorUI.getShortcuts().invokePlayDebug();
+                EditorUI.getShortcuts().invokePlayOrStopPlayer(true);
                 return true;
             }
 
@@ -102,6 +102,12 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 EditorUI.getModelOps().showSnapSettings();
                 return true;
             }
+
+            if (refid == "edit frame selected") {
+                EditorUI.getShortcuts().invokeFrameSelected();
+                return true;
+            }
+
 
             return false;
 
@@ -248,15 +254,17 @@ var editItems = {
     "Paste": ["edit paste", StringID.ShortcutPaste],
     "Select All": ["edit select all", StringID.ShortcutSelectAll],
     "-2": null,
+    "Frame Selected": ["edit frame selected", StringID.ShortcutFrameSelected],
+    "-3": null,
     "Find": ["edit find", StringID.ShortcutFind],
     "Find Next": ["edit find next", StringID.ShortcutFindNext],
     "Find Prev": ["edit find prev", StringID.ShortcutFindPrev],
-    "-3": null,
-    "Format Code": ["edit format code", StringID.ShortcutBeautify],
     "-4": null,
+    "Format Code": ["edit format code", StringID.ShortcutBeautify],
+    "-5": null,
     "Play": ["edit play", StringID.ShortcutPlay],
     "Debug (C# Project)": ["edit play debug", StringID.ShortcutPlayDebug],
-    "-5": null,
+    "-6": null,
     "Snap Settings": ["edit snap settings"]
 
 };

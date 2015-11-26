@@ -111,7 +111,8 @@ UI::UI(Context* context) :
     initialized_(false),
     skinLoaded_(false),
     consoleVisible_(false),
-    exitRequested_(false)
+    exitRequested_(false),
+    changedEventsBlocked_(0)
 {
 
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(UI, HandleExitRequested));
@@ -150,6 +151,31 @@ void UI::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void UI::Shutdown()
 {
+
+}
+
+bool UI::GetFocusedWidget()
+{
+    if (!TBWidget::focused_widget)
+        return false;
+
+    return TBWidget::focused_widget->IsOfType<TBEditField>();
+}
+
+void UI::SetBlockChangedEvents(bool blocked)
+{
+    if (blocked)
+        changedEventsBlocked_++;
+    else
+    {
+        changedEventsBlocked_--;
+
+        if (changedEventsBlocked_ < 0)
+        {
+            LOGERROR("UI::BlockChangedEvents - mismatched block calls, setting to 0");
+            changedEventsBlocked_ = 0;
+        }
+    }
 
 }
 
@@ -194,6 +220,7 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_KEYUP, HANDLER(UI, HandleKeyUp));
     SubscribeToEvent(E_TEXTINPUT, HANDLER(UI, HandleTextInput));
     SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
+    SubscribeToEvent(E_SCREENMODE, HANDLER(UI, HandleScreenMode));
     SubscribeToEvent(SystemUI::E_CONSOLECLOSED, HANDLER(UI, HandleConsoleClosed));
 
     SubscribeToEvent(E_TOUCHBEGIN, HANDLER(UI, HandleTouchBegin));

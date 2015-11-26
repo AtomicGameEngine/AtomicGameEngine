@@ -41,6 +41,8 @@ private:
 
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
 
+    void HandleQuit(StringHash eventType, VariantMap& eventData);
+
     bool debugPlayer_;
 
 };

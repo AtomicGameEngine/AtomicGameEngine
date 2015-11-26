@@ -41,6 +41,7 @@ private:
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
     void HandleIPCInitialize(StringHash eventType, VariantMap& eventData);
     void HandleViewRender(StringHash eventType, VariantMap& eventData);
+    void HandleExitRequest(StringHash eventType, VariantMap& eventData);
 
 // BEGIN LICENSE MANAGEMENT
     void HandleMessageAck(StringHash eventType, VariantMap& eventData);

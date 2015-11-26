@@ -37,7 +37,6 @@ public:
 
     SceneView3D(Context* context, SceneEditor3D* sceneEditor);
     virtual ~SceneView3D();
-    void SelectNode(Node* node);
 
     Ray GetCameraRay();
 
@@ -51,6 +50,9 @@ public:
     void Enable();
     void Disable();
     bool IsEnabled() { return enabled_; }
+
+    DebugRenderer* GetDebugRenderer() { return debugRenderer_; }
+    SceneEditor3D* GetSceneEditor3D() { return sceneEditor_; }
 
 private:
 
@@ -68,13 +70,9 @@ private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
-    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     void HandleUIWidgetFocusEscaped(StringHash eventType, VariantMap& eventData);
     void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);
-
-    void DrawNodeDebug(Node* node, DebugRenderer* debug, bool drawNode = true);
 
     void MoveCamera(float timeStep);
 
@@ -96,8 +94,8 @@ private:
     SharedPtr<Camera> camera_;
     SharedPtr<DebugRenderer> debugRenderer_;
     SharedPtr<Octree> octree_;
-    SharedPtr<Node> selectedNode_;
-    WeakPtr<Node> framedNode_;
+
+    BoundingBox framedBBox_;
 
     SharedPtr<Scene> preloadResourceScene_;
     String dragAssetGUID_;

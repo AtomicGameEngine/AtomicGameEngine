@@ -235,7 +235,43 @@ void js_object_to_variantmap(duk_context* ctx, int objIdx, VariantMap &v)
 
 }
 
-void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
+duk_bool_t js_check_is_buffer_and_get_data(duk_context* ctx, duk_idx_t idx, void** data, duk_size_t* size)
+{
+    void* temp;
+    if (duk_is_buffer(ctx, idx))
+    {
+        temp = duk_get_buffer_data(ctx, idx, size);
+        if (data)
+        {
+            *data = temp;
+        }
+        return true;
+    }
+    if (!(duk_is_object(ctx, idx) &&
+        duk_has_prop_string(ctx, idx, "length") &&
+        duk_has_prop_string(ctx, idx, "byteLength") &&
+        duk_has_prop_string(ctx, idx, "byteOffset") &&
+        duk_has_prop_string(ctx, idx, "BYTES_PER_ELEMENT")))
+    {
+        if (data)
+        {
+            *data = nullptr;
+        }
+        if (size)
+        {
+            *size = 0;
+        }
+        return false;
+    }
+    temp = duk_require_buffer_data(ctx, idx, size);
+    if (data)
+    {
+        *data = temp;
+    }
+    return true;
+}
+
+void js_to_variant(duk_context* ctx, int variantIdx, Variant &v, VariantType variantType)
 {
     v.Clear();
 
@@ -313,18 +349,67 @@ void js_to_variant(duk_context* ctx, int variantIdx, Variant &v)
         return;
     }
 
-    // object check after array
+    {
+        void* bufferData;
+        duk_size_t bufferSize;
+        if (js_check_is_buffer_and_get_data(ctx, variantIdx, &bufferData, &bufferSize))
+        {
+            // copy the buffer into the variant
+            v.SetBuffer(bufferData, (unsigned)bufferSize);
+            return;
+        }
+    }
+
+    // object check after array and buffer object check
     if (duk_is_object(ctx, variantIdx))
     {
-        RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
-        if (o)
-            v = o;
+        if (variantType == VAR_RESOURCEREFLIST)
+        {
+            ResourceRefList refList;
+
+            duk_get_prop_string(ctx, variantIdx, "typeName");
+            refList.type_ = duk_to_string(ctx, -1);
+
+            duk_get_prop_string(ctx, variantIdx, "resources");
+            int length = duk_get_length(ctx, -1);
+
+            for (int i = 0; i < length; i++) {
+
+                duk_get_prop_index(ctx, -1, i);
+
+                Resource* resource = NULL;
+
+                if (duk_is_object(ctx, -1))
+                {
+                     resource = js_to_class_instance<Resource>(ctx, -1, 0);
+
+                }
+
+                if (resource) {
+                    refList.names_.Push(resource->GetName());
+                }
+                else
+                    refList.names_.Push(String::EMPTY);
+
+                duk_pop(ctx);
+            }
+
+            duk_pop_n(ctx, 2);
+
+            v = refList;
+        }
+        else
+        {
+            RefCounted* o = js_to_class_instance<RefCounted>(ctx, variantIdx, 0);
+            if (o)
+                v = o;
+        }
+
         return;
     }
 
 
 }
-
 
 // variant map Proxy getter, so we can convert access to string based
 // member lookup, to string hash on the fly
@@ -405,18 +490,7 @@ void js_push_variantmap(duk_context* ctx, const VariantMap &vmap)
 
 void js_push_variant(duk_context *ctx, const Variant& v)
 {
-    VariantType type = v.GetType();
-    RefCounted* ref;
-    Vector2 vector2 = Vector2::ZERO;
-    IntVector2 intVector2 = IntVector2::ZERO;
-    Vector3 vector3 = Vector3::ZERO;
-    Vector4 vector4 = Vector4::ZERO;
-    Color color = Color::BLACK;
-    Resource* resource = NULL;
-    ResourceCache* cache = NULL;
-    ResourceRef resourceRef;
-
-    switch (type)
+    switch (v.GetType())
     {
     case VAR_NONE:
         duk_push_undefined(ctx);
@@ -425,9 +499,10 @@ void js_push_variant(duk_context *ctx, const Variant& v)
     case VAR_VOIDPTR:
         duk_push_null(ctx);
         break;
-    case VAR_PTR:
 
-        ref = v.GetPtr();
+    case VAR_PTR:
+    {
+        RefCounted* ref = v.GetPtr();
 
         // if we're null or don't have any refs, return null
         if (!ref || !ref->Refs())
@@ -438,7 +513,7 @@ void js_push_variant(duk_context *ctx, const Variant& v)
 
         // check that class is supported
         duk_push_heap_stash(ctx);
-        duk_push_pointer(ctx, (void*) ref->GetClassID());
+        duk_push_pointer(ctx, (void*)ref->GetClassID());
         duk_get_prop(ctx, -2);
 
         if (!duk_is_object(ctx, -1))
@@ -452,45 +527,92 @@ void js_push_variant(duk_context *ctx, const Variant& v)
             js_push_class_object_instance(ctx, ref);
         }
 
-        break;
+    }   break;
 
     case VAR_RESOURCEREF:
-        resourceRef = v.GetResourceRef();
-        cache = JSVM::GetJSVM(ctx)->GetContext()->GetSubsystem<ResourceCache>();
-        resource = cache->GetResource(resourceRef.type_, resourceRef.name_);
+    {
+        const ResourceRef& resourceRef(v.GetResourceRef());
+        ResourceCache* cache = JSVM::GetJSVM(ctx)->GetContext()->GetSubsystem<ResourceCache>();
+        Resource* resource = cache->GetResource(resourceRef.type_, resourceRef.name_);
         js_push_class_object_instance(ctx, resource);
-        break;
+    }   break;
+
+    case VAR_RESOURCEREFLIST:
+    {
+
+        const ResourceRefList& resourceRefList(v.GetResourceRefList());
+        const Context* context = JSVM::GetJSVM(ctx)->GetContext();
+
+        duk_push_object(ctx);
+        duk_push_string(ctx, context->GetTypeName(resourceRefList.type_).CString());
+        duk_put_prop_string(ctx, -2, "typeName");
+
+        duk_push_array(ctx);
+
+        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+
+        for (unsigned i = 0; i < resourceRefList.names_.Size(); i++) {
+
+            Resource* resource = cache->GetResource(resourceRefList.type_, resourceRefList.names_[i]);
+            js_push_class_object_instance(ctx, resource);
+            duk_put_prop_index(ctx, -2, i);
+        }
+
+        duk_put_prop_string(ctx, -2, "resources");
+
+    } break;
 
     case VAR_BOOL:
         duk_push_boolean(ctx, v.GetBool() ? 1 : 0);
         break;
+
     case VAR_INT:
         duk_push_number(ctx, v.GetInt());
         break;
+
     case VAR_FLOAT:
         duk_push_number(ctx, v.GetFloat());
         break;
+
     case VAR_STRING:
-        duk_push_string(ctx, v.GetString().CString());
-        break;
+    {
+        const String& string(v.GetString());
+        duk_push_lstring(ctx, string.CString(), string.Length());
+    }   break;
+
+    case VAR_BUFFER:
+    {
+        const PODVector<unsigned char>& buffer(v.GetBuffer()); // The braces are to scope this reference.
+        duk_push_fixed_buffer(ctx, buffer.Size());
+        duk_push_buffer_object(ctx, -1, 0, buffer.Size(), DUK_BUFOBJ_UINT8ARRAY);
+        duk_replace(ctx, -2);
+        unsigned char* data = (unsigned char*)duk_require_buffer_data(ctx, -1, (duk_size_t*)nullptr);
+        memcpy(data, buffer.Buffer(), buffer.Size());
+    }   break;
+
     case VAR_VECTOR2:
-        vector2 = v.GetVector2();
+    {
+        const Vector2& vector2(v.GetVector2());
         duk_push_array(ctx);
         duk_push_number(ctx, vector2.x_);
         duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, vector2.y_);
         duk_put_prop_index(ctx, -2, 1);
-        break;
+    }   break;
+
     case VAR_INTVECTOR2:
-        intVector2 = v.GetIntVector2();
+    {
+        const IntVector2& intVector2(v.GetIntVector2());
         duk_push_array(ctx);
         duk_push_number(ctx, intVector2.x_);
         duk_put_prop_index(ctx, -2, 0);
         duk_push_number(ctx, intVector2.y_);
         duk_put_prop_index(ctx, -2, 1);
-        break;
+    }   break;
+
     case VAR_VECTOR3:
-        vector3 = v.GetVector3();
+    {
+        const Vector3& vector3(v.GetVector3());
         duk_push_array(ctx);
         duk_push_number(ctx, vector3.x_);
         duk_put_prop_index(ctx, -2, 0);
@@ -498,9 +620,11 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         duk_put_prop_index(ctx, -2, 1);
         duk_push_number(ctx, vector3.z_);
         duk_put_prop_index(ctx, -2, 2);
-        break;
+    }   break;
+
     case VAR_QUATERNION:
-        vector3 = v.GetQuaternion().EulerAngles();
+    {
+        const Vector3& vector3(v.GetQuaternion().EulerAngles());
         duk_push_array(ctx);
         duk_push_number(ctx, vector3.x_);
         duk_put_prop_index(ctx, -2, 0);
@@ -508,9 +632,11 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         duk_put_prop_index(ctx, -2, 1);
         duk_push_number(ctx, vector3.z_);
         duk_put_prop_index(ctx, -2, 2);
-        break;
+    }   break;
+
     case VAR_COLOR:
-        color = v.GetColor();
+    {
+        const Color& color(v.GetColor());
         duk_push_array(ctx);
         duk_push_number(ctx, color.r_);
         duk_put_prop_index(ctx, -2, 0);
@@ -520,9 +646,11 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         duk_put_prop_index(ctx, -2, 2);
         duk_push_number(ctx, color.a_);
         duk_put_prop_index(ctx, -2, 3);
-        break;
+    }   break;
+
     case VAR_VECTOR4:
-        vector4 = v.GetVector4();
+    {
+        const Vector4& vector4(v.GetVector4());
         duk_push_array(ctx);
         duk_push_number(ctx, vector4.x_);
         duk_put_prop_index(ctx, -2, 0);
@@ -532,7 +660,7 @@ void js_push_variant(duk_context *ctx, const Variant& v)
         duk_put_prop_index(ctx, -2, 2);
         duk_push_number(ctx, vector4.w_);
         duk_put_prop_index(ctx, -2, 3);
-        break;
+    }   break;
 
     default:
         duk_push_undefined(ctx);

@@ -220,7 +220,7 @@ static bool InvokeShortcut(UI* ui, int key, SPECIAL_KEY special_key, MODIFIER_KE
 #else
     bool shortcut_key = (modifierkeys & TB_CTRL) ? true : false;
 #endif
-    if (!TBWidget::focused_widget || !down || (!shortcut_key && special_key ==TB_KEY_UNDEFINED))
+    if (!down || (!shortcut_key && special_key ==TB_KEY_UNDEFINED))
         return false;
     bool reverse_key = (modifierkeys & TB_SHIFT) ? true : false;
     int upper_key = toupr_ascii(key);

@@ -37,6 +37,7 @@ using namespace ToolCore;
 namespace AtomicEditor
 {
 
+class SceneSelection;
 class SceneEditHistory;
 
 class SceneEditor3D: public ResourceEditor
@@ -51,8 +52,14 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev);
 
-    void SelectNode(Node* node);
-    void GetSelectionBoundingBox(BoundingBox& bbox);
+    SceneSelection* GetSelection() { return selection_; }
+    SceneEditHistory* GetEditHistory() { return editHistory_; }
+    SceneView3D* GetSceneView3D() { return sceneView_; }
+
+    void RegisterNode(Node* node);
+    void RegisterNodes(const PODVector<Node*>& nodes);
+
+    void ReparentNode(Node* node, Node* newParent);
 
     Scene* GetScene() { return scene_; }
     Gizmo3D* GetGizmo() { return gizmo3D_; }
@@ -66,13 +73,19 @@ public:
 
     void Undo();
     void Redo();
+    void Cut();
+    void Copy();
+    void Paste();
 
     ProjectUserPrefs* GetUserPrefs();
+
+    void InvokeShortcut(const String& shortcut);
+
+    static SceneEditor3D* GetSceneEditor(Scene* scene);
 
 private:
 
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleEditorActiveNodeChange(StringHash eventType, VariantMap& eventData);
     void HandlePlayStarted(StringHash eventType, VariantMap& eventData);
     void HandlePlayStopped(StringHash eventType, VariantMap& eventData);
     void HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData);
@@ -80,10 +93,11 @@ private:
 
     void HandleUserPrefSaved(StringHash eventType, VariantMap& eventData);
 
-    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
-    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
-
     void HandleSceneEditSceneModified(StringHash eventType, VariantMap& eventData);
+    void HandleSceneEditNodeCreated(StringHash eventType, VariantMap& eventData);
+
+    void HandleCubemapRenderBegin(StringHash eventType, VariantMap& eventData);
+    void HandleCubemapRenderEnd(StringHash eventType, VariantMap& eventData);
 
     void UpdateGizmoSnapSettings();
 
@@ -94,12 +108,18 @@ private:
 
     SharedPtr<Gizmo3D> gizmo3D_;
 
-    WeakPtr<Node> selectedNode_;
-    SharedPtr<Node> clipboardNode_;
-
+    SharedPtr<SceneSelection> selection_;
     SharedPtr<SceneEditHistory> editHistory_;
 
+    SharedPtr<Node> clipboardNode_;
+
     WeakPtr<ProjectUserPrefs> userPrefs_;
+
+    void RegisterSceneEditor();
+
+    static Vector<WeakPtr<SceneEditor3D>> sceneEditors_;
+
+    int cubemapRenderCount_;
 
 };
 

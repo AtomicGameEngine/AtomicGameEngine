@@ -69,11 +69,14 @@ void PrefabComponent::LoadPrefabNode()
     Quaternion rot = node->GetRotation();
     Vector3 scale = node->GetScale();
 
+    String name = node->GetName();
+
     node->LoadXML(xmlfile->GetRoot());
 
     node->SetPosition(pos);
     node->SetRotation(rot);
     node->SetScale(scale);
+    node->SetName(name);
 
     // Get the root components of the load node
     const Vector<SharedPtr<Component>>& rootComponents = node->GetComponents();

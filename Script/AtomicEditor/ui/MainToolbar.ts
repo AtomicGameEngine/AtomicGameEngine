@@ -6,6 +6,7 @@
 //
 
 import EditorUI = require("./EditorUI");
+import EditorEvents = require("../editor/EditorEvents");
 
 class MainToolbar extends Atomic.UIWidget {
 
@@ -13,6 +14,7 @@ class MainToolbar extends Atomic.UIWidget {
     rotateButton: Atomic.UIButton;
     scaleButton: Atomic.UIButton;
     axisButton: Atomic.UIButton;
+    playButton: Atomic.UIButton;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -26,13 +28,25 @@ class MainToolbar extends Atomic.UIWidget {
 
         this.axisButton = <Atomic.UIButton>this.getWidget("3d_axismode");
 
+        this.playButton = <Atomic.UIButton>this.getWidget("maintoolbar_play");
+
         this.translateButton.value = 1;
 
         parent.addChild(this);
 
         this.subscribeToEvent("GizmoAxisModeChanged", (ev) => this.handleGizmoAxisModeChanged(ev));
         this.subscribeToEvent("GizmoEditModeChanged", (ev) => this.handleGizmoEditModeChanged(ev));
+
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
+        this.subscribeToEvent(EditorEvents.PlayerStarted, (data) => {
+            var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
+            skin.setSkinBg("StopButton");
+        });
+        this.subscribeToEvent(EditorEvents.PlayerStopped, (data) => {
+            var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
+            skin.setSkinBg("PlayButton");
+        });
     }
 
     handleGizmoAxisModeChanged(ev: Editor.GizmoAxisModeChangedEvent) {
@@ -91,10 +105,8 @@ class MainToolbar extends Atomic.UIWidget {
                 return true;
 
             } else if (ev.target.id == "maintoolbar_play") {
-
-                EditorUI.getShortcuts().invokePlay();
+                EditorUI.getShortcuts().invokePlayOrStopPlayer();
                 return true;
-
             }
 
         }

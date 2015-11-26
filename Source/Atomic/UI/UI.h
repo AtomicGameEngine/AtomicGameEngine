@@ -98,12 +98,18 @@ public:
     void ShowConsole(bool value);
     void ToggleConsole();
 
+    bool GetFocusedWidget();
+
     /// request exit on next frame
     void RequestExit() { exitRequested_ = true; inputDisabled_ = true; }
 
     UIRenderer* GetRenderer() { return renderer_; }
 
     UIWidget* GetWidgetAt(int x, int y, bool include_children);
+
+    bool GetBlockChangedEvents() const { return changedEventsBlocked_ > 0; }
+
+    void SetBlockChangedEvents(bool blocked = true);
 
 private:
 
@@ -137,6 +143,8 @@ private:
 
     HashMap<tb::TBWidget*, SharedPtr<UIWidget> > widgetWrap_;
     HashMap<unsigned, String> tbidToString_;
+
+    int changedEventsBlocked_;
 
     bool inputDisabled_;
     bool keyboardDisabled_;

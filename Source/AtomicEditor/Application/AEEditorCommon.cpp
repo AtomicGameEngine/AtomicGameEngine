@@ -19,11 +19,15 @@
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
 
+#include <Atomic/IO/File.h>
+
 #ifdef ATOMIC_DOTNET
 #include <AtomicNET/NETCore/NETHost.h>
 #include <AtomicNET/NETCore/NETCore.h>
 #include <AtomicNET/NETScript/NETScript.h>
 #endif
+
+#include "../Components/EditorComponents.h"
 
 #include "AEEditorCommon.h"
 
@@ -72,6 +76,8 @@ void AEEditorCommon::Setup()
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);
 #endif
+
+    RegisterEditorComponentLibrary(context_);
 
 #ifdef ATOMIC_DOTNET
     RegisterNETScriptLibrary(context_);
@@ -148,6 +154,38 @@ void AEEditorCommon::Stop()
         context_->RemoveSubsystem<NETCore>();
     }
 #endif
+}
+
+
+bool AEEditorCommon::ReadPreferences(String& path, JSONValue& prefs, const String& propertyName)
+{
+    if (!path.EndsWith(".json"))
+        path.Append(".json");
+
+    SharedPtr<File> file(new File(context_, path, FILE_READ));
+
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    if (!jsonFile->BeginLoad(*file))
+        return false;
+
+    JSONValue root = jsonFile->GetRoot();
+
+    if (propertyName.Length() > 0)
+    {
+        if (root.Contains(propertyName))
+        {
+            prefs = root.Get(propertyName);
+        }
+    }
+    else
+    {
+        prefs = root;
+    }
+
+    file->Close();
+
+    return true;
 }
 
 }

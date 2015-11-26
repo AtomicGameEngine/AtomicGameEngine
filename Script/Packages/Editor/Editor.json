@@ -1,7 +1,10 @@
 {
 	"name" : "Editor",
+	"includes" : ["<Atomic/Graphics/DebugRenderer.h>"],
 	"sources" : ["Source/AtomicEditor/Application", "Source/AtomicEditor/Utils",
-							"Source/AtomicEditor/EditorMode", "Source/AtomicEditor/PlayerMode",
-							 "Source/AtomicEditor/Editors", "Source/AtomicEditor/Editors/SceneEditor3D"],
-	"classes" : ["EditorMode", "PlayerMode", "FileUtils", "ResourceEditor", "JSResourceEditor", "SceneEditor3D", "SceneView3D"]
+							 "Source/AtomicEditor/EditorMode", "Source/AtomicEditor/PlayerMode",
+							 "Source/AtomicEditor/Editors", "Source/AtomicEditor/Editors/SceneEditor3D",
+						   "Source/AtomicEditor/Components"],
+	"classes" : ["EditorMode", "PlayerMode", "FileUtils", "ResourceEditor", "JSResourceEditor",
+							 "SceneEditor3D", "SceneView3D", "SceneSelection", "EditorComponent", "CubemapGenerator"]
 }

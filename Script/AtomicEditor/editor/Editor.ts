@@ -34,11 +34,11 @@ class Editor extends Atomic.ScriptObject {
 
         Editor.instance = this;
 
+        Preferences.getInstance().read();
+
         this.initUI();
 
         this.editorLicense = new EditorLicense();
-
-        Preferences.getInstance().read();
 
         EditorUI.initialize();
 
@@ -51,6 +51,10 @@ class Editor extends Atomic.ScriptObject {
         this.subscribeToEvent("ProjectUnloaded", (data) => {
             Atomic.graphics.windowTitle = "AtomicEditor";
             this.handleProjectUnloaded(data)
+        });
+
+        this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {
+            Preferences.getInstance().savePlayerWindowData(data.posX, data.posY, data.width, data.height, data.monitor);
         });
 
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
@@ -118,6 +122,7 @@ class Editor extends Atomic.ScriptObject {
     }
 
     closeProject() {
+        this.sendEvent("IPCPlayerExitRequest");
         var system = ToolCore.getToolSystem();
 
         if (system.project) {
@@ -129,9 +134,7 @@ class Editor extends Atomic.ScriptObject {
 
     handleProjectUnloaded(event) {
 
-        this.sendEvent(EditorEvents.ActiveSceneChange, { scene: null });
-
-
+        this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: null });
 
     }
 
@@ -157,6 +160,7 @@ class Editor extends Atomic.ScriptObject {
 
     // event handling
     handleExitRequested(data) {
+        this.sendEvent("IPCPlayerExitRequest");
         this.exitRequested = true;
         this.closeAllResourceEditors();
     }
