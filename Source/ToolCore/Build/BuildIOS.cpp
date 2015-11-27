@@ -7,6 +7,7 @@
 
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
@@ -308,7 +309,7 @@ void BuildIOS::Build(const String& buildPath)
 
     fileSystem->CreateDir(buildDestDist);
 
-    String resourcePackagePath = buildDestDist + "/AtomicResources.pak";
+    String resourcePackagePath = buildDestDist + "/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
 
     fileSystem->Copy(buildAppSourceDir + "/AtomicPlayer", buildDestDist + "/AtomicPlayer");

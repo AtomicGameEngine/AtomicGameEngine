@@ -6,6 +6,7 @@
 //
 
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
@@ -81,7 +82,7 @@ void BuildMac::Build(const String& buildPath)
     fileSystem->CreateDir(buildPath_ + "/Contents/MacOS");
     fileSystem->CreateDir(buildPath_ + "/Contents/Resources");
 
-    String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources.pak";
+    String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
 
     fileSystem->Copy(appSrcPath + "/Contents/Resources/Atomic.icns", buildPath_ + "/Contents/Resources/Atomic.icns");

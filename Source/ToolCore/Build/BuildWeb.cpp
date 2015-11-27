@@ -8,6 +8,7 @@
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/File.h>
+#include <Atomic/Resource/ResourceCache.h>
 
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
@@ -99,7 +100,7 @@ void BuildWeb::Build(const String& buildPath)
     file.Close();
 
     String request;
-    request.AppendWithFormat("new DataRequest(0, %i, 0, 0).open('GET', '/AtomicResources.pak');", rsize);
+    request.AppendWithFormat("new DataRequest(0, %i, 0, 0).open('GET', '/AtomicResources%s');", rsize, PAK_EXTENSION);
 
     resourcejs.Replace("$$REMOTE_PACKAGE_SIZE$$", ToString("%i", rsize));
     resourcejs.Replace("$$ATOMIC_RESOURCES_DATA_REQUEST$$", request);

@@ -245,7 +245,7 @@ bool Engine::Initialize(const VariantMap& parameters)
         // If path is not absolute, prefer to add it as a package if possible
         if (!IsAbsolutePath(resourcePaths[i]))
         {
-            String packageName = resourcePrefixPath + resourcePaths[i] + ".pak";
+            String packageName = resourcePrefixPath + resourcePaths[i] + PAK_EXTENSION;
             if (fileSystem->FileExists(packageName))
                 success = cache->AddPackageFile(packageName);
 
@@ -259,7 +259,9 @@ bool Engine::Initialize(const VariantMap& parameters)
         else
         {
             String pathName = resourcePaths[i];
-            if (fileSystem->DirExists(pathName))
+            if (pathName.EndsWith(PAK_EXTENSION) && fileSystem->FileExists(pathName))
+                success = cache->AddPackageFile(pathName);
+            else if (fileSystem->DirExists(pathName))
                 success = cache->AddResourceDir(pathName);
         }
 
@@ -320,7 +322,7 @@ bool Engine::Initialize(const VariantMap& parameters)
 
             // Add all the found package files (non-recursive)
             Vector<String> paks;
-            fileSystem->ScanDir(paks, autoLoadPath, "*.pak", SCAN_FILES, false);
+            fileSystem->ScanDir(paks, autoLoadPath, PAK_EXTENSION, SCAN_FILES, false);
             for (unsigned y = 0; y < paks.Size(); ++y)
             {
                 String pak = paks[y];
@@ -828,6 +830,11 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                     ret["LogLevel"] = logLevel;
                     ++i;
                 }
+            }
+            else if (argument == "logname" && !value.Empty())
+            {
+                ret["LogName"] = value;
+                ++i;
             }
             else if (argument == "x" && !value.Empty())
             {

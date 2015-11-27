@@ -37,6 +37,10 @@ class PackageFile;
 
 /// Sets to priority so that a package or file is pushed to the end of the vector.
 static const unsigned PRIORITY_LAST = 0xffffffff;
+/// Extension used for package files
+extern const char* PAK_EXTENSION;
+/// File search filter used to find package files
+extern const char* PAK_FILTER;
 
 /// Container of resources with specific type.
 struct ResourceGroup
