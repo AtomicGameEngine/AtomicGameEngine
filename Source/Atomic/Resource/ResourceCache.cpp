@@ -64,8 +64,8 @@ static const char* checkDirs[] =
 };
 
 static const SharedPtr<Resource> noResource;
-const char* Atomic::PAK_EXTENSION = ".pak";
-const char* Atomic::PAK_FILTER = "*.pak";
+const char* PAK_EXTENSION = ".pak";
+const char* PAK_FILTER = "*.pak";
 
 ResourceCache::ResourceCache(Context* context) :
     Object(context),
