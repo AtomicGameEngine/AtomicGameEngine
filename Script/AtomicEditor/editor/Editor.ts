@@ -160,6 +160,7 @@ class Editor extends Atomic.ScriptObject {
 
     // event handling
     handleExitRequested(data) {
+        if (this.exitRequested) return;
         this.sendEvent("IPCPlayerExitRequest");
         this.exitRequested = true;
         this.closeAllResourceEditors();

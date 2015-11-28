@@ -42,11 +42,14 @@ public:
         if (editor_->HasUnsavedModifications())
         {
             TBMessageWindow *msg_win = new TBMessageWindow(this, TBIDC("unsaved_modifications_dialog"));
-            TBMessageWindowSettings settings(TB_MSG_OK_CANCEL, TBID(uint32(0)));
+            TBMessageWindowSettings settings(TB_MSG_NONE, TBID(uint32(0)));
             settings.dimmer = true;
             settings.styling = true;
             String windowString = Atomic::ToString("%s has unsaved modifications.\nDo you wish to discard them and close?", GetFileNameAndExtension(editor_->GetFullPath()).CString());
             msg_win->Show("Unsaved Modifications",  windowString.CString(), &settings, 640, 360);
+            msg_win->AddButtonLeft("dont_save", false);
+            msg_win->AddButton("TBMessageWindow.cancel", false);
+            msg_win->AddButton("save", true);
             return false;
         }
         else
@@ -62,15 +65,21 @@ public:
         {
             if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
             {
-                if (ev.ref_id == TBIDC("TBMessageWindow.ok"))
+                if (ev.ref_id == TBIDC("dont_save"))
                 {
                     container_->OnEvent(ev);
                     editor_->Close(container_->GetNumPages()>1);
                 }
-                else
+                else if (ev.ref_id == TBIDC("cancel"))
                 {
                     editor_->SendEvent(E_EDITORRESOURCECLOSECANCELED);
                     SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
+                }
+                else if (ev.ref_id == TBIDC("save"))
+                {
+                    editor_->Save();
+                    container_->OnEvent(ev);
+                    editor_->Close(container_->GetNumPages()>1);
                 }
                 return true;
             }

@@ -14,3 +14,4 @@ new New
 save Save
 close Close
 search Search
+dont_save Don't Save
