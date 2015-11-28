@@ -47,8 +47,7 @@ public:
             settings.styling = true;
             String windowString = Atomic::ToString("%s has unsaved modifications.\nDo you wish to discard them and close?", GetFileNameAndExtension(editor_->GetFullPath()).CString());
             msg_win->Show("Unsaved Modifications",  windowString.CString(), &settings, 640, 360);
-            TBButton *btn = new TBButton();
-            msg_win->AddButton("dont_save", false, msg_win->GetWidgetByIDAndType<TBLayout>(5));
+            msg_win->AddButtonLeft("dont_save", false);
             msg_win->AddButton("TBMessageWindow.cancel", false);
             msg_win->AddButton("save", true);
             return false;

@@ -116,6 +116,11 @@ bool TBMessageWindow::Show(const char *title, const char *message, TBMessageWind
 	return true;
 }
 
+void TBMessageWindow::AddButtonLeft(TBID id, bool focused)
+{
+    AddButton(id, focused, GetWidgetByIDAndType<TBLayout>(5));
+}
+
 void TBMessageWindow::AddButton(TBID id, bool focused, TBLayout *layout)
 {
     if (!layout) 

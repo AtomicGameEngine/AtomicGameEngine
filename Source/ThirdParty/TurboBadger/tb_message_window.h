@@ -56,7 +56,9 @@ public:
 	virtual bool OnEvent(const TBWidgetEvent &ev);
 	virtual void OnDie();
 
-    void AddButton(TBID id, bool focused, TBLayout *layout = NULL);
+    void AddButton(TBID id, bool focused, TBLayout *layout = nullptr);
+    void AddButtonLeft(TBID id, bool focused);
+
 private:
 	// TBWidgetListener
 	virtual void OnWidgetDelete(TBWidget *widget);
