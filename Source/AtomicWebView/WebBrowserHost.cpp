@@ -23,9 +23,6 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     CefMainArgs args(arguments.Size(), arguments.Size() ? (char**) &argv[0] : (char **) _argv);
 
-    // TODO: We're losing the main system menu items on OSX and cmd-q no longer works
-    // when we init CEF
-
     int result = CefExecuteProcess(args, nullptr, nullptr);
 
     if (result >= 0)
@@ -34,6 +31,9 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     }
 
     CefSettings settings;
+
+    // TODO: We're losing the main system menu items on OSX and cmd-q no longer works
+    // when we call CefInitialize
 
     if (!CefInitialize(args, settings, nullptr, nullptr))
     {
