@@ -62,6 +62,11 @@ void AEEditorCommon::Start()
 {
     ValidateWindow();
 
+#ifdef ATOMIC_WEBVIEW
+    // Initialize in Start so window already exists
+    context_->RegisterSubsystem(new WebBrowserHost(context_));
+#endif
+
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -112,12 +117,6 @@ void AEEditorCommon::Setup()
 #else
 
     env->InitFromPackage();
-
-#endif
-
-#ifdef ATOMIC_WEBVIEW
-
-    context_->RegisterSubsystem(new WebBrowserHost(context_));
 
 #endif
 
