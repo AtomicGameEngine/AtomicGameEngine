@@ -99,10 +99,13 @@ class Shortcuts extends Atomic.ScriptObject {
 
     }
 
-    invokeGizmoAxisModeChanged(mode: Editor.AxisMode, toggle: boolean = false) {
+    toggleGizmoAxisMode() {
+        var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
 
-        this.sendEvent("GizmoAxisModeChanged", { mode: mode, toggle: toggle });
-
+        if (editor instanceof Editor.SceneEditor3D) {
+            var mode = editor.getGizmo().axisMode ? Editor.AXIS_WORLD : Editor.AXIS_LOCAL;
+            this.sendEvent("GizmoAxisModeChanged", { mode: mode });
+        }
     }
 
     invokeResourceFrameShortcut(shortcut: string) {
@@ -129,7 +132,7 @@ class Shortcuts extends Atomic.ScriptObject {
                 } else if (ev.key == Atomic.KEY_R) {
                     this.invokeGizmoEditModeChanged(Editor.EDIT_SCALE);
                 } else if (ev.key == Atomic.KEY_X) {
-                    this.invokeGizmoAxisModeChanged(Editor.AXIS_WORLD, true);
+                    this.toggleGizmoAxisMode();
                 } else if (ev.key == Atomic.KEY_F) {
                     this.invokeFrameSelected();
                 }

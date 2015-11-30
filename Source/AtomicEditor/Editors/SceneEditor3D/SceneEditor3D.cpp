@@ -228,16 +228,7 @@ void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap&
 void SceneEditor3D::HandleGizmoAxisModeChanged(StringHash eventType, VariantMap& eventData)
 {
     AxisMode mode = (AxisMode) (eventData[GizmoAxisModeChanged::P_MODE].GetInt());
-    bool toggle = eventData[GizmoAxisModeChanged::P_TOGGLE].GetBool();
-    if (toggle)
-    {
-        AxisMode mode = gizmo3D_->GetAxisMode() == AXIS_WORLD ? AXIS_LOCAL : AXIS_WORLD;
-        VariantMap neventData;
-        neventData[GizmoAxisModeChanged::P_MODE] = (int) mode;
-        SendEvent(E_GIZMOAXISMODECHANGED, neventData);
-    }
-    else
-        gizmo3D_->SetAxisMode(mode);
+    gizmo3D_->SetAxisMode(mode);
 }
 
 

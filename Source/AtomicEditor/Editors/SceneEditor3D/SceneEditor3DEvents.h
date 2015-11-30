@@ -21,8 +21,6 @@ EVENT(E_GIZMOEDITMODECHANGED, GizmoEditModeChanged)
 EVENT(E_GIZMOAXISMODECHANGED, GizmoAxisModeChanged)
 {
     PARAM(P_MODE, Mode);            // int
-    PARAM(P_TOGGLE, Toggle);            // bool
-
 }
 
 EVENT(E_GIZMOMOVED, GizmoMoved)
