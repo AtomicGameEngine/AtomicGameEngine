@@ -46,7 +46,7 @@ class Shortcuts extends Atomic.ScriptObject {
 
     invokeFormatCode() {
 
-        var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+        var editor = EditorUI.getCurrentResourceEditor();
 
         if (editor && editor.typeName == "JSResourceEditor") {
 
@@ -100,9 +100,9 @@ class Shortcuts extends Atomic.ScriptObject {
     }
 
     toggleGizmoAxisMode() {
-        var editor = EditorUI.getMainFrame().resourceframe.currentResourceEditor;
+        var editor = EditorUI.getCurrentResourceEditor();
 
-        if (editor instanceof Editor.SceneEditor3D) {
+        if (editor && editor instanceof Editor.SceneEditor3D) {
             var mode = editor.getGizmo().axisMode ? Editor.AXIS_WORLD : Editor.AXIS_LOCAL;
             this.sendEvent("GizmoAxisModeChanged", { mode: mode });
         }
