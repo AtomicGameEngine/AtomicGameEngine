@@ -58,37 +58,44 @@ void BuildMac::Build(const String& buildPath)
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
-    VariantMap buildOutput;
-    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Mac Deployment</color>\n\n";
-    SendEvent(E_BUILDOUTPUT, buildOutput);
+    BuildLog("Starting Mac Deployment");
 
     Initialize();
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
+    if (!BuildRemoveDirectory(buildPath_))
+        return;
+
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem->DirExists(buildPath_))
-        fileSystem->RemoveDir(buildPath_, true);
 
     String appSrcPath = tenv->GetPlayerAppFolder();
 
-    fileSystem->CreateDir(buildPath_);
+    if (!BuildCreateDirectory(buildPath_))
+        return;
 
     buildPath_ += "/AtomicPlayer.app";
 
-    fileSystem->CreateDir(buildPath_);
-
-    fileSystem->CreateDir(buildPath_ + "/Contents");
-    fileSystem->CreateDir(buildPath_ + "/Contents/MacOS");
-    fileSystem->CreateDir(buildPath_ + "/Contents/Resources");
+    if (!BuildCreateDirectory(buildPath_))
+        return;
+    if (!BuildCreateDirectory(buildPath_ + "/Contents"))
+        return;
+    if (!BuildCreateDirectory(buildPath_ + "/Contents/MacOS"))
+        return;
+    if (!BuildCreateDirectory(buildPath_ + "/Contents/Resources"))
+        return;
 
     String resourcePackagePath = buildPath_ + "/Contents/Resources/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
 
-    fileSystem->Copy(appSrcPath + "/Contents/Resources/Atomic.icns", buildPath_ + "/Contents/Resources/Atomic.icns");
+    if (!BuildCopyFile(appSrcPath + "/Contents/Resources/Atomic.icns", buildPath_ + "/Contents/Resources/Atomic.icns"))
+        return;
 
-    fileSystem->Copy(appSrcPath + "/Contents/Info.plist", buildPath_ + "/Contents/Info.plist");
-    fileSystem->Copy(appSrcPath + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer");
+    if (!BuildCopyFile(appSrcPath + "/Contents/Info.plist", buildPath_ + "/Contents/Info.plist"))
+        return;
+
+    if (!BuildCopyFile(appSrcPath + "/Contents/MacOS/AtomicPlayer", buildPath_ + "/Contents/MacOS/AtomicPlayer"))
+        return;
 
 #ifdef ATOMIC_PLATFORM_OSX
     Vector<String> args;
@@ -97,8 +104,7 @@ void BuildMac::Build(const String& buildPath)
     fileSystem->SystemRun("chmod", args);
 #endif
 
-    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Mac Deployment Complete</color>\n\n";
-    SendEvent(E_BUILDOUTPUT, buildOutput);
+    BuildLog("Mac Deployment Complete");
 
     buildPath_ = buildPath + "/Mac-Build";
     buildSystem->BuildComplete(PLATFORMID_MAC, buildPath_);

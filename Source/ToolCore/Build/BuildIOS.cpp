@@ -160,7 +160,7 @@ void BuildIOS::RunConvertPList()
 
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunConvertPList");
+        FailBuild("BuildFailed::RunConvertPList");
         return;
     }
 
@@ -210,7 +210,7 @@ void BuildIOS::RunCodeSign()
 
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunCodeSign");
+        FailBuild("BuildFailed::RunCodeSign");
         return;
     }
 
@@ -259,7 +259,7 @@ void BuildIOS::RunDeploy()
 
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunDeploy");
+        FailBuild("BuildFailed::RunDeploy");
         return;
     }
 

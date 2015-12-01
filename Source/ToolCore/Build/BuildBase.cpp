@@ -12,6 +12,7 @@
 #include "../Project/Project.h"
 #include "../ToolEnvironment.h"
 
+#include "BuildSystem.h"
 #include "BuildEvents.h"
 #include "BuildBase.h"
 #include "ResourcePackager.h"
@@ -21,7 +22,8 @@ namespace ToolCore
 
 BuildBase::BuildBase(Context * context, Project* project, PlatformID platform) : Object(context),
     platformID_(platform),
-    containsMDL_(false)
+    containsMDL_(false),
+    buildFailed_(false)
 {
     if (UseResourcePackager())
         resourcePackager_ = new ResourcePackager(context, this);
@@ -38,28 +40,193 @@ BuildBase::~BuildBase()
     }
 }
 
-void BuildBase::BuildLog(const String& message)
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+bool BuildBase::BuildClean(const String& path)
+{
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::BuildClean - Attempt to clean directory of failed build, %s", path.CString());
+        return false;
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    if (!fileSystem->DirExists(path))
+        return true;
+
+    // On Windows, do a little dance with the folder to avoid issues
+    // with deleting folder and immediately recreating it
+
+    String pathName, fileName, ext;
+    SplitPath(path, pathName, fileName, ext);
+    pathName = AddTrailingSlash(pathName);    
+
+    unsigned i = 0;
+    while (true) 
+    {
+        String newPath = ToString("%s%s_Temp_%u", pathName.CString(), fileName.CString(), i++);
+        if (!fileSystem->DirExists(newPath))
+        {
+            if (!MoveFileExW(GetWideNativePath(path).CString(), GetWideNativePath(newPath).CString(), MOVEFILE_WRITE_THROUGH))
+            {
+                FailBuild(ToString("BuildBase::BuildClean: Unable to move directory %s -> ", path.CString(), newPath.CString()));
+                return false;
+            }
+
+            // Remove the moved directory
+            return BuildRemoveDirectory(newPath);
+
+        }
+        else
+        {
+            LOGWARNINGF("BuildBase::BuildClean - temp build folder exists, removing: %s", newPath.CString());
+            fileSystem->RemoveDir(newPath, true);
+        }
+
+        if (i == 255)
+        {
+            FailBuild(ToString("BuildBase::BuildClean: Unable to move directory ( i == 255) %s -> ", path.CString(), newPath.CString()));
+            return false;
+        }
+    }
+
+    return false;
+}
+
+#else
+
+bool BuildBase::BuildClean(const String& path)
+{
+    return BuildRemoveDirectory(path);
+}
+
+#endif
+
+bool BuildBase::BuildCreateDirectory(const String& path)
+{
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::BuildCreateDirectory - Attempt to create directory of failed build, %s", path.CString());
+        return false;
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    if (fileSystem->DirExists(path))
+        return true;
+
+    bool result = fileSystem->CreateDir(path);
+
+    if (!result)
+    {
+        FailBuild(ToString("BuildBase::BuildCreateDirectory: Unable to create directory %s", path.CString()));
+        return false;
+    }
+
+    return true;
+
+}
+
+bool BuildBase::BuildCopyFile(const String& srcFileName, const String& destFileName)
+{
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::BuildCopyFile - Attempt to copy file of failed build, %s", srcFileName.CString());
+        return false;
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    bool result = fileSystem->Copy(srcFileName, destFileName);
+
+    if (!result)
+    {
+        FailBuild(ToString("BuildBase::BuildCopyFile: Unable to copy file %s -> %s", srcFileName.CString(), destFileName.CString()));
+        return false;
+    }
+
+    return true;
+}
+
+bool BuildBase::BuildRemoveDirectory(const String& path)
+{
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::BuildRemoveDirectory - Attempt to remove directory of failed build, %s", path.CString());
+        return false;
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (!fileSystem->DirExists(path))
+        return true;
+
+    bool result = fileSystem->RemoveDir(path, true);
+
+    if (!result)
+    {
+        FailBuild(ToString("BuildBase::BuildRemoveDirectory: Unable to remove directory %s", path.CString()));
+        return false;
+    }
+
+    return true;
+}
+
+void BuildBase::BuildLog(const String& message, bool sendEvent)
 {
     buildLog_.Push(message);
+
+    if (sendEvent)
+    {
+        String colorMsg = ToString("<color #D4FB79>%s</color>\n", message.CString());
+        VariantMap buildOutput;
+        buildOutput[BuildOutput::P_TEXT] = colorMsg;
+        SendEvent(E_BUILDOUTPUT, buildOutput);
+    }
+
 }
 
-void BuildBase::BuildWarn(const String& warning)
+void BuildBase::BuildWarn(const String& warning, bool sendEvent)
 {
     buildWarnings_.Push(warning);
+
+    if (sendEvent)
+    {
+        String colorMsg = ToString("<color #FFFF00>%s</color>\n", warning.CString());
+        VariantMap buildOutput;
+        buildOutput[BuildOutput::P_TEXT] = colorMsg;
+        SendEvent(E_BUILDOUTPUT, buildOutput);
+    }
+
 }
 
-void BuildBase::BuildError(const String& error)
+void BuildBase::BuildError(const String& error, bool sendEvent)
 {
     buildErrors_.Push(error);
+
+    if (sendEvent)
+    {
+        String colorMsg = ToString("<color #FF0000>%s</color>\n", error.CString());
+        VariantMap buildOutput;
+        buildOutput[BuildOutput::P_TEXT] = colorMsg;
+        SendEvent(E_BUILDOUTPUT, buildOutput);
+    }
 }
 
-void BuildBase::SendBuildFailure(const String& message)
+void BuildBase::FailBuild(const String& message)
 {
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::FailBuild - Attempt to fail already failed build: %s", message.CString());
+        return;
+    }
 
-    VariantMap buildError;
-    buildError[BuildComplete::P_PLATFORMID] = platformID_;
-    buildError[BuildComplete::P_MESSAGE] = message;
-    SendEvent(E_BUILDCOMPLETE, buildError);
+    buildFailed_ = true;
+
+    BuildError(message);
+
+    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+    buildSystem->BuildComplete(platformID_, buildPath_, false, message);
 
 }
 

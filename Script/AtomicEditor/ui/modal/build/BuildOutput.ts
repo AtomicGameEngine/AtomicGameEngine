@@ -59,7 +59,7 @@ class BuildOutput extends ModalWindow {
         return false;
     }
 
-    textOutput: string;
+    textOutput: string = "";
     buildBase: ToolCore.BuildBase;
     outputField: Atomic.UIEditField;
 
