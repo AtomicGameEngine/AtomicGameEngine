@@ -725,7 +725,18 @@ private:
                 const TransformationComp comp = static_cast<TransformationComp>(i);
 
                 if (chain[i].IsIdentity() && (anim_chain_bitmask & bit) == 0) {
-                    continue;
+
+                    // ATOMIC BEGIN
+                    // Only optimize these out if not a TRS
+                    // As these may be animated in an external FBX
+                    // and should not be dropped
+                    if (comp != TransformationComp_Translation &&
+                        comp != TransformationComp_Rotation &&
+                        comp != TransformationComp_Scaling)
+                    {
+                        continue;
+                    }
+                    // ATOMIC END
                 }
 
                 aiNode* nd = new aiNode();
