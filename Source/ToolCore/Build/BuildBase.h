@@ -39,16 +39,21 @@ public:
     // will warn on name conflicts
     void AddResourceDir(const String& dir);
 
-    void BuildLog(const String& message);
-    void BuildWarn(const String& warning);
-    void BuildError(const String& error);
+    void BuildLog(const String& message, bool sendEvent = true);
+    void BuildWarn(const String& warning, bool sendEvent = true);
+    void BuildError(const String& error, bool sendEvent = true);
 
     /// Converts subprocess output event to a buildoutput event
     void HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData);
 
 protected:
 
-    void SendBuildFailure(const String& message);
+    bool BuildRemoveDirectory(const String& path);
+    bool BuildCreateDirectory(const String& path);
+    bool BuildCopyFile(const String& srcFileName, const String& destFileName);
+
+    /// Fail the current build
+    void FailBuild(const String& message);
 
     void GenerateResourcePackage(const String& resourcePackagePath);
 
@@ -65,6 +70,7 @@ private:
 
     PlatformID platformID_;
 
+    bool buildFailed_;
     Vector<String> buildLog_;
     Vector<String> buildWarnings_;
     Vector<String> buildErrors_;

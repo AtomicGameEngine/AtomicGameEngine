@@ -55,7 +55,7 @@ ResourcePackager::~ResourcePackager()
 
 bool ResourcePackager::WritePackageFile(const String& destFilePath)
 {
-    buildBase_->BuildLog("Writing package");
+    buildBase_->BuildLog("Writing package", false);
 
     SharedPtr<File> dest(new File(context_, destFilePath, FILE_WRITE));
     if (!dest->IsOpen())
@@ -149,7 +149,7 @@ bool ResourcePackager::WritePackageFile(const String& destFilePath)
             pos += unpackedSize;
         }
 
-        buildBase_->BuildLog(entry->absolutePath_ + " in " + String(dataSize) + " out " + String(totalPackedBytes));
+        buildBase_->BuildLog(entry->absolutePath_ + " in " + String(dataSize) + " out " + String(totalPackedBytes), false);
         }
     //}
 
@@ -171,6 +171,7 @@ bool ResourcePackager::WritePackageFile(const String& destFilePath)
         dest->WriteUInt(entry->checksum_);
     }
 
+    buildBase_->BuildLog("Resource Package:");
     buildBase_->BuildLog("Number of files " + String(resourceEntries_.Size()));
     buildBase_->BuildLog("File data size " + String(totalDataSize));
     buildBase_->BuildLog("Package size " + String(dest->GetSize()));
