@@ -40,6 +40,69 @@ BuildBase::~BuildBase()
     }
 }
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+bool BuildBase::BuildClean(const String& path)
+{
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::BuildClean - Attempt to clean directory of failed build, %s", path.CString());
+        return false;
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    if (!fileSystem->DirExists(path))
+        return true;
+
+    // On Windows, do a little dance with the folder to avoid issues
+    // with deleting folder and immediately recreating it
+
+    String pathName, fileName, ext;
+    SplitPath(path, pathName, fileName, ext);
+    pathName = AddTrailingSlash(pathName);    
+
+    unsigned i = 0;
+    while (true) 
+    {
+        String newPath = ToString("%s%s_Temp_%u", pathName.CString(), fileName.CString(), i++);
+        if (!fileSystem->DirExists(newPath))
+        {
+            if (!MoveFileExW(GetWideNativePath(path).CString(), GetWideNativePath(newPath).CString(), MOVEFILE_WRITE_THROUGH))
+            {
+                FailBuild(ToString("BuildBase::BuildClean: Unable to move directory %s -> ", path.CString(), newPath.CString()));
+                return false;
+            }
+
+            // Remove the moved directory
+            return BuildRemoveDirectory(newPath);
+
+        }
+        else
+        {
+            LOGWARNINGF("BuildBase::BuildClean - temp build folder exists, removing: %s", newPath.CString());
+            fileSystem->RemoveDir(newPath, true);
+        }
+
+        if (i == 255)
+        {
+            FailBuild(ToString("BuildBase::BuildClean: Unable to move directory ( i == 255) %s -> ", path.CString(), newPath.CString()));
+            return false;
+        }
+    }
+
+    return false;
+}
+
+#else
+
+bool BuildBase::BuildClean(const String& path)
+{
+    return BuildRemoveDirectory(path);
+}
+
+#endif
+
 bool BuildBase::BuildCreateDirectory(const String& path)
 {
     if (buildFailed_)

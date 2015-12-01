@@ -60,7 +60,7 @@ bool ResourcePackager::WritePackageFile(const String& destFilePath)
     SharedPtr<File> dest(new File(context_, destFilePath, FILE_WRITE));
     if (!dest->IsOpen())
     {
-        buildBase_->BuildError("Could not open output file " + destFilePath);
+        buildBase_->FailBuild("Could not open output file " + destFilePath);
         return false;
     }
 
@@ -90,7 +90,7 @@ bool ResourcePackager::WritePackageFile(const String& destFilePath)
         File srcFile(context_, entry->absolutePath_);
         if (!srcFile.IsOpen())
         {
-            buildBase_->BuildError("Could not open input file " + entry->absolutePath_);
+            buildBase_->FailBuild("Could not open input file " + entry->absolutePath_);
             return false;
         }
 
@@ -100,7 +100,7 @@ bool ResourcePackager::WritePackageFile(const String& destFilePath)
 
         if (srcFile.Read(&buffer[0], dataSize) != dataSize)
         {
-            buildBase_->BuildError("Could not read input file " + entry->absolutePath_);
+            buildBase_->FailBuild("Could not read input file " + entry->absolutePath_);
             return false;
         }
 
@@ -137,7 +137,7 @@ bool ResourcePackager::WritePackageFile(const String& destFilePath)
             unsigned packedSize = LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
             if (!packedSize)
             {
-                buildBase_->BuildError("LZ4 compression failed for file " + entry->absolutePath_ + " at offset " + pos);
+                buildBase_->FailBuild("LZ4 compression failed for file " + entry->absolutePath_ + " at offset " + pos);
                 return false;
             }
 
@@ -197,7 +197,7 @@ void ResourcePackager::GeneratePackage(const String& destFilePath)
 
         if (!file.Open(entry->absolutePath_))
         {
-            buildBase_->BuildError(Atomic::ToString("Could not open resource file %s", entry->absolutePath_.CString()));
+            buildBase_->FailBuild(Atomic::ToString("Could not open resource file %s", entry->absolutePath_.CString()));
             return;
         }
 

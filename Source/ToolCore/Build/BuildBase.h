@@ -43,17 +43,19 @@ public:
     void BuildWarn(const String& warning, bool sendEvent = true);
     void BuildError(const String& error, bool sendEvent = true);
 
+    /// Fail the current build
+    void FailBuild(const String& message);
+
     /// Converts subprocess output event to a buildoutput event
     void HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData);
 
 protected:
 
+    bool BuildClean(const String& path);
     bool BuildRemoveDirectory(const String& path);
     bool BuildCreateDirectory(const String& path);
     bool BuildCopyFile(const String& srcFileName, const String& destFileName);
 
-    /// Fail the current build
-    void FailBuild(const String& message);
 
     void GenerateResourcePackage(const String& resourcePackagePath);
 
@@ -65,12 +67,12 @@ protected:
     PODVector<BuildResourceEntry*> resourceEntries_;
 
     bool containsMDL_;
+    bool buildFailed_;
 
 private:
 
     PlatformID platformID_;
-
-    bool buildFailed_;
+    
     Vector<String> buildLog_;
     Vector<String> buildWarnings_;
     Vector<String> buildErrors_;
