@@ -210,13 +210,11 @@ void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
 {
-    sceneView_->Disable();
 
 }
 
 void SceneEditor3D::HandlePlayStopped(StringHash eventType, VariantMap& eventData)
 {
-    sceneView_->Enable();
 }
 
 void SceneEditor3D::HandleGizmoEditModeChanged(StringHash eventType, VariantMap& eventData)
