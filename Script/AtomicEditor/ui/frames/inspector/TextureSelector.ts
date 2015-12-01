@@ -35,7 +35,7 @@ class TextureSelector extends Atomic.UIWindow {
 
         var db = ToolCore.getAssetDatabase();
 
-        var textures = db.getAssetsByImporterType("TextureImporter");
+        var textures = db.getAssetsByImporterType("TextureImporter", "Texture2D");
 
         for (var i in textures) {
 

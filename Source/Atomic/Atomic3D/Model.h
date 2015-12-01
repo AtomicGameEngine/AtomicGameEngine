@@ -209,16 +209,6 @@ public:
     /// Return vertex buffer morph range vertex count.
     unsigned GetMorphRangeCount(unsigned bufferIndex) const;
 
-    // ATOMIC BEGIN
-
-    void AddAnimationResource(Animation* animation);
-    void RemoveAnimationResource(Animation* animation);
-    void ClearAnimationResources();
-    unsigned GetAnimationCount() const { return animationsResources_.Size(); }
-    const Vector<SharedPtr<Animation>>& GetAnimationResources() { return animationsResources_; }
-
-    // ATOMIC END
-
 private:
     /// Bounding box.
     BoundingBox boundingBox_;
@@ -247,12 +237,6 @@ private:
     /// Geometry definitions for asynchronous loading.
     Vector<PODVector<GeometryDesc> > loadGeometries_;
 
-    // ATOMIC BEGIN
-
-    /// animation resources
-    Vector<SharedPtr<Animation> > animationsResources_;
-
-    // ATOMIC END
 };
 
 }

@@ -404,11 +404,11 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
                 if (value == undefined) {
 
-                  console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
-                  widget.text = "???";
+                    console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
+                    widget.text = "???";
 
                 } else {
-                  widget.text = parseFloat(value.toFixed(5)).toString();
+                    widget.text = parseFloat(value.toFixed(5)).toString();
                 }
 
             }
@@ -636,7 +636,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         if (parent) {
 
-          parent.sendEvent("AttributeEditResourceChanged", { attrInfoEdit: this, resource: resource});
+            parent.sendEvent("AttributeEditResourceChanged", { attrInfoEdit: this, resource: resource });
 
         }
 
@@ -679,10 +679,17 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 var text = "";
 
                 if (resource) {
-                    text = resource.name;
-                    var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                    if (asset)
-                        text = asset.name;
+                    if (resource instanceof Atomic.Animation) {
+
+                      text = (<Atomic.Animation>resource).animationName;
+
+                    } else {
+
+                        text = resource.name;
+                        var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                        if (asset)
+                            text = asset.name;
+                    }
                 }
                 this.editField.text = text;
             }
@@ -718,9 +725,20 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         selectButton.onClick = () => {
 
-            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
+            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function(retObject: any) {
 
-                var resource = asset.getResource(resourceTypeName);
+                var resource: Atomic.Resource = null;
+
+                if (retObject instanceof ToolCore.Asset) {
+
+                    resource = (<ToolCore.Asset>retObject).getResource(resourceTypeName);
+
+                } else if (retObject instanceof Atomic.Resource) {
+
+                    resource = <Atomic.Resource>retObject;
+
+                }
+
                 this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
                 this.onResourceChanged(resource);
                 this.refresh();
@@ -770,6 +788,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
     layout: Atomic.UILayout;
     refEdits: ResourceRefAttributeEdit[] = [];
+    sizeEdit: Atomic.UIEditField;
 
     initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
 
@@ -803,9 +822,19 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 304;
-
         layout.layoutParams = lp;
 
+        var name = this.attrInfo.name + " Size";
+        if (name == "AnimationResources")
+          name = "Animations";
+
+        var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 198;
+        sizeEdit.layoutParams = lp;
+
+        sizeEdit.subscribeToEvent(sizeEdit, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
 
         this.editWidget = layout;
 
@@ -818,6 +847,48 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
         this.addChild(this.editWidget);
+
+    }
+
+    handleUIWidgetEditCompleteEvent(ev) {
+
+        var size = Number(this.sizeEdit.text);
+
+        if (size > 64 || size < 0)
+            return;
+
+        var editType = this.editType;
+
+        var refresh = false;
+
+        for (var i in editType.objects) {
+
+            var object = editType.objects[i];
+            var value = object.getAttribute(this.attrInfo.name);
+
+            if (value.resources.length > size) {
+
+                value.resources.length = size;
+                object.setAttribute(this.attrInfo.name, value);
+                refresh = true;
+
+            } else if (value.resources.length < size) {
+
+                for (var j = value.resources.length; j < size; j++) {
+
+                    value.resources.push(null);
+
+                }
+
+                object.setAttribute(this.attrInfo.name, value);
+                refresh = true;
+
+            }
+
+        }
+
+        if (refresh)
+            this.refresh();
 
     }
 
@@ -847,6 +918,8 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
             }
 
         }
+
+        this.sizeEdit.text = maxLength.toString();
 
         if (maxLength == -1) {
             this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;

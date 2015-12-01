@@ -71,8 +71,11 @@ class InspectorUtils {
   static createAttrEditField(name:string, parent:Atomic.UIWidget):Atomic.UIEditField {
 
     var attrLayout = new Atomic.UILayout();
-    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
+    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+    attrLayout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+    
     var _name = InspectorUtils.createAttrName(name);
     attrLayout.addChild(_name);
 

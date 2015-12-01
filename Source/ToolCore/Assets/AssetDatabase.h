@@ -44,7 +44,7 @@ public:
 
     String GetResourceImporterName(const String& resourceTypeName);
 
-    void GetAssetsByImporterType(StringHash type, PODVector<Asset*>& assets) const;
+    void GetAssetsByImporterType(StringHash type, const String& resourceType, PODVector<Asset*>& assets) const;
 
     void GetDirtyAssets(PODVector<Asset*>& assets);
 

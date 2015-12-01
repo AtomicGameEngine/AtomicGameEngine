@@ -302,16 +302,6 @@ bool Model::BeginLoad(Deserializer& source)
     // MODEL_VERSION
     unsigned version = source.ReadUInt();
 
-    ResourceRefList animList = source.ReadResourceRefList();
-
-    animationsResources_.Clear();
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < animList.names_.Size(); ++i)
-    {
-        AddAnimationResource(cache->GetResource<Animation>(animList.names_[i]));
-    }
-
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -454,14 +444,6 @@ bool Model::Save(Serializer& dest) const
     // ATOMIC BEGIN
 
     dest.WriteUInt(MODEL_VERSION);
-
-    // animation resources
-
-    ResourceRefList animList(Animation::GetTypeStatic());
-    animList.names_.Resize(animationsResources_.Size());
-    for (unsigned i = 0; i < animationsResources_.Size(); ++i)
-        animList.names_[i] = GetResourceName(animationsResources_[i]);
-    dest.WriteResourceRefList(animList);
 
     // ATOMIC END
 
@@ -766,34 +748,5 @@ unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
 {
     return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
 }
-
-// ATOMIC BEGIN
-
-void Model::AddAnimationResource(Animation* animation)
-{
-    if (!animation)
-        return;
-
-    SharedPtr<Animation> anim(animation);
-
-    if (!animationsResources_.Contains(anim))
-        animationsResources_.Push(anim);
-}
-
-void Model::RemoveAnimationResource(Animation* animation)
-{
-    if (!animation)
-        return;
-
-    animationsResources_.Remove(SharedPtr<Animation>(animation));
-
-}
-
-void Model::ClearAnimationResources()
-{
-    animationsResources_.Clear();
-}
-
-// ATOMIC END
 
 }

@@ -237,7 +237,7 @@ class MaterialInspector extends ScriptWidget {
 
         var inspector = this;
 
-        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", function(asset: ToolCore.Asset, args: any) {
+        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", "Texture2D", function(asset: ToolCore.Asset, args: any) {
 
             var texture = <Atomic.Texture2D> Atomic.cache.getResource("Texture2D", asset.path);
 

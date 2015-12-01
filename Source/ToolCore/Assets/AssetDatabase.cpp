@@ -382,7 +382,7 @@ void AssetDatabase::GetFolderAssets(String folder, PODVector<Asset*>& assets) co
 
 }
 
-void AssetDatabase::GetAssetsByImporterType(StringHash type, PODVector<Asset*>& assets) const
+void AssetDatabase::GetAssetsByImporterType(StringHash type, const String &resourceType, PODVector<Asset*>& assets) const
 {
     assets.Clear();
 
@@ -537,6 +537,8 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
         resourceTypeToImporterType_["JSONFile"] = "JSONImporter";
         resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
+
+        resourceTypeToImporterType_["Animation"] = "ModelImporter";
 
 
 #ifdef ATOMIC_DOTNET
