@@ -31,7 +31,7 @@ class ArrayEditWidget extends Atomic.UILayout {
 
         this.countEditField = <Atomic.UIEditField> countEdit.getWidget("editfield");
 
-        this.subscribeToEvent(this.countEditField, "WidgetEvent", (data) => this.handleCountWidgetEvent(data));
+        this.subscribeToEvent(this.countEditField, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
         this.subscribeToEvent(this.countEditField, "WidgetFocusChanged", (data) => this.handleCountWidgetFocusChanged(data));
 
     }
@@ -50,31 +50,19 @@ class ArrayEditWidget extends Atomic.UILayout {
 
     }
 
-    handleCountWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleUIWidgetEditCompleteEvent(ev) {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+      if (this.countRestore != this.countEditField.text) {
 
-            if (ev.key == Atomic.KEY_RETURN) {
+          this.countRestore = this.countEditField.text;
 
-                if (this.countRestore != this.countEditField.text) {
+          if (this.onCountChanged) {
 
-                    this.countRestore = this.countEditField.text;
+            this.onCountChanged(Number(this.countRestore));
 
-                    if (this.onCountChanged) {
+          }
 
-                      this.onCountChanged(Number(this.countRestore));
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
-
-        }
+      }
 
     }
 
