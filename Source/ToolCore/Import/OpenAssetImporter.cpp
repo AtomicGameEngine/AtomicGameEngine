@@ -468,6 +468,8 @@ bool OpenAssetImporter::BuildAndSaveModel(OutModel& model)
         outModel->SetNumGeometryLodLevels(destGeomIndex, 1);
         outModel->SetGeometry(destGeomIndex, 0, geom);
         outModel->SetGeometryCenter(destGeomIndex, center);
+        outModel->SetGeometryName(destGeomIndex, FromAIString(model.meshNodes_[i]->mName));
+
         if (model.bones_.Size() > maxBones_)
             allBoneMappings.Push(boneMappings);
 
