@@ -47,7 +47,7 @@ namespace Atomic
 
 extern const char* wrapModeNames[];
 
-static const char* textureUnitNames[] =
+const char* TEXTURE_UNIT_NAMES[] =
 {
     "diffuse",
     "normal",
@@ -95,7 +95,7 @@ TextureUnit ParseTextureUnitName(String name)
 {
     name = name.ToLower().Trimmed();
 
-    TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
+    TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), TEXTURE_UNIT_NAMES, MAX_TEXTURE_UNITS);
     if (unit == MAX_TEXTURE_UNITS)
     {
         // Check also for shorthand names
@@ -428,7 +428,7 @@ bool Material::Save(XMLElement& dest) const
         if (texture)
         {
             XMLElement textureElem = dest.CreateChild("texture");
-            textureElem.SetString("unit", textureUnitNames[j]);
+            textureElem.SetString("unit", TEXTURE_UNIT_NAMES[j]);
             textureElem.SetString("name", texture->GetName());
         }
     }
@@ -758,7 +758,7 @@ Scene* Material::GetScene() const
 
 String Material::GetTextureUnitName(TextureUnit unit)
 {
-    return textureUnitNames[unit];
+    return TEXTURE_UNIT_NAMES[unit];
 }
 
 Variant Material::ParseShaderParameterValue(const String& value)

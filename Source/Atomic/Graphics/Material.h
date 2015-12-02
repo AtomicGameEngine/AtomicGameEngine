@@ -41,6 +41,7 @@ class TextureCube;
 class ValueAnimationInfo;
 
 static const unsigned char DEFAULT_RENDER_ORDER = 128;
+extern const char* TEXTURE_UNIT_NAMES[];
 
 /// %Material's shader parameter definition.
 struct MaterialShaderParameter
