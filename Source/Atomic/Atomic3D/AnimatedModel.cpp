@@ -283,7 +283,7 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
     }
 
     // Handle mesh hiding
-    if (true)//geometryEnabled_.Size() == batches_.Size())
+    if (geometryDisabled_)
     {
         for (unsigned i = 0; i < batches_.Size(); ++i)
         {

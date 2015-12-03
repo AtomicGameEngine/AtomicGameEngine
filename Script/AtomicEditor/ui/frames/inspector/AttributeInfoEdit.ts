@@ -823,6 +823,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         layout.spacing = 2;
         layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
         layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
         layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var lp = new Atomic.UILayoutParams();
@@ -830,13 +831,13 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         layout.layoutParams = lp;
 
         var name = this.attrInfo.name + " Size";
-        if (name == "AnimationResources")
+        if (name == "AnimationResources Size")
             name = "Animations";
 
         var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
 
         var lp = new Atomic.UILayoutParams();
-        lp.width = 198;
+        lp.width = 160;
         sizeEdit.layoutParams = lp;
 
         sizeEdit.subscribeToEvent(sizeEdit, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));

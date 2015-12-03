@@ -108,8 +108,11 @@ public:
 
     // ATOMIC BEGIN
 
+    /// Get whether a named submesh is visible
     bool GetGeometryVisible(const String& name);
+    /// Show a named submesh
     void ShowGeometry(const String& name);
+    /// Hide a named submesh
     void HideGeometry(const String& name);
 
     void SetGeometryEnabledAttr(const VariantVector& value);
@@ -142,6 +145,8 @@ protected:
 
     // ATOMIC BEGIN
     mutable VariantVector geometryEnabled_;
+    /// true if any geometry has been disabled
+    mutable bool geometryDisabled_;
     // ATOMIC END
 
 private:

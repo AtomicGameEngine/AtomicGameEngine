@@ -46,7 +46,8 @@ extern const char* GEOMETRY_CATEGORY;
 StaticModel::StaticModel(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     occlusionLodLevel_(M_MAX_UNSIGNED),
-    materialsAttr_(Material::GetTypeStatic())
+    materialsAttr_(Material::GetTypeStatic()),
+    geometryDisabled_(false)
 {
 }
 
@@ -494,6 +495,17 @@ void StaticModel::ShowGeometry(const String& name)
         if (name == names[i])
             geometryData_[i].enabled_ = true;
     }
+
+    geometryDisabled_ = false;
+    for (unsigned i = 0; i < geometryData_.Size(); i++)
+    {
+        if (!geometryData_[i].enabled_)
+        {
+            geometryDisabled_ = true;
+            break;
+        }
+    }
+
 }
 
 void StaticModel::HideGeometry(const String& name)
@@ -506,7 +518,10 @@ void StaticModel::HideGeometry(const String& name)
     for (unsigned i = 0; i < names.Size(); i++)
     {
         if (name == names[i])
+        {
+            geometryDisabled_ = true;
             geometryData_[i].enabled_ = false;
+        }
     }
 }
 
@@ -514,6 +529,7 @@ void StaticModel::SetGeometryEnabledAttr(const VariantVector& value)
 {
     if (!value.Size() || value.Size() != geometryData_.Size())
     {
+        geometryDisabled_ = false;
         geometryEnabled_.Clear();
         return;
     }
@@ -525,6 +541,8 @@ void StaticModel::SetGeometryEnabledAttr(const VariantVector& value)
     for (unsigned i = 0; i < geometryData_.Size(); i++)
     {
         geometryData_[i].enabled_ = geometryEnabled_[i].GetBool();
+        if (!geometryData_[i].enabled_)
+            geometryDisabled_ = true;
         if (init)
             geometryData_[i].batchGeometry_ = 0;
     }
@@ -534,8 +552,14 @@ const VariantVector& StaticModel::GetGeometryEnabledAttr() const
 {
     geometryEnabled_.Resize(geometryData_.Size());
 
+    geometryDisabled_ = false;
     for (unsigned i = 0; i < geometryData_.Size(); i++)
+    {
         geometryEnabled_[i] = geometryData_[i].enabled_;
+
+        if (!geometryData_[i].enabled_)
+            geometryDisabled_ = true;
+    }
 
     return geometryEnabled_;
 }
