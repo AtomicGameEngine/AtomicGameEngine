@@ -52,7 +52,10 @@ static const unsigned MAX_NODE_ANIMATION_STATES = 256;
 extern const char* LOGIC_CATEGORY;
 
 AnimationController::AnimationController(Context* context) :
-    Component(context)
+    Component(context),
+    animationResourcesAttr_(Animation::GetTypeStatic()),
+    autoPlay_(true),
+    autoPlayed_(false)
 {
 }
 
@@ -71,6 +74,12 @@ void AnimationController::RegisterObject(Context* context)
         Variant::emptyBuffer, AM_NET | AM_LATESTDATA | AM_NOEDIT);
     MIXED_ACCESSOR_ATTRIBUTE("Node Animation States", GetNodeAnimationStatesAttr, SetNodeAnimationStatesAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+
+    // ATOMIC BEGIN
+    MIXED_ACCESSOR_ATTRIBUTE("Animation", GetAnimationAttr, SetAnimationAttr, ResourceRef, ResourceRef(Animation::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE("Autoplay", bool, autoPlay_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE("AnimationResources", GetAnimationResourcesAttr, SetAnimationResourcesAttr, ResourceRefList, ResourceRefList(Animation::GetTypeStatic()), AM_DEFAULT);
+    // ATOMIC END
 }
 
 void AnimationController::OnSetEnabled()
@@ -87,6 +96,12 @@ void AnimationController::OnSetEnabled()
 
 void AnimationController::Update(float timeStep)
 {
+    if (autoPlay_ && !autoPlayed_ && animation_.NotNull())
+    {
+        autoPlayed_ = true;
+        Play(animation_->GetAnimationName(), 0, true);
+    }
+
     // Loop through animations
     for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
     {
@@ -166,12 +181,19 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
         Animation* newAnimation = 0;
 
         // Check if we're using attached animation resource
-        for (unsigned i = 0; i < animationsResources_.Size(); i++)
+        if (animation_.NotNull() && animation_->GetAnimationName() == name)
         {
-            if (name == animationsResources_[i]->GetAnimationName())
+            newAnimation = animation_;
+        }
+        else
+        {
+            for (unsigned i = 0; i < animationResources_.Size(); i++)
             {
-                newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animationsResources_[i]->GetName());
-                break;
+                if (name == animationResources_[i]->GetAnimationName())
+                {
+                    newAnimation = animationResources_[i];
+                    break;
+                }
             }
         }
 
@@ -806,7 +828,9 @@ VariantVector AnimationController::GetNodeAnimationStatesAttr() const
 void AnimationController::OnSceneSet(Scene* scene)
 {
     if (scene && IsEnabledEffective())
+    {
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimationController, HandleScenePostUpdate));
+    }
     else if (!scene)
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
@@ -856,12 +880,19 @@ void AnimationController::FindAnimation(const String& name, unsigned& index, Ani
     StringHash nameHash(name);
 
     // Check if we're using attached animation resource
-    for (unsigned i = 0; i < animationsResources_.Size(); i++)
+    if (animation_.NotNull() && animation_->GetAnimationName() == name)
     {
-        if (name == animationsResources_[i]->GetAnimationName())
+        nameHash = animation_->GetName();
+    }
+    else
+    {
+        for (unsigned i = 0; i < animationResources_.Size(); i++)
         {
-            nameHash = animationsResources_[i]->GetName();
-            break;
+            if (name == animationResources_[i]->GetAnimationName())
+            {
+                nameHash = animationResources_[i]->GetName();
+                break;
+            }
         }
     }
 
@@ -892,6 +923,19 @@ void AnimationController::HandleScenePostUpdate(StringHash eventType, VariantMap
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
+// ATOMIC BEGIN
+
+void AnimationController::SetAnimationAttr(const ResourceRef& value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    animation_ = cache->GetResource<Animation>(value.name_);
+}
+
+ResourceRef AnimationController::GetAnimationAttr() const
+{
+    return GetResourceRef(animation_, Animation::GetTypeStatic());
+}
+
 void AnimationController::AddAnimationResource(Animation* animation)
 {
     if (!animation)
@@ -899,8 +943,8 @@ void AnimationController::AddAnimationResource(Animation* animation)
 
     SharedPtr<Animation> anim(animation);
 
-    if (!animationsResources_.Contains(anim))
-        animationsResources_.Push(anim);
+    if (!animationResources_.Contains(anim))
+        animationResources_.Push(anim);
 }
 
 void AnimationController::RemoveAnimationResource(Animation* animation)
@@ -908,34 +952,46 @@ void AnimationController::RemoveAnimationResource(Animation* animation)
     if (!animation)
         return;
 
-    animationsResources_.Remove(SharedPtr<Animation>(animation));
+    animationResources_.Remove(SharedPtr<Animation>(animation));
 
 }
 
 void AnimationController::ClearAnimationResources()
 {
-    animationsResources_.Clear();
+    animationResources_.Clear();
 }
 
-void AnimationController::ApplyAttributes()
+void AnimationController::SetAnimationResourcesAttr(const ResourceRefList& value)
 {
+    animationResources_.Clear();
 
-    // This currently requires that the AnimationController is after the AnimatedModel
-    // component on the node, look into removing the requirement
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    for (unsigned i = 0; i < value.names_.Size(); ++i)
+    {
+        Animation* animation = cache->GetResource<Animation>(value.names_[i]);
+        if (!animation)
+        {
+            //LOGERRORF("AnimationController::SetAnimationResourcesAttr - Unable to load animation: %s", value.names_[i].CString());
+            animationResources_.Push(SharedPtr<Animation>(0));
+        }
+        else
+        {
+            animationResources_.Push(SharedPtr<Animation>(animation));
+        }
 
-    AnimatedModel* animatedModel = GetComponent<AnimatedModel>();
-
-    if (!animatedModel)
-        return;
-
-    Model* model = animatedModel->GetModel();
-
-    if (!model)
-        return;
-
-    animationsResources_ = model->GetAnimationResources();
-
+    }
 
 }
+
+const ResourceRefList& AnimationController::GetAnimationResourcesAttr() const
+{
+    animationResourcesAttr_.names_.Resize(animationResources_.Size());
+    for (unsigned i = 0; i < animationResources_.Size(); ++i)
+        animationResourcesAttr_.names_[i] = GetResourceName(animationResources_[i]);
+
+    return animationResourcesAttr_;
+}
+
+// ATOMIC END
 
 }

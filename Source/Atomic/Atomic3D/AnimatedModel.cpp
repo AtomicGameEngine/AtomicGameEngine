@@ -113,6 +113,14 @@ void AnimatedModel::RegisterObject(Context* context)
         Variant::emptyVariantVector, AM_FILE);
     ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
+
+    // ATOMIC BEGIN
+
+    ACCESSOR_ATTRIBUTE("Geometry Enabled", GetGeometryEnabledAttr, SetGeometryEnabledAttr, VariantVector,
+        Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+
+    // ATOMIC END
+
 }
 
 bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
@@ -273,6 +281,30 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
+
+    // Handle mesh hiding
+    if (geometryDisabled_)
+    {
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            SourceBatch* batch = &batches_[i];
+            StaticModelGeometryData* data = &geometryData_[i];
+
+            if (batch->geometry_)
+                data->batchGeometry_ = batch->geometry_;
+
+            if (data->enabled_ && !batch->geometry_)
+            {
+                batch->geometry_ = data->batchGeometry_;
+            }
+            else if (!data->enabled_ && batch->geometry_)
+            {
+                data->batchGeometry_ = batch->geometry_;
+                batch->geometry_ = 0;
+            }
+        }
+    }
+
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -333,6 +365,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         {
             geometries_[i] = geometries[i];
             geometryData_[i].center_ = geometryCenters[i];
+            geometryData_[i].enabled_ = true;
+            geometryData_[i].batchGeometry_ = 0;
         }
 
         // Copy geometry bone mappings

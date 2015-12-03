@@ -91,6 +91,7 @@ bool Model::BeginLoad(Deserializer& source)
     geometries_.Clear();
     geometryBoneMappings_.Clear();
     geometryCenters_.Clear();
+    geometryNames_.Clear();
     morphs_.Clear();
     vertexBuffers_.Clear();
     indexBuffers_.Clear();
@@ -302,14 +303,11 @@ bool Model::BeginLoad(Deserializer& source)
     // MODEL_VERSION
     unsigned version = source.ReadUInt();
 
-    ResourceRefList animList = source.ReadResourceRefList();
-
-    animationsResources_.Clear();
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    for (unsigned i = 0; i < animList.names_.Size(); ++i)
+    // Read geometry names
+    geometryNames_.Resize(geometries_.Size());
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
-        AddAnimationResource(cache->GetResource<Animation>(animList.names_[i]));
+        geometryNames_[i] = source.ReadString();
     }
 
     SetMemoryUse(memoryUse);
@@ -455,13 +453,9 @@ bool Model::Save(Serializer& dest) const
 
     dest.WriteUInt(MODEL_VERSION);
 
-    // animation resources
-
-    ResourceRefList animList(Animation::GetTypeStatic());
-    animList.names_.Resize(animationsResources_.Size());
-    for (unsigned i = 0; i < animationsResources_.Size(); ++i)
-        animList.names_[i] = GetResourceName(animationsResources_[i]);
-    dest.WriteResourceRefList(animList);
+    // Write geometry names
+    for (unsigned i = 0; i < geometryNames_.Size(); ++i)
+        dest.WriteString(geometryNames_[i]);
 
     // ATOMIC END
 
@@ -530,6 +524,7 @@ void Model::SetNumGeometries(unsigned num)
     geometries_.Resize(num);
     geometryBoneMappings_.Resize(num);
     geometryCenters_.Resize(num);
+    geometryNames_.Resize(num);
 
     // For easier creation of from-scratch geometry, ensure that all geometries start with at least 1 LOD level (0 makes no sense)
     for (unsigned i = 0; i < geometries_.Size(); ++i)
@@ -671,8 +666,11 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
 
     // Deep copy all the geometry LOD levels and refer to the copied vertex/index buffers
     ret->geometries_.Resize(geometries_.Size());
+    ret->geometryNames_.Resize(geometryNames_.Size());
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
+        ret->geometryNames_[i] = geometryNames_[i];
+
         ret->geometries_[i].Resize(geometries_[i].Size());
         for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
@@ -769,29 +767,27 @@ unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
 
 // ATOMIC BEGIN
 
-void Model::AddAnimationResource(Animation* animation)
+bool Model::SetGeometryName(unsigned index, const String& name)
 {
-    if (!animation)
-        return;
+    if (index >= geometryNames_.Size())
+    {
+        LOGERROR("Geometry name index out of bounds");
+        return false;
+    }
 
-    SharedPtr<Animation> anim(animation);
+    geometryNames_[index] = name;
 
-    if (!animationsResources_.Contains(anim))
-        animationsResources_.Push(anim);
-}
-
-void Model::RemoveAnimationResource(Animation* animation)
-{
-    if (!animation)
-        return;
-
-    animationsResources_.Remove(SharedPtr<Animation>(animation));
+    return true;
 
 }
 
-void Model::ClearAnimationResources()
+const String& Model::GetGeometryName(unsigned index) const
 {
-    animationsResources_.Clear();
+    if (index >= geometryNames_.Size())
+        return String::EMPTY;
+
+    return geometryNames_[index];
+
 }
 
 // ATOMIC END

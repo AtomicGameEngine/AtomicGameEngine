@@ -47,7 +47,7 @@ class InspectorUtils {
 
     // atttribute name layout param
     var atlp = new Atomic.UILayoutParams();
-    atlp.width = 100;
+    atlp.width = 120;
     nameField.layoutParams = atlp;
 
     return nameField;
@@ -61,7 +61,7 @@ class InspectorUtils {
     edit.skinBg = "TBAttrEditorField";
     edit.fontDescription = InspectorUtils.attrFontDesc;
     var lp = new Atomic.UILayoutParams();
-    lp.width = 140;
+    lp.width = 160;
     edit.layoutParams = lp;
 
     return edit;
@@ -71,6 +71,9 @@ class InspectorUtils {
   static createAttrEditField(name:string, parent:Atomic.UIWidget):Atomic.UIEditField {
 
     var attrLayout = new Atomic.UILayout();
+
+    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+    attrLayout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
     attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
     var _name = InspectorUtils.createAttrName(name);
@@ -84,6 +87,27 @@ class InspectorUtils {
     return edit;
 
   }
+
+  static createAttrCheckBox(name:string, parent:Atomic.UIWidget):{ textField:Atomic.UITextField, checkBox: Atomic.UICheckBox} {
+
+    var attrLayout = new Atomic.UILayout();
+
+    attrLayout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+    attrLayout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+    var _name = InspectorUtils.createAttrName(name);
+    attrLayout.addChild(_name);
+
+    var checkBox = new Atomic.UICheckBox();
+
+    attrLayout.addChild(checkBox);
+    parent.addChild(attrLayout);
+
+    return {textField: _name, checkBox : checkBox};
+
+  }
+
 
   static createAttrEditFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{editField:Atomic.UIEditField, selectButton:Atomic.UIButton} {
 

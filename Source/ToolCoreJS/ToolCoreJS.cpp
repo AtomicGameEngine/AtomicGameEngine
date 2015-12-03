@@ -5,6 +5,8 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+#include <Atomic/Atomic3D/Animation.h>
+
 #include <AtomicJS/Javascript/JSVM.h>
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/ToolSystem.h>
@@ -12,6 +14,8 @@
 #include <ToolCore/Project/Project.h>
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/Build/BuildSystem.h>
+
+#include <ToolCore/Assets/ModelImporter.h>
 
 using namespace Atomic;
 
@@ -87,6 +91,7 @@ static int AssetDatabase_GetAssetsByImporterType(duk_context* ctx)
     Project* project = ts->GetProject();
 
     StringHash type = duk_require_string(ctx, 0);
+    String resourceType = duk_require_string(ctx, 1);
 
     duk_push_array(ctx);
 
@@ -94,7 +99,7 @@ static int AssetDatabase_GetAssetsByImporterType(duk_context* ctx)
         return 1;
 
     PODVector<Asset*> assets;
-    db->GetAssetsByImporterType(type, assets);
+    db->GetAssetsByImporterType(type, resourceType, assets);
 
     for(unsigned i = 0; i < assets.Size(); i++)
     {
@@ -105,6 +110,24 @@ static int AssetDatabase_GetAssetsByImporterType(duk_context* ctx)
     return 1;
 }
 
+static int ModelImporter_GetAnimations(duk_context* ctx)
+{
+    duk_push_this(ctx);
+    ModelImporter* importer = js_to_class_instance<ModelImporter>(ctx, -1, 0);
+
+    PODVector<Animation*> animations;
+    importer->GetAnimations(animations);
+
+    duk_push_array(ctx);
+
+    for(unsigned i = 0; i < animations.Size(); i++)
+    {
+        js_push_class_object_instance(ctx, animations[i], 0);
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    return 1;
+}
 
 void jsapi_init_toolcore(JSVM* vm)
 {
@@ -146,11 +169,14 @@ void jsapi_init_toolcore(JSVM* vm)
     js_class_get_prototype(ctx, "ToolCore", "AssetDatabase");
     duk_push_c_function(ctx, AssetDatabase_GetFolderAssets, 1);
     duk_put_prop_string(ctx, -2, "getFolderAssets");
-    duk_push_c_function(ctx, AssetDatabase_GetAssetsByImporterType, 1);
+    duk_push_c_function(ctx, AssetDatabase_GetAssetsByImporterType, 2);
     duk_put_prop_string(ctx, -2, "getAssetsByImporterType");
     duk_pop(ctx);
 
-
+    js_class_get_prototype(ctx, "ToolCore", "ModelImporter");
+    duk_push_c_function(ctx, ModelImporter_GetAnimations, 0);
+    duk_put_prop_string(ctx, -2, "getAnimations");
+    duk_pop(ctx);
 }
 
 }

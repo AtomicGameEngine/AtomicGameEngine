@@ -16,7 +16,6 @@
 
 #include "JSResourceEditor.h"
 
-#include "../Javascript/JSAutocomplete.h"
 #include "../Javascript/JSTheme.h"
 #include "../Javascript/JSASTSyntaxColorVisitor.h"
 
@@ -133,9 +132,6 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
         syntaxColor.visit(program);
     }
 
-    autocomplete_ = new JSAutocomplete(text);
-    autocomplete_->UpdateLocals();
-
     SubscribeToEvent(E_UPDATE, HANDLER(JSResourceEditor, HandleUpdate));
 
     // FIXME: Set the size at the end of setup, so all children are updated accordingly
@@ -222,27 +218,6 @@ void JSResourceEditor::OnChange(TBStyleEdit* styleEdit)
     textDirty_ = true;
 
     SetModified(true);
-
-    autocomplete_->Hide();
-
-    TBTextFragment* fragment = 0;
-    int ofs = styleEdit_->caret.pos.ofs;
-    fragment = styleEdit_->caret.pos.block->FindFragment(ofs, true);
-
-    if (fragment && fragment->len && (styleEdit_->caret.pos.ofs == (fragment->ofs + fragment->len)))
-    {
-        String value(fragment->Str(), fragment->len);
-        bool hasCompletions = autocomplete_->UpdateCompletions(value);
-
-        if (hasCompletions)
-        {
-            autocomplete_->SetPosition(TBPoint(fragment->xpos, (styleEdit_->caret.y - styleEdit_->scroll_y) + fragment->line_height));
-
-            // autocomplete disabled until it can be looked at
-            //autocomplete_->Show();
-        }
-    }
-
     UpdateLineNumbers();
 }
 
@@ -250,10 +225,6 @@ bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_KEY_DOWN)
     {
-        if (autocomplete_ && autocomplete_->Visible())
-        {
-            return autocomplete_->OnEvent(ev);
-        }
 
         if (ev.special_key == TB_KEY_ESC)
         {
@@ -314,25 +285,6 @@ void JSResourceEditor::HandleUpdate(StringHash eventType, VariantMap& eventData)
     // sync line number
     lineNumberList_->GetScrollContainer()->ScrollTo(0, styleEdit_->scroll_y);
     lineNumberList_->SetValue(styleEdit_->GetCaretLine());
-
-    if (autocomplete_->Visible())
-    {
-        TBTextFragment* fragment = 0;
-        int ofs = styleEdit_->caret.pos.ofs;
-        fragment = styleEdit_->caret.pos.block->FindFragment(ofs, true);
-
-        if (fragment && (styleEdit_->caret.pos.ofs == (fragment->ofs + fragment->len)))
-        {
-            String value(fragment->Str(), fragment->len);
-            bool hasCompletions = autocomplete_->UpdateCompletions(value);
-
-            if (!hasCompletions)
-            {
-                autocomplete_->Hide();
-            }
-        }
-
-    }
 
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();

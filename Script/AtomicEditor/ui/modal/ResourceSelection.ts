@@ -12,33 +12,56 @@ import ModalWindow = require("./ModalWindow");
 class ResourceSelection extends ModalWindow {
 
     folderList: Atomic.UIListView;
-    callback: (asset: ToolCore.Asset, args:any) => void;
-    args:any;
+    callback: (returnObject: any, args: any) => void;
+    args: any;
+    resourceType: string;
 
-    populate(importerType: string) {
+    populate(importerType: string, resourceType: string) {
 
         var db = ToolCore.assetDatabase;
-        var assets = db.getAssetsByImporterType(importerType);
+        var assets = db.getAssetsByImporterType(importerType, resourceType);
 
         for (var i in assets) {
 
             var asset = assets[i];
 
             if (importerType == "JavascriptImporter") {
-                if (!(<ToolCore.JavascriptImporter> asset.importer).isComponentFile())
+                if (!(<ToolCore.JavascriptImporter>asset.importer).isComponentFile())
                     continue;
             }
 
-            this.folderList.addRootItem(asset.relativePath, "", asset.guid);
+            // TODO: Generalize this for other cache assets
+            if (resourceType == "Animation") {
+
+                var modelImporter = <ToolCore.ModelImporter>(asset.importer);
+                var animations = modelImporter.getAnimations();
+
+                if (animations.length) {
+
+                    for (var i in animations) {
+
+                        this.folderList.addRootItem(animations[i].animationName + " : " + asset.name, "", animations[i].name);
+
+                    }
+
+
+                }
+
+            } else {
+
+                this.folderList.addRootItem(asset.relativePath, "", asset.guid);
+
+            }
 
         }
 
     }
 
-    constructor(windowText: string, importerType: string, callback: (asset: ToolCore.Asset, args:any) => void, args:any) {
+    constructor(windowText: string, importerType: string, resourceType: string, callback: (asset: ToolCore.Asset, args: any) => void, args: any) {
 
         super();
 
+        this.resourceType = resourceType;
         this.callback = callback;
         this.args = args;
 
@@ -52,7 +75,7 @@ class ResourceSelection extends ModalWindow {
 
         foldercontainer.addChild(folderList);
 
-        this.populate(importerType);
+        this.populate(importerType, resourceType);
 
         this.text = windowText;
         this.setSize(800, 600);
@@ -62,9 +85,9 @@ class ResourceSelection extends ModalWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if(ev.count >= 2) {
+        if (ev.count >= 2) {
             var id = ev.target.id;
-            if(id == this.folderList.rootList.id) {
+            if (id == this.folderList.rootList.id) {
                 this.selectFile();
             }
         }
@@ -89,12 +112,28 @@ class ResourceSelection extends ModalWindow {
 
     }
 
-    selectFile():boolean {
+    selectFile(): boolean {
+
         var id = this.folderList.selectedItemID;
-        if(id.length) {
-            this.callback(ToolCore.assetDatabase.getAssetByGUID(id), this.args);
-            this.hide();
-            return true;
+
+        if (this.resourceType == "Animation") {
+
+          if (id.length) {
+              this.callback(Atomic.cache.getResource("Animation", id), this.args);
+              this.hide();
+              return true;
+          }
+
+          this.hide();
+          return true;
+
+        } else {
+
+            if (id.length) {
+                this.callback(ToolCore.assetDatabase.getAssetByGUID(id), this.args);
+                this.hide();
+                return true;
+            }
         }
         return false;
     }

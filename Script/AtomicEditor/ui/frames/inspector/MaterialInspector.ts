@@ -17,8 +17,10 @@ var solidSource = new Atomic.UIMenuItemSource();
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse", "Diffuse"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Emissive", "Diffuse Emissive"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Normal", "Diffuse Normal"));
+solidSource.addItem(new Atomic.UIMenuItem("Diffuse Specular", "Diffuse Specular"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Normal Specular", "Diffuse Normal Specular"));
 solidSource.addItem(new Atomic.UIMenuItem("Diffuse Unlit", "Diffuse Unlit"));
+solidSource.addItem(new Atomic.UIMenuItem("No Texture", "No Texture"));
 
 var tranSource = new Atomic.UIMenuItemSource();
 tranSource.addItem(new Atomic.UIMenuItem("Alpha", "Alpha"));
@@ -49,11 +51,13 @@ var techniqueLookup = {
     "Techniques/Diff.xml": "Diffuse",
     "Techniques/DiffEmissive.xml": "Diffuse Emissive",
     "Techniques/DiffNormal.xml": "Diffuse Normal",
+    "Techniques/DiffSpec.xml": "Diffuse Specular",
     "Techniques/DiffNormalSpec.xml": "Diffuse Normal Specular",
     "Techniques/DiffUnlit.xml": "Diffuse Unlit",
     "Techniques/DiffAlpha.xml": "Alpha",
     "Techniques/DiffAlphaMask.xml": "Alpha Mask",
-    "Techniques/DiffAdd.xml": "Additive"
+    "Techniques/DiffAdd.xml": "Additive",
+    "Techniques/NoTexture.xml": "No Texture"
 }
 
 var techniqueReverseLookup = {};
@@ -237,7 +241,7 @@ class MaterialInspector extends ScriptWidget {
 
         var inspector = this;
 
-        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", function(asset: ToolCore.Asset, args: any) {
+        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", "Texture2D", function(asset: ToolCore.Asset, args: any) {
 
             var texture = <Atomic.Texture2D> Atomic.cache.getResource("Texture2D", asset.path);
 
@@ -388,15 +392,10 @@ class MaterialInspector extends ScriptWidget {
         field.skinBg = "TBAttrEditorField";;
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
-        lp.width = 140;
+        lp.width = 160;
         field.layoutParams = lp;
 
-        field.text = material.name;
-
-        var texture = material.getTexture(Atomic.TU_DIFFUSE);
-
-        if (texture)
-            field.text = texture.name;
+        field.text = Atomic.splitPath(material.name).fileName;
 
         nameLayout.addChild(field);
 

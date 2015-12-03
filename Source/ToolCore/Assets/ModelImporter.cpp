@@ -13,6 +13,7 @@
 
 #include <Atomic/Atomic3D/AnimatedModel.h>
 #include <Atomic/Atomic3D/Animation.h>
+#include <Atomic/Atomic3D/AnimationController.h>
 #include <Atomic/Atomic3D/StaticModel.h>
 #include <Atomic/Atomic3D/Model.h>
 
@@ -104,18 +105,12 @@ bool ModelImporter::ImportAnimation(const String& filename, const String& name, 
             ResourceCache* cache = GetSubsystem<ResourceCache>();
 
             AnimatedModel* animatedModel = importNode_->GetComponent<AnimatedModel>();
-
-            if (animatedModel)
+            AnimationController* controller = importNode_->GetComponent<AnimationController>();
+            if (animatedModel && controller)
             {
-                Model* model = animatedModel->GetModel();
-
-                if (model)
-                {
-                    SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
-                    if (animation)
-                        model->AddAnimationResource(animation);
-                }
-
+                SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
+                if (animation)
+                    controller->AddAnimationResource(animation);
             }
 
             LOGINFOF("Import Info: %s : %s", info.name_.CString(), fileName.CString());
@@ -132,8 +127,8 @@ bool ModelImporter::ImportAnimations()
 {
     if (!animationInfo_.Size())
     {
-       if (!ImportAnimation(asset_->GetPath(), "RootAnim"))
-           return false;
+        if (!ImportAnimation(asset_->GetPath(), "RootAnim"))
+            return false;
     }
 
     // embedded animations
@@ -174,8 +169,8 @@ bool ModelImporter::ImportAnimations()
 
                 if (!importer->animationInfo_.Size())
                 {
-                   if (!ImportAnimation(asset->GetPath(), animationName))
-                       return false;
+                    if (!ImportAnimation(asset->GetPath(), animationName))
+                        return false;
                 }
                 else
                 {
@@ -247,27 +242,8 @@ bool ModelImporter::Import()
                 ImportAnimations();
             }
 
-            AnimatedModel* animatedModel = importNode_->GetComponent<AnimatedModel>();
-            if (animatedModel)
-            {
-                Model* model = animatedModel->GetModel();
-                if (model && model->GetAnimationCount())
-                {
-                    // resave with animation info
-
-                    File mdlFile(context_);
-                    if (!mdlFile.Open(asset_->GetCachePath() + ".mdl", FILE_WRITE))
-                    {
-                        ErrorExit("Could not open output file " + asset_->GetCachePath() + ".mdl");
-                        return false;
-                    }
-
-                    model->Save(mdlFile);
-                }
-            }
         }
     }
-
 
     File outFile(context_);
 
@@ -302,6 +278,35 @@ void ModelImporter::SetAnimationCount(unsigned count)
 
     }
 
+}
+
+void ModelImporter::GetAnimations(PODVector<Animation*>& animations)
+{
+    animations.Clear();
+
+    SharedPtr<File> file(new File(context_, asset_->GetCachePath()));
+    SharedPtr<XMLFile> xml(new XMLFile(context_));
+
+    if (!xml->Load(*file))
+        return;
+
+    SharedPtr<Node> node(new Node(context_));
+    node->LoadXML(xml->GetRoot());
+
+    AnimationController* controller = node->GetComponent<AnimationController>();
+
+    if (!controller)
+        return;
+
+    const Vector<SharedPtr<Animation>>& animresources = controller->GetAnimationResources();
+
+    for (unsigned i = 0; i < animresources.Size(); i++)
+    {
+        if (animresources[i].NotNull())
+        {
+            animations.Push(animresources[i]);
+        }
+    }
 }
 
 bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
@@ -361,9 +366,9 @@ bool ModelImporter::SaveSettingsInternal(JSONValue& jsonRoot)
         animInfo.Push(jinfo);
     }
 
-   save.Set("animInfo", animInfo);
+    save.Set("animInfo", animInfo);
 
-   jsonRoot.Set("ModelImporter", save);
+    jsonRoot.Set("ModelImporter", save);
 
     return true;
 }

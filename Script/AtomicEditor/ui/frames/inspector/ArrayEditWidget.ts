@@ -9,7 +9,7 @@ import InspectorUtils = require("./InspectorUtils");
 
 class ArrayEditWidget extends Atomic.UILayout {
 
-    constructor(title:string) {
+    constructor(title: string) {
 
         super();
 
@@ -29,48 +29,30 @@ class ArrayEditWidget extends Atomic.UILayout {
 
         InspectorUtils.createSeparator(this);
 
-        this.countEditField = <Atomic.UIEditField> countEdit.getWidget("editfield");
+        this.countEditField = <Atomic.UIEditField>countEdit.getWidget("editfield");
 
         this.subscribeToEvent(this.countEditField, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
-        this.subscribeToEvent(this.countEditField, "WidgetFocusChanged", (data) => this.handleCountWidgetFocusChanged(data));
 
     }
 
-    handleCountWidgetFocusChanged(ev) {
+    handleUIWidgetEditCompleteEvent(ev):boolean {
 
-        if (ev.focused) {
+        var count = Number(this.countEditField.text);
 
-            this.countRestore = this.countEditField.text;
+        if (this.onCountChanged) {
 
-        } else {
-
-            this.countEditField.text = this.countRestore;
+            this.onCountChanged(count);
 
         }
 
-    }
-
-    handleUIWidgetEditCompleteEvent(ev) {
-
-      if (this.countRestore != this.countEditField.text) {
-
-          this.countRestore = this.countEditField.text;
-
-          if (this.onCountChanged) {
-
-            this.onCountChanged(Number(this.countRestore));
-
-          }
-
-      }
+        return true;
 
     }
 
-    countEdit:Atomic.UIEditField;
+    countEdit: Atomic.UIEditField;
 
-    onCountChanged: (count:number) => void;
+    onCountChanged: (count: number) => void;
 
-    countRestore: string;
     countEditField: Atomic.UIEditField;
 
 }

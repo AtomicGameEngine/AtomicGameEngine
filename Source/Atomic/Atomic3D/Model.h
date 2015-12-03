@@ -211,11 +211,9 @@ public:
 
     // ATOMIC BEGIN
 
-    void AddAnimationResource(Animation* animation);
-    void RemoveAnimationResource(Animation* animation);
-    void ClearAnimationResources();
-    unsigned GetAnimationCount() const { return animationsResources_.Size(); }
-    const Vector<SharedPtr<Animation>>& GetAnimationResources() { return animationsResources_; }
+    bool SetGeometryName(unsigned index, const String& name);
+    const String& GetGeometryName(unsigned index) const;
+    const Vector<String>& GetGeometryNames() const { return geometryNames_; }
 
     // ATOMIC END
 
@@ -248,11 +246,9 @@ private:
     Vector<PODVector<GeometryDesc> > loadGeometries_;
 
     // ATOMIC BEGIN
-
-    /// animation resources
-    Vector<SharedPtr<Animation> > animationsResources_;
-
+    Vector<String> geometryNames_;
     // ATOMIC END
+
 };
 
 }
