@@ -69,7 +69,13 @@ class ModelInspector extends InspectorWidget {
         // Model Section
         var modelLayout = this.createSection(rootLayout, "Model", 1);
 
-        this.scaleEdit = this.createAttrEditField("Scale", modelLayout);
+        var editField = InspectorUtils.createAttrEditField("Name", modelLayout);
+
+        var lp = new Atomic.UILayoutParams();
+        editField.readOnly = true;
+        editField.text = asset.name;
+
+        this.scaleEdit = InspectorUtils.createAttrEditField("Scale", modelLayout);
         this.scaleEdit.text = this.importer.scale.toString();
 
         // Animations Section

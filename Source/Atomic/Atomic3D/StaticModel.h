@@ -36,6 +36,13 @@ struct StaticModelGeometryData
     Vector3 center_;
     /// Current LOD level.
     unsigned lodLevel_;
+
+    // ATOMIC BEGIN
+
+    bool enabled_;
+    Geometry* batchGeometry_;
+
+    // ATOMIC END
 };
 
 /// Static model component.
@@ -99,6 +106,17 @@ public:
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
 
+    // ATOMIC BEGIN
+
+    bool GetGeometryVisible(const String& name);
+    void ShowGeometry(const String& name);
+    void HideGeometry(const String& name);
+
+    void SetGeometryEnabledAttr(const VariantVector& value);
+    const VariantVector& GetGeometryEnabledAttr() const;
+
+    // ATOMIC END
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
@@ -121,6 +139,10 @@ protected:
     unsigned occlusionLodLevel_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
+
+    // ATOMIC BEGIN
+    mutable VariantVector geometryEnabled_;
+    // ATOMIC END
 
 private:
     /// Handle model reload finished.

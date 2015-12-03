@@ -17,6 +17,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
     editWidget: Atomic.UIWidget;
 
     nameOverride: string;
+    hideName: boolean = false;
 
     constructor() {
 
@@ -52,11 +53,6 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
         this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-        var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        name.skinBg = "InspectorTextAttrName";
-        name.layoutParams = attrNameLP;
-
         if (attr.type == Atomic.VAR_VECTOR3 || attr.type == Atomic.VAR_COLOR ||
             attr.type == Atomic.VAR_QUATERNION) {
             this.axis = Atomic.UI_AXIS_Y;
@@ -64,19 +60,28 @@ class AttributeInfoEdit extends Atomic.UILayout {
             this.skinBg = "InspectorVectorAttrLayout";
         }
 
-        var bname = attr.name;
+        if (!this.hideName) {
 
-        if (bname == "Is Enabled")
-            bname = "Enabled";
+            var name = new Atomic.UITextField();
+            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.skinBg = "InspectorTextAttrName";
+            name.layoutParams = attrNameLP;
+            var bname = attr.name;
 
-        if (this.nameOverride)
-            name.text = this.nameOverride;
-        else
-            name.text = bname;
+            if (bname == "Is Enabled")
+                bname = "Enabled";
 
-        name.fontDescription = AttributeInfoEdit.fontDesc;
+            if (this.nameOverride)
+                name.text = this.nameOverride;
+            else
+                name.text = bname;
 
-        this.addChild(name);
+            name.fontDescription = AttributeInfoEdit.fontDesc;
+
+            this.addChild(name);
+
+
+        }
 
         this.addChild(this.editWidget);
 
@@ -139,7 +144,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
     private static Ctor = (() => {
 
         var attrNameLP = AttributeInfoEdit.attrNameLP = new Atomic.UILayoutParams();
-        attrNameLP.width = 100;
+        attrNameLP.width = 120;
 
         var fd = AttributeInfoEdit.fontDesc = new Atomic.UIFontDescription();
         fd.id = "Vera";
@@ -681,7 +686,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 if (resource) {
                     if (resource instanceof Atomic.Animation) {
 
-                      text = (<Atomic.Animation>resource).animationName;
+                        text = (<Atomic.Animation>resource).animationName;
 
                     } else {
 
@@ -826,7 +831,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         var name = this.attrInfo.name + " Size";
         if (name == "AnimationResources")
-          name = "Animations";
+            name = "Animations";
 
         var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
 
