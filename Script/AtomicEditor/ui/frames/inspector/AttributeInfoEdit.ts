@@ -208,7 +208,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
         field.skinBg = "TBAttrEditorField";;
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
-        lp.width = 140;
+        lp.width = 160;
         field.layoutParams = lp;
 
         field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));

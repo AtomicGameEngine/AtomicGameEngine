@@ -168,6 +168,36 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
             }.bind(this));
         }
 
+        // handle dropping of component on field
+        o.editField.subscribeToEvent(o.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
+
+            if (ev.target == o.editField) {
+
+                var dragObject = ev.dragObject;
+
+                var importer;
+
+                if (dragObject.object && dragObject.object.typeName == "Asset") {
+
+                    var asset = <ToolCore.Asset>dragObject.object;
+
+                    if (asset.importerTypeName == importerName) {
+                        importer = asset.importer;
+                    }
+
+                }
+
+                if (importer) {
+
+                    var resource = asset.getResource(resourceTypeName);
+
+                    this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
+                    this.refresh();
+                }
+            }
+
+        });
+
     }
 
     createEditWidget() {
