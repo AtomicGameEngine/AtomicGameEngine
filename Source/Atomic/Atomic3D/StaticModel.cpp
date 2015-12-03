@@ -493,7 +493,13 @@ void StaticModel::ShowGeometry(const String& name)
     for (unsigned i = 0; i < names.Size(); i++)
     {
         if (name == names[i])
+        {
+            if (geometryData_[i].batchGeometry_)
+                batches_[i].geometry_ = geometryData_[i].batchGeometry_;
+
+            geometryData_[i].batchGeometry_ = 0;
             geometryData_[i].enabled_ = true;
+        }
     }
 
     geometryDisabled_ = false;
@@ -520,6 +526,10 @@ void StaticModel::HideGeometry(const String& name)
         if (name == names[i])
         {
             geometryDisabled_ = true;
+
+            if (batches_[i].geometry_)
+                geometryData_[i].batchGeometry_ = batches_[i].geometry_;
+
             geometryData_[i].enabled_ = false;
         }
     }
