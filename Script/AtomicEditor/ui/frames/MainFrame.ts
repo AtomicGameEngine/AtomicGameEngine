@@ -44,14 +44,18 @@ class MainFrame extends ScriptWidget {
 
         this.menu = new MainFrameMenu();
 
+        this.disableProjectMenus();
+
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 
         this.subscribeToEvent("ProjectLoaded", (data) => {
             this.showWelcomeFrame(false);
+            this.enableProjectMenus();
         });
 
         this.subscribeToEvent("ProjectUnloaded", (data) => {
             this.showWelcomeFrame(true);
+            this.disableProjectMenus();
         });
 
         this.showWelcomeFrame(true);
@@ -119,6 +123,18 @@ class MainFrame extends ScriptWidget {
 
         return false;
 
+    }
+
+    disableProjectMenus() {
+        this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
+        this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
+        this.getWidget("menu tools").setStateRaw(Atomic.UI_WIDGET_STATE_DISABLED);
+    }
+
+    enableProjectMenus() {
+        this.getWidget("menu edit").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
+        this.getWidget("menu build").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
+        this.getWidget("menu tools").setStateRaw(Atomic.UI_WIDGET_STATE_NONE);
     }
 
     shutdown() {
