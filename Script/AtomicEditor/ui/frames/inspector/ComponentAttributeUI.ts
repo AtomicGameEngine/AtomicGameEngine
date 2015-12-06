@@ -319,20 +319,17 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                     var text = "";
 
                     if (resource) {
-                        if (resource instanceof Atomic.Animation) {
 
-                            text = (<Atomic.Animation>resource).animationName;
+                        if (resource instanceof Atomic.Material) {
+
+                            text = (<Atomic.Material>resource).name;
 
                         } else {
-
-                            text = resource.name;
-                            var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                            if (asset)
-                                text = asset.name;
+                            text = "???";
                         }
                     }
-                    var pathinfo = Atomic.splitPath(text);
 
+                    var pathinfo = Atomic.splitPath(text);
                     matEdit.editField.text = pathinfo.fileName;
                 }
 
