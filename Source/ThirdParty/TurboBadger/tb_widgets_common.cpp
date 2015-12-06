@@ -30,6 +30,7 @@ int TBWidgetString::GetHeight(TBWidget *widget)
 
 void TBWidgetString::Paint(TBWidget *widget, const TBRect &rect, const TBColor &color)
 {
+    // TODO: store calculated string width to avoid recalculation each frame
 	TBFontFace *font = widget->GetFont();
 	int string_w = GetWidth(widget);
 
@@ -40,8 +41,11 @@ void TBWidgetString::Paint(TBWidget *widget, const TBRect &rect, const TBColor &
 		x += MAX(0, (rect.w - string_w) / 2);
 	int y = rect.y + (rect.h - GetHeight(widget)) / 2;
 
-	if (string_w <= rect.w)
+    if (string_w <= rect.w)
+    {
+        widget->SetShorten(false);
 		font->DrawString(x, y, color, m_text);
+    }
 	else
 	{
 		// There's not enough room for the entire string
@@ -50,6 +54,8 @@ void TBWidgetString::Paint(TBWidget *widget, const TBRect &rect, const TBColor &
 		// const char *end = "…"; // 2026 HORIZONTAL ELLIPSIS
 		// Some fonts seem to render ellipsis a lot uglier than three dots.
 		const char *end = "...";
+
+        widget->SetShorten(true);
 
 		int endw = font->GetStringWidth(end);
 		int startw = 0;

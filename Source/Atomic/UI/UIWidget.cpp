@@ -273,6 +273,14 @@ void UIWidget::SetGravity(UI_GRAVITY gravity)
 
 }
 
+void UIWidget::SetAxis(UI_AXIS axis)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetAxis((AXIS) axis);
+}
+
 bool UIWidget::IsAncestorOf(UIWidget* widget)
 {
     if (!widget_ || !widget || !widget->widget_)
@@ -793,6 +801,13 @@ void UIWidget::SetCapturing(bool capturing)
     widget_->SetCapturing(capturing);
 }
 
+bool UIWidget::GetCapturing()
+{
+    if (!widget_)
+        return false;
+
+    widget_->GetCapturing();
+}
 
 void UIWidget::InvalidateLayout()
 {
@@ -808,6 +823,38 @@ void UIWidget::InvokeShortcut(const String& shortcut)
     TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
     ev.ref_id = TBIDC(shortcut.CString());
     widget_->OnEvent(ev);
+}
+
+bool UIWidget::GetShorten()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->GetShorten();
+}
+
+void UIWidget::SetShorten(bool shorten)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetShorten(shorten);
+}
+
+String UIWidget::GetTooltip()
+{
+    if (!widget_)
+        return "";
+
+    return widget_->GetTooltip().CStr();
+}
+
+void UIWidget::SetTooltip(const String& tooltip)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetTooltip(tooltip.CString());
 }
 
 
