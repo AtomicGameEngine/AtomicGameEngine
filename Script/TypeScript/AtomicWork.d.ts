@@ -4,7 +4,6 @@
 /// <reference path="AtomicPlayer.d.ts" />
 
 
-
 declare module Atomic {
 
     export function print(...args: any[]);
@@ -23,7 +22,6 @@ declare module Atomic {
     export var ui: UI;
     export var audio: Audio;
     export var player: AtomicPlayer.Player;
-
 
     export var editorMode: Editor.EditorMode;
 
