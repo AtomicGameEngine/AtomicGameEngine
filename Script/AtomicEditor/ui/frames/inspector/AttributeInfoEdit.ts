@@ -17,6 +17,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
     editWidget: Atomic.UIWidget;
 
     nameOverride: string;
+    hideName: boolean = false;
 
     constructor() {
 
@@ -52,11 +53,6 @@ class AttributeInfoEdit extends Atomic.UILayout {
 
         this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
-        var name = new Atomic.UITextField();
-        name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        name.skinBg = "InspectorTextAttrName";
-        name.layoutParams = attrNameLP;
-
         if (attr.type == Atomic.VAR_VECTOR3 || attr.type == Atomic.VAR_COLOR ||
             attr.type == Atomic.VAR_QUATERNION) {
             this.axis = Atomic.UI_AXIS_Y;
@@ -64,19 +60,28 @@ class AttributeInfoEdit extends Atomic.UILayout {
             this.skinBg = "InspectorVectorAttrLayout";
         }
 
-        var bname = attr.name;
+        if (!this.hideName) {
 
-        if (bname == "Is Enabled")
-            bname = "Enabled";
+            var name = new Atomic.UITextField();
+            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.skinBg = "InspectorTextAttrName";
+            name.layoutParams = attrNameLP;
+            var bname = attr.name;
 
-        if (this.nameOverride)
-            name.text = this.nameOverride;
-        else
-            name.text = bname;
+            if (bname == "Is Enabled")
+                bname = "Enabled";
 
-        name.fontDescription = AttributeInfoEdit.fontDesc;
+            if (this.nameOverride)
+                name.text = this.nameOverride;
+            else
+                name.text = bname;
 
-        this.addChild(name);
+            name.fontDescription = AttributeInfoEdit.fontDesc;
+
+            this.addChild(name);
+
+
+        }
 
         this.addChild(this.editWidget);
 
@@ -139,7 +144,7 @@ class AttributeInfoEdit extends Atomic.UILayout {
     private static Ctor = (() => {
 
         var attrNameLP = AttributeInfoEdit.attrNameLP = new Atomic.UILayoutParams();
-        attrNameLP.width = 100;
+        attrNameLP.width = 120;
 
         var fd = AttributeInfoEdit.fontDesc = new Atomic.UIFontDescription();
         fd.id = "Vera";
@@ -203,7 +208,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
         field.skinBg = "TBAttrEditorField";;
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
-        lp.width = 140;
+        lp.width = 160;
         field.layoutParams = lp;
 
         field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
@@ -404,11 +409,11 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
                 if (value == undefined) {
 
-                  console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
-                  widget.text = "???";
+                    console.log("WARNING: Undefined value for object: ", this.editType.typeName + "." + attrInfo.name);
+                    widget.text = "???";
 
                 } else {
-                  widget.text = parseFloat(value.toFixed(5)).toString();
+                    widget.text = parseFloat(value.toFixed(5)).toString();
                 }
 
             }
@@ -636,7 +641,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         if (parent) {
 
-          parent.sendEvent("AttributeEditResourceChanged", { attrInfoEdit: this, resource: resource});
+            parent.sendEvent("AttributeEditResourceChanged", { attrInfoEdit: this, resource: resource });
 
         }
 
@@ -679,10 +684,17 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 var text = "";
 
                 if (resource) {
-                    text = resource.name;
-                    var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
-                    if (asset)
-                        text = asset.name;
+                    if (resource instanceof Atomic.Animation) {
+
+                        text = (<Atomic.Animation>resource).animationName;
+
+                    } else {
+
+                        text = resource.name;
+                        var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                        if (asset)
+                            text = asset.name;
+                    }
                 }
                 this.editField.text = text;
             }
@@ -718,9 +730,20 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         selectButton.onClick = () => {
 
-            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, function(asset: ToolCore.Asset) {
+            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function(retObject: any) {
 
-                var resource = asset.getResource(resourceTypeName);
+                var resource: Atomic.Resource = null;
+
+                if (retObject instanceof ToolCore.Asset) {
+
+                    resource = (<ToolCore.Asset>retObject).getResource(resourceTypeName);
+
+                } else if (retObject instanceof Atomic.Resource) {
+
+                    resource = <Atomic.Resource>retObject;
+
+                }
+
                 this.editType.onAttributeInfoEdited(this.attrInfo, resource, this.refListIndex);
                 this.onResourceChanged(resource);
                 this.refresh();
@@ -770,6 +793,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
     layout: Atomic.UILayout;
     refEdits: ResourceRefAttributeEdit[] = [];
+    sizeEdit: Atomic.UIEditField;
 
     initialize(editType: SerializableEditType, attrInfo: Atomic.AttributeInfo): boolean {
 
@@ -799,13 +823,24 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         layout.spacing = 2;
         layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
         layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
         layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 304;
-
         layout.layoutParams = lp;
 
+        var name = this.attrInfo.name + " Size";
+        if (name == "AnimationResources Size")
+            name = "Animations";
+
+        var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 160;
+        sizeEdit.layoutParams = lp;
+
+        sizeEdit.subscribeToEvent(sizeEdit, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
 
         this.editWidget = layout;
 
@@ -818,6 +853,48 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
         this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
         this.addChild(this.editWidget);
+
+    }
+
+    handleUIWidgetEditCompleteEvent(ev) {
+
+        var size = Number(this.sizeEdit.text);
+
+        if (size > 64 || size < 0)
+            return;
+
+        var editType = this.editType;
+
+        var refresh = false;
+
+        for (var i in editType.objects) {
+
+            var object = editType.objects[i];
+            var value = object.getAttribute(this.attrInfo.name);
+
+            if (value.resources.length > size) {
+
+                value.resources.length = size;
+                object.setAttribute(this.attrInfo.name, value);
+                refresh = true;
+
+            } else if (value.resources.length < size) {
+
+                for (var j = value.resources.length; j < size; j++) {
+
+                    value.resources.push(null);
+
+                }
+
+                object.setAttribute(this.attrInfo.name, value);
+                refresh = true;
+
+            }
+
+        }
+
+        if (refresh)
+            this.refresh();
 
     }
 
@@ -847,6 +924,8 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
             }
 
         }
+
+        this.sizeEdit.text = maxLength.toString();
 
         if (maxLength == -1) {
             this.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;

@@ -1418,7 +1418,6 @@ TBStyleEdit::TBStyleEdit()
 	, selection(nullptr)
 	, scroll_x(0)
 	, scroll_y(0)
-    , autocomplete_visible(false)
 	, select_state(0)
 	, mousedown_fragment(nullptr)
 	, font(nullptr)
@@ -1751,15 +1750,6 @@ bool TBStyleEdit::KeyDown(int key, SPECIAL_KEY special_key, MODIFIER_KEYS modifi
 {
 	if (select_state)
 		return false;
-
-    if (autocomplete_visible
-        && (special_key == TB_KEY_UP || special_key == TB_KEY_DOWN
-            || special_key == TB_KEY_ENTER || special_key == TB_KEY_ESC
-            || special_key == TB_KEY_TAB)
-        && !modifierkeys)
-    {
-        return false;
-    }
 
 	bool handled = true;
 	bool move_caret = special_key == TB_KEY_LEFT || special_key == TB_KEY_RIGHT ||

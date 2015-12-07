@@ -6,5 +6,5 @@
 							 "Source/AtomicEditor/Editors", "Source/AtomicEditor/Editors/SceneEditor3D",
 						   "Source/AtomicEditor/Components"],
 	"classes" : ["EditorMode", "PlayerMode", "FileUtils", "ResourceEditor", "JSResourceEditor",
-							 "SceneEditor3D", "SceneView3D", "SceneSelection", "EditorComponent", "CubemapGenerator"]
+							 "SceneEditor3D", "SceneView3D", "SceneSelection", "EditorComponent", "CubemapGenerator", "Gizmo3D"]
 }

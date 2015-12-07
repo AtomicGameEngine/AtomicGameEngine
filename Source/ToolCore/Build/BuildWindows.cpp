@@ -76,6 +76,8 @@ void BuildWindows::BuildAtomicNET()
     if (!results.Size())
         return;
 
+    BuildLog("Building AtomicNET");
+
     fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources/AtomicNET");
     fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic");
     fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies");
@@ -124,42 +126,41 @@ void BuildWindows::Build(const String& buildPath)
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
-    VariantMap buildOutput;
-    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Starting Windows Deployment</color>\n\n";
-    SendEvent(E_BUILDOUTPUT, buildOutput);
+    BuildLog("Starting Windows Deployment");
 
     Initialize();
+
+    if (!BuildClean(buildPath_))
+        return;
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    if (fileSystem->DirExists(buildPath_))
-        fileSystem->RemoveDir(buildPath_, true);
-
     String rootSourceDir = tenv->GetRootSourceDir();
     String playerBinary = tenv->GetPlayerBinary();
     String d3d9dll = GetPath(playerBinary) + "/D3DCompiler_47.dll";
 
-    fileSystem->CreateDir(buildPath_);
-    fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources");
+    if (!BuildCreateDirectory(buildPath_))
+        return;
+
+    if (!BuildCreateDirectory(buildPath_ + "/AtomicPlayer_Resources"))
+        return;
 
     String resourcePackagePath = buildPath_ + "/AtomicPlayer_Resources/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
+    if (buildFailed_)
+        return;
+   
+    if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer.exe"))
+        return;
 
-    fileSystem->Copy(playerBinary, buildPath_ + "/AtomicPlayer.exe");
-    fileSystem->Copy(d3d9dll, buildPath_ + "/D3DCompiler_47.dll");
-
-    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Building AtomicNET</color>\n\n";
-    SendEvent(E_BUILDOUTPUT, buildOutput);
+    if (!BuildCopyFile(d3d9dll, buildPath_ + "/D3DCompiler_47.dll"))
+        return;
 
     BuildAtomicNET();
 
-    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Building AtomicNET Complete</color>\n\n";
-    SendEvent(E_BUILDOUTPUT, buildOutput);
-
-    buildOutput[BuildOutput::P_TEXT] = "\n\n<color #D4FB79>Windows Deployment Complete</color>\n\n";
-    SendEvent(E_BUILDOUTPUT, buildOutput);
+    BuildLog("Windows Deployment Complete");
 
     buildSystem->BuildComplete(PLATFORMID_WINDOWS, buildPath_);
 

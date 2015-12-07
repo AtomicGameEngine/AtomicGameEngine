@@ -61,6 +61,7 @@ public:
 	virtual bool OnWidgetInvokeEvent(TBWidget *widget, const TBWidgetEvent &ev) { return false; }
 private:
 	friend class TBWidget;
+    friend class TBEditField;
 	static void InvokeWidgetDelete(TBWidget *widget);
 	static bool InvokeWidgetDying(TBWidget *widget);
 	static void InvokeWidgetAdded(TBWidget *parent, TBWidget *child);

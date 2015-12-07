@@ -12,6 +12,7 @@
 namespace tb {
 
 enum TB_MSG {
+    TB_MSG_NONE,
 	TB_MSG_OK,
 	TB_MSG_OK_CANCEL,
 	TB_MSG_YES_NO
@@ -54,8 +55,11 @@ public:
 
 	virtual bool OnEvent(const TBWidgetEvent &ev);
 	virtual void OnDie();
+
+    void AddButton(TBID id, bool focused, TBLayout *layout = nullptr);
+    void AddButtonLeft(TBID id, bool focused);
+
 private:
-	void AddButton(TBID id, bool focused);
 	// TBWidgetListener
 	virtual void OnWidgetDelete(TBWidget *widget);
 	virtual bool OnWidgetDying(TBWidget *widget);

@@ -180,19 +180,28 @@ public:
     /// Return node animation states attribute.
     VariantVector GetNodeAnimationStatesAttr() const;
 
-    // Animation Resources
+    // ATOMIC BEGIN
 
     void AddAnimationResource(Animation* animation);
     void RemoveAnimationResource(Animation* animation);
     void ClearAnimationResources();
+    const Vector<SharedPtr<Animation>>& GetAnimationResources() { return animationResources_; }
+
+    /// Set animation resources attribute.
+    void SetAnimationResourcesAttr(const ResourceRefList& value);
+    /// Return animation resources attribute.
+    const ResourceRefList& GetAnimationResourcesAttr() const;
+
+    /// Set animation attribute.
+    void SetAnimationAttr(const ResourceRef& value);
+    /// Return animation attribute.
+    ResourceRef GetAnimationAttr() const;
+
+    // ATOMIC END
 
 protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
-
-    // ATOMIC BEGIN
-    void ApplyAttributes();
-    // ATOMIC END
 
 private:
     /// Add an animation state either to AnimatedModel or as a node animation.
@@ -211,8 +220,18 @@ private:
     /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
 
-    /// animation resources
-    Vector<SharedPtr<Animation> > animationsResources_;
+    // ATOMIC BEGIN
+
+    SharedPtr<Animation> animation_;
+    bool autoPlay_;
+    bool autoPlayed_;
+
+    /// animation resources    
+    Vector<SharedPtr<Animation>> animationResources_;
+    mutable ResourceRefList animationResourcesAttr_;
+
+    // ATOMIC END
+
 };
 
 }

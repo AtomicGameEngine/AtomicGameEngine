@@ -42,11 +42,14 @@ bool TBMessageWindow::Show(const char *title, const char *message, TBMessageWind
 
 	TBWidget *root = target->GetParentRoot();
 
-	const char *source =	"TBLayout: axis: y, distribution: available\n"
-							"	TBLayout: distribution: available, size: available\n"
-							"		TBSkinImage: id: 2\n"
-							"		TBEditField: multiline: 1, readonly: 1, id: 1\n"
-							"	TBLayout: distribution-position: right bottom, id: 3\n";
+    const char *source =    "TBLayout: axis: y, distribution: available\n"
+                            "	TBLayout: distribution: available, size: available\n"
+                            "		TBSkinImage: id: 2\n"
+                            "		TBEditField: multiline: 1, readonly: 1, id: 1\n"
+                            "	TBLayout: distribution: available\n"
+                            "		TBLayout: distribution-position: left top, id: 5\n"
+                            "		TBLayout: distribution-position: right bottom, id: 3\n";
+
 	if (!g_widgets_reader->LoadData(GetContentRoot(), source))
 		return false;
 
@@ -113,12 +116,20 @@ bool TBMessageWindow::Show(const char *title, const char *message, TBMessageWind
 	return true;
 }
 
-void TBMessageWindow::AddButton(TBID id, bool focused)
+void TBMessageWindow::AddButtonLeft(TBID id, bool focused)
 {
-	TBLayout *layout = GetWidgetByIDAndType<TBLayout>(3);
+    AddButton(id, focused, GetWidgetByIDAndType<TBLayout>(5));
+}
+
+void TBMessageWindow::AddButton(TBID id, bool focused, TBLayout *layout)
+{
+    if (!layout) 
+	    layout = GetWidgetByIDAndType<TBLayout>(3);
+
 	if (!layout)
 		return;
-	if (TBButton *btn = new TBButton)
+	
+    if (TBButton *btn = new TBButton)
 	{
 		btn->SetID(id);
 		btn->SetText(g_tb_lng->GetString(btn->GetID()));

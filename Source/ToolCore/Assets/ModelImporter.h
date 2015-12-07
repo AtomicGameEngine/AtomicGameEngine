@@ -12,6 +12,7 @@
 namespace Atomic
 {
     class Node;
+    class Animation;
 }
 
 using namespace Atomic;
@@ -70,6 +71,8 @@ public:
     void SetAnimationCount(unsigned count);
 
     Resource* GetResource(const String& typeName = String::EMPTY);
+
+    void GetAnimations(PODVector<Atomic::Animation *>& animations);
 
     AnimationImportInfo* GetAnimationInfo(unsigned index) { return animationInfo_[index]; }
 

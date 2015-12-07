@@ -15,9 +15,12 @@
 						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "IOSBuildSettings"],
 	"typescript_decl" : {
 
+		"ModelImporter" : [
+			"getAnimations():Atomic.Animation[];"	
+		],
 		"AssetDatabase" : [
 			"getFolderAssets(folder:string):ToolCore.Asset[];",
-			"getAssetsByImporterType(type:string):ToolCore.Asset[];"
+			"getAssetsByImporterType(importerType:string, resourceType:string):ToolCore.Asset[];"
 		]
 	}
 

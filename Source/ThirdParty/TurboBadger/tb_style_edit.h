@@ -442,8 +442,6 @@ public:
 	int32 scroll_x;
 	int32 scroll_y;
 
-    bool autocomplete_visible;
-
 	int8 select_state;
 	TBPoint mousedown_point;
 	TBTextFragment *mousedown_fragment;

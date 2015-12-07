@@ -183,9 +183,10 @@ void CubemapGenerator::EndRender()
     cameraNode_ = 0;
     camera_ = 0;
     viewport_ = 0;
-    renderImage_ = 0;
-    assert(renderSurface_->Refs() == 1);
     renderSurface_ = 0;
+
+    // release renderImage_ after renderSurface_, as it doesn't hold a ref
+    renderImage_ = 0;
     updateCycle_ = 0;
 
     GetScene()->SendEvent(E_CUBEMAPRENDEREND);

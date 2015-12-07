@@ -9,7 +9,7 @@ import InspectorUtils = require("./InspectorUtils");
 
 class ArrayEditWidget extends Atomic.UILayout {
 
-    constructor(title:string) {
+    constructor(title: string) {
 
         super();
 
@@ -29,60 +29,30 @@ class ArrayEditWidget extends Atomic.UILayout {
 
         InspectorUtils.createSeparator(this);
 
-        this.countEditField = <Atomic.UIEditField> countEdit.getWidget("editfield");
+        this.countEditField = <Atomic.UIEditField>countEdit.getWidget("editfield");
 
-        this.subscribeToEvent(this.countEditField, "WidgetEvent", (data) => this.handleCountWidgetEvent(data));
-        this.subscribeToEvent(this.countEditField, "WidgetFocusChanged", (data) => this.handleCountWidgetFocusChanged(data));
-
-    }
-
-    handleCountWidgetFocusChanged(ev) {
-
-        if (ev.focused) {
-
-            this.countRestore = this.countEditField.text;
-
-        } else {
-
-            this.countEditField.text = this.countRestore;
-
-        }
+        this.subscribeToEvent(this.countEditField, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
 
     }
 
-    handleCountWidgetEvent(ev: Atomic.UIWidgetEvent) {
+    handleUIWidgetEditCompleteEvent(ev):boolean {
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+        var count = Number(this.countEditField.text);
 
-            if (ev.key == Atomic.KEY_RETURN) {
+        if (this.onCountChanged) {
 
-                if (this.countRestore != this.countEditField.text) {
-
-                    this.countRestore = this.countEditField.text;
-
-                    if (this.onCountChanged) {
-
-                      this.onCountChanged(Number(this.countRestore));
-
-                    }
-
-                }
-
-            }
+            this.onCountChanged(count);
 
         }
 
-        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
-
-        }
+        return true;
 
     }
 
-    countEdit:Atomic.UIEditField;
+    countEdit: Atomic.UIEditField;
 
-    onCountChanged: (count:number) => void;
+    onCountChanged: (count: number) => void;
 
-    countRestore: string;
     countEditField: Atomic.UIEditField;
 
 }

@@ -67,7 +67,7 @@ void BuildAndroid::RunADBStartActivity()
     Subprocess* subprocess = subs->Launch(adbCommand, args, buildPath_);
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunStartActivity");
+        FailBuild("BuildFailed::RunStartActivity");
         return;
     }
 
@@ -110,7 +110,7 @@ void BuildAndroid::RunADBInstall()
 
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunADBInstall");
+        FailBuild("BuildFailed::RunADBInstall");
         return;
     }
 
@@ -194,7 +194,7 @@ void BuildAndroid::RunADBListDevices()
 
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunADBListDevices");
+        FailBuild("BuildFailed::RunADBListDevices");
         return;
     }
 
@@ -251,7 +251,7 @@ void BuildAndroid::RunAntDebug()
 
     if (!subprocess)
     {
-        SendBuildFailure("BuildFailed::RunAntDebug");
+        FailBuild("BuildFailed::RunAntDebug");
         return;
     }
 
@@ -338,7 +338,7 @@ void BuildAndroid::Build(const String& buildPath)
 
     if (!gen.Generate())
     {
-        SendBuildFailure(gen.GetErrorText());
+        FailBuild(gen.GetErrorText());
         return;
     }
 

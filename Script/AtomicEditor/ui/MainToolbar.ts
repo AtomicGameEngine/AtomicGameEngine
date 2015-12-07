@@ -50,17 +50,13 @@ class MainToolbar extends Atomic.UIWidget {
     }
 
     handleGizmoAxisModeChanged(ev: Editor.GizmoAxisModeChangedEvent) {
-
-        if (ev.toggle) return;
-
-        if (ev.mode == Editor.AXIS_WORLD) {
-            this.axisButton.value = 1;
-            this.axisButton.text = "World";
-        } else {
+        if (ev.mode) {
             this.axisButton.value = 0;
             this.axisButton.text = "Local";
+        } else {
+            this.axisButton.value = 1;
+            this.axisButton.text = "World";
         }
-
     }
 
     handleGizmoEditModeChanged(ev: Editor.GizmoEditModeChangedEvent) {
@@ -101,7 +97,7 @@ class MainToolbar extends Atomic.UIWidget {
 
             } else if (ev.target.id == "3d_axismode") {
 
-                EditorUI.getShortcuts().invokeGizmoAxisModeChanged(ev.target.value ? Editor.AXIS_WORLD : Editor.AXIS_LOCAL);
+                EditorUI.getShortcuts().toggleGizmoAxisMode();
                 return true;
 
             } else if (ev.target.id == "maintoolbar_play") {

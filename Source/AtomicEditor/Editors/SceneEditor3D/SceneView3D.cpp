@@ -390,6 +390,10 @@ void SceneView3D::HandlePostRenderUpdate(StringHash eventType, VariantMap& event
 
                 }
             }
+            else
+            {
+                sceneEditor_->GetSelection()->Clear();
+            }
         }
 
         mouseMoved_ = false;
@@ -442,6 +446,13 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
     {
         if (ev.ref_id == TBIDC("close"))
             return false;
+    }
+    if (ev.type == EVENT_TYPE_KEY_UP)
+    {
+        if (ev.special_key == TB_KEY_ESC)
+        {
+            sceneEditor_->GetSelection()->Clear();
+        }
     }
 
     return sceneEditor_->OnEvent(ev);
