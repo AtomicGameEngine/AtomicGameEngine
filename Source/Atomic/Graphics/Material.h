@@ -41,7 +41,6 @@ class TextureCube;
 class ValueAnimationInfo;
 
 static const unsigned char DEFAULT_RENDER_ORDER = 128;
-extern const char* TEXTURE_UNIT_NAMES[];
 
 /// %Material's shader parameter definition.
 struct MaterialShaderParameter
@@ -232,6 +231,8 @@ public:
     static String GetTextureUnitName(TextureUnit unit);
     /// Parse a shader parameter value from a string. Retunrs either a bool, a float, or a 2 to 4-component vector.
     static Variant ParseShaderParameterValue(const String& value);
+    /// Return the names of supported texture units
+    static const char** GetTextureUnitNames();
 
 private:
     /// Re-evaluate occlusion rendering.
