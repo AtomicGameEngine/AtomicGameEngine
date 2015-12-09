@@ -131,10 +131,10 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
     createMaterialEdit(materialIndex: number) {
 
-        var o = InspectorUtils.createAttrEditFieldWithSelectButton("", this.mainLayout);
+        var o = InspectorUtils.createAttrEditFieldWithSelectButton("Material", this.mainLayout);
 
         var lp = new Atomic.UILayoutParams();
-        lp.width = 250;
+        lp.width = 140;
         o.editField.layoutParams = lp;
         o.editField.readOnly = true;
 
@@ -429,10 +429,10 @@ class SubmeshListAttributeEdit extends AttributeInfoEdit {
                     submeshEdit.initialize(this.editType, this.attrInfo);
                     this.layout.addChild(submeshEdit);
                     this.submeshEdits[name] = submeshEdit;
+                    InspectorUtils.createSeparator(this.layout);
                 }
 
                 this.submeshEdits[name].materialIndexes.push(j);
-
             }
 
         }
