@@ -57,7 +57,9 @@ var techniqueLookup = {
     "Techniques/DiffAlpha.xml": "Alpha",
     "Techniques/DiffAlphaMask.xml": "Alpha Mask",
     "Techniques/DiffAdd.xml": "Additive",
-    "Techniques/NoTexture.xml": "No Texture"
+    "Techniques/NoTexture.xml": "No Texture",
+    "Techniques/DiffLightMap.xml": "Lightmap",
+    "Techniques/DiffLightMapAlpha.xml": "Lightmap Alpha"
 }
 
 var techniqueReverseLookup = {};
@@ -274,7 +276,7 @@ class MaterialInspector extends ScriptWidget {
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR];// ,Atomic.TU_EMISSIVE, Atomic.TU_ENVIRONMENT,
+        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR ,Atomic.TU_EMISSIVE];//, Atomic.TU_ENVIRONMENT,
         //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
 
         for (var i in textureUnits) {
