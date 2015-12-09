@@ -718,6 +718,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
+        lp.height = 24;
         o.editField.layoutParams = lp;
         o.editField.readOnly = true;
 
@@ -828,6 +829,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 304;
+        lp.height = 24;
         layout.layoutParams = lp;
 
         var name = this.attrInfo.name + " Size";

@@ -135,6 +135,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
+        lp.height = 24;
         o.editField.layoutParams = lp;
         o.editField.readOnly = true;
 
