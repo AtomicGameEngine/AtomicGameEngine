@@ -5,11 +5,6 @@ TBLayout: axis: y, distribution: gravity, position: left
 			TBLayout: gravity: left right, distribution-position: right bottom
 				TBEditField: id: project_name, text: "MyGame", autofocus: 1
 					lp: min-width: 240
-	TBLayout: distribution: gravity
-		TBTextField: text: "Project Language:"
-		TBLayout: gravity: left right, distribution-position: right bottom
-			TBSelectDropdown: id: project_language
-				lp: min-width: 240
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBImageWidget: id: project_image
 				lp: width: 128, height: 96
@@ -20,6 +15,12 @@ TBLayout: axis: y, distribution: gravity, position: left
 			TBEditField: id: project_path
 				lp: min-width: 380
 			TBButton: text: "Choose" id: choose_path
+	TBSeparator: gravity: left right, skin: AESeparator
+	TBLayout: distribution: gravity
+		TBTextField: text: "Project Language:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBSelectDropdown: id: project_language
+				lp: min-width: 240
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:
 		TBButton: text: Create, id: create
