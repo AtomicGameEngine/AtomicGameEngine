@@ -21,6 +21,7 @@ class CreateProject extends ModalWindow {
 
         this.projectPathField = <Atomic.UIEditField> this.getWidget("project_path");
         this.projectNameField = <Atomic.UIEditField> this.getWidget("project_name");
+        this.projectLanguageField = <Atomic.UISelectDropdown> this.getWidget("project_language");
         this.image = <Atomic.UIImageWidget> this.getWidget("project_image");
 
         if (!imagePath)
@@ -44,6 +45,7 @@ class CreateProject extends ModalWindow {
         }
 
         this.projectPathField.text = userDocuments;
+        this.populateLanguageSelectionList();
 
         this.resizeToFitContent();
         this.center();
@@ -139,8 +141,29 @@ class CreateProject extends ModalWindow {
         }
     }
 
+    /**
+     * Queries the json file for languages that are available to this template and populates the
+     * list.
+     */
+    populateLanguageSelectionList() {
+      this.projectLanguageFieldSource.clear();
+      var languages: string[] = ["JavaScript", "TypeScript", "CSharp"];
+
+      for (var i in languages) {
+          this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(languages[i]));
+      }
+
+      this.projectLanguageField.source = this.projectLanguageFieldSource;
+
+      // force a refresh
+      this.projectLanguageField.value = -1;
+      this.projectLanguageField.value = 0;
+    }
+
     projectPathField: Atomic.UIEditField;
     projectNameField: Atomic.UIEditField;
+    projectLanguageField: Atomic.UISelectDropdown;
+    projectLanguageFieldSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
     image: Atomic.UIImageWidget;
 
     templateSourceDir: string;
