@@ -131,22 +131,33 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
             if (refid == "file open project") {
 
-                if (ToolCore.toolSystem.project) {
-
-                    EditorUI.showModalError("Project Open",
-                        "Please close the current project before opening new one");
-
-                    return true;
-                }
-
                 var utils = new Editor.FileUtils();
                 var path = utils.openProjectFileDialog();
-                if (path) {
 
-                    this.sendEvent(EditorEvents.LoadProject, { path: path });
+                if (path=="") {
+
+                    return true;
 
                 }
 
+                var openProject = () => this.sendEvent(EditorEvents.LoadProject, { path: path });
+
+                if (ToolCore.toolSystem.project) {
+
+                    this.subscribeToEvent(EditorEvents.ProjectClosed, () => {
+
+                        this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
+                        openProject();
+
+                    });
+
+                    this.sendEvent(EditorEvents.CloseProject);
+
+                } else {
+
+                    openProject();
+
+                }
 
                 return true;
 
