@@ -20,37 +20,59 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include <TurboBadger/tb_widgets.h>
+#include <TurboBadger/tb_popup_window.h>
 
-#include <TurboBadger/tb_select_item.h>
+#include "UI.h"
+#include "UIEvents.h"
 #include "UIWidget.h"
+#include "UIPopupWindow.h"
+
+using namespace tb;
 
 namespace Atomic
 {
 
-class UISelectItemSource;
-
-class UIMenuWindow : public UIWidget
+UIPopupWindow::UIPopupWindow(Context* context, bool createWidget, UIWidget* target, const String& id) : UIWidget(context, false)
 {
-    OBJECT(UIMenuWindow)
+    if (createWidget)
+    {
+        //if we should create widget, then target shouldn't be null
+        assert(target);
+        widget_ = new TBPopupWindow(target->GetInternalWidget());
+        widget_->SetID(TBIDC(id.CString()));
+        widget_->SetDelegate(this);
+        GetSubsystem<UI>()->WrapWidget(this, widget_);
+    }
+}
 
-public:
+UIPopupWindow::~UIPopupWindow()
+{
+}
 
-    UIMenuWindow(Context* context, UIWidget* target, const String& id = String::EMPTY);
-    virtual ~UIMenuWindow();
+void UIPopupWindow::Show(int x, int y)
+{
+    if (x != -1 && y != -1)
+    {
+        ((TBPopupWindow*)widget_)->Show(TBPopupAlignment(TBPoint(x, y)));
+    }
+    else
+    {
+        ((TBPopupWindow*)widget_)->Show(TBPopupAlignment());
+    }
+}
 
-    void Show(UISelectItemSource* source, int x = -1, int y = -1);
+bool UIPopupWindow::OnEvent(const tb::TBWidgetEvent &ev)
+{
+    return false;
+}
 
-    void Close();
+void UIPopupWindow::Close()
+{
+    if (!widget_)
+        return;
 
-protected:
-
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
-
-private:
-
-    tb::TBSelectItemSource* source_;
-
-};
+    ((TBPopupWindow*)widget_)->Close();
+}
 
 }

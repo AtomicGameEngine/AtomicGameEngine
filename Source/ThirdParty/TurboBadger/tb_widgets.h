@@ -999,6 +999,14 @@ public:
 
     TBWidget *GetWidgetByTouchId(unsigned touchId);
 
+    bool GetShortened() { return shortened_; }
+
+    void SetShortened(bool shortened) { shortened_ = shortened; }
+
+    TBStr GetTooltip() { return tooltip_; }
+
+    bool SetTooltip(const char *tooltip) { return tooltip_.Set(tooltip); }
+
 private:
 	friend class TBWidgetListener;	///< It does iteration of m_listeners for us.
 	TBWidget *m_parent;				///< The parent of this widget
@@ -1024,6 +1032,8 @@ private:
     bool needCapturing_; //if ours widget need capturing
     bool captured_; //if ours widget is currently captured
     unsigned touchId_;
+    bool shortened_;
+    TBStr tooltip_;
 	union {
 		struct {
 			uint16 is_group_root : 1;

@@ -146,6 +146,9 @@ void TBWidget::OnInflate(const INFLATE_INFO &info)
 				dc->GetPxFromValue(val.GetArray()->GetValue(3), 0)));
 		}
 	}
+
+    if (const char *tooltip = info.node->GetValueString("tooltip", nullptr))
+        SetTooltip(tooltip);
 }
 
 TB_WIDGET_FACTORY(TBButton, TBValue::TYPE_NULL, WIDGET_Z_BOTTOM) {}

@@ -143,6 +143,13 @@ enum UI_WIDGET_STATE {
 
 };
 
+enum UI_AXIS {
+    ///< Horizontal layout
+    UI_AXIS_X = tb::AXIS_X,
+    ///< Vertical layout
+    UI_AXIS_Y = tb::AXIS_Y,
+};
+
 
 class UIView;
 class UILayoutParams;
@@ -189,6 +196,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     void Center();
     void SetGravity(UI_GRAVITY gravity);
+    void SetAxis(UI_AXIS axis);
 
     void SetValue(double value);
     virtual double GetValue();
@@ -208,7 +216,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     UI_WIDGET_VISIBILITY GetVisibility();
 
     void SetStateRaw(UI_WIDGET_STATE state);
-   UI_WIDGET_STATE GetStateRaw();
+    UI_WIDGET_STATE GetStateRaw();
 
     void Invalidate();
     void Die();
@@ -250,9 +258,17 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     bool GetCaptured();
 
     void SetCapturing(bool capturing);
-    bool GetCapturing() { return widget_->GetCapturing(); }
+    bool GetCapturing();
 
     void InvokeShortcut(const String& shortcut);
+
+    bool GetShortened();
+
+    void SetShortened(bool shortened);
+
+    String GetTooltip();
+
+    void SetTooltip(const String& text);
 
 protected:
 

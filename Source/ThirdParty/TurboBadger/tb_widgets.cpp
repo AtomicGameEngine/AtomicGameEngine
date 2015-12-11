@@ -75,6 +75,7 @@ TBWidget::TBWidget()
 	, m_packed_init(0)
     , needCapturing_(true)
     , captured_(false)
+    , shortened_(false)
 {
 #ifdef TB_RUNTIME_DEBUG_INFO
 	last_measure_time = 0;

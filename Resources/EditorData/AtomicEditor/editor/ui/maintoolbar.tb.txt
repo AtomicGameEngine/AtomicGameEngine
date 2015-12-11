@@ -7,6 +7,7 @@ TBLayout: distribution: gravity, spacing: 4
 		@include definitions>menubutton
 		TBSkinImage: skin: PlayButton, id: skin_image
 		id maintoolbar_play
+		tooltip Play project
 	TBButton: toggle-mode: 1
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DTranslateBitmap
