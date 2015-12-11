@@ -551,24 +551,20 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
             UILayout* tooltipLayout = new UILayout(context_, UI_AXIS_Y, true);
             if (hoveredWidget->GetShortened())
             {
-                UIEditField* fullTextField = new UIEditField(context_, true);
-                fullTextField->SetAdaptToContentSize(true);
+                UITextField* fullTextField = new UITextField(context_, true);
                 fullTextField->SetText(hoveredWidget->GetText());
-                fullTextField->SetReadOnly(true);
                 tooltipLayout->AddChild(fullTextField);
             }
             if (hoveredWidget->GetTooltip().Length() > 0)
             {
-                UIEditField* tooltipTextField = new UIEditField(context_, true);
-                tooltipTextField->SetAdaptToContentSize(true);
+                UITextField* tooltipTextField = new UITextField(context_, true);
                 tooltipTextField->SetText(hoveredWidget->GetTooltip());
-                tooltipTextField->SetReadOnly(true);
                 tooltipLayout->AddChild(tooltipTextField);
             }
             Input* input = GetSubsystem<Input>();
             IntVector2 mousePosition = input->GetMousePosition();
             tooltip_->AddChild(tooltipLayout);
-            tooltip_->Show(mousePosition.x_ + 1, mousePosition.y_ + 1);
+            tooltip_->Show(mousePosition.x_ + 8, mousePosition.y_ + 8);
         }
     }
     else 
