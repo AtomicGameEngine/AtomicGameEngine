@@ -21,10 +21,10 @@ class CreateProject extends ModalWindow {
 
         this.init("Create Project", "AtomicEditor/editor/ui/createproject.tb.txt");
 
-        this.projectPathField = <Atomic.UIEditField> this.getWidget("project_path");
-        this.projectNameField = <Atomic.UIEditField> this.getWidget("project_name");
-        this.projectLanguageField = <Atomic.UISelectDropdown> this.getWidget("project_language");
-        this.image = <Atomic.UIImageWidget> this.getWidget("project_image");
+        this.projectPathField = <Atomic.UIEditField>this.getWidget("project_path");
+        this.projectNameField = <Atomic.UIEditField>this.getWidget("project_name");
+        this.projectLanguageField = <Atomic.UISelectDropdown>this.getWidget("project_language");
+        this.image = <Atomic.UIImageWidget>this.getWidget("project_image");
 
         if (!projectTemplate.screenshot)
             this.image.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
@@ -100,32 +100,31 @@ class CreateProject extends ModalWindow {
         }
 
         // Do the creation!
-        let templateDetail : ProjectTemplates.ProjectTemplateDetail;
+        let templateDetail: ProjectTemplates.ProjectTemplateDetail;
         let selectedLanguage = this.projectLanguageField.text;
 
         for (let i = 0; i < this.projectTemplate.templates.length; i++) {
-          if (this.projectTemplate.templates[i].language === selectedLanguage) {
-            templateDetail = this.projectTemplate.templates[i];
-            break;
-          }
+            if (this.projectTemplate.templates[i].language === selectedLanguage) {
+                templateDetail = this.projectTemplate.templates[i];
+                break;
+            }
         }
 
         if (templateDetail) {
 
-          fileSystem.copyDir(templateDetail.folder + "Resources", folder + "Resources");
+            fileSystem.copyDir(templateDetail.folder + "Resources", folder + "Resources");
 
-          var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
-          file.close();
+            var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
+            file.close();
 
-          this.hide();
+            this.hide();
 
-          this.sendEvent(EditorEvents.LoadProject, { path: folder });
+            this.sendEvent(EditorEvents.LoadProject, { path: folder });
 
-          return true;
+            return true;
         } else {
-          return false;
+            return false;
         }
-
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -162,14 +161,14 @@ class CreateProject extends ModalWindow {
      * list.
      */
     populateLanguageSelectionList() {
-      this.projectLanguageFieldSource.clear();
+        this.projectLanguageFieldSource.clear();
 
-      this.projectTemplate.templates.forEach(templateDetail => {
-          this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(templateDetail.language));
-      });
+        this.projectTemplate.templates.forEach(templateDetail => {
+            this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(templateDetail.language));
+        });
 
-      this.projectLanguageField.source = this.projectLanguageFieldSource;
-      this.projectLanguageField.value = 0;
+        this.projectLanguageField.source = this.projectLanguageFieldSource;
+        this.projectLanguageField.value = 0;
     }
 
     projectPathField: Atomic.UIEditField;

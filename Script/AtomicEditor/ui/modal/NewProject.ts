@@ -37,7 +37,7 @@ class NewProject extends ModalWindow {
                 let ops = EditorUI.getModelOps();
                 ops.showCreateProject(projectDefinition);
             } else {
-              EditorUI.showModalError("New Project Error", `Could not create new project of type: ${id}`);
+                EditorUI.showModalError("New Project Error", `Could not create new project of type: ${id}`);
             }
         }
     }

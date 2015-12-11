@@ -43,9 +43,9 @@ class WelcomeFrame extends ScriptWidget {
 
     handleClickedExample(example: ProjectTemplates.ProjectTemplateDefinition) {
 
-      var ops = EditorUI.getModelOps();
-      var env = ToolCore.toolEnvironment;
-      ops.showCreateProject(example);
+        var ops = EditorUI.getModelOps();
+        var env = ToolCore.toolEnvironment;
+        ops.showCreateProject(example);
     }
 
     addExample(example: ProjectTemplates.ProjectTemplateDefinition) {
@@ -77,7 +77,7 @@ class WelcomeFrame extends ScriptWidget {
 
         button.onClick = () => {
 
-          this.handleClickedExample(example);
+            this.handleClickedExample(example);
 
         };
 

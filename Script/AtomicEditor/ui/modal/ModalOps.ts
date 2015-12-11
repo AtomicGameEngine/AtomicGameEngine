@@ -41,7 +41,7 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateDefinition : ProjectTemplates.ProjectTemplateDefinition) {
+    showCreateProject(projectTemplateDefinition: ProjectTemplates.ProjectTemplateDefinition) {
 
         if (this.show()) {
 
@@ -123,7 +123,7 @@ class ModalOps extends Atomic.ScriptObject {
     }
 
 
-    showResourceSelection(windowText: string, importerType: string, resourceType:string, callback: (retObject: any, args: any) => void, args: any = undefined) {
+    showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args: any = undefined) {
 
         if (this.show()) {
 
@@ -255,7 +255,7 @@ class ModalOps extends Atomic.ScriptObject {
 
         // only show snap settings if we have a project loaded
         if (!ToolCore.toolSystem.project)
-          return;
+            return;
 
         if (this.show()) {
 
