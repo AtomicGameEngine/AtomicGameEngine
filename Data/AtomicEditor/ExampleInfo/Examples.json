@@ -44,6 +44,10 @@
 					{
 						"language" : "JavaScript",
 						"folder" : "RoboMan3D"
+					},
+					{
+						"language" : "TypeScript",
+						"folder" : "RoboMan3DTypeScript"
 					}
 				],
 				"module" : "3D"
