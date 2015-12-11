@@ -47,7 +47,7 @@ namespace Atomic
 
 extern const char* wrapModeNames[];
 
-static const char* textureUnitNames[] =
+const char* textureUnitNames[] =
 {
     "diffuse",
     "normal",
@@ -768,6 +768,11 @@ Variant Material::ParseShaderParameterValue(const String& value)
         return Variant(ToBool(valueTrimmed));
     else
         return ToVectorVariant(valueTrimmed);
+}
+
+const char** Material::GetTextureUnitNames()
+{
+    return textureUnitNames;
 }
 
 void Material::CheckOcclusion()

@@ -47,6 +47,7 @@ export interface ContentFolderChangedEvent {
 }
 
 export const CloseProject = "EditorCloseProject";
+export const ProjectClosed = "EditorProjectClosed";
 
 export const LoadProject = "EditorLoadProject";
 export interface LoadProjectEvent {

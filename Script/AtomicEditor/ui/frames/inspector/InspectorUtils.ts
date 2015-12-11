@@ -62,6 +62,7 @@ class InspectorUtils {
     edit.fontDescription = InspectorUtils.attrFontDesc;
     var lp = new Atomic.UILayoutParams();
     lp.width = 160;
+    lp.height = 24;
     edit.layoutParams = lp;
 
     return edit;

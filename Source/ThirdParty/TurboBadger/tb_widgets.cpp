@@ -1354,19 +1354,29 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
     TBWidget* down_widget = GetWidgetAt(x, y, true);
-	if (down_widget && down_widget->touchId_ == touchId)
+	if ((down_widget && down_widget->touchId_ == touchId) || captured_widget)
 	{
+        TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
+        TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
         down_widget->Invalidate();
         down_widget->InvalidateSkinStates();
         down_widget->OnCaptureChanged(false);
 		down_widget->ConvertFromRoot(x, y);
-		TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
-		TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
 		down_widget->InvokeEvent(ev_up);
-		if (!cancel_click && down_widget->GetHitStatus(x, y))
+        if (!cancel_click && down_widget->GetHitStatus(x, y))
+        {
 			down_widget->InvokeEvent(ev_click);
-		if (captured_widget) // && button == captured_button
-			captured_widget->ReleaseCapture();
+        }
+        if (captured_widget)
+        {
+            captured_widget->ConvertFromRoot(x, y);
+            if (!cancel_click && captured_widget->GetHitStatus(x, y))
+            {
+                captured_widget->InvokeEvent(ev_click);
+            }
+            captured_widget->InvokeEvent(ev_up);
+            captured_widget->ReleaseCapture();
+        }
 	}
 }
 
