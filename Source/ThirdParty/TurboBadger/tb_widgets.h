@@ -1003,7 +1003,7 @@ public:
 
     void SetShortened(bool shortened) { shortened_ = shortened; }
 
-    TBStr GetTooltip() { TBStr str; str.Set(tooltip_); return str; }
+    TBStr GetTooltip() { return tooltip_; }
 
     bool SetTooltip(const char *tooltip) { return tooltip_.Set(tooltip); }
 

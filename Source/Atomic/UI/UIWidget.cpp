@@ -250,11 +250,10 @@ void UIWidget::AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* re
 String UIWidget::GetText()
 {
     if (!widget_)
-        return "";
+        return String::EMPTY;
 
     return widget_->GetText().CStr();
 }
-
 
 void UIWidget::SetText(const String& text)
 {
@@ -806,7 +805,7 @@ bool UIWidget::GetCapturing()
     if (!widget_)
         return false;
 
-    widget_->GetCapturing();
+    return widget_->GetCapturing();
 }
 
 void UIWidget::InvalidateLayout()
@@ -833,7 +832,7 @@ bool UIWidget::GetShortened()
     return widget_->GetShortened();
 }
 
-void UIWidget::GetShortened(bool shortened)
+void UIWidget::SetShortened(bool shortened)
 {
     if (!widget_)
         return;
@@ -844,7 +843,7 @@ void UIWidget::GetShortened(bool shortened)
 String UIWidget::GetTooltip()
 {
     if (!widget_)
-        return "";
+        return String::EMPTY;
 
     return widget_->GetTooltip().CStr();
 }

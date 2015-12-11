@@ -264,7 +264,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     bool GetShortened();
 
-    void GetShortened(bool shortened);
+    void SetShortened(bool shortened);
 
     String GetTooltip();
 
