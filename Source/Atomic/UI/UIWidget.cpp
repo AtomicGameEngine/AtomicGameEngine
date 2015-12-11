@@ -825,20 +825,20 @@ void UIWidget::InvokeShortcut(const String& shortcut)
     widget_->OnEvent(ev);
 }
 
-bool UIWidget::GetShorten()
+bool UIWidget::GetShortened()
 {
     if (!widget_)
         return false;
 
-    return widget_->GetShorten();
+    return widget_->GetShortened();
 }
 
-void UIWidget::SetShorten(bool shorten)
+void UIWidget::GetShortened(bool shortened)
 {
     if (!widget_)
         return;
 
-    widget_->SetShorten(shorten);
+    widget_->SetShortened(shortened);
 }
 
 String UIWidget::GetTooltip()

@@ -158,7 +158,7 @@ private:
     bool consoleVisible_;
     bool exitRequested_;
     
-    float mouseStayedTime;
+    float tooltipHoverTime_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);

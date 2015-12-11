@@ -262,9 +262,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     void InvokeShortcut(const String& shortcut);
 
-    bool GetShorten();
+    bool GetShortened();
 
-    void SetShorten(bool shorten);
+    void GetShortened(bool shortened);
 
     String GetTooltip();
 

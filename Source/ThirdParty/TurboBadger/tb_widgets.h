@@ -999,9 +999,9 @@ public:
 
     TBWidget *GetWidgetByTouchId(unsigned touchId);
 
-    bool GetShorten() { return shorten_; }
+    bool GetShortened() { return shortened_; }
 
-    void SetShorten(bool shorten) { shorten_ = shorten; }
+    void SetShortened(bool shortened) { shortened_ = shortened; }
 
     TBStr GetTooltip() { TBStr str; str.Set(tooltip_); return str; }
 
@@ -1032,7 +1032,7 @@ private:
     bool needCapturing_; //if ours widget need capturing
     bool captured_; //if ours widget is currently captured
     unsigned touchId_;
-    bool shorten_;
+    bool shortened_;
     TBStr tooltip_;
 	union {
 		struct {

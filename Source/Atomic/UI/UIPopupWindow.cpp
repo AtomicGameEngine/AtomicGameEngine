@@ -33,41 +33,46 @@ using namespace tb;
 namespace Atomic
 {
 
-    UIPopupWindow::UIPopupWindow(Context* context, UIWidget* target, const String& id) : UIWidget(context, false)
+UIPopupWindow::UIPopupWindow(Context* context, bool createWidget, UIWidget* target, const String& id) : UIWidget(context, false)
+{
+    if (createWidget)
     {
+        //if we should create widget, then target shouldn't be null
+        assert(target);
         widget_ = new TBPopupWindow(target->GetInternalWidget());
         widget_->SetID(TBIDC(id.CString()));
         widget_->SetDelegate(this);
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
+}
 
-    UIPopupWindow::~UIPopupWindow()
+UIPopupWindow::~UIPopupWindow()
+{
+}
+
+void UIPopupWindow::Show(int x, int y)
+{
+    if (x != -1 && y != -1)
     {
+        ((TBPopupWindow*)widget_)->Show(TBPopupAlignment(TBPoint(x, y)));
     }
-
-    void UIPopupWindow::Show(int x, int y)
+    else
     {
-        if (x != -1 && y != -1)
-        {
-            ((TBPopupWindow*)widget_)->Show(TBPopupAlignment(TBPoint(x, y)));
-        }
-        else
-        {
-            ((TBPopupWindow*)widget_)->Show(TBPopupAlignment());
-        }
+        ((TBPopupWindow*)widget_)->Show(TBPopupAlignment());
     }
+}
 
-    bool UIPopupWindow::OnEvent(const tb::TBWidgetEvent &ev)
-    {
-        return false;
-    }
+bool UIPopupWindow::OnEvent(const tb::TBWidgetEvent &ev)
+{
+    return false;
+}
 
-    void UIPopupWindow::Close()
-    {
-        if (!widget_)
-            return;
+void UIPopupWindow::Close()
+{
+    if (!widget_)
+        return;
 
-        ((TBPopupWindow*)widget_)->Close();
-    }
+    ((TBPopupWindow*)widget_)->Close();
+}
 
 }

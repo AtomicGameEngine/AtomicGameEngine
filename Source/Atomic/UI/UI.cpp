@@ -540,16 +540,16 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         return;
     }
     
-    mouseStayedTime += eventData[Update::P_TIMESTEP].GetFloat();
+    tooltipHoverTime_ += eventData[Update::P_TIMESTEP].GetFloat();
 
-    if (mouseStayedTime >= 0.5f)
+    if (tooltipHoverTime_ >= 0.5f)
     {
         UIWidget* hoveredWidget = GetHoveredWidget();
-        if (hoveredWidget && !tooltip_ && (hoveredWidget->GetShorten() || hoveredWidget->GetTooltip().Length() > 0))
+        if (hoveredWidget && !tooltip_ && (hoveredWidget->GetShortened() || hoveredWidget->GetTooltip().Length() > 0))
         {
-            tooltip_ = new UIPopupWindow(context_, hoveredWidget, "tooltip");
+            tooltip_ = new UIPopupWindow(context_, true, hoveredWidget, "tooltip");
             UILayout* tooltipLayout = new UILayout(context_, UI_AXIS_Y, true);
-            if (hoveredWidget->GetShorten())
+            if (hoveredWidget->GetShortened())
             {
                 UIEditField* fullTextField = new UIEditField(context_, true);
                 fullTextField->SetAdaptToContentSize(true);
@@ -644,6 +644,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     // switch this to use a factory?
 
     // this is order dependent as we're using IsOfType which also works if a base class
+
+    if (widget->IsOfType<TBPopupWindow>())
+    {
+        UIPopupWindow* popupWindow = new UIPopupWindow(context_, false);
+        popupWindow->SetWidget(widget);
+        widgetWrap_[widget] = popupWindow;
+        return popupWindow;
+    }
 
     if (widget->IsOfType<TBDimmer>())
     {

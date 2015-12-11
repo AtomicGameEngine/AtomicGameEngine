@@ -43,7 +43,7 @@ void TBWidgetString::Paint(TBWidget *widget, const TBRect &rect, const TBColor &
 
     if (string_w <= rect.w)
     {
-        widget->SetShorten(false);
+        widget->SetShortened(false);
 		font->DrawString(x, y, color, m_text);
     }
 	else
@@ -55,7 +55,7 @@ void TBWidgetString::Paint(TBWidget *widget, const TBRect &rect, const TBColor &
 		// Some fonts seem to render ellipsis a lot uglier than three dots.
 		const char *end = "...";
 
-        widget->SetShorten(true);
+        widget->SetShortened(true);
 
 		int endw = font->GetStringWidth(end);
 		int startw = 0;

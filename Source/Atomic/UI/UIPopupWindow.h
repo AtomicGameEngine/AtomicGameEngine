@@ -31,9 +31,9 @@ class UIPopupWindow: public UIWidget
 {
     OBJECT(UIPopupWindow)
 
-    public:
+public:
 
-    UIPopupWindow(Context* context, UIWidget* target, const String& id = String::EMPTY);
+    UIPopupWindow(Context* context, bool createWidget, UIWidget* target = nullptr, const String& id = String::EMPTY);
     virtual ~UIPopupWindow();
 
     void Show(int x = -1, int y = -1);
