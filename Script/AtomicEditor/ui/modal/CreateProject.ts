@@ -9,13 +9,15 @@ import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 
+import ProjectTemplates = require("../resources/ProjectTemplates");
+
 class CreateProject extends ModalWindow {
 
-    constructor(templateSourceDir: string, imagePath: string = "") {
+    constructor(projectTemplate: ProjectTemplates.ProjectTemplateDefinition) {
 
         super();
 
-        this.templateSourceDir = templateSourceDir;
+        this.projectTemplate = projectTemplate;
 
         this.init("Create Project", "AtomicEditor/editor/ui/createproject.tb.txt");
 
@@ -24,10 +26,10 @@ class CreateProject extends ModalWindow {
         this.projectLanguageField = <Atomic.UISelectDropdown> this.getWidget("project_language");
         this.image = <Atomic.UIImageWidget> this.getWidget("project_image");
 
-        if (!imagePath)
+        if (!projectTemplate.screenshot)
             this.image.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         else
-            this.image.image = imagePath;
+            this.image.image = projectTemplate.screenshot;
 
 
         var fileSystem = Atomic.getFileSystem();
@@ -98,17 +100,31 @@ class CreateProject extends ModalWindow {
         }
 
         // Do the creation!
+        let templateDetail : ProjectTemplates.ProjectTemplateDetail;
+        let selectedLanguage = this.projectLanguageField.text;
 
-        fileSystem.copyDir(this.templateSourceDir + "Resources", folder + "Resources");
+        for (let i = 0; i < this.projectTemplate.templates.length; i++) {
+          if (this.projectTemplate.templates[i].language === selectedLanguage) {
+            templateDetail = this.projectTemplate.templates[i];
+            break;
+          }
+        }
 
-        var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
-        file.close();
+        if (templateDetail) {
 
-        this.hide();
+          fileSystem.copyDir(templateDetail.folder + "Resources", folder + "Resources");
 
-        this.sendEvent(EditorEvents.LoadProject, { path: folder });
+          var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
+          file.close();
 
-        return true;
+          this.hide();
+
+          this.sendEvent(EditorEvents.LoadProject, { path: folder });
+
+          return true;
+        } else {
+          return false;
+        }
 
     }
 
@@ -147,16 +163,12 @@ class CreateProject extends ModalWindow {
      */
     populateLanguageSelectionList() {
       this.projectLanguageFieldSource.clear();
-      var languages: string[] = ["JavaScript", "TypeScript", "CSharp"];
 
-      for (var i in languages) {
-          this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(languages[i]));
-      }
+      this.projectTemplate.templates.forEach(templateDetail => {
+          this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(templateDetail.language));
+      });
 
       this.projectLanguageField.source = this.projectLanguageFieldSource;
-
-      // force a refresh
-      this.projectLanguageField.value = -1;
       this.projectLanguageField.value = 0;
     }
 
@@ -166,7 +178,7 @@ class CreateProject extends ModalWindow {
     projectLanguageFieldSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
     image: Atomic.UIImageWidget;
 
-    templateSourceDir: string;
+    projectTemplate: ProjectTemplates.ProjectTemplateDefinition;
 }
 
 

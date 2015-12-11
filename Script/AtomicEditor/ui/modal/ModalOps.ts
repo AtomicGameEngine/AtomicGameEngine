@@ -28,6 +28,9 @@ import UIResourceOps = require("./UIResourceOps");
 
 import SnapSettingsWindow = require("./SnapSettingsWindow");
 
+import ProjectTemplates = require("../../resources/ProjectTemplates");
+
+
 class ModalOps extends Atomic.ScriptObject {
 
     constructor() {
@@ -38,11 +41,11 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateFolder: string, imagePath: string = "") {
+    showCreateProject(projectTemplateDefinition : ProjectTemplates.ProjectTemplateDefinition) {
 
         if (this.show()) {
 
-            this.opWindow = new CreateProject(projectTemplateFolder, imagePath);
+            this.opWindow = new CreateProject(projectTemplateDefinition);
 
         }
 
