@@ -46,8 +46,13 @@ logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "SplinePath"));
 
 var navigationCreateSource = new Atomic.UIMenuItemSource();
 
+navigationCreateSource.addItem(new Atomic.UIMenuItem("CrowdAgent", "CrowdAgent"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("CrowdManager", "CrowdManager"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("NavArea", "NavArea"));
 navigationCreateSource.addItem(new Atomic.UIMenuItem("Navigable", "Navigable"));
 navigationCreateSource.addItem(new Atomic.UIMenuItem("NavigationMesh", "NavigationMesh"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("DynamicNavigationMesh", "DynamicNavigationMesh"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("Obstacle", "Obstacle"));
 navigationCreateSource.addItem(new Atomic.UIMenuItem("OffMeshConnection", "OffMeshConnection"));
 
 var networkCreateSource = new Atomic.UIMenuItemSource();
