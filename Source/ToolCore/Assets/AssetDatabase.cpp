@@ -537,6 +537,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
         resourceTypeToImporterType_["JSONFile"] = "JSONImporter";
         resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
+        resourceTypeToImporterType_["ParticleEffect"] = "ParticleEffectImporter";
 
         resourceTypeToImporterType_["Animation"] = "ModelImporter";
 

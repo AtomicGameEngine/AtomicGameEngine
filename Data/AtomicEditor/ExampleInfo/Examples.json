@@ -85,6 +85,18 @@
 				"module" : "2D"
 			},
 			{
+				"name": "ParticleEmitter3D",
+				"desc" : "An example of 3d particles driven by script",
+				"screenshot" : "ParticleEmitter3D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "ParticleEmitter3D"
+					}
+				],
+				"module" : "3D"
+			},
+			{
 				"name": "Butterflies",
 				"desc" : "An example of particles driven by script",
 				"screenshot" : "Butterflies.png",
