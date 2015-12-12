@@ -84,47 +84,55 @@ class CreateProject extends ModalWindow {
 
 
         folder = Atomic.addTrailingSlash(folder);
-
         if (!fileSystem.dirExists(folder)) {
 
-            var utils = new Editor.FileUtils();
-            utils.createDirs(folder);
+            // Determine if we have a language template for the selected language.
+            let templateDetail: ProjectTemplates.ProjectTemplateDetail;
+            let selectedLanguage = this.projectLanguageField.text;
 
-            utils.createDirs(folder + "Cache");
+            for (let i = 0; i < this.projectTemplate.templates.length; i++) {
+                if (this.projectTemplate.templates[i].language === selectedLanguage) {
+                    templateDetail = this.projectTemplate.templates[i];
+                    break;
+                }
+            }
 
-            if (!fileSystem.dirExists(folder)) {
-                var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
+            // Do the creation!
+            if (templateDetail) {
+
+                fileSystem.copyDir(templateDetail.folder, folder);
+
+                var utils = new Editor.FileUtils();
+
+                utils.createDirs(folder + "Cache");
+
+                if (!fileSystem.dirExists(folder)) {
+                    var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
+                    EditorUI.showModalError("New Project Editor Error", message);
+                    return false;
+                }
+
+                // Look for the .atomic project file and if it exists, then rename it
+                let fileResults = fileSystem.scanDir(folder, "*.atomic", Atomic.SCAN_FILES, false);
+                if (fileResults.length === 1) {
+                    fileSystem.rename(folder + fileResults[0], folder + name + ".atomic");
+                } else {
+                    // Just create the file.  We either don't have one existing, or we have more than one and don't know which one to rename
+                    var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
+                    file.close();
+                }
+
+                this.hide();
+
+                this.sendEvent(EditorEvents.LoadProject, { path: folder });
+                return true;
+            } else {
+                var message = "Unable to create project for language:  " + selectedLanguage + "\n\nPlease choose a different language";
                 EditorUI.showModalError("New Project Editor Error", message);
                 return false;
             }
         }
-
-        // Do the creation!
-        let templateDetail: ProjectTemplates.ProjectTemplateDetail;
-        let selectedLanguage = this.projectLanguageField.text;
-
-        for (let i = 0; i < this.projectTemplate.templates.length; i++) {
-            if (this.projectTemplate.templates[i].language === selectedLanguage) {
-                templateDetail = this.projectTemplate.templates[i];
-                break;
-            }
-        }
-
-        if (templateDetail) {
-
-            fileSystem.copyDir(templateDetail.folder + "Resources", folder + "Resources");
-
-            var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
-            file.close();
-
-            this.hide();
-
-            this.sendEvent(EditorEvents.LoadProject, { path: folder });
-
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
