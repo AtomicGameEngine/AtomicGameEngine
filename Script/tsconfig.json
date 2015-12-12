@@ -12,7 +12,8 @@
     },
     "filesGlob": [
         "./ToolCore/**/*.ts",
-        "./AtomicEditor/**/*.ts"
+        "./AtomicEditor/**/*.ts",
+        "./TypeScript/**/*.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
@@ -24,6 +25,7 @@
         "./AtomicEditor/editor/EditorLicense.ts",
         "./AtomicEditor/editor/Preferences.ts",
         "./AtomicEditor/main.ts",
+        "./AtomicEditor/resources/ProjectTemplates.ts",
         "./AtomicEditor/resources/ResourceOps.ts",
         "./AtomicEditor/ui/EditorStrings.ts",
         "./AtomicEditor/ui/EditorUI.ts",
@@ -86,6 +88,12 @@
         "./AtomicEditor/ui/playmode/PlayMode.ts",
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
-        "./AtomicEditor/ui/UIEvents.ts"
+        "./AtomicEditor/ui/UIEvents.ts",
+        "./TypeScript/Atomic.d.ts",
+        "./TypeScript/AtomicNET.d.ts",
+        "./TypeScript/AtomicPlayer.d.ts",
+        "./TypeScript/AtomicWork.d.ts",
+        "./TypeScript/Editor.d.ts",
+        "./TypeScript/ToolCore.d.ts"
     ]
 }
