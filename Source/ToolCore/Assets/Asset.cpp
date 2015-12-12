@@ -27,6 +27,7 @@
 #include "PEXImporter.h"
 #include "TextImporter.h"
 #include "NETAssemblyImporter.h"
+#include "TypeScriptImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -268,6 +269,10 @@ bool Asset::CreateImporter()
         else if (ext == ".js")
         {
             importer_ = new JavascriptImporter(context_, this);
+        }
+        else if (ext == ".ts")
+        {
+            importer_ = new TypeScriptImporter(context_, this);
         }
         else if (ext == ".json")
         {
