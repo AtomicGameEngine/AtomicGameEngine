@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "target": "ES5",
+        "module": "commonjs",
+        "declaration": false,
+        "inlineSourceMap": false,
+        "removeComments": false
+    },
+    "filesGlob": [
+        "!node_modules/**",
+        "!build/**",
+        "Resources/**/*.ts",
+        "typings/**/*.ts"
+    ],
+    "files": [
+        "Resources/Components/Spinner.ts",
+        "Resources/Scripts/main.ts",
+        "typings/Atomic/Atomic.d.ts",
+        "typings/Atomic/AtomicPlayer.d.ts",
+        "typings/Atomic/AtomicWork.d.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}
