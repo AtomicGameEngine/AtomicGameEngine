@@ -81,7 +81,6 @@ public:
                     container_->OnEvent(ev);
                     editor_->Close(container_->GetNumPages()>1);
                 }
-
                 return true;
             }
             else if (ev.target->GetID() == TBIDC("tabclose"))
@@ -89,13 +88,21 @@ public:
                 if (RequestClose())
                 {
                     container_->OnEvent(ev);
-                    return true;
                 }
+
+                return true;
+            }
+            else
+            {
+                TBWidgetEvent nevent = ev;
+                nevent.target = this;
+                return container_->OnEvent(nevent);
             }
         }
 
         return false;
     }
+
 };
 
 ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabContainer *container):
