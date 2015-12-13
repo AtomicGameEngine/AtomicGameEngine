@@ -61,7 +61,11 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev)
     {
-        if (ev.type == EVENT_TYPE_CLICK || ev.type == EVENT_TYPE_POINTER_DOWN)
+        // Don't process pointer down, we only respond to click events
+        if (ev.type == EVENT_TYPE_POINTER_DOWN)
+            return true;
+
+        if (ev.type == EVENT_TYPE_CLICK)
         {
             if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
             {
@@ -83,24 +87,26 @@ public:
                 }
                 return true;
             }
-            if (ev.target->GetID() == TBIDC("tabclose"))
+            else if (ev.target->GetID() == TBIDC("tabclose"))
             {
                 if (RequestClose())
                 {
                     container_->OnEvent(ev);
-                    return true;
                 }
+
+                return true;
             }
-            else 
+            else
             {
                 TBWidgetEvent nevent = ev;
                 nevent.target = this;
-                container_->OnEvent(nevent);
+                return container_->OnEvent(nevent);
             }
         }
 
         return false;
     }
+
 };
 
 ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabContainer *container):
