@@ -11,10 +11,6 @@ TBLayout: distribution: gravity, axis: y
 					TBLayout: distribution: gravity
 						TBButton
 							@include definitions>menubutton
-							text Atomic Editor
-							id menu atomic editor
-						TBButton
-							@include definitions>menubutton
 							text File
 							id menu file
 						TBButton
