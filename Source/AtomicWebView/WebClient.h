@@ -2,6 +2,8 @@
 #include <ThirdParty/CEF/include/cef_client.h>
 #include <Atomic/Core/Object.h>
 
+#include "WebRenderer.h"
+
 #pragma once
 
 namespace Atomic
@@ -17,7 +19,15 @@ public:
     /// Destruct.
     ~WebClient();
 
+    // CEF3
+    virtual CefRefPtr<CefRenderHandler> GetRenderHandler() {
+      return renderer_.Get();
+    }
+
+
 private:
+
+    SharedPtr<WebRenderer> renderer_;
 
 };
 

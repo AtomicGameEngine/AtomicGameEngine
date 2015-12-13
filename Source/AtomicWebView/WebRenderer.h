@@ -1,8 +1,7 @@
+#include <ThirdParty/CEF/include/cef_client.h>
 
 #include <Atomic/Graphics/Texture2D.h>
 #include <Atomic/Graphics/Material.h>
-
-#include "WebClient.h"
 
 #pragma once
 
