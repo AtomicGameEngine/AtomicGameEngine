@@ -61,7 +61,7 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev)
     {
-        if (ev.type == EVENT_TYPE_CLICK || ev.type == EVENT_TYPE_POINTER_DOWN)
+        if (ev.type == EVENT_TYPE_CLICK)
         {
             if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
             {
@@ -81,21 +81,16 @@ public:
                     container_->OnEvent(ev);
                     editor_->Close(container_->GetNumPages()>1);
                 }
+
                 return true;
             }
-            if (ev.target->GetID() == TBIDC("tabclose"))
+            else if (ev.target->GetID() == TBIDC("tabclose"))
             {
                 if (RequestClose())
                 {
                     container_->OnEvent(ev);
                     return true;
                 }
-            }
-            else 
-            {
-                TBWidgetEvent nevent = ev;
-                nevent.target = this;
-                container_->OnEvent(nevent);
             }
         }
 
