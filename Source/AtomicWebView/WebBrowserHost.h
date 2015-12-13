@@ -6,7 +6,6 @@
 namespace Atomic
 {
 
-/// Javascript subsystem.
 class ATOMIC_API WebBrowserHost : public Object
 {
     OBJECT(WebBrowserHost);
