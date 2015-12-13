@@ -129,6 +129,8 @@ class Editor extends Atomic.ScriptObject {
 
             system.closeProject();
             this.sendEvent(EditorEvents.ProjectClosed);
+            this.projectCloseRequested = false;
+            this.unsubscribeFromEvent(EditorEvents.EditorResourceClose);
         }
 
     }
