@@ -1,3 +1,4 @@
+#include <ThirdParty/CEF/include/cef_render_handler.h>
 
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Graphics/Graphics.h>
@@ -8,9 +9,41 @@
 namespace Atomic
 {
 
-
-WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRenderer(context)
+class WebTexture2DPrivate : public CefRenderHandler
 {
+    friend class WebTexture2D;
+
+public:
+
+    IMPLEMENT_REFCOUNTING(WebTexture2DPrivate)
+
+    WebTexture2DPrivate(WebTexture2D* webTexture2D)
+    {
+        webTexture2D_ = webTexture2D;
+    }
+
+    bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) OVERRIDE
+    {
+        rect = CefRect(0, 0, webTexture2D_->GetCurrentWidth(), webTexture2D_->GetCurrentHeight());
+        return true;
+    }
+
+    void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
+                           const void *buffer, int width, int height) OVERRIDE
+    {
+        webTexture2D_->texture_->SetData(0, 0, 0, width, height, buffer);
+    }
+
+private:
+
+    WeakPtr<WebTexture2D> webTexture2D_;
+
+};
+
+WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRenderHandler(context)
+{
+    d_ = new WebTexture2DPrivate(this);
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     texture_ = new Texture2D(context_);
@@ -23,9 +56,29 @@ WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRendere
     material_->SetTexture(TU_DIFFUSE, texture_);
 }
 
-WebTexture2D::~WebTexture2D()
+void WebTexture2D::SetCurrentWidth(unsigned width)
 {
 
+}
+
+void WebTexture2D::SetCurrentHeight(unsigned height)
+{
+
+}
+
+void WebTexture2D::SetMaxWidth(unsigned width)
+{
+
+}
+
+void WebTexture2D::SetMaxHeight(unsigned height)
+{
+
+}
+
+WebTexture2D::~WebTexture2D()
+{
+    d_->Release();
 }
 
 

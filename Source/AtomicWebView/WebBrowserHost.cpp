@@ -8,6 +8,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/IO/Log.h>
 
+#include "WebClient.h"
 #include "WebBrowserHost.h"
 
 class SimpleApp : public CefApp,
@@ -75,5 +76,18 @@ WebBrowserHost::~WebBrowserHost()
 {
 
 }
+
+bool WebBrowserHost::CreateBrowser(WebClient* webClient)
+{
+    CefWindowInfo windowInfo;
+    CefBrowserSettings browserSettings;
+
+    CefBrowserHost::CreateBrowser(windowInfo, (CefClient*) webClient->d_,
+                                  "http://www.atomicgameengine.com", browserSettings, nullptr);
+
+    return true;
+}
+
+
 
 }

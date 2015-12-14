@@ -3,17 +3,17 @@
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Technique.h>
 
-#include "WebRenderer.h"
+#include "WebRenderHandler.h"
 
 namespace Atomic
 {
 
 
-WebRenderer::WebRenderer(Context* context) : Object (context)
+WebRenderHandler::WebRenderHandler(Context* context) : Object (context)
 {
 }
 
-WebRenderer::~WebRenderer()
+WebRenderHandler::~WebRenderHandler()
 {
 
 }

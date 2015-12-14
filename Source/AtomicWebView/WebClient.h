@@ -1,33 +1,35 @@
 
-#include <ThirdParty/CEF/include/cef_client.h>
 #include <Atomic/Core/Object.h>
-
-#include "WebRenderer.h"
+#include "WebRenderHandler.h"
 
 #pragma once
 
 namespace Atomic
 {
 
-class ATOMIC_API WebClient : public Object, public CefClient
+class WebClientPrivate;
+
+class ATOMIC_API WebClient : public Object
 {
-    OBJECT(WebClient);
+    friend class WebBrowserHost;
+    friend class WebClientPrivate;
+
+    OBJECT(WebClient)
 
 public:
     /// Construct.
     WebClient(Context* context);
+
     /// Destruct.
-    ~WebClient();
+    virtual ~WebClient();
 
-    // CEF3
-    virtual CefRefPtr<CefRenderHandler> GetRenderHandler() {
-      return renderer_.Get();
-    }
-
+    void SetWebRenderHandler(WebRenderHandler* handler);
 
 private:
 
-    SharedPtr<WebRenderer> renderer_;
+    SharedPtr<WebRenderHandler> renderHandler_;
+
+    WebClientPrivate* d_;
 
 };
 
