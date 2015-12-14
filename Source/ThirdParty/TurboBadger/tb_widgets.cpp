@@ -1353,31 +1353,39 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
-    TBWidget* down_widget = GetWidgetAt(x, y, true);
-	if ((down_widget && down_widget->touchId_ == touchId) || captured_widget)
-	{
+    int ox = x;
+    int oy = y;
+    //First check for the captured widget
+    if (captured_widget && captured_widget->touchId_ == touchId)
+    {
+        captured_widget->ConvertFromRoot(x, y);
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
         TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
-        down_widget->Invalidate();
-        down_widget->InvalidateSkinStates();
-        down_widget->OnCaptureChanged(false);
+        captured_widget->InvokeEvent(ev_up);
+        if (!cancel_click && captured_widget->GetHitStatus(x, y))
+        {
+            captured_widget->InvokeEvent(ev_click);
+        }
+        captured_widget->ReleaseCapture();
+    }
+    x = ox;
+    y = oy;
+    TBWidget* down_widget = GetWidgetAt(x, y, true);
+	//then if we have any down widgets, then make sure that it's not captured_widget otherwise events will be sent twice
+    if (down_widget && down_widget->touchId_ == touchId && captured_widget != down_widget)
+	{
 		down_widget->ConvertFromRoot(x, y);
-		down_widget->InvokeEvent(ev_up);
+        TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
+        TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
+    	down_widget->InvokeEvent(ev_up);
         if (!cancel_click && down_widget->GetHitStatus(x, y))
         {
 			down_widget->InvokeEvent(ev_click);
         }
-        if (captured_widget)
-        {
-            captured_widget->ConvertFromRoot(x, y);
-            if (!cancel_click && captured_widget->GetHitStatus(x, y))
-            {
-                captured_widget->InvokeEvent(ev_click);
-            }
-            captured_widget->InvokeEvent(ev_up);
-            captured_widget->ReleaseCapture();
-        }
-	}
+        down_widget->Invalidate();
+        down_widget->InvalidateSkinStates();
+        down_widget->OnCaptureChanged(false);
+    }
 }
 
 void TBWidget::InvokeRightPointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys)
@@ -1406,7 +1414,6 @@ void TBWidget::InvokeRightPointerUp(int x, int y, MODIFIER_KEYS modifierkeys)
     widget->InvokeEvent(ev);
 
 }
-
 
 void TBWidget::MaybeInvokeLongClickOrContextMenu(bool touch)
 {
