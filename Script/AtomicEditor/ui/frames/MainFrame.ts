@@ -111,12 +111,18 @@ class MainFrame extends ScriptWidget {
         if (this.menu.handlePopupMenu(target, refid))
             return true;
 
+        if (this.openedMenu && this.openedMenu.id == target.id + " popup") {
+            this.openedMenu.close();
+            this.openedMenu = null;
+            return true;
+        }
+
         var src = MenuItemSources.getMenuItemSource(target.id);
 
         if (src) {
 
-            var menu = new Atomic.UIMenuWindow(target, target.id + " popup");
-            menu.show(src);
+            this.openedMenu = new Atomic.UIMenuWindow(target, target.id + " popup");
+            this.openedMenu.show(src);
             return true;
 
         }
@@ -168,6 +174,7 @@ class MainFrame extends ScriptWidget {
     inspectorlayout: Atomic.UILayout;
     mainToolbar: MainToolbar;
     menu: MainFrameMenu;
+    openedMenu: Atomic.UIMenuWindow;
 
 }
 
