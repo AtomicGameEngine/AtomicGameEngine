@@ -252,7 +252,6 @@ ListViewItemWidget::ListViewItemWidget(ListViewItem *item, ListViewItemSource *s
     SetLayoutDistribution(LAYOUT_DISTRIBUTION_GRAVITY);
     SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP);
     SetPaintOverflowFadeout(false);
-    SetCapturing(false);
 
     item_->widget_ = this;
 

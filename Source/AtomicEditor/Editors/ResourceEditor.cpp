@@ -61,10 +61,6 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev)
     {
-        // Don't process pointer down, we only respond to click events
-        if (ev.type == EVENT_TYPE_POINTER_DOWN)
-            return true;
-
         if (ev.type == EVENT_TYPE_CLICK)
         {
             if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
