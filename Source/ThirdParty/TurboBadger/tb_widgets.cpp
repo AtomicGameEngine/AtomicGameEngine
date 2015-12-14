@@ -1353,6 +1353,8 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
+    int ox = x;
+    int oy = y;
     //First check for the captured widget
     if (captured_widget && captured_widget->touchId_ == touchId)
     {
@@ -1366,6 +1368,8 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         }
         captured_widget->ReleaseCapture();
     }
+    x = ox;
+    y = oy;
     TBWidget* down_widget = GetWidgetAt(x, y, true);
 	//then if we have any down widgets, then make sure that it's not captured_widget otherwise events will be sent twice
     if (down_widget && down_widget->touchId_ == touchId && captured_widget != down_widget)
