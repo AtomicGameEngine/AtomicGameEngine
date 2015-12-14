@@ -1353,9 +1353,11 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
+    //save the old coordinates, because it will be changed due to convertion it from root
     int ox = x;
     int oy = y;
-    TBWidget *old_capture;
+    //old_capture to keep pointer on captured_widget if it was released
+    TBWidget *old_capture = nullptr;
     //First check for the captured widget
     if (captured_widget && captured_widget->touchId_ == touchId)
     {
@@ -1370,6 +1372,7 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         old_capture = captured_widget;
         captured_widget->ReleaseCapture();
     }
+    //restore coordinates
     x = ox;
     y = oy;
     TBWidget* down_widget = GetWidgetAt(x, y, true);

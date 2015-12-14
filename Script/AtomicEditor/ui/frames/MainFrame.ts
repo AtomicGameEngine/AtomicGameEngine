@@ -113,7 +113,6 @@ class MainFrame extends ScriptWidget {
 
         if (this.openedMenu && this.openedMenu.id == target.id + " popup") {
             this.openedMenu.close();
-            this.openedMenu = null;
             return true;
         }
 
