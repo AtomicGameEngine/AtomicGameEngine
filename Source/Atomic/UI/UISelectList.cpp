@@ -227,11 +227,7 @@ void UISelectList::HandleUIUpdate(StringHash eventType, VariantMap& eventData)
                 select->GetScrollContainer()->ScrollBy(0, speed);
 
         }
-        handlingDragAndDrop_ = true;
-    }
-    else
-    {
-        handlingDragAndDrop_ = false;
+
     }
 
 }
@@ -241,12 +237,6 @@ bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
     if (ev.type == EVENT_TYPE_POINTER_DOWN)
     {
         GetTBSelectList()->SetFocus(WIDGET_FOCUS_REASON_POINTER);
-    }
-    if (ev.type == EVENT_TYPE_POINTER_MOVE)
-    {
-        //if we handle drag and drop then return true, to avoid panning scroll widget by turbobadger, let the widget control scroll by itself
-        if (handlingDragAndDrop_)
-            return true;
     }
     return UIWidget::OnEvent(ev);
 }
