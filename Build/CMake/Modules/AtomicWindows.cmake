@@ -15,7 +15,7 @@ endif()
 
 add_definitions(-DATOMIC_PLATFORM_WINDOWS -D_CRT_SECURE_NO_WARNINGS -DATOMIC_TBUI )
 
-list (APPEND ATOMIC_LINK_LIBRARIES MojoShader user32 gdi32 winmm imm32 ole32 oleaut32 version uuid Ws2_32)
+list (APPEND ATOMIC_LINK_LIBRARIES MojoShader user32 gdi32 winmm imm32 Iphlpapi ole32 oleaut32 version uuid Wldap32 Ws2_32)
 
 if (ATOMIC_D3D11)
 
