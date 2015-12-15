@@ -16,11 +16,11 @@ namespace tb {
 class TBWidgetSkinConditionContext : public TBSkinConditionContext
 {
 public:
-	TBWidgetSkinConditionContext(TBWidget *widget) : m_widget(widget) {}
-	virtual bool GetCondition(TBSkinCondition::TARGET target, const TBSkinCondition::CONDITION_INFO &info);
+    TBWidgetSkinConditionContext(TBWidget *widget) : m_widget(widget) {}
+    virtual bool GetCondition(TBSkinCondition::TARGET target, const TBSkinCondition::CONDITION_INFO &info);
 private:
-	bool GetCondition(TBWidget *widget, const TBSkinCondition::CONDITION_INFO &info);
-	TBWidget *m_widget;
+    bool GetCondition(TBWidget *widget, const TBSkinCondition::CONDITION_INFO &info);
+    TBWidget *m_widget;
 };
 
 }; // namespace tb

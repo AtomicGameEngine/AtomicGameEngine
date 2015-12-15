@@ -32,12 +32,12 @@ public:
             free(data);
     }
 
-	virtual long Size()
-	{
+    virtual long Size()
+    {
         return (long) size;
-	}
-	virtual size_t Read(void *buf, size_t elemSize, size_t count)
-	{
+    }
+    virtual size_t Read(void *buf, size_t elemSize, size_t count)
+    {
         size_t totalRead = elemSize * count;
 
         if (currentPos + totalRead > size)
@@ -56,7 +56,7 @@ public:
 
         return totalRead;
 
-	}
+    }
 private:
     void* data;
     size_t size;

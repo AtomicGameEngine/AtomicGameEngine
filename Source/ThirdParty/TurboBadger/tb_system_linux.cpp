@@ -14,7 +14,7 @@
 
 void TBDebugOut(const char *str)
 {
-	printf("%s", str);
+    printf("%s", str);
 }
 
 #endif // TB_RUNTIME_DEBUG_INFO
@@ -25,9 +25,9 @@ namespace tb {
 
 double TBSystem::GetTimeMS()
 {
-	struct timeval now;
-	gettimeofday( &now, NULL );
-	return now.tv_usec/1000 + now.tv_sec*1000;
+    struct timeval now;
+    gettimeofday( &now, NULL );
+    return now.tv_usec/1000 + now.tv_sec*1000;
 }
 
 // Implementation currently done in port_glut.cpp.
@@ -38,23 +38,23 @@ double TBSystem::GetTimeMS()
 
 int TBSystem::GetLongClickDelayMS()
 {
-	return 500;
+    return 500;
 }
 
 int TBSystem::GetPanThreshold()
 {
-	return 5 * GetDPI() / 96;
+    return 5 * GetDPI() / 96;
 }
 
 int TBSystem::GetPixelsPerLine()
 {
-	return 40 * GetDPI() / 96;
+    return 40 * GetDPI() / 96;
 }
 
 int TBSystem::GetDPI()
 {
-	// FIX: Implement!
-	return 96;
+    // FIX: Implement!
+    return 96;
 }
 
 }; // namespace tb

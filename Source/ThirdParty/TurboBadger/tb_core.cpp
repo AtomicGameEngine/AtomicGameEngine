@@ -23,35 +23,35 @@ TBFontManager *g_font_manager = nullptr;
 
 bool tb_core_init(TBRenderer *renderer, const char *lng_file)
 {
-	TBDebugPrint("Initiating Turbo Badger - version %s\n", TB_VERSION_STR);
-	g_renderer = renderer;
-	g_tb_lng = new TBLanguage;
-	g_tb_lng->Load(lng_file);
-	g_font_manager = new TBFontManager();
-	g_tb_skin = new TBSkin();
-	g_widgets_reader = TBWidgetsReader::Create();
+    TBDebugPrint("Initiating Turbo Badger - version %s\n", TB_VERSION_STR);
+    g_renderer = renderer;
+    g_tb_lng = new TBLanguage;
+    g_tb_lng->Load(lng_file);
+    g_font_manager = new TBFontManager();
+    g_tb_skin = new TBSkin();
+    g_widgets_reader = TBWidgetsReader::Create();
 #ifdef TB_IMAGE
-	g_image_manager = new TBImageManager();
+    g_image_manager = new TBImageManager();
 #endif
-	return TBInitAddons();
+    return TBInitAddons();
 }
 
 void tb_core_shutdown()
 {
-	TBAnimationManager::AbortAllAnimations();
-	TBShutdownAddons();
+    TBAnimationManager::AbortAllAnimations();
+    TBShutdownAddons();
 #ifdef TB_IMAGE
-	delete g_image_manager;
+    delete g_image_manager;
 #endif
-	delete g_widgets_reader;
-	delete g_tb_skin;
-	delete g_font_manager;
-	delete g_tb_lng;
+    delete g_widgets_reader;
+    delete g_tb_skin;
+    delete g_font_manager;
+    delete g_tb_lng;
 }
 
 bool tb_core_is_initialized()
 {
-	return g_widgets_reader ? true : false;
+    return g_widgets_reader ? true : false;
 }
 
 }; // namespace tb

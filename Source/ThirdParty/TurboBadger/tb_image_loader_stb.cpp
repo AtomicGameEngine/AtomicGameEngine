@@ -33,62 +33,62 @@ namespace tb {
 class STBI_Loader : public TBImageLoader
 {
 public:
-	int width, height;
-	unsigned char *data;
+    int width, height;
+    unsigned char *data;
 
-	STBI_Loader() : width(0), height(0), data(nullptr) {}
-	~STBI_Loader() { stbi_image_free(data); }
+    STBI_Loader() : width(0), height(0), data(nullptr) {}
+    ~STBI_Loader() { stbi_image_free(data); }
 
-	virtual int Width() { return width; }
-	virtual int Height() { return height; }
-	virtual uint32 *Data() { return (uint32*)data; }
+    virtual int Width() { return width; }
+    virtual int Height() { return height; }
+    virtual uint32 *Data() { return (uint32*)data; }
 };
 
 TBImageLoader *TBImageLoader::CreateFromFile(const char *filename)
 {
-	// Load directly from file
-	/*int w, h, comp;
-	if (unsigned char *data = stbi_load(filename, &w, &h, &comp, 4))
-	{
-		if (STBI_Loader *img = new STBI_Loader())
-		{
-			img->width = w;
-			img->height = h;
-			img->data = data;
-			return img;
-		}
-		else
-			stbi_image_free(data);
-	}
-	return nullptr;*/
-	if (TBFile *file = TBFile::Open(filename, TBFile::MODE_READ))
-	{
-		long size = file->Size();
-		if (unsigned char *data = new unsigned char[size])
-		{
-			size = file->Read(data, 1, size);
+    // Load directly from file
+    /*int w, h, comp;
+    if (unsigned char *data = stbi_load(filename, &w, &h, &comp, 4))
+    {
+        if (STBI_Loader *img = new STBI_Loader())
+        {
+            img->width = w;
+            img->height = h;
+            img->data = data;
+            return img;
+        }
+        else
+            stbi_image_free(data);
+    }
+    return nullptr;*/
+    if (TBFile *file = TBFile::Open(filename, TBFile::MODE_READ))
+    {
+        long size = file->Size();
+        if (unsigned char *data = new unsigned char[size])
+        {
+            size = file->Read(data, 1, size);
 
-			int w, h, comp;
-			if (unsigned char *img_data = stbi_load_from_memory(data, size, &w, &h, &comp, 4))
-			{
-				if (STBI_Loader *img = new STBI_Loader())
-				{
-					img->width = w;
-					img->height = h;
-					img->data = img_data;
-					delete [] data;
-					delete file;
-					return img;
-				}
-				else
-					stbi_image_free(img_data);
-			}
+            int w, h, comp;
+            if (unsigned char *img_data = stbi_load_from_memory(data, size, &w, &h, &comp, 4))
+            {
+                if (STBI_Loader *img = new STBI_Loader())
+                {
+                    img->width = w;
+                    img->height = h;
+                    img->data = img_data;
+                    delete [] data;
+                    delete file;
+                    return img;
+                }
+                else
+                    stbi_image_free(img_data);
+            }
 
-			delete data;
-		}
-		delete file;
-	}
-	return nullptr;
+            delete data;
+        }
+        delete file;
+    }
+    return nullptr;
 }
 
 }; // namespace tb
