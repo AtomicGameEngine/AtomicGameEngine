@@ -1373,11 +1373,11 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
+    //get down_widget before making handling captured_widget event to make sure that down_widget won't be changed
+    TBWidget* down_widget = GetWidgetAt(x, y, true);
     //save x and y to restore it later
     int ox = x;
     int oy = y;
-    //true if pointer up event handled by captured_widget
-    bool handled = false;
     //save old_capture for later check, because captured_widget can be nullptr after releasing capture
     TBWidget *old_capture = captured_widget;
     if (captured_widget && captured_widget->touchId_ == touchId)
@@ -1388,16 +1388,15 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         captured_widget->InvokeEvent(ev_up);
         if (!cancel_click && captured_widget->GetHitStatus(x, y))
         {
-            handled = captured_widget->InvokeEvent(ev_click);
+            captured_widget->InvokeEvent(ev_click);
         }
         captured_widget->ReleaseCapture();
     }
     //restore x and y coords, to use with down_widget
     x = ox;
     y = oy;
-    TBWidget* down_widget = GetWidgetAt(x, y, true);
     //make sure that down_widget is not captured_widget to don't sent event twice
-    if (down_widget && down_widget->touchId_ == touchId && old_capture != down_widget && !handled)
+    if (down_widget && down_widget->touchId_ == touchId && old_capture != down_widget)
     {
         down_widget->ConvertFromRoot(x, y);
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
