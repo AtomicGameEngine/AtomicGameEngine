@@ -4,6 +4,8 @@
 
 #pragma once
 
+class CefRenderHandler;
+
 namespace Atomic
 {
 
@@ -30,7 +32,9 @@ public:
     unsigned GetMaxWidth() const { return maxWidth_; }
     unsigned GetMaxHeight() const { return maxHeight_; }
 
-private:
+    virtual CefRenderHandler* GetCEFRenderHandler() = 0;
+
+protected:
 
     unsigned currentWidth_;
     unsigned currentHeight_;

@@ -244,6 +244,8 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
 
     if (!IsCompressed())
     {
+        if (format == GL_BGRA)
+            format = GL_RGBA;
         if (wholeLevel)
             glTexImage2D(target_, level, format, width, height, 0, GetExternalFormat(format_), GetDataType(format_), data);
         else
@@ -482,6 +484,8 @@ bool Texture2D::Create()
     if (!IsCompressed())
     {
         glGetError();
+        if (format == GL_BGRA)
+            format = GL_RGBA;
         glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {

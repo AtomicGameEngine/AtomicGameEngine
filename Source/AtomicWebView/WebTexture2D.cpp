@@ -43,17 +43,32 @@ private:
 WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRenderHandler(context)
 {
     d_ = new WebTexture2DPrivate(this);
+    d_->AddRef();
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
+    currentWidth_ = maxWidth_ = width;
+    currentHeight_ = maxHeight_ = height;
+
     texture_ = new Texture2D(context_);
-    texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC);
-    texture_->SetFilterMode(FILTER_NEAREST);
+    texture_->SetNumLevels(1);
+    texture_->SetSize(width, height, Graphics::GetBGRAFormat(), TEXTURE_DYNAMIC);
+    texture_->SetFilterMode(FILTER_BILINEAR);
 
     material_ = new Material(context_);
 
     material_->SetTechnique(0, cache->GetResource<Technique>("Techniques/DiffUnlit.xml"));
     material_->SetTexture(TU_DIFFUSE, texture_);
+}
+
+WebTexture2D::~WebTexture2D()
+{
+    d_->Release();
+}
+
+CefRenderHandler* WebTexture2D::GetCEFRenderHandler()
+{
+    return d_;
 }
 
 void WebTexture2D::SetCurrentWidth(unsigned width)
@@ -75,11 +90,5 @@ void WebTexture2D::SetMaxHeight(unsigned height)
 {
 
 }
-
-WebTexture2D::~WebTexture2D()
-{
-    d_->Release();
-}
-
 
 }

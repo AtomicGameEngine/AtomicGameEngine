@@ -30,6 +30,11 @@ public:
     virtual void SetMaxWidth(unsigned width);
     virtual void SetMaxHeight(unsigned height);
 
+    CefRenderHandler* GetCEFRenderHandler();
+
+    Texture2D* GetTexture2D() const { return texture_; }
+    Material* GetMaterial() const { return material_; }
+
 private:
 
     SharedPtr<Texture2D> texture_;

@@ -18,6 +18,15 @@ public:
         webClient_ = client;
     }
 
+    CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE {
+
+        if (webClient_->renderHandler_.Null())
+            return nullptr;
+
+        return webClient_->renderHandler_->GetCEFRenderHandler();
+
+    }
+
     IMPLEMENT_REFCOUNTING(WebClientPrivate)
 
 private:
@@ -30,6 +39,7 @@ private:
 WebClient::WebClient(Context* context) : Object(context)
 {
     d_ = new WebClientPrivate(this);
+    d_->AddRef();
 }
 
 WebClient::~WebClient()

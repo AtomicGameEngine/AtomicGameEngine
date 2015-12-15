@@ -1,31 +1,36 @@
 
+#include <SDL/include/SDL.h>
+#include <ThirdParty/SDL/include/SDL_syswm.h>
+
 #include <ThirdParty/CEF/include/cef_app.h>
 #include <ThirdParty/CEF/include/cef_client.h>
 #include <ThirdParty/CEF/include/cef_render_handler.h>
 #include <ThirdParty/CEF/include/wrapper/cef_helpers.h>
 
-
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
+
+#include <Atomic/Graphics/Graphics.h>
 
 #include "WebClient.h"
 #include "WebBrowserHost.h"
 
 class SimpleApp : public CefApp,
-                  public CefBrowserProcessHandler {
- public:
-  SimpleApp();
+        public CefBrowserProcessHandler {
+public:
+    SimpleApp();
 
-  // CefApp methods:
-  virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
-      OVERRIDE { return this; }
+    // CefApp methods:
+    virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
+    OVERRIDE { return this; }
 
-  // CefBrowserProcessHandler methods:
-  virtual void OnContextInitialized() OVERRIDE;
+    // CefBrowserProcessHandler methods:
+    virtual void OnContextInitialized() OVERRIDE;
 
- private:
-  // Include the default reference counting implementation.
-  IMPLEMENT_REFCOUNTING(SimpleApp);
+private:
+    // Include the default reference counting implementation.
+    IMPLEMENT_REFCOUNTING(SimpleApp);
 };
 
 SimpleApp::SimpleApp() {
@@ -33,12 +38,16 @@ SimpleApp::SimpleApp() {
 
 void SimpleApp::OnContextInitialized() {
 
-  CEF_REQUIRE_UI_THREAD();
+    CEF_REQUIRE_UI_THREAD();
 
 }
 
 namespace Atomic
 {
+
+#ifdef ATOMIC_PLATFORM_OSX
+void* GetNSWindowContentView(void* window);
+#endif
 
 WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
@@ -70,11 +79,13 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
         LOGERROR("CefInitialize - Error");
     }
 
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
+
 }
 
 WebBrowserHost::~WebBrowserHost()
 {
-
+    CefShutdown();
 }
 
 bool WebBrowserHost::CreateBrowser(WebClient* webClient)
@@ -82,12 +93,28 @@ bool WebBrowserHost::CreateBrowser(WebClient* webClient)
     CefWindowInfo windowInfo;
     CefBrowserSettings browserSettings;
 
-    CefBrowserHost::CreateBrowser(windowInfo, (CefClient*) webClient->d_,
-                                  "http://www.atomicgameengine.com", browserSettings, nullptr);
+    Graphics* graphics = GetSubsystem<Graphics>();
 
-    return true;
+    SDL_Window* sdlWindow = static_cast<SDL_Window*>(graphics->GetSDLWindow());
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+
+    if(SDL_GetWindowWMInfo(sdlWindow, &info))
+    {
+        NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
+        windowInfo.SetAsWindowless(view, false);
+
+        return CefBrowserHost::CreateBrowser(windowInfo, (CefClient*) webClient->d_,
+                                             "https://html5test.com/", browserSettings, nullptr);
+    }
+
+    return false;
+
 }
 
-
+void WebBrowserHost::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+{
+    CefDoMessageLoopWork();
+}
 
 }

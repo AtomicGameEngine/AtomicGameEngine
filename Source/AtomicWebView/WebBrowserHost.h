@@ -22,6 +22,8 @@ public:
 
 private:
 
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+
 };
 
 }

@@ -39,6 +39,7 @@
 namespace Atomic
 {
     void jsapi_init_atomicnet(JSVM* vm);
+    void jsapi_init_webview(JSVM* vm);;
 }
 
 using namespace ToolCore;
@@ -62,11 +63,6 @@ void AEEditorCommon::Start()
 {
     ValidateWindow();
 
-#ifdef ATOMIC_WEBVIEW
-    // Initialize in Start so window already exists
-    context_->RegisterSubsystem(new WebBrowserHost(context_));
-#endif
-
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -76,9 +72,18 @@ void AEEditorCommon::Start()
 
     jsapi_init_toolcore(vm_);
 
+#ifdef ATOMIC_WEBVIEW
+    // Initialize in Start so window already exists
+    context_->RegisterSubsystem(new WebBrowserHost(context_));
+    jsapi_init_webview(vm_);
+#endif
+
+
 #ifdef ATOMIC_DOTNET
     jsapi_init_atomicnet(vm_);
 #endif
+
+
 
 }
 
