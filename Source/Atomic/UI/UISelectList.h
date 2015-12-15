@@ -77,6 +77,8 @@ protected:
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
 private:
+    //Returns true if we have drag and drop element on select list widget
+    bool handlingDragAndDrop_;
 };
 
 
