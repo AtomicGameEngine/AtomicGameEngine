@@ -21,28 +21,28 @@ namespace tb {
 class TBDebugInfo
 {
 public:
-	TBDebugInfo();
+    TBDebugInfo();
 
-	enum SETTING {
-		/** Show widgets bounds */
-		LAYOUT_BOUNDS,
-		/** Show child widget clipping set by some widgets. */
-		LAYOUT_CLIPPING,
-		/** Show highlights on widgets that recalculate their preferred
-			size, and those who recalculate their layout. */
-		LAYOUT_PS_DEBUGGING,
-		/** Show render batch info and log batch info in the debug
-			output. It depends on the renderer backend if this is available. */
-		RENDER_BATCHES,
-		/** Render the bitmap fragments of the skin. */
-		RENDER_SKIN_BITMAP_FRAGMENTS,
-		/** Render the bitmap fragments of the font that's set on the hovered
-			or focused widget. */
-		RENDER_FONT_BITMAP_FRAGMENTS,
+    enum SETTING {
+        /** Show widgets bounds */
+        LAYOUT_BOUNDS,
+        /** Show child widget clipping set by some widgets. */
+        LAYOUT_CLIPPING,
+        /** Show highlights on widgets that recalculate their preferred
+            size, and those who recalculate their layout. */
+        LAYOUT_PS_DEBUGGING,
+        /** Show render batch info and log batch info in the debug
+            output. It depends on the renderer backend if this is available. */
+        RENDER_BATCHES,
+        /** Render the bitmap fragments of the skin. */
+        RENDER_SKIN_BITMAP_FRAGMENTS,
+        /** Render the bitmap fragments of the font that's set on the hovered
+            or focused widget. */
+        RENDER_FONT_BITMAP_FRAGMENTS,
 
-		NUM_SETTINGS
-	};
-	int settings[NUM_SETTINGS];
+        NUM_SETTINGS
+    };
+    int settings[NUM_SETTINGS];
 };
 
 extern TBDebugInfo g_tb_debug;

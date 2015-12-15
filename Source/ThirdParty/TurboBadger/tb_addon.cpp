@@ -14,9 +14,9 @@ namespace tb {
 TBAddonFactory *g_registered_addon_factories = nullptr;
 
 TBAddonFactory::TBAddonFactory()
-	: next(g_registered_addon_factories)
+    : next(g_registered_addon_factories)
 {
-	g_registered_addon_factories = this;
+    g_registered_addon_factories = this;
 }
 
 // ======================================================================================
@@ -25,29 +25,29 @@ TBLinkListOf<TBAddon> m_addons;
 
 bool TBInitAddons()
 {
-	TBAddonFactory *f = g_registered_addon_factories;
-	while (f)
-	{
-		TBAddon *addon = f->Create();
-		if (!addon || !addon->Init())
-		{
-			delete addon;
-			TBDebugOut("Failed initiating addon\n");
-			return false;
-		}
-		m_addons.AddLast(addon);
-		f = f->next;
-	}
-	return true;
+    TBAddonFactory *f = g_registered_addon_factories;
+    while (f)
+    {
+        TBAddon *addon = f->Create();
+        if (!addon || !addon->Init())
+        {
+            delete addon;
+            TBDebugOut("Failed initiating addon\n");
+            return false;
+        }
+        m_addons.AddLast(addon);
+        f = f->next;
+    }
+    return true;
 }
 
 void TBShutdownAddons()
 {
-	while (TBAddon *addon = m_addons.GetLast())
-	{
-		addon->Shutdown();
-		m_addons.Delete(addon);
-	}
+    while (TBAddon *addon = m_addons.GetLast())
+    {
+        addon->Shutdown();
+        m_addons.Delete(addon);
+    }
 }
 
 }; // namespace tb

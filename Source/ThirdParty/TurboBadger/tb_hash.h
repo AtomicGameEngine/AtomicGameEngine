@@ -32,14 +32,14 @@ static constexpr uint32 prime = 16777619U;
 // compile-time hash helper function
 constexpr uint32 TBGetHash_one(char c, const char* remain, uint32 value)
 {
-	return c == 0 ? value : TBGetHash_one(remain[0], remain + 1, (value ^ c) * prime);
+    return c == 0 ? value : TBGetHash_one(remain[0], remain + 1, (value ^ c) * prime);
 }
 
 // compile-time hash
 constexpr uint32 TBGetHash(const char* str)
 {
-	return (str && *str) ? TBGetHash_one(str[0], str + 1, basis) : 0;
-}
+    return (str && *str) ? TBGetHash_one(str[0], str + 1, basis) : 0;
+    }
 
 #define TBIDC(str) TBGetHash(str)
 
