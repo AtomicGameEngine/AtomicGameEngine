@@ -225,33 +225,41 @@ void PS(
         float3 lightColor;
         float3 finalColor;
 
-        float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
+        #if defined(LIGHTMAP) && defined(SHADOW)
+            float diff = 1-GetShadow(iShadowPos, iWorldPos.w);
 
-        #ifdef SHADOW
-            diff *= GetShadow(iShadowPos, iWorldPos.w);
-        #endif
+            finalColor = diff * diffColor.rgb * cAmbientColor;
 
-        #if defined(SPOTLIGHT)
-            lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
-        #elif defined(CUBEMASK)
-            lightColor = SampleCube(LightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
-        #else
-            lightColor = cLightColor.rgb;
-        #endif
-    
-        #ifdef SPECULAR
-            float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
-            finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
-        #else
-            finalColor = diff * lightColor * diffColor.rgb;
-        #endif
-
-        #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
-            finalColor += cMatEmissiveColor;
-            oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
-        #else
             oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
+        #else
+            float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
+
+            #ifdef SHADOW
+                diff *= GetShadow(iShadowPos, iWorldPos.w);
+            #endif
+
+            #if defined(SPOTLIGHT)
+                lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+            #elif defined(CUBEMASK)
+                lightColor = SampleCube(LightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
+            #else
+                lightColor = cLightColor.rgb;
+            #endif
+        
+            #ifdef SPECULAR
+                float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
+                finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
+            #else
+                finalColor = diff * lightColor * diffColor.rgb;
+            #endif
+
+            #ifdef AMBIENT
+                finalColor += cAmbientColor * diffColor.rgb;
+                finalColor += cMatEmissiveColor;
+                oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
+            #else
+                oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
+            #endif
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
