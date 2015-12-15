@@ -1353,8 +1353,11 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
+    //save the old coordinates, because it will be changed due to convertion it from root
     int ox = x;
     int oy = y;
+    //old_capture to keep pointer on captured_widget if it was released
+    TBWidget *old_capture = nullptr;
     //First check for the captured widget
     if (captured_widget && captured_widget->touchId_ == touchId)
     {
@@ -1366,28 +1369,29 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         {
             captured_widget->InvokeEvent(ev_click);
         }
+        old_capture = captured_widget;
         captured_widget->ReleaseCapture();
     }
+    //restore coordinates
     x = ox;
     y = oy;
     TBWidget* down_widget = GetWidgetAt(x, y, true);
-	//then if we have any down widgets, then make sure that it's not captured_widget otherwise events will be sent twice
-    if (down_widget && down_widget->touchId_ == touchId && captured_widget != down_widget)
-	{
-		down_widget->ConvertFromRoot(x, y);
+    //then if we have any down widgets, then make sure that it's not captured_widget otherwise events will be sent twice
+    if (down_widget && down_widget->touchId_ == touchId && old_capture != down_widget)
+    {
+        down_widget->ConvertFromRoot(x, y);
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
         TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
-    	down_widget->InvokeEvent(ev_up);
+        down_widget->InvokeEvent(ev_up);
         if (!cancel_click && down_widget->GetHitStatus(x, y))
         {
-			down_widget->InvokeEvent(ev_click);
+            down_widget->InvokeEvent(ev_click);
         }
         down_widget->Invalidate();
         down_widget->InvalidateSkinStates();
         down_widget->OnCaptureChanged(false);
     }
 }
-
 void TBWidget::InvokeRightPointerDown(int x, int y, int click_count, MODIFIER_KEYS modifierkeys)
 {
     // note we're not capturing the widget as with normal pointer down
