@@ -77,6 +77,7 @@ protected:
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
 private:
+
 };
 
 
