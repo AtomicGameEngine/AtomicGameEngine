@@ -63,7 +63,7 @@ WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRenderH
 
 WebTexture2D::~WebTexture2D()
 {
-    d_->Release();
+    //d_->Release();
 }
 
 CefRenderHandler* WebTexture2D::GetCEFRenderHandler()

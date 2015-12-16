@@ -3,9 +3,12 @@
 
 #pragma once
 
+class CefLifeSpanHandler;
+
 namespace Atomic
 {
 
+class WebBrowserHostPrivate;
 class WebClient;
 
 class ATOMIC_API WebBrowserHost : public Object
@@ -20,9 +23,13 @@ public:
 
     bool CreateBrowser(WebClient* webClient);
 
+    CefLifeSpanHandler* GetCefLifeSpanHandler();
+
 private:
 
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+
+    WebBrowserHostPrivate* d_;
 
 };
 

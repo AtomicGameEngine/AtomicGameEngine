@@ -24,11 +24,18 @@ endif()
 if(OS_MACOSX)
     set(CEF_STANDARD_LIBS "-lpthread" "-framework Cocoa" "-framework AppKit")
     set(CEF_LIBTYPE SHARED)
-    set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/$<CONFIGURATION>")
-    set(CEF_BINARY_DIR_DEBUG "${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/Debug")
+
+    # using release
+    #set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/$<CONFIGURATION>")
+    set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/Release")
+
     set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/Release")
-    set(CEF_LIB_DEBUG "${CEF_BINARY_DIR_DEBUG}/Chromium Embedded Framework.framework/Chromium Embedded Framework")
     set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/Chromium Embedded Framework.framework/Chromium Embedded Framework")
+
+    # using release
+    set(CEF_BINARY_DIR_DEBUG "${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/Release")
+    set(CEF_LIB_DEBUG "${CEF_BINARY_DIR_DEBUG}/Chromium Embedded Framework.framework/Chromium Embedded Framework")
+
 endif()
 
 #

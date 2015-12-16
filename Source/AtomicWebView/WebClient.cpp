@@ -1,6 +1,8 @@
 
 #include <ThirdParty/CEF/include/cef_client.h>
 
+
+#include "WebBrowserHost.h"
 #include "WebClient.h"
 
 namespace Atomic
@@ -16,9 +18,11 @@ public:
     {
 
         webClient_ = client;
+        webBrowserHost_ = webClient_->GetSubsystem<WebBrowserHost>();
     }
 
-    CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE {
+    CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE
+    {
 
         if (webClient_->renderHandler_.Null())
             return nullptr;
@@ -27,10 +31,25 @@ public:
 
     }
 
-    IMPLEMENT_REFCOUNTING(WebClientPrivate)
+    virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE
+    {
+        return webBrowserHost_->GetCefLifeSpanHandler();
+    }
+
+    bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+                                  CefProcessId source_process,
+                                  CefRefPtr<CefProcessMessage> message) OVERRIDE
+    {
+        return false;
+    }
+
+
+
+    IMPLEMENT_REFCOUNTING(WebClientPrivate);
 
 private:
 
+    WeakPtr<WebBrowserHost> webBrowserHost_;
     WeakPtr<WebClient> webClient_;
 
 };
@@ -39,12 +58,12 @@ private:
 WebClient::WebClient(Context* context) : Object(context)
 {
     d_ = new WebClientPrivate(this);
-    d_->AddRef();
 }
 
 WebClient::~WebClient()
 {
-    d_->Release();
+    renderHandler_ = 0;
+    //d_->Release();
 }
 
 void WebClient::SetWebRenderHandler(WebRenderHandler* handler)
