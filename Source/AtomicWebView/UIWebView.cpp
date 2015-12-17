@@ -22,6 +22,10 @@
 
 #include <Atomic/UI/UIRenderer.h>
 
+#include "WebClient.h"
+#include "WebTexture2D.h"
+#include "WebBrowserHost.h"
+
 #include "UIWebView.h"
 
 using namespace tb;
@@ -61,22 +65,19 @@ public:
         TBRect rect = GetRect();
         rect.x = rect.y = 0;
         ConvertToRoot(rect.x, rect.y);
-        IntVector2 size; /* = webView_->GetSize();*/
 
-        if (size.x_ != rect.w || size.y_ != rect.h)
-        {
-            size.x_ = rect.w;
-            size.y_ = rect.h;
-
-            webView_->SetResizeRequired();
-            // early out here, responsible for flicker
-            // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/115
-            return;
-        }
+        IntRect size = webView_->GetRect();
 
         float* data = &vertexData_[0];
 
         UI* ui = webView_->GetSubsystem<UI>();
+
+        WebTexture2D* tex = webView_->GetWebTexture2D();
+
+        tex->SetCurrentSize(rect.w, rect.h);
+
+        float umax = (float)tex->GetCurrentWidth()/(float)tex->GetMaxWidth();
+        float vmax = (float)tex->GetCurrentHeight()/(float)tex->GetMaxHeight();
 
         float color;
         float fopacity = GetOpacity() * ui->GetRenderer()->GetOpacity();
@@ -89,6 +90,15 @@ public:
         data[21] = color;
         data[27] = color;
         data[33] = color;
+
+        // UV
+        data[4] = 0; data[5] = 0;
+        data[10] = umax; data[11] = 0;
+        data[16] = umax; data[17] = vmax;
+        data[22] = 0; data[23] = 0;
+        data[28] = umax; data[29] = vmax;
+        data[34] = 0; data[35] = vmax;
+
 
         data[0] = rect.x;
         data[1] = rect.y;
@@ -108,10 +118,7 @@ public:
         data[30] = rect.x;
         data[31] = rect.y + rect.h;
 
-        /*
-        webView_->GetSubsystem<UI>()->SubmitBatchVertexData(webView_->GetTexture(), vertexData_);
-        */
-
+        ui->SubmitBatchVertexData(tex->GetTexture2D(), vertexData_);
 
     }
 
@@ -125,7 +132,6 @@ private:
 UIWebView::UIWebView(Context* context) : UIWidget(context, false),
     resizeRequired_(false)
 {
-
     widget_ = new WebViewWidget();
     widget_->SetDelegate(this);
     widget_->SetGravity(WIDGET_GRAVITY_ALL);
@@ -133,11 +139,38 @@ UIWebView::UIWebView(Context* context) : UIWidget(context, false),
 
     UI* ui = GetSubsystem<UI>();
     ui->WrapWidget(this, widget_);
+
+    webClient_ = new WebClient(context);
+    webTexture_ = new WebTexture2D(context);
+    webClient_->SetWebRenderHandler(webTexture_);
+    webClient_->CreateBrowser();
 }
 
 UIWebView::~UIWebView()
 {
 
+}
+
+bool UIWebView::OnEvent(const TBWidgetEvent &ev)
+{
+    if (ev.type == EVENT_TYPE_POINTER_DOWN || ev.type == EVENT_TYPE_POINTER_UP)
+    {
+        webClient_->SendMouseClickEvent(ev.target_x, ev.target_y, 0, ev.type == EVENT_TYPE_POINTER_UP, 0);
+        return true;
+    }
+    else if (ev.type == EVENT_TYPE_POINTER_MOVE)
+    {
+        webClient_->SendMouseMoveEvent(ev.target_x, ev.target_y, 0);
+        return true;
+    }
+
+
+    return UIWidget::OnEvent(ev);
+}
+
+WebTexture2D* UIWebView::GetWebTexture2D() const
+{
+    return webTexture_;
 }
 
 

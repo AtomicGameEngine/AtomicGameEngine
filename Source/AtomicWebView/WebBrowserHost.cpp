@@ -23,11 +23,7 @@
 namespace Atomic
 {
 
-#ifdef ATOMIC_PLATFORM_OSX
-void* GetNSWindowContentView(void* window);
-#endif
-
-class WebBrowserHostPrivate : public CefLifeSpanHandler
+class WebBrowserHostPrivate
 {
     friend class WebBrowserHost;
 
@@ -44,69 +40,7 @@ public:
         host_ = 0;
     }
 
-    // CefLifeSpanHandler methods:
-    virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE
-    {
-        CEF_REQUIRE_UI_THREAD();
-        browsers_.Push(browser);
-    }
-
-    virtual bool DoClose(CefRefPtr<CefBrowser> browser) OVERRIDE
-    {
-        return false;
-    }
-
-    virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE
-    {
-        CEF_REQUIRE_UI_THREAD();
-
-        // Remove from the list of existing browsers.
-        Vector<CefRefPtr<CefBrowser>>::Iterator itr = browsers_.Begin();
-        while (itr != browsers_.End())
-        {
-            if ((*itr)->IsSame(browser))
-            {
-                browsers_.Erase(itr);
-                break;
-            }
-
-            itr++;
-        }
-    }
-
-    void CloseAllBrowsers(bool force_close)
-    {
-        if (!CefCurrentlyOn(TID_UI))
-        {
-            // Execute on the UI thread.
-            CefPostTask(TID_UI,
-                        base::Bind(&WebBrowserHostPrivate::CloseAllBrowsers, this, force_close));
-
-            return;
-        }
-
-        if (!browsers_.Size())
-            return;
-
-        // make a copy of vector, as we'll be erasing as we go
-        Vector<CefRefPtr<CefBrowser>> browsers = browsers_;
-
-        Vector<CefRefPtr<CefBrowser>>::Iterator itr = browsers.Begin();
-
-        while (itr != browsers.End())
-        {
-            (*itr)->GetHost()->CloseBrowser(force_close);
-            itr++;
-        }
-
-        browsers_.Clear();
-    }
-
-    IMPLEMENT_REFCOUNTING(WebBrowserHostPrivate);
-
 private:
-
-    Vector<CefRefPtr<CefBrowser>> browsers_;
 
     WeakPtr<WebBrowserHost> host_;
 
@@ -143,7 +77,6 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     }
 
     d_ = new WebBrowserHostPrivate(this);
-    d_->AddRef();
 
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
 
@@ -151,38 +84,7 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
 WebBrowserHost::~WebBrowserHost()
 {
-    d_->CloseAllBrowsers(true);
-    d_->Release();
     CefShutdown();
-}
-
-CefLifeSpanHandler* WebBrowserHost::GetCefLifeSpanHandler()
-{
-    return d_;
-}
-
-bool WebBrowserHost::CreateBrowser(WebClient* webClient)
-{
-    CefWindowInfo windowInfo;
-    CefBrowserSettings browserSettings;
-
-    Graphics* graphics = GetSubsystem<Graphics>();
-
-    SDL_Window* sdlWindow = static_cast<SDL_Window*>(graphics->GetSDLWindow());
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-
-    if(SDL_GetWindowWMInfo(sdlWindow, &info))
-    {
-        NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
-        windowInfo.SetAsWindowless(view, false);
-
-        return CefBrowserHost::CreateBrowser(windowInfo, (CefClient*) webClient->d_,
-                                             "https://html5test.com/", browserSettings, nullptr);
-    }
-
-    return false;
-
 }
 
 void WebBrowserHost::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

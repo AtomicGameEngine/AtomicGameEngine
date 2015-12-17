@@ -4,6 +4,8 @@
 
 #pragma once
 
+class CefClient;
+
 namespace Atomic
 {
 
@@ -23,7 +25,17 @@ public:
     /// Destruct.
     virtual ~WebClient();
 
+    // call once initialized with handlers
+    bool CreateBrowser();
+
     void SetWebRenderHandler(WebRenderHandler* handler);
+
+    CefClient* GetCefClient();
+
+    void WasResized();
+
+    void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const;
+    void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
 
 private:
 

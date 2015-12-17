@@ -70,13 +70,6 @@ UISceneView::UISceneView(Context* context, bool createWidget) : UIWidget(context
 
 UISceneView::~UISceneView()
 {
-    // FIXME: need to refactor Light2D viewport handling
-    if (viewport_.NotNull())
-    {
-        RenderPath* renderpath = viewport_->GetRenderPath();
-        if (renderpath)
-            renderpath->RemoveCommands("Light2D");
-    }
 
 }
 

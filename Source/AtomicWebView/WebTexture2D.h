@@ -24,11 +24,8 @@ public:
     /// Destruct.
     virtual ~WebTexture2D();
 
-    virtual void SetCurrentWidth(unsigned width);
-    virtual void SetCurrentHeight(unsigned height);
-
-    virtual void SetMaxWidth(unsigned width);
-    virtual void SetMaxHeight(unsigned height);
+    virtual void SetCurrentSize(unsigned width, unsigned height);
+    virtual void SetMaxSize(unsigned width, unsigned height);
 
     CefRenderHandler* GetCEFRenderHandler();
 

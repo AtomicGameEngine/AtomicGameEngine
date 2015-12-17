@@ -22,11 +22,18 @@
 
 #pragma once
 
+#include <TurboBadger/tb_widgets.h>
+
 #include <Atomic/UI/UI.h>
 #include <Atomic/UI/UIWidget.h>
 
+#include <Atomic/Graphics/Texture2D.h>
+
 namespace Atomic
 {
+
+class WebClient;
+class WebTexture2D;
 
 class UIWebView : public UIWidget
 {
@@ -39,11 +46,18 @@ public:
 
     void SetResizeRequired() { resizeRequired_  = true; }
 
+    WebTexture2D* GetWebTexture2D() const;
+
 protected:
+
+    bool OnEvent(const tb::TBWidgetEvent &ev);
 
 private:
 
     bool resizeRequired_;
+
+    SharedPtr<WebClient> webClient_;
+    SharedPtr<WebTexture2D> webTexture_;
 
 };
 

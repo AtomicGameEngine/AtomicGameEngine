@@ -3,8 +3,6 @@
 
 #pragma once
 
-class CefLifeSpanHandler;
-
 namespace Atomic
 {
 
@@ -20,10 +18,6 @@ public:
     WebBrowserHost(Context* context);
     /// Destruct.
     virtual ~WebBrowserHost();
-
-    bool CreateBrowser(WebClient* webClient);
-
-    CefLifeSpanHandler* GetCefLifeSpanHandler();
 
 private:
 
