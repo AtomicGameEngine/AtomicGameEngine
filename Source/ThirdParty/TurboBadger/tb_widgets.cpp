@@ -1336,15 +1336,35 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
             focus_target = focus_target->m_parent;
         }
     }
-    if (down_widget)
+    //save x and y to restore it later
+    int ox = x;
+    int oy = y;
+    //check only for captured_widget
+    if (captured_widget)
     {
+        captured_widget->SetTouchId(touchId);
+        //converts x, y
+        captured_widget->ConvertFromRoot(x, y);
+        pointer_move_widget_x = pointer_down_widget_x = x;
+        pointer_move_widget_y = pointer_down_widget_y = y;
+        TBWidgetEvent ev(EVENT_TYPE_POINTER_DOWN, x, y, touch, modifierkeys);
+        ev.count = click_count;
+        captured_widget->InvokeEvent(ev);
+    }
+    //restore x and y coords, to use with down_widget
+    x = ox;
+    y = oy;
+    //if down_widget is captured and it's not a captured_widget 
+    //then send an event, otherwise don't send it because POINTER_DOWN event will be sent twice
+    if (down_widget && down_widget != captured_widget)
+    {
+        //the same things that's done with captured_widget
         down_widget->Invalidate();
         down_widget->InvalidateSkinStates();
         down_widget->OnCaptureChanged(true);
         down_widget->SetTouchId(touchId);
+        //convert x, y
         down_widget->ConvertFromRoot(x, y);
-        pointer_move_widget_x = pointer_down_widget_x = x;
-        pointer_move_widget_y = pointer_down_widget_y = y;
         TBWidgetEvent ev(EVENT_TYPE_POINTER_DOWN, x, y, touch, modifierkeys);
         ev.count = click_count;
         down_widget->InvokeEvent(ev);
@@ -1353,30 +1373,44 @@ void TBWidget::InvokePointerDown(int x, int y, int click_count, MODIFIER_KEYS mo
 
 void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool touch, int touchId)
 {
+    //get down_widget before making handling captured_widget event to make sure that down_widget won't be changed
     TBWidget* down_widget = GetWidgetAt(x, y, true);
-    if ((down_widget && down_widget->touchId_ == touchId) || captured_widget)
+    //save x and y to restore it later
+    int ox = x;
+    int oy = y;
+    //save old_capture for later check, because captured_widget can be nullptr after releasing capture
+    TBWidget *old_capture = captured_widget;
+    if (captured_widget && captured_widget->touchId_ == touchId)
     {
+        captured_widget->ConvertFromRoot(x, y);
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
         TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
-        down_widget->Invalidate();
-        down_widget->InvalidateSkinStates();
-        down_widget->OnCaptureChanged(false);
+        captured_widget->OnCaptureChanged(false);
+        captured_widget->InvokeEvent(ev_up);
+        if (!cancel_click && captured_widget->GetHitStatus(x, y))
+        {
+            captured_widget->InvokeEvent(ev_click);
+        }
+        captured_widget->ReleaseCapture();
+    }
+    //restore x and y coords, to use with down_widget
+    x = ox;
+    y = oy;
+    //make sure that down_widget is not captured_widget to don't sent event twice
+    if (down_widget && down_widget->touchId_ == touchId && old_capture != down_widget)
+    {
         down_widget->ConvertFromRoot(x, y);
+        TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
+        TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
+        down_widget->OnCaptureChanged(false);
         down_widget->InvokeEvent(ev_up);
         if (!cancel_click && down_widget->GetHitStatus(x, y))
         {
             down_widget->InvokeEvent(ev_click);
         }
-        if (captured_widget)
-        {
-            captured_widget->ConvertFromRoot(x, y);
-            if (!cancel_click && captured_widget->GetHitStatus(x, y))
-            {
-                captured_widget->InvokeEvent(ev_click);
-            }
-            captured_widget->InvokeEvent(ev_up);
-            captured_widget->ReleaseCapture();
-        }
+        //ReleaseCapture
+        down_widget->Invalidate();
+        down_widget->InvalidateSkinStates();
     }
 }
 
