@@ -70,7 +70,7 @@ public:
                     container_->OnEvent(ev);
                     editor_->Close(container_->GetNumPages()>1);
                 }
-                else if (ev.ref_id == TBIDC("cancel"))
+                else if (ev.ref_id == TBIDC("TBMessageWindow.cancel"))
                 {
                     editor_->SendEvent(E_EDITORRESOURCECLOSECANCELED);
                     SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);

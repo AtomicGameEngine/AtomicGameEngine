@@ -1385,6 +1385,7 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         captured_widget->ConvertFromRoot(x, y);
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
         TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
+        captured_widget->OnCaptureChanged(false);
         captured_widget->InvokeEvent(ev_up);
         if (!cancel_click && captured_widget->GetHitStatus(x, y))
         {
@@ -1401,6 +1402,7 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         down_widget->ConvertFromRoot(x, y);
         TBWidgetEvent ev_up(EVENT_TYPE_POINTER_UP, x, y, touch, modifierkeys);
         TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
+        down_widget->OnCaptureChanged(false);
         down_widget->InvokeEvent(ev_up);
         if (!cancel_click && down_widget->GetHitStatus(x, y))
         {
@@ -1409,7 +1411,6 @@ void TBWidget::InvokePointerUp(int x, int y, MODIFIER_KEYS modifierkeys, bool to
         //ReleaseCapture
         down_widget->Invalidate();
         down_widget->InvalidateSkinStates();
-        down_widget->OnCaptureChanged(false);
     }
 }
 
