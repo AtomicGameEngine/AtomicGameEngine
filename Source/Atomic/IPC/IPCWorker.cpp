@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include "../Core/Timer.h"
 #include "../IO/Log.h"
 
 #include "IPCWorker.h"
@@ -109,6 +110,8 @@ void IPCWorker::ThreadFunction()
         {
            break;
         }
+
+        Time::Sleep(100);
     }
 
     shouldRun_ = false;

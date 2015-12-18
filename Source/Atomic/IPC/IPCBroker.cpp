@@ -25,6 +25,7 @@
 #endif
 
 #include "../Core/StringUtils.h"
+#include "../Core/Timer.h"
 #include "../IO/Log.h"
 
 #include "IPCUnix.h"
@@ -59,6 +60,9 @@ void IPCBroker::ThreadFunction()
         {
             break;
         }
+
+        // sleep thread a bit so we don't gobble CPU
+        Time::Sleep(100);
     }
 
     shouldRun_ = false;
