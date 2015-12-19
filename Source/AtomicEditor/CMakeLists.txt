@@ -71,3 +71,5 @@ GroupSources("Javascript")
 GroupSources("PlayerMode")
 GroupSources("Utils")
 GroupSources("Components")
+
+include(AtomicDoc)

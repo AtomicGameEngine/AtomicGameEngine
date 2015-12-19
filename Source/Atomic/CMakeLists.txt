@@ -102,3 +102,5 @@ GroupSources("UI")
 GroupSources("Web")
 
 add_library(Atomic ${SOURCE_FILES})
+
+include(AtomicDoc)

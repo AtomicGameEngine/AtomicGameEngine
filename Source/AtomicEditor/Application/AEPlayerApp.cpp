@@ -84,7 +84,7 @@ void AEPlayerApplication::Setup()
 
     engineParameters_["LogLevel"] = LOG_DEBUG;
 
-#if ATOMIC_PLATFORM_WINDOWS
+#if ATOMIC_PLATFORM_WINDOWS || ATOMIC_PLATFORM_LINUX
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
     engineParameters_["ResourcePrefixPath"] = "AtomicPlayer_Resources";
 #elif ATOMIC_PLATFORM_ANDROID

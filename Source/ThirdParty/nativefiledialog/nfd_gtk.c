@@ -213,9 +213,10 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
 
         result = NFD_OKAY;
     }
-
-    WaitForCleanup();
+ 
+   
     gtk_widget_destroy(dialog);
+    WaitForCleanup();
 
     return result;
 }
@@ -261,8 +262,8 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
         result = NFD_OKAY;
     }
 
-    WaitForCleanup();
     gtk_widget_destroy(dialog);
+    WaitForCleanup();
 
     return result;
 }

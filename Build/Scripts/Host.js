@@ -7,6 +7,10 @@ if (os.platform() == "win32") {
   module.exports = require("./HostMac");
   require("./BuildMac");
 }
+else if (os.platform() == "linux") {
+  module.exports = require("./HostLinux");
+  require("./BuildLinux");
+}
 
 require("./BuildCommon");
 require("./BuildAndroid");
