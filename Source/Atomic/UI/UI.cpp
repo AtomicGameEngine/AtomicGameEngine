@@ -213,9 +213,6 @@ void UI::Initialize(const String& languageFile)
     rootWidget_->SetSize(width, height);
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
-    // register the UIDragDrop subsystem
-    context_->RegisterSubsystem(new UIDragDrop(context_));
-
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
@@ -232,6 +229,9 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+
+    // register the UIDragDrop subsystem (after we have subscribed to events, so it is processed after)
+    context_->RegisterSubsystem(new UIDragDrop(context_));
 
     tb::TBWidgetListener::AddGlobalListener(this);
 
