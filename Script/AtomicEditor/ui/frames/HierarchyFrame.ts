@@ -49,6 +49,13 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         // handle dropping on hierarchy, moving node, dropping prefabs, etc
         this.subscribeToEvent(this.hierList.rootList, "DragEnded", (data) => this.handleDragEnded(data));
+        // on mouse up clear the list's drag object
+        this.subscribeToEvent("MouseButtonUp", () => {
+
+          this.hierList.rootList.dragObject = null;
+
+        });
+
 
         this.subscribeToEvent(EditorEvents.SceneClosed, (ev: EditorEvents.SceneClosedEvent) => {
 
