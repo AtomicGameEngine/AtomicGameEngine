@@ -238,6 +238,13 @@ bool UISelectList::OnEvent(const tb::TBWidgetEvent &ev)
     {
         GetTBSelectList()->SetFocus(WIDGET_FOCUS_REASON_POINTER);
     }
+    if (ev.type == EVENT_TYPE_POINTER_MOVE)
+    {
+        UIDragDrop* dragDrop = GetSubsystem<UIDragDrop>();
+        //if return true, then scroll event will be controlled by that widget itself
+        if (dragDrop->GetDraggingObject())
+            return true;
+    }
     return UIWidget::OnEvent(ev);
 }
 

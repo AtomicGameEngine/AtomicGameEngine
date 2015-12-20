@@ -61,10 +61,6 @@ public:
 
     bool OnEvent(const TBWidgetEvent &ev)
     {
-        // Don't process pointer down, we only respond to click events
-        if (ev.type == EVENT_TYPE_POINTER_DOWN)
-            return true;
-
         if (ev.type == EVENT_TYPE_CLICK)
         {
             if (ev.target->GetID() == TBIDC("unsaved_modifications_dialog"))
@@ -74,7 +70,7 @@ public:
                     container_->OnEvent(ev);
                     editor_->Close(container_->GetNumPages()>1);
                 }
-                else if (ev.ref_id == TBIDC("cancel"))
+                else if (ev.ref_id == TBIDC("TBMessageWindow.cancel"))
                 {
                     editor_->SendEvent(E_EDITORRESOURCECLOSECANCELED);
                     SetFocus(WIDGET_FOCUS_REASON_UNKNOWN);
