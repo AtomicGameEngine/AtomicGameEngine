@@ -78,7 +78,7 @@ public:
             windowInfo.SetAsWindowless(view, false);
 
             CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
-                                                                              "https://html5test.com/", browserSettings, nullptr);
+                                                                              "https://youtube.com/", browserSettings, nullptr);
 
             if (!browser.get())
                 return false;

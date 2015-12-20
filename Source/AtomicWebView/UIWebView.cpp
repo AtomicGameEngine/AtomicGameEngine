@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <Atomic/IO/Log.h>
 #include <Atomic/UI/UIRenderer.h>
 
 #include "WebClient.h"

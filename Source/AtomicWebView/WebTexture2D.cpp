@@ -1,10 +1,14 @@
 #include <ThirdParty/CEF/include/cef_render_handler.h>
 
+#include <Atomic/IO/Log.h>
+
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Technique.h>
 
+#include "WebClient.h"
 #include "WebTexture2D.h"
+
 
 namespace Atomic
 {
@@ -37,22 +41,6 @@ public:
             webTexture2D_->texture_->SetData(0, 0, 0, width, height, buffer);
         }
 
-
-        /*
-        if (dirtyRects.size() == 1 && width == )
-            return;
-
-        int vwidth = width;
-        int vheight = height;
-
-        if (vwidth > webTexture2D_->texture_->GetWidth())
-            vwidth = webTexture2D_->texture_->GetWidth();
-
-        if (vheight > webTexture2D_->texture_->GetHeight())
-            vheight = webTexture2D_->texture_->GetHeight();
-
-
-        */
     }
 
 private:
@@ -91,25 +79,39 @@ CefRenderHandler* WebTexture2D::GetCEFRenderHandler()
 
 void WebTexture2D::SetCurrentSize(unsigned width, unsigned height)
 {
+    if (currentWidth_ == width && currentHeight_ == height)
+        return;
+
     currentWidth_ = width;
     currentHeight_ = height;
 
     unsigned newMaxWidth = NextPowerOfTwo(width);
     unsigned newMaxHeight = NextPowerOfTwo(height);
 
-    if (newMaxWidth != maxWidth_ || newMaxHeight != maxHeight_)
-    {
-        SetMaxSize(newMaxWidth, newMaxHeight);
-    }
+    SetMaxSize(newMaxWidth, newMaxHeight);
+
+    if (webClient_.NotNull())
+        webClient_->WasResized();
 
 }
 
 void WebTexture2D::SetMaxSize(unsigned width, unsigned height)
 {
+    if (maxWidth_ == width && height == maxHeight_)
+        return;
+
+    if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
+    {
+        LOGERRORF("WebTexture2D::SetMaxSize - attempted to set size to %ux%u (must be a power of two)", width, height );
+        return;
+    }
+
     maxWidth_ = width;
     maxHeight_ = height;
 
     texture_->SetSize(maxWidth_, maxHeight_, Graphics::GetBGRAFormat(), TEXTURE_DYNAMIC);
+
+    LOGDEBUGF("WebTexture2D max size set: %u %u", maxWidth_, maxHeight_);
 
 }
 
