@@ -171,6 +171,11 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
         webClient_->SendMouseMoveEvent(ev.target_x, ev.target_y, 0);
         return true;
     }
+    else if (ev.type == EVENT_TYPE_WHEEL)
+    {
+        webClient_->SendMouseWheelEvent(ev.target_x, ev.target_y, 0, ev.delta_x, ev.delta_y);
+        return true;
+    }
 
 
     return UIWidget::OnEvent(ev);

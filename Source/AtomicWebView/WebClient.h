@@ -36,6 +36,7 @@ public:
 
     void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const;
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
+    void SendMouseWheelEvent(int x, int y, unsigned modifier, int deltaX, int deltaY) const;
 
 private:
 

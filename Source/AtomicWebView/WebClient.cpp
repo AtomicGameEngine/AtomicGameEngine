@@ -72,6 +72,8 @@ public:
         CefWindowInfo windowInfo;
         CefBrowserSettings browserSettings;
 
+        //browserSettings.webgl = STATE_ENABLED;
+
         windowInfo.width = width;
         windowInfo.height = height;
 
@@ -200,6 +202,28 @@ void WebClient::SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLe
     host->SendMouseMoveEvent(mevent, mouseLeave);
 
 }
+
+void WebClient::SendMouseWheelEvent(int x, int y, unsigned modifier,int deltaX, int deltaY) const
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
+
+    CefMouseEvent mevent;
+    mevent.x = x;
+    mevent.y = y;
+    mevent.modifiers = 0;
+
+#ifdef ATOMIC_PLATFORM_OSX
+    deltaY = -deltaY;
+#endif
+
+    host->SendMouseWheelEvent(mevent, deltaX, deltaY * 5);
+
+}
+
+
 
 void WebClient::WasResized()
 {
