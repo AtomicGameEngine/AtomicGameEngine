@@ -1,7 +1,7 @@
 var fs = require('fs-extra');
 var bcommon = require("./BuildCommon");
 
-var buildDir = bcommon.artifactsRoot + "Build/Mac/";
+var buildDir = bcommon.artifactsRoot + "Build/Linux/";
 var atomicToolBinary = buildDir + "Bin/AtomicTool";
 
 function clean() {
@@ -29,15 +29,15 @@ namespace('build', function() {
     process.chdir(toolBuildDir);
 
     var cmds = [
-      'cmake ../../../../ -DATOMICTOOL_NOGEN=1 -G Xcode',
-      'xcodebuild -target AtomicTool -configuration Release'
+        cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=Release -DATOMIC_BUILD_2D=0 -DLINUX=1 ");
+        cmds.push("make AtomicTool")
     ]
 
     jake.exec(cmds, function() {
 
       var srcToolBinary = toolBuildDir + "Source/AtomicTool/Release/AtomicTool"
       fs.copySync(srcToolBinary, atomicToolBinary);
-      console.log("Built MacOSX AtomicTool");
+      console.log("Built Linux AtomicTool");
       complete();
 
     }, {

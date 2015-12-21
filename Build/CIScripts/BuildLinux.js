@@ -15,7 +15,7 @@ namespace('build', function() {
     var playerBuildDir = buildDir + "AtomicPlayer/";
 
     bcommon.cleanCreateDir(playerBuildDir);
-    bcommon.cleanCreateDir(bcommon.getGenScriptRootDir("MACOSX"));
+    bcommon.cleanCreateDir(bcommon.getGenScriptRootDir("LINUX"));
 
     process.chdir(playerBuildDir);
 
