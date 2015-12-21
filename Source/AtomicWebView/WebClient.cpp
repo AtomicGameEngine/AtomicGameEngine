@@ -13,6 +13,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/Input/Input.h>
 
 #include <Atomic/Graphics/Graphics.h>
 
@@ -195,9 +196,14 @@ void WebClient::SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLe
     mevent.y = y;
     mevent.modifiers = 0;
 
-    //MBT_LEFT   = 0,
-    //MBT_MIDDLE,
-    //MBT_RIGHT,
+    Input* input = GetSubsystem<Input>();
+
+    if (input->GetMouseButtonDown(MOUSEB_LEFT))
+        mevent.modifiers |= EVENTFLAG_LEFT_MOUSE_BUTTON;
+    if (input->GetMouseButtonDown(MOUSEB_MIDDLE))
+        mevent.modifiers |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
+    if (input->GetMouseButtonDown(MOUSEB_RIGHT))
+        mevent.modifiers |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
 
     host->SendMouseMoveEvent(mevent, mouseLeave);
 

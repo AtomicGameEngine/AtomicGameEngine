@@ -81,9 +81,6 @@ public:
 
         webView_->webClient_->SetSize(rect.w, rect.h);
 
-        float umax = 1.0f;
-        float vmax = 1.0f;
-
         float color;
         float fopacity = GetOpacity() * ui->GetRenderer()->GetOpacity();
         unsigned char opacity = (unsigned char) (fopacity* 255.0f);
@@ -95,15 +92,6 @@ public:
         data[21] = color;
         data[27] = color;
         data[33] = color;
-
-        // UV
-        data[4] = 0; data[5] = 0;
-        data[10] = umax; data[11] = 0;
-        data[16] = umax; data[17] = vmax;
-        data[22] = 0; data[23] = 0;
-        data[28] = umax; data[29] = vmax;
-        data[34] = 0; data[35] = vmax;
-
 
         data[0] = rect.x;
         data[1] = rect.y;
@@ -174,6 +162,14 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     else if (ev.type == EVENT_TYPE_WHEEL)
     {
         webClient_->SendMouseWheelEvent(ev.target_x, ev.target_y, 0, ev.delta_x, ev.delta_y);
+        return true;
+    }
+    else if (ev.type == EVENT_TYPE_KEY_DOWN)
+    {
+        return true;
+    }
+    else if (ev.type == EVENT_TYPE_KEY_UP)
+    {
         return true;
     }
 
