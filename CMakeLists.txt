@@ -64,4 +64,12 @@ elseif(EMSCRIPTEN)
 
 endif()
 
+find_program(CLDOC cldoc)
+if(CLDOC)
+
+   add_custom_target(docs 
+    DEPENDS AtomicEngineDocs
+    )
+endif()
+
 add_subdirectory(Source)

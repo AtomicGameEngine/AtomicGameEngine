@@ -42,6 +42,9 @@ bool ToolEnvironment::InitFromPackage()
 #ifdef ATOMIC_PLATFORM_WINDOWS
 	editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor.exe";
     String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
+#elif ATOMIC_PLATFORM_LINUX
+    editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
+    String resourcesDir = fileSystem->GetProgramDir() + "Resources/";
 #else
     editorBinary_ = fileSystem->GetProgramDir() + "AtomicEditor";
     String resourcesDir = GetPath(RemoveTrailingSlash(fileSystem->GetProgramDir())) + "Resources/";
@@ -92,6 +95,8 @@ bool ToolEnvironment::InitFromJSON(bool atomicTool)
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
         netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Release/x64/", ATOMIC_ROOT_SOURCE_DIR));
+#elif ATOMIC_PLATFORM_LINUX
+        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Linux/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
 #else
         netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/MacOSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
 #endif
@@ -147,6 +152,8 @@ const String& ToolEnvironment::GetDevConfigFilename()
     devConfigFilename_ = fileSystem->GetUserDocumentsDir() + ".atomicgameengine/toolEnv.json";
 #elif ATOMIC_PLATFORM_WINDOWS
     devConfigFilename_ = fileSystem->GetUserDocumentsDir() + "AtomicGameEngine/toolEnv.json";
+#else
+    devConfigFilename_ = fileSystem->GetUserDocumentsDir() + ".atomicgameengine/toolEnv.json";
 #endif
 
     return devConfigFilename_;
@@ -198,6 +205,10 @@ void ToolEnvironment::SetRootBuildDir(const String& buildDir, bool setBinaryPath
         playerAppFolder_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer.app/";
         editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor.app/Contents/MacOS/AtomicEditor";
 #endif
+
+#else
+        playerBinary_ = rootBuildDir_ + "Source/AtomicPlayer/Application/AtomicPlayer";
+        editorBinary_ = rootBuildDir_ + "Source/AtomicEditor/AtomicEditor";
 
 #endif
     }

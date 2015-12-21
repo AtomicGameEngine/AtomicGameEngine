@@ -15,3 +15,11 @@ if (os.platform() == "darwin") {
   require("./BuildWindows");
   require("./GenWindowsEditor");
 }
+else if (os.platform() == "linux") {
+  module.exports = require("./HostLinux");
+  require("./BuildLinux");
+  require("./BuildWeb");
+  require("./BuildAndroid");
+  require("./GenEditorData");
+  require("./GenLinuxEditor");
+}

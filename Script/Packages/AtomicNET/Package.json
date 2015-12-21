@@ -4,5 +4,5 @@
   "namespace" : "Atomic",
   "dependencies" : ["Script/Packages/Atomic"],
   "modules" : ["NETCore", "NETScript"],
-  "platforms" : ["WINDOWS", "MACOSX"]
+  "platforms" : ["WINDOWS", "MACOSX","LINUX"]
 }

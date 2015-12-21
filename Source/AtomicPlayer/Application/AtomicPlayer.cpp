@@ -96,7 +96,7 @@ void AtomicPlayerApp::Setup()
     engineParameters_.InsertNew("ResourcePaths", "AtomicResources");
 #endif
 
-#if ATOMIC_PLATFORM_WINDOWS
+#if ATOMIC_PLATFORM_WINDOWS || ATOMIC_PLATFORM_LINUX
 
     engineParameters_.InsertNew("WindowIcon", "Images/AtomicLogo32.png");
     engineParameters_.InsertNew("ResourcePrefixPath", "AtomicPlayer_Resources");
