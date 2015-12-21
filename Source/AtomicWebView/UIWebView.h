@@ -37,14 +37,14 @@ class WebTexture2D;
 
 class UIWebView : public UIWidget
 {
+    friend class WebViewWidget;
+
     OBJECT(UIWebView)
 
 public:
 
-    UIWebView(Context* context);
+    UIWebView(Context* context, const String& initialURL = String::EMPTY);
     virtual ~UIWebView();
-
-    void SetResizeRequired() { resizeRequired_  = true; }
 
     WebTexture2D* GetWebTexture2D() const;
 
@@ -54,10 +54,10 @@ protected:
 
 private:
 
-    bool resizeRequired_;
-
     SharedPtr<WebClient> webClient_;
     SharedPtr<WebTexture2D> webTexture_;
+
+    String initialURL_;
 
 };
 

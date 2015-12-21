@@ -61,10 +61,19 @@ public:
         return false;
     }
 
-    bool CreateBrowser()
+    bool CreateBrowser(const String& initialURL, int width, int height)
     {
+        if (webClient_->renderHandler_.Null())
+        {
+            LOGERROR("WebClient::CreateBrowser - No render handler specified");
+            return false;
+        }
+
         CefWindowInfo windowInfo;
         CefBrowserSettings browserSettings;
+
+        windowInfo.width = width;
+        windowInfo.height = height;
 
         Graphics* graphics = webClient_->GetSubsystem<Graphics>();
 
@@ -77,13 +86,14 @@ public:
             NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
             windowInfo.SetAsWindowless(view, false);
 
+            webClient_->renderHandler_->SetSize(width, height);
             CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
-                                                                              "https://youtube.com/", browserSettings, nullptr);
+                                                                              initialURL.CString(), browserSettings, nullptr);
 
             if (!browser.get())
                 return false;
 
-            browsers_.Push(browser);
+            browser_ = browser;
 
             return true;
         }
@@ -107,53 +117,33 @@ public:
     {
         CEF_REQUIRE_UI_THREAD();
 
-        // Remove from the list of existing browsers.
-        Vector<CefRefPtr<CefBrowser>>::Iterator itr = browsers_.Begin();
-        while (itr != browsers_.End())
-        {
-            if ((*itr)->IsSame(browser))
-            {
-                browsers_.Erase(itr);
-                break;
-            }
+        if (browser->IsSame(browser_))
+            browser_ = nullptr;
 
-            itr++;
-        }
     }
 
-    void CloseAllBrowsers(bool force_close)
+    void CloseBrowser(bool force_close)
     {
         if (!CefCurrentlyOn(TID_UI))
         {
             // Execute on the UI thread.
             CefPostTask(TID_UI,
-                        base::Bind(&WebClientPrivate::CloseAllBrowsers, this, force_close));
+                        base::Bind(&WebClientPrivate::CloseBrowser, this, force_close));
 
             return;
         }
 
-        if (!browsers_.Size())
+        if (!browser_.get())
             return;
 
-        // make a copy of vector, as we'll be erasing as we go
-        Vector<CefRefPtr<CefBrowser>> browsers = browsers_;
-
-        Vector<CefRefPtr<CefBrowser>>::Iterator itr = browsers.Begin();
-
-        while (itr != browsers.End())
-        {
-            (*itr)->GetHost()->CloseBrowser(force_close);
-            itr++;
-        }
-
-        browsers_.Clear();
+        browser_->GetHost()->CloseBrowser(force_close);
     }
 
     IMPLEMENT_REFCOUNTING(WebClientPrivate);
 
 private:
 
-    Vector<CefRefPtr<CefBrowser>> browsers_;
+    CefRefPtr<CefBrowser> browser_;
     WeakPtr<WebBrowserHost> webBrowserHost_;
     WeakPtr<WebClient> webClient_;
 
@@ -173,11 +163,10 @@ WebClient::~WebClient()
 
 void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const
 {
-    if (!d_->browsers_.Size())
+    if (!d_->browser_.get())
         return;
 
-    CefRefPtr<CefBrowser> browser = d_->browsers_[0];
-    CefRefPtr<CefBrowserHost> host = browser->GetHost();
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
 
     CefMouseEvent mevent;
     mevent.x = x;
@@ -194,11 +183,10 @@ void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp,
 
 void WebClient::SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave) const
 {
-    if (!d_->browsers_.Size())
+    if (!d_->browser_.get())
         return;
 
-    CefRefPtr<CefBrowser> browser = d_->browsers_[0];
-    CefRefPtr<CefBrowserHost> host = browser->GetHost();
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
 
     CefMouseEvent mevent;
     mevent.x = x;
@@ -215,15 +203,30 @@ void WebClient::SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLe
 
 void WebClient::WasResized()
 {
-    if (!d_->browsers_.Size())
+    if (!d_->browser_.get())
         return;
 
-    d_->browsers_[0]->GetHost()->WasResized();;
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
+    host->WasResized();;
 }
 
-bool WebClient::CreateBrowser()
+bool WebClient::CreateBrowser(const String& initialURL, int width, int height)
 {
-    return d_->CreateBrowser();
+    return d_->CreateBrowser(initialURL, width, height);
+}
+
+void WebClient::SetSize(int width, int height)
+{
+    if (renderHandler_.Null())
+        return;
+
+    if (renderHandler_->GetWidth() == width && renderHandler_->GetHeight() == height)
+        return;
+
+    renderHandler_->SetSize(width, height);
+
+    WasResized();
+
 }
 
 void WebClient::SetWebRenderHandler(WebRenderHandler* handler)

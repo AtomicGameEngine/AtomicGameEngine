@@ -10,11 +10,7 @@ namespace Atomic
 {
 
 
-WebRenderHandler::WebRenderHandler(Context* context) : Object (context),
-    currentWidth_(0),
-    currentHeight_(0),
-    maxHeight_(0),
-    maxWidth_(0)
+WebRenderHandler::WebRenderHandler(Context* context) : Object (context)
 {
 }
 

@@ -25,19 +25,21 @@ public:
     /// Destruct.
     virtual ~WebClient();
 
-    // call once initialized with handlers
-    bool CreateBrowser();
+    /// call once initialized with handlers
+    bool CreateBrowser(const String& initialURL, int width, int height);
+
+    void SetSize(int width, int height);
 
     void SetWebRenderHandler(WebRenderHandler* handler);
 
     CefClient* GetCefClient();
 
-    void WasResized();
-
     void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const;
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
 
 private:
+
+    void WasResized();
 
     SharedPtr<WebRenderHandler> renderHandler_;
 

@@ -42,7 +42,7 @@ public:
     // For safe typecasting
     TBOBJECT_SUBCLASS(WebViewWidget, tb::TBWidget);
 
-    WebViewWidget()
+    WebViewWidget() : browserCreated_(false)
     {
         vertexData_.Resize(6 * UI_VERTEX_SIZE);
         float color;
@@ -73,12 +73,16 @@ public:
 
         UI* ui = webView_->GetSubsystem<UI>();
 
-        WebTexture2D* tex = webView_->GetWebTexture2D();
+        if (!browserCreated_)
+        {
+            browserCreated_ = true;
+            webView_->webClient_->CreateBrowser(webView_->initialURL_, rect.w, rect.h);
+        }
 
-        tex->SetCurrentSize(rect.w, rect.h);
+        webView_->webClient_->SetSize(rect.w, rect.h);
 
-        float umax = (float)tex->GetCurrentWidth()/(float)tex->GetMaxWidth();
-        float vmax = (float)tex->GetCurrentHeight()/(float)tex->GetMaxHeight();
+        float umax = 1.0f;
+        float vmax = 1.0f;
 
         float color;
         float fopacity = GetOpacity() * ui->GetRenderer()->GetOpacity();
@@ -119,19 +123,20 @@ public:
         data[30] = rect.x;
         data[31] = rect.y + rect.h;
 
-        ui->SubmitBatchVertexData(tex->GetTexture2D(), vertexData_);
+        ui->SubmitBatchVertexData(webView_->GetWebTexture2D()->GetTexture2D(), vertexData_);
 
     }
 
 private:
+
+    bool browserCreated_;
 
     WeakPtr<UIWebView> webView_;
     PODVector<float> vertexData_;
 
 };
 
-UIWebView::UIWebView(Context* context) : UIWidget(context, false),
-    resizeRequired_(false)
+UIWebView::UIWebView(Context* context, const String &initialURL) : UIWidget(context, false)
 {
     widget_ = new WebViewWidget();
     widget_->SetDelegate(this);
@@ -144,7 +149,9 @@ UIWebView::UIWebView(Context* context) : UIWidget(context, false),
     webClient_ = new WebClient(context);
     webTexture_ = new WebTexture2D(context);
     webClient_->SetWebRenderHandler(webTexture_);
-    webClient_->CreateBrowser();
+
+    initialURL_ = initialURL;
+
 }
 
 UIWebView::~UIWebView()

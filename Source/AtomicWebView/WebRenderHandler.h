@@ -22,11 +22,10 @@ public:
     /// Destruct.
     virtual ~WebRenderHandler();
 
-    unsigned GetCurrentWidth() const { return currentWidth_; }
-    unsigned GetCurrentHeight() const { return currentHeight_; }
+    virtual int GetWidth() const = 0;
+    virtual int GetHeight() const = 0;
 
-    unsigned GetMaxWidth() const { return maxWidth_; }
-    unsigned GetMaxHeight() const { return maxHeight_; }
+    virtual void SetSize(int width, int height) = 0;
 
     void SetWebClient(WebClient* webClient);
     WebClient* GetWebClient() const;
@@ -34,12 +33,6 @@ public:
     virtual CefRenderHandler* GetCEFRenderHandler() = 0;
 
 protected:
-
-    unsigned currentWidth_;
-    unsigned currentHeight_;
-
-    unsigned maxHeight_;
-    unsigned maxWidth_;
 
     WeakPtr<WebClient> webClient_;
 

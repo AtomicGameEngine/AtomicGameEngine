@@ -28,7 +28,7 @@ public:
 
     bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) OVERRIDE
     {
-        rect = CefRect(0, 0, webTexture2D_->GetCurrentWidth(), webTexture2D_->GetCurrentHeight());
+        rect = CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight());
         return true;
     }
 
@@ -38,7 +38,11 @@ public:
 
         if (type == PET_VIEW)
         {
-            webTexture2D_->texture_->SetData(0, 0, 0, width, height, buffer);
+            if (width == webTexture2D_->GetWidth() && height == webTexture2D_->GetHeight())
+            {
+                Texture2D* tex = webTexture2D_->texture_;
+                tex->SetData(0, 0, 0, width, height, buffer);
+            }
         }
 
     }
@@ -49,7 +53,7 @@ private:
 
 };
 
-WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRenderHandler(context)
+WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context)
 {
     d_ = new WebTexture2DPrivate(this);
     d_->AddRef();
@@ -57,8 +61,6 @@ WebTexture2D::WebTexture2D(Context* context, int width, int height) : WebRenderH
     texture_ = new Texture2D(context_);
     texture_->SetNumLevels(1);
     texture_->SetFilterMode(FILTER_BILINEAR);
-
-    SetCurrentSize(width, height);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     material_ = new Material(context_);
@@ -76,42 +78,22 @@ CefRenderHandler* WebTexture2D::GetCEFRenderHandler()
     return d_;
 }
 
-
-void WebTexture2D::SetCurrentSize(unsigned width, unsigned height)
+int WebTexture2D::GetWidth() const
 {
-    if (currentWidth_ == width && currentHeight_ == height)
-        return;
-
-    currentWidth_ = width;
-    currentHeight_ = height;
-
-    unsigned newMaxWidth = NextPowerOfTwo(width);
-    unsigned newMaxHeight = NextPowerOfTwo(height);
-
-    SetMaxSize(newMaxWidth, newMaxHeight);
-
-    if (webClient_.NotNull())
-        webClient_->WasResized();
-
+    return texture_->GetWidth();
 }
 
-void WebTexture2D::SetMaxSize(unsigned width, unsigned height)
+int WebTexture2D::GetHeight() const
 {
-    if (maxWidth_ == width && height == maxHeight_)
+    return texture_->GetHeight();
+}
+
+void WebTexture2D::SetSize(int width, int height)
+{
+    if (width == texture_->GetWidth() && height == texture_->GetHeight())
         return;
 
-    if (!IsPowerOfTwo(width) || !IsPowerOfTwo(height))
-    {
-        LOGERRORF("WebTexture2D::SetMaxSize - attempted to set size to %ux%u (must be a power of two)", width, height );
-        return;
-    }
-
-    maxWidth_ = width;
-    maxHeight_ = height;
-
-    texture_->SetSize(maxWidth_, maxHeight_, Graphics::GetBGRAFormat(), TEXTURE_DYNAMIC);
-
-    LOGDEBUGF("WebTexture2D max size set: %u %u", maxWidth_, maxHeight_);
+    texture_->SetSize(width, height, Graphics::GetBGRAFormat(), TEXTURE_DYNAMIC);
 
 }
 

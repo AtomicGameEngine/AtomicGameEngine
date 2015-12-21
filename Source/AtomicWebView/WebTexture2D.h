@@ -20,12 +20,14 @@ class ATOMIC_API WebTexture2D : public WebRenderHandler
 public:
 
     /// Construct.
-    WebTexture2D(Context* context, int width = 1024, int height = 1024);
+    WebTexture2D(Context* context);
     /// Destruct.
     virtual ~WebTexture2D();
 
-    virtual void SetCurrentSize(unsigned width, unsigned height);
-    virtual void SetMaxSize(unsigned width, unsigned height);
+    int GetWidth() const;
+    int GetHeight() const;
+
+    void SetSize(int width, int height);
 
     CefRenderHandler* GetCEFRenderHandler();
 
