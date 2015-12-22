@@ -187,7 +187,7 @@ public:
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
-
+        webTexture2D_->GetTexture2D()->SetData(0, 0, 0, width, height, buffer);
     }
 
 #endif

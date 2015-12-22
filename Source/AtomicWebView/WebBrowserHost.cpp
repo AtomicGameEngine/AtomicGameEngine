@@ -48,6 +48,7 @@ private:
 
 WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
+
     const Vector<String>& arguments = GetArguments();
 
 #ifdef ATOMIC_PLATFORM_OSX
