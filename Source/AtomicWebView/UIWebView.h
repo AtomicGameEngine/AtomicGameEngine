@@ -51,6 +51,7 @@ public:
 protected:
 
     bool OnEvent(const tb::TBWidgetEvent &ev);
+    bool HandleKeyEvent(const tb::TBWidgetEvent &ev, bool keyDown);
 
 private:
 

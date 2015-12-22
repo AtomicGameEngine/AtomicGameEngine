@@ -40,7 +40,15 @@ public:
 
     void SendTextEvent(const String& text, unsigned modifiers);
 
-    void SendKeyEvent(int key, bool keyUp, int scanCode, unsigned raw, int buttons, int qual);
+    void SendKeyEvent(int scanCode, int qual, bool keyUp);
+
+    void ShortcutCut();
+    void ShortcutCopy();
+    void ShortcutPaste();
+    void ShortcutSelectAll();
+    void ShortcutUndo();
+    void ShortcutRedo();
+    void ShortcutDelete();
 
 private:
 

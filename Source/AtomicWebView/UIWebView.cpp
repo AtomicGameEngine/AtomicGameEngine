@@ -22,6 +22,7 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/Input/InputEvents.h>
+#include <Atomic/Input/Input.h>
 #include <Atomic/UI/UIRenderer.h>
 
 #include "WebClient.h"
@@ -142,8 +143,8 @@ UIWebView::UIWebView(Context* context, const String &initialURL) : UIWidget(cont
 
     initialURL_ = initialURL;
 
-    SubscribeToEvent(E_KEYDOWN, HANDLER(UIWebView, HandleKeyDown));
-    SubscribeToEvent(E_KEYUP, HANDLER(UIWebView, HandleKeyUp));
+    //SubscribeToEvent(E_KEYDOWN, HANDLER(UIWebView, HandleKeyDown));
+    //SubscribeToEvent(E_KEYUP, HANDLER(UIWebView, HandleKeyUp));
     SubscribeToEvent(E_TEXTINPUT, HANDLER(UIWebView, HandleTextInput));
 }
 
@@ -166,7 +167,7 @@ void UIWebView::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     int buttons = eventData[KeyDown::P_BUTTONS].GetInt();
     int qual = eventData[KeyDown::P_QUALIFIERS].GetInt();
 
-    webClient_->SendKeyEvent(key, false, scanCode, raw, buttons, qual);
+    webClient_->SendKeyEvent(scanCode, qual, false);
 
 }
 
@@ -181,7 +182,7 @@ void UIWebView::HandleKeyUp(StringHash eventType, VariantMap& eventData)
     int buttons = eventData[KeyUp::P_BUTTONS].GetInt();
     int qual = eventData[KeyUp::P_QUALIFIERS].GetInt();
 
-    webClient_->SendKeyEvent(key, true, scanCode, raw, buttons, qual);
+    webClient_->SendKeyEvent(scanCode, qual, true);
 
 }
 
@@ -193,6 +194,69 @@ void UIWebView::HandleTextInput(StringHash eventType, VariantMap& eventData)
     String text = eventData[TextInput::P_TEXT].GetString();
 
     webClient_->SendTextEvent(text, 0);
+
+}
+
+bool UIWebView::HandleKeyEvent(const TBWidgetEvent &ev, bool keyDown)
+{
+    if (!keyDown)
+        return true;
+
+    if (ev.special_key == TB_KEY_UNDEFINED)
+        return true;
+
+    int qual = 0;
+
+    if (ev.modifierkeys & TB_CTRL)
+        qual |= QUAL_CTRL;
+    if (ev.modifierkeys & TB_SHIFT)
+        qual |= QUAL_SHIFT;
+    if (ev.modifierkeys & TB_ALT)
+        qual |= QUAL_ALT;
+
+    int scanCode = SDL_SCANCODE_UNKNOWN;
+
+    switch (ev.special_key)
+    {
+    case TB_KEY_UP:
+        scanCode = SDL_SCANCODE_UP;
+        break;
+    case TB_KEY_DOWN:
+        scanCode = SDL_SCANCODE_DOWN;
+        break;
+    case TB_KEY_RIGHT:
+        scanCode = SDL_SCANCODE_RIGHT;
+        break;
+    case TB_KEY_LEFT:
+        scanCode = SDL_SCANCODE_LEFT;
+        break;
+    case TB_KEY_ENTER:
+        scanCode = SDL_SCANCODE_RETURN;
+        break;
+    case TB_KEY_DELETE:
+    case TB_KEY_BACKSPACE:
+        scanCode = SDL_SCANCODE_BACKSPACE;
+        break;
+    default:
+        break;
+    }
+
+    if (scanCode == SDL_SCANCODE_UNKNOWN)
+        return true;
+
+    webClient_->SendKeyEvent(scanCode, qual, !keyDown);
+
+    return true;
+
+    /*
+    TB_KEY_UNDEFINED = 0,
+    TB_KEY_UP, TB_KEY_DOWN, TB_KEY_LEFT, TB_KEY_RIGHT,
+    TB_KEY_PAGE_UP, TB_KEY_PAGE_DOWN, TB_KEY_HOME, TB_KEY_END,
+    TB_KEY_TAB, TB_KEY_BACKSPACE, TB_KEY_INSERT, TB_KEY_DELETE,
+    TB_KEY_ENTER, TB_KEY_ESC,
+    TB_KEY_F1, TB_KEY_F2, TB_KEY_F3, TB_KEY_F4, TB_KEY_F5, TB_KEY_F6,
+    TB_KEY_F7, TB_KEY_F8, TB_KEY_F9, TB_KEY_F10, TB_KEY_F11, TB_KEY_F12
+    */
 
 }
 
@@ -215,11 +279,45 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     }
     else if (ev.type == EVENT_TYPE_KEY_DOWN)
     {
-        return true;
+        return HandleKeyEvent(ev, true);
     }
     else if (ev.type == EVENT_TYPE_KEY_UP)
     {
-        return true;
+        return HandleKeyEvent(ev, false);
+    }
+    else if (ev.type == EVENT_TYPE_SHORTCUT)
+    {
+        if (ev.ref_id == TBIDC("copy"))
+        {
+            webClient_->ShortcutCopy();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("paste"))
+        {
+            webClient_->ShortcutPaste();
+            return true;
+        }
+        if (ev.ref_id == TBIDC("cut"))
+        {
+            webClient_->ShortcutCut();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("selectall"))
+        {
+            webClient_->ShortcutSelectAll();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("undo"))
+        {
+            webClient_->ShortcutUndo();
+            return true;
+        }
+        else if (ev.ref_id == TBIDC("redo"))
+        {
+            webClient_->ShortcutRedo();
+            return true;
+        }
+
     }
 
     return UIWidget::OnEvent(ev);

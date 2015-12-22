@@ -248,7 +248,7 @@ void WebClient::SendMouseWheelEvent(int x, int y, unsigned modifier,int deltaX, 
 } cef_event_flags_t;
 
 */
-void WebClient::SendKeyEvent(int key, bool keyUp, int scanCode, unsigned raw, int buttons, int qual)
+void WebClient::SendKeyEvent(int scanCode, int qual, bool keyUp)
 {
     if (!d_->browser_.get())
         return;
@@ -256,15 +256,14 @@ void WebClient::SendKeyEvent(int key, bool keyUp, int scanCode, unsigned raw, in
     CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
     CefKeyEvent keyEvent;
 
+    if (keyUp)
+        return;
+
     // handle return special
     if (scanCode == SDL_SCANCODE_RETURN)
     {
-        if (keyUp)
-            return;
-
         keyEvent.type = KEYEVENT_CHAR;
         keyEvent.character = 13;
-        keyEvent.unmodified_character = 13;
         host->SendKeyEvent(keyEvent);
         return;
     }
@@ -305,7 +304,22 @@ void WebClient::SendKeyEvent(int key, bool keyUp, int scanCode, unsigned raw, in
 
     keyEvent.type = keyUp ? KEYEVENT_KEYUP : KEYEVENT_KEYDOWN;
     keyEvent.native_key_code = nativeKeyCode;
+
     host->SendKeyEvent(keyEvent);
+
+#ifdef ATOMIC_PLATFORM_OSX
+    // Send an empty key event on OSX, which seems to fix
+    // keyboard problems on OSX with cefclient
+    // ./cefclient --off-screen-rendering-enabled
+    // return does not work at all on cef client with offscreen
+    // bad interaction with arrow keys (for example here, after
+    // hitting arrow keys, return/text takes a couple presses to register
+    keyEvent.type = keyUp ? KEYEVENT_KEYUP : KEYEVENT_KEYDOWN;
+    keyEvent.modifiers = 0;
+    keyEvent.native_key_code = 0;
+    host->SendKeyEvent(keyEvent);
+#endif
+
 
 }
 
@@ -321,6 +335,70 @@ void WebClient::SendTextEvent(const String& text, unsigned modifiers)
     keyEvent.character = text[0];
 
     host->SendKeyEvent(keyEvent);
+}
+
+void WebClient::ShortcutCut()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->Cut();
+
+}
+
+
+void WebClient::ShortcutCopy()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->Copy();
+
+}
+
+void WebClient::ShortcutPaste()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->Paste();
+
+}
+
+void WebClient::ShortcutSelectAll()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->SelectAll();
+
+}
+
+void WebClient::ShortcutUndo()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->Undo();
+
+}
+
+void WebClient::ShortcutRedo()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->Redo();
+
+}
+
+void WebClient::ShortcutDelete()
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetFocusedFrame()->Delete();
+
 }
 
 void WebClient::WasResized()
