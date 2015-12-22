@@ -54,6 +54,10 @@ protected:
 
 private:
 
+    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+    void HandleKeyUp(StringHash eventType, VariantMap& eventData);
+    void HandleTextInput(StringHash eventType, VariantMap& eventData);
+
     SharedPtr<WebClient> webClient_;
     SharedPtr<WebTexture2D> webTexture_;
 

@@ -50,23 +50,10 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
     const Vector<String>& arguments = GetArguments();
 
-    const char** _argv { 0 };
-
-    PODVector<const char*> argv;
-    for (unsigned i = 0; i < arguments.Size(); i++)
-        argv.Push(arguments[i].CString());
-
-    CefMainArgs args(arguments.Size(), arguments.Size() ? (char**) &argv[0] : (char **) _argv);
-
-    int result = CefExecuteProcess(args, nullptr, nullptr);
-
-    if (result >= 0)
-    {
-        LOGERROR("CEFExecuteProcess - Error");
-    }
+    const char* _argv[3] = { "", "--enable-media-stream", "--enable-usermedia-screen-capturing" };
+    CefMainArgs args(3, (char**) &_argv);
 
     CefSettings settings;
-
     settings.windowless_rendering_enabled = true;
 
     // If losing OSX system menu, it means we're calling this

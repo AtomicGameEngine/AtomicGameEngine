@@ -38,6 +38,10 @@ public:
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
     void SendMouseWheelEvent(int x, int y, unsigned modifier, int deltaX, int deltaY) const;
 
+    void SendTextEvent(const String& text, unsigned modifiers);
+
+    void SendKeyEvent(int key, bool keyUp, int scanCode, unsigned raw, int buttons, int qual);
+
 private:
 
     void WasResized();

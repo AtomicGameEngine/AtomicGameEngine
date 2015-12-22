@@ -9,7 +9,6 @@
 #include <ThirdParty/CEF/include/base/cef_bind.h>
 #include <ThirdParty/CEF/include/wrapper/cef_closure_task.h>
 
-
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
@@ -19,6 +18,8 @@
 
 #include "WebBrowserHost.h"
 #include "WebClient.h"
+
+#include "WebKeyboardSDL.h"
 
 namespace Atomic
 {
@@ -229,7 +230,98 @@ void WebClient::SendMouseWheelEvent(int x, int y, unsigned modifier,int deltaX, 
 
 }
 
+/*
 
+  EVENTFLAG_CAPS_LOCK_ON        = 1 << 0,
+  EVENTFLAG_SHIFT_DOWN          = 1 << 1,
+  EVENTFLAG_CONTROL_DOWN        = 1 << 2,
+  EVENTFLAG_ALT_DOWN            = 1 << 3,
+  EVENTFLAG_LEFT_MOUSE_BUTTON   = 1 << 4,
+  EVENTFLAG_MIDDLE_MOUSE_BUTTON = 1 << 5,
+  EVENTFLAG_RIGHT_MOUSE_BUTTON  = 1 << 6,
+  // Mac OS-X command key.
+  EVENTFLAG_COMMAND_DOWN        = 1 << 7,
+  EVENTFLAG_NUM_LOCK_ON         = 1 << 8,
+  EVENTFLAG_IS_KEY_PAD          = 1 << 9,
+  EVENTFLAG_IS_LEFT             = 1 << 10,
+  EVENTFLAG_IS_RIGHT            = 1 << 11,
+} cef_event_flags_t;
+
+*/
+void WebClient::SendKeyEvent(int key, bool keyUp, int scanCode, unsigned raw, int buttons, int qual)
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
+    CefKeyEvent keyEvent;
+
+    // handle return special
+    if (scanCode == SDL_SCANCODE_RETURN)
+    {
+        if (keyUp)
+            return;
+
+        keyEvent.type = KEYEVENT_CHAR;
+        keyEvent.character = 13;
+        keyEvent.unmodified_character = 13;
+        host->SendKeyEvent(keyEvent);
+        return;
+    }
+
+    unsigned modifiers = EVENTFLAG_NONE;
+
+    if (qual & QUAL_SHIFT)
+        modifiers |= EVENTFLAG_SHIFT_DOWN;
+    if (qual & QUAL_ALT)
+        modifiers |= EVENTFLAG_ALT_DOWN;
+    if (qual & QUAL_CTRL)
+        modifiers |= EVENTFLAG_CONTROL_DOWN;
+
+#ifdef ATOMIC_PLATFORM_OSX
+    Input* input = GetSubsystem<Input>();
+    if (input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI))
+    {
+        modifiers |= EVENTFLAG_COMMAND_DOWN;
+    }
+#endif
+
+    keyEvent.modifiers = modifiers;
+
+    int nativeKeyCode = GetNativeKeyFromSDLScanCode(scanCode);
+
+    if (nativeKeyCode == -1)
+        return;
+
+    /*
+    target->type = src->type;
+    target->modifiers = src->modifiers;
+    target->windows_key_code = src->windows_key_code;
+    target->native_key_code = src->native_key_code;
+    target->is_system_key = src->is_system_key;
+    target->character = src->character;
+    target->unmodified_character = src->unmodified_character;
+    */
+
+    keyEvent.type = keyUp ? KEYEVENT_KEYUP : KEYEVENT_KEYDOWN;
+    keyEvent.native_key_code = nativeKeyCode;
+    host->SendKeyEvent(keyEvent);
+
+}
+
+void WebClient::SendTextEvent(const String& text, unsigned modifiers)
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
+
+    CefKeyEvent keyEvent;
+    keyEvent.type = KEYEVENT_CHAR;
+    keyEvent.character = text[0];
+
+    host->SendKeyEvent(keyEvent);
+}
 
 void WebClient::WasResized()
 {

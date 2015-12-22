@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/IO/Log.h>
+#include <Atomic/Input/InputEvents.h>
 #include <Atomic/UI/UIRenderer.h>
 
 #include "WebClient.h"
@@ -129,6 +130,7 @@ UIWebView::UIWebView(Context* context, const String &initialURL) : UIWidget(cont
     widget_ = new WebViewWidget();
     widget_->SetDelegate(this);
     widget_->SetGravity(WIDGET_GRAVITY_ALL);
+    widget_->SetIsFocusable(true);
     ((WebViewWidget*)widget_)->webView_ = this;
 
     UI* ui = GetSubsystem<UI>();
@@ -140,10 +142,57 @@ UIWebView::UIWebView(Context* context, const String &initialURL) : UIWidget(cont
 
     initialURL_ = initialURL;
 
+    SubscribeToEvent(E_KEYDOWN, HANDLER(UIWebView, HandleKeyDown));
+    SubscribeToEvent(E_KEYUP, HANDLER(UIWebView, HandleKeyUp));
+    SubscribeToEvent(E_TEXTINPUT, HANDLER(UIWebView, HandleTextInput));
 }
 
 UIWebView::~UIWebView()
 {
+
+}
+
+void UIWebView::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    if (!widget_ || !widget_->GetIsFocused())
+        return;
+
+    //if (eventData[KeyDown::P_REPEAT].GetBool())
+    //    return;
+
+    int key = eventData[KeyDown::P_KEY].GetInt();
+    int scanCode = eventData[KeyDown::P_SCANCODE].GetInt();
+    unsigned raw = eventData[KeyDown::P_RAW].GetUInt();
+    int buttons = eventData[KeyDown::P_BUTTONS].GetInt();
+    int qual = eventData[KeyDown::P_QUALIFIERS].GetInt();
+
+    webClient_->SendKeyEvent(key, false, scanCode, raw, buttons, qual);
+
+}
+
+void UIWebView::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+{
+    if (!widget_ || !widget_->GetIsFocused())
+        return;
+
+    int key = eventData[KeyUp::P_KEY].GetInt();
+    int scanCode = eventData[KeyUp::P_SCANCODE].GetInt();
+    unsigned raw = eventData[KeyUp::P_RAW].GetUInt();
+    int buttons = eventData[KeyUp::P_BUTTONS].GetInt();
+    int qual = eventData[KeyUp::P_QUALIFIERS].GetInt();
+
+    webClient_->SendKeyEvent(key, true, scanCode, raw, buttons, qual);
+
+}
+
+void UIWebView::HandleTextInput(StringHash eventType, VariantMap& eventData)
+{
+    if (!widget_ || !widget_->GetIsFocused())
+        return;
+
+    String text = eventData[TextInput::P_TEXT].GetString();
+
+    webClient_->SendTextEvent(text, 0);
 
 }
 
@@ -172,7 +221,6 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     {
         return true;
     }
-
 
     return UIWidget::OnEvent(ev);
 }
