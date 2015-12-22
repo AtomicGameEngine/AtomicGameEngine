@@ -89,6 +89,7 @@ public:
         return true;
     }
 
+#ifdef ATOMIC_PLATFORM_OSX
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
@@ -181,6 +182,15 @@ public:
         glDisable(GL_TEXTURE_2D);
 
     }
+#else
+
+    void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
+                 const void *buffer, int width, int height) OVERRIDE
+    {
+
+    }
+
+#endif
 
 private:
 
@@ -231,7 +241,7 @@ void WebTexture2D::SetSize(int width, int height)
     if (width == texture_->GetWidth() && height == texture_->GetHeight())
         return;
 
-    texture_->SetSize(width, height, Graphics::GetBGRAFormat(), TEXTURE_DYNAMIC);
+    texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC);
 
 }
 

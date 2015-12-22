@@ -50,8 +50,12 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
     const Vector<String>& arguments = GetArguments();
 
+#ifdef ATOMIC_PLATFORM_OSX
     const char* _argv[3] = { "", "--enable-media-stream", "--enable-usermedia-screen-capturing" };
     CefMainArgs args(3, (char**) &_argv);
+#else
+    CefMainArgs args;
+#endif
 
     CefSettings settings;
     settings.windowless_rendering_enabled = true;

@@ -38,6 +38,11 @@ if(OS_MACOSX)
 
 endif()
 
+if(OS_WINDOWS)
+    set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
+    set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/libcef.lib")
+endif()
+
 #
 # Shared macros.
 #

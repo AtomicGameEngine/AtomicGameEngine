@@ -87,8 +87,14 @@ public:
 
         if(SDL_GetWindowWMInfo(sdlWindow, &info))
         {
+#ifdef ATOMIC_PLATFORM_OSX
             NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
             windowInfo.SetAsWindowless(view, false);
+#endif
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+         windowInfo.SetAsWindowless(info.info.win.window, false);
+#endif
 
             webClient_->renderHandler_->SetSize(width, height);
             CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,

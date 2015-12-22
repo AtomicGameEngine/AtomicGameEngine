@@ -54,13 +54,17 @@ if(OS_MACOSX)
   set(CEF_HELPER_TARGET "AtomicEditor Helper")
 endif()
 
-# Logical target used to link the libcef library.
-ADD_LOGICAL_TARGET("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
-
-# Determine the target output directory.
-SET_CEF_TARGET_OUT_DIR()
+if (OS_WINDOWS)
+    target_link_libraries(AtomicEditor AtomicWebView libcef_dll_wrapper "${CEF_LIB_RELEASE}")
+endif()
 
 if(OS_MACOSX)
+
+  # Logical target used to link the libcef library.
+  ADD_LOGICAL_TARGET("libcef_lib" "${CEF_LIB_DEBUG}" "${CEF_LIB_RELEASE}")
+
+  # Determine the target output directory.
+  SET_CEF_TARGET_OUT_DIR()
 
   # Output paths for the app bundles.
   set(CEF_APP "${CEF_TARGET_OUT_DIR}/${CEF_TARGET}.app")
