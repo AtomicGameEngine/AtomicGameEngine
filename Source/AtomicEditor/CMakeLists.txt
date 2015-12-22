@@ -3,8 +3,7 @@ include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
                       ${CMAKE_SOURCE_DIR}/Source/ThirdParty/kNet/include
                       ${CMAKE_SOURCE_DIR}/Source/ThirdParty/FreeType/include
                       ${CMAKE_SOURCE_DIR}/Source/ThirdParty/Box2D
-                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog
-                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/CEF )
+                      ${CMAKE_SOURCE_DIR}/Source/ThirdParty/nativefiledialog )
 
 file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
 

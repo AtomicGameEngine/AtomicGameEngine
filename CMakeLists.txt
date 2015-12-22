@@ -73,4 +73,9 @@ if(CLDOC)
     )
 endif()
 
+if (ATOMIC_WEBVIEW)
+  include_directories (${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/)
+  add_subdirectory(Submodules/CEF/MacOSX/libcef_dll)
+endif()
+
 add_subdirectory(Source)

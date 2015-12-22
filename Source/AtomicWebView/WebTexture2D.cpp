@@ -3,7 +3,7 @@
 #include <ThirdParty/GLEW/glew.h>
 #endif
 
-#include <ThirdParty/CEF/include/cef_render_handler.h>
+#include <include/cef_render_handler.h>
 
 #include <Atomic/IO/Log.h>
 

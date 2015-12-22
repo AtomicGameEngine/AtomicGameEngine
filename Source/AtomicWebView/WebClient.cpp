@@ -2,12 +2,12 @@
 #include <SDL/include/SDL.h>
 #include <ThirdParty/SDL/include/SDL_syswm.h>
 
-#include <ThirdParty/CEF/include/cef_app.h>
-#include <ThirdParty/CEF/include/cef_client.h>
-#include <ThirdParty/CEF/include/cef_browser.h>
-#include <ThirdParty/CEF/include/wrapper/cef_helpers.h>
-#include <ThirdParty/CEF/include/base/cef_bind.h>
-#include <ThirdParty/CEF/include/wrapper/cef_closure_task.h>
+#include <include/cef_app.h>
+#include <include/cef_client.h>
+#include <include/cef_browser.h>
+#include <include/wrapper/cef_helpers.h>
+#include <include/base/cef_bind.h>
+#include <include/wrapper/cef_closure_task.h>
 
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>

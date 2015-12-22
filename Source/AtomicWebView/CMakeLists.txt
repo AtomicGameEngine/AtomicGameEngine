@@ -1,5 +1,6 @@
+
 include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty/CEF )
+                     ${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/)
 
 file (GLOB SOURCE_FILES *.cpp *.h)
 
@@ -16,4 +17,3 @@ endif()
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE} ${PLATFORM_SOURCE} )
 
 add_library(AtomicWebView ${SOURCE_FILES})
-
