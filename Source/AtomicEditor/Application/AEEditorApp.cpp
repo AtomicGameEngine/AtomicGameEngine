@@ -122,6 +122,7 @@ void AEEditorApp::Setup()
             engineParameters_["WindowPositionY"] = editorWindow.Get("y").GetUInt();
             engineParameters_["WindowWidth"] = editorWindow.Get("width").GetUInt();
             engineParameters_["WindowHeight"] = editorWindow.Get("height").GetUInt();
+            engineParameters_["WindowMaximized"] = editorWindow.Get("maximized").GetBool();
         }
     }
 }

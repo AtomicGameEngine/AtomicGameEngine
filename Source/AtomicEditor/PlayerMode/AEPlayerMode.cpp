@@ -249,6 +249,7 @@ void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
     data[P_WIDTH] = graphics->GetWidth();
     data[P_HEIGHT] = graphics->GetHeight();
     data[P_MONITOR] = graphics->GetCurrentMonitor();
+    data[P_MAXIMIZED] = graphics->GetMaximized();
     ipc_->SendEventToBroker(E_IPCPLAYERWINDOWCHANGED, data);
     SendEvent(E_PLAYERQUIT);
 }

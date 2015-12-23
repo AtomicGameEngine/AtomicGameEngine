@@ -43,6 +43,7 @@ declare module Atomic {
         fullscreen: boolean;
         resizable: boolean;
         borderless: boolean;
+        maximized: boolean;
 
     }
 

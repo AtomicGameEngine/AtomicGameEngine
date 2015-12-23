@@ -379,6 +379,9 @@ bool Engine::Initialize(const VariantMap& parameters)
         ))
             return false;
 
+        if (GetParameter(parameters, "WindowMaximized", false) == true)
+            graphics->Maximize();
+
         if (HasParameter(parameters, "DumpShaders"))
             graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
         if (HasParameter(parameters, "RenderPath"))
