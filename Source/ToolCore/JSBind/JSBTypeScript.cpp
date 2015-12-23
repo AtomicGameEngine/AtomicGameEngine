@@ -75,7 +75,9 @@ String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
 
 void JSBTypeScript::Begin()
 {
-    source_ += "//Atomic TypeScript Definitions\n\n\n";
+    source_ += "//Atomic TypeScript Definitions\n";
+    source_ += "/* tslint:disable */\n\n\n";
+
 
     if (package_->GetName() != "Atomic")
     {

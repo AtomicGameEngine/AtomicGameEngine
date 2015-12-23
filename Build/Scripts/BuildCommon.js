@@ -14,21 +14,35 @@ namespace('build', function() {
 
         var modules = host.getScriptModules(platform);
         var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
+        var node;
+
+        switch(os.platform()) {
+            case "win32":
+                node = "Build/Windows/node/node.exe";
+                break;
+            case "darwin":
+                node = "Build/Mac/node/node";
+                break;
+            case "linux":
+                node = "Build/Linux/node/node";
+                break;
+        }
 
         var cmds = [];
         for (var pkgName in modules) {
             cmds.push(bindCmd + "Script/Packages/" + pkgName + "/ " + platform);
         }
 
-        // Compile the Editor Scripts
-        if (os.platform() == "win32")
-          cmds.push(atomicRoot + "Build/Windows/node/node.exe " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
-        else if (os.platform() == "darwin")
-          cmds.push(atomicRoot + "Build/Mac/node/node " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
-        else if (os.platform() == "linux") {
-          cmds.push(atomicRoot + "Build/Linux/node/node " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
+        if (node) {
+          // compile
+          cmds.push(node + " ./Build/node_modules/typeScript/bin/tsc -p ./Script");
+          // lint
+          cmds.push(node + " ./Build/node_modules/tslint/bin/tslint -c ./Script/tslint.json ./Script/**/*.ts");
+        } else {
+            throw new Error("Node not configured for this platform: " + os.platform());
         }
-        jake.exec(cmds, function() {
+
+         jake.exec(cmds, function() {
 
           complete();
 
