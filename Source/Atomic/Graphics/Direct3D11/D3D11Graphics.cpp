@@ -2791,6 +2791,13 @@ int Graphics::GetMonitorsNumber()
 {
     return SDL_GetNumVideoDisplays();
 }
+bool Graphics::GetMaximized()
+{
+    if (!impl_->window_)
+        return false;
+
+    return SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MAXIMIZED;
+}
 // ATOMIC END
 
 }

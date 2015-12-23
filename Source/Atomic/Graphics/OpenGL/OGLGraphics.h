@@ -530,6 +530,8 @@ public:
     int GetCurrentMonitor();
     /// Return the available monitors number
     int GetMonitorsNumber();
+    /// Return true if window is maximized
+    bool GetMaximized();
     // ATOMIC END
 
 private:
