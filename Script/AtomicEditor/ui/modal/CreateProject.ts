@@ -98,7 +98,7 @@ class CreateProject extends ModalWindow {
             }
 
             // Do the creation!
-            if (templateDetail) {
+            if (templateDetail && fileSystem.dirExists(templateDetail.folder)) {
 
                 fileSystem.copyDir(templateDetail.folder, folder);
 
@@ -127,7 +127,15 @@ class CreateProject extends ModalWindow {
                 this.sendEvent(EditorEvents.LoadProject, { path: folder });
                 return true;
             } else {
-                var message = "Unable to create project for language:  " + selectedLanguage + "\n\nPlease choose a different language";
+                let message = [
+                    "Unable to create project for:",
+                    "",
+                    `language: ${selectedLanguage}`,
+                    `template: ${templateDetail.folder}`,
+                    "",
+                    "Please choose a different language."
+                ].join("\n");
+
                 EditorUI.showModalError("New Project Editor Error", message);
                 return false;
             }
