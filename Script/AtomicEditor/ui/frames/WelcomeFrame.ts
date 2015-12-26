@@ -50,6 +50,20 @@ class WelcomeFrame extends ScriptWidget {
 
     addExample(example: ProjectTemplates.ProjectTemplateDefinition) {
 
+        var fileSystem = Atomic.getFileSystem();
+
+        // Verify that at least one of the projects for this example exists, otherwise bounce out
+        let exists = false;
+        example.templates.forEach(template => {
+            if (fileSystem.dirExists(template.folder)) {
+                exists = true;
+            }
+        });
+
+        if (!exists) {
+            return;
+        }
+
         var exlayout = <Atomic.UILayout>this.getWidget("examples_layout");
 
         if (!this.currentExampleLayout) {
