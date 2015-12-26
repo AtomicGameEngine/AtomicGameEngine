@@ -26,6 +26,7 @@ EVENT(E_IPCPLAYERWINDOWCHANGED, IPCPlayerWindowChanged)
     PARAM(P_WIDTH, Width);
     PARAM(P_HEIGHT, Height);
     PARAM(P_MONITOR, Monitor);
+    PARAM(P_MAXIMIZED, Maximized);
 }
 
 EVENT(E_PLAYERQUIT, PlayerQuit)

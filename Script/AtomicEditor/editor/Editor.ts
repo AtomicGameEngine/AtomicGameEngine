@@ -54,10 +54,16 @@ class Editor extends Atomic.ScriptObject {
         });
 
         this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {
+            //if player window is maximized, then we want keep the window size from the previous state
+            if (data.maximized) {
+                Preferences.getInstance().playerWindow.maximized = true;
+                return;
+            }
             Preferences.getInstance().savePlayerWindowData({x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized});
         });
 
         this.subscribeToEvent("ScreenMode", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
+        this.subscribeToEvent("WindowPos", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
 
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
