@@ -47,6 +47,8 @@ PlayerMode::PlayerMode(Context* context) :
     SubscribeToEvent(E_LOGMESSAGE, HANDLER(PlayerMode, HandleLogMessage));
     SubscribeToEvent(E_JSERROR, HANDLER(PlayerMode, HandleJSError));
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(PlayerMode, HandleExitRequest));
+    SubscribeToEvent(E_SCREENMODE, HANDLER(PlayerMode, HandlePlayerWindowChanged));
+    SubscribeToEvent(E_WINDOWPOS, HANDLER(PlayerMode, HandlePlayerWindowChanged));
 
     // BEGIN LICENSE MANAGEMENT
     SubscribeToEvent(E_BEGINVIEWRENDER, HANDLER(PlayerMode, HandleViewRender));
@@ -239,7 +241,7 @@ void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
 
 }
 
-void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
+void PlayerMode::HandlePlayerWindowChanged(StringHash eventType, VariantMap& eventData)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     using namespace IPCPlayerWindowChanged;
@@ -249,7 +251,12 @@ void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
     data[P_WIDTH] = graphics->GetWidth();
     data[P_HEIGHT] = graphics->GetHeight();
     data[P_MONITOR] = graphics->GetCurrentMonitor();
+    data[P_MAXIMIZED] = graphics->GetMaximized();
     ipc_->SendEventToBroker(E_IPCPLAYERWINDOWCHANGED, data);
+}
+
+void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
+{
     SendEvent(E_PLAYERQUIT);
 }
 

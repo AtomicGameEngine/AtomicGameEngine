@@ -173,6 +173,10 @@ void AEPlayerApplication::Setup()
             else if (argument == "--resizable") 
             {
                 engineParameters_["WindowResizable"] = true;
+            } 
+            else if (argument == "--maximize")
+            {
+                engineParameters_["WindowMaximized"] = true;
             }
         }
     }

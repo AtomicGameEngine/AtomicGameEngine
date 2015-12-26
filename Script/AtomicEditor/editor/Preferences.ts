@@ -83,27 +83,26 @@ class Preferences {
 
     }
 
-    write(): void {
+    write(): boolean {
         var filePath = this.getPreferencesFullPath();
         var jsonFile = new Atomic.File(filePath, Atomic.FILE_WRITE);
-        if (!jsonFile.isOpen()) return;
-        var graphics = Atomic.getGraphics();
-        var pos, width, height;
-        if (graphics && !graphics.getFullscreen()) {
-            pos = graphics.getWindowPosition();
-            width = graphics.getWidth();
-            height = graphics.getHeight();
-        }
-        this._prefs.editorWindow = { x: pos[0], y: pos[1], width: width, height: height, monitor: graphics.getCurrentMonitor() };
+        if (!jsonFile.isOpen()) return false;
         jsonFile.writeString(JSON.stringify(this._prefs, null, 2));
     }
 
-    savePlayerWindowData(x, y, width, height, monitor) {
-        this._prefs.playerWindow = { x: x, y: y, width: width, height: height, monitor: monitor };
+    saveEditorWindowData(windowData:WindowData) {
+        this._prefs.editorWindow = windowData;
+        this.write();
+    }
+
+    savePlayerWindowData(windowData:WindowData) {
+        this._prefs.playerWindow = windowData;
+        this.write();
     }
 
     useDefaultConfig():void {
         this._prefs = new PreferencesFormat();
+        if (!this._prefs.recentProjects) this._prefs.recentProjects = [""];
     }
 
     get editorWindow():WindowData {
@@ -129,6 +128,7 @@ interface WindowData {
     width: number;
     height: number;
     monitor: number;
+    maximized: boolean;
 }
 
 class PreferencesFormat {
