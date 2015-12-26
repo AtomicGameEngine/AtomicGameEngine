@@ -375,12 +375,10 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "WindowResizable", false).GetBool(),
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
-            GetParameter(parameters, "MultiSample", 1).GetInt()
+            GetParameter(parameters, "MultiSample", 1).GetInt(),
+            GetParameter(parameters, "WindowMaximized", false).GetBool()
         ))
             return false;
-
-        if (GetParameter(parameters, "WindowMaximized", false) == true)
-            graphics->Maximize();
 
         if (HasParameter(parameters, "DumpShaders"))
             graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());

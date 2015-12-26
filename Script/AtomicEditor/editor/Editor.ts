@@ -54,12 +54,17 @@ class Editor extends Atomic.ScriptObject {
         });
 
         this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {
+            var playerWindow = Preferences.getInstance().playerWindow;
             //if player window is maximized, then we want keep the window size from the previous state
             if (data.maximized) {
-                Preferences.getInstance().playerWindow.maximized = true;
-                return;
+                playerWindow.x = data.posX;
+                playerWindow.y = data.posY;
+                playerWindow.monitor = data.monitor;
+                playerWindow.maximized = true;
+            } else {
+                playerWindow = {x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized};
             }
-            Preferences.getInstance().savePlayerWindowData({x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized});
+            Preferences.getInstance().savePlayerWindowData(playerWindow);
         });
 
         this.subscribeToEvent("ScreenMode", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
@@ -105,7 +110,10 @@ class Editor extends Atomic.ScriptObject {
         var editorWindowData = Preferences.getInstance().editorWindow;
 
         if (graphics.getMaximized()) {
+            editorWindowData.x = pos[0];
+            editorWindowData.y = pos[1];
             editorWindowData.maximized = true;
+            editorWindowData.monitor = monitor;
         } else {
             editorWindowData = {x: pos[0], y: pos[1], width: width, height: height, monitor: monitor, maximized: false}
         }
