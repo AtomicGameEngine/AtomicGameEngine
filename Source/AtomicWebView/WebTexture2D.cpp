@@ -187,7 +187,10 @@ public:
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
-        webTexture2D_->GetTexture2D()->SetData(0, 0, 0, width, height, buffer);
+        if (type == PET_VIEW)
+        {
+            webTexture2D_->GetTexture2D()->SetData(0, 0, 0, width, height, buffer);
+        }
     }
 
 #endif
@@ -208,7 +211,7 @@ WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context)
 
     texture_ = new Texture2D(context_);
     texture_->SetNumLevels(1);
-    texture_->SetFilterMode(FILTER_BILINEAR);
+    texture_->SetFilterMode(FILTER_NEAREST);
 }
 
 WebTexture2D::~WebTexture2D()
