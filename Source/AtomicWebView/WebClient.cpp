@@ -18,8 +18,7 @@
 
 #include "WebBrowserHost.h"
 #include "WebClient.h"
-
-#include "WebKeyboardSDL.h"
+#include "WebKeyboard.h"
 
 namespace Atomic
 {
@@ -254,62 +253,17 @@ void WebClient::SendMouseWheelEvent(int x, int y, unsigned modifier,int deltaX, 
 } cef_event_flags_t;
 
 */
-void WebClient::SendKeyEvent(int scanCode, int qual, bool keyUp)
+void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
 {
     if (!d_->browser_.get())
         return;
 
     CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
+
     CefKeyEvent keyEvent;
 
-    if (keyUp)
+    if (!ConvertKeyEvent(eventType, eventData, keyEvent))
         return;
-
-    // handle return special
-    if (scanCode == SDL_SCANCODE_RETURN)
-    {
-        keyEvent.type = KEYEVENT_CHAR;
-        keyEvent.character = 13;
-        host->SendKeyEvent(keyEvent);
-        return;
-    }
-
-    unsigned modifiers = EVENTFLAG_NONE;
-
-    if (qual & QUAL_SHIFT)
-        modifiers |= EVENTFLAG_SHIFT_DOWN;
-    if (qual & QUAL_ALT)
-        modifiers |= EVENTFLAG_ALT_DOWN;
-    if (qual & QUAL_CTRL)
-        modifiers |= EVENTFLAG_CONTROL_DOWN;
-
-#ifdef ATOMIC_PLATFORM_OSX
-    Input* input = GetSubsystem<Input>();
-    if (input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI))
-    {
-        modifiers |= EVENTFLAG_COMMAND_DOWN;
-    }
-#endif
-
-    keyEvent.modifiers = modifiers;
-
-    int nativeKeyCode = GetNativeKeyFromSDLScanCode(scanCode);
-
-    if (nativeKeyCode == -1)
-        return;
-
-    /*
-    target->type = src->type;
-    target->modifiers = src->modifiers;
-    target->windows_key_code = src->windows_key_code;
-    target->native_key_code = src->native_key_code;
-    target->is_system_key = src->is_system_key;
-    target->character = src->character;
-    target->unmodified_character = src->unmodified_character;
-    */
-
-    keyEvent.type = keyUp ? KEYEVENT_KEYUP : KEYEVENT_KEYDOWN;
-    keyEvent.native_key_code = nativeKeyCode;
 
     host->SendKeyEvent(keyEvent);
 
@@ -329,7 +283,7 @@ void WebClient::SendKeyEvent(int scanCode, int qual, bool keyUp)
 
 }
 
-void WebClient::SendTextEvent(const String& text, unsigned modifiers)
+void WebClient::SendTextInputEvent(const StringHash eventType, VariantMap& eventData)
 {
     if (!d_->browser_.get())
         return;
@@ -337,8 +291,9 @@ void WebClient::SendTextEvent(const String& text, unsigned modifiers)
     CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
 
     CefKeyEvent keyEvent;
-    keyEvent.type = KEYEVENT_CHAR;
-    keyEvent.character = text[0];
+
+    if (!ConvertTextInputEvent(eventType, eventData, keyEvent))
+        return;
 
     host->SendKeyEvent(keyEvent);
 }

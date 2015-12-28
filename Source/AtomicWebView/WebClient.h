@@ -38,9 +38,8 @@ public:
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
     void SendMouseWheelEvent(int x, int y, unsigned modifier, int deltaX, int deltaY) const;
 
-    void SendTextEvent(const String& text, unsigned modifiers);
-
-    void SendKeyEvent(int scanCode, int qual, bool keyUp);
+    void SendTextInputEvent(const StringHash eventType, VariantMap& eventData);
+    void SendKeyEvent(const StringHash eventType, VariantMap& eventData);
 
     void ShortcutCut();
     void ShortcutCopy();
