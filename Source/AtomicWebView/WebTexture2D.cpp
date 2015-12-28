@@ -212,6 +212,7 @@ WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context)
     texture_ = new Texture2D(context_);
     texture_->SetNumLevels(1);
     texture_->SetFilterMode(FILTER_NEAREST);
+
 }
 
 WebTexture2D::~WebTexture2D()

@@ -80,11 +80,6 @@ public:
     unsigned vertexEnd_;
     /// Gradient flag.
     bool useGradient_;
-
-    // ATOMIC BEGIN
-    /// Whether texture is in BGRA format
-    bool useBGRA_;
-    // ATOMIC END
 };
 
 }

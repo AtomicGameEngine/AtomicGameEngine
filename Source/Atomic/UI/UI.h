@@ -59,7 +59,7 @@ public:
 
     void Render(bool resetRenderTargets = true);
     void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
-    void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData, BlendMode blendMode = BLEND_ALPHA, bool useBGRA = false);
+    void SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData);
 
     void Initialize(const String& languageFile);
 

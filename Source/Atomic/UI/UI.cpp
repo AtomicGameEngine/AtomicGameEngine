@@ -343,8 +343,6 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
     ShaderVariation* diffMaskTexturePS = graphics_->GetShader(PS, "Basic", "DIFFMAP ALPHAMASK VERTEXCOLOR");
     ShaderVariation* alphaTexturePS = graphics_->GetShader(PS, "Basic", "ALPHAMAP VERTEXCOLOR");
 
-    ShaderVariation* diffmapBGRAPS = graphics_->GetShader(PS, "Basic", "DIFFMAP VERTEXCOLOR DIFFMAPBGRA");
-
     unsigned alphaFormat = Graphics::GetAlphaFormat();
 
     for (unsigned i = batchStart; i < batchEnd; ++i)
@@ -366,9 +364,7 @@ void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigne
             // If texture contains only an alpha channel, use alpha shader (for fonts)
             vs = diffTextureVS;
 
-            if (batch.useBGRA_)
-                ps = diffmapBGRAPS;
-            else if (batch.texture_->GetFormat() == alphaFormat)
+            if (batch.texture_->GetFormat() == alphaFormat)
                 ps = alphaTexturePS;
             else if (batch.blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
                 ps = diffMaskTexturePS;
@@ -448,10 +444,9 @@ void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, c
     tb::g_renderer->EndPaint();
 }
 
-void UI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData, BlendMode blendMode, bool useBGRA)
+void UI::SubmitBatchVertexData(Texture* texture, const PODVector<float>& vertexData)
 {
-    UIBatch b(blendMode , renderer_->currentScissor_, texture, &vertexData_);
-    b.useBGRA_ = useBGRA;
+    UIBatch b(BLEND_ALPHA , renderer_->currentScissor_, texture, &vertexData_);
 
     unsigned begin = b.vertexData_->Size();
     b.vertexData_->Resize(begin + vertexData.Size());
