@@ -5,10 +5,11 @@
 
 #include <include/cef_render_handler.h>
 
+#include <Atomic/Math/Rect.h>
 #include <Atomic/IO/Log.h>
-
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Graphics/Graphics.h>
+#include <Atomic/Graphics/GraphicsImpl.h>
 #include <Atomic/Graphics/Technique.h>
 
 #include "WebClient.h"
@@ -184,13 +185,99 @@ public:
     }
 #else
 
+    void D3D9Blit(const IntRect& dstRect, unsigned char* src, unsigned srcStride, bool discard = false)
+    {
+        RECT d3dRect;
+
+        d3dRect.left = dstRect.left_;
+        d3dRect.top = dstRect.top_;
+        d3dRect.right = dstRect.right_;
+        d3dRect.bottom = dstRect.bottom_;
+
+        int level = 0;
+        DWORD flags = discard ? D3DLOCK_DISCARD : 0;
+
+        D3DLOCKED_RECT d3dLockedRect;
+        IDirect3DTexture9* object = (IDirect3DTexture9*) webTexture2D_->GetTexture2D()->GetGPUObject();
+
+        if (FAILED(object->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
+        {
+            LOGERROR("WebTexture2D - Could not lock texture");
+            return;
+        }
+
+        int width = dstRect.Width();
+        int height = dstRect.Height();
+
+        for (int j = 0; j < height; ++j)
+        {
+            unsigned char* dst = (unsigned char*) d3dLockedRect.pBits + j * d3dLockedRect.Pitch;
+            memcpy(dst, src, width * 4);
+            src += srcStride;
+        }
+
+        object->UnlockRect(level);
+    }
+
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
+
         if (type == PET_VIEW)
         {
-            webTexture2D_->GetTexture2D()->SetData(0, 0, 0, width, height, buffer);
+            if (dirtyRects.size() == 1 &&
+                    dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
+            {
+                D3D9Blit(IntRect(0, 0, width, height), (unsigned char*) buffer, width * 4, true);
+                return;
+            }
+
+            // Update just the dirty rectangles
+            CefRenderHandler::RectList::const_iterator i = dirtyRects.begin();
+
+            for (; i != dirtyRects.end(); ++i)
+            {
+                const CefRect& rect = *i;
+
+                unsigned char* src = (unsigned char*) buffer;
+                src += rect.y * (width * 4) + (rect.x * 4);
+
+                D3D9Blit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
+            }
+
         }
+        else if (type == PET_POPUP && popupRect_.width > 0 && popupRect_.height > 0)
+        {
+            int  x = popupRect_.x;
+            int  y = popupRect_.y;
+            int w = width;
+            int h = height;
+            int viewwidth = webTexture2D_->GetWidth();
+            int viewheight = webTexture2D_->GetHeight();
+
+            // Adjust the popup to fit inside the view.
+            if (x < 0)
+            {
+                x = 0;
+            }
+            if (y < 0)
+            {
+                y = 0;
+            }
+            if (x + w > viewwidth)
+            {
+                w -= x + w - viewwidth;
+            }
+            if (y + h > viewheight)
+            {
+                h -= y + h - viewheight;
+            }
+
+            unsigned char* src = (unsigned char*) buffer;
+            D3D9Blit(IntRect(x, y, x + w, y + h), src, width * 4, false);
+
+        }
+
     }
 
 #endif
