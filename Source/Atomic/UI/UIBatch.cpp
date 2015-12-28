@@ -74,6 +74,7 @@ void UIBatch::SetDefaultColor()
 {
     color_ = 0xffffffff;
     useGradient_ = false;
+    useBGRA_ = false;
 }
 
 void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
@@ -208,7 +209,8 @@ bool UIBatch::Merge(const UIBatch& batch)
         batch.scissor_ != scissor_ ||
         batch.texture_ != texture_ ||
         batch.vertexData_ != vertexData_ ||
-        batch.vertexStart_ != vertexEnd_)
+        batch.vertexStart_ != vertexEnd_ ||
+        batch.useBGRA_ != useBGRA_    )
         return false;
 
     vertexEnd_ = batch.vertexEnd_;

@@ -209,11 +209,6 @@ WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context)
     texture_ = new Texture2D(context_);
     texture_->SetNumLevels(1);
     texture_->SetFilterMode(FILTER_BILINEAR);
-
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    material_ = new Material(context_);
-    material_->SetTechnique(0, cache->GetResource<Technique>("Techniques/DiffUnlit.xml"));
-    material_->SetTexture(TU_DIFFUSE, texture_);
 }
 
 WebTexture2D::~WebTexture2D()

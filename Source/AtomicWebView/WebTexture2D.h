@@ -32,12 +32,10 @@ public:
     CefRenderHandler* GetCEFRenderHandler();
 
     Texture2D* GetTexture2D() const { return texture_; }
-    Material* GetMaterial() const { return material_; }
 
 private:
 
     SharedPtr<Texture2D> texture_;
-    SharedPtr<Material> material_;
 
     WebTexture2DPrivate* d_;
 

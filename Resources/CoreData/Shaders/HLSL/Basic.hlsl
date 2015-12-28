@@ -73,7 +73,11 @@ void PS(
             if (diffInput.a < 0.5)
                 discard;
         #endif
-        oColor = diffColor * diffInput;
+        #ifdef DIFFMAPBGRA
+          oColor = diffColor * float4(diffInput.b, diffInput.g, diffInput.r, diffInput.a);
+        #else
+          oColor = diffColor * diffInput;
+        #endif
     #endif
     #ifdef ALPHAMAP
         float alphaInput = Sample2D(DiffMap, iTexCoord).a;

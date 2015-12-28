@@ -113,7 +113,11 @@ public:
         data[30] = rect.x;
         data[31] = rect.y + rect.h;
 
-        ui->SubmitBatchVertexData(webView_->GetWebTexture2D()->GetTexture2D(), vertexData_);
+        bool useBGRA = false;
+#ifdef ATOMIC_PLATFORM_WINDOWS
+        useBGRA = true;
+#endif
+        ui->SubmitBatchVertexData(webView_->GetWebTexture2D()->GetTexture2D(), vertexData_, BLEND_ALPHA, useBGRA );
 
     }
 
