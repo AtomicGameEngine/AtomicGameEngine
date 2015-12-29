@@ -7,6 +7,7 @@ add_subdirectory(LZ4)
 add_subdirectory(PugiXml)
 add_subdirectory(STB)
 add_subdirectory(TurboBadger)
+add_subdirectory(zlib)
 
 if (NOT ATOMIC_BUILD_2D)
 	add_subdirectory(Bullet)
