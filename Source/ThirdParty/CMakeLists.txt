@@ -22,6 +22,7 @@ if (NOT EMSCRIPTEN)
         add_subdirectory(DetourCrowd)
         add_subdirectory(DetourTileCache)
 	add_subdirectory(kNet)
+	add_subdirectory(openssl)
 endif()
 
 if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
