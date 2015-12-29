@@ -29,9 +29,7 @@
 
 #ifdef _WIN32
 #  include <stddef.h>
-#endif
-
-#ifdef __APPLE__
+#else
 #  include <unistd.h>
 #endif
 
