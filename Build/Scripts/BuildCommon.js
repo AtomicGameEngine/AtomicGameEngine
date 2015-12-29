@@ -37,7 +37,8 @@ namespace('build', function() {
           // compile
           cmds.push(node + " ./Build/node_modules/typeScript/bin/tsc -p ./Script");
           // lint
-          cmds.push(node + " ./Build/node_modules/tslint/bin/tslint -c ./Script/tslint.json ./Script/**/*.ts");
+          cmds.push(node + " ./Build/node_modules/tslint/bin/tslint -c ./Script/tslint.json ./Script/TypeScript/*.ts");
+          cmds.push(node + " ./Build/node_modules/tslint/bin/tslint -c ./Script/tslint.json ./Script/AtomicEditor/**/*.ts");
         } else {
             throw new Error("Node not configured for this platform: " + os.platform());
         }
