@@ -50,7 +50,7 @@ class Editor extends Atomic.ScriptObject {
         this.subscribeToEvent(EditorEvents.CloseProject, (data) => this.handleEditorCloseProject(data));
         this.subscribeToEvent("ProjectUnloaded", (data) => {
             Atomic.graphics.windowTitle = "AtomicEditor";
-            this.handleProjectUnloaded(data)
+            this.handleProjectUnloaded(data);
         });
 
         this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {

@@ -7,7 +7,7 @@
 
 import EditorEvents = require("../editor/EditorEvents");
 import EditorUI = require("./EditorUI");
-import Preferences = require("editor/Preferences")
+import Preferences = require("editor/Preferences");
 
 class Shortcuts extends Atomic.ScriptObject {
 

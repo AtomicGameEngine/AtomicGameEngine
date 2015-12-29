@@ -81,12 +81,11 @@ class EditorUI extends Atomic.ScriptObject {
 
     this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {
       this.showModalError(event.title, event.message);
-    })
+    });
 
   }
 
-  showModalError(windowText:string, message:string)
-  {
+  showModalError(windowText:string, message:string) {
       var window = new Atomic.UIMessageWindow(this.view, "modal_error");
       window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
   }

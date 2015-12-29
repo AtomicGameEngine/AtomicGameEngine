@@ -15,9 +15,11 @@ class ResourceOps extends Atomic.ScriptObject {
 
         this.subscribeToEvent("AssetImportError", (ev: ToolCore.AssetImportErrorEvent) => {
 
+            /* tslint:disable:no-use-before-declare */
             resourceOps.sendEvent(EditorEvents.ModalError, { title: "Asset Import Error", message: ev.error });
+            /* tslint:enable:no-use-before-declare*/
 
-        })
+        });
 
     }
 

@@ -41,13 +41,11 @@ export class EditorString {
 
         var lookup = EditorString.lookup;
 
-        var lookup = EditorString.lookup;
-
         var shortcutKey;
         if (Atomic.platform == "MacOSX") {
             shortcutKey = "⌘";
         } else { // Windows and Linux
-            shortcutKey = "CTRL + "
+            shortcutKey = "CTRL + ";
         }
 
         lookup[StringID.RevealInFinder] = "Reveal in Finder";
