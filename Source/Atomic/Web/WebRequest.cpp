@@ -307,6 +307,9 @@ void WebRequest::setup(asio::io_service *service, CURLM *curlm)
     curl_easy_setopt(is_->curl, CURLOPT_ERRORBUFFER, is_->error);
     is_->error[0] = '\0';
 
+    // This line will eventually go away with a CA bundle in place, or other TLS options.
+    curl_easy_setopt(is_->curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+
     curl_easy_setopt(is_->curl, CURLOPT_URL, is_->url.CString());
 
     // All callbacks must look at is_->isAborted flag!
