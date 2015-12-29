@@ -32,6 +32,7 @@
 #ifndef EMSCRIPTEN
 #include "../Web/WebInternalConfig.h"
 #include <asio/io_service.hpp>
+#include <curl/curl.h>
 #endif
 
 #include "../DebugNew.h"
@@ -43,6 +44,7 @@ struct WebPrivate
 {
 #ifndef EMSCRIPTEN
     asio::io_service service;
+    CURLM *curlm;
 #endif
 };
 
@@ -50,31 +52,59 @@ Web::Web(Context* context) :
     Object(context),
     d(new WebPrivate())
 {
+#ifndef EMSCRIPTEN
+    d->curlm = curl_multi_init();
+#endif
     SubscribeToEvent(E_UPDATE, HANDLER(Web, internalUpdate));
 }
 
 Web::~Web()
 {
     UnsubscribeFromEvent(E_UPDATE);
+#ifndef EMSCRIPTEN
+    curl_multi_cleanup(d->curlm);
+#endif
     delete d;
 }
 
 void Web::internalUpdate(StringHash eventType, VariantMap& eventData)
 {
 #ifndef EMSCRIPTEN
+    int runningHandles;
+    curl_multi_perform(d->curlm, &runningHandles);
+
+    CURLMsg *msg;
+    int msgsLeft;
+    while ((msg = curl_multi_info_read(d->curlm, &msgsLeft)))
+    {
+        if (msg->msg != CURLMSG_DONE)
+        {
+            continue;
+        }
+
+        WebRequest *wr;
+        curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &wr);
+        if (wr != NULL)
+        {
+            WebRequest::internalNotify(wr, int(msg->data.result));
+        }
+    }
+
     d->service.reset();
     d->service.poll();
 #endif
 }
 
-SharedPtr<WebRequest> Web::MakeWebRequest(const String& url, const String& verb, const Vector<String>& headers,
-    const String& postData)
+SharedPtr<WebRequest> Web::MakeWebRequest(const String& verb, const String& url, double requestContentSize)
 {
     PROFILE(MakeWebRequest);
 
     // The initialization of the request will take time, can not know at this point if it has an error or not
-    SharedPtr<WebRequest> request(new WebRequest(url, verb, headers, postData));
-    return request;
+    SharedPtr<WebRequest> webRequest(new WebRequest(context_, verb, url, requestContentSize));
+#ifndef EMSCRIPTEN
+    webRequest->setup(&d->service, d->curlm);
+#endif
+    return webRequest;
 }
 
 SharedPtr<WebSocket> Web::MakeWebSocket(const String& url)
