@@ -2615,11 +2615,6 @@ unsigned Graphics::GetRGBAFormat()
     return GL_RGBA;
 }
 
-unsigned Graphics::GetBGRAFormat()
-{
-    return GL_BGRA;
-}
-
 unsigned Graphics::GetRGBA16Format()
 {
 #ifndef GL_ES_VERSION_2_0

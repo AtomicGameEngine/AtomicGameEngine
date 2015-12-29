@@ -92,6 +92,7 @@ public:
     }
 
 #ifdef ATOMIC_PLATFORM_OSX
+
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
@@ -106,10 +107,9 @@ public:
             if (dirtyRects.size() == 1 &&
                     dirtyRects[0] == CefRect(0, 0, webTexture2D_->GetWidth(), webTexture2D_->GetHeight()))
             {
-                Texture2D* tex = webTexture2D_->texture_;
                 glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
                 glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-                tex->SetData(0, 0, 0, width, height, buffer);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
             }
             else
             {

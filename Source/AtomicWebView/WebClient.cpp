@@ -274,7 +274,10 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
     // return does not work at all on cef client with offscreen
     // bad interaction with arrow keys (for example here, after
     // hitting arrow keys, return/text takes a couple presses to register
-    keyEvent.type = keyUp ? KEYEVENT_KEYUP : KEYEVENT_KEYDOWN;
+    if (eventType == "KeyDown")
+        keyEvent.type = KEYEVENT_KEYDOWN;
+    else
+        keyEvent.type = KEYEVENT_KEYUP;
     keyEvent.modifiers = 0;
     keyEvent.native_key_code = 0;
     host->SendKeyEvent(keyEvent);

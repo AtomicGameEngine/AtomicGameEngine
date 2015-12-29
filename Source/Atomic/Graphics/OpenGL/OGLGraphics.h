@@ -490,8 +490,6 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format.
     static unsigned GetRGBAFormat();
-    /// Return the API-specific BGRA texture format.
-    static unsigned GetBGRAFormat();
     /// Return the API-specific RGBA 16-bit texture format.
     static unsigned GetRGBA16Format();
     /// Return the API-specific RGBA 16-bit float texture format.
