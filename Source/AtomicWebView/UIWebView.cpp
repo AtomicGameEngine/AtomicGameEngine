@@ -79,6 +79,8 @@ public:
         {
             browserCreated_ = true;
             webView_->webClient_->CreateBrowser(webView_->initialURL_, rect.w, rect.h);
+            // start focused
+            webView_->webClient_->SendFocusEvent(true);
         }
 
         webView_->webClient_->SetSize(rect.w, rect.h);

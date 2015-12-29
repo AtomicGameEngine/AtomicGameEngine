@@ -38,6 +38,8 @@ public:
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
     void SendMouseWheelEvent(int x, int y, unsigned modifier, int deltaX, int deltaY) const;
 
+    void SendFocusEvent(bool focus = true);
+
     void SendTextInputEvent(const StringHash eventType, VariantMap& eventData);
     void SendKeyEvent(const StringHash eventType, VariantMap& eventData);
 

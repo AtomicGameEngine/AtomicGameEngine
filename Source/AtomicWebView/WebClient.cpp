@@ -298,6 +298,15 @@ void WebClient::SendTextInputEvent(const StringHash eventType, VariantMap& event
     host->SendKeyEvent(keyEvent);
 }
 
+void WebClient::SendFocusEvent(bool focus)
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefRefPtr<CefBrowserHost> host = d_->browser_->GetHost();
+    host->SendFocusEvent(focus);
+}
+
 void WebClient::ShortcutCut()
 {
     if (!d_->browser_.get())

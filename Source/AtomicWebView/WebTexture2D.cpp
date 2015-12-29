@@ -30,6 +30,7 @@ public:
     WebTexture2DPrivate(WebTexture2D* webTexture2D)
     {
         webTexture2D_ = webTexture2D;
+        ClearPopupRects();
     }
 
     void OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) OVERRIDE
@@ -238,10 +239,8 @@ public:
             for (; i != dirtyRects.end(); ++i)
             {
                 const CefRect& rect = *i;
-
                 unsigned char* src = (unsigned char*) buffer;
                 src += rect.y * (width * 4) + (rect.x * 4);
-
                 D3D9Blit(IntRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height), src, width * 4, false);
             }
 
