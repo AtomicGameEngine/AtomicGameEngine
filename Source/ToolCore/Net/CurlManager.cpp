@@ -22,7 +22,7 @@ CurlRequest::CurlRequest(Context* context, const String& url, const String& post
     url_ = url;
     postData_ = postData;
 
-#if !(defined WIN32 || APPLE)
+#if !(defined WIN32 || defined APPLE)
     // This line will eventually go away with a CA bundle in place, or other TLS options.
     curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0L);
 #endif
