@@ -307,8 +307,10 @@ void WebRequest::setup(asio::io_service *service, CURLM *curlm)
     curl_easy_setopt(is_->curl, CURLOPT_ERRORBUFFER, is_->error);
     is_->error[0] = '\0';
 
+#if !(defined WIN32 || APPLE)
     // This line will eventually go away with a CA bundle in place, or other TLS options.
-    curl_easy_setopt(is_->curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_easy_setopt(is_->curl, CURLOPT_SSL_VERIFYPEER, 0L);
+#endif
 
     curl_easy_setopt(is_->curl, CURLOPT_URL, is_->url.CString());
 

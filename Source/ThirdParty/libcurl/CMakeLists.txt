@@ -104,8 +104,13 @@ option(CURL_HIDDEN_SYMBOLS "Set to ON to hide libcurl internal symbols (=hide al
 mark_as_advanced(CURL_HIDDEN_SYMBOLS)
 
 IF(WIN32)
-  OPTION(CURL_WINDOWS_SSPI "Use windows libraries to allow NTLM authentication without openssl" OFF)
+  OPTION(CURL_WINDOWS_SSPI "Use windows libraries to allow NTLM authentication without openssl" ON)
   MARK_AS_ADVANCED(CURL_WINDOWS_SSPI)
+
+  if (CURL_WINDOWS_SSPI)
+    add_definitions(-DUSE_WINDOWS_SSPI -DUSE_SCHANNEL)
+    set(SSL_ENABLED 1)
+  endif()
 ENDIF()
 
 option(HTTP_ONLY "disables all protocols except HTTP (This overrides all CURL_DISABLE_* options)" ON)
@@ -290,7 +295,11 @@ if(WIN32)
   check_library_exists_concat("winmm"  getch        HAVE_LIBWINMM)
 endif()
 
-option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" ON)
+if (WIN32)
+  option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" OFF)
+else()
+  option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" ON)
+endif()
 mark_as_advanced(CMAKE_USE_OPENSSL)
 
 set(USE_SSLEAY OFF)
@@ -1395,7 +1404,7 @@ if(CURL_STATICLIB)
   #message(WARNING "Static linking is broken!")
   set_property(
     TARGET libcurl
-    APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS LIBCURL_STATIC=1
+    APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS CURL_STATICLIB=1
   )
   set(ENABLE_STATIC         "yes")
 else()
