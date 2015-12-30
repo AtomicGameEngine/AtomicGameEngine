@@ -113,6 +113,25 @@ IF(WIN32)
   endif()
 ENDIF()
 
+if(APPLE)
+  # This is for both iOS and OSX
+
+  find_library(CORE_FOUNDATION CoreFoundation)
+  if(NOT CORE_FOUNDATION)
+    message(FATAL_ERROR "Apple Core Foundation framework not found!")
+  endif()
+  list(APPEND CURL_LIBS ${CORE_FOUNDATION})
+
+  find_library(SECURITY Security)
+  if(NOT SECURITY)
+    message(FATAL_ERROR "Apple Security framework not found!")
+  endif()
+  list(APPEND CURL_LIBS ${SECURITY})
+
+  add_definitions(-DUSE_DARWINSSL)
+  set(SSL_ENABLED 1)
+endif()
+
 option(HTTP_ONLY "disables all protocols except HTTP (This overrides all CURL_DISABLE_* options)" ON)
 mark_as_advanced(HTTP_ONLY)
 option(CURL_DISABLE_FTP "disables FTP" OFF)
@@ -295,7 +314,7 @@ if(WIN32)
   check_library_exists_concat("winmm"  getch        HAVE_LIBWINMM)
 endif()
 
-if (WIN32)
+if (WIN32 OR APPLE)
   option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" OFF)
 else()
   option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" ON)
