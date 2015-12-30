@@ -218,7 +218,7 @@ class HierarchyFrame extends Atomic.UIWidget {
         var name = node.name;
 
         if (!name.length)
-            name = "(Anonymous)"
+            name = "(Anonymous)";
 
         var icon = "";
 

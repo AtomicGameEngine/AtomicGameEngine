@@ -33,7 +33,7 @@ class EULAWindow extends ModalWindow {
         var file = cache.getFile("AtomicEditor/eulas/atomic_game_engine_eula.txt");
         this.age_license.text = file.readText();
 
-        var file = cache.getFile("AtomicEditor/eulas/atomic_runtime_eula.txt");
+        file = cache.getFile("AtomicEditor/eulas/atomic_runtime_eula.txt");
         this.age_runtimelicense.text = file.readText();
 
         file = cache.getFile("AtomicEditor/eulas/atomic_thirdparty_eula.txt");

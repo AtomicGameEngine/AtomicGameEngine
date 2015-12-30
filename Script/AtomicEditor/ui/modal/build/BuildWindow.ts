@@ -68,7 +68,7 @@ class BuildWindow extends ModalWindow {
 
               if (!userPrefs.lastBuildPath.length || !Atomic.fileSystem.dirExists(userPrefs.lastBuildPath)) {
 
-                  new Atomic.UIMessageWindow(this, "modal_error").show("Build Folder","Please select an existing build folder", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 480, 240);
+                  new Atomic.UIMessageWindow(this, "modal_error").show("Build Folder", "Please select an existing build folder", Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 480, 240);
                   return true;
               }
 

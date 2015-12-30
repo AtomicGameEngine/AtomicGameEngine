@@ -29,7 +29,7 @@
     "no-trailing-whitespace": true,
     "no-unused-variable": false,
     "no-unreachable": true,
-    "no-use-before-declare": true,
+    "no-use-before-declare": false,
     "one-line": [true,
       "check-open-brace",
       "check-catch",
