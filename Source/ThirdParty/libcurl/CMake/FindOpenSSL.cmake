@@ -1,0 +1,7 @@
+# Spicific to Atomic Game Engine
+
+set(OPENSSL_FOUND 1 CACHE INTERNAL "OpenSSL Found")
+set(OPENSSL_INCLUDE_DIR "${openssl_BINARY_DIR}/" CACHE INTERNAL "OpenSSL include")
+set(OPENSSL_LIBRARIES crypto ssl CACHE INTERNAL "OpenSSL target")
+
+mark_as_advanced(OPENSSL_FOUND OPENSSL_INCLUDE_DIR OPENSSL_LIBRARIES)

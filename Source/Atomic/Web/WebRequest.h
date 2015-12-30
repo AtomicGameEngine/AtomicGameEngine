@@ -23,11 +23,21 @@
 
 #pragma once
 
+#include "../Core/Object.h"
+#include "../Container/Str.h"
 #include "../Container/ArrayPtr.h"
-#include "../Core/Mutex.h"
-#include "../Container/RefCounted.h"
-#include "../Core/Thread.h"
-#include "../IO/Deserializer.h"
+
+namespace asio
+{
+class io_service;
+}
+
+#ifndef EMSCRIPTEN
+extern "C"
+{
+typedef void CURLM;
+}
+#endif
 
 namespace Atomic
 {
@@ -41,67 +51,57 @@ enum WebRequestState
     HTTP_CLOSED
 };
 
+struct WebRequestInternalState;
+
 /// An HTTP connection with response data stream.
-class WebRequest : public RefCounted, public Deserializer, public Thread
+class WebRequest : public Object
 {
-    REFCOUNTED(WebRequest)
+    friend class Web;
+
+    OBJECT(WebRequest)
 
 public:
     /// Construct with parameters.
-    WebRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData);
-    /// Destruct. Release the connection object.
+    WebRequest(Context* context, const String& verb, const String& url, double requestContentSize);
+    /// Destruct. Release the connection.
     ~WebRequest();
 
-    /// Process the connection in the worker thread until closed.
-    virtual void ThreadFunction();
-
-    /// Read response data from the HTTP connection and return number of bytes actually read. While the connection is open, will block while trying to read the specified size. To avoid blocking, only read up to as many bytes as GetAvailableSize() returns.
-    virtual unsigned Read(void* dest, unsigned size);
-    /// Set position from the beginning of the stream. Not supported.
-    virtual unsigned Seek(unsigned position);
-
     /// Return URL used in the request.
-    const String& GetURL() const { return url_; }
-
-    /// Return verb used in the request. Default GET if empty verb specified on construction.
-    const String& GetVerb() const { return verb_; }
+    const String& GetURL() const;
 
     /// Return error. Only non-empty in the error state.
     String GetError() const;
     /// Return connection state.
     WebRequestState GetState() const;
-    /// Return amount of bytes in the read buffer.
-    unsigned GetAvailableSize() const;
+    /// Get the HTTP verb for this request.
+    String GetVerb() const;
+
+    /// Abort the WebRequest.
+    void Abort();
 
     /// Return whether connection is in the open state.
     bool IsOpen() const { return GetState() == HTTP_OPEN; }
 
-private:
-    /// Check for end of the data stream and return available size in buffer. Must only be called when the mutex is held by the main thread.
-    unsigned CheckEofAndAvailableSize();
+    /// Return whether "download_chunk" event will be fired or if only "complete" will be.
+    bool HasDownloadChunkEvent();
 
-    /// URL.
-    String url_;
-    /// Verb.
-    String verb_;
-    /// Error string. Empty if no error.
-    String error_;
-    /// Headers.
-    Vector<String> headers_;
-    /// POST data.
-    String postData_;
-    /// Connection state.
-    WebRequestState state_;
-    /// Mutex for synchronizing the worker and the main thread.
-    mutable Mutex mutex_;
-    /// Read buffer for the worker thread.
-    SharedArrayPtr<unsigned char> httpReadBuffer_;
-    /// Read buffer for the main thread.
-    SharedArrayPtr<unsigned char> readBuffer_;
-    /// Read buffer read cursor.
-    unsigned readPosition_;
-    /// Read buffer write cursor.
-    unsigned writePosition_;
+    /// Set an HTTP request header (only works before Send has been called).
+    void SetRequestHeader(const String& header, const String& value);
+    /// Start sending the request.
+    void Send();
+    /// Get an HTTP response header.
+    StringVector GetResponseHeaderKeys();
+    /// Get an HTTP response header.
+    String GetResponseHeader(const String& header);
+    /// Get all HTTP response headers. Using GetResponseHeaderKeys() and GetResponseHeader() is more efficient than using this function.
+    String GetAllResponseHeaders();
+
+private:
+#ifndef EMSCRIPTEN
+    void setup(asio::io_service *service, CURLM* curlm);
+    static void internalNotify(WebRequest *wr, int code);
+#endif
+    WebRequestInternalState* is_;
 };
 
 }

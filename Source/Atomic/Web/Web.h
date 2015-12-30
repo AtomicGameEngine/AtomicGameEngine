@@ -45,10 +45,12 @@ public:
     /// Destruct.
     ~Web();
 
+    // Note that the use of "double" here is strictly to make automatic binding
+    // work properly. It should accually be a "long long" or "size_t", and the
+    // value will be floored to an integer before it's used.
+
     /// Perform an HTTP request to the specified URL. Empty verb defaults to a GET request. Return a request object which can be used to read the response data.
-    SharedPtr<WebRequest> MakeWebRequest
-        (const String& url, const String& verb = String::EMPTY, const Vector<String>& headers = Vector<String>(),
-            const String& postData = String::EMPTY);
+    SharedPtr<WebRequest> MakeWebRequest(const String& verb, const String& url, double requestContentSize = 0.0);
     /// Perform an WebSocket request to the specified URL. Return a WebSocket object which can be used to comunicate with the server.
     SharedPtr<WebSocket> MakeWebSocket(const String& url);
 

@@ -577,7 +577,7 @@ public:
         return *this;
     }
 
-    // Assign from a string vector.
+    /// Assign from a string vector.
     Variant& operator =(const StringVector& rhs)
     {
         SetType(VAR_STRINGVECTOR);

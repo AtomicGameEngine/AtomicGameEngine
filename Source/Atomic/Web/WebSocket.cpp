@@ -179,6 +179,7 @@ void WebSocket::setup(asio::io_service *service)
 
 WebSocket::~WebSocket()
 {
+    LOGDEBUG("Destroy WebSocket");
     std::error_code ec;
     is_->es = nullptr;
     is_->con->terminate(ec);
@@ -188,7 +189,6 @@ WebSocket::~WebSocket()
     is_->c.set_message_handler(nullptr);
     is_->con.reset();
     is_.reset();
-    LOGDEBUG("Destroy WebSocket");
 }
 
 const String& WebSocket::GetURL() const

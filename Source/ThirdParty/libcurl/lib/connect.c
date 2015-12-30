@@ -1016,7 +1016,11 @@ static CURLcode singleipconnect(struct connectdata *conn,
   }
   infof(data, "  Trying %s...\n", ipaddress);
 
+#ifdef ENABLE_IPV6
   is_tcp = (addr.family == AF_INET || addr.family == AF_INET6) &&
+#else
+  is_tcp = addr.family == AF_INET &&
+#endif
            addr.socktype == SOCK_STREAM;
   if(is_tcp && data->set.tcp_nodelay)
     tcpnodelay(conn, sockfd);
@@ -1043,7 +1047,11 @@ static CURLcode singleipconnect(struct connectdata *conn,
   }
 
   /* possibly bind the local end to an IP, interface or port */
+#ifdef ENABLE_IPV6
   if(addr.family == AF_INET || addr.family == AF_INET6) {
+#else
+  if(addr.family == AF_INET) {
+#endif
     result = bindlocal(conn, sockfd, addr.family,
                        Curl_ipv6_scope((struct sockaddr*)&addr.sa_addr));
     if(result) {

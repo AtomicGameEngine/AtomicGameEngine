@@ -8,6 +8,9 @@
 
 # Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
+project(Assimp)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
+
 if (MINGW)
     # The IFCReaderGen.cpp.obj has too many sections in DEBUG configuration build
     # Since GCC does not support /bigobj compiler flags as in MSVC, we use optimization flags to reduce the object file size
@@ -116,12 +119,21 @@ SET( CONTRIB_FILES
 	${IrrXML_SRCS}
 	${ConvertUTF_SRCS}
 	${unzip_SRCS}
-	${zlib_SRCS}
+#	${zlib_SRCS}
 	${Poly2Tri_SRCS}
 	${Clipper_SRCS}
 	# Necessary to show the headers in the project when using the VC++ generator:
 	${Boost_SRCS}
 )
+
+find_package(ZLIB)
+if (ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+else ()
+    message(STATUS "Using contrib version of zlib.")
+    list(APPEND CONTRIB_FILES ${zlib_SRCS})
+endif ()
+
 
 set (TARGET_NAME Assimp)
 list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS})
@@ -130,3 +142,4 @@ list (APPEND SOURCE_FILES ${CONTRIB_FILES} ${PUBLIC_HEADERS} ${COMPILER_HEADERS}
 #enable_pch (code/AssimpPCH.h)
 
 add_library(Assimp ${SOURCE_FILES})
+target_link_libraries(Assimp zlib)
