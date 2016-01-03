@@ -26,6 +26,6 @@ macro(GroupSources curdir)
 
 endmacro()
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if(NOT CMAKE_CROSSCOMPILING AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
   set(LINUX TRUE CACHE BOOL "Indicates if host is Linux.")
 endif()
