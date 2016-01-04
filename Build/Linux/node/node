@@ -1,0 +1,17 @@
+#!/bin/sh
+
+NODE1=$(which nodejs)
+NODE2=$(which node)
+
+if   [ -x "$NODE1" ]; then
+  NODE=$NODE1
+elif [ -x "$NODE2" ]; then
+  NODE=$NODE2
+fi
+
+if [ ! -x "$NODE" ]; then
+  echo "Please install Node.JS"
+  return 1
+fi
+
+$NODE $@

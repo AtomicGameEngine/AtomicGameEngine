@@ -39,19 +39,19 @@ if (MSVC)
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicPlayer>/D3DCompiler_47.dll\")
 
-    target_link_libraries(AtomicPlayer NETCore NETScript)
+  target_link_libraries(AtomicPlayer NETCore NETScript)
+endif(MSVC)
 
-endif()
 
 if (APPLE)
 
-if (NOT IOS)
+  if (NOT IOS)
 
     target_link_libraries(AtomicPlayer NETCore NETScript)
 
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
 
-else()
+  else()
 
     set_target_properties(AtomicPlayer PROPERTIES
       MACOSX_BUNDLE_GUI_IDENTIFIER "com.atomicgameengine.atomicplayer"
@@ -65,8 +65,17 @@ else()
 
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/iOSBundleInfo.plist.template)
 
-endif()
+  endif()
+
 endif(APPLE)
+
+
+if (LINUX)
+
+    target_link_libraries(AtomicPlayer NETCore NETScript)
+
+endif(LINUX)
+
 
 if (TARGET_PROPERTIES)
     set_target_properties (AtomicPlayer PROPERTIES ${TARGET_PROPERTIES})
