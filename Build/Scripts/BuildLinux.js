@@ -28,9 +28,9 @@ task('atomiceditor', {
 
   var cmds = [];
 
-  cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=Release -DATOMIC_BUILD_2D=0 -DLINUX=1 ");
-  cmds.push("make GenerateScriptBindings")
-  cmds.push("make AtomicEditor AtomicPlayer")
+  cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=Release");
+  cmds.push("make -j4 GenerateScriptBindings")
+  cmds.push("make -j4 AtomicEditor AtomicPlayer")
 
   jake.exec(cmds, function() {
 
