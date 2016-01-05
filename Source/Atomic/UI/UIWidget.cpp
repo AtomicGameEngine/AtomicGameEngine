@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-//--player --editor-resource-paths "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/PlayerData!/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources"
-
 #include "../IO/Log.h"
 #include "../Input/InputEvents.h"
 

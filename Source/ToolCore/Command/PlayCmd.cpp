@@ -95,8 +95,6 @@ void PlayCmd::Run()
 
     Vector<String> vargs;
 
-    //String args = ToString("--editor-resource-paths \"%s\"", resourcePaths.CString());
-
     String args = ToString("--player --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
 
     vargs = args.Split(' ');
