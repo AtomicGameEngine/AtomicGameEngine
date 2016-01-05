@@ -59,6 +59,7 @@ private:
     static bool LoadEngineConfig(const JSONValue& jengine);
 
     static VariantMap engineConfig_;
+    static String engineConfigFilename_;
 
 };
 
