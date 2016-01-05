@@ -168,6 +168,76 @@ bool EngineConfig::LoadGraphicsConfig(const JSONValue& jgraphics)
     return true;
 }
 
+bool EngineConfig::LoadWindowConfig(const JSONValue& jwindow)
+{
+    if (!jwindow.IsObject())
+        return false;
+
+    for (JSONObject::ConstIterator i = jwindow.Begin(); i != jwindow.End(); ++i)
+    {
+        String key = i->first_.ToLower();
+        const JSONValue& jvalue = i->second_;
+
+        if (key == "title")
+            engineConfig_["WindowTitle"] = GetStringValue(jvalue, "Atomic");
+        else if (key == "fullscreen")
+            engineConfig_["FullScreen"] = GetBoolValue(jvalue, false);
+        else if (key == "borderless")
+            engineConfig_["Borderless"] = GetBoolValue(jvalue, false);
+        else if (key == "resizable")
+            engineConfig_["WindowResizable"] = GetBoolValue(jvalue, false);
+
+    }
+
+    return true;
+
+}
+
+bool EngineConfig::LoadSoundConfig(const JSONValue& jsound)
+{
+    if (!jsound.IsObject())
+        return false;
+
+    for (JSONObject::ConstIterator i = jsound.Begin(); i != jsound.End(); ++i)
+    {
+        String key = i->first_.ToLower();
+        const JSONValue& jvalue = i->second_;
+
+        if (key == "enabled")
+            engineConfig_["Sound"] = GetBoolValue(jvalue, true);
+        else if (key == "interpolation")
+            engineConfig_["SoundInterpolation"] = GetBoolValue(jvalue, true);
+        else if (key == "stereo")
+            engineConfig_["SoundStereo"] = GetBoolValue(jvalue, true);
+        else if (key == "bufferms")
+            engineConfig_["SoundBuffer"] = GetIntValue(jvalue, 100);
+        else if (key == "mixrate")
+            engineConfig_["SoundMixRate"] = GetIntValue(jvalue, 44100);
+
+    }
+
+    return true;
+
+}
+
+bool EngineConfig::LoadInputConfig(const JSONValue& jinput)
+{
+    if (!jinput.IsObject())
+        return false;
+
+    for (JSONObject::ConstIterator i = jinput.Begin(); i != jinput.End(); ++i)
+    {
+        String key = i->first_.ToLower();
+        const JSONValue& jvalue = i->second_;
+
+        if (key == "touchemulation")
+            engineConfig_["TouchEmulation"] = GetBoolValue(jvalue, false);
+    }
+
+    return true;
+
+}
+
 
 bool EngineConfig::LoadDesktopConfig(JSONValue root)
 {
@@ -184,6 +254,18 @@ bool EngineConfig::LoadDesktopConfig(JSONValue root)
     if (jgraphics.IsObject())
         LoadGraphicsConfig(jgraphics);
 
+    const JSONValue& jwindow = jdesktop["window"];
+    if (jwindow.IsObject())
+        LoadWindowConfig(jwindow);
+
+    const JSONValue& jsound = jdesktop["sound"];
+    if (jsound.IsObject())
+        LoadSoundConfig(jsound);
+
+    const JSONValue& jinput = jdesktop["input"];
+    if (jinput.IsObject())
+        LoadInputConfig(jinput);
+
     return true;
 }
 
@@ -199,7 +281,8 @@ bool EngineConfig::LoadFromJSON(const String& json)
     if (!jroot.IsObject())
         return false;
 
-    LoadDesktopConfig(jroot);
+    if (!LoadDesktopConfig(jroot))
+        return false;
 
     return true;
 }
@@ -225,6 +308,7 @@ void EngineConfig::ApplyConfig(VariantMap& settings)
         settings.InsertNew(itr->first_, itr->second_);
         itr++;
     }
+
 }
 
 }

@@ -48,6 +48,9 @@ private:
 
     static bool LoadDesktopConfig(JSONValue root);
     static bool LoadGraphicsConfig(const JSONValue& jgraphics);
+    static bool LoadWindowConfig(const JSONValue& jwindow);
+    static bool LoadSoundConfig(const JSONValue& jsound);
+    static bool LoadInputConfig(const JSONValue& jinput);
 
     static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
     static int GetIntValue(const JSONValue& jvalue, int defaultValue);

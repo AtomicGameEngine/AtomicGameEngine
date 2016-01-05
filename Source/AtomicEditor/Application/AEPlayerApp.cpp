@@ -65,7 +65,7 @@ void AEPlayerApplication::Setup()
 
     engine_->SetAutoExit(false);
 
-    engineParameters_["WindowTitle"] = "AtomicPlayer";
+    engineParameters_.InsertNew("WindowTitle", "AtomicPlayer");
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
@@ -84,7 +84,7 @@ void AEPlayerApplication::Setup()
     engineParameters_["WindowHeight"] = 720;
 #endif
 
-    engineParameters_["LogLevel"] = LOG_DEBUG;
+    engineParameters_.InsertNew("LogLevel", LOG_DEBUG);
 
 #if ATOMIC_PLATFORM_WINDOWS || ATOMIC_PLATFORM_LINUX
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
