@@ -70,7 +70,11 @@ void JSClassWriter::GenerateSource(String& sourceOut)
 
 void JSClassWriter::GenerateStaticFunctionsSource(String& source, String& packageName)
 {
+    // Store function on both the constructor and prototype
+    // so can access static functions from both the class constructor and an instance
+
     source.AppendWithFormat("js_class_get_constructor(ctx, \"%s\", \"%s\");\n", packageName.CString(), klass_->GetName().CString());
+    source.AppendWithFormat("js_class_get_prototype(ctx, \"%s\", \"%s\");\n", packageName.CString(), klass_->GetName().CString());
 
     for (unsigned i = 0; i < klass_->functions_.Size(); i++)
     {
@@ -96,9 +100,13 @@ void JSClassWriter::GenerateStaticFunctionsSource(String& source, String& packag
 
         String scriptName = function->GetName();
         scriptName[0] = tolower(scriptName[0]);
-        source.AppendWithFormat("duk_put_prop_string(ctx, -2, \"%s\");\n", scriptName.CString());
+
+        source.Append("duk_dup(ctx, -1);\n");
+        source.AppendWithFormat("duk_put_prop_string(ctx, -3, \"%s\");\n", scriptName.CString());
+        source.AppendWithFormat("duk_put_prop_string(ctx, -3, \"%s\");\n", scriptName.CString());
     }
-    source.Append("duk_pop(ctx);\n");
+
+    source.Append("duk_pop_2(ctx);\n");
 }
 
 void JSClassWriter::GenerateNonStaticFunctionsSource(String& source, String& packageName)
