@@ -43,6 +43,8 @@ private:
 
     void HandleQuit(StringHash eventType, VariantMap& eventData);
 
+    void ReadEngineConfig();
+
     bool debugPlayer_;
 
 };

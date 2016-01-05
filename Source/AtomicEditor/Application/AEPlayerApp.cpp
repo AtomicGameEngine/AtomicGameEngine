@@ -7,6 +7,7 @@
 
 #include <Atomic/Atomic.h>
 #include <Atomic/Engine/Engine.h>
+#include <Atomic/Engine/EngineConfig.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/IOEvents.h>
@@ -59,9 +60,10 @@ void AEPlayerApplication::Setup()
 {
     AEEditorCommon::Setup();
 
-    engine_->SetAutoExit(false);
+    // Read the engine configuration
+    ReadEngineConfig();
 
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    engine_->SetAutoExit(false);
 
     engineParameters_["WindowTitle"] = "AtomicPlayer";
 
@@ -93,6 +95,8 @@ void AEPlayerApplication::Setup()
     engineParameters_["ResourcePrefixPath"] = "../Resources";
 #endif
 
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+
     const Vector<String>& arguments = GetArguments();
 
     for (unsigned i = 0; i < arguments.Size(); ++i)
@@ -113,9 +117,6 @@ void AEPlayerApplication::Setup()
             else if (argument == "--project" && value.Length())
             {
                 engineParameters_["ResourcePrefixPath"] = "";
-
-                // This works for a local dev build, --editor-resource-paths command below is for
-                // launching from AtomicEditor (IPC)
 
                 value = AddTrailingSlash(value);
 
@@ -181,10 +182,47 @@ void AEPlayerApplication::Setup()
         }
     }
 
-
-
     // Use the script file name as the base name for the log file
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
+}
+
+void AEPlayerApplication::ReadEngineConfig()
+{
+    // find the project path from the command line args
+
+    String projectPath;
+    const Vector<String>& arguments = GetArguments();
+
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1)
+        {
+            String argument = arguments[i].ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "--project" && value.Length())
+            {
+                projectPath = AddTrailingSlash(value);
+                break;
+            }
+
+        }
+    }
+
+    if (!projectPath.Length())
+        return;
+
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    String filename = projectPath + "Settings/Engine.json";
+
+    if (!filesystem->FileExists(filename))
+        return;
+
+    if (EngineConfig::LoadFromFile(context_, filename))
+    {
+        EngineConfig::ApplyConfig(engineParameters_);
+    }
+
 }
 
 void AEPlayerApplication::Start()
