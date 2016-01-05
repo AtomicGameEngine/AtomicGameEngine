@@ -28,6 +28,9 @@ import UIResourceOps = require("./UIResourceOps");
 
 import SnapSettingsWindow = require("./SnapSettingsWindow");
 
+import ProjectTemplates = require("../../resources/ProjectTemplates");
+
+
 class ModalOps extends Atomic.ScriptObject {
 
     constructor() {
@@ -38,11 +41,11 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showCreateProject(projectTemplateFolder: string, imagePath: string = "") {
+    showCreateProject(projectTemplateDefinition: ProjectTemplates.ProjectTemplateDefinition) {
 
         if (this.show()) {
 
-            this.opWindow = new CreateProject(projectTemplateFolder, imagePath);
+            this.opWindow = new CreateProject(projectTemplateDefinition);
 
         }
 
@@ -120,7 +123,7 @@ class ModalOps extends Atomic.ScriptObject {
     }
 
 
-    showResourceSelection(windowText: string, importerType: string, resourceType:string, callback: (retObject: any, args: any) => void, args: any = undefined) {
+    showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args: any = undefined) {
 
         if (this.show()) {
 
@@ -252,7 +255,7 @@ class ModalOps extends Atomic.ScriptObject {
 
         // only show snap settings if we have a project loaded
         if (!ToolCore.toolSystem.project)
-          return;
+            return;
 
         if (this.show()) {
 

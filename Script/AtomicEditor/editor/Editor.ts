@@ -54,8 +54,21 @@ class Editor extends Atomic.ScriptObject {
         });
 
         this.subscribeToEvent("IPCPlayerWindowChanged", (data) => {
-            Preferences.getInstance().savePlayerWindowData(data.posX, data.posY, data.width, data.height, data.monitor);
+            var playerWindow = Preferences.getInstance().playerWindow;
+            //if player window is maximized, then we want keep the window size from the previous state
+            if (data.maximized) {
+                playerWindow.x = data.posX;
+                playerWindow.y = data.posY;
+                playerWindow.monitor = data.monitor;
+                playerWindow.maximized = true;
+            } else {
+                playerWindow = {x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized};
+            }
+            Preferences.getInstance().savePlayerWindowData(playerWindow);
         });
+
+        this.subscribeToEvent("ScreenMode", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
+        this.subscribeToEvent("WindowPos", (data:Atomic.ScreenModeEvent) => this.saveWindowPreferences(data));
 
         this.subscribeToEvent("ExitRequested", (data) => this.handleExitRequested(data));
 
@@ -83,6 +96,31 @@ class Editor extends Atomic.ScriptObject {
       ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
       ui.setDefaultFont("Vera", 12);
 
+    }
+
+    saveWindowPreferences(data: Atomic.ScreenModeEvent): boolean {
+        var graphics = Atomic.getGraphics();
+        if (!graphics) return false;
+
+        var pos = graphics.getWindowPosition();
+        var width = graphics.getWidth();
+        var height = graphics.getHeight();
+        var monitor = graphics.getCurrentMonitor();
+
+        var editorWindowData = Preferences.getInstance().editorWindow;
+
+        if (graphics.getMaximized()) {
+            editorWindowData.x = pos[0];
+            editorWindowData.y = pos[1];
+            editorWindowData.maximized = true;
+            editorWindowData.monitor = monitor;
+        } else {
+            editorWindowData = {x: pos[0], y: pos[1], width: width, height: height, monitor: monitor, maximized: false}
+        }
+
+        Preferences.getInstance().saveEditorWindowData(editorWindowData);
+
+        return true;
     }
 
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
@@ -128,8 +166,11 @@ class Editor extends Atomic.ScriptObject {
         if (system.project) {
 
             system.closeProject();
-
+            this.sendEvent(EditorEvents.ProjectClosed);
+            this.projectCloseRequested = false;
+            this.unsubscribeFromEvent(EditorEvents.EditorResourceClose);
         }
+
     }
 
     handleProjectUnloaded(event) {
@@ -167,7 +208,7 @@ class Editor extends Atomic.ScriptObject {
     }
 
     exit() {
-        Preferences.getInstance().write();
+        //Preferences.getInstance().write();
         EditorUI.shutdown();
         Atomic.getEngine().exit();
     }

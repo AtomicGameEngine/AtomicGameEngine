@@ -27,6 +27,8 @@
 #include "PEXImporter.h"
 #include "TextImporter.h"
 #include "NETAssemblyImporter.h"
+#include "TypeScriptImporter.h"
+#include "ParticleEffectImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -269,6 +271,10 @@ bool Asset::CreateImporter()
         {
             importer_ = new JavascriptImporter(context_, this);
         }
+        else if (ext == ".ts")
+        {
+            importer_ = new TypeScriptImporter(context_, this);
+        }
         else if (ext == ".json")
         {
             importer_ = new JSONImporter(context_, this);
@@ -292,6 +298,10 @@ bool Asset::CreateImporter()
         else if (ext == ".pex")
         {
             importer_ = new PEXImporter(context_, this);
+        }
+        else if (ext == ".peffect")
+        {
+            importer_ = new ParticleEffectImporter(context_, this);
         }
         else if (ext == ".txt")
         {

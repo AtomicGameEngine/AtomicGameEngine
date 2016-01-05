@@ -125,7 +125,6 @@ void SceneView3D::Enable()
 
     enabled_ = true;
 
-    SetVisibility(UI_WIDGET_VISIBILITY_VISIBLE);
 }
 
 void SceneView3D::Disable()
@@ -134,8 +133,6 @@ void SceneView3D::Disable()
         return;
 
     enabled_ = false;
-
-    SetVisibility(UI_WIDGET_VISIBILITY_INVISIBLE);
 
 }
 
@@ -461,6 +458,14 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 
 void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // parent is the contentRoot for our tab, when tab isn't active it will not be visible
+    if (!GetParent() || GetParent()->GetVisibility() != UI_WIDGET_VISIBILITY_VISIBLE)
+    {
+        Disable();
+        return;
+    }
+
+    Enable();
 
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();

@@ -7,6 +7,7 @@
 
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
+import ProjectTemplates = require("../../resources/ProjectTemplates");
 
 class NewProject extends ModalWindow {
 
@@ -22,38 +23,22 @@ class NewProject extends ModalWindow {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_CLICK) {
 
-            var id = ev.target.id;
+            let id = ev.target.id;
 
             if (id == "cancel") {
                 this.hide();
                 return true;
             }
+            let projectDefinition = ProjectTemplates.getNewProjectTemplateDefinition(id);
 
-            var projectType = "";
-
-            if (id == "project_empty") {
-                projectType = "EmptyProject/";
-            }
-            else if (id == "project_2d") {
-                projectType = "Project2D/";
-            }
-            else if (id == "project_3d") {
-                projectType = "Project3D/";
-            }
-
-            if (projectType) {
-
-                var env = ToolCore.toolEnvironment;
-                var projectTemplateFolder = env.toolDataDir + "ProjectTemplates/" + projectType;
-
+            if (projectDefinition) {
                 this.hide();
 
-                var ops = EditorUI.getModelOps();
-                ops.showCreateProject(projectTemplateFolder);
-
-
+                let ops = EditorUI.getModelOps();
+                ops.showCreateProject(projectDefinition);
+            } else {
+                EditorUI.showModalError("New Project Error", `Could not create new project of type: ${id}`);
             }
-
         }
     }
 }

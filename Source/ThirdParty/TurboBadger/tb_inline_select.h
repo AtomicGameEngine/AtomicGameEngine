@@ -13,24 +13,24 @@
 namespace tb {
 
 /** TBSelectList is a select widget with no popups. Instead it has two
-	arrow buttons that cycle between the choices.
-	By default it is a number widget.
+    arrow buttons that cycle between the choices.
+    By default it is a number widget.
 
-	FIX: Should also be possible to set a list of strings that will be
-		shown instead of numbers.
+    FIX: Should also be possible to set a list of strings that will be
+        shown instead of numbers.
 */
 class TBInlineSelect : public TBWidget, private TBWidgetListener
 {
 public:
-	// For safe typecasting
-	TBOBJECT_SUBCLASS(TBInlineSelect, TBWidget);
+    // For safe typecasting
+    TBOBJECT_SUBCLASS(TBInlineSelect, TBWidget);
 
-	TBInlineSelect();
-	~TBInlineSelect();
+    TBInlineSelect();
+    ~TBInlineSelect();
 
-	/** Set along which axis the content should layouted. */
-	virtual void SetAxis(AXIS axis) { m_layout.SetAxis(axis); }
-	virtual AXIS GetAxis() const { return m_layout.GetAxis(); }
+    /** Set along which axis the content should layouted. */
+    virtual void SetAxis(AXIS axis) { m_layout.SetAxis(axis); }
+    virtual AXIS GetAxis() const { return m_layout.GetAxis(); }
 
     void SetLimits(double min, double max);
     double GetMinValue() const { return m_min; }
@@ -39,18 +39,18 @@ public:
     virtual void SetValueDouble(double value) { SetValueInternal(value, true); }
     virtual double GetValueDouble() { return m_value; }
 
-	virtual void SetValue(int value) { SetValueInternal(value, true); }
+    virtual void SetValue(int value) { SetValueInternal(value, true); }
     virtual int GetValue() { return m_value; }
 
     void SetEditFieldLayoutParams(LayoutParams& lp);
 
-	virtual void OnInflate(const INFLATE_INFO &info);
-	virtual void OnSkinChanged();
-	virtual bool OnEvent(const TBWidgetEvent &ev);
+    virtual void OnInflate(const INFLATE_INFO &info);
+    virtual void OnSkinChanged();
+    virtual bool OnEvent(const TBWidgetEvent &ev);
 protected:
-	TBButton m_buttons[2];
-	TBLayout m_layout;
-	TBEditField m_editfield;
+    TBButton m_buttons[2];
+    TBLayout m_layout;
+    TBEditField m_editfield;
     double m_value;
     double m_min, m_max;
     bool m_modified;

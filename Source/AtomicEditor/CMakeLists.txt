@@ -25,9 +25,8 @@ if (APPLE)
     set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
     set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
-elseif(LINUX)
-
 else()
+
     include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
     add_definitions(-DCURL_STATICLIB)
 
@@ -36,6 +35,7 @@ else()
     add_definitions(-DATOMIC_WIN32_CONSOLE)
 
     set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
+
 endif(APPLE)
 
 add_executable(AtomicEditor ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
@@ -45,10 +45,10 @@ target_link_libraries(AtomicEditor ToolCore AtomicJS AtomicPlayerJS AtomicNETJS 
 if (APPLE)
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
 
-    target_link_libraries(AtomicEditor NETCore NETScript curl)
+    target_link_libraries(AtomicEditor NETCore NETScript libcurl)
 
 elseif(LINUX)
-    target_link_libraries(AtomicEditor NETCore NETScript curl nativefiledialog ${GTK3_LIBRARIES})
+    target_link_libraries(AtomicEditor NETCore NETScript libcurl nativefiledialog ${GTK3_LIBRARIES})
 
 else()
     target_link_libraries(AtomicEditor NETCore NETScript libcurl Iphlpapi Wldap32)
@@ -71,3 +71,5 @@ GroupSources("Javascript")
 GroupSources("PlayerMode")
 GroupSources("Utils")
 GroupSources("Components")
+
+include(AtomicDoc)

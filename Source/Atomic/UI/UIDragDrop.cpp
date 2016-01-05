@@ -116,18 +116,32 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
 
     if ((eventData[P_BUTTONS].GetUInt() & MOUSEB_LEFT) && TBWidget::hovered_widget)
     {
-        // see if we have a widget
-        TBWidget* tbw = TBWidget::hovered_widget;
+        // see if we have a widget with a drag object
 
-        while(tbw && !tbw->GetDelegate())
+        TBWidget* tbw = TBWidget::hovered_widget;
+        UIWidget* widget = nullptr;
+
+        while(tbw)
         {
+            if (tbw->GetDelegate())
+            {
+                widget = (UIWidget*) tbw->GetDelegate();
+
+                if (widget->GetDragObject())
+                {
+                    // TODO: check if we're in widget bounds
+                    // this is going to need to be updated for drag/drop multiselect
+                    break;
+                }
+
+                widget = nullptr;
+            }
+
             tbw = tbw->GetParent();
         }
 
-        if (!tbw)
+        if (!widget)
             return;
-
-        UIWidget* widget = (UIWidget*) tbw->GetDelegate();
 
         currentTargetWidget_ = widget;
         dragSourceWidget_ = widget;

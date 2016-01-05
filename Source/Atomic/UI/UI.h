@@ -33,6 +33,7 @@ namespace Atomic
 class VertexBuffer;
 class UIRenderer;
 class UIWidget;
+class UIPopupWindow;
 
 namespace SystemUI
 {
@@ -111,6 +112,8 @@ public:
 
     void SetBlockChangedEvents(bool blocked = true);
 
+    UIWidget* GetHoveredWidget();
+
 private:
 
     static WeakPtr<Context> uiContext_;
@@ -144,6 +147,8 @@ private:
     HashMap<tb::TBWidget*, SharedPtr<UIWidget> > widgetWrap_;
     HashMap<unsigned, String> tbidToString_;
 
+    WeakPtr<UIPopupWindow> tooltip_;
+
     int changedEventsBlocked_;
 
     bool inputDisabled_;
@@ -152,6 +157,8 @@ private:
     bool skinLoaded_;
     bool consoleVisible_;
     bool exitRequested_;
+    
+    float tooltipHoverTime_;
 
     // Events
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);

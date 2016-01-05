@@ -34,7 +34,9 @@ if (WIN32)
 
    add_definitions (-D_WINSOCKAPI_)
    add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-   add_definitions (-DKNET_MEMORY_LEAK_CHECK)
+   # ATOMIC: Disable KNET_MEMORY_LEAK_CHECK, only used on Windows
+   # redefines new/delete and causes a compilation problem on VS2015 Update 1
+   # add_definitions (-DKNET_MEMORY_LEAK_CHECK)
 elseif (UNIX)
    file (GLOB kNetUnixSourceFiles src/unix/*.cpp)
    file (GLOB kNetUnixHeaderFiles include/*.h include/kNet/*.h include/kNet/unix/*.h)
@@ -61,4 +63,3 @@ endif ()
 set (SOURCE_FILES ${kNetSourceFiles} ${kNetHeaderFiles})
 
 add_library(kNet ${SOURCE_FILES})
-

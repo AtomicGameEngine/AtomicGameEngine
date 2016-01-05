@@ -25,7 +25,9 @@ namespace('build', function() {
           cmds.push(atomicRoot + "Build/Windows/node/node.exe " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
         else if (os.platform() == "darwin")
           cmds.push(atomicRoot + "Build/Mac/node/node " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
-
+        else if (os.platform() == "linux") {
+          cmds.push(atomicRoot + "Build/Linux/node/node " + atomicRoot + "Build/TypeScript/tsc.js -p " + atomicRoot + "Script");
+        }
         jake.exec(cmds, function() {
 
           complete();

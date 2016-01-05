@@ -54,7 +54,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
             }
 
             if (child) {
-                child.scene.sendEvent("SceneEditNodeCreated", { node : child});
+                child.scene.sendEvent("SceneEditNodeCreated", { node: child });
             }
 
             return true;
@@ -69,7 +69,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
         if (target.id == "node context menu") {
 
-            var node = <Atomic.Node> target['node'];
+            var node = <Atomic.Node>target['node'];
 
             if (!node) {
                 return false;
@@ -77,13 +77,22 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
             if (refid == "delete_node") {
 
-              node.removeAllComponents();
-              node.remove();
+                if (node instanceof Atomic.Scene)
+                    return;
+
+                var scene = node.scene;
+                scene.sendEvent("SceneEditAddRemoveNodes", { end: false });
+                scene.sendEvent("SceneEditNodeRemoved", { node: node, parent: node.parent, scene: scene });
+                node.remove();
+                scene.sendEvent("SceneEditAddRemoveNodes", { end: true });
 
             } else if (refid == "duplicate_node") {
 
+                if (node instanceof Atomic.Scene)
+                    return;
+
                 var newnode = node.clone();
-                node.scene.sendEvent("SceneEditNodeCreated", { node : newnode});
+                node.scene.sendEvent("SceneEditNodeCreated", { node: newnode });
             }
 
             return true;

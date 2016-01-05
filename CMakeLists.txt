@@ -33,7 +33,7 @@ endif()
 
 if (NOT EMSCRIPTEN)
     add_definitions( -DATOMIC_NETWORK)
-    set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} SDL Civetweb Recast Detour DetourCrowd DetourTileCache kNet )
+    set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} SDL Civetweb Recast Detour DetourCrowd DetourTileCache kNet libcurl )
 endif()
 
 add_definitions( -DATOMIC_WEB )
@@ -62,6 +62,14 @@ elseif(EMSCRIPTEN)
 
 	include(AtomicWeb)
 
+endif()
+
+find_program(CLDOC cldoc)
+if(CLDOC)
+
+   add_custom_target(docs 
+    DEPENDS AtomicEngineDocs
+    )
 endif()
 
 add_subdirectory(Source)

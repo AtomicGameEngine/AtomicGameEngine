@@ -1,6 +1,8 @@
+set (JAVASCRIPT_BINDINGS_PLATFORM "LINUX")
+set (ATOMIC_NODE_JAKE Build/Linux/node/node Build/node_modules/jake/bin/cli.js  -f  Build/Scripts/Bootstrap.js)
+
 include(AtomicDesktop)
 
-set (JAVASCRIPT_BINDINGS_PLATFORM "LINUX")
 
 add_definitions(-DATOMIC_PLATFORM_LINUX -DATOMIC_OPENGL -DKNET_UNIX -DHAVE_INT64_T)
 

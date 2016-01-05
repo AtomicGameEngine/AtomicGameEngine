@@ -28,6 +28,7 @@
 #include <Aclapi.h>
 #include <string>
 
+#include "../Core/Timer.h"
 #include "IPCWindows.h"
 
 typedef std::wstring IPCWString;
@@ -213,6 +214,8 @@ void PipeWin::ReaderThread::ThreadFunction()
         {
             readSize_ = (unsigned) bytesRead;
         }
+
+        Time::Sleep(100);
 
     }
 }

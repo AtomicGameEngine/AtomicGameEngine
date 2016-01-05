@@ -9,6 +9,7 @@ import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import ScriptWidget = require("ui/ScriptWidget");
 import Preferences = require("editor/Preferences");
+import ProjectTemplates = require("resources/ProjectTemplates");
 
 class WelcomeFrame extends ScriptWidget {
 
@@ -40,15 +41,28 @@ class WelcomeFrame extends ScriptWidget {
 
     }
 
-    handleClickedExample(example: ExampleFormat) {
+    handleClickedExample(example: ProjectTemplates.ProjectTemplateDefinition) {
 
-      var ops = EditorUI.getModelOps();
-      var env = ToolCore.toolEnvironment;
-      ops.showCreateProject(env.toolDataDir + "AtomicExamples/" + example.folder + "/", this.exampleInfoDir + example.screenshot);
-
+        var ops = EditorUI.getModelOps();
+        var env = ToolCore.toolEnvironment;
+        ops.showCreateProject(example);
     }
 
-    addExample(example: ExampleFormat) {
+    addExample(example: ProjectTemplates.ProjectTemplateDefinition) {
+
+        var fileSystem = Atomic.getFileSystem();
+
+        // Verify that at least one of the projects for this example exists, otherwise bounce out
+        let exists = false;
+        example.templates.forEach(template => {
+            if (fileSystem.dirExists(template.folder)) {
+                exists = true;
+            }
+        });
+
+        if (!exists) {
+            return;
+        }
 
         var exlayout = <Atomic.UILayout>this.getWidget("examples_layout");
 
@@ -77,11 +91,11 @@ class WelcomeFrame extends ScriptWidget {
 
         button.onClick = () => {
 
-          this.handleClickedExample(example);
+            this.handleClickedExample(example);
 
-        }
+        };
 
-        image.image = this.exampleInfoDir + example.screenshot;
+        image.image = example.screenshot;
         image.skinBg = "ImageFrame";
         var rect = [0, 0, image.imageWidth / 2, image.imageHeight / 2];
         image.rect = rect;
@@ -144,24 +158,10 @@ class WelcomeFrame extends ScriptWidget {
     }
 
     initExampleBrowser() {
-
-        var env = ToolCore.toolEnvironment;
-
-        this.exampleInfoDir =env.toolDataDir + "ExampleInfo/";
-
-        var exampleJsonFile = this.exampleInfoDir + "Examples.json";
-
-        var jsonFile = new Atomic.File(exampleJsonFile, Atomic.FILE_READ);
-        if (!jsonFile.isOpen())
-            return;
-
-        var examples = <ExamplesFormat>JSON.parse(jsonFile.readText());
-
-        for (var i in examples.examples) {
-
-            this.addExample(examples.examples[i]);
+        let examples = ProjectTemplates.getExampleProjectTemplateDefinitions();
+        for (var i = 0; i < examples.length; i++) {
+            this.addExample(examples[i]);
         }
-
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -235,28 +235,12 @@ class WelcomeFrame extends ScriptWidget {
     }
 
     // examples
-    exampleInfoDir: string;
     exampleCount = 0;
     currentExampleLayout: Atomic.UILayout;
-    exampleInfos:[ExampleFormat];
 
     recent: string[] = [];
     recentList: Atomic.UIListView;
 
-}
-
-class ExamplesFormat {
-
-    examples: [ExampleFormat];
-
-}
-
-class ExampleFormat {
-    name: string;
-    desc: string;
-    screenshot: string;
-    folder: string;
-    module: string;
 }
 
 export = WelcomeFrame;

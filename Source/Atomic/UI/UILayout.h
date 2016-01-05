@@ -29,13 +29,6 @@
 namespace Atomic
 {
 
-enum UI_AXIS {
-    ///< Horizontal layout
-    UI_AXIS_X = tb::AXIS_X,
-    ///< Vertical layout
-    UI_AXIS_Y = tb::AXIS_Y,
-};
-
 /// Specifies which height widgets in a AXIS_X layout should have,
 ///	or which width widgets in a AXIS_Y layout should have.
 ///	No matter what, it will still prioritize minimum and maximum for each widget.

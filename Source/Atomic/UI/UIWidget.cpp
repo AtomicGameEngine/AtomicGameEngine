@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-//--player --editor-resource-paths "/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/CoreData!/Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicPlayer/Resources/PlayerData!/Users/josh/Dev/atomic/AtomicExamples/UIExample/Resources"
-
 #include "../IO/Log.h"
 #include "../Input/InputEvents.h"
 
@@ -250,11 +248,10 @@ void UIWidget::AddChildRelative(UIWidget* child, UI_WIDGET_Z_REL z, UIWidget* re
 String UIWidget::GetText()
 {
     if (!widget_)
-        return "";
+        return String::EMPTY;
 
     return widget_->GetText().CStr();
 }
-
 
 void UIWidget::SetText(const String& text)
 {
@@ -271,6 +268,14 @@ void UIWidget::SetGravity(UI_GRAVITY gravity)
 
     widget_->SetGravity((WIDGET_GRAVITY) gravity);
 
+}
+
+void UIWidget::SetAxis(UI_AXIS axis)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetAxis((AXIS) axis);
 }
 
 bool UIWidget::IsAncestorOf(UIWidget* widget)
@@ -793,6 +798,13 @@ void UIWidget::SetCapturing(bool capturing)
     widget_->SetCapturing(capturing);
 }
 
+bool UIWidget::GetCapturing()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->GetCapturing();
+}
 
 void UIWidget::InvalidateLayout()
 {
@@ -808,6 +820,38 @@ void UIWidget::InvokeShortcut(const String& shortcut)
     TBWidgetEvent ev(EVENT_TYPE_SHORTCUT);
     ev.ref_id = TBIDC(shortcut.CString());
     widget_->OnEvent(ev);
+}
+
+bool UIWidget::GetShortened()
+{
+    if (!widget_)
+        return false;
+
+    return widget_->GetShortened();
+}
+
+void UIWidget::SetShortened(bool shortened)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetShortened(shortened);
+}
+
+String UIWidget::GetTooltip()
+{
+    if (!widget_)
+        return String::EMPTY;
+
+    return widget_->GetTooltip().CStr();
+}
+
+void UIWidget::SetTooltip(const String& tooltip)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetTooltip(tooltip.CString());
 }
 
 

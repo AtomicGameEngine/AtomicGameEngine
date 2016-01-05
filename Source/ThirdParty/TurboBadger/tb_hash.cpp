@@ -11,17 +11,17 @@ namespace tb {
 
 uint32 TBGetHash(const char *str)
 {
-	if (!str || !*str)
-		return 0;
-	// FNV hash
-	uint32 hash = 2166136261U;
-	int i = 0;
-	while (str[i])
-	{
-		char c = str[i++];
-		hash = (16777619U * hash) ^ c;
-	}
-	return hash;
+    if (!str || !*str)
+        return 0;
+    // FNV hash
+    uint32 hash = 2166136261U;
+    int i = 0;
+    while (str[i])
+    {
+        char c = str[i++];
+        hash = (16777619U * hash) ^ c;
+    }
+    return hash;
 }
 
 #endif // !TB_SUPPORT_CONSTEXPR

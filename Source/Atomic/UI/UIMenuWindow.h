@@ -36,7 +36,7 @@ class UIMenuWindow : public UIWidget
 
 public:
 
-    UIMenuWindow(Context* context, UIWidget* target, const String& id);
+    UIMenuWindow(Context* context, UIWidget* target, const String& id = String::EMPTY);
     virtual ~UIMenuWindow();
 
     void Show(UISelectItemSource* source, int x = -1, int y = -1);

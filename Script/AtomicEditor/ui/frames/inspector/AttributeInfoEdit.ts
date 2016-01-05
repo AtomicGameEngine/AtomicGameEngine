@@ -209,6 +209,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
         lp.width = 160;
+        lp.height = 24;
         field.layoutParams = lp;
 
         field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
@@ -292,6 +293,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
             field.fontDescription = AttributeInfoEdit.fontDesc;
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
+            lp.height = 24;
             field.layoutParams = lp;
 
             field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
@@ -387,6 +389,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
+        lp.height = 24;
         field.layoutParams = lp;
 
         field.subscribeToEvent(field, "UIWidgetEditComplete", (ev) => this.handleUIWidgetEditCompleteEvent(ev));
@@ -718,6 +721,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
+        lp.height = 24;
         o.editField.layoutParams = lp;
         o.editField.readOnly = true;
 

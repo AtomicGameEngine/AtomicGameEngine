@@ -139,6 +139,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
     rootWidget_->InvokePointerMove(px, py, tb::TB_MODIFIER_NONE, false);
 
+    tooltipHoverTime_ = 0;
 }
 
 

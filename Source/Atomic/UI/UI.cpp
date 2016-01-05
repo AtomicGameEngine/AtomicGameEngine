@@ -36,6 +36,8 @@
 #include <TurboBadger/tb_tab_container.h>
 #include <TurboBadger/tb_toggle_container.h>
 #include <TurboBadger/tb_scroll_container.h>
+#include <TurboBadger/tb_menu_window.h>
+#include <TurboBadger/tb_popup_window.h>
 #include <TurboBadger/image/tb_image_widget.h>
 
 void register_tbbf_font_renderer();
@@ -79,6 +81,8 @@ using namespace tb;
 #include "UISeparator.h"
 #include "UIDimmer.h"
 #include "UISelectDropdown.h"
+#include "UIMenuWindow.h"
+#include "UIPopupWindow.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -209,9 +213,6 @@ void UI::Initialize(const String& languageFile)
     rootWidget_->SetSize(width, height);
     rootWidget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
 
-    // register the UIDragDrop subsystem
-    context_->RegisterSubsystem(new UIDragDrop(context_));
-
     SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(UI, HandleMouseButtonDown));
     SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(UI, HandleMouseButtonUp));
     SubscribeToEvent(E_MOUSEMOVE, HANDLER(UI, HandleMouseMove));
@@ -228,6 +229,9 @@ void UI::Initialize(const String& languageFile)
     SubscribeToEvent(E_TOUCHMOVE, HANDLER(UI, HandleTouchMove));
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
+
+    // register the UIDragDrop subsystem (after we have subscribed to events, so it is processed after)
+    context_->RegisterSubsystem(new UIDragDrop(context_));
 
     tb::TBWidgetListener::AddGlobalListener(this);
 
@@ -535,9 +539,46 @@ void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
         exitRequested_ = false;
         return;
     }
+    
+    tooltipHoverTime_ += eventData[Update::P_TIMESTEP].GetFloat();
+
+    if (tooltipHoverTime_ >= 0.5f)
+    {
+        UIWidget* hoveredWidget = GetHoveredWidget();
+        if (hoveredWidget && !tooltip_ && (hoveredWidget->GetShortened() || hoveredWidget->GetTooltip().Length() > 0))
+        {
+            tooltip_ = new UIPopupWindow(context_, true, hoveredWidget, "tooltip");
+            UILayout* tooltipLayout = new UILayout(context_, UI_AXIS_Y, true);
+            if (hoveredWidget->GetShortened())
+            {
+                UITextField* fullTextField = new UITextField(context_, true);
+                fullTextField->SetText(hoveredWidget->GetText());
+                tooltipLayout->AddChild(fullTextField);
+            }
+            if (hoveredWidget->GetTooltip().Length() > 0)
+            {
+                UITextField* tooltipTextField = new UITextField(context_, true);
+                tooltipTextField->SetText(hoveredWidget->GetTooltip());
+                tooltipLayout->AddChild(tooltipTextField);
+            }
+            Input* input = GetSubsystem<Input>();
+            IntVector2 mousePosition = input->GetMousePosition();
+            tooltip_->AddChild(tooltipLayout);
+            tooltip_->Show(mousePosition.x_ + 8, mousePosition.y_ + 8);
+        }
+    }
+    else 
+    {
+        if (tooltip_) tooltip_->Close();
+    }
 
     SendEvent(E_UIUPDATE);
     TBMessageHandler::ProcessMessages();
+}
+
+UIWidget* UI::GetHoveredWidget()
+{
+    return WrapWidget(TBWidget::hovered_widget);
 }
 
 bool UI::IsWidgetWrapped(tb::TBWidget* widget)
@@ -600,6 +641,14 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
 
     // this is order dependent as we're using IsOfType which also works if a base class
 
+    if (widget->IsOfType<TBPopupWindow>())
+    {
+        UIPopupWindow* popupWindow = new UIPopupWindow(context_, false);
+        popupWindow->SetWidget(widget);
+        widgetWrap_[widget] = popupWindow;
+        return popupWindow;
+    }
+
     if (widget->IsOfType<TBDimmer>())
     {
         UIDimmer* dimmer = new UIDimmer(context_, false);
@@ -639,7 +688,6 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
         widgetWrap_[widget] = sep;
         return sep;
     }
-
 
     if (widget->IsOfType<TBContainer>())
     {

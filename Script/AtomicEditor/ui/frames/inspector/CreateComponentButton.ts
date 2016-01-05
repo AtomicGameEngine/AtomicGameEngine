@@ -28,27 +28,32 @@ var geometryCreateSource = new Atomic.UIMenuItemSource();
 geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModel", "StaticModel"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimatedModel", "AnimatedModel"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "AnimationController"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("BillboardSet", "create component"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("CustomGeometry", "create component"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("ParticleEmitter", "create component"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("BillboardSet", "BillboardSet"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("CustomGeometry", "CustomGeometry"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("ParticleEmitter", "ParticleEmitter"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Skybox", "SkyBox"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModelGroup", "create component"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("Terrain", "create component"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("StaticModelGroup", "StaticModelGroup"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("Terrain", "Terrain"));
 geometryCreateSource.addItem(new Atomic.UIMenuItem("Text3D", "create component"));
-geometryCreateSource.addItem(new Atomic.UIMenuItem("Water", "create component"));
+geometryCreateSource.addItem(new Atomic.UIMenuItem("Water", "Water"));
 
 var logicCreateSource = new Atomic.UIMenuItemSource();
 
 logicCreateSource.addItem(new Atomic.UIMenuItem("JSComponent", "JSComponent"));
 logicCreateSource.addItem(new Atomic.UIMenuItem("CSComponent", "CSComponent"));
-logicCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "create component"));
-logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "create component"));
+logicCreateSource.addItem(new Atomic.UIMenuItem("AnimationController", "AnimationController"));
+logicCreateSource.addItem(new Atomic.UIMenuItem("SplinePath", "SplinePath"));
 
 var navigationCreateSource = new Atomic.UIMenuItemSource();
 
-navigationCreateSource.addItem(new Atomic.UIMenuItem("Navigable", "create component"));
-navigationCreateSource.addItem(new Atomic.UIMenuItem("NavigationMesh", "create component"));
-navigationCreateSource.addItem(new Atomic.UIMenuItem("OffMeshConnection", "create component"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("CrowdAgent", "CrowdAgent"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("CrowdManager", "CrowdManager"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("NavArea", "NavArea"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("Navigable", "Navigable"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("NavigationMesh", "NavigationMesh"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("DynamicNavigationMesh", "DynamicNavigationMesh"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("Obstacle", "Obstacle"));
+navigationCreateSource.addItem(new Atomic.UIMenuItem("OffMeshConnection", "OffMeshConnection"));
 
 var networkCreateSource = new Atomic.UIMenuItemSource();
 
@@ -57,7 +62,7 @@ networkCreateSource.addItem(new Atomic.UIMenuItem("Network Priority", "create co
 var physicsCreateSource = new Atomic.UIMenuItemSource();
 
 physicsCreateSource.addItem(new Atomic.UIMenuItem("CollisionShape", "CollisionShape"));
-physicsCreateSource.addItem(new Atomic.UIMenuItem("Constraint", "create component"));
+physicsCreateSource.addItem(new Atomic.UIMenuItem("Constraint", "Constraint"));
 physicsCreateSource.addItem(new Atomic.UIMenuItem("RigidBody", "RigidBody"));
 
 var sceneCreateSource = new Atomic.UIMenuItemSource();

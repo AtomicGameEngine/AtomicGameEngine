@@ -7,6 +7,7 @@
 
 #include <Atomic/Atomic.h>
 #include <Atomic/Engine/Engine.h>
+#include <Atomic/Engine/EngineConfig.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/IOEvents.h>
@@ -59,11 +60,12 @@ void AEPlayerApplication::Setup()
 {
     AEEditorCommon::Setup();
 
+    // Read the engine configuration
+    ReadEngineConfig();
+
     engine_->SetAutoExit(false);
 
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
-
-    engineParameters_["WindowTitle"] = "AtomicPlayer";
+    engineParameters_.InsertNew("WindowTitle", "AtomicPlayer");
 
 #if (ATOMIC_PLATFORM_ANDROID)
     engineParameters_["FullScreen"] = true;
@@ -82,9 +84,9 @@ void AEPlayerApplication::Setup()
     engineParameters_["WindowHeight"] = 720;
 #endif
 
-    engineParameters_["LogLevel"] = LOG_DEBUG;
+    engineParameters_.InsertNew("LogLevel", LOG_DEBUG);
 
-#if ATOMIC_PLATFORM_WINDOWS
+#if ATOMIC_PLATFORM_WINDOWS || ATOMIC_PLATFORM_LINUX
     engineParameters_["WindowIcon"] = "Images/AtomicLogo32.png";
     engineParameters_["ResourcePrefixPath"] = "AtomicPlayer_Resources";
 #elif ATOMIC_PLATFORM_ANDROID
@@ -92,6 +94,8 @@ void AEPlayerApplication::Setup()
 #elif ATOMIC_PLATFORM_OSX
     engineParameters_["ResourcePrefixPath"] = "../Resources";
 #endif
+
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
 
     const Vector<String>& arguments = GetArguments();
 
@@ -113,9 +117,6 @@ void AEPlayerApplication::Setup()
             else if (argument == "--project" && value.Length())
             {
                 engineParameters_["ResourcePrefixPath"] = "";
-
-                // This works for a local dev build, --editor-resource-paths command below is for
-                // launching from AtomicEditor (IPC)
 
                 value = AddTrailingSlash(value);
 
@@ -173,14 +174,55 @@ void AEPlayerApplication::Setup()
             else if (argument == "--resizable") 
             {
                 engineParameters_["WindowResizable"] = true;
+            } 
+            else if (argument == "--maximize")
+            {
+                engineParameters_["WindowMaximized"] = true;
             }
         }
     }
 
-
-
     // Use the script file name as the base name for the log file
     engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
+}
+
+void AEPlayerApplication::ReadEngineConfig()
+{
+    // find the project path from the command line args
+
+    String projectPath;
+    const Vector<String>& arguments = GetArguments();
+
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1)
+        {
+            String argument = arguments[i].ToLower();
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+
+            if (argument == "--project" && value.Length())
+            {
+                projectPath = AddTrailingSlash(value);
+                break;
+            }
+
+        }
+    }
+
+    if (!projectPath.Length())
+        return;
+
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
+    String filename = projectPath + "Settings/Engine.json";
+
+    if (!filesystem->FileExists(filename))
+        return;
+
+    if (EngineConfig::LoadFromFile(context_, filename))
+    {
+        EngineConfig::ApplyConfig(engineParameters_);
+    }
+
 }
 
 void AEPlayerApplication::Start()

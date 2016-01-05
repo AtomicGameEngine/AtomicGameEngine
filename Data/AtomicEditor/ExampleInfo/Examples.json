@@ -4,120 +4,216 @@
 				"name": "Physics Platformer 2D",
 				"desc" : "Moving platforms, vines, and neat 2D lighting",
 				"screenshot" : "PhysicsPlatformer2D.png",
-				"folder" : "PhysicsPlatformer",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "PhysicsPlatformer"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "ToonTown",
 				"desc" : "Town, Terrain, Day/Night Cycles",
 				"screenshot" : "ToonTown.png",
-				"folder" : "ToonTown",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "ToonTown"
+					}
+				],
 				"module" : "3D"
 			},
 			{
 				"name": "SpaceGame",
 				"desc" : "A 2D Arcade Space Game",
 				"screenshot" : "SpaceGame.png",
-				"folder" : "SpaceGame",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "SpaceGame"
+					}
+				],
 				"module" : "2D"
-
 			},
 			{
 				"name": "Roboman 3D",
 				"desc" : "A 3D physics example featuring Roboman!",
 				"screenshot" : "Roboman3D.png",
-				"folder" : "RoboMan3D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "RoboMan3D"
+					}
+				],
 				"module" : "3D"
 			},
 			{
 				"name": "Character Animation 2D",
 				"desc" : "Example of controlling a Spriter animated character",
 				"screenshot" : "CharacterAnimation2D.png",
-				"folder" : "CharacterAnimation2D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "CharacterAnimation2D"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "Character Animation 3D",
 				"desc" : "Example of controlling a skeletally animated character",
 				"screenshot" : "CharacterAnimation3D.png",
-				"folder" : "CharacterAnimation3D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "CharacterAnimation3D"
+					}
+				],
 				"module" : "3D"
 			},
 			{
 				"name": "Light 2D",
 				"desc" : "An example of realtime 2D lights with shadows",
 				"screenshot" : "Light2D.png",
-				"folder" : "Light2DExample",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Light2DExample"
+					}
+				],
 				"module" : "2D"
+			},
+			{
+				"name": "ParticleEmitter3D",
+				"desc" : "An example of 3d particles driven by script",
+				"screenshot" : "ParticleEmitter3D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "ParticleEmitter3D"
+					}
+				],
+				"module" : "3D"
 			},
 			{
 				"name": "Butterflies",
 				"desc" : "An example of particles driven by script",
 				"screenshot" : "Butterflies.png",
-				"folder" : "Butterflies",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Butterflies"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "BunnyMark",
 				"desc" : "A benchmark test using sprite bunnies",
 				"screenshot" : "BunnyMark.png",
-				"folder" : "BunnyMark",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "BunnyMark"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "Breakout",
 				"desc" : "2D Breakout game with touch controls",
 				"screenshot" : "Breakout.png",
-				"folder" : "Breakout",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Breakout"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "Render to Texture",
 				"desc" : "An example of a scene rendered onto a 3D object",
 				"screenshot" : "RenderToTexture.png",
-				"folder" : "RenderToTexture",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "RenderToTexture"
+					}
+				],
 				"module" : "3D"
 			},
 			{
 				"name": "UI Scene View",
 				"desc" : "UI example showing a scene playing inside a UI frame",
 				"screenshot" : "UISceneView2D.png",
-				"folder" : "UISceneView2D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "UISceneView2D"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "Chickens",
 				"desc" : "Chickens!",
 				"screenshot" : "Chickens.png",
-				"folder" : "Chickens",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Chickens"
+					}
+				],
 				"module" : "3D"
 			},
 			{
 				"name": "Particles 2D",
 				"desc" : "An example of the 2D particle system",
 				"screenshot" : "Particles2D.png",
-				"folder" : "Particles2D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Particles2D"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "Basic 2D",
 				"desc" : "An example of a 2D sprite in a scene",
 				"screenshot" : "Basic2D.png",
-				"folder" : "Basic2D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Basic2D"
+					}
+				],
 				"module" : "2D"
 			},
 			{
 				"name": "Basic 3D",
 				"desc" : "An example of a 3D object in a scene",
 				"screenshot" : "Basic3D.png",
-				"folder" : "Basic3D",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Basic3D"
+					}
+				],
 				"module" : "3D"
 			},
 			{
 				"name": "Event Loop",
 				"desc" : "An example using the JavaScript event loop",
 				"screenshot" : "EventLoop.png",
-				"folder" : "EventLoop",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "EventLoop"
+					}
+				],
 				"module" : "2D"
 			}
 	]

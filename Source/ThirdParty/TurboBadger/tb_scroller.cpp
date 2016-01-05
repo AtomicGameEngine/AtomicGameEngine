@@ -30,49 +30,49 @@ namespace tb {
 
 float TBScrollerFunction::GetDurationFromSpeed(float start_speed)
 {
-	float abs_start_speed = ABS(start_speed);
-	if (abs_start_speed <= SF_GATE_THRESHOLD)
-		return 0;
-	return -log(SF_GATE_THRESHOLD / abs_start_speed) * m_decay;
+    float abs_start_speed = ABS(start_speed);
+    if (abs_start_speed <= SF_GATE_THRESHOLD)
+        return 0;
+    return -log(SF_GATE_THRESHOLD / abs_start_speed) * m_decay;
 }
 
 float TBScrollerFunction::GetSpeedFromDistance(float distance)
 {
-	float speed = distance / m_decay;
-	if (distance > SF_GATE_THRESHOLD)
-		return speed + SF_GATE_THRESHOLD;
-	else if (distance < -SF_GATE_THRESHOLD)
-		return speed - SF_GATE_THRESHOLD;
-	return speed;
+    float speed = distance / m_decay;
+    if (distance > SF_GATE_THRESHOLD)
+        return speed + SF_GATE_THRESHOLD;
+    else if (distance < -SF_GATE_THRESHOLD)
+        return speed - SF_GATE_THRESHOLD;
+    return speed;
 }
 
 float TBScrollerFunction::GetDistanceAtTime(float start_speed, float elapsed_time_ms)
 {
-	assert(elapsed_time_ms >= 0);
-	return start_speed * (1 - exp(-elapsed_time_ms / m_decay)) * m_decay;
+    assert(elapsed_time_ms >= 0);
+    return start_speed * (1 - exp(-elapsed_time_ms / m_decay)) * m_decay;
 }
 
 int TBScrollerFunction::GetDistanceAtTimeInt(float start_speed, float elapsed_time_ms)
 {
-	float distance = GetDistanceAtTime(start_speed, elapsed_time_ms);
-	return (int)(distance < 0 ? distance - 0.5f : distance + 0.5f);
+    float distance = GetDistanceAtTime(start_speed, elapsed_time_ms);
+    return (int)(distance < 0 ? distance - 0.5f : distance + 0.5f);
 }
 
 // == TBScroller ========================================================================
 
 TBScroller::TBScroller(TBWidget *target)
-	: m_target(target)
-	, m_snap_listener(nullptr)
-	, m_func(SCROLL_DECAY)
-	, m_previous_pan_dx(0)
-	, m_previous_pan_dy(0)
-	, m_scroll_start_ms(0)
-	, m_scroll_duration_x_ms(0)
-	, m_scroll_duration_y_ms(0)
-	, m_pan_power_multiplier_x(1)
-	, m_pan_power_multiplier_y(1)
+    : m_target(target)
+    , m_snap_listener(nullptr)
+    , m_func(SCROLL_DECAY)
+    , m_previous_pan_dx(0)
+    , m_previous_pan_dy(0)
+    , m_scroll_start_ms(0)
+    , m_scroll_duration_x_ms(0)
+    , m_scroll_duration_y_ms(0)
+    , m_pan_power_multiplier_x(1)
+    , m_pan_power_multiplier_y(1)
 {
-	Reset();
+    Reset();
 }
 
 TBScroller::~TBScroller()
@@ -81,300 +81,300 @@ TBScroller::~TBScroller()
 
 void TBScroller::Reset()
 {
-	m_is_started = false;
-	m_pan_dx = m_pan_dy = 0;
-	m_pan_time_ms = 0;
-	m_pan_delta_time_ms = 0;
-	m_scroll_start_speed_ppms_x = m_scroll_start_speed_ppms_y = 0;
-	m_scroll_start_scroll_x = m_scroll_start_scroll_y = 0;
-	// don't reset m_previous_pan_dx and m_previous_pan_dy here.
-	// don't reset m_pan_power here. It's done on start since it's needed for next pan!
-	m_expected_scroll_x = m_expected_scroll_y = 0;
+    m_is_started = false;
+    m_pan_dx = m_pan_dy = 0;
+    m_pan_time_ms = 0;
+    m_pan_delta_time_ms = 0;
+    m_scroll_start_speed_ppms_x = m_scroll_start_speed_ppms_y = 0;
+    m_scroll_start_scroll_x = m_scroll_start_scroll_y = 0;
+    // don't reset m_previous_pan_dx and m_previous_pan_dy here.
+    // don't reset m_pan_power here. It's done on start since it's needed for next pan!
+    m_expected_scroll_x = m_expected_scroll_y = 0;
 }
 
 void TBScroller::OnScrollBy(int dx, int dy, bool accumulative)
 {
-	if (!IsStarted())
-		Start();
+    if (!IsStarted())
+        Start();
 
-	float ppms_x = m_func.GetSpeedFromDistance((float)dx);
-	float ppms_y = m_func.GetSpeedFromDistance((float)dy);
+    float ppms_x = m_func.GetSpeedFromDistance((float)dx);
+    float ppms_y = m_func.GetSpeedFromDistance((float)dy);
 
-	if (accumulative && IsScrolling())
-	{
-		TBWidget::ScrollInfo info = m_target->GetScrollInfo();
-		// If new direction is the same as the current direction,
-		// calculate the speed needed for the remaining part and
-		// add that to the new scroll speed.
-		if ((ppms_x < 0) == (m_scroll_start_speed_ppms_x < 0))
-		{
-			int distance_x = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_x,
-				m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_x));
-			int distance_remaining_x = m_scroll_start_scroll_x + distance_x - info.x;
-			distance_remaining_x += m_func.GetDistanceAtTimeInt(ppms_x, m_func.GetDurationFromSpeed(ppms_x));
-			ppms_x = m_func.GetSpeedFromDistance((float)distance_remaining_x);
-		}
-		if ((ppms_y < 0) == (m_scroll_start_speed_ppms_y < 0))
-		{
-			int distance_y = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_y,
-				m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_y));
-			int distance_remaining_y = m_scroll_start_scroll_y + distance_y - info.y;
-			distance_remaining_y += m_func.GetDistanceAtTimeInt(ppms_y, m_func.GetDurationFromSpeed(ppms_y));
-			ppms_y = m_func.GetSpeedFromDistance((float)distance_remaining_y);
-		}
-	}
+    if (accumulative && IsScrolling())
+    {
+        TBWidget::ScrollInfo info = m_target->GetScrollInfo();
+        // If new direction is the same as the current direction,
+        // calculate the speed needed for the remaining part and
+        // add that to the new scroll speed.
+        if ((ppms_x < 0) == (m_scroll_start_speed_ppms_x < 0))
+        {
+            int distance_x = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_x,
+                                                         m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_x));
+            int distance_remaining_x = m_scroll_start_scroll_x + distance_x - info.x;
+            distance_remaining_x += m_func.GetDistanceAtTimeInt(ppms_x, m_func.GetDurationFromSpeed(ppms_x));
+            ppms_x = m_func.GetSpeedFromDistance((float)distance_remaining_x);
+        }
+        if ((ppms_y < 0) == (m_scroll_start_speed_ppms_y < 0))
+        {
+            int distance_y = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_y,
+                                                         m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_y));
+            int distance_remaining_y = m_scroll_start_scroll_y + distance_y - info.y;
+            distance_remaining_y += m_func.GetDistanceAtTimeInt(ppms_y, m_func.GetDurationFromSpeed(ppms_y));
+            ppms_y = m_func.GetSpeedFromDistance((float)distance_remaining_y);
+        }
+    }
 
-	AdjustToSnappingAndScroll(ppms_x, ppms_y);
+    AdjustToSnappingAndScroll(ppms_x, ppms_y);
 }
 
 bool TBScroller::OnPan(int dx, int dy)
 {
-	if (!IsStarted())
-		Start();
+    if (!IsStarted())
+        Start();
 
-	// Pan the target
-	const int in_dx = dx, in_dy = dy;
-	m_target->ScrollByRecursive(dx, dy);
+    // Pan the target
+    const int in_dx = dx, in_dy = dy;
+    m_target->ScrollByRecursive(dx, dy);
 
-	// Calculate the pan speed. Smooth it out with the
-	// previous pan speed to reduce fluctuation a little.
-	double now_ms = TBSystem::GetTimeMS();
-	if (m_pan_time_ms)
-	{
-		if (m_pan_delta_time_ms)
-			m_pan_delta_time_ms = (now_ms - m_pan_time_ms + m_pan_delta_time_ms) / 2.0f;
-		else
-			m_pan_delta_time_ms = now_ms - m_pan_time_ms;
-	}
+    // Calculate the pan speed. Smooth it out with the
+    // previous pan speed to reduce fluctuation a little.
+    double now_ms = TBSystem::GetTimeMS();
+    if (m_pan_time_ms)
+    {
+        if (m_pan_delta_time_ms)
+            m_pan_delta_time_ms = (now_ms - m_pan_time_ms + m_pan_delta_time_ms) / 2.0f;
+        else
+            m_pan_delta_time_ms = now_ms - m_pan_time_ms;
+    }
 
-	m_pan_time_ms = now_ms;
-	m_pan_dx = (m_pan_dx + in_dx) / 2.0f;
-	m_pan_dy = (m_pan_dy + in_dy) / 2.0f;
+    m_pan_time_ms = now_ms;
+    m_pan_dx = (m_pan_dx + in_dx) / 2.0f;
+    m_pan_dy = (m_pan_dy + in_dy) / 2.0f;
 
-	// If we change direction, reset the pan power multiplier in that axis.
-	if (m_pan_dx != 0 && (m_previous_pan_dx < 0) != (m_pan_dx < 0))
-		m_pan_power_multiplier_x = 1;
-	if (m_pan_dy != 0 && (m_previous_pan_dy < 0) != (m_pan_dy < 0))
-		m_pan_power_multiplier_y = 1;
-	m_previous_pan_dx = m_pan_dx;
-	m_previous_pan_dy = m_pan_dy;
+    // If we change direction, reset the pan power multiplier in that axis.
+    if (m_pan_dx != 0 && (m_previous_pan_dx < 0) != (m_pan_dx < 0))
+        m_pan_power_multiplier_x = 1;
+    if (m_pan_dy != 0 && (m_previous_pan_dy < 0) != (m_pan_dy < 0))
+        m_pan_power_multiplier_y = 1;
+    m_previous_pan_dx = m_pan_dx;
+    m_previous_pan_dy = m_pan_dy;
 
-	return in_dx != dx || in_dy != dy;
+    return in_dx != dx || in_dy != dy;
 }
 
 void TBScroller::OnPanReleased()
 {
-	if (TBSystem::GetTimeMS() < m_pan_time_ms + PAN_START_THRESHOLD_MS)
-	{
-		// Don't start scroll if we have too little speed.
-		// This will prevent us from scrolling accidently.
-		float pan_start_distance_threshold_px = 2 * TBSystem::GetDPI() / 100.0f;
-		if (ABS(m_pan_dx) < pan_start_distance_threshold_px && ABS(m_pan_dy) < pan_start_distance_threshold_px)
-		{
-			StopOrSnapScroll();
-			return;
-		}
+    if (TBSystem::GetTimeMS() < m_pan_time_ms + PAN_START_THRESHOLD_MS)
+    {
+        // Don't start scroll if we have too little speed.
+        // This will prevent us from scrolling accidently.
+        float pan_start_distance_threshold_px = 2 * TBSystem::GetDPI() / 100.0f;
+        if (ABS(m_pan_dx) < pan_start_distance_threshold_px && ABS(m_pan_dy) < pan_start_distance_threshold_px)
+        {
+            StopOrSnapScroll();
+            return;
+        }
 
-		if (m_pan_delta_time_ms == 0)
-		{
-			StopOrSnapScroll();
-			return;
-		}
+        if (m_pan_delta_time_ms == 0)
+        {
+            StopOrSnapScroll();
+            return;
+        }
 
-		float ppms_x = (float)m_pan_dx / (float)m_pan_delta_time_ms;
-		float ppms_y = (float)m_pan_dy / (float)m_pan_delta_time_ms;
-		ppms_x *= m_pan_power_multiplier_x;
-		ppms_y *= m_pan_power_multiplier_y;
+        float ppms_x = (float)m_pan_dx / (float)m_pan_delta_time_ms;
+        float ppms_y = (float)m_pan_dy / (float)m_pan_delta_time_ms;
+        ppms_x *= m_pan_power_multiplier_x;
+        ppms_y *= m_pan_power_multiplier_y;
 
-		AdjustToSnappingAndScroll(ppms_x, ppms_y);
-	}
-	else
-		StopOrSnapScroll();
+        AdjustToSnappingAndScroll(ppms_x, ppms_y);
+    }
+    else
+        StopOrSnapScroll();
 }
 
 void TBScroller::Start()
 {
-	if (IsStarted())
-		return;
-	m_is_started = true;
-	double now_ms = TBSystem::GetTimeMS();
-	if (now_ms < m_scroll_start_ms + PAN_POWER_ACC_THRESHOLD_MS)
-	{
-		m_pan_power_multiplier_x *= PAN_POWER_MULTIPLIER;
-		m_pan_power_multiplier_y *= PAN_POWER_MULTIPLIER;
-	}
-	else
-	{
-		m_pan_power_multiplier_x = m_pan_power_multiplier_y = 1;
-	}
+    if (IsStarted())
+        return;
+    m_is_started = true;
+    double now_ms = TBSystem::GetTimeMS();
+    if (now_ms < m_scroll_start_ms + PAN_POWER_ACC_THRESHOLD_MS)
+    {
+        m_pan_power_multiplier_x *= PAN_POWER_MULTIPLIER;
+        m_pan_power_multiplier_y *= PAN_POWER_MULTIPLIER;
+    }
+    else
+    {
+        m_pan_power_multiplier_x = m_pan_power_multiplier_y = 1;
+    }
 }
 
 void TBScroller::Stop()
 {
-	DeleteAllMessages();
-	Reset();
+    DeleteAllMessages();
+    Reset();
 }
 
 bool TBScroller::StopIfAlmostStill()
 {
-	double now_ms = TBSystem::GetTimeMS();
-	if (now_ms > m_scroll_start_ms + (double)m_scroll_duration_x_ms &&
-		now_ms > m_scroll_start_ms + (double)m_scroll_duration_y_ms)
-	{
-		Stop();
-		return true;
-	}
-	return false;
+    double now_ms = TBSystem::GetTimeMS();
+    if (now_ms > m_scroll_start_ms + (double)m_scroll_duration_x_ms &&
+            now_ms > m_scroll_start_ms + (double)m_scroll_duration_y_ms)
+    {
+        Stop();
+        return true;
+    }
+    return false;
 }
 
 void TBScroller::StopOrSnapScroll()
 {
-	AdjustToSnappingAndScroll(0, 0);
-	if (!IsScrolling())
-		Stop();
+    AdjustToSnappingAndScroll(0, 0);
+    if (!IsScrolling())
+        Stop();
 }
 
 void TBScroller::AdjustToSnappingAndScroll(float ppms_x, float ppms_y)
 {
-	if (m_snap_listener)
-	{
-		// Calculate the distance
-		int distance_x = m_func.GetDistanceAtTimeInt(ppms_x, m_func.GetDurationFromSpeed(ppms_x));
-		int distance_y = m_func.GetDistanceAtTimeInt(ppms_y, m_func.GetDurationFromSpeed(ppms_y));
+    if (m_snap_listener)
+    {
+        // Calculate the distance
+        int distance_x = m_func.GetDistanceAtTimeInt(ppms_x, m_func.GetDurationFromSpeed(ppms_x));
+        int distance_y = m_func.GetDistanceAtTimeInt(ppms_y, m_func.GetDurationFromSpeed(ppms_y));
 
-		// Let the snap listener modify the distance
-		TBWidget::ScrollInfo info = m_target->GetScrollInfo();
-		int target_x = distance_x + info.x;
-		int target_y = distance_y + info.y;
-		m_snap_listener->OnScrollSnap(m_target, target_x, target_y);
-		distance_x = target_x - info.x;
-		distance_y = target_y - info.y;
+        // Let the snap listener modify the distance
+        TBWidget::ScrollInfo info = m_target->GetScrollInfo();
+        int target_x = distance_x + info.x;
+        int target_y = distance_y + info.y;
+        m_snap_listener->OnScrollSnap(m_target, target_x, target_y);
+        distance_x = target_x - info.x;
+        distance_y = target_y - info.y;
 
-		// Get the start speed from the new distance
-		ppms_x = m_func.GetSpeedFromDistance((float)distance_x);
-		ppms_y = m_func.GetSpeedFromDistance((float)distance_y);
-	}
+        // Get the start speed from the new distance
+        ppms_x = m_func.GetSpeedFromDistance((float)distance_x);
+        ppms_y = m_func.GetSpeedFromDistance((float)distance_y);
+    }
 
-	Scroll(ppms_x, ppms_y);
+    Scroll(ppms_x, ppms_y);
 }
 
 void TBScroller::Scroll(float start_speed_ppms_x, float start_speed_ppms_y)
 {
-	// Set start values
-	m_scroll_start_ms = TBSystem::GetTimeMS();
-	GetTargetScrollXY(m_scroll_start_scroll_x, m_scroll_start_scroll_y);
-	m_scroll_start_speed_ppms_x = start_speed_ppms_x;
-	m_scroll_start_speed_ppms_y = start_speed_ppms_y;
+    // Set start values
+    m_scroll_start_ms = TBSystem::GetTimeMS();
+    GetTargetScrollXY(m_scroll_start_scroll_x, m_scroll_start_scroll_y);
+    m_scroll_start_speed_ppms_x = start_speed_ppms_x;
+    m_scroll_start_speed_ppms_y = start_speed_ppms_y;
 
-	// Calculate duration for the scroll (each axis independently)
-	m_scroll_duration_x_ms = m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_x);
-	m_scroll_duration_y_ms = m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_y);
+    // Calculate duration for the scroll (each axis independently)
+    m_scroll_duration_x_ms = m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_x);
+    m_scroll_duration_y_ms = m_func.GetDurationFromSpeed(m_scroll_start_speed_ppms_y);
 
-	if (StopIfAlmostStill())
-		return;
+    if (StopIfAlmostStill())
+        return;
 
-	// Post the pan message if we don't already have one
-	if (!GetMessageByID(TBIDC("scroll")))
-	{
-		// Update expected translation
-		GetTargetChildTranslation(m_expected_scroll_x, m_expected_scroll_y);
+    // Post the pan message if we don't already have one
+    if (!GetMessageByID(TBIDC("scroll")))
+    {
+        // Update expected translation
+        GetTargetChildTranslation(m_expected_scroll_x, m_expected_scroll_y);
 
-		PostMessageDelayed(TBIDC("scroll"), nullptr, (uint32)PAN_MSG_DELAY_MS);
-	}
+        PostMessageDelayed(TBIDC("scroll"), nullptr, (uint32)PAN_MSG_DELAY_MS);
+    }
 }
 
 bool TBScroller::IsScrolling()
 {
-	return GetMessageByID(TBIDC("scroll")) ? true : false;
+    return GetMessageByID(TBIDC("scroll")) ? true : false;
 }
 
 void TBScroller::GetTargetChildTranslation(int &x, int &y) const
 {
-	int root_x = 0, root_y = 0;
-	int child_translation_x = 0, child_translation_y = 0;
-	TBWidget *scroll_root = m_target->GetScrollRoot();
-	scroll_root->ConvertToRoot(root_x, root_y);
-	scroll_root->GetChildTranslation(child_translation_x, child_translation_y);
-	x = root_x + child_translation_x;
-	y = root_y + child_translation_y;
+    int root_x = 0, root_y = 0;
+    int child_translation_x = 0, child_translation_y = 0;
+    TBWidget *scroll_root = m_target->GetScrollRoot();
+    scroll_root->ConvertToRoot(root_x, root_y);
+    scroll_root->GetChildTranslation(child_translation_x, child_translation_y);
+    x = root_x + child_translation_x;
+    y = root_y + child_translation_y;
 }
 
 void TBScroller::GetTargetScrollXY(int &x, int &y) const
 {
-	x = 0;
-	y = 0;
-	TBWidget *tmp = m_target->GetScrollRoot();
-	while (tmp)
-	{
-		TBWidget::ScrollInfo info = tmp->GetScrollInfo();
-		x += info.x;
-		y += info.y;
-		tmp = tmp->GetParent();
-	}
+    x = 0;
+    y = 0;
+    TBWidget *tmp = m_target->GetScrollRoot();
+    while (tmp)
+    {
+        TBWidget::ScrollInfo info = tmp->GetScrollInfo();
+        x += info.x;
+        y += info.y;
+        tmp = tmp->GetParent();
+    }
 }
 
 void TBScroller::OnMessageReceived(TBMessage *msg)
 {
-	if (msg->message == TBIDC("scroll"))
-	{
-		int actual_scroll_x = 0, actual_scroll_y = 0;
-		GetTargetChildTranslation(actual_scroll_x, actual_scroll_y);
-		if (actual_scroll_x != m_expected_scroll_x ||
-			actual_scroll_y != m_expected_scroll_y)
-		{
-			// Something else has affected the target child translation.
-			// This should abort the scroll.
-			// This could happen f.ex if something shrunk the scroll limits,
-			// some other action changed scroll position, or if another
-			// scroller started operating on a sub child that when reacing
-			// its scroll limit, started scrolling its chain of parents.
-			Stop();
-			return;
-		}
+    if (msg->message == TBIDC("scroll"))
+    {
+        int actual_scroll_x = 0, actual_scroll_y = 0;
+        GetTargetChildTranslation(actual_scroll_x, actual_scroll_y);
+        if (actual_scroll_x != m_expected_scroll_x ||
+                actual_scroll_y != m_expected_scroll_y)
+        {
+            // Something else has affected the target child translation.
+            // This should abort the scroll.
+            // This could happen f.ex if something shrunk the scroll limits,
+            // some other action changed scroll position, or if another
+            // scroller started operating on a sub child that when reacing
+            // its scroll limit, started scrolling its chain of parents.
+            Stop();
+            return;
+        }
 
-		// Calculate the time elapsed from scroll start. Clip within the
-		// duration for each axis.
-		double now_ms = TBSystem::GetTimeMS();
-		float elapsed_time_x = (float)(now_ms - m_scroll_start_ms);
-		float elapsed_time_y = elapsed_time_x;
-		elapsed_time_x = MIN(elapsed_time_x, m_scroll_duration_x_ms);
-		elapsed_time_y = MIN(elapsed_time_y, m_scroll_duration_y_ms);
+        // Calculate the time elapsed from scroll start. Clip within the
+        // duration for each axis.
+        double now_ms = TBSystem::GetTimeMS();
+        float elapsed_time_x = (float)(now_ms - m_scroll_start_ms);
+        float elapsed_time_y = elapsed_time_x;
+        elapsed_time_x = MIN(elapsed_time_x, m_scroll_duration_x_ms);
+        elapsed_time_y = MIN(elapsed_time_y, m_scroll_duration_y_ms);
 
-		// Get the new scroll position from the current distance in each axis.
-		int scroll_x = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_x, elapsed_time_x);
-		int scroll_y = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_y, elapsed_time_y);
-		scroll_x += m_scroll_start_scroll_x;
-		scroll_y += m_scroll_start_scroll_y;
+        // Get the new scroll position from the current distance in each axis.
+        int scroll_x = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_x, elapsed_time_x);
+        int scroll_y = m_func.GetDistanceAtTimeInt(m_scroll_start_speed_ppms_y, elapsed_time_y);
+        scroll_x += m_scroll_start_scroll_x;
+        scroll_y += m_scroll_start_scroll_y;
 
-		// Get the scroll delta and invoke ScrollByRecursive.
-		int curr_scroll_x, curr_scroll_y;
-		GetTargetScrollXY(curr_scroll_x, curr_scroll_y);
-		const int dx = scroll_x - curr_scroll_x;
-		const int dy = scroll_y - curr_scroll_y;
+        // Get the scroll delta and invoke ScrollByRecursive.
+        int curr_scroll_x, curr_scroll_y;
+        GetTargetScrollXY(curr_scroll_x, curr_scroll_y);
+        const int dx = scroll_x - curr_scroll_x;
+        const int dy = scroll_y - curr_scroll_y;
 
-		int idx = dx, idy = dy;
-		m_target->ScrollByRecursive(idx, idy);
+        int idx = dx, idy = dy;
+        m_target->ScrollByRecursive(idx, idy);
 
-		// Update expected translation
-		GetTargetChildTranslation(m_expected_scroll_x, m_expected_scroll_y);
+        // Update expected translation
+        GetTargetChildTranslation(m_expected_scroll_x, m_expected_scroll_y);
 
-		if ((dx && actual_scroll_x == m_expected_scroll_x) &&
-			(dy && actual_scroll_y == m_expected_scroll_y))
-		{
-			// We didn't get anywhere despite we tried,
-			// so we're done (reached the end).
-			Stop();
-			return;
-		}
+        if ((dx && actual_scroll_x == m_expected_scroll_x) &&
+                (dy && actual_scroll_y == m_expected_scroll_y))
+        {
+            // We didn't get anywhere despite we tried,
+            // so we're done (reached the end).
+            Stop();
+            return;
+        }
 
-		if (!StopIfAlmostStill())
-		{
-			double next_fire_time = msg->GetFireTime() + PAN_MSG_DELAY_MS;
-			// avoid timer catch-up if program went sleeping for a while.
-			next_fire_time = MAX(next_fire_time, now_ms);
-			PostMessageOnTime(TBIDC("scroll"), nullptr, next_fire_time);
-		}
-	}
+        if (!StopIfAlmostStill())
+        {
+            double next_fire_time = msg->GetFireTime() + PAN_MSG_DELAY_MS;
+            // avoid timer catch-up if program went sleeping for a while.
+            next_fire_time = MAX(next_fire_time, now_ms);
+            PostMessageOnTime(TBIDC("scroll"), nullptr, next_fire_time);
+        }
+    }
 }
 
 }; // namespace tb

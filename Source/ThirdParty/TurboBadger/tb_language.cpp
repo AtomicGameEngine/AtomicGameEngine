@@ -11,47 +11,47 @@ namespace tb {
 
 TBLanguage::~TBLanguage()
 {
-	Clear();
+    Clear();
 }
 
 bool TBLanguage::Load(const char *filename)
 {
-	// Read the file into a node tree (even though it's only a flat list)
-	TBNode node;
-	if (!node.ReadFile(filename))
-		return false;
+    // Read the file into a node tree (even though it's only a flat list)
+    TBNode node;
+    if (!node.ReadFile(filename))
+        return false;
 
-	// Go through all nodes and add to the strings hash table
-	TBNode *n = node.GetFirstChild();
-	while (n)
-	{
-		const char *str = n->GetValue().GetString();
-		TBStr *new_str = new TBStr(str);
-		if (!new_str || !strings.Add(TBID(n->GetName()), new_str))
-		{
-			delete new_str;
-			return false;
-		}
-		n = n->GetNext();
-	}
-	return true;
+    // Go through all nodes and add to the strings hash table
+    TBNode *n = node.GetFirstChild();
+    while (n)
+    {
+        const char *str = n->GetValue().GetString();
+        TBStr *new_str = new TBStr(str);
+        if (!new_str || !strings.Add(TBID(n->GetName()), new_str))
+        {
+            delete new_str;
+            return false;
+        }
+        n = n->GetNext();
+    }
+    return true;
 }
 
 void TBLanguage::Clear()
 {
-	strings.DeleteAll();
+    strings.DeleteAll();
 }
 
 const char *TBLanguage::GetString(const TBID &id)
 {
-	if (TBStr *str = strings.Get(id))
-		return *str;
+    if (TBStr *str = strings.Get(id))
+        return *str;
 #ifdef TB_RUNTIME_DEBUG_INFO
-	static TBStr tmp;
-	tmp.SetFormatted("<TRANSLATE:%s>", id.debug_string.CStr());
-	return tmp;
+    static TBStr tmp;
+    tmp.SetFormatted("<TRANSLATE:%s>", id.debug_string.CStr());
+    return tmp;
 #else
-	return "<TRANSLATE!>";
+    return "<TRANSLATE!>";
 #endif
 }
 

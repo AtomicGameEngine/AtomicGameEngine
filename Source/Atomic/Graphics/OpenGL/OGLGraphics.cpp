@@ -334,11 +334,9 @@ void* Graphics::GetSDLWindow()
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample)
+    int multiSample, bool maximize)
 {
     PROFILE(SetScreenMode);
-
-    bool maximize = false;
 
     // Fullscreen or Borderless can not be resizable
     if (fullscreen || borderless)
@@ -376,7 +374,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         }
         else
         {
-            maximize = resizable;
             width = 1024;
             height = 768;
         }
@@ -580,7 +577,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -617,7 +614,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
 }
 
 void Graphics::Close()
@@ -3305,6 +3302,13 @@ int Graphics::GetCurrentMonitor()
 int Graphics::GetMonitorsNumber()
 {
     return SDL_GetNumVideoDisplays();
+}
+bool Graphics::GetMaximized()
+{
+    if (!impl_->window_)
+        return false;
+
+    return SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MAXIMIZED;
 }
 // ATOMIC END
 

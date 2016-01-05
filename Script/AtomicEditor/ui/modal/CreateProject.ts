@@ -9,24 +9,27 @@ import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 
+import ProjectTemplates = require("../resources/ProjectTemplates");
+
 class CreateProject extends ModalWindow {
 
-    constructor(templateSourceDir: string, imagePath: string = "") {
+    constructor(projectTemplate: ProjectTemplates.ProjectTemplateDefinition) {
 
         super();
 
-        this.templateSourceDir = templateSourceDir;
+        this.projectTemplate = projectTemplate;
 
         this.init("Create Project", "AtomicEditor/editor/ui/createproject.tb.txt");
 
-        this.projectPathField = <Atomic.UIEditField> this.getWidget("project_path");
-        this.projectNameField = <Atomic.UIEditField> this.getWidget("project_name");
-        this.image = <Atomic.UIImageWidget> this.getWidget("project_image");
+        this.projectPathField = <Atomic.UIEditField>this.getWidget("project_path");
+        this.projectNameField = <Atomic.UIEditField>this.getWidget("project_name");
+        this.projectLanguageField = <Atomic.UISelectDropdown>this.getWidget("project_language");
+        this.image = <Atomic.UIImageWidget>this.getWidget("project_image");
 
-        if (!imagePath)
+        if (!projectTemplate.screenshot)
             this.image.visibility = Atomic.UI_WIDGET_VISIBILITY_GONE;
         else
-            this.image.image = imagePath;
+            this.image.image = projectTemplate.screenshot;
 
 
         var fileSystem = Atomic.getFileSystem();
@@ -44,6 +47,7 @@ class CreateProject extends ModalWindow {
         }
 
         this.projectPathField.text = userDocuments;
+        this.populateLanguageSelectionList();
 
         this.resizeToFitContent();
         this.center();
@@ -80,34 +84,63 @@ class CreateProject extends ModalWindow {
 
 
         folder = Atomic.addTrailingSlash(folder);
-
         if (!fileSystem.dirExists(folder)) {
 
-            var utils = new Editor.FileUtils();
-            utils.createDirs(folder);
+            // Determine if we have a language template for the selected language.
+            let templateDetail: ProjectTemplates.ProjectTemplateDetail;
+            let selectedLanguage = this.projectLanguageField.text;
 
-            utils.createDirs(folder + "Cache");
+            for (let i = 0; i < this.projectTemplate.templates.length; i++) {
+                if (this.projectTemplate.templates[i].language === selectedLanguage) {
+                    templateDetail = this.projectTemplate.templates[i];
+                    break;
+                }
+            }
 
-            if (!fileSystem.dirExists(folder)) {
-                var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
+            // Do the creation!
+            if (templateDetail && fileSystem.dirExists(templateDetail.folder)) {
+
+                fileSystem.copyDir(templateDetail.folder, folder);
+
+                var utils = new Editor.FileUtils();
+
+                utils.createDirs(folder + "Cache");
+
+                if (!fileSystem.dirExists(folder)) {
+                    var message = "Unable to create folder: " + folder + "\n\nPlease choose a different root folder or project name";
+                    EditorUI.showModalError("New Project Editor Error", message);
+                    return false;
+                }
+
+                // Look for the .atomic project file and if it exists, then rename it
+                let fileResults = fileSystem.scanDir(folder, "*.atomic", Atomic.SCAN_FILES, false);
+                if (fileResults.length === 1) {
+                    fileSystem.rename(folder + fileResults[0], folder + name + ".atomic");
+                } else {
+                    // Just create the file.  We either don't have one existing, or we have more than one and don't know which one to rename
+                    var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
+                    file.close();
+                }
+
+                this.hide();
+
+                this.sendEvent(EditorEvents.LoadProject, { path: folder });
+                return true;
+            } else {
+                let message = [
+                    "Unable to create project for:",
+                    "",
+                    `language: ${selectedLanguage}`,
+                    `template: ${templateDetail.folder}`,
+                    "",
+                    "Please choose a different language."
+                ].join("\n");
+
                 EditorUI.showModalError("New Project Editor Error", message);
                 return false;
             }
         }
-
-        // Do the creation!
-
-        fileSystem.copyDir(this.templateSourceDir + "Resources", folder + "Resources");
-
-        var file = new Atomic.File(folder + name + ".atomic", Atomic.FILE_WRITE);
-        file.close();
-
-        this.hide();
-
-        this.sendEvent(EditorEvents.LoadProject, { path: folder });
-
-        return true;
-
+        return false;
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -139,11 +172,28 @@ class CreateProject extends ModalWindow {
         }
     }
 
+    /**
+     * Queries the json file for languages that are available to this template and populates the
+     * list.
+     */
+    populateLanguageSelectionList() {
+        this.projectLanguageFieldSource.clear();
+
+        this.projectTemplate.templates.forEach(templateDetail => {
+            this.projectLanguageFieldSource.addItem(new Atomic.UISelectItem(templateDetail.language));
+        });
+
+        this.projectLanguageField.source = this.projectLanguageFieldSource;
+        this.projectLanguageField.value = 0;
+    }
+
     projectPathField: Atomic.UIEditField;
     projectNameField: Atomic.UIEditField;
+    projectLanguageField: Atomic.UISelectDropdown;
+    projectLanguageFieldSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
     image: Atomic.UIImageWidget;
 
-    templateSourceDir: string;
+    projectTemplate: ProjectTemplates.ProjectTemplateDefinition;
 }
 
 

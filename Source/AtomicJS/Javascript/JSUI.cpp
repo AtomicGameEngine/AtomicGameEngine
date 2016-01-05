@@ -82,6 +82,7 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UISeparator"] = true;
     uiTypes_["UIDimmer"] = true;
     uiTypes_["UISelectDropdown"] = true;
+    uiTypes_["UIPopupWindow"] = true;
 
 }
 

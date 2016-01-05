@@ -16,7 +16,6 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
         super();
 
-        MenuItemSources.createMenuItemSource("menu atomic editor", editorItems);
         MenuItemSources.createMenuItemSource("menu edit", editItems);
         MenuItemSources.createMenuItemSource("menu file", fileItems);
         MenuItemSources.createMenuItemSource("menu build", buildItems);
@@ -27,31 +26,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
 
-        if (target.id == "menu atomic editor popup") {
-
-            if (refid == "about atomic editor") {
-
-                EditorUI.getModelOps().showAbout();
-
-                return true;
-            }
-
-            if (refid == "manage license") {
-
-                EditorUI.getModelOps().showManageLicense();
-
-                return true;
-
-            }
-
-            if (refid == "quit") {
-
-                this.sendEvent("ExitRequested");
-                return true;
-
-            }
-
-        } else if (target.id == "menu edit popup") {
+        if (target.id == "menu edit popup") {
 
             if (refid == "edit play") {
                 EditorUI.getShortcuts().invokePlayOrStopPlayer();
@@ -112,7 +87,12 @@ class MainFrameMenu extends Atomic.ScriptObject {
             return false;
 
         } else if (target.id == "menu file popup") {
+            if (refid == "quit") {
 
+                this.sendEvent("ExitRequested");
+                return true;
+
+            }
             if (refid == "file new project") {
 
                 if (ToolCore.toolSystem.project) {
@@ -131,22 +111,33 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
             if (refid == "file open project") {
 
-                if (ToolCore.toolSystem.project) {
-
-                    EditorUI.showModalError("Project Open",
-                        "Please close the current project before opening new one");
-
-                    return true;
-                }
-
                 var utils = new Editor.FileUtils();
                 var path = utils.openProjectFileDialog();
-                if (path) {
 
-                    this.sendEvent(EditorEvents.LoadProject, { path: path });
+                if (path=="") {
+
+                    return true;
 
                 }
 
+                var openProject = () => this.sendEvent(EditorEvents.LoadProject, { path: path });
+
+                if (ToolCore.toolSystem.project) {
+
+                    this.subscribeToEvent(EditorEvents.ProjectClosed, () => {
+
+                        this.unsubscribeFromEvent(EditorEvents.ProjectClosed);
+                        openProject();
+
+                    });
+
+                    this.sendEvent(EditorEvents.CloseProject);
+
+                } else {
+
+                    openProject();
+
+                }
 
                 return true;
 
@@ -207,7 +198,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
         } else if (target.id == "menu help popup") {
-
+            if (refid == "about atomic editor") {
+                EditorUI.getModelOps().showAbout();
+                return true;
+            }
+            if (refid == "manage license") {
+                EditorUI.getModelOps().showManageLicense();
+                return true;
+            }
             if (refid == "help forums") {
                 Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/")
                 return true;
@@ -233,16 +231,6 @@ export = MainFrameMenu;
 
 // initialization
 var StringID = strings.StringID;
-
-var editorItems = {
-    "About Atomic Editor": "about atomic editor",
-    "-1": null,
-    "Manage License": "manage license",
-    "-2": null,
-    "Check for Updates": "check update",
-    "-3": null,
-    "Quit": "quit"
-};
 
 var editItems = {
 
@@ -298,15 +286,21 @@ var fileItems = {
     "-2": null,
     "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
-    "Close File": ["file close file", StringID.ShortcutCloseFile]
+    "Close File": ["file close file", StringID.ShortcutCloseFile],
+     "-3": null,
+    "Quit": "quit"
 }
 
 var helpItems = {
 
+    "Check for Updates": "check update",
     "API Documentation": ["help api"],
     "-1": null,
     "Atomic Chat": ["help chat"],
     "Atomic Forums": ["help forums"],
     "-2": null,
-    "Atomic Game Engine on GitHub": ["help github"]
+    "Atomic Game Engine on GitHub": ["help github"],
+    "About Atomic Editor": "about atomic editor",
+    "-3": null,
+    "Manage License": "manage license"
 }
