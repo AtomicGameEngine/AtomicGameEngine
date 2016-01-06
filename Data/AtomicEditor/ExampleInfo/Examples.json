@@ -97,6 +97,18 @@
 				"module" : "3D"
 			},
 			{
+				"name": "Cube Map Example",
+				"desc" : "Example of Atomic’s built-in cube map generator",
+				"screenshot" : "CubeMapExample.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "CubeMapExample"
+					}
+				],
+				"module" : "3D"
+			},
+			{
 				"name": "Butterflies",
 				"desc" : "An example of particles driven by script",
 				"screenshot" : "Butterflies.png",
