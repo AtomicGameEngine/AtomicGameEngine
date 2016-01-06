@@ -5,7 +5,7 @@
  *  include guard.  Other parts of the header are Duktape
  *  internal and related to platform/compiler/feature detection.
  *
- *  Git commit df5e369cbd20005700281f008e49ab09725677ef (v1.3.0-202-gdf5e369-dirty).
+ *  Git commit 5c863edb9d3186e8db2417dcd1ac9a2b508f3023 (v1.3.0-431-g5c863ed).
  *  Git branch master.
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
@@ -71,6 +71,7 @@
  *  * Legimet <legimet.calc@gmail.com>
  *  * Karl Skomski <karl@skomski.com>
  *  * Bruce Pascoe <fatcerberus1@gmail.com>
+ *  * Ren\u00e9 Hollander <rene@rene8888.at>
  *  
  *  Other contributions
  *  ===================
@@ -107,6 +108,7 @@
  *  * https://github.com/sstruchtrup
  *  * Michael Drake (https://github.com/tlsa)
  *  * https://github.com/chris-y
+ *  * Laurent Zubiaur (https://github.com/lzubiaur)
  *  
  *  If you are accidentally missing from this list, send me an e-mail
  *  (``sami.vaarala@iki.fi``) and I'll fix the omission.
@@ -218,8 +220,8 @@ struct duk_number_list_entry {
  * which Duktape snapshot was used.  Not available in the Ecmascript
  * environment.
  */
-#define DUK_GIT_COMMIT                    "df5e369cbd20005700281f008e49ab09725677ef"
-#define DUK_GIT_DESCRIBE                  "v1.3.0-202-gdf5e369-dirty"
+#define DUK_GIT_COMMIT                    "5c863edb9d3186e8db2417dcd1ac9a2b508f3023"
+#define DUK_GIT_DESCRIBE                  "v1.3.0-431-g5c863ed"
 #define DUK_GIT_BRANCH                    "master"
 
 /* Duktape debug protocol version used by this build. */
@@ -242,6 +244,7 @@ struct duk_number_list_entry {
 #define DUK_API_ENTRY_STACK               64
 
 /* Value types, used by e.g. duk_get_type() */
+#define DUK_TYPE_MIN                      0
 #define DUK_TYPE_NONE                     0    /* no value, e.g. invalid index */
 #define DUK_TYPE_UNDEFINED                1    /* Ecmascript undefined */
 #define DUK_TYPE_NULL                     2    /* Ecmascript null */
@@ -252,6 +255,7 @@ struct duk_number_list_entry {
 #define DUK_TYPE_BUFFER                   7    /* fixed or dynamic, garbage collected byte buffer */
 #define DUK_TYPE_POINTER                  8    /* raw void pointer */
 #define DUK_TYPE_LIGHTFUNC                9    /* lightweight function pointer */
+#define DUK_TYPE_MAX                      9
 
 /* Value mask types, used by e.g. duk_get_type_mask() */
 #define DUK_TYPE_MASK_NONE                (1 << DUK_TYPE_NONE)
@@ -554,7 +558,7 @@ DUK_EXTERNAL_DECL duk_idx_t duk_push_error_object_va_raw(duk_context *ctx, duk_e
 DUK_EXTERNAL_DECL void *duk_push_buffer_raw(duk_context *ctx, duk_size_t size, duk_small_uint_t flags);
 
 #define duk_push_buffer(ctx,size,dynamic) \
-	duk_push_buffer_raw((ctx), (size), (dynamic) ? DUK_BUF_FLAG_DYNAMIC : 0);
+	duk_push_buffer_raw((ctx), (size), (dynamic) ? DUK_BUF_FLAG_DYNAMIC : 0)
 #define duk_push_fixed_buffer(ctx,size) \
 	duk_push_buffer_raw((ctx), (size), 0 /*flags*/)
 #define duk_push_dynamic_buffer(ctx,size) \
@@ -621,7 +625,8 @@ DUK_EXTERNAL_DECL duk_bool_t duk_is_ecmascript_function(duk_context *ctx, duk_id
 DUK_EXTERNAL_DECL duk_bool_t duk_is_bound_function(duk_context *ctx, duk_idx_t index);
 DUK_EXTERNAL_DECL duk_bool_t duk_is_thread(duk_context *ctx, duk_idx_t index);
 
-DUK_EXTERNAL_DECL duk_bool_t duk_is_callable(duk_context *ctx, duk_idx_t index);
+#define duk_is_callable(ctx,index) \
+	duk_is_function((ctx), (index))
 DUK_EXTERNAL_DECL duk_bool_t duk_is_dynamic_buffer(duk_context *ctx, duk_idx_t index);
 DUK_EXTERNAL_DECL duk_bool_t duk_is_fixed_buffer(duk_context *ctx, duk_idx_t index);
 DUK_EXTERNAL_DECL duk_bool_t duk_is_external_buffer(duk_context *ctx, duk_idx_t index);
@@ -648,6 +653,18 @@ DUK_EXTERNAL_DECL duk_bool_t duk_is_external_buffer(duk_context *ctx, duk_idx_t 
 DUK_EXTERNAL_DECL duk_errcode_t duk_get_error_code(duk_context *ctx, duk_idx_t index);
 #define duk_is_error(ctx,index) \
 	(duk_get_error_code((ctx), (index)) != 0)
+#define duk_is_eval_error(ctx,index) \
+	(duk_get_error_code((ctx), (index)) == DUK_ERR_EVAL_ERROR)
+#define duk_is_range_error(ctx,index) \
+	(duk_get_error_code((ctx), (index)) == DUK_ERR_RANGE_ERROR)
+#define duk_is_reference_error(ctx,index) \
+	(duk_get_error_code((ctx), (index)) == DUK_ERR_REFERENCE_ERROR)
+#define duk_is_syntax_error(ctx,index) \
+	(duk_get_error_code((ctx), (index)) == DUK_ERR_SYNTAX_ERROR)
+#define duk_is_type_error(ctx,index) \
+	(duk_get_error_code((ctx), (index)) == DUK_ERR_TYPE_ERROR)
+#define duk_is_uri_error(ctx,index) \
+	(duk_get_error_code((ctx), (index)) == DUK_ERR_URI_ERROR)
 
 /*
  *  Get operations: no coercion, returns default value for invalid
@@ -692,6 +709,9 @@ DUK_EXTERNAL_DECL void *duk_require_buffer_data(duk_context *ctx, duk_idx_t inde
 DUK_EXTERNAL_DECL void *duk_require_pointer(duk_context *ctx, duk_idx_t index);
 DUK_EXTERNAL_DECL duk_c_function duk_require_c_function(duk_context *ctx, duk_idx_t index);
 DUK_EXTERNAL_DECL duk_context *duk_require_context(duk_context *ctx, duk_idx_t index);
+DUK_EXTERNAL_DECL void duk_require_function(duk_context *ctx, duk_idx_t index);
+#define duk_require_callable(ctx,index) \
+	duk_require_function((ctx), (index))
 DUK_EXTERNAL_DECL void *duk_require_heapptr(duk_context *ctx, duk_idx_t index);
 
 #define duk_require_object_coercible(ctx,index) \
@@ -1213,13 +1233,13 @@ DUK_EXTERNAL_DECL void duk_debugger_cooperate(duk_context *ctx);
 union duk_double_union {
 	double d;
 	float f[2];
-#ifdef DUK_USE_64BIT_OPS
+#if defined(DUK_USE_64BIT_OPS)
 	duk_uint64_t ull[1];
 #endif
 	duk_uint32_t ui[2];
 	duk_uint16_t us[4];
 	duk_uint8_t uc[8];
-#ifdef DUK_USE_PACKED_TVAL_POSSIBLE
+#if defined(DUK_USE_PACKED_TVAL)
 	void *vp[2];  /* used by packed duk_tval, assumes sizeof(void *) == 4 */
 #endif
 };
