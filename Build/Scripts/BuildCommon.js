@@ -44,8 +44,8 @@ namespace('build', function() {
           // Since TSLint does not yet support recursively searching for files, then we need to
           // create a command per file.  The main issue with this is that it will abort on the first error instead
           // of listing out all lint errors
-          glob("./Script/AtomicEditor/**/*.ts", (err, results) => {
-            results.forEach((file)=>{
+          glob("./Script/AtomicEditor/**/*.ts", function(err, results) {
+            results.forEach(function(file) {
               cmds.push(node + " " + tslint + " -c ./Script/tslint.json " + file);
             });
 
