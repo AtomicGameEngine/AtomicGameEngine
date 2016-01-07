@@ -334,7 +334,7 @@ void* Graphics::GetSDLWindow()
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample, bool maximize)
+    int multiSample, bool maximize, bool center)
 {
     PROFILE(SetScreenMode);
 
@@ -508,9 +508,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
         CreateWindowIcon();
 
-        if (maximize)
+        if (maximize || center)
         {
-            Maximize();
+            if (maximize)
+                Maximize();
+            else if (center)
+                CenterWindow();
             SDL_GetWindowSize(impl_->window_, &width, &height);
         }
 
@@ -577,7 +580,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -614,7 +617,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
 }
 
 void Graphics::Close()
