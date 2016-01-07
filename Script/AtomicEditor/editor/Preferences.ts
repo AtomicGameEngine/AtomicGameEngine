@@ -60,24 +60,30 @@ class Preferences {
     read(): void {
         var filePath = this.getPreferencesFullPath();
         var jsonFile;
-        //check if file doesn't exists, create an empty JSON file
+
+        //check if file doesn't exist, create default json
         if (!this.fileSystem.fileExists(filePath)) {
-            jsonFile = new Atomic.File(filePath, Atomic.FILE_WRITE);
-            jsonFile.writeString("{}");
-            jsonFile.close();
+            this.useDefaultConfig();
+            this.write();
+            return;
         }
+
         //Read file
         jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
+
         var prefs;
+
         try {
-          prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
-        } catch (e){
-          console.log("Editor preference file invalid, regenerating default configuration");
-          prefs = null;
-          this.useDefaultConfig();
+
+            prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
+
+        } catch (e) {
+            console.log("Editor preference file invalid, regenerating default configuration");
+            this.useDefaultConfig();
+            this.write();
         }
+
         if (prefs) {
-            if (!prefs.recentProjects) prefs.recentProjects = [""];
             this._prefs = prefs;
         }
 
@@ -90,30 +96,29 @@ class Preferences {
         jsonFile.writeString(JSON.stringify(this._prefs, null, 2));
     }
 
-    saveEditorWindowData(windowData:WindowData) {
+    saveEditorWindowData(windowData: WindowData) {
         this._prefs.editorWindow = windowData;
         this.write();
     }
 
-    savePlayerWindowData(windowData:WindowData) {
+    savePlayerWindowData(windowData: WindowData) {
         this._prefs.playerWindow = windowData;
         this.write();
     }
 
-    useDefaultConfig():void {
+    useDefaultConfig(): void {
         this._prefs = new PreferencesFormat();
-        if (!this._prefs.recentProjects) this._prefs.recentProjects = [""];
     }
 
-    get editorWindow():WindowData {
+    get editorWindow(): WindowData {
         return this._prefs.editorWindow;
     }
 
-    get playerWindow():WindowData {
+    get playerWindow(): WindowData {
         return this._prefs.playerWindow;
     }
 
-    get recentProjects(): [string] {
+    get recentProjects(): string[] {
         return this._prefs.recentProjects;
     }
 
@@ -132,7 +137,37 @@ interface WindowData {
 }
 
 class PreferencesFormat {
-    recentProjects: [string];
+
+    constructor() {
+
+        this.setDefault();
+    }
+
+    setDefault() {
+
+        this.recentProjects = [];
+
+        this.editorWindow = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            monitor: 0,
+            maximized: true
+        }
+
+        this.playerWindow = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            monitor: 0,
+            maximized: true
+        }
+
+    }
+
+    recentProjects: string[];
     editorWindow: WindowData;
     playerWindow: WindowData;
 }

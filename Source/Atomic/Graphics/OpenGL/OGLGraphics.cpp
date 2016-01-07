@@ -365,7 +365,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
-        if (fullscreen || borderless)
+        if (fullscreen || borderless || maximize)
         {
             SDL_DisplayMode mode;
             SDL_GetDesktopDisplayMode(0, &mode);
