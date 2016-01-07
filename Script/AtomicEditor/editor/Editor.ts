@@ -115,7 +115,7 @@ class Editor extends Atomic.ScriptObject {
             editorWindowData.maximized = true;
             editorWindowData.monitor = monitor;
         } else {
-            editorWindowData = {x: pos[0], y: pos[1], width: width, height: height, monitor: monitor, maximized: false}
+            editorWindowData = {x: pos[0], y: pos[1], width: width, height: height, monitor: monitor, maximized: false};
         }
 
         Preferences.getInstance().saveEditorWindowData(editorWindowData);
