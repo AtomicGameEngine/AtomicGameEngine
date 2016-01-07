@@ -109,22 +109,8 @@ void AEEditorApp::Setup()
 
 #endif // ATOMIC_DEV_BUILD
 
-    String prefsPath = filesystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
-    prefsPath += "prefs.json";
+    ReadPreferences();
 
-    JSONValue editorWindow;
-
-    if (ReadPreferences(prefsPath, editorWindow, "editorWindow"))
-    {
-        if (editorWindow.IsObject())
-        {
-            engineParameters_["WindowPositionX"] = editorWindow.Get("x").GetUInt();
-            engineParameters_["WindowPositionY"] = editorWindow.Get("y").GetUInt();
-            engineParameters_["WindowWidth"] = editorWindow.Get("width").GetUInt();
-            engineParameters_["WindowHeight"] = editorWindow.Get("height").GetUInt();
-            engineParameters_["WindowMaximized"] = editorWindow.Get("maximized").GetBool();
-        }
-    }
 }
 
 void AEEditorApp::Stop()

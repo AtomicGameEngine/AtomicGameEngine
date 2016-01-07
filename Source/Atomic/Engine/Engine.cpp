@@ -376,7 +376,8 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
             GetParameter(parameters, "MultiSample", 1).GetInt(),
-            GetParameter(parameters, "WindowMaximized", false).GetBool()
+            GetParameter(parameters, "WindowMaximized", false).GetBool(),
+            GetParameter(parameters, "WindowCentered", false).GetBool()
         ))
             return false;
 

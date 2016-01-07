@@ -37,7 +37,8 @@ public:
 
 protected:
 
-    bool ReadPreferences(String& path, JSONValue& prefs, const String& propertyName = "");
+    bool CreateDefaultPreferences(String& path, JSONValue& prefs);
+    bool ReadPreferences();
     
     SharedPtr<JSVM> vm_;
 
