@@ -61,9 +61,8 @@ class Editor extends Atomic.ScriptObject {
                 playerWindow.y = data.posY;
                 playerWindow.monitor = data.monitor;
                 playerWindow.maximized = true;
-                playerWindow.centered = false;
             } else {
-                playerWindow = {x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized, centered: false};
+                playerWindow = {x: data.posX, y: data.posY, width: data.width, height: data.height, monitor: data.monitor, maximized: data.maximized};
             }
             Preferences.getInstance().savePlayerWindowData(playerWindow);
         });
@@ -116,7 +115,7 @@ class Editor extends Atomic.ScriptObject {
             editorWindowData.maximized = true;
             editorWindowData.monitor = monitor;
         } else {
-            editorWindowData = {x: pos[0], y: pos[1], width: width, height: height, monitor: monitor, maximized: false, centered: false}
+            editorWindowData = {x: pos[0], y: pos[1], width: width, height: height, monitor: monitor, maximized: false}
         }
 
         Preferences.getInstance().saveEditorWindowData(editorWindowData);

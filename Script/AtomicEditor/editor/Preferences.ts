@@ -131,7 +131,6 @@ interface WindowData {
     height: number;
     monitor: number;
     maximized: boolean;
-    centered: boolean;
 }
 
 class PreferencesFormat {
@@ -151,18 +150,16 @@ class PreferencesFormat {
             width: 0,
             height: 0,
             monitor: 0,
-            maximized: true,
-            centered: false
+            maximized: true
         }
 
         this.playerWindow = {
             x: 0,
             y: 0,
-            width: 1280,
-            height: 720,
+            width: 0,
+            height: 0,
             monitor: 0,
-            maximized: false,
-            centered: true
+            maximized: false
         }
 
     }

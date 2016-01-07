@@ -368,16 +368,15 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 
         if (!graphics->SetMode(
-            GetParameter(parameters, "WindowWidth", 0).GetInt(),
-            GetParameter(parameters, "WindowHeight", 0).GetInt(),
+            GetParameter(parameters, "WindowMaximized", false).GetBool() ? 0 : GetParameter(parameters, "WindowWidth", 0).GetInt(),
+            GetParameter(parameters, "WindowMaximized", false).GetBool() ? 0 : GetParameter(parameters, "WindowHeight", 0).GetInt(),
             GetParameter(parameters, "FullScreen", true).GetBool(),
             GetParameter(parameters, "Borderless", false).GetBool(),
             GetParameter(parameters, "WindowResizable", false).GetBool(),
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
             GetParameter(parameters, "MultiSample", 1).GetInt(),
-            GetParameter(parameters, "WindowMaximized", false).GetBool(),
-            GetParameter(parameters, "WindowCentered", false).GetBool()
+            GetParameter(parameters, "WindowMaximized", false).GetBool()
         ))
             return false;
 
