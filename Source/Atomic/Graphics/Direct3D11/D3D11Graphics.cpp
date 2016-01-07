@@ -2200,19 +2200,6 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
 
-        // ATOMIC BEGIN
-
-        // if position is negative, center the window
-        if (position_.x_ < 0 || position_.y_ < 0)
-        {
-            IntVector2 size = GetDesktopResolution();
-            position_.x_ = size.x_/2 -  width/2;
-            position_.y_ = size.y_/2 -  height/2;
-        }
-
-        // ATOMIC END
-
-
         impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
     }
     else
