@@ -405,7 +405,7 @@ void Graphics::RaiseWindow()
         SDL_RaiseWindow(impl_->window_);
 }
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample, bool maximize)
+    int multiSample, bool maximize, bool center)
 {
     PROFILE(SetScreenMode);
 
@@ -448,7 +448,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     if (!impl_->window_)
     {
-        if (!OpenWindow(width, height, resizable, borderless))
+        if (!OpenWindow(width, height, resizable, borderless, center))
             return false;
     }
 
@@ -599,7 +599,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -620,7 +620,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
 }
 
 void Graphics::Close()
@@ -2380,7 +2380,7 @@ void Graphics::ResetStreamFrequencies()
     }
 }
 
-bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
+bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless, bool center)
 {
     if (!externalWindow_)
     {
@@ -2400,6 +2400,9 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
+
+    if (center)
+        CenterWindow();
 
     SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
 

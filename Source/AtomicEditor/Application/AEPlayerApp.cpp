@@ -179,6 +179,10 @@ void AEPlayerApplication::Setup()
             {
                 engineParameters_["WindowMaximized"] = true;
             }
+            else if (argument == "--center")
+            {
+                engineParameters_["WindowCentered"] = true;
+            }
         }
     }
 

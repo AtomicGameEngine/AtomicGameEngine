@@ -104,8 +104,7 @@ public:
     /// Bring the window to front with focus
     void RaiseWindow();
     /// Set screen mode. Return true if successful.
-    bool SetMode
-        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample, bool maximize);
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample, bool maximize, bool center);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
@@ -508,7 +507,7 @@ private:
     /// Reset stream frequencies.
     void ResetStreamFrequencies();
     /// Create the application window.
-    bool OpenWindow(int width, int height, bool resizable, bool borderless);
+    bool OpenWindow(int width, int height, bool resizable, bool borderless, bool center);
     /// Create the application window icon.
     void CreateWindowIcon();
     /// Adjust the window for new resolution and fullscreen mode.
