@@ -16,7 +16,7 @@ namespace('build', function() {
         var modules = host.getScriptModules(platform);
         var bindCmd = host.atomicTool + " bind \"" + atomicRoot + "\" ";
         var node;
-        var tsc = "./Build/node_modules/typeScript/lib/tsc";
+        var tsc = "./Build/node_modules/typescript/lib/tsc";
         var tslint = "./Build/node_modules/tslint/lib/tslint-cli";
 
         switch(os.platform()) {
