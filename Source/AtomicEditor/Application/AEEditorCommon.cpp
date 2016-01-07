@@ -156,7 +156,7 @@ void AEEditorCommon::Stop()
 #endif
 }
 
-void AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
+bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
 {
     // Note there is some duplication here with the editor's
     // TypeScript preference code, this is due to the preferences for
@@ -194,10 +194,17 @@ void AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
 
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
 
+    if (!file->IsOpen())
+    {
+        LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
+        return false;
+    }
+
     jsonFile->Save(*file, "   ");
 
     prefs = root;
 
+    return true;
 }
 
 bool AEEditorCommon::ReadPreferences()
@@ -210,7 +217,8 @@ bool AEEditorCommon::ReadPreferences()
 
     if (!fileSystem->FileExists(path))
     {
-        CreateDefaultPreferences(path, prefs);
+        if (!CreateDefaultPreferences(path, prefs))
+            return false;
     }
     else
     {
@@ -220,7 +228,8 @@ bool AEEditorCommon::ReadPreferences()
         if (!jsonFile->BeginLoad(*file))
         {
             file->Close();
-            CreateDefaultPreferences(path, prefs);
+            if (!CreateDefaultPreferences(path, prefs))
+                return false;
         }
         else
         {
@@ -231,7 +240,8 @@ bool AEEditorCommon::ReadPreferences()
 
     if (!prefs.IsObject() || !prefs["editorWindow"].IsObject())
     {
-        CreateDefaultPreferences(path, prefs);
+        if (!CreateDefaultPreferences(path, prefs))
+            return false;
     }
 
     JSONValue& editorWindow = prefs["editorWindow"];

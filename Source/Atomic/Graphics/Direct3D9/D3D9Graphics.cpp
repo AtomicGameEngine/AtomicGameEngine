@@ -417,7 +417,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
-        if (fullscreen || borderless)
+        if (fullscreen || borderless || maximize)
         {
             width = mode.w;
             height = mode.h;
