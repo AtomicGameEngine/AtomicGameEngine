@@ -157,12 +157,12 @@ class PreferencesFormat {
         }
 
         this.playerWindow = {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
+            x: -1, // negative value centers on screen
+            y: -1,
+            width: 1280,
+            height: 720,
             monitor: 0,
-            maximized: true
+            maximized: false
         }
 
     }

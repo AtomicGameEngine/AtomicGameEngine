@@ -182,12 +182,12 @@ bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
     editorWindow["maximized"] = true;
 
     JSONValue playerWindow;
-    playerWindow["x"] = 0;
-    playerWindow["y"] = 0;
-    playerWindow["width"] = 0;
-    playerWindow["height"] = 0;
+    playerWindow["x"] = -1; // negative value will center window
+    playerWindow["y"] = -1;
+    playerWindow["width"] = 1280;
+    playerWindow["height"] = 720;
     playerWindow["monitor"] = 0;
-    playerWindow["maximized"] = true;
+    playerWindow["maximized"] = false;
 
     root["editorWindow"] = editorWindow;
     root["playerWindow"] = playerWindow;
