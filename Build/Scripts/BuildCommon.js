@@ -5,7 +5,48 @@ var host = require("./Host");
 var atomicRoot = host.atomicRoot;
 var glob = require('glob');
 
+var Tslint = require("tslint");
+
 namespace('build', function() {
+
+  // Linting task
+  task('lint_typescript', {
+      async: true
+  }, function(fileMask, failOnError) {
+
+    console.log("TSLINT: Linting files in " + fileMask);
+    var lintConfig = JSON.parse(fs.readFileSync("./Script/tslint.json"));
+    var options = {
+        configuration: lintConfig,
+        formatter: "prose"
+    };
+
+    // lint
+    // Since TSLint does not yet support recursively searching for files, then we need to
+    // create a command per file.  The main issue with this is that it will abort on the first error instead
+    // of listing out all lint errors
+    glob(fileMask, function(err, results) {
+      var lintErrors = [];
+      results.forEach(function(filename) {
+
+        var contents = fs.readFileSync(filename, "utf8");
+
+        var ll = new Tslint(filename, contents, options);
+        var result = ll.lint();
+        if (result.failureCount > 0) {
+            lintErrors.push(result.output);
+        }
+      });
+      if (lintErrors.length > 0) {
+          console.warn("TSLINT: WARNING - Lint errors detected");
+          console.warn(lintErrors.join(''));
+          if (failOnError) {
+              fail("TSLint errors detected");
+          }
+      }
+      complete();
+    });
+  });
 
   task('genscripts', {
     async: true
@@ -40,23 +81,21 @@ namespace('build', function() {
           // compile
           cmds.push(node + " " + tsc + " -p ./Script");
 
-          // lint
-          // Since TSLint does not yet support recursively searching for files, then we need to
-          // create a command per file.  The main issue with this is that it will abort on the first error instead
-          // of listing out all lint errors
-          glob("./Script/AtomicEditor/**/*.ts", function(err, results) {
-            results.forEach(function(file) {
-              cmds.push(node + " " + tslint + " -c ./Script/tslint.json " + file);
-            });
+          var lintTask = jake.Task['build:lint_typescript'];
 
+          lintTask.addListener('complete', function () {
+            console.log("\n\nLint: Typescript linting complete.\n\n");
             jake.exec(cmds, function() {
 
-              complete();
+               complete();
 
             }, {
               printStdout: true
             });
           });
+
+          lintTask.invoke("./Script/AtomicEditor/**/*.ts", false);
+
         } else {
             throw new Error("Node not configured for this platform: " + os.platform());
         }
