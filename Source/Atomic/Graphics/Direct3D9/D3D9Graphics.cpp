@@ -431,7 +431,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             float ratio = float(mode.h) / float(mode.w);
             width = mode.w - 200;
             height = (int) (float (mode.w - 200) * ratio);
-            SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
+
+            // Only set the position if on the first monitor, otherwise, the maximize will be on the wrong monitor
+            if ( (position_.x_ >= 0 && position_.x_ < mode.w) && (position_.y_ >= 0 && position_.y_ < mode.h))
+                SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
 
             if (!maximize)
                 center = true;
