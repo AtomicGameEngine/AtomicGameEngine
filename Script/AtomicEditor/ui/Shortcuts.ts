@@ -39,9 +39,6 @@ class Shortcuts extends Atomic.ScriptObject {
                     if (playerWindow.maximized) {
                         args += " --maximize";
                     }
-                    if (playerWindow.centered) {
-                        args += " --center";
-                    }
                     Atomic.editorMode.playProject(args, debug);
                 }
             } else {

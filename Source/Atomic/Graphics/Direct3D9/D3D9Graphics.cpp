@@ -405,7 +405,7 @@ void Graphics::RaiseWindow()
         SDL_RaiseWindow(impl_->window_);
 }
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample, bool maximize, bool center)
+    int multiSample, bool maximize)
 {
     PROFILE(SetScreenMode);
 
@@ -414,18 +414,30 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     SDL_GetDesktopDisplayMode(0, &mode);
     D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
 
+    bool center = false;
+
     // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
-        if (fullscreen || borderless || maximize)
+        if (fullscreen || borderless)
         {
             width = mode.w;
             height = mode.h;
         }
         else
         {
-            width = 1024;
-            height = 768;
+            // If we don't have a height/width calculate a reasonable starting window size, and center it
+            // this will also be the restore size when switching from maximized
+            float ratio = float(mode.h) / float(mode.w);
+            width = mode.w - 200;
+            height = (int) (float (mode.w - 200) * ratio);
+
+            // Only set the position if on the first monitor, otherwise, the maximize will be on the wrong monitor
+            if ( (position_.x_ >= 0 && position_.x_ < mode.w) && (position_.y_ >= 0 && position_.y_ < mode.h))
+                SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
+
+            if (!maximize)
+                center = true;
         }
     }
 
@@ -448,7 +460,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     if (!impl_->window_)
     {
-        if (!OpenWindow(width, height, resizable, borderless, center))
+        if (!OpenWindow(width, height, resizable, borderless))
             return false;
     }
 
@@ -497,13 +509,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             multiSample = 1;
     }
 
+    if (maximize)
+        width = height = 0;
+
     AdjustWindow(width, height, fullscreen, borderless);
 
-    if (maximize)
-    {
-        Maximize();
-        SDL_GetWindowSize(impl_->window_, &width, &height);
-    }
+    if (center)
+        CenterWindow();
 
     if (fullscreen)
     {
@@ -599,7 +611,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -620,7 +632,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
 }
 
 void Graphics::Close()
@@ -2380,7 +2392,7 @@ void Graphics::ResetStreamFrequencies()
     }
 }
 
-bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless, bool center)
+bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
     if (!externalWindow_)
     {
@@ -2400,9 +2412,6 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
-
-    if (center)
-        CenterWindow();
 
     SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
 

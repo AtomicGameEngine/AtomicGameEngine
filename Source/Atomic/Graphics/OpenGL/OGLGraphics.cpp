@@ -334,9 +334,11 @@ void* Graphics::GetSDLWindow()
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample, bool maximize, bool center)
+    int multiSample, bool maximize)
 {
     PROFILE(SetScreenMode);
+
+    bool center = false;
 
     // Fullscreen or Borderless can not be resizable
     if (fullscreen || borderless)
@@ -365,17 +367,28 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
-        if (fullscreen || borderless || maximize)
+        SDL_DisplayMode mode;
+        SDL_GetDesktopDisplayMode(0, &mode);
+
+        if (fullscreen || borderless)
         {
-            SDL_DisplayMode mode;
-            SDL_GetDesktopDisplayMode(0, &mode);
             width = mode.w;
             height = mode.h;
         }
         else
         {
-            width = 1024;
-            height = 768;
+            // If we don't have a height/width calculate a reasonable starting window size, and center it
+            // this will also be the restore size when switching from maximized
+            float ratio = float(mode.h) / float(mode.w);
+            width = mode.w - 200;
+            height = (int) (float (mode.w - 200) * ratio);
+
+            // Only set the position if on the first monitor, otherwise, the maximize will be on the wrong monitor
+            if ( (position_.x_ >= 0 && position_.x_ < mode.w) && (position_.y_ >= 0 && position_.y_ < mode.h))
+                SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
+
+            if (!maximize)
+                center = true;
         }
     }
 
@@ -580,7 +593,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -617,7 +630,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false, false);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_, false);
 }
 
 void Graphics::Close()
