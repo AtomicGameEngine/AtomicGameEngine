@@ -382,10 +382,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             float ratio = float(mode.h) / float(mode.w);
             width = mode.w - 200;
             height = (int) (float (mode.w - 200) * ratio);
-            SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
 
             if (!maximize)
+            {
+                SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
                 center = true;
+            }
         }
     }
 
