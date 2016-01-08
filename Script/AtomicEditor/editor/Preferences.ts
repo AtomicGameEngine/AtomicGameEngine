@@ -30,7 +30,7 @@ class Preferences {
         this.updateRecentProjects(true);
     }
 
-    updateRecentProjects(write:boolean = false): void {
+    updateRecentProjects(write: boolean = false): void {
 
         for (var i in this._prefs.recentProjects) {
             var path = this._prefs.recentProjects[i];
@@ -40,7 +40,7 @@ class Preferences {
             }
         }
         if (write)
-          this.write();
+            this.write();
     }
 
     deleteRecentProjects(): void {
@@ -68,20 +68,28 @@ class Preferences {
         //Read file
         jsonFile = new Atomic.File(filePath, Atomic.FILE_READ);
 
-        var prefs;
+        var prefs = null;
 
         try {
 
-            prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
+            if (jsonFile.isOpen())
+                prefs = <PreferencesFormat>JSON.parse(jsonFile.readText());
 
         } catch (e) {
-            console.log("Editor preference file invalid, regenerating default configuration");
-            this.useDefaultConfig();
-            this.write();
+
+            prefs = null;
+        }
+
+        if (prefs && (!prefs.editorWindow || !prefs.playerWindow || !prefs.recentProjects)) {
+            prefs = null;
         }
 
         if (prefs) {
             this._prefs = prefs;
+        } else {
+            console.log("Editor preference file invalid, regenerating default configuration");
+            this.useDefaultConfig();
+            this.write();
         }
 
     }
