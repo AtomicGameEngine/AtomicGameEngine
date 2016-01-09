@@ -73,7 +73,7 @@ public:
         CefWindowInfo windowInfo;
         CefBrowserSettings browserSettings;
 
-        //browserSettings.webgl = STATE_ENABLED;
+        browserSettings.webgl = STATE_ENABLED;
 
         windowInfo.width = width;
         windowInfo.height = height;
@@ -92,7 +92,7 @@ public:
 #endif
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-         windowInfo.SetAsWindowless(info.info.win.window, false);
+            windowInfo.SetAsWindowless(info.info.win.window, false);
 #endif
 
             webClient_->renderHandler_->SetSize(width, height);
@@ -166,6 +166,9 @@ WebClient::WebClient(Context* context) : Object(context)
 
 WebClient::~WebClient()
 {
+    if (d_)
+        d_->CloseBrowser(true);
+
     renderHandler_ = 0;
     //d_->Release();
 }

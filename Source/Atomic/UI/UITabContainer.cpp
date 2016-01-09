@@ -68,6 +68,19 @@ int UITabContainer::GetNumPages()
 
 }
 
+UILayout* UITabContainer::GetTabLayout()
+{
+    if (!widget_)
+        return 0;
+
+    TBLayout* layout = ((TBTabContainer*)widget_)->GetTabLayout();
+
+    if (!layout)
+        return 0;
+
+    UI* ui = GetSubsystem<UI>();
+    return (UILayout*) ui->WrapWidget(layout);
+}
 
 void UITabContainer::SetCurrentPage(int page)
 {

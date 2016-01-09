@@ -1,6 +1,4 @@
 
-#include <list>
-
 #include <SDL/include/SDL.h>
 #include <ThirdParty/SDL/include/SDL_syswm.h>
 
@@ -9,7 +7,6 @@
 #include <include/wrapper/cef_helpers.h>
 #include <include/base/cef_bind.h>
 #include <include/wrapper/cef_closure_task.h>
-
 
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>
