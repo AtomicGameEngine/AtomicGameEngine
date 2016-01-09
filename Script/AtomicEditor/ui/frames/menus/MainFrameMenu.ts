@@ -114,7 +114,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 var utils = new Editor.FileUtils();
                 var path = utils.openProjectFileDialog();
 
-                if (path=="") {
+                if (path == "") {
 
                     return true;
 
@@ -207,13 +207,13 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
             if (refid == "help forums") {
-                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/")
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/");
                 return true;
             } else if (refid == "help chat") {
-                Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/")
+                Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/");
                 return true;
             } else if (refid == "help github") {
-                Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/")
+                Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/");
                 return true;
             } else if (refid == "help api") {
                 var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/Atomic.html";
@@ -261,20 +261,20 @@ var toolsItems = {
 
     "Toggle Profiler": ["tools toggle profiler"]
 
-}
+};
 
 var buildItems = {
 
     "Build": ["build build", StringID.ShortcutBuild],
     "Build Settings": ["build settings", StringID.ShortcutBuildSettings]
-}
+};
 
 
 var developerItems = {
 
     "Show Console": ["developer show console"]
 
-}
+};
 
 var fileItems = {
 
@@ -289,7 +289,7 @@ var fileItems = {
     "Close File": ["file close file", StringID.ShortcutCloseFile],
      "-3": null,
     "Quit": "quit"
-}
+};
 
 var helpItems = {
 
@@ -303,4 +303,4 @@ var helpItems = {
     "About Atomic Editor": "about atomic editor",
     "-3": null,
     "Manage License": "manage license"
-}
+};

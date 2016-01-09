@@ -13,7 +13,7 @@ class WindowsSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
       super();
 
-      this.settings = ToolCore.toolSystem.project.buildSettings.windowsBuildSettings
+      this.settings = ToolCore.toolSystem.project.buildSettings.windowsBuildSettings;
 
       this.load("AtomicEditor/editor/ui/buildsettings_windows.tb.txt");
 

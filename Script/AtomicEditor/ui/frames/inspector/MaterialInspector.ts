@@ -58,7 +58,7 @@ var techniqueLookup = {
     "Techniques/DiffAlphaMask.xml": "Alpha Mask",
     "Techniques/DiffAdd.xml": "Additive",
     "Techniques/NoTexture.xml": "No Texture"
-}
+};
 
 var techniqueReverseLookup = {};
 
@@ -113,7 +113,7 @@ class MaterialInspector extends ScriptWidget {
 
             var field = new Atomic.UIEditField();
             field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-            field.skinBg = "TBAttrEditorField";;
+            field.skinBg = "TBAttrEditorField";
             field.fontDescription = this.fd;
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
@@ -254,7 +254,7 @@ class MaterialInspector extends ScriptWidget {
 
         return true;
 
-      }
+      };
 
     }
 
@@ -274,7 +274,7 @@ class MaterialInspector extends ScriptWidget {
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR];// ,Atomic.TU_EMISSIVE, Atomic.TU_ENVIRONMENT,
+        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR]; // ,Atomic.TU_EMISSIVE, Atomic.TU_ENVIRONMENT,
         //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
 
         for (var i in textureUnits) {
@@ -389,7 +389,7 @@ class MaterialInspector extends ScriptWidget {
 
         var field = new Atomic.UIEditField();
         field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        field.skinBg = "TBAttrEditorField";;
+        field.skinBg = "TBAttrEditorField";
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
         lp.width = 160;

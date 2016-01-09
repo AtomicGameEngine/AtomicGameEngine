@@ -76,7 +76,7 @@ class CubemapGeneratorSectionUI extends SelectionSectionUI {
 
                         count++;
 
-                    })
+                    });
 
                     this.subscribeToEvent(scene, "CubemapRenderEnd", () => {
 
@@ -85,7 +85,7 @@ class CubemapGeneratorSectionUI extends SelectionSectionUI {
                         if (!count)
                             progressModal.hide();
 
-                    })
+                    });
 
 
                 }

@@ -167,7 +167,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                 this.refresh();
 
             }.bind(this));
-        }
+        };
 
         // handle dropping of component on field
         o.editField.subscribeToEvent(o.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {

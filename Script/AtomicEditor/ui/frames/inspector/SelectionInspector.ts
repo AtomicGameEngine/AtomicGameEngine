@@ -76,9 +76,9 @@ class ComponentSection extends SelectionSection {
             inspector.onComponentDelete(editType);
             return true;
 
-        }
+        };
 
-        this.attrLayout.addChild(deleteButton);;
+        this.attrLayout.addChild(deleteButton);
 
     }
 
@@ -495,6 +495,7 @@ class SelectionInspector extends ScriptWidget {
             return;
         }
 
+        var editType;
         if (!ev.removed) {
 
             editType = this.addSerializable(ev.component);
@@ -505,7 +506,7 @@ class SelectionInspector extends ScriptWidget {
             for (var i in this.sections) {
 
                 var section = this.sections[i];
-                var editType = section.editType;
+                editType = section.editType;
 
                 var index = editType.objects.indexOf(ev.component);
                 if (index != -1) {

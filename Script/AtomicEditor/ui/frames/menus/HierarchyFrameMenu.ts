@@ -21,7 +21,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
         this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
-        })
+        });
 
     }
 
@@ -69,7 +69,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
         if (target.id == "node context menu") {
 
-            var node = <Atomic.Node>target['node'];
+            var node = <Atomic.Node>target["node"];
 
             if (!node) {
                 return false;
@@ -108,7 +108,7 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
         var menu = new Atomic.UIMenuWindow(parent, "node context menu");
 
-        menu['node'] = node;
+        menu["node"] = node;
 
         var srcName: string = "node context general";
 

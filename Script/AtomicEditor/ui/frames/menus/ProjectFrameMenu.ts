@@ -22,7 +22,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
         this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
-        })
+        });
 
     }
 
@@ -31,7 +31,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
         if (target.id == "asset context menu" || target.id == "create popup") {
 
             var path;
-            var asset = <ToolCore.Asset> target['asset'];
+            var asset = <ToolCore.Asset> target["asset"];
 
             if (asset) {
                 path = asset.path;
@@ -93,7 +93,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
     createAssetContextMenu(parent: Atomic.UIWidget, asset: ToolCore.Asset, x: number, y: number) {
 
         var menu = new Atomic.UIMenuWindow(parent, "asset context menu");
-        menu['asset'] = asset;
+        menu["asset"] = asset;
 
         var srcName: string;
 

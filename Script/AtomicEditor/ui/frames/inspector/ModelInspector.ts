@@ -49,7 +49,7 @@ class ModelInspector extends InspectorWidget {
           if (isNaN(_endTime)) _endTime = 0;
 
           info.startTime = _startTime;
-          info.endTime = _endTime;;
+          info.endTime = _endTime;
 
         }
 

@@ -1,0 +1,6 @@
+import * as ts from "typescript";
+import * as Lint from "../lint";
+export declare class Rule extends Lint.Rules.AbstractRule {
+    static FAILURE_STRING_FACTORY: (type: string) => string;
+    apply(sourceFile: ts.SourceFile): Lint.RuleFailure[];
+}

@@ -51,8 +51,7 @@ class AssemblyInspector extends InspectorWidget {
         var label = InspectorUtils.createAttrName("CSComponents:");
         panel.addChild(label);
 
-        for (var index in assemblyFile.classNames)
-        {
+        for (var index in assemblyFile.classNames) {
             var classname = assemblyFile.classNames[index];
 
             label = InspectorUtils.createAttrName(classname);

@@ -205,7 +205,7 @@ class StringAttributeEdit extends AttributeInfoEdit {
 
         var field = new Atomic.UIEditField();
         field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        field.skinBg = "TBAttrEditorField";;
+        field.skinBg = "TBAttrEditorField";
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
         lp.width = 160;
@@ -289,7 +289,7 @@ class IntAttributeEdit extends AttributeInfoEdit {
 
             var field = new Atomic.UIEditField();
             field.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
-            field.skinBg = "TBAttrEditorField";;
+            field.skinBg = "TBAttrEditorField";
             field.fontDescription = AttributeInfoEdit.fontDesc;
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
@@ -385,7 +385,7 @@ class FloatAttributeEdit extends AttributeInfoEdit {
 
         var field = new Atomic.UIEditField();
         field.textAlign = Atomic.UI_TEXT_ALIGN_CENTER;
-        field.skinBg = "TBAttrEditorField";;
+        field.skinBg = "TBAttrEditorField";
         field.fontDescription = AttributeInfoEdit.fontDesc;
         var lp = new Atomic.UILayoutParams();
         lp.width = 140;
@@ -754,7 +754,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
             }.bind(this));
 
-        }
+        };
 
         // handle dropping of component on field
         this.editField.subscribeToEvent(this.editField, "DragEnded", (ev: Atomic.DragEndedEvent) => {
@@ -840,7 +840,7 @@ class ResourceRefListAttributeEdit extends AttributeInfoEdit {
 
         var sizeEdit = this.sizeEdit = InspectorUtils.createAttrEditField(name, layout);
 
-        var lp = new Atomic.UILayoutParams();
+        lp = new Atomic.UILayoutParams();
         lp.width = 160;
         sizeEdit.layoutParams = lp;
 

@@ -77,6 +77,7 @@ void JSBTypeScript::Begin()
 {
     source_ += "//Atomic TypeScript Definitions\n\n\n";
 
+
     if (package_->GetName() != "Atomic")
     {
         source_ += "/// <reference path=\"Atomic.d.ts\" />\n\n";
