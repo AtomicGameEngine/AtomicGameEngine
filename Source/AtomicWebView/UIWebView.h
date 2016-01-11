@@ -46,6 +46,8 @@ public:
     UIWebView(Context* context, const String& initialURL = String::EMPTY);
     virtual ~UIWebView();
 
+    WebClient* GetWebClient() { return webClient_; }
+
     WebTexture2D* GetWebTexture2D() const;
 
 protected:

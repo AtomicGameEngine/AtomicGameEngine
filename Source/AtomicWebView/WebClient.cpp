@@ -19,6 +19,8 @@
 #include "WebBrowserHost.h"
 #include "WebClient.h"
 #include "WebKeyboard.h"
+#include "WebViewEvents.h"
+#include "WebString.h"
 
 namespace Atomic
 {
@@ -27,7 +29,7 @@ namespace Atomic
 void* GetNSWindowContentView(void* window);
 #endif
 
-class WebClientPrivate : public CefClient, public CefLifeSpanHandler
+class WebClientPrivate : public CefClient, public CefLifeSpanHandler, public CefLoadHandler
 {
     friend class WebClient;
 
@@ -53,6 +55,74 @@ public:
     virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE
     {
         return this;
+    }
+
+    virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE {
+        return this;
+    }
+
+    // CefLoadHandler
+
+    void OnLoadStart(CefRefPtr<CefBrowser> browser,
+                     CefRefPtr<CefFrame> frame) OVERRIDE
+    {
+        if (webClient_.Null())
+            return;
+
+        if (!frame->IsMain())
+            return;
+
+        VariantMap eventData;
+        eventData[WebViewLoadStart::P_CLIENT] = webClient_;
+
+        CefString cefURL = frame->GetURL();
+        String url;
+        ConvertCEFString(cefURL, url);
+        eventData[WebViewLoadStart::P_URL] = url;
+
+        webClient_->SendEvent(E_WEBVIEWLOADSTART, eventData);
+
+    }
+
+    void OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                   CefRefPtr<CefFrame> frame,
+                   int httpStatusCode) OVERRIDE
+    {
+        if (webClient_.Null())
+            return;
+
+        if (!frame->IsMain())
+            return;
+
+        VariantMap eventData;
+        eventData[WebViewLoadEnd::P_CLIENT] = webClient_;
+
+        CefString cefURL = frame->GetURL();
+        String url;
+        ConvertCEFString(cefURL, url);
+        eventData[WebViewLoadEnd::P_URL] = url;
+
+        webClient_->SendEvent(E_WEBVIEWLOADEND, eventData);
+
+    }
+
+    void OnLoadError(CefRefPtr<CefBrowser> browser,
+                     CefRefPtr<CefFrame> frame,
+                     ErrorCode errorCode,
+                     const CefString& errorText,
+                     const CefString& failedUrl) OVERRIDE
+    {
+        if (webClient_.Null())
+            return;
+
+    }
+
+    void OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+                              bool isLoading,
+                              bool canGoBack,
+                              bool canGoForward) OVERRIDE
+    {
+
     }
 
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
@@ -313,13 +383,24 @@ void WebClient::SendFocusEvent(bool focus)
     host->SendFocusEvent(focus);
 }
 
+// Navigation
+
+void WebClient::LoadURL(const String& url)
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefString _url(url.CString());
+    d_->browser_->GetMainFrame()->LoadURL(_url);
+
+}
+
 void WebClient::ShortcutCut()
 {
     if (!d_->browser_.get())
         return;
 
     d_->browser_->GetFocusedFrame()->Cut();
-
 }
 
 

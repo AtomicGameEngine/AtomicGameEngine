@@ -51,6 +51,11 @@ public:
     void ShortcutRedo();
     void ShortcutDelete();
 
+    // Navigation
+
+    /// Load the specified url into the main frame of the browser
+    void LoadURL(const String& url);
+
 private:
 
     void WasResized();
