@@ -39,6 +39,8 @@ public:
     UIButton(Context* context, bool createWidget = true);
     virtual ~UIButton();
 
+    /// Set if the button's text field should be allowed to squeeze below its preferred size
+    /// If squeezable it may shrink to width 0
     void SetSqueezable(bool value);
 
     void SetEmulationButton(int button);

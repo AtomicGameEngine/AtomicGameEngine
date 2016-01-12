@@ -8,7 +8,7 @@ namespace Atomic
 
 bool ConvertCEFString(const CefString& cefString, String& output)
 {
-    output = "Failed to Convert CefString";
+    output = String::EMPTY;
 
     cef_string_utf8_t utf8;
     memset(&utf8, 0, sizeof(utf8));

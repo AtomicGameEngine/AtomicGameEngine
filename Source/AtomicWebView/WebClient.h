@@ -53,8 +53,14 @@ public:
 
     // Navigation
 
+    bool IsLoading();
+
     /// Load the specified url into the main frame of the browser
     void LoadURL(const String& url);
+    void GoBack();
+    void GoForward();
+
+    void Reload();
 
 private:
 

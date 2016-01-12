@@ -270,6 +270,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     void SetTooltip(const String& text);
 
+    void Enable();
+    void Disable();
+
 protected:
 
     void ConvertEvent(UIWidget* handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
