@@ -912,5 +912,16 @@ bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
     return false;
 }
 
+void UI::DebugShowSettingsWindow(UIWidget* parent)
+{
+
+#ifdef TB_RUNTIME_DEBUG_INFO
+    if (parent && parent->GetInternalWidget())
+        tb::ShowDebugInfoSettingsWindow(parent->GetInternalWidget());
+#endif
+
+}
+
+
 
 }

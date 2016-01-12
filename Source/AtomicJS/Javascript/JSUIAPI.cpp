@@ -149,22 +149,6 @@ int UI_DebugGetWrappedWidgetCount(duk_context* ctx)
     return 1;
 }
 
-int UI_DebugShowSettingsWindow(duk_context* ctx)
-{
-    UIWidget* widget = js_to_class_instance<UIWidget>(ctx, 0, 0);
-
-    if (!widget)
-        return 0;
-
-#ifdef TB_RUNTIME_DEBUG_INFO
-    if (widget->GetInternalWidget())
-        tb::ShowDebugInfoSettingsWindow(widget->GetInternalWidget());
-#endif
-
-
-    return 0;
-}
-
 void jsapi_init_ui(JSVM* vm)
 {
     duk_context* ctx = vm->GetJSContext();
@@ -178,9 +162,6 @@ void jsapi_init_ui(JSVM* vm)
 
     duk_push_c_function(ctx, UI_DebugGetUIKeepAliveCount, 0);
     duk_put_prop_string(ctx, -2, "debugGetUIKeepAliveCount");
-
-    duk_push_c_function(ctx, UI_DebugShowSettingsWindow, 1);
-    duk_put_prop_string(ctx, -2, "debugShowSettingsWindow");
 
     duk_pop_2(ctx);
 

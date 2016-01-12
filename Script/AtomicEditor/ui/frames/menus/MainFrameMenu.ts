@@ -175,6 +175,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "developer show uidebugger") {
+                Atomic.UI.debugShowSettingsWindow(EditorUI.getView());
+                return true;
+            }
+
         } else if (target.id == "menu tools popup") {
 
             if (refid == "tools toggle profiler") {
@@ -272,7 +277,8 @@ var buildItems = {
 
 var developerItems = {
 
-    "Show Console": ["developer show console"]
+    "Show Console": ["developer show console"],
+    "Show UI Debugger": ["developer show uidebugger"]
 
 };
 
