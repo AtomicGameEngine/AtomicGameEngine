@@ -51,11 +51,16 @@ TBTabContainer::TBTabContainer()
     m_root_layout.SetLayoutDistribution(LAYOUT_DISTRIBUTION_AVAILABLE);
     m_root_layout.SetLayoutOrder(LAYOUT_ORDER_TOP_TO_BOTTOM);
     m_root_layout.SetSkinBg(TBIDC("TBTabContainer.rootlayout"));
+    m_root_layout.SetID("root_layout");
+
     m_tab_layout.SetLayoutDistributionPosition(LAYOUT_DISTRIBUTION_POSITION_CENTER);
     m_tab_layout.SetSkinBg(TBIDC("TBTabContainer.tablayout_x"));
     m_tab_layout.SetLayoutPosition(LAYOUT_POSITION_RIGHT_BOTTOM);
+    m_tab_layout.SetID("tab_layout");
+
     m_content_root.SetGravity(WIDGET_GRAVITY_ALL);
     m_content_root.SetSkinBg(TBIDC("TBTabContainer.container"));
+    m_content_root.SetID("content_root");
 }
 
 TBTabContainer::~TBTabContainer()
@@ -89,6 +94,14 @@ void TBTabContainer::SetValue(int index)
         bool active = index == m_current_page;
         page->SetVisibilility(active ? WIDGET_VISIBILITY_VISIBLE : WIDGET_VISIBILITY_INVISIBLE);
         tab->SetValue(active ? 1 : 0);
+
+        if (active)
+        {
+            // m_content_root is a widget and not a layout, so ensure page
+            // is sized correctly (ie. takes up full content rect)
+            TBRect rect = m_content_root.GetRect();
+            page->SetRect(TBRect(0, 0, rect.w, rect.h));
+        }
     }
 
     TBWidgetEvent ev(EVENT_TYPE_TAB_CHANGED);
