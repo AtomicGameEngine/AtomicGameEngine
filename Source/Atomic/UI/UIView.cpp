@@ -34,13 +34,18 @@ UIView::UIView(Context* context) : UIWidget(context, false)
 {
     widget_ = new TBWidget();
     widget_->SetDelegate(this);
-    GetSubsystem<UI>()->WrapWidget(this, widget_);
+
+    // Set gravity all so we resize correctly
+    widget_->SetGravity(WIDGET_GRAVITY_ALL);
 
     UI* ui = GetSubsystem<UI>();
+    ui->WrapWidget(this, widget_);
 
+    // Set initial size for view
     TBRect rect = ui->GetRootWidget()->GetRect();
     widget_->SetSize(rect.w, rect.h);
 
+    // add to the root widget
     ui->GetRootWidget()->AddChild(widget_);
 
 }
