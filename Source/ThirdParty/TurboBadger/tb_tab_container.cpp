@@ -100,12 +100,16 @@ void TBTabContainer::SetValue(int index)
             if (page->GetVisibility() == WIDGET_VISIBILITY_GONE)
                 continue;
 
-            TBRect contentRect = m_content_root.GetRect();
+            TBRect contentRect = m_content_root.GetRect();            
+            TBSkinElement* skin = m_content_root.GetSkinBgElement();
+            contentRect = contentRect.Shrink(skin->padding_left, skin->padding_top, skin->padding_right, skin->padding_bottom);
+
             TBRect pageRect = page->GetRect();
 
-            if (contentRect.w != pageRect.w || contentRect.h != pageRect.w)
+            if (contentRect.w != pageRect.w || contentRect.h != pageRect.h)
             {
-                contentRect.x = contentRect.y = 0;
+                contentRect.x = skin->padding_left;
+                contentRect.y = skin->padding_right;
                 page->SetRect(contentRect);
             }
         }
