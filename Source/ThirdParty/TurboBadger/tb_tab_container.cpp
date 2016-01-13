@@ -97,10 +97,17 @@ void TBTabContainer::SetValue(int index)
 
         if (active)
         {
-            // m_content_root is a widget and not a layout, so ensure page
-            // is sized correctly (ie. takes up full content rect)
-            TBRect rect = m_content_root.GetRect();
-            page->SetRect(TBRect(0, 0, rect.w, rect.h));
+            if (page->GetVisibility() == WIDGET_VISIBILITY_GONE)
+                continue;
+
+            TBRect contentRect = m_content_root.GetRect();
+            TBRect pageRect = page->GetRect();
+
+            if (contentRect.w != pageRect.w || contentRect.h != pageRect.w)
+            {
+                contentRect.x = contentRect.y = 0;
+                page->SetRect(contentRect);
+            }
         }
     }
 
