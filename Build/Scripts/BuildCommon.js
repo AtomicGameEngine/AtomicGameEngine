@@ -61,8 +61,8 @@ namespace('build', function() {
         var tslint = "./Build/node_modules/tslint/lib/tslint-cli";
 
         switch(os.platform()) {
-            case "win32":
-                node = "Build/Windows/node/node.exe";
+            case "win32":                
+                node = "Build\\Windows\\node\\node.exe";
                 break;
             case "darwin":
                 node = "Build/Mac/node/node";
