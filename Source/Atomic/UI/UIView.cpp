@@ -24,6 +24,7 @@
 
 #include "UI.h"
 #include "UIView.h"
+#include "../Graphics/GraphicsEvents.h"
 
 using namespace tb;
 
@@ -38,16 +39,30 @@ UIView::UIView(Context* context) : UIWidget(context, false)
 
     UI* ui = GetSubsystem<UI>();
 
+    SubscribeToEvent(E_SCREENMODE, HANDLER(UIView, HandleScreenMode));
+
     TBRect rect = ui->GetRootWidget()->GetRect();
     widget_->SetSize(rect.w, rect.h);
 
     ui->GetRootWidget()->AddChild(widget_);
-
 }
 
 UIView::~UIView()
 {
+    // UIWidget calls UnsubscribeFromAllEvents(),
+    // so we don't need to do anything here.
+}
 
+void UIView::HandleScreenMode(StringHash eventType, VariantMap& eventData)
+{
+    TBWidget* root = widget_->GetParent();
+    if (!root)
+    {
+        UI* ui = GetSubsystem<UI>();
+        root = ui->GetRootWidget();
+    }
+
+    widget_->SetRect(root->GetRect());
 }
 
 
