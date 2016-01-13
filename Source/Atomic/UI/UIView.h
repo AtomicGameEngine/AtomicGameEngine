@@ -38,6 +38,7 @@ public:
     virtual ~UIView();
 
 protected:
+    virtual void HandleScreenMode(StringHash eventType, VariantMap& eventData);
 
 private:
 
