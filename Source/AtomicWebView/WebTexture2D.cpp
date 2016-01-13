@@ -326,7 +326,17 @@ void WebTexture2D::SetSize(int width, int height)
     if (width == texture_->GetWidth() && height == texture_->GetHeight())
         return;
 
-    texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC);
+    // initialize to white (color should probably be an option)
+    if (texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC))
+    {
+        SharedArrayPtr<unsigned char> whitedata(new unsigned char[width * height * 4]);
+        memset(whitedata.Get(), 255, width * height * 4);
+        texture_->SetData(0, 0, 0, width, height, whitedata.Get());
+    }
+    else
+    {
+        LOGERRORF("Unable to set WebTexture2D size to %i x %i", width, height);
+    }
 
 }
 

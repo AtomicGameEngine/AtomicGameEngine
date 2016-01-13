@@ -53,7 +53,10 @@ public:
 protected:
 
     bool OnEvent(const tb::TBWidgetEvent &ev);
+    void OnFocusChanged(bool focused);
     bool HandleKeyEvent(const tb::TBWidgetEvent &ev, bool keyDown);
+
+
 
 private:
 

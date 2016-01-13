@@ -60,6 +60,31 @@ public:
         data[32] = 0; data[33] = color; data[34] = 0; data[35] = 1;
     }
 
+    void OnProcess()
+    {
+        TBWidget::OnProcess();
+
+        if (webView_.Null())
+            return;
+
+        if (!browserCreated_)
+        {
+            browserCreated_ = true;
+            TBRect rect = GetRect();
+            webView_->webClient_->CreateBrowser(webView_->initialURL_, rect.w, rect.h);
+        }
+
+    }
+
+    void OnResized(int oldW, int oldH)
+    {
+        if (webView_.Null())
+            return;
+
+        TBRect rect = GetRect();
+        webView_->webClient_->SetSize(rect.w, rect.h);
+    }
+
     void OnPaint(const PaintProps &paint_props)
     {
         if (webView_.Null())
@@ -69,21 +94,9 @@ public:
         rect.x = rect.y = 0;
         ConvertToRoot(rect.x, rect.y);
 
-        IntRect size = webView_->GetRect();
-
         float* data = &vertexData_[0];
 
         UI* ui = webView_->GetSubsystem<UI>();
-
-        if (!browserCreated_)
-        {
-            browserCreated_ = true;
-            webView_->webClient_->CreateBrowser(webView_->initialURL_, rect.w, rect.h);
-            // start focused
-            webView_->webClient_->SendFocusEvent(true);
-        }
-
-        webView_->webClient_->SetSize(rect.w, rect.h);
 
         float color;
         float fopacity = GetOpacity() * ui->GetRenderer()->GetOpacity();
@@ -309,6 +322,11 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     }
 
     return UIWidget::OnEvent(ev);
+}
+
+void UIWebView::OnFocusChanged(bool focused)
+{
+    webClient_->SendFocusEvent(focused);
 }
 
 WebTexture2D* UIWebView::GetWebTexture2D() const
