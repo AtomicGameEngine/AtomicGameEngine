@@ -860,15 +860,19 @@ void TBWidget::OnResized(int old_w, int old_h)
     {
         if (child->GetVisibility() == WIDGET_VISIBILITY_GONE)
             continue;
+
         TBRect rect = child->m_rect;
+
         if ((child->m_gravity & WIDGET_GRAVITY_LEFT) && (child->m_gravity & WIDGET_GRAVITY_RIGHT))
             rect.w += dw;
         else if(child->m_gravity & WIDGET_GRAVITY_RIGHT)
             rect.x += dw;
+
         if ((child->m_gravity & WIDGET_GRAVITY_TOP) && (child->m_gravity & WIDGET_GRAVITY_BOTTOM))
             rect.h += dh;
         else if (child->m_gravity & WIDGET_GRAVITY_BOTTOM)
             rect.y += dh;
+
         child->SetRect(rect);
     }
 }

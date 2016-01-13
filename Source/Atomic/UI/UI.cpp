@@ -529,7 +529,6 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScreenMode;
     rootWidget_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
-    //SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
 }
 
 void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
