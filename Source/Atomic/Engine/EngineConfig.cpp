@@ -186,6 +186,14 @@ bool EngineConfig::LoadWindowConfig(const JSONValue& jwindow)
             engineConfig_["Borderless"] = GetBoolValue(jvalue, false);
         else if (key == "resizable")
             engineConfig_["WindowResizable"] = GetBoolValue(jvalue, false);
+        else if (key == "width")
+            engineConfig_["WindowWidth"] = GetIntValue(jvalue, false);
+        else if (key == "height")
+            engineConfig_["WindowHeight"] = GetIntValue(jvalue, false);
+        else if (key == "positionx")
+            engineConfig_["WindowPositionX"] = GetIntValue(jvalue, false);
+        else if (key == "positiony")
+            engineConfig_["WindowPositionY"] = GetIntValue(jvalue, false);
 
     }
 
