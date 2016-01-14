@@ -118,6 +118,10 @@ public:
     static const Variant
         & GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
 
+    // ATOMIC BEGIN
+    static bool GetDebugBuild();
+    // ATOMIC END
+
 private:
     /// Handle exit requested event. Auto-exit if enabled.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);

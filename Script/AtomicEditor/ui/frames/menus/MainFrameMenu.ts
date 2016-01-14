@@ -22,6 +22,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
+
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -176,9 +177,30 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "developer show uidebugger") {
-                Atomic.UI.debugShowSettingsWindow(EditorUI.getView());
+
+                if (Atomic.engine.debugBuild) {
+                    Atomic.UI.debugShowSettingsWindow(EditorUI.getView());
+                }
+                else {
+                    EditorUI.showModalError("Debug Build Required",
+                        "UIDebugger currently requires a Debug engine build");
+                }
+
                 return true;
             }
+
+            if (refid == "developer assetdatabase scan") {
+
+              ToolCore.assetDatabase.scan();
+
+            }
+
+            if (refid == "developer assetdatabase force") {
+
+              ToolCore.assetDatabase.reimportAllAssets();
+
+            }
+
 
         } else if (target.id == "menu tools popup") {
 
@@ -278,7 +300,14 @@ var buildItems = {
 var developerItems = {
 
     "Show Console": ["developer show console"],
-    "Show UI Debugger": ["developer show uidebugger"]
+    "Debug": {
+        "UI Debugger": ["developer show uidebugger"],
+        "Asset Database": {
+            "Scan": ["developer assetdatabase scan"],
+            "Force Reimport": ["developer assetdatabase force"]
+        }
+    }
+
 
 };
 
@@ -293,7 +322,7 @@ var fileItems = {
     "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
     "Close File": ["file close file", StringID.ShortcutCloseFile],
-     "-3": null,
+    "-3": null,
     "Quit": "quit"
 };
 

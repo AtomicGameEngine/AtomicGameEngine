@@ -1,5 +1,7 @@
 include (BundleUtilities)
 
+include(AtomicCommon)
+
 set (JAVASCRIPT_BINDINGS_PLATFORM "IOS")
 
 add_definitions (-DIOS -DATOMIC_PLATFORM_IOS -DATOMIC_OPENGL -DKNET_UNIX -DATOMIC_TBUI)
