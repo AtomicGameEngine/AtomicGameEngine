@@ -40,6 +40,8 @@ public:
 
     void Scan();
 
+    void ReimportAllAssets();
+
     void GetFolderAssets(String folder, PODVector<Asset*>& assets) const;
 
     String GetResourceImporterName(const String& resourceTypeName);

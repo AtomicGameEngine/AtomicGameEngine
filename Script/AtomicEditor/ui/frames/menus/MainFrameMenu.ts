@@ -22,6 +22,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
+
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -185,10 +186,21 @@ class MainFrameMenu extends Atomic.ScriptObject {
                         "UIDebugger currently requires a Debug engine build");
                 }
 
-
-
                 return true;
             }
+
+            if (refid == "developer assetdatabase scan") {
+
+              ToolCore.assetDatabase.scan();
+
+            }
+
+            if (refid == "developer assetdatabase force") {
+
+              ToolCore.assetDatabase.reimportAllAssets();
+
+            }
+
 
         } else if (target.id == "menu tools popup") {
 
@@ -288,7 +300,14 @@ var buildItems = {
 var developerItems = {
 
     "Show Console": ["developer show console"],
-    "Show UI Debugger": ["developer show uidebugger"]
+    "Debug": {
+        "UI Debugger": ["developer show uidebugger"],
+        "Asset Database": {
+            "Scan": ["developer assetdatabase scan"],
+            "Force Reimport": ["developer assetdatabase force"]
+        }
+    }
+
 
 };
 
