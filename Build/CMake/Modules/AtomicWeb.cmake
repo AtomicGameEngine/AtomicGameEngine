@@ -1,4 +1,6 @@
 
+include(AtomicCommon)
+
 set (JAVASCRIPT_BINDINGS_PLATFORM "WEB")
 
 add_definitions(-DATOMIC_PLATFORM_WEB)

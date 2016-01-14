@@ -176,7 +176,17 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
             if (refid == "developer show uidebugger") {
-                Atomic.UI.debugShowSettingsWindow(EditorUI.getView());
+
+                if (Atomic.engine.debugBuild) {
+                    Atomic.UI.debugShowSettingsWindow(EditorUI.getView());
+                }
+                else {
+                    EditorUI.showModalError("Debug Build Required",
+                        "UIDebugger currently requires a Debug engine build");
+                }
+
+
+
                 return true;
             }
 
@@ -293,7 +303,7 @@ var fileItems = {
     "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
     "Close File": ["file close file", StringID.ShortcutCloseFile],
-     "-3": null,
+    "-3": null,
     "Quit": "quit"
 };
 

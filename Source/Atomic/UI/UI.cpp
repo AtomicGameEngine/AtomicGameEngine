@@ -914,7 +914,7 @@ bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
 void UI::DebugShowSettingsWindow(UIWidget* parent)
 {
 
-#ifdef TB_RUNTIME_DEBUG_INFO
+#ifdef ATOMIC_DEBUG
     if (parent && parent->GetInternalWidget())
         tb::ShowDebugInfoSettingsWindow(parent->GetInternalWidget());
 #endif

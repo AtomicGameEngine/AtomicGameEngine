@@ -958,4 +958,18 @@ void Engine::DoExit()
 #endif
 }
 
+// ATOMIC BEGIN
+
+bool Engine::GetDebugBuild()
+{
+#ifdef ATOMIC_DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
+
+// ATOMIC END
+
+
 }
