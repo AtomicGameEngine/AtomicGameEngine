@@ -159,7 +159,7 @@ class PreferencesFormat {
             height: 0,
             monitor: 0,
             maximized: true
-        }
+        };
 
         this.playerWindow = {
             x: 0,
@@ -168,7 +168,7 @@ class PreferencesFormat {
             height: 0,
             monitor: 0,
             maximized: false
-        }
+        };
 
     }
 
