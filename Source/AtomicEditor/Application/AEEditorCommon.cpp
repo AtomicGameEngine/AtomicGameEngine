@@ -264,14 +264,46 @@ void AEEditorCommon::ValidateWindow()
     IntVector2 windowPosition = graphics->GetWindowPosition();
     int monitors = graphics->GetMonitorsNumber();
     IntVector2 maxResolution;
+
     for (int i = 0; i < monitors; i++)
     {
         IntVector2 monitorResolution = graphics->GetMonitorResolution(i);
         maxResolution += monitorResolution;
     }
-    if (windowPosition.x_ > maxResolution.x_ || windowPosition.y_ > maxResolution.y_ || windowPosition.x_ < maxResolution.x_ || windowPosition.y_ < maxResolution.y_)
+
+    if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ || windowPosition.x_ < 0 || windowPosition.y_ < 0)
     {
-        graphics->CenterWindow();
+        bool editor = this->GetTypeName() == "AEEditorApp";
+        JSONValue window;
+        window["x"] = 0;
+        window["y"] = 0;
+        window["width"] = 0;
+        window["height"] = 0;
+        window["monitor"] = 0;
+        window["maximized"] = editor ? true : false;
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+        path += "prefs.json";
+
+        JSONValue prefs;
+
+        SharedPtr<File> file(new File(context_, path, FILE_READWRITE));
+        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+        jsonFile->BeginLoad(*file);
+        prefs = jsonFile->GetRoot();
+
+        prefs[editor ? "editorWindow" : "playerWindow"] = window;
+
+        jsonFile->Save(*file, "   ");
+        file->Close();
+
+        graphics->SetMode(0, 0);
+        if (editor)
+        {
+            graphics->Maximize();
+        }
     }
 }
 
