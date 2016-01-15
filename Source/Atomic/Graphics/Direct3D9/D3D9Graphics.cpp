@@ -2788,6 +2788,13 @@ bool Graphics::GetMaximized()
 
     return SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MAXIMIZED;
 }
+
+IntVector2 Graphics::GetMonitorResolution(int monitorId) const
+{
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(monitorId, &mode);
+    return IntVector2(mode.w, mode.h);
+}
 // ATOMIC END
 
 }

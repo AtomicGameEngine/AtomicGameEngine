@@ -7,6 +7,7 @@
 
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/Input/Input.h>
+#include <Atomic/Graphics/Graphics.h>
 
 #include <Atomic/IPC/IPC.h>
 
@@ -55,6 +56,8 @@ AEEditorCommon::AEEditorCommon(Context* context) :
 
 void AEEditorCommon::Start()
 {
+    ValidateWindow();
+
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -253,6 +256,23 @@ bool AEEditorCommon::ReadPreferences()
     engineParameters_["WindowMaximized"] = editorWindow["maximized"].GetBool();
 
     return true;
+}
+
+void AEEditorCommon::ValidateWindow()
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    IntVector2 windowPosition = graphics->GetWindowPosition();
+    int monitors = graphics->GetMonitorsNumber();
+    IntVector2 maxResolution;
+    for (int i = 0; i < monitors; i++)
+    {
+        IntVector2 monitorResolution = graphics->GetMonitorResolution(i);
+        maxResolution += monitorResolution;
+    }
+    if (windowPosition.x_ > maxResolution.x_ || windowPosition.y_ > maxResolution.y_ || windowPosition.x_ < maxResolution.x_ || windowPosition.y_ < maxResolution.y_)
+    {
+        graphics->CenterWindow();
+    }
 }
 
 }

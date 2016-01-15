@@ -39,7 +39,8 @@ protected:
 
     bool CreateDefaultPreferences(String& path, JSONValue& prefs);
     bool ReadPreferences();
-    
+    void ValidateWindow();
+
     SharedPtr<JSVM> vm_;
 
 private:

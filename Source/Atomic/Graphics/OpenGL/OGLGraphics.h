@@ -531,6 +531,8 @@ public:
     int GetMonitorsNumber();
     /// Return true if window is maximized
     bool GetMaximized();
+    /// Return monitor resolution
+    IntVector2 GetMonitorResolution(int monitorId) const;
     // ATOMIC END
 
 private:
