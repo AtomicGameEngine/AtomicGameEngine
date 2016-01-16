@@ -231,7 +231,7 @@ void AEEditorCommon::ValidateWindow()
         maxResolution += monitorResolution;
     }
 
-    if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ )
+    if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ || (windowPosition.x_ + graphics->GetWidth()) < 0 || (windowPosition.y_ + graphics->GetHeight()) < 0)
     {
         JSONValue prefs;
 
