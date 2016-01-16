@@ -23,6 +23,7 @@
 import ScriptWidget = require("ui/ScriptWidget");
 import EditorEvents = require("editor/EditorEvents");
 import UIEvents = require("ui/UIEvents");
+import ServiceLocator from "../../extensionServices/ServiceLocator";
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
 // so we can access the editor they belong to from the widget itself
@@ -55,6 +56,10 @@ class ResourceFrame extends ScriptWidget {
 
         if (this.currentResourceEditor) {
             this.currentResourceEditor.save();
+            // Grab the path to this file and pass it to the save resource
+            ServiceLocator.resourceServices.saveResource({
+                path: this.currentResourceEditor.fullPath,
+            });
         }
 
     }
@@ -63,6 +68,7 @@ class ResourceFrame extends ScriptWidget {
 
         for (var i in this.editors) {
             this.editors[i].save();
+            ServiceLocator.resourceServices.saveResource({ path: this.editors[i].fullPath });
         }
 
     }
