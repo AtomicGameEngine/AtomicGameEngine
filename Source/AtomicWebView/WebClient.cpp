@@ -311,6 +311,12 @@ void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp,
 
 }
 
+void WebClient::SendMousePressEvent(int x, int y, unsigned button, unsigned modifier) const
+{
+    SendMouseClickEvent(x, y, button, false, modifier);
+    SendMouseClickEvent(x, y, button, true, modifier);
+}
+
 void WebClient::SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave) const
 {
     if (!d_->browser_.get())

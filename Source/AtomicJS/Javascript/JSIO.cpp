@@ -39,7 +39,6 @@ enum IO_MAGIC_TYPE
     IO_MAGIC_BINARY
 };
 
-
 static Serializer* CastToSerializer(duk_context* ctx, int index)
 {
     Object* o = js_to_class_instance<Object>(ctx, index, 0);

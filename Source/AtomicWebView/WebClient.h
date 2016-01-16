@@ -35,6 +35,7 @@ public:
     CefClient* GetCefClient();
 
     void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const;
+    void SendMousePressEvent(int x, int y, unsigned button = 0, unsigned modifier = 0) const;
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
     void SendMouseWheelEvent(int x, int y, unsigned modifier, int deltaX, int deltaY) const;
 
