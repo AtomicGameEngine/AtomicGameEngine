@@ -2776,7 +2776,7 @@ int Graphics::GetCurrentMonitor()
     return SDL_GetWindowDisplayIndex((SDL_Window*) this->GetSDLWindow());
 }
 
-int Graphics::GetMonitorsNumber()
+int Graphics::GetNumMonitors()
 {
     return SDL_GetNumVideoDisplays();
 }

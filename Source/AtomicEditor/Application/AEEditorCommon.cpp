@@ -177,35 +177,17 @@ bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
     root["recentProjects"] = JSONArray();
 
     JSONValue editorWindow;
-    editorWindow["x"] = 0;
-    editorWindow["y"] = 0;
-    editorWindow["width"] = 0;
-    editorWindow["height"] = 0;
-    editorWindow["monitor"] = 0;
-    editorWindow["maximized"] = true;
+    GetDefaultWindowPreferences(editorWindow);
 
     JSONValue playerWindow;
-    playerWindow["x"] = 0;
-    playerWindow["y"] = 0;
-    playerWindow["width"] = 0;
-    playerWindow["height"] = 0;
-    playerWindow["monitor"] = 0;
-    playerWindow["maximized"] = false;
+    GetDefaultWindowPreferences(playerWindow);
 
     root["editorWindow"] = editorWindow;
     root["playerWindow"] = playerWindow;
 
-    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
-
-    if (!file->IsOpen())
-    {
-        LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
-        return false;
-    }
-
-    jsonFile->Save(*file, "   ");
-
     prefs = root;
+
+    SavePreferences(prefs);
 
     return true;
 }
@@ -213,33 +195,11 @@ bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
 bool AEEditorCommon::ReadPreferences()
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
-    path += "prefs.json";
+    String path = GetPreferencesPath();
 
     JSONValue prefs;
 
-    if (!fileSystem->FileExists(path))
-    {
-        if (!CreateDefaultPreferences(path, prefs))
-            return false;
-    }
-    else
-    {
-        SharedPtr<File> file(new File(context_, path, FILE_READ));
-        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
-
-        if (!jsonFile->BeginLoad(*file))
-        {
-            file->Close();
-            if (!CreateDefaultPreferences(path, prefs))
-                return false;
-        }
-        else
-        {
-            prefs = jsonFile->GetRoot();
-        }
-
-    }
+    LoadPreferences(prefs);
 
     if (!prefs.IsObject() || !prefs["editorWindow"].IsObject())
     {
@@ -262,7 +222,7 @@ void AEEditorCommon::ValidateWindow()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     IntVector2 windowPosition = graphics->GetWindowPosition();
-    int monitors = graphics->GetMonitorsNumber();
+    int monitors = graphics->GetNumMonitors();
     IntVector2 maxResolution;
 
     for (int i = 0; i < monitors; i++)
@@ -273,38 +233,97 @@ void AEEditorCommon::ValidateWindow()
 
     if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ || windowPosition.x_ < 0 || windowPosition.y_ < 0)
     {
-        bool editor = this->GetTypeName() == "AEEditorApp";
-        JSONValue window;
-        window["x"] = 0;
-        window["y"] = 0;
-        window["width"] = 0;
-        window["height"] = 0;
-        window["monitor"] = 0;
-        window["maximized"] = editor ? true : false;
-
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
-        String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
-        path += "prefs.json";
-
         JSONValue prefs;
 
-        SharedPtr<File> file(new File(context_, path, FILE_READWRITE));
-        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+        if (!LoadPreferences(prefs))
+            return;
 
-        jsonFile->BeginLoad(*file);
-        prefs = jsonFile->GetRoot();
+        JSONValue window;
+        GetDefaultWindowPreferences(window);
 
-        prefs[editor ? "editorWindow" : "playerWindow"] = window;
-
-        jsonFile->Save(*file, "   ");
-        file->Close();
+        prefs[context_->GetEditorContext() ? "editorWindow" : "playerWindow"] = window;
 
         graphics->SetMode(0, 0);
-        if (editor)
+        graphics->CenterWindow();
+        if (context_->GetEditorContext())
         {
             graphics->Maximize();
         }
+
+        SavePreferences(prefs);
     }
+}
+
+void AEEditorCommon::GetDefaultWindowPreferences(JSONValue& windowPrefs)
+{
+    windowPrefs["x"] = 0;
+    windowPrefs["y"] = 0;
+    windowPrefs["width"] = 0;
+    windowPrefs["height"] = 0;
+    windowPrefs["monitor"] = 0;
+    windowPrefs["maximized"] = context_->GetEditorContext() ? true : false;
+}
+
+String AEEditorCommon::GetPreferencesPath()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+    path += "prefs.json";
+    return path;
+}
+
+bool AEEditorCommon::LoadPreferences(JSONValue& prefs)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = GetPreferencesPath();
+
+    if (!fileSystem->FileExists(path))
+    {
+        if (!CreateDefaultPreferences(path, prefs))
+            return false;
+    }
+    else
+    {
+        SharedPtr<File> file(new File(context_, path, FILE_READ));
+        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+        if (!jsonFile->BeginLoad(*file))
+        {
+            file->Close();
+            if (!CreateDefaultPreferences(path, prefs))
+                return false;
+        }
+        else
+        {
+            prefs = jsonFile->GetRoot();
+        }
+
+        file->Close();
+    }
+
+    return true;
+}
+
+bool AEEditorCommon::SavePreferences(JSONValue& prefs)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = GetPreferencesPath();
+
+    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    jsonFile->GetRoot() = prefs;
+
+    if (!file->IsOpen())
+    {
+        LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
+        return false;
+    }
+
+    jsonFile->Save(*file, "   ");
+    file->Close();
+    
+    return true;
 }
 
 }

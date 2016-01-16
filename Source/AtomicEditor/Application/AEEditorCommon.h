@@ -44,7 +44,10 @@ protected:
     SharedPtr<JSVM> vm_;
 
 private:
-
+    void GetDefaultWindowPreferences(JSONValue& windowPrefs);
+    String GetPreferencesPath();
+    bool LoadPreferences(JSONValue& prefs);
+    bool SavePreferences(JSONValue& prefs);
 };
 
 }
