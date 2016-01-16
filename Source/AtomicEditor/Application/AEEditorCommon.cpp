@@ -177,10 +177,10 @@ bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
     root["recentProjects"] = JSONArray();
 
     JSONValue editorWindow;
-    GetDefaultWindowPreferences(editorWindow);
+    GetDefaultWindowPreferences(editorWindow, true);
 
     JSONValue playerWindow;
-    GetDefaultWindowPreferences(playerWindow);
+    GetDefaultWindowPreferences(playerWindow, false);
 
     root["editorWindow"] = editorWindow;
     root["playerWindow"] = playerWindow;
@@ -231,21 +231,24 @@ void AEEditorCommon::ValidateWindow()
         maxResolution += monitorResolution;
     }
 
-    if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ || windowPosition.x_ < 0 || windowPosition.y_ < 0)
+    if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ )
     {
         JSONValue prefs;
 
         if (!LoadPreferences(prefs))
             return;
 
+        bool editor = context_->GetEditorContext();
+
         JSONValue window;
-        GetDefaultWindowPreferences(window);
+        GetDefaultWindowPreferences(window, editor);
 
-        prefs[context_->GetEditorContext() ? "editorWindow" : "playerWindow"] = window;
+        prefs[editor ? "editorWindow" : "playerWindow"] = window;
 
+        //Setting the mode to 0 width/height will use engine defaults for window size and layout
         graphics->SetMode(0, 0);
         graphics->CenterWindow();
-        if (context_->GetEditorContext())
+        if (editor)
         {
             graphics->Maximize();
         }
@@ -254,14 +257,14 @@ void AEEditorCommon::ValidateWindow()
     }
 }
 
-void AEEditorCommon::GetDefaultWindowPreferences(JSONValue& windowPrefs)
+void AEEditorCommon::GetDefaultWindowPreferences(JSONValue& windowPrefs, bool maximized)
 {
     windowPrefs["x"] = 0;
     windowPrefs["y"] = 0;
     windowPrefs["width"] = 0;
     windowPrefs["height"] = 0;
     windowPrefs["monitor"] = 0;
-    windowPrefs["maximized"] = context_->GetEditorContext() ? true : false;
+    windowPrefs["maximized"] = maximized ? true : false;
 }
 
 String AEEditorCommon::GetPreferencesPath()

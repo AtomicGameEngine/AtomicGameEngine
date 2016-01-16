@@ -30,7 +30,7 @@ class Shortcuts extends Atomic.ScriptObject {
         } else {
             var playerWindow = Preferences.getInstance().playerWindow;
             if (playerWindow) {
-                if ((playerWindow.monitor + 1) > Atomic.graphics.getMonitorsNumber()) {
+                if ((playerWindow.monitor + 1) > Atomic.graphics.getNumMonitors()) {
                     //will use default settings if monitor is not available
                     var args = "--resizable";
                     Atomic.editorMode.playProject(args, debug);
