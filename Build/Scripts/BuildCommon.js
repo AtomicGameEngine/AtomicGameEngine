@@ -88,8 +88,9 @@ namespace('build', function() {
             console.log("\n\nLint: Typescript linting complete.\n\n");
             jake.exec(cmds, function() {
 
-                // copy 3rd party module folder to the destination.  This needs to be more thought out though..maybe another place to store this?
-               jake.cpR("./Script/AtomicEditor/modules","./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor");
+                // copy typescript into the editor modules directory since there is a dependency there
+               fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules");
+               fs.copySync("./Build/node_modules/typescript/lib/typescript.js","./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules/typescript.js")
                complete();
 
             }, {
