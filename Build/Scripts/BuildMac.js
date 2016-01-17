@@ -29,8 +29,8 @@ task('atomiceditor', {
   var cmds = [];
 
   cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -G Xcode");
-  cmds.push("xcodebuild -target GenerateScriptBindings -configuration Release")
-  cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -configuration Release")
+  cmds.push("xcodebuild -target GenerateScriptBindings -configuration Release -parallelizeTargets -jobs 4")
+  cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -configuration Release -parallelizeTargets -jobs 4")
 
   jake.exec(cmds, function() {
 

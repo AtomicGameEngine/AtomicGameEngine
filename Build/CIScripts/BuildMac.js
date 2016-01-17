@@ -23,7 +23,7 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ MACOSX",
       "cmake -DATOMIC_DEV_BUILD=0 -G Xcode ../../../../",
-      "xcodebuild -target AtomicPlayer -configuration Release"
+      "xcodebuild -target AtomicPlayer -configuration Release -parallelizeTargets -jobs 4"
     ];
 
     jake.exec(cmds, function() {
@@ -57,7 +57,7 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Editor/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNET/ MACOSX",
       "cmake -DATOMIC_DEV_BUILD=0 -G Xcode ../../../../",
-      "xcodebuild -target AtomicEditor -configuration Release"
+      "xcodebuild -target AtomicEditor -configuration Release -parallelizeTargets -jobs 4"
     ];
 
     jake.exec(cmds, function() {

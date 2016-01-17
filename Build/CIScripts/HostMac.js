@@ -30,7 +30,7 @@ namespace('build', function() {
 
     var cmds = [
       'cmake ../../../../ -DATOMICTOOL_NOGEN=1 -G Xcode',
-      'xcodebuild -target AtomicTool -configuration Release'
+      'xcodebuild -target AtomicTool -configuration Release -parallelizeTargets -jobs 4'
     ]
 
     jake.exec(cmds, function() {
