@@ -32,7 +32,7 @@ namespace('build', function() {
 
     }
 
-    cmds.push("xcodebuild -configuration Release");
+    cmds.push("xcodebuild -configuration Release -parallelizeTargets -jobs 4");
 
     jake.exec(cmds, function() {
       var iosPlayerBinary = playerBuildDir + "Source/AtomicPlayer/Application/Release-iphoneos/AtomicPlayer.app/AtomicPlayer";
