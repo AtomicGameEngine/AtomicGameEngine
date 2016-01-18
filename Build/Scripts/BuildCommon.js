@@ -91,6 +91,10 @@ namespace('build', function() {
                 // copy typescript into the editor modules directory since there is a dependency there
                fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules");
                fs.copySync("./Build/node_modules/typescript/lib/typescript.js","./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules/typescript.js")
+
+               // copy lib.core.d.ts into the tool data directory
+               fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
+               fs.copySync("./Build/node_modules/typescript/lib/lib.core.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.core.d.ts")
                complete();
 
             }, {
