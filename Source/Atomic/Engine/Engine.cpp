@@ -368,8 +368,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 
         if (!graphics->SetMode(
-            GetParameter(parameters, "WindowWidth", 0).GetInt(),
-            GetParameter(parameters, "WindowHeight", 0).GetInt(),
+            GetParameter(parameters, "WindowMaximized", false).GetBool() ? 0 : GetParameter(parameters, "WindowWidth", 0).GetInt(),
+            GetParameter(parameters, "WindowMaximized", false).GetBool() ? 0 : GetParameter(parameters, "WindowHeight", 0).GetInt(),
             GetParameter(parameters, "FullScreen", true).GetBool(),
             GetParameter(parameters, "Borderless", false).GetBool(),
             GetParameter(parameters, "WindowResizable", false).GetBool(),
@@ -957,5 +957,19 @@ void Engine::DoExit()
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
 #endif
 }
+
+// ATOMIC BEGIN
+
+bool Engine::GetDebugBuild()
+{
+#ifdef ATOMIC_DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
+
+// ATOMIC END
+
 
 }

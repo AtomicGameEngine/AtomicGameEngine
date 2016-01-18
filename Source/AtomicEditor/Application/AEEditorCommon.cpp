@@ -156,34 +156,101 @@ void AEEditorCommon::Stop()
 #endif
 }
 
-
-bool AEEditorCommon::ReadPreferences(String& path, JSONValue& prefs, const String& propertyName)
+bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
 {
-    if (!path.EndsWith(".json"))
-        path.Append(".json");
+    // Note there is some duplication here with the editor's
+    // TypeScript preference code, this is due to the preferences for
+    // the editor window needing to be available at window creation time
+    // It could be better to split this all out to a native, scriptable
+    // preferences object
 
-    SharedPtr<File> file(new File(context_, path, FILE_READ));
+    LOGINFOF("Creating default Atomic Editor preferences: %s", path.CString());
 
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
 
-    if (!jsonFile->BeginLoad(*file))
-        return false;
+    JSONValue& root = jsonFile->GetRoot();
 
-    JSONValue root = jsonFile->GetRoot();
+    root.Clear();
+    root["recentProjects"] = JSONArray();
 
-    if (propertyName.Length() > 0)
+    JSONValue editorWindow;
+    editorWindow["x"] = 0;
+    editorWindow["y"] = 0;
+    editorWindow["width"] = 0;
+    editorWindow["height"] = 0;
+    editorWindow["monitor"] = 0;
+    editorWindow["maximized"] = true;
+
+    JSONValue playerWindow;
+    playerWindow["x"] = 0;
+    playerWindow["y"] = 0;
+    playerWindow["width"] = 0;
+    playerWindow["height"] = 0;
+    playerWindow["monitor"] = 0;
+    playerWindow["maximized"] = false;
+
+    root["editorWindow"] = editorWindow;
+    root["playerWindow"] = playerWindow;
+
+    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
+
+    if (!file->IsOpen())
     {
-        if (root.Contains(propertyName))
-        {
-            prefs = root.Get(propertyName);
-        }
+        LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
+        return false;
+    }
+
+    jsonFile->Save(*file, "   ");
+
+    prefs = root;
+
+    return true;
+}
+
+bool AEEditorCommon::ReadPreferences()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+    path += "prefs.json";
+
+    JSONValue prefs;
+
+    if (!fileSystem->FileExists(path))
+    {
+        if (!CreateDefaultPreferences(path, prefs))
+            return false;
     }
     else
     {
-        prefs = root;
+        SharedPtr<File> file(new File(context_, path, FILE_READ));
+        SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+        if (!jsonFile->BeginLoad(*file))
+        {
+            file->Close();
+            if (!CreateDefaultPreferences(path, prefs))
+                return false;
+        }
+        else
+        {
+            prefs = jsonFile->GetRoot();
+        }
+
     }
 
-    file->Close();
+    if (!prefs.IsObject() || !prefs["editorWindow"].IsObject())
+    {
+        if (!CreateDefaultPreferences(path, prefs))
+            return false;
+    }
+
+    JSONValue& editorWindow = prefs["editorWindow"];
+
+    engineParameters_["WindowPositionX"] = editorWindow["x"].GetUInt();
+    engineParameters_["WindowPositionY"] = editorWindow["y"].GetUInt();
+    engineParameters_["WindowWidth"] = editorWindow["width"].GetUInt();
+    engineParameters_["WindowHeight"] = editorWindow["height"].GetUInt();
+    engineParameters_["WindowMaximized"] = editorWindow["maximized"].GetBool();
 
     return true;
 }

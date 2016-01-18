@@ -114,6 +114,9 @@ public:
 
     UIWidget* GetHoveredWidget();
 
+    // Debugging
+    static void DebugShowSettingsWindow(UIWidget* parent);
+
 private:
 
     static WeakPtr<Context> uiContext_;

@@ -257,6 +257,7 @@ void PlayerMode::HandlePlayerWindowChanged(StringHash eventType, VariantMap& eve
 
 void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)
 {
+    UnsubscribeFromEvent(E_LOGMESSAGE);
     SendEvent(E_PLAYERQUIT);
 }
 

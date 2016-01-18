@@ -31,7 +31,7 @@ function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
 
             var value = items[key];
 
-            if (typeof value === 'string') {
+            if (typeof value === "string") {
 
                 src.addItem(new UIMenuItem(key, value));
 
@@ -40,7 +40,7 @@ function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
                 // add a separator
                 src.addItem(new UIMenuItem(key));
 
-            } else if (Object.prototype.toString.call(value) === '[object Array]') {
+            } else if (Object.prototype.toString.call(value) === "[object Array]") {
 
                 if (value.length == 1)
                     src.addItem(new UIMenuItem(key, value[0]));
@@ -61,7 +61,7 @@ function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
                 }
 
             }
-            else if (typeof value === 'object') {
+            else if (typeof value === "object") {
 
                 var subsrc = createMenuItemSourceRecursive(value);
 

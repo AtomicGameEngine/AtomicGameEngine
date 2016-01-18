@@ -60,7 +60,7 @@ class ProjectFrame extends ScriptWidget {
 
             // console.log("File CHANGED! ", data.fileName);
 
-        })
+        });
 
     }
 
@@ -72,9 +72,9 @@ class ProjectFrame extends ScriptWidget {
 
             if (widget.id == ev.asset.guid) {
 
-                if (widget['assetButton']) {
-                    widget['assetButton'].text = ev.asset.name + ev.asset.extension;
-                    widget['assetButton'].dragObject = new Atomic.UIDragObject(ev.asset, ev.asset.name);
+                if (widget["assetButton"]) {
+                    widget["assetButton"].text = ev.asset.name + ev.asset.extension;
+                    widget["assetButton"].dragObject = new Atomic.UIDragObject(ev.asset, ev.asset.name);
                 }
 
                 break;
@@ -466,7 +466,7 @@ class ProjectFrame extends ScriptWidget {
         button.text = asset.name + asset.extension;
         button.skinBg = "TBButton.flat";
         button["asset"] = asset;
-        blayout['assetButton'] = button;
+        blayout["assetButton"] = button;
         blayout.addChild(button);
 
         return blayout;

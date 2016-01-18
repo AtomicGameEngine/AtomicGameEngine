@@ -20,7 +20,10 @@
 // THE SOFTWARE.
 //
 
+#include "../Core/Context.h"
+#include "../IO/Log.h"
 #include "../IO/File.h"
+#include "../IO/FileSystem.h"
 #include "../Resource/JSONFile.h"
 #include "../Graphics/GraphicsDefs.h"
 #include "EngineConfig.h"
@@ -29,6 +32,7 @@ namespace Atomic
 {
 
 VariantMap EngineConfig::engineConfig_;
+String EngineConfig::engineConfigFilename_;
 
 bool EngineConfig::GetBoolValue(const JSONValue& jvalue, bool defaultValue)
 {
@@ -284,7 +288,10 @@ bool EngineConfig::LoadFromJSON(const String& json)
     JSONValue jroot;
 
     if (!JSONFile::ParseJSON(json, jroot))
+    {
+        LOGERRORF("EngineConfig::LoadFromJSON - Unable to parse config file JSON: %s", engineConfigFilename_.CString());
         return false;
+    }
 
     if (!jroot.IsObject())
         return false;
@@ -297,10 +304,21 @@ bool EngineConfig::LoadFromJSON(const String& json)
 
 bool EngineConfig::LoadFromFile(Context *context, const String& filename)
 {
+
+    FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
+
+    if (!fileSystem->FileExists(filename))
+        return false;
+
+    engineConfigFilename_ = filename;
+
     SharedPtr<File> file(new File(context));
 
     if (!file->Open(filename))
+    {
+        LOGERRORF("EngineConfig::LoadFromFile - Unable to open config file %s", filename.CString());
         return false;
+    }
 
     String json;
     file->ReadText(json);

@@ -30,7 +30,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         var name = new Atomic.UITextField();
         name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
         name.skinBg = "InspectorTextAttrName";
-        name.text = "Prefab"
+        name.text = "Prefab";
         name.fontDescription = fd;
 
         var saveButton = new Atomic.UIButton();
@@ -41,7 +41,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
             this.node.scene.sendEvent("SceneEditPrefabSave", {node : this.node});
             return true;
-        }
+        };
 
         var undoButton = new Atomic.UIButton();
         undoButton.text = "Revert";
@@ -52,7 +52,7 @@ class SelectionPrefabWidget extends Atomic.UILayout {
             this.node.scene.sendEvent("SceneEditPrefabRevert", {node : this.node});
             return true;
 
-        }
+        };
 
         var breakButton = new Atomic.UIButton();
         breakButton.text = "Break";
@@ -62,18 +62,18 @@ class SelectionPrefabWidget extends Atomic.UILayout {
 
             this.node.scene.sendEvent("SceneEditPrefabBreak", {node : this.node});
             return true;
-        }
+        };
 
         var noticeName = new Atomic.UITextField();
         noticeName.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
         noticeName.skinBg = "InspectorTextAttrName";
-        noticeName.text = "Prefab"
+        noticeName.text = "Prefab";
         noticeName.fontDescription = fd;
 
         var noticeText = new Atomic.UITextField();
         noticeText.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
         noticeText.skinBg = "InspectorTextAttrName";
-        noticeText.text = "Multiple Selection"
+        noticeText.text = "Multiple Selection";
         noticeText.fontDescription = fd;
 
         noticeLayout.addChild(noticeName);

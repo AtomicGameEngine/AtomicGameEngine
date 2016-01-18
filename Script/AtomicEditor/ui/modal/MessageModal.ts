@@ -8,8 +8,7 @@
 import UIEvents = require("../UIEvents");
 import EditorUI = require("../EditorUI");
 
-export class MessageModal extends Atomic.ScriptObject
-{
+export class MessageModal extends Atomic.ScriptObject {
 
   showErrorWindow(title:string, message:string):void {
 

@@ -38,7 +38,7 @@ class ResourceFrame extends ScriptWidget {
 
     handleSaveResource(ev: EditorEvents.SaveResourceEvent) {
 
-        if (this.currentResourceEditor){
+        if (this.currentResourceEditor) {
             this.currentResourceEditor.save();
         }
 
@@ -171,11 +171,11 @@ class ResourceFrame extends ScriptWidget {
         }
 
         if (navigate) {
-            var nextEditor = editors[closedIndex+1];
+            var nextEditor = editors[closedIndex + 1];
             if (nextEditor) {
                 this.navigateToResource(nextEditor);
             } else {
-                this.navigateToResource(editors[closedIndex-1]);
+                this.navigateToResource(editors[closedIndex - 1]);
             }
         }
 

@@ -555,5 +555,19 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
 
 }
 
+void AssetDatabase::ReimportAllAssets()
+{
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    while (itr != assets_.End())
+    {
+        (*itr)->SetDirty(true);
+        itr++;
+    }
+
+    Scan();
+
+}
+
 
 }

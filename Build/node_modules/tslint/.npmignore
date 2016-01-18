@@ -1,0 +1,15 @@
+.DS_Store
+.gitmodules
+.jscsrc
+.project
+.settings
+.travis.yml
+.tslintrc
+.vscode
+appveyor.yml
+Gruntfile.js
+tslint.json
+/build/
+/src/
+/test/
+tscommand*.txt

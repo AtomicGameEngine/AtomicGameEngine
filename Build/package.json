@@ -1,0 +1,10 @@
+{
+  "name": "atomic-editor",
+  "dependencies": {
+    "fs-extra": "^0.24.0",
+    "glob": "^6.0.3",
+    "jake": "^8.0.12",
+    "tslint": "^3.2.0",
+    "typescript": "^1.7.5"
+  }
+}

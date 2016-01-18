@@ -26,7 +26,7 @@ class Pro3DWindow extends ModalWindow {
 
             var id = ev.target.id;
 
-            if (id == 'purchase') {
+            if (id == "purchase") {
 
                 Atomic.fileSystem.systemOpen("https://store.atomicgameengine.com/site");
 

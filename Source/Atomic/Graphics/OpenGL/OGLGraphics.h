@@ -103,8 +103,7 @@ public:
     /// Get the SDL_Window as a void* to avoid having to include the graphics implementation
     void* GetSDLWindow();
     /// Set screen mode. Return true if successful.
-    bool SetMode
-        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample, bool maximize);
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample, bool maximize);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.

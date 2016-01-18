@@ -22,6 +22,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu tools", toolsItems);
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
+
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -114,7 +115,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 var utils = new Editor.FileUtils();
                 var path = utils.openProjectFileDialog();
 
-                if (path=="") {
+                if (path == "") {
 
                     return true;
 
@@ -175,6 +176,32 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "developer show uidebugger") {
+
+                if (Atomic.engine.debugBuild) {
+                    Atomic.UI.debugShowSettingsWindow(EditorUI.getView());
+                }
+                else {
+                    EditorUI.showModalError("Debug Build Required",
+                        "UIDebugger currently requires a Debug engine build");
+                }
+
+                return true;
+            }
+
+            if (refid == "developer assetdatabase scan") {
+
+              ToolCore.assetDatabase.scan();
+
+            }
+
+            if (refid == "developer assetdatabase force") {
+
+              ToolCore.assetDatabase.reimportAllAssets();
+
+            }
+
+
         } else if (target.id == "menu tools popup") {
 
             if (refid == "tools toggle profiler") {
@@ -207,13 +234,13 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
             if (refid == "help forums") {
-                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/")
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/");
                 return true;
             } else if (refid == "help chat") {
-                Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/")
+                Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/");
                 return true;
             } else if (refid == "help github") {
-                Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/")
+                Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/");
                 return true;
             } else if (refid == "help api") {
                 var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/Atomic.html";
@@ -261,20 +288,28 @@ var toolsItems = {
 
     "Toggle Profiler": ["tools toggle profiler"]
 
-}
+};
 
 var buildItems = {
 
     "Build": ["build build", StringID.ShortcutBuild],
     "Build Settings": ["build settings", StringID.ShortcutBuildSettings]
-}
+};
 
 
 var developerItems = {
 
-    "Show Console": ["developer show console"]
+    "Show Console": ["developer show console"],
+    "Debug": {
+        "UI Debugger": ["developer show uidebugger"],
+        "Asset Database": {
+            "Scan": ["developer assetdatabase scan"],
+            "Force Reimport": ["developer assetdatabase force"]
+        }
+    }
 
-}
+
+};
 
 var fileItems = {
 
@@ -287,9 +322,9 @@ var fileItems = {
     "Save File": ["file save file", StringID.ShortcutSaveFile],
     "Save All Files": ["file save all"],
     "Close File": ["file close file", StringID.ShortcutCloseFile],
-     "-3": null,
+    "-3": null,
     "Quit": "quit"
-}
+};
 
 var helpItems = {
 
@@ -303,4 +338,4 @@ var helpItems = {
     "About Atomic Editor": "about atomic editor",
     "-3": null,
     "Manage License": "manage license"
-}
+};

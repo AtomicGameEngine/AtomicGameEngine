@@ -21,7 +21,7 @@ class PlayerOutput extends Atomic.UIWindow {
 
         this.text = "Player Output";
 
-        this.load("AtomicEditor/editor/ui/playeroutput.tb.txt")
+        this.load("AtomicEditor/editor/ui/playeroutput.tb.txt");
 
         this.output = <Atomic.UIEditField> this.getWidget("output");
 
@@ -29,7 +29,7 @@ class PlayerOutput extends Atomic.UIWindow {
 
             this.close();
 
-        }
+        };
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
         this.subscribeToEvent(EditorEvents.PlayerLog, (ev: EditorEvents.PlayerLogEvent) => this.handlePlayerLog(ev));

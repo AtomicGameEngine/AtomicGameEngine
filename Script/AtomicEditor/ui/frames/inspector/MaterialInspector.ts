@@ -59,8 +59,8 @@ var techniqueLookup = {
     "Techniques/DiffAdd.xml": "Additive",
     "Techniques/NoTexture.xml": "No Texture",
     "Techniques/DiffLightMap.xml": "Lightmap",
-    "Techniques/DiffLightMapAlpha.xml": "Lightmap Alpha"
-}
+    "Techniques/NoTexture.xml": "No Texture"
+};
 
 var techniqueReverseLookup = {};
 
@@ -115,7 +115,7 @@ class MaterialInspector extends ScriptWidget {
 
             var field = new Atomic.UIEditField();
             field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-            field.skinBg = "TBAttrEditorField";;
+            field.skinBg = "TBAttrEditorField";
             field.fontDescription = this.fd;
             var lp = new Atomic.UILayoutParams();
             lp.width = 140;
@@ -256,7 +256,7 @@ class MaterialInspector extends ScriptWidget {
 
         return true;
 
-      }
+      };
 
     }
 
@@ -391,7 +391,7 @@ class MaterialInspector extends ScriptWidget {
 
         var field = new Atomic.UIEditField();
         field.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-        field.skinBg = "TBAttrEditorField";;
+        field.skinBg = "TBAttrEditorField";
         field.fontDescription = this.fd;
         var lp = new Atomic.UILayoutParams();
         lp.width = 160;

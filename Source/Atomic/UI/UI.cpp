@@ -529,7 +529,6 @@ void UI::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScreenMode;
     rootWidget_->SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
-    //SetSize(eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
 }
 
 void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -911,6 +910,17 @@ bool UI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
 {
     return false;
 }
+
+void UI::DebugShowSettingsWindow(UIWidget* parent)
+{
+
+#ifdef ATOMIC_DEBUG
+    if (parent && parent->GetInternalWidget())
+        tb::ShowDebugInfoSettingsWindow(parent->GetInternalWidget());
+#endif
+
+}
+
 
 
 }

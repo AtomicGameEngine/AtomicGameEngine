@@ -414,6 +414,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     SDL_GetDesktopDisplayMode(0, &mode);
     D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
 
+    bool center = false;
+
     // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
     if (!width || !height)
     {
@@ -424,8 +426,18 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         }
         else
         {
-            width = 1024;
-            height = 768;
+            // If we don't have a height/width calculate a reasonable starting window size, and center it
+            // this will also be the restore size when switching from maximized
+            float ratio = float(mode.h) / float(mode.w);
+            width = mode.w - 200;
+            height = (int) (float (mode.w - 200) * ratio);
+
+            // Only set the position if on the first monitor, otherwise, the maximize will be on the wrong monitor
+            if ( (position_.x_ >= 0 && position_.x_ < mode.w) && (position_.y_ >= 0 && position_.y_ < mode.h))
+                SetWindowPosition(mode.w/2 - width/2, mode.h/2 - height/2);
+
+            if (!maximize)
+                center = true;
         }
     }
 
@@ -497,13 +509,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             multiSample = 1;
     }
 
+    if (maximize)
+        width = height = 0;
+
     AdjustWindow(width, height, fullscreen, borderless);
 
-    if (maximize)
-    {
-        Maximize();
-        SDL_GetWindowSize(impl_->window_, &width, &height);
-    }
+    if (center)
+        CenterWindow();
 
     if (fullscreen)
     {

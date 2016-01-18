@@ -17,7 +17,7 @@ class ResourceOps extends Atomic.ScriptObject {
 
             resourceOps.sendEvent(EditorEvents.ModalError, { title: "Asset Import Error", message: ev.error });
 
-        })
+        });
 
     }
 
