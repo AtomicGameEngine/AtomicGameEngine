@@ -7,7 +7,7 @@
 
 import * as EditorEvents from "../editor/EditorEvents";
 import TypescriptLanguageService from "./resourceServices/TypescriptLanguageService";
-
+import * as EditorUI from "../ui/EditorUI";
 /**
  * Base interface for any editor services.
  */
@@ -59,7 +59,11 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
         this.registeredServices.forEach((service) => {
             // Verify that the service contains the appropriate methods and that it can save
             if (service.canSave && service.save && service.canSave(ev)) {
-                service.save(ev);
+                try {
+                    service.save(ev);
+                } catch (e) {
+                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}`);
+                }
             }
         });
     }
