@@ -58,7 +58,7 @@ class ResourceFrame extends ScriptWidget {
             this.currentResourceEditor.save();
             // Grab the path to this file and pass it to the save resource
             ServiceLocator.resourceServices.saveResource({
-                path: this.currentResourceEditor.fullPath,
+                path: ev.path || this.currentResourceEditor.fullPath,
             });
         }
 
@@ -257,6 +257,9 @@ class ResourceFrame extends ScriptWidget {
       for (var i in this.editors) {
           this.editors[i].close();
       }
+
+      // tell extensions that the project has been unloaded
+      ServiceLocator.resourceServices.projectUnloaded(data);
 
     }
 

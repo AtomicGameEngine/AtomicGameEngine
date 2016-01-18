@@ -31,8 +31,11 @@ export interface EditorService {
 }
 
 export interface ResourceService extends EditorService {
-    save(ev: EditorEvents.SaveResourceEvent);
-    canSave(ev: EditorEvents.SaveResourceEvent);
+    save?(ev: EditorEvents.SaveResourceEvent);
+    canSave?(ev: EditorEvents.SaveResourceEvent);
+    projectUnloaded?();
+    canDelete?();
+    delete?();
 }
 
 /**
@@ -54,6 +57,7 @@ class ServiceRegistry<T extends EditorService> {
  * Registry for service extensions that are concerned about Resources
  */
 class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
+
     saveResource(ev: EditorEvents.SaveResourceEvent) {
         // run through and find any services that can handle this.
         this.registeredServices.forEach((service) => {
@@ -62,7 +66,41 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
                 try {
                     service.save(ev);
                 } catch (e) {
-                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}`);
+                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                }
+            }
+        });
+    }
+
+    /**
+     * Called when a resource is being deleted
+     * @return {[type]} [description]
+     */
+    deleteResource() {
+        this.registeredServices.forEach((service) => {
+            // Verify that the service contains the appropriate methods and that it can save
+            if (service.canDelete && service.delete && service.canDelete()) {
+                try {
+                    service.delete();
+                } catch (e) {
+                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                }
+            }
+        });
+    }
+
+    /**
+     * Called when the project is unloaded
+     * @param  {[type]} data Event info from the project unloaded event
+     */
+    projectUnloaded(data) {
+        this.registeredServices.forEach((service) => {
+            // Verify that the service contains the appropriate methods and that it can save
+            if (service.projectUnloaded) {
+                try {
+                    service.projectUnloaded();
+                } catch (e) {
+                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
                 }
             }
         });

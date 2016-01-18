@@ -4,7 +4,6 @@
 // Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
-
 // Based upon the TypeScript language services example at https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API#incremental-build-support-using-the-language-services
 
 import * as ExtensionServices from "../EditorExtensionServices";
@@ -20,7 +19,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
 
     languageService: ts.LanguageService;
     projectFiles: string[];
-    versionMap: ts.Map<{ version: number }> = {};
+    versionMap: ts.Map<{ version: number, snapshot?: ts.IScriptSnapshot }> = {};
 
     /**
      * Perform a full compile on save, or just transpile the current file
@@ -119,14 +118,34 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
                 getScriptFileNames: () => this.projectFiles,
                 getScriptVersion: (fileName) => this.versionMap[fileName] && this.versionMap[fileName].version.toString(),
                 getScriptSnapshot: (fileName) => {
+                    const scriptVersion = this.versionMap[fileName];
                     if (!Atomic.fileSystem.exists(fileName)) {
+                        if (scriptVersion) {
+                            delete this.versionMap[fileName];
+                            let idx = this.projectFiles.indexOf(fileName);
+                            if (idx > -1) {
+                                this.projectFiles.splice(idx, 1);
+                            }
+                        }
                         return undefined;
                     }
-                    let script = new Atomic.File(fileName, Atomic.FILE_READ);
-                    try {
-                        return ts.ScriptSnapshot.fromString(script.readText());
-                    } finally {
-                        script.close();
+
+                    // Grab the cached version
+                    if (scriptVersion) {
+                        if (scriptVersion.snapshot) {
+                            console.log(`cache hit snapshot for ${fileName}`);
+                            return scriptVersion.snapshot;
+                        } else {
+                            let script = new Atomic.File(fileName, Atomic.FILE_READ);
+                            try {
+                                scriptVersion.snapshot = ts.ScriptSnapshot.fromString(script.readText());
+                                return scriptVersion.snapshot;
+                            } finally {
+                                script.close();
+                            }
+                        }
+                    } else {
+                        console.log(`no script version for ${fileName}`);
                     }
                 },
                 getCurrentDirectory: () => ToolCore.toolSystem.project.resourcePath,
@@ -146,6 +165,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
             files.forEach(filename => {
                 // increment the version number since we changed
                 this.versionMap[filename].version++;
+                this.versionMap[filename].snapshot = null;
                 errors = errors.concat(this.compileFile(filename));
             });
         }
@@ -223,6 +243,14 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
     }
 
     /**
+     * clear out any caches, etc.
+     */
+    resetLanguageService() {
+        this.projectFiles = null;
+        this.versionMap = {};
+    }
+
+    /**
      * Inject this language service into the registry
      * @return {[type]}             True if successful
      */
@@ -253,6 +281,15 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
                 noLib: true
             });
         }
+    }
+
+    /**
+     * Called when the project is being unloaded to allow the typscript language service to reset
+     */
+    projectUnloaded() {
+        // got an unload, we need to reset the language service
+        console.log(`${this.name}: received a project unloaded event`);
+        this.resetLanguageService();
     }
 
     /**
