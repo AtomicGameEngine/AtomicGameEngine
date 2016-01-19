@@ -59,8 +59,6 @@ var techniqueLookup = {
     "Techniques/DiffAdd.xml": "Additive",
     "Techniques/NoTexture.xml": "No Texture",
     "Techniques/DiffLightMap.xml": "Lightmap",
-    "Techniques/NoTexture.xml": "No Texture",
-    "Techniques/DiffLightMap.xml": "Lightmap",
     "Techniques/DiffLightMapAlpha.xml": "Lightmap Alpha"
 };
 
