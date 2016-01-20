@@ -43,7 +43,7 @@ static bool SDLScanCodeToDarwinScanCode(SDL_Scancode code, int& darwinScanCode)
 
 }
 
-bool ConvertKeyEvent(const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)
+bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)
 {
     if (eventType != "KeyDown" && eventType != "KeyUp")
     {
@@ -74,6 +74,11 @@ bool ConvertKeyEvent(const StringHash eventType, VariantMap& eventData, CefKeyEv
         keyEvent.modifiers |= EVENTFLAG_ALT_DOWN;
     if (wk.qual & QUAL_CTRL)
         keyEvent.modifiers |= EVENTFLAG_CONTROL_DOWN;
+
+    bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
+
+    if (superdown)
+        keyEvent.modifiers |= EVENTFLAG_COMMAND_DOWN;
 
 
     int darwinScanCode;

@@ -6,7 +6,9 @@
 namespace Atomic
 {
 
-bool ConvertKeyEvent(const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent);
+class Input;
+
+bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent);
 bool ConvertTextInputEvent(const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent);
 
 struct WebKeyEvent

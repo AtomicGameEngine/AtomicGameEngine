@@ -413,7 +413,7 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
 
     CefKeyEvent keyEvent;
 
-    if (!ConvertKeyEvent(eventType, eventData, keyEvent))
+    if (!ConvertKeyEvent(GetSubsystem<Input>(), eventType, eventData, keyEvent))
         return;
 
     host->SendKeyEvent(keyEvent);

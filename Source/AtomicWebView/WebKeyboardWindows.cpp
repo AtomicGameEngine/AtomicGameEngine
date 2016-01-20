@@ -73,7 +73,7 @@ static bool SDLScanCodeToWindowsScanCode(SDL_Scancode code, LPARAM& lParam, WPAR
 
 }
 
-bool ConvertKeyEvent(const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)
+bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)
 {
     if (eventType != "KeyDown" && eventType != "KeyUp")
     {
