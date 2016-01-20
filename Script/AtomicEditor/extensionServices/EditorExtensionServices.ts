@@ -33,9 +33,13 @@ export interface EditorService {
 export interface ResourceService extends EditorService {
     save?(ev: EditorEvents.SaveResourceEvent);
     canSave?(ev: EditorEvents.SaveResourceEvent);
-    projectUnloaded?();
     canDelete?(ev: EditorEvents.DeleteResourceEvent);
     delete?(ev: EditorEvents.DeleteResourceEvent);
+}
+
+export interface ProjectService extends EditorService {
+    projectUnloaded?();
+    projectLoaded?(ev: EditorEvents.LoadProjectEvent);
 }
 
 /**
@@ -50,6 +54,49 @@ class ServiceRegistry<T extends EditorService> {
      */
     register(service: T) {
         this.registeredServices.push(service);
+    }
+}
+
+/**
+ * Registry for service extensions that are concerned about project events
+ */
+class ProjectServiceRegistry extends ServiceRegistry<ProjectService> {
+    constructor() {
+        super();
+    }
+
+    /**
+     * Called when the project is unloaded
+     * @param  {[type]} data Event info from the project unloaded event
+     */
+    projectUnloaded(data) {
+        this.registeredServices.forEach((service) => {
+            // Verify that the service contains the appropriate methods and that it can save
+            if (service.projectUnloaded) {
+                try {
+                    service.projectUnloaded();
+                } catch (e) {
+                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                }
+            }
+        });
+    }
+
+    /**
+     * Called when the project is loaded
+     * @param  {[type]} data Event info from the project unloaded event
+     */
+    projectLoaded(ev:EditorEvents.LoadProjectEvent) {
+        this.registeredServices.forEach((service) => {
+            // Verify that the service contains the appropriate methods and that it can save
+            if (service.projectLoaded) {
+                try {
+                    service.projectLoaded(ev);
+                } catch (e) {
+                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                }
+            }
+        });
     }
 }
 
@@ -92,22 +139,6 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
         });
     }
 
-    /**
-     * Called when the project is unloaded
-     * @param  {[type]} data Event info from the project unloaded event
-     */
-    projectUnloaded(data) {
-        this.registeredServices.forEach((service) => {
-            // Verify that the service contains the appropriate methods and that it can save
-            if (service.projectUnloaded) {
-                try {
-                    service.projectUnloaded();
-                } catch (e) {
-                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
-                }
-            }
-        });
-    }
 }
 
 /**
@@ -118,9 +149,11 @@ export class ServiceLocatorType {
 
     constructor() {
         this.resourceServices = new ResourceServiceRegistry();
+        this.projectServices = new ProjectServiceRegistry();
     }
 
     resourceServices: ResourceServiceRegistry;
+    projectServices: ProjectServiceRegistry;
 
     loadService(service: EditorService) {
         service.initialize(this);

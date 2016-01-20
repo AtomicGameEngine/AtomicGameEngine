@@ -107,7 +107,7 @@ class ProjectFrame extends ScriptWidget {
 
     /**
      * Called when the user deletes a resource
-     * @param  {EditorEvents.DeleteResourceEvent} ev 
+     * @param  {EditorEvents.DeleteResourceEvent} ev
      */
     handleDeleteResource(ev: EditorEvents.DeleteResourceEvent) {
         var db = ToolCore.getAssetDatabase();
@@ -410,6 +410,8 @@ class ProjectFrame extends ScriptWidget {
         this.folderList.setExpanded(this.resourcesID, true);
         this.refreshContent(this.resourceFolder);
 
+        // tell extensions that the project has been unloaded
+        ServiceLocator.projectServices.projectLoaded(data);
     }
 
     handleProjectUnloaded(data) {
@@ -420,6 +422,8 @@ class ProjectFrame extends ScriptWidget {
         var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
         container.deleteAllChildren();
 
+        // tell extensions that the project has been loaded
+        ServiceLocator.projectServices.projectUnloaded(data);
     }
 
     // Shows referenced file in projectframe

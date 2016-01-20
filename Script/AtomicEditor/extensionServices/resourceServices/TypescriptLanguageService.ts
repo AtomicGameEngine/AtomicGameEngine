@@ -13,7 +13,7 @@ import * as ts from "modules/typescript";
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
  */
-export default class TypescriptLanguageService implements ExtensionServices.ResourceService {
+export default class TypescriptLanguageService implements ExtensionServices.ResourceService, ExtensionServices.ProjectService {
     name: string = "TypeScriptResourceService";
     description: string = "This service transpiles TypeScript into JavaScript on save.";
 
@@ -257,8 +257,12 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @return {[type]}             True if successful
      */
     initialize(serviceRegistry: ExtensionServices.ServiceLocatorType) {
+        // We care about both resource events as well as project events
         serviceRegistry.resourceServices.register(this);
+        serviceRegistry.projectServices.register(this);
     }
+
+    /*** ResourceService implementation ****/
 
     /**
      * Called once a resource has been saved
@@ -283,15 +287,6 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
                 noLib: true
             });
         }
-    }
-
-    /**
-     * Called when the project is being unloaded to allow the typscript language service to reset
-     */
-    projectUnloaded() {
-        // got an unload, we need to reset the language service
-        console.log(`${this.name}: received a project unloaded event`);
-        this.resetLanguageService();
     }
 
     /**
@@ -343,4 +338,28 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
             ToolCore.assetDatabase.deleteAsset(jsFileAsset);
         }
     }
+
+    /*** ProjectService implementation ****/
+
+    /**
+     * Called when the project is being unloaded to allow the typscript language service to reset
+     */
+    projectUnloaded() {
+        // got an unload, we need to reset the language service
+        console.log(`${this.name}: received a project unloaded event`);
+        this.resetLanguageService();
+    }
+
+    /**
+     * Called when the project is being loaded to allow the typscript language service to reset and
+     * possibly compile
+     */
+    projectLoaded(ev: EditorEvents.LoadProjectEvent) {
+        // got a load, we need to reset the language service
+        console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
+        this.resetLanguageService();
+
+        //TODO: do we want to run through and compile at this point?
+    }
+
 }

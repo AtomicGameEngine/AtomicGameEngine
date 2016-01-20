@@ -258,9 +258,6 @@ class ResourceFrame extends ScriptWidget {
           this.editors[i].close();
       }
 
-      // tell extensions that the project has been unloaded
-      ServiceLocator.resourceServices.projectUnloaded(data);
-
     }
 
     constructor(parent: Atomic.UIWidget) {
