@@ -52,6 +52,8 @@ public:
     void ShortcutRedo();
     void ShortcutDelete();
 
+    void ExecuteJavaScript(const String& script);
+
     // Navigation
 
     bool IsLoading();

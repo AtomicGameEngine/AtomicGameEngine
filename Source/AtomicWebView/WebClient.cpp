@@ -172,6 +172,30 @@ public:
 
     }
 
+    ///
+    // Called to display a console message. Return true to stop the message from
+    // being output to the console.
+    ///
+    /*--cef(optional_param=message,optional_param=source)--*/
+    virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
+                                  const CefString& message,
+                                  const CefString& source,
+                                  int line) OVERRIDE
+    {
+        if (webClient_.Null())
+            return false;
+
+        String _message;
+        ConvertCEFString(message, _message);
+        String _source;
+        ConvertCEFString(source, _source);
+
+        LOGINFOF("WebViewJS: %s (%s:%i)", _message.CString(), _source.CString(), line);
+
+        return false;
+    }
+
+
 
     bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                   CefProcessId source_process,
@@ -437,12 +461,23 @@ void WebClient::SendFocusEvent(bool focus)
     host->SendFocusEvent(focus);
 }
 
+// Javascript
+void WebClient::ExecuteJavaScript(const String& script)
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetMainFrame()->ExecuteJavaScript(CefString(script.CString()), "", 0);
+}
+
 // Navigation
 
 void WebClient::LoadURL(const String& url)
 {
     if (!d_->browser_.get())
+    {
         return;
+    }
 
     CefString _url(url.CString());
     d_->browser_->GetMainFrame()->LoadURL(_url);
