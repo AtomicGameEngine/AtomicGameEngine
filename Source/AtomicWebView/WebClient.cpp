@@ -216,6 +216,8 @@ public:
         CefBrowserSettings browserSettings;
 
         browserSettings.webgl = STATE_ENABLED;
+        browserSettings.file_access_from_file_urls = STATE_ENABLED;
+        browserSettings.universal_access_from_file_urls = STATE_ENABLED;
 
         windowInfo.width = width;
         windowInfo.height = height;

@@ -42,9 +42,8 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     layout->AddChild(c);
 
-    String url = "file://";
-
-    webView_ = new UIWebView(context_, "file:///Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicEditor/CodeEditor/Editor.html");
+    String url = "file:///Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicEditor/CodeEditor/Editor.html";
+    webView_ = new UIWebView(context_, url);
     webClient_ = webView_->GetWebClient();
 
     SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
@@ -63,8 +62,8 @@ JSResourceEditor::~JSResourceEditor()
 }
 
 void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
-{
-    webClient_->ExecuteJavaScript("sayHi();");
+{    
+    webClient_->ExecuteJavaScript(ToString("loadCode(\"atomic://resources/%s\");", fullpath_.CString()));
 }
 
 void JSResourceEditor::FormatCode()

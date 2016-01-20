@@ -14,8 +14,10 @@
 
 #include <Atomic/Graphics/Graphics.h>
 
+#include "WebSchemeHandler.h"
 #include "WebClient.h"
 #include "WebBrowserHost.h"
+
 
 namespace Atomic
 {
@@ -65,6 +67,8 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
         LOGERROR("CefInitialize - Error");
     }
 
+    RegisterWebSchemeHandlers(this);
+
     d_ = new WebBrowserHostPrivate(this);
 
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
@@ -73,6 +77,7 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
 WebBrowserHost::~WebBrowserHost()
 {
+    CefClearSchemeHandlerFactories();
     CefShutdown();
 }
 

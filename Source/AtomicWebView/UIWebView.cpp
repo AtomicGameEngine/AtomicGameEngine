@@ -82,6 +82,10 @@ public:
             return;
 
         TBRect rect = GetRect();
+
+        if ((rect.w < 0 || rect.h < 0) || (rect.w == rect.h == 0))
+            return;
+
         webView_->webClient_->SetSize(rect.w, rect.h);
     }
 
