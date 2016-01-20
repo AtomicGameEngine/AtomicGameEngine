@@ -65,6 +65,8 @@ private:
 
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
 
+    void ReadEngineConfig();
+
 };
 
 }

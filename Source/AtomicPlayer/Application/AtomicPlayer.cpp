@@ -23,6 +23,7 @@
 
 #include <Atomic/Atomic.h>
 #include <Atomic/Engine/Engine.h>
+#include <Atomic/Engine/EngineConfig.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/IOEvents.h>
@@ -75,6 +76,9 @@ void AtomicPlayerApp::Setup()
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
     context_->RegisterSubsystem(new ScriptSystem(context_));
+
+    // Read the engine configuration
+    ReadEngineConfig();
 
     engineParameters_.InsertNew("WindowTitle", "AtomicPlayer");
 
@@ -258,5 +262,18 @@ void AtomicPlayerApp::HandleJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
+void AtomicPlayerApp::ReadEngineConfig()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String filename = fileSystem->GetProgramDir() + "Settings/Engine.json";
+
+    if (!fileSystem->FileExists(filename))
+        return;
+
+    if (EngineConfig::LoadFromFile(context_, filename))
+    {
+        EngineConfig::ApplyConfig(engineParameters_);
+    }
+}
 
 }

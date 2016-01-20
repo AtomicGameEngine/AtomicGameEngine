@@ -1,0 +1,9 @@
+<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+    <pass name="base" vsdefines="ENVCUBEMAP LIGHTMAP" psdefines="ENVCUBEMAP LIGHTMAP" />
+    <pass name="prepass" psdefines="PREPASS" />
+    <pass name="light" vsdefines="LIGHTMAP" psdefines="LIGHTMAP" depthtest="equal" depthwrite="false" blend="subtract" />
+    <pass name="material" vsdefines="ENVCUBEMAP LIGHTMAP" psdefines="MATERIAL ENVCUBEMAP LIGHTMAP" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" vsdefines="ENVCUBEMAP LIGHTMAP" psdefines="DEFERRED ENVCUBEMAP LIGHTMAP" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

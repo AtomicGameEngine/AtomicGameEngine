@@ -252,6 +252,10 @@ void BuildBase::GetDefaultResourcePaths(Vector<String>& paths)
     paths.Push(AddTrailingSlash(tenv->GetPlayerDataDir()));
 }
 
+String BuildBase::GetSettingsDirectory()
+{
+    return project_->GetProjectPath() + "/Settings";
+}
 
 void BuildBase::ScanResourceDirectory(const String& resourceDir)
 {

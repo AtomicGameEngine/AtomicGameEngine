@@ -201,11 +201,6 @@ void ResourcePackager::GeneratePackage(const String& destFilePath)
             return;
         }
 
-        if (!file.GetSize())
-        {
-            return;
-        }
-
         entry->size_ = file.GetSize();
     }
 

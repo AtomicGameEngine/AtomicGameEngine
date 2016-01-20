@@ -152,6 +152,12 @@ void BuildWindows::Build(const String& buildPath)
     if (buildFailed_)
         return;
    
+    if (!BuildCreateDirectory(buildPath_ + "/Settings"))
+        return;
+
+    if (!BuildCopyFile(GetSettingsDirectory() + "/Engine.json", buildPath_ + "/Settings/Engine.json"))
+        return;
+
     if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer.exe"))
         return;
 
