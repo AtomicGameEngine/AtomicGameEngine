@@ -56,8 +56,7 @@ export class ResourceDelete extends ModalWindow {
 
                 this.hide();
 
-                var db = ToolCore.getAssetDatabase();
-                db.deleteAsset(this.asset);
+                this.sendEvent(EditorEvents.DeleteResource, { path: this.asset.path, asset: this.asset });
 
                 return true;
             }

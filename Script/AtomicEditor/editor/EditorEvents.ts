@@ -99,6 +99,16 @@ export interface EditResourceEvent {
 
 }
 
+export const DeleteResource = "EditorDeleteResource";
+export interface DeleteResourceEvent {
+
+  // The full path to the resource to edit
+  path: string;
+
+  // the asset to delete
+  asset: ToolCore.Asset;
+}
+
 export const SceneEditStateChange = "SceneEditStateChange";
 export interface SceneEditStateChangeEvent {
 

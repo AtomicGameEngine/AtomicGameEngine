@@ -6,8 +6,8 @@
 //
 
 import * as EditorEvents from "../editor/EditorEvents";
-import TypescriptLanguageService from "./resourceServices/TypescriptLanguageService";
 import * as EditorUI from "../ui/EditorUI";
+
 /**
  * Base interface for any editor services.
  */
@@ -34,8 +34,8 @@ export interface ResourceService extends EditorService {
     save?(ev: EditorEvents.SaveResourceEvent);
     canSave?(ev: EditorEvents.SaveResourceEvent);
     projectUnloaded?();
-    canDelete?();
-    delete?();
+    canDelete?(ev: EditorEvents.DeleteResourceEvent);
+    delete?(ev: EditorEvents.DeleteResourceEvent);
 }
 
 /**
@@ -57,6 +57,9 @@ class ServiceRegistry<T extends EditorService> {
  * Registry for service extensions that are concerned about Resources
  */
 class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
+    constructor() {
+        super();
+    }
 
     saveResource(ev: EditorEvents.SaveResourceEvent) {
         // run through and find any services that can handle this.
@@ -76,12 +79,12 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
      * Called when a resource is being deleted
      * @return {[type]} [description]
      */
-    deleteResource() {
+    deleteResource(ev: EditorEvents.DeleteResourceEvent) {
         this.registeredServices.forEach((service) => {
             // Verify that the service contains the appropriate methods and that it can save
-            if (service.canDelete && service.delete && service.canDelete()) {
+            if (service.canDelete && service.delete && service.canDelete(ev)) {
                 try {
-                    service.delete();
+                    service.delete(ev);
                 } catch (e) {
                     EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
                 }
@@ -121,11 +124,5 @@ export class ServiceLocatorType {
 
     loadService(service: EditorService) {
         service.initialize(this);
-    }
-
-    initializeServices() {
-        // first we will load the built in services
-        this.loadService(new TypescriptLanguageService);
-        //TODO: Scan the user folders for services to load
     }
 }

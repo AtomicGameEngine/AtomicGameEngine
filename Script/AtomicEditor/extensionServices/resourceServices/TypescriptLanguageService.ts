@@ -105,7 +105,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param  {ts.CompilerOptions} options for the compiler
      */
     compile(files: string[], options: ts.CompilerOptions): void {
-
+        let start = new Date().getTime();
         //scan all the files in the project
         this.refreshProjectFiles(files);
         let errors: ts.Diagnostic[] = [];
@@ -173,6 +173,8 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
         if (errors.length) {
             this.logErrors(errors);
         }
+
+        console.log(`${this.name}: Compiling complete after ${new Date().getTime() - start} ms`);
     }
 
     /**
@@ -304,5 +306,41 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
             return true;
         }
         return false;
+    }
+
+    /**
+     * Determine if we care if an asset has been deleted
+     * @param  {EditorEvents.DeleteResourceEvent} ev
+     * @return {boolean}                            true if we care
+     */
+    canDelete(ev: EditorEvents.DeleteResourceEvent): boolean {
+        const ext = Atomic.getExtension(ev.path);
+        if (ext == ".ts") {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Handle the delete.  This should delete the corresponding javascript file
+     * @param  {EditorEvents.DeleteResourceEvent} ev
+     */
+    delete(ev: EditorEvents.DeleteResourceEvent) {
+        console.log(`${this.name}: received a delete resource event`);
+        if (this.versionMap[ev.path]) {
+            delete this.versionMap[ev.path];
+        }
+        let idx = this.projectFiles.indexOf(ev.path);
+        if (idx > -1) {
+            this.projectFiles.splice(idx, 1);
+        }
+
+        // Delete the corresponding js file
+        let jsFile = ev.path.replace(/\.ts$/, ".js");
+        let jsFileAsset = ToolCore.assetDatabase.getAssetByPath(jsFile);
+        if (jsFileAsset) {
+            console.log(`${this.name}: deleting corresponding .js file`);
+            ToolCore.assetDatabase.deleteAsset(jsFileAsset);
+        }
     }
 }
