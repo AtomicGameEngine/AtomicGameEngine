@@ -27,7 +27,7 @@ export interface ModalErrorEvent {
   message: string;
 
 }
-
+export const PlayerStartRequest = "EditorPlayRequest";
 export const PlayerStarted = "EditorPlayerStarted";
 export const PlayerStopped = "EditorPlayerStopped";
 export const PlayerLog = "EditorPlayerLog";
@@ -65,6 +65,7 @@ export const CloseProject = "EditorCloseProject";
 export const ProjectClosed = "EditorProjectClosed";
 
 export const LoadProject = "EditorLoadProject";
+export const LoadProjectNotification = "EditorLoadProjectNotification";
 export interface LoadProjectEvent {
 
   // The full path to the .atomic file
