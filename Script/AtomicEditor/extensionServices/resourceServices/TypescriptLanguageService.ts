@@ -17,9 +17,9 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
     name: string = "TypeScriptResourceService";
     description: string = "This service transpiles TypeScript into JavaScript on save.";
 
-    languageService: ts.LanguageService;
-    projectFiles: string[];
-    versionMap: ts.Map<{ version: number, snapshot?: ts.IScriptSnapshot }> = {};
+    private languageService: ts.LanguageService;
+    private projectFiles: string[];
+    private versionMap: ts.Map<{ version: number, snapshot?: ts.IScriptSnapshot }> = {};
 
     /**
      * Perform a full compile on save, or just transpile the current file
@@ -31,7 +31,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * used by the compile to build a registery of all of the project files
      * @param {string[]} files optional list of files to refresh.  If not provided, then all files will be reloaded
      */
-    refreshProjectFiles(files?: string[]) {
+    private refreshProjectFiles(files?: string[]) {
         if (!this.projectFiles || !files) {
             // First time in, let's index the entire project
             this.projectFiles = [];
@@ -73,7 +73,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param {string[]}           fileNames array of files to transpile
      * @param {ts.CompilerOptions} options   compiler options
      */
-    transpile(fileNames: string[], options: ts.CompilerOptions): void {
+    private transpile(fileNames: string[], options: ts.CompilerOptions): void {
         fileNames.forEach((fileName) => {
             console.log(`${this.name}:  Transpiling ${fileName}`);
             let script = new Atomic.File(fileName, Atomic.FILE_READ);
@@ -104,7 +104,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
      */
-    compile(files: string[], options: ts.CompilerOptions): void {
+    private compile(files: string[], options: ts.CompilerOptions): void {
         let start = new Date().getTime();
         //scan all the files in the project
         this.refreshProjectFiles(files);
@@ -182,7 +182,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param  {string} filename the file to compile
      * @return {[ts.Diagnostic]} a list of any errors
      */
-    compileFile(filename: string): ts.Diagnostic[] {
+    private compileFile(filename: string): ts.Diagnostic[] {
         console.log(`${this.name}: Compiling version ${this.versionMap[filename].version} of ${filename}`);
         //if (!filename.match("\.d\.ts$")) {
         try {
@@ -200,7 +200,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param  {string} filename [description]
      * @return {[ts.Diagnostic]} a list of any errors
      */
-    emitFile(filename: string): ts.Diagnostic[] {
+    private emitFile(filename: string): ts.Diagnostic[] {
         let output = this.languageService.getEmitOutput(filename);
         let allDiagnostics: ts.Diagnostic[] = [];
         if (output.emitSkipped) {
@@ -227,7 +227,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param {ts.Diagnostic} diagnostics information about the errors
      * @return {[type]}          [description]
      */
-    logErrors(diagnostics: ts.Diagnostic[]) {
+    private logErrors(diagnostics: ts.Diagnostic[]) {
         let msg = [];
 
         diagnostics.forEach(diagnostic => {
@@ -247,9 +247,22 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
     /**
      * clear out any caches, etc.
      */
-    resetLanguageService() {
+    private resetLanguageService() {
         this.projectFiles = null;
         this.versionMap = {};
+    }
+
+    /**
+     * Determines if the file name/path provided is something we care about
+     * @param  {string} path
+     * @return {boolean}
+     */
+    private isValidFiletype(path: string): boolean {
+        const ext = Atomic.getExtension(path);
+        if (ext == ".ts") {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -263,6 +276,14 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
     }
 
     /*** ResourceService implementation ****/
+    /**
+     * Can this service extension handle the save event for the resource?
+     * @param  {EditorEvents.SaveResourceEvent} ev the
+     * @return {boolean}                return true if this service can handle the resource
+     */
+    canSave(ev: EditorEvents.SaveResourceEvent): boolean {
+        return this.isValidFiletype(ev.path);
+    }
 
     /**
      * Called once a resource has been saved
@@ -290,30 +311,12 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
     }
 
     /**
-     * Can this service extension handle the save event for the resource?
-     * @param  {EditorEvents.SaveResourceEvent} ev the
-     * @return {boolean}                return true if this service can handle the resource
-     */
-    canSave(ev: EditorEvents.SaveResourceEvent): boolean {
-        const ext = Atomic.getExtension(ev.path);
-        //if (ext == ".ts" && !ev.path.match("\.d\.ts$")) {
-        if (ext == ".ts") {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Determine if we care if an asset has been deleted
      * @param  {EditorEvents.DeleteResourceEvent} ev
-     * @return {boolean}                            true if we care
+     * @return {boolean} true if we care
      */
     canDelete(ev: EditorEvents.DeleteResourceEvent): boolean {
-        const ext = Atomic.getExtension(ev.path);
-        if (ext == ".ts") {
-            return true;
-        }
-        return false;
+        return this.isValidFiletype(ev.path);
     }
 
     /**
@@ -322,12 +325,14 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      */
     delete(ev: EditorEvents.DeleteResourceEvent) {
         console.log(`${this.name}: received a delete resource event`);
-        if (this.versionMap[ev.path]) {
-            delete this.versionMap[ev.path];
-        }
-        let idx = this.projectFiles.indexOf(ev.path);
-        if (idx > -1) {
-            this.projectFiles.splice(idx, 1);
+        if (this.versionMap && this.projectFiles) {
+            if (this.versionMap[ev.path]) {
+                delete this.versionMap[ev.path];
+            }
+            let idx = this.projectFiles.indexOf(ev.path);
+            if (idx > -1) {
+                this.projectFiles.splice(idx, 1);
+            }
         }
 
         // Delete the corresponding js file
@@ -336,6 +341,44 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
         if (jsFileAsset) {
             console.log(`${this.name}: deleting corresponding .js file`);
             ToolCore.assetDatabase.deleteAsset(jsFileAsset);
+        }
+
+    }
+
+    /**
+     * Determine if we want to respond to resource renames
+     * @param  {EditorEvents.RenameResourceEvent} ev
+     * @return {boolean} true if we care
+     */
+    canRename(ev: EditorEvents.RenameResourceEvent): boolean {
+        return this.isValidFiletype(ev.path);
+    }
+
+    /**
+     * Handle the rename.  Should rename the corresponding .js file
+     * @param  {EditorEvents.RenameResourceEvent} ev
+     */
+    rename(ev: EditorEvents.RenameResourceEvent) {
+        console.log(`${this.name}: received a rename resource event`);
+        if (this.versionMap && this.projectFiles) {
+            let oldFile = this.versionMap[ev.path];
+            if (oldFile) {
+                delete this.versionMap[ev.path];
+                this.versionMap[ev.newPath] = oldFile;
+            }
+            let idx = this.projectFiles.indexOf(ev.path);
+            if (idx > -1) {
+                this.projectFiles[idx] = ev.newPath;
+            }
+        }
+
+        // Rename the corresponding js file
+        let jsFile = ev.path.replace(/\.ts$/, ".js");
+        let jsFileNew = ev.newPath.replace(/\.ts$/, ".js");
+        let jsFileAsset = ToolCore.assetDatabase.getAssetByPath(jsFile);
+        if (jsFileAsset) {
+            console.log(`${this.name}: renaming corresponding .js file`);
+            jsFileAsset.rename(jsFileNew);
         }
     }
 

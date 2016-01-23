@@ -25,7 +25,6 @@ import Editor = require("editor/Editor");
 import EditorEvents = require("editor/EditorEvents");
 import ProjectFrameMenu = require("./menus/ProjectFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
-import ServiceLocator from "../../extensionServices/ServiceLocator";
 
 class ProjectFrame extends ScriptWidget {
 
@@ -69,7 +68,6 @@ class ProjectFrame extends ScriptWidget {
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
-        this.subscribeToEvent(EditorEvents.DeleteResource, (ev: EditorEvents.DeleteResourceEvent) => this.handleDeleteResource(ev));
         this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
         this.subscribeToEvent(EditorEvents.InspectorProjectReference, (ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path) });
 
@@ -105,23 +103,9 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
-    /**
-     * Called when the user deletes a resource
-     * @param  {EditorEvents.DeleteResourceEvent} ev
-     */
-    handleDeleteResource(ev: EditorEvents.DeleteResourceEvent) {
-        var db = ToolCore.getAssetDatabase();
-        db.deleteAsset(ev.asset);
-        ServiceLocator.resourceServices.deleteResource(ev);
-    }
-
     handleResourceRemoved(ev: ToolCore.ResourceRemovedEvent) {
 
         var folderList = this.folderList;
-        let asset = ToolCore.assetDatabase.getAssetByGUID(ev.guid);
-        if (asset) {
-            ServiceLocator.resourceServices.deleteResource({ path: asset.path, asset: asset });
-        }
         folderList.deleteItemByID(ev.guid);
 
         var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
@@ -410,8 +394,6 @@ class ProjectFrame extends ScriptWidget {
         this.folderList.setExpanded(this.resourcesID, true);
         this.refreshContent(this.resourceFolder);
 
-        // tell extensions that the project has been unloaded
-        ServiceLocator.projectServices.projectLoaded(data);
     }
 
     handleProjectUnloaded(data) {
@@ -422,8 +404,6 @@ class ProjectFrame extends ScriptWidget {
         var container: Atomic.UILayout = <Atomic.UILayout>this.getWidget("contentcontainer");
         container.deleteAllChildren();
 
-        // tell extensions that the project has been loaded
-        ServiceLocator.projectServices.projectUnloaded(data);
     }
 
     // Shows referenced file in projectframe

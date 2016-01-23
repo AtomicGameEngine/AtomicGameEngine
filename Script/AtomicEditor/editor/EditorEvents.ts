@@ -75,10 +75,14 @@ export interface LoadProjectEvent {
 export const SaveAllResources = "EditorSaveAllResources";
 
 export const SaveResource = "EditorSaveResource";
+/**
+ * Called once the resource has been saved
+ * @type {String}
+ */
+export const SaveResourceNotification = "EditorSaveResourceNotification";
 export interface SaveResourceEvent {
 
-  // The full path to the resource to save
-  // empty or undefined for current
+  // The full path to the resource to save / empty or undefined for current
   path: string;
 
 }
@@ -100,10 +104,29 @@ export interface EditResourceEvent {
 }
 
 export const DeleteResource = "EditorDeleteResource";
+/**
+ * Called once the resource has been deleted
+ * @type {String}
+ */
+export const DeleteResourceNotification = "EditorDeleteResourceNotification";
 export interface DeleteResourceEvent {
 
   // The full path to the resource to edit
   path: string;
+
+}
+
+export const RenameResource = "EditorRenameResource";
+/**
+ * Called once the resource has been renamed
+ * @type {String}
+ */
+export const RenameResourceNotification = "EditorRenameResourceNotification";
+export interface RenameResourceEvent {
+
+  // The full path to the resource to edit
+  path: string;
+  newPath: string;
 
   // the asset to delete
   asset: ToolCore.Asset;

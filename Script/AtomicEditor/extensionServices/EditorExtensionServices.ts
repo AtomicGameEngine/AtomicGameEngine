@@ -35,11 +35,21 @@ export interface ResourceService extends EditorService {
     canSave?(ev: EditorEvents.SaveResourceEvent);
     canDelete?(ev: EditorEvents.DeleteResourceEvent);
     delete?(ev: EditorEvents.DeleteResourceEvent);
+    canRename?(ev: EditorEvents.RenameResourceEvent);
+    rename?(ev: EditorEvents.RenameResourceEvent);
 }
 
 export interface ProjectService extends EditorService {
     projectUnloaded?();
     projectLoaded?(ev: EditorEvents.LoadProjectEvent);
+}
+
+interface ServiceEventSubscriber {
+    /**
+     * Allow this service registry to subscribe to events that it is interested in
+     * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
+     */
+    subscribeToEvents(topLevelWindow: Atomic.UIWidget);
 }
 
 /**
@@ -55,14 +65,24 @@ class ServiceRegistry<T extends EditorService> {
     register(service: T) {
         this.registeredServices.push(service);
     }
+
 }
 
 /**
  * Registry for service extensions that are concerned about project events
  */
-class ProjectServiceRegistry extends ServiceRegistry<ProjectService> {
+class ProjectServiceRegistry extends ServiceRegistry<ProjectService> implements ServiceEventSubscriber {
     constructor() {
         super();
+    }
+
+    /**
+     * Allow this service registry to subscribe to events that it is interested in
+     * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
+     */
+    subscribeToEvents(topLevelWindow: Atomic.UIWidget) {
+        topLevelWindow.subscribeToEvent(EditorEvents.LoadProject, (ev) => this.projectLoaded(ev));
+        topLevelWindow.subscribeToEvent(EditorEvents.CloseProject, (ev) => this.projectUnloaded(ev));
     }
 
     /**
@@ -71,13 +91,13 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> {
      */
     projectUnloaded(data) {
         this.registeredServices.forEach((service) => {
-            // Verify that the service contains the appropriate methods and that it can save
-            if (service.projectUnloaded) {
-                try {
+            // Notify services that the project has been unloaded
+            try {
+                if (service.projectUnloaded) {
                     service.projectUnloaded();
-                } catch (e) {
-                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
                 }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
             }
         });
     }
@@ -86,15 +106,15 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> {
      * Called when the project is loaded
      * @param  {[type]} data Event info from the project unloaded event
      */
-    projectLoaded(ev:EditorEvents.LoadProjectEvent) {
+    projectLoaded(ev: EditorEvents.LoadProjectEvent) {
         this.registeredServices.forEach((service) => {
-            // Verify that the service contains the appropriate methods and that it can save
-            if (service.projectLoaded) {
-                try {
+            try {
+                // Notify services that the project has just been loaded
+                if (service.projectLoaded) {
                     service.projectLoaded(ev);
-                } catch (e) {
-                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
                 }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
             }
         });
     }
@@ -108,33 +128,64 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
         super();
     }
 
+    /**
+     * Allow this service registry to subscribe to events that it is interested in
+     * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
+     */
+    subscribeToEvents(topLevelWindow: Atomic.UIWidget) {
+        topLevelWindow.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.saveResource(ev));
+        topLevelWindow.subscribeToEvent(EditorEvents.DeleteResourceNotification, (ev) => this.deleteResource(ev));
+        topLevelWindow.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev) => this.renameResource(ev));
+    }
+
+    /**
+     * Called after a resource has been saved
+     * @param  {EditorEvents.SaveResourceEvent} ev
+     */
     saveResource(ev: EditorEvents.SaveResourceEvent) {
         // run through and find any services that can handle this.
         this.registeredServices.forEach((service) => {
-            // Verify that the service contains the appropriate methods and that it can save
-            if (service.canSave && service.save && service.canSave(ev)) {
-                try {
+            try {
+                // Verify that the service contains the appropriate methods and that it can save
+                if (service.canSave && service.save && service.canSave(ev)) {
                     service.save(ev);
-                } catch (e) {
-                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
                 }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
             }
         });
     }
 
     /**
-     * Called when a resource is being deleted
+     * Called when a resource has been deleted
      * @return {[type]} [description]
      */
     deleteResource(ev: EditorEvents.DeleteResourceEvent) {
         this.registeredServices.forEach((service) => {
-            // Verify that the service contains the appropriate methods and that it can save
-            if (service.canDelete && service.delete && service.canDelete(ev)) {
-                try {
+            try {
+                // Verify that the service contains the appropriate methods and that it can delete
+                if (service.canDelete && service.delete && service.canDelete(ev)) {
                     service.delete(ev);
-                } catch (e) {
-                    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
                 }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called when a resource has been renamed
+     * @param  {EditorEvents.RenameResourceEvent} ev
+     */
+    renameResource(ev: EditorEvents.RenameResourceEvent) {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle the rename
+                if (service.canRename && service.rename && service.canRename(ev)) {
+                    service.rename(ev);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
             }
         });
     }
@@ -157,5 +208,14 @@ export class ServiceLocatorType {
 
     loadService(service: EditorService) {
         service.initialize(this);
+    }
+
+    /**
+     * This is where the top level window will allow the service locator to listen for events and act on them.
+     * @param  {Atomic.UIWidget} frame
+     */
+    subscribeToEvents(frame: Atomic.UIWidget) {
+        this.resourceServices.subscribeToEvents(frame);
+        this.projectServices.subscribeToEvents(frame);
     }
 }

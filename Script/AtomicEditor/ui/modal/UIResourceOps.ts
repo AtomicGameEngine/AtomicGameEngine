@@ -56,7 +56,14 @@ export class ResourceDelete extends ModalWindow {
 
                 this.hide();
 
-                this.sendEvent(EditorEvents.DeleteResource, { path: this.asset.path, asset: this.asset });
+                let eventData = {
+                    path: this.asset.path
+                };
+
+                var db = ToolCore.getAssetDatabase();
+                db.deleteAsset(this.asset);
+
+                this.sendEvent(EditorEvents.DeleteResourceNotification, eventData);
 
                 return true;
             }
@@ -363,8 +370,15 @@ export class RenameAsset extends ModalWindow {
 
                 this.hide();
 
-                if (this.asset.name != this.nameEdit.text)
+                if (this.asset.name != this.nameEdit.text) {
+                    let eventData = {
+                        path: this.asset.path,
+                        newPath: this.nameEdit.text,
+                        asset: this.asset
+                    };
                     this.asset.rename(this.nameEdit.text);
+                    this.sendEvent(EditorEvents.RenameResourceNotification, eventData);
+                }
 
                 return true;
             }
