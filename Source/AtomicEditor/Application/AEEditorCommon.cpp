@@ -246,12 +246,7 @@ void AEEditorCommon::ValidateWindow()
         prefs[editor ? "editorWindow" : "playerWindow"] = window;
 
         //Setting the mode to 0 width/height will use engine defaults for window size and layout
-        graphics->SetMode(0, 0);
-        graphics->CenterWindow();
-        if (editor)
-        {
-            graphics->Maximize();
-        }
+        graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample(), editor);
 
         SavePreferences(prefs);
     }
@@ -264,7 +259,7 @@ void AEEditorCommon::GetDefaultWindowPreferences(JSONValue& windowPrefs, bool ma
     windowPrefs["width"] = 0;
     windowPrefs["height"] = 0;
     windowPrefs["monitor"] = 0;
-    windowPrefs["maximized"] = maximized ? true : false;
+    windowPrefs["maximized"] = maximized;
 }
 
 String AEEditorCommon::GetPreferencesPath()
