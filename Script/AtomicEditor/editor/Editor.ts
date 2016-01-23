@@ -149,7 +149,11 @@ class Editor extends Atomic.ScriptObject {
             return false;
 
         }
-        return system.loadProject(event.path);
+        const loaded = system.loadProject(event.path);
+        if (loaded) {
+            this.sendEvent(EditorEvents.LoadProjectNotification, event);
+        }
+        return loaded;
     }
 
     closeAllResourceEditors() {

@@ -42,6 +42,7 @@ export interface ResourceService extends EditorService {
 export interface ProjectService extends EditorService {
     projectUnloaded?();
     projectLoaded?(ev: EditorEvents.LoadProjectEvent);
+    playerStarted?();
 }
 
 interface ServiceEventSubscriber {
@@ -81,8 +82,9 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> implements 
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(topLevelWindow: Atomic.UIWidget) {
-        topLevelWindow.subscribeToEvent(EditorEvents.LoadProject, (ev) => this.projectLoaded(ev));
+        topLevelWindow.subscribeToEvent(EditorEvents.LoadProjectNotification, (ev) => this.projectLoaded(ev));
         topLevelWindow.subscribeToEvent(EditorEvents.CloseProject, (ev) => this.projectUnloaded(ev));
+        topLevelWindow.subscribeToEvent(EditorEvents.PlayerStartRequest, () => this.playerStarted());
     }
 
     /**
@@ -112,6 +114,19 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> implements 
                 // Notify services that the project has just been loaded
                 if (service.projectLoaded) {
                     service.projectLoaded(ev);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+            }
+        });
+    }
+
+    playerStarted() {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Notify services that the project has just been loaded
+                if (service.playerStarted) {
+                    service.playerStarted();
                 }
             } catch (e) {
                 EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
@@ -203,6 +218,8 @@ export class ServiceLocatorType {
         this.projectServices = new ProjectServiceRegistry();
     }
 
+    private eventDispatcher: Atomic.UIWidget = null;
+
     resourceServices: ResourceServiceRegistry;
     projectServices: ProjectServiceRegistry;
 
@@ -215,7 +232,30 @@ export class ServiceLocatorType {
      * @param  {Atomic.UIWidget} frame
      */
     subscribeToEvents(frame: Atomic.UIWidget) {
-        this.resourceServices.subscribeToEvents(frame);
-        this.projectServices.subscribeToEvents(frame);
+        this.eventDispatcher = frame;
+        this.resourceServices.subscribeToEvents(this.eventDispatcher);
+        this.projectServices.subscribeToEvents(this.eventDispatcher);
+    }
+
+    /**
+     * Send a custom event.  This can be used by services to publish custom events
+     * @param  {string} eventType
+     * @param  {any} data
+     */
+    sendEvent(eventType: string, data: any) {
+        if (this.eventDispatcher) {
+            this.eventDispatcher.sendEvent(eventType, data);
+        }
+    }
+
+    /**
+     * Subscribe to an event and provide a callback.  This can be used by services to subscribe to custom events
+     * @param  {string} eventType
+     * @param  {any} callback
+     */
+    subscribeToEvent(eventType: string, callback: (data: any) => void) {
+        if (this.eventDispatcher) {
+            this.eventDispatcher.subscribeToEvent(eventType, callback);
+        }
     }
 }

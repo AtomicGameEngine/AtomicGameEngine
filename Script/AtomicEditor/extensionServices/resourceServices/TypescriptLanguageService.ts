@@ -110,7 +110,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
         this.refreshProjectFiles(files);
         let errors: ts.Diagnostic[] = [];
 
-        if (!this.languageService) {
+        if (!this.languageService || files == null) {
             // This is the first time in.  Need to create a language service
 
             // Create the language service host to allow the LS to communicate with the host
@@ -402,7 +402,25 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
         console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
         this.resetLanguageService();
 
+        this.refreshProjectFiles();
+
         //TODO: do we want to run through and compile at this point?
+    }
+
+    /**
+     * Called when the player is launged
+     */
+    playerStarted() {
+        console.log(`${this.name}: received a player started event for project`);
+        if (this.fullCompile) {
+            this.compile(null, {
+                noEmitOnError: true,
+                noImplicitAny: false,
+                target: ts.ScriptTarget.ES5,
+                module: ts.ModuleKind.CommonJS,
+                noLib: true
+            });
+        }
     }
 
 }
