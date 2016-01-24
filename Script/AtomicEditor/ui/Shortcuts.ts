@@ -35,7 +35,7 @@ class Shortcuts extends Atomic.ScriptObject {
                     var args = "--resizable";
                     Atomic.editorMode.playProject(args, debug);
                 } else {
-                    var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable";
+                    var args = "--windowposx " + playerWindow.x + " --windowposy " + playerWindow.y + " --windowwidth " + playerWindow.width + " --windowheight " + playerWindow.height + " --resizable" + " --fromEditorPlay";
                     if (playerWindow.maximized) {
                         args += " --maximize";
                     }

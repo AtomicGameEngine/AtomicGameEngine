@@ -45,7 +45,11 @@ private:
 
     void ReadEngineConfig();
 
+    void ReadCommandLineArguments();
+
     bool debugPlayer_;
+
+    bool runningFromEditorPlay_;
 
 };
 

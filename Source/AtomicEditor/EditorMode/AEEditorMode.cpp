@@ -124,7 +124,7 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     Vector<String> vargs;
 
-    String args = ToString("--player --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
+    String args = ToString("--player --fromEditorPlay --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
 
     vargs = args.Split(' ');
 
