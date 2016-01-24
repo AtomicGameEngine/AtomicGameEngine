@@ -8,6 +8,7 @@
 #include "include/cef_scheme.h"
 #include "include/wrapper/cef_helpers.h"
 
+#include <Atomic/Math/MathDefs.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/FileSystem.h>
 
@@ -101,7 +102,7 @@ public:
         if (offset_ < fileLength_)
         {
             // Copy the next block of data into the buffer.
-            int transfer_size = std::min(bytes_to_read, static_cast<int>(fileLength_ - offset_));
+            int transfer_size = Min(bytes_to_read, static_cast<int>(fileLength_ - offset_));
 
             file_->Read(data_out, transfer_size);
             offset_ += transfer_size;
