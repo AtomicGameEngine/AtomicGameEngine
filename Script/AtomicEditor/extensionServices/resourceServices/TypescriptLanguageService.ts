@@ -10,6 +10,8 @@ import * as ExtensionServices from "../EditorExtensionServices";
 import * as EditorEvents from "../../editor/EditorEvents";
 import * as ts from "modules/typescript";
 
+import * as metrics from "modules/metrics";
+
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
  */
@@ -31,6 +33,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * used by the compile to build a registery of all of the project files
      * @param {string[]} files optional list of files to refresh.  If not provided, then all files will be reloaded
      */
+    @metrics.profileDecorator
     private refreshProjectFiles(files?: string[]) {
         if (!this.projectFiles || !files) {
             // First time in, let's index the entire project
@@ -104,10 +107,12 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
      */
+    @metrics.profileDecorator
     private compile(files: string[], options: ts.CompilerOptions): void {
         let start = new Date().getTime();
         //scan all the files in the project
         this.refreshProjectFiles(files);
+
         let errors: ts.Diagnostic[] = [];
 
         if (!this.languageService || files == null) {
@@ -118,34 +123,39 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
                 getScriptFileNames: () => this.projectFiles,
                 getScriptVersion: (fileName) => this.versionMap[fileName] && this.versionMap[fileName].version.toString(),
                 getScriptSnapshot: (fileName) => {
-                    const scriptVersion = this.versionMap[fileName];
-                    if (!Atomic.fileSystem.exists(fileName)) {
-                        if (scriptVersion) {
-                            delete this.versionMap[fileName];
-                            let idx = this.projectFiles.indexOf(fileName);
-                            if (idx > -1) {
-                                this.projectFiles.splice(idx, 1);
+                    metrics.start("script_snapshot");
+                    try {
+                        const scriptVersion = this.versionMap[fileName];
+                        if (!Atomic.fileSystem.exists(fileName)) {
+                            if (scriptVersion) {
+                                delete this.versionMap[fileName];
+                                let idx = this.projectFiles.indexOf(fileName);
+                                if (idx > -1) {
+                                    this.projectFiles.splice(idx, 1);
+                                }
                             }
+                            return undefined;
                         }
-                        return undefined;
-                    }
 
-                    // Grab the cached version
-                    if (scriptVersion) {
-                        if (scriptVersion.snapshot) {
-                            console.log(`cache hit snapshot for ${fileName}`);
-                            return scriptVersion.snapshot;
-                        } else {
-                            let script = new Atomic.File(fileName, Atomic.FILE_READ);
-                            try {
-                                scriptVersion.snapshot = ts.ScriptSnapshot.fromString(script.readText());
+                        // Grab the cached version
+                        if (scriptVersion) {
+                            if (scriptVersion.snapshot) {
+                                console.log(`cache hit snapshot for ${fileName}`);
                                 return scriptVersion.snapshot;
-                            } finally {
-                                script.close();
+                            } else {
+                                let script = new Atomic.File(fileName, Atomic.FILE_READ);
+                                try {
+                                    scriptVersion.snapshot = ts.ScriptSnapshot.fromString(script.readText());
+                                    return scriptVersion.snapshot;
+                                } finally {
+                                    script.close();
+                                }
                             }
+                        } else {
+                            console.log(`no script version for ${fileName}`);
                         }
-                    } else {
-                        console.log(`no script version for ${fileName}`);
+                    } finally {
+                        metrics.stop("script_snapshot");
                     }
                 },
                 getCurrentDirectory: () => ToolCore.toolSystem.project.resourcePath,
@@ -200,8 +210,11 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
      * @param  {string} filename [description]
      * @return {[ts.Diagnostic]} a list of any errors
      */
+    @metrics.profileDecorator
     private emitFile(filename: string): ts.Diagnostic[] {
+        metrics.start("emit_get_output");
         let output = this.languageService.getEmitOutput(filename);
+        metrics.stop("emit_get_output");
         let allDiagnostics: ts.Diagnostic[] = [];
         if (output.emitSkipped) {
             console.log(`${this.name}: Failure Emitting ${filename}`);
@@ -211,6 +224,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
         }
 
         output.outputFiles.forEach(o => {
+            metrics.start("emit_write");
             let script = new Atomic.File(o.name, Atomic.FILE_WRITE);
             try {
                 script.writeString(o.text);
@@ -218,6 +232,7 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
             } finally {
                 script.close();
             }
+            metrics.stop("emit_write");
         });
         return allDiagnostics;
     }
@@ -308,7 +323,9 @@ export default class TypescriptLanguageService implements ExtensionServices.Reso
                 noLib: true
             });
         }
+        metrics.logMetrics();
     }
+
 
     /**
      * Determine if we care if an asset has been deleted
