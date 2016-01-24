@@ -88,9 +88,14 @@ namespace('build', function() {
             console.log("\n\nLint: Typescript linting complete.\n\n");
             jake.exec(cmds, function() {
 
-                // copy typescript into the editor modules directory since there is a dependency there
-               fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules");
-               fs.copySync("./Build/node_modules/typescript/lib/typescript.js","./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules/typescript.js")
+                // copy some external dependencies into the editor modules directory
+               var editorModulesDir = "./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules";
+               var nodeModulesDir = "./Build/node_modules";
+               fs.mkdirsSync(editorModulesDir);
+               // TypeScript
+               fs.copySync(nodeModulesDir + "/typescript/lib/typescript.js", editorModulesDir + "/typescript.js")
+               // UserTiming - for measuring and metrics
+               fs.copySync(nodeModulesDir + "/usertiming/src/usertiming.js", editorModulesDir + "/usertiming.js")
 
                // copy lib.core.d.ts into the tool data directory
                fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
