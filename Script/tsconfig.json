@@ -8,7 +8,8 @@
         "noLib": false,
         "outDir": "../Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
         "moduleResolution": "classic",
-        "sourceMap": true
+        "sourceMap": true,
+        "experimentalDecorators": true
     },
     "filesGlob": [
         "./ToolCore/**/*.ts",
@@ -28,7 +29,9 @@
         "./AtomicEditor/extensionServices/resourceServices/TypescriptLanguageService.ts",
         "./AtomicEditor/extensionServices/ServiceLocator.ts",
         "./AtomicEditor/main.ts",
+        "./AtomicEditor/modules/metrics.ts",
         "./AtomicEditor/modules/typescript.d.ts",
+        "./AtomicEditor/modules/usertiming.d.ts",
         "./AtomicEditor/resources/ProjectTemplates.ts",
         "./AtomicEditor/resources/ResourceOps.ts",
         "./AtomicEditor/ui/EditorStrings.ts",
