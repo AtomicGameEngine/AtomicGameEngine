@@ -27,13 +27,19 @@
   <script src="./source/ace/ext-language_tools.js"></script>
   <script>
 
-  var editor;
+  editor = ace.edit("editor");
+
+  editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableSnippets: true,
+    enableLiveAutocompletion: true
+  });
 
   function saveCode() {
 
     var data = {
         message : "saveCode",
-        payload : editor.getValue()
+        payload : editor.session.getValue()
     }
 
     window.atomicQuery({request: JSON.stringify(data),
@@ -44,18 +50,10 @@
 
   function codeLoaded(value) {
 
-    editor = ace.edit("editor");
-
-    editor.setOptions({
-      enableBasicAutocompletion: true,
-      enableSnippets: true,
-      enableLiveAutocompletion: true
-    });
-
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/typescript");
-
-    editor.setValue(value);
+    editor.session.setValue(value);
+    editor.gotoLine(0);
 
     editor.getSession().on('change', function(e) {
       window.atomicQuery({request: 'change',

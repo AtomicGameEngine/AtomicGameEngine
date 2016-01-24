@@ -86,9 +86,10 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
     {
         keyEvent.native_key_code = darwinScanCode;
         keyEvent.type = wk.keyDown ? KEYEVENT_KEYDOWN : KEYEVENT_KEYUP;
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 bool ConvertTextInputEvent(StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)

@@ -199,72 +199,6 @@ void UIWebView::HandleTextInput(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool UIWebView::HandleKeyEvent(const TBWidgetEvent &ev, bool keyDown)
-{
-
-#ifdef ATOMIC_PLATFORM_OSX
-    if (!keyDown)
-        return true;
-#endif
-
-    if (ev.special_key == TB_KEY_UNDEFINED)
-        return true;
-
-    int qual = 0;
-
-    if (ev.modifierkeys & TB_CTRL)
-        qual |= QUAL_CTRL;
-    if (ev.modifierkeys & TB_SHIFT)
-        qual |= QUAL_SHIFT;
-    if (ev.modifierkeys & TB_ALT)
-        qual |= QUAL_ALT;
-
-    int scanCode = SDL_SCANCODE_UNKNOWN;
-
-    switch (ev.special_key)
-    {
-    case TB_KEY_UP:
-        scanCode = SDL_SCANCODE_UP;
-        break;
-    case TB_KEY_DOWN:
-        scanCode = SDL_SCANCODE_DOWN;
-        break;
-    case TB_KEY_RIGHT:
-        scanCode = SDL_SCANCODE_RIGHT;
-        break;
-    case TB_KEY_LEFT:
-        scanCode = SDL_SCANCODE_LEFT;
-        break;
-    case TB_KEY_ENTER:
-        scanCode = SDL_SCANCODE_RETURN;
-        break;
-    case TB_KEY_DELETE:
-    case TB_KEY_BACKSPACE:
-        scanCode = SDL_SCANCODE_BACKSPACE;
-        break;
-    default:
-        break;
-    }
-
-    if (scanCode == SDL_SCANCODE_UNKNOWN)
-        return true;
-
-    //webClient_->SendKeyEvent(scanCode, qual, !keyDown);
-
-    return true;
-
-    /*
-    TB_KEY_UNDEFINED = 0,
-    TB_KEY_UP, TB_KEY_DOWN, TB_KEY_LEFT, TB_KEY_RIGHT,
-    TB_KEY_PAGE_UP, TB_KEY_PAGE_DOWN, TB_KEY_HOME, TB_KEY_END,
-    TB_KEY_TAB, TB_KEY_BACKSPACE, TB_KEY_INSERT, TB_KEY_DELETE,
-    TB_KEY_ENTER, TB_KEY_ESC,
-    TB_KEY_F1, TB_KEY_F2, TB_KEY_F3, TB_KEY_F4, TB_KEY_F5, TB_KEY_F6,
-    TB_KEY_F7, TB_KEY_F8, TB_KEY_F9, TB_KEY_F10, TB_KEY_F11, TB_KEY_F12
-    */
-
-}
-
 bool UIWebView::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_POINTER_DOWN || ev.type == EVENT_TYPE_POINTER_UP)
@@ -281,14 +215,6 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     {
         webClient_->SendMouseWheelEvent(ev.target_x, ev.target_y, 0, ev.delta_x, ev.delta_y);
         return true;
-    }
-    else if (ev.type == EVENT_TYPE_KEY_DOWN)
-    {
-        return HandleKeyEvent(ev, true);
-    }
-    else if (ev.type == EVENT_TYPE_KEY_UP)
-    {
-        return HandleKeyEvent(ev, false);
     }
     else if (ev.type == EVENT_TYPE_SHORTCUT)
     {

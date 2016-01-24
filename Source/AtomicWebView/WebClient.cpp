@@ -485,6 +485,9 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
     // return does not work at all on cef client with offscreen
     // bad interaction with arrow keys (for example here, after
     // hitting arrow keys, return/text takes a couple presses to register
+
+    memset((void*)&keyEvent, 0, sizeof(keyEvent));
+
     if (eventType == "KeyDown")
         keyEvent.type = KEYEVENT_KEYDOWN;
     else
@@ -691,7 +694,9 @@ void WebClient::WasResized()
 
 bool WebClient::CreateBrowser(const String& initialURL, int width, int height)
 {
-    return d_->CreateBrowser(initialURL, width, height);
+    bool result = d_->CreateBrowser(initialURL, width, height);
+
+    return result;
 }
 
 void WebClient::SetSize(int width, int height)
