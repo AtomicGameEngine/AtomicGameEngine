@@ -16,6 +16,7 @@ namespace Atomic
 {
     class UIWebView;
     class WebClient;
+    class WebMessageHandler;
 }
 
 namespace AtomicEditor
@@ -48,13 +49,13 @@ public:
 private:
 
     void HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData);
+    void HandleWebMessage(StringHash eventType, VariantMap& eventData);
 
     bool BeautifyJavascript(const char* source, String& output);
 
     SharedPtr<UIWebView> webView_;
     WeakPtr<WebClient> webClient_;
-
-
+    WeakPtr<WebMessageHandler> messageHandler_;
 };
 
 }

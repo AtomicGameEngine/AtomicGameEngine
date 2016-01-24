@@ -44,6 +44,12 @@
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/typescript");
 
+    editor.getSession().on('change', function(e) {
+      window.atomicQuery({request: 'change',
+      persistent: false,
+      onSuccess: function(response) { },
+      onFailure: function(error_code, error_message) {console.log("Error on change")}});
+    });
   }
 
   function loadCode(codeUrl)

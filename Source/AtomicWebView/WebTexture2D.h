@@ -1,10 +1,10 @@
 
+#pragma once
+
 #include <Atomic/Graphics/Texture2D.h>
 #include <Atomic/Graphics/Material.h>
 
 #include "WebRenderHandler.h"
-
-#pragma once
 
 namespace Atomic
 {

@@ -14,6 +14,8 @@
 
 #include <Atomic/Graphics/Graphics.h>
 
+#include "Internal/WebAppBrowser.h"
+
 #include "WebSchemeHandler.h"
 #include "WebClient.h"
 #include "WebBrowserHost.h"
@@ -32,6 +34,7 @@ public:
     {
 
         host_ = host;
+        app_ = new WebAppBrowser();
     }
 
     virtual ~WebBrowserHostPrivate()
@@ -42,6 +45,7 @@ public:
 private:
 
     WeakPtr<WebBrowserHost> host_;
+    CefRefPtr<CefApp> app_;
 
 };
 
@@ -49,6 +53,9 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
 
     const Vector<String>& arguments = GetArguments();
+
+    // IMPORTANT: Cef::App contains virtual void OnBeforeCommandLineProcessing(), which should make it possible
+    // to setup args on Windows
 
 #ifdef ATOMIC_PLATFORM_OSX
     const char* _argv[3] = { "", "--enable-media-stream", "--enable-usermedia-screen-capturing" };
@@ -60,16 +67,16 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     CefSettings settings;
     settings.windowless_rendering_enabled = true;
 
+    d_ = new WebBrowserHostPrivate(this);
+
     // If losing OSX system menu, it means we're calling this
     // before initializing graphics subsystem
-    if (!CefInitialize(args, settings, nullptr, nullptr))
+    if (!CefInitialize(args, settings, d_->app_, nullptr))
     {
         LOGERROR("CefInitialize - Error");
     }
 
-    RegisterWebSchemeHandlers(this);
-
-    d_ = new WebBrowserHostPrivate(this);
+    RegisterWebSchemeHandlers(this);    
 
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
 

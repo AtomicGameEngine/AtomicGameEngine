@@ -43,5 +43,17 @@ EVENT(E_WEBVIEWTITLECHANGE, WebViewTitleChange)
     PARAM(P_TITLE, Title);   // String
 }
 
+/// WebView title change
+EVENT(E_WEBMESSAGE, WebMessage)
+{
+    PARAM(P_HANDLER, Handler);          // WebMessageHandler*
+    PARAM(P_QUERYID, QueryID);          // Double (Int64 CEF Side)
+    PARAM(P_REQUEST, Request);          // String
+    PARAM(P_PERSISTENT, Persistent);    // Bool
+
+    PARAM(P_CEFBROWSER, Browser);       // CefBrowser*
+    PARAM(P_CEFFRAME, Frame);           // CefFrame*
+}
+
 
 }

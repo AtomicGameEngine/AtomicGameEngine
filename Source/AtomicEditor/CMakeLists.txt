@@ -76,7 +76,7 @@ if(OS_MACOSX)
   # Helper executable target.
   add_executable(${CEF_HELPER_TARGET} MACOSX_BUNDLE "${CMAKE_CURRENT_SOURCE_DIR}/WebView/WebProcessHelperMac.cpp")
   add_dependencies(${CEF_HELPER_TARGET} libcef_dll_wrapper)
-  target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
+  target_link_libraries(${CEF_HELPER_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS} Atomic AtomicWebView ${ATOMIC_LINK_LIBRARIES})
   set_target_properties(${CEF_HELPER_TARGET} PROPERTIES
     MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/Build/CMake/Modules/AtomicEditor-HelperInfo.plist.template"
     )

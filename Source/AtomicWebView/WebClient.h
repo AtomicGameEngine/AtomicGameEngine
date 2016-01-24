@@ -1,8 +1,8 @@
+#pragma once
 
+#include <Atomic/Container/List.h>
 #include <Atomic/Core/Object.h>
 #include "WebRenderHandler.h"
-
-#pragma once
 
 class CefClient;
 
@@ -10,6 +10,7 @@ namespace Atomic
 {
 
 class WebClientPrivate;
+class WebMessageHandler;
 
 class ATOMIC_API WebClient : public Object
 {
@@ -32,8 +33,6 @@ public:
 
     void SetWebRenderHandler(WebRenderHandler* handler);
 
-    CefClient* GetCefClient();
-
     void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const;
     void SendMousePressEvent(int x, int y, unsigned button = 0, unsigned modifier = 0) const;
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
@@ -52,6 +51,8 @@ public:
     void ShortcutRedo();
     void ShortcutDelete();
 
+    void AddMessageHandler(WebMessageHandler* handler, bool first = false);
+    void RemoveMessageHandler(WebMessageHandler* handler);
     void ExecuteJavaScript(const String& script);
 
     // Navigation
@@ -65,11 +66,15 @@ public:
 
     void Reload();
 
+    CefClient* GetCefClient();
+
 private:
 
     void WasResized();
 
     SharedPtr<WebRenderHandler> renderHandler_;
+
+    List<SharedPtr<WebMessageHandler>> messageHandlers_;
 
     WebClientPrivate* d_;
 

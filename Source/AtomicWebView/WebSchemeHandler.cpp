@@ -75,6 +75,9 @@ public:
 
         if (ext == ".js")
             response->SetMimeType("text/javascript");
+        else if (ext == ".ts")
+            response->SetMimeType("text/typescript");
+
 
         response->SetStatus(200);
 
@@ -105,7 +108,11 @@ public:
 
             bytes_read = transfer_size;
             has_data = true;
+
+            if (offset_ >= fileLength_)
+                file_->Close();
         }
+
 
         return has_data;
     }

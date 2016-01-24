@@ -1,7 +1,6 @@
 
 #pragma once
 
-
 #include <Atomic/Container/Str.h>
 
 namespace Atomic

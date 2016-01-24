@@ -9,7 +9,6 @@
 namespace Atomic
 {
 
-
 WebRenderHandler::WebRenderHandler(Context* context) : Object (context)
 {
 }

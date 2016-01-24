@@ -8,6 +8,7 @@
 #include <include/wrapper/cef_helpers.h>
 #include <include/base/cef_bind.h>
 #include <include/wrapper/cef_closure_task.h>
+#include "include/wrapper/cef_message_router.h"
 
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>
@@ -17,6 +18,7 @@
 #include <Atomic/Graphics/Graphics.h>
 
 #include "WebBrowserHost.h"
+#include "WebMessageHandler.h"
 #include "WebClient.h"
 #include "WebKeyboard.h"
 #include "WebViewEvents.h"
@@ -29,7 +31,7 @@ namespace Atomic
 void* GetNSWindowContentView(void* window);
 #endif
 
-class WebClientPrivate : public CefClient, public CefLifeSpanHandler, public CefLoadHandler, public CefDisplayHandler
+class WebClientPrivate : public CefClient, public CefLifeSpanHandler, public CefLoadHandler, public CefDisplayHandler, public CefRequestHandler
 {
     friend class WebClient;
 
@@ -40,6 +42,16 @@ public:
 
         webClient_ = client;
         webBrowserHost_ = webClient_->GetSubsystem<WebBrowserHost>();
+
+        CefMessageRouterConfig config;
+        config.js_query_function = "atomicQuery";
+        config.js_cancel_function = "atomicQueryCancel";
+        browserSideRouter_ = CefMessageRouterBrowserSide::Create(config);
+
+    }
+
+    virtual ~WebClientPrivate()
+    {
     }
 
     CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE
@@ -52,19 +64,63 @@ public:
 
     }
 
-    virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE
+    CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE
     {
         return this;
     }
 
-    virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE {
+    CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE
+    {
         return this;
     }
 
-    virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE {
+    CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE
+    {
         return this;
     }
 
+    CefRefPtr<CefRequestHandler> GetRequestHandler() OVERRIDE
+    {
+        return this;
+    }
+
+
+    // CefRequestHandler methods
+    bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
+                        CefRefPtr<CefFrame> frame,
+                        CefRefPtr<CefRequest> request,
+                        bool is_redirect) OVERRIDE
+    {
+        CEF_REQUIRE_UI_THREAD();
+
+        browserSideRouter_->OnBeforeBrowse(browser, frame);
+        return false;
+
+    }
+
+    bool OnProcessMessageReceived(
+            CefRefPtr<CefBrowser> browser,
+            CefProcessId source_process,
+            CefRefPtr<CefProcessMessage> message) OVERRIDE
+    {
+
+        CEF_REQUIRE_UI_THREAD();
+
+        if (browserSideRouter_->OnProcessMessageReceived(browser, source_process, message))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+                                   TerminationStatus status) OVERRIDE
+    {
+        CEF_REQUIRE_UI_THREAD();
+        browserSideRouter_->OnRenderProcessTerminated(browser);
+    }
 
     // CefLoadHandler
 
@@ -195,15 +251,6 @@ public:
         return false;
     }
 
-
-
-    bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
-                                  CefProcessId source_process,
-                                  CefRefPtr<CefProcessMessage> message) OVERRIDE
-    {
-        return false;
-    }
-
     bool CreateBrowser(const String& initialURL, int width, int height)
     {
         if (webClient_->renderHandler_.Null())
@@ -256,6 +303,7 @@ public:
     }
 
     // CefLifeSpanHandler methods:
+
     virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE
     {
         CEF_REQUIRE_UI_THREAD();
@@ -270,8 +318,17 @@ public:
     {
         CEF_REQUIRE_UI_THREAD();
 
-        if (browser->IsSame(browser_))
-            browser_ = nullptr;
+        List<SharedPtr<WebMessageHandler>>::Iterator itr = webClient_->messageHandlers_.Begin();
+        while (itr != webClient_->messageHandlers_.End())
+        {
+            CefMessageRouterBrowserSide::Handler* handler = static_cast<CefMessageRouterBrowserSide::Handler*>((*itr)->GetCefHandler());
+            browserSideRouter_->RemoveHandler(handler);
+            itr++;
+        }
+
+        webClient_->messageHandlers_.Clear();
+
+        browser_ = nullptr;
 
     }
 
@@ -299,6 +356,7 @@ private:
     CefRefPtr<CefBrowser> browser_;
     WeakPtr<WebBrowserHost> webBrowserHost_;
     WeakPtr<WebClient> webClient_;
+    CefRefPtr<CefMessageRouterBrowserSide> browserSideRouter_;
 
 };
 
@@ -470,6 +528,45 @@ void WebClient::ExecuteJavaScript(const String& script)
         return;
 
     d_->browser_->GetMainFrame()->ExecuteJavaScript(CefString(script.CString()), "", 0);
+}
+
+void WebClient::AddMessageHandler(WebMessageHandler* handler, bool first)
+{
+    SharedPtr<WebMessageHandler> _handler(handler);
+
+    if (handler->GetWebClient())
+    {
+        LOGWARNING("WebClient::AddMessageHandler - message handler already added to another client");
+        return;
+    }
+
+    if (messageHandlers_.Contains(_handler))
+    {
+        LOGWARNING("WebClient::AddMessageHandler - message handler already added to this client");
+        return;
+    }
+
+    _handler->SetWebClient(this);
+    messageHandlers_.Push(_handler);
+    d_->browserSideRouter_->AddHandler(static_cast<CefMessageRouterBrowserSide::Handler*>(handler->GetCefHandler()), first);
+
+}
+
+void WebClient::RemoveMessageHandler(WebMessageHandler* handler)
+{
+
+    SharedPtr<WebMessageHandler> _handler(handler);
+
+    List<SharedPtr<WebMessageHandler>>::Iterator itr = messageHandlers_.Find(_handler);
+
+    if (itr == messageHandlers_.End())
+    {
+        LOGWARNING("WebClient::RemoveMessageHandler - message handler not found");
+        return;
+    }
+
+    d_->browserSideRouter_->RemoveHandler(static_cast<CefMessageRouterBrowserSide::Handler*>(handler->GetCefHandler()));
+    messageHandlers_.Erase(itr);
 }
 
 // Navigation

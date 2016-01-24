@@ -17,6 +17,7 @@
 #include <AtomicWebView/WebViewEvents.h>
 #include <AtomicWebView/UIWebView.h>
 #include <AtomicWebView/WebClient.h>
+#include <AtomicWebView/WebMessageHandler.h>
 
 #include "JSResourceEditor.h"
 
@@ -45,8 +46,12 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     String url = "file:///Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicEditor/CodeEditor/Editor.html";
     webView_ = new UIWebView(context_, url);
     webClient_ = webView_->GetWebClient();
+    messageHandler_ = new WebMessageHandler(context_);
+    webClient_->AddMessageHandler(messageHandler_);
 
     SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
+    SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
+
 
     c->AddChild(webView_->GetInternalWidget());
 
@@ -64,6 +69,22 @@ JSResourceEditor::~JSResourceEditor()
 void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
 {    
     webClient_->ExecuteJavaScript(ToString("loadCode(\"atomic://resources/%s\");", fullpath_.CString()));
+}
+
+void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventData)
+{
+    using namespace WebMessage;
+
+    const String& request = eventData[P_REQUEST].GetString();
+    WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
+
+    if (request == "change")
+    {
+        SetModified(true);
+    }
+
+    handler->Success();
+
 }
 
 void JSResourceEditor::FormatCode()

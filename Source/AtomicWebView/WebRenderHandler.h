@@ -1,8 +1,8 @@
 
+#pragma once
+
 #include <Atomic/Graphics/Texture2D.h>
 #include <Atomic/Graphics/Material.h>
-
-#pragma once
 
 class CefRenderHandler;
 
