@@ -99,7 +99,7 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> implements 
                     service.projectUnloaded();
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
             }
         });
     }
@@ -116,7 +116,7 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> implements 
                     service.projectLoaded(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
             }
         });
     }
@@ -129,7 +129,7 @@ class ProjectServiceRegistry extends ServiceRegistry<ProjectService> implements 
                     service.playerStarted();
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
             }
         });
     }
@@ -166,7 +166,7 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
                     service.save(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
             }
         });
     }
@@ -200,7 +200,7 @@ class ResourceServiceRegistry extends ServiceRegistry<ResourceService> {
                     service.rename(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
             }
         });
     }
@@ -224,7 +224,11 @@ export class ServiceLocatorType {
     projectServices: ProjectServiceRegistry;
 
     loadService(service: EditorService) {
-        service.initialize(this);
+        try {
+            service.initialize(this);
+        } catch (e) {
+            EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+        }
     }
 
     /**
