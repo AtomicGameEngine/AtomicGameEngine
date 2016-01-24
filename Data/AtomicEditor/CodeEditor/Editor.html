@@ -29,9 +29,20 @@
 
   var editor;
 
-  function codeLoaded(value) {
+  function saveCode() {
 
-    document.getElementsByTagName('pre')[0].innerHTML = value;
+    var data = {
+        message : "saveCode",
+        payload : editor.getValue()
+    }
+
+    window.atomicQuery({request: JSON.stringify(data),
+    persistent: false,
+    onSuccess: function(response) { },
+    onFailure: function(error_code, error_message) {console.log("Error getting code")}});
+  }
+
+  function codeLoaded(value) {
 
     editor = ace.edit("editor");
 
@@ -43,6 +54,8 @@
 
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/typescript");
+
+    editor.setValue(value);
 
     editor.getSession().on('change', function(e) {
       window.atomicQuery({request: 'change',

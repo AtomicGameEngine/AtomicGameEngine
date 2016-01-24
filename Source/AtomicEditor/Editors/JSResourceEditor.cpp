@@ -11,6 +11,8 @@
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Resource/JSONFile.h>
+
 #include <Atomic/Core/CoreEvents.h>
 #include <AtomicJS/Javascript/JSVM.h>
 
@@ -82,6 +84,21 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     {
         SetModified(true);
     }
+    else
+    {
+        JSONValue jvalue;
+        if (JSONFile::ParseJSON(request, jvalue, false))
+        {
+            String message = jvalue["message"].GetString();
+            if (message == "saveCode")
+            {
+                String code = jvalue["payload"].GetString();
+                File file(context_, fullpath_, FILE_WRITE);
+                file.Write((void*) code.CString(), code.Length());
+                file.Close();
+            }
+        }
+    }
 
     handler->Success();
 
@@ -134,6 +151,8 @@ bool JSResourceEditor::Save()
 {
     if (!modified_)
         return true;
+
+    webClient_->ExecuteJavaScript("saveCode();");
 
     SetModified(false);
 
