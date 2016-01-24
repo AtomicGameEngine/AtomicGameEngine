@@ -39,11 +39,15 @@ protected:
 
     bool CreateDefaultPreferences(String& path, JSONValue& prefs);
     bool ReadPreferences();
-    
+    void ValidateWindow();
+
     SharedPtr<JSVM> vm_;
 
 private:
-
+    void GetDefaultWindowPreferences(JSONValue& windowPrefs, bool maximized);
+    String GetPreferencesPath();
+    bool LoadPreferences(JSONValue& prefs);
+    bool SavePreferences(JSONValue& prefs);
 };
 
 }
