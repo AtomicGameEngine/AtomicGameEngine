@@ -24,10 +24,6 @@ static bool SDLScanCodeToWindowsScanCode(SDL_Scancode code, LPARAM& lParam, WPAR
     wParam = 0;
     lParam = 0;
 
-    if (code >= SDL_SCANCODE_A && code <= SDL_SCANCODE_0)
-        return false;
-
-    /*
     int numCodes = sizeof(windows_scancode_table)/sizeof(SDL_Scancode);
 
     int windowsScanCode = -1;
@@ -42,9 +38,9 @@ static bool SDLScanCodeToWindowsScanCode(SDL_Scancode code, LPARAM& lParam, WPAR
 
     if (windowsScanCode != -1)
     {
+        wParam = MapVirtualKey(windowsScanCode, MAPVK_VSC_TO_VK);
         lParam = windowsScanCode << 16;
     }
-    */
 
     switch (code)
     {
@@ -69,7 +65,7 @@ static bool SDLScanCodeToWindowsScanCode(SDL_Scancode code, LPARAM& lParam, WPAR
 
     }
 
-    return wParam != 0;
+    return wParam != 0 || lParam != 0;
 
 }
 
