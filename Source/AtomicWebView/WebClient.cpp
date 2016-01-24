@@ -318,16 +318,6 @@ public:
     {
         CEF_REQUIRE_UI_THREAD();
 
-        List<SharedPtr<WebMessageHandler>>::Iterator itr = webClient_->messageHandlers_.Begin();
-        while (itr != webClient_->messageHandlers_.End())
-        {
-            CefMessageRouterBrowserSide::Handler* handler = static_cast<CefMessageRouterBrowserSide::Handler*>((*itr)->GetCefHandler());
-            browserSideRouter_->RemoveHandler(handler);
-            itr++;
-        }
-
-        webClient_->messageHandlers_.Clear();
-
         browser_ = nullptr;
 
     }
@@ -369,7 +359,17 @@ WebClient::WebClient(Context* context) : Object(context)
 WebClient::~WebClient()
 {
     if (d_)
+    {
+        List<SharedPtr<WebMessageHandler>>::Iterator itr = messageHandlers_.Begin();
+        while (itr != messageHandlers_.End())
+        {
+            CefMessageRouterBrowserSide::Handler* handler = static_cast<CefMessageRouterBrowserSide::Handler*>((*itr)->GetCefHandler());
+            d_->browserSideRouter_->RemoveHandler(handler);
+            itr++;
+        }
+
         d_->CloseBrowser(true);
+    }
 
     renderHandler_ = 0;
     //d_->Release();
