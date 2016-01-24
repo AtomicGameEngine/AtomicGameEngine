@@ -83,8 +83,12 @@ macro(SET_CEF_TARGET_OUT_DIR)
     set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
   else()
     # ATOMIC: Unix Makefiles not creating Debug/Release?
-    set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-    #set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>")
+
+    if(${CMAKE_GENERATOR} STREQUAL "Xcode")
+      set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>")
+    else()
+      set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    endif()
   endif()
 endmacro()
 

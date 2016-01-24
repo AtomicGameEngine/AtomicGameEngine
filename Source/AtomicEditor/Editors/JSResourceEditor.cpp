@@ -16,6 +16,8 @@
 #include <Atomic/Core/CoreEvents.h>
 #include <AtomicJS/Javascript/JSVM.h>
 
+#include <ToolCore/ToolEnvironment.h>
+
 #include <AtomicWebView/WebViewEvents.h>
 #include <AtomicWebView/UIWebView.h>
 #include <AtomicWebView/WebClient.h>
@@ -25,6 +27,7 @@
 
 
 using namespace tb;
+using namespace ToolCore;
 
 namespace AtomicEditor
 {
@@ -45,7 +48,16 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     layout->AddChild(c);
 
-    String url = "file:///Users/josh/Dev/atomic/AtomicGameEngine/Data/AtomicEditor/CodeEditor/Editor.html";
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    String codeEditorDir = tenv->GetToolDataDir();
+    codeEditorDir += "CodeEditor/Editor.html";
+
+#ifdef ATOMIC_PLATFORM_OSX
+    String url = "file://" + codeEditorDir;
+#else
+    String url = "file:///" + codeEditorDir;
+#endif
+
     webView_ = new UIWebView(context_, url);
     webClient_ = webView_->GetWebClient();
     messageHandler_ = new WebMessageHandler(context_);

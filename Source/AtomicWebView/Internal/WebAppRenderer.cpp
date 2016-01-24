@@ -172,7 +172,7 @@ bool WebAppRenderer::OnProcessMessageReceived(
         CefProcessId source_process,
         CefRefPtr<CefProcessMessage> message)
 {
-    DCHECK_EQ(source_process, PID_BROWSER);
+    assert(source_process == PID_BROWSER);
 
     bool handled = false;
 
