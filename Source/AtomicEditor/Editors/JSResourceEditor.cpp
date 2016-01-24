@@ -106,7 +106,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
 
 void JSResourceEditor::FormatCode()
 {
-
+    //webClient_->ExecuteJavaScript("beautifyCode();");
 }
 
 bool JSResourceEditor::OnEvent(const TBWidgetEvent &ev)

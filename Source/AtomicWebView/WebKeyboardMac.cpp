@@ -22,8 +22,8 @@ static bool SDLScanCodeToDarwinScanCode(SDL_Scancode code, int& darwinScanCode)
 
     darwinScanCode = -1;
 
-    if (code >= SDL_SCANCODE_A && code <= SDL_SCANCODE_0)
-        return false;
+    //if (code >= SDL_SCANCODE_A && code <= SDL_SCANCODE_0)
+    //    return false;
 
     int numCodes = sizeof(darwin_scancode_table)/sizeof(SDL_Scancode);
 

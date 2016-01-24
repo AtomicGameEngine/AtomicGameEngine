@@ -53,7 +53,7 @@
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/typescript");
     editor.session.setValue(value);
-    editor.gotoLine(0);
+    editor.gotoLine(0);    
 
     editor.getSession().on('change', function(e) {
       window.atomicQuery({request: 'change',

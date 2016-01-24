@@ -83,7 +83,7 @@ public:
 
         TBRect rect = GetRect();
 
-        if ((rect.w < 0 || rect.h < 0) || (rect.w == rect.h == 0))
+        if (rect.w <= 0 || rect.h <= 0)
             return;
 
         webView_->webClient_->SetSize(rect.w, rect.h);
@@ -218,6 +218,8 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     }
     else if (ev.type == EVENT_TYPE_SHORTCUT)
     {
+        // Currently handled by key combinations
+        /*
         if (ev.ref_id == TBIDC("copy"))
         {
             webClient_->ShortcutCopy();
@@ -248,6 +250,7 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
             webClient_->ShortcutRedo();
             return true;
         }
+        */
 
     }
 
