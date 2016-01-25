@@ -79,6 +79,13 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 utils.revealInFinder(path);
                 return true;
             }
+
+            if (refid == "force_reimport") {
+                asset.setDirty(true);
+                ToolCore.assetDatabase.scan();
+                return true;
+            }
+
         }
 
         return false;
@@ -134,6 +141,7 @@ var StringID = strings.StringID;
 var assetGeneralContextItems = {
     "Rename": ["rename_asset", undefined, ""],
     "Reveal in Finder": ["reveal_folder", undefined, ""],
+    "Force Reimport": ["force_reimport", undefined, ""],
     "-1": null,
     "Delete": ["delete_asset", undefined, ""]
 };
