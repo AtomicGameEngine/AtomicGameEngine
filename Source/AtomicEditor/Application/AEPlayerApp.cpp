@@ -194,7 +194,7 @@ void AEPlayerApplication::ReadCommandLineArguments()
 #ifdef __APPLE__
                 engineParameters_["ResourcePrefixPath"] = "../Resources";
 #else
-                engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
+                engineParameters_["ResourcePrefixPath"] = fileSystem->GetProgramDir() + "Resources";
 #endif
 
                 String resourcePaths = ToString("CoreData;PlayerData;%s/;%s/Resources;%s;%sCache",
