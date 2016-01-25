@@ -117,6 +117,18 @@ if(OS_MACOSX)
   endif()
 endif()
 
+if(OS_WINDOWS)
+
+  # Determine the target output directory.
+  SET_CEF_TARGET_OUT_DIR()
+
+  # Copy CEF binary and resource files to the target output directory.
+  # set(CEF_TARGET_OUT_DIR $<TARGET_FILE_DIR:AtomicEditor>)
+  COPY_FILES("${CEF_TARGET}" "${CEF_BINARY_FILES}" "${CEF_BINARY_DIR}" "${CEF_TARGET_OUT_DIR}")
+  COPY_FILES("${CEF_TARGET}" "${CEF_RESOURCE_FILES}" "${CEF_RESOURCE_DIR}" "${CEF_TARGET_OUT_DIR}")
+
+endif()
+
 endif()
 
 

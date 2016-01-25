@@ -41,6 +41,8 @@ endif()
 if(OS_WINDOWS)
     set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
     set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/libcef.lib")
+    set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
+    set(CEF_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Resources")
 endif()
 
 #
@@ -84,7 +86,7 @@ macro(SET_CEF_TARGET_OUT_DIR)
   else()
     # ATOMIC: Unix Makefiles not creating Debug/Release?
 
-    if(${CMAKE_GENERATOR} STREQUAL "Xcode")
+    if(${CMAKE_GENERATOR} STREQUAL "Xcode" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 14 2015 Win64")
       set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>")
     else()
       set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
@@ -315,5 +317,37 @@ macro(ADD_WINDOWS_MANIFEST manifest_path target)
     COMMENT "Adding manifest..."
     )
 endmacro()
+
+# List of CEF binary files.
+set(CEF_BINARY_FILES
+  d3dcompiler_43.dll
+  d3dcompiler_47.dll
+  libcef.dll
+  libEGL.dll
+  libGLESv2.dll
+  natives_blob.bin
+  snapshot_blob.bin
+  )
+
+# We don't have a 32 bit build right now
+#if(PROJECT_ARCH STREQUAL "x86")
+# Only used on 32-bit platforms.
+#  set(CEF_BINARY_FILES
+#    ${CEF_BINARY_FILES}
+#    wow_helper.exe
+#    )
+#endif()
+
+# List of CEF resource files.
+set(CEF_RESOURCE_FILES
+  cef.pak
+  cef_100_percent.pak
+  cef_200_percent.pak
+  cef_extensions.pak
+  devtools_resources.pak
+  icudtl.dat
+  locales
+  )
+
 
 endif(OS_WINDOWS)
