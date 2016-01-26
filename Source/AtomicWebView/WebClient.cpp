@@ -1,7 +1,4 @@
 
-#include <SDL/include/SDL.h>
-#include <ThirdParty/SDL/include/SDL_syswm.h>
-
 #include <include/cef_app.h>
 #include <include/cef_client.h>
 #include <include/cef_browser.h>
@@ -23,6 +20,9 @@
 #include "WebKeyboard.h"
 #include "WebViewEvents.h"
 #include "WebString.h"
+
+#include <SDL/include/SDL.h>
+#include <ThirdParty/SDL/include/SDL_syswm.h>
 
 namespace Atomic
 {

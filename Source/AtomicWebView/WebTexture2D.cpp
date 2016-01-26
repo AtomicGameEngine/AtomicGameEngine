@@ -91,7 +91,7 @@ public:
         return true;
     }
 
-#ifdef ATOMIC_PLATFORM_OSX
+#ifndef ATOMIC_PLATFORM_WINDOWS
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE

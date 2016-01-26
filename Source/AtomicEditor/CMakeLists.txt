@@ -58,6 +58,10 @@ if (OS_WINDOWS)
     target_link_libraries(AtomicEditor AtomicWebView libcef_dll_wrapper "${CEF_LIB_RELEASE}")
 endif()
 
+if (OS_LINUX)
+    target_link_libraries(AtomicEditor AtomicWebView libcef_dll_wrapper "${CEF_LIB_RELEASE}")
+endif()
+
 if(OS_MACOSX)
 
   # Logical target used to link the libcef library.

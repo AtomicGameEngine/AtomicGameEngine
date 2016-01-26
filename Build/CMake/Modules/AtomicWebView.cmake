@@ -45,6 +45,14 @@ if(OS_WINDOWS)
     set(CEF_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Resources")
 endif()
 
+if(OS_LINUX)
+    set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/Linux/Release")
+    set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/libcef.so")
+    set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Linux/Release")
+    set(CEF_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Linux/Resources")
+endif()
+
+
 #
 # Shared macros.
 #
