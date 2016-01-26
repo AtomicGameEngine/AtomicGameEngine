@@ -5,7 +5,7 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#if defined(ATOMIC_PLATFORM_WINDOWS) || defined (ATOMIC_PLATFORM_LINUX)
 #ifdef ATOMIC_WEBVIEW
 #include <AtomicWebView/AtomicWebView.h>
 #endif
@@ -112,8 +112,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #else
 int main(int argc, char** argv)
 {
+  Atomic::ParseArguments(argc, argv);
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
+#if defined(ATOMIC_PLATFORM_WINDOWS) || defined (ATOMIC_PLATFORM_LINUX)
 #ifdef ATOMIC_WEBVIEW
 
     int exit_code = Atomic::WebMain(argc, argv);
@@ -126,8 +127,6 @@ int main(int argc, char** argv)
 
 #endif
 #endif
-
-    Atomic::ParseArguments(argc, argv);
 
     const Vector<String>& arguments = GetArguments();
 

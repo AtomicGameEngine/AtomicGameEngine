@@ -10,7 +10,7 @@ namespace Atomic
 // These flags must match the Chromium values.
 static const char kProcessType[] = "type";
 static const char kRendererProcess[] = "renderer";
-#if defined(OS_LINUX)
+#ifdef ATOMIC_PLATFORM_LINUX
 static const char kZygoteProcess[] = "zygote";
 #endif
 
@@ -31,7 +31,7 @@ WebApp::ProcessType WebApp::GetProcessType(CefRefPtr<CefCommandLine> command_lin
     if (processType == kRendererProcess)
         return RendererProcess;
 
-#if defined(OS_LINUX)
+#ifdef ATOMIC_PLATFORM_LINUX
     else if (processType == kZygoteProcess)
         return ZygoteProcess;
 #endif

@@ -20,6 +20,28 @@
 #include "WebClient.h"
 #include "WebBrowserHost.h"
 
+#ifdef ATOMIC_PLATFORM_LINUX
+
+#include <X11/Xlib.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+
+static int XErrorHandlerImpl(Display *display, XErrorEvent *event) {
+  return 0;
+}
+
+static int XIOErrorHandlerImpl(Display *display) {
+  return 0;
+}
+
+static void TerminationSignalHandler(int signatl) {
+
+}
+
+#endif
+
+
 
 namespace Atomic
 {
@@ -54,11 +76,25 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     const Vector<String>& arguments = GetArguments();
 
+    #ifdef ATOMIC_PLATFORM_LINUX
+      XSetErrorHandler(XErrorHandlerImpl);
+      XSetIOErrorHandler(XIOErrorHandlerImpl);
+
+      // Install a signal handler so we clean up after ourselves.
+      signal(SIGINT, TerminationSignalHandler);
+      signal(SIGTERM, TerminationSignalHandler);
+
+    #endif
+
+
     // IMPORTANT: Cef::App contains virtual void OnBeforeCommandLineProcessing(), which should make it possible
     // to setup args on Windows
 
 #ifdef ATOMIC_PLATFORM_OSX
     const char* _argv[3] = { "", "--enable-media-stream", "--enable-usermedia-screen-capturing" };
+    CefMainArgs args(3, (char**) &_argv);
+#elif ATOMIC_PLATFORM_LINUX
+    static const char* _argv[3] = { "AtomicWebView", "--disable-setuid-sandbox", "--off-screen-rendering-enabled" };
     CefMainArgs args(3, (char**) &_argv);
 #else
     CefMainArgs args;
@@ -76,7 +112,7 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
         LOGERROR("CefInitialize - Error");
     }
 
-    RegisterWebSchemeHandlers(this);    
+    RegisterWebSchemeHandlers(this);
 
     SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
 

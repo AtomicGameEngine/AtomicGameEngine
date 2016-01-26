@@ -59,7 +59,7 @@ if (OS_WINDOWS)
 endif()
 
 if (OS_LINUX)
-    target_link_libraries(AtomicEditor AtomicWebView libcef_dll_wrapper "${CEF_LIB_RELEASE}")
+    target_link_libraries(AtomicEditor AtomicWebView X11 libcef_dll_wrapper "${CEF_LIB_RELEASE}")
 endif()
 
 if(OS_MACOSX)
