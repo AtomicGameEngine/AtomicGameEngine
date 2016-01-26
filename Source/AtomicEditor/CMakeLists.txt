@@ -13,7 +13,6 @@ list(REMOVE_ITEM SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/WebView/WebProcessHelp
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
-
 set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE} ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (APPLE)
@@ -133,15 +132,14 @@ if(OS_WINDOWS)
 
 endif()
 
-endif()
-
+endif(ATOMIC_WEBVIEW)
 
 
 if (APPLE)
-    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/Build/CMake/Modules/AtomicEditorInfo.plist.template")
 
-    SET( MACOSX_BUNDLE_GUI_IDENTIFIER "com.thunderbeastgames.atomiceditor")
-    SET( MACOSX_BUNDLE_BUNDLE_NAME "AtomicEditor")
+    set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/Build/CMake/Modules/AtomicEditorInfo.plist.template")
+    set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.thunderbeastgames.atomiceditor")
+    set (MACOSX_BUNDLE_BUNDLE_NAME "AtomicEditor")
 
     target_link_libraries(AtomicEditor NETCore NETScript libcurl)
 

@@ -218,8 +218,7 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
     }
     else if (ev.type == EVENT_TYPE_SHORTCUT)
     {
-        // Currently handled by key combinations
-        /*
+        // These shortcuts are not being invoked with key combinations (Handle KeyDown/KeyUp)
         if (ev.ref_id == TBIDC("copy"))
         {
             webClient_->ShortcutCopy();
@@ -230,11 +229,14 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
             webClient_->ShortcutPaste();
             return true;
         }
-        if (ev.ref_id == TBIDC("cut"))
+        else if (ev.ref_id == TBIDC("cut"))
         {
             webClient_->ShortcutCut();
             return true;
         }
+
+        // Handled by key combinations in Handle KeyDown/KeyUp
+        /*
         else if (ev.ref_id == TBIDC("selectall"))
         {
             webClient_->ShortcutSelectAll();
@@ -251,6 +253,7 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
             return true;
         }
         */
+
 
     }
 

@@ -58,12 +58,12 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNET/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicWebView/ MACOSX",
       "cmake -DATOMIC_DEV_BUILD=0 -G Xcode ../../../../",
-      "xcodebuild -target AtomicEditor -configuration Release -parallelizeTargets -jobs 4"
+      "xcodebuild -target AtomicEditor -configuration Release -parallelizeTargets -jobs 4",
+      "cd " + editorBuildDir + "Source/AtomicEditor/Release && zip -r -X " + buildDir + "Bin/AtomicEditor.zip ./AtomicEditor.app"
     ];
 
     jake.exec(cmds, function() {
-      var macEditorBinary = editorBuildDir + "Source/AtomicEditor/Release/AtomicEditor.app/Contents/MacOS/AtomicEditor";
-      fs.copySync(macEditorBinary, buildDir + "Bin/AtomicEditor");
+
       console.log("Built Mac Editor");
       complete();
 

@@ -117,16 +117,13 @@ namespace('build', function() {
 
     // Mac App
 
-    fs.copySync(atomicRoot + "Build/CIScripts/Mac/EditorApp",
-      buildDir + "MacApps/EditorApp");
-
     fs.copySync(atomicRoot + "Build/CIScripts/Mac/PlayerApp/",
       buildDir + "MacApps/PlayerApp/");
 
     // Editor Binaries
 
-    fs.copySync(bcommon.artifactsRoot + "Build/Mac/Bin/AtomicEditor",
-      buildDir + "EditorBinaries/Mac/AtomicEditor");
+    fs.copySync(bcommon.artifactsRoot + "Build/Mac/Bin/AtomicEditor.zip",
+      buildDir + "EditorBinaries/Mac/AtomicEditor.zip");
 
     fs.copySync(bcommon.artifactsRoot + "Build/Windows/Bin/AtomicEditor.exe",
       buildDir + "EditorBinaries/Windows/AtomicEditor.exe");

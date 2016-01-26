@@ -43,7 +43,8 @@ namespace('build', function() {
 
     bcommon.cleanCreateDir(dstDir);
 
-    cmds = ["unzip " + srcDir + "EditorData.zip -d " + srcDir];
+    cmds = ["unzip " + srcDir + "EditorData.zip -d " + srcDir,
+            "unzip " + srcDir + "EditorBinaries/Mac/AtomicEditor.zip -d " + srcDir + "EditorBinaries/Mac"];
 
     jake.exec(cmds, function() {
 
@@ -51,11 +52,8 @@ namespace('build', function() {
 
       var editorAppFolder = dstDir + "AtomicEditor.app/Contents/";
 
-      fs.copySync(srcDir + "MacApps/EditorApp",
-        editorAppFolder);
-
-      fs.copySync(srcDir + "EditorBinaries/Mac/AtomicEditor",
-        editorAppFolder + "MacOS/AtomicEditor");
+      fs.copySync(srcDir + "EditorBinaries/Mac/AtomicEditor.app",
+        dstDir + "AtomicEditor.app");
 
       fs.copySync(srcDir + "Resources/CoreData",
         editorAppFolder + "Resources/CoreData");
