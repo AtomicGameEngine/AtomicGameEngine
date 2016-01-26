@@ -8,9 +8,13 @@ namespace Atomic
 
 class Input;
 
+/// Convert an Atomic KeyEvent to a CefKeyEvent, returns true if processing should continue
 bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent);
+/// Convert an Atomic TextInput to a CefKeyEvent, returns true if processing should continue
 bool ConvertTextInputEvent(const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent);
 
+
+/// A convenience structure to "parse" a KeyUp/KeyDown event
 struct WebKeyEvent
 {
     bool repeat;

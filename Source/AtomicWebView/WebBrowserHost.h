@@ -9,6 +9,8 @@ namespace Atomic
 class WebBrowserHostPrivate;
 class WebClient;
 
+
+/// Browser host subsystem, responsible for initializing CEF
 class ATOMIC_API WebBrowserHost : public Object
 {
     OBJECT(WebBrowserHost);

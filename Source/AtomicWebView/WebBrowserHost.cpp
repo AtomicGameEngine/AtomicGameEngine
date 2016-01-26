@@ -27,20 +27,22 @@
 #include <unistd.h>
 #include <signal.h>
 
-static int XErrorHandlerImpl(Display *display, XErrorEvent *event) {
-  return 0;
+static int XErrorHandlerImpl(Display *display, XErrorEvent *event)
+{
+    return 0;
 }
 
-static int XIOErrorHandlerImpl(Display *display) {
-  return 0;
+static int XIOErrorHandlerImpl(Display *display)
+{
+    return 0;
 }
 
-static void TerminationSignalHandler(int signatl) {
+static void TerminationSignalHandler(int signatl)
+{
 
 }
 
 #endif
-
 
 
 namespace Atomic
@@ -76,15 +78,15 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     const Vector<String>& arguments = GetArguments();
 
-    #ifdef ATOMIC_PLATFORM_LINUX
-      XSetErrorHandler(XErrorHandlerImpl);
-      XSetIOErrorHandler(XIOErrorHandlerImpl);
+#ifdef ATOMIC_PLATFORM_LINUX
+    XSetErrorHandler(XErrorHandlerImpl);
+    XSetIOErrorHandler(XIOErrorHandlerImpl);
 
-      // Install a signal handler so we clean up after ourselves.
-      signal(SIGINT, TerminationSignalHandler);
-      signal(SIGTERM, TerminationSignalHandler);
+    // Install a signal handler so we clean up after ourselves.
+    signal(SIGINT, TerminationSignalHandler);
+    signal(SIGTERM, TerminationSignalHandler);
 
-    #endif
+#endif
 
 
     // IMPORTANT: Cef::App contains virtual void OnBeforeCommandLineProcessing(), which should make it possible

@@ -35,6 +35,7 @@ namespace Atomic
 class WebClient;
 class WebTexture2D;
 
+/// UI widget for WebViews
 class UIWebView : public UIWidget
 {
     friend class WebViewWidget;
@@ -46,8 +47,10 @@ public:
     UIWebView(Context* context, const String& initialURL = String::EMPTY);
     virtual ~UIWebView();
 
+    /// Get the widget's WebClient
     WebClient* GetWebClient() { return webClient_; }
 
+    /// Get the WebTexture in use by the WebView
     WebTexture2D* GetWebTexture2D() const;
 
 protected:
