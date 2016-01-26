@@ -56,7 +56,7 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/ToolCore/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Editor/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNET/ MACOSX",
-      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicWebView/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/WebView/ MACOSX",
       "cmake -DATOMIC_DEV_BUILD=0 -G Xcode ../../../../",
       "xcodebuild -target AtomicEditor -configuration Release -parallelizeTargets -jobs 4",
       "cd " + editorBuildDir + "Source/AtomicEditor/Release && zip -r -X " + buildDir + "Bin/AtomicEditor.zip ./AtomicEditor.app"
