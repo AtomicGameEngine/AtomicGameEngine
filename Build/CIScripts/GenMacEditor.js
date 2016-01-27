@@ -20,7 +20,7 @@ namespace('build', function() {
       "chmod +x " + editorAppFolder + "/Contents/MacOS/AtomicEditor",
       "chmod +x " + editorAppFolder + "/Contents/Resources/ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer",
       "security unlock-keychain -p \"jenkins\" /Users/jenkins/Library/Keychains/login.keychain",
-      "codesign -s \"THUNDERBEAST GAMES LLC\" -f -v -d" + editorAppFolder,
+      "codesign -s \"THUNDERBEAST GAMES LLC\" -f -v --deep" + editorAppFolder,
       "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
     ];
 
