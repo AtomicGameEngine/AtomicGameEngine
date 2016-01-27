@@ -1,4 +1,4 @@
-cut Cortat
+cut Cortar
 copy Copiar
 paste Pegar
 delete Eliminar
