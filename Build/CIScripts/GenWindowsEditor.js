@@ -62,33 +62,39 @@ namespace('build', function() {
 
     jake.exec(cmds, function() {
 
-    console.log("Generating Windows Editor");
+      console.log("Generating Windows Editor");
 
-    var editorAppFolder = dstDir + "AtomicEditor/";
+      var editorAppFolder = dstDir + "AtomicEditor/";
 
-    fs.copySync(srcDir + "EditorBinaries/Windows/AtomicEditor.exe",
+      fs.copySync(srcDir + "EditorBinaries/Windows/AtomicEditor.exe",
       editorAppFolder + "AtomicEditor.exe");
 
-    fs.copySync(srcDir + "EditorBinaries/Windows/D3DCompiler_47.dll",
+      fs.copySync(srcDir + "EditorBinaries/Windows/D3DCompiler_47.dll",
       editorAppFolder + "D3DCompiler_47.dll");
 
-    fs.copySync(srcDir + "Resources/CoreData",
+      fs.copySync(srcDir + "Resources/CoreData",
       editorAppFolder + "Resources/CoreData");
 
-    fs.copySync(srcDir + "Resources/EditorData",
+      fs.copySync(srcDir + "Resources/EditorData",
       editorAppFolder + "Resources/EditorData");
 
-    fs.copySync(srcDir + "Resources/PlayerData",
+      fs.copySync(srcDir + "Resources/PlayerData",
       editorAppFolder + "Resources/PlayerData");
 
-    fs.copySync(srcDir + "Resources/ToolData",
+      fs.copySync(srcDir + "Resources/ToolData",
       editorAppFolder + "Resources/ToolData");
 
-    fs.copySync(srcDir + "AtomicExamples",
+      fs.copySync(srcDir + "AtomicExamples",
       editorAppFolder + "Resources/ToolData/AtomicExamples");
 
-    fs.copySync(srcDir + "Docs",
+      fs.copySync(srcDir + "Docs",
       editorAppFolder + "Resources/ToolData/Docs/JSDocs");
+
+      // CEF
+      var cefRoot = atomicRoot + "Submodules/CEF/Windows/64bit/";
+
+      fs.copySync(cefRoot + "Release", editorAppFolder);
+      fs.copySync(cefRoot + "Resources", editorAppFolder);
 
       complete();
 
