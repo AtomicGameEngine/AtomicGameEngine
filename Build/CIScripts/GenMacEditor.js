@@ -19,6 +19,11 @@ namespace('build', function() {
       cmds = [
       "chmod +x " + editorAppFolder + "/Contents/MacOS/AtomicEditor",
       "chmod +x " + editorAppFolder + "/Contents/Resources/ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents/Frameworks/AtomicEditor\\ Helper.app",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents//Frameworks/AtomicEditor\\ Helper\\ EH.app",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents/Frameworks/AtomicEditor\\ Helper\\ NP.app",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents/Frameworks/Chromium\\ Embedded\\ Framework.framework",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder,
       //"security unlock-keychain -p \"jenkins\" /Users/jenkins/Library/Keychains/login.keychain",
       //"codesign -s \"THUNDERBEAST GAMES LLC\" -f -v " + editorAppFolder,
       "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
