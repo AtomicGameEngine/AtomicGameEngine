@@ -419,21 +419,21 @@ bool TmxFile2D::EndLoad()
             SharedPtr<TmxTileLayer2D> tileLayer (new TmxTileLayer2D(this));
             ret = tileLayer->Load(childElement, info_);
 
-            layers_.Push(static_cast<SharedPtr<TmxLayer2D>>(tileLayer));
+            layers_.Push((SharedPtr<TmxLayer2D>)(tileLayer));
         }
         else if (name == "objectgroup")
         {
             SharedPtr<TmxObjectGroup2D> objectGroup (new TmxObjectGroup2D(this));
             ret = objectGroup->Load(childElement, info_);
 
-            layers_.Push(static_cast<SharedPtr<TmxLayer2D>>(objectGroup));
+            layers_.Push((SharedPtr<TmxLayer2D>)(objectGroup));
         }
         else if (name == "imagelayer")
         {
             SharedPtr<TmxImageLayer2D> imageLayer (new TmxImageLayer2D(this));
             ret = imageLayer->Load(childElement, info_);
 
-            layers_.Push(static_cast<SharedPtr<TmxLayer2D>>(imageLayer));
+            layers_.Push((SharedPtr<TmxLayer2D>)(imageLayer));
         }
 
         if (!ret)
