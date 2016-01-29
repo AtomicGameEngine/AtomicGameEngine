@@ -253,8 +253,11 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
             return true;
         }
         */
-
-
+    }
+    else if (ev.type == EVENT_TYPE_KEY_DOWN || ev.type == EVENT_TYPE_KEY_UP)
+    {
+        // We consume all key events as they are handled by the UI event system directly
+        return true;
     }
 
     return UIWidget::OnEvent(ev);
