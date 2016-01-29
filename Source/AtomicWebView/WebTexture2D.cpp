@@ -290,7 +290,7 @@ private:
 
 };
 
-WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context)
+WebTexture2D::WebTexture2D(Context* context) : WebRenderHandler(context), clearColor_(Color::WHITE)
 {
     d_ = new WebTexture2DPrivate(this);
     d_->AddRef();
@@ -329,9 +329,15 @@ void WebTexture2D::SetSize(int width, int height)
     // initialize to white (color should probably be an option)
     if (texture_->SetSize(width, height, Graphics::GetRGBAFormat(), TEXTURE_DYNAMIC))
     {
-        SharedArrayPtr<unsigned char> whitedata(new unsigned char[width * height * 4]);
-        memset(whitedata.Get(), 255, width * height * 4);
-        texture_->SetData(0, 0, 0, width, height, whitedata.Get());
+        SharedArrayPtr<unsigned> cleardata(new unsigned[width * height]);
+        unsigned color = clearColor_.ToUInt();
+        unsigned* ptr = cleardata.Get();
+        for (unsigned i = 0; i < width * height; i++, ptr++)
+        {
+            *ptr = color;
+        }
+
+        texture_->SetData(0, 0, 0, width, height, cleardata.Get());
     }
     else
     {

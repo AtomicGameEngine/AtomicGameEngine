@@ -32,14 +32,22 @@ public:
     int GetHeight() const;
     /// Get the Texture2D associated with the WebTexture2D
     Texture2D* GetTexture2D() const { return texture_; }
+    /// get the clear color for the WebTexture
+    const Color& GetClearColor() const { return clearColor_; }
+
 
     /// Set the dimensions of the texture
     void SetSize(int width, int height);
+
+    /// Set the clear color for the WebTexture
+    void SetClearColor(const Color& color) { clearColor_ = color; }
 
     /// Get the (internal) CEFRenderHandler
     CefRenderHandler* GetCEFRenderHandler();
 
 private:
+
+    Color clearColor_;
 
     SharedPtr<Texture2D> texture_;
 

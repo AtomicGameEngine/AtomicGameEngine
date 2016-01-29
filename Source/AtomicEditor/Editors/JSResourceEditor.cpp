@@ -22,6 +22,7 @@
 #include <AtomicWebView/UIWebView.h>
 #include <AtomicWebView/WebClient.h>
 #include <AtomicWebView/WebMessageHandler.h>
+#include <AtomicWebView/WebTexture2D.h>
 
 #include "JSResourceEditor.h"
 
@@ -63,16 +64,14 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     messageHandler_ = new WebMessageHandler(context_);
     webClient_->AddMessageHandler(messageHandler_);
 
+    webView_->GetWebTexture2D()->SetClearColor(Color(.23f, .23f, .23f, 1));
+
     SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
     SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
 
 
     c->AddChild(webView_->GetInternalWidget());
 
-    // FIXME: Set the size at the end of setup, so all children are updated accordingly
-    // future size changes will be handled automatically
-    IntRect rect = container_->GetContentRoot()->GetRect();
-    rootContentWidget_->SetSize(rect.Width(), rect.Height());
 }
 
 JSResourceEditor::~JSResourceEditor()
