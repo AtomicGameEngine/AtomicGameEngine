@@ -375,7 +375,7 @@ WebClient::~WebClient()
     //d_->Release();
 }
 
-void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const
+void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier, int clickCount) const
 {
     if (!d_->browser_.get())
         return;
@@ -391,14 +391,14 @@ void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp,
     //MBT_MIDDLE,
     //MBT_RIGHT,
 
-    host->SendMouseClickEvent(mevent, (CefBrowserHost::MouseButtonType) button, mouseUp, 1);
+    host->SendMouseClickEvent(mevent, (CefBrowserHost::MouseButtonType) button, mouseUp, clickCount);
 
 }
 
-void WebClient::SendMousePressEvent(int x, int y, unsigned button, unsigned modifier) const
+void WebClient::SendMousePressEvent(int x, int y, unsigned button, unsigned modifier, int clickCount) const
 {
-    SendMouseClickEvent(x, y, button, false, modifier);
-    SendMouseClickEvent(x, y, button, true, modifier);
+    SendMouseClickEvent(x, y, button, false, modifier, clickCount);
+    SendMouseClickEvent(x, y, button, true, modifier, clickCount);
 }
 
 void WebClient::SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave) const
@@ -438,11 +438,13 @@ void WebClient::SendMouseWheelEvent(int x, int y, unsigned modifier,int deltaX, 
     mevent.y = y;
     mevent.modifiers = 0;
 
-#ifdef ATOMIC_PLATFORM_OSX
-    deltaY = -deltaY;
+    deltaY = -deltaY * 5;
+
+#ifndef ATOMIC_PLATFORM_OSX
+    deltaY *= 5;
 #endif
 
-    host->SendMouseWheelEvent(mevent, deltaX, deltaY * 5);
+    host->SendMouseWheelEvent(mevent, deltaX, deltaY);
 
 }
 

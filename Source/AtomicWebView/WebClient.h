@@ -35,9 +35,9 @@ public:
     void SetSize(int width, int height);
 
     /// Send a mouse click event to the browser
-    void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier) const;
+    void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier, int clickCount = 1) const;
     /// Send a mouse press event to the browser
-    void SendMousePressEvent(int x, int y, unsigned button = 0, unsigned modifier = 0) const;
+    void SendMousePressEvent(int x, int y, unsigned button = 0, unsigned modifier = 0, int clickCount = 1) const;
     /// Send a mouse move event to the browser
     void SendMouseMoveEvent(int x, int y, unsigned modifier, bool mouseLeave = false) const;
     /// Send a mouse wheel event to the browser

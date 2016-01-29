@@ -203,7 +203,7 @@ bool UIWebView::OnEvent(const TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_POINTER_DOWN || ev.type == EVENT_TYPE_POINTER_UP)
     {
-        webClient_->SendMouseClickEvent(ev.target_x, ev.target_y, 0, ev.type == EVENT_TYPE_POINTER_UP, 0);
+        webClient_->SendMouseClickEvent(ev.target_x, ev.target_y, 0, ev.type == EVENT_TYPE_POINTER_UP, 0, ev.count);
         return true;
     }
     else if (ev.type == EVENT_TYPE_POINTER_MOVE)
