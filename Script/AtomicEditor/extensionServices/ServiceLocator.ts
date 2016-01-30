@@ -5,11 +5,11 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 import {ServiceLocatorType} from "./EditorExtensionServices";
-import TypescriptLanguageService from "./resourceServices/TypescriptLanguageService";
+import TypescriptLanguageExtension from "./resourceServices/TypscriptLanguageExtension";
 
 // Singleton service locator that can be referenced
 const serviceLocator = new ServiceLocatorType();
 export default serviceLocator;
 
 // Load up all the internal services
-serviceLocator.loadService(new TypescriptLanguageService());
+serviceLocator.loadService(new TypescriptLanguageExtension());

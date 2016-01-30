@@ -27,6 +27,7 @@
         "./AtomicEditor/editor/Preferences.ts",
         "./AtomicEditor/extensionServices/EditorExtensionServices.ts",
         "./AtomicEditor/extensionServices/resourceServices/TypescriptLanguageService.ts",
+        "./AtomicEditor/extensionServices/resourceServices/TypscriptLanguageExtension.ts",
         "./AtomicEditor/extensionServices/ServiceLocator.ts",
         "./AtomicEditor/main.ts",
         "./AtomicEditor/modules/metrics.ts",
