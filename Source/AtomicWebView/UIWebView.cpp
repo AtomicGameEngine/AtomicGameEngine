@@ -107,6 +107,21 @@ public:
         unsigned char opacity = (unsigned char) (fopacity* 255.0f);
         ((unsigned&)color) = (0x00FFFFFF + (((uint32)opacity) << 24));
 
+        float x = (float) rect.x;
+        float y = (float) rect.y;
+        float w = (float) rect.w;
+        float h = (float) rect.h;
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+#ifndef ATOMIC_D3D11
+        //Direct3D9 Adjustment
+        x += 0.5f;
+        y += 0.5f;
+#endif
+
+#endif
+
         data[3] = color;
         data[9] = color;
         data[15] = color;
@@ -114,23 +129,23 @@ public:
         data[27] = color;
         data[33] = color;
 
-        data[0] = rect.x;
-        data[1] = rect.y;
+        data[0] = x;
+        data[1] = y;
 
-        data[6] = rect.x + rect.w;
-        data[7] =  rect.y;
+        data[6] = x + w;
+        data[7] =  y;
 
-        data[12] = rect.x + rect.w;
-        data[13] = rect.y + rect.h;
+        data[12] = x + w;
+        data[13] = y + h;
 
-        data[18] = rect.x;
-        data[19] = rect.y;
+        data[18] = x;
+        data[19] = y;
 
-        data[24] = rect.x + rect.w;
-        data[25] = rect.y + rect.h;
+        data[24] = x + w;
+        data[25] = y + h;
 
-        data[30] = rect.x;
-        data[31] = rect.y + rect.h;
+        data[30] = x;
+        data[31] = y + h;
 
         ui->SubmitBatchVertexData(webView_->GetWebTexture2D()->GetTexture2D(), vertexData_);
 
