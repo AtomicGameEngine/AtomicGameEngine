@@ -102,24 +102,6 @@ public:
                                CefEventHandle os_event,
                                bool* is_keyboard_shortcut) OVERRIDE
     {
-
-        /*
-#ifdef ATOMIC_PLATFORM_OSX
-
-        if (!event.native_key_code)
-            return false;
-
-        if (event.native_key_code == 36)
-        {
-            if (event.focus_on_editable_field && event.type != KEYEVENT_CHAR)
-                return true;
-
-            if (!event.focus_on_editable_field && event.type == KEYEVENT_CHAR)
-                return true;
-        }
-
-#endif */
-
         return false;
     }
 
@@ -522,6 +504,9 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
+    // RETURN KEY: We need to send both keydown and char for return key
+    // this allows it to be used both to confirm entry on popups,
+    // while also being used for text input
     if (keyEvent.windows_key_code == 13)
     {
         keyEvent.type = KEYEVENT_CHAR;
@@ -531,6 +516,16 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
 #endif
 
 #ifdef ATOMIC_PLATFORM_OSX
+
+    // RETURN KEY: We need to send both keydown and char for return key
+    // this allows it to be used both to confirm entry on popups,
+    // while also being used for text input
+    if (keyEvent.native_key_code == 36)
+    {
+        keyEvent.type = KEYEVENT_CHAR;
+        host->SendKeyEvent(keyEvent);
+    }
+
     // Send an empty key event on OSX, which seems to fix
     // keyboard problems on OSX with cefclient
     // ./cefclient --off-screen-rendering-enabled
@@ -538,24 +533,9 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
     // bad interaction with arrow keys (for example here, after
     // hitting arrow keys, return/text takes a couple presses to register
 
-    if (keyEvent.native_key_code == 36)
-    {
-        keyEvent.type = KEYEVENT_CHAR;
-        host->SendKeyEvent(keyEvent);
-    }
-
-    //if (keyEvent.native_key_code == 125)
-    //{
-    //    keyEvent.type = KEYEVENT_KEYUP;
-    //    host->SendKeyEvent(keyEvent);
-    //}
-
     memset((void*)&keyEvent, 0, sizeof(keyEvent));
 
-    if (eventType == "KeyDown")
-        keyEvent.type = KEYEVENT_KEYDOWN;
-    else
-        keyEvent.type = KEYEVENT_KEYUP;
+    keyEvent.type = KEYEVENT_KEYDOWN;
     keyEvent.modifiers = 0;
     keyEvent.native_key_code = 0;
     host->SendKeyEvent(keyEvent);
