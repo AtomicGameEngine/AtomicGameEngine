@@ -86,7 +86,7 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
 
         keyEvent.windows_key_code = VK_RETURN;
         keyEvent.native_key_code = (int) 0;
-        keyEvent.type = KEYEVENT_CHAR;
+        keyEvent.type = KEYEVENT_RAWKEYDOWN;
         return true;
     }
 

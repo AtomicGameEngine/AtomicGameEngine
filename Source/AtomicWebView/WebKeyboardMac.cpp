@@ -54,6 +54,8 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
     if (eventType == "KeyUp")
         return false;
 
+    memset((void*)&keyEvent, 0, sizeof(keyEvent));
+
     WebKeyEvent wk(eventType, eventData);
 
     if (wk.scanCode == SDL_SCANCODE_RETURN)
@@ -62,7 +64,7 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
             return false;
 
         keyEvent.native_key_code = 36;
-        keyEvent.type = KEYEVENT_CHAR;
+        keyEvent.type = KEYEVENT_RAWKEYDOWN;
         return true;
     }
 
@@ -80,12 +82,11 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
     if (superdown)
         keyEvent.modifiers |= EVENTFLAG_COMMAND_DOWN;
 
-
     int darwinScanCode;
     if (SDLScanCodeToDarwinScanCode((SDL_Scancode) wk.scanCode, darwinScanCode))
     {
         keyEvent.native_key_code = darwinScanCode;
-        keyEvent.type = wk.keyDown ? KEYEVENT_KEYDOWN : KEYEVENT_KEYUP;
+        keyEvent.type = wk.keyDown ? KEYEVENT_RAWKEYDOWN : KEYEVENT_KEYUP;
         return true;
     }
 
