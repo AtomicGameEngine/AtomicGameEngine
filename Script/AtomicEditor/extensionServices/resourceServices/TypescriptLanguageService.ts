@@ -30,6 +30,12 @@ export interface FileSystemInterface {
      * @param  {string} contents
      */
     writeFile(filename: string, contents: string);
+
+    /**
+     * Returns the current directory / root of the source tree
+     * @return {string}
+     */
+    getCurrentDirectory(): string;
 }
 
 /**
@@ -112,7 +118,7 @@ export class TypescriptLanguageService {
                 getScriptVersion: (fileName) => this.versionMap[fileName] && this.versionMap[fileName].version.toString(),
                 getScriptSnapshot: (fileName) => {
                     const scriptVersion = this.versionMap[fileName];
-                    if (this.fs.fileExists(fileName)) {
+                    if (!this.fs.fileExists(fileName)) {
                         if (scriptVersion) {
                             delete this.versionMap[fileName];
                             let idx = this.projectFiles.indexOf(fileName);
@@ -137,7 +143,7 @@ export class TypescriptLanguageService {
                         console.log(`no script version for ${fileName}`);
                     }
                 },
-                getCurrentDirectory: () => ToolCore.toolSystem.project.resourcePath,
+                getCurrentDirectory: () => this.fs.getCurrentDirectory(),
                 getCompilationSettings: () => options,
                 getDefaultLibFileName: (options) => undefined
             };

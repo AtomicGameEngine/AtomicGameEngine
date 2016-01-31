@@ -23,8 +23,7 @@ class AtomicFileSystem implements FileSystemInterface {
      * @return {boolean}
      */
     fileExists(filename: string): boolean {
-        return !Atomic.fileSystem.exists(filename);
-
+        return Atomic.fileSystem.exists(filename);
     }
 
     /**
@@ -54,6 +53,14 @@ class AtomicFileSystem implements FileSystemInterface {
         } finally {
             script.close();
         }
+    }
+
+    /**
+     * Returns the current directory / root of the source tree
+     * @return {string}
+     */
+    getCurrentDirectory(): string {
+        return ToolCore.toolSystem.project.resourcePath;
     }
 
 }
