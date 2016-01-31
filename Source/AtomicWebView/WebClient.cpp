@@ -31,7 +31,12 @@ namespace Atomic
 void* GetNSWindowContentView(void* window);
 #endif
 
-class WebClientPrivate : public CefClient, public CefLifeSpanHandler, public CefLoadHandler, public CefDisplayHandler, public CefRequestHandler
+class WebClientPrivate : public CefClient,
+        public CefLifeSpanHandler,
+        public CefLoadHandler,
+        public CefDisplayHandler,
+        public CefRequestHandler,
+        public CefKeyboardHandler
 {
     friend class WebClient;
 
@@ -83,6 +88,41 @@ public:
     {
         return this;
     }
+
+    CefRefPtr<CefKeyboardHandler> GetKeyboardHandler() OVERRIDE
+    {
+        return this;
+    }
+
+
+    // CefKeyboardHandler
+
+    virtual bool OnPreKeyEvent(CefRefPtr<CefBrowser> browser,
+                               const CefKeyEvent& event,
+                               CefEventHandle os_event,
+                               bool* is_keyboard_shortcut) OVERRIDE
+    {
+
+        /*
+#ifdef ATOMIC_PLATFORM_OSX
+
+        if (!event.native_key_code)
+            return false;
+
+        if (event.native_key_code == 36)
+        {
+            if (event.focus_on_editable_field && event.type != KEYEVENT_CHAR)
+                return true;
+
+            if (!event.focus_on_editable_field && event.type == KEYEVENT_CHAR)
+                return true;
+        }
+
+#endif */
+
+        return false;
+    }
+
 
 
     // CefRequestHandler methods
@@ -487,6 +527,18 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
     // return does not work at all on cef client with offscreen
     // bad interaction with arrow keys (for example here, after
     // hitting arrow keys, return/text takes a couple presses to register
+
+    if (keyEvent.native_key_code == 36)
+    {
+        keyEvent.type = KEYEVENT_CHAR;
+        host->SendKeyEvent(keyEvent);
+    }
+
+    //if (keyEvent.native_key_code == 125)
+    //{
+    //    keyEvent.type = KEYEVENT_KEYUP;
+    //    host->SendKeyEvent(keyEvent);
+    //}
 
     memset((void*)&keyEvent, 0, sizeof(keyEvent));
 
