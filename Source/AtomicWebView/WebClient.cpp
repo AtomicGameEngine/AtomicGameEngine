@@ -520,6 +520,16 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
 
     host->SendKeyEvent(keyEvent);
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+    if (keyEvent.windows_key_code == 13)
+    {
+        keyEvent.type = KEYEVENT_CHAR;
+        host->SendKeyEvent(keyEvent);
+    }
+
+#endif
+
 #ifdef ATOMIC_PLATFORM_OSX
     // Send an empty key event on OSX, which seems to fix
     // keyboard problems on OSX with cefclient
