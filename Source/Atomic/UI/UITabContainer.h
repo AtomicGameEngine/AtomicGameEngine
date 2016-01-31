@@ -27,6 +27,8 @@
 namespace Atomic
 {
 
+class UILayout;
+
 class UITabContainer : public UIWidget
 {
     OBJECT(UITabContainer)
@@ -40,6 +42,8 @@ public:
     void SetCurrentPage(int page);
 
     UIWidget* GetCurrentPageWidget();
+
+    UILayout* GetTabLayout();
 
 protected:
 

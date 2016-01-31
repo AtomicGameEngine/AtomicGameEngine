@@ -40,7 +40,7 @@ public:
     /// Construct.
     Javascript(Context* context);
     /// Destruct.
-    ~Javascript();
+    virtual ~Javascript();
 
     /// Returns NULL if a VM with name already exists
     JSVM* InstantiateVM(const String& name);

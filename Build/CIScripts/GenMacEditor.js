@@ -19,8 +19,12 @@ namespace('build', function() {
       cmds = [
       "chmod +x " + editorAppFolder + "/Contents/MacOS/AtomicEditor",
       "chmod +x " + editorAppFolder + "/Contents/Resources/ToolData/Deployment/MacOS/AtomicPlayer.app/Contents/MacOS/AtomicPlayer",
-      "security unlock-keychain -p \"jenkins\" /Users/jenkins/Library/Keychains/login.keychain",
-      "codesign -s \"THUNDERBEAST GAMES LLC\" -f -v " + editorAppFolder,
+      "security unlock-keychain -p \"jenkins\" /Users/jenkins/Library/Keychains/login.keychain  ",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents/Frameworks/AtomicEditor\\ Helper.app",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents//Frameworks/AtomicEditor\\ Helper\\ EH.app",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents/Frameworks/AtomicEditor\\ Helper\\ NP.app",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder + "/Contents/Frameworks/Chromium\\ Embedded\\ Framework.framework",
+      "codesign --force --verify --verbose --sign \"Developer ID Application: THUNDERBEAST GAMES LLC (C7M5MAQQWR)\" " + editorAppFolder,      
       "cd " + dstDir + " && zip -r -X " + "./MacEditorInstaller/AtomicEditor_MacOSX_" + bcommon.buildSHA + ".zip ./AtomicEditor.app"
     ];
 
@@ -43,7 +47,8 @@ namespace('build', function() {
 
     bcommon.cleanCreateDir(dstDir);
 
-    cmds = ["unzip " + srcDir + "EditorData.zip -d " + srcDir];
+    cmds = ["unzip " + srcDir + "EditorData.zip -d " + srcDir,
+            "unzip " + srcDir + "EditorBinaries/Mac/AtomicEditor.zip -d " + srcDir + "EditorBinaries/Mac"];
 
     jake.exec(cmds, function() {
 
@@ -51,11 +56,8 @@ namespace('build', function() {
 
       var editorAppFolder = dstDir + "AtomicEditor.app/Contents/";
 
-      fs.copySync(srcDir + "MacApps/EditorApp",
-        editorAppFolder);
-
-      fs.copySync(srcDir + "EditorBinaries/Mac/AtomicEditor",
-        editorAppFolder + "MacOS/AtomicEditor");
+      fs.copySync(srcDir + "EditorBinaries/Mac/AtomicEditor.app",
+        dstDir + "AtomicEditor.app");
 
       fs.copySync(srcDir + "Resources/CoreData",
         editorAppFolder + "Resources/CoreData");

@@ -67,10 +67,20 @@ endif()
 
 find_program(CLDOC cldoc)
 if(CLDOC)
+   add_custom_target(docs DEPENDS AtomicEngineDocs)
+endif()
 
-   add_custom_target(docs
-    DEPENDS AtomicEngineDocs
-    )
+if (ATOMIC_WEBVIEW)
+  if(APPLE)
+    include_directories (${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/)
+    add_subdirectory(Submodules/CEF/MacOSX/libcef_dll)
+  elseif(MSVC)
+    include_directories (${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit)
+    add_subdirectory(Submodules/CEF/Windows/64bit/libcef_dll)
+  else()
+    include_directories (${CMAKE_SOURCE_DIR}/Submodules/CEF/Linux)
+    add_subdirectory(Submodules/CEF/Linux/libcef_dll)
+  endif()
 endif()
 
 add_subdirectory(Source)

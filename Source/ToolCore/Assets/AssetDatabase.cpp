@@ -100,11 +100,12 @@ Asset* AssetDatabase::GetAssetByCachePath(const String& cachePath)
 {
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
 
-    String cacheFilename = GetFileName(cachePath);
+    // This is the GUID
+    String cacheFilename = GetFileName(cachePath).ToLower();
 
     while (itr != assets_.End())
     {
-        if ((*itr)->GetCachePath().Contains(cacheFilename))
+        if ((*itr)->GetGUID().ToLower() == cacheFilename)
             return *itr;
 
         itr++;

@@ -591,6 +591,24 @@ double UIWidget::GetValue()
 
 }
 
+void UIWidget::Enable()
+{
+    if (!widget_)
+        return;
+
+    widget_->SetState(WIDGET_STATE_DISABLED, false);
+
+}
+
+void UIWidget::Disable()
+{
+
+    if (!widget_)
+        return;
+
+    widget_->SetState(WIDGET_STATE_DISABLED, true);
+
+}
 
 bool UIWidget::GetState(UI_WIDGET_STATE state)
 {

@@ -1,0 +1,3 @@
+[submodule "Submodules/CEF"]
+	path = Submodules/CEF
+	url = ../CEF3Binaries

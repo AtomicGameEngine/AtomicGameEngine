@@ -1,0 +1,8 @@
+
+{
+  "name" : "WebView",
+  "namespace" : "Atomic",
+  "dependencies" : ["Script/Packages/Atomic"],
+  "modules" : ["WebView"],
+  "platforms" : ["WINDOWS", "MACOSX", "LINUX"]
+}
