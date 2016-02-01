@@ -79,7 +79,7 @@ declare module AceAjax {
     }
     var KeyBinding: {
         new(editor: Editor): KeyBinding;
-    }
+    };
 
     export interface TextMode {
 
@@ -194,7 +194,7 @@ declare module AceAjax {
          * @param column The starting column position
         **/
         new(doc: Document, row: number, column: number): Anchor;
-    }
+    };
 
     ////////////////////////////////
     /// BackgroundTokenizer
@@ -257,7 +257,7 @@ declare module AceAjax {
          * @param editor The editor to associate with
         **/
         new(tokenizer: Tokenizer, editor: Editor): BackgroundTokenizer;
-    }
+    };
 
     ////////////////
     /// Document
@@ -448,7 +448,7 @@ declare module AceAjax {
          * @param text The starting text
         **/
         new(text?: string[]): Document;
-    }
+    };
 
     ////////////////////////////////
     /// EditSession
@@ -1024,7 +1024,7 @@ declare module AceAjax {
         new(content: string, mode?: string): IEditSession;
 
         new (text: string[], mode?: string): IEditSession;
-    }
+    };
 
     ////////////////////////////////
     /// Editor
@@ -1037,7 +1037,7 @@ declare module AceAjax {
     **/
     export interface Editor {
 
-        addEventListener(ev: 'change', callback: (ev: EditorChangeEvent) => any): void;
+        addEventListener(ev: "change", callback: (ev: EditorChangeEvent) => any): void;
         addEventListener(ev: string, callback: Function): void;
 
         inMultiSelectMode: boolean;
@@ -1739,7 +1739,7 @@ declare module AceAjax {
          * @param session The `EditSession` to refer to
         **/
         new(renderer: VirtualRenderer, session?: IEditSession): Editor;
-    }
+    };
 
     interface EditorChangeEvent {
         start: Position;
@@ -1810,7 +1810,7 @@ declare module AceAjax {
         new (session: Document, length: number, pos: number, others: string, mainClass: string, othersClass: string): PlaceHolder;
 
         new (session: IEditSession, length: number, pos: Position, positions: Position[]): PlaceHolder;
-    }
+    };
 
     ////////////////
     /// RangeList
@@ -1831,7 +1831,7 @@ declare module AceAjax {
     }
     export var RangeList: {
         new (): IRangeList;
-    }
+    };
 
     ////////////////
     /// Range
@@ -2035,7 +2035,7 @@ declare module AceAjax {
     var Range: {
         fromPoints(pos1: Position, pos2: Position): Range;
         new(startRow: number, startColumn: number, endRow: number, endColumn: number): Range;
-    }
+    };
 
     ////////////////
     /// RenderLoop
@@ -2044,7 +2044,7 @@ declare module AceAjax {
     export interface RenderLoop { }
     var RenderLoop: {
         new(): RenderLoop;
-    }
+    };
 
     ////////////////
     /// ScrollBar
@@ -2090,7 +2090,7 @@ declare module AceAjax {
          * @param parent A DOM element
         **/
         new(parent: HTMLElement): ScrollBar;
-    }
+    };
 
     ////////////////
     /// Search
@@ -2153,7 +2153,7 @@ declare module AceAjax {
          * - `skipCurrent`: Whether or not to include the current line in the search. Default to `false`.
         **/
         new(): Search;
-    }
+    };
 
     ////////////////
     /// Search
@@ -2414,7 +2414,7 @@ declare module AceAjax {
          * @param session The session to use
         **/
         new(session: IEditSession): Selection;
-    }
+    };
 
     ////////////////
     /// Split
@@ -2498,7 +2498,7 @@ declare module AceAjax {
     }
     var Split: {
         new(): Split;
-    }
+    };
 
     //////////////////
     /// TokenIterator
@@ -2542,7 +2542,7 @@ declare module AceAjax {
          * @param initialColumn The column to start the tokenizing at
         **/
         new(session: IEditSession, initialRow: number, initialColumn: number): TokenIterator;
-    }
+    };
 
     //////////////////
     /// Tokenizer
@@ -2566,7 +2566,7 @@ declare module AceAjax {
          * @param flag Any additional regular expression flags to pass (like "i" for case insensitive)
         **/
         new(rules: any, flag: string): Tokenizer;
-    }
+    };
 
     //////////////////
     /// UndoManager
@@ -2628,7 +2628,7 @@ declare module AceAjax {
          * Resets the current undo state and creates a new `UndoManager`.
         **/
         new(): UndoManager;
-    }
+    };
 
     ////////////////////
     /// VirtualRenderer
@@ -2978,7 +2978,7 @@ declare module AceAjax {
          * @param theme The starting theme
         **/
         new(container: HTMLElement, theme?: string): VirtualRenderer;
-    }
+    };
 }
 
 declare var ace: AceAjax.Ace;
