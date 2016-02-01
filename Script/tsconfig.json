@@ -94,6 +94,7 @@
         "./TypeScript/AtomicPlayer.d.ts",
         "./TypeScript/AtomicWork.d.ts",
         "./TypeScript/Editor.d.ts",
-        "./TypeScript/ToolCore.d.ts"
+        "./TypeScript/ToolCore.d.ts",
+        "./TypeScript/WebView.d.ts"
     ]
 }

@@ -505,7 +505,7 @@ class NumberArrayAttributeEdit extends AttributeInfoEdit {
 
     refresh() {
 
-        for (var i in this.selects) {
+        for (var i = 0; i < this.selects.length; i++) {
 
             var select = this.selects[i];
             if (select["_edit"].focus || select["_dec"].captured || select["_inc"].captured)
