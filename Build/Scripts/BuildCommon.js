@@ -96,7 +96,6 @@ namespace('build', function() {
           });
 
           lintTask.invoke("{./Script/AtomicEditor/**/*.ts,./Script/AtomicWebViewEditor/**/*.ts}", false);
-          //lintTask.invoke("./Script/AtomicWebViewEditor/**/*.ts", false);
 
         } else {
             throw new Error("Node not configured for this platform: " + os.platform());
