@@ -73,6 +73,18 @@
 				"module" : "3D"
 			},
 			{
+				"name": "Water Shader",
+				"desc" : "A simple water shader example",
+				"screenshot" : "WaterShip.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WaterShip"
+					}
+				],
+				"module" : "3D"
+			},
+			{
 				"name": "Light 2D",
 				"desc" : "An example of realtime 2D lights with shadows",
 				"screenshot" : "Light2D.png",
