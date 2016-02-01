@@ -534,6 +534,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Material"] = "MaterialImporter";
         resourceTypeToImporterType_["Texture2D"] = "TextureImporter";
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
+        resourceTypeToImporterType_["Image"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
         resourceTypeToImporterType_["JSONFile"] = "JSONImporter";
