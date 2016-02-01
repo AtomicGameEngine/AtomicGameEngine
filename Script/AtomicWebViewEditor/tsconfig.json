@@ -1,14 +1,12 @@
 {
     "compilerOptions": {
-        "module": "system",
+        "module": "System",
         "target": "ES6",
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "outDir": "./out",
         "outFile": "../../Data/AtomicEditor/CodeEditor/editor.bundle.js",
-        "moduleResolution": "classic",
         "sourceMap": true
     },
     "filesGlob": [
