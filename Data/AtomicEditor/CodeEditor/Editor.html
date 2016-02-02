@@ -25,55 +25,10 @@
 
   <script src="./source/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script src="./source/ace/ext-language_tools.js"></script>
+  <script src="./source/systemjs/system-register-only.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./editor.bundle.js" type="text/javascript" charset="utf-8"></script>
   <script>
-
-  editor = ace.edit("editor");
-
-  editor.setOptions({
-    enableBasicAutocompletion: true,
-    enableSnippets: true,
-    enableLiveAutocompletion: true
-  });
-
-  function saveCode() {
-
-    var data = {
-        message : "saveCode",
-        payload : editor.session.getValue()
-    }
-
-    window.atomicQuery({request: JSON.stringify(data),
-    persistent: false,
-    onSuccess: function(response) { },
-    onFailure: function(error_code, error_message) {console.log("Error getting code")}});
-  }
-
-  function codeLoaded(value) {
-
-    editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/typescript");
-    editor.session.setValue(value);
-    editor.gotoLine(0);    
-
-    editor.getSession().on('change', function(e) {
-      window.atomicQuery({request: 'change',
-      persistent: false,
-      onSuccess: function(response) { },
-      onFailure: function(error_code, error_message) {console.log("Error on change")}});
-    });
-  }
-
-  function loadCode(codeUrl)
-  {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() {
-      if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-      codeLoaded(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", codeUrl, true); // true for asynchronous
-    xmlHttp.send(null);
-  }
-
+    System.import('./interop');
   </script>
 
 </body>

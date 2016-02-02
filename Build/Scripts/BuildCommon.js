@@ -61,7 +61,7 @@ namespace('build', function() {
         var tslint = "./Build/node_modules/tslint/lib/tslint-cli";
 
         switch(os.platform()) {
-            case "win32":                
+            case "win32":
                 node = "Build\\Windows\\node\\node.exe";
                 break;
             case "darwin":
@@ -80,6 +80,7 @@ namespace('build', function() {
         if (node) {
           // compile
           cmds.push(node + " " + tsc + " -p ./Script");
+          cmds.push(node + " " + tsc + " -p ./Script/AtomicWebViewEditor");
 
           var lintTask = jake.Task['build:lint_typescript'];
 
@@ -94,7 +95,7 @@ namespace('build', function() {
             });
           });
 
-          lintTask.invoke("./Script/AtomicEditor/**/*.ts", false);
+          lintTask.invoke("{./Script/AtomicEditor/**/*.ts,./Script/AtomicWebViewEditor/**/*.ts}", false);
 
         } else {
             throw new Error("Node not configured for this platform: " + os.platform());
