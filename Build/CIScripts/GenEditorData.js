@@ -95,8 +95,11 @@ namespace('build', function() {
 
     process.chdir(atomicRoot);
 
+    var tsc = "./Build/node_modules/typescript/lib/tsc";
+
     cmds = [
-      atomicRoot + "Build/Mac/node/node " + atomicRoot + "/Build/TypeScript/tsc.js -p ./Script"
+      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script",
+      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor"
     ];
 
     jake.exec(cmds, function() {
