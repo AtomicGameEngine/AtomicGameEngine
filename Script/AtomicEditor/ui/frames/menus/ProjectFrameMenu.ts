@@ -133,9 +133,7 @@ var StringID = strings.StringID;
 
 var assetGeneralContextItems = {
     "Rename": ["rename_asset", undefined, ""],
-    "Reveal in Finder": ["reveal_folder", undefined, ""],
-    "-1": null,
-    "Delete": ["delete_asset", undefined, ""]
+    "-1": null
 };
 
 var assetFolderContextItems = {
@@ -145,10 +143,25 @@ var assetFolderContextItems = {
     "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "-1": null,
-    "Reveal in Finder": ["reveal_folder", undefined, ""],
-    "-2": null,
-    "Delete": ["delete_asset", undefined, "FolderDeleteBitmap"]
+    "-2": null
 };
+
+//Change the words "Reveal in Finder" based on platform
+if (Atomic.platform == "Windows") {
+    assetGeneralContextItems["Reveal in Explorer"] = ["reveal_folder", undefined, ""];
+    assetFolderContextItems["Reveal in Explorer"] = ["reveal_folder", undefined, ""];
+} else if (Atomic.platform == "MacOSX") {
+    assetGeneralContextItems["Reveal in Finder"] = ["reveal_folder", undefined, ""];
+    assetFolderContextItems["Reveal in Finder"] = ["reveal_folder", undefined, ""];
+}
+else {
+    assetGeneralContextItems["Reveal in File Manager"] = ["reveal_folder", undefined, ""];
+    assetFolderContextItems["Reveal in File Manager"] = ["reveal_folder", undefined, ""];
+}
+
+//Ensures that delete is at the bottom of the menu lists
+assetGeneralContextItems["Delete"] = ["delete_asset", undefined, ""];
+assetFolderContextItems["Delete"] = ["delete_asset", undefined, "FolderDeleteBitmap"];
 
 var createItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
