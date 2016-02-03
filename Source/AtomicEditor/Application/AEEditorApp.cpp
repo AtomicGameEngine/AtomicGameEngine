@@ -76,14 +76,10 @@ void AEEditorApp::Setup()
 
     AEEditorCommon::Setup();
 
-    // #ISSUE 576 Start
-    //This ensures that the user can not
-    //create an exclusive fullscreen
-    //by pressing ALT + Enter in Atomic Editor Mode
-    //It also allows fullscreen mode when in Player Mode
+    // Ensure exclusive fullscreen is disabled in Editor application
     Input* input = GetSubsystem<Input>();
     input->SetToggleFullscreen(false);
-    //#ISSUE 576 End
+
 
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
 
