@@ -201,6 +201,9 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             }
 
+            /*if (refid == "developer clear preferences") {
+            //Needed to perform some action on clear preference click
+            }*/
 
         } else if (target.id == "menu tools popup") {
 
@@ -300,6 +303,7 @@ var buildItems = {
 var developerItems = {
 
     "Show Console": ["developer show console"],
+    "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {
         "UI Debugger": ["developer show uidebugger"],
         "Asset Database": {
