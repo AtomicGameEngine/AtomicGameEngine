@@ -178,7 +178,7 @@ void AEPreferences::UpdateRecentFiles(bool write)
 
         recentProjects.Push(path);
 
-        if (recentProjects.Size() == 10)
+        if (recentProjects.Size() > 0 && recentProjects.Size() <= 15)
             break;
     }
 
