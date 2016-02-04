@@ -133,7 +133,7 @@ var StringID = strings.StringID;
 
 var assetGeneralContextItems = {
     "Rename": ["rename_asset", undefined, ""],
-    "-1": null
+    
 };
 
 var assetFolderContextItems = {
@@ -143,7 +143,7 @@ var assetFolderContextItems = {
     "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "-1": null,
-    "-2": null
+    
 };
 
 //Change the words "Reveal in Finder" based on platform
@@ -159,9 +159,14 @@ else {
     assetFolderContextItems["Reveal in File Manager"] = ["reveal_folder", undefined, ""];
 }
 
+
+
 //Ensures that delete is at the bottom of the menu lists
+assetGeneralContextItems["-1"] = null;
 assetGeneralContextItems["Delete"] = ["delete_asset", undefined, ""];
+assetFolderContextItems["-2"] = null;
 assetFolderContextItems["Delete"] = ["delete_asset", undefined, "FolderDeleteBitmap"];
+
 
 var createItems = {
     "Create Folder": ["create_folder", undefined, "Folder.icon"],
