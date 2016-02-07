@@ -86,7 +86,8 @@ UIDragDrop::~UIDragDrop()
 void UIDragDrop::DragEnd()
 {
     SharedPtr<UIDragObject> dragObject = dragObject_;
-    WeakPtr<UIWidget> currentTargetWidget = currentTargetWidget_;
+    SharedPtr<UIWidget> currentTargetWidget(currentTargetWidget_);
+    SharedPtr<UIWidget> dragSourceWidget(dragSourceWidget_);
 
     // clean up
     currentTargetWidget_ = 0;
@@ -94,7 +95,7 @@ void UIDragDrop::DragEnd()
     dragSourceWidget_ = 0;
     dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
-    if (currentTargetWidget.Null())
+    if (currentTargetWidget.Null() || dragSourceWidget == currentTargetWidget)
     {
         return;
     }
