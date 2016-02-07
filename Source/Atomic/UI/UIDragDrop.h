@@ -64,8 +64,8 @@ private:
     SharedPtr<UIImageWidget> dragImage_;
     SharedPtr<UITextField> dragText_;
 
-    WeakPtr<UIWidget> currentTargetWidget_;
-    WeakPtr<UIWidget> dragSourceWidget_;
+    SharedPtr<UIWidget> currentTargetWidget_;
+    SharedPtr<UIWidget> dragSourceWidget_;
 
     SharedPtr<UIDragObject> dragObject_;
 
