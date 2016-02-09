@@ -5,6 +5,12 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+#if defined(ATOMIC_PLATFORM_WINDOWS) || defined (ATOMIC_PLATFORM_LINUX)
+#ifdef ATOMIC_WEBVIEW
+#include <AtomicWebView/AtomicWebView.h>
+#endif
+#endif
+
 #if defined(WIN32) && !defined(ATOMIC_WIN32_CONSOLE)
 #include <Atomic/Core/MiniDump.h>
 #include <windows.h>
@@ -106,7 +112,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #else
 int main(int argc, char** argv)
 {
-    Atomic::ParseArguments(argc, argv);
+  Atomic::ParseArguments(argc, argv);
+
+#if defined(ATOMIC_PLATFORM_WINDOWS) || defined (ATOMIC_PLATFORM_LINUX)
+#ifdef ATOMIC_WEBVIEW
+
+    int exit_code = Atomic::WebMain(argc, argv);
+
+    if (exit_code >= 0)
+    {
+        // The sub-process has completed so return here.
+        return exit_code;
+    }
+
+#endif
+#endif
 
     const Vector<String>& arguments = GetArguments();
 

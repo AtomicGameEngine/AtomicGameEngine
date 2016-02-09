@@ -26,6 +26,7 @@ namespace('build', function() {
       bindCmd + "Script/Packages/ToolCore/ WINDOWS",
       bindCmd + "Script/Packages/Editor/ WINDOWS",
       bindCmd + "Script/Packages/AtomicNET/ WINDOWS",
+      bindCmd + "Script/Packages/WebView/ WINDOWS",
       atomicRoot + "/Build/CIScripts/Windows/CompileAtomic.bat",
     ]
 

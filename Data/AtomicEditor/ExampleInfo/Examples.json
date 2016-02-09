@@ -49,6 +49,90 @@
 				"module" : "3D"
 			},
 			{
+				"name": "Web Browser",
+				"desc" : "A multi-tab browser using UIWebView",
+				"screenshot" : "UIWebView.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "AtomicWebView"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "Cube Map Example",
+				"desc" : "Example of Atomic’s built-in cube map generator",
+				"screenshot" : "CubeMapExample.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "CubeMapExample"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "Water Shader",
+				"desc" : "A simple water shader example",
+				"screenshot" : "WaterShip.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WaterShip"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "Light 2D",
+				"desc" : "An example of realtime 2D lights with shadows",
+				"screenshot" : "Light2D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "Light2DExample"
+					}
+				],
+				"module" : "2D"
+			},
+			{
+				"name": "Atomic Drive-in",
+				"desc" : "3D WebView scene example",
+				"screenshot" : "WebView3D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebView3D"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "ParticleEmitter3D",
+				"desc" : "An example of 3d particles driven by script",
+				"screenshot" : "ParticleEmitter3D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "ParticleEmitter3D"
+					}
+				],
+				"module" : "3D"
+			},
+			{
+				"name": "3D Web Texture",
+				"desc" : "Simple 3D web texture with raycasting",
+				"screenshot" : "WebTexture3D.png",
+				"templates" : [
+					{
+						"language" : "JavaScript",
+						"folder" : "WebTexture"
+					}
+				],
+				"module" : "3D"
+			},
+			{
 				"name": "Character Animation 2D",
 				"desc" : "Example of controlling a Spriter animated character",
 				"screenshot" : "CharacterAnimation2D.png",
@@ -68,42 +152,6 @@
 					{
 						"language" : "JavaScript",
 						"folder" : "CharacterAnimation3D"
-					}
-				],
-				"module" : "3D"
-			},
-			{
-				"name": "Light 2D",
-				"desc" : "An example of realtime 2D lights with shadows",
-				"screenshot" : "Light2D.png",
-				"templates" : [
-					{
-						"language" : "JavaScript",
-						"folder" : "Light2DExample"
-					}
-				],
-				"module" : "2D"
-			},
-			{
-				"name": "ParticleEmitter3D",
-				"desc" : "An example of 3d particles driven by script",
-				"screenshot" : "ParticleEmitter3D.png",
-				"templates" : [
-					{
-						"language" : "JavaScript",
-						"folder" : "ParticleEmitter3D"
-					}
-				],
-				"module" : "3D"
-			},
-			{
-				"name": "Cube Map Example",
-				"desc" : "Example of Atomic’s built-in cube map generator",
-				"screenshot" : "CubeMapExample.png",
-				"templates" : [
-					{
-						"language" : "JavaScript",
-						"folder" : "CubeMapExample"
 					}
 				],
 				"module" : "3D"

@@ -24,6 +24,7 @@ namespace('build', function() {
       bindCmd + "Script/Packages/ToolCore/ WINDOWS",
       bindCmd + "Script/Packages/Editor/ WINDOWS",
       bindCmd + "Script/Packages/AtomicNET/ WINDOWS",
+      bindCmd + "Script/Packages/WebView/ WINDOWS",
     ];
 
     jake.exec(cmds, function() {
@@ -94,8 +95,11 @@ namespace('build', function() {
 
     process.chdir(atomicRoot);
 
+    var tsc = "./Build/node_modules/typescript/lib/tsc";
+
     cmds = [
-      atomicRoot + "Build/Mac/node/node " + atomicRoot + "/Build/TypeScript/tsc.js -p ./Script"
+      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script",
+      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor"
     ];
 
     jake.exec(cmds, function() {
@@ -117,16 +121,13 @@ namespace('build', function() {
 
     // Mac App
 
-    fs.copySync(atomicRoot + "Build/CIScripts/Mac/EditorApp",
-      buildDir + "MacApps/EditorApp");
-
     fs.copySync(atomicRoot + "Build/CIScripts/Mac/PlayerApp/",
       buildDir + "MacApps/PlayerApp/");
 
     // Editor Binaries
 
-    fs.copySync(bcommon.artifactsRoot + "Build/Mac/Bin/AtomicEditor",
-      buildDir + "EditorBinaries/Mac/AtomicEditor");
+    fs.copySync(bcommon.artifactsRoot + "Build/Mac/Bin/AtomicEditor.zip",
+      buildDir + "EditorBinaries/Mac/AtomicEditor.zip");
 
     fs.copySync(bcommon.artifactsRoot + "Build/Windows/Bin/AtomicEditor.exe",
       buildDir + "EditorBinaries/Windows/AtomicEditor.exe");

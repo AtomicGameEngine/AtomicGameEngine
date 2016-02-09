@@ -20,11 +20,14 @@
 // THE SOFTWARE.
 //
 
+#include "JSMath.h"
 #include "JSGraphics.h"
-#include "JSVM.h"
 
 #include <Atomic/Graphics/Material.h>
 #include <Atomic/Graphics/Light.h>
+#include <Atomic/Graphics/Octree.h>
+#include <Atomic/Graphics/Camera.h>
+#include <Atomic/Scene/Node.h>
 
 namespace Atomic
 {
@@ -198,6 +201,141 @@ static int Material_GetTextureUnitName(duk_context* ctx)
     return 1;
 }
 
+static int Camera_GetScreenRay(duk_context* ctx)
+{
+    float x = (float) duk_to_number(ctx, 0);
+    float y = (float) duk_to_number(ctx, 1);
+
+    duk_push_this(ctx);
+    Camera* camera = js_to_class_instance<Camera>(ctx, -1, 0);
+
+    Ray ray = camera->GetScreenRay(x, y);
+    duk_push_new_ray(ctx, ray);
+
+    return 1;
+}
+
+// Octree Queries
+
+static duk_int_t DUK_MAGIC_RAYCAST = 1;
+static duk_int_t DUK_MAGIC_RAYCAST_SINGLE = 2;
+
+static void duk_push_rayqueryresult(duk_context* ctx, const RayQueryResult& result)
+{
+    duk_push_object(ctx);
+
+    duk_push_new_vector3(ctx, result.position_);
+    duk_put_prop_string(ctx, -2, "position");
+
+    duk_push_new_vector3(ctx, result.normal_);
+    duk_put_prop_string(ctx, -2, "normal");
+
+    duk_push_new_vector2(ctx, result.textureUV_);
+    duk_put_prop_string(ctx, -2, "textureUV");
+
+    duk_push_number(ctx, result.distance_);
+    duk_put_prop_string(ctx, -2, "distance");
+
+    js_push_class_object_instance(ctx, result.drawable_, "Drawable");
+    duk_put_prop_string(ctx, -2, "drawable");
+
+    js_push_class_object_instance(ctx, result.node_, "Node");
+    duk_put_prop_string(ctx, -2, "node");
+
+    duk_push_number(ctx, (duk_double_t) result.subObject_);
+    duk_put_prop_string(ctx, -2, "subObject");
+
+}
+
+static int Octree_Raycast(duk_context* ctx)
+{
+    bool single = duk_get_current_magic(ctx) == DUK_MAGIC_RAYCAST_SINGLE;
+
+    duk_idx_t nargs = duk_get_top(ctx);
+
+    // require at least the ray
+    if (nargs < 1)
+    {
+        duk_push_undefined(ctx);
+        return 1;
+    }
+
+    Ray ray;
+    if (!duk_get_ray(ctx, 0, ray))
+    {
+        duk_push_undefined(ctx);
+        return 1;
+    }
+
+    RayQueryLevel level = RAY_TRIANGLE;
+    if (nargs > 1)
+    {
+        unsigned _level = (unsigned) duk_to_number(ctx, 1);
+        if (_level > (unsigned) RAY_TRIANGLE_UV)
+        {
+            duk_push_undefined(ctx);
+            return 1;
+        }
+
+        level = (RayQueryLevel) _level;
+    }
+
+    float maxDistance = M_INFINITY;
+    if (nargs > 2)
+    {
+        maxDistance = (float) duk_to_number(ctx, 2);
+    }
+
+    unsigned char drawableFlags = DRAWABLE_ANY;
+    if (nargs > 3)
+    {
+        drawableFlags = (unsigned char) duk_to_number(ctx, 3);
+    }
+
+    unsigned viewMask = DEFAULT_VIEWMASK;
+    if (nargs > 4)
+    {
+        viewMask = (unsigned) duk_to_number(ctx, 4);
+    }
+
+    duk_push_this(ctx);
+    Octree* octree = js_to_class_instance<Octree>(ctx, -1, 0);
+
+    PODVector<RayQueryResult> result;
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
+
+    single ? octree->RaycastSingle(query) : octree->Raycast(query);
+
+    // handle case of nothing hit
+    if (!result.Size())
+    {
+        if (single)
+            duk_push_null(ctx);
+        else
+            duk_push_array(ctx);
+
+        return 1;
+    }
+    else
+    {
+        if (single)
+        {
+            duk_push_rayqueryresult(ctx, result[0]);
+        }
+        else
+        {
+            duk_push_array(ctx);
+
+            for (unsigned i = 0; i < result.Size(); i++)
+            {
+                duk_push_rayqueryresult(ctx, result[i]);
+                duk_put_prop_index(ctx, -2, i);
+            }
+        }
+    }
+
+    return 1;
+}
 
 void jsapi_init_graphics(JSVM* vm)
 {
@@ -221,11 +359,26 @@ void jsapi_init_graphics(JSVM* vm)
     duk_put_prop_string(ctx, -2, "setShaderParameter");
     duk_pop(ctx);
 
+    js_class_get_prototype(ctx, "Atomic", "Octree");
+    duk_push_c_function(ctx, Octree_Raycast, DUK_VARARGS);
+    duk_set_magic(ctx, -1, (unsigned) DUK_MAGIC_RAYCAST);
+    duk_put_prop_string(ctx, -2, "rayCast");
+    duk_push_c_function(ctx, Octree_Raycast, DUK_VARARGS);
+    duk_set_magic(ctx, -1, (unsigned) DUK_MAGIC_RAYCAST_SINGLE);
+    duk_put_prop_string(ctx, -2, "rayCastSingle");
+    duk_pop(ctx);
+
+    js_class_get_prototype(ctx, "Atomic", "Camera");
+    duk_push_c_function(ctx, Camera_GetScreenRay, 2);
+    duk_put_prop_string(ctx, -2, "getScreenRay");
+    duk_pop(ctx);
+
     // static methods
     js_class_get_constructor(ctx, "Atomic", "Material");
     duk_push_c_function(ctx, Material_GetTextureUnitName, 1);
     duk_put_prop_string(ctx, -2, "getTextureUnitName");
     duk_pop(ctx);
+
 
 }
 

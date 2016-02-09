@@ -58,12 +58,19 @@ public:
     // based on whether the Getter/Setter is all caps
     // GetMyValue -> myValue;
     // GetGUID -> guid
+    // URLEnabled -> urlEnabled
     String GetCasePropertyName()
     {
         if (!name_.Length())
             return name_;
 
         bool allUpper = true;
+
+        // TODO: https://github.com/AtomicGameEngine/AtomicGameEngine/issues/587
+        if (name_ == "URLEnabled")
+        {
+            return "urlEnabled";
+        }
 
         for (unsigned k = 0; k < name_.Length(); k++)
         {

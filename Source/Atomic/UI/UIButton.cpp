@@ -35,7 +35,9 @@ using namespace tb;
 namespace Atomic
 {
 
-UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, false), emulationButton_(-1)
+UIButton::UIButton(Context* context, bool createWidget) : UIWidget(context, false),
+    emulationButton_(-1),
+    urlEnabled_(true)
 {
     if (createWidget)
     {
@@ -66,12 +68,15 @@ void UIButton::SetEmulationButton(int emulationButton)
 bool UIButton::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_CLICK)
-	{
-        String text = GetText();
-        if (text.StartsWith("http://") || text.StartsWith("https://"))
-		{
-            FileSystem* fileSystem = GetSubsystem<FileSystem>();
-            fileSystem->SystemOpen(text);
+    {
+        if (urlEnabled_)
+        {
+            String text = GetText();
+            if (text.StartsWith("http://") || text.StartsWith("https://"))
+            {
+                FileSystem* fileSystem = GetSubsystem<FileSystem>();
+                fileSystem->SystemOpen(text);
+            }
         }
     }
     if (ev.type == EVENT_TYPE_POINTER_DOWN && emulationButton_ >= 0)

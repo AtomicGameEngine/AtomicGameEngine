@@ -213,7 +213,7 @@ private:
     /// Gid to tile objectgroup  mapping.
     HashMap<int, SharedPtr<TmxObjectGroup2D> > gidToObjectGroupMapping_;
     /// Layers.
-    Vector<TmxLayer2D*> layers_;
+    Vector<SharedPtr<TmxLayer2D>> layers_;
 };
 
 }
