@@ -1,0 +1,3 @@
+[submodule "Submodules/CEF"]
+	path = Submodules/CEF
+	url = https://github.com/AtomicGameEngine/CEF3Binaries

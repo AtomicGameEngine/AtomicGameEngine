@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "System",
+        "target": "ES6",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "outFile": "../../Data/AtomicEditor/CodeEditor/editor.bundle.js",
+        "sourceMap": true
+    },
+    "filesGlob": [
+        "./**/*.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    },
+    "files": [
+        "./editor/editor.ts",
+        "./editor/editorConfig.ts",
+        "./interop.ts",
+        "./typings/ace.d.ts",
+        "./typings/AtomicQuery.d.ts"
+    ]
+}

@@ -154,7 +154,7 @@ void UI::HandleMouseWheel(StringHash eventType, VariantMap& eventData)
 
     Input* input = GetSubsystem<Input>();
 
-    rootWidget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, delta > 0 ? -1 : 1, tb::TB_MODIFIER_NONE);
+    rootWidget_->InvokeWheel(input->GetMousePosition().x_, input->GetMousePosition().y_, 0, -delta, tb::TB_MODIFIER_NONE);
 
 }
 

@@ -100,11 +100,12 @@ Asset* AssetDatabase::GetAssetByCachePath(const String& cachePath)
 {
     List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
 
-    String cacheFilename = GetFileName(cachePath);
+    // This is the GUID
+    String cacheFilename = GetFileName(cachePath).ToLower();
 
     while (itr != assets_.End())
     {
-        if ((*itr)->GetCachePath().Contains(cacheFilename))
+        if ((*itr)->GetGUID().ToLower() == cacheFilename)
             return *itr;
 
         itr++;
@@ -533,6 +534,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Material"] = "MaterialImporter";
         resourceTypeToImporterType_["Texture2D"] = "TextureImporter";
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
+        resourceTypeToImporterType_["Image"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
         resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
         resourceTypeToImporterType_["JSONFile"] = "JSONImporter";

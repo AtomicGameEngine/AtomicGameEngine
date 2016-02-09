@@ -8,19 +8,21 @@
 #pragma once
 
 #include "ResourceEditor.h"
-#include <TurboBadger/tb_editfield.h>
-#include <TurboBadger/tb_style_edit.h>
-#include <TurboBadger/tb_select.h>
 
 using namespace Atomic;
 using namespace tb;
 
+namespace Atomic
+{
+    class UIWebView;
+    class WebClient;
+    class WebMessageHandler;
+}
+
 namespace AtomicEditor
 {
 
-class JSAutocomplete; 
-
-class JSResourceEditor: public ResourceEditor, public TBStyleEditTextChangeListener
+class JSResourceEditor: public ResourceEditor
 {
     OBJECT(JSResourceEditor);
 
@@ -35,9 +37,6 @@ public:
     bool FindText(const String& findText, unsigned flags);
     void FindTextClose();
 
-    void OnChange(TBStyleEdit* styleEdit);
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
     void GotoTokenPos(int tokenPos);
     void GotoLineNumber(int lineNumber);
 
@@ -49,21 +48,14 @@ public:
 
 private:
 
-    bool ParseJavascriptToJSON(const char* source, String& json, bool loose = true);
+    void HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData);
+    void HandleWebMessage(StringHash eventType, VariantMap& eventData);
+
     bool BeautifyJavascript(const char* source, String& output);
-    void UpdateLineNumbers();
 
-    tb::TBStyleEdit* styleEdit_;
-    tb::TBSelectList* lineNumberList_;
-
-    TBEditField* editField_;
-    JSAutocomplete* autocomplete_;
-
-    float textDelta_;
-    bool textDirty_;
-
-    int currentFindPos_;
-
+    SharedPtr<UIWebView> webView_;
+    WeakPtr<WebClient> webClient_;
+    WeakPtr<WebMessageHandler> messageHandler_;
 };
 
 }

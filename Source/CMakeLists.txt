@@ -2,6 +2,12 @@
 add_subdirectory(ThirdParty)
 add_subdirectory(Atomic)
 add_subdirectory(AtomicJS)
+
+
+if (ATOMIC_WEBVIEW)
+    add_subdirectory(AtomicWebView)    
+endif()
+
 add_subdirectory(AtomicPlayer)
 add_subdirectory(AtomicPlayerJS)
 

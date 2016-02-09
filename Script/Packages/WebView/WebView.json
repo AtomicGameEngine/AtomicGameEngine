@@ -1,0 +1,6 @@
+{
+	"name" : "WebView",
+	"includes" : ["<Atomic/Graphics/DebugRenderer.h>"],
+	"sources" : ["Source/AtomicWebView"],
+	"classes" : ["WebBrowserHost", "WebClient", "WebRenderHandler", "WebTexture2D", "UIWebView"]
+}

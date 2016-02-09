@@ -140,12 +140,14 @@ bool JSONFile::BeginLoad(Deserializer& source)
     return true;
 }
 
-bool JSONFile::ParseJSON(const String& json, JSONValue& value)
+bool JSONFile::ParseJSON(const String& json, JSONValue& value, bool reportError)
 {
     rapidjson::Document document;
     if (document.Parse<0>(json.CString()).HasParseError())
     {
-        LOGERROR("Could not parse JSON data from string");
+        if (reportError)
+            LOGERROR("Could not parse JSON data from string");
+
         return false;
     }
 

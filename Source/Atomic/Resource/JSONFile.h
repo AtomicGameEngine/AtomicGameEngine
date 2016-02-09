@@ -55,7 +55,7 @@ public:
 
     // ATOMIC BEGIN
 
-    static bool ParseJSON(const String& json, JSONValue& value);
+    static bool ParseJSON(const String& json, JSONValue& value, bool reportError = true);
 
     // ATOMIC END
 
