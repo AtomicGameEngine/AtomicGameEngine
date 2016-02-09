@@ -27,7 +27,7 @@ class SerializableEditType {
 
         var value: any;
 
-        for (var i in this.objects) {
+        for (var i = 0; i < this.objects.length; i++) {
 
             var object = this.objects[i];
 

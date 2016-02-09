@@ -32,7 +32,7 @@ class Preferences {
 
     updateRecentProjects(write: boolean = false): void {
 
-        for (var i in this._prefs.recentProjects) {
+        for (var i = 0; i < this._prefs.recentProjects.length; i++) {
             var path = this._prefs.recentProjects[i];
             if (!this.fileSystem.exists(path)) {
                 this._prefs.recentProjects.splice(i, 1);

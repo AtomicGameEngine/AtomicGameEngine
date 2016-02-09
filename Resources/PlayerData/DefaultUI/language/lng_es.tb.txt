@@ -1,0 +1,16 @@
+cut Cortar
+copy Copiar
+paste Pegar
+delete Eliminar
+selectall Seleccionar todo
+undo Deshacer
+redo Rehacer
+TBMessageWindow.ok Ok
+TBMessageWindow.cancel Cancelar
+TBMessageWindow.yes Si
+TBMessageWindow.no No
+TBList.header Mostrando %d de %d
+new Nuevo
+save Guardar
+close Cerrar
+search Buscar
