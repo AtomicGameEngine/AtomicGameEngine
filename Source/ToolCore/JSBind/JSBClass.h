@@ -79,9 +79,23 @@ public:
             return name_.ToLower();
         }
 
-        String name = name_;
-        name[0] = tolower(name[0]);
-        return name;
+        for (unsigned k = 0; k < name_.Length(); k++)
+        {
+            //if-statements converts string to required format
+
+            if ('0' <= name_[k + 1] && name_[k + 1] <= '9') {//if-statement handles numbers eg: RGBA16Format -> rgba16Format
+                name_[k] = tolower(name_[k]);
+            }else if (name_[k + 1] == tolower(name_[k + 1])) {
+                break;
+            }
+
+            if (name_[k] == toupper(name_[k])) {
+                name_[k] = tolower(name_[k]);
+            }
+        }
+
+        name_[0] = tolower(name_[0]);
+        return name_;
     }
 
 };
