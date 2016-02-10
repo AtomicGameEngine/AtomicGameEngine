@@ -58,19 +58,15 @@ public:
     // based on whether the Getter/Setter is all caps
     // GetMyValue -> myValue;
     // GetGUID -> guid
-    // URLEnabled -> urlEnabled
     String GetCasePropertyName()
     {
         if (!name_.Length())
             return name_;
 
         bool allUpper = true;
+        String newName = name_;
 
         // TODO: https://github.com/AtomicGameEngine/AtomicGameEngine/issues/587
-        if (name_ == "URLEnabled")
-        {
-            return "urlEnabled";
-        }
 
         for (unsigned k = 0; k < name_.Length(); k++)
         {
@@ -86,23 +82,56 @@ public:
             return name_.ToLower();
         }
 
-        for (unsigned k = 0; k < name_.Length(); k++)
-        {
-            //if-statements converts string to required format
-
-            if ('0' <= name_[k + 1] && name_[k + 1] <= '9') {//if-statement handles numbers eg: RGBA16Format -> rgba16Format
-                name_[k] = tolower(name_[k]);
-            }else if (name_[k + 1] == tolower(name_[k + 1])) {
-                break;
-            }
-
-            if (name_[k] == toupper(name_[k])) {
-                name_[k] = tolower(name_[k]);
-            }
+        if (isupper(name_[0])) {
+            newName[0] = tolower(name_[0]);
         }
 
-        name_[0] = tolower(name_[0]);
-        return name_;
+        for (int k = 1; k < name_.Length() - 1; k++)
+        {
+            int currChar = k;
+            int prevChar = k - 1;
+            int nextChar = k + 1;
+
+            if (currChar == name_.Length() - 1) {
+                if (isupper(name_[currChar])) {
+                    if (islower(name_[prevChar])) {
+                        newName[currChar] = toupper(name_[currChar]);
+                        break;
+                    }
+                    else if (isupper(name_[prevChar])) {
+                        newName[currChar] = tolower(name_[currChar]);
+                        break;
+                    }
+                }
+                else if (islower(name_[currChar])) {
+                    break;
+                }
+            }
+
+            if ('0' <= name_[nextChar] && name_[nextChar] <= '9') {
+                newName[currChar] = tolower(name_[currChar]);
+            }
+
+            if (isupper(name_[currChar])) {
+                if ((islower(name_[prevChar])) && isupper(name_[nextChar])) {
+                    newName[currChar] = toupper(name_[currChar]);
+                }
+                else if ((islower(name_[prevChar])) && islower(name_[nextChar])) {
+                    newName[currChar] = toupper(name_[currChar]);
+                }
+                else if ((isupper(name_[prevChar])) && islower(name_[nextChar])) {
+                    newName[currChar] = toupper(name_[currChar]);
+                }
+                else if ((isupper(name_[prevChar])) && isupper(name_[nextChar])) {
+                    newName[currChar] = tolower(name_[currChar]);
+                }
+            }
+
+            if (islower(name_[currChar])) {
+                newName[currChar] = name_[currChar];
+            }
+        }
+        return newName;
     }
 
 };
