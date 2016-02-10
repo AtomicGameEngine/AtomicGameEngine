@@ -86,11 +86,15 @@ public:
             newName[0] = tolower(name_[0]);
         }
 
-        for (int k = 1; k < name_.Length() - 1; k++)
+        for (int k = 1; k < name_.Length(); k++)
         {
             int currChar = k;
             int prevChar = k - 1;
             int nextChar = k + 1;
+
+            if (nullptr) {
+                break;
+            }
 
             if (currChar == name_.Length() - 1) {
                 if (isupper(name_[currChar])) {
@@ -101,9 +105,13 @@ public:
                     else if (isupper(name_[prevChar])) {
                         newName[currChar] = tolower(name_[currChar]);
                         break;
+                    } else if ('0' <= name_[prevChar] && name_[prevChar] <= '9') {
+                        newName[currChar] = toupper(name_[currChar]);
+                        break;
                     }
-                }
-                else if (islower(name_[currChar])) {
+                } else if (islower(name_[currChar])) {
+                    break;
+                } else if ('0' <= name_[currChar] && name_[currChar] <= '9') {
                     break;
                 }
             }
