@@ -376,7 +376,7 @@ declare module ToolCore {
 
     export interface BuildCompleteEvent {
 
-        platformID: number;
+        platformId: number;
         message: string;
         success: boolean;
         buildFolder: string;

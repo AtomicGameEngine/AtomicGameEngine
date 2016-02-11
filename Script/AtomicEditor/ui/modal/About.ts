@@ -90,7 +90,7 @@ class About extends ModalWindow {
         else
             availableText += "<widget TBSkinImage: skin: 'LogoAndroid-Small'> ";
 
-            if (licenseSystem.licenseIOS)
+            if (licenseSystem.licenseIos)
                 installedText += "<widget TBSkinImage: skin: 'LogoIOS-Small'> ";
             else
                 availableText += "<widget TBSkinImage: skin: 'LogoIOS-Small'> ";
@@ -104,7 +104,7 @@ class About extends ModalWindow {
 
         text += installedText + "\n\n\n";
 
-        if (!licenseSystem.licenseIOS || !licenseSystem.licenseAndroid || !licenseSystem.licenseModule3D) {
+        if (!licenseSystem.licenseIos || !licenseSystem.licenseAndroid || !licenseSystem.licenseModule3D) {
           text += "<color #76D6FF>Available platforms and modules:</color>\n\n";
           text += availableText + "\n\n\n";
       }

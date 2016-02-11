@@ -114,7 +114,7 @@ class ResourceSelection extends ModalWindow {
 
     selectFile(): boolean {
 
-        var id = this.folderList.selectedItemID;
+        var id = this.folderList.selectedItemId;
 
         if (this.resourceType == "Animation") {
 

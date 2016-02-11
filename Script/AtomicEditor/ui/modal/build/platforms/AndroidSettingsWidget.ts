@@ -63,8 +63,8 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
                 if (path.length) {
 
                     var toolPrefs = ToolCore.toolEnvironment.toolPrefs;
-                    if (toolPrefs.androidSDKPath != path) {
-                        toolPrefs.androidSDKPath = path;
+                    if (toolPrefs.androidSdkPath != path) {
+                        toolPrefs.androidSdkPath = path;
                         toolPrefs.save();
                     }
 
@@ -101,8 +101,8 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
                 if (path.length) {
 
                     var toolPrefs = ToolCore.toolEnvironment.toolPrefs;
-                    if (toolPrefs.jDKRootPath != path) {
-                        toolPrefs.jDKRootPath = path;
+                    if (toolPrefs.jdkRootPath != path) {
+                        toolPrefs.jdkRootPath = path;
                         toolPrefs.save();
                     }
 
@@ -158,16 +158,16 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         var toolPrefs = ToolCore.toolEnvironment.toolPrefs;
 
-        sdkPathEdit.text = toolPrefs.androidSDKPath;
+        sdkPathEdit.text = toolPrefs.androidSdkPath;
         antPathEdit.text = toolPrefs.antPath;
-        jdkRootEdit.text = toolPrefs.jDKRootPath;
+        jdkRootEdit.text = toolPrefs.jdkRootPath;
 
         this.appNameEdit.text = this.settings.appName;
         this.packageNameEdit.text = this.settings.packageName;
         this.productNameEdit.text = this.settings.productName;
         this.companyNameEdit.text = this.settings.companyName;
 
-        this.sdkTargetSelect.text = this.settings.sDKVersion;
+        this.sdkTargetSelect.text = this.settings.sdkVersion;
 
     }
 
@@ -181,7 +181,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         if (this.antPathEdit.text.length && this.antPathEdit.text != ToolCore.toolEnvironment.toolPrefs.antPath)
             ToolCore.toolEnvironment.toolPrefs.antPath = this.antPathEdit.text;
 
-        this.settings.sDKVersion = this.sdkTargetSelect.text;
+        this.settings.sdkVersion = this.sdkTargetSelect.text;
 
     }
 
