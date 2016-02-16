@@ -1,5 +1,6 @@
 
 add_subdirectory(Box2D)
+add_subdirectory(crunch)
 add_subdirectory(Duktape)
 add_subdirectory(FreeType)
 add_subdirectory(JO)
