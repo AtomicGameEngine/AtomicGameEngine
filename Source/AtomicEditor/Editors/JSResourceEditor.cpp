@@ -96,7 +96,8 @@ JSResourceEditor::~JSResourceEditor()
 
 void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
 {
-    webClient_->ExecuteJavaScript(ToString("loadCode(\"atomic://resources/%s\");", fullpath_.CString()));
+    // need to wait until we get an editor load complete message since we could
+    // still be streaming things in.
 }
 
 void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventData)
@@ -104,11 +105,29 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     using namespace WebMessage;
 
     const String& request = eventData[P_REQUEST].GetString();
+    const String& EDITOR_CHANGE = "change";
+    const String& EDITOR_SAVE_CODE = "saveCode";
+    const String& EDITOR_LOAD_COMPLETE = "editorLoadComplete";
+    
+    const String& RESOURCES_MARKER = "resources/";
+    
+    // Full path is the fully qualified path from the root of the filesystem.  In order
+    // to take advantage of the resource caching system, let's trim it down to just the
+    // path inside the resources directory
+    String normalizedPath = fullpath_.SubstringUTF8(fullpath_.ToLower().Find(RESOURCES_MARKER) + RESOURCES_MARKER.Length());
+    
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
-    if (request == "change")
+    if (request == EDITOR_CHANGE)
     {
         SetModified(true);
+    }
+    else if (request == EDITOR_LOAD_COMPLETE)
+    {
+        // We need to wait until the editor javascript is all required in to call the
+        // method to load the code.  The HandleWebViewLoadEnd event is getting called
+        // too soon.
+        webClient_->ExecuteJavaScript(ToString("HOST_loadCode(\"atomic://resources/%s\");", normalizedPath.CString()));
     }
     else
     {
@@ -116,7 +135,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
         if (JSONFile::ParseJSON(request, jvalue, false))
         {
             String message = jvalue["message"].GetString();
-            if (message == "saveCode")
+            if (message == EDITOR_SAVE_CODE)
             {
                 String code = jvalue["payload"].GetString();
                 File file(context_, fullpath_, FILE_WRITE);
@@ -178,7 +197,7 @@ bool JSResourceEditor::Save()
     if (!modified_)
         return true;
 
-    webClient_->ExecuteJavaScript("saveCode();");
+    webClient_->ExecuteJavaScript("HOST_saveCode();");
 
     SetModified(false);
 
