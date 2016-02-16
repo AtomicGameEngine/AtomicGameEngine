@@ -62,8 +62,8 @@ public:
             return false;
 
         ConvertCEFString(request->GetURL(), url_);
-        // shave off atomic://resources/
-        url_ = url_.SubstringUTF8(19);
+        //shave off the atomic:// part
+        url_ = url_.SubstringUTF8(9);
 
         if (IsAbsolutePath(url_))
         {
@@ -71,6 +71,8 @@ public:
         }
         else
         {
+            //shave off the resources part so we can grab the value from the resource cache
+            url_ = url_.SubstringUTF8(10);
             ResourceCache* cache = webBrowserHost_->GetSubsystem<ResourceCache>();
             file_ = cache->GetFile(url_, false);
         }
