@@ -496,9 +496,11 @@ public:
     /// Return the current monitor number
     int GetCurrentMonitor();
     /// Return the available monitors number
-    int GetMonitorsNumber();
+    int GetNumMonitors();
     /// Return true if window is maximized
     bool GetMaximized();
+    /// Return monitor resolution
+    IntVector2 GetMonitorResolution(int monitorId) const;
     // ATOMIC END
 
 private:

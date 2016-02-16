@@ -138,10 +138,21 @@ export = ProjectFrameMenus;
 // initialization
 var StringID = strings.StringID;
 
+//Change the words "Reveal in Finder" based on platform
+var showInFs = "Reveal in File Manager";
+
+if (Atomic.platform == "Windows") {
+    showInFs = "Reveal in Explorer";
+}
+else if (Atomic.platform == "MacOSX") {
+    showInFs = "Reveal in Finder";
+}
+
+
 var assetGeneralContextItems = {
     "Rename": ["rename_asset", undefined, ""],
-    "Reveal in Finder": ["reveal_folder", undefined, ""],
     "Force Reimport": ["force_reimport", undefined, ""],
+    [showInFs]: ["reveal_folder", undefined, ""], 
     "-1": null,
     "Delete": ["delete_asset", undefined, ""]
 };
@@ -153,7 +164,7 @@ var assetFolderContextItems = {
     "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
     "-1": null,
-    "Reveal in Finder": ["reveal_folder", undefined, ""],
+    [showInFs]: ["reveal_folder", undefined, ""],
     "-2": null,
     "Delete": ["delete_asset", undefined, "FolderDeleteBitmap"]
 };

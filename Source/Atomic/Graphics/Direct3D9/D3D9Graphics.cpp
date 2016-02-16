@@ -2776,7 +2776,7 @@ int Graphics::GetCurrentMonitor()
     return SDL_GetWindowDisplayIndex((SDL_Window*) this->GetSDLWindow());
 }
 
-int Graphics::GetMonitorsNumber()
+int Graphics::GetNumMonitors()
 {
     return SDL_GetNumVideoDisplays();
 }
@@ -2787,6 +2787,13 @@ bool Graphics::GetMaximized()
         return false;
 
     return SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MAXIMIZED;
+}
+
+IntVector2 Graphics::GetMonitorResolution(int monitorId) const
+{
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(monitorId, &mode);
+    return IntVector2(mode.w, mode.h);
 }
 // ATOMIC END
 

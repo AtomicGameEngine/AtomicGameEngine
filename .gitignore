@@ -21,5 +21,3 @@ node_modules/*
 Script/TypeScript/*
 !Script/TypeScript/AtomicWork.d.ts
 Script/Haxe/*
-
-Submodules/*

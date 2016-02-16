@@ -310,8 +310,6 @@ TmxFile2D::TmxFile2D(Context* context) :
 
 TmxFile2D::~TmxFile2D()
 {
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        delete layers_[i];
 }
 
 void TmxFile2D::RegisterObject(Context* context)
@@ -408,8 +406,6 @@ bool TmxFile2D::EndLoad()
     info_.tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
     info_.tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
 
-    for (unsigned i = 0; i < layers_.Size(); ++i)
-        delete layers_[i];
     layers_.Clear();
 
     for (XMLElement childElement = rootElem.GetChild(); childElement; childElement = childElement.GetNext())
@@ -420,25 +416,24 @@ bool TmxFile2D::EndLoad()
             ret = LoadTileSet(childElement);
         else if (name == "layer")
         {
-            TmxTileLayer2D* tileLayer = new TmxTileLayer2D(this);
+            SharedPtr<TmxTileLayer2D> tileLayer (new TmxTileLayer2D(this));
             ret = tileLayer->Load(childElement, info_);
 
-            layers_.Push(tileLayer);
+            layers_.Push((SharedPtr<TmxLayer2D>)(tileLayer));
         }
         else if (name == "objectgroup")
         {
-            TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
+            SharedPtr<TmxObjectGroup2D> objectGroup (new TmxObjectGroup2D(this));
             ret = objectGroup->Load(childElement, info_);
 
-            layers_.Push(objectGroup);
-
+            layers_.Push((SharedPtr<TmxLayer2D>)(objectGroup));
         }
         else if (name == "imagelayer")
         {
-            TmxImageLayer2D* imageLayer = new TmxImageLayer2D(this);
+            SharedPtr<TmxImageLayer2D> imageLayer (new TmxImageLayer2D(this));
             ret = imageLayer->Load(childElement, info_);
 
-            layers_.Push(imageLayer);
+            layers_.Push((SharedPtr<TmxLayer2D>)(imageLayer));
         }
 
         if (!ret)

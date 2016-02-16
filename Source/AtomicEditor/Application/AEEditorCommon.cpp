@@ -7,6 +7,7 @@
 
 #include <Atomic/Engine/Engine.h>
 #include <Atomic/Input/Input.h>
+#include <Atomic/Graphics/Graphics.h>
 
 #include <Atomic/IPC/IPC.h>
 
@@ -27,6 +28,10 @@
 #include <AtomicNET/NETScript/NETScript.h>
 #endif
 
+#ifdef ATOMIC_WEBVIEW
+#include <AtomicWebView/WebBrowserHost.h>
+#endif
+
 #include "../Components/EditorComponents.h"
 
 #include "AEEditorCommon.h"
@@ -34,6 +39,7 @@
 namespace Atomic
 {
     void jsapi_init_atomicnet(JSVM* vm);
+    void jsapi_init_webview(JSVM* vm);;
 }
 
 using namespace ToolCore;
@@ -55,6 +61,8 @@ AEEditorCommon::AEEditorCommon(Context* context) :
 
 void AEEditorCommon::Start()
 {
+    ValidateWindow();
+
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -64,9 +72,18 @@ void AEEditorCommon::Start()
 
     jsapi_init_toolcore(vm_);
 
+#ifdef ATOMIC_WEBVIEW
+    // Initialize in Start so window already exists
+    context_->RegisterSubsystem(new WebBrowserHost(context_));
+    jsapi_init_webview(vm_);
+#endif
+
+
 #ifdef ATOMIC_DOTNET
     jsapi_init_atomicnet(vm_);
 #endif
+
+
 
 }
 
@@ -174,35 +191,17 @@ bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
     root["recentProjects"] = JSONArray();
 
     JSONValue editorWindow;
-    editorWindow["x"] = 0;
-    editorWindow["y"] = 0;
-    editorWindow["width"] = 0;
-    editorWindow["height"] = 0;
-    editorWindow["monitor"] = 0;
-    editorWindow["maximized"] = true;
+    GetDefaultWindowPreferences(editorWindow, true);
 
     JSONValue playerWindow;
-    playerWindow["x"] = 0;
-    playerWindow["y"] = 0;
-    playerWindow["width"] = 0;
-    playerWindow["height"] = 0;
-    playerWindow["monitor"] = 0;
-    playerWindow["maximized"] = false;
+    GetDefaultWindowPreferences(playerWindow, false);
 
     root["editorWindow"] = editorWindow;
     root["playerWindow"] = playerWindow;
 
-    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
-
-    if (!file->IsOpen())
-    {
-        LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
-        return false;
-    }
-
-    jsonFile->Save(*file, "   ");
-
     prefs = root;
+
+    SavePreferences(prefs);
 
     return true;
 }
@@ -210,10 +209,85 @@ bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)
 bool AEEditorCommon::ReadPreferences()
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
-    path += "prefs.json";
+    String path = GetPreferencesPath();
 
     JSONValue prefs;
+
+    LoadPreferences(prefs);
+
+    if (!prefs.IsObject() || !prefs["editorWindow"].IsObject())
+    {
+        if (!CreateDefaultPreferences(path, prefs))
+            return false;
+    }
+
+    JSONValue& editorWindow = prefs["editorWindow"];
+
+    engineParameters_["WindowPositionX"] = editorWindow["x"].GetUInt();
+    engineParameters_["WindowPositionY"] = editorWindow["y"].GetUInt();
+    engineParameters_["WindowWidth"] = editorWindow["width"].GetUInt();
+    engineParameters_["WindowHeight"] = editorWindow["height"].GetUInt();
+    engineParameters_["WindowMaximized"] = editorWindow["maximized"].GetBool();
+
+    return true;
+}
+
+void AEEditorCommon::ValidateWindow()
+{
+    Graphics* graphics = GetSubsystem<Graphics>();
+    IntVector2 windowPosition = graphics->GetWindowPosition();
+    int monitors = graphics->GetNumMonitors();
+    IntVector2 maxResolution;
+
+    for (int i = 0; i < monitors; i++)
+    {
+        IntVector2 monitorResolution = graphics->GetMonitorResolution(i);
+        maxResolution += monitorResolution;
+    }
+
+    if (windowPosition.x_ >= maxResolution.x_ || windowPosition.y_ >= maxResolution.y_ || (windowPosition.x_ + graphics->GetWidth()) < 0 || (windowPosition.y_ + graphics->GetHeight()) < 0)
+    {
+        JSONValue prefs;
+
+        if (!LoadPreferences(prefs))
+            return;
+
+        bool editor = context_->GetEditorContext();
+
+        JSONValue window;
+        GetDefaultWindowPreferences(window, editor);
+
+        prefs[editor ? "editorWindow" : "playerWindow"] = window;
+
+        //Setting the mode to 0 width/height will use engine defaults for window size and layout
+        graphics->SetMode(0, 0, graphics->GetFullscreen(), graphics->GetBorderless(), graphics->GetResizable(), graphics->GetVSync(), graphics->GetTripleBuffer(), graphics->GetMultiSample(), editor);
+
+        SavePreferences(prefs);
+    }
+}
+
+void AEEditorCommon::GetDefaultWindowPreferences(JSONValue& windowPrefs, bool maximized)
+{
+    windowPrefs["x"] = 0;
+    windowPrefs["y"] = 0;
+    windowPrefs["width"] = 0;
+    windowPrefs["height"] = 0;
+    windowPrefs["monitor"] = 0;
+    windowPrefs["maximized"] = maximized;
+}
+
+String AEEditorCommon::GetPreferencesPath()
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = fileSystem->GetAppPreferencesDir("AtomicEditor", "Preferences");
+    path += "prefs.json";
+    return path;
+}
+
+bool AEEditorCommon::LoadPreferences(JSONValue& prefs)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = GetPreferencesPath();
 
     if (!fileSystem->FileExists(path))
     {
@@ -236,22 +310,31 @@ bool AEEditorCommon::ReadPreferences()
             prefs = jsonFile->GetRoot();
         }
 
+        file->Close();
     }
 
-    if (!prefs.IsObject() || !prefs["editorWindow"].IsObject())
+    return true;
+}
+
+bool AEEditorCommon::SavePreferences(JSONValue& prefs)
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String path = GetPreferencesPath();
+
+    SharedPtr<File> file(new File(context_, path, FILE_WRITE));
+    SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    jsonFile->GetRoot() = prefs;
+
+    if (!file->IsOpen())
     {
-        if (!CreateDefaultPreferences(path, prefs))
-            return false;
+        LOGERRORF("Unable to open Atomic Editor preferences for writing: %s", path.CString());
+        return false;
     }
 
-    JSONValue& editorWindow = prefs["editorWindow"];
-
-    engineParameters_["WindowPositionX"] = editorWindow["x"].GetUInt();
-    engineParameters_["WindowPositionY"] = editorWindow["y"].GetUInt();
-    engineParameters_["WindowWidth"] = editorWindow["width"].GetUInt();
-    engineParameters_["WindowHeight"] = editorWindow["height"].GetUInt();
-    engineParameters_["WindowMaximized"] = editorWindow["maximized"].GetBool();
-
+    jsonFile->Save(*file, "   ");
+    file->Close();
+    
     return true;
 }
 
