@@ -19,6 +19,7 @@ class ProjectFrame extends ScriptWidget {
     resourceFolder: ToolCore.Asset;
     assetGUIDToItemID = {};
     resourcesID: number = -1;
+    assetReferencePath: string = null;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -50,6 +51,7 @@ class ProjectFrame extends ScriptWidget {
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
         this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
+        this.subscribeToEvent(EditorEvents.InspectorProjectReference, (ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path) });
 
         folderList.subscribeToEvent("UIListViewSelectionChanged", (event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event));
 
@@ -213,7 +215,6 @@ class ProjectFrame extends ScriptWidget {
                     } else {
 
                         this.sendEvent(EditorEvents.EditResource, { "path": asset.path });
-
                     }
 
                 }
@@ -382,6 +383,19 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    // Shows referenced file in projectframe
+    handleInspectorProjectReferenceHighlight(path: string): void {
+
+        this.assetReferencePath = path;
+        var db = ToolCore.getAssetDatabase();
+        var asset = db.getAssetByPath(this.resourceFolder.getPath() + "/" + path);
+      
+        this.folderList.selectAllItems(false);
+        this.folderList.selectItemByID(asset.parent.guid, true);    
+        this.refreshContent(asset.parent);
+        this.folderList.scrollToSelectedItem();  
+    }
+
     private refreshContent(folder: ToolCore.Asset) {
 
         if (this.currentFolder != folder) {
@@ -441,6 +455,14 @@ class ProjectFrame extends ScriptWidget {
         blayout.addChild(spacer);
 
         var button = new Atomic.UIButton();
+
+        //Get the path of the button and compare it to the asset's path to highlight 
+        var texturePath = this.resourceFolder.getPath() + "/" + this.assetReferencePath;
+
+        //Highlight Button UI
+        if (texturePath == asset.path) {
+            button.setState(4, true);
+        }
 
         // setup the drag object
         button.dragObject = new Atomic.UIDragObject(asset, asset.name);
