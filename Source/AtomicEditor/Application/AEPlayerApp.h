@@ -49,7 +49,7 @@ private:
 
     bool debugPlayer_;
 
-    bool runningFromEditorPlay_;
+    bool launchedByEditor_;
 
 };
 
