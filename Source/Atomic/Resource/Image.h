@@ -138,12 +138,18 @@ public:
     bool SaveTGA(const String& fileName) const;
     /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality) const;
+    /// Save in DDS format. Return true if successful.
+    bool SaveDDS(const String& fileName) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.
     bool IsArray() const { return array_; }
     /// Whether this texture is in sRGB, only relevant for DDS.
     bool IsSRGB() const { return sRGB_; }
+    /// Whether this texture has power of two dimensions
+    bool IsPOT() const { return pot_; }
+    /// Whether this texture has an alpha channel
+    bool HasAlphaChannel() const { return hasAlphaChannel_; }
 
     /// Return a 2D pixel color.
     Color GetPixel(int x, int y) const;
@@ -219,6 +225,10 @@ private:
     bool array_;
     /// Data is sRGB.
     bool sRGB_;
+    /// Dimensions are power of two
+    bool pot_;
+    /// Image has alpha channel
+    bool hasAlphaChannel_;
     /// Compressed format.
     CompressedFormat compressedFormat_;
     /// Pixel data.

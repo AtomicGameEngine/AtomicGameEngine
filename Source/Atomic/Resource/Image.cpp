@@ -33,6 +33,7 @@
 #include <SDL/include/SDL_surface.h>
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
+#include <crunch/inc/crnlib.h>
 
 #include "../DebugNew.h"
 
@@ -246,7 +247,9 @@ Image::Image(Context* context) :
     components_(0),
     cubemap_(false),
     array_(false),
-    sRGB_(false)
+    sRGB_(false),
+    pot_(false),
+    hasAlphaChannel_(false)
 {
 }
 
@@ -800,6 +803,8 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
     components_ = components;
     compressedFormat_ = CF_NONE;
     numCompressedLevels_ = 0;
+    pot_ = IsPowerOfTwo(width_) && IsPowerOfTwo(height_);
+    hasAlphaChannel_ = components > 3;
     nextLevel_.Reset();
 
     SetMemoryUse(width * height * depth * components);
@@ -1209,6 +1214,91 @@ bool Image::SaveJPG(const String& fileName, int quality) const
         return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
     else
         return false;
+}
+
+bool Image::SaveDDS(const String& fileName) const
+{
+    PROFILE(SaveImageDDS);
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to DDS");
+        return false;
+    }
+
+    if (data_)
+    {
+        // #623 BEGIN TODO: Should have an abstract ImageReader and ImageWriter classes
+        // with subclasses for particular image output types. Also should have image settings in the image meta.
+        // ImageReader/Writers should also support a progress callback so UI can be updated.
+
+        // Compression setup
+        crn_comp_params compParams;
+        compParams.m_width = width_;
+        compParams.m_height = height_;
+        compParams.set_flag(cCRNCompFlagPerceptual, true); // IsSRGB() incorrectly returning false
+        compParams.set_flag(cCRNCompFlagDXT1AForTransparency, false);
+        compParams.set_flag(cCRNCompFlagHierarchical, true);
+        compParams.m_file_type = cCRNFileTypeDDS;
+        compParams.m_format = (hasAlphaChannel_ ? cCRNFmtDXT5 : cCRNFmtDXT1);
+
+        compParams.m_pImages[0][0] = (uint32_t*)data_.Get();
+
+        compParams.m_target_bitrate = 0;
+        compParams.m_quality_level = 255;
+        compParams.m_num_helper_threads = 1;
+        compParams.m_pProgress_func = nullptr;
+
+        // Mipmap setup
+        crn_mipmap_params mipParams;
+        mipParams.m_gamma_filtering = true; // IsSRGB() incorrectly returns false
+        mipParams.m_mode = cCRNMipModeNoMips; // or cCRNMipModeGenerateMips
+
+        // Output params
+        crn_uint32 actualQualityLevel;
+        float actualBitrate;
+        crn_uint32 outputFileSize;
+
+        void* compressedData = crn_compress(
+            compParams, 
+            mipParams, 
+            outputFileSize, 
+            &actualQualityLevel, 
+            &actualBitrate);
+
+        if (nullptr == compressedData)
+        {
+            LOGERROR("Failed to compress image to DXT");
+            return false;
+        }
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
+
+        if (dest.Null())
+        {
+            // Open error already logged
+            crn_free_block(compressedData);
+            return false;
+        }
+        else
+        {
+            bool success = dest->Write(compressedData, outputFileSize) == outputFileSize;
+            crn_free_block(compressedData);
+            return success;
+        }
+        
+        // #623 END TODO
+    }
+
+    return false;
 }
 
 Color Image::GetPixel(int x, int y) const
