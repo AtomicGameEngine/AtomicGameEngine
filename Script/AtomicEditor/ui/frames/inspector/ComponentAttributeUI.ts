@@ -9,6 +9,7 @@ import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import AttributeInfoEdit = require("./AttributeInfoEdit");
 import SerializableEditType = require("./SerializableEditType");
+import EditorEvents = require("editor/EditorEvents");
 
 class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
@@ -106,6 +107,7 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
 interface MaterialEdit {
 
     index: number;
+    pathReference: string;
     editField: Atomic.UIEditField;
     selectButton: Atomic.UIButton;
 
@@ -141,7 +143,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         var selectButton = o.selectButton;
 
-        var materialEdit: MaterialEdit = { index: materialIndex, editField: o.editField, selectButton: selectButton };
+        var materialEdit: MaterialEdit = { index: materialIndex, pathReference: "" , editField: o.editField, selectButton: selectButton };
         this.materialEdits[materialIndex] = materialEdit;
 
         var resourceTypeName = "Material";
@@ -199,6 +201,16 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         });
 
+        o.editField.subscribeToEvent(o.editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
+
+            if (ev.widget == o.editField && o.editField.focus) {
+
+                var pathName = materialEdit.pathReference;
+                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+
+             }
+
+        });
     }
 
     createEditWidget() {
@@ -332,6 +344,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
                     var pathinfo = Atomic.splitPath(text);
                     matEdit.editField.text = pathinfo.fileName;
+                    matEdit.pathReference = text;
                 }
 
 

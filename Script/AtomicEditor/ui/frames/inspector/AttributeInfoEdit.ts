@@ -8,6 +8,7 @@
 import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
+import EditorEvents = require("editor/EditorEvents");
 
 class AttributeInfoEdit extends Atomic.UILayout {
 
@@ -700,6 +701,37 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                     }
                 }
                 this.editField.text = text;
+
+                this.editField.subscribeToEvent(this.editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
+
+                    if (ev.widget == this.editField && this.editField.focus) {
+
+                        resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+
+                        if (resource instanceof Atomic.JSComponentFile) {
+
+                            var pathName = resource.name;
+                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+
+                        } else if (resource instanceof Atomic.Model) {
+
+                            var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+
+                        } else if (resource instanceof Atomic.Animation) {
+
+                             var animCacheReferenceName = resource.name.replace("_"+(<Atomic.Animation>resource).animationName, "");
+                             var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
+                             this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+
+                        } else {
+
+                            console.debug("Unknown resource reference type.");
+
+                        }
+                    }
+
+                });
             }
 
 

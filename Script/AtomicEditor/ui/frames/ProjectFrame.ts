@@ -20,6 +20,9 @@ class ProjectFrame extends ScriptWidget {
     assetGUIDToItemID = {};
     resourcesID: number = -1;
     assetReferencePath: string = null;
+    currentReferencedButton: Atomic.UIButton = null;
+    containerScrollToHeight: number;
+    containerScrollToHeightCounter: number;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -221,6 +224,11 @@ class ProjectFrame extends ScriptWidget {
 
             }
 
+            if (this.currentReferencedButton) {
+                this.currentReferencedButton.setState(4, false);
+                this.currentReferencedButton = null;
+            }
+
         }
 
         return false;
@@ -385,15 +393,14 @@ class ProjectFrame extends ScriptWidget {
 
     // Shows referenced file in projectframe
     handleInspectorProjectReferenceHighlight(path: string): void {
-
         this.assetReferencePath = path;
         var db = ToolCore.getAssetDatabase();
         var asset = db.getAssetByPath(this.resourceFolder.getPath() + "/" + path);
-      
+
         this.folderList.selectAllItems(false);
-        this.folderList.selectItemByID(asset.parent.guid, true);    
+        this.folderList.selectItemByID(asset.parent.guid, true);
         this.refreshContent(asset.parent);
-        this.folderList.scrollToSelectedItem();  
+        this.folderList.scrollToSelectedItem();
     }
 
     private refreshContent(folder: ToolCore.Asset) {
@@ -413,12 +420,17 @@ class ProjectFrame extends ScriptWidget {
 
         var assets = db.getFolderAssets(folder.path);
 
+        this.containerScrollToHeightCounter = 0;
+
         for (var i in assets) {
 
             var asset = assets[i];
-
             container.addChild(this.createButtonLayout(asset));
+            this.containerScrollToHeightCounter++;
         }
+       
+        var containerScroll: Atomic.UIScrollContainer = <Atomic.UIScrollContainer>this.getWidget("contentcontainerscroll");
+        containerScroll.scrollTo(0, this.containerScrollToHeight);
 
     }
 
@@ -456,19 +468,25 @@ class ProjectFrame extends ScriptWidget {
 
         var button = new Atomic.UIButton();
 
-        //Get the path of the button and compare it to the asset's path to highlight 
-        var texturePath = this.resourceFolder.getPath() + "/" + this.assetReferencePath;
 
-        //Highlight Button UI
-        if (texturePath == asset.path) {
-            button.setState(4, true);
-        }
 
         // setup the drag object
         button.dragObject = new Atomic.UIDragObject(asset, asset.name);
 
         var lp = new Atomic.UILayoutParams;
-        lp.height = 20;
+        var buttonHeight = lp.height = 20;
+        
+        //Get the path of the button and compare it to the asset's path to highlight 
+        var resourcePath = this.resourceFolder.getPath() + "/" + this.assetReferencePath;
+
+        //Highlight Button UI
+        if (resourcePath == asset.path) {
+
+            button.setState(4, true);
+            this.currentReferencedButton = button;
+            this.containerScrollToHeight = this.containerScrollToHeightCounter * buttonHeight;
+
+        }
 
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";

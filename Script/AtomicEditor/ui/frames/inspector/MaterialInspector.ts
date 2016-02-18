@@ -266,7 +266,7 @@ class MaterialInspector extends ScriptWidget {
             var texture = this.material.getTexture(textureUnit);
 
             if (texture != null) {
-                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });            
+                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });
             } else {
                 this.openTextureSelectionBox(textureUnit, textureWidget);
             }
