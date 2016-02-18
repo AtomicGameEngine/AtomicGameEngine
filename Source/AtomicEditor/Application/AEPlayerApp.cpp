@@ -53,7 +53,7 @@ namespace AtomicEditor
 AEPlayerApplication::AEPlayerApplication(Context* context) :
     AEEditorCommon(context),
     debugPlayer_(false),
-    runningFromEditorPlay_(false)
+    launchedByEditor_(false)
 {
 }
 
@@ -101,8 +101,10 @@ void AEPlayerApplication::Setup()
     ReadCommandLineArguments();
 
     // Re-apply project settings if running from editor play button
-    if (runningFromEditorPlay_)
+    if (launchedByEditor_)
+    {
         EngineConfig::ApplyConfig(engineParameters_, true);
+    }
 
     // Use the script file name as the base name for the log file
     engineParameters_["LogName"] = GetSubsystem<FileSystem>()->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log";
@@ -163,9 +165,11 @@ void AEPlayerApplication::ReadCommandLineArguments()
             {
                 SubscribeToEvent(E_LOGMESSAGE, HANDLER(AEPlayerApplication, HandleLogMessage));
             }
-            else if (argument == "--fromeditorplay")
+            else if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
             {
-                runningFromEditorPlay_ = true;
+                // If we have IPC server/client we're being launched from the Editor
+                // TODO: Unify this with AEPlayerMode handling
+                launchedByEditor_ = true;
             }
             else if (argument == "--debug")
             {
