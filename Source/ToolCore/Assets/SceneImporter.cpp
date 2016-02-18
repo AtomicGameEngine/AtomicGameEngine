@@ -5,6 +5,8 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+#include <Atomic/Core/StringUtils.h>
+
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "SceneImporter.h"
@@ -25,6 +27,9 @@ SceneImporter::~SceneImporter()
 void SceneImporter::SetDefaults()
 {
     AssetImporter::SetDefaults();
+
+    sceneCamRotation_ = Quaternion::IDENTITY;
+    sceneCamPosition_ = Vector3::ZERO;
 }
 
 bool SceneImporter::Import()
@@ -39,6 +44,14 @@ bool SceneImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 
     JSONValue import = jsonRoot.Get("SceneImporter");
 
+    SetDefaults();
+
+    if (import.Get("sceneCamRotation").IsString())
+        sceneCamRotation_ = ToQuaternion(import.Get("sceneCamRotation").GetString());
+
+    if (import.Get("sceneCamPosition").IsString())
+        sceneCamPosition_ = ToVector3(import.Get("sceneCamPosition").GetString());
+
     return true;
 }
 
@@ -47,8 +60,12 @@ bool SceneImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     if (!AssetImporter::SaveSettingsInternal(jsonRoot))
         return false;
 
-    JSONValue import(JSONValue::emptyObject);
-    jsonRoot.Set("SceneImporter", import);
+    JSONValue save;
+
+    save.Set("sceneCamRotation", sceneCamRotation_.ToString());
+    save.Set("sceneCamPosition", sceneCamPosition_.ToString());
+
+    jsonRoot.Set("SceneImporter", save);
 
     return true;
 }
