@@ -30,6 +30,7 @@ class Octree;
 namespace ToolCore
 {
     class ProjectUserPrefs;
+    class SceneImporter;
 }
 
 using namespace ToolCore;
@@ -110,6 +111,7 @@ private:
 
     SharedPtr<SceneSelection> selection_;
     SharedPtr<SceneEditHistory> editHistory_;
+    SharedPtr<SceneImporter> sceneImporter_;
 
     SharedPtr<Node> clipboardNode_;
 

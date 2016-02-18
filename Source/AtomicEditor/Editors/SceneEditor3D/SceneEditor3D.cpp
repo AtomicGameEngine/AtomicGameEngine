@@ -29,6 +29,7 @@
 #include <ToolCore/Project/ProjectUserPrefs.h>
 #include <ToolCore/Assets/AssetDatabase.h>
 #include <ToolCore/Assets/Asset.h>
+#include <ToolCore/Assets/SceneImporter.h>
 
 
 #include "../../EditorMode/AEEditorEvents.h"
@@ -71,24 +72,19 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     sceneView_ = new SceneView3D(context_, this);
     editHistory_ = new SceneEditHistory(context, this);
 
-    // EARLY ACCESS
-    if (fullpath.Find(String("ToonTown")) != String::NPOS)
+    AssetDatabase* assetDB = GetSubsystem<AssetDatabase>();
+    Asset* sceneAsset = assetDB->GetAssetByPath(fullpath);
+
+    if (sceneAsset)
     {
-        sceneView_->GetCameraNode()->SetWorldPosition(Vector3(-119.073f, 76.1121f, 16.47763f));
-        Quaternion q(0.55f, 0.14f,  0.8f, -0.2f);
-        sceneView_->SetYaw(q.YawAngle());
-        sceneView_->SetPitch(q.PitchAngle());
-        sceneView_->GetCameraNode()->SetWorldRotation(q);
+        sceneImporter_ = static_cast<SceneImporter*>(sceneAsset->GetImporter());
+        sceneView_->GetCameraNode()->SetWorldPosition(sceneImporter_->GetSceneCamPosition());
+        sceneView_->SetPitch(sceneImporter_->GetSceneCamRotation().PitchAngle());
+        sceneView_->SetYaw(sceneImporter_->GetSceneCamRotation().YawAngle());
     }
     else
     {
-        Node* playerSpawn = scene_->GetChild("PlayerInfoStart", true);
-        if (playerSpawn)
-        {
-            sceneView_->GetCameraNode()->SetPosition(playerSpawn->GetPosition());
-            sceneView_->SetYaw(playerSpawn->GetRotation().EulerAngles().y_);
-        }
-
+        LOGERRORF("SceneEditor3D::SceneEditor3D - Unable to get scene asset");
     }
 
     sceneView_->SetGravity(UI_GRAVITY_ALL);
@@ -236,6 +232,14 @@ void SceneEditor3D::Close(bool navigateToAvailableResource)
     VariantMap data;
     data["Scene"] = scene_;
     SendEvent("EditorSceneClosed", data);
+
+    if (sceneImporter_.NotNull())
+    {
+        sceneImporter_->SetSceneCamPosition(sceneView_->GetCameraNode()->GetWorldPosition());
+        sceneImporter_->SetSceneCamRotation(sceneView_->GetCameraNode()->GetWorldRotation());
+        sceneImporter_->GetAsset()->Save();
+        sceneImporter_ = nullptr;
+    }
 
     ResourceEditor::Close(navigateToAvailableResource);
 }
