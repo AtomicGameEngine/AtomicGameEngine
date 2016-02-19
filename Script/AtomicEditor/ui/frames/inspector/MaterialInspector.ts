@@ -276,8 +276,7 @@ class MaterialInspector extends ScriptWidget {
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR ,Atomic.TU_EMISSIVE];//, Atomic.TU_ENVIRONMENT,
-        //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
+        var textureUnits = [ Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR, Atomic.TU_EMISSIVE ];
 
         for (var i in textureUnits) {
 
