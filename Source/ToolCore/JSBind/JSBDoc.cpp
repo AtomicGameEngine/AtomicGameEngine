@@ -50,7 +50,11 @@ static String GetScriptType(JSBFunctionType* ftype)
 
 void JSBDoc::Begin()
 {
-    source_ += "//Atomic JSDoc Definitions\n\n\n";
+    source_ += "//////////////////////////////////////////////////////////\n";
+    source_ += "// IMPORTANT: THIS FILE IS GENERATED, CHANGES WILL BE LOST\n";
+    source_ += "//////////////////////////////////////////////////////////\n\n";
+
+    source_ += "//Atomic JSDoc Definitions\n\n";
 
     source_ += "/**\n * Atomic Game Engine\n * @namespace\n*/\n var " + package_->GetName() + " = {}\n\n";
 }
