@@ -29,7 +29,7 @@ export default class JavascriptLanguageExtension implements Editor.ClientExtensi
      */
     private isValidFiletype(path: string): boolean {
         let ext = path.split(".").pop();
-        return ext == "ts";
+        return ext == "js";
     }
 
     /**
