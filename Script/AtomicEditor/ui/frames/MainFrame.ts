@@ -33,7 +33,7 @@ import ScriptWidget = require("ui/ScriptWidget");
 import MainFrameMenu = require("./menus/MainFrameMenu");
 
 import MenuItemSources = require("./menus/MenuItemSources");
-import ServiceLocator from "../../extensionServices/ServiceLocator";
+import ServiceLocator from "../../hostExtensions/ServiceLocator";
 
 class MainFrame extends ScriptWidget {
 

@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+// TODO: migrate these interfaces out to the d.ts and migrate the static strings to some common location
 export const ModalError = "ModalError";
 export interface ModalErrorEvent {
 

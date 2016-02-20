@@ -25,14 +25,10 @@
         "./AtomicEditor/editor/EditorEvents.ts",
         "./AtomicEditor/editor/EditorLicense.ts",
         "./AtomicEditor/editor/Preferences.ts",
-        "./AtomicEditor/extensionServices/EditorExtensionServices.ts",
-        "./AtomicEditor/extensionServices/resourceServices/TypescriptLanguageService.ts",
-        "./AtomicEditor/extensionServices/resourceServices/TypscriptLanguageExtension.ts",
-        "./AtomicEditor/extensionServices/ServiceLocator.ts",
+        "./AtomicEditor/hostExtensions/HostExtensionServices.ts",
+        "./AtomicEditor/hostExtensions/languageExtensions/TypscriptLanguageExtension.ts",
+        "./AtomicEditor/hostExtensions/ServiceLocator.ts",
         "./AtomicEditor/main.ts",
-        "./AtomicEditor/modules/metrics.ts",
-        "./AtomicEditor/modules/typescript.d.ts",
-        "./AtomicEditor/modules/usertiming.d.ts",
         "./AtomicEditor/resources/ProjectTemplates.ts",
         "./AtomicEditor/resources/ResourceOps.ts",
         "./AtomicEditor/ui/EditorStrings.ts",
@@ -97,6 +93,13 @@
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
         "./AtomicEditor/ui/UIEvents.ts",
-        "./TypeScript/AtomicWork.d.ts"
+        "./TypeScript/Atomic.d.ts",
+        "./TypeScript/AtomicNET.d.ts",
+        "./TypeScript/AtomicPlayer.d.ts",
+        "./TypeScript/AtomicWork.d.ts",
+        "./TypeScript/Editor.d.ts",
+        "./TypeScript/EditorWork.d.ts",
+        "./TypeScript/ToolCore.d.ts",
+        "./TypeScript/WebView.d.ts"
     ]
 }

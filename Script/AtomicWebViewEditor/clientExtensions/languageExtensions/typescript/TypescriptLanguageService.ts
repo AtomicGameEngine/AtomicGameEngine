@@ -6,7 +6,7 @@
 //
 // Based upon the TypeScript language services example at https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API#incremental-build-support-using-the-language-services
 
-import * as ts from "modules/typescript";
+import * as ts from "../../../modules/typescript";
 
 /**
  * Abstraction over the file system
@@ -45,10 +45,23 @@ export class TypescriptLanguageService {
 
     constructor(fs: FileSystemInterface) {
         this.fs = fs;
+
+        // Create the language service files
+        this.documentRegistry = ts.createDocumentRegistry();
+        this.createLanguageService(this.documentRegistry);
     }
 
     private fs: FileSystemInterface = null;
     private languageService: ts.LanguageService = null;
+    private documentRegistry: ts.DocumentRegistry = null;
+
+    public compilerOptions: ts.CompilerOptions = {
+        noEmitOnError: true,
+        noImplicitAny: false,
+        target: ts.ScriptTarget.ES5,
+        module: ts.ModuleKind.CommonJS,
+        noLib: true
+    };
 
     name: string = "TypescriptLanguageService";
 
@@ -61,16 +74,87 @@ export class TypescriptLanguageService {
     private projectFiles: string[] = [];
     private versionMap: ts.Map<{ version: number, snapshot?: ts.IScriptSnapshot }> = {};
 
+    private createLanguageService(documentRegistry: ts.DocumentRegistry) {
+
+        // Create the language service host to allow the LS to communicate with the host
+        const servicesHost: ts.LanguageServiceHost = {
+            getScriptFileNames: () => this.projectFiles,
+            getScriptVersion: (fileName) => this.versionMap[fileName] && this.versionMap[fileName].version.toString(),
+            getScriptSnapshot: (filename) => {
+                const scriptVersion = this.versionMap[filename];
+                // if (!this.fs.fileExists(fileName)) {
+                //     if (scriptVersion) {
+                //         delete this.versionMap[fileName];
+                //         let idx = this.projectFiles.indexOf(fileName);
+                //         if (idx > -1) {
+                //             this.projectFiles.splice(idx, 1);
+                //         }
+                //     }
+                //     console.log("file not exist: " + fileName);
+                //     return undefined;
+                // }
+
+                // Grab the cached version
+                if (scriptVersion) {
+                    if (scriptVersion.snapshot) {
+                        console.log(`returning snapshot for ${filename} version ${scriptVersion.version}`);
+                        return scriptVersion.snapshot;
+                    } else {
+                        console.log(`!!! creating snapshot for ${filename}`);
+                        let sourceFile = this.documentRegistry.acquireDocument(filename, this.compilerOptions, ts.ScriptSnapshot.fromString(""), scriptVersion.version.toString());
+                        return ts.ScriptSnapshot.fromString(sourceFile.text);
+                        //let script = this.fs.getFile(fileName);
+                        //scriptVersion.snapshot = ts.ScriptSnapshot.fromString(script);
+                        //return scriptVersion.snapshot;
+                    }
+                } else {
+                    // console.log(`no script version for ${fileName}`);
+                }
+            },
+            getCurrentDirectory: () => this.fs.getCurrentDirectory(),
+            getCompilationSettings: () => this.compilerOptions,
+            getDefaultLibFileName: (options) => undefined
+        };
+
+        this.languageService = ts.createLanguageService(servicesHost, documentRegistry);
+    }
+
     /**
      * Adds a file to the internal project cache
-     * @param  {string} file the full path of the file to add
+     * @param  {string} filename the full path of the file to add
+     * @param [{sring}] fileContents optional file contents.  If not provided, the filesystem object will be queried
      */
-    addProjectFile(file: string) {
-        if (this.projectFiles.indexOf(file) == -1) {
-            console.log("ADDED: " + file);
-            this.versionMap[file] = { version: 0 };
-            this.projectFiles.push(file);
+    addProjectFile(filename: string, fileContents?: string) {
+        if (this.projectFiles.indexOf(filename) == -1) {
+            console.log("Added project file: " + filename);
+            this.versionMap[filename] = {
+                version: 0,
+                snapshot: ts.ScriptSnapshot.fromString(fileContents || this.fs.getFile(filename))
+            };
+            this.projectFiles.push(filename);
+            this.documentRegistry.acquireDocument(
+                filename,
+                this.compilerOptions,
+                this.versionMap[filename].snapshot,
+                "0");
         }
+    }
+
+    /**
+     * Updates the internal file representation.
+     * @param  {string} filename name of the file
+     * @param  {string} fileContents optional contents of the file.  If not provided, the file system object will be queried
+     * @return {ts.SourceFile}
+     */
+    updateProjectFile(filename: string, fileContents?: string): ts.SourceFile {
+        console.log("Updated project file: " + filename);
+        this.versionMap[filename].version++;
+        this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents || this.fs.getFile(filename));
+        return this.documentRegistry.updateDocument(
+            filename,
+            this.compilerOptions,
+            this.versionMap[filename].snapshot,
+            this.versionMap[filename].version.toString());
     }
 
     /**
@@ -78,7 +162,10 @@ export class TypescriptLanguageService {
      * @param {string[]}           fileNames array of files to transpile
      * @param {ts.CompilerOptions} options   compiler options
      */
-    transpile(fileNames: string[], options: ts.CompilerOptions): void {
+    transpile(fileNames: string[], options?: ts.CompilerOptions): void {
+        options = options || this.compilerOptions;
+        this.compilerOptions = options;
+
         fileNames.forEach((fileName) => {
             console.log(`${this.name}:  Transpiling ${fileName}`);
             let script = this.fs.getFile(fileName);
@@ -87,7 +174,6 @@ export class TypescriptLanguageService {
             if (diagnostics.length) {
                 this.logErrors(diagnostics);
             }
-
             if (diagnostics.length == 0) {
                 this.fs.writeFile(fileName.replace(".ts", ".js"), result);
             }
@@ -95,12 +181,45 @@ export class TypescriptLanguageService {
     }
 
     /**
+     * Converts the line and character offset to a position
+     * @param  {ts.SourceFile} file
+     * @param  {number} line
+     * @param  {number} character
+     * @return {number}
+     */
+    getPositionOfLineAndCharacter(file: ts.SourceFile, line: number, character: number): number {
+        return ts.getPositionOfLineAndCharacter(file, line, character);
+    }
+
+    /**
+     * Returns the completions available at the provided position
+     * @param  {string} filename
+     * @param  {number} position
+     * @return {ts.CompletionInfo}
+     */
+    getCompletions(filename: string, pos: number): ts.CompletionInfo {
+        return this.languageService.getCompletionsAtPosition(filename, pos);
+    }
+
+    /**
+     * Returns details of this completion entry
+     * @param  {string} filename
+     * @param  {number} pos
+     * @param  {string} entryname
+     * @return {ts.CompletionEntryDetails}
+     */
+    getCompletionEntryDetails(filename: string, pos: number, entryname: string): ts.CompletionEntryDetails {
+        return this.languageService.getCompletionEntryDetails(filename, pos, entryname);
+    }
+    /**
      * Compile the provided file to javascript with full type checking etc
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
      */
-    compile(files: string[], options: ts.CompilerOptions): void {
+    compile(files: string[], options?: ts.CompilerOptions): void {
         let start = new Date().getTime();
+
+        options = options || this.compilerOptions;
 
         //Make sure we have these files in the project
         files.forEach((file) => {
@@ -109,49 +228,8 @@ export class TypescriptLanguageService {
 
         let errors: ts.Diagnostic[] = [];
 
-        if (!this.languageService) {
-            // This is the first time in.  Need to create a language service
-
-            // Create the language service host to allow the LS to communicate with the host
-            const servicesHost: ts.LanguageServiceHost = {
-                getScriptFileNames: () => this.projectFiles,
-                getScriptVersion: (fileName) => this.versionMap[fileName] && this.versionMap[fileName].version.toString(),
-                getScriptSnapshot: (fileName) => {
-                    const scriptVersion = this.versionMap[fileName];
-                    if (!this.fs.fileExists(fileName)) {
-                        if (scriptVersion) {
-                            delete this.versionMap[fileName];
-                            let idx = this.projectFiles.indexOf(fileName);
-                            if (idx > -1) {
-                                this.projectFiles.splice(idx, 1);
-                            }
-                        }
-                        return undefined;
-                    }
-
-                    // Grab the cached version
-                    if (scriptVersion) {
-                        if (scriptVersion.snapshot) {
-                            console.log(`cache hit snapshot for ${fileName}`);
-                            return scriptVersion.snapshot;
-                        } else {
-                            let script = this.fs.getFile(fileName);
-                            scriptVersion.snapshot = ts.ScriptSnapshot.fromString(script);
-                            return scriptVersion.snapshot;
-                        }
-                    } else {
-                        console.log(`no script version for ${fileName}`);
-                    }
-                },
-                getCurrentDirectory: () => this.fs.getCurrentDirectory(),
-                getCompilationSettings: () => options,
-                getDefaultLibFileName: (options) => undefined
-            };
-
-            // Create the language service files
-            this.languageService = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
-
-            // This is the first time in, let's compile all the files
+        if (files.length == 0) {
+            // We haven't passed any files in, so let's compile them all
             this.projectFiles.forEach(filename => {
                 errors = errors.concat(this.compileFile(filename));
             });
@@ -209,7 +287,7 @@ export class TypescriptLanguageService {
     reset() {
         this.projectFiles = [];
         this.versionMap = {};
-        this.languageService = null;
+        //this.languageService = null;
     }
 
     /**
@@ -262,7 +340,13 @@ export class TypescriptLanguageService {
         diagnostics.forEach(diagnostic => {
             let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
             if (diagnostic.file) {
-                let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                let d = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                let line = d.line;
+                let character = d.character;
+
+                // NOTE: Destructuring throws an error in chrome web view
+                //let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+
                 msg.push(`${this.name}:  Error ${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
             }
             else {
