@@ -105,17 +105,18 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     using namespace WebMessage;
 
     const String& request = eventData[P_REQUEST].GetString();
-    const String& EDITOR_CHANGE = "change";
-    const String& EDITOR_SAVE_CODE = "saveCode";
+    const String& EDITOR_CHANGE = "editorChange";
+    const String& EDITOR_SAVE_CODE = "editorSaveCode";
+    const String& EDITOR_SAVE_FILE = "editorSaveFile";
     const String& EDITOR_LOAD_COMPLETE = "editorLoadComplete";
     
     const String& RESOURCES_MARKER = "resources/";
     
     // Full path is the fully qualified path from the root of the filesystem.  In order
     // to take advantage of the resource caching system, let's trim it down to just the
-    // path inside the resources directory
-    String normalizedPath = fullpath_.SubstringUTF8(fullpath_.ToLower().Find(RESOURCES_MARKER) + RESOURCES_MARKER.Length());
-    
+    // path inside the resources directory including the Resources directory so that the casing
+    // correct.
+    String normalizedPath = fullpath_.SubstringUTF8(fullpath_.ToLower().Find(RESOURCES_MARKER));
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
     if (request == EDITOR_CHANGE)
@@ -127,7 +128,7 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
         // We need to wait until the editor javascript is all required in to call the
         // method to load the code.  The HandleWebViewLoadEnd event is getting called
         // too soon.
-        webClient_->ExecuteJavaScript(ToString("HOST_loadCode(\"atomic://resources/%s\");", normalizedPath.CString()));
+        webClient_->ExecuteJavaScript(ToString("HOST_loadCode(\"atomic://%s\");", normalizedPath.CString()));
     }
     else
     {
@@ -139,6 +140,15 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
             {
                 String code = jvalue["payload"].GetString();
                 File file(context_, fullpath_, FILE_WRITE);
+                file.Write((void*) code.CString(), code.Length());
+                file.Close();
+            }
+            else if (message == EDITOR_SAVE_FILE)
+            {
+                String code = jvalue["payload"].GetString();
+                String fn = jvalue["filename"].GetString();
+                // TODO: determine if we are absolute path or partial path
+                File file(context_, fn, FILE_WRITE);
                 file.Write((void*) code.CString(), code.Length());
                 file.Close();
             }
