@@ -90,12 +90,11 @@ namespace('build', function() {
 
                 // copy some external dependencies into the editor modules directory
                var editorModulesDir = "./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules";
+               var webeditorModulesDir = "./Data/AtomicEditor/CodeEditor/source/editorCore/modules";
                var nodeModulesDir = "./Build/node_modules";
                fs.mkdirsSync(editorModulesDir);
                // TypeScript
-               fs.copySync(nodeModulesDir + "/typescript/lib/typescript.js", editorModulesDir + "/typescript.js")
-               // UserTiming - for measuring and metrics
-               fs.copySync(nodeModulesDir + "/usertiming/src/usertiming.js", editorModulesDir + "/usertiming.js")
+               fs.copySync(nodeModulesDir + "/typescript/lib/typescript.js", webeditorModulesDir + "/typescript.js")
 
                // copy lib.core.d.ts into the tool data directory
                fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
