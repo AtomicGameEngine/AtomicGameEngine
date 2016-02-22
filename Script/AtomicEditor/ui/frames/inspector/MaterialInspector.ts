@@ -74,6 +74,10 @@ for (var key in techniqueLookup) {
 
 class MaterialInspector extends ScriptWidget {
 
+    currentTexture: Atomic.UITextureWidget = null;
+    tunit: number;
+    textureWidget: Atomic.UITextureWidget 
+
     constructor() {
 
         super();
@@ -81,7 +85,7 @@ class MaterialInspector extends ScriptWidget {
         this.fd.id = "Vera";
         this.fd.size = 11;
 
-
+        this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => this.createTextureRemoveButtonCallback(this.tunit, this.textureWidget));
     }
 
     createShaderParametersSection(): Atomic.UISection {
@@ -265,7 +269,7 @@ class MaterialInspector extends ScriptWidget {
 
             var texture = this.material.getTexture(textureUnit);
 
-            if (texture != null) {
+            if (textureWidget.getTexture() != null) {
                 this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });
             } else {
                 this.openTextureSelectionBox(textureUnit, textureWidget);
@@ -281,9 +285,22 @@ class MaterialInspector extends ScriptWidget {
     createTextureReferenceButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
         return () => {
+            this.tunit = textureUnit;
+            this.textureWidget = textureWidget;
             this.openTextureSelectionBox(textureUnit, textureWidget);
             return true;
         };
+    }
+
+    //Remove Texture Button
+    createTextureRemoveButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
+
+            var texture = this.material.getTexture(textureUnit);
+
+            if (texture != null && textureWidget != null) {
+                textureWidget.setTexture(null);
+            }
+
     }
 
     createTextureSection(): Atomic.UISection {

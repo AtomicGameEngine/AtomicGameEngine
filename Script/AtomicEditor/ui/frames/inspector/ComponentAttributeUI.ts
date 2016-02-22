@@ -123,12 +123,46 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
     enabledCheckBox: Atomic.UICheckBox;
     nameField: Atomic.UITextField;
     name: string;
+    matIndex: number;
 
     constructor(name: string) {
 
         super();
         this.name = name;
         this.hideName = true;
+
+        this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => {
+
+            this.editType.onAttributeInfoEdited(this.attrInfo, null, this.matIndex);
+            this.refresh();
+        });
+
+
+    }
+
+    openResourceSelectionBox(materialIndex: number, resourceTypeName: string, importerName: string) {
+
+        this.matIndex = materialIndex;
+
+        EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function (retObject: any) {
+
+            var resource: Atomic.Resource = null;
+
+            if (retObject instanceof ToolCore.Asset) {
+
+                resource = (<ToolCore.Asset>retObject).getResource(resourceTypeName);
+
+            } else if (retObject instanceof Atomic.Resource) {
+
+                resource = <Atomic.Resource>retObject;
+
+            }
+
+            this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
+            this.refresh();
+
+        }.bind(this));
+
     }
 
     createMaterialEdit(materialIndex: number) {
@@ -149,26 +183,11 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
         var resourceTypeName = "Material";
         var importerName = ToolCore.assetDatabase.getResourceImporterName(resourceTypeName);
 
+
         selectButton.onClick = () => {
 
-            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function(retObject: any) {
+            this.openResourceSelectionBox(materialIndex, resourceTypeName, importerName);
 
-                var resource: Atomic.Resource = null;
-
-                if (retObject instanceof ToolCore.Asset) {
-
-                    resource = (<ToolCore.Asset>retObject).getResource(resourceTypeName);
-
-                } else if (retObject instanceof Atomic.Resource) {
-
-                    resource = <Atomic.Resource>retObject;
-
-                }
-
-                this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
-                this.refresh();
-
-            }.bind(this));
         };
 
         // handle dropping of component on field
@@ -203,12 +222,15 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         o.editField.subscribeToEvent(o.editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
 
-            if (ev.widget == o.editField && o.editField.focus) {
+            if (ev.widget == o.editField && o.editField.focus && o.editField.text != "") {
 
                 var pathName = materialEdit.pathReference;
                 this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
 
-             }
+            } else if (o.editField.text == "") {
+
+                this.openResourceSelectionBox(materialIndex, resourceTypeName, importerName);
+            }
 
         });
     }

@@ -99,3 +99,8 @@ export interface InspectorProjectReferenceEvent {
 
 }
 
+export const RemoveCurrentAssetAssigned = "RemoveCurrentAssetAssigned";
+export interface RemoveCurrentAssetAssignedEvent {
+
+}
+
