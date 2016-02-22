@@ -726,7 +726,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                         } else {
 
-                            console.debug("Unknown resource reference type.");
+                            //Unknown Resource
 
                         }
                     }
