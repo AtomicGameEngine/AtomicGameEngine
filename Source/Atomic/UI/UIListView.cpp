@@ -852,7 +852,7 @@ void UIListView::SendItemSelectedChanged(ListViewItem* item)
 
 }
 
-void UIListView::selectItem(ListViewItem* item, bool select)
+void UIListView::SelectItem(ListViewItem* item, bool select)
 {
     item->SetSelected(select);
     UpdateItemVisibility();
@@ -906,11 +906,11 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
                         for (int j = first + 1; j < i; j++)
                         {
                             ListViewItem* itemSelect = source_->GetItem(j);
-                            selectItem(itemSelect, true);
+                            SelectItem(itemSelect, true);
                             SetValueFirstSelected();
                         }
 
-                        selectItem(item, true);
+                        SelectItem(item, true);
                         SetValueFirstSelected();
                     }
                     else if (i < first)
@@ -918,11 +918,11 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
                         for (int j = first - 1; j > i; j--)
                         {
                             ListViewItem* itemSelect = source_->GetItem(j);
-                            selectItem(itemSelect, true);
+                            SelectItem(itemSelect, true);
                             SetValueFirstSelected();
                         }
 
-                        selectItem(item, true);
+                        SelectItem(item, true);
                         SetValueFirstSelected();
                     }
                 }
@@ -930,11 +930,11 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
                 {
                     if (item->GetSelected())
                     {
-                        selectItem(item, false);
+                        SelectItem(item, false);
                     }
                     else
                     {
-                        selectItem(item, true);
+                        SelectItem(item, true);
                     }
 
                     SetValueFirstSelected();
