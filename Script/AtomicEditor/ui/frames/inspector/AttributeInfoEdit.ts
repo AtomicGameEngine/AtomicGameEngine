@@ -702,9 +702,9 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                 }
                 this.editField.text = text;
 
-                this.editField.subscribeToEvent(this.editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
+                this.editField.subscribeToEvent(this.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
 
-                    if (ev.widget == this.editField && this.editField.focus) {
+                    if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
 
                         resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
 

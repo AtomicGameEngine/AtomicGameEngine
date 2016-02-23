@@ -220,9 +220,9 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         });
 
-        o.editField.subscribeToEvent(o.editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
+        o.editField.subscribeToEvent(o.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
 
-            if (ev.widget == o.editField && o.editField.focus && o.editField.text != "") {
+            if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
 
                 var pathName = materialEdit.pathReference;
                 this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
