@@ -46,8 +46,8 @@ class PlayerOutput extends Atomic.UIWindow {
 
         if (text.length > 32768)
             this.output.text = "";
-
-        this.output.appendText("\n" + ev.message);//Ensures all subsequent \n operators and player text outputs correctly
+        //Ensures all subsequent \n operators and player text outputs correctly
+        this.output.appendText("\n" + ev.message);
 
         this.output.scrollTo(0, 0xffffff);
     }

@@ -108,6 +108,26 @@ public:
         if (isupper(name_[nameLength - 1]) && isupper(prevChar))
             newName[nameLength - 1] = tolower(name_[nameLength - 1]);
 
+        //Checks IOS at front
+        if (name_.StartsWith("IOS", false))
+        {
+            newName[0] = tolower(name_[0]);
+            newName[1] = tolower(name_[1]);
+            newName[2] = tolower(name_[2]);
+        }
+
+        int lastLetter = nameLength - 1;
+        int secondLast = nameLength - 2;
+        int thirdLast = nameLength - 3;
+
+        //Check IOS at back
+        if (name_.EndsWith("IOS", false))
+        {
+            newName[lastLetter] = toupper(name_[lastLetter]);
+            newName[secondLast] = toupper(name_[secondLast]);
+            newName[thirdLast] = toupper(name_[thirdLast]);
+        }
+
         return newName;
     }
 
