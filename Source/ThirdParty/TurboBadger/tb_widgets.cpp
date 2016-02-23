@@ -630,6 +630,9 @@ bool TBWidget::MoveFocus(bool forward)
     if (!root)
         root = origin->GetParentRoot();
 
+    if (root == origin)
+        return false;
+
     TBWidget *current = origin;
     while (current)
     {

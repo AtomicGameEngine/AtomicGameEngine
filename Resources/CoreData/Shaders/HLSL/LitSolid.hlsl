@@ -231,6 +231,8 @@ void PS(
             finalColor = diff * diffColor.rgb * cAmbientColor;
 
             oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
+		#elif defined(LIGHTMAP)            
+            oColor = float4(0.0, 0.0, 0.0, 0.0);
         #else
             float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
 
@@ -310,11 +312,16 @@ void PS(
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif
 
-        #ifdef ENVCUBEMAP
-            finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
-        #endif
         #ifdef LIGHTMAP
             finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
+			
+			#ifdef ENVCUBEMAP
+				finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb * Sample2D(EmissiveMap, iTexCoord2).rgb;
+			#endif
+		#else
+			#ifdef ENVCUBEMAP
+				finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
+			#endif
         #endif
         #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;
