@@ -40,7 +40,7 @@ public:
     static bool LoadFromJSON(const String& json);
 
     /// Apply the configuration to a setting variant map, values that exist will not be overriden
-    static void ApplyConfig(VariantMap& settings);
+    static void ApplyConfig(VariantMap& settings, bool overwrite = false);
 
     static const VariantMap& GetConfig() { return engineConfig_; }
 
