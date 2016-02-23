@@ -1910,6 +1910,7 @@ bool Bind::visit(SimpleDeclarationAST *ast)
 
             if (Function *funTy = decl->type()->asFunctionType()) {
                 funTy->setMethodKey(methodKey);
+                funTy->setVisibility(_visibility);
 
                 bool pureVirtualInit = it->value->equal_token
                         && it->value->initializer
