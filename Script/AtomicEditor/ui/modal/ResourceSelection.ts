@@ -21,6 +21,8 @@ class ResourceSelection extends ModalWindow {
         var db = ToolCore.assetDatabase;
         var assets = db.getAssetsByImporterType(importerType, resourceType);
 
+        this.folderList.addRootItem("None", "", "");
+
         for (var i in assets) {
 
             var asset = assets[i];
@@ -115,6 +117,12 @@ class ResourceSelection extends ModalWindow {
     selectFile(): boolean {
 
         var id = this.folderList.selectedItemID;
+
+        if (id == "") {
+            this.sendEvent(EditorEvents.RemoveCurrentAssetAssigned);
+            this.hide();
+            return true;
+        }
 
         if (this.resourceType == "Animation") {
 

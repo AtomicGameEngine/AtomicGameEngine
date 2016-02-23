@@ -104,6 +104,13 @@ UI_SCROLL_MODE UIScrollContainer::GetScrollMode()
 
 }
 
+void UIScrollContainer::ScrollTo(int x, int y)
+{
+    if (!widget_)
+        return;
+
+    return ((TBScrollContainer *)widget_)->ScrollTo(x, y);
+}
 
 bool UIScrollContainer::OnEvent(const tb::TBWidgetEvent &ev)
 {

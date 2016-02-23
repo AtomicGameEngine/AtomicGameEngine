@@ -63,6 +63,8 @@ public:
     void SetAdaptContentSize(bool adapt);
     bool GetAdaptContentSize();
 
+    void ScrollTo(int x, int y);
+
 
 protected:
 

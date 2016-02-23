@@ -852,6 +852,13 @@ void UIListView::SendItemSelectedChanged(ListViewItem* item)
 
 }
 
+void UIListView::SelectItem(ListViewItem* item, bool select)
+{
+    item->SetSelected(select);
+    UpdateItemVisibility();
+    SendItemSelectedChanged(item);
+}
+
 bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
 {
     if (ev.type == EVENT_TYPE_KEY_UP )
@@ -883,25 +890,51 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
             if (item->id == ev.target->GetID())
             {
                 bool multi = false;
-                if (multiSelect_ && (ev.modifierkeys & TB_SHIFT || ev.modifierkeys & TB_CTRL || ev.modifierkeys & TB_SUPER))
+                if (multiSelect_ && (ev.modifierkeys & TB_CTRL || ev.modifierkeys & TB_SUPER))
                     multi = true;
 
-                if (multi)
+                bool shiftMulti = false;
+                if (multiSelect_ && (ev.modifierkeys & TB_SHIFT))
+                    shiftMulti = true;
+
+                if (shiftMulti)
+                {
+                    int first = rootList_->GetValue();
+
+                    if (i > first)
+                    {
+                        for (int j = first + 1; j < i; j++)
+                        {
+                            ListViewItem* itemSelect = source_->GetItem(j);
+                            SelectItem(itemSelect, true);
+                            SetValueFirstSelected();
+                        }
+
+                        SelectItem(item, true);
+                        SetValueFirstSelected();
+                    }
+                    else if (i < first)
+                    {
+                        for (int j = first - 1; j > i; j--)
+                        {
+                            ListViewItem* itemSelect = source_->GetItem(j);
+                            SelectItem(itemSelect, true);
+                            SetValueFirstSelected();
+                        }
+
+                        SelectItem(item, true);
+                        SetValueFirstSelected();
+                    }
+                }
+                else if (multi)
                 {
                     if (item->GetSelected())
                     {
-                        item->SetSelected(false);
-                        UpdateItemVisibility();
-
-                        SendItemSelectedChanged(item);
+                        SelectItem(item, false);
                     }
                     else
                     {
-
-                        item->SetSelected(true);
-                        UpdateItemVisibility();
-
-                        SendItemSelectedChanged(item);
+                        SelectItem(item, true);
                     }
 
                     SetValueFirstSelected();
