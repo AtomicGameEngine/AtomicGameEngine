@@ -95,7 +95,7 @@ void UIDragDrop::DragEnd()
     dragSourceWidget_ = 0;
     dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
-    if (currentTargetWidget.Null() || dragSourceWidget == currentTargetWidget)
+    if (currentTargetWidget.Null())
     {
         return;
     }
