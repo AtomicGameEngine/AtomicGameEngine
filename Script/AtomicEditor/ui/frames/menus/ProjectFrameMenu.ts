@@ -152,7 +152,7 @@ else if (Atomic.platform == "MacOSX") {
 var assetGeneralContextItems = {
     "Rename": ["rename_asset", undefined, ""],
     "Force Reimport": ["force_reimport", undefined, ""],
-    [showInFs]: ["reveal_folder", undefined, ""], 
+    [showInFs]: ["reveal_folder", undefined, ""],
     "-1": null,
     "Delete": ["delete_asset", undefined, ""]
 };

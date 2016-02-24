@@ -90,3 +90,17 @@ export interface SceneEditStateChangeEvent {
   serializable: Atomic.Serializable;
 
 }
+
+export const InspectorProjectReference = "InspectorProjectReference";
+export interface InspectorProjectReferenceEvent {
+
+    // The full path to the resource to edit
+    path: string;
+
+}
+
+export const RemoveCurrentAssetAssigned = "RemoveCurrentAssetAssigned";
+export interface RemoveCurrentAssetAssignedEvent {
+
+}
+

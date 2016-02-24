@@ -19,6 +19,10 @@ class ProjectFrame extends ScriptWidget {
     resourceFolder: ToolCore.Asset;
     assetGUIDToItemID = {};
     resourcesID: number = -1;
+    assetReferencePath: string = null;
+    currentReferencedButton: Atomic.UIButton = null;
+    containerScrollToHeight: number;
+    containerScrollToHeightCounter: number;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -50,6 +54,7 @@ class ProjectFrame extends ScriptWidget {
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
         this.subscribeToEvent("ResourceRemoved", (ev: ToolCore.ResourceRemovedEvent) => this.handleResourceRemoved(ev));
         this.subscribeToEvent("AssetRenamed", (ev: ToolCore.AssetRenamedEvent) => this.handleAssetRenamed(ev));
+        this.subscribeToEvent(EditorEvents.InspectorProjectReference, (ev: EditorEvents.InspectorProjectReferenceEvent) => { this.handleInspectorProjectReferenceHighlight(ev.path) });
 
         folderList.subscribeToEvent("UIListViewSelectionChanged", (event: Atomic.UIListViewSelectionChangedEvent) => this.handleFolderListSelectionChangedEvent(event));
 
@@ -213,11 +218,15 @@ class ProjectFrame extends ScriptWidget {
                     } else {
 
                         this.sendEvent(EditorEvents.EditResource, { "path": asset.path });
-
                     }
 
                 }
 
+            }
+
+            if (this.currentReferencedButton) {
+                this.currentReferencedButton.setState(4, false);
+                this.currentReferencedButton = null;
             }
 
         }
@@ -382,6 +391,18 @@ class ProjectFrame extends ScriptWidget {
 
     }
 
+    // Shows referenced file in projectframe
+    handleInspectorProjectReferenceHighlight(path: string): void {
+        this.assetReferencePath = path;
+        var db = ToolCore.getAssetDatabase();
+        var asset = db.getAssetByPath(this.resourceFolder.getPath() + "/" + path);
+
+        this.folderList.selectAllItems(false);
+        this.folderList.selectItemByID(asset.parent.guid, true);
+        this.refreshContent(asset.parent);
+        this.folderList.scrollToSelectedItem();
+    }
+
     private refreshContent(folder: ToolCore.Asset) {
 
         if (this.currentFolder != folder) {
@@ -399,12 +420,17 @@ class ProjectFrame extends ScriptWidget {
 
         var assets = db.getFolderAssets(folder.path);
 
+        this.containerScrollToHeightCounter = 0;
+
         for (var i in assets) {
 
             var asset = assets[i];
-
             container.addChild(this.createButtonLayout(asset));
+            this.containerScrollToHeightCounter++;
         }
+       
+        var containerScroll: Atomic.UIScrollContainer = <Atomic.UIScrollContainer>this.getWidget("contentcontainerscroll");
+        containerScroll.scrollTo(0, this.containerScrollToHeight);
 
     }
 
@@ -442,11 +468,25 @@ class ProjectFrame extends ScriptWidget {
 
         var button = new Atomic.UIButton();
 
+
+
         // setup the drag object
         button.dragObject = new Atomic.UIDragObject(asset, asset.name);
 
         var lp = new Atomic.UILayoutParams;
-        lp.height = 20;
+        var buttonHeight = lp.height = 20;
+        
+        //Get the path of the button and compare it to the asset's path to highlight 
+        var resourcePath = this.resourceFolder.getPath() + "/" + this.assetReferencePath;
+
+        //Highlight Button UI
+        if (resourcePath == asset.path) {
+
+            button.setState(4, true);
+            this.currentReferencedButton = button;
+            this.containerScrollToHeight = this.containerScrollToHeightCounter * buttonHeight;
+
+        }
 
         var fd = new Atomic.UIFontDescription();
         fd.id = "Vera";

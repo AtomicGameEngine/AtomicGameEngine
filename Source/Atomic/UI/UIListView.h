@@ -96,6 +96,8 @@ private:
 
     unsigned itemLookupId_;
 
+    void SelectItem(ListViewItem* item, bool select);
+
 };
 
 }

@@ -8,6 +8,7 @@
 import InspectorWidget = require("./InspectorWidget");
 import ArrayEditWidget = require("./ArrayEditWidget");
 import InspectorUtils = require("./InspectorUtils");
+import EditorEvents = require("editor/EditorEvents");
 
 class ModelInspector extends InspectorWidget {
 
@@ -74,6 +75,15 @@ class ModelInspector extends InspectorWidget {
         var lp = new Atomic.UILayoutParams();
         editField.readOnly = true;
         editField.text = asset.name;
+
+        //This should preferably be onClick
+        editField.subscribeToEvent(editField, "UIWidgetFocusChanged", (ev: Atomic.UIWidgetFocusChangedEvent) => {
+
+            if (ev.widget == editField && editField.focus) {
+                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+            }
+
+        });
 
         this.scaleEdit = InspectorUtils.createAttrEditField("Scale", modelLayout);
         this.scaleEdit.text = this.importer.scale.toString();

@@ -75,8 +75,11 @@ String JSBTypeScript::GetScriptType(JSBFunctionType* ftype)
 
 void JSBTypeScript::Begin()
 {
-    source_ += "//Atomic TypeScript Definitions\n\n\n";
+    source_ += "//////////////////////////////////////////////////////////\n";
+    source_ += "// IMPORTANT: THIS FILE IS GENERATED, CHANGES WILL BE LOST\n";
+    source_ += "//////////////////////////////////////////////////////////\n\n";
 
+    source_ += "// Atomic TypeScript Definitions\n\n";
 
     if (package_->GetName() != "Atomic")
     {
