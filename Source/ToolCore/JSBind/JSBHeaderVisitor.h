@@ -272,7 +272,10 @@ public:
         if (name.StartsWith("operator "))
             return NULL;
 
-        if (name == klass->GetNativeName())
+        if (name == klass->GetNativeName() && function->isPrivate())
+            jfunction->SetPrivateConstructor();
+
+        if (name == klass->GetNativeName() && function->isPublic())
             jfunction->SetConstructor();
 
         if (name.StartsWith("~"))
@@ -476,9 +479,6 @@ public:
 
             Declaration* decl = symbol->asDeclaration();
 
-            if (name == "RefCounted" && getNameString(symbol->name()) == "RefCounted")
-                int i = 0;
-
             // if the function describes the body in the header
             Function* function = symbol->asFunction();
 
@@ -492,8 +492,16 @@ public:
                     jclass->SetAbstract();
 
                 JSBFunction* jfunction = processFunction(jclass, function);
+
                 if (jfunction)
+                {
+                    if (jfunction->IsPrivateConstructor())
+                    {
+                        jclass->SetHasPrivateConstruct(true);
+                        continue;
+                    }
                     jclass->AddFunction(jfunction);
+                }
             }
 
         }

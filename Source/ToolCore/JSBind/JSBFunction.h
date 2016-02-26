@@ -119,7 +119,8 @@ public:
                                    isConstructor_(false), isDestructor_(false),
                                    isGetter_(false), isSetter_(false),
                                    isOverload_(false), skip_(false), 
-                                   isVirtual_(false), isStatic_(false)
+                                   isVirtual_(false), isStatic_(false),
+                                   isPrivateConstructor_(false)
     {
 
     }
@@ -136,6 +137,7 @@ public:
     bool IsVirtual() { return isVirtual_; }
     bool IsStatic() { return isStatic_; }
     bool Skip() { return skip_; }
+    bool IsPrivateConstructor() { return isPrivateConstructor_; }
 
     JSBClass* GetClass() { return class_; }
     const String& GetPropertyName() { return propertyName_; }
@@ -159,6 +161,7 @@ public:
     void SetSkip(bool value) { skip_ = value; }
     void SetReturnType(JSBFunctionType* retType) { returnType_ = retType; }
     void SetDocString(const String& docString) { docString_ = docString; }
+    void SetPrivateConstructor(bool value = true) { isPrivateConstructor_ = value; }
 
     int FirstDefaultParameter()
     {
@@ -229,6 +232,7 @@ private:
     bool isVirtual_;
     bool isStatic_;
     bool skip_;
+    bool isPrivateConstructor_;
 
 };
 
