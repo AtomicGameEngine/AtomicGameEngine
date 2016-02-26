@@ -38,7 +38,11 @@ void JSModuleWriter::WriteForwardDeclarations(String& source)
         if (cls->IsNumberArray())
             continue;
 
-        source.AppendWithFormat("static duk_ret_t jsb_constructor_%s(duk_context* ctx);\n", cls->GetName().CString());
+        JSBFunction* constructor = cls->GetConstructor();
+
+        if (constructor)
+            source.AppendWithFormat("static duk_ret_t jsb_constructor_%s(duk_context* ctx);\n", cls->GetName().CString());
+
         source.AppendWithFormat("static void jsb_class_define_%s(JSVM* vm);\n", cls->GetName().CString());
 
     }
@@ -61,7 +65,10 @@ void JSModuleWriter::WriteClassDeclaration(String& source)
         if (klass->IsNumberArray())
             continue;
 
-        source.AppendWithFormat("   js_class_declare<%s>(vm, \"%s\", \"%s\", jsb_constructor_%s);\n", klass->GetNativeName().CString(), packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
+        JSBFunction* constructor = klass->GetConstructor();
+
+        if (constructor)
+            source.AppendWithFormat("   js_class_declare<%s>(vm, \"%s\", \"%s\", jsb_constructor_%s);\n", klass->GetNativeName().CString(), packageName.CString(), klass->GetName().CString(), klass->GetName().CString());
 
         if (klass->HasProperties())
         {

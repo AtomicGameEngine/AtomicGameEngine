@@ -56,8 +56,13 @@ void CSClassWriter::GenerateNativeSource(String& sourceOut)
 
     JSBPackage* package = klass_->GetPackage();
 
-    source.AppendWithFormat("ATOMIC_EXPORT_API ClassID csb_%s_%s_GetClassIDStatic()\n{\n", package->GetName().CString(),klass_->GetName().CString());
-    source.AppendWithFormat("   return %s::GetClassIDStatic();\n}\n\n", klass_->GetNativeName().CString());
+    JSBFunction* constructor = klass_->GetConstructor();
+
+    if (constructor)
+    {
+        source.AppendWithFormat("ATOMIC_EXPORT_API ClassID csb_%s_%s_GetClassIDStatic()\n{\n", package->GetName().CString(), klass_->GetName().CString());
+        source.AppendWithFormat("   return %s::GetClassIDStatic();\n}\n\n", klass_->GetNativeName().CString());
+    }
 
     WriteNativeFunctions(source);
 
