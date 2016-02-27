@@ -192,7 +192,8 @@ mark_as_advanced(DISABLED_THREADSAFE)
 option(ENABLE_IPV6 "Define if you want to enable IPv6 support" ON)
 mark_as_advanced(ENABLE_IPV6)
 if(ENABLE_IPV6 AND NOT WIN32)
-  if(IOS)
+  if(APPLE)
+    # This is for both iOS and OSX
     set(HAVE_SOCKADDR_IN6_SIN6_ADDR 1)
     set(HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1)
   else()
@@ -256,7 +257,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES AIX)
 endif(${CMAKE_SYSTEM_NAME} MATCHES AIX)
 
 # Include all the necessary files for macros
-if(NOT IOS)
+if(NOT APPLE)
+  # This not used for either iOS or OSX
   include (CheckFunctionExists)
   include (CheckIncludeFile)
   include (CheckIncludeFiles)
@@ -284,7 +286,8 @@ if(ENABLE_THREADED_RESOLVER)
 endif()
 
 # Check for all needed libraries
-if(IOS)
+if(APPLE)
+  # This is for both iOS and OSX
   set(HAVE_LIBDL OFF)
   set(HAVE_LIBSOCKET OFF)
   set(NOT_NEED_LIBNSL ON)
@@ -305,7 +308,8 @@ if(NOT NOT_NEED_LIBNSL)
   check_library_exists_concat("nsl"    gethostbyname  HAVE_LIBNSL)
 endif(NOT NOT_NEED_LIBNSL)
 
-if(NOT IOS)
+if(NOT APPLE)
+  # This not used for both iOS or OSX
   check_function_exists(gethostname HAVE_GETHOSTNAME)
 endif()
 
@@ -315,6 +319,7 @@ if(WIN32)
 endif()
 
 if (WIN32 OR APPLE)
+  # Use platform spicific encryption on Windows, iOS, and OSX.
   option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" OFF)
 else()
   option(CMAKE_USE_OPENSSL "Use OpenSSL code. Experimental" ON)
@@ -336,7 +341,7 @@ if(CMAKE_USE_OPENSSL)
     set(HAVE_LIBSSL ON)
     include_directories(${OPENSSL_INCLUDE_DIR})
     set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
-    if(IOS)
+    if(APPLE)
       set(HAVE_OPENSSL_CRYPTO_H ON)
       set(HAVE_OPENSSL_ENGINE_H ON)
       set(HAVE_OPENSSL_ERR_H ON)
@@ -467,7 +472,9 @@ if(NOT CURL_DISABLE_LDAPS)
   check_include_file_concat("ldapssl.h"  HAVE_LDAPSSL_H)
 endif()
 
-if(NOT IOS)
+if(NOT APPLE)
+  # This not used for either iOS or OSX
+
   # Check for idn
   check_library_exists_concat("idn" idna_to_ascii_lz HAVE_LIBIDN)
 
@@ -585,7 +592,8 @@ endif()
 
 option(ENABLE_UNIX_SOCKETS "Define if you want Unix domain sockets support" ON)
 if(ENABLE_UNIX_SOCKETS)
-  if(IOS)
+  if(APPLE)
+    # This is for both iOS and OSX
     set(USE_UNIX_SOCKETS ON)
   else()
     include(CheckStructHasMember)
@@ -603,7 +611,8 @@ if(NOT UNIX)
   check_include_file_concat("winsock.h"      HAVE_WINSOCK_H)
 endif(NOT UNIX)
 
-if(IOS)
+if(APPLE)
+  # This is for both iOS and OSX
   set(HAVE_INTTYPES_H ON)
   set(HAVE_SYS_FILIO_H ON)
   set(HAVE_SYS_IOCTL_H ON)
@@ -687,7 +696,7 @@ if(IOS)
   set(SIZEOF___INT64 8)
   set(SIZEOF_LONG_DOUBLE 8)
   set(SIZEOF_TIME_T 8)
-else(IOS)
+else(APPLE)
   check_include_file_concat("inttypes.h"       HAVE_INTTYPES_H)
   check_include_file_concat("sys/filio.h"      HAVE_SYS_FILIO_H)
   check_include_file_concat("sys/ioctl.h"      HAVE_SYS_IOCTL_H)
@@ -769,7 +778,7 @@ else(IOS)
   check_type_size("__int64"  SIZEOF___INT64)
   check_type_size("long double"  SIZEOF_LONG_DOUBLE)
   check_type_size("time_t"  SIZEOF_TIME_T)
-endif(IOS)
+endif(APPLE)
 
 
 if(NOT HAVE_SIZEOF_SSIZE_T)
@@ -840,7 +849,8 @@ elseif(HAVE_LIBSOCKET)
   set(CMAKE_REQUIRED_LIBRARIES socket)
 endif()
 
-if(IOS)
+if(APPLE)
+  # This is for both iOS and OSX
   set(HAVE_BASENAME ON)
   set(HAVE_SOCKET ON)
   set(HAVE_POLL ON)
@@ -937,7 +947,7 @@ if(IOS)
     endif(HAVE_SETJMP_H)
   endif(NOT HAVE_SIGSETJMP)
 
-else(IOS)
+else(APPLE)
   check_symbol_exists(basename      "${CURL_INCLUDES}" HAVE_BASENAME)
   check_symbol_exists(socket        "${CURL_INCLUDES}" HAVE_SOCKET)
   check_symbol_exists(poll          "${CURL_INCLUDES}" HAVE_POLL)
@@ -1034,7 +1044,7 @@ else(IOS)
       endif(HAVE_MACRO_SIGSETJMP)
     endif(HAVE_SETJMP_H)
   endif(NOT HAVE_SIGSETJMP)
-endif(IOS)
+endif(APPLE)
 
 # If there is no stricmp(), do not allow LDAP to parse URLs
 if(NOT HAVE_STRICMP)
@@ -1043,19 +1053,22 @@ endif(NOT HAVE_STRICMP)
 
 
 # See if we're being cross compiled, so make sure that tests that need to
-# run already have results filled.
-if(CMAKE_CROSSCOMPILING OR IOS)
+# run already have results filled. Also fill results if we don't want to
+# run the checks that would fill them, such as on OSX.
+if(CMAKE_CROSSCOMPILING OR APPLE)
   SET(HAVE_GLIBC_STRERROR_R "" CACHE STRING "Result from TRY_RUN" FORCE)
   SET(HAVE_GLIBC_STRERROR_R__TRYRUN_OUTPUT "" CACHE STRING "Output from TRY_RUN" FORCE)
   SET(HAVE_POSIX_STRERROR_R 1 CACHE STRING "Result from TRY_RUN" FORCE)
   SET(HAVE_POSIX_STRERROR_R__TRYRUN_OUTPUT "" CACHE STRING "Output from TRY_RUN" FORCE)
   SET(HAVE_POLL_FINE_EXITCODE "0" CACHE STRING "Result from TRY_RUN" FORCE)
   SET(HAVE_POLL_FINE ON CACHE STRING "Result from TRY_RUN" FORCE)
-endif(CMAKE_CROSSCOMPILING OR IOS)
+endif(CMAKE_CROSSCOMPILING OR APPLE)
 
 # iOS can't to try_compile, so put the results of the tests for iOS here explicitly.
-if (IOS)
-  # Say what iOS has explicitly.
+if (APPLE)
+  # This is for both iOS and OSX
+
+  # Say what iOS and OSX has explicitly.
   set(HAVE_FCNTL_O_NONBLOCK ON)
   set(HAVE_IOCTLSOCKET OFF)
   set(HAVE_IOCTLSOCKET_CAMEL OFF)
@@ -1092,7 +1105,7 @@ if (IOS)
     set(_FILE_OFFSET_BITS 64)
   endif(HAVE_FILE_OFFSET_BITS)
 
-  # Extra iOS variables that are normally set by tests
+  # Extra iOS and OSX variables that are normally set by tests
   set(RECV_TYPE_ARG1 "int")
   set(RECV_TYPE_ARG2 "void *")
   set(RECV_TYPE_ARG3 "size_t")
@@ -1108,7 +1121,7 @@ if (IOS)
   set(HAVE_SEND 1)
   set(HAVE_STRUCT_TIMEVAL 1)
 
-else(IOS)
+else(APPLE)
   # Do curl specific tests
   foreach(CURL_TEST
       HAVE_FCNTL_O_NONBLOCK
@@ -1171,7 +1184,7 @@ else(IOS)
       endif(${CURL_TEST}_REENTRANT)
     endif(NOT ${CURL_TEST})
   endforeach(CURL_TEST)
-endif(IOS)
+endif(APPLE)
 
 if(NEED_REENTRANT)
   foreach(CURL_TEST
@@ -1216,11 +1229,11 @@ if(_FILE_OFFSET_BITS)
 endif(_FILE_OFFSET_BITS)
 set(CMAKE_REQUIRED_FLAGS "-D_FILE_OFFSET_BITS=64")
 set(CMAKE_EXTRA_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/curl/curl.h")
-if (IOS)
+if (APPLE)
   set(SIZEOF_CURL_OFF_T ${SIZEOF_SIZE_T})
-else(IOS)
+else(APPLE)
   check_type_size("curl_off_t" SIZEOF_CURL_OFF_T)
-endif(IOS)
+endif(APPLE)
 set(CMAKE_EXTRA_INCLUDE_FILES)
 set(CMAKE_REQUIRED_FLAGS)
 
@@ -1266,12 +1279,13 @@ if(HAVE_SOCKLEN_T)
   elseif(HAVE_SYS_SOCKET_H)
     set(CMAKE_EXTRA_INCLUDE_FILES "sys/socket.h")
   endif()
-  if (IOS)
+  if (APPLE)
+    # This is for both iOS and OSX
     set(CURL_SIZEOF_CURL_SOCKLEN_T 4)
     set(HAVE_CURL_SIZEOF_CURL_SOCKLEN_T ON)
-  else(IOS)
+  else(APPLE)
     check_type_size("socklen_t" CURL_SIZEOF_CURL_SOCKLEN_T)
-  endif(IOS)
+  endif(APPLE)
   set(CMAKE_EXTRA_INCLUDE_FILES)
   if(NOT HAVE_CURL_SIZEOF_CURL_SOCKLEN_T)
     message(FATAL_ERROR
@@ -1293,9 +1307,10 @@ endif()
 set(CURL_PULL_STDINT_H ${HAVE_STDINT_H})
 set(CURL_PULL_INTTYPES_H ${HAVE_INTTYPES_H})
 
-if(NOT IOS)
+if(NOT APPLE)
+  # This not used for either iOS or OSX
   include(CMake/OtherTests.cmake)
-endif(NOT IOS)
+endif(NOT APPLE)
 
 add_definitions(-DHAVE_CONFIG_H)
 
