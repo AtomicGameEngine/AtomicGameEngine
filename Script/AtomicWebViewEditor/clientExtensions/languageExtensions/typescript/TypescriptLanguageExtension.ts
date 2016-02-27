@@ -7,74 +7,7 @@
 // Based upon the TypeScript language services example at https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API#incremental-build-support-using-the-language-services
 
 import * as ts from "../../../modules/typescript";
-import {TypescriptLanguageService, FileSystemInterface} from "./TypescriptLanguageService";
-
-interface TSConfigFile {
-    compilerOptions?: ts.CompilerOptions;
-    files: Array<string>;
-}
-
-/**
- * Class that provides access to the Atomic filesystem routines
- */
-class WebFileSystem implements FileSystemInterface {
-
-    private fileCache = {};
-    /**
-     * Deterimine if the particular file exists in the resources
-     * @param  {string} filename
-     * @return {boolean}
-     */
-    fileExists(filename: string): boolean {
-        return this.fileCache[filename] != null;
-    }
-
-    /**
-     * Cache a file in the filesystem
-     * @param  {string} filename
-     * @param  {string} file
-     */
-    cacheFile(filename: string, file: string) {
-        this.fileCache[filename] = file;
-    }
-
-    /**
-     * Grab the contents of the file
-     * @param  {string} filename
-     * @return {string}
-     */
-    getFile(filename: string): string {
-        console.log("FS.GETFILE!!");
-        // return HostInterop.getResource("atomic:" + filename);
-        return this.fileCache[filename];
-    }
-
-    /**
-     * Write the contents to the file specified
-     * @param  {string} filename
-     * @param  {string} contents
-     */
-    writeFile(filename: string, contents: string) {
-        //TODO:
-        /*let script = new Atomic.File(filename, Atomic.FILE_WRITE);
-        try {
-            script.writeString(contents);
-            script.flush();
-        } finally {
-            script.close();
-        }
-        */
-    }
-
-    /**
-     * Returns the current directory / root of the source tree
-     * @return {string}
-     */
-    getCurrentDirectory(): string {
-        return "";
-    }
-
-}
+import * as WorkerProcessCommands from "./workerprocess/workerProcessCommands";
 
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
@@ -90,19 +23,16 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     private filename: string;
 
     private serviceLocator: Editor.ClientExtensions.ClientServiceLocator;
+
+    private worker: SharedWorker.SharedWorker;
+
+    private editor;
+
     /**
      * Perform a full compile on save, or just transpile the current file
      * @type {boolean}
      */
     fullCompile: boolean = true;
-
-    /**
-     * The language service that will handle building
-     * @type {TypescriptLanguageService}
-     */
-    languageService: TypescriptLanguageService = null;
-
-    fs: WebFileSystem; // needed?
 
     /**
     * Inject this language service into the registry
@@ -111,8 +41,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     initialize(serviceLocator: Editor.ClientExtensions.ClientServiceLocator) {
         // initialize the language service
         this.serviceLocator = serviceLocator;
-        this.fs = new WebFileSystem();
-        this.languageService = new TypescriptLanguageService(this.fs);
     }
 
     /**
@@ -125,28 +53,26 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         return ext == "ts";
     }
 
-
     /**
-     * Seed the language service with all of the relevant files in the project
+     * Utility function that handles sending a request to the worker process and then when
+     * a response is received pass it back to the caller.  Since this is all handled async,
+     * it will be facilitated by passing back a promise
+     * @param  {string} responseChannel The unique string name of the response message channel
+     * @param  {any} message
+     * @return {PromiseLike}
      */
-    private loadProjectFiles() {
-        this.serviceLocator.getHostInterop().getFileResource("resources/tsconfig.atomic").then((jsonTsConfig: string) => {
-            let promises: PromiseLike<void>[] = [];
-            let tsConfig: TSConfigFile = JSON.parse(jsonTsConfig);
+    private workerRequest(responseChannel: string, message: any): PromiseLike<{}> {
+        let worker = this.worker;
 
-            if (tsConfig.compilerOptions) {
-                this.languageService.compilerOptions = tsConfig.compilerOptions;
+        return new Promise((resolve, reject) => {
+            const responseCallback = function(e: WorkerProcessCommands.WorkerProcessMessage<any>) {
+                if (e.data.command == responseChannel) {
+                    worker.port.removeEventListener("message", responseCallback);
+                    resolve(e.data);
+                }
             };
-
-            tsConfig.files.forEach((f) => {
-                promises.push(this.serviceLocator.getHostInterop().getFileResource(f).then((code: string) => {
-                    this.languageService.addProjectFile(f, code);
-                }));
-            });
-            return Promise.all(promises);
-        }).then(() => {
-            // Let's seed the compiler state
-            this.languageService.compile([this.filename]);
+            this.worker.port.addEventListener("message", responseCallback);
+            this.worker.port.postMessage(message);
         });
     }
 
@@ -156,8 +82,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            let editor = <AceAjax.Editor>ev.editor;
-            editor.session.setMode("ace/mode/typescript");
+            this.editor = <AceAjax.Editor>ev.editor;
+            this.editor.session.setMode("ace/mode/typescript");
         }
     }
 
@@ -173,12 +99,48 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             let editor = ev.editor;
 
             // we only want the typescript completer, otherwise we get a LOT of noise
-            editor.completers = [this.buildWordCompleter(ev.filename, this.languageService)];
+            editor.completers = [this.buildWordCompleter(ev.filename)];
 
-            // for now, we will handle project stuff in the same thread.  In the future we need to share this between sessions
-            this.languageService.reset();
-            this.loadProjectFiles();
+            // Build our worker
+            this.buildWorker();
+
+            // post a message to the shared web worker
+            this.worker.port.postMessage({ command: WorkerProcessCommands.Connect, sender: "Typescript Language Extension", filename: ev.filename });
         }
+    }
+
+    /**
+     * Handler for any messages initiated by the worker process
+     * @param  {any} e
+     * @return {[type]}
+     */
+    handleWorkerMessage(e: WorkerProcessCommands.WorkerProcessMessage<any>) {
+        switch (e.data.command) {
+            case WorkerProcessCommands.Message:
+                console.log(e.data.message);
+                break;
+            case WorkerProcessCommands.Alert:
+                alert(e.data.message);
+                break;
+        }
+    }
+
+    /**
+     * Build/Attach to the shared web worker
+     */
+    buildWorker() {
+
+        this.worker = new SharedWorker("./source/editorCore/clientExtensions/languageExtensions/typescript/workerprocess/workerLoader.js");
+
+        // hook up the event listener
+        this.worker.port.addEventListener("message", this.handleWorkerMessage.bind(this), false);
+
+        // Tell the SharedWorker we're closing
+        addEventListener("beforeunload", () => {
+            this.worker.port.postMessage({ command: WorkerProcessCommands.Disconnect });
+        });
+
+        this.worker.port.start();
     }
 
     /**
@@ -188,49 +150,42 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {FileSystemInterface} fs the interface into the file system
      * @return {[type]} returns a completer
      */
-    private buildWordCompleter(filename: string, langService: TypescriptLanguageService): {
-        getDocTooltip?: (selected: any) => { docText?: string, docHTML?: string },
+    private buildWordCompleter(filename: string): {
+        getDocTooltip?: (selected: WorkerProcessCommands.WordCompletion) => void,
         getCompletions: (editor, session, pos, prefix, callback) => void
     } {
-        //let langTools = ace.require("ace/ext/language_tools");
+        let extension = this;
         let wordCompleter = {
-            getDocTooltip: function(selected: any): { docText?: string, docHTML?: string } {
-                let details = langService.getCompletionEntryDetails(filename, selected.pos, selected.caption);
-                if (details) {
-                    return {
-                        docHTML: details.displayParts.map(part => part.text).join("")
-                        + "<br/>"
-                        + details.documentation.map(part => part.text).join("")
-                    };
-                } else {
-                    return null;
-                }
+            getDocTooltip: function(selected: WorkerProcessCommands.WordCompletion) {
+                const message: WorkerProcessCommands.GetDocTooltipMessageData = {
+                    command: WorkerProcessCommands.GetDocTooltip,
+                    filename: extension.filename,
+                    completionItem: selected,
+                    pos: selected.pos
+                };
+
+                // Since the doc tooltip built in function of Ace doesn't support async calls to retrieve the tootip,
+                // we need to go ahead and call the worker and then force the display of the tooltip when we get
+                // a result back
+                extension.workerRequest(WorkerProcessCommands.DocTooltipResponse, message)
+                    .then((e: WorkerProcessCommands.GetDocTooltipResponseMessageData) => {
+                    extension.editor.completer.showDocTooltip(e);
+                });
             },
 
             getCompletions: function(editor, session, pos, prefix, callback) {
-                try {
-                    let sourceFile = langService.updateProjectFile(filename, editor.session.getValue());
+                const message: WorkerProcessCommands.GetCompletionsMessageData = {
+                    command: WorkerProcessCommands.GetCompletions,
+                    filename: extension.filename,
+                    pos: pos,
+                    sourceText: editor.session.getValue(),
+                    prefix: prefix
+                };
 
-                    //langService.compile([ev.filename]);
-                    let newpos = langService.getPositionOfLineAndCharacter(sourceFile, pos.row, pos.column);
-                    let completions = langService.getCompletions(filename, newpos);
-                    if (completions) {
-                        callback(null, completions.entries.map(function(completion: ts.CompletionEntry) {
-                            return {
-                                caption: completion.name,
-                                value: completion.name,
-                                score: 100 - parseInt(completion.sortText, 0),
-                                meta: completion.kind,
-                                pos: newpos
-                            };
-                        }));
-                    } else {
-                        console.log("No completions available: " + prefix);
-                    }
-                } catch (e) {
-                    console.log("Failure completing " + filename);
-                    console.log(e);
-                }
+                extension.workerRequest(WorkerProcessCommands.CompletionResponse, message)
+                    .then((e: WorkerProcessCommands.GetCompletionsResponseMessageData) => {
+                    callback(null, e.completions);
+                });
             }
         };
         return wordCompleter;
@@ -242,40 +197,46 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Called once a resource has been saved
      * @param  {Editor.EditorEvents.SaveResourceEvent} ev
      */
-    save(ev: Editor.EditorEvents.SaveResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a save resource event for ${ev.path}`);
-            if (this.fullCompile) {
-                this.languageService.compile([ev.path]);
-            } else {
-                this.languageService.transpile([ev.path]);
-            }
-        }
-    }
+    // save(ev: Editor.EditorEvents.SaveResourceEvent) {
+    //     if (this.isValidFiletype(ev.path)) {
+    //         console.log(`${this.name}: received a save resource event for ${ev.path}`);
+    //         this.worker.port.postMessage({
+    //             command: WorkerProcessCommands.Save,
+    //             path: ev.path
+    //         });
+    //     }
+    // }
 
     /**
      * Handle the delete.  This should delete the corresponding javascript file
      * @param  {Editor.EditorEvents.DeleteResourceEvent} ev
      */
-    delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a delete resource event`);
-
-            // notify the typescript language service that the file has been deleted
-            this.languageService.deleteProjectFile(ev.path);
-        }
-    }
+    // delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
+    //     if (this.isValidFiletype(ev.path)) {
+    //         console.log(`${this.name}: received a delete resource event`);
+    //
+    //         // notify the typescript language service that the file has been deleted
+    //         this.worker.port.postMessage({
+    //             command: WorkerProcessCommands.Delete,
+    //             path: ev.path
+    //         });
+    //     }
+    // }
 
     /**
      * Handle the rename.  Should rename the corresponding .js file
      * @param  {Editor.EditorEvents.RenameResourceEvent} ev
      */
-    rename(ev: Editor.EditorEvents.RenameResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a rename resource event`);
-
-            // notify the typescript language service that the file has been renamed
-            this.languageService.renameProjectFile(ev.path, ev.newPath);
-        }
-    }
+    // rename(ev: Editor.EditorEvents.RenameResourceEvent) {
+    //     if (this.isValidFiletype(ev.path)) {
+    //         console.log(`${this.name}: received a rename resource event`);
+    //
+    //         // notify the typescript language service that the file has been renamed
+    //         this.worker.port.postMessage({
+    //             command: WorkerProcessCommands.Rename,
+    //             path: ev.path,
+    //             newPath: ev.newPath
+    //         });
+    //     }
+    // }
 }

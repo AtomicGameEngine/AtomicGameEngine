@@ -6,7 +6,7 @@
 //
 // Based upon the TypeScript language services example at https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API#incremental-build-support-using-the-language-services
 
-import * as ts from "../../../modules/typescript";
+import * as ts from "../../../../modules/typescript";
 
 /**
  * Abstraction over the file system
@@ -82,33 +82,16 @@ export class TypescriptLanguageService {
             getScriptVersion: (fileName) => this.versionMap[fileName] && this.versionMap[fileName].version.toString(),
             getScriptSnapshot: (filename) => {
                 const scriptVersion = this.versionMap[filename];
-                // if (!this.fs.fileExists(fileName)) {
-                //     if (scriptVersion) {
-                //         delete this.versionMap[fileName];
-                //         let idx = this.projectFiles.indexOf(fileName);
-                //         if (idx > -1) {
-                //             this.projectFiles.splice(idx, 1);
-                //         }
-                //     }
-                //     console.log("file not exist: " + fileName);
-                //     return undefined;
-                // }
 
                 // Grab the cached version
                 if (scriptVersion) {
                     if (scriptVersion.snapshot) {
-                        console.log(`returning snapshot for ${filename} version ${scriptVersion.version}`);
                         return scriptVersion.snapshot;
                     } else {
                         console.log(`!!! creating snapshot for ${filename}`);
                         let sourceFile = this.documentRegistry.acquireDocument(filename, this.compilerOptions, ts.ScriptSnapshot.fromString(""), scriptVersion.version.toString());
                         return ts.ScriptSnapshot.fromString(sourceFile.text);
-                        //let script = this.fs.getFile(fileName);
-                        //scriptVersion.snapshot = ts.ScriptSnapshot.fromString(script);
-                        //return scriptVersion.snapshot;
                     }
-                } else {
-                    // console.log(`no script version for ${fileName}`);
                 }
             },
             getCurrentDirectory: () => this.fs.getCurrentDirectory(),
