@@ -1,3 +1,10 @@
+//
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// LICENSE: Atomic Game Engine Editor and Tools EULA
+// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
+// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+//
+
 // This is the interop file, exposing functions that can be called by the host game engine
 import editor from "./editor/editor";
 import * as editorConfig from "./editor/editorConfig";
