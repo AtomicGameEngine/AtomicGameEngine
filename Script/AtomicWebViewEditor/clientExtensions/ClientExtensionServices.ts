@@ -5,8 +5,9 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
-// Entry point for web view extensions -- extensions that live inside the web view
+import ClientExtensionEventNames from "./ClientExtensionEventNames";
 
+// Entry point for web view extensions -- extensions that live inside the web view
 interface EventSubscription {
     eventName: string;
     callback: (data: any) => any;
@@ -34,6 +35,7 @@ export class EventDispatcher implements Editor.Extensions.EventDispatcher {
     }
 }
 
+
 /**
  * Generic registry for storing Editor Extension Services
  */
@@ -56,8 +58,11 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
      * @param  {EventDispatcher} eventDispatcher The global event dispatcher
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
-        eventDispatcher.subscribeToEvent("CodeLoadedNotification", (ev) => this.codeLoaded(ev));
-        eventDispatcher.subscribeToEvent("ConfigureEditor", (ev) => this.configureEditor(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeLoadedEvent, (ev) => this.codeLoaded(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ConfigureEditorEvent, (ev) => this.configureEditor(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceRenamedEvent, (ev) => this.renameResource(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ProjectUnloadedEvent, (ev) => this.projectUnloaded());
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
     }
 
     /**
@@ -78,6 +83,57 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
     }
 
     /**
+     * Called after a resource has been saved
+     * @param  {Editor.EditorEvents.SaveResourceEvent} ev
+     */
+    saveResource(ev: Editor.EditorEvents.SaveResourceEvent) {
+        // run through and find any services that can handle this.
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can save
+                if (service.save) {
+                    service.save(ev);
+                }
+            } catch (e) {
+                alert(`Error detected in extension ${service.name}\n \n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called when a resource has been deleted
+     */
+    deleteResource(ev: Editor.EditorEvents.DeleteResourceEvent) {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can delete
+                if (service.delete) {
+                    service.delete(ev);
+                }
+            } catch (e) {
+                alert(`Error detected in extension ${service.name}\n \n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called when a resource has been renamed
+     * @param  {Editor.EditorEvents.RenameResourceEvent} ev
+     */
+    renameResource(ev: Editor.EditorEvents.RenameResourceEvent) {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle the rename
+                if (service.rename) {
+                    service.rename(ev);
+                }
+            } catch (e) {
+                alert(`Error detected in extension ${service.name}\n \n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
      * Called when the editor is requesting to be configured for a particular file
      * @param  {Editor.EditorEvents.EditorFileEvent} ev
      */
@@ -87,6 +143,23 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
                 // Notify services that the project has just been loaded
                 if (service.configureEditor) {
                     service.configureEditor(ev);
+                }
+            } catch (e) {
+                alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
+            }
+        });
+    }
+
+
+    /**
+     * Called when the project is unloaded
+     */
+    projectUnloaded() {
+        this.registeredServices.forEach((service) => {
+            // Notify services that the project has been unloaded
+            try {
+                if (service.projectUnloaded) {
+                    service.projectUnloaded();
                 }
             } catch (e) {
                 alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);

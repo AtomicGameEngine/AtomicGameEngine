@@ -54,3 +54,7 @@ export const Connect = "HELO";
 export const Disconnect = "CLOSE";
 export const Message = "MESSAGE";
 export const Alert = "ALERT";
+
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.SaveResourceEvent { }
+export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent {}
+export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent {}

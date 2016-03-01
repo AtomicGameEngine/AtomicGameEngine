@@ -12,4 +12,8 @@ interface Window {
     atomicQuery: any;
     HOST_loadCode: (codeUrl) => void;
     HOST_saveCode: () => void;
+
+    HOST_projectUnloaded: () => void;
+    HOST_resourceRenamed: (path:string, newPath:string) => void;
+    HOST_resourceDeleted: (path: string) => void;
 }

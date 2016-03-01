@@ -8,9 +8,9 @@
 import editor from "./editor";
 import serviceLocator from "../clientExtensions/ServiceLocator";
 import HostInterop from "../interop";
+import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventNames";
 
-const CONFIGURE_EDITOR_EVENT = "ConfigureEditor";
-const CODE_LOADED_NOTIFICATION = "CodeLoadedNotification";
+
 /**
  * Set the editor theme and configuration based upon the file extension
  * @param  {string} fileExt
@@ -24,11 +24,19 @@ export function configure(fileExt: string, filename: string) {
     editor.session.setMode("ace/mode/javascript");
 
     // give the language extensions the opportunity to configure the editor based upon the file type
-    serviceLocator.sendEvent(CONFIGURE_EDITOR_EVENT, {
+    serviceLocator.sendEvent(ClientExtensionEventNames.ConfigureEditorEvent, {
         fileExt: fileExt,
         filename: filename,
         editor: editor
     });
+}
+
+/**
+ * Returns the text in the editor instance
+ * @return {string}
+ */
+export function getSourceText() : string {
+    return editor.session.getValue();
 }
 
 /**
@@ -45,11 +53,42 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
         HostInterop.getInstance().notifyEditorChange();
     });
 
-    serviceLocator.sendEvent(CODE_LOADED_NOTIFICATION, {
+    serviceLocator.sendEvent(ClientExtensionEventNames.CodeLoadedEvent, {
         code: code,
         filename: filename,
         fileExt: fileExt,
         editor: editor
     });
 
+}
+
+/**
+ * Called when the project is getting unloaded
+ */
+export function projectUnloaded() {
+    serviceLocator.sendEvent(ClientExtensionEventNames.ProjectUnloadedEvent, null);
+}
+
+/**
+ * Called when a resource is getting renamed
+ * @param  {string} path
+ * @param  {string} newPath
+ */
+export function resourceRenamed(path: string, newPath: string) {
+    let data:Editor.EditorEvents.RenameResourceEvent = {
+        path: path,
+        newPath: newPath
+    };
+    serviceLocator.sendEvent(ClientExtensionEventNames.ResourceRenamedEvent, data);
+}
+
+/**
+ * Called when a resource is getting deleted
+ * @param  {string} path
+ */
+export function resourceDeleted(path: string) {
+    let data:Editor.EditorEvents.DeleteResourceEvent = {
+        path: path
+    };
+    serviceLocator.sendEvent(ClientExtensionEventNames.ResourceDeletedEvent, data);
 }

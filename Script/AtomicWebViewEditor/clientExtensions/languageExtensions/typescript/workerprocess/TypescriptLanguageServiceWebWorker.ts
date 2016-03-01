@@ -11,7 +11,8 @@
  */
 import * as ts from "../../../../modules/typescript";
 import {TypescriptLanguageService, FileSystemInterface} from "./TypescriptLanguageService";
-import * as WorkerProcessCommands from "./workerProcessCommands";
+import * as WorkerProcessTypes from "./workerProcessTypes";
+import ClientExtensionEventNames from "../../../ClientExtensionEventNames";
 
 interface TSConfigFile {
     compilerOptions?: ts.CompilerOptions;
@@ -137,19 +138,31 @@ export default class TypescriptLanguageServiceWebWorker {
         let port: MessagePort = e.ports[0];
         this.connections++;
 
-        port.addEventListener("message", (e:WorkerProcessCommands.WorkerProcessMessage<any>) => {
+        port.addEventListener("message", (e: WorkerProcessTypes.WorkerProcessMessage<any>) => {
             switch (e.data.command) {
-                case WorkerProcessCommands.Connect:
+                case WorkerProcessTypes.Connect:
                     this.handleHELO(port, e.data);
                     break;
-                case WorkerProcessCommands.Disconnect:
+                case WorkerProcessTypes.Disconnect:
                     this.handleCLOSE(port, e.data);
                     break;
-                case WorkerProcessCommands.GetCompletions:
+                case WorkerProcessTypes.GetCompletions:
                     this.handleGetCompletions(port, e.data);
                     break;
-                case WorkerProcessCommands.GetDocTooltip:
+                case WorkerProcessTypes.GetDocTooltip:
                     this.handleGetDocTooltip(port, e.data);
+                    break;
+                case ClientExtensionEventNames.ResourceSavedEvent:
+                    this.handleSave(port, e.data);
+                    break;
+                case ClientExtensionEventNames.ResourceRenamedEvent:
+                    this.handleRename(port, e.data);
+                    break;
+                case ClientExtensionEventNames.ResourceDeletedEvent:
+                    this.handleDelete(port, e.data);
+                    break;
+                case ClientExtensionEventNames.ProjectUnloadedEvent:
+                    this.handleProjectUnloaded(port);
                     break;
             }
 
@@ -207,7 +220,7 @@ export default class TypescriptLanguageServiceWebWorker {
         sender: string,
         filename: string
     }) {
-        port.postMessage({ command: WorkerProcessCommands.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
+        port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.loadProjectFiles().then(() => {
             this.languageService.compile([eventData.filename]);
         });
@@ -231,14 +244,14 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {MessagePort} port
      * @param  {WorkerProcessCommands.GetCompletionsMessage} eventData
      */
-    handleGetCompletions(port: MessagePort, eventData: WorkerProcessCommands.GetCompletionsMessageData) {
+    handleGetCompletions(port: MessagePort, eventData: WorkerProcessTypes.GetCompletionsMessageData) {
         let sourceFile = this.languageService.updateProjectFile(eventData.filename, eventData.sourceText);
 
         let newpos = this.languageService.getPositionOfLineAndCharacter(sourceFile, eventData.pos.row, eventData.pos.column);
         let completions = this.languageService.getCompletions(eventData.filename, newpos);
 
-        let message: WorkerProcessCommands.GetCompletionsResponseMessageData = {
-            command: WorkerProcessCommands.CompletionResponse,
+        let message: WorkerProcessTypes.GetCompletionsResponseMessageData = {
+            command: WorkerProcessTypes.CompletionResponse,
             completions: []
         };
         let langService = this.languageService;
@@ -246,7 +259,7 @@ export default class TypescriptLanguageServiceWebWorker {
         if (completions) {
             message.completions = completions.entries.map((completion: ts.CompletionEntry) => {
                 let value = completion.name;
-                let completionItem: WorkerProcessCommands.WordCompletion = {
+                let completionItem: WorkerProcessTypes.WordCompletion = {
                     caption: completion.name,
                     value: value,
                     score: 100 - parseInt(completion.sortText, 0),
@@ -268,9 +281,9 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.GetDocTooltipMessageData} eventData
      * @return {[type]}
      */
-    handleGetDocTooltip(port: MessagePort, eventData: WorkerProcessCommands.GetDocTooltipMessageData) {
-        let message: WorkerProcessCommands.GetDocTooltipResponseMessageData = {
-            command: WorkerProcessCommands.DocTooltipResponse
+    handleGetDocTooltip(port: MessagePort, eventData: WorkerProcessTypes.GetDocTooltipMessageData) {
+        let message: WorkerProcessTypes.GetDocTooltipResponseMessageData = {
+            command: WorkerProcessTypes.DocTooltipResponse
         };
         const details = this.languageService.getCompletionEntryDetails(eventData.filename, eventData.pos, eventData.completionItem.caption);
         if (details) {
@@ -283,5 +296,43 @@ export default class TypescriptLanguageServiceWebWorker {
         }
 
         port.postMessage(message);
+    }
+
+    /**
+     * Called when the file has been saved.
+     * @param  {MessagePort} port
+     * @param  {WorkerProcessCommands.SaveMessageData} eventData
+     */
+    handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
+        // let's reload the file
+        getFileResource(eventData.path).then((code: string) => {
+            this.languageService.updateProjectFile(eventData.path, code);
+        });
+    }
+
+    /**
+     * Called when a file has been deleted
+     * @param  {MessagePort} port
+     * @param  {WorkerProcessCommands.DeleteMessageData} eventData
+     */
+    handleDelete(port: MessagePort, eventData: WorkerProcessTypes.DeleteMessageData) {
+        this.languageService.deleteProjectFile(eventData.path);
+    }
+
+    /**
+     * Called when a file has been renamed
+     * @param  {MessagePort} port
+     * @param  {WorkerProcessCommands.RenameMessageData} eventData
+     */
+    handleRename(port: MessagePort, eventData: WorkerProcessTypes.RenameMessageData) {
+        this.languageService.renameProjectFile(eventData.path, eventData.newPath);
+    }
+
+    /**
+     * Called when the project has been closed
+     * @param  {MessagePort} port
+     */
+    handleProjectUnloaded(port: MessagePort) {
+        this.reset();
     }
 }

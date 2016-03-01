@@ -6,8 +6,7 @@
 //
 
 // This is the interop file, exposing functions that can be called by the host game engine
-import editor from "./editor/editor";
-import * as editorConfig from "./editor/editorConfig";
+import * as editorCommands from "./editor/editorCommands";
 
 /**
  * Port to attach Chrome Dev Tools to
@@ -46,10 +45,6 @@ function atomicQueryPromise(message: any): Promise<{}> {
 }
 
 export default class HostInteropType {
-    static EDITOR_SAVE_CODE = "editorSaveCode";
-    static EDITOR_SAVE_FILE = "editorSaveFile";
-    static EDITOR_LOAD_COMPLETE = "editorLoadComplete";
-    static EDITOR_CHANGE = "editorChange";
 
     private static _inst: HostInteropType = null;
     static getInstance(): HostInteropType {
@@ -59,10 +54,19 @@ export default class HostInteropType {
         return HostInteropType._inst;
     }
 
+    static EDITOR_SAVE_CODE = "editorSaveCode";
+    static EDITOR_SAVE_FILE = "editorSaveFile";
+    static EDITOR_LOAD_COMPLETE = "editorLoadComplete";
+    static EDITOR_CHANGE = "editorChange";
+
     constructor() {
         // Set up the window object so the host can call into it
         window.HOST_loadCode = this.loadCode.bind(this);
         window.HOST_saveCode = this.saveCode.bind(this);
+
+        window.HOST_projectUnloaded = this.projectUnloaded.bind(this);
+        window.HOST_resourceRenamed = this.resourceRenamed.bind(this);
+        window.HOST_resourceDeleted = this.resourceDeleted.bind(this);
     }
 
     /**
@@ -75,11 +79,11 @@ export default class HostInteropType {
         const filename = codeUrl.replace("atomic://", "");
 
         // go ahead and set the theme prior to pulling the file across
-        editorConfig.configure(fileExt, filename);
+        editorCommands.configure(fileExt, filename);
 
         // get the code
         this.getResource(codeUrl).then((src: string) => {
-            editorConfig.loadCodeIntoEditor(src, filename, fileExt);
+            editorCommands.loadCodeIntoEditor(src, filename, fileExt);
         }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error loading code: " + e.error_message);
         });
@@ -92,7 +96,7 @@ export default class HostInteropType {
     saveCode(): Promise<{}> {
         return atomicQueryPromise({
             message: HostInteropType.EDITOR_SAVE_CODE,
-            payload: editor.session.getValue()
+            payload: editorCommands.getSourceText()
         });
     }
 
@@ -155,6 +159,31 @@ export default class HostInteropType {
         atomicQueryPromise(HostInteropType.EDITOR_CHANGE).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error on change: " + e.error_message);
         });
+    }
+
+    /**
+     * Notify that the project has been unloaded
+     */
+    projectUnloaded() {
+        editorCommands.projectUnloaded();
+    }
+
+    /**
+     * Notify that a resource has been renamed
+     * @param  {string} path
+     * @param  {string} newPath
+     */
+    resourceRenamed(path: string, newPath: string) {
+        editorCommands.resourceRenamed(path, newPath);
+
+    }
+
+    /**
+     * Notify that a resource has been deleted
+     * @param  {string} path
+     */
+    resourceDeleted(path: string) {
+        editorCommands.resourceDeleted(path);
     }
 }
 

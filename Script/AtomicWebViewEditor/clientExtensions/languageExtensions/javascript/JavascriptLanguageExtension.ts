@@ -40,6 +40,11 @@ export default class JavascriptLanguageExtension implements Editor.ClientExtensi
         if (this.isValidFiletype(ev.filename)) {
             let editor = <AceAjax.Editor>ev.editor;
             editor.session.setMode("ace/mode/javascript");
+
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true
+            });
         }
     }
 }

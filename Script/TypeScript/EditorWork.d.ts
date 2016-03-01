@@ -110,9 +110,6 @@ declare module Editor.EditorEvents {
         // The full path to the resource to edit
         path: string;
         newPath: string;
-
-        // the asset to delete
-        asset: ToolCore.Asset;
     }
 
     export interface SceneEditStateChangeEvent {
@@ -238,6 +235,10 @@ declare module Editor.ClientExtensions {
     export interface WebViewService extends Editor.Extensions.EditorService {
         configureEditor?(ev: EditorEvents.EditorFileEvent);
         codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
+        save?(ev: EditorEvents.SaveResourceEvent);
+        delete?(ev: EditorEvents.DeleteResourceEvent);
+        rename?(ev: EditorEvents.RenameResourceEvent);
+        projectUnloaded?();
     }
 
     export interface AtomicErrorMessage {

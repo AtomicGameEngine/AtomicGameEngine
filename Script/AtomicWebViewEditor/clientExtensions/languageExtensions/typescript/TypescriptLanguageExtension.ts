@@ -7,7 +7,8 @@
 // Based upon the TypeScript language services example at https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API#incremental-build-support-using-the-language-services
 
 import * as ts from "../../../modules/typescript";
-import * as WorkerProcessCommands from "./workerprocess/workerProcessCommands";
+import * as WorkerProcessTypes from "./workerprocess/workerProcessTypes";
+import ClientExtensionEventNames from "../../ClientExtensionEventNames";
 
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
@@ -65,7 +66,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         let worker = this.worker;
 
         return new Promise((resolve, reject) => {
-            const responseCallback = function(e: WorkerProcessCommands.WorkerProcessMessage<any>) {
+            const responseCallback = function(e: WorkerProcessTypes.WorkerProcessMessage<any>) {
                 if (e.data.command == responseChannel) {
                     worker.port.removeEventListener("message", responseCallback);
                     resolve(e.data);
@@ -82,8 +83,15 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            this.editor = <AceAjax.Editor>ev.editor;
-            this.editor.session.setMode("ace/mode/typescript");
+            let editor = <AceAjax.Editor>ev.editor;
+            editor.session.setMode("ace/mode/typescript");
+
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true
+            });
+
+            this.editor = editor; // cache this so that we can reference it later
         }
     }
 
@@ -105,21 +113,20 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.buildWorker();
 
             // post a message to the shared web worker
-            this.worker.port.postMessage({ command: WorkerProcessCommands.Connect, sender: "Typescript Language Extension", filename: ev.filename });
+            this.worker.port.postMessage({ command: WorkerProcessTypes.Connect, sender: "Typescript Language Extension", filename: ev.filename });
         }
     }
 
     /**
      * Handler for any messages initiated by the worker process
-     * @param  {any} e
-     * @return {[type]}
+     * @param  {WorkerProcessTypes.WorkerProcessMessage} e
      */
-    handleWorkerMessage(e: WorkerProcessCommands.WorkerProcessMessage<any>) {
+    handleWorkerMessage(e: WorkerProcessTypes.WorkerProcessMessage<any>) {
         switch (e.data.command) {
-            case WorkerProcessCommands.Message:
+            case WorkerProcessTypes.Message:
                 console.log(e.data.message);
                 break;
-            case WorkerProcessCommands.Alert:
+            case WorkerProcessTypes.Alert:
                 alert(e.data.message);
                 break;
         }
@@ -137,7 +144,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
         // Tell the SharedWorker we're closing
         addEventListener("beforeunload", () => {
-            this.worker.port.postMessage({ command: WorkerProcessCommands.Disconnect });
+            this.worker.port.postMessage({ command: WorkerProcessTypes.Disconnect });
         });
 
         this.worker.port.start();
@@ -146,19 +153,17 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     /**
      * Builds the word completer for the Ace Editor.  This will handle determining which items to display in the popup and in which order
      * @param  {string} filename the filename of the current file
-     * @param  {TypescriptLanguageService} langService The language service that handles compilation, completion resolution, etc.
-     * @param  {FileSystemInterface} fs the interface into the file system
      * @return {[type]} returns a completer
      */
     private buildWordCompleter(filename: string): {
-        getDocTooltip?: (selected: WorkerProcessCommands.WordCompletion) => void,
+        getDocTooltip?: (selected: WorkerProcessTypes.WordCompletion) => void,
         getCompletions: (editor, session, pos, prefix, callback) => void
     } {
         let extension = this;
         let wordCompleter = {
-            getDocTooltip: function(selected: WorkerProcessCommands.WordCompletion) {
-                const message: WorkerProcessCommands.GetDocTooltipMessageData = {
-                    command: WorkerProcessCommands.GetDocTooltip,
+            getDocTooltip: function(selected: WorkerProcessTypes.WordCompletion) {
+                const message: WorkerProcessTypes.GetDocTooltipMessageData = {
+                    command: WorkerProcessTypes.GetDocTooltip,
                     filename: extension.filename,
                     completionItem: selected,
                     pos: selected.pos
@@ -167,23 +172,23 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 // Since the doc tooltip built in function of Ace doesn't support async calls to retrieve the tootip,
                 // we need to go ahead and call the worker and then force the display of the tooltip when we get
                 // a result back
-                extension.workerRequest(WorkerProcessCommands.DocTooltipResponse, message)
-                    .then((e: WorkerProcessCommands.GetDocTooltipResponseMessageData) => {
+                extension.workerRequest(WorkerProcessTypes.DocTooltipResponse, message)
+                    .then((e: WorkerProcessTypes.GetDocTooltipResponseMessageData) => {
                     extension.editor.completer.showDocTooltip(e);
                 });
             },
 
             getCompletions: function(editor, session, pos, prefix, callback) {
-                const message: WorkerProcessCommands.GetCompletionsMessageData = {
-                    command: WorkerProcessCommands.GetCompletions,
+                const message: WorkerProcessTypes.GetCompletionsMessageData = {
+                    command: WorkerProcessTypes.GetCompletions,
                     filename: extension.filename,
                     pos: pos,
                     sourceText: editor.session.getValue(),
                     prefix: prefix
                 };
 
-                extension.workerRequest(WorkerProcessCommands.CompletionResponse, message)
-                    .then((e: WorkerProcessCommands.GetCompletionsResponseMessageData) => {
+                extension.workerRequest(WorkerProcessTypes.CompletionResponse, message)
+                    .then((e: WorkerProcessTypes.GetCompletionsResponseMessageData) => {
                     callback(null, e.completions);
                 });
             }
@@ -191,52 +196,73 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         return wordCompleter;
     }
 
-    /*** ResourceService implementation ****/
-
     /**
      * Called once a resource has been saved
      * @param  {Editor.EditorEvents.SaveResourceEvent} ev
      */
-    // save(ev: Editor.EditorEvents.SaveResourceEvent) {
-    //     if (this.isValidFiletype(ev.path)) {
-    //         console.log(`${this.name}: received a save resource event for ${ev.path}`);
-    //         this.worker.port.postMessage({
-    //             command: WorkerProcessCommands.Save,
-    //             path: ev.path
-    //         });
-    //     }
-    // }
+    save(ev: Editor.EditorEvents.SaveResourceEvent) {
+        if (this.isValidFiletype(ev.path)) {
+            console.log(`${this.name}: received a save resource event for ${ev.path}`);
+
+            const message: WorkerProcessTypes.SaveMessageData = {
+                command: ClientExtensionEventNames.ResourceSavedEvent,
+                path: ev.path
+            };
+
+            this.worker.port.postMessage(message);
+        }
+    }
 
     /**
      * Handle the delete.  This should delete the corresponding javascript file
      * @param  {Editor.EditorEvents.DeleteResourceEvent} ev
      */
-    // delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
-    //     if (this.isValidFiletype(ev.path)) {
-    //         console.log(`${this.name}: received a delete resource event`);
-    //
-    //         // notify the typescript language service that the file has been deleted
-    //         this.worker.port.postMessage({
-    //             command: WorkerProcessCommands.Delete,
-    //             path: ev.path
-    //         });
-    //     }
-    // }
+    delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
+        if (this.isValidFiletype(ev.path)) {
+            console.log(`${this.name}: received a delete resource event`);
+
+            // notify the typescript language service that the file has been deleted
+            const message: WorkerProcessTypes.DeleteMessageData = {
+                command: ClientExtensionEventNames.ResourceDeletedEvent,
+                path: ev.path
+            };
+
+            this.worker.port.postMessage(message);
+        }
+    }
 
     /**
      * Handle the rename.  Should rename the corresponding .js file
      * @param  {Editor.EditorEvents.RenameResourceEvent} ev
      */
-    // rename(ev: Editor.EditorEvents.RenameResourceEvent) {
-    //     if (this.isValidFiletype(ev.path)) {
-    //         console.log(`${this.name}: received a rename resource event`);
-    //
-    //         // notify the typescript language service that the file has been renamed
-    //         this.worker.port.postMessage({
-    //             command: WorkerProcessCommands.Rename,
-    //             path: ev.path,
-    //             newPath: ev.newPath
-    //         });
-    //     }
-    // }
+    rename(ev: Editor.EditorEvents.RenameResourceEvent) {
+        if (this.isValidFiletype(ev.path)) {
+            console.log(`${this.name}: received a rename resource event`);
+
+            // notify the typescript language service that the file has been renamed
+            const message: WorkerProcessTypes.RenameMessageData = {
+                command: ClientExtensionEventNames.ResourceRenamedEvent,
+                path: ev.path,
+                newPath: ev.newPath
+            };
+
+            this.worker.port.postMessage(message);
+        }
+    }
+
+    /**
+     * Handle when the project is unloaded so that resources can be freed
+     */
+    projectUnloaded() {
+        if (this.worker) {
+
+            console.log(`${this.name}: received a project unloaded event`);
+
+            const message: WorkerProcessTypes.WorkerProcessMessageData = {
+                command: ClientExtensionEventNames.ProjectUnloadedEvent
+            };
+
+            this.worker.port.postMessage(message);
+        }
+    }
 }
