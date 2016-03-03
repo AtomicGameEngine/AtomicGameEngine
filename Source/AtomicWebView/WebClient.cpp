@@ -353,8 +353,10 @@ public:
         }
         else
         {
+#ifndef ATOMIC_PLATFORM_LINUX
             // headless
             windowInfo.SetAsWindowless(nullptr, false);
+#endif
         }
 
         webClient_->renderHandler_->SetSize(width, height);
