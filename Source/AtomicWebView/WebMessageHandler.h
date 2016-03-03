@@ -42,6 +42,8 @@ public:
     /// Destruct.
     virtual ~WebMessageHandler();
 
+    void HandleDeferredResponse(double queryID, bool success, const String& response);
+
     /// Success callback
     void Success(const String& response = String::EMPTY);
     /// Failure callback
@@ -51,7 +53,7 @@ public:
     WebClient* GetWebClient() { return client_; }
 
     /// Set the WebClient associated with this WebMessageHandler
-    void SetWebClient(WebClient* client) { client_ = client; }
+    void SetWebClient(WebClient* client) { client_ = client; }       
 
     /// Get the CefMessageRouterBrowserSide::Handler* as a opaque void*
     void* GetCefHandler() { return (void*) d_; }

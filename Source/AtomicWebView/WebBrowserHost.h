@@ -44,7 +44,7 @@ public:
 
 private:
 
-    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
     WebBrowserHostPrivate* d_;
 

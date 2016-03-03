@@ -68,12 +68,74 @@ public:
         message_router_->OnContextReleased(browser,  frame, context);
     }
 
-    virtual bool OnProcessMessageReceived(
+    virtual bool OnProcessMessageReceived (
             CefRefPtr<WebAppRenderer> app,
             CefRefPtr<CefBrowser> browser,
             CefProcessId source_process,
             CefRefPtr<CefProcessMessage> message) OVERRIDE
     {
+
+        const CefString& message_name = message->GetName();
+
+        if (message_name == "atomic_eval_javascript")
+        {
+            CefRefPtr<CefV8Context> context = browser->GetMainFrame()->GetV8Context();
+            CefRefPtr<CefV8Value> retval;
+            CefRefPtr<CefV8Exception> exception;
+
+            context->Enter();
+
+            CefRefPtr<CefV8Value> json = context->GetGlobal()->GetValue("JSON");
+            if (!json.get() || !json->IsObject())
+            {
+                context->Exit();
+                return false;
+            }
+
+            CefRefPtr<CefV8Value> stringify = json->GetValue("stringify");
+            if (!stringify.get() || !stringify->IsFunction())
+            {
+                context->Exit();
+                return false;
+            }
+
+            unsigned evalID = (unsigned) message->GetArgumentList()->GetInt(0);
+            CefString script = message->GetArgumentList()->GetString(1);
+
+            bool result = context->Eval(script, retval, exception);
+
+            // Create the result message object.
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("atomic_eval_javascript_result");
+
+            // Retrieve the argument list object.
+            CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+            // Populate the argument values.
+            args->SetInt(0, (int) evalID);
+            args->SetBool(1, result);
+            if (result)
+            {
+                CefV8ValueList stringifyArgs;
+                stringifyArgs.push_back(retval);
+                CefRefPtr<CefV8Value> sjson = stringify->ExecuteFunctionWithContext(context, NULL, stringifyArgs);
+                if (!sjson.get() || !sjson->IsString())
+                {
+                    args->SetString(2, "WebAppRenderer::OnProcessMessageReceived() - Error Getting Return JSON");
+                }
+                else
+                {
+                    args->SetString(2, sjson->GetStringValue());
+                }
+            }
+            else
+                args->SetString(2, exception->GetMessage());
+
+            browser->SendProcessMessage(PID_BROWSER, msg);
+
+            context->Exit();
+            return true;
+        }
+
         return message_router_->OnProcessMessageReceived(
                     browser, source_process, message);
     }
@@ -86,6 +148,7 @@ private:
 
     IMPLEMENT_REFCOUNTING(WebRenderDelegate);
 };
+
 
 WebAppRenderer::WebAppRenderer() {
 }
@@ -151,6 +214,7 @@ void WebAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
                                       CefRefPtr<CefFrame> frame,
                                       CefRefPtr<CefV8Context> context)
 {
+
     DelegateSet::Iterator it = delegates_.Begin();
     for (; it != delegates_.End(); ++it)
         (*it)->OnContextCreated(this, browser, frame, context);
