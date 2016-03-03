@@ -137,7 +137,7 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     RegisterWebSchemeHandlers(this);
 
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
+    SubscribeToEvent(E_UPDATE, HANDLER(WebBrowserHost, HandleUpdate));
 
 }
 
@@ -147,7 +147,7 @@ WebBrowserHost::~WebBrowserHost()
     CefShutdown();
 }
 
-void WebBrowserHost::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+void WebBrowserHost::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     CefDoMessageLoopWork();
 }

@@ -149,6 +149,24 @@ public:
 
         CEF_REQUIRE_UI_THREAD();
 
+        const CefString& message_name = message->GetName();
+
+        if (message_name == "atomic_eval_javascript_result")
+        {
+            if (webClient_.Null())
+                return false;
+
+            unsigned evalID = (unsigned) message->GetArgumentList()->GetInt(0);
+            bool result = message->GetArgumentList()->GetBool(1);
+            String value;
+            ConvertCEFString(message->GetArgumentList()->GetString(2), value);
+
+            webClient_->EvalJavaScriptResult(evalID, result, value);
+
+            return true;
+        }
+
+
         if (browserSideRouter_->OnProcessMessageReceived(browser, source_process, message))
         {
             return true;
@@ -314,34 +332,42 @@ public:
 
         Graphics* graphics = webClient_->GetSubsystem<Graphics>();
 
-        SDL_Window* sdlWindow = static_cast<SDL_Window*>(graphics->GetSDLWindow());
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-
-        if(SDL_GetWindowWMInfo(sdlWindow, &info))
+        if (graphics)
         {
+            SDL_Window* sdlWindow = static_cast<SDL_Window*>(graphics->GetSDLWindow());
+            SDL_SysWMinfo info;
+            SDL_VERSION(&info.version);
+
+            if(SDL_GetWindowWMInfo(sdlWindow, &info))
+            {
 #ifdef ATOMIC_PLATFORM_OSX
-            NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
-            windowInfo.SetAsWindowless(view, false);
+                NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
+                windowInfo.SetAsWindowless(view, false);
 #endif
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-            windowInfo.SetAsWindowless(info.info.win.window, false);
+                windowInfo.SetAsWindowless(info.info.win.window, false);
 #endif
+            }
 
-            webClient_->renderHandler_->SetSize(width, height);
-            CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
-                                                                              initialURL.CString(), browserSettings, nullptr);
-
-            if (!browser.get())
-                return false;
-
-            browser_ = browser;
-
-            return true;
+        }
+        else
+        {
+            // headless
+            windowInfo.SetAsWindowless(nullptr, false);
         }
 
-        return false;
+        webClient_->renderHandler_->SetSize(width, height);
+        CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
+                                                                          initialURL.CString(), browserSettings, nullptr);
+
+        if (!browser.get())
+            return false;
+
+        browser_ = browser;
+
+        return true;
+
 
     }
 
@@ -596,6 +622,39 @@ void WebClient::ExecuteJavaScript(const String& script)
         return;
 
     d_->browser_->GetMainFrame()->ExecuteJavaScript(CefString(script.CString()), "", 0);
+}
+
+void WebClient::EvalJavaScript(unsigned evalID, const String& script)
+{
+    if (!d_->browser_.get())
+        return;
+
+    // Create the message object.
+    CefRefPtr<CefProcessMessage> msg= CefProcessMessage::Create("atomic_eval_javascript");
+
+    // Retrieve the argument list object.
+    CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+    // Populate the argument values.
+    args->SetInt(0, (int) evalID);
+    args->SetString(1, CefString(script.CString()));
+
+    // Send the process message to the render process.
+    // Use PID_BROWSER instead when sending a message to the browser process.
+    d_->browser_->SendProcessMessage(PID_RENDERER, msg);
+}
+
+void WebClient::EvalJavaScriptResult(unsigned evalID, bool result, const String& value)
+{
+    using namespace WebViewJSEvalResult;
+
+    VariantMap eventData;
+    eventData[P_CLIENT] = this;
+    eventData[P_EVALID] = evalID;
+    eventData[P_RESULT] = result;
+    eventData[P_VALUE] = value;
+
+    SendEvent(E_WEBVIEWJSEVALRESULT, eventData);
 }
 
 void WebClient::AddMessageHandler(WebMessageHandler* handler, bool first)

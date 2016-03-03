@@ -92,24 +92,88 @@ public:
         eventData[P_CEFBROWSER] = (void*) browser;
         eventData[P_CEFFRAME] = (void*) frame;
 
+        // defaults to not being deferred
+        eventData[P_DEFERRED] = false;
+
         queryHandled_ = false;
         webMessageHandler_->SendEvent(E_WEBMESSAGE, eventData);
 
-        currentCallback_ = nullptr;
+        bool deferred = eventData[P_DEFERRED].GetBool();
 
-        if (!queryHandled_)
+        if (!deferred)
         {
-            LOGERROR("WebMessageHandlerPrivate::OnQuery - WebQuery was not handled");
-            return false;
+            if (!queryHandled_)
+            {
+                currentCallback_ = nullptr;
+                LOGERROR("WebMessageHandlerPrivate::OnQuery - WebQuery was not handled");
+                return false;
+            }
+        }
+        else
+        {
+            DeferredWebMessage* deferred = new DeferredWebMessage();
+            deferred->browser_ = browser;
+            deferred->frame_  = frame;
+            deferred->queryID_ = query_id;
+            deferred->request_ = request_;
+            deferred->persistent_ = persistent;
+            deferred->callback_ = currentCallback_;
+            deferredWebMessages_.Push(deferred);
         }
 
+        currentCallback_ = nullptr;
+
         return true;
+    }
+
+    void HandleDeferredResponse(double queryID, bool success, const String& response)
+    {
+        List<DeferredWebMessage*>::Iterator itr = deferredWebMessages_.Begin();
+        while (itr != deferredWebMessages_.End())
+        {
+            if ((*itr)->queryID_ == queryID)
+                break;
+
+            itr++;
+        }
+
+        if (itr == deferredWebMessages_.End())
+        {
+            LOGERRORF("WebMessageHandlerPrivate::HandleDeferredResponse - unable to find queryid: %d", queryID);
+            return;
+        }
+
+        if (success)
+        {
+            (*itr)->callback_->Success(CefString(response.CString()));
+        }
+        else
+        {
+            (*itr)->callback_->Failure(0, CefString(response.CString()));
+        }
+
+        DeferredWebMessage* ptr = (*itr);
+        deferredWebMessages_.Erase(itr);
+        delete ptr;
+
     }
 
 private:
 
     CefRefPtr<Callback> currentCallback_;
     bool queryHandled_;
+
+    struct DeferredWebMessage
+    {
+        CefRefPtr<CefBrowser> browser_;
+        CefRefPtr<CefFrame> frame_;
+        int64 queryID_;
+        String request_;
+        bool persistent_;
+        CefRefPtr<Callback> callback_;
+    };
+
+    List<DeferredWebMessage*> deferredWebMessages_;
 
     WeakPtr<WebMessageHandler> webMessageHandler_;
 };
@@ -123,6 +187,11 @@ WebMessageHandler::~WebMessageHandler()
 {
     delete d_;
     d_ = nullptr;
+}
+
+void WebMessageHandler::HandleDeferredResponse(double queryID, bool success, const String& response)
+{
+    d_->HandleDeferredResponse(queryID, success, response);
 }
 
 void WebMessageHandler::Success(const String& response)

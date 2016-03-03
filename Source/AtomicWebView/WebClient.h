@@ -99,6 +99,9 @@ public:
     /// Execute some JavaScript in the browser
     void ExecuteJavaScript(const String& script);
 
+    /// Eval some JavaScript in the browser (async return value referenced by evalID)
+    void EvalJavaScript(unsigned evalID, const String& script);
+
     // Navigation
 
     /// Returns true if the page is currently loading
@@ -124,6 +127,8 @@ public:
 private:
 
     void WasResized();
+
+    void EvalJavaScriptResult(unsigned evalID, bool result, const String& value);
 
     SharedPtr<WebRenderHandler> renderHandler_;
 
