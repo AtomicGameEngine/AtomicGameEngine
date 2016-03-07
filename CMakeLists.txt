@@ -72,6 +72,11 @@ endif()
 
 if (ATOMIC_WEBVIEW)
   if(APPLE)
+    if(POLICY CMP0037)
+      # new cmake doesn't like creating framework whose name has spaces
+      # which CEF3 scripts (including shell) currently require on OSX
+      cmake_policy(SET CMP0037 OLD)
+    endif()
     include_directories (${CMAKE_SOURCE_DIR}/Submodules/CEF/MacOSX/)
     add_subdirectory(Submodules/CEF/MacOSX/libcef_dll)
   elseif(MSVC)
