@@ -2124,7 +2124,12 @@ unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height
 
     SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
     source.Read(buffer.Get(), dataSize);
-    return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, (int*)&components, 0);
+    // #623 BEGIN TODO: Crunch expects all 4 components. This isn't ideal, but since
+    // precompressed versions should always be loaded anyway it doesn't matter.
+    // Might need to handle differently per platform.
+    components = 4;
+    return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, nullptr, components);
+    // #623 END TODO: Crunch expects all 4 components. This isn't ideal, but since
 }
 
 void Image::FreeImageData(unsigned char* pixelData)
