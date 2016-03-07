@@ -1,6 +1,6 @@
 
-if (APPLE)
-  include(LibCurl.cmake)
+if (MSVC)
+    include(LibCurlWindows.cmake)
 else()
-  include(LibCurlWindows.cmake)
+    include(LibCurl.cmake)
 endif()
