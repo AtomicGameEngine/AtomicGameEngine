@@ -571,5 +571,22 @@ void AssetDatabase::ReimportAllAssets()
 
 }
 
+void AssetDatabase::ReimportAllAssetsInDirectory(const String& directoryPath)
+{
+    List<SharedPtr<Asset>>::ConstIterator itr = assets_.Begin();
+
+    while (itr != assets_.End())
+    {
+        if ((*itr)->GetPath().StartsWith(directoryPath))
+        {
+            (*itr)->SetDirty(true);
+        }
+        itr++;
+    }
+
+    Scan();
+
+}
+
 
 }

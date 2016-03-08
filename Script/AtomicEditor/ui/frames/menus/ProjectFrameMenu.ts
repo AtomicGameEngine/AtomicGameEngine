@@ -86,6 +86,11 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
 
+            if (refid == "force_reimport_folder") {
+                ToolCore.assetDatabase.reimportAllAssetsInDirectory(path);
+                return true;
+            }
+
         }
 
         return false;
@@ -163,6 +168,7 @@ var assetFolderContextItems = {
     "Create Script": ["create_script", undefined, "ComponentBitmap"],
     "Create Material": ["create_material", undefined, "ComponentBitmap"],
     "Create Scene": ["create_scene", undefined, "ComponentBitmap"],
+    "Force Reimport": ["force_reimport_folder", undefined, ""],
     "-1": null,
     [showInFs]: ["reveal_folder", undefined, ""],
     "-2": null,
