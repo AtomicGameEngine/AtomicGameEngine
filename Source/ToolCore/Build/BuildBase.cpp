@@ -149,6 +149,11 @@ bool BuildBase::BuildCopyFile(const String& srcFileName, const String& destFileN
     return true;
 }
 
+bool BuildBase::CheckIncludeResourceFile(const String & resourceDir, const String & fileName)
+{
+    return (GetExtension(fileName) != ".psd");
+}
+
 bool BuildBase::BuildRemoveDirectory(const String& path)
 {
     if (buildFailed_)
@@ -278,8 +283,7 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
             }
         }
 
-        // TODO: Add additional filters
-        if (GetExtension(filename) == ".psd")
+        if (!CheckIncludeResourceFile(resourceDir, filename))
             continue;
 
         BuildResourceEntry* newEntry = new BuildResourceEntry;
