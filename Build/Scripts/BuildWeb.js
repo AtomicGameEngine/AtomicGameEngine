@@ -37,7 +37,7 @@ namespace('build', function() {
 
     }
     else {
-      cmds.push("cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=\"" + atomicRoot + "Build/CMake/Toolchains/emscripten.toolchain.cmake\" -DCMAKE_BUILD_TYPE=Release ../../../../");
+      cmds.push("cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=\"" + atomicRoot + "Build/CMake/Toolchains/emscripten.toolchain.cmake\" -DCMAKE_BUILD_TYPE=Release ../../../../");
       cmds.push("make -j4");
       // -s ERROR_ON_UNDEFINED_SYMBOLS=1 (disabled for pthread errors currently on incoming)
       cmds.push("cd ./Source/AtomicPlayer/Application && mv ./AtomicPlayer ./AtomicPlayer.bc && " +
