@@ -100,7 +100,11 @@ class CreateProject extends ModalWindow {
             // Do the creation!
             if (templateDetail && fileSystem.dirExists(templateDetail.folder)) {
 
-                fileSystem.copyDir(templateDetail.folder, folder);
+                if (!fileSystem.copyDir(templateDetail.folder, folder)) {
+                  var message = "Unable to copy folder: " + templateDetail.folder + " to " + folder;
+                  EditorUI.showModalError("New Project Editor Error", message);
+                  return false;
+                }
 
                 var utils = new Editor.FileUtils();
 
