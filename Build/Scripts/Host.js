@@ -13,3 +13,4 @@ if (os.platform() == "win32") {
 
 require("./BuildCommon");
 require("./BuildAndroid");
+require("./BuildWeb");
