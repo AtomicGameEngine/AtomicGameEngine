@@ -73,6 +73,10 @@ EVENT(E_WEBVIEWJSEVALRESULT, WebViewJSEvalResult)
     PARAM(P_VALUE, Value);   // String (sucess: eval's value, error: exception message)
 }
 
+/// WebView load state change
+EVENT(E_WEBVIEWGLOBALPROPERTIESCHANGED, WebViewGlobalPropertiesChanged)
+{
+}
 
 /// WebView title change
 EVENT(E_WEBMESSAGE, WebMessage)

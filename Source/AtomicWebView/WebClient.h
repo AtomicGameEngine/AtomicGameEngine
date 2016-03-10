@@ -110,6 +110,9 @@ public:
     /// Load the specified url into the main frame of the browser
     void LoadURL(const String& url);
 
+    /// Load html source into main frame of browser
+    void LoadString(const String& source, const String &url = "http://localcontent/");
+
     /// Go back in page history
     void GoBack();
     /// Go forward in page history
@@ -125,6 +128,10 @@ public:
     CefClient* GetCefClient();
 
 private:
+
+    void HandleWebViewGlobalPropertiesChanged(StringHash eventType, VariantMap& eventData);
+
+    void UpdateGlobalProperties();
 
     void WasResized();
 

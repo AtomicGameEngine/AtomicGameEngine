@@ -20,6 +20,11 @@
 // THE SOFTWARE.
 //
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#include <windows.h>
+#undef LoadString
+#endif
+
 #include <include/cef_app.h>
 #include <include/cef_client.h>
 #include <include/cef_browser.h>
@@ -34,6 +39,8 @@
 #include <Atomic/Input/Input.h>
 
 #include <Atomic/Graphics/Graphics.h>
+
+#include "Internal/WebAppBrowser.h"
 
 #include "WebBrowserHost.h"
 #include "WebMessageHandler.h"
@@ -129,6 +136,11 @@ public:
 
 
     // CefRequestHandler methods
+
+    void OnRenderViewReady(CefRefPtr<CefBrowser> browser) OVERRIDE
+    {
+    }
+
     bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
                         CefRefPtr<CefFrame> frame,
                         CefRefPtr<CefRequest> request,
@@ -137,6 +149,7 @@ public:
         CEF_REQUIRE_UI_THREAD();
 
         browserSideRouter_->OnBeforeBrowse(browser, frame);
+
         return false;
 
     }
@@ -425,6 +438,8 @@ private:
 WebClient::WebClient(Context* context) : Object(context)
 {
     d_ = new WebClientPrivate(this);
+
+    SubscribeToEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED, HANDLER(WebClient, HandleWebViewGlobalPropertiesChanged));
 }
 
 WebClient::~WebClient()
@@ -712,6 +727,23 @@ void WebClient::LoadURL(const String& url)
 
 }
 
+void WebClient::LoadString(const String& source, const String& url)
+{
+    if (!d_->browser_.get())
+    {
+        return;
+    }
+
+    // We need to make sure global properties are updated when loading web content from source string
+    // This is handled differently internally then we requests
+    WebClient::UpdateGlobalProperties();
+
+    CefString _source(source.CString());
+    d_->browser_->GetMainFrame()->LoadString(_source, url.CString());
+
+}
+
+
 void WebClient::GoBack()
 {
     if (!d_->browser_.get())
@@ -823,6 +855,36 @@ bool WebClient::CreateBrowser(const String& initialURL, int width, int height)
     bool result = d_->CreateBrowser(initialURL, width, height);
 
     return result;
+}
+
+void WebClient::UpdateGlobalProperties()
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefRefPtr<CefDictionaryValue> globalProps;
+    if (!WebAppBrowser::CreateGlobalProperties(globalProps))
+        return;
+
+    // Create the message object.
+    CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("atomic_set_globalproperties");
+
+    // Retrieve the argument list object.
+    CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+    args->SetDictionary(0, globalProps);
+
+    // Send the process message to the render process.
+    if (!d_->browser_->SendProcessMessage(PID_RENDERER, msg))
+    {
+        LOGERROR("WebClient::UpdateGlobalProperties - Failed to send message");
+    }
+
+}
+
+void WebClient::HandleWebViewGlobalPropertiesChanged(StringHash eventType, VariantMap& eventData)
+{
+    UpdateGlobalProperties();
 }
 
 void WebClient::SetSize(int width, int height)

@@ -20,8 +20,10 @@
 // THE SOFTWARE.
 //
 
+#include <Atomic/IO/Log.h>
 
 #include "WebAppBrowser.h"
+#include "../WebBrowserHost.h"
 
 namespace Atomic
 {
@@ -40,6 +42,70 @@ void WebAppBrowser::OnBeforeCommandLineProcessing(const CefString& process_type,
 void WebAppBrowser::OnContextInitialized()
 {
     CefBrowserProcessHandler::OnContextInitialized();
+}
+
+bool WebAppBrowser::CreateGlobalProperties(CefRefPtr<CefDictionaryValue>& globalProps)
+{
+
+    // Get a copy global properties
+    GlobalPropertyMap props = WebBrowserHost::GetGlobalProperties();
+
+    if (props.Empty())
+        return false;
+
+    GlobalPropertyMap::ConstIterator itr = props.Begin();
+
+    // populate with globals args
+    globalProps = CefDictionaryValue::Create();
+
+    while (itr != props.End())
+    {
+        HashMap<String, Variant>::ConstIterator pitr = itr->second_.Begin();
+
+        const String& globalVar = itr->first_;
+
+        CefRefPtr<CefDictionaryValue> kprops = CefDictionaryValue::Create();
+
+        while (pitr != itr->second_.End())
+        {
+            const String& propertyName = pitr->first_;
+            const Variant& value = pitr->second_;
+
+            if (value.GetType() == VAR_INT || value.GetType() == VAR_FLOAT || value.GetType() == VAR_DOUBLE)
+            {
+                kprops->SetDouble(propertyName.CString(), value.GetDouble());
+            }
+            else if (value.GetType() == VAR_BOOL)
+            {
+                kprops->SetBool(propertyName.CString(), value.GetBool());
+            }
+            else if (value.GetType() == VAR_STRING)
+            {
+                kprops->SetString(propertyName.CString(), value.GetString().CString());
+            }
+
+
+            pitr++;
+        }
+
+        globalProps->SetDictionary(globalVar.CString(), kprops);
+
+        itr++;
+    }
+
+    return true;
+
+}
+
+void WebAppBrowser::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info)
+{
+    // We're not on main thread here, we're on IO thread
+    CefRefPtr<CefDictionaryValue> globalProps;
+    if (CreateGlobalProperties(globalProps))
+    {
+        extra_info->SetDictionary(0, globalProps);
+    }
+
 }
 
 
