@@ -773,7 +773,11 @@ void Lexer::scanUntilQuote(Token *tok, unsigned char quote)
         yyinp();
 
     if (control())
+    {
         tok->string = control()->stringLiteral(yytext, yylen);
+        if (quote == '"')
+            ((StringLiteral *)tok->string)->_quotedString = true;
+    }
 }
 
 void Lexer::scanNumericLiteral(Token *tok)
