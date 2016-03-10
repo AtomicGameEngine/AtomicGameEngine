@@ -311,8 +311,10 @@ public:
                     if (arg->hasInitializer())
                     {
                         ftype->initializer_ = arg->initializer()->chars();
-                        if (ftype->initializer_.StartsWith("\\"))
+
+                        if (arg->initializer()->_quotedString)
                             ftype->initializer_ = "\"" + ftype->initializer_ + "\"";
+
                     }
 
                     jfunction->AddParameter(ftype);
@@ -425,7 +427,7 @@ public:
         }
 
         if (type->isIntegerType() || _unsigned)
-        {            
+        {
             module_->RegisterConstant(getNameString(decl->name()).CString(), value, JSBPrimitiveType::Int, _unsigned);
         }
         else

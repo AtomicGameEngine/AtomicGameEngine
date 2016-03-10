@@ -67,8 +67,12 @@ class CPLUSPLUS_EXPORT StringLiteral: public Literal
 {
 public:
     StringLiteral(const char *chars, unsigned size)
-        : Literal(chars, size)
+        : Literal(chars, size), _quotedString(false)
     { }
+
+    // ATOMIC BEGIN
+    bool _quotedString;
+    // ATOMIC END
 };
 
 class CPLUSPLUS_EXPORT NumericLiteral: public Literal
