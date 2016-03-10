@@ -327,6 +327,12 @@ public:
 
     bool CreateBrowser(const String& initialURL, int width, int height)
     {
+        if (browser_.get())
+        {
+            LOGERROR("WebClient::CreateBrowser - Browser already created");
+            return false;
+        }
+
         if (webClient_->renderHandler_.Null())
         {
             LOGERROR("WebClient::CreateBrowser - No render handler specified");
@@ -372,14 +378,25 @@ public:
 #endif
         }
 
+        // TODO: There seems to be a CEF bug when loading a string into a browser
+        // which was created with an empty URL, this workaround gets things going
+        // NOTE: I also tried loading the string, delaying 5 seconds and still won't
+        // load a string until a URL has been passed into the view
+        String _initialURL = initialLoadString_.Length() ? "x" : initialURL;
+
         webClient_->renderHandler_->SetSize(width, height);
         CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
-                                                                          initialURL.CString(), browserSettings, nullptr);
+                                                                          _initialURL.CString(), browserSettings, nullptr);
 
         if (!browser.get())
             return false;
 
         browser_ = browser;
+
+        if (initialLoadString_.Length())
+        {
+            webClient_->LoadString(initialLoadString_, initialLoadStringURL_);
+        }
 
         return true;
 
@@ -423,9 +440,18 @@ public:
         browser_->GetHost()->CloseBrowser(force_close);
     }
 
+    void SetInitialLoadString(const String& loadString, const String& url)
+    {
+        initialLoadString_ = loadString;
+        initialLoadStringURL_ = url;
+    }
+
     IMPLEMENT_REFCOUNTING(WebClientPrivate);
 
 private:
+
+    String initialLoadString_;
+    String initialLoadStringURL_;
 
     CefRefPtr<CefBrowser> browser_;
     WeakPtr<WebBrowserHost> webBrowserHost_;
@@ -731,15 +757,15 @@ void WebClient::LoadString(const String& source, const String& url)
 {
     if (!d_->browser_.get())
     {
+        d_->SetInitialLoadString(source, url);
         return;
     }
 
     // We need to make sure global properties are updated when loading web content from source string
     // This is handled differently internally then we requests
-    WebClient::UpdateGlobalProperties();
+    UpdateGlobalProperties();
 
-    CefString _source(source.CString());
-    d_->browser_->GetMainFrame()->LoadString(_source, url.CString());
+    d_->browser_->GetMainFrame()->LoadString(source.CString(), url.CString());
 
 }
 
