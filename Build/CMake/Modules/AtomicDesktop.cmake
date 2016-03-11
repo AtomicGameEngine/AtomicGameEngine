@@ -9,39 +9,22 @@ set (ATOMIC_LINK_LIBRARIES ${ATOMIC_LINK_LIBRARIES} LibCpuId SQLite)
 
 # Check whether the CEF submodule is available
 if (EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF)
-    #Check if CEF got pulled
+    #Check if CEF got pulled by looking if the foldes is empty
     file(GLOB RESULT ${CMAKE_SOURCE_DIR}/Submodules/CEF)
     list(LENGTH ${RESULT} RES_LEN)
     if(RES_LEN EQUAL 0)
-     message(STATUS "Trying to initalise CEF submodule")
+     message(STATUS "Initialising CEF submodule")
 
-     set(PATH_STRING $ENV{PATH})
-     string(REPLACE ":" ";" PATHLIST ${PATH_STRING})
-
-     set(GIT_FOUND false)
-     foreach(cpath ${PATHLIST})
-      if (EXISTS ${cpath}/git)
-       set(GIT_FOUND true)
-       break()
-      endif()
-     endforeach(cpath)
-
-     # DIR is empty, so init the submodule and checkout master
+     find_package(Git REQUIRED)
      if(GIT_FOUND)
       execute_process(COMMAND git submodule update --init --remote)
-
-      set(ATOMIC_WEBVIEW TRUE)
-      add_definitions( -DATOMIC_WEBVIEW )
-      include("AtomicWebView")
      else ()
-      message(STATUS "Could not find git in your Path please install git to enable WebView")
+      message(STATUS "Could not find git in your Path. Please install git")
      endif(GIT_FOUND)
-
-    else ()
-     set(ATOMIC_WEBVIEW TRUE)
-     add_definitions( -DATOMIC_WEBVIEW )
-     include("AtomicWebView")
     endif()
+    set(ATOMIC_WEBVIEW TRUE)
+    add_definitions( -DATOMIC_WEBVIEW )
+    include("AtomicWebView")
 endif()
 
 include(AtomicNET)
