@@ -1,6 +1,13 @@
 
 include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/zlib)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
+if (ATOMIC_PROJECT_ARCH STREQUAL "x86")
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/32bit)
+else()
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/curl/windows/64bit)
+endif()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 add_definitions(-DBUILDING_LIBCURL -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_WIN32_WINNT=0x0501)
 add_definitions(-DUSE_SCHANNEL -DUSE_WINDOWS_SSPI -DHAVE_CONFIG_H)
