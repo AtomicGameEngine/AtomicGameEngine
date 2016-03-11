@@ -92,6 +92,11 @@ if (ATOMIC_WEBVIEW)
     include_directories (${CMAKE_SOURCE_DIR}/Submodules/CEF/Linux)
     add_subdirectory(Submodules/CEF/Linux/libcef_dll)
   endif()
+
+  if (ATOMIC_UWEBKIT)
+    add_subdirectory(Submodules/uWebKit/uWebKitNative)
+  endif()
+
 endif()
 
 add_subdirectory(Source)
