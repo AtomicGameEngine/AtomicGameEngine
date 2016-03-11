@@ -1,3 +1,7 @@
 [submodule "Submodules/CEF"]
 	path = Submodules/CEF
 	url = https://github.com/AtomicGameEngine/CEF3Binaries
+	
+[submodule "Submodules/uWebKit"]
+	path = Submodules/uWebKit
+	url = https://github.com/uWebKit/uWebKit3
