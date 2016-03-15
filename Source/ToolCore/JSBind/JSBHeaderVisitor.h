@@ -272,7 +272,10 @@ public:
         if (name.StartsWith("operator "))
             return NULL;
 
-        if (name == klass->GetNativeName())
+        if (name == klass->GetNativeName() && function->isPrivate())
+            jfunction->SetPrivateConstructor();
+
+        if (name == klass->GetNativeName() && function->isPublic())
             jfunction->SetConstructor();
 
         if (name.StartsWith("~"))
@@ -283,6 +286,9 @@ public:
 
         if (function->isStatic())
             jfunction->SetStatic(true);
+
+        if (!function->isPublic())
+            jfunction->SetSkip(true);
 
         // see if we support return type
         if (function->hasReturnType() && !function->returnType().type()->isVoidType())
@@ -487,13 +493,17 @@ public:
                 if (function->isPureVirtual())
                     jclass->SetAbstract();
 
-                // only want public functions
-                if (!symbol->isPublic())
-                    continue;
-
                 JSBFunction* jfunction = processFunction(jclass, function);
+
                 if (jfunction)
+                {
+                    if (jfunction->IsPrivateConstructor())
+                    {
+                        jclass->SetHasPrivateConstruct(true);
+                        continue;
+                    }
                     jclass->AddFunction(jfunction);
+                }
             }
 
         }

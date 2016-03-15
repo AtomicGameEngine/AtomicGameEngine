@@ -36,7 +36,7 @@ public:
 
     bool Match(JSBFunction* function);
 
-    void Parse() ;
+    void Parse();
 
     bool parsed_;
 };
@@ -54,27 +54,25 @@ public:
 
     }
 
-    // returns proper case for property name
-    // based on whether the Getter/Setter is all caps
-    // GetMyValue -> myValue;
-    // GetGUID -> guid
-    // URLEnabled -> urlEnabled
+    /* returns proper case for property name eg:
+        URLEnabled->urlEnabled
+        BaseType->baseType
+        RGBA16Format->rgba16Format
+        EncodeURLList->encodeUrlList
+        EncodeURLListB->encodeUrlListB
+        EncodeURLB->encodeUrlb// No way to split words*/
     String GetCasePropertyName()
     {
         if (!name_.Length())
             return name_;
 
         bool allUpper = true;
+        String newName = name_;
+        int nameLength = name_.Length();
 
-        // TODO: https://github.com/AtomicGameEngine/AtomicGameEngine/issues/587
-        if (name_ == "URLEnabled")
+        for (unsigned k = 0; k < nameLength; k++)
         {
-            return "urlEnabled";
-        }
-
-        for (unsigned k = 0; k < name_.Length(); k++)
-        {
-            if (!isupper(name_[k]))
+            if (islower(name_[k]))
             {
                 allUpper = false;
                 break;
@@ -82,13 +80,55 @@ public:
         }
 
         if (allUpper)
-        {
             return name_.ToLower();
+
+        if (isupper(name_[0]))
+            newName[0] = tolower(name_[0]);
+
+        if (nameLength == 1)
+            return newName;
+
+        char prevChar = name_[0];
+        for (int k = 1; k < nameLength - 1; k++)
+        {
+            char currChar = name_[k];
+            char nextChar = name_[k + 1];
+
+            if ('0' <= nextChar && nextChar <= '9')
+            {
+                newName[k] = tolower(currChar);
+            }
+            else if (isupper(currChar) && isupper(prevChar) && isupper(nextChar))
+            {
+                newName[k] = tolower(currChar);
+            }
+
+            prevChar = currChar;
+        }
+        if (isupper(name_[nameLength - 1]) && isupper(prevChar))
+            newName[nameLength - 1] = tolower(name_[nameLength - 1]);
+
+        //Checks IOS at front
+        if (name_.StartsWith("IOS", false))
+        {
+            newName[0] = tolower(name_[0]);
+            newName[1] = tolower(name_[1]);
+            newName[2] = tolower(name_[2]);
         }
 
-        String name = name_;
-        name[0] = tolower(name[0]);
-        return name;
+        int lastLetter = nameLength - 1;
+        int secondLast = nameLength - 2;
+        int thirdLast = nameLength - 3;
+
+        //Check IOS at back
+        if (name_.EndsWith("IOS", false))
+        {
+            newName[lastLetter] = toupper(name_[lastLetter]);
+            newName[secondLast] = toupper(name_[secondLast]);
+            newName[thirdLast] = toupper(name_[thirdLast]);
+        }
+
+        return newName;
     }
 
 };
@@ -109,7 +149,7 @@ public:
     const String& GetName() { return name_; }
     const String& GetNativeName() { return nativeName_; }
     JSBClass* GetBaseClass();
-    PODVector<JSBClass*>& GetBaseClasses() {return baseClasses_; }
+    PODVector<JSBClass*>& GetBaseClasses() { return baseClasses_; }
     PODVector<JSBFunction*>& GetFunctions() { return functions_; }
 
     bool IsAbstract() { return isAbstract_; }
@@ -136,8 +176,11 @@ public:
     JSBModule* GetModule() { return module_; }
     JSBPackage* GetPackage() { return module_->GetPackage(); }
 
+    bool HasPrivateConstruct() { return hasPrivateConstruct_; }
+    void SetHasPrivateConstruct(bool value = true) { hasPrivateConstruct_ = value; }
+
     bool IsNumberArray() { return numberArrayElements_ != 0; }
-    int  GetNumberArrayElements() { return numberArrayElements_;}
+    int  GetNumberArrayElements() { return numberArrayElements_; }
     const String& GetArrayElementType() const { return arrayElementType_; }
 
     JSBFunction* GetConstructor();
@@ -195,6 +238,8 @@ private:
 
     bool hasProperties_;
     HashMap<String, JSBProperty*> properties_;
+
+    bool hasPrivateConstruct_;
 
 };
 

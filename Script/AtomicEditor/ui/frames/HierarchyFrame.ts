@@ -272,7 +272,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         var typeName = ev.dragObject.object.typeName;
 
-        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
+        var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemId));
 
         if (!dropNode) return;
 
@@ -353,7 +353,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             if (id == "create popup") {
 
-                var selectedId = Number(this.hierList.rootList.selectedItemID);
+                var selectedId = Number(this.hierList.rootList.selectedItemId);
                 var node = this.scene.getNode(selectedId);
                 if (!node)
                     node = this.scene;
@@ -379,7 +379,7 @@ class HierarchyFrame extends Atomic.UIWidget {
             var node: Atomic.Node;
 
             if (id == "hierList_")
-                node = this.scene.getNode(Number(this.hierList.hoverItemID));
+                node = this.scene.getNode(Number(this.hierList.hoverItemId));
             else
                 node = this.scene.getNode(Number(id));
 
