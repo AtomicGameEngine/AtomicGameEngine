@@ -265,7 +265,8 @@ bool Engine::Initialize(const VariantMap& parameters)
                 success = cache->AddResourceDir(pathName);
         }
 
-        if (!success)
+        // ATOMIC: Only fail when CoreData can't be opened and not headless
+        if (!success && !headless_)
         {
             LOGERRORF("Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
                 resourcePaths[i].CString());
