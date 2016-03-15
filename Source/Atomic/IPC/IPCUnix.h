@@ -78,11 +78,13 @@ class IPCProcess : public Object
 
     public:
 
-        IPCProcess(Context* context, int fd1, int fd2, int pid = -1);
+    IPCProcess(Context* context, int fd1, int fd2, int pid = -1);
 
     virtual ~IPCProcess();
 
     bool IsRunning();
+
+    bool Terminate() { return true; }
 
     int fd1() const { return fd1_; }
     int fd2() const { return fd2_; }
