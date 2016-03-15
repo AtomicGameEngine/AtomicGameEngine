@@ -115,11 +115,13 @@ class IPCProcess : public Object
 
     public:
 
-        IPCProcess(Context* context, IPCHandle clientRead, IPCHandle clientWrite, IPCHandle pid = INVALID_IPCHANDLE_VALUE);
+    IPCProcess(Context* context, IPCHandle clientRead, IPCHandle clientWrite, IPCHandle pid = INVALID_IPCHANDLE_VALUE);
 
     virtual ~IPCProcess();
 
     bool IsRunning();
+
+    bool Terminate();
 
     IPCHandle clientRead() const { return clientRead_; }
     IPCHandle clientWrite() const { return clientWrite_; }

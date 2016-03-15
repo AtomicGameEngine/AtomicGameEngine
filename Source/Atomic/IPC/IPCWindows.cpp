@@ -263,6 +263,17 @@ IPCProcess::~IPCProcess()
 
 }
 
+bool IPCProcess::Terminate()
+{
+    if (TerminateProcess(pid_, 0))
+    {
+        WaitForSingleObject(pid_, 1000);
+        return true;
+    }
+        
+    return false;
+}
+
 bool IPCProcess::IsRunning()
 {
     DWORD exitCode;
