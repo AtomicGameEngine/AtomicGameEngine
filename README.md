@@ -4,7 +4,7 @@ This repository contains the **full source code** to the Atomic Game Engine Runt
 
 ##### LICENSE
 
-The Atomic Game Engine source code is released under the permissive **[MIT license](https://opensource.org/licenses/MIT)**.  Please see  [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/LICENSE.md) for complete licensing information.
+The Atomic Game Engine source code is released under the permissive **[MIT license](https://opensource.org/licenses/MIT)**.  Please see  [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md) for complete licensing information.
 
 ##### Website
 
