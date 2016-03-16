@@ -113,7 +113,9 @@ Engine::Engine(Context* context) :
     initialized_(false),
     exiting_(false),
     headless_(false),
-    audioPaused_(false)
+    audioPaused_(false),
+    paused_(false),
+    runNextPausedFrame_(false)
 {
     // Register self as a subsystem
     context_->RegisterSubsystem(this);
@@ -157,6 +159,8 @@ Engine::Engine(Context* context) :
     RegisterNavigationLibrary(context_);
 #endif
 
+    SubscribeToEvent(E_PAUSERESUMEREQUESTED, HANDLER(Engine, HandlePauseResumeRequested));
+    SubscribeToEvent(E_PAUSESTEPREQUESTED, HANDLER(Engine, HandlePauseStepRequested));
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(Engine, HandleExitRequested));
 }
 
@@ -452,8 +456,9 @@ void Engine::RunFrame()
 
     time->BeginFrame(timeStep_);
 
-    // If pause when minimized -mode is in use, stop updates and audio as necessary
-    if (pauseMinimized_ && input->IsMinimized())
+    // If paused, or pause when minimized -mode is in use, stop updates and audio as necessary
+    if ((paused_ && !runNextPausedFrame_) ||
+        (pauseMinimized_ && input->IsMinimized()))
     {
         if (audio->IsPlaying())
         {
@@ -469,6 +474,9 @@ void Engine::RunFrame()
             audio->Play();
             audioPaused_ = false;
         }
+        
+        // Only run one frame when stepping
+        runNextPausedFrame_ = false;
 
         Update();
     }
@@ -498,7 +506,7 @@ Console* Engine::CreateConsole()
     */
 }
 
-DebugHud* Engine::CreateDebugHud()
+SystemUI::DebugHud* Engine::CreateDebugHud()
 {
     return 0;
 
@@ -555,6 +563,23 @@ void Engine::SetAutoExit(bool enable)
 void Engine::SetNextTimeStep(float seconds)
 {
     timeStep_ = Max(seconds, 0.0f);
+}
+
+void Engine::SetPaused(bool paused)
+{
+    paused_ = paused;
+
+    using namespace UpdatesPaused;
+
+    // Updates paused event
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_PAUSED] = paused_;
+    SendEvent(E_UPDATESPAUSEDRESUMED, eventData);
+}
+
+void Engine::SetRunNextPausedFrame(bool run)
+{
+    runNextPausedFrame_ = run;
 }
 
 void Engine::Exit()
@@ -934,6 +959,20 @@ const Variant& Engine::GetParameter(const VariantMap& parameters, const String& 
     StringHash nameHash(parameter);
     VariantMap::ConstIterator i = parameters.Find(nameHash);
     return i != parameters.End() ? i->second_ : defaultValue;
+}
+
+
+void Engine::HandlePauseResumeRequested(StringHash eventType, VariantMap& eventData)
+{
+    SetPaused(!IsPaused());
+}
+
+void Engine::HandlePauseStepRequested(StringHash eventType, VariantMap& eventData)
+{
+    if (IsPaused())
+    {
+        SetRunNextPausedFrame(true);
+    }
 }
 
 void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)

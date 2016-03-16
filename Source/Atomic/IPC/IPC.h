@@ -71,7 +71,7 @@ private:
     unsigned workerChannelID_;
 
     // processes queued events
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
 
     mutable Mutex eventMutex_;
 

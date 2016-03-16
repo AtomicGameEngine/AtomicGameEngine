@@ -63,4 +63,10 @@ EVENT(E_ENDFRAME, EndFrame)
 {
 }
 
+/// Updating paused or resumed event.
+EVENT(E_UPDATESPAUSEDRESUMED, UpdatesPaused)
+{
+    PARAM(P_PAUSED, Paused);            // bool
+}
+
 }

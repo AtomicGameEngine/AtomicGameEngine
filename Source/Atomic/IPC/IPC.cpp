@@ -39,7 +39,7 @@ namespace Atomic
 IPC::IPC(Context* context) : Object(context),
     workerChannelID_(0)
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(IPC, HandleUpdate));
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(IPC, HandleBeginFrame));
 }
 
 IPC::~IPC()
@@ -102,7 +102,7 @@ void IPC::SendEventToBroker(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void IPC::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void IPC::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // If we're a worker, if update fails, time to exit
     if (worker_.NotNull())

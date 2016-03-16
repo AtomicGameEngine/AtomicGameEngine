@@ -81,6 +81,12 @@ elements
 	StopButton
 		bitmap stop.png
 
+	PauseButton
+		bitmap pause.png
+
+	StepButton
+		bitmap step.png
+
 	PowerOffButton
 		bitmap power_off.png
 

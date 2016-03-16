@@ -41,6 +41,9 @@ private:
     void HandleIPCJSError(StringHash eventType, VariantMap& eventData);
     void HandleIPCWorkerLog(StringHash eventType, VariantMap& eventData);
     void HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData);
+    void HandleIPCPlayerPauseResumeRequest(StringHash eventType, VariantMap& eventData);
+    void HandleIPCPlayerUpdatesPausedResumed(StringHash eventType, VariantMap& eventData);
+    void HandleIPCPlayerPauseStepRequest(StringHash eventType, VariantMap& eventData);
     void HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<IPCBroker> playerBroker_;

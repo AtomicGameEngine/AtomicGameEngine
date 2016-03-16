@@ -68,6 +68,18 @@ EVENT(E_EDITORPLAYERSTARTED, EditorPlayerStarted)
     PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
 }
 
+// emitted once player has paused
+EVENT(E_EDITORPLAYERPAUSED, EditorPlayerPaused)
+{
+
+}
+
+// emitted once paused player has resumed
+EVENT(E_EDITORPLAYERRESUMED, EditorPlayerResumed)
+{
+
+}
+
 // emitted once play has stopped
 EVENT(E_EDITORPLAYERSTOPPED, EditorPlayerStopped)
 {

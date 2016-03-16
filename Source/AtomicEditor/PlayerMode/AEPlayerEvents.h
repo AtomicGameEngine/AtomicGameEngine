@@ -14,6 +14,21 @@ using namespace Atomic;
 namespace AtomicEditor
 {
 
+EVENT(E_IPCPLAYERPAUSERESUMEREQUEST, IPCPlayerPauseResumeRequest)
+{
+
+}
+
+EVENT(E_IPCPLAYERUPDATESPAUSEDRESUMED, IPCPlayerUpdatesPausedResumed)
+{
+    PARAM(P_PAUSED, Paused);            // bool
+}
+
+EVENT(E_IPCPLAYERPAUSESTEPREQUEST, IPCPlayerPauseStepRequest)
+{
+
+}
+
 EVENT(E_IPCPLAYEREXITREQUEST, IPCPlayerExitRequest)
 {
 

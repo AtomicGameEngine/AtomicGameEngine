@@ -9,6 +9,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/Input/InputEvents.h>
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Graphics/GraphicsEvents.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Camera.h>
@@ -49,6 +50,7 @@ PlayerMode::PlayerMode(Context* context) :
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(PlayerMode, HandleExitRequest));
     SubscribeToEvent(E_SCREENMODE, HANDLER(PlayerMode, HandlePlayerWindowChanged));
     SubscribeToEvent(E_WINDOWPOS, HANDLER(PlayerMode, HandlePlayerWindowChanged));
+    SubscribeToEvent(E_UPDATESPAUSEDRESUMED, HANDLER(PlayerMode, HandleUpdatesPausedResumed));
 
     // BEGIN LICENSE MANAGEMENT
     SubscribeToEvent(E_BEGINVIEWRENDER, HANDLER(PlayerMode, HandleViewRender));
@@ -253,6 +255,11 @@ void PlayerMode::HandlePlayerWindowChanged(StringHash eventType, VariantMap& eve
     data[P_MONITOR] = graphics->GetCurrentMonitor();
     data[P_MAXIMIZED] = graphics->GetMaximized();
     ipc_->SendEventToBroker(E_IPCPLAYERWINDOWCHANGED, data);
+}
+
+void PlayerMode::HandleUpdatesPausedResumed(StringHash eventType, VariantMap& eventData)
+{
+    ipc_->SendEventToBroker(E_IPCPLAYERUPDATESPAUSEDRESUMED, eventData);
 }
 
 void PlayerMode::HandleExitRequest(StringHash eventType, VariantMap& eventData)

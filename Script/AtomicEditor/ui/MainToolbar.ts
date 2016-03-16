@@ -15,6 +15,8 @@ class MainToolbar extends Atomic.UIWidget {
     scaleButton: Atomic.UIButton;
     axisButton: Atomic.UIButton;
     playButton: Atomic.UIButton;
+    pauseButton: Atomic.UIButton;
+    stepButton: Atomic.UIButton;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -30,6 +32,10 @@ class MainToolbar extends Atomic.UIWidget {
 
         this.playButton = <Atomic.UIButton>this.getWidget("maintoolbar_play");
 
+        this.pauseButton = <Atomic.UIButton>this.getWidget("maintoolbar_pause");
+
+        this.stepButton = <Atomic.UIButton>this.getWidget("maintoolbar_step");
+
         this.translateButton.value = 1;
 
         parent.addChild(this);
@@ -42,10 +48,22 @@ class MainToolbar extends Atomic.UIWidget {
         this.subscribeToEvent(EditorEvents.PlayerStarted, (data) => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("StopButton");
+            var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
+            skin.setSkinBg("PauseButton");
         });
         this.subscribeToEvent(EditorEvents.PlayerStopped, (data) => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
+            var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
+            skin.setSkinBg("PauseButton");
+        });
+        this.subscribeToEvent(EditorEvents.PlayerPaused, (data) => {
+            var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
+            skin.setSkinBg("PlayButton");
+        });
+        this.subscribeToEvent(EditorEvents.PlayerResumed, (data) => {
+            var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
+            skin.setSkinBg("PauseButton");
         });
     }
 
@@ -102,6 +120,14 @@ class MainToolbar extends Atomic.UIWidget {
 
             } else if (ev.target.id == "maintoolbar_play") {
                 EditorUI.getShortcuts().invokePlayOrStopPlayer();
+                return true;
+
+            } else if (ev.target.id == "maintoolbar_pause") {
+                EditorUI.getShortcuts().invokePauseOrResumePlayer();
+                return true;
+
+            } else if (ev.target.id == "maintoolbar_step") {
+                EditorUI.getShortcuts().invokeStepPausedPlayer();
                 return true;
             }
 

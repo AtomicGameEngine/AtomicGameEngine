@@ -11,6 +11,7 @@
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCBroker.h>
 
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Input/InputEvents.h>
 
 #include <ToolCore/ToolEnvironment.h>
@@ -35,6 +36,9 @@ EditorMode::EditorMode(Context* context) :
     Object(context)
 {
     SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
+    SubscribeToEvent(E_IPCPLAYERPAUSERESUMEREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseResumeRequest));
+    SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
+    SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
     SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
 }
 
@@ -150,6 +154,31 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     return playerBroker_.NotNull();
 
+}
+
+void EditorMode::HandleIPCPlayerPauseResumeRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (!playerBroker_) return;
+    VariantMap noEventData;
+    playerBroker_->PostMessage(E_PAUSERESUMEREQUESTED, noEventData);
+}
+
+void EditorMode::HandleIPCPlayerUpdatesPausedResumed(StringHash eventType, VariantMap& eventData)
+{
+    using namespace UpdatesPaused;
+
+    bool paused = eventData[P_PAUSED].GetBool();
+    if (paused)
+        SendEvent(E_EDITORPLAYERPAUSED);
+    else
+        SendEvent(E_EDITORPLAYERRESUMED);
+}
+
+void EditorMode::HandleIPCPlayerPauseStepRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (!playerBroker_) return;
+    VariantMap noEventData;
+    playerBroker_->PostMessage(E_PAUSESTEPREQUESTED, noEventData);
 }
 
 void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData)

@@ -43,6 +43,7 @@ private:
     void HandleViewRender(StringHash eventType, VariantMap& eventData);
     void HandleExitRequest(StringHash eventType, VariantMap& eventData);
     void HandlePlayerWindowChanged(StringHash eventType, VariantMap& eventData);
+    void HandleUpdatesPausedResumed(StringHash eventType, VariantMap& eventData);
 
 // BEGIN LICENSE MANAGEMENT
     void HandleMessageAck(StringHash eventType, VariantMap& eventData);
