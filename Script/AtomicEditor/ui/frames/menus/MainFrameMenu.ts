@@ -350,7 +350,5 @@ var helpItems = {
     "Atomic Forums": ["help forums"],
     "-2": null,
     "Atomic Game Engine on GitHub": ["help github"],
-    "About Atomic Editor": "about atomic editor",
-    "-3": null,
-    "Manage License": "manage license"
+    "About Atomic Editor": "about atomic editor"
 };

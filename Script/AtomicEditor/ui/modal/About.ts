@@ -36,7 +36,6 @@ class About extends ModalWindow {
         this.load("AtomicEditor/editor/ui/about.tb.txt");
 
         this.age_license = <Atomic.UIEditField>this.getWidget("age_license");
-        this.age_runtimelicense = <Atomic.UIEditField> this.getWidget("age_runtime_license");
         this.thirdparty_license = <Atomic.UIEditField>this.getWidget("thirdparty_license");
         this.externaltool_license = <Atomic.UIEditField>this.getWidget("externaltool_license");
         this.about_text = <Atomic.UIEditField>this.getWidget("about_text");
@@ -45,9 +44,6 @@ class About extends ModalWindow {
 
         var file = cache.getFile("AtomicEditor/eulas/atomic_game_engine_eula.txt");
         this.age_license.text = file.readText();
-
-        file = cache.getFile("AtomicEditor/eulas/atomic_runtime_eula.txt");
-        this.age_runtimelicense.text = file.readText();
 
         file = cache.getFile("AtomicEditor/eulas/atomic_thirdparty_eula.txt");
         this.thirdparty_license.text = file.readText();
@@ -134,7 +130,6 @@ class About extends ModalWindow {
     }
 
     age_license: Atomic.UIEditField;
-    age_runtimelicense: Atomic.UIEditField;
     thirdparty_license: Atomic.UIEditField;
     externaltool_license: Atomic.UIEditField;
     about_text: Atomic.UIEditField;

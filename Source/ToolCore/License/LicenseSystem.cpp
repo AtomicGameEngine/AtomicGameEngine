@@ -97,6 +97,8 @@ void LicenseSystem::Initialize()
         return;
     }
 
+    // TODO: Cleanup for MIT
+
     if (!LoadLicense() || !key_.Length())
     {
         ResetLicense();
@@ -106,7 +108,7 @@ void LicenseSystem::Initialize()
     }
     else
     {
-        RequestServerVerification(key_);
+        // RequestServerVerification(key_);
     }
 }
 
@@ -154,6 +156,18 @@ void LicenseSystem::ResetLicense()
 bool LicenseSystem::LoadLicense()
 {
 
+    key_ = "ATOMIC-XXXX-XXXX-XXXX-XXXX";
+    licenseWindows_ = true;
+    licenseMac_ = true;
+    licenseAndroid_ = true;
+    licenseIOS_ = true;
+    licenseHTML5_ = true;
+    licenseModule3D_ = true;
+
+    return true;
+
+   // TODO: Cleanup for MIT
+/*
     ResetLicense();
 
     FileSystem* filesystem = GetSubsystem<FileSystem>();
@@ -179,6 +193,7 @@ bool LicenseSystem::LoadLicense()
     licenseModule3D_ = file->ReadBool();
 
     return true;
+*/
 }
 
 bool LicenseSystem::ValidateKey(const String& key)

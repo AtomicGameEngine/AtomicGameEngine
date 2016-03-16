@@ -3,18 +3,13 @@ TBLayout: axis: y
 		gravity all
 		id tabcontainer
 		tabs
-			TBButton: text: "Editor and Tool License"
-			TBButton: text: "Runtime License"
+			TBButton: text: "Atomic Game Engine License"
 			TBButton: text: "Third Party Licenses"
 			TBButton: text: "External Tool Licenses"
 		TBEditField: multiline: 1, styling: 1, gravity: all, id: age_license, readonly: 1, adapt-to-content: 0
 			font: size: 12
 			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
 			text: "..."
-		TBEditField: multiline: 1, styling: 1, gravity: all, id: age_runtime_license, readonly: 1, adapt-to-content: 0
-			font: size: 12
-			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
-			text: "..."			
 		TBEditField: multiline: 1, styling: 1, gravity: all, id: thirdparty_license, readonly: 1, adapt-to-content: 0
 			font: size: 12
 			lp: max-width: 800, min-width: 800, min-height: 512, max-height: 512
