@@ -12,6 +12,10 @@ The Atomic Game Engine source code is released under the permissive **[MIT licen
 
 Visit http://www.AtomicGameEngine.com for all the latest news and downloads of the Atomic Game Engine
 
+####Chat
+
+[![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ####Screenshots
 
 #####Atomic Editor
@@ -30,13 +34,9 @@ Visit http://www.AtomicGameEngine.com for all the latest news and downloads of t
 [AndroidBuildSettings]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/AndroidBuildSettings.png
 ![alt text][AndroidBuildSettings] 
 
-######Looking for the Javascript and TypeScript examples?
+####Looking for the Javascript and TypeScript examples?
 
 They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript Examples</a>
-
-#####Chat
-
-[![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ###Building the Atomic Editor from Source
 
