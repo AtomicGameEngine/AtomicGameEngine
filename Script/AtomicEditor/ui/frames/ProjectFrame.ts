@@ -149,7 +149,7 @@ class ProjectFrame extends ScriptWidget {
             var asset: ToolCore.Asset;
 
             if (id == "folderList_")
-                asset = db.getAssetByGUID(this.folderList.hoverItemID);
+                asset = db.getAssetByGUID(this.folderList.hoverItemId);
             else
                 asset = db.getAssetByGUID(id);
 
@@ -190,7 +190,7 @@ class ProjectFrame extends ScriptWidget {
 
                     var list = <Atomic.UISelectList>data.target;
 
-                    var selectedId = list.selectedItemID;
+                    var selectedId = list.selectedItemId;
 
                     // selectedId == 0 = root "Resources"
 
@@ -257,7 +257,7 @@ class ProjectFrame extends ScriptWidget {
 
     handleFolderListSelectionChangedEvent(event: Atomic.UIListViewSelectionChangedEvent) {
 
-        var selectedId = this.folderList.selectedItemID;
+        var selectedId = this.folderList.selectedItemId;
 
         if (selectedId != "0") {
             var db = ToolCore.getAssetDatabase();
@@ -294,7 +294,7 @@ class ProjectFrame extends ScriptWidget {
 
             // if the drop target is the folderList's root select widget
             var rootList = this.folderList.rootList;
-            var hoverID = rootList.hoverItemID;
+            var hoverID = rootList.hoverItemId;
 
             if (hoverID == "")
                 return;
