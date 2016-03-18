@@ -91,6 +91,11 @@ void AEEditorApp::Setup()
 
     AEEditorCommon::Setup();
 
+    // Ensure exclusive fullscreen is disabled in Editor application
+    Input* input = GetSubsystem<Input>();
+    input->SetToggleFullscreen(false);
+
+
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
 
     engineParameters_["WindowTitle"] = "AtomicEditor";
