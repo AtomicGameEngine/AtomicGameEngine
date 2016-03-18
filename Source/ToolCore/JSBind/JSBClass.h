@@ -106,7 +106,7 @@ public:
     JSBClass(Context* context, JSBModule* module, const String& name, const String& nativeName);
     virtual ~JSBClass();
 
-    const String& GetName() { return name_; }
+    const String& GetName() const { return name_; }
     const String& GetNativeName() { return nativeName_; }
     JSBClass* GetBaseClass();
     PODVector<JSBClass*>& GetBaseClasses() {return baseClasses_; }

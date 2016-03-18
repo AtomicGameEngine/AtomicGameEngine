@@ -162,12 +162,20 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
 
 }
 
+inline bool CompareJSBClassesByName(const SharedPtr<JSBClass>& lhs, const SharedPtr<JSBClass>& rhs)
+{
+    return lhs->GetName() < rhs->GetName();
+}
+
 void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 {
     Vector<SharedPtr<JSBClass>> classes = module->GetClasses();
 
     if (!classes.Size())
         return;
+
+    // Sort classes to ensure consistent output across machines
+    Sort(classes.Begin(), classes.End(), CompareJSBClassesByName);
 
     source_ += "\n";
 
@@ -265,10 +273,13 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
 void JSBTypeScript::ExportModuleConstants(JSBModule* module)
 {
-    const Vector<String>& constants = module->GetConstants().Keys();
+    Vector<String>& constants = module->GetConstants().Keys();
 
     if (!constants.Size())
         return;
+
+    // Sort constants to ensure consistent output across machines
+    Sort(constants.Begin(), constants.End());
 
     source_ += "\n";
 
@@ -283,14 +294,23 @@ void JSBTypeScript::ExportModuleConstants(JSBModule* module)
 
 }
 
+inline bool CompareJSBEnumsByName(const SharedPtr<JSBEnum>& lhs, const SharedPtr<JSBEnum>& rhs)
+{
+    return lhs->GetName() < rhs->GetName();
+}
+
 void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 {
 
     Vector<SharedPtr<JSBEnum>> enums = module->GetEnums();
 
-    for (unsigned i = 0; i <enums.Size(); i++)
+    // Sort enums alphabetically to ensure consistent output across machines
+    Sort(enums.Begin(), enums.End(), CompareJSBEnumsByName);
+
+    Vector<SharedPtr<JSBEnum>>::Iterator enumIter;
+    for (enumIter = enums.Begin(); enumIter != enums.End(); enumIter++)
     {
-        JSBEnum* _enum = enums[i];
+        JSBEnum* _enum = *enumIter;
 
         // can't use a TS enum, so use a type alias
 
@@ -299,15 +319,15 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
         HashMap<String, String>& values = _enum->GetValues();
 
-        HashMap<String, String>::ConstIterator itr = values.Begin();
+        HashMap<String, String>::ConstIterator valsIter = values.Begin();
 
-        while (itr != values.End())
+        while (valsIter != values.End())
         {
-            String name = (*itr).first_;
+            String name = (*valsIter).first_;
 
             source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
 
-            itr++;
+            valsIter++;
         }
 
         source_ += "\n";
@@ -327,11 +347,19 @@ void JSBTypeScript::WriteToFile(const String &path)
 
 }
 
+inline bool CompareJSBModulesByName(const SharedPtr<JSBModule>& lhs, const SharedPtr<JSBModule>& rhs)
+{
+    return lhs->GetName() < rhs->GetName();
+}
+
 void JSBTypeScript::Emit(JSBPackage* package, const String& path)
 {
     package_ = package;
 
     Vector<SharedPtr<JSBModule>>& modules = package->GetModules();
+
+    // Sort modules alphabetically to ensure consistent output across machines
+    Sort(modules.Begin(), modules.End(), CompareJSBModulesByName);
 
     Begin();
 
