@@ -24,6 +24,7 @@ import strings = require("../../EditorStrings");
 import EditorEvents = require("../../../editor/EditorEvents");
 import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
+import Preferences = require("editor/Preferences");
 
 class MainFrameMenu extends Atomic.ScriptObject {
 
@@ -216,6 +217,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
             }
 
+            //Sets all value in prefs.json to default and shuts down the editor.
+            if (refid == "developer clear preferences") {
+                var myPrefs = Preferences.getInstance();
+                myPrefs.useDefaultConfig();
+                myPrefs.saveEditorWindowData(myPrefs.editorWindow);
+                myPrefs.savePlayerWindowData(myPrefs.playerWindow);
+                Atomic.getEngine().exit();
+            }
 
         } else if (target.id == "menu tools popup") {
 
@@ -315,6 +324,7 @@ var buildItems = {
 var developerItems = {
 
     "Show Console": ["developer show console"],
+    "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {
         "UI Debugger": ["developer show uidebugger"],
         "Asset Database": {
