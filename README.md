@@ -2,7 +2,7 @@
 ![alt text][AtomicLogo]
 ####Editor and Player Source Repository
 
-This repository contains the **full source code** to the Atomic Game Engine Runtime, Atomic Editor, Atomic CLI, and other tools.  The Atomic Game Engine is a cross platform authoring solution with **deployment to Windows, OSX, Android, iOS, Linux, and WebGL**
+This repository contains the **full source code** to the Atomic Game Engine Runtime, Atomic Editor, and other tools.  The Atomic Game Engine is a cross platform authoring solution with **deployment to Windows, OSX, Android, iOS, Linux, and WebGL**. Games and applications can be written in **JavaScript, TypeScript, C++, with C# scripting in development**.
 
 ####LICENSE
 
