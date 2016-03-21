@@ -1,7 +1,7 @@
 #### Atomic Game Engine License
 -------------------------------------
 
-Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC 
+Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC  
 https://github.com/AtomicGameEngine/AtomicGameEngine
 
 Permission is hereby granted, free of charge, to any person obtaining a
