@@ -263,6 +263,10 @@ class MainFrameMenu extends Atomic.ScriptObject {
             } else if (refid == "help chat") {
                 Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/");
                 return true;
+            }
+            else if (refid == "help getting started") {
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/learn/");
+                return true;
             } else if (refid == "help github") {
                 Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/");
                 return true;
@@ -353,7 +357,7 @@ var fileItems = {
 
 var helpItems = {
 
-    "Check for Updates": "check update",
+    "Getting Started": "help getting started",
     "API Documentation": ["help api"],
     "-1": null,
     "Atomic Chat": ["help chat"],
