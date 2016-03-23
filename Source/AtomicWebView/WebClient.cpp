@@ -20,6 +20,11 @@
 // THE SOFTWARE.
 //
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+#include <windows.h>
+#undef LoadString
+#endif
+
 #include <include/cef_app.h>
 #include <include/cef_client.h>
 #include <include/cef_browser.h>
@@ -34,6 +39,8 @@
 #include <Atomic/Input/Input.h>
 
 #include <Atomic/Graphics/Graphics.h>
+
+#include "Internal/WebAppBrowser.h"
 
 #include "WebBrowserHost.h"
 #include "WebMessageHandler.h"
@@ -129,6 +136,11 @@ public:
 
 
     // CefRequestHandler methods
+
+    void OnRenderViewReady(CefRefPtr<CefBrowser> browser) OVERRIDE
+    {
+    }
+
     bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
                         CefRefPtr<CefFrame> frame,
                         CefRefPtr<CefRequest> request,
@@ -137,6 +149,7 @@ public:
         CEF_REQUIRE_UI_THREAD();
 
         browserSideRouter_->OnBeforeBrowse(browser, frame);
+
         return false;
 
     }
@@ -148,6 +161,24 @@ public:
     {
 
         CEF_REQUIRE_UI_THREAD();
+
+        const CefString& message_name = message->GetName();
+
+        if (message_name == "atomic_eval_javascript_result")
+        {
+            if (webClient_.Null())
+                return false;
+
+            unsigned evalID = (unsigned) message->GetArgumentList()->GetInt(0);
+            bool result = message->GetArgumentList()->GetBool(1);
+            String value;
+            ConvertCEFString(message->GetArgumentList()->GetString(2), value);
+
+            webClient_->EvalJavaScriptResult(evalID, result, value);
+
+            return true;
+        }
+
 
         if (browserSideRouter_->OnProcessMessageReceived(browser, source_process, message))
         {
@@ -296,6 +327,12 @@ public:
 
     bool CreateBrowser(const String& initialURL, int width, int height)
     {
+        if (browser_.get())
+        {
+            LOGERROR("WebClient::CreateBrowser - Browser already created");
+            return false;
+        }
+
         if (webClient_->renderHandler_.Null())
         {
             LOGERROR("WebClient::CreateBrowser - No render handler specified");
@@ -314,34 +351,55 @@ public:
 
         Graphics* graphics = webClient_->GetSubsystem<Graphics>();
 
-        SDL_Window* sdlWindow = static_cast<SDL_Window*>(graphics->GetSDLWindow());
-        SDL_SysWMinfo info;
-        SDL_VERSION(&info.version);
-
-        if(SDL_GetWindowWMInfo(sdlWindow, &info))
+        if (graphics)
         {
+            SDL_Window* sdlWindow = static_cast<SDL_Window*>(graphics->GetSDLWindow());
+            SDL_SysWMinfo info;
+            SDL_VERSION(&info.version);
+
+            if(SDL_GetWindowWMInfo(sdlWindow, &info))
+            {
 #ifdef ATOMIC_PLATFORM_OSX
-            NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
-            windowInfo.SetAsWindowless(view, false);
+                NSView* view = (NSView*) GetNSWindowContentView(info.info.cocoa.window);
+                windowInfo.SetAsWindowless(view, false);
 #endif
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-            windowInfo.SetAsWindowless(info.info.win.window, false);
+                windowInfo.SetAsWindowless(info.info.win.window, false);
 #endif
+            }
 
-            webClient_->renderHandler_->SetSize(width, height);
-            CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
-                                                                              initialURL.CString(), browserSettings, nullptr);
-
-            if (!browser.get())
-                return false;
-
-            browser_ = browser;
-
-            return true;
+        }
+        else
+        {
+#ifndef ATOMIC_PLATFORM_LINUX
+            // headless
+            windowInfo.SetAsWindowless(nullptr, false);
+#endif
         }
 
-        return false;
+        // TODO: There seems to be a CEF bug when loading a string into a browser
+        // which was created with an empty URL, this workaround gets things going
+        // NOTE: I also tried loading the string, delaying 5 seconds and still won't
+        // load a string until a URL has been passed into the view
+        String _initialURL = initialLoadString_.Length() ? "x" : initialURL;
+
+        webClient_->renderHandler_->SetSize(width, height);
+        CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(windowInfo, this,
+                                                                          _initialURL.CString(), browserSettings, nullptr);
+
+        if (!browser.get())
+            return false;
+
+        browser_ = browser;
+
+        if (initialLoadString_.Length())
+        {
+            webClient_->LoadString(initialLoadString_, initialLoadStringURL_);
+        }
+
+        return true;
+
 
     }
 
@@ -382,9 +440,18 @@ public:
         browser_->GetHost()->CloseBrowser(force_close);
     }
 
+    void SetInitialLoadString(const String& loadString, const String& url)
+    {
+        initialLoadString_ = loadString;
+        initialLoadStringURL_ = url;
+    }
+
     IMPLEMENT_REFCOUNTING(WebClientPrivate);
 
 private:
+
+    String initialLoadString_;
+    String initialLoadStringURL_;
 
     CefRefPtr<CefBrowser> browser_;
     WeakPtr<WebBrowserHost> webBrowserHost_;
@@ -397,6 +464,8 @@ private:
 WebClient::WebClient(Context* context) : Object(context)
 {
     d_ = new WebClientPrivate(this);
+
+    SubscribeToEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED, HANDLER(WebClient, HandleWebViewGlobalPropertiesChanged));
 }
 
 WebClient::~WebClient()
@@ -598,6 +667,39 @@ void WebClient::ExecuteJavaScript(const String& script)
     d_->browser_->GetMainFrame()->ExecuteJavaScript(CefString(script.CString()), "", 0);
 }
 
+void WebClient::EvalJavaScript(unsigned evalID, const String& script)
+{
+    if (!d_->browser_.get())
+        return;
+
+    // Create the message object.
+    CefRefPtr<CefProcessMessage> msg= CefProcessMessage::Create("atomic_eval_javascript");
+
+    // Retrieve the argument list object.
+    CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+    // Populate the argument values.
+    args->SetInt(0, (int) evalID);
+    args->SetString(1, CefString(script.CString()));
+
+    // Send the process message to the render process.
+    // Use PID_BROWSER instead when sending a message to the browser process.
+    d_->browser_->SendProcessMessage(PID_RENDERER, msg);
+}
+
+void WebClient::EvalJavaScriptResult(unsigned evalID, bool result, const String& value)
+{
+    using namespace WebViewJSEvalResult;
+
+    VariantMap eventData;
+    eventData[P_CLIENT] = this;
+    eventData[P_EVALID] = evalID;
+    eventData[P_RESULT] = result;
+    eventData[P_VALUE] = value;
+
+    SendEvent(E_WEBVIEWJSEVALRESULT, eventData);
+}
+
 void WebClient::AddMessageHandler(WebMessageHandler* handler, bool first)
 {
     SharedPtr<WebMessageHandler> _handler(handler);
@@ -650,6 +752,23 @@ void WebClient::LoadURL(const String& url)
     d_->browser_->GetMainFrame()->LoadURL(_url);
 
 }
+
+void WebClient::LoadString(const String& source, const String& url)
+{
+    if (!d_->browser_.get())
+    {
+        d_->SetInitialLoadString(source, url);
+        return;
+    }
+
+    // We need to make sure global properties are updated when loading web content from source string
+    // This is handled differently internally then we requests
+    UpdateGlobalProperties();
+
+    d_->browser_->GetMainFrame()->LoadString(source.CString(), url.CString());
+
+}
+
 
 void WebClient::GoBack()
 {
@@ -762,6 +881,36 @@ bool WebClient::CreateBrowser(const String& initialURL, int width, int height)
     bool result = d_->CreateBrowser(initialURL, width, height);
 
     return result;
+}
+
+void WebClient::UpdateGlobalProperties()
+{
+    if (!d_->browser_.get())
+        return;
+
+    CefRefPtr<CefDictionaryValue> globalProps;
+    if (!WebAppBrowser::CreateGlobalProperties(globalProps))
+        return;
+
+    // Create the message object.
+    CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("atomic_set_globalproperties");
+
+    // Retrieve the argument list object.
+    CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+    args->SetDictionary(0, globalProps);
+
+    // Send the process message to the render process.
+    if (!d_->browser_->SendProcessMessage(PID_RENDERER, msg))
+    {
+        LOGERROR("WebClient::UpdateGlobalProperties - Failed to send message");
+    }
+
+}
+
+void WebClient::HandleWebViewGlobalPropertiesChanged(StringHash eventType, VariantMap& eventData)
+{
+    UpdateGlobalProperties();
 }
 
 void WebClient::SetSize(int width, int height)

@@ -15,12 +15,6 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   set(OS_WINDOWS 1)
 endif()
 
-if(CMAKE_SIZEOF_VOID_P MATCHES 8)
-  set(PROJECT_ARCH "x86_64")
-else()
-  set(PROJECT_ARCH "x86")
-endif()
-
 if(OS_MACOSX)
     set(CEF_STANDARD_LIBS "-lpthread" "-framework Cocoa" "-framework AppKit")
     set(CEF_LIBTYPE SHARED)
@@ -39,10 +33,18 @@ if(OS_MACOSX)
 endif()
 
 if(OS_WINDOWS)
-    set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
-    set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/libcef.lib")
-    set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
-    set(CEF_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Resources")
+
+    if (ATOMIC_PROJECT_ARCH STREQUAL "x86")
+        set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/32bit/Release")
+        set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/libcef.lib")
+        set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/32bit/Release")
+        set(CEF_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/32bit/Resources")
+    else()
+        set(CEF_BINARY_DIR_RELEASE "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
+        set(CEF_LIB_RELEASE "${CEF_BINARY_DIR_RELEASE}/libcef.lib")
+        set(CEF_BINARY_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Release")
+        set(CEF_RESOURCE_DIR "${CMAKE_SOURCE_DIR}/Submodules/CEF/Windows/64bit/Resources")
+    endif()
 endif()
 
 if(OS_LINUX)
@@ -337,14 +339,14 @@ set(CEF_BINARY_FILES
   snapshot_blob.bin
   )
 
-# We don't have a 32 bit build right now
-#if(PROJECT_ARCH STREQUAL "x86")
-# Only used on 32-bit platforms.
-#  set(CEF_BINARY_FILES
-#    ${CEF_BINARY_FILES}
-#    wow_helper.exe
-#    )
-#endif()
+
+if(ATOMIC_PROJECT_ARCH STREQUAL "x86")
+    #Only used on 32-bit platforms.
+  set(CEF_BINARY_FILES
+    ${CEF_BINARY_FILES}
+    wow_helper.exe
+    )
+endif()
 
 # List of CEF resource files.
 set(CEF_RESOURCE_FILES

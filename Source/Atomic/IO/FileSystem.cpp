@@ -908,37 +908,62 @@ bool FileSystem::CreateDirs(const String& root, const String& subdirectory)
 
 }
 
-bool FileSystem::CreateDirsRecursive(const String& directoryIn, const String& directoryOut)
+bool FileSystem::CreateDirsRecursive(const String& directoryIn)
 {
-    if (!CreateDir(directoryOut))
+    String directory = AddTrailingSlash(GetInternalPath(directoryIn));
+
+    if (DirExists(directory))
+        return true;
+
+    if (FileExists(directory))
         return false;
 
-    Vector<String> results;
-    ScanDir(results, directoryIn, "*", SCAN_DIRS, false );
+    String parentPath = directory;
 
-    while (results.Remove(".")) {}
-    while (results.Remove("..")) {}
+    Vector<String> paths;
 
-    for (unsigned i = 0; i < results.Size(); i++)
+    paths.Push(directory);
+
+    while (true)
     {
-        String dirIn = directoryIn + "/" + results[i];
-        String dirOut = directoryOut + "/" + results[i];
+        parentPath = GetParentPath(parentPath);
 
-        //LOGINFOF("SRC: %s, DST: %s", dirIn.CString(), dirOut.CString());
+        if (!parentPath.Length())
+            break;
 
-        if (!CreateDirsRecursive(dirIn, dirOut))
+        paths.Push(parentPath);
+    }
+
+    if (!paths.Size())
+        return false;
+
+    for (int i = (int) (paths.Size() - 1); i >= 0; i--)
+    {
+        const String& pathName = paths[i];
+
+        if (FileExists(pathName))
             return false;
+
+        if (DirExists(pathName))
+            continue;
+
+        if (!CreateDir(pathName))
+            return false;
+
+        // double check
+        if (!DirExists(pathName))
+            return false;
+
     }
 
     return true;
+
 }
 
 bool FileSystem::CopyDir(const String& directoryIn, const String& directoryOut)
 {
     if (FileExists(directoryOut) || DirExists(directoryOut))
         return false;
-
-    CreateDirsRecursive(directoryIn, directoryOut);
 
     Vector<String> results;
     ScanDir(results, directoryIn, "*", SCAN_FILES, true );
@@ -947,8 +972,15 @@ bool FileSystem::CopyDir(const String& directoryIn, const String& directoryOut)
     {
         String srcFile = directoryIn + "/" + results[i];
         String dstFile = directoryOut + "/" + results[i];
+
+        String dstPath = GetPath(dstFile);
+
+        if (!CreateDirsRecursive(dstPath))
+            return false;
+
         //LOGINFOF("SRC: %s DST: %s", srcFile.CString(), dstFile.CString());
-        Copy(srcFile, dstFile);
+        if (!Copy(srcFile, dstFile))
+            return false;
     }
 
     return true;

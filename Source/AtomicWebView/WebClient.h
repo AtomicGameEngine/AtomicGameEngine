@@ -99,6 +99,9 @@ public:
     /// Execute some JavaScript in the browser
     void ExecuteJavaScript(const String& script);
 
+    /// Eval some JavaScript in the browser (async return value referenced by evalID)
+    void EvalJavaScript(unsigned evalID, const String& script);
+
     // Navigation
 
     /// Returns true if the page is currently loading
@@ -106,6 +109,9 @@ public:
 
     /// Load the specified url into the main frame of the browser
     void LoadURL(const String& url);
+
+    /// Load html source into main frame of browser
+    void LoadString(const String& source, const String &url = "http://localcontent/");
 
     /// Go back in page history
     void GoBack();
@@ -123,7 +129,13 @@ public:
 
 private:
 
+    void HandleWebViewGlobalPropertiesChanged(StringHash eventType, VariantMap& eventData);
+
+    void UpdateGlobalProperties();
+
     void WasResized();
+
+    void EvalJavaScriptResult(unsigned evalID, bool result, const String& value);
 
     SharedPtr<WebRenderHandler> renderHandler_;
 

@@ -1,60 +1,48 @@
-####Atomic Game Engine™ Editor and Player Source Repository
+[AtomicLogo]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/Atomic-Game-Engine-512.png
+![alt text][AtomicLogo]
+####Editor and Player Source Repository
 
-##### Website
+This repository contains the **full source code** to the Atomic Game Engine Runtime, Atomic Editor, and other tools.  The Atomic Game Engine is a cross platform authoring solution with **deployment to Windows, OSX, Android, iOS, Linux, and WebGL**. Games and applications can be written in **JavaScript, TypeScript, C++, with C# scripting in development**.
 
-<a href="http://atomicgameengine.com">http://www.AtomicGameEngine.com</a>
+####LICENSE
 
-###### Looking for the Javascript examples?
+The Atomic Game Engine source code is released under the permissive **[MIT license](https://opensource.org/licenses/MIT)**.  Please see  [LICENSE.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/LICENSE.md) for complete licensing information.
+
+####Documentation and Downloads
+
+**[Getting Started Documentation](http://atomicgameengine.com/learn/)** 
+
+**[Download the Atomic Editor](http://atomicgameengine.com/download/)** 
+
+####Community
+
+**Forums:** [Atomic Forums](http://atomicgameengine.com/forum/)
+
+**Gitter Chat:** [![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+ 
+####Screenshots
+
+#####Atomic Editor
+[RoboBeach]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/RoboBeach.png
+![alt text][RoboBeach]
+
+#####Atomic Examples
+[DevSnapshot]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/DevSnapshot2116.png
+![alt text][DevSnapshot]
+
+#####Atomic on Mobile
+[ToonTown]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/ToonTownTouchUpdate.gif
+![alt text][ToonTown]
+
+#####Atomic Build Settings
+[AndroidBuildSettings]: https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/images/repo/AndroidBuildSettings.png
+![alt text][AndroidBuildSettings] 
+
+####Looking for the Javascript and TypeScript examples?
 
 They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples">Javascript Examples</a>
 
-###### Looking for Atomic-Haxe?
-
-It's here: <a href="https://github.com/rsredsq/atomic-haxe">Atomic-Haxe</a>  <sup>(Community Supported)</sup>
-
-##### Chat
-
-[![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-##### Forums
-
-<a href="http://atomicgameengine.com/forum">Atomic Game Engine Forums</a>
-
-##### Twitter
-
-<a href="https://twitter.com/AtomicGEngine">Follow @AtomicGEngine</a>
-
-[WelcomeScreen]: https://github.com/AtomicGameEngine/AtomicExamples/wiki/images/WelcomeScreen.png
-
-![alt text][WelcomeScreen]
-
-This repository contains the **full source code** to the Atomic Game Engine Runtime, Atomic Editor, Atomic CLI, and other tools.
-
-The source code is intended for licensees who need to customize the C++ runtime and editor.  For most users, we recommend the **supported binary releases** available for [DOWNLOAD](http://atomicgameengine.com/download) on our website.
-
-Custom builds of the Atomic Game Engine Editor require product activation and platform deployment licenses.  These can also be acquired at our website.
-
-For **supported binary releases** and to acquire **product activation keys** or **platform deployment licenses** please visit: http://www.AtomicGameEngine.com
-
-### Licensing Information
-
-#### [The Atomic Game Engine™ Runtime EULA (MIT)](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/Licenses/LICENSE_ATOMIC_RUNTIME.md)
-
-> The full source code to the Atomic Runtime used by end user apps, games, simulations, and visualizations is available under the permissive **MIT license**
-
-#### [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/Licenses/LICENSE_ATOMIC_EDITOR_AND_TOOLS.md)
-
-> The full source code to the Atomic Editor and other tooling is available under the terms of the [The Atomic Game Engine™ Editor and Tools EULA](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/Licenses/LICENSE_ATOMIC_EDITOR_AND_TOOLS.md)
-
-**[Third Party Licenses](https://github.com/AtomicGameEngine/AtomicRuntime/blob/master/Licenses/LICENSE_THIRDPARTY.md)**
-
-> The Atomic Game Engine contains third party technology available under permissive Open Source licenses.
-
-
-### Building the Atomic Editor from Source
+###Building the Atomic Editor from Source
 
 Please see [Building the Atomic Editor from Source](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-the-Atomic-Editor-from-Source) for Visual Studio 2013, XCode, and QtCreator build instructions.
 
-### Website
-
-Visit http://www.AtomicGameEngine.com for all the latest news and downloads of the Atomic Game Engine

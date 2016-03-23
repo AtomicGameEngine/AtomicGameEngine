@@ -36,6 +36,8 @@ class WebRenderDelegate : public WebAppRenderer::Delegate
 
 public:
 
+    static CefRefPtr<CefDictionaryValue> globalProperties_;
+
     WebRenderDelegate()
         : last_node_is_editable_(false)
     {
@@ -52,12 +54,91 @@ public:
         message_router_ = CefMessageRouterRendererSide::Create(config);
     }
 
+    virtual void OnRenderThreadCreated(CefRefPtr<WebAppRenderer> app,
+                                       CefRefPtr<CefListValue> extra_info) OVERRIDE
+    {
+        // extra info comes from void WebAppBrowser::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info)
+
+        if (extra_info->GetSize() > 0)
+        {
+            // index 0 is global properties
+            globalProperties_ = extra_info->GetDictionary(0)->Copy(false);
+        }
+
+    }
+
+    virtual bool OnBeforeNavigation(CefRefPtr<WebAppRenderer> app,
+                                    CefRefPtr<CefBrowser> browser,
+                                    CefRefPtr<CefFrame> frame,
+                                    CefRefPtr<CefRequest> request,
+                                    cef_navigation_type_t navigation_type,
+                                    bool is_redirect) OVERRIDE
+    {
+        return false;
+    }
+
+    void UpdateGlobalProperties(CefRefPtr<CefV8Context> context)
+    {
+
+        if (!globalProperties_.get())
+        {
+            return;
+        }
+
+        context->Enter();
+
+        CefDictionaryValue::KeyList keys;
+        globalProperties_->GetKeys(keys);
+
+        for (unsigned i = 0; i < keys.size(); i++)
+        {
+            const CefString& globalVarName = keys[i];
+
+            CefRefPtr<CefV8Value> globalVar = CefV8Value::CreateObject(nullptr);
+
+            CefDictionaryValue::KeyList pkeys;
+            CefRefPtr<CefDictionaryValue> props = globalProperties_->GetDictionary(globalVarName);
+            props->GetKeys(pkeys);
+
+            for (unsigned j = 0; j < pkeys.size(); j++)
+            {
+                const CefString& keyName = pkeys[j];
+
+                CefValueType type = props->GetType(keyName);
+
+                if (type == VTYPE_BOOL)
+                {
+                    globalVar->SetValue(keyName, CefV8Value::CreateBool(props->GetBool(keyName)), V8_PROPERTY_ATTRIBUTE_NONE);
+                }
+                else if (type == VTYPE_DOUBLE)
+                {
+                    globalVar->SetValue(keyName, CefV8Value::CreateDouble(props->GetDouble(keyName)), V8_PROPERTY_ATTRIBUTE_NONE);
+                }
+                else if (type == VTYPE_STRING)
+                {
+                    globalVar->SetValue(keyName, CefV8Value::CreateString(props->GetString(keyName)), V8_PROPERTY_ATTRIBUTE_NONE);
+                }
+            }
+
+            context->GetGlobal()->SetValue(globalVarName, globalVar, V8_PROPERTY_ATTRIBUTE_NONE);
+        }
+
+        context->Exit();
+    }
+
+    virtual void OnBrowserCreated(CefRefPtr<WebAppRenderer> app,
+                                  CefRefPtr<CefBrowser> browser) OVERRIDE
+    {
+    }
+
     virtual void OnContextCreated(CefRefPtr<WebAppRenderer> app,
                                   CefRefPtr<CefBrowser> browser,
                                   CefRefPtr<CefFrame> frame,
                                   CefRefPtr<CefV8Context> context) OVERRIDE
     {
         message_router_->OnContextCreated(browser,  frame, context);
+
+        UpdateGlobalProperties(context);
     }
 
     virtual void OnContextReleased(CefRefPtr<WebAppRenderer> app,
@@ -68,12 +149,80 @@ public:
         message_router_->OnContextReleased(browser,  frame, context);
     }
 
-    virtual bool OnProcessMessageReceived(
+    virtual bool OnProcessMessageReceived (
             CefRefPtr<WebAppRenderer> app,
             CefRefPtr<CefBrowser> browser,
             CefProcessId source_process,
             CefRefPtr<CefProcessMessage> message) OVERRIDE
     {
+
+        const CefString& message_name = message->GetName();
+
+        if (message_name == "atomic_eval_javascript")
+        {
+            CefRefPtr<CefV8Context> context = browser->GetMainFrame()->GetV8Context();
+            CefRefPtr<CefV8Value> retval;
+            CefRefPtr<CefV8Exception> exception;
+
+            context->Enter();
+
+            CefRefPtr<CefV8Value> json = context->GetGlobal()->GetValue("JSON");
+            if (!json.get() || !json->IsObject())
+            {
+                context->Exit();
+                return false;
+            }
+
+            CefRefPtr<CefV8Value> stringify = json->GetValue("stringify");
+            if (!stringify.get() || !stringify->IsFunction())
+            {
+                context->Exit();
+                return false;
+            }
+
+            unsigned evalID = (unsigned) message->GetArgumentList()->GetInt(0);
+            CefString script = message->GetArgumentList()->GetString(1);
+
+            bool result = context->Eval(script, retval, exception);
+
+            // Create the result message object.
+            CefRefPtr<CefProcessMessage> msg = CefProcessMessage::Create("atomic_eval_javascript_result");
+
+            // Retrieve the argument list object.
+            CefRefPtr<CefListValue> args = msg->GetArgumentList();
+
+            // Populate the argument values.
+            args->SetInt(0, (int) evalID);
+            args->SetBool(1, result);
+            if (result)
+            {
+                CefV8ValueList stringifyArgs;
+                stringifyArgs.push_back(retval);
+                CefRefPtr<CefV8Value> sjson = stringify->ExecuteFunctionWithContext(context, NULL, stringifyArgs);
+                if (!sjson.get() || !sjson->IsString())
+                {
+                    args->SetString(2, "WebAppRenderer::OnProcessMessageReceived() - Error Getting Return JSON");
+                }
+                else
+                {
+                    args->SetString(2, sjson->GetStringValue());
+                }
+            }
+            else
+                args->SetString(2, exception->GetMessage());
+
+            browser->SendProcessMessage(PID_BROWSER, msg);
+
+            context->Exit();
+            return true;
+        }
+        else if (message_name == "atomic_set_globalproperties")
+        {
+            globalProperties_ = message->GetArgumentList()->GetDictionary(0)->Copy(false);
+            UpdateGlobalProperties(browser->GetMainFrame()->GetV8Context());
+            return true;
+        }
+
         return message_router_->OnProcessMessageReceived(
                     browser, source_process, message);
     }
@@ -86,6 +235,9 @@ private:
 
     IMPLEMENT_REFCOUNTING(WebRenderDelegate);
 };
+
+CefRefPtr<CefDictionaryValue> WebRenderDelegate::globalProperties_;
+
 
 WebAppRenderer::WebAppRenderer() {
 }
@@ -151,6 +303,7 @@ void WebAppRenderer::OnContextCreated(CefRefPtr<CefBrowser> browser,
                                       CefRefPtr<CefFrame> frame,
                                       CefRefPtr<CefV8Context> context)
 {
+
     DelegateSet::Iterator it = delegates_.Begin();
     for (; it != delegates_.End(); ++it)
         (*it)->OnContextCreated(this, browser, frame, context);

@@ -65,6 +65,20 @@ EVENT(E_WEBVIEWTITLECHANGE, WebViewTitleChange)
 }
 
 /// WebView title change
+EVENT(E_WEBVIEWJSEVALRESULT, WebViewJSEvalResult)
+{
+    PARAM(P_CLIENT, Client);   // WebClient*
+    PARAM(P_EVALID, EvalID);   // unsigned
+    PARAM(P_RESULT, Result);   // boolean (true: success, false: error)
+    PARAM(P_VALUE, Value);   // String (sucess: eval's value, error: exception message)
+}
+
+/// WebView load state change
+EVENT(E_WEBVIEWGLOBALPROPERTIESCHANGED, WebViewGlobalPropertiesChanged)
+{
+}
+
+/// WebView title change
 EVENT(E_WEBMESSAGE, WebMessage)
 {
     PARAM(P_HANDLER, Handler);          // WebMessageHandler*
@@ -74,6 +88,8 @@ EVENT(E_WEBMESSAGE, WebMessage)
 
     PARAM(P_CEFBROWSER, Browser);       // CefBrowser*
     PARAM(P_CEFFRAME, Frame);           // CefFrame*
+
+    PARAM(P_DEFERRED, Deferred);        // Return Value: Bool
 }
 
 
