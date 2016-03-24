@@ -56,6 +56,7 @@ public:
     void Scan();
 
     void ReimportAllAssets();
+    void ReimportAllAssetsInDirectory(const String& directoryPath);
 
     void GetFolderAssets(String folder, PODVector<Asset*>& assets) const;
 

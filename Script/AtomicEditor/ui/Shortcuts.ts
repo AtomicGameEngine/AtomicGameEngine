@@ -62,6 +62,18 @@ class Shortcuts extends Atomic.ScriptObject {
         }
     }
 
+    invokePauseOrResumePlayer() {
+        if (Atomic.editorMode.isPlayerEnabled()) {
+            this.sendEvent("IPCPlayerPauseResumeRequest");
+        }
+    }
+
+    invokeStepPausedPlayer() {
+        if (Atomic.editorMode.isPlayerEnabled()) {
+            this.sendEvent("IPCPlayerPauseStepRequest");
+        }
+    }
+
     invokeFormatCode() {
 
         var editor = EditorUI.getCurrentResourceEditor();
@@ -192,14 +204,20 @@ class Shortcuts extends Atomic.ScriptObject {
             }
             else if (ev.key == Atomic.KEY_P) {
                 this.invokePlayOrStopPlayer();
-                //if shift is pressed
-            } else if (ev.qualifiers & Atomic.QUAL_SHIFT) {
-                if (ev.key == Atomic.KEY_B) {
-                    EditorUI.getModelOps().showBuildSettings();
-                }
             } else if (ev.key == Atomic.KEY_B) {
-                EditorUI.getModelOps().showBuild();
+                if (ev.qualifiers & Atomic.QUAL_SHIFT) {
+                    EditorUI.getModelOps().showBuildSettings();
+                } else {
+                    EditorUI.getModelOps().showBuild();
+                }            
             }
+            else if (ev.key == Atomic.KEY_U) {
+                if (ev.qualifiers & Atomic.QUAL_SHIFT) {
+                    this.invokeStepPausedPlayer();
+                } else {
+                    this.invokePauseOrResumePlayer();
+                }
+            } 
 
         }
 

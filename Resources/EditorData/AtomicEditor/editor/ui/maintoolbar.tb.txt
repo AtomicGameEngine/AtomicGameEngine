@@ -8,6 +8,16 @@ TBLayout: distribution: gravity, spacing: 4
 		TBSkinImage: skin: PlayButton, id: skin_image
 		id maintoolbar_play
 		tooltip Play project
+	TBButton
+		@include definitions>menubutton
+		TBSkinImage: skin: PauseButton, id: skin_image
+		id maintoolbar_pause
+		tooltip Pause/Resume playing project
+	TBButton
+		@include definitions>menubutton
+		TBSkinImage: skin: StepButton, id: skin_image
+		id maintoolbar_step
+		tooltip Step paused project 1 frame
 	TBButton: toggle-mode: 1
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DTranslateBitmap
