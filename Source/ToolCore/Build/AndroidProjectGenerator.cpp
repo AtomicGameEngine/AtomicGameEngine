@@ -174,6 +174,7 @@ bool AndroidProjectGenerator::GenerateProjectProperties()
 
 bool AndroidProjectGenerator::GenerateStringXML()
 {
+    FileSystem* fs = GetSubsystem<FileSystem>();
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
     Project* project = toolSystem->GetProject();
     AndroidBuildSettings* settings = project->GetBuildSettings()->GetAndroidBuildSettings();
@@ -193,11 +194,27 @@ bool AndroidProjectGenerator::GenerateStringXML()
     strings.AppendWithFormat("<string name=\"app_name\">%s</string>\n", appName.CString());
 
     strings += "</resources>\n";
-
+    
+    // Create res/values if it doesn't exist
+    if (!fs->DirExists(buildPath_ + "/res/values"))
+    {
+        fs->CreateDirsRecursive(buildPath_ + "/res/values");
+    }
+    
+    // Check that we successfully created it
+    if (!fs->DirExists(buildPath_ + "/res/values"))
+    {
+        errorText_ = "Unable to create directory: " + buildPath_ + "/res/values";
+        return false;
+    }
+    
     File file(context_, buildPath_ + "/res/values/strings.xml", FILE_WRITE);
 
     if (!file.IsOpen())
+    {
+        errorText_ = "Unable to write: " + buildPath_ + "/res/values/strings.xml";
         return false;
+    }
 
     file.Write(strings.CString(), strings.Length());
 
