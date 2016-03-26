@@ -270,6 +270,8 @@ private:
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
 
+    void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
+
     /// kNet message connection.
     kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Scene.
@@ -315,3 +317,4 @@ private:
 };
 
 }
+

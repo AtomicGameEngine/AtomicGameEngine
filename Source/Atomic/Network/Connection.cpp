@@ -200,6 +200,8 @@ void Connection::SetScene(Scene* newScene)
         scene_->StopAsyncLoading();
         SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, HANDLER(Connection, HandleAsyncLoadFinished));
     }
+
+    SubscribeToEvent(scene_, E_COMPONENTREMOVED, HANDLER(Connection, HandleComponentRemoved));
 }
 
 void Connection::SetIdentity(const VariantMap& identity)
@@ -1100,6 +1102,28 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     msg_.WriteUInt(scene_->GetChecksum());
     SendMessage(MSG_SCENELOADED, true, true, msg_);
 }
+
+void Connection::HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ComponentRemoved;
+
+    Component* comp = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
+    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+
+    unsigned nodeId = node->GetID();
+    unsigned compId = comp->GetID();
+
+    if (sceneState_.nodeStates_.Contains(node->GetID()))
+    {
+        NodeReplicationState& nodeState = sceneState_.nodeStates_[node->GetID()];
+        if (nodeState.componentStates_.Contains(comp->GetID()))
+        {
+            ComponentReplicationState& compState = nodeState.componentStates_[comp->GetID()];
+            compState.component_ = NULL;
+        }
+    }
+}
+
 
 void Connection::ProcessNode(unsigned nodeID)
 {

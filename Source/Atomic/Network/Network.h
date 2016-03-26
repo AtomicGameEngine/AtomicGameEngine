@@ -66,6 +66,10 @@ public:
 
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+
+    bool ConnectSimple(const String& address, unsigned short port, Scene* scene);
+    bool StartServerSimple(unsigned short port, Scene* scene);
+
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
@@ -145,6 +149,8 @@ private:
     void OnServerDisconnected();
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
+    void HandleClientConnected(StringHash eventType, VariantMap& eventData);
+
 
     /// kNet instance.
     kNet::Network* network_;
@@ -170,6 +176,8 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
+
+    Scene* sharedScene_;
 };
 
 /// Register Network library objects.

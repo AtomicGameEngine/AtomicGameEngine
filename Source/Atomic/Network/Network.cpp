@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2015 the `project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -203,6 +203,11 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     }
 }
 
+bool Network::ConnectSimple(const String& address, unsigned short port, Scene* scene)
+{
+    return Connect(address, port, scene, Variant::emptyVariantMap);
+}
+
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
     PROFILE(Connect);
@@ -260,6 +265,30 @@ bool Network::StartServer(unsigned short port)
         LOGERROR("Failed to start server on port " + String(port));
         return false;
     }
+}
+
+bool Network::StartServerSimple(unsigned short port, Scene* scene)
+{
+    bool rc = StartServer(port);
+
+    if (!rc) {
+        return false;
+    }
+
+    sharedScene_ = scene;
+
+    SubscribeToEvent(E_CLIENTCONNECTED, HANDLER(Network, HandleClientConnected));
+
+    return true;
+}
+
+void Network::HandleClientConnected(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ClientConnected;
+
+    // When a client connects, assign to scene to begin scene replication
+    Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
+    newConnection->SetScene(sharedScene_);
 }
 
 void Network::StopServer()
