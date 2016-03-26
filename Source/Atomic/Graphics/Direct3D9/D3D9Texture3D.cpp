@@ -152,13 +152,13 @@ bool Texture3D::EndLoad()
 
 void Texture3D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (Graphics::IsUnmanagedPool(pool_))
         Release();
 }
 
 void Texture3D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (Graphics::IsUnmanagedPool(pool_) || !object_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -297,7 +297,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     DWORD flags = 0;
     if (level == 0 && x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth &&
-        pool_ == D3DPOOL_DEFAULT)
+        usage_ & D3DUSAGE_DYNAMIC)
         flags |= D3DLOCK_DISCARD;
 
     if (FAILED(((IDirect3DVolumeTexture9*)object_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags)))

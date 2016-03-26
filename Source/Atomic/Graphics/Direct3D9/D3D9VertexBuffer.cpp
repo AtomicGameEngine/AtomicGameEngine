@@ -76,13 +76,13 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (Graphics::IsUnmanagedPool(pool_))
         Release();
 }
 
 void VertexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_)
+    if (Graphics::IsUnmanagedPool(pool_) || !object_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -320,7 +320,7 @@ void VertexBuffer::Unlock()
 
 bool VertexBuffer::IsDynamic() const
 {
-    return pool_ == D3DPOOL_DEFAULT;
+    return (usage_ & D3DUSAGE_DYNAMIC) != 0;
 }
 
 void VertexBuffer::UpdateOffsets()

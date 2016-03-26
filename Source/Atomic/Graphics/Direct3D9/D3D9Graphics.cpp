@@ -2836,6 +2836,11 @@ IntVector2 Graphics::GetMonitorResolution(int monitorId) const
     return IntVector2(mode.w, mode.h);
 }
 
+bool Graphics::IsUnmanagedPool(unsigned pool)
+{
+    return enableD3D9Ex_ ? false : pool == D3DPOOL_DEFAULT;
+}
+
 unsigned Graphics::GetDefaultD3D9Usage()
 {
     return enableD3D9Ex_ ? (unsigned)  D3DUSAGE_DYNAMIC : 0;

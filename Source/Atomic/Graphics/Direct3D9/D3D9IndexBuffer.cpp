@@ -58,13 +58,13 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (Graphics::IsUnmanagedPool(pool_))
         Release();
 }
 
 void IndexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_)
+    if (Graphics::IsUnmanagedPool(pool_) || !object_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -297,7 +297,7 @@ void IndexBuffer::Unlock()
 
 bool IndexBuffer::IsDynamic() const
 {
-    return pool_ == D3DPOOL_DEFAULT;
+    return (usage_ & D3DUSAGE_DYNAMIC) != 0;
 }
 
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)

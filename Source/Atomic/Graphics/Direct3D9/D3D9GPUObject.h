@@ -62,6 +62,16 @@ public:
     /// Return whether has pending data assigned while device was lost.
     bool HasPendingData() const { return dataPending_; }
 
+    // ATOMIC BEGIN
+
+    void SetGPUShared(bool shared = true) { gpuShared_ = shared; }
+    bool GetGPUShared() const { return gpuShared_; }
+
+    void SetGPUSharedHandle(void* gpuSharedHandle) { gpuSharedHandle_ = gpuSharedHandle; }
+    void* GetGPUSharedHandle() { return gpuSharedHandle_; }
+
+    // ATOMIC END
+
 protected:
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -71,6 +81,11 @@ protected:
     bool dataLost_;
     /// Data pending flag.
     bool dataPending_;
+
+    // ATOMIC BEGIN
+    bool gpuShared_;
+    void* gpuSharedHandle_;
+    // ATOMIC END
 };
 
 }

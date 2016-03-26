@@ -168,7 +168,7 @@ TextureUsage Texture::GetUsage() const
     if (usage_ & D3DUSAGE_RENDERTARGET)
         return TEXTURE_RENDERTARGET;
 
-    if (pool_ == D3DPOOL_DEFAULT)
+    if ((usage_ & D3DUSAGE_DYNAMIC) != 0)
         return TEXTURE_DYNAMIC;
 
     return TEXTURE_STATIC;

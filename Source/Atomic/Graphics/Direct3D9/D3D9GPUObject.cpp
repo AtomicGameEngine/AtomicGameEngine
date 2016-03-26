@@ -34,7 +34,9 @@ GPUObject::GPUObject(Graphics* graphics) :
     graphics_(graphics),
     object_(0),
     dataLost_(false),
-    dataPending_(false)
+    dataPending_(false),
+    gpuShared_(false),
+    gpuSharedHandle_(0)
 {
     if (graphics_)
         graphics->AddGPUObject(this);

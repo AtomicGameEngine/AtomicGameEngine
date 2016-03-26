@@ -108,13 +108,13 @@ bool Texture2D::EndLoad()
 
 void Texture2D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (Graphics::IsUnmanagedPool(pool_))
         Release();
 }
 
 void Texture2D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (Graphics::IsUnmanagedPool(pool_) || !object_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -251,7 +251,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     d3dRect.bottom = y + height;
 
     DWORD flags = 0;
-    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
+    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && usage_ & D3DUSAGE_DYNAMIC)
         flags |= D3DLOCK_DISCARD;
 
     if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
@@ -612,6 +612,8 @@ bool Texture2D::Create()
     }
     else
     {
+        HANDLE sharedHandle = 0;
+
         if (!device || FAILED(graphics_->GetImpl()->GetDevice()->CreateTexture(
             (UINT)width_,
             (UINT)height_,
@@ -620,11 +622,13 @@ bool Texture2D::Create()
             (D3DFORMAT)format_,
             (D3DPOOL)pool_,
             (IDirect3DTexture9**)&object_,
-            0)))
+            gpuShared_ ? &sharedHandle : 0 )))
         {
             LOGERROR("Could not create texture");
             return false;
         }
+
+        gpuSharedHandle_ = (void*) sharedHandle;
 
         levels_ = ((IDirect3DTexture9*)object_)->GetLevelCount();
 

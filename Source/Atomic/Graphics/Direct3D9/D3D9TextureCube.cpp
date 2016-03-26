@@ -254,13 +254,13 @@ bool TextureCube::EndLoad()
 
 void TextureCube::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (Graphics::IsUnmanagedPool(pool_))
         Release();
 }
 
 void TextureCube::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (Graphics::IsUnmanagedPool(pool_) || !object_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -321,7 +321,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         faceMemoryUse_[i] = 0;
     }
 
-    pool_ = Graphics::GetDirect3D9ExEnabled() ? D3DPOOL_SYSTEMMEM : D3DPOOL_MANAGED;
+    pool_ = Graphics::GetDirect3D9ExEnabled() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     usage_ = 0;
 
     if (usage == TEXTURE_RENDERTARGET)
@@ -397,6 +397,9 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         return false;
     }
 
+    IDirect3DSurface9* offscreenSurface = 0;
+    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+
     D3DLOCKED_RECT d3dLockedRect;
     RECT d3dRect;
     d3dRect.left = x;
@@ -405,14 +408,35 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     d3dRect.bottom = y + height;
 
     DWORD flags = 0;
-    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
-        flags |= D3DLOCK_DISCARD;
 
-    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect,
-        (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
+    if (!Graphics::GetDirect3D9ExEnabled())
     {
-        LOGERROR("Could not lock texture");
-        return false;
+        if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
+            flags |= D3DLOCK_DISCARD;
+
+        if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect,
+            (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
+        {
+            LOGERROR("Could not lock texture");
+            return false;
+        }
+    }
+    else
+    {
+        device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_DEFAULT, &offscreenSurface, 0);
+        if (!offscreenSurface)
+        {
+            LOGERROR("TextureCube::SetData - Could not create offscreen surface for updating TextureCube");
+            return false;
+        }
+
+        if (FAILED(offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_DISCARD)))
+        {
+            LOGERROR("TextureCube::SetData - Could not lock offscreen surface for updating TextureCube");
+            offscreenSurface->Release();
+            return false;
+        }
+
     }
 
     if (IsCompressed())
@@ -471,7 +495,35 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         break;
     }
 
-    ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    if (!offscreenSurface)
+    {
+        ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    }
+    else
+    {
+        offscreenSurface->UnlockRect();
+
+        IDirect3DSurface9* faceSurface = 0;
+
+        if (FAILED(((IDirect3DCubeTexture9*)object_)->GetCubeMapSurface((D3DCUBEMAP_FACES)face, level, &faceSurface)))
+        {
+            LOGERROR("TextureCube::SetData - Could not get cubemap surface");
+            offscreenSurface->Release();
+            return false;
+        }
+
+        if (FAILED(device->StretchRect(offscreenSurface, NULL, faceSurface, NULL, D3DTEXF_NONE)))
+        {
+            LOGERROR("TextureCube::SetData - Could not stretch rect");
+            faceSurface->Release();
+            offscreenSurface->Release();
+            return false;
+        }
+
+        faceSurface->Release();
+        offscreenSurface->Release();
+    }
+
     return true;
 }
 

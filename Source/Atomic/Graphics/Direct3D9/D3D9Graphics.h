@@ -507,6 +507,8 @@ public:
     static void SetDirect3D9ExEnabled ( bool enabled) { enableD3D9Ex_ = enabled; }
     static bool GetDirect3D9ExEnabled () { return enableD3D9Ex_; }
 
+    static bool IsUnmanagedPool(unsigned pool);
+
     static unsigned GetDefaultD3D9Usage();
     static unsigned GetDefaultD3D9Pool();
 

@@ -294,11 +294,9 @@ void AEPlayerApplication::Start()
     netScript->ExecMainAssembly();
 #endif
 
-    if (!playerMode->launchedByEditor())
+    if (!playerMode->GetLaunchedByEditor())
     {
-        JSVM* vm = JSVM::GetJSVM(0);
-
-        if (!vm->ExecuteMain())
+        if (!playerMode->Start())
         {
             SendEvent(E_EXITREQUESTED);
         }

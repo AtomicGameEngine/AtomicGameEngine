@@ -46,7 +46,9 @@ public:
     /// Destruct.
     virtual ~PlayerMode();
 
-    bool launchedByEditor() { return launchedByEditor_; }
+    bool GetLaunchedByEditor() { return launchedByEditor_; }
+
+    bool Start();
 
 private:
 
@@ -55,21 +57,16 @@ private:
     void HandleJSError(StringHash eventType, VariantMap& eventData);
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
     void HandleIPCInitialize(StringHash eventType, VariantMap& eventData);
-    void HandleViewRender(StringHash eventType, VariantMap& eventData);
     void HandleExitRequest(StringHash eventType, VariantMap& eventData);
     void HandlePlayerWindowChanged(StringHash eventType, VariantMap& eventData);
     void HandleUpdatesPausedResumed(StringHash eventType, VariantMap& eventData);
-
-// BEGIN LICENSE MANAGEMENT
-    void HandleMessageAck(StringHash eventType, VariantMap& eventData);
-    bool licenseModule3D_;
-    SharedPtr<SystemUI::MessageBox> messageBox_;
-// END LICENSE MANAGEMENT
 
     IPCHandle fd_[2];
     WeakPtr<IPC> ipc_;
     bool brokerActive_;
     bool launchedByEditor_;
+
+    String scenePath_;
 
 };
 

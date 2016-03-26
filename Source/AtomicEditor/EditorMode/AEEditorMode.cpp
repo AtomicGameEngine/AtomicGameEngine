@@ -117,7 +117,7 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 }
 
-bool EditorMode::PlayProject(String addArgs, bool debug)
+bool EditorMode::PlaySetup(Vector<String>& vargs, const String& addArgs, bool debug)
 {
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -141,8 +141,6 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
     String resourcePaths;
     resourcePaths.Join(paths, "!");
 
-    Vector<String> vargs;
-
     String args = ToString("--player --project \"%s\"", AddTrailingSlash(project->GetProjectPath()).CString());
 
     vargs = args.Split(' ');
@@ -152,6 +150,46 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     if (addArgs.Length() > 0)
         vargs.Insert(0, addArgs.Split(' '));
+
+    return true;
+}
+
+bool EditorMode::PlayScene(const String& scenePath, const String& addArgs, bool debug)
+{
+    String _addArgs = "--scene \"" + scenePath +"\" " + addArgs;
+
+    Vector<String> vargs;
+    if (!PlaySetup(vargs, _addArgs, debug))
+        return false;
+
+    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
+    const String& editorBinary = env->GetEditorBinary();
+
+    String dump;
+    dump.Join(vargs, " ");
+    LOGINFOF("Launching Scene Player Broker %s %s", editorBinary.CString(), dump.CString());
+
+    IPC* ipc = GetSubsystem<IPC>();
+    playerBroker_ = ipc->SpawnWorker(editorBinary, vargs);
+
+    if (playerBroker_)
+    {
+        SubscribeToEvent(playerBroker_, E_IPCJSERROR, HANDLER(EditorMode, HandleIPCJSError));
+        SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, HANDLER(EditorMode, HandleIPCWorkerExit));
+        SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, HANDLER(EditorMode, HandleIPCWorkerLog));
+    }
+
+    return playerBroker_.NotNull();
+}
+
+bool EditorMode::PlayProject(const String& addArgs, bool debug)
+{
+    Vector<String> vargs;
+    if (!PlaySetup(vargs, addArgs, debug))
+        return false;
+
+    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
+    const String& editorBinary = env->GetEditorBinary();
 
     String dump;
     dump.Join(vargs, " ");

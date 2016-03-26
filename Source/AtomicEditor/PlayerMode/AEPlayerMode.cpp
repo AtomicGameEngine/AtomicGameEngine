@@ -38,6 +38,8 @@
 #include <AtomicJS/Javascript/JSEvents.h>
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
+#include <AtomicPlayer/Player.h>
+
 #include "AEPlayerEvents.h"
 
 #include "AEPlayerMode.h"
@@ -52,8 +54,7 @@ namespace AtomicEditor
 PlayerMode::PlayerMode(Context* context) :
     Object(context),
     brokerActive_(false),
-    launchedByEditor_(false),
-    licenseModule3D_(false)
+    launchedByEditor_(false)
 {
     fd_[0] = INVALID_IPCHANDLE_VALUE;
     fd_[1] = INVALID_IPCHANDLE_VALUE;
@@ -66,10 +67,6 @@ PlayerMode::PlayerMode(Context* context) :
     SubscribeToEvent(E_SCREENMODE, HANDLER(PlayerMode, HandlePlayerWindowChanged));
     SubscribeToEvent(E_WINDOWPOS, HANDLER(PlayerMode, HandlePlayerWindowChanged));
     SubscribeToEvent(E_UPDATESPAUSEDRESUMED, HANDLER(PlayerMode, HandleUpdatesPausedResumed));
-
-    // BEGIN LICENSE MANAGEMENT
-    SubscribeToEvent(E_BEGINVIEWRENDER, HANDLER(PlayerMode, HandleViewRender));
-    // END LICENSE MANAGEMENT
 }
 
 PlayerMode::~PlayerMode()
@@ -77,22 +74,35 @@ PlayerMode::~PlayerMode()
 
 }
 
+bool PlayerMode::Start()
+{
+    if (!scenePath_.Length())
+    {
+        JSVM* vm = JSVM::GetJSVM(0);
+
+        if (!vm->ExecuteMain())
+        {
+            return false;
+        }
+
+    }
+    else
+    {
+        GetSubsystem<AtomicPlayer::Player>()->LoadScene(scenePath_);
+    }
+
+    return true;
+}
+
 void PlayerMode::HandleIPCInitialize(StringHash eventType, VariantMap& eventData)
 {
     brokerActive_ = true;
 
-    JSVM* vm = JSVM::GetJSVM(0);
-
-    if (!vm->ExecuteMain())
+    if (!Start())
     {
         SendEvent(E_EXITREQUESTED);
+        return;
     }
-
-    // BEGIN LICENSE MANAGEMENT
-
-    licenseModule3D_ = eventData["license3D"].GetBool();
-
-    // END LICENSE MANAGEMENT
 
     SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
     if (debugHud)
@@ -111,7 +121,7 @@ void PlayerMode::ProcessArguments() {
         if (arguments[i].Length() > 1)
         {
             String argument = arguments[i].ToLower();
-            // String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
+            String value = i + 1 < arguments.Size() ? arguments[i + 1] : String::EMPTY;
 
             if (argument.StartsWith("--ipc-id="))
             {
@@ -120,7 +130,6 @@ void PlayerMode::ProcessArguments() {
 
                     id = ToInt(idc[1].CString());
             }
-
             else if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
             {
                 LOGINFOF("Starting IPCWorker %s", argument.CString());
@@ -157,7 +166,10 @@ void PlayerMode::ProcessArguments() {
                 }
 
             }
-
+            else if (argument == "--scene" && value.Length())
+            {
+                scenePath_ = value;
+            }
         }
     }
 
@@ -213,48 +225,6 @@ void PlayerMode::HandleLogMessage(StringHash eventType, VariantMap& eventData)
         logEvent[IPCWorkerLog::P_MESSAGE] = eventData[P_MESSAGE].GetString();
         ipc_->SendEventToBroker(E_IPCWORKERLOG, logEvent);
     }
-
-}
-
-void PlayerMode::HandleMessageAck(StringHash eventType, VariantMap& eventData)
-{
-    messageBox_ = 0;
-    GetSubsystem<UI>()->RequestExit();
-}
-
-void PlayerMode::HandleViewRender(StringHash eventType, VariantMap& eventData)
-{
-// BEGIN LICENSE MANAGEMENT
-    static bool done = false;
-
-    if (!launchedByEditor_ || licenseModule3D_)
-        return;
-
-    Camera* camera = static_cast<Camera*>(eventData[BeginViewRender::P_CAMERA].GetPtr());
-
-    if (!camera || camera->IsOrthographic())
-        return;
-
-    if (!done) {
-
-        done = true;
-
-        messageBox_ = GetSubsystem<UI>()->ShowSystemMessageBox("3D Module License Required", "A 3D Module License is required to display 3D content.\n\nUpgrade to Atomic Pro for all features and platforms.");
-        SubscribeToEvent(messageBox_, SystemUI::E_MESSAGEACK, HANDLER(PlayerMode, HandleMessageAck));
-
-        if (brokerActive_)
-        {
-
-            if (ipc_.Null())
-                return;
-
-            VariantMap msgEvent;
-            msgEvent[IPCMessage::P_MESSAGE] = String("3D Module License Required");
-            ipc_->SendEventToBroker(E_IPCMESSAGE, msgEvent);
-        }
-    }
-
-// END LICENSE MANAGEMENT
 
 }
 

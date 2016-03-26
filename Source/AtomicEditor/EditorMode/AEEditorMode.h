@@ -47,10 +47,13 @@ public:
     /// Destruct.
     virtual ~EditorMode();
 
-    bool PlayProject(String addArgs = "", bool debug = false);
+    bool PlayProject(const String& addArgs = String::EMPTY, bool debug = false);
+    bool PlayScene(const String& scenePath, const String& addArgs = String::EMPTY, bool debug = false);
     bool IsPlayerEnabled();
 
 private:
+
+    bool PlaySetup(Vector<String>& vargs, const String& addArgs, bool debug);
 
     void HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData);
     void HandleIPCJSError(StringHash eventType, VariantMap& eventData);
