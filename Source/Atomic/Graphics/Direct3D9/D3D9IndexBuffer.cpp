@@ -38,7 +38,7 @@ IndexBuffer::IndexBuffer(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     indexCount_(0),
     indexSize_(0),
-    pool_(D3DPOOL_MANAGED),
+    pool_(Graphics::GetDefaultD3D9Pool()),
     usage_(0),
     lockState_(LOCK_NONE),
     lockStart_(0),
@@ -120,7 +120,7 @@ bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
     }
     else
     {
-        pool_ = D3DPOOL_MANAGED;
+        pool_ = Graphics::GetDefaultD3D9Pool();
         usage_ = 0;
     }
 

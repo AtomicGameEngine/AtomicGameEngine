@@ -98,12 +98,15 @@ void AEEditorCommon::Start()
     jsapi_init_atomicnet(vm_);
 #endif
 
-
-
 }
 
 void AEEditorCommon::Setup()
 {
+
+#if !defined(ATOMIC_OPENGL) && !defined(ATOMIC_D3D11)
+    // Enable Direct3D9Ex for extended features required by the editor
+    Graphics::SetDirect3D9ExEnabled(true);
+#endif
 
 #ifdef ATOMIC_3D
     RegisterEnvironmentLibrary(context_);

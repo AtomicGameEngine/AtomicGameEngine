@@ -38,7 +38,11 @@ GraphicsImpl::GraphicsImpl() :
     defaultDepthStencilSurface_(0),
     frameQuery_(0),
     adapter_(D3DADAPTER_DEFAULT),
-    deviceType_(D3DDEVTYPE_HAL)
+    deviceType_(D3DDEVTYPE_HAL),
+    // ATOMIC BEGIN
+    interfaceD3D9Ex_(0),
+    deviceD3D9Ex_(0)
+    // ATOMIC END
 {
     memset(&presentParams_, 0, sizeof presentParams_);
 }

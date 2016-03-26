@@ -237,6 +237,7 @@ static HWND GetWindowHandle(SDL_Window* window)
 static unsigned readableDepthFormat = 0;
 
 const Vector2 Graphics::pixelUVOffset(0.5f, 0.5f);
+bool Graphics::enableD3D9Ex_ = false;
 
 Graphics::Graphics(Context* context) :
     Object(context),
@@ -2458,7 +2459,24 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
 
 bool Graphics::CreateInterface()
 {
-    impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
+    if (!enableD3D9Ex_)
+    {
+        impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
+    }
+    else
+    {
+        // TODO: Code for checking whether OS supports Direct3DCreate9Ex: https://msdn.microsoft.com/en-us/library/windows/desktop/bb219676(v=vs.85).aspx
+        // Though, can just check for Windows XP probably
+        if ( FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &impl_->interfaceD3D9Ex_)))
+        {
+            impl_->interfaceD3D9Ex_ = 0;
+            LOGERROR("Could not create Direct3D9Ex interface");
+            return false;
+        }
+
+        impl_->interface_ =  impl_->interfaceD3D9Ex_;
+    }
+
     if (!impl_->interface_)
     {
         LOGERROR("Could not create Direct3D9 interface");
@@ -2502,16 +2520,38 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
     else
         behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
-    if (FAILED(impl_->interface_->CreateDevice(
-        adapter,
-        (D3DDEVTYPE)deviceType,
-        GetWindowHandle(impl_->window_),
-        behaviorFlags,
-        &impl_->presentParams_,
-        &impl_->device_)))
+    if (enableD3D9Ex_)
     {
-        LOGERROR("Could not create Direct3D9 device");
-        return false;
+        if (FAILED(impl_->interfaceD3D9Ex_->CreateDeviceEx(
+            adapter,
+            (D3DDEVTYPE)deviceType,
+            GetWindowHandle(impl_->window_),
+            behaviorFlags,
+            &impl_->presentParams_,
+            NULL,
+            &impl_->deviceD3D9Ex_)))
+        {
+            impl_->deviceD3D9Ex_ = 0;
+
+            LOGERROR("Could not create Direct3D9Ex device");
+            return false;
+        }
+
+        impl_->device_ = impl_->deviceD3D9Ex_;
+    }
+    else
+    {
+        if (FAILED(impl_->interface_->CreateDevice(
+            adapter,
+            (D3DDEVTYPE)deviceType,
+            GetWindowHandle(impl_->window_),
+            behaviorFlags,
+            &impl_->presentParams_,
+            &impl_->device_)))
+        {
+            LOGERROR("Could not create Direct3D9 device");
+            return false;
+        }
     }
 
     impl_->adapter_ = adapter;
@@ -2519,7 +2559,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
     OnDeviceReset();
 
-    LOGINFO("Created Direct3D9 device");
+    LOGINFO(enableD3D9Ex_ ?  "Created Direct3D9Ex device" : "Created Direct3D9 device");
     return true;
 }
 
@@ -2795,6 +2835,17 @@ IntVector2 Graphics::GetMonitorResolution(int monitorId) const
     SDL_GetDesktopDisplayMode(monitorId, &mode);
     return IntVector2(mode.w, mode.h);
 }
+
+unsigned Graphics::GetDefaultD3D9Usage()
+{
+    return enableD3D9Ex_ ? (unsigned)  D3DUSAGE_DYNAMIC : 0;
+}
+
+unsigned Graphics::GetDefaultD3D9Pool()
+{
+    return enableD3D9Ex_ ? (unsigned)  D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+}
+
 // ATOMIC END
 
 }

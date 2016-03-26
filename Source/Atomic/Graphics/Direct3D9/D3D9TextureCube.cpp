@@ -321,7 +321,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         faceMemoryUse_[i] = 0;
     }
 
-    pool_ = D3DPOOL_MANAGED;
+    pool_ = Graphics::GetDirect3D9ExEnabled() ? D3DPOOL_SYSTEMMEM : D3DPOOL_MANAGED;
     usage_ = 0;
 
     if (usage == TEXTURE_RENDERTARGET)

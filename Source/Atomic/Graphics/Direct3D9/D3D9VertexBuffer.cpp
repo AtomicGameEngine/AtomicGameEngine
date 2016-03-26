@@ -54,7 +54,7 @@ VertexBuffer::VertexBuffer(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     vertexCount_(0),
     elementMask_(0),
-    pool_(D3DPOOL_MANAGED),
+    pool_(Graphics::GetDefaultD3D9Pool()),
     usage_(0),
     lockState_(LOCK_NONE),
     lockStart_(0),
@@ -141,7 +141,7 @@ bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dyna
     }
     else
     {
-        pool_ = D3DPOOL_MANAGED;
+        pool_ = Graphics::GetDefaultD3D9Pool();
         usage_ = 0;
     }
 

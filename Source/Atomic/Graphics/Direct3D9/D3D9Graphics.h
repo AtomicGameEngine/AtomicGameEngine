@@ -493,14 +493,23 @@ public:
     static unsigned GetMaxBones() { return 64; }
 
     // ATOMIC BEGIN
+
     /// Return the current monitor number
     int GetCurrentMonitor();
-    /// Return the available monitors number
+    /// Return the available number of monitors
     int GetNumMonitors();
     /// Return true if window is maximized
     bool GetMaximized();
     /// Return monitor resolution
     IntVector2 GetMonitorResolution(int monitorId) const;
+
+    // Enabled Direct3D9Ex extended capabilities Windows Vista+
+    static void SetDirect3D9ExEnabled ( bool enabled) { enableD3D9Ex_ = enabled; }
+    static bool GetDirect3D9ExEnabled () { return enableD3D9Ex_; }
+
+    static unsigned GetDefaultD3D9Usage();
+    static unsigned GetDefaultD3D9Pool();
+
     // ATOMIC END
 
 private:
@@ -686,6 +695,10 @@ private:
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;
+
+    // ATOMIC BEGIN
+    static bool enableD3D9Ex_;
+    // ATOMIC END
 };
 
 /// Register Graphics library objects.

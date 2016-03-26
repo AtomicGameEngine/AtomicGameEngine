@@ -105,6 +105,15 @@ private:
     D3DBLEND destBlend_;
     /// Blend operation.
     D3DBLENDOP blendOp_;
+
+    // ATOMIC BEGIN:
+
+    /// Direct3D9Ex interface.
+    IDirect3D9Ex* interfaceD3D9Ex_;
+    /// Direct3D9Ex device.
+    IDirect3DDevice9Ex* deviceD3D9Ex_;
+
+    // ATOMIC END
 };
 
 }

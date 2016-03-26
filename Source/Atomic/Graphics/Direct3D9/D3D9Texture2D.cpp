@@ -161,16 +161,19 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 {
     // Delete the old rendersurface if any
     renderSurface_.Reset();
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
+    pool_ = Graphics::GetDefaultD3D9Pool();
+    usage_ = Graphics::GetDefaultD3D9Usage();
 
     if (usage == TEXTURE_RENDERTARGET || usage == TEXTURE_DEPTHSTENCIL)
     {
+        usage_ &= ~Graphics::GetDefaultD3D9Usage();
+
         renderSurface_ = new RenderSurface(this);
         if (usage == TEXTURE_RENDERTARGET)
             usage_ |= D3DUSAGE_RENDERTARGET;
         else
             usage_ |= D3DUSAGE_DEPTHSTENCIL;
+
         pool_ = D3DPOOL_DEFAULT;
 
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled

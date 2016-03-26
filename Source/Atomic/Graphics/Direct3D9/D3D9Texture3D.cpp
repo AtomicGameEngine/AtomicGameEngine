@@ -205,11 +205,13 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 {
     // Delete the old rendersurface if any
     renderSurface_.Reset();
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
+    pool_ = Graphics::GetDefaultD3D9Pool();
+    usage_ = Graphics::GetDefaultD3D9Usage();
 
     if (usage == TEXTURE_RENDERTARGET)
     {
+        usage_ &= ~Graphics::GetDefaultD3D9Usage();
+
         renderSurface_ = new RenderSurface(this);
         usage_ |= D3DUSAGE_RENDERTARGET;
         pool_ = D3DPOOL_DEFAULT;
