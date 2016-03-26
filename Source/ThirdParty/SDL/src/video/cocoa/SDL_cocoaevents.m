@@ -197,7 +197,7 @@ CreateApplicationMenus(void)
     if (NSApp == nil) {
         return;
     }
-    
+
     /* Create the main menu bar */
     [NSApp setMainMenu:[[NSMenu alloc] init]];
 

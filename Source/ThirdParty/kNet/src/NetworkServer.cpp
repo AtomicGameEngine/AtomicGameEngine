@@ -330,10 +330,21 @@ bool NetworkServer::ProcessNewUDPConnectionAttempt(Socket *listenSocket, const E
 		Lockable<ConnectionMap>::LockType clientsLock = clients.Acquire();
 		if (clientsLock->find(endPoint) == clientsLock->end())
 			(*clientsLock)[endPoint] = connection;
-		else
-			KNET_LOG(LogError, "NetworkServer::ProcessNewUDPConnectionAttempt: Trying to overwrite an old connection with a new one! Discarding connection attempt datagram!",
-				timer.MSecsElapsed());
 
+		// BEGIN ATOMIC CHANGE
+		//else
+		//	KNET_LOG(LogError, "NetworkServer::ProcessNewUDPConnectionAttempt: Trying to overwrite an old connection with a new one! Discarding connection attempt datagram!",
+		//			 timer.MSecsElapsed());
+		else {
+			KNET_LOG(LogError,
+					 "NetworkServer::ProcessNewUDPConnectionAttempt: Trying to overwrite an old connection with a new one! Discarding connection attempt datagram!",
+					 timer.MSecsElapsed());
+
+			// If we do not return here, then the original connection will be lost. Since we are already connected,
+			// we do not want to lose the existing connection. This was causing issues when doing NAT punchthrough.
+			return false;
+		}
+		// END ATOMIC CHANGE
 
 		KNET_LOG(LogWaits, "NetworkServer::ProcessNewUDPConnectionAttempt: Accessing the connection list took %f msecs.",
 			timer.MSecsElapsed());
