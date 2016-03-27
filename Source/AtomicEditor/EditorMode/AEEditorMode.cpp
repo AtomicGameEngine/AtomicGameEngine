@@ -28,6 +28,7 @@
 
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Input/InputEvents.h>
+#include <Atomic/Graphics/Texture2D.h>
 
 #include <ToolCore/ToolEnvironment.h>
 #include <ToolCore/ToolSystem.h>
@@ -55,6 +56,8 @@ EditorMode::EditorMode(Context* context) :
     SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
     SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
     SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
+
+    SubscribeToEvent(E_IPCPLAYERRENDERTEXTUREINFO, HANDLER(EditorMode, HandleIPCPlayerRenderTextureInfo));
 }
 
 EditorMode::~EditorMode()
@@ -85,10 +88,27 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 
 }
 
+void EditorMode::HandleIPCPlayerRenderTextureInfo(StringHash eventType, VariantMap& eventData)
+{
+    using namespace IPCPlayerRenderTextureInfo;
+
+    int width = eventData[P_WIDTH].GetInt();
+    int height = eventData[P_HEIGHT].GetInt();
+    unsigned format = eventData[P_FORMAT].GetUInt();
+    TextureUsage usage = (TextureUsage)  eventData[P_USAGE].GetUInt();
+    unsigned resourceHandle = eventData[P_RESOURCEHANDLE].GetUInt();
+
+    renderTexture_ = new Texture2D(context_);
+    renderTexture_->SetGPUShared(true);
+    renderTexture_->SetGPUSharedHandle((void*) ((uintptr_t)resourceHandle));
+    renderTexture_->SetSize(width, height, format, usage);
+
+    SendEvent(E_EDITORPLAYERRENDERTEXTUREUPDATED);
+}
+
+
 void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
 {
-    //SendEvent(E_EDITORPLAYSTOP);
-
     if (eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
     {
         playerBroker_ = 0;

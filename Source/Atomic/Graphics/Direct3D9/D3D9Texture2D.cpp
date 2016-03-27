@@ -614,6 +614,10 @@ bool Texture2D::Create()
     {
         HANDLE sharedHandle = 0;
 
+        if (gpuShared_ && gpuSharedHandle_)
+            sharedHandle = (HANDLE) gpuSharedHandle_;
+
+
         if (!device || FAILED(graphics_->GetImpl()->GetDevice()->CreateTexture(
             (UINT)width_,
             (UINT)height_,

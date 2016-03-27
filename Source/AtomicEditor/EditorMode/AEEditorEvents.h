@@ -101,6 +101,13 @@ EVENT(E_EDITORPLAYERSTOPPED, EditorPlayerStopped)
 
 }
 
+// emitted once play has stopped
+EVENT(E_EDITORPLAYERRENDERTEXTUREUPDATED, EditorPlayerRenderTextureUpdated)
+{
+
+}
+
+
 EVENT(E_EDITORBUILD, EditorBuild)
 {
     PARAM(P_PLATFORM, Platform);      // string

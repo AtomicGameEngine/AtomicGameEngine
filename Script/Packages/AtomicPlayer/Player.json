@@ -1,5 +1,6 @@
 {
 	"name" : "Player",
+	"includes" : ["<Atomic/Graphics/Texture2D.h>"],
 	"sources" : ["Source/AtomicPlayer"],
 	"classes" : ["Player"]
 }

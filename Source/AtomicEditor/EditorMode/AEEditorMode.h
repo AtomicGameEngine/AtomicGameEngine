@@ -29,6 +29,7 @@
 namespace Atomic
 {
     class IPCBroker;
+    class Texture2D;
 }
 
 using namespace Atomic;
@@ -51,6 +52,8 @@ public:
     bool PlayScene(const String& scenePath, const String& addArgs = String::EMPTY, bool debug = false);
     bool IsPlayerEnabled();
 
+    Texture2D* GetPlayerRenderTexture() const { return renderTexture_; }
+
 private:
 
     bool PlaySetup(Vector<String>& vargs, const String& addArgs, bool debug);
@@ -64,7 +67,10 @@ private:
     void HandleIPCPlayerPauseStepRequest(StringHash eventType, VariantMap& eventData);
     void HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData);
 
+    void HandleIPCPlayerRenderTextureInfo(StringHash eventType, VariantMap& eventData);
+
     SharedPtr<IPCBroker> playerBroker_;
+    SharedPtr<Texture2D> renderTexture_;
 
     bool playerEnabled_ = false;
 

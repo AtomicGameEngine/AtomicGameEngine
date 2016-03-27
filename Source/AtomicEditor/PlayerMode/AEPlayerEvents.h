@@ -64,4 +64,13 @@ EVENT(E_PLAYERQUIT, PlayerQuit)
 
 }
 
+EVENT(E_IPCPLAYERRENDERTEXTUREINFO, IPCPlayerRenderTextureInfo)
+{
+    PARAM(P_RESOURCEHANDLE, ResourceHandle);
+    PARAM(P_WIDTH, Width);
+    PARAM(P_HEIGHT, Height);
+    PARAM(P_FORMAT, Format);
+    PARAM(P_USAGE, Usage);
+}
+
 }

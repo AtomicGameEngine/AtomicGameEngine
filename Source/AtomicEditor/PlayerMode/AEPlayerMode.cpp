@@ -28,6 +28,7 @@
 #include <Atomic/Graphics/GraphicsEvents.h>
 #include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Camera.h>
+#include <Atomic/Graphics/Texture2D.h>
 #include <Atomic/UI/SystemUI/DebugHud.h>
 #include <Atomic/UI/SystemUI/SystemUIEvents.h>
 #include <Atomic/UI/UI.h>
@@ -76,6 +77,7 @@ PlayerMode::~PlayerMode()
 
 bool PlayerMode::Start()
 {
+    // If we aren't playing a scene, kick off the main.js if any
     if (!scenePath_.Length())
     {
         JSVM* vm = JSVM::GetJSVM(0);
@@ -88,7 +90,26 @@ bool PlayerMode::Start()
     }
     else
     {
-        GetSubsystem<AtomicPlayer::Player>()->LoadScene(scenePath_);
+        AtomicPlayer::Player* player = GetSubsystem<AtomicPlayer::Player>();
+        player->SetRenderToTexture(512, 512);
+
+        player->LoadScene(scenePath_);
+
+        using namespace IPCPlayerRenderTextureInfo;
+
+        VariantMap eventData;
+
+        Texture2D* texture = player->GetRenderTexture();
+
+        eventData[P_WIDTH] = texture->GetWidth();
+        eventData[P_HEIGHT] = texture->GetHeight();
+        eventData[P_FORMAT] = texture->GetFormat();
+        eventData[P_USAGE] = (unsigned) texture->GetUsage();
+        // Note: On D3D9/11 and MacGL this handle is 32 bit, any > 32 bit resource handle would need to be fixed here
+        eventData[P_RESOURCEHANDLE] = (unsigned) ((uintptr_t) texture->GetGPUSharedHandle());
+
+        ipc_->SendEventToBroker(E_IPCPLAYERRENDERTEXTUREINFO, eventData);
+
     }
 
     return true;

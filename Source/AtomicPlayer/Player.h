@@ -26,6 +26,11 @@
 #include <Atomic/Graphics/Viewport.h>
 #include <Atomic/Scene/Scene.h>
 
+namespace Atomic
+{
+    class Texture2D;
+}
+
 using namespace Atomic;
 
 namespace AtomicPlayer
@@ -42,9 +47,13 @@ public:
     /// Destruct.
     virtual ~Player();
 
+    void SetRenderToTexture(unsigned width, unsigned height);
+
     Scene* LoadScene(const String& filename, Camera* camera = NULL);
 
     Scene* GetCurrentScene() { return currentScene_; }
+
+    Texture2D* GetRenderTexture() const { return renderTexture_; }
 
 private:
 
@@ -52,8 +61,15 @@ private:
 
     // Strong reference
     SharedPtr<Scene> currentScene_;
-
     SharedPtr<Viewport> viewport_;
+
+    /// Renderable texture.
+    SharedPtr<Texture2D> renderTexture_;
+    /// Depth stencil texture.
+    SharedPtr<Texture2D> depthTexture_;
+
+    unsigned renderWidth_;
+    unsigned renderHeight_;
 
 };
 

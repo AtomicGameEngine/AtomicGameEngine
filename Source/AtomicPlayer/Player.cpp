@@ -25,8 +25,10 @@
 #include <Atomic/Input/InputEvents.h>
 
 #include <Atomic/Resource/ResourceCache.h>
+#include <Atomic/Graphics/Graphics.h>
 #include <Atomic/Graphics/Renderer.h>
 #include <Atomic/Graphics/Camera.h>
+#include <Atomic/Graphics/Texture2D.h>
 
 #include "Player.h"
 
@@ -34,10 +36,11 @@ namespace AtomicPlayer
 {
 
 Player::Player(Context* context) :
-    Object(context)
+    Object(context),
+    renderWidth_(0),
+    renderHeight_(0)
 {
     viewport_ = new Viewport(context_);
-    GetSubsystem<Renderer>()->SetViewport(0, viewport_);
 
     SubscribeToEvent(E_EXITREQUESTED, HANDLER(Player, HandleExitRequested));
 }
@@ -54,10 +57,36 @@ void Player::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 }
 
+void Player::SetRenderToTexture(unsigned width, unsigned height)
+{
+    renderWidth_ = width;
+    renderHeight_ = height;
+
+    renderTexture_ = new Texture2D(context_);
+    depthTexture_ = new Texture2D(context_);
+
+    renderTexture_->SetGPUShared(true);
+
+    viewport_->SetRect(IntRect(0, 0, width, height));
+    renderTexture_->SetSize(width, height, Graphics::GetRGBFormat(), TEXTURE_RENDERTARGET);
+    depthTexture_->SetSize(width, height, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+
+    RenderSurface* surface = renderTexture_->GetRenderSurface();
+    surface->SetViewport(0, viewport_);
+    surface->SetUpdateMode(SURFACE_UPDATEALWAYS );
+    surface->SetLinkedDepthStencil(depthTexture_->GetRenderSurface());
+}
+
 Scene* Player::LoadScene(const String& filename, Camera *camera)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(filename);
+
+    // If we're not rendering to texture and we haven't set the viewport, set it
+    if (renderTexture_.Null() && GetSubsystem<Renderer>()->GetViewport(0) != viewport_)
+    {
+        GetSubsystem<Renderer>()->SetViewport(0, viewport_);
+    }
 
     if (!file->IsOpen())
     {
