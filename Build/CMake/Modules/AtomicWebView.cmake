@@ -96,7 +96,7 @@ macro(SET_CEF_TARGET_OUT_DIR)
   else()
     # ATOMIC: Unix Makefiles not creating Debug/Release?
 
-    if(${CMAKE_GENERATOR} STREQUAL "Xcode" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 14 2015 Win64")
+    if(${CMAKE_GENERATOR} STREQUAL "Xcode" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 14 2015" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 14 2015 Win64")
       set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>")
     else()
       set(CEF_TARGET_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
