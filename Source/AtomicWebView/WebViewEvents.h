@@ -73,6 +73,13 @@ EVENT(E_WEBVIEWJSEVALRESULT, WebViewJSEvalResult)
     PARAM(P_VALUE, Value);   // String (sucess: eval's value, error: exception message)
 }
 
+/// WebView popup request
+EVENT(E_WEBVIEWPOPUPREQUEST, WebViewPopupRequest)
+{
+    PARAM(P_CLIENT, Client);   // WebClient*
+    PARAM(P_URL, Url);   // String
+}
+
 /// WebView load state change
 EVENT(E_WEBVIEWGLOBALPROPERTIESCHANGED, WebViewGlobalPropertiesChanged)
 {
