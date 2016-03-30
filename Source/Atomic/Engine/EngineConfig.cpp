@@ -326,13 +326,24 @@ bool EngineConfig::LoadFromFile(Context *context, const String& filename)
     return LoadFromJSON(json);
 }
 
-void EngineConfig::ApplyConfig(VariantMap& settings)
+void EngineConfig::ApplyConfig(VariantMap& settings, bool overwrite)
 {
     VariantMap::ConstIterator itr = engineConfig_.Begin();
-    while (itr != engineConfig_.End())
+    if (overwrite)
+    { 
+        while (itr != engineConfig_.End())
+        {
+            settings[itr->first_] = itr->second_;
+            itr++;
+        }
+    }
+    else
     {
-        settings.InsertNew(itr->first_, itr->second_);
-        itr++;
+        while (itr != engineConfig_.End())
+        {
+            settings.InsertNew(itr->first_, itr->second_);
+            itr++;
+        }
     }
 
 }

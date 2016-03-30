@@ -95,7 +95,7 @@ void UIDragDrop::DragEnd()
     dragSourceWidget_ = 0;
     dragLayout_->SetVisibility(UI_WIDGET_VISIBILITY_GONE);
 
-    if (currentTargetWidget.Null() || dragSourceWidget == currentTargetWidget)
+    if (currentTargetWidget.Null())
     {
         return;
     }
@@ -146,6 +146,7 @@ void UIDragDrop::HandleMouseDown(StringHash eventType, VariantMap& eventData)
 
         currentTargetWidget_ = widget;
         dragSourceWidget_ = widget;
+        mouseDownPosition_ = input->GetMousePosition();
 
     }
 
@@ -171,8 +172,6 @@ void UIDragDrop::HandleMouseUp(StringHash eventType, VariantMap& eventData)
 
 void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 {
-    Input* input = GetSubsystem<Input>();
-
     if (dragObject_.Null() && dragSourceWidget_.Null())
         return;
 
@@ -188,6 +187,17 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
     }
 
+    using namespace MouseMove;
+
+    int x = eventData[P_X].GetInt();
+    int y = eventData[P_Y].GetInt();
+
+    // tolerance to 8 pixels to start drag/drop operation
+    IntVector2 mousePos(x, y);
+    mousePos -= mouseDownPosition_;
+    if (Abs(mousePos.x_) < 8 && Abs(mousePos.y_) < 8)
+        return;
+
     // initialize if necessary
     if (dragLayout_->GetVisibility() == UI_WIDGET_VISIBILITY_GONE)
     {
@@ -198,11 +208,6 @@ void UIDragDrop::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         UIPreferredSize* sz = dragLayout_->GetPreferredSize();
         dragLayout_->SetRect(IntRect(0, 0, sz->GetMinWidth(), sz->GetMinHeight()));
     }
-
-    using namespace MouseMove;
-
-    int x = eventData[P_X].GetInt();
-    int y = eventData[P_Y].GetInt();
 
     // see if we have a widget
     TBWidget* tbw = TBWidget::hovered_widget;

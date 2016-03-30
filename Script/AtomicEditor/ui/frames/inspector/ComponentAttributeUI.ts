@@ -1,14 +1,30 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import AttributeInfoEdit = require("./AttributeInfoEdit");
 import SerializableEditType = require("./SerializableEditType");
+import EditorEvents = require("editor/EditorEvents");
 
 class LightCascadeAttributeEdit extends AttributeInfoEdit {
 
@@ -106,6 +122,7 @@ class LightCascadeAttributeEdit extends AttributeInfoEdit {
 interface MaterialEdit {
 
     index: number;
+    pathReference: string;
     editField: Atomic.UIEditField;
     selectButton: Atomic.UIButton;
 
@@ -121,12 +138,47 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
     enabledCheckBox: Atomic.UICheckBox;
     nameField: Atomic.UITextField;
     name: string;
+    matIndex: number;
 
     constructor(name: string) {
 
         super();
         this.name = name;
         this.hideName = true;
+
+        this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => {
+
+            this.editType.onAttributeInfoEdited(this.attrInfo, null, this.matIndex);
+            this.refresh();
+        });
+
+
+    }
+
+    openResourceSelectionBox(materialIndex: number, resourceTypeName: string, importerName: string) {
+
+        this.matIndex = materialIndex;
+
+        EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function (retObject: any) {
+
+            var resource: Atomic.Resource = null;
+
+            if (retObject instanceof ToolCore.Asset) {
+
+                resource = (<ToolCore.Asset>retObject).getResource(resourceTypeName);
+
+            } else if (retObject instanceof Atomic.Resource) {
+
+                resource = <Atomic.Resource>retObject;
+
+            }
+
+            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": resource.name });
+            this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
+            this.refresh();
+
+        }.bind(this));
+
     }
 
     createMaterialEdit(materialIndex: number) {
@@ -141,32 +193,18 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         var selectButton = o.selectButton;
 
-        var materialEdit: MaterialEdit = { index: materialIndex, editField: o.editField, selectButton: selectButton };
+        var materialEdit: MaterialEdit = { index: materialIndex, pathReference: "" , editField: o.editField, selectButton: selectButton };
         this.materialEdits[materialIndex] = materialEdit;
 
         var resourceTypeName = "Material";
         var importerName = ToolCore.assetDatabase.getResourceImporterName(resourceTypeName);
 
+
         selectButton.onClick = () => {
 
-            EditorUI.getModelOps().showResourceSelection("Select " + resourceTypeName + " Resource", importerName, resourceTypeName, function(retObject: any) {
+            this.openResourceSelectionBox(materialIndex, resourceTypeName, importerName);
+           // this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
 
-                var resource: Atomic.Resource = null;
-
-                if (retObject instanceof ToolCore.Asset) {
-
-                    resource = (<ToolCore.Asset>retObject).getResource(resourceTypeName);
-
-                } else if (retObject instanceof Atomic.Resource) {
-
-                    resource = <Atomic.Resource>retObject;
-
-                }
-
-                this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
-                this.refresh();
-
-            }.bind(this));
         };
 
         // handle dropping of component on field
@@ -191,7 +229,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
                 if (importer) {
 
                     var resource = asset.getResource(resourceTypeName);
-
+                    this.sendEvent(EditorEvents.InspectorProjectReference, { "path": resource.name });
                     this.editType.onAttributeInfoEdited(this.attrInfo, resource, materialIndex);
                     this.refresh();
                 }
@@ -199,6 +237,19 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         });
 
+        o.editField.subscribeToEvent(o.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
+
+            if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN && o.editField.text != "") {
+
+                var pathName = materialEdit.pathReference;
+                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+
+            } else if (o.editField.text == "") {
+
+                this.openResourceSelectionBox(materialIndex, resourceTypeName, importerName);
+            }
+
+        });
     }
 
     createEditWidget() {
@@ -332,6 +383,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
                     var pathinfo = Atomic.splitPath(text);
                     matEdit.editField.text = pathinfo.fileName;
+                    matEdit.pathReference = text;
                 }
 
 

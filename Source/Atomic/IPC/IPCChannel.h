@@ -58,6 +58,8 @@ public:
 
     void PostMessage(StringHash eventType, VariantMap& eventData);
 
+    IPCProcess* GetOtherProcess() { return otherProcess_; }
+
 protected:
 
     unsigned id_;

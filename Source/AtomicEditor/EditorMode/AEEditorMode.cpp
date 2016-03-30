@@ -1,8 +1,23 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 #include <Atomic/IO/Log.h>
@@ -11,6 +26,7 @@
 #include <Atomic/IPC/IPCEvents.h>
 #include <Atomic/IPC/IPCBroker.h>
 
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/Input/InputEvents.h>
 
 #include <ToolCore/ToolEnvironment.h>
@@ -35,6 +51,9 @@ EditorMode::EditorMode(Context* context) :
     Object(context)
 {
     SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
+    SubscribeToEvent(E_IPCPLAYERPAUSERESUMEREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseResumeRequest));
+    SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
+    SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
     SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
 }
 
@@ -70,7 +89,7 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
 {
     //SendEvent(E_EDITORPLAYSTOP);
 
-    if (eventData[IPCWorkerExit::P_BROKER] == playerBroker_) 
+    if (eventData[IPCWorkerExit::P_BROKER] == playerBroker_)
     {
         playerBroker_ = 0;
         playerEnabled_ = false;
@@ -150,6 +169,31 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     return playerBroker_.NotNull();
 
+}
+
+void EditorMode::HandleIPCPlayerPauseResumeRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (!playerBroker_) return;
+    VariantMap noEventData;
+    playerBroker_->PostMessage(E_PAUSERESUMEREQUESTED, noEventData);
+}
+
+void EditorMode::HandleIPCPlayerUpdatesPausedResumed(StringHash eventType, VariantMap& eventData)
+{
+    using namespace UpdatesPaused;
+
+    bool paused = eventData[P_PAUSED].GetBool();
+    if (paused)
+        SendEvent(E_EDITORPLAYERPAUSED);
+    else
+        SendEvent(E_EDITORPLAYERRESUMED);
+}
+
+void EditorMode::HandleIPCPlayerPauseStepRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (!playerBroker_) return;
+    VariantMap noEventData;
+    playerBroker_->PostMessage(E_PAUSESTEPREQUESTED, noEventData);
 }
 
 void EditorMode::HandleIPCPlayerExitRequest(StringHash eventType, VariantMap& eventData)

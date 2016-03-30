@@ -1,13 +1,29 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
+import EditorEvents = require("editor/EditorEvents");
 
 class AttributeInfoEdit extends Atomic.UILayout {
 
@@ -700,6 +716,37 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
                     }
                 }
                 this.editField.text = text;
+
+                this.editField.subscribeToEvent(this.editField, "WidgetEvent", (ev: Atomic.UIWidgetEvent) => {
+
+                    if (ev.type == Atomic.UI_EVENT_TYPE_POINTER_DOWN) {
+
+                        resource = <Atomic.Resource>object.getAttribute(this.attrInfo.name);
+
+                        if (resource instanceof Atomic.JSComponentFile) {
+
+                            var pathName = resource.name;
+                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": pathName });
+
+                        } else if (resource instanceof Atomic.Model) {
+
+                            var asset = ToolCore.assetDatabase.getAssetByCachePath(resource.name);
+                            this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+
+                        } else if (resource instanceof Atomic.Animation) {
+
+                             var animCacheReferenceName = resource.name.replace("_"+(<Atomic.Animation>resource).animationName, "");
+                             var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
+                             this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
+
+                        } else {
+
+                            //Unknown Resource
+
+                        }
+                    }
+
+                });
             }
 
 
