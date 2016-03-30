@@ -14,4 +14,8 @@ TBLayout: distribution: gravity, axis: y, id: hierarchyframe
 			gravity left right
 			placeholder @search
 			type search	
+		TBButton
+			@include definitions>menubutton
+			text X
+			id cancel search
 	TBLayout: distribution: gravity, id: hierarchycontainer, gravity: all

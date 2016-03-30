@@ -27,6 +27,7 @@
         "./AtomicEditor/main.ts",
         "./AtomicEditor/resources/ProjectTemplates.ts",
         "./AtomicEditor/resources/ResourceOps.ts",
+        "./AtomicEditor/resources/SearchBarFiltering.ts",
         "./AtomicEditor/ui/EditorStrings.ts",
         "./AtomicEditor/ui/EditorUI.ts",
         "./AtomicEditor/ui/frames/HierarchyFrame.ts",
