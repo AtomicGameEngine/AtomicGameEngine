@@ -90,7 +90,7 @@ public:
     CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE
     {
 
-        if (webClient_->renderHandler_.Null())
+        if (webClient_.Null() || webClient_->renderHandler_.Null())
             return nullptr;
 
         return webClient_->renderHandler_->GetCEFRenderHandler();
@@ -487,6 +487,14 @@ public:
 
     IMPLEMENT_REFCOUNTING(WebClientPrivate);
 
+    void ClearReferences()
+    {
+        browser_ = nullptr;
+        webBrowserHost_ = nullptr;
+        webClient_ = nullptr;
+        browserSideRouter_ = nullptr;
+    }
+
 private:
 
     String initialLoadString_;
@@ -503,6 +511,7 @@ private:
 WebClient::WebClient(Context* context) : Object(context)
 {
     d_ = new WebClientPrivate(this);
+    d_->AddRef();
 
     SubscribeToEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED, HANDLER(WebClient, HandleWebViewGlobalPropertiesChanged));
 }
@@ -520,10 +529,12 @@ WebClient::~WebClient()
         }
 
         d_->CloseBrowser(true);
+        d_->ClearReferences();
+        d_->Release();
     }
 
-    renderHandler_ = 0;
-    //d_->Release();
+    d_ = nullptr;
+    renderHandler_ = 0;    
 }
 
 void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier, int clickCount) const
