@@ -27,6 +27,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/JSONFile.h>
+#include <Atomic/Resource/ResourceEvents.h>
 
 #include <Atomic/Core/CoreEvents.h>
 #include <AtomicJS/Javascript/JSVM.h>
@@ -84,16 +85,56 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
     SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
 
+    SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleRenameResourceNotification));
+    SubscribeToEvent(E_DELETERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleDeleteResourceNotification));
+    SubscribeToEvent(E_PROJECTUNLOADEDNOTIFICATION, HANDLER(JSResourceEditor, HandleProjectUnloadedNotification));
 
     c->AddChild(webView_->GetInternalWidget());
 
 }
-
+    
 JSResourceEditor::~JSResourceEditor()
 {
 
 }
-
+   
+String getNormalizedPath(const String& path)
+{
+    // Full path is the fully qualified path from the root of the filesystem.  In order
+    // to take advantage of the resource caching system, let's trim it down to just the
+    // path inside the resources directory including the Resources directory so that the casing
+    // is correct.
+    const String& RESOURCES_MARKER = "resources/";
+    return path.SubstringUTF8(path.ToLower().Find(RESOURCES_MARKER));
+}
+    
+void JSResourceEditor::HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData)
+{
+    using namespace RenameResourceNotification;
+    const String& newPath = eventData[P_NEWRESOURCEPATH].GetString();
+    const String& path = eventData[P_RESOURCEPATH].GetString();
+    
+    webClient_->ExecuteJavaScript(ToString("HOST_resourceRenamed(\"%s\",\"%s\");", getNormalizedPath(path).CString(), getNormalizedPath(newPath).CString()));
+    
+    if (fullpath_.Compare(path) == 0) {
+        fullpath_ = newPath;
+        SetModified(modified_);
+    }
+}
+    
+void JSResourceEditor::HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData)
+{
+    using namespace DeleteResourceNotification;
+    const String& path = eventData[P_RESOURCEPATH].GetString();
+    
+    webClient_->ExecuteJavaScript(ToString("HOST_resourceDeleted(\"%s\");", getNormalizedPath(path).CString()));
+}
+    
+void JSResourceEditor::HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData)
+{
+    webClient_->ExecuteJavaScript("HOST_projectUnloaded();");
+}
+    
 void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
 {
     // need to wait until we get an editor load complete message since we could
@@ -110,13 +151,8 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     const String& EDITOR_SAVE_FILE = "editorSaveFile";
     const String& EDITOR_LOAD_COMPLETE = "editorLoadComplete";
     
-    const String& RESOURCES_MARKER = "resources/";
+    String normalizedPath = getNormalizedPath(fullpath_);
     
-    // Full path is the fully qualified path from the root of the filesystem.  In order
-    // to take advantage of the resource caching system, let's trim it down to just the
-    // path inside the resources directory including the Resources directory so that the casing
-    // correct.
-    String normalizedPath = fullpath_.SubstringUTF8(fullpath_.ToLower().Find(RESOURCES_MARKER));
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
     if (request == EDITOR_CHANGE)

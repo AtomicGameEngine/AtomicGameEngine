@@ -65,6 +65,9 @@ public:
     virtual void Redo() {}
 
     virtual bool Save() { return true; }
+    
+    virtual void ProjectUnloaded();
+    virtual void Delete();
 
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }
 
@@ -89,7 +92,7 @@ protected:
 private:
 
     void HandleFileChanged(StringHash eventType, VariantMap& eventData);
-
+    void HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData);
 };
 
 }
