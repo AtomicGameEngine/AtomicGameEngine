@@ -376,12 +376,16 @@ export class RenameAsset extends ModalWindow {
                 this.hide();
 
                 if (this.asset.name != this.nameEdit.text) {
-                    let eventData = {
-                        path: this.asset.path,
-                        newPath: this.nameEdit.text,
+                    let oldPath = this.asset.path;
+                    this.asset.rename(this.nameEdit.text);
+
+                    let eventData: EditorEvents.RenameResourceEvent = {
+                        path: oldPath,
+                        newPath: this.asset.path,
+                        newName: this.nameEdit.text,
                         asset: this.asset
                     };
-                    this.asset.rename(this.nameEdit.text);
+
                     this.sendEvent(EditorEvents.RenameResourceNotification, eventData);
                 }
 

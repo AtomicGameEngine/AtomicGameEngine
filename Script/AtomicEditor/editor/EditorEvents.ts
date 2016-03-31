@@ -64,6 +64,7 @@ export interface ContentFolderChangedEvent {
 
 export const CloseProject = "EditorCloseProject";
 export const ProjectClosed = "EditorProjectClosed";
+export const ProjectUnloadedNotification = "ProjectUnloadedNotification";
 
 export const LoadProject = "EditorLoadProject";
 export const LoadProjectNotification = "EditorLoadProjectNotification";
@@ -110,7 +111,7 @@ export const DeleteResource = "EditorDeleteResource";
  * Called once the resource has been deleted
  * @type {String}
  */
-export const DeleteResourceNotification = "EditorDeleteResourceNotification";
+export const DeleteResourceNotification = "DeleteResourceNotification";
 export interface DeleteResourceEvent {
 
   // The full path to the resource to edit
@@ -123,12 +124,13 @@ export const RenameResource = "EditorRenameResource";
  * Called once the resource has been renamed
  * @type {String}
  */
-export const RenameResourceNotification = "EditorRenameResourceNotification";
+export const RenameResourceNotification = "RenameResourceNotification";
 export interface RenameResourceEvent {
 
   // The full path to the resource to edit
   path: string;
   newPath: string;
+  newName: string;
 
   // the asset to delete
   asset: ToolCore.Asset;

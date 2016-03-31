@@ -185,30 +185,39 @@ export default class TypescriptLanguageServiceWebWorker {
      * @return {Promise}
      */
     private loadProjectFiles() {
-        if (!this.projectLoaded) {
-            return getFileResource("resources/tsconfig.atomic").then((jsonTsConfig: string) => {
-                let promises: PromiseLike<void>[] = [];
-                let tsConfig: TSConfigFile = JSON.parse(jsonTsConfig);
+        // Let's query the backend and get a list of the current files
+        // and delete any that may be been removed and sync up
+        return getFileResource("resources/tsconfig.atomic").then((jsonTsConfig: string) => {
+            let promises: PromiseLike<void>[] = [];
+            let tsConfig: TSConfigFile = JSON.parse(jsonTsConfig);
 
-                if (tsConfig.compilerOptions) {
-                    this.languageService.compilerOptions = tsConfig.compilerOptions;
-                };
+            if (tsConfig.compilerOptions) {
+                this.languageService.compilerOptions = tsConfig.compilerOptions;
+            };
 
-                tsConfig.files.forEach((f) => {
+            let existingFiles = this.languageService.getProjectFiles();
+
+            // see if anything was deleted
+            existingFiles.forEach((f) => {
+                if (tsConfig.files.indexOf(f) == -1) {
+                    this.languageService.deleteProjectFile(f);
+                }
+            });
+
+            // load up any new files that may have been added
+            tsConfig.files.forEach((f) => {
+                if (existingFiles.indexOf(f) == -1) {
                     promises.push(getFileResource(f).then((code: string) => {
                         this.languageService.addProjectFile(f, code);
                     }));
-                });
-                return Promise.all(promises);
-            }).then(() => {
-                // Let's seed the compiler state
-                // this.languageService.compile([this.filename]);
-                this.projectLoaded = true;
+                }
             });
-        } else {
-            // just return a resolved promise.. we are done
-            return Promise.resolve();
-        }
+            return Promise.all(promises);
+        }).then(() => {
+            // Let's seed the compiler state
+            // this.languageService.compile([this.filename]);
+            this.projectLoaded = true;
+        });
     }
 
     /**

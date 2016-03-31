@@ -107,9 +107,26 @@ declare module Editor.EditorEvents {
      */
     export interface RenameResourceEvent {
 
-        // The full path to the resource to edit
+        /**
+         * Original path of the resource
+         * @type {string}
+         */
         path: string;
+
+        /**
+         * New path of the resource
+         * @type {string}
+         */
         newPath: string;
+
+        /**
+         * New base name of the resource (no path or extension)
+         * @type {string}
+         */
+        newName?: string;
+
+        // the asset being changed
+        asset?: ToolCore.Asset;
     }
 
     export interface SceneEditStateChangeEvent {

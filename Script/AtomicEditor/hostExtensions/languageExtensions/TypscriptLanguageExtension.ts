@@ -4,6 +4,7 @@
 // Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
+import * as EditorEvents from "../../editor/EditorEvents";
 
 /**
  * Resource extension that supports the web view typescript extension
@@ -17,7 +18,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * @type {Boolean}
      */
     private isTypescriptProject = false;
-
+    private serviceRegistry: Editor.HostExtensions.HostServiceLocator = null;
     /**
      * Determines if the file name/path provided is something we care about
      * @param  {string} path
@@ -94,6 +95,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         // We care about both resource events as well as project events
         serviceRegistry.resourceServices.register(this);
         serviceRegistry.projectServices.register(this);
+        this.serviceRegistry = serviceRegistry;
     }
 
     /**
@@ -110,6 +112,15 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             if (jsFileAsset) {
                 console.log(`${this.name}: deleting corresponding .js file`);
                 ToolCore.assetDatabase.deleteAsset(jsFileAsset);
+
+                let eventData: EditorEvents.DeleteResourceEvent = {
+                    path: jsFile
+                };
+
+                this.serviceRegistry.sendEvent(EditorEvents.DeleteResourceNotification, eventData);
+                
+                // rebuild the tsconfig.atomic
+                this.loadProjectFiles();
             }
         }
     }
@@ -124,11 +135,23 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
             // Rename the corresponding js file
             let jsFile = ev.path.replace(/\.ts$/, ".js");
-            let jsFileNew = ev.newPath.replace(/\.ts$/, ".js");
+            let jsFileNew = ev.newPath.replace(/\.ts$/, ".js"); // rename doesn't want extension
             let jsFileAsset = ToolCore.assetDatabase.getAssetByPath(jsFile);
             if (jsFileAsset) {
                 console.log(`${this.name}: renaming corresponding .js file`);
-                jsFileAsset.rename(jsFileNew);
+                jsFileAsset.rename(ev.newName);
+
+                let eventData: EditorEvents.RenameResourceEvent = {
+                    path: jsFile,
+                    newPath: jsFileNew,
+                    newName: ev.newName,
+                    asset: jsFileAsset
+                };
+
+                this.serviceRegistry.sendEvent(EditorEvents.RenameResourceNotification, eventData);
+
+                // rebuild the tsconfig.atomic
+                this.loadProjectFiles();
             }
         }
     }

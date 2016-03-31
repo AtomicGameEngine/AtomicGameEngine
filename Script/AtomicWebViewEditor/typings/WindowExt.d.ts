@@ -14,6 +14,6 @@ interface Window {
     HOST_saveCode: () => void;
 
     HOST_projectUnloaded: () => void;
-    HOST_resourceRenamed: (path:string, newPath:string) => void;
+    HOST_resourceRenamed: (path: string, newPath: string) => void;
     HOST_resourceDeleted: (path: string) => void;
 }

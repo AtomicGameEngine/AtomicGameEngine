@@ -141,6 +141,13 @@ export class TypescriptLanguageService {
     }
 
     /**
+     * Returns the list of project files
+     * @return {string[]}
+     */
+    getProjectFiles(): string[] {
+        return this.projectFiles;
+    }
+    /**
      * Simply transpile the typescript file.  This is much faster and only checks for syntax errors
      * @param {string[]}           fileNames array of files to transpile
      * @param {ts.CompilerOptions} options   compiler options
@@ -243,6 +250,7 @@ export class TypescriptLanguageService {
         }
         let idx = this.projectFiles.indexOf(filepath);
         if (idx > -1) {
+            console.log(`delete project file from ${filepath}`);
             this.projectFiles.splice(idx, 1);
         }
     }
@@ -255,11 +263,13 @@ export class TypescriptLanguageService {
     renameProjectFile(filepath: string, newpath: string): void {
         let oldFile = this.versionMap[filepath];
         if (oldFile) {
+            console.log(`Rename project file from ${filepath} to ${newpath}`);
             delete this.versionMap[filepath];
             this.versionMap[newpath] = oldFile;
         }
         let idx = this.projectFiles.indexOf(filepath);
         if (idx > -1) {
+            console.log(`Update project files array from ${filepath} to ${newpath}`)
             this.projectFiles[idx] = newpath;
         }
     }

@@ -219,7 +219,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a delete resource event`);
+            console.log(`${this.name}: received a delete resource event for ${ev.path}`);
 
             // notify the typescript language service that the file has been deleted
             const message: WorkerProcessTypes.DeleteMessageData = {
@@ -237,7 +237,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a rename resource event`);
+            console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
 
             // notify the typescript language service that the file has been renamed
             const message: WorkerProcessTypes.RenameMessageData = {

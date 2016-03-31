@@ -175,7 +175,6 @@ export default class HostInteropType {
      */
     resourceRenamed(path: string, newPath: string) {
         editorCommands.resourceRenamed(path, newPath);
-
     }
 
     /**

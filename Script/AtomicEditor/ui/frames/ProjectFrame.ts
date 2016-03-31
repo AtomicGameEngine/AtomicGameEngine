@@ -63,7 +63,7 @@ class ProjectFrame extends ScriptWidget {
 
         // events
         this.subscribeToEvent("ProjectLoaded", (data) => this.handleProjectLoaded(data));
-        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent("DragEnded", (data: Atomic.DragEndedEvent) => this.handleDragEnded(data));
 
         this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.handleResourceAdded(ev));
