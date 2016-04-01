@@ -129,6 +129,9 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     CefSettings settings;
     settings.windowless_rendering_enabled = true;
+    
+    // Enable remote debugging on port 3335
+    settings.remote_debugging_port = 3335;
 
     d_ = new WebBrowserHostPrivate(this);
 

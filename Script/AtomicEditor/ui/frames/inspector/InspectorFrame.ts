@@ -54,7 +54,7 @@ class InspectorFrame extends ScriptWidget {
         var container = this.getWidget("inspectorcontainer");
 
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
-        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
 
         this.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (data) => this.handleActiveSceneEditorChanged(data));
 

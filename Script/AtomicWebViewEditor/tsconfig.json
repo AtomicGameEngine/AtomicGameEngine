@@ -6,20 +6,41 @@
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "outFile": "../../Data/AtomicEditor/CodeEditor/editor.bundle.js",
+        "outDir": "../../Data/AtomicEditor/CodeEditor/source/editorCore",
         "sourceMap": true
     },
     "filesGlob": [
-        "./**/*.ts"
+        "./**/*.ts",
+        "../TypeScript/*.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
     },
     "files": [
+        "./clientExtensions/ClientExtensionEventNames.ts",
+        "./clientExtensions/ClientExtensionServices.ts",
+        "./clientExtensions/languageExtensions/javascript/JavascriptLanguageExtension.ts",
+        "./clientExtensions/languageExtensions/typescript/TypescriptLanguageExtension.ts",
+        "./clientExtensions/languageExtensions/typescript/workerprocess/TypescriptLanguageService.ts",
+        "./clientExtensions/languageExtensions/typescript/workerprocess/TypescriptLanguageServiceWebWorker.ts",
+        "./clientExtensions/languageExtensions/typescript/workerprocess/workerLoader.ts",
+        "./clientExtensions/languageExtensions/typescript/workerprocess/workerProcessTypes.ts",
+        "./clientExtensions/ServiceLocator.ts",
         "./editor/editor.ts",
-        "./editor/editorConfig.ts",
+        "./editor/editorCommands.ts",
         "./interop.ts",
+        "./modules/typescript.d.ts",
         "./typings/ace.d.ts",
-        "./typings/AtomicQuery.d.ts"
+        "./typings/systemjs.d.ts",
+        "./typings/webworkers.d.ts",
+        "./typings/WindowExt.d.ts",
+        "../TypeScript/Atomic.d.ts",
+        "../TypeScript/AtomicNET.d.ts",
+        "../TypeScript/AtomicPlayer.d.ts",
+        "../TypeScript/AtomicWork.d.ts",
+        "../TypeScript/Editor.d.ts",
+        "../TypeScript/EditorWork.d.ts",
+        "../TypeScript/ToolCore.d.ts",
+        "../TypeScript/WebView.d.ts"
     ]
 }

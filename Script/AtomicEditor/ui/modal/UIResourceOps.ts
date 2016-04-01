@@ -56,8 +56,14 @@ export class ResourceDelete extends ModalWindow {
 
                 this.hide();
 
+                let eventData = {
+                    path: this.asset.path
+                };
+
                 var db = ToolCore.getAssetDatabase();
                 db.deleteAsset(this.asset);
+
+                this.sendEvent(EditorEvents.DeleteResourceNotification, eventData);
 
                 return true;
             }
@@ -146,8 +152,10 @@ export class CreateComponent extends ModalWindow {
                 var componentName = this.nameField.text;
                 var outputFile = Atomic.addTrailingSlash(this.resourcePath) + componentName;
 
-                if (outputFile.indexOf(".js") == -1) outputFile += ".js";
-
+                // Check to see if we have a file extension.  If we don't then assume .js
+                if (outputFile.indexOf(".") == -1) {
+                    outputFile += ".js";
+                }
 
                 if (ResourceOps.CreateNewComponent(outputFile, componentName)) {
 
@@ -199,7 +207,10 @@ export class CreateScript extends ModalWindow {
                 var scriptName = this.nameField.text;
                 var outputFile = Atomic.addTrailingSlash(this.resourcePath) + scriptName;
 
-                if (outputFile.indexOf(".js") == -1) outputFile += ".js";
+                // Check to see if we have a file extension.  If we don't then assume .js
+                if (outputFile.indexOf(".") == -1) {
+                    outputFile += ".js";
+                }
 
 
                 if (ResourceOps.CreateNewScript(outputFile, scriptName)) {
@@ -364,8 +375,19 @@ export class RenameAsset extends ModalWindow {
 
                 this.hide();
 
-                if (this.asset.name != this.nameEdit.text)
+                if (this.asset.name != this.nameEdit.text) {
+                    let oldPath = this.asset.path;
                     this.asset.rename(this.nameEdit.text);
+
+                    let eventData: EditorEvents.RenameResourceEvent = {
+                        path: oldPath,
+                        newPath: this.asset.path,
+                        newName: this.nameEdit.text,
+                        asset: this.asset
+                    };
+
+                    this.sendEvent(EditorEvents.RenameResourceNotification, eventData);
+                }
 
                 return true;
             }
