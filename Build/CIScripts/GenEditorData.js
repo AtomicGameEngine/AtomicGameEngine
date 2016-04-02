@@ -170,12 +170,6 @@ namespace('build', function() {
     });
 
     lintTask.invoke("{./Script/AtomicEditor/**/*.ts,./Script/AtomicWebViewEditor/**/*.ts}", false);
-
-    }, {
-      printStdout: true
-    });
-
-
   });
 
   task('geneditordata', ["build:compileeditorscripts", "build:ios_deploy", "build:gendocs"], {
