@@ -33,6 +33,13 @@
 #include "IPC.h"
 #include "IPCEvents.h"
 
+#if defined(ATOMIC_PLATFORM_WINDOWS)
+
+#include <windows.h>
+#undef PostMessage
+
+#endif
+
 namespace Atomic
 {
 
@@ -40,6 +47,28 @@ IPC::IPC(Context* context) : Object(context),
     workerChannelID_(0)
 {
     SubscribeToEvent(E_BEGINFRAME, HANDLER(IPC, HandleBeginFrame));
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+    jobHandle_ = CreateJobObject(NULL, NULL);
+    if (!jobHandle_)
+    {
+        LOGERROR("IPC::IPC - Unable to create IPC job");
+    }
+    else
+    {
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+
+        // Configure all child processes associated with the job to terminate when main process is closed
+        jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+        if (0 == SetInformationJobObject(jobHandle_, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+        {
+            LOGERROR("IPC::IPC - Unable set job information");
+            jobHandle_ = 0;
+        }
+    }
+
+#endif
 }
 
 IPC::~IPC()
