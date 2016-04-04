@@ -55,14 +55,29 @@ class ResourceFrame extends ScriptWidget {
 
         if (this.currentResourceEditor) {
             this.currentResourceEditor.save();
+            // Grab the path to this file and pass it to the save resource
+            this.sendEvent(EditorEvents.SaveResourceNotification, {
+                path: ev.path || this.currentResourceEditor.fullPath
+            });
         }
 
+    }
+
+    handleDeleteResource(ev: EditorEvents.DeleteResourceEvent) {
+        var editor = this.editors[ev.path];
+        if (editor) {
+            editor.close(true);
+            delete this.editors[ev.path];
+        }
     }
 
     handleSaveAllResources(data) {
 
         for (var i in this.editors) {
             this.editors[i].save();
+            this.sendEvent(EditorEvents.SaveResourceNotification, {
+                path: this.editors[i].fullPath
+            });
         }
 
     }
@@ -203,6 +218,14 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
+    handleRenameResource(ev:EditorEvents.RenameResourceEvent) {
+        var editor = this.editors[ev.path];
+        if (editor) {
+            this.editors[ev.newPath] = editor;
+            delete this.editors[ev.path];
+        }
+    }
+
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
@@ -268,11 +291,13 @@ class ResourceFrame extends ScriptWidget {
 
         this.resourceViewContainer.addChild(this);
 
-        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
         this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));
         this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
+        this.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev));
+        this.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => this.handleDeleteResource(data));
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 

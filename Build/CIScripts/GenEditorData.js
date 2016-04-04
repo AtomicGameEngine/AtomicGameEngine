@@ -6,6 +6,8 @@ var buildDir = bcommon.artifactsRoot + "Build/EditorData/";
 var jsDocFolder = bcommon.artifactsRoot + "Build/JSDoc/";
 var atomicRoot = bcommon.atomicRoot;
 var atomicTool = host.getAtomicToolBinary();
+var glob = require("glob");
+var Tslint = require("tslint");
 
 namespace('build', function() {
 
@@ -87,6 +89,45 @@ namespace('build', function() {
 
   });
 
+  // Linting task
+  task('lint_typescript', {
+      async: true
+  }, function(fileMask, failOnError) {
+
+    console.log("TSLINT: Linting files in " + fileMask);
+    var lintConfig = JSON.parse(fs.readFileSync("./Script/tslint.json"));
+    var options = {
+        configuration: lintConfig,
+        formatter: "prose"
+    };
+
+    // lint
+    // Since TSLint does not yet support recursively searching for files, then we need to
+    // create a command per file.  The main issue with this is that it will abort on the first error instead
+    // of listing out all lint errors
+    glob(fileMask, function(err, results) {
+      var lintErrors = [];
+      results.forEach(function(filename) {
+
+        var contents = fs.readFileSync(filename, "utf8");
+
+        var ll = new Tslint(filename, contents, options);
+        var result = ll.lint();
+        if (result.failureCount > 0) {
+            lintErrors.push(result.output);
+        }
+      });
+      if (lintErrors.length > 0) {
+          console.warn("TSLINT: WARNING - Lint errors detected");
+          console.warn(lintErrors.join(''));
+          if (failOnError) {
+              fail("TSLint errors detected");
+          }
+      }
+      complete();
+    });
+  });
+
   task('compileeditorscripts', ["build:genscriptbindings"],{
     async: true
   }, function() {
@@ -102,17 +143,33 @@ namespace('build', function() {
       atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor"
     ];
 
-    jake.exec(cmds, function() {
-
       // will be copied when editor resources are copied
 
-      complete();
+    var lintTask = jake.Task['build:lint_typescript'];
 
-    }, {
-      printStdout: true
+    lintTask.addListener('complete', function () {
+      console.log("\n\nLint: Typescript linting complete.\n\n");
+      jake.exec(cmds, function() {
+
+          // copy some external dependencies into the editor modules directory
+         var editorModulesDir = "./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/modules";
+         var webeditorModulesDir = "./Data/AtomicEditor/CodeEditor/source/editorCore/modules";
+         var nodeModulesDir = "./Build/node_modules";
+         fs.mkdirsSync(editorModulesDir);
+         // TypeScript
+         fs.copySync(nodeModulesDir + "/typescript/lib/typescript.js", webeditorModulesDir + "/typescript.js")
+
+         // copy lib.core.d.ts into the tool data directory
+         fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
+         fs.copySync("./Build/node_modules/typescript/lib/lib.core.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.core.d.ts")
+         complete();
+
+      }, {
+        printStdout: true
+      });
     });
 
-
+    lintTask.invoke("{./Script/AtomicEditor/**/*.ts,./Script/AtomicWebViewEditor/**/*.ts}", false);
   });
 
   task('geneditordata', ["build:compileeditorscripts", "build:ios_deploy", "build:gendocs"], {

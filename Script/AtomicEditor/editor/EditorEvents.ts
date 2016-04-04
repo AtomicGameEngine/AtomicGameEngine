@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+// TODO: migrate these interfaces out to the d.ts and migrate the static strings to some common location
 export const ModalError = "ModalError";
 export interface ModalErrorEvent {
 
@@ -27,7 +28,7 @@ export interface ModalErrorEvent {
   message: string;
 
 }
-
+export const PlayerStartRequest = "EditorPlayRequest";
 export const PlayerStarted = "EditorPlayerStarted";
 export const PlayerStopped = "EditorPlayerStopped";
 export const PlayerPaused = "EditorPlayerPaused";
@@ -65,8 +66,10 @@ export interface ContentFolderChangedEvent {
 
 export const CloseProject = "EditorCloseProject";
 export const ProjectClosed = "EditorProjectClosed";
+export const ProjectUnloadedNotification = "ProjectUnloadedNotification";
 
 export const LoadProject = "EditorLoadProject";
+export const LoadProjectNotification = "EditorLoadProjectNotification";
 export interface LoadProjectEvent {
 
   // The full path to the .atomic file
@@ -77,10 +80,14 @@ export interface LoadProjectEvent {
 export const SaveAllResources = "EditorSaveAllResources";
 
 export const SaveResource = "EditorSaveResource";
+/**
+ * Called once the resource has been saved
+ * @type {String}
+ */
+export const SaveResourceNotification = "EditorSaveResourceNotification";
 export interface SaveResourceEvent {
 
-  // The full path to the resource to save
-  // empty or undefined for current
+  // The full path to the resource to save / empty or undefined for current
   path: string;
 
 }
@@ -99,6 +106,36 @@ export interface EditResourceEvent {
   // The full path to the resource to edit
   path: string;
 
+}
+
+export const DeleteResource = "EditorDeleteResource";
+/**
+ * Called once the resource has been deleted
+ * @type {String}
+ */
+export const DeleteResourceNotification = "DeleteResourceNotification";
+export interface DeleteResourceEvent {
+
+  // The full path to the resource to edit
+  path: string;
+
+}
+
+export const RenameResource = "EditorRenameResource";
+/**
+ * Called once the resource has been renamed
+ * @type {String}
+ */
+export const RenameResourceNotification = "RenameResourceNotification";
+export interface RenameResourceEvent {
+
+  // The full path to the resource to edit
+  path: string;
+  newPath: string;
+  newName: string;
+
+  // the asset to delete
+  asset: ToolCore.Asset;
 }
 
 export const SceneEditStateChange = "SceneEditStateChange";
