@@ -331,6 +331,9 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     handleDragEnded(ev: Atomic.DragEndedEvent) {
 
+        if (!ev.dragObject.object)
+            return;
+
         var typeName = ev.dragObject.object.typeName;
 
         var dropNode: Atomic.Node = this.scene.getNode(Number(this.hierList.hoverItemID));
