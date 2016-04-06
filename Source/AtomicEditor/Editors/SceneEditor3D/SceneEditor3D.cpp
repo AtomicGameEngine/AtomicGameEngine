@@ -105,6 +105,7 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     sceneView_->SetGravity(UI_GRAVITY_ALL);
 
     rootContentWidget_->AddChild(sceneView_);
+    rootContentWidget_->AddChild(profilerContentWidget_);
 
     gizmo3D_ = new Gizmo3D(context_);
     gizmo3D_->SetView(sceneView_);
@@ -120,6 +121,12 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     // future size changes will be handled automatically
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
+
+    int profilerWidth = rect.Width() - profilerText_->GetRect().Width();
+    int profilerHeight = rect.Height() - modeText_->GetRect().Height();
+
+    profilerContentWidget_->SetSize(profilerWidth, profilerHeight);
+    profilerContentWidget_->Disable();
 
     SubscribeToEvent(E_PROJECTUSERPREFSAVED, HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
@@ -217,6 +224,20 @@ void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (!cubemapRenderCount_)
         gizmo3D_->Update();
+
+    if (debugHud_->GetShowSceneHud())
+    {
+        debugHud_->SetIsSceneOpen(true);
+        statsText_->SetText(debugHud_->GetStatsString());
+        modeText_->SetText(debugHud_->GetModeString());
+        profilerText_->SetText(debugHud_->GetProfilerString());
+    }
+    else
+    {
+        statsText_->SetText("");
+        modeText_->SetText("");
+        profilerText_->SetText("");
+    }
 }
 
 void SceneEditor3D::HandlePlayStarted(StringHash eventType, VariantMap& eventData)
@@ -255,6 +276,8 @@ void SceneEditor3D::Close(bool navigateToAvailableResource)
         sceneImporter_->GetAsset()->Save();
         sceneImporter_ = nullptr;
     }
+
+    debugHud_->SetIsSceneOpen(false);
 
     ResourceEditor::Close(navigateToAvailableResource);
 }

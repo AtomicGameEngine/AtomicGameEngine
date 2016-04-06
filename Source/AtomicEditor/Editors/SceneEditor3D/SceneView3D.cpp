@@ -482,6 +482,9 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     Enable();
 
+    SystemUI::DebugHud* debugHud = GetSubsystem<SystemUI::DebugHud>();
+    debugHud->SetIsSceneOpen(true);
+
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 

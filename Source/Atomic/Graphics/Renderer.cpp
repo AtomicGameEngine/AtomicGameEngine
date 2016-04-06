@@ -672,6 +672,7 @@ void Renderer::Render()
         graphics_->ResetRenderTargets();
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, defaultZone_->GetFogColor());
 
+        numSinglePassPrimitives_ = 0;
         numPrimitives_ = 0;
         numBatches_ = 0;
     }
@@ -703,6 +704,7 @@ void Renderer::Render()
         }
 
         // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
+        numSinglePassPrimitives_ = graphics_->GetSinglePassPrimitives();
         numPrimitives_ = graphics_->GetNumPrimitives();
         numBatches_ = graphics_->GetNumBatches();
     }

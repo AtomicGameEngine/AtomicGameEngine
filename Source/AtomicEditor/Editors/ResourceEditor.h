@@ -25,6 +25,7 @@
 #include <Atomic/Core/Object.h>
 
 #include <Atomic/UI/UIButton.h>
+#include <Atomic/UI/UIEditField.h>
 #include <Atomic/UI/UITabContainer.h>
 
 using namespace Atomic;
@@ -88,6 +89,11 @@ protected:
     SharedPtr<UITabContainer> container_;
     SharedPtr<UIWidget> rootContentWidget_;
     SharedPtr<UIButton> button_;
+    SharedPtr<UIWidget> profilerContentWidget_;
+
+    SharedPtr<UIEditField> statsText_;
+    SharedPtr<UIEditField> modeText_;
+    SharedPtr<UIEditField> profilerText_;
 
 private:
 

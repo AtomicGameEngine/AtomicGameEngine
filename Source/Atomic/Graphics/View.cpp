@@ -1551,8 +1551,13 @@ void View::ExecuteRenderPathCommands()
 
                     SetRenderTargets(command);
 
+                    graphics_->SetNumPasses();
+
                     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
                     {
+
+                        graphics_->AddPasses();
+
                         // If reusing shadowmaps, render each of them before the lit batches
                         if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
                         {
@@ -2913,6 +2918,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         const ShadowBatchQueue& shadowQueue = queue.shadowSplits_[i];
         if (!shadowQueue.shadowBatches_.IsEmpty())
         {
+            graphics_->AddPasses();
             graphics_->SetViewport(shadowQueue.shadowViewport_);
             shadowQueue.shadowBatches_.Draw(this, false, false, true);
         }

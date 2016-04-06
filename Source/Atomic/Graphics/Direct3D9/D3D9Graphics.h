@@ -288,6 +288,9 @@ public:
     /// Return whether Direct3D device is lost, and can not yet render. This happens during fullscreen resolution switching.
     bool IsDeviceLost() const { return deviceLost_; }
 
+    /// Return number of True primitives drawn this frame.
+    unsigned GetSinglePassPrimitives() const { return numSinglePassPrimitives_; }
+
     /// Return number of primitives drawn this frame.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
 
@@ -503,7 +506,13 @@ public:
     IntVector2 GetMonitorResolution(int monitorId) const;
     // ATOMIC END
 
+    int GetNumPasses() { return numPasses_; }
+    void SetNumPasses() { numPasses_ = 0; }
+    void AddPasses() { numPasses_++; }
+
 private:
+    int numPasses_;
+
     /// Set vertex buffer stream frequency.
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies.
@@ -579,6 +588,8 @@ private:
     bool sRGBSupport_;
     /// sRGB conversion on write support flag.
     bool sRGBWriteSupport_;
+    ///Number of true primitives
+    unsigned numSinglePassPrimitives_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.
