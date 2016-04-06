@@ -423,6 +423,45 @@ public:
 
     }
 
+    virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
+                               CefRefPtr<CefFrame> frame,
+                               const CefString& target_url,
+                               const CefString& target_frame_name,
+                               CefLifeSpanHandler::WindowOpenDisposition target_disposition,
+                               bool user_gesture,
+                               const CefPopupFeatures& popupFeatures,
+                               CefWindowInfo& windowInfo,
+                               CefRefPtr<CefClient>& client,
+                               CefBrowserSettings& settings,
+                               bool* no_javascript_access)  OVERRIDE
+    {
+        // Called on the IO thread, cancel and convert to popup request
+
+        assert(!CefCurrentlyOn(TID_UI));
+
+        // Execute on the UI thread.
+        CefPostTask(TID_UI,
+                    base::Bind(&WebClientPrivate::OnPopupRequest, this, target_url));
+
+        return true;
+    }
+
+    void OnPopupRequest(const CefString& target_url)
+    {
+        if (webClient_.Null())
+            return;
+
+        String url;
+        ConvertCEFString(target_url, url);
+
+        VariantMap eventData;
+        eventData[WebViewPopupRequest::P_CLIENT] = webClient_;
+        eventData[WebViewPopupRequest::P_URL] = url;
+
+        webClient_->SendEvent(E_WEBVIEWPOPUPREQUEST, eventData);
+
+    }
+
     void CloseBrowser(bool force_close)
     {
         if (!CefCurrentlyOn(TID_UI))

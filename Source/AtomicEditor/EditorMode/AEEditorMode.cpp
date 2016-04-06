@@ -77,6 +77,8 @@ void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventD
 
     startupData["debugHudMode"] = debugHud ? debugHud->GetMode() : (unsigned) 0;
 
+    SendEvent(E_EDITORPLAYREQUEST);
+
     playerBroker_->PostMessage(E_IPCINITIALIZE, startupData);
 
     SendEvent(E_EDITORPLAYERSTARTED);

@@ -60,7 +60,7 @@ public:
     void SetFocus();
 
     bool Save();
-
+    
 private:
 
     void HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData);
@@ -68,6 +68,10 @@ private:
 
     bool BeautifyJavascript(const char* source, String& output);
 
+    void HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData);
+    void HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData);
+    void HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData);
+    
     SharedPtr<UIWebView> webView_;
     WeakPtr<WebClient> webClient_;
     WeakPtr<WebMessageHandler> messageHandler_;
