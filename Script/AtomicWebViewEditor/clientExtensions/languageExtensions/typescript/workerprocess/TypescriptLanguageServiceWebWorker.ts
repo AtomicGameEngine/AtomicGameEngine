@@ -168,7 +168,7 @@ export default class TypescriptLanguageServiceWebWorker {
                 case WorkerProcessTypes.GetDocTooltip:
                     this.handleGetDocTooltip(port, e.data);
                     break;
-                case ClientExtensionEventNames.ResourceSavedEvent:
+                case ClientExtensionEventNames.CodeSavedEvent:
                     this.handleSave(port, e.data);
                     break;
                 case ClientExtensionEventNames.ResourceRenamedEvent:
@@ -179,6 +179,9 @@ export default class TypescriptLanguageServiceWebWorker {
                     break;
                 case ClientExtensionEventNames.ProjectUnloadedEvent:
                     this.handleProjectUnloaded(port);
+                    break;
+                case WorkerProcessTypes.GetAnnotations:
+                    this.handleGetAnnotations(port, e.data);
                     break;
             }
 
@@ -323,16 +326,23 @@ export default class TypescriptLanguageServiceWebWorker {
         port.postMessage(message);
     }
 
+    handleGetAnnotations(port: MessagePort, eventData: WorkerProcessTypes.GetAnnotationsMessageData) {
+        let message: WorkerProcessTypes.GetAnnotationsResponseMessageData = {
+            command: WorkerProcessTypes.AnnotationsUpdated,
+            annotations: this.languageService.getPreEmitWarnings(eventData.filename)
+        };
+
+        port.postMessage(message);
+    }
+
     /**
-     * Called when the file has been saved.
+     * Called when the file has been saved.  This will also send back annotations to the caller
      * @param  {MessagePort} port
      * @param  {WorkerProcessCommands.SaveMessageData} eventData
      */
     handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
-        // let's reload the file
-        getFileResource(eventData.path).then((code: string) => {
-            this.languageService.updateProjectFile(eventData.path, code);
-        });
+        this.languageService.updateProjectFile(eventData.filename, eventData.code);
+        this.handleGetAnnotations(port, eventData );
     }
 
     /**

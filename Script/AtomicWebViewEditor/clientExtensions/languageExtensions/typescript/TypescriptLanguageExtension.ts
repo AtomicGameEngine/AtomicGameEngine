@@ -144,7 +144,24 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             case WorkerProcessTypes.Alert:
                 alert(e.data.message);
                 break;
+            case WorkerProcessTypes.AnnotationsUpdated:
+                this.setAnnotations(e.data);
+                break;
         }
+    }
+
+    /**
+     * Set annotations based upon issues reported by the typescript language service
+     * @param  {WorkerProcessTypes.GetAnnotationsResponseMessageData} event
+     */
+    setAnnotations(event: WorkerProcessTypes.GetAnnotationsResponseMessageData) {
+        // grab the existing annotations and filter out any TS annotations
+        let oldAnnotations = this.editor.session.getAnnotations().filter(ann => !ann.tsAnnotation);
+        this.editor.session.clearAnnotations();
+
+        // Mark these annotations as special
+        event.annotations.forEach(ann => ann.tsAnnotation = true);
+        this.editor.session.setAnnotations(oldAnnotations.concat(event.annotations));
     }
 
     /**
@@ -215,13 +232,16 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Called once a resource has been saved
      * @param  {Editor.EditorEvents.SaveResourceEvent} ev
      */
-    save(ev: Editor.EditorEvents.SaveResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a save resource event for ${ev.path}`);
+    save(ev: Editor.EditorEvents.CodeSavedEvent) {
+        if (this.isValidFiletype(ev.filename)) {
+            console.log(`${this.name}: received a save resource event for ${ev.filename}`);
 
             const message: WorkerProcessTypes.SaveMessageData = {
-                command: ClientExtensionEventNames.ResourceSavedEvent,
-                path: ev.path
+                command: ClientExtensionEventNames.CodeSavedEvent,
+                filename: ev.filename,
+                fileExt: ev.fileExt,
+                code: ev.code,
+                editor: null // cannot send editor across the boundary
             };
 
             this.worker.port.postMessage(message);
