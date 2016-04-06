@@ -314,7 +314,7 @@ export default class TypescriptLanguageServiceWebWorker {
         if (details) {
             let docs = details.displayParts.map(part => part.text).join("");
             if (details.documentation) {
-                docs += "<br/" + details.documentation.map(part => part.text).join("");
+                docs += "<p>" + details.documentation.map(part => part.text).join("") + "</p>";
             }
 
             message.docHTML = docs;
