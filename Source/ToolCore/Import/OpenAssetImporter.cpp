@@ -27,6 +27,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/ImportConfig.h>
 
 #include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -39,6 +40,9 @@
 #include <Atomic/Graphics/IndexBuffer.h>
 #include <Atomic/Graphics/VertexBuffer.h>
 #include <Atomic/Graphics/Material.h>
+
+#include <ToolCore/Project/Project.h>
+#include <ToolCore/ToolSystem.h>
 
 #include "OpenAssetImporter.h"
 
@@ -73,18 +77,42 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     endTime_(-1)
 {
 
-    aiFlagsDefault_ =
-        aiProcess_ConvertToLeftHanded |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_Triangulate |
-        aiProcess_GenSmoothNormals |
-        aiProcess_LimitBoneWeights |
-        aiProcess_ImproveCacheLocality |
-        aiProcess_FixInfacingNormals |
-        aiProcess_FindInvalidData |
-        aiProcess_GenUVCoords |
-        aiProcess_FindInstances |
-        aiProcess_OptimizeMeshes;
+    ReadImportConfig();
+
+    VariantMap::ConstIterator itr = aiFlagParameters_.Begin();
+
+    aiFlagsDefault_ = 0;
+
+    while (itr != aiFlagParameters_.End())
+    {
+        if (itr->second_ == true)
+        {
+            if (itr->first_ == "aiProcess_ConvertToLeftHanded")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ConvertToLeftHanded;
+            else if (itr->first_ == "aiProcess_JoinIdenticalVertices")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_JoinIdenticalVertices;
+            else if (itr->first_ == "aiProcess_Triangulate")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_Triangulate;
+            else if (itr->first_ == "aiProcess_GenSmoothNormals")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenSmoothNormals;
+            else if (itr->first_ == "aiProcess_LimitBoneWeights")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_LimitBoneWeights;
+            else if (itr->first_ == "aiProcess_ImproveCacheLocality")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ImproveCacheLocality;
+            else if (itr->first_ == "aiProcess_FixInfacingNormals")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FixInfacingNormals;
+            else if (itr->first_ == "aiProcess_FindInvalidData")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInvalidData;
+            else if (itr->first_ == "aiProcess_GenUVCoords")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenUVCoords;
+            else if (itr->first_ == "aiProcess_FindInstances")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInstances;
+            else if (itr->first_ == "aiProcess_OptimizeMeshes")
+                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_OptimizeMeshes;
+        }
+
+        itr++;
+    }
 
     // TODO:  make this an option on importer
 
@@ -858,6 +886,26 @@ void OpenAssetImporter::CollectAnimations(OutModel* model)
     }
 
     /// \todo Vertex morphs are ignored for now
+}
+
+void OpenAssetImporter::ReadImportConfig()
+{
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+
+    String projectPath = project->GetProjectPath();
+
+    String filename = projectPath + "Settings/Import.json";
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (!fileSystem->FileExists(filename))
+        return;
+
+    if (ImportConfig::LoadFromFile(context_, filename))
+    {
+        ImportConfig::ApplyConfig(aiFlagParameters_);
+    }
+
 }
 
 void OpenAssetImporter::BuildBoneCollisionInfo(OutModel& model)
