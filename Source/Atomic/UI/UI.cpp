@@ -858,7 +858,7 @@ void UI::ToggleDebugHud()
     if (!hud)
         return;
 
-    if (!hud->GetIsSceneOpen())
+    if (!hud->GetSceneOpen())
         hud->ToggleAll();
     else
         hud->ToggleSceneHud();

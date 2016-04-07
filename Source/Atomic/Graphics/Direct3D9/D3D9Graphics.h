@@ -507,8 +507,8 @@ public:
     // ATOMIC END
 
     int GetNumPasses() { return numPasses_; }
-    void SetNumPasses() { numPasses_ = 0; }
-    void AddPasses() { numPasses_++; }
+    void ResetNumPasses() { numPasses_ = 0; }
+    void IncNumPasses() { numPasses_++; }
 
 private:
     int numPasses_;

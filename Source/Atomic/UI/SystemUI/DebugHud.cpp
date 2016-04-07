@@ -66,7 +66,7 @@ DebugHud::DebugHud(Context* context) :
     fpsTimeSinceUpdate_(FPS_UPDATE_INTERVAL),
     fpsFramesSinceUpdate_(0),
     fps_(0),
-    isSceneOpen_(false),
+    sceneOpen_(false),
     showSceneHud_(false)
 {
     SystemUI* ui = GetSubsystem<SystemUI>();
@@ -108,7 +108,7 @@ void DebugHud::Update(float timeStep)
         return;
 
     UI* ui = GetSubsystem<UI>();
-    if (GetIsSceneOpen())
+    if (GetSceneOpen())
     {
         ui->ShowDebugHud(false);
     }
@@ -123,7 +123,7 @@ void DebugHud::Update(float timeStep)
         uiRoot->AddChild(profilerText_);
     }
 
-    if (statsText_->IsVisible() || GetIsSceneOpen())
+    if (statsText_->IsVisible() || GetSceneOpen())
     {
         fpsTimeSinceUpdate_ += timeStep;
         ++fpsFramesSinceUpdate_;
@@ -175,7 +175,7 @@ void DebugHud::Update(float timeStep)
         statsString_ = stats;
     }
 
-    if (modeText_->IsVisible() || GetIsSceneOpen())
+    if (modeText_->IsVisible() || GetSceneOpen())
     {
         String mode;
         mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
@@ -200,7 +200,7 @@ void DebugHud::Update(float timeStep)
         {
             profilerTimer_.Reset();
 
-            if (profilerText_->IsVisible() || GetIsSceneOpen())
+            if (profilerText_->IsVisible() || GetSceneOpen())
             {
                 String profilerOutput = profiler->GetData(false, false, profilerMaxDepth_);
                 profilerText_->SetText(profilerOutput);

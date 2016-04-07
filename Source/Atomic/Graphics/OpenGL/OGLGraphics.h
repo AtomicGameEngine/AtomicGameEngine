@@ -294,6 +294,9 @@ public:
     /// Return whether device is lost, and can not yet render.
     bool IsDeviceLost() const;
 
+    /// Return number of True primitives drawn this frame.
+    unsigned GetSinglePassPrimitives() const { return numSinglePassPrimitives_; }
+
     /// Return number of primitives drawn this frame.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
 
@@ -535,7 +538,13 @@ public:
     IntVector2 GetMonitorResolution(int monitorId) const;
     // ATOMIC END
 
+    int GetNumPasses() { return numPasses_; }
+    void ResetNumPasses() { numPasses_ = 0; }
+    void IncNumPasses() { numPasses_++; }
+
 private:
+    int numPasses_;
+
     /// Create the application window icon.
     void CreateWindowIcon();
     /// Check supported rendering features.
@@ -613,6 +622,8 @@ private:
     bool sRGBSupport_;
     /// sRGB conversion on write support flag.
     bool sRGBWriteSupport_;
+    ///Number of true primitives
+    unsigned numSinglePassPrimitives_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

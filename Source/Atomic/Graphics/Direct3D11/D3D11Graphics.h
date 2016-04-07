@@ -293,6 +293,9 @@ public:
     /// Return whether Direct3D device is lost, and can not yet render. Always false on D3D11.
     bool IsDeviceLost() const { return false; }
 
+    /// Return number of True primitives drawn this frame.
+    unsigned GetSinglePassPrimitives() const { return numSinglePassPrimitives_; }
+
     /// Return number of primitives drawn this frame.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
 
@@ -510,7 +513,13 @@ public:
     IntVector2 GetMonitorResolution(int monitorId) const;
     // ATOMIC END
 
+    int GetNumPasses() { return numPasses_; }
+    void ResetNumPasses() { numPasses_ = 0; }
+    void IncNumPasses() { numPasses_++; }
+
 private:
+    int numPasses_;
+
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable, bool borderless);
     /// Create the application window icon.
@@ -576,6 +585,8 @@ private:
     bool sRGBSupport_;
     /// sRGB conversion on write support flag.
     bool sRGBWriteSupport_;
+    ///Number of true primitives
+    unsigned numSinglePassPrimitives_;
     /// Number of primitives this frame.
     unsigned numPrimitives_;
     /// Number of batches this frame.

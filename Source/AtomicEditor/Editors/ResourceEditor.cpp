@@ -156,6 +156,7 @@ ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabCo
 
     profilerContentWidget_ = new UIWidget(context_);
     profilerContentWidget_->SetGravity(UI_GRAVITY_ALL);
+    profilerContentWidget_->GetInternalWidget()->SetDisabledOpacity(1.0f);
 
     statsText_ = new UIEditField(context_);
     statsText_->SetGravity(UI_GRAVITY_LEFT);

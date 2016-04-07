@@ -122,7 +122,7 @@ private:
 
     SharedPtr<Scene> scene_;
 
-    SystemUI::DebugHud* debugHud_ = GetSubsystem<SystemUI::DebugHud>();
+    SystemUI::DebugHud* debugHud_;
 
     // TODO: multiple views
     SharedPtr<SceneView3D> sceneView_;

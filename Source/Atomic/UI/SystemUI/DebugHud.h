@@ -106,8 +106,8 @@ public:
     /// Clear all application-specific stats.
     void ClearAppStats();
 
-    bool GetIsSceneOpen() { return isSceneOpen_; }
-    void SetIsSceneOpen(bool isOpen) { isSceneOpen_ = isOpen; }
+    bool GetSceneOpen() { return sceneOpen_; }
+    void SetSceneOpen(bool isOpen) { sceneOpen_ = isOpen; }
 
     String GetStatsString() { return statsString_; }
     String GetModeString() { return modeString_; }
@@ -150,7 +150,7 @@ private:
     String modeString_;
     String profilerString_;
 
-    bool isSceneOpen_;
+    bool sceneOpen_;
     bool showSceneHud_;
 };
 

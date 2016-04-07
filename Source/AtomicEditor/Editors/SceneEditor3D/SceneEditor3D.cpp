@@ -71,6 +71,8 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     Project* project = tsystem->GetProject();
     userPrefs_ = project->GetUserPrefs();
 
+    debugHud_ = GetSubsystem<SystemUI::DebugHud>();
+
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     scene_ = new Scene(context_);
@@ -227,7 +229,7 @@ void SceneEditor3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (debugHud_->GetShowSceneHud())
     {
-        debugHud_->SetIsSceneOpen(true);
+        debugHud_->SetSceneOpen(true);
         statsText_->SetText(debugHud_->GetStatsString());
         modeText_->SetText(debugHud_->GetModeString());
         profilerText_->SetText(debugHud_->GetProfilerString());
@@ -277,7 +279,7 @@ void SceneEditor3D::Close(bool navigateToAvailableResource)
         sceneImporter_ = nullptr;
     }
 
-    debugHud_->SetIsSceneOpen(false);
+    debugHud_->SetSceneOpen(false);
 
     ResourceEditor::Close(navigateToAvailableResource);
 }

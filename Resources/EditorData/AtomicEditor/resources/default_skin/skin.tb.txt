@@ -15,7 +15,7 @@ defaults
 	placeholder
 		opacity 0.2
 	disabled
-		opacity 1
+		opacity 0.3
 elements
 	TBButton
 		text-color #fefefe
