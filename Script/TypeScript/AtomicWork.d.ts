@@ -2,7 +2,7 @@
 /// <reference path="ToolCore.d.ts" />
 /// <reference path="Editor.d.ts" />
 /// <reference path="AtomicPlayer.d.ts" />
-
+/// <reference path="AtomicNet.d.ts" />
 
 declare module Atomic {
 

@@ -195,6 +195,11 @@ declare module Editor.Extensions {
          * @param  {T}      service the service to register
          */
         register(service: T);
+        /**
+         * Removes a service from the registered services list for this type of service
+         * @param  {T}      service the service to unregister
+         */
+        unregister(service: T);
     }
 }
 
