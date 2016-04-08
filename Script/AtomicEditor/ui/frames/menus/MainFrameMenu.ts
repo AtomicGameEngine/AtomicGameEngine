@@ -28,6 +28,8 @@ import Preferences = require("editor/Preferences");
 
 class MainFrameMenu extends Atomic.ScriptObject {
 
+    private pluginMenuItemSource: Atomic.UIMenuItemSource;
+
     constructor() {
 
         super();
@@ -39,6 +41,27 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
 
+    }
+
+    createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        if (!this.pluginMenuItemSource) {
+            var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
+            this.pluginMenuItemSource = MenuItemSources.createSubMenuItemSource(developerMenuItemSource ,"Plugins", {});
+        }
+
+        return MenuItemSources.createSubMenuItemSource(this.pluginMenuItemSource , id, items);
+
+    }
+
+    removePluginMenuItemSource(id: string) {
+        if (this.pluginMenuItemSource) {
+            this.pluginMenuItemSource.removeItem(id);
+            if (0 == this.pluginMenuItemSource.itemCount) {
+                var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
+                developerMenuItemSource.removeItem("Plugins");
+                this.pluginMenuItemSource = null;
+            }
+        }
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {

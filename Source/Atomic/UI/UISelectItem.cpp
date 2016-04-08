@@ -84,6 +84,18 @@ UISelectItemSource::~UISelectItemSource()
 
 }
 
+void UISelectItemSource::RemoveItem(const String& id)
+{
+    tb::TBID test = TBID(id.CString());
+    for (List<SharedPtr<UISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
+    {
+        if ((*itr)->GetID() == test) {
+            items_.Erase(itr);
+            break;
+        }
+    }
+}
+
 TBSelectItemSource *UISelectItemSource::GetTBItemSource()
 {
     // caller's responsibility to clean up

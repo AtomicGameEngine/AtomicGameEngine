@@ -27,7 +27,7 @@ import * as EditorUI from "../ui/EditorUI";
 /**
  * Generic registry for storing Editor Extension Services
  */
-class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
+export class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
     registeredServices: T[] = [];
 
     /**
@@ -46,7 +46,7 @@ class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Edit
     }
 }
 
-interface ServiceEventSubscriber {
+export interface ServiceEventSubscriber {
     /**
      * Allow this service registry to subscribe to events that it is interested in
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
