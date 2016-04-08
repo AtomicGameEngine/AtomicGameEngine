@@ -74,66 +74,24 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     maxBones_(64),
     defaultTicksPerSecond_(4800.0f),
     startTime_(-1),
-    endTime_(-1), 
-    configSettingsAvailable_(false)
+    endTime_(-1)
 {
+
+    aiFlagsDefault_ =
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_Triangulate |
+        aiProcess_GenSmoothNormals |
+        aiProcess_LimitBoneWeights |
+        aiProcess_ImproveCacheLocality |
+        aiProcess_FixInfacingNormals |
+        aiProcess_FindInvalidData |
+        aiProcess_GenUVCoords |
+        aiProcess_FindInstances |
+        aiProcess_OptimizeMeshes;
 
     ReadImportConfig();
 
-    if (configSettingsAvailable_)
-    {
-        VariantMap::ConstIterator itr = aiFlagParameters_.Begin();
-
-        aiFlagsDefault_ = 0;
-
-        while (itr != aiFlagParameters_.End())
-        {
-            if (itr->second_ == true)
-            {
-                if (itr->first_ == "aiProcess_ConvertToLeftHanded")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ConvertToLeftHanded;
-                else if (itr->first_ == "aiProcess_JoinIdenticalVertices")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_JoinIdenticalVertices;
-                else if (itr->first_ == "aiProcess_Triangulate")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_Triangulate;
-                else if (itr->first_ == "aiProcess_GenSmoothNormals")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenSmoothNormals;
-                else if (itr->first_ == "aiProcess_LimitBoneWeights")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_LimitBoneWeights;
-                else if (itr->first_ == "aiProcess_ImproveCacheLocality")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ImproveCacheLocality;
-                else if (itr->first_ == "aiProcess_FixInfacingNormals")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FixInfacingNormals;
-                else if (itr->first_ == "aiProcess_FindInvalidData")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInvalidData;
-                else if (itr->first_ == "aiProcess_GenUVCoords")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenUVCoords;
-                else if (itr->first_ == "aiProcess_FindInstances")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInstances;
-                else if (itr->first_ == "aiProcess_OptimizeMeshes")
-                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_OptimizeMeshes;
-            }
-
-            itr++;
-        }
-
-        configSettingsAvailable_ = false;
-    } 
-    else
-    {
-        aiFlagsDefault_ =
-            aiProcess_ConvertToLeftHanded |
-            aiProcess_JoinIdenticalVertices |
-            aiProcess_Triangulate |
-            aiProcess_GenSmoothNormals |
-            aiProcess_LimitBoneWeights |
-            aiProcess_ImproveCacheLocality |
-            aiProcess_FixInfacingNormals |
-            aiProcess_FindInvalidData |
-            aiProcess_GenUVCoords |
-            aiProcess_FindInstances |
-            aiProcess_OptimizeMeshes;
-    }
     // TODO:  make this an option on importer
 
     aiFlagsDefault_ |= aiProcess_CalcTangentSpace;
@@ -908,6 +866,48 @@ void OpenAssetImporter::CollectAnimations(OutModel* model)
     /// \todo Vertex morphs are ignored for now
 }
 
+void OpenAssetImporter::ApplyFlag(int flag, bool active)
+{
+    aiFlagsDefault_ &= ~flag;
+    if (active)
+        aiFlagsDefault_ |= flag;
+}
+
+void OpenAssetImporter::SetOveriddenFlags(VariantMap aiFlagParameters)
+{
+
+    VariantMap::ConstIterator itr = aiFlagParameters.Begin();
+
+    while (itr != aiFlagParameters.End())
+    {
+        if (itr->first_ == "aiProcess_ConvertToLeftHanded")
+            ApplyFlag(aiProcess_ConvertToLeftHanded, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_JoinIdenticalVertices")
+            ApplyFlag(aiProcess_JoinIdenticalVertices, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_Triangulate")
+            ApplyFlag(aiProcess_Triangulate, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_GenSmoothNormals")
+            ApplyFlag(aiProcess_GenSmoothNormals, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_LimitBoneWeights")
+            ApplyFlag(aiProcess_LimitBoneWeights, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_ImproveCacheLocality")
+            ApplyFlag(aiProcess_ImproveCacheLocality, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_FixInfacingNormals")
+            ApplyFlag(aiProcess_FixInfacingNormals, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_FindInvalidData")
+            ApplyFlag(aiProcess_FindInvalidData, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_GenUVCoords")
+            ApplyFlag(aiProcess_GenUVCoords, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_FindInstances")
+            ApplyFlag(aiProcess_FindInstances, itr->second_.GetBool());
+        else if (itr->first_ == "aiProcess_OptimizeMeshes")
+            ApplyFlag(aiProcess_OptimizeMeshes, itr->second_.GetBool());
+
+        itr++;
+    }
+
+}
+
 void OpenAssetImporter::ReadImportConfig()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
@@ -923,8 +923,9 @@ void OpenAssetImporter::ReadImportConfig()
 
     if (ImportConfig::LoadFromFile(context_, filename))
     {
-        configSettingsAvailable_ = true;
-        ImportConfig::ApplyConfig(aiFlagParameters_);
+        VariantMap aiFlagParameters;
+        ImportConfig::ApplyConfig(aiFlagParameters);
+        SetOveriddenFlags(aiFlagParameters);
     }
 
 }
