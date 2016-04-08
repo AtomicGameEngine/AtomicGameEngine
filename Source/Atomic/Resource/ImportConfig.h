@@ -24,34 +24,31 @@
 
 #include "../Core/Variant.h"
 #include "JSONValue.h"
+#include "Configuration.h"
 
 namespace Atomic
 {
 
 class Context;
 
-class ImportConfig
+class ImportConfig :
+    Configuration
 {
 
 public:
 
-    static bool LoadFromFile(Context* context, const String& filename);
-    static bool LoadFromJSON(const String& json);
+    static bool LoadFromFile(Context* context, const String& filename) { return importConfig_.Configuration::LoadFromFile(context, filename); }
+    static bool LoadFromJSON(const String& json) { return importConfig_.Configuration::LoadFromJSON(json); }
 
     /// Apply the configuration to a setting variant map, values that exist will not be overriden
-    static void ApplyConfig(VariantMap& settings, bool overwrite = false);
-
-    static const VariantMap& GetConfig() { return importConfig_; }
+    static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return importConfig_.Configuration::ApplyConfig(settings, overwrite); }
 
 private:
 
-    static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
+    virtual bool LoadDesktopConfig(JSONValue root);
+    bool LoadAIFlagsDefaultConfig(const JSONValue& jflags);
 
-    static bool LoadDesktopConfig(JSONValue root);
-    static bool LoadAIFlagsDefaultConfig(const JSONValue& jflags);
-
-    static VariantMap importConfig_;
-    static String importConfigFilename_;
+    static ImportConfig importConfig_;
 };
 
 }

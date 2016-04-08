@@ -74,46 +74,66 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     maxBones_(64),
     defaultTicksPerSecond_(4800.0f),
     startTime_(-1),
-    endTime_(-1)
+    endTime_(-1), 
+    configSettingsAvailable_(false)
 {
 
     ReadImportConfig();
 
-    VariantMap::ConstIterator itr = aiFlagParameters_.Begin();
-
-    aiFlagsDefault_ = 0;
-
-    while (itr != aiFlagParameters_.End())
+    if (configSettingsAvailable_)
     {
-        if (itr->second_ == true)
+        VariantMap::ConstIterator itr = aiFlagParameters_.Begin();
+
+        aiFlagsDefault_ = 0;
+
+        while (itr != aiFlagParameters_.End())
         {
-            if (itr->first_ == "aiProcess_ConvertToLeftHanded")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ConvertToLeftHanded;
-            else if (itr->first_ == "aiProcess_JoinIdenticalVertices")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_JoinIdenticalVertices;
-            else if (itr->first_ == "aiProcess_Triangulate")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_Triangulate;
-            else if (itr->first_ == "aiProcess_GenSmoothNormals")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenSmoothNormals;
-            else if (itr->first_ == "aiProcess_LimitBoneWeights")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_LimitBoneWeights;
-            else if (itr->first_ == "aiProcess_ImproveCacheLocality")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ImproveCacheLocality;
-            else if (itr->first_ == "aiProcess_FixInfacingNormals")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FixInfacingNormals;
-            else if (itr->first_ == "aiProcess_FindInvalidData")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInvalidData;
-            else if (itr->first_ == "aiProcess_GenUVCoords")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenUVCoords;
-            else if (itr->first_ == "aiProcess_FindInstances")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInstances;
-            else if (itr->first_ == "aiProcess_OptimizeMeshes")
-                aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_OptimizeMeshes;
+            if (itr->second_ == true)
+            {
+                if (itr->first_ == "aiProcess_ConvertToLeftHanded")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ConvertToLeftHanded;
+                else if (itr->first_ == "aiProcess_JoinIdenticalVertices")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_JoinIdenticalVertices;
+                else if (itr->first_ == "aiProcess_Triangulate")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_Triangulate;
+                else if (itr->first_ == "aiProcess_GenSmoothNormals")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenSmoothNormals;
+                else if (itr->first_ == "aiProcess_LimitBoneWeights")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_LimitBoneWeights;
+                else if (itr->first_ == "aiProcess_ImproveCacheLocality")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_ImproveCacheLocality;
+                else if (itr->first_ == "aiProcess_FixInfacingNormals")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FixInfacingNormals;
+                else if (itr->first_ == "aiProcess_FindInvalidData")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInvalidData;
+                else if (itr->first_ == "aiProcess_GenUVCoords")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_GenUVCoords;
+                else if (itr->first_ == "aiProcess_FindInstances")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_FindInstances;
+                else if (itr->first_ == "aiProcess_OptimizeMeshes")
+                    aiFlagsDefault_ = aiFlagsDefault_ | aiProcess_OptimizeMeshes;
+            }
+
+            itr++;
         }
 
-        itr++;
+        configSettingsAvailable_ = false;
+    } 
+    else
+    {
+        aiFlagsDefault_ =
+            aiProcess_ConvertToLeftHanded |
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_Triangulate |
+            aiProcess_GenSmoothNormals |
+            aiProcess_LimitBoneWeights |
+            aiProcess_ImproveCacheLocality |
+            aiProcess_FixInfacingNormals |
+            aiProcess_FindInvalidData |
+            aiProcess_GenUVCoords |
+            aiProcess_FindInstances |
+            aiProcess_OptimizeMeshes;
     }
-
     // TODO:  make this an option on importer
 
     aiFlagsDefault_ |= aiProcess_CalcTangentSpace;
@@ -903,6 +923,7 @@ void OpenAssetImporter::ReadImportConfig()
 
     if (ImportConfig::LoadFromFile(context_, filename))
     {
+        configSettingsAvailable_ = true;
         ImportConfig::ApplyConfig(aiFlagParameters_);
     }
 

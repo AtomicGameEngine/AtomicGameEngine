@@ -143,6 +143,7 @@ private:
     float endTime_;
 
     VariantMap aiFlagParameters_;
+    bool configSettingsAvailable_;
 
 };
 
