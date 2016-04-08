@@ -101,10 +101,16 @@ void IPCWorker::ThreadFunction()
 {
     while (shouldRun_)
     {
+
+// On windows we use a job object to control process lifetime, we don't have a 
+// parent pid (these change and are reused on Windows, so we would need to DuplicateHandle and pass
+// to child on command line
+#ifndef ATOMIC_PLATFORM_WINDOWS
         if (!otherProcess_->IsRunning())
         {
             break;
         }
+#endif
 
         if (!Receive())
         {

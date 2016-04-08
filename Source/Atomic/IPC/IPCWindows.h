@@ -132,7 +132,7 @@ private:
 
     IPCHandle pid_;
     IPCHandle clientRead_;
-    IPCHandle clientWrite_;
+    IPCHandle clientWrite_;    
 };
 
 }
