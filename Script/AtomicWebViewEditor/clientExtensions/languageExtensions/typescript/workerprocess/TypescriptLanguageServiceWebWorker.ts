@@ -250,7 +250,8 @@ export default class TypescriptLanguageServiceWebWorker {
     }) {
         port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.loadProjectFiles().then(() => {
-            this.languageService.compile([eventData.filename]);
+            let diagnostics = this.languageService.compile([eventData.filename]);
+            this.handleGetAnnotations(port, eventData);
         });
     }
 
@@ -342,7 +343,7 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
         this.languageService.updateProjectFile(eventData.filename, eventData.code);
-        this.handleGetAnnotations(port, eventData );
+        this.handleGetAnnotations(port, eventData);
     }
 
     /**

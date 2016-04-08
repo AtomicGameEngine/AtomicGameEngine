@@ -242,7 +242,7 @@ export class TypescriptLanguageService {
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
      */
-    compile(files: string[], options?: ts.CompilerOptions): void {
+    compile(files: string[], options?: ts.CompilerOptions): ts.Diagnostic[] {
         let start = new Date().getTime();
 
         options = options || this.compilerOptions;
@@ -262,18 +262,12 @@ export class TypescriptLanguageService {
         } else {
             // Only compile the files that are newly edited
             files.forEach(filename => {
-                // increment the version number since we changed
-                this.versionMap[filename].version++;
-                this.versionMap[filename].snapshot = null;
                 errors = errors.concat(this.compileFile(filename));
             });
         }
 
-        if (errors.length) {
-            this.logErrors(errors);
-        }
-
         console.log(`${this.name}: Compiling complete after ${new Date().getTime() - start} ms`);
+        return errors;
     }
 
     /**
