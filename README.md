@@ -16,6 +16,8 @@ The Atomic Game Engine source code is released under the permissive **[MIT licen
 
 ####Community
 
+**Facebook Group:** [https://www.facebook.com/groups/AtomicGameEngine/](https://www.facebook.com/groups/AtomicGameEngine/)
+
 **Forums:** [Atomic Forums](http://atomicgameengine.com/forum/)
 
 **Gitter Chat:** [![Join the chat at https://gitter.im/AtomicGameEngine/AtomicGameEngine](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AtomicGameEngine/AtomicGameEngine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

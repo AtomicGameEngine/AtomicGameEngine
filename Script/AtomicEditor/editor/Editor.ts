@@ -63,7 +63,7 @@ class Editor extends Atomic.ScriptObject {
 
         this.subscribeToEvent(EditorEvents.LoadProject, (data) => this.handleEditorLoadProject(data));
         this.subscribeToEvent(EditorEvents.CloseProject, (data) => this.handleEditorCloseProject(data));
-        this.subscribeToEvent("ProjectUnloaded", (data) => {
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => {
             Atomic.graphics.windowTitle = "AtomicEditor";
             this.handleProjectUnloaded(data);
         });
@@ -149,7 +149,11 @@ class Editor extends Atomic.ScriptObject {
             return false;
 
         }
-        return system.loadProject(event.path);
+        const loaded = system.loadProject(event.path);
+        if (loaded) {
+            this.sendEvent(EditorEvents.LoadProjectNotification, event);
+        }
+        return loaded;
     }
 
     closeAllResourceEditors() {
@@ -171,6 +175,7 @@ class Editor extends Atomic.ScriptObject {
 
     handleEditorCloseProject(event) {
         this.projectCloseRequested = true;
+        this.sendEvent(EditorEvents.ProjectUnloadedNotification, event);
         this.closeAllResourceEditors();
     }
 

@@ -50,6 +50,8 @@
     SDL_SendQuit();
 }
 
+// ATOMIC: Fixes missing WebView keystrokes on OSX
+// (see https://bugzilla.libsdl.org/show_bug.cgi?id=3107)
 // Dispatch events here so that we can handle events caught by
 // nextEventMatchingMask in SDL, as well as events caught by other
 // processes (such as CEF) that are passed down to NSApp.

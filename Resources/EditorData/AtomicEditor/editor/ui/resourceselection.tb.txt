@@ -10,6 +10,9 @@ TBLayout: distribution: gravity, axis: y, id: resourceselectionframe
 			gravity left right
 			placeholder @search
 			type search	
+		TBButton 
+			id cancel search
+			text X
 	TBWidget: gravity: all
 		TBLayout: distribution: gravity, id: resourcecontainer, gravity: all
 	TBLayout: 

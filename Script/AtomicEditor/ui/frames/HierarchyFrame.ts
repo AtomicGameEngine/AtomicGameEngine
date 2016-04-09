@@ -24,6 +24,7 @@ import HierarchyFrameMenu = require("./menus/HierarchyFrameMenu");
 import MenuItemSources = require("./menus/MenuItemSources");
 import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
+import SearchBarFiltering = require("resources/SearchBarFiltering");
 
 var IconTemporary = "ComponentBitmap";
 
@@ -34,6 +35,10 @@ class HierarchyFrame extends Atomic.UIWidget {
     hierList: Atomic.UIListView;
     menu: HierarchyFrameMenu;
     nodeIDToItemID = {};
+    uiSearchBar: SearchBarFiltering.UISearchBar = new SearchBarFiltering.UISearchBar();
+    search: boolean = false;
+    searchEdit: Atomic.UIEditField;
+    selectedNode: Atomic.Node;
 
     constructor(parent: Atomic.UIWidget) {
 
@@ -44,6 +49,8 @@ class HierarchyFrame extends Atomic.UIWidget {
         this.load("AtomicEditor/editor/ui/hierarchyframe.tb.txt");
 
         this.gravity = Atomic.UI_GRAVITY_TOP_BOTTOM;
+
+        this.searchEdit = <Atomic.UIEditField>this.getWidget("filter");
 
         var hierarchycontainer = parent.getWidget("hierarchycontainer");
         hierarchycontainer.addChild(this);
@@ -136,6 +143,21 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             }
 
+        });
+
+        // Activates search while user is typing in search widget
+        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => {
+            if (!ToolCore.toolSystem.project) return;
+
+            if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+                this.search = true;
+                this.populate();
+
+                if (this.searchEdit.text == "" && this.selectedNode) {
+                        this.hierList.selectItemByID(this.selectedNode.id.toString(), true);    //maintains selected item after search is cancelled
+                }
+
+            }
         });
 
     }
@@ -260,6 +282,25 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     }
 
+    // Searches folders within folders recursively
+    searchHierarchyFolder(asset: Atomic.Node, parentID: number, searchText: string) {
+
+        for (var i = 0; i < asset.getNumChildren(false); i++) {
+
+            var childAsset = asset.getChildAtIndex(i);
+
+            if (this.uiSearchBar.searchPopulate(searchText, childAsset.name)) {
+                this.recursiveAddNode(parentID, childAsset);
+            }
+
+            if (childAsset.getNumChildren(false) > 0) {
+                this.searchHierarchyFolder(childAsset, parentID, searchText);
+            }
+
+        }
+    }
+
+    // Populates frame when the search bar is used
     populate() {
 
         this.nodeIDToItemID = {};
@@ -272,10 +313,15 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         this.nodeIDToItemID[this.scene.id] = parentID;
 
-        for (var i = 0; i < this.scene.getNumChildren(false); i++) {
+        var asset = this.scene;
 
-            this.recursiveAddNode(parentID, this.scene.getChildAtIndex(i));
+        if (this.searchEdit.text == "" || !this.search) {
+            for (var i = 0; i < this.scene.getNumChildren(false); i++) {
+                this.recursiveAddNode(parentID, this.scene.getChildAtIndex(i));
+            }
 
+        } else if (this.search) {
+            this.searchHierarchyFolder(asset, parentID, this.searchEdit.text);
         }
 
         this.hierList.rootList.value = -1;
@@ -284,6 +330,9 @@ class HierarchyFrame extends Atomic.UIWidget {
     }
 
     handleDragEnded(ev: Atomic.DragEndedEvent) {
+
+        if (!ev.dragObject.object)
+            return;
 
         var typeName = ev.dragObject.object.typeName;
 
@@ -312,6 +361,7 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     handleSceneNodeSelected(ev: Editor.SceneNodeSelectedEvent) {
 
+        this.selectedNode = ev.node;    //Stores selection for when the search is cancelled
         this.hierList.selectItemByID(ev.node.id.toString(), ev.selected);
 
     }
@@ -385,6 +435,24 @@ class HierarchyFrame extends Atomic.UIWidget {
                 menu.show(src);
                 return true;
 
+            }
+
+            // cancel search
+            if (id == "cancel search") {
+
+                if (!this.scene) {
+                    this.searchEdit.text = "";
+                    return;
+                }
+
+                if (!ToolCore.toolSystem.project) return;
+                this.searchEdit.text = "";
+                this.populate();
+                this.search = false;
+
+                if (this.selectedNode) {
+                    this.hierList.selectItemByID(this.selectedNode.id.toString(), true);    //maintains selected item after search is cancelled
+                }
             }
 
 
