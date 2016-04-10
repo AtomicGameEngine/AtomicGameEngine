@@ -1575,4 +1575,16 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
     RequestNeededPackages(1, msg);
 }
 
+// Expose control methods for current controls
+void Connection::SetControlButtons(unsigned buttons, bool down)
+{
+    controls_.Set(buttons,down);
+}
+
+/// Check if a button is held down.
+bool Connection::IsControlButtonDown(unsigned button) const
+{
+    return (controls_.IsDown(button));
+}
+
 }

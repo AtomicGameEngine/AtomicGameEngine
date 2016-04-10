@@ -231,6 +231,12 @@ public:
     /// Identity map.
     VariantMap identity_;
 
+    // Expose control methods for current controls
+    void SetControlButtons(unsigned buttons, bool down = true);
+
+    /// Check if a button is held down.
+    bool IsControlButtonDown(unsigned button) const;
+
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
