@@ -22,6 +22,7 @@
 
 import * as HostExtensionServices from "./HostExtensionServices";
 import * as EditorUI from "../ui/EditorUI";
+import ProjectBasedExtensionLoader from "./coreExtensions/ProjectBasedExtensionLoader";
 import TypescriptLanguageExtension from "./languageExtensions/TypscriptLanguageExtension";
 
 /**
@@ -33,18 +34,20 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
     constructor() {
         this.resourceServices = new HostExtensionServices.ResourceServiceRegistry();
         this.projectServices = new HostExtensionServices.ProjectServiceRegistry();
+        this.uiServices = new HostExtensionServices.UIServiceRegistry();
     }
 
     private eventDispatcher: Atomic.UIWidget = null;
 
     resourceServices: HostExtensionServices.ResourceServiceRegistry;
     projectServices: HostExtensionServices.ProjectServiceRegistry;
+    uiServices: HostExtensionServices.UIServiceRegistry;
 
     loadService(service: Editor.HostExtensions.HostEditorService) {
         try {
             service.initialize(this);
         } catch (e) {
-            EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+            EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
         }
     }
 
@@ -56,6 +59,7 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
         this.eventDispatcher = frame;
         this.resourceServices.subscribeToEvents(this);
         this.projectServices.subscribeToEvents(this);
+        this.uiServices.subscribeToEvents(this);
     }
 
     /**
@@ -85,4 +89,5 @@ const serviceLocator = new ServiceLocatorType();
 export default serviceLocator;
 
 // Load up all the internal services
+serviceLocator.loadService(new ProjectBasedExtensionLoader());
 serviceLocator.loadService(new TypescriptLanguageExtension());

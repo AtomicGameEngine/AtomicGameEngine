@@ -76,6 +76,7 @@ class MainFrame extends ScriptWidget {
         });
 
         // Allow the service locator to hook into the event system
+        ServiceLocator.uiServices.setMainFrameMenu(this.menu);
         ServiceLocator.subscribeToEvents(this);
 
         this.showWelcomeFrame(true);
