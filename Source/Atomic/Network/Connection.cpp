@@ -60,6 +60,11 @@ PackageUpload::PackageUpload() :
 {
 }
 
+Connection::Connection(Context* context) : Object(context)
+{
+
+}
+
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
     timeStamp_(0),

@@ -267,30 +267,6 @@ bool Network::StartServer(unsigned short port)
     }
 }
 
-bool Network::StartServerSimple(unsigned short port, Scene* scene)
-{
-    bool rc = StartServer(port);
-
-    if (!rc) {
-        return false;
-    }
-
-    sharedScene_ = scene;
-
-    SubscribeToEvent(E_CLIENTCONNECTED, HANDLER(Network, HandleClientConnected));
-
-    return true;
-}
-
-void Network::HandleClientConnected(StringHash eventType, VariantMap& eventData)
-{
-    using namespace ClientConnected;
-
-    // When a client connects, assign to scene to begin scene replication
-    Connection* newConnection = static_cast<Connection*>(eventData[P_CONNECTION].GetPtr());
-    newConnection->SetScene(sharedScene_);
-}
-
 void Network::StopServer()
 {
     if (!IsServerRunning())

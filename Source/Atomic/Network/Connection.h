@@ -107,6 +107,7 @@ class ATOMIC_API Connection : public Object
     OBJECT(Connection);
 
 public:
+    Connection(Context* context);
     /// Construct with context and kNet message connection pointers.
     Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
     /// Destruct.
