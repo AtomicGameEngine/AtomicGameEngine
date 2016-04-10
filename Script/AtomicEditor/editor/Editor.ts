@@ -26,7 +26,6 @@ import PlayMode = require("ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
 import Preferences = require("./Preferences");
-import ServiceLocator from "../hostExtensions/ServiceLocator";
 
 class Editor extends Atomic.ScriptObject {
 
