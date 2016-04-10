@@ -22,9 +22,6 @@
 
 import * as EditorEvents from "../../editor/EditorEvents";
 
-// Duktape require isn't recognized as a function, but can be used as one
-declare function require(filename: string): any;
-
 /**
  * Resource extension that supports the web view typescript extension
  */

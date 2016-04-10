@@ -7,7 +7,8 @@ declare interface Console {
 
 declare var console: Console;
 
-//export function require(filename: string) : any;
+// Duktape require isn't recognized as a function, but can be used as one
+declare function require(filename: string): any;
 
 declare interface DuktapeModule {
     modSearch(id: string, require, exports, module);
