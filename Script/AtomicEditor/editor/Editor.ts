@@ -26,10 +26,6 @@ import PlayMode = require("ui/playmode/PlayMode");
 import EditorLicense = require("./EditorLicense");
 import EditorEvents = require("./EditorEvents");
 import Preferences = require("./Preferences");
-import ServiceLocator from "../hostExtensions/ServiceLocator";
-
-// Duktape require isn't recognized as a function, but can be used as one
-declare function require(filename : string) : any;
 
 class Editor extends Atomic.ScriptObject {
 
@@ -155,33 +151,9 @@ class Editor extends Atomic.ScriptObject {
         }
         const loaded = system.loadProject(event.path);
         if (loaded) {
-            this.loadProjectExtensions();
             this.sendEvent(EditorEvents.LoadProjectNotification, event);
         }
         return loaded;
-    }
-
-    loadProjectExtensions() {
-        var system = ToolCore.getToolSystem();
-        if (system.project) {
-            var fileSystem = Atomic.getFileSystem();
-            var editorScriptsPath = system.project.resourcePath + "../Editor/";
-            if (fileSystem.dirExists(editorScriptsPath)) {
-                var filenames = fileSystem.scanDir(editorScriptsPath, "*.js", Atomic.SCAN_FILES, true);
-                for (var index in filenames) {
-                    var filename = filenames[index];
-                    // Filtered search in Atomic doesn't due true wildcarding, only handles extension filters
-                    if (filename.lastIndexOf(".Service.js") >= 0) {
-                        var extensionPath = editorScriptsPath + filename;
-                        extensionPath = extensionPath.substring(0, extensionPath.length - 3);
-                        // Note: duktape does not yet support unloading modules,
-                        // but will return the same object when passed a path the second time.
-                        var resourceService = <Editor.HostExtensions.HostEditorService> require(extensionPath).default;
-                        ServiceLocator.loadService(resourceService);
-                    }
-                }
-            }
-        }
     }
 
     closeAllResourceEditors() {

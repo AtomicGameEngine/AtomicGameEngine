@@ -64,6 +64,13 @@ class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Edit
     register(service: T) {
         this.registeredServices.push(service);
     }
+
+    unregister(service: T) {
+        var index = this.registeredServices.indexOf(service, 0);
+        if (index > -1) {
+            this.registeredServices.splice(index, 1);
+        }
+    }
 }
 
 export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExtensions.WebViewService> {

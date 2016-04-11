@@ -25,6 +25,7 @@ import EditorEvents = require("../../../editor/EditorEvents");
 import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
 import Preferences = require("editor/Preferences");
+import ServiceLocator from "../../../hostExtensions/ServiceLocator";
 
 class MainFrameMenu extends Atomic.ScriptObject {
 
@@ -241,12 +242,14 @@ class MainFrameMenu extends Atomic.ScriptObject {
             if (refid == "developer assetdatabase scan") {
 
               ToolCore.assetDatabase.scan();
+              return true;
 
             }
 
             if (refid == "developer assetdatabase force") {
 
               ToolCore.assetDatabase.reimportAllAssets();
+              return true;
 
             }
 
@@ -257,7 +260,11 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 myPrefs.saveEditorWindowData(myPrefs.editorWindow);
                 myPrefs.savePlayerWindowData(myPrefs.playerWindow);
                 Atomic.getEngine().exit();
+                return true;
             }
+
+            // If we got here, then we may have been injected by a plugin.  Notify the plugins
+            return ServiceLocator.uiServices.menuItemClicked(refid);
 
         } else if (target.id == "menu tools popup") {
 
@@ -309,6 +316,8 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+        } else {
+            console.log("Menu: " + target.id + " clicked");
         }
 
     }

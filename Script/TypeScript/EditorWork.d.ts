@@ -210,8 +210,9 @@ declare module Editor.HostExtensions {
      * or by the editor itself.
      */
     export interface HostServiceLocator extends Editor.Extensions.ServiceLoader {
-        resourceServices: Editor.Extensions.ServiceRegistry<ResourceService>;
-        projectServices: Editor.Extensions.ServiceRegistry<ProjectService>;
+        resourceServices: ResourceServiceRegistry;
+        projectServices: ProjectServiceRegistry;
+        uiServices: UIServiceRegistry;
     }
 
     export interface HostEditorService extends Editor.Extensions.EditorService {
@@ -226,11 +227,22 @@ declare module Editor.HostExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
     }
+    export interface ResourceServiceRegistry extends Editor.Extensions.ServiceRegistry<ResourceService> { }
 
     export interface ProjectService extends Editor.Extensions.EditorService {
         projectUnloaded?();
         projectLoaded?(ev: EditorEvents.LoadProjectEvent);
         playerStarted?();
+    }
+    export interface ProjectServiceRegistry extends Editor.Extensions.ServiceRegistry<ProjectService> { }
+
+    export interface UIService extends Editor.Extensions.EditorService {
+        menuItemClicked?(refId: string): boolean;
+    }
+    export interface UIServiceRegistry extends Editor.Extensions.ServiceRegistry<UIService> {
+        createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removePluginMenuItemSource(id: string);
+        menuItemClicked(refId: string): boolean;
     }
 }
 
