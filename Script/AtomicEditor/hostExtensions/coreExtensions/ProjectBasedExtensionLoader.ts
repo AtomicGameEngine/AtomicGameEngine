@@ -109,7 +109,7 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
                 filenames.forEach((filename) => {
                     // Filtered search in Atomic doesn't due true wildcarding, only handles extension filters
                     // in the future this may be better handled with some kind of manifest file
-                    if (filename.toLowerCase().lastIndexOf(".service.js") >= 0) {
+                    if (filename.toLowerCase().lastIndexOf(".plugin.js") >= 0) {
                         var extensionPath = editorScriptsPath + filename;
                         extensionPath = extensionPath.substring(0, extensionPath.length - 3);
 
