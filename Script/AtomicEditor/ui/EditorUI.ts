@@ -24,6 +24,7 @@ import EditorEvents = require("editor/EditorEvents");
 import MainFrame = require("./frames/MainFrame");
 import ModalOps = require("./modal/ModalOps");
 import Shortcuts = require("./Shortcuts");
+import ServiceLocator from "../hostExtensions/ServiceLocator";
 
 // this is designed with public get functions to solve
 // circular dependency issues in TS
@@ -93,6 +94,10 @@ class EditorUI extends Atomic.ScriptObject {
 
     this.modalOps = new ModalOps();
     this.shortcuts = new Shortcuts();
+
+    // Hook the service locator into the event system and give it the ui objects it needs
+    ServiceLocator.uiServices.init(this.mainframe.menu, this.modalOps);
+    ServiceLocator.subscribeToEvents(this.mainframe);
 
     this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {
       this.showModalError(event.title, event.message);

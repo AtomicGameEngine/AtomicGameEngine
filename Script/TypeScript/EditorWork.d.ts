@@ -5,6 +5,7 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+/// <reference path="Atomic.d.ts" />
 /// <reference path="Editor.d.ts" />
 
 declare module Editor.EditorEvents {
@@ -203,6 +204,12 @@ declare module Editor.Extensions {
     }
 }
 
+declare module Editor.Modal {
+    export interface ExtensionWindow extends Atomic.UIWindow {
+        hide();
+    }
+}
+
 declare module Editor.HostExtensions {
 
     /**
@@ -242,6 +249,7 @@ declare module Editor.HostExtensions {
     export interface UIServiceRegistry extends Editor.Extensions.ServiceRegistry<UIService> {
         createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
         removePluginMenuItemSource(id: string);
+        showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
         menuItemClicked(refId: string): boolean;
     }
 }

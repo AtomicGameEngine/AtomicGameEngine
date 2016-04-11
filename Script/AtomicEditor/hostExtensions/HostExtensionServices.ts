@@ -23,7 +23,7 @@
 import * as EditorEvents from "../editor/EditorEvents";
 import * as EditorUI from "../ui/EditorUI";
 import MainFramMenu = require("../ui/frames/menus/MainFrameMenu");
-
+import ModalOps = require("../ui/modal/ModalOps");
 /**
  * Generic registry for storing Editor Extension Services
  */
@@ -205,11 +205,15 @@ export class UIServiceRegistry extends ServiceRegistry<Editor.HostExtensions.UIS
     }
 
     private mainFrameMenu: MainFramMenu = null;
+    private modalOps: ModalOps;
 
-    setMainFrameMenu(menu: MainFramMenu) {
-        // Only set this once
+    init(menu: MainFramMenu, modalOps: ModalOps) {
+        // Only set these once
         if (this.mainFrameMenu == null) {
             this.mainFrameMenu = menu;
+        }
+        if (this.modalOps == null) {
+            this.modalOps = modalOps;
         }
     }
 
@@ -229,6 +233,14 @@ export class UIServiceRegistry extends ServiceRegistry<Editor.HostExtensions.UIS
      */
     removePluginMenuItemSource(id: string) {
         this.mainFrameMenu.removePluginMenuItemSource(id);
+    }
+
+    /**
+     * Disaplays a modal window
+     * @param  {Editor.Modal.ModalWindow} window
+     */
+    showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
+        return this.modalOps.showExtensionWindow(windowText, uifilename, handleWidgetEventCB);
     }
 
     /**

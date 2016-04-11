@@ -103,7 +103,7 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
         let system = ToolCore.getToolSystem();
         if (system.project) {
             let fileSystem = Atomic.getFileSystem();
-            let editorScriptsPath = Atomic.addTrailingSlash(system.project.projectPath) + "Editor/";
+            let editorScriptsPath = Atomic.addTrailingSlash(system.project.resourcePath) + "EditorData/";
             if (fileSystem.dirExists(editorScriptsPath)) {
                 let filenames = fileSystem.scanDir(editorScriptsPath, "*.js", Atomic.SCAN_FILES, true);
                 filenames.forEach((filename) => {
