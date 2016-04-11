@@ -29,6 +29,7 @@
 
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
+#include <ThirdParty/kNet/include/kNet/EndPoint.h>
 
 namespace Atomic
 {
@@ -37,7 +38,7 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
-/// MessageConnection hash function.
+    /// MessageConnection hash function.
 template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 {
     return ((unsigned)(size_t)value) >> 9;
@@ -68,6 +69,8 @@ public:
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
 
     bool ConnectSimple(const String& address, unsigned short port, Scene* scene);
+
+    bool ConnectToMaster(const String& address, unsigned short port);
 
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
@@ -175,6 +178,17 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
+
+    void HandleMasterServerMessage(const String& msg);
+
+
+    bool readingMasterMessageLength;
+    uint32_t bytesRemainingInMasterServerMessage_;
+    String masterMessageLengthStr;
+    String masterMessageStr;
+    kNet::EndPoint masterEndPoint_;
+    kNet::Socket* masterUDPConnection_;
+    kNet::Socket* masterTCPConnection_;
 };
 
 /// Register Network library objects.
