@@ -77,8 +77,8 @@ export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtension
      * @param  {[type]} data Event info from the project unloaded event
      */
     projectUnloaded(data) {
-        // Need to use a for loop and don't cache the length because the list of services *may* change while processing
-        for (let i = 0; i < this.registeredServices.length; i++) {
+        // Need to use a for loop for length down to 0 because extensions *could* delete themselves from the list on projectUnloaded
+        for (let i = this.registeredServices.length - 1; i >= 0; i--) {
             let service = this.registeredServices[i];
             // Notify services that the project has been unloaded
             try {
@@ -96,7 +96,7 @@ export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtension
      * @param  {[type]} data Event info from the project unloaded event
      */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
-        // Need to use a for loop and don't cache the length because the list of services *may* change while processing
+        // Need to use a for loop and don't cache the length because the list of services *may* change while processing.  Extensions could be appended to the end
         for (let i = 0; i < this.registeredServices.length; i++) {
             let service = this.registeredServices[i];
             try {
