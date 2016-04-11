@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+/// <reference path="../../../TypeScript/duktape.d.ts" />
+
 import * as EditorEvents from "../../editor/EditorEvents";
 
 /**
