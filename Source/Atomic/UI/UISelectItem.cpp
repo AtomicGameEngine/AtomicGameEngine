@@ -84,12 +84,23 @@ UISelectItemSource::~UISelectItemSource()
 
 }
 
-void UISelectItemSource::RemoveItem(const String& id)
+void UISelectItemSource::RemoveItemWithId(const String& id)
 {
     tb::TBID test = TBID(id.CString());
     for (List<SharedPtr<UISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
     {
         if ((*itr)->GetID() == test) {
+            items_.Erase(itr);
+            break;
+        }
+    }
+}
+
+void UISelectItemSource::RemoveItemWithStr(const String& str)
+{
+    for (List<SharedPtr<UISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
+    {
+        if ((*itr)->GetStr() == str) {
             items_.Erase(itr);
             break;
         }

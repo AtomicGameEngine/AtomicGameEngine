@@ -56,10 +56,10 @@ class MainFrameMenu extends Atomic.ScriptObject {
 
     removePluginMenuItemSource(id: string) {
         if (this.pluginMenuItemSource) {
-            this.pluginMenuItemSource.removeItem(id);
+            this.pluginMenuItemSource.removeItemWithStr(id);
             if (0 == this.pluginMenuItemSource.itemCount) {
                 var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
-                developerMenuItemSource.removeItem("Plugins");
+                developerMenuItemSource.removeItemWithStr("Plugins");
                 this.pluginMenuItemSource = null;
             }
         }
