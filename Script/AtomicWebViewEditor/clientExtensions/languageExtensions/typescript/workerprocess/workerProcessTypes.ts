@@ -28,6 +28,10 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent { }
+export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent {}
+export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent {}
+
 export const GetCompletions = "COMPLETIONS";
 export const CompletionResponse = "COMPLETION_RESPONSE";
 export interface WordCompletion {
@@ -65,11 +69,14 @@ export interface GetDocTooltipResponseMessageData extends WorkerProcessMessageDa
     docHTML?: string;
 }
 
+export const GetAnnotations = "ANNOTATIONS";
+export const AnnotationsUpdated = "ANNOTATIONS_RESPONSE";
+export interface GetAnnotationsMessageData extends SaveMessageData {};
+export interface GetAnnotationsResponseMessageData extends WorkerProcessMessageData {
+    annotations: any[];
+}
+
 export const Connect = "HELO";
 export const Disconnect = "CLOSE";
 export const Message = "MESSAGE";
 export const Alert = "ALERT";
-
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.SaveResourceEvent { }
-export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent {}
-export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent {}

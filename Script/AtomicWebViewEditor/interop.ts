@@ -62,6 +62,9 @@ function atomicQueryPromise(message: any): Promise<{}> {
 export default class HostInteropType {
 
     private static _inst: HostInteropType = null;
+    private fileName: string = null;
+    private fileExt: string = null;
+
     static getInstance(): HostInteropType {
         if (HostInteropType._inst == null) {
             HostInteropType._inst = new HostInteropType();
@@ -90,8 +93,12 @@ export default class HostInteropType {
      */
     loadCode(codeUrl: string) {
         console.log("Load Code called for :" + codeUrl);
-        const fileExt = codeUrl.split(".").pop();
+        const fileExt = codeUrl.indexOf(".") != -1 ? codeUrl.split(".").pop() : "";
         const filename = codeUrl.replace("atomic://", "");
+
+        // Keep track of our filename
+        this.fileName = filename;
+        this.fileExt = fileExt;
 
         // go ahead and set the theme prior to pulling the file across
         editorCommands.configure(fileExt, filename);
@@ -108,10 +115,13 @@ export default class HostInteropType {
      * Save the contents of the editor
      * @return {Promise}
      */
-    saveCode(): Promise<{}> {
+    saveCode(): Promise<any> {
+        let source = editorCommands.getSourceText();
         return atomicQueryPromise({
             message: HostInteropType.EDITOR_SAVE_CODE,
-            payload: editorCommands.getSourceText()
+            payload: source
+        }).then(() => {
+            editorCommands.codeSaved(this.fileName, this.fileExt, source);
         });
     }
 
@@ -121,11 +131,14 @@ export default class HostInteropType {
      * @param  {string} fileContents
      * @return {Promise}
      */
-    saveFile(filename: string, fileContents: string): Promise<{}> {
+    saveFile(filename: string, fileContents: string): Promise<any> {
+        const fileExt = filename.indexOf(".") != -1 ? filename.split(".").pop() : "";
         return atomicQueryPromise({
             message: HostInteropType.EDITOR_SAVE_FILE,
             filename: filename,
             payload: fileContents
+        }).then(() => {
+            editorCommands.codeSaved(filename, fileExt, fileContents);
         });
     }
 
@@ -189,6 +202,7 @@ export default class HostInteropType {
      * @param  {string} newPath
      */
     resourceRenamed(path: string, newPath: string) {
+        this.fileName = newPath;
         editorCommands.resourceRenamed(path, newPath);
     }
 

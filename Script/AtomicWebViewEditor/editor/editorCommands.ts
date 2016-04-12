@@ -107,3 +107,19 @@ export function resourceDeleted(path: string) {
     };
     serviceLocator.sendEvent(ClientExtensionEventNames.ResourceDeletedEvent, data);
 }
+
+/**
+ * Called when a resource is saved
+ * @param  {string} path
+ * @param {string} fileExt
+ * @param {string} contents
+ */
+export function codeSaved(path: string, fileExt: string, contents: string) {
+    let data:Editor.EditorEvents.CodeSavedEvent = {
+        filename: path,
+        fileExt: fileExt,
+        editor: editor,
+        code: contents
+    };
+    serviceLocator.sendEvent(ClientExtensionEventNames.CodeSavedEvent, data);
+}
