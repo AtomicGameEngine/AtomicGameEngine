@@ -22,12 +22,12 @@
 
 import * as EditorEvents from "../editor/EditorEvents";
 import * as EditorUI from "../ui/EditorUI";
-
-
+import MainFramMenu = require("../ui/frames/menus/MainFrameMenu");
+import ModalOps = require("../ui/modal/ModalOps");
 /**
  * Generic registry for storing Editor Extension Services
  */
-class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
+export class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
     registeredServices: T[] = [];
 
     /**
@@ -38,9 +38,15 @@ class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Edit
         this.registeredServices.push(service);
     }
 
+    unregister(service: T) {
+        var index = this.registeredServices.indexOf(service, 0);
+        if (index > -1) {
+            this.registeredServices.splice(index, 1);
+        }
+    }
 }
 
-interface ServiceEventSubscriber {
+export interface ServiceEventSubscriber {
     /**
      * Allow this service registry to subscribe to events that it is interested in
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
@@ -51,7 +57,7 @@ interface ServiceEventSubscriber {
 /**
  * Registry for service extensions that are concerned about project events
  */
-export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtensions.ProjectService> implements ServiceEventSubscriber {
+export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtensions.ProjectService> implements Editor.HostExtensions.ProjectServiceRegistry {
     constructor() {
         super();
     }
@@ -71,16 +77,18 @@ export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtension
      * @param  {[type]} data Event info from the project unloaded event
      */
     projectUnloaded(data) {
-        this.registeredServices.forEach((service) => {
+        // Need to use a for loop for length down to 0 because extensions *could* delete themselves from the list on projectUnloaded
+        for (let i = this.registeredServices.length - 1; i >= 0; i--) {
+            let service = this.registeredServices[i];
             // Notify services that the project has been unloaded
             try {
                 if (service.projectUnloaded) {
                     service.projectUnloaded();
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e} \n\n ${e.stack}`);
             }
-        });
+        };
     }
 
     /**
@@ -88,16 +96,18 @@ export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtension
      * @param  {[type]} data Event info from the project unloaded event
      */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
-        this.registeredServices.forEach((service) => {
+        // Need to use a for loop and don't cache the length because the list of services *may* change while processing.  Extensions could be appended to the end
+        for (let i = 0; i < this.registeredServices.length; i++) {
+            let service = this.registeredServices[i];
             try {
                 // Notify services that the project has just been loaded
                 if (service.projectLoaded) {
                     service.projectLoaded(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
-        });
+        };
     }
 
     playerStarted() {
@@ -117,7 +127,7 @@ export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtension
 /**
  * Registry for service extensions that are concerned about Resources
  */
-export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensions.ResourceService> {
+export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensions.ResourceService> implements Editor.HostExtensions.ResourceServiceRegistry {
     constructor() {
         super();
     }
@@ -145,7 +155,7 @@ export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensio
                     service.save(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -161,7 +171,7 @@ export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensio
                     service.delete(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n ${e}\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -178,9 +188,110 @@ export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensio
                     service.rename(ev);
                 }
             } catch (e) {
-                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
 
+}
+
+/**
+ * Registry for service extensions that are concerned about and need access to parts of the editor user interface
+ * Note: we may want to move this out into it's own file since it has a bunch of editor dependencies
+ */
+export class UIServiceRegistry extends ServiceRegistry<Editor.HostExtensions.UIService> implements Editor.HostExtensions.UIServiceRegistry {
+    constructor() {
+        super();
+    }
+
+    private mainFrameMenu: MainFramMenu = null;
+    private modalOps: ModalOps;
+
+    init(menu: MainFramMenu, modalOps: ModalOps) {
+        // Only set these once
+        if (this.mainFrameMenu == null) {
+            this.mainFrameMenu = menu;
+        }
+        if (this.modalOps == null) {
+            this.modalOps = modalOps;
+        }
+    }
+
+    /**
+     * Adds a new menu to the plugin menu
+     * @param  {string} id
+     * @param  {any} items
+     * @return {Atomic.UIMenuItemSource}
+     */
+    createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        return this.mainFrameMenu.createPluginMenuItemSource(id, items);
+    }
+
+    /**
+     * Removes a previously added menu from the plugin menu
+     * @param  {string} id
+     */
+    removePluginMenuItemSource(id: string) {
+        this.mainFrameMenu.removePluginMenuItemSource(id);
+    }
+
+    /**
+     * Disaplays a modal window
+     * @param  {Editor.Modal.ModalWindow} window
+     */
+    showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
+        return this.modalOps.showExtensionWindow(windowText, uifilename, handleWidgetEventCB);
+    }
+
+    /**
+     * Called when a menu item has been clicked
+     * @param  {string} refId
+     * @type {boolean} return true if handled
+     */
+    menuItemClicked(refId: string): boolean {
+
+        // run through and find any services that can handle this.
+        let holdResult = false;
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle it
+                if (service.menuItemClicked) {
+                    if (service.menuItemClicked(refId)) {
+                        holdResult = true;
+                    }
+                }
+            } catch (e) {
+               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+        return holdResult;
+    }
+
+    /**
+     * Allow this service registry to subscribe to events that it is interested in
+     * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
+     */
+    subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
+        // Placeholder
+        //eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.doSomeUiMessage(ev));
+    }
+
+    /**
+     * Called after a resource has been saved
+     * @param  {Editor.EditorEvents.SaveResourceEvent} ev
+     */
+    doSomeUiMessage(ev: Editor.EditorEvents.SaveResourceEvent) {
+        // PLACEHOLDER
+        // run through and find any services that can handle this.
+        this.registeredServices.forEach((service) => {
+            // try {
+            //     // Verify that the service contains the appropriate methods and that it can save
+            //     if (service.save) {
+            //         service.save(ev);
+            //     }
+            // } catch (e) {
+            //    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            // }
+        });
+    }
 }

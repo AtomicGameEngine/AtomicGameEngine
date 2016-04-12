@@ -5,6 +5,7 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+/// <reference path="Atomic.d.ts" />
 /// <reference path="Editor.d.ts" />
 
 declare module Editor.EditorEvents {
@@ -199,6 +200,17 @@ declare module Editor.Extensions {
          * @param  {T}      service the service to register
          */
         register(service: T);
+        /**
+         * Removes a service from the registered services list for this type of service
+         * @param  {T}      service the service to unregister
+         */
+        unregister(service: T);
+    }
+}
+
+declare module Editor.Modal {
+    export interface ExtensionWindow extends Atomic.UIWindow {
+        hide();
     }
 }
 
@@ -209,8 +221,9 @@ declare module Editor.HostExtensions {
      * or by the editor itself.
      */
     export interface HostServiceLocator extends Editor.Extensions.ServiceLoader {
-        resourceServices: Editor.Extensions.ServiceRegistry<ResourceService>;
-        projectServices: Editor.Extensions.ServiceRegistry<ProjectService>;
+        resourceServices: ResourceServiceRegistry;
+        projectServices: ProjectServiceRegistry;
+        uiServices: UIServiceRegistry;
     }
 
     export interface HostEditorService extends Editor.Extensions.EditorService {
@@ -225,11 +238,23 @@ declare module Editor.HostExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
     }
+    export interface ResourceServiceRegistry extends Editor.Extensions.ServiceRegistry<ResourceService> { }
 
     export interface ProjectService extends Editor.Extensions.EditorService {
         projectUnloaded?();
         projectLoaded?(ev: EditorEvents.LoadProjectEvent);
         playerStarted?();
+    }
+    export interface ProjectServiceRegistry extends Editor.Extensions.ServiceRegistry<ProjectService> { }
+
+    export interface UIService extends Editor.Extensions.EditorService {
+        menuItemClicked?(refId: string): boolean;
+    }
+    export interface UIServiceRegistry extends Editor.Extensions.ServiceRegistry<UIService> {
+        createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removePluginMenuItemSource(id: string);
+        showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
+        menuItemClicked(refId: string): boolean;
     }
 }
 

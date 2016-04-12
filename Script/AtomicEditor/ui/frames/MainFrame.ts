@@ -33,7 +33,6 @@ import ScriptWidget = require("ui/ScriptWidget");
 import MainFrameMenu = require("./menus/MainFrameMenu");
 
 import MenuItemSources = require("./menus/MenuItemSources");
-import ServiceLocator from "../../hostExtensions/ServiceLocator";
 import * as EditorEvents from "../../editor/EditorEvents";
 
 class MainFrame extends ScriptWidget {
@@ -74,9 +73,6 @@ class MainFrame extends ScriptWidget {
             this.showWelcomeFrame(true);
             this.disableProjectMenus();
         });
-
-        // Allow the service locator to hook into the event system
-        ServiceLocator.subscribeToEvents(this);
 
         this.showWelcomeFrame(true);
 
