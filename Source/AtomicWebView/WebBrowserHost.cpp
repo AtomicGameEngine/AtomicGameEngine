@@ -114,13 +114,10 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 #endif
 
 
-    // IMPORTANT: Cef::App contains virtual void OnBeforeCommandLineProcessing(), which should make it possible
-    // to setup args on Windows
+    // IMPORTANT: See flags being set in implementation of void WebAppBrowser::OnBeforeCommandLineProcessing
+    // these include "--enable-media-stream", "--enable-usermedia-screen-capturing"
 
-#ifdef ATOMIC_PLATFORM_OSX
-    const char* _argv[3] = { "", "--enable-media-stream", "--enable-usermedia-screen-capturing" };
-    CefMainArgs args(3, (char**) &_argv);
-#elif ATOMIC_PLATFORM_LINUX
+#ifdef ATOMIC_PLATFORM_LINUX
     static const char* _argv[3] = { "AtomicWebView", "--disable-setuid-sandbox", "--off-screen-rendering-enabled" };
     CefMainArgs args(3, (char**) &_argv);
 #else
