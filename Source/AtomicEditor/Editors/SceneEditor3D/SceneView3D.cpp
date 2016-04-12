@@ -73,7 +73,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     mouseLeftDown_(false),
     mouseMoved_(false),
     enabled_(true),
-    cameraMove_(false)
+    cameraMove_(false),
+    cameraMoveSpeed_(20.0f)
 {
 
     sceneEditor_ = sceneEditor;
@@ -160,7 +161,26 @@ bool SceneView3D::GetOrbitting()
 bool SceneView3D::GetZooming()
 {
     Input* input = GetSubsystem<Input>();
-    return MouseInView() && input->GetKeyDown(KEY_ALT) && input->GetMouseMoveWheel();
+    return MouseInView() && input->GetMouseMoveWheel() && !input->GetMouseButtonDown(MOUSEB_RIGHT);
+}
+
+bool SceneView3D::GetChangingCameraSpeed()
+{
+    Input* input = GetSubsystem<Input>();
+    return MouseInView() && input->GetMouseMoveWheel() && input->GetMouseButtonDown(MOUSEB_RIGHT);
+}
+
+void SceneView3D::CheckCameraSpeedBounds()
+{
+    float maxCameraSpeed = 80.0f;
+    float minCameraSpeed = 2.0f;
+
+    if (cameraMoveSpeed_ >= maxCameraSpeed)
+    {
+        cameraMoveSpeed_ = maxCameraSpeed;
+    }
+    if (cameraMoveSpeed_ <= minCameraSpeed)
+        cameraMoveSpeed_ = minCameraSpeed;
 }
 
 
@@ -177,14 +197,14 @@ void SceneView3D::MoveCamera(float timeStep)
     bool mouseInView = MouseInView();
     bool orbitting = GetOrbitting();
     bool zooming = GetZooming();
+    bool changingCameraSpeed = GetChangingCameraSpeed();
 
-    // Movement speed as world units per second
-    float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.2f;
-
-    if (shiftDown)
-        MOVE_SPEED *= 3.0f;
+    // Tempo at which mouse speed increases using mousewheel
+    const float CAMERA_MOVE_TEMPO = 5.0f;
+    // Tempo used when zooming in and out
+    const float ZOOM_TEMPO = 0.6f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     if ((mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT)) || orbitting)
@@ -199,11 +219,12 @@ void SceneView3D::MoveCamera(float timeStep)
     // Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
     Quaternion q(pitch_, yaw_, 0.0f);
 
-    if (!zooming)
+    if (!zooming || !changingCameraSpeed)
         cameraNode_->SetRotation(q);
 
     if (orbitting)
     {
+        zooming = false;
         BoundingBox bbox;
         sceneEditor_->GetSelection()->GetBounds(bbox);
         if (bbox.defined_)
@@ -217,12 +238,23 @@ void SceneView3D::MoveCamera(float timeStep)
 
     if (zooming)
     {
+        orbitting = false;
         Ray ray = GetCameraRay();
         Vector3 wpos = cameraNode_->GetWorldPosition();
-        wpos += ray.direction_ * (float (input->GetMouseMoveWheel()) * (shiftDown ? 0.6f : 0.2f));
+        wpos += ray.direction_ * (float(input->GetMouseMoveWheel()) * ZOOM_TEMPO);
         cameraNode_->SetWorldPosition(wpos);
     }
 
+    if (changingCameraSpeed)
+    {
+        if (input->GetMouseMoveWheel() > 0)
+            cameraMoveSpeed_ += input->GetMouseMoveWheel() * CAMERA_MOVE_TEMPO;
+        else
+            if (input->GetMouseMoveWheel() < 0)
+                cameraMoveSpeed_ += input->GetMouseMoveWheel() * CAMERA_MOVE_TEMPO;
+
+        CheckCameraSpeedBounds();
+    }
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
     bool superdown = input->GetKeyDown(KEY_LCTRL) || input->GetKeyDown(KEY_RCTRL);
@@ -237,31 +269,32 @@ void SceneView3D::MoveCamera(float timeStep)
         if (input->GetKeyDown(KEY_W))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
+            cameraNode_->Translate(Vector3::FORWARD * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_S))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
+            cameraNode_->Translate(Vector3::BACK * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_A))
-        {   SetFocus();
-            cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
+        {
+            SetFocus();
+            cameraNode_->Translate(Vector3::LEFT * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_D))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
+            cameraNode_->Translate(Vector3::RIGHT * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_E))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
+            cameraNode_->Translate(Vector3::UP * cameraMoveSpeed_ * timeStep);
         }
         if (input->GetKeyDown(KEY_Q))
         {
             SetFocus();
-            cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
+            cameraNode_->Translate(Vector3::DOWN * cameraMoveSpeed_ * timeStep);
         }
     }
 
