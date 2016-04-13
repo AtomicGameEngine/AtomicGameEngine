@@ -184,7 +184,8 @@ private:
     AxisMode axisMode_;
 
     bool dragging_;
-	bool cloning_;
+    bool cloning_;
+    bool startClone_;
 
     // snap settings
     float snapTranslationX_;

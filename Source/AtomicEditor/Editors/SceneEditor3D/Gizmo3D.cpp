@@ -38,9 +38,10 @@ namespace AtomicEditor
 {
 
 
-	Gizmo3D::Gizmo3D(Context* context) : Object(context),
-		dragging_(false),
-		cloning_(false)
+    Gizmo3D::Gizmo3D(Context* context) : Object(context),
+        dragging_(false),
+        cloning_(false),
+        startClone_(false)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
@@ -185,16 +186,14 @@ void Gizmo3D::Use()
     Ray cameraRay = view3D_->GetCameraRay();
     float scale = gizmoNode_->GetScale().x_;
 
-	// Clones an object when it's dragged while holding down Shift
-	bool dragShift = input->GetMouseButtonDown(MOUSEB_LEFT) && input->GetKeyDown(KEY_SHIFT);
+    // Clones an object when it's dragged/rotated/scaled while holding down Shift
+    if (startClone_ && !cloning_)
+    {
+        cloning_ = true;
+        selection_->Copy();
+        selection_->Paste();
+    }
 
-	if (dragShift && !cloning_)
-	{
-		cloning_ = true;
-		selection_->Copy();
-		selection_->Paste();
-	}
-	
     // Recalculate axes only when not left-dragging
     bool drag = input->GetMouseButtonDown(MOUSEB_LEFT);// && (Abs(input->GetMouseMoveX()) > 3 || Abs(input->GetMouseMoveY()) > 3);
     if (!drag)
@@ -204,11 +203,9 @@ void Gizmo3D::Use()
             scene_->SendEvent(E_SCENEEDITEND);
             dragging_ = false;
         }
-		
-		if (cloning_)
-		{
-			cloning_ = false;
-		}
+
+        startClone_ = false;
+        cloning_ = false;
 
         CalculateGizmoAxes();
     }
@@ -431,6 +428,16 @@ void Gizmo3D::Drag()
     dragging_ = true;
 
     float scale = gizmoNode_->GetScale().x_;
+
+    Input* input = GetSubsystem<Input>();
+
+    //Activates cloning when any of these modes is used while holding shift
+    if (editMode_ == EDIT_MOVE ||
+        editMode_ == EDIT_ROTATE ||
+        editMode_ == EDIT_SCALE)
+    {
+        startClone_ = input->GetKeyDown(KEY_SHIFT);
+    }
 
     if (editMode_ == EDIT_MOVE)
     {
