@@ -29,10 +29,15 @@ else()
 
 endif()
 
+# removes dependency on D3DCompiler dll for Atomic Direct3D9 builds which don't require it
+# (binaries that never initialize the Direct3D9 graphics subsystem)
+if (NOT ATOMIC_D3DCOMPILER_DISABLE AND NOT ATOMIC_UWEBKIT)
+  add_definitions(-DATOMIC_D3DCOMPILER_ENABLED)
+endif()
 
 
 # compile with static runtime
-set(CompilerFlags CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
+set( CompilerFlags CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_RELWITHDEBINFO )
 
 foreach(CompilerFlag ${CompilerFlags})
     string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
