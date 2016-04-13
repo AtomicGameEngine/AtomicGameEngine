@@ -37,11 +37,10 @@
 namespace AtomicEditor
 {
 
-
-    Gizmo3D::Gizmo3D(Context* context) : Object(context),
-        dragging_(false),
-        cloning_(false),
-        startClone_(false)
+Gizmo3D::Gizmo3D(Context* context) : Object(context),
+    dragging_(false),
+    cloning_(false),
+    startClone_(false)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
