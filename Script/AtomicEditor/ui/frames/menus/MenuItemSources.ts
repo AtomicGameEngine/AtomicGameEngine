@@ -77,12 +77,7 @@ function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
 
             }
             else if (typeof value === "object") {
-
-                var subsrc = createMenuItemSourceRecursive(value);
-
-                var item = new Atomic.UIMenuItem(key);
-                item.subSource = subsrc;
-                src.addItem(item);
+                createSubMenuItemSource(src, key, value);
 
             }
 
@@ -95,10 +90,26 @@ function createMenuItemSourceRecursive(items: any): Atomic.UIMenuItemSource {
 
 }
 
+export function createSubMenuItemSource(src: Atomic.UIMenuItemSource, id: string, items: any): Atomic.UIMenuItemSource {
+    var subsrc = createMenuItemSourceRecursive(items);
+
+    var item = new Atomic.UIMenuItem(id);
+    item.subSource = subsrc;
+    src.addItem(item);
+
+    return subsrc;
+}
+
 export function createMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
 
     srcLookup[id] = createMenuItemSourceRecursive(items);
 
     return srcLookup[id];
 
+}
+
+export function deleteMenuItemSource(id: string) {
+    if (srcLookup[id]) {
+        delete srcLookup[id];
+    }
 }

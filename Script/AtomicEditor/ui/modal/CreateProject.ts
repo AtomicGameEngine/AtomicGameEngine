@@ -24,7 +24,7 @@ import EditorEvents = require("../../editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 
-import ProjectTemplates = require("../resources/ProjectTemplates");
+import ProjectTemplates = require("../../resources/ProjectTemplates");
 
 class CreateProject extends ModalWindow {
 

@@ -33,6 +33,7 @@ import ScriptWidget = require("ui/ScriptWidget");
 import MainFrameMenu = require("./menus/MainFrameMenu");
 
 import MenuItemSources = require("./menus/MenuItemSources");
+import * as EditorEvents from "../../editor/EditorEvents";
 
 class MainFrame extends ScriptWidget {
 
@@ -68,7 +69,7 @@ class MainFrame extends ScriptWidget {
             this.enableProjectMenus();
         });
 
-        this.subscribeToEvent("ProjectUnloaded", (data) => {
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => {
             this.showWelcomeFrame(true);
             this.disableProjectMenus();
         });

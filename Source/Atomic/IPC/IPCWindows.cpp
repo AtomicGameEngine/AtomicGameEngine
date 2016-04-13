@@ -29,7 +29,10 @@
 #include <string>
 
 #include "../Core/Timer.h"
+#include "../IO/Log.h"
 #include "IPCWindows.h"
+
+#include "IPC.h"
 
 typedef std::wstring IPCWString;
 
@@ -301,6 +304,17 @@ bool IPCProcess::Launch(const String& command, const Vector<String>& args, const
     // The child process inherits the pipe handle.
     if (!::CreateProcessW(wcommand.CString(), (LPWSTR) wargs.CString(), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
         return false;
+    }
+
+    IPC* ipc = GetSubsystem<IPC>();
+    IPCHandle jobHandle = ipc->GetJobHandle();
+
+    if (jobHandle)
+    {
+        if (0 == AssignProcessToJobObject(jobHandle, pi.hProcess))
+        {
+            LOGERROR("IPCProcess::Launch - unable to assign job");
+        }
     }
 
     pid_ = pi.hProcess;

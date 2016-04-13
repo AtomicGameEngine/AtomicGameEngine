@@ -39,14 +39,21 @@
 			"getChildrenWithName(name:string, recursive?:boolean):Node[];",
 			"getChildrenWithComponent(componentType:string, recursive?:boolean):Node[];",
 			"getComponents(componentType?:string, recursive?:boolean):Component[];",
+			"getComponent<T extends Atomic.Component>(type: string): T;",
 			"getChildAtIndex(index:number):Node;",
 			"createJSComponent(name:string, args?:{});",
-			"getJSComponent(name:string, recursive?:boolean):JSComponent;",
+			"getJSComponent(name:string, recursive?:boolean): JSComponent;",
+			"getJSComponent<T extends Atomic.JSComponent>(name:string, recursive?:boolean): T;",
 			"createChildPrefab(childName:string, prefabPath:string):Node;",
-			"loadPrefab(prefabPath:string):boolean;"
+			"loadPrefab(prefabPath:string):boolean;",
+			"createComponent<T extends Atomic.Component>(type: string, mode?: CreateMode, id?: number): T;",
+			"getOrCreateComponent<T extends Atomic.Component>(type: string, mode?: CreateMode, id?: number): T;"
 		],
 		"Scene" : [
 			"getMainCamera():Camera;"
+		],
+		"Component": [
+		    "getComponent<T extends Atomic.Component>(type: string): T;"
 		]
 	},
 	"haxe_decl" : {

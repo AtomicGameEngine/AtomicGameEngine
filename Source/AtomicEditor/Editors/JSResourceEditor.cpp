@@ -27,6 +27,7 @@
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/JSONFile.h>
+#include <Atomic/Resource/ResourceEvents.h>
 
 #include <Atomic/Core/CoreEvents.h>
 #include <AtomicJS/Javascript/JSVM.h>
@@ -84,19 +85,60 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
     SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
 
+    SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleRenameResourceNotification));
+    SubscribeToEvent(E_DELETERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleDeleteResourceNotification));
+    SubscribeToEvent(E_PROJECTUNLOADEDNOTIFICATION, HANDLER(JSResourceEditor, HandleProjectUnloadedNotification));
 
     c->AddChild(webView_->GetInternalWidget());
 
 }
-
+    
 JSResourceEditor::~JSResourceEditor()
 {
 
 }
-
+   
+String getNormalizedPath(const String& path)
+{
+    // Full path is the fully qualified path from the root of the filesystem.  In order
+    // to take advantage of the resource caching system, let's trim it down to just the
+    // path inside the resources directory including the Resources directory so that the casing
+    // is correct.
+    const String& RESOURCES_MARKER = "resources/";
+    return path.SubstringUTF8(path.ToLower().Find(RESOURCES_MARKER));
+}
+    
+void JSResourceEditor::HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData)
+{
+    using namespace RenameResourceNotification;
+    const String& newPath = eventData[P_NEWRESOURCEPATH].GetString();
+    const String& path = eventData[P_RESOURCEPATH].GetString();
+    
+    webClient_->ExecuteJavaScript(ToString("HOST_resourceRenamed(\"%s\",\"%s\");", getNormalizedPath(path).CString(), getNormalizedPath(newPath).CString()));
+    
+    if (fullpath_.Compare(path) == 0) {
+        fullpath_ = newPath;
+        SetModified(modified_);
+    }
+}
+    
+void JSResourceEditor::HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData)
+{
+    using namespace DeleteResourceNotification;
+    const String& path = eventData[P_RESOURCEPATH].GetString();
+    
+    webClient_->ExecuteJavaScript(ToString("HOST_resourceDeleted(\"%s\");", getNormalizedPath(path).CString()));
+}
+    
+void JSResourceEditor::HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData)
+{
+    webClient_->ExecuteJavaScript("HOST_projectUnloaded();");
+}
+    
 void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
 {
-    webClient_->ExecuteJavaScript(ToString("loadCode(\"atomic://resources/%s\");", fullpath_.CString()));
+    // need to wait until we get an editor load complete message since we could
+    // still be streaming things in.
 }
 
 void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventData)
@@ -104,11 +146,25 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     using namespace WebMessage;
 
     const String& request = eventData[P_REQUEST].GetString();
+    const String& EDITOR_CHANGE = "editorChange";
+    const String& EDITOR_SAVE_CODE = "editorSaveCode";
+    const String& EDITOR_SAVE_FILE = "editorSaveFile";
+    const String& EDITOR_LOAD_COMPLETE = "editorLoadComplete";
+    
+    String normalizedPath = getNormalizedPath(fullpath_);
+    
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
-    if (request == "change")
+    if (request == EDITOR_CHANGE)
     {
         SetModified(true);
+    }
+    else if (request == EDITOR_LOAD_COMPLETE)
+    {
+        // We need to wait until the editor javascript is all required in to call the
+        // method to load the code.  The HandleWebViewLoadEnd event is getting called
+        // too soon.
+        webClient_->ExecuteJavaScript(ToString("HOST_loadCode(\"atomic://%s\");", normalizedPath.CString()));
     }
     else
     {
@@ -116,10 +172,19 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
         if (JSONFile::ParseJSON(request, jvalue, false))
         {
             String message = jvalue["message"].GetString();
-            if (message == "saveCode")
+            if (message == EDITOR_SAVE_CODE)
             {
                 String code = jvalue["payload"].GetString();
                 File file(context_, fullpath_, FILE_WRITE);
+                file.Write((void*) code.CString(), code.Length());
+                file.Close();
+            }
+            else if (message == EDITOR_SAVE_FILE)
+            {
+                String code = jvalue["payload"].GetString();
+                String fn = jvalue["filename"].GetString();
+                // TODO: determine if we are absolute path or partial path
+                File file(context_, fn, FILE_WRITE);
                 file.Write((void*) code.CString(), code.Length());
                 file.Close();
             }
@@ -178,7 +243,7 @@ bool JSResourceEditor::Save()
     if (!modified_)
         return true;
 
-    webClient_->ExecuteJavaScript("saveCode();");
+    webClient_->ExecuteJavaScript("HOST_saveCode();");
 
     SetModified(false);
 

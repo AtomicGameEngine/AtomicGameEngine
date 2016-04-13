@@ -65,6 +65,10 @@ public:
     void SendEventToBroker(StringHash eventType);
     void SendEventToBroker(StringHash eventType, VariantMap& eventData);
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    IPCHandle GetJobHandle() const { return jobHandle_; }
+#endif
+
 private:
 
     // if non-zero we're a worked and this is out broker's channel id
@@ -81,6 +85,10 @@ private:
 
     // valid on child
     SharedPtr<IPCWorker> worker_;
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+    IPCHandle jobHandle_;
+#endif
 
 };
 

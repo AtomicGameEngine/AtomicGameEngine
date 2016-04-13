@@ -25,10 +25,21 @@
 
   <script src="./source/ace/ace.js" type="text/javascript" charset="utf-8"></script>
   <script src="./source/ace/ext-language_tools.js"></script>
-  <script src="./source/systemjs/system-register-only.js" type="text/javascript" charset="utf-8"></script>
-  <script src="./editor.bundle.js" type="text/javascript" charset="utf-8"></script>
+  <script src="./source/systemjs/system.js" type="text/javascript" charset="utf-8"></script>
   <script>
-    System.import('./interop');
+    System.config({
+        "baseURL": "/",
+        "defaultJSExtensions": true,
+        // TODO: figure out how to make this be loaded in by the extension instead of being hard-coded in the html page
+        meta: {
+        './source/editorCore/modules/typescript.js': {
+          format: 'global',
+          exports: 'ts',
+        }
+      }
+    });
+
+    System.import('./source/editorCore/interop');
   </script>
 
 </body>
