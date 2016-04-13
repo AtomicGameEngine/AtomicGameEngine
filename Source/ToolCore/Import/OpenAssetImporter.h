@@ -83,7 +83,7 @@ private:
     void CollectAnimations(OutModel* model = 0);
 
     void ReadImportConfig();
-    void SetOveriddenFlags(VariantMap aiFlagParameters);
+    void SetOveriddenFlags(VariantMap& aiFlagParameters);
     void ApplyFlag(int processStep, bool active);
 
     String GetMeshMaterialName(aiMesh* mesh);

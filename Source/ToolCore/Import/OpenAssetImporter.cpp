@@ -27,7 +27,7 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
-#include <Atomic/Resource/ImportConfig.h>
+#include <ToolCore/Import/ImportConfig.h>
 
 #include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -873,7 +873,7 @@ void OpenAssetImporter::ApplyFlag(int flag, bool active)
         aiFlagsDefault_ |= flag;
 }
 
-void OpenAssetImporter::SetOveriddenFlags(VariantMap aiFlagParameters)
+void OpenAssetImporter::SetOveriddenFlags(VariantMap& aiFlagParameters)
 {
 
     VariantMap::ConstIterator itr = aiFlagParameters.Begin();
