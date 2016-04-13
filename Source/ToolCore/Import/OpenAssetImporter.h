@@ -82,6 +82,10 @@ private:
     void BuildBoneCollisionInfo(OutModel& model);
     void CollectAnimations(OutModel* model = 0);
 
+    void ReadImportConfig();
+    void SetOveriddenFlags(VariantMap& aiFlagParameters);
+    void ApplyFlag(int processStep, bool active);
+
     String GetMeshMaterialName(aiMesh* mesh);
     String GenerateMaterialName(aiMaterial* material);
     String GetMaterialTextureName(const String& nameIn);

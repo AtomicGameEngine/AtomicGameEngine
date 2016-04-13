@@ -23,38 +23,38 @@
 #pragma once
 
 #include "../Core/Variant.h"
-#include "../Resource/JSONValue.h"
-#include "../Resource/Configuration.h"
+#include "JSONValue.h"
 
 namespace Atomic
 {
 
 class Context;
 
-/// Atomic engine configuration
-class EngineConfig :
-    Configuration
+class Configuration
 {
-
 public:
 
-    static bool LoadFromFile(Context* context, const String& filename) { return engineConfig_.Configuration::LoadFromFile(context, filename); }
-    static bool LoadFromJSON(const String& json) { return engineConfig_.Configuration::LoadFromJSON(json); }
+    bool LoadFromFile(Context* context, const String& filename);
+    bool LoadFromJSON(const String& json);
 
     /// Apply the configuration to a setting variant map, values that exist will not be overriden
-    static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return engineConfig_.Configuration::ApplyConfig(settings, overwrite); }
+    void ApplyConfig(VariantMap& settings, bool overwrite = false);
+
+    const VariantMap& GetConfig() { return valueMap_; }
+
+protected:
+    static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
+    static int GetIntValue(const JSONValue& jvalue, int defaultValue);
+    static String GetStringValue(const JSONValue& jvalue, const String& defaultValue);
+
+    virtual bool LoadDesktopConfig(JSONValue root) { return true; };
+
+    VariantMap valueMap_;
 
 private:
-
-    virtual bool LoadDesktopConfig(JSONValue root);
-    bool LoadGraphicsConfig(const JSONValue& jgraphics);
-    bool LoadWindowConfig(const JSONValue& jwindow);
-    bool LoadSoundConfig(const JSONValue& jsound);
-    bool LoadInputConfig(const JSONValue& jinput);
-
-    bool LoadEngineConfig(const JSONValue& jengine);
-
-    static EngineConfig engineConfig_;
+    String filename_;
 };
-
 }
+
+
+

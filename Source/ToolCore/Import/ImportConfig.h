@@ -22,39 +22,33 @@
 
 #pragma once
 
-#include "../Core/Variant.h"
-#include "../Resource/JSONValue.h"
-#include "../Resource/Configuration.h"
+#include "../../Atomic/Core/Variant.h"
+#include "../../Atomic/Resource/JSONValue.h"
+#include "../../Atomic/Resource/Configuration.h"
 
 namespace Atomic
 {
 
 class Context;
 
-/// Atomic engine configuration
-class EngineConfig :
+class ImportConfig :
     Configuration
 {
 
 public:
 
-    static bool LoadFromFile(Context* context, const String& filename) { return engineConfig_.Configuration::LoadFromFile(context, filename); }
-    static bool LoadFromJSON(const String& json) { return engineConfig_.Configuration::LoadFromJSON(json); }
+    static bool LoadFromFile(Context* context, const String& filename) { return importConfig_.Configuration::LoadFromFile(context, filename); }
+    static bool LoadFromJSON(const String& json) { return importConfig_.Configuration::LoadFromJSON(json); }
 
     /// Apply the configuration to a setting variant map, values that exist will not be overriden
-    static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return engineConfig_.Configuration::ApplyConfig(settings, overwrite); }
+    static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return importConfig_.Configuration::ApplyConfig(settings, overwrite); }
 
 private:
 
     virtual bool LoadDesktopConfig(JSONValue root);
-    bool LoadGraphicsConfig(const JSONValue& jgraphics);
-    bool LoadWindowConfig(const JSONValue& jwindow);
-    bool LoadSoundConfig(const JSONValue& jsound);
-    bool LoadInputConfig(const JSONValue& jinput);
+    bool LoadAIFlagsDefaultConfig(const JSONValue& jflags);
 
-    bool LoadEngineConfig(const JSONValue& jengine);
-
-    static EngineConfig engineConfig_;
+    static ImportConfig importConfig_;
 };
 
 }
