@@ -33,7 +33,6 @@
 #include <SDL/include/SDL_surface.h>
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
-#include <crunch/inc/crnlib.h>
 
 #include "../DebugNew.h"
 
@@ -1236,6 +1235,7 @@ bool Image::SaveDDS(const String& fileName) const
         // with subclasses for particular image output types. Also should have image settings in the image meta.
         // ImageReader/Writers should also support a progress callback so UI can be updated.
 
+#ifdef CRUNCH
         // Compression setup
         crn_comp_params compParams;
         compParams.m_width = width_;
@@ -1291,6 +1291,7 @@ bool Image::SaveDDS(const String& fileName) const
             crn_free_block(compressedData);
             return success;
         }
+#endif
         
         // #623 END TODO
     }

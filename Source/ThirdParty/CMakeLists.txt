@@ -34,7 +34,7 @@ if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN)
     add_subdirectory(SQLite)
     add_subdirectory(Poco)
     add_subdirectory(nativefiledialog)
-    add_subdirectory(crunch)
+    add_subdirectory(libsquish)
 endif ()
 
 if (LINUX OR APPLE AND NOT IOS)
