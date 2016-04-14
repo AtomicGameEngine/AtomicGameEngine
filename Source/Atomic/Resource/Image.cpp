@@ -36,6 +36,10 @@
 
 #include "../DebugNew.h"
 
+#ifdef ATOMIC_PLATFORM_DESKTOP
+#include <libsquish/squish.h>
+#endif
+
 extern "C" unsigned char* stbi_write_png_to_mem(unsigned char* pixels, int stride_bytes, int x, int y, int n, int* out_len);
 
 #ifndef MAKEFOURCC
@@ -1213,7 +1217,12 @@ bool Image::SaveJPG(const String& fileName, int quality) const
 
 bool Image::SaveDDS(const String& fileName) const
 {
-#if defined(ATOMIC_PLATFORM_WINDOWS) || defined (ATOMIC_PLATFORM_LINUX) || defined (ATOMIC_PLATFORM_OSX)
+#if !defined(ATOMIC_PLATFORM_DESKTOP)
+
+    LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
+    return false;
+
+#else
     PROFILE(SaveImageDDS);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
@@ -1235,68 +1244,73 @@ bool Image::SaveDDS(const String& fileName) const
         // with subclasses for particular image output types. Also should have image settings in the image meta.
         // ImageReader/Writers should also support a progress callback so UI can be updated.
 
-#ifdef CRUNCH
-        // Compression setup
-        crn_comp_params compParams;
-        compParams.m_width = width_;
-        compParams.m_height = height_;
-        compParams.set_flag(cCRNCompFlagPerceptual, true); // IsSRGB() incorrectly returning false
-        compParams.set_flag(cCRNCompFlagDXT1AForTransparency, false);
-        compParams.set_flag(cCRNCompFlagHierarchical, true);
-        compParams.m_file_type = cCRNFileTypeDDS;
-        compParams.m_format = (HasAlphaChannel() ? cCRNFmtDXT5 : cCRNFmtDXT1);
+        if (!width_ || !height_)
+        {
+            LOGERRORF("Attempting to save zero width/height DDS to %s", fileName.CString());
+            return false;
+        }
 
-        compParams.m_pImages[0][0] = (uint32_t*)data_.Get();
 
-        compParams.m_target_bitrate = 0;
-        compParams.m_quality_level = 255;
-        compParams.m_num_helper_threads = 1;
-        compParams.m_pProgress_func = nullptr;
+        squish::u8 *inputData = (squish::u8 *) data_.Get();
 
-        // Mipmap setup
-        crn_mipmap_params mipParams;
-        mipParams.m_gamma_filtering = true; // IsSRGB() incorrectly returns false
-        mipParams.m_mode = cCRNMipModeNoMips; // or cCRNMipModeGenerateMips
+        SharedPtr<Image> tempImage;
 
-        // Output params
-        crn_uint32 actualQualityLevel;
-        float actualBitrate;
-        crn_uint32 outputFileSize;
+        // libsquish expects 4 channel RGBA, so create a temporary image if necessary
+        if (components_ != 4)
+        {
+            if (components_ != 3)
+            {
+                LOGERROR("Can only save images with 3 or 4 components to DDS");
+                return false;
+            }
 
-        void* compressedData = crn_compress(
-            compParams, 
-            mipParams, 
-            outputFileSize, 
-            &actualQualityLevel, 
-            &actualBitrate);
+            tempImage = new Image(context_);
+            tempImage->SetSize(width_, height_, 4);
 
-        if (nullptr == compressedData)
+            squish::u8* srcBits = (squish::u8*) data_;
+            squish::u8* dstBits = (squish::u8*) tempImage->data_;
+
+            for (unsigned i = 0; i < width_ * height_ * 4; i++)
+            {
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = 255;
+            }
+
+            inputData = (squish::u8 *) tempImage->data_.Get();
+        }
+
+
+        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_, HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1 );
+        SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
+
+        squish::CompressImage(inputData, width_, height_, compressedData.Get(), HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1);
+
+        if (compressedData)
         {
             LOGERROR("Failed to compress image to DXT");
             return false;
         }
 
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
         SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
 
-        if (dest.Null())
+        if (!dest->IsOpen())
         {
-            // Open error already logged
-            crn_free_block(compressedData);
+            LOGERRORF("Failed to open DXT image file for writing %s", fileName.CString());
             return false;
         }
         else
         {
-            bool success = dest->Write(compressedData, outputFileSize) == outputFileSize;
-            crn_free_block(compressedData);
+            bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
+
+            if (!success)
+                LOGERRORF("Failed to write image to DXT, file size mismatch %s", fileName.CString());
+
             return success;
-        }
-#endif
-        
+        }        
         // #623 END TODO
-    }
-#else
-    LOGWARNING("Image::SaveDDS - Unsupported on current platform");
+    }    
 #endif
 
     return false;
@@ -2135,13 +2149,8 @@ unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height
 
     SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
     source.Read(buffer.Get(), dataSize);
-    // #623 BEGIN TODO: Crunch expects all 4 components. This isn't ideal, but since
-    // precompressed versions should always be loaded anyway it doesn't matter.
-    // Might need to handle differently per platform.
-        components = 4;
-        return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, nullptr, components);
-    // #623 END TODO: Crunch expects all 4 components. This isn't ideal, but since
-    }
+    return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, (int*)&components, 0);
+}
 
 void Image::FreeImageData(unsigned char* pixelData)
 {

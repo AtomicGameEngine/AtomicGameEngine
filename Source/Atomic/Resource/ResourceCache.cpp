@@ -599,7 +599,7 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
 
     // #623 BEGIN TODO: For now try to get DDS version of textures from /DDS cache sub directory,
     // ultimately should have per platform compressed versions saved in cache
-#if ATOMIC_PLATFORM_WINDOWS
+#ifdef ATOMIC_PLATFORM_DESKTOP
     String ext = Atomic::GetExtension(name);
     if (ext == ".jpg" || ext == ".png" || ext == ".tga")
     {

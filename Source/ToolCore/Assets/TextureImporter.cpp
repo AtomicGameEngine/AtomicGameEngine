@@ -57,30 +57,22 @@ bool TextureImporter::Import()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String cachePath = db->GetCachePath();
 
-    // #623 BEGIN TODO: Delete previously saved per-platform compressed version so
-    // it won't get re-loaded here
-#if ATOMIC_PLATFORM_WINDOWS
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String compressedPath = cachePath + "DDS/" + asset_->GetRelativePath() + ".dds";
-    fileSystem->Delete(compressedPath);
-#endif
-    // #623 END TODO
+    if (fileSystem->FileExists(compressedPath))
+        fileSystem->Delete(compressedPath);
 
     SharedPtr<Image> image = cache->GetTempResource<Image>(asset_->GetPath());
 
     if (image.Null())
         return false;
 
-    // #623 BEGIN TODO: Save per-platform compressed version to cache
-#if ATOMIC_PLATFORM_WINDOWS
     if (compressTextures_ &&
         !image->IsCompressed())
     {
         fileSystem->CreateDirs(cachePath, "DDS/" + Atomic::GetPath(asset_->GetRelativePath()));
         image->SaveDDS(compressedPath);
     }
-#endif
-    // #623 END TODO
 
     // todo, proper proportions
     image->Resize(64, 64);
