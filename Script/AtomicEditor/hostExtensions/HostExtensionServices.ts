@@ -249,7 +249,6 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @type {boolean} return true if handled
      */
     menuItemClicked(refId: string): boolean {
-
         // run through and find any services that can handle this.
         let holdResult = false;
         this.registeredServices.forEach((service) => {
@@ -272,26 +271,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
-        // Placeholder
+        // Placeholder for when UI events published by the editor need to be listened for
         //eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.doSomeUiMessage(ev));
-    }
-
-    /**
-     * Called after a resource has been saved
-     * @param  {Editor.EditorEvents.SaveResourceEvent} ev
-     */
-    doSomeUiMessage(ev: Editor.EditorEvents.SaveResourceEvent) {
-        // PLACEHOLDER
-        // run through and find any services that can handle this.
-        this.registeredServices.forEach((service) => {
-            // try {
-            //     // Verify that the service contains the appropriate methods and that it can save
-            //     if (service.save) {
-            //         service.save(ev);
-            //     }
-            // } catch (e) {
-            //    EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
-            // }
-        });
     }
 }
