@@ -21,6 +21,7 @@
 //
 
 import EditorEvents = require("../../editor/EditorEvents");
+import EditorUI = require("../EditorUI");
 import PlayerOutput = require("./PlayerOutput");
 
 class PlayMode extends Atomic.ScriptObject {
@@ -33,6 +34,31 @@ class PlayMode extends Atomic.ScriptObject {
 
         this.subscribeToEvent("IPCJSError", (ev: Atomic.IPCJSErrorEvent) => this.handleIPCJSError(ev));
         this.subscribeToEvent(EditorEvents.PlayerStarted, (ev) => this.handlePlayerStarted(ev));
+
+        this.subscribeToEvent("EditorPlayerRenderTextureUpdated", (ev) => this.handlePlayerRenderTextureUpdated(ev));
+
+    }
+
+    handlePlayerRenderTextureUpdated(ev) {
+
+      // Create a UIWindow
+      var window = new Atomic.UIWindow();
+      window.settings = Atomic.UI_WINDOW_SETTINGS_TITLEBAR;
+      window.text = "Scene Preview";
+      window.setSize(512 + 16, 550);
+
+      var widget = new Atomic.UITextureWidget();
+      widget.texture = Atomic.editorMode.getPlayerRenderTexture();
+
+      var tlp = new Atomic.UILayoutParams();
+      tlp.width = 512;
+      tlp.height = 512;
+      widget.layoutParams = tlp;
+
+      window.addChild(widget);
+
+      EditorUI.getView().addChild(window);
+      window.center();
 
     }
 

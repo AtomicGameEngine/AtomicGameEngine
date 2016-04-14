@@ -204,6 +204,9 @@ bool EditorMode::PlayScene(const String& scenePath, const String& addArgs, bool 
 
 bool EditorMode::PlayProject(const String& addArgs, bool debug)
 {
+
+    return PlayScene("Scenes/ToonTown.scene", addArgs, debug);
+
     Vector<String> vargs;
     if (!PlaySetup(vargs, addArgs, debug))
         return false;
