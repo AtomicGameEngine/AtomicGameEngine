@@ -1,10 +1,25 @@
 // Portions Copyright (c) 2008-2015 the Urho3D project.
 
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 #include <Atomic/Atomic3D/Model.h>
@@ -22,9 +37,10 @@
 namespace AtomicEditor
 {
 
-
 Gizmo3D::Gizmo3D(Context* context) : Object(context),
-    dragging_(false)
+    dragging_(false),
+    cloning_(false),
+    startClone_(false)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
@@ -169,6 +185,14 @@ void Gizmo3D::Use()
     Ray cameraRay = view3D_->GetCameraRay();
     float scale = gizmoNode_->GetScale().x_;
 
+    // Clones an object when it's dragged/rotated/scaled while holding down Shift
+    if (startClone_ && !cloning_)
+    {
+        cloning_ = true;
+        selection_->Copy();
+        selection_->Paste();
+    }
+
     // Recalculate axes only when not left-dragging
     bool drag = input->GetMouseButtonDown(MOUSEB_LEFT);// && (Abs(input->GetMouseMoveX()) > 3 || Abs(input->GetMouseMoveY()) > 3);
     if (!drag)
@@ -178,6 +202,9 @@ void Gizmo3D::Use()
             scene_->SendEvent(E_SCENEEDITEND);
             dragging_ = false;
         }
+
+        startClone_ = false;
+        cloning_ = false;
 
         CalculateGizmoAxes();
     }
@@ -400,6 +427,16 @@ void Gizmo3D::Drag()
     dragging_ = true;
 
     float scale = gizmoNode_->GetScale().x_;
+
+    Input* input = GetSubsystem<Input>();
+
+    //Activates cloning when any of these modes is used while holding shift
+    if (editMode_ == EDIT_MOVE ||
+        editMode_ == EDIT_ROTATE ||
+        editMode_ == EDIT_SCALE)
+    {
+        startClone_ = input->GetKeyDown(KEY_SHIFT);
+    }
 
     if (editMode_ == EDIT_MOVE)
     {

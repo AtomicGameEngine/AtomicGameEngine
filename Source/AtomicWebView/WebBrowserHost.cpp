@@ -37,6 +37,7 @@
 
 #include "Internal/WebAppBrowser.h"
 
+#include "WebViewEvents.h"
 #include "WebSchemeHandler.h"
 #include "WebClient.h"
 #include "WebBrowserHost.h"
@@ -94,6 +95,9 @@ private:
 
 };
 
+GlobalPropertyMap WebBrowserHost::globalProperties_;
+WeakPtr<WebBrowserHost> WebBrowserHost::instance_;
+
 WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
 
@@ -110,13 +114,10 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 #endif
 
 
-    // IMPORTANT: Cef::App contains virtual void OnBeforeCommandLineProcessing(), which should make it possible
-    // to setup args on Windows
+    // IMPORTANT: See flags being set in implementation of void WebAppBrowser::OnBeforeCommandLineProcessing
+    // these include "--enable-media-stream", "--enable-usermedia-screen-capturing"
 
-#ifdef ATOMIC_PLATFORM_OSX
-    const char* _argv[3] = { "", "--enable-media-stream", "--enable-usermedia-screen-capturing" };
-    CefMainArgs args(3, (char**) &_argv);
-#elif ATOMIC_PLATFORM_LINUX
+#ifdef ATOMIC_PLATFORM_LINUX
     static const char* _argv[3] = { "AtomicWebView", "--disable-setuid-sandbox", "--off-screen-rendering-enabled" };
     CefMainArgs args(3, (char**) &_argv);
 #else
@@ -125,6 +126,9 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     CefSettings settings;
     settings.windowless_rendering_enabled = true;
+    
+    // Enable remote debugging on port 3335
+    settings.remote_debugging_port = 3335;
 
     d_ = new WebBrowserHostPrivate(this);
 
@@ -137,17 +141,47 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     RegisterWebSchemeHandlers(this);
 
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(WebBrowserHost, HandleBeginFrame));
+    SubscribeToEvent(E_UPDATE, HANDLER(WebBrowserHost, HandleUpdate));
+
+    instance_ = this;
 
 }
 
 WebBrowserHost::~WebBrowserHost()
 {
+    instance_ = 0;
     CefClearSchemeHandlerFactories();
     CefShutdown();
 }
 
-void WebBrowserHost::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+void WebBrowserHost::SetGlobalBoolProperty(const String& globalVar, const String& property, bool value)
+{
+    Variant v(value);
+    SetGlobalProperty(globalVar, property, v);
+}
+
+void WebBrowserHost::SetGlobalStringProperty(const String& globalVar, const String& property, const String& value)
+{
+    Variant v(value);
+    SetGlobalProperty(globalVar, property, v);
+}
+
+void WebBrowserHost::SetGlobalNumberProperty(const String& globalVar, const String& property, double value)
+{
+    Variant v(value);
+    SetGlobalProperty(globalVar, property, v);
+}
+
+void WebBrowserHost::SetGlobalProperty(const String& globalVar, const String &property, Variant& value)
+{
+    globalProperties_[globalVar][property] = value;
+
+    if (!instance_.NotNull())
+        instance_->SendEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED);
+}
+
+
+void WebBrowserHost::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     CefDoMessageLoopWork();
 }

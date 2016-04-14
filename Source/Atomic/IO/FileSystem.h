@@ -113,7 +113,7 @@ public:
 	/// Check if a file or directory exists at the specified path
     bool Exists(const String& pathName) const { return FileExists(pathName) || DirExists(pathName); }
 
-    bool CreateDirsRecursive(const String& directoryIn, const String& directoryOut);
+    bool CreateDirsRecursive(const String& directoryIn);
     
 private:
     /// Scan directory, called internally.

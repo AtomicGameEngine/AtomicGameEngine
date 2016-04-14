@@ -29,7 +29,11 @@ namespace Atomic
 {
 
 class Console;
+    
+namespace SystemUI
+{
 class DebugHud;
+}
 
 /// Atomic engine. Creates the other subsystems.
 class ATOMIC_API Engine : public Object
@@ -49,7 +53,7 @@ public:
     /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
     Console* CreateConsole();
     /// Create the debug hud.
-    DebugHud* CreateDebugHud();
+    SystemUI::DebugHud* CreateDebugHud();
     /// Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
     void SetMinFps(int fps);
     /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
@@ -64,6 +68,10 @@ public:
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);
+    /// Set whether the engine is paused.
+    void SetPaused(bool paused);
+    /// Set whether to run the next frame even if paused (for stepping frame by frame)
+    void SetRunNextPausedFrame(bool run);
     /// Close the graphics window and set the exit flag. No-op on iOS, as an iOS application can not legally exit.
     void Exit();
     /// Dump profiling information to the log.
@@ -97,6 +105,12 @@ public:
     /// Return whether engine has been initialized.
     bool IsInitialized() const { return initialized_; }
 
+    /// Return whether the engine is paused.
+    bool IsPaused() const { return paused_; }
+
+    /// Return whether to run the next frame even if paused (for stepping frame by frame)
+    bool GetRunNextPausedFrame() const { return runNextPausedFrame_; }
+
     /// Return whether exit has been requested.
     bool IsExiting() const { return exiting_; }
 
@@ -123,6 +137,10 @@ public:
     // ATOMIC END
 
 private:
+    /// Handle exit requested event. Auto-exit if enabled.
+    void HandlePauseResumeRequested(StringHash eventType, VariantMap& eventData);
+    /// Handle exit requested event. Auto-exit if enabled.
+    void HandlePauseStepRequested(StringHash eventType, VariantMap& eventData);
     /// Handle exit requested event. Auto-exit if enabled.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
     /// Actually perform the exit actions.
@@ -158,6 +176,10 @@ private:
     bool headless_;
     /// Audio paused flag.
     bool audioPaused_;
+    /// Engine paused flag
+    bool paused_;
+    /// Whether to run the next frame even if paused (for stepping frame by frame)
+    bool runNextPausedFrame_;
 };
 
 }

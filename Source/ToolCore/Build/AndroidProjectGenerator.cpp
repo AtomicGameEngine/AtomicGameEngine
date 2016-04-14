@@ -1,8 +1,23 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 #include <Poco/File.h>
@@ -159,6 +174,7 @@ bool AndroidProjectGenerator::GenerateProjectProperties()
 
 bool AndroidProjectGenerator::GenerateStringXML()
 {
+    FileSystem* fs = GetSubsystem<FileSystem>();
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
     Project* project = toolSystem->GetProject();
     AndroidBuildSettings* settings = project->GetBuildSettings()->GetAndroidBuildSettings();
@@ -178,11 +194,27 @@ bool AndroidProjectGenerator::GenerateStringXML()
     strings.AppendWithFormat("<string name=\"app_name\">%s</string>\n", appName.CString());
 
     strings += "</resources>\n";
-
+    
+    // Create res/values if it doesn't exist
+    if (!fs->DirExists(buildPath_ + "/res/values"))
+    {
+        fs->CreateDirsRecursive(buildPath_ + "/res/values");
+    }
+    
+    // Check that we successfully created it
+    if (!fs->DirExists(buildPath_ + "/res/values"))
+    {
+        errorText_ = "Unable to create directory: " + buildPath_ + "/res/values";
+        return false;
+    }
+    
     File file(context_, buildPath_ + "/res/values/strings.xml", FILE_WRITE);
 
     if (!file.IsOpen())
+    {
+        errorText_ = "Unable to write: " + buildPath_ + "/res/values/strings.xml";
         return false;
+    }
 
     file.Write(strings.CString(), strings.Length());
 

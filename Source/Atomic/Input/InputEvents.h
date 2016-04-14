@@ -217,6 +217,16 @@ EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
     PARAM(P_MODE, Mode);                    // MouseMode
 }
 
+/// Application pause requested.
+EVENT(E_PAUSERESUMEREQUESTED, PauseResumeRequested)
+{
+}
+
+/// Application step frame while paused requested.
+EVENT(E_PAUSESTEPREQUESTED, PauseStepRequested)
+{
+}
+
 /// Application exit requested.
 EVENT(E_EXITREQUESTED, ExitRequested)
 {

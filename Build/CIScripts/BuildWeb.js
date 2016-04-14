@@ -23,7 +23,7 @@ namespace('build', function() {
 
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ WEB",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ WEB",
-      "cmake -DEMSCRIPTEN=1 -DATOMIC_BUILD_2D=1 -DCMAKE_TOOLCHAIN_FILE=" + bcommon.atomicRoot + "Build/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../../",
+      "cmake -DEMSCRIPTEN=1 -DCMAKE_TOOLCHAIN_FILE=" + bcommon.atomicRoot + "Build/CMake/Toolchains/emscripten.toolchain.cmake -DCMAKE_BUILD_TYPE=Release ../../../../",
       "make -j4",
       "cd ./Source/AtomicPlayer/Application && mv ./AtomicPlayer ./AtomicPlayer.bc && " +
       // -s ERROR_ON_UNDEFINED_SYMBOLS=1 (disabled for pthread errors currently on incoming)

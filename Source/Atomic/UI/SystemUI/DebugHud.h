@@ -54,12 +54,14 @@ public:
     /// Destruct.
     ~DebugHud();
 
-    /// Update. Called by HandlePostUpdate().
-    void Update();
+    /// Updates the hud. Called by HandlePostUpdate().
+    void Update(float timeStep);
     /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);
     /// Set elements to show.
     void SetMode(unsigned mode);
+    /// Cycle through elements
+    void CycleMode();
     /// Set maximum profiler block depth, default unlimited.
     void SetProfilerMaxDepth(unsigned depth);
     /// Set profiler accumulation interval in seconds.
@@ -126,6 +128,12 @@ private:
     bool useRendererStats_;
     /// Current shown-element mode.
     unsigned mode_;
+    /// Time since last fps display update
+    float fpsTimeSinceUpdate_;
+    /// Frames since last fps display update
+    float fpsFramesSinceUpdate_;
+    /// Calculated fps
+    unsigned fps_;
 };
 
 }

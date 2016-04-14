@@ -44,6 +44,8 @@ public:
 
     void SetString(const String& str) { str_ = str; }
     void SetID(const String& id);
+    const String& GetStr() { return str_; }
+    tb::TBID GetID() { return id_; }
     void SetSkinImage(const String& skinImage);
     void SetSubSource(UISelectItemSource *subSource);
 
@@ -72,6 +74,9 @@ public:
     virtual ~UISelectItemSource();
 
     void AddItem(UISelectItem* item) { items_.Push(SharedPtr<UISelectItem>(item)); }
+    void RemoveItemWithId(const String& id);
+    void RemoveItemWithStr(const String& str);
+    int GetItemCount() { return items_.Size(); }
 
     void Clear() { items_.Clear(); }
 

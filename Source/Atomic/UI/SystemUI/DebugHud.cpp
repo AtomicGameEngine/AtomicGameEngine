@@ -54,12 +54,17 @@ static const char* shadowQualityTexts[] =
     "24bit High"
 };
 
+static const float FPS_UPDATE_INTERVAL = 0.5f;
+
 DebugHud::DebugHud(Context* context) :
     Object(context),
     profilerMaxDepth_(M_MAX_UNSIGNED),
     profilerInterval_(1000),
     useRendererStats_(false),
-    mode_(DEBUGHUD_SHOW_NONE)
+    mode_(DEBUGHUD_SHOW_NONE),
+    fpsTimeSinceUpdate_(FPS_UPDATE_INTERVAL),
+    fpsFramesSinceUpdate_(0),
+    fps_(0)
 {
     SystemUI* ui = GetSubsystem<SystemUI>();
     UIElement* uiRoot = ui->GetRoot();
@@ -92,7 +97,7 @@ DebugHud::~DebugHud()
     profilerText_->Remove();
 }
 
-void DebugHud::Update()
+void DebugHud::Update(float timeStep)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();
@@ -111,6 +116,15 @@ void DebugHud::Update()
 
     if (statsText_->IsVisible())
     {
+        fpsTimeSinceUpdate_ += timeStep;
+        ++fpsFramesSinceUpdate_;
+        if (fpsTimeSinceUpdate_ > FPS_UPDATE_INTERVAL)
+        {
+            fps_ = (int)(fpsFramesSinceUpdate_ / fpsTimeSinceUpdate_);
+            fpsFramesSinceUpdate_ = 0;
+            fpsTimeSinceUpdate_ = 0;
+        }
+
         unsigned primitives, batches;
         if (!useRendererStats_)
         {
@@ -124,7 +138,8 @@ void DebugHud::Update()
         }
 
         String stats;
-        stats.AppendWithFormat("Triangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
+        stats.AppendWithFormat("FPS %d\nTriangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
+            fps_,
             primitives,
             batches,
             renderer->GetNumViews(),
@@ -199,6 +214,29 @@ void DebugHud::SetMode(unsigned mode)
     mode_ = mode;
 }
 
+void DebugHud::CycleMode()
+{
+    switch (mode_)
+    {
+    case DEBUGHUD_SHOW_NONE:
+        SetMode(DEBUGHUD_SHOW_STATS);
+        break;
+    case DEBUGHUD_SHOW_STATS:
+        SetMode(DEBUGHUD_SHOW_MODE);
+        break;
+    case DEBUGHUD_SHOW_MODE:
+        SetMode(DEBUGHUD_SHOW_PROFILER);
+        break;
+    case DEBUGHUD_SHOW_PROFILER:
+        SetMode(DEBUGHUD_SHOW_ALL);
+        break;
+    case DEBUGHUD_SHOW_ALL:
+    default:
+        SetMode(DEBUGHUD_SHOW_NONE);
+        break;
+    }
+}
+
 void DebugHud::SetProfilerMaxDepth(unsigned depth)
 {
     profilerMaxDepth_ = depth;
@@ -261,7 +299,7 @@ void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace PostUpdate;
 
-    Update();
+    Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 }

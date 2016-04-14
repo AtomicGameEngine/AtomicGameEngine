@@ -1,8 +1,23 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
@@ -40,14 +55,29 @@ class ResourceFrame extends ScriptWidget {
 
         if (this.currentResourceEditor) {
             this.currentResourceEditor.save();
+            // Grab the path to this file and pass it to the save resource
+            this.sendEvent(EditorEvents.SaveResourceNotification, {
+                path: ev.path || this.currentResourceEditor.fullPath
+            });
         }
 
+    }
+
+    handleDeleteResource(ev: EditorEvents.DeleteResourceEvent) {
+        var editor = this.editors[ev.path];
+        if (editor) {
+            editor.close(true);
+            delete this.editors[ev.path];
+        }
     }
 
     handleSaveAllResources(data) {
 
         for (var i in this.editors) {
             this.editors[i].save();
+            this.sendEvent(EditorEvents.SaveResourceNotification, {
+                path: this.editors[i].fullPath
+            });
         }
 
     }
@@ -188,6 +218,14 @@ class ResourceFrame extends ScriptWidget {
 
     }
 
+    handleRenameResource(ev:EditorEvents.RenameResourceEvent) {
+        var editor = this.editors[ev.path];
+        if (editor) {
+            this.editors[ev.newPath] = editor;
+            delete this.editors[ev.path];
+        }
+    }
+
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
@@ -253,11 +291,13 @@ class ResourceFrame extends ScriptWidget {
 
         this.resourceViewContainer.addChild(this);
 
-        this.subscribeToEvent("ProjectUnloaded", (data) => this.handleProjectUnloaded(data));
+        this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
         this.subscribeToEvent(EditorEvents.SaveResource, (data) => this.handleSaveResource(data));
         this.subscribeToEvent(EditorEvents.SaveAllResources, (data) => this.handleSaveAllResources(data));
         this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
+        this.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev));
+        this.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => this.handleDeleteResource(data));
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 

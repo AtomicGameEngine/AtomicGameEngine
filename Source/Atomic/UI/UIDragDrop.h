@@ -69,7 +69,8 @@ private:
 
     SharedPtr<UIDragObject> dragObject_;
 
-
+    // initial mouse down position to handle whether or not to start a drag operation
+    IntVector2 mouseDownPosition_;
 
 };
 

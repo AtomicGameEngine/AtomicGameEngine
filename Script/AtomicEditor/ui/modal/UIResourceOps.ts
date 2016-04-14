@@ -1,8 +1,23 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import EditorEvents = require("editor/EditorEvents");
@@ -41,8 +56,14 @@ export class ResourceDelete extends ModalWindow {
 
                 this.hide();
 
+                let eventData = {
+                    path: this.asset.path
+                };
+
                 var db = ToolCore.getAssetDatabase();
                 db.deleteAsset(this.asset);
+
+                this.sendEvent(EditorEvents.DeleteResourceNotification, eventData);
 
                 return true;
             }
@@ -131,8 +152,10 @@ export class CreateComponent extends ModalWindow {
                 var componentName = this.nameField.text;
                 var outputFile = Atomic.addTrailingSlash(this.resourcePath) + componentName;
 
-                if (outputFile.indexOf(".js") == -1) outputFile += ".js";
-
+                // Check to see if we have a file extension.  If we don't then assume .js
+                if (outputFile.indexOf(".") == -1) {
+                    outputFile += ".js";
+                }
 
                 if (ResourceOps.CreateNewComponent(outputFile, componentName)) {
 
@@ -184,7 +207,10 @@ export class CreateScript extends ModalWindow {
                 var scriptName = this.nameField.text;
                 var outputFile = Atomic.addTrailingSlash(this.resourcePath) + scriptName;
 
-                if (outputFile.indexOf(".js") == -1) outputFile += ".js";
+                // Check to see if we have a file extension.  If we don't then assume .js
+                if (outputFile.indexOf(".") == -1) {
+                    outputFile += ".js";
+                }
 
 
                 if (ResourceOps.CreateNewScript(outputFile, scriptName)) {
@@ -349,8 +375,19 @@ export class RenameAsset extends ModalWindow {
 
                 this.hide();
 
-                if (this.asset.name != this.nameEdit.text)
+                if (this.asset.name != this.nameEdit.text) {
+                    let oldPath = this.asset.path;
                     this.asset.rename(this.nameEdit.text);
+
+                    let eventData: EditorEvents.RenameResourceEvent = {
+                        path: oldPath,
+                        newPath: this.asset.path,
+                        newName: this.nameEdit.text,
+                        asset: this.asset
+                    };
+
+                    this.sendEvent(EditorEvents.RenameResourceNotification, eventData);
+                }
 
                 return true;
             }

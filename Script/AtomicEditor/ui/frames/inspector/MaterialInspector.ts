@@ -1,13 +1,29 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import ScriptWidget = require("ui/ScriptWidget");
 import UIEvents = require("ui/UIEvents");
 import EditorUI = require("ui/EditorUI");
+import EditorEvents = require("editor/EditorEvents");
 
 import TextureSelector = require("./TextureSelector");
 
@@ -73,6 +89,10 @@ for (var key in techniqueLookup) {
 
 class MaterialInspector extends ScriptWidget {
 
+    currentTexture: Atomic.UITextureWidget = null;
+    tunit: number;
+    textureWidget: Atomic.UITextureWidget
+
     constructor() {
 
         super();
@@ -80,7 +100,7 @@ class MaterialInspector extends ScriptWidget {
         this.fd.id = "Vera";
         this.fd.size = 11;
 
-
+        this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => this.createTextureRemoveButtonCallback(this.tunit, this.textureWidget));
     }
 
     createShaderParametersSection(): Atomic.UISection {
@@ -237,22 +257,38 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
-    createTextureButtonCallback(textureUnit:number, textureWidget:Atomic.UITextureWidget) {
 
-      return  () => {
+    openTextureSelectionBox(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
         var inspector = this;
 
-        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", "Texture2D", function(asset: ToolCore.Asset, args: any) {
+        EditorUI.getModelOps().showResourceSelection("Select Texture", "TextureImporter", "Texture2D", function (asset: ToolCore.Asset, args: any) {
 
-            var texture = <Atomic.Texture2D> Atomic.cache.getResource("Texture2D", asset.path);
+            var texture = <Atomic.Texture2D>Atomic.cache.getResource("Texture2D", asset.path);
 
             if (texture) {
                 inspector.material.setTexture(textureUnit, texture);
                 textureWidget.texture = inspector.getTextureThumbnail(texture);
+
+                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });
             }
 
         });
+
+    }
+
+     // Big Texture Button(referenced texture file path in project frame)
+    createTextureButtonCallback(textureUnit:number, textureWidget:Atomic.UITextureWidget) {
+
+        return () => {
+
+            var texture = this.material.getTexture(textureUnit);
+
+            if (textureWidget.getTexture() != null) {
+                this.sendEvent(EditorEvents.InspectorProjectReference, { "path": texture.getName() });
+            } else {
+                this.openTextureSelectionBox(textureUnit, textureWidget);
+            }
 
         return true;
 
@@ -260,6 +296,27 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
+   // Small Texture Button (Opens texture selection window)
+    createTextureReferenceButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
+
+        return () => {
+            this.tunit = textureUnit;
+            this.textureWidget = textureWidget;
+            this.openTextureSelectionBox(textureUnit, textureWidget);
+            return true;
+        };
+    }
+
+    //Remove Texture Button
+    createTextureRemoveButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
+
+            var texture = this.material.getTexture(textureUnit);
+
+            if (texture != null && textureWidget != null) {
+                textureWidget.setTexture(null);
+            }
+
+    }
 
     createTextureSection(): Atomic.UISection {
 
@@ -276,8 +333,7 @@ class MaterialInspector extends ScriptWidget {
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR ,Atomic.TU_EMISSIVE];//, Atomic.TU_ENVIRONMENT,
-        //Atomic.TU_CUSTOM1, Atomic.TU_CUSTOM2];
+        var textureUnits = [ Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR, Atomic.TU_EMISSIVE ];
 
         for (var i in textureUnits) {
 
@@ -310,11 +366,19 @@ class MaterialInspector extends ScriptWidget {
             textureButton["tunit"] = tunit;
             textureButton["textureWidget"] = textureWidget;
 
+            //Create drop-down buttons to open Texture Selection Dialog Box
+            var textureRefButton = new Atomic.UIButton();
+            textureRefButton.skinBg = "arrow.down";
+            textureRefButton["tunit"] = tunit;
+            textureRefButton["textureWidget"] = textureWidget;
+
             textureButton.onClick = this.createTextureButtonCallback(tunit, textureWidget);
+            textureRefButton.onClick = this.createTextureReferenceButtonCallback(tunit, textureWidget);
 
             textureButton.contentRoot.addChild(textureWidget);
 
             attrLayout.addChild(textureButton);
+            attrLayout.addChild(textureRefButton);
 
             attrsVerticalLayout.addChild(attrLayout);
 
@@ -335,6 +399,7 @@ class MaterialInspector extends ScriptWidget {
                         this.material.setTexture(ev.target["tunit"], texture);
                         (<Atomic.UITextureWidget>ev.target["textureWidget"]).texture = this.getTextureThumbnail(texture);
 
+                        this.sendEvent("InspectorProjectReference", { "path": texture.getName(), "ButtonID": texture.getName() });
                     }
                 }
             });

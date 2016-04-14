@@ -8,7 +8,8 @@
         "noLib": false,
         "outDir": "../Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts",
         "moduleResolution": "classic",
-        "sourceMap": true
+        "sourceMap": true,
+        "experimentalDecorators": true
     },
     "filesGlob": [
         "./ToolCore/**/*.ts",
@@ -24,9 +25,14 @@
         "./AtomicEditor/editor/EditorEvents.ts",
         "./AtomicEditor/editor/EditorLicense.ts",
         "./AtomicEditor/editor/Preferences.ts",
+        "./AtomicEditor/hostExtensions/coreExtensions/ProjectBasedExtensionLoader.ts",
+        "./AtomicEditor/hostExtensions/HostExtensionServices.ts",
+        "./AtomicEditor/hostExtensions/languageExtensions/TypscriptLanguageExtension.ts",
+        "./AtomicEditor/hostExtensions/ServiceLocator.ts",
         "./AtomicEditor/main.ts",
         "./AtomicEditor/resources/ProjectTemplates.ts",
         "./AtomicEditor/resources/ResourceOps.ts",
+        "./AtomicEditor/resources/SearchBarFiltering.ts",
         "./AtomicEditor/ui/EditorStrings.ts",
         "./AtomicEditor/ui/EditorUI.ts",
         "./AtomicEditor/ui/frames/HierarchyFrame.ts",
@@ -93,7 +99,9 @@
         "./TypeScript/AtomicNET.d.ts",
         "./TypeScript/AtomicPlayer.d.ts",
         "./TypeScript/AtomicWork.d.ts",
+        "./TypeScript/duktape.d.ts",
         "./TypeScript/Editor.d.ts",
+        "./TypeScript/EditorWork.d.ts",
         "./TypeScript/ToolCore.d.ts",
         "./TypeScript/WebView.d.ts"
     ]

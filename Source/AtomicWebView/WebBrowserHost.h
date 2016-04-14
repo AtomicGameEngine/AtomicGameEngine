@@ -30,6 +30,7 @@ namespace Atomic
 class WebBrowserHostPrivate;
 class WebClient;
 
+typedef HashMap<String, HashMap<String, Variant>> GlobalPropertyMap;
 
 /// Browser host subsystem, responsible for initializing CEF
 class ATOMIC_API WebBrowserHost : public Object
@@ -42,11 +43,24 @@ public:
     /// Destruct.
     virtual ~WebBrowserHost();
 
+    /// Set global property object values, available as read only on page
+    static void SetGlobalBoolProperty(const String& globalVar, const String& property, bool value);
+    static void SetGlobalStringProperty(const String& globalVar, const String& property, const String& value);
+    static void SetGlobalNumberProperty(const String& globalVar, const String& property, double value);
+
+    static const GlobalPropertyMap& GetGlobalProperties() { return globalProperties_; }
+
 private:
 
-    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+    static void SetGlobalProperty(const String& globalVar, const String& property, Variant& value);
 
     WebBrowserHostPrivate* d_;
+
+    static WeakPtr<WebBrowserHost> instance_;
+
+    static GlobalPropertyMap globalProperties_;
 
 };
 

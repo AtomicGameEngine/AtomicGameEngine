@@ -42,9 +42,12 @@ public:
         return this;
     }
 
-    // CefBrowserProcessHandler methods.
-    void OnContextInitialized() OVERRIDE;
+    static bool CreateGlobalProperties(CefRefPtr<CefDictionaryValue>& globalProps);
 
+    // CefBrowserProcessHandler methods.
+    virtual void OnContextInitialized() OVERRIDE;
+
+    virtual void OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info) OVERRIDE;
 
 private:
 

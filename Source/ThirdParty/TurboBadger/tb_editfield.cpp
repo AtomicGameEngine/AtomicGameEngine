@@ -232,6 +232,8 @@ bool TBEditField::OnEvent(const TBWidgetEvent &ev)
         {
             // Post a message to start selection scroll
             PostMessageDelayed(TBIDC("selscroll"), nullptr, SELECTION_SCROLL_DELAY);
+            // forward to delegate, if any
+            TBWidget::OnEvent(ev);
             return true;
         }
     }
