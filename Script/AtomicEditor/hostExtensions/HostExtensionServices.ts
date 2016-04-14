@@ -27,7 +27,7 @@ import ModalOps = require("../ui/modal/ModalOps");
 /**
  * Generic registry for storing Editor Extension Services
  */
-export class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
+export class ServicesProvider<T extends Editor.Extensions.ServiceEventListener> implements Editor.Extensions.ServicesProvider<T> {
     registeredServices: T[] = [];
 
     /**
@@ -57,7 +57,7 @@ export interface ServiceEventSubscriber {
 /**
  * Registry for service extensions that are concerned about project events
  */
-export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtensions.ProjectService> implements Editor.HostExtensions.ProjectServiceRegistry {
+export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensions.ProjectServicesEventListener> implements Editor.HostExtensions.ProjectServicesProvider {
     constructor() {
         super();
     }
@@ -127,7 +127,7 @@ export class ProjectServiceRegistry extends ServiceRegistry<Editor.HostExtension
 /**
  * Registry for service extensions that are concerned about Resources
  */
-export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensions.ResourceService> implements Editor.HostExtensions.ResourceServiceRegistry {
+export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtensions.ResourceServicesEventListener> implements Editor.HostExtensions.ResourceServicesProvider {
     constructor() {
         super();
     }
@@ -199,7 +199,7 @@ export class ResourceServiceRegistry extends ServiceRegistry<Editor.HostExtensio
  * Registry for service extensions that are concerned about and need access to parts of the editor user interface
  * Note: we may want to move this out into it's own file since it has a bunch of editor dependencies
  */
-export class UIServiceRegistry extends ServiceRegistry<Editor.HostExtensions.UIService> implements Editor.HostExtensions.UIServiceRegistry {
+export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.UIServicesEventListener> implements Editor.HostExtensions.UIServicesProvider {
     constructor() {
         super();
     }

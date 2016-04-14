@@ -25,7 +25,7 @@ import * as EditorEvents from "../../editor/EditorEvents";
 /**
  * Resource extension that supports the web view typescript extension
  */
-export default class TypescriptLanguageExtension implements Editor.HostExtensions.ResourceService, Editor.HostExtensions.ProjectService {
+export default class TypescriptLanguageExtension implements Editor.HostExtensions.ResourceServicesEventListener, Editor.HostExtensions.ProjectServicesEventListener {
     name: string = "HostTypeScriptLanguageExtension";
     description: string = "This service supports the typscript webview extension.";
 
@@ -107,11 +107,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * Inject this language service into the registry
      * @return {[type]}             True if successful
      */
-    initialize(serviceRegistry: Editor.HostExtensions.HostServiceLocator) {
+    initialize(serviceLocator: Editor.HostExtensions.HostServiceLocator) {
         // We care about both resource events as well as project events
-        serviceRegistry.resourceServices.register(this);
-        serviceRegistry.projectServices.register(this);
-        this.serviceRegistry = serviceRegistry;
+        serviceLocator.resourceServices.register(this);
+        serviceLocator.projectServices.register(this);
+        this.serviceRegistry = serviceLocator;
     }
 
     /**
