@@ -147,9 +147,9 @@ public:
     /// Whether this texture is in sRGB, only relevant for DDS.
     bool IsSRGB() const { return sRGB_; }
     /// Whether this texture has power of two dimensions
-    bool IsPOT() const { return pot_; }
+    bool IsPOT() const;
     /// Whether this texture has an alpha channel
-    bool HasAlphaChannel() const { return hasAlphaChannel_; }
+    bool HasAlphaChannel() const;
 
     /// Return a 2D pixel color.
     Color GetPixel(int x, int y) const;
@@ -225,10 +225,6 @@ private:
     bool array_;
     /// Data is sRGB.
     bool sRGB_;
-    /// Dimensions are power of two
-    bool pot_;
-    /// Image has alpha channel
-    bool hasAlphaChannel_;
     /// Compressed format.
     CompressedFormat compressedFormat_;
     /// Pixel data.

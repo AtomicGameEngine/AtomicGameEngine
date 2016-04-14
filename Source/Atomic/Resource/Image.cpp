@@ -247,9 +247,7 @@ Image::Image(Context* context) :
     components_(0),
     cubemap_(false),
     array_(false),
-    sRGB_(false),
-    pot_(false),
-    hasAlphaChannel_(false)
+    sRGB_(false)
 {
 }
 
@@ -803,8 +801,6 @@ bool Image::SetSize(int width, int height, int depth, unsigned components)
     components_ = components;
     compressedFormat_ = CF_NONE;
     numCompressedLevels_ = 0;
-    pot_ = IsPowerOfTwo(width_) && IsPowerOfTwo(height_);
-    hasAlphaChannel_ = components > 3;
     nextLevel_.Reset();
 
     SetMemoryUse(width * height * depth * components);
@@ -1218,6 +1214,7 @@ bool Image::SaveJPG(const String& fileName, int quality) const
 
 bool Image::SaveDDS(const String& fileName) const
 {
+#if defined(ATOMIC_PLATFORM_WINDOWS) || defined (ATOMIC_PLATFORM_LINUX) || defined (ATOMIC_PLATFORM_OSX)
     PROFILE(SaveImageDDS);
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
@@ -1247,7 +1244,7 @@ bool Image::SaveDDS(const String& fileName) const
         compParams.set_flag(cCRNCompFlagDXT1AForTransparency, false);
         compParams.set_flag(cCRNCompFlagHierarchical, true);
         compParams.m_file_type = cCRNFileTypeDDS;
-        compParams.m_format = (hasAlphaChannel_ ? cCRNFmtDXT5 : cCRNFmtDXT1);
+        compParams.m_format = (HasAlphaChannel() ? cCRNFmtDXT5 : cCRNFmtDXT1);
 
         compParams.m_pImages[0][0] = (uint32_t*)data_.Get();
 
@@ -1297,8 +1294,21 @@ bool Image::SaveDDS(const String& fileName) const
         
         // #623 END TODO
     }
+#else
+    LOGWARNING("Image::SaveDDS - Unsupported on current platform");
+#endif
 
     return false;
+}
+
+bool Image::IsPOT() const
+{
+    return IsPowerOfTwo(width_) && IsPowerOfTwo(height_);
+}
+
+bool Image::HasAlphaChannel() const
+{
+    return components_ > 3;
 }
 
 Color Image::GetPixel(int x, int y) const
@@ -2127,10 +2137,10 @@ unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height
     // #623 BEGIN TODO: Crunch expects all 4 components. This isn't ideal, but since
     // precompressed versions should always be loaded anyway it doesn't matter.
     // Might need to handle differently per platform.
-    components = 4;
-    return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, nullptr, components);
+        components = 4;
+        return stbi_load_from_memory(buffer.Get(), dataSize, &width, &height, nullptr, components);
     // #623 END TODO: Crunch expects all 4 components. This isn't ideal, but since
-}
+    }
 
 void Image::FreeImageData(unsigned char* pixelData)
 {
