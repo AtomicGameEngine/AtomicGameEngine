@@ -82,7 +82,7 @@ private:
     void BuildBoneCollisionInfo(OutModel& model);
     void CollectAnimations(OutModel* model = 0);
 
-    void ReadImportConfig();
+    void ApplyProjectImportConfig();
     void SetOveriddenFlags(VariantMap& aiFlagParameters);
     void ApplyFlag(int processStep, bool active);
 

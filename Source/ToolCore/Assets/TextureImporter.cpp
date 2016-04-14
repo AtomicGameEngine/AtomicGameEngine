@@ -26,6 +26,8 @@
 #include <Atomic/Atomic2D/StaticSprite2D.h>
 #include <Atomic/IO/FileSystem.h>
 
+#include <ToolCore/Import/ImportConfig.h>
+
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "TextureImporter.h"
@@ -33,9 +35,10 @@
 namespace ToolCore
 {
 
-TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
+TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
+compressTextures_(false)
 {
-
+    ApplyProjectImportConfig();
 }
 
 TextureImporter::~TextureImporter()
@@ -70,7 +73,8 @@ bool TextureImporter::Import()
 
     // #623 BEGIN TODO: Save per-platform compressed version to cache
 #if ATOMIC_PLATFORM_WINDOWS
-    if (!image->IsCompressed())
+    if (compressTextures_ &&
+        !image->IsCompressed())
     {
         fileSystem->CreateDirs(cachePath, "DDS/" + Atomic::GetPath(asset_->GetRelativePath()));
         image->SaveDDS(compressedPath);
@@ -89,6 +93,22 @@ bool TextureImporter::Import()
     image->SavePNG(cachePath + asset_->GetGUID() + "_thumbnail.png");
 
     return true;
+}
+
+void TextureImporter::ApplyProjectImportConfig()
+{
+    if (ImportConfig::IsLoaded())
+    {
+        VariantMap tiParameters;
+        ImportConfig::ApplyConfig(tiParameters);
+        VariantMap::ConstIterator itr = tiParameters.Begin();
+
+        for (; itr != tiParameters.End(); itr++)
+        {
+            if (itr->first_ == "tiProcess_CompressTextures")
+                compressTextures_ = itr->second_.GetBool();
+        }
+    }
 }
 
 bool TextureImporter::LoadSettingsInternal(JSONValue& jsonRoot)
