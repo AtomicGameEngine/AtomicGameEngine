@@ -83,6 +83,25 @@ static const unsigned DDS_DXGI_FORMAT_BC2_UNORM_SRGB = 75;
 static const unsigned DDS_DXGI_FORMAT_BC3_UNORM = 77;
 static const unsigned DDS_DXGI_FORMAT_BC3_UNORM_SRGB = 78;
 
+// ATOMIC BEGIN
+static const unsigned DDSD_CAPS = 0x00000001;
+static const unsigned DDSD_HEIGHT = 0x00000002;
+static const unsigned DDSD_WIDTH = 0x00000004;
+static const unsigned DDSD_PITCH = 0x00000008;
+static const unsigned DDSD_PIXELFORMAT = 0x00001000;
+static const unsigned DDSD_MIPMAPCOUNT = 0x00020000;
+static const unsigned DDSD_LINEARSIZE = 0x00080000;
+static const unsigned DDSD_DEPTH = 0x00800000;
+
+static const unsigned DDPF_ALPHAPIXELS = 0x00000001;
+static const unsigned DDPF_ALPHA = 0x00000002;
+static const unsigned DDPF_FOURCC = 0x00000004;
+static const unsigned DDPF_PALETTEINDEXED8 = 0x00000020;
+static const unsigned DDPF_RGB = 0x00000040;
+static const unsigned DDPF_LUMINANCE = 0x00020000;
+static const unsigned DDPF_NORMAL = 0x80000000;  // nvidia specific
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -1250,7 +1269,6 @@ bool Image::SaveDDS(const String& fileName) const
             return false;
         }
 
-
         squish::u8 *inputData = (squish::u8 *) data_.Get();
 
         SharedPtr<Image> tempImage;
@@ -1270,7 +1288,7 @@ bool Image::SaveDDS(const String& fileName) const
             squish::u8* srcBits = (squish::u8*) data_;
             squish::u8* dstBits = (squish::u8*) tempImage->data_;
 
-            for (unsigned i = 0; i < width_ * height_ * 4; i++)
+            for (unsigned i = 0; i < (unsigned) width_ * (unsigned) height_; i++)
             {
                 *dstBits++ = *srcBits++;
                 *dstBits++ = *srcBits++;
@@ -1280,18 +1298,34 @@ bool Image::SaveDDS(const String& fileName) const
 
             inputData = (squish::u8 *) tempImage->data_.Get();
         }
+        
+        unsigned squishFlags = HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1;
 
+        // Use a slow but high quality colour compressor (the default). (TODO: expose other settings as parameter)
+        squishFlags |= squish::kColourClusterFit;
 
-        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_, HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1 );
+        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_,  squishFlags);
+
         SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
 
-        squish::CompressImage(inputData, width_, height_, compressedData.Get(), HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1);
+        squish::CompressImage(inputData, width_, height_, compressedData.Get(), squishFlags);
 
-        if (compressedData)
+        DDSurfaceDesc2 sdesc;
+
+        if (sizeof(sdesc) != 124)
         {
-            LOGERROR("Failed to compress image to DXT");
+            LOGERROR("Image::SaveDDS - sizeof(DDSurfaceDesc2) != 124");
             return false;
         }
+        memset(&sdesc, 0, sizeof(sdesc));
+        sdesc.dwSize_ = 124;
+        sdesc.dwFlags_ = DDSD_CAPS | DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT;
+        sdesc.dwWidth_ = width_;
+        sdesc.dwHeight_ = height_;
+
+        sdesc.ddpfPixelFormat_.dwSize_ = 32;        
+        sdesc.ddpfPixelFormat_.dwFlags_ = DDPF_FOURCC | (HasAlphaChannel() ? DDPF_ALPHAPIXELS : 0);
+        sdesc.ddpfPixelFormat_.dwFourCC_ = HasAlphaChannel() ? FOURCC_DXT5 : FOURCC_DXT1;
 
         SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
 
@@ -1302,6 +1336,10 @@ bool Image::SaveDDS(const String& fileName) const
         }
         else
         {
+
+            dest->Write((void*)"DDS ", 4);
+            dest->Write((void*)&sdesc, sizeof(sdesc));
+
             bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
 
             if (!success)
