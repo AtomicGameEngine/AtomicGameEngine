@@ -146,7 +146,7 @@ bool JSONFile::ParseJSON(const String& json, JSONValue& value, bool reportError)
     if (document.Parse<0>(json.CString()).HasParseError())
     {
         if (reportError)
-            LOGERROR("Could not parse JSON data from string");
+            LOGERRORF("Could not parse JSON data from string with error: %s", document.GetParseError());
 
         return false;
     }

@@ -33,8 +33,9 @@ namespace Atomic
 
 ImportConfig ImportConfig::importConfig_;
 
-bool ImportConfig::LoadAIFlagsDefaultConfig(const JSONValue& jflags)
+bool ImportConfig::LoadModelImporterConfig(const JSONValue& jModelImporterConfig)
 {
+    const JSONValue& jflags = jModelImporterConfig["aiFlagsDefault"];
     if (!jflags.IsObject())
         return false;
 
@@ -72,6 +73,20 @@ bool ImportConfig::LoadAIFlagsDefaultConfig(const JSONValue& jflags)
     return true;
 }
 
+bool ImportConfig::LoadTextureImporterConfig(const JSONValue& jTextureImporterConfig)
+{
+    for (JSONObject::ConstIterator i = jTextureImporterConfig.Begin(); i != jTextureImporterConfig.End(); ++i)
+    {
+        String key = i->first_;
+        const JSONValue& jvalue = i->second_;
+
+        if (key == "compressTextures")
+            valueMap_["tiProcess_CompressTextures"] = GetBoolValue(jvalue, false);
+    }
+
+    return true;
+}
+
 bool ImportConfig::LoadDesktopConfig(JSONValue root)
 {
     const JSONValue& jdesktop = root["desktop"];
@@ -79,10 +94,14 @@ bool ImportConfig::LoadDesktopConfig(JSONValue root)
     if (!jdesktop.IsObject())
         return false;
 
-    const JSONValue& jflags = jdesktop["aiFlagsDefault"];
-    if (jflags.IsObject())
-        LoadAIFlagsDefaultConfig(jflags);
+    const JSONValue& jModelImporterConfig = jdesktop["ModelImporter"];
+    if (jModelImporterConfig.IsObject())
+        LoadModelImporterConfig(jModelImporterConfig);
  
+    const JSONValue& jTextureImporterConfig = jdesktop["TextureImporter"];
+    if (jTextureImporterConfig.IsObject())
+        LoadTextureImporterConfig(jTextureImporterConfig);
+
     return true;
 }
 

@@ -79,6 +79,7 @@ private:
 
     void PruneOrphanedDotAssetFiles();
 
+    void ReadImportConfig();
     void Import(const String& path);
 
     bool ImportDirtyAssets();
