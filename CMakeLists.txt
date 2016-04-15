@@ -25,7 +25,7 @@ endif()
 # this is here as QtCreator is having trouble picking up #include <Atomic/*> without it
 include_directories(${CMAKE_SOURCE_DIR}/Source ${CMAKE_SOURCE_DIR}/Source/AtomicEditor/Source)
 
-set (ATOMIC_LINK_LIBRARIES Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB crunch)
+set (ATOMIC_LINK_LIBRARIES Atomic Box2D Duktape TurboBadger FreeType JO LZ4 PugiXml STB)
 
 if (NOT ATOMIC_BUILD_2D)
     add_definitions( -DATOMIC_PHYSICS -DATOMIC_3D)
