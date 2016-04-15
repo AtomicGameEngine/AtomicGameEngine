@@ -31,6 +31,7 @@
 #include "BuildEvents.h"
 #include "BuildBase.h"
 #include "ResourcePackager.h"
+#include "AssetBuildConfig.h"
 
 namespace ToolCore
 {
@@ -38,13 +39,15 @@ namespace ToolCore
 BuildBase::BuildBase(Context * context, Project* project, PlatformID platform) : Object(context),
     platformID_(platform),
     containsMDL_(false),
-    buildFailed_(false)
+    buildFailed_(false),
+    assetBuildTag_(String::EMPTY)
 {
     if (UseResourcePackager())
         resourcePackager_ = new ResourcePackager(context, this);
 
     project_ = project;
 
+    ReadAssetBuildConfig();
 }
 
 BuildBase::~BuildBase()
@@ -317,6 +320,74 @@ void BuildBase::ScanResourceDirectory(const String& resourceDir)
     }
 }
 
+void BuildBase::BuildProjectResourceEntries()
+{
+    Vector<String> fileNames;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    fileSystem->ScanDir(fileNames, project_->GetResourcePath(), "*.*", SCAN_FILES, true);
+    
+    VariantMap resourceTags;
+    AssetBuildConfig::ApplyConfig(resourceTags);
+
+    VariantMap::ConstIterator itr = resourceTags.Begin();
+
+    Vector<String> resources;
+    while (itr != resourceTags.End())
+    {
+        if (itr->first_ == assetBuildTag_)
+        {
+            resources = itr->second_.GetStringVector();
+            break;
+        }
+        itr++;
+    }
+
+    for (unsigned i = 0; i < fileNames.Size(); i++)
+    {
+        const String& filename = fileNames[i];
+
+        for (unsigned j = 0; j < resourceEntries_.Size(); j++)
+        {
+            const BuildResourceEntry* entry = resourceEntries_[j];
+
+            if (entry->packagePath_ == filename)
+            {
+                BuildWarn(ToString("Resource Path: %s already exists", filename.CString()));
+                continue;
+            }
+        }
+
+        for (auto it = resources.Begin(); it != resources.End(); ++it)
+        {
+            if (filename == (*it))
+            {
+                // TODO: Add additional filters
+                if (GetExtension(filename) == ".psd")
+                    break;
+
+                BuildResourceEntry* newEntry = new BuildResourceEntry;
+
+                // BEGIN LICENSE MANAGEMENT
+                if (GetExtension(filename) == ".mdl")
+                {
+                    containsMDL_ = true;
+                }
+                // END LICENSE MANAGEMENT
+
+                newEntry->absolutePath_ = project_->GetResourcePath() + filename;
+                newEntry->resourceDir_ = project_->GetResourcePath();
+
+                newEntry->packagePath_ = filename;
+
+                resourceEntries_.Push(newEntry);
+                resourcePackager_->AddResourceEntry(newEntry);
+
+                break;
+            }
+        }
+    }
+}
+
 void BuildBase::BuildResourceEntries()
 {
     for (unsigned i = 0; i < resourceDirs_.Size(); i++)
@@ -345,6 +416,24 @@ void BuildBase::AddResourceDir(const String& dir)
 {
     assert(!resourceDirs_.Contains(dir));
     resourceDirs_.Push(dir);
+}
+
+void BuildBase::ReadAssetBuildConfig()
+{
+    String projectPath = project_->GetProjectPath();
+    projectPath = RemoveTrailingSlash(projectPath);
+
+    String filename = projectPath + "Settings/AssetBuildConfig.json";
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (!fileSystem->FileExists(filename))
+        return;
+
+    if (AssetBuildConfig::LoadFromFile(context_, filename))
+    {
+        VariantMap assetBuildConfig;
+        AssetBuildConfig::ApplyConfig(assetBuildConfig);
+    }
 }
 
 

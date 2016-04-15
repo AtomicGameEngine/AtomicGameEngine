@@ -22,40 +22,33 @@
 
 #pragma once
 
-#include "../Core/Variant.h"
-#include "JSONValue.h"
+#include "../../Atomic/Core/Variant.h"
+#include "../../Atomic/Resource/JSONValue.h"
+#include "../../Atomic/Resource/Configuration.h"
 
 namespace Atomic
 {
 
-class Context;
+    class Context;
 
-class Configuration
-{
-public:
+    class AssetBuildConfig :
+        Configuration
+    {
 
-    bool LoadFromFile(Context* context, const String& filename);
-    bool LoadFromJSON(const String& json);
+    public:
 
-    /// Apply the configuration to a setting variant map, values that exist will not be overriden
-    void ApplyConfig(VariantMap& settings, bool overwrite = false);
+        static bool LoadFromFile(Context* context, const String& filename) { return assetBuildConfig_.Configuration::LoadFromFile(context, filename); }
+        static bool LoadFromJSON(const String& json) { return assetBuildConfig_.Configuration::LoadFromJSON(json); }
 
-    const VariantMap& GetConfig() { return valueMap_; }
+        /// Apply the configuration to a setting variant map, values that exist will not be overriden
+        static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return assetBuildConfig_.Configuration::ApplyConfig(settings, overwrite); }
 
-protected:
-    static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
-    static int GetIntValue(const JSONValue& jvalue, int defaultValue);
-    static String GetStringValue(const JSONValue& jvalue, const String& defaultValue);
-    static StringVector GetArrayValue(const JSONArray& jarray, const StringVector& defaultValue);
-    
-    virtual bool LoadDesktopConfig(JSONValue root) { return true; };
+    private:
 
-    VariantMap valueMap_;
+        virtual bool LoadDesktopConfig(JSONValue root);
+        bool LoadAssetBuildTagArray(const JSONArray& tags);
 
-private:
-    String filename_;
-};
+        static AssetBuildConfig assetBuildConfig_;
+    };
+
 }
-
-
-

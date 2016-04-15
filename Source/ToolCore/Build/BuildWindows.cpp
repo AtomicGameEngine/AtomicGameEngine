@@ -53,19 +53,23 @@ void BuildWindows::Initialize()
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
-    String projectResources = project->GetResourcePath();
+    
 
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
         AddResourceDir(defaultResourcePaths[i]);
     }
-
-    // TODO: smart filtering of cache
     AddResourceDir(project->GetProjectPath() + "Cache/");
-    AddResourceDir(projectResources);
-
     BuildResourceEntries();
 
+    String projectResources = project->GetResourcePath();
+    BuildProjectResourceEntries();
+    
+
+    // TODO: smart filtering of cache
+    
+    //AddResourceDir(projectResources);
+    //BuildResourceEntries();
 }
 
 void BuildWindows::BuildAtomicNET()

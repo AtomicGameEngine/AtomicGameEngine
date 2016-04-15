@@ -64,6 +64,10 @@ public:
     /// Converts subprocess output event to a buildoutput event
     void HandleSubprocessOutputEvent(StringHash eventType, VariantMap& eventData);
 
+    /// Asset build tag used by the assetbuildconfig.json file to identify the assets to that should be include
+    /// in the build. If no tag is specified, then all resources are included.
+    void SetAssetBuildTag(const String assetBuildTag) { assetBuildTag_ = assetBuildTag; }
+
 protected:
 
     bool BuildClean(const String& path);
@@ -75,6 +79,7 @@ protected:
     void GenerateResourcePackage(const String& resourcePackagePath);
 
     void BuildResourceEntries();
+    void BuildProjectResourceEntries();
 
     void GetDefaultResourcePaths(Vector<String>& paths);
     String GetSettingsDirectory();
@@ -84,6 +89,8 @@ protected:
 
     bool containsMDL_;
     bool buildFailed_;
+
+    String assetBuildTag_;
 
 private:
 
@@ -98,6 +105,8 @@ private:
     SharedPtr<Project> project_;
     SharedPtr<ResourcePackager> resourcePackager_;
     Vector<String> resourceDirs_;
+
+    void ReadAssetBuildConfig();
 
 };
 

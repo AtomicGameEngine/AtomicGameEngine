@@ -62,6 +62,19 @@ namespace Atomic
         return value;
     }
 
+    StringVector Configuration::GetArrayValue(const JSONArray & jarray, const StringVector & defaultValue)
+    {
+        StringVector value;
+
+        for (auto it = jarray.Begin(); it != jarray.End(); it++)
+        {
+            if (it->IsString())
+            {
+                value.Push(it->GetString());
+            }
+        }
+        return value;
+    }
 
     bool Configuration::LoadFromFile(Context *context, const String& filename)
     {
