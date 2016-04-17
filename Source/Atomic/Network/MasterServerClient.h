@@ -26,9 +26,15 @@ public:
     void Update(float timeStep);
 
     bool ConnectToMaster(const String& address, unsigned short port);
+    void SendMessageToMasterServer(const String& message);
 
 private:
     void HandleMasterServerMessage(const String& msg);
+
+    bool isConnectingUDP_;
+    float udpTimeout_;
+    float udpConnectionSecondsRemaining_;
+    float udpSecondsTillRetry_;
 
     bool readingMasterMessageLength;
     uint32_t bytesRemainingInMasterServerMessage_;
@@ -37,6 +43,13 @@ private:
     kNet::EndPoint masterEndPoint_;
     kNet::Socket* masterUDPConnection_;
     kNet::Socket* masterTCPConnection_;
+
+    bool isTCPConnected;
+    bool isUDPConnected;
+
+    String masterServerConnectionId_;
+
+    void ConnectUDP(float dt);
 };
 
 }

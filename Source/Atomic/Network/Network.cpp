@@ -607,7 +607,7 @@ void Network::ConfigureNetworkSimulator()
 
 bool Network::ConnectToMaster(const String& address, unsigned short port)
 {
-    masterServerClient_.ConnectToMaster(address, port);
+    return masterServerClient_.ConnectToMaster(address, port);
 }
 
 void RegisterNetworkLibrary(Context* context)

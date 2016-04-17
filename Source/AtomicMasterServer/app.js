@@ -7,7 +7,79 @@ var _ = require('lodash');
 
 var messageEventEmitter = new events.EventEmitter();
 
-var registeredServers = [];
+var connections = [];
+
+function writeMessageToSocket(sock, msgObj) {
+    var msg = JSON.stringify(msgObj);
+
+    var len = msg.length;
+
+    console.log("Writing message to socket: "+sock+", "+msg);
+
+    sock.write(len.toString());
+    sock.write(':');
+    sock.write(msg);
+}
+
+function handleServerTCPMessage(socket, msgObj) {
+    console.log('Processing TCP message: ' + JSON.stringify(msgObj));
+
+    if (msgObj.cmd === 'connectRequest') {
+        var connectionId = uuid.v4();
+
+        var connectionObj = {
+            connectionId: connectionId,
+            internalIP: msgObj.internalIP,
+            internalPort: msgObj.internalPort,
+            externalIP: socket.remoteAddress,
+            externalTCPPort: socket.remotePort,
+            tcpSocket: socket
+        };
+
+        connections.push(connectionObj);
+
+        // Send the uuid back to the game server
+        var registerSuccessMessage = {
+            cmd: 'connectTCPSuccess',
+            id: connectionId
+        };
+
+        writeMessageToSocket(socket, registerSuccessMessage);
+
+        console.log('Registered connection from IP:' + connectionObj.externalIP);
+    } else {
+        console.log('Unable to process message: ' + msg)
+    }
+}
+
+function handleServerUDPMessage(rinfo, msgObj) {
+    console.log('Processing UDP message: ' + JSON.stringify(msgObj));
+
+    if (msgObj.cmd === 'registerUDPPort') {
+        var connectionId = msgObj.id;
+
+        var connectionObj = _.find(connections, { connectionId: connectionId });
+
+        if (!connectionObj) {
+            console.error('No server found for id: '+connectionId);
+            return;
+        }
+
+        // Save the UDP port
+        connectionObj.remoteUDPPort = rinfo.port;
+
+        // Send the success message
+        var udpPortMessage = {
+            cmd: 'connectUDPSuccess'
+        };
+
+        writeMessageToSocket(connectionObj.tcpSocket, udpPortMessage);
+
+        console.log('Got udp port from IP:' + connectionObj.externalIP);
+    } else {
+        console.log('Unable to process message: ' + msg)
+    }
+}
 
 // Set up UDP
 server.on('error', function(err) {
@@ -18,7 +90,14 @@ server.on('error', function(err) {
 server.on('message', function (msg, rinfo) {
     console.log('Received %d bytes from %s:%d\n', msg.length, rinfo.address, rinfo.port);
 
-    console.log(msg);
+    try {
+        var msgObj = JSON.parse(msg);
+        handleServerUDPMessage(rinfo, msgObj);
+    } catch (err) {
+        console.error(err);
+        console.error(err.stack);
+        console.log('Unable to parse JSON from UDP: ' + message)
+    }
 });
 
 server.on('listening', function () {
@@ -27,18 +106,6 @@ server.on('listening', function () {
 });
 
 server.bind(41234);
-
-
-function writeMessageToSocket(sock, msgObj) {
-    var msg = JSON.stringify(msgObj);
-    
-    var len = msg.length;
-
-    sock.write(len.toString());
-    sock.write(':');
-    sock.write(msg);
-}
-
 
 // Set up TCP
 console.log('Setting up tcp');
@@ -90,40 +157,11 @@ tcpServer.on('connection', function(sock) {
     });
 });
 
-function handleServerMessage(socket, msgObj) {
-    console.log('Processing message: ' + JSON.stringify(msgObj));
-
-    if (msgObj.cmd === 'registerGameServer') {
-        var serverId = uuid.v4();
-
-        var gameServerObj = {
-            serverId: serverId,
-            internalIP: msgObj.internalIP,
-            internalPort: msgObj.internalPort,
-            externalIP: socket.remoteAddress,
-            externalTCPPort: socket.remotePort
-        };
-
-        registeredServers.push(gameServerObj);
-
-        // Send the uuid back to the game server
-        var registerSuccessMessage = {
-            cmd: 'registerSuccess',
-            id: serverId
-        };
-
-        writeMessageToSocket(socket, registerSuccessMessage);
-
-        console.log('Registered game server on IP:' + gameServerObj.externalIP);
-    } else {
-        console.log('Unable to process message: ' + msg)
-    }
-}
 
 messageEventEmitter.addListener('msg', function(socket, message) {
     try {
         var msgObj = JSON.parse(message);
-        handleServerMessage(socket, msgObj);
+        handleServerTCPMessage(socket, msgObj);
     } catch (err) {
         console.error(err);
         console.error(err.stack);

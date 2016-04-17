@@ -11,12 +11,20 @@
 #include "../Network/Network.h"
 #include "../Core/Profiler.h"
 
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/prettywriter.h>
+
 namespace Atomic
 {
 
 MasterServerClient::MasterServerClient(Context *context) :
         readingMasterMessageLength(true),
-        Object(context)
+        Object(context),
+        udpTimeout_(5.0f),
+        udpSecondsTillRetry_(0.5f),
+        isTCPConnected(false),
+        isUDPConnected(false)
 {
 
 }
@@ -50,13 +58,18 @@ bool MasterServerClient::ConnectToMaster(const String &address, unsigned short p
                                             listenSocket->LocalEndPoint(),
                                             listenSocket->LocalAddress(), masterEndPoint_, "",
                                             kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
+
     masterTCPConnection_ = kNetNetwork->ConnectSocket(address.CString(), port, kNet::SocketOverTCP);
 
-    String msg = "{\"cmd\":\"registerGameServer\"}";
-    String netString = String(msg.Length()) + ':' + msg;
-    masterTCPConnection_->Send(netString.CString(), netString.Length());
+    SendMessageToMasterServer("{ \"cmd\": \"connectRequest\" }");
 
     return true;
+}
+
+void MasterServerClient::SendMessageToMasterServer(const String& msg)
+{
+    String netString = String(msg.Length()) + ':' + msg;
+    masterTCPConnection_->Send(netString.CString(), netString.Length());
 }
 
 void MasterServerClient::Update(float dt) {
@@ -65,19 +78,20 @@ void MasterServerClient::Update(float dt) {
         kNet::OverlappedTransferBuffer *buf = masterTCPConnection_->BeginReceive();
 
         if (buf && buf->bytesContains > 0) {
-            String tmp(buf->buffer.buf);
 
             int n = 0;
-            int totalBytes = tmp.Length();
+            int totalBytes = buf->bytesContains;
 
             while (n < totalBytes) {
-                char c = tmp[n++];
+                char c = buf->buffer.buf[n++];
 
                 // Are we still reading in the length?
                 if (readingMasterMessageLength) {
                     if (c == ':') {
                         sscanf(masterMessageLengthStr.CString(), "%" SCNd32, &bytesRemainingInMasterServerMessage_);
                         readingMasterMessageLength = false;
+
+                        LOGINFO("Message is "+String(bytesRemainingInMasterServerMessage_)+" long");
                     }
                     else {
                         masterMessageLengthStr += c;
@@ -102,10 +116,70 @@ void MasterServerClient::Update(float dt) {
             masterTCPConnection_->EndReceive(buf);
         }
     }
+
+    if (isConnectingUDP_)
+    {
+        ConnectUDP(dt);
+    }
 }
 
-void MasterServerClient::HandleMasterServerMessage(const String &msg) {
+void MasterServerClient::ConnectUDP(float dt)
+{
+    if (udpConnectionSecondsRemaining_ <= 0)
+    {
+        isConnectingUDP_ = false;
+
+        // TODO - emit error event
+
+        return;
+    }
+
+    if (udpSecondsTillRetry_ <= 0)
+    {
+        String msg = "{ \"cmd\": \"registerUDPPort\", \"id\": \"" + masterServerConnectionId_ + "\"}";
+
+        masterUDPConnection_->Send(msg.CString(), msg.Length());
+        udpSecondsTillRetry_ = 0.5;
+    }
+    else
+    {
+        udpSecondsTillRetry_ -= dt;
+        udpConnectionSecondsRemaining_ -= dt;
+    }
+}
+
+void MasterServerClient::HandleMasterServerMessage(const String &msg)
+{
     LOGINFO("Got master server message: " + msg);
+
+    rapidjson::Document document;
+    if (document.Parse<0>(msg.CString()).HasParseError())
+    {
+        LOGERROR("Could not parse JSON data from string");
+        return;
+    }
+
+    String cmd = document["cmd"].GetString();
+
+    if (cmd == "connectTCPSuccess")
+    {
+        isTCPConnected = true;
+        isConnectingUDP_ = true;
+        udpSecondsTillRetry_ = 0;
+        udpConnectionSecondsRemaining_ = 5.0;
+        masterServerConnectionId_ = document["id"].GetString();
+
+        LOGINFO("TCP Connected");
+    }
+    if (cmd == "connectUDPSuccess")
+    {
+        isUDPConnected = true;
+        isConnectingUDP_ = false;
+
+        LOGINFO("UDP Connected");
+
+        // TODO - emit success event
+    }
 }
 
 
