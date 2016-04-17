@@ -26,6 +26,7 @@
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
+#include "../Network/MasterServerClient.h"
 
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
@@ -140,6 +141,8 @@ public:
     /// Send outgoing messages after frame logic. Called by HandleRenderUpdate.
     void PostUpdate(float timeStep);
 
+    kNet::Network* GetKnetNetwork() { return network_; }
+
 private:
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
@@ -178,17 +181,8 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
-
-    void HandleMasterServerMessage(const String& msg);
-
-
-    bool readingMasterMessageLength;
-    uint32_t bytesRemainingInMasterServerMessage_;
-    String masterMessageLengthStr;
-    String masterMessageStr;
-    kNet::EndPoint masterEndPoint_;
-    kNet::Socket* masterUDPConnection_;
-    kNet::Socket* masterTCPConnection_;
+    // MasterServerClient
+    MasterServerClient masterServerClient_;
 };
 
 /// Register Network library objects.

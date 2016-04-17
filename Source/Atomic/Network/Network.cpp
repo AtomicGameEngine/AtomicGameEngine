@@ -39,7 +39,6 @@
 #include "../Scene/Scene.h"
 
 #include <kNet/include/kNet.h>
-#include <vector>
 
 #include "../DebugNew.h"
 
@@ -55,7 +54,7 @@ Network::Network(Context* context) :
     simulatedPacketLoss_(0.0f),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
     updateAcc_(0.0f),
-    readingMasterMessageLength(true)
+    masterServerClient_(context)
 {
     network_ = new kNet::Network();
 
@@ -239,33 +238,6 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
         SendEvent(E_CONNECTFAILED);
         return false;
     }
-}
-
-bool Network::ConnectToMaster(const String& address, unsigned short port)
-{
-    PROFILE(ConnectToMaster);
-
-    sscanf(address.CString(), "%hu.%hu.%hu.%hu",
-           (unsigned short*) &masterEndPoint_.ip[0],
-           (unsigned short*) &masterEndPoint_.ip[1],
-           (unsigned short*) &masterEndPoint_.ip[2],
-           (unsigned short*) &masterEndPoint_.ip[3]);
-
-    masterEndPoint_.port = port;
-
-    std::vector<kNet::Socket *> listenSockets = network_->GetServer()->ListenSockets();
-
-    kNet::Socket* listenSocket = listenSockets[0];
-
-    // Create a UDP and a TCP connection to the master server
-    // UDP connection re-uses the same udp port we are listening on for the sever
-    masterUDPConnection_ = new kNet::Socket(listenSocket->GetSocketHandle(),
-                                           listenSocket->LocalEndPoint(),
-                                           listenSocket->LocalAddress(), masterEndPoint_, "",
-                                           kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
-    masterTCPConnection_ = network_->ConnectSocket(address.CString(),port,kNet::SocketOverTCP);
-
-    return true;
 }
 
 void Network::Disconnect(int waitMSec)
@@ -510,61 +482,12 @@ void Network::Update(float timeStep)
             OnServerDisconnected();
     }
 
-    // Check for messages from master
-    // TODO - move this into a separate class?
-    if (masterTCPConnection_) {
-        kNet::OverlappedTransferBuffer* buf = masterTCPConnection_->BeginReceive();
-
-        if (buf && buf->bytesContains>0)
-        {
-            String tmp(buf->buffer.buf);
-
-            int n=0;
-            int totalBytes = tmp.Length();
-
-            while (n<totalBytes)
-            {
-                char c = tmp[n++];
-
-                // Are we still reading in the length?
-                if (readingMasterMessageLength)
-                {
-                    if (c == ':')
-                    {
-                        sscanf(masterMessageLengthStr.CString(), "%" SCNd32, &bytesRemainingInMasterServerMessage_);
-                        readingMasterMessageLength = false;
-                    }
-                    else
-                    {
-                        masterMessageLengthStr+=c;
-                    }
-                }
-                else
-                {
-                    // Are we reading in the string?
-
-                    masterMessageStr+=c;
-                    bytesRemainingInMasterServerMessage_--;
-
-                    // Did we hit the end of the string?
-                    if (bytesRemainingInMasterServerMessage_==0)
-                    {
-                        HandleMasterServerMessage(masterMessageStr);
-                        readingMasterMessageLength = true;
-                        masterMessageLengthStr="";
-                        masterMessageStr="";
-                    }
-                }
-            }
-
-            masterTCPConnection_->EndReceive(buf);
-        }
-    }
-
     // Process the network server if started
     kNet::SharedPtr<kNet::NetworkServer> server = network_->GetServer();
     if (server)
         server->Process();
+
+    masterServerClient_.Update(timeStep);
 }
 
 void Network::PostUpdate(float timeStep)
@@ -682,13 +605,14 @@ void Network::ConfigureNetworkSimulator()
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }
 
+bool Network::ConnectToMaster(const String& address, unsigned short port)
+{
+    masterServerClient_.ConnectToMaster(address, port);
+}
+
 void RegisterNetworkLibrary(Context* context)
 {
     NetworkPriority::RegisterObject(context);
 }
 
-void Network::HandleMasterServerMessage(const String& msg)
-{
-    LOGINFO("Got master server message: "+msg);
-}
 }
