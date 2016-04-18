@@ -49,9 +49,14 @@ function handleServerTCPMessage(socket, msgObj) {
 
         console.log('Registered connection from IP:' + connectionObj.externalIP);
     } else if (msgObj.cmd === 'getServerList' ) {
+
+        var servers = _.map(serverList, function (item) {
+            return _.pick(item, ['connectionId', 'internalIP', 'internalPort', 'externalIP', 'externalUDPPort']);
+        })
+
         var response = {
             cmd: 'serverList',
-            servers: JSON.stringify(serverList)
+            servers: JSON.stringify(servers)
         }
 
         writeMessageToSocket(socket, response);
@@ -89,7 +94,7 @@ function handleServerUDPMessage(rinfo, msgObj) {
         }
 
         // Save the UDP port
-        connectionObj.remoteUDPPort = rinfo.port;
+        connectionObj.externalUDPPort = rinfo.port;
 
         // Send the success message
         var udpPortMessage = {
@@ -98,7 +103,7 @@ function handleServerUDPMessage(rinfo, msgObj) {
 
         writeMessageToSocket(connectionObj.tcpSocket, udpPortMessage);
 
-        console.log('Got udp port from IP:' + connectionObj.externalIP);
+        console.log('Got udp port:' + connectionObj.externalUDPPort);
     } else {
         console.log('Unable to process message: ' + msg)
     }

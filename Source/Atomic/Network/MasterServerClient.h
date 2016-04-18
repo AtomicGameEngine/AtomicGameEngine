@@ -35,9 +35,9 @@ public:
     void Update(float timeStep);
 
     void ConnectToMaster(const String& address, unsigned short port);
-    void RequestMasterIntroductionToServer(const String& serverId);
     void RequestServerListFromMaster();
     void RegisterServerWithMaster(const String& serverName);
+    void ConnectToServerViaMaster(const String& serverId);
 
 private:
     void SendMessageToMasterServer(const String& message);

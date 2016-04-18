@@ -615,9 +615,9 @@ void Network::RequestServerListFromMaster()
     masterServerClient_.RequestServerListFromMaster();
 }
 
-void Network::RequestMasterIntroductionToServer(const String &serverId)
+void Network::ConnectToServerViaMaster(const String &serverId)
 {
-    masterServerClient_.RequestMasterIntroductionToServer(serverId);
+    masterServerClient_.ConnectToServerViaMaster(serverId);
 }
 
 void Network::RegisterServerWithMaster(const String& name)

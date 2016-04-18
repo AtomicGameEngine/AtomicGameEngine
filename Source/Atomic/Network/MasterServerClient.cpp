@@ -20,12 +20,14 @@ namespace Atomic
 {
 
 MasterServerClient::MasterServerClient(Context *context) :
+
         readingMasterMessageLength(true),
         Object(context),
         udpTimeout_(5.0f),
         udpSecondsTillRetry_(0.5f),
         isTCPConnected(false),
-        isUDPConnected(false)
+        isUDPConnected(false),
+        masterTCPConnection_(NULL)
 {
 
 }
@@ -50,16 +52,25 @@ void MasterServerClient::ConnectToMaster(const String &address, unsigned short p
     Atomic::Network* network = GetSubsystem<Network>();
     kNet::Network* kNetNetwork = network->GetKnetNetwork();
 
-    std::vector < kNet::Socket * > listenSockets = kNetNetwork->GetServer()->ListenSockets();
+    kNet::NetworkServer* server = kNetNetwork->GetServer().ptr();
 
-    kNet::Socket *listenSocket = listenSockets[0];
+    if (server)
+    {
+        std::vector < kNet::Socket * > listenSockets = kNetNetwork->GetServer()->ListenSockets();
 
-    // Create a UDP and a TCP connection to the master server
-    // UDP connection re-uses the same udp port we are listening on for the sever
-    masterUDPConnection_ = new kNet::Socket(listenSocket->GetSocketHandle(),
-                                            listenSocket->LocalEndPoint(),
-                                            listenSocket->LocalAddress(), masterEndPoint_, "",
-                                            kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
+        kNet::Socket *listenSocket = listenSockets[0];
+
+        // Create a UDP and a TCP connection to the master server
+        // UDP connection re-uses the same udp port we are listening on for the sever
+        masterUDPConnection_ = new kNet::Socket(listenSocket->GetSocketHandle(),
+                                                listenSocket->LocalEndPoint(),
+                                                listenSocket->LocalAddress(), masterEndPoint_, "",
+                                                kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
+    }
+    else
+    {
+        masterUDPConnection_ = kNetNetwork->ConnectSocket(address.CString(),port,kNet::SocketOverUDP);
+    }
 
     masterTCPConnection_ = kNetNetwork->ConnectSocket(address.CString(), port, kNet::SocketOverTCP);
 
@@ -71,7 +82,7 @@ void MasterServerClient::RequestServerListFromMaster()
     SendMessageToMasterServer("{ \"cmd\": \"getServerList\" }");
 }
 
-void MasterServerClient::RequestMasterIntroductionToServer(const String &serverId)
+void MasterServerClient::ConnectToServerViaMaster(const String &serverId)
 {
     SendMessageToMasterServer("{ \"cmd\": \"requestIntroduction\", \"id:\"" + serverId +" \"}");
 }
