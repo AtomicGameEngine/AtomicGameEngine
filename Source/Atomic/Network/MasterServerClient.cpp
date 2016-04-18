@@ -10,6 +10,7 @@
 #include "../Network/NetworkPriority.h"
 #include "../Network/Network.h"
 #include "../Core/Profiler.h"
+#include "../Network/NetworkEvents.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -34,9 +35,10 @@ MasterServerClient::~MasterServerClient()
 
 }
 
-bool MasterServerClient::ConnectToMaster(const String &address, unsigned short port) {
+void MasterServerClient::ConnectToMaster(const String &address, unsigned short port) {
     PROFILE(ConnectToMaster);
 
+    // TODO - support dns names too
     sscanf(address.CString(), "%hu.%hu.%hu.%hu",
            (unsigned short *) &masterEndPoint_.ip[0],
            (unsigned short *) &masterEndPoint_.ip[1],
@@ -62,59 +64,80 @@ bool MasterServerClient::ConnectToMaster(const String &address, unsigned short p
     masterTCPConnection_ = kNetNetwork->ConnectSocket(address.CString(), port, kNet::SocketOverTCP);
 
     SendMessageToMasterServer("{ \"cmd\": \"connectRequest\" }");
-
-    return true;
 }
 
-void MasterServerClient::SendMessageToMasterServer(const String& msg)
+void MasterServerClient::RequestServerListFromMaster()
+{
+    SendMessageToMasterServer("{ \"cmd\": \"getServerList\" }");
+}
+
+void MasterServerClient::RequestMasterIntroductionToServer(const String &serverId)
+{
+    SendMessageToMasterServer("{ \"cmd\": \"requestIntroduction\", \"id:\"" + serverId +" \"}");
+}
+
+void MasterServerClient::RegisterServerWithMaster(const String &name)
+{
+    String msg = String("{") +
+                 String("\"cmd\":") + String("\"registerServer\",") +
+                 String("\"id\":\"") + masterServerConnectionId_ + String("\", ") +
+                 String("\"serverName\":\"") + name + String("\"") +
+                 String("}");
+
+    SendMessageToMasterServer(msg);
+}
+
+    void MasterServerClient::SendMessageToMasterServer(const String& msg)
 {
     String netString = String(msg.Length()) + ':' + msg;
     masterTCPConnection_->Send(netString.CString(), netString.Length());
 }
 
 void MasterServerClient::Update(float dt) {
-    // Check for messages from master
-    if (masterTCPConnection_) {
-        kNet::OverlappedTransferBuffer *buf = masterTCPConnection_->BeginReceive();
+    if (masterTCPConnection_==NULL)
+    {
+        return;
+    }
 
-        if (buf && buf->bytesContains > 0) {
+    kNet::OverlappedTransferBuffer *buf = masterTCPConnection_->BeginReceive();
 
-            int n = 0;
-            int totalBytes = buf->bytesContains;
+    if (buf && buf->bytesContains > 0) {
 
-            while (n < totalBytes) {
-                char c = buf->buffer.buf[n++];
+        int n = 0;
+        int totalBytes = buf->bytesContains;
 
-                // Are we still reading in the length?
-                if (readingMasterMessageLength) {
-                    if (c == ':') {
-                        sscanf(masterMessageLengthStr.CString(), "%" SCNd32, &bytesRemainingInMasterServerMessage_);
-                        readingMasterMessageLength = false;
+        while (n < totalBytes) {
+            char c = buf->buffer.buf[n++];
 
-                        LOGINFO("Message is "+String(bytesRemainingInMasterServerMessage_)+" long");
-                    }
-                    else {
-                        masterMessageLengthStr += c;
-                    }
+            // Are we still reading in the length?
+            if (readingMasterMessageLength) {
+                if (c == ':') {
+                    sscanf(masterMessageLengthStr.CString(), "%" SCNd32, &bytesRemainingInMasterServerMessage_);
+                    readingMasterMessageLength = false;
+
+                    LOGINFO("Message is "+String(bytesRemainingInMasterServerMessage_)+" long");
                 }
                 else {
-                    // Are we reading in the string?
-
-                    masterMessageStr += c;
-                    bytesRemainingInMasterServerMessage_--;
-
-                    // Did we hit the end of the string?
-                    if (bytesRemainingInMasterServerMessage_ == 0) {
-                        HandleMasterServerMessage(masterMessageStr);
-                        readingMasterMessageLength = true;
-                        masterMessageLengthStr = "";
-                        masterMessageStr = "";
-                    }
+                    masterMessageLengthStr += c;
                 }
             }
+            else {
+                // Are we reading in the string?
 
-            masterTCPConnection_->EndReceive(buf);
+                masterMessageStr += c;
+                bytesRemainingInMasterServerMessage_--;
+
+                // Did we hit the end of the string?
+                if (bytesRemainingInMasterServerMessage_ == 0) {
+                    HandleMasterServerMessage(masterMessageStr);
+                    readingMasterMessageLength = true;
+                    masterMessageLengthStr = "";
+                    masterMessageStr = "";
+                }
+            }
         }
+
+        masterTCPConnection_->EndReceive(buf);
     }
 
     if (isConnectingUDP_)
@@ -171,14 +194,23 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
 
         LOGINFO("TCP Connected");
     }
-    if (cmd == "connectUDPSuccess")
+    else if (cmd == "connectUDPSuccess")
     {
         isUDPConnected = true;
         isConnectingUDP_ = false;
 
         LOGINFO("UDP Connected");
 
-        // TODO - emit success event
+        SendEvent(E_MASTERCONNECTIONREADY);
+    }
+    else
+    {
+        // If message was not handled internally, forward as an event
+        using namespace NetworkMessage;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_DATA] = msg;
+        SendEvent(E_MASTERMESSAGE, eventData);
     }
 }
 

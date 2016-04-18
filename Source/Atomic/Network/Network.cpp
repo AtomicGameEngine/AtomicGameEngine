@@ -605,9 +605,24 @@ void Network::ConfigureNetworkSimulator()
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }
 
-bool Network::ConnectToMaster(const String& address, unsigned short port)
+void Network::ConnectToMaster(const String& address, unsigned short port)
 {
-    return masterServerClient_.ConnectToMaster(address, port);
+    masterServerClient_.ConnectToMaster(address, port);
+}
+
+void Network::RequestServerListFromMaster()
+{
+    masterServerClient_.RequestServerListFromMaster();
+}
+
+void Network::RequestMasterIntroductionToServer(const String &serverId)
+{
+    masterServerClient_.RequestMasterIntroductionToServer(serverId);
+}
+
+void Network::RegisterServerWithMaster(const String& name)
+{
+    masterServerClient_.RegisterServerWithMaster(name);
 }
 
 void RegisterNetworkLibrary(Context* context)

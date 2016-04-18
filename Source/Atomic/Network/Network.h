@@ -71,7 +71,10 @@ public:
 
     bool ConnectSimple(const String& address, unsigned short port, Scene* scene);
 
-    bool ConnectToMaster(const String& address, unsigned short port);
+    void ConnectToMaster(const String& address, unsigned short port);
+    void RegisterServerWithMaster(const String& name);
+    void RequestMasterIntroductionToServer(const String& serverId);
+    void RequestServerListFromMaster();
 
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);

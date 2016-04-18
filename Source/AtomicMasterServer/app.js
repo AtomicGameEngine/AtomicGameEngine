@@ -8,6 +8,7 @@ var _ = require('lodash');
 var messageEventEmitter = new events.EventEmitter();
 
 var connections = [];
+var serverList = [];
 
 function writeMessageToSocket(sock, msgObj) {
     var msg = JSON.stringify(msgObj);
@@ -47,6 +48,28 @@ function handleServerTCPMessage(socket, msgObj) {
         writeMessageToSocket(socket, registerSuccessMessage);
 
         console.log('Registered connection from IP:' + connectionObj.externalIP);
+    } else if (msgObj.cmd === 'getServerList' ) {
+        var response = {
+            cmd: 'serverList',
+            servers: JSON.stringify(serverList)
+        }
+
+        writeMessageToSocket(socket, response);
+    } else if (msgObj.cmd === 'registerServer' ) {
+        var connectionInfo = _.find(connections, { connectionId: msgObj.id });
+
+        if (!connectionInfo) {
+            console.error("No server found: " + msgObj.id);
+        }
+
+        var serverInfo = _.clone(connectionInfo);
+        serverInfo.serverName = msgObj.serverName;
+
+        serverList.push(serverInfo);
+
+        console.log('Registered server: ' + serverInfo.serverName);
+    } else if (msgObj.cmd === 'requestIntroduction' ) {
+
     } else {
         console.log('Unable to process message: ' + msg)
     }

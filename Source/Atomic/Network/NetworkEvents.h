@@ -97,4 +97,14 @@ EVENT(E_REMOTEEVENTDATA, RemoteEventData)
     PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
+/// Master server connection ready
+EVENT(E_MASTERCONNECTIONREADY, MasterConnectionReady)
+{
+}
+
+/// Unhandled master message received.
+EVENT(E_MASTERMESSAGE, MasterServerMessage)
+{
+    PARAM(P_DATA, Data);                    // Buffer
+}
 }

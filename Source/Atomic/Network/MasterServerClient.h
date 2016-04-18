@@ -10,6 +10,15 @@
 
 namespace Atomic
 {
+class ATOMIC_API MasterServerEntry : public Object
+{
+    OBJECT(MasterServerEntry);
+
+public:
+    MasterServerEntry(Context* context);
+
+    String serverId;
+};
 
 /// %MasterServerClient subsystem.
 class ATOMIC_API MasterServerClient : public Object
@@ -25,10 +34,13 @@ public:
     /// Process messages
     void Update(float timeStep);
 
-    bool ConnectToMaster(const String& address, unsigned short port);
-    void SendMessageToMasterServer(const String& message);
+    void ConnectToMaster(const String& address, unsigned short port);
+    void RequestMasterIntroductionToServer(const String& serverId);
+    void RequestServerListFromMaster();
+    void RegisterServerWithMaster(const String& serverName);
 
 private:
+    void SendMessageToMasterServer(const String& message);
     void HandleMasterServerMessage(const String& msg);
 
     bool isConnectingUDP_;
