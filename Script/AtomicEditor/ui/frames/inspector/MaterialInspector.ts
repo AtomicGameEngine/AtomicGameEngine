@@ -51,6 +51,8 @@ var lightmapSource = new Atomic.UIMenuItemSource();
 lightmapSource.addItem(new Atomic.UIMenuItem("Lightmap", "Lightmap"));
 lightmapSource.addItem(new Atomic.UIMenuItem("Lightmap Alpha", "Lightmap Alpha"));
 
+var projectSource = new Atomic.UIMenuItemSource();
+
 var _ = new Atomic.UIMenuItem("Solid");
 _.subSource = solidSource;
 techniqueSource.addItem(_);
@@ -61,6 +63,10 @@ techniqueSource.addItem(_);
 
 _ = new Atomic.UIMenuItem("Lightmap");
 _.subSource = lightmapSource;
+techniqueSource.addItem(_);
+
+_ = new Atomic.UIMenuItem("Project");
+_.subSource = projectSource;
 techniqueSource.addItem(_);
 
 var techniqueLookup = {
@@ -79,6 +85,8 @@ var techniqueLookup = {
 };
 
 var techniqueReverseLookup = {};
+
+var projectTechniques = {};
 
 for (var key in techniqueLookup) {
 
@@ -144,11 +152,11 @@ class MaterialInspector extends ScriptWidget {
             field.id = params[i].name;
             field.text = params[i].valueString;
 
-            field.subscribeToEvent(field, "WidgetEvent", function(ev: Atomic.UIWidgetEvent) {
+            field.subscribeToEvent(field, "WidgetEvent", function (ev: Atomic.UIWidgetEvent) {
 
                 if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
 
-                    var field = <Atomic.UIEditField> ev.target;
+                    var field = <Atomic.UIEditField>ev.target;
                     this.material.setShaderParameter(field.id, field.text);
 
                 }
@@ -181,7 +189,7 @@ class MaterialInspector extends ScriptWidget {
         var thumbnail = asset.cachePath + "_thumbnail.png";
         var cache = Atomic.getResourceCache();
 
-        var thumb = <Atomic.Texture2D> cache.getTempResource("Texture2D", thumbnail);
+        var thumb = <Atomic.Texture2D>cache.getTempResource("Texture2D", thumbnail);
 
         if (thumb)
             return thumb;
@@ -195,17 +203,22 @@ class MaterialInspector extends ScriptWidget {
         this.techniqueButton.text = techniqueName;
 
         var cache = Atomic.getResourceCache();
-        var technique = <Atomic.Technique> cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
-        this.material.setTechnique(0, technique);
+        var technique = <Atomic.Technique>cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
 
+        if (technique == null)
+            technique = <Atomic.Technique>cache.getResource("Technique", techniqueName + ".xml");
+
+        this.material.setTechnique(0, technique);
     }
 
     createTechniquePopup(): Atomic.UIWidget {
 
+        this.loadProjectTechniques();
+
         var button = this.techniqueButton = new Atomic.UIButton();
         var technique = this.material.getTechnique(0);
 
-        button.text = techniqueLookup[technique.name];
+        button.text = technique.name;
 
         button.fontDescription = this.fd;
 
@@ -213,14 +226,14 @@ class MaterialInspector extends ScriptWidget {
         lp.width = 140;
         button.layoutParams = lp;
 
-        button.onClick = function() {
+        button.onClick = function () {
 
             var menu = new Atomic.UIMenuWindow(button, "technique popup");
 
             menu.fontDescription = this.fd;
             menu.show(techniqueSource);
 
-            button.subscribeToEvent(button, "WidgetEvent", function(ev: Atomic.UIWidgetEvent) {
+            button.subscribeToEvent(button, "WidgetEvent", function (ev: Atomic.UIWidgetEvent) {
 
                 if (ev.type != Atomic.UI_EVENT_TYPE_CLICK)
                     return;
@@ -245,7 +258,7 @@ class MaterialInspector extends ScriptWidget {
 
         if (dragObject.object && dragObject.object.typeName == "Asset") {
 
-            var asset = <ToolCore.Asset> dragObject.object;
+            var asset = <ToolCore.Asset>dragObject.object;
 
             if (asset.importerTypeName == importerTypeName) {
                 return asset.importer;
@@ -277,8 +290,8 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
-     // Big Texture Button(referenced texture file path in project frame)
-    createTextureButtonCallback(textureUnit:number, textureWidget:Atomic.UITextureWidget) {
+    // Big Texture Button(referenced texture file path in project frame)
+    createTextureButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
         return () => {
 
@@ -290,13 +303,13 @@ class MaterialInspector extends ScriptWidget {
                 this.openTextureSelectionBox(textureUnit, textureWidget);
             }
 
-        return true;
+            return true;
 
-      };
+        };
 
     }
 
-   // Small Texture Button (Opens texture selection window)
+    // Small Texture Button (Opens texture selection window)
     createTextureReferenceButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
         return () => {
@@ -310,11 +323,11 @@ class MaterialInspector extends ScriptWidget {
     //Remove Texture Button
     createTextureRemoveButtonCallback(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
-            var texture = this.material.getTexture(textureUnit);
+        var texture = this.material.getTexture(textureUnit);
 
-            if (texture != null && textureWidget != null) {
-                textureWidget.setTexture(null);
-            }
+        if (texture != null && textureWidget != null) {
+            textureWidget.setTexture(null);
+        }
 
     }
 
@@ -333,7 +346,7 @@ class MaterialInspector extends ScriptWidget {
         section.contentRoot.addChild(attrsVerticalLayout);
 
         // TODO: Filter on technique
-        var textureUnits = [ Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR, Atomic.TU_EMISSIVE ];
+        var textureUnits = [Atomic.TU_DIFFUSE, Atomic.TU_NORMAL, Atomic.TU_SPECULAR, Atomic.TU_EMISSIVE];
 
         for (var i in textureUnits) {
 
@@ -389,10 +402,10 @@ class MaterialInspector extends ScriptWidget {
 
                 if (importer) {
 
-                    var textureImporter = <ToolCore.TextureImporter> importer;
+                    var textureImporter = <ToolCore.TextureImporter>importer;
                     var asset = textureImporter.asset;
 
-                    var texture = <Atomic.Texture2D> Atomic.cache.getResource("Texture2D", asset.path);
+                    var texture = <Atomic.Texture2D>Atomic.cache.getResource("Texture2D", asset.path);
 
                     if (texture) {
 
@@ -410,9 +423,20 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
+    loadProjectTechniques() {
 
+        projectSource.clear();
+        var resourcePath = ToolCore.toolSystem.project.getResourcePath();
+        var TechniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(resourcePath + "Techniques");
+
+        for (var key in TechniqueAssets) {
+            projectTechniques[key] = TechniqueAssets[key].name;
+            projectSource.addItem(new Atomic.UIMenuItem(projectTechniques[key], projectTechniques[key]));
+        }
+    }
 
     inspect(asset: ToolCore.Asset, material: Atomic.Material) {
+        // Add folders to resource directory
 
         this.asset = asset;
         this.material = material;
@@ -499,9 +523,9 @@ class MaterialInspector extends ScriptWidget {
         button.gravity = Atomic.UI_GRAVITY_RIGHT;
         button.text = "Save";
 
-        button.onClick = function() {
+        button.onClick = function () {
 
-            var importer = <ToolCore.MaterialImporter> this.asset.getImporter();
+            var importer = <ToolCore.MaterialImporter>this.asset.getImporter();
             importer.saveMaterial();
 
         }.bind(this);

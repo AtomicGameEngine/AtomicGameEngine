@@ -98,7 +98,7 @@ class ResourceFrame extends ScriptWidget {
 
         var editor: Editor.ResourceEditor = null;
 
-        if (ext == ".js" || ext == ".txt" || ext == ".json" || ext == ".ts") {
+        if (ext == ".js" || ext == ".txt" || ext == ".json" || ext == ".ts" || ext == ".xml" || ext == ".hlsl") {
 
             editor = new Editor.JSResourceEditor(path, this.tabcontainer);
 
