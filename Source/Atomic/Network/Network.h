@@ -71,9 +71,11 @@ public:
 
     bool ConnectSimple(const String& address, unsigned short port, Scene* scene);
 
+    bool ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene);
+
     void ConnectToMaster(const String& address, unsigned short port);
     void RegisterServerWithMaster(const String& name);
-    void ConnectToServerViaMaster(const String& serverId);
+    void ConnectToServerViaMaster(const String& serverId, const String& address, unsigned short port, Scene* scene);
     void RequestServerListFromMaster();
 
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.

@@ -10,6 +10,9 @@
 
 namespace Atomic
 {
+
+class Scene;
+
 class ATOMIC_API MasterServerEntry : public Object
 {
     OBJECT(MasterServerEntry);
@@ -37,7 +40,7 @@ public:
     void ConnectToMaster(const String& address, unsigned short port);
     void RequestServerListFromMaster();
     void RegisterServerWithMaster(const String& serverName);
-    void ConnectToServerViaMaster(const String& serverId);
+    void ConnectToServerViaMaster(const String& serverId, const String& address, unsigned short port, Scene* scene);
 
 private:
     void SendMessageToMasterServer(const String& message);

@@ -75,6 +75,27 @@ function handleServerTCPMessage(socket, msgObj) {
         console.log('Registered server: ' + serverInfo.serverName);
     } else if (msgObj.cmd === 'requestIntroduction' ) {
 
+        var clientInfo = _.find(connections, { connectionId: msgObj.id });
+
+        if (!clientInfo) {
+            console.error("No client found: " + msgObj.id);
+        }
+
+        var serverInfo = _.find(connections, { connectionId: msgObj.serverId });
+
+        if (!serverInfo) {
+            console.error("No client found: " + msgObj.id);
+        }
+
+        // Send introduction request to server
+        var response = {
+            cmd: 'sendPacketToClient',
+            clientIP: clientInfo.externalIP,
+            clientPort: clientInfo.externalUDPPort
+        }
+
+        // Send this to the server
+        writeMessageToSocket(serverInfo.tcpSocket, response);
     } else {
         console.log('Unable to process message: ' + msg)
     }

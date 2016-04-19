@@ -209,6 +209,37 @@ bool Network::ConnectSimple(const String& address, unsigned short port, Scene* s
     return Connect(address, port, scene, Variant::emptyVariantMap);
 }
 
+bool Network::ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene)
+{
+    PROFILE(ConnectWithExistingSocket);
+
+    // If a previous connection already exists, disconnect it and wait for some time for the connection to terminate
+    if (serverConnection_)
+    {
+        serverConnection_->Disconnect(100);
+        OnServerDisconnected();
+    }
+
+    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(existingSocket, this);
+    if (connection)
+    {
+        serverConnection_ = new Connection(context_, false, connection);
+        serverConnection_->SetScene(scene);
+        serverConnection_->SetIdentity(Variant::emptyVariantMap);
+        serverConnection_->SetConnectPending(true);
+        serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
+        LOGINFO("Connecting to server " + serverConnection_->ToString());
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to connect to server ");
+        SendEvent(E_CONNECTFAILED);
+        return false;
+    }
+}
+
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
     PROFILE(Connect);
@@ -615,9 +646,9 @@ void Network::RequestServerListFromMaster()
     masterServerClient_.RequestServerListFromMaster();
 }
 
-void Network::ConnectToServerViaMaster(const String &serverId)
+void Network::ConnectToServerViaMaster(const String &serverId, const String &address, unsigned short port, Scene* scene)
 {
-    masterServerClient_.ConnectToServerViaMaster(serverId);
+    masterServerClient_.ConnectToServerViaMaster(serverId, address, port, scene);
 }
 
 void Network::RegisterServerWithMaster(const String& name)

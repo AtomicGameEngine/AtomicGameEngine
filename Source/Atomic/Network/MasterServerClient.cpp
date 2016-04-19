@@ -69,7 +69,7 @@ void MasterServerClient::ConnectToMaster(const String &address, unsigned short p
     }
     else
     {
-        masterUDPConnection_ = kNetNetwork->ConnectSocket(address.CString(),port,kNet::SocketOverUDP);
+        masterUDPConnection_ = kNetNetwork->CreateUnconnectedUDPSocket(address.CString(),port);
     }
 
     masterTCPConnection_ = kNetNetwork->ConnectSocket(address.CString(), port, kNet::SocketOverTCP);
@@ -82,9 +82,48 @@ void MasterServerClient::RequestServerListFromMaster()
     SendMessageToMasterServer("{ \"cmd\": \"getServerList\" }");
 }
 
-void MasterServerClient::ConnectToServerViaMaster(const String &serverId)
+void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const String &address, unsigned short port, Scene* scene)
 {
-    SendMessageToMasterServer("{ \"cmd\": \"requestIntroduction\", \"id:\"" + serverId +" \"}");
+    String msg = String("{") +
+                 String("\"cmd\":") + String("\"requestIntroduction\",") +
+                 String("\"id\":\"") + masterServerConnectionId_ + String("\", ") +
+                 String("\"serverId\":\"") + serverId + String("\"") +
+                 String("}");
+
+    SendMessageToMasterServer(msg);
+
+    String addr = "127.0.0.1";
+
+    kNet::EndPoint serverEndPoint;
+    sscanf(addr.CString(), "%hu.%hu.%hu.%hu",
+           (unsigned short *) &serverEndPoint.ip[0],
+           (unsigned short *) &serverEndPoint.ip[1],
+           (unsigned short *) &serverEndPoint.ip[2],
+           (unsigned short *) &serverEndPoint.ip[3]);
+
+    serverEndPoint.port = port;
+
+
+    // Create a UDP and a TCP connection to the master server
+    // UDP connection re-uses the same udp port we are listening on for the sever
+
+
+    kNet::Socket* s = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
+                                       masterUDPConnection_->LocalEndPoint(),
+                                       masterUDPConnection_->LocalAddress(), serverEndPoint, "",
+                                       kNet::SocketOverUDP, kNet::ClientConnectionLessSocket, 1400);
+
+
+    Atomic::Network* network = GetSubsystem<Network>();
+
+
+    //kNet::Network* kNetNetwork = network->GetKnetNetwork();
+
+    //kNet::Socket* s = kNetNetwork->ConnectSocket(addr.CString(),port,kNet::SocketOverUDP);
+
+    // network->ConnectWithExistingSocket(s, scene);
+
+    network->ConnectWithExistingSocket(s, scene);
 }
 
 void MasterServerClient::RegisterServerWithMaster(const String &name)
@@ -195,6 +234,8 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
 
     String cmd = document["cmd"].GetString();
 
+    bool sendEvent = false;
+
     if (cmd == "connectTCPSuccess")
     {
         isTCPConnected = true;
@@ -214,9 +255,17 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
 
         SendEvent(E_MASTERCONNECTIONREADY);
     }
-    else
+    else if (cmd == "sendPacketToClient")
     {
-        // If message was not handled internally, forward as an event
+        LOGINFO("Got request to send packet to client");
+    }
+    else if (cmd == "serverList")
+    {
+        sendEvent = true;
+    }
+
+    if (sendEvent)
+    {
         using namespace NetworkMessage;
 
         VariantMap& eventData = GetEventDataMap();
