@@ -96,7 +96,11 @@ class EditorUI extends Atomic.ScriptObject {
     this.shortcuts = new Shortcuts();
 
     // Hook the service locator into the event system and give it the ui objects it needs
-    ServiceLocator.uiServices.init(this.mainframe.menu, this.modalOps);
+    ServiceLocator.uiServices.init(
+      this.mainframe.menu, 
+      this.mainframe.hierarchyFrame.menu,
+      this.mainframe.projectframe.menu,
+      this.modalOps);
     ServiceLocator.subscribeToEvents(this.mainframe);
 
     this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {

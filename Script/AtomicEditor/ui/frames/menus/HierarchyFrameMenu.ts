@@ -24,15 +24,20 @@ import strings = require("ui/EditorStrings");
 import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import MenuItemSources = require("./MenuItemSources");
+import ServiceLocator from "../../../hostExtensions/ServiceLocator";
 
 class HierarchyFrameMenus extends Atomic.ScriptObject {
+
+    contentFolder: string;
+
+    private contextMenuItemSource: Atomic.UIMenuItemSource = null;
 
     constructor() {
 
         super();
 
         MenuItemSources.createMenuItemSource("hierarchy create items", createItems);
-        MenuItemSources.createMenuItemSource("node context general", nodeGeneralContextItems);
+        this.contextMenuItemSource = MenuItemSources.createMenuItemSource("node context general", nodeGeneralContextItems);
 
         this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
             this.contentFolder = ev.path;
@@ -110,7 +115,8 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                 node.scene.sendEvent("SceneEditNodeCreated", { node: newnode });
             }
 
-            return true;
+            // Let plugins handle context
+            return ServiceLocator.uiServices.hierarchyContextItemClicked(target, refid);
         }
 
         return false;
@@ -133,7 +139,13 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    contentFolder: string;
+    createPluginItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        return MenuItemSources.createSubMenuItemSource(this.contextMenuItemSource , id, items);
+    }
+
+    removePluginItemSource(id: string) {
+        this.contextMenuItemSource.removeItemWithStr(id);
+    }
 
 }
 
