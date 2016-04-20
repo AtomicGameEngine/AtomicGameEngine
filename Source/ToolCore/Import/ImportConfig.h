@@ -39,14 +39,18 @@ public:
 
     static bool LoadFromFile(Context* context, const String& filename) { return importConfig_.Configuration::LoadFromFile(context, filename); }
     static bool LoadFromJSON(const String& json) { return importConfig_.Configuration::LoadFromJSON(json); }
+    static void Clear() { importConfig_.Configuration::Clear();  }
 
     /// Apply the configuration to a setting variant map, values that exist will not be overriden
     static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return importConfig_.Configuration::ApplyConfig(settings, overwrite); }
 
+    static bool IsLoaded() { return importConfig_.Configuration::IsLoaded(); };
+
 private:
 
     virtual bool LoadDesktopConfig(JSONValue root);
-    bool LoadAIFlagsDefaultConfig(const JSONValue& jflags);
+    bool LoadModelImporterConfig(const JSONValue& jModelImporterConfig);
+    bool LoadTextureImporterConfig(const JSONValue& jTextureImporterConfig);
 
     static ImportConfig importConfig_;
 };

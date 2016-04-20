@@ -595,7 +595,26 @@ Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool
     }
 
     // Attempt to load the resource
-    SharedPtr<File> file = GetFile(name, sendEventOnFailure);
+    SharedPtr<File> file;
+
+    // #623 BEGIN TODO: For now try to get DDS version of textures from /DDS cache sub directory,
+    // ultimately should have per platform compressed versions saved in cache
+#ifdef ATOMIC_PLATFORM_DESKTOP
+    String ext = Atomic::GetExtension(name);
+    if (ext == ".jpg" || ext == ".png" || ext == ".tga")
+    {
+        String ddsName = "DDS/" + name + ".dds";
+        file = GetFile(ddsName, false);
+        if (file)
+            LOGDEBUG("Loaded cached DDS " + name + ".dds");
+    }
+    if (!file)
+        file = GetFile(name, sendEventOnFailure);
+#else
+    // #623 END TODO
+    file = GetFile(name, sendEventOnFailure);
+#endif
+
     if (!file)
         return 0;   // Error is already logged
 
