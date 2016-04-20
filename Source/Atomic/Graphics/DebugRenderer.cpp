@@ -52,7 +52,15 @@ static const unsigned MAX_LINES = 1000000;
 static const unsigned MAX_TRIANGLES = 100000;
 
 DebugRenderer::DebugRenderer(Context* context) :
-    Component(context)
+    Component(context),
+    position1_(0, 0, 0),
+    position2_(0, 0, 0),
+    position3_(0, 0, 0),
+    numGridLines_(81),
+    scale_(0),
+    lineLength_(0),
+    offset_(0),
+    scaleIncrement_(10)
 {
     vertexBuffer_ = new VertexBuffer(context_);
 
@@ -346,6 +354,57 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
             indices += 3;
         }
     }
+}
+
+void DebugRenderer::CreateXAxisLines(unsigned gridColor, unsigned subdivisionColor, bool depthTest, int x, int y, int z)
+{
+    for (int i = 0; i < numGridLines_; i++)
+    {
+        position1_ = Vector3(x, y, z - offset_);
+        position2_ = Vector3(position1_.x_ + lineLength_, y, z - offset_);
+        position3_ = Vector3(position1_.x_ + -lineLength_, y, z - offset_);
+
+        AddLine(position1_, position2_, gridColor, depthTest);
+        AddLine(position3_, position1_, gridColor, depthTest);
+
+        z += scale_;
+    }
+
+}
+
+void DebugRenderer::CreateZAxisLines(unsigned gridColor, unsigned subdivisionColor, bool depthTest, int x, int y, int z)
+{
+    for (int j = 0; j < numGridLines_; j++)
+    {
+        position1_ = Vector3(x - offset_, y, z);
+        position2_ = Vector3(x - offset_, y, position1_.z_ + lineLength_);
+        position3_ = Vector3(x - offset_, y, position1_.z_ + -lineLength_);
+
+        AddLine(position1_, position2_, gridColor, depthTest);
+        AddLine(position3_, position1_, gridColor, depthTest);
+
+        x += scale_;
+    }
+}
+
+void DebugRenderer::CreateGrid(const Color& grid, const Color& subdivision, bool depthTest, Vector3 position)
+{
+    unsigned gridColor = grid.ToUInt();
+    unsigned subdivisionColor = subdivision.ToUInt();
+
+    int x = position.x_;
+    int z = position.z_;
+
+    scale_ = (position.y_ / position.y_) * scaleIncrement_;
+
+    if (position.y_ < scaleIncrement_)
+        scale_ = 1;
+
+    lineLength_ = (numGridLines_ / 2) * scale_;
+    offset_ = (numGridLines_ / 2) * scale_;
+
+    CreateXAxisLines(gridColor, subdivisionColor, depthTest, x, 0, z);
+    CreateZAxisLines(gridColor, subdivisionColor, depthTest, x, 0, z);
 }
 
 void DebugRenderer::Render()

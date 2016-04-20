@@ -74,7 +74,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     mouseMoved_(false),
     enabled_(true),
     cameraMove_(false),
-    cameraMoveSpeed_(20.0f)
+    cameraMoveSpeed_(20.0f),
+    gridEnabled_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -360,6 +361,14 @@ bool SceneView3D::MouseInView()
 
 }
 
+void SceneView3D::ToggleGrid()
+{
+    Input* input = GetSubsystem<Input>();
+
+    if (input->GetKeyPress(KEY_G))
+        gridEnabled_ = !gridEnabled_;
+}
+
 void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData)
 {
     if (!enabled_)
@@ -526,6 +535,11 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     QueueUpdate();
+
+    ToggleGrid();
+
+    if (gridEnabled_)
+        debugRenderer_->CreateGrid(Color::GRAY, Color::RED, false, cameraNode_->GetPosition());
 
     if (preloadResourceScene_.NotNull())
     {
