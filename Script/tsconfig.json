@@ -76,6 +76,7 @@
         "./AtomicEditor/ui/modal/build/platforms/WebSettingsWidget.ts",
         "./AtomicEditor/ui/modal/build/platforms/WindowsSettingsWidget.ts",
         "./AtomicEditor/ui/modal/CreateProject.ts",
+        "./AtomicEditor/ui/modal/ExtensionWindow.ts",
         "./AtomicEditor/ui/modal/license/ActivationSuccessWindow.ts",
         "./AtomicEditor/ui/modal/license/ActivationWindow.ts",
         "./AtomicEditor/ui/modal/license/EULAWindow.ts",
