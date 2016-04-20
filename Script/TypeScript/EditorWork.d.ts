@@ -254,11 +254,17 @@ declare module Editor.HostExtensions {
     export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> { }
 
     export interface UIServicesEventListener extends Editor.Extensions.ServiceEventListener {
-        menuItemClicked?(refId: string): boolean;
+        menuItemClicked?(refid: string): boolean;
+        projectContextItemClicked?(target: Atomic.UIWidget, refid: string): boolean;
+        hierarchyContextItemClicked?(target: Atomic.UIWidget, refid: string): boolean;
     }
     export interface UIServicesProvider extends Editor.Extensions.ServicesProvider<UIServicesEventListener> {
         createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
         removePluginMenuItemSource(id: string);
+        createHierarchyContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removeHierarchyContextMenuItemSource(id: string);
+        createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removeProjectContextMenuItemSource(id: string);
         showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
     }
 }
