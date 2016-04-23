@@ -46,6 +46,7 @@ private:
     void SendMessageToMasterServer(const String& message);
     void HandleMasterServerMessage(const String& msg);
 
+    // Used by the client
     bool isConnectingUDP_;
     float udpTimeout_;
     float udpConnectionSecondsRemaining_;
@@ -65,6 +66,11 @@ private:
     String masterServerConnectionId_;
 
     void ConnectUDP(float dt);
+
+    float timeBetweenClientPunchThroughAttempts_;
+    float timeTillNextPunchThroughAttempt_;
+
+    HashMap<String, kNet::Socket*> clientIdToPunchThroughSocketMap_;
 };
 
 }

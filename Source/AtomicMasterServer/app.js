@@ -90,6 +90,7 @@ function handleServerTCPMessage(socket, msgObj) {
         // Send introduction request to server
         var response = {
             cmd: 'sendPacketToClient',
+            clientId: clientInfo.connectionId,
             clientIP: clientInfo.externalIP,
             clientPort: clientInfo.externalUDPPort
         }
@@ -159,8 +160,7 @@ server.bind(41234);
 // Set up TCP
 console.log('Setting up tcp');
 var tcpServer = net.createServer();
-tcpServer.listen(41234);
-console.log('TCP Server listening on ' + tcpServer.address().address +':'+ tcpServer.address().port);
+tcpServer.listen(41234,'0.0.0.0');
 tcpServer.on('connection', function(sock) {
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
 

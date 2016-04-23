@@ -27,6 +27,8 @@ MasterServerClient::MasterServerClient(Context *context) :
         udpSecondsTillRetry_(0.5f),
         isTCPConnected(false),
         isUDPConnected(false),
+        timeBetweenClientPunchThroughAttempts_(1.0),
+        timeTillNextPunchThroughAttempt_(0.0),
         masterTCPConnection_(NULL)
 {
 
@@ -194,6 +196,24 @@ void MasterServerClient::Update(float dt) {
     {
         ConnectUDP(dt);
     }
+
+    // Do we have clients requesting a punchthrough?
+    if (clientIdToPunchThroughSocketMap_.Size()>0)
+    {
+        if (timeTillNextPunchThroughAttempt_ <= 0)
+        {
+            for (HashMap<String, kNet::Socket*>::ConstIterator i = clientIdToPunchThroughSocketMap_.Begin(); i != clientIdToPunchThroughSocketMap_.End(); ++i)
+            {
+                kNet::Socket* s = i->second_;
+                s->Send("KNOCK",5);
+            }
+
+            // Reset the timer
+            timeTillNextPunchThroughAttempt_ = timeBetweenClientPunchThroughAttempts_;
+        }
+
+        timeTillNextPunchThroughAttempt_ -= dt;
+    }
 }
 
 void MasterServerClient::ConnectUDP(float dt)
@@ -257,7 +277,34 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
     }
     else if (cmd == "sendPacketToClient")
     {
-        LOGINFO("Got request to send packet to client");
+        String clientIP = document["clientIP"].GetString();
+        int clientPort = document["clientPort"].GetInt();
+
+        addrinfo *result = NULL;
+        char strPort[256];
+        sprintf(strPort, "%d", (unsigned int)clientPort);
+        int ret = getaddrinfo(clientIP.CString(), strPort, NULL, &result);
+        if (ret != 0)
+        {
+            LOGINFO("Network::Connect: getaddrinfo failed: " + String(kNet::Network::GetErrorString(ret).c_str()));
+            return;
+        }
+
+        LOGINFO("Got request to send packet to client at "+clientIP+":"+String(clientPort));
+
+        kNet::EndPoint serverEndPoint;
+        serverEndPoint.FromSockAddrIn(* (struct sockaddr_in *)result->ai_addr);
+        serverEndPoint.port = clientPort;
+
+        // Create a socket that goes out the same port we are listening on to the client.
+        // This will be used until the client actually connects.
+        kNet::Socket* s = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
+                                           masterUDPConnection_->LocalEndPoint(),
+                                           masterUDPConnection_->LocalAddress(), serverEndPoint, "",
+                                           kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
+
+        String clientId = document["clientId"].GetString();
+        clientIdToPunchThroughSocketMap_.Insert(MakePair(clientId, s));
     }
     else if (cmd == "serverList")
     {
