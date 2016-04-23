@@ -112,7 +112,7 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
             }
 
             // Let plugins handle context
-            return ServiceLocator.uiServices.projectContextItemClicked(target, refid);
+            return ServiceLocator.uiServices.projectContextItemClicked(asset, refid);
         }
 
         return false;
