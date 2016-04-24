@@ -115,6 +115,9 @@ void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const 
                                        masterUDPConnection_->LocalEndPoint(),
                                        masterUDPConnection_->LocalAddress(), serverEndPoint, "",
                                        kNet::SocketOverUDP, kNet::ClientConnectionLessSocket, 1400);
+
+    Atomic::Network* network = GetSubsystem<Network>();
+    network->ConnectWithExistingSocket(clientToServerSocket_, clientPendingScene_);
 }
 
 void MasterServerClient::RegisterServerWithMaster(const String &name)
