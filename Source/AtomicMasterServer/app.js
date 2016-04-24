@@ -10,96 +10,42 @@ var messageEventEmitter = new events.EventEmitter();
 var connections = [];
 var serverList = [];
 
+var MASTER_SERVER_PORT = 41234;
+
+// -------------------------------------------------------------------
+//
+// Atomic Master Server
+//
+//
+// This server is designed to work with the MasterServerClient
+// in the Atomic Game Engine to allow multiplayer servers to register
+// themselves, in order to be discovered by multiplayer clients.
+//
+// It also handles NAT punchthrough in case the server is behind
+// a NAT firewall.
+//
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+// UDP Server
+//
+// We use a UDP Socket to listen for messages from both clients
+// and servers. This way we can identify their external UDP ports
+// assigned by any NAT firewall they might be behind.
+//
+// We do not send any UDP packets back. We acknowledge that we
+// received the UDP port by sending a message back on the TCP socket.
+//
+// -------------------------------------------------------------------
+
 function writeMessageToSocket(sock, msgObj) {
     var msg = JSON.stringify(msgObj);
 
     var len = msg.length;
 
-    console.log("Writing message to socket: "+sock+", "+msg);
-
     sock.write(len.toString());
     sock.write(':');
     sock.write(msg);
-}
-
-function handleServerTCPMessage(socket, msgObj) {
-    console.log('Processing TCP message: ' + JSON.stringify(msgObj));
-
-    if (msgObj.cmd === 'connectRequest') {
-        var connectionId = uuid.v4();
-
-        var connectionObj = {
-            connectionId: connectionId,
-            internalIP: msgObj.internalIP,
-            internalPort: msgObj.internalPort,
-            externalIP: socket.remoteAddress,
-            externalTCPPort: socket.remotePort,
-            tcpSocket: socket
-        };
-
-        connections.push(connectionObj);
-
-        // Send the uuid back to the game server
-        var registerSuccessMessage = {
-            cmd: 'connectTCPSuccess',
-            id: connectionId
-        };
-
-        writeMessageToSocket(socket, registerSuccessMessage);
-
-        console.log('Registered connection from IP:' + connectionObj.externalIP);
-    } else if (msgObj.cmd === 'getServerList' ) {
-
-        var servers = _.map(serverList, function (item) {
-            return _.pick(item, ['connectionId', 'internalIP', 'internalPort', 'externalIP', 'externalUDPPort']);
-        })
-
-        var response = {
-            cmd: 'serverList',
-            servers: JSON.stringify(servers)
-        }
-
-        writeMessageToSocket(socket, response);
-    } else if (msgObj.cmd === 'registerServer' ) {
-        var connectionInfo = _.find(connections, { connectionId: msgObj.id });
-
-        if (!connectionInfo) {
-            console.error("No server found: " + msgObj.id);
-        }
-
-        var serverInfo = _.clone(connectionInfo);
-        serverInfo.serverName = msgObj.serverName;
-
-        serverList.push(serverInfo);
-
-        console.log('Registered server: ' + serverInfo.serverName);
-    } else if (msgObj.cmd === 'requestIntroduction' ) {
-
-        var clientInfo = _.find(connections, { connectionId: msgObj.id });
-
-        if (!clientInfo) {
-            console.error("No client found: " + msgObj.id);
-        }
-
-        var serverInfo = _.find(connections, { connectionId: msgObj.serverId });
-
-        if (!serverInfo) {
-            console.error("No client found: " + msgObj.id);
-        }
-
-        // Send introduction request to server
-        var response = {
-            cmd: 'sendPacketToClient',
-            clientId: clientInfo.connectionId,
-            clientIP: clientInfo.externalIP,
-            clientPort: clientInfo.externalUDPPort
-        }
-
-        // Send this to the server
-        writeMessageToSocket(serverInfo.tcpSocket, response);
-    } else {
-        console.log('Unable to process message: ' + msg)
-    }
 }
 
 function handleServerUDPMessage(rinfo, msgObj) {
@@ -155,19 +101,158 @@ server.on('listening', function () {
     console.log("udp server listening on "+address.address + ":" + address.port);
 });
 
-server.bind(41234);
+server.bind(MASTER_SERVER_PORT);
 
-// Set up TCP
+// -------------------------------------------------------------------
+// TCP Server
+//
+// We use a TCP connection to handle requests from clients and from
+// servers. If the server TCP connection dies, we remove the server
+// from our list.
+//
+// Messages are received in a simplified 'netstring' format, where
+// the message length is followed by a colon, and then the actual
+// message.
+//
+// Example: "13:Hello, World!"
+//
+// Messages may not be complete until multiple data calls have
+// been made. Once we have a complete message, we fire the 'msg'
+// event on an event emitter and handle the message.
+// -------------------------------------------------------------------
+
+
+function handleServerTCPMessage(socket, msgObj) {
+    console.log('Processing TCP message: ' + JSON.stringify(msgObj));
+
+    if (msgObj.cmd === 'connectRequest') {
+        var connectionId = uuid.v4();
+
+        var connectionObj = {
+            connectionId: connectionId,
+            internalIP: msgObj.internalIP,
+            internalPort: msgObj.internalPort,
+            externalIP: socket.remoteAddress,
+            externalTCPPort: socket.remotePort,
+            tcpSocket: socket
+        };
+
+        connections.push(connectionObj);
+
+        // Send the uuid back to the game server
+        var registerSuccessMessage = {
+            cmd: 'connectTCPSuccess',
+            id: connectionId
+        };
+
+        writeMessageToSocket(socket, registerSuccessMessage);
+
+        console.log('Registered connection from IP:' + connectionObj.externalIP);
+    } else if (msgObj.cmd === 'getServerList' ) {
+
+        var servers = _.map(serverList, function (item) {
+            return _.pick(item, ['connectionId', 'internalIP', 'internalPort', 'externalIP', 'externalUDPPort', 'serverName' ]);
+        })
+
+        var response = {
+            cmd: 'serverList',
+            servers: JSON.stringify(servers)
+        }
+
+        writeMessageToSocket(socket, response);
+    } else if (msgObj.cmd === 'registerServer' ) {
+        var connectionInfo = _.find(connections, { connectionId: msgObj.id });
+
+        if (!connectionInfo) {
+            console.error("No server found: " + msgObj.id);
+        }
+
+        var serverInfo = _.clone(connectionInfo);
+        serverInfo.serverName = msgObj.serverName;
+
+        serverList.push(serverInfo);
+
+        console.log('Registered server: ' + serverInfo.serverName);
+    } else if (msgObj.cmd === 'requestIntroduction' ) {
+
+        var clientInfo = _.find(connections, { connectionId: msgObj.id });
+
+        if (!clientInfo) {
+            return;
+            console.error("No client found: " + msgObj.id);
+        }
+
+        var serverInfo = _.find(connections, { connectionId: msgObj.serverId });
+
+        if (!serverInfo) {
+            console.error("No client found: " + msgObj.id);
+            return;
+        }
+
+        // Send introduction request to server
+        var response = {
+            cmd: 'sendPacketToClient',
+            clientId: clientInfo.connectionId,
+            clientIP: clientInfo.externalIP,
+            clientPort: clientInfo.externalUDPPort
+        }
+
+        // Send this to the server
+        writeMessageToSocket(serverInfo.tcpSocket, response);
+    } else {
+        console.log('Unable to process message: ' + msg)
+    }
+}
+
+messageEventEmitter.addListener('msg', function(socket, message) {
+    try {
+        var msgObj = JSON.parse(message);
+        handleServerTCPMessage(socket, msgObj);
+    } catch (err) {
+        console.error(err);
+        console.error(err.stack);
+        console.log('Unable to parse JSON: ' + message)
+    }
+});
+
+
 console.log('Setting up tcp');
 var tcpServer = net.createServer();
-tcpServer.listen(41234,'0.0.0.0');
+tcpServer.listen(MASTER_SERVER_PORT,'0.0.0.0');
 tcpServer.on('connection', function(sock) {
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
+
+    // Set keep alive true so we can detect when a client or server has died
+    sock.setKeepAlive(true);
+
 
     var readingLength = true;
     var messageLengthStr = '';
     var bytesRemainingInMasterServerMessage = 0;
     var messageStr = '';
+
+    // Clean up on disconnect
+    sock.on('end', function() {
+        console.log('Socket disconnected');
+
+        var connectionIndex = _.findIndex(connections, function(item) {
+            return item.tcpSocket === sock;
+        });
+
+        if (connectionIndex >= 0) {
+            console.log('Client disconnected: ' + connections[connectionIndex].connectionId);
+            connections.splice(connectionIndex, 1);
+        }
+
+        var serverIndex = _.findIndex(serverList, function(item) {
+            return item.tcpSocket === sock;
+        });
+
+        if (serverIndex >= 0) {
+            console.log('Server disconnected: ' + serverList[serverIndex].connectionId);
+            serverList.splice(serverIndex, 1);
+        }
+    });
 
     sock.on('data', function (_data) {
         var data = _data.toString();
@@ -204,16 +289,4 @@ tcpServer.on('connection', function(sock) {
             }
         }
     });
-});
-
-
-messageEventEmitter.addListener('msg', function(socket, message) {
-    try {
-        var msgObj = JSON.parse(message);
-        handleServerTCPMessage(socket, msgObj);
-    } catch (err) {
-        console.error(err);
-        console.error(err.stack);
-        console.log('Unable to parse JSON: ' + message)
-    }
 });

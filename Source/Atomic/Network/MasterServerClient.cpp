@@ -40,7 +40,10 @@ MasterServerClient::MasterServerClient(Context *context) :
 
 MasterServerClient::~MasterServerClient()
 {
-
+    if (masterTCPConnection_)
+    {
+        masterTCPConnection_->Disconnect();
+    }
 }
 
 void MasterServerClient::ConnectToMaster(const String &address, unsigned short port) {
@@ -125,10 +128,17 @@ void MasterServerClient::RegisterServerWithMaster(const String &name)
     SendMessageToMasterServer(msg);
 }
 
-    void MasterServerClient::SendMessageToMasterServer(const String& msg)
+void MasterServerClient::SendMessageToMasterServer(const String& msg)
 {
-    String netString = String(msg.Length()) + ':' + msg;
-    masterTCPConnection_->Send(netString.CString(), netString.Length());
+    if (masterTCPConnection_)
+    {
+        String netString = String(msg.Length()) + ':' + msg;
+        masterTCPConnection_->Send(netString.CString(), netString.Length());
+    }
+    else
+    {
+        LOGERROR("No master server connection. Cannot send message");
+    }
 }
 
 void MasterServerClient::Update(float dt) {
@@ -190,8 +200,9 @@ void MasterServerClient::Update(float dt) {
         {
             for (HashMap<String, kNet::Socket*>::ConstIterator i = clientIdToPunchThroughSocketMap_.Begin(); i != clientIdToPunchThroughSocketMap_.End(); ++i)
             {
+                LOGINFO("Sending packet to client");
                 kNet::Socket* s = i->second_;
-                s->Send("KNOCK",5);
+                s->Send("K",1);
             }
 
             // Reset the timer
