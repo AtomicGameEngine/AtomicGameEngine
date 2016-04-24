@@ -70,7 +70,12 @@ private:
     float timeBetweenClientPunchThroughAttempts_;
     float timeTillNextPunchThroughAttempt_;
 
+    float timeBetweenClientConnectAttempts_;
+    float timeTillNextClientConnectAttempt_;
+
     HashMap<String, kNet::Socket*> clientIdToPunchThroughSocketMap_;
+    kNet::Socket* clientToServerSocket_;
+    Scene* clientPendingScene_;
 };
 
 }

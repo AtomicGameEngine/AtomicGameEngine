@@ -29,7 +29,11 @@ MasterServerClient::MasterServerClient(Context *context) :
         isUDPConnected(false),
         timeBetweenClientPunchThroughAttempts_(1.0),
         timeTillNextPunchThroughAttempt_(0.0),
-        masterTCPConnection_(NULL)
+        timeBetweenClientConnectAttempts_(1.0),
+        timeTillNextClientConnectAttempt_(1.0),
+        masterTCPConnection_(NULL),
+        clientToServerSocket_(NULL),
+        clientPendingScene_(NULL)
 {
 
 }
@@ -94,10 +98,8 @@ void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const 
 
     SendMessageToMasterServer(msg);
 
-    String addr = "127.0.0.1";
-
     kNet::EndPoint serverEndPoint;
-    sscanf(addr.CString(), "%hu.%hu.%hu.%hu",
+    sscanf(address.CString(), "%hu.%hu.%hu.%hu",
            (unsigned short *) &serverEndPoint.ip[0],
            (unsigned short *) &serverEndPoint.ip[1],
            (unsigned short *) &serverEndPoint.ip[2],
@@ -105,27 +107,11 @@ void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const 
 
     serverEndPoint.port = port;
 
-
-    // Create a UDP and a TCP connection to the master server
-    // UDP connection re-uses the same udp port we are listening on for the sever
-
-
-    kNet::Socket* s = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
+    clientPendingScene_ = scene;
+    clientToServerSocket_ = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
                                        masterUDPConnection_->LocalEndPoint(),
                                        masterUDPConnection_->LocalAddress(), serverEndPoint, "",
                                        kNet::SocketOverUDP, kNet::ClientConnectionLessSocket, 1400);
-
-
-    Atomic::Network* network = GetSubsystem<Network>();
-
-
-    //kNet::Network* kNetNetwork = network->GetKnetNetwork();
-
-    //kNet::Socket* s = kNetNetwork->ConnectSocket(addr.CString(),port,kNet::SocketOverUDP);
-
-    // network->ConnectWithExistingSocket(s, scene);
-
-    network->ConnectWithExistingSocket(s, scene);
 }
 
 void MasterServerClient::RegisterServerWithMaster(const String &name)
@@ -214,6 +200,21 @@ void MasterServerClient::Update(float dt) {
 
         timeTillNextPunchThroughAttempt_ -= dt;
     }
+
+    if (clientToServerSocket_ != NULL && timeTillNextClientConnectAttempt_ <= 0)
+    {
+        Atomic::Network* network = GetSubsystem<Network>();
+
+        if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
+        {
+            network->ConnectWithExistingSocket(clientToServerSocket_, clientPendingScene_);
+        }
+
+        timeTillNextClientConnectAttempt_ = timeBetweenClientConnectAttempts_;
+    }
+
+    timeTillNextClientConnectAttempt_ -= dt;
+
 }
 
 void MasterServerClient::ConnectUDP(float dt)
@@ -280,27 +281,24 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
         String clientIP = document["clientIP"].GetString();
         int clientPort = document["clientPort"].GetInt();
 
-        addrinfo *result = NULL;
-        char strPort[256];
-        sprintf(strPort, "%d", (unsigned int)clientPort);
-        int ret = getaddrinfo(clientIP.CString(), strPort, NULL, &result);
-        if (ret != 0)
-        {
-            LOGINFO("Network::Connect: getaddrinfo failed: " + String(kNet::Network::GetErrorString(ret).c_str()));
-            return;
-        }
-
         LOGINFO("Got request to send packet to client at "+clientIP+":"+String(clientPort));
 
-        kNet::EndPoint serverEndPoint;
-        serverEndPoint.FromSockAddrIn(* (struct sockaddr_in *)result->ai_addr);
-        serverEndPoint.port = clientPort;
+        kNet::EndPoint clientEndPoint;
+
+        sscanf(clientIP.CString(), "%hu.%hu.%hu.%hu",
+               (unsigned short *) &clientEndPoint.ip[0],
+               (unsigned short *) &clientEndPoint.ip[1],
+               (unsigned short *) &clientEndPoint.ip[2],
+               (unsigned short *) &clientEndPoint.ip[3]);
+
+
+        clientEndPoint.port = clientPort;
 
         // Create a socket that goes out the same port we are listening on to the client.
         // This will be used until the client actually connects.
         kNet::Socket* s = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
                                            masterUDPConnection_->LocalEndPoint(),
-                                           masterUDPConnection_->LocalAddress(), serverEndPoint, "",
+                                           masterUDPConnection_->LocalAddress(), clientEndPoint, "",
                                            kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
 
         String clientId = document["clientId"].GetString();
