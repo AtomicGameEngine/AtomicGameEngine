@@ -52,6 +52,7 @@ lightmapSource.addItem(new Atomic.UIMenuItem("Lightmap", "Lightmap"));
 lightmapSource.addItem(new Atomic.UIMenuItem("Lightmap Alpha", "Lightmap Alpha"));
 
 var projectSource = new Atomic.UIMenuItemSource();
+var subFolderSource = new Atomic.UIMenuItemSource();
 
 var _ = new Atomic.UIMenuItem("Solid");
 _.subSource = solidSource;
@@ -68,6 +69,8 @@ techniqueSource.addItem(_);
 _ = new Atomic.UIMenuItem("Project");
 _.subSource = projectSource;
 techniqueSource.addItem(_);
+
+
 
 var techniqueLookup = {
     "Techniques/Diff.xml": "Diffuse",
@@ -87,6 +90,8 @@ var techniqueLookup = {
 var techniqueReverseLookup = {};
 
 var projectTechniques = {};
+
+var projectTechniquesAddress = {};
 
 for (var key in techniqueLookup) {
 
@@ -204,21 +209,36 @@ class MaterialInspector extends ScriptWidget {
 
         var cache = Atomic.getResourceCache();
         var technique = <Atomic.Technique>cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
+        var resourcePath = ToolCore.toolSystem.project.getResourcePath();
 
         if (technique == null)
-            technique = <Atomic.Technique>cache.getResource("Technique", "Techniques/" + techniqueName + ".xml");
+
+            var techniquePath;
+
+        for (var tech in projectTechniques) {
+
+            if (techniqueName == projectTechniques[tech]) {
+                techniquePath = projectTechniquesAddress[tech];
+                break;
+            }
+        }
+        techniquePath = techniquePath.replace(resourcePath, "");
+        technique = <Atomic.Technique>cache.getResource("Technique", techniquePath);
 
         this.material.setTechnique(0, technique);
     }
 
     createTechniquePopup(): Atomic.UIWidget {
 
-        this.loadProjectTechniques();
+        projectSource.clear();
+        var resourcesPath = ToolCore.toolSystem.project.getResourcePath();
+        this.loadProjectTechniques(resourcesPath + "Techniques", projectSource);
 
         var button = this.techniqueButton = new Atomic.UIButton();
         var technique = this.material.getTechnique(0);
+        var techniqueName = technique.name.replace("Techniques/", "").replace(".xml", "");
 
-        button.text = technique.name;
+        button.text = techniqueName;
 
         button.fontDescription = this.fd;
 
@@ -423,15 +443,28 @@ class MaterialInspector extends ScriptWidget {
 
     }
 
-    loadProjectTechniques() {
+    loadProjectTechniques(directory: string, menuItem: Atomic.UIMenuItemSource) {
 
-        projectSource.clear();
         var resourcePath = ToolCore.toolSystem.project.getResourcePath();
-        var TechniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(resourcePath + "Techniques");
+        var TechniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(directory);
 
-        for (var key in TechniqueAssets) {
-            projectTechniques[key] = TechniqueAssets[key].name;
-            projectSource.addItem(new Atomic.UIMenuItem(projectTechniques[key], projectTechniques[key]));
+        for (var i in TechniqueAssets) {
+
+            var asset = TechniqueAssets[i];
+            if (TechniqueAssets[i].isFolder()) {
+
+                var subfoldersource = new Atomic.UIMenuItemSource();
+                _ = new Atomic.UIMenuItem(TechniqueAssets[i].name);
+                _.subSource = subfoldersource;
+                menuItem.addItem(_);
+
+                this.loadProjectTechniques(asset.path, subfoldersource);
+            }
+            else {
+                projectTechniques[i] = TechniqueAssets[i].name;
+                projectTechniquesAddress[i] = TechniqueAssets[i].path;
+                menuItem.addItem(new Atomic.UIMenuItem(projectTechniques[i], projectTechniques[i]));
+            }
         }
     }
 
