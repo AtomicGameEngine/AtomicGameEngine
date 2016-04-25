@@ -27,7 +27,6 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
-#include <ToolCore/Import/ImportConfig.h>
 
 #include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -43,6 +42,7 @@
 
 #include <ToolCore/Project/Project.h>
 #include <ToolCore/ToolSystem.h>
+#include <ToolCore/Import/ImportConfig.h>
 
 #include "OpenAssetImporter.h"
 
@@ -90,7 +90,7 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
         aiProcess_FindInstances |
         aiProcess_OptimizeMeshes;
 
-    ReadImportConfig();
+    ApplyProjectImportConfig();
 
     // TODO:  make this an option on importer
 
@@ -908,26 +908,14 @@ void OpenAssetImporter::SetOveriddenFlags(VariantMap& aiFlagParameters)
 
 }
 
-void OpenAssetImporter::ReadImportConfig()
+void OpenAssetImporter::ApplyProjectImportConfig()
 {
-    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-    Project* project = tsystem->GetProject();
-
-    String projectPath = project->GetProjectPath();
-
-    String filename = projectPath + "Settings/Import.json";
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (!fileSystem->FileExists(filename))
-        return;
-
-    if (ImportConfig::LoadFromFile(context_, filename))
+    if (ImportConfig::IsLoaded())
     {
         VariantMap aiFlagParameters;
         ImportConfig::ApplyConfig(aiFlagParameters);
         SetOveriddenFlags(aiFlagParameters);
     }
-
 }
 
 void OpenAssetImporter::BuildBoneCollisionInfo(OutModel& model)
