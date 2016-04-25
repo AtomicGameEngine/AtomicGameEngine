@@ -463,6 +463,22 @@ Connection* Network::GetConnection(kNet::MessageConnection* connection) const
     }
 }
 
+bool Network::IsEndPointConnected(const kNet::EndPoint& endPoint) const
+{
+    Vector<SharedPtr<Connection> > ret;
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+         i != clientConnections_.End(); ++i)
+    {
+        kNet::EndPoint remoteEndPoint = i->first_->GetSocket()->RemoteEndPoint();
+        if (endPoint.ToString()==remoteEndPoint.ToString())
+        {
+            return i->second_->IsConnected();
+        }
+    }
+
+    return false;
+}
+
 Connection* Network::GetServerConnection() const
 {
     return serverConnection_;

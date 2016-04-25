@@ -129,6 +129,9 @@ public:
 
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
     Connection* GetConnection(kNet::MessageConnection* connection) const;
+    // Return the connection with the matching endpoint
+    bool IsEndPointConnected(const kNet::EndPoint& endPoint) const;
+
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.

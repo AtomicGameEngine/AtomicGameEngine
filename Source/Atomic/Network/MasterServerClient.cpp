@@ -201,11 +201,21 @@ void MasterServerClient::Update(float dt) {
     {
         if (timeTillNextPunchThroughAttempt_ <= 0)
         {
-            for (HashMap<String, kNet::Socket*>::ConstIterator i = clientIdToPunchThroughSocketMap_.Begin(); i != clientIdToPunchThroughSocketMap_.End(); ++i)
+            for (HashMap<String, kNet::Socket*>::Iterator i = clientIdToPunchThroughSocketMap_.Begin(); i != clientIdToPunchThroughSocketMap_.End();)
             {
+                Atomic::Network* network = GetSubsystem<Network>();
                 LOGINFO("Sending packet to client");
                 kNet::Socket* s = i->second_;
-                s->Send("K",1);
+
+                if (network->IsEndPointConnected(s->RemoteEndPoint()))
+                {
+                    i = clientIdToPunchThroughSocketMap_.Erase(i);
+                }
+                else
+                {
+                    s->Send("K",1);
+                    ++i;
+                }
             }
 
             // Reset the timer
