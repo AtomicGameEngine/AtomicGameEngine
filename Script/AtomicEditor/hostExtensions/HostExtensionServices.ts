@@ -296,69 +296,69 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      */
     menuItemClicked(refid: string): boolean {
         // run through and find any services that can handle this.
-        let holdResult = false;
-        this.registeredServices.forEach((service) => {
+        return this.registeredServices.some((service) => {
             try {
                 // Verify that the service contains the appropriate methods and that it can handle it
                 if (service.menuItemClicked) {
                     if (service.menuItemClicked(refid)) {
-                        holdResult = true;
+                        return true;
                     }
                 }
             } catch (e) {
                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
-        return holdResult;
     }
 
     /**
      * Called when a context menu item in the hierarchy pane has been clicked
-     * @param  {Atomic.UIWidget} target
+     * @param  {Atomic.Node} node
      * @param  {string} refId
      * @type {boolean} return true if handled
      */
-    hierarchyContextItemClicked(target: Atomic.UIWidget, refid: string): boolean {
+    hierarchyContextItemClicked(node: Atomic.Node, refid: string): boolean {
+        if (!node) 
+            return false;
+
         // run through and find any services that can handle this.
-        let holdResult = false;
-        this.registeredServices.forEach((service) => {
+        return this.registeredServices.some((service) => {
             try {
                 // Verify that the service contains the appropriate methods and that it can handle it
                 if (service.hierarchyContextItemClicked) {
-                    if (service.hierarchyContextItemClicked(target, refid)) {
-                        holdResult = true;
+                    if (service.hierarchyContextItemClicked(node, refid)) {
+                        return true;
                     }
                 }
             } catch (e) {
                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
-        return holdResult;
     }
 
 
     /**
      * Called when a context menu item in the hierarchy pane has been clicked
-     * @param  {Atomic.UIWidget} target
+     * @param  {ToolCore.Asset} asset
      * @param  {string} refId
      * @type {boolean} return true if handled
      */
-    projectContextItemClicked(target: Atomic.UIWidget, refid: string): boolean {
+    projectContextItemClicked(asset: ToolCore.Asset, refid: string): boolean {
+        if (!asset)
+            return false;
+
         // run through and find any services that can handle this.
-        let holdResult = false;
-        this.registeredServices.forEach((service) => {
+        return this.registeredServices.some((service) => {
             try {
                 // Verify that the service contains the appropriate methods and that it can handle it
                 if (service.projectContextItemClicked) {
-                    if (service.projectContextItemClicked(target, refid)) {
-                        holdResult = true;
+                    if (service.projectContextItemClicked(asset, refid)) {
+                        return true;
                     }
                 }
             } catch (e) {
                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
-        return holdResult;
     }
 
     /**

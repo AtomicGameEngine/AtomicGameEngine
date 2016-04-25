@@ -106,6 +106,8 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
                 node.remove();
                 scene.sendEvent("SceneEditAddRemoveNodes", { end: true });
 
+                return true;
+
             } else if (refid == "duplicate_node") {
 
                 if (node instanceof Atomic.Scene)
@@ -113,10 +115,12 @@ class HierarchyFrameMenus extends Atomic.ScriptObject {
 
                 var newnode = node.clone();
                 node.scene.sendEvent("SceneEditNodeCreated", { node: newnode });
+
+                return true;
             }
 
             // Let plugins handle context
-            return ServiceLocator.uiServices.hierarchyContextItemClicked(target, refid);
+            return ServiceLocator.uiServices.hierarchyContextItemClicked(node, refid);
         }
 
         return false;
