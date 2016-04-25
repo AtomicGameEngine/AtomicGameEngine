@@ -237,6 +237,9 @@ public:
     /// Check if a button is held down.
     bool IsControlButtonDown(unsigned button) const;
 
+    /// Send a message.
+    void SendStringMessage(const String& message);
+
 private:
     /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);

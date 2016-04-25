@@ -221,7 +221,8 @@ void MasterServerClient::Update(float dt) {
 
         if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
         {
-            network->ConnectWithExistingSocket(clientToServerSocket_, clientPendingScene_);
+            LOGINFO("Sending packet to server");
+            clientToServerSocket_->Send("K",1);
         }
 
         timeTillNextClientConnectAttempt_ = timeBetweenClientConnectAttempts_;

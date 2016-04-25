@@ -1587,4 +1587,13 @@ bool Connection::IsControlButtonDown(unsigned button) const
     return (controls_.IsDown(button));
 }
 
+
+void Connection::SendStringMessage(const String& message)
+{
+    // Send the identity map now
+    VectorBuffer msg;
+    msg.WriteString(message);
+    SendMessage(MSG_STRING, true, true, msg);
+}
+
 }
