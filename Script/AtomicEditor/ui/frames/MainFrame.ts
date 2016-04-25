@@ -68,19 +68,6 @@ class MainFrame extends ScriptWidget {
         this.subscribeToEvent("ProjectLoaded", (data) => {
             this.showWelcomeFrame(false);
             this.enableProjectMenus();
-
-        this.resourcePath = ToolCore.toolSystem.project.getResourcePath();
-        this.resourceCache = Atomic.getResourceCache();
-
-        //Check if a 'Techniques' folder exists within a project, if so, add it to ResourceCache Directory
-        if (Atomic.fileSystem.dirExists(this.resourcePath + "Techniques")){
-            this.resourceCache.addResourceDir(this.resourcePath + "Techniques");
-        }
-        //Check if a 'Shaders' folder exists within a project, if so, add it to ResourceCache Directory
-        if (Atomic.fileSystem.dirExists(this.resourcePath + "Shaders")) {
-            this.resourceCache.addResourceDir(this.resourcePath + "Shaders");
-        }
-
         });
 
         this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => {
@@ -201,8 +188,6 @@ class MainFrame extends ScriptWidget {
     inspectorlayout: Atomic.UILayout;
     mainToolbar: MainToolbar;
     menu: MainFrameMenu;
-    resourceCache: Atomic.ResourceCache;
-    resourcePath: String;
 
 }
 

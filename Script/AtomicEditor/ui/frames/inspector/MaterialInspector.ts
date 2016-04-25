@@ -206,7 +206,7 @@ class MaterialInspector extends ScriptWidget {
         var technique = <Atomic.Technique>cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
 
         if (technique == null)
-            technique = <Atomic.Technique>cache.getResource("Technique", techniqueName + ".xml");
+            technique = <Atomic.Technique>cache.getResource("Technique", "Techniques/" + techniqueName + ".xml");
 
         this.material.setTechnique(0, technique);
     }
