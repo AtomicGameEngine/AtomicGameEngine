@@ -95,6 +95,8 @@ private:
 
     WeakPtr<SceneEditor3D> sceneEditor_;
 
+    int newCameraYPos_;
+
     float yaw_;
     float pitch_;
 

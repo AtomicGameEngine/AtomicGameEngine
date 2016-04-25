@@ -74,7 +74,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     mouseMoved_(false),
     enabled_(true),
     cameraMove_(false),
-    gridEnabled_(false)
+    gridEnabled_(false),
+    newCameraYPos_(0)
 {
 
     sceneEditor_ = sceneEditor;
@@ -482,6 +483,8 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
 
 void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    int FARCLIP_INCREMENT = 8;
+
     // parent is the contentRoot for our tab, when tab isn't active it will not be visible
     if (!GetParent() || GetParent()->GetVisibility() != UI_WIDGET_VISIBILITY_VISIBLE)
     {
@@ -501,7 +504,31 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     ToggleGrid();
 
     if (gridEnabled_)
-        debugRenderer_->CreateGrid(Color::GRAY, Color::RED, false, cameraNode_->GetPosition());
+    {
+        int cameraYPos = cameraNode_->GetPosition().y_;
+        int farClip = camera_->GetFarClip();
+
+        if (cameraYPos == newCameraYPos_)
+        {
+            farClip = camera_->GetFarClip();
+        }
+        else
+        {
+            if (cameraYPos > newCameraYPos_)
+            {
+                farClip += FARCLIP_INCREMENT;
+                camera_->SetFarClip(farClip);
+            }
+            else
+            {
+                farClip -= FARCLIP_INCREMENT;
+                camera_->SetFarClip(farClip);
+            }
+        }
+        newCameraYPos_ = cameraYPos;
+
+        debugRenderer_->CreateGrid(Color::GRAY, true, cameraNode_->GetPosition());
+    }
 
     if (preloadResourceScene_.NotNull())
     {

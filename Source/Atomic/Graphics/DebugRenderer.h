@@ -136,11 +136,11 @@ public:
             unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
 
     /// Create positive and negative X axis lines
-    void CreateXAxisLines(unsigned gridColor, unsigned subdivisionColor, bool depthTest, int x, int y, int z);
+    void CreateXAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z);
     /// Create positive and negative Z axis lines
-    void CreateZAxisLines(unsigned gridColor, unsigned subdivisionColor, bool depthTest, int x, int y, int z);
+    void CreateZAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z);
     /// Creates a grid on all axis
-    void CreateGrid(const Color& grid, const Color& subdivision, bool depthTest, Vector3 position);
+    void CreateGrid(const Color& grid, bool depthTest, Vector3 position);
 
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
