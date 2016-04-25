@@ -56,7 +56,7 @@ DebugRenderer::DebugRenderer(Context* context) :
     position1_(0, 0, 0),
     position2_(0, 0, 0),
     position3_(0, 0, 0),
-    numGridLines_(81),
+    numGridLines_(200),
     scale_(0),
     lineLength_(0),
     offset_(0),
@@ -356,7 +356,7 @@ void DebugRenderer::AddTriangleMesh(const void* vertexData, unsigned vertexSize,
     }
 }
 
-void DebugRenderer::CreateXAxisLines(unsigned gridColor, unsigned subdivisionColor, bool depthTest, int x, int y, int z)
+void DebugRenderer::CreateXAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z)
 {
     for (int i = 0; i < numGridLines_; i++)
     {
@@ -372,7 +372,7 @@ void DebugRenderer::CreateXAxisLines(unsigned gridColor, unsigned subdivisionCol
 
 }
 
-void DebugRenderer::CreateZAxisLines(unsigned gridColor, unsigned subdivisionColor, bool depthTest, int x, int y, int z)
+void DebugRenderer::CreateZAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z)
 {
     for (int j = 0; j < numGridLines_; j++)
     {
@@ -387,15 +387,11 @@ void DebugRenderer::CreateZAxisLines(unsigned gridColor, unsigned subdivisionCol
     }
 }
 
-void DebugRenderer::CreateGrid(const Color& grid, const Color& subdivision, bool depthTest, Vector3 position)
+void DebugRenderer::CreateGrid(const Color& grid, bool depthTest, Vector3 position)
 {
     unsigned gridColor = grid.ToUInt();
-    unsigned subdivisionColor = subdivision.ToUInt();
 
-    int x = position.x_;
-    int z = position.z_;
-
-    scale_ = (position.y_ / position.y_) * scaleIncrement_;
+    scale_ = position.y_ / scaleIncrement_;
 
     if (position.y_ < scaleIncrement_)
         scale_ = 1;
@@ -403,8 +399,8 @@ void DebugRenderer::CreateGrid(const Color& grid, const Color& subdivision, bool
     lineLength_ = (numGridLines_ / 2) * scale_;
     offset_ = (numGridLines_ / 2) * scale_;
 
-    CreateXAxisLines(gridColor, subdivisionColor, depthTest, x, 0, z);
-    CreateZAxisLines(gridColor, subdivisionColor, depthTest, x, 0, z);
+    CreateXAxisLines(gridColor, depthTest, 0, 0, 0);
+    CreateZAxisLines(gridColor, depthTest, 0, 0, 0);
 }
 
 void DebugRenderer::Render()
