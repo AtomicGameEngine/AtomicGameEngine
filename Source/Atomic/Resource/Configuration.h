@@ -30,6 +30,7 @@ namespace Atomic
 
 class Context;
 
+/// Configuration base class for mapping JSON setting files to VariantMap configuration settings
 class Configuration
 {
 public:
