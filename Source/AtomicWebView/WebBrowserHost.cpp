@@ -130,8 +130,8 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     CefSettings settings;
     settings.windowless_rendering_enabled = 1;
 
-    // disable default background
-    settings.background_color = 0;
+    // default background is white, add a setting
+    // settings.background_color = 0;
 
     if (productVersion_.Length())
     {

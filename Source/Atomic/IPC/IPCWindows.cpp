@@ -42,7 +42,7 @@ namespace Atomic
 static const wchar_t kPipePrefix[] = L"\\\\.\\pipe\\";
 // start with 1 megabyte of buffer, this will grow if a request exceeds this size
 // however, it will block during resize
-static const int kPipeBufferSz = 1024 * 1024;
+static const int kPipeBufferSz = ATOMIC_WINDOWS_IPC_BUFFER_SIZE;
 static LONG g_pipe_seq = 0;
 
 HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool read)
@@ -215,7 +215,7 @@ void PipeWin::ReaderThread::ThreadFunction()
             continue;
 
         DWORD bytesRead = 0;
-        if (TRUE == ::ReadFile(pipeWin_->pipeRead_, &buf_[0], 4096, &bytesRead, NULL))
+        if (TRUE == ::ReadFile(pipeWin_->pipeRead_, &buf_[0], ATOMIC_WINDOWS_IPC_BUFFER_SIZE, &bytesRead, NULL))
         {
             readSize_ = (unsigned) bytesRead;
         }
