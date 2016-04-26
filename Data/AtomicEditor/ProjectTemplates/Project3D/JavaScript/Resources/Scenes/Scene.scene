@@ -56,7 +56,7 @@
 	<node id="363">
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Chest" />
-		<attribute name="Position" value="0 -0.374877 0" />
+		<attribute name="Position" value="0 -0.374877 2" />
 		<attribute name="Rotation" value="1 0 0 0" />
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />

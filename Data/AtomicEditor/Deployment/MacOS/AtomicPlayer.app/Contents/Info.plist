@@ -39,5 +39,7 @@
         <key>URHO3D_PREFIX_PATH</key>
         <string>../Resources</string>
     </dict>
+    <key>NSHighResolutionCapable</key>
+    <true/>
 </dict>
 </plist>

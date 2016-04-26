@@ -36,6 +36,10 @@
 
 #include "../DebugNew.h"
 
+#ifdef ATOMIC_PLATFORM_DESKTOP
+#include <libsquish/squish.h>
+#endif
+
 extern "C" unsigned char* stbi_write_png_to_mem(unsigned char* pixels, int stride_bytes, int x, int y, int n, int* out_len);
 
 #ifndef MAKEFOURCC
@@ -78,6 +82,25 @@ static const unsigned DDS_DXGI_FORMAT_BC2_UNORM = 74;
 static const unsigned DDS_DXGI_FORMAT_BC2_UNORM_SRGB = 75;
 static const unsigned DDS_DXGI_FORMAT_BC3_UNORM = 77;
 static const unsigned DDS_DXGI_FORMAT_BC3_UNORM_SRGB = 78;
+
+// ATOMIC BEGIN
+static const unsigned DDSD_CAPS = 0x00000001;
+static const unsigned DDSD_HEIGHT = 0x00000002;
+static const unsigned DDSD_WIDTH = 0x00000004;
+static const unsigned DDSD_PITCH = 0x00000008;
+static const unsigned DDSD_PIXELFORMAT = 0x00001000;
+static const unsigned DDSD_MIPMAPCOUNT = 0x00020000;
+static const unsigned DDSD_LINEARSIZE = 0x00080000;
+static const unsigned DDSD_DEPTH = 0x00800000;
+
+static const unsigned DDPF_ALPHAPIXELS = 0x00000001;
+static const unsigned DDPF_ALPHA = 0x00000002;
+static const unsigned DDPF_FOURCC = 0x00000004;
+static const unsigned DDPF_PALETTEINDEXED8 = 0x00000020;
+static const unsigned DDPF_RGB = 0x00000040;
+static const unsigned DDPF_LUMINANCE = 0x00020000;
+static const unsigned DDPF_NORMAL = 0x80000000;  // nvidia specific
+// ATOMIC END
 
 namespace Atomic
 {
@@ -1209,6 +1232,136 @@ bool Image::SaveJPG(const String& fileName, int quality) const
         return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
     else
         return false;
+}
+
+bool Image::SaveDDS(const String& fileName) const
+{
+#if !defined(ATOMIC_PLATFORM_DESKTOP)
+
+    LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
+    return false;
+
+#else
+    PROFILE(SaveImageDDS);
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        LOGERROR("Can not save compressed image to DDS");
+        return false;
+    }
+
+    if (data_)
+    {
+        // #623 BEGIN TODO: Should have an abstract ImageReader and ImageWriter classes
+        // with subclasses for particular image output types. Also should have image settings in the image meta.
+        // ImageReader/Writers should also support a progress callback so UI can be updated.
+
+        if (!width_ || !height_)
+        {
+            LOGERRORF("Attempting to save zero width/height DDS to %s", fileName.CString());
+            return false;
+        }
+
+        squish::u8 *inputData = (squish::u8 *) data_.Get();
+
+        SharedPtr<Image> tempImage;
+
+        // libsquish expects 4 channel RGBA, so create a temporary image if necessary
+        if (components_ != 4)
+        {
+            if (components_ != 3)
+            {
+                LOGERROR("Can only save images with 3 or 4 components to DDS");
+                return false;
+            }
+
+            tempImage = new Image(context_);
+            tempImage->SetSize(width_, height_, 4);
+
+            squish::u8* srcBits = (squish::u8*) data_;
+            squish::u8* dstBits = (squish::u8*) tempImage->data_;
+
+            for (unsigned i = 0; i < (unsigned) width_ * (unsigned) height_; i++)
+            {
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = *srcBits++;
+                *dstBits++ = 255;
+            }
+
+            inputData = (squish::u8 *) tempImage->data_.Get();
+        }
+        
+        unsigned squishFlags = HasAlphaChannel() ? squish::kDxt5 : squish::kDxt1;
+
+        // Use a slow but high quality colour compressor (the default). (TODO: expose other settings as parameter)
+        squishFlags |= squish::kColourClusterFit;
+
+        unsigned storageRequirements = (unsigned) squish::GetStorageRequirements( width_, height_,  squishFlags);
+
+        SharedArrayPtr<unsigned char> compressedData(new unsigned char[storageRequirements]);
+
+        squish::CompressImage(inputData, width_, height_, compressedData.Get(), squishFlags);
+
+        DDSurfaceDesc2 sdesc;
+
+        if (sizeof(sdesc) != 124)
+        {
+            LOGERROR("Image::SaveDDS - sizeof(DDSurfaceDesc2) != 124");
+            return false;
+        }
+        memset(&sdesc, 0, sizeof(sdesc));
+        sdesc.dwSize_ = 124;
+        sdesc.dwFlags_ = DDSD_CAPS | DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT;
+        sdesc.dwWidth_ = width_;
+        sdesc.dwHeight_ = height_;
+
+        sdesc.ddpfPixelFormat_.dwSize_ = 32;        
+        sdesc.ddpfPixelFormat_.dwFlags_ = DDPF_FOURCC | (HasAlphaChannel() ? DDPF_ALPHAPIXELS : 0);
+        sdesc.ddpfPixelFormat_.dwFourCC_ = HasAlphaChannel() ? FOURCC_DXT5 : FOURCC_DXT1;
+
+        SharedPtr<File> dest(new File(context_, fileName, FILE_WRITE));
+
+        if (!dest->IsOpen())
+        {
+            LOGERRORF("Failed to open DXT image file for writing %s", fileName.CString());
+            return false;
+        }
+        else
+        {
+
+            dest->Write((void*)"DDS ", 4);
+            dest->Write((void*)&sdesc, sizeof(sdesc));
+
+            bool success = dest->Write(compressedData.Get(), storageRequirements) == storageRequirements;
+
+            if (!success)
+                LOGERRORF("Failed to write image to DXT, file size mismatch %s", fileName.CString());
+
+            return success;
+        }        
+        // #623 END TODO
+    }    
+#endif
+
+    return false;
+}
+
+bool Image::IsPOT() const
+{
+    return IsPowerOfTwo(width_) && IsPowerOfTwo(height_);
+}
+
+bool Image::HasAlphaChannel() const
+{
+    return components_ > 3;
 }
 
 Color Image::GetPixel(int x, int y) const

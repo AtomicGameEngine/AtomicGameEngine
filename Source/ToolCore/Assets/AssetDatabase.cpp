@@ -1,8 +1,23 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 #include <Poco/MD5Engine.h>
@@ -15,6 +30,7 @@
 #include <Atomic/Resource/ResourceEvents.h>
 #include <Atomic/Resource/ResourceCache.h>
 
+#include "../Import/ImportConfig.h"
 #include "../ToolEvents.h"
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
@@ -85,6 +101,24 @@ void AssetDatabase::RegisterGUID(const String& guid)
     }
 
     usedGUID_.Push(guid);
+}
+
+void AssetDatabase::ReadImportConfig()
+{
+    ImportConfig::Clear();
+
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+
+    String projectPath = project->GetProjectPath();
+
+    String filename = projectPath + "Settings/Import.json";
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (!fileSystem->FileExists(filename))
+        return;
+
+    ImportConfig::LoadFromFile(context_, filename);
 }
 
 void AssetDatabase::Import(const String& path)
@@ -419,6 +453,8 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
 {
     project_ = GetSubsystem<ToolSystem>()->GetProject();
 
+    ReadImportConfig();
+
     FileSystem* fs = GetSubsystem<FileSystem>();
 
     if (!fs->DirExists(GetCachePath()))
@@ -536,7 +572,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
         resourceTypeToImporterType_["Sprite2D"] = "TextureImporter";
         resourceTypeToImporterType_["Image"] = "TextureImporter";
         resourceTypeToImporterType_["AnimatedSprite2D"] = "SpriterImporter";
-        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";        
+        resourceTypeToImporterType_["JSComponentFile"] = "JavascriptImporter";
         resourceTypeToImporterType_["JSONFile"] = "JSONImporter";
         resourceTypeToImporterType_["ParticleEffect2D"] = "PEXImporter";
         resourceTypeToImporterType_["ParticleEffect"] = "ParticleEffectImporter";

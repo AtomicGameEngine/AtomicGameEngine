@@ -57,6 +57,14 @@ task('atomiceditor', {
       fs.copySync(buildDir +  "Source/AtomicPlayer/Application/AtomicPlayer",
         editorAppFolder + "Resources/ToolData/Deployment/Linux/AtomicPlayer");
 
+      // Copy CEF support files
+      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/icudtl.dat",
+        editorAppFolder+"/icudtl.dat");
+      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/natives_blob.bin",
+        editorAppFolder+"/natives_blob.bin");
+      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/snapshot_blob.bin",
+        editorAppFolder+"/snapshot_blob.bin");
+
     console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
 
     complete();

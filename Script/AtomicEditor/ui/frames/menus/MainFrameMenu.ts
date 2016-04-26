@@ -1,16 +1,35 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
-// LICENSE: Atomic Game Engine Editor and Tools EULA
-// Please see LICENSE_ATOMIC_EDITOR_AND_TOOLS.md in repository root for
-// license information: https://github.com/AtomicGameEngine/AtomicGameEngine
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import strings = require("../../EditorStrings");
 import EditorEvents = require("../../../editor/EditorEvents");
 import EditorUI = require("../../EditorUI");
 import MenuItemSources = require("./MenuItemSources");
+import Preferences = require("editor/Preferences");
+import ServiceLocator from "../../../hostExtensions/ServiceLocator";
 
 class MainFrameMenu extends Atomic.ScriptObject {
+
+    private pluginMenuItemSource: Atomic.UIMenuItemSource;
 
     constructor() {
 
@@ -23,6 +42,27 @@ class MainFrameMenu extends Atomic.ScriptObject {
         MenuItemSources.createMenuItemSource("menu developer", developerItems);
         MenuItemSources.createMenuItemSource("menu help", helpItems);
 
+    }
+
+    createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        if (!this.pluginMenuItemSource) {
+            var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
+            this.pluginMenuItemSource = MenuItemSources.createSubMenuItemSource(developerMenuItemSource ,"Plugins", {});
+        }
+
+        return MenuItemSources.createSubMenuItemSource(this.pluginMenuItemSource , id, items);
+
+    }
+
+    removePluginMenuItemSource(id: string) {
+        if (this.pluginMenuItemSource) {
+            this.pluginMenuItemSource.removeItemWithStr(id);
+            if (0 == this.pluginMenuItemSource.itemCount) {
+                var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
+                developerMenuItemSource.removeItemWithStr("Plugins");
+                this.pluginMenuItemSource = null;
+            }
+        }
     }
 
     handlePopupMenu(target: Atomic.UIWidget, refid: string): boolean {
@@ -202,15 +242,29 @@ class MainFrameMenu extends Atomic.ScriptObject {
             if (refid == "developer assetdatabase scan") {
 
               ToolCore.assetDatabase.scan();
+              return true;
 
             }
 
             if (refid == "developer assetdatabase force") {
 
               ToolCore.assetDatabase.reimportAllAssets();
+              return true;
 
             }
 
+            //Sets all value in prefs.json to default and shuts down the editor.
+            if (refid == "developer clear preferences") {
+                var myPrefs = Preferences.getInstance();
+                myPrefs.useDefaultConfig();
+                myPrefs.saveEditorWindowData(myPrefs.editorWindow);
+                myPrefs.savePlayerWindowData(myPrefs.playerWindow);
+                Atomic.getEngine().exit();
+                return true;
+            }
+
+            // If we got here, then we may have been injected by a plugin.  Notify the plugins
+            return ServiceLocator.uiServices.menuItemClicked(refid);
 
         } else if (target.id == "menu tools popup") {
 
@@ -249,6 +303,10 @@ class MainFrameMenu extends Atomic.ScriptObject {
             } else if (refid == "help chat") {
                 Atomic.fileSystem.systemOpen("https://gitter.im/AtomicGameEngine/AtomicGameEngine/");
                 return true;
+            }
+            else if (refid == "help getting started") {
+                Atomic.fileSystem.systemOpen("http://atomicgameengine.com/learn/");
+                return true;
             } else if (refid == "help github") {
                 Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/");
                 return true;
@@ -258,6 +316,8 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 return true;
             }
 
+        } else {
+            console.log("Menu: " + target.id + " clicked");
         }
 
     }
@@ -312,6 +372,7 @@ var buildItems = {
 var developerItems = {
 
     "Show Console": ["developer show console"],
+    "Clear Preferences": ["developer clear preferences"], //Adds clear preference to developer menu items list
     "Debug": {
         "UI Debugger": ["developer show uidebugger"],
         "Asset Database": {
@@ -340,14 +401,12 @@ var fileItems = {
 
 var helpItems = {
 
-    "Check for Updates": "check update",
+    "Getting Started": "help getting started",
     "API Documentation": ["help api"],
     "-1": null,
     "Atomic Chat": ["help chat"],
     "Atomic Forums": ["help forums"],
     "-2": null,
     "Atomic Game Engine on GitHub": ["help github"],
-    "About Atomic Editor": "about atomic editor",
-    "-3": null,
-    "Manage License": "manage license"
+    "About Atomic Editor": "about atomic editor"
 };

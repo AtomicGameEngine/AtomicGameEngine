@@ -100,6 +100,11 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
 
     bool superdown = input->GetKeyDown(KEY_LGUI) || input->GetKeyDown(KEY_RGUI);
 
+    if (!superdown && eventData.Contains("ForceSuperDown"))
+    {
+        superdown = eventData["ForceSuperDown"].GetBool();
+    }
+
     if (superdown)
         keyEvent.modifiers |= EVENTFLAG_COMMAND_DOWN;
 
