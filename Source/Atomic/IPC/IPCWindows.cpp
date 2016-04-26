@@ -40,7 +40,9 @@ namespace Atomic
 {
 
 static const wchar_t kPipePrefix[] = L"\\\\.\\pipe\\";
-static const int kPipeBufferSz = 4 * 1024;
+// start with 1 megabyte of buffer, this will grow if a request exceeds this size
+// however, it will block during resize
+static const int kPipeBufferSz = 1024 * 1024;
 static LONG g_pipe_seq = 0;
 
 HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool read)
