@@ -152,15 +152,7 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
     FileSystem* fs = GetSubsystem<FileSystem>();
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());
 
-    // reload it immediately so it is ready for use
-    // TODO: The resource cache is reloading after this reload due to catching the file cache
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    XMLFile* xmlfile = cache->GetResource<XMLFile>(asset_->GetGUID());
-    cache->ReloadResource(xmlfile);
-
-    VariantMap changedData;
-    changedData[PrefabChanged::P_GUID] = asset_->GetGUID();
-    SendEvent(E_PREFABCHANGED, changedData);
+    OnPrefabFileChanged();
 
 }
 
@@ -170,7 +162,22 @@ bool PrefabImporter::Import()
 
     fs->Copy(asset_->GetPath(), asset_->GetCachePath());
 
+    OnPrefabFileChanged();
+
     return true;
+}
+
+void PrefabImporter::OnPrefabFileChanged()
+{
+    // reload it immediately so it is ready for use
+    // TODO: The resource cache is reloading after this reload due to catching the file cache
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    XMLFile* xmlfile = cache->GetResource<XMLFile>(asset_->GetGUID());
+    cache->ReloadResource(xmlfile);
+
+    VariantMap changedData;
+    changedData[PrefabChanged::P_GUID] = asset_->GetGUID();
+    SendEvent(E_PREFABCHANGED, changedData);
 }
 
 bool PrefabImporter::LoadSettingsInternal(JSONValue& jsonRoot)

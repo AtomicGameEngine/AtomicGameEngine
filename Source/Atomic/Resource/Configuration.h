@@ -30,17 +30,22 @@ namespace Atomic
 
 class Context;
 
+/// Configuration base class for mapping JSON setting files to VariantMap configuration settings
 class Configuration
 {
 public:
 
+    Configuration();
+
     bool LoadFromFile(Context* context, const String& filename);
     bool LoadFromJSON(const String& json);
+    void Clear();
 
     /// Apply the configuration to a setting variant map, values that exist will not be overriden
     void ApplyConfig(VariantMap& settings, bool overwrite = false);
 
     const VariantMap& GetConfig() { return valueMap_; }
+    const bool IsLoaded() const { return isLoaded_; }
 
 protected:
     static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
@@ -53,6 +58,7 @@ protected:
 
 private:
     String filename_;
+    bool isLoaded_;
 };
 }
 

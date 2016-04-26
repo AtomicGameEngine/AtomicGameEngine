@@ -7,6 +7,7 @@
 
 /// <reference path="Atomic.d.ts" />
 /// <reference path="Editor.d.ts" />
+/// <reference path="ToolCore.d.ts" />
 
 declare module Editor.EditorEvents {
 
@@ -146,7 +147,7 @@ declare module Editor.Extensions {
     /**
      * Base interface for any editor services.
      */
-    export interface EditorService {
+    export interface EditorServiceExtension {
         /**
          * Unique name of this service
          * @type {string}
@@ -160,6 +161,12 @@ declare module Editor.Extensions {
         description: string;
 
     }
+
+    /**
+     * Base Service Event Listener.  Attach descendents of these to an EditorServiceExtension
+     * to hook service events
+     */
+    export interface ServiceEventListener extends EditorServiceExtension { }
 
     interface EventDispatcher {
         /**
@@ -186,13 +193,13 @@ declare module Editor.Extensions {
          * Loads a service into a service registry
          * @param  {EditorService} service
          */
-        loadService(service: EditorService): void;
+        loadService(service: EditorServiceExtension): void;
     }
 
     /**
      * Service registry interface for registering services
      */
-    export interface ServiceRegistry<T extends EditorService> {
+    export interface ServicesProvider<T extends ServiceEventListener> {
         registeredServices: T[];
 
         /**
@@ -221,40 +228,45 @@ declare module Editor.HostExtensions {
      * or by the editor itself.
      */
     export interface HostServiceLocator extends Editor.Extensions.ServiceLoader {
-        resourceServices: ResourceServiceRegistry;
-        projectServices: ProjectServiceRegistry;
-        uiServices: UIServiceRegistry;
+        resourceServices: ResourceServicesProvider;
+        projectServices: ProjectServicesProvider;
+        uiServices: UIServicesProvider;
     }
 
-    export interface HostEditorService extends Editor.Extensions.EditorService {
+    export interface HostEditorService extends Editor.Extensions.EditorServiceExtension {
         /**
          * Called by the service locator at load time
          */
-        initialize(serviceLocator: Editor.Extensions.ServiceLoader);
+        initialize(serviceLocator: HostServiceLocator);
     }
 
-    export interface ResourceService extends Editor.Extensions.EditorService {
+    export interface ResourceServicesEventListener extends Editor.Extensions.ServiceEventListener {
         save?(ev: EditorEvents.SaveResourceEvent);
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
     }
-    export interface ResourceServiceRegistry extends Editor.Extensions.ServiceRegistry<ResourceService> { }
+    export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> { }
 
-    export interface ProjectService extends Editor.Extensions.EditorService {
+    export interface ProjectServicesEventListener extends Editor.Extensions.ServiceEventListener {
         projectUnloaded?();
         projectLoaded?(ev: EditorEvents.LoadProjectEvent);
         playerStarted?();
     }
-    export interface ProjectServiceRegistry extends Editor.Extensions.ServiceRegistry<ProjectService> { }
+    export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> { }
 
-    export interface UIService extends Editor.Extensions.EditorService {
-        menuItemClicked?(refId: string): boolean;
+    export interface UIServicesEventListener extends Editor.Extensions.ServiceEventListener {
+        menuItemClicked?(refid: string): boolean;
+        projectContextItemClicked?(asset: ToolCore.Asset, refid: string): boolean;
+        hierarchyContextItemClicked?(node: Atomic.Node, refid: string): boolean;
     }
-    export interface UIServiceRegistry extends Editor.Extensions.ServiceRegistry<UIService> {
+    export interface UIServicesProvider extends Editor.Extensions.ServicesProvider<UIServicesEventListener> {
         createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
         removePluginMenuItemSource(id: string);
+        createHierarchyContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removeHierarchyContextMenuItemSource(id: string);
+        createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removeProjectContextMenuItemSource(id: string);
         showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
-        menuItemClicked(refId: string): boolean;
     }
 }
 
@@ -271,14 +283,14 @@ declare module Editor.ClientExtensions {
         getHostInterop(): HostInterop;
     }
 
-    export interface ClientEditorService extends Editor.Extensions.EditorService {
+    export interface ClientEditorService extends Editor.Extensions.EditorServiceExtension {
         /**
          * Called by the service locator at load time
          */
         initialize(serviceLocator: ClientServiceLocator);
     }
 
-    export interface WebViewService extends Editor.Extensions.EditorService {
+    export interface WebViewService extends Editor.Extensions.EditorServiceExtension {
         configureEditor?(ev: EditorEvents.EditorFileEvent);
         codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
         save?(ev: EditorEvents.CodeSavedEvent);

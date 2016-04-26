@@ -54,7 +54,7 @@ export class EventDispatcher implements Editor.Extensions.EventDispatcher {
 /**
  * Generic registry for storing Editor Extension Services
  */
-class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
+class ServiceRegistry<T extends Editor.Extensions.ServiceEventListener> implements Editor.Extensions.ServicesProvider<T> {
     registeredServices: T[] = [];
 
     /**

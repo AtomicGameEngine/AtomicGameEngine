@@ -55,6 +55,9 @@ protected:
     virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
     virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
+    /// Handle notifying any objects that might need to update after the prefab file changes, such as ResourceCache or any scene components
+    virtual void OnPrefabFileChanged();
+
 private:
 
     void HandlePrefabSave(StringHash eventType, VariantMap& eventData);

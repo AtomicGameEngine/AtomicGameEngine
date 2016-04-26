@@ -24,15 +24,20 @@ import strings = require("ui/EditorStrings");
 import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("ui/EditorUI");
 import MenuItemSources = require("./MenuItemSources");
+import ServiceLocator from "../../../hostExtensions/ServiceLocator";
 
 class ProjectFrameMenus extends Atomic.ScriptObject {
+
+    contentFolder: string;
+
+    private contextMenuItemSource: Atomic.UIMenuItemSource = null;
 
     constructor() {
 
         super();
 
         MenuItemSources.createMenuItemSource("asset context folder", assetFolderContextItems);
-        MenuItemSources.createMenuItemSource("asset context general", assetGeneralContextItems);
+        this.contextMenuItemSource = MenuItemSources.createMenuItemSource("asset context general", assetGeneralContextItems);
         MenuItemSources.createMenuItemSource("project create items", createItems);
 
         this.subscribeToEvent(EditorEvents.ContentFolderChanged, (ev: EditorEvents.ContentFolderChangedEvent) => {
@@ -106,6 +111,8 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
                 return true;
             }
 
+            // Let plugins handle context
+            return ServiceLocator.uiServices.projectContextItemClicked(asset, refid);
         }
 
         return false;
@@ -149,7 +156,13 @@ class ProjectFrameMenus extends Atomic.ScriptObject {
 
     }
 
-    contentFolder: string;
+    createPluginItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        return MenuItemSources.createSubMenuItemSource(this.contextMenuItemSource , id, items);
+    }
+
+    removePluginItemSource(id: string) {
+        this.contextMenuItemSource.removeItemWithStr(id);
+    }
 
 }
 

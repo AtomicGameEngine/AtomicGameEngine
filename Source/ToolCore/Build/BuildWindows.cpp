@@ -27,6 +27,7 @@
 #include "../ToolSystem.h"
 #include "../ToolEnvironment.h"
 #include "../Project/Project.h"
+#include "../Assets/AssetDatabase.h"
 
 #include "BuildWindows.h"
 #include "BuildSystem.h"
@@ -66,6 +67,27 @@ void BuildWindows::Initialize()
 
     BuildResourceEntries();
 
+}
+
+bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const String& fileName)
+{
+    // #623 BEGIN TODO: Skip files that have a converted version in the cache
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    if (resourceDir != cachePath)
+    {
+        String ext = GetExtension(fileName);
+        if (ext == ".jpg" || ext == ".png" || ext == ".tga")
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            String compressedPath = cachePath + "DDS/" + fileName + ".dds";
+            if (fileSystem->FileExists(compressedPath))
+                return false;
+        }
+    }
+    // #623 END TODO
+    
+    return BuildBase::CheckIncludeResourceFile(resourceDir, fileName);
 }
 
 void BuildWindows::BuildAtomicNET()
