@@ -299,7 +299,6 @@ EventLoop.requestExit = function () {
  * schedules a function to be called on the next frame
  * @method
  * @param {function} func the Function to call
- * @param {any} [parameters] A comma separated list of parameters to pass to func
  * @returns {int} the id of the callback to be used in cancelAnimationFrame in order to cancel the call
  */
 function requestAnimationFrame(step) {
