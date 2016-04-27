@@ -56,6 +56,9 @@ public:
     /// Set the browser's width and height
     void SetSize(int width, int height);
 
+    /// Set browser zoom level, specify 0.0 to reset the zoom level
+    void SetZoomLevel(float zoomLevel);
+
     /// Send a mouse click event to the browser
     void SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier, int clickCount = 1) const;
     /// Send a mouse press event to the browser
