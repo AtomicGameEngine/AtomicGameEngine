@@ -137,10 +137,12 @@ namespace('build', function() {
     process.chdir(atomicRoot);
 
     var tsc = "./Build/node_modules/typescript/lib/tsc";
+    var dtsGenerator = "./Build/node_modules/dts-generator/bin/dts-generator";
 
     cmds = [
       atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script",
-      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor"
+      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor",
+      atomicRoot + "Build/Mac/node/node " + dtsGenerator + " --name Atomic --baseDir ./Script/TypeScript --file ./Script/TypeScript/*.d.ts --exclude ./Script/TypeScript/dist/*.d.ts --out ./Script/TypeScript/dist/Atomic.d.ts"
     ];
 
       // will be copied when editor resources are copied
@@ -162,6 +164,9 @@ namespace('build', function() {
          // copy lib.core.d.ts into the tool data directory
          fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
          fs.copySync("./Build/node_modules/typescript/lib/lib.core.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.core.d.ts")
+
+         // copy the combined Atomic.d.ts to the tool data directory
+         fs.copySync("./Script/TypeScript/dist/Atomic.d.ts","./Data/AtomicEditor/TypeScriptSupport/Atomic.d.ts")
          complete();
 
       }, {
