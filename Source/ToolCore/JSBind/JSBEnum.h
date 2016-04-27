@@ -44,7 +44,7 @@ public:
     JSBEnum(Context* context, JSBModule* module, const String& name);
     virtual ~JSBEnum();
 
-    const String& GetName() { return name_; }
+    const String& GetName() const { return name_; }
     JSBHeader* GetHeader() { return header_; }
 
     JSBPackage* GetPackage();
