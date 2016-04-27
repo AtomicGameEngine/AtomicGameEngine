@@ -59,6 +59,7 @@ namespace('build', function() {
         var node;
         var tsc = "./Build/node_modules/typescript/lib/tsc";
         var tslint = "./Build/node_modules/tslint/lib/tslint-cli";
+        var dtsGenerator = "./Build/node_modules/dts-generator/bin/dts-generator";
 
         switch(os.platform()) {
             case "win32":
@@ -82,6 +83,9 @@ namespace('build', function() {
           cmds.push(node + " " + tsc + " -p ./Script");
           cmds.push(node + " " + tsc + " -p ./Script/AtomicWebViewEditor");
 
+          // generate combined atomic.d.ts
+          cmds.push(node + " " + dtsGenerator + " --name Atomic --baseDir ./Script/TypeScript --file ./Script/TypeScript/*.d.ts --exclude ./Script/TypeScript/dist/*.d.ts --out ./Script/TypeScript/dist/Atomic.d.ts");
+
           var lintTask = jake.Task['build:lint_typescript'];
 
           lintTask.addListener('complete', function () {
@@ -99,6 +103,10 @@ namespace('build', function() {
                // copy lib.core.d.ts into the tool data directory
                fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
                fs.copySync("./Build/node_modules/typescript/lib/lib.core.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.core.d.ts")
+
+               // copy the combined Atomic.d.ts to the tool data directory
+               fs.copySync("./Script/TypeScript/dist/Atomic.d.ts","./Data/AtomicEditor/TypeScriptSupport/Atomic.d.ts")
+
                complete();
 
             }, {
