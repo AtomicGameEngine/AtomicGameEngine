@@ -978,6 +978,14 @@ void WebClient::SetSize(int width, int height)
 
 }
 
+void WebClient::SetZoomLevel(float zoomLevel)
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetHost()->SetZoomLevel(zoomLevel);
+}
+
 void WebClient::SetWebRenderHandler(WebRenderHandler* handler)
 {
     handler->SetWebClient(this);
