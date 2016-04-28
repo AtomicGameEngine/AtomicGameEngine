@@ -437,16 +437,24 @@ void UIWidget::SetFontId(const String& fontId)
     widget_->SetFontDescription(fd);
 }
 
-void UIWidget::SetFontId(tb::uint32 fontId)
+void UIWidget::SetFontIdHash(unsigned fontIdHash)
 {
     if (!widget_)
         return;
 
     tb::TBFontDescription fd(widget_->GetFontDescription());
-    fd.SetID(fontId);
+    fd.SetID(fontIdHash);
     widget_->SetFontDescription(fd);
 }
 
+unsigned UIWidget::GetFontIdHash()
+{
+    if (!widget_)
+        return 0;
+
+    tb::TBFontDescription fd(widget_->GetFontDescription());
+    return fd.GetID();
+}
 
 void UIWidget::SetFontSize(int size)
 {

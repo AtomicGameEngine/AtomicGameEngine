@@ -275,7 +275,8 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     // Font Description
     void SetFontId(const String& fontId);
-    void SetFontId(tb::uint32 fontId);
+    void SetFontIdHash(unsigned fontIdHash);
+    unsigned GetFontIdHash();
     void SetFontSize(int size);
     int GetFontSize();
 
