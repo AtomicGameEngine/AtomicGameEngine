@@ -34,6 +34,7 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
     constructor() {
         this.resourceServices = new HostExtensionServices.ResourceServicesProvider();
         this.projectServices = new HostExtensionServices.ProjectServicesProvider();
+        this.sceneServices = new HostExtensionServices.SceneServicesProvider();
         this.uiServices = new HostExtensionServices.UIServicesProvider();
     }
 
@@ -41,6 +42,7 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
 
     resourceServices: HostExtensionServices.ResourceServicesProvider;
     projectServices: HostExtensionServices.ProjectServicesProvider;
+    sceneServices: HostExtensionServices.SceneServicesProvider;
     uiServices: HostExtensionServices.UIServicesProvider;
 
     loadService(service: Editor.HostExtensions.HostEditorService) {
@@ -59,6 +61,7 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
         this.eventDispatcher = frame;
         this.resourceServices.subscribeToEvents(this);
         this.projectServices.subscribeToEvents(this);
+        this.sceneServices.subscribeToEvents(this);
         this.uiServices.subscribeToEvents(this);
     }
 
