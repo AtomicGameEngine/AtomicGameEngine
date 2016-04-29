@@ -230,6 +230,7 @@ declare module Editor.HostExtensions {
     export interface HostServiceLocator extends Editor.Extensions.ServiceLoader {
         resourceServices: ResourceServicesProvider;
         projectServices: ProjectServicesProvider;
+        sceneServices: SceneServicesProvider;
         uiServices: UIServicesProvider;
     }
 
@@ -245,7 +246,10 @@ declare module Editor.HostExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
     }
-    export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> { }
+
+    export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> {
+        createMaterial(resourcePath: string, materialName: string, reportError: boolean): boolean;
+    }
 
     export interface ProjectServicesEventListener extends Editor.Extensions.ServiceEventListener {
         projectUnloaded?();
@@ -253,6 +257,12 @@ declare module Editor.HostExtensions {
         playerStarted?();
     }
     export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> { }
+
+    export interface SceneServicesEventListener extends Editor.Extensions.ServiceEventListener {
+        activeSceneEditorChanged?(ev: EditorEvents.ActiveSceneEditorChangeEvent);
+        editorSceneClosed?(ev: EditorEvents.SceneClosedEvent);
+    }
+    export interface SceneServicesProvider extends Editor.Extensions.ServicesProvider<SceneServicesEventListener> { }
 
     export interface UIServicesEventListener extends Editor.Extensions.ServiceEventListener {
         menuItemClicked?(refid: string): boolean;
@@ -266,7 +276,11 @@ declare module Editor.HostExtensions {
         removeHierarchyContextMenuItemSource(id: string);
         createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
         removeProjectContextMenuItemSource(id: string);
+        refreshHierarchyFrame();
         showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
+        showModalError(windowText: string, message: string);
+        showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args?: any);
+
     }
 }
 

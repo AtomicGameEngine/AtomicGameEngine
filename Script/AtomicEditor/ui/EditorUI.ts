@@ -97,9 +97,7 @@ class EditorUI extends Atomic.ScriptObject {
 
     // Hook the service locator into the event system and give it the ui objects it needs
     ServiceLocator.uiServices.init(
-      this.mainframe.menu, 
-      this.mainframe.hierarchyFrame.menu,
-      this.mainframe.projectframe.menu,
+      this.mainframe, 
       this.modalOps);
     ServiceLocator.subscribeToEvents(this.mainframe);
 
@@ -109,9 +107,8 @@ class EditorUI extends Atomic.ScriptObject {
 
   }
 
-  showModalError(windowText:string, message:string) {
-      var window = new Atomic.UIMessageWindow(this.view, "modal_error");
-      window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
+  showModalError(windowText: string, message: string) {
+      this.modalOps.showError(windowText, message);
   }
 
   view: Atomic.UIView;
