@@ -123,6 +123,66 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
             }
         });
     }
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                let prefs = JSON.parse(prefsFile.readText());
+                let extensionPrefs = prefs["extensions"];
+                if (extensionPrefs && extensionPrefs[extensionName]) {
+                    return extensionPrefs[extensionName][preferenceName] || defaultValue;
+                }
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        // if all else fails
+        return defaultValue;
+    }
+
+
+    /**
+     * Sets a user preference value in the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
+
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        let prefs = {};
+
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                prefs = JSON.parse(prefsFile.readText());
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        prefs["extensions"] = prefs["extensions"] || {};
+        prefs["extensions"][extensionName] = prefs["extensions"][extensionName] || {};
+        prefs["extensions"][extensionName][preferenceName] = value;
+
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        try {
+            saveFile.writeString(JSON.stringify(prefs, null, "  "));
+        } finally {
+            saveFile.flush();
+            saveFile.close();
+        }
+    }
 }
 
 /**
@@ -196,7 +256,7 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
     }
 
     /**
-     * Create New Material 
+     * Create New Material
      * @param  {string} resourcePath
      * @param  {string} materialName
      * @param  {boolean} reportError
@@ -391,7 +451,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -403,7 +463,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @type {boolean} return true if handled
      */
     hierarchyContextItemClicked(node: Atomic.Node, refid: string): boolean {
-        if (!node) 
+        if (!node)
             return false;
 
         // run through and find any services that can handle this.
@@ -416,7 +476,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -442,7 +502,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
