@@ -21,6 +21,7 @@
 //
 
 import ClientExtensionEventNames from "./ClientExtensionEventNames";
+import HostInteropType from "../interop";
 
 // Entry point for web view extensions -- extensions that live inside the web view
 interface EventSubscription {
@@ -54,7 +55,7 @@ export class EventDispatcher implements Editor.Extensions.EventDispatcher {
 /**
  * Generic registry for storing Editor Extension Services
  */
-class ServiceRegistry<T extends Editor.Extensions.ServiceEventListener> implements Editor.Extensions.ServicesProvider<T> {
+class ServicesProvider<T extends Editor.Extensions.ServiceEventListener> implements Editor.Extensions.ServicesProvider<T> {
     registeredServices: T[] = [];
 
     /**
@@ -73,7 +74,18 @@ class ServiceRegistry<T extends Editor.Extensions.ServiceEventListener> implemen
     }
 }
 
-export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExtensions.WebViewService> {
+export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExtensions.WebViewServiceEventListener> {
+
+    private userPreferences = {};
+
+    /**
+     * Sets the preferences for the service locator
+     * @param  {any} prefs
+     * @return {[type]}
+     */
+    setPreferences(prefs : any) {
+        this.userPreferences = prefs;
+    }
 
     /**
      * Allow this service registry to subscribe to events that it is interested in
@@ -206,6 +218,34 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
                 alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
             }
         });
+    }
+
+    /**
+     * Returns the Host Interop module
+     * @return {Editor.ClientExtensions.HostInterop}
+     */
+    getHostInterop(): Editor.ClientExtensions.HostInterop {
+        return HostInteropType.getInstance();
+    }
+
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+        if (this.userPreferences) {
+            let extensionPrefs = this.userPreferences["extensions"];
+            if (extensionPrefs && extensionPrefs[extensionName]) {
+                return extensionPrefs[extensionName][preferenceName] || defaultValue;
+            }
+        }
+
+        // if all else fails
+        return defaultValue;
     }
 
 

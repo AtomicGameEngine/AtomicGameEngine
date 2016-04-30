@@ -318,6 +318,39 @@ declare module Editor.ClientExtensions {
      * or by the editor itself.
      */
     export interface ClientServiceLocator extends Editor.Extensions.ServiceLoader {
+        /**
+         * Exposed services
+         * @type {WebViewServicesProvider}
+         */
+        clientServices: WebViewServicesProvider;
+    }
+
+    export interface ClientEditorService extends Editor.Extensions.EditorServiceExtension {
+        /**
+         * Called by the service locator at load time
+         */
+        initialize(serviceLocator: ClientServiceLocator);
+    }
+
+    export interface WebViewServiceEventListener extends Editor.Extensions.EditorServiceExtension {
+        configureEditor?(ev: EditorEvents.EditorFileEvent);
+        codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
+        save?(ev: EditorEvents.CodeSavedEvent);
+        delete?(ev: EditorEvents.DeleteResourceEvent);
+        rename?(ev: EditorEvents.RenameResourceEvent);
+        projectUnloaded?();
+        preferencesChanged?();
+    }
+
+    /**
+     * Available methods exposed to client services
+     */
+    export interface WebViewServicesProvider extends Editor.Extensions.ServicesProvider<WebViewServiceEventListener> {
+
+        /**
+         * Get a reference to the interop to talk to the host
+         * @return {HostInterop}
+         */
         getHostInterop(): HostInterop;
 
         /**
@@ -328,23 +361,6 @@ declare module Editor.ClientExtensions {
          * @return {number|boolean|string}
          */
         getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string;
-    }
-
-    export interface ClientEditorService extends Editor.Extensions.EditorServiceExtension {
-        /**
-         * Called by the service locator at load time
-         */
-        initialize(serviceLocator: ClientServiceLocator);
-    }
-
-    export interface WebViewService extends Editor.Extensions.EditorServiceExtension {
-        configureEditor?(ev: EditorEvents.EditorFileEvent);
-        codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
-        save?(ev: EditorEvents.CodeSavedEvent);
-        delete?(ev: EditorEvents.DeleteResourceEvent);
-        rename?(ev: EditorEvents.RenameResourceEvent);
-        projectUnloaded?();
-        preferencesChanged?();
     }
 
     export interface AtomicErrorMessage {
