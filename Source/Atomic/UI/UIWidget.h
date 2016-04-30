@@ -24,6 +24,7 @@
 
 #include <ThirdParty/TurboBadger/tb_widgets.h>
 #include <ThirdParty/TurboBadger/tb_widgets_common.h>
+#include <ThirdParty/TurboBadger/tb_font_renderer.h>
 
 #include "../Core/Object.h"
 
@@ -275,8 +276,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     // Font Description
     void SetFontId(const String& fontId);
-    void SetFontIdHash(unsigned fontIdHash);
-    unsigned GetFontIdHash();
+    String GetFontId();
     void SetFontSize(int size);
     int GetFontSize();
 
