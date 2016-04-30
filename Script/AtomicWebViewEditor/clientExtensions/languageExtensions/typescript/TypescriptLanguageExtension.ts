@@ -300,4 +300,12 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.worker.port.postMessage(message);
         }
     }
+
+    /**
+     * Called when the user preferences have been changed (or initially loaded)
+     * @return {[type]}
+     */
+    preferencesChanged() {
+        // nothing to do yet
+    }
 }

@@ -40,13 +40,15 @@ export class ClientServiceLocatorType implements Editor.ClientExtensions.ClientS
 
     private services: ClientExtensionServices.ExtensionServiceRegistry;
     private eventDispatcher: Editor.Extensions.EventDispatcher = new ClientExtensionServices.EventDispatcher();
-
+    private userPreferences = {};
+    
     /**
-     * Returns the Host Interop module
-     * @return {Editor.ClientExtensions.HostInterop}
+     * Sets the preferences for the service locator
+     * @param  {any} prefs
+     * @return {[type]}
      */
-    getHostInterop(): Editor.ClientExtensions.HostInterop {
-        return HostInteropType.getInstance();
+    setPreferences(prefs : any) {
+        this.userPreferences = prefs;
     }
 
     loadService(service: Editor.ClientExtensions.ClientEditorService) {
@@ -78,6 +80,36 @@ export class ClientServiceLocatorType implements Editor.ClientExtensions.ClientS
         if (this.eventDispatcher) {
             this.eventDispatcher.subscribeToEvent(eventType, callback);
         }
+    }
+
+    /** Methods available to extensions **/
+
+    /**
+     * Returns the Host Interop module
+     * @return {Editor.ClientExtensions.HostInterop}
+     */
+    getHostInterop(): Editor.ClientExtensions.HostInterop {
+        return HostInteropType.getInstance();
+    }
+
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+        if (this.userPreferences) {
+            let extensionPrefs = this.userPreferences["extensions"];
+            if (extensionPrefs && extensionPrefs[extensionName]) {
+                return extensionPrefs[extensionName][preferenceName] || defaultValue;
+            }
+        }
+
+        // if all else fails
+        return defaultValue;
     }
 }
 

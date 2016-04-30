@@ -86,6 +86,7 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ProjectUnloadedEvent, (ev) => this.projectUnloaded());
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeSavedEvent, (ev) => this.saveCode(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged());
     }
 
     /**
@@ -189,4 +190,23 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
             }
         });
     }
+
+    /**
+     * Called when prefeerences changes
+     * @param  {Editor.EditorEvents.PreferencesChangedEvent} ev
+     */
+    preferencesChanged() {
+        this.registeredServices.forEach((service) => {
+            // Notify services that the project has been unloaded
+            try {
+                if (service.preferencesChanged) {
+                    service.preferencesChanged();
+                }
+            } catch (e) {
+                alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
+            }
+        });
+    }
+
+
 }

@@ -140,6 +140,12 @@ declare module Editor.EditorEvents {
         serializable: Atomic.Serializable;
 
     }
+
+    export interface PreferencesChangedEvent {
+
+        preferences: any;
+
+    }
 }
 
 declare module Editor.Extensions {
@@ -313,6 +319,15 @@ declare module Editor.ClientExtensions {
      */
     export interface ClientServiceLocator extends Editor.Extensions.ServiceLoader {
         getHostInterop(): HostInterop;
+
+        /**
+         * Return a preference value or the provided default from the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to retrieve
+         * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+         * @return {number|boolean|string}
+         */
+        getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string;
     }
 
     export interface ClientEditorService extends Editor.Extensions.EditorServiceExtension {
@@ -329,6 +344,7 @@ declare module Editor.ClientExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
         projectUnloaded?();
+        preferencesChanged?();
     }
 
     export interface AtomicErrorMessage {
