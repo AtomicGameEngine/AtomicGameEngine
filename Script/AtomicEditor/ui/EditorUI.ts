@@ -25,6 +25,7 @@ import MainFrame = require("./frames/MainFrame");
 import ModalOps = require("./modal/ModalOps");
 import Shortcuts = require("./Shortcuts");
 import ServiceLocator from "../hostExtensions/ServiceLocator";
+import Editor = require("editor/Editor");
 
 // this is designed with public get functions to solve
 // circular dependency issues in TS
@@ -47,8 +48,12 @@ export function getShortcuts():Shortcuts {
   return editorUI.shortcuts;
 }
 
-export function initialize() {
-  editorUI = new EditorUI();
+export function initialize(editor: Editor) {
+  editorUI = new EditorUI(editor);
+}
+
+export function getEditor(): Editor {
+    return editorUI.editor;
 }
 
 export function shutdown() {
@@ -68,10 +73,9 @@ export function getCurrentResourceEditor():Editor.ResourceEditor {
     return getMainFrame().resourceframe.currentResourceEditor;
 }
 
-
 class EditorUI extends Atomic.ScriptObject {
 
-  constructor() {
+  constructor(editor: Editor) {
 
     super();
 
@@ -82,6 +86,8 @@ class EditorUI extends Atomic.ScriptObject {
     this.mainframe = new MainFrame();
 
     this.view.addChild(this.mainframe);
+
+    this.editor = editor;
 
     this.subscribeToEvent("ScreenMode", (ev:Atomic.ScreenModeEvent) => {
 
@@ -97,7 +103,7 @@ class EditorUI extends Atomic.ScriptObject {
 
     // Hook the service locator into the event system and give it the ui objects it needs
     ServiceLocator.uiServices.init(
-      this.mainframe, 
+      this.mainframe,
       this.modalOps);
     ServiceLocator.subscribeToEvents(this.mainframe);
 
@@ -115,5 +121,6 @@ class EditorUI extends Atomic.ScriptObject {
   mainframe: MainFrame;
   modalOps: ModalOps;
   shortcuts: Shortcuts;
+  editor: Editor;
 
 }

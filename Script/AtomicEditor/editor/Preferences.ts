@@ -145,6 +145,63 @@ class Preferences {
     static getInstance(): Preferences {
         return Preferences.instance;
     }
+
+    /**
+     * Return a preference value or the provided default from the user settings file located in the project
+     * @param  {string} settingsGroup name of the group these settings should fall under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                let prefs = JSON.parse(prefsFile.readText());
+                if (prefs && prefs[settingsGroup]) {
+                    return prefs[settingsGroup][preferenceName] || defaultValue;
+                }
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        // if all else fails
+        return defaultValue;
+    }
+
+    /**
+     * Sets a user preference value in the user settings file located in the project
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(settingsGroup: string, preferenceName: string, value: number | boolean | string) {
+
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        let prefs = {};
+
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                prefs = JSON.parse(prefsFile.readText());
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        prefs[settingsGroup] = prefs[settingsGroup] || {};
+        prefs[settingsGroup][preferenceName] = value;
+
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        try {
+            saveFile.writeString(JSON.stringify(prefs, null, "  "));
+        } finally {
+            saveFile.flush();
+            saveFile.close();
+        }
+    }
 }
 
 interface WindowData {

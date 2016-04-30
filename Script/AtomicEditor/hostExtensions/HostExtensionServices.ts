@@ -25,6 +25,8 @@ import * as EditorUI from "../ui/EditorUI";
 import MainFrame = require("../ui/frames/MainFrame");
 import ModalOps = require("../ui/modal/ModalOps");
 import ResourceOps = require("../resources/ResourceOps");
+import Editor = require("../editor/Editor");
+
 /**
  * Generic registry for storing Editor Extension Services
  */
@@ -132,22 +134,7 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
      * @return {number|boolean|string}
      */
     getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
-        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
-        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
-            try {
-                let prefs = JSON.parse(prefsFile.readText());
-                let extensionPrefs = prefs["extensions"];
-                if (extensionPrefs && extensionPrefs[extensionName]) {
-                    return extensionPrefs[extensionName][preferenceName] || defaultValue;
-                }
-            } finally {
-                prefsFile.close();
-            }
-        }
-
-        // if all else fails
-        return defaultValue;
+        return EditorUI.getEditor().getUserPreference(extensionName, preferenceName);
     }
 
 
@@ -158,30 +145,7 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
      * @param  {number | boolean | string} value value to set
      */
     setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
-
-        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
-        let prefs = {};
-
-        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
-            try {
-                prefs = JSON.parse(prefsFile.readText());
-            } finally {
-                prefsFile.close();
-            }
-        }
-
-        prefs["extensions"] = prefs["extensions"] || {};
-        prefs["extensions"][extensionName] = prefs["extensions"][extensionName] || {};
-        prefs["extensions"][extensionName][preferenceName] = value;
-
-        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
-        try {
-            saveFile.writeString(JSON.stringify(prefs, null, "  "));
-        } finally {
-            saveFile.flush();
-            saveFile.close();
-        }
+        EditorUI.getEditor().setUserPreference(extensionName, preferenceName, value);
     }
 }
 

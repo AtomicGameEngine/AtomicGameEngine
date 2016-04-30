@@ -55,7 +55,7 @@ class Editor extends Atomic.ScriptObject {
 
         this.editorLicense = new EditorLicense();
 
-        EditorUI.initialize();
+        EditorUI.initialize(this);
 
         this.playMode = new PlayMode();
 
@@ -136,6 +136,29 @@ class Editor extends Atomic.ScriptObject {
         Preferences.getInstance().saveEditorWindowData(editorWindowData);
 
         return true;
+    }
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+        return Preferences.getInstance().getUserPreference(extensionName, preferenceName, defaultValue);
+    }
+
+
+    /**
+     * Sets a user preference value in the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
+        Preferences.getInstance().setUserPreference(extensionName, preferenceName, value);
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
     }
 
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {

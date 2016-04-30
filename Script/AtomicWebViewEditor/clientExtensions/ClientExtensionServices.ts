@@ -231,16 +231,16 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
 
     /**
      * Return a preference value or the provided default from the user settings file
-     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} gorupName name of the group the preference lives under
      * @param  {string} preferenceName name of the preference to retrieve
      * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
      * @return {number|boolean|string}
      */
-    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+    getUserPreference(groupName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
         if (this.userPreferences) {
-            let extensionPrefs = this.userPreferences["extensions"];
-            if (extensionPrefs && extensionPrefs[extensionName]) {
-                return extensionPrefs[extensionName][preferenceName] || defaultValue;
+            let prefs = this.userPreferences[groupName];
+            if (prefs) {
+                return prefs[groupName][preferenceName] || defaultValue;
             }
         }
 
