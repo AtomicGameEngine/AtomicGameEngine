@@ -95,6 +95,11 @@ EVENT(E_PROJECTUNLOADEDNOTIFICATION, ProjecUnloadedNotification)
 {
 }
     
+/// User Preferences Changed
+EVENT(E_USERPREFERENCESCHANGEDNOTIFICAITON, UserPreferencesChangedNotification)
+{
+}
+    
 
 /// Language changed.
 EVENT(E_CHANGELANGUAGE, ChangeLanguage)

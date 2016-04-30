@@ -71,6 +71,7 @@ private:
     void HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData);
     void HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData);
     void HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData);
+    void HandleUserPreferencesChangedNotification(StringHash eventType, VariantMap& eventData);
     
     SharedPtr<UIWebView> webView_;
     WeakPtr<WebClient> webClient_;
