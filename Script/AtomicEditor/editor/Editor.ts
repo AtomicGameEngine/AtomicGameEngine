@@ -161,6 +161,18 @@ class Editor extends Atomic.ScriptObject {
         this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
     }
 
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(settingsGroup: string, groupPreferenceValues: Object) {
+        Preferences.getInstance().setUserPreferenceGroup(settingsGroup, groupPreferenceValues);
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
+    }
+
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
 
         var system = ToolCore.getToolSystem();

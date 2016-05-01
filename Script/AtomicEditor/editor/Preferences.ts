@@ -31,6 +31,8 @@ class Preferences {
     private static instance: Preferences;
     private _prefs: PreferencesFormat;
 
+    private cachedProjectjPreferences: Object = null;
+
     constructor() {
         this.fileSystem = Atomic.getFileSystem();
         Preferences.instance = this;
@@ -154,17 +156,23 @@ class Preferences {
      * @return {number|boolean|string}
      */
     getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
-        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
-        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
-            try {
-                let prefs = JSON.parse(prefsFile.readText());
-                if (prefs && prefs[settingsGroup]) {
-                    return prefs[settingsGroup][preferenceName] || defaultValue;
+
+        // Cache the settings so we don't keep going out to the file
+        if (this.cachedProjectjPreferences == null) {
+            const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+            if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+                let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+                try {
+                    let prefs = JSON.parse(prefsFile.readText());
+                    this.cachedProjectjPreferences = prefs;
+                } finally {
+                    prefsFile.close();
                 }
-            } finally {
-                prefsFile.close();
             }
+        }
+
+        if (this.cachedProjectjPreferences && this.cachedProjectjPreferences[settingsGroup]) {
+            return this.cachedProjectjPreferences[settingsGroup][preferenceName] || defaultValue;
         }
 
         // if all else fails
@@ -201,6 +209,48 @@ class Preferences {
             saveFile.flush();
             saveFile.close();
         }
+
+        // Cache the update
+        this.cachedProjectjPreferences = prefs;
+    }
+
+
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(settingsGroup: string, groupPreferenceValues: Object) {
+
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        let prefs = {};
+
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                prefs = JSON.parse(prefsFile.readText());
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        prefs[settingsGroup] = prefs[settingsGroup] || {};
+        for (let preferenceName in groupPreferenceValues) {
+            prefs[settingsGroup][preferenceName] = groupPreferenceValues[preferenceName];
+        }
+
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        try {
+            saveFile.writeString(JSON.stringify(prefs, null, "  "));
+        } finally {
+            saveFile.flush();
+            saveFile.close();
+        }
+
+        // Cache the update
+        this.cachedProjectjPreferences = prefs;
     }
 }
 

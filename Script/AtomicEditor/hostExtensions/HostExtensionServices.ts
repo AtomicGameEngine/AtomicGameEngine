@@ -147,6 +147,17 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
     setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
         EditorUI.getEditor().setUserPreference(extensionName, preferenceName, value);
     }
+
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} extensionName name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(extensionName: string, groupPreferenceValues: Object) {
+        EditorUI.getEditor().setUserPreferenceGroup(extensionName, groupPreferenceValues);
+    }
 }
 
 /**
