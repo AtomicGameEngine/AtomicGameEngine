@@ -444,6 +444,9 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
     case MSG_PACKAGEINFO:
         ProcessPackageInfo(msgID, msg);
         break;
+    case MSG_STRING:
+        ProcessStringMessage(msgID, msg);
+        break;
 
     default:
         processed = false;
@@ -1587,6 +1590,13 @@ bool Connection::IsControlButtonDown(unsigned button) const
     return (controls_.IsDown(button));
 }
 
+void Connection::SetControlDataInt(const String &key, int value) {
+    controls_.extraData_[key] = value;
+}
+
+int Connection::GetControlDataInt(const String &key) {
+    return controls_.extraData_[key].GetInt();
+}
 
 void Connection::SendStringMessage(const String& message)
 {
@@ -1594,6 +1604,15 @@ void Connection::SendStringMessage(const String& message)
     VectorBuffer msg;
     msg.WriteString(message);
     SendMessage(MSG_STRING, true, true, msg);
+}
+
+void Connection::ProcessStringMessage(int msgID, MemoryBuffer &msg) {
+    using namespace NetworkMessage;
+
+    VariantMap &eventData = GetEventDataMap();
+    eventData[P_MESSAGEID] = (int) msgID;
+    eventData[P_DATA] = msg.ReadString();
+    SendEvent(E_NETWORKSTRINGMESSAGE, eventData);
 }
 
 }

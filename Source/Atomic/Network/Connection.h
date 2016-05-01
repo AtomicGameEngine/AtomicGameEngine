@@ -237,6 +237,10 @@ public:
     /// Check if a button is held down.
     bool IsControlButtonDown(unsigned button) const;
 
+    void SetControlDataInt(const String& key, int value);
+
+    int GetControlDataInt(const String& key);
+
     /// Send a message.
     void SendStringMessage(const String& message);
 
@@ -279,6 +283,8 @@ private:
     void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
+
+    void ProcessStringMessage(int msgID, MemoryBuffer& msg);
 
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
 

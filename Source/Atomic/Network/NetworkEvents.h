@@ -107,4 +107,10 @@ EVENT(E_MASTERMESSAGE, MasterServerMessage)
 {
     PARAM(P_DATA, Data);                    // Buffer
 }
+
+/// Unhandled master message received.
+EVENT(E_NETWORKSTRINGMESSAGE, NetworkStringMessage)
+{
+    PARAM(P_DATA, Data);                    // Buffer
+}
 }
