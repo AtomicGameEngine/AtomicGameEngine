@@ -111,6 +111,7 @@ EVENT(E_MASTERMESSAGE, MasterServerMessage)
 /// Unhandled master message received.
 EVENT(E_NETWORKSTRINGMESSAGE, NetworkStringMessage)
 {
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
     PARAM(P_DATA, Data);                    // Buffer
 }
 }

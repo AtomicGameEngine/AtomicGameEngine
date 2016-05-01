@@ -1611,6 +1611,7 @@ void Connection::ProcessStringMessage(int msgID, MemoryBuffer &msg) {
 
     VariantMap &eventData = GetEventDataMap();
     eventData[P_MESSAGEID] = (int) msgID;
+    eventData[P_CONNECTION] = this;
     eventData[P_DATA] = msg.ReadString();
     SendEvent(E_NETWORKSTRINGMESSAGE, eventData);
 }
