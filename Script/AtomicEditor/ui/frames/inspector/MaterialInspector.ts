@@ -52,25 +52,7 @@ lightmapSource.addItem(new Atomic.UIMenuItem("Lightmap", "Lightmap"));
 lightmapSource.addItem(new Atomic.UIMenuItem("Lightmap Alpha", "Lightmap Alpha"));
 
 var projectSource = new Atomic.UIMenuItemSource();
-var subFolderSource = new Atomic.UIMenuItemSource();
-
-var _ = new Atomic.UIMenuItem("Solid");
-_.subSource = solidSource;
-techniqueSource.addItem(_);
-
-_ = new Atomic.UIMenuItem("Transparency");
-_.subSource = tranSource;
-techniqueSource.addItem(_);
-
-_ = new Atomic.UIMenuItem("Lightmap");
-_.subSource = lightmapSource;
-techniqueSource.addItem(_);
-
-_ = new Atomic.UIMenuItem("Project");
-_.subSource = projectSource;
-techniqueSource.addItem(_);
-
-
+var _ = new Atomic.UIMenuItem();
 
 var techniqueLookup = {
     "Techniques/Diff.xml": "Diffuse",
@@ -88,9 +70,7 @@ var techniqueLookup = {
 };
 
 var techniqueReverseLookup = {};
-
 var projectTechniques = {};
-
 var projectTechniquesAddress = {};
 
 for (var key in techniqueLookup) {
@@ -98,7 +78,6 @@ for (var key in techniqueLookup) {
     techniqueReverseLookup[techniqueLookup[key]] = key;
 
 }
-
 
 class MaterialInspector extends ScriptWidget {
 
@@ -114,6 +93,7 @@ class MaterialInspector extends ScriptWidget {
         this.fd.size = 11;
 
         this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => this.createTextureRemoveButtonCallback(this.tunit, this.textureWidget));
+        this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.refreshTechniquesPopup());
     }
 
     createShaderParametersSection(): Atomic.UISection {
@@ -173,12 +153,8 @@ class MaterialInspector extends ScriptWidget {
             attrsVerticalLayout.addChild(attrLayout);
 
             // print(params[i].name, " : ", params[i].value, " : ", params[i].type);
-
         }
-
-
         return section;
-
     }
 
     getTextureThumbnail(texture: Atomic.Texture): Atomic.Texture {
@@ -212,13 +188,12 @@ class MaterialInspector extends ScriptWidget {
         var resourcePath = ToolCore.toolSystem.project.getResourcePath();
 
         if (technique == null)
-
             var techniquePath;
 
-        for (var tech in projectTechniques) {
+        for (var i in projectTechniques) {
 
-            if (techniqueName == projectTechniques[tech]) {
-                techniquePath = projectTechniquesAddress[tech];
+            if (techniqueName == projectTechniques[i]) {
+                techniquePath = projectTechniquesAddress[i];
                 break;
             }
         }
@@ -230,9 +205,7 @@ class MaterialInspector extends ScriptWidget {
 
     createTechniquePopup(): Atomic.UIWidget {
 
-        projectSource.clear();
-        var resourcesPath = ToolCore.toolSystem.project.getResourcePath();
-        this.loadProjectTechniques(resourcesPath + "Techniques", projectSource);
+        this.refreshTechniquesPopup();
 
         var button = this.techniqueButton = new Atomic.UIButton();
         var technique = this.material.getTechnique(0);
@@ -289,7 +262,6 @@ class MaterialInspector extends ScriptWidget {
         return null;
 
     }
-
 
     openTextureSelectionBox(textureUnit: number, textureWidget: Atomic.UITextureWidget) {
 
@@ -453,17 +425,75 @@ class MaterialInspector extends ScriptWidget {
             var asset = TechniqueAssets[i];
             if (TechniqueAssets[i].isFolder()) {
 
-                var subfoldersource = new Atomic.UIMenuItemSource();
-                _ = new Atomic.UIMenuItem(TechniqueAssets[i].name);
-                _.subSource = subfoldersource;
-                menuItem.addItem(_);
+                if (this.scanDirectoryForTechniques(asset.path)) {
 
-                this.loadProjectTechniques(asset.path, subfoldersource);
+                    var subfoldersource = new Atomic.UIMenuItemSource();
+                    _ = new Atomic.UIMenuItem(TechniqueAssets[i].name);
+                    _.subSource = subfoldersource;
+                    menuItem.addItem(_);
+
+                    this.loadProjectTechniques(asset.path, subfoldersource);
+                }
             }
             else {
                 projectTechniques[i] = TechniqueAssets[i].name;
                 projectTechniquesAddress[i] = TechniqueAssets[i].path;
                 menuItem.addItem(new Atomic.UIMenuItem(projectTechniques[i], projectTechniques[i]));
+            }
+        }
+    }
+
+    scanDirectoryForTechniques(directory: string): boolean {
+
+        var techniqueFound = false;
+
+        var techniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(directory);
+
+        for (var i in techniqueAssets) {
+
+            var asset = techniqueAssets[i];
+
+            if (techniqueAssets[i].isFolder()) {
+                if (this.scanDirectoryForTechniques(asset.path)) {
+                    return true;
+                }
+            }
+            else if (techniqueAssets[i].getExtension() == ".xml") {
+                techniqueFound = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    refreshTechniquesPopup() {
+
+        techniqueSource.clear();
+
+        _ = new Atomic.UIMenuItem("Solid");
+        _.subSource = solidSource;
+        techniqueSource.addItem(_);
+
+        _ = new Atomic.UIMenuItem("Transparency");
+        _.subSource = tranSource;
+        techniqueSource.addItem(_);
+
+        _ = new Atomic.UIMenuItem("Lightmap");
+        _.subSource = lightmapSource;
+        techniqueSource.addItem(_);
+
+        var projectTechniquesPath = ToolCore.toolSystem.project.getResourcePath() + "Techniques";
+
+        if (Atomic.fileSystem.dirExists(projectTechniquesPath )) {
+            if (this.scanDirectoryForTechniques(projectTechniquesPath)) {
+
+                projectSource.clear();
+
+                _ = new Atomic.UIMenuItem("Project");
+                _.subSource = projectSource;
+                techniqueSource.addItem(_);
+
+                this.loadProjectTechniques(projectTechniquesPath, projectSource);
             }
         }
     }
