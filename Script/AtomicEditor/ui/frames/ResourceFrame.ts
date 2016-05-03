@@ -100,7 +100,14 @@ class ResourceFrame extends ScriptWidget {
 
         if (ext == ".js" || ext == ".txt" || ext == ".json" || ext == ".ts") {
 
-            editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+             let jseditor = new Editor.JSResourceEditor(path, this.tabcontainer);
+
+             jseditor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => {
+                 // We can get the webclient here now, though this might not be a great place to set this up                 
+                 let webClient = jseditor.webView.webClient;
+             });
+
+             editor = jseditor;
 
         } else if (ext == ".scene") {
 
