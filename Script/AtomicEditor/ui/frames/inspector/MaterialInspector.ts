@@ -423,6 +423,7 @@ class MaterialInspector extends ScriptWidget {
         for (var i in TechniqueAssets) {
 
             var asset = TechniqueAssets[i];
+
             if (TechniqueAssets[i].isFolder()) {
 
                 if (this.scanDirectoryForTechniques(asset.path)) {
@@ -445,8 +446,6 @@ class MaterialInspector extends ScriptWidget {
 
     scanDirectoryForTechniques(directory: string): boolean {
 
-        var techniqueFound = false;
-
         var techniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(directory);
 
         for (var i in techniqueAssets) {
@@ -459,7 +458,6 @@ class MaterialInspector extends ScriptWidget {
                 }
             }
             else if (techniqueAssets[i].getExtension() == ".xml") {
-                techniqueFound = true;
                 return true;
             }
         }
@@ -484,7 +482,8 @@ class MaterialInspector extends ScriptWidget {
 
         var projectTechniquesPath = ToolCore.toolSystem.project.getResourcePath() + "Techniques";
 
-        if (Atomic.fileSystem.dirExists(projectTechniquesPath )) {
+        if (Atomic.fileSystem.dirExists(projectTechniquesPath)) {
+
             if (this.scanDirectoryForTechniques(projectTechniquesPath)) {
 
                 projectSource.clear();
