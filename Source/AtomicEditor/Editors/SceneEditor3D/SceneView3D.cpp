@@ -172,15 +172,15 @@ bool SceneView3D::GetChangingCameraSpeed()
 
 void SceneView3D::CheckCameraSpeedBounds()
 {
-    float maxCameraSpeed = 80.0f;
-    float minCameraSpeed = 2.0f;
+    const float MAX_CAMERA_SPEED = 80.0f;
+    const float MIN_CAMERA_SPEED = 2.0f;
 
-    if (cameraMoveSpeed_ >= maxCameraSpeed)
+    if (cameraMoveSpeed_ >= MAX_CAMERA_SPEED)
     {
-        cameraMoveSpeed_ = maxCameraSpeed;
+        cameraMoveSpeed_ = MAX_CAMERA_SPEED;
     }
-    if (cameraMoveSpeed_ <= minCameraSpeed)
-        cameraMoveSpeed_ = minCameraSpeed;
+    if (cameraMoveSpeed_ <= MIN_CAMERA_SPEED)
+        cameraMoveSpeed_ = MIN_CAMERA_SPEED;
 }
 
 
