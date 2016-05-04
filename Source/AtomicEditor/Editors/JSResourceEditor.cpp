@@ -90,7 +90,6 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
     SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleRenameResourceNotification));
     SubscribeToEvent(E_DELETERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleDeleteResourceNotification));
     SubscribeToEvent(E_PROJECTUNLOADEDNOTIFICATION, HANDLER(JSResourceEditor, HandleProjectUnloadedNotification));
-    SubscribeToEvent(E_USERPREFERENCESCHANGEDNOTIFICAITON, HANDLER(JSResourceEditor, HandleUserPreferencesChangedNotification));
 
     c->AddChild(webView_->GetInternalWidget());
 
@@ -138,17 +137,6 @@ void JSResourceEditor::HandleProjectUnloadedNotification(StringHash eventType, V
     webClient_->ExecuteJavaScript("HOST_projectUnloaded();");
 }
 
-void JSResourceEditor::HandleUserPreferencesChangedNotification(StringHash eventType, VariantMap& eventData)
-{
-    ToolSystem* tsys = GetSubsystem<ToolSystem>();
-    Project* proj = tsys->GetProject();
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem->FileExists(proj->GetUserPrefsFullPath()))
-    {
-        webClient_->ExecuteJavaScript(ToString("HOST_loadPreferences(\"atomic://%s\");", proj->GetUserPrefsFullPath().CString()));
-    }
-}
-    
 void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
 {
     // need to wait until we get an editor load complete message since we could
