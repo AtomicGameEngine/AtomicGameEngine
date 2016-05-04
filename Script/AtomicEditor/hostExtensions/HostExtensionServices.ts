@@ -23,6 +23,8 @@
 import * as EditorEvents from "../editor/EditorEvents";
 import * as EditorUI from "../ui/EditorUI";
 import MainFramMenu = require("../ui/frames/menus/MainFrameMenu");
+import HierarchyFrameMenu = require("../ui/frames/menus/HierarchyFrameMenu");
+import ProjectFrameMenu = require("../ui/frames/menus/ProjectFrameMenu");
 import ModalOps = require("../ui/modal/ModalOps");
 /**
  * Generic registry for storing Editor Extension Services
@@ -205,12 +207,20 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
     }
 
     private mainFrameMenu: MainFramMenu = null;
+    private hierarchyFrameMenu: HierarchyFrameMenu = null;
+    private projectFrameMenu: ProjectFrameMenu = null;
     private modalOps: ModalOps;
 
-    init(menu: MainFramMenu, modalOps: ModalOps) {
+    init(mainFrameMenu: MainFramMenu, hierarchyFrameMenu: HierarchyFrameMenu, projectFrameMenu: ProjectFrameMenu, modalOps: ModalOps) {
         // Only set these once
         if (this.mainFrameMenu == null) {
-            this.mainFrameMenu = menu;
+            this.mainFrameMenu = mainFrameMenu;
+        }
+        if (this.hierarchyFrameMenu == null) {
+            this.hierarchyFrameMenu = hierarchyFrameMenu;
+        }
+        if (this.projectFrameMenu == null) {
+            this.projectFrameMenu = projectFrameMenu;
         }
         if (this.modalOps == null) {
             this.modalOps = modalOps;
@@ -236,6 +246,42 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
     }
 
     /**
+     * Adds a new menu to the hierarchy context menu
+     * @param  {string} id
+     * @param  {any} items
+     * @return {Atomic.UIMenuItemSource}
+     */
+    createHierarchyContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        return this.hierarchyFrameMenu.createPluginItemSource(id, items);
+    }
+
+    /**
+     * Removes a previously added menu from the hierarchy context menu
+     * @param  {string} id
+     */
+    removeHierarchyContextMenuItemSource(id: string) {
+        this.hierarchyFrameMenu.removePluginItemSource(id);
+    }
+
+    /**
+     * Adds a new menu to the project context menu
+     * @param  {string} id
+     * @param  {any} items
+     * @return {Atomic.UIMenuItemSource}
+     */
+    createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
+        return this.projectFrameMenu.createPluginItemSource(id, items);
+    }
+
+    /**
+     * Removes a previously added menu from the project context menu
+     * @param  {string} id
+     */
+    removeProjectContextMenuItemSource(id: string) {
+        this.projectFrameMenu.removePluginItemSource(id);
+    }
+
+    /**
      * Disaplays a modal window
      * @param  {Editor.Modal.ModalWindow} window
      */
@@ -248,22 +294,71 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @param  {string} refId
      * @type {boolean} return true if handled
      */
-    menuItemClicked(refId: string): boolean {
+    menuItemClicked(refid: string): boolean {
         // run through and find any services that can handle this.
-        let holdResult = false;
-        this.registeredServices.forEach((service) => {
+        return this.registeredServices.some((service) => {
             try {
                 // Verify that the service contains the appropriate methods and that it can handle it
                 if (service.menuItemClicked) {
-                    if (service.menuItemClicked(refId)) {
-                        holdResult = true;
+                    if (service.menuItemClicked(refid)) {
+                        return true;
                     }
                 }
             } catch (e) {
                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
-        return holdResult;
+    }
+
+    /**
+     * Called when a context menu item in the hierarchy pane has been clicked
+     * @param  {Atomic.Node} node
+     * @param  {string} refId
+     * @type {boolean} return true if handled
+     */
+    hierarchyContextItemClicked(node: Atomic.Node, refid: string): boolean {
+        if (!node) 
+            return false;
+
+        // run through and find any services that can handle this.
+        return this.registeredServices.some((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle it
+                if (service.hierarchyContextItemClicked) {
+                    if (service.hierarchyContextItemClicked(node, refid)) {
+                        return true;
+                    }
+                }
+            } catch (e) {
+               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
+
+
+    /**
+     * Called when a context menu item in the hierarchy pane has been clicked
+     * @param  {ToolCore.Asset} asset
+     * @param  {string} refId
+     * @type {boolean} return true if handled
+     */
+    projectContextItemClicked(asset: ToolCore.Asset, refid: string): boolean {
+        if (!asset)
+            return false;
+
+        // run through and find any services that can handle this.
+        return this.registeredServices.some((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle it
+                if (service.projectContextItemClicked) {
+                    if (service.projectContextItemClicked(asset, refid)) {
+                        return true;
+                    }
+                }
+            } catch (e) {
+               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
     }
 
     /**

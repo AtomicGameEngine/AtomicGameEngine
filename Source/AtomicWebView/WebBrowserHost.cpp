@@ -97,6 +97,9 @@ private:
 
 GlobalPropertyMap WebBrowserHost::globalProperties_;
 WeakPtr<WebBrowserHost> WebBrowserHost::instance_;
+String WebBrowserHost::userAgent_;
+String WebBrowserHost::productVersion_;
+int WebBrowserHost::debugPort_ = 3335;
 
 WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
@@ -126,9 +129,18 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     CefSettings settings;
     settings.windowless_rendering_enabled = true;
+
+    if (productVersion_.Length())
+    {
+        CefString(&settings.product_version).FromASCII(productVersion_.CString());
+    }
+
+    if (userAgent_.Length())
+    {
+        CefString(&settings.user_agent).FromASCII(userAgent_.CString());
+    }
     
-    // Enable remote debugging on port 3335
-    settings.remote_debugging_port = 3335;
+    settings.remote_debugging_port = debugPort_;
 
     d_ = new WebBrowserHostPrivate(this);
 

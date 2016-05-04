@@ -219,6 +219,27 @@ bool EngineConfig::LoadInputConfig(const JSONValue& jinput)
 
 }
 
+bool EngineConfig::LoadWebViewConfig(const JSONValue& jwebview)
+{
+    if (!jwebview.IsObject())
+        return false;
+
+    for (JSONObject::ConstIterator i = jwebview.Begin(); i != jwebview.End(); ++i)
+    {
+        String key = i->first_.ToLower();
+        const JSONValue& jvalue = i->second_;
+
+        if (key == "useragent")
+            valueMap_["WebViewUserAgent"] = GetStringValue(jvalue, String::EMPTY);
+        else if (key == "productversion")
+            valueMap_["WebViewProductVersion"] = GetStringValue(jvalue, String::EMPTY);
+        else if (key == "debugPort")
+            valueMap_["WebViewDebugPort"] = GetIntValue(jvalue, 8080);
+    }
+
+    return true;
+
+}
 
 bool EngineConfig::LoadDesktopConfig(JSONValue root)
 {
@@ -246,6 +267,11 @@ bool EngineConfig::LoadDesktopConfig(JSONValue root)
     const JSONValue& jinput = jdesktop["input"];
     if (jinput.IsObject())
         LoadInputConfig(jinput);
+
+    const JSONValue& jwebview = jdesktop["webview"];
+    if (jwebview.IsObject())
+        LoadWebViewConfig(jwebview);
+
 
     return true;
 }
