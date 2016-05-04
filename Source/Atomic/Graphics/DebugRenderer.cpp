@@ -56,7 +56,7 @@ DebugRenderer::DebugRenderer(Context* context) :
     position1_(0, 0, 0),
     position2_(0, 0, 0),
     position3_(0, 0, 0),
-    numGridLines_(200),
+    numGridLines_(100),
     scale_(0),
     lineLength_(0),
     offset_(0),

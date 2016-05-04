@@ -513,6 +513,8 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
             sceneEditor_->GetSelection()->Clear();
         }
     }
+    if (ev.type == EVENT_TYPE_KEY_DOWN)
+        ToggleGrid();
 
     return sceneEditor_->OnEvent(ev);
 }
@@ -537,8 +539,6 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     QueueUpdate();
-
-    ToggleGrid();
 
     if (gridEnabled_)
     {
