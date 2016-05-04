@@ -54,7 +54,7 @@
 namespace Atomic
 {
     void jsapi_init_atomicnet(JSVM* vm);
-    void jsapi_init_webview(JSVM* vm);;
+    void jsapi_init_webview(JSVM* vm, const VariantMap& engineParameters);
 }
 
 using namespace ToolCore;
@@ -88,9 +88,8 @@ void AEEditorCommon::Start()
     jsapi_init_toolcore(vm_);
 
 #ifdef ATOMIC_WEBVIEW
-    // Initialize in Start so window already exists
-    context_->RegisterSubsystem(new WebBrowserHost(context_));
-    jsapi_init_webview(vm_);
+    // Initialize in Start so window already exists    
+    jsapi_init_webview(vm_, engineParameters_);
 #endif
 
 

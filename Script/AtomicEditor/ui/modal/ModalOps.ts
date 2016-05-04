@@ -43,6 +43,8 @@ import UIResourceOps = require("./UIResourceOps");
 
 import SnapSettingsWindow = require("./SnapSettingsWindow");
 
+import ExtensionWindow = require("./ExtensionWindow");
+
 import ProjectTemplates = require("../../resources/ProjectTemplates");
 
 
@@ -278,6 +280,14 @@ class ModalOps extends Atomic.ScriptObject {
 
         }
 
+    }
+
+    showExtensionWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
+        if (this.show()) {
+
+            this.opWindow = new ExtensionWindow(windowText, uifilename, handleWidgetEventCB);
+            return this.opWindow;
+        }
     }
 
     private show(): boolean {

@@ -38,6 +38,7 @@
         "../TypeScript/AtomicNET.d.ts",
         "../TypeScript/AtomicPlayer.d.ts",
         "../TypeScript/AtomicWork.d.ts",
+        "../TypeScript/duktape.d.ts",
         "../TypeScript/Editor.d.ts",
         "../TypeScript/EditorWork.d.ts",
         "../TypeScript/ToolCore.d.ts",

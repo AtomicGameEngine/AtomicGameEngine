@@ -35,6 +35,9 @@ WebAppBrowser::WebAppBrowser()
 
 void WebAppBrowser::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
+    command_line->AppendSwitch("--enable-media-stream");
+    command_line->AppendSwitch("--enable-usermedia-screen-capturing");
+
     CefApp::OnBeforeCommandLineProcessing(process_type, command_line);
 }
 

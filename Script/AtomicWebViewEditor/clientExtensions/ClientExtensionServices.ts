@@ -54,7 +54,7 @@ export class EventDispatcher implements Editor.Extensions.EventDispatcher {
 /**
  * Generic registry for storing Editor Extension Services
  */
-class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Editor.Extensions.ServiceRegistry<T> {
+class ServiceRegistry<T extends Editor.Extensions.ServiceEventListener> implements Editor.Extensions.ServicesProvider<T> {
     registeredServices: T[] = [];
 
     /**
@@ -63,6 +63,13 @@ class ServiceRegistry<T extends Editor.Extensions.EditorService> implements Edit
      */
     register(service: T) {
         this.registeredServices.push(service);
+    }
+
+    unregister(service: T) {
+        var index = this.registeredServices.indexOf(service, 0);
+        if (index > -1) {
+            this.registeredServices.splice(index, 1);
+        }
     }
 }
 
@@ -78,6 +85,7 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceRenamedEvent, (ev) => this.renameResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ProjectUnloadedEvent, (ev) => this.projectUnloaded());
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeSavedEvent, (ev) => this.saveCode(ev));
     }
 
     /**
@@ -98,10 +106,10 @@ export class ExtensionServiceRegistry extends ServiceRegistry<Editor.ClientExten
     }
 
     /**
-     * Called after a resource has been saved
+     * Called after code has been saved
      * @param  {Editor.EditorEvents.SaveResourceEvent} ev
      */
-    saveResource(ev: Editor.EditorEvents.SaveResourceEvent) {
+    saveCode(ev: Editor.EditorEvents.CodeSavedEvent) {
         // run through and find any services that can handle this.
         this.registeredServices.forEach((service) => {
             try {
