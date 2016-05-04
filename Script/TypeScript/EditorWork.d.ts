@@ -271,7 +271,9 @@ declare module Editor.HostExtensions {
          * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
          * @return {number|boolean|string}
          */
-        getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
 
         /**
          * Sets a user preference value in the user settings file

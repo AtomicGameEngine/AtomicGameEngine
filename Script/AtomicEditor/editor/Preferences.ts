@@ -31,7 +31,7 @@ class Preferences {
     private static instance: Preferences;
     private _prefs: PreferencesFormat;
 
-    private cachedProjectjPreferences: Object = null;
+    private cachedProjectPreferences: Object = null;
 
     constructor() {
         this.fileSystem = Atomic.getFileSystem();
@@ -155,24 +155,27 @@ class Preferences {
      * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
      * @return {number|boolean|string}
      */
-    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
 
         // Cache the settings so we don't keep going out to the file
-        if (this.cachedProjectjPreferences == null) {
+        if (this.cachedProjectPreferences == null) {
             const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
             if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
                 let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
                 try {
                     let prefs = JSON.parse(prefsFile.readText());
-                    this.cachedProjectjPreferences = prefs;
+                    this.cachedProjectPreferences = prefs;
                 } finally {
                     prefsFile.close();
                 }
             }
         }
 
-        if (this.cachedProjectjPreferences && this.cachedProjectjPreferences[settingsGroup]) {
-            return this.cachedProjectjPreferences[settingsGroup][preferenceName] || defaultValue;
+        if (this.cachedProjectPreferences && this.cachedProjectPreferences[settingsGroup]) {
+            return this.cachedProjectPreferences[settingsGroup][preferenceName] || defaultValue;
         }
 
         // if all else fails
@@ -211,7 +214,7 @@ class Preferences {
         }
 
         // Cache the update
-        this.cachedProjectjPreferences = prefs;
+        this.cachedProjectPreferences = prefs;
     }
 
 
@@ -250,7 +253,7 @@ class Preferences {
         }
 
         // Cache the update
-        this.cachedProjectjPreferences = prefs;
+        this.cachedProjectPreferences = prefs;
     }
 }
 

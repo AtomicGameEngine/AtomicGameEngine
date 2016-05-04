@@ -145,7 +145,10 @@ class Editor extends Atomic.ScriptObject {
      * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
      * @return {number|boolean|string}
      */
-    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: any): any {
         return Preferences.getInstance().getUserPreference(extensionName, preferenceName, defaultValue);
     }
 

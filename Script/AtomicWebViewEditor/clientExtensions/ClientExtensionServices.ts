@@ -204,7 +204,7 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
     }
 
     /**
-     * Called when prefeerences changes
+     * Called when preferences changes
      * @param  {Editor.EditorEvents.PreferencesChangedEvent} ev
      */
     preferencesChanged() {
