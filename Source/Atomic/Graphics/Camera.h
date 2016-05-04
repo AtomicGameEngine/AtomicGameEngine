@@ -31,7 +31,7 @@ namespace Atomic
 {
 
 static const float DEFAULT_NEARCLIP = 0.1f;
-static const float DEFAULT_FARCLIP = 200.0f;
+static const float DEFAULT_FARCLIP = 1000.0f;
 static const float DEFAULT_CAMERA_FOV = 45.0f;
 static const float DEFAULT_ORTHOSIZE = 20.0f;
 
