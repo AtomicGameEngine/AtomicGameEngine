@@ -91,10 +91,23 @@ private:
 
     void MoveCamera(float timeStep);
 
+    void SnapCameraToView(int snapView);
+    void SelectView();
+
+    // stores the last known position of the perspective camera
+    void SetPerspectiveCameraPosition();
+
     WeakPtr<SceneEditor3D> sceneEditor_;
 
     float yaw_;
     float pitch_;
+
+    Vector3 perspectCamPosition_;
+    float perspectiveYaw_;
+    float perspectivePitch_;
+
+    // checks if perspective camera settings has been set
+    bool perspectivePositionSaved_;
 
     bool mouseLeftDown_;
     bool mouseMoved_;

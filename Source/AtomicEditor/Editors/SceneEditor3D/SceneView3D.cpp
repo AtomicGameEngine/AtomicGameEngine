@@ -73,7 +73,11 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     mouseLeftDown_(false),
     mouseMoved_(false),
     enabled_(true),
-    cameraMove_(false)
+    cameraMove_(false),
+    perspectCamPosition_(0, 0, 0),
+    perspectiveYaw_(0),
+    perspectivePitch_(0),
+    perspectivePositionSaved_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -282,6 +286,174 @@ void SceneView3D::MoveCamera(float timeStep)
     }
 }
 
+void SceneView3D::SnapCameraToView(int snapView)
+{
+    Vector3 selectedNodePos(0, 0, 0);
+
+    // the distance the camera snaps from the selected object
+    const int DISTANCE = 5;
+
+    int xVal = 0;
+    int yVal = 0;
+    int zVal = 0;
+
+    camera_->SetOrthographic(true);
+    perspectivePositionSaved_ = true;
+
+    // if no object is selected will snap to view relative to camera position
+    if (sceneEditor_->GetSelection()->GetNodes().Size() > 0)
+    {
+        selectedNodePos = sceneEditor_->GetSelection()->GetSelectedNode(0)->GetPosition();
+
+        switch (snapView)
+        {
+            case 1:
+                selectedNodePos.y_ = selectedNodePos.y_ + DISTANCE;
+                break;
+            case 2:
+                selectedNodePos.y_ = selectedNodePos.y_ - DISTANCE;
+                break;
+            case 3:
+                selectedNodePos.x_ = selectedNodePos.x_ + DISTANCE;
+                break;
+            case 4:
+                selectedNodePos.x_ = selectedNodePos.x_ - DISTANCE;
+                break;
+            case 5:
+                selectedNodePos.z_ = selectedNodePos.z_ - DISTANCE;
+                break;
+            case 6:
+                selectedNodePos.z_ = selectedNodePos.z_ + DISTANCE;
+                break;
+        }
+        cameraNode_->SetPosition(selectedNodePos);
+    }
+    else
+        cameraNode_->SetPosition(cameraNode_->GetPosition());
+
+
+    cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0));
+
+}
+
+void SceneView3D::SelectView()
+{
+    Input* input = GetSubsystem<Input>();
+    Vector3 camPos(0, 0, 0);
+
+    int snapView = 0;
+
+    if (MouseInView())
+    {
+        if (input->GetKeyPress(KEY_1))
+        {
+            snapView = 1;
+            SetPerspectiveCameraPosition();
+        }
+        if (input->GetKeyPress(KEY_2))
+        {
+            snapView = 2;
+            SetPerspectiveCameraPosition();
+        }
+        if (input->GetKeyPress(KEY_3))
+        {
+            snapView = 3;
+            SetPerspectiveCameraPosition();
+        }
+        if (input->GetKeyPress(KEY_4))
+        {
+            snapView = 4;
+            SetPerspectiveCameraPosition();
+        }
+        if (input->GetKeyPress(KEY_5))
+        {
+            snapView = 5;
+            SetPerspectiveCameraPosition();
+        }
+        if (input->GetKeyPress(KEY_6))
+        {
+            snapView = 6;
+            SetPerspectiveCameraPosition();
+        }
+
+        if (input->GetKeyPress(KEY_P))
+        {
+            perspectivePositionSaved_ = false;
+            camera_->SetOrthographic(false);
+
+            pitch_ = perspectivePitch_;
+            yaw_ = perspectiveYaw_;
+            cameraNode_->SetPosition(perspectCamPosition_);
+            cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0));
+        }
+
+        if (input->GetKeyPress(KEY_O))
+        {
+            if (camera_->IsOrthographic())
+                perspectivePositionSaved_ = true;
+
+            if (!camera_->IsOrthographic())
+                perspectivePositionSaved_ = false;
+
+            camera_->SetOrthographic(!camera_->IsOrthographic());
+        }
+
+    }
+
+    switch (snapView)
+    {
+        case 1:
+            // View top
+            yaw_ = 0;
+            pitch_ = 90;
+            SnapCameraToView(1);
+            break;
+        case 2:
+            // View bottom
+            yaw_ = 0;
+            pitch_ = -90;
+            SnapCameraToView(2);
+            break;
+        case 3:
+            // View left
+            yaw_ = -90;
+            pitch_ = 0;
+            SnapCameraToView(3);
+            break;
+        case 4:
+            // View right
+            yaw_ = 90;
+            pitch_ = 0;
+            SnapCameraToView(4);
+            break;
+        case 5:
+            // View front
+            yaw_ = 0;
+            pitch_ = 0;
+            SnapCameraToView(5);
+            break;
+        case 6:
+            // View back
+            yaw_ = 180;
+            pitch_ = 0;
+            SnapCameraToView(6);
+            break;
+    }
+}
+
+void SceneView3D::SetPerspectiveCameraPosition()
+{
+    if (perspectivePositionSaved_)
+        return;
+
+    if (!perspectivePositionSaved_ && !camera_->IsOrthographic())
+    {
+        perspectCamPosition_ = cameraNode_->GetPosition();
+        perspectivePitch_ = pitch_;
+        perspectiveYaw_ = yaw_;
+    }
+}
+
 Ray SceneView3D::GetCameraRay()
 {
     Ray camRay;
@@ -466,6 +638,9 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
             sceneEditor_->GetSelection()->Clear();
         }
     }
+
+    if (ev.type == EVENT_TYPE_KEY_DOWN)
+            SelectView();
 
     return sceneEditor_->OnEvent(ev);
 }
