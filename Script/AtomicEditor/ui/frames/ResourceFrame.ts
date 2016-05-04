@@ -100,7 +100,7 @@ class ResourceFrame extends ScriptWidget {
 
         if (ext == ".js" || ext == ".txt" || ext == ".json" || ext == ".ts") {
 
-            editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+             editor = new Editor.JSResourceEditor(path, this.tabcontainer);
 
         } else if (ext == ".scene") {
 
@@ -226,6 +226,23 @@ class ResourceFrame extends ScriptWidget {
         }
     }
 
+    handleUserPreferencesChanged() {
+        let prefsPath = ToolCore.toolSystem.project.userPrefsFullPath;
+        if (Atomic.fileSystem.fileExists(prefsPath)) {
+            for (let editorKey in this.editors) {
+                let editor = this.editors[editorKey];
+                if (editor.typeName == "JSResourceEditor") {
+                    let jsEditor = <Editor.JSResourceEditor>editor;
+
+                    // Get a reference to the web client so we can call the load preferences method
+                    let webClient = jsEditor.webView.webClient;
+
+                    webClient.executeJavaScript(`HOST_loadPreferences("atomic://${prefsPath}");`);
+                }
+            }
+        }
+    }
+
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
@@ -298,6 +315,7 @@ class ResourceFrame extends ScriptWidget {
         this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
         this.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev));
         this.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => this.handleDeleteResource(data));
+        this.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => this.handleUserPreferencesChanged());
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
 

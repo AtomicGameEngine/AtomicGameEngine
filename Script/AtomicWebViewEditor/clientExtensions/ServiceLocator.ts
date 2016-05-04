@@ -19,7 +19,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-import HostInteropType from "../interop";
 import * as ClientExtensionServices from "./ClientExtensionServices";
 
 // Initialize and configure the extensions
@@ -34,24 +33,15 @@ import tbExtension from "./languageExtensions/turbobadger/TurboBadgerLanguageExt
 export class ClientServiceLocatorType implements Editor.ClientExtensions.ClientServiceLocator {
 
     constructor() {
-        this.services = new ClientExtensionServices.ExtensionServiceRegistry();
-        this.services.subscribeToEvents(this);
+        this.clientServices = new ClientExtensionServices.WebViewServicesProvider();
+        this.clientServices.subscribeToEvents(this);
     }
 
-    private services: ClientExtensionServices.ExtensionServiceRegistry;
     private eventDispatcher: Editor.Extensions.EventDispatcher = new ClientExtensionServices.EventDispatcher();
 
-    /**
-     * Returns the Host Interop module
-     * @return {Editor.ClientExtensions.HostInterop}
-     */
-    getHostInterop(): Editor.ClientExtensions.HostInterop {
-        return HostInteropType.getInstance();
-    }
-
+    clientServices: ClientExtensionServices.WebViewServicesProvider;
     loadService(service: Editor.ClientExtensions.ClientEditorService) {
         try {
-            this.services.register(service);
             service.initialize(this);
         } catch (e) {
             alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
@@ -79,6 +69,7 @@ export class ClientServiceLocatorType implements Editor.ClientExtensions.ClientS
             this.eventDispatcher.subscribeToEvent(eventType, callback);
         }
     }
+
 }
 
 // Singleton service locator that can be referenced

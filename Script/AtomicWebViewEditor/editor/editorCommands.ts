@@ -123,3 +123,12 @@ export function codeSaved(path: string, fileExt: string, contents: string) {
     };
     serviceLocator.sendEvent(ClientExtensionEventNames.CodeSavedEvent, data);
 }
+
+/**
+ * Called when new preferences are available (or initially with current prefs)
+ * @param  {any} prefs
+ */
+export function loadPreferences(prefs: any) {
+    serviceLocator.clientServices.setPreferences(prefs);
+    serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, null);
+}

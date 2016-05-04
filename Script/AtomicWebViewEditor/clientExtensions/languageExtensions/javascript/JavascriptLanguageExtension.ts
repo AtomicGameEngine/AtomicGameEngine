@@ -23,7 +23,7 @@
 /**
  * Resource extension that handles configuring the editor for Javascript
  */
-export default class JavascriptLanguageExtension implements Editor.ClientExtensions.WebViewService {
+export default class JavascriptLanguageExtension implements Editor.ClientExtensions.WebViewServiceEventListener {
     name: string = "ClientJavascriptLanguageExtension";
     description: string = "Javascript language services for the editor.";
 
@@ -36,6 +36,7 @@ export default class JavascriptLanguageExtension implements Editor.ClientExtensi
     initialize(serviceLocator: Editor.ClientExtensions.ClientServiceLocator) {
         // initialize the language service
         this.serviceLocator = serviceLocator;
+        serviceLocator.clientServices.register(this);
     }
 
     /**

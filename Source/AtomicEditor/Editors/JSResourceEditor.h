@@ -47,6 +47,9 @@ public:
 
     virtual ~JSResourceEditor();
 
+    /// Get the editor's UIWebView
+    UIWebView* GetWebView() const { return webView_; }
+
     bool OnEvent(const TBWidgetEvent &ev);
 
     bool FindText(const String& findText, unsigned flags);
@@ -60,7 +63,7 @@ public:
     void SetFocus();
 
     bool Save();
-    
+
 private:
 
     void HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData);

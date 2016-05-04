@@ -140,6 +140,12 @@ declare module Editor.EditorEvents {
         serializable: Atomic.Serializable;
 
     }
+
+    export interface PreferencesChangedEvent {
+
+        preferences: any;
+
+    }
 }
 
 declare module Editor.Extensions {
@@ -256,7 +262,27 @@ declare module Editor.HostExtensions {
         projectLoaded?(ev: EditorEvents.LoadProjectEvent);
         playerStarted?();
     }
-    export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> { }
+    export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> {
+
+        /**
+         * Return a preference value or the provided default from the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to retrieve
+         * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+         * @return {number|boolean|string}
+         */
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+
+        /**
+         * Sets a user preference value in the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to set
+         * @param  {number | boolean | string} value value to set
+         */
+        setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string);
+    }
 
     export interface SceneServicesEventListener extends Editor.Extensions.ServiceEventListener {
         activeSceneEditorChanged?(ev: EditorEvents.ActiveSceneEditorChangeEvent);
@@ -294,7 +320,11 @@ declare module Editor.ClientExtensions {
      * or by the editor itself.
      */
     export interface ClientServiceLocator extends Editor.Extensions.ServiceLoader {
-        getHostInterop(): HostInterop;
+        /**
+         * Exposed services
+         * @type {WebViewServicesProvider}
+         */
+        clientServices: WebViewServicesProvider;
     }
 
     export interface ClientEditorService extends Editor.Extensions.EditorServiceExtension {
@@ -304,13 +334,35 @@ declare module Editor.ClientExtensions {
         initialize(serviceLocator: ClientServiceLocator);
     }
 
-    export interface WebViewService extends Editor.Extensions.EditorServiceExtension {
+    export interface WebViewServiceEventListener extends Editor.Extensions.EditorServiceExtension {
         configureEditor?(ev: EditorEvents.EditorFileEvent);
         codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
         save?(ev: EditorEvents.CodeSavedEvent);
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
         projectUnloaded?();
+        preferencesChanged?();
+    }
+
+    /**
+     * Available methods exposed to client services
+     */
+    export interface WebViewServicesProvider extends Editor.Extensions.ServicesProvider<WebViewServiceEventListener> {
+
+        /**
+         * Get a reference to the interop to talk to the host
+         * @return {HostInterop}
+         */
+        getHostInterop(): HostInterop;
+
+        /**
+         * Return a preference value or the provided default from the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to retrieve
+         * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+         * @return {number|boolean|string}
+         */
+        getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string;
     }
 
     export interface AtomicErrorMessage {

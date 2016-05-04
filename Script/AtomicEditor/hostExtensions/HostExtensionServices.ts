@@ -25,6 +25,8 @@ import * as EditorUI from "../ui/EditorUI";
 import MainFrame = require("../ui/frames/MainFrame");
 import ModalOps = require("../ui/modal/ModalOps");
 import ResourceOps = require("../resources/ResourceOps");
+import Editor = require("../editor/Editor");
+
 /**
  * Generic registry for storing Editor Extension Services
  */
@@ -123,6 +125,42 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
             }
         });
     }
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: any): any {
+        return EditorUI.getEditor().getUserPreference(extensionName, preferenceName, defaultValue);
+    }
+
+
+    /**
+     * Sets a user preference value in the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
+        EditorUI.getEditor().setUserPreference(extensionName, preferenceName, value);
+    }
+
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} extensionName name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(extensionName: string, groupPreferenceValues: Object) {
+        EditorUI.getEditor().setUserPreferenceGroup(extensionName, groupPreferenceValues);
+    }
 }
 
 /**
@@ -196,7 +234,7 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
     }
 
     /**
-     * Create New Material 
+     * Create New Material
      * @param  {string} resourcePath
      * @param  {string} materialName
      * @param  {boolean} reportError
@@ -391,7 +429,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -403,7 +441,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @type {boolean} return true if handled
      */
     hierarchyContextItemClicked(node: Atomic.Node, refid: string): boolean {
-        if (!node) 
+        if (!node)
             return false;
 
         // run through and find any services that can handle this.
@@ -416,7 +454,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -442,7 +480,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }

@@ -23,7 +23,7 @@
 /**
  * Resource extension that handles configuring the editor for Javascript
  */
-export default class TurboBadgerLanguageExtension implements Editor.ClientExtensions.WebViewService {
+export default class TurboBadgerLanguageExtension implements Editor.ClientExtensions.WebViewServiceEventListener {
     name: string = "ClientTurboBadgerLanguageExtension";
     description: string = "TurboBadger language services for the editor.";
 
@@ -36,6 +36,7 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
     initialize(serviceLocator: Editor.ClientExtensions.ClientServiceLocator) {
         // initialize the language service
         this.serviceLocator = serviceLocator;
+        serviceLocator.clientServices.register(this);
     }
 
     /**

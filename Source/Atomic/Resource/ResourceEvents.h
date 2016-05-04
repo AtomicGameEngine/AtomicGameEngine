@@ -74,7 +74,7 @@ EVENT(E_RESOURCEBACKGROUNDLOADED, ResourceBackgroundLoaded)
     PARAM(P_SUCCESS, Success);                      // bool
     PARAM(P_RESOURCE, Resource);                    // Resource pointer
 }
-    
+
 /// Resource was renamed
 EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
 {
@@ -95,7 +95,6 @@ EVENT(E_PROJECTUNLOADEDNOTIFICATION, ProjecUnloadedNotification)
 {
 }
     
-
 /// Language changed.
 EVENT(E_CHANGELANGUAGE, ChangeLanguage)
 {
