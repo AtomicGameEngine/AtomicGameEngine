@@ -100,7 +100,14 @@ class ResourceFrame extends ScriptWidget {
 
         if (ext == ".js" || ext == ".txt" || ext == ".json" || ext == ".ts") {
 
-             editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+            editor = new Editor.JSResourceEditor(path, this.tabcontainer);
+
+            // one time subscriptions waiting for the web view to finish loading
+            this.subscribeToEvent("WebViewLoadEnd", (data) => {
+                this.unsubscribeFromEvent("WebViewLoadEnd");
+                let webClient = <WebView.WebClient> data.client;
+                webClient.executeJavaScript(`HOST_loadCode("atomic://${path}");`);
+            });
 
         } else if (ext == ".scene") {
 
@@ -318,7 +325,6 @@ class ResourceFrame extends ScriptWidget {
         this.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => this.handleUserPreferencesChanged());
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
-
 
         this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
 

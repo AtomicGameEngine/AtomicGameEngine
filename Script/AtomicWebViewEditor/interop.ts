@@ -78,17 +78,6 @@ export default class HostInteropType {
     static EDITOR_CHANGE = "editorChange";
     static EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
-    constructor() {
-        // Set up the window object so the host can call into it
-        window.HOST_loadCode = this.loadCode.bind(this);
-        window.HOST_saveCode = this.saveCode.bind(this);
-
-        window.HOST_projectUnloaded = this.projectUnloaded.bind(this);
-        window.HOST_resourceRenamed = this.resourceRenamed.bind(this);
-        window.HOST_resourceDeleted = this.resourceDeleted.bind(this);
-        window.HOST_loadPreferences = this.loadPreferences.bind(this);
-    }
-
     /**
      * Called from the host to notify the client what file to load
      * @param  {string} codeUrl
@@ -235,5 +224,3 @@ export default class HostInteropType {
         });
     }
 }
-
-HostInteropType.getInstance().editorLoaded();
