@@ -29,7 +29,6 @@ export default class TurboBadgerResourceEditorBuilder extends AbstractTextResour
     }
 
     canHandleResource(resourcePath: string) : boolean {
-        var ext = Atomic.getExtension(resourcePath).toLowerCase();
-        return ext == ".tb" || ext == "txt.tb";
+        return resourcePath.toLowerCase().search("\\.tb\\.txt$|\\.tb$") != -1;
     }
 }
