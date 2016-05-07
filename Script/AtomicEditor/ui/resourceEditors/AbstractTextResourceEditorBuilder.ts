@@ -61,14 +61,9 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         //     }
         // });
 
-        editor.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => {
-            const webClient = editor.webView.webClient;
-            webClient.executeJavaScript("HOST_projectUnloaded();");
-        });
-
         editor.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => {
             const webClient = editor.webView.webClient;
-            webClient.executeJavaScript(`HOST_resourceDeleted("atomic://${this.getNormalizedPath(editor.fullPath)}");`);
+            webClient.executeJavaScript(`HOST_resourceDeleted("atomic://${this.getNormalizedPath(data.path)}");`);
         });
 
         editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => {
