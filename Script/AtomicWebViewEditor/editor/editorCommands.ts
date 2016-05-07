@@ -78,13 +78,6 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
 }
 
 /**
- * Called when the project is getting unloaded
- */
-export function projectUnloaded() {
-    serviceLocator.sendEvent(ClientExtensionEventNames.ProjectUnloadedEvent, null);
-}
-
-/**
  * Called when a resource is getting renamed
  * @param  {string} path
  * @param  {string} newPath

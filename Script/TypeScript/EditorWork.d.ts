@@ -219,6 +219,22 @@ declare module Editor.Extensions {
          */
         unregister(service: T);
     }
+
+    /**
+     * Interface that describes a Resource Editor Factory that will build out the editor for the relevant resource type
+     */
+    export interface ResourceEditorBuilder {
+        /**
+         * Returns true if this builder can generate an editor for this resource type
+         */
+        canHandleResource(resourcePath: string) : boolean;
+        /**
+         * Generates a resource editor for the provided resource type
+         * @param  resourcePath
+         * @param  tabContainer
+         */
+        getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor;
+    }
 }
 
 declare module Editor.Modal {

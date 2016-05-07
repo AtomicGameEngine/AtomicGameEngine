@@ -78,23 +78,11 @@ export default class HostInteropType {
     static EDITOR_CHANGE = "editorChange";
     static EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
-    constructor() {
-        // Set up the window object so the host can call into it
-        window.HOST_loadCode = this.loadCode.bind(this);
-        window.HOST_saveCode = this.saveCode.bind(this);
-
-        window.HOST_projectUnloaded = this.projectUnloaded.bind(this);
-        window.HOST_resourceRenamed = this.resourceRenamed.bind(this);
-        window.HOST_resourceDeleted = this.resourceDeleted.bind(this);
-        window.HOST_loadPreferences = this.loadPreferences.bind(this);
-    }
-
     /**
      * Called from the host to notify the client what file to load
      * @param  {string} codeUrl
      */
     loadCode(codeUrl: string) {
-        console.log("Load Code called for :" + codeUrl);
         const fileExt = codeUrl.indexOf(".") != -1 ? codeUrl.split(".").pop() : "";
         const filename = codeUrl.replace("atomic://", "");
 
@@ -195,13 +183,6 @@ export default class HostInteropType {
     }
 
     /**
-     * Notify that the project has been unloaded
-     */
-    projectUnloaded() {
-        editorCommands.projectUnloaded();
-    }
-
-    /**
      * Notify that a resource has been renamed
      * @param  {string} path
      * @param  {string} newPath
@@ -225,7 +206,6 @@ export default class HostInteropType {
      * @param  {string} prefUrl
      */
     loadPreferences(prefUrl: string) {
-        console.log("Load preferences called for :" + prefUrl);
         // load prefs
         this.getResource(prefUrl).then((prefsJson: string) => {
             let prefs = JSON.parse(prefsJson);
@@ -235,5 +215,3 @@ export default class HostInteropType {
         });
     }
 }
-
-HostInteropType.getInstance().editorLoaded();

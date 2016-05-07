@@ -19,16 +19,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+import EditorEvents = require("../../editor/EditorEvents");
 
-/**
- * Defines the interface to what is available for the host to call or for the client to call on the window object
- */
-interface Window {
-    atomicQuery: any;
-    HOST_loadCode: (codeUrl) => void;
-    HOST_saveCode: () => void;
+export default class Scene3dResourceEditorBuilder implements Editor.Extensions.ResourceEditorBuilder {
 
-    HOST_resourceRenamed: (path: string, newPath: string) => void;
-    HOST_resourceDeleted: (path: string) => void;
-    HOST_loadPreferences: (path: string) => void;
+    canHandleResource(resourcePath: string) : boolean {
+        var ext = Atomic.getExtension(resourcePath);
+        return ext == ".scene";
+    }
+
+    getEditor(resourceFram: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor {
+
+        const editor = new Editor.SceneEditor3D(resourcePath, tabContainer);
+        editor.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: editor });
+
+        return editor;
+    }
 }

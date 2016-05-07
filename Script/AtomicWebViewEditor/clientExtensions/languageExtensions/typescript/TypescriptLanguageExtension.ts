@@ -287,22 +287,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
-     * Handle when the project is unloaded so that resources can be freed
-     */
-    projectUnloaded() {
-        if (this.worker) {
-
-            console.log(`${this.name}: received a project unloaded event`);
-
-            const message: WorkerProcessTypes.WorkerProcessMessageData = {
-                command: ClientExtensionEventNames.ProjectUnloadedEvent
-            };
-
-            this.worker.port.postMessage(message);
-        }
-    }
-
-    /**
      * Called when the user preferences have been changed (or initially loaded)
      * @return {[type]}
      */

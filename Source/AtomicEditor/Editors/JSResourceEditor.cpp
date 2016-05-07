@@ -84,12 +84,9 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     webView_->GetWebTexture2D()->SetClearColor(Color(.23f, .23f, .23f, 1));
 
-    SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
     SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
 
     SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleRenameResourceNotification));
-    SubscribeToEvent(E_DELETERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleDeleteResourceNotification));
-    SubscribeToEvent(E_PROJECTUNLOADEDNOTIFICATION, HANDLER(JSResourceEditor, HandleProjectUnloadedNotification));
 
     c->AddChild(webView_->GetInternalWidget());
 
@@ -110,6 +107,7 @@ String getNormalizedPath(const String& path)
     return path.SubstringUTF8(path.ToLower().Find(RESOURCES_MARKER));
 }
 
+// This needs to stay in place until these properties are accessible from the .ts side
 void JSResourceEditor::HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData)
 {
     using namespace RenameResourceNotification;
@@ -124,25 +122,7 @@ void JSResourceEditor::HandleRenameResourceNotification(StringHash eventType, Va
     }
 }
 
-void JSResourceEditor::HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData)
-{
-    using namespace DeleteResourceNotification;
-    const String& path = eventData[P_RESOURCEPATH].GetString();
-
-    webClient_->ExecuteJavaScript(ToString("HOST_resourceDeleted(\"%s\");", getNormalizedPath(path).CString()));
-}
-
-void JSResourceEditor::HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData)
-{
-    webClient_->ExecuteJavaScript("HOST_projectUnloaded();");
-}
-
-void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
-{
-    // need to wait until we get an editor load complete message since we could
-    // still be streaming things in.
-}
-
+// This needs to stay in place until there is a way for the .ts side to provide back a "success" method
 void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WebMessage;
@@ -151,7 +131,6 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     const String& EDITOR_CHANGE = "editorChange";
     const String& EDITOR_SAVE_CODE = "editorSaveCode";
     const String& EDITOR_SAVE_FILE = "editorSaveFile";
-    const String& EDITOR_LOAD_COMPLETE = "editorLoadComplete";
     const String& EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
     String normalizedPath = getNormalizedPath(fullpath_);
@@ -161,13 +140,6 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     if (request == EDITOR_CHANGE)
     {
         SetModified(true);
-    }
-    else if (request == EDITOR_LOAD_COMPLETE)
-    {
-        // We need to wait until the editor javascript is all required in to call the
-        // method to load the code.  The HandleWebViewLoadEnd event is getting called
-        // too soon.
-        webClient_->ExecuteJavaScript(ToString("HOST_loadCode(\"atomic://%s\");", normalizedPath.CString()));
     }
     else
     {

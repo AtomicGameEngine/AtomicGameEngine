@@ -20,15 +20,15 @@
 // THE SOFTWARE.
 //
 
-/**
- * Defines the interface to what is available for the host to call or for the client to call on the window object
- */
-interface Window {
-    atomicQuery: any;
-    HOST_loadCode: (codeUrl) => void;
-    HOST_saveCode: () => void;
+import {AbstractTextResourceEditorBuilder} from "./AbstractTextResourceEditorBuilder";
 
-    HOST_resourceRenamed: (path: string, newPath: string) => void;
-    HOST_resourceDeleted: (path: string) => void;
-    HOST_loadPreferences: (path: string) => void;
+export default class TurboBadgerResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
+
+    constructor() {
+        super();
+    }
+
+    canHandleResource(resourcePath: string) : boolean {
+        return resourcePath.toLowerCase().search("\\.tb\\.txt$|\\.tb$") != -1;
+    }
 }

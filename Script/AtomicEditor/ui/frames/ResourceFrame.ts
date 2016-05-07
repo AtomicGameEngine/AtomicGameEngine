@@ -23,6 +23,7 @@
 import ScriptWidget = require("ui/ScriptWidget");
 import EditorEvents = require("editor/EditorEvents");
 import UIEvents = require("ui/UIEvents");
+import ResourceEditorProvider from "../ResourceEditorProvider";
 
 // the root content of editor widgets (rootContentWidget property) are extended with an editor field
 // so we can access the editor they belong to from the widget itself
@@ -37,6 +38,7 @@ class ResourceFrame extends ScriptWidget {
     resourceViewContainer: Atomic.UILayout;
     currentResourceEditor: Editor.ResourceEditor;
     wasClosed: boolean;
+    resourceEditorProvider: ResourceEditorProvider;
 
     // editors have a rootCotentWidget which is what is a child of the tab container
 
@@ -94,22 +96,7 @@ class ResourceFrame extends ScriptWidget {
 
         }
 
-        var ext = Atomic.getExtension(path);
-
-        var editor: Editor.ResourceEditor = null;
-
-        if (ext == ".js" || ext == ".txt" || ext == ".json" || ext == ".ts") {
-
-             editor = new Editor.JSResourceEditor(path, this.tabcontainer);
-
-        } else if (ext == ".scene") {
-
-            var sceneEditor3D = new Editor.SceneEditor3D(path, this.tabcontainer);
-            editor = sceneEditor3D;
-            this.sendEvent(EditorEvents.ActiveSceneEditorChange, { sceneEditor: sceneEditor3D });
-
-        }
-
+        var editor = this.resourceEditorProvider.getEditor(ev.path, this.tabcontainer);
         if (editor) {
 
             // cast and add editor lookup on widget itself
@@ -226,23 +213,6 @@ class ResourceFrame extends ScriptWidget {
         }
     }
 
-    handleUserPreferencesChanged() {
-        let prefsPath = ToolCore.toolSystem.project.userPrefsFullPath;
-        if (Atomic.fileSystem.fileExists(prefsPath)) {
-            for (let editorKey in this.editors) {
-                let editor = this.editors[editorKey];
-                if (editor.typeName == "JSResourceEditor") {
-                    let jsEditor = <Editor.JSResourceEditor>editor;
-
-                    // Get a reference to the web client so we can call the load preferences method
-                    let webClient = jsEditor.webView.webClient;
-
-                    webClient.executeJavaScript(`HOST_loadPreferences("atomic://${prefsPath}");`);
-                }
-            }
-        }
-    }
-
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
         if (ev.type == Atomic.UI_EVENT_TYPE_TAB_CHANGED && ev.target == this.tabcontainer) {
@@ -289,7 +259,7 @@ class ResourceFrame extends ScriptWidget {
     handleProjectUnloaded(data) {
 
       for (var i in this.editors) {
-          this.editors[i].close();
+           this.sendEvent(EditorEvents.EditorResourceClose, { editor: this.editors[i], navigateToAvailableResource: false });
       }
 
     }
@@ -307,6 +277,8 @@ class ResourceFrame extends ScriptWidget {
         this.resourceLayout = <Atomic.UILayout> this.getWidget("resourcelayout");
 
         this.resourceViewContainer.addChild(this);
+        this.resourceEditorProvider = new ResourceEditorProvider(this);
+        this.resourceEditorProvider.loadStandardEditors();
 
         this.subscribeToEvent(EditorEvents.ProjectUnloadedNotification, (data) => this.handleProjectUnloaded(data));
         this.subscribeToEvent(EditorEvents.EditResource, (data) => this.handleEditResource(data));
@@ -315,10 +287,8 @@ class ResourceFrame extends ScriptWidget {
         this.subscribeToEvent(EditorEvents.EditorResourceClose, (ev: EditorEvents.EditorCloseResourceEvent) => this.handleCloseResource(ev));
         this.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev: EditorEvents.RenameResourceEvent) => this.handleRenameResource(ev));
         this.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => this.handleDeleteResource(data));
-        this.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => this.handleUserPreferencesChanged());
 
         this.subscribeToEvent(UIEvents.ResourceEditorChanged, (data) => this.handleResourceEditorChanged(data));
-
 
         this.subscribeToEvent("WidgetEvent", (data) => this.handleWidgetEvent(data));
 

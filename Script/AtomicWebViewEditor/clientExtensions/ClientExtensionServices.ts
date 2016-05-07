@@ -95,7 +95,6 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeLoadedEvent, (ev) => this.codeLoaded(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ConfigureEditorEvent, (ev) => this.configureEditor(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceRenamedEvent, (ev) => this.renameResource(ev));
-        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ProjectUnloadedEvent, (ev) => this.projectUnloaded());
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeSavedEvent, (ev) => this.saveCode(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged());
@@ -179,23 +178,6 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
                 // Notify services that the project has just been loaded
                 if (service.configureEditor) {
                     service.configureEditor(ev);
-                }
-            } catch (e) {
-                alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
-            }
-        });
-    }
-
-
-    /**
-     * Called when the project is unloaded
-     */
-    projectUnloaded() {
-        this.registeredServices.forEach((service) => {
-            // Notify services that the project has been unloaded
-            try {
-                if (service.projectUnloaded) {
-                    service.projectUnloaded();
                 }
             } catch (e) {
                 alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
