@@ -84,17 +84,6 @@ EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
     PARAM(P_RESOURCE, Asset);                       // Resource pointer
 }
 
-/// Resource was deleted
-EVENT(E_DELETERESOURCENOTIFICATION, DeleteResourceNotification)
-{
-    PARAM(P_RESOURCEPATH, Path);                    // String
-}
-
-/// Project was unloaded
-EVENT(E_PROJECTUNLOADEDNOTIFICATION, ProjecUnloadedNotification)
-{
-}
-    
 /// Language changed.
 EVENT(E_CHANGELANGUAGE, ChangeLanguage)
 {
