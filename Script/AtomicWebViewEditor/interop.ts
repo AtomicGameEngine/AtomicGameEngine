@@ -83,7 +83,6 @@ export default class HostInteropType {
      * @param  {string} codeUrl
      */
     loadCode(codeUrl: string) {
-        console.log("Load Code called for :" + codeUrl);
         const fileExt = codeUrl.indexOf(".") != -1 ? codeUrl.split(".").pop() : "";
         const filename = codeUrl.replace("atomic://", "");
 
@@ -198,7 +197,6 @@ export default class HostInteropType {
      * @param  {string} path
      */
     resourceDeleted(path: string) {
-        console.log(path);
         editorCommands.resourceDeleted(path);
     }
 
@@ -208,7 +206,6 @@ export default class HostInteropType {
      * @param  {string} prefUrl
      */
     loadPreferences(prefUrl: string) {
-        console.log("Load preferences called for :" + prefUrl);
         // load prefs
         this.getResource(prefUrl).then((prefsJson: string) => {
             let prefs = JSON.parse(prefsJson);
