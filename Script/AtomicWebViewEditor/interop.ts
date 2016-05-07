@@ -184,13 +184,6 @@ export default class HostInteropType {
     }
 
     /**
-     * Notify that the project has been unloaded
-     */
-    projectUnloaded() {
-        editorCommands.projectUnloaded();
-    }
-
-    /**
      * Notify that a resource has been renamed
      * @param  {string} path
      * @param  {string} newPath
@@ -205,6 +198,7 @@ export default class HostInteropType {
      * @param  {string} path
      */
     resourceDeleted(path: string) {
+        console.log(path);
         editorCommands.resourceDeleted(path);
     }
 

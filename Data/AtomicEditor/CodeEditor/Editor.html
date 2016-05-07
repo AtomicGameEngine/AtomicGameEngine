@@ -55,12 +55,6 @@
         });
     }
 
-    function HOST_projectUnloaded() {
-        System.import('./source/editorCore/interop').then((module) => {
-            module.default.getInstance().projectUnloaded();
-        });
-    }
-
     function HOST_resourceRenamed(path, newPath) {
         System.import('./source/editorCore/interop').then((module) => {
             module.default.getInstance().resourceRenamed(path, newPath);
