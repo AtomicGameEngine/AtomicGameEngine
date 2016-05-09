@@ -406,39 +406,39 @@ void SceneView3D::SelectView()
             // View top
             yaw_ = 0;
             pitch_ = 90;
-            SnapCameraToView(1);
+            SnapCameraToView(snapView);
             break;
         case 2:
             // View bottom
             yaw_ = 0;
             pitch_ = -90;
-            SnapCameraToView(2);
+            SnapCameraToView(snapView);
             break;
         case 3:
             // View left
             yaw_ = -90;
             pitch_ = 0;
-            SnapCameraToView(3);
+            SnapCameraToView(snapView);
             break;
         case 4:
             // View right
             yaw_ = 90;
             pitch_ = 0;
-            SnapCameraToView(4);
+            SnapCameraToView(snapView);
             break;
         case 5:
             // View front
             yaw_ = 0;
             pitch_ = 0;
-            SnapCameraToView(5);
+            SnapCameraToView(snapView);
             break;
         case 6:
             // View back
             yaw_ = 180;
             pitch_ = 0;
-            SnapCameraToView(6);
+            SnapCameraToView(snapView);
             break;
-    }
+        }
 }
 
 void SceneView3D::SetPerspectiveCameraPosition()
