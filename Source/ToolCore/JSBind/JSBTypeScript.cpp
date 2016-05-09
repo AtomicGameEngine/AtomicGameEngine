@@ -125,7 +125,7 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
     }
 
     if (function->GetDocString().Length())
-        source_ += "      //" + function->GetDocString() + "\n";
+        source_ += "      /** " + function->GetDocString() + " */\n";
 
     source_ += "      ";
 
