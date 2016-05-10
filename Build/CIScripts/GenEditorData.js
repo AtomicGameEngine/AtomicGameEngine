@@ -142,7 +142,7 @@ namespace('build', function() {
     cmds = [
       atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script",
       atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor",
-      atomicRoot + "Build/Mac/node/node " + dtsGenerator + " --name Atomic --baseDir ./Script/TypeScript --file ./Script/TypeScript/*.d.ts --exclude ./Script/TypeScript/dist/*.d.ts --out ./Script/TypeScript/dist/Atomic.d.ts"
+      atomicRoot + "Build/Mac/node/node " + dtsGenerator + " --name Atomic --baseDir ./Script/TypeScript --exclude ./Script/TypeScript/dist/*.d.ts --out ./Script/TypeScript/dist/Atomic.d.ts ./Script/TypeScript/*.d.ts"
     ];
 
       // will be copied when editor resources are copied
