@@ -427,6 +427,317 @@ void UIWidget::SetFontDescription(UIFontDescription* fd)
 
 }
 
+void UIWidget::SetFontId(const String& fontId)
+{
+    if (!widget_)
+        return;
+
+    tb::TBFontDescription fd(widget_->GetFontDescription());
+    fd.SetID(fontId.CString());
+    widget_->SetFontDescription(fd);
+}
+
+String UIWidget::GetFontId()
+{
+    if (!widget_)
+        return "";
+
+    tb::TBFontDescription fd(widget_->GetFontDescription());
+    if (!g_font_manager->HasFontFace(fd))
+    {
+        return "";
+    }
+    return g_font_manager->GetFontInfo(fd.GetID())->GetName();
+}
+
+void UIWidget::SetFontSize(int size)
+{
+    if (!widget_)
+        return;
+
+    tb::TBFontDescription fd(widget_->GetFontDescription());
+    fd.SetSize(size);
+    widget_->SetFontDescription(fd);
+}
+
+int UIWidget::GetFontSize()
+{
+    if (!widget_)
+        return 0;
+
+    tb::TBFontDescription fd(widget_->GetFontDescription());
+    return fd.GetSize();
+}
+
+void UIWidget::SetLayoutWidth(int width)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.SetWidth(width);
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutWidth()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->pref_w;
+}
+
+void UIWidget::SetLayoutHeight(int height)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.SetHeight(height);
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutHeight()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->pref_h;
+}
+
+void UIWidget::SetLayoutPrefWidth(int width)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.pref_w = width;
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutPrefWidth()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->pref_w;
+}
+
+void UIWidget::SetLayoutPrefHeight(int height)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.pref_h = height;
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutPrefHeight()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->pref_h;
+}
+
+void UIWidget::SetLayoutMinWidth(int width)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.min_w = width;
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutMinWidth()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->min_w;
+}
+
+void UIWidget::SetLayoutMinHeight(int height)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.min_h = height;
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutMinHeight()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->min_h;
+}
+
+void UIWidget::SetLayoutMaxWidth(int width)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.max_w = width;
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutMaxWidth()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->max_w;
+}
+
+void UIWidget::SetLayoutMaxHeight(int height)
+{
+    if (!widget_)
+        return;
+
+    tb::LayoutParams lp;
+
+    const tb::LayoutParams *oldLp(widget_->GetLayoutParams());
+    if (oldLp)
+        lp = *oldLp;
+
+    lp.max_h = height;
+    widget_->SetLayoutParams(lp);
+}
+
+int UIWidget::GetLayoutMaxHeight()
+{
+    if (!widget_)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    const tb::LayoutParams *lp(widget_->GetLayoutParams());
+    if (!lp)
+        return tb::LayoutParams::UNSPECIFIED;
+
+    return lp->max_h;
+}
+
+void UIWidget::SetOpacity(float opacity)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetOpacity(opacity);
+}
+
+float UIWidget::GetOpacity()
+{
+    if (!widget_)
+        return -0.0f;
+
+    return widget_->GetOpacity();
+}
+
+void UIWidget::SetAutoOpacity(float autoOpacity)
+{
+    if (!widget_)
+        return;
+
+    if (autoOpacity == 0.0f)
+    {
+        widget_->SetOpacity(autoOpacity);
+        widget_->SetVisibilility(tb::WIDGET_VISIBILITY_INVISIBLE);
+    }
+    else
+    {
+        widget_->SetVisibilility(tb::WIDGET_VISIBILITY_VISIBLE);
+        widget_->SetOpacity(autoOpacity);
+    }
+}
+
+float UIWidget::GetAutoOpacity()
+{
+    if (!widget_)
+        return -0.0f;
+
+    float autoOpacity(widget_->GetOpacity());
+
+    if (autoOpacity == 0.0f)
+    {
+        if (widget_->GetVisibility() == tb::WIDGET_VISIBILITY_VISIBLE)
+            return 0.0001f; // Don't say that it's completly invisible.
+    }
+    else
+    {
+        if (widget_->GetVisibility() != tb::WIDGET_VISIBILITY_VISIBLE)
+            return 0.0f; // Say it's invisible.
+    }
+    return autoOpacity;
+}
+
 void UIWidget::DeleteAllChildren()
 {
     if (!widget_)

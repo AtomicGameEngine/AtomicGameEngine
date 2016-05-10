@@ -33,6 +33,8 @@
 #include <AtomicJS/Javascript/JSVM.h>
 
 #include <ToolCore/ToolEnvironment.h>
+#include <ToolCore/ToolSystem.h>
+#include <ToolCore/Project/Project.h>
 
 #include <AtomicWebView/WebViewEvents.h>
 #include <AtomicWebView/UIWebView.h>
@@ -82,22 +84,19 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     webView_->GetWebTexture2D()->SetClearColor(Color(.23f, .23f, .23f, 1));
 
-    SubscribeToEvent(webClient_, E_WEBVIEWLOADEND, HANDLER(JSResourceEditor, HandleWebViewLoadEnd));
     SubscribeToEvent(messageHandler_, E_WEBMESSAGE, HANDLER(JSResourceEditor, HandleWebMessage));
 
     SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleRenameResourceNotification));
-    SubscribeToEvent(E_DELETERESOURCENOTIFICATION, HANDLER(JSResourceEditor, HandleDeleteResourceNotification));
-    SubscribeToEvent(E_PROJECTUNLOADEDNOTIFICATION, HANDLER(JSResourceEditor, HandleProjectUnloadedNotification));
 
     c->AddChild(webView_->GetInternalWidget());
 
 }
-    
+
 JSResourceEditor::~JSResourceEditor()
 {
 
 }
-   
+
 String getNormalizedPath(const String& path)
 {
     // Full path is the fully qualified path from the root of the filesystem.  In order
@@ -107,40 +106,23 @@ String getNormalizedPath(const String& path)
     const String& RESOURCES_MARKER = "resources/";
     return path.SubstringUTF8(path.ToLower().Find(RESOURCES_MARKER));
 }
-    
+
+// This needs to stay in place until these properties are accessible from the .ts side
 void JSResourceEditor::HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData)
 {
     using namespace RenameResourceNotification;
     const String& newPath = eventData[P_NEWRESOURCEPATH].GetString();
     const String& path = eventData[P_RESOURCEPATH].GetString();
-    
+
     webClient_->ExecuteJavaScript(ToString("HOST_resourceRenamed(\"%s\",\"%s\");", getNormalizedPath(path).CString(), getNormalizedPath(newPath).CString()));
-    
+
     if (fullpath_.Compare(path) == 0) {
         fullpath_ = newPath;
         SetModified(modified_);
     }
 }
-    
-void JSResourceEditor::HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData)
-{
-    using namespace DeleteResourceNotification;
-    const String& path = eventData[P_RESOURCEPATH].GetString();
-    
-    webClient_->ExecuteJavaScript(ToString("HOST_resourceDeleted(\"%s\");", getNormalizedPath(path).CString()));
-}
-    
-void JSResourceEditor::HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData)
-{
-    webClient_->ExecuteJavaScript("HOST_projectUnloaded();");
-}
-    
-void JSResourceEditor::HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData)
-{
-    // need to wait until we get an editor load complete message since we could
-    // still be streaming things in.
-}
 
+// This needs to stay in place until there is a way for the .ts side to provide back a "success" method
 void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WebMessage;
@@ -149,22 +131,15 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     const String& EDITOR_CHANGE = "editorChange";
     const String& EDITOR_SAVE_CODE = "editorSaveCode";
     const String& EDITOR_SAVE_FILE = "editorSaveFile";
-    const String& EDITOR_LOAD_COMPLETE = "editorLoadComplete";
-    
+    const String& EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
+
     String normalizedPath = getNormalizedPath(fullpath_);
-    
+
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
     if (request == EDITOR_CHANGE)
     {
         SetModified(true);
-    }
-    else if (request == EDITOR_LOAD_COMPLETE)
-    {
-        // We need to wait until the editor javascript is all required in to call the
-        // method to load the code.  The HandleWebViewLoadEnd event is getting called
-        // too soon.
-        webClient_->ExecuteJavaScript(ToString("HOST_loadCode(\"atomic://%s\");", normalizedPath.CString()));
     }
     else
     {
@@ -187,6 +162,16 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
                 File file(context_, fn, FILE_WRITE);
                 file.Write((void*) code.CString(), code.Length());
                 file.Close();
+            }
+            else if (message == EDITOR_GET_USER_PREFS)
+            {
+                ToolSystem* tsys = GetSubsystem<ToolSystem>();
+                Project* proj = tsys->GetProject();
+                FileSystem* fileSystem = GetSubsystem<FileSystem>();
+                if (fileSystem->FileExists(proj->GetUserPrefsFullPath()))
+                {
+                    webClient_->ExecuteJavaScript(ToString("HOST_loadPreferences(\"atomic://%s\");", proj->GetUserPrefsFullPath().CString()));
+                }
             }
         }
     }

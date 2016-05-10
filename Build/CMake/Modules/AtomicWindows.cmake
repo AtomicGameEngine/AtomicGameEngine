@@ -31,8 +31,8 @@ endif()
 
 # removes dependency on D3DCompiler dll for Atomic Direct3D9 builds which don't require it
 # (binaries that never initialize the Direct3D9 graphics subsystem)
-if (NOT ATOMIC_D3DCOMPILER_DISABLE AND NOT ATOMIC_UWEBKIT)
-  add_definitions(-DATOMIC_D3DCOMPILER_ENABLED)
+if (ATOMIC_D3D9SHADERCOMPILER_DISABLE)
+  add_definitions(-DATOMIC_D3D9SHADERCOMPILER_DISABLE)
 endif()
 
 

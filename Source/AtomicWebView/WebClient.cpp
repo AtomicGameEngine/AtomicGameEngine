@@ -347,7 +347,8 @@ public:
         browserSettings.universal_access_from_file_urls = STATE_ENABLED;
 
         windowInfo.width = width;
-        windowInfo.height = height;
+        windowInfo.height = height;        
+        windowInfo.transparent_painting_enabled = 1;
 
         Graphics* graphics = webClient_->GetSubsystem<Graphics>();
 
@@ -365,7 +366,7 @@ public:
 #endif
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-                windowInfo.SetAsWindowless(info.info.win.window, false);
+                windowInfo.SetAsWindowless(info.info.win.window, /*transparent*/ true);
 #endif
             }
 
@@ -374,7 +375,7 @@ public:
         {
 #ifndef ATOMIC_PLATFORM_LINUX
             // headless
-            windowInfo.SetAsWindowless(nullptr, false);
+            windowInfo.SetAsWindowless(nullptr, true);
 #endif
         }
 
@@ -975,6 +976,14 @@ void WebClient::SetSize(int width, int height)
 
     WasResized();
 
+}
+
+void WebClient::SetZoomLevel(float zoomLevel)
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetHost()->SetZoomLevel(zoomLevel);
 }
 
 void WebClient::SetWebRenderHandler(WebRenderHandler* handler)

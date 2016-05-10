@@ -22,10 +22,11 @@
 
 import * as EditorEvents from "../editor/EditorEvents";
 import * as EditorUI from "../ui/EditorUI";
-import MainFramMenu = require("../ui/frames/menus/MainFrameMenu");
-import HierarchyFrameMenu = require("../ui/frames/menus/HierarchyFrameMenu");
-import ProjectFrameMenu = require("../ui/frames/menus/ProjectFrameMenu");
+import MainFrame = require("../ui/frames/MainFrame");
 import ModalOps = require("../ui/modal/ModalOps");
+import ResourceOps = require("../resources/ResourceOps");
+import Editor = require("../editor/Editor");
+
 /**
  * Generic registry for storing Editor Extension Services
  */
@@ -124,6 +125,42 @@ export class ProjectServicesProvider extends ServicesProvider<Editor.HostExtensi
             }
         });
     }
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: any): any {
+        return EditorUI.getEditor().getUserPreference(extensionName, preferenceName, defaultValue);
+    }
+
+
+    /**
+     * Sets a user preference value in the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
+        EditorUI.getEditor().setUserPreference(extensionName, preferenceName, value);
+    }
+
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} extensionName name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(extensionName: string, groupPreferenceValues: Object) {
+        EditorUI.getEditor().setUserPreferenceGroup(extensionName, groupPreferenceValues);
+    }
 }
 
 /**
@@ -142,6 +179,7 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
         eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.saveResource(ev));
         eventDispatcher.subscribeToEvent(EditorEvents.DeleteResourceNotification, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev) => this.renameResource(ev));
+
     }
 
     /**
@@ -195,6 +233,70 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
         });
     }
 
+    /**
+     * Create New Material
+     * @param  {string} resourcePath
+     * @param  {string} materialName
+     * @param  {boolean} reportError
+     */
+    createMaterial(resourcePath: string, materialName: string, reportError: boolean): boolean {
+        return ResourceOps.CreateNewMaterial(resourcePath, materialName, reportError);
+    }
+
+}
+
+/**
+ * Registry for service extensions that are concerned about Scenes
+ */
+export class SceneServicesProvider extends ServicesProvider<Editor.HostExtensions.SceneServicesEventListener> implements Editor.HostExtensions.SceneServicesProvider {
+    constructor() {
+        super();
+    }
+
+    /**
+     * Allow this service registry to subscribe to events that it is interested in
+     * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
+     */
+    subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
+        eventDispatcher.subscribeToEvent(EditorEvents.ActiveSceneEditorChange, (ev) => this.activeSceneEditorChange(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.SceneClosed, (ev) => this.sceneClosed(ev));
+    }
+
+    /**
+     * Called after an active scene editor change
+     * @param  {Editor.EditorEvents.ActiveSceneEditorChangeEvent} ev
+     */
+    activeSceneEditorChange(ev: Editor.EditorEvents.ActiveSceneEditorChangeEvent) {
+        // run through and find any services that can handle this.
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can save
+                if (service.activeSceneEditorChanged) {
+                    service.activeSceneEditorChanged(ev);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called after a scene is closed
+     * @param  {Editor.EditorEvents.SceneClosedEvent} ev
+     */
+    sceneClosed(ev: Editor.EditorEvents.SceneClosedEvent) {
+        // run through and find any services that can handle this.
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can save
+                if (service.editorSceneClosed) {
+                    service.editorSceneClosed(ev);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
 }
 
 /**
@@ -206,21 +308,13 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
         super();
     }
 
-    private mainFrameMenu: MainFramMenu = null;
-    private hierarchyFrameMenu: HierarchyFrameMenu = null;
-    private projectFrameMenu: ProjectFrameMenu = null;
+    private mainFrame: MainFrame = null;
     private modalOps: ModalOps;
 
-    init(mainFrameMenu: MainFramMenu, hierarchyFrameMenu: HierarchyFrameMenu, projectFrameMenu: ProjectFrameMenu, modalOps: ModalOps) {
+    init(mainFrame: MainFrame, modalOps: ModalOps) {
         // Only set these once
-        if (this.mainFrameMenu == null) {
-            this.mainFrameMenu = mainFrameMenu;
-        }
-        if (this.hierarchyFrameMenu == null) {
-            this.hierarchyFrameMenu = hierarchyFrameMenu;
-        }
-        if (this.projectFrameMenu == null) {
-            this.projectFrameMenu = projectFrameMenu;
+        if (this.mainFrame == null) {
+            this.mainFrame = mainFrame;
         }
         if (this.modalOps == null) {
             this.modalOps = modalOps;
@@ -234,7 +328,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @return {Atomic.UIMenuItemSource}
      */
     createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
-        return this.mainFrameMenu.createPluginMenuItemSource(id, items);
+        return this.mainFrame.menu.createPluginMenuItemSource(id, items);
     }
 
     /**
@@ -242,7 +336,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @param  {string} id
      */
     removePluginMenuItemSource(id: string) {
-        this.mainFrameMenu.removePluginMenuItemSource(id);
+        this.mainFrame.menu.removePluginMenuItemSource(id);
     }
 
     /**
@@ -252,7 +346,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @return {Atomic.UIMenuItemSource}
      */
     createHierarchyContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
-        return this.hierarchyFrameMenu.createPluginItemSource(id, items);
+        return this.mainFrame.hierarchyFrame.menu.createPluginItemSource(id, items);
     }
 
     /**
@@ -260,7 +354,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @param  {string} id
      */
     removeHierarchyContextMenuItemSource(id: string) {
-        this.hierarchyFrameMenu.removePluginItemSource(id);
+        this.mainFrame.hierarchyFrame.menu.removePluginItemSource(id);
     }
 
     /**
@@ -270,7 +364,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @return {Atomic.UIMenuItemSource}
      */
     createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
-        return this.projectFrameMenu.createPluginItemSource(id, items);
+        return this.mainFrame.projectframe.menu.createPluginItemSource(id, items);
     }
 
     /**
@@ -278,7 +372,14 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @param  {string} id
      */
     removeProjectContextMenuItemSource(id: string) {
-        this.projectFrameMenu.removePluginItemSource(id);
+        this.mainFrame.projectframe.menu.removePluginItemSource(id);
+    }
+
+    /**
+     * Refreshes the hierarchy frame
+     */
+    refreshHierarchyFrame() {
+        this.mainFrame.hierarchyFrame.populate();
     }
 
     /**
@@ -287,6 +388,29 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      */
     showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow {
         return this.modalOps.showExtensionWindow(windowText, uifilename, handleWidgetEventCB);
+    }
+
+    /**
+     * Disaplays a modal error window
+     * @param  {string} windowText
+     * @param  {string} message
+     */
+    showModalError(windowText: string, message: string) {
+        return this.modalOps.showError(windowText, message);
+    }
+
+    /**
+ * Disaplays a resource slection window
+ * @param  {string} windowText
+ * @param  {string} importerType
+ * @param  {string} resourceType
+ * @param  {function} callback
+ * @param  {any} retObject
+ * @param  {any} args
+ */
+    showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args: any = undefined) {
+
+        this.modalOps.showResourceSelection(windowText, importerType, resourceType, callback);
     }
 
     /**
@@ -305,7 +429,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -317,7 +441,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      * @type {boolean} return true if handled
      */
     hierarchyContextItemClicked(node: Atomic.Node, refid: string): boolean {
-        if (!node) 
+        if (!node)
             return false;
 
         // run through and find any services that can handle this.
@@ -330,7 +454,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
@@ -356,7 +480,7 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
                     }
                 }
             } catch (e) {
-               EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
             }
         });
     }
