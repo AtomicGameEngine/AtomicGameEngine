@@ -1,5 +1,5 @@
-##Atomic Game Engine™ Javascript Reference
+## Atomic Game Engine™ Javascript Reference
 
-##EARLY ACCESS DRAFT September 8th 2015
+## EARLY ACCESS DRAFT May 2016
 
 Atomic Game Engine Core API Reference
