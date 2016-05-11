@@ -100,6 +100,13 @@ void JSBTypeScript::Begin()
     {
         source_ += "/// <reference path=\"Atomic.d.ts\" />\n\n";
     }
+    const Vector<SharedPtr<JSBPackage> >& dependencies = package_->GetDependencies();
+    for (unsigned i = 0; i < dependencies.Size(); i++)
+    {
+        String dependencyName = dependencies[i]->GetName();
+        if (dependencyName != "Atomic")
+            source_ += "/// <reference path=\"" + dependencyName + ".d.ts\" />\n\n";
+    }
 
     source_ += "declare module "+ package_->GetName() + " {\n\n";
 }
