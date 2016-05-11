@@ -28,7 +28,7 @@ interface Window {
     HOST_loadCode: (codeUrl) => void;
     HOST_saveCode: () => void;
 
-    HOST_projectUnloaded: () => void;
     HOST_resourceRenamed: (path: string, newPath: string) => void;
     HOST_resourceDeleted: (path: string) => void;
+    HOST_loadPreferences: (path: string) => void;
 }

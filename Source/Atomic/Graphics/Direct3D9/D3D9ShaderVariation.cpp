@@ -31,7 +31,10 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
+#ifndef ATOMIC_D3D9SHADERCOMPILER_DISABLE
 #include <d3dcompiler.h>
+#endif
+
 #include <MojoShader/mojoshader.h>
 
 #include "../../DebugNew.h"
@@ -220,6 +223,10 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
 
 bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
 {
+
+#ifdef ATOMIC_D3D9SHADERCOMPILER_DISABLE
+    return false;
+#else
     const String& sourceCode = owner_->GetSourceCode(type_);
     Vector<String> defines = defines_.Split(' ');
 
@@ -306,6 +313,7 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         errorMsgs->Release();
 
     return !byteCode.Empty();
+#endif
 }
 
 void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)

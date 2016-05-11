@@ -29,7 +29,10 @@
 #include <string>
 
 #include "../Core/Timer.h"
+#include "../IO/Log.h"
 #include "IPCWindows.h"
+
+#include "IPC.h"
 
 typedef std::wstring IPCWString;
 
@@ -37,7 +40,9 @@ namespace Atomic
 {
 
 static const wchar_t kPipePrefix[] = L"\\\\.\\pipe\\";
-static const int kPipeBufferSz = 4 * 1024;
+// start with 1 megabyte of buffer, this will grow if a request exceeds this size
+// however, it will block during resize
+static const int kPipeBufferSz = ATOMIC_WINDOWS_IPC_BUFFER_SIZE;
 static LONG g_pipe_seq = 0;
 
 HANDLE PipePair::OpenPipeServer(const wchar_t* name, bool read)
@@ -210,12 +215,12 @@ void PipeWin::ReaderThread::ThreadFunction()
             continue;
 
         DWORD bytesRead = 0;
-        if (TRUE == ::ReadFile(pipeWin_->pipeRead_, &buf_[0], 4096, &bytesRead, NULL))
+        if (TRUE == ::ReadFile(pipeWin_->pipeRead_, &buf_[0], ATOMIC_WINDOWS_IPC_BUFFER_SIZE, &bytesRead, NULL))
         {
             readSize_ = (unsigned) bytesRead;
         }
 
-        Time::Sleep(100);
+        Time::Sleep(50);
 
     }
 }
@@ -301,6 +306,17 @@ bool IPCProcess::Launch(const String& command, const Vector<String>& args, const
     // The child process inherits the pipe handle.
     if (!::CreateProcessW(wcommand.CString(), (LPWSTR) wargs.CString(), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
         return false;
+    }
+
+    IPC* ipc = GetSubsystem<IPC>();
+    IPCHandle jobHandle = ipc->GetJobHandle();
+
+    if (jobHandle)
+    {
+        if (0 == AssignProcessToJobObject(jobHandle, pi.hProcess))
+        {
+            LOGERROR("IPCProcess::Launch - unable to assign job");
+        }
     }
 
     pid_ = pi.hProcess;

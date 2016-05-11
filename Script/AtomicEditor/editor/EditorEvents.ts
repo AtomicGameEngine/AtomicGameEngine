@@ -157,3 +157,7 @@ export const RemoveCurrentAssetAssigned = "RemoveCurrentAssetAssigned";
 export interface RemoveCurrentAssetAssignedEvent {
 
 }
+
+export const UserPreferencesChangedNotification  = "UserPreferencesChangedNotification";
+export const WebViewLoadEnd = "WebViewLoadEnd";
+export const WebMessage = "WebMessage";

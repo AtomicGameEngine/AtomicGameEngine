@@ -31,6 +31,8 @@ class Preferences {
     private static instance: Preferences;
     private _prefs: PreferencesFormat;
 
+    private cachedProjectPreferences: Object = null;
+
     constructor() {
         this.fileSystem = Atomic.getFileSystem();
         Preferences.instance = this;
@@ -144,6 +146,114 @@ class Preferences {
 
     static getInstance(): Preferences {
         return Preferences.instance;
+    }
+
+    /**
+     * Return a preference value or the provided default from the user settings file located in the project
+     * @param  {string} settingsGroup name of the group these settings should fall under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
+
+        // Cache the settings so we don't keep going out to the file
+        if (this.cachedProjectPreferences == null) {
+            const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+            if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+                let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+                try {
+                    let prefs = JSON.parse(prefsFile.readText());
+                    this.cachedProjectPreferences = prefs;
+                } finally {
+                    prefsFile.close();
+                }
+            }
+        }
+
+        if (this.cachedProjectPreferences && this.cachedProjectPreferences[settingsGroup]) {
+            return this.cachedProjectPreferences[settingsGroup][preferenceName] || defaultValue;
+        }
+
+        // if all else fails
+        return defaultValue;
+    }
+
+    /**
+     * Sets a user preference value in the user settings file located in the project
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(settingsGroup: string, preferenceName: string, value: number | boolean | string) {
+
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        let prefs = {};
+
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                prefs = JSON.parse(prefsFile.readText());
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        prefs[settingsGroup] = prefs[settingsGroup] || {};
+        prefs[settingsGroup][preferenceName] = value;
+
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        try {
+            saveFile.writeString(JSON.stringify(prefs, null, "  "));
+        } finally {
+            saveFile.flush();
+            saveFile.close();
+        }
+
+        // Cache the update
+        this.cachedProjectPreferences = prefs;
+    }
+
+
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(settingsGroup: string, groupPreferenceValues: Object) {
+
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        let prefs = {};
+
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                prefs = JSON.parse(prefsFile.readText());
+            } finally {
+                prefsFile.close();
+            }
+        }
+
+        prefs[settingsGroup] = prefs[settingsGroup] || {};
+        for (let preferenceName in groupPreferenceValues) {
+            prefs[settingsGroup][preferenceName] = groupPreferenceValues[preferenceName];
+        }
+
+        let saveFile = new Atomic.File(prefsFileLoc, Atomic.FILE_WRITE);
+        try {
+            saveFile.writeString(JSON.stringify(prefs, null, "  "));
+        } finally {
+            saveFile.flush();
+            saveFile.close();
+        }
+
+        // Cache the update
+        this.cachedProjectPreferences = prefs;
     }
 }
 

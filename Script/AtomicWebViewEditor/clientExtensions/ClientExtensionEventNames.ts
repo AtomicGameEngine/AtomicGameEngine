@@ -26,8 +26,8 @@
 export default class ClientExtensionEventNames {
     static CodeLoadedEvent = "CodeLoadedEvent";
     static ConfigureEditorEvent = "ConfigureEditorEvent";
-    static ResourceSavedEvent = "ResourceSavedEvent";
+    static CodeSavedEvent = "CodeSavedEvent";
     static ResourceRenamedEvent = "ResourceRenamedEvent";
     static ResourceDeletedEvent = "ResourceDeletedEvent";
-    static ProjectUnloadedEvent = "ProjectUnloadedEvent";
+    static PreferencesChangedEvent = "PreferencesChangedEvent";
 }

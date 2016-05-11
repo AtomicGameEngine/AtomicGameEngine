@@ -90,7 +90,7 @@ public:
     CefRefPtr<CefRenderHandler> GetRenderHandler() OVERRIDE
     {
 
-        if (webClient_->renderHandler_.Null())
+        if (webClient_.Null() || webClient_->renderHandler_.Null())
             return nullptr;
 
         return webClient_->renderHandler_->GetCEFRenderHandler();
@@ -347,7 +347,8 @@ public:
         browserSettings.universal_access_from_file_urls = STATE_ENABLED;
 
         windowInfo.width = width;
-        windowInfo.height = height;
+        windowInfo.height = height;        
+        windowInfo.transparent_painting_enabled = 1;
 
         Graphics* graphics = webClient_->GetSubsystem<Graphics>();
 
@@ -365,7 +366,7 @@ public:
 #endif
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
-                windowInfo.SetAsWindowless(info.info.win.window, false);
+                windowInfo.SetAsWindowless(info.info.win.window, /*transparent*/ true);
 #endif
             }
 
@@ -374,7 +375,7 @@ public:
         {
 #ifndef ATOMIC_PLATFORM_LINUX
             // headless
-            windowInfo.SetAsWindowless(nullptr, false);
+            windowInfo.SetAsWindowless(nullptr, true);
 #endif
         }
 
@@ -487,6 +488,14 @@ public:
 
     IMPLEMENT_REFCOUNTING(WebClientPrivate);
 
+    void ClearReferences()
+    {
+        browser_ = nullptr;
+        webBrowserHost_ = nullptr;
+        webClient_ = nullptr;
+        browserSideRouter_ = nullptr;
+    }
+
 private:
 
     String initialLoadString_;
@@ -503,6 +512,7 @@ private:
 WebClient::WebClient(Context* context) : Object(context)
 {
     d_ = new WebClientPrivate(this);
+    d_->AddRef();
 
     SubscribeToEvent(E_WEBVIEWGLOBALPROPERTIESCHANGED, HANDLER(WebClient, HandleWebViewGlobalPropertiesChanged));
 }
@@ -520,10 +530,12 @@ WebClient::~WebClient()
         }
 
         d_->CloseBrowser(true);
+        d_->ClearReferences();
+        d_->Release();
     }
 
-    renderHandler_ = 0;
-    //d_->Release();
+    d_ = nullptr;
+    renderHandler_ = 0;    
 }
 
 void WebClient::SendMouseClickEvent(int x, int y, unsigned button, bool mouseUp, unsigned modifier, int clickCount) const
@@ -964,6 +976,14 @@ void WebClient::SetSize(int width, int height)
 
     WasResized();
 
+}
+
+void WebClient::SetZoomLevel(float zoomLevel)
+{
+    if (!d_->browser_.get())
+        return;
+
+    d_->browser_->GetHost()->SetZoomLevel(zoomLevel);
 }
 
 void WebClient::SetWebRenderHandler(WebRenderHandler* handler)

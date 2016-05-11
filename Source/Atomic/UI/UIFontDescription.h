@@ -36,6 +36,8 @@ public:
     UIFontDescription(Context* context);
     virtual ~UIFontDescription();
 
+    int GetSize();
+
     void SetId(const String& id);
     void SetSize(int size);
 
