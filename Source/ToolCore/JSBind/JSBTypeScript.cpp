@@ -100,6 +100,13 @@ void JSBTypeScript::Begin()
     {
         source_ += "/// <reference path=\"Atomic.d.ts\" />\n\n";
     }
+    const Vector<SharedPtr<JSBPackage> >& dependencies = package_->GetDependencies();
+    for (unsigned i = 0; i < dependencies.Size(); i++)
+    {
+        String dependencyName = dependencies[i]->GetName();
+        if (dependencyName != "Atomic")
+            source_ += "/// <reference path=\"" + dependencyName + ".d.ts\" />\n\n";
+    }
 
     source_ += "declare module "+ package_->GetName() + " {\n\n";
 }
@@ -177,20 +184,12 @@ void JSBTypeScript::ExportFunction(JSBFunction* function)
 
 }
 
-inline bool CompareJSBClassesByName(const SharedPtr<JSBClass>& lhs, const SharedPtr<JSBClass>& rhs)
-{
-    return lhs->GetName() < rhs->GetName();
-}
-
 void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 {
     Vector<SharedPtr<JSBClass>> classes = module->GetClasses();
 
     if (!classes.Size())
         return;
-
-    // Sort classes to ensure consistent output across machines
-    Sort(classes.Begin(), classes.End(), CompareJSBClassesByName);
 
     source_ += "\n";
 
@@ -288,14 +287,10 @@ void JSBTypeScript::ExportModuleClasses(JSBModule* module)
 
 void JSBTypeScript::ExportModuleConstants(JSBModule* module)
 {
-    // we're going to modify the vector, so copy the keys locally instead of using a reference
-    Vector<String> constants = module->GetConstants().Keys();
+    const Vector<String>& constants = module->GetConstants().Keys();
 
     if (!constants.Size())
         return;
-
-    // Sort constants to ensure consistent output across machines
-    Sort(constants.Begin(), constants.End());
 
     source_ += "\n";
 
@@ -310,23 +305,14 @@ void JSBTypeScript::ExportModuleConstants(JSBModule* module)
 
 }
 
-inline bool CompareJSBEnumsByName(const SharedPtr<JSBEnum>& lhs, const SharedPtr<JSBEnum>& rhs)
-{
-    return lhs->GetName() < rhs->GetName();
-}
-
 void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 {
 
     Vector<SharedPtr<JSBEnum>> enums = module->GetEnums();
 
-    // Sort enums alphabetically to ensure consistent output across machines
-    Sort(enums.Begin(), enums.End(), CompareJSBEnumsByName);
-
-    Vector<SharedPtr<JSBEnum>>::Iterator enumIter;
-    for (enumIter = enums.Begin(); enumIter != enums.End(); enumIter++)
+    for (unsigned i = 0; i <enums.Size(); i++)
     {
-        JSBEnum* _enum = *enumIter;
+        JSBEnum* _enum = enums[i];
 
         // can't use a TS enum, so use a type alias
 
@@ -335,15 +321,15 @@ void JSBTypeScript::ExportModuleEnums(JSBModule* module)
 
         HashMap<String, String>& values = _enum->GetValues();
 
-        HashMap<String, String>::ConstIterator valsIter = values.Begin();
+        HashMap<String, String>::ConstIterator itr = values.Begin();
 
-        while (valsIter != values.End())
+        while (itr != values.End())
         {
-            String name = (*valsIter).first_;
+            String name = (*itr).first_;
 
             source_ += "   export var " + name + ": " +  _enum->GetName() + ";\n";
 
-            valsIter++;
+            itr++;
         }
 
         source_ += "\n";
@@ -363,19 +349,11 @@ void JSBTypeScript::WriteToFile(const String &path)
 
 }
 
-inline bool CompareJSBModulesByName(const SharedPtr<JSBModule>& lhs, const SharedPtr<JSBModule>& rhs)
-{
-    return lhs->GetName() < rhs->GetName();
-}
-
 void JSBTypeScript::Emit(JSBPackage* package, const String& path)
 {
     package_ = package;
 
     Vector<SharedPtr<JSBModule>>& modules = package->GetModules();
-
-    // Sort modules alphabetically to ensure consistent output across machines
-    Sort(modules.Begin(), modules.End(), CompareJSBModulesByName);
 
     Begin();
 
