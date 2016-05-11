@@ -27,7 +27,7 @@ import * as EditorEvents from "../../editor/EditorEvents";
 /**
  * Resource extension that supports the web view typescript extension
  */
-export default class ProjectBasedExtensionLoader implements Editor.HostExtensions.ProjectService {
+export default class ProjectBasedExtensionLoader implements Editor.HostExtensions.ProjectServicesEventListener {
     name: string = "ProjectBasedExtensionLoader";
     description: string = "This service supports loading extensions that reside in the project under {ProjectRoot}/Editor and named '*.Service.js'.";
 
@@ -44,14 +44,14 @@ export default class ProjectBasedExtensionLoader implements Editor.HostExtension
      * Inject this language service into the registry
      * @return {[type]}             True if successful
      */
-    initialize(serviceRegistry: Editor.HostExtensions.HostServiceLocator) {
+    initialize(serviceLocator: Editor.HostExtensions.HostServiceLocator) {
 
         // Let's rewrite the mod search
         this.rewriteModSearch();
 
         // We care project events
-        serviceRegistry.projectServices.register(this);
-        this.serviceRegistry = serviceRegistry;
+        serviceLocator.projectServices.register(this);
+        this.serviceRegistry = serviceLocator;
     }
 
     /**

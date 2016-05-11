@@ -78,13 +78,6 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
 }
 
 /**
- * Called when the project is getting unloaded
- */
-export function projectUnloaded() {
-    serviceLocator.sendEvent(ClientExtensionEventNames.ProjectUnloadedEvent, null);
-}
-
-/**
  * Called when a resource is getting renamed
  * @param  {string} path
  * @param  {string} newPath
@@ -122,4 +115,13 @@ export function codeSaved(path: string, fileExt: string, contents: string) {
         code: contents
     };
     serviceLocator.sendEvent(ClientExtensionEventNames.CodeSavedEvent, data);
+}
+
+/**
+ * Called when new preferences are available (or initially with current prefs)
+ * @param  {any} prefs
+ */
+export function loadPreferences(prefs: any) {
+    serviceLocator.clientServices.setPreferences(prefs);
+    serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, null);
 }

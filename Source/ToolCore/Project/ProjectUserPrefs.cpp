@@ -136,8 +136,16 @@ bool ProjectUserPrefs::Load(const String& path)
 
 void ProjectUserPrefs::Save(const String& path)
 {
-
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
+
+    // Load existing prefs file if it exists and just update editor settings.  The
+    // file may contain other settings we are not aware of so we shouldn't overwrite those
+    SharedPtr<File> oldFile(new File(context_, path));
+    if (oldFile->IsOpen())
+    {
+        bool result = jsonFile->Load(*oldFile);
+        oldFile->Close();
+    }
 
     JSONValue& root = jsonFile->GetRoot();
 

@@ -76,6 +76,11 @@ namespace Atomic
         return value;
     }
 
+    Configuration::Configuration() :
+        isLoaded_(false)
+    {
+    }
+
     bool Configuration::LoadFromFile(Context *context, const String& filename)
     {
 
@@ -102,6 +107,11 @@ namespace Atomic
 
     void Configuration::ApplyConfig(VariantMap& settings, bool overwrite)
     {
+        if (!isLoaded_) {
+            LOGERROR("Configuration::ApplyConfig - Applying a config that has not yet been populated");
+            return;
+        }
+
         VariantMap::ConstIterator itr = valueMap_.Begin();
         if (overwrite)
         {
@@ -124,7 +134,7 @@ namespace Atomic
 
     bool Configuration::LoadFromJSON(const String& json)
     {
-        valueMap_.Clear();
+        Clear();
 
         JSONValue jroot;
 
@@ -140,7 +150,13 @@ namespace Atomic
         if (!LoadDesktopConfig(jroot))
             return false;
 
+        isLoaded_ = true;
         return true;
+    }
+
+    void Configuration::Clear()
+    {
+        valueMap_.Clear();
     }
 
 }

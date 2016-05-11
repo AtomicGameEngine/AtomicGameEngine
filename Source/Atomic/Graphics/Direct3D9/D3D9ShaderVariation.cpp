@@ -31,7 +31,7 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
-#ifdef ATOMIC_D3DCOMPILER_ENABLED
+#ifndef ATOMIC_D3D9SHADERCOMPILER_DISABLE
 #include <d3dcompiler.h>
 #endif
 
@@ -224,7 +224,7 @@ bool ShaderVariation::LoadByteCode(PODVector<unsigned>& byteCode, const String& 
 bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
 {
 
-#ifndef ATOMIC_D3DCOMPILER_ENABLED
+#ifdef ATOMIC_D3D9SHADERCOMPILER_DISABLE
     return false;
 #else
     const String& sourceCode = owner_->GetSourceCode(type_);

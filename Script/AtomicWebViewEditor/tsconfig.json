@@ -11,7 +11,8 @@
     },
     "filesGlob": [
         "./**/*.ts",
-        "../TypeScript/*.ts"
+        "../TypeScript/*.ts",
+        "!../TypeScript/dist/*.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
@@ -20,6 +21,7 @@
         "./clientExtensions/ClientExtensionEventNames.ts",
         "./clientExtensions/ClientExtensionServices.ts",
         "./clientExtensions/languageExtensions/javascript/JavascriptLanguageExtension.ts",
+        "./clientExtensions/languageExtensions/turbobadger/TurboBadgerLanguageExtension.ts",
         "./clientExtensions/languageExtensions/typescript/TypescriptLanguageExtension.ts",
         "./clientExtensions/languageExtensions/typescript/workerprocess/TypescriptLanguageService.ts",
         "./clientExtensions/languageExtensions/typescript/workerprocess/TypescriptLanguageServiceWebWorker.ts",

@@ -24,6 +24,9 @@
 #include <Atomic/Resource/Image.h>
 #include <Atomic/Atomic2D/Sprite2D.h>
 #include <Atomic/Atomic2D/StaticSprite2D.h>
+#include <Atomic/IO/FileSystem.h>
+
+#include <ToolCore/Import/ImportConfig.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"
@@ -32,9 +35,10 @@
 namespace ToolCore
 {
 
-TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
+TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
+compressTextures_(false)
 {
-
+    ApplyProjectImportConfig();
 }
 
 TextureImporter::~TextureImporter()
@@ -50,17 +54,28 @@ void TextureImporter::SetDefaults()
 bool TextureImporter::Import()
 {
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
-
     ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String cachePath = db->GetCachePath();
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    String compressedPath = cachePath + "DDS/" + asset_->GetRelativePath() + ".dds";
+    if (fileSystem->FileExists(compressedPath))
+        fileSystem->Delete(compressedPath);
+
     SharedPtr<Image> image = cache->GetTempResource<Image>(asset_->GetPath());
 
     if (image.Null())
         return false;
 
+    if (compressTextures_ &&
+        !image->IsCompressed())
+    {
+        fileSystem->CreateDirs(cachePath, "DDS/" + Atomic::GetPath(asset_->GetRelativePath()));
+        image->SaveDDS(compressedPath);
+    }
+
     // todo, proper proportions
     image->Resize(64, 64);
-
-    String cachePath = db->GetCachePath();
 
     // not sure entirely what we want to do here, though if the cache file doesn't exist
     // will reimport
@@ -70,6 +85,22 @@ bool TextureImporter::Import()
     image->SavePNG(cachePath + asset_->GetGUID() + "_thumbnail.png");
 
     return true;
+}
+
+void TextureImporter::ApplyProjectImportConfig()
+{
+    if (ImportConfig::IsLoaded())
+    {
+        VariantMap tiParameters;
+        ImportConfig::ApplyConfig(tiParameters);
+        VariantMap::ConstIterator itr = tiParameters.Begin();
+
+        for (; itr != tiParameters.End(); itr++)
+        {
+            if (itr->first_ == "tiProcess_CompressTextures")
+                compressTextures_ = itr->second_.GetBool();
+        }
+    }
 }
 
 bool TextureImporter::LoadSettingsInternal(JSONValue& jsonRoot)

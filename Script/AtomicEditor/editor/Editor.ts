@@ -55,7 +55,7 @@ class Editor extends Atomic.ScriptObject {
 
         this.editorLicense = new EditorLicense();
 
-        EditorUI.initialize();
+        EditorUI.initialize(this);
 
         this.playMode = new PlayMode();
 
@@ -136,6 +136,44 @@ class Editor extends Atomic.ScriptObject {
         Preferences.getInstance().saveEditorWindowData(editorWindowData);
 
         return true;
+    }
+
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(extensionName: string, preferenceName: string, defaultValue?: any): any {
+        return Preferences.getInstance().getUserPreference(extensionName, preferenceName, defaultValue);
+    }
+
+
+    /**
+     * Sets a user preference value in the user settings file
+     * @param  {string} extensionName name of the extension the preference lives under
+     * @param  {string} preferenceName name of the preference to set
+     * @param  {number | boolean | string} value value to set
+     */
+    setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
+        Preferences.getInstance().setUserPreference(extensionName, preferenceName, value);
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
+    }
+
+    /**
+     * Sets a group of user preference values in the user settings file located in the project.  Elements in the
+     * group will merge in with existing group preferences.  Use this method if setting a bunch of settings
+     * at once.
+     * @param  {string} settingsGroup name of the group the preference lives under
+     * @param  {string} groupPreferenceValues an object literal containing all of the preferences for the group.
+     */
+    setUserPreferenceGroup(settingsGroup: string, groupPreferenceValues: Object) {
+        Preferences.getInstance().setUserPreferenceGroup(settingsGroup, groupPreferenceValues);
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
     }
 
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {

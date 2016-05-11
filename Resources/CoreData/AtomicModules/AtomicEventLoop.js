@@ -16,6 +16,8 @@
  *      - Modified the way that setTimeout,clearTimeout,setInterval,clearInterval are loaded into global scope
  *      - Implemented setImmediate/clearImmediate
  *
+ *  Jay Sistar - April 2016
+ *      - Added requestAnimationFrame and cancelAnimationFrame for per frame callbacks
  */
 
 /*
@@ -36,6 +38,10 @@ EventLoop = {
     nextTimerId: 1,
     minimumDelay: 1,
     maxExpirys: 10,
+
+    // per frame events
+    pfeCallbacks: [],
+    pfeCurrentTime: 0.0,
 
     // misc
     exitRequested: false
@@ -269,8 +275,48 @@ EventLoop.processImmediates = function () {
     }
 }
 
+EventLoop.processPerFrameEvents = function(eventData) {
+    this.pfeCurrentTime += eventData.timeStep;
+    var callbacks = this.pfeCallbacks;
+    this.pfeCallbacks = [];
+    callbacks.forEach(function(callback) {
+        // The second parameter isn't standard, but it's useful in Atomic.
+        callback(this.pfeCurrentTime, eventData.timeStep);
+    }.bind(this));
+}
+
 EventLoop.requestExit = function () {
     this.exitRequested = true;
+}
+
+/*
+ *  Per Frame Event API
+ *
+ *  These interface with the singleton EventLoop.
+ */
+
+/**
+ * schedules a function to be called on the next frame
+ * @method
+ * @param {function} func the Function to call
+ * @returns {int} the id of the callback to be used in cancelAnimationFrame in order to cancel the call
+ */
+function requestAnimationFrame(step) {
+    if (typeof step !== "function") {
+        throw '"requestAnimationFrame" only accepts a function.'
+    }
+    var call_id = EventLoop.pfeCallbacks.length;
+    EventLoop.pfeCallbacks.push(step);
+    return call_id;
+}
+
+/**
+ * stops a previously queued call to requestAnimationFrame
+ * @method
+ * @param {int} call_id the id of the timer that was created via requestAnimationFrame
+ */
+function cancelAnimationFrame(call_id) {
+    EventLoop.pfeCallbacks[call_id] = function(){}; // NOP
 }
 
 /*
@@ -467,6 +513,7 @@ function throttleProcessTimers(ms) {
     var pendingOps = false;
 
     function doThrottle(eventData) {
+        EventLoop.processPerFrameEvents(eventData);
         deltaTimer += eventData.timeStep * 1000;
         if (deltaTimer > ms || pendingOps) {
             deltaTimer -= ms;
@@ -497,6 +544,8 @@ Atomic.engine.subscribeToEvent('PostUpdate', function (eventData) {
     global.clearTimeout = global.clearTimeout || clearTimeout;
     global.setImmediate = global.setImmediate || setImmediate;
     global.clearImmediate = global.clearImmediate || clearImmediate;
+    global.requestAnimationFrame = global.requestAnimationFrame || requestAnimationFrame;
+    global.cancelAnimationFrame = global.cancelAnimationFrame || cancelAnimationFrame;
 
     global.requestEventLoopExit = global.requestEventLoopExit || requestEventLoopExit;
 })(new Function('return this')());

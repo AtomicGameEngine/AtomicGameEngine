@@ -47,6 +47,8 @@ public:
 private:
 
     virtual bool LoadDesktopConfig(JSONValue root);
+
+    bool LoadWebViewConfig(const JSONValue& jwebview);
     bool LoadGraphicsConfig(const JSONValue& jgraphics);
     bool LoadWindowConfig(const JSONValue& jwindow);
     bool LoadSoundConfig(const JSONValue& jsound);

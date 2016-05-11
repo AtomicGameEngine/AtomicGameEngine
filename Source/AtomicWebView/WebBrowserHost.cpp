@@ -97,6 +97,9 @@ private:
 
 GlobalPropertyMap WebBrowserHost::globalProperties_;
 WeakPtr<WebBrowserHost> WebBrowserHost::instance_;
+String WebBrowserHost::userAgent_;
+String WebBrowserHost::productVersion_;
+int WebBrowserHost::debugPort_ = 3335;
 
 WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
@@ -115,20 +118,32 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
 
     // IMPORTANT: See flags being set in implementation of void WebAppBrowser::OnBeforeCommandLineProcessing
-    // these include "--enable-media-stream", "--enable-usermedia-screen-capturing"
+    // these include "--enable-media-stream", "--enable-usermedia-screen-capturing", "--off-screen-rendering-enabled", "--transparent-painting-enabled"
 
 #ifdef ATOMIC_PLATFORM_LINUX
-    static const char* _argv[3] = { "AtomicWebView", "--disable-setuid-sandbox", "--off-screen-rendering-enabled" };
+    static const char* _argv[3] = { "AtomicWebView", "--disable-setuid-sandbox" };
     CefMainArgs args(3, (char**) &_argv);
 #else
     CefMainArgs args;
 #endif
 
     CefSettings settings;
-    settings.windowless_rendering_enabled = true;
+    settings.windowless_rendering_enabled = 1;
+
+    // default background is white, add a setting
+    // settings.background_color = 0;
+
+    if (productVersion_.Length())
+    {
+        CefString(&settings.product_version).FromASCII(productVersion_.CString());
+    }
+
+    if (userAgent_.Length())
+    {
+        CefString(&settings.user_agent).FromASCII(userAgent_.CString());
+    }
     
-    // Enable remote debugging on port 3335
-    settings.remote_debugging_port = 3335;
+    settings.remote_debugging_port = debugPort_;
 
     d_ = new WebBrowserHostPrivate(this);
 

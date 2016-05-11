@@ -32,16 +32,18 @@ import TypescriptLanguageExtension from "./languageExtensions/TypscriptLanguageE
 export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLocator {
 
     constructor() {
-        this.resourceServices = new HostExtensionServices.ResourceServiceRegistry();
-        this.projectServices = new HostExtensionServices.ProjectServiceRegistry();
-        this.uiServices = new HostExtensionServices.UIServiceRegistry();
+        this.resourceServices = new HostExtensionServices.ResourceServicesProvider();
+        this.projectServices = new HostExtensionServices.ProjectServicesProvider();
+        this.sceneServices = new HostExtensionServices.SceneServicesProvider();
+        this.uiServices = new HostExtensionServices.UIServicesProvider();
     }
 
     private eventDispatcher: Atomic.UIWidget = null;
 
-    resourceServices: HostExtensionServices.ResourceServiceRegistry;
-    projectServices: HostExtensionServices.ProjectServiceRegistry;
-    uiServices: HostExtensionServices.UIServiceRegistry;
+    resourceServices: HostExtensionServices.ResourceServicesProvider;
+    projectServices: HostExtensionServices.ProjectServicesProvider;
+    sceneServices: HostExtensionServices.SceneServicesProvider;
+    uiServices: HostExtensionServices.UIServicesProvider;
 
     loadService(service: Editor.HostExtensions.HostEditorService) {
         try {
@@ -59,6 +61,7 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
         this.eventDispatcher = frame;
         this.resourceServices.subscribeToEvents(this);
         this.projectServices.subscribeToEvents(this);
+        this.sceneServices.subscribeToEvents(this);
         this.uiServices.subscribeToEvents(this);
     }
 
