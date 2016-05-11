@@ -62,6 +62,8 @@ public:
 
     JSBClass* GetClass(const String& name);
 
+    const Vector<SharedPtr<JSBPackage> >& GetDependencies() const { return dependencies_; }
+
     PODVector<JSBClass*>& GetAllClasses() { return allClasses_; }
     void RegisterClass(JSBClass* cls) {allClasses_.Push(cls); }
 
