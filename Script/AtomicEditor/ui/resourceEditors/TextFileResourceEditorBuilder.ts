@@ -30,6 +30,6 @@ export default class TextResourceEditorBuilder extends AbstractTextResourceEdito
 
     canHandleResource(resourcePath: string) : boolean {
         var ext = Atomic.getExtension(resourcePath).toLowerCase();
-        return ext == ".txt";
+        return ext == ".txt" || ext == ".hlsl" || ext == ".xml";
     }
 }
