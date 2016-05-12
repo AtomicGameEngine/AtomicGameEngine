@@ -23,10 +23,9 @@ MasterServerClient::MasterServerClient(Context *context) :
 
         readingMasterMessageLength(true),
         Object(context),
-        udpTimeout_(5.0f),
         udpSecondsTillRetry_(0.5f),
-        isTCPConnected(false),
-        isUDPConnected(false),
+        connectToMasterState_(MASTER_NOT_CONNECTED),
+        clientConnectToGameServerState_(GAME_NOT_CONNECTED),
         timeBetweenClientPunchThroughAttempts_(1.0),
         timeTillNextPunchThroughAttempt_(0.0),
         timeBetweenClientConnectAttempts_(1.0),
@@ -67,7 +66,12 @@ void MasterServerClient::ConnectToMaster(const String &address, unsigned short p
     {
         std::vector < kNet::Socket * > listenSockets = kNetNetwork->GetServer()->ListenSockets();
 
+        int numSockets = listenSockets.size();
+
         kNet::Socket *listenSocket = listenSockets[0];
+
+        String foo = String(listenSocket->LocalEndPoint().ToString().c_str());
+        LOGINFO(foo);
 
         // Create a UDP and a TCP connection to the master server
         // UDP connection re-uses the same udp port we are listening on for the sever
@@ -81,6 +85,9 @@ void MasterServerClient::ConnectToMaster(const String &address, unsigned short p
         masterUDPConnection_ = kNetNetwork->CreateUnconnectedUDPSocket(address.CString(),port);
     }
 
+    // We first make a TCP connection
+    connectToMasterState_ = MASTER_CONNECTING_TCP;
+
     masterTCPConnection_ = kNetNetwork->ConnectSocket(address.CString(), port, kNet::SocketOverTCP);
 
     SendMessageToMasterServer("{ \"cmd\": \"connectRequest\" }");
@@ -91,8 +98,14 @@ void MasterServerClient::RequestServerListFromMaster()
     SendMessageToMasterServer("{ \"cmd\": \"getServerList\" }");
 }
 
-void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const String &address, unsigned short port, Scene* scene)
+void MasterServerClient::ConnectToServerViaMaster(const String &serverId,
+                                                  const String &internalAddress, unsigned short internalPort,
+                                                  const String &externalAddress, unsigned short externalPort,
+                                                  Scene* scene)
 {
+    clientConnectToGameServerState_ = GAME_CONNECTING_INTERNAL_IP;
+
+    /*
     String msg = String("{") +
                  String("\"cmd\":") + String("\"requestIntroduction\",") +
                  String("\"id\":\"") + masterServerConnectionId_ + String("\", ") +
@@ -100,15 +113,16 @@ void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const 
                  String("}");
 
     SendMessageToMasterServer(msg);
+    */
 
     kNet::EndPoint serverEndPoint;
-    sscanf(address.CString(), "%hu.%hu.%hu.%hu",
+    sscanf(internalAddress.CString(), "%hu.%hu.%hu.%hu",
            (unsigned short *) &serverEndPoint.ip[0],
            (unsigned short *) &serverEndPoint.ip[1],
            (unsigned short *) &serverEndPoint.ip[2],
            (unsigned short *) &serverEndPoint.ip[3]);
 
-    serverEndPoint.port = port;
+    serverEndPoint.port = internalPort;
 
     clientPendingScene_ = scene;
     clientToServerSocket_ = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
@@ -122,8 +136,21 @@ void MasterServerClient::ConnectToServerViaMaster(const String &serverId, const 
 
 void MasterServerClient::RegisterServerWithMaster(const String &name)
 {
+    // Get the internal IP and port
+    kNet::EndPoint localEndPoint = masterTCPConnection_->LocalEndPoint();
+
+    unsigned char* ip = localEndPoint.ip;
+
+    char str[256];
+    sprintf(str, "%d.%d.%d.%d", (unsigned int)ip[0], (unsigned int)ip[1], (unsigned int)ip[2], (unsigned int)ip[3]);
+
+    Atomic::Network* network = GetSubsystem<Network>();
+    unsigned int localPort = network->GetServerPort();
+
     String msg = String("{") +
                  String("\"cmd\":") + String("\"registerServer\",") +
+                 String("\"internalIP\": \"") + String(str) + String("\", ") +
+                 String("\"internalPort\": ") + String(localPort) + String(", ") +
                  String("\"id\":\"") + masterServerConnectionId_ + String("\", ") +
                  String("\"serverName\":\"") + name + String("\"") +
                  String("}");
@@ -191,7 +218,7 @@ void MasterServerClient::Update(float dt) {
         masterTCPConnection_->EndReceive(buf);
     }
 
-    if (isConnectingUDP_)
+    if (connectToMasterState_ == MASTER_CONNECTING_UDP)
     {
         ConnectUDP(dt);
     }
@@ -246,7 +273,7 @@ void MasterServerClient::ConnectUDP(float dt)
 {
     if (udpConnectionSecondsRemaining_ <= 0)
     {
-        isConnectingUDP_ = false;
+        connectToMasterState_ = MASTER_CONNECTION_FAILED;
 
         // TODO - emit error event
 
@@ -284,8 +311,8 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
 
     if (cmd == "connectTCPSuccess")
     {
-        isTCPConnected = true;
-        isConnectingUDP_ = true;
+        // TCP connection success - now try connecting UDP
+        connectToMasterState_ = MASTER_CONNECTING_UDP;
         udpSecondsTillRetry_ = 0;
         udpConnectionSecondsRemaining_ = 5.0;
         masterServerConnectionId_ = document["id"].GetString();
@@ -294,8 +321,7 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
     }
     else if (cmd == "connectUDPSuccess")
     {
-        isUDPConnected = true;
-        isConnectingUDP_ = false;
+        connectToMasterState_ = MASTER_CONNECTED;
 
         LOGINFO("UDP Connected");
 

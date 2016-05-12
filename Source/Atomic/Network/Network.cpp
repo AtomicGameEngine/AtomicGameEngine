@@ -287,6 +287,8 @@ bool Network::StartServer(unsigned short port)
 
     PROFILE(StartServer);
 
+    serverPort_ = port;
+
     if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
     {
         LOGINFO("Started server on port " + String(port));
@@ -662,9 +664,15 @@ void Network::RequestServerListFromMaster()
     masterServerClient_.RequestServerListFromMaster();
 }
 
-void Network::ConnectToServerViaMaster(const String &serverId, const String &address, unsigned short port, Scene* scene)
+void Network::ConnectToServerViaMaster(const String &serverId,
+                                       const String &internalAddress, unsigned short internalPort,
+                                       const String &externalAddress, unsigned short externalPort,
+                                       Scene* scene)
 {
-    masterServerClient_.ConnectToServerViaMaster(serverId, address, port, scene);
+    masterServerClient_.ConnectToServerViaMaster(serverId,
+                                                 internalAddress, internalPort,
+                                                 externalAddress, externalPort,
+                                                 scene);
 }
 
 void Network::RegisterServerWithMaster(const String& name)

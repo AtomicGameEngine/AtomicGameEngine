@@ -169,6 +169,8 @@ function handleServerTCPMessage(socket, msgObj) {
 
         var serverInfo = _.clone(connectionInfo);
         serverInfo.serverName = msgObj.serverName;
+        serverInfo.internalIP = msgObj.internalIP;
+        serverInfo.internalPort = msgObj.internalPort;
 
         serverList.push(serverInfo);
 

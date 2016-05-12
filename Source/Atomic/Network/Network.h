@@ -75,7 +75,10 @@ public:
 
     void ConnectToMaster(const String& address, unsigned short port);
     void RegisterServerWithMaster(const String& name);
-    void ConnectToServerViaMaster(const String& serverId, const String& address, unsigned short port, Scene* scene);
+    void ConnectToServerViaMaster(const String& serverId,
+                                  const String& internalAddress, unsigned short internalPort,
+                                  const String& externalAddress, unsigned short externalPort,
+                                  Scene* scene);
     void RequestServerListFromMaster();
 
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
@@ -151,6 +154,8 @@ public:
 
     kNet::Network* GetKnetNetwork() { return network_; }
 
+    unsigned int GetServerPort() { return serverPort_; }
+
 private:
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
@@ -191,6 +196,8 @@ private:
     String packageCacheDir_;
     // MasterServerClient
     MasterServerClient masterServerClient_;
+    // Server Port
+    unsigned int serverPort_;
 };
 
 /// Register Network library objects.

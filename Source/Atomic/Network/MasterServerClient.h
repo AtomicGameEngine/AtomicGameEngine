@@ -11,17 +11,26 @@
 namespace Atomic
 {
 
-class Scene;
-
-class ATOMIC_API MasterServerEntry : public Object
+enum ConnectToMasterState
 {
-    OBJECT(MasterServerEntry);
-
-public:
-    MasterServerEntry(Context* context);
-
-    String serverId;
+    MASTER_NOT_CONNECTED = 0,
+    MASTER_CONNECTING_UDP,
+    MASTER_CONNECTING_TCP,
+    MASTER_CONNECTED,
+    MASTER_CONNECTION_FAILED
 };
+
+enum ClientConnectToGameServerState
+{
+    GAME_NOT_CONNECTED = 0,
+    GAME_CONNECTING_INTERNAL_IP,
+    GAME_VERIFYING_SERVER,
+    GAME_CONNECTING_EXTERNAL_IP,
+    GAME_CONNECTED,
+    GAME_CONNECTION_FAILED
+};
+
+class Scene;
 
 /// %MasterServerClient subsystem.
 class ATOMIC_API MasterServerClient : public Object
@@ -40,18 +49,19 @@ public:
     void ConnectToMaster(const String& address, unsigned short port);
     void RequestServerListFromMaster();
     void RegisterServerWithMaster(const String& serverName);
-    void ConnectToServerViaMaster(const String& serverId, const String& address, unsigned short port, Scene* scene);
+    void ConnectToServerViaMaster(const String& serverId,
+                                  const String& internalAddress, unsigned short internalPort,
+                                  const String& externalAddress, unsigned short externalPort,
+                                  Scene* scene);
 
 private:
     void SendMessageToMasterServer(const String& message);
     void HandleMasterServerMessage(const String& msg);
 
-    // Used by the client
-    bool isConnectingUDP_;
-    float udpTimeout_;
     float udpConnectionSecondsRemaining_;
     float udpSecondsTillRetry_;
 
+    // Communication with Master Server
     bool readingMasterMessageLength;
     uint32_t bytesRemainingInMasterServerMessage_;
     String masterMessageLengthStr;
@@ -59,9 +69,6 @@ private:
     kNet::EndPoint masterEndPoint_;
     kNet::Socket* masterUDPConnection_;
     kNet::Socket* masterTCPConnection_;
-
-    bool isTCPConnected;
-    bool isUDPConnected;
 
     String masterServerConnectionId_;
 
@@ -76,6 +83,9 @@ private:
     HashMap<String, kNet::Socket*> clientIdToPunchThroughSocketMap_;
     kNet::Socket* clientToServerSocket_;
     Scene* clientPendingScene_;
+
+    ConnectToMasterState connectToMasterState_;
+    ClientConnectToGameServerState clientConnectToGameServerState_;
 };
 
 }

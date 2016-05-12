@@ -560,6 +560,17 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 		return 0;
 	}
 
+	struct addrinfo* aip;
+	for (aip = result; aip != NULL; aip = aip->ai_next)
+	{
+		char buf[512];
+		char port[512];
+		if (getnameinfo(aip->ai_addr, sizeof(struct sockaddr), buf, 512, port, 512, 0) == 0)
+		{
+			printf("%s:%s\n", buf,port);
+		}
+	}
+
 	SOCKET listenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	KNET_LOG(LogInfo, "Network::OpenListenSocket: Created listenSocket 0x%8X.", (unsigned int)listenSocket);
 
