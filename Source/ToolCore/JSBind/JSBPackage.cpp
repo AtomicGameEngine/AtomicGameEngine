@@ -195,6 +195,7 @@ bool JSBPackage::Load(const String& packageFolder)
                 return false;
             }
 
+            dependencies_.Push(depPackage);
         }
 
     }
