@@ -160,7 +160,7 @@ void BuildIOS::Initialize()
     AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
-    BuildResourceEntries();
+    BuildDefaultResourceEntries();
 
 }
 

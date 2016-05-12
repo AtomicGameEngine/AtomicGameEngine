@@ -65,7 +65,7 @@ void BuildWeb::Initialize()
     AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
-    BuildResourceEntries();
+    BuildDefaultResourceEntries();
 }
 void BuildWeb::Build(const String& buildPath)
 {

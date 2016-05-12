@@ -22,10 +22,14 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/JSONFile.h> // EGS:
+
 
 #include "../Subprocess/SubprocessSystem.h"
 #include "../Project/Project.h"
 #include "../ToolEnvironment.h"
+#include "../Assets/Asset.h" // EGS:
+
 
 #include "BuildSystem.h"
 #include "BuildEvents.h"
@@ -282,133 +286,195 @@ String BuildBase::GetSettingsDirectory()
 
 void BuildBase::ScanResourceDirectory(const String& resourceDir)
 {
-    Vector<String> fileNames;
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    fileSystem->ScanDir(fileNames, resourceDir, "*.*", SCAN_FILES, true);
-
-    for (unsigned i = 0; i < fileNames.Size(); i++)
     {
-        const String& filename = fileNames[i];
-
-        for (unsigned j = 0; j < resourceEntries_.Size(); j++)
-        {
-            const BuildResourceEntry* entry = resourceEntries_[j];
-
-            if (entry->packagePath_ == filename)
-            {
-                BuildWarn(ToString("Resource Path: %s already exists", filename.CString()));
-                continue;
-            }
-        }
-
-        if (!CheckIncludeResourceFile(resourceDir, filename))
-            continue;
-
-        BuildResourceEntry* newEntry = new BuildResourceEntry;
-
-// BEGIN LICENSE MANAGEMENT
-        if (GetExtension(filename) == ".mdl")
-        {
-            containsMDL_ = true;
-        }
-// END LICENSE MANAGEMENT
-
-        newEntry->absolutePath_ = resourceDir + filename;
-        newEntry->resourceDir_ = resourceDir;
-
-        newEntry->packagePath_ = filename;
-
-        resourceEntries_.Push(newEntry);
 
         //LOGINFOF("Adding resource: %s : %s", newEntry->absolutePath_.CString(), newEntry->packagePath_.CString());
     }
 }
 
-void BuildBase::BuildProjectResourceEntries()
+void BuildBase::BuildDefaultResourceEntries()
 {
-    Vector<String> fileNames;
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    fileSystem->ScanDir(fileNames, project_->GetResourcePath(), "*.*", SCAN_FILES, true);
-    
-    VariantMap resourceTags;
-    AssetBuildConfig::ApplyConfig(resourceTags);
-
-    VariantMap::ConstIterator itr = resourceTags.Begin();
-
-    Vector<String> resources;
-    while (itr != resourceTags.End())
+    for (unsigned i = 0; i < resourceDirs_.Size(); i++)
     {
-        if (itr->first_ == assetBuildTag_)
+        String resourceDir = resourceDirs_[i];
+        Vector<String> fileNames;
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        fileSystem->ScanDir(fileNames, resourceDir, "*.*", SCAN_FILES, true);
+
+        for (unsigned i = 0; i < fileNames.Size(); i++)
         {
-            resources = itr->second_.GetStringVector();
-            break;
-        }
-        itr++;
-    }
-
-    for (unsigned i = 0; i < fileNames.Size(); i++)
-    {
-        const String& filename = fileNames[i];
-
-        for (unsigned j = 0; j < resourceEntries_.Size(); j++)
-        {
-            const BuildResourceEntry* entry = resourceEntries_[j];
-
-            if (entry->packagePath_ == filename)
-            {
-                BuildWarn(ToString("Resource Path: %s already exists", filename.CString()));
+            const String& filename = fileNames[i];
+            
+            if (!CheckIncludeResourceFile(resourceDir, filename))
                 continue;
-            }
-        }
 
-        for (auto it = resources.Begin(); it != resources.End(); ++it)
-        {
-            if (filename == (*it))
-            {
-                // TODO: Add additional filters
-                if (GetExtension(filename) == ".psd")
-                    break;
-
-                BuildResourceEntry* newEntry = new BuildResourceEntry;
-
-                // BEGIN LICENSE MANAGEMENT
-                if (GetExtension(filename) == ".mdl")
-                {
-                    containsMDL_ = true;
-                }
-                // END LICENSE MANAGEMENT
-
-                newEntry->absolutePath_ = project_->GetResourcePath() + filename;
-                newEntry->resourceDir_ = project_->GetResourcePath();
-
-                newEntry->packagePath_ = filename;
-
-                resourceEntries_.Push(newEntry);
-                resourcePackager_->AddResourceEntry(newEntry);
-
-                break;
-            }
+            AddToResourcePackager(filename);
         }
     }
 }
 
-void BuildBase::BuildResourceEntries()
+void BuildBase::BuildProjectResourceEntries()
 {
-    for (unsigned i = 0; i < resourceDirs_.Size(); i++)
+    if (AssetBuildConfig::IsLoaded() && !assetBuildTag_.Empty())
     {
-        ScanResourceDirectory(resourceDirs_[i]);
+        // add log comment
+        BuildFilteredProjectResourceEntries();
+    }
+    else
+    {
+        // add log comment
+        BuildAllProjectResourceEntries();
+    }
+}
+
+void BuildBase::BuildAllProjectResourceEntries()
+{
+    for (unsigned i = 0; i < projectResourceDir_.Size(); i++)
+    {
+        String projectResourceDir = projectResourceDir_[i];
+        Vector<String> fileNamesInProject;
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        fileSystem->ScanDir(fileNamesInProject, projectResourceDir, "*.*", SCAN_FILES, true);
+
+        for (unsigned i = 0; i < fileNamesInProject.Size(); i++)
+        {
+            AddToResourcePackager(fileNamesInProject[i]);
+        }
+    }
+    
+}
+
+void BuildBase::BuildFilteredProjectResourceEntries()
+{
+    // Loading up the assetbuildconfig.json,
+    // obtaining a list of files to include in the build.
+    VariantMap resourceTags;
+    AssetBuildConfig::ApplyConfig(resourceTags);
+    Vector<String> resourceFilesToInclude;
+    VariantMap::ConstIterator itr = resourceTags.Begin();
+
+    while (itr != resourceTags.End())
+    {
+        if (itr->first_ == assetBuildTag_)
+        {
+            resourceFilesToInclude = itr->second_.GetStringVector();
+            break;
+        }
+        
+        itr++;
+        if (itr == resourceTags.End())
+        {
+            LOGERRORF("BuildBase::BuildFilteredProjectResourceEntries - Asset Build Tag \"%s\" not defined in .\\Settings\\assetbuildconfig.json", assetBuildTag_.CString());
+        }
     }
 
-    if (resourcePackager_.NotNull())
+    // check if the files in assetbuildconfig.json exist,
+    // as well as their corresponding .asset file
+    Vector<String> filesInResourceFolder;
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    fileSystem->ScanDir(filesInResourceFolder, project_->GetResourcePath(), "*.*", SCAN_FILES, true);
+
+    for (auto itr = resourceFilesToInclude.Begin(); itr != resourceFilesToInclude.End(); ++itr)
     {
-        for (unsigned i = 0; i < resourceEntries_.Size(); i++)
+        // .asset file is of primary importance since we used it to identify the associated cached file.
+        // without the .asset file the resource becomes redundant.
+        if (!filesInResourceFolder.Contains(*itr + ".asset"))
         {
-            BuildResourceEntry* entry = resourceEntries_[i];
-            resourcePackager_->AddResourceEntry(entry);
+            BuildWarn(ToString("BuildBase::BuildFilteredProjectResourceEntries - File \"%s\" associated .asset file not found in the Resources folder.\nRemoving \"%s\" from build pakcage", (*itr).CString()));
+            if (filesInResourceFolder.Contains(*itr))
+            {
+                resourceFilesToInclude.Remove(*itr);
+                itr--;
+                continue;
+            }
         }
 
+        resourceFilesToInclude.Push(*itr + ".asset");
     }
 
+    // Get associated cache GUID from the asset file
+    Vector<String> filesWithGUIDtoInclude;
+    for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
+    {
+        if (GetExtension(*it) == ".asset");
+        {
+            SharedPtr<File> file(new File(context_, *it));
+            SharedPtr<JSONFile> json(new JSONFile(context_));
+            json->Load(*file);
+            file->Close();
+
+            JSONValue root = json->GetRoot();
+
+            assert(root.Get("version").GetInt() == ASSET_VERSION);
+
+            String guid = root.Get("guid").GetString();
+            filesWithGUIDtoInclude.Push(guid);
+        }
+    }
+    
+    // obtain files in cache folder,
+    // check if the file contains the guid, and add it to the resourceFilesToInclude
+    Vector<String> filesInCacheFolder;
+    fileSystem->ScanDir(filesInCacheFolder, project_->GetProjectPath() + "Cache/", "*.*", SCAN_FILES, true);
+
+    for (unsigned i = 0; i < filesWithGUIDtoInclude.Size(); i++)
+    {
+        String &guid = filesWithGUIDtoInclude[i];
+        for (unsigned j = 0; j < filesInCacheFolder.Size(); j++)
+        {
+            String &filename = GetFileName(filesInCacheFolder[j]);
+            if (filename.Contains(guid))
+            {
+                resourceFilesToInclude.Push(filesInCacheFolder[j]);
+                // do not continue...
+                // there might be multiple files with the same guid
+            }
+        }
+    }
+
+    for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
+    {
+        AddToResourcePackager(*it);
+    }
+}
+
+void BuildBase::AddToResourcePackager(const String& filename)
+{
+    // Check if the file is already included in the resourceEntries_ list
+    for (unsigned j = 0; j < resourceEntries_.Size(); j++)
+    {
+        const BuildResourceEntry* entry = resourceEntries_[j];
+
+        if (entry->packagePath_ == filename)
+        {
+            BuildWarn(ToString("Resource Path: %s already exists", filename.CString()));
+            continue;
+        }
+    }
+
+    // Add the file to the resourceEntries_ list
+    // TODO: Add additional filters
+    if (GetExtension(filename) == ".psd")
+        return;
+
+    BuildResourceEntry* newEntry = new BuildResourceEntry;
+
+    // BEGIN LICENSE MANAGEMENT
+    if (GetExtension(filename) == ".mdl")
+    {
+        containsMDL_ = true;
+    }
+    // END LICENSE MANAGEMENT
+
+    newEntry->absolutePath_ = project_->GetResourcePath() + filename;
+    newEntry->resourceDir_ = project_->GetResourcePath();
+
+    newEntry->packagePath_ = filename;
+
+    resourceEntries_.Push(newEntry);
+    
+    assert(resourcePackager_.NotNull());
+    resourcePackager_->AddResourceEntry(newEntry);
 }
 
 void BuildBase::GenerateResourcePackage(const String& resourcePackagePath)
@@ -420,6 +486,12 @@ void BuildBase::AddResourceDir(const String& dir)
 {
     assert(!resourceDirs_.Contains(dir));
     resourceDirs_.Push(dir);
+}
+
+void BuildBase::AddProjectResourceDir(const String& dir)
+{
+    assert(!projectResourceDir_.Contains(dir));
+    projectResourceDir_.Push(dir);
 }
 
 void BuildBase::ReadAssetBuildConfig()

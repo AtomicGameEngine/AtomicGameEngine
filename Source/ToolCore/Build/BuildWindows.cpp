@@ -49,28 +49,21 @@ BuildWindows::~BuildWindows()
 void BuildWindows::Initialize()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-
     Project* project = tsystem->GetProject();
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
     
-
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
         AddResourceDir(defaultResourcePaths[i]);
     }
-    AddResourceDir(project->GetProjectPath() + "Cache/");
-    BuildResourceEntries();
-
-    String projectResources = project->GetResourcePath();
+    BuildDefaultResourceEntries();
+    
+    // EGS: Build the project resources and cache
+    AddProjectResourceDir(project->GetProjectPath());
+    AddProjectResourceDir(project->GetProjectPath() + "Cache/");
     BuildProjectResourceEntries();
-    
-
-    // TODO: smart filtering of cache
-    
-    //AddResourceDir(projectResources);
-    //BuildResourceEntries();
 }
 
 bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const String& fileName)

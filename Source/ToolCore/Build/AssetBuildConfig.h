@@ -28,7 +28,6 @@
 
 namespace Atomic
 {
-
     class Context;
 
     class AssetBuildConfig :
@@ -43,6 +42,8 @@ namespace Atomic
         /// Apply the configuration to a setting variant map, values that exist will not be overriden
         static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return assetBuildConfig_.Configuration::ApplyConfig(settings, overwrite); }
 
+        static const bool IsLoaded() { return assetBuildConfig_.Configuration::IsLoaded(); }
+
     private:
 
         virtual bool LoadDesktopConfig(JSONValue root);
@@ -50,5 +51,4 @@ namespace Atomic
 
         static AssetBuildConfig assetBuildConfig_;
     };
-
 }

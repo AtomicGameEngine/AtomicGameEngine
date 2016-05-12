@@ -297,7 +297,7 @@ void BuildAndroid::Initialize()
     AddResourceDir(project->GetProjectPath() + "Cache/");
     AddResourceDir(projectResources);
 
-    BuildResourceEntries();
+    BuildDefaultResourceEntries();
 }
 
 void BuildAndroid::Build(const String& buildPath)
