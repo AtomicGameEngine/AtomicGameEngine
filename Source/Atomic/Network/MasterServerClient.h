@@ -32,6 +32,12 @@ enum ClientConnectToGameServerState
     GAME_CONNECTION_FAILED
 };
 
+struct MasterServer
+{
+    String address;
+    unsigned short port;
+};
+
 /// Game server info used by a client when connecting
 struct RemoteGameServer
 {
@@ -86,9 +92,10 @@ private:
     String masterServerConnectionId_;
 
     void SetConnectToGameServerState(ClientConnectToGameServerState state);
+    void SetConnectToMasterState(ConnectToMasterState state);
 
-    void ConnectToMasterUDP(float dt);
-    void ConnectToGameServer(float dt);
+    void ConnectToMasterUpdate(float dt);
+    void ConnectToGameServerUpdate(float dt);
 
     float timeBetweenClientPunchThroughAttempts_;
     float timeTillNextPunchThroughAttempt_;
@@ -104,6 +111,8 @@ private:
 
     RemoteGameServer remoteGameServerInfo_;
     float connectToGameServerSecondsRemaining_;
+
+    MasterServer masterServerInfo_;
 };
 
 }
