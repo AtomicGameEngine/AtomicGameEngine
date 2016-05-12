@@ -11,6 +11,8 @@
 namespace Atomic
 {
 
+class Scene;
+
 enum ConnectToMasterState
 {
     MASTER_NOT_CONNECTED = 0,
@@ -30,7 +32,18 @@ enum ClientConnectToGameServerState
     GAME_CONNECTION_FAILED
 };
 
-class Scene;
+/// Game server info used by a client when connecting
+struct RemoteGameServer
+{
+    /// Game server id
+    String serverId;
+    String internalAddress;
+    unsigned short internalPort;
+    String externalAddress;
+    unsigned short externalPort;
+    Scene* clientScene;
+};
+
 
 /// %MasterServerClient subsystem.
 class ATOMIC_API MasterServerClient : public Object
@@ -72,7 +85,10 @@ private:
 
     String masterServerConnectionId_;
 
-    void ConnectUDP(float dt);
+    void SetConnectToGameServerState(ClientConnectToGameServerState state);
+
+    void ConnectToMasterUDP(float dt);
+    void ConnectToGameServer(float dt);
 
     float timeBetweenClientPunchThroughAttempts_;
     float timeTillNextPunchThroughAttempt_;
@@ -82,10 +98,12 @@ private:
 
     HashMap<String, kNet::Socket*> clientIdToPunchThroughSocketMap_;
     kNet::Socket* clientToServerSocket_;
-    Scene* clientPendingScene_;
 
     ConnectToMasterState connectToMasterState_;
     ClientConnectToGameServerState clientConnectToGameServerState_;
+
+    RemoteGameServer remoteGameServerInfo_;
+    float connectToGameServerSecondsRemaining_;
 };
 
 }

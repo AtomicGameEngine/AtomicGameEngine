@@ -31,8 +31,7 @@ MasterServerClient::MasterServerClient(Context *context) :
         timeBetweenClientConnectAttempts_(1.0),
         timeTillNextClientConnectAttempt_(1.0),
         masterTCPConnection_(NULL),
-        clientToServerSocket_(NULL),
-        clientPendingScene_(NULL)
+        clientToServerSocket_(NULL)
 {
 
 }
@@ -103,35 +102,14 @@ void MasterServerClient::ConnectToServerViaMaster(const String &serverId,
                                                   const String &externalAddress, unsigned short externalPort,
                                                   Scene* scene)
 {
-    clientConnectToGameServerState_ = GAME_CONNECTING_INTERNAL_IP;
+    remoteGameServerInfo_.serverId = serverId;
+    remoteGameServerInfo_.internalAddress = internalAddress;
+    remoteGameServerInfo_.internalPort = internalPort;
+    remoteGameServerInfo_.externalAddress = externalAddress;
+    remoteGameServerInfo_.externalPort = externalPort;
+    remoteGameServerInfo_.clientScene = scene;
 
-    /*
-    String msg = String("{") +
-                 String("\"cmd\":") + String("\"requestIntroduction\",") +
-                 String("\"id\":\"") + masterServerConnectionId_ + String("\", ") +
-                 String("\"serverId\":\"") + serverId + String("\"") +
-                 String("}");
-
-    SendMessageToMasterServer(msg);
-    */
-
-    kNet::EndPoint serverEndPoint;
-    sscanf(internalAddress.CString(), "%hu.%hu.%hu.%hu",
-           (unsigned short *) &serverEndPoint.ip[0],
-           (unsigned short *) &serverEndPoint.ip[1],
-           (unsigned short *) &serverEndPoint.ip[2],
-           (unsigned short *) &serverEndPoint.ip[3]);
-
-    serverEndPoint.port = internalPort;
-
-    clientPendingScene_ = scene;
-    clientToServerSocket_ = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
-                                       masterUDPConnection_->LocalEndPoint(),
-                                       masterUDPConnection_->LocalAddress(), serverEndPoint, "",
-                                       kNet::SocketOverUDP, kNet::ClientConnectionLessSocket, 1400);
-
-    Atomic::Network* network = GetSubsystem<Network>();
-    network->ConnectWithExistingSocket(clientToServerSocket_, clientPendingScene_);
+    SetConnectToGameServerState(GAME_CONNECTING_INTERNAL_IP);
 }
 
 void MasterServerClient::RegisterServerWithMaster(const String &name)
@@ -220,7 +198,13 @@ void MasterServerClient::Update(float dt) {
 
     if (connectToMasterState_ == MASTER_CONNECTING_UDP)
     {
-        ConnectUDP(dt);
+        ConnectToMasterUDP(dt);
+    }
+
+    if (clientConnectToGameServerState_ != GAME_NOT_CONNECTED &&
+        clientConnectToGameServerState_ != GAME_CONNECTION_FAILED)
+    {
+        ConnectToGameServer(dt);
     }
 
     // Do we have clients requesting a punchthrough?
@@ -269,7 +253,7 @@ void MasterServerClient::Update(float dt) {
 
 }
 
-void MasterServerClient::ConnectUDP(float dt)
+void MasterServerClient::ConnectToMasterUDP(float dt)
 {
     if (udpConnectionSecondsRemaining_ <= 0)
     {
@@ -292,6 +276,93 @@ void MasterServerClient::ConnectUDP(float dt)
         udpSecondsTillRetry_ -= dt;
         udpConnectionSecondsRemaining_ -= dt;
     }
+}
+
+void MasterServerClient::SetConnectToGameServerState(ClientConnectToGameServerState state)
+{
+    if (clientConnectToGameServerState_ == GAME_NOT_CONNECTED &&
+        state == GAME_CONNECTING_INTERNAL_IP)
+    {
+        kNet::EndPoint serverEndPoint;
+        sscanf(remoteGameServerInfo_.internalAddress.CString(), "%hu.%hu.%hu.%hu",
+               (unsigned short *) &serverEndPoint.ip[0],
+               (unsigned short *) &serverEndPoint.ip[1],
+               (unsigned short *) &serverEndPoint.ip[2],
+               (unsigned short *) &serverEndPoint.ip[3]);
+
+        serverEndPoint.port = remoteGameServerInfo_.internalPort;
+
+        clientToServerSocket_ = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
+                                                 masterUDPConnection_->LocalEndPoint(),
+                                                 masterUDPConnection_->LocalAddress(), serverEndPoint, "",
+                                                 kNet::SocketOverUDP, kNet::ClientConnectionLessSocket, 1400);
+
+        Atomic::Network* network = GetSubsystem<Network>();
+        network->ConnectWithExistingSocket(clientToServerSocket_, remoteGameServerInfo_.clientScene);
+
+        connectToGameServerSecondsRemaining_ = 5.0f;
+    }
+    else if (clientConnectToGameServerState_ == GAME_CONNECTING_INTERNAL_IP &&
+             state == GAME_CONNECTING_EXTERNAL_IP)
+    {
+        // Ask the master server to tell the game server
+        // we want to connect to it.
+        String msg = String("{") +
+                     String("\"cmd\":") + String("\"requestIntroduction\",") +
+                     String("\"id\":\"") + masterServerConnectionId_ + String("\", ") +
+                     String("\"serverId\":\"") + remoteGameServerInfo_.serverId + String("\"") +
+                     String("}");
+
+        SendMessageToMasterServer(msg);
+
+        kNet::EndPoint serverEndPoint;
+        sscanf(remoteGameServerInfo_.externalAddress.CString(), "%hu.%hu.%hu.%hu",
+               (unsigned short *) &serverEndPoint.ip[0],
+               (unsigned short *) &serverEndPoint.ip[1],
+               (unsigned short *) &serverEndPoint.ip[2],
+               (unsigned short *) &serverEndPoint.ip[3]);
+
+        serverEndPoint.port = remoteGameServerInfo_.externalPort;
+
+        clientToServerSocket_ = new kNet::Socket(masterUDPConnection_->GetSocketHandle(),
+                                                 masterUDPConnection_->LocalEndPoint(),
+                                                 masterUDPConnection_->LocalAddress(), serverEndPoint, "",
+                                                 kNet::SocketOverUDP, kNet::ClientConnectionLessSocket, 1400);
+
+        Atomic::Network* network = GetSubsystem<Network>();
+        network->ConnectWithExistingSocket(clientToServerSocket_, remoteGameServerInfo_.clientScene);
+
+        connectToGameServerSecondsRemaining_ = 5.0f;
+    }
+
+    clientConnectToGameServerState_ = state;
+}
+
+void MasterServerClient::ConnectToGameServer(float dt)
+{
+    Atomic::Network* network = GetSubsystem<Network>();
+
+    // If we are connected then set the final state
+    if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
+    {
+        SetConnectToGameServerState(GAME_CONNECTED);
+        return;
+    }
+
+    if (connectToGameServerSecondsRemaining_ <= 0)
+    {
+        if (clientConnectToGameServerState_ == GAME_CONNECTING_INTERNAL_IP)
+        {
+            SetConnectToGameServerState(GAME_CONNECTING_EXTERNAL_IP);
+        }
+        else
+        {
+            SetConnectToGameServerState(GAME_CONNECTION_FAILED);
+        }
+        return;
+    }
+
+    connectToGameServerSecondsRemaining_ -= dt;
 }
 
 void MasterServerClient::HandleMasterServerMessage(const String &msg)
