@@ -82,7 +82,7 @@ protected:
     void BuildDefaultResourceEntries();
     void BuildProjectResourceEntries();
 
-    void AddToResourcePackager(const String& filename);
+    void AddToResourcePackager(const String& filename, const String& resourceDir);
 
     void GetDefaultResourcePaths(Vector<String>& paths);
     String GetSettingsDirectory();

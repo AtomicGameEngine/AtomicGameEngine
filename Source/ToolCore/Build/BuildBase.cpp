@@ -308,7 +308,7 @@ void BuildBase::BuildDefaultResourceEntries()
             if (!CheckIncludeResourceFile(resourceDir, filename))
                 continue;
 
-            AddToResourcePackager(filename);
+            AddToResourcePackager(filename, resourceDir);
         }
     }
 }
@@ -338,10 +338,9 @@ void BuildBase::BuildAllProjectResourceEntries()
 
         for (unsigned i = 0; i < fileNamesInProject.Size(); i++)
         {
-            AddToResourcePackager(fileNamesInProject[i]);
+            AddToResourcePackager(fileNamesInProject[i], projectResourceDir);
         }
     }
-    
 }
 
 void BuildBase::BuildFilteredProjectResourceEntries()
@@ -374,37 +373,60 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     fileSystem->ScanDir(filesInResourceFolder, project_->GetResourcePath(), "*.*", SCAN_FILES, true);
 
-    for (auto itr = resourceFilesToInclude.Begin(); itr != resourceFilesToInclude.End(); ++itr)
+    Vector<String> filesToAdd;
+    Vector<String> filesToRemove;
+    for (unsigned i = 0; i < resourceFilesToInclude.Size(); ++i)
     {
         // .asset file is of primary importance since we used it to identify the associated cached file.
         // without the .asset file the resource becomes redundant.
-        if (!filesInResourceFolder.Contains(*itr + ".asset"))
+        String &filename = resourceFilesToInclude[i];
+        if (!filesInResourceFolder.Contains(filename + ".asset"))
         {
-            BuildWarn(ToString("BuildBase::BuildFilteredProjectResourceEntries - File \"%s\" associated .asset file not found in the Resources folder.\nRemoving \"%s\" from build pakcage", (*itr).CString()));
-            if (filesInResourceFolder.Contains(*itr))
+            BuildWarn(ToString("BuildBase::BuildFilteredProjectResourceEntries - File \"%s\" associated .asset file not found in the Resources folder.\nRemoving \"%s\" from build pakcage", filename.CString()));
+            if (filesInResourceFolder.Contains(filename))
             {
-                resourceFilesToInclude.Remove(*itr);
-                itr--;
+                filesToRemove.Push(filename);
                 continue;
             }
         }
+        filesToAdd.Push(filename + ".asset");
+    }
 
-        resourceFilesToInclude.Push(*itr + ".asset");
+    // remove files not to include
+    for (unsigned i = 0; i < filesToRemove.Size(); ++i)
+    {
+        String &filename = filesToRemove[i];
+        if (resourceFilesToInclude.Contains(filename))
+        {
+            resourceFilesToInclude.Remove(filename);
+        }
+    }
+
+    // add files to include
+    for (unsigned i = 0; i < filesToAdd.Size(); ++i)
+    {
+        String &filename = filesToAdd[i];
+        if (!resourceFilesToInclude.Contains(filename))
+        {
+            resourceFilesToInclude.Push(filename);
+        }
     }
 
     // Get associated cache GUID from the asset file
     Vector<String> filesWithGUIDtoInclude;
     for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
     {
-        if (GetExtension(*it) == ".asset");
+        String &filename = *it;
+        
+        if (GetExtension(*it) == ".asset")
         {
-            SharedPtr<File> file(new File(context_, *it));
+            SharedPtr<File> file(new File(context_, project_->GetResourcePath() + *it));
             SharedPtr<JSONFile> json(new JSONFile(context_));
             json->Load(*file);
             file->Close();
 
             JSONValue root = json->GetRoot();
-
+            int test = root.Get("version").GetInt();
             assert(root.Get("version").GetInt() == ASSET_VERSION);
 
             String guid = root.Get("guid").GetString();
@@ -415,6 +437,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     // obtain files in cache folder,
     // check if the file contains the guid, and add it to the resourceFilesToInclude
     Vector<String> filesInCacheFolder;
+    Vector<String> cacheFilesToInclude;
     fileSystem->ScanDir(filesInCacheFolder, project_->GetProjectPath() + "Cache/", "*.*", SCAN_FILES, true);
 
     for (unsigned i = 0; i < filesWithGUIDtoInclude.Size(); i++)
@@ -425,7 +448,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
             String &filename = GetFileName(filesInCacheFolder[j]);
             if (filename.Contains(guid))
             {
-                resourceFilesToInclude.Push(filesInCacheFolder[j]);
+                cacheFilesToInclude.Push(filesInCacheFolder[j]);
                 // do not continue...
                 // there might be multiple files with the same guid
             }
@@ -434,11 +457,16 @@ void BuildBase::BuildFilteredProjectResourceEntries()
 
     for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
     {
-        AddToResourcePackager(*it);
+        AddToResourcePackager(*it, project_->GetResourcePath());
+    }
+
+    for (auto it = cacheFilesToInclude.Begin(); it != cacheFilesToInclude.End(); ++it)
+    {
+        AddToResourcePackager(*it, project_->GetProjectPath() + "Cache/");
     }
 }
 
-void BuildBase::AddToResourcePackager(const String& filename)
+void BuildBase::AddToResourcePackager(const String& filename, const String& resourceDir)
 {
     // Check if the file is already included in the resourceEntries_ list
     for (unsigned j = 0; j < resourceEntries_.Size(); j++)
@@ -466,8 +494,8 @@ void BuildBase::AddToResourcePackager(const String& filename)
     }
     // END LICENSE MANAGEMENT
 
-    newEntry->absolutePath_ = project_->GetResourcePath() + filename;
-    newEntry->resourceDir_ = project_->GetResourcePath();
+    newEntry->absolutePath_ = resourceDir + filename;
+    newEntry->resourceDir_ = resourceDir;
 
     newEntry->packagePath_ = filename;
 
