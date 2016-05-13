@@ -118,6 +118,62 @@ void MasterServerClient::Update(float dt)
         return;
     }
 
+    CheckForMessageFromMaster();
+    ConnectToMasterUpdate(dt);
+    ConnectToGameServerUpdate(dt);
+    CheckForNatPunchThroughRequests(dt);
+}
+
+void MasterServerClient::CheckForNatPunchThroughRequests(float dt)
+{
+    if (clientIdToPunchThroughSocketMap_.Size() > 0)
+    {
+        if (timeTillNextPunchThroughAttempt_ <= 0)
+        {
+            for (HashMap<String, kNet::Socket*>::Iterator i = clientIdToPunchThroughSocketMap_.Begin();
+                 i != clientIdToPunchThroughSocketMap_.End();)
+            {
+                Network* network = GetSubsystem<Network>();
+                LOGINFO("Sending packet to client");
+                kNet::Socket* s = i->second_;
+
+                if (network->IsEndPointConnected(s->RemoteEndPoint()))
+                {
+                    i = clientIdToPunchThroughSocketMap_.Erase(i);
+                }
+                else
+                {
+                    s->Send("K",1);
+                    ++i;
+                }
+            }
+
+            // Reset the timer
+            timeTillNextPunchThroughAttempt_ = timeBetweenClientPunchThroughAttempts_;
+        }
+
+        timeTillNextPunchThroughAttempt_ -= dt;
+    }
+
+    // See if we need to still be trying to punch through from the client
+    if (clientToServerSocket_ != NULL && timeTillNextClientConnectAttempt_ <= 0)
+    {
+        Atomic::Network* network = GetSubsystem<Network>();
+
+        if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
+        {
+            LOGINFO("Sending packet to server");
+            clientToServerSocket_->Send("K",1);
+        }
+
+        timeTillNextClientConnectAttempt_ = timeBetweenClientConnectAttempts_;
+    }
+
+    timeTillNextClientConnectAttempt_ -= dt;
+}
+
+void MasterServerClient::CheckForMessageFromMaster()
+{
     kNet::OverlappedTransferBuffer *buf = masterTCPConnection_->BeginReceive();
 
     if (buf && buf->bytesContains > 0) {
@@ -134,7 +190,7 @@ void MasterServerClient::Update(float dt)
                     sscanf(masterMessageLengthStr.CString(), "%" SCNd32, &bytesRemainingInMasterServerMessage_);
                     readingMasterMessageLength = false;
 
-                    LOGINFO("Message is "+String(bytesRemainingInMasterServerMessage_)+" long");
+                    LOGINFO("Message is " + String(bytesRemainingInMasterServerMessage_) + " long");
                 }
                 else {
                     masterMessageLengthStr += c;
@@ -158,88 +214,41 @@ void MasterServerClient::Update(float dt)
 
         masterTCPConnection_->EndReceive(buf);
     }
-
-    if (connectToMasterState_ != MASTER_NOT_CONNECTED &&
-        connectToMasterState_ != MASTER_CONNECTION_FAILED)
-    {
-        ConnectToMasterUpdate(dt);
-    }
-
-    if (clientConnectToGameServerState_ != GAME_NOT_CONNECTED &&
-        clientConnectToGameServerState_ != GAME_CONNECTION_FAILED)
-    {
-        ConnectToGameServerUpdate(dt);
-    }
-
-    // Do we have clients requesting a punchthrough?
-    if (clientIdToPunchThroughSocketMap_.Size()>0)
-    {
-        if (timeTillNextPunchThroughAttempt_ <= 0)
-        {
-            for (HashMap<String, kNet::Socket*>::Iterator i = clientIdToPunchThroughSocketMap_.Begin(); i != clientIdToPunchThroughSocketMap_.End();)
-            {
-                Atomic::Network* network = GetSubsystem<Network>();
-                LOGINFO("Sending packet to client");
-                kNet::Socket* s = i->second_;
-
-                if (network->IsEndPointConnected(s->RemoteEndPoint()))
-                {
-                    i = clientIdToPunchThroughSocketMap_.Erase(i);
-                }
-                else
-                {
-                    s->Send("K",1);
-                    ++i;
-                }
-            }
-
-            // Reset the timer
-            timeTillNextPunchThroughAttempt_ = timeBetweenClientPunchThroughAttempts_;
-        }
-
-        timeTillNextPunchThroughAttempt_ -= dt;
-    }
-
-    if (clientToServerSocket_ != NULL && timeTillNextClientConnectAttempt_ <= 0)
-    {
-        Atomic::Network* network = GetSubsystem<Network>();
-
-        if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
-        {
-            LOGINFO("Sending packet to server");
-            clientToServerSocket_->Send("K",1);
-        }
-
-        timeTillNextClientConnectAttempt_ = timeBetweenClientConnectAttempts_;
-    }
-
-    timeTillNextClientConnectAttempt_ -= dt;
-
 }
 
 void MasterServerClient::ConnectToMasterUpdate(float dt)
 {
-    if (udpConnectionSecondsRemaining_ <= 0)
+    if (connectToMasterState_ == MASTER_NOT_CONNECTED ||
+        connectToMasterState_ == MASTER_CONNECTION_FAILED)
     {
-        connectToMasterState_ = MASTER_CONNECTION_FAILED;
-
-        // TODO - emit error event
-
         return;
     }
 
-    if (udpSecondsTillRetry_ <= 0)
+    if (connectToMasterState_ == MASTER_CONNECTING_UDP)
     {
-        String msg = "{ \"cmd\": \"registerUDPPort\", \"id\": \"" + masterServerConnectionId_ + "\"}";
+        if (udpConnectionSecondsRemaining_ <= 0)
+        {
+            connectToMasterState_ = MASTER_CONNECTION_FAILED;
 
-        masterUDPConnection_->Send(msg.CString(), msg.Length());
-        udpSecondsTillRetry_ = 0.5;
+            // TODO - emit error event
+
+            return;
+        }
+
+        if (udpSecondsTillRetry_ <= 0)
+        {
+            String msg = "{ \"cmd\": \"registerUDPPort\", \"id\": \"" + masterServerConnectionId_ + "\"}";
+
+            masterUDPConnection_->Send(msg.CString(), msg.Length());
+            udpSecondsTillRetry_ = 0.5;
+        }
+        else
+        {
+            udpSecondsTillRetry_ -= dt;
+            udpConnectionSecondsRemaining_ -= dt;
+        }
     }
-    else
-    {
-        udpSecondsTillRetry_ -= dt;
-        udpConnectionSecondsRemaining_ -= dt;
-    }
+
 }
 
 void MasterServerClient::SetConnectToMasterState(ConnectToMasterState state)
@@ -270,6 +279,17 @@ void MasterServerClient::SetConnectToMasterState(ConnectToMasterState state)
 
         kNet::NetworkServer* server = kNetNetwork->GetServer().ptr();
 
+        kNet::EndPoint masterEndPoint;
+
+        sscanf(masterServerInfo_.address.CString(), "%hu.%hu.%hu.%hu",
+               (unsigned short *) &masterEndPoint.ip[0],
+               (unsigned short *) &masterEndPoint.ip[1],
+               (unsigned short *) &masterEndPoint.ip[2],
+               (unsigned short *) &masterEndPoint.ip[3]);
+
+        masterEndPoint.port = masterServerInfo_.port;
+
+
         if (server)
         {
             std::vector < kNet::Socket * > listenSockets = kNetNetwork->GetServer()->ListenSockets();
@@ -280,7 +300,7 @@ void MasterServerClient::SetConnectToMasterState(ConnectToMasterState state)
             // UDP connection re-uses the same udp port we are listening on for the sever
             masterUDPConnection_ = new kNet::Socket(listenSocket->GetSocketHandle(),
                                                     listenSocket->LocalEndPoint(),
-                                                    listenSocket->LocalAddress(), masterEndPoint_, "",
+                                                    listenSocket->LocalAddress(), masterEndPoint, "",
                                                     kNet::SocketOverUDP, kNet::ServerClientSocket, 1400);
         }
         else
@@ -293,6 +313,11 @@ void MasterServerClient::SetConnectToMasterState(ConnectToMasterState state)
     if (state == MASTER_CONNECTION_FAILED)
     {
         LOGERROR("Could not connect to master server");
+    }
+
+    if (state == MASTER_CONNECTED)
+    {
+        SendEvent(E_MASTERCONNECTIONREADY);
     }
 
     connectToMasterState_ = state;
@@ -360,11 +385,27 @@ void MasterServerClient::SetConnectToGameServerState(ClientConnectToGameServerSt
 
 void MasterServerClient::ConnectToGameServerUpdate(float dt)
 {
+    if (clientConnectToGameServerState_ == GAME_NOT_CONNECTED ||
+        clientConnectToGameServerState_ == GAME_CONNECTED ||
+        clientConnectToGameServerState_ == GAME_CONNECTION_FAILED)
+    {
+       return;
+    }
+
     Atomic::Network* network = GetSubsystem<Network>();
 
     // If we are connected then set the final state
     if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
     {
+        if (GAME_CONNECTING_INTERNAL_IP)
+        {
+            LOGINFO("Successfully connected using internal IP");
+        }
+        else if (GAME_CONNECTING_EXTERNAL_IP)
+        {
+            LOGINFO("Successfully connected using external IP");
+        }
+
         SetConnectToGameServerState(GAME_CONNECTED);
         return;
     }
@@ -412,11 +453,9 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
     }
     else if (cmd == "connectUDPSuccess")
     {
-        connectToMasterState_ = MASTER_CONNECTED;
+        SetConnectToMasterState(MASTER_CONNECTED);
 
         LOGINFO("UDP Connected");
-
-        SendEvent(E_MASTERCONNECTIONREADY);
     }
     else if (cmd == "sendPacketToClient")
     {

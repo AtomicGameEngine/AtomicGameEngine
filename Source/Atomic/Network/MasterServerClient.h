@@ -85,7 +85,6 @@ private:
     uint32_t bytesRemainingInMasterServerMessage_;
     String masterMessageLengthStr;
     String masterMessageStr;
-    kNet::EndPoint masterEndPoint_;
     kNet::Socket* masterUDPConnection_;
     kNet::Socket* masterTCPConnection_;
 
@@ -113,6 +112,10 @@ private:
     float connectToGameServerSecondsRemaining_;
 
     MasterServer masterServerInfo_;
+
+    void CheckForMessageFromMaster();
+
+    void CheckForNatPunchThroughRequests(float dt);
 };
 
 }
