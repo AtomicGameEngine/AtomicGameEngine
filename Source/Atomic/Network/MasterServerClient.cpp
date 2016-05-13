@@ -395,7 +395,7 @@ void MasterServerClient::ConnectToGameServerUpdate(float dt)
     Atomic::Network* network = GetSubsystem<Network>();
 
     // If we are connected then set the final state
-    if (!network->GetServerConnection() || !network->GetServerConnection()->IsConnected())
+    if (network->GetServerConnection() && network->GetServerConnection()->IsConnected())
     {
         if (GAME_CONNECTING_INTERNAL_IP)
         {
