@@ -45,6 +45,7 @@ public:
 protected:
 
     void Initialize();
+    virtual bool CheckIncludeResourceFile(const String& resourceDir, const String& fileName);
 
 
 };

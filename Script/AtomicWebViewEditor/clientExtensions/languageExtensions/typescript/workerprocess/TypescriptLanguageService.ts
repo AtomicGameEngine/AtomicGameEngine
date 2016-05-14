@@ -163,6 +163,26 @@ export class TypescriptLanguageService {
     getProjectFiles(): string[] {
         return this.projectFiles;
     }
+
+    getPreEmitWarnings(filename: string, options?: ts.CompilerOptions) {
+        options = options || this.compilerOptions;
+
+        let allDiagnostics = this.compileFile(filename);
+        let results = [];
+
+        allDiagnostics.forEach(diagnostic => {
+            let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+            let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+            results.push({
+                row: lineChar.line,
+                column: lineChar.character,
+                text: message,
+                type: diagnostic.category == 1 ? "error" : "warning"
+            });
+        });
+        return results;
+    }
+
     /**
      * Simply transpile the typescript file.  This is much faster and only checks for syntax errors
      * @param {string[]}           fileNames array of files to transpile
@@ -222,7 +242,7 @@ export class TypescriptLanguageService {
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
      */
-    compile(files: string[], options?: ts.CompilerOptions): void {
+    compile(files: string[], options?: ts.CompilerOptions): ts.Diagnostic[] {
         let start = new Date().getTime();
 
         options = options || this.compilerOptions;
@@ -242,18 +262,12 @@ export class TypescriptLanguageService {
         } else {
             // Only compile the files that are newly edited
             files.forEach(filename => {
-                // increment the version number since we changed
-                this.versionMap[filename].version++;
-                this.versionMap[filename].snapshot = null;
                 errors = errors.concat(this.compileFile(filename));
             });
         }
 
-        if (errors.length) {
-            this.logErrors(errors);
-        }
-
         console.log(`${this.name}: Compiling complete after ${new Date().getTime() - start} ms`);
+        return errors;
     }
 
     /**
@@ -285,7 +299,7 @@ export class TypescriptLanguageService {
         }
         let idx = this.projectFiles.indexOf(filepath);
         if (idx > -1) {
-            console.log(`Update project files array from ${filepath} to ${newpath}`)
+            console.log(`Update project files array from ${filepath} to ${newpath}`);
             this.projectFiles[idx] = newpath;
         }
     }

@@ -44,10 +44,12 @@ public:
 protected:
 
     bool Import();
+    void ApplyProjectImportConfig();
 
     virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
     virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
+    bool compressTextures_;
 };
 
 }

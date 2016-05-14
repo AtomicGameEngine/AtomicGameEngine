@@ -14,7 +14,8 @@
     "filesGlob": [
         "./ToolCore/**/*.ts",
         "./AtomicEditor/**/*.ts",
-        "./TypeScript/**/*.ts"
+        "./TypeScript/**/*.ts",
+        "!./TypeScript/dist/*.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
@@ -25,6 +26,7 @@
         "./AtomicEditor/editor/EditorEvents.ts",
         "./AtomicEditor/editor/EditorLicense.ts",
         "./AtomicEditor/editor/Preferences.ts",
+        "./AtomicEditor/hostExtensions/coreExtensions/ProjectBasedExtensionLoader.ts",
         "./AtomicEditor/hostExtensions/HostExtensionServices.ts",
         "./AtomicEditor/hostExtensions/languageExtensions/TypscriptLanguageExtension.ts",
         "./AtomicEditor/hostExtensions/ServiceLocator.ts",
@@ -75,6 +77,7 @@
         "./AtomicEditor/ui/modal/build/platforms/WebSettingsWidget.ts",
         "./AtomicEditor/ui/modal/build/platforms/WindowsSettingsWidget.ts",
         "./AtomicEditor/ui/modal/CreateProject.ts",
+        "./AtomicEditor/ui/modal/ExtensionWindow.ts",
         "./AtomicEditor/ui/modal/license/ActivationSuccessWindow.ts",
         "./AtomicEditor/ui/modal/license/ActivationWindow.ts",
         "./AtomicEditor/ui/modal/license/EULAWindow.ts",
@@ -91,6 +94,14 @@
         "./AtomicEditor/ui/modal/UIResourceOps.ts",
         "./AtomicEditor/ui/playmode/PlayerOutput.ts",
         "./AtomicEditor/ui/playmode/PlayMode.ts",
+        "./AtomicEditor/ui/ResourceEditorProvider.ts",
+        "./AtomicEditor/ui/resourceEditors/AbstractTextResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/JavascriptResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/JsonResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/Scene3dResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/TextFileResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/TurboBadgerResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/TypescriptResourceEditorBuilder.ts",
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
         "./AtomicEditor/ui/UIEvents.ts",
@@ -98,6 +109,7 @@
         "./TypeScript/AtomicNET.d.ts",
         "./TypeScript/AtomicPlayer.d.ts",
         "./TypeScript/AtomicWork.d.ts",
+        "./TypeScript/duktape.d.ts",
         "./TypeScript/Editor.d.ts",
         "./TypeScript/EditorWork.d.ts",
         "./TypeScript/ToolCore.d.ts",

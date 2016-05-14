@@ -24,6 +24,8 @@ import EditorEvents = require("editor/EditorEvents");
 import MainFrame = require("./frames/MainFrame");
 import ModalOps = require("./modal/ModalOps");
 import Shortcuts = require("./Shortcuts");
+import ServiceLocator from "../hostExtensions/ServiceLocator";
+import Editor = require("editor/Editor");
 
 // this is designed with public get functions to solve
 // circular dependency issues in TS
@@ -46,8 +48,12 @@ export function getShortcuts():Shortcuts {
   return editorUI.shortcuts;
 }
 
-export function initialize() {
-  editorUI = new EditorUI();
+export function initialize(editor: Editor) {
+  editorUI = new EditorUI(editor);
+}
+
+export function getEditor(): Editor {
+    return editorUI.editor;
 }
 
 export function shutdown() {
@@ -67,10 +73,9 @@ export function getCurrentResourceEditor():Editor.ResourceEditor {
     return getMainFrame().resourceframe.currentResourceEditor;
 }
 
-
 class EditorUI extends Atomic.ScriptObject {
 
-  constructor() {
+  constructor(editor: Editor) {
 
     super();
 
@@ -81,6 +86,8 @@ class EditorUI extends Atomic.ScriptObject {
     this.mainframe = new MainFrame();
 
     this.view.addChild(this.mainframe);
+
+    this.editor = editor;
 
     this.subscribeToEvent("ScreenMode", (ev:Atomic.ScreenModeEvent) => {
 
@@ -94,20 +101,26 @@ class EditorUI extends Atomic.ScriptObject {
     this.modalOps = new ModalOps();
     this.shortcuts = new Shortcuts();
 
+    // Hook the service locator into the event system and give it the ui objects it needs
+    ServiceLocator.uiServices.init(
+      this.mainframe,
+      this.modalOps);
+    ServiceLocator.subscribeToEvents(this.mainframe);
+
     this.subscribeToEvent(EditorEvents.ModalError, (event:EditorEvents.ModalErrorEvent) => {
       this.showModalError(event.title, event.message);
     });
 
   }
 
-  showModalError(windowText:string, message:string) {
-      var window = new Atomic.UIMessageWindow(this.view, "modal_error");
-      window.show(windowText, message, Atomic.UI_MESSAGEWINDOW_SETTINGS_OK, true, 640, 360);
+  showModalError(windowText: string, message: string) {
+      this.modalOps.showError(windowText, message);
   }
 
   view: Atomic.UIView;
   mainframe: MainFrame;
   modalOps: ModalOps;
   shortcuts: Shortcuts;
+  editor: Editor;
 
 }

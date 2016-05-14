@@ -30,6 +30,7 @@
 #include <Atomic/Resource/ResourceEvents.h>
 #include <Atomic/Resource/ResourceCache.h>
 
+#include "../Import/ImportConfig.h"
 #include "../ToolEvents.h"
 #include "../ToolSystem.h"
 #include "../Project/Project.h"
@@ -100,6 +101,24 @@ void AssetDatabase::RegisterGUID(const String& guid)
     }
 
     usedGUID_.Push(guid);
+}
+
+void AssetDatabase::ReadImportConfig()
+{
+    ImportConfig::Clear();
+
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
+
+    String projectPath = project->GetProjectPath();
+
+    String filename = projectPath + "Settings/Import.json";
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (!fileSystem->FileExists(filename))
+        return;
+
+    ImportConfig::LoadFromFile(context_, filename);
 }
 
 void AssetDatabase::Import(const String& path)
@@ -433,6 +452,8 @@ void AssetDatabase::GetDirtyAssets(PODVector<Asset*>& assets)
 void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventData)
 {
     project_ = GetSubsystem<ToolSystem>()->GetProject();
+
+    ReadImportConfig();
 
     FileSystem* fs = GetSubsystem<FileSystem>();
 

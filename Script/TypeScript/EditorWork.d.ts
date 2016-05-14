@@ -5,7 +5,9 @@
 // license information: https://github.com/AtomicGameEngine/AtomicGameEngine
 //
 
+/// <reference path="Atomic.d.ts" />
 /// <reference path="Editor.d.ts" />
+/// <reference path="ToolCore.d.ts" />
 
 declare module Editor.EditorEvents {
 
@@ -76,6 +78,10 @@ declare module Editor.EditorEvents {
         code: string;
     }
 
+    export interface CodeSavedEvent extends EditorFileEvent {
+        code: string;
+    }
+
     export interface EditorCloseResourceEvent {
 
         editor: Editor.ResourceEditor;
@@ -134,6 +140,12 @@ declare module Editor.EditorEvents {
         serializable: Atomic.Serializable;
 
     }
+
+    export interface PreferencesChangedEvent {
+
+        preferences: any;
+
+    }
 }
 
 declare module Editor.Extensions {
@@ -141,7 +153,7 @@ declare module Editor.Extensions {
     /**
      * Base interface for any editor services.
      */
-    export interface EditorService {
+    export interface EditorServiceExtension {
         /**
          * Unique name of this service
          * @type {string}
@@ -155,6 +167,12 @@ declare module Editor.Extensions {
         description: string;
 
     }
+
+    /**
+     * Base Service Event Listener.  Attach descendents of these to an EditorServiceExtension
+     * to hook service events
+     */
+    export interface ServiceEventListener extends EditorServiceExtension { }
 
     interface EventDispatcher {
         /**
@@ -181,13 +199,13 @@ declare module Editor.Extensions {
          * Loads a service into a service registry
          * @param  {EditorService} service
          */
-        loadService(service: EditorService): void;
+        loadService(service: EditorServiceExtension): void;
     }
 
     /**
      * Service registry interface for registering services
      */
-    export interface ServiceRegistry<T extends EditorService> {
+    export interface ServicesProvider<T extends ServiceEventListener> {
         registeredServices: T[];
 
         /**
@@ -195,6 +213,33 @@ declare module Editor.Extensions {
          * @param  {T}      service the service to register
          */
         register(service: T);
+        /**
+         * Removes a service from the registered services list for this type of service
+         * @param  {T}      service the service to unregister
+         */
+        unregister(service: T);
+    }
+
+    /**
+     * Interface that describes a Resource Editor Factory that will build out the editor for the relevant resource type
+     */
+    export interface ResourceEditorBuilder {
+        /**
+         * Returns true if this builder can generate an editor for this resource type
+         */
+        canHandleResource(resourcePath: string) : boolean;
+        /**
+         * Generates a resource editor for the provided resource type
+         * @param  resourcePath
+         * @param  tabContainer
+         */
+        getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer) : Editor.ResourceEditor;
+    }
+}
+
+declare module Editor.Modal {
+    export interface ExtensionWindow extends Atomic.UIWindow {
+        hide();
     }
 }
 
@@ -205,27 +250,79 @@ declare module Editor.HostExtensions {
      * or by the editor itself.
      */
     export interface HostServiceLocator extends Editor.Extensions.ServiceLoader {
-        resourceServices: Editor.Extensions.ServiceRegistry<ResourceService>;
-        projectServices: Editor.Extensions.ServiceRegistry<ProjectService>;
+        resourceServices: ResourceServicesProvider;
+        projectServices: ProjectServicesProvider;
+        sceneServices: SceneServicesProvider;
+        uiServices: UIServicesProvider;
     }
 
-    export interface HostEditorService extends Editor.Extensions.EditorService {
+    export interface HostEditorService extends Editor.Extensions.EditorServiceExtension {
         /**
          * Called by the service locator at load time
          */
-        initialize(serviceLocator: Editor.Extensions.ServiceLoader);
+        initialize(serviceLocator: HostServiceLocator);
     }
 
-    export interface ResourceService extends Editor.Extensions.EditorService {
+    export interface ResourceServicesEventListener extends Editor.Extensions.ServiceEventListener {
         save?(ev: EditorEvents.SaveResourceEvent);
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
     }
 
-    export interface ProjectService extends Editor.Extensions.EditorService {
+    export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> {
+        createMaterial(resourcePath: string, materialName: string, reportError: boolean): boolean;
+    }
+
+    export interface ProjectServicesEventListener extends Editor.Extensions.ServiceEventListener {
         projectUnloaded?();
         projectLoaded?(ev: EditorEvents.LoadProjectEvent);
         playerStarted?();
+    }
+    export interface ProjectServicesProvider extends Editor.Extensions.ServicesProvider<ProjectServicesEventListener> {
+
+        /**
+         * Return a preference value or the provided default from the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to retrieve
+         * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+         * @return {number|boolean|string}
+         */
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+
+        /**
+         * Sets a user preference value in the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to set
+         * @param  {number | boolean | string} value value to set
+         */
+        setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string);
+    }
+
+    export interface SceneServicesEventListener extends Editor.Extensions.ServiceEventListener {
+        activeSceneEditorChanged?(ev: EditorEvents.ActiveSceneEditorChangeEvent);
+        editorSceneClosed?(ev: EditorEvents.SceneClosedEvent);
+    }
+    export interface SceneServicesProvider extends Editor.Extensions.ServicesProvider<SceneServicesEventListener> { }
+
+    export interface UIServicesEventListener extends Editor.Extensions.ServiceEventListener {
+        menuItemClicked?(refid: string): boolean;
+        projectContextItemClicked?(asset: ToolCore.Asset, refid: string): boolean;
+        hierarchyContextItemClicked?(node: Atomic.Node, refid: string): boolean;
+    }
+    export interface UIServicesProvider extends Editor.Extensions.ServicesProvider<UIServicesEventListener> {
+        createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removePluginMenuItemSource(id: string);
+        createHierarchyContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removeHierarchyContextMenuItemSource(id: string);
+        createProjectContextMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
+        removeProjectContextMenuItemSource(id: string);
+        refreshHierarchyFrame();
+        showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
+        showModalError(windowText: string, message: string);
+        showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args?: any);
+
     }
 }
 
@@ -239,23 +336,49 @@ declare module Editor.ClientExtensions {
      * or by the editor itself.
      */
     export interface ClientServiceLocator extends Editor.Extensions.ServiceLoader {
-        getHostInterop(): HostInterop;
+        /**
+         * Exposed services
+         * @type {WebViewServicesProvider}
+         */
+        clientServices: WebViewServicesProvider;
     }
 
-    export interface ClientEditorService extends Editor.Extensions.EditorService {
+    export interface ClientEditorService extends Editor.Extensions.EditorServiceExtension {
         /**
          * Called by the service locator at load time
          */
         initialize(serviceLocator: ClientServiceLocator);
     }
 
-    export interface WebViewService extends Editor.Extensions.EditorService {
+    export interface WebViewServiceEventListener extends Editor.Extensions.EditorServiceExtension {
         configureEditor?(ev: EditorEvents.EditorFileEvent);
         codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
-        save?(ev: EditorEvents.SaveResourceEvent);
+        save?(ev: EditorEvents.CodeSavedEvent);
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
         projectUnloaded?();
+        preferencesChanged?();
+    }
+
+    /**
+     * Available methods exposed to client services
+     */
+    export interface WebViewServicesProvider extends Editor.Extensions.ServicesProvider<WebViewServiceEventListener> {
+
+        /**
+         * Get a reference to the interop to talk to the host
+         * @return {HostInterop}
+         */
+        getHostInterop(): HostInterop;
+
+        /**
+         * Return a preference value or the provided default from the user settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to retrieve
+         * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+         * @return {number|boolean|string}
+         */
+        getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string;
     }
 
     export interface AtomicErrorMessage {

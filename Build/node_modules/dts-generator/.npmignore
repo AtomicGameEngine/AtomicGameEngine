@@ -1,0 +1,5 @@
+.gitignore
+*.ts
+typings/
+tsconfig.json
+tsd.json

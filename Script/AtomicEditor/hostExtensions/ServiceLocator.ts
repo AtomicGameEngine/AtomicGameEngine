@@ -22,6 +22,7 @@
 
 import * as HostExtensionServices from "./HostExtensionServices";
 import * as EditorUI from "../ui/EditorUI";
+import ProjectBasedExtensionLoader from "./coreExtensions/ProjectBasedExtensionLoader";
 import TypescriptLanguageExtension from "./languageExtensions/TypscriptLanguageExtension";
 
 /**
@@ -31,20 +32,24 @@ import TypescriptLanguageExtension from "./languageExtensions/TypscriptLanguageE
 export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLocator {
 
     constructor() {
-        this.resourceServices = new HostExtensionServices.ResourceServiceRegistry();
-        this.projectServices = new HostExtensionServices.ProjectServiceRegistry();
+        this.resourceServices = new HostExtensionServices.ResourceServicesProvider();
+        this.projectServices = new HostExtensionServices.ProjectServicesProvider();
+        this.sceneServices = new HostExtensionServices.SceneServicesProvider();
+        this.uiServices = new HostExtensionServices.UIServicesProvider();
     }
 
     private eventDispatcher: Atomic.UIWidget = null;
 
-    resourceServices: HostExtensionServices.ResourceServiceRegistry;
-    projectServices: HostExtensionServices.ProjectServiceRegistry;
+    resourceServices: HostExtensionServices.ResourceServicesProvider;
+    projectServices: HostExtensionServices.ProjectServicesProvider;
+    sceneServices: HostExtensionServices.SceneServicesProvider;
+    uiServices: HostExtensionServices.UIServicesProvider;
 
     loadService(service: Editor.HostExtensions.HostEditorService) {
         try {
             service.initialize(this);
         } catch (e) {
-            EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}\n \n ${e.stack}`);
+            EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
         }
     }
 
@@ -56,6 +61,8 @@ export class ServiceLocatorType implements Editor.HostExtensions.HostServiceLoca
         this.eventDispatcher = frame;
         this.resourceServices.subscribeToEvents(this);
         this.projectServices.subscribeToEvents(this);
+        this.sceneServices.subscribeToEvents(this);
+        this.uiServices.subscribeToEvents(this);
     }
 
     /**
@@ -85,4 +92,5 @@ const serviceLocator = new ServiceLocatorType();
 export default serviceLocator;
 
 // Load up all the internal services
+serviceLocator.loadService(new ProjectBasedExtensionLoader());
 serviceLocator.loadService(new TypescriptLanguageExtension());

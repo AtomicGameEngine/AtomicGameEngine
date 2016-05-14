@@ -1,6 +1,6 @@
 {
 	"name" : "Editor",
-	"includes" : ["<Atomic/Graphics/DebugRenderer.h>"],
+	"includes" : ["<Atomic/Graphics/DebugRenderer.h>", "<AtomicWebView/UIWebView.h>"],
 	"sources" : ["Source/AtomicEditor/Application", "Source/AtomicEditor/Utils",
 							 "Source/AtomicEditor/EditorMode", "Source/AtomicEditor/PlayerMode",
 							 "Source/AtomicEditor/Editors", "Source/AtomicEditor/Editors/SceneEditor3D",

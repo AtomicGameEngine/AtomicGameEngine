@@ -138,12 +138,18 @@ public:
     bool SaveTGA(const String& fileName) const;
     /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality) const;
+    /// Save in DDS format. Return true if successful.
+    bool SaveDDS(const String& fileName) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.
     bool IsArray() const { return array_; }
     /// Whether this texture is in sRGB, only relevant for DDS.
     bool IsSRGB() const { return sRGB_; }
+    /// Whether this texture has power of two dimensions
+    bool IsPOT() const;
+    /// Whether this texture has an alpha channel
+    bool HasAlphaChannel() const;
 
     /// Return a 2D pixel color.
     Color GetPixel(int x, int y) const;
@@ -192,6 +198,8 @@ public:
     CompressedLevel GetCompressedLevel(unsigned index) const;
     /// Return subimage from the image by the defined rect or null if failed. 3D images are not supported. You must free the subimage yourself.
     Image* GetSubimage(const IntRect& rect) const;
+    /// Copy contents of the image into the defined rect, scaling if necessary. This image should already be large enough to include the rect. Compressed and 3D images are not supported.
+    bool SetSubimage(const Image* image, const IntRect& rect);
     /// Return an SDL surface from the image, or null if failed. Only RGB images are supported. Specify rect to only return partial image. You must free the surface yourself.
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     /// Precalculate the mip levels. Used by asynchronous texture loading.
