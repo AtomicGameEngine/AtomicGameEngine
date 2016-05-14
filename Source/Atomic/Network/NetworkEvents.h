@@ -102,6 +102,11 @@ EVENT(E_MASTERCONNECTIONREADY, MasterConnectionReady)
 {
 }
 
+/// Master server connection failed
+EVENT(E_MASTERCONNECTIONFAILED, MasterConnectionFailed)
+{
+}
+
 /// Unhandled master message received.
 EVENT(E_MASTERMESSAGE, MasterServerMessage)
 {

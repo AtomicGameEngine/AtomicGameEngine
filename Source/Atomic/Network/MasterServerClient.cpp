@@ -327,6 +327,7 @@ void MasterServerClient::SetConnectToMasterState(ConnectToMasterState state)
     if (state == MASTER_CONNECTION_FAILED)
     {
         LOGERROR("Could not connect to master server");
+        SendEvent(E_MASTERCONNECTIONFAILED);
     }
 
     if (state == MASTER_CONNECTED)
@@ -401,6 +402,11 @@ void MasterServerClient::SetConnectToGameServerState(ClientConnectToGameServerSt
                 remoteGameServerInfo_.externalAddress + ":" +
                 String(remoteGameServerInfo_.externalPort));
 
+    }
+
+    if (state == GAME_CONNECTION_FAILED)
+    {
+        SendEvent(E_CONNECTFAILED);
     }
 
     clientConnectToGameServerState_ = state;
