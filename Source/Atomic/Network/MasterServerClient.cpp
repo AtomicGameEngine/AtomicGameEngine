@@ -360,6 +360,10 @@ void MasterServerClient::SetConnectToGameServerState(ClientConnectToGameServerSt
         network->ConnectWithExistingSocket(clientToServerSocket_, remoteGameServerInfo_.clientScene);
 
         connectToGameServerSecondsRemaining_ = 5.0f;
+
+        LOGINFO("Connecting to Game Server on Internal IP: " +
+                        remoteGameServerInfo_.internalAddress + ":" +
+                        String(remoteGameServerInfo_.internalPort));
     }
     else if (clientConnectToGameServerState_ == GAME_CONNECTING_INTERNAL_IP &&
              state == GAME_CONNECTING_EXTERNAL_IP)
@@ -392,6 +396,11 @@ void MasterServerClient::SetConnectToGameServerState(ClientConnectToGameServerSt
         network->ConnectWithExistingSocket(clientToServerSocket_, remoteGameServerInfo_.clientScene);
 
         connectToGameServerSecondsRemaining_ = 5.0f;
+
+        LOGINFO("Connecting to Game Server on External IP: " +
+                remoteGameServerInfo_.externalAddress + ":" +
+                String(remoteGameServerInfo_.externalPort));
+
     }
 
     clientConnectToGameServerState_ = state;
@@ -411,11 +420,11 @@ void MasterServerClient::ConnectToGameServerUpdate(float dt)
     // If we are connected then set the final state
     if (network->GetServerConnection() && network->GetServerConnection()->IsConnected())
     {
-        if (GAME_CONNECTING_INTERNAL_IP)
+        if (clientConnectToGameServerState_ == GAME_CONNECTING_INTERNAL_IP)
         {
             LOGINFO("Successfully connected using internal IP");
         }
-        else if (GAME_CONNECTING_EXTERNAL_IP)
+        else if (clientConnectToGameServerState_ == GAME_CONNECTING_EXTERNAL_IP)
         {
             LOGINFO("Successfully connected using external IP");
         }
@@ -428,6 +437,7 @@ void MasterServerClient::ConnectToGameServerUpdate(float dt)
     {
         if (clientConnectToGameServerState_ == GAME_CONNECTING_INTERNAL_IP)
         {
+            LOGINFO("Unable to connect via internal IP, trying external IP");
             SetConnectToGameServerState(GAME_CONNECTING_EXTERNAL_IP);
         }
         else
@@ -461,12 +471,6 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
         udpConnectionSecondsRemaining_ = 5.0;
         masterServerConnectionId_ = document["id"].GetString();
 
-        // Register server if needed
-        if (masterServerInfo_.isRegisteringServer)
-        {
-            RegisterServerWithMaster(masterServerInfo_.serverName);
-        }
-
         // Now connect with UDP
         SetConnectToMasterState(MASTER_CONNECTING_UDP);
         LOGINFO("TCP Connected");
@@ -474,6 +478,12 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
     else if (cmd == "connectUDPSuccess")
     {
         SetConnectToMasterState(MASTER_CONNECTED);
+
+        // Register server if needed
+        if (masterServerInfo_.isRegisteringServer)
+        {
+            RegisterServerWithMaster(masterServerInfo_.serverName);
+        }
 
         LOGINFO("UDP Connected");
     }
