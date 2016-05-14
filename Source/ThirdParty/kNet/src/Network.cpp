@@ -560,17 +560,6 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 		return 0;
 	}
 
-	struct addrinfo* aip;
-	for (aip = result; aip != NULL; aip = aip->ai_next)
-	{
-		char buf[512];
-		char port[512];
-		if (getnameinfo(aip->ai_addr, sizeof(struct sockaddr), buf, 512, port, 512, 0) == 0)
-		{
-			printf("%s:%s\n", buf,port);
-		}
-	}
-
 	SOCKET listenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	KNET_LOG(LogInfo, "Network::OpenListenSocket: Created listenSocket 0x%8X.", (unsigned int)listenSocket);
 
@@ -726,6 +715,9 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	return sock;
 }
 
+// BEGIN ATOMIC CHANGE
+// An unconnected UDP socket can be used to communicate to more than one host.
+// This is useful when using NAT punchthrough.
 Socket* Network::CreateUnconnectedUDPSocket(const char *address, unsigned short port)
 {
 	addrinfo *result = NULL;
@@ -796,6 +788,7 @@ Socket* Network::CreateUnconnectedUDPSocket(const char *address, unsigned short 
 
 	return sock;
 }
+// END ATOMIC CHANGE
 
 Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port,
 	SocketTransportLayer transport, IMessageHandler *messageHandler, Datagram *connectMessage)
@@ -825,30 +818,30 @@ Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port
 	return connection;
 }
 
+// BEGIN ATOMIC CHANGE
+// Start up the connection worker thread on an existing socket.
+// This allows us to create a kNet connection with the same socket
+// we used to connect to the master server.
 Ptr(MessageConnection) Network::Connect(Socket* socket, IMessageHandler *messageHandler, Datagram *connectMessage)
 {
-	if (socket->TransportLayer() == SocketOverUDP)
-	{
-		SendUDPConnectDatagram(*socket, connectMessage);
-		KNET_LOG(LogInfo, "Network::Connect: Sent a UDP Connection Start datagram to to %s.", socket->ToString().c_str());
-	}
-	else
-		KNET_LOG(LogInfo, "Network::Connect: Connected a TCP socket to %s.", socket->ToString().c_str());
-
-	Ptr(MessageConnection) connection;
+	// This only works with UDP
 	if (socket->TransportLayer() == SocketOverTCP)
-		connection = new TCPMessageConnection(this, 0, socket, ConnectionOK);
-	else
-		connection = new UDPMessageConnection(this, 0, socket, ConnectionPending);
+	{
+		return 0;
+	}
+
+	SendUDPConnectDatagram(*socket, connectMessage);
+	KNET_LOG(LogInfo, "Network::Connect: Sent a UDP Connection Start datagram to to %s.", socket->ToString().c_str());
+
+	Ptr(MessageConnection) connection = new UDPMessageConnection(this, 0, socket, ConnectionPending);
 
 	connection->RegisterInboundMessageHandler(messageHandler);
 	AssignConnectionToWorkerThread(connection);
 
-	//sockets.push_back(*socket);
-
 	connections.insert(connection);
 	return connection;
 }
+// END ATOMIC CHANGE
 
 Socket *Network::CreateUDPSlaveSocket(Socket *serverListenSocket, const EndPoint &remoteEndPoint, const char *remoteHostName)
 {

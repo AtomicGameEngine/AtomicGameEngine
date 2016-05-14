@@ -70,8 +70,10 @@ public:
 	/// Connects a raw socket (low-level, no MessageConnection abstraction) to the given destination.
 	Socket *ConnectSocket(const char *address, unsigned short port, SocketTransportLayer transport);
 
+	// BEGIN ATOMIC CHANGE
 	/// Create a raw socket (low-level, no MessageConnection abstraction) to the given destination.
 	Socket *CreateUnconnectedUDPSocket(const char *address, unsigned short port);
+	// END ATOMIC CHANGE
 
 	/// Frees the given Socket object (performs an immediate bidirectional shutdown and frees the socket). After calling 
 	/// this function, do not dereference that Socket pointer, as it is deleted.
@@ -84,8 +86,10 @@ public:
 		free it by letting the refcount go to 0. */
 	Ptr(MessageConnection) Connect(const char *address, unsigned short port, SocketTransportLayer transport, IMessageHandler *messageHandler, Datagram *connectMessage = 0);
 
-	/** Connect with an existing socket */
+	// BEGIN ATOMIC CHANGE
+	/** Connect with an existing socket. This is used when creating a connection with NAT punchthrough. */
 	Ptr(MessageConnection) Connect(Socket* s, IMessageHandler *messageHandler, Datagram *connectMessage = 0);
+	// END ATOMIC CHANGE
 
 	/// Returns the local host name of the system (the local machine name or the local IP, whatever is specified by the system).
 	const char *LocalAddress() const { return localHostName.c_str(); }

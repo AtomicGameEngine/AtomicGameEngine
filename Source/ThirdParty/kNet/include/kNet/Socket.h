@@ -86,7 +86,9 @@ enum SocketType
 	ServerListenSocket, ///< For TCP: a listen socket. For UDP: the single master socket handle that is used to send & receive all data.
 	ServerClientSocket, ///< For TCP: a client data socket. For UDP: a slave-mode Socket object that shares the underlying socket handle with the UDP master Socket.
 	ClientSocket, ///< A client-side socket.
+	// BEGIN ATOMIC CHANGE
 	ClientConnectionLessSocket ///< A client-side socket without a connection
+	// END ATOMIC CHANGE
 };
 
 std::string SocketTypeToString(SocketType type);
