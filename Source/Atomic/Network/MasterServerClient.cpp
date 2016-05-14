@@ -156,7 +156,8 @@ void MasterServerClient::CheckForNatPunchThroughRequests(float dt)
     }
 
     // See if we need to still be trying to punch through from the client
-    if (clientToServerSocket_ != NULL && timeTillNextClientConnectAttempt_ <= 0)
+    if (clientConnectToGameServerState_ == GAME_CONNECTING_EXTERNAL_IP &&
+        clientToServerSocket_ != NULL && timeTillNextClientConnectAttempt_ <= 0)
     {
         Atomic::Network* network = GetSubsystem<Network>();
 
