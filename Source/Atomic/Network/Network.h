@@ -73,18 +73,23 @@ public:
 
     bool ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene);
 
-    void ConnectToMaster(const String& address, unsigned short port);
-    void RegisterServerWithMaster(const String& name);
-    void ConnectToServerViaMaster(const String& serverId,
-                                  const String& internalAddress, unsigned short internalPort,
-                                  const String& externalAddress, unsigned short externalPort,
-                                  Scene* scene);
+    void ClientConnectToMaster(const String& address, unsigned short port);
+
+    void ClientConnectToServerViaMaster(const String& serverId,
+                                        const String& internalAddress, unsigned short internalPort,
+                                        const String& externalAddress, unsigned short externalPort,
+                                        Scene* scene);
     void RequestServerListFromMaster();
 
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
     bool StartServer(unsigned short port);
+
+    /// Start a server on a port using UDP protocol. Return true if successful.
+    /// Also register the server with the master server.
+    bool StartServerAndRegisterWithMaster(unsigned short serverPort, const String& masterAddress, unsigned short masterPort, const String& serverName);
+
     /// Stop the server.
     void StopServer();
     /// Broadcast a message with content ID to all client connections.

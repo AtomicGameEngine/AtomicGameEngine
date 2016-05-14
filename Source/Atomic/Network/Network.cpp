@@ -654,7 +654,7 @@ void Network::ConfigureNetworkSimulator()
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }
 
-void Network::ConnectToMaster(const String& address, unsigned short port)
+void Network::ClientConnectToMaster(const String& address, unsigned short port)
 {
     masterServerClient_.ConnectToMaster(address, port);
 }
@@ -664,7 +664,7 @@ void Network::RequestServerListFromMaster()
     masterServerClient_.RequestServerListFromMaster();
 }
 
-void Network::ConnectToServerViaMaster(const String &serverId,
+void Network::ClientConnectToServerViaMaster(const String &serverId,
                                        const String &internalAddress, unsigned short internalPort,
                                        const String &externalAddress, unsigned short externalPort,
                                        Scene* scene)
@@ -675,9 +675,21 @@ void Network::ConnectToServerViaMaster(const String &serverId,
                                                  scene);
 }
 
-void Network::RegisterServerWithMaster(const String& name)
+bool Network::StartServerAndRegisterWithMaster(unsigned short serverPort, const String &masterAddress,
+                                               unsigned short masterPort, const String &serverName)
 {
-    masterServerClient_.RegisterServerWithMaster(name);
+    // First start the server
+    bool rc = StartServer(serverPort);
+
+    if (!rc)
+    {
+        return false;
+    }
+
+    // Connect to the master server
+    masterServerClient_.ConnectToMasterAndRegister(masterAddress, masterPort, serverName);
+
+    return true;
 }
 
 void RegisterNetworkLibrary(Context* context)

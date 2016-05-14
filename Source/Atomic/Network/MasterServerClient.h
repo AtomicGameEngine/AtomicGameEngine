@@ -36,6 +36,8 @@ struct MasterServer
 {
     String address;
     unsigned short port;
+    bool isRegisteringServer;
+    String serverName;
 };
 
 /// Game server info used by a client when connecting
@@ -66,8 +68,10 @@ public:
     void Update(float timeStep);
 
     void ConnectToMaster(const String& address, unsigned short port);
+
+    void ConnectToMasterAndRegister(const String& address, unsigned short port, const String& serverName);
+
     void RequestServerListFromMaster();
-    void RegisterServerWithMaster(const String& serverName);
     void ConnectToServerViaMaster(const String& serverId,
                                   const String& internalAddress, unsigned short internalPort,
                                   const String& externalAddress, unsigned short externalPort,
@@ -76,6 +80,8 @@ public:
 private:
     void SendMessageToMasterServer(const String& message);
     void HandleMasterServerMessage(const String& msg);
+
+    void RegisterServerWithMaster(const String& serverName);
 
     float udpConnectionSecondsRemaining_;
     float udpSecondsTillRetry_;

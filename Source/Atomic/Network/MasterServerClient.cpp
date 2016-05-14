@@ -49,6 +49,19 @@ void MasterServerClient::ConnectToMaster(const String &address, unsigned short p
 
     masterServerInfo_.address = address;
     masterServerInfo_.port = port;
+    masterServerInfo_.isRegisteringServer = false;
+
+    // We first make a TCP connection
+    SetConnectToMasterState(MASTER_CONNECTING_TCP);
+}
+
+void MasterServerClient::ConnectToMasterAndRegister(const String &address, unsigned short port, const String& serverName) {
+    PROFILE(ConnectToMaster);
+
+    masterServerInfo_.address = address;
+    masterServerInfo_.port = port;
+    masterServerInfo_.serverName = serverName;
+    masterServerInfo_.isRegisteringServer = true;
 
     // We first make a TCP connection
     SetConnectToMasterState(MASTER_CONNECTING_TCP);
@@ -447,6 +460,12 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
         udpSecondsTillRetry_ = 0;
         udpConnectionSecondsRemaining_ = 5.0;
         masterServerConnectionId_ = document["id"].GetString();
+
+        // Register server if needed
+        if (masterServerInfo_.isRegisteringServer)
+        {
+            RegisterServerWithMaster(masterServerInfo_.serverName);
+        }
 
         // Now connect with UDP
         SetConnectToMasterState(MASTER_CONNECTING_UDP);
