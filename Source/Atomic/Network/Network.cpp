@@ -659,6 +659,11 @@ void Network::ClientConnectToMaster(const String& address, unsigned short port)
     masterServerClient_.ConnectToMaster(address, port);
 }
 
+void Network::ClientDisconnectFromMaster()
+{
+    masterServerClient_.DisconnectFromMaster();
+}
+
 void Network::RequestServerListFromMaster()
 {
     masterServerClient_.RequestServerListFromMaster();

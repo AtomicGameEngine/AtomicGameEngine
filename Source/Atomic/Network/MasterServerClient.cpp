@@ -47,6 +47,11 @@ MasterServerClient::~MasterServerClient()
 void MasterServerClient::ConnectToMaster(const String &address, unsigned short port) {
     PROFILE(ConnectToMaster);
 
+    if (connectToMasterState_ != MASTER_NOT_CONNECTED)
+    {
+        DisconnectFromMaster();
+    }
+
     masterServerInfo_.address = address;
     masterServerInfo_.port = port;
     masterServerInfo_.isRegisteringServer = false;
@@ -55,8 +60,21 @@ void MasterServerClient::ConnectToMaster(const String &address, unsigned short p
     SetConnectToMasterState(MASTER_CONNECTING_TCP);
 }
 
+void MasterServerClient::DisconnectFromMaster()
+{
+    masterTCPConnection_->Disconnect();
+    masterUDPConnection_->Disconnect();
+
+    SetConnectToMasterState(MASTER_NOT_CONNECTED);
+}
+
 void MasterServerClient::ConnectToMasterAndRegister(const String &address, unsigned short port, const String& serverName) {
     PROFILE(ConnectToMaster);
+
+    if (connectToMasterState_ != MASTER_NOT_CONNECTED)
+    {
+        DisconnectFromMaster();
+    }
 
     masterServerInfo_.address = address;
     masterServerInfo_.port = port;

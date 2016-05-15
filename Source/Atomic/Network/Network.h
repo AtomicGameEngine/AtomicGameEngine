@@ -74,6 +74,7 @@ public:
     bool ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene);
 
     void ClientConnectToMaster(const String& address, unsigned short port);
+    void ClientDisconnectFromMaster();
 
     void ClientConnectToServerViaMaster(const String& serverId,
                                         const String& internalAddress, unsigned short internalPort,

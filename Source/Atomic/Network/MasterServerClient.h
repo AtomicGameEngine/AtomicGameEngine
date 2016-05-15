@@ -68,6 +68,7 @@ public:
     void Update(float timeStep);
 
     void ConnectToMaster(const String& address, unsigned short port);
+    void DisconnectFromMaster();
 
     void ConnectToMasterAndRegister(const String& address, unsigned short port, const String& serverName);
 

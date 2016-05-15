@@ -218,7 +218,25 @@ messageEventEmitter.addListener('msg', function(socket, message) {
 });
 
 function onDisconnect(sock) {
-    
+    console.log('Socket disconnected');
+
+    var connectionIndex = _.findIndex(connections, function(item) {
+        return item.tcpSocket === sock;
+    });
+
+    if (connectionIndex >= 0) {
+        console.log('Client disconnected: ' + connections[connectionIndex].connectionId);
+        connections.splice(connectionIndex, 1);
+    }
+
+    var serverIndex = _.findIndex(serverList, function(item) {
+        return item.tcpSocket === sock;
+    });
+
+    if (serverIndex >= 0) {
+        console.log('Server disconnected: ' + serverList[serverIndex].connectionId);
+        serverList.splice(serverIndex, 1);
+    }
 }
 
 console.log('Setting up tcp');
@@ -238,7 +256,7 @@ tcpServer.on('connection', function(sock) {
 
     // Clean up on disconnect
     sock.on('end', function() {
-       
+       onDisconnect(sock);
     });
 
     sock.on('data', function (_data) {
@@ -279,6 +297,7 @@ tcpServer.on('connection', function(sock) {
 
     sock.on('error', function(error) {
         console.log('Got TCP error: '+error);
+        onDisconnect(sock);
     });
 
 });
