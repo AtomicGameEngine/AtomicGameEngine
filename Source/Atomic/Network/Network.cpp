@@ -53,7 +53,8 @@ Network::Network(Context* context) :
     simulatedLatency_(0),
     simulatedPacketLoss_(0.0f),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
-    updateAcc_(0.0f)
+    updateAcc_(0.0f),
+    masterServerClient_(context)
 {
     network_ = new kNet::Network();
 
@@ -203,6 +204,42 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     }
 }
 
+bool Network::ConnectSimple(const String& address, unsigned short port, Scene* scene)
+{
+    return Connect(address, port, scene, Variant::emptyVariantMap);
+}
+
+bool Network::ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene)
+{
+    PROFILE(ConnectWithExistingSocket);
+
+    // If a previous connection already exists, disconnect it and wait for some time for the connection to terminate
+    if (serverConnection_)
+    {
+        serverConnection_->Disconnect(100);
+        OnServerDisconnected();
+    }
+
+    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(existingSocket, this);
+    if (connection)
+    {
+        serverConnection_ = new Connection(context_, false, connection);
+        serverConnection_->SetScene(scene);
+        serverConnection_->SetIdentity(Variant::emptyVariantMap);
+        serverConnection_->SetConnectPending(true);
+        serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
+        LOGINFO("Connecting to server " + serverConnection_->ToString());
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to connect to server ");
+        SendEvent(E_CONNECTFAILED);
+        return false;
+    }
+}
+
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
     PROFILE(Connect);
@@ -250,9 +287,12 @@ bool Network::StartServer(unsigned short port)
 
     PROFILE(StartServer);
 
+    serverPort_ = port;
+
     if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
     {
         LOGINFO("Started server on port " + String(port));
+
         return true;
     }
     else
@@ -425,6 +465,22 @@ Connection* Network::GetConnection(kNet::MessageConnection* connection) const
     }
 }
 
+bool Network::IsEndPointConnected(const kNet::EndPoint& endPoint) const
+{
+    Vector<SharedPtr<Connection> > ret;
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+         i != clientConnections_.End(); ++i)
+    {
+        kNet::EndPoint remoteEndPoint = i->first_->GetSocket()->RemoteEndPoint();
+        if (endPoint.ToString()==remoteEndPoint.ToString())
+        {
+            return i->second_->IsConnected();
+        }
+    }
+
+    return false;
+}
+
 Connection* Network::GetServerConnection() const
 {
     return serverConnection_;
@@ -479,6 +535,8 @@ void Network::Update(float timeStep)
     kNet::SharedPtr<kNet::NetworkServer> server = network_->GetServer();
     if (server)
         server->Process();
+
+    masterServerClient_.Update(timeStep);
 }
 
 void Network::PostUpdate(float timeStep)
@@ -594,6 +652,49 @@ void Network::ConfigureNetworkSimulator()
     for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+}
+
+void Network::ClientConnectToMaster(const String& address, unsigned short port)
+{
+    masterServerClient_.ConnectToMaster(address, port);
+}
+
+void Network::ClientDisconnectFromMaster()
+{
+    masterServerClient_.DisconnectFromMaster();
+}
+
+void Network::RequestServerListFromMaster()
+{
+    masterServerClient_.RequestServerListFromMaster();
+}
+
+void Network::ClientConnectToServerViaMaster(const String &serverId,
+                                       const String &internalAddress, unsigned short internalPort,
+                                       const String &externalAddress, unsigned short externalPort,
+                                       Scene* scene)
+{
+    masterServerClient_.ConnectToServerViaMaster(serverId,
+                                                 internalAddress, internalPort,
+                                                 externalAddress, externalPort,
+                                                 scene);
+}
+
+bool Network::StartServerAndRegisterWithMaster(unsigned short serverPort, const String &masterAddress,
+                                               unsigned short masterPort, const String &serverName)
+{
+    // First start the server
+    bool rc = StartServer(serverPort);
+
+    if (!rc)
+    {
+        return false;
+    }
+
+    // Connect to the master server
+    masterServerClient_.ConnectToMasterAndRegister(masterAddress, masterPort, serverName);
+
+    return true;
 }
 
 void RegisterNetworkLibrary(Context* context)
