@@ -60,9 +60,12 @@ void BuildWindows::Initialize()
     }
     BuildDefaultResourceEntries();
     
-    // EGS: Build the project resources and cache
+    // Include the project resources and cache separately
     AddProjectResourceDir(project->GetProjectPath());
-    AddProjectResourceDir(project->GetProjectPath() + "Cache/");
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    AddProjectResourceDir(cachePath);
+
     BuildProjectResourceEntries();
 }
 
@@ -149,9 +152,6 @@ void BuildWindows::BuildAtomicNET()
         SplitPath(results[i], pathName, fileName, ext);
         fileSystem->Copy(assembliesPath + results[i], ToString("%s/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies/%s.dll", buildPath_.CString(), fileName.CString()));
     }
-
-
-
 }
 
 void BuildWindows::Build(const String& buildPath)

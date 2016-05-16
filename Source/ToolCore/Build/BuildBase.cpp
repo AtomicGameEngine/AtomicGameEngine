@@ -22,14 +22,13 @@
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
-#include <Atomic/Resource/JSONFile.h> // EGS:
-
+#include <Atomic/Resource/JSONFile.h>
 
 #include "../Subprocess/SubprocessSystem.h"
 #include "../Project/Project.h"
 #include "../ToolEnvironment.h"
-#include "../Assets/Asset.h" // EGS:
-
+#include "../Assets/Asset.h"
+#include "../Assets/AssetDatabase.h"
 
 #include "BuildSystem.h"
 #include "BuildEvents.h"
@@ -349,14 +348,14 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     // obtaining a list of files to include in the build.
     VariantMap resourceTags;
     AssetBuildConfig::ApplyConfig(resourceTags);
-    Vector<String> resourceFilesToInclude;
+    Vector<String> assetBuildConfigFiles;
     VariantMap::ConstIterator itr = resourceTags.Begin();
 
     while (itr != resourceTags.End())
     {
         if (itr->first_ == assetBuildTag_)
         {
-            resourceFilesToInclude = itr->second_.GetStringVector();
+            assetBuildConfigFiles = itr->second_.GetStringVector();
             break;
         }
         
@@ -367,57 +366,63 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         }
     }
 
+    // find any folders defined in assetbuildconfig.json, and add the non-".asset" files in them.
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    Vector<String> filesInFolderToAdd;
+    
+    for (unsigned i = 0; i < assetBuildConfigFiles.Size(); ++i)
+    {
+        String &filename = assetBuildConfigFiles[i];
+        if (GetExtension(filename) == String::EMPTY &&
+            fileSystem->DirExists(project_->GetResourcePath() + filename))
+        {
+            Vector<String> filesInFolder;
+            fileSystem->ScanDir(filesInFolder, project_->GetResourcePath() + filename, "*.*", SCAN_FILES, true);
+            for (unsigned j = 0; j < filesInFolder.Size(); ++j)
+            {
+                if (GetExtension(filesInFolder[j]) != ".asset")
+                    filesInFolderToAdd.Push(filesInFolder[j]);
+            }
+        }
+    }
+
+    // add the files defined using a folder in assetbuildconfig.json
+    for (unsigned i = 0; i < filesInFolderToAdd.Size(); ++i)
+    {
+        assetBuildConfigFiles.Push(filesInFolderToAdd[i]);
+    }
+
     // check if the files in assetbuildconfig.json exist,
     // as well as their corresponding .asset file
     Vector<String> filesInResourceFolder;
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    Vector<String> resourceFilesToInclude;
     fileSystem->ScanDir(filesInResourceFolder, project_->GetResourcePath(), "*.*", SCAN_FILES, true);
 
-    Vector<String> filesToAdd;
-    Vector<String> filesToRemove;
-    for (unsigned i = 0; i < resourceFilesToInclude.Size(); ++i)
+    for (unsigned i = 0; i < assetBuildConfigFiles.Size(); ++i)
     {
         // .asset file is of primary importance since we used it to identify the associated cached file.
-        // without the .asset file the resource becomes redundant.
-        String &filename = resourceFilesToInclude[i];
-        if (!filesInResourceFolder.Contains(filename + ".asset"))
-        {
-            BuildWarn(ToString("BuildBase::BuildFilteredProjectResourceEntries - File \"%s\" associated .asset file not found in the Resources folder.\nRemoving \"%s\" from build pakcage", filename.CString()));
-            if (filesInResourceFolder.Contains(filename))
-            {
-                filesToRemove.Push(filename);
-                continue;
-            }
-        }
-        filesToAdd.Push(filename + ".asset");
-    }
-
-    // remove files not to include
-    for (unsigned i = 0; i < filesToRemove.Size(); ++i)
-    {
-        String &filename = filesToRemove[i];
-        if (resourceFilesToInclude.Contains(filename))
-        {
-            resourceFilesToInclude.Remove(filename);
-        }
-    }
-
-    // add files to include
-    for (unsigned i = 0; i < filesToAdd.Size(); ++i)
-    {
-        String &filename = filesToAdd[i];
-        if (!resourceFilesToInclude.Contains(filename))
+        // without the .asset file the resource is removed from being included in the build.
+        String &filename = assetBuildConfigFiles[i];
+        if (filesInResourceFolder.Contains(filename) &&
+            filesInResourceFolder.Contains(filename + ".asset"))
         {
             resourceFilesToInclude.Push(filename);
+            resourceFilesToInclude.Push(filename + ".asset");
         }
+    }
+
+    // add valid files included from the assetbuildconfig.json
+    for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
+    {
+        AddToResourcePackager(*it, project_->GetResourcePath());
     }
 
     // Get associated cache GUID from the asset file
     Vector<String> filesWithGUIDtoInclude;
+
     for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
     {
         String &filename = *it;
-        
         if (GetExtension(*it) == ".asset")
         {
             SharedPtr<File> file(new File(context_, project_->GetResourcePath() + *it));
@@ -434,35 +439,44 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         }
     }
     
-    // obtain files in cache folder,
-    // check if the file contains the guid, and add it to the resourceFilesToInclude
+    // Obtain files in cache folder,
+    // Check if the file contains the guid, and add it to the resourceFilesToInclude
     Vector<String> filesInCacheFolder;
     Vector<String> cacheFilesToInclude;
-    fileSystem->ScanDir(filesInCacheFolder, project_->GetProjectPath() + "Cache/", "*.*", SCAN_FILES, true);
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    fileSystem->ScanDir(filesInCacheFolder, cachePath, "*.*", SCAN_FILES, true);
 
-    for (unsigned i = 0; i < filesWithGUIDtoInclude.Size(); i++)
+    for (unsigned i = 0; i < filesWithGUIDtoInclude.Size(); ++i)
     {
         String &guid = filesWithGUIDtoInclude[i];
-        for (unsigned j = 0; j < filesInCacheFolder.Size(); j++)
+        for (unsigned j = 0; j < filesInCacheFolder.Size(); ++j)
         {
             String &filename = GetFileName(filesInCacheFolder[j]);
             if (filename.Contains(guid))
             {
                 cacheFilesToInclude.Push(filesInCacheFolder[j]);
                 // do not continue...
-                // there might be multiple files with the same guid
+                // there might be multiple files with the same guid having an guid_animaiton extention.
             }
         }
     }
 
-    for (auto it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
-    {
-        AddToResourcePackager(*it, project_->GetResourcePath());
-    }
+    // Add the DDS files when building in windows
+#ifdef ATOMIC_PLATFORM_DESKTOP
+    Vector<String> filesInCacheDDSfolder;
+    fileSystem->ScanDir(filesInCacheDDSfolder, cachePath + "DDS/", "*.dds", SCAN_FILES, true);
 
+    for (unsigned i = 0; i < filesInCacheDDSfolder.Size(); ++i)
+    {
+        cacheFilesToInclude.Push(filesInCacheDDSfolder[i]);
+    }
+#endif
+
+    // Add the cache files to the resource packager
     for (auto it = cacheFilesToInclude.Begin(); it != cacheFilesToInclude.End(); ++it)
     {
-        AddToResourcePackager(*it, project_->GetProjectPath() + "Cache/");
+        AddToResourcePackager(*it, cachePath);
     }
 }
 

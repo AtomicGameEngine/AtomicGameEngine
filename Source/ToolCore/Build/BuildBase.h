@@ -99,7 +99,6 @@ protected:
 private:
     void BuildFilteredProjectResourceEntries();
     void BuildAllProjectResourceEntries();
-    
 
     PlatformID platformID_;
 

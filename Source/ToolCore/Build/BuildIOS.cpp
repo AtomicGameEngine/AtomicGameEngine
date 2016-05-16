@@ -28,6 +28,7 @@
 #include "../ToolEnvironment.h"
 #include "../Project/Project.h"
 #include "../Project/ProjectBuildSettings.h"
+#include "../Assets/AssetDatabase.h"
 
 #include "../Subprocess/SubprocessSystem.h"
 
@@ -149,19 +150,22 @@ void BuildIOS::Initialize()
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
-    String projectResources = project->GetResourcePath();
+    
 
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
         AddResourceDir(defaultResourcePaths[i]);
     }
-
-    // TODO: smart filtering of cache
-    AddResourceDir(project->GetProjectPath() + "Cache/");
-    AddResourceDir(projectResources);
-
     BuildDefaultResourceEntries();
 
+    // TODO: smart filtering of cache
+    String projectResources = project->GetResourcePath();
+    AddProjectResourceDir(projectResources);
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    AddProjectResourceDir(cachePath);
+
+    BuildProjectResourceEntries();
 }
 
 void BuildIOS::RunConvertPList()
