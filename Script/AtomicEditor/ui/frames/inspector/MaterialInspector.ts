@@ -187,19 +187,18 @@ class MaterialInspector extends ScriptWidget {
         var technique = <Atomic.Technique>cache.getResource("Technique", techniqueReverseLookup[techniqueName]);
         var resourcePath = ToolCore.toolSystem.project.getResourcePath();
 
-        if (technique == null)
-            var techniquePath;
+        if (technique == null) {
+            var techniquePath = "";
 
-        for (var i in projectTechniques) {
-
-            if (techniqueName == projectTechniques[i]) {
-                techniquePath = projectTechniquesAddress[i];
-                break;
+            for (var i in projectTechniques) {
+                if (techniqueName == projectTechniques[i]) {
+                    techniquePath = projectTechniquesAddress[i];
+                    break;
+                }
             }
+            techniquePath = techniquePath.replace(resourcePath, "");
+            technique = <Atomic.Technique>cache.getResource("Technique", techniquePath);
         }
-        techniquePath = techniquePath.replace(resourcePath, "");
-        technique = <Atomic.Technique>cache.getResource("Technique", techniquePath);
-
         this.material.setTechnique(0, technique);
     }
 
@@ -209,7 +208,13 @@ class MaterialInspector extends ScriptWidget {
 
         var button = this.techniqueButton = new Atomic.UIButton();
         var technique = this.material.getTechnique(0);
-        var techniqueName = technique.name.replace("Techniques/", "").replace(".xml", "");
+        var techniqueName = "";
+
+        if (technique != null) {
+            techniqueName = technique.name.replace("Techniques/", "").replace(".xml", "");
+        } else {
+            techniqueName = "UNDEFINED";
+        }
 
         button.text = techniqueName;
 
