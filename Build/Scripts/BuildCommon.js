@@ -84,7 +84,7 @@ namespace('build', function() {
           cmds.push(node + " " + tsc + " -p ./Script/AtomicWebViewEditor");
 
           // generate combined atomic.d.ts
-          cmds.push(node + " " + dtsGenerator + " --name Atomic --baseDir ./Script/TypeScript --file ./Script/TypeScript/*.d.ts --exclude ./Script/TypeScript/dist/*.d.ts --out ./Script/TypeScript/dist/Atomic.d.ts");
+          cmds.push(node + " " + dtsGenerator + " --name Atomic --project ./Script/TypeScript --out ./Script/TypeScript/dist/Atomic.d.ts");
 
           var lintTask = jake.Task['build:lint_typescript'];
 
