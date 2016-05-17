@@ -425,7 +425,7 @@ class MaterialInspector extends ScriptWidget {
         var resourcePath = ToolCore.toolSystem.project.getResourcePath();
         var TechniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(directory);
 
-        for (var i in TechniqueAssets) {
+        for (var i = 0; i < TechniqueAssets.length; i++) {
 
             var asset = TechniqueAssets[i];
 
@@ -453,7 +453,7 @@ class MaterialInspector extends ScriptWidget {
 
         var techniqueAssets = ToolCore.getAssetDatabase().getFolderAssets(directory);
 
-        for (var i in techniqueAssets) {
+        for (var i = 0; i < techniqueAssets.length; i++) {
 
             var asset = techniqueAssets[i];
 
