@@ -47,6 +47,7 @@
         "./AtomicEditor/ui/frames/inspector/InspectorUtils.ts",
         "./AtomicEditor/ui/frames/inspector/InspectorWidget.ts",
         "./AtomicEditor/ui/frames/inspector/MaterialInspector.ts",
+        "./AtomicEditor/ui/frames/inspector/TextureInspector.ts",
         "./AtomicEditor/ui/frames/inspector/ModelInspector.ts",
         "./AtomicEditor/ui/frames/inspector/PrefabInspector.ts",
         "./AtomicEditor/ui/frames/inspector/SelectionEditTypes.ts",
