@@ -36,8 +36,6 @@ class TextureInspector extends ScriptWidget {
         this.fd.id = "Vera";
         this.fd.size = 11;
 
-        //this.subscribeToEvent(EditorEvents.RemoveCurrentAssetAssigned, (ev: EditorEvents.RemoveCurrentAssetAssignedEvent) => this.createTextureRemoveButtonCallback(this.tunit, this.textureWidget));
-        //this.subscribeToEvent("ResourceAdded", (ev: ToolCore.ResourceAddedEvent) => this.refreshTechniquesPopup());
     }
 
     getTextureThumbnail(texture: Atomic.Texture2D): Atomic.Texture {
@@ -109,19 +107,19 @@ class TextureInspector extends ScriptWidget {
         var mlp = new Atomic.UILayoutParams();
         mlp.width = 310;
 
-        var materialLayout = new Atomic.UILayout();
-        materialLayout.spacing = 4;
+        var textureLayout = new Atomic.UILayout();
+        textureLayout.spacing = 4;
 
-        materialLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
-        materialLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-        materialLayout.layoutParams = mlp;
-        materialLayout.axis = Atomic.UI_AXIS_Y;
+        textureLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+        textureLayout.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+        textureLayout.layoutParams = mlp;
+        textureLayout.axis = Atomic.UI_AXIS_Y;
 
-        var materialSection = new Atomic.UISection();
-        materialSection.text = "Texture";
-        materialSection.value = 1;
-        materialSection.fontDescription = this.fd;
-        materialLayout.addChild(materialSection);
+        var textureSection = new Atomic.UISection();
+        textureSection.text = "Texture";
+        textureSection.value = 1;
+        textureSection.fontDescription = this.fd;
+        textureLayout.addChild(textureSection);
 
         var attrsVerticalLayout = new Atomic.UILayout(Atomic.UI_AXIS_Y);
         attrsVerticalLayout.spacing = 3;
@@ -155,11 +153,11 @@ class TextureInspector extends ScriptWidget {
 
         attrsVerticalLayout.addChild(nameLayout);
 
-        materialSection.contentRoot.addChild(attrsVerticalLayout);
+        textureSection.contentRoot.addChild(attrsVerticalLayout);
 
-        materialLayout.addChild(this.createTextureSection());
+        textureLayout.addChild(this.createTextureSection());
 
-        this.addChild(materialLayout);
+        this.addChild(textureLayout);
 
     }
 
