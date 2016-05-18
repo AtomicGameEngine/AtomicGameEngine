@@ -22,7 +22,7 @@
 
 import {AbstractTextResourceEditorBuilder} from "./AbstractTextResourceEditorBuilder";
 
-export default class TextResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
+export default class ShaderResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
 
     constructor() {
         super();
@@ -30,6 +30,6 @@ export default class TextResourceEditorBuilder extends AbstractTextResourceEdito
 
     canHandleResource(resourcePath: string) : boolean {
         var ext = Atomic.getExtension(resourcePath).toLowerCase();
-        return ext == ".txt";
+        return ext == ".hlsl" || ext == ".glsl";
     }
 }

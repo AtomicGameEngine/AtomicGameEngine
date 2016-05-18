@@ -26,6 +26,8 @@ import Scene3dResourceEditorBuilder from "./resourceEditors/Scene3dResourceEdito
 import TextFileResourceEditorBuilder from "./resourceEditors/TextFileResourceEditorBuilder";
 import TurboBadgerResourceEditorBuilder from "./resourceEditors/TurboBadgerResourceEditorBuilder";
 import TypescriptResourceEditorBuilder from "./resourceEditors/TypescriptResourceEditorBuilder";
+import XMLResourceEditorBuilder from "./resourceEditors/XMLResourceEditorBuilder";
+import ShaderResourceEditorBuilder from "./resourceEditors/ShaderResourceEditorBuilder";
 
 export default class ResourceEditorProvider {
     private standardEditorRegistry: Editor.Extensions.ResourceEditorBuilder[] = [];
@@ -88,6 +90,8 @@ export default class ResourceEditorProvider {
         this.registerStandardEditor(new JsonResourceEditorBuilder());
         this.registerStandardEditor(new TypescriptResourceEditorBuilder());
         this.registerStandardEditor(new Scene3dResourceEditorBuilder());
+        this.registerStandardEditor(new XMLResourceEditorBuilder());
+        this.registerStandardEditor(new ShaderResourceEditorBuilder());
 
         // this overrides the test resource editor so need to put it in the custom bucket
         this.registerCustomEditor(new TurboBadgerResourceEditorBuilder());

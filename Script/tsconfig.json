@@ -103,6 +103,8 @@
         "./AtomicEditor/ui/resourceEditors/TextFileResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/TurboBadgerResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/TypescriptResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/XMLResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/ShaderResourceEditorBuilder.ts",
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",
         "./AtomicEditor/ui/UIEvents.ts",
