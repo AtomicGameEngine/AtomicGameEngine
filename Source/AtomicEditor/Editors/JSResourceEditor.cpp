@@ -51,7 +51,7 @@ using namespace ToolCore;
 namespace AtomicEditor
 {
 
-JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UITabContainer *container) :
+JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UITabContainer *container, const String &editorUrl) :
     ResourceEditor(context, fullpath, container)
 {
 
@@ -67,17 +67,7 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     layout->AddChild(c);
 
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    String codeEditorDir = tenv->GetToolDataDir();
-    codeEditorDir += "CodeEditor/Editor.html";
-
-#ifdef ATOMIC_PLATFORM_OSX
-    String url = "file://" + codeEditorDir;
-#else
-    String url = "file:///" + codeEditorDir;
-#endif
-
-    webView_ = new UIWebView(context_, url);
+    webView_ = new UIWebView(context_, editorUrl);
     webClient_ = webView_->GetWebClient();
     messageHandler_ = new WebMessageHandler(context_);
     webClient_->AddMessageHandler(messageHandler_);
@@ -158,8 +148,13 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
             {
                 String code = jvalue["payload"].GetString();
                 String fn = jvalue["filename"].GetString();
-                // TODO: determine if we are absolute path or partial path
-                File file(context_, fn, FILE_WRITE);
+
+                // NOTE: We only want to be able save into the resource directory, so parse out the file path and append
+                // it to the resource directory
+                ToolSystem* tsys = GetSubsystem<ToolSystem>();
+                String fullFilePath = tsys->GetProject()->GetProjectPath() + getNormalizedPath(fn);
+
+                File file(context_, fullFilePath, FILE_WRITE);
                 file.Write((void*) code.CString(), code.Length());
                 file.Close();
             }
