@@ -4,8 +4,6 @@
 
 #include "MasterServerClient.h"
 #include "../Precompiled.h"
-#include <vector>
-#include <inttypes.h>
 #include "../IO/Log.h"
 #include "../Network/NetworkPriority.h"
 #include "../Network/Network.h"
@@ -219,7 +217,7 @@ void MasterServerClient::CheckForMessageFromMaster()
             // Are we still reading in the length?
             if (readingMasterMessageLength) {
                 if (c == ':') {
-                    sscanf(masterMessageLengthStr.CString(), "%" SCNd32, &bytesRemainingInMasterServerMessage_);
+                    sscanf(masterMessageLengthStr.CString(), "%u" , &bytesRemainingInMasterServerMessage_);
                     readingMasterMessageLength = false;
 
                     LOGINFO("Message is " + String(bytesRemainingInMasterServerMessage_) + " long");
