@@ -35,9 +35,24 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         return path.substring(path.toLowerCase().indexOf(RESOURCES_MARKER));
     }
 
-    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {
+    /**
+     * Returns the URL to load into the web view.  Override this to return a custom url
+     * @return {string}
+     */
+    getEditorUrl(): string {
+/*
+        Reference -- delete when working in osx and windows
+        #ifdef ATOMIC_PLATFORM_OSX
+            String url = "file://" + codeEditorDir;
+        #else
+            String url = "file:///" + codeEditorDir;
+        #endif
+*/
+        return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/Editor.html`;
+    }
 
-        const editor = new Editor.JSResourceEditor(resourcePath, tabContainer);
+    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {
+        const editor = new Editor.JSResourceEditor(resourcePath, tabContainer, this.getEditorUrl());
 
         // one time subscriptions waiting for the web view to finish loading.  This event
         // actually hits the editor instance before we can hook it, so listen to it on the
