@@ -98,9 +98,9 @@ private:
 
     void SelectItem(ListViewItem* item, bool select);
 
-    ListViewItem* pivot;
-    int pivotIndex;
-    bool startNewSelection;
+    ListViewItem* pivot_;
+    int pivotIndex_;
+    bool startNewSelection_;
 
 };
 
