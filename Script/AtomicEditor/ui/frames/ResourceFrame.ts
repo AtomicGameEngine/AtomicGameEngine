@@ -152,6 +152,7 @@ class ResourceFrame extends ScriptWidget {
     }
 
     handleCloseResource(ev: EditorEvents.EditorCloseResourceEvent) {
+        console.log('close: ' + ev.editor.fullPath);
         this.wasClosed = false;
         var editor = ev.editor;
         var navigate = ev.navigateToAvailableResource;
@@ -259,7 +260,9 @@ class ResourceFrame extends ScriptWidget {
     handleProjectUnloaded(data) {
 
       for (var i in this.editors) {
-           this.sendEvent(EditorEvents.EditorResourceClose, { editor: this.editors[i], navigateToAvailableResource: false });
+          var editor = this.editors[i];
+           this.sendEvent(EditorEvents.EditorResourceClose, { editor: editor, navigateToAvailableResource: false });
+           editor.close();
       }
 
     }
