@@ -40,14 +40,6 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
      * @return {string}
      */
     getEditorUrl(): string {
-/*
-        Reference -- delete when working in osx and windows
-        #ifdef ATOMIC_PLATFORM_OSX
-            String url = "file://" + codeEditorDir;
-        #else
-            String url = "file:///" + codeEditorDir;
-        #endif
-*/
         return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/Editor.html`;
     }
 

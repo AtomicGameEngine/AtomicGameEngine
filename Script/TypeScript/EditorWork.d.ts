@@ -323,6 +323,17 @@ declare module Editor.HostExtensions {
         showModalError(windowText: string, message: string);
         showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args?: any);
 
+        /**
+         * Register a custom editor.  These editors will override editors in the standard editor list if
+         * they both resolve the ```canHandleResource``` call.
+         */
+        registerCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder);
+
+        /**
+         * Will unregister a previously registered editor builder
+         * @param  {Editor.Extensions.ResourceEditorBuilder} editorBuilder
+         */
+        unregisterCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder);
     }
 }
 
