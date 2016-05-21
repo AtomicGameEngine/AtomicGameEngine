@@ -26,6 +26,8 @@
 #include "../Core/Variant.h"
 #include "../Resource/XMLElement.h"
 
+// Testing Build Bot
+
 namespace Atomic
 {
 
@@ -115,7 +117,7 @@ public:
     virtual bool IsObject() const { return true; }
     static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
     static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic("Object"); return typeNameStatic; }
-    
+
 protected:
     /// Execution context.
     Context* context_;
