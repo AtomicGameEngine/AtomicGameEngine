@@ -49,8 +49,20 @@ export default class ResourceEditorProvider {
      * Register a custom editor.  These editors will override editors in the standard editor list if
      * they both resolve the ```canHandleResource``` call.
      */
-    registerCustomEditor(editorBuilder) {
+    registerCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
         this.customEditorRegistry.push(editorBuilder);
+    }
+
+    /**
+     * Will unregister a previously registered editor builder
+     * @param  {Editor.Extensions.ResourceEditorBuilder} editorBuilder
+     */
+    unregisterCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
+        var index = this.customEditorRegistry.indexOf(editorBuilder, 0);
+        console.log(`custom editor len: ${this.customEditorRegistry.length}`);
+        if (index > -1) {
+            this.customEditorRegistry.splice(index, 1);
+        }
     }
 
     /**
@@ -58,6 +70,7 @@ export default class ResourceEditorProvider {
      */
     getEditor(resourcePath: string, tabContainer) {
         let editorBuilder: Editor.Extensions.ResourceEditorBuilder;
+        console.log(`custom editor len: ${this.customEditorRegistry.length}`);
         this.customEditorRegistry.forEach((builder) => {
             if (builder.canHandleResource(resourcePath)) {
                 editorBuilder = builder;

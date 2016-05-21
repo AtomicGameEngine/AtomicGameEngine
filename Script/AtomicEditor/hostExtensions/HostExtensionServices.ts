@@ -400,17 +400,33 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
     }
 
     /**
- * Disaplays a resource slection window
- * @param  {string} windowText
- * @param  {string} importerType
- * @param  {string} resourceType
- * @param  {function} callback
- * @param  {any} retObject
- * @param  {any} args
- */
+     * Displays a resource slection window
+     * @param  {string} windowText
+     * @param  {string} importerType
+     * @param  {string} resourceType
+     * @param  {function} callback
+     * @param  {any} retObject
+     * @param  {any} args
+     */
     showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args: any = undefined) {
 
         this.modalOps.showResourceSelection(windowText, importerType, resourceType, callback);
+    }
+
+    /**
+     * Will register a custom editor for a particular file type.
+     * @param  {Editor.Extensions.ResourceEditorBuilder} editorBuilder
+     */
+    registerCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
+        this.mainFrame.resourceframe.resourceEditorProvider.registerCustomEditor(editorBuilder);
+    }
+
+    /**
+     * Will unregister a previously registered editor builder
+     * @param  {Editor.Extensions.ResourceEditorBuilder} editorBuilder
+     */
+    unregisterCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
+        this.mainFrame.resourceframe.resourceEditorProvider.unregisterCustomEditor(editorBuilder);
     }
 
     /**
