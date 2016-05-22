@@ -59,7 +59,6 @@ export default class ResourceEditorProvider {
      */
     unregisterCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
         var index = this.customEditorRegistry.indexOf(editorBuilder, 0);
-        console.log(`custom editor len: ${this.customEditorRegistry.length}`);
         if (index > -1) {
             this.customEditorRegistry.splice(index, 1);
         }
@@ -70,7 +69,6 @@ export default class ResourceEditorProvider {
      */
     getEditor(resourcePath: string, tabContainer) {
         let editorBuilder: Editor.Extensions.ResourceEditorBuilder;
-        console.log(`custom editor len: ${this.customEditorRegistry.length}`);
         this.customEditorRegistry.forEach((builder) => {
             if (builder.canHandleResource(resourcePath)) {
                 editorBuilder = builder;

@@ -152,7 +152,6 @@ class ResourceFrame extends ScriptWidget {
     }
 
     handleCloseResource(ev: EditorEvents.EditorCloseResourceEvent) {
-        console.log('close: ' + ev.editor.fullPath);
         this.wasClosed = false;
         var editor = ev.editor;
         var navigate = ev.navigateToAvailableResource;
