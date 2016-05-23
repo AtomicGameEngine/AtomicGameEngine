@@ -24,6 +24,7 @@ import EditorEvents = require("editor/EditorEvents");
 import EditorUI = require("../EditorUI");
 import ModalWindow = require("./ModalWindow");
 import ResourceOps = require("resources/ResourceOps");
+import ProjectTemplates = require("resources/ProjectTemplates");
 
 export class ResourceDelete extends ModalWindow {
 
@@ -139,6 +140,24 @@ export class CreateComponent extends ModalWindow {
         this.resourcePath = resourcePath;
         this.init("New Component", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
+        this.templateField = <Atomic.UISelectDropdown>this.getWidget("template_list");
+        this.loadTemplatesList();
+    }
+
+    /**
+     *
+     * Gets the template definitions and loads it up
+     */
+    loadTemplatesList() {
+        this.templates = ProjectTemplates.GetNewFileTemplateDefinitions("component");
+        this.templateFieldSource.clear();
+
+        this.templates.forEach( template => {
+            this.templateFieldSource.addItem(new Atomic.UISelectItem(template.name));
+        });
+
+        this.templateField.source = this.templateFieldSource;
+        this.templateField.value = 0;
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -151,21 +170,31 @@ export class CreateComponent extends ModalWindow {
 
                 var componentName = this.nameField.text;
                 var outputFile = Atomic.addTrailingSlash(this.resourcePath) + componentName;
+                let selectedTemplate : Editor.Templates.FileTemplateDefinition = null;
+                this.templates.forEach(t => {
+                    if (t.name == this.templateField.text) {
+                        selectedTemplate = t;
+                    }
+                });
 
-                // Check to see if we have a file extension.  If we don't then assume .js
-                if (outputFile.indexOf(".") == -1) {
-                    outputFile += ".js";
+                if (selectedTemplate) {
+                    // Check to see if we have a file extension.  If we don't then use the one defined in the template
+                    if (outputFile.indexOf(".") == -1) {
+                        outputFile += selectedTemplate.ext;
+                    }
+
+                    if (ResourceOps.CreateNewComponent(outputFile, componentName, selectedTemplate)) {
+
+                        this.hide();
+
+                        this.sendEvent(EditorEvents.EditResource, { path: outputFile });
+
+                    }
+
+                    return true;
+                } else {
+                    return false;
                 }
-
-                if (ResourceOps.CreateNewComponent(outputFile, componentName)) {
-
-                    this.hide();
-
-                    this.sendEvent(EditorEvents.EditResource, { path: outputFile });
-
-                }
-
-                return true;
 
             }
 
@@ -180,8 +209,11 @@ export class CreateComponent extends ModalWindow {
 
     }
 
+    templates: Editor.Templates.FileTemplateDefinition[];
     resourcePath: string;
     nameField: Atomic.UIEditField;
+    templateField: Atomic.UISelectDropdown;
+    templateFieldSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
 
 }
 
@@ -192,8 +224,26 @@ export class CreateScript extends ModalWindow {
         super();
 
         this.resourcePath = resourcePath;
-        this.init("New Script", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
-        this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
+        this.init("New Script", "AtomicEditor/editor/ui/resourcecreatescript.tb.txt");
+        this.nameField = <Atomic.UIEditField>this.getWidget("script_name");
+        this.templateField = <Atomic.UISelectDropdown>this.getWidget("template_list");
+        this.loadTemplatesList();
+    }
+
+    /**
+     *
+     * Gets the template definitions and loads it up
+     */
+    loadTemplatesList() {
+        this.templates = ProjectTemplates.GetNewFileTemplateDefinitions("script");
+        this.templateFieldSource.clear();
+
+        this.templates.forEach( template => {
+            this.templateFieldSource.addItem(new Atomic.UISelectItem(template.name));
+        });
+
+        this.templateField.source = this.templateFieldSource;
+        this.templateField.value = 0;
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
@@ -206,22 +256,31 @@ export class CreateScript extends ModalWindow {
 
                 var scriptName = this.nameField.text;
                 var outputFile = Atomic.addTrailingSlash(this.resourcePath) + scriptName;
+                let selectedTemplate : Editor.Templates.FileTemplateDefinition = null;
+                this.templates.forEach(t => {
+                    if (t.name == this.templateField.text) {
+                        selectedTemplate = t;
+                    }
+                });
 
-                // Check to see if we have a file extension.  If we don't then assume .js
-                if (outputFile.indexOf(".") == -1) {
-                    outputFile += ".js";
+                if (selectedTemplate) {
+                    // Check to see if we have a file extension.  If we don't then use the one defined in the template
+                    if (outputFile.indexOf(".") == -1) {
+                        outputFile += selectedTemplate.ext;
+                    }
+
+                    if (ResourceOps.CreateNewScript(outputFile, scriptName, selectedTemplate)) {
+
+                        this.hide();
+
+                        this.sendEvent(EditorEvents.EditResource, { path: outputFile });
+
+                    }
+
+                    return true;
+                } else {
+                    return false;
                 }
-
-
-                if (ResourceOps.CreateNewScript(outputFile, scriptName)) {
-
-                    this.hide();
-
-                    this.sendEvent(EditorEvents.EditResource, { path: outputFile });
-
-                }
-
-                return true;
 
             }
 
@@ -236,8 +295,11 @@ export class CreateScript extends ModalWindow {
 
     }
 
+    templates: Editor.Templates.FileTemplateDefinition[];
     resourcePath: string;
     nameField: Atomic.UIEditField;
+    templateField: Atomic.UISelectDropdown;
+    templateFieldSource: Atomic.UISelectItemSource = new Atomic.UISelectItemSource();
 
 }
 
@@ -248,7 +310,7 @@ export class CreateScene extends ModalWindow {
         super();
 
         this.resourcePath = resourcePath;
-        this.init("New Scene", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.init("New Scene", "AtomicEditor/editor/ui/resourcecreateresource.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
     }
 
@@ -300,7 +362,7 @@ export class CreateMaterial extends ModalWindow {
         super();
 
         this.resourcePath = resourcePath;
-        this.init("New Material", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.init("New Material", "AtomicEditor/editor/ui/resourcecreateresource.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
     }
 

@@ -31,7 +31,12 @@
 namespace ToolCore
 {
 
-ToolPrefs::ToolPrefs(Context* context) : Object(context)
+ToolPrefs::ToolPrefs(Context* context) : Object(context),
+    androidSDKPath_(),
+    jdkRootPath_(),
+    antPath_(),
+    releasePath_(),
+    releaseCheck_(false)
 {
 
 }
@@ -94,6 +99,8 @@ void ToolPrefs::Load()
         androidSDKPath_ = androidRoot.Get("androidSDKPath").GetString();
         jdkRootPath_ = androidRoot.Get("jdkRootPath").GetString();
         antPath_ = androidRoot.Get("antPath").GetString();
+        releasePath_ = androidRoot.Get("releasePath").GetString();
+        releaseCheck_ = androidRoot.Get("releaseCheck").GetInt();
     }
 
 }
@@ -101,21 +108,21 @@ void ToolPrefs::Load()
 void ToolPrefs::Save()
 {
     String path = GetPrefsPath();
-
+ 
     SharedPtr<JSONFile> jsonFile(new JSONFile(context_));
-
-    JSONValue root = jsonFile->GetRoot();
+    JSONValue& root = jsonFile->GetRoot();
+    root.Clear();
+    
+    JSONValue androidRoot; 
+    androidRoot["androidSDKPath"] = androidSDKPath_;
+    androidRoot["jdkRootPath"] = jdkRootPath_;
+    androidRoot["antPath"] = antPath_;
+    androidRoot["releasePath"] = releasePath_;
+    androidRoot["releaseCheck"] = releaseCheck_;
+   root["android"] = androidRoot;
 
     SharedPtr<File> file(new File(context_, path, FILE_WRITE));
-
-    JSONValue androidRoot;
-    androidRoot.Set("androidSDKPath", androidSDKPath_);
-    androidRoot.Set("jdkRootPath", jdkRootPath_);
-    androidRoot.Set("antPath", antPath_);
-    root.Set("android", androidRoot);
-
-    jsonFile->Save(*file, String("   "));
-
+    jsonFile->Save(*file, "   ");
     file->Close();
 
 }

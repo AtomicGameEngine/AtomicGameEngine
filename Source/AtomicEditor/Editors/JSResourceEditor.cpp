@@ -51,7 +51,7 @@ using namespace ToolCore;
 namespace AtomicEditor
 {
 
-JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UITabContainer *container) :
+JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UITabContainer *container, const String &editorUrl) :
     ResourceEditor(context, fullpath, container)
 {
 
@@ -67,17 +67,7 @@ JSResourceEditor ::JSResourceEditor(Context* context, const String &fullpath, UI
 
     layout->AddChild(c);
 
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    String codeEditorDir = tenv->GetToolDataDir();
-    codeEditorDir += "CodeEditor/Editor.html";
-
-#ifdef ATOMIC_PLATFORM_OSX
-    String url = "file://" + codeEditorDir;
-#else
-    String url = "file:///" + codeEditorDir;
-#endif
-
-    webView_ = new UIWebView(context_, url);
+    webView_ = new UIWebView(context_, editorUrl);
     webClient_ = webView_->GetWebClient();
     messageHandler_ = new WebMessageHandler(context_);
     webClient_->AddMessageHandler(messageHandler_);
@@ -131,47 +121,42 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     const String& EDITOR_CHANGE = "editorChange";
     const String& EDITOR_SAVE_CODE = "editorSaveCode";
     const String& EDITOR_SAVE_FILE = "editorSaveFile";
-    const String& EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
-
-    String normalizedPath = getNormalizedPath(fullpath_);
 
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
-    if (request == EDITOR_CHANGE)
+    // All messages come in as a JSON string with a "message" property describing what the message is
+    JSONValue jvalue;
+    if (JSONFile::ParseJSON(request, jvalue, false))
     {
-        SetModified(true);
-    }
-    else
-    {
-        JSONValue jvalue;
-        if (JSONFile::ParseJSON(request, jvalue, false))
+        String message = jvalue["message"].GetString();
+        if (message == EDITOR_CHANGE) {
+            SetModified(true);
+        }
+        else if (message == EDITOR_SAVE_CODE)
         {
-            String message = jvalue["message"].GetString();
-            if (message == EDITOR_SAVE_CODE)
+            String code = jvalue["payload"].GetString();
+            File file(context_, fullpath_, FILE_WRITE);
+            file.Write((void*) code.CString(), code.Length());
+            file.Close();
+        }
+        else if (message == EDITOR_SAVE_FILE)
+        {
+            // filename coming in should be a fully qualified path
+            String code = jvalue["payload"].GetString();
+            String fn = jvalue["filename"].GetString();
+
+            // NOTE: We only want to be able save into the resource directory, so check to see if the file coming in
+            // should live in the resource directory and also for safety check that there is no funky path navigation
+            // going on such as my/resource/../../../out.file
+            ToolSystem* tsys = GetSubsystem<ToolSystem>();
+            if (fn.Find(tsys->GetProject()->GetResourcePath(), 0, false) != String::NPOS
+                && fn.Find("..", 0) == String::NPOS )
             {
-                String code = jvalue["payload"].GetString();
-                File file(context_, fullpath_, FILE_WRITE);
-                file.Write((void*) code.CString(), code.Length());
-                file.Close();
-            }
-            else if (message == EDITOR_SAVE_FILE)
-            {
-                String code = jvalue["payload"].GetString();
-                String fn = jvalue["filename"].GetString();
-                // TODO: determine if we are absolute path or partial path
-                File file(context_, fn, FILE_WRITE);
-                file.Write((void*) code.CString(), code.Length());
-                file.Close();
-            }
-            else if (message == EDITOR_GET_USER_PREFS)
-            {
-                ToolSystem* tsys = GetSubsystem<ToolSystem>();
-                Project* proj = tsys->GetProject();
-                FileSystem* fileSystem = GetSubsystem<FileSystem>();
-                if (fileSystem->FileExists(proj->GetUserPrefsFullPath()))
-                {
-                    webClient_->ExecuteJavaScript(ToString("HOST_loadPreferences(\"atomic://%s\");", proj->GetUserPrefsFullPath().CString()));
-                }
+                    File file(context_, fn, FILE_WRITE);
+                    file.Write((void*) code.CString(), code.Length());
+                    file.Close();
+            } else {
+                LOGWARNING("Ignoring attempt to write file: " + fn);
             }
         }
     }

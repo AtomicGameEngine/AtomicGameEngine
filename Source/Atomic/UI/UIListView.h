@@ -98,6 +98,10 @@ private:
 
     void SelectItem(ListViewItem* item, bool select);
 
+    ListViewItem* pivot_;
+    int pivotIndex_;
+    bool startNewSelection_;
+
 };
 
 }

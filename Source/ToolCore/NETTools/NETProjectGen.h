@@ -32,126 +32,138 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-class NETProjectGen;
+    class NETProjectGen;
 
-class NETProjectBase : public Object
-{
-    OBJECT(NETProjectBase);
+    class NETProjectBase : public Object
+    {
+        OBJECT(NETProjectBase);
 
-public:
+    public:
 
-    NETProjectBase(Context* context, NETProjectGen* projectGen);
-    virtual ~NETProjectBase();
+        NETProjectBase(Context* context, NETProjectGen* projectGen);
+        virtual ~NETProjectBase();
 
-    void ReplacePathStrings(String& path);
+        void ReplacePathStrings(String& path);
 
-protected:
+        void CopyXMLElementRecursive(XMLElement source, XMLElement dest);
 
-    SharedPtr<XMLFile> xmlFile_;
-    WeakPtr<NETProjectGen> projectGen_;
+    protected:
 
-};
+        SharedPtr<XMLFile> xmlFile_;
+        WeakPtr<NETProjectGen> projectGen_;
 
-class NETCSProject : public NETProjectBase
-{
-    OBJECT(NETCSProject);
+    };
 
-public:
+    class NETCSProject : public NETProjectBase
+    {
+        OBJECT(NETCSProject);
 
-    NETCSProject(Context* context, NETProjectGen* projectGen);
-    virtual ~NETCSProject();
+    public:
 
-    bool Load(const JSONValue& root);
+        NETCSProject(Context* context, NETProjectGen* projectGen);
+        virtual ~NETCSProject();
 
-    const String& GetName() { return name_; }
-    const String& GetProjectGUID() { return projectGuid_; }
+        bool Load(const JSONValue& root);
 
-    bool Generate();
+        const String& GetName() { return name_; }
+        const String& GetProjectGUID() { return projectGuid_; }
 
-private:
+        const Vector<String>& GetReferences() const { return references_; }
 
-    void CreateCompileItemGroup(XMLElement &projectRoot);
-    void CreateReferencesItemGroup(XMLElement &projectRoot);
-    void CreateMainPropertyGroup(XMLElement &projectRoot);
-    void CreateDebugPropertyGroup(XMLElement &projectRoot);
-    void CreateReleasePropertyGroup(XMLElement &projectRoot);
-    void GetAssemblySearchPaths(String& paths);
+        bool Generate();
 
-    String name_;
-    String projectGuid_;
-    String outputType_;
-    String rootNamespace_;
-    String assemblyName_;
-    String assemblyOutputPath_;
-    String assemblySearchPaths_;
+    private:
 
-    XMLElement xmlRoot_;
+        bool CreateProjectFolder(const String& path);
 
-    Vector<String> references_;
-    Vector<String> sourceFolders_;
-};
+        void CreateCompileItemGroup(XMLElement &projectRoot);
+        void CreateReferencesItemGroup(XMLElement &projectRoot);
+        void CreateProjectReferencesItemGroup(XMLElement & projectRoot);
+        void CreatePackagesItemGroup(XMLElement &projectRoot);
+        void CreateMainPropertyGroup(XMLElement &projectRoot);
+        void CreateDebugPropertyGroup(XMLElement &projectRoot);
+        void CreateReleasePropertyGroup(XMLElement &projectRoot);
+        void CreateAssemblyInfo();
+        void GetAssemblySearchPaths(String& paths);
 
-class NETSolution : public NETProjectBase
-{
-    OBJECT(NETSolution);
+        String name_;
+        String projectGuid_;
+        String outputType_;
+        String rootNamespace_;
+        String assemblyName_;
+        String assemblyOutputPath_;
+        String assemblySearchPaths_;
 
-public:
+        // project paths
+        String projectPath_;
 
-    NETSolution(Context* context, NETProjectGen* projectGen);
-    virtual ~NETSolution();
+        XMLElement xmlRoot_;
 
-    bool Load(const JSONValue& root);
+        Vector<String> references_;
+        Vector<String> packages_;
+        Vector<String> sourceFolders_;
+    };
 
-    bool Generate();
+    class NETSolution : public NETProjectBase
+    {
+        OBJECT(NETSolution);
 
-    const String& GetOutputPath() { return outputPath_; }
+    public:
 
-private:
+        NETSolution(Context* context, NETProjectGen* projectGen);
+        virtual ~NETSolution();
 
-    void GenerateXamarinStudio(const String& slnPath);
+        bool Load(const JSONValue& root);
 
-    String name_;
-    String outputPath_;
+        bool Generate();
 
-};
+        const String& GetOutputPath() { return outputPath_; }
 
-class NETProjectGen : public Object
-{
-    OBJECT(NETProjectGen);
+    private:
 
-public:
+        void GenerateSolution(const String& slnPath);
 
-    NETProjectGen(Context* context);
-    virtual ~NETProjectGen();
+        String name_;
+        String outputPath_;
+        String solutionGUID_;
 
-    const String& GetScriptPlatform() { return scriptPlatform_; }
+    };
 
-    NETSolution* GetSolution() { return solution_; }
+    class NETProjectGen : public Object
+    {
+        OBJECT(NETProjectGen);
 
-    bool GetMonoBuild() { return monoBuild_; }
-    bool GetGameBuild() { return gameBuild_; }
+    public:
 
-    const Vector<SharedPtr<NETCSProject>>& GetCSProjects() { return projects_; }
+        NETProjectGen(Context* context);
+        virtual ~NETProjectGen();
 
-    void SetScriptPlatform(const String& platform) { scriptPlatform_ = platform; }
+        const String& GetScriptPlatform() { return scriptPlatform_; }
 
-    bool Generate();
+        NETSolution* GetSolution() { return solution_; }
 
-    String GenerateUUID();
+        const Vector<SharedPtr<NETCSProject>>& GetCSProjects() { return projects_; }
 
-    bool LoadProject(const JSONValue& root, bool gameBuild = false);
-    bool LoadProject(const String& projectPath, bool gameBuild = false);
+        NETCSProject* GetCSProjectByName(const String& name);
 
-private:
+        bool GetCSProjectDependencies(NETCSProject * source, PODVector<NETCSProject*>& depends) const;
 
-    String scriptPlatform_;
+        void SetScriptPlatform(const String& platform) { scriptPlatform_ = platform; }
 
-    bool monoBuild_;
-    bool gameBuild_;
+        bool Generate();
 
-    SharedPtr<NETSolution> solution_;
-    Vector<SharedPtr<NETCSProject>> projects_;
+        String GenerateUUID();
 
-};
+        bool LoadProject(const JSONValue& root);
+        bool LoadProject(const String& projectPath);
+
+    private:
+
+        String scriptPlatform_;
+
+        SharedPtr<NETSolution> solution_;
+        Vector<SharedPtr<NETCSProject>> projects_;
+
+    };
 
 }

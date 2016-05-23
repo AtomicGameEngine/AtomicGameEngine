@@ -27,8 +27,9 @@ import ScriptWidget = require("ui/ScriptWidget");
 
 import MaterialInspector = require("./MaterialInspector");
 import ModelInspector = require("./ModelInspector");
-import AssemblyInspector = require("./AssemblyInspector");
 import PrefabInspector = require("./PrefabInspector");
+import TextureInspector = require("./TextureInspector");
+import AssemblyInspector = require("./AssemblyInspector");
 
 import SelectionInspector = require("./SelectionInspector");
 // make sure these are hooked in
@@ -196,21 +197,36 @@ class InspectorFrame extends ScriptWidget {
             materialInspector.inspect(asset, material);
         }
 
-        if (asset.importerTypeName == "NETAssemblyImporter") {
-
-            var assemblyInspector = new AssemblyInspector();
-            container.addChild(assemblyInspector);
-
-            assemblyInspector.inspect(asset);
-
-        }
-
         if (asset.importerTypeName == "PrefabImporter") {
 
             var prefabInspector = new PrefabInspector();
             container.addChild(prefabInspector);
 
             prefabInspector.inspect(asset);
+        }
+
+        if (asset.importerTypeName == "TextureImporter") {
+
+            var thumbnail = asset.cachePath + "_thumbnail.png";
+            var cache = Atomic.getResourceCache();
+            var texture = <Atomic.Texture2D>cache.getResource("Texture2D", thumbnail);
+
+            if (!texture) {
+                return;
+            }
+
+            var textureInspector = new TextureInspector();
+            container.addChild(textureInspector);
+
+            textureInspector.inspect(texture, asset);
+        }
+
+        if (asset.importerTypeName == "NETAssemblyImporter") {
+
+          var assemblyInspector = new AssemblyInspector();
+          container.addChild(assemblyInspector);
+          assemblyInspector.inspect(asset);
+
         }
 
     }

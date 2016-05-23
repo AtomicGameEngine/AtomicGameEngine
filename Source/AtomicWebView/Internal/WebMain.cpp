@@ -27,8 +27,6 @@
 namespace Atomic
 {
 
-using namespace Atomic;
-
 int WebMain(int argc, char* argv[])
 {
 

@@ -35,6 +35,12 @@ EVENT(E_LICENSE_EULAREQUIRED, LicenseEulaRequired)
 
 }
 
+// EULA agreement accepted
+EVENT(E_LICENSE_EULAACCEPTED, LicenseEulaAccepted)
+{
+
+}
+
 // activation required
 EVENT(E_LICENSE_ACTIVATIONREQUIRED, LicenseActivationRequired)
 {

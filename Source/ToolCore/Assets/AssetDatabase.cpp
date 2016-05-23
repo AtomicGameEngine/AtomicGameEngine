@@ -579,10 +579,7 @@ String AssetDatabase::GetResourceImporterName(const String& resourceTypeName)
 
         resourceTypeToImporterType_["Animation"] = "ModelImporter";
 
-
-#ifdef ATOMIC_DOTNET
         resourceTypeToImporterType_["CSComponentAssembly"] = "NETAssemblyImporter";
-#endif
 
     }
 

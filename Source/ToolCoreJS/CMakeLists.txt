@@ -10,4 +10,4 @@ add_library(ToolCoreJS ${SOURCE_FILES})
 
 target_link_libraries(ToolCoreJS ToolCore)
 
-add_dependencies(ToolCoreJS AtomicTool)
+add_dependencies(ToolCoreJS AtomicToolCheckScripts)

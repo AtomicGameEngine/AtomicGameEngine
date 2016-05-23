@@ -21,9 +21,6 @@ namespace('build', function() {
       common.cleanCreateDir(host.getGenScriptRootDir("WINDOWS"));
     }
 
-    // create the generated script files, so they will be picked up by cmake
-    host.createGenScriptFiles("WINDOWS");
-
     process.chdir(buildDir);
 
     var cmds = [];
@@ -72,7 +69,9 @@ namespace('build', function() {
   // Generate a Visual Studio 2015 solution
   task('genvs2015', {
     async: true
-  }, function() {
+  }, function(devBuild) {
+    if (devBuild === undefined)
+      devBuild = 1;
 
     var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
 
@@ -80,25 +79,15 @@ namespace('build', function() {
         jake.mkdirP(slnRoot);
     }
 
-    // create the generated script files, so they will be picked up by cmake
-    host.createGenScriptFiles("WINDOWS");
-
     process.chdir(slnRoot);
 
     var cmds = [];
 
-    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot);
+    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild);
 
     jake.exec(cmds, function() {
 
-      var task = jake.Task['build:genscripts']
-
-      task.addListener('complete', function () {
-          console.log("\n\nVisual Studio Solution generated in ", slnRoot);
-          complete();
-        });
-
-      task.invoke("WINDOWS");
+      complete();
 
     }, {
       printStdout: true

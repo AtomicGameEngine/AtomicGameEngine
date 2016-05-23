@@ -203,8 +203,6 @@ void BuildWindows::Build(const String& buildPath)
     if (!BuildCopyFile(d3d9dll, buildPath_ + "/D3DCompiler_47.dll"))
         return;
 
-    BuildAtomicNET();
-
     BuildLog("Windows Deployment Complete");
 
     buildSystem->BuildComplete(PLATFORMID_WINDOWS, buildPath_);

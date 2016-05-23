@@ -383,6 +383,9 @@ var ts;
         NodeFlags[NodeFlags["HasDecorators"] = 8388608] = "HasDecorators";
         NodeFlags[NodeFlags["HasParamDecorators"] = 16777216] = "HasParamDecorators";
         NodeFlags[NodeFlags["HasAsyncFunctions"] = 33554432] = "HasAsyncFunctions";
+        // This was picked out from the 'master' branch.
+        // To keep the flags consistent, we're skipping a few ahead.
+        NodeFlags[NodeFlags["HasJsxSpreadAttribute"] = 1073741824] = "HasJsxSpreadAttribute";
         NodeFlags[NodeFlags["Modifier"] = 1022] = "Modifier";
         NodeFlags[NodeFlags["AccessibilityModifier"] = 56] = "AccessibilityModifier";
         NodeFlags[NodeFlags["BlockScoped"] = 24576] = "BlockScoped";
@@ -409,7 +412,7 @@ var ts;
         // its type can be specified usign a JSDoc comment.
         ParserContextFlags[ParserContextFlags["JavaScriptFile"] = 32] = "JavaScriptFile";
         // Context flags set directly by the parser.
-        ParserContextFlags[ParserContextFlags["ParserGeneratedFlags"] = 31] = "ParserGeneratedFlags";
+        ParserContextFlags[ParserContextFlags["ParserGeneratedFlags"] = 63] = "ParserGeneratedFlags";
         // Exclude these flags when parsing a Type
         ParserContextFlags[ParserContextFlags["TypeExcludesFlags"] = 10] = "TypeExcludesFlags";
         // Context flags computed by aggregating child flags upwards.
@@ -716,6 +719,14 @@ var ts;
         NewLineKind[NewLineKind["LineFeed"] = 1] = "LineFeed";
     })(ts.NewLineKind || (ts.NewLineKind = {}));
     var NewLineKind = ts.NewLineKind;
+    (function (ScriptKind) {
+        ScriptKind[ScriptKind["Unknown"] = 0] = "Unknown";
+        ScriptKind[ScriptKind["JS"] = 1] = "JS";
+        ScriptKind[ScriptKind["JSX"] = 2] = "JSX";
+        ScriptKind[ScriptKind["TS"] = 3] = "TS";
+        ScriptKind[ScriptKind["TSX"] = 4] = "TSX";
+    })(ts.ScriptKind || (ts.ScriptKind = {}));
+    var ScriptKind = ts.ScriptKind;
     (function (ScriptTarget) {
         ScriptTarget[ScriptTarget["ES3"] = 0] = "ES3";
         ScriptTarget[ScriptTarget["ES5"] = 1] = "ES5";
@@ -1137,6 +1148,14 @@ var ts;
         return hasOwnProperty.call(map, key);
     }
     ts.hasProperty = hasProperty;
+    function getKeys(map) {
+        var keys = [];
+        for (var key in map) {
+            keys.push(key);
+        }
+        return keys;
+    }
+    ts.getKeys = getKeys;
     function getProperty(map, key) {
         return hasOwnProperty.call(map, key) ? map[key] : undefined;
     }
@@ -1594,6 +1613,32 @@ var ts;
         return pathLen > extLen && path.substr(pathLen - extLen, extLen) === extension;
     }
     ts.fileExtensionIs = fileExtensionIs;
+    function ensureScriptKind(fileName, scriptKind) {
+        // Using scriptKind as a condition handles both:
+        // - 'scriptKind' is unspecified and thus it is `undefined`
+        // - 'scriptKind' is set and it is `Unknown` (0)
+        // If the 'scriptKind' is 'undefined' or 'Unknown' then we attempt
+        // to get the ScriptKind from the file name. If it cannot be resolved
+        // from the file name then the default 'TS' script kind is returned.
+        return (scriptKind || getScriptKindFromFileName(fileName)) || 3 /* TS */;
+    }
+    ts.ensureScriptKind = ensureScriptKind;
+    function getScriptKindFromFileName(fileName) {
+        var ext = fileName.substr(fileName.lastIndexOf("."));
+        switch (ext.toLowerCase()) {
+            case ".js":
+                return 1 /* JS */;
+            case ".jsx":
+                return 2 /* JSX */;
+            case ".ts":
+                return 3 /* TS */;
+            case ".tsx":
+                return 4 /* TSX */;
+            default:
+                return 0 /* Unknown */;
+        }
+    }
+    ts.getScriptKindFromFileName = getScriptKindFromFileName;
     /**
      *  List of supported extensions in order of file resolution precedence.
      */
@@ -2068,15 +2113,20 @@ var ts;
                         var current = files_2[_i];
                         var name_3 = ts.combinePaths(path, current);
                         if (!ts.contains(exclude, getCanonicalPath(name_3))) {
-                            var stat = _fs.statSync(name_3);
-                            if (stat.isFile()) {
-                                if (!extension || ts.fileExtensionIs(name_3, extension)) {
-                                    result.push(name_3);
+                            // fs.statSync would throw an exception if the file is a symlink
+                            // whose linked file doesn't exist.
+                            try {
+                                var stat = _fs.statSync(name_3);
+                                if (stat.isFile()) {
+                                    if (!extension || ts.fileExtensionIs(name_3, extension)) {
+                                        result.push(name_3);
+                                    }
+                                }
+                                else if (stat.isDirectory()) {
+                                    directories.push(name_3);
                                 }
                             }
-                            else if (stat.isDirectory()) {
-                                directories.push(name_3);
-                            }
+                            catch (e) { }
                         }
                     }
                     for (var _a = 0, directories_1 = directories; _a < directories_1.length; _a++) {
@@ -2819,6 +2869,7 @@ var ts;
         Only_amd_and_system_modules_are_supported_alongside_0: { code: 6082, category: ts.DiagnosticCategory.Error, key: "Only_amd_and_system_modules_are_supported_alongside_0_6082", message: "Only 'amd' and 'system' modules are supported alongside --{0}." },
         Allow_javascript_files_to_be_compiled: { code: 6083, category: ts.DiagnosticCategory.Message, key: "Allow_javascript_files_to_be_compiled_6083", message: "Allow javascript files to be compiled." },
         Specifies_the_object_invoked_for_createElement_and_spread_when_targeting_react_JSX_emit: { code: 6084, category: ts.DiagnosticCategory.Message, key: "Specifies_the_object_invoked_for_createElement_and_spread_when_targeting_react_JSX_emit_6084", message: "Specifies the object invoked for createElement and __spread when targeting 'react' JSX emit" },
+        Option_0_should_have_array_of_strings_as_a_value: { code: 6103, category: ts.DiagnosticCategory.Error, key: "Option_0_should_have_array_of_strings_as_a_value_6103", message: "Option '{0}' should have array of strings as a value." },
         Do_not_emit_use_strict_directives_in_module_output: { code: 6112, category: ts.DiagnosticCategory.Message, key: "Do_not_emit_use_strict_directives_in_module_output_6112", message: "Do not emit 'use strict' directives in module output." },
         Variable_0_implicitly_has_an_1_type: { code: 7005, category: ts.DiagnosticCategory.Error, key: "Variable_0_implicitly_has_an_1_type_7005", message: "Variable '{0}' implicitly has an '{1}' type." },
         Parameter_0_implicitly_has_an_1_type: { code: 7006, category: ts.DiagnosticCategory.Error, key: "Parameter_0_implicitly_has_an_1_type_7006", message: "Parameter '{0}' implicitly has an '{1}' type." },
@@ -2869,7 +2920,9 @@ var ts;
         An_unary_expression_with_the_0_operator_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses: { code: 17006, category: ts.DiagnosticCategory.Error, key: "An_unary_expression_with_the_0_operator_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_ex_17006", message: "An unary expression with the '{0}' operator is not allowed in the left-hand side of an exponentiation expression. Consider enclosing the expression in parentheses." },
         A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Consider_enclosing_the_expression_in_parentheses: { code: 17007, category: ts.DiagnosticCategory.Error, key: "A_type_assertion_expression_is_not_allowed_in_the_left_hand_side_of_an_exponentiation_expression_Con_17007", message: "A type assertion expression is not allowed in the left-hand side of an exponentiation expression. Consider enclosing the expression in parentheses." },
         JSX_element_0_has_no_corresponding_closing_tag: { code: 17008, category: ts.DiagnosticCategory.Error, key: "JSX_element_0_has_no_corresponding_closing_tag_17008", message: "JSX element '{0}' has no corresponding closing tag." },
-        super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class: { code: 17009, category: ts.DiagnosticCategory.Error, key: "super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class_17009", message: "'super' must be called before accessing 'this' in the constructor of a derived class." }
+        super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class: { code: 17009, category: ts.DiagnosticCategory.Error, key: "super_must_be_called_before_accessing_this_in_the_constructor_of_a_derived_class_17009", message: "'super' must be called before accessing 'this' in the constructor of a derived class." },
+        Unknown_typing_option_0: { code: 17010, category: ts.DiagnosticCategory.Error, key: "Unknown_typing_option_0_17010", message: "Unknown typing option '{0}'." },
+        Too_many_JavaScript_files_in_the_project_Consider_specifying_the_exclude_setting_in_project_configuration_to_limit_included_source_folders_The_likely_folder_to_exclude_is_0_To_disable_the_project_size_limit_set_the_disableSizeLimit_compiler_option_to_true: { code: 17012, category: ts.DiagnosticCategory.Error, key: "Too_many_JavaScript_files_in_the_project_Consider_specifying_the_exclude_setting_in_project_configur_17012", message: "Too many JavaScript files in the project. Consider specifying the 'exclude' setting in project configuration to limit included source folders. The likely folder to exclude is '{0}'. To disable the project size limit, set the 'disableSizeLimit' compiler option to 'true'." }
     };
 })(ts || (ts = {}));
 /// <reference path="core.ts"/>
@@ -5548,6 +5601,9 @@ var ts;
     /// Given a BinaryExpression, returns SpecialPropertyAssignmentKind for the various kinds of property
     /// assignments we treat as special in the binder
     function getSpecialPropertyAssignmentKind(expression) {
+        if (!isInJavaScriptFile(expression)) {
+            return 0 /* None */;
+        }
         if (expression.kind !== 184 /* BinaryExpression */) {
             return 0 /* None */;
         }
@@ -6807,6 +6863,10 @@ var ts;
         return ts.forEach(ts.supportedJavascriptExtensions, function (extension) { return ts.fileExtensionIs(fileName, extension); });
     }
     ts.hasJavaScriptFileExtension = hasJavaScriptFileExtension;
+    function hasTypeScriptFileExtension(fileName) {
+        return ts.forEach(ts.supportedTypeScriptExtensions, function (extension) { return ts.fileExtensionIs(fileName, extension); });
+    }
+    ts.hasTypeScriptFileExtension = hasTypeScriptFileExtension;
     /**
      * Replace each instance of non-ascii characters by one, two, three, or four escape sequences
      * representing the UTF-8 encoding of the character, and return the expanded char code list.
@@ -7557,10 +7617,10 @@ var ts;
         }
     }
     ts.forEachChild = forEachChild;
-    function createSourceFile(fileName, sourceText, languageVersion, setParentNodes) {
+    function createSourceFile(fileName, sourceText, languageVersion, setParentNodes, scriptKind) {
         if (setParentNodes === void 0) { setParentNodes = false; }
         var start = new Date().getTime();
-        var result = Parser.parseSourceFile(fileName, sourceText, languageVersion, /*syntaxCursor*/ undefined, setParentNodes);
+        var result = Parser.parseSourceFile(fileName, sourceText, languageVersion, /*syntaxCursor*/ undefined, setParentNodes, scriptKind);
         ts.parseTime += new Date().getTime() - start;
         return result;
     }
@@ -7685,19 +7745,19 @@ var ts;
         // Note: any errors at the end of the file that do not precede a regular node, should get
         // attached to the EOF token.
         var parseErrorBeforeNextFinishedNode = false;
-        function parseSourceFile(fileName, _sourceText, languageVersion, _syntaxCursor, setParentNodes) {
-            var isJavaScriptFile = ts.hasJavaScriptFileExtension(fileName) || _sourceText.lastIndexOf("// @language=javascript", 0) === 0;
-            initializeState(fileName, _sourceText, languageVersion, isJavaScriptFile, _syntaxCursor);
-            var result = parseSourceFileWorker(fileName, languageVersion, setParentNodes);
+        function parseSourceFile(fileName, _sourceText, languageVersion, _syntaxCursor, setParentNodes, scriptKind) {
+            scriptKind = ts.ensureScriptKind(fileName, scriptKind);
+            initializeState(fileName, _sourceText, languageVersion, _syntaxCursor, scriptKind);
+            var result = parseSourceFileWorker(fileName, languageVersion, setParentNodes, scriptKind);
             clearState();
             return result;
         }
         Parser.parseSourceFile = parseSourceFile;
-        function getLanguageVariant(fileName) {
+        function getLanguageVariant(scriptKind) {
             // .tsx and .jsx files are treated as jsx language variant.
-            return ts.fileExtensionIs(fileName, ".tsx") || ts.fileExtensionIs(fileName, ".jsx") || ts.fileExtensionIs(fileName, ".js") ? 1 /* JSX */ : 0 /* Standard */;
+            return scriptKind === 4 /* TSX */ || scriptKind === 2 /* JSX */ || scriptKind === 1 /* JS */ ? 1 /* JSX */ : 0 /* Standard */;
         }
-        function initializeState(fileName, _sourceText, languageVersion, isJavaScriptFile, _syntaxCursor) {
+        function initializeState(fileName, _sourceText, languageVersion, _syntaxCursor, scriptKind) {
             NodeConstructor = ts.objectAllocator.getNodeConstructor();
             SourceFileConstructor = ts.objectAllocator.getSourceFileConstructor();
             sourceText = _sourceText;
@@ -7707,13 +7767,13 @@ var ts;
             identifiers = {};
             identifierCount = 0;
             nodeCount = 0;
-            contextFlags = isJavaScriptFile ? 32 /* JavaScriptFile */ : 0 /* None */;
+            contextFlags = scriptKind === 1 /* JS */ || scriptKind === 2 /* JSX */ ? 32 /* JavaScriptFile */ : 0 /* None */;
             parseErrorBeforeNextFinishedNode = false;
             // Initialize and prime the scanner before parsing the source elements.
             scanner.setText(sourceText);
             scanner.setOnError(scanError);
             scanner.setScriptTarget(languageVersion);
-            scanner.setLanguageVariant(getLanguageVariant(fileName));
+            scanner.setLanguageVariant(getLanguageVariant(scriptKind));
         }
         function clearState() {
             // Clear out the text the scanner is pointing at, so it doesn't keep anything alive unnecessarily.
@@ -7726,8 +7786,8 @@ var ts;
             syntaxCursor = undefined;
             sourceText = undefined;
         }
-        function parseSourceFileWorker(fileName, languageVersion, setParentNodes) {
-            sourceFile = createSourceFile(fileName, languageVersion);
+        function parseSourceFileWorker(fileName, languageVersion, setParentNodes, scriptKind) {
+            sourceFile = createSourceFile(fileName, languageVersion, scriptKind);
             if (contextFlags & 32 /* JavaScriptFile */) {
                 sourceFile.parserContextFlags = 32 /* JavaScriptFile */;
             }
@@ -7784,7 +7844,7 @@ var ts;
             }
         }
         Parser.fixupParentReferences = fixupParentReferences;
-        function createSourceFile(fileName, languageVersion) {
+        function createSourceFile(fileName, languageVersion, scriptKind) {
             // code from createNode is inlined here so createNode won't have to deal with special case of creating source files
             // this is quite rare comparing to other nodes and createNode should be as fast as possible
             var sourceFile = new SourceFileConstructor(251 /* SourceFile */, /*pos*/ 0, /* end */ sourceText.length);
@@ -7794,7 +7854,8 @@ var ts;
             sourceFile.languageVersion = languageVersion;
             sourceFile.fileName = ts.normalizePath(fileName);
             sourceFile.flags = ts.fileExtensionIs(sourceFile.fileName, ".d.ts") ? 4096 /* DeclarationFile */ : 0;
-            sourceFile.languageVariant = getLanguageVariant(sourceFile.fileName);
+            sourceFile.languageVariant = getLanguageVariant(scriptKind);
+            sourceFile.scriptKind = scriptKind;
             return sourceFile;
         }
         function setContextFlag(val, flag) {
@@ -8460,7 +8521,7 @@ var ts;
             // differently depending on what mode it is in.
             //
             // This also applies to all our other context flags as well.
-            var nodeContextFlags = node.parserContextFlags & 31 /* ParserGeneratedFlags */;
+            var nodeContextFlags = node.parserContextFlags & 63 /* ParserGeneratedFlags */;
             if (nodeContextFlags !== contextFlags) {
                 return undefined;
             }
@@ -12100,7 +12161,7 @@ var ts;
             }
             JSDocParser.isJSDocType = isJSDocType;
             function parseJSDocTypeExpressionForTests(content, start, length) {
-                initializeState("file.js", content, 2 /* Latest */, /*isJavaScriptFile*/ true, /*_syntaxCursor:*/ undefined);
+                initializeState("file.js", content, 2 /* Latest */, /*_syntaxCursor:*/ undefined, 1 /* JS */);
                 scanner.setText(content, start, length);
                 token = scanner.scan();
                 var jsDocTypeExpression = parseJSDocTypeExpression();
@@ -12367,7 +12428,7 @@ var ts;
                 }
             }
             function parseIsolatedJSDocComment(content, start, length) {
-                initializeState("file.js", content, 2 /* Latest */, /*isJavaScriptFile*/ true, /*_syntaxCursor:*/ undefined);
+                initializeState("file.js", content, 2 /* Latest */, /*_syntaxCursor:*/ undefined, 1 /* JS */);
                 sourceFile = { languageVariant: 0 /* Standard */, text: content };
                 var jsDocComment = parseJSDocCommentWorker(start, length);
                 var diagnostics = parseDiagnostics;
@@ -12637,7 +12698,7 @@ var ts;
             if (sourceFile.statements.length === 0) {
                 // If we don't have any statements in the current source file, then there's no real
                 // way to incrementally parse.  So just do a full parse instead.
-                return Parser.parseSourceFile(sourceFile.fileName, newText, sourceFile.languageVersion, /*syntaxCursor*/ undefined, /*setParentNodes*/ true);
+                return Parser.parseSourceFile(sourceFile.fileName, newText, sourceFile.languageVersion, /*syntaxCursor*/ undefined, /*setParentNodes*/ true, sourceFile.scriptKind);
             }
             // Make sure we're not trying to incrementally update a source file more than once.  Once
             // we do an update the original source file is considered unusbale from that point onwards.
@@ -12693,7 +12754,7 @@ var ts;
             // inconsistent tree.  Setting the parents on the new tree should be very fast.  We
             // will immediately bail out of walking any subtrees when we can see that their parents
             // are already correct.
-            var result = Parser.parseSourceFile(sourceFile.fileName, newText, sourceFile.languageVersion, syntaxCursor, /*setParentNodes*/ true);
+            var result = Parser.parseSourceFile(sourceFile.fileName, newText, sourceFile.languageVersion, syntaxCursor, /*setParentNodes*/ true, sourceFile.scriptKind);
             return result;
         }
         IncrementalParser.updateSourceFile = updateSourceFile;
@@ -13209,6 +13270,7 @@ var ts;
         var hasAsyncFunctions;
         var hasDecorators;
         var hasParameterDecorators;
+        var hasJsxSpreadAttribute;
         // If this file is an external module, then it is automatically in strict-mode according to
         // ES6.  If it is not an external module, then we'll determine if it is in strict mode or
         // not depending on if we see "use strict" in certain places (or if we hit a class/namespace).
@@ -13242,6 +13304,7 @@ var ts;
             hasAsyncFunctions = false;
             hasDecorators = false;
             hasParameterDecorators = false;
+            hasJsxSpreadAttribute = false;
         }
         return bindSourceFile;
         function createSymbol(flags, name) {
@@ -13534,6 +13597,9 @@ var ts;
                 if (hasAsyncFunctions) {
                     flags |= 33554432 /* HasAsyncFunctions */;
                 }
+                if (hasJsxSpreadAttribute) {
+                    flags |= 1073741824 /* HasJsxSpreadAttribute */;
+                }
             }
             node.flags = flags;
             if (saveState) {
@@ -13745,6 +13811,7 @@ var ts;
                 case 146 /* GetAccessor */:
                 case 147 /* SetAccessor */:
                 case 153 /* FunctionType */:
+                case 264 /* JSDocFunctionType */:
                 case 154 /* ConstructorType */:
                 case 176 /* FunctionExpression */:
                 case 177 /* ArrowFunction */:
@@ -14222,6 +14289,9 @@ var ts;
                     return bindPropertyOrMethodOrAccessor(node, 4 /* Property */, 107455 /* PropertyExcludes */);
                 case 250 /* EnumMember */:
                     return bindPropertyOrMethodOrAccessor(node, 8 /* EnumMember */, 107455 /* EnumMemberExcludes */);
+                case 242 /* JsxSpreadAttribute */:
+                    hasJsxSpreadAttribute = true;
+                    return;
                 case 148 /* CallSignature */:
                 case 149 /* ConstructSignature */:
                 case 150 /* IndexSignature */:
@@ -14350,7 +14420,7 @@ var ts;
         function bindModuleExportsAssignment(node) {
             // 'module.exports = expr' assignment
             setCommonJsModuleIndicator(node);
-            bindExportAssignment(node);
+            declareSymbol(file.symbol.exports, file.symbol, node, 4 /* Property */ | 7340032 /* Export */ | 512 /* ValueModule */, 0 /* None */);
         }
         function bindThisPropertyAssignment(node) {
             // Declare a 'member' in case it turns out the container was an ES5 class
@@ -14380,7 +14450,8 @@ var ts;
                 funcSymbol.members = {};
             }
             // Declare the method/property
-            declareSymbol(funcSymbol.members, funcSymbol, leftSideOfAssignment, 4 /* Property */, 107455 /* PropertyExcludes */);
+            // It's acceptable for multiple prototype property assignments of the same identifier to occur
+            declareSymbol(funcSymbol.members, funcSymbol, leftSideOfAssignment, 4 /* Property */, 107455 /* PropertyExcludes */ & ~4 /* Property */);
         }
         function bindCallExpression(node) {
             // We're only inspecting call expressions to detect CommonJS modules, so we can skip
@@ -15439,7 +15510,9 @@ var ts;
         function getTargetOfImportClause(node) {
             var moduleSymbol = resolveExternalModuleName(node, node.parent.moduleSpecifier);
             if (moduleSymbol) {
-                var exportDefaultSymbol = resolveSymbol(moduleSymbol.exports["default"]);
+                var exportDefaultSymbol = moduleSymbol.exports["export="] ?
+                    getPropertyOfType(getTypeOfSymbol(moduleSymbol.exports["export="]), "default") :
+                    resolveSymbol(moduleSymbol.exports["default"]);
                 if (!exportDefaultSymbol && !allowSyntheticDefaultImports) {
                     error(node.name, ts.Diagnostics.Module_0_has_no_default_export, symbolToString(moduleSymbol));
                 }
@@ -15508,8 +15581,15 @@ var ts;
             if (targetSymbol) {
                 var name_9 = specifier.propertyName || specifier.name;
                 if (name_9.text) {
+                    var symbolFromVariable = void 0;
+                    // First check if module was specified with "export=". If so, get the member from the resolved type
+                    if (moduleSymbol && moduleSymbol.exports && moduleSymbol.exports["export="]) {
+                        symbolFromVariable = getPropertyOfType(getTypeOfSymbol(targetSymbol), name_9.text);
+                    }
+                    else {
+                        symbolFromVariable = getPropertyOfVariable(targetSymbol, name_9.text);
+                    }
                     var symbolFromModule = getExportOfModule(targetSymbol, name_9.text);
-                    var symbolFromVariable = getPropertyOfVariable(targetSymbol, name_9.text);
                     var symbol = symbolFromModule && symbolFromVariable ?
                         combineValueAndTypeSymbols(symbolFromVariable, symbolFromModule) :
                         symbolFromModule || symbolFromVariable;
@@ -19403,7 +19483,7 @@ var ts;
             for (var i = 0; i < checkCount; i++) {
                 var s = i < sourceMax ? getTypeOfSymbol(sourceParams[i]) : getRestTypeOfSignature(source);
                 var t = i < targetMax ? getTypeOfSymbol(targetParams[i]) : getRestTypeOfSignature(target);
-                var related = compareTypes(t, s, /*reportErrors*/ false) || compareTypes(s, t, reportErrors);
+                var related = compareTypes(s, t, /*reportErrors*/ false) || compareTypes(t, s, reportErrors);
                 if (!related) {
                     if (reportErrors) {
                         errorReporter(ts.Diagnostics.Types_of_parameters_0_and_1_are_incompatible, sourceParams[i < sourceMax ? i : sourceMax].name, targetParams[i < targetMax ? i : targetMax].name);
@@ -20528,8 +20608,10 @@ var ts;
         function inferTypes(context, source, target) {
             var sourceStack;
             var targetStack;
+            var maxDepth = 5;
             var depth = 0;
             var inferiority = 0;
+            var visited = {};
             inferFromTypes(source, target);
             function isInProcess(source, target) {
                 for (var i = 0; i < depth; i++) {
@@ -20655,9 +20737,19 @@ var ts;
                         if (isInProcess(source, target)) {
                             return;
                         }
+                        // we delibirately limit the depth we examine to infer types: this speeds up the overall inference process
+                        // and user rarely expects inferences to be made from the deeply nested constituents.
+                        if (depth > maxDepth) {
+                            return;
+                        }
                         if (isDeeplyNestedGeneric(source, sourceStack, depth) && isDeeplyNestedGeneric(target, targetStack, depth)) {
                             return;
                         }
+                        var key = source.id + "," + target.id;
+                        if (ts.hasProperty(visited, key)) {
+                            return;
+                        }
+                        visited[key] = true;
                         if (depth === 0) {
                             sourceStack = [];
                             targetStack = [];
@@ -24302,6 +24394,7 @@ var ts;
             }
             // The identityMapper object is used to indicate that function expressions are wildcards
             if (contextualMapper === identityMapper && isContextSensitive(node)) {
+                checkNodeDeferred(node);
                 return anyFunctionType;
             }
             var links = getNodeLinks(node);
@@ -30548,7 +30641,7 @@ var ts;
     function getDeclarationDiagnostics(host, resolver, targetSourceFile) {
         var declarationDiagnostics = ts.createDiagnosticCollection();
         ts.forEachExpectedEmitFile(host, getDeclarationDiagnosticsFromFile, targetSourceFile);
-        return declarationDiagnostics.getDiagnostics(targetSourceFile.fileName);
+        return declarationDiagnostics.getDiagnostics(targetSourceFile ? targetSourceFile.fileName : undefined);
         function getDeclarationDiagnosticsFromFile(_a, sources, isBundledEmit) {
             var declarationFilePath = _a.declarationFilePath;
             emitDeclarations(host, resolver, declarationDiagnostics, declarationFilePath, sources, isBundledEmit);
@@ -32368,6 +32461,7 @@ var ts;
     function emitFiles(resolver, host, targetSourceFile) {
         // emit output for the __extends helper function
         var extendsHelper = "\nvar __extends = (this && this.__extends) || function (d, b) {\n    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];\n    function __() { this.constructor = d; }\n    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n};";
+        var assignHelper = "\nvar __assign = (this && this.__assign) || Object.assign || function(t) {\n    for (var s, i = 1, n = arguments.length; i < n; i++) {\n        s = arguments[i];\n        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))\n            t[p] = s[p];\n    }\n    return t;\n};";
         // emit output for the __decorate helper function
         var decorateHelper = "\nvar __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\n};";
         // emit output for the __metadata helper function
@@ -32457,6 +32551,7 @@ var ts;
             var decoratedClassAliases;
             var convertedLoopState;
             var extendsEmitted;
+            var assignEmitted;
             var decorateEmitted;
             var paramEmitted;
             var awaiterEmitted;
@@ -32527,6 +32622,7 @@ var ts;
                 decorateEmitted = false;
                 paramEmitted = false;
                 awaiterEmitted = false;
+                assignEmitted = false;
                 tempFlags = 0;
                 tempVariables = undefined;
                 tempParameters = undefined;
@@ -33083,11 +33179,10 @@ var ts;
                     }
                     else {
                         // Either emit one big object literal (no spread attribs), or
-                        // a call to React.__spread
+                        // a call to the __assign helper
                         var attrs = openingNode.attributes;
                         if (ts.forEach(attrs, function (attr) { return attr.kind === 242 /* JsxSpreadAttribute */; })) {
-                            emitExpressionIdentifier(syntheticReactRef);
-                            write(".__spread(");
+                            write("__assign(");
                             var haveOpenedObjectLiteral = false;
                             for (var i = 0; i < attrs.length; i++) {
                                 if (attrs[i].kind === 242 /* JsxSpreadAttribute */) {
@@ -38768,9 +38863,13 @@ var ts;
                 if (!compilerOptions.noEmitHelpers) {
                     // Only Emit __extends function when target ES5.
                     // For target ES6 and above, we can emit classDeclaration as is.
-                    if ((languageVersion < 2 /* ES6 */) && (!extendsEmitted && node.flags & 4194304 /* HasClassExtends */)) {
+                    if (languageVersion < 2 /* ES6 */ && !extendsEmitted && node.flags & 4194304 /* HasClassExtends */) {
                         writeLines(extendsHelper);
                         extendsEmitted = true;
+                    }
+                    if (compilerOptions.jsx !== 1 /* Preserve */ && !assignEmitted && (node.flags & 1073741824 /* HasJsxSpreadAttribute */)) {
+                        writeLines(assignHelper);
+                        assignEmitted = true;
                     }
                     if (!decorateEmitted && node.flags & 8388608 /* HasDecorators */) {
                         writeLines(decorateHelper);
@@ -39258,9 +39357,10 @@ var ts;
     /* @internal */ ts.emitTime = 0;
     /* @internal */ ts.ioReadTime = 0;
     /* @internal */ ts.ioWriteTime = 0;
+    /* @internal */ ts.maxProgramSizeForNonTsFiles = 20 * 1024 * 1024;
     /** The version of the TypeScript compiler release */
     var emptyArray = [];
-    ts.version = "1.8.2";
+    ts.version = "1.8.10";
     function findConfigFile(searchPath, fileExists) {
         var fileName = "tsconfig.json";
         while (true) {
@@ -39552,6 +39652,8 @@ var ts;
         var diagnosticsProducingTypeChecker;
         var noDiagnosticsTypeChecker;
         var classifiableNames;
+        var programSizeLimitExceeded = -1;
+        var programSizeForNonTsFiles = 0;
         var skipDefaultLib = options.noLib;
         var supportedExtensions = ts.getSupportedExtensions(options);
         var start = new Date().getTime();
@@ -39593,7 +39695,8 @@ var ts;
                 (oldOptions.target !== options.target) ||
                 (oldOptions.noLib !== options.noLib) ||
                 (oldOptions.jsx !== options.jsx) ||
-                (oldOptions.allowJs !== options.allowJs)) {
+                (oldOptions.allowJs !== options.allowJs) ||
+                (oldOptions.disableSizeLimit !== options.disableSizeLimit)) {
                 oldProgram = undefined;
             }
         }
@@ -39634,6 +39737,9 @@ var ts;
         verifyCompilerOptions();
         ts.programTime += new Date().getTime() - start;
         return program;
+        function exceedProgramSizeLimit() {
+            return !options.disableSizeLimit && programSizeForNonTsFiles === programSizeLimitExceeded;
+        }
         function getCommonSourceDirectory() {
             if (typeof commonSourceDirectory === "undefined") {
                 if (options.rootDir && checkSourceFilesBelongToPath(files, options.rootDir)) {
@@ -39825,7 +39931,14 @@ var ts;
             return getDiagnosticsHelper(sourceFile, getSemanticDiagnosticsForFile, cancellationToken);
         }
         function getDeclarationDiagnostics(sourceFile, cancellationToken) {
-            return getDiagnosticsHelper(sourceFile, getDeclarationDiagnosticsForFile, cancellationToken);
+            var options = program.getCompilerOptions();
+            // collect diagnostics from the program only once if either no source file was specified or out/outFile is set (bundled emit)
+            if (!sourceFile || options.out || options.outFile) {
+                return getDeclarationDiagnosticsWorker(sourceFile, cancellationToken);
+            }
+            else {
+                return getDiagnosticsHelper(sourceFile, getDeclarationDiagnosticsForFile, cancellationToken);
+            }
         }
         function getSyntacticDiagnosticsForFile(sourceFile, cancellationToken) {
             return sourceFile.parseDiagnostics;
@@ -40019,15 +40132,16 @@ var ts;
                 }
             });
         }
-        function getDeclarationDiagnosticsForFile(sourceFile, cancellationToken) {
+        function getDeclarationDiagnosticsWorker(sourceFile, cancellationToken) {
             return runWithCancellationToken(function () {
-                if (!ts.isDeclarationFile(sourceFile)) {
-                    var resolver = getDiagnosticsProducingTypeChecker().getEmitResolver(sourceFile, cancellationToken);
-                    // Don't actually write any files since we're just getting diagnostics.
-                    var writeFile_1 = function () { };
-                    return ts.getDeclarationDiagnostics(getEmitHost(writeFile_1), resolver, sourceFile);
-                }
+                var resolver = getDiagnosticsProducingTypeChecker().getEmitResolver(sourceFile, cancellationToken);
+                // Don't actually write any files since we're just getting diagnostics.
+                var writeFile = function () { };
+                return ts.getDeclarationDiagnostics(getEmitHost(writeFile), resolver, sourceFile);
             });
+        }
+        function getDeclarationDiagnosticsForFile(sourceFile, cancellationToken) {
+            return ts.isDeclarationFile(sourceFile) ? [] : getDeclarationDiagnosticsWorker(sourceFile, cancellationToken);
         }
         function getOptionsDiagnostics() {
             var allDiagnostics = [];
@@ -40157,7 +40271,7 @@ var ts;
                     }
                 }
             }
-            if (diagnostic) {
+            if (diagnostic && !exceedProgramSizeLimit()) {
                 if (refFile !== undefined && refEnd !== undefined && refPos !== undefined) {
                     fileProcessingDiagnostics.add(ts.createFileDiagnostic.apply(void 0, [refFile, refPos, refEnd - refPos, diagnostic].concat(diagnosticArgument)));
                 }
@@ -40185,6 +40299,10 @@ var ts;
                 }
                 return file_1;
             }
+            var isNonTsFile = !ts.hasTypeScriptFileExtension(fileName);
+            if (isNonTsFile && exceedProgramSizeLimit()) {
+                return undefined;
+            }
             // We haven't looked for this file, do so now and cache result
             var file = host.getSourceFile(fileName, options.target, function (hostErrorMessage) {
                 if (refFile !== undefined && refPos !== undefined && refEnd !== undefined) {
@@ -40194,6 +40312,24 @@ var ts;
                     fileProcessingDiagnostics.add(ts.createCompilerDiagnostic(ts.Diagnostics.Cannot_read_file_0_Colon_1, fileName, hostErrorMessage));
                 }
             });
+            if (isNonTsFile && !options.disableSizeLimit && file && file.text) {
+                programSizeForNonTsFiles += file.text.length;
+                if (programSizeForNonTsFiles > ts.maxProgramSizeForNonTsFiles) {
+                    // If the program size limit was reached when processing a file, this file is
+                    // likely in the problematic folder than contains too many files.
+                    // Normally the folder is one level down from the commonSourceDirectory, for example,
+                    // if the commonSourceDirectory is "/src/", and the last processed path was "/src/node_modules/a/b.js",
+                    // we should show in the error message "/src/node_modules/".
+                    var commonSourceDirectory_1 = getCommonSourceDirectory();
+                    var rootLevelDirectory = path.substring(0, Math.max(commonSourceDirectory_1.length, path.indexOf(ts.directorySeparator, commonSourceDirectory_1.length)));
+                    if (rootLevelDirectory[rootLevelDirectory.length - 1] !== ts.directorySeparator) {
+                        rootLevelDirectory += ts.directorySeparator;
+                    }
+                    programDiagnostics.add(ts.createCompilerDiagnostic(ts.Diagnostics.Too_many_JavaScript_files_in_the_project_Consider_specifying_the_exclude_setting_in_project_configuration_to_limit_included_source_folders_The_likely_folder_to_exclude_is_0_To_disable_the_project_size_limit_set_the_disableSizeLimit_compiler_option_to_true, rootLevelDirectory));
+                    programSizeForNonTsFiles = programSizeLimitExceeded;
+                    return undefined;
+                }
+            }
             filesByName.set(path, file);
             if (file) {
                 file.path = path;
@@ -40774,6 +40910,10 @@ var ts;
             name: "noCustomAsyncPromise",
             type: "boolean",
             experimental: true
+        },
+        {
+            name: "disableSizeLimit",
+            type: "boolean"
         }
     ];
     var optionNameMapCache;
@@ -40963,6 +41103,7 @@ var ts;
         return {
             options: options,
             fileNames: getFileNames(),
+            typingOptions: getTypingOptions(),
             errors: errors
         };
         function getFileNames() {
@@ -40983,7 +41124,7 @@ var ts;
                 }
                 else {
                     // by default exclude node_modules, and any specificied output directory
-                    exclude = ["node_modules"];
+                    exclude = ["node_modules", "bower_components"];
                     var outDir = json["compilerOptions"] && json["compilerOptions"]["outDir"];
                     if (outDir) {
                         exclude.push(outDir);
@@ -41021,6 +41162,34 @@ var ts;
                 }
             }
             return fileNames;
+        }
+        function getTypingOptions() {
+            var options = ts.getBaseFileName(configFileName) === "jsconfig.json"
+                ? { enableAutoDiscovery: true, include: [], exclude: [] }
+                : { enableAutoDiscovery: false, include: [], exclude: [] };
+            var jsonTypingOptions = json["typingOptions"];
+            if (jsonTypingOptions) {
+                for (var id in jsonTypingOptions) {
+                    if (id === "enableAutoDiscovery") {
+                        if (typeof jsonTypingOptions[id] === "boolean") {
+                            options.enableAutoDiscovery = jsonTypingOptions[id];
+                        }
+                        else {
+                            errors.push(ts.createCompilerDiagnostic(ts.Diagnostics.Unknown_typing_option_0, id));
+                        }
+                    }
+                    else if (id === "include") {
+                        options.include = convertJsonOptionToStringArray(id, jsonTypingOptions[id], errors);
+                    }
+                    else if (id === "exclude") {
+                        options.exclude = convertJsonOptionToStringArray(id, jsonTypingOptions[id], errors);
+                    }
+                    else {
+                        errors.push(ts.createCompilerDiagnostic(ts.Diagnostics.Unknown_typing_option_0, id));
+                    }
+                }
+            }
+            return options;
         }
     }
     ts.parseJsonConfigFileContent = parseJsonConfigFileContent;
@@ -41070,6 +41239,30 @@ var ts;
         return { options: options, errors: errors };
     }
     ts.convertCompilerOptionsFromJson = convertCompilerOptionsFromJson;
+    function convertJsonOptionToStringArray(optionName, optionJson, errors, func) {
+        var items = [];
+        var invalidOptionType = false;
+        if (!ts.isArray(optionJson)) {
+            invalidOptionType = true;
+        }
+        else {
+            for (var _i = 0, _a = optionJson; _i < _a.length; _i++) {
+                var element = _a[_i];
+                if (typeof element === "string") {
+                    var item = func ? func(element) : element;
+                    items.push(item);
+                }
+                else {
+                    invalidOptionType = true;
+                    break;
+                }
+            }
+        }
+        if (invalidOptionType) {
+            errors.push(ts.createCompilerDiagnostic(ts.Diagnostics.Option_0_should_have_array_of_strings_as_a_value, optionName));
+        }
+        return items;
+    }
 })(ts || (ts = {}));
 /* @internal */
 var ts;
@@ -41407,6 +41600,11 @@ var ts;
     var NavigationBar;
     (function (NavigationBar) {
         function getNavigationBarItems(sourceFile, compilerOptions) {
+            // TODO: Handle JS files differently in 'navbar' calls for now, but ideally we should unify
+            // the 'navbar' and 'navto' logic for TypeScript and JavaScript.
+            if (ts.isSourceFileJavaScript(sourceFile)) {
+                return getJsNavigationBarItems(sourceFile, compilerOptions);
+            }
             // If the source file has any child items, then it included in the tree
             // and takes lexical ownership of all other top-level items.
             var hasGlobalNode = false;
@@ -41558,8 +41756,8 @@ var ts;
             }
             function isTopLevelFunctionDeclaration(functionDeclaration) {
                 if (functionDeclaration.kind === 216 /* FunctionDeclaration */) {
-                    // A function declaration is 'top level' if it contains any function declarations 
-                    // within it. 
+                    // A function declaration is 'top level' if it contains any function declarations
+                    // within it.
                     if (functionDeclaration.body && functionDeclaration.body.kind === 195 /* Block */) {
                         // Proper function declarations can only have identifier names
                         if (ts.forEach(functionDeclaration.body.statements, function (s) { return s.kind === 216 /* FunctionDeclaration */ && !isEmpty(s.name.text); })) {
@@ -41817,6 +42015,188 @@ var ts;
             }
         }
         NavigationBar.getNavigationBarItems = getNavigationBarItems;
+        function getJsNavigationBarItems(sourceFile, compilerOptions) {
+            var anonFnText = "<function>";
+            var anonClassText = "<class>";
+            var indent = 0;
+            var rootName = ts.isExternalModule(sourceFile) ?
+                "\"" + ts.escapeString(ts.getBaseFileName(ts.removeFileExtension(ts.normalizePath(sourceFile.fileName)))) + "\""
+                : "<global>";
+            var sourceFileItem = getNavBarItem(rootName, ts.ScriptElementKind.moduleElement, [getNodeSpan(sourceFile)]);
+            var topItem = sourceFileItem;
+            // Walk the whole file, because we want to also find function expressions - which may be in variable initializer,
+            // call arguments, expressions, etc...
+            ts.forEachChild(sourceFile, visitNode);
+            function visitNode(node) {
+                var newItem = createNavBarItem(node);
+                if (newItem) {
+                    topItem.childItems.push(newItem);
+                }
+                // Add a level if traversing into a container
+                if (newItem && (ts.isFunctionLike(node) || ts.isClassLike(node))) {
+                    var lastTop = topItem;
+                    indent++;
+                    topItem = newItem;
+                    ts.forEachChild(node, visitNode);
+                    topItem = lastTop;
+                    indent--;
+                    // If the last item added was an anonymous function expression, and it had no children, discard it.
+                    if (newItem && newItem.text === anonFnText && newItem.childItems.length === 0) {
+                        topItem.childItems.pop();
+                    }
+                }
+                else {
+                    ts.forEachChild(node, visitNode);
+                }
+            }
+            function createNavBarItem(node) {
+                switch (node.kind) {
+                    case 214 /* VariableDeclaration */:
+                        // Only add to the navbar if at the top-level of the file
+                        // Note: "const" and "let" are also SyntaxKind.VariableDeclarations
+                        if (node.parent /*VariableDeclarationList*/.parent /*VariableStatement*/
+                            .parent /*SourceFile*/.kind !== 251 /* SourceFile */) {
+                            return undefined;
+                        }
+                        // If it is initialized with a function expression, handle it when we reach the function expression node
+                        var varDecl = node;
+                        if (varDecl.initializer && (varDecl.initializer.kind === 176 /* FunctionExpression */ ||
+                            varDecl.initializer.kind === 177 /* ArrowFunction */ ||
+                            varDecl.initializer.kind === 189 /* ClassExpression */)) {
+                            return undefined;
+                        }
+                    // Fall through
+                    case 216 /* FunctionDeclaration */:
+                    case 217 /* ClassDeclaration */:
+                    case 145 /* Constructor */:
+                    case 146 /* GetAccessor */:
+                    case 147 /* SetAccessor */:
+                        // "export default function().." looks just like a regular function/class declaration, except with the 'default' flag
+                        var name_34 = node.flags && (node.flags & 512 /* Default */) && !node.name ? "default" :
+                            node.kind === 145 /* Constructor */ ? "constructor" :
+                                ts.declarationNameToString(node.name);
+                        return getNavBarItem(name_34, getScriptKindForElementKind(node.kind), [getNodeSpan(node)]);
+                    case 176 /* FunctionExpression */:
+                    case 177 /* ArrowFunction */:
+                    case 189 /* ClassExpression */:
+                        return getDefineModuleItem(node) || getFunctionOrClassExpressionItem(node);
+                    case 144 /* MethodDeclaration */:
+                        var methodDecl = node;
+                        return getNavBarItem(ts.declarationNameToString(methodDecl.name), ts.ScriptElementKind.memberFunctionElement, [getNodeSpan(node)]);
+                    case 230 /* ExportAssignment */:
+                        // e.g. "export default <expr>"
+                        return getNavBarItem("default", ts.ScriptElementKind.variableElement, [getNodeSpan(node)]);
+                    case 226 /* ImportClause */:
+                        if (!node.name) {
+                            // No default import (this node is still a parent of named & namespace imports, which are handled below)
+                            return undefined;
+                        }
+                    // fall through
+                    case 229 /* ImportSpecifier */: // e.g. 'id' in: import {id} from 'mod' (in NamedImports, in ImportClause)
+                    case 227 /* NamespaceImport */: // e.g. '* as ns' in: import * as ns from 'mod' (in ImportClause)
+                    case 233 /* ExportSpecifier */:
+                        // Export specifiers are only interesting if they are reexports from another module, or renamed, else they are already globals
+                        if (node.kind === 233 /* ExportSpecifier */) {
+                            if (!node.parent.parent.moduleSpecifier && !node.propertyName) {
+                                return undefined;
+                            }
+                        }
+                        var decl = node;
+                        if (!decl.name) {
+                            return undefined;
+                        }
+                        var declName = ts.declarationNameToString(decl.name);
+                        return getNavBarItem(declName, ts.ScriptElementKind.constElement, [getNodeSpan(node)]);
+                    default:
+                        return undefined;
+                }
+            }
+            function getNavBarItem(text, kind, spans, kindModifiers) {
+                if (kindModifiers === void 0) { kindModifiers = ts.ScriptElementKindModifier.none; }
+                return {
+                    text: text, kind: kind, kindModifiers: kindModifiers, spans: spans, childItems: [], indent: indent, bolded: false, grayed: false
+                };
+            }
+            function getDefineModuleItem(node) {
+                if (node.kind !== 176 /* FunctionExpression */ && node.kind !== 177 /* ArrowFunction */) {
+                    return undefined;
+                }
+                // No match if this is not a call expression to an identifier named 'define'
+                if (node.parent.kind !== 171 /* CallExpression */) {
+                    return undefined;
+                }
+                var callExpr = node.parent;
+                if (callExpr.expression.kind !== 69 /* Identifier */ || callExpr.expression.getText() !== 'define') {
+                    return undefined;
+                }
+                // Return a module of either the given text in the first argument, or of the source file path
+                var defaultName = node.getSourceFile().fileName;
+                if (callExpr.arguments[0].kind === 9 /* StringLiteral */) {
+                    defaultName = (callExpr.arguments[0]).text;
+                }
+                return getNavBarItem(defaultName, ts.ScriptElementKind.moduleElement, [getNodeSpan(node.parent)]);
+            }
+            function getFunctionOrClassExpressionItem(node) {
+                if (node.kind !== 176 /* FunctionExpression */ &&
+                    node.kind !== 177 /* ArrowFunction */ &&
+                    node.kind !== 189 /* ClassExpression */) {
+                    return undefined;
+                }
+                var fnExpr = node;
+                var fnName;
+                if (fnExpr.name && ts.getFullWidth(fnExpr.name) > 0) {
+                    // The expression has an identifier, so use that as the name
+                    fnName = ts.declarationNameToString(fnExpr.name);
+                }
+                else {
+                    // See if it is a var initializer. If so, use the var name.
+                    if (fnExpr.parent.kind === 214 /* VariableDeclaration */) {
+                        fnName = ts.declarationNameToString(fnExpr.parent.name);
+                    }
+                    else if (fnExpr.parent.kind === 184 /* BinaryExpression */ &&
+                        fnExpr.parent.operatorToken.kind === 56 /* EqualsToken */) {
+                        fnName = fnExpr.parent.left.getText();
+                        if (fnName.length > 20) {
+                            fnName = fnName.substring(0, 17) + "...";
+                        }
+                    }
+                    else if (fnExpr.parent.kind === 248 /* PropertyAssignment */ &&
+                        fnExpr.parent.name) {
+                        fnName = fnExpr.parent.name.getText();
+                    }
+                    else {
+                        fnName = node.kind === 189 /* ClassExpression */ ? anonClassText : anonFnText;
+                    }
+                }
+                var scriptKind = node.kind === 189 /* ClassExpression */ ? ts.ScriptElementKind.classElement : ts.ScriptElementKind.functionElement;
+                return getNavBarItem(fnName, scriptKind, [getNodeSpan(node)]);
+            }
+            function getNodeSpan(node) {
+                return node.kind === 251 /* SourceFile */
+                    ? ts.createTextSpanFromBounds(node.getFullStart(), node.getEnd())
+                    : ts.createTextSpanFromBounds(node.getStart(), node.getEnd());
+            }
+            function getScriptKindForElementKind(kind) {
+                switch (kind) {
+                    case 214 /* VariableDeclaration */:
+                        return ts.ScriptElementKind.variableElement;
+                    case 216 /* FunctionDeclaration */:
+                        return ts.ScriptElementKind.functionElement;
+                    case 217 /* ClassDeclaration */:
+                        return ts.ScriptElementKind.classElement;
+                    case 145 /* Constructor */:
+                        return ts.ScriptElementKind.constructorImplementationElement;
+                    case 146 /* GetAccessor */:
+                        return ts.ScriptElementKind.memberGetAccessorElement;
+                    case 147 /* SetAccessor */:
+                        return ts.ScriptElementKind.memberSetAccessorElement;
+                    default:
+                        return "unknown";
+                }
+            }
+            return sourceFileItem.childItems;
+        }
+        NavigationBar.getJsNavigationBarItems = getJsNavigationBarItems;
     })(NavigationBar = ts.NavigationBar || (ts.NavigationBar = {}));
 })(ts || (ts = {}));
 /* @internal */
@@ -43733,6 +44113,212 @@ var ts;
         return name;
     }
     ts.stripQuotes = stripQuotes;
+    function scriptKindIs(fileName, host) {
+        var scriptKinds = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            scriptKinds[_i - 2] = arguments[_i];
+        }
+        var scriptKind = getScriptKind(fileName, host);
+        return ts.forEach(scriptKinds, function (k) { return k === scriptKind; });
+    }
+    ts.scriptKindIs = scriptKindIs;
+    function getScriptKind(fileName, host) {
+        // First check to see if the script kind can be determined from the file name
+        var scriptKind = ts.getScriptKindFromFileName(fileName);
+        if (scriptKind === 0 /* Unknown */ && host && host.getScriptKind) {
+            // Next check to see if the host can resolve the script kind
+            scriptKind = host.getScriptKind(fileName);
+        }
+        return ts.ensureScriptKind(fileName, scriptKind);
+    }
+    ts.getScriptKind = getScriptKind;
+})(ts || (ts = {}));
+// Copyright (c) Microsoft. All rights reserved. Licensed under the Apache License, Version 2.0.
+// See LICENSE.txt in the project root for complete license information.
+/// <reference path='services.ts' />
+/* @internal */
+var ts;
+(function (ts) {
+    var JsTyping;
+    (function (JsTyping) {
+        ;
+        ;
+        // A map of loose file names to library names
+        // that we are confident require typings
+        var safeList;
+        /**
+         * @param host is the object providing I/O related operations.
+         * @param fileNames are the file names that belong to the same project
+         * @param projectRootPath is the path to the project root directory
+         * @param safeListPath is the path used to retrieve the safe list
+         * @param packageNameToTypingLocation is the map of package names to their cached typing locations
+         * @param typingOptions are used to customize the typing inference process
+         * @param compilerOptions are used as a source for typing inference
+         */
+        function discoverTypings(host, fileNames, projectRootPath, safeListPath, packageNameToTypingLocation, typingOptions, compilerOptions) {
+            // A typing name to typing file path mapping
+            var inferredTypings = {};
+            if (!typingOptions || !typingOptions.enableAutoDiscovery) {
+                return { cachedTypingPaths: [], newTypingNames: [], filesToWatch: [] };
+            }
+            // Only infer typings for .js and .jsx files
+            fileNames = ts.filter(ts.map(fileNames, ts.normalizePath), function (f) { return ts.scriptKindIs(f, /*LanguageServiceHost*/ undefined, 1 /* JS */, 2 /* JSX */); });
+            if (!safeList) {
+                var result = ts.readConfigFile(safeListPath, function (path) { return host.readFile(path); });
+                if (result.config) {
+                    safeList = result.config;
+                }
+                else {
+                    safeList = {};
+                }
+            }
+            var filesToWatch = [];
+            // Directories to search for package.json, bower.json and other typing information
+            var searchDirs = [];
+            var exclude = [];
+            mergeTypings(typingOptions.include);
+            exclude = typingOptions.exclude || [];
+            var possibleSearchDirs = ts.map(fileNames, ts.getDirectoryPath);
+            if (projectRootPath !== undefined) {
+                possibleSearchDirs.push(projectRootPath);
+            }
+            searchDirs = ts.deduplicate(possibleSearchDirs);
+            for (var _i = 0, searchDirs_1 = searchDirs; _i < searchDirs_1.length; _i++) {
+                var searchDir = searchDirs_1[_i];
+                var packageJsonPath = ts.combinePaths(searchDir, "package.json");
+                getTypingNamesFromJson(packageJsonPath, filesToWatch);
+                var bowerJsonPath = ts.combinePaths(searchDir, "bower.json");
+                getTypingNamesFromJson(bowerJsonPath, filesToWatch);
+                var nodeModulesPath = ts.combinePaths(searchDir, "node_modules");
+                getTypingNamesFromNodeModuleFolder(nodeModulesPath);
+            }
+            getTypingNamesFromSourceFileNames(fileNames);
+            // Add the cached typing locations for inferred typings that are already installed
+            for (var name_35 in packageNameToTypingLocation) {
+                if (ts.hasProperty(inferredTypings, name_35) && !inferredTypings[name_35]) {
+                    inferredTypings[name_35] = packageNameToTypingLocation[name_35];
+                }
+            }
+            // Remove typings that the user has added to the exclude list
+            for (var _a = 0, exclude_1 = exclude; _a < exclude_1.length; _a++) {
+                var excludeTypingName = exclude_1[_a];
+                delete inferredTypings[excludeTypingName];
+            }
+            var newTypingNames = [];
+            var cachedTypingPaths = [];
+            for (var typing in inferredTypings) {
+                if (inferredTypings[typing] !== undefined) {
+                    cachedTypingPaths.push(inferredTypings[typing]);
+                }
+                else {
+                    newTypingNames.push(typing);
+                }
+            }
+            return { cachedTypingPaths: cachedTypingPaths, newTypingNames: newTypingNames, filesToWatch: filesToWatch };
+            /**
+             * Merge a given list of typingNames to the inferredTypings map
+             */
+            function mergeTypings(typingNames) {
+                if (!typingNames) {
+                    return;
+                }
+                for (var _i = 0, typingNames_1 = typingNames; _i < typingNames_1.length; _i++) {
+                    var typing = typingNames_1[_i];
+                    if (!ts.hasProperty(inferredTypings, typing)) {
+                        inferredTypings[typing] = undefined;
+                    }
+                }
+            }
+            /**
+             * Get the typing info from common package manager json files like package.json or bower.json
+             */
+            function getTypingNamesFromJson(jsonPath, filesToWatch) {
+                var result = ts.readConfigFile(jsonPath, function (path) { return host.readFile(path); });
+                if (result.config) {
+                    var jsonConfig = result.config;
+                    filesToWatch.push(jsonPath);
+                    if (jsonConfig.dependencies) {
+                        mergeTypings(ts.getKeys(jsonConfig.dependencies));
+                    }
+                    if (jsonConfig.devDependencies) {
+                        mergeTypings(ts.getKeys(jsonConfig.devDependencies));
+                    }
+                    if (jsonConfig.optionalDependencies) {
+                        mergeTypings(ts.getKeys(jsonConfig.optionalDependencies));
+                    }
+                    if (jsonConfig.peerDependencies) {
+                        mergeTypings(ts.getKeys(jsonConfig.peerDependencies));
+                    }
+                }
+            }
+            /**
+             * Infer typing names from given file names. For example, the file name "jquery-min.2.3.4.js"
+             * should be inferred to the 'jquery' typing name; and "angular-route.1.2.3.js" should be inferred
+             * to the 'angular-route' typing name.
+             * @param fileNames are the names for source files in the project
+             */
+            function getTypingNamesFromSourceFileNames(fileNames) {
+                var jsFileNames = ts.filter(fileNames, ts.hasJavaScriptFileExtension);
+                var inferredTypingNames = ts.map(jsFileNames, function (f) { return ts.removeFileExtension(ts.getBaseFileName(f.toLowerCase())); });
+                var cleanedTypingNames = ts.map(inferredTypingNames, function (f) { return f.replace(/((?:\.|-)min(?=\.|$))|((?:-|\.)\d+)/g, ""); });
+                if (safeList === undefined) {
+                    mergeTypings(cleanedTypingNames);
+                }
+                else {
+                    mergeTypings(ts.filter(cleanedTypingNames, function (f) { return ts.hasProperty(safeList, f); }));
+                }
+                var hasJsxFile = ts.forEach(fileNames, function (f) { return ts.scriptKindIs(f, /*LanguageServiceHost*/ undefined, 2 /* JSX */); });
+                if (hasJsxFile) {
+                    mergeTypings(["react"]);
+                }
+            }
+            /**
+             * Infer typing names from node_module folder
+             * @param nodeModulesPath is the path to the "node_modules" folder
+             */
+            function getTypingNamesFromNodeModuleFolder(nodeModulesPath) {
+                // Todo: add support for ModuleResolutionHost too
+                if (!host.directoryExists(nodeModulesPath)) {
+                    return;
+                }
+                var typingNames = [];
+                var fileNames = host.readDirectory(nodeModulesPath, "*.json", /*exclude*/ undefined, /*depth*/ 2);
+                for (var _i = 0, fileNames_1 = fileNames; _i < fileNames_1.length; _i++) {
+                    var fileName = fileNames_1[_i];
+                    var normalizedFileName = ts.normalizePath(fileName);
+                    if (ts.getBaseFileName(normalizedFileName) !== "package.json") {
+                        continue;
+                    }
+                    var result = ts.readConfigFile(normalizedFileName, function (path) { return host.readFile(path); });
+                    if (!result.config) {
+                        continue;
+                    }
+                    var packageJson = result.config;
+                    // npm 3's package.json contains a "_requiredBy" field
+                    // we should include all the top level module names for npm 2, and only module names whose
+                    // "_requiredBy" field starts with "#" or equals "/" for npm 3.
+                    if (packageJson._requiredBy &&
+                        ts.filter(packageJson._requiredBy, function (r) { return r[0] === "#" || r === "/"; }).length === 0) {
+                        continue;
+                    }
+                    // If the package has its own d.ts typings, those will take precedence. Otherwise the package name will be used
+                    // to download d.ts files from DefinitelyTyped
+                    if (!packageJson.name) {
+                        continue;
+                    }
+                    if (packageJson.typings) {
+                        var absolutePath = ts.getNormalizedAbsolutePath(packageJson.typings, ts.getDirectoryPath(normalizedFileName));
+                        inferredTypings[packageJson.name] = absolutePath;
+                    }
+                    else {
+                        typingNames.push(packageJson.name);
+                    }
+                }
+                mergeTypings(typingNames);
+            }
+        }
+        JsTyping.discoverTypings = discoverTypings;
+    })(JsTyping = ts.JsTyping || (ts.JsTyping = {}));
 })(ts || (ts = {}));
 /// <reference path="formatting.ts"/>
 /// <reference path="..\..\compiler\scanner.ts"/>
@@ -44443,9 +45029,9 @@ var ts;
             }
             Rules.prototype.getRuleName = function (rule) {
                 var o = this;
-                for (var name_34 in o) {
-                    if (o[name_34] === rule) {
-                        return name_34;
+                for (var name_36 in o) {
+                    if (o[name_36] === rule) {
+                        return name_36;
                     }
                 }
                 throw new Error("Unknown rule");
@@ -45120,12 +45706,20 @@ var ts;
             if (line === 0) {
                 return [];
             }
-            // get the span for the previous\current line
+            // After the enter key, the cursor is now at a new line. The new line may or may not contain non-whitespace characters.
+            // If the new line has only whitespaces, we won't want to format this line, because that would remove the indentation as
+            // trailing whitespaces. So the end of the formatting span should be the later one between:
+            //  1. the end of the previous line
+            //  2. the last non-whitespace character in the current line
+            var endOfFormatSpan = ts.getEndLinePosition(line, sourceFile);
+            while (ts.isWhiteSpace(sourceFile.text.charCodeAt(endOfFormatSpan)) && !ts.isLineBreak(sourceFile.text.charCodeAt(endOfFormatSpan))) {
+                endOfFormatSpan--;
+            }
             var span = {
                 // get start position for the previous line
                 pos: ts.getStartPositionOfLine(line - 1, sourceFile),
-                // get end position for the current line (end value is exclusive so add 1 to the result)
-                end: ts.getEndLinePosition(line, sourceFile) + 1
+                // end value is exclusive so add 1 to the result
+                end: endOfFormatSpan + 1
             };
             return formatSpan(span, sourceFile, options, rulesProvider, 2 /* FormatOnEnter */);
         }
@@ -46447,12 +47041,13 @@ var ts;
 /// <reference path='patternMatcher.ts' />
 /// <reference path='signatureHelp.ts' />
 /// <reference path='utilities.ts' />
+/// <reference path='jsTyping.ts' />
 /// <reference path='formatting\formatting.ts' />
 /// <reference path='formatting\smartIndenter.ts' />
 var ts;
 (function (ts) {
     /** The version of the language service API */
-    ts.servicesVersion = "0.4";
+    ts.servicesVersion = "0.5";
     var ScriptSnapshot;
     (function (ScriptSnapshot) {
         var StringScriptSnapshot = (function () {
@@ -47440,7 +48035,8 @@ var ts;
                 entry = {
                     hostFileName: fileName,
                     version: this.host.getScriptVersion(fileName),
-                    scriptSnapshot: scriptSnapshot
+                    scriptSnapshot: scriptSnapshot,
+                    scriptKind: ts.getScriptKind(fileName, this.host)
                 };
             }
             this.fileNameToEntry.set(path, entry);
@@ -47488,11 +48084,12 @@ var ts;
                 // The host does not know about this file.
                 throw new Error("Could not find file: '" + fileName + "'.");
             }
+            var scriptKind = ts.getScriptKind(fileName, this.host);
             var version = this.host.getScriptVersion(fileName);
             var sourceFile;
             if (this.currentFileName !== fileName) {
                 // This is a new file, just parse it
-                sourceFile = createLanguageServiceSourceFile(fileName, scriptSnapshot, 2 /* Latest */, version, /*setNodeParents*/ true);
+                sourceFile = createLanguageServiceSourceFile(fileName, scriptSnapshot, 2 /* Latest */, version, /*setNodeParents*/ true, scriptKind);
             }
             else if (this.currentFileVersion !== version) {
                 // This is the same file, just a newer version. Incrementally parse the file.
@@ -47592,9 +48189,9 @@ var ts;
         return output.outputText;
     }
     ts.transpile = transpile;
-    function createLanguageServiceSourceFile(fileName, scriptSnapshot, scriptTarget, version, setNodeParents) {
+    function createLanguageServiceSourceFile(fileName, scriptSnapshot, scriptTarget, version, setNodeParents, scriptKind) {
         var text = scriptSnapshot.getText(0, scriptSnapshot.getLength());
-        var sourceFile = ts.createSourceFile(fileName, text, scriptTarget, setNodeParents);
+        var sourceFile = ts.createSourceFile(fileName, text, scriptTarget, setNodeParents, scriptKind);
         setSourceFileFields(sourceFile, scriptSnapshot, version);
         return sourceFile;
     }
@@ -47647,7 +48244,7 @@ var ts;
             }
         }
         // Otherwise, just create a new source file.
-        return createLanguageServiceSourceFile(sourceFile.fileName, scriptSnapshot, sourceFile.languageVersion, version, /*setNodeParents*/ true);
+        return createLanguageServiceSourceFile(sourceFile.fileName, scriptSnapshot, sourceFile.languageVersion, version, /*setNodeParents*/ true, sourceFile.scriptKind);
     }
     ts.updateLanguageServiceSourceFile = updateLanguageServiceSourceFile;
     function createDocumentRegistry(useCaseSensitiveFileNames, currentDirectory) {
@@ -47686,20 +48283,20 @@ var ts;
             });
             return JSON.stringify(bucketInfoArray, undefined, 2);
         }
-        function acquireDocument(fileName, compilationSettings, scriptSnapshot, version) {
-            return acquireOrUpdateDocument(fileName, compilationSettings, scriptSnapshot, version, /*acquiring*/ true);
+        function acquireDocument(fileName, compilationSettings, scriptSnapshot, version, scriptKind) {
+            return acquireOrUpdateDocument(fileName, compilationSettings, scriptSnapshot, version, /*acquiring*/ true, scriptKind);
         }
-        function updateDocument(fileName, compilationSettings, scriptSnapshot, version) {
-            return acquireOrUpdateDocument(fileName, compilationSettings, scriptSnapshot, version, /*acquiring*/ false);
+        function updateDocument(fileName, compilationSettings, scriptSnapshot, version, scriptKind) {
+            return acquireOrUpdateDocument(fileName, compilationSettings, scriptSnapshot, version, /*acquiring*/ false, scriptKind);
         }
-        function acquireOrUpdateDocument(fileName, compilationSettings, scriptSnapshot, version, acquiring) {
+        function acquireOrUpdateDocument(fileName, compilationSettings, scriptSnapshot, version, acquiring, scriptKind) {
             var bucket = getBucketForCompilationSettings(compilationSettings, /*createIfMissing*/ true);
             var path = ts.toPath(fileName, currentDirectory, getCanonicalFileName);
             var entry = bucket.get(path);
             if (!entry) {
                 ts.Debug.assert(acquiring, "How could we be trying to update a document that the registry doesn't have?");
                 // Have never seen this file with these settings.  Create a new source file for it.
-                var sourceFile = createLanguageServiceSourceFile(fileName, scriptSnapshot, compilationSettings.target, version, /*setNodeParents*/ false);
+                var sourceFile = createLanguageServiceSourceFile(fileName, scriptSnapshot, compilationSettings.target, version, /*setNodeParents*/ false, scriptKind);
                 entry = {
                     sourceFile: sourceFile,
                     languageServiceRefCount: 0,
@@ -48301,7 +48898,8 @@ var ts;
                     oldSettings.module !== newSettings.module ||
                     oldSettings.noResolve !== newSettings.noResolve ||
                     oldSettings.jsx !== newSettings.jsx ||
-                    oldSettings.allowJs !== newSettings.allowJs);
+                    oldSettings.allowJs !== newSettings.allowJs ||
+                    oldSettings.disableSizeLimit !== oldSettings.disableSizeLimit);
             // Now create a new compiler
             var compilerHost = {
                 getSourceFile: getOrCreateSourceFile,
@@ -48387,11 +48985,15 @@ var ts;
                         // it's source file any more, and instead defers to DocumentRegistry to get
                         // either version 1, version 2 (or some other version) depending on what the
                         // host says should be used.
-                        return documentRegistry.updateDocument(fileName, newSettings, hostFileInformation.scriptSnapshot, hostFileInformation.version);
+                        // We do not support the scenario where a host can modify a registered
+                        // file's script kind, i.e. in one project some file is treated as ".ts"
+                        // and in another as ".js"
+                        ts.Debug.assert(hostFileInformation.scriptKind === oldSourceFile.scriptKind, "Registered script kind (" + oldSourceFile.scriptKind + ") should match new script kind (" + hostFileInformation.scriptKind + ") for file: " + fileName);
+                        return documentRegistry.updateDocument(fileName, newSettings, hostFileInformation.scriptSnapshot, hostFileInformation.version, hostFileInformation.scriptKind);
                     }
                 }
                 // Could not find this file in the old program, create a new SourceFile for it.
-                return documentRegistry.acquireDocument(fileName, newSettings, hostFileInformation.scriptSnapshot, hostFileInformation.version);
+                return documentRegistry.acquireDocument(fileName, newSettings, hostFileInformation.scriptSnapshot, hostFileInformation.version, hostFileInformation.scriptKind);
             }
             function sourceFileUpToDate(sourceFile) {
                 if (!sourceFile) {
@@ -49144,8 +49746,8 @@ var ts;
                     if (element.getStart() <= position && position <= element.getEnd()) {
                         continue;
                     }
-                    var name_35 = element.propertyName || element.name;
-                    exisingImportsOrExports[name_35.text] = true;
+                    var name_37 = element.propertyName || element.name;
+                    exisingImportsOrExports[name_37.text] = true;
                 }
                 if (ts.isEmpty(exisingImportsOrExports)) {
                     return exportsOfModule;
@@ -49262,14 +49864,14 @@ var ts;
                 var entries = [];
                 var target = program.getCompilerOptions().target;
                 var nameTable = getNameTable(sourceFile);
-                for (var name_36 in nameTable) {
+                for (var name_38 in nameTable) {
                     // Skip identifiers produced only from the current location
-                    if (nameTable[name_36] === position) {
+                    if (nameTable[name_38] === position) {
                         continue;
                     }
-                    if (!uniqueNames[name_36]) {
-                        uniqueNames[name_36] = name_36;
-                        var displayName = getCompletionEntryDisplayName(name_36, target, /*performCharacterChecks*/ true);
+                    if (!uniqueNames[name_38]) {
+                        uniqueNames[name_38] = name_38;
+                        var displayName = getCompletionEntryDisplayName(name_38, target, /*performCharacterChecks*/ true);
                         if (displayName) {
                             var entry = {
                                 name: displayName,
@@ -51221,19 +51823,19 @@ var ts;
                 if (isNameOfPropertyAssignment(node)) {
                     var objectLiteral = node.parent.parent;
                     var contextualType = typeChecker.getContextualType(objectLiteral);
-                    var name_37 = node.text;
+                    var name_39 = node.text;
                     if (contextualType) {
                         if (contextualType.flags & 16384 /* Union */) {
                             // This is a union type, first see if the property we are looking for is a union property (i.e. exists in all types)
                             // if not, search the constituent types for the property
-                            var unionProperty = contextualType.getProperty(name_37);
+                            var unionProperty = contextualType.getProperty(name_39);
                             if (unionProperty) {
                                 return [unionProperty];
                             }
                             else {
                                 var result_6 = [];
                                 ts.forEach(contextualType.types, function (t) {
-                                    var symbol = t.getProperty(name_37);
+                                    var symbol = t.getProperty(name_39);
                                     if (symbol) {
                                         result_6.push(symbol);
                                     }
@@ -51242,7 +51844,7 @@ var ts;
                             }
                         }
                         else {
-                            var symbol_1 = contextualType.getProperty(name_37);
+                            var symbol_1 = contextualType.getProperty(name_39);
                             if (symbol_1) {
                                 return [symbol_1];
                             }
@@ -53619,6 +54221,14 @@ var ts;
             var scriptSnapshot = this.shimHost.getScriptSnapshot(fileName);
             return scriptSnapshot && new ScriptSnapshotShimAdapter(scriptSnapshot);
         };
+        LanguageServiceShimHostAdapter.prototype.getScriptKind = function (fileName) {
+            if ("getScriptKind" in this.shimHost) {
+                return this.shimHost.getScriptKind(fileName);
+            }
+            else {
+                return 0 /* Unknown */;
+            }
+        };
         LanguageServiceShimHostAdapter.prototype.getScriptVersion = function (fileName) {
             return this.shimHost.getScriptVersion(fileName);
         };
@@ -53677,8 +54287,16 @@ var ts;
                 this.directoryExists = function (directoryName) { return _this.shimHost.directoryExists(directoryName); };
             }
         }
-        CoreServicesShimHostAdapter.prototype.readDirectory = function (rootDir, extension, exclude) {
-            var encoded = this.shimHost.readDirectory(rootDir, extension, JSON.stringify(exclude));
+        CoreServicesShimHostAdapter.prototype.readDirectory = function (rootDir, extension, exclude, depth) {
+            // Wrap the API changes for 2.0 release. This try/catch
+            // should be removed once TypeScript 2.0 has shipped.
+            var encoded;
+            try {
+                encoded = this.shimHost.readDirectory(rootDir, extension, JSON.stringify(exclude), depth);
+            }
+            catch (e) {
+                encoded = this.shimHost.readDirectory(rootDir, extension, JSON.stringify(exclude));
+            }
             return JSON.parse(encoded);
         };
         CoreServicesShimHostAdapter.prototype.fileExists = function (fileName) {
@@ -54081,6 +54699,7 @@ var ts;
                 if (result.error) {
                     return {
                         options: {},
+                        typingOptions: {},
                         files: [],
                         errors: [realizeDiagnostic(result.error, "\r\n")]
                     };
@@ -54089,6 +54708,7 @@ var ts;
                 var configFile = ts.parseJsonConfigFileContent(result.config, _this.host, ts.getDirectoryPath(normalizedFileName), /*existingOptions*/ {}, normalizedFileName);
                 return {
                     options: configFile.options,
+                    typingOptions: configFile.typingOptions,
                     files: configFile.fileNames,
                     errors: realizeDiagnostics(configFile.errors, "\r\n")
                 };
@@ -54096,6 +54716,14 @@ var ts;
         };
         CoreServicesShimObject.prototype.getDefaultCompilationSettings = function () {
             return this.forwardJSONCall("getDefaultCompilationSettings()", function () { return ts.getDefaultCompilerOptions(); });
+        };
+        CoreServicesShimObject.prototype.discoverTypings = function (discoverTypingsJson) {
+            var _this = this;
+            var getCanonicalFileName = ts.createGetCanonicalFileName(/*useCaseSensitivefileNames:*/ false);
+            return this.forwardJSONCall("discoverTypings()", function () {
+                var info = JSON.parse(discoverTypingsJson);
+                return ts.JsTyping.discoverTypings(_this.host, info.fileNames, ts.toPath(info.projectRootPath, info.projectRootPath, getCanonicalFileName), ts.toPath(info.safeListPath, info.safeListPath, getCanonicalFileName), info.packageNameToTypingLocation, info.typingOptions, info.compilerOptions);
+            });
         };
         return CoreServicesShimObject;
     }(ShimBase));

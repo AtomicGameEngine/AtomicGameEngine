@@ -18,6 +18,6 @@ Data/AtomicEditor/Deployment/Web/AtomicPlayer.html.mem
 Data/AtomicEditor/Deployment/IOS/AtomicPlayer.app/AtomicPlayer
 node_modules/*
 /.project
-Script/TypeScript/*
-!Script/TypeScript/AtomicWork.d.ts
+Script/TypeScript/**/*.d.ts
+!Script/TypeScript/**/*Work.d.ts
 Script/Haxe/*

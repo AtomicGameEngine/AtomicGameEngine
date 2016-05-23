@@ -69,7 +69,7 @@ export function CreateNewFolder(resourcePath: string, reportError: boolean = tru
 
 }
 
-export function CreateNewComponent(resourcePath: string, componentName: string, reportError: boolean = true): boolean {
+export function CreateNewComponent(resourcePath: string, componentName: string, template: Editor.Templates.FileTemplateDefinition, reportError: boolean = true): boolean {
 
     var title = "New Component Error";
 
@@ -82,7 +82,7 @@ export function CreateNewComponent(resourcePath: string, componentName: string, 
 
     }
 
-    var templateFilename = "AtomicEditor/templates/template_component.js";
+    var templateFilename = template.filename;
     var file = Atomic.cache.getFile(templateFilename);
 
     if (!file) {
@@ -109,7 +109,7 @@ export function CreateNewComponent(resourcePath: string, componentName: string, 
 
 }
 
-export function CreateNewScript(resourcePath: string, scriptName: string, reportError: boolean = true): boolean {
+export function CreateNewScript(resourcePath: string, scriptName: string, template: Editor.Templates.FileTemplateDefinition, reportError: boolean = true): boolean {
 
     var title = "New Script Error";
 
@@ -122,7 +122,7 @@ export function CreateNewScript(resourcePath: string, scriptName: string, report
 
     }
 
-    var templateFilename = "AtomicEditor/templates/template_script.js";
+    var templateFilename = template.filename;
     var file = Atomic.cache.getFile(templateFilename);
 
     if (!file) {

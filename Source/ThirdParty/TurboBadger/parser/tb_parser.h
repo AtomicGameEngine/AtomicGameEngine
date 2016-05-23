@@ -47,7 +47,7 @@ public:
         STATUS_OUT_OF_MEMORY,
         STATUS_PARSE_ERROR
     };
-    TBParser() {}
+    TBParser() { indent_spaces = -1; indent_tabs = false; }
     STATUS Read(TBParserStream *stream, TBParserTarget *target);
 private:
     int current_indent;
@@ -60,6 +60,9 @@ private:
     void OnCompactLine(char *line, TBParserTarget *target);
     void OnMultiline(char *line, TBParserTarget *target);
     void ConsumeValue(TBValue &dst_value, char *&line);
+
+    int indent_spaces;
+    bool indent_tabs;
 };
 
 }; // namespace tb

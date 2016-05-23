@@ -156,7 +156,7 @@ ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabCo
 
     SubscribeToEvent(E_FILECHANGED, HANDLER(ResourceEditor, HandleFileChanged));
     SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(ResourceEditor, HandleRenameResourceNotification));
-    
+
 }
 
 ResourceEditor::~ResourceEditor()
@@ -184,10 +184,14 @@ void ResourceEditor::HandleRenameResourceNotification(StringHash eventType, Vari
 {
     using namespace RenameResourceNotification;
     const String& newPath = eventData[P_NEWRESOURCEPATH].GetString();
-    fullpath_ = newPath;
-    SetModified(modified_);
+    const String& path = eventData[P_RESOURCEPATH].GetString();
+
+    if (fullpath_.Compare(path) == 0) {
+        fullpath_ = newPath;
+        SetModified(modified_);
+    }
 }
-    
+
 void ResourceEditor::RequestClose()
 {
     editorTabLayout_->RequestClose();
@@ -228,11 +232,9 @@ void ResourceEditor::SetModified(bool modified)
         button_->SetText(filename.CString());
     }
 }
-    
-    
-void ResourceEditor::ProjectUnloaded() {}
+
     
 void ResourceEditor::Delete() {}
-    
-    
+
+
 }

@@ -47,7 +47,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
     createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
         if (!this.pluginMenuItemSource) {
             var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
-            this.pluginMenuItemSource = MenuItemSources.createSubMenuItemSource(developerMenuItemSource ,"Plugins", {});
+            this.pluginMenuItemSource = MenuItemSources.createSubMenuItemSource(developerMenuItemSource, "Plugins", {});
         }
 
         return MenuItemSources.createSubMenuItemSource(this.pluginMenuItemSource , id, items);
@@ -293,10 +293,6 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 EditorUI.getModelOps().showAbout();
                 return true;
             }
-            if (refid == "manage license") {
-                EditorUI.getModelOps().showManageLicense();
-                return true;
-            }
             if (refid == "help forums") {
                 Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/");
                 return true;
@@ -311,13 +307,13 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/");
                 return true;
             } else if (refid == "help api") {
-                var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/Atomic.html";
+                var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/index.html";
                 Atomic.fileSystem.systemOpen(url);
                 return true;
             }
 
         } else {
-            console.log("Menu: " + target.id + " clicked");
+            // console.log("Menu: " + target.id + " clicked");
         }
 
     }

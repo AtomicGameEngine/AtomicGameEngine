@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/Core/ProcessUtils.h>
+#include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 
 #include "JSBPackage.h"
@@ -57,6 +58,11 @@ bool JSBind::LoadPackage(const String& sourceRootFolder, const String& packageFo
 bool JSBind::GenerateCSharpBindings()
 {
 
+    if (!package_->GenerateBindings(JSBPackage::CSHARP))
+        return true;
+
+    LOGINFOF("Generating C# Bindings");
+
     String modulesFolder = "Artifacts/Build/Source/Generated/" + platform_ + "/CSharp/Packages/";
     modulesFolder += package_->GetName() + "/";
 
@@ -90,6 +96,11 @@ bool JSBind::GenerateCSharpBindings()
 
 bool JSBind::GenerateJavaScriptBindings()
 {
+    if (!package_->GenerateBindings(JSBPackage::JAVASCRIPT))
+        return true;
+
+    LOGINFOF("Generating JS Bindings");
+
     String modulesFolder = "Artifacts/Build/Source/Generated/" + platform_ + "/Javascript/Packages/";
     modulesFolder += package_->GetName() + "/";
 

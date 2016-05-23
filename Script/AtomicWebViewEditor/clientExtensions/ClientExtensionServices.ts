@@ -76,15 +76,18 @@ class ServicesProvider<T extends Editor.Extensions.ServiceEventListener> impleme
 
 export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExtensions.WebViewServiceEventListener> {
 
-    private userPreferences = {};
+    private projectPreferences = {};
+    private applicationPreferences = {};
 
     /**
      * Sets the preferences for the service locator
-     * @param  {any} prefs
+     * @param  {any} projectPreferences
+     * @param  {any} applicationPreferences
      * @return {[type]}
      */
-    setPreferences(prefs : any) {
-        this.userPreferences = prefs;
+    setPreferences(projectPreferences?: any, applicationPreferences?: any) {
+        this.projectPreferences = projectPreferences || this.projectPreferences;
+        this.applicationPreferences = applicationPreferences || this.applicationPreferences;
     }
 
     /**
@@ -97,7 +100,7 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceRenamedEvent, (ev) => this.renameResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeSavedEvent, (ev) => this.saveCode(ev));
-        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged());
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged(ev));
     }
 
     /**
@@ -189,12 +192,12 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
      * Called when preferences changes
      * @param  {Editor.EditorEvents.PreferencesChangedEvent} ev
      */
-    preferencesChanged() {
+    preferencesChanged(prefs: Editor.ClientExtensions.PreferencesChangedEventData) {
         this.registeredServices.forEach((service) => {
             // Notify services that the project has been unloaded
             try {
                 if (service.preferencesChanged) {
-                    service.preferencesChanged();
+                    service.preferencesChanged(prefs);
                 }
             } catch (e) {
                 alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
@@ -213,16 +216,19 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
 
     /**
      * Return a preference value or the provided default from the user settings file
-     * @param  {string} gorupName name of the group the preference lives under
+     * @param  {string} settignsGroup name of the group the preference lives under
      * @param  {string} preferenceName name of the preference to retrieve
      * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
      * @return {number|boolean|string}
      */
-    getUserPreference(groupName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
-        if (this.userPreferences) {
-            let prefs = this.userPreferences[groupName];
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
+        if (this.projectPreferences) {
+            let prefs = this.projectPreferences[settingsGroup];
             if (prefs) {
-                return prefs[groupName][preferenceName] || defaultValue;
+                return prefs[preferenceName] || defaultValue;
             }
         }
 
@@ -230,5 +236,26 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         return defaultValue;
     }
 
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} settignsGroup name of the group the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
+        if (this.applicationPreferences) {
+            let prefs = this.applicationPreferences[settingsGroup];
+            if (prefs) {
+                return prefs[preferenceName] || defaultValue;
+            }
+        }
+
+        // if all else fails
+        return defaultValue;
+    }
 
 }

@@ -38,7 +38,7 @@
 #include <AtomicJS/Javascript/JSEvents.h>
 #include <AtomicJS/Javascript/JSIPCEvents.h>
 
-#include "AEPlayerEvents.h"
+#include <AtomicApp/Player/IPCPlayerAppEvents.h>
 
 #include "AEPlayerMode.h"
 

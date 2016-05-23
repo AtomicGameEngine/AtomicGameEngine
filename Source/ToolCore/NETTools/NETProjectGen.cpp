@@ -35,497 +35,642 @@
 namespace ToolCore
 {
 
-NETProjectBase::NETProjectBase(Context* context, NETProjectGen* projectGen):
-    Object(context), xmlFile_(new XMLFile(context)), projectGen_(projectGen)
-{
-
-}
-
-NETProjectBase::~NETProjectBase()
-{
-
-}
-
-void NETProjectBase::ReplacePathStrings(String& path)
-{
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    ToolSystem* tsys = GetSubsystem<ToolSystem>();
-
-    const String& atomicRoot = tenv->GetRootSourceDir();
-    const String& scriptPlatform = projectGen_->GetScriptPlatform();
-
-    path.Replace("$ATOMIC_ROOT$", atomicRoot, false);
-    path.Replace("$SCRIPT_PLATFORM$", scriptPlatform, false);
-
-    Project* project = tsys->GetProject();
-    if (project)
+    NETProjectBase::NETProjectBase(Context* context, NETProjectGen* projectGen) :
+        Object(context), xmlFile_(new XMLFile(context)), projectGen_(projectGen)
     {
-        path.Replace("$PROJECT_ROOT$", project->GetProjectPath(), false);
+
     }
 
-}
-
-NETCSProject::NETCSProject(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen)
-{
-
-}
-
-NETCSProject::~NETCSProject()
-{
-
-}
-
-void NETCSProject::CreateCompileItemGroup(XMLElement &projectRoot)
-{
-    FileSystem* fs = GetSubsystem<FileSystem>();
-
-    XMLElement igroup = projectRoot.CreateChild("ItemGroup");
-
-    for (unsigned i = 0; i < sourceFolders_.Size(); i++)
+    NETProjectBase::~NETProjectBase()
     {
-        const String& sourceFolder = sourceFolders_[i];
 
-        Vector<String> result;
-        fs->ScanDir(result, sourceFolder, "*.cs", SCAN_FILES, true);
+    }
 
-        for (unsigned j = 0; j < result.Size(); j++)
+    void NETProjectBase::ReplacePathStrings(String& path)
+    {
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
+        String atomicRoot = tenv->GetRootSourceDir();
+        atomicRoot = RemoveTrailingSlash(atomicRoot);
+        
+        const String& scriptPlatform = projectGen_->GetScriptPlatform();
+
+        path.Replace("$ATOMIC_ROOT$", atomicRoot, false);
+        path.Replace("$SCRIPT_PLATFORM$", scriptPlatform, false);
+
+    }
+
+    NETCSProject::NETCSProject(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen)
+    {
+
+    }
+
+    NETCSProject::~NETCSProject()
+    {
+
+    }
+
+    bool NETCSProject::CreateProjectFolder(const String& path)
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        if (fileSystem->DirExists(path))
+            return true;
+
+        fileSystem->CreateDirsRecursive(path);
+
+        if (!fileSystem->DirExists(path))
         {
-            XMLElement compile = igroup.CreateChild("Compile");
+            LOGERRORF("Unable to create dir: %s", path.CString());
+            return false;
+        }
 
-            compile.SetAttribute("Include", sourceFolder + result[j]);
+        return true;
+    }
 
-            // put generated files into generated folder
-            if (sourceFolder.Contains("Generated") && sourceFolder.Contains("CSharp") && sourceFolder.Contains("Packages") )
+
+    void NETCSProject::CreateCompileItemGroup(XMLElement &projectRoot)
+    {
+        FileSystem* fs = GetSubsystem<FileSystem>();
+
+        XMLElement igroup = projectRoot.CreateChild("ItemGroup");
+
+        // Compile AssemblyInfo.cs
+        igroup.CreateChild("Compile").SetAttribute("Include", "Properties\\AssemblyInfo.cs");
+
+        for (unsigned i = 0; i < sourceFolders_.Size(); i++)
+        {
+            const String& sourceFolder = sourceFolders_[i];
+
+            Vector<String> result;
+            fs->ScanDir(result, sourceFolder, "*.cs", SCAN_FILES, true);
+
+            for (unsigned j = 0; j < result.Size(); j++)
             {
-                compile.CreateChild("Link").SetValue("Generated\\" + result[j]);
+                XMLElement compile = igroup.CreateChild("Compile");
+
+                // IMPORTANT: / Slash direction breaks intellisense :/
+                String path = sourceFolder + result[j];
+                path.Replace('/', '\\');
+
+                compile.SetAttribute("Include", path.CString());
+
+                // put generated files into generated folder
+                if (sourceFolder.Contains("Generated") && sourceFolder.Contains("CSharp") && sourceFolder.Contains("Packages"))
+                {
+                    compile.CreateChild("Link").SetValue("Generated\\" + result[j]);
+                }
+                else
+                {
+                    compile.CreateChild("Link").SetValue(result[j]);
+                }
+
             }
 
         }
 
     }
 
-}
-
-void NETCSProject::CreateReferencesItemGroup(XMLElement &projectRoot)
-{
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    FileSystem* fs = GetSubsystem<FileSystem>();
-
-    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
-
-    XMLElement igroup = projectRoot.CreateChild("ItemGroup");
-
-    XMLElement mscorlibref = igroup.CreateChild("Reference");
-    mscorlibref.SetAttribute("Include", "mscorlib");
-    mscorlibref.CreateChild("HintPath").SetValue(coreCLRAbsPath + "mscorlib.dll");
-    mscorlibref.CreateChild("Private").SetValue("False");
-
-    for (unsigned i = 0; i < references_.Size(); i++)
+    void NETProjectBase::CopyXMLElementRecursive(XMLElement source, XMLElement dest)
     {
-        String ref = references_[i];
-        String refpath = ref + ".dll";
+        Vector<String> attrNames = source.GetAttributeNames();
 
-        // we explicitly add mscorlib
-        if (ref == "mscorlib")
-            continue;
-
-        XMLElement xref = igroup.CreateChild("Reference");
-        xref.SetAttribute("Include", ref);
-
-        // if we're a coreclr assembly, qualify it
-        if (fs->FileExists(coreCLRAbsPath + refpath))
+        for (unsigned i = 0; i < attrNames.Size(); i++)
         {
-            refpath = coreCLRAbsPath + refpath;
+            String value = source.GetAttribute(attrNames[i]);
+            dest.SetAttribute(attrNames[i], value);
         }
 
-        xref.CreateChild("HintPath").SetValue(refpath);
-        xref.CreateChild("Private").SetValue("False");
+        dest.SetValue(source.GetValue());
 
+        XMLElement child = source.GetChild();
+
+        while (child.NotNull() && child.GetName().Length())
+        {
+            XMLElement childDest = dest.CreateChild(child.GetName());
+            CopyXMLElementRecursive(child, childDest);
+            child = child.GetNext();
+        }
     }
-}
 
-void NETCSProject::GetAssemblySearchPaths(String& paths)
-{
-    paths.Clear();
-
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    const String& coreCLRAbsPath = tenv->GetNETCoreCLRAbsPath();
-
-    Vector<String> searchPaths;
-    searchPaths.Push(coreCLRAbsPath);
-
-    if (assemblySearchPaths_.Length())
-        searchPaths.Push(assemblySearchPaths_);
-
-    paths.Join(searchPaths, ";");
-}
-
-void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
-{
-    XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
-    pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ");
-
-    pgroup.CreateChild("DebugType").SetValue("full");
-    pgroup.CreateChild("Optimize").SetValue("true");
-    pgroup.CreateChild("OutputPath").SetValue(assemblyOutputPath_);
-    pgroup.CreateChild("ErrorReport").SetValue("prompt");
-    pgroup.CreateChild("WarningLevel").SetValue("4");
-    pgroup.CreateChild("ConsolePause").SetValue("false");
-    pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
-    pgroup.CreateChild("NoStdLib").SetValue("true");
-    pgroup.CreateChild("NoConfig").SetValue("true");
-    pgroup.CreateChild("NoCompilerStandardLib").SetValue("true");
-
-    String assemblySearchPaths;
-    GetAssemblySearchPaths(assemblySearchPaths);
-    pgroup.CreateChild("AssemblySearchPaths").SetValue(assemblySearchPaths);
-
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    const String& editorBinary = tenv->GetEditorBinary();
-
-    if (!projectGen_->GetGameBuild())
+    void NETCSProject::CreateReferencesItemGroup(XMLElement &projectRoot)
     {
-        XMLElement command = pgroup.CreateChild("CustomCommands").CreateChild("CustomCommands").CreateChild("Command");
-        command.SetAttribute("type", "Execute");
-        command.SetAttribute("command", editorBinary.CString());
+
+        XMLElement xref;
+        XMLElement igroup = projectRoot.CreateChild("ItemGroup");
+
+        for (unsigned i = 0; i < references_.Size(); i++)
+        {
+            String ref = references_[i];
+
+            // project reference
+            if (projectGen_->GetCSProjectByName(ref))
+                continue;
+
+            // NuGet project
+            if (ref.StartsWith("<"))
+            {
+                XMLFile xmlFile(context_);
+
+                if (!xmlFile.FromString(ref))
+                {
+                    LOGERROR("NETCSProject::CreateReferencesItemGroup - Unable to parse reference XML");
+                }
+                
+
+                xref = igroup.CreateChild("Reference");
+                CopyXMLElementRecursive(xmlFile.GetRoot(), xref);
+                continue;
+            }
+
+            String refpath = ref + ".dll";
+            xref = igroup.CreateChild("Reference");
+            xref.SetAttribute("Include", ref);
+
+        }
     }
-}
 
-void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
-{
-    XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
-    pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ");
-
-    pgroup.CreateChild("DebugSymbols").SetValue("true");
-    pgroup.CreateChild("DebugType").SetValue("full");
-    pgroup.CreateChild("Optimize").SetValue("false");
-    pgroup.CreateChild("OutputPath").SetValue(assemblyOutputPath_);
-    pgroup.CreateChild("DefineConstants").SetValue("DEBUG;");
-    pgroup.CreateChild("ErrorReport").SetValue("prompt");
-    pgroup.CreateChild("WarningLevel").SetValue("4");
-    pgroup.CreateChild("ConsolePause").SetValue("false");
-    pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
-    pgroup.CreateChild("NoStdLib").SetValue("true");
-    pgroup.CreateChild("NoConfig").SetValue("true");
-    pgroup.CreateChild("NoCompilerStandardLib").SetValue("true");
-
-    String assemblySearchPaths;
-    GetAssemblySearchPaths(assemblySearchPaths);
-    pgroup.CreateChild("AssemblySearchPaths").SetValue(assemblySearchPaths);
-
-    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-    const String& editorBinary = tenv->GetEditorBinary();
-
-    if (!projectGen_->GetGameBuild())
+    void NETCSProject::CreateProjectReferencesItemGroup(XMLElement &projectRoot)
     {
-        XMLElement command = pgroup.CreateChild("CustomCommands").CreateChild("CustomCommands").CreateChild("Command");
-        command.SetAttribute("type", "Execute");
-        command.SetAttribute("command", editorBinary.CString());
+
+        XMLElement igroup = projectRoot.CreateChild("ItemGroup");
+
+        for (unsigned i = 0; i < references_.Size(); i++)
+        {
+            const String& ref = references_[i];
+            NETCSProject* project = projectGen_->GetCSProjectByName(ref);
+
+            if (!project)
+                continue;
+
+
+            XMLElement projectRef = igroup.CreateChild("ProjectReference");
+            projectRef.SetAttribute("Include", ToString("..\\%s\\%s.csproj", ref.CString(), ref.CString()));
+
+            XMLElement xproject = projectRef.CreateChild("Project");
+            xproject.SetValue(ToString("{%s}", project->GetProjectGUID().ToLower().CString()));
+
+            XMLElement xname = projectRef.CreateChild("Name");
+            xname.SetValue(project->GetName());
+        }
     }
 
-}
 
-void NETCSProject::CreateMainPropertyGroup(XMLElement& projectRoot)
-{
-    XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
+    void NETCSProject::CreatePackagesItemGroup(XMLElement &projectRoot)
+    {
+        if (!packages_.Size())
+            return;
 
-    // Configuration
-    XMLElement config = pgroup.CreateChild("Configuration");
-    config.SetAttribute("Condition", " '$(Configuration)' == '' ");
-    config.SetValue("Debug");
+        XMLElement xref;
+        XMLElement igroup = projectRoot.CreateChild("ItemGroup");
+        xref = igroup.CreateChild("None");
+        xref.SetAttribute("Include", "packages.config");
 
-    // Platform
-    XMLElement platform = pgroup.CreateChild("Platform");
-    platform.SetAttribute("Condition", " '$(Platform)' == '' ");
-    platform.SetValue("AnyCPU");
+        XMLFile packageConfig(context_);
 
-    // ProjectGuid
-    XMLElement guid = pgroup.CreateChild("ProjectGuid");
-    guid.SetValue(projectGuid_);
+        XMLElement packageRoot = packageConfig.CreateRoot("packages");
 
-    // OutputType
-    XMLElement outputType = pgroup.CreateChild("OutputType");
-    outputType.SetValue(outputType_);
+        for (unsigned i = 0; i < packages_.Size(); i++)
+        {
+            XMLFile xmlFile(context_);
+            if (!xmlFile.FromString(packages_[i]))
+            {
+                LOGERROR("NETCSProject::CreatePackagesItemGroup - Unable to parse package xml");
+            }
 
-    // RootNamespace
-    XMLElement rootNamespace = pgroup.CreateChild("RootNamespace");
-    rootNamespace.SetValue(rootNamespace_);
+            xref = packageRoot.CreateChild("package");
 
-    // AssemblyName
-    XMLElement assemblyName = pgroup.CreateChild("AssemblyName");
-    assemblyName.SetValue(assemblyName_);
+            CopyXMLElementRecursive(xmlFile.GetRoot(), xref);
+        }
 
-    // TargetFrameworkVersion
-    XMLElement targetFrameWork = pgroup.CreateChild("TargetFrameworkVersion");
-    targetFrameWork.SetValue("4.5");
+        SharedPtr<File> output(new File(context_, projectPath_ + "packages.config", FILE_WRITE));
+        String source = packageConfig.ToString();
+        output->Write(source.CString(), source.Length());
 
-}
+    }
 
-bool NETCSProject::Generate()
-{
-    XMLElement project = xmlFile_->CreateRoot("Project");
+    void NETCSProject::GetAssemblySearchPaths(String& paths)
+    {
+        paths.Clear();
 
-    project.SetAttribute("DefaultTargets", "Build");
-    project.SetAttribute("ToolsVersion", "4.0");
-    project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
-    CreateMainPropertyGroup(project);
-    CreateDebugPropertyGroup(project);
-    CreateReleasePropertyGroup(project);
-    CreateReferencesItemGroup(project);
-    CreateCompileItemGroup(project);
+        Vector<String> searchPaths;
 
-    project.CreateChild("Import").SetAttribute("Project", "$(MSBuildBinPath)\\Microsoft.CSharp.targets");
+        if (assemblySearchPaths_.Length())
+            searchPaths.Push(assemblySearchPaths_);
 
-    // on msbuild this seems to stop referencing of framework assemblies
-    project.CreateChild("Target").SetAttribute("Name", "GetReferenceAssemblyPaths");
-    project.CreateChild("Target").SetAttribute("Name", "GetFrameworkPaths");
+        paths.Join(searchPaths, ";");
+    }
 
-    String projectSource = xmlFile_->ToString();
+    void NETCSProject::CreateReleasePropertyGroup(XMLElement &projectRoot)
+    {
+        XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
+        pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ");
 
-    NETSolution* solution = projectGen_->GetSolution();
+        pgroup.CreateChild("DebugType").SetValue("full");
+        pgroup.CreateChild("Optimize").SetValue("true");
+        pgroup.CreateChild("OutputPath").SetValue(assemblyOutputPath_ + "Release\\");
+        pgroup.CreateChild("DefineConstants").SetValue("TRACE");
+        pgroup.CreateChild("ErrorReport").SetValue("prompt");
+        pgroup.CreateChild("WarningLevel").SetValue("4");
+        pgroup.CreateChild("ConsolePause").SetValue("false");
+        pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
+        pgroup.CreateChild("PlatformTarget").SetValue("x64");
 
-    String projectPath = solution->GetOutputPath() + name_ + ".csproj";
+    }
 
-    SharedPtr<File> output(new File(context_, projectPath, FILE_WRITE));
-    output->Write(projectSource.CString(), projectSource.Length());
+    void NETCSProject::CreateDebugPropertyGroup(XMLElement &projectRoot)
+    {
+        XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
+        pgroup.SetAttribute("Condition", " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ");
 
-    return true;
-}
+        pgroup.CreateChild("DebugSymbols").SetValue("true");
+        pgroup.CreateChild("DebugType").SetValue("full");
+        pgroup.CreateChild("Optimize").SetValue("false");
+        pgroup.CreateChild("OutputPath").SetValue(assemblyOutputPath_ + "Debug\\");
+        pgroup.CreateChild("DefineConstants").SetValue("DEBUG;TRACE");
+        pgroup.CreateChild("ErrorReport").SetValue("prompt");
+        pgroup.CreateChild("WarningLevel").SetValue("4");
+        pgroup.CreateChild("ConsolePause").SetValue("false");
+        pgroup.CreateChild("AllowUnsafeBlocks").SetValue("true");
+        pgroup.CreateChild("PlatformTarget").SetValue("x64");
 
-bool NETCSProject::Load(const JSONValue& root)
-{
-    bool gameBuild = projectGen_->GetGameBuild();
+    }
 
-    name_ = root["name"].GetString();
+    void NETCSProject::CreateAssemblyInfo()
+    {
 
-    projectGuid_ = projectGen_->GenerateUUID();
+        String info = "using System.Reflection;\nusing System.Runtime.CompilerServices;\nusing System.Runtime.InteropServices;\n\n\n";
+        info += ToString("[assembly:AssemblyTitle(\"%s\")]\n", name_.CString());
+        info += "[assembly:AssemblyDescription(\"\")]\n";
+        info += "[assembly:AssemblyConfiguration(\"\")]\n";
+        info += "[assembly:AssemblyCompany(\"\")]\n";
+        info += ToString("[assembly:AssemblyProduct(\"%s\")]\n", name_.CString());
 
-    if (gameBuild)
-        outputType_ = "Library";
-    else
+        info += "\n\n\n";
+
+        info += "[assembly:ComVisible(false)]\n";
+
+        info += "\n\n";
+
+        info += ToString("[assembly:Guid(\"%s\")]\n", projectGuid_.CString());
+
+        info += "\n\n";
+
+        info += "[assembly:AssemblyVersion(\"1.0.0.0\")]\n";
+        info += "[assembly:AssemblyFileVersion(\"1.0.0.0\")]\n";
+
+        SharedPtr<File> output(new File(context_, projectPath_ + "Properties/AssemblyInfo.cs", FILE_WRITE));
+        output->Write(info.CString(), info.Length());
+
+    }
+
+    void NETCSProject::CreateMainPropertyGroup(XMLElement& projectRoot)
+    {
+        XMLElement pgroup = projectRoot.CreateChild("PropertyGroup");
+
+        // Configuration
+        XMLElement config = pgroup.CreateChild("Configuration");
+        config.SetAttribute("Condition", " '$(Configuration)' == '' ");
+        config.SetValue("Debug");
+
+        // Platform
+        XMLElement platform = pgroup.CreateChild("Platform");
+        platform.SetAttribute("Condition", " '$(Platform)' == '' ");
+        platform.SetValue("AnyCPU");
+
+        // ProjectGuid
+        XMLElement guid = pgroup.CreateChild("ProjectGuid");
+        guid.SetValue("{" + projectGuid_ + "}");
+
+        // OutputType
+        XMLElement outputType = pgroup.CreateChild("OutputType");
+        outputType.SetValue(outputType_);
+
+        pgroup.CreateChild("AppDesignerFolder").SetValue("Properties");
+
+        // RootNamespace
+        XMLElement rootNamespace = pgroup.CreateChild("RootNamespace");
+        rootNamespace.SetValue(rootNamespace_);
+
+        // AssemblyName
+        XMLElement assemblyName = pgroup.CreateChild("AssemblyName");
+        assemblyName.SetValue(assemblyName_);
+
+        // TargetFrameworkVersion
+        XMLElement targetFrameWork = pgroup.CreateChild("TargetFrameworkVersion");
+        targetFrameWork.SetValue("v4.6");
+
+        pgroup.CreateChild("FileAlignment").SetValue("512");
+
+    }
+
+    bool NETCSProject::Generate()
+    {
+        NETSolution* solution = projectGen_->GetSolution();
+
+        projectPath_ = solution->GetOutputPath() + name_ + "/";
+
+        if (!CreateProjectFolder(projectPath_))
+            return false;
+
+        if (!CreateProjectFolder(projectPath_ + "Properties"))
+            return false;
+
+        XMLElement project = xmlFile_->CreateRoot("Project");
+
+        project.SetAttribute("DefaultTargets", "Build");
+        project.SetAttribute("ToolsVersion", "14.0");
+        project.SetAttribute("DefaultTargets", "Build");
+        project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+        XMLElement import = project.CreateChild("Import");
+        import.SetAttribute("Project", "$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props");
+        import.SetAttribute("Condition", "Exists('$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props')");
+
+        CreateMainPropertyGroup(project);
+        CreateDebugPropertyGroup(project);
+        CreateReleasePropertyGroup(project);
+        CreateReferencesItemGroup(project);
+        CreateProjectReferencesItemGroup(project);
+        CreateCompileItemGroup(project);
+        CreatePackagesItemGroup(project);
+        CreateAssemblyInfo();
+
+        project.CreateChild("Import").SetAttribute("Project", "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
+
+        String projectSource = xmlFile_->ToString();
+
+        SharedPtr<File> output(new File(context_, projectPath_ + name_ + ".csproj", FILE_WRITE));
+        output->Write(projectSource.CString(), projectSource.Length());
+
+        return true;
+    }
+
+    bool NETCSProject::Load(const JSONValue& root)
+    {
+        name_ = root["name"].GetString();
+
+        projectGuid_ = projectGen_->GenerateUUID();
+
         outputType_ = root["outputType"].GetString();
 
-    rootNamespace_ = root["rootNamespace"].GetString();
-    assemblyName_ = root["assemblyName"].GetString();
-    assemblyOutputPath_ = root["assemblyOutputPath"].GetString();
-    ReplacePathStrings(assemblyOutputPath_);
+        rootNamespace_ = root["rootNamespace"].GetString();
+        assemblyName_ = root["assemblyName"].GetString();
+        assemblyOutputPath_ = root["assemblyOutputPath"].GetString();
+        ReplacePathStrings(assemblyOutputPath_);
 
-    assemblySearchPaths_ = root["assemblySearchPaths"].GetString();
+        assemblySearchPaths_ = root["assemblySearchPaths"].GetString();
 
-    if (gameBuild)
-    {
-        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
-        const String& engineAssemblyPath = tenv->GetAtomicNETEngineAssemblyPath();
-        if (assemblySearchPaths_.Length())
+        ReplacePathStrings(assemblySearchPaths_);
+
+        const JSONArray& references = root["references"].GetArray();
+
+        for (unsigned i = 0; i < references.Size(); i++)
         {
-            assemblySearchPaths_ += ";";
-            assemblySearchPaths_ += engineAssemblyPath;
-        }
-        else
-        {
-            assemblySearchPaths_ = engineAssemblyPath;
+            String reference = references[i].GetString();
+            ReplacePathStrings(reference);
+            references_.Push(reference);
         }
 
+        const JSONArray& packages = root["packages"].GetArray();
+
+        for (unsigned i = 0; i < packages.Size(); i++)
+        {
+            String package = packages[i].GetString();
+            packages_.Push(package);
+        }
+
+        const JSONArray& sources = root["sources"].GetArray();
+
+        for (unsigned i = 0; i < sources.Size(); i++)
+        {
+            String source = sources[i].GetString();
+            ReplacePathStrings(source);
+            sourceFolders_.Push(AddTrailingSlash(source));
+        }
+
+        return true;
     }
 
-    ReplacePathStrings(assemblySearchPaths_);
-
-    const JSONArray& references = root["references"].GetArray();
-
-    for (unsigned i = 0; i < references.Size(); i++)
+    NETSolution::NETSolution(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen)
     {
-        String reference = references[i].GetString();
-        ReplacePathStrings(reference);
-        references_.Push(reference);
+
     }
 
-    if (gameBuild)
+    NETSolution::~NETSolution()
     {
-        references_.Push("AtomicNETEngine");
+
     }
 
-    // msvc doesn't like including these
-    if (projectGen_->GetMonoBuild())
+    bool NETSolution::Generate()
     {
-        references_.Push("System.Console");
-        references_.Push("System.IO");
-        references_.Push("System.IO.FileSystem");
+
+        String slnPath = outputPath_ + name_ + ".sln";
+
+        GenerateSolution(slnPath);
+
+        return true;
     }
 
-    const JSONArray& sources = root["sources"].GetArray();
-
-    for (unsigned i = 0; i < sources.Size(); i++)
+    void NETSolution::GenerateSolution(const String &slnPath)
     {
-        String source = sources[i].GetString();
-        ReplacePathStrings(source);
-        sourceFolders_.Push(AddTrailingSlash(source));
+        String source = "Microsoft Visual Studio Solution File, Format Version 12.00\n";
+        source += "# Visual Studio 14\n";
+        source += "VisualStudioVersion = 14.0.25420.1\n";
+        source += "MinimumVisualStudioVersion = 10.0.40219.1\n";
+
+        solutionGUID_ = projectGen_->GenerateUUID();
+
+        PODVector<NETCSProject*> depends;
+        const Vector<SharedPtr<NETCSProject>>& projects = projectGen_->GetCSProjects();
+
+        for (unsigned i = 0; i < projects.Size(); i++)
+        {
+            NETCSProject* p = projects.At(i);
+
+            const String& projectName = p->GetName();
+            const String& projectGUID = p->GetProjectGUID();
+
+            source += ToString("Project(\"{%s}\") = \"%s\", \"%s\\%s.csproj\", \"{%s}\"\n",
+                solutionGUID_.CString(), projectName.CString(), projectName.CString(),
+                projectName.CString(), projectGUID.CString());
+
+            projectGen_->GetCSProjectDependencies(p, depends);
+
+            if (depends.Size())
+            {
+                source += "\tProjectSection(ProjectDependencies) = postProject\n";
+
+                for (unsigned j = 0; j < depends.Size(); j++)
+                {
+                    source += ToString("\t{%s} = {%s}\n",
+                        depends[j]->GetProjectGUID().CString(), depends[j]->GetProjectGUID().CString());
+                }
+
+                source += "\tEndProjectSection\n";
+            }
+
+            source += "\tEndProject\n";
+        }
+
+        source += "Global\n";
+        source += "    GlobalSection(SolutionConfigurationPlatforms) = preSolution\n";
+        source += "        Debug|Any CPU = Debug|Any CPU\n";
+        source += "        Release|Any CPU = Release|Any CPU\n";
+        source += "    EndGlobalSection\n";
+        source += "    GlobalSection(ProjectConfigurationPlatforms) = postSolution\n";
+
+        for (unsigned i = 0; i < projects.Size(); i++)
+        {
+            NETCSProject* p = projects.At(i);
+
+            source += ToString("        {%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n", p->GetProjectGUID().CString());
+            source += ToString("        {%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\n", p->GetProjectGUID().CString());
+            source += ToString("        {%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\n", p->GetProjectGUID().CString());
+            source += ToString("        {%s}.Release|Any CPU.Build.0 = Release|Any CPU\n", p->GetProjectGUID().CString());
+        }
+
+        source += "    EndGlobalSection\n";
+
+        source += "EndGlobal\n";
+
+        SharedPtr<File> output(new File(context_, slnPath, FILE_WRITE));
+        output->Write(source.CString(), source.Length());
+        output->Close();
     }
 
-    return true;
-}
-
-NETSolution::NETSolution(Context* context, NETProjectGen* projectGen) : NETProjectBase(context, projectGen)
-{
-
-}
-
-NETSolution::~NETSolution()
-{
-
-}
-
-bool NETSolution::Generate()
-{
-
-    String slnPath = outputPath_ + name_ + ".sln";
-
-    GenerateXamarinStudio(slnPath);
-
-    return true;
-}
-
-void NETSolution::GenerateXamarinStudio(const String &slnPath)
-{
-    String source = "Microsoft Visual Studio Solution File, Format Version 12.00\n";
-    source += "# Visual Studio 2012\n";
-
-    const Vector<SharedPtr<NETCSProject>>& projects = projectGen_->GetCSProjects();
-    for (unsigned i = 0; i < projects.Size(); i++)
+    bool NETSolution::Load(const JSONValue& root)
     {
-        NETCSProject* p = projects.At(i);
+        FileSystem* fs = GetSubsystem<FileSystem>();
 
-        source += ToString("Project(\"{%s}\") = \"%s\", \"%s.csproj\", \"{%s}\"\n",
-                           p->GetProjectGUID().CString(), p->GetName().CString(), p->GetName().CString(),
-                           p->GetProjectGUID().CString());
+        name_ = root["name"].GetString();
 
-        source += "EndProject\n";
+        outputPath_ = AddTrailingSlash(root["outputPath"].GetString());
+        ReplacePathStrings(outputPath_);
+
+        // TODO: use poco mkdirs
+        if (!fs->DirExists(outputPath_))
+            fs->CreateDirsRecursive(outputPath_);
+
+        return true;
     }
 
-    source += "Global\n";
-    source += "    GlobalSection(SolutionConfigurationPlatforms) = preSolution\n";
-    source += "        Debug|Any CPU = Debug|Any CPU\n";
-    source += "        Release|Any CPU = Release|Any CPU\n";
-    source += "    EndGlobalSection\n";
-    source += "    GlobalSection(ProjectConfigurationPlatforms) = postSolution\n";
-
-    for (unsigned i = 0; i < projects.Size(); i++)
+    NETProjectGen::NETProjectGen(Context* context) : Object(context)
     {
-        NETCSProject* p = projects.At(i);
 
-        source += ToString("        {%s}.Debug|Any CPU.ActiveCfg = Debug|Any CPU\n",  p->GetProjectGUID().CString());
-        source += ToString("        {%s}.Debug|Any CPU.Build.0 = Debug|Any CPU\n",  p->GetProjectGUID().CString());
-        source += ToString("        {%s}.Release|Any CPU.ActiveCfg = Release|Any CPU\n",  p->GetProjectGUID().CString());
-        source += ToString("        {%s}.Release|Any CPU.Build.0 = Release|Any CPU\n",  p->GetProjectGUID().CString());
     }
 
-    source += "    EndGlobalSection\n";
-
-    source += "EndGlobal\n";
-
-    SharedPtr<File> output(new File(context_, slnPath, FILE_WRITE));
-    output->Write(source.CString(), source.Length());
-    output->Close();
-}
-
-bool NETSolution::Load(const JSONValue& root)
-{
-    FileSystem* fs = GetSubsystem<FileSystem>();
-
-    name_ = root["name"].GetString();
-
-    outputPath_ = AddTrailingSlash(root["outputPath"].GetString());
-    ReplacePathStrings(outputPath_);
-
-    // TODO: use poco mkdirs
-    if (!fs->DirExists(outputPath_))
-        fs->CreateDir(outputPath_);
-
-    return true;
-}
-
-NETProjectGen::NETProjectGen(Context* context) : Object(context),
-    monoBuild_(false), gameBuild_(false)
-{
-
-#ifndef ATOMIC_PLATFORM_WINDOWS
-    monoBuild_ = true;
-#endif
-
-}
-
-NETProjectGen::~NETProjectGen()
-{
-
-}
-
-bool NETProjectGen::Generate()
-{
-    solution_->Generate();
-
-    for (unsigned i = 0; i < projects_.Size(); i++)
+    NETProjectGen::~NETProjectGen()
     {
-        if (!projects_[i]->Generate())
+
+    }
+
+    NETCSProject* NETProjectGen::GetCSProjectByName(const String & name)
+    {
+
+        for (unsigned i = 0; i < projects_.Size(); i++)
+        {
+            if (projects_[i]->GetName() == name)
+                return projects_[i];
+        }
+
+        return nullptr;
+    }
+
+    bool NETProjectGen::GetCSProjectDependencies(NETCSProject* source, PODVector<NETCSProject*>& depends) const
+    {
+        depends.Clear();
+
+        const Vector<String>& references = source->GetReferences();
+
+        for (unsigned i = 0; i < projects_.Size(); i++)
+        {
+            NETCSProject* pdepend = projects_.At(i);
+
+            if (source == pdepend)
+                continue;
+
+            for (unsigned j = 0; j < references.Size(); j++)
+            {
+                if (pdepend->GetName() == references[j])
+                {
+                    depends.Push(pdepend);
+                }
+            }
+        }
+
+        return depends.Size() != 0;
+
+    }
+
+    bool NETProjectGen::Generate()
+    {
+        solution_->Generate();
+
+        for (unsigned i = 0; i < projects_.Size(); i++)
+        {
+            if (!projects_[i]->Generate())
+                return false;
+        }
+        return true;
+    }
+
+    bool NETProjectGen::LoadProject(const JSONValue &root)
+    {
+
+        solution_ = new NETSolution(context_, this);
+
+        solution_->Load(root["solution"]);
+
+        const JSONValue& jprojects = root["projects"];
+
+        if (!jprojects.IsArray() || !jprojects.Size())
             return false;
+
+        for (unsigned i = 0; i < jprojects.Size(); i++)
+        {
+            const JSONValue& jproject = jprojects[i];
+
+            if (!jproject.IsObject())
+                return false;
+
+            SharedPtr<NETCSProject> csProject(new NETCSProject(context_, this));
+
+            if (!csProject->Load(jproject))
+                return false;
+
+            projects_.Push(csProject);
+
+        }
+
+        return true;
     }
-    return true;
-}
 
-bool NETProjectGen::LoadProject(const JSONValue &root, bool gameBuild)
-{
-
-    gameBuild_ = gameBuild;
-    solution_ = new NETSolution(context_, this);
-
-    solution_->Load(root["solution"]);
-
-    const JSONValue& jprojects = root["projects"];
-
-    if (!jprojects.IsArray() || ! jprojects.Size())
-        return false;
-
-    for (unsigned i = 0; i < jprojects.Size(); i++)
+    bool NETProjectGen::LoadProject(const String& projectPath)
     {
-        const JSONValue& jproject = jprojects[i];
+        SharedPtr<File> file(new File(context_));
 
-        if (!jproject.IsObject())
+        if (!file->Open(projectPath))
             return false;
 
-        SharedPtr<NETCSProject> csProject(new NETCSProject(context_, this));
+        String json;
+        file->ReadText(json);
 
-        if (!csProject->Load(jproject))
+        JSONValue jvalue;
+
+        if (!JSONFile::ParseJSON(json, jvalue))
             return false;
 
-        projects_.Push(csProject);
-
+        return LoadProject(jvalue);
     }
 
-    return true;
-}
-
-bool NETProjectGen::LoadProject(const String& projectPath, bool gameBuild)
-{
-    SharedPtr<File> file(new File(context_));
-
-    if (!file->Open(projectPath))
-        return false;
-
-    String json;
-    file->ReadText(json);
-
-    JSONValue jvalue;
-
-    if (!JSONFile::ParseJSON(json, jvalue))
-        return false;
-
-    return LoadProject(jvalue, gameBuild);
-}
-
-String NETProjectGen::GenerateUUID()
-{
-    Poco::UUIDGenerator& generator = Poco::UUIDGenerator::defaultGenerator();
-    Poco::UUID uuid(generator.create()); // time based
-    return String(uuid.toString().c_str()).ToUpper();
-}
+    String NETProjectGen::GenerateUUID()
+    {
+        Poco::UUIDGenerator& generator = Poco::UUIDGenerator::defaultGenerator();
+        Poco::UUID uuid(generator.create()); // time based
+        return String(uuid.toString().c_str()).ToUpper();
+    }
 
 }

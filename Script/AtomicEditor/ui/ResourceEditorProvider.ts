@@ -26,6 +26,8 @@ import Scene3dResourceEditorBuilder from "./resourceEditors/Scene3dResourceEdito
 import TextFileResourceEditorBuilder from "./resourceEditors/TextFileResourceEditorBuilder";
 import TurboBadgerResourceEditorBuilder from "./resourceEditors/TurboBadgerResourceEditorBuilder";
 import TypescriptResourceEditorBuilder from "./resourceEditors/TypescriptResourceEditorBuilder";
+import XMLResourceEditorBuilder from "./resourceEditors/XMLResourceEditorBuilder";
+import ShaderResourceEditorBuilder from "./resourceEditors/ShaderResourceEditorBuilder";
 
 export default class ResourceEditorProvider {
     private standardEditorRegistry: Editor.Extensions.ResourceEditorBuilder[] = [];
@@ -47,8 +49,19 @@ export default class ResourceEditorProvider {
      * Register a custom editor.  These editors will override editors in the standard editor list if
      * they both resolve the ```canHandleResource``` call.
      */
-    registerCustomEditor(editorBuilder) {
+    registerCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
         this.customEditorRegistry.push(editorBuilder);
+    }
+
+    /**
+     * Will unregister a previously registered editor builder
+     * @param  {Editor.Extensions.ResourceEditorBuilder} editorBuilder
+     */
+    unregisterCustomEditor(editorBuilder: Editor.Extensions.ResourceEditorBuilder) {
+        var index = this.customEditorRegistry.indexOf(editorBuilder, 0);
+        if (index > -1) {
+            this.customEditorRegistry.splice(index, 1);
+        }
     }
 
     /**
@@ -88,6 +101,8 @@ export default class ResourceEditorProvider {
         this.registerStandardEditor(new JsonResourceEditorBuilder());
         this.registerStandardEditor(new TypescriptResourceEditorBuilder());
         this.registerStandardEditor(new Scene3dResourceEditorBuilder());
+        this.registerStandardEditor(new XMLResourceEditorBuilder());
+        this.registerStandardEditor(new ShaderResourceEditorBuilder());
 
         // this overrides the test resource editor so need to put it in the custom bucket
         this.registerCustomEditor(new TurboBadgerResourceEditorBuilder());

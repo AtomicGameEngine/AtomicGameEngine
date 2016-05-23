@@ -110,10 +110,19 @@ void WebAppBrowser::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_i
 {
     // We're not on main thread here, we're on IO thread
     CefRefPtr<CefDictionaryValue> globalProps;
+
     if (CreateGlobalProperties(globalProps))
     {
         extra_info->SetDictionary(0, globalProps);
     }
+    else
+    {
+        extra_info->SetNull(0);
+    }
+
+    extra_info->SetString(1, WebBrowserHost::GetJSMessageQueryFunctionName().CString());
+    extra_info->SetString(2, WebBrowserHost::GetJSMessageQueryCancelFunctionName().CString());
+
 
 }
 

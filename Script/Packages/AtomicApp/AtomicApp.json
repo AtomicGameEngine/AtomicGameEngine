@@ -1,0 +1,5 @@
+{
+	"name" : "AtomicApp",
+	"sources" : ["Source/AtomicApp", "Source/AtomicApp/Player"],
+	"classes" : ["AppBase", "IPCClientApp", "PlayerApp", "IPCPlayerApp"]
+}

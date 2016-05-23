@@ -53,6 +53,8 @@ OpenAssetImporter::OpenAssetImporter(Context* context) : Object(context) ,
     scene_(0),
     rootNode_(0),
     useSubdirs_(true),
+    importMaterials_(true),
+    importMaterialsDefault_(true),
     localIDs_(false),
     saveBinary_(false),
     createZone_(true),
@@ -902,6 +904,8 @@ void OpenAssetImporter::SetOveriddenFlags(VariantMap& aiFlagParameters)
             ApplyFlag(aiProcess_FindInstances, itr->second_.GetBool());
         else if (itr->first_ == "aiProcess_OptimizeMeshes")
             ApplyFlag(aiProcess_OptimizeMeshes, itr->second_.GetBool());
+        else if (itr->first_ == "ImportMaterials")
+            importMaterialsDefault_ = itr->second_.GetBool();
 
         itr++;
     }
@@ -1184,13 +1188,17 @@ bool OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &an
 // Materials
 void OpenAssetImporter::ExportMaterials(HashSet<String>& usedTextures)
 {
-    if (useSubdirs_)
+    if (importMaterials_ )
     {
-        context_->GetSubsystem<FileSystem>()->CreateDir(sourceAssetPath_ + "Materials");
+        if (useSubdirs_)
+        {
+            context_->GetSubsystem<FileSystem>()->CreateDir(sourceAssetPath_ + "Materials");
+        }
+
+        for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
+            BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
     }
 
-    for (unsigned i = 0; i < scene_->mNumMaterials; ++i)
-        BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
 }
 
 bool OpenAssetImporter::BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)

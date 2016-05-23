@@ -28,221 +28,224 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/IO/Serializer.h>
 
-#include "CSManaged.h"
+#include "NETScriptEvents.h"
 #include "CSComponentAssembly.h"
 
 namespace Atomic
 {
 
-HashMap<StringHash, VariantType> CSComponentAssembly::typeMap_;
+    HashMap<StringHash, VariantType> CSComponentAssembly::typeMap_;
 
-CSComponentAssembly::CSComponentAssembly(Context* context) :
-    ScriptComponentFile(context)
-{
-
-}
-
-CSComponentAssembly::~CSComponentAssembly()
-{
-
-}
-
-void CSComponentAssembly::InitTypeMap()
-{
-    typeMap_["Boolean"] = VAR_BOOL;
-    typeMap_["Int32"] = VAR_INT;
-    typeMap_["Single"] = VAR_FLOAT;
-    typeMap_["Double"] = VAR_DOUBLE;
-    typeMap_["String"] = VAR_STRING;
-    typeMap_["Vector2"] = VAR_VECTOR2;
-    typeMap_["Vector3"] = VAR_VECTOR3;
-    typeMap_["Vector4"] = VAR_VECTOR4;
-    typeMap_["Quaternion"] = VAR_QUATERNION;
-
-}
-
-CSComponent* CSComponentAssembly::CreateCSComponent(const String& classname)
-{
-    const String& name = GetName();
-
-    // TODO: cache this
-    String pathName, fileName, ext;
-    SplitPath(name, pathName, fileName, ext);
-
-    CSManaged* managed = GetSubsystem<CSManaged>();
-
-    return managed->CSComponentCreate(fileName, classname);
-}
-
-bool CSComponentAssembly::ParseComponentClassJSON(const JSONValue& json)
-{
-    if (!typeMap_.Size())
-        InitTypeMap();
-
-    String className = json.Get("name").GetString();
-
-    classNames_.Push(className);
-
-    const JSONValue& jfields = json.Get("fields");
-
-    PODVector<StringHash> enumsAdded;
-
-    if (jfields.IsArray())
+    CSComponentAssembly::CSComponentAssembly(Context* context) :
+        ScriptComponentFile(context)
     {
-        for (unsigned i = 0; i < jfields.GetArray().Size(); i++)
+
+    }
+
+    CSComponentAssembly::~CSComponentAssembly()
+    {
+
+    }
+
+    void CSComponentAssembly::InitTypeMap()
+    {
+        typeMap_["Boolean"] = VAR_BOOL;
+        typeMap_["Int32"] = VAR_INT;
+        typeMap_["Single"] = VAR_FLOAT;
+        typeMap_["Double"] = VAR_DOUBLE;
+        typeMap_["String"] = VAR_STRING;
+        typeMap_["Vector2"] = VAR_VECTOR2;
+        typeMap_["Vector3"] = VAR_VECTOR3;
+        typeMap_["Vector4"] = VAR_VECTOR4;
+        typeMap_["Quaternion"] = VAR_QUATERNION;
+
+    }
+
+    CSComponent* CSComponentAssembly::CreateCSComponent(const String& classname)
+    {
+        return nullptr;
+    }
+
+    bool CSComponentAssembly::ParseComponentClassJSON(const JSONValue& json)
+    {
+        if (!typeMap_.Size())
+            InitTypeMap();
+
+        String className = json.Get("name").GetString();
+
+        classNames_.Push(className);
+
+        const JSONValue& jfields = json.Get("fields");
+
+        PODVector<StringHash> enumsAdded;
+
+        if (jfields.IsArray())
         {
-            const JSONValue& jfield = jfields.GetArray().At(i);
-
-            VariantType varType = VAR_NONE;
-
-            bool isEnum = jfield.Get("isEnum").GetBool();
-            String typeName = jfield.Get("typeName").GetString();
-            String fieldName = jfield.Get("name").GetString();
-            String defaultValue = jfield.Get("defaultValue").GetString();
-
-            if (!defaultValue.Length())
+            for (unsigned i = 0; i < jfields.GetArray().Size(); i++)
             {
-                JSONArray caPos = jfield.Get("caPos").GetArray();
-                if (caPos.Size())
-                    defaultValue = caPos[0].GetString();
-            }
+                const JSONValue& jfield = jfields.GetArray().At(i);
 
-            if (!defaultValue.Length())
-            {
-                JSONObject caNamed = jfield.Get("caNamed").GetObject();
-                if (caNamed.Contains("DefaultValue"))
-                    defaultValue = caNamed["DefaultValue"].GetString();
-            }
+                VariantType varType = VAR_NONE;
 
-            if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(fieldName))
-            {
-                varType = VAR_INT;
-                enumsAdded.Push(fieldName);
-                const Vector<EnumInfo>& einfos = assemblyEnums_[typeName];
-                for (unsigned i = 0; i < einfos.Size(); i++)
-                    AddEnum(/*typeName*/fieldName, einfos[i], className);
-            }
+                bool isEnum = jfield.Get("isEnum").GetBool();
+                String typeName = jfield.Get("typeName").GetString();
+                String fieldName = jfield.Get("name").GetString();
+                String defaultValue = jfield.Get("defaultValue").GetString();
 
-            if (varType == VAR_NONE && typeMap_.Contains(typeName))
-                varType = typeMap_[typeName];
-
-            if (varType == VAR_NONE)
-            {
-                // FIXME: We need to be able to test if a type is a ResourceRef, this isn't really the way to achieve that
-                const HashMap<StringHash, SharedPtr<ObjectFactory>>& factories = context_->GetObjectFactories();
-                HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator itr = factories.Begin();
-
-                while (itr != factories.End())
+                if (!defaultValue.Length())
                 {
-                    if ( itr->second_->GetTypeName() == typeName)
-                    {
-                        varType = VAR_RESOURCEREF;
-                        break;
-                    }
-
-                    itr++;
+                    JSONArray caPos = jfield.Get("caPos").GetArray();
+                    if (caPos.Size())
+                        defaultValue = caPos[0].GetString();
                 }
+
+                if (!defaultValue.Length())
+                {
+                    JSONObject caNamed = jfield.Get("caNamed").GetObject();
+                    if (caNamed.Contains("DefaultValue"))
+                        defaultValue = caNamed["DefaultValue"].GetString();
+                }
+
+                if (isEnum && assemblyEnums_.Contains(typeName) && !enumsAdded.Contains(fieldName))
+                {
+                    varType = VAR_INT;
+                    enumsAdded.Push(fieldName);
+                    const Vector<EnumInfo>& einfos = assemblyEnums_[typeName];
+                    for (unsigned i = 0; i < einfos.Size(); i++)
+                        AddEnum(/*typeName*/fieldName, einfos[i], className);
+                }
+
+                if (varType == VAR_NONE && typeMap_.Contains(typeName))
+                    varType = typeMap_[typeName];
 
                 if (varType == VAR_NONE)
                 {
-                    LOGERRORF("Component Class %s contains unmappable type %s in field %s",
-                          className.CString(), typeName.CString(), fieldName.CString());
+                    // FIXME: We need to be able to test if a type is a ResourceRef, this isn't really the way to achieve that
+                    const HashMap<StringHash, SharedPtr<ObjectFactory>>& factories = context_->GetObjectFactories();
+                    HashMap<StringHash, SharedPtr<ObjectFactory>>::ConstIterator itr = factories.Begin();
 
-                    continue;
+                    while (itr != factories.End())
+                    {
+                        if (itr->second_->GetTypeName() == typeName)
+                        {
+                            varType = VAR_RESOURCEREF;
+                            break;
+                        }
+
+                        itr++;
+                    }
+
+                    if (varType == VAR_NONE)
+                    {
+                        LOGERRORF("Component Class %s contains unmappable type %s in field %s",
+                            className.CString(), typeName.CString(), fieldName.CString());
+
+                        continue;
+                    }
+
                 }
 
-            }
-
-            if (!defaultValue.Length() && varType == VAR_RESOURCEREF)
-            {
-                // We still need a default value for ResourceRef's so we know the classtype
-                AddDefaultValue(fieldName, ResourceRef(typeName), className);
-            }
-            else
-            {
-                Variant value;
-
-                if (varType == VAR_RESOURCEREF)
+                if (!defaultValue.Length() && varType == VAR_RESOURCEREF)
                 {
-                    ResourceRef rref(typeName);
-                    rref.name_ = defaultValue;
-                    value = rref;
+                    // We still need a default value for ResourceRef's so we know the classtype
+                    AddDefaultValue(fieldName, ResourceRef(typeName), className);
                 }
                 else
                 {
-                    value.FromString(varType, defaultValue);
+                    Variant value;
+
+                    if (varType == VAR_RESOURCEREF)
+                    {
+                        ResourceRef rref(typeName);
+                        rref.name_ = defaultValue;
+                        value = rref;
+                    }
+                    else
+                    {
+                        value.FromString(varType, defaultValue);
+                    }
+
+                    AddDefaultValue(fieldName, value, className);
                 }
 
-                AddDefaultValue(fieldName, value, className);
+                AddField(fieldName, varType, className);
+
             }
 
-            AddField(fieldName, varType, className);
-
         }
 
+        return true;
     }
 
-    return true;
-}
-
-bool CSComponentAssembly::ParseAssemblyJSON(const JSONValue& json)
-{
-    Clear();
-    assemblyEnums_.Clear();
-    classNames_.Clear();
-
-    const JSONArray& enums = json.Get("enums").GetArray();
-
-    // parse to all enums hash
-    for (unsigned i = 0; i < enums.Size(); i++)
+    bool CSComponentAssembly::ParseAssemblyJSON(const JSONValue& json)
     {
-        const JSONValue& ejson = enums.At(i);
+        Clear();
+        assemblyEnums_.Clear();
+        classNames_.Clear();
 
-        String enumName = ejson.Get("name").GetString();
+        const JSONArray& enums = json.Get("enums").GetArray();
 
-        const JSONObject& evalues = ejson.Get("values").GetObject();
-
-        JSONObject::ConstIterator itr = evalues.Begin();
-
-        Vector<EnumInfo> values;
-
-        while(itr != evalues.End())
+        // parse to all enums hash
+        for (unsigned i = 0; i < enums.Size(); i++)
         {
-            EnumInfo info;
-            info.name_ = itr->first_;
-            info.value_ = itr->second_.GetInt();
-            values.Push(info);
-            itr++;
+            const JSONValue& ejson = enums.At(i);
+
+            String enumName = ejson.Get("name").GetString();
+
+            const JSONObject& evalues = ejson.Get("values").GetObject();
+
+            JSONObject::ConstIterator itr = evalues.Begin();
+
+            Vector<EnumInfo> values;
+
+            while (itr != evalues.End())
+            {
+                EnumInfo info;
+                info.name_ = itr->first_;
+                info.value_ = itr->second_.GetInt();
+                values.Push(info);
+                itr++;
+            }
+
+            assemblyEnums_[enumName] = values;
         }
 
-        assemblyEnums_[enumName] = values;
+        const JSONArray& components = json.Get("components").GetArray();
+
+        for (unsigned i = 0; i < components.Size(); i++)
+        {
+            const JSONValue& cjson = components.At(i);
+
+            ParseComponentClassJSON(cjson);
+        }
+
+        return true;
     }
 
-    const JSONArray& components = json.Get("components").GetArray();
-
-    for (unsigned i = 0; i < components.Size(); i++)
+    void CSComponentAssembly::RegisterObject(Context* context)
     {
-        const JSONValue& cjson = components.At(i);
-
-        ParseComponentClassJSON(cjson);
+        context->RegisterFactory<CSComponentAssembly>();
     }
 
-    return true;
-}
+    bool CSComponentAssembly::BeginLoad(Deserializer& source)
+    {
+        File* file = (File*) &source;
 
-void CSComponentAssembly::RegisterObject(Context* context)
-{
-    context->RegisterFactory<CSComponentAssembly>();
-}
+        fullAssemblyPath_ = file->GetFullPath();
 
-bool CSComponentAssembly::BeginLoad(Deserializer& source)
-{
-    return true;
-}
+        VariantMap eventData;
 
-bool CSComponentAssembly::Save(Serializer& dest) const
-{
-    return true;
-}
+        using namespace CSComponentAssemblyReference;
+        eventData[P_ASSEMBLYPATH] = fullAssemblyPath_;
+
+        SendEvent(E_CSCOMPONENTASSEMBLYREFERENCE, eventData);
+
+        return true;
+    }
+
+    bool CSComponentAssembly::Save(Serializer& dest) const
+    {
+        return true;
+    }
 
 }

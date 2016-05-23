@@ -117,7 +117,7 @@ void IPCWorker::ThreadFunction()
            break;
         }
 
-        Time::Sleep(100);
+        Time::Sleep(10);
     }
 
     shouldRun_ = false;

@@ -65,6 +65,9 @@ public:
     void SendEventToBroker(StringHash eventType);
     void SendEventToBroker(StringHash eventType, VariantMap& eventData);
 
+    // Processes arg strings looking for ipc server/client handles, returns true if an IPC subprocess
+    static bool ProcessArguments(const Vector<String>& arguments, int& id, IPCHandle& fd1, IPCHandle& fd2);
+
 #ifdef ATOMIC_PLATFORM_WINDOWS
     IPCHandle GetJobHandle() const { return jobHandle_; }
 #endif

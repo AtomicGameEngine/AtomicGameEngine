@@ -45,6 +45,12 @@ class JSBPackage : public Object
 
 public:
 
+    enum BindingType
+    {
+        JAVASCRIPT,
+        CSHARP
+    };
+
     JSBPackage(Context* context);
     virtual ~JSBPackage();
 
@@ -59,6 +65,8 @@ public:
     const String& GetName() { return name_; }
     const String& GetNamespace() { return namespace_; }
 
+    /// Returns whether bindings for a specific type should be generated for this package
+    bool GenerateBindings(BindingType type) { return bindingTypes_.Contains(type); }
 
     JSBClass* GetClass(const String& name);
 
@@ -93,6 +101,8 @@ private:
 
     Vector<SharedPtr<JSBModule> > modules_;
     PODVector<JSBClass*> allClasses_;
+
+    PODVector<BindingType> bindingTypes_;
 
     static Vector<SharedPtr<JSBPackage> > allPackages_;
 

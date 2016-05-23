@@ -19,6 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#include <Poco/File.h>
 
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
@@ -170,6 +171,27 @@ bool BuildBase::BuildCopyFile(const String& srcFileName, const String& destFileN
     return true;
 }
 
+bool BuildBase::BuildCopyDir(const String& srcDir, const String& destDir)
+{
+    if (buildFailed_)
+    {
+        LOGERRORF("BuildBase::BuildCopyDir - Attempt to copy directory of failed build, %s", srcDir.CString());
+        return false;
+    }
+
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    bool result = fileSystem->CopyDir(srcDir, destDir);
+
+    if (!result)
+    {
+        FailBuild(ToString("BuildBase::BuildCopyDir: Unable to copy dir %s -> %s", srcDir.CString(), destDir.CString()));
+        return false;
+    }
+
+    return true;
+}
+
 bool BuildBase::CheckIncludeResourceFile(const String & resourceDir, const String & fileName)
 {
     return (GetExtension(fileName) != ".psd");
@@ -187,7 +209,15 @@ bool BuildBase::BuildRemoveDirectory(const String& path)
     if (!fileSystem->DirExists(path))
         return true;
 
+#ifdef ATOMIC_PLATFORM_LINUX
+    bool result = true;   // fileSystem->RemoveDir(path, true); crashes on linux
+    Poco::File dirs(buildPath_.CString());
+    dirs.remove(true);
+    if (fileSystem->DirExists(buildPath_))
+        result = false;
+#else
     bool result = fileSystem->RemoveDir(path, true);
+#endif
 
     if (!result)
     {

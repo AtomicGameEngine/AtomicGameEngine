@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": false,
+        "noLib": false,
+        "moduleResolution": "classic",
+        "sourceMap": true,
+        "experimentalDecorators": true
+    },
+    "exclude": [
+      "dist/Atomic.d.ts"
+    ]
+}

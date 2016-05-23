@@ -201,6 +201,11 @@ public:
         if (!jtype)
         {
             jtype = processTypeConversion(type);
+
+            // explicit script string -> StringHash required
+            if (jtype && jtype->asStringHashType())
+                isReference = false;
+
             if (fst.isUnsigned() && jtype->asPrimitiveType())
                 jtype->asPrimitiveType()->isUnsigned_ = true;
 
@@ -315,13 +320,23 @@ public:
             for (unsigned i = 0; i < function->argumentCount(); i++)
             {
                 Symbol* symbol = function->argumentAt(i);
+
                 if (symbol->isArgument())
                 {
                     Argument* arg = symbol->asArgument();
 
                     JSBFunctionType* ftype = processFunctionArgType(arg);
+
                     if (!ftype)
-                        return NULL;
+                    {
+                        // if we don't have an initializer, the function cannot be bound
+                        // as unscriptable type
+                        if (!arg->hasInitializer())
+                            return NULL;
+
+                        // otherwise, break and the optional args will be ignored
+                        break;
+                    }
 
                     if (arg->hasInitializer())
                     {
@@ -353,7 +368,7 @@ public:
         {
             const Token &tcomment = unit_->commentAt(i);
             unsigned line;
-            unit_->getPosition(tcomment.utf16charOffset, &line);
+            unit_->getPosition(tcomment.utf16charsEnd(), &line);
 
             if (line ==  function->line() - 1)
             {
@@ -374,6 +389,34 @@ public:
                     jfunction->SetDocString(docString);
                 }
 
+            }
+
+            if (comment[0] == '/' && comment[1] == '*' && comment[2] == '*')
+            {
+                int index = 3;
+                bool foundStar = false;
+                String docString = jfunction->GetDocString();
+                while(comment[index])
+                {
+                    // did we find a star in the last loop?
+                    if (foundStar)
+                    {
+                        // We have a an end of block indicator, let's break
+                        if (comment[index] == '/' && foundStar)
+                            break;
+
+                        // This is just a star in the comment, not an end of comment indicator.  Let's keep it
+                        docString += '*';
+                    }
+                    
+                    foundStar = comment[index] == '*';
+
+                    if (!foundStar)
+                        docString += comment[index];
+
+                    index++;
+                }
+                jfunction->SetDocString(docString);
             }
 
         }

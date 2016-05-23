@@ -1,0 +1,15 @@
+TBLayout: axis: y
+    gravity all
+    TBEditField: multiline: 1, styling: 1, gravity: all, id: newbuild_text, readonly: 1, adapt-to-content: 0
+        font: size: 14
+        lp: max-width: 640, min-width: 640, min-height: 460, max-height: 460
+        text: "..."
+    TBLayout:
+        TBCheckBox: id: newbuild_check
+        TBTextField: text: "Don't show me again until a new build is installed"
+            font: size: 16
+    TBLayout:
+        TBButton: text: Current Funding Information, id: cfi
+            lp: min-width: 128, min-height: 48
+        TBButton: text: Ok, id: ok
+            lp: min-width: 128, min-height: 48

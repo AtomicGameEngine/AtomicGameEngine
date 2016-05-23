@@ -72,12 +72,6 @@ public:
     const String& GetPlayerDataDir() { return resourcePlayerDataDir_; }
     const String& GetEditorDataDir() { return resourceEditorDataDir_; }
 
-    /// AtomicNET
-    const String& GetNETCoreCLRAbsPath() { return netCoreCLRAbsPath_; }
-    const String& GetNETAssemblyLoadPaths() { return netAssemblyLoadPaths_; }
-    const String& GetNETTPAPaths() { return netTPAPaths_; }
-    const String& GetAtomicNETEngineAssemblyPath() { return netAtomicNETEngineAssemblyPath_; }
-
     /// Data directories
     const String& GetDeploymentDataDir() { return toolBinary_; }
 
@@ -114,12 +108,6 @@ private:
     String toolBinary_;
 
     String toolDataDir_;
-
-    // AtomicNET
-    String netCoreCLRAbsPath_;
-    String netAssemblyLoadPaths_;
-    String netTPAPaths_;
-    String netAtomicNETEngineAssemblyPath_;
 
     // resources
     String resourceCoreDataDir_;

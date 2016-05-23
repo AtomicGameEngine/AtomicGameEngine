@@ -4,7 +4,15 @@
 	"classes" : ["Resource", "ResourceCache", "XMLFile", "PListFile", "JSONFile", "Image"],
 	"overloads": {
 		"Image": {
-			"GetPixel": ["int", "int"]
+			"GetPixel": ["int", "int"],
+			"SetSize": ["int", "int", "int", "unsigned"]
 		}
+	},
+	"typescript_decl" : {
+		"ResourceCache" : [
+			"getResource<T extends Resource>(type: string, name: string, sendEventOnFailure?: boolean): T;",
+			"getTempResource<T extends Resource>(type: string, name: string, sendEventOnFailure?: boolean): T;",
+	        "getExistingResource<T extends Resource>(type: string, name: string): T;"
+		]
 	}
 }

@@ -9,7 +9,7 @@ include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
 # Define source files
 file (GLOB SOURCE_FILES *.cpp *.h )
 
-set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
+# set (SOURCE_FILES ${SOURCE_FILES}) ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (MSVC)
     set (EXE_TYPE WIN32)
@@ -18,9 +18,9 @@ elseif(APPLE)
     #ICNS
     set(MACOSX_BUNDLE_ICON_FILE Atomic.icns)
 if (NOT IOS)
-    set(ATOMIC_EDITOR_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
+    set(ATOMIC_PLAYER_ICON ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.icns)
 endif()
-    set_source_files_properties(${ATOMIC_EDITOR_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties(${ATOMIC_PLAYER_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set (EXE_TYPE MACOSX_BUNDLE)
 endif()
 
@@ -28,7 +28,7 @@ if (ANDROID)
 	include_directories(${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/include)
 	add_library(AtomicPlayer SHARED ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android/SDL_android_main.c)
 else()
-	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_EDITOR_ICON})
+	add_executable(AtomicPlayer ${EXE_TYPE} ${SOURCE_FILES} ${ATOMIC_PLAYER_ICON})
 endif()
 
 target_link_libraries(AtomicPlayer AtomicJS AtomicPlayerLib AtomicPlayerJS ${ATOMIC_LINK_LIBRARIES})
@@ -39,15 +39,12 @@ if (MSVC)
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicPlayer>/D3DCompiler_47.dll\")
 
-  target_link_libraries(AtomicPlayer NETCore NETScript)
 endif(MSVC)
 
 
 if (APPLE)
 
   if (NOT IOS)
-
-    target_link_libraries(AtomicPlayer NETCore NETScript)
 
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
 
@@ -68,13 +65,6 @@ if (APPLE)
   endif()
 
 endif(APPLE)
-
-
-if (LINUX)
-
-    target_link_libraries(AtomicPlayer NETCore NETScript)
-
-endif(LINUX)
 
 
 if (TARGET_PROPERTIES)

@@ -27,11 +27,7 @@ import NewProject = require("./NewProject");
 import CreateProject = require("./CreateProject");
 
 import EULAWindow = require("./license/EULAWindow");
-import ActivationWindow = require("./license/ActivationWindow");
-import ActivationSuccessWindow = require("./license/ActivationSuccessWindow");
-import ManageLicense = require("./license/ManageLicense");
-import Pro3DWindow = require("./license/Pro3DWindow");
-import ProPlatformWindow = require("./license/ProPlatformWindow");
+import NewBuildWindow = require("./license/NewBuildWindow");
 
 import BuildWindow = require("./build/BuildWindow");
 import BuildOutput = require("./build/BuildOutput");
@@ -169,46 +165,15 @@ class ModalOps extends Atomic.ScriptObject {
 
     }
 
-    showActivationWindow() {
+    showNewBuildWindow() {
 
         if (this.show()) {
 
-            this.opWindow = new ActivationWindow();
+            this.opWindow = new NewBuildWindow();
 
         }
 
     }
-
-    showManageLicense() {
-
-        if (this.show()) {
-
-            this.opWindow = new ManageLicense();
-
-        }
-
-    }
-
-    showPro3DWindow() {
-
-        if (this.show()) {
-
-            this.opWindow = new Pro3DWindow();
-
-        }
-
-    }
-
-    showProPlatformWindow() {
-
-        if (this.show()) {
-
-            this.opWindow = new ProPlatformWindow();
-
-        }
-
-    }
-
 
     showAbout() {
 
@@ -252,17 +217,6 @@ class ModalOps extends Atomic.ScriptObject {
         if (this.show()) {
 
             this.opWindow = new BuildOutput(buildBase);
-
-        }
-
-    }
-
-
-    showActivationSuccessWindow() {
-
-        if (this.show()) {
-
-            this.opWindow = new ActivationSuccessWindow();
 
         }
 

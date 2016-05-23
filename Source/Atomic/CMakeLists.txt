@@ -100,6 +100,7 @@ GroupSources("Resource")
 GroupSources("Scene")
 GroupSources("UI")
 GroupSources("Web")
+GroupSources("Script")
 
 add_library(Atomic ${SOURCE_FILES})
 

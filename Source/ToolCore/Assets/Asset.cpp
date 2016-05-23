@@ -41,9 +41,9 @@
 #include "TMXImporter.h"
 #include "PEXImporter.h"
 #include "TextImporter.h"
-#include "NETAssemblyImporter.h"
 #include "TypeScriptImporter.h"
 #include "ParticleEffectImporter.h"
+#include "NETAssemblyImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -318,16 +318,13 @@ bool Asset::CreateImporter()
         {
             importer_ = new ParticleEffectImporter(context_, this);
         }
-        else if (ext == ".txt")
+        else if (ext == ".txt" || ext == ".xml" || ext == ".hlsl" || ext == ".glsl")
         {
             importer_ = new TextImporter(context_, this);
         }
         else if (ext == ".dll")
         {
-            // TODO: check for native dll
-#ifdef ATOMIC_DOTNET
             importer_ = new NETAssemblyImporter(context_, this);
-#endif
         }
         else if (textureFormats.Contains(ext))
         {

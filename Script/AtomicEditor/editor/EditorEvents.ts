@@ -159,5 +159,17 @@ export interface RemoveCurrentAssetAssignedEvent {
 }
 
 export const UserPreferencesChangedNotification  = "UserPreferencesChangedNotification";
+export interface UserPreferencesChangedEvent {
+    /**
+     * JSON string of the project preferences
+     */
+    projectPreferences: string;
+
+    /**
+     * JSON string of the application preferences
+     */
+    applicationPreferences: string;
+}
+
 export const WebViewLoadEnd = "WebViewLoadEnd";
 export const WebMessage = "WebMessage";

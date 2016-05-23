@@ -158,12 +158,6 @@ export class BuildSettingsWindow extends ModalWindow {
 
                         }
 
-                        if (!platform.license) {
-                            this.hide();
-                            EditorUI.getModelOps().showProPlatformWindow();
-                            return true;
-                        }
-
                         toolSystem.setCurrentPlatform(platform.platformID);
 
                         return true;

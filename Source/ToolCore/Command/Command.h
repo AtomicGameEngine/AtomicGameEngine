@@ -42,7 +42,7 @@ EVENT(E_COMMANDFINISHED, CommandFinished)
 
 class Command : public Object
 {
-    OBJECT(Command);
+    OBJECT(Command)
 
 public:
 

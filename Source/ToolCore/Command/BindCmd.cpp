@@ -90,10 +90,8 @@ void BindCmd::Run()
     LOGINFOF("Loading Package");
     jsbind->LoadPackage(sourceRootFolder_, packageFolder_, bindPlatform_);
 
-    LOGINFOF("Generating JS Bindings");
     jsbind->GenerateJavaScriptBindings();
 
-    LOGINFOF("Generating C# Bindings");
     jsbind->GenerateCSharpBindings();
 
     Finished();

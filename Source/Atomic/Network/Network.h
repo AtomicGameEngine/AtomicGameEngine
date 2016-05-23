@@ -37,7 +37,7 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
-/// MessageConnection hash function.
+    /// MessageConnection hash function.
 template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 {
     return ((unsigned)(size_t)value) >> 9;
@@ -46,6 +46,8 @@ template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class ATOMIC_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
+    friend class MasterServerClient;
+
     OBJECT(Network);
 
 public:
@@ -66,6 +68,9 @@ public:
 
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+    /// Connect to a server, reusing an existing Socket
+    bool ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene);
+
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
@@ -117,6 +122,9 @@ public:
 
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
     Connection* GetConnection(kNet::MessageConnection* connection) const;
+    // Return the connection with the matching endpoint
+    bool IsEndPointConnected(const kNet::EndPoint& endPoint) const;
+
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
@@ -134,7 +142,10 @@ public:
     /// Send outgoing messages after frame logic. Called by HandleRenderUpdate.
     void PostUpdate(float timeStep);
 
+    unsigned short GetServerPort() const { return serverPort_; }
+
 private:
+
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle render update frame event.
@@ -145,6 +156,9 @@ private:
     void OnServerDisconnected();
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
+    void HandleClientConnected(StringHash eventType, VariantMap& eventData);
+
+    kNet::Network* GetKnetNetwork() { return network_; }
 
     /// kNet instance.
     kNet::Network* network_;
@@ -170,6 +184,8 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
+
+    unsigned short serverPort_;
 };
 
 /// Register Network library objects.

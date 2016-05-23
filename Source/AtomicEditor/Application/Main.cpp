@@ -63,6 +63,17 @@ static int RunPlayerApplication()
 #if defined(_MSC_VER) && defined(_DEBUG) && !defined(ATOMIC_WIN32_CONSOLE)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
+
+#ifdef ATOMIC_WEBVIEW
+    int exit_code = Atomic::WebMain(0, nullptr);
+
+    if (exit_code >= 0)
+    {
+        // The sub-process has completed so return here.
+        return exit_code;
+    }
+#endif
+
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     Atomic::ParseArguments(GetCommandLineW());
 
@@ -104,6 +115,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #elif defined(WIN32) && !defined(ATOMIC_WIN32_CONSOLE)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
+#ifdef ATOMIC_WEBVIEW
+    int exit_code = Atomic::WebMain(0, nullptr);
+
+    if (exit_code >= 0)
+    {
+        // The sub-process has completed so return here.
+        return exit_code;
+    }
+#endif
+
     Atomic::ParseArguments(GetCommandLineW());
 
     const Vector<String>& arguments = GetArguments();

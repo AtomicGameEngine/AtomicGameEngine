@@ -400,7 +400,7 @@ static int select_list_sort_cb(TBSelectItemSource *_source, const int *a, const 
 
 UIListView::UIListView(Context* context, bool createWidget) :
     UIWidget(context, createWidget),
-    source_(0), itemLookupId_(0), multiSelect_(false), moveDelta_(0.0f)
+    source_(0), itemLookupId_(0), multiSelect_(false), moveDelta_(0.0f), pivot_(nullptr), pivotIndex_(0), startNewSelection_(true)
 {
     rootList_ = new UISelectList(context);
     rootList_->SetUIListView(true);
@@ -855,7 +855,6 @@ void UIListView::SendItemSelectedChanged(ListViewItem* item)
 void UIListView::SelectItem(ListViewItem* item, bool select)
 {
     item->SetSelected(select);
-    UpdateItemVisibility();
     SendItemSelectedChanged(item);
 }
 
@@ -899,32 +898,40 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
 
                 if (shiftMulti)
                 {
-                    int first = rootList_->GetValue();
+                    if (startNewSelection_)
+                        SelectAllItems(false);
 
-                    if (i > first)
+                    if (!pivot_)
                     {
-                        for (int j = first + 1; j < i; j++)
+                        pivotIndex_ = 0;
+                        pivot_ = source_->GetItem(pivotIndex_);
+                    }
+
+                    SetValueFirstSelected();
+
+                    if (i > pivotIndex_)
+                    {
+                        for (int j = pivotIndex_; j < i; j++)
                         {
                             ListViewItem* itemSelect = source_->GetItem(j);
-                            SelectItem(itemSelect, true);
-                            SetValueFirstSelected();
-                        }
 
-                        SelectItem(item, true);
-                        SetValueFirstSelected();
+                            if (!itemSelect->parent_ || itemSelect->parent_->GetExpanded())
+                                SelectItem(itemSelect, true);
+                        }
                     }
-                    else if (i < first)
+                    else if (i < pivotIndex_)
                     {
-                        for (int j = first - 1; j > i; j--)
+                        for (int j = pivotIndex_; j > i; j--)
                         {
                             ListViewItem* itemSelect = source_->GetItem(j);
-                            SelectItem(itemSelect, true);
-                            SetValueFirstSelected();
-                        }
 
-                        SelectItem(item, true);
-                        SetValueFirstSelected();
+                            if (itemSelect->parent_->GetExpanded())
+                                SelectItem(itemSelect, true);
+                        }
                     }
+
+                    SelectItem(item, true);
+                    UpdateItemVisibility();
                 }
                 else if (multi)
                 {
@@ -938,11 +945,19 @@ bool UIListView::OnEvent(const tb::TBWidgetEvent &ev)
                     }
 
                     SetValueFirstSelected();
+                    UpdateItemVisibility();
 
+                    pivot_ = item;
+                    pivotIndex_ = i;
+                    startNewSelection_ = false;
                 }
                 else
                 {
                     SelectSingleItem(item, false);
+
+                    pivot_ = item;
+                    pivotIndex_ = i;
+                    startNewSelection_ = true;
                 }
 
                 return true;

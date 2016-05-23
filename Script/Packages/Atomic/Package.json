@@ -2,11 +2,12 @@
 {
 	"name" : "Atomic",
 	"namespace" : "Atomic",
-
 	"modules" : ["Container", "Math", "Core", "Scene", "Graphics", "Atomic3D", "Atomic2D", "Audio",
-	"Physics", "Navigation", "Input", "UI", "Resource", "Network", "IO",
-	"Engine", "Script", "Javascript", "Environment", "Web"],
-	"moduleExclude" : {
-		"WEB" : ["Network", "Navigation"]
+		"Physics", "Navigation", "Input", "UI", "Resource", "Network", "IO",
+		"Engine", "Script", "Javascript", "Environment", "Web", "IPC"],
+		"moduleExclude" : {
+			"WEB" : ["Network", "Navigation", "IPC"],
+			"ANDROID" : ["IPC"],
+			"IOS" : ["IPC"]
+		}
 	}
-}

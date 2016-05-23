@@ -28,4 +28,4 @@ var Spinner = (function (_super) {
     };
     return Spinner;
 })(Atomic.JSComponent);
-module.exports = Spinner;
+exports.default = Spinner;

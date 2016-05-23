@@ -119,7 +119,7 @@ void CSModuleWriter::GenerateNativeSource()
 
     WriteIncludes(source);
 
-    source += "\n#include <AtomicNET/NETCore/NETCore.h>\n";
+    source += "\n#include <AtomicNET/NETNative/NETCore.h>\n";
 
     String ns = module_->GetPackage()->GetNamespace();
 
@@ -377,22 +377,12 @@ void CSModuleWriter::GenerateManagedModuleClass(String& sourceOut)
         if (klass->IsNumberArray() || klass->IsAbstract())
             continue;
 
-        line = ToString("NativeCore.RegisterNativeType(typeof(%s));\n", klass->GetName().CString());
+        const char* className = klass->GetName().CString();
+
+        line = ToString("new NativeType(%s.csb_%s_%s_GetClassIDStatic (), ", className, package->GetName().CString(), className);
+        line += ToString("typeof(%s), (IntPtr x) => { return new %s (x); } );\n",className, className);
 
         source += IndentLine(line);
-
-        line = ToString("NativeCore.nativeClassIDToManagedConstructor [ %s.csb_%s_%s_GetClassIDStatic ()] = (IntPtr x) => {\n",
-                        klass->GetName().CString(), package->GetName().CString(), klass->GetName().CString());
-
-        source += IndentLine(line);
-
-        Indent();
-
-        source += IndentLine(ToString("return new %s (x);\n", klass->GetName().CString()));
-
-        Dedent();
-
-        source += IndentLine("};\n");
 
     }
 

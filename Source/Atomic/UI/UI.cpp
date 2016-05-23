@@ -39,6 +39,7 @@
 #include <TurboBadger/tb_menu_window.h>
 #include <TurboBadger/tb_popup_window.h>
 #include <TurboBadger/image/tb_image_widget.h>
+#include <TurboBadger/tb_atomic_widgets.h>
 
 void register_tbbf_font_renderer();
 void register_stb_font_renderer();
@@ -83,6 +84,9 @@ using namespace tb;
 #include "UISelectDropdown.h"
 #include "UIMenuWindow.h"
 #include "UIPopupWindow.h"
+#include "UISlider.h"
+#include "UIColorWidget.h"
+#include "UIColorWheel.h"
 
 #include "SystemUI/SystemUI.h"
 #include "SystemUI/SystemUIEvents.h"
@@ -408,7 +412,9 @@ void UI::Render(bool resetRenderTargets)
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
 
-    GetSubsystem<SystemUI::SystemUI>()->Render();
+    SystemUI::SystemUI* systemUI = GetSubsystem<SystemUI::SystemUI>();
+    if (systemUI)
+        systemUI->Render();
 }
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -667,6 +673,30 @@ UIWidget* UI::WrapWidget(tb::TBWidget* widget)
     if (widget->IsOfType<TBInlineSelect>())
     {
         UIInlineSelect* select = new UIInlineSelect(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
+    }
+
+    if (widget->IsOfType<TBSlider>())
+    {
+        UISlider* select = new UISlider(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
+    }
+
+    if (widget->IsOfType<TBColorWidget>())
+    {
+        UIColorWidget* select = new UIColorWidget(context_, false);
+        select->SetWidget(widget);
+        widgetWrap_[widget] = select;
+        return select;
+    }
+
+    if (widget->IsOfType<TBColorWheel>())
+    {
+        UIColorWheel* select = new UIColorWheel(context_, false);
         select->SetWidget(widget);
         widgetWrap_[widget] = select;
         return select;

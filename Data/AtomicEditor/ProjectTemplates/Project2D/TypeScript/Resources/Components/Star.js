@@ -28,4 +28,4 @@ var Star = (function (_super) {
     };
     return Star;
 })(Atomic.JSComponent);
-module.exports = Star;
+exports.default = Star;

@@ -98,6 +98,14 @@ JSComponent* JSComponentFile::CreateJSComponent()
 
         PushModule();
 
+        // Check to see if the module exposes a "default" constructor which is used by TS and ES2015
+        duk_get_prop_string(ctx, -1, "default");
+        if (!duk_is_function(ctx, -1))
+        {
+            // We are not a "default" style object, so reset the stack
+            duk_pop(ctx);
+        }
+
         duk_new(ctx, 0);
 
         if (duk_is_object(ctx, -1))
@@ -145,16 +153,26 @@ bool JSComponentFile::InitModule()
     }
     else if (duk_is_object(ctx, -1))
     {
-        duk_get_prop_string(ctx, -1, "component");
-
+        // Look for "default" constructor which is used by TypeScript and ES2015
+        duk_get_prop_string(ctx, -1, "default");
         if (!duk_is_function(ctx, -1))
         {
-            LOGERRORF("Component file export object does not export a key \"component\" function: %s", GetName().CString());
-            duk_set_top(ctx, top);
-            return false;
+            duk_pop(ctx);
+            duk_get_prop_string(ctx, -1, "component");
+
+            if (!duk_is_function(ctx, -1))
+            {
+                LOGERRORF("Component file export object does not export a key \"component\" function: %s", GetName().CString());
+                duk_set_top(ctx, top);
+                return false;
+            }
+
+            scriptClass_ = false;
+        } else {
+            // this is a TS or ES2015 default class
+            scriptClass_ = true;
         }
 
-        scriptClass_ = false;
     }
 
     duk_set_top(ctx, top);

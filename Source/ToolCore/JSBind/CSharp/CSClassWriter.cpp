@@ -200,7 +200,6 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
 
     WriteManagedProperties(source);
 
-    Indent();
     JSBPackage* package = klass_->GetPackage();
 
     // CoreCLR has pinvoke security demand code commented out, so we do not (currently) need this optimization:
@@ -249,8 +248,6 @@ void CSClassWriter::GenerateManagedSource(String& sourceOut)
         source += IndentLine("{\n");
         source += IndentLine("}\n\n");
     }
-
-    Dedent();
 
     source += IndentLine("}\n");
 

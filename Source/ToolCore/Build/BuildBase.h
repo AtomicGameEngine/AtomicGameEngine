@@ -38,6 +38,8 @@ class BuildBase : public Object
 {
     OBJECT(BuildBase);
 
+friend class AndroidProjectGenerator;
+
 public:
 
     BuildBase(Context* context, Project* project, PlatformID platform);
@@ -75,6 +77,8 @@ protected:
     bool BuildRemoveDirectory(const String& path);
     bool BuildCreateDirectory(const String& path);
     bool BuildCopyFile(const String& srcFileName, const String& destFileName);
+    bool BuildCopyDir(const String& srcDir, const String& destDir);
+
     virtual bool CheckIncludeResourceFile(const String& resourceDir, const String& fileName);
 
     void GenerateResourcePackage(const String& resourcePackagePath);

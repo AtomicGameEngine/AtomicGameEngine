@@ -1,0 +1,216 @@
+# Editor skin override (contains some additions for the atomic editor)
+elements
+	background
+		bitmap bg_tile.png
+		type Tile
+	background_solid
+		background-color #d6d6d6
+		padding 10
+	AEContainer
+		type StretchBox
+		bitmap window.png
+		cut 16
+		expand 12
+		padding 0
+
+	Checkerboard
+		type StretchBox
+		bitmap checkerboard.png
+	HSVSkin
+		type StretchBox
+		bitmap HSV21.png
+	AccentColor1
+		text-color #224444
+	AccentColor2
+		text-color #113333
+	AccentColor3
+		text-color #002222
+	AccentColor4
+		text-color #001111
+	AccentColorWarn
+		text-color #ffff66
+	AccentColorError
+		text-color #ff6666
+	AccentColorSuccess
+		text-color #66ff66
+
+	Folder
+		text-color #2c2c2c
+	Folder.selected
+		text-color #ffffff
+	Folder.icon: type: Image, bitmap: folder.png
+
+	ImageCaption
+		background-color #c6c6c6
+	ImageFrame
+		overlays
+			element ImageFrame.overlay
+				state all
+	ImageFrame.overlay
+		bitmap image_frame.png
+		cut 22
+		expand 15
+
+	StarButton
+		overlays
+			element Star
+				condition: target: ancestors, property: skin, value: "StarCondition"
+	Star
+		bitmap star_gray.png
+		type Image
+		img-position-x 0
+		img-position-y 0
+		img-ofs-x -8
+		img-ofs-y -12
+		overrides
+			element Star.active
+				condition: target: parent, property: hover
+	Star.active
+		bitmap star_gold.png
+		type Image
+		img-position-x 0
+		img-position-y 0
+		img-ofs-x -10
+		img-ofs-y -14
+
+	LineNumberSelectList
+		background-color #F5F5F5
+
+	ComponentBitmap
+		bitmap component.png
+
+	MagnifierBitmap
+		bitmap magnifier.png
+
+	JavascriptBitmap
+		bitmap javascript.png
+
+	2DLevelBitmap
+		bitmap 2d_level.png
+
+	FolderCreateBitmap
+		bitmap folder_create.png
+
+	FolderDeleteBitmap
+		bitmap folder_delete.png
+
+	FileBitmap
+		bitmap file.png
+
+	PlayButton
+		bitmap play.png
+
+	StopButton
+		bitmap stop.png
+
+	PauseButton
+		bitmap pause.png
+
+	StepButton
+		bitmap step.png
+
+	PowerOffButton
+		bitmap power_off.png
+
+	AESeparator
+		bitmap item_separator_x.png
+		type Stretch Image
+
+	LogoWindows
+		bitmap logo_windows.png
+
+	LogoAndroid
+		bitmap logo_android.png
+
+	LogoHTML5
+		bitmap logo_html5.png
+
+	LogoIOS
+		bitmap logo_ios.png
+
+	LogoMac
+		bitmap logo_mac.png
+
+	LogoWindows-Small
+		bitmap logo_windows.png
+		width 48
+		height 48
+
+	LogoAndroid-Small
+		bitmap logo_android.png
+		width 48
+		height 48
+
+	LogoHTML5-Small
+		bitmap logo_html5.png
+		width 48
+		height 48
+
+	LogoIOS-Small
+		bitmap logo_ios.png
+		width 48
+		height 48
+
+	LogoMac-Small
+		bitmap logo_mac.png
+		width 48
+		height 48
+
+	LogoWindows-Small
+		bitmap logo_windows.png
+		width 48
+		height 48
+
+	Module2D-Small
+		bitmap module_2d.png
+		width 48
+		height 48
+
+	Module3D-Small
+		bitmap module_3d.png
+		width 48
+		height 48
+
+	LogoAtomic64
+		bitmap logo_atomic_64.png
+
+	TextCode
+		background-color #c6c6c6
+
+	3DScaleBitmap
+		bitmap 3d_scale.png
+	3DTranslateBitmap
+		bitmap 3d_translate.png
+	3DRotateBitmap
+		bitmap 3d_rotate.png
+
+	DarkGrayText
+		text-color #212121
+
+
+	InspectorTopLayout
+		background-color #c6c6c6
+
+	InspectorVectorAttrLayout
+		background-color #c6c6c6
+
+	InspectorTextLabel
+		text-color #2c2c2c
+		min-width 140
+		max-width 140
+
+	InspectorVectorAttrName
+		text-color #2c2c2c
+		min-width 140
+		max-width 140
+
+	InspectorTextAttrName
+		padding 4
+		text-color #2c2c2c
+		min-width 140
+		max-width 140
+
+	HierarchyPrefabText
+		text-color #2c2c2c
+	HierarchyPrefabText.selected
+		text-color #2c2c2c

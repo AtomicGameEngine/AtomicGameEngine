@@ -22,33 +22,64 @@
 
 #pragma once
 
+#include <Atomic/IPC/IPCServer.h>
+
 #include "AssetImporter.h"
+
+using namespace Atomic;
 
 namespace ToolCore
 {
+    class NETAssemblyImporter;
 
-class NETAssemblyImporter : public AssetImporter
-{
-    OBJECT(NETAssemblyImporter);
+    class NETAssemblyImporterResultHandler : public IPCResultHandler
+    {
+        OBJECT(NETAssemblyImporterResultHandler)
 
-public:
-    /// Construct.
-    NETAssemblyImporter(Context* context, Asset* asset);
-    virtual ~NETAssemblyImporter();
+    public:
+        /// Construct.
+        NETAssemblyImporterResultHandler(Context* context, NETAssemblyImporter* importer);
+        /// Destruct.
+        virtual ~NETAssemblyImporterResultHandler();
 
-    virtual void SetDefaults();
+        virtual void HandleResult(unsigned cmdID, const VariantMap& cmdResult);
 
-    Resource* GetResource(const String& typeName = String::EMPTY);
+    private:
 
-protected:
+        WeakPtr<NETAssemblyImporter> importer_;
 
-    bool Import();
+    };
 
-    virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
-    virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
+    class NETAssemblyImporter : public AssetImporter
+    {
+        friend class NETAssemblyImporterResultHandler;
 
-    JSONValue assemblyJSON_;
+        OBJECT(NETAssemblyImporter)
 
-};
+    public:
+        /// Construct.
+        NETAssemblyImporter(Context* context, Asset* asset);
+        virtual ~NETAssemblyImporter();
+
+        virtual void SetDefaults();
+
+        Resource* GetResource(const String& typeName = String::EMPTY);
+
+    protected:
+
+        bool Import();
+
+        virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
+        virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
+
+    private:
+
+        virtual void HandleResult(unsigned cmdID, const VariantMap& cmdResult);
+
+        JSONValue assemblyJSON_;
+
+        SharedPtr<NETAssemblyImporterResultHandler> resultHandler_;
+
+    };
 
 }
