@@ -197,6 +197,9 @@ void SceneView3D::MoveCamera(float timeStep)
     const float CAMERA_MOVE_TEMPO = 5.0f;
     // Tempo used when zooming in and out
     const float ZOOM_TEMPO = 0.6f;
+    // Orthographic zoom settings
+    const float ZOOM_INCREMENT = 0.1f;
+    const float DEFAULT_ZOOM = 1.0f;
 
     if (!enabled_ && !GetFocus())
         return;
@@ -215,11 +218,6 @@ void SceneView3D::MoveCamera(float timeStep)
     float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.2f;
-
-    // Orthographic zoom settings
-    float currCameraZoom = camera_->GetZoom();
-    const float ZOOM_INCREMENT = 0.1f;
-    const float DEFAULT_ZOOM = 1.0f;
 
     if (shiftDown)
         MOVE_SPEED *= 3.0f;
@@ -336,6 +334,8 @@ void SceneView3D::MoveCamera(float timeStep)
         cameraNode_->SetWorldPosition(pos);
 
     }
+
+    float currCameraZoom = camera_->GetZoom();
 
     if (camera_->IsOrthographic() && mouseInView && !orbitting)
     {
