@@ -324,14 +324,6 @@ bool SceneView3D::MouseInView()
 
 }
 
-void SceneView3D::ToggleGrid()
-{
-    Input* input = GetSubsystem<Input>();
-
-    if (input->GetKeyPress(KEY_G))
-        gridEnabled_ = !gridEnabled_;
-}
-
 void SceneView3D::HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData)
 {
     if (!enabled_)
@@ -477,8 +469,12 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
         }
     }
     if (ev.type == EVENT_TYPE_KEY_DOWN)
-        ToggleGrid();
+    {
+        Input* input = GetSubsystem<Input>();
 
+        if (input->GetKeyPress(KEY_G))
+            gridEnabled_ = !gridEnabled_;
+    }
     return sceneEditor_->OnEvent(ev);
 }
 

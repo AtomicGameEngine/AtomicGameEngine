@@ -75,8 +75,6 @@ private:
     bool GetOrbitting();
     bool GetZooming();
 
-    void ToggleGrid();
-
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
     void UpdateDragNode(int mouseX, int mouseY);
