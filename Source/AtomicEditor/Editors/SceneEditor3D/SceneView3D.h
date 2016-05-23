@@ -99,7 +99,7 @@ private:
     void SelectView();
 
     // stores the last known position of the perspective camera
-    void SetPerspectiveCameraPosition();
+    void SavePerspectiveCameraPosition();
 
     WeakPtr<SceneEditor3D> sceneEditor_;
 
@@ -110,14 +110,14 @@ private:
     float perspectiveYaw_;
     float perspectivePitch_;
 
-    // checks if perspective camera settings has been set
-    bool perspectivePositionSaved_;
-
     bool mouseLeftDown_;
     bool mouseMoved_;
 
     bool enabled_;
     bool gridEnabled_;
+
+    // Checks whether your switching from an orthographic view
+    bool fromOrthographic_;
 
     bool cameraMove_;
     float cameraMoveTime_;
