@@ -545,8 +545,11 @@ void BuildBase::AddToResourcePackager(const String& filename, const String& reso
 
     // Add the file to the resourceEntries_ list
     // TODO: Add additional filters
-    if (GetExtension(filename) == ".psd")
+    if (CheckIncludeResourceFile(resourceDir, filename))
         return;
+
+    //if (GetExtension(filename) == ".psd")
+    //    return;
 
     BuildResourceEntry* newEntry = new BuildResourceEntry;
 
