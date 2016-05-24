@@ -61,7 +61,7 @@ void BuildWindows::Initialize()
     BuildDefaultResourceEntries();
     
     // Include the project resources and cache separately
-    AddProjectResourceDir(project->GetProjectPath());
+    AddProjectResourceDir(project->GetResourcePath());
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
     String cachePath = db->GetCachePath();
     AddProjectResourceDir(cachePath);

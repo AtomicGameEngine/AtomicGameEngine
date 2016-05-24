@@ -43,7 +43,8 @@ static const wchar_t* openMode[] =
     L"rb",
     L"wb",
     L"r+b",
-    L"w+b"
+    L"w+b",
+    L"a+b"
 };
 #else
 static const char* openMode[] =
@@ -51,7 +52,8 @@ static const char* openMode[] =
     "rb",
     "wb",
     "r+b",
-    "w+b"
+    "w+b",
+    "a+b"
 };
 #endif
 
