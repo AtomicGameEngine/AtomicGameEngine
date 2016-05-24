@@ -43,7 +43,7 @@ class JSResourceEditor: public ResourceEditor
 
 public:
 
-    JSResourceEditor(Context* context, const String& fullpath, UITabContainer* container);
+    JSResourceEditor(Context* context, const String& fullpath, UITabContainer* container, const String& editorUrl);
 
     virtual ~JSResourceEditor();
 
@@ -74,7 +74,7 @@ private:
     void HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData);
     void HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData);
     void HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData);
-    
+
     SharedPtr<UIWebView> webView_;
     WeakPtr<WebClient> webClient_;
     WeakPtr<WebMessageHandler> messageHandler_;
