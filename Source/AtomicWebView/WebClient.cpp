@@ -77,8 +77,8 @@ public:
         webBrowserHost_ = webClient_->GetSubsystem<WebBrowserHost>();
 
         CefMessageRouterConfig config;
-        config.js_query_function = "atomicQuery";
-        config.js_cancel_function = "atomicQueryCancel";
+        config.js_query_function = WebBrowserHost::GetJSMessageQueryFunctionName().CString();
+        config.js_cancel_function = WebBrowserHost::GetJSMessageQueryCancelFunctionName().CString();
         browserSideRouter_ = CefMessageRouterBrowserSide::Create(config);
 
     }
@@ -345,6 +345,7 @@ public:
         browserSettings.webgl = STATE_ENABLED;
         browserSettings.file_access_from_file_urls = STATE_ENABLED;
         browserSettings.universal_access_from_file_urls = STATE_ENABLED;
+        browserSettings.web_security = WebBrowserHost::GetWebSecurity() ? STATE_ENABLED : STATE_DISABLED;
 
         windowInfo.width = width;
         windowInfo.height = height;        
