@@ -429,6 +429,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
             fileSystem->ScanDir(filesInFolder, project_->GetResourcePath() + filename, "*.*", SCAN_FILES, true);
             for (unsigned j = 0; j < filesInFolder.Size(); ++j)
             {
+                String file = filesInFolder[j];
                 if (GetExtension(filesInFolder[j]) != ".asset")
                     filesInFolderToAdd.Push(filesInFolder[j]);
             }
@@ -493,7 +494,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     Vector<String> cacheFilesToInclude;
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
     String cachePath = db->GetCachePath();
-    fileSystem->ScanDir(filesInCacheFolder, cachePath, "*.*", SCAN_FILES, true);
+    fileSystem->ScanDir(filesInCacheFolder, cachePath, "*.*", SCAN_FILES, false);
 
     for (unsigned i = 0; i < filesWithGUIDtoInclude.Size(); ++i)
     {
@@ -501,6 +502,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         for (unsigned j = 0; j < filesInCacheFolder.Size(); ++j)
         {
             String &filename = GetFileName(filesInCacheFolder[j]);
+            String &filenamePath = filesInCacheFolder[j];
             if (filename.Contains(guid))
             {
                 cacheFilesToInclude.Push(filesInCacheFolder[j]);
@@ -517,7 +519,8 @@ void BuildBase::BuildFilteredProjectResourceEntries()
 
     for (unsigned i = 0; i < filesInCacheDDSfolder.Size(); ++i)
     {
-        cacheFilesToInclude.Push(filesInCacheDDSfolder[i]);
+        String& file = filesInCacheDDSfolder[i];
+        cacheFilesToInclude.Push("DDS/" + filesInCacheDDSfolder[i]);
     }
 #endif
 
