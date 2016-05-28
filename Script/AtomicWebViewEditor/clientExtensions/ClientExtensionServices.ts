@@ -213,14 +213,17 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
 
     /**
      * Return a preference value or the provided default from the user settings file
-     * @param  {string} gorupName name of the group the preference lives under
+     * @param  {string} settignsGroup name of the group the preference lives under
      * @param  {string} preferenceName name of the preference to retrieve
      * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
      * @return {number|boolean|string}
      */
-    getUserPreference(groupName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string {
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
         if (this.userPreferences) {
-            let prefs = this.userPreferences[groupName];
+            let prefs = this.userPreferences[settingsGroup];
             if (prefs) {
                 return prefs[preferenceName] || defaultValue;
             }

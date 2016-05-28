@@ -215,4 +215,13 @@ export default class HostInteropType {
             console.log("Error loading preferences: " + e.error_message);
         });
     }
+
+    /**
+     * This adds a global routine to the window object so that it can be called from the host
+     * @param  {string} routineName
+     * @param  {(} callback
+     */
+    addCustomHostRoutine(routineName: string, callback: () => void) {
+        window[routineName] = callback;
+    }
 }
