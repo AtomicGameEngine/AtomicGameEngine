@@ -222,7 +222,7 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         if (this.userPreferences) {
             let prefs = this.userPreferences[groupName];
             if (prefs) {
-                return prefs[groupName][preferenceName] || defaultValue;
+                return prefs[preferenceName] || defaultValue;
             }
         }
 
