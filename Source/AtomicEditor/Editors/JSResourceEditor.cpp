@@ -127,46 +127,43 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
 
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
-    if (request == EDITOR_CHANGE)
+    // All messages come in as a JSON string with a "message" property describing what the message is
+    JSONValue jvalue;
+    if (JSONFile::ParseJSON(request, jvalue, false))
     {
-        SetModified(true);
-    }
-    else
-    {
-        JSONValue jvalue;
-        if (JSONFile::ParseJSON(request, jvalue, false))
+        String message = jvalue["message"].GetString();
+        if (message == EDITOR_CHANGE) {
+            SetModified(true);
+        }
+        else if (message == EDITOR_SAVE_CODE)
         {
-            String message = jvalue["message"].GetString();
-            if (message == EDITOR_SAVE_CODE)
-            {
-                String code = jvalue["payload"].GetString();
-                File file(context_, fullpath_, FILE_WRITE);
-                file.Write((void*) code.CString(), code.Length());
-                file.Close();
-            }
-            else if (message == EDITOR_SAVE_FILE)
-            {
-                String code = jvalue["payload"].GetString();
-                String fn = jvalue["filename"].GetString();
+            String code = jvalue["payload"].GetString();
+            File file(context_, fullpath_, FILE_WRITE);
+            file.Write((void*) code.CString(), code.Length());
+            file.Close();
+        }
+        else if (message == EDITOR_SAVE_FILE)
+        {
+            String code = jvalue["payload"].GetString();
+            String fn = jvalue["filename"].GetString();
 
-                // NOTE: We only want to be able save into the resource directory, so parse out the file path and append
-                // it to the resource directory
-                ToolSystem* tsys = GetSubsystem<ToolSystem>();
-                String fullFilePath = tsys->GetProject()->GetProjectPath() + getNormalizedPath(fn);
+            // NOTE: We only want to be able save into the resource directory, so parse out the file path and append
+            // it to the resource directory
+            ToolSystem* tsys = GetSubsystem<ToolSystem>();
+            String fullFilePath = tsys->GetProject()->GetProjectPath() + getNormalizedPath(fn);
 
-                File file(context_, fullFilePath, FILE_WRITE);
-                file.Write((void*) code.CString(), code.Length());
-                file.Close();
-            }
-            else if (message == EDITOR_GET_USER_PREFS)
+            File file(context_, fullFilePath, FILE_WRITE);
+            file.Write((void*) code.CString(), code.Length());
+            file.Close();
+        }
+        else if (message == EDITOR_GET_USER_PREFS)
+        {
+            ToolSystem* tsys = GetSubsystem<ToolSystem>();
+            Project* proj = tsys->GetProject();
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            if (fileSystem->FileExists(proj->GetUserPrefsFullPath()))
             {
-                ToolSystem* tsys = GetSubsystem<ToolSystem>();
-                Project* proj = tsys->GetProject();
-                FileSystem* fileSystem = GetSubsystem<FileSystem>();
-                if (fileSystem->FileExists(proj->GetUserPrefsFullPath()))
-                {
-                    webClient_->ExecuteJavaScript(ToString("HOST_loadPreferences(\"atomic://%s\");", proj->GetUserPrefsFullPath().CString()));
-                }
+                webClient_->ExecuteJavaScript(ToString("HOST_loadPreferences(\"atomic://%s\");", proj->GetUserPrefsFullPath().CString()));
             }
         }
     }
