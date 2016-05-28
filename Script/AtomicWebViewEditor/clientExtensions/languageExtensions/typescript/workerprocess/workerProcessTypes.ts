@@ -32,6 +32,13 @@ export interface SaveMessageData extends WorkerProcessMessageData, Editor.Editor
 export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent {}
 export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent {}
 
+export const SetPreferences = "SET_PREFERENCES";
+export interface SetPreferencesMessageData extends WorkerProcessMessageData {
+    preferences: {
+        compileOnSave?: boolean;
+    };
+}
+
 export const GetCompletions = "COMPLETIONS";
 export const CompletionResponse = "COMPLETION_RESPONSE";
 export interface WordCompletion {
@@ -75,6 +82,12 @@ export interface GetAnnotationsMessageData extends SaveMessageData {};
 export interface GetAnnotationsResponseMessageData extends WorkerProcessMessageData {
     annotations: any[];
 }
+
+export const DoFullCompile  = "DO_FULL_COMPILE";
+export const DisplayFullCompileResults = "DISPLAY_FULL_COMPILE_RESULTS";
+export interface FullCompileResultsMessageData extends GetAnnotationsResponseMessageData {}
+
+export const SaveFile = "SAVE_FILE";
 
 export const Connect = "HELO";
 export const Disconnect = "CLOSE";

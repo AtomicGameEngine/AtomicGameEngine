@@ -68,15 +68,18 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             // First we need to load in a copy of the lib.core.d.ts that is necessary for the hosted typescript compiler
             projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.core.d.ts");
 
-            // Load up a copy of the duktape.d.ts
-            projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "duktape.d.ts");
-
-
-            // Look in a 'typings' directory for any typescript definition files
-            const typingsDir = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + "typings";
-            Atomic.fileSystem.scanDir(typingsDir, "*.d.ts", Atomic.SCAN_FILES, true).forEach(filename => {
-                projectFiles.push(Atomic.addTrailingSlash(typingsDir) + filename);
+            // Then see if we have a copy of Atomic.d.ts in the project directory.  If we don't then we should load it up from the tool environment
+            let found = false;
+            projectFiles.forEach((file) => {
+                if (file.indexOf("Atomic.d.ts") != -1) {
+                    found = true;
+                }
             });
+
+            if (!found) {
+                // Load up the Atomic.d.ts from the tool core
+                console.log("Need to load up hosted Atomic.d.ts!");
+            }
 
             let files = projectFiles.map((f: string) => {
                 if (f.indexOf(ToolCore.toolSystem.project.resourcePath) != -1) {
@@ -111,6 +114,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         // We care about both resource events as well as project events
         serviceLocator.resourceServices.register(this);
         serviceLocator.projectServices.register(this);
+        serviceLocator.uiServices.register(this);
         this.serviceRegistry = serviceLocator;
     }
 
@@ -197,5 +201,81 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         // got a load, we need to reset the language service
         console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
         this.loadProjectFiles();
+        this.rebuildMenu();
+    }
+
+
+    /**
+     * Rebuilds the plugin menu.  This is needed to toggle the CompileOnSave true or false
+     */
+    rebuildMenu() {
+        if (this.isTypescriptProject) {
+            this.serviceRegistry.uiServices.removePluginMenuItemSource("TypeScript");
+            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+            let subMenu = {};
+            if (isCompileOnSave) {
+                subMenu["Compile on Save: On"] = [`${this.name}.compileonsave`];
+            } else {
+                subMenu["Compile on Save: Off"] = [`${this.name}.compileonsave`];
+            }
+            subMenu["Compile Project"] = [`${this.name}.compileproject`];
+            this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", subMenu);
+        }
+    }
+
+    /*** UIService implementation ***/
+
+    /**
+     * Called when a plugin menu item is clicked
+     * @param  {string} refId
+     * @return {boolean}
+     */
+    menuItemClicked(refId: string): boolean {
+        let [extension, action] = refId.split(".");
+        if (extension == this.name) {
+            switch (action) {
+                case "compileonsave":
+                    // Toggle
+                    const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+                    this.serviceRegistry.projectServices.setUserPreference(this.name, "CompileOnSave", !isCompileOnSave);
+                    this.rebuildMenu();
+                    return true;
+                case "compileproject":
+                    const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
+                    if (editor && editor.typeName == "JSResourceEditor") {
+                        const jsEditor = <Editor.JSResourceEditor>editor;
+                        jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
+                    }
+                    return true;
+            }
+        }
+    }
+
+    /**
+     * Handle messages that are submitted via Atomic.Query from within a web view editor.
+     * @param message The message type that was submitted to be used to determine what the data contains if present
+     * @param data any additional data that needs to be submitted with the message
+     */
+    handleWebMessage(messageType: string, data: any) {
+        switch (messageType) {
+            case "TypeScript.DisplayCompileResults":
+                this.displayCompileResults(data.annotations);
+                break;
+        }
+    }
+
+    /**
+     * Display the results of the compilation step
+     * @param  {any[]} annotations
+     */
+    displayCompileResults(annotations: any[]) {
+        let messageArray = annotations.map((result) => {
+            return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
+        });
+
+        if (messageArray.length == 0) {
+            messageArray.push("Success");
+        }
+        this.serviceRegistry.uiServices.showModalError("TypeScript Compilation Results", messageArray.join("\n"));
     }
 }

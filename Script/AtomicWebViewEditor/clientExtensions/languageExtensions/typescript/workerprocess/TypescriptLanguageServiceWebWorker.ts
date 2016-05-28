@@ -36,6 +36,30 @@ interface TSConfigFile {
 }
 
 /**
+ * Promise version of atomic query
+ * @param  {string} message the query to use to pass to atomicQuery.  If there is no payload, this will be passed directly, otherwise it will be passed in a data object
+ * @param  {any} payload optional data to send
+ * @return {Promise}
+ */
+function atomicQueryPromise(message: any): Promise<{}> {
+    return new Promise(function(resolve, reject) {
+        let queryMessage = message;
+
+        // if message is coming in as an object then let's stringify it
+        if (typeof (message) != "string") {
+            queryMessage = JSON.stringify(message);
+        }
+
+        window.atomicQuery({
+            request: queryMessage,
+            persistent: false,
+            onSuccess: resolve,
+            onFailure: (error_code, error_message) => reject({ error_code: error_code, error_message: error_message })
+        });
+    });
+}
+
+/**
  * Queries the host for a particular resource and returns it in a promise
  * @param  {string} codeUrl
  * @return {Promise}
@@ -68,6 +92,17 @@ function getFileResource(filename: string): Promise<{}> {
 class WebFileSystem implements FileSystemInterface {
 
     private fileCache = {};
+    private communicationPort: MessagePort;
+
+    /**
+     * Sets the port used to communicate with the primary window.
+     * This is needed since AtomicQuery can't be called from a webworker
+     * @param  {MessagePort} port
+     */
+    setCommunicationPort(port: MessagePort) {
+        this.communicationPort = port;
+    }
+
     /**
      * Deterimine if the particular file exists in the resources
      * @param  {string} filename
@@ -103,15 +138,16 @@ class WebFileSystem implements FileSystemInterface {
      * @param  {string} contents
      */
     writeFile(filename: string, contents: string) {
-        //TODO:
-        /*let script = new Atomic.File(filename, Atomic.FILE_WRITE);
-        try {
-            script.writeString(contents);
-            script.flush();
-        } finally {
-            script.close();
-        }
-        */
+        const fileExt = filename.indexOf(".") != -1 ? filename.split(".").pop() : "";
+        let message: WorkerProcessTypes.SaveMessageData = {
+            command: WorkerProcessTypes.SaveFile,
+            filename: filename,
+            code: contents,
+            fileExt: fileExt,
+            editor: null
+        };
+
+        this.communicationPort.postMessage(message);
     }
 
     /**
@@ -140,6 +176,10 @@ export default class TypescriptLanguageServiceWebWorker {
     fs: WebFileSystem; // needed?
 
     projectLoaded = false;
+
+    options = {
+        compileOnSave: false
+    };
 
     constructor() {
         this.fs = new WebFileSystem();
@@ -179,6 +219,12 @@ export default class TypescriptLanguageServiceWebWorker {
                     break;
                 case WorkerProcessTypes.GetAnnotations:
                     this.handleGetAnnotations(port, e.data);
+                    break;
+                case WorkerProcessTypes.SetPreferences:
+                    this.setPreferences(port, e.data);
+                    break;
+                case WorkerProcessTypes.DoFullCompile:
+                    this.doFullCompile(port);
                     break;
             }
 
@@ -245,7 +291,7 @@ export default class TypescriptLanguageServiceWebWorker {
         sender: string,
         filename: string
     }) {
-        port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
+        // port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.loadProjectFiles().then(() => {
             let diagnostics = this.languageService.compile([eventData.filename]);
             this.handleGetAnnotations(port, eventData);
@@ -262,7 +308,6 @@ export default class TypescriptLanguageServiceWebWorker {
         if (this.connections <= 0) {
             this.reset();
         }
-        console.log("Got a close");
     }
 
     /**
@@ -341,6 +386,38 @@ export default class TypescriptLanguageServiceWebWorker {
     handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
         this.languageService.updateProjectFile(eventData.filename, eventData.code);
         this.handleGetAnnotations(port, eventData);
+
+        if (this.options.compileOnSave) {
+            this.fs.setCommunicationPort(port);
+            let results = this.languageService.compile([eventData.filename]);
+        }
+    }
+
+    /**
+     * Perform a full compile of the typescript
+     * @param  {MessagePort} port
+     */
+    doFullCompile(port: MessagePort) {
+        this.fs.setCommunicationPort(port);
+        let errors = this.languageService.compile([]);
+
+        let results = errors.map(diagnostic => {
+            let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+            let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+            return {
+                file: diagnostic.file.fileName,
+                row: lineChar.line,
+                column: lineChar.character,
+                text: message,
+                type: diagnostic.category == 1 ? "error" : "warning"
+            };
+        });
+
+        let message: WorkerProcessTypes.FullCompileResultsMessageData = {
+            command: WorkerProcessTypes.DisplayFullCompileResults,
+            annotations: results
+        };
+        port.postMessage(message);
     }
 
     /**
@@ -359,5 +436,9 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     handleRename(port: MessagePort, eventData: WorkerProcessTypes.RenameMessageData) {
         this.languageService.renameProjectFile(eventData.path, eventData.newPath);
+    }
+
+    setPreferences(port: MessagePort, eventData: WorkerProcessTypes.SetPreferencesMessageData) {
+        this.options.compileOnSave = eventData.preferences.compileOnSave;
     }
 }

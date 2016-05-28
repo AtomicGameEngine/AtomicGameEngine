@@ -118,6 +118,10 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
+
+            // Hook in the routine to allow the host to perform a full compile
+            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
+
             this.filename = ev.filename;
 
             let editor = ev.editor;
@@ -148,7 +152,22 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             case WorkerProcessTypes.AnnotationsUpdated:
                 this.setAnnotations(e.data);
                 break;
+            case WorkerProcessTypes.SaveFile:
+                this.saveFile(e.data);
+                break;
+            case WorkerProcessTypes.DisplayFullCompileResults:
+                this.displayFullCompileResults(e.data);
+                break;
         }
+    }
+
+    /**
+     * Saves a compiled file sent across from the worker service
+     * @param  {WorkerProcessTypes.SaveMessageData} event
+     */
+    saveFile(event: WorkerProcessTypes.SaveMessageData) {
+        console.log("Save File:" + event.filename);
+        this.serviceLocator.clientServices.getHostInterop().saveFile(event.filename, event.code);
     }
 
     /**
@@ -207,8 +226,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 // a result back
                 extension.workerRequest(WorkerProcessTypes.DocTooltipResponse, message)
                     .then((e: WorkerProcessTypes.GetDocTooltipResponseMessageData) => {
-                    extension.editor.completer.showDocTooltip(e);
-                });
+                        extension.editor.completer.showDocTooltip(e);
+                    });
             },
 
             getCompletions: function(editor, session, pos, prefix, callback) {
@@ -222,8 +241,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
                 extension.workerRequest(WorkerProcessTypes.CompletionResponse, message)
                     .then((e: WorkerProcessTypes.GetCompletionsResponseMessageData) => {
-                    callback(null, e.completions);
-                });
+                        callback(null, e.completions);
+                    });
             }
         };
         return wordCompleter;
@@ -235,7 +254,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     save(ev: Editor.EditorEvents.CodeSavedEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            console.log(`${this.name}: received a save resource event for ${ev.filename}`);
+            //console.log(`${this.name}: received a save resource event for ${ev.filename}`);
 
             const message: WorkerProcessTypes.SaveMessageData = {
                 command: ClientExtensionEventNames.CodeSavedEvent,
@@ -255,7 +274,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a delete resource event for ${ev.path}`);
+            //console.log(`${this.name}: received a delete resource event for ${ev.path}`);
 
             // notify the typescript language service that the file has been deleted
             const message: WorkerProcessTypes.DeleteMessageData = {
@@ -273,7 +292,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
+            //console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
 
             // notify the typescript language service that the file has been renamed
             const message: WorkerProcessTypes.RenameMessageData = {
@@ -291,7 +310,36 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @return {[type]}
      */
     preferencesChanged() {
-        // Stub function for now
-        this.serviceLocator.clientServices.getUserPreference("TypescriptLanguageExtension", "CompileOnSave", true);
+        let compileOnSave = this.serviceLocator.clientServices.getUserPreference("HostTypeScriptLanguageExtension", "CompileOnSave", true);
+        const message: WorkerProcessTypes.SetPreferencesMessageData = {
+            command: WorkerProcessTypes.SetPreferences,
+            preferences: {
+                compileOnSave: compileOnSave
+            }
+        };
+
+        this.worker.port.postMessage(message);
+    }
+
+    /**
+     * Tell the language service to perform a full compile
+     */
+    doFullCompile() {
+        const message: WorkerProcessTypes.WorkerProcessMessageData = {
+            command: WorkerProcessTypes.DoFullCompile
+        };
+        this.worker.port.postMessage(message);
+    }
+
+
+    /**
+     * Displays the results from a full compile
+     * @param  {WorkerProcessTypes.FullCompileResultsMessageData} results
+     */
+    displayFullCompileResults(results: WorkerProcessTypes.FullCompileResultsMessageData) {
+        let messageArray = results.annotations.map((result) => {
+            return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
+        });
+        window.atomicQueryPromise("TypeScript.DisplayCompileResults", results);
     }
 }
