@@ -241,10 +241,10 @@ export class TypescriptLanguageService {
      * Compile the provided file to javascript with full type checking etc
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
+     * @param  {function} optional callback which will be called for every file compiled and will provide any errors
      */
-    compile(files: string[], options?: ts.CompilerOptions): ts.Diagnostic[] {
+    compile(files: string[], options?: ts.CompilerOptions, progress?: (filename:string, errors: ts.Diagnostic[]) => void): ts.Diagnostic[] {
         let start = new Date().getTime();
-
         options = options || this.compilerOptions;
 
         //Make sure we have these files in the project
@@ -254,17 +254,18 @@ export class TypescriptLanguageService {
 
         let errors: ts.Diagnostic[] = [];
 
+        // if we have a 0 length for files, let's compile all files
         if (files.length == 0) {
-            // We haven't passed any files in, so let's compile them all
-            this.projectFiles.forEach(filename => {
-                errors = errors.concat(this.compileFile(filename));
-            });
-        } else {
-            // Only compile the files that are newly edited
-            files.forEach(filename => {
-                errors = errors.concat(this.compileFile(filename));
-            });
+            files = this.projectFiles;
         }
+
+        files.forEach(filename => {
+            let currentErrors = this.compileFile(filename);
+            errors = errors.concat(currentErrors);
+            if (progress) {
+                progress(filename, currentErrors);
+            }
+        });
 
         console.log(`${this.name}: Compiling complete after ${new Date().getTime() - start} ms`);
         return errors;

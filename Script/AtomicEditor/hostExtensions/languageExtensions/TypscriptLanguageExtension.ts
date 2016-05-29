@@ -241,11 +241,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                     this.rebuildMenu();
                     return true;
                 case "compileproject":
-                    const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
-                    if (editor && editor.typeName == "JSResourceEditor") {
-                        const jsEditor = <Editor.JSResourceEditor>editor;
-                        jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
-                    }
+                    this.doFullCompile();
                     return true;
             }
         }
@@ -265,12 +261,29 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     }
 
     /**
+     * Perform a full compile of the TypeScript
+     */
+    doFullCompile() {
+        const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
+        if (editor && editor.typeName == "JSResourceEditor") {
+            const jsEditor = <Editor.JSResourceEditor>editor;
+            jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
+        }
+    }
+
+    /**
      * Display the results of the compilation step
      * @param  {any[]} annotations
      */
     displayCompileResults(annotations: any[]) {
         let messageArray = annotations.map((result) => {
-            return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
+            let message = `<color #888888>${result.file}: </color>`;
+            if (result.type == "success") {
+                message += `<color #00ff00>${result.text}</color>`;
+            } else {
+                message += `<color #e3e02b>${result.text} at line ${result.row} col ${result.column}</color>`;
+            }
+            return message;
         });
 
         if (messageArray.length == 0) {

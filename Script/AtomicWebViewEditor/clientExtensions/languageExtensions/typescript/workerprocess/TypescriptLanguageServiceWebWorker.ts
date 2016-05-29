@@ -399,18 +399,29 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     doFullCompile(port: MessagePort) {
         this.fs.setCommunicationPort(port);
-        let errors = this.languageService.compile([]);
-
-        let results = errors.map(diagnostic => {
-            let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-            let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-            return {
-                file: diagnostic.file.fileName,
-                row: lineChar.line,
-                column: lineChar.character,
-                text: message,
-                type: diagnostic.category == 1 ? "error" : "warning"
-            };
+        let results = [];
+        this.languageService.compile([], this.languageService.compilerOptions, (filename, errors) => {
+            if (errors.length > 0) {
+                results = results.concat(errors.map(diagnostic => {
+                    let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                    let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+                    return {
+                        file: diagnostic.file.fileName,
+                        row: lineChar.line,
+                        column: lineChar.character,
+                        text: message,
+                        type: diagnostic.category == 1 ? "error" : "warning"
+                    };
+                }));
+            } else {
+                results.push({
+                    file: filename,
+                    row: 0,
+                    column: 0,
+                    text: "Success",
+                    type: "success"
+                });
+            }
         });
 
         let message: WorkerProcessTypes.FullCompileResultsMessageData = {
