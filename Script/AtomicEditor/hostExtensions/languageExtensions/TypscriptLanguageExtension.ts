@@ -276,7 +276,17 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * @param  {any[]} annotations
      */
     displayCompileResults(annotations: any[]) {
-        let messageArray = annotations.map((result) => {
+        // get the name of the resources directory without preceding path
+        let resourceDir = ToolCore.toolSystem.project.resourcePath.replace(Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath), "");
+        console.log(resourceDir);
+        let messageArray = annotations.filter(result => {
+            // If we are compiling the lib.d.ts or some other built-in library and it was successful, then
+            // we really don't need to display that result since it's just noise.  Only display it if it fails
+            if (result.type == "success") {
+                return result.file.indexOf(resourceDir) == 0;
+            }
+            return true;
+        }).map(result => {
             let message = `<color #888888>${result.file}: </color>`;
             if (result.type == "success") {
                 message += `<color #00ff00>${result.text}</color>`;
