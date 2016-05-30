@@ -35,6 +35,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     private isTypescriptProject = false;
     private serviceRegistry: Editor.HostExtensions.HostServiceLocator = null;
+    private extensionMenu: Atomic.UIMenuItemSource = null;
+    private compileOnSaveMenuItem: Atomic.UIMenuItem;
+
     /**
      * Determines if the file name/path provided is something we care about
      * @param  {string} path
@@ -197,22 +200,26 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         this.rebuildMenu();
     }
 
-
     /**
      * Rebuilds the plugin menu.  This is needed to toggle the CompileOnSave true or false
      */
     rebuildMenu() {
         if (this.isTypescriptProject) {
-            this.serviceRegistry.uiServices.removePluginMenuItemSource("TypeScript");
-            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-            let subMenu = {};
-            if (isCompileOnSave) {
-                subMenu["Compile on Save: On"] = [`${this.name}.compileonsave`];
-            } else {
-                subMenu["Compile on Save: Off"] = [`${this.name}.compileonsave`];
+
+            if (!this.extensionMenu) {
+                // First build up an empty menu then manually add the items so we can have reference to them
+                this.extensionMenu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
+                this.compileOnSaveMenuItem = new Atomic.UIMenuItem("Compile on Save", `${this.name}.compileonsave`);
+                this.extensionMenu.addItem(this.compileOnSaveMenuItem);
+                this.extensionMenu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
             }
-            subMenu["Compile Project"] = [`${this.name}.compileproject`];
-            this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", subMenu);
+
+            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+            if (isCompileOnSave) {
+                this.compileOnSaveMenuItem.string = "Compile on Save: On";
+            } else {
+                this.compileOnSaveMenuItem.string = "Compile on Save: Off";
+            }
         }
     }
 
