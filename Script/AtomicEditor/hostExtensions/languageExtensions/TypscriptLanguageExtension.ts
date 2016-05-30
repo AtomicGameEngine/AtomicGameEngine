@@ -35,7 +35,8 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     private isTypescriptProject = false;
     private serviceRegistry: Editor.HostExtensions.HostServiceLocator = null;
-    private extensionMenu: Atomic.UIMenuItemSource = null;
+
+    /** Reference to the compileOnSaveMenuItem */
     private compileOnSaveMenuItem: Atomic.UIMenuItem;
 
     /**
@@ -197,30 +198,26 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         // got a load, we need to reset the language service
         console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
         this.setTsConfigOnWebView(this.buildTsConfig());
-        this.rebuildMenu();
+
+        if (this.isTypescriptProject) {
+            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+
+            // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
+            const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
+            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
+            menu.addItem(this.compileOnSaveMenuItem);
+            menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+        }
     }
 
     /**
-     * Rebuilds the plugin menu.  This is needed to toggle the CompileOnSave true or false
+     * Called when the project is unloaded
      */
-    rebuildMenu() {
-        if (this.isTypescriptProject) {
-
-            if (!this.extensionMenu) {
-                // First build up an empty menu then manually add the items so we can have reference to them
-                this.extensionMenu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
-                this.compileOnSaveMenuItem = new Atomic.UIMenuItem("Compile on Save", `${this.name}.compileonsave`);
-                this.extensionMenu.addItem(this.compileOnSaveMenuItem);
-                this.extensionMenu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
-            }
-
-            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-            if (isCompileOnSave) {
-                this.compileOnSaveMenuItem.string = "Compile on Save: On";
-            } else {
-                this.compileOnSaveMenuItem.string = "Compile on Save: Off";
-            }
-        }
+    projectUnloaded() {
+        // Clean up
+        this.serviceRegistry.uiServices.removePluginMenuItemSource("TypeScript");
+        this.compileOnSaveMenuItem = null;
+        this.isTypescriptProject = false;
     }
 
     /*** UIService implementation ***/
@@ -235,10 +232,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         if (extension == this.name) {
             switch (action) {
                 case "compileonsave":
+                    let isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
                     // Toggle
-                    const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-                    this.serviceRegistry.projectServices.setUserPreference(this.name, "CompileOnSave", !isCompileOnSave);
-                    this.rebuildMenu();
+                    isCompileOnSave = !isCompileOnSave;
+                    this.serviceRegistry.projectServices.setUserPreference(this.name, "CompileOnSave", isCompileOnSave);
+                    this.compileOnSaveMenuItem.string = `Compile on Save: ${isCompileOnSave ? "On" : "Off"}`;
                     return true;
                 case "compileproject":
                     this.doFullCompile();
