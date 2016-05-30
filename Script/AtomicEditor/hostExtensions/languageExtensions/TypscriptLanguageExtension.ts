@@ -51,10 +51,10 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     }
 
     /**
-     * Seed the language service with all of the relevant files in the project.  This updates the tsconifg.atomic file in
-     * the root of the resources directory.
+     * Build an in-memory config file to be sent down to the web view client.  This will scan the resources directory
+     * and generate a file list
      */
-    private loadProjectFiles() {
+    private buildTsConfig(): any {
         let projectFiles: Array<string> = [];
 
         //scan all the files in the project for any typescript files so we can determine if this is a typescript project
@@ -78,7 +78,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
 
             if (!found) {
                 // Load up the Atomic.d.ts from the tool core
-                console.log("Need to load up hosted Atomic.d.ts!");
+                projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "Atomic.d.ts");
             }
 
             let files = projectFiles.map((f: string) => {
@@ -95,14 +95,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 files: files
             };
 
-            let filename = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + "tsconfig.atomic";
-            let script = new Atomic.File(filename, Atomic.FILE_WRITE);
-            try {
-                script.writeString(JSON.stringify(tsConfig));
-                script.flush();
-            } finally {
-                script.close();
-            }
+            return tsConfig;
+        } else {
+            return {
+                files: []
+            };
         }
     }
 
@@ -124,7 +121,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a delete resource event`);
+            // console.log(`${this.name}: received a delete resource event`);
 
             // Delete the corresponding js file
             let jsFile = ev.path.replace(/\.ts$/, ".js");
@@ -137,10 +134,8 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                     path: jsFile
                 };
 
+                this.setTsConfigOnWebView(this.buildTsConfig());
                 this.serviceRegistry.sendEvent(EditorEvents.DeleteResourceNotification, eventData);
-
-                // rebuild the tsconfig.atomic
-                this.loadProjectFiles();
             }
         }
     }
@@ -151,7 +146,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a rename resource event`);
+            // console.log(`${this.name}: received a rename resource event`);
 
             // Rename the corresponding js file
             let jsFile = ev.path.replace(/\.ts$/, ".js");
@@ -168,10 +163,8 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                     asset: jsFileAsset
                 };
 
+                this.setTsConfigOnWebView(this.buildTsConfig());
                 this.serviceRegistry.sendEvent(EditorEvents.RenameResourceNotification, eventData);
-
-                // rebuild the tsconfig.atomic
-                this.loadProjectFiles();
             }
         }
     }
@@ -186,7 +179,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         if (!this.isTypescriptProject) {
             if (Atomic.getExtension(ev.path) == ".ts") {
                 this.isTypescriptProject = true;
-                this.loadProjectFiles();
+                this.setTsConfigOnWebView(this.buildTsConfig());
             }
         }
     }
@@ -200,7 +193,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
         // got a load, we need to reset the language service
         console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
-        this.loadProjectFiles();
+        this.setTsConfigOnWebView(this.buildTsConfig());
         this.rebuildMenu();
     }
 
@@ -260,6 +253,10 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         }
     }
 
+    setTsConfigOnWebView(tsConfig: any) {
+        WebView.WebBrowserHost.setGlobalStringProperty("TypeScriptLanguageExtension", "tsConfig", JSON.stringify(tsConfig));
+    }
+
     /**
      * Perform a full compile of the TypeScript
      */
@@ -268,7 +265,33 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         if (editor && editor.typeName == "JSResourceEditor") {
             const jsEditor = <Editor.JSResourceEditor>editor;
             jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
+        } else {
+            this.serviceRegistry.uiServices.showModalError("TypeScript Compilation", "Please open a TypeScript file in the editor before attempting to do a full compile.");
         }
+
+        // Ideally, we would want to either launch up a background web view, or shell out to node or something and not
+        // need to have an editor open.  Still researching this
+        /*
+            const url = `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/Editor.html`;
+            const webClient = new WebView.WebClient();
+            this.webClient = webClient;
+            //this.webClient.loadURL(url);
+
+            const webTexture = new WebView.WebTexture2D();
+            webClient.webRenderHandler = webTexture;
+
+            // doesn't work because atomicquery doesn't seem to be exposed to WebView.WebClient instances
+            webClient.subscribeToEvent(EditorEvents.WebMessage, (data) => {
+                switch (data.message) {
+                    case "editorLoadComplete":
+                        webClient.unsubscribeFromEvent(EditorEvents.WebMessage);
+                        webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
+                        break;
+                }
+            });
+
+            webClient.createBrowser(url, 1, 1);
+        */
     }
 
     /**

@@ -94,6 +94,14 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
+     * Grabs the TS Config file attached to the global window object
+     * @return {any}
+     */
+    private getTsConfig():any {
+        return JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
+    }
+
+    /**
      * Called when the editor needs to be configured for a particular file
      * @param  {Editor.EditorEvents.EditorFileEvent} ev
      */
@@ -133,7 +141,12 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.buildWorker();
 
             // post a message to the shared web worker
-            this.worker.port.postMessage({ command: WorkerProcessTypes.Connect, sender: "Typescript Language Extension", filename: ev.filename });
+            this.worker.port.postMessage({
+                command: WorkerProcessTypes.Connect,
+                sender: "Typescript Language Extension",
+                filename: ev.filename,
+                tsConfig: this.getTsConfig()
+            });
         }
     }
 
@@ -166,7 +179,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {WorkerProcessTypes.SaveMessageData} event
      */
     saveFile(event: WorkerProcessTypes.SaveMessageData) {
-        console.log("Save File:" + event.filename);
         this.serviceLocator.clientServices.getHostInterop().saveFile(event.filename, event.code);
     }
 
@@ -261,6 +273,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 filename: ev.filename,
                 fileExt: ev.fileExt,
                 code: ev.code,
+                tsConfig: this.getTsConfig(),
                 editor: null // cannot send editor across the boundary
             };
 

@@ -28,7 +28,11 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent { }
+export interface TSConfigAttached {
+    tsConfig: any;
+}
+
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent, TSConfigAttached { }
 export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent {}
 export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent {}
 

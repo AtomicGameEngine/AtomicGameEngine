@@ -36,30 +36,6 @@ interface TSConfigFile {
 }
 
 /**
- * Promise version of atomic query
- * @param  {string} message the query to use to pass to atomicQuery.  If there is no payload, this will be passed directly, otherwise it will be passed in a data object
- * @param  {any} payload optional data to send
- * @return {Promise}
- */
-function atomicQueryPromise(message: any): Promise<{}> {
-    return new Promise(function(resolve, reject) {
-        let queryMessage = message;
-
-        // if message is coming in as an object then let's stringify it
-        if (typeof (message) != "string") {
-            queryMessage = JSON.stringify(message);
-        }
-
-        window.atomicQuery({
-            request: queryMessage,
-            persistent: false,
-            onSuccess: resolve,
-            onFailure: (error_code, error_message) => reject({ error_code: error_code, error_message: error_message })
-        });
-    });
-}
-
-/**
  * Queries the host for a particular resource and returns it in a promise
  * @param  {string} codeUrl
  * @return {Promise}
@@ -144,7 +120,8 @@ class WebFileSystem implements FileSystemInterface {
             filename: filename,
             code: contents,
             fileExt: fileExt,
-            editor: null
+            editor: null,
+            tsConfig: null
         };
 
         this.communicationPort.postMessage(message);
@@ -180,6 +157,8 @@ export default class TypescriptLanguageServiceWebWorker {
     options = {
         compileOnSave: false
     };
+
+    tsConfig: TSConfigFile = null;
 
     constructor() {
         this.fs = new WebFileSystem();
@@ -251,23 +230,22 @@ export default class TypescriptLanguageServiceWebWorker {
         // and delete any that may be been removed and sync up
         return getFileResource("resources/tsconfig.atomic").then((jsonTsConfig: string) => {
             let promises: PromiseLike<void>[] = [];
-            let tsConfig: TSConfigFile = JSON.parse(jsonTsConfig);
 
-            if (tsConfig.compilerOptions) {
-                this.languageService.compilerOptions = tsConfig.compilerOptions;
+            if (this.tsConfig.compilerOptions) {
+                this.languageService.compilerOptions = this.tsConfig.compilerOptions;
             };
 
             let existingFiles = this.languageService.getProjectFiles();
 
             // see if anything was deleted
             existingFiles.forEach((f) => {
-                if (tsConfig.files.indexOf(f) == -1) {
+                if (this.tsConfig.files.indexOf(f) == -1) {
                     this.languageService.deleteProjectFile(f);
                 }
             });
 
             // load up any new files that may have been added
-            tsConfig.files.forEach((f) => {
+            this.tsConfig.files.forEach((f) => {
                 if (existingFiles.indexOf(f) == -1) {
                     promises.push(getFileResource(f).then((code: string) => {
                         this.languageService.addProjectFile(f, code);
@@ -289,9 +267,11 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     handleHELO(port: MessagePort, eventData: any | {
         sender: string,
-        filename: string
+        filename: string,
+        tsConfig: any
     }) {
         // port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
+        this.tsConfig = eventData.tsConfig;
         this.loadProjectFiles().then(() => {
             let diagnostics = this.languageService.compile([eventData.filename]);
             this.handleGetAnnotations(port, eventData);
@@ -384,6 +364,7 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.SaveMessageData} eventData
      */
     handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
+        this.tsConfig = eventData.tsConfig;
         this.languageService.updateProjectFile(eventData.filename, eventData.code);
         this.handleGetAnnotations(port, eventData);
 
