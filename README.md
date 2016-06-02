@@ -46,5 +46,5 @@ They are over here: <a href="https://github.com/AtomicGameEngine/AtomicExamples"
 
 ###Building the Atomic Editor from Source
 
-Please see [Building the Atomic Editor from Source](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-the-Atomic-Editor-from-Source) for Visual Studio 2013, XCode, and QtCreator build instructions.
+Please see [Building the Atomic Editor from Source](https://github.com/AtomicGameEngine/AtomicGameEngine/wiki/Building-the-Atomic-Editor-from-Source) for Visual Studio 2015, XCode, and QtCreator build instructions.
 
