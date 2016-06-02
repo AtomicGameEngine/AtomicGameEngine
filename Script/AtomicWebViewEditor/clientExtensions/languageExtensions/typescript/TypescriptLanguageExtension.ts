@@ -338,8 +338,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Tell the language service to perform a full compile
      */
     doFullCompile() {
-        const message: WorkerProcessTypes.WorkerProcessMessageData = {
-            command: WorkerProcessTypes.DoFullCompile
+        const message: WorkerProcessTypes.FullCompileMessageData = {
+            command: WorkerProcessTypes.DoFullCompile,
+            tsConfig: this.getTsConfig()
         };
         this.worker.port.postMessage(message);
     }

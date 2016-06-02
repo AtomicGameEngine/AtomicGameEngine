@@ -142,13 +142,13 @@ export class TypescriptLanguageService {
     /**
      * Updates the internal file representation.
      * @param  {string} filename name of the file
-     * @param  {string} fileContents optional contents of the file.  If not provided, the file system object will be queried
+     * @param  {string} fileContents optional contents of the file.
      * @return {ts.SourceFile}
      */
-    updateProjectFile(filename: string, fileContents?: string): ts.SourceFile {
-        console.log("Updated project file: " + filename);
+    updateProjectFile(filename: string, fileContents: string): ts.SourceFile {
         this.versionMap[filename].version++;
-        this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents || this.fs.getFile(filename));
+        this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents);
+
         return this.documentRegistry.updateDocument(
             filename,
             this.compilerOptions,
@@ -156,6 +156,19 @@ export class TypescriptLanguageService {
             this.versionMap[filename].version.toString());
     }
 
+    /**
+     * Updates the internal file version number
+     * @param  {string} filename name of the file
+     * @return {ts.SourceFile}
+     */
+    updateProjectFileVersionNumber(filename: string): ts.SourceFile {
+        this.versionMap[filename].version++;
+        return this.documentRegistry.updateDocument(
+            filename,
+            this.compilerOptions,
+            this.versionMap[filename].snapshot,
+            this.versionMap[filename].version.toString());
+    }
     /**
      * Returns the list of project files
      * @return {string[]}
@@ -237,13 +250,14 @@ export class TypescriptLanguageService {
     getCompletionEntryDetails(filename: string, pos: number, entryname: string): ts.CompletionEntryDetails {
         return this.languageService.getCompletionEntryDetails(filename, pos, entryname);
     }
+    
     /**
      * Compile the provided file to javascript with full type checking etc
      * @param  {string}  a list of file names to compile
      * @param  {ts.CompilerOptions} options for the compiler
      * @param  {function} optional callback which will be called for every file compiled and will provide any errors
      */
-    compile(files: string[], options?: ts.CompilerOptions, progress?: (filename:string, errors: ts.Diagnostic[]) => void): ts.Diagnostic[] {
+    compile(files: string[], options?: ts.CompilerOptions, progress?: (filename: string, errors: ts.Diagnostic[]) => void): ts.Diagnostic[] {
         let start = new Date().getTime();
         options = options || this.compilerOptions;
 
@@ -377,8 +391,8 @@ export class TypescriptLanguageService {
                 msg.push(`${this.name}  Error: ${message}`);
             }
         });
-        console.log(`TypeScript Errors:\n${msg.join("\n") }`);
-        throw new Error(`TypeScript Errors:\n${msg.join("\n") }`);
+        console.log(`TypeScript Errors:\n${msg.join("\n")}`);
+        throw new Error(`TypeScript Errors:\n${msg.join("\n")}`);
     }
 
 }

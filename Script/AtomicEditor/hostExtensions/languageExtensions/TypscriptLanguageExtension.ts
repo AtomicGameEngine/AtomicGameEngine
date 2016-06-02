@@ -59,23 +59,52 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * and generate a file list
      */
     private buildTsConfig(): any {
-        let projectFiles: Array<string> = [];
-
-        //scan all the files in the project for any typescript files so we can determine if this is a typescript project
-        Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
-            projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
-            this.isTypescriptProject = true;
-        });
-
         // only build out a tsconfig.atomic if we actually have typescript files in the project
         if (this.isTypescriptProject) {
+            let projectFiles: Array<string> = [];
+
+            //scan all the files in the project for any typescript files and add them to the project
+            Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
+                projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
+            });
+
             // First we need to load in a copy of the lib.core.d.ts that is necessary for the hosted typescript compiler
             projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.core.d.ts");
+
+            const slashedProjectPath = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath);
+
+            const tsconfigFn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + "tsconfig.json";
+            // Let's look for a tsconfig.json file in the project root and add any additional files
+            if (Atomic.fileSystem.fileExists(tsconfigFn)) {
+                // load up the tsconfig file and parse out the files block and compare it to what we have
+                // in resources
+                const file = new Atomic.File(tsconfigFn, Atomic.FILE_READ);
+                try {
+                    const savedTsConfig = JSON.parse(file.readText());
+                    if (savedTsConfig["files"]) {
+                        savedTsConfig["files"].forEach((file: string) => {
+                            let newFile = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + file;
+                            let exists = false;
+                            if (Atomic.fileSystem.fileExists(newFile)) {
+                                exists = true;
+                                file = newFile;
+                            } else if (Atomic.fileSystem.exists(file)) {
+                                exists = true;
+                            }
+                            if (exists && projectFiles.indexOf(file) == -1) {
+                                projectFiles.push(file);
+                            }
+                        });
+                    }
+                } finally {
+                    file.close();
+                }
+            };
 
             // Then see if we have a copy of Atomic.d.ts in the project directory.  If we don't then we should load it up from the tool environment
             let found = false;
             projectFiles.forEach((file) => {
-                if (file.indexOf("Atomic.d.ts") != -1) {
+                if (file.toLowerCase().indexOf("atomic.d.ts") != -1) {
                     found = true;
                 }
             });
@@ -85,20 +114,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "Atomic.d.ts");
             }
 
-            let files = projectFiles.map((f: string) => {
-                if (f.indexOf(ToolCore.toolSystem.project.resourcePath) != -1) {
-                    // if we are in the resources directory, just pass back the path from resources down
-                    return f.replace(Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath), "");
-                } else {
-                    // otherwise return the full path
-                    return f;
-                }
-            });
-
             let tsConfig = {
-                files: files
+                files: projectFiles
             };
-
             return tsConfig;
         } else {
             return {
@@ -196,10 +214,16 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
         // got a load, we need to reset the language service
-        console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
-        this.setTsConfigOnWebView(this.buildTsConfig());
+        // console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
+
+        this.isTypescriptProject = false;
+        //scan all the files in the project for any typescript files so we can determine if this is a typescript project
+        Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
+            this.isTypescriptProject = true;
+        });
 
         if (this.isTypescriptProject) {
+            this.setTsConfigOnWebView(this.buildTsConfig());
             const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
 
             // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
@@ -311,11 +335,14 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             // If we are compiling the lib.d.ts or some other built-in library and it was successful, then
             // we really don't need to display that result since it's just noise.  Only display it if it fails
             if (result.type == "success") {
-                return result.file.indexOf(resourceDir) == 0;
+                return result.file.indexOf(ToolCore.toolSystem.project.projectPath) == 0;
             }
             return true;
         }).map(result => {
-            let message = `<color #888888>${result.file}: </color>`;
+
+            // Clean up the path for display
+            let file = result.file.replace(ToolCore.toolSystem.project.projectPath, "");
+            let message = `<color #888888>${file}: </color>`;
             if (result.type == "success") {
                 message += `<color #00ff00>${result.text}</color>`;
             } else {
