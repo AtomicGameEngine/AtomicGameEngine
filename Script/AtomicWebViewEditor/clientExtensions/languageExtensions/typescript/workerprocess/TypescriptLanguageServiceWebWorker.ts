@@ -103,7 +103,7 @@ class WebFileSystem implements FileSystemInterface {
      * @return {string}
      */
     getFile(filename: string): string {
-        console.log("FS.GETFILE!!");
+        // console.log("FS.GETFILE!!");
         // return HostInterop.getResource("atomic:" + filename);
         return this.fileCache[filename];
     }
@@ -114,17 +114,19 @@ class WebFileSystem implements FileSystemInterface {
      * @param  {string} contents
      */
     writeFile(filename: string, contents: string) {
-        const fileExt = filename.indexOf(".") != -1 ? filename.split(".").pop() : "";
-        let message: WorkerProcessTypes.SaveMessageData = {
-            command: WorkerProcessTypes.SaveFile,
-            filename: filename,
-            code: contents,
-            fileExt: fileExt,
-            editor: null,
-            tsConfig: null
-        };
+        if (this.communicationPort) {
+            const fileExt = filename.indexOf(".") != -1 ? filename.split(".").pop() : "";
+            let message: WorkerProcessTypes.SaveMessageData = {
+                command: WorkerProcessTypes.SaveFile,
+                filename: filename,
+                code: contents,
+                fileExt: fileExt,
+                editor: null,
+                tsConfig: null
+            };
 
-        this.communicationPort.postMessage(message);
+            this.communicationPort.postMessage(message);
+        }
     }
 
     /**
@@ -304,7 +306,7 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {string} partial
      * @return {string}
      */
-    resolvePartialFilename(partial: string):string {
+    resolvePartialFilename(partial: string): string {
         let result = this.tsConfig.files.find(fn => fn.endsWith(partial));
         return result || partial;
     }
@@ -395,6 +397,7 @@ export default class TypescriptLanguageServiceWebWorker {
         if (this.options.compileOnSave) {
             this.fs.setCommunicationPort(port);
             let results = this.languageService.compile([filename]);
+            this.fs.setCommunicationPort(null);
         }
     }
 
@@ -440,6 +443,7 @@ export default class TypescriptLanguageServiceWebWorker {
             command: WorkerProcessTypes.DisplayFullCompileResults,
             annotations: results
         };
+        this.fs.setCommunicationPort(null);
         port.postMessage(message);
     }
 
