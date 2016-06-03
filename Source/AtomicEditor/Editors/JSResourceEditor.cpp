@@ -123,8 +123,6 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     const String& EDITOR_SAVE_FILE = "editorSaveFile";
     const String& EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
-    String normalizedPath = getNormalizedPath(fullpath_);
-
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
     // All messages come in as a JSON string with a "message" property describing what the message is
@@ -144,17 +142,23 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
         }
         else if (message == EDITOR_SAVE_FILE)
         {
+            // filename coming in should be a fully qualified path
             String code = jvalue["payload"].GetString();
             String fn = jvalue["filename"].GetString();
 
-            // NOTE: We only want to be able save into the resource directory, so parse out the file path and append
-            // it to the resource directory
+            // NOTE: We only want to be able save into the resource directory, so check to see if the file coming in
+            // should live in the resource directory and also for safety check that there is no funky path navigation
+            // going on such as my/resource/../../../out.file
             ToolSystem* tsys = GetSubsystem<ToolSystem>();
-            String fullFilePath = tsys->GetProject()->GetProjectPath() + getNormalizedPath(fn);
-
-            File file(context_, fullFilePath, FILE_WRITE);
-            file.Write((void*) code.CString(), code.Length());
-            file.Close();
+            if (fn.Find(tsys->GetProject()->GetResourcePath(), 0, false) != String::NPOS
+                && fn.Find("..", 0) == String::NPOS )
+            {
+                    File file(context_, fn, FILE_WRITE);
+                    file.Write((void*) code.CString(), code.Length());
+                    file.Close();
+            } else {
+                LOGWARNING("Ignoring attempt to write file: " + fn);
+            }
         }
         else if (message == EDITOR_GET_USER_PREFS)
         {
