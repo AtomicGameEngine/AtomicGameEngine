@@ -264,9 +264,22 @@ declare module Editor.HostExtensions {
     }
 
     export interface ResourceServicesEventListener extends Editor.Extensions.ServiceEventListener {
+        /**
+         * Called once a resource is saved
+         */
         save?(ev: EditorEvents.SaveResourceEvent);
+        /**
+         * Called when a resource is deleted
+         */
         delete?(ev: EditorEvents.DeleteResourceEvent);
+        /**
+         * Called when a resource is renamed
+         */
         rename?(ev: EditorEvents.RenameResourceEvent);
+        /**
+         * Called when a resource is about to be edited
+         */
+        edit?(ev: EditorEvents.EditResourceEvent);
     }
 
     export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> {

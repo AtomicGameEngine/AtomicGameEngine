@@ -179,6 +179,7 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
         eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.saveResource(ev));
         eventDispatcher.subscribeToEvent(EditorEvents.DeleteResourceNotification, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev) => this.renameResource(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.EditResource, (ev) => this.editResource(ev));
 
     }
 
@@ -226,6 +227,23 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
                 // Verify that the service contains the appropriate methods and that it can handle the rename
                 if (service.rename) {
                     service.rename(ev);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called when a resource is about to be edited
+     * @param  {Editor.EditorEvents.EditResourceEvent} ev
+     */
+    editResource(ev: Editor.EditorEvents.EditResourceEvent) {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle the edit
+                if (service.edit) {
+                    service.edit(ev);
                 }
             } catch (e) {
                 EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
