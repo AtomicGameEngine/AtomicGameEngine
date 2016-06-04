@@ -38,6 +38,13 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     private filename: string;
 
+    /**
+     * Is this instance of the extension active?  Only true if the current editor
+     * is a typescript file.
+     * @type {Boolean}
+     */
+    private active = false;
+
     private serviceLocator: Editor.ClientExtensions.ClientServiceLocator;
 
     private worker: SharedWorker.SharedWorker;
@@ -131,6 +138,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
 
             this.filename = ev.filename;
+            this.active = true;
 
             let editor = ev.editor;
 
@@ -179,7 +187,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {WorkerProcessTypes.SaveMessageData} event
      */
     saveFile(event: WorkerProcessTypes.SaveMessageData) {
-        this.serviceLocator.clientServices.getHostInterop().saveFile(event.filename, event.code);
+        if (this.active) {
+            this.serviceLocator.clientServices.getHostInterop().saveFile(event.filename, event.code);
+        }
     }
 
     /**
@@ -265,7 +275,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {Editor.EditorEvents.SaveResourceEvent} ev
      */
     save(ev: Editor.EditorEvents.CodeSavedEvent) {
-        if (this.isValidFiletype(ev.filename)) {
+        if (this.active && this.isValidFiletype(ev.filename)) {
             //console.log(`${this.name}: received a save resource event for ${ev.filename}`);
 
             const message: WorkerProcessTypes.SaveMessageData = {
@@ -285,7 +295,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {Editor.EditorEvents.DeleteResourceEvent} ev
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
+        if (this.active && this.isValidFiletype(ev.path)) {
             //console.log(`${this.name}: received a delete resource event for ${ev.path}`);
 
             // notify the typescript language service that the file has been deleted
@@ -303,7 +313,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {Editor.EditorEvents.RenameResourceEvent} ev
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
+        if (this.active && this.isValidFiletype(ev.path)) {
             //console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
 
             // notify the typescript language service that the file has been renamed
@@ -322,7 +332,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @return {[type]}
      */
     preferencesChanged() {
-        if (this.worker) {
+        if (this.active) {
             let compileOnSave = this.serviceLocator.clientServices.getUserPreference("HostTypeScriptLanguageExtension", "CompileOnSave", true);
             const message: WorkerProcessTypes.SetPreferencesMessageData = {
                 command: WorkerProcessTypes.SetPreferences,
@@ -339,7 +349,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Tell the language service to perform a full compile
      */
     doFullCompile() {
-        if (this.worker) {
+        if (this.active) {
             const message: WorkerProcessTypes.FullCompileMessageData = {
                 command: WorkerProcessTypes.DoFullCompile,
                 tsConfig: this.getTsConfig()
