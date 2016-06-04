@@ -33,7 +33,6 @@ const defaultCompilerOptions = {
     noImplicitAny: false,
     target: "es5",
     module: "commonjs",
-    moduleResolution: "classic",
     declaration: false,
     inlineSourceMap: false,
     removeComments: false,
@@ -317,7 +316,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     doFullCompile() {
         const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
-        if (editor && editor.typeName == "JSResourceEditor") {
+        if (editor && editor.typeName == "JSResourceEditor" && this.isValidFiletype(editor.fullPath)) {
             const jsEditor = <Editor.JSResourceEditor>editor;
             jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
         } else {

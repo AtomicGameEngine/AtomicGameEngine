@@ -270,7 +270,7 @@ export default class TypescriptLanguageServiceWebWorker {
         //port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.tsConfig = eventData.tsConfig;
         if (!this.languageService) {
-            this.languageService = new TypescriptLanguageService(this.fs, this.tsConfig.compilerOptions);
+            this.languageService = new TypescriptLanguageService(this.fs, this.tsConfig);
         }
 
         // Check to see if the file coming in is already in the
@@ -403,10 +403,7 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     doFullCompile(port: MessagePort, eventData: WorkerProcessTypes.FullCompileMessageData) {
         this.tsConfig = eventData.tsConfig;
-        this.languageService.compilerOptions = this.tsConfig.compilerOptions;
-        if (eventData.tsConfig.compilerOptions) {
-            this.languageService.compilerOptions = eventData.tsConfig.compilerOptions;
-        }
+        this.languageService.setTsConfig(eventData.tsConfig);
 
         this.fs.setCommunicationPort(port);
 
@@ -445,7 +442,7 @@ export default class TypescriptLanguageServiceWebWorker {
         let message: WorkerProcessTypes.FullCompileResultsMessageData = {
             command: WorkerProcessTypes.DisplayFullCompileResults,
             annotations: results,
-            compilerOptions: this.languageService.compilerOptions,
+            compilerOptions: this.tsConfig.compilerOptions,
             duration: duration
         };
         this.fs.setCommunicationPort(null);

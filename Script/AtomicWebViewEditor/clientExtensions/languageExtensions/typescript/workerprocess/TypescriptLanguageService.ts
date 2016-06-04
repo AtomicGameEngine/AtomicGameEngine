@@ -59,9 +59,9 @@ export interface FileSystemInterface {
  */
 export class TypescriptLanguageService {
 
-    constructor(fs: FileSystemInterface, compilerOptions: ts.CompilerOptions) {
+    constructor(fs: FileSystemInterface, tsconfig: any) {
         this.fs = fs;
-        this.compilerOptions = compilerOptions;
+        this.setTsConfig(tsconfig);
 
         // Create the language service files
         this.documentRegistry = ts.createDocumentRegistry();
@@ -72,7 +72,7 @@ export class TypescriptLanguageService {
     private languageService: ts.LanguageService = null;
     private documentRegistry: ts.DocumentRegistry = null;
 
-    public compilerOptions: ts.CompilerOptions = null;
+    private compilerOptions: ts.CompilerOptions = null;
 
     name: string = "TypescriptLanguageService";
 
@@ -111,6 +111,16 @@ export class TypescriptLanguageService {
         this.languageService = ts.createLanguageService(servicesHost, documentRegistry);
     }
 
+    /**
+     * Sets the tsconfig file and parses out the command line options
+     * @param  {any} tsConfig
+     * @return {[type]}
+     */
+    setTsConfig(tsConfig: any) {
+        let cmdLine = ts.parseJsonConfigFileContent(tsConfig, undefined, undefined);
+        this.compilerOptions = cmdLine.options;
+    }
+    
     /**
      * Adds a file to the internal project cache
      * @param  {string} filename the full path of the file to add
