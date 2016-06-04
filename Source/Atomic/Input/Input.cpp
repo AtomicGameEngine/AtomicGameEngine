@@ -1502,7 +1502,17 @@ void Input::HandleSDLEvent(void* sdlEvent)
             }
         }
         break;
+    case SDL_TEXTEDITING:
+        {
+            using namespace TextEdit;
 
+            VariantMap textEditData;
+
+            textEditData[P_TEXT] = &evt.edit.text[0];
+            SendEvent(E_TEXTEDIT, textEditData);
+        }
+
+        break;
     case SDL_MOUSEBUTTONDOWN:
         if (!touchEmulation_)
             SetMouseButton(1 << (evt.button.button - 1), true);
@@ -2034,5 +2044,6 @@ void Input::SimulateButtonUp(int button)
     evt.key.keysym.sym = button;
     HandleSDLEvent(&evt);
 }
+
 
 }

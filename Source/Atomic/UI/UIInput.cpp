@@ -31,6 +31,8 @@ using namespace tb;
 #include "UI.h"
 #include "UIEvents.h"
 
+#include "UIEditField.h"
+
 namespace Atomic
 {
 
@@ -309,8 +311,22 @@ static bool InvokeKey(UI* ui, TBWidget* root, unsigned int key, SPECIAL_KEY spec
 
 void UI::HandleKey(bool keydown, int keycode, int scancode)
 {
+    // When using IME, we press Return-Key to decide which candidate we take. (Search by the words of "sdl ime", I followed the document.
+    // 'SendEvent(E_UIWIDGETFOCUSESCAPED)' and 'InvokeKey(this, rootWidget_, 0, specialKey, mod, keydown)' in this method prevented us from typing as usual.
+    // 'bool nowEditingText' just below will help us.
+    // But I do not know the precise condition. In that, in which case we should invoke 'FOCUSESCAPE'?
+    // If you know something about it, please help me.
+    bool nowEditingText = false;
+    if(rootWidget_->focused_widget){
+        UIWidget *tmpWidget = WrapWidget(rootWidget_->focused_widget);
+        if(tmpWidget && tmpWidget->editText_.Length() > 1){
+            nowEditingText = true;
+        }
+    }
+
     if (keydown && (keycode == KEY_ESC || keycode == KEY_RETURN || keycode == KEY_RETURN2 || keycode == KEY_KP_ENTER)
-            && TBWidget::focused_widget)
+            && TBWidget::focused_widget
+            && !nowEditingText)
     {
         SendEvent(E_UIWIDGETFOCUSESCAPED);
     }
@@ -428,7 +444,9 @@ void UI::HandleKey(bool keydown, int keycode, int scancode)
     }
     else
     {
-        InvokeKey(this, rootWidget_, 0, specialKey, mod, keydown);
+        if(!nowEditingText){
+            InvokeKey(this, rootWidget_, 0, specialKey, mod, keydown);
+        }
     }
 
 }
@@ -493,10 +511,38 @@ void UI::HandleTextInput(StringHash eventType, VariantMap& eventData)
 
     const String& text = eventData[P_TEXT].GetString();
 
-    for (unsigned i = 0; i < text.Length(); i++)
-    {
-        InvokeKey(this, rootWidget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, true);
-        InvokeKey(this, rootWidget_, text[i], TB_KEY_UNDEFINED, TB_MODIFIER_NONE, false);
+    int offset = 0;
+    while(true){
+        UCS4 keyCodeInUtf32 = utf8::decode_next(text.CString(), &offset, text.Length());
+
+        if(keyCodeInUtf32 == 0xFFFF || !keyCodeInUtf32){
+            break;
+        }
+        else{
+            InvokeKey(this, rootWidget_, keyCodeInUtf32, TB_KEY_UNDEFINED, TB_MODIFIER_NONE, true);
+            InvokeKey(this, rootWidget_, keyCodeInUtf32, TB_KEY_UNDEFINED, TB_MODIFIER_NONE, false);
+        }
+    }
+
+    if(rootWidget_->focused_widget){
+        UIWidget *tmpWidget = WrapWidget(rootWidget_->focused_widget);
+        if(tmpWidget){
+            tmpWidget->editText_.Clear();
+        }
+    }
+}
+
+void UI::HandleTextEdit(StringHash EventType, VariantMap &eventData)
+{
+    if (inputDisabled_ || keyboardDisabled_ || consoleVisible_)
+        return;
+
+    if(rootWidget_->focused_widget){
+        UIWidget *tmpWidget = WrapWidget(rootWidget_->focused_widget);
+        if(tmpWidget){
+            using namespace TextEdit;
+            tmpWidget->editText_ = eventData[P_TEXT].GetString();
+        }
     }
 
 }
