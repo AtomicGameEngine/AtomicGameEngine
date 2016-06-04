@@ -62,13 +62,10 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * @return {boolean}
      */
     private isValidFiletype(path: string): boolean {
-        if (this.isTypescriptProject) {
-            const ext = Atomic.getExtension(path);
-            if (ext == ".ts") {
-                return true;
-            }
+        const ext = Atomic.getExtension(path);
+        if (ext == ".ts") {
+            return true;
         }
-        return false;
     }
 
     /**
@@ -151,6 +148,23 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     }
 
     /**
+     * Configures the project to be a Typescript Project
+     * @return {[type]}
+     */
+    private configureTypescriptProject() {
+        if (this.isTypescriptProject) {
+            this.setTsConfigOnWebView(this.buildTsConfig());
+            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
+
+            // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
+            const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
+            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
+            menu.addItem(this.compileOnSaveMenuItem);
+            menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+        }
+    }
+
+    /**
      * Inject this language service into the registry
      * @return {[type]}             True if successful
      */
@@ -160,6 +174,18 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         serviceLocator.projectServices.register(this);
         serviceLocator.uiServices.register(this);
         this.serviceRegistry = serviceLocator;
+    }
+
+    /**
+     * Handle when a new file is loaded and we have not yet configured the editor for TS.
+     * This could be when someone adds a TS file to a vanilla project
+     * @param  {Editor.EditorEvents.EditResourceEvent} ev
+     */
+    edit(ev: Editor.EditorEvents.EditResourceEvent) {
+        if (this.isValidFiletype(ev.path) && !this.isTypescriptProject) {
+            this.isTypescriptProject = true;
+            this.configureTypescriptProject();
+        }
     }
 
     /**
@@ -247,17 +273,9 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             this.isTypescriptProject = true;
         });
 
-        if (this.isTypescriptProject) {
-            this.setTsConfigOnWebView(this.buildTsConfig());
-            const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
-
-            // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
-            const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("TypeScript", {});
-            this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
-            menu.addItem(this.compileOnSaveMenuItem);
-            menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
-        }
+        this.configureTypescriptProject();
     }
+
 
     /**
      * Called when the project is unloaded
