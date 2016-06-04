@@ -23,6 +23,24 @@
 import * as EditorEvents from "../../editor/EditorEvents";
 
 /**
+ * Default compiler options to use for compilation.  If there
+ * is a compiler option block in a tsconfig.json located in the project,
+ * then the one in the project will overwrite these
+ * @type {ts.CompilerOptions}
+ */
+const defaultCompilerOptions = {
+    noEmitOnError: true,
+    noImplicitAny: false,
+    target: "es5",
+    module: "commonjs",
+    moduleResolution: "classic",
+    declaration: false,
+    inlineSourceMap: false,
+    removeComments: false,
+    noLib: true
+};
+
+/**
  * Resource extension that supports the web view typescript extension
  */
 export default class TypescriptLanguageExtension implements Editor.HostExtensions.ResourceServicesEventListener, Editor.HostExtensions.ProjectServicesEventListener {
@@ -63,6 +81,8 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         if (this.isTypescriptProject) {
             let projectFiles: Array<string> = [];
 
+            let compilerOptions = defaultCompilerOptions;
+
             //scan all the files in the project for any typescript files and add them to the project
             Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
                 projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
@@ -96,6 +116,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                             }
                         });
                     }
+
+                    // override the default options if the tsconfig contains them
+                    if (savedTsConfig["compilerOptions"]) {
+                        compilerOptions = savedTsConfig["compilerOptions"];
+                    }
                 } finally {
                     file.close();
                 }
@@ -115,6 +140,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             }
 
             let tsConfig = {
+                compilerOptions: compilerOptions,
                 files: projectFiles
             };
             return tsConfig;
@@ -277,7 +303,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     handleWebMessage(messageType: string, data: any) {
         switch (messageType) {
             case "TypeScript.DisplayCompileResults":
-                this.displayCompileResults(data.annotations);
+                this.displayCompileResults(data);
                 break;
         }
     }
@@ -327,11 +353,14 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * Display the results of the compilation step
      * @param  {any[]} annotations
      */
-    displayCompileResults(annotations: any[]) {
+    displayCompileResults(results: {
+        annotations: any[],
+        compilerOptions: any,
+        duration: number
+    }) {
         // get the name of the resources directory without preceding path
         let resourceDir = ToolCore.toolSystem.project.resourcePath.replace(Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath), "");
-        console.log(resourceDir);
-        let messageArray = annotations.filter(result => {
+        let messageArray = results.annotations.filter(result => {
             // If we are compiling the lib.d.ts or some other built-in library and it was successful, then
             // we really don't need to display that result since it's just noise.  Only display it if it fails
             if (result.type == "success") {
@@ -349,11 +378,21 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 message += `<color #e3e02b>${result.text} at line ${result.row} col ${result.column}</color>`;
             }
             return message;
-        });
+        }).join("\n");
 
         if (messageArray.length == 0) {
-            messageArray.push("Success");
+            messageArray = "Success";
         }
-        this.serviceRegistry.uiServices.showModalError("TypeScript Compilation Results", messageArray.join("\n"));
+
+        let message = [
+            "Compiler Options: ",
+            JSON.stringify(results.compilerOptions, null, 2),
+            "",
+            messageArray,
+            "",
+            `Compilation Completed in ${results.duration}ms`
+        ].join("\n");
+
+        this.serviceRegistry.uiServices.showModalError("TypeScript Compilation Results", message);
     }
 }

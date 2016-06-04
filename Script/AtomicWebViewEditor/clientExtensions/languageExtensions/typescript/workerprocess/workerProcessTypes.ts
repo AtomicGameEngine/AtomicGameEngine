@@ -28,9 +28,7 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent {
-    tsConfig: any
-}
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent {}
 
 export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent { }
 export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent { }
@@ -92,7 +90,10 @@ export interface FullCompileMessageData extends WorkerProcessMessageData {
 };
 
 export const DisplayFullCompileResults = "DISPLAY_FULL_COMPILE_RESULTS";
-export interface FullCompileResultsMessageData extends GetAnnotationsResponseMessageData { }
+export interface FullCompileResultsMessageData extends GetAnnotationsResponseMessageData {
+    compilerOptions: any;
+    duration: number;
+}
 
 export const SaveFile = "SAVE_FILE";
 

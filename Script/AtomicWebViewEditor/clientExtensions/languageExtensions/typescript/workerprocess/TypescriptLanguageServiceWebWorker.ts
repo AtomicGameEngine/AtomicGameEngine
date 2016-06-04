@@ -121,8 +121,7 @@ class WebFileSystem implements FileSystemInterface {
                 filename: filename,
                 code: contents,
                 fileExt: fileExt,
-                editor: null,
-                tsConfig: null
+                editor: null
             };
 
             this.communicationPort.postMessage(message);
@@ -164,7 +163,6 @@ export default class TypescriptLanguageServiceWebWorker {
 
     constructor() {
         this.fs = new WebFileSystem();
-        this.languageService = new TypescriptLanguageService(this.fs);
     }
 
     /**
@@ -236,10 +234,6 @@ export default class TypescriptLanguageServiceWebWorker {
         // and delete any that may be been removed and sync up
         let promises: PromiseLike<void>[] = [];
 
-        if (this.tsConfig.compilerOptions) {
-            this.languageService.compilerOptions = this.tsConfig.compilerOptions;
-        };
-
         let existingFiles = this.languageService.getProjectFiles();
 
         // see if anything was deleted
@@ -275,6 +269,9 @@ export default class TypescriptLanguageServiceWebWorker {
     }) {
         //port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.tsConfig = eventData.tsConfig;
+        if (!this.languageService) {
+            this.languageService = new TypescriptLanguageService(this.fs, this.tsConfig.compilerOptions);
+        }
 
         // Check to see if the file coming in is already in the
         // tsconfig.  The file coming in won't have a full path
@@ -388,7 +385,6 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.SaveMessageData} eventData
      */
     handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
-        this.tsConfig = eventData.tsConfig;
         let filename = this.resolvePartialFilename(eventData.filename);
 
         this.languageService.updateProjectFile(filename, eventData.code);
@@ -407,6 +403,11 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     doFullCompile(port: MessagePort, eventData: WorkerProcessTypes.FullCompileMessageData) {
         this.tsConfig = eventData.tsConfig;
+        this.languageService.compilerOptions = this.tsConfig.compilerOptions;
+        if (eventData.tsConfig.compilerOptions) {
+            this.languageService.compilerOptions = eventData.tsConfig.compilerOptions;
+        }
+
         this.fs.setCommunicationPort(port);
 
         // update all the files
@@ -415,7 +416,8 @@ export default class TypescriptLanguageServiceWebWorker {
         });
 
         let results = [];
-        this.languageService.compile([], this.languageService.compilerOptions, (filename, errors) => {
+        let start = Date.now();
+        this.languageService.compile([], (filename, errors) => {
             if (errors.length > 0) {
                 results = results.concat(errors.map(diagnostic => {
                     let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
@@ -438,10 +440,13 @@ export default class TypescriptLanguageServiceWebWorker {
                 });
             }
         });
+        let duration = Date.now() - start;
 
         let message: WorkerProcessTypes.FullCompileResultsMessageData = {
             command: WorkerProcessTypes.DisplayFullCompileResults,
-            annotations: results
+            annotations: results,
+            compilerOptions: this.languageService.compilerOptions,
+            duration: duration
         };
         this.fs.setCommunicationPort(null);
         port.postMessage(message);

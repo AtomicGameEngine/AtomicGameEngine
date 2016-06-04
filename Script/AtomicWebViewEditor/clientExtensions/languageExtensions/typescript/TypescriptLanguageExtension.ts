@@ -97,7 +97,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Grabs the TS Config file attached to the global window object
      * @return {any}
      */
-    private getTsConfig():any {
+    private getTsConfig(): any {
         return JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
     }
 
@@ -273,7 +273,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 filename: ev.filename,
                 fileExt: ev.fileExt,
                 code: ev.code,
-                tsConfig: this.getTsConfig(),
                 editor: null // cannot send editor across the boundary
             };
 
@@ -323,26 +322,30 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @return {[type]}
      */
     preferencesChanged() {
-        let compileOnSave = this.serviceLocator.clientServices.getUserPreference("HostTypeScriptLanguageExtension", "CompileOnSave", true);
-        const message: WorkerProcessTypes.SetPreferencesMessageData = {
-            command: WorkerProcessTypes.SetPreferences,
-            preferences: {
-                compileOnSave: compileOnSave
-            }
-        };
+        if (this.worker) {
+            let compileOnSave = this.serviceLocator.clientServices.getUserPreference("HostTypeScriptLanguageExtension", "CompileOnSave", true);
+            const message: WorkerProcessTypes.SetPreferencesMessageData = {
+                command: WorkerProcessTypes.SetPreferences,
+                preferences: {
+                    compileOnSave: compileOnSave
+                }
+            };
 
-        this.worker.port.postMessage(message);
+            this.worker.port.postMessage(message);
+        }
     }
 
     /**
      * Tell the language service to perform a full compile
      */
     doFullCompile() {
-        const message: WorkerProcessTypes.FullCompileMessageData = {
-            command: WorkerProcessTypes.DoFullCompile,
-            tsConfig: this.getTsConfig()
-        };
-        this.worker.port.postMessage(message);
+        if (this.worker) {
+            const message: WorkerProcessTypes.FullCompileMessageData = {
+                command: WorkerProcessTypes.DoFullCompile,
+                tsConfig: this.getTsConfig()
+            };
+            this.worker.port.postMessage(message);
+        }
     }
 
 
