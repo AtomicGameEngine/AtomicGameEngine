@@ -95,3 +95,20 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
     });
     return exampleJson.examples;
 }
+
+/**
+ * Return an array of all of the file type templates for the provided file type
+ * @param  {string} fileTemplateType
+ * @return {[FileTemplateDefinition]}
+ */
+export function GetNewFileTemplateDefinitions(fileTemplateType: Editor.Templates.TemplateType) : Editor.Templates.FileTemplateDefinition[] {
+    const templateDefinitions = "AtomicEditor/templates/file_template_definitions.json";
+    const file = Atomic.cache.getFile(templateDefinitions);
+
+    if (!file) {
+        return [];
+    }
+
+    const templates = JSON.parse(file.readText());
+    return templates[fileTemplateType] || [];
+}

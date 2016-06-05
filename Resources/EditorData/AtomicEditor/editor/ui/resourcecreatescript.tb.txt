@@ -1,10 +1,14 @@
 TBLayout: axis: y, distribution: gravity, position: left
-	TBLayout: 
+	TBLayout:
 		TBTextField: text: "Script Name:"
 		TBEditField: id: script_name, autofocus: 1
 			lp: min-width: 180
+	TBLayout: distribution: gravity
+		TBTextField: text: "Script Template:"
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBSelectDropdown: id: template_list
+				lp: min-width: 240
 	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout: 
+	TBLayout:
 		TBButton: text: Create, id: create
 		TBButton: text: Cancel, id: cancel
-		

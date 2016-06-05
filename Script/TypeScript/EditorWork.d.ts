@@ -148,6 +148,25 @@ declare module Editor.EditorEvents {
     }
 }
 
+declare module Editor.Templates {
+    export type TemplateType = "component" | "script";
+    /**
+     * New file defintion
+     */
+    export interface FileTemplateDefinition {
+        /** name to display in the dropdown */
+        name: string;
+        /** description */
+        desc: string;
+        /** type of template */
+        templateType: TemplateType;
+        /** file extension */
+        ext: string;
+        /** file name/path of the source templage file to clone from.  Note, needs to be in the atomic cache */
+        filename: string;
+    }
+}
+
 declare module Editor.Extensions {
 
     /**
