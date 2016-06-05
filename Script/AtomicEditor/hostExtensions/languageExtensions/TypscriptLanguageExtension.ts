@@ -182,9 +182,14 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * @param  {Editor.EditorEvents.EditResourceEvent} ev
      */
     edit(ev: Editor.EditorEvents.EditResourceEvent) {
-        if (this.isValidFiletype(ev.path) && !this.isTypescriptProject) {
-            this.isTypescriptProject = true;
-            this.configureTypescriptProject();
+        if (this.isValidFiletype(ev.path)) {
+            if (!this.isTypescriptProject) {
+                this.isTypescriptProject = true;
+                this.configureTypescriptProject();
+            }
+
+            // update ts config in case we have a new resource
+            this.setTsConfigOnWebView(this.buildTsConfig());
         }
     }
 
