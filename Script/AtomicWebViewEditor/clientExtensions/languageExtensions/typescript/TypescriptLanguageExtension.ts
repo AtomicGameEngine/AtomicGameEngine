@@ -38,6 +38,13 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     private filename: string;
 
+    /**
+     * Is this instance of the extension active?  Only true if the current editor
+     * is a typescript file.
+     * @type {Boolean}
+     */
+    private active = false;
+
     private serviceLocator: Editor.ClientExtensions.ClientServiceLocator;
 
     private worker: SharedWorker.SharedWorker;
@@ -94,6 +101,14 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
+     * Grabs the TS Config file attached to the global window object
+     * @return {any}
+     */
+    private getTsConfig(): any {
+        return JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
+    }
+
+    /**
      * Called when the editor needs to be configured for a particular file
      * @param  {Editor.EditorEvents.EditorFileEvent} ev
      */
@@ -118,7 +133,12 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
+
+            // Hook in the routine to allow the host to perform a full compile
+            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
+
             this.filename = ev.filename;
+            this.active = true;
 
             let editor = ev.editor;
 
@@ -129,7 +149,12 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.buildWorker();
 
             // post a message to the shared web worker
-            this.worker.port.postMessage({ command: WorkerProcessTypes.Connect, sender: "Typescript Language Extension", filename: ev.filename });
+            this.worker.port.postMessage({
+                command: WorkerProcessTypes.Connect,
+                sender: "Typescript Language Extension",
+                filename: ev.filename,
+                tsConfig: this.getTsConfig()
+            });
         }
     }
 
@@ -148,6 +173,22 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             case WorkerProcessTypes.AnnotationsUpdated:
                 this.setAnnotations(e.data);
                 break;
+            case WorkerProcessTypes.SaveFile:
+                this.saveFile(e.data);
+                break;
+            case WorkerProcessTypes.DisplayFullCompileResults:
+                this.displayFullCompileResults(e.data);
+                break;
+        }
+    }
+
+    /**
+     * Saves a compiled file sent across from the worker service
+     * @param  {WorkerProcessTypes.SaveMessageData} event
+     */
+    saveFile(event: WorkerProcessTypes.SaveMessageData) {
+        if (this.active) {
+            this.serviceLocator.clientServices.getHostInterop().saveFile(event.filename, event.code);
         }
     }
 
@@ -207,8 +248,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 // a result back
                 extension.workerRequest(WorkerProcessTypes.DocTooltipResponse, message)
                     .then((e: WorkerProcessTypes.GetDocTooltipResponseMessageData) => {
-                    extension.editor.completer.showDocTooltip(e);
-                });
+                        extension.editor.completer.showDocTooltip(e);
+                    });
             },
 
             getCompletions: function(editor, session, pos, prefix, callback) {
@@ -222,8 +263,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
                 extension.workerRequest(WorkerProcessTypes.CompletionResponse, message)
                     .then((e: WorkerProcessTypes.GetCompletionsResponseMessageData) => {
-                    callback(null, e.completions);
-                });
+                        callback(null, e.completions);
+                    });
             }
         };
         return wordCompleter;
@@ -234,8 +275,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {Editor.EditorEvents.SaveResourceEvent} ev
      */
     save(ev: Editor.EditorEvents.CodeSavedEvent) {
-        if (this.isValidFiletype(ev.filename)) {
-            console.log(`${this.name}: received a save resource event for ${ev.filename}`);
+        if (this.active && this.isValidFiletype(ev.filename)) {
+            //console.log(`${this.name}: received a save resource event for ${ev.filename}`);
 
             const message: WorkerProcessTypes.SaveMessageData = {
                 command: ClientExtensionEventNames.CodeSavedEvent,
@@ -254,8 +295,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {Editor.EditorEvents.DeleteResourceEvent} ev
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a delete resource event for ${ev.path}`);
+        if (this.active && this.isValidFiletype(ev.path)) {
+            //console.log(`${this.name}: received a delete resource event for ${ev.path}`);
 
             // notify the typescript language service that the file has been deleted
             const message: WorkerProcessTypes.DeleteMessageData = {
@@ -272,8 +313,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {Editor.EditorEvents.RenameResourceEvent} ev
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
-        if (this.isValidFiletype(ev.path)) {
-            console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
+        if (this.active && this.isValidFiletype(ev.path)) {
+            //console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
 
             // notify the typescript language service that the file has been renamed
             const message: WorkerProcessTypes.RenameMessageData = {
@@ -291,7 +332,41 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @return {[type]}
      */
     preferencesChanged() {
-        // Stub function for now
-        this.serviceLocator.clientServices.getUserPreference("TypescriptLanguageExtension", "CompileOnSave", true);
+        if (this.active) {
+            let compileOnSave = this.serviceLocator.clientServices.getUserPreference("HostTypeScriptLanguageExtension", "CompileOnSave", true);
+            const message: WorkerProcessTypes.SetPreferencesMessageData = {
+                command: WorkerProcessTypes.SetPreferences,
+                preferences: {
+                    compileOnSave: compileOnSave
+                }
+            };
+
+            this.worker.port.postMessage(message);
+        }
+    }
+
+    /**
+     * Tell the language service to perform a full compile
+     */
+    doFullCompile() {
+        if (this.active) {
+            const message: WorkerProcessTypes.FullCompileMessageData = {
+                command: WorkerProcessTypes.DoFullCompile,
+                tsConfig: this.getTsConfig()
+            };
+            this.worker.port.postMessage(message);
+        }
+    }
+
+
+    /**
+     * Displays the results from a full compile
+     * @param  {WorkerProcessTypes.FullCompileResultsMessageData} results
+     */
+    displayFullCompileResults(results: WorkerProcessTypes.FullCompileResultsMessageData) {
+        let messageArray = results.annotations.map((result) => {
+            return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
+        });
+        window.atomicQueryPromise("TypeScript.DisplayCompileResults", results);
     }
 }

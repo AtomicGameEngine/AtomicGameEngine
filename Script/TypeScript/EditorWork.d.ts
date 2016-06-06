@@ -148,6 +148,25 @@ declare module Editor.EditorEvents {
     }
 }
 
+declare module Editor.Templates {
+    export type TemplateType = "component" | "script";
+    /**
+     * New file defintion
+     */
+    export interface FileTemplateDefinition {
+        /** name to display in the dropdown */
+        name: string;
+        /** description */
+        desc: string;
+        /** type of template */
+        templateType: TemplateType;
+        /** file extension */
+        ext: string;
+        /** file name/path of the source templage file to clone from.  Note, needs to be in the atomic cache */
+        filename: string;
+    }
+}
+
 declare module Editor.Extensions {
 
     /**
@@ -264,9 +283,22 @@ declare module Editor.HostExtensions {
     }
 
     export interface ResourceServicesEventListener extends Editor.Extensions.ServiceEventListener {
+        /**
+         * Called once a resource is saved
+         */
         save?(ev: EditorEvents.SaveResourceEvent);
+        /**
+         * Called when a resource is deleted
+         */
         delete?(ev: EditorEvents.DeleteResourceEvent);
+        /**
+         * Called when a resource is renamed
+         */
         rename?(ev: EditorEvents.RenameResourceEvent);
+        /**
+         * Called when a resource is about to be edited
+         */
+        edit?(ev: EditorEvents.EditResourceEvent);
     }
 
     export interface ResourceServicesProvider extends Editor.Extensions.ServicesProvider<ResourceServicesEventListener> {
@@ -310,7 +342,15 @@ declare module Editor.HostExtensions {
         menuItemClicked?(refid: string): boolean;
         projectContextItemClicked?(asset: ToolCore.Asset, refid: string): boolean;
         hierarchyContextItemClicked?(node: Atomic.Node, refid: string): boolean;
+
+        /**
+         * Handle messages that are submitted via Atomic.Query from within a web view editor.
+         * @param message The message type that was submitted to be used to determine what the data contains if present
+         * @param data any additional data that needs to be submitted with the message
+         */
+        handleWebMessage?(messageType: string, data?: any): void;
     }
+
     export interface UIServicesProvider extends Editor.Extensions.ServicesProvider<UIServicesEventListener> {
         createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource;
         removePluginMenuItemSource(id: string);
@@ -322,6 +362,12 @@ declare module Editor.HostExtensions {
         showModalWindow(windowText: string, uifilename: string, handleWidgetEventCB: (ev: Atomic.UIWidgetEvent) => void): Editor.Modal.ExtensionWindow;
         showModalError(windowText: string, message: string);
         showResourceSelection(windowText: string, importerType: string, resourceType: string, callback: (retObject: any, args: any) => void, args?: any);
+
+        /**
+         * Returns the currently active resource editor or null
+         * @return {Editor.ResourceEditor}
+         */
+        getCurrentResourceEditor(): Editor.ResourceEditor;
 
         /**
          * Register a custom editor.  These editors will override editors in the standard editor list if
@@ -389,7 +435,9 @@ declare module Editor.ClientExtensions {
          * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
          * @return {number|boolean|string}
          */
-        getUserPreference(extensionName: string, preferenceName: string, defaultValue?: number | boolean | string): number | boolean | string;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+        getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
     }
 
     export interface AtomicErrorMessage {
@@ -440,5 +488,12 @@ declare module Editor.ClientExtensions {
          * Notify the host that the contents of the editor has changed
          */
         notifyEditorChange();
+
+        /**
+         * This adds a global routine to the window object so that it can be called from the host
+         * @param  {string} routineName
+         * @param  {(} callback
+         */
+        addCustomHostRoutine(routineName: string, callback: () => void);
     }
 }

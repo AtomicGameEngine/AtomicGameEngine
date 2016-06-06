@@ -37,27 +37,35 @@ const DEBUG_ALERT = false;
 
 /**
  * Promise version of atomic query
- * @param  {string} message the query to use to pass to atomicQuery.  If there is no payload, this will be passed directly, otherwise it will be passed in a data object
- * @param  {any} payload optional data to send
+ * @param  {string} messageType the message type to pass to atomicQuery.  If there is no payload, this will be passed directly, otherwise it will be passed in a data object
+ * @param  {any} data optional data to send
  * @return {Promise}
  */
-function atomicQueryPromise(message: any): Promise<{}> {
+window.atomicQueryPromise = function(messageType: string, data?: {}): Promise<{}> {
     return new Promise(function(resolve, reject) {
-        let queryMessage = message;
 
-        // if message is coming in as an object then let's stringify it
-        if (typeof (message) != "string") {
-            queryMessage = JSON.stringify(message);
+        let queryMessage;
+
+        // if we have a data element, then we need to structure the message so that the host understands it
+        // by adding the message to the object and then stringify-ing the whole thing
+        if (data) {
+            // stringify and reparse since we need to modify the data, but don't want to modify the passed in object
+            queryMessage = JSON.parse(JSON.stringify(data));
+            queryMessage.message = messageType;
+        } else {
+            queryMessage = {
+                message: messageType
+            };
         }
 
         window.atomicQuery({
-            request: queryMessage,
+            request: JSON.stringify(queryMessage),
             persistent: false,
             onSuccess: resolve,
             onFailure: (error_code, error_message) => reject({ error_code: error_code, error_message: error_message })
         });
     });
-}
+};
 
 export default class HostInteropType {
 
@@ -96,9 +104,7 @@ export default class HostInteropType {
         // get the code
         this.getResource(codeUrl).then((src: string) => {
             editorCommands.loadCodeIntoEditor(src, filename, fileExt);
-            atomicQueryPromise({
-                message: HostInteropType.EDITOR_GET_USER_PREFS
-            });
+            window.atomicQueryPromise(HostInteropType.EDITOR_GET_USER_PREFS);
         }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error loading code: " + e.error_message);
         });
@@ -110,8 +116,7 @@ export default class HostInteropType {
      */
     saveCode(): Promise<any> {
         let source = editorCommands.getSourceText();
-        return atomicQueryPromise({
-            message: HostInteropType.EDITOR_SAVE_CODE,
+        return window.atomicQueryPromise(HostInteropType.EDITOR_SAVE_CODE, {
             payload: source
         }).then(() => {
             editorCommands.codeSaved(this.fileName, this.fileExt, source);
@@ -125,13 +130,9 @@ export default class HostInteropType {
      * @return {Promise}
      */
     saveFile(filename: string, fileContents: string): Promise<any> {
-        const fileExt = filename.indexOf(".") != -1 ? filename.split(".").pop() : "";
-        return atomicQueryPromise({
-            message: HostInteropType.EDITOR_SAVE_FILE,
+        return window.atomicQueryPromise(HostInteropType.EDITOR_SAVE_FILE, {
             filename: filename,
             payload: fileContents
-        }).then(() => {
-            editorCommands.codeSaved(filename, fileExt, fileContents);
         });
     }
 
@@ -143,7 +144,7 @@ export default class HostInteropType {
         if (DEBUG_ALERT) {
             alert(`Attach chrome dev tools to this instance by navigating to http://localhost:${DEBUG_PORT}`);
         }
-        atomicQueryPromise(HostInteropType.EDITOR_LOAD_COMPLETE);
+        window.atomicQueryPromise(HostInteropType.EDITOR_LOAD_COMPLETE);
     }
 
     /**
@@ -177,7 +178,7 @@ export default class HostInteropType {
      * Notify the host that the contents of the editor has changed
      */
     notifyEditorChange() {
-        atomicQueryPromise(HostInteropType.EDITOR_CHANGE).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
+        window.atomicQueryPromise(HostInteropType.EDITOR_CHANGE).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error on change: " + e.error_message);
         });
     }
@@ -213,5 +214,14 @@ export default class HostInteropType {
         }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error loading preferences: " + e.error_message);
         });
+    }
+
+    /**
+     * This adds a global routine to the window object so that it can be called from the host
+     * @param  {string} routineName
+     * @param  {(} callback
+     */
+    addCustomHostRoutine(routineName: string, callback: () => void) {
+        window[routineName] = callback;
     }
 }

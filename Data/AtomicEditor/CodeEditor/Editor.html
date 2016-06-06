@@ -72,6 +72,11 @@
             module.default.getInstance().loadPreferences(prefUrl);
         });
     }
+
+    System.import('./source/editorCore/interop').then((module) => {
+        module.default.getInstance().editorLoaded();
+    });
+
   </script>
 
 </body>

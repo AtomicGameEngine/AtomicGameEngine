@@ -68,6 +68,17 @@ function getFileResource(filename: string): Promise<{}> {
 class WebFileSystem implements FileSystemInterface {
 
     private fileCache = {};
+    private communicationPort: MessagePort;
+
+    /**
+     * Sets the port used to communicate with the primary window.
+     * This is needed since AtomicQuery can't be called from a webworker
+     * @param  {MessagePort} port
+     */
+    setCommunicationPort(port: MessagePort) {
+        this.communicationPort = port;
+    }
+
     /**
      * Deterimine if the particular file exists in the resources
      * @param  {string} filename
@@ -92,7 +103,7 @@ class WebFileSystem implements FileSystemInterface {
      * @return {string}
      */
     getFile(filename: string): string {
-        console.log("FS.GETFILE!!");
+        // console.log("FS.GETFILE!!");
         // return HostInterop.getResource("atomic:" + filename);
         return this.fileCache[filename];
     }
@@ -103,15 +114,18 @@ class WebFileSystem implements FileSystemInterface {
      * @param  {string} contents
      */
     writeFile(filename: string, contents: string) {
-        //TODO:
-        /*let script = new Atomic.File(filename, Atomic.FILE_WRITE);
-        try {
-            script.writeString(contents);
-            script.flush();
-        } finally {
-            script.close();
+        if (this.communicationPort) {
+            const fileExt = filename.indexOf(".") != -1 ? filename.split(".").pop() : "";
+            let message: WorkerProcessTypes.SaveMessageData = {
+                command: WorkerProcessTypes.SaveFile,
+                filename: filename,
+                code: contents,
+                fileExt: fileExt,
+                editor: null
+            };
+
+            this.communicationPort.postMessage(message);
         }
-        */
     }
 
     /**
@@ -141,9 +155,14 @@ export default class TypescriptLanguageServiceWebWorker {
 
     projectLoaded = false;
 
+    options = {
+        compileOnSave: false
+    };
+
+    tsConfig: TSConfigFile = null;
+
     constructor() {
         this.fs = new WebFileSystem();
-        this.languageService = new TypescriptLanguageService(this.fs);
     }
 
     /**
@@ -155,31 +174,41 @@ export default class TypescriptLanguageServiceWebWorker {
         this.connections++;
 
         port.addEventListener("message", (e: WorkerProcessTypes.WorkerProcessMessage<any>) => {
-            switch (e.data.command) {
-                case WorkerProcessTypes.Connect:
-                    this.handleHELO(port, e.data);
-                    break;
-                case WorkerProcessTypes.Disconnect:
-                    this.handleCLOSE(port, e.data);
-                    break;
-                case WorkerProcessTypes.GetCompletions:
-                    this.handleGetCompletions(port, e.data);
-                    break;
-                case WorkerProcessTypes.GetDocTooltip:
-                    this.handleGetDocTooltip(port, e.data);
-                    break;
-                case ClientExtensionEventNames.CodeSavedEvent:
-                    this.handleSave(port, e.data);
-                    break;
-                case ClientExtensionEventNames.ResourceRenamedEvent:
-                    this.handleRename(port, e.data);
-                    break;
-                case ClientExtensionEventNames.ResourceDeletedEvent:
-                    this.handleDelete(port, e.data);
-                    break;
-                case WorkerProcessTypes.GetAnnotations:
-                    this.handleGetAnnotations(port, e.data);
-                    break;
+            try {
+                switch (e.data.command) {
+                    case WorkerProcessTypes.Connect:
+                        this.handleHELO(port, e.data);
+                        break;
+                    case WorkerProcessTypes.Disconnect:
+                        this.handleCLOSE(port, e.data);
+                        break;
+                    case WorkerProcessTypes.GetCompletions:
+                        this.handleGetCompletions(port, e.data);
+                        break;
+                    case WorkerProcessTypes.GetDocTooltip:
+                        this.handleGetDocTooltip(port, e.data);
+                        break;
+                    case ClientExtensionEventNames.CodeSavedEvent:
+                        this.handleSave(port, e.data);
+                        break;
+                    case ClientExtensionEventNames.ResourceRenamedEvent:
+                        this.handleRename(port, e.data);
+                        break;
+                    case ClientExtensionEventNames.ResourceDeletedEvent:
+                        this.handleDelete(port, e.data);
+                        break;
+                    case WorkerProcessTypes.GetAnnotations:
+                        this.handleGetAnnotations(port, e.data);
+                        break;
+                    case WorkerProcessTypes.SetPreferences:
+                        this.setPreferences(port, e.data);
+                        break;
+                    case WorkerProcessTypes.DoFullCompile:
+                        this.doFullCompile(port, e.data);
+                        break;
+                }
+            } catch (e) {
+                port.postMessage({ command: WorkerProcessTypes.Message, message: `Error in TypescriptLanguageServiceWebWorker: ${e}\n${e.stack}` });
             }
 
         }, false);
@@ -203,35 +232,27 @@ export default class TypescriptLanguageServiceWebWorker {
     private loadProjectFiles() {
         // Let's query the backend and get a list of the current files
         // and delete any that may be been removed and sync up
-        return getFileResource("resources/tsconfig.atomic").then((jsonTsConfig: string) => {
-            let promises: PromiseLike<void>[] = [];
-            let tsConfig: TSConfigFile = JSON.parse(jsonTsConfig);
+        let promises: PromiseLike<void>[] = [];
 
-            if (tsConfig.compilerOptions) {
-                this.languageService.compilerOptions = tsConfig.compilerOptions;
-            };
+        let existingFiles = this.languageService.getProjectFiles();
 
-            let existingFiles = this.languageService.getProjectFiles();
+        // see if anything was deleted
+        existingFiles.forEach((f) => {
+            if (this.tsConfig.files.indexOf(f) == -1) {
+                this.languageService.deleteProjectFile(f);
+            }
+        });
 
-            // see if anything was deleted
-            existingFiles.forEach((f) => {
-                if (tsConfig.files.indexOf(f) == -1) {
-                    this.languageService.deleteProjectFile(f);
-                }
-            });
+        // load up any new files that may have been added
+        this.tsConfig.files.forEach((f) => {
+            if (existingFiles.indexOf(f) == -1) {
+                promises.push(getFileResource(f).then((code: string) => {
+                    this.languageService.addProjectFile(f, code);
+                }));
+            }
+        });
 
-            // load up any new files that may have been added
-            tsConfig.files.forEach((f) => {
-                if (existingFiles.indexOf(f) == -1) {
-                    promises.push(getFileResource(f).then((code: string) => {
-                        this.languageService.addProjectFile(f, code);
-                    }));
-                }
-            });
-            return Promise.all(promises);
-        }).then(() => {
-            // Let's seed the compiler state
-            // this.languageService.compile([this.filename]);
+        return Promise.all(promises).then(() => {
             this.projectLoaded = true;
         });
     }
@@ -243,11 +264,22 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     handleHELO(port: MessagePort, eventData: any | {
         sender: string,
-        filename: string
+        filename: string,
+        tsConfig: any
     }) {
-        port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
+        //port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
+        this.tsConfig = eventData.tsConfig;
+        if (!this.languageService) {
+            this.languageService = new TypescriptLanguageService(this.fs, this.tsConfig);
+        }
+
+        // Check to see if the file coming in is already in the
+        // tsconfig.  The file coming in won't have a full path
+        // so, compare the ends
+        const fn = this.resolvePartialFilename(eventData.filename);
+
         this.loadProjectFiles().then(() => {
-            let diagnostics = this.languageService.compile([eventData.filename]);
+            let diagnostics = this.languageService.compile([fn]);
             this.handleGetAnnotations(port, eventData);
         });
     }
@@ -262,19 +294,31 @@ export default class TypescriptLanguageServiceWebWorker {
         if (this.connections <= 0) {
             this.reset();
         }
-        console.log("Got a close");
     }
 
+    /**
+     * Look up the filename in the tsconfig and see if it exists.  The filename
+     * may contain a partial path and the tsconfig contains full paths, so check
+     * the ends
+     * @param  {string} partial
+     * @return {string}
+     */
+    resolvePartialFilename(partial: string): string {
+        let result = this.tsConfig.files.find(fn => fn.endsWith(partial));
+        return result || partial;
+    }
     /**
      * Get completions
      * @param  {MessagePort} port
      * @param  {WorkerProcessCommands.GetCompletionsMessage} eventData
      */
     handleGetCompletions(port: MessagePort, eventData: WorkerProcessTypes.GetCompletionsMessageData) {
-        let sourceFile = this.languageService.updateProjectFile(eventData.filename, eventData.sourceText);
+        // filename may not include the entire path, so let's find it in the tsconfig
+        let filename = this.resolvePartialFilename(eventData.filename);
+        let sourceFile = this.languageService.updateProjectFile(filename, eventData.sourceText);
 
         let newpos = this.languageService.getPositionOfLineAndCharacter(sourceFile, eventData.pos.row, eventData.pos.column);
-        let completions = this.languageService.getCompletions(eventData.filename, newpos);
+        let completions = this.languageService.getCompletions(filename, newpos);
 
         let message: WorkerProcessTypes.GetCompletionsResponseMessageData = {
             command: WorkerProcessTypes.CompletionResponse,
@@ -311,7 +355,8 @@ export default class TypescriptLanguageServiceWebWorker {
         let message: WorkerProcessTypes.GetDocTooltipResponseMessageData = {
             command: WorkerProcessTypes.DocTooltipResponse
         };
-        const details = this.languageService.getCompletionEntryDetails(eventData.filename, eventData.pos, eventData.completionItem.caption);
+        let filename = this.resolvePartialFilename(eventData.filename);
+        const details = this.languageService.getCompletionEntryDetails(filename, eventData.pos, eventData.completionItem.caption);
         if (details) {
             let docs = details.displayParts.map(part => part.text).join("");
             if (details.documentation) {
@@ -325,9 +370,10 @@ export default class TypescriptLanguageServiceWebWorker {
     }
 
     handleGetAnnotations(port: MessagePort, eventData: WorkerProcessTypes.GetAnnotationsMessageData) {
+        let filename = this.resolvePartialFilename(eventData.filename);
         let message: WorkerProcessTypes.GetAnnotationsResponseMessageData = {
             command: WorkerProcessTypes.AnnotationsUpdated,
-            annotations: this.languageService.getPreEmitWarnings(eventData.filename)
+            annotations: this.languageService.getPreEmitWarnings(filename)
         };
 
         port.postMessage(message);
@@ -339,8 +385,68 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.SaveMessageData} eventData
      */
     handleSave(port: MessagePort, eventData: WorkerProcessTypes.SaveMessageData) {
-        this.languageService.updateProjectFile(eventData.filename, eventData.code);
+        let filename = this.resolvePartialFilename(eventData.filename);
+
+        this.languageService.updateProjectFile(filename, eventData.code);
         this.handleGetAnnotations(port, eventData);
+
+        if (this.options.compileOnSave) {
+            this.fs.setCommunicationPort(port);
+            let results = this.languageService.compile([filename]);
+            this.fs.setCommunicationPort(null);
+        }
+    }
+
+    /**
+     * Perform a full compile of the typescript
+     * @param  {MessagePort} port
+     */
+    doFullCompile(port: MessagePort, eventData: WorkerProcessTypes.FullCompileMessageData) {
+        this.tsConfig = eventData.tsConfig;
+        this.languageService.setTsConfig(eventData.tsConfig);
+
+        this.fs.setCommunicationPort(port);
+
+        // update all the files
+        this.tsConfig.files.forEach(file => {
+            this.languageService.updateProjectFileVersionNumber(file);
+        });
+
+        let results = [];
+        let start = Date.now();
+        this.languageService.compile([], (filename, errors) => {
+            if (errors.length > 0) {
+                results = results.concat(errors.map(diagnostic => {
+                    let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                    let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+                    return {
+                        file: diagnostic.file.fileName,
+                        row: lineChar.line,
+                        column: lineChar.character,
+                        text: message,
+                        type: diagnostic.category == 1 ? "error" : "warning"
+                    };
+                }));
+            } else {
+                results.push({
+                    file: filename,
+                    row: 0,
+                    column: 0,
+                    text: "Success",
+                    type: "success"
+                });
+            }
+        });
+        let duration = Date.now() - start;
+
+        let message: WorkerProcessTypes.FullCompileResultsMessageData = {
+            command: WorkerProcessTypes.DisplayFullCompileResults,
+            annotations: results,
+            compilerOptions: this.tsConfig.compilerOptions,
+            duration: duration
+        };
+        this.fs.setCommunicationPort(null);
+        port.postMessage(message);
     }
 
     /**
@@ -359,5 +465,9 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     handleRename(port: MessagePort, eventData: WorkerProcessTypes.RenameMessageData) {
         this.languageService.renameProjectFile(eventData.path, eventData.newPath);
+    }
+
+    setPreferences(port: MessagePort, eventData: WorkerProcessTypes.SetPreferencesMessageData) {
+        this.options.compileOnSave = eventData.preferences.compileOnSave;
     }
 }

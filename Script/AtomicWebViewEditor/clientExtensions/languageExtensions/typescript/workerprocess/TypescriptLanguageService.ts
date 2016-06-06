@@ -59,8 +59,9 @@ export interface FileSystemInterface {
  */
 export class TypescriptLanguageService {
 
-    constructor(fs: FileSystemInterface) {
+    constructor(fs: FileSystemInterface, tsconfig: any) {
         this.fs = fs;
+        this.setTsConfig(tsconfig);
 
         // Create the language service files
         this.documentRegistry = ts.createDocumentRegistry();
@@ -71,13 +72,7 @@ export class TypescriptLanguageService {
     private languageService: ts.LanguageService = null;
     private documentRegistry: ts.DocumentRegistry = null;
 
-    public compilerOptions: ts.CompilerOptions = {
-        noEmitOnError: true,
-        noImplicitAny: false,
-        target: ts.ScriptTarget.ES5,
-        module: ts.ModuleKind.CommonJS,
-        noLib: true
-    };
+    private compilerOptions: ts.CompilerOptions = null;
 
     name: string = "TypescriptLanguageService";
 
@@ -91,7 +86,6 @@ export class TypescriptLanguageService {
     private versionMap: ts.Map<{ version: number, snapshot?: ts.IScriptSnapshot }> = {};
 
     private createLanguageService(documentRegistry: ts.DocumentRegistry) {
-
         // Create the language service host to allow the LS to communicate with the host
         const servicesHost: ts.LanguageServiceHost = {
             getScriptFileNames: () => this.projectFiles,
@@ -104,7 +98,6 @@ export class TypescriptLanguageService {
                     if (scriptVersion.snapshot) {
                         return scriptVersion.snapshot;
                     } else {
-                        console.log(`!!! creating snapshot for ${filename}`);
                         let sourceFile = this.documentRegistry.acquireDocument(filename, this.compilerOptions, ts.ScriptSnapshot.fromString(""), scriptVersion.version.toString());
                         return ts.ScriptSnapshot.fromString(sourceFile.text);
                     }
@@ -118,6 +111,16 @@ export class TypescriptLanguageService {
         this.languageService = ts.createLanguageService(servicesHost, documentRegistry);
     }
 
+    /**
+     * Sets the tsconfig file and parses out the command line options
+     * @param  {any} tsConfig
+     * @return {[type]}
+     */
+    setTsConfig(tsConfig: any) {
+        let cmdLine = ts.parseJsonConfigFileContent(tsConfig, undefined, undefined);
+        this.compilerOptions = cmdLine.options;
+    }
+    
     /**
      * Adds a file to the internal project cache
      * @param  {string} filename the full path of the file to add
@@ -142,13 +145,13 @@ export class TypescriptLanguageService {
     /**
      * Updates the internal file representation.
      * @param  {string} filename name of the file
-     * @param  {string} fileContents optional contents of the file.  If not provided, the file system object will be queried
+     * @param  {string} fileContents optional contents of the file.
      * @return {ts.SourceFile}
      */
-    updateProjectFile(filename: string, fileContents?: string): ts.SourceFile {
-        console.log("Updated project file: " + filename);
+    updateProjectFile(filename: string, fileContents: string): ts.SourceFile {
         this.versionMap[filename].version++;
-        this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents || this.fs.getFile(filename));
+        this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents);
+
         return this.documentRegistry.updateDocument(
             filename,
             this.compilerOptions,
@@ -157,6 +160,20 @@ export class TypescriptLanguageService {
     }
 
     /**
+     * Updates the internal file version number
+     * @param  {string} filename name of the file
+     * @return {ts.SourceFile}
+     */
+    updateProjectFileVersionNumber(filename: string): ts.SourceFile {
+        this.versionMap[filename].version++;
+
+        return this.documentRegistry.updateDocument(
+            filename,
+            this.compilerOptions,
+            this.versionMap[filename].snapshot,
+            this.versionMap[filename].version.toString());
+    }
+    /**
      * Returns the list of project files
      * @return {string[]}
      */
@@ -164,9 +181,7 @@ export class TypescriptLanguageService {
         return this.projectFiles;
     }
 
-    getPreEmitWarnings(filename: string, options?: ts.CompilerOptions) {
-        options = options || this.compilerOptions;
-
+    getPreEmitWarnings(filename: string) {
         let allDiagnostics = this.compileFile(filename);
         let results = [];
 
@@ -186,17 +201,13 @@ export class TypescriptLanguageService {
     /**
      * Simply transpile the typescript file.  This is much faster and only checks for syntax errors
      * @param {string[]}           fileNames array of files to transpile
-     * @param {ts.CompilerOptions} options   compiler options
      */
-    transpile(fileNames: string[], options?: ts.CompilerOptions): void {
-        options = options || this.compilerOptions;
-        this.compilerOptions = options;
-
+    transpile(fileNames: string[]): void {
         fileNames.forEach((fileName) => {
             console.log(`${this.name}:  Transpiling ${fileName}`);
             let script = this.fs.getFile(fileName);
             let diagnostics: ts.Diagnostic[] = [];
-            let result = ts.transpile(script, options, fileName, diagnostics);
+            let result = ts.transpile(script, this.compilerOptions, fileName, diagnostics);
             if (diagnostics.length) {
                 this.logErrors(diagnostics);
             }
@@ -237,15 +248,14 @@ export class TypescriptLanguageService {
     getCompletionEntryDetails(filename: string, pos: number, entryname: string): ts.CompletionEntryDetails {
         return this.languageService.getCompletionEntryDetails(filename, pos, entryname);
     }
+
     /**
      * Compile the provided file to javascript with full type checking etc
      * @param  {string}  a list of file names to compile
-     * @param  {ts.CompilerOptions} options for the compiler
+     * @param  {function} optional callback which will be called for every file compiled and will provide any errors
      */
-    compile(files: string[], options?: ts.CompilerOptions): ts.Diagnostic[] {
+    compile(files: string[], progress?: (filename: string, errors: ts.Diagnostic[]) => void): ts.Diagnostic[] {
         let start = new Date().getTime();
-
-        options = options || this.compilerOptions;
 
         //Make sure we have these files in the project
         files.forEach((file) => {
@@ -254,17 +264,18 @@ export class TypescriptLanguageService {
 
         let errors: ts.Diagnostic[] = [];
 
+        // if we have a 0 length for files, let's compile all files
         if (files.length == 0) {
-            // We haven't passed any files in, so let's compile them all
-            this.projectFiles.forEach(filename => {
-                errors = errors.concat(this.compileFile(filename));
-            });
-        } else {
-            // Only compile the files that are newly edited
-            files.forEach(filename => {
-                errors = errors.concat(this.compileFile(filename));
-            });
+            files = this.projectFiles;
         }
+
+        files.forEach(filename => {
+            let currentErrors = this.compileFile(filename);
+            errors = errors.concat(currentErrors);
+            if (progress) {
+                progress(filename, currentErrors);
+            }
+        });
 
         console.log(`${this.name}: Compiling complete after ${new Date().getTime() - start} ms`);
         return errors;
@@ -376,8 +387,8 @@ export class TypescriptLanguageService {
                 msg.push(`${this.name}  Error: ${message}`);
             }
         });
-        console.log(`TypeScript Errors:\n${msg.join("\n") }`);
-        throw new Error(`TypeScript Errors:\n${msg.join("\n") }`);
+        console.log(`TypeScript Errors:\n${msg.join("\n")}`);
+        throw new Error(`TypeScript Errors:\n${msg.join("\n")}`);
     }
 
 }

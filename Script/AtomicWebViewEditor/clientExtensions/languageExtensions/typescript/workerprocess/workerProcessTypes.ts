@@ -28,9 +28,17 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent { }
-export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent {}
-export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent {}
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent {}
+
+export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent { }
+export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent { }
+
+export const SetPreferences = "SET_PREFERENCES";
+export interface SetPreferencesMessageData extends WorkerProcessMessageData {
+    preferences: {
+        compileOnSave?: boolean;
+    };
+}
 
 export const GetCompletions = "COMPLETIONS";
 export const CompletionResponse = "COMPLETION_RESPONSE";
@@ -71,10 +79,23 @@ export interface GetDocTooltipResponseMessageData extends WorkerProcessMessageDa
 
 export const GetAnnotations = "ANNOTATIONS";
 export const AnnotationsUpdated = "ANNOTATIONS_RESPONSE";
-export interface GetAnnotationsMessageData extends SaveMessageData {};
+export interface GetAnnotationsMessageData extends SaveMessageData { };
 export interface GetAnnotationsResponseMessageData extends WorkerProcessMessageData {
     annotations: any[];
 }
+
+export const DoFullCompile = "DO_FULL_COMPILE";
+export interface FullCompileMessageData extends WorkerProcessMessageData {
+    tsConfig: any;
+};
+
+export const DisplayFullCompileResults = "DISPLAY_FULL_COMPILE_RESULTS";
+export interface FullCompileResultsMessageData extends GetAnnotationsResponseMessageData {
+    compilerOptions: any;
+    duration: number;
+}
+
+export const SaveFile = "SAVE_FILE";
 
 export const Connect = "HELO";
 export const Disconnect = "CLOSE";
