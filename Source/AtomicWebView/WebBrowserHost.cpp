@@ -52,6 +52,8 @@
 
 static int XErrorHandlerImpl(Display *display, XErrorEvent *event)
 {
+    if ( display && event )
+    {
         char msg[132];
         XGetErrorText(display, event->error_code, msg, sizeof(msg));
         fprintf(stderr, "X11 Error %d (%s): request %d.%d \n",
