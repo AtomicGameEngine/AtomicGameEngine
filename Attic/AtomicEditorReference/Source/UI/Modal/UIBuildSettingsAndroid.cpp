@@ -146,7 +146,8 @@ void UIBuildSettingsAndroid::RefreshAndroidTargets()
 #ifdef ATOMIC_PLATFORM_OSX
     Vector<String> args = String("list targets").Split(' ');
     androidCommand += "tools/android";
-#else
+#endif
+#ifdef ATOMIC_PLATFORM_WINDOWS
     Vector<String> args;
     // android is a batch file on windows, so have to run with cmd /c
     args.Push("/c");
@@ -154,6 +155,10 @@ void UIBuildSettingsAndroid::RefreshAndroidTargets()
     args.Push("list");
     args.Push("targets");
     androidCommand = "cmd";
+#endif
+#ifdef ATOMIC_PLATFORM_LINUX
+    Vector<String> args = String("list targets").Split(' ');
+    androidCommand += "tools/android";
 #endif
 
     targetOutput_.Clear();
