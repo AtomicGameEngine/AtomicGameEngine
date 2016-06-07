@@ -36,11 +36,44 @@ namespace Atomic
 
 bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)
 {
-    return false;
+    memset((void*)&keyEvent, 0, sizeof(keyEvent));
+    
+    WebKeyEvent wk(eventType, eventData); 
+
+    keyEvent.type = wk.keyDown ? KEYEVENT_KEYDOWN : KEYEVENT_KEYUP;
+    keyEvent.is_system_key = false;
+    keyEvent.windows_key_code = 0;
+    keyEvent.focus_on_editable_field = false;
+    keyEvent.modifiers = EVENTFLAG_NONE;
+    if (wk.qual & QUAL_SHIFT) keyEvent.modifiers |= EVENTFLAG_SHIFT_DOWN;
+    if (wk.qual & QUAL_ALT) keyEvent.modifiers |= EVENTFLAG_ALT_DOWN;
+    if (wk.qual & QUAL_CTRL) keyEvent.modifiers |= EVENTFLAG_CONTROL_DOWN;
+    
+    keyEvent.native_key_code = wk.scanCode;
+    keyEvent.character = wk.key;
+    keyEvent.unmodified_character = wk.raw;
+
+    return true;
 }
 
 bool ConvertTextInputEvent(StringHash eventType, VariantMap& eventData, CefKeyEvent& keyEvent)
 {
+   if (eventType != "TextInput")
+    {
+        LOGERROR("ConvertTextInputEvent - Unknown event type");
+        return false;
+    }
+
+    memset((void*)&keyEvent, 0, sizeof(keyEvent));
+
+    String text = eventData[TextInput::P_TEXT].GetString();
+ 
+    if ( text.Length() > 0)
+    {
+		keyEvent.character = (char16)text[0];
+		keyEvent.type = KEYEVENT_CHAR;
+		return true; 
+	}
     return false;
 }
 
