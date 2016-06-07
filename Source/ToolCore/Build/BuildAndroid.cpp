@@ -249,7 +249,8 @@ void BuildAndroid::RunAntDebug()
     String antCommand = tprefs->GetAntPath();
     Vector<String> args;
     args.Push("debug");
-#else
+#endif
+#ifdef ATOMIC_PLATFORM_WINDOWS
     // C:\ProgramData\Oracle\Java\javapath;
     Vector<String> args;
     String antCommand = "cmd";
@@ -258,6 +259,25 @@ void BuildAndroid::RunAntDebug()
     // ant is a batch file on windows, so have to run with cmd /c
     args.Push("/c");
     args.Push("\"" + antPath + "\"");
+    args.Push("debug");
+#endif
+#ifdef ATOMIC_PLATFORM_LINUX 
+
+    String antCommand = tprefs->GetAntPath();
+    if ( antCommand.Empty() ) // user didnt fill it out, use installed one
+    {
+ 		antCommand = "/usr/bin/ant"; // system default if installed
+	}
+	else
+	{
+		antCommand.Append("/ant"); 
+	}
+ 	FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if ( !fileSystem->FileExists ( antCommand) ) 
+    {
+		FailBuild("BuildFailed ant program not installed");
+	}	
+    Vector<String> args;
     args.Push("debug");
 #endif
 
