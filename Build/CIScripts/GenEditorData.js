@@ -52,7 +52,7 @@ namespace('build', function() {
 
     cmds = [
       "git clone https://github.com/AtomicGameEngine/AtomicExamples " + buildDir + "AtomicExamples && rm -rf " + buildDir + "AtomicExamples/.git",
-      "cd " + jsDocFolder + " && npm install typedoc",
+      "cd " + jsDocFolder + " && npm install typedoc@0.3.12",
       "cd " + jsDocFolder + " && ./node_modules/.bin/typedoc --out out ../../../Script/TypeScript/dist/Atomic.d.ts --module commonjs --includeDeclarations --mode file --theme atomic-theme --name 'Atomic Game Engine' --readme ./Readme.md",
     ];
 

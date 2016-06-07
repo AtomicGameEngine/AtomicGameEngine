@@ -149,7 +149,8 @@ declare module Editor.EditorEvents {
 }
 
 declare module Editor.Templates {
-    export type TemplateType = "component" | "script";
+    // Commented out until the TSDoc gets updated to the latest version of TypeScript
+    //export type TemplateType = "component" | "script";
     /**
      * New file defintion
      */
@@ -159,7 +160,7 @@ declare module Editor.Templates {
         /** description */
         desc: string;
         /** type of template */
-        templateType: TemplateType;
+        templateType: string;
         /** file extension */
         ext: string;
         /** file name/path of the source templage file to clone from.  Note, needs to be in the atomic cache */

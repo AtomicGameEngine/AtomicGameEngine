@@ -101,7 +101,7 @@ export function getExampleProjectTemplateDefinitions(): [ProjectTemplateDefiniti
  * @param  {string} fileTemplateType
  * @return {[FileTemplateDefinition]}
  */
-export function GetNewFileTemplateDefinitions(fileTemplateType: Editor.Templates.TemplateType) : Editor.Templates.FileTemplateDefinition[] {
+export function GetNewFileTemplateDefinitions(fileTemplateType: string) : Editor.Templates.FileTemplateDefinition[] {
     const templateDefinitions = "AtomicEditor/templates/file_template_definitions.json";
     const file = Atomic.cache.getFile(templateDefinitions);
 
