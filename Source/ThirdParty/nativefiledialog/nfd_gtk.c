@@ -13,7 +13,8 @@
 
 
 const char INIT_FAIL_MSG[] = "gtk_init_check failed to initilaize GTK+";
-
+const char NOPATH_MSG[] = "The selected path is out of memory.";
+const char NOMEM_MSG[] = "Out of memory.";
 
 static void AddTypeToFilterName( const char *typebuf, char *filterName, size_t bufsize )
 {
@@ -121,6 +122,7 @@ static nfdresult_t AllocPathSet( GSList *fileList, nfdpathset_t *pathSet )
     pathSet->indices = NFDi_Malloc( sizeof(size_t)*pathSet->count );
     if ( !pathSet->indices )
     {
+        NFDi_SetError(NOMEM_MSG);
         return NFD_ERROR;
     }
 
@@ -206,6 +208,7 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
             {
                 g_free( filename );
                 gtk_widget_destroy(dialog);
+                NFDi_SetError(NOPATH_MSG);
                 return NFD_ERROR;
             }
         }
@@ -256,6 +259,7 @@ nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
         if ( AllocPathSet( fileList, outPaths ) == NFD_ERROR )
         {
             gtk_widget_destroy(dialog);
+            NFDi_SetError(NOPATH_MSG);
             return NFD_ERROR;
         }
 
@@ -292,6 +296,7 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
 
     /* Build the filter list */
     AddFiltersToDialog(dialog, filterList);
+    SetDefaultPath(dialog, defaultPath);
 
     result = NFD_CANCEL;
     if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT )
@@ -307,6 +312,7 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
             {
                 g_free( filename );
                 gtk_widget_destroy(dialog);
+                NFDi_SetError(NOPATH_MSG);
                 return NFD_ERROR;
             }
         }
@@ -326,7 +332,47 @@ nfdresult_t NFD_ChooseDirectory( const nfdchar_t *prompt,
                                  const nfdchar_t *defaultPath,
                                  nfdchar_t **outPath )
 {
+    GtkWidget *dialog = NULL;
+    nfdresult_t result = NFD_ERROR;
 
-  return NFD_ERROR;
+    if ( !gtk_init_check( NULL, NULL ) )
+    {
+        NFDi_SetError(INIT_FAIL_MSG);
+        return NFD_ERROR;
+    }
+    dialog = gtk_file_chooser_dialog_new( prompt,
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                          "_Cancel", GTK_RESPONSE_CANCEL,
+                                          "_Open", GTK_RESPONSE_ACCEPT,
+                                          NULL );
 
+    SetDefaultPath(dialog, defaultPath);
+
+    result = NFD_CANCEL;
+    if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT )
+    {
+        char *filename = NULL;
+        filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(dialog) );
+        {
+            size_t len = strlen(filename);
+            *outPath = NFDi_Malloc( len + 1 );
+            memcpy( *outPath, filename, len + 1 );
+            if ( !*outPath )
+            {
+                g_free( filename );
+                gtk_widget_destroy(dialog);
+                NFDi_SetError(NOPATH_MSG);
+                return NFD_ERROR;
+            }
+        }
+        g_free(filename);
+        result = NFD_OKAY;
+    }
+
+    gtk_widget_destroy(dialog);
+
+    WaitForCleanup();
+
+    return result;        
 }

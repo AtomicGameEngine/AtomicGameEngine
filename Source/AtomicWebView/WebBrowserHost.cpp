@@ -52,17 +52,30 @@
 
 static int XErrorHandlerImpl(Display *display, XErrorEvent *event)
 {
+    if ( display && event )
+    {
+        char msg[132];
+        XGetErrorText(display, event->error_code, msg, sizeof(msg));
+        fprintf(stderr, "X11 Error %d (%s): request %d.%d \n",
+                        event->error_code, 
+                        msg, 
+                        event->request_code,
+                        event->minor_code );
+    }
     return 0;
 }
 
 static int XIOErrorHandlerImpl(Display *display)
 {
+    if ( display )
+      fprintf(stderr, "XIO Error on display %p, quitting.\n", (void*)display );
     return 0;
 }
 
 static void TerminationSignalHandler(int signatl)
 {
-
+    fprintf(stderr,"Received signal %d, quitting.\n", signatl );
+    exit(0);
 }
 
 #endif

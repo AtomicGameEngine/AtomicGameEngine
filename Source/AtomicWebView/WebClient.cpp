@@ -369,6 +369,10 @@ public:
 #ifdef ATOMIC_PLATFORM_WINDOWS
                 windowInfo.SetAsWindowless(info.info.win.window, /*transparent*/ true);
 #endif
+#ifdef ATOMIC_PLATFORM_LINUX
+                if ( info.subsystem == SDL_SYSWM_X11 )
+                    windowInfo.SetAsWindowless(info.info.x11.window, true);
+#endif
             }
 
         }
@@ -683,6 +687,13 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
     host->SendKeyEvent(keyEvent);
 #endif
 
+#ifdef ATOMIC_PLATFORM_LINUX
+    if ( keyEvent.character == 0xD && keyEvent.type == KEYEVENT_KEYUP) 
+    {
+        keyEvent.type = KEYEVENT_CHAR;
+        host->SendKeyEvent(keyEvent);
+    }
+#endif
 
 }
 
