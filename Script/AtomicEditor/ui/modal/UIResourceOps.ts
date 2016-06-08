@@ -310,7 +310,7 @@ export class CreateScene extends ModalWindow {
         super();
 
         this.resourcePath = resourcePath;
-        this.init("New Scene", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.init("New Scene", "AtomicEditor/editor/ui/resourcecreateresource.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
     }
 
@@ -362,7 +362,7 @@ export class CreateMaterial extends ModalWindow {
         super();
 
         this.resourcePath = resourcePath;
-        this.init("New Material", "AtomicEditor/editor/ui/resourcecreatecomponent.tb.txt");
+        this.init("New Material", "AtomicEditor/editor/ui/resourcecreateresource.tb.txt");
         this.nameField = <Atomic.UIEditField>this.getWidget("component_name");
     }
 
