@@ -266,17 +266,17 @@ void BuildAndroid::RunAntDebug()
     String antCommand = tprefs->GetAntPath();
     if ( antCommand.Empty() ) // user didnt fill it out, use installed one
     {
- 		antCommand = "/usr/bin/ant"; // system default if installed
-	}
-	else
-	{
-		antCommand.Append("/ant"); 
-	}
- 	FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        antCommand = "/usr/bin/ant"; // system default if installed
+    }
+    else
+    {
+        antCommand.Append("/ant"); 
+    }
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if ( !fileSystem->FileExists ( antCommand) ) 
     {
-		FailBuild("BuildFailed ant program not installed");
-	}	
+        FailBuild("BuildFailed ant program not installed");
+    }
     Vector<String> args;
     args.Push("debug");
 #endif
