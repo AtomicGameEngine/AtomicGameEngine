@@ -186,6 +186,13 @@ void SceneView3D::CheckCameraSpeedBounds()
 
 void SceneView3D::MoveCamera(float timeStep)
 {
+    // Mouse sensitivity as degrees per pixel
+    const float MOUSE_SENSITIVITY = 0.2f;
+    // Tempo at which mouse speed increases using mousewheel
+    const float CAMERA_MOVE_TEMPO = 5.0f;
+    // Tempo used when zooming in and out
+    const float ZOOM_TEMPO = 0.6f;
+
     if (!enabled_ && !GetFocus())
         return;
 
@@ -198,13 +205,6 @@ void SceneView3D::MoveCamera(float timeStep)
     bool orbitting = GetOrbitting();
     bool zooming = GetZooming();
     bool changingCameraSpeed = GetChangingCameraSpeed();
-
-    // Mouse sensitivity as degrees per pixel
-    const float MOUSE_SENSITIVITY = 0.2f;
-    // Tempo at which mouse speed increases using mousewheel
-    const float CAMERA_MOVE_TEMPO = 5.0f;
-    // Tempo used when zooming in and out
-    const float ZOOM_TEMPO = 0.6f;
 
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     if ((mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT)) || orbitting)
