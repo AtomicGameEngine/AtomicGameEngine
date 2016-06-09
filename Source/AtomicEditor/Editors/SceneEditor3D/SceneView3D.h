@@ -75,6 +75,8 @@ private:
     bool GetOrbitting();
     bool GetZooming();
 
+    bool GetChangingCameraSpeed();
+
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
     void UpdateDragNode(int mouseX, int mouseY);
@@ -90,6 +92,7 @@ private:
     void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);
 
     void MoveCamera(float timeStep);
+    void CheckCameraSpeedBounds();
 
     WeakPtr<SceneEditor3D> sceneEditor_;
 
@@ -103,6 +106,7 @@ private:
 
     bool cameraMove_;
     float cameraMoveTime_;
+    float cameraMoveSpeed_;
     Vector3 cameraMoveStart_;
     Vector3 cameraMoveTarget_;
 
