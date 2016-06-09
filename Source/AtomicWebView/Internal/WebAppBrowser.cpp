@@ -35,8 +35,14 @@ WebAppBrowser::WebAppBrowser()
 
 void WebAppBrowser::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
+
+    // media stream support
     command_line->AppendSwitch("--enable-media-stream");
     command_line->AppendSwitch("--enable-usermedia-screen-capturing");
+
+    // transparency support
+    command_line->AppendSwitch("--off-screen-rendering-enabled");
+    command_line->AppendSwitch("--transparent-painting-enabled");
 
     CefApp::OnBeforeCommandLineProcessing(process_type, command_line);
 }
@@ -104,10 +110,19 @@ void WebAppBrowser::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_i
 {
     // We're not on main thread here, we're on IO thread
     CefRefPtr<CefDictionaryValue> globalProps;
+
     if (CreateGlobalProperties(globalProps))
     {
         extra_info->SetDictionary(0, globalProps);
     }
+    else
+    {
+        extra_info->SetNull(0);
+    }
+
+    extra_info->SetString(1, WebBrowserHost::GetJSMessageQueryFunctionName().CString());
+    extra_info->SetString(2, WebBrowserHost::GetJSMessageQueryCancelFunctionName().CString());
+
 
 }
 

@@ -37,6 +37,8 @@ class WebRenderDelegate : public WebAppRenderer::Delegate
 public:
 
     static CefRefPtr<CefDictionaryValue> globalProperties_;
+    static CefString jsMessageQueryFunctionName_;
+    static CefString jsMessageQueryCancelFunctionName_;
 
     WebRenderDelegate()
         : last_node_is_editable_(false)
@@ -48,8 +50,8 @@ public:
     {
         // Create the renderer-side router for query handling.
         CefMessageRouterConfig config;
-        config.js_query_function = "atomicQuery";
-        config.js_cancel_function = "atomicQueryCancel";
+        config.js_query_function = jsMessageQueryFunctionName_.length() ? jsMessageQueryFunctionName_ : "atomicQuery";
+        config.js_cancel_function = jsMessageQueryCancelFunctionName_.length() ? jsMessageQueryCancelFunctionName_ : "atomicQueryCancel";
 
         message_router_ = CefMessageRouterRendererSide::Create(config);
     }
@@ -59,10 +61,23 @@ public:
     {
         // extra info comes from void WebAppBrowser::OnRenderProcessThreadCreated(CefRefPtr<CefListValue> extra_info)
 
+        // index 0 is global properties
         if (extra_info->GetSize() > 0)
         {
-            // index 0 is global properties
-            globalProperties_ = extra_info->GetDictionary(0)->Copy(false);
+            if (extra_info->GetType(0) == CefValueType::VTYPE_DICTIONARY)
+                globalProperties_ = extra_info->GetDictionary(0)->Copy(false);            
+        }
+
+        // index 1 is name for jsMessageQuery function
+        if (extra_info->GetSize() > 1)
+        {            
+            jsMessageQueryFunctionName_ = extra_info->GetString(1);
+        }
+
+        // index 2 is name for jsMessageQueryCancel function
+        if (extra_info->GetSize() > 2)
+        {
+            jsMessageQueryCancelFunctionName_ = extra_info->GetString(2);
         }
 
     }
@@ -237,6 +252,8 @@ private:
 };
 
 CefRefPtr<CefDictionaryValue> WebRenderDelegate::globalProperties_;
+CefString WebRenderDelegate::jsMessageQueryFunctionName_;
+CefString WebRenderDelegate::jsMessageQueryCancelFunctionName_;
 
 
 WebAppRenderer::WebAppRenderer() {

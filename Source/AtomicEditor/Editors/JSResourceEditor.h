@@ -43,9 +43,12 @@ class JSResourceEditor: public ResourceEditor
 
 public:
 
-    JSResourceEditor(Context* context, const String& fullpath, UITabContainer* container);
+    JSResourceEditor(Context* context, const String& fullpath, UITabContainer* container, const String& editorUrl);
 
     virtual ~JSResourceEditor();
+
+    /// Get the editor's UIWebView
+    UIWebView* GetWebView() const { return webView_; }
 
     bool OnEvent(const TBWidgetEvent &ev);
 
@@ -60,7 +63,7 @@ public:
     void SetFocus();
 
     bool Save();
-    
+
 private:
 
     void HandleWebViewLoadEnd(StringHash eventType, VariantMap& eventData);
@@ -71,7 +74,7 @@ private:
     void HandleRenameResourceNotification(StringHash eventType, VariantMap& eventData);
     void HandleDeleteResourceNotification(StringHash eventType, VariantMap& eventData);
     void HandleProjectUnloadedNotification(StringHash eventType, VariantMap& eventData);
-    
+
     SharedPtr<UIWebView> webView_;
     WeakPtr<WebClient> webClient_;
     WeakPtr<WebMessageHandler> messageHandler_;

@@ -47,14 +47,13 @@ namespace('build', function() {
 
     console.log("Generating Examples & JSDocs");
 
-    fs.copySync(atomicRoot + "Build/Docs/Readme.md", jsDocFolder + "/Readme.md");
-    fs.copySync(atomicRoot + "Build/Docs/jsdoc.conf", jsDocFolder + "/jsdoc.conf");
+    fs.copySync(atomicRoot + "Build/Docs/Readme.md", jsDocFolder + "Readme.md");
+    fs.copySync(atomicRoot + "Build/Docs/atomic-theme", jsDocFolder + "atomic-theme");
 
     cmds = [
       "git clone https://github.com/AtomicGameEngine/AtomicExamples " + buildDir + "AtomicExamples && rm -rf " + buildDir + "AtomicExamples/.git",
-      "cd " + jsDocFolder + " && npm install git+https://github.com/jsdoc3/jsdoc",
-      "cd " + jsDocFolder + " && git clone https://github.com/AtomicGameEngine/jaguarjs-jsdoc && cd jaguarjs-jsdoc && git checkout atomic_master",
-      "cd " + jsDocFolder + " && ./node_modules/.bin/jsdoc ./Atomic.js -t ./jaguarjs-jsdoc/ -c ./jsdoc.conf Readme.md",
+      "cd " + jsDocFolder + " && npm install typedoc",
+      "cd " + jsDocFolder + " && ./node_modules/.bin/typedoc --out out ../../../Script/TypeScript/dist/Atomic.d.ts --module commonjs --includeDeclarations --mode file --theme atomic-theme --name 'Atomic Game Engine' --readme ./Readme.md",
     ];
 
     jake.exec(cmds, function() {
@@ -137,10 +136,12 @@ namespace('build', function() {
     process.chdir(atomicRoot);
 
     var tsc = "./Build/node_modules/typescript/lib/tsc";
+    var dtsGenerator = "./Build/node_modules/dts-generator/bin/dts-generator";
 
     cmds = [
       atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script",
-      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor"
+      atomicRoot + "Build/Mac/node/node " + tsc + " -p ./Script/AtomicWebViewEditor",
+      atomicRoot + "Build/Mac/node/node " + dtsGenerator + " --name Atomic --project ./Script/TypeScript --out ./Script/TypeScript/dist/Atomic.d.ts"
     ];
 
       // will be copied when editor resources are copied
@@ -162,6 +163,9 @@ namespace('build', function() {
          // copy lib.core.d.ts into the tool data directory
          fs.mkdirsSync("./Artifacts/Build/Resources/EditorData/AtomicEditor/EditorScripts/AtomicEditor/TypeScriptSupport");
          fs.copySync("./Build/node_modules/typescript/lib/lib.core.d.ts","./Data/AtomicEditor/TypeScriptSupport/lib.core.d.ts")
+
+         // copy the combined Atomic.d.ts to the tool data directory
+         fs.copySync("./Script/TypeScript/dist/Atomic.d.ts","./Data/AtomicEditor/TypeScriptSupport/Atomic.d.ts")
          complete();
 
       }, {
