@@ -66,7 +66,7 @@ namespace Atomic
     {
         StringVector value;
 
-        for (auto it = jarray.Begin(); it != jarray.End(); it++)
+        for (JSONArray::ConstIterator it = jarray.Begin(); it != jarray.End(); it++)
         {
             if (it->IsString())
             {
