@@ -353,7 +353,7 @@ public:
         {
             const Token &tcomment = unit_->commentAt(i);
             unsigned line;
-            unit_->getPosition(tcomment.utf16charOffset, &line);
+            unit_->getPosition(tcomment.utf16charsEnd(), &line);
 
             if (line ==  function->line() - 1)
             {
@@ -374,6 +374,34 @@ public:
                     jfunction->SetDocString(docString);
                 }
 
+            }
+
+            if (comment[0] == '/' && comment[1] == '*' && comment[2] == '*')
+            {
+                int index = 3;
+                bool foundStar = false;
+                String docString = jfunction->GetDocString();
+                while(comment[index])
+                {
+                    // did we find a star in the last loop?
+                    if (foundStar)
+                    {
+                        // We have a an end of block indicator, let's break
+                        if (comment[index] == '/' && foundStar)
+                            break;
+
+                        // This is just a star in the comment, not an end of comment indicator.  Let's keep it
+                        docString += '*';
+                    }
+                    
+                    foundStar = comment[index] == '*';
+
+                    if (!foundStar)
+                        docString += comment[index];
+
+                    index++;
+                }
+                jfunction->SetDocString(docString);
             }
 
         }

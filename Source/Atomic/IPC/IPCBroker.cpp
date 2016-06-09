@@ -62,7 +62,7 @@ void IPCBroker::ThreadFunction()
         }
 
         // sleep thread a bit so we don't gobble CPU
-        Time::Sleep(100);
+        Time::Sleep(10);
     }
 
     shouldRun_ = false;

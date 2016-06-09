@@ -76,23 +76,13 @@ export default class HostInteropType {
     static EDITOR_SAVE_FILE = "editorSaveFile";
     static EDITOR_LOAD_COMPLETE = "editorLoadComplete";
     static EDITOR_CHANGE = "editorChange";
-
-    constructor() {
-        // Set up the window object so the host can call into it
-        window.HOST_loadCode = this.loadCode.bind(this);
-        window.HOST_saveCode = this.saveCode.bind(this);
-
-        window.HOST_projectUnloaded = this.projectUnloaded.bind(this);
-        window.HOST_resourceRenamed = this.resourceRenamed.bind(this);
-        window.HOST_resourceDeleted = this.resourceDeleted.bind(this);
-    }
+    static EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
     /**
      * Called from the host to notify the client what file to load
      * @param  {string} codeUrl
      */
     loadCode(codeUrl: string) {
-        console.log("Load Code called for :" + codeUrl);
         const fileExt = codeUrl.indexOf(".") != -1 ? codeUrl.split(".").pop() : "";
         const filename = codeUrl.replace("atomic://", "");
 
@@ -106,6 +96,9 @@ export default class HostInteropType {
         // get the code
         this.getResource(codeUrl).then((src: string) => {
             editorCommands.loadCodeIntoEditor(src, filename, fileExt);
+            atomicQueryPromise({
+                message: HostInteropType.EDITOR_GET_USER_PREFS
+            });
         }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
             console.log("Error loading code: " + e.error_message);
         });
@@ -190,13 +183,6 @@ export default class HostInteropType {
     }
 
     /**
-     * Notify that the project has been unloaded
-     */
-    projectUnloaded() {
-        editorCommands.projectUnloaded();
-    }
-
-    /**
      * Notify that a resource has been renamed
      * @param  {string} path
      * @param  {string} newPath
@@ -213,6 +199,19 @@ export default class HostInteropType {
     resourceDeleted(path: string) {
         editorCommands.resourceDeleted(path);
     }
-}
 
-HostInteropType.getInstance().editorLoaded();
+    /**
+     * Host is notifying client that there are preferences to load and passing us the path
+     * of the prefs.
+     * @param  {string} prefUrl
+     */
+    loadPreferences(prefUrl: string) {
+        // load prefs
+        this.getResource(prefUrl).then((prefsJson: string) => {
+            let prefs = JSON.parse(prefsJson);
+            editorCommands.loadPreferences(prefs);
+        }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
+            console.log("Error loading preferences: " + e.error_message);
+        });
+    }
+}

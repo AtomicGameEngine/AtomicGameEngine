@@ -311,7 +311,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 Atomic.fileSystem.systemOpen("https://github.com/AtomicGameEngine/AtomicGameEngine/");
                 return true;
             } else if (refid == "help api") {
-                var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/Atomic.html";
+                var url = "file://" + ToolCore.toolEnvironment.toolDataDir + "Docs/JSDocs/index.html";
                 Atomic.fileSystem.systemOpen(url);
                 return true;
             }

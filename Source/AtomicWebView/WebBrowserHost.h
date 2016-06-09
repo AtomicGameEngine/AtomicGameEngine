@@ -43,6 +43,8 @@ public:
     /// Destruct.
     virtual ~WebBrowserHost();
 
+    void ClearCookies(const String& url = String::EMPTY, const String& cookieName = String::EMPTY);
+
     /// Set global property object values, available as read only on page
     static void SetGlobalBoolProperty(const String& globalVar, const String& property, bool value);
     static void SetGlobalStringProperty(const String& globalVar, const String& property, const String& value);
@@ -50,8 +52,13 @@ public:
 
     static const GlobalPropertyMap& GetGlobalProperties() { return globalProperties_; }
 
-
     // Configuration settings that must be set before creating WebBrowserHost subsystem
+
+    /// Set the absolute root path for the cache, this is combined with the cache name to generate the full cache path
+    static void SetRootCacheFolder(const String& rootCacheFolder) { rootCacheFolder_ = rootCacheFolder; }
+
+    /// Set the cache name which is combined with the root cache folder to generate an absolute path to the browser cache
+    static void SetCacheName(const String& cacheName) { cacheName_ = cacheName; }
 
     /// Set value that will be returned as the User-Agent HTTP header.
     static void SetUserAgent(const String& userAgent) { userAgent_ = userAgent; }
@@ -62,11 +69,35 @@ public:
     /// Set to a value between 1024 and 65535 to enable remote debugging on the specified port
     static void SetDebugPort(int debugPort) { debugPort_ = debugPort; }
 
+    /// Set whether web security is enabled
+    static void SetWebSecurity(bool enabled) { webSecurity_ = enabled; }
+
+    /// Set the name of the function used for JavaScript message queries
+    static void SetJSMessageQueryFunctionName(const String& name) { jsMessageQueryFunctionName_ = name; }
+
+    /// Set the name of the function used to cancel JavaScript message queries
+    static void SetJSMessageQueryCancelFunctionName(const String& name) { jsMessageQueryCancelFunctionName_ = name; }
+
+    /// Get the absolute root path for the cache, this is combined with the cache name to generate the full cache path
+    static const String& GetRootCacheFolder() { return rootCacheFolder_; }
+
+    /// Get the cache name which is combined with the root cache folder to generate an absolute path to the browser cache
+    static const String& GetCacheName() { return cacheName_; }
+
     /// Get User-Agent of the HTTP header. If empty the default User-Agent string will be used
     static const String& GetUserAgent() { return userAgent_; }
 
     /// Get value that will be inserted as the product portion of the default User-Agent string.  If empty the Chromium product version will be used      
     static const String& GetProductVersion() { return productVersion_; }
+
+    /// Get whether web security is enabled
+    static bool GetWebSecurity() { return webSecurity_; }
+
+    /// Get the name of the function used for JavaScript message queries
+    static const String& GetJSMessageQueryFunctionName() { return jsMessageQueryFunctionName_; }
+
+    /// Get the name of the function used to cancel JavaScript message queries
+    static const String& GetJSMessageQueryCancelFunctionName() { return jsMessageQueryCancelFunctionName_; }
 
 
 private:
@@ -84,7 +115,16 @@ private:
     // configuration settings that must be set before WebBrowserHost subsystem is created
     static String userAgent_;
     static String productVersion_;
+
+    static String rootCacheFolder_;
+    static String cacheName_;
+
+    static String jsMessageQueryFunctionName_;
+    static String jsMessageQueryCancelFunctionName_;
+
     static int debugPort_;
+    static bool webSecurity_;
+
 
 };
 

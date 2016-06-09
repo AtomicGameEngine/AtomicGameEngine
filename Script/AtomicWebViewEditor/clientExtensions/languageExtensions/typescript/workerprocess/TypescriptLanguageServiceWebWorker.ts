@@ -177,9 +177,6 @@ export default class TypescriptLanguageServiceWebWorker {
                 case ClientExtensionEventNames.ResourceDeletedEvent:
                     this.handleDelete(port, e.data);
                     break;
-                case ClientExtensionEventNames.ProjectUnloadedEvent:
-                    this.handleProjectUnloaded(port);
-                    break;
                 case WorkerProcessTypes.GetAnnotations:
                     this.handleGetAnnotations(port, e.data);
                     break;
@@ -362,13 +359,5 @@ export default class TypescriptLanguageServiceWebWorker {
      */
     handleRename(port: MessagePort, eventData: WorkerProcessTypes.RenameMessageData) {
         this.languageService.renameProjectFile(eventData.path, eventData.newPath);
-    }
-
-    /**
-     * Called when the project has been closed
-     * @param  {MessagePort} port
-     */
-    handleProjectUnloaded(port: MessagePort) {
-        this.reset();
     }
 }

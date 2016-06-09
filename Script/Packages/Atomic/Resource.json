@@ -4,7 +4,8 @@
 	"classes" : ["Resource", "ResourceCache", "XMLFile", "PListFile", "JSONFile", "Image"],
 	"overloads": {
 		"Image": {
-			"GetPixel": ["int", "int"]
+			"GetPixel": ["int", "int"],
+			"SetSize": ["int", "int", "int", "unsigned"]
 		}
 	}
 }

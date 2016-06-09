@@ -60,7 +60,7 @@ private:
 
 class PipeTransport : public PipeUnix {
 public:
-    static const size_t kBufferSz = 4096;
+    static const size_t kBufferSz = 1024 * 1024;
 
     bool Send(const void* buf, size_t sz) {
         return Write(buf, sz);
