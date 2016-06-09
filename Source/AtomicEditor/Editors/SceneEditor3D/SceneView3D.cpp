@@ -73,7 +73,8 @@ SceneView3D ::SceneView3D(Context* context, SceneEditor3D *sceneEditor) :
     mouseLeftDown_(false),
     mouseMoved_(false),
     enabled_(true),
-    cameraMove_(false)
+    cameraMove_(false),
+    gridEnabled_(false)
 {
 
     sceneEditor_ = sceneEditor;
@@ -466,7 +467,13 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
             sceneEditor_->GetSelection()->Clear();
         }
     }
+    if (ev.type == EVENT_TYPE_KEY_DOWN)
+    {
+        Input* input = GetSubsystem<Input>();
 
+        if (input->GetKeyPress(KEY_G))
+            gridEnabled_ = !gridEnabled_;
+    }
     return sceneEditor_->OnEvent(ev);
 }
 
@@ -488,6 +495,10 @@ void SceneView3D::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     QueueUpdate();
+
+    if (gridEnabled_)
+        debugRenderer_->CreateGrid(Color::GRAY, true, cameraNode_->GetPosition());
+
 
     if (preloadResourceScene_.NotNull())
     {

@@ -100,6 +100,7 @@ private:
     bool mouseMoved_;
 
     bool enabled_;
+    bool gridEnabled_;
 
     bool cameraMove_;
     float cameraMoveTime_;

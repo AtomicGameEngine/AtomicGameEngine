@@ -134,6 +134,14 @@ public:
     void AddTriangleMesh
         (const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart,
             unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+
+    /// Create positive and negative X axis lines
+    void CreateXAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z);
+    /// Create positive and negative Z axis lines
+    void CreateZAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z);
+    /// Creates a grid on all axis
+    void CreateGrid(const Color& grid, bool depthTest, Vector3 position);
+
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
 
@@ -171,6 +179,24 @@ private:
     Frustum frustum_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+
+    /// Positioning of grid lines point 1
+    Vector3 position1_;
+    /// Positioning of grid lines point 2
+    Vector3 position2_;
+    /// Positioning of grid lines point 3
+    Vector3 position3_;
+    
+    /// Number of total grid lines
+    int numGridLines_;
+    /// Length of a grid line
+    int lineLength_;
+    /// Offset centres the grid
+    int offset_;
+    /// Scales the grid according to y-position of camera
+    int scale_;
+    /// The amount the scale gets incremented
+    int scaleIncrement_;
 };
 
 }
