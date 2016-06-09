@@ -88,17 +88,6 @@ class ProjectFrame extends ScriptWidget {
 
         });
 
-        // Activates search while user is typing in search widget
-        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => {
-
-            if (!ToolCore.toolSystem.project) return;
-
-            if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
-                this.search = true;
-                this.refreshContent(this.currentFolder);
-            }
-        });
-
     }
 
     handleAssetRenamed(ev: ToolCore.AssetRenamedEvent) {
@@ -173,6 +162,20 @@ class ProjectFrame extends ScriptWidget {
     }
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
+
+        if (!ToolCore.toolSystem.project) return;
+
+        if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+
+            // Activates search while user is typing in search widget
+            if (data.target == this.searchEdit) {
+
+                if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+                    this.search = true;
+                    this.refreshContent(this.currentFolder);
+                }
+            }
+        }
 
         if (data.type == Atomic.UI_EVENT_TYPE_RIGHT_POINTER_UP) {
 

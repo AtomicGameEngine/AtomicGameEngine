@@ -151,21 +151,6 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         });
 
-        // Activates search while user is typing in search widget
-        this.searchEdit.subscribeToEvent(this.searchEdit, "WidgetEvent", (data) => {
-            if (!ToolCore.toolSystem.project) return;
-
-            if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
-                this.search = true;
-                this.populate();
-
-                if (this.searchEdit.text == "" && this.selectedNode) {
-                        this.hierList.selectItemByID(this.selectedNode.id.toString(), true);    //maintains selected item after search is cancelled
-                }
-
-            }
-        });
-
     }
 
     handleSceneEditNodeAdded(ev: Editor.SceneEditNodeAddedEvent) {
@@ -391,7 +376,20 @@ class HierarchyFrame extends Atomic.UIWidget {
 
     handleWidgetEvent(data: Atomic.UIWidgetEvent): boolean {
 
+        if (!this.scene) return;
+
         if (data.type == Atomic.UI_EVENT_TYPE_KEY_UP) {
+
+            // activates search while user is typing in search widget
+            if (data.target == this.searchEdit) {
+
+                this.search = true;
+                this.populate();
+
+                if (this.searchEdit.text == "" && this.selectedNode) {
+                        this.hierList.selectItemByID(this.selectedNode.id.toString(), true);    //maintains selected item after search is cancelled
+                }
+            }
 
             // node deletion
             if (data.key == Atomic.KEY_DELETE || data.key == Atomic.KEY_BACKSPACE) {
