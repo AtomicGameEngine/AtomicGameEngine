@@ -84,10 +84,6 @@ bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const Str
             if (fileSystem->FileExists(compressedPath))
                 return false;
         }
-        else if (ext == ".psd")
-        {
-            return false;
-        }
     }
     // #623 END TODO
     

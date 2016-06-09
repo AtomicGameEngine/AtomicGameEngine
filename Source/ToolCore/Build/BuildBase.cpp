@@ -353,7 +353,7 @@ void BuildBase::BuildProjectResourceEntries()
             BuildFilteredProjectResourceEntries();
             return;
         }
-        buildLogOutput += "No build-tag parameter used.\n";
+        buildLogOutput += "No build-tag parameter used.";
     }
     buildLogOutput += "\nBaseBuild::BuildProjectResourceEntries - No custom asset include configuration being used - ";
     buildLogOutput += "AssetBuildConfig.json not loaded, OR no build-tag parameter used.";
@@ -394,10 +394,9 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         if (itr->first_ == assetBuildTag_)
         {
             assetBuildConfigFiles = itr->second_.GetStringVector();
-
-            // remove case sensitivity 
             for (unsigned i = 0; i < assetBuildConfigFiles.Size(); ++i)
             {
+                // remove case sensitivity 
                 assetBuildConfigFiles[i] = assetBuildConfigFiles[i].ToLower();
             }
             break;
@@ -430,7 +429,6 @@ void BuildBase::BuildFilteredProjectResourceEntries()
 
             Vector<String> filesInFolder;
             fileSystem->ScanDir(filesInFolder, project_->GetResourcePath() + folder, "*.*", SCAN_FILES, true);
-
             for (unsigned j = 0; j < filesInFolder.Size(); ++j)
             {
                 String path = filesInFolder[j];
@@ -512,7 +510,6 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     AssetDatabase* db = GetSubsystem<AssetDatabase>();
     String cachePath = db->GetCachePath();
     fileSystem->ScanDir(filesInCacheFolder, cachePath, "*.*", SCAN_FILES, false);
-
     for (unsigned i = 0; i < filesWithGUIDtoInclude.Size(); ++i)
     {
         String &guid = filesWithGUIDtoInclude[i];
@@ -529,15 +526,20 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         }
     }
 
-    // Add the DDS files when building in windows
+    // include a texture file's cached .dds file when building in windows
 #ifdef ATOMIC_PLATFORM_DESKTOP
-    Vector<String> filesInCacheDDSfolder;
-    fileSystem->ScanDir(filesInCacheDDSfolder, cachePath + "DDS/", "*.dds", SCAN_FILES, true);
-
-    for (unsigned i = 0; i < filesInCacheDDSfolder.Size(); ++i)
+    for (StringVector::ConstIterator it = resourceFilesToInclude.Begin(); it != resourceFilesToInclude.End(); ++it)
     {
-        String& file = filesInCacheDDSfolder[i];
-        cacheFilesToInclude.Push("DDS/" + filesInCacheDDSfolder[i]);
+        if (!CheckIncludeResourceFile(project_->GetResourcePath(), *it))
+        {
+            FileSystem* fileSystem = GetSubsystem<FileSystem>();
+            String associatedDDSpath = "DDS/" + *it + ".dds";
+            String compressedPath = cachePath + associatedDDSpath;
+            if (fileSystem->FileExists(compressedPath))
+            {
+                cacheFilesToInclude.Push(associatedDDSpath);
+            }
+        }
     }
 #endif
 
