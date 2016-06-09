@@ -65,8 +65,7 @@ public:
     virtual void Redo() {}
 
     virtual bool Save() { return true; }
-    
-    virtual void ProjectUnloaded();
+
     virtual void Delete();
 
     UIWidget* GetRootContentWidget() { return rootContentWidget_; }

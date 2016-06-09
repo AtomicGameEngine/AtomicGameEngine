@@ -74,7 +74,7 @@ EVENT(E_RESOURCEBACKGROUNDLOADED, ResourceBackgroundLoaded)
     PARAM(P_SUCCESS, Success);                      // bool
     PARAM(P_RESOURCE, Resource);                    // Resource pointer
 }
-    
+
 /// Resource was renamed
 EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
 {
@@ -83,18 +83,6 @@ EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
     PARAM(P_NEWNAME, NewName);                      // String
     PARAM(P_RESOURCE, Asset);                       // Resource pointer
 }
-
-/// Resource was deleted
-EVENT(E_DELETERESOURCENOTIFICATION, DeleteResourceNotification)
-{
-    PARAM(P_RESOURCEPATH, Path);                    // String
-}
-
-/// Project was unloaded
-EVENT(E_PROJECTUNLOADEDNOTIFICATION, ProjecUnloadedNotification)
-{
-}
-    
 
 /// Language changed.
 EVENT(E_CHANGELANGUAGE, ChangeLanguage)

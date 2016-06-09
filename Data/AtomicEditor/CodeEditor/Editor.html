@@ -39,7 +39,39 @@
       }
     });
 
-    System.import('./source/editorCore/interop');
+    // Functions exposed to the host editor.  These
+    // are hooked in here so that they are available immediately from the host
+    // and when called will bring in the interop as a promise and call it once
+    // it has been loaded
+    function HOST_loadCode(url) {
+        System.import('./source/editorCore/interop').then((module) => {
+            module.default.getInstance().loadCode(url);
+        });
+    }
+
+    function HOST_saveCode() {
+        System.import('./source/editorCore/interop').then((module) => {
+            module.default.getInstance().saveCode();
+        });
+    }
+
+    function HOST_resourceRenamed(path, newPath) {
+        System.import('./source/editorCore/interop').then((module) => {
+            module.default.getInstance().resourceRenamed(path, newPath);
+        });
+    }
+
+    function HOST_resourceDeleted(path) {
+        System.import('./source/editorCore/interop').then((module) => {
+            module.default.getInstance().resourceDeleted(path);
+        });
+    }
+
+    function HOST_loadPreferences(prefUrl) {
+        System.import('./source/editorCore/interop').then((module) => {
+            module.default.getInstance().loadPreferences(prefUrl);
+        });
+    }
   </script>
 
 </body>

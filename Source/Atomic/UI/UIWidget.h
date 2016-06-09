@@ -24,6 +24,7 @@
 
 #include <ThirdParty/TurboBadger/tb_widgets.h>
 #include <ThirdParty/TurboBadger/tb_widgets_common.h>
+#include <ThirdParty/TurboBadger/tb_font_renderer.h>
 
 #include "../Core/Object.h"
 
@@ -164,7 +165,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     public:
 
-        UIWidget(Context* context, bool createWidget = true);
+    UIWidget(Context* context, bool createWidget = true);
     virtual ~UIWidget();
 
     bool Load(const String& filename);
@@ -272,6 +273,46 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     void Enable();
     void Disable();
+
+    // Font Description
+    void SetFontId(const String& fontId);
+    String GetFontId();
+    void SetFontSize(int size);
+    int GetFontSize();
+
+    // Rect
+    void SetX(int x) { IntRect r(GetRect()); r.right_ = x + r.Width(); r.left_ = x; SetRect(r); }
+    int GetX() { return GetRect().left_; }
+    void SetY(int y) { IntRect r(GetRect()); r.bottom_ = y + r.Height(); r.top_ = y; SetRect(r); }
+    int GetY() { return GetRect().top_; }
+    void SetWidth(int width) { IntRect r(GetRect()); r.right_ = r.left_ + width; SetRect(r); }
+    int GetWidth() { return GetRect().Width(); }
+    void SetHeight(int height) { IntRect r(GetRect()); r.bottom_ = r.top_ + height; SetRect(r); }
+    int GetHeight() { return GetRect().Height(); }
+
+    // Layout Params
+    void SetLayoutWidth(int width);
+    int GetLayoutWidth();
+    void SetLayoutHeight(int height);
+    int GetLayoutHeight();
+    void SetLayoutPrefWidth(int width);
+    int GetLayoutPrefWidth();
+    void SetLayoutPrefHeight(int height);
+    int GetLayoutPrefHeight();
+    void SetLayoutMinWidth(int width);
+    int GetLayoutMinWidth();
+    void SetLayoutMinHeight(int height);
+    int GetLayoutMinHeight();
+    void SetLayoutMaxWidth(int width);
+    int GetLayoutMaxWidth();
+    void SetLayoutMaxHeight(int height);
+    int GetLayoutMaxHeight();
+
+    // Opacity and AutoOpacity (AutoOpacity sets visibility as well based on opacity being 0.0 or non-0.0).
+    void SetOpacity(float opacity);
+    float GetOpacity();
+    void SetAutoOpacity(float autoOpacity);
+    float GetAutoOpacity();
 
 protected:
 

@@ -43,6 +43,11 @@ UIFontDescription::~UIFontDescription()
 
 }
 
+int UIFontDescription::GetSize()
+{
+    return desc_.GetSize();
+}
+
 void UIFontDescription::SetId(const String& id)
 {
     desc_.SetID(TBIDC(id.CString()));
