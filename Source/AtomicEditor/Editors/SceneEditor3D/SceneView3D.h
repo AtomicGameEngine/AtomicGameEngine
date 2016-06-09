@@ -91,15 +91,28 @@ private:
 
     void MoveCamera(float timeStep);
 
+    void SnapCameraToView(int snapView);
+    void SelectView();
+
+    // stores the last known position of the perspective camera
+    void SavePerspectiveCameraPosition();
+
     WeakPtr<SceneEditor3D> sceneEditor_;
 
     float yaw_;
     float pitch_;
 
+    Vector3 perspectCamPosition_;
+    float perspectiveYaw_;
+    float perspectivePitch_;
+
     bool mouseLeftDown_;
     bool mouseMoved_;
 
     bool enabled_;
+
+    // Checks whether your switching from an orthographic view
+    bool fromOrthographic_;
 
     bool cameraMove_;
     float cameraMoveTime_;
