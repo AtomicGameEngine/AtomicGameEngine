@@ -247,11 +247,16 @@ void SceneView3D::MoveCamera(float timeStep)
 
     if (changingCameraSpeed)
     {
-        if (input->GetMouseMoveWheel() > 0)
-            cameraMoveSpeed_ += input->GetMouseMoveWheel() * CAMERA_MOVE_TEMPO;
-        else
-            if (input->GetMouseMoveWheel() < 0)
-                cameraMoveSpeed_ += input->GetMouseMoveWheel() * CAMERA_MOVE_TEMPO;
+
+        int mouseWheel = input->GetMouseMoveWheel();
+
+        // Apple decided to change the direction of mousewheel input to match touch devices
+#ifdef ATOMIC_PLATFORM_OSX
+        mouseWheel = -mouseWheel;
+#endif
+
+        if (mouseWheel)
+            cameraMoveSpeed_ += mouseWheel * CAMERA_MOVE_TEMPO;
 
         CheckCameraSpeedBounds();
     }
