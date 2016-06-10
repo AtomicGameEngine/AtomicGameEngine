@@ -76,6 +76,7 @@ private:
     bool GetZooming();
 
     bool GetChangingCameraSpeed();
+    void ToggleGrid();
 
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
@@ -103,6 +104,7 @@ private:
     bool mouseMoved_;
 
     bool enabled_;
+    bool gridEnabled_;
 
     bool cameraMove_;
     float cameraMoveTime_;
