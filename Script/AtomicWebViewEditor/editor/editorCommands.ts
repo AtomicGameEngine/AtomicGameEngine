@@ -32,11 +32,16 @@ import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventN
  */
 export function configure(fileExt: string, filename: string) {
 
-    // set a default theme
-    editor.setTheme("ace/theme/monokai");
-
     // set a default mode
     editor.session.setMode("ace/mode/javascript");
+
+    // Grab the configured editor defaults and apply them
+    editor.setTheme(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "theme", "ace/theme/monokai"));
+    editor.setKeyboardHandler(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "keyboardHandler", "ace/keyboard/textinput"));
+    editor.setFontSize(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "fontSize", 12).toString() + "px");
+    editor.setShowInvisibles(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "showInvisibles", false));
+    editor.session.setUseSoftTabs(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "useSoftTabs", true));
+    editor.session.setTabSize(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "tabSize", 4));
 
     // give the language extensions the opportunity to configure the editor based upon the file type
     serviceLocator.sendEvent(ClientExtensionEventNames.ConfigureEditorEvent, {
@@ -50,7 +55,7 @@ export function configure(fileExt: string, filename: string) {
  * Returns the text in the editor instance
  * @return {string}
  */
-export function getSourceText() : string {
+export function getSourceText(): string {
     return editor.session.getValue();
 }
 
@@ -83,7 +88,7 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
  * @param  {string} newPath
  */
 export function resourceRenamed(path: string, newPath: string) {
-    let data:Editor.EditorEvents.RenameResourceEvent = {
+    let data: Editor.EditorEvents.RenameResourceEvent = {
         path: path,
         newPath: newPath
     };
@@ -95,7 +100,7 @@ export function resourceRenamed(path: string, newPath: string) {
  * @param  {string} path
  */
 export function resourceDeleted(path: string) {
-    let data:Editor.EditorEvents.DeleteResourceEvent = {
+    let data: Editor.EditorEvents.DeleteResourceEvent = {
         path: path
     };
     serviceLocator.sendEvent(ClientExtensionEventNames.ResourceDeletedEvent, data);
@@ -108,7 +113,7 @@ export function resourceDeleted(path: string) {
  * @param {string} contents
  */
 export function codeSaved(path: string, fileExt: string, contents: string) {
-    let data:Editor.EditorEvents.CodeSavedEvent = {
+    let data: Editor.EditorEvents.CodeSavedEvent = {
         filename: path,
         fileExt: fileExt,
         editor: editor,
@@ -118,10 +123,18 @@ export function codeSaved(path: string, fileExt: string, contents: string) {
 }
 
 /**
+ * Called when the editor has finished it's initial load
+ */
+export function editorLoaded() {
+    // let's grab the prefs and seed the service locator
+    serviceLocator.clientServices.setPreferences(JSON.parse(window.HOST_Preferences.ProjectPreferences), JSON.parse(window.HOST_Preferences.ApplicationPreferences));
+}
+
+/**
  * Called when new preferences are available (or initially with current prefs)
  * @param  {any} prefs
  */
-export function loadPreferences(prefs: any) {
-    serviceLocator.clientServices.setPreferences(prefs);
+export function preferencesChanged() {
+    serviceLocator.clientServices.setPreferences(JSON.parse(window.HOST_Preferences.ProjectPreferences), JSON.parse(window.HOST_Preferences.ApplicationPreferences));
     serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, null);
 }

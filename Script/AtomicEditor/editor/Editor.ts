@@ -161,6 +161,7 @@ class Editor extends Atomic.ScriptObject {
      */
     setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
         Preferences.getInstance().setUserPreference(extensionName, preferenceName, value);
+        WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
         this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
     }
 
@@ -173,6 +174,7 @@ class Editor extends Atomic.ScriptObject {
      */
     setUserPreferenceGroup(settingsGroup: string, groupPreferenceValues: Object) {
         Preferences.getInstance().setUserPreferenceGroup(settingsGroup, groupPreferenceValues);
+        WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
         this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
     }
 
@@ -189,6 +191,8 @@ class Editor extends Atomic.ScriptObject {
         }
         const loaded = system.loadProject(event.path);
         if (loaded) {
+            WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
+            WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ApplicationPreferences", JSON.stringify(Preferences.getInstance().cachedApplicationPreferences, null, 2 ));
             this.sendEvent(EditorEvents.LoadProjectNotification, event);
         }
         return loaded;

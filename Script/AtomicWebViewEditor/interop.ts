@@ -144,6 +144,7 @@ export default class HostInteropType {
         if (DEBUG_ALERT) {
             alert(`Attach chrome dev tools to this instance by navigating to http://localhost:${DEBUG_PORT}`);
         }
+        editorCommands.editorLoaded();
         window.atomicQueryPromise(HostInteropType.EDITOR_LOAD_COMPLETE);
     }
 
@@ -206,14 +207,8 @@ export default class HostInteropType {
      * of the prefs.
      * @param  {string} prefUrl
      */
-    loadPreferences(prefUrl: string) {
-        // load prefs
-        this.getResource(prefUrl).then((prefsJson: string) => {
-            let prefs = JSON.parse(prefsJson);
-            editorCommands.loadPreferences(prefs);
-        }).catch((e: Editor.ClientExtensions.AtomicErrorMessage) => {
-            console.log("Error loading preferences: " + e.error_message);
-        });
+    preferencesChanged() {
+        editorCommands.preferencesChanged();
     }
 
     /**

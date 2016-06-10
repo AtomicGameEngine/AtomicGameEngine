@@ -439,6 +439,17 @@ declare module Editor.ClientExtensions {
         getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
         getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
         getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+
+        /**
+         * Return a preference value or the provided default from the application settings file
+         * @param  {string} extensionName name of the extension the preference lives under
+         * @param  {string} preferenceName name of the preference to retrieve
+         * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+         * @return {number|boolean|string}
+         */
+        getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+        getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+        getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
     }
 
     export interface AtomicErrorMessage {

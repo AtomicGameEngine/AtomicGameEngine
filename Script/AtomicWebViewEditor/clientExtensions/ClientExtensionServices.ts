@@ -76,15 +76,18 @@ class ServicesProvider<T extends Editor.Extensions.ServiceEventListener> impleme
 
 export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExtensions.WebViewServiceEventListener> {
 
-    private userPreferences = {};
+    private projectPreferences = {};
+    private applicationPreferences = {};
 
     /**
      * Sets the preferences for the service locator
-     * @param  {any} prefs
+     * @param  {any} projectPreferences
+     * @param  {any} applicationPreferences
      * @return {[type]}
      */
-    setPreferences(prefs : any) {
-        this.userPreferences = prefs;
+    setPreferences(projectPreferences?: any, applicationPreferences?: any) {
+        this.projectPreferences = projectPreferences || this.projectPreferences;
+        this.applicationPreferences = applicationPreferences || this.applicationPreferences;
     }
 
     /**
@@ -222,8 +225,8 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
     getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
     getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
     getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
-        if (this.userPreferences) {
-            let prefs = this.userPreferences[settingsGroup];
+        if (this.projectPreferences) {
+            let prefs = this.projectPreferences[settingsGroup];
             if (prefs) {
                 return prefs[preferenceName] || defaultValue;
             }
@@ -233,5 +236,26 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         return defaultValue;
     }
 
+    /**
+     * Return a preference value or the provided default from the user settings file
+     * @param  {string} settignsGroup name of the group the preference lives under
+     * @param  {string} preferenceName name of the preference to retrieve
+     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
+     * @return {number|boolean|string}
+     */
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
+    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
+        if (this.applicationPreferences) {
+            let prefs = this.applicationPreferences[settingsGroup];
+            if (prefs) {
+                return prefs[preferenceName] || defaultValue;
+            }
+        }
+
+        // if all else fails
+        return defaultValue;
+    }
 
 }
