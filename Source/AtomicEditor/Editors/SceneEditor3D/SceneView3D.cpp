@@ -221,14 +221,6 @@ void SceneView3D::MoveCamera(float timeStep)
     bool zooming = GetZooming();
     bool changingCameraSpeed = GetChangingCameraSpeed();
 
-    // Movement speed as world units per second
-    float MOVE_SPEED = 20.0f;
-    // Mouse sensitivity as degrees per pixel
-    const float MOUSE_SENSITIVITY = 0.2f;
-
-    if (shiftDown)
-        MOVE_SPEED *= 3.0f;
-
     // Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
     if ((mouseInView && input->GetMouseButtonDown(MOUSEB_RIGHT)) || orbitting)
     {
@@ -650,13 +642,13 @@ bool SceneView3D::OnEvent(const TBWidgetEvent &ev)
     }
     if (ev.type == EVENT_TYPE_KEY_DOWN)
     {
+        Input* input = GetSubsystem<Input>();
+
+        if (input->GetKeyPress(KEY_G))
+            gridEnabled_ = !gridEnabled_;
+
         SelectView();
     }
-
-    Input* input = GetSubsystem<Input>();
-
-    if (input->GetKeyPress(KEY_G))
-        gridEnabled_ = !gridEnabled_;
 
     return sceneEditor_->OnEvent(ev);
 }
