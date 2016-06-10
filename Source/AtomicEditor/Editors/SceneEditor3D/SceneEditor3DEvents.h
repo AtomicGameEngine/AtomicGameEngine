@@ -128,10 +128,30 @@ EVENT(E_SCENEEDITPREFABREVERT, SceneEditPrefabRevert)
     PARAM(P_NODE, Node);                    // Node pointer
 }
 
+EVENT(E_SCENEEDITPREFABCOPY, SceneEditPrefabCopy)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
+
+EVENT(E_SCENEEDITPREFABPASTE, SceneEditPrefabPaste)
+{
+    PARAM(P_NODE, Node);                    // Node pointer
+}
 
 EVENT(E_SCENEEDITPREFABBREAK, SceneEditPrefabBreak)
 {
     PARAM(P_NODE, Node);                    // Node pointer
+}
+
+EVENT(E_SCENEEDITCOMPONENTCOPY, SceneEditComponentCopy)
+{
+    PARAM(P_COMPONENT, Component);          // Component pointer
+}
+
+EVENT(E_SCENEEDITCOMPONENTPASTE, SceneEditComponentPaste)
+{
+    PARAM(P_COMPONENT, Component);          // Component pointer
+    PARAM(P_END, End);                       // bool
 }
 
 EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
