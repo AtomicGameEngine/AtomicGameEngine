@@ -437,7 +437,7 @@ void SceneSelection::HandleSceneEditComponentCopy(StringHash eventType, VariantM
 
     if (!component)
     {
-        LOGERRORF("Component Copy: Unable to copy component from node: %s", component->GetAttribute("type").ToString());
+        LOGERRORF("Component Copy: Unable to copy component from node: %s", component->GetAttribute("type").ToString().CString());
         return;
     }
 
@@ -462,7 +462,7 @@ void SceneSelection::HandleSceneEditComponentPaste(StringHash eventType, Variant
 
     if (!component)
     {
-        LOGERRORF("Component Paste: Unable to paste component to node: %s", component->GetAttribute("type").ToString());
+        LOGERRORF("Component Paste: Unable to paste component to node: %s", component->GetAttribute("type").ToString().CString());
         return;
     }
 
