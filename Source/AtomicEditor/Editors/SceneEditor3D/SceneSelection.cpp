@@ -42,7 +42,7 @@
 namespace AtomicEditor
 {
 
-SceneSelection::SceneSelection(Context* context, SceneEditor3D *sceneEditor) : Object(context)
+SceneSelection::SceneSelection(Context* context, SceneEditor3D *sceneEditor) : Object(context), hasCopied_(false)
 {
     sceneEditor3D_ = sceneEditor;
     scene_ = sceneEditor3D_->GetScene();
@@ -53,6 +53,10 @@ SceneSelection::SceneSelection(Context* context, SceneEditor3D *sceneEditor) : O
     SubscribeToEvent(scene_, E_SCENEEDITPREFABSAVE, HANDLER(SceneSelection, HandleSceneEditPrefabSave));
     SubscribeToEvent(scene_, E_SCENEEDITPREFABREVERT, HANDLER(SceneSelection, HandleSceneEditPrefabRevert));
     SubscribeToEvent(scene_, E_SCENEEDITPREFABBREAK, HANDLER(SceneSelection, HandleSceneEditPrefabBreak));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABCOPY, HANDLER(SceneSelection, HandleSceneEditPrefabCopy));
+    SubscribeToEvent(scene_, E_SCENEEDITPREFABPASTE, HANDLER(SceneSelection, HandleSceneEditPrefabPaste));
+    SubscribeToEvent(scene_, E_SCENEEDITCOMPONENTCOPY, HANDLER(SceneSelection, HandleSceneEditComponentCopy));
+    SubscribeToEvent(scene_, E_SCENEEDITCOMPONENTPASTE, HANDLER(SceneSelection, HandleSceneEditComponentPaste));
 }
 
 SceneSelection::~SceneSelection()
@@ -392,6 +396,94 @@ void SceneSelection::HandleSceneEditPrefabBreak(StringHash eventType, VariantMap
 
     scene_->SendEvent(E_SCENEEDITSCENEMODIFIED);
 
+}
+
+void SceneSelection::HandleSceneEditPrefabCopy(StringHash eventType, VariantMap & eventData)
+{
+    Node* node = static_cast<Node*> (eventData[SceneEditPrefabCopy::P_NODE].GetPtr());
+
+    PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
+    if (!prefab)
+    {
+        LOGERRORF("Prefab Copy: Unable to get prefab component for node: %s", node->GetName().CString());
+        return;
+    }
+
+    nodePosition_ = node->GetAttribute("Position").GetVector3();
+    nodeRotation_ = node->GetAttribute("Rotation").GetQuaternion();
+    nodeScale_ = node->GetAttribute("Scale").GetVector3();
+}
+
+void SceneSelection::HandleSceneEditPrefabPaste(StringHash eventType, VariantMap & eventData)
+{
+    Node* node = static_cast<Node*> (eventData[SceneEditPrefabPaste::P_NODE].GetPtr());
+
+    PrefabComponent* prefab = node->GetComponent<PrefabComponent>();
+    if (!prefab)
+    {
+        LOGERRORF("Prefab Paste: Unable to get prefab component for node: %s", node->GetName().CString());
+        return;
+    }
+
+    node->SetPosition(nodePosition_);
+    node->SetRotation(nodeRotation_);
+    node->SetScale(nodeScale_);
+}
+
+void SceneSelection::HandleSceneEditComponentCopy(StringHash eventType, VariantMap & eventData)
+{
+    Component* component = static_cast<Component*> (eventData[SceneEditComponentCopy::P_COMPONENT].GetPtr());
+    copiedComponent_ = component;
+
+    if (!component)
+    {
+        LOGERRORF("Component Copy: Unable to copy component from node: %s", component->GetAttribute("type").ToString());
+        return;
+    }
+
+    componentAttributeNames_.Clear();
+    componentAttributeValues_.Clear();
+
+    for (int i = 0; i < component->GetAttributes()->Size(); i++)
+    {
+        String attributeName = component->GetAttributes()->At(i).name_;
+        Variant attributeValue = component->GetAttribute(attributeName);
+        componentAttributeNames_.Push(attributeName);
+        componentAttributeValues_.Push(attributeValue);
+    }
+
+    hasCopied_ = true;
+
+}
+
+void SceneSelection::HandleSceneEditComponentPaste(StringHash eventType, VariantMap & eventData)
+{
+    Component* component = static_cast<Component*> (eventData[SceneEditComponentCopy::P_COMPONENT].GetPtr());
+
+    if (!component)
+    {
+        LOGERRORF("Component Paste: Unable to paste component to node: %s", component->GetAttribute("type").ToString());
+        return;
+    }
+
+    if (!hasCopied_)
+    {
+        LOGERROR("Component Paste: Unable to paste, no information has been copied.");
+        return;
+    }
+
+    if (copiedComponent_->GetType() != component->GetType())
+    {
+        LOGERROR("Component Paste: Unable to paste, component type differ.");
+        return;
+    }
+
+    for (int i = 0; i < componentAttributeNames_.Size(); i++)
+    {
+        String attrName = componentAttributeNames_[i];
+        Variant attrValue = componentAttributeValues_[i];
+        component->SetAttribute(attrName, attrValue);
+    }
 }
 
 

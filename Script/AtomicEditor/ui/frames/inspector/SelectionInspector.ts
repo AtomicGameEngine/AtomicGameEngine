@@ -93,7 +93,27 @@ class ComponentSection extends SelectionSection {
 
         };
 
+        var copyButton = new Atomic.UIButton();
+        copyButton.text = "Copy Settings";
+
+        copyButton.onClick = () => {
+
+            inspector.onComponentCopy(editType);
+            return true;
+
+        };
+
+        var pasteButton = new Atomic.UIButton();
+        pasteButton.text = "Paste Settings";
+
+        pasteButton.onClick = () => {
+            inspector.onComponentPaste(editType);
+            return true;
+        };
+
         this.attrLayout.addChild(deleteButton);
+        this.attrLayout.addChild(copyButton);
+        this.attrLayout.addChild(pasteButton);
 
     }
 
@@ -146,6 +166,8 @@ class JSComponentSection extends ComponentSection {
 // Node Inspector + Component Inspectors
 
 class SelectionInspector extends ScriptWidget {
+
+    component: Atomic.Component;
 
     constructor(sceneEditor: Editor.SceneEditor3D) {
 
@@ -575,6 +597,51 @@ class SelectionInspector extends ScriptWidget {
             this.sceneEditor.scene.sendEvent("SceneEditEnd");
             this.refresh();
 
+        }
+
+    }
+
+    onComponentCopy(editType: SerializableEditType) {
+
+        var copy: Atomic.Component[] = [];
+
+        for (var i in editType.objects) {
+
+            var c = <Atomic.Component>editType.objects[i];
+            copy.push(c);
+
+        }
+
+        for (var i in copy) {
+
+            var c = copy[i];
+
+            this.component = c;
+
+            this.sceneEditor.scene.sendEvent("SceneEditComponentCopy", { component: this.component });
+            this.refresh();
+
+        }
+    }
+
+    onComponentPaste(editType: SerializableEditType) {
+        var paste: Atomic.Component[] = [];
+
+        for (var i in editType.objects) {
+
+            var c = <Atomic.Component>editType.objects[i];
+            paste.push(c);
+
+        }
+
+        for (var i in paste) {
+
+            var c = paste[i];
+
+            this.component = c;
+
+            this.sceneEditor.scene.sendEvent("SceneEditComponentPaste", { component: this.component });
+            this.refresh();
         }
 
     }

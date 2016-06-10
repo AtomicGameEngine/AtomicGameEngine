@@ -79,6 +79,24 @@ class SelectionPrefabWidget extends Atomic.UILayout {
             return true;
         };
 
+        var copyButton = new Atomic.UIButton();
+        copyButton.text = "Copy";
+        copyButton.fontDescription = fd;
+
+        copyButton.onClick = () => {
+            this.node.scene.sendEvent("SceneEditPrefabCopy", {node : this.node });
+            return true;
+        };
+
+        var pasteButton = new Atomic.UIButton();
+        pasteButton.text = "Paste";
+        pasteButton.fontDescription = fd;
+
+        pasteButton.onClick = () => {
+            this.node.scene.sendEvent("SceneEditPrefabPaste", {node : this.node });
+            return true;
+        };
+
         var noticeName = new Atomic.UITextField();
         noticeName.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
         noticeName.skinBg = "InspectorTextAttrName";
@@ -98,6 +116,8 @@ class SelectionPrefabWidget extends Atomic.UILayout {
         widgetLayout.addChild(saveButton);
         widgetLayout.addChild(undoButton);
         widgetLayout.addChild(breakButton);
+        widgetLayout.addChild(copyButton);
+        widgetLayout.addChild(pasteButton);
 
         this.addChild(this.widgetLayout);
         this.addChild(this.noticeLayout);
