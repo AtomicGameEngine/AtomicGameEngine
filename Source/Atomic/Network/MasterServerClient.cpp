@@ -116,9 +116,7 @@ void MasterServerClient::RegisterServerWithMaster(const String &name)
     sprintf(str, "%d.%d.%d.%d", (unsigned int)ip[0], (unsigned int)ip[1], (unsigned int)ip[2], (unsigned int)ip[3]);
 
     Atomic::Network* network = GetSubsystem<Network>();
-
-    // FIXME
-    unsigned int localPort = 9;//network->GetServerPort();
+    unsigned int localPort = network->GetServerPort();
 
     String msg = String("{") +
                  String("\"cmd\":") + String("\"registerServer\",") +
