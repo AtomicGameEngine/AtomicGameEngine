@@ -53,36 +53,47 @@ struct RemoteGameServer
 };
 
 
-/// %MasterServerClient subsystem.
+/// Client for master server, see Script/AtomicMasterServer for example master server implementation
 class ATOMIC_API MasterServerClient : public Object
 {
     OBJECT(MasterServerClient);
 
 public:
+
     /// Construct.
     MasterServerClient(Context* context);
     /// Destruct.
     ~MasterServerClient();
 
-    /// Process messages
-    void Update(float timeStep);
-
     void ConnectToMaster(const String& address, unsigned short port);
+
     void DisconnectFromMaster();
 
-    void ConnectToMasterAndRegister(const String& address, unsigned short port, const String& serverName);
-
     void RequestServerListFromMaster();
+
     void ConnectToServerViaMaster(const String& serverId,
                                   const String& internalAddress, unsigned short internalPort,
                                   const String& externalAddress, unsigned short externalPort,
                                   Scene* scene);
 
+    void ConnectToMasterAndRegister(const String& address, unsigned short port, const String& serverName);
+
+    /// Convenience method to start server and register it with the master server
+    bool StartServerAndRegisterWithMaster(unsigned short serverPort, const String &masterAddress,
+                                          unsigned short masterPort, const String &serverName);
+
 private:
+
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+
     void SendMessageToMasterServer(const String& message);
+
     void HandleMasterServerMessage(const String& msg);
 
     void RegisterServerWithMaster(const String& serverName);
+
+    /// Process messages
+    void Update(float timeStep);
 
     float udpConnectionSecondsRemaining_;
     float udpSecondsTillRetry_;

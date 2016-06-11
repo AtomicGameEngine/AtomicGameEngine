@@ -8,6 +8,7 @@
 #include "../Network/NetworkPriority.h"
 #include "../Network/Network.h"
 #include "../Core/Profiler.h"
+#include "../Core/CoreEvents.h"
 #include "../Network/NetworkEvents.h"
 
 #include <rapidjson/document.h>
@@ -18,7 +19,6 @@ namespace Atomic
 {
 
 MasterServerClient::MasterServerClient(Context *context) :
-
         readingMasterMessageLength(true),
         Object(context),
         udpSecondsTillRetry_(0.5f),
@@ -31,7 +31,7 @@ MasterServerClient::MasterServerClient(Context *context) :
         masterTCPConnection_(NULL),
         clientToServerSocket_(NULL)
 {
-
+    SubscribeToEvent(E_BEGINFRAME, HANDLER(MasterServerClient, HandleBeginFrame));
 }
 
 MasterServerClient::~MasterServerClient()
@@ -42,7 +42,8 @@ MasterServerClient::~MasterServerClient()
     }
 }
 
-void MasterServerClient::ConnectToMaster(const String &address, unsigned short port) {
+void MasterServerClient::ConnectToMaster(const String &address, unsigned short port)
+{
     PROFILE(ConnectToMaster);
 
     if (connectToMasterState_ != MASTER_NOT_CONNECTED)
@@ -66,7 +67,8 @@ void MasterServerClient::DisconnectFromMaster()
     SetConnectToMasterState(MASTER_NOT_CONNECTED);
 }
 
-void MasterServerClient::ConnectToMasterAndRegister(const String &address, unsigned short port, const String& serverName) {
+void MasterServerClient::ConnectToMasterAndRegister(const String &address, unsigned short port, const String& serverName)
+{
     PROFILE(ConnectToMaster);
 
     if (connectToMasterState_ != MASTER_NOT_CONNECTED)
@@ -114,7 +116,9 @@ void MasterServerClient::RegisterServerWithMaster(const String &name)
     sprintf(str, "%d.%d.%d.%d", (unsigned int)ip[0], (unsigned int)ip[1], (unsigned int)ip[2], (unsigned int)ip[3]);
 
     Atomic::Network* network = GetSubsystem<Network>();
-    unsigned int localPort = network->GetServerPort();
+
+    // FIXME
+    unsigned int localPort = 9;//network->GetServerPort();
 
     String msg = String("{") +
                  String("\"cmd\":") + String("\"registerServer\",") +
@@ -281,9 +285,18 @@ void MasterServerClient::ConnectToMasterUpdate(float dt)
 
 }
 
+void MasterServerClient::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+{
+    using namespace BeginFrame;
+
+    Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+
 void MasterServerClient::SetConnectToMasterState(ConnectToMasterState state)
 {
     Atomic::Network* network = GetSubsystem<Network>();
+
     kNet::Network* kNetNetwork = network->GetKnetNetwork();
 
     if (connectToMasterState_ == MASTER_NOT_CONNECTED &&
@@ -552,5 +565,31 @@ void MasterServerClient::HandleMasterServerMessage(const String &msg)
     }
 }
 
+
+bool MasterServerClient::StartServerAndRegisterWithMaster(unsigned short serverPort, const String &masterAddress,
+                                                          unsigned short masterPort, const String &serverName)
+{
+    Network* network = GetSubsystem<Network>();
+
+    if (!network)
+    {
+        LOGERROR("MasterServerClient::StartServerAndRegisterWithMaster - Unable to get Network subsystem");
+        return false;
+    }
+
+    // First start the server
+    bool rc = network->StartServer(serverPort);
+
+    if (!rc)
+    {
+        LOGERROR("MasterServerClient::StartServerAndRegisterWithMaster - Unable to start server");
+        return false;
+    }
+
+    // Connect to the master server
+    ConnectToMasterAndRegister(masterAddress, masterPort, serverName);
+
+    return true;
+}
 
 }
