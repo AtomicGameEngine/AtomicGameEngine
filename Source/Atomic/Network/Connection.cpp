@@ -60,6 +60,11 @@ PackageUpload::PackageUpload() :
 {
 }
 
+Connection::Connection(Context* context) : Object(context)
+{
+
+}
+
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
     timeStamp_(0),
@@ -200,6 +205,8 @@ void Connection::SetScene(Scene* newScene)
         scene_->StopAsyncLoading();
         SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, HANDLER(Connection, HandleAsyncLoadFinished));
     }
+
+    SubscribeToEvent(scene_, E_COMPONENTREMOVED, HANDLER(Connection, HandleComponentRemoved));
 }
 
 void Connection::SetIdentity(const VariantMap& identity)
@@ -436,6 +443,9 @@ bool Connection::ProcessMessage(int msgID, MemoryBuffer& msg)
 
     case MSG_PACKAGEINFO:
         ProcessPackageInfo(msgID, msg);
+        break;
+    case MSG_STRING:
+        ProcessStringMessage(msgID, msg);
         break;
 
     default:
@@ -1101,6 +1111,28 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
     SendMessage(MSG_SCENELOADED, true, true, msg_);
 }
 
+void Connection::HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ComponentRemoved;
+
+    Component* comp = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
+    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+
+    unsigned nodeId = node->GetID();
+    unsigned compId = comp->GetID();
+
+    if (sceneState_.nodeStates_.Contains(node->GetID()))
+    {
+        NodeReplicationState& nodeState = sceneState_.nodeStates_[node->GetID()];
+        if (nodeState.componentStates_.Contains(comp->GetID()))
+        {
+            ComponentReplicationState& compState = nodeState.componentStates_[comp->GetID()];
+            compState.component_ = NULL;
+        }
+    }
+}
+
+
 void Connection::ProcessNode(unsigned nodeID)
 {
     // Check that we have not already processed this due to dependency recursion
@@ -1544,6 +1576,44 @@ void Connection::ProcessPackageInfo(int msgID, MemoryBuffer& msg)
     }
 
     RequestNeededPackages(1, msg);
+}
+
+// Expose control methods for current controls
+void Connection::SetControlButtons(unsigned buttons, bool down)
+{
+    controls_.Set(buttons,down);
+}
+
+/// Check if a button is held down.
+bool Connection::IsControlButtonDown(unsigned button) const
+{
+    return (controls_.IsDown(button));
+}
+
+void Connection::SetControlDataInt(const String &key, int value) {
+    controls_.extraData_[key] = value;
+}
+
+int Connection::GetControlDataInt(const String &key) {
+    return controls_.extraData_[key].GetInt();
+}
+
+void Connection::SendStringMessage(const String& message)
+{
+    // Send the identity map now
+    VectorBuffer msg;
+    msg.WriteString(message);
+    SendMessage(MSG_STRING, true, true, msg);
+}
+
+void Connection::ProcessStringMessage(int msgID, MemoryBuffer &msg) {
+    using namespace NetworkMessage;
+
+    VariantMap &eventData = GetEventDataMap();
+    eventData[P_MESSAGEID] = (int) msgID;
+    eventData[P_CONNECTION] = this;
+    eventData[P_DATA] = msg.ReadString();
+    SendEvent(E_NETWORKSTRINGMESSAGE, eventData);
 }
 
 }

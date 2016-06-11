@@ -39,6 +39,8 @@
 #include "../Scene/Scene.h"
 
 #include <kNet/include/kNet.h>
+#include <kNet/include/kNet/EndPoint.h>
+
 
 #include "../DebugNew.h"
 
@@ -53,7 +55,8 @@ Network::Network(Context* context) :
     simulatedLatency_(0),
     simulatedPacketLoss_(0.0f),
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
-    updateAcc_(0.0f)
+    updateAcc_(0.0f),
+    serverPort_(0xFFFF)
 {
     network_ = new kNet::Network();
 
@@ -203,6 +206,37 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     }
 }
 
+bool Network::ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene)
+{
+    PROFILE(ConnectWithExistingSocket);
+
+    // If a previous connection already exists, disconnect it and wait for some time for the connection to terminate
+    if (serverConnection_)
+    {
+        serverConnection_->Disconnect(100);
+        OnServerDisconnected();
+    }
+
+    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(existingSocket, this);
+    if (connection)
+    {
+        serverConnection_ = new Connection(context_, false, connection);
+        serverConnection_->SetScene(scene);
+        serverConnection_->SetIdentity(Variant::emptyVariantMap);
+        serverConnection_->SetConnectPending(true);
+        serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
+
+        LOGINFO("Connecting to server " + serverConnection_->ToString());
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to connect to server ");
+        SendEvent(E_CONNECTFAILED);
+        return false;
+    }
+}
+
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
     PROFILE(Connect);
@@ -250,9 +284,12 @@ bool Network::StartServer(unsigned short port)
 
     PROFILE(StartServer);
 
+    serverPort_ = port;
+
     if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
     {
         LOGINFO("Started server on port " + String(port));
+
         return true;
     }
     else
@@ -423,6 +460,22 @@ Connection* Network::GetConnection(kNet::MessageConnection* connection) const
         else
             return 0;
     }
+}
+
+bool Network::IsEndPointConnected(const kNet::EndPoint& endPoint) const
+{
+    Vector<SharedPtr<Connection> > ret;
+    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+         i != clientConnections_.End(); ++i)
+    {
+        kNet::EndPoint remoteEndPoint = i->first_->GetSocket()->RemoteEndPoint();
+        if (endPoint.ToString()==remoteEndPoint.ToString())
+        {
+            return i->second_->IsConnected();
+        }
+    }
+
+    return false;
 }
 
 Connection* Network::GetServerConnection() const

@@ -201,6 +201,11 @@ public:
         if (!jtype)
         {
             jtype = processTypeConversion(type);
+
+            // explicit script string -> StringHash required
+            if (jtype && jtype->asStringHashType())
+                isReference = false;
+
             if (fst.isUnsigned() && jtype->asPrimitiveType())
                 jtype->asPrimitiveType()->isUnsigned_ = true;
 
@@ -315,13 +320,23 @@ public:
             for (unsigned i = 0; i < function->argumentCount(); i++)
             {
                 Symbol* symbol = function->argumentAt(i);
+
                 if (symbol->isArgument())
                 {
                     Argument* arg = symbol->asArgument();
 
                     JSBFunctionType* ftype = processFunctionArgType(arg);
+
                     if (!ftype)
-                        return NULL;
+                    {
+                        // if we don't have an initializer, the function cannot be bound
+                        // as unscriptable type
+                        if (!arg->hasInitializer())
+                            return NULL;
+
+                        // otherwise, break and the optional args will be ignored
+                        break;
+                    }
 
                     if (arg->hasInitializer())
                     {
