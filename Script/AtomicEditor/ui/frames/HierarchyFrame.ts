@@ -396,6 +396,8 @@ class HierarchyFrame extends Atomic.UIWidget {
 
             if (data.target == this.hierList.rootList) {
 
+                if(!this.scene)
+                    return;
                 var node = this.scene.getNode(Number(data.refid));
 
                 if (node) {
