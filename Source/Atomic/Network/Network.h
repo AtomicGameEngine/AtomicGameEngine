@@ -26,9 +26,11 @@
 #include "../Core/Object.h"
 #include "../IO/VectorBuffer.h"
 #include "../Network/Connection.h"
+#include "../Network/MasterServerClient.h"
 
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
+#include <ThirdParty/kNet/include/kNet/EndPoint.h>
 
 namespace Atomic
 {
@@ -37,7 +39,7 @@ class HttpRequest;
 class MemoryBuffer;
 class Scene;
 
-/// MessageConnection hash function.
+    /// MessageConnection hash function.
 template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 {
     return ((unsigned)(size_t)value) >> 9;
@@ -66,10 +68,29 @@ public:
 
     /// Connect to a server using UDP protocol. Return true if connection process successfully started.
     bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = Variant::emptyVariantMap);
+
+    bool ConnectSimple(const String& address, unsigned short port, Scene* scene);
+
+    bool ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene);
+
+    void ClientConnectToMaster(const String& address, unsigned short port);
+    void ClientDisconnectFromMaster();
+
+    void ClientConnectToServerViaMaster(const String& serverId,
+                                        const String& internalAddress, unsigned short internalPort,
+                                        const String& externalAddress, unsigned short externalPort,
+                                        Scene* scene);
+    void RequestServerListFromMaster();
+
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful.
     bool StartServer(unsigned short port);
+
+    /// Start a server on a port using UDP protocol. Return true if successful.
+    /// Also register the server with the master server.
+    bool StartServerAndRegisterWithMaster(unsigned short serverPort, const String& masterAddress, unsigned short masterPort, const String& serverName);
+
     /// Stop the server.
     void StopServer();
     /// Broadcast a message with content ID to all client connections.
@@ -117,6 +138,9 @@ public:
 
     /// Return a client or server connection by kNet MessageConnection, or null if none exist.
     Connection* GetConnection(kNet::MessageConnection* connection) const;
+    // Return the connection with the matching endpoint
+    bool IsEndPointConnected(const kNet::EndPoint& endPoint) const;
+
     /// Return the connection to the server. Null if not connected.
     Connection* GetServerConnection() const;
     /// Return all client connections.
@@ -134,6 +158,10 @@ public:
     /// Send outgoing messages after frame logic. Called by HandleRenderUpdate.
     void PostUpdate(float timeStep);
 
+    kNet::Network* GetKnetNetwork() { return network_; }
+
+    unsigned int GetServerPort() { return serverPort_; }
+
 private:
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
@@ -145,6 +173,8 @@ private:
     void OnServerDisconnected();
     /// Reconfigure network simulator parameters on all existing connections.
     void ConfigureNetworkSimulator();
+    void HandleClientConnected(StringHash eventType, VariantMap& eventData);
+
 
     /// kNet instance.
     kNet::Network* network_;
@@ -170,6 +200,10 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
+    // MasterServerClient
+    MasterServerClient masterServerClient_;
+    // Server Port
+    unsigned int serverPort_;
 };
 
 /// Register Network library objects.
