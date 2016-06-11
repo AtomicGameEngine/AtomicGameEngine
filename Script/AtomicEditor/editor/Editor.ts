@@ -103,14 +103,18 @@ class Editor extends Atomic.ScriptObject {
         this.parseArguments();
     }
 
-    initUI() {
+    initUI() { 
+        var defSkin = Preferences.getInstance().getApplicationPreference("uiData", "skinPath", "AtomicEditor/editor/skin/");
+        var defDefaultSkin = Preferences.getInstance().getApplicationPreference("uiData", "defaultSkinPath", "AtomicEditor/resources/default_skin/");
+        var defFontFile = Preferences.getInstance().getApplicationPreference("uiData", "fontFile", "AtomicEditor/resources/vera.ttf");
+        var defFontName = Preferences.getInstance().getApplicationPreference("uiData", "fontName", "Vera");
+        var defFontSize = Preferences.getInstance().getApplicationPreference("uiData", "fontSize", 12);
 
-      var ui = Atomic.ui;
-      ui.loadSkin("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
-      ui.addFont("AtomicEditor/resources/vera.ttf", "Vera");
-      ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-      ui.setDefaultFont("Vera", 12);
-
+        var ui = Atomic.ui;
+        ui.loadSkin(defDefaultSkin + "/skin.tb.txt", defSkin + "/skin.tb.txt");
+        ui.addFont(defFontFile, defFontName);
+        ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
+        ui.setDefaultFont(defFontName, defFontSize);
     }
 
     saveWindowPreferences(data: Atomic.ScreenModeEvent): boolean {
