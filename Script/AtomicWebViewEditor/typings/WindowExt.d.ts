@@ -44,5 +44,13 @@ interface Window {
 
     HOST_resourceRenamed: (path: string, newPath: string) => void;
     HOST_resourceDeleted: (path: string) => void;
-    HOST_loadPreferences: (path: string) => void;
+    HOST_preferencesChanged: () => void;
+
+    /**
+     * Preferences set by the host.  Each preference category is a JSON string of all the prefs
+     */
+    HOST_Preferences: {
+        ApplicationPreferences: string,
+        ProjectPreferences: string
+    };
 }

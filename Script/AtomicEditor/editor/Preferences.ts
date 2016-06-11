@@ -31,7 +31,7 @@ class Preferences {
     private static instance: Preferences;
     private _prefs: PreferencesFormat;
 
-    private cachedProjectPreferences: Object = null;
+    private _cachedProjectPreferences: Object = null;
 
     constructor() {
         this.fileSystem = Atomic.getFileSystem();
@@ -97,14 +97,15 @@ class Preferences {
             prefs = null;
         }
 
-        if (prefs && (!prefs.editorWindow || !prefs.playerWindow || !prefs.recentProjects)) {
-            prefs = null;
-        }
-
         if (prefs) {
+            const defaultPrefs = new PreferencesFormat();
+            const shouldWrite = defaultPrefs.applyMissingDefaults(prefs);
             this._prefs = prefs;
+            if (shouldWrite) {
+                this.write();
+            }
         } else {
-            console.log("Editor preference file invalid, regenerating default configuration");
+            console.log("Editor preference file missing or invalid, regenerating default configuration");
             this.useDefaultConfig();
             this.write();
         }
@@ -130,6 +131,14 @@ class Preferences {
 
     useDefaultConfig(): void {
         this._prefs = new PreferencesFormat();
+    }
+
+    get cachedProjectPreferences():any {
+        return this._cachedProjectPreferences;
+    }
+
+    get cachedApplicationPreferences():PreferencesFormat {
+        return this._prefs;
     }
 
     get editorWindow(): WindowData {
@@ -161,21 +170,21 @@ class Preferences {
     getUserPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
 
         // Cache the settings so we don't keep going out to the file
-        if (this.cachedProjectPreferences == null) {
+        if (this._cachedProjectPreferences == null) {
             const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
             if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
                 let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
                 try {
                     let prefs = JSON.parse(prefsFile.readText());
-                    this.cachedProjectPreferences = prefs;
+                    this._cachedProjectPreferences = prefs;
                 } finally {
                     prefsFile.close();
                 }
             }
         }
 
-        if (this.cachedProjectPreferences && this.cachedProjectPreferences[settingsGroup]) {
-            return this.cachedProjectPreferences[settingsGroup][preferenceName] || defaultValue;
+        if (this._cachedProjectPreferences && this._cachedProjectPreferences[settingsGroup]) {
+            return this._cachedProjectPreferences[settingsGroup][preferenceName] || defaultValue;
         }
 
         // if all else fails
@@ -214,7 +223,7 @@ class Preferences {
         }
 
         // Cache the update
-        this.cachedProjectPreferences = prefs;
+        this._cachedProjectPreferences = prefs;
     }
 
 
@@ -253,7 +262,7 @@ class Preferences {
         }
 
         // Cache the update
-        this.cachedProjectPreferences = prefs;
+        this._cachedProjectPreferences = prefs;
     }
 }
 
@@ -264,6 +273,15 @@ interface WindowData {
     height: number;
     monitor: number;
     maximized: boolean;
+}
+
+interface AceEditorSettings {
+    theme: string;
+    keyboardHandler: string;
+    fontSize: number;
+    showInvisibles: boolean;
+    useSoftTabs: boolean;
+    tabSize: number;
 }
 
 class PreferencesFormat {
@@ -295,11 +313,51 @@ class PreferencesFormat {
             maximized: false
         };
 
+        this.codeEditorSettings = {
+            theme: "ace/theme/monokai",
+            keyboardHandler: "ace/keyboard/textinput",
+            fontSize: 12,
+            showInvisibles: false,
+            useSoftTabs: true,
+            tabSize: 4
+        };
+    }
+
+    /**
+     * Run through a provided prefs block and verify that all the sections are present.  If any
+     * are missing, add the defaults in
+     * @param  {PreferencesFormat} prefs
+     * @return boolean returns true if any missing defaults were updated
+     */
+    applyMissingDefaults(prefs: PreferencesFormat) {
+        let updatedMissingDefaults = false;
+        if (!prefs.recentProjects) {
+            prefs.recentProjects = this.recentProjects;
+            updatedMissingDefaults = true;
+        }
+
+        if (!prefs.editorWindow) {
+            prefs.editorWindow = this.editorWindow;
+            updatedMissingDefaults = true;
+        }
+
+        if (!prefs.playerWindow) {
+            prefs.playerWindow = this.playerWindow;
+            updatedMissingDefaults = true;
+        }
+
+        if (!prefs.codeEditorSettings) {
+            prefs.codeEditorSettings = this.codeEditorSettings;
+            updatedMissingDefaults = true;
+        }
+
+        return updatedMissingDefaults;
     }
 
     recentProjects: string[];
     editorWindow: WindowData;
     playerWindow: WindowData;
+    codeEditorSettings: AceEditorSettings;
 }
 
 export = Preferences;

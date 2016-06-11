@@ -67,9 +67,9 @@
         });
     }
 
-    function HOST_loadPreferences(prefUrl) {
+    function HOST_preferencesChanged() {
         System.import('./source/editorCore/interop').then((module) => {
-            module.default.getInstance().loadPreferences(prefUrl);
+            module.default.getInstance().preferencesChanged();
         });
     }
 

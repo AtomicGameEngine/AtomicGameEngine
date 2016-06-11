@@ -121,7 +121,6 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
     const String& EDITOR_CHANGE = "editorChange";
     const String& EDITOR_SAVE_CODE = "editorSaveCode";
     const String& EDITOR_SAVE_FILE = "editorSaveFile";
-    const String& EDITOR_GET_USER_PREFS = "editorGetUserPrefs";
 
     WebMessageHandler* handler = static_cast<WebMessageHandler*>(eventData[P_HANDLER].GetPtr());
 
@@ -158,16 +157,6 @@ void JSResourceEditor::HandleWebMessage(StringHash eventType, VariantMap& eventD
                     file.Close();
             } else {
                 LOGWARNING("Ignoring attempt to write file: " + fn);
-            }
-        }
-        else if (message == EDITOR_GET_USER_PREFS)
-        {
-            ToolSystem* tsys = GetSubsystem<ToolSystem>();
-            Project* proj = tsys->GetProject();
-            FileSystem* fileSystem = GetSubsystem<FileSystem>();
-            if (fileSystem->FileExists(proj->GetUserPrefsFullPath()))
-            {
-                webClient_->ExecuteJavaScript(ToString("HOST_loadPreferences(\"atomic://%s\");", proj->GetUserPrefsFullPath().CString()));
             }
         }
     }

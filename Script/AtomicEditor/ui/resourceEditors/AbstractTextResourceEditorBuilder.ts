@@ -74,22 +74,11 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
         });
 
         editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => {
-            this.getUserPrefs(editor);
+            const webClient = editor.webView.webClient;
+            webClient.executeJavaScript("HOST_preferencesChanged();");
         });
 
         return editor;
-    }
-
-    /**
-     * Send the url of the user prefs to the web view so that it can request it
-     */
-    getUserPrefs(editor: Editor.JSResourceEditor) {
-        let prefsPath = ToolCore.toolSystem.project.userPrefsFullPath;
-        if (Atomic.fileSystem.fileExists(prefsPath)) {
-            // Get a reference to the web client so we can call the load preferences method
-            const webClient = editor.webView.webClient;
-            webClient.executeJavaScript(`HOST_loadPreferences("atomic://${prefsPath}");`);
-        }
     }
 
     /**
