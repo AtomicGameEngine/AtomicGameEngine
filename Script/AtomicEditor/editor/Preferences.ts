@@ -153,44 +153,14 @@ class Preferences {
         return this._prefs.recentProjects;
     }
 
+    get uiData(): UserInterfaceData {
+        return this._prefs.uiData;
+    }
+
     static getInstance(): Preferences {
         return Preferences.instance;
     }
 
-    /**
-     * Return a preference value or the provided default from the user settings file
-     * @param  {string} settignsGroup name of the group the preference lives under
-     * @param  {string} preferenceName name of the preference to retrieve
-     * @param  {number | boolean | string} defaultValue value to return if pref doesn't exist
-     * @return {number|boolean|string}
-     */
-    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: number): number;
-    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: string): string;
-    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: boolean): boolean;
-    getApplicationPreference(settingsGroup: string, preferenceName: string, defaultValue?: any): any {
-
-        // Cache the settings so we don't keep going out to the file
-        if (this._prefs == null) {
-            const prefsAppFileLoc = this.getPreferencesFullPath();
-            if (Atomic.fileSystem.fileExists(prefsAppFileLoc)) {
-                let prefsAppFile = new Atomic.File(prefsAppFileLoc, Atomic.FILE_READ);
-                try {
-                    let prefs = JSON.parse(prefsAppFile.readText());
-                    this._prefs = prefs;
-                } finally {
-                    prefsAppFile.close();
-                }
-            }
-        }
-
-        if (this._prefs && this._prefs[settingsGroup]) {
-            return this._prefs[settingsGroup][preferenceName] || defaultValue;
-        }
-
-        // if all else fails
-        return defaultValue;
-    }
-    
     /**
      * Return a preference value or the provided default from the user settings file located in the project
      * @param  {string} settingsGroup name of the group these settings should fall under

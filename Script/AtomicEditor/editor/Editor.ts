@@ -103,18 +103,13 @@ class Editor extends Atomic.ScriptObject {
         this.parseArguments();
     }
 
-    initUI() { 
-        var defSkin = Preferences.getInstance().getApplicationPreference("uiData", "skinPath", "AtomicEditor/editor/skin/");
-        var defDefaultSkin = Preferences.getInstance().getApplicationPreference("uiData", "defaultSkinPath", "AtomicEditor/resources/default_skin/");
-        var defFontFile = Preferences.getInstance().getApplicationPreference("uiData", "fontFile", "AtomicEditor/resources/vera.ttf");
-        var defFontName = Preferences.getInstance().getApplicationPreference("uiData", "fontName", "Vera");
-        var defFontSize = Preferences.getInstance().getApplicationPreference("uiData", "fontSize", 12);
-
+    initUI() {
+        var uiData = Preferences.getInstance().uiData;
         var ui = Atomic.ui;
-        ui.loadSkin(defDefaultSkin + "/skin.tb.txt", defSkin + "/skin.tb.txt");
-        ui.addFont(defFontFile, defFontName);
+        ui.loadSkin(uiData.skinPath + "/skin.tb.txt", uiData.defaultSkinPath + "/skin.tb.txt");
+        ui.addFont(uiData.fontFile, uiData.fontName);
         ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-        ui.setDefaultFont(defFontName, defFontSize);
+        ui.setDefaultFont(uiData.fontName, uiData.fontSize);
     }
 
     saveWindowPreferences(data: Atomic.ScreenModeEvent): boolean {
