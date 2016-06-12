@@ -57,30 +57,24 @@ task('atomiceditor', {
       fs.copySync(buildDir +  "Source/AtomicPlayer/Application/AtomicPlayer",
         editorAppFolder + "Resources/ToolData/Deployment/Linux/AtomicPlayer");
 
-      // Copy CEF support files
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/icudtl.dat",
-        editorAppFolder+"/icudtl.dat");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/natives_blob.bin",
-        editorAppFolder+"/natives_blob.bin");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/snapshot_blob.bin",
-        editorAppFolder+"/snapshot_blob.bin");
 
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/locales", editorAppFolder+"/locales");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef.pak", editorAppFolder+"/cef.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef_100_percent.pak", editorAppFolder+"/cef_100_percent.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef_200_percent.pak", editorAppFolder+"/cef_200_percent.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef_extensions.pak", editorAppFolder+"/cef_extensions.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/devtools_resources.pak", editorAppFolder+"/devtools_resources.pak");
+      var binaryFiles = ["chrome-sandbox", "libcef.so", "natives_blob.bin", "snapshot_blob.bin"];
 
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/icudtl.dat",  atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/icudtl.dat");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/natives_blob.bin", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/natives_blob.bin");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/snapshot_blob.bin", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/snapshot_blob.bin");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/locales", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/locales");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef.pak", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/cef.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef_100_percent.pak", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/cef_100_percent.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef_200_percent.pak", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/cef_200_percent.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/cef_extensions.pak", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/cef_extensions.pak");
-      fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/devtools_resources.pak", atomicRoot +"/Artifacts/Build/Linux/Source/AtomicEditor/devtools_resources.pak");
+      var resourceFiles = ["cef.pak",
+                "cef_100_percent.pak",
+                "cef_200_percent.pak",
+                "cef_extensions.pak",
+                "devtools_resources.pak",
+                "icudtl.dat",
+                "locales"];
+
+      for (var i = 0; i < binaryFiles.length; i++) {
+        fs.copySync(atomicRoot + "Submodules/CEF/Linux/Release/" + binaryFiles[i], editorAppFolder+"/" + binaryFiles[i]);
+      }
+
+      for (var i = 0; i < resourceFiles.length; i++) {
+        fs.copySync(atomicRoot + "Submodules/CEF/Linux/Resources/" + resourceFiles[i], editorAppFolder+"/" + resourceFiles[i]);
+      }
 
 
     console.log("\n\nAtomic Editor build to " + editorAppFolder + "\n\n");
@@ -92,5 +86,3 @@ task('atomiceditor', {
   });
 
 });
-
-});// end of build namespace
