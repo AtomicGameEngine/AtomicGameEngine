@@ -68,6 +68,9 @@ public:
     void SetWrapping(bool wrap);
     bool GetWrapping();
 
+    int GetCaretPosX(){ return static_cast<tb::TBEditField *>(widget_)->GetStyleEdit()->caret.x; }
+    int GetCaretPosY(){ return static_cast<tb::TBEditField *>(widget_)->GetStyleEdit()->caret.y; }
+
 protected:
 
     virtual bool OnEvent(const tb::TBWidgetEvent &ev);

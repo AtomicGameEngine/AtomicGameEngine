@@ -314,6 +314,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetAutoOpacity(float autoOpacity);
     float GetAutoOpacity();
 
+    String editText_;
+    String GetEditText(){ return editText_; }
+
 protected:
 
     void ConvertEvent(UIWidget* handler, UIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);

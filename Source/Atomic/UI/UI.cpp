@@ -230,6 +230,8 @@ void UI::Initialize(const String& languageFile)
 
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
 
+    SubscribeToEvent(E_TEXTEDIT, HANDLER(UI, HandleTextEdit));
+
     // register the UIDragDrop subsystem (after we have subscribed to events, so it is processed after)
     context_->RegisterSubsystem(new UIDragDrop(context_));
 
@@ -297,7 +299,7 @@ void UI::SetDefaultFont(const String& name, int size)
     // Render some glyphs in one go now since we know we are going to use them. It would work fine
     // without this since glyphs are rendered when needed, but with some extra updating of the glyph bitmap.
     if (font)
-        font->RenderGlyphs(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~•·åäöÅÄÖ");
+        font->RenderGlyphs(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
 }
 
 void UI::AddFont(const String& fontFile, const String& name)

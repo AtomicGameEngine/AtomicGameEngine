@@ -232,6 +232,12 @@ EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 
+/// Text editing event.
+EVENT(E_TEXTEDIT, TextEdit)
+{
+    PARAM(P_TEXT, Text);
+}
+
 static const int MOUSEB_LEFT = SDL_BUTTON_LMASK;
 static const int MOUSEB_MIDDLE = SDL_BUTTON_MMASK;
 static const int MOUSEB_RIGHT = SDL_BUTTON_RMASK;
