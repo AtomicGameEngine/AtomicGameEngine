@@ -153,6 +153,10 @@ class Preferences {
         return this._prefs.recentProjects;
     }
 
+    get uiData(): UserInterfaceData {
+        return this._prefs.uiData;
+    }
+
     static getInstance(): Preferences {
         return Preferences.instance;
     }
@@ -284,6 +288,14 @@ interface AceEditorSettings {
     tabSize: number;
 }
 
+interface UserInterfaceData {
+    skinPath : string;
+    defaultSkinPath : string;
+    fontFile : string;
+    fontName : string;
+    fontSize : number;
+}
+
 class PreferencesFormat {
 
     constructor() {
@@ -321,6 +333,15 @@ class PreferencesFormat {
             useSoftTabs: true,
             tabSize: 4
         };
+
+        this.uiData = {
+            skinPath : "AtomicEditor/editor/skin/",
+            defaultSkinPath : "AtomicEditor/resources/default_skin/",
+            fontFile : "AtomicEditor/resources/vera.ttf",
+            fontName : "Vera",
+            fontSize : 12
+        };
+
     }
 
     /**
@@ -351,6 +372,11 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
+        if (!prefs.uiData) {
+            prefs.uiData = this.uiData;
+            updatedMissingDefaults = true;
+        }
+
         return updatedMissingDefaults;
     }
 
@@ -358,6 +384,7 @@ class PreferencesFormat {
     editorWindow: WindowData;
     playerWindow: WindowData;
     codeEditorSettings: AceEditorSettings;
+    uiData : UserInterfaceData;
 }
 
 export = Preferences;

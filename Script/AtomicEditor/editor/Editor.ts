@@ -104,13 +104,12 @@ class Editor extends Atomic.ScriptObject {
     }
 
     initUI() {
-
-      var ui = Atomic.ui;
-      ui.loadSkin("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
-      ui.addFont("AtomicEditor/resources/vera.ttf", "Vera");
-      ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-      ui.setDefaultFont("Vera", 12);
-
+        var uiData = Preferences.getInstance().uiData;
+        var ui = Atomic.ui;
+        ui.loadSkin(uiData.skinPath + "/skin.tb.txt", uiData.defaultSkinPath + "/skin.tb.txt");
+        ui.addFont(uiData.fontFile, uiData.fontName);
+        ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
+        ui.setDefaultFont(uiData.fontName, uiData.fontSize);
     }
 
     saveWindowPreferences(data: Atomic.ScreenModeEvent): boolean {
