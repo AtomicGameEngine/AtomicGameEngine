@@ -354,7 +354,9 @@ STBIDEF void stbi_install_YCbCr_to_RGB(stbi_YCbCr_to_RGB_run func);
 #ifndef STBI_NO_STDIO
 #include <stdio.h>
 #endif
+#define _GLIBCXX_INCLUDE_NEXT_C_HEADERS
 #include <stdlib.h>
+#undef _GLIBCXX_INCLUDE_NEXT_C_HEADERS
 #include <string.h>
 #ifndef STBI_ASSERT
 #include <assert.h>
