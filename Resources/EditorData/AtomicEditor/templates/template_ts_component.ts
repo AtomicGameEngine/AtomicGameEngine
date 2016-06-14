@@ -3,7 +3,7 @@
 /**
  * A new component
  */
-class Component extends Atomic.JSComponent {
+export default class Component extends Atomic.JSComponent {
 
     /**
      * Fields witihin the inspectorFields object will be exposed to the editor
@@ -26,5 +26,3 @@ class Component extends Atomic.JSComponent {
 
     }
 }
-
-export = Component;

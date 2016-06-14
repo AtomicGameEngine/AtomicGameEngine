@@ -3,7 +3,7 @@
 /**
  * Component that will rotate a node at a configurable speed.
  */
-class Spinner extends Atomic.JSComponent {
+export default class Spinner extends Atomic.JSComponent {
 
     /**
      * Fields witihin the inspectorFields object will be exposed to the editor
@@ -28,5 +28,3 @@ class Spinner extends Atomic.JSComponent {
 
     }
 }
-
-export = Spinner;
