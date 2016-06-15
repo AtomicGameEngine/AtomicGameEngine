@@ -688,11 +688,13 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
 #endif
 
 #ifdef ATOMIC_PLATFORM_LINUX
-    if ( keyEvent.character == 0xD && keyEvent.type == KEYEVENT_KEYUP) 
+
+    if (keyEvent.windows_key_code == 0x0D)
     {
         keyEvent.type = KEYEVENT_CHAR;
         host->SendKeyEvent(keyEvent);
     }
+
 #endif
 
 }
