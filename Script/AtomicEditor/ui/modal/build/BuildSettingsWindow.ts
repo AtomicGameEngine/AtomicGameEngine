@@ -56,7 +56,7 @@ export class BuildSettingsWindow extends ModalWindow {
         platformSource.addItem(new Atomic.UISelectItem("Windows", "WindowsBuildSettings", "LogoWindows"));
         platformSource.addItem(new Atomic.UISelectItem("Mac", "MacBuildSettings", "LogoMac"));
         platformSource.addItem(new Atomic.UISelectItem("Android", "AndroidBuildSettings", "LogoAndroid"));
-        platformSource.addItem(new Atomic.UISelectItem("iOS", "iOSBuildSettings", "LogoIOS"));
+        platformSource.addItem(new Atomic.UISelectItem("iOS", "iosBuildSettings", "LogoIOS"));
         platformSource.addItem(new Atomic.UISelectItem("WebGL", "WebGLBuildSettings", "LogoHTML5"));
 
         platformSelect.setSource(platformSource);
@@ -146,7 +146,7 @@ export class BuildSettingsWindow extends ModalWindow {
 
                         var platform = toolSystem.getPlatformByName(name);
 
-                        if (platform.platformID == ToolCore.PLATFORMID_IOS) {
+                        if (platform.platformId == ToolCore.PLATFORMID_IOS) {
 
                             if (Atomic.platform == "Windows") {
 
@@ -164,7 +164,7 @@ export class BuildSettingsWindow extends ModalWindow {
                             return true;
                         }
 
-                        toolSystem.setCurrentPlatform(platform.platformID);
+                        toolSystem.setCurrentPlatform(platform.platformId);
 
                         return true;
                     }
@@ -186,7 +186,7 @@ export class BuildSettingsWindow extends ModalWindow {
                 this.setDisplayPlatform(toolSystem.getPlatformByName("ANDROID"));
                 return true;
             }
-            if (ev.refid == "iOSBuildSettings") {
+            if (ev.refid == "iosBuildSettings") {
                 this.setDisplayPlatform(toolSystem.getPlatformByName("IOS"));
                 return true;
             }

@@ -30,7 +30,7 @@ class IOSSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
 
         this.load("AtomicEditor/editor/ui/buildsettings_ios.tb.txt");
 
-        this.settings = ToolCore.toolSystem.project.buildSettings.iOSBuildSettings;
+        this.settings = ToolCore.toolSystem.project.buildSettings.iosBuildSettings;
 
         this.appNameEdit = <Atomic.UIEditField>this.getWidget("app_name");
         this.packageNameEdit = <Atomic.UIEditField>this.getWidget("app_package");
@@ -54,7 +54,7 @@ class IOSSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
         this.companyNameEdit.text = this.settings.companyName;
 
         this.provisionPathEdit.text = this.settings.provisionFile;
-        this.appIDPrefixField.text = this.settings.appIDPrefix;
+        this.appIDPrefixField.text = this.settings.appIdPrefix;
 
     }
 
@@ -97,7 +97,7 @@ class IOSSettingsWidget extends Atomic.UIWidget implements BuildSettingsWindow.B
         this.settings.companyName = this.companyNameEdit.text;
 
         this.settings.provisionFile = this.provisionPathEdit.text;
-        this.settings.appIDPrefix = this.appIDPrefixField.text;
+        this.settings.appIdPrefix = this.appIDPrefixField.text;
 
     }
 
