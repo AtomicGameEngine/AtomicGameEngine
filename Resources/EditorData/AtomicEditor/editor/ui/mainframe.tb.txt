@@ -1,80 +1,80 @@
 definitions
-	menubutton		
-		lp: height: 28
-		font: name: Vera
-		skin TBButton.flat
+    menubutton
+        lp: height: 28
+        font: name: Vera
+        skin TBButton.flat
 TBLayout: distribution: gravity, axis: y
-	TBContainer: skin: AEContainer, gravity: all, id: mainframecontainer
-		TBLayout: distribution: gravity, axis: y		
-			TBLayout: distribution: gravity
-				TBContainer: skin: AEContainer, gravity: left right
-					TBLayout: distribution: gravity
-						TBButton
-							@include definitions>menubutton
-							text File
-							id menu file
-						TBButton
-							@include definitions>menubutton
-							text Edit
-							id menu edit
-						TBButton
-							@include definitions>menubutton
-							text Build
-							id menu build
-						TBButton
-							@include definitions>menubutton
-							text Tools
-							id menu tools
-						TBButton
-							@include definitions>menubutton
-							text Help
-							id menu help
-						TBButton
-							@include definitions>menubutton
-							text Developer
-							id menu developer
-						TBLayout: gravity: left right
-							TBWidget
-			TBLayout: distribution: gravity, position: top
-				TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom
-					TBEditField: text: "<color #AAAAAA>Project</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
-						font: size: 11
-					TBLayout: distribution: gravity, id: projectviewcontainer
-					TBSeparator: gravity: left right, skin: AESeparator
-					TBEditField: text: "<color #AAAAAA>Hierarchy</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
-						font: size: 11
-					TBLayout: distribution: gravity, id: hierarchycontainer
-						TBWidget: gravity: top bottom
-				TBLayout: distribution: gravity, axis: y
-					TBLayout: gravity: left right, id: maintoolbarcontainer
-					TBSeparator: gravity: left right, skin: AESeparator
-					TBLayout: distribution: gravity, id: resourceviewcontainer
-					TBContainer: skin: AEContainer, gravity: left right bottom, id: consolecontainer
-						TBEditField: multiline: 1, styling: 1, gravity: left right, id: consoletext
-							text: "Hello World!"
-				TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom, id: inspectorlayout
-					TBEditField: text: "<color #AAAAAA>Inspector</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
-						font: size: 11
-					TBLayout: distribution: gravity, id: inspectorcontainer
+    TBContainer: skin: AEContainer, gravity: all, id: mainframecontainer
+        TBLayout: distribution: gravity, axis: y
+            TBLayout: distribution: gravity
+                TBContainer: skin: AEContainer, gravity: left right
+                    TBLayout: distribution: gravity
+                        TBButton
+                            @include definitions>menubutton
+                            text File
+                            id menu file
+                        TBButton
+                            @include definitions>menubutton
+                            text Edit
+                            id menu edit
+                        TBButton
+                            @include definitions>menubutton
+                            text Build
+                            id menu build
+                        TBButton
+                            @include definitions>menubutton
+                            text Tools
+                            id menu tools
+                        TBButton
+                            @include definitions>menubutton
+                            text Developer
+                            id menu developer
+                        TBButton
+                            @include definitions>menubutton
+                            text Help
+                            id menu help
+                        TBLayout: gravity: left right
+                            TBWidget
+            TBLayout: distribution: gravity, position: top
+                TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom
+                    TBEditField: text: "<color #AAAAAA>Project</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                        font: size: 11
+                    TBLayout: distribution: gravity, id: projectviewcontainer
+                    TBSeparator: gravity: left right, skin: AESeparator
+                    TBEditField: text: "<color #AAAAAA>Hierarchy</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                        font: size: 11
+                    TBLayout: distribution: gravity, id: hierarchycontainer
+                        TBWidget: gravity: top bottom
+                TBLayout: distribution: gravity, axis: y
+                    TBLayout: gravity: left right, id: maintoolbarcontainer
+                    TBSeparator: gravity: left right, skin: AESeparator
+                    TBLayout: distribution: gravity, id: resourceviewcontainer
+                    TBContainer: skin: AEContainer, gravity: left right bottom, id: consolecontainer
+                        TBEditField: multiline: 1, styling: 1, gravity: left right, id: consoletext
+                            text: "Hello World!"
+                TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom, id: inspectorlayout
+                    TBEditField: text: "<color #AAAAAA>Inspector</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                        font: size: 11
+                    TBLayout: distribution: gravity, id: inspectorcontainer
 
-			TBLayout: distribution: gravity
-				TBContainer: skin: AEContainer, gravity: left right
-					TBLayout: distribution: gravity
-						TBLayout: distribution: gravity
-							TBLayout: axis: y, position: left, gravity: top left
-								TBSkinImage: skin: LogoAtomic64, id: current_platform_indicator
-									lp: height: 28, width:28
-						TBLayout: gravity: left right
-							TBWidget
-						TBButton
-							@include definitions>menubutton
-							text Errors
-							id menu errors
-						TBButton
-							@include definitions>menubutton
-							text Issues
-							id menu issues
-						TBButton
-							@include definitions>menubutton
-							text Console
-							id menu console
+            TBLayout: distribution: gravity
+                TBContainer: skin: AEContainer, gravity: left right
+                    TBLayout: distribution: gravity
+                        TBLayout: distribution: gravity
+                            TBLayout: axis: y, position: left, gravity: top left
+                                TBSkinImage: skin: LogoAtomic64, id: current_platform_indicator
+                                    lp: height: 28, width:28
+                        TBLayout: gravity: left right
+                            TBWidget
+                        TBButton
+                            @include definitions>menubutton
+                            text Errors
+                            id menu errors
+                        TBButton
+                            @include definitions>menubutton
+                            text Issues
+                            id menu issues
+                        TBButton
+                            @include definitions>menubutton
+                            text Console
+                            id menu console

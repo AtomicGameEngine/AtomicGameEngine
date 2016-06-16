@@ -84,9 +84,10 @@ A cross platform game engine targeting 6 platforms is a lot of work! We need to 
 
 In addition to monetary funding, we need help reviewing pull requests, addressing open issues, providing support in chat, etc.
 
-<widget TBImageWidget: filename: 'AtomicEditor/editor/images/josh.jpg'> - Josh Engebretson on behalf of the Atomic Community
+<color #D4FB79>Thanks for your support!</color>
 
-<color #D4FB79>This notice will be displayed whenever a new Atomic Editor build is installed.</color>`;
+<widget TBImageWidget: filename: 'AtomicEditor/editor/images/josh.jpg'> - Josh Engebretson on behalf of the Atomic Community
+`;
 
         return text;
 
