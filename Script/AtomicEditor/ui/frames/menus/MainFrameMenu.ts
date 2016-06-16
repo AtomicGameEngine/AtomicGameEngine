@@ -313,7 +313,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
         } else {
-            console.log("Menu: " + target.id + " clicked");
+            // console.log("Menu: " + target.id + " clicked");
         }
 
     }

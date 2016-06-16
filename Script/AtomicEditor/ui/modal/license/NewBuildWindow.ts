@@ -54,6 +54,11 @@ class NewBuildWindow extends ModalWindow {
 
             var id = ev.target.id;
 
+            if (id == "cfi") {
+
+                Atomic.fileSystem.systemOpen("http://www.atomicgameengine.com/funding/")
+            }
+
             if (id == "ok") {
 
                 this.hide();
@@ -64,8 +69,6 @@ class NewBuildWindow extends ModalWindow {
                     Preferences.getInstance().write();
 
                 }
-
-                Atomic.fileSystem.systemOpen("http://www.atomicgameengine.com/funding/")
                 return true;
             }
         }
