@@ -86,8 +86,8 @@ class About extends ModalWindow {
         var text = "";
 
         text += "<widget TBImageWidget: filename: 'AtomicEditor/editor/images/atomic_logo.png'>\n\n";
-        text += "<color #D4FB79>Version  0.1.p0</color>\n\n";
-        text += "(c) 2014-2015 THUNDERBEAST GAMES LLC\n\n\n";
+        text += "<color #D4FB79>Git SHA: " + Atomic.getGitRevision() +"</color>\n\n";
+        text += "(c) 2014-2016 THUNDERBEAST GAMES LLC\n\n\n";
 
         text += "<color #D4FB79>Installed platforms and modules:</color>\n\n";
 

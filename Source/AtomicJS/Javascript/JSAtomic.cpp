@@ -63,6 +63,8 @@
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Environment/ProcSky.h>
 
+#include <AtomicBuildInfo/AtomicBuildInfo.h>
+
 namespace Atomic
 {
 
@@ -197,6 +199,13 @@ static int js_atomic_GetUI(duk_context* ctx)
     return 1;
 }
 
+static int js_atomic_GetGitRevision(duk_context* ctx)
+{
+    duk_push_string(ctx, GetGitSHA());
+    return 1;
+}
+
+
 
 static int js_atomic_script(duk_context* ctx)
 {
@@ -290,6 +299,7 @@ static int js_atomic_destroy(duk_context* ctx)
 
     return 0;
 }
+
 
 void jsapi_init_atomic(JSVM* vm)
 {
@@ -423,6 +433,8 @@ void jsapi_init_atomic(JSVM* vm)
     duk_put_prop_string(ctx, -2, "ui");
 
     // end subsystems
+    duk_push_c_function(ctx, js_atomic_GetGitRevision, 0);
+    duk_put_prop_string(ctx, -2, "getGitRevision");
 
     duk_push_c_function(ctx, js_atomic_script, 1);
     duk_put_prop_string(ctx, -2, "script");

@@ -1,5 +1,6 @@
 
 add_subdirectory(ThirdParty)
+add_subdirectory(AtomicBuildInfo)
 add_subdirectory(Atomic)
 add_subdirectory(AtomicJS)
 
