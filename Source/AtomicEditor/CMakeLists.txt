@@ -32,9 +32,12 @@ else()
     include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/libcurl/include)
     add_definitions(-DCURL_STATICLIB)
 
-    # We want the console for now
-    #set (EXE_TYPE WIN32)
-    add_definitions(-DATOMIC_WIN32_CONSOLE)
+    # We want a console for development builds
+    if (${ATOMIC_DEV_BUILD} EQUAL 1)
+      add_definitions(-DATOMIC_WIN32_CONSOLE)
+    else()
+      set (EXE_TYPE WIN32)
+    endif()
 
     set (SOURCE_FILES ${SOURCE_FILES} ${CMAKE_SOURCE_DIR}/Build/CMake/Modules/Atomic.rc)
 

@@ -293,10 +293,6 @@ class MainFrameMenu extends Atomic.ScriptObject {
                 EditorUI.getModelOps().showAbout();
                 return true;
             }
-            if (refid == "manage license") {
-                EditorUI.getModelOps().showManageLicense();
-                return true;
-            }
             if (refid == "help forums") {
                 Atomic.fileSystem.systemOpen("http://atomicgameengine.com/forum/");
                 return true;
@@ -317,7 +313,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
             }
 
         } else {
-            console.log("Menu: " + target.id + " clicked");
+            // console.log("Menu: " + target.id + " clicked");
         }
 
     }

@@ -157,6 +157,10 @@ class Preferences {
         return this._prefs.uiData;
     }
 
+    get editorBuildData(): EditorBuildData {
+        return this._prefs.editorBuildData;
+    }
+
     static getInstance(): Preferences {
         return Preferences.instance;
     }
@@ -296,6 +300,11 @@ interface UserInterfaceData {
     fontSize : number;
 }
 
+interface EditorBuildData {
+    lastEditorBuildSHA : string;
+}
+
+
 class PreferencesFormat {
 
     constructor() {
@@ -342,6 +351,10 @@ class PreferencesFormat {
             fontSize : 12
         };
 
+        this.editorBuildData = {
+            lastEditorBuildSHA : "Unversioned Build"
+        }
+
     }
 
     /**
@@ -377,6 +390,11 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
+        if (!prefs.editorBuildData) {
+            prefs.editorBuildData = this.editorBuildData;
+            updatedMissingDefaults = true;
+        }
+
         return updatedMissingDefaults;
     }
 
@@ -385,6 +403,7 @@ class PreferencesFormat {
     playerWindow: WindowData;
     codeEditorSettings: AceEditorSettings;
     uiData : UserInterfaceData;
+    editorBuildData : EditorBuildData;
 }
 
 export = Preferences;

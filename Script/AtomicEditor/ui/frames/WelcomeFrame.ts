@@ -213,6 +213,9 @@ class WelcomeFrame extends ScriptWidget {
             }
 
             if (id == "recentList") {
+                if (!this.recentList.getSelectedItemID()) {
+                    return;
+                }
                 var path: string = this.recent[this.recentList.getSelectedItemID()];
                 this.sendEvent(EditorEvents.LoadProject, { path: path });
             }

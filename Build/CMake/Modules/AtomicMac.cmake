@@ -8,6 +8,9 @@ include(AtomicDesktop)
 # only have 32 bit mono installed, fix this
 # set (CMAKE_OSX_ARCHITECTURES i386)
 
+# for CEF3
+set(PROJECT_ARCH "x86_64")
+
 set(CMAKE_OSX_ARCHITECTURES "x86_64")
 set(CMAKE_OSX_DEPLOYMENT_TARGET  "10.9")
 

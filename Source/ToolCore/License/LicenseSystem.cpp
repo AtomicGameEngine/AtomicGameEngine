@@ -96,6 +96,10 @@ void LicenseSystem::Initialize()
         SendEvent(E_LICENSE_EULAREQUIRED);
         return;
     }
+    else
+    {
+        SendEvent(E_LICENSE_EULAACCEPTED);
+    }
 
     // TODO: Cleanup for MIT
 
