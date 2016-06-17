@@ -16,6 +16,12 @@
 
 		"UIButton" : [
 			"onClick: () => void;"
+		],
+		"UI": [
+		    "getWidgetAt<T extends UIWidget>(x: number, y: number, include_children: boolean): T;"
+		],
+		"UIWidget": [
+		    "getWidget<T extends UIWidget>(id: string): T;"
 		]
 	}
 
