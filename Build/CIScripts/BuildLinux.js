@@ -55,7 +55,6 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ LINUX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/ToolCore/ LINUX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Editor/ LINUX",
-      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNET/ LINUX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/WebView/ LINUX",
       "cmake -DATOMIC_DEV_BUILD=0 -DLINUX=1 ../../../../",
       "make"

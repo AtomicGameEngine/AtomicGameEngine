@@ -37,12 +37,6 @@
 
 #include <Atomic/IO/File.h>
 
-#ifdef ATOMIC_DOTNET
-#include <AtomicNET/NETCore/NETHost.h>
-#include <AtomicNET/NETCore/NETCore.h>
-#include <AtomicNET/NETScript/NETScript.h>
-#endif
-
 #ifdef ATOMIC_WEBVIEW
 #include <AtomicWebView/WebBrowserHost.h>
 #endif
@@ -53,7 +47,6 @@
 
 namespace Atomic
 {
-    void jsapi_init_atomicnet(JSVM* vm);
     void jsapi_init_webview(JSVM* vm, const VariantMap& engineParameters);
 }
 
@@ -92,13 +85,6 @@ void AEEditorCommon::Start()
     jsapi_init_webview(vm_, engineParameters_);
 #endif
 
-
-#ifdef ATOMIC_DOTNET
-    jsapi_init_atomicnet(vm_);
-#endif
-
-
-
 }
 
 void AEEditorCommon::Setup()
@@ -109,10 +95,6 @@ void AEEditorCommon::Setup()
 #endif
 
     RegisterEditorComponentLibrary(context_);
-
-#ifdef ATOMIC_DOTNET
-    RegisterNETScriptLibrary(context_);
-#endif
 
     // Register IPC system
     context_->RegisterSubsystem(new IPC(context_));
@@ -139,28 +121,6 @@ void AEEditorCommon::Setup()
 
 #endif
 
-#ifdef ATOMIC_DOTNET
-
-    // Instantiate and register the AtomicNET subsystem
-    SharedPtr<NETCore> netCore (new NETCore(context_));
-    context_->RegisterSubsystem(netCore);
-    String netCoreErrorMsg;
-
-    NETHost::SetCoreCLRFilesAbsPath(env->GetNETCoreCLRAbsPath());
-    NETHost::SetCoreCLRTPAPaths(env->GetNETTPAPaths());
-    NETHost::SetCoreCLRAssemblyLoadPaths(env->GetNETAssemblyLoadPaths());
-
-    if (!netCore->Initialize(netCoreErrorMsg))
-    {
-        LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
-        context_->RemoveSubsystem(NETCore::GetTypeStatic());
-    }
-    else
-    {
-
-    }
-#endif
-
     ToolSystem* system = new ToolSystem(context_);
     context_->RegisterSubsystem(system);
 
@@ -177,14 +137,6 @@ void AEEditorCommon::Stop()
     // as if not, will hold on engine subsystems, which is bad
     assert(!JSVM::GetJSVM(0));
 
-#ifdef ATOMIC_DOTNET
-    NETCore* netCore = GetSubsystem<NETCore>();
-    if (netCore)
-    {
-        netCore->Shutdown();
-        context_->RemoveSubsystem<NETCore>();
-    }
-#endif
 }
 
 bool AEEditorCommon::CreateDefaultPreferences(String& path, JSONValue& prefs)

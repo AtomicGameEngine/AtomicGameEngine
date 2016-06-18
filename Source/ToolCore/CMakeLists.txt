@@ -17,12 +17,7 @@ add_library(ToolCore ${SOURCE_FILES})
 
 target_link_libraries(ToolCore Assimp Poco libcurl)
 
-if (LINUX)
-    target_link_libraries(ToolCore NETCore NETScript)
-endif()
-
 GroupSources("Assets")
-GroupSources("AtomicNET")
 GroupSources("Build")
 GroupSources("Command")
 GroupSources("Import")

@@ -9,7 +9,7 @@ include_directories ( ${CMAKE_SOURCE_DIR}/Source/ThirdParty
 # Define source files
 file (GLOB SOURCE_FILES *.cpp *.h )
 
-set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
+# set (SOURCE_FILES ${SOURCE_FILES}) ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE}  ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (MSVC)
     set (EXE_TYPE WIN32)
@@ -39,15 +39,12 @@ if (MSVC)
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_if_different \"${D3DCOMPILER_47_DLL}\" \"$<TARGET_FILE_DIR:AtomicPlayer>/D3DCompiler_47.dll\")
 
-  target_link_libraries(AtomicPlayer NETCore NETScript)
 endif(MSVC)
 
 
 if (APPLE)
 
   if (NOT IOS)
-
-    target_link_libraries(AtomicPlayer NETCore NETScript)
 
     set (TARGET_PROPERTIES MACOSX_BUNDLE_INFO_PLIST MacOSXBundleInfo.plist.template)
 
@@ -68,13 +65,6 @@ if (APPLE)
   endif()
 
 endif(APPLE)
-
-
-if (LINUX)
-
-    target_link_libraries(AtomicPlayer NETCore NETScript)
-
-endif(LINUX)
 
 
 if (TARGET_PROPERTIES)

@@ -13,7 +13,8 @@ list(REMOVE_ITEM SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/WebView/WebProcessHelp
 file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/Editor/*.cpp)
 
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE})
-set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE} ${CSHARPATOMICNET_BINDINGS_SOURCE})
+
+#set (SOURCE_FILES ${SOURCE_FILES} ${CSHARP_BINDINGS_SOURCE} ${CSHARPATOMICPLAYER_BINDINGS_SOURCE} ${CSHARPATOMICNET_BINDINGS_SOURCE})
 
 if (APPLE)
 
@@ -167,7 +168,7 @@ endif()
 
 endif(ATOMIC_WEBVIEW)
 
-target_link_libraries(${CEF_TARGET} ToolCore AtomicWebView AtomicJS AtomicPlayerJS AtomicNETJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(${CEF_TARGET} ToolCore AtomicWebView AtomicJS AtomicPlayerJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 
 if (APPLE)
@@ -176,14 +177,14 @@ if (APPLE)
     set (MACOSX_BUNDLE_GUI_IDENTIFIER "com.thunderbeastgames.atomiceditor")
     set (MACOSX_BUNDLE_BUNDLE_NAME "AtomicEditor")
 
-    target_link_libraries(AtomicEditor NETCore NETScript libcurl)
+    target_link_libraries(AtomicEditor libcurl)
 
 elseif(LINUX)
-    target_link_libraries(AtomicEditor NETCore NETScript libcurl nativefiledialog ${GTK3_LIBRARIES})
+    target_link_libraries(AtomicEditor libcurl nativefiledialog ${GTK3_LIBRARIES})
     target_link_libraries(${CEF_TARGET} libcef_lib libcef_dll_wrapper ${CEF_STANDARD_LIBS})
 
 else()
-    target_link_libraries(AtomicEditor NETCore NETScript libcurl Iphlpapi Wldap32)
+    target_link_libraries(AtomicEditor libcurl Iphlpapi Wldap32)
 
     # pre-Windows 8 can't count on D3DCompiler_47.dll being on system
     add_custom_command (TARGET AtomicEditor POST_BUILD

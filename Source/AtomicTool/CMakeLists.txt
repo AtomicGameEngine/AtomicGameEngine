@@ -6,7 +6,7 @@ endif(MSVC)
 
 add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
-target_link_libraries(AtomicTool ToolCore NETCore NETScript Poco ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicTool ToolCore Poco ${ATOMIC_LINK_LIBRARIES})
 
 if (MSVC)
     target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
@@ -40,39 +40,3 @@ add_custom_target ( GenerateScriptBindings
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                     COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]
                     DEPENDS AtomicTool )
-
-if (ATOMIC_DOTNET_DEV)
-
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
- file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/TPA)
-endif()
-
-if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build)
- file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build)
-endif()
-
-if (MSVC)
-
-add_custom_command(TARGET AtomicTool POST_BUILD
-                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build/
-                   COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" WINDOWS
-                   COMMAND msbuild
-                   COMMENT "Compiling AtomicNET Assemblies")
-elseif(APPLE)
-
-if (NOT IOS)
-
-# if we have xbuild available
-
-if(EXISTS "/usr/local/bin/xbuild")
-
-add_custom_command(TARGET AtomicTool POST_BUILD
-                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Artifacts/AtomicNET/Build/
-                   COMMAND $<TARGET_FILE:AtomicTool> net-projectgen "\"${CMAKE_SOURCE_DIR}/Script/AtomicNET/AtomicNETProjects.json\"" MACOSX
-                   COMMAND /usr/local/bin/xbuild
-                   COMMENT "Compiling AtomicNET Assemblies")
-endif(xbuild)
-endif(NOT IOS)
-endif()
-
-endif(ATOMIC_DOTNET_DEV)

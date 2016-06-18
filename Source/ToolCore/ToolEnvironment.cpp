@@ -74,17 +74,6 @@ bool ToolEnvironment::InitFromPackage()
 
     toolDataDir_ =  resourcesDir + "ToolData/";
 
-    // AtomicNET
-    netAssemblyLoadPaths_ = GetNativePath(ToString("%sAtomicNET/Windows/Atomic/", resourcesDir.CString()));
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-    netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
-    netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
-#else
-    netCoreCLRAbsPath_ = GetNativePath(ToString("%sAtomicNET/Windows/x64/", resourcesDir.CString()));
-    netTPAPaths_ = ToString("%sAtomicNET/Windows/Atomic/TPA/", resourcesDir.CString());
-#endif
-
     return true;
 }
 
@@ -104,19 +93,6 @@ bool ToolEnvironment::InitFromJSON(bool atomicTool)
 
         SetRootSourceDir(ATOMIC_ROOT_SOURCE_DIR);
         SetRootBuildDir(ATOMIC_ROOT_BUILD_DIR, true);
-
-        netAssemblyLoadPaths_ = GetNativePath(ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR));
-        netAtomicNETEngineAssemblyPath_ = ToString("%s/Artifacts/AtomicNET/", ATOMIC_ROOT_SOURCE_DIR);
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Windows/Release/x64/", ATOMIC_ROOT_SOURCE_DIR));
-#elif ATOMIC_PLATFORM_LINUX
-        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/Linux/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
-#else
-        netCoreCLRAbsPath_ = GetNativePath(ToString("%s/Submodules/CoreCLR/MacOSX/Debug/x64/", ATOMIC_ROOT_SOURCE_DIR));
-#endif
-
-        netTPAPaths_ = ToString("%s/Artifacts/AtomicNET/TPA/", ATOMIC_ROOT_SOURCE_DIR);
 
         return true;
     }

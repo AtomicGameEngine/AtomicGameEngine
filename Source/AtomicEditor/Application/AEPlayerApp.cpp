@@ -38,12 +38,6 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
-#ifdef ATOMIC_DOTNET
-#include <AtomicNET/NETCore/NETCore.h>
-#include <AtomicNET/NETScript/NETScript.h>
-#endif
-
-
 #include "../PlayerMode/AEPlayerMode.h"
 #include <AtomicPlayer/Player.h>
 
@@ -224,12 +218,6 @@ void AEPlayerApplication::ReadCommandLineArguments()
 
                 engineParameters_["ResourcePaths"] = resourcePaths;
 
-#ifdef ATOMIC_DOTNET
-                NETCore* netCore = GetSubsystem<NETCore>();
-                String assemblyLoadPath = GetNativePath(ToString("%sResources/Assemblies/", value.CString()));
-                netCore->AddAssemblyLoadPath(assemblyLoadPath);
-#endif
-
             }
             else if (argument == "--windowposx" && value.Length())
             {
@@ -273,26 +261,11 @@ void AEPlayerApplication::Start()
 
     SubscribeToEvent(E_JSERROR, HANDLER(AEPlayerApplication, HandleJSError));
 
-#ifdef ATOMIC_DOTNET
-        if (debugPlayer_)
-        {
-           GetSubsystem<NETCore>()->WaitForDebuggerConnect();
-        }
-#endif
-
     vm_->SetModuleSearchPaths("Modules");
 
     // Instantiate and register the Player subsystem
     context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
     AtomicPlayer::jsapi_init_atomicplayer(vm_);
-
-#ifdef ATOMIC_DOTNET
-    // Initialize Scripting Subsystem
-    NETScript* netScript = new NETScript(context_);
-    context_->RegisterSubsystem(netScript);
-    netScript->Initialize();
-    netScript->ExecMainAssembly();
-#endif
 
     if (!playerMode->launchedByEditor())
     {

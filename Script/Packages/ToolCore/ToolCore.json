@@ -8,7 +8,7 @@
 							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter", "JavascriptImporter", "JSONImporter",
-							 "TextureImporter", "SpriterImporter", "PEXImporter", "NETAssemblyImporter",
+							 "TextureImporter", "SpriterImporter", "PEXImporter",
 							 "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
 						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS",
@@ -16,7 +16,7 @@
 	"typescript_decl" : {
 
 		"ModelImporter" : [
-			"getAnimations():Atomic.Animation[];"	
+			"getAnimations():Atomic.Animation[];"
 		],
 		"AssetDatabase" : [
 			"getFolderAssets(folder:string):ToolCore.Asset[];",
