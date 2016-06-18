@@ -37,7 +37,6 @@
         "./typings/webworkers.d.ts",
         "./typings/WindowExt.d.ts",
         "../TypeScript/Atomic.d.ts",
-        "../TypeScript/AtomicNET.d.ts",
         "../TypeScript/AtomicPlayer.d.ts",
         "../TypeScript/AtomicWork.d.ts",
         "../TypeScript/duktape.d.ts",

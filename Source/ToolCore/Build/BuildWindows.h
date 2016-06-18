@@ -49,8 +49,6 @@ protected:
 
 private:
 
-    void BuildAtomicNET();
-
 };
 
 }

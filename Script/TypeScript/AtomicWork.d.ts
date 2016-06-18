@@ -2,7 +2,6 @@
 /// <reference path="ToolCore.d.ts" />
 /// <reference path="Editor.d.ts" />
 /// <reference path="AtomicPlayer.d.ts" />
-/// <reference path="AtomicNET.d.ts" />
 
 declare module Atomic {
 
@@ -248,17 +247,6 @@ declare module Atomic {
     export function getExtension(path: string): string;
 
     export function splitPath(path: string): PathInfo;
-
-}
-
-declare module AtomicNET {
-
-    export interface CSComponentClassChangedEvent {
-
-        cscomponent: CSComponent;
-        classname: string;
-
-    }
 
 }
 

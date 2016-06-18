@@ -26,4 +26,4 @@ if (EXISTS ${CMAKE_SOURCE_DIR}/Submodules/CEF)
     set(ATOMIC_WEBVIEW TRUE)
     add_definitions( -DATOMIC_WEBVIEW )
 endif()
-include(AtomicNET)
+
