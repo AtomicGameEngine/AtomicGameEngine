@@ -675,7 +675,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
             this.nameOverride = attrInfo.resourceTypeName + " " + this.refListIndex;
 
         var importerName = ToolCore.assetDatabase.getResourceImporterName(attrInfo.resourceTypeName);
-
+        
         if (!importerName)
             return false;
 

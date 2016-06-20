@@ -22,6 +22,9 @@ namespace('build', function() {
     var cmds = [
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Atomic/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicPlayer/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicApp/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNETNative/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNETScript/ MACOSX",
       "cmake -DATOMIC_DEV_BUILD=0 -G Xcode ../../../../",
       "xcodebuild -target AtomicPlayer -configuration Release -parallelizeTargets -jobs 4"
     ];
@@ -56,6 +59,9 @@ namespace('build', function() {
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/ToolCore/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/Editor/ MACOSX",
       atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/WebView/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicApp/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNETNative/ MACOSX",
+      atomicTool + " bind " + bcommon.atomicRoot + " Script/Packages/AtomicNETScript/ MACOSX",      
       "cmake -DATOMIC_DEV_BUILD=0 -G Xcode ../../../../",
       "xcodebuild -target AtomicEditor -configuration Release -parallelizeTargets -jobs 4",
       "cd " + editorBuildDir + "Source/AtomicEditor/Release && zip -r -X " + buildDir + "Bin/AtomicEditor.zip ./AtomicEditor.app"

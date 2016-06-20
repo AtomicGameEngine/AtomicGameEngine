@@ -22,8 +22,12 @@
 
 #pragma once
 
+#include <Atomic/Core/Variant.h>
+
 namespace Atomic
 {
+
+class Context;
 
 /// JSON value type.
 enum JSONValueType

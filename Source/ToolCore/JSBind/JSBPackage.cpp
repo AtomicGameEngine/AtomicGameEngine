@@ -37,7 +37,9 @@ Vector<SharedPtr<JSBPackage> > JSBPackage::allPackages_;
 
 JSBPackage::JSBPackage(Context* context) : Object(context)
 {
-
+    // by default we bind for both JavaScript and C#
+    bindingTypes_.Push(JAVASCRIPT);
+    bindingTypes_.Push(CSHARP);
 }
 
 JSBPackage::~JSBPackage()
@@ -272,6 +274,28 @@ bool JSBPackage::Load(const String& packageFolder)
 
         modules_.Push(module);
 
+    }
+
+    // bindings to generate
+    JSONValue bindings = root.Get("bindings");
+
+    if (bindings.IsArray())
+    {
+        bindingTypes_.Clear();
+
+        for (unsigned i = 0; i < bindings.GetArray().Size(); i++)
+        {
+            String binding = bindings.GetArray()[i].GetString();
+
+            if (binding.ToUpper() == "CSHARP")
+            {
+                bindingTypes_.Push(CSHARP);
+            }
+            else if (binding.ToUpper() == "JAVASCRIPT")
+            {
+                bindingTypes_.Push(JAVASCRIPT);
+            }
+        }
     }
 
     allPackages_.Push(SharedPtr<JSBPackage>(this));

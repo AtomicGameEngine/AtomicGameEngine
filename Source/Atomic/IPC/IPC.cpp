@@ -91,18 +91,85 @@ bool IPC::InitWorker(unsigned id, IPCHandle fd1, IPCHandle fd2)
 #ifndef ATOMIC_PLATFORM_WINDOWS
     // close server fd
     close(fd1);
-	worker_ = new IPCWorker(context_, fd2, id);
+    worker_ = new IPCWorker(context_, fd2, id);
 #else
-	worker_ = new IPCWorker(context_, fd1, fd2, id);
+    worker_ = new IPCWorker(context_, fd1, fd2, id);
 #endif
 
-
-
-	worker_->Run();
+    worker_->Run();
 
     SendEventToBroker(E_IPCWORKERSTART);
 
     return true;
+}
+
+bool IPC::ProcessArguments(const Vector<String>& arguments, int& id, IPCHandle& fd0, IPCHandle& fd1)
+{
+    id = -1;
+    fd0 = INVALID_IPCHANDLE_VALUE;
+    fd1 = INVALID_IPCHANDLE_VALUE;
+
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+    {
+        if (arguments[i].Length() > 1)
+        {
+            String argument = arguments[i].ToLower();
+
+            if (argument.StartsWith("--ipc-id="))
+            {
+                Vector<String> idc = argument.Split(argument.CString(), '=');
+                if (idc.Size() == 2)
+
+                    id = ToInt(idc[1].CString());
+            }
+
+            else if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
+            {
+                LOGINFOF("Starting IPCWorker %s", argument.CString());
+
+                Vector<String> ipc = argument.Split(argument.CString(), '=');
+
+                if (ipc.Size() == 2)
+                {
+                    if (argument.StartsWith("--ipc-server="))
+                    {
+#ifdef ATOMIC_PLATFORM_WINDOWS
+                        // clientRead
+                        WString wipc(ipc[1]);
+                        HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
+                        fd0 = pipe;
+#else
+                        int fd = ToInt(ipc[1].CString());
+                        fd0 = fd;
+#endif
+                    }
+                    else
+                    {
+#ifdef ATOMIC_PLATFORM_WINDOWS
+                        // clientWrite
+                        WString wipc(ipc[1]);
+                        HANDLE pipe = reinterpret_cast<HANDLE>(_wtoi64(wipc.CString()));
+                        fd1 = pipe;
+#else
+                        int fd = ToInt(ipc[1].CString());
+                        fd1 = fd;
+#endif
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    if (id > 0 && fd0 != INVALID_IPCHANDLE_VALUE && fd1 != INVALID_IPCHANDLE_VALUE)
+    {
+        return true;
+    }
+
+    return false;
+
 }
 
 IPCBroker* IPC::SpawnWorker(const String& command, const Vector<String>& args, const String& initialDirectory)

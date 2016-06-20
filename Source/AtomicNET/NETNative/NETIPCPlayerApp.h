@@ -1,5 +1,6 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,47 +23,35 @@
 
 #pragma once
 
-#include <Atomic/Engine/Application.h>
-#include <Atomic/Resource/JSONFile.h>
-
-using namespace Atomic;
+#include <AtomicApp/Player/IPCPlayerApp.h>
 
 namespace Atomic
 {
-    class JSVM;
-}
 
-namespace AtomicEditor
-{
+    class NETIPCPlayerApp : public IPCPlayerApp
+    {
+        OBJECT(NETIPCPlayerApp)
 
-class AEEditorCommon : public Application
-{
-    OBJECT(AEEditorCommon);
+    public:
 
-public:
-    /// Construct.
-    AEEditorCommon(Context* context);
+        static NETIPCPlayerApp* CreateInternal();
 
-    /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual void Setup();
-    /// Setup after engine initialization. Load the script and execute its start function.
-    virtual void Start();
-    /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual void Stop();
+        int Initialize();
 
-protected:
+        bool RunFrame();
 
-    bool CreateDefaultPreferences(String& path, JSONValue& prefs);
-    bool ReadPreferences();
-    void ValidateWindow();
+        void Shutdown();
 
-    SharedPtr<JSVM> vm_;
+    private:
 
-private:
-    void GetDefaultWindowPreferences(JSONValue& windowPrefs, bool maximized);
-    String GetPreferencesPath();
-    bool LoadPreferences(JSONValue& prefs);
-    bool SavePreferences(JSONValue& prefs);
-};
+        /// Construct.
+        NETIPCPlayerApp(Context* context);
+
+        /// Setup before engine initialization.
+        virtual void Setup();
+        /// Cleanup after the main loop.
+        virtual void Stop();
+
+    };
 
 }

@@ -29,6 +29,7 @@ import MaterialInspector = require("./MaterialInspector");
 import ModelInspector = require("./ModelInspector");
 import PrefabInspector = require("./PrefabInspector");
 import TextureInspector = require("./TextureInspector");
+import AssemblyInspector = require("./AssemblyInspector");
 
 import SelectionInspector = require("./SelectionInspector");
 // make sure these are hooked in
@@ -218,6 +219,14 @@ class InspectorFrame extends ScriptWidget {
             container.addChild(textureInspector);
 
             textureInspector.inspect(texture, asset);
+        }
+
+        if (asset.importerTypeName == "NETAssemblyImporter") {
+
+          var assemblyInspector = new AssemblyInspector();
+          container.addChild(assemblyInspector);
+          assemblyInspector.inspect(asset);
+
         }
 
     }

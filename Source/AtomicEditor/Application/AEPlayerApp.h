@@ -22,50 +22,34 @@
 
 #pragma once
 
-#include "AEEditorCommon.h"
+#include <AtomicApp/Player/IPCPlayerApp.h>
 
 using namespace Atomic;
 
 namespace AtomicEditor
 {
+    class AEPlayerApplication : public IPCPlayerApp
+    {
+        OBJECT(AEPlayerApplication)
 
-class AEPlayerApplication : public AEEditorCommon
-{
-    OBJECT(AEPlayerApplication);
+    public:
+        /// Construct.
+        AEPlayerApplication(Context* context);
+        virtual ~AEPlayerApplication();
 
-public:
-    /// Construct.
-    AEPlayerApplication(Context* context);
+        /// Setup before engine initialization. 
+        virtual void Setup();
+        /// Setup after engine initialization. L
+        virtual void Start();
+        /// Cleanup after the main loop. 
+        virtual void Stop();
 
-    /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual void Setup();
-    /// Setup after engine initialization. Load the script and execute its start function.
-    virtual void Start();
-    /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual void Stop();
+        virtual void ProcessArguments();
 
-private:
-    /// Handle reload start of the script file.
-    void HandleScriptReloadStarted(StringHash eventType, VariantMap& eventData);
-    /// Handle reload success of the script file.
-    void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
-    /// Handle reload failure of the script file.
-    void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
+    protected:
 
-    void HandleJSError(StringHash eventType, VariantMap& eventData);
+    private:
 
-    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
-
-    void HandleQuit(StringHash eventType, VariantMap& eventData);
-
-    void ReadEngineConfig();
-
-    void ReadCommandLineArguments();
-
-    bool debugPlayer_;
-
-    bool launchedByEditor_;
-
-};
+    };
 
 }

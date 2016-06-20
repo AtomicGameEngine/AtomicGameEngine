@@ -59,7 +59,7 @@ Scene* Player::LoadScene(const String& filename, Camera *camera)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(filename);
 
-    if (!file->IsOpen())
+    if (!file || !file->IsOpen())
     {
         return 0;
     }

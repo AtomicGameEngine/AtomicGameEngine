@@ -168,7 +168,7 @@ endif()
 
 endif(ATOMIC_WEBVIEW)
 
-target_link_libraries(${CEF_TARGET} ToolCore AtomicWebView AtomicJS AtomicPlayerJS ToolCoreJS Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(${CEF_TARGET} ToolCore AtomicApp AtomicWebView AtomicJS AtomicPlayerJS ToolCoreJS AtomicNETScriptBindings AtomicNETScript Poco nativefiledialog ${ATOMIC_LINK_LIBRARIES})
 
 
 if (APPLE)

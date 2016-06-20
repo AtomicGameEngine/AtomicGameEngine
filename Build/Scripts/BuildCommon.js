@@ -79,6 +79,31 @@ namespace('build', function() {
         }
     }
 
+    task('genAtomicNET', {
+      async:true
+    }, function(platform, configuration) {
+
+      if (configuration != "Debug" && configuration != "Release")
+        configuration = "Release";
+
+      // Compile AtomicNET assemblies
+      var cmds = [];
+
+      if (os.platform() == "win32") {
+        cmds.push(host.atomicTool + " net genproject " + atomicRoot + "/Script/AtomicNET/AtomicNETProject.json " + platform);
+        cmds.push(host.atomicTool + " net compile " + atomicRoot + "Artifacts\\AtomicNET\\Build\\AtomicNET.sln " + configuration);
+      }
+
+      jake.exec(cmds, function() {
+
+          complete();
+
+      }, {
+          printStdout: true
+      });
+
+    })
+
     task('genscripts', {
         async: true
     }, function(platform, force) {

@@ -1,0 +1,30 @@
+// Debugging Unmanaged Code, example invocation
+
+/usr/local/share/dotnet/dotnet exec --additionalprobingpath /Users/josh/.nuget/packages /Users/josh/Dev/atomic/AtomicGameEngine/Script/AtomicNET/AtomicNETCore/bin/Debug/netcoreapp1.0/AtomicNETCore.dll
+
+// Example launch.json
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/AtomicTest/bin/Debug/netcoreapp1.0/AtomicTest.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": false,
+            "externalConsole": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": 0
+        }
+    ]
+}
+
+// Example tasks.json
