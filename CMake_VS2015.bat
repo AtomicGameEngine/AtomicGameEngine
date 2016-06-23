@@ -1,11 +1,11 @@
 @ECHO OFF
 @echo:
 @echo:
-ECHO Generating Visual Studio Solution, this process will take a few minutes
+ECHO Generating Visual Studio Solution (64 bit)
 @echo:
 @echo:
-PAUSE
-Build\Windows\node\node.exe Build\node_modules\jake\bin\cli.js -f ./Build/Scripts/Bootstrap.js build:genvs2015
+call "%VS140COMNTOOLS%..\..\VC\bin\amd64\vcvars64.bat"
+cmake -E make_directory "..\AtomicGameEngine-VS2015" && cmake -E chdir "..\AtomicGameEngine-VS2015" cmake ../AtomicGameEngine -G "Visual Studio 14 2015 Win64"
 @echo:
+ECHO Solution created in ..\AtomicGameEngine-VS2015
 @echo:
-PAUSE
