@@ -20,3 +20,5 @@ file (GLOB JAVASCRIPT_BINDINGS_SOURCE ${CMAKE_SOURCE_DIR}/Artifacts/Build/Source
 set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE})
 
 add_library(AtomicJS ${SOURCE_FILES})
+
+add_dependencies(AtomicJS AtomicTool)
