@@ -27,6 +27,10 @@ add_custom_command( TARGET AtomicTool POST_BUILD
                    COMMAND ${CMAKE_COMMAND}
                    ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\" )
 
+add_custom_command( TARGET AtomicTool POST_BUILD
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},true])
+
 if (MSVC)
 
 # Copy the D3D shader compiler
