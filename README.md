@@ -24,7 +24,7 @@ The Atomic Game Engine source code is released under the permissive **[MIT licen
 
 ####Atomic Development Fund
 
-Atomic Backers:  Please see  [BACKERS.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/BACKERS.md) for a list of contributors to the [Atomic Development Fund](http://atomicgameengine.com/funding/)
+Atomic Backers:  Please see [BACKERS.md](https://github.com/AtomicGameEngine/AtomicGameEngine/blob/master/BACKERS.md) for a list of contributors to the [Atomic Development Fund](http://atomicgameengine.com/funding/)
 
 ####Screenshots
 
