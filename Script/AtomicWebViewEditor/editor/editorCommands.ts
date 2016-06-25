@@ -34,24 +34,17 @@ export function configure(fileExt: string, filename: string) {
 
     let monacoEditor = <monaco.editor.IStandaloneCodeEditor>internalEditor.getInternalEditor();
     monacoEditor.updateOptions({
-        theme: "vs-dark",
-        mouseWheelScrollSensitivity: 2
+        theme: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "theme", "vs-dark"),
+        renderWhitespace: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "showInvisibles", false),
+        mouseWheelScrollSensitivity: 2,
+        fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "fontSize", 12)
     });
-
-    // TODO: apply settings
-    // Grab the configured editor defaults and apply them
-    // editor.setTheme(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "theme", "ace/theme/monokai"));
-    // editor.setKeyboardHandler(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "keyboardHandler", "ace/keyboard/textinput"));
-    // editor.setFontSize(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "fontSize", 12).toString() + "px");
-    // editor.setShowInvisibles(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "showInvisibles", false));
-    // editor.session.setUseSoftTabs(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "useSoftTabs", true));
-    // editor.session.setTabSize(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "tabSize", 4));
 
     // give the language extensions the opportunity to configure the editor based upon the file type
     serviceLocator.sendEvent(ClientExtensionEventNames.ConfigureEditorEvent, {
         fileExt: fileExt,
         filename: filename,
-        editor: internalEditor.getInternalEditor()
+        editor: monacoEditor
     });
 }
 
@@ -73,8 +66,13 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
 
     let monacoEditor = internalEditor.getInternalEditor();
     let model = monaco.editor.createModel(code, null, monaco.Uri.file(filename));
-    monacoEditor.setModel(model);
 
+    model.updateOptions({
+        insertSpaces: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "useSoftTabs", true),
+        tabSize: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "tabSize", 4)
+    });
+
+    monacoEditor.setModel(model);
     serviceLocator.sendEvent(ClientExtensionEventNames.CodeLoadedEvent, {
         code: code,
         filename: filename,
