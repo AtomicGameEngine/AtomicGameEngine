@@ -54,15 +54,17 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            let editor = <AceAjax.Editor>ev.editor;
-            editor.session.setMode("ace/mode/properties");
 
-            editor.setOptions({
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true,
-                useSoftTabs: false,
-                showInvisibles: true
-            });
+            let editor = <monaco.editor.IStandaloneCodeEditor>ev.editor;
+            // TODO: set the options
+            // editor.session.setMode("ace/mode/properties");
+            //
+            // editor.setOptions({
+            //     enableBasicAutocompletion: true,
+            //     enableLiveAutocompletion: true,
+            //     useSoftTabs: false,
+            //     showInvisibles: true
+            // });
         }
     }
 }

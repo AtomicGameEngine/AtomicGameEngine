@@ -101,3 +101,35 @@ export const Connect = "HELO";
 export const Disconnect = "CLOSE";
 export const Message = "MESSAGE";
 export const Alert = "ALERT";
+
+
+/* New Monaco messages */
+export interface MonacoWordCompletion extends monaco.languages.CompletionItem {
+    uri: string;
+    positionOffset: number;
+    /**
+     * Completion kind from the TypescriptLanguage Service
+     * @type {string}
+     */
+    completionKind: string;
+}
+
+export const MonacoProvideCompletionItems = "MONACO_PROVIDE_COMPLETION_ITEMS";
+export const MonacoProvideCompletionItemsResponse = "MONACO_PROVIDE_COMPLETION_ITEMS_RESPONS";
+export interface MonacoProvideCompletionItemsMessageData extends WorkerProcessMessageData {
+    uri: string;
+    source: string;
+    positionOffset: number;
+}
+
+export interface MonacoProvideCompletionItemsResponseMessageData extends WorkerProcessMessageData {
+    completions: MonacoWordCompletion[];
+}
+
+export const MonacoResolveCompletionItem = "MONACO_RESOLVE_COMPLETION_ITEM";
+export const MonacoResolveCompletionItemResponse = "MONACO_RESOLVE_COMPLETION_ITEM_RESPONSE";
+export interface MonacoResolveCompletionItemMessageData extends WorkerProcessMessageData {
+    item: MonacoWordCompletion;
+}
+
+export interface MonacoResolveCompletionItemResponseMessageData extends WorkerProcessMessageData, monaco.languages.CompletionItem { }

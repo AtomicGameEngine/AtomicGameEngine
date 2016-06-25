@@ -40,7 +40,7 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
      * @return {string}
      */
     getEditorUrl(): string {
-        return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/Editor.html`;
+        return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/MonacoEditor.html`;
     }
 
     getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {

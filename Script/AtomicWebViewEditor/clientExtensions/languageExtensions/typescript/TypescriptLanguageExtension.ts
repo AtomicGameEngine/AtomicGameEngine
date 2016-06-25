@@ -24,6 +24,7 @@
 import * as ts from "../../../modules/typescript";
 import * as WorkerProcessTypes from "./workerprocess/workerProcessTypes";
 import ClientExtensionEventNames from "../../ClientExtensionEventNames";
+import * as tsLanguageSupport from "./tsLanguageSupport";
 
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
@@ -36,7 +37,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * current filename
      * @type {string}
      */
-    private filename: string;
+    filename: string;
 
     /**
      * Is this instance of the extension active?  Only true if the current editor
@@ -85,7 +86,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {any} message
      * @return {PromiseLike}
      */
-    private workerRequest(responseChannel: string, message: any): PromiseLike<{}> {
+    workerRequest(responseChannel: string, message: any): PromiseLike<{}> {
         let worker = this.worker;
 
         return new Promise((resolve, reject) => {
@@ -114,15 +115,22 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            let editor = <AceAjax.Editor>ev.editor;
-            editor.session.setMode("ace/mode/typescript");
+            let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
+            this.editor = editor; // cache this so that we can reference it later
 
-            editor.setOptions({
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true
+            // Let's turn some things off in the editor.  These will be provided by the shared web worker
+            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                noEmit: true,
+                noResolve: true
             });
 
-            this.editor = editor; // cache this so that we can reference it later
+            monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+                noSemanticValidation: true,
+                noSyntaxValidation: true
+            });
+
+            // Register editor feature providers
+            monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
         }
     }
 
@@ -140,21 +148,19 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.filename = ev.filename;
             this.active = true;
 
-            let editor = ev.editor;
-
-            // we only want the typescript completer, otherwise we get a LOT of noise
-            editor.completers = [this.buildWordCompleter(ev.filename)];
-
             // Build our worker
             this.buildWorker();
 
+            let tsConfig = this.getTsConfig();
             // post a message to the shared web worker
             this.worker.port.postMessage({
                 command: WorkerProcessTypes.Connect,
                 sender: "Typescript Language Extension",
                 filename: ev.filename,
-                tsConfig: this.getTsConfig()
+                tsConfig: tsConfig
             });
+
+            this.editor.setModel(monaco.editor.getModel(monaco.Uri.file(ev.filename)));
         }
     }
 
@@ -198,12 +204,12 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     setAnnotations(event: WorkerProcessTypes.GetAnnotationsResponseMessageData) {
         // grab the existing annotations and filter out any TS annotations
-        let oldAnnotations = this.editor.session.getAnnotations().filter(ann => !ann.tsAnnotation);
-        this.editor.session.clearAnnotations();
+        //let oldAnnotations = this.editor.session.getAnnotations().filter(ann => !ann.tsAnnotation);
+        //this.editor.session.clearAnnotations();
 
         // Mark these annotations as special
-        event.annotations.forEach(ann => ann.tsAnnotation = true);
-        this.editor.session.setAnnotations(oldAnnotations.concat(event.annotations));
+        //event.annotations.forEach(ann => ann.tsAnnotation = true);
+        //this.editor.session.setAnnotations(oldAnnotations.concat(event.annotations));
     }
 
     /**
@@ -368,5 +374,49 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
         });
         window.atomicQueryPromise("TypeScript.DisplayCompileResults", results);
+    }
+}
+
+/**
+ * Customized completion provider that will delegate to the shared web worker for it's completions
+ */
+class CustomCompletionProvider implements monaco.languages.CompletionItemProvider {
+    constructor(extension: TypescriptLanguageExtension) {
+        this.extension = extension;
+    }
+    private extension: TypescriptLanguageExtension;
+
+    get triggerCharacters(): string[] {
+        return ["."];
+    }
+
+    provideCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
+        const message: WorkerProcessTypes.MonacoProvideCompletionItemsMessageData = {
+            command: WorkerProcessTypes.MonacoProvideCompletionItems,
+            uri: this.extension.filename,
+            source: model.getValue(),
+            positionOffset: model.getOffsetAt(position)
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoProvideCompletionItemsResponse, message)
+            .then((e: WorkerProcessTypes.MonacoProvideCompletionItemsResponseMessageData) => {
+                // Need to map the TS completion kind to the monaco completion kind
+                return e.completions.map(completion => {
+                    completion.kind = tsLanguageSupport.Kind.convertKind(completion.completionKind);
+                    return completion;
+                });
+            });
+    }
+
+    resolveCompletionItem(item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> {
+        const message: WorkerProcessTypes.MonacoResolveCompletionItemMessageData = {
+            command: WorkerProcessTypes.MonacoResolveCompletionItem,
+            item: item as WorkerProcessTypes.MonacoWordCompletion
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoResolveCompletionItem, message)
+            .then((e: WorkerProcessTypes.MonacoResolveCompletionItemResponseMessageData) => {
+                return e;
+            });
     }
 }

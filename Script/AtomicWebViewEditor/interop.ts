@@ -219,4 +219,12 @@ export default class HostInteropType {
     addCustomHostRoutine(routineName: string, callback: () => void) {
         window[routineName] = callback;
     }
+
+    /**
+     * Sets the editor instance
+     * @param  {any} editor
+     */
+    setEditor(editor: any) {
+        editorCommands.setEditor(editor);
+    }
 }

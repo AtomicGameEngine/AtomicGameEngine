@@ -22,6 +22,7 @@
         "./clientExtensions/ClientExtensionServices.ts",
         "./clientExtensions/languageExtensions/javascript/JavascriptLanguageExtension.ts",
         "./clientExtensions/languageExtensions/turbobadger/TurboBadgerLanguageExtension.ts",
+        "./clientExtensions/languageExtensions/typescript/tsLanguageSupport.ts",
         "./clientExtensions/languageExtensions/typescript/TypescriptLanguageExtension.ts",
         "./clientExtensions/languageExtensions/typescript/workerprocess/TypescriptLanguageService.ts",
         "./clientExtensions/languageExtensions/typescript/workerprocess/TypescriptLanguageServiceWebWorker.ts",
@@ -33,16 +34,19 @@
         "./interop.ts",
         "./modules/typescript.d.ts",
         "./typings/ace.d.ts",
+        "./typings/monaco.d.ts",
         "./typings/systemjs.d.ts",
         "./typings/webworkers.d.ts",
         "./typings/WindowExt.d.ts",
         "../TypeScript/Atomic.d.ts",
+        "../TypeScript/AtomicNET.d.ts",
         "../TypeScript/AtomicPlayer.d.ts",
         "../TypeScript/AtomicWork.d.ts",
         "../TypeScript/duktape.d.ts",
         "../TypeScript/Editor.d.ts",
         "../TypeScript/EditorWork.d.ts",
         "../TypeScript/ToolCore.d.ts",
-        "../TypeScript/WebView.d.ts"
+        "../TypeScript/WebView.d.ts",
+        "../TypeScript/WebViewWork.d.ts"
     ]
 }

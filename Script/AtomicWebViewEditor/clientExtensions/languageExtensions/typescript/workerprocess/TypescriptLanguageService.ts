@@ -120,7 +120,7 @@ export class TypescriptLanguageService {
         let cmdLine = ts.parseJsonConfigFileContent(tsConfig, undefined, undefined);
         this.compilerOptions = cmdLine.options;
     }
-    
+
     /**
      * Adds a file to the internal project cache
      * @param  {string} filename the full path of the file to add
