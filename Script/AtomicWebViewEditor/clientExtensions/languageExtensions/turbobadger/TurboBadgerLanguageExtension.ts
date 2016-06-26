@@ -55,16 +55,29 @@ export default class TurboBadgerLanguageExtension implements Editor.ClientExtens
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
 
+            monaco.languages.register({ id: "turbobadger" });
+            // TODO: set up syntax hilighter
+            // monaco.languages.setMonarchTokensProvider("turbobadger", this.getTokensProvider());
+
             let editor = <monaco.editor.IStandaloneCodeEditor>ev.editor;
-            // TODO: set the options
-            // editor.session.setMode("ace/mode/properties");
-            //
-            // editor.setOptions({
-            //     enableBasicAutocompletion: true,
-            //     enableLiveAutocompletion: true,
-            //     useSoftTabs: false,
-            //     showInvisibles: true
-            // });
+            monaco.editor.setModelLanguage(editor.getModel(), "turbobadger");
+            editor.updateOptions({
+                renderWhitespace: true,
+                useTabStops: true,
+            });
+        }
+    }
+
+    /**
+     * Called when code is first loaded into the editor
+     * @param  {CodeLoadedEvent} ev
+     */
+    codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
+        if (this.isValidFiletype(ev.filename)) {
+            let editor = <monaco.editor.IStandaloneCodeEditor>ev.editor;
+            editor.getModel().updateOptions({
+                insertSpaces: false
+            });
         }
     }
 }
