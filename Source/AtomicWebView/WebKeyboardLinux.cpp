@@ -123,26 +123,72 @@ static bool SDLScanCodeToWindowsScanCode(SDL_Scancode code, long int& lParam, lo
         lParam = windowsScanCode << 16;
     }
 
+    if ( code >= SDL_SCANCODE_A && code < SDL_SCANCODE_1 )
+    {
+        wParam = code + 61;
+        lParam = wParam << 16;
+        return wParam != 0 || lParam != 0;
+    }
+   
     switch (code)
     {
-    case SDL_SCANCODE_RIGHT:
-        wParam = VKEY_RIGHT;
-        break;
-    case SDL_SCANCODE_LEFT:
-        wParam = VKEY_LEFT;
-        break;
-    case SDL_SCANCODE_UP:
-        wParam = VKEY_UP;
-        break;
-    case SDL_SCANCODE_DOWN:
-        wParam = VKEY_DOWN;
-        break;
-    case SDL_SCANCODE_DELETE:
-        wParam = VKEY_DELETE;
-        break;
-    case SDL_SCANCODE_BACKSPACE:
-        wParam = VKEY_BACK;
-        break;
+    case SDL_SCANCODE_RIGHT: wParam = VKEY_RIGHT; break;
+    case SDL_SCANCODE_LEFT: wParam = VKEY_LEFT; break;
+    case SDL_SCANCODE_UP: wParam = VKEY_UP; break;
+    case SDL_SCANCODE_DOWN: wParam = VKEY_DOWN; break;
+    case SDL_SCANCODE_DELETE: wParam = VKEY_DELETE; break;
+    case SDL_SCANCODE_BACKSPACE: wParam = VKEY_BACK; break;
+    case SDL_SCANCODE_F1: wParam = VKEY_F1; break;
+    case SDL_SCANCODE_F2: wParam = VKEY_F2; break;
+    case SDL_SCANCODE_F3: wParam = VKEY_F3; break;
+    case SDL_SCANCODE_F4: wParam = VKEY_F4; break;
+    case SDL_SCANCODE_F5: wParam = VKEY_F5; break;
+    case SDL_SCANCODE_F6: wParam = VKEY_F6; break;
+    case SDL_SCANCODE_F7: wParam = VKEY_F7; break;
+    case SDL_SCANCODE_F8: wParam = VKEY_F8; break;
+    case SDL_SCANCODE_F9: wParam = VKEY_F9; break;
+    case SDL_SCANCODE_F10: wParam = VKEY_F10; break;
+    case SDL_SCANCODE_F11: wParam = VKEY_F11; break;
+    case SDL_SCANCODE_F12: wParam = VKEY_F12; break;
+    case SDL_SCANCODE_PRINTSCREEN: wParam = VKEY_SNAPSHOT; break;
+    case SDL_SCANCODE_SCROLLLOCK: wParam = VKEY_SCROLL; break;
+    case SDL_SCANCODE_PAUSE: wParam = VKEY_PAUSE; break;
+    case SDL_SCANCODE_INSERT: wParam = VKEY_INSERT; break;
+    case SDL_SCANCODE_HOME: wParam = VKEY_HOME; break;
+    case SDL_SCANCODE_PAGEUP: wParam = VKEY_PRIOR; break;
+    case SDL_SCANCODE_END: wParam = VKEY_END; break;
+    case SDL_SCANCODE_PAGEDOWN: wParam = VKEY_NEXT; break;
+    case SDL_SCANCODE_1: wParam = VKEY_1; break;
+    case SDL_SCANCODE_2: wParam = VKEY_2; break;
+    case SDL_SCANCODE_3: wParam = VKEY_3; break;
+    case SDL_SCANCODE_4: wParam = VKEY_4; break;
+    case SDL_SCANCODE_5: wParam = VKEY_5; break;
+    case SDL_SCANCODE_6: wParam = VKEY_6; break;
+    case SDL_SCANCODE_7: wParam = VKEY_7; break;
+    case SDL_SCANCODE_8: wParam = VKEY_8; break;
+    case SDL_SCANCODE_9: wParam = VKEY_9; break;
+    case SDL_SCANCODE_0: wParam = VKEY_0; break;
+    case SDL_SCANCODE_SEMICOLON: wParam = VKEY_OEM_1; break;
+    case SDL_SCANCODE_APOSTROPHE: wParam = VKEY_OEM_7; break;
+    case SDL_SCANCODE_GRAVE: wParam = VKEY_OEM_3; break;
+    case SDL_SCANCODE_KP_DIVIDE: wParam = VKEY_DIVIDE; break;
+    case SDL_SCANCODE_KP_MULTIPLY: wParam = VKEY_MULTIPLY; break;
+    case SDL_SCANCODE_KP_MINUS: wParam = VKEY_SUBTRACT; break;
+    case SDL_SCANCODE_KP_PLUS: wParam = VKEY_ADD; break;
+    case SDL_SCANCODE_KP_ENTER: wParam = VKEY_SEPARATOR; break;
+    case SDL_SCANCODE_KP_1: wParam = VKEY_NUMPAD1; break;
+    case SDL_SCANCODE_KP_2: wParam = VKEY_NUMPAD2; break;
+    case SDL_SCANCODE_KP_3: wParam = VKEY_NUMPAD3; break;
+    case SDL_SCANCODE_KP_4: wParam = VKEY_NUMPAD4; break;
+    case SDL_SCANCODE_KP_5: wParam = VKEY_NUMPAD5; break;
+    case SDL_SCANCODE_KP_6: wParam = VKEY_NUMPAD6; break;
+    case SDL_SCANCODE_KP_7: wParam = VKEY_NUMPAD7; break;
+    case SDL_SCANCODE_KP_8: wParam = VKEY_NUMPAD8; break;
+    case SDL_SCANCODE_KP_9: wParam = VKEY_NUMPAD9; break;
+    case SDL_SCANCODE_KP_0: wParam = VKEY_NUMPAD0; break;
+    case SDL_SCANCODE_KP_PERIOD: wParam = VKEY_DECIMAL; break;
+    case SDL_SCANCODE_NUMLOCKCLEAR: wParam = VKEY_NUMLOCK; break;
+    case SDL_SCANCODE_CAPSLOCK: wParam = VKEY_CAPITAL; break;
     }
 
     return wParam != 0 || lParam != 0;
