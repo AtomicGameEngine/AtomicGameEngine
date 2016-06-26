@@ -83,7 +83,7 @@ class MaterialInspector extends ScriptWidget {
 
     currentTexture: Atomic.UITextureWidget = null;
     tunit: number;
-    textureWidget: Atomic.UITextureWidget
+    textureWidget: Atomic.UITextureWidget;
 
     constructor() {
 
