@@ -353,7 +353,7 @@ class PreferencesFormat {
 
         this.editorBuildData = {
             lastEditorBuildSHA : "Unversioned Build"
-        }
+        };
 
     }
 

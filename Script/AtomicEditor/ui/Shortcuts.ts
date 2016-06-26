@@ -209,7 +209,7 @@ class Shortcuts extends Atomic.ScriptObject {
                     EditorUI.getModelOps().showBuildSettings();
                 } else {
                     EditorUI.getModelOps().showBuild();
-                }            
+                }
             }
             else if (ev.key == Atomic.KEY_U) {
                 if (ev.qualifiers & Atomic.QUAL_SHIFT) {
@@ -217,7 +217,7 @@ class Shortcuts extends Atomic.ScriptObject {
                 } else {
                     this.invokePauseOrResumePlayer();
                 }
-            } 
+            }
 
         }
 
