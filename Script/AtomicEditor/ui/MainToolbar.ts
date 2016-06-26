@@ -63,13 +63,13 @@ class MainToolbar extends Atomic.UIWidget {
         this.subscribeToEvent(EditorEvents.PlayerStarted, (data) => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("StopButton");
-            var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
+            skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
         });
         this.subscribeToEvent(EditorEvents.PlayerStopped, (data) => {
             var skin = <Atomic.UISkinImage> this.playButton.getWidget("skin_image");
             skin.setSkinBg("PlayButton");
-            var skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
+            skin = <Atomic.UISkinImage> this.pauseButton.getWidget("skin_image");
             skin.setSkinBg("PauseButton");
         });
         this.subscribeToEvent(EditorEvents.PlayerPaused, (data) => {

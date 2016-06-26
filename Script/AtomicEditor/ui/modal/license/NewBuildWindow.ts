@@ -56,7 +56,7 @@ class NewBuildWindow extends ModalWindow {
 
             if (id == "cfi") {
 
-                Atomic.fileSystem.systemOpen("http://www.atomicgameengine.com/funding/")
+                Atomic.fileSystem.systemOpen("http://www.atomicgameengine.com/funding/");
             }
 
             if (id == "ok") {

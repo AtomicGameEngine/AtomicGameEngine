@@ -47,7 +47,7 @@ class MainFrameMenu extends Atomic.ScriptObject {
     createPluginMenuItemSource(id: string, items: any): Atomic.UIMenuItemSource {
         if (!this.pluginMenuItemSource) {
             var developerMenuItemSource = MenuItemSources.getMenuItemSource("menu developer");
-            this.pluginMenuItemSource = MenuItemSources.createSubMenuItemSource(developerMenuItemSource ,"Plugins", {});
+            this.pluginMenuItemSource = MenuItemSources.createSubMenuItemSource(developerMenuItemSource, "Plugins", {});
         }
 
         return MenuItemSources.createSubMenuItemSource(this.pluginMenuItemSource , id, items);
