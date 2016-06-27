@@ -428,12 +428,21 @@ export default class TypescriptLanguageServiceWebWorker {
         this.languageService.compile([], (filename, errors) => {
             if (errors.length > 0) {
                 results = results.concat(errors.map(diagnostic => {
-                    let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                    let row = 0;
+                    let char = 0;
+                    let filename = "";
+                    if (diagnostic.file) {
+                        let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                        row = lineChar.line;
+                        char = lineChar.character;
+                        filename = diagnostic.file.fileName;
+                    }
+
                     let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
                     return {
-                        file: diagnostic.file.fileName,
-                        row: lineChar.line,
-                        column: lineChar.character,
+                        file: filename,
+                        row: row,
+                        column: char,
                         text: message,
                         type: diagnostic.category == 1 ? "error" : "warning"
                     };

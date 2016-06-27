@@ -186,11 +186,18 @@ export class TypescriptLanguageService {
         let results = [];
 
         allDiagnostics.forEach(diagnostic => {
-            let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+            let row = 0;
+            let char = 0;
+            if (diagnostic.file) {
+                let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                row = lineChar.line;
+                char = lineChar.character;
+            }
+
             let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
             results.push({
-                row: lineChar.line,
-                column: lineChar.character,
+                row: row,
+                column: char,
                 text: message,
                 type: diagnostic.category == 1 ? "error" : "warning"
             });
@@ -355,11 +362,12 @@ export class TypescriptLanguageService {
             allDiagnostics = this.languageService.getCompilerOptionsDiagnostics()
                 .concat(this.languageService.getSyntacticDiagnostics(filename))
                 .concat(this.languageService.getSemanticDiagnostics(filename));
+        } else {
+            output.outputFiles.forEach(o => {
+                this.fs.writeFile(o.name, o.text);
+            });
         }
 
-        output.outputFiles.forEach(o => {
-            this.fs.writeFile(o.name, o.text);
-        });
         return allDiagnostics;
     }
 

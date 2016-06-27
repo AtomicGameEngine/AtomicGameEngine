@@ -2,5 +2,35 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-!function(){"use strict";var e=self.GlobalEnvironment,s=e&&e.baseUrl?e.baseUrl:"../../../";importScripts(s+"vs/loader.js"),require.config({baseUrl:s,catchError:!0});var n=function(e){require([e],function(e){var s=e.create(function(e){self.postMessage(e)},null);for(self.onmessage=function(e){return s.onmessage(e.data)};o.length>0;)self.onmessage(o.shift())})},r=!0,o=[];self.onmessage=function(e){return r?(r=!1,void n(e.data)):void o.push(e)}}();
-//# sourceMappingURL=../../../../min-maps/vs/base/worker/workerMain.js.map
+(function () {
+    'use strict';
+    var MonacoEnvironment = self.MonacoEnvironment;
+    var monacoBaseUrl = MonacoEnvironment && MonacoEnvironment.baseUrl ? MonacoEnvironment.baseUrl : '../../../';
+    importScripts(monacoBaseUrl + 'vs/loader.js');
+    require.config({
+        baseUrl: monacoBaseUrl,
+        catchError: true
+    });
+    var loadCode = function (moduleId) {
+        require([moduleId], function (ws) {
+            var messageHandler = ws.create(function (msg) {
+                self.postMessage(msg);
+            }, null);
+            self.onmessage = function (e) { return messageHandler.onmessage(e.data); };
+            while (beforeReadyMessages.length > 0) {
+                self.onmessage(beforeReadyMessages.shift());
+            }
+        });
+    };
+    var isFirstMessage = true;
+    var beforeReadyMessages = [];
+    self.onmessage = function (message) {
+        if (!isFirstMessage) {
+            beforeReadyMessages.push(message);
+            return;
+        }
+        isFirstMessage = false;
+        loadCode(message.data);
+    };
+})();
+//# sourceMappingURL=workerMain.js.map

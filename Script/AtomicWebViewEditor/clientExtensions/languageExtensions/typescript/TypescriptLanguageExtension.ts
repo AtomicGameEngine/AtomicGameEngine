@@ -50,7 +50,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
     private worker: SharedWorker.SharedWorker;
 
-    private editor;
+    private editor: monaco.editor.IStandaloneCodeEditor;
 
     /**
      * Perform a full compile on save, or just transpile the current file
@@ -75,7 +75,31 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     private isValidFiletype(path: string): boolean {
         let ext = path.split(".").pop();
-        return ext == "ts";
+        return ext == "ts" || ext == "js";
+    }
+
+    /**
+     * Returns true if this is a javascript file
+     * @param  {string} path
+     * @return {boolean}
+     */
+    private isJsFile(path: string): boolean {
+        let ext = path.split(".").pop();
+        return ext == "js";
+    }
+
+    /**
+     * Checks to see if this is a transpiled Javascript file
+     * @param  {string} path
+     * @param  {[type]} tsconfig
+     * @return {boolean}
+     */
+    private isTranspiledJsFile(path: string, tsconfig): boolean {
+        if (this.isJsFile(path)) {
+            const tsFilename = path.replace(/\.js$/, ".ts");
+            return tsconfig.files.find(f => f.endsWith(tsFilename)) != null;
+        }
+        return false;
     }
 
     /**
@@ -119,25 +143,44 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.editor = editor; // cache this so that we can reference it later
 
             // Let's turn some things off in the editor.  These will be provided by the shared web worker
-            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-                noEmit: true,
-                noResolve: true
-            });
+            if (this.isJsFile(ev.filename)) {
+                monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+                    noEmit: true,
+                    noResolve: true,
+                    allowNonTsExtensions: true,
+                    noLib: true,
+                    target: monaco.languages.typescript.ScriptTarget.ES5
+                });
 
-            monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-                noSemanticValidation: true,
-                noSyntaxValidation: true
-            });
+                monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+                    noSemanticValidation: true,
+                    noSyntaxValidation: true
+                });
 
-            // Register editor feature providers
-            monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
+                // Register editor feature providers
+                monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
+            } else {
+                monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                    noEmit: true,
+                    noResolve: true,
+                    noLib: true,
+                    target: monaco.languages.typescript.ScriptTarget.ES5
+                });
+
+                monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+                    noSemanticValidation: true,
+                    noSyntaxValidation: true
+                });
+                
+                // Register editor feature providers
+                monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
+            }
         }
     }
 
     /**
      * Called when code is first loaded into the editor
      * @param  {CodeLoadedEvent} ev
-     * @return {[type]}
      */
     codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
@@ -152,15 +195,29 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.buildWorker();
 
             let tsConfig = this.getTsConfig();
-            // post a message to the shared web worker
-            this.worker.port.postMessage({
-                command: WorkerProcessTypes.Connect,
-                sender: "Typescript Language Extension",
-                filename: ev.filename,
-                tsConfig: tsConfig
-            });
+            if (!this.isTranspiledJsFile(ev.filename, tsConfig)) {
+                // post a message to the shared web worker
+                this.worker.port.postMessage({
+                    command: WorkerProcessTypes.Connect,
+                    sender: "Typescript Language Extension",
+                    filename: ev.filename,
+                    tsConfig: tsConfig
+                });
+            } else {
+                // This is a transpiled file..make it readonly
+                const generatedHeader = [
+                    "// ********************** MACHINE GENERATED FILE *********************************",
+                    `// This file was generated from the TypeScript source file: ${ev.filename.replace(/\.js$/,".ts")}`,
+                    "// Any edits made to this file will be overwritten.",
+                    "// *******************************************************************************",
+                    "",
+                    ""
+                ].join("\n");
 
-            this.editor.setModel(monaco.editor.getModel(monaco.Uri.file(ev.filename)));
+                let model = this.editor.getModel();
+                model.setValue(generatedHeader + model.getValue());
+            }
+
         }
     }
 
@@ -228,52 +285,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         });
 
         this.worker.port.start();
-    }
-
-    /**
-     * Builds the word completer for the Ace Editor.  This will handle determining which items to display in the popup and in which order
-     * @param  {string} filename the filename of the current file
-     * @return {[type]} returns a completer
-     */
-    private buildWordCompleter(filename: string): {
-        getDocTooltip?: (selected: WorkerProcessTypes.WordCompletion) => void,
-        getCompletions: (editor, session, pos, prefix, callback) => void
-    } {
-        let extension = this;
-        let wordCompleter = {
-            getDocTooltip: function(selected: WorkerProcessTypes.WordCompletion) {
-                const message: WorkerProcessTypes.GetDocTooltipMessageData = {
-                    command: WorkerProcessTypes.GetDocTooltip,
-                    filename: extension.filename,
-                    completionItem: selected,
-                    pos: selected.pos
-                };
-
-                // Since the doc tooltip built in function of Ace doesn't support async calls to retrieve the tootip,
-                // we need to go ahead and call the worker and then force the display of the tooltip when we get
-                // a result back
-                extension.workerRequest(WorkerProcessTypes.DocTooltipResponse, message)
-                    .then((e: WorkerProcessTypes.GetDocTooltipResponseMessageData) => {
-                        extension.editor.completer.showDocTooltip(e);
-                    });
-            },
-
-            getCompletions: function(editor, session, pos, prefix, callback) {
-                const message: WorkerProcessTypes.GetCompletionsMessageData = {
-                    command: WorkerProcessTypes.GetCompletions,
-                    filename: extension.filename,
-                    pos: pos,
-                    sourceText: editor.session.getValue(),
-                    prefix: prefix
-                };
-
-                extension.workerRequest(WorkerProcessTypes.CompletionResponse, message)
-                    .then((e: WorkerProcessTypes.GetCompletionsResponseMessageData) => {
-                        callback(null, e.completions);
-                    });
-            }
-        };
-        return wordCompleter;
     }
 
     /**

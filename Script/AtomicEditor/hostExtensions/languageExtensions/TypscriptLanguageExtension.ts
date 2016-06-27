@@ -36,7 +36,9 @@ const defaultCompilerOptions = {
     declaration: false,
     inlineSourceMap: false,
     removeComments: false,
-    noLib: true
+    noLib: true,
+    allowNonTsExtensions: true,
+    allowJs: true
 };
 
 /**
@@ -63,7 +65,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     private isValidFiletype(path: string): boolean {
         const ext = Atomic.getExtension(path);
-        if (ext == ".ts") {
+        if (ext == ".ts" || ext == ".js") {
             return true;
         }
     }
@@ -74,86 +76,90 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     private buildTsConfig(): any {
         // only build out a tsconfig.atomic if we actually have typescript files in the project
-        if (this.isTypescriptProject) {
-            let projectFiles: Array<string> = [];
+        let projectFiles: Array<string> = [];
 
-            let compilerOptions = defaultCompilerOptions;
+        let compilerOptions = defaultCompilerOptions;
 
-            //scan all the files in the project for any typescript files and add them to the project
-            Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
-                projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
-            });
-
-            // First we need to load in a copy of the lib.core.d.ts that is necessary for the hosted typescript compiler
-            projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.core.d.ts");
-
-            const slashedProjectPath = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath);
-
-            const tsconfigFn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + "tsconfig.json";
-            // Let's look for a tsconfig.json file in the project root and add any additional files
-            if (Atomic.fileSystem.fileExists(tsconfigFn)) {
-                // load up the tsconfig file and parse out the files block and compare it to what we have
-                // in resources
-                const file = new Atomic.File(tsconfigFn, Atomic.FILE_READ);
-                try {
-                    const savedTsConfig = JSON.parse(file.readText());
-                    if (savedTsConfig["files"]) {
-                        savedTsConfig["files"].forEach((file: string) => {
-                            let newFile = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + file;
-                            let exists = false;
-                            if (Atomic.fileSystem.fileExists(newFile)) {
-                                exists = true;
-                                file = newFile;
-                            } else if (Atomic.fileSystem.exists(file)) {
-                                exists = true;
-                            }
-                            if (exists && projectFiles.indexOf(file) == -1) {
-                                projectFiles.push(file);
-                            }
-                        });
-                    }
-
-                    // override the default options if the tsconfig contains them
-                    if (savedTsConfig["compilerOptions"]) {
-                        compilerOptions = savedTsConfig["compilerOptions"];
-                    }
-                } finally {
-                    file.close();
-                }
-            };
-
-            // Then see if we have a copy of Atomic.d.ts in the project directory.  If we don't then we should load it up from the tool environment
-            let found = false;
-            projectFiles.forEach((file) => {
-                if (file.toLowerCase().indexOf("atomic.d.ts") != -1) {
-                    found = true;
-                }
-            });
-
-            if (!found) {
-                // Load up the Atomic.d.ts from the tool core
-                projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "Atomic.d.ts");
+        //scan all the files in the project for any typescript files and add them to the project
+        Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
+            projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
+            if (!this.isTypescriptProject) {
+                this.isTypescriptProject = true;
             }
+        });
 
-            let tsConfig = {
-                compilerOptions: compilerOptions,
-                files: projectFiles
-            };
-            return tsConfig;
-        } else {
-            return {
-                files: []
-            };
+        Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
+            let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
+
+            // only add .js files that don't match .ts files
+            if (projectFiles.indexOf(fn.replace(/\.js$/, ".ts")) == -1) {
+                projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
+            }
+        });
+        // First we need to load in a copy of the lib.core.d.ts that is necessary for the hosted typescript compiler
+        projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.core.d.ts");
+
+        const slashedProjectPath = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath);
+
+        const tsconfigFn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + "tsconfig.json";
+        // Let's look for a tsconfig.json file in the project root and add any additional files
+        if (Atomic.fileSystem.fileExists(tsconfigFn)) {
+            // load up the tsconfig file and parse out the files block and compare it to what we have
+            // in resources
+            const file = new Atomic.File(tsconfigFn, Atomic.FILE_READ);
+            try {
+                const savedTsConfig = JSON.parse(file.readText());
+                if (savedTsConfig["files"]) {
+                    savedTsConfig["files"].forEach((file: string) => {
+                        let newFile = Atomic.addTrailingSlash(ToolCore.toolSystem.project.projectPath) + file;
+                        let exists = false;
+                        if (Atomic.fileSystem.fileExists(newFile)) {
+                            exists = true;
+                            file = newFile;
+                        } else if (Atomic.fileSystem.exists(file)) {
+                            exists = true;
+                        }
+                        if (exists && projectFiles.indexOf(file) == -1) {
+                            projectFiles.push(file);
+                        }
+                    });
+                }
+
+                // override the default options if the tsconfig contains them
+                if (savedTsConfig["compilerOptions"]) {
+                    compilerOptions = savedTsConfig["compilerOptions"];
+                }
+            } finally {
+                file.close();
+            }
+        };
+
+        // Then see if we have a copy of Atomic.d.ts in the project directory.  If we don't then we should load it up from the tool environment
+        let found = false;
+        projectFiles.forEach((file) => {
+            if (file.toLowerCase().indexOf("atomic.d.ts") != -1) {
+                found = true;
+            }
+        });
+
+        if (!found) {
+            // Load up the Atomic.d.ts from the tool core
+            projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "Atomic.d.ts");
         }
+
+        let tsConfig = {
+            compilerOptions: compilerOptions,
+            files: projectFiles
+        };
+        return tsConfig;
     }
 
     /**
      * Configures the project to be a Typescript Project
      * @return {[type]}
      */
-    private configureTypescriptProject() {
+    private configureTypescriptProjectMenu() {
         if (this.isTypescriptProject) {
-            this.setTsConfigOnWebView(this.buildTsConfig());
             const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
 
             // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
@@ -183,13 +189,13 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     edit(ev: Editor.EditorEvents.EditResourceEvent) {
         if (this.isValidFiletype(ev.path)) {
-            if (!this.isTypescriptProject) {
-                this.isTypescriptProject = true;
-                this.configureTypescriptProject();
-            }
-
             // update ts config in case we have a new resource
-            this.setTsConfigOnWebView(this.buildTsConfig());
+            let tsConfig = this.buildTsConfig();
+            this.setTsConfigOnWebView(tsConfig);
+
+            if (this.isTypescriptProject) {
+                this.configureTypescriptProjectMenu();
+            }
         }
     }
 
@@ -270,15 +276,12 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      */
     projectLoaded(ev: Editor.EditorEvents.LoadProjectEvent) {
         // got a load, we need to reset the language service
-        // console.log(`${this.name}: received a project loaded event for project at ${ev.path}`);
-
         this.isTypescriptProject = false;
         //scan all the files in the project for any typescript files so we can determine if this is a typescript project
-        Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
+        if (Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).length > 0) {
             this.isTypescriptProject = true;
-        });
-
-        this.configureTypescriptProject();
+            this.configureTypescriptProjectMenu();
+        };
     }
 
 
