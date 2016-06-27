@@ -55,6 +55,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
     private isTypescriptProject = false;
     private serviceRegistry: Editor.HostExtensions.HostServiceLocator = null;
 
+    private menuCreated = false;
     /** Reference to the compileOnSaveMenuItem */
     private compileOnSaveMenuItem: Atomic.UIMenuItem;
 
@@ -159,7 +160,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
      * @return {[type]}
      */
     private configureTypescriptProjectMenu() {
-        if (this.isTypescriptProject) {
+        if (this.isTypescriptProject && !this.menuCreated) {
             const isCompileOnSave = this.serviceRegistry.projectServices.getUserPreference(this.name, "CompileOnSave", false);
 
             // Build the menu - First build up an empty menu then manually add the items so we can have reference to them
@@ -167,6 +168,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
             this.compileOnSaveMenuItem = new Atomic.UIMenuItem(`Compile on Save: ${isCompileOnSave ? "On" : "Off"}`, `${this.name}.compileonsave`);
             menu.addItem(this.compileOnSaveMenuItem);
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+            this.menuCreated = true;
         }
     }
 
@@ -292,6 +294,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         // Clean up
         this.serviceRegistry.uiServices.removePluginMenuItemSource("TypeScript");
         this.compileOnSaveMenuItem = null;
+        this.menuCreated = false;
         this.isTypescriptProject = false;
     }
 
