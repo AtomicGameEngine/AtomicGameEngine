@@ -31,6 +31,7 @@ using namespace Atomic;
 
 namespace ToolCore
 {
+class BuildBase;
 
 class AndroidProjectGenerator : public Object
 {
@@ -44,7 +45,7 @@ public:
 
     void SetBuildPath(const String& buildpath) { buildPath_ = buildpath; }
 
-    bool Generate();
+    bool Generate( BuildBase * );
 
     const String& GetErrorText() { return errorText_; }
 
@@ -52,9 +53,10 @@ private:
 
     bool GenerateAndroidManifest();
     bool GenerateStringXML();
-    bool GenerateLocalProperties();
+    bool GenerateLocalProperties(BuildBase *);
     bool GenerateProjectProperties();
     bool GenerateActivitySource();
+    bool CopyUserIcons( BuildBase *);
 
     String buildPath_;
     String errorText_;

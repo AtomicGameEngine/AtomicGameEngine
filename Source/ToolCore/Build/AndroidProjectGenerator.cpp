@@ -48,7 +48,7 @@ AndroidProjectGenerator::~AndroidProjectGenerator()
 
 }
 
-bool AndroidProjectGenerator::Generate()
+bool AndroidProjectGenerator::Generate( BuildBase *baseOps )
 {
     if (!GenerateAndroidManifest())
         return false;
@@ -56,13 +56,16 @@ bool AndroidProjectGenerator::Generate()
     if (!GenerateStringXML())
         return false;
 
-    if (!GenerateLocalProperties())
+    if (!GenerateLocalProperties(baseOps))
         return false;
 
     if (!GenerateProjectProperties())
         return false;
 
     if (!GenerateActivitySource())
+        return false;
+
+    if (!CopyUserIcons(baseOps))
         return false;
 
     return true;
@@ -78,7 +81,7 @@ bool AndroidProjectGenerator::GenerateActivitySource()
 
     if (!packageName.Length())
     {
-        errorText_ = "Invalid Package Name";
+        errorText_ = "Invalid App Package name. The general naming convention is com.company.appname";
         return false;
     }
 
@@ -93,7 +96,7 @@ bool AndroidProjectGenerator::GenerateActivitySource()
 
     if (!dirs.exists())
     {
-        errorText_ = "Unable to create ";
+        errorText_ = "Project generator unable to create dirs " + path;
         return false;
     }
 
@@ -109,15 +112,17 @@ bool AndroidProjectGenerator::GenerateActivitySource()
     File file(context_, path + "/AtomicGameEngine.java", FILE_WRITE);
 
     if (!file.IsOpen())
+    {
+        errorText_ = "Project generator unable to open file " + path + "/AtomicGameEngine.java";
         return false;
-
+    }
     file.Write(source.CString(), source.Length());
 
     return true;
 
 }
 
-bool AndroidProjectGenerator::GenerateLocalProperties()
+bool AndroidProjectGenerator::GenerateLocalProperties( BuildBase *fileOps )
 {
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
     ToolPrefs* prefs = tenv->GetToolPrefs();
@@ -125,7 +130,7 @@ bool AndroidProjectGenerator::GenerateLocalProperties()
 
     if (!sdkPath.Length())
     {
-        errorText_ = "Invalid Android SDK Path";
+        errorText_ = "Invalid Android SDK Path, select the path in Build Settings.";
         return false;
     }
 
@@ -135,10 +140,35 @@ bool AndroidProjectGenerator::GenerateLocalProperties()
     File file(context_, buildPath_ + "/local.properties", FILE_WRITE);
 
     if (!file.IsOpen())
+    {
+        errorText_ = "Project generator unable to open file " + buildPath_ + "/local.properties ";
         return false;
-
+    }
+    
     file.Write(props.CString(), props.Length());
 
+
+    if ( prefs->GetReleaseCheck() > 0 ) // if release flag is set ...
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        String Reldir = prefs->GetReleasePath();
+        if (!fileSystem->DirExists(Reldir))
+        {
+            errorText_ = "Invalid Release Path, select the path in Build Settings.";
+            return false;
+        }
+        
+        String antname = Reldir + "/ant.properties";
+        if ( !fileSystem->FileExists ( antname) ) 
+        {
+            errorText_ = "The file ant.properties not found in " + Reldir + ", unable to generate Release APK.";
+            return false;
+        }
+
+        if ( !fileOps->BuildCopyFile ( antname, buildPath_ + "/ant.properties" ))
+            return false;
+
+    }
     return true;
 
 }
@@ -153,7 +183,7 @@ bool AndroidProjectGenerator::GenerateProjectProperties()
 
     if (!apiString.Length())
     {
-        errorText_ = "Invalid Android API";
+        errorText_ = "Invalid Android API level, Press Refresh and select a valid level.";
         return false;
     }
 
@@ -164,8 +194,10 @@ bool AndroidProjectGenerator::GenerateProjectProperties()
     File file(context_, buildPath_ + "/project.properties", FILE_WRITE);
 
     if (!file.IsOpen())
+    {
+        errorText_ = "Project generator unable to open file project.properties in " + buildPath_;
         return false;
-
+    }
     file.Write(props.CString(), props.Length());
 
     return true;
@@ -183,7 +215,7 @@ bool AndroidProjectGenerator::GenerateStringXML()
 
     if (!appName.Length())
     {
-        errorText_ = "Invalid App Name";
+        errorText_ = "Invalid App Name, select the App Name in Build Settings.";
         return false;
     }
 
@@ -233,11 +265,11 @@ bool AndroidProjectGenerator::GenerateAndroidManifest()
 
     if (!package.Length())
     {
-        errorText_ = "Invalid Package Name";
+        errorText_ = "Invalid App Package name. The general naming convention is com.company.appname";
         return false;
     }
 
-    // TODO: from settings
+    // TODO: from settings -- should this be ProductName ?
     String activityName = "AtomicGameEngine";
     if (!activityName.Length())
     {
@@ -279,6 +311,55 @@ bool AndroidProjectGenerator::GenerateAndroidManifest()
 
     return true;
 
+}
+
+bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
+{
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
+    Project* project = toolSystem->GetProject();
+    AndroidBuildSettings* settings = project->GetBuildSettings()->GetAndroidBuildSettings();
+
+    String userIconPath = settings->GetIconPath();
+    if (!fileSystem->DirExists(userIconPath))               // dont do anything if there is no path defined.
+        return true;
+            
+    String userIconDir = userIconPath + "/drawable";        // 1st target dir 
+    String userIconFile = userIconDir + "/logo_large.png";  // 1st target file
+    String destDir = buildPath_ + "/res/drawable";          // where it should be in the build
+    if ( fileSystem->FileExists (userIconFile) )            // is there a file there?
+    {
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/logo_large.png" ))
+            return false;
+    }
+
+    userIconDir = userIconPath + "/drawable-ldpi"; 
+    userIconFile = userIconDir + "/icon.png"; 
+    destDir = buildPath_ + "/res/drawable-ldpi";
+    if ( fileSystem->FileExists (userIconFile) )
+    {
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png"))
+            return false;
+    } 
+
+    userIconDir = userIconPath + "/drawable-mdpi"; 
+    userIconFile = userIconDir + "/icon.png"; 
+    destDir = buildPath_ + "/res/drawable-mdpi";
+    {
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
+            return false;
+    } 
+
+    userIconDir = userIconPath + "/drawable-hdpi"; 
+    userIconFile = userIconDir + "/icon.png"; 
+    destDir = buildPath_ + "/res/drawable-hdpi";
+    if ( fileSystem->FileExists (userIconFile) )
+    {
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
+            return false;
+    }
+
+    return true;
 }
 
 }
