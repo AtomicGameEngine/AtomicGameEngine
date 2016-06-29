@@ -59,55 +59,48 @@
         };
         */
 
-        var editorPromise = new Promise((resolve, reject) => {
+        var setupEditor = new Promise((resolve, reject) => {
             require(['vs/editor/editor.main'], function() {
-                //var editor = monaco.editor.create(document.getElementById('editor'), {
-                    //language: 'typescript'
-                //});
-
                 var editor = monaco.editor.create(document.getElementById('editor'));
 
                 System.import('./source/editorCore/interop').then((module) => {
                     module.default.getInstance().setEditor(editor);
-                    resolve();
+                    resolve(module.default);
                 });
             });
         });
-
 
         // Functions exposed to the host editor.  These
         // are hooked in here so that they are available immediately from the host
         // and when called will bring in the interop as a promise and call it once
         // it has been loaded
         function HOST_loadCode(url) {
-            editorPromise.then(() => {
-                System.import('./source/editorCore/interop').then((module) => {
-                    module.default.getInstance().loadCode(url);
-                });
+            setupEditor.then((interop) => {
+                interop.getInstance().loadCode(url);
             });
         }
 
         function HOST_saveCode() {
-            System.import('./editorCore/interop').then((module) => {
-                module.default.getInstance().saveCode();
+            setupEditor.then((interop) => {
+                interop.getInstance().saveCode();
             });
         }
 
         function HOST_resourceRenamed(path, newPath) {
-            System.import('./editorCore/interop').then((module) => {
-                module.default.getInstance().resourceRenamed(path, newPath);
+            setupEditor.then((interop) => {
+                interop.getInstance().resourceRenamed(path, newPath);
             });
         }
 
         function HOST_resourceDeleted(path) {
-            System.import('./editorCore/interop').then((module) => {
-                module.default.getInstance().resourceDeleted(path);
+            setupEditor.then((interop) => {
+                interop.getInstance().resourceDeleted(path);
             });
         }
 
         function HOST_preferencesChanged() {
-            System.import('./editorCore/interop').then((module) => {
-                module.default.getInstance().preferencesChanged();
+            setupEditor.then((interop) => {
+                interop.getInstance().preferencesChanged();
             });
         }
 
