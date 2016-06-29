@@ -239,5 +239,48 @@ void FileUtils::RevealInFinder(const String& fullpath)
         fs->SystemOpen(GetPath(fullpath));
 }
 
+String FileUtils::GetReleasePath(const String& defaultPath)
+{
+    String releasePath;
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_ChooseDirectory("Please choose the folder of your ant.properties",
+        defaultPath.Length() ? defaultPath.CString() : NULL,
+        &outPath);
+
+    if (outPath && result == NFD_OKAY)
+    {
+        releasePath = outPath;
+    }
+
+    if (outPath)
+        free(outPath);
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    return GetInternalPath(releasePath);
+}
+
+String FileUtils::GetIconPath(const String& defaultPath)
+{
+    String iconPath;
+    nfdchar_t *outPath = NULL;
+
+    nfdresult_t result = NFD_ChooseDirectory("Please choose the folder of the mdpi icon",
+        defaultPath.Length() ? defaultPath.CString() : NULL,
+        &outPath);
+
+    if (outPath && result == NFD_OKAY)
+    {
+        iconPath = outPath;
+    }
+
+    if (outPath)
+        free(outPath);
+
+    GetSubsystem<Graphics>()->RaiseWindow();
+
+    return GetInternalPath(iconPath);
+}
 
 }

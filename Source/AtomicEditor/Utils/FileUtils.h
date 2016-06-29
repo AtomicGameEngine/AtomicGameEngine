@@ -46,6 +46,8 @@ public:
     String GetAndroidSDKPath(const String& defaultPath);
     String GetAntPath(const String& defaultPath);
     String GetJDKRootPath(const String& defaultPath);
+    String GetReleasePath(const String& defaultPath);
+    String GetIconPath(const String& defaultPath);
     String OpenProjectFileDialog();
     String NewProjectFileDialog();
     String GetBuildPath(const String& defaultPath);

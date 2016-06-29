@@ -10,6 +10,7 @@ TBLayout: axis: y, distribution: gravity, position: left
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: app_package, autofocus: 1
 				lp: min-width: 220
+				tooltip The naming convention is : com.companyname.appname
 	TBLayout: distribution: gravity
 		TBTextField: text: "Company Name:"
 		TBLayout: gravity: left right, distribution-position: right bottom
@@ -20,40 +21,49 @@ TBLayout: axis: y, distribution: gravity, position: left
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: product_name, autofocus: 1
 				lp: min-width: 220
+	TBLayout: axis: y, position: left, distribution: gravity
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: icon_root, autofocus: 0
+				lp: min-width: 265
+			TBButton: id: choose_icon, lp: min-width: 48, min-height:48
+				tooltip location of the drawable folders for app icons
+				TBImageWidget: id: and_icon, filename: "Resources/ToolData/Deployment/Android/res/drawable-ldpi/icon.png"
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout: axis: y, position: left, distribution: gravity
 		TBTextField: text: "Android SDK Path:", skin: DarkGrayText
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: sdk_path, autofocus: 0
 				lp: min-width: 250
-			TBButton: text: "Choose" id: choose_sdk_path
+			TBButton: text: "Choose", id: choose_sdk_path
+				tooltip location of the Android SDK folder
 	TBLayout: axis: y, position: left, distribution: gravity
 		TBTextField: text: "Android API Level:", skin: DarkGrayText
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBSelectDropdown: id: sdk_target_select
 				lp: min-width: 250
-			TBButton: text: "Refresh" id: refresh_sdk_targets
+			TBButton: text: "Refresh", id: refresh_sdk_targets
 	TBLayout: axis: y, position: left, distribution: gravity
-		TBTextField: text: "Ant Path:" id: ant_path_text, skin: DarkGrayText
+		TBTextField: text: "Ant Path:", id: ant_path_text, skin: DarkGrayText
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: ant_path, autofocus: 0
 				lp: min-width: 250
-			TBButton: text: "Choose" id: choose_ant_path
+				tooltip May be left blank if installed locally.
+			TBButton: text: "Choose", id: choose_ant_path
+				tooltip May be left blank if installed locally.
 	TBLayout: axis: y, position: left, distribution: gravity
-		TBTextField: text: "JDK Root:" id: jdk_root_text, skin: DarkGrayText
+		TBTextField: text: "JDK Root:", id: jdk_root_text, skin: DarkGrayText
 		TBLayout: gravity: left right, distribution-position: right bottom
 			TBEditField: id: jdk_root, autofocus: 0
 				lp: min-width: 250
-			TBButton: text: "Choose" id: choose_jdk_root
-	TBSeparator: gravity: left right, skin: AESeparator
-	TBLayout:
-		TBLayout: axis: y
-			TBTextField: text: "Icon:"
-			TBLayout: gravity: left right, distribution-position: right bottom
-				TBSkinImage: skin: LogoAtomic64
-					lp: min-width: 64, min-height:64
-		TBLayout: axis: y
-			TBTextField: text: "Splash Screen:"
-			TBLayout: gravity: left right, distribution-position: right bottom
-				TBSkinImage: skin: LogoAtomic64
-					lp: min-width: 64, min-height:64
+			TBButton: text: "Choose", id: choose_jdk_root
+				tooltip May be left blank if installed locally.
+	TBLayout: axis: y, position: left, distribution: gravity
+		TBLayout: gravity: left, distribution-position: right bottom
+			TBClickLabel: text: "Release Path", skin: DarkGrayText
+				TBCheckBox: id: and_auth_check, lp: min-height: 20
+		TBLayout: gravity: left right, distribution-position: right bottom
+			TBEditField: id: auth_root, autofocus: 0
+				lp: min-width: 250
+				tooltip Select Release Path for a release version APK
+			TBButton: text: "Choose", id: choose_and_auth
+				tooltip Directory containing the ant.properties
