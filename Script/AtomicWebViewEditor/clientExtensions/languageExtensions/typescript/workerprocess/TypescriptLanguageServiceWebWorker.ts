@@ -276,7 +276,8 @@ export default class TypescriptLanguageServiceWebWorker {
     handleHELO(port: MessagePort, eventData: any | {
         sender: string,
         filename: string,
-        tsConfig: any
+        tsConfig: any,
+        code: string
     }) {
         //port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.tsConfig = eventData.tsConfig;
@@ -290,7 +291,7 @@ export default class TypescriptLanguageServiceWebWorker {
         const fn = this.resolvePartialFilename(eventData.filename);
 
         this.loadProjectFiles().then(() => {
-            let diagnostics = this.languageService.compile([fn]);
+            //let diagnostics = this.languageService.compile([fn]);
             this.handleGetAnnotations(port, eventData);
         });
     }
@@ -382,9 +383,10 @@ export default class TypescriptLanguageServiceWebWorker {
 
     handleGetAnnotations(port: MessagePort, eventData: WorkerProcessTypes.GetAnnotationsMessageData) {
         let filename = this.resolvePartialFilename(eventData.filename);
+        this.languageService.updateProjectFile(filename, eventData.code);
         let message: WorkerProcessTypes.GetAnnotationsResponseMessageData = {
             command: WorkerProcessTypes.AnnotationsUpdated,
-            annotations: this.languageService.getPreEmitWarnings(filename)
+            annotations: this.languageService.getDiagnostics(filename)
         };
 
         port.postMessage(message);

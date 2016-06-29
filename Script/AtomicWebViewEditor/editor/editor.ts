@@ -33,12 +33,10 @@ editor.setOptions({
     theme: "ace/theme/monokai"
 });
 */
-export function getInternalEditor() : monaco.editor.IStandaloneCodeEditor {
+export function getInternalEditor(): monaco.editor.IStandaloneCodeEditor {
     return editor;
 }
 
-export function setInternalEditor(editorInstance: any) {
+export function setInternalEditor(editorInstance: monaco.editor.IStandaloneCodeEditor) {
     editor = editorInstance;
-
-    let monacoEditor = <monaco.editor.IStandaloneCodeEditor>editorInstance;
 }

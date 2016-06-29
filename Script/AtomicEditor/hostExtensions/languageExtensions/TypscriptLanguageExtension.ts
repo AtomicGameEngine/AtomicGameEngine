@@ -37,6 +37,19 @@ const defaultCompilerOptions = {
     inlineSourceMap: false,
     removeComments: false,
     noLib: true,
+    allowNonTsExtensions: false,
+    allowJs: false
+};
+
+const defaultCompilerOptionsJs = {
+    noEmitOnError: true,
+    noImplicitAny: false,
+    target: "es5",
+    module: "commonjs",
+    declaration: false,
+    inlineSourceMap: false,
+    removeComments: false,
+    noLib: true,
     allowNonTsExtensions: true,
     allowJs: true
 };
@@ -79,7 +92,6 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         // only build out a tsconfig.atomic if we actually have typescript files in the project
         let projectFiles: Array<string> = [];
 
-        let compilerOptions = defaultCompilerOptions;
 
         //scan all the files in the project for any typescript files and add them to the project
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.ts", Atomic.SCAN_FILES, true).forEach(filename => {
@@ -88,6 +100,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
                 this.isTypescriptProject = true;
             }
         });
+
+        let compilerOptions = defaultCompilerOptions;
+        if (!this.isTypescriptProject)  {
+            compilerOptions = defaultCompilerOptionsJs;
+        }
 
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;

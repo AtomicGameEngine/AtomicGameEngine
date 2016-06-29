@@ -126,7 +126,7 @@ export class TypescriptLanguageService {
      * @param  {string} filename the full path of the file to add
      * @param [{sring}] fileContents optional file contents.  If not provided, the filesystem object will be queried
      */
-    addProjectFile(filename: string, fileContents?: string) {
+    addProjectFile(filename: string, fileContents?: string): ts.SourceFile {
         if (this.projectFiles.indexOf(filename) == -1) {
             console.log("Added project file: " + filename);
             this.versionMap[filename] = {
@@ -134,11 +134,13 @@ export class TypescriptLanguageService {
                 snapshot: ts.ScriptSnapshot.fromString(fileContents || this.fs.getFile(filename))
             };
             this.projectFiles.push(filename);
-            this.documentRegistry.acquireDocument(
+            return this.documentRegistry.acquireDocument(
                 filename,
                 this.compilerOptions,
                 this.versionMap[filename].snapshot,
                 "0");
+        } else {
+            return null;
         }
     }
 
@@ -149,14 +151,17 @@ export class TypescriptLanguageService {
      * @return {ts.SourceFile}
      */
     updateProjectFile(filename: string, fileContents: string): ts.SourceFile {
-        this.versionMap[filename].version++;
-        this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents);
-
-        return this.documentRegistry.updateDocument(
-            filename,
-            this.compilerOptions,
-            this.versionMap[filename].snapshot,
-            this.versionMap[filename].version.toString());
+        if (this.projectFiles.indexOf(filename) == -1) {
+            return this.addProjectFile(filename, fileContents);
+        } else {
+            this.versionMap[filename].version++;
+            this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents);
+            return this.documentRegistry.updateDocument(
+                filename,
+                this.compilerOptions,
+                this.versionMap[filename].snapshot,
+                this.versionMap[filename].version.toString());
+        }
     }
 
     /**
@@ -181,25 +186,35 @@ export class TypescriptLanguageService {
         return this.projectFiles;
     }
 
+    getDiagnostics(filename: string) {
+        let allDiagnostics = this.languageService.getSyntacticDiagnostics(filename);
+        if (filename.endsWith(".ts")) {
+            allDiagnostics = allDiagnostics.concat(this.languageService.getSemanticDiagnostics(filename));
+        }
+
+        return allDiagnostics.map(diagnostic => {
+            return {
+                message: ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"),
+                type: diagnostic.category == 1 ? "error" : "warning",
+                start: diagnostic.start,
+                length: diagnostic.length,
+                code: diagnostic.code,
+                source: filename
+            };
+        });
+    }
     getPreEmitWarnings(filename: string) {
         let allDiagnostics = this.compileFile(filename);
         let results = [];
 
         allDiagnostics.forEach(diagnostic => {
-            let row = 0;
-            let char = 0;
-            if (diagnostic.file) {
-                let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-                row = lineChar.line;
-                char = lineChar.character;
-            }
-
-            let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
             results.push({
-                row: row,
-                column: char,
-                text: message,
-                type: diagnostic.category == 1 ? "error" : "warning"
+                message: ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"),
+                type: diagnostic.category == 1 ? "error" : "warning",
+                start: diagnostic.start,
+                length: diagnostic.length,
+                code: diagnostic.code,
+                source: filename
             });
         });
         return results;
@@ -277,6 +292,11 @@ export class TypescriptLanguageService {
         }
 
         files.forEach(filename => {
+            // Don't compile .js files
+            if (!filename.endsWith(".js")) {
+                return;
+            }
+
             let currentErrors = this.compileFile(filename);
             errors = errors.concat(currentErrors);
             if (progress) {

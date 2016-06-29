@@ -157,8 +157,11 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                     noSyntaxValidation: true
                 });
 
-                // Register editor feature providers
-                monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
+                if (!this.isTranspiledJsFile(ev.filename, this.getTsConfig())) {
+                    // Register editor feature providers
+                    monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
+                }
+
             } else {
                 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
                     noEmit: true,
@@ -171,7 +174,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                     noSemanticValidation: true,
                     noSyntaxValidation: true
                 });
-                
+
                 // Register editor feature providers
                 monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
             }
@@ -196,18 +199,26 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
             let tsConfig = this.getTsConfig();
             if (!this.isTranspiledJsFile(ev.filename, tsConfig)) {
+                let model = this.editor.getModel();
+                let handle: number;
+                model.onDidChangeContent(() => {
+                    clearTimeout(handle);
+                    handle = setTimeout(() => this.getAnnotations(), 500);
+                });
+
                 // post a message to the shared web worker
                 this.worker.port.postMessage({
                     command: WorkerProcessTypes.Connect,
                     sender: "Typescript Language Extension",
                     filename: ev.filename,
-                    tsConfig: tsConfig
+                    tsConfig: tsConfig,
+                    code: ev.code
                 });
             } else {
                 // This is a transpiled file..make it readonly
                 const generatedHeader = [
                     "// ********************** MACHINE GENERATED FILE *********************************",
-                    `// This file was generated from the TypeScript source file: ${ev.filename.replace(/\.js$/,".ts")}`,
+                    `// This file was generated from the TypeScript source file: ${ev.filename.replace(/\.js$/, ".ts")}`,
                     "// Any edits made to this file will be overwritten.",
                     "// *******************************************************************************",
                     "",
@@ -217,7 +228,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 let model = this.editor.getModel();
                 model.setValue(generatedHeader + model.getValue());
             }
-
         }
     }
 
@@ -256,17 +266,42 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
+     * Request the markers to display
+     */
+    getAnnotations() {
+        const message: WorkerProcessTypes.GetAnnotationsMessageData = {
+            command: WorkerProcessTypes.GetAnnotations,
+            code: this.editor.getModel().getValue(),
+            filename: this.filename,
+            fileExt: null,
+            editor: null // cannot send editor across the boundary
+        };
+
+        this.worker.port.postMessage(message);
+    }
+
+    /**
      * Set annotations based upon issues reported by the typescript language service
      * @param  {WorkerProcessTypes.GetAnnotationsResponseMessageData} event
      */
     setAnnotations(event: WorkerProcessTypes.GetAnnotationsResponseMessageData) {
-        // grab the existing annotations and filter out any TS annotations
-        //let oldAnnotations = this.editor.session.getAnnotations().filter(ann => !ann.tsAnnotation);
-        //this.editor.session.clearAnnotations();
+        let model = this.editor.getModel();
+        let markers = event.annotations
+        .filter(ann => ann.start != undefined)
+        .map(ann => {
+            return {
+                code: ann.code,
+                severity: monaco.Severity.Error,
+                message: ann.message,
+                //source?: string;
+                startLineNumber: model.getPositionAt(ann.start).lineNumber,
+                startColumn: model.getPositionAt(ann.start).column,
+                endLineNumber: model.getPositionAt(ann.start + ann.length).lineNumber,
+                endColumn: model.getPositionAt(ann.start + ann.length).column
+            };
+        });
 
-        // Mark these annotations as special
-        //event.annotations.forEach(ann => ann.tsAnnotation = true);
-        //this.editor.session.setAnnotations(oldAnnotations.concat(event.annotations));
+        monaco.editor.setModelMarkers(this.editor.getModel(), "Atomic", markers);
     }
 
     /**
@@ -293,8 +328,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     save(ev: Editor.EditorEvents.CodeSavedEvent) {
         if (this.active && this.isValidFiletype(ev.filename)) {
-            //console.log(`${this.name}: received a save resource event for ${ev.filename}`);
-
             const message: WorkerProcessTypes.SaveMessageData = {
                 command: ClientExtensionEventNames.CodeSavedEvent,
                 filename: ev.filename,
@@ -313,8 +346,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
         if (this.active && this.isValidFiletype(ev.path)) {
-            //console.log(`${this.name}: received a delete resource event for ${ev.path}`);
-
             // notify the typescript language service that the file has been deleted
             const message: WorkerProcessTypes.DeleteMessageData = {
                 command: ClientExtensionEventNames.ResourceDeletedEvent,
@@ -331,8 +362,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
         if (this.active && this.isValidFiletype(ev.path)) {
-            //console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
-
             // notify the typescript language service that the file has been renamed
             const message: WorkerProcessTypes.RenameMessageData = {
                 command: ClientExtensionEventNames.ResourceRenamedEvent,
