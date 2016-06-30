@@ -2,9 +2,9 @@
 
 PLATFORM=""
 if [ "$(uname)" = "Darwin" ]; then
-	PLATFORM="MacOS"
+    PLATFORM="MacOS"
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
-	PLATFORM="Linux"
+    PLATFORM="Linux"
 elif [ "$(expr substr $(uname -s) 1 7)" = "MSYS_NT" ]; then
     PLATFORM="MSYS"
 else
