@@ -139,6 +139,13 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
+            this.active = true;
+
+            // Hook in the routine to allow the host to perform a full compile
+            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
+
+            this.filename = ev.filename;
+
             let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
             this.editor = editor; // cache this so that we can reference it later
 
@@ -157,11 +164,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                     noSyntaxValidation: true
                 });
 
-                if (!this.isTranspiledJsFile(ev.filename, this.getTsConfig())) {
-                    // Register editor feature providers
-                    monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
-                }
-
+                // Register editor feature providers
+                monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
             } else {
                 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
                     noEmit: true,
@@ -188,12 +192,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
 
-            // Hook in the routine to allow the host to perform a full compile
-            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
-
-            this.filename = ev.filename;
-            this.active = true;
-
             // Build our worker
             this.buildWorker();
 
@@ -213,6 +211,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 tsConfig: tsConfig,
                 code: ev.code
             });
+
+            // Configure based on prefs
+            this.preferencesChanged();
         }
     }
 
@@ -293,18 +294,19 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * Build/Attach to the shared web worker
      */
     buildWorker() {
+        if (!this.worker) {
+            this.worker = new SharedWorker("./source/editorCore/clientExtensions/languageExtensions/typescript/workerprocess/workerLoader.js");
 
-        this.worker = new SharedWorker("./source/editorCore/clientExtensions/languageExtensions/typescript/workerprocess/workerLoader.js");
+            // hook up the event listener
+            this.worker.port.addEventListener("message", this.handleWorkerMessage.bind(this), false);
 
-        // hook up the event listener
-        this.worker.port.addEventListener("message", this.handleWorkerMessage.bind(this), false);
+            // Tell the SharedWorker we're closing
+            addEventListener("beforeunload", () => {
+                this.worker.port.postMessage({ command: WorkerProcessTypes.Disconnect });
+            });
 
-        // Tell the SharedWorker we're closing
-        addEventListener("beforeunload", () => {
-            this.worker.port.postMessage({ command: WorkerProcessTypes.Disconnect });
-        });
-
-        this.worker.port.start();
+            this.worker.port.start();
+        }
     }
 
     /**
@@ -388,7 +390,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.worker.port.postMessage(message);
         }
     }
-
 
     /**
      * Displays the results from a full compile
