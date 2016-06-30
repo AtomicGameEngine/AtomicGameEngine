@@ -41,6 +41,9 @@ public:
     Resource* GetResource(const String& typeName = String::EMPTY);
     Node* InstantiateNode(Node* parent, const String& name);
 
+	void SetCompressedImageSize(unsigned int compressedSize) { compressedSize_ = compressedSize; }
+	unsigned int GetCompressedImageSize() { return compressedSize_; }
+
 protected:
 
     bool Import();
@@ -50,6 +53,8 @@ protected:
     virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
     bool compressTextures_;
+
+	unsigned int compressedSize_;
 };
 
 }

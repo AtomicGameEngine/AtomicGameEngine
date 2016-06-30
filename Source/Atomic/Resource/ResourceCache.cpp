@@ -371,8 +371,33 @@ bool ResourceCache::ReloadResource(Resource* resource)
 
     bool success = false;
     SharedPtr<File> file = GetFile(resource->GetName());
-    if (file)
-        success = resource->Load(*(file.Get()));
+	
+
+	if (file) 
+	{
+#ifdef ATOMIC_PLATFORM_DESKTOP
+		String ext = GetExtension(resource->GetName());
+		if (ext == ".jpg" || ext == ".png" || ext == ".tga")
+		{
+			String ddsName = "DDS/" + resource->GetName() + ".dds";
+			file = GetFile(ddsName, false);
+			if (file != NULL)
+				success = resource->Load(*(file.Get()));
+			else
+			{
+				file = GetFile(resource->GetName());
+				success = resource->Load(*(file.Get()));
+			}
+		}
+		else
+		{
+			success = resource->Load(*(file.Get()));
+		}
+#else
+		success = resource->Load(*(file.Get()));
+#endif
+	}
+
 
     if (success)
     {

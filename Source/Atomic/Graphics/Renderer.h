@@ -206,6 +206,8 @@ public:
     void SetMobileShadowBiasAdd(float add);
     /// Force reload of shaders.
     void ReloadShaders();
+	/// Reload textures.
+	void ReloadTextures();
 
     /// Return number of backbuffer viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
@@ -369,8 +371,6 @@ private:
     void LoadPassShaders(Pass* pass);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
-    /// Reload textures.
-    void ReloadTextures();
     /// Create light volume geometries.
     void CreateGeometries();
     /// Create instancing vertex buffer.
