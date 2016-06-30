@@ -32,17 +32,7 @@
     <script>
         System.config({
             "baseURL": "./",
-            "defaultJSExtensions": true,
-            // TODO: figure out how to make this be loaded in by the extension instead of being hard-coded in the html page
-            meta: {
-                './editorCore/modules/typescript.js': {
-                    format: 'global',
-                    exports: 'ts',
-                }
-            },
-            map: {
-                vs: 'source/monaco/vs'
-            }
+            "defaultJSExtensions": true
         });
 
         // Load up the monaco editor and set it up to be able to be configured
@@ -51,13 +41,6 @@
                 'vs': 'source/monaco/vs'
             }
         });
-
-        /*window.MonacoEnvironment = {
-            getWorkerUrl: function(workerId, label) {
-                return 'source/monaco-editor-worker-loader-proxy.js';
-            }
-        };
-        */
 
         var setupEditor = new Promise((resolve, reject) => {
             require(['vs/editor/editor.main'], function() {
@@ -103,10 +86,6 @@
                 interop.getInstance().preferencesChanged();
             });
         }
-
-        // System.import('./source/editorCore/interop').then((module) => {
-        //     module.default.getInstance().editorLoaded();
-        // });
     </script>
 
 </body>
