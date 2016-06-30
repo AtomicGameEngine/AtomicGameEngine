@@ -37,19 +37,6 @@ const defaultCompilerOptions = {
     inlineSourceMap: false,
     removeComments: false,
     noLib: true,
-    allowNonTsExtensions: false,
-    allowJs: false
-};
-
-const defaultCompilerOptionsJs = {
-    noEmitOnError: true,
-    noImplicitAny: false,
-    target: "es5",
-    module: "commonjs",
-    declaration: false,
-    inlineSourceMap: false,
-    removeComments: false,
-    noLib: true,
     allowNonTsExtensions: true,
     allowJs: true
 };
@@ -102,18 +89,11 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         });
 
         let compilerOptions = defaultCompilerOptions;
-        if (!this.isTypescriptProject)  {
-            compilerOptions = defaultCompilerOptionsJs;
-        }
-
         Atomic.fileSystem.scanDir(ToolCore.toolSystem.project.resourcePath, "*.js", Atomic.SCAN_FILES, true).forEach(filename => {
             let fn = Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename;
-
-            // only add .js files that don't match .ts files
-            if (projectFiles.indexOf(fn.replace(/\.js$/, ".ts")) == -1) {
-                projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
-            }
+            projectFiles.push(Atomic.addTrailingSlash(ToolCore.toolSystem.project.resourcePath) + filename);
         });
+
         // First we need to load in a copy of the lib.core.d.ts that is necessary for the hosted typescript compiler
         projectFiles.push(Atomic.addTrailingSlash(Atomic.addTrailingSlash(ToolCore.toolEnvironment.toolDataDir) + "TypeScriptSupport") + "lib.core.d.ts");
 

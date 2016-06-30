@@ -198,36 +198,21 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.buildWorker();
 
             let tsConfig = this.getTsConfig();
-            if (!this.isTranspiledJsFile(ev.filename, tsConfig)) {
-                let model = this.editor.getModel();
-                let handle: number;
-                model.onDidChangeContent(() => {
-                    clearTimeout(handle);
-                    handle = setTimeout(() => this.getAnnotations(), 500);
-                });
+            let model = this.editor.getModel();
+            let handle: number;
+            model.onDidChangeContent(() => {
+                clearTimeout(handle);
+                handle = setTimeout(() => this.getAnnotations(), 500);
+            });
 
-                // post a message to the shared web worker
-                this.worker.port.postMessage({
-                    command: WorkerProcessTypes.Connect,
-                    sender: "Typescript Language Extension",
-                    filename: ev.filename,
-                    tsConfig: tsConfig,
-                    code: ev.code
-                });
-            } else {
-                // This is a transpiled file..make it readonly
-                const generatedHeader = [
-                    "// ********************** MACHINE GENERATED FILE *********************************",
-                    `// This file was generated from the TypeScript source file: ${ev.filename.replace(/\.js$/, ".ts")}`,
-                    "// Any edits made to this file will be overwritten.",
-                    "// *******************************************************************************",
-                    "",
-                    ""
-                ].join("\n");
-
-                let model = this.editor.getModel();
-                model.setValue(generatedHeader + model.getValue());
-            }
+            // post a message to the shared web worker
+            this.worker.port.postMessage({
+                command: WorkerProcessTypes.Connect,
+                sender: "Typescript Language Extension",
+                filename: ev.filename,
+                tsConfig: tsConfig,
+                code: ev.code
+            });
         }
     }
 
@@ -287,19 +272,19 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     setAnnotations(event: WorkerProcessTypes.GetAnnotationsResponseMessageData) {
         let model = this.editor.getModel();
         let markers = event.annotations
-        .filter(ann => ann.start != undefined)
-        .map(ann => {
-            return {
-                code: ann.code,
-                severity: monaco.Severity.Error,
-                message: ann.message,
-                //source?: string;
-                startLineNumber: model.getPositionAt(ann.start).lineNumber,
-                startColumn: model.getPositionAt(ann.start).column,
-                endLineNumber: model.getPositionAt(ann.start + ann.length).lineNumber,
-                endColumn: model.getPositionAt(ann.start + ann.length).column
-            };
-        });
+            .filter(ann => ann.start != undefined)
+            .map(ann => {
+                return {
+                    code: ann.code,
+                    severity: monaco.Severity.Error,
+                    message: ann.message,
+                    //source?: string;
+                    startLineNumber: model.getPositionAt(ann.start).lineNumber,
+                    startColumn: model.getPositionAt(ann.start).column,
+                    endLineNumber: model.getPositionAt(ann.start + ann.length).lineNumber,
+                    endColumn: model.getPositionAt(ann.start + ann.length).column
+                };
+            });
 
         monaco.editor.setModelMarkers(this.editor.getModel(), "Atomic", markers);
     }

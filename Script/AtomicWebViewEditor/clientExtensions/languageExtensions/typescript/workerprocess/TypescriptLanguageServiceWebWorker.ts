@@ -214,14 +214,10 @@ export default class TypescriptLanguageServiceWebWorker {
                     case WorkerProcessTypes.MonacoResolveCompletionItem:
                         this.monacoHandleResolveCompletionItem(port, e.data);
                         break;
-
-
-
                 }
             } catch (e) {
                 port.postMessage({ command: WorkerProcessTypes.Message, message: `Error in TypescriptLanguageServiceWebWorker: ${e}\n${e.stack}` });
             }
-
         }, false);
 
         port.start();
@@ -319,6 +315,7 @@ export default class TypescriptLanguageServiceWebWorker {
         let result = this.tsConfig.files.find(fn => fn.endsWith(partial));
         return result || partial;
     }
+
     /**
      * Get completions
      * @param  {MessagePort} port
@@ -336,7 +333,6 @@ export default class TypescriptLanguageServiceWebWorker {
             command: WorkerProcessTypes.CompletionResponse,
             completions: []
         };
-        let langService = this.languageService;
 
         if (completions) {
             message.completions = completions.entries.map((completion: ts.CompletionEntry) => {
@@ -482,7 +478,6 @@ export default class TypescriptLanguageServiceWebWorker {
         // filename may not include the entire path, so let"s find it in the tsconfig
         let filename = this.resolvePartialFilename(eventData.uri);
         let sourceFile = this.languageService.updateProjectFile(filename, eventData.source);
-
         let completions = this.languageService.getCompletions(filename, eventData.positionOffset);
 
         let message: WorkerProcessTypes.MonacoProvideCompletionItemsResponseMessageData = {
@@ -490,10 +485,7 @@ export default class TypescriptLanguageServiceWebWorker {
             completions: []
         };
 
-        let langService = this.languageService;
-
         if (completions) {
-
             message.completions = completions.entries.map((completion: ts.CompletionEntry) => {
                 let completionItem: WorkerProcessTypes.MonacoWordCompletion = {
                     label: completion.name,
@@ -505,7 +497,7 @@ export default class TypescriptLanguageServiceWebWorker {
                 };
                 return completionItem;
             });
-        }
+        };
 
         port.postMessage(message);
     }

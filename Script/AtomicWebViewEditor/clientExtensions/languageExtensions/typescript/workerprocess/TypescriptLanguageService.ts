@@ -76,12 +76,6 @@ export class TypescriptLanguageService {
 
     name: string = "TypescriptLanguageService";
 
-    /**
-     * Perform a full compile on save, or just transpile the current file
-     * @type {boolean}
-     */
-    fullCompile: boolean = true;
-
     private projectFiles: string[] = [];
     private versionMap: ts.Map<{ version: number, snapshot?: ts.IScriptSnapshot }> = {};
 
@@ -119,6 +113,28 @@ export class TypescriptLanguageService {
     setTsConfig(tsConfig: any) {
         let cmdLine = ts.parseJsonConfigFileContent(tsConfig, undefined, undefined);
         this.compilerOptions = cmdLine.options;
+
+        // Set a dummy out directory because we need to be able to handle JS files
+        // and if we don't set one, then the compiler complains that it will
+        // overwrite a source file.  During emit, we just won't emit
+        // js files
+        this.compilerOptions.outDir = "DUMMY_OUT_DIR";
+    }
+
+    /**
+     * Release a project file from the internal project cache
+     * @param  {string} filename
+     */
+    releaseProjectFile(filename: string) {
+        if (this.versionMap[filename]) {
+            const fileIndex = this.projectFiles.indexOf(filename);
+            if (fileIndex > -1) {
+                this.projectFiles.splice(fileIndex, 1);
+            }
+
+            delete this.versionMap[filename];
+            this.documentRegistry.releaseDocument(filename, this.compilerOptions);
+        }
     }
 
     /**
@@ -154,8 +170,10 @@ export class TypescriptLanguageService {
         if (this.projectFiles.indexOf(filename) == -1) {
             return this.addProjectFile(filename, fileContents);
         } else {
+            console.log("Updating file: " + filename);
             this.versionMap[filename].version++;
             this.versionMap[filename].snapshot = ts.ScriptSnapshot.fromString(fileContents);
+
             return this.documentRegistry.updateDocument(
                 filename,
                 this.compilerOptions,
@@ -178,6 +196,7 @@ export class TypescriptLanguageService {
             this.versionMap[filename].snapshot,
             this.versionMap[filename].version.toString());
     }
+
     /**
      * Returns the list of project files
      * @return {string[]}
@@ -202,22 +221,6 @@ export class TypescriptLanguageService {
                 source: filename
             };
         });
-    }
-    getPreEmitWarnings(filename: string) {
-        let allDiagnostics = this.compileFile(filename);
-        let results = [];
-
-        allDiagnostics.forEach(diagnostic => {
-            results.push({
-                message: ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"),
-                type: diagnostic.category == 1 ? "error" : "warning",
-                start: diagnostic.start,
-                length: diagnostic.length,
-                code: diagnostic.code,
-                source: filename
-            });
-        });
-        return results;
     }
 
     /**
@@ -284,6 +287,15 @@ export class TypescriptLanguageService {
             this.addProjectFile(file);
         });
 
+        // We need to run through and release any transpiled JS files
+        this.projectFiles
+            .filter(f => f.endsWith(".js"))
+            .forEach(f => {
+                if (this.projectFiles.indexOf(f.replace(/\.js$/, ".ts")) > -1) {
+                    this.releaseProjectFile(f);
+                }
+            });
+
         let errors: ts.Diagnostic[] = [];
 
         // if we have a 0 length for files, let's compile all files
@@ -292,11 +304,6 @@ export class TypescriptLanguageService {
         }
 
         files.forEach(filename => {
-            // Don't compile .js files
-            if (!filename.endsWith(".js")) {
-                return;
-            }
-
             let currentErrors = this.compileFile(filename);
             errors = errors.concat(currentErrors);
             if (progress) {
@@ -331,14 +338,18 @@ export class TypescriptLanguageService {
     renameProjectFile(filepath: string, newpath: string): void {
         let oldFile = this.versionMap[filepath];
         if (oldFile) {
-            console.log(`Rename project file from ${filepath} to ${newpath}`);
-            delete this.versionMap[filepath];
+            this.releaseProjectFile(filepath);
+
+            oldFile.version++;
+
             this.versionMap[newpath] = oldFile;
-        }
-        let idx = this.projectFiles.indexOf(filepath);
-        if (idx > -1) {
-            console.log(`Update project files array from ${filepath} to ${newpath}`);
-            this.projectFiles[idx] = newpath;
+            this.projectFiles.push(newpath);
+
+            this.documentRegistry.acquireDocument(
+                newpath,
+                this.compilerOptions,
+                oldFile.snapshot,
+                oldFile.version.toString());
         }
     }
 
@@ -375,17 +386,19 @@ export class TypescriptLanguageService {
      * @return {[ts.Diagnostic]} a list of any errors
      */
     private emitFile(filename: string): ts.Diagnostic[] {
-        let output = this.languageService.getEmitOutput(filename);
         let allDiagnostics: ts.Diagnostic[] = [];
-        if (output.emitSkipped) {
-            console.log(`${this.name}: Failure Emitting ${filename}`);
-            allDiagnostics = this.languageService.getCompilerOptionsDiagnostics()
-                .concat(this.languageService.getSyntacticDiagnostics(filename))
-                .concat(this.languageService.getSemanticDiagnostics(filename));
-        } else {
-            output.outputFiles.forEach(o => {
-                this.fs.writeFile(o.name, o.text);
-            });
+        if (filename.endsWith(".ts")) {
+            let output = this.languageService.getEmitOutput(filename);
+            if (output.emitSkipped) {
+                console.log(`${this.name}: Failure Emitting ${filename}`);
+                allDiagnostics = this.languageService.getCompilerOptionsDiagnostics()
+                    .concat(this.languageService.getSyntacticDiagnostics(filename))
+                    .concat(this.languageService.getSemanticDiagnostics(filename));
+            } else {
+                output.outputFiles.forEach(o => {
+                    this.fs.writeFile(filename.replace(/\.ts$/, ".js"), o.text);
+                });
+            }
         }
 
         return allDiagnostics;
