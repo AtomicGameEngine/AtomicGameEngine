@@ -21,15 +21,18 @@ else()
     target_link_libraries(AtomicTool libcurl)
 endif()
 
-add_custom_command( TARGET AtomicTool POST_BUILD
+add_custom_target( CopyAtomicTool
                    COMMAND ${CMAKE_COMMAND}
                    ARGS -E make_directory ${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool
                    COMMAND ${CMAKE_COMMAND}
                    ARGS -E copy_if_different $<TARGET_FILE:AtomicTool> \"${CMAKE_SOURCE_DIR}/Artifacts/Build/AtomicTool/\" )
 
-add_custom_command( TARGET AtomicTool POST_BUILD
-                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},true])
+add_custom_target( AtomicToolCheckScripts
+                   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                   COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},false])
+
+add_dependencies (CopyAtomicTool AtomicTool)
+add_dependencies (AtomicToolCheckScripts CopyAtomicTool)
 
 if (MSVC)
 
@@ -42,5 +45,5 @@ endif(MSVC)
 
 add_custom_target ( GenerateScriptBindings
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM}]
-                    DEPENDS AtomicTool )
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},true]
+                    DEPENDS CopyAtomicTool )

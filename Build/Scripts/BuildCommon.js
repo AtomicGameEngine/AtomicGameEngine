@@ -81,14 +81,14 @@ namespace('build', function() {
 
     task('genscripts', {
         async: true
-    }, function(platform, checkZero) {
+    }, function(platform, force) {
 
-        if (checkZero === undefined) {
-            checkZero = false;
+        if (force === undefined) {
+            force = true;
         }
 
         var anyZero = false;
-        if (checkZero) {
+        if (!force) {
 
             var filenames = common.getGenScriptFilenames(platform);
             for (var i in filenames) {

@@ -21,4 +21,4 @@ set (SOURCE_FILES ${JAVASCRIPT_SOURCE} ${JAVASCRIPT_BINDINGS_SOURCE})
 
 add_library(AtomicJS ${SOURCE_FILES})
 
-add_dependencies(AtomicJS AtomicTool)
+add_dependencies(AtomicJS AtomicToolCheckScripts)
