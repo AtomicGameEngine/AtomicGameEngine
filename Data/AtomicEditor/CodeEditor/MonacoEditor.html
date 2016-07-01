@@ -46,6 +46,11 @@
             require(['vs/editor/editor.main'], function() {
                 var editor = monaco.editor.create(document.getElementById('editor'));
 
+                // Make sure the editor resizes when the window resizes
+                window.onresize = ()=>{
+                    editor.layout();
+                }
+
                 System.import('./source/editorCore/interop').then((module) => {
                     module.default.getInstance().setEditor(editor);
                     resolve(module.default);
