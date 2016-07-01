@@ -40,42 +40,6 @@ export interface SetPreferencesMessageData extends WorkerProcessMessageData {
     };
 }
 
-export const GetCompletions = "COMPLETIONS";
-export const CompletionResponse = "COMPLETION_RESPONSE";
-export interface WordCompletion {
-    caption: string;
-    meta: string;
-    score: number;
-    value: string;
-    pos: number;
-    snippet?: string;
-    docHTML?: string;
-    docText?: string;
-}
-
-export interface GetCompletionsMessageData extends WorkerProcessMessageData {
-    sourceText: string;
-    filename: string;
-    pos: { row: number, column: number };
-}
-
-export interface GetCompletionsResponseMessageData extends WorkerProcessMessageData {
-    completions: Array<WordCompletion>;
-}
-
-export const GetDocTooltip = "DOC_TOOLTIP";
-export const DocTooltipResponse = "DOC_TOOLTIP_RESPONSE";
-export interface GetDocTooltipMessageData extends WorkerProcessMessageData {
-    completionItem: WordCompletion;
-    filename: string;
-    pos: number;
-}
-
-export interface GetDocTooltipResponseMessageData extends WorkerProcessMessageData {
-    docText?: string;
-    docHTML?: string;
-}
-
 export const GetAnnotations = "ANNOTATIONS";
 export const AnnotationsUpdated = "ANNOTATIONS_RESPONSE";
 export interface GetAnnotationsMessageData extends SaveMessageData { };
@@ -147,4 +111,18 @@ export interface MonacoGetQuickInfoResponseMessageData extends WorkerProcessMess
         start: number,
         length: number
     };
+}
+
+export const MonacoGetSignature = "SIGNATURE";
+export const MonacoGetSignatureResponse = "SIGNATURE_RESPONSE";
+export interface MonacoGetSignatureMessageData extends WorkerProcessMessageData {
+    source: string;
+    uri: string;
+    positionOffset: number;
+}
+
+export interface MonacoGetSignatureMessageDataResponse extends WorkerProcessMessageData {
+    selectedItemIndex?: number;
+    argumentIndex?: number;
+    signatures?;
 }

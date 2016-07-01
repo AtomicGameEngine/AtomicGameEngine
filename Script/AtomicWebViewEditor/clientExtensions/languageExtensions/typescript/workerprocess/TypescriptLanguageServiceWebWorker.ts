@@ -182,12 +182,6 @@ export default class TypescriptLanguageServiceWebWorker {
                     case WorkerProcessTypes.Disconnect:
                         this.handleCLOSE(port, e.data);
                         break;
-                    case WorkerProcessTypes.GetCompletions:
-                        this.handleGetCompletions(port, e.data);
-                        break;
-                    case WorkerProcessTypes.GetDocTooltip:
-                        this.handleGetDocTooltip(port, e.data);
-                        break;
                     case ClientExtensionEventNames.CodeSavedEvent:
                         this.handleSave(port, e.data);
                         break;
@@ -214,9 +208,11 @@ export default class TypescriptLanguageServiceWebWorker {
                     case WorkerProcessTypes.MonacoResolveCompletionItem:
                         this.monacoHandleResolveCompletionItem(port, e.data);
                         break;
-
                     case WorkerProcessTypes.MonacoGetQuickInfo:
                         this.monacoGetQuickInfo(port, e.data);
+                        break;
+                    case WorkerProcessTypes.MonacoGetSignature:
+                        this.monacoGetSignature(port, e.data);
                         break;
                 }
             } catch (e) {
@@ -321,66 +317,10 @@ export default class TypescriptLanguageServiceWebWorker {
     }
 
     /**
-     * Get completions
+     * Get any errors or warnings
      * @param  {MessagePort} port
-     * @param  {WorkerProcessCommands.GetCompletionsMessage} eventData
+     * @param  {WorkerProcessTypes.GetAnnotationsMessageData} eventData
      */
-    handleGetCompletions(port: MessagePort, eventData: WorkerProcessTypes.GetCompletionsMessageData) {
-        // filename may not include the entire path, so let"s find it in the tsconfig
-        let filename = this.resolvePartialFilename(eventData.filename);
-        let sourceFile = this.languageService.updateProjectFile(filename, eventData.sourceText);
-
-        let newpos = this.languageService.getPositionOfLineAndCharacter(sourceFile, eventData.pos.row, eventData.pos.column);
-        let completions = this.languageService.getCompletions(filename, newpos);
-
-        let message: WorkerProcessTypes.GetCompletionsResponseMessageData = {
-            command: WorkerProcessTypes.CompletionResponse,
-            completions: []
-        };
-
-        if (completions) {
-            message.completions = completions.entries.map((completion: ts.CompletionEntry) => {
-                let value = completion.name;
-                let completionItem: WorkerProcessTypes.WordCompletion = {
-                    caption: completion.name,
-                    value: value,
-                    score: 100 - parseInt(completion.sortText, 0),
-                    meta: completion.kind,
-                    pos: newpos
-                };
-
-                //completionItem.docTooltip = this.getDocTooltip(eventData.filename, newpos, completionItem);
-                return completionItem;
-            });
-        }
-
-        port.postMessage(message);
-    }
-
-    /**
-     * Get the documentation popup information for the current completion item
-     * @param  {MessagePort} port
-     * @param  {WorkerProcessCommands.GetDocTooltipMessageData} eventData
-     * @return {[type]}
-     */
-    handleGetDocTooltip(port: MessagePort, eventData: WorkerProcessTypes.GetDocTooltipMessageData) {
-        let message: WorkerProcessTypes.GetDocTooltipResponseMessageData = {
-            command: WorkerProcessTypes.DocTooltipResponse
-        };
-        let filename = this.resolvePartialFilename(eventData.filename);
-        const details = this.languageService.getCompletionEntryDetails(filename, eventData.pos, eventData.completionItem.caption);
-        if (details) {
-            let docs = details.displayParts.map(part => part.text).join("");
-            if (details.documentation) {
-                docs += "<p>" + details.documentation.map(part => part.text).join("") + "</p>";
-            }
-
-            message.docHTML = docs;
-        }
-
-        port.postMessage(message);
-    }
-
     handleGetAnnotations(port: MessagePort, eventData: WorkerProcessTypes.GetAnnotationsMessageData) {
         let filename = this.resolvePartialFilename(eventData.filename);
         this.languageService.updateProjectFile(filename, eventData.code);
@@ -535,6 +475,51 @@ export default class TypescriptLanguageServiceWebWorker {
         if (quickInfo) {
             message.contents = quickInfo.contents;
             message.textSpan = quickInfo.range;
+        }
+
+        port.postMessage(message);
+    }
+
+    monacoGetSignature(port: MessagePort, eventData: WorkerProcessTypes.MonacoGetSignatureMessageData) {
+        let filename = this.resolvePartialFilename(eventData.uri);
+        let sourceFile = this.languageService.updateProjectFile(filename, eventData.source);
+        let signatureInfo = this.languageService.getSignatureHelpItems(filename, eventData.positionOffset);
+
+        let message: WorkerProcessTypes.MonacoGetSignatureMessageDataResponse = {
+            command: WorkerProcessTypes.MonacoGetSignatureResponse,
+        };
+
+        if (signatureInfo) {
+            message.selectedItemIndex = signatureInfo.selectedItemIndex;
+            message.argumentIndex = signatureInfo.argumentIndex;
+            message.signatures = [];
+
+            signatureInfo.items.forEach(item => {
+                let signature: monaco.languages.SignatureInformation = {
+                    label: "",
+                    documentation: null,
+                    parameters: []
+                };
+
+                signature.label += ts.displayPartsToString(item.prefixDisplayParts);
+
+                item.parameters.forEach((p, i, a) => {
+                    let label = ts.displayPartsToString(p.displayParts);
+                    let parameter: monaco.languages.ParameterInformation = {
+                        label: label,
+                        documentation: ts.displayPartsToString(p.documentation)
+                    };
+
+                    signature.label += label;
+                    signature.parameters.push(parameter);
+                    if (i < a.length - 1) {
+                        signature.label += ts.displayPartsToString(item.separatorDisplayParts);
+                    }
+                });
+
+                signature.label += ts.displayPartsToString(item.suffixDisplayParts);
+                message.signatures.push(signature);
+            });
         }
 
         port.postMessage(message);

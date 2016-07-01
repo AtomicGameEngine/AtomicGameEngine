@@ -141,6 +141,8 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
         if (this.isValidFiletype(ev.filename)) {
             this.active = true;
 
+            this.overrideBuiltinServiceProviders();
+
             // Hook in the routine to allow the host to perform a full compile
             this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
 
@@ -148,7 +150,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
             let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
             this.editor = editor; // cache this so that we can reference it later
-
             // Let's turn some things off in the editor.  These will be provided by the shared web worker
             if (this.isJsFile(ev.filename)) {
                 monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
@@ -167,7 +168,11 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
                 // Register editor feature providers
                 monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
                 monaco.languages.registerHoverProvider("javascript", new CustomHoverProvider(this));
+                monaco.languages.registerSignatureHelpProvider("javascript", new CustomSignatureProvider(this));
             } else {
+                monaco.languages.register({
+                    id: "atomic-ts"
+                });
                 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
                     noEmit: true,
                     noResolve: true,
@@ -182,9 +187,41 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
                 // Register editor feature providers
                 monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
+                monaco.languages.registerSignatureHelpProvider("typescript", new CustomSignatureProvider(this));
                 monaco.languages.registerHoverProvider("typescript", new CustomHoverProvider(this));
             }
         }
+    }
+
+    /**
+     * Monkeypatch the TypeScript language provider so that our service providers get loaded
+     * and not the built-in ones.  Ours use a shared web worker so that state can be shared
+     * across tabs.
+     */
+    private overrideBuiltinServiceProviders() {
+        monaco.languages.registerSignatureHelpProvider = ((original) => {
+            return function(languageId: string, provider: monaco.languages.SignatureHelpProvider): monaco.IDisposable {
+                if (provider["isOverride"]) {
+                    return original(languageId, provider);
+                }
+            };
+        })(monaco.languages.registerSignatureHelpProvider);
+
+        monaco.languages.registerCompletionItemProvider = ((original) => {
+            return function(languageId: string, provider: monaco.languages.CompletionItemProvider): monaco.IDisposable {
+                if (provider["isOverride"]) {
+                    return original(languageId, provider);
+                }
+            };
+        })(monaco.languages.registerCompletionItemProvider);
+
+        monaco.languages.registerHoverProvider = ((original) => {
+            return function(languageId: string, provider: monaco.languages.HoverProvider): monaco.IDisposable {
+                if (provider["isOverride"]) {
+                    return original(languageId, provider);
+                }
+            };
+        })(monaco.languages.registerHoverProvider);
     }
 
     /**
@@ -405,15 +442,29 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 }
 
+
 /**
- * Customized completion provider that will delegate to the shared web worker for it's completions
+ * Class used as a base for our custom providers to let the patched loader
+ * know to allow this through.
  */
-class CustomCompletionProvider implements monaco.languages.CompletionItemProvider {
+class BuiltinServiceProviderOverride {
+
     constructor(extension: TypescriptLanguageExtension) {
         this.extension = extension;
     }
-    private extension: TypescriptLanguageExtension;
+    protected extension: TypescriptLanguageExtension;
 
+    /**
+     * Used to tell the loader that we want to load this extension.  Others will be skipped
+     * @type {Boolean}
+     */
+    public isOverride = true;
+}
+
+/**
+ * Customized completion provider that will delegate to the shared web worker for it's completions
+ */
+class CustomCompletionProvider extends BuiltinServiceProviderOverride implements monaco.languages.CompletionItemProvider {
     get triggerCharacters(): string[] {
         return ["."];
     }
@@ -432,6 +483,9 @@ class CustomCompletionProvider implements monaco.languages.CompletionItemProvide
                 return e.completions.map(completion => {
                     completion.kind = tsLanguageSupport.Kind.convertKind(completion.completionKind);
                     return completion;
+                }).filter(completion => {
+                    // Filter out built-in keywords since most of them don't apply to Atomic
+                    return completion.kind != monaco.languages.CompletionItemKind.Keyword;
                 });
             });
     }
@@ -449,12 +503,7 @@ class CustomCompletionProvider implements monaco.languages.CompletionItemProvide
     }
 }
 
-class CustomHoverProvider implements monaco.languages.HoverProvider {
-    constructor(extension: TypescriptLanguageExtension) {
-        this.extension = extension;
-    }
-    private extension: TypescriptLanguageExtension;
-
+class CustomHoverProvider extends BuiltinServiceProviderOverride implements monaco.languages.HoverProvider {
     protected _offsetToPosition(uri: monaco.Uri, offset: number): monaco.IPosition {
         let model = monaco.editor.getModel(uri);
         return model.getPositionAt(offset);
@@ -484,6 +533,35 @@ class CustomHoverProvider implements monaco.languages.HoverProvider {
                         range: this._textSpanToRange(resource, e.textSpan),
                         contents: [e.contents]
                     };
+                }
+            });
+    }
+}
+
+export class CustomSignatureProvider extends BuiltinServiceProviderOverride implements monaco.languages.SignatureHelpProvider {
+    public signatureHelpTriggerCharacters = ["(", ","];
+
+    provideSignatureHelp(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
+        let resource = model.uri;
+
+        const message: WorkerProcessTypes.MonacoGetSignatureMessageData = {
+            command: WorkerProcessTypes.MonacoGetSignature,
+            uri: this.extension.filename,
+            source: model.getValue(),
+            positionOffset: model.getOffsetAt(position)
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoGetSignatureResponse, message)
+            .then((e: WorkerProcessTypes.MonacoGetSignatureMessageDataResponse) => {
+                if (e.signatures) {
+                    console.log(e);
+                    let result: monaco.languages.SignatureHelp = {
+                        signatures: e.signatures,
+                        activeSignature: e.selectedItemIndex,
+                        activeParameter: e.argumentIndex
+                    };
+
+                    return result;
                 }
             });
     }

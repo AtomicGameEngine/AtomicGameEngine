@@ -305,6 +305,24 @@ export class TypescriptLanguageService {
     }
 
     /**
+     * Returns information about the current element in a function signature
+     * @param  {string} filename
+     * @param  {number} pos
+     */
+    getSignatureHelpItems(filename: string, pos: number) {
+        let results = this.languageService.getSignatureHelpItems(filename, pos);
+        if (results) {
+            return {
+                selectedItemIndex: results.selectedItemIndex,
+                argumentIndex: results.argumentIndex,
+                items: results.items
+            };
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Compile the provided file to javascript with full type checking etc
      * @param  {string}  a list of file names to compile
      * @param  {function} optional callback which will be called for every file compiled and will provide any errors
