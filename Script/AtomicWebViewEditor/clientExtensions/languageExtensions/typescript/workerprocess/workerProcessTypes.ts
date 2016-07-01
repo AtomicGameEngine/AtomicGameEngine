@@ -28,7 +28,7 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent {}
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent { }
 
 export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent { }
 export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent { }
@@ -57,7 +57,6 @@ export interface GetCompletionsMessageData extends WorkerProcessMessageData {
     sourceText: string;
     filename: string;
     pos: { row: number, column: number };
-    prefix: string;
 }
 
 export interface GetCompletionsResponseMessageData extends WorkerProcessMessageData {
@@ -133,3 +132,19 @@ export interface MonacoResolveCompletionItemMessageData extends WorkerProcessMes
 }
 
 export interface MonacoResolveCompletionItemResponseMessageData extends WorkerProcessMessageData, monaco.languages.CompletionItem { }
+
+export const MonacoGetQuickInfo = "QUICK_INFO";
+export const MonacoGetQuickInfoResponse = "QUICK_INFO_RESPONSE";
+export interface MonacoGetQuickInfoMessageData extends WorkerProcessMessageData {
+    source: string;
+    uri: string;
+    positionOffset: number;
+}
+
+export interface MonacoGetQuickInfoResponseMessageData extends WorkerProcessMessageData {
+    contents?: string;
+    textSpan?: {
+        start: number,
+        length: number
+    };
+}

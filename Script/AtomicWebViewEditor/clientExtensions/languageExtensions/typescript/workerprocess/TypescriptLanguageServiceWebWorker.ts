@@ -214,6 +214,10 @@ export default class TypescriptLanguageServiceWebWorker {
                     case WorkerProcessTypes.MonacoResolveCompletionItem:
                         this.monacoHandleResolveCompletionItem(port, e.data);
                         break;
+
+                    case WorkerProcessTypes.MonacoGetQuickInfo:
+                        this.monacoGetQuickInfo(port, e.data);
+                        break;
                 }
             } catch (e) {
                 port.postMessage({ command: WorkerProcessTypes.Message, message: `Error in TypescriptLanguageServiceWebWorker: ${e}\n${e.stack}` });
@@ -406,6 +410,7 @@ export default class TypescriptLanguageServiceWebWorker {
         }
     }
 
+
     /**
      * Perform a full compile of the typescript
      * @param  {MessagePort} port
@@ -415,11 +420,6 @@ export default class TypescriptLanguageServiceWebWorker {
         this.languageService.setTsConfig(eventData.tsConfig);
 
         this.fs.setCommunicationPort(port);
-
-        // update all the files
-        this.tsConfig.files.forEach(file => {
-            this.languageService.updateProjectFileVersionNumber(file);
-        });
 
         let results = [];
         let start = Date.now();
@@ -519,6 +519,22 @@ export default class TypescriptLanguageServiceWebWorker {
             message.kind = data.item.kind;
             message.detail = ts.displayPartsToString(details.displayParts);
             message.documentation = ts.displayPartsToString(details.documentation);
+        }
+
+        port.postMessage(message);
+    }
+
+    monacoGetQuickInfo(port: MessagePort, eventData: WorkerProcessTypes.MonacoGetQuickInfoMessageData) {
+        let filename = this.resolvePartialFilename(eventData.uri);
+        let quickInfo = this.languageService.getQuickInfoAtPosition(filename, eventData.positionOffset);
+
+        let message: WorkerProcessTypes.MonacoGetQuickInfoResponseMessageData = {
+            command: WorkerProcessTypes.MonacoGetQuickInfoResponse,
+        };
+
+        if (quickInfo) {
+            message.contents = quickInfo.contents;
+            message.textSpan = quickInfo.range;
         }
 
         port.postMessage(message);

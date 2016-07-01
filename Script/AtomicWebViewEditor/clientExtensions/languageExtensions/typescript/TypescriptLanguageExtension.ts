@@ -166,6 +166,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
                 // Register editor feature providers
                 monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
+                monaco.languages.registerHoverProvider("javascript", new CustomHoverProvider(this));
             } else {
                 monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
                     noEmit: true,
@@ -181,6 +182,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
                 // Register editor feature providers
                 monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
+                monaco.languages.registerHoverProvider("typescript", new CustomHoverProvider(this));
             }
         }
     }
@@ -443,6 +445,46 @@ class CustomCompletionProvider implements monaco.languages.CompletionItemProvide
         return this.extension.workerRequest(WorkerProcessTypes.MonacoResolveCompletionItem, message)
             .then((e: WorkerProcessTypes.MonacoResolveCompletionItemResponseMessageData) => {
                 return e;
+            });
+    }
+}
+
+class CustomHoverProvider implements monaco.languages.HoverProvider {
+    constructor(extension: TypescriptLanguageExtension) {
+        this.extension = extension;
+    }
+    private extension: TypescriptLanguageExtension;
+
+    protected _offsetToPosition(uri: monaco.Uri, offset: number): monaco.IPosition {
+        let model = monaco.editor.getModel(uri);
+        return model.getPositionAt(offset);
+    }
+
+    protected _textSpanToRange(uri: monaco.Uri, span: ts.TextSpan): monaco.IRange {
+        let p1 = this._offsetToPosition(uri, span.start);
+        let p2 = this._offsetToPosition(uri, span.start + span.length);
+        let {lineNumber: startLineNumber, column: startColumn} = p1;
+        let {lineNumber: endLineNumber, column: endColumn} = p2;
+        return { startLineNumber, startColumn, endLineNumber, endColumn };
+    }
+
+    provideHover(model, position) {
+        let resource = model.uri;
+        const message: WorkerProcessTypes.MonacoGetQuickInfoMessageData = {
+            command: WorkerProcessTypes.MonacoGetQuickInfo,
+            uri: this.extension.filename,
+            source: model.getValue(),
+            positionOffset: model.getOffsetAt(position)
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoGetQuickInfoResponse, message)
+            .then((e: WorkerProcessTypes.MonacoGetQuickInfoResponseMessageData) => {
+                if (e.contents) {
+                    return {
+                        range: this._textSpanToRange(resource, e.textSpan),
+                        contents: [e.contents]
+                    };
+                }
             });
     }
 }

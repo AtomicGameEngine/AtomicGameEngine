@@ -183,6 +183,19 @@ export class TypescriptLanguageService {
     }
 
     /**
+     * returns a file previously registered
+     * @param  {string} filename
+     * @return {ts.SourceFile}
+     */
+    getSourceFile(filename: string): ts.SourceFile {
+        return this.documentRegistry.acquireDocument(
+            filename,
+            this.compilerOptions,
+            this.versionMap[filename].snapshot,
+            this.versionMap[filename].version.toString());
+    }
+
+    /**
      * Updates the internal file version number
      * @param  {string} filename name of the file
      * @return {ts.SourceFile}
@@ -272,6 +285,23 @@ export class TypescriptLanguageService {
      */
     getCompletionEntryDetails(filename: string, pos: number, entryname: string): ts.CompletionEntryDetails {
         return this.languageService.getCompletionEntryDetails(filename, pos, entryname);
+    }
+
+    /**
+     * Returns hover information about a position
+     * @param  {string} filename
+     * @param  {number} pos
+     */
+    getQuickInfoAtPosition(filename: string, pos: number) {
+        let results = this.languageService.getQuickInfoAtPosition(filename, pos);
+        if (results) {
+            return {
+                contents: ts.displayPartsToString(results.displayParts),
+                range: results.textSpan
+            };
+        } else {
+            return null;
+        }
     }
 
     /**
