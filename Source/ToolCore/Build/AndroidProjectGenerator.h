@@ -55,6 +55,7 @@ private:
     bool GenerateLocalProperties();
     bool GenerateProjectProperties();
     bool GenerateActivitySource();
+    bool CopyUserIcons();
 
     String buildPath_;
     String errorText_;

@@ -19,6 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#include <Poco/File.h>
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
@@ -82,7 +83,7 @@ void BuildAndroid::RunADBStartActivity()
     Subprocess* subprocess = subs->Launch(adbCommand, args, buildPath_);
     if (!subprocess)
     {
-        FailBuild("BuildFailed::RunStartActivity");
+        FailBuild("StartActivity operation did not launch successfully.");
         return;
     }
 
@@ -114,18 +115,23 @@ void BuildAndroid::HandleRunADBInstallComplete(StringHash eventType, VariantMap&
 
 void BuildAndroid::RunADBInstall()
 {
-
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    ToolPrefs* prefs = tenv->GetToolPrefs();
     SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
     String adbCommand = platformAndroid_->GetADBCommand();
 
-    Vector<String> args = String("install -r ./bin/Atomic-debug-unaligned.apk").Split(' ');
+    Vector<String> args;
+
+    if ( prefs->GetReleaseCheck() > 0 ) // install release apk
+        args = String("install -r ./bin/Atomic-release.apk").Split(' ');
+    else
+        args = String("install -r ./bin/Atomic-debug-unaligned.apk").Split(' ');
 
     currentBuildPhase_ = ADBInstall;
     Subprocess* subprocess = subs->Launch(adbCommand, args, buildPath_);
-
     if (!subprocess)
     {
-        FailBuild("BuildFailed::RunADBInstall");
+        FailBuild("APK Device Installation operation did not launch successfully.");
         return;
     }
 
@@ -209,7 +215,7 @@ void BuildAndroid::RunADBListDevices()
 
     if (!subprocess)
     {
-        FailBuild("BuildFailed::RunADBListDevices");
+        FailBuild("Android List Device operation did not launch successfully.");
         return;
     }
 
@@ -245,10 +251,16 @@ void BuildAndroid::RunAntDebug()
 
     Poco::Process::Env env;
 
+    String buildApk = "debug";  // the default
+
+    if ( tprefs->GetReleaseCheck() > 0 ) // create release apk
+        buildApk = "release";
+
+
 #ifdef ATOMIC_PLATFORM_OSX
     String antCommand = tprefs->GetAntPath();
     Vector<String> args;
-    args.Push("debug");
+    args.Push(buildApk);
 #endif
 #ifdef ATOMIC_PLATFORM_WINDOWS
     // C:\ProgramData\Oracle\Java\javapath;
@@ -259,7 +271,7 @@ void BuildAndroid::RunAntDebug()
     // ant is a batch file on windows, so have to run with cmd /c
     args.Push("/c");
     args.Push("\"" + antPath + "\"");
-    args.Push("debug");
+    args.Push(buildApk);
 #endif
 #ifdef ATOMIC_PLATFORM_LINUX 
 
@@ -275,10 +287,10 @@ void BuildAndroid::RunAntDebug()
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if ( !fileSystem->FileExists ( antCommand) ) 
     {
-        FailBuild("BuildFailed ant program not installed");
+        FailBuild("The ant program can not be found, check the Ant Path in Build Settings.");
     }
     Vector<String> args;
-    args.Push("debug");
+    args.Push(buildApk);
 #endif
 
     currentBuildPhase_ = AntBuildDebug;
@@ -286,12 +298,12 @@ void BuildAndroid::RunAntDebug()
 
     if (!subprocess)
     {
-        FailBuild("BuildFailed::RunAntDebug");
+        FailBuild("The ant build operation did not launch successfully.");
         return;
     }
 
     VariantMap buildOutput;
-    buildOutput[BuildOutput::P_TEXT] = "<color #D4FB79>Starting Android Deployment</color>\n\n";
+    buildOutput[BuildOutput::P_TEXT] = "<color #D4FB79>Starting Android " + buildApk + " Deployment</color>\n\n";
     SendEvent(E_BUILDOUTPUT, buildOutput);
 
     SubscribeToEvent(subprocess, E_SUBPROCESSCOMPLETE, HANDLER(BuildAndroid, HandleAntDebugComplete));
@@ -328,6 +340,13 @@ void BuildAndroid::Build(const String& buildPath)
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if (fileSystem->DirExists(buildPath_))
+    {
+        Poco::File dirs(buildPath_.CString());
+        dirs.remove(true);
+    }
+
     Initialize();
 
     //generate manifest file
@@ -339,10 +358,6 @@ void BuildAndroid::Build(const String& buildPath)
         if ( i != resourceEntries_.Size() - 1)
             manifest += ";";
     }
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem->DirExists(buildPath_))
-        fileSystem->RemoveDir(buildPath_, true);
 
     String buildSourceDir = tenv->GetToolDataDir();
 
@@ -367,6 +382,13 @@ void BuildAndroid::Build(const String& buildPath)
     SharedPtr<File> mfile(new File(context_, buildPath_ + "/assets/AtomicManifest", FILE_WRITE));
     mfile->WriteString(manifest);
     mfile->Close();
+
+    //check for Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so
+    if ( !fileSystem->FileExists(androidProject + "/libs/armeabi-v7a/libAtomicPlayer.so")  )
+    {
+        FailBuild( " the file libAtomicPlayer.so is not found. This is required for APK generation." );
+        return;
+    }
 
     AndroidProjectGenerator gen(context_);
     gen.SetBuildPath(buildPath_);
