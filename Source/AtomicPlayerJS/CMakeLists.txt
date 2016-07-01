@@ -10,4 +10,4 @@ add_library(AtomicPlayerJS ${SOURCE_FILES})
 
 target_link_libraries(AtomicPlayerJS AtomicPlayerLib)
 
-add_dependencies(AtomicPlayerJS AtomicTool)
+add_dependencies(AtomicPlayerJS AtomicToolCheckScripts)

@@ -13,4 +13,4 @@ set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE} ${PLATFORM_SOURC
 
 add_library(AtomicWebView ${SOURCE_FILES})
 
-add_dependencies(AtomicWebView AtomicTool)
+add_dependencies(AtomicWebView AtomicToolCheckScripts)
