@@ -83,12 +83,13 @@ namespace('build', function() {
         async: true
     }, function(platform, force) {
 
-        if (force === undefined) {
-            force = true;
+        // default to true
+        if (force != "true" && force != "false") {
+            force = "true";
         }
 
         var anyZero = false;
-        if (!force) {
+        if (force != "true") {
 
             var filenames = common.getGenScriptFilenames(platform);
             for (var i in filenames) {
