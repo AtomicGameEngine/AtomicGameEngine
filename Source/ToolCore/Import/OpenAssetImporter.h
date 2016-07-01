@@ -60,8 +60,10 @@ public:
     void SetEndTime(float endTime) { endTime_ = endTime; }
     void SetScale(float scale) { scale_ = scale; }
     void SetExportAnimations(bool exportAnimations) { noAnimations_ = !exportAnimations; }
-
+    void SetImportMaterials(bool importMaterials) { importMaterials_ = importMaterials; }
     void SetVerboseLog(bool verboseLog) { verboseLog_ = verboseLog; }
+
+    bool GetImportMaterialsDefault() { return importMaterialsDefault_; }
 
     const Vector<AnimationInfo>& GetAnimationInfos() { return animationInfos_; }
 
@@ -106,6 +108,8 @@ private:
     String resourcePath_;
     String outPath_;
     bool useSubdirs_;
+    bool importMaterials_;
+    bool importMaterialsDefault_;
     bool localIDs_;
     bool saveBinary_;
     bool createZone_;

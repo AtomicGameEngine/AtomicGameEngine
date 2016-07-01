@@ -58,9 +58,11 @@ ModelImporter::~ModelImporter()
 void ModelImporter::SetDefaults()
 {
     AssetImporter::SetDefaults();
+    SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
 
     scale_ = 1.0;
     importAnimations_ = false;
+    importMaterials_ = importer->GetImportMaterialsDefault();
     animationInfo_.Clear();
 
 }
@@ -77,6 +79,7 @@ bool ModelImporter::ImportModel()
     importer->SetScale(scale_);
     importer->SetExportAnimations(false);
     importer->SetImportNode(importNode_);
+    importer->SetImportMaterials(importMaterials_);
 
     if (importer->Load(asset_->GetPath()))
     {
@@ -91,6 +94,13 @@ bool ModelImporter::ImportModel()
 
     return false;
 }
+
+/*void ModelImporter::SetImportMaterials(bool importMat)
+{
+    LOGDEBUGF("Importing Materials of: %s", asset_->GetPath().CString());
+    SharedPtr<OpenAssetImporter> importer(new OpenAssetImporter(context_));
+    importer->SetImportMaterials(importMat);
+}*/
 
 bool ModelImporter::ImportAnimation(const String& filename, const String& name, float startTime, float endTime)
 {
@@ -257,6 +267,7 @@ bool ModelImporter::Import()
                 ImportAnimations();
             }
 
+            SetImportMaterials(importMaterials_);
         }
     }
 
@@ -339,6 +350,15 @@ bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)
     if (import.Get("importAnimations").IsBool())
         importAnimations_ = import.Get("importAnimations").GetBool();
 
+    if (import.Get("importMaterials").IsBool())
+    {
+        importMaterials_ = import.Get("importMaterials").GetBool();
+    }
+    else
+    {
+
+    }
+
     if (import.Get("animInfo").IsArray())
     {
         JSONArray animInfo = import.Get("animInfo").GetArray();
@@ -368,6 +388,7 @@ bool ModelImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     JSONValue save;
     save.Set("scale", scale_);
     save.Set("importAnimations", importAnimations_);
+    save.Set("importMaterials", importMaterials_);
 
     JSONArray animInfo;
 

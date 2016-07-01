@@ -81,6 +81,8 @@ public:
 
     bool GetImportAnimations() { return importAnimations_; }
     void SetImportAnimations(bool importAnimations) { importAnimations_ = importAnimations; }
+    bool GetImportMaterials() { return importMaterials_; }
+    void SetImportMaterials(bool importMat) { importMaterials_ = importMat; };
 
     unsigned GetAnimationCount();
     void SetAnimationCount(unsigned count);
@@ -108,6 +110,7 @@ protected:
 
     double scale_;
     bool importAnimations_;
+    bool importMaterials_;
     Vector<SharedPtr<AnimationImportInfo>> animationInfo_;
 
     SharedPtr<Node> importNode_;
