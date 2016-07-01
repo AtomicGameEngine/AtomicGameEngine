@@ -19,7 +19,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include <Poco/File.h>
 
 #include <Atomic/Core/StringUtils.h>
 #include <Atomic/IO/FileSystem.h>
@@ -340,14 +339,10 @@ void BuildAndroid::Build(const String& buildPath)
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem->DirExists(buildPath_))
-    {
-        Poco::File dirs(buildPath_.CString());
-        dirs.remove(true);
-    }
-
     Initialize();
+ 
+    if (!BuildClean(buildPath_))
+        return;
 
     //generate manifest file
     String manifest;
@@ -364,7 +359,9 @@ void BuildAndroid::Build(const String& buildPath)
     String androidProject = buildSourceDir + "Deployment/Android";
 
     // Copy the base android project
-    fileSystem->CopyDir(androidProject, buildPath_);
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    if( !BuildCopyDir(androidProject, buildPath_))
+        return;
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
@@ -372,11 +369,14 @@ void BuildAndroid::Build(const String& buildPath)
 
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
-        fileSystem->CopyDir(defaultResourcePaths[i], buildPath_ + "/assets/" + GetFileName(RemoveTrailingSlash(defaultResourcePaths[i])));
+        if ( !BuildCopyDir(defaultResourcePaths[i], buildPath_ + "/assets/" + GetFileName(RemoveTrailingSlash(defaultResourcePaths[i]))))
+            return;
     }
 
-    fileSystem->CopyDir(project->GetProjectPath() + "Cache/", buildPath_ + "/assets/Cache");
-    fileSystem->CopyDir(projectResources, buildPath_ + "/assets/AtomicResources");
+    if( !BuildCopyDir(project->GetProjectPath() + "Cache/", buildPath_ + "/assets/Cache"))
+        return;
+    if( !BuildCopyDir(projectResources, buildPath_ + "/assets/AtomicResources"))
+        return;
 
     // write the manifest
     SharedPtr<File> mfile(new File(context_, buildPath_ + "/assets/AtomicManifest", FILE_WRITE));
@@ -393,7 +393,7 @@ void BuildAndroid::Build(const String& buildPath)
     AndroidProjectGenerator gen(context_);
     gen.SetBuildPath(buildPath_);
 
-    if (!gen.Generate())
+    if (!gen.Generate( static_cast<BuildBase*>(this)))
     {
         FailBuild(gen.GetErrorText());
         return;

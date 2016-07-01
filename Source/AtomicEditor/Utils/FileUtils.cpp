@@ -127,30 +127,6 @@ String FileUtils::GetBuildPath(const String& defaultPath)
 
 }
 
-String FileUtils::GetAndroidSDKPath(const String& defaultPath)
-{
-    String sdkPath;
-
-    nfdchar_t *outPath = NULL;
-
-    nfdresult_t result = NFD_ChooseDirectory( "Please choose the root folder of your Android SDK",
-                                defaultPath.Length() ? defaultPath.CString() : NULL,
-                                &outPath);
-
-    if (outPath && result == NFD_OKAY)
-    {
-        sdkPath = outPath;
-    }
-
-    if (outPath)
-        free(outPath);
-
-    GetSubsystem<Graphics>()->RaiseWindow();
-
-    return GetInternalPath(sdkPath);
-
-}
-
 String FileUtils::GetAntPath(const String& defaultPath)
 {
     String antPath;
@@ -178,30 +154,6 @@ String FileUtils::GetAntPath(const String& defaultPath)
     GetSubsystem<Graphics>()->RaiseWindow();
 
     return GetInternalPath(antPath);
-}
-
-String FileUtils::GetJDKRootPath(const String& defaultPath)
-{
-    String jdkPath;
-
-    nfdchar_t *outPath = NULL;
-
-    nfdresult_t result = NFD_ChooseDirectory("Please choose the root folder of your JDK",
-        defaultPath.Length() ? defaultPath.CString() : NULL,
-        &outPath);
-
-    if (outPath && result == NFD_OKAY)
-    {
-        jdkPath = outPath;
-    }
-
-    if (outPath)
-        free(outPath);
-
-    GetSubsystem<Graphics>()->RaiseWindow();
-
-    return GetInternalPath(jdkPath);
-
 }
 
 String FileUtils::GetMobileProvisionPath()
@@ -239,18 +191,18 @@ void FileUtils::RevealInFinder(const String& fullpath)
         fs->SystemOpen(GetPath(fullpath));
 }
 
-String FileUtils::GetReleasePath(const String& defaultPath)
+String FileUtils::FindPath(const String& title, const String& defaultPath)
 {
-    String releasePath;
+    String resultPath;
     nfdchar_t *outPath = NULL;
 
-    nfdresult_t result = NFD_ChooseDirectory("Please choose the folder of your ant.properties",
+    nfdresult_t result = NFD_ChooseDirectory(title.CString(),
         defaultPath.Length() ? defaultPath.CString() : NULL,
         &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
-        releasePath = outPath;
+        resultPath = outPath;
     }
 
     if (outPath)
@@ -258,29 +210,29 @@ String FileUtils::GetReleasePath(const String& defaultPath)
 
     GetSubsystem<Graphics>()->RaiseWindow();
 
-    return GetInternalPath(releasePath);
+    return GetInternalPath(resultPath);
 }
 
-String FileUtils::GetIconPath(const String& defaultPath)
+String FileUtils::FindFile (const String& filterlist, const String& defaultPath)
 {
-    String iconPath;
+    String fullpath;
     nfdchar_t *outPath = NULL;
 
-    nfdresult_t result = NFD_ChooseDirectory("Please choose the folder of the mdpi icon",
+    nfdresult_t result = NFD_OpenDialog( filterlist.CString(),
         defaultPath.Length() ? defaultPath.CString() : NULL,
         &outPath);
 
     if (outPath && result == NFD_OKAY)
     {
-        iconPath = outPath;
+        fullpath = outPath;
     }
+
+    GetSubsystem<Graphics>()->RaiseWindow();
 
     if (outPath)
         free(outPath);
 
-    GetSubsystem<Graphics>()->RaiseWindow();
-
-    return GetInternalPath(iconPath);
+    return fullpath;
 }
 
 }

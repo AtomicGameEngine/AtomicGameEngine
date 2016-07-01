@@ -43,15 +43,13 @@ public:
     bool CreateDirs(const String& folder);
 
     String GetMobileProvisionPath();
-    String GetAndroidSDKPath(const String& defaultPath);
     String GetAntPath(const String& defaultPath);
-    String GetJDKRootPath(const String& defaultPath);
-    String GetReleasePath(const String& defaultPath);
-    String GetIconPath(const String& defaultPath);
     String OpenProjectFileDialog();
     String NewProjectFileDialog();
     String GetBuildPath(const String& defaultPath);
-    void RevealInFinder(const String& fullpath);
+    void RevealInFinder(const String& fullpath);    
+    String FindPath (const String& title, const String& defaultPath );
+    String FindFile (const String& filterlist, const String& defaultPath );
 
 private:
 

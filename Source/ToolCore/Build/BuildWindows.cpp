@@ -115,12 +115,17 @@ void BuildWindows::BuildAtomicNET()
 
     BuildLog("Building AtomicNET");
 
-    fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources/AtomicNET");
-    fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic");
-    fileSystem->CreateDir(buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies");
+    if (!BuildCreateDirectory(buildPath_ + "/AtomicPlayer_Resources/AtomicNET"))
+        return;
+    if (!BuildCreateDirectory(buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic"))
+        return;
+    if (!BuildCreateDirectory(buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies"))
+        return;
 
-    fileSystem->CopyDir(tenv->GetNETCoreCLRAbsPath(), buildPath_ + "/AtomicPlayer_Resources/AtomicNET/CoreCLR");
-    fileSystem->CopyDir(tenv->GetNETTPAPaths(), buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic/TPA");
+    if (!BuildCopyDir(tenv->GetNETCoreCLRAbsPath(), buildPath_ + "/AtomicPlayer_Resources/AtomicNET/CoreCLR"))
+        return;
+    if (!BuildCopyDir(tenv->GetNETTPAPaths(), buildPath_ + "/AtomicPlayer_Resources/AtomicNET/Atomic/TPA"))
+        return;
 
     // Atomic Assemblies
 
@@ -140,7 +145,8 @@ void BuildWindows::BuildAtomicNET()
             if (fileName != "AtomicNETEngine")
                 continue;
 
-            fileSystem->Copy(paths[i] + "/" + loadResults[j], ToString("%s/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies/%s.dll", buildPath_.CString(), fileName.CString()));
+            if (!BuildCopyFile(paths[i] + "/" + loadResults[j], ToString("%s/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies/%s.dll", buildPath_.CString(), fileName.CString())))
+                return;
         }
 
     }
@@ -150,7 +156,8 @@ void BuildWindows::BuildAtomicNET()
     {
         String pathName, fileName, ext;
         SplitPath(results[i], pathName, fileName, ext);
-        fileSystem->Copy(assembliesPath + results[i], ToString("%s/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies/%s.dll", buildPath_.CString(), fileName.CString()));
+        if (!BuildCopyFile(assembliesPath + results[i], ToString("%s/AtomicPlayer_Resources/AtomicNET/Atomic/Assemblies/%s.dll", buildPath_.CString(), fileName.CString())))
+            return;
     }
 
 

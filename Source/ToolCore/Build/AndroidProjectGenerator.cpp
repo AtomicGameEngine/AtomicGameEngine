@@ -48,7 +48,7 @@ AndroidProjectGenerator::~AndroidProjectGenerator()
 
 }
 
-bool AndroidProjectGenerator::Generate()
+bool AndroidProjectGenerator::Generate( BuildBase *baseOps )
 {
     if (!GenerateAndroidManifest())
         return false;
@@ -56,7 +56,7 @@ bool AndroidProjectGenerator::Generate()
     if (!GenerateStringXML())
         return false;
 
-    if (!GenerateLocalProperties())
+    if (!GenerateLocalProperties(baseOps))
         return false;
 
     if (!GenerateProjectProperties())
@@ -65,7 +65,7 @@ bool AndroidProjectGenerator::Generate()
     if (!GenerateActivitySource())
         return false;
 
-    if (!CopyUserIcons())
+    if (!CopyUserIcons(baseOps))
         return false;
 
     return true;
@@ -122,7 +122,7 @@ bool AndroidProjectGenerator::GenerateActivitySource()
 
 }
 
-bool AndroidProjectGenerator::GenerateLocalProperties()
+bool AndroidProjectGenerator::GenerateLocalProperties( BuildBase *fileOps )
 {
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
     ToolPrefs* prefs = tenv->GetToolPrefs();
@@ -165,8 +165,8 @@ bool AndroidProjectGenerator::GenerateLocalProperties()
             return false;
         }
 
-        Poco::File antp ( antname.CString() ); // lookup ant.properties 
-        antp.copyTo( buildPath_.CString());  // copy offending file
+        if ( !fileOps->BuildCopyFile ( antname, buildPath_ + "/ant.properties" ))
+            return false;
 
     }
     return true;
@@ -313,7 +313,7 @@ bool AndroidProjectGenerator::GenerateAndroidManifest()
 
 }
 
-bool AndroidProjectGenerator::CopyUserIcons()
+bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
@@ -329,8 +329,8 @@ bool AndroidProjectGenerator::CopyUserIcons()
     String destDir = buildPath_ + "/res/drawable";          // where it should be in the build
     if ( fileSystem->FileExists (userIconFile) )            // is there a file there?
     {
-        Poco::File icon1 ( userIconFile.CString() );        // declare the file
-        icon1.copyTo( destDir.CString() );                  // copy the file into the build
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/logo_large.png" ))
+            return false;
     }
 
     userIconDir = userIconPath + "/drawable-ldpi"; 
@@ -338,16 +338,16 @@ bool AndroidProjectGenerator::CopyUserIcons()
     destDir = buildPath_ + "/res/drawable-ldpi";
     if ( fileSystem->FileExists (userIconFile) )
     {
-        Poco::File icon2 ( userIconFile.CString() );
-        icon2.copyTo( destDir.CString() );
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png"))
+            return false;
     } 
 
     userIconDir = userIconPath + "/drawable-mdpi"; 
     userIconFile = userIconDir + "/icon.png"; 
     destDir = buildPath_ + "/res/drawable-mdpi";
     {
-        Poco::File icon3 ( userIconFile.CString() );
-        icon3.copyTo( destDir.CString() );
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
+            return false;
     } 
 
     userIconDir = userIconPath + "/drawable-hdpi"; 
@@ -355,8 +355,8 @@ bool AndroidProjectGenerator::CopyUserIcons()
     destDir = buildPath_ + "/res/drawable-hdpi";
     if ( fileSystem->FileExists (userIconFile) )
     {
-        Poco::File icon4 ( userIconFile.CString() );
-        icon4.copyTo( destDir.CString() );
+        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
+            return false;
     }
 
     return true;

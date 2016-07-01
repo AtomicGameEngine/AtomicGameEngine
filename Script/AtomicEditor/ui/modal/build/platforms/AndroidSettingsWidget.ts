@@ -66,12 +66,6 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         this.subscribeToEvent(this, "WidgetEvent", (ev) => this.handleWidgetEvent(ev));
 
-        // if the icon path has contents, attempt to show an image in the button
-        if (this.settings.iconPath.length > 0) 
-        {
-            this.iconImage.setImage( this.settings.iconPath + "/drawable-ldpi/icon.png");
-        } 
-
     }
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
@@ -81,9 +75,9 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             if (ev.target.id == "choose_sdk_path") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.getAndroidSDKPath("");
-
-                this.sdkPathEdit.text = path;
+                var path = fileUtils.findPath("Please choose the root folder of your Android SDK","");
+                if ( path.length > 0 )
+                    this.sdkPathEdit.text = path;
 
                 return true;
 
@@ -91,15 +85,17 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
                 var fileUtils = new Editor.FileUtils();
                 var path = fileUtils.getAntPath("");
-                this.antPathEdit.text = path;
+                if ( path.length > 0 )
+                    this.antPathEdit.text = path;
 
                 return true;
 
             }  else if (ev.target.id == "choose_jdk_root") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.getJDKRootPath("");
-                this.jdkRootEdit.text = path;
+                var path = fileUtils.findPath("Please choose the root folder of your JDK","");
+                if ( path.length > 0 )
+                    this.jdkRootEdit.text = path;
 
                 return true;
 
@@ -109,15 +105,19 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
             }  else if (ev.target.id == "choose_and_auth") {
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.getReleasePath("");
-                this.releaseNameEdit.text = path;                
+                var path = fileUtils.findPath( "Please choose the folder of your ant.properties", "");
+                if ( path.length > 0 )
+                    this.releaseNameEdit.text = path;                
                 return true;
 
             }  else if (ev.target.id == "choose_icon") {
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.getIconPath("");
-                this.iconNameEdit.text = path;
-                this.iconImage.setImage(path + "/drawable-ldpi/icon.png");
+                var path = fileUtils.findPath("Please choose the folder with drawable folders","");
+                if ( path.length > 0 )
+                {
+                    this.iconNameEdit.text = path;
+                    this.updateIconButton();
+               }
                 return true;
                 
            } 
@@ -153,6 +153,26 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         });
 
     }
+    
+    updateIconButton() {
+    
+        var fileSystem = Atomic.getFileSystem();
+
+        if ( this.iconNameEdit.text.length > 0 ) {
+
+            let myicon = this.iconNameEdit.text + "/drawable-ldpi/icon.png";
+            if ( fileSystem.fileExists(myicon) ) {
+
+                this.iconImage.setImage( myicon );
+                return;
+            }
+        }
+
+        let defaulticon = fileSystem.getProgramDir() + "Resources/ToolData/Deployment/Android/res/drawable-ldpi/icon.png";
+        this.iconImage.setImage( defaulticon );
+
+    }
+    
 
     refreshWidgets() {
 
@@ -172,6 +192,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
 
         this.sdkTargetSelect.text = this.settings.sDKVersion;
 
+        this.updateIconButton();
     }
 
     storeValues() {
