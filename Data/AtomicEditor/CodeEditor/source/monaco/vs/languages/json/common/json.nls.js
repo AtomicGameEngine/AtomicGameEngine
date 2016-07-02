@@ -4,20 +4,5 @@
  * Released under the MIT license
  * https://github.com/Microsoft/vscode/blob/master/LICENSE.txt
  *-----------------------------------------------------------*/
-
-/*---------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
-define("vs/languages/json/common/json.nls", {
-	"vs/base/common/json": [
-		"Invalid symbol",
-		"Invalid number format",
-		"Property name expected",
-		"Value expected",
-		"Colon expected",
-		"Comma expected",
-		"Closing brace expected",
-		"Closing bracket expected",
-		"End of file expected"
-	]
-});
+define("vs/languages/json/common/json.nls",{"vs/base/common/json":["Invalid symbol","Invalid number format","Property name expected","Value expected","Colon expected","Comma expected","Closing brace expected","Closing bracket expected","End of file expected"]});
+//# sourceMappingURL=../../../../../min-maps/vs/languages/json/common/json.nls.js.map

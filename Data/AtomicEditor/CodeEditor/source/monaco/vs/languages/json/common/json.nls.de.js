@@ -4,17 +4,5 @@
  * Released under the MIT license
  * https://github.com/Microsoft/vscode/blob/master/LICENSE.txt
  *-----------------------------------------------------------*/
-
-define("vs/languages/json/common/json.nls.de", {
-	"vs/base/common/json": [
-		"Ungültiges Symbol",
-		"Ungültiges Zahlenformat.",
-		"Ein Eigenschaftenname wurde erwartet.",
-		"Ein Wert wurde erwartet.",
-		"Ein Doppelpunkt wurde erwartet.",
-		"Ein Komma wurde erwartet.",
-		"Eine schließende geschweifte Klammer wurde erwartet.",
-		"Eine schließende Klammer wurde erwartet.",
-		"Das Dateiende wurde erwartet.",
-	]
-});
+define("vs/languages/json/common/json.nls.de",{"vs/base/common/json":["Ungültiges Symbol","Ungültiges Zahlenformat.","Ein Eigenschaftenname wurde erwartet.","Ein Wert wurde erwartet.","Ein Doppelpunkt wurde erwartet.","Ein Komma wurde erwartet.","Eine schließende geschweifte Klammer wurde erwartet.","Eine schließende Klammer wurde erwartet.","Das Dateiende wurde erwartet."]});
+//# sourceMappingURL=../../../../../min-maps/vs/languages/json/common/json.nls.de.js.map
