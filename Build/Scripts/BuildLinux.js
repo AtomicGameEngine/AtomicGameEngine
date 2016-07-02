@@ -26,7 +26,7 @@ namespace('build', function() {
         var cmds = [];
 
         cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=Release");
-        cmds.push("make -j2 AtomicEditor AtomicPlayer")
+        cmds.push("make AtomicEditor AtomicPlayer")
 
         jake.exec(cmds, function() {
 
