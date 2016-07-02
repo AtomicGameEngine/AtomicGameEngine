@@ -551,7 +551,6 @@ export class CustomSignatureProvider extends BuiltinServiceProviderOverride impl
         return this.extension.workerRequest(WorkerProcessTypes.MonacoGetSignatureResponse, message)
             .then((e: WorkerProcessTypes.MonacoGetSignatureMessageDataResponse) => {
                 if (e.signatures) {
-                    console.log(e);
                     let result: monaco.languages.SignatureHelp = {
                         signatures: e.signatures,
                         activeSignature: e.selectedItemIndex,
