@@ -44,7 +44,7 @@ interface Window {
 
     HOST_resourceRenamed: (path: string, newPath: string) => void;
     HOST_resourceDeleted: (path: string) => void;
-    HOST_preferencesChanged: () => void;
+    HOST_preferencesChanged: (jsonProjectPrefs: string, jsonApplicationPrefs: string) => void;
 
     /**
      * Preferences set by the host.  Each preference category is a JSON string of all the prefs

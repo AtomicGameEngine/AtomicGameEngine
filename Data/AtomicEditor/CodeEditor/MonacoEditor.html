@@ -53,6 +53,7 @@
 
                 System.import('./source/editorCore/interop').then((module) => {
                     module.default.getInstance().setEditor(editor);
+                    module.default.getInstance().editorLoaded();
                     resolve(module.default);
                 });
             });
@@ -86,9 +87,15 @@
             });
         }
 
-        function HOST_preferencesChanged() {
+        function HOST_preferencesChanged(jsonProjectPrefs, jsonApplicationPrefs) {
             setupEditor.then((interop) => {
-                interop.getInstance().preferencesChanged();
+
+                let prefs = {
+                    projectPreferences: JSON.parse(jsonProjectPrefs),
+                    applicationPreferences: JSON.parse(jsonApplicationPrefs)
+                };
+
+                interop.getInstance().preferencesChanged(prefs);
             });
         }
     </script>

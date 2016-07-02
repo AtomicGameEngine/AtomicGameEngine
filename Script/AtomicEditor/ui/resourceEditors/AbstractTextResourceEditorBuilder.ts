@@ -73,9 +73,9 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
             webClient.executeJavaScript(`HOST_resourceDeleted("atomic://${this.getNormalizedPath(data.path)}");`);
         });
 
-        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => {
+        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data: EditorEvents.UserPreferencesChangedEvent) => {
             const webClient = editor.webView.webClient;
-            webClient.executeJavaScript("HOST_preferencesChanged();");
+            webClient.executeJavaScript(`HOST_preferencesChanged('${data.projectPreferences}','${data.applicationPreferences}');`);
         });
 
         return editor;

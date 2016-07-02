@@ -135,11 +135,10 @@ export function editorLoaded() {
 
 /**
  * Called when new preferences are available (or initially with current prefs)
- * @param  {any} prefs
  */
-export function preferencesChanged() {
-    serviceLocator.clientServices.setPreferences(JSON.parse(window.HOST_Preferences.ProjectPreferences), JSON.parse(window.HOST_Preferences.ApplicationPreferences));
-    serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, null);
+export function preferencesChanged(prefs: Editor.ClientExtensions.PreferencesChangedEventData) {
+    serviceLocator.clientServices.setPreferences(prefs.projectPreferences, prefs.applicationPreferences);
+    serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, prefs);
 }
 
 export function setEditor(editor: any) {

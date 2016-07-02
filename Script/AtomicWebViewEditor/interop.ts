@@ -203,12 +203,11 @@ export default class HostInteropType {
     }
 
     /**
-     * Host is notifying client that there are preferences to load and passing us the path
+     * Host is notifying client that there are preferences to load and passing us JSON objects containing the prefs
      * of the prefs.
-     * @param  {string} prefUrl
      */
-    preferencesChanged() {
-        editorCommands.preferencesChanged();
+    preferencesChanged(prefs: Editor.ClientExtensions.PreferencesChangedEventData) {
+        editorCommands.preferencesChanged(prefs);
     }
 
     /**

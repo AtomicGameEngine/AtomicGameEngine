@@ -133,11 +133,11 @@ class Preferences {
         this._prefs = new PreferencesFormat();
     }
 
-    get cachedProjectPreferences():any {
+    get cachedProjectPreferences(): any {
         return this._cachedProjectPreferences;
     }
 
-    get cachedApplicationPreferences():PreferencesFormat {
+    get cachedApplicationPreferences(): PreferencesFormat {
         return this._prefs;
     }
 
@@ -166,6 +166,22 @@ class Preferences {
     }
 
     /**
+     * Load up the user preferences for the project
+     */
+    loadUserPrefs() {
+        const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
+        if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
+            let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
+            try {
+                let prefs = JSON.parse(prefsFile.readText());
+                this._cachedProjectPreferences = prefs;
+            } finally {
+                prefsFile.close();
+            }
+        }
+    }
+
+    /**
      * Return a preference value or the provided default from the user settings file located in the project
      * @param  {string} settingsGroup name of the group these settings should fall under
      * @param  {string} preferenceName name of the preference to retrieve
@@ -179,16 +195,7 @@ class Preferences {
 
         // Cache the settings so we don't keep going out to the file
         if (this._cachedProjectPreferences == null) {
-            const prefsFileLoc = ToolCore.toolSystem.project.userPrefsFullPath;
-            if (Atomic.fileSystem.fileExists(prefsFileLoc)) {
-                let prefsFile = new Atomic.File(prefsFileLoc, Atomic.FILE_READ);
-                try {
-                    let prefs = JSON.parse(prefsFile.readText());
-                    this._cachedProjectPreferences = prefs;
-                } finally {
-                    prefsFile.close();
-                }
-            }
+            this.loadUserPrefs();
         }
 
         if (this._cachedProjectPreferences && this._cachedProjectPreferences[settingsGroup]) {
@@ -293,15 +300,15 @@ interface AceEditorSettings {
 }
 
 interface UserInterfaceData {
-    skinPath : string;
-    defaultSkinPath : string;
-    fontFile : string;
-    fontName : string;
-    fontSize : number;
+    skinPath: string;
+    defaultSkinPath: string;
+    fontFile: string;
+    fontName: string;
+    fontSize: number;
 }
 
 interface EditorBuildData {
-    lastEditorBuildSHA : string;
+    lastEditorBuildSHA: string;
 }
 
 
@@ -344,15 +351,15 @@ class PreferencesFormat {
         };
 
         this.uiData = {
-            skinPath : "AtomicEditor/editor/skin/",
-            defaultSkinPath : "AtomicEditor/resources/default_skin/",
-            fontFile : "AtomicEditor/resources/vera.ttf",
-            fontName : "Vera",
-            fontSize : 12
+            skinPath: "AtomicEditor/editor/skin/",
+            defaultSkinPath: "AtomicEditor/resources/default_skin/",
+            fontFile: "AtomicEditor/resources/vera.ttf",
+            fontName: "Vera",
+            fontSize: 12
         };
 
         this.editorBuildData = {
-            lastEditorBuildSHA : "Unversioned Build"
+            lastEditorBuildSHA: "Unversioned Build"
         }
 
     }
@@ -402,8 +409,8 @@ class PreferencesFormat {
     editorWindow: WindowData;
     playerWindow: WindowData;
     codeEditorSettings: AceEditorSettings;
-    uiData : UserInterfaceData;
-    editorBuildData : EditorBuildData;
+    uiData: UserInterfaceData;
+    editorBuildData: EditorBuildData;
 }
 
 export = Preferences;

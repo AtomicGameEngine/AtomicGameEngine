@@ -408,6 +408,11 @@ declare module Editor.ClientExtensions {
         initialize(serviceLocator: ClientServiceLocator);
     }
 
+    export interface PreferencesChangedEventData {
+        applicationPreferences? : any,
+        projectPreferences? : any
+    }
+
     export interface WebViewServiceEventListener extends Editor.Extensions.EditorServiceExtension {
         configureEditor?(ev: EditorEvents.EditorFileEvent);
         codeLoaded?(ev: EditorEvents.CodeLoadedEvent);
@@ -415,7 +420,7 @@ declare module Editor.ClientExtensions {
         delete?(ev: EditorEvents.DeleteResourceEvent);
         rename?(ev: EditorEvents.RenameResourceEvent);
         projectUnloaded?();
-        preferencesChanged?();
+        preferencesChanged?(preferences: PreferencesChangedEventData);
     }
 
     /**

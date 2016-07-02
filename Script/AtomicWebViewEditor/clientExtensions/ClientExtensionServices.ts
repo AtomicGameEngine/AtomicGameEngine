@@ -100,7 +100,7 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceRenamedEvent, (ev) => this.renameResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.ResourceDeletedEvent, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(ClientExtensionEventNames.CodeSavedEvent, (ev) => this.saveCode(ev));
-        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged());
+        eventDispatcher.subscribeToEvent(ClientExtensionEventNames.PreferencesChangedEvent, (ev) => this.preferencesChanged(ev));
     }
 
     /**
@@ -192,12 +192,12 @@ export class WebViewServicesProvider extends ServicesProvider<Editor.ClientExten
      * Called when preferences changes
      * @param  {Editor.EditorEvents.PreferencesChangedEvent} ev
      */
-    preferencesChanged() {
+    preferencesChanged(prefs: Editor.ClientExtensions.PreferencesChangedEventData) {
         this.registeredServices.forEach((service) => {
             // Notify services that the project has been unloaded
             try {
                 if (service.preferencesChanged) {
-                    service.preferencesChanged();
+                    service.preferencesChanged(prefs);
                 }
             } catch (e) {
                 alert(`Extension Error:\n Error detected in extension ${service.name}\n \n ${e.stack}`);
