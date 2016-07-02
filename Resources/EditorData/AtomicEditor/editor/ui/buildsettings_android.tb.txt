@@ -27,6 +27,8 @@ TBLayout: axis: y, distribution: gravity, position: left
 				tooltip Location of the drawable folders for app icons
 				TBImageWidget: id: and_icon, filename: "Resources/ToolData/Deployment/Android/res/drawable-ldpi/icon.png"
 					lp: min-width: 36, min-height: 36, max-width: 36, max-height: 36
+			TBWidget: gravity: left right
+				lp: min-width: 36, min-height: 36, max-width: 36, max-height: 36
 			TBEditField: id: icon_root, autofocus: 0
 				lp: min-width: 220
 	TBSeparator: gravity: left right, skin: AESeparator
