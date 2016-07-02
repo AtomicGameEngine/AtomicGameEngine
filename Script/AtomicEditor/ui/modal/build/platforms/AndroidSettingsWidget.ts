@@ -31,7 +31,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         this.load("AtomicEditor/editor/ui/buildsettings_android.tb.txt");
 
         this.settings = ToolCore.toolSystem.project.buildSettings.androidBuildSettings;
-        
+
         this.sdkPathEdit = <Atomic.UIEditField>this.getWidget("sdk_path");
         this.sdkTargetSelect = <Atomic.UISelectDropdown>this.getWidget("sdk_target_select");
         this.appNameEdit = <Atomic.UIEditField>this.getWidget("app_name");
@@ -52,14 +52,14 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         this.iconNameEdit = <Atomic.UIEditField>this.getWidget("icon_root");
         this.iconChooseButton = <Atomic.UIButton>this.getWidget("choose_icon");
         this.iconImage = <Atomic.UIImageWidget>this.getWidget("and_icon");
-        
+
         if (Atomic.platform == "Windows") {
 
             jdkRootText.text = "JDK Root: (Ex. C:\\Program Files\\Java\\jdk1.8.0_31)";
             antPathText.text = "Ant Path: (The folder that contains ant.bat)";
 
         }
-        
+
         this.antPathEdit = <Atomic.UIEditField>this.getWidget("ant_path");
 
         this.refreshWidgets();
@@ -75,7 +75,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             if (ev.target.id == "choose_sdk_path") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath("Please choose the root folder of your Android SDK","");
+                var path = fileUtils.findPath("Please choose the root folder of your Android SDK" , "");
                 if ( path.length > 0 )
                     this.sdkPathEdit.text = path;
 
@@ -93,7 +93,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
             }  else if (ev.target.id == "choose_jdk_root") {
 
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath("Please choose the root folder of your JDK","");
+                var path = fileUtils.findPath("Please choose the root folder of your JDK" , "");
                 if ( path.length > 0 )
                     this.jdkRootEdit.text = path;
 
@@ -107,23 +107,22 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
                 var fileUtils = new Editor.FileUtils();
                 var path = fileUtils.findPath( "Please choose the folder of your ant.properties", "");
                 if ( path.length > 0 )
-                    this.releaseNameEdit.text = path;                
+                    this.releaseNameEdit.text = path;
                 return true;
 
             }  else if (ev.target.id == "choose_icon") {
                 var fileUtils = new Editor.FileUtils();
-                var path = fileUtils.findPath("Please choose the folder with drawable folders","");
-                if ( path.length > 0 )
-                {
+                var path = fileUtils.findPath("Please choose the folder with drawable folders" , "");
+                if ( path.length > 0 ) {
                     this.iconNameEdit.text = path;
                     this.updateIconButton();
                }
                 return true;
-                
-           } 
+
+           }
 
         }
- 
+
         return false;
     }
 
@@ -153,9 +152,9 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         });
 
     }
-    
+
     updateIconButton() {
-    
+
         var fileSystem = Atomic.getFileSystem();
 
         if ( this.iconNameEdit.text.length > 0 ) {
@@ -172,7 +171,7 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
         this.iconImage.setImage( defaulticon );
 
     }
-    
+
 
     refreshWidgets() {
 
@@ -227,11 +226,11 @@ class AndroidSettingsWidget extends Atomic.UIWidget implements BuildSettingsWind
     packageNameEdit: Atomic.UIEditField;
     productNameEdit: Atomic.UIEditField;
     companyNameEdit: Atomic.UIEditField;
-    
+
     releaseNameEdit : Atomic.UIEditField;
     releaseChooseButton : Atomic.UIButton;
     releaseCheck : Atomic.UICheckBox;
-    iconNameEdit : Atomic.UIEditField; 
+    iconNameEdit : Atomic.UIEditField;
     iconChooseButton : Atomic.UIButton;
     iconImage : Atomic.UIImageWidget;
 }

@@ -40,12 +40,12 @@ class AndroidProjectGenerator : public Object
 
 public:
 
-    AndroidProjectGenerator(Context* context);
+    AndroidProjectGenerator(Context* context, BuildBase *buildBase);
     virtual ~AndroidProjectGenerator();
 
     void SetBuildPath(const String& buildpath) { buildPath_ = buildpath; }
 
-    bool Generate( BuildBase * );
+    bool Generate();
 
     const String& GetErrorText() { return errorText_; }
 
@@ -53,11 +53,12 @@ private:
 
     bool GenerateAndroidManifest();
     bool GenerateStringXML();
-    bool GenerateLocalProperties(BuildBase *);
+    bool GenerateLocalProperties();
     bool GenerateProjectProperties();
     bool GenerateActivitySource();
-    bool CopyUserIcons( BuildBase *);
+    bool CopyUserIcons( );
 
+    WeakPtr<BuildBase> buildBase_;
     String buildPath_;
     String errorText_;
 

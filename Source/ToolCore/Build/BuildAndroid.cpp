@@ -386,14 +386,14 @@ void BuildAndroid::Build(const String& buildPath)
     //check for Deployment/Android/libs/armeabi-v7a/libAtomicPlayer.so
     if ( !fileSystem->FileExists(androidProject + "/libs/armeabi-v7a/libAtomicPlayer.so")  )
     {
-        FailBuild( " the file libAtomicPlayer.so is not found. This is required for APK generation." );
+        FailBuild( "The file libAtomicPlayer.so is not found. This is required for APK generation." );
         return;
     }
 
-    AndroidProjectGenerator gen(context_);
+    AndroidProjectGenerator gen(context_, this);
     gen.SetBuildPath(buildPath_);
 
-    if (!gen.Generate( static_cast<BuildBase*>(this)))
+    if (!gen.Generate())
     {
         FailBuild(gen.GetErrorText());
         return;

@@ -37,8 +37,9 @@
 namespace ToolCore
 {
 
-AndroidProjectGenerator::AndroidProjectGenerator(Context* context) :
-    Object(context)
+AndroidProjectGenerator::AndroidProjectGenerator(Context* context, BuildBase* buildBase) :
+    Object(context),
+    buildBase_(buildBase)
 {
 
 }
@@ -48,7 +49,7 @@ AndroidProjectGenerator::~AndroidProjectGenerator()
 
 }
 
-bool AndroidProjectGenerator::Generate( BuildBase *baseOps )
+bool AndroidProjectGenerator::Generate()
 {
     if (!GenerateAndroidManifest())
         return false;
@@ -56,7 +57,7 @@ bool AndroidProjectGenerator::Generate( BuildBase *baseOps )
     if (!GenerateStringXML())
         return false;
 
-    if (!GenerateLocalProperties(baseOps))
+    if (!GenerateLocalProperties())
         return false;
 
     if (!GenerateProjectProperties())
@@ -65,7 +66,7 @@ bool AndroidProjectGenerator::Generate( BuildBase *baseOps )
     if (!GenerateActivitySource())
         return false;
 
-    if (!CopyUserIcons(baseOps))
+    if (!CopyUserIcons())
         return false;
 
     return true;
@@ -122,7 +123,7 @@ bool AndroidProjectGenerator::GenerateActivitySource()
 
 }
 
-bool AndroidProjectGenerator::GenerateLocalProperties( BuildBase *fileOps )
+bool AndroidProjectGenerator::GenerateLocalProperties( )
 {
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
     ToolPrefs* prefs = tenv->GetToolPrefs();
@@ -165,7 +166,7 @@ bool AndroidProjectGenerator::GenerateLocalProperties( BuildBase *fileOps )
             return false;
         }
 
-        if ( !fileOps->BuildCopyFile ( antname, buildPath_ + "/ant.properties" ))
+        if ( !buildBase_->BuildCopyFile ( antname, buildPath_ + "/ant.properties" ))
             return false;
 
     }
@@ -313,7 +314,7 @@ bool AndroidProjectGenerator::GenerateAndroidManifest()
 
 }
 
-bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
+bool AndroidProjectGenerator::CopyUserIcons()
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
@@ -329,7 +330,7 @@ bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
     String destDir = buildPath_ + "/res/drawable";          // where it should be in the build
     if ( fileSystem->FileExists (userIconFile) )            // is there a file there?
     {
-        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/logo_large.png" ))
+        if ( !buildBase_->BuildCopyFile ( userIconFile, destDir + "/logo_large.png" ))
             return false;
     }
 
@@ -338,7 +339,7 @@ bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
     destDir = buildPath_ + "/res/drawable-ldpi";
     if ( fileSystem->FileExists (userIconFile) )
     {
-        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png"))
+        if ( !buildBase_->BuildCopyFile ( userIconFile, destDir + "/icon.png"))
             return false;
     } 
 
@@ -346,7 +347,7 @@ bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
     userIconFile = userIconDir + "/icon.png"; 
     destDir = buildPath_ + "/res/drawable-mdpi";
     {
-        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
+        if ( !buildBase_->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
             return false;
     } 
 
@@ -355,7 +356,7 @@ bool AndroidProjectGenerator::CopyUserIcons( BuildBase *fileOps )
     destDir = buildPath_ + "/res/drawable-hdpi";
     if ( fileSystem->FileExists (userIconFile) )
     {
-        if ( !fileOps->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
+        if ( !buildBase_->BuildCopyFile ( userIconFile, destDir + "/icon.png" ))
             return false;
     }
 
