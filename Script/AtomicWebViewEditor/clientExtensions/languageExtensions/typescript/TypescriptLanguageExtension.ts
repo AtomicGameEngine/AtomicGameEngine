@@ -126,14 +126,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
-     * Grabs the TS Config file attached to the global window object
-     * @return {any}
-     */
-    private getTsConfig(): any {
-        return JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
-    }
-
-    /**
      * Called when the editor needs to be configured for a particular file
      * @param  {Editor.EditorEvents.EditorFileEvent} ev
      */
@@ -144,7 +136,10 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             this.overrideBuiltinServiceProviders();
 
             // Hook in the routine to allow the host to perform a full compile
-            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
+            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", (jsonTsConfig: string) => {
+                let tsConfig = JSON.parse(jsonTsConfig);
+                this.doFullCompile(tsConfig);
+            });
 
             this.filename = ev.filename;
 
@@ -234,7 +229,9 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             // Build our worker
             this.buildWorker();
 
-            let tsConfig = this.getTsConfig();
+            // Initial load, so the TSConfig on the window object should be the most current
+            let tsConfig = JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
+
             let model = this.editor.getModel();
             let handle: number;
             model.onDidChangeContent(() => {
@@ -420,11 +417,11 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     /**
      * Tell the language service to perform a full compile
      */
-    doFullCompile() {
+    doFullCompile(tsConfig: any) {
         if (this.active) {
             const message: WorkerProcessTypes.FullCompileMessageData = {
                 command: WorkerProcessTypes.DoFullCompile,
-                tsConfig: this.getTsConfig()
+                tsConfig: tsConfig
             };
             this.worker.port.postMessage(message);
         }

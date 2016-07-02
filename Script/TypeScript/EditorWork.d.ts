@@ -511,6 +511,6 @@ declare module Editor.ClientExtensions {
          * @param  {string} routineName
          * @param  {(} callback
          */
-        addCustomHostRoutine(routineName: string, callback: () => void);
+        addCustomHostRoutine(routineName: string, callback: (...any) => void);
     }
 }

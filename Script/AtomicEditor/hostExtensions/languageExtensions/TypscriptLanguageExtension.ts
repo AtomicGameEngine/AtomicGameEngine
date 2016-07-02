@@ -344,7 +344,7 @@ export default class TypescriptLanguageExtension implements Editor.HostExtension
         const editor = this.serviceRegistry.uiServices.getCurrentResourceEditor();
         if (editor && editor.typeName == "JSResourceEditor" && this.isValidFiletype(editor.fullPath)) {
             const jsEditor = <Editor.JSResourceEditor>editor;
-            jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile();`);
+            jsEditor.webView.webClient.executeJavaScript(`TypeScript_DoFullCompile('${JSON.stringify(this.buildTsConfig())}');`);
         } else {
             this.serviceRegistry.uiServices.showModalError("TypeScript Compilation", "Please open a TypeScript file in the editor before attempting to do a full compile.");
         }
