@@ -286,6 +286,9 @@ export default class TypescriptLanguageServiceWebWorker {
         // so, compare the ends
         const fn = this.resolvePartialFilename(eventData.filename);
 
+        // Add this file right away, and then add the rest of the project files
+        this.languageService.addProjectFile(fn, eventData.code);
+
         this.loadProjectFiles().then(() => {
             //let diagnostics = this.languageService.compile([fn]);
             this.handleGetAnnotations(port, eventData);
@@ -531,7 +534,8 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.DeleteMessageData} eventData
      */
     handleDelete(port: MessagePort, eventData: WorkerProcessTypes.DeleteMessageData) {
-        this.languageService.deleteProjectFile(eventData.path);
+        let filename = this.resolvePartialFilename(eventData.path);
+        this.languageService.deleteProjectFile(filename);
     }
 
     /**
@@ -540,7 +544,9 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.RenameMessageData} eventData
      */
     handleRename(port: MessagePort, eventData: WorkerProcessTypes.RenameMessageData) {
-        this.languageService.renameProjectFile(eventData.path, eventData.newPath);
+        let fromFn = this.resolvePartialFilename(eventData.path);
+        let toFn = fromFn.replace(eventData.path, eventData.newPath);
+        this.languageService.renameProjectFile(fromFn, toFn);
     }
 
     setPreferences(port: MessagePort, eventData: WorkerProcessTypes.SetPreferencesMessageData) {

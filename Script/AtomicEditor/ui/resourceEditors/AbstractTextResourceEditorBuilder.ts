@@ -70,7 +70,7 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
 
         editor.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => {
             const webClient = editor.webView.webClient;
-            webClient.executeJavaScript(`HOST_resourceDeleted("atomic://${this.getNormalizedPath(data.path)}");`);
+            webClient.executeJavaScript(`HOST_resourceDeleted("${this.getNormalizedPath(data.path)}");`);
         });
 
         editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data: EditorEvents.UserPreferencesChangedEvent) => {
