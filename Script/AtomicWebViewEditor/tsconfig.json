@@ -39,14 +39,12 @@
         "./typings/webworkers.d.ts",
         "./typings/WindowExt.d.ts",
         "../TypeScript/Atomic.d.ts",
-        "../TypeScript/AtomicNET.d.ts",
         "../TypeScript/AtomicPlayer.d.ts",
         "../TypeScript/AtomicWork.d.ts",
         "../TypeScript/duktape.d.ts",
         "../TypeScript/Editor.d.ts",
         "../TypeScript/EditorWork.d.ts",
         "../TypeScript/ToolCore.d.ts",
-        "../TypeScript/WebView.d.ts",
-        "../TypeScript/WebViewWork.d.ts"
+        "../TypeScript/WebView.d.ts"
     ]
 }
