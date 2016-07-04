@@ -79,25 +79,31 @@ void BuildWeb::Build(const String& buildPath)
 
     Initialize();
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem->DirExists(buildPath_))
-        fileSystem->RemoveDir(buildPath_, true);
+    if (!BuildClean(buildPath_))
+        return;
 
     String dataPath = tenv->GetToolDataDir();
 
     String buildSourceDir  = dataPath + "Deployment/Web";
 
-    fileSystem->CreateDir(buildPath_);
+    if (!BuildCreateDirectory(buildPath_))
+        return;
 
     String resourcePackagePath = buildPath_ + "/AtomicResources.data";
     GenerateResourcePackage(resourcePackagePath);
 
-    fileSystem->Copy(buildSourceDir + "/AtomicPlayer.html", buildPath_ + "/AtomicPlayer.html");
-    fileSystem->Copy(buildSourceDir + "/AtomicPlayer.html.mem", buildPath_ + "/AtomicPlayer.html.mem");
-    fileSystem->Copy(buildSourceDir + "/AtomicPlayer.js", buildPath_ + "/AtomicPlayer.js");
-    fileSystem->Copy(buildSourceDir + "/AtomicLoader.js", buildPath_ + "/AtomicLoader.js");
-    fileSystem->Copy(buildSourceDir + "/index.html", buildPath_ + "/index.html");
-    fileSystem->Copy(buildSourceDir + "/Atomic_Logo_Header.png", buildPath_ + "/Atomic_Logo_Header.png");
+    if (!BuildCopyFile(buildSourceDir + "/AtomicPlayer.html", buildPath_ + "/AtomicPlayer.html"))
+        return;
+    if (!BuildCopyFile(buildSourceDir + "/AtomicPlayer.html.mem", buildPath_ + "/AtomicPlayer.html.mem"))
+        return;
+    if (!BuildCopyFile(buildSourceDir + "/AtomicPlayer.js", buildPath_ + "/AtomicPlayer.js"))
+        return;
+    if (!BuildCopyFile(buildSourceDir + "/AtomicLoader.js", buildPath_ + "/AtomicLoader.js"))
+        return;
+    if (!BuildCopyFile(buildSourceDir + "/index.html", buildPath_ + "/index.html"))
+        return;
+    if (!BuildCopyFile(buildSourceDir + "/Atomic_Logo_Header.png", buildPath_ + "/Atomic_Logo_Header.png"))
+        return;
 
     File file(context_, buildSourceDir + "/AtomicResources_js.template", FILE_READ);
     unsigned size = file.GetSize();

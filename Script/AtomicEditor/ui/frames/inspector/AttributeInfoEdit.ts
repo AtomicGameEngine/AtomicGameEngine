@@ -735,7 +735,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                         } else if (resource instanceof Atomic.Animation) {
 
-                             var animCacheReferenceName = resource.name.replace("_"+(<Atomic.Animation>resource).animationName, "");
+                             var animCacheReferenceName = resource.name.replace( "_" + (<Atomic.Animation>resource).animationName, "");
                              var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
                              this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
 

@@ -39,31 +39,7 @@ endif()
 
 add_definitions( -DATOMIC_WEB )
 
-if (MSVC)
-
-    include(AtomicWindows)
-
-elseif(APPLE)
-
-    if (IOS)
-        include(AtomicIOS)
-    else()
-        include(AtomicMac)
-    endif()
-
-elseif(LINUX)
-
-  include(AtomicLinux)
-
-elseif(ANDROID)
-
-    include(AtomicAndroid)
-
-elseif(EMSCRIPTEN)
-
-	include(AtomicWeb)
-
-endif()
+include (AtomicPlatform)
 
 find_program(CLDOC cldoc)
 if(CLDOC)

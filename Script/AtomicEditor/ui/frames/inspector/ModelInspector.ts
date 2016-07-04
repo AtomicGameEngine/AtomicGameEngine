@@ -46,6 +46,7 @@ class ModelInspector extends InspectorWidget {
         this.importer.scale = Number(this.scaleEdit.text);
 
         this.importer.importAnimations = this.importAnimationBox.value ? true : false;
+        this.importer.setImportMaterials(this.importMaterials.value ? true : false);
 
         for (var i = 0; i < this.importer.animationCount; i++) {
 
@@ -102,6 +103,9 @@ class ModelInspector extends InspectorWidget {
 
         this.scaleEdit = InspectorUtils.createAttrEditField("Scale", modelLayout);
         this.scaleEdit.text = this.importer.scale.toString();
+
+        this.importMaterials = this.createAttrCheckBox("Import Materials", modelLayout);
+        this.importMaterials.value = this.importer.getImportMaterials() ? 1 : 0;
 
         // Animations Section
         var animationLayout = this.createSection(rootLayout, "Animation", 1);
@@ -192,6 +196,7 @@ class ModelInspector extends InspectorWidget {
 
     // animation
     importAnimationBox: Atomic.UICheckBox;
+    importMaterials: Atomic.UICheckBox;
     importAnimationArray: ArrayEditWidget;
     animationInfoLayout: Atomic.UILayout;
 

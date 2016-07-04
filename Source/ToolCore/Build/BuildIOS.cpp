@@ -311,27 +311,31 @@ void BuildIOS::Build(const String& buildPath)
 
     Initialize();
 
-    if (fileSystem->DirExists(buildPath_))
-        fileSystem->RemoveDir(buildPath_, true);
+    if (!BuildClean(buildPath_))
+        return;
 
     String buildSourceDir = tenv->GetToolDataDir();
 
     String buildAppSourceDir = buildSourceDir + "Deployment/IOS/AtomicPlayer.app";
 
-    fileSystem->CreateDir(buildPath_);
+    if (!BuildCreateDirectory(buildPath_))
+        return;
 
     String buildDestDist = buildPath_ + "/AtomicPlayer.app";
 
-    fileSystem->CreateDir(buildDestDist);
+    if (!BuildCreateDirectory(buildDestDist))
+        return;
 
     String resourcePackagePath = buildDestDist + "/AtomicResources" + PAK_EXTENSION;
     GenerateResourcePackage(resourcePackagePath);
 
-    fileSystem->Copy(buildAppSourceDir + "/AtomicPlayer", buildDestDist + "/AtomicPlayer");
-    fileSystem->Copy(buildAppSourceDir + "/PkgInfo", buildDestDist + "/PkgInfo");
-
-    fileSystem->Copy(iosSettings->GetProvisionFile(), buildDestDist + "/embedded.mobileprovision");
-
+    if (!BuildCopyFile(buildAppSourceDir + "/AtomicPlayer", buildDestDist + "/AtomicPlayer"))
+        return;
+    if (!BuildCopyFile(buildAppSourceDir + "/PkgInfo", buildDestDist + "/PkgInfo"))
+        return;
+    if (!BuildCopyFile(iosSettings->GetProvisionFile(), buildDestDist + "/embedded.mobileprovision"))
+        return;
+        
     String entitlements = GenerateEntitlements();
     String plist = GenerateInfoPlist();
 

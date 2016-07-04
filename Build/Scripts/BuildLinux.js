@@ -21,16 +21,12 @@ namespace('build', function() {
             common.cleanCreateDir(host.getGenScriptRootDir("LINUX"));
         }
 
-        // create the generated script files, so they will be picked up by cmake
-        host.createGenScriptFiles("LINUX");
-
         process.chdir(buildDir);
 
         var cmds = [];
 
         cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -DCMAKE_BUILD_TYPE=Release");
-        cmds.push("make -j4 GenerateScriptBindings")
-        cmds.push("make -j4 AtomicEditor AtomicPlayer")
+        cmds.push("make -j2")
 
         jake.exec(cmds, function() {
 
@@ -86,5 +82,5 @@ namespace('build', function() {
         });
 
     });
-    
+
 });

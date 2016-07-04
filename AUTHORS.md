@@ -3,9 +3,9 @@
 
 #### THUNDERBEAST GAMES LLC:
 
-- Josh Engebretson (Technical Director)
+- Josh Engebretson (https://github.com/JoshEngebretson)
 
-- Lara Engebretson
+- Lara Engebretson (https://github.com/LaraEngebretson)
 
 ### Contributors:
 

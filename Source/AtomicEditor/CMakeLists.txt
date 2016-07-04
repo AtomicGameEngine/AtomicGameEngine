@@ -197,6 +197,8 @@ if (TARGET_PROPERTIES)
     set_target_properties (AtomicEditor PROPERTIES ${TARGET_PROPERTIES})
 endif ()
 
+add_dependencies(${CEF_TARGET} AtomicToolCheckScripts)
+
 GroupSources("Application")
 GroupSources("EditorMode")
 GroupSources("Editors")

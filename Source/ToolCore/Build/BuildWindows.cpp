@@ -86,7 +86,7 @@ bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const Str
         }
     }
     // #623 END TODO
-    
+
     return BuildBase::CheckIncludeResourceFile(resourceDir, fileName);
 }
 

@@ -21,15 +21,11 @@ task('atomiceditor', {
     common.cleanCreateDir(host.getGenScriptRootDir("MACOSX"));
   }
 
-  // create the generated script files, so they will be picked up by cmake
-  host.createGenScriptFiles("MACOSX");
-
   process.chdir(buildDir);
 
   var cmds = [];
 
   cmds.push("cmake ../../../ -DATOMIC_DEV_BUILD=0 -G Xcode");
-  cmds.push("xcodebuild -target GenerateScriptBindings -configuration Release -parallelizeTargets -jobs 4")
   cmds.push("xcodebuild -target AtomicEditor -target AtomicPlayer -configuration Release -parallelizeTargets -jobs 4")
 
   jake.exec(cmds, function() {
@@ -81,26 +77,15 @@ task('genxcode', {
       jake.mkdirP(xcodeRoot);
   }
 
-  // create the generated script files, so they will be picked up by cmake
-  host.createGenScriptFiles("MACOSX");
-
   process.chdir(xcodeRoot);
 
   var cmds = [];
 
   cmds.push("cmake ../AtomicGameEngine -DATOMIC_DEV_BUILD=1 -G Xcode");
-  cmds.push("xcodebuild -target GenerateScriptBindings -configuration Debug")
 
   jake.exec(cmds, function() {
 
-    var task = jake.Task['build:genscripts']
-
-    task.addListener('complete', function () {
-        console.log("\n\nXCode workspace generated in " +  xcodeRoot + "\n\n");
-        complete();
-      });
-
-    task.invoke("MACOSX");
+    complete();
 
   }, {
     printStdout: true
