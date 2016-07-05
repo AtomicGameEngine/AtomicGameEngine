@@ -290,9 +290,8 @@ interface WindowData {
     maximized: boolean;
 }
 
-interface AceEditorSettings {
+interface MonacoEditorSettings {
     theme: string;
-    keyboardHandler: string;
     fontSize: number;
     showInvisibles: boolean;
     useSoftTabs: boolean;
@@ -341,9 +340,8 @@ class PreferencesFormat {
             maximized: false
         };
 
-        this.codeEditorSettings = {
-            theme: "ace/theme/monokai",
-            keyboardHandler: "ace/keyboard/textinput",
+        this.codeEditor = {
+            theme: "vs-dark",
             fontSize: 12,
             showInvisibles: false,
             useSoftTabs: true,
@@ -360,7 +358,7 @@ class PreferencesFormat {
 
         this.editorBuildData = {
             lastEditorBuildSHA: "Unversioned Build"
-        }
+        };
 
     }
 
@@ -387,8 +385,8 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
-        if (!prefs.codeEditorSettings) {
-            prefs.codeEditorSettings = this.codeEditorSettings;
+        if (!prefs.codeEditor) {
+            prefs.codeEditor = this.codeEditor;
             updatedMissingDefaults = true;
         }
 
@@ -408,7 +406,7 @@ class PreferencesFormat {
     recentProjects: string[];
     editorWindow: WindowData;
     playerWindow: WindowData;
-    codeEditorSettings: AceEditorSettings;
+    codeEditor: MonacoEditorSettings;
     uiData: UserInterfaceData;
     editorBuildData: EditorBuildData;
 }
