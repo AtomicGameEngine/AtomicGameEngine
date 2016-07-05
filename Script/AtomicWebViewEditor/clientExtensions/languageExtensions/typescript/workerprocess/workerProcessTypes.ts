@@ -28,7 +28,7 @@ export interface WorkerProcessMessageData {
     command: string;
 }
 
-export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent {}
+export interface SaveMessageData extends WorkerProcessMessageData, Editor.EditorEvents.CodeSavedEvent { }
 
 export interface DeleteMessageData extends WorkerProcessMessageData, Editor.EditorEvents.DeleteResourceEvent { }
 export interface RenameMessageData extends WorkerProcessMessageData, Editor.EditorEvents.RenameResourceEvent { }
@@ -38,43 +38,6 @@ export interface SetPreferencesMessageData extends WorkerProcessMessageData {
     preferences: {
         compileOnSave?: boolean;
     };
-}
-
-export const GetCompletions = "COMPLETIONS";
-export const CompletionResponse = "COMPLETION_RESPONSE";
-export interface WordCompletion {
-    caption: string;
-    meta: string;
-    score: number;
-    value: string;
-    pos: number;
-    snippet?: string;
-    docHTML?: string;
-    docText?: string;
-}
-
-export interface GetCompletionsMessageData extends WorkerProcessMessageData {
-    sourceText: string;
-    filename: string;
-    pos: { row: number, column: number };
-    prefix: string;
-}
-
-export interface GetCompletionsResponseMessageData extends WorkerProcessMessageData {
-    completions: Array<WordCompletion>;
-}
-
-export const GetDocTooltip = "DOC_TOOLTIP";
-export const DocTooltipResponse = "DOC_TOOLTIP_RESPONSE";
-export interface GetDocTooltipMessageData extends WorkerProcessMessageData {
-    completionItem: WordCompletion;
-    filename: string;
-    pos: number;
-}
-
-export interface GetDocTooltipResponseMessageData extends WorkerProcessMessageData {
-    docText?: string;
-    docHTML?: string;
 }
 
 export const GetAnnotations = "ANNOTATIONS";
@@ -101,3 +64,65 @@ export const Connect = "HELO";
 export const Disconnect = "CLOSE";
 export const Message = "MESSAGE";
 export const Alert = "ALERT";
+
+
+/* New Monaco messages */
+export interface MonacoWordCompletion extends monaco.languages.CompletionItem {
+    uri: string;
+    positionOffset: number;
+    /**
+     * Completion kind from the TypescriptLanguage Service
+     * @type {string}
+     */
+    completionKind: string;
+}
+
+export const MonacoProvideCompletionItems = "MONACO_PROVIDE_COMPLETION_ITEMS";
+export const MonacoProvideCompletionItemsResponse = "MONACO_PROVIDE_COMPLETION_ITEMS_RESPONS";
+export interface MonacoProvideCompletionItemsMessageData extends WorkerProcessMessageData {
+    uri: string;
+    source: string;
+    positionOffset: number;
+}
+
+export interface MonacoProvideCompletionItemsResponseMessageData extends WorkerProcessMessageData {
+    completions: MonacoWordCompletion[];
+}
+
+export const MonacoResolveCompletionItem = "MONACO_RESOLVE_COMPLETION_ITEM";
+export const MonacoResolveCompletionItemResponse = "MONACO_RESOLVE_COMPLETION_ITEM_RESPONSE";
+export interface MonacoResolveCompletionItemMessageData extends WorkerProcessMessageData {
+    item: MonacoWordCompletion;
+}
+
+export interface MonacoResolveCompletionItemResponseMessageData extends WorkerProcessMessageData, monaco.languages.CompletionItem { }
+
+export const MonacoGetQuickInfo = "QUICK_INFO";
+export const MonacoGetQuickInfoResponse = "QUICK_INFO_RESPONSE";
+export interface MonacoGetQuickInfoMessageData extends WorkerProcessMessageData {
+    source: string;
+    uri: string;
+    positionOffset: number;
+}
+
+export interface MonacoGetQuickInfoResponseMessageData extends WorkerProcessMessageData {
+    contents?: string;
+    textSpan?: {
+        start: number,
+        length: number
+    };
+}
+
+export const MonacoGetSignature = "SIGNATURE";
+export const MonacoGetSignatureResponse = "SIGNATURE_RESPONSE";
+export interface MonacoGetSignatureMessageData extends WorkerProcessMessageData {
+    source: string;
+    uri: string;
+    positionOffset: number;
+}
+
+export interface MonacoGetSignatureMessageDataResponse extends WorkerProcessMessageData {
+    selectedItemIndex?: number;
+    argumentIndex?: number;
+    signatures?;
+}

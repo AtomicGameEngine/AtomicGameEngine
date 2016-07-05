@@ -72,7 +72,7 @@ class WebFileSystem implements FileSystemInterface {
 
     /**
      * Sets the port used to communicate with the primary window.
-     * This is needed since AtomicQuery can't be called from a webworker
+     * This is needed since AtomicQuery can"t be called from a webworker
      * @param  {MessagePort} port
      */
     setCommunicationPort(port: MessagePort) {
@@ -182,12 +182,6 @@ export default class TypescriptLanguageServiceWebWorker {
                     case WorkerProcessTypes.Disconnect:
                         this.handleCLOSE(port, e.data);
                         break;
-                    case WorkerProcessTypes.GetCompletions:
-                        this.handleGetCompletions(port, e.data);
-                        break;
-                    case WorkerProcessTypes.GetDocTooltip:
-                        this.handleGetDocTooltip(port, e.data);
-                        break;
                     case ClientExtensionEventNames.CodeSavedEvent:
                         this.handleSave(port, e.data);
                         break;
@@ -206,11 +200,24 @@ export default class TypescriptLanguageServiceWebWorker {
                     case WorkerProcessTypes.DoFullCompile:
                         this.doFullCompile(port, e.data);
                         break;
+
+                    /* Monaco */
+                    case WorkerProcessTypes.MonacoProvideCompletionItems:
+                        this.monacoHandleProvideCompletionItems(port, e.data);
+                        break;
+                    case WorkerProcessTypes.MonacoResolveCompletionItem:
+                        this.monacoHandleResolveCompletionItem(port, e.data);
+                        break;
+                    case WorkerProcessTypes.MonacoGetQuickInfo:
+                        this.monacoGetQuickInfo(port, e.data);
+                        break;
+                    case WorkerProcessTypes.MonacoGetSignature:
+                        this.monacoGetSignature(port, e.data);
+                        break;
                 }
             } catch (e) {
                 port.postMessage({ command: WorkerProcessTypes.Message, message: `Error in TypescriptLanguageServiceWebWorker: ${e}\n${e.stack}` });
             }
-
         }, false);
 
         port.start();
@@ -230,7 +237,7 @@ export default class TypescriptLanguageServiceWebWorker {
      * @return {Promise}
      */
     private loadProjectFiles() {
-        // Let's query the backend and get a list of the current files
+        // Let"s query the backend and get a list of the current files
         // and delete any that may be been removed and sync up
         let promises: PromiseLike<void>[] = [];
 
@@ -265,7 +272,8 @@ export default class TypescriptLanguageServiceWebWorker {
     handleHELO(port: MessagePort, eventData: any | {
         sender: string,
         filename: string,
-        tsConfig: any
+        tsConfig: any,
+        code: string
     }) {
         //port.postMessage({ command: WorkerProcessTypes.Message, message: "Hello " + eventData.sender + " (port #" + this.connections + ")" });
         this.tsConfig = eventData.tsConfig;
@@ -274,12 +282,15 @@ export default class TypescriptLanguageServiceWebWorker {
         }
 
         // Check to see if the file coming in is already in the
-        // tsconfig.  The file coming in won't have a full path
+        // tsconfig.  The file coming in won"t have a full path
         // so, compare the ends
         const fn = this.resolvePartialFilename(eventData.filename);
 
+        // Add this file right away, and then add the rest of the project files
+        this.languageService.addProjectFile(fn, eventData.code);
+
         this.loadProjectFiles().then(() => {
-            let diagnostics = this.languageService.compile([fn]);
+            //let diagnostics = this.languageService.compile([fn]);
             this.handleGetAnnotations(port, eventData);
         });
     }
@@ -307,73 +318,18 @@ export default class TypescriptLanguageServiceWebWorker {
         let result = this.tsConfig.files.find(fn => fn.endsWith(partial));
         return result || partial;
     }
-    /**
-     * Get completions
-     * @param  {MessagePort} port
-     * @param  {WorkerProcessCommands.GetCompletionsMessage} eventData
-     */
-    handleGetCompletions(port: MessagePort, eventData: WorkerProcessTypes.GetCompletionsMessageData) {
-        // filename may not include the entire path, so let's find it in the tsconfig
-        let filename = this.resolvePartialFilename(eventData.filename);
-        let sourceFile = this.languageService.updateProjectFile(filename, eventData.sourceText);
-
-        let newpos = this.languageService.getPositionOfLineAndCharacter(sourceFile, eventData.pos.row, eventData.pos.column);
-        let completions = this.languageService.getCompletions(filename, newpos);
-
-        let message: WorkerProcessTypes.GetCompletionsResponseMessageData = {
-            command: WorkerProcessTypes.CompletionResponse,
-            completions: []
-        };
-        let langService = this.languageService;
-
-        if (completions) {
-            message.completions = completions.entries.map((completion: ts.CompletionEntry) => {
-                let value = completion.name;
-                let completionItem: WorkerProcessTypes.WordCompletion = {
-                    caption: completion.name,
-                    value: value,
-                    score: 100 - parseInt(completion.sortText, 0),
-                    meta: completion.kind,
-                    pos: newpos
-                };
-
-                //completionItem.docTooltip = this.getDocTooltip(eventData.filename, newpos, completionItem);
-                return completionItem;
-            });
-        }
-
-        port.postMessage(message);
-    }
 
     /**
-     * Get the documentation popup information for the current completion item
+     * Get any errors or warnings
      * @param  {MessagePort} port
-     * @param  {WorkerProcessCommands.GetDocTooltipMessageData} eventData
-     * @return {[type]}
+     * @param  {WorkerProcessTypes.GetAnnotationsMessageData} eventData
      */
-    handleGetDocTooltip(port: MessagePort, eventData: WorkerProcessTypes.GetDocTooltipMessageData) {
-        let message: WorkerProcessTypes.GetDocTooltipResponseMessageData = {
-            command: WorkerProcessTypes.DocTooltipResponse
-        };
-        let filename = this.resolvePartialFilename(eventData.filename);
-        const details = this.languageService.getCompletionEntryDetails(filename, eventData.pos, eventData.completionItem.caption);
-        if (details) {
-            let docs = details.displayParts.map(part => part.text).join("");
-            if (details.documentation) {
-                docs += "<p>" + details.documentation.map(part => part.text).join("") + "</p>";
-            }
-
-            message.docHTML = docs;
-        }
-
-        port.postMessage(message);
-    }
-
     handleGetAnnotations(port: MessagePort, eventData: WorkerProcessTypes.GetAnnotationsMessageData) {
         let filename = this.resolvePartialFilename(eventData.filename);
+        this.languageService.updateProjectFile(filename, eventData.code);
         let message: WorkerProcessTypes.GetAnnotationsResponseMessageData = {
             command: WorkerProcessTypes.AnnotationsUpdated,
-            annotations: this.languageService.getPreEmitWarnings(filename)
+            annotations: this.languageService.getDiagnostics(filename)
         };
 
         port.postMessage(message);
@@ -397,6 +353,7 @@ export default class TypescriptLanguageServiceWebWorker {
         }
     }
 
+
     /**
      * Perform a full compile of the typescript
      * @param  {MessagePort} port
@@ -407,22 +364,26 @@ export default class TypescriptLanguageServiceWebWorker {
 
         this.fs.setCommunicationPort(port);
 
-        // update all the files
-        this.tsConfig.files.forEach(file => {
-            this.languageService.updateProjectFileVersionNumber(file);
-        });
-
         let results = [];
         let start = Date.now();
         this.languageService.compile([], (filename, errors) => {
             if (errors.length > 0) {
                 results = results.concat(errors.map(diagnostic => {
-                    let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                    let row = 0;
+                    let char = 0;
+                    let filename = "";
+                    if (diagnostic.file) {
+                        let lineChar = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+                        row = lineChar.line;
+                        char = lineChar.character;
+                        filename = diagnostic.file.fileName;
+                    }
+
                     let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
                     return {
-                        file: diagnostic.file.fileName,
-                        row: lineChar.line,
-                        column: lineChar.character,
+                        file: filename,
+                        row: row,
+                        column: char,
                         text: message,
                         type: diagnostic.category == 1 ? "error" : "warning"
                     };
@@ -449,13 +410,132 @@ export default class TypescriptLanguageServiceWebWorker {
         port.postMessage(message);
     }
 
+    /*  Monaco Routines */
+
+    /**
+     * Get completions
+     * @param  {MessagePort} port
+     * @param  {WorkerProcessCommands.GetCompletionsMessage} eventData
+     */
+    monacoHandleProvideCompletionItems(port: MessagePort, eventData: WorkerProcessTypes.MonacoProvideCompletionItemsMessageData) {
+        // filename may not include the entire path, so let"s find it in the tsconfig
+        let filename = this.resolvePartialFilename(eventData.uri);
+        let sourceFile = this.languageService.updateProjectFile(filename, eventData.source);
+        let completions = this.languageService.getCompletions(filename, eventData.positionOffset);
+
+        let message: WorkerProcessTypes.MonacoProvideCompletionItemsResponseMessageData = {
+            command: WorkerProcessTypes.MonacoProvideCompletionItemsResponse,
+            completions: []
+        };
+
+        if (completions) {
+            message.completions = completions.entries.map((completion: ts.CompletionEntry) => {
+                let completionItem: WorkerProcessTypes.MonacoWordCompletion = {
+                    label: completion.name,
+                    uri: eventData.uri,
+                    sortText: completion.sortText,
+                    completionKind: completion.kind,
+                    kind: -1,
+                    positionOffset: eventData.positionOffset
+                };
+                return completionItem;
+            });
+        };
+
+        port.postMessage(message);
+    }
+
+
+    monacoHandleResolveCompletionItem(port: MessagePort, data: WorkerProcessTypes.MonacoResolveCompletionItemMessageData) {
+        let filename = this.resolvePartialFilename(data.item.uri);
+        const details = this.languageService.getCompletionEntryDetails(filename, data.item.positionOffset, data.item.label);
+        let message: WorkerProcessTypes.MonacoResolveCompletionItemResponseMessageData = {
+            command: WorkerProcessTypes.MonacoResolveCompletionItemResponse,
+            label: data.item.label,
+            kind: data.item.kind,
+            detail: "",
+            documentation: ""
+        };
+
+        if (details) {
+            message.label = details.name;
+            message.kind = data.item.kind;
+            message.detail = ts.displayPartsToString(details.displayParts);
+            message.documentation = ts.displayPartsToString(details.documentation);
+        }
+
+        port.postMessage(message);
+    }
+
+    monacoGetQuickInfo(port: MessagePort, eventData: WorkerProcessTypes.MonacoGetQuickInfoMessageData) {
+        let filename = this.resolvePartialFilename(eventData.uri);
+        let quickInfo = this.languageService.getQuickInfoAtPosition(filename, eventData.positionOffset);
+
+        let message: WorkerProcessTypes.MonacoGetQuickInfoResponseMessageData = {
+            command: WorkerProcessTypes.MonacoGetQuickInfoResponse,
+        };
+
+        if (quickInfo) {
+            message.contents = quickInfo.contents;
+            message.textSpan = quickInfo.range;
+        }
+
+        port.postMessage(message);
+    }
+
+    monacoGetSignature(port: MessagePort, eventData: WorkerProcessTypes.MonacoGetSignatureMessageData) {
+        let filename = this.resolvePartialFilename(eventData.uri);
+        let sourceFile = this.languageService.updateProjectFile(filename, eventData.source);
+        let signatureInfo = this.languageService.getSignatureHelpItems(filename, eventData.positionOffset);
+
+        let message: WorkerProcessTypes.MonacoGetSignatureMessageDataResponse = {
+            command: WorkerProcessTypes.MonacoGetSignatureResponse,
+        };
+
+        if (signatureInfo) {
+            message.selectedItemIndex = signatureInfo.selectedItemIndex;
+            message.argumentIndex = signatureInfo.argumentIndex;
+            message.signatures = [];
+
+            signatureInfo.items.forEach(item => {
+                let signature: monaco.languages.SignatureInformation = {
+                    label: "",
+                    documentation: null,
+                    parameters: []
+                };
+
+                signature.label += ts.displayPartsToString(item.prefixDisplayParts);
+
+                item.parameters.forEach((p, i, a) => {
+                    let label = ts.displayPartsToString(p.displayParts);
+                    let parameter: monaco.languages.ParameterInformation = {
+                        label: label,
+                        documentation: ts.displayPartsToString(p.documentation)
+                    };
+
+                    signature.label += label;
+                    signature.parameters.push(parameter);
+                    if (i < a.length - 1) {
+                        signature.label += ts.displayPartsToString(item.separatorDisplayParts);
+                    }
+                });
+
+                signature.label += ts.displayPartsToString(item.suffixDisplayParts);
+                message.signatures.push(signature);
+            });
+        }
+
+        port.postMessage(message);
+    }
+
     /**
      * Called when a file has been deleted
      * @param  {MessagePort} port
      * @param  {WorkerProcessCommands.DeleteMessageData} eventData
      */
     handleDelete(port: MessagePort, eventData: WorkerProcessTypes.DeleteMessageData) {
-        this.languageService.deleteProjectFile(eventData.path);
+        let filename = this.resolvePartialFilename(eventData.path);
+        this.languageService.deleteProjectFile(filename);
     }
 
     /**
@@ -464,7 +544,9 @@ export default class TypescriptLanguageServiceWebWorker {
      * @param  {WorkerProcessCommands.RenameMessageData} eventData
      */
     handleRename(port: MessagePort, eventData: WorkerProcessTypes.RenameMessageData) {
-        this.languageService.renameProjectFile(eventData.path, eventData.newPath);
+        let fromFn = this.resolvePartialFilename(eventData.path);
+        let toFn = fromFn.replace(eventData.path, eventData.newPath);
+        this.languageService.renameProjectFile(fromFn, toFn);
     }
 
     setPreferences(port: MessagePort, eventData: WorkerProcessTypes.SetPreferencesMessageData) {

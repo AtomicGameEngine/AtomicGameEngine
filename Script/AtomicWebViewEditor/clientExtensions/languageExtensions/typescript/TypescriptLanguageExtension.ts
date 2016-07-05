@@ -24,6 +24,7 @@
 import * as ts from "../../../modules/typescript";
 import * as WorkerProcessTypes from "./workerprocess/workerProcessTypes";
 import ClientExtensionEventNames from "../../ClientExtensionEventNames";
+import * as tsLanguageSupport from "./tsLanguageSupport";
 
 /**
  * Resource extension that handles compiling or transpling typescript on file save.
@@ -36,7 +37,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * current filename
      * @type {string}
      */
-    private filename: string;
+    filename: string;
 
     /**
      * Is this instance of the extension active?  Only true if the current editor
@@ -49,7 +50,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
 
     private worker: SharedWorker.SharedWorker;
 
-    private editor;
+    private editor: monaco.editor.IStandaloneCodeEditor;
 
     /**
      * Perform a full compile on save, or just transpile the current file
@@ -74,7 +75,31 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     private isValidFiletype(path: string): boolean {
         let ext = path.split(".").pop();
-        return ext == "ts";
+        return ext == "ts" || ext == "js";
+    }
+
+    /**
+     * Returns true if this is a javascript file
+     * @param  {string} path
+     * @return {boolean}
+     */
+    private isJsFile(path: string): boolean {
+        let ext = path.split(".").pop();
+        return ext == "js";
+    }
+
+    /**
+     * Checks to see if this is a transpiled Javascript file
+     * @param  {string} path
+     * @param  {[type]} tsconfig
+     * @return {boolean}
+     */
+    private isTranspiledJsFile(path: string, tsconfig): boolean {
+        if (this.isJsFile(path)) {
+            const tsFilename = path.replace(/\.js$/, ".ts");
+            return tsconfig.files.find(f => f.endsWith(tsFilename)) != null;
+        }
+        return false;
     }
 
     /**
@@ -85,7 +110,7 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      * @param  {any} message
      * @return {PromiseLike}
      */
-    private workerRequest(responseChannel: string, message: any): PromiseLike<{}> {
+    workerRequest(responseChannel: string, message: any): PromiseLike<{}> {
         let worker = this.worker;
 
         return new Promise((resolve, reject) => {
@@ -101,60 +126,130 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
-     * Grabs the TS Config file attached to the global window object
-     * @return {any}
-     */
-    private getTsConfig(): any {
-        return JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
-    }
-
-    /**
      * Called when the editor needs to be configured for a particular file
      * @param  {Editor.EditorEvents.EditorFileEvent} ev
      */
     configureEditor(ev: Editor.EditorEvents.EditorFileEvent) {
         if (this.isValidFiletype(ev.filename)) {
-            let editor = <AceAjax.Editor>ev.editor;
-            editor.session.setMode("ace/mode/typescript");
+            this.active = true;
 
-            editor.setOptions({
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion: true
+            this.overrideBuiltinServiceProviders();
+
+            // Hook in the routine to allow the host to perform a full compile
+            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", (jsonTsConfig: string) => {
+                let tsConfig = JSON.parse(jsonTsConfig);
+                this.doFullCompile(tsConfig);
             });
 
+            this.filename = ev.filename;
+
+            let editor = ev.editor as monaco.editor.IStandaloneCodeEditor;
             this.editor = editor; // cache this so that we can reference it later
+            // Let's turn some things off in the editor.  These will be provided by the shared web worker
+            if (this.isJsFile(ev.filename)) {
+                monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+                    noEmit: true,
+                    noResolve: true,
+                    allowNonTsExtensions: true,
+                    noLib: true,
+                    target: monaco.languages.typescript.ScriptTarget.ES5
+                });
+
+                monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+                    noSemanticValidation: true,
+                    noSyntaxValidation: true
+                });
+
+                // Register editor feature providers
+                monaco.languages.registerCompletionItemProvider("javascript", new CustomCompletionProvider(this));
+                monaco.languages.registerHoverProvider("javascript", new CustomHoverProvider(this));
+                monaco.languages.registerSignatureHelpProvider("javascript", new CustomSignatureProvider(this));
+            } else {
+                monaco.languages.register({
+                    id: "atomic-ts"
+                });
+                monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+                    noEmit: true,
+                    noResolve: true,
+                    noLib: true,
+                    target: monaco.languages.typescript.ScriptTarget.ES5
+                });
+
+                monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+                    noSemanticValidation: true,
+                    noSyntaxValidation: true
+                });
+
+                // Register editor feature providers
+                monaco.languages.registerCompletionItemProvider("typescript", new CustomCompletionProvider(this));
+                monaco.languages.registerSignatureHelpProvider("typescript", new CustomSignatureProvider(this));
+                monaco.languages.registerHoverProvider("typescript", new CustomHoverProvider(this));
+            }
         }
+    }
+
+    /**
+     * Monkeypatch the TypeScript language provider so that our service providers get loaded
+     * and not the built-in ones.  Ours use a shared web worker so that state can be shared
+     * across tabs.
+     */
+    private overrideBuiltinServiceProviders() {
+        monaco.languages.registerSignatureHelpProvider = ((original) => {
+            return function(languageId: string, provider: monaco.languages.SignatureHelpProvider): monaco.IDisposable {
+                if (provider["isOverride"]) {
+                    return original(languageId, provider);
+                }
+            };
+        })(monaco.languages.registerSignatureHelpProvider);
+
+        monaco.languages.registerCompletionItemProvider = ((original) => {
+            return function(languageId: string, provider: monaco.languages.CompletionItemProvider): monaco.IDisposable {
+                if (provider["isOverride"]) {
+                    return original(languageId, provider);
+                }
+            };
+        })(monaco.languages.registerCompletionItemProvider);
+
+        monaco.languages.registerHoverProvider = ((original) => {
+            return function(languageId: string, provider: monaco.languages.HoverProvider): monaco.IDisposable {
+                if (provider["isOverride"]) {
+                    return original(languageId, provider);
+                }
+            };
+        })(monaco.languages.registerHoverProvider);
     }
 
     /**
      * Called when code is first loaded into the editor
      * @param  {CodeLoadedEvent} ev
-     * @return {[type]}
      */
     codeLoaded(ev: Editor.EditorEvents.CodeLoadedEvent) {
         if (this.isValidFiletype(ev.filename)) {
 
-            // Hook in the routine to allow the host to perform a full compile
-            this.serviceLocator.clientServices.getHostInterop().addCustomHostRoutine("TypeScript_DoFullCompile", this.doFullCompile.bind(this));
-
-            this.filename = ev.filename;
-            this.active = true;
-
-            let editor = ev.editor;
-
-            // we only want the typescript completer, otherwise we get a LOT of noise
-            editor.completers = [this.buildWordCompleter(ev.filename)];
-
             // Build our worker
             this.buildWorker();
+
+            // Initial load, so the TSConfig on the window object should be the most current
+            let tsConfig = JSON.parse(window["TypeScriptLanguageExtension"]["tsConfig"]);
+
+            let model = this.editor.getModel();
+            let handle: number;
+            model.onDidChangeContent(() => {
+                clearTimeout(handle);
+                handle = setTimeout(() => this.getAnnotations(), 500);
+            });
 
             // post a message to the shared web worker
             this.worker.port.postMessage({
                 command: WorkerProcessTypes.Connect,
                 sender: "Typescript Language Extension",
                 filename: ev.filename,
-                tsConfig: this.getTsConfig()
+                tsConfig: tsConfig,
+                code: ev.code
             });
+
+            // Configure based on prefs
+            this.preferencesChanged();
         }
     }
 
@@ -193,81 +288,61 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     }
 
     /**
+     * Request the markers to display
+     */
+    getAnnotations() {
+        const message: WorkerProcessTypes.GetAnnotationsMessageData = {
+            command: WorkerProcessTypes.GetAnnotations,
+            code: this.editor.getModel().getValue(),
+            filename: this.filename,
+            fileExt: null,
+            editor: null // cannot send editor across the boundary
+        };
+
+        this.worker.port.postMessage(message);
+    }
+
+    /**
      * Set annotations based upon issues reported by the typescript language service
      * @param  {WorkerProcessTypes.GetAnnotationsResponseMessageData} event
      */
     setAnnotations(event: WorkerProcessTypes.GetAnnotationsResponseMessageData) {
-        // grab the existing annotations and filter out any TS annotations
-        let oldAnnotations = this.editor.session.getAnnotations().filter(ann => !ann.tsAnnotation);
-        this.editor.session.clearAnnotations();
+        let model = this.editor.getModel();
+        let markers = event.annotations
+            .filter(ann => ann.start != undefined)
+            .map(ann => {
+                return {
+                    code: ann.code,
+                    severity: monaco.Severity.Error,
+                    message: ann.message,
+                    //source?: string;
+                    startLineNumber: model.getPositionAt(ann.start).lineNumber,
+                    startColumn: model.getPositionAt(ann.start).column,
+                    endLineNumber: model.getPositionAt(ann.start + ann.length).lineNumber,
+                    endColumn: model.getPositionAt(ann.start + ann.length).column
+                };
+            });
 
-        // Mark these annotations as special
-        event.annotations.forEach(ann => ann.tsAnnotation = true);
-        this.editor.session.setAnnotations(oldAnnotations.concat(event.annotations));
+        monaco.editor.setModelMarkers(this.editor.getModel(), "Atomic", markers);
     }
 
     /**
      * Build/Attach to the shared web worker
      */
     buildWorker() {
+        if (!this.worker) {
+            this.worker = new SharedWorker("./source/editorCore/clientExtensions/languageExtensions/typescript/workerprocess/workerLoader.js");
 
-        this.worker = new SharedWorker("./source/editorCore/clientExtensions/languageExtensions/typescript/workerprocess/workerLoader.js");
+            // hook up the event listener
+            this.worker.port.addEventListener("message", this.handleWorkerMessage.bind(this), false);
 
-        // hook up the event listener
-        this.worker.port.addEventListener("message", this.handleWorkerMessage.bind(this), false);
+            // Tell the SharedWorker we're closing
+            addEventListener("beforeunload", () => {
+                this.worker.port.postMessage({ command: WorkerProcessTypes.Disconnect });
+            });
 
-        // Tell the SharedWorker we're closing
-        addEventListener("beforeunload", () => {
-            this.worker.port.postMessage({ command: WorkerProcessTypes.Disconnect });
-        });
-
-        this.worker.port.start();
-    }
-
-    /**
-     * Builds the word completer for the Ace Editor.  This will handle determining which items to display in the popup and in which order
-     * @param  {string} filename the filename of the current file
-     * @return {[type]} returns a completer
-     */
-    private buildWordCompleter(filename: string): {
-        getDocTooltip?: (selected: WorkerProcessTypes.WordCompletion) => void,
-        getCompletions: (editor, session, pos, prefix, callback) => void
-    } {
-        let extension = this;
-        let wordCompleter = {
-            getDocTooltip: function(selected: WorkerProcessTypes.WordCompletion) {
-                const message: WorkerProcessTypes.GetDocTooltipMessageData = {
-                    command: WorkerProcessTypes.GetDocTooltip,
-                    filename: extension.filename,
-                    completionItem: selected,
-                    pos: selected.pos
-                };
-
-                // Since the doc tooltip built in function of Ace doesn't support async calls to retrieve the tootip,
-                // we need to go ahead and call the worker and then force the display of the tooltip when we get
-                // a result back
-                extension.workerRequest(WorkerProcessTypes.DocTooltipResponse, message)
-                    .then((e: WorkerProcessTypes.GetDocTooltipResponseMessageData) => {
-                        extension.editor.completer.showDocTooltip(e);
-                    });
-            },
-
-            getCompletions: function(editor, session, pos, prefix, callback) {
-                const message: WorkerProcessTypes.GetCompletionsMessageData = {
-                    command: WorkerProcessTypes.GetCompletions,
-                    filename: extension.filename,
-                    pos: pos,
-                    sourceText: editor.session.getValue(),
-                    prefix: prefix
-                };
-
-                extension.workerRequest(WorkerProcessTypes.CompletionResponse, message)
-                    .then((e: WorkerProcessTypes.GetCompletionsResponseMessageData) => {
-                        callback(null, e.completions);
-                    });
-            }
-        };
-        return wordCompleter;
+            this.worker.port.start();
+        }
     }
 
     /**
@@ -276,8 +351,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     save(ev: Editor.EditorEvents.CodeSavedEvent) {
         if (this.active && this.isValidFiletype(ev.filename)) {
-            //console.log(`${this.name}: received a save resource event for ${ev.filename}`);
-
             const message: WorkerProcessTypes.SaveMessageData = {
                 command: ClientExtensionEventNames.CodeSavedEvent,
                 filename: ev.filename,
@@ -296,8 +369,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     delete(ev: Editor.EditorEvents.DeleteResourceEvent) {
         if (this.active && this.isValidFiletype(ev.path)) {
-            //console.log(`${this.name}: received a delete resource event for ${ev.path}`);
-
             // notify the typescript language service that the file has been deleted
             const message: WorkerProcessTypes.DeleteMessageData = {
                 command: ClientExtensionEventNames.ResourceDeletedEvent,
@@ -314,8 +385,6 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
      */
     rename(ev: Editor.EditorEvents.RenameResourceEvent) {
         if (this.active && this.isValidFiletype(ev.path)) {
-            //console.log(`${this.name}: received a rename resource event for ${ev.path} -> ${ev.newPath}`);
-
             // notify the typescript language service that the file has been renamed
             const message: WorkerProcessTypes.RenameMessageData = {
                 command: ClientExtensionEventNames.ResourceRenamedEvent,
@@ -348,16 +417,15 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
     /**
      * Tell the language service to perform a full compile
      */
-    doFullCompile() {
+    doFullCompile(tsConfig: any) {
         if (this.active) {
             const message: WorkerProcessTypes.FullCompileMessageData = {
                 command: WorkerProcessTypes.DoFullCompile,
-                tsConfig: this.getTsConfig()
+                tsConfig: tsConfig
             };
             this.worker.port.postMessage(message);
         }
     }
-
 
     /**
      * Displays the results from a full compile
@@ -368,5 +436,129 @@ export default class TypescriptLanguageExtension implements Editor.ClientExtensi
             return `${result.text} at line ${result.row} col ${result.column} in ${result.file}`;
         });
         window.atomicQueryPromise("TypeScript.DisplayCompileResults", results);
+    }
+}
+
+
+/**
+ * Class used as a base for our custom providers to let the patched loader
+ * know to allow this through.
+ */
+class BuiltinServiceProviderOverride {
+
+    constructor(extension: TypescriptLanguageExtension) {
+        this.extension = extension;
+    }
+    protected extension: TypescriptLanguageExtension;
+
+    /**
+     * Used to tell the loader that we want to load this extension.  Others will be skipped
+     * @type {Boolean}
+     */
+    public isOverride = true;
+}
+
+/**
+ * Customized completion provider that will delegate to the shared web worker for it's completions
+ */
+class CustomCompletionProvider extends BuiltinServiceProviderOverride implements monaco.languages.CompletionItemProvider {
+    get triggerCharacters(): string[] {
+        return ["."];
+    }
+
+    provideCompletionItems(model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken): monaco.languages.CompletionItem[] | monaco.Thenable<monaco.languages.CompletionItem[]> | monaco.languages.CompletionList | monaco.Thenable<monaco.languages.CompletionList> {
+        const message: WorkerProcessTypes.MonacoProvideCompletionItemsMessageData = {
+            command: WorkerProcessTypes.MonacoProvideCompletionItems,
+            uri: this.extension.filename,
+            source: model.getValue(),
+            positionOffset: model.getOffsetAt(position)
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoProvideCompletionItemsResponse, message)
+            .then((e: WorkerProcessTypes.MonacoProvideCompletionItemsResponseMessageData) => {
+                // Need to map the TS completion kind to the monaco completion kind
+                return e.completions.map(completion => {
+                    completion.kind = tsLanguageSupport.Kind.convertKind(completion.completionKind);
+                    return completion;
+                }).filter(completion => {
+                    // Filter out built-in keywords since most of them don't apply to Atomic
+                    return completion.kind != monaco.languages.CompletionItemKind.Keyword;
+                });
+            });
+    }
+
+    resolveCompletionItem(item: monaco.languages.CompletionItem, token: monaco.CancellationToken): monaco.languages.CompletionItem | monaco.Thenable<monaco.languages.CompletionItem> {
+        const message: WorkerProcessTypes.MonacoResolveCompletionItemMessageData = {
+            command: WorkerProcessTypes.MonacoResolveCompletionItem,
+            item: item as WorkerProcessTypes.MonacoWordCompletion
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoResolveCompletionItem, message)
+            .then((e: WorkerProcessTypes.MonacoResolveCompletionItemResponseMessageData) => {
+                return e;
+            });
+    }
+}
+
+class CustomHoverProvider extends BuiltinServiceProviderOverride implements monaco.languages.HoverProvider {
+    protected _offsetToPosition(uri: monaco.Uri, offset: number): monaco.IPosition {
+        let model = monaco.editor.getModel(uri);
+        return model.getPositionAt(offset);
+    }
+
+    protected _textSpanToRange(uri: monaco.Uri, span: ts.TextSpan): monaco.IRange {
+        let p1 = this._offsetToPosition(uri, span.start);
+        let p2 = this._offsetToPosition(uri, span.start + span.length);
+        let {lineNumber: startLineNumber, column: startColumn} = p1;
+        let {lineNumber: endLineNumber, column: endColumn} = p2;
+        return { startLineNumber, startColumn, endLineNumber, endColumn };
+    }
+
+    provideHover(model, position) {
+        let resource = model.uri;
+        const message: WorkerProcessTypes.MonacoGetQuickInfoMessageData = {
+            command: WorkerProcessTypes.MonacoGetQuickInfo,
+            uri: this.extension.filename,
+            source: model.getValue(),
+            positionOffset: model.getOffsetAt(position)
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoGetQuickInfoResponse, message)
+            .then((e: WorkerProcessTypes.MonacoGetQuickInfoResponseMessageData) => {
+                if (e.contents) {
+                    return {
+                        range: this._textSpanToRange(resource, e.textSpan),
+                        contents: [e.contents]
+                    };
+                }
+            });
+    }
+}
+
+export class CustomSignatureProvider extends BuiltinServiceProviderOverride implements monaco.languages.SignatureHelpProvider {
+    public signatureHelpTriggerCharacters = ["(", ","];
+
+    provideSignatureHelp(model: monaco.editor.IReadOnlyModel, position: monaco.Position) {
+        let resource = model.uri;
+
+        const message: WorkerProcessTypes.MonacoGetSignatureMessageData = {
+            command: WorkerProcessTypes.MonacoGetSignature,
+            uri: this.extension.filename,
+            source: model.getValue(),
+            positionOffset: model.getOffsetAt(position)
+        };
+
+        return this.extension.workerRequest(WorkerProcessTypes.MonacoGetSignatureResponse, message)
+            .then((e: WorkerProcessTypes.MonacoGetSignatureMessageDataResponse) => {
+                if (e.signatures) {
+                    let result: monaco.languages.SignatureHelp = {
+                        signatures: e.signatures,
+                        activeSignature: e.selectedItemIndex,
+                        activeParameter: e.argumentIndex
+                    };
+
+                    return result;
+                }
+            });
     }
 }

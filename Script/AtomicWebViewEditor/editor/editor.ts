@@ -21,14 +21,22 @@
 //
 
 // Instantiate the editor
-const editor = ace.edit("editor");
+//let editor = ace.edit("editor");
+let editor: monaco.editor.IStandaloneCodeEditor;
 
 // and set some default options
+/*
 editor.setOptions({
     enableBasicAutocompletion: true,
     enableSnippets: true,
     enableLiveAutocompletion: true,
     theme: "ace/theme/monokai"
 });
+*/
+export function getInternalEditor(): monaco.editor.IStandaloneCodeEditor {
+    return editor;
+}
 
-export default editor;
+export function setInternalEditor(editorInstance: monaco.editor.IStandaloneCodeEditor) {
+    editor = editorInstance;
+}

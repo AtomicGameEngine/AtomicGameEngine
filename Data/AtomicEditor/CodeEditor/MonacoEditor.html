@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Editor</title>
+    <style type="text/css" media="screen">
+        body {
+            overflow: hidden;
+        }
+
+        #editor {
+            margin: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <pre id="editor"></pre>
+
+
+    <script src="./source/systemjs/system.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./source/monaco/vs/loader.js"></script>
+    <script>
+        System.config({
+            "baseURL": "./",
+            "defaultJSExtensions": true
+        });
+
+        // Load up the monaco editor and set it up to be able to be configured
+        require.config({
+            paths: {
+                'vs': 'source/monaco/vs'
+            }
+        });
+
+        var setupEditor = new Promise((resolve, reject) => {
+            require(['vs/editor/editor.main'], function() {
+                var editor = monaco.editor.create(document.getElementById('editor'));
+
+                // Make sure the editor resizes when the window resizes
+                window.onresize = ()=>{
+                    editor.layout();
+                }
+
+                System.import('./source/editorCore/interop').then((module) => {
+                    module.default.getInstance().setEditor(editor);
+                    module.default.getInstance().editorLoaded();
+                    resolve(module.default);
+                });
+            });
+        });
+
+        // Functions exposed to the host editor.  These
+        // are hooked in here so that they are available immediately from the host
+        // and when called will bring in the interop as a promise and call it once
+        // it has been loaded
+        function HOST_loadCode(url) {
+            setupEditor.then((interop) => {
+                interop.getInstance().loadCode(url);
+            });
+        }
+
+        function HOST_saveCode() {
+            setupEditor.then((interop) => {
+                interop.getInstance().saveCode();
+            });
+        }
+
+        function HOST_resourceRenamed(path, newPath) {
+            setupEditor.then((interop) => {
+                interop.getInstance().resourceRenamed(path, newPath);
+            });
+        }
+
+        function HOST_resourceDeleted(path) {
+            setupEditor.then((interop) => {
+                interop.getInstance().resourceDeleted(path);
+            });
+        }
+
+        function HOST_preferencesChanged(jsonProjectPrefs, jsonApplicationPrefs) {
+            setupEditor.then((interop) => {
+
+                let prefs = {
+                    projectPreferences: JSON.parse(jsonProjectPrefs),
+                    applicationPreferences: JSON.parse(jsonApplicationPrefs)
+                };
+
+                interop.getInstance().preferencesChanged(prefs);
+            });
+        }
+    </script>
+
+</body>
+
+</html>

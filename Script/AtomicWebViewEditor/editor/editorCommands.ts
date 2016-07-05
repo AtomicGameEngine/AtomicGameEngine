@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-import editor from "./editor";
+import * as internalEditor from "./editor";
 import serviceLocator from "../clientExtensions/ServiceLocator";
 import HostInterop from "../interop";
 import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventNames";
@@ -32,22 +32,19 @@ import ClientExtensionEventNames from "../clientExtensions/ClientExtensionEventN
  */
 export function configure(fileExt: string, filename: string) {
 
-    // set a default mode
-    editor.session.setMode("ace/mode/javascript");
-
-    // Grab the configured editor defaults and apply them
-    editor.setTheme(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "theme", "ace/theme/monokai"));
-    editor.setKeyboardHandler(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "keyboardHandler", "ace/keyboard/textinput"));
-    editor.setFontSize(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "fontSize", 12).toString() + "px");
-    editor.setShowInvisibles(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "showInvisibles", false));
-    editor.session.setUseSoftTabs(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "useSoftTabs", true));
-    editor.session.setTabSize(serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "tabSize", 4));
+    let monacoEditor = <monaco.editor.IStandaloneCodeEditor>internalEditor.getInternalEditor();
+    monacoEditor.updateOptions({
+        theme: serviceLocator.clientServices.getApplicationPreference("codeEditor", "theme", "vs-dark"),
+        renderWhitespace: serviceLocator.clientServices.getApplicationPreference("codeEditor", "showInvisibles", false),
+        mouseWheelScrollSensitivity: 2,
+        fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12)
+    });
 
     // give the language extensions the opportunity to configure the editor based upon the file type
     serviceLocator.sendEvent(ClientExtensionEventNames.ConfigureEditorEvent, {
         fileExt: fileExt,
         filename: filename,
-        editor: editor
+        editor: monacoEditor
     });
 }
 
@@ -56,7 +53,7 @@ export function configure(fileExt: string, filename: string) {
  * @return {string}
  */
 export function getSourceText(): string {
-    return editor.session.getValue();
+    return internalEditor.getInternalEditor().getModel().getValue();
 }
 
 /**
@@ -66,20 +63,26 @@ export function getSourceText(): string {
  * @param  {string} fileExt
  */
 export function loadCodeIntoEditor(code: string, filename: string, fileExt: string) {
-    editor.session.setValue(code);
-    editor.gotoLine(0);
 
-    editor.getSession().on("change", function(e) {
-        HostInterop.getInstance().notifyEditorChange();
+    let monacoEditor = internalEditor.getInternalEditor();
+    let model = monaco.editor.createModel(code, null, monaco.Uri.file(filename));
+
+    model.updateOptions({
+        insertSpaces: serviceLocator.clientServices.getApplicationPreference("codeEditor", "useSoftTabs", true),
+        tabSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "tabSize", 4)
     });
 
+    monacoEditor.setModel(model);
     serviceLocator.sendEvent(ClientExtensionEventNames.CodeLoadedEvent, {
         code: code,
         filename: filename,
         fileExt: fileExt,
-        editor: editor
+        editor: monacoEditor
     });
 
+    monacoEditor.onDidChangeModelContent((listener) => {
+        HostInterop.getInstance().notifyEditorChange();
+    });
 }
 
 /**
@@ -116,7 +119,7 @@ export function codeSaved(path: string, fileExt: string, contents: string) {
     let data: Editor.EditorEvents.CodeSavedEvent = {
         filename: path,
         fileExt: fileExt,
-        editor: editor,
+        editor: internalEditor.getInternalEditor(),
         code: contents
     };
     serviceLocator.sendEvent(ClientExtensionEventNames.CodeSavedEvent, data);
@@ -132,9 +135,12 @@ export function editorLoaded() {
 
 /**
  * Called when new preferences are available (or initially with current prefs)
- * @param  {any} prefs
  */
-export function preferencesChanged() {
-    serviceLocator.clientServices.setPreferences(JSON.parse(window.HOST_Preferences.ProjectPreferences), JSON.parse(window.HOST_Preferences.ApplicationPreferences));
-    serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, null);
+export function preferencesChanged(prefs: Editor.ClientExtensions.PreferencesChangedEventData) {
+    serviceLocator.clientServices.setPreferences(prefs.projectPreferences, prefs.applicationPreferences);
+    serviceLocator.sendEvent(ClientExtensionEventNames.PreferencesChangedEvent, prefs);
+}
+
+export function setEditor(editor: any) {
+    internalEditor.setInternalEditor(editor);
 }

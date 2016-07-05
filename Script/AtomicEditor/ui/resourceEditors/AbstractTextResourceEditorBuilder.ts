@@ -40,7 +40,7 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
      * @return {string}
      */
     getEditorUrl(): string {
-        return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/Editor.html`;
+        return `atomic://${ToolCore.toolEnvironment.toolDataDir}CodeEditor/MonacoEditor.html`;
     }
 
     getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {
@@ -70,12 +70,12 @@ export abstract class AbstractTextResourceEditorBuilder implements Editor.Extens
 
         editor.subscribeToEvent(EditorEvents.DeleteResourceNotification, (data) => {
             const webClient = editor.webView.webClient;
-            webClient.executeJavaScript(`HOST_resourceDeleted("atomic://${this.getNormalizedPath(data.path)}");`);
+            webClient.executeJavaScript(`HOST_resourceDeleted("${this.getNormalizedPath(data.path)}");`);
         });
 
-        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data) => {
+        editor.subscribeToEvent(EditorEvents.UserPreferencesChangedNotification, (data: EditorEvents.UserPreferencesChangedEvent) => {
             const webClient = editor.webView.webClient;
-            webClient.executeJavaScript("HOST_preferencesChanged();");
+            webClient.executeJavaScript(`HOST_preferencesChanged('${data.projectPreferences}','${data.applicationPreferences}');`);
         });
 
         return editor;
