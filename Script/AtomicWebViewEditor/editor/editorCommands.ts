@@ -34,10 +34,10 @@ export function configure(fileExt: string, filename: string) {
 
     let monacoEditor = <monaco.editor.IStandaloneCodeEditor>internalEditor.getInternalEditor();
     monacoEditor.updateOptions({
-        theme: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "theme", "vs-dark"),
-        renderWhitespace: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "showInvisibles", false),
+        theme: serviceLocator.clientServices.getApplicationPreference("codeEditor", "theme", "vs-dark"),
+        renderWhitespace: serviceLocator.clientServices.getApplicationPreference("codeEditor", "showInvisibles", false),
         mouseWheelScrollSensitivity: 2,
-        fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "fontSize", 12)
+        fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12)
     });
 
     // give the language extensions the opportunity to configure the editor based upon the file type
@@ -68,8 +68,8 @@ export function loadCodeIntoEditor(code: string, filename: string, fileExt: stri
     let model = monaco.editor.createModel(code, null, monaco.Uri.file(filename));
 
     model.updateOptions({
-        insertSpaces: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "useSoftTabs", true),
-        tabSize: serviceLocator.clientServices.getApplicationPreference("codeEditorSettings", "tabSize", 4)
+        insertSpaces: serviceLocator.clientServices.getApplicationPreference("codeEditor", "useSoftTabs", true),
+        tabSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "tabSize", 4)
     });
 
     monacoEditor.setModel(model);
