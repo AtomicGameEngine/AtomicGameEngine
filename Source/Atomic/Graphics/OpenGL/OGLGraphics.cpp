@@ -2477,7 +2477,7 @@ void Graphics::Restore()
             int allver = (majver * 10000) + (minver * 1000) + pointver;
 
             if ( allver < 101004 ) // Mesa drivers less than this version cause linux display artifacts
-            {                      // a semicolon separated list of workarounds.
+            {                      // so remove this context and let it fall back to GL2
                 SDL_GL_DeleteContext(impl_->context_); 
                 impl_->context_ = NULL;
                 LOGINFO ( "This version Graphics driver requires ForceGL2 to be set for proper performance." );
