@@ -243,11 +243,6 @@ void AEPlayerApplication::ReadCommandLineArguments()
             {
                 engineParameters_["WindowMaximized"] = true;
             }
-            else if (argument == "--ForceGL2")
-            {
-                engineParameters_["ForceGL2"] = true;
-                LOGINFOF ( "This Graphics driver version is setting ForceGL2 for proper performance." );
-            }
         }
     }
 }

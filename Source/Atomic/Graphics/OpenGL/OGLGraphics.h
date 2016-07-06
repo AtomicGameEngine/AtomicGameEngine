@@ -252,9 +252,6 @@ public:
     /// Return graphics API name.
     const String& GetApiName() const { return apiName_; }
 
-    /// Return current driver version patch information 
-    const String& GetVersionPatch() const { return versionPatch_; }
-
     /// Return window position.
     IntVector2 GetWindowPosition() const;
 
@@ -726,8 +723,6 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
-    /// String to report driver version problems
-    String versionPatch_;
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;

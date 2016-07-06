@@ -161,10 +161,6 @@ class Preferences {
         return this._prefs.editorBuildData;
     }
 
-    get editorFeature(): EditorFeature {
-        return this._prefs.editorFeature;
-    }
-
     static getInstance(): Preferences {
         return Preferences.instance;
     }
@@ -315,9 +311,6 @@ interface EditorBuildData {
     lastEditorBuildSHA: string;
 }
 
-interface EditorFeature {
-    versionPatch : string;
-}
 
 class PreferencesFormat {
 
@@ -369,10 +362,6 @@ class PreferencesFormat {
             lastEditorBuildSHA: "Unversioned Build"
         };
 
-        this.editorFeature = {
-            versionPatch : ""
-        };
-
     }
 
     /**
@@ -413,11 +402,6 @@ class PreferencesFormat {
             updatedMissingDefaults = true;
         }
 
-        if (!prefs.editorFeature) {
-            prefs.editorFeature = this.editorFeature;
-            updatedMissingDefaults = true;
-        }
-
         return updatedMissingDefaults;
     }
 
@@ -427,7 +411,6 @@ class PreferencesFormat {
     codeEditor: MonacoEditorSettings;
     uiData: UserInterfaceData;
     editorBuildData: EditorBuildData;
-    editorFeature : EditorFeature;
 }
 
 export = Preferences;

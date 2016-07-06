@@ -20,8 +20,6 @@
 // THE SOFTWARE.
 //
 
-#include <Atomic/Graphics/Graphics.h>
-
 #include <Atomic/IO/Log.h>
 
 #include <Atomic/IPC/IPC.h>
@@ -126,17 +124,6 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
     ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
 
-    bool FGL2 = false;
-
-#ifdef ATOMIC_PLATFORM_LINUX
-
-    Graphics* graphics = GetSubsystem<Graphics>();
-    String patchVersion = graphics->GetVersionPatch(); // this method is only valid for OGL graphics
-    if ( patchVersion.Contains( "ForceGL2" ) )
-        FGL2 = true;
-
-#endif
-
     const String& editorBinary = env->GetEditorBinary();
 
     Project* project = tsystem->GetProject();
@@ -164,9 +151,6 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     if (debug)
         vargs.Insert(0, "--debug");
-
-    if( FGL2 )
-        vargs.Insert(0, "--ForceGL2");
 
     if (addArgs.Length() > 0)
         vargs.Insert(0, addArgs.Split(' '));

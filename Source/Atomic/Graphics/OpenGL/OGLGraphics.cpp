@@ -234,11 +234,10 @@ Graphics::Graphics(Context* context_) :
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight"),
 #ifndef GL_ES_VERSION_2_0
-    apiName_("GL2"),
+    apiName_("GL2")
 #else
-    apiName_("GLES2"),
+    apiName_("GLES2")
 #endif
-    versionPatch_()
 {
     SetTextureUnitMappings();
     ResetCachedState();
@@ -2897,37 +2896,6 @@ void Graphics::CheckFeatureSupport()
         #ifdef EMSCRIPTEN
         dummyColorFormat_ = GetRGBAFormat();
 #endif
-    }
-#endif
-
-#if defined(__linux__)
-
-    String driverx( (const char*)glGetString(GL_VERSION) );
-    LOGINFOF("Graphics Driver : %s", driverx.CString() );
-    Vector<String>tokens = driverx.Split (' ');
-    unsigned ii = 0;
-    if (tokens.Size() > 2) // must have enough tokens to work with
-    {
-        // Size() - 2 is the manufacturer, "Mesa" is the target
-        if ( tokens[ tokens.Size()-2].Compare ( "Mesa", false ) == 0 )
-        {
-            // Size() - 1  is the version number, convert to long, can be n | n.n | n.n.n
-            Vector<String>versionx = tokens[tokens.Size()-1].Split ('.');
-            int majver = 0;
-            int minver = 0;
-            int pointver = 0;
-            if ( tokens.Size() > 1 ) majver = atoi(versionx[0].CString());
-            if ( tokens.Size() > 2 ) minver = atoi(versionx[1].CString());
-            if ( tokens.Size() > 3 ) pointver = atoi(versionx[2].CString());
-    
-            int allver = (majver * 10000) + (minver * 1000) + pointver;
-
-            if ( allver < 101004 ) // Mesa drivers less than this version cause linux display artifacts
-            {                      // a semicolon separated list of workarounds.
-                versionPatch_.Append("ForceGL2;");
-                LOGINFOF ( "This Graphics driver version requires ForceGL2 to be set for proper performance." );
-            }
-        }
     }
 #endif
 }
