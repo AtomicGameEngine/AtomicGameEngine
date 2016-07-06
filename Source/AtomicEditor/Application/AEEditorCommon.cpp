@@ -195,7 +195,18 @@ bool AEEditorCommon::ReadPreferences()
     engineParameters_["WindowHeight"] = editorWindow["height"].GetUInt();
     engineParameters_["WindowMaximized"] = editorWindow["maximized"].GetBool();
 
-    return true;
+    JSONValue& editorFeatures = prefs["editorFeature"];
+    String patchVersion = editorFeatures["versionPatch"].GetString();
+    if ( !patchVersion.Empty() )
+    {
+         if ( patchVersion.Contains( "ForceGL2" ) )
+         {
+             engineParameters_["ForceGL2"] = true;
+             LOGINFO ( "Setting ForceGL2 for proper performance of this version of the Graphics driver." );
+         }
+    } 
+
+   return true;
 }
 
 void AEEditorCommon::ValidateWindow()
@@ -230,6 +241,29 @@ void AEEditorCommon::ValidateWindow()
 
         SavePreferences(prefs);
     }
+
+#ifdef ATOMIC_PLATFORM_LINUX
+
+    // set the version patch into prefs after the graphics subsystem is initialized
+    String patchVersion = graphics->GetVersionPatch(); // this method is only valid for OGL graphics
+    JSONValue myprefs;
+    if (!LoadPreferences(myprefs))
+        return;
+    JSONValue& editorFeatures = myprefs["editorFeature"];
+    if ( editorFeatures["versionPatch"].GetString().Empty() && !patchVersion.Empty() ) // set it
+    {
+        editorFeatures["versionPatch"] = patchVersion;
+        SavePreferences(myprefs);
+        LOGINFO ( "This Graphics driver version requires ForceGL2 to set. This will take effect on the next invocation." );
+    }
+    else if ( !editorFeatures["versionPatch"].GetString().Empty() && patchVersion.Empty() ) // clear it
+    {
+        editorFeatures["versionPatch"] = "";
+        SavePreferences(myprefs);
+    } // otherwise do nothing.
+    
+#endif
+
 }
 
 void AEEditorCommon::GetDefaultWindowPreferences(JSONValue& windowPrefs, bool maximized)
