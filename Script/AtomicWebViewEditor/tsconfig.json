@@ -12,7 +12,8 @@
     "filesGlob": [
         "./**/*.ts",
         "../TypeScript/*.ts",
-        "!../TypeScript/dist/*.ts"
+        "!../TypeScript/dist/*.ts",
+        "!../TypeScript/AtomicNET.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

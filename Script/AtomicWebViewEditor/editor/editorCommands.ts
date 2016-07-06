@@ -37,7 +37,8 @@ export function configure(fileExt: string, filename: string) {
         theme: serviceLocator.clientServices.getApplicationPreference("codeEditor", "theme", "vs-dark"),
         renderWhitespace: serviceLocator.clientServices.getApplicationPreference("codeEditor", "showInvisibles", false),
         mouseWheelScrollSensitivity: 2,
-        fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12)
+        fontSize: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontSize", 12),
+        fontFamily: serviceLocator.clientServices.getApplicationPreference("codeEditor", "fontFamily", "")
     });
 
     // give the language extensions the opportunity to configure the editor based upon the file type
