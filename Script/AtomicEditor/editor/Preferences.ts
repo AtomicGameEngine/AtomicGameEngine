@@ -293,6 +293,7 @@ interface WindowData {
 interface MonacoEditorSettings {
     theme: string;
     fontSize: number;
+    fontFamily: string;
     showInvisibles: boolean;
     useSoftTabs: boolean;
     tabSize: number;
@@ -343,6 +344,7 @@ class PreferencesFormat {
         this.codeEditor = {
             theme: "vs-dark",
             fontSize: 12,
+            fontFamily: "",
             showInvisibles: false,
             useSoftTabs: true,
             tabSize: 4
