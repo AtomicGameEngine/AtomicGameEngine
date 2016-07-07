@@ -2458,7 +2458,6 @@ void Graphics::Restore()
 
     String driverx( (const char*)glGetString(GL_VERSION) );
     Vector<String>tokens = driverx.Split (' ');
-    unsigned ii = 0;
     if (tokens.Size() > 2) // must have enough tokens to work with
     {
         // Size() - 2 is the manufacturer, "Mesa" is the target
