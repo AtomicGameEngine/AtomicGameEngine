@@ -2457,7 +2457,6 @@ void Graphics::Restore()
 #if defined(__linux__)
 
     String driverx( (const char*)glGetString(GL_VERSION) );
-    LOGINFOF("Graphics Driver : %s", driverx.CString() );
     Vector<String>tokens = driverx.Split (' ');
     unsigned ii = 0;
     if (tokens.Size() > 2) // must have enough tokens to work with
@@ -2473,14 +2472,14 @@ void Graphics::Restore()
             if ( tokens.Size() > 1 ) majver = atoi(versionx[0].CString());
             if ( tokens.Size() > 2 ) minver = atoi(versionx[1].CString());
             if ( tokens.Size() > 3 ) pointver = atoi(versionx[2].CString());
-    
+
             int allver = (majver * 10000) + (minver * 1000) + pointver;
 
             if ( allver < 101004 ) // Mesa drivers less than this version cause linux display artifacts
             {                      // so remove this context and let it fall back to GL2
-                SDL_GL_DeleteContext(impl_->context_); 
+                SDL_GL_DeleteContext(impl_->context_);
                 impl_->context_ = NULL;
-                LOGINFO ( "This version Graphics driver requires ForceGL2 to be set for proper performance." );
+                LOGINFOF ( "Mesa GL Driver: %s detected, forcing GL2 context creation.  Please use gl2 command line option to avoid this warning.", driverx.CString() );
             }
         }
     }
