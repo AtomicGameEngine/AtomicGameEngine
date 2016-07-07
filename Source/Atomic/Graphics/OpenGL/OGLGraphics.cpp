@@ -2454,6 +2454,36 @@ void Graphics::Restore()
     {
         impl_->context_ = SDL_GL_CreateContext(impl_->window_);
 
+#if defined(__linux__)
+
+    String driverx( (const char*)glGetString(GL_VERSION) );
+    Vector<String>tokens = driverx.Split (' ');
+    if (tokens.Size() > 2) // must have enough tokens to work with
+    {
+        // Size() - 2 is the manufacturer, "Mesa" is the target
+        if ( tokens[ tokens.Size()-2].Compare ( "Mesa", false ) == 0 )
+        {
+            // Size() - 1  is the version number, convert to long, can be n | n.n | n.n.n
+            Vector<String>versionx = tokens[tokens.Size()-1].Split ('.');
+            int majver = 0;
+            int minver = 0;
+            int pointver = 0;
+            if ( tokens.Size() > 1 ) majver = atoi(versionx[0].CString());
+            if ( tokens.Size() > 2 ) minver = atoi(versionx[1].CString());
+            if ( tokens.Size() > 3 ) pointver = atoi(versionx[2].CString());
+
+            int allver = (majver * 10000) + (minver * 1000) + pointver;
+
+            if ( allver < 101004 ) // Mesa drivers less than this version cause linux display artifacts
+            {                      // so remove this context and let it fall back to GL2
+                SDL_GL_DeleteContext(impl_->context_);
+                impl_->context_ = NULL;
+                LOGINFOF ( "Mesa GL Driver: %s detected, forcing GL2 context creation.  Please use gl2 command line option to avoid this warning.", driverx.CString() );
+            }
+        }
+    }
+#endif
+
 #ifndef GL_ES_VERSION_2_0
         // If we're trying to use OpenGL 3, but context creation fails, retry with 2
         if (!forceGL2_ && !impl_->context_)
