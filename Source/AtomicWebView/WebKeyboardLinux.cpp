@@ -138,6 +138,7 @@ static bool SDLScanCodeToWindowsScanCode(SDL_Scancode code, long int& lParam, lo
     case SDL_SCANCODE_DOWN: wParam = VKEY_DOWN; break;
     case SDL_SCANCODE_DELETE: wParam = VKEY_DELETE; break;
     case SDL_SCANCODE_BACKSPACE: wParam = VKEY_BACK; break;
+    case SDL_SCANCODE_TAB: wParam = VKEY_TAB; break;
     case SDL_SCANCODE_F1: wParam = VKEY_F1; break;
     case SDL_SCANCODE_F2: wParam = VKEY_F2; break;
     case SDL_SCANCODE_F3: wParam = VKEY_F3; break;
