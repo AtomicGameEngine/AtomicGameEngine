@@ -408,7 +408,9 @@ void UI::Render(bool resetRenderTargets)
     SetVertexData(vertexBuffer_, vertexData_);
     Render(vertexBuffer_, batches_, 0, batches_.Size());
 
-    GetSubsystem<SystemUI::SystemUI>()->Render();
+    SystemUI::SystemUI* systemUI = GetSubsystem<SystemUI::SystemUI>();
+    if (systemUI)
+        systemUI->Render();
 }
 
 void UI::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)

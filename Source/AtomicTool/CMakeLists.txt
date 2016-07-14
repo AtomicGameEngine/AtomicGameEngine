@@ -6,7 +6,7 @@ endif(MSVC)
 
 add_executable(AtomicTool ${ATOMIC_TOOL_SOURCES})
 
-target_link_libraries(AtomicTool ToolCore Poco ${ATOMIC_LINK_LIBRARIES})
+target_link_libraries(AtomicTool ToolCore AtomicNETScript Poco ${ATOMIC_LINK_LIBRARIES})
 
 if (MSVC)
     target_link_libraries(AtomicTool libcurl Iphlpapi Wldap32)
@@ -46,5 +46,10 @@ endif(MSVC)
 
 add_custom_target ( GenerateScriptBindings
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},true]
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genscripts[${JAVASCRIPT_BINDINGS_PLATFORM},true];--trace
+                    DEPENDS AtomicTool )
+
+add_custom_target ( GenerateAtomicNET
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                    COMMAND ${ATOMIC_NODE_JAKE};build:genAtomicNET[${JAVASCRIPT_BINDINGS_PLATFORM},$<$<CONFIG:debug>:"Debug">$<$<CONFIG:release>:"Release">];--trace
                     DEPENDS AtomicTool )

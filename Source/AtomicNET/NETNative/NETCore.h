@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,46 +22,48 @@
 
 #pragma once
 
+#include <Atomic/Core/Context.h>
 #include <Atomic/Core/Object.h>
 
-using namespace Atomic;
-
-namespace AtomicEditor
+namespace Atomic
 {
 
-EVENT(E_IPCPLAYERPAUSERESUMEREQUEST, IPCPlayerPauseResumeRequest)
+typedef void (*NETCoreEventDispatchFunction)(unsigned eventID, VariantMap* eventData);
+
+struct NETCoreDelegates
+{
+    NETCoreEventDispatchFunction eventDispatch;
+};
+
+class ATOMIC_API NETCore : public Object
 {
 
-}
+    OBJECT(NETCore)
 
-EVENT(E_IPCPLAYERUPDATESPAUSEDRESUMED, IPCPlayerUpdatesPausedResumed)
-{
-    PARAM(P_PAUSED, Paused);            // bool
-}
+public:
 
-EVENT(E_IPCPLAYERPAUSESTEPREQUEST, IPCPlayerPauseStepRequest)
-{
+    /// Construct.
+    NETCore(Context* context, NETCoreDelegates* delegates);
 
-}
+    /// Destruct.
+    virtual ~NETCore();
 
-EVENT(E_IPCPLAYEREXITREQUEST, IPCPlayerExitRequest)
-{
+    static void Shutdown();
 
-}
+    static void RegisterNETEventType(unsigned eventType);
 
-EVENT(E_IPCPLAYERWINDOWCHANGED, IPCPlayerWindowChanged)
-{
-    PARAM(P_POSX, PosX);
-    PARAM(P_POSY, PosY);
-    PARAM(P_WIDTH, Width);
-    PARAM(P_HEIGHT, Height);
-    PARAM(P_MONITOR, Monitor);
-    PARAM(P_MAXIMIZED, Maximized);
-}
+    inline static void DispatchEvent(unsigned eventID, VariantMap* eventData = nullptr) { eventDispatch_(eventID, eventData); }
 
-EVENT(E_PLAYERQUIT, PlayerQuit)
-{
+    /// We access this directly in binding code, where there isn't a context
+    /// to get a reference from
+    static inline Context* GetContext() { return csContext_; }
 
-}
+private:
+
+    static SharedPtr<Context> csContext_;
+
+    static NETCoreEventDispatchFunction eventDispatch_;
+
+};
 
 }

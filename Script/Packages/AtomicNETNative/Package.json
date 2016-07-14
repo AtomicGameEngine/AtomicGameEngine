@@ -1,0 +1,9 @@
+
+{
+  "name" : "AtomicNETNative",
+  "namespace" : "Atomic",
+  "dependencies" : ["Script/Packages/AtomicApp"],
+  "modules" : ["AtomicNETNative"],
+  "platforms" : ["WINDOWS", "MACOSX","LINUX"],
+  "bindings" : ["CSharp"]
+}

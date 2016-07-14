@@ -1,0 +1,6 @@
+{
+	"name" : "IPC",
+	"includes" : ["Atomic/IPC/IPCMessage.h"],
+	"sources" : ["Source/Atomic/IPC"],
+	"classes" : ["IPC"]
+}

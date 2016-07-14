@@ -1,0 +1,8 @@
+
+{
+  "name" : "AtomicApp",
+  "namespace" : "Atomic",
+  "dependencies" : ["Script/Packages/Atomic"],
+  "modules" : ["AtomicApp"],
+  "platforms" : ["WINDOWS", "MACOSX", "LINUX"]
+}

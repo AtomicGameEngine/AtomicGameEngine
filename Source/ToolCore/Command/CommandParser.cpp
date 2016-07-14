@@ -29,6 +29,7 @@
 #include "PlayCmd.h"
 #include "EditCmd.h"
 #include "BindCmd.h"
+#include "NETCmd.h"
 
 namespace ToolCore
 {
@@ -80,6 +81,10 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             else if (argument == "bind")
             {
                 cmd = new BindCmd(context_);
+            }
+            else if (argument == "net")
+            {
+                cmd = new NETCmd(context_);
             }
 
         }

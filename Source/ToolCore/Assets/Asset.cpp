@@ -43,6 +43,7 @@
 #include "TextImporter.h"
 #include "TypeScriptImporter.h"
 #include "ParticleEffectImporter.h"
+#include "NETAssemblyImporter.h"
 
 #include "AssetEvents.h"
 #include "Asset.h"
@@ -320,6 +321,10 @@ bool Asset::CreateImporter()
         else if (ext == ".txt" || ext == ".xml" || ext == ".hlsl" || ext == ".glsl")
         {
             importer_ = new TextImporter(context_, this);
+        }
+        else if (ext == ".dll")
+        {
+            importer_ = new NETAssemblyImporter(context_, this);
         }
         else if (textureFormats.Contains(ext))
         {
