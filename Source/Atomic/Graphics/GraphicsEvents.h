@@ -99,6 +99,12 @@ EVENT(E_ENDVIEWRENDER, EndViewRender)
     PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
+/// A render path event has occurred.
+EVENT(E_RENDERPATHEVENT, RenderPathEvent)
+{
+    PARAM(P_NAME, Name);                    // String
+}
+
 /// Graphics context has been lost. Some or all (depending on the API) GPU objects have lost their contents.
 EVENT(E_DEVICELOST, DeviceLost)
 {

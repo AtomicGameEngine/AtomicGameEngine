@@ -1619,6 +1619,17 @@ void View::ExecuteRenderPathCommands()
                 }
                 break;
 
+            case CMD_SENDEVENT:
+            {
+                using namespace RenderPathEvent;
+
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_NAME] = command.eventName_;
+                renderer_->SendEvent(E_RENDERPATHEVENT, eventData);
+            }
+            break;
+
+
             default:
                 break;
             }

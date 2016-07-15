@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/Core/Context.h>
+#include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -48,7 +49,8 @@ namespace ToolCore
 {
 
 ToolSystem::ToolSystem(Context* context) : Object(context),
-    cli_(false)
+    cli_(false),
+    updateDelta_(0.0f)
 {
     context_->RegisterSubsystem(new AssetDatabase(context_));
     context_->RegisterSubsystem(new CurlManager(context_));
@@ -62,10 +64,26 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     RegisterPlatform(new PlatformWindows(context));
     RegisterPlatform(new PlatformIOS(context));
     RegisterPlatform(new PlatformAndroid(context));
+
+    SubscribeToEvent(E_UPDATE, HANDLER(ToolSystem, HandleUpdate));
 }
 
 ToolSystem::~ToolSystem()
 {
+
+}
+
+void ToolSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace Update;
+
+    updateDelta_ += eventData[P_TIMESTEP].GetFloat();
+    
+    if (updateDelta_ >= 0.5f)
+    {
+        updateDelta_ = 0.0f;
+        SendEvent(E_TOOLUPDATE);
+    }
 
 }
 

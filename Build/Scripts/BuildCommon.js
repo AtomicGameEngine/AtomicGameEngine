@@ -90,8 +90,7 @@ namespace('build', function() {
       var cmds = [];
 
       if (os.platform() == "win32") {
-        cmds.push(host.atomicTool + " net genproject " + atomicRoot + "/Script/AtomicNET/AtomicNETProject.json " + platform);
-        cmds.push(host.atomicTool + " net compile " + atomicRoot + "Artifacts\\AtomicNET\\Build\\AtomicNET.sln " + configuration);
+        cmds.push(host.atomicTool + " net compile " + atomicRoot + "Script/AtomicNET/AtomicNETProject.json " + platform + " " + configuration);
       }
 
       jake.exec(cmds, function() {

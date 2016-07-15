@@ -31,6 +31,7 @@
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/ToolSystem.h>
 #include <ToolCore/ToolEnvironment.h>
+#include <ToolCore/NETTools/NETBuildSystem.h>
 
 #include "../EditorMode/AEEditorMode.h"
 #include "../EditorMode/AEEditorNETService.h"
@@ -156,6 +157,7 @@ namespace AtomicEditor
 #endif
 
         context_->RegisterSubsystem(new EditorMode(context_));
+        context_->RegisterSubsystem(new NETBuildSystem(context_));
         context_->RegisterSubsystem(new EditorNETService(context_));
 
         vm_->SetModuleSearchPaths("AtomicEditor/JavaScript;AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");

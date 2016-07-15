@@ -29,10 +29,12 @@ namespace Atomic
 {
 
 typedef void (*NETCoreEventDispatchFunction)(unsigned eventID, VariantMap* eventData);
+typedef void(*NETCoreUpdateDispatchFunction)(float timeStep);
 
 struct NETCoreDelegates
 {
     NETCoreEventDispatchFunction eventDispatch;
+    NETCoreUpdateDispatchFunction updateDispatch;
 };
 
 class ATOMIC_API NETCore : public Object
@@ -53,6 +55,7 @@ public:
     static void RegisterNETEventType(unsigned eventType);
 
     inline static void DispatchEvent(unsigned eventID, VariantMap* eventData = nullptr) { eventDispatch_(eventID, eventData); }
+    inline static void DispatchUpdateEvent(float timeStep) { if (updateDispatch_) updateDispatch_(timeStep); }
 
     /// We access this directly in binding code, where there isn't a context
     /// to get a reference from
@@ -62,6 +65,7 @@ private:
 
     static SharedPtr<Context> csContext_;
 
+    static NETCoreUpdateDispatchFunction updateDispatch_;
     static NETCoreEventDispatchFunction eventDispatch_;
 
 };

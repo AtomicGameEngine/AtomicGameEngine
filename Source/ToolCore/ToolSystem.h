@@ -63,6 +63,8 @@ public:
 
 private:
 
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
     /// Full path to data files
     String dataPath_;
 
@@ -74,6 +76,8 @@ private:
     SharedPtr<Project> project_;
 
     bool cli_;
+
+    float updateDelta_;
 
 };
 

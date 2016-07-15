@@ -650,19 +650,39 @@ namespace AtomicEngine
 				return Identity;
 		}
 
-		#endregion
+        #endregion
 
-		#endregion
+        public static Quaternion CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+        {
+            float halfRoll = roll * 0.5f;
+            float halfPitch = pitch * 0.5f;
+            float halfYaw = yaw * 0.5f;
 
-		#region Operators
+            float sinRoll = (float)Math.Sin(halfRoll);
+            float cosRoll = (float)Math.Cos(halfRoll);
+            float sinPitch = (float)Math.Sin(halfPitch);
+            float cosPitch = (float)Math.Cos(halfPitch);
+            float sinYaw = (float)Math.Sin(halfYaw);
+            float cosYaw = (float)Math.Cos(halfYaw);
 
-		/// <summary>
-		/// Adds two instances.
-		/// </summary>
-		/// <param name="left">The first instance.</param>
-		/// <param name="right">The second instance.</param>
-		/// <returns>The result of the calculation.</returns>
-		public static Quaternion operator +(Quaternion left, Quaternion right)
+            return new Quaternion((cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll),
+                                  (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll),
+                                  (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll),
+                                  (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll));
+        }
+
+
+        #endregion
+
+        #region Operators
+
+        /// <summary>
+        /// Adds two instances.
+        /// </summary>
+        /// <param name="left">The first instance.</param>
+        /// <param name="right">The second instance.</param>
+        /// <returns>The result of the calculation.</returns>
+        public static Quaternion operator +(Quaternion left, Quaternion right)
 		{
 			left.Xyz += right.Xyz;
 			left.W += right.W;

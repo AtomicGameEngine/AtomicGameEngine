@@ -70,11 +70,18 @@ namespace AtomicEngine
 			Z = z;
 		}
 
-		/// <summary>
-		/// Constructs a new Vector3 from the given Vector2.
-		/// </summary>
-		/// <param name="v">The Vector2 to copy components from.</param>
-		public Vector3(Vector2 v)
+        public Vector3(Vector2 v2, float z)
+        {
+            X = v2.X;
+            Y = v2.Y;
+            Z = z;
+        }
+
+        /// <summary>
+        /// Constructs a new Vector3 from the given Vector2.
+        /// </summary>
+        /// <param name="v">The Vector2 to copy components from.</param>
+        public Vector3(Vector2 v)
 		{
 			X = v.X;
 			Y = v.Y;
@@ -1353,6 +1360,43 @@ namespace AtomicEngine
 				Z == other.Z;
 		}
 
-		#endregion
-	}
+        #endregion
+
+        public static Vector3 operator *(Vector3 value1, Vector3 value2)
+        {
+            value1.X *= value2.X;
+            value1.Y *= value2.Y;
+            value1.Z *= value2.Z;
+            return value1;
+        }
+
+
+        public static float Distance(Vector3 value1, Vector3 value2)
+        {
+            float result;
+            DistanceSquared(ref value1, ref value2, out result);
+            return (float)Math.Sqrt(result);
+        }
+
+        public static void Distance(ref Vector3 value1, ref Vector3 value2, out float result)
+        {
+            DistanceSquared(ref value1, ref value2, out result);
+            result = (float)Math.Sqrt(result);
+        }
+
+        public static float DistanceSquared(Vector3 value1, Vector3 value2)
+        {
+            return (value1.X - value2.X) * (value1.X - value2.X) +
+                    (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                    (value1.Z - value2.Z) * (value1.Z - value2.Z);
+        }
+
+        public static void DistanceSquared(ref Vector3 value1, ref Vector3 value2, out float result)
+        {
+            result = (value1.X - value2.X) * (value1.X - value2.X) +
+                     (value1.Y - value2.Y) * (value1.Y - value2.Y) +
+                     (value1.Z - value2.Z) * (value1.Z - value2.Z);
+        }
+
+    }
 }

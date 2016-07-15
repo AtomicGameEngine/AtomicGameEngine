@@ -26,6 +26,7 @@
 #include <Atomic/Resource/ResourceCache.h>
 #include <Atomic/Resource/Image.h>
 
+#include <AtomicNET/NETScript/NETScriptEvents.h>
 #include <AtomicNET/NETScript/CSComponentAssembly.h>
 
 #include "Asset.h"
@@ -84,6 +85,12 @@ namespace ToolCore
                     else
                     {
                         asset_->Save();
+
+                        using namespace CSComponentAssemblyChanged;
+                        VariantMap assemblyChangedEventData;
+                        assemblyChangedEventData[P_RESOURCE] = asset_->GetResource();
+                        assemblyChangedEventData[P_ASSEMBLYPATH] = asset_->GetPath();        
+                        SendEvent(E_CSCOMPONENTASSEMBLYCHANGED, assemblyChangedEventData);
                     }
                 }
                 else

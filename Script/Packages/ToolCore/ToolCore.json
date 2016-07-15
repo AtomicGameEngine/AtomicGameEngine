@@ -8,7 +8,7 @@
 							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
 							 "Asset", "AssetDatabase", "AssetImporter", "AudioImporter", "ModelImporter", "MaterialImporter", "AnimationImportInfo",
 							 "PrefabImporter", "JavascriptImporter", "JSONImporter",
-							 "TextureImporter", "SpriterImporter", "PEXImporter", "NETAssemblyImporter",
+							 "TextureImporter", "SpriterImporter", "PEXImporter", "CSharpImporter", "NETAssemblyImporter",
 							 "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
 						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS",

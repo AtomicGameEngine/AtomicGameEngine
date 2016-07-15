@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace AtomicEngine
 {
@@ -30,37 +32,41 @@ namespace AtomicEngine
 
         static internal void SubscribeToEvent(AObject receiver, uint eventType)
         {
-            List<WeakReference> eventReceivers;
+            List<WeakReference<AObject>> eventReceivers;
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
-                eventReceivers = eventReceiverLookup[eventType] = new List<WeakReference>();
+                eventReceivers = eventReceiverLookup[eventType] = new List<WeakReference<AObject>>();
             }
 
-            foreach (WeakReference wr in eventReceivers)
+            AObject obj;
+
+            foreach (WeakReference<AObject> wr in eventReceivers)
             {
-                // GC'd?
-                if (!wr.IsAlive)
-                    continue;
+
+                if (!wr.TryGetTarget(out obj))
+                    continue; // GC'd
 
                 // already on list?
-                if (((AObject)wr.Target) == receiver)
+                if (obj == receiver)
                     return;
             }
 
-            WeakReference w = null;
+            WeakReference<RefCounted> w = null;
 
             if (!nativeLookup.TryGetValue(receiver.nativeInstance, out w))
             {
                 throw new System.InvalidOperationException("NativeCore.SubscribeToEvent - unable to find native instance");
             }
 
-            if (!w.IsAlive)
+            RefCounted refcounted;
+
+            if (!w.TryGetTarget(out refcounted))
             {
                 throw new System.InvalidOperationException("NativeCore.SubscribeToEvent - attempting to subscribe a GC'd AObject");
             }
 
-            eventReceivers.Add(w);
+            eventReceivers.Add(new WeakReference<AObject>(receiver));
         }
 
         static ScriptVariantMap[] svm;
@@ -77,22 +83,23 @@ namespace AtomicEngine
 
         public static void EventDispatch(uint eventType, IntPtr eventData)
         {
-            List<WeakReference> eventReceivers;
+            List<WeakReference<AObject>> eventReceivers;
 
             if (!eventReceiverLookup.TryGetValue(eventType, out eventReceivers))
             {
-
                 // This should not happen, as event NET objects are subscribed to are filtered 
                 throw new System.InvalidOperationException("NativeCore.EventDispatch - received unregistered event type");
 
             }
 
             ScriptVariantMap scriptMap = null;
+            AObject receiver;
 
-            foreach (var w in eventReceivers)
+            // iterate over copy of list so we can modify it while running
+            foreach (var w in eventReceivers.ToList())
             {
                 // GC'd?
-                if (!w.IsAlive)
+                if (!w.TryGetTarget(out receiver))
                     continue;
 
                 if (scriptMap == null)
@@ -106,12 +113,83 @@ namespace AtomicEngine
                     scriptMap.CopyVariantMap(eventData);
                 }
 
-                ((AObject)w.Target).HandleEvent(eventType, scriptMap);
+                receiver.HandleEvent(eventType, scriptMap);
             }
 
             if (scriptMap != null)
                 svmDepth--;
 
+        }
+
+        static void ExpireNatives()
+        {
+            var watch = new Stopwatch();
+            watch.Start();
+
+            // expire event listeners
+
+            int eventListenersRemoved = 0;
+            int nativesRemoved = 0;
+
+            AObject obj;
+
+            foreach (List<WeakReference<AObject>> receiverList in eventReceiverLookup.Values)
+            {
+                foreach (WeakReference<AObject> receiver in receiverList.ToList())
+                {
+                    if (!receiver.TryGetTarget(out obj))
+                    {
+                        receiverList.Remove(receiver);
+                        eventListenersRemoved++;
+                    }
+
+                    if (watch.ElapsedMilliseconds > 16)
+                        break;
+
+                }
+
+                if (watch.ElapsedMilliseconds > 16)
+                    break;
+            }
+
+            RefCounted r;
+
+            foreach (var native in nativeLookup.Keys.ToList())
+            {
+                var w = nativeLookup[native];
+
+                if (!w.TryGetTarget(out r))
+                {
+                    // expired
+                    csb_AtomicEngine_ReleaseRef(native);
+                    nativeLookup.Remove(native);
+                    nativesRemoved++;
+                }
+
+                if (watch.ElapsedMilliseconds > 16)
+                    break;
+            }
+
+            /*
+            if (nativesRemoved != 0 || eventListenersRemoved != 0)
+            {
+                Console.WriteLine("Released {0} natives and {1} event receivers", nativesRemoved, eventListenersRemoved);
+            }
+            */
+
+        }
+
+        static float expireDelta = 0.0f;
+
+        // called ahead of E_UPDATE event
+        public static void UpdateDispatch(float timeStep)
+        {
+            expireDelta += timeStep;
+            if (expireDelta > 2.0f)
+            {
+                expireDelta = 0.0f;
+                ExpireNatives();
+            }
         }
 
         // register a newly created native
@@ -123,12 +201,10 @@ namespace AtomicEngine
             }
 
             r.nativeInstance = native;
-
-            var w = new WeakReference(r);
-            nativeLookup[native] = w;
-
             // keep native side alive
             r.AddRef();
+
+            nativeLookup[native] = new WeakReference<RefCounted>(r);
 
             return native;
         }
@@ -140,24 +216,30 @@ namespace AtomicEngine
             if (native == IntPtr.Zero)
                 return null;
 
-            WeakReference w;
+            RefCounted r;
+            WeakReference<RefCounted> w;
 
             // first see if we're already available
             if (nativeLookup.TryGetValue(native, out w))
             {
 
-                if (w.IsAlive)
+                if (w.TryGetTarget(out r))
                 {
-
                     // we're alive!
-                    return (T)w.Target;
-
+                    return (T)r;
                 }
                 else
                 {
-
                     // we were seen before, but have since been GC'd, remove!
                     nativeLookup.Remove(native);
+
+                    if (csb_Atomic_RefCounted_Refs(native) == 1)
+                    {
+                        // only managed ref remains, so release and return null
+                        csb_AtomicEngine_ReleaseRef(native);
+                        return null;
+                    }
+
                     csb_AtomicEngine_ReleaseRef(native);
                 }
             }
@@ -174,8 +256,9 @@ namespace AtomicEngine
                 throw new System.InvalidOperationException("NativeCore.WrapNative - Attempting to wrap unknown native class id");
             }
 
-            RefCounted r = nativeType.managedConstructor(native);
-            w = new WeakReference(r);
+            r = nativeType.managedConstructor(native);
+
+            w = new WeakReference<RefCounted>(r);
             NativeCore.nativeLookup[native] = w;
 
             // store a ref, so native side will not be released while we still have a reference in managed code
@@ -183,6 +266,12 @@ namespace AtomicEngine
 
             return (T)r;
         }
+
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private static extern IntPtr csb_Atomic_AObject_GetTypeName(IntPtr self);
+
+        [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private static extern int csb_Atomic_RefCounted_Refs(IntPtr self);
 
         public static void RegisterNativeType(NativeType nativeType)
         {
@@ -200,13 +289,21 @@ namespace AtomicEngine
 
         }
 
+        public static bool IsNativeType(Type type)
+        {
+            if (typeToNativeType.ContainsKey(type))
+                return true;
+
+            return false;
+        }
+
         static public IntPtr NativeContructorOverride
         {
             get
             {
                 IntPtr value = nativeContructorOverride;
                 nativeContructorOverride = IntPtr.Zero;
-                return value;                
+                return value;
             }
 
             set
@@ -232,13 +329,15 @@ namespace AtomicEngine
         private static IntPtr nativeContructorOverride = IntPtr.Zero;
 
         // weak references here, hold a ref native side
-        internal static Dictionary<IntPtr, WeakReference> nativeLookup = new Dictionary<IntPtr, WeakReference>();
+        internal static Dictionary<IntPtr, WeakReference<RefCounted>> nativeLookup = new Dictionary<IntPtr, WeakReference<RefCounted>>();
+
+        // weak references here, hold a ref native side
+        internal static Dictionary<uint, List<WeakReference<AObject>>> eventReceiverLookup = new Dictionary<uint, List<WeakReference<AObject>>>();
+
 
         // Native ClassID to NativeType lookup
         internal static Dictionary<IntPtr, NativeType> nativeClassIDToNativeType = new Dictionary<IntPtr, NativeType>();
 
-        // weak references here, hold a ref native side
-        internal static Dictionary<uint, List<WeakReference>> eventReceiverLookup = new Dictionary<uint, List<WeakReference>>();
 
         // Managed Type to NativeType lookup
         internal static Dictionary<Type, NativeType> typeToNativeType = new Dictionary<Type, NativeType>();

@@ -11,6 +11,7 @@ namespace AtomicEngine
     {
 
         public static Context Context => context;
+        public static ResourceCache Cache;
 
         public static T GetSubsystem<T>() where T : AObject
         {
@@ -66,16 +67,18 @@ namespace AtomicEngine
             UIModule.Initialize();
             IPCModule.Initialize();
             AtomicAppModule.Initialize();
+            ScriptModule.Initialize();
 
             AtomicNETScriptModule.Initialize();
             AtomicNETNativeModule.Initialize();
 
-            PlayerModule.Initialize();            
+            PlayerModule.Initialize();
 
-            CoreDelegates delegates = new CoreDelegates();
-            delegates.eventDispatch = NativeCore.EventDispatch;
+            coreDelegates = new CoreDelegates();
+            coreDelegates.eventDispatch = NativeCore.EventDispatch;
+            coreDelegates.updateDispatch = NativeCore.UpdateDispatch;
 
-            IntPtr coreptr = csb_Atomic_NETCore_Initialize(ref delegates);
+            IntPtr coreptr = csb_Atomic_NETCore_Initialize(ref coreDelegates);
 
             NETCore core = (coreptr == IntPtr.Zero ? null : NativeCore.WrapNative<NETCore>(coreptr));
 
@@ -85,15 +88,15 @@ namespace AtomicEngine
             context = core.Context;
 
             NativeCore.Initialize();
-
             CSComponentCore.Initialize();
 
         }
 
         [DllImport(Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        private static extern IntPtr csb_Atomic_NETCore_Initialize(ref CoreDelegates delegates);
+        private static extern IntPtr csb_Atomic_NETCore_Initialize(ref CoreDelegates delegates);        
 
         private static Context context;
+        private static CoreDelegates coreDelegates;
         private static Dictionary<Type, AObject> subSystems = new Dictionary<Type, AObject>();
 
     }

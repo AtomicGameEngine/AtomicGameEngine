@@ -36,7 +36,7 @@ namespace ToolCore
 
     class NETProjectBase : public Object
     {
-        OBJECT(NETProjectBase);
+        OBJECT(NETProjectBase)
 
     public:
 
@@ -56,7 +56,7 @@ namespace ToolCore
 
     class NETCSProject : public NETProjectBase
     {
-        OBJECT(NETCSProject);
+        OBJECT(NETCSProject)
 
     public:
 
@@ -69,6 +69,7 @@ namespace ToolCore
         const String& GetProjectGUID() { return projectGuid_; }
 
         const Vector<String>& GetReferences() const { return references_; }
+        const Vector<String>& GetPackages() const { return packages_; }
 
         bool Generate();
 
@@ -106,7 +107,7 @@ namespace ToolCore
 
     class NETSolution : public NETProjectBase
     {
-        OBJECT(NETSolution);
+        OBJECT(NETSolution)
 
     public:
 
@@ -118,6 +119,12 @@ namespace ToolCore
         bool Generate();
 
         const String& GetOutputPath() { return outputPath_; }
+        String GetOutputFilename() { return outputPath_ + name_ + ".sln"; }
+
+        Vector<String>& GetPackages() { return packages_;  }
+
+        // Registers a NuGet package, returns true if the package hasn't been previously registered
+        bool RegisterPackage(const String& package);
 
     private:
 
@@ -126,12 +133,13 @@ namespace ToolCore
         String name_;
         String outputPath_;
         String solutionGUID_;
+        Vector<String> packages_;
 
     };
 
     class NETProjectGen : public Object
     {
-        OBJECT(NETProjectGen);
+        OBJECT(NETProjectGen)
 
     public:
 
@@ -152,10 +160,14 @@ namespace ToolCore
 
         bool Generate();
 
+        /// Returns true if the generated solution requires NuGet
+        bool GetRequiresNuGet();
+
         String GenerateUUID();
 
         bool LoadProject(const JSONValue& root);
         bool LoadProject(const String& projectPath);
+        bool LoadProject(Project* project);
 
     private:
 

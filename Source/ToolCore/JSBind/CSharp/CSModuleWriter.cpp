@@ -221,6 +221,15 @@ void CSModuleWriter::GenerateManagedEnumsAndConstants(String& source)
             String name = (*itr).first_;
             String value = (*itr).second_;
 
+            // BodyType2D enum order is assigned in RigidBody2D.h in incorrect order
+            if (jenum->GetName() == "BodyType2D")
+            {                 
+                if (name == "BT_KINEMATIC")
+                    value = "1";
+                else if (name == "BT_DYNAMIC")
+                    value = "2";
+            }
+
             if (value.Length())
             {
                 line = name + " = " + value;

@@ -34,5 +34,10 @@ EVENT(E_PLATFORMCHANGED, PlatformChanged)
     PARAM(P_PLATFORM, Platform);    // Platform Ptr
 }
 
+// called at 2Hz for non-time critical updates
+EVENT(E_TOOLUPDATE, ToolUpdate)
+{
+}
+
 
 }

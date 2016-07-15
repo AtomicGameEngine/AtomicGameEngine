@@ -20,43 +20,16 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+import {AbstractTextResourceEditorBuilder} from "./AbstractTextResourceEditorBuilder";
 
-#include <Atomic/Core/Object.h>
+export default class CSharpResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
 
-using namespace Atomic;
-
-namespace ToolCore
-{
-
-    EVENT(E_NETCOMPILERESULT, NETCompilerResult)
-    {
-        PARAM(P_SUCCESS, Success); // bool = success = true;
-        PARAM(P_ERRORTEXT, ErrorText); // for failure, the compilation output
+    constructor() {
+        super();
     }
 
-    class NETCompile : public Object
-    {
-
-    // NET solution compilation, in ToolCore for native compilation requirements
-        OBJECT(NETCompile)
-
-    public:
-
-        NETCompile(Context* context);
-        virtual ~NETCompile();
-
-        bool Compile(const String& solutionPath, const String& configuration = "Release");
-
-    private:
-
-        void HandleSubprocessOutput(StringHash eventType, VariantMap& eventData);
-        void HandleCompileProcessComplete(StringHash eventType, VariantMap& eventData);
-
-        String allArgs_;
-        String solutionPath_;
-        String compileText_;
-
-    };
-
+    canHandleResource(resourcePath: string) : boolean {
+        var ext = Atomic.getExtension(resourcePath).toLowerCase();
+        return ext == ".cs";
+    }
 }

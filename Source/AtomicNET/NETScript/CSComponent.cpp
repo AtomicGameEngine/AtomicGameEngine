@@ -40,7 +40,7 @@ extern const char* LOGIC_CATEGORY;
 CSComponent::CSComponent(Context* context) :
     ScriptComponent(context)
 {
-
+    
 }
 
 CSComponent::~CSComponent()
