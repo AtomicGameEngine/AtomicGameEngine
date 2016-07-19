@@ -69,7 +69,9 @@ namespace('build', function() {
   // Generate a Visual Studio 2015 solution
   task('genvs2015', {
     async: true
-  }, function() {
+  }, function(devBuild) {
+    if (devBuild === undefined)
+      devBuild = 1;
 
     var slnRoot = path.resolve(atomicRoot, "") + "-VS2015\\";
 
@@ -81,7 +83,7 @@ namespace('build', function() {
 
     var cmds = [];
 
-    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot);
+    cmds.push(atomicRoot + "Build/Scripts/Windows/GenerateVS2015.bat " + atomicRoot + " " + devBuild);
 
     jake.exec(cmds, function() {
 
