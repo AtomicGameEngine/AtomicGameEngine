@@ -8,10 +8,10 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
                 TBButton: id: new project
                     text New Project
             TBLayout: distribution: gravity, axis: y, position: left, id: recentprojects
-                TBEditField: text: "<color #76D6FF>Recent Projects:</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                TBEditField: text: "Recent Projects:", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor2
     TBLayout: distribution: gravity, size: available
         TBLayout: distribution: gravity, axis: y, position: left
-            TBEditField: text: "<color #76D6FF>Welcome:</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+            TBEditField: text: "Welcome:", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor2
             TBImageWidget: filename: "AtomicEditor/editor/images/earlyaccess_header.png"
                 lp: width: 420, height: 137
             TBEditField: multiline: 1, styling: 1, gravity: all, id: welcome_text, readonly: 1, adapt-to-content: 0
@@ -33,7 +33,7 @@ TBLayout: distribution: gravity, size: available, axis: y, id: welcomelayout, po
             TBLayout: distribution: gravity, size: available
                 TBContainer: gravity: left right
                     TBLayout: distribution: gravity
-                        TBEditField: text: "<color #76D6FF>More Examples:</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                        TBEditField: text: "More Examples:", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor2
                         TBButton: id: 'examples_github' text: "https://github.com/AtomicGameEngine/AtomicExamples", skin: TBButton.link
                         TBWidget: gravity: left right
             TBScrollContainer: scroll-mode: auto

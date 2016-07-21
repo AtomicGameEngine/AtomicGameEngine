@@ -337,7 +337,7 @@ class SubmeshAttributeEdit extends AttributeInfoEdit {
 
         } else {
 
-            this.enabledCheckBox.skinBg = "TBGreyCheckBox";
+            this.enabledCheckBox.skinBg = "TBCheckBox";
             this.enabledCheckBox.value = enabled ? 1 : 0;
 
         }

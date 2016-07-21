@@ -83,6 +83,9 @@ JSUI::JSUI(Context* context) : Object(context),
     uiTypes_["UIDimmer"] = true;
     uiTypes_["UISelectDropdown"] = true;
     uiTypes_["UIPopupWindow"] = true;
+    uiTypes_["UISlider"] = true;
+    uiTypes_["UIColorWidget"] = true;
+    uiTypes_["UIColorWheel"] = true;
 
 }
 
