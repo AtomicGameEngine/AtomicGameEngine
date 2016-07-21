@@ -24,6 +24,7 @@ import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
 import EditorEvents = require("editor/EditorEvents");
+import ColorChooser = require ("./ColorChooser" );
 
 class AttributeInfoEdit extends Atomic.UILayout {
 
@@ -184,7 +185,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
 
         if (uniform) {
             var object = this.editType.getFirstObject();
-            this.editWidget.skinBg = "TBGreyCheckBox";
+            this.editWidget.skinBg = "TBCheckBox";
             if (object) {
                 var value = object.getAttribute(this.attrInfo.name);
                 this.editWidget.value = (value ? 1 : 0);
@@ -192,7 +193,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
 
         } else {
 
-            this.editWidget.skinBg = "TBGreyCheckBoxNonUniform";
+            this.editWidget.skinBg = "TBCheckBoxNonUniform";
             this.editWidget.value = 1;
 
         }
@@ -628,6 +629,59 @@ class ColorAttributeEdit extends NumberArrayAttributeEdit {
         super(4);
 
     }
+
+    createLayout() {
+
+        this.createEditWidget();
+
+        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
+        var attr = this.attrInfo;
+        var attrNameLP = AttributeInfoEdit.attrNameLP;
+
+        this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        if ( attr.type == Atomic.VAR_COLOR) {
+            this.axis = Atomic.UI_AXIS_Y;
+            this.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
+            this.skinBg = "InspectorVectorAttrLayout";
+        }
+
+        if (!this.hideName) {
+
+            var name = new Atomic.UITextField();
+            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
+            name.skinBg = "InspectorTextAttrName";
+            name.layoutParams = attrNameLP;
+            var bname = attr.name;
+
+            if (bname == "Is Enabled")
+                bname = "Enabled";
+
+            if (this.nameOverride)
+                name.text = this.nameOverride;
+            else
+                name.text = bname;
+
+            name.fontDescription = AttributeInfoEdit.fontDesc;
+
+            this.addChild(name);
+
+            var selectButton = new Atomic.UIButton();
+            selectButton.text = "...";
+            selectButton.fontDescription = AttributeInfoEdit.fontDesc;
+            this.addChild(selectButton);
+
+            selectButton.onClick = () => {
+                new ColorChooser( this.selects[0], this.selects[1], this.selects[2], this.selects[3] );
+            };
+
+         }
+
+        this.addChild(this.editWidget);
+
+    }
+
 
 }
 

@@ -22,15 +22,19 @@ TBLayout: distribution: gravity, spacing: 4
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DTranslateBitmap
 		id 3d_translate
+		tooltip Translate
 	TBButton: toggle-mode: 1
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DRotateBitmap
 		id 3d_rotate
+		tooltip Rotate
 	TBButton: toggle-mode: 1
 		@include definitions>menubutton
 		TBSkinImage: skin: 3DScaleBitmap
 		id 3d_scale
+		tooltip Scale
 	TBButton: toggle-mode: 1
 		lp: width: 64
 		text: "Local"
 		id 3d_axismode
+		tooltip Effect world or local object
