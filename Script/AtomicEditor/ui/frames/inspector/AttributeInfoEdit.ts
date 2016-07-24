@@ -622,68 +622,129 @@ class QuaternionAttributeEdit extends NumberArrayAttributeEdit {
 
 }
 
-class ColorAttributeEdit extends NumberArrayAttributeEdit {
+class ColorAttributeEdit extends AttributeInfoEdit {
 
-    constructor() {
-
-        super(4);
-
-    }
 
     createLayout() {
 
-        this.createEditWidget();
+        var layout = new Atomic.UILayout();
+        var o = InspectorUtils.createAttrColorFieldWithSelectButton(this.attrInfo.name, layout);
+
+        var colorWidget = this.colorWidget = o.colorWidget;
+        var selectButton = o.selectButton;
+
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 140;
+        lp.height = 24;
+        colorWidget.layoutParams = lp;
+
+        this.editWidget = layout;
 
         this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
-        var attr = this.attrInfo;
-        var attrNameLP = AttributeInfoEdit.attrNameLP;
+        selectButton.onClick = () => {
 
-        this.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+            // store original color
+            let color = [1, 1, 1, 1];
+            let object = this.editType.getFirstObject();
 
-        if ( attr.type == Atomic.VAR_COLOR) {
-            this.axis = Atomic.UI_AXIS_Y;
-            this.layoutPosition = Atomic.UI_LAYOUT_POSITION_LEFT_TOP;
-            this.skinBg = "InspectorVectorAttrLayout";
-        }
+            if (object) {
+                color = object.getAttribute(this.attrInfo.name);
+            }
 
-        if (!this.hideName) {
+            colorWidget.color = color;
 
-            var name = new Atomic.UITextField();
-            name.textAlign = Atomic.UI_TEXT_ALIGN_LEFT;
-            name.skinBg = "InspectorTextAttrName";
-            name.layoutParams = attrNameLP;
-            var bname = attr.name;
+            let restore = null;
+            let chooser = new ColorChooser ( color );
 
-            if (bname == "Is Enabled")
-                bname = "Enabled";
+            this.subscribeToEvent(chooser, "ColorChooserChanged", (ev) => {
 
-            if (this.nameOverride)
-                name.text = this.nameOverride;
-            else
-                name.text = bname;
+                restore = color;
+                this.updateColor(chooser.getRGBA());
 
-            name.fontDescription = AttributeInfoEdit.fontDesc;
+            });
 
-            this.addChild(name);
+            this.subscribeToEvent(chooser, "UIWidgetEditCanceled", (ev) => {
 
-            var selectButton = new Atomic.UIButton();
-            selectButton.text = "...";
-            selectButton.fontDescription = AttributeInfoEdit.fontDesc;
-            this.addChild(selectButton);
+                if (restore) {
 
-            selectButton.onClick = () => {
+                    colorWidget.color = restore;
+                    this.updateColor(restore);
 
-                    new ColorChooser ( this.selects[0], this.selects[1],
-                        this.selects[2], this.selects[3] );
+                }
 
-            };
+            });
 
-         };
+            this.subscribeToEvent(chooser, "UIWidgetEditComplete", (ev) => {
+
+                let newColor = chooser.getRGBA();
+
+                // check for new color edit
+                let committed = false;
+                for (let i = 0; i < 4; i++) {
+
+                    if (color[i] != newColor[i]) {
+
+                        this.editType.onAttributeInfoEdited(this.attrInfo, newColor);
+                        this.refresh();
+                        committed = true;
+                        break;
+
+                    }
+                }
+
+                if (restore && !committed) {
+
+                    for (let i = 0; i < 4; i++) {
+
+                        if (color[i] != restore[i]) {
+
+                            this.updateColor(color);
+                            break;
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        };
 
         this.addChild(this.editWidget);
+
     }
 
+    refresh() {
+
+        let object = this.editType.getFirstObject();
+
+        if (object) {
+            this.colorWidget.color = object.getAttribute(this.attrInfo.name);
+        }
+    }
+
+    // updates color on selection without committing to undo/redo for preview
+    updateColor(rgba:number[]) {
+
+        this.colorWidget.color = rgba;
+
+        for (var i in this.editType.objects) {
+
+            let object = this.editType.objects[i];
+            object.setAttribute(this.attrInfo.name, rgba );
+
+        }
+
+    }
+
+    colorWidget : Atomic.UIColorWidget;
 
 }
 

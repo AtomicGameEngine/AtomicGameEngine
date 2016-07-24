@@ -41,8 +41,7 @@ class ColorChooser extends Atomic.UIWindow {
     infohex : Atomic.UIEditField;
     infohsl : Atomic.UIEditField;
 
-    constructor( pred : Atomic.UIInlineSelect, pgreen : Atomic.UIInlineSelect,
-                pblue : Atomic.UIInlineSelect, palpha : Atomic.UIInlineSelect ) {
+    constructor( startRGBA:number[] ) {
 
         super();
 
@@ -50,7 +49,6 @@ class ColorChooser extends Atomic.UIWindow {
         view.addChild(this);
 
         this.text = "Color Chooser";
-
         this.load("AtomicEditor/editor/ui/colorchooser.tb.txt");
 
         this.r_ils = <Atomic.UIInlineSelect>this.getWidget("redselect");
@@ -69,30 +67,25 @@ class ColorChooser extends Atomic.UIWindow {
         this.lslide = <Atomic.UISlider>this.getWidget("lslider");
 
         (<Atomic.UIButton>this.getWidget("ccancelbutton")).onClick = () => {
+
+            this.sendEvent("UIWidgetEditCanceled", { widget : this });
+            this.unsubscribeFromEvent("WidgetDeleted");
             this.close();
+
         };
 
         (<Atomic.UIButton>this.getWidget("cokbutton")).onClick = () => {
 
-            var rr = this.rgbhsla[0] / 255;
-            var gg = this.rgbhsla[1] / 255;
-            var bb = this.rgbhsla[2] / 255;
-            var aa = this.rgbhsla[6] / 255;
-            var wr = pred;
-			var wg = pgreen;
-			var wb = pblue;
-			var wa = palpha;
-			wr.setValue ( rr );
- 			wr.sendEvent( "UIWidgetEditComplete", { widget: wr } );
-			wg.setValue ( gg );
- 			wg.sendEvent( "UIWidgetEditComplete", { widget: wg } );
-			wb.setValue ( bb );
- 			wb.sendEvent( "UIWidgetEditComplete", { widget: wb } );
-			wa.setValue ( aa );
- 			wa.sendEvent( "UIWidgetEditComplete", { widget: wa } );
-
+            this.sendEvent("UIWidgetEditComplete", { widget : this });
+            this.unsubscribeFromEvent("WidgetDeleted");
             this.close();
         };
+
+        this.subscribeToEvent(this, "WidgetDeleted", (event: Atomic.UIWidgetDeletedEvent) => {
+
+            this.sendEvent("UIWidgetEditCanceled", { widget : this });
+
+        });
 
         this.subscribeToEvent(this, "WidgetEvent", (data) => this.handleWidgetEvent(data));
 
@@ -100,12 +93,11 @@ class ColorChooser extends Atomic.UIWindow {
         this.center();
         this.setFocus();
 
-        let rx = pred.getValue() * 255;
-        if ( rx > 255 ) rx = 255;
-        let gx = pgreen.getValue() * 255;
-        if ( gx > 255 ) gx = 255;
-        let bx = pblue.getValue() * 255;
-        if ( bx > 255 ) bx = 255;
+        let rx = Math.min(startRGBA[0] * 255, 255);
+        let gx = Math.min(startRGBA[1] * 255, 255);
+        let bx = Math.min(startRGBA[2] * 255, 255);
+        let ax = Math.min(startRGBA[3] * 255, 255);
+
         let oldcolor = "#";
         var rrr =  Math.round(rx).toString(16);
         if (rrr.length < 2) oldcolor = oldcolor + "0";
@@ -116,11 +108,20 @@ class ColorChooser extends Atomic.UIWindow {
         var bbb =  Math.round(bx).toString(16);
         if (bbb.length < 2) oldcolor = oldcolor + "0";
         oldcolor = oldcolor + bbb;
-        this.oldcolor.setColor( oldcolor );
+        this.oldcolor.setColorString( oldcolor );
+
+        // start with current color instead of black
+        this.rgbhsla[0] = rx;
+        this.rgbhsla[1] = gx;
+        this.rgbhsla[2] = bx;
+        this.recalc_hsl();
+        this.fixcolor();
+        this.update_rgbwidgets();
+        this.update_hslwidgets();
 
         Atomic.ui.blockChangedEvents = true;
 
-        this.oldcolor.setAlpha( palpha.getValue() * 255 );
+        this.oldcolor.setAlpha( startRGBA[3] * 255 );
         this.a_sld.setValue(this.rgbhsla[6]);
 
         Atomic.ui.blockChangedEvents = false;
@@ -129,68 +130,59 @@ class ColorChooser extends Atomic.UIWindow {
 
     handleWidgetEvent(ev: Atomic.UIWidgetEvent) {
 
-        if (ev.target.id == "colorwheel" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            var myhue = this.wheel.getHue();
-            var mysat = this.wheel.getSaturation();
-            var mylit = this.lslide.getValue();
-            this.rgbhsla[3] = myhue / 360;
-            this.rgbhsla[4] = mysat / 128;
-            this.rgbhsla[5] = mylit / 255;
-            this.recalc_rgb();
-            this.fixcolor();
-            this.update_rgbwidgets();
+        if (ev.type == Atomic.UI_EVENT_TYPE_CHANGED) {
+
+            let changed = false;
+            let hsltargets = ["colorwheel", "lslider"];
+            let rgbtargets = {
+                "redselect" : 0,
+                "redslider" : 0,
+                "greenselect" : 1,
+                "greenslider" : 1,
+                "blueselect" : 2,
+                "blueslider" : 2,
+                "alphaslider" : 3
+            }
+
+            if (hsltargets.indexOf(ev.target.id) > -1) {
+
+                changed = true;
+                this.rgbhsla[3] = this.wheel.getHue() / 360;
+                this.rgbhsla[4] = this.wheel.getSaturation() / 128;
+                this.rgbhsla[5] = this.lslide.getValue() / 255;
+                this.recalc_rgb();
+                this.fixcolor();
+                this.update_rgbwidgets();
+
+            } else if (ev.target.id in rgbtargets) {
+
+                changed = true;
+                this.rgbhsla[rgbtargets[ev.target.id]] = ev.target.getValue();
+                this.recalc_hsl();
+                this.fixcolor();
+                this.update_hslwidgets();
+
+            }
+
+            if (changed) {
+
+                this.sendEvent("ColorChooserChanged", { widget : this });
+
+            }
+
         }
-        if (ev.target.id == "lslider" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            var myhue = this.wheel.getHue();
-            var mysat = this.wheel.getSaturation();
-            var mylit = ev.target.getValue();
-            this.rgbhsla[3] = myhue / 360;
-            this.rgbhsla[4] = mysat / 128;
-            this.rgbhsla[5] = mylit / 255;
-            this.recalc_rgb();
-            this.fixcolor();
-            this.update_rgbwidgets();
-        }
-        if ( ev.target.id == "redselect" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[0] = ev.target.getValue();
-            this.recalc_hsl();
-            this.fixcolor();
-            this.update_hslwidgets();
-        }
-        if ( ev.target.id == "redslider" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[0] = ev.target.getValue();
-            this.recalc_hsl();
-            this.fixcolor();
-            this.update_hslwidgets();
-        }
-        if ( ev.target.id == "greenselect" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[1] = ev.target.getValue();
-            this.recalc_hsl();
-            this.fixcolor();
-            this.update_hslwidgets();
-        }
-        if ( ev.target.id == "greenslider"  && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[1] = ev.target.getValue();
-            this.recalc_hsl();
-            this.fixcolor();
-            this.update_hslwidgets();
-        }
-        if ( ev.target.id == "blueselect" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[2] = ev.target.getValue();
-            this.recalc_hsl();
-            this.fixcolor();
-            this.update_hslwidgets();
-        }
-        if ( ev.target.id == "blueslider" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[2] = ev.target.getValue();
-            this.recalc_hsl();
-            this.fixcolor();
-            this.update_hslwidgets();
-        }
-        if ( ev.target.id == "alphaslider" && ev.type == Atomic.UI_EVENT_TYPE_CHANGED ) {
-            this.rgbhsla[6] = ev.target.getValue();
-            this.fixcolor();
-        }
+
+    }
+
+    // return current color choice as a RGBA array
+    getRGBA() : number[] {
+
+        var rr = this.rgbhsla[0] / 255;
+        var gg = this.rgbhsla[1] / 255;
+        var bb = this.rgbhsla[2] / 255;
+        var aa = this.rgbhsla[6] / 255;
+
+        return [rr, gg, bb, aa];
 
     }
 
@@ -282,7 +274,7 @@ class ColorChooser extends Atomic.UIWindow {
         if (bbb.length < 2) mycolor = mycolor + "0";
         mycolor = mycolor + bbb;
 
-        this.newcolor.setColor( mycolor );
+        this.newcolor.setColorString( mycolor );
         this.newcolor.setAlpha( this.rgbhsla[6] / 255 );
         this.infohex.text = mycolor;
 

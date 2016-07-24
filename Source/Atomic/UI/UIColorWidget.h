@@ -40,7 +40,14 @@ public:
     UIColorWidget(Context* context, bool createWidget = true);
     virtual ~UIColorWidget();
 
-    void SetColor ( const String &name );
+    /// Set color from a Color value
+    void SetColor(const Color& color);
+
+    /// Set color from hex string
+    void SetColorString(const String &name);
+
+    Color GetColor() const;
+
     void SetAlpha ( float value );
 
 protected:

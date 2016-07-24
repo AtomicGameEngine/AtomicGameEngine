@@ -57,11 +57,31 @@ bool UIColorWidget::OnEvent(const tb::TBWidgetEvent &ev)
     return UIWidget::OnEvent(ev);
 }
 
-void UIColorWidget::SetColor ( const String &name )
+void UIColorWidget::SetColorString( const String &name )
 {
      if (!widget_)
         return;
     ((TBColorWidget*) widget_)->SetColor(name.CString());
+}
+
+void UIColorWidget::SetColor(const Color& color)
+{
+    if (!widget_)
+        return;
+
+    ((TBColorWidget*)widget_)->SetColor(color.r_ * 255.0f, color.g_ * 255.0f, color.b_ * 255.0f, color.a_ * 255.0f);
+}
+
+Color UIColorWidget::GetColor() const
+{
+    if (!widget_)
+        return Color::BLACK;
+
+    const TBColor& color = ((TBColorWidget*)widget_)->GetColor();
+    float alpha = ((TBColorWidget*)widget_)->GetAlpha();
+
+    return Color(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, alpha / 255.0f);
+
 }
 
 void UIColorWidget::SetAlpha ( float value )

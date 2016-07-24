@@ -35,7 +35,7 @@ namespace tb {
 
 // == TBColorWidget =======================================
 
-TBColorWidget::TBColorWidget() : color_(), alpha_ ( 1.0)
+TBColorWidget::TBColorWidget() : color_(), alpha_ ( 1.0f)
 {
 }
 
@@ -44,6 +44,14 @@ void TBColorWidget::SetColor ( const char *name )
 	if ( name )
   	 color_.SetFromString(name, strlen(name));
      
+    InvalidateSkinStates();
+    Invalidate();
+}
+
+void TBColorWidget::SetColor(float r, float g, float b, float a)
+{
+    color_.Set(TBColor(r, g, b, a));
+
     InvalidateSkinStates();
     Invalidate();
 }

@@ -43,8 +43,14 @@ public:
 
     TBColorWidget();
 
-    virtual void SetColor ( const char * );
-    virtual void SetAlpha ( float );
+    void SetColor ( const char * );
+    void SetColor (float r, float g, float b, float a);
+
+    void SetAlpha ( float );
+
+    const TBColor& GetColor() const { return color_; }
+    float GetAlpha() const { return alpha_; }
+
     virtual void OnInflate(const INFLATE_INFO &info);
     virtual void OnPaint(const PaintProps &paint_props);
 
