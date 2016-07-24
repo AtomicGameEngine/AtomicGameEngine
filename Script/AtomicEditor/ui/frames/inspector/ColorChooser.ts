@@ -38,11 +38,8 @@ class ColorChooser extends Atomic.UIWindow {
     newcolor : Atomic.UIColorWidget;
     wheel : Atomic.UIColorWheel;
     lslide : Atomic.UISlider;
-    infotext : Atomic.UIEditField;
-    parent_rils : Atomic.UIInlineSelect;
-    parent_gils : Atomic.UIInlineSelect;
-    parent_bils : Atomic.UIInlineSelect;
-    parent_ails : Atomic.UIInlineSelect;
+    infohex : Atomic.UIEditField;
+    infohsl : Atomic.UIEditField;
 
     constructor( pred : Atomic.UIInlineSelect, pgreen : Atomic.UIInlineSelect,
                 pblue : Atomic.UIInlineSelect, palpha : Atomic.UIInlineSelect ) {
@@ -52,10 +49,6 @@ class ColorChooser extends Atomic.UIWindow {
         var view = EditorUI.getView();
         view.addChild(this);
 
-        this.parent_rils = pred;
-        this.parent_gils = pgreen;
-        this.parent_bils = pblue;
-        this.parent_ails = palpha;
         this.text = "Color Chooser";
 
         this.load("AtomicEditor/editor/ui/colorchooser.tb.txt");
@@ -70,7 +63,8 @@ class ColorChooser extends Atomic.UIWindow {
         this.a_sld = <Atomic.UISlider>this.getWidget("alphaslider");
         this.newcolor = <Atomic.UIColorWidget>this.getWidget("colornew" );
         this.oldcolor = <Atomic.UIColorWidget>this.getWidget("colorold" );
-        this.infotext = <Atomic.UIEditField>this.getWidget("infotext" );
+        this.infohex = <Atomic.UIEditField>this.getWidget("infohex" );
+        this.infohsl = <Atomic.UIEditField>this.getWidget("infohsl" );
         this.wheel = <Atomic.UIColorWheel>this.getWidget("colorwheel" );
         this.lslide = <Atomic.UISlider>this.getWidget("lslider");
 
@@ -80,10 +74,23 @@ class ColorChooser extends Atomic.UIWindow {
 
         (<Atomic.UIButton>this.getWidget("cokbutton")).onClick = () => {
 
-            this.parent_rils.setValue( this.rgbhsla[0] / 255 );
-            this.parent_gils.setValue( this.rgbhsla[1] / 255 );
-            this.parent_bils.setValue( this.rgbhsla[2] / 255 );
-            this.parent_ails.setValue( this.rgbhsla[6] / 255 );
+            var rr = this.rgbhsla[0] / 255;
+            var gg = this.rgbhsla[1] / 255;
+            var bb = this.rgbhsla[2] / 255;
+            var aa = this.rgbhsla[6] / 255;
+            var wr = pred;
+			var wg = pgreen;
+			var wb = pblue;
+			var wa = palpha;
+			wr.setValue ( rr );
+ 			wr.sendEvent( "UIWidgetEditComplete", { widget: wr } );
+			wg.setValue ( gg );
+ 			wg.sendEvent( "UIWidgetEditComplete", { widget: wg } );
+			wb.setValue ( bb );
+ 			wb.sendEvent( "UIWidgetEditComplete", { widget: wb } );
+			wa.setValue ( aa );
+ 			wa.sendEvent( "UIWidgetEditComplete", { widget: wa } );
+
             this.close();
         };
 
@@ -93,11 +100,11 @@ class ColorChooser extends Atomic.UIWindow {
         this.center();
         this.setFocus();
 
-        let rx = this.parent_rils.getValue() * 255;
+        let rx = pred.getValue() * 255;
         if ( rx > 255 ) rx = 255;
-        let gx = this.parent_gils.getValue() * 255;
+        let gx = pgreen.getValue() * 255;
         if ( gx > 255 ) gx = 255;
-        let bx = this.parent_bils.getValue() * 255;
+        let bx = pblue.getValue() * 255;
         if ( bx > 255 ) bx = 255;
         let oldcolor = "#";
         var rrr =  Math.round(rx).toString(16);
@@ -113,7 +120,7 @@ class ColorChooser extends Atomic.UIWindow {
 
         Atomic.ui.blockChangedEvents = true;
 
-        this.oldcolor.setAlpha( this.parent_ails.getValue() * 255 );
+        this.oldcolor.setAlpha( palpha.getValue() * 255 );
         this.a_sld.setValue(this.rgbhsla[6]);
 
         Atomic.ui.blockChangedEvents = false;
@@ -277,7 +284,14 @@ class ColorChooser extends Atomic.UIWindow {
 
         this.newcolor.setColor( mycolor );
         this.newcolor.setAlpha( this.rgbhsla[6] / 255 );
-        this.infotext.text = mycolor;
+        this.infohex.text = mycolor;
+
+        let myhsl = Number(this.rgbhsla[3]).toFixed(2);
+        myhsl += ", ";
+        myhsl += Number(this.rgbhsla[4]).toFixed(2);
+        myhsl += ", ";
+        myhsl += Number(this.rgbhsla[5]).toFixed(2);
+        this.infohsl.text = myhsl;
     }
 
 }

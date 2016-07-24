@@ -28,10 +28,11 @@ TBLayout: axis: y, distribution: gravity, position: left
 			TBInlineSelect: id: alphaselect, min: 0, max: 255, connection: aconn
 			TBSlider: id: alphaslider, min: 0, max: 255, value: 255, connection: aconn
 		TBSeparator: gravity: left right
-		TBLayout: axis: y, gravity: left right
-			TBEditField: id: infotext, text: "#000000", readonly: 1
+		TBLayout: axis: x, distribution: available, gravity: left right
+			TBEditField: id: infohex, text: "#000000", readonly: 1
 				font: size: 16
-				lp: min-width: 180
+			TBEditField: id: infohsl, text: "0.0, 0.0, 0,0", readonly: 1
+				font: size: 16
 	TBSeparator: gravity: left right, skin: AESeparator
 	TBLayout:
 		TBButton: text: Cancel, id: ccancelbutton

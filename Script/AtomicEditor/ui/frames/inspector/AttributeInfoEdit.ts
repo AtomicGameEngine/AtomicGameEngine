@@ -24,7 +24,7 @@ import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
 import EditorEvents = require("editor/EditorEvents");
-import ColorChooser = require ("./ColorChooser" );
+import ColorChooser = require("./ColorChooser");
 
 class AttributeInfoEdit extends Atomic.UILayout {
 
@@ -673,13 +673,15 @@ class ColorAttributeEdit extends NumberArrayAttributeEdit {
             this.addChild(selectButton);
 
             selectButton.onClick = () => {
-                new ColorChooser( this.selects[0], this.selects[1], this.selects[2], this.selects[3] );
+
+                    new ColorChooser ( this.selects[0], this.selects[1],
+                        this.selects[2], this.selects[3] );
+
             };
 
-         }
+         };
 
         this.addChild(this.editWidget);
-
     }
 
 
@@ -729,7 +731,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
             this.nameOverride = attrInfo.resourceTypeName + " " + this.refListIndex;
 
         var importerName = ToolCore.assetDatabase.getResourceImporterName(attrInfo.resourceTypeName);
-        
+
         if (!importerName)
             return false;
 
