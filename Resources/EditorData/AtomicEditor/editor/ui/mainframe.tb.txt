@@ -37,11 +37,11 @@ TBLayout: distribution: gravity, axis: y
                             TBWidget
             TBLayout: distribution: gravity, position: top
                 TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom
-                    TBEditField: text: "<color #AAAAAA>Project</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                    TBEditField: text: "Project", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor4
                         font: size: 11
                     TBLayout: distribution: gravity, id: projectviewcontainer
                     TBSeparator: gravity: left right, skin: AESeparator
-                    TBEditField: text: "<color #AAAAAA>Hierarchy</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                    TBEditField: text: "Hierarchy", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor4
                         font: size: 11
                     TBLayout: distribution: gravity, id: hierarchycontainer
                         TBWidget: gravity: top bottom
@@ -53,7 +53,7 @@ TBLayout: distribution: gravity, axis: y
                         TBEditField: multiline: 1, styling: 1, gravity: left right, id: consoletext
                             text: "Hello World!"
                 TBLayout: distribution: gravity, axis: y, position: left, gravity: top bottom, id: inspectorlayout
-                    TBEditField: text: "<color #AAAAAA>Inspector</color>", styling: 1, readonly: 1, adapt-to-content: 1, skin: 0
+                    TBEditField: text: "Inspector", styling: 1, readonly: 1, adapt-to-content: 1, skin: AccentColor4
                         font: size: 11
                     TBLayout: distribution: gravity, id: inspectorcontainer
 

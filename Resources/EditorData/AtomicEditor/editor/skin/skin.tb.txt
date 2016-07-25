@@ -12,6 +12,28 @@ elements
 		cut 16
 		expand 12
 		padding 0
+
+	Checkerboard
+		type StretchBox
+		bitmap checkerboard.png
+	HSVSkin
+		type StretchBox
+		bitmap HSV21.png
+	AccentColor1
+		text-color #D4FB79
+	AccentColor2
+		text-color #76D6FF
+	AccentColor3
+		text-color #9A7DA1
+	AccentColor4
+		text-color #AAAAAA
+	AccentColorWarn
+		text-color #ffff66
+	AccentColorError
+		text-color #ff3333
+	AccentColorSuccess
+		text-color #33ff33
+
 	Folder
 		text-color #aaaaaa
 	Folder.selected
