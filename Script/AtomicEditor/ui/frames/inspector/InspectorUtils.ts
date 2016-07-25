@@ -84,6 +84,21 @@ class InspectorUtils {
 
   }
 
+  static createColorWidget():Atomic.UIColorWidget {
+
+    var colorWidget = new Atomic.UIColorWidget();
+    colorWidget.id = "colorfield";
+
+    var lp = new Atomic.UILayoutParams();
+    lp.width = 160;
+    lp.height = 24;
+    colorWidget.layoutParams = lp;
+
+    return colorWidget;
+
+  }
+
+
   static createAttrEditField(name:string, parent:Atomic.UIWidget):Atomic.UIEditField {
 
     var attrLayout = new Atomic.UILayout();
@@ -154,6 +169,34 @@ class InspectorUtils {
 
   }
 
+  static createAttrColorFieldWithSelectButton(name:string, parent:Atomic.UIWidget):{colorWidget:Atomic.UIColorWidget, selectButton:Atomic.UIButton} {
+
+    var attrLayout = new Atomic.UILayout();
+    attrLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+
+    if (name) {
+      var _name = InspectorUtils.createAttrName(name);
+      attrLayout.addChild(_name);
+    }
+
+    var fieldLayout = new Atomic.UILayout();
+    fieldLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_POSITION_LEFT_TOP;
+
+    var colorWidget = InspectorUtils.createColorWidget();
+
+    var selectButton = new Atomic.UIButton();
+    selectButton.text = "...";
+    selectButton.fontDescription = InspectorUtils.attrFontDesc;
+
+    fieldLayout.addChild(colorWidget);
+    fieldLayout.addChild(selectButton);
+
+    attrLayout.addChild(fieldLayout);
+    parent.addChild(attrLayout);
+
+    return {colorWidget:colorWidget, selectButton:selectButton};
+
+  }
 
   // "static constructor"
   static attrFontDesc:Atomic.UIFontDescription;
