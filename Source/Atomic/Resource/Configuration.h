@@ -45,7 +45,7 @@ public:
     void ApplyConfig(VariantMap& settings, bool overwrite = false);
 
     const VariantMap& GetConfig() { return valueMap_; }
-    const bool IsLoaded() const { return isLoaded_; }
+    bool IsLoaded() const { return isLoaded_; }
 
 protected:
     static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);

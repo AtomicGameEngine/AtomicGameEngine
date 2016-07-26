@@ -24,7 +24,7 @@ import EditorUI = require("ui/EditorUI");
 
 class CSComponentClassSelector extends Atomic.UIWindow {
 
-    constructor(editField: Atomic.UIEditField, component: AtomicNET.CSComponent) {
+    constructor(editField: Atomic.UIEditField, component: AtomicNETScript.CSComponent) {
 
         super();
 

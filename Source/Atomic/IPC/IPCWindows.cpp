@@ -220,7 +220,7 @@ void PipeWin::ReaderThread::ThreadFunction()
             readSize_ = (unsigned) bytesRead;
         }
 
-        Time::Sleep(50);
+        Time::Sleep(10);
 
     }
 }

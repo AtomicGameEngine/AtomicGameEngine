@@ -16,7 +16,7 @@
 	"typescript_decl" : {
 
 		"ModelImporter" : [
-			"getAnimations():Atomic.Animation[];"	
+			"getAnimations():Atomic.Animation[];"
 		],
 		"AssetDatabase" : [
 			"getFolderAssets(folder:string):ToolCore.Asset[];",

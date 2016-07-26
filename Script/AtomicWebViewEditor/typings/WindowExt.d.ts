@@ -24,11 +24,33 @@
  * Defines the interface to what is available for the host to call or for the client to call on the window object
  */
 interface Window {
-    atomicQuery: any;
+    atomicQuery: (message: {
+        request: any,
+        persistent: boolean,
+        onSuccess: () => void,
+        onFailure: (error_code, error_message) => void
+    }) => void;
+
+    /**
+     * Used to call into the host and provide messages
+     * @param {string} messageType
+     * @param {object} data
+     * @return {Promise}
+     */
+    atomicQueryPromise: (messageType: string, data?: {}) => Promise<{}>;
+
     HOST_loadCode: (codeUrl) => void;
     HOST_saveCode: () => void;
 
     HOST_resourceRenamed: (path: string, newPath: string) => void;
     HOST_resourceDeleted: (path: string) => void;
-    HOST_loadPreferences: (path: string) => void;
+    HOST_preferencesChanged: (jsonProjectPrefs: string, jsonApplicationPrefs: string) => void;
+
+    /**
+     * Preferences set by the host.  Each preference category is a JSON string of all the prefs
+     */
+    HOST_Preferences: {
+        ApplicationPreferences: string,
+        ProjectPreferences: string
+    };
 }

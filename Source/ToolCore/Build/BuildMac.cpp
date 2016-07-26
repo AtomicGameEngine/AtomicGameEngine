@@ -102,7 +102,7 @@ void BuildMac::Build(const String& buildPath)
 
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
 
-    if (!BuildRemoveDirectory(buildPath_))
+    if (!BuildClean(buildPath_))
         return;
 
     FileSystem* fileSystem = GetSubsystem<FileSystem>();

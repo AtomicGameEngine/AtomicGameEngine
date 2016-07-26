@@ -12,3 +12,5 @@ endif()
 set (SOURCE_FILES ${SOURCE_FILES} ${JAVASCRIPT_BINDINGS_SOURCE} ${PLATFORM_SOURCE} )
 
 add_library(AtomicWebView ${SOURCE_FILES})
+
+add_dependencies(AtomicWebView AtomicToolCheckScripts)

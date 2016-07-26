@@ -104,13 +104,12 @@ class Editor extends Atomic.ScriptObject {
     }
 
     initUI() {
-
-      var ui = Atomic.ui;
-      ui.loadSkin("AtomicEditor/resources/default_skin/skin.tb.txt", "AtomicEditor/editor/skin/skin.tb.txt");
-      ui.addFont("AtomicEditor/resources/vera.ttf", "Vera");
-      ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
-      ui.setDefaultFont("Vera", 12);
-
+        var uiData = Preferences.getInstance().uiData;
+        var ui = Atomic.ui;
+        ui.loadSkin(uiData.skinPath + "/skin.tb.txt", uiData.defaultSkinPath + "/skin.tb.txt");
+        ui.addFont(uiData.fontFile, uiData.fontName);
+        ui.addFont("AtomicEditor/resources/MesloLGS-Regular.ttf", "Monaco");
+        ui.setDefaultFont(uiData.fontName, uiData.fontSize);
     }
 
     saveWindowPreferences(data: Atomic.ScreenModeEvent): boolean {
@@ -161,7 +160,13 @@ class Editor extends Atomic.ScriptObject {
      */
     setUserPreference(extensionName: string, preferenceName: string, value: number | boolean | string) {
         Preferences.getInstance().setUserPreference(extensionName, preferenceName, value);
-        this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
+        WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
+        const eventData: EditorEvents.UserPreferencesChangedEvent = {
+            projectPreferences: JSON.stringify(Preferences.getInstance().cachedProjectPreferences),
+            applicationPreferences: JSON.stringify(Preferences.getInstance().cachedApplicationPreferences)
+        };
+
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification, eventData);
     }
 
     /**
@@ -173,7 +178,13 @@ class Editor extends Atomic.ScriptObject {
      */
     setUserPreferenceGroup(settingsGroup: string, groupPreferenceValues: Object) {
         Preferences.getInstance().setUserPreferenceGroup(settingsGroup, groupPreferenceValues);
-        this.sendEvent(EditorEvents.UserPreferencesChangedNotification);
+        WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
+        const eventData: EditorEvents.UserPreferencesChangedEvent = {
+            projectPreferences: JSON.stringify(Preferences.getInstance().cachedProjectPreferences),
+            applicationPreferences: JSON.stringify(Preferences.getInstance().cachedApplicationPreferences)
+        };
+
+        this.sendEvent(EditorEvents.UserPreferencesChangedNotification, eventData);
     }
 
     handleEditorLoadProject(event: EditorEvents.LoadProjectEvent): boolean {
@@ -189,6 +200,9 @@ class Editor extends Atomic.ScriptObject {
         }
         const loaded = system.loadProject(event.path);
         if (loaded) {
+            Preferences.getInstance().loadUserPrefs();
+            WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ProjectPreferences", JSON.stringify(Preferences.getInstance().cachedProjectPreferences, null, 2 ));
+            WebView.WebBrowserHost.setGlobalStringProperty("HOST_Preferences", "ApplicationPreferences", JSON.stringify(Preferences.getInstance().cachedApplicationPreferences, null, 2 ));
             this.sendEvent(EditorEvents.LoadProjectNotification, event);
         }
         return loaded;

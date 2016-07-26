@@ -78,6 +78,8 @@ class EULAWindow extends ModalWindow {
                 var licenseSystem = ToolCore.getLicenseSystem();
                 licenseSystem.licenseAgreementConfirmed();
 
+                this.sendEvent("LicenseEulaAccepted");
+
                 return true;
             }
 

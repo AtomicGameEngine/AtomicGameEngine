@@ -38,7 +38,7 @@
 
 #include <Atomic/UI/SystemUI/DebugHud.h>
 
-#include "../PlayerMode/AEPlayerEvents.h"
+#include <AtomicApp/Player/IPCPlayerAppEvents.h>
 
 #include "AEEditorMode.h"
 
@@ -50,16 +50,11 @@ namespace AtomicEditor
 EditorMode::EditorMode(Context* context) :
     Object(context)
 {
-    SubscribeToEvent(E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
-    SubscribeToEvent(E_IPCPLAYERPAUSERESUMEREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseResumeRequest));
-    SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
-    SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
-    SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
+
 }
 
 EditorMode::~EditorMode()
 {
-
 }
 
 void EditorMode::HandleIPCWorkerStarted(StringHash eventType, VariantMap& eventData)
@@ -95,7 +90,18 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
     {
         playerBroker_ = 0;
         playerEnabled_ = false;
+
+        UnsubscribeFromEvent(E_IPCWORKERSTART);
+        UnsubscribeFromEvent(E_IPCPLAYERPAUSERESUMEREQUEST);
+        UnsubscribeFromEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED);
+        UnsubscribeFromEvent(E_IPCPLAYERPAUSESTEPREQUEST);
+        UnsubscribeFromEvent(E_IPCPLAYEREXITREQUEST);
+
         SendEvent(E_EDITORPLAYERSTOPPED);
+    }
+    else
+    {
+        LOGERROR("EditorMode::HandleIPCWorkerExit - Unknown Broker");
     }
 }
 
@@ -164,6 +170,14 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     if (playerBroker_)
     {
+        SubscribeToEvent(playerBroker_, E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
+
+        SubscribeToEvent(E_IPCPLAYERPAUSERESUMEREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseResumeRequest));
+        SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
+        SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
+        SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
+    
+
         SubscribeToEvent(playerBroker_, E_IPCJSERROR, HANDLER(EditorMode, HandleIPCJSError));
         SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, HANDLER(EditorMode, HandleIPCWorkerExit));
         SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, HANDLER(EditorMode, HandleIPCWorkerLog));

@@ -77,8 +77,8 @@ public:
         webBrowserHost_ = webClient_->GetSubsystem<WebBrowserHost>();
 
         CefMessageRouterConfig config;
-        config.js_query_function = "atomicQuery";
-        config.js_cancel_function = "atomicQueryCancel";
+        config.js_query_function = WebBrowserHost::GetJSMessageQueryFunctionName().CString();
+        config.js_cancel_function = WebBrowserHost::GetJSMessageQueryCancelFunctionName().CString();
         browserSideRouter_ = CefMessageRouterBrowserSide::Create(config);
 
     }
@@ -345,6 +345,7 @@ public:
         browserSettings.webgl = STATE_ENABLED;
         browserSettings.file_access_from_file_urls = STATE_ENABLED;
         browserSettings.universal_access_from_file_urls = STATE_ENABLED;
+        browserSettings.web_security = WebBrowserHost::GetWebSecurity() ? STATE_ENABLED : STATE_DISABLED;
 
         windowInfo.width = width;
         windowInfo.height = height;        
@@ -367,6 +368,10 @@ public:
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
                 windowInfo.SetAsWindowless(info.info.win.window, /*transparent*/ true);
+#endif
+#ifdef ATOMIC_PLATFORM_LINUX
+                if ( info.subsystem == SDL_SYSWM_X11 )
+                    windowInfo.SetAsWindowless(info.info.x11.window, true);
 #endif
             }
 
@@ -682,6 +687,15 @@ void WebClient::SendKeyEvent(const StringHash eventType, VariantMap& eventData)
     host->SendKeyEvent(keyEvent);
 #endif
 
+#ifdef ATOMIC_PLATFORM_LINUX
+
+    if (keyEvent.windows_key_code == 0x0D)
+    {
+        keyEvent.type = KEYEVENT_CHAR;
+        host->SendKeyEvent(keyEvent);
+    }
+
+#endif
 
 }
 

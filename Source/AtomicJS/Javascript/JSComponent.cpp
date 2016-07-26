@@ -280,12 +280,21 @@ void JSComponent::InitInstance(bool hasArgs, int argIdx)
             return;
         }
 
-        duk_get_prop_string(ctx, -1, "component");
+        // Check for "default" constructor which is used by TypeScript and ES2015
+        duk_get_prop_string(ctx, -1, "default");
 
         if (!duk_is_function(ctx, -1))
         {
-            duk_set_top(ctx, top);
-            return;
+            duk_pop(ctx);
+
+            // If "default" doesn't exist, look for component
+            duk_get_prop_string(ctx, -1, "component");
+
+            if (!duk_is_function(ctx, -1))
+            {
+                duk_set_top(ctx, top);
+                return;
+            }
         }
 
         // call with self

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2014-2016, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,50 +32,53 @@
 namespace Atomic
 {
 
-class CSComponent;
-class NETVariantMap;
+    class CSComponent;
+    class NETVariantMap;
 
-// At runtime we need to load the assembly, in the editor we use metadata
-/// NET Assembly resource.
-class ATOMIC_API CSComponentAssembly : public ScriptComponentFile
-{
-    OBJECT(CSComponentAssembly);
-    BASEOBJECT(CSComponentAssembly);
+    /// NET Assembly resource.
+    class ATOMIC_API CSComponentAssembly : public ScriptComponentFile
+    {
+        OBJECT(CSComponentAssembly)
+        BASEOBJECT(CSComponentAssembly)
 
-public:
+    public:
 
-    /// Construct.
-    CSComponentAssembly(Context* context);
-    /// Destruct.
-    virtual ~CSComponentAssembly();
+        /// Construct.
+        CSComponentAssembly(Context* context);
+        /// Destruct.
+        virtual ~CSComponentAssembly();
 
-    bool ParseAssemblyJSON(const JSONValue& json);
+        bool ParseAssemblyJSON(const JSONValue& json);
 
-    CSComponent* CreateCSComponent(const String& classname);
+        CSComponent* CreateCSComponent(const String& classname);
 
-    /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
-    /// Save resource
-    virtual bool Save(Serializer& dest) const;
+        /// Load resource from stream. May be called from a worker thread. Return true if successful.
+        virtual bool BeginLoad(Deserializer& source);
+        /// Save resource
+        virtual bool Save(Serializer& dest) const;
 
-    /// Register object factory.
-    static void RegisterObject(Context* context);
+        /// Register object factory.
+        static void RegisterObject(Context* context);
 
-    /// Only valid in editor, as we don't inspect assembly at runtime
-    const Vector<String>& GetClassNames() { return classNames_; }
+        const String& GetFullPath() const { return fullAssemblyPath_;  }
 
-private:
+        /// Only valid in editor, as we don't inspect assembly at runtime
+        const Vector<String>& GetClassNames() { return classNames_; }
 
-    static void InitTypeMap();
+    private:
 
-    bool ParseComponentClassJSON(const JSONValue& json);
+        static void InitTypeMap();
 
-    // only valid in editor
-    Vector<String> classNames_;
+        bool ParseComponentClassJSON(const JSONValue& json);
 
-    HashMap<String, Vector<EnumInfo>> assemblyEnums_;
-    static HashMap<StringHash, VariantType> typeMap_;
+        String fullAssemblyPath_;
 
-};
+        // only valid in editor
+        Vector<String> classNames_;
+
+        HashMap<String, Vector<EnumInfo>> assemblyEnums_;
+        static HashMap<StringHash, VariantType> typeMap_;
+
+    };
 
 }

@@ -1,0 +1,8 @@
+
+{
+  "name" : "AtomicNETScript",
+  "namespace" : "Atomic",
+  "dependencies" : ["Script/Packages/Atomic"],
+  "modules" : ["AtomicNETScript"],
+  "platforms" : ["WINDOWS", "MACOSX","LINUX"]
+}

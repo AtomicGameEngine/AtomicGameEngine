@@ -141,8 +141,12 @@ String PlatformAndroid::GetADBCommand() const
 
 #ifdef ATOMIC_PLATFORM_OSX
     adbCommand += "/platform-tools/adb";
-#else
+#endif
+#ifdef ATOMIC_PLATFORM_WINDOWS
     adbCommand += "/platform-tools/adb.exe";
+#endif
+#ifdef ATOMIC_PLATFORM_LINUX
+    adbCommand += "/platform-tools/adb";
 #endif
 
     return adbCommand;
@@ -161,14 +165,17 @@ String PlatformAndroid::GetAndroidCommand() const
 #ifdef ATOMIC_PLATFORM_OSX
     //Vector<String> args = String("list targets").Split(' ');
     androidCommand += "/tools/android";
-#else
+#endif
+#ifdef ATOMIC_PLATFORM_WINDOWS
 
     // android is a batch file on windows, so have to run with cmd /c
     androidCommand += "\\tools\\android.bat";
 
     //androidCommand = "cmd";
 #endif
-
+#ifdef ATOMIC_PLATFORM_LINUX
+    androidCommand += "/tools/android";
+#endif
     return androidCommand;
 
 }

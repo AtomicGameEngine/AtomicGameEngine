@@ -40,11 +40,6 @@
 
 #include <AtomicJS/Javascript/Javascript.h>
 
-#ifdef ATOMIC_DOTNET
-#include <AtomicNET/NETCore/NETCore.h>
-#include <AtomicNET/NETCore/NETHost.h>
-#endif
-
 #include <AtomicPlayer/Player.h>
 
 #include "AtomicPlayer.h"
@@ -157,39 +152,6 @@ void AtomicPlayerApp::Start()
     AtomicPlayer::jsapi_init_atomicplayer(vm_);
 
     JSVM* vm = JSVM::GetJSVM(0);
-
-#ifdef ATOMIC_DOTNET
-
-    // Instantiate and register the AtomicNET subsystem
-    SharedPtr<NETCore> netCore (new NETCore(context_));
-    context_->RegisterSubsystem(netCore);
-    String netCoreErrorMsg;
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
-    String rootNETDir = fileSystem->GetProgramDir() + "AtomicPlayer_Resources/AtomicNET/";
-
-#else
-
-    String rootNETDir = fileSystem->GetProgramDir() + "AtomicPlayer_Resources/AtomicNET/";
-
-#endif
-
-    NETHost::SetCoreCLRFilesAbsPath(GetNativePath(rootNETDir + "CoreCLR/"));
-    NETHost::SetCoreCLRTPAPaths(GetNativePath(rootNETDir + "Atomic/TPA/"));
-    NETHost::SetCoreCLRAssemblyLoadPaths(GetNativePath(rootNETDir + "Atomic/Assemblies/"));
-
-    if (!netCore->Initialize(netCoreErrorMsg))
-    {
-        LOGERRORF("NetCore: Unable to initialize! %s", netCoreErrorMsg.CString());
-        context_->RemoveSubsystem(NETCore::GetTypeStatic());
-    }
-    else
-    {
-
-    }
-#endif
-
 
     if (!vm->ExecuteMain())
     {

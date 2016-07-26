@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <Atomic/Core/Variant.h>
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Resource/ResourceCache.h>
@@ -27,102 +28,166 @@
 
 #include <AtomicNET/NETScript/CSComponentAssembly.h>
 
-#include "../NETTools/NETToolSystem.h"
-
 #include "Asset.h"
 #include "AssetDatabase.h"
+
+#include "../NETTools/AtomicNETService.h"
+
 #include "NETAssemblyImporter.h"
 
 namespace ToolCore
 {
 
-NETAssemblyImporter::NETAssemblyImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
-{
-    requiresCacheFile_ = false;
-}
-
-NETAssemblyImporter::~NETAssemblyImporter()
-{
-
-}
-
-void NETAssemblyImporter::SetDefaults()
-{
-    AssetImporter::SetDefaults();
-}
-
-bool NETAssemblyImporter::Import()
-{
-    NETToolSystem* tools = GetSubsystem<NETToolSystem>();
-
-    assemblyJSON_.SetType(JSON_NULL);
-
-    if (tools->InspectAssembly(asset_->GetPath(), assemblyJSON_))
+    NETAssemblyImporter::NETAssemblyImporter(Context* context, Asset *asset) : AssetImporter(context, asset)
     {
-        if (!assemblyJSON_.IsObject())
+        requiresCacheFile_ = false;
+        resultHandler_ = new NETAssemblyImporterResultHandler(context, this);
+    }
+
+    NETAssemblyImporter::~NETAssemblyImporter()
+    {
+
+    }
+
+    void NETAssemblyImporter::SetDefaults()
+    {
+        AssetImporter::SetDefaults();
+    }
+
+    void NETAssemblyImporter::HandleResult(unsigned cmdID, const VariantMap& cmdResult)
+    {
+        const String& command = cmdResult["command"]->GetString();
+
+        if (command == "parse")
         {
+            // Assembly parse results
+            const String& resultJSON = cmdResult["result"]->GetString();
+
             assemblyJSON_.SetType(JSON_NULL);
+
+            JSONFile::ParseJSON(resultJSON, assemblyJSON_);
+
+            if (!assemblyJSON_.IsObject())
+            {
+                LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly json for %s", asset_->GetPath().CString());
+            }
+            else
+            {
+                ResourceCache* cache = GetSubsystem<ResourceCache>();
+                CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
+                if (assemblyFile)
+                {
+                    if (!assemblyFile->ParseAssemblyJSON(assemblyJSON_))
+                    {
+                        LOGERRORF("NETAssemblyImporter::HandleResult - Unable to parse assembly %s", asset_->GetPath().CString());
+                    }
+                    else
+                    {
+                        asset_->Save();
+                    }
+                }
+                else
+                {
+
+                    LOGERRORF("NETAssemblyImporter::HandleResult - Unable to get CSComponentAssembly resource for %s", asset_->GetPath().CString());
+
+                }
+                    
+            }
+            
         }
-        else
+
+    }
+
+    bool NETAssemblyImporter::Import()
+    {
+        AtomicNETService* service = GetSubsystem<AtomicNETService>();
+
+        if (!service)
         {
+            LOGERRORF("NETAssemblyImporter::Import - Unable to get AtomicNETService subsystem importing %s", asset_->GetPath().CString());
+            return false;
+        }
+
+
+        assemblyJSON_.SetType(JSON_NULL);
+
+        VariantMap cmdMap;
+        cmdMap["command"] = "parse";
+        cmdMap["assemblyPath"] = asset_->GetPath();
+
+        service->QueueCommand(resultHandler_, cmdMap);
+
+        return true;
+
+    }
+
+    bool NETAssemblyImporter::LoadSettingsInternal(JSONValue& jsonRoot)
+    {
+        if (!AssetImporter::LoadSettingsInternal(jsonRoot))
+            return false;
+
+        JSONValue import = jsonRoot.Get("NETAssemblyImporter");
+
+        assemblyJSON_.SetType(JSON_NULL);
+
+        const JSONValue& ajson = import.Get("AssemblyJSON");
+
+        if (ajson.IsObject())
+        {
+            assemblyJSON_ = ajson.GetObject();
+
             ResourceCache* cache = GetSubsystem<ResourceCache>();
             CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
             if (assemblyFile)
                 assemblyFile->ParseAssemblyJSON(assemblyJSON_);
         }
 
+        return true;
     }
 
-    return true;
-}
-
-bool NETAssemblyImporter::LoadSettingsInternal(JSONValue& jsonRoot)
-{
-    if (!AssetImporter::LoadSettingsInternal(jsonRoot))
-        return false;
-
-    JSONValue import = jsonRoot.Get("NETAssemblyImporter");
-
-    assemblyJSON_.SetType(JSON_NULL);
-
-    const JSONValue& ajson = import.Get("AssemblyJSON");
-
-    if (ajson.IsObject())
+    bool NETAssemblyImporter::SaveSettingsInternal(JSONValue& jsonRoot)
     {
-        assemblyJSON_ = ajson.GetObject();
+        if (!AssetImporter::SaveSettingsInternal(jsonRoot))
+            return false;
 
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
-        if (assemblyFile)
-            assemblyFile->ParseAssemblyJSON(assemblyJSON_);
+        JSONValue import;
+        import.SetType(JSON_OBJECT);
+        import.Set("AssemblyJSON", assemblyJSON_);
+        jsonRoot.Set("NETAssemblyImporter", import);
+
+        return true;
     }
 
-    return true;
-}
+    Resource* NETAssemblyImporter::GetResource(const String& typeName)
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-bool NETAssemblyImporter::SaveSettingsInternal(JSONValue& jsonRoot)
-{
-    if (!AssetImporter::SaveSettingsInternal(jsonRoot))
-        return false;
+        CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
 
-    JSONValue import;
-    import.SetType(JSON_OBJECT);
-    import.Set("AssemblyJSON", assemblyJSON_);
-    jsonRoot.Set("NETAssemblyImporter", import);
+        return assemblyFile;
 
-    return true;
-}
-
-Resource* NETAssemblyImporter::GetResource(const String& typeName)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    CSComponentAssembly* assemblyFile = cache->GetResource<CSComponentAssembly>(asset_->GetPath());
-
-    return assemblyFile;
-
-}
+    }
 
 
+    // NETAssemblyImporterClient
+
+
+    NETAssemblyImporterResultHandler::NETAssemblyImporterResultHandler(Context* context, NETAssemblyImporter* importer) :
+        IPCResultHandler(context),
+        importer_(importer)
+    {
+
+    }
+
+    NETAssemblyImporterResultHandler::~NETAssemblyImporterResultHandler()
+    {
+
+    }
+
+    void NETAssemblyImporterResultHandler::HandleResult(unsigned cmdID, const VariantMap& cmdResult)
+    {
+        importer_->HandleResult(cmdID, cmdResult);
+    }
 
 }

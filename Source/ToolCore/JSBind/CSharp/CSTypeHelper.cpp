@@ -35,7 +35,7 @@ void CSTypeHelper::GenNativeFunctionParameterSignature(JSBFunction* function, St
 
     Vector<String> args;
 
-    if (!function->IsConstructor())
+    if (!function->IsConstructor() && !function->IsStatic())
     {
         args.Push(ToString("%s* self", klass->GetNativeName().CString()));
     }

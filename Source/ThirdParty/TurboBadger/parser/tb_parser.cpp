@@ -252,11 +252,61 @@ void TBParser::OnLine(char *line, TBParserTarget *target)
         return;
     }
 
+    int i = 0;
+    int tabs = 0;
+    int spaces = 0;
+
+    while (line[i] != 0)
+    {
+        if (line[i] == '\t')
+            tabs++;
+        else if (line[i] == ' ')
+            spaces++;
+        else
+            break;
+        i++;
+    }
+
+    if (spaces && indent_spaces == -1)
+    {
+        indent_spaces = spaces;
+    }
+
+    if ((tabs || indent_tabs) && spaces)
+    {
+        target->OnError(current_line_nr, "Indentation error. Mixed tabs and spaces (Line skipped)");
+        return;
+    }
+
+
     // Check indent
     int indent = 0;
-    while (line[indent] == '\t' && line[indent] != 0)
-        indent++;
-    line += indent;
+
+    if (tabs)
+    {
+        indent_tabs = true;
+        indent += tabs;
+        line += tabs;
+    }
+    else
+    {
+        i = 0;
+        int c = 0;
+        while (line[i] == ' ' && line[i] != 0)
+        {
+            c++;
+            i++;
+
+            if (indent_spaces == c)
+            {
+                c = 0;
+                indent++;
+            }
+
+        }
+
+        line += i;
+    }
 
     if (indent - current_indent > 1)
     {

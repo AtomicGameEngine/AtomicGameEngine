@@ -26,100 +26,16 @@
 #include <Atomic/Core/Context.h>
 #include <Atomic/Resource/ResourceCache.h>
 
-#ifdef ATOMIC_PHYSICS
-#include <Atomic/Physics/PhysicsEvents.h>
-#include <Atomic/Physics/PhysicsWorld.h>
-#endif
 #include <Atomic/Scene/Scene.h>
 #include <Atomic/Scene/SceneEvents.h>
 
-#include "../NETCore/NETVariant.h"
 #include "NETScriptEvents.h"
-#include "CSManaged.h"
 #include "CSComponent.h"
 
 namespace Atomic
 {
 
 extern const char* LOGIC_CATEGORY;
-
-class CSComponentFactory : public ObjectFactory
-{
-public:
-    /// Construct.
-    CSComponentFactory(Context* context) :
-        ObjectFactory(context)
-    {
-        type_ = CSComponent::GetTypeStatic();
-        baseType_ = CSComponent::GetBaseTypeStatic();
-        typeName_ = CSComponent::GetTypeNameStatic();
-    }
-
-    /// Create an object of the specific type.
-    SharedPtr<Object> CreateObject(const XMLElement& source = XMLElement::EMPTY)
-    {
-
-        // if in editor, just create the CSComponent
-        if (context_->GetEditorContext())
-        {
-            return SharedPtr<Object>(new CSComponent(context_));
-        }
-
-        // At runtime, a XML CSComponent may refer to a managed component
-
-        String managedClass;
-        String assemblyRef;
-
-        if (source != XMLElement::EMPTY)
-        {
-            XMLElement attrElem = source.GetChild("attribute");
-
-            while (attrElem)
-            {
-                if (attrElem.GetAttribute("name") == "Assembly")
-                {
-                    assemblyRef = attrElem.GetAttribute("value");
-                }
-                else if (attrElem.GetAttribute("name") == "Class")
-                {
-                    managedClass = attrElem.GetAttribute("value");
-                }
-
-                if (assemblyRef.Length() && managedClass.Length())
-                    break;
-
-                attrElem = attrElem.GetNext("attribute");
-            }
-        }               
-
-        SharedPtr<Object> ptr;
-
-        if (assemblyRef.Length())
-        {
-            Vector<String> split = assemblyRef.Split(';');
-
-            if (split.Size() == 2)
-            {
-                ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
-                CSComponentAssembly* componentFile = cache->GetResource<CSComponentAssembly>(split[1]);
-                if (componentFile)
-                    ptr = componentFile->CreateCSComponent(managedClass);
-                else
-                {
-                    LOGERRORF("Unable to load component file %s", split[1].CString());
-                }
-            }
-
-        }
-
-        if (ptr.Null())
-        {
-            ptr = new CSComponent(context_);
-        }
-
-        return ptr;    }
-};
-
 
 CSComponent::CSComponent(Context* context) :
     ScriptComponent(context)
@@ -134,7 +50,8 @@ CSComponent::~CSComponent()
 
 void CSComponent::RegisterObject(Context* context)
 {
-    context->RegisterFactory(new CSComponentFactory(context), LOGIC_CATEGORY);
+    context->RegisterFactory<CSComponent>(LOGIC_CATEGORY);
+
     ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 
     ATTRIBUTE("FieldValues", VariantMap, fieldValues_, Variant::emptyVariantMap, AM_FILE);
@@ -156,15 +73,7 @@ void CSComponent::ApplyAttributes()
 void CSComponent::ApplyFieldValues()
 {
     if (!fieldValues_.Size())
-        return;
-
-    SharedPtr<NETVariantMap> vmap(new NETVariantMap());
-    vmap->CopySourceVariantMap(fieldValues_);
-
-    CSManaged* managed = GetSubsystem<CSManaged>();
-
-    managed->CSComponentApplyFields(this, vmap);
-
+        return;   
 }
 
 void CSComponent::SetComponentClassName(const String& name)
@@ -173,41 +82,63 @@ void CSComponent::SetComponentClassName(const String& name)
 
     if (assemblyFile_ && assemblyFile_->GetClassNames().Contains(name))
     {
+        /*
         using namespace CSComponentClassChanged;
         VariantMap eventData;
         eventData[P_CSCOMPONENT] = this;
         eventData[P_CLASSNAME] = name;
         SendEvent(E_CSCOMPONENTCLASSCHANGED, eventData);
+        */
     }
 }
 
 void CSComponent::OnNodeSet(Node* node)
 {
-    if (node)
-    {
-        //UpdateReferences();
-    }
-    else
-    {
-        // We are being detached from a node: execute user-defined stop function and prepare for destruction
-        //UpdateReferences(true);
-        //Stop();
-    }
+
 }
 
 void CSComponent::OnSceneSet(Scene* scene)
 {
+
+}
+
+void CSComponent::SendLoadEvent()
+{
+    if (!assemblyFile_ || !componentClassName_.Length())
+        return;
+
+    using namespace CSComponentLoad;
+
+    VariantMap eventData;
+
+    eventData[P_ASSEMBLYPATH] = assemblyFile_->GetFullPath();
+    eventData[P_CLASSNAME] = componentClassName_;
+    eventData[P_NATIVEINSTANCE] = (void*) this;
+
+    if (!fieldValues_.Empty())
+        eventData[P_FIELDVALUES] = (void*) &fieldValues_;
+
+    SendEvent(E_CSCOMPONENTLOAD, eventData);
+
 }
 
 bool CSComponent::Load(Deserializer& source, bool setInstanceDefault)
 {
     bool success = Component::Load(source, setInstanceDefault);
+
+    if (success)
+        SendLoadEvent();
+
     return success;
 }
 
 bool CSComponent::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
     bool success = Component::LoadXML(source, setInstanceDefault);
+
+    if (success)
+        SendLoadEvent();
+
     return success;
 }
 

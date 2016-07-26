@@ -38,6 +38,9 @@ class XMLFile;
 /// Base class for texture resources.
 class ATOMIC_API Texture : public Resource, public GPUObject
 {
+    OBJECT(Texture)
+    BASEOBJECT(Resource)
+
 public:
     /// Construct.
     Texture(Context* context);

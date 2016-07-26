@@ -2,5 +2,5 @@
 	"name" : "Engine",
 	"sources" : ["Source/Atomic/Engine"],
 	"includes" : [],
-	"classes" : ["Engine"]
+	"classes" : ["Engine", "Application"]
 }

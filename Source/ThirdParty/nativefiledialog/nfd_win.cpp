@@ -13,7 +13,8 @@
 #include <wchar.h>
 #include <stdio.h>
 #include <assert.h>
-#include <atlbase.h>
+//ATOMIC: Removed reference to ATL
+//#include <atlbase.h>
 #include <windows.h>
 #include <ShObjIdl.h>
 

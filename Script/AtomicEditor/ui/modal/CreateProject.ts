@@ -141,6 +141,12 @@ class CreateProject extends ModalWindow {
                     file.close();
                 }
 
+                // Look for a .userprefs file and if it exists, then rename it
+                fileResults = fileSystem.scanDir(folder, "*.userprefs", Atomic.SCAN_FILES, false);
+                if (fileResults.length === 1) {
+                    fileSystem.rename(folder + fileResults[0], folder + name + ".userprefs");
+                }
+
                 this.hide();
 
                 this.sendEvent(EditorEvents.LoadProject, { path: folder });

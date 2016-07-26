@@ -1,7 +1,16 @@
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${CMAKE_SOURCE_DIR}/Source/ThirdParty)
 
-include_directories (${CMAKE_SOURCE_DIR}/Source/ThirdParty/rapidjson/include
-                     ${CMAKE_SOURCE_DIR}/Source/ThirdParty )
+set (CSATOMICNETSCRIPTNATIVEDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/CSharp/Packages/AtomicNETScript/Native")
+set (JSATOMICNETSCRIPTDIR "${CMAKE_SOURCE_DIR}/Artifacts/Build/Source/Generated/${JAVASCRIPT_BINDINGS_PLATFORM}/Javascript/Packages/AtomicNETScript")
 
-file (GLOB SOURCE_FILES *.cpp *.h)
+file ( GLOB ATOMICNETSCRIPT_BINDINGS_SOURCE ${CSATOMICNETSCRIPTNATIVEDIR}/*.cpp ${CSATOMICNETSCRIPTNATIVEDIR}/*.h
+                                            ${JSATOMICNETSCRIPTDIR}/*.cpp ${JSATOMICNETSCRIPTDIR}/*.h )
 
-add_library(NETScript ${SOURCE_FILES})
+file (GLOB_RECURSE SOURCE_FILES *.cpp *.h)
+
+add_library(AtomicNETScript ${SOURCE_FILES})
+
+add_library(AtomicNETScriptBindings ${ATOMICNETSCRIPT_BINDINGS_SOURCE})
+
+add_dependencies(AtomicNETScriptBindings AtomicToolCheckScripts)

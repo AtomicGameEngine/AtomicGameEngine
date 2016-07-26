@@ -29,7 +29,7 @@
 #include "PlayCmd.h"
 #include "EditCmd.h"
 #include "BindCmd.h"
-#include "NETProjectGenCmd.h"
+#include "NETCmd.h"
 
 namespace ToolCore
 {
@@ -82,9 +82,9 @@ Command* CommandParser::Parse(const Vector<String>& arguments)
             {
                 cmd = new BindCmd(context_);
             }
-            else if (argument == "net-projectgen")
+            else if (argument == "net")
             {
-                cmd = new NETProjectGenCmd(context_);
+                cmd = new NETCmd(context_);
             }
 
         }

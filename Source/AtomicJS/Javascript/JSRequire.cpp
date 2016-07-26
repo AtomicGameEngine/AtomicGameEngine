@@ -124,8 +124,8 @@ namespace Atomic
         SplitPath(moduleID, pathName, fileName, extension);
         String path = moduleID;
 
-        // Do we really want this?  It is nice to not have to specify the Atomic path
-        if (fileName.StartsWith("Atomic"))
+        // It is nice to not have to specify the Atomic path, but verify that the module exists first since it could be user provided
+        if (fileName.StartsWith("Atomic") && cache->Exists("AtomicModules/" + path + ".js"))
         {
             path = "AtomicModules/" + path + ".js";
         }

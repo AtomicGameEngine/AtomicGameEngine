@@ -39,13 +39,17 @@ function getScriptModules(platform) {
       var moduleName = pkg.modules[j];
 
       if (pkg.moduleExclude && pkg.moduleExclude[platform])
-        if (pkg.moduleExclude[platform].indexOf(moduleName) != -1)
-          continue;
+      if (pkg.moduleExclude[platform].indexOf(moduleName) != -1)
+        continue;
 
-      if (!modules[pkg.name])
-        modules[pkg.name] = [];
+      if (!modules[pkg.name]) {
+        modules[pkg.name] = {
+          moduleNames: [],
+          bindings: pkg.bindings
+        };
+      }
 
-      modules[pkg.name].push(moduleName);
+      modules[pkg.name].moduleNames.push(moduleName);
     }
 
   }
@@ -71,13 +75,36 @@ function getGenScriptFilenames(platform) {
 
   for (var pkgName in modules) {
 
-    var jsPackageFolder = scriptGenRoot + "Javascript/Packages/" + pkgName + "/";
+    var module = modules[pkgName];
 
-    // the JS package sources
-    filenames.push(jsPackageFolder + "JSPackage" + pkgName + ".cpp");
+    // handle JS bindings
+    if (!module.bindings || module.bindings.indexOf("JavaScript") != -1) {
 
-    for (var i in modules[pkgName]) {
-      filenames.push(jsPackageFolder + "JSModule" + modules[pkgName][i] + ".cpp");
+      var jsPackageFolder = scriptGenRoot + "Javascript/Packages/" + pkgName + "/";
+
+      // the JS package sources
+      filenames.push(jsPackageFolder + "JSPackage" + pkgName + ".cpp");
+
+      for (var i in module.moduleNames) {
+        filenames.push(jsPackageFolder + "JSModule" + module.moduleNames[i] + ".cpp");
+      }
+    }
+
+    // C#
+    if (!module.bindings || module.bindings.indexOf("CSharp") != -1) {
+
+      var csPackageFolder = scriptGenRoot + "CSharp/Packages/" + pkgName + "/";
+      var csPackageNativeFolder = csPackageFolder + "Native/";
+      var csPackageManagedFolder = csPackageFolder + "Managed/";
+
+      // Native Package sources
+      filenames.push(csPackageNativeFolder + "CSPackage" + pkgName + ".cpp");
+      filenames.push(csPackageNativeFolder + "CSPackage" + pkgName + ".h");
+
+      for (var i in module.moduleNames) {
+        filenames.push(csPackageNativeFolder + "CSModule" + module.moduleNames[i] + ".cpp");
+      }
+
     }
 
   }

@@ -3,9 +3,9 @@
 
 #### THUNDERBEAST GAMES LLC:
 
-- Josh Engebretson (Technical Director)
+- Josh Engebretson (https://github.com/JoshEngebretson)
 
-- Lara Engebretson
+- Lara Engebretson (https://github.com/LaraEngebretson)
 
 ### Contributors:
 
@@ -30,6 +30,8 @@
 - Wynand van Vuuren (https://github.com/Vlamboljant)
 
 - Johnny Wahib (https://github.com/JohnnyWahib)
+
+- JimMarlowe (https://github.com/JimMarlowe)
 
 ### Contribution Copyright and Licensing
 

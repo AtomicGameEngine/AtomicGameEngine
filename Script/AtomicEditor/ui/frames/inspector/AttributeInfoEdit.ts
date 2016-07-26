@@ -24,6 +24,7 @@ import EditorUI = require("ui/EditorUI");
 import InspectorUtils = require("./InspectorUtils");
 import SerializableEditType = require("./SerializableEditType");
 import EditorEvents = require("editor/EditorEvents");
+import ColorChooser = require("./ColorChooser");
 
 class AttributeInfoEdit extends Atomic.UILayout {
 
@@ -184,7 +185,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
 
         if (uniform) {
             var object = this.editType.getFirstObject();
-            this.editWidget.skinBg = "TBGreyCheckBox";
+            this.editWidget.skinBg = "TBCheckBox";
             if (object) {
                 var value = object.getAttribute(this.attrInfo.name);
                 this.editWidget.value = (value ? 1 : 0);
@@ -192,7 +193,7 @@ class BoolAttributeEdit extends AttributeInfoEdit {
 
         } else {
 
-            this.editWidget.skinBg = "TBGreyCheckBoxNonUniform";
+            this.editWidget.skinBg = "TBCheckBoxNonUniform";
             this.editWidget.value = 1;
 
         }
@@ -621,13 +622,129 @@ class QuaternionAttributeEdit extends NumberArrayAttributeEdit {
 
 }
 
-class ColorAttributeEdit extends NumberArrayAttributeEdit {
+class ColorAttributeEdit extends AttributeInfoEdit {
 
-    constructor() {
 
-        super(4);
+    createLayout() {
+
+        var layout = new Atomic.UILayout();
+        var o = InspectorUtils.createAttrColorFieldWithSelectButton(this.attrInfo.name, layout);
+
+        var colorWidget = this.colorWidget = o.colorWidget;
+        var selectButton = o.selectButton;
+
+        layout.layoutSize = Atomic.UI_LAYOUT_SIZE_AVAILABLE;
+        layout.gravity = Atomic.UI_GRAVITY_LEFT_RIGHT;
+        layout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+
+        var lp = new Atomic.UILayoutParams();
+        lp.width = 140;
+        lp.height = 24;
+        colorWidget.layoutParams = lp;
+
+        this.editWidget = layout;
+
+        this.editWidget.subscribeToEvent(this.editWidget, "WidgetEvent", (data) => this.handleWidgetEvent(data));
+
+        selectButton.onClick = () => {
+
+            // store original color
+            let color = [1, 1, 1, 1];
+            let object = this.editType.getFirstObject();
+
+            if (object) {
+                color = object.getAttribute(this.attrInfo.name);
+            }
+
+            colorWidget.color = color;
+
+            let restore = null;
+            let chooser = new ColorChooser ( color );
+
+            this.subscribeToEvent(chooser, "ColorChooserChanged", (ev) => {
+
+                restore = color;
+                this.updateColor(chooser.getRGBA());
+
+            });
+
+            this.subscribeToEvent(chooser, "UIWidgetEditCanceled", (ev) => {
+
+                if (restore) {
+
+                    colorWidget.color = restore;
+                    this.updateColor(restore);
+
+                }
+
+            });
+
+            this.subscribeToEvent(chooser, "UIWidgetEditComplete", (ev) => {
+
+                let newColor = chooser.getRGBA();
+
+                // check for new color edit
+                let committed = false;
+                for (let i = 0; i < 4; i++) {
+
+                    if (color[i] != newColor[i]) {
+
+                        this.editType.onAttributeInfoEdited(this.attrInfo, newColor);
+                        this.refresh();
+                        committed = true;
+                        break;
+
+                    }
+                }
+
+                if (restore && !committed) {
+
+                    for (let i = 0; i < 4; i++) {
+
+                        if (color[i] != restore[i]) {
+
+                            this.updateColor(color);
+                            break;
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        };
+
+        this.addChild(this.editWidget);
 
     }
+
+    refresh() {
+
+        let object = this.editType.getFirstObject();
+
+        if (object) {
+            this.colorWidget.color = object.getAttribute(this.attrInfo.name);
+        }
+    }
+
+    // updates color on selection without committing to undo/redo for preview
+    updateColor(rgba:number[]) {
+
+        this.colorWidget.color = rgba;
+
+        for (var i in this.editType.objects) {
+
+            let object = this.editType.objects[i];
+            object.setAttribute(this.attrInfo.name, rgba );
+
+        }
+
+    }
+
+    colorWidget : Atomic.UIColorWidget;
 
 }
 
@@ -735,7 +852,7 @@ class ResourceRefAttributeEdit extends AttributeInfoEdit {
 
                         } else if (resource instanceof Atomic.Animation) {
 
-                             var animCacheReferenceName = resource.name.replace("_"+(<Atomic.Animation>resource).animationName, "");
+                             var animCacheReferenceName = resource.name.replace( "_" + (<Atomic.Animation>resource).animationName, "");
                              var asset = ToolCore.assetDatabase.getAssetByCachePath(animCacheReferenceName);
                              this.sendEvent(EditorEvents.InspectorProjectReference, { "path": asset.getRelativePath() });
 

@@ -179,6 +179,7 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
         eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.saveResource(ev));
         eventDispatcher.subscribeToEvent(EditorEvents.DeleteResourceNotification, (ev) => this.deleteResource(ev));
         eventDispatcher.subscribeToEvent(EditorEvents.RenameResourceNotification, (ev) => this.renameResource(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.EditResource, (ev) => this.editResource(ev));
 
     }
 
@@ -226,6 +227,23 @@ export class ResourceServicesProvider extends ServicesProvider<Editor.HostExtens
                 // Verify that the service contains the appropriate methods and that it can handle the rename
                 if (service.rename) {
                     service.rename(ev);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
+     * Called when a resource is about to be edited
+     * @param  {Editor.EditorEvents.EditResourceEvent} ev
+     */
+    editResource(ev: Editor.EditorEvents.EditResourceEvent) {
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can handle the edit
+                if (service.edit) {
+                    service.edit(ev);
                 }
             } catch (e) {
                 EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
@@ -337,6 +355,15 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
      */
     removePluginMenuItemSource(id: string) {
         this.mainFrame.menu.removePluginMenuItemSource(id);
+    }
+
+
+    /**
+     * Returns the currently active resource editor or null
+     * @return {Editor.ResourceEditor}
+     */
+    getCurrentResourceEditor(): Editor.ResourceEditor {
+        return this.mainFrame.resourceframe.currentResourceEditor;
     }
 
     /**
@@ -502,11 +529,40 @@ export class UIServicesProvider extends ServicesProvider<Editor.HostExtensions.U
     }
 
     /**
+     * Hooks into web messages coming in from web views
+     * @param  {[String|Object]} data
+     */
+    handleWebMessage(data) {
+        let messageType;
+        let messageObject;
+
+        try {
+            messageObject = JSON.parse(data.request);
+            messageType = messageObject.message;
+        } catch (e) {
+            // not JSON, we are just getting a notification message of some sort
+            messageType = data.request;
+        }
+
+        // run through and find any services that can handle this.
+        this.registeredServices.forEach((service) => {
+            try {
+                // Verify that the service contains the appropriate methods and that it can save
+                if (service.handleWebMessage) {
+                    service.handleWebMessage(messageType, messageObject);
+                }
+            } catch (e) {
+                EditorUI.showModalError("Extension Error", `Error detected in extension ${service.name}:\n${e}\n\n ${e.stack}`);
+            }
+        });
+    }
+
+    /**
      * Allow this service registry to subscribe to events that it is interested in
      * @param  {Atomic.UIWidget} topLevelWindow The top level window that will be receiving these events
      */
     subscribeToEvents(eventDispatcher: Editor.Extensions.EventDispatcher) {
         // Placeholder for when UI events published by the editor need to be listened for
-        //eventDispatcher.subscribeToEvent(EditorEvents.SaveResourceNotification, (ev) => this.doSomeUiMessage(ev));
+        eventDispatcher.subscribeToEvent(EditorEvents.WebMessage, (ev) => this.handleWebMessage(ev));
     }
 }

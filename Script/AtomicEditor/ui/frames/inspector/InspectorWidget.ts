@@ -117,7 +117,7 @@ class InspectorWidget extends ScriptWidget {
       attrLayout.addChild(_name);
 
       var box = new Atomic.UICheckBox();
-      box.skinBg = "TBGreyCheckBox";
+      box.skinBg = "TBCheckBox";
       attrLayout.addChild(box);
       parent.addChild(attrLayout);
 

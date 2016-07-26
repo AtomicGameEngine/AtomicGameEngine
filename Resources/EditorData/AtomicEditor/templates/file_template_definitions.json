@@ -1,0 +1,28 @@
+{
+    "component": [{
+        "name": "Basic (JavaScript)",
+        "desc": "An empty component for JavaScript",
+        "templateType": "component",
+        "ext": ".js",
+        "filename": "AtomicEditor/templates/template_component.js"
+    }, {
+        "name": "Basic (TypeScript)",
+        "desc": "An empty component for TypeScript",
+        "templateType": "component",
+        "ext": ".ts",
+        "filename": "AtomicEditor/templates/template_ts_component.ts"
+    }],
+    "script": [{
+        "name": "Basic (JavaScript)",
+        "desc": "An empty script for JavaScript",
+        "templateType": "script",
+        "ext": ".js",
+        "filename": "AtomicEditor/templates/template_script.js"
+    }, {
+        "name": "Basic (TypeScript)",
+        "desc": "An empty script for TypeScript",
+        "templateType": "script",
+        "ext": ".ts",
+        "filename": "AtomicEditor/templates/template_ts_script.ts"
+    }]
+}

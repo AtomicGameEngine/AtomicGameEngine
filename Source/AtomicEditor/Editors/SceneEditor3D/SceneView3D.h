@@ -75,6 +75,9 @@ private:
     bool GetOrbitting();
     bool GetZooming();
 
+    bool GetChangingCameraSpeed();
+    void ToggleGrid();
+
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
 
     void UpdateDragNode(int mouseX, int mouseY);
@@ -90,19 +93,35 @@ private:
     void HandleUIUnhandledShortcut(StringHash eventType, VariantMap& eventData);
 
     void MoveCamera(float timeStep);
+    void CheckCameraSpeedBounds();
+
+    void SnapCameraToView(int snapView);
+    void SelectView();
+
+    // stores the last known position of the perspective camera
+    void SavePerspectiveCameraPosition();
 
     WeakPtr<SceneEditor3D> sceneEditor_;
 
     float yaw_;
     float pitch_;
 
+    Vector3 perspectCamPosition_;
+    float perspectiveYaw_;
+    float perspectivePitch_;
+
     bool mouseLeftDown_;
     bool mouseMoved_;
 
     bool enabled_;
+    bool gridEnabled_;
+
+    // Checks whether your switching from an orthographic view
+    bool fromOrthographic_;
 
     bool cameraMove_;
     float cameraMoveTime_;
+    float cameraMoveSpeed_;
     Vector3 cameraMoveStart_;
     Vector3 cameraMoveTarget_;
 

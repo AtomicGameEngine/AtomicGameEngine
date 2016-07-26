@@ -32,6 +32,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 
 #include <Atomic/Graphics/Graphics.h>
 
@@ -51,17 +52,30 @@
 
 static int XErrorHandlerImpl(Display *display, XErrorEvent *event)
 {
+    if ( display && event )
+    {
+        char msg[132];
+        XGetErrorText(display, event->error_code, msg, sizeof(msg));
+        fprintf(stderr, "X11 Error %d (%s): request %d.%d \n",
+                        event->error_code, 
+                        msg, 
+                        event->request_code,
+                        event->minor_code );
+    }
     return 0;
 }
 
 static int XIOErrorHandlerImpl(Display *display)
 {
+    if ( display )
+      fprintf(stderr, "XIO Error on display %p, quitting.\n", (void*)display );
     return 0;
 }
 
 static void TerminationSignalHandler(int signatl)
 {
-
+    fprintf(stderr,"Received signal %d, quitting.\n", signatl );
+    exit(0);
 }
 
 #endif
@@ -97,9 +111,16 @@ private:
 
 GlobalPropertyMap WebBrowserHost::globalProperties_;
 WeakPtr<WebBrowserHost> WebBrowserHost::instance_;
+String WebBrowserHost::rootCacheFolder_;
+String WebBrowserHost::cacheName_;
 String WebBrowserHost::userAgent_;
 String WebBrowserHost::productVersion_;
+String WebBrowserHost::jsMessageQueryFunctionName_ = "atomicQuery";
+String WebBrowserHost::jsMessageQueryCancelFunctionName_ = "atomicQueryCancel";
+
 int WebBrowserHost::debugPort_ = 3335;
+bool WebBrowserHost::webSecurity_ = true;
+
 
 WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 {
@@ -121,8 +142,8 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     // these include "--enable-media-stream", "--enable-usermedia-screen-capturing", "--off-screen-rendering-enabled", "--transparent-painting-enabled"
 
 #ifdef ATOMIC_PLATFORM_LINUX
-    static const char* _argv[3] = { "AtomicWebView", "--disable-setuid-sandbox" };
-    CefMainArgs args(3, (char**) &_argv);
+    static const char* _argv[2] = { "AtomicWebView", "--disable-setuid-sandbox" };
+    CefMainArgs args(2, (char**) &_argv);
 #else
     CefMainArgs args;
 #endif
@@ -142,7 +163,25 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     {
         CefString(&settings.user_agent).FromASCII(userAgent_.CString());
     }
-    
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    String fullPath;
+
+    // If we've specified the absolute path to a root cache folder, use it
+    if (rootCacheFolder_.Length() && cacheName_.Length())
+    {        
+        fullPath = rootCacheFolder_ + "/" + cacheName_;
+        CefString(&settings.cache_path).FromASCII(fullPath.CString());
+    }
+    else
+    {
+        fullPath = fs->GetAppPreferencesDir(cacheName_.CString(), "WebCache");
+    }
+
+
+    CefString(&settings.cache_path).FromASCII(fullPath.CString());
+
     settings.remote_debugging_port = debugPort_;
 
     d_ = new WebBrowserHostPrivate(this);
@@ -156,6 +195,9 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
     RegisterWebSchemeHandlers(this);
 
+    // Ensure cookie manager is created
+    CefCookieManager::GetGlobalManager(nullptr);
+
     SubscribeToEvent(E_UPDATE, HANDLER(WebBrowserHost, HandleUpdate));
 
     instance_ = this;
@@ -165,6 +207,13 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 WebBrowserHost::~WebBrowserHost()
 {
     instance_ = 0;
+
+    // TODO: Better place for this?  If there are issues with cookies not persisting
+    // it is possible the async nature of this call could be a culprit
+    CefRefPtr<CefCookieManager> manager = CefCookieManager::GetGlobalManager(nullptr);
+    if (manager.get())
+        manager->FlushStore(nullptr);
+
     CefClearSchemeHandlerFactories();
     CefShutdown();
 }
@@ -200,5 +249,23 @@ void WebBrowserHost::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     CefDoMessageLoopWork();
 }
+
+void WebBrowserHost::ClearCookies(const String& url, const String& cookieName)
+{
+    CefRefPtr<CefCookieManager> manager = CefCookieManager::GetGlobalManager(nullptr);
+
+    if (!manager.get())
+        return;
+
+    CefString cefUrl;
+    cefUrl.FromASCII(url.CString());
+
+    CefString cefCookieName;
+    cefCookieName.FromASCII(cookieName.CString());
+
+    manager->DeleteCookies(cefUrl, cefCookieName, nullptr);
+
+}
+
 
 }
