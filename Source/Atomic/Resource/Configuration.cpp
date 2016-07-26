@@ -62,6 +62,19 @@ namespace Atomic
         return value;
     }
 
+    StringVector Configuration::GetArrayValue(const JSONArray & jarray, const StringVector & defaultValue)
+    {
+        StringVector value;
+
+        for (JSONArray::ConstIterator it = jarray.Begin(); it != jarray.End(); it++)
+        {
+            if (it->IsString())
+            {
+                value.Push(it->GetString());
+            }
+        }
+        return value;
+    }
 
     Configuration::Configuration() :
         isLoaded_(false)

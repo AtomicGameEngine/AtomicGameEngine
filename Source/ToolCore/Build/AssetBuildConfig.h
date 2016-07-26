@@ -22,46 +22,33 @@
 
 #pragma once
 
-#include "../Core/Variant.h"
-#include "JSONValue.h"
+#include "../../Atomic/Core/Variant.h"
+#include "../../Atomic/Resource/JSONValue.h"
+#include "../../Atomic/Resource/Configuration.h"
 
 namespace Atomic
 {
+    class Context;
 
-class Context;
+    class AssetBuildConfig :
+        Configuration
+    {
 
-/// Configuration base class for mapping JSON setting files to VariantMap configuration settings
-class Configuration
-{
-public:
+    public:
 
-    Configuration();
+        static bool LoadFromFile(Context* context, const String& filename) { return assetBuildConfig_.Configuration::LoadFromFile(context, filename); }
+        static bool LoadFromJSON(const String& json) { return assetBuildConfig_.Configuration::LoadFromJSON(json); }
 
-    bool LoadFromFile(Context* context, const String& filename);
-    bool LoadFromJSON(const String& json);
-    void Clear();
+        /// Apply the configuration to a setting variant map, values that exist will not be overriden
+        static void ApplyConfig(VariantMap& settings, bool overwrite = false) { return assetBuildConfig_.Configuration::ApplyConfig(settings, overwrite); }
 
-    /// Apply the configuration to a setting variant map, values that exist will not be overriden
-    void ApplyConfig(VariantMap& settings, bool overwrite = false);
+        static const bool IsLoaded() { return assetBuildConfig_.Configuration::IsLoaded(); }
 
-    const VariantMap& GetConfig() { return valueMap_; }
-    bool IsLoaded() const { return isLoaded_; }
+    private:
 
-protected:
-    static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
-    static int GetIntValue(const JSONValue& jvalue, int defaultValue);
-    static String GetStringValue(const JSONValue& jvalue, const String& defaultValue);
-    static StringVector GetArrayValue(const JSONArray& jarray, const StringVector& defaultValue);
-    
-    virtual bool LoadDesktopConfig(JSONValue root) { return true; };
+        virtual bool LoadDesktopConfig(JSONValue root);
+        bool LoadAssetBuildTagArray(const JSONArray& tags);
 
-    VariantMap valueMap_;
-
-private:
-    String filename_;
-    bool isLoaded_;
-};
+        static AssetBuildConfig assetBuildConfig_;
+    };
 }
-
-
-
