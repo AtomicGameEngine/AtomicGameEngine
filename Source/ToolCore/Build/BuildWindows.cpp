@@ -49,24 +49,24 @@ BuildWindows::~BuildWindows()
 void BuildWindows::Initialize()
 {
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-
     Project* project = tsystem->GetProject();
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
-    String projectResources = project->GetResourcePath();
-
+    
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
         AddResourceDir(defaultResourcePaths[i]);
     }
+    BuildDefaultResourceEntries();
+    
+    // Include the project resources and cache separately
+    AddProjectResourceDir(project->GetResourcePath());
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    AddProjectResourceDir(cachePath);
 
-    // TODO: smart filtering of cache
-    AddResourceDir(project->GetProjectPath() + "Cache/");
-    AddResourceDir(projectResources);
-
-    BuildResourceEntries();
-
+    BuildProjectResourceEntries();
 }
 
 bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const String& fileName)
@@ -86,7 +86,7 @@ bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const Str
         }
     }
     // #623 END TODO
-
+    
     return BuildBase::CheckIncludeResourceFile(resourceDir, fileName);
 }
 

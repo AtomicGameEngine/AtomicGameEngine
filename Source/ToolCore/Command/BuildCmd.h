@@ -45,8 +45,10 @@ public:
 private:
 
     void HandleBuildComplete(StringHash eventType, VariantMap& eventData);
+    
 
     String buildPlatform_;
+    String assetsBuildTag_;
 
 };
 

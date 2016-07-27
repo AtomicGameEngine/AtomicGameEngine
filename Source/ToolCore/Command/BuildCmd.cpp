@@ -28,6 +28,7 @@
 #include "../Project/Project.h"
 #include "../Build/BuildEvents.h"
 #include "../Build/BuildSystem.h"
+#include "../Build/AssetBuildConfig.h"
 
 #include "BuildCmd.h"
 #include <Poco/File.h>
@@ -49,6 +50,7 @@ bool BuildCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Strin
 {
     String argument = arguments[startIndex].ToLower();
     String value = startIndex + 1 < arguments.Size() ? arguments[startIndex + 1] : String::EMPTY;
+    String tag = startIndex + 2 < arguments.Size() ? arguments[startIndex + 2] : String::EMPTY;
 
     if (argument != "build")
     {
@@ -63,6 +65,7 @@ bool BuildCmd::Parse(const Vector<String>& arguments, unsigned startIndex, Strin
     }
 
     buildPlatform_ = value.ToLower();
+    assetsBuildTag_ = tag.ToLower();
 
     return true;
 }
@@ -77,6 +80,8 @@ void BuildCmd::HandleBuildComplete(StringHash eventType, VariantMap& eventData)
         Finished();
 
 }
+
+
 
 void BuildCmd::Run()
 {
@@ -103,6 +108,10 @@ void BuildCmd::Run()
 
     // create the build
     BuildBase* buildBase = platform->NewBuild(project);
+    if (!assetsBuildTag_.Empty())
+    {
+        buildBase->SetAssetBuildTag(assetsBuildTag_);
+    }
 
     // add it to the build system
     BuildSystem* buildSystem = GetSubsystem<BuildSystem>();

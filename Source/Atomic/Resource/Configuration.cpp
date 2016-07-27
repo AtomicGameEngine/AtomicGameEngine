@@ -62,6 +62,19 @@ namespace Atomic
         return value;
     }
 
+    void Configuration::GetArrayValue(const JSONArray & jarray, StringVector& value)
+    {
+        value.Clear();
+
+        for (JSONArray::ConstIterator it = jarray.Begin(); it != jarray.End(); it++)
+        {
+            if (it->IsString())
+            {
+                value.Push(it->GetString());
+            }
+        }
+
+    }
 
     Configuration::Configuration() :
         isLoaded_(false)

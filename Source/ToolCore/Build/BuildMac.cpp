@@ -53,19 +53,22 @@ void BuildMac::Initialize()
 
     Vector<String> defaultResourcePaths;
     GetDefaultResourcePaths(defaultResourcePaths);
-    String projectResources = project->GetResourcePath();
+    
 
     for (unsigned i = 0; i < defaultResourcePaths.Size(); i++)
     {
         AddResourceDir(defaultResourcePaths[i]);
     }
+    BuildDefaultResourceEntries();
 
     // TODO: smart filtering of cache
-    AddResourceDir(project->GetProjectPath() + "Cache/");
-    AddResourceDir(projectResources);
+    String projectResources = project->GetResourcePath();
+    AddProjectResourceDir(projectResources);
+    AssetDatabase* db = GetSubsystem<AssetDatabase>();
+    String cachePath = db->GetCachePath();
+    AddProjectResourceDir(cachePath);
 
-    BuildResourceEntries();
-
+    BuildProjectResourceEntries();
 }
 
 bool BuildMac::CheckIncludeResourceFile(const String& resourceDir, const String& fileName)
