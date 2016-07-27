@@ -51,8 +51,8 @@ protected:
     static bool GetBoolValue(const JSONValue& jvalue, bool defaultValue);
     static int GetIntValue(const JSONValue& jvalue, int defaultValue);
     static String GetStringValue(const JSONValue& jvalue, const String& defaultValue);
-    static StringVector GetArrayValue(const JSONArray& jarray, const StringVector& defaultValue);
-    
+    static void GetArrayValue(const JSONArray& jarray, StringVector& value);
+
     virtual bool LoadDesktopConfig(JSONValue root) { return true; };
 
     VariantMap valueMap_;
@@ -62,6 +62,3 @@ private:
     bool isLoaded_;
 };
 }
-
-
-

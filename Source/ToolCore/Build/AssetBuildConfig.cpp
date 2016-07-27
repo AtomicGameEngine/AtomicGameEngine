@@ -45,8 +45,9 @@ namespace Atomic
 
             const JSONArray& resources = resourceTag["Resources"]->GetArray();
 
-            Vector<String> empty;
-            valueMap_[tag.CString()] = GetArrayValue(resources, empty);
+            StringVector value;
+            GetArrayValue(resources, value);
+            valueMap_[tag.CString()] = value;
         }
 
         return true;

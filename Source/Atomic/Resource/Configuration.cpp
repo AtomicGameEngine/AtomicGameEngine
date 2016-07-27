@@ -62,9 +62,9 @@ namespace Atomic
         return value;
     }
 
-    StringVector Configuration::GetArrayValue(const JSONArray & jarray, const StringVector & defaultValue)
+    void Configuration::GetArrayValue(const JSONArray & jarray, StringVector& value)
     {
-        StringVector value;
+        value.Clear();
 
         for (JSONArray::ConstIterator it = jarray.Begin(); it != jarray.End(); it++)
         {
@@ -73,7 +73,7 @@ namespace Atomic
                 value.Push(it->GetString());
             }
         }
-        return value;
+
     }
 
     Configuration::Configuration() :
