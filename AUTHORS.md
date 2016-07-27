@@ -33,6 +33,8 @@
 
 - JimMarlowe (https://github.com/JimMarlowe)
 
+- Tarik Belabbas (https://github.com/Tarik-B)
+
 ### Contribution Copyright and Licensing
 
 Atomic Game Engine contribution copyrights are held by their authors.  Each author retains the copyright to their contribution and agrees to irrevocably license the contribution under the Atomic Game Engine Contribution License `CONTRIBUTION_LICENSE.md`.  Please see `CONTRIBUTING.md` for more details.
