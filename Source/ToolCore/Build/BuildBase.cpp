@@ -52,7 +52,7 @@ BuildBase::BuildBase(Context * context, Project* project, PlatformID platform) :
         resourcePackager_ = new ResourcePackager(context, this);
 
     fileIncludedResourcesLog_ = new File(context_, "BuildIncludedResources.log", Atomic::FILE_WRITE);
-    
+
     ReadAssetBuildConfig();
 }
 
@@ -332,7 +332,7 @@ void BuildBase::BuildDefaultResourceEntries()
         for (unsigned i = 0; i < fileNames.Size(); i++)
         {
             const String& filename = fileNames[i];
-            
+
             AddToResourcePackager(filename, resourceDir);
         }
     }
@@ -396,12 +396,12 @@ void BuildBase::BuildFilteredProjectResourceEntries()
             assetBuildConfigFiles = itr->second_.GetStringVector();
             for (unsigned i = 0; i < assetBuildConfigFiles.Size(); ++i)
             {
-                // remove case sensitivity 
+                // remove case sensitivity
                 assetBuildConfigFiles[i] = assetBuildConfigFiles[i].ToLower();
             }
             break;
         }
-        
+
         itr++;
         if (itr == resourceTags.End())
         {
@@ -412,7 +412,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     // find any folders defined in assetbuildconfig.json, and add the non-".asset" files in them.
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     Vector<String> filesInFolderToAdd;
-    
+
     for (unsigned i = 0; i < assetBuildConfigFiles.Size(); ++i)
     {
         String &filename = assetBuildConfigFiles[i];
@@ -454,7 +454,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     fileSystem->ScanDir(filesInResourceFolder, project_->GetResourcePath(), "*.*", SCAN_FILES, true);
     for (unsigned j = 0; j < filesInResourceFolder.Size(); ++j)
     {
-        // don't want to checks to be case sensitive 
+        // don't want to checks to be case sensitive
         filesInResourceFolder[j] = filesInResourceFolder[j].ToLower();
     }
 
@@ -462,9 +462,9 @@ void BuildBase::BuildFilteredProjectResourceEntries()
     {
         // .asset file is of primary importance since we used it to identify the associated cached file.
         // without the .asset file the resource is removed from being included in the build.
-        
+
         // don't want checks to be case sensitive
-        String &filename = assetBuildConfigFiles[i]; 
+        String &filename = assetBuildConfigFiles[i];
         if (filesInResourceFolder.Contains(filename) &&
             filesInResourceFolder.Contains(filename + ".asset"))
         {
@@ -502,7 +502,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
             filesWithGUIDtoInclude.Push(guid);
         }
     }
-    
+
     // Obtain files in cache folder,
     // Check if the file contains the guid, and add it to the cacheFilesToInclude
     Vector<String> filesInCacheFolder;
@@ -515,7 +515,7 @@ void BuildBase::BuildFilteredProjectResourceEntries()
         String &guid = filesWithGUIDtoInclude[i];
         for (unsigned j = 0; j < filesInCacheFolder.Size(); ++j)
         {
-            String &filename = GetFileName(filesInCacheFolder[j]);
+            const String &filename = GetFileName(filesInCacheFolder[j]);
             String &filenamePath = filesInCacheFolder[j];
             if (filename.Contains(guid))
             {
@@ -584,7 +584,7 @@ void BuildBase::AddToResourcePackager(const String& filename, const String& reso
     newEntry->packagePath_ = filename;
 
     resourceEntries_.Push(newEntry);
-    
+
     assert(resourcePackager_.NotNull());
     resourcePackager_->AddResourceEntry(newEntry);
 
