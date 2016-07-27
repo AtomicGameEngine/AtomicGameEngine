@@ -24,9 +24,6 @@
 
 #include "IPCUnix.h"
 
-namespace Atomic
-{
-
 #include <unistd.h>
 #include <signal.h>
 #include <sys/socket.h>
@@ -35,6 +32,13 @@ namespace Atomic
 #ifdef ATOMIC_PLATFORM_OSX
 #include <libproc.h>
 #endif
+
+#ifdef ATOMIC_PLATFORM_LINUX
+#include <sys/wait.h>
+#endif
+
+namespace Atomic
+{
 
 #define HANDLE_EINTR(x) ({ \
     typeof(x) __eintr_result__; \
@@ -176,15 +180,22 @@ bool IPCProcess::IsRunning()
     if (pid_ == -1)
         return false;
 
-#ifdef __APPLE__
+#if defined(ATOMIC_PLATFORM_OSX)
     char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     int ret = proc_pidpath (pid_, pathbuf, sizeof(pathbuf));
     if ( ret > 0 )
     {
         return true;
     }
+#elif defined(ATOMIC_PLATFORM_LINUX)
+    int status;
+    pid_t childPid = waitpid( pid_, &status, WNOHANG );
+    bool childRunning = !WIFEXITED( status ) && !WIFSIGNALED( status ) && !WIFSTOPPED( status );
+    if ( childPid != pid_ || childRunning )
+    {
+        return true;
+    }
 #else
-
     // this doesn't seem to work on OSX?
     if (kill(pid_, 0) == 0)
         return true;
