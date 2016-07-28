@@ -44,6 +44,12 @@ void WebAppBrowser::OnBeforeCommandLineProcessing(const CefString& process_type,
     command_line->AppendSwitch("--off-screen-rendering-enabled");
     command_line->AppendSwitch("--transparent-painting-enabled");
 
+#ifdef ATOMIC_PLATFORM_LINUX
+    // Issues with GPU acceleration (and possibly offscreen rendering)
+    // https://github.com/AtomicGameEngine/AtomicGameEngine/issues/924
+    command_line->AppendSwitch("--disable-gpu");
+#endif
+
     CefApp::OnBeforeCommandLineProcessing(process_type, command_line);
 }
 

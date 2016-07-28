@@ -199,7 +199,7 @@ public:
     // CefLoadHandler
 
     void OnLoadStart(CefRefPtr<CefBrowser> browser,
-                     CefRefPtr<CefFrame> frame) OVERRIDE
+                     CefRefPtr<CefFrame> frame, TransitionType transition_type) OVERRIDE
     {
         if (webClient_.Null() || !frame->IsMain())
             return;
