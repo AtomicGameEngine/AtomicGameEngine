@@ -26,6 +26,7 @@ import Scene3dResourceEditorBuilder from "./resourceEditors/Scene3dResourceEdito
 import TextFileResourceEditorBuilder from "./resourceEditors/TextFileResourceEditorBuilder";
 import TurboBadgerResourceEditorBuilder from "./resourceEditors/TurboBadgerResourceEditorBuilder";
 import TypescriptResourceEditorBuilder from "./resourceEditors/TypescriptResourceEditorBuilder";
+import CSharpResourceEditorBuilder from "./resourceEditors/CSharpResourceEditorBuilder";
 import XMLResourceEditorBuilder from "./resourceEditors/XMLResourceEditorBuilder";
 import ShaderResourceEditorBuilder from "./resourceEditors/ShaderResourceEditorBuilder";
 
@@ -99,6 +100,7 @@ export default class ResourceEditorProvider {
         this.registerStandardEditor(new TextFileResourceEditorBuilder());
         this.registerStandardEditor(new JavascriptResourceEditorBuilder());
         this.registerStandardEditor(new JsonResourceEditorBuilder());
+        this.registerStandardEditor(new CSharpResourceEditorBuilder());
         this.registerStandardEditor(new TypescriptResourceEditorBuilder());
         this.registerStandardEditor(new Scene3dResourceEditorBuilder());
         this.registerStandardEditor(new XMLResourceEditorBuilder());

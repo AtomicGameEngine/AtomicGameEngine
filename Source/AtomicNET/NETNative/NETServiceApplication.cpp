@@ -89,10 +89,12 @@ namespace Atomic
 
     bool NETServiceApplication::RunFrame()
     {
-        if (engine_->IsExiting())
-            return false;
-
         engine_->RunFrame();
+
+        if (engine_->IsExiting())
+        {
+            return false;
+        }
 
         return true;
     }

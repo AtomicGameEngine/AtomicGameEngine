@@ -61,7 +61,14 @@ namespace ToolCore
 
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
-        execPath = tenv->GetRootSourceDir() + "Artifacts/AtomicNET/Debug/AtomicNETService.exe";
+#ifdef _DEBUG
+
+        String config = "Debug";
+#else
+        String config = "Release";
+#endif
+
+        execPath = tenv->GetRootSourceDir() + "Artifacts/AtomicNET/" + config + "/AtomicNETService.exe";
 
 #elif ATOMIC_PLATFORM_OSX
 

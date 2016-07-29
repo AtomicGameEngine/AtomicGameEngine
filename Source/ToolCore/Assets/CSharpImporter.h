@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014-2016, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +20,33 @@
 // THE SOFTWARE.
 //
 
-#include <Atomic/Core/CoreEvents.h>
+#pragma once
 
-#include "NETCore.h"
-#include "NETEventDispatcher.h"
+#include "AssetImporter.h"
 
-namespace Atomic
+namespace ToolCore
 {
 
-
-    NETEventDispatcher::NETEventDispatcher(Context* context) :
-        Object(context)
+    class CSharpImporter : public AssetImporter
     {
+        OBJECT(CSharpImporter)
 
-    }
+    public:
+        /// Construct.
+        CSharpImporter(Context* context, Asset* asset);
+        virtual ~CSharpImporter();
 
-    NETEventDispatcher::~NETEventDispatcher()
-    {
-    }
+        virtual void SetDefaults();
 
-    void NETEventDispatcher::BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
-    {
-        if (eventType == E_UPDATE)
-        {
-            NETCore::DispatchUpdateEvent(eventData[Update::P_TIMESTEP].GetFloat());
-        }
+        Resource* GetResource(const String& typeName = String::EMPTY);
 
-        if (!netEvents_.Contains(eventType))
-            return;
+    protected:
 
-        NETCore::DispatchEvent(eventType.Value(), &eventData);
+        bool Import();
 
-    }
+        virtual bool LoadSettingsInternal(JSONValue& jsonRoot);
+        virtual bool SaveSettingsInternal(JSONValue& jsonRoot);
 
-    void NETEventDispatcher::EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData)
-    {
-        if (!netEvents_.Contains(eventType))
-            return;
-    }
+    };
 
 }

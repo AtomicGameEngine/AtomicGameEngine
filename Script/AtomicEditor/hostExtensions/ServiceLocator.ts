@@ -24,6 +24,7 @@ import * as HostExtensionServices from "./HostExtensionServices";
 import * as EditorUI from "../ui/EditorUI";
 import ProjectBasedExtensionLoader from "./coreExtensions/ProjectBasedExtensionLoader";
 import TypescriptLanguageExtension from "./languageExtensions/TypscriptLanguageExtension";
+import CSharpLanguageExtension from "./languageExtensions/CSharpLanguageExtension";
 
 /**
  * Generic service locator of editor services that may be injected by either a plugin
@@ -94,3 +95,4 @@ export default serviceLocator;
 // Load up all the internal services
 serviceLocator.loadService(new ProjectBasedExtensionLoader());
 serviceLocator.loadService(new TypescriptLanguageExtension());
+serviceLocator.loadService(new CSharpLanguageExtension());

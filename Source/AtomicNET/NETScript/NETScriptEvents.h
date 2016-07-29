@@ -41,4 +41,11 @@ namespace Atomic
         PARAM(P_FIELDVALUES, FieldValues);  // VariantMap as void*
     }
 
+    EVENT(E_CSCOMPONENTASSEMBLYCHANGED, CSComponentAssemblyChanged)
+    {
+        PARAM(P_RESOURCE, Resource); // resource* 
+        PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
+    }
+
+
 }

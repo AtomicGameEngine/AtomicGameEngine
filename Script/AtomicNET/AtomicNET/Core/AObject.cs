@@ -9,6 +9,13 @@ namespace AtomicEngine
     {
         internal Dictionary<uint, EventDelegate> eventHandlers = new Dictionary<uint, EventDelegate>();
 
+        public static T GetSubsystem<T>() where T : AObject
+        {
+            return AtomicNET.GetSubsystem<T>();
+        }
+
+
+
         internal void HandleEvent(uint eventType, ScriptVariantMap eventData)
         {
             eventHandlers[eventType](eventType, eventData);

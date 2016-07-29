@@ -23,14 +23,11 @@
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/File.h>
 #include <Atomic/Resource/ResourceCache.h>
-#include <Atomic/Resource/Image.h>
-
 #include <AtomicJS/Javascript/JSComponentFile.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"
 #include "TypeScriptImporter.h"
-
 
 namespace ToolCore
 {

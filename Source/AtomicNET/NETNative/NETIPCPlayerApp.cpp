@@ -83,14 +83,17 @@ namespace Atomic
 
     bool NETIPCPlayerApp::RunFrame()
     {
-        if (engine_->IsExiting())
-            return false;
-
         engine_->RunFrame();
 
-        return true;
-    }
+        if (engine_->IsExiting())
+        {            
+            return false;
+        }
 
+        return true;
+        
+    }
+    
     void NETIPCPlayerApp::Shutdown()
     {
         Stop();

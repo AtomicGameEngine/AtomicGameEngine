@@ -271,6 +271,7 @@ namespace ToolCore
         pgroup.CreateChild("DebugType").SetValue("full");
         pgroup.CreateChild("Optimize").SetValue("true");
         pgroup.CreateChild("OutputPath").SetValue(assemblyOutputPath_ + "Release\\");
+
         pgroup.CreateChild("DefineConstants").SetValue("TRACE");
         pgroup.CreateChild("ErrorReport").SetValue("prompt");
         pgroup.CreateChild("WarningLevel").SetValue("4");
@@ -400,6 +401,15 @@ namespace ToolCore
 
         project.CreateChild("Import").SetAttribute("Project", "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
 
+        if (name_ == "AtomicProject")
+        {
+            XMLElement afterBuild = project.CreateChild("Target");
+            afterBuild.SetAttribute("Name", "AfterBuild");
+            XMLElement copy = afterBuild.CreateChild("Copy");
+            copy.SetAttribute("SourceFiles", "$(TargetPath)");
+            copy.SetAttribute("DestinationFolder", projectPath_ + "../../../Resources/");
+        }
+
         String projectSource = xmlFile_->ToString();
 
         SharedPtr<File> output(new File(context_, projectPath_ + name_ + ".csproj", FILE_WRITE));
@@ -439,6 +449,15 @@ namespace ToolCore
         for (unsigned i = 0; i < packages.Size(); i++)
         {
             String package = packages[i].GetString();
+
+            if (packages_.Find(package) != packages_.End())
+            {
+                LOGERRORF("Duplicate package found %s", package.CString());
+                continue;
+            }
+
+            projectGen_->GetSolution()->RegisterPackage(package);
+
             packages_.Push(package);
         }
 
@@ -557,6 +576,16 @@ namespace ToolCore
         return true;
     }
 
+    bool NETSolution::RegisterPackage(const String& package)
+    {
+        if (packages_.Find(package) != packages_.End())
+            return false;
+        
+        packages_.Push(package);
+
+        return true;
+    }
+
     NETProjectGen::NETProjectGen(Context* context) : Object(context)
     {
 
@@ -665,6 +694,70 @@ namespace ToolCore
 
         return LoadProject(jvalue);
     }
+
+    bool NETProjectGen::LoadProject(Project* project)
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
+        JSONValue root;
+
+        JSONValue solution;
+
+        solution["name"] = "AtomicProject";
+        solution["outputPath"] = AddTrailingSlash(project->GetProjectPath()) + "AtomicNET/Solution/";
+
+        JSONArray projects;
+
+        JSONObject jproject;
+        jproject["name"] = "AtomicProject";
+        jproject["outputType"] = "Library";
+        jproject["assemblyName"] = "AtomicProject";
+        jproject["assemblyOutputPath"] = AddTrailingSlash(project->GetProjectPath()) + "AtomicNET/Bin/";
+
+        JSONArray references;
+        references.Push(JSONValue("System"));
+        references.Push(JSONValue("System.Core"));
+        references.Push(JSONValue("System.Xml.Linq"));
+        references.Push(JSONValue("System.XML"));
+
+        String atomicNETAssembly = tenv->GetAtomicNETCoreAssemblyDir() + "AtomicNET.dll";
+
+        if (!fileSystem->FileExists(atomicNETAssembly))
+        {
+            LOGERRORF("NETProjectGen::LoadProject - AtomicNET assembly does not exist: %s", atomicNETAssembly.CString());
+            return false;
+        }
+
+        references.Push(JSONValue(atomicNETAssembly));        
+
+        jproject["references"] = references;
+
+        JSONArray sources;
+        sources.Push(JSONValue(ToString("%s", project->GetResourcePath().CString())));
+
+        jproject["sources"] = sources;
+
+        projects.Push(jproject);
+
+        root["projects"] = projects;
+        root["solution"] = solution;
+        
+        return LoadProject(root);
+    }
+
+    bool NETProjectGen::GetRequiresNuGet()
+    {
+        if (solution_.Null())
+        {
+            LOGERROR("NETProjectGen::GetRequiresNuGet() - called without a solution loaded");
+            return false;
+        }
+
+        return solution_->GetPackages().Size() != 0;
+
+    }
+
 
     String NETProjectGen::GenerateUUID()
     {

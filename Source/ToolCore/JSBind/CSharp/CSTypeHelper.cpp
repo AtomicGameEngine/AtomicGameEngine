@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-
+#include <Atomic/Core/ProcessUtils.h>
 #include "../JSBPackage.h"
 #include "CSTypeHelper.h"
 
@@ -143,12 +143,15 @@ String CSTypeHelper::GetManagedPrimitiveType(JSBPrimitiveType* ptype)
         return "float";
     if (ptype->kind_ == JSBPrimitiveType::Char && ptype->isUnsigned_)
         return "byte";
-    else if (ptype->kind_ == JSBPrimitiveType::Char)
+    if (ptype->kind_ == JSBPrimitiveType::Char)
         return "char";
     if (ptype->kind_ == JSBPrimitiveType::Short)
         return "short";
+    if (ptype->kind_ == JSBPrimitiveType::LongLong)
+        return "long";
 
-    assert(0);
+    ErrorDialog("CSTypeHelper::GetManagedPrimitiveType", ToString("%i", ptype->kind_));
+
     return "";
 }
 

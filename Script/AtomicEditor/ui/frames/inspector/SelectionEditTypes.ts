@@ -50,4 +50,31 @@ class JSComponentEditType extends SerializableEditType {
 
 }
 
+class CSComponentEditType extends SerializableEditType {
+
+    compareTypes(otherType: SerializableEditType, multiSelect: boolean = false): boolean {
+
+        if (this.typeName != otherType.typeName) {
+            return false;
+        }
+
+        if (!multiSelect)
+            return false;
+
+        var csc1 = <AtomicNETScript.CSComponent>(otherType.objects[0]);
+        var csc2 = <AtomicNETScript.CSComponent>(this.objects[0]);
+
+        return csc1.assemblyFile == csc2.assemblyFile && csc1.componentClassName == csc2.componentClassName;
+
+    }
+
+    private static Ctor = (() => {
+
+        SelectionInspector.registerEditType("CSComponent", CSComponentEditType);
+
+    })();
+
+
+}
+
 export = JSComponentEditType;

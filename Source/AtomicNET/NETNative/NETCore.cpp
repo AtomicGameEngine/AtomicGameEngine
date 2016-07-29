@@ -12,6 +12,7 @@ namespace Atomic
 
 SharedPtr<Context> NETCore::csContext_;
 NETCoreEventDispatchFunction NETCore::eventDispatch_ = nullptr;
+NETCoreUpdateDispatchFunction NETCore::updateDispatch_ = nullptr;
 
 NETCore::NETCore(Context* context, NETCoreDelegates* delegates) :
     Object(context)
@@ -20,6 +21,7 @@ NETCore::NETCore(Context* context, NETCoreDelegates* delegates) :
     csContext_ = context;
 
     eventDispatch_ = delegates->eventDispatch;
+    updateDispatch_ = delegates->updateDispatch;
 
     NETEventDispatcher* dispatcher = new NETEventDispatcher(context_);
     context_->RegisterSubsystem(dispatcher);

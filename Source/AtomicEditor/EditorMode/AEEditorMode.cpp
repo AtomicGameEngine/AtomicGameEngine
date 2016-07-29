@@ -127,15 +127,25 @@ void EditorMode::HandleIPCJSError(StringHash eventType, VariantMap& eventData)
 
 bool EditorMode::PlayProject(String addArgs, bool debug)
 {
-    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-
-    const String& editorBinary = env->GetEditorBinary();
-
     Project* project = tsystem->GetProject();
 
     if (!project)
         return false;
+
+    ToolEnvironment* env = GetSubsystem<ToolEnvironment>();
+
+    String playerBinary = env->GetEditorBinary();
+
+    // TODO: We need to configure project as managed
+    bool managed = false;
+    if (fileSystem->FileExists(project->GetResourcePath() + "AtomicProject.dll"))
+    {
+        managed = true;
+        playerBinary = env->GetAtomicNETManagedPlayerBinary();
+    }
+
 
     Vector<String> paths;
     paths.Push(env->GetCoreDataDir());
@@ -163,10 +173,10 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     String dump;
     dump.Join(vargs, " ");
-    LOGINFOF("Launching Broker %s %s", editorBinary.CString(), dump.CString());
+    LOGINFOF("Launching Broker %s %s", playerBinary.CString(), dump.CString());
 
     IPC* ipc = GetSubsystem<IPC>();
-    playerBroker_ = ipc->SpawnWorker(editorBinary, vargs);
+    playerBroker_ = ipc->SpawnWorker(playerBinary, vargs);
 
     if (playerBroker_)
     {

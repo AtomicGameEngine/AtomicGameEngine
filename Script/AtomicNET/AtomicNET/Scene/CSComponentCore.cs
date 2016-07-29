@@ -24,8 +24,12 @@ namespace AtomicEngine
             }
 
             // Methods
-            Type[] parms = new Type[1] { typeof(float) };
-            UpdateMethod = type.GetMethod("Update", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, parms, null);
+            Type[] updateParms = new Type[1] { typeof(float) };
+            UpdateMethod = type.GetMethod("Update", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, updateParms, null);
+
+            Type[] startParms = new Type[0] { };
+            StartMethod = type.GetMethod("Start", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, startParms, null);
+
         }
 
         public void ApplyFieldValues(CSComponent component, IntPtr fieldValuePtr)
@@ -93,21 +97,98 @@ namespace AtomicEngine
         public void RegisterInstance(CSComponent component)
         {
             Instances.Add(component);
+
+            if (StartMethod != null)
+            {
+                StartList.Add(component);
+            }
+
         }
 
+        public void Update(Object[] args)
+        {
+            if (StartMethod != null)
+            {
+                foreach (var instance in StartList)
+                {
+                    var node = instance.Node;
+
+                    if (node != null && node.IsEnabled())
+                    {
+                        if (node.Scene != null)
+                        {
+                            StartMethod.Invoke(instance, null);
+                        }
+                    }
+
+                }
+
+                // TODO: need to handle delayed starts when node isn't enabled
+                StartList.Clear();
+
+            }
+
+            if (UpdateMethod != null)
+            {
+                foreach (var instance in Instances)
+                {
+                    bool remove = false;
+
+                    var node = instance.Node;
+
+                    if (node != null && node.IsEnabled())
+                    {
+
+                        if (node.Scene != null)
+                        {
+                            UpdateMethod.Invoke(instance, args);
+                        }
+                        else
+                        {
+                            remove = true;
+                        }
+                    }
+                    else
+                    {
+                        remove = true;
+                    }
+
+                    if (remove)
+                        RemoveList.Add(instance);
+                }
+            }
+
+            foreach (var instance in RemoveList)
+            {
+                Instances.Remove(instance);                
+            }
+
+            RemoveList.Clear();
+        }
 
         public List<CSComponent> Instances = new List<CSComponent>();
+        public List<CSComponent> StartList = new List<CSComponent>();
+
+        public List<CSComponent> RemoveList = new List<CSComponent>();
+
         public FieldInfo[] InspectorFields;
         public Type Type;
+
         public MethodInfo UpdateMethod = null;
+        public MethodInfo StartMethod = null;
 
         ScriptVariantMap fieldMap = new ScriptVariantMap();
 
         public Dictionary<uint, FieldInfo> fieldLookup = new Dictionary<uint, FieldInfo>();
     }
 
-    internal class CSComponentCore : NETScriptObject
+    public class CSComponentCore : NETScriptObject
     {
+
+        public static void RegisterInstance(CSComponent component)
+        {
+            instance.csinfoLookup[component.GetType()].RegisterInstance(component);
+        }
 
         void HandleUpdate(uint eventType, ScriptVariantMap eventData)
         {
@@ -115,16 +196,9 @@ namespace AtomicEngine
 
             foreach (var csinfo in csinfoLookup.Values)
             {
-                var updateMethod = csinfo.UpdateMethod;
-
-                if (updateMethod != null)
-                {
-                    foreach (var instance in csinfo.Instances)
-                    {
-                        updateMethod.Invoke(instance, args);
-                    }
-                }
+                csinfo.Update(args);
             }
+
         }
 
         void HandleComponentLoad(uint eventType, ScriptVariantMap eventData)

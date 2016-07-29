@@ -257,7 +257,7 @@ void CSFunctionWriter::WriteNativeFunction(String& source)
 
     if (sharedPtrReturn)
     {
-        source += IndentLine("returnValue->AddRef();\n");
+        source += IndentLine("if (returnValue.NotNull()) returnValue->AddRef();\n");
         source += IndentLine("return returnValue;\n");
     }
     else if (returnType == "const char*")
@@ -313,10 +313,18 @@ void CSFunctionWriter::WriteManagedPInvokeFunctionSignature(String& source)
 
     String line = "[DllImport (Constants.LIBNAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n";
     source += IndentLine(line);
+
     JSBClass* klass = function_->GetClass();
     JSBPackage* package = klass->GetPackage();
 
     String returnType = CSTypeHelper::GetPInvokeTypeString(function_->GetReturnType());
+
+    if (returnType == "bool")
+    {
+        // default boolean marshal is 4 byte windows type BOOL and not 1 byte bool
+        // https://blogs.msdn.microsoft.com/jaredpar/2008/10/14/pinvoke-and-bool-or-should-i-say-bool/        
+        source += IndentLine("[return: MarshalAs(UnmanagedType.I1)]\n");
+    }
 
     if (returnType == "string")
         returnType = "IntPtr";
@@ -478,7 +486,9 @@ void CSFunctionWriter::WriteManagedConstructor(String& source)
 
     source += IndentLine(ToString("var classType = typeof(%s);\n", klass->GetName().CString()));
     source += IndentLine("var thisType = this.GetType();\n");
-    source += IndentLine("if ( thisType == classType || thisType.BaseType == classType)\n");
+    source += IndentLine("var nativeThisType = NativeCore.IsNativeType(thisType);\n");    
+    source += IndentLine("var nativeBaseType = NativeCore.IsNativeType(thisType.BaseType);\n");
+    source += IndentLine("if ( (nativeThisType && (thisType == classType)) || (!nativeThisType && (nativeBaseType && (thisType.BaseType == classType))))\n");
     source += IndentLine("{\n");
 
     Indent();

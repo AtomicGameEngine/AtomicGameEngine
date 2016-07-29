@@ -3,7 +3,7 @@
 	"sources" : ["Source/Atomic/Atomic3D"],
 	"requires" : ["3D"],
 	"includes" : ["<Atomic/Container/ArrayPtr.h>","<Atomic/Scene/Scene.h>", "<Atomic/Atomic3D/Animation.h>", "<Atomic/Graphics/OcclusionBuffer.h>",
-			      "<Atomic/Scene/ValueAnimation.h>", "<Atomic/Graphics/Material.h>", "<Atomic/Resource/Image.h>"],
+			      "<Atomic/Scene/ValueAnimation.h>", "<Atomic/Graphics/Material.h>", "<Atomic/Resource/Image.h>", "<Atomic/Graphics/VertexBuffer.h>"],
 	"classes" : ["Model",
 				 "StaticModel",
 				 "Animation", "AnimatedModel", "AnimationController", "AnimationState", "Billboard", "BillboardSet", "CustomGeometry",

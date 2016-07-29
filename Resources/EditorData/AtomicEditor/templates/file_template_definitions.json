@@ -1,16 +1,23 @@
 {
     "component": [{
-        "name": "Basic (JavaScript)",
+        "name": "Basic - JavaScript",
         "desc": "An empty component for JavaScript",
         "templateType": "component",
         "ext": ".js",
         "filename": "AtomicEditor/templates/template_component.js"
     }, {
-        "name": "Basic (TypeScript)",
+        "name": "Basic - TypeScript",
         "desc": "An empty component for TypeScript",
         "templateType": "component",
         "ext": ".ts",
         "filename": "AtomicEditor/templates/template_ts_component.ts"
+    },
+    {
+        "name": "Basic - C#",
+        "desc": "An empty component for CSharp",
+        "templateType": "component",
+        "ext": ".cs",
+        "filename": "AtomicEditor/templates/template_cs_component.cs"
     }],
     "script": [{
         "name": "Basic (JavaScript)",

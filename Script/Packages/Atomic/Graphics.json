@@ -7,7 +7,8 @@
 				 "DebugRenderer",
 				 "RenderSurface", "Shader", "ShaderPrecache", "ShaderVariation",
 				 "Pass", "Technique",
-				 "Texture3D", "TextureCube", "View"],
+				 "Texture3D", "TextureCube", "View",
+			 	 "VertexBuffer"],
 	"overloads" : {
 		"Viewport" : {
 			"Viewport" : ["Context", "Scene", "Camera", "RenderPath"],
@@ -17,7 +18,8 @@
 			"SetOrthoSize" : ["float"]
 		},
 		"Graphics" : {
-			"SetWindowPosition" : ["int", "int"]
+			"SetWindowPosition" : ["int", "int"],
+			"Draw" : ["PrimitiveType", "unsigned", "unsigned"]
 		}
 
 	},

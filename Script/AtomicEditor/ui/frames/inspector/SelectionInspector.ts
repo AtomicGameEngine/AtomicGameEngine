@@ -162,6 +162,50 @@ class JSComponentSection extends ComponentSection {
 
 }
 
+class CSComponentSection extends ComponentSection {
+
+    constructor(editType: SerializableEditType, inspector: SelectionInspector) {
+
+        super(editType, inspector);
+
+        this.hasDynamicAttr = true;
+
+        this.subscribeToEvent(this, "AttributeEditResourceChanged", (ev) => this.handleAttributeEditResourceChanged(ev));
+
+        this.subscribeToEvent("CSComponentAssemblyChanged", (ev) => this.handleCSComponentAssemblyChanged(ev));
+
+    }
+
+    private handleCSComponentAssemblyChanged(ev) {
+
+        var csc = <AtomicNETScript.CSComponent>this.editType.getFirstObject();
+
+        if (!csc)
+          return;
+
+        if (csc.assemblyFile == <AtomicNETScript.CSComponentAssembly> ev.resource) {
+
+          var attrInfos = csc.getAttributes();
+          this.updateDynamicAttrInfos(attrInfos);
+
+        }
+
+    }
+
+    private handleAttributeEditResourceChanged(ev: AttributeEditResourceChangedEvent) {
+
+
+        var csc = <AtomicNETScript.CSComponent>this.editType.getFirstObject();
+
+        if (!csc)
+            return;
+
+        var attrInfos = csc.getAttributes();
+        this.updateDynamicAttrInfos(attrInfos);
+
+    }
+
+}
 
 // Node Inspector + Component Inspectors
 
@@ -330,12 +374,15 @@ class SelectionInspector extends ScriptWidget {
             section = new SceneSection(editType);
 
         } else if (editType.typeName == "JSComponent") {
+
             section = new JSComponentSection(editType, this);
+
+        } else if (editType.typeName == "CSComponent") {
+
+            section = new CSComponentSection(editType, this);
         }
         else {
-
             section = new ComponentSection(editType, this);
-
         }
 
         section.value = SelectionInspector.sectionStates[editType.typeName] ? 1 : 0;
@@ -650,7 +697,7 @@ class SelectionInspector extends ScriptWidget {
 
         var valid = true;
 
-        if (ev.componentTypeName != "JSComponent") {
+        if (ev.componentTypeName != "JSComponent" && ev.componentTypeName != "CSComponent") {
 
             for (var i in this.nodes) {
 
