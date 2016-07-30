@@ -28,6 +28,9 @@ using namespace Atomic;
 
 namespace ToolCore
 {
+
+    class Project;
+
     // AtomicProject.dll state (this shouldn't be in resources too)
 
     enum NETProjectState
@@ -46,13 +49,35 @@ namespace ToolCore
         NETProjectSystem(Context* context);
         virtual ~NETProjectSystem();
 
+        const String& GetSolutionPath() const { return solutionPath_; }
+
         bool GetVisualStudioAvailable() const { return visualStudioPath_.Length() != 0; }
 
     private:
 
+        void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+        void HandleFileChanged(StringHash eventType, VariantMap& eventData);
+        void HandleResourceAdded(StringHash eventType, VariantMap& eventData);
+        void HandleResourceRemoved(StringHash eventType, VariantMap& eventData);
+        void HandleAssetRenamed(StringHash eventType, VariantMap& eventData);
+        void HandleAssetMoved(StringHash eventType, VariantMap& eventData);
+
+        void HandleProjectLoaded(StringHash eventType, VariantMap& eventData);
+        void HandleProjectUnloaded(StringHash eventType, VariantMap& eventData);
+
+        void Clear();
         void Initialize();
 
         String visualStudioPath_;
+
+        String solutionPath_;
+        String projectAssemblyPath_;
+
+        float quietPeriod_;
+
+        bool solutionDirty_;
+        bool  projectAssemblyDirty_;
 
     };
 

@@ -22,9 +22,19 @@
 
 #include <Poco/Environment.h>
 
+#include <Atomic/Core/CoreEvents.h>
+
 #include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
+#include <Atomic/Resource/ResourceEvents.h>
 
+#include "../ToolSystem.h"
+#include "../Assets/AssetEvents.h"
+#include "../Project/Project.h"
+#include "../Project/ProjectEvents.h"
+
+#include "NETProjectGen.h"
+#include "NETBuildSystem.h"
 #include "NETProjectSystem.h"
 
 namespace ToolCore
@@ -41,9 +51,141 @@ namespace ToolCore
 
     }
 
-    void NETProjectSystem::Initialize()
-    
+    void NETProjectSystem::Clear()
     {
+        quietPeriod_ = 0.0f;
+        solutionPath_.Clear();
+        projectAssemblyPath_.Clear();
+        solutionDirty_ = false;
+        projectAssemblyDirty_ = false;
+    }
+
+    void NETProjectSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace Update;
+
+        float delta = eventData[P_TIMESTEP].GetFloat();
+
+        quietPeriod_ -= delta;
+
+        if (quietPeriod_ < 0.0f)
+            quietPeriod_ = 0.0f;
+
+        if (quietPeriod_ > 0.0f)
+            return;
+
+        if (solutionDirty_)
+        {
+            ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+            Project* project = tsystem->GetProject();
+
+            SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
+
+            gen->SetScriptPlatform("WINDOWS");
+
+            if (!gen->LoadProject(project))
+            {
+                return;
+            }
+
+            if (!gen->Generate())
+            {
+                return;
+            }
+
+            solutionDirty_ = false;
+
+        }
+
+        if (projectAssemblyDirty_)
+        {
+            using namespace NETBuildAtomicProject;
+
+            VariantMap eventData;
+            Project* project = GetSubsystem<ToolSystem>()->GetProject();
+            eventData[P_PROJECT] = project;
+
+            // We need to rebuild the project assembly
+            SendEvent(E_NETBUILDATOMICPROJECT, eventData);
+
+            projectAssemblyDirty_ = false;
+
+        }
+
+    }
+
+    void NETProjectSystem::HandleProjectLoaded(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace ProjectLoaded;
+
+        String projectPath = eventData[P_PROJECTPATH].GetString();
+        
+        if (GetExtension(projectPath) == ".atomic")
+            projectPath = GetParentPath(projectPath);
+
+        solutionPath_ = AddTrailingSlash(projectPath) + "AtomicNET/Solution/AtomicProject.sln";
+        projectAssemblyPath_ = AddTrailingSlash(projectPath) + "Resource/AtomicProject.dll";
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        // if the solution or project assemblies don't exist mark as dirty
+
+        if (!fileSystem->FileExists(solutionPath_))
+            solutionDirty_ = true;
+
+        if (!fileSystem->FileExists(projectAssemblyPath_))
+            projectAssemblyDirty_ = true;
+
+    }
+    
+    void NETProjectSystem::HandleProjectUnloaded(StringHash eventType, VariantMap& eventData)
+    {
+        Clear();
+    }
+
+    void NETProjectSystem::HandleFileChanged(StringHash eventType, VariantMap& eventData)
+    {
+
+    }
+
+    void NETProjectSystem::HandleResourceAdded(StringHash eventType, VariantMap& eventData)
+    {
+
+    }
+
+    void NETProjectSystem::HandleResourceRemoved(StringHash eventType, VariantMap& eventData)
+    {
+
+    }
+
+    void NETProjectSystem::HandleAssetRenamed(StringHash eventType, VariantMap& eventData)
+    {
+
+    }
+
+    void NETProjectSystem::HandleAssetMoved(StringHash eventType, VariantMap& eventData)
+    {
+
+    }
+
+    void NETProjectSystem::Initialize()    
+    {
+        Clear();
+
+        SubscribeToEvent(E_UPDATE, HANDLER(NETProjectSystem, HandleUpdate));
+
+        SubscribeToEvent(E_PROJECTLOADED, HANDLER(NETProjectSystem, HandleProjectLoaded));
+        SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(NETProjectSystem, HandleProjectUnloaded));
+
+        SubscribeToEvent(E_FILECHANGED, HANDLER(NETProjectSystem, HandleFileChanged));
+
+        SubscribeToEvent(E_RESOURCEADDED, HANDLER(NETProjectSystem, HandleResourceAdded));
+        SubscribeToEvent(E_RESOURCEREMOVED, HANDLER(NETProjectSystem, HandleResourceRemoved));
+
+        SubscribeToEvent(E_ASSETRENAMED, HANDLER(NETProjectSystem, HandleAssetRenamed));
+        SubscribeToEvent(E_ASSETMOVED, HANDLER(NETProjectSystem, HandleAssetMoved));
+
+
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
