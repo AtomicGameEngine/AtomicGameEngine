@@ -40,13 +40,21 @@ namespace Atomic
 class JSFile;
 class JSUI;
 class JSMetrics;
+class JSVM;
+
+
+/// Registration signature for JSVM package registration
+typedef void(*JSVMPackageRegistrationFunction)(JSVM* vm);
+
+/// Registration signature for JSVM package registration with settings
+typedef void(*JSVMPackageRegistrationSettingsFunction)(JSVM* vm, const VariantMap& setting);
 
 class ATOMIC_API JSVM : public Object
 {
 
     friend class JSMetrics;
 
-    OBJECT(JSVM);
+    OBJECT(JSVM)
 
 public:
     /// Construct.
@@ -55,6 +63,13 @@ public:
     virtual ~JSVM();
 
     void InitJSContext();
+
+    /// Package registration
+    static void RegisterPackage(JSVMPackageRegistrationFunction regFunction);
+    static void RegisterPackage(JSVMPackageRegistrationSettingsFunction regFunction, const VariantMap& settings);
+
+    /// Initialize registered packages
+    void InitializePackages();
 
     bool ExecuteFile(File* file);
 
@@ -184,6 +199,33 @@ public:
 
 private:
 
+    struct JSAPIPackageRegistration
+    {
+        JSAPIPackageRegistration()
+        {
+            registrationFunction = 0;
+            registrationSettingsFunction = 0;
+        }
+
+        JSAPIPackageRegistration(JSVMPackageRegistrationFunction regFunction)
+        {
+            registrationFunction = regFunction;
+            registrationSettingsFunction = 0;
+        }
+
+        JSAPIPackageRegistration(JSVMPackageRegistrationSettingsFunction regFunction, const VariantMap& regSettings)
+        {
+            registrationFunction = 0;
+            registrationSettingsFunction = regFunction;
+            settings = regSettings;
+        }
+
+
+        JSVMPackageRegistrationFunction registrationFunction;
+        JSVMPackageRegistrationSettingsFunction registrationSettingsFunction;
+        VariantMap settings;
+    };
+
     void SubscribeToEvents();
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
@@ -210,6 +252,9 @@ private:
     VariantMap objectRemovedData_;
 
     SharedPtr<JSMetrics> metrics_;
+
+    static Vector<JSAPIPackageRegistration*> packageRegistrations_;
+
 
     static JSVM* instance_;
 

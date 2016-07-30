@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <AtomicJS/Javascript/JSVM.h>
+
 #include "AEEditorPrefs.h"
 #include "AEPlayerApp.h"
 
@@ -47,6 +49,11 @@ namespace AtomicEditor
 
         AEEditorPrefs* prefs = new AEEditorPrefs(context_);
         context_->RegisterSubsystem(prefs);
+
+#ifdef ATOMIC_WEBVIEW
+        JSVM::RegisterPackage(jsapi_init_webview, engineParameters_);
+#endif
+
     }
 
     void AEPlayerApplication::Start()
@@ -54,11 +61,6 @@ namespace AtomicEditor
         IPCPlayerApp::Start();
 
         GetSubsystem<AEEditorPrefs>()->ValidateWindow();
-
-#ifdef ATOMIC_WEBVIEW
-        // Initialize in Start so window already exists    
-        jsapi_init_webview(vm_, engineParameters_);
-#endif
 
     }
 

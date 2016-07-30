@@ -137,6 +137,17 @@ namespace AtomicEditor
 #endif // ATOMIC_DEV_BUILD
 
         GetSubsystem<AEEditorPrefs>()->ReadPreferences(engineParameters_);
+
+        // Register JS packages
+
+        JSVM::RegisterPackage(jsapi_init_toolcore);
+        JSVM::RegisterPackage(jsapi_init_editor);
+        JSVM::RegisterPackage(jsb_package_atomicnetscript_init);
+
+#ifdef ATOMIC_WEBVIEW
+        JSVM::RegisterPackage(jsapi_init_webview, engineParameters_);
+#endif
+
     }
 
     void AEEditorApp::Start()
@@ -145,29 +156,19 @@ namespace AtomicEditor
         // this can be toggled temporarily, for example to setup an animation preview
         AnimatedModel::SetBoneCreationEnabled(false);
 
-        AppBase::Start();
-
         GetSubsystem<AEEditorPrefs>()->ValidateWindow();
-
-        jsapi_init_toolcore(vm_);
-
-#ifdef ATOMIC_WEBVIEW
-        // Initialize in Start so window already exists    
-        jsapi_init_webview(vm_, engineParameters_);
-#endif
 
         context_->RegisterSubsystem(new EditorMode(context_));
         context_->RegisterSubsystem(new NETBuildSystem(context_));
-        context_->RegisterSubsystem(new EditorNETService(context_));
+        context_->RegisterSubsystem(new EditorNETService(context_));        
+
+        AppBase::Start();
 
         vm_->SetModuleSearchPaths("AtomicEditor/JavaScript;AtomicEditor/EditorScripts;AtomicEditor/EditorScripts/AtomicEditor");
 
         // move UI initialization to JS
         UI* ui = GetSubsystem<UI>();
-        ui->Initialize("AtomicEditor/resources/language/lng_en.tb.txt");
-
-        jsapi_init_editor(vm_);
-        jsb_package_atomicnetscript_init(vm_);
+        ui->Initialize("AtomicEditor/resources/language/lng_en.tb.txt");        
 
         duk_get_global_string(vm_->GetJSContext(), "require");
         duk_push_string(vm_->GetJSContext(), "main");
