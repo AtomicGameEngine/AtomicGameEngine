@@ -26,6 +26,8 @@ namespace('build', function() {
       bindCmd + "Script/Packages/ToolCore/ WINDOWS",
       bindCmd + "Script/Packages/Editor/ WINDOWS",
       bindCmd + "Script/Packages/WebView/ WINDOWS",
+      bindCmd + "Script/Packages/AtomicNETScript/ WINDOWS",
+      bindCmd + "Script/Packages/AtomicApp/ WINDOWS"
     ];
 
     jake.exec(cmds, function() {
