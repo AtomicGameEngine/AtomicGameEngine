@@ -20,49 +20,40 @@
 // THE SOFTWARE.
 //
 
-#include <Atomic/Core/Context.h>
-#include <Atomic/IO/Log.h>
+#pragma once
 
-#include <AtomicNET/NETScript/NETScript.h>
+#include <Atomic/Core/Object.h>
 
-#include <ToolCore/NETTools/NETProjectSystem.h>
-#include <ToolCore/NETTools/AtomicNETService.h>
-#include "AEEditorNETService.h"
+using namespace Atomic;
 
-namespace AtomicEditor
+namespace ToolCore
 {
-    
-    EditorNETService::EditorNETService(Context* context) : Object(context)
+    // AtomicProject.dll state (this shouldn't be in resources too)
+
+    enum NETProjectState
     {
+        NETPROJECT_CLEAN,
+        NETPROJECT_DIRTY,
+        NETPROJECT_ERROR
+    };
 
-        Initialize();
-
-    }
-
-
-    EditorNETService::~EditorNETService()
+    class NETProjectSystem : public Object
     {
+        OBJECT(NETProjectSystem)
 
-    }
+    public:
 
-    bool EditorNETService::Initialize()
-    {
-        RegisterNETScriptLibrary(context_);
+        NETProjectSystem(Context* context);
+        virtual ~NETProjectSystem();
 
-        context_->RegisterSubsystem(new NETProjectSystem(context_));
+        bool GetVisualStudioAvailable() const { return visualStudioPath_.Length() != 0; }
 
-        netService_ = new AtomicNETService(context_);
+    private:
 
-        if (!netService_->Start())
-        {
-            netService_ = nullptr;
-            LOGERRORF("Unable to start AtomicNETService");
-            return false;
-        }
+        void Initialize();
 
-        context_->RegisterSubsystem(netService_);
+        String visualStudioPath_;
 
-        return true;
-    }
+    };
 
 }

@@ -20,49 +20,46 @@
 // THE SOFTWARE.
 //
 
-#include <Atomic/Core/Context.h>
+#include <Poco/Environment.h>
+
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/FileSystem.h>
 
-#include <AtomicNET/NETScript/NETScript.h>
+#include "NETProjectSystem.h"
 
-#include <ToolCore/NETTools/NETProjectSystem.h>
-#include <ToolCore/NETTools/AtomicNETService.h>
-#include "AEEditorNETService.h"
-
-namespace AtomicEditor
+namespace ToolCore
 {
-    
-    EditorNETService::EditorNETService(Context* context) : Object(context)
-    {
 
+    NETProjectSystem::NETProjectSystem(Context* context) :
+        Object(context)
+    {
         Initialize();
-
     }
 
-
-    EditorNETService::~EditorNETService()
+    NETProjectSystem::~NETProjectSystem()
     {
 
     }
 
-    bool EditorNETService::Initialize()
+    void NETProjectSystem::Initialize()
+    
     {
-        RegisterNETScriptLibrary(context_);
+#ifdef ATOMIC_PLATFORM_WINDOWS
 
-        context_->RegisterSubsystem(new NETProjectSystem(context_));
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-        netService_ = new AtomicNETService(context_);
+        // Query for Visual Studio 2015 path
+        String visualStudioPath_ = Poco::Environment::get("VS140COMNTOOLS").c_str();
 
-        if (!netService_->Start())
+        if (visualStudioPath_.Length())
         {
-            netService_ = nullptr;
-            LOGERRORF("Unable to start AtomicNETService");
-            return false;
+            visualStudioPath_.Replace("Tools\\", "IDE\\devenv.exe");
+
+            if (!fileSystem->FileExists(visualStudioPath_))
+                visualStudioPath_.Clear();
         }
 
-        context_->RegisterSubsystem(netService_);
-
-        return true;
     }
+#endif
 
 }
