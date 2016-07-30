@@ -90,12 +90,13 @@ namespace Atomic
         FileSystem *filesystem = GetSubsystem<FileSystem>();
         engineParameters_.InsertNew("LogName", filesystem->GetAppPreferencesDir("AtomicPlayer", "Logs") + "AtomicPlayer.log");
 
+        // Register JS packages
+        JSVM::RegisterPackage(AtomicPlayer::jsapi_init_atomicplayer);
+
     }
 
     void PlayerApp::Start()
     {
-        AppBase::Start();
-
         UI* ui = GetSubsystem<UI>();
         ui->Initialize("DefaultUI/language/lng_en.tb.txt");
         ui->LoadDefaultPlayerSkin();
@@ -104,7 +105,8 @@ namespace Atomic
 
         // Instantiate and register the Player subsystem
         context_->RegisterSubsystem(new AtomicPlayer::Player(context_));
-        AtomicPlayer::jsapi_init_atomicplayer(vm_);
+
+        AppBase::Start();
 
         if (executeJSMain_)
         {

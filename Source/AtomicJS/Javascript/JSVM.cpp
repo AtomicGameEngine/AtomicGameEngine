@@ -45,6 +45,7 @@ namespace Atomic
 {
 
 JSVM* JSVM::instance_ = NULL;
+Vector<JSVM::JSAPIPackageRegistration*> JSVM::packageRegistrations_;
 
 JSVM::JSVM(Context* context) :
     Object(context),
@@ -94,11 +95,44 @@ void JSVM::InitJSContext()
 
     ui_ = new JSUI(context_);
 
+    InitializePackages();
+
     // handle this elsewhere?
     SubscribeToEvents();
 
 }
 
+void JSVM::InitializePackages()
+{   
+    for (unsigned i = 0; i < packageRegistrations_.Size(); i++)
+    {
+        JSAPIPackageRegistration* pkgReg = packageRegistrations_.At(i);
+
+        if (pkgReg->registrationFunction)
+        {
+            pkgReg->registrationFunction(this);
+        }
+        else
+        {
+            pkgReg->registrationSettingsFunction(this, pkgReg->settings);
+        }
+
+        delete pkgReg;
+    }
+
+    packageRegistrations_.Clear();
+    
+}
+
+void JSVM::RegisterPackage(JSVMPackageRegistrationFunction regFunction)
+{
+    packageRegistrations_.Push(new JSAPIPackageRegistration(regFunction));
+}
+
+void JSVM::RegisterPackage(JSVMPackageRegistrationSettingsFunction regFunction, const VariantMap& settings)
+{
+    packageRegistrations_.Push(new JSAPIPackageRegistration(regFunction, settings));
+}
 
 void JSVM::SubscribeToEvents()
 {

@@ -87,6 +87,7 @@ namespace Atomic
         // Instantiate and register the Javascript subsystem
         Javascript* javascript = new Javascript(context_);
         context_->RegisterSubsystem(javascript);
+        vm_ = javascript->InstantiateVM("MainVM");
 
         SubscribeToEvent(E_JSERROR, HANDLER(AppBase, HandleJSError));
 
@@ -95,9 +96,7 @@ namespace Atomic
     void AppBase::Start()
     {
         Application::Start();
-
-        Javascript* javascript = GetSubsystem<Javascript>();
-        vm_ = javascript->InstantiateVM("MainVM");
+        
         vm_->InitJSContext();
 
     }
