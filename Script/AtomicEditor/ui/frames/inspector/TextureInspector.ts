@@ -24,10 +24,12 @@ import ScriptWidget = require("ui/ScriptWidget");
 import UIEvents = require("ui/UIEvents");
 import EditorUI = require("ui/EditorUI");
 import EditorEvents = require("editor/EditorEvents");
+import InspectorWidget = require("./InspectorWidget");
+import InspectorUtils = require("./InspectorUtils");
 
 import TextureSelector = require("./TextureSelector");
 
-class TextureInspector extends ScriptWidget {
+class TextureInspector extends InspectorWidget {
 
     constructor() {
 
@@ -35,6 +37,12 @@ class TextureInspector extends ScriptWidget {
 
         this.fd.id = "Vera";
         this.fd.size = 11;
+
+    }
+
+    handleWidgetEvent(ev: Atomic.UIWidgetEvent): boolean {
+
+        return false;
 
     }
 
@@ -103,6 +111,7 @@ class TextureInspector extends ScriptWidget {
 
         this.texture = texture;
         this.asset = asset;
+        this.importer = <ToolCore.TextureImporter>asset.importer;
 
         var mlp = new Atomic.UILayoutParams();
         mlp.width = 310;
@@ -153,6 +162,19 @@ class TextureInspector extends ScriptWidget {
 
         attrsVerticalLayout.addChild(nameLayout);
 
+        var maxSizeLayout = new Atomic.UILayout();
+        maxSizeLayout.layoutDistribution = Atomic.UI_LAYOUT_DISTRIBUTION_GRAVITY;
+
+        //COMPRESSION SIZE
+        var maxSize = InspectorUtils.createAttrName("Max Size");
+        this.populateCompressionSizeList();
+
+        maxSizeLayout.addChild(maxSize);
+        maxSizeLayout.addChild(this.compressionSize);
+
+        attrsVerticalLayout.addChild(maxSizeLayout);
+        attrsVerticalLayout.addChild(this.createApplyButton());
+
         textureSection.contentRoot.addChild(attrsVerticalLayout);
 
         textureLayout.addChild(this.createTextureSection());
@@ -161,13 +183,50 @@ class TextureInspector extends ScriptWidget {
 
     }
 
+    onApply()
+    {
+
+        this.importer.setCompressedImageSize(Number(this.compressionSize.text));
+        this.asset.import();
+        this.asset.save();
+
+    }
+
+    populateCompressionSizeList()
+    {
+        this.compressionSize = new Atomic.UISelectDropdown();
+        this.compressionSizeSource = new Atomic.UISelectItemSource();
+
+        for (var i = 0; i < this.compressionSizes.length; i ++)
+        {
+            var size = new Atomic.UISelectItem();
+            size.setString(this.compressionSizes[i].toString());           
+            this.compressionSizeSource.addItem(size);
+        }
+
+        this.compressionSize.setSource(this.compressionSizeSource);
+
+        if (this.importer.getCompressedImageSize() != 0)
+        {
+            this.compressionSize.setText(this.importer.getCompressedImageSize().toString());
+        }
+        else
+        {
+            this.compressionSize.setText("NONE");
+        }
+    }
+
     texture: Atomic.Texture2D;
 
     techniqueButton: Atomic.UIButton;
     material: Atomic.Material;
     asset: ToolCore.Asset;
     nameTextField: Atomic.UITextField;
+    compressionSize: Atomic.UISelectDropdown;
+    compressionSizeSource: Atomic.UISelectItemSource;
     fd: Atomic.UIFontDescription = new Atomic.UIFontDescription();
+    importer: ToolCore.TextureImporter;
+    compressionSizes: number[] = [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192];
 
 }
 

@@ -27,6 +27,7 @@
 #include <Atomic/IO/FileSystem.h>
 
 #include <ToolCore/Import/ImportConfig.h>
+#include <Atomic/Graphics/Renderer.h>
 
 #include "Asset.h"
 #include "AssetDatabase.h"
@@ -35,8 +36,8 @@
 namespace ToolCore
 {
 
-TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
-compressTextures_(false)
+	TextureImporter::TextureImporter(Context* context, Asset *asset) : AssetImporter(context, asset),
+		compressTextures_(false), compressedSize_(0)
 {
     ApplyProjectImportConfig();
 }
@@ -49,6 +50,9 @@ TextureImporter::~TextureImporter()
 void TextureImporter::SetDefaults()
 {
     AssetImporter::SetDefaults();
+
+	compressedSize_ = 0;
+
 }
 
 bool TextureImporter::Import()
@@ -71,7 +75,30 @@ bool TextureImporter::Import()
         !image->IsCompressed())
     {
         fileSystem->CreateDirs(cachePath, "DDS/" + Atomic::GetPath(asset_->GetRelativePath()));
-        image->SaveDDS(compressedPath);
+
+		float resizefactor;
+		float width = image->GetWidth();
+		float height = image->GetHeight();
+
+		if (width > compressedSize_ || height > compressedSize_)
+		{
+			if (width >= height)
+			{
+				resizefactor = compressedSize_ / width;
+			}
+			else
+			{
+				resizefactor = compressedSize_ / height;
+			}
+
+			image->Resize(width*resizefactor, height*resizefactor);
+		}
+
+		if (image->SaveDDS(compressedPath))
+		{			
+			Renderer * renderer = GetSubsystem<Renderer>();
+			renderer->ReloadTextures();
+		}
     }
 
     // todo, proper proportions
@@ -110,6 +137,11 @@ bool TextureImporter::LoadSettingsInternal(JSONValue& jsonRoot)
 
     JSONValue import = jsonRoot.Get("TextureImporter");
 
+	SetDefaults();
+
+	if (import.Get("compressionSize").IsNumber())
+		compressedSize_ = (CompressedFormat)import.Get("compressionSize").GetInt();
+
     return true;
 }
 
@@ -119,6 +151,8 @@ bool TextureImporter::SaveSettingsInternal(JSONValue& jsonRoot)
         return false;
 
     JSONValue import(JSONValue::emptyObject);
+	import.Set("compressionSize", compressedSize_);
+
     jsonRoot.Set("TextureImporter", import);
 
     return true;
