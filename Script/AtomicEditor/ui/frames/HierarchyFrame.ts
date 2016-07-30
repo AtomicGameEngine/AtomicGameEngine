@@ -78,6 +78,12 @@ class HierarchyFrame extends Atomic.UIWidget {
 
         });
 
+        this.subscribeToEvent(EditorEvents.ProjectClosed, (ev) => {
+            
+            this.scene = null;
+            this.populate();
+
+        });
 
         this.subscribeToEvent(EditorEvents.SceneClosed, (ev: EditorEvents.SceneClosedEvent) => {
 
