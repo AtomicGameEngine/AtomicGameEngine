@@ -42,6 +42,7 @@
         "./AtomicEditor/ui/frames/inspector/ArrayEditWidget.ts",
         "./AtomicEditor/ui/frames/inspector/AssemblyInspector.ts",
         "./AtomicEditor/ui/frames/inspector/AttributeInfoEdit.ts",
+        "./AtomicEditor/ui/frames/inspector/ColorChooser.ts",
         "./AtomicEditor/ui/frames/inspector/ComponentAttributeUI.ts",
         "./AtomicEditor/ui/frames/inspector/CreateComponentButton.ts",
         "./AtomicEditor/ui/frames/inspector/CSComponentClassSelector.ts",
