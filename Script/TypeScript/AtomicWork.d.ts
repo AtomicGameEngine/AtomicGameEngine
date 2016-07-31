@@ -377,6 +377,7 @@ declare module ToolCore {
     export var assetDatabase: AssetDatabase;
     export var licenseSystem: LicenseSystem;
     export var buildSystem: BuildSystem;
+    export var netProjectSystem: NETProjectSystem;
 
     export function getToolEnvironment(): ToolEnvironment;
     export function getToolSystem(): ToolSystem;

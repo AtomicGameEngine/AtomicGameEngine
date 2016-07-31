@@ -22,16 +22,22 @@
 
 import {AbstractTextResourceEditorBuilder} from "./AbstractTextResourceEditorBuilder";
 
-export default class CSharpResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
+export default class VisualStudioResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
 
     constructor() {
         super();
     }
 
+    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {
+
+        ToolCore.netProjectSystem.openSourceFile(resourcePath);
+        return null;
+    }
+
     canHandleResource(resourcePath: string) : boolean {
 
         /// Handled externally by VS, TODO: make this a preference
-        if (ToolCore.netProjectSystem.visualStudioAvailable)
+        if (!ToolCore.netProjectSystem.visualStudioAvailable)
             return false;
 
         var ext = Atomic.getExtension(resourcePath).toLowerCase();

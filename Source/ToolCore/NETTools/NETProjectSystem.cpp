@@ -33,6 +33,8 @@
 #include "../Project/Project.h"
 #include "../Project/ProjectEvents.h"
 
+#include "../Subprocess/SubprocessSystem.h"
+
 #include "NETProjectGen.h"
 #include "NETBuildSystem.h"
 #include "NETProjectSystem.h"
@@ -58,6 +60,49 @@ namespace ToolCore
         projectAssemblyPath_.Clear();
         solutionDirty_ = false;
         projectAssemblyDirty_ = false;
+    }
+
+    void NETProjectSystem::OpenSourceFile(const String& sourceFilePath)
+    {
+        if (!visualStudioPath_.Length())
+            return;
+
+        StringVector args;
+
+        if (vsSubprocess_.Expired())
+        {
+            SubprocessSystem* subs = GetSubsystem<SubprocessSystem>();
+            vsSubprocess_ = 0;
+
+            args.Push(solutionPath_);
+            args.Push(sourceFilePath);
+
+            try
+            {
+                vsSubprocess_ = subs->Launch(visualStudioPath_, args);
+            }
+            catch (Poco::SystemException)
+            {
+                vsSubprocess_ = 0;
+            }
+
+        }
+        else
+        {
+            try
+            {
+                std::vector<std::string> args;
+                args.push_back("/edit");
+                args.push_back(sourceFilePath.CString());
+                Poco::Process::launch(visualStudioPath_.CString(), args);
+
+            }
+            catch (Poco::SystemException)
+            {
+            }
+
+        }
+
     }
 
     void NETProjectSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -191,7 +236,7 @@ namespace ToolCore
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
         // Query for Visual Studio 2015 path
-        String visualStudioPath_ = Poco::Environment::get("VS140COMNTOOLS").c_str();
+        visualStudioPath_ = Poco::Environment::get("VS140COMNTOOLS").c_str();
 
         if (visualStudioPath_.Length())
         {

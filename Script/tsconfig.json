@@ -104,6 +104,7 @@
         "./AtomicEditor/ui/resourceEditors/TextFileResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/TurboBadgerResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/TypescriptResourceEditorBuilder.ts",
+        "./AtomicEditor/ui/resourceEditors/VisualStudioResourceEditorBuilder.ts",
         "./AtomicEditor/ui/resourceEditors/XMLResourceEditorBuilder.ts",
         "./AtomicEditor/ui/ScriptWidget.ts",
         "./AtomicEditor/ui/Shortcuts.ts",

@@ -30,6 +30,7 @@ namespace ToolCore
 {
 
     class Project;
+    class Subprocess;
 
     // AtomicProject.dll state (this shouldn't be in resources too)
 
@@ -52,6 +53,8 @@ namespace ToolCore
         const String& GetSolutionPath() const { return solutionPath_; }
 
         bool GetVisualStudioAvailable() const { return visualStudioPath_.Length() != 0; }
+
+        void OpenSourceFile(const String& sourceFilePath);
 
     private:
 
@@ -78,6 +81,9 @@ namespace ToolCore
 
         bool solutionDirty_;
         bool  projectAssemblyDirty_;
+
+        // Visual Studio subprocess
+        WeakPtr<Subprocess> vsSubprocess_;
 
     };
 
