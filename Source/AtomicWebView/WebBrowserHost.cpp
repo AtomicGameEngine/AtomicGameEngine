@@ -32,6 +32,7 @@
 #include <Atomic/Core/ProcessUtils.h>
 #include <Atomic/Core/CoreEvents.h>
 #include <Atomic/IO/Log.h>
+#include <Atomic/IO/File.h>
 #include <Atomic/IO/FileSystem.h>
 
 #include <Atomic/Graphics/Graphics.h>
@@ -137,7 +138,6 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 
 #endif
 
-
     // IMPORTANT: See flags being set in implementation of void WebAppBrowser::OnBeforeCommandLineProcessing
     // these include "--enable-media-stream", "--enable-usermedia-screen-capturing", "--off-screen-rendering-enabled", "--transparent-painting-enabled"
 
@@ -149,7 +149,31 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
 #endif
 
     CefSettings settings;
-    settings.windowless_rendering_enabled = 1;
+    settings.windowless_rendering_enabled = 1;    
+
+    FileSystem* fs = GetSubsystem<FileSystem>();
+
+    // Set CEF log file to existing log folder if any avoid attempting to write
+    // to executable folder, which is likely not writeable
+
+    Log* log = GetSubsystem<Log>();
+    if (log && log->GetLogFile())
+    {
+        const File* logFile = log->GetLogFile();
+        String logPath = logFile->GetName ();
+        if (logPath.Length())
+        {
+            String pathName, fileName, ext;
+            SplitPath(logPath, pathName, fileName, ext);
+            if (pathName.Length())
+            {
+                pathName = AddTrailingSlash(pathName) + "CEF.log";
+                CefString(&settings.log_file).FromASCII(GetNativePath(pathName).CString());
+            }
+            
+        }
+        
+    }        
 
     // default background is white, add a setting
     // settings.background_color = 0;
@@ -163,8 +187,6 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     {
         CefString(&settings.user_agent).FromASCII(userAgent_.CString());
     }
-
-    FileSystem* fs = GetSubsystem<FileSystem>();
 
     String fullPath;
 

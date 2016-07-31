@@ -108,6 +108,12 @@ public:
     /// Write raw output to the log.
     static void WriteRaw(const String& message, bool error = false);
 
+    // ATOMIC BEGIN
+
+    const File* GetLogFile() const { return logFile_; }
+
+    // ATOMIC END
+
 private:
     /// Handle end of frame. Process the threaded log messages.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
