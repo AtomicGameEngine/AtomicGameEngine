@@ -88,6 +88,26 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 #if defined(ATOMIC_FILEWATCHER)
 #if defined(WIN32)
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
+
+// ATOMIC BEGIN
+
+    // Create a dummy file to make sure the path is writeable, otherwise we would hang at exit
+    // This isn't terribly elegant, though avoids a cluser of Windows security API    
+    String dummyFileName = nativePath + "/" + "dummy.tmp";
+    File file(context_, dummyFileName, FILE_WRITE);
+    if (file.IsOpen())
+    {
+        file.Close();
+        if (fileSystem_)
+            fileSystem_->Delete(dummyFileName);
+    }
+    else
+    {
+        LOGDEBUGF("FileWatcher::StartWatching - Ignoring non-writable path %s", nativePath.CString());
+        return false;
+    }
+
+// ATOMIC END
     
     dirHandle_ = (void*)CreateFileW(
         WString(nativePath).CString(),
