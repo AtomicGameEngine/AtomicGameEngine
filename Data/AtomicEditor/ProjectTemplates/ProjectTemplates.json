@@ -28,6 +28,10 @@
             {
                 "folder": "Project3D/TypeScript",
                 "language": "TypeScript"
+            },
+            {
+                "folder": "Project3D/CSharp",
+                "language": "CSharp"
             }
         ]
     },
