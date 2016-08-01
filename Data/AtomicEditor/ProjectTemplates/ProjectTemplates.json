@@ -12,6 +12,10 @@
             {
                 "folder": "Project2D/TypeScript",
                 "language": "TypeScript"
+            },
+            {
+                "folder": "Project2D/CSharp",
+                "language": "CSharp"
             }
         ]
     },
@@ -28,6 +32,10 @@
             {
                 "folder": "Project3D/TypeScript",
                 "language": "TypeScript"
+            },
+            {
+                "folder": "Project3D/CSharp",
+                "language": "CSharp"
             }
         ]
     },
@@ -44,6 +52,10 @@
             {
                 "folder": "EmptyProject/TypeScript",
                 "language": "TypeScript"
+            },
+            {
+                "folder": "EmptyProject/CSharp",
+                "language": "CSharp"
             }
         ]
     }

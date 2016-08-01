@@ -33,6 +33,7 @@
 #include "../Subprocess/SubprocessSystem.h"
 #include "../Project/Project.h"
 
+#include "NETProjectSystem.h"
 #include "NETProjectGen.h"
 #include "NETBuildSystem.h"
 
@@ -122,7 +123,7 @@ namespace ToolCore
                 }
 
             }
-            
+
         }
         else
         {
@@ -197,27 +198,12 @@ namespace ToolCore
                     CurrentBuildError(ToString("Error loading project (%s), project expired", solutionPath.CString()));
                 }
 
-                Project* project = curBuild_->project_;
+                NETProjectSystem* projectSystem = GetSubsystem<NETProjectSystem>();
 
-                SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
+                solutionPath = projectSystem->GetSolutionPath();
 
-                gen->SetScriptPlatform(curBuild_->platform_);
-
-                if (!gen->LoadProject(project))
-                {
-                    CurrentBuildError(ToString("Error loading project (%s)", solutionPath.CString()));
-                    return;
-                }
-
-                if (!gen->Generate())
-                {
-                    CurrentBuildError(ToString("Error generating project (%s)", solutionPath.CString()));
-                    return;
-                }
-
-                solutionPath = gen->GetSolution()->GetOutputFilename();
-                requiresNuGet = gen->GetRequiresNuGet();
-
+                // TODO: handle projects that require nuget
+                requiresNuGet = false;
 
                 if (!fileSystem->FileExists(solutionPath))
                 {
@@ -273,7 +259,7 @@ namespace ToolCore
             }
 
             String vcvars64 = ToString("%s..\\..\\VC\\bin\\amd64\\vcvars64.bat", cmdToolsPath.CString());
-            
+
             const String configuration = curBuild_->configuration_;
 
             String cmd = "cmd";
@@ -323,7 +309,7 @@ namespace ToolCore
     }
 
 
-    NETBuild* NETBuildSystem::GetBuild(const String& solutionPath, const String& platform,  const String& configuration)
+    NETBuild* NETBuildSystem::GetBuild(const String& solutionPath, const String& platform, const String& configuration)
     {
         List<SharedPtr<NETBuild>>::ConstIterator itr = builds_.Begin();
 
@@ -380,7 +366,7 @@ namespace ToolCore
         }
 
         LOGINFOF("Received build for project %s", project->GetProjectFilePath().CString());
-            
+
     }
 
     NETBuild* NETBuildSystem::Build(const String& solutionPath, const String& platform, const String& configuration)
@@ -403,7 +389,7 @@ namespace ToolCore
         // Create a new build
         build = new NETBuild(context_, solutionPath, platform, configuration);
 
-        builds_.Push(build);        
+        builds_.Push(build);
 
         return build;
     }

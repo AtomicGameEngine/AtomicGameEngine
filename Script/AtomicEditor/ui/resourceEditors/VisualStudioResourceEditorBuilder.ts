@@ -20,32 +20,27 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+import {AbstractTextResourceEditorBuilder} from "./AbstractTextResourceEditorBuilder";
 
-#include <Duktape/duktape.h>
+export default class VisualStudioResourceEditorBuilder extends AbstractTextResourceEditorBuilder {
 
-#include <Atomic/Core/Object.h>
+    constructor() {
+        super();
+    }
 
-using namespace Atomic;
+    getEditor(resourceFrame: Atomic.UIWidget, resourcePath: string, tabContainer: Atomic.UITabContainer): Editor.ResourceEditor {
 
-namespace AtomicEditor
-{
+        ToolCore.netProjectSystem.openSourceFile(resourcePath);
+        return null;
+    }
 
-class JSErrorChecker : public Object
-{
-    OBJECT(JSErrorChecker);
+    canHandleResource(resourcePath: string) : boolean {
 
-public:
+        /// Handled externally by VS, TODO: make this a preference
+        if (!ToolCore.netProjectSystem.visualStudioAvailable)
+            return false;
 
-    /// Construct.
-    JSErrorChecker(Context* context, duk_context* ctx);
-    /// Destruct.
-    ~JSErrorChecker();
-
-private:
-
-    duk_context* ctx_;
-
-};
-
+        var ext = Atomic.getExtension(resourcePath).toLowerCase();
+        return ext == ".cs";
+    }
 }

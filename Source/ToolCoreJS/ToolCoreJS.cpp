@@ -30,6 +30,8 @@
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/Build/BuildSystem.h>
 
+#include <ToolCore/NETTools/NETProjectSystem.h>
+
 #include <ToolCore/Assets/ModelImporter.h>
 
 using namespace Atomic;
@@ -166,6 +168,9 @@ void jsapi_init_toolcore(JSVM* vm)
 
     js_push_class_object_instance(ctx, vm->GetSubsystem<BuildSystem>(), "BuildSystem");
     duk_put_prop_string(ctx, -2, "buildSystem");
+
+    js_push_class_object_instance(ctx, vm->GetSubsystem<NETProjectSystem>(), "NETProjectSystem");
+    duk_put_prop_string(ctx, -2, "netProjectSystem");
 
     duk_push_c_function(ctx, js_atomic_GetLicenseSystem, 0);
     duk_put_prop_string(ctx, -2, "getLicenseSystem");

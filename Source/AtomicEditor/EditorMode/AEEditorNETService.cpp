@@ -25,7 +25,7 @@
 
 #include <AtomicNET/NETScript/NETScript.h>
 
-
+#include <ToolCore/NETTools/NETProjectSystem.h>
 #include <ToolCore/NETTools/AtomicNETService.h>
 #include "AEEditorNETService.h"
 
@@ -48,6 +48,8 @@ namespace AtomicEditor
     bool EditorNETService::Initialize()
     {
         RegisterNETScriptLibrary(context_);
+
+        context_->RegisterSubsystem(new NETProjectSystem(context_));
 
         netService_ = new AtomicNETService(context_);
 

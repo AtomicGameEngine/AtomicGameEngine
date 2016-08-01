@@ -29,6 +29,7 @@ import TypescriptResourceEditorBuilder from "./resourceEditors/TypescriptResourc
 import CSharpResourceEditorBuilder from "./resourceEditors/CSharpResourceEditorBuilder";
 import XMLResourceEditorBuilder from "./resourceEditors/XMLResourceEditorBuilder";
 import ShaderResourceEditorBuilder from "./resourceEditors/ShaderResourceEditorBuilder";
+import VisualStudioResourceEditorBuilder from "./resourceEditors/VisualStudioResourceEditorBuilder";
 
 export default class ResourceEditorProvider {
     private standardEditorRegistry: Editor.Extensions.ResourceEditorBuilder[] = [];
@@ -108,5 +109,7 @@ export default class ResourceEditorProvider {
 
         // this overrides the test resource editor so need to put it in the custom bucket
         this.registerCustomEditor(new TurboBadgerResourceEditorBuilder());
+
+        this.registerCustomEditor(new VisualStudioResourceEditorBuilder());
     }
 }

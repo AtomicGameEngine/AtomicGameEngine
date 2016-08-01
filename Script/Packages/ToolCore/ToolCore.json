@@ -2,7 +2,7 @@
 	"name" : "ToolCore",
 	"sources" : ["Source/ToolCore", "Source/ToolCore/Project", "Source/ToolCore/Platform", "Source/ToolCore/Command",
 							 "Source/ToolCore/Import", "Source/ToolCore/Assets", "Source/ToolCore/License", "Source/ToolCore/Build",
-						 	 "Source/ToolCore/Subprocess"],
+						 	 "Source/ToolCore/Subprocess", "Source/ToolCore/NETTools"],
 	"classes" : ["ToolEnvironment", "ToolSystem", "ToolPrefs", "SubprocessSystem", "Subprocess",
 								"Project", "ProjectFile", "Platform", "PlatformMac", "PlatformWeb",
 							 "PlatformWindows", "PlatformAndroid", "PlatformIOS", "Command", "PlayCmd", "OpenAssetImporter",
@@ -11,6 +11,7 @@
 							 "TextureImporter", "SpriterImporter", "PEXImporter", "CSharpImporter", "NETAssemblyImporter",
 							 "LicenseSystem",
 						 	 "ProjectUserPrefs", "ProjectBuildSettings",
+							 "NETProjectSystem",
 						 	 "BuildBase", "BuildSystem", "BuildMac", "BuildWeb", "BuildWindows", "BuildAndroid", "BuildIOS",
 						 	 "ProjectBuildSettings", "MacBuildSettings", "WindowsBuildSettings", "WebBuildSettings", "AndroidBuildSettings", "IOSBuildSettings"],
 	"typescript_decl" : {

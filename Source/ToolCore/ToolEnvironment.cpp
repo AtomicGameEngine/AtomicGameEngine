@@ -168,8 +168,8 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
 
     atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());
 
+    atomicNETRootDir_ = rootSourceDir_ + "Artifacts/AtomicNET/";
     atomicNETCoreAssemblyDir_ = rootSourceDir_ + "Artifacts/AtomicNET/" + config + "/";
-
     atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
 
 }
