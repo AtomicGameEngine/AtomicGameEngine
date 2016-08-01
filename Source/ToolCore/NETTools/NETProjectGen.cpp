@@ -439,15 +439,23 @@ namespace ToolCore
                     XMLElement propertyGroup = project.CreateChild("PropertyGroup");
                     propertyGroup.SetAttribute("Condition", ToString("'$(Configuration)|$(Platform)' == '%s|AnyCPU'", cfg.CString()));
 
+                    String startArguments;
+
 #ifdef ATOMIC_DEV_BUILD
                     String playerBin = tenv->GetAtomicNETRootDir() + cfg + "/AtomicPlayer.exe";
 #else
                     String playerBin = tenv->GetAtomicNETRootDir() + "Release/AtomicPlayer.exe";
+
+                    startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "Resources/").CString());
+
 #endif
 
                     propertyGroup.CreateChild("StartAction").SetValue("Program");                    
                     propertyGroup.CreateChild("StartProgram").SetValue(playerBin );
-                    propertyGroup.CreateChild("StartArguments").SetValue(ToString("--project %s", atomicProject->GetProjectPath().CString()));
+
+                    startArguments += ToString("--project \"%s\"", atomicProject->GetProjectPath().CString());
+
+                    propertyGroup.CreateChild("StartArguments").SetValue(startArguments);
                     
                 }
 

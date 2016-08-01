@@ -60,6 +60,8 @@ namespace ToolCore
 
         void HandleUpdate(StringHash eventType, VariantMap& eventData);
 
+        void HandleNETBuildResult(StringHash eventType, VariantMap& eventData);
+
         void HandleFileChanged(StringHash eventType, VariantMap& eventData);
         void HandleResourceAdded(StringHash eventType, VariantMap& eventData);
         void HandleResourceRemoved(StringHash eventType, VariantMap& eventData);

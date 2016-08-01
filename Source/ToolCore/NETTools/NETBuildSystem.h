@@ -87,6 +87,8 @@ namespace ToolCore
         /// Build either a .sln or .json configuration file
         NETBuild* Build(const String& solutionPath, const String& platform, const String& configuration = "Release");
 
+        NETBuild* BuildAtomicProject(Project* project);
+
     private:
 
         void CurrentBuildError(String errorText);

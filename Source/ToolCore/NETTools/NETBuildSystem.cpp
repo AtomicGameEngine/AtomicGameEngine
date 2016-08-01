@@ -244,7 +244,7 @@ namespace ToolCore
             ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
             const String& nugetBinary = tenv->GetAtomicNETNuGetBinary();
 
-            if (!fileSystem->FileExists(nugetBinary))
+            if (requiresNuGet && !fileSystem->FileExists(nugetBinary))
             {
                 CurrentBuildError(ToString("NuGet binary is missing (%s)", nugetBinary.CString()));
                 return;
@@ -327,18 +327,8 @@ namespace ToolCore
 
     }
 
-    void NETBuildSystem::HandleBuildAtomicProject(StringHash eventType, VariantMap& eventData)
+    NETBuild* NETBuildSystem::BuildAtomicProject(Project* project)
     {
-        using namespace NETBuildAtomicProject;
-
-        Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());
-
-        if (!project)
-        {
-            LOGERROR("NETBuildSystem::HandleBuildAtomicProject - null project");
-            return;
-        }
-
         String platform;
         String configuration;
 
@@ -366,6 +356,25 @@ namespace ToolCore
         }
 
         LOGINFOF("Received build for project %s", project->GetProjectFilePath().CString());
+
+        return build;
+
+    }
+
+
+    void NETBuildSystem::HandleBuildAtomicProject(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace NETBuildAtomicProject;
+
+        Project* project = static_cast<Project*>(eventData[P_PROJECT].GetPtr());
+
+        if (!project)
+        {
+            LOGERROR("NETBuildSystem::HandleBuildAtomicProject - null project");
+            return;
+        }
+
+        BuildAtomicProject(project);
 
     }
 

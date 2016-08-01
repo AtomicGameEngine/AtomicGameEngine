@@ -105,6 +105,25 @@ namespace ToolCore
 
     }
 
+    void NETProjectSystem::HandleNETBuildResult(StringHash eventType, VariantMap& eventData)
+    {
+        using namespace NETBuildResult;
+
+        if (eventData[P_SUCCESS].GetBool())
+        {
+            LOGINFOF("NETBuild Success for project");
+        }
+        else
+        {
+            const String& errorText = eventData[P_ERRORTEXT].GetString();
+
+            LOGERRORF("\n%s\n", errorText.CString());
+            LOGERRORF("NETBuild Error for project");
+        }
+
+    }
+
+
     void NETProjectSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         using namespace Update;
@@ -144,14 +163,13 @@ namespace ToolCore
 
         if (projectAssemblyDirty_)
         {
-            using namespace NETBuildAtomicProject;
-
-            VariantMap eventData;
             Project* project = GetSubsystem<ToolSystem>()->GetProject();
-            eventData[P_PROJECT] = project;
+            NETBuild* build = GetSubsystem<NETBuildSystem>()->BuildAtomicProject(project);
 
-            // We need to rebuild the project assembly
-            SendEvent(E_NETBUILDATOMICPROJECT, eventData);
+            if (build)
+            {
+                build->SubscribeToEvent(E_NETBUILDRESULT, HANDLER(NETProjectSystem, HandleNETBuildResult));
+            }
 
             projectAssemblyDirty_ = false;
 
