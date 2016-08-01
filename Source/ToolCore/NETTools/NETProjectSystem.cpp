@@ -217,6 +217,8 @@ namespace ToolCore
     {
         Clear();
 
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
         SubscribeToEvent(E_UPDATE, HANDLER(NETProjectSystem, HandleUpdate));
 
         SubscribeToEvent(E_PROJECTLOADED, HANDLER(NETProjectSystem, HandleProjectLoaded));
@@ -229,9 +231,6 @@ namespace ToolCore
 
         SubscribeToEvent(E_ASSETRENAMED, HANDLER(NETProjectSystem, HandleAssetRenamed));
         SubscribeToEvent(E_ASSETMOVED, HANDLER(NETProjectSystem, HandleAssetMoved));
-
-
-#ifdef ATOMIC_PLATFORM_WINDOWS
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
@@ -246,7 +245,9 @@ namespace ToolCore
                 visualStudioPath_.Clear();
         }
 
-    }
 #endif
+
+    }
+
 
 }
