@@ -369,7 +369,9 @@ namespace ToolCore
 
     bool NETCSProject::Generate()
     {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
         NETSolution* solution = projectGen_->GetSolution();
+        ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
         projectPath_ = solution->GetOutputPath() + name_ + "/";
 
@@ -401,13 +403,56 @@ namespace ToolCore
 
         project.CreateChild("Import").SetAttribute("Project", "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
 
-        if (name_ == "AtomicProject")
+        Project* atomicProject = projectGen_->GetAtomicProject();
+
+        if (atomicProject)
         {
             XMLElement afterBuild = project.CreateChild("Target");
             afterBuild.SetAttribute("Name", "AfterBuild");
             XMLElement copy = afterBuild.CreateChild("Copy");
             copy.SetAttribute("SourceFiles", "$(TargetPath)");
             copy.SetAttribute("DestinationFolder", projectPath_ + "../../../Resources/");
+
+            // Create the AtomicProject.csproj.user file if it doesn't exist
+            String userSettingsFilename = projectPath_ + name_ + ".csproj.user";
+            if (!fileSystem->FileExists(userSettingsFilename))
+            {
+                SharedPtr<XMLFile> userSettings(new XMLFile(context_));
+
+                XMLElement project = userSettings->CreateRoot("Project");
+                
+                //XMLElement xml = userRoot.CreateChild("?xml");
+                //xml.SetAttribute("version", "1.0");
+                //xml.SetAttribute("encoding", "utf-8");
+
+                project.SetAttribute("ToolsVersion", "14.0");
+                project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+
+                StringVector configs;
+                configs.Push("Debug");
+                configs.Push("Release");
+
+                for (unsigned i = 0; i < configs.Size(); i++)
+                {
+                    String cfg = configs[i];
+
+                    XMLElement propertyGroup = project.CreateChild("PropertyGroup");
+                    propertyGroup.SetAttribute("Condition", ToString("'$(Configuration)|$(Platform)' == '%s|AnyCPU'", cfg.CString()));
+
+                    String playerBin = tenv->GetAtomicNETRootDir() + cfg + "/AtomicPlayer.exe";
+                    propertyGroup.CreateChild("StartAction").SetValue("Program");                    
+                    propertyGroup.CreateChild("StartProgram").SetValue(playerBin );
+                    propertyGroup.CreateChild("StartArguments").SetValue(ToString("--project %s", atomicProject->GetProjectPath().CString()));
+                    
+                }
+
+                String userSettingsSource = userSettings->ToString();
+                SharedPtr<File> output(new File(context_, userSettingsFilename, FILE_WRITE));
+                output->Write(userSettingsSource.CString(), userSettingsSource.Length());
+                output->Close();
+
+            }
+            
         }
 
         String projectSource = xmlFile_->ToString();
@@ -700,8 +745,9 @@ namespace ToolCore
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
         ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
 
-        JSONValue root;
+        atomicProject_ = project;
 
+        JSONValue root;
         JSONValue solution;
 
         solution["name"] = "AtomicProject";

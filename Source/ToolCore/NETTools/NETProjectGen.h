@@ -152,6 +152,8 @@ namespace ToolCore
 
         const Vector<SharedPtr<NETCSProject>>& GetCSProjects() { return projects_; }
 
+        Project* GetAtomicProject() const { return atomicProject_;  }
+
         NETCSProject* GetCSProjectByName(const String& name);
 
         bool GetCSProjectDependencies(NETCSProject * source, PODVector<NETCSProject*>& depends) const;
@@ -173,6 +175,7 @@ namespace ToolCore
 
         String scriptPlatform_;
 
+        SharedPtr<Project> atomicProject_;
         SharedPtr<NETSolution> solution_;
         Vector<SharedPtr<NETCSProject>> projects_;
 

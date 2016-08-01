@@ -81,6 +81,7 @@ public:
 
     // AtomicNET
 
+    const String& GetAtomicNETRootDir() { return atomicNETRootDir_; }
     const String& GetAtomicNETCoreAssemblyDir() { return atomicNETCoreAssemblyDir_; }
     const String& GetAtomicNETNuGetBinary() { return atomicNETNuGetBinary_; }
     const String& GetAtomicNETManagedPlayerBinary() { return atomicNETManagedPlayerBinary_; }
@@ -140,6 +141,7 @@ private:
     String devConfigFilename_;
 
     // AtomicNET
+    String atomicNETRootDir_;
     String atomicNETCoreAssemblyDir_;
     String atomicNETNuGetBinary_;
     String atomicNETManagedPlayerBinary_;
