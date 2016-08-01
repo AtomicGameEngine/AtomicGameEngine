@@ -31,5 +31,11 @@
         "templateType": "script",
         "ext": ".ts",
         "filename": "AtomicEditor/templates/template_ts_script.ts"
+    }, {
+        "name": "Basic (CSharp)",
+        "desc": "An empty script for CSharp",
+        "templateType": "script",
+        "ext": ".cs",
+        "filename": "AtomicEditor/templates/template_cs_script.cs"
     }]
 }
