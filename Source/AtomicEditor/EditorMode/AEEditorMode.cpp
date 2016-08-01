@@ -165,6 +165,12 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     vargs = args.Split(' ');
 
+    if (managed)
+    {            
+        vargs.Insert(0, ToString("\"%s\"", (fileSystem->GetProgramDir() + "Resources/").CString()));        
+        vargs.Insert(0, "--resourcePrefix");
+    }
+
     if (debug)
         vargs.Insert(0, "--debug");
 
