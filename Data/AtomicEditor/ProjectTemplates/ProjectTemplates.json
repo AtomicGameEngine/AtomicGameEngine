@@ -12,6 +12,10 @@
             {
                 "folder": "Project2D/TypeScript",
                 "language": "TypeScript"
+            },
+            {
+                "folder": "Project2D/CSharp",
+                "language": "CSharp"
             }
         ]
     },
