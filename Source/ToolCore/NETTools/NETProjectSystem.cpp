@@ -62,6 +62,23 @@ namespace ToolCore
         projectAssemblyDirty_ = false;
     }
 
+    void NETProjectSystem::OpenSolution()
+    {
+        if (!visualStudioPath_.Length())
+            return;
+
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        if (!fileSystem->FileExists(solutionPath_))
+        {
+            if (!GenerateSolution())
+                return;
+        }
+
+        OpenSourceFile(String::EMPTY);
+
+    }
+
     void NETProjectSystem::OpenSourceFile(const String& sourceFilePath)
     {
         if (!visualStudioPath_.Length())
@@ -75,7 +92,9 @@ namespace ToolCore
             vsSubprocess_ = 0;
 
             args.Push(solutionPath_);
-            args.Push(sourceFilePath);
+
+            if (sourceFilePath.Length())
+                args.Push(sourceFilePath);
 
             try
             {
@@ -89,6 +108,9 @@ namespace ToolCore
         }
         else
         {
+            if (!sourceFilePath.Length())
+                return;
+
             try
             {
                 std::vector<std::string> args;
@@ -123,6 +145,69 @@ namespace ToolCore
 
     }
 
+    void NETProjectSystem::BuildAtomicProject()
+    {
+        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+        if (!fileSystem->FileExists(solutionPath_))
+        {
+            if (!GenerateSolution())
+            {
+                LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
+                return;
+            }
+        }
+
+#ifdef ATOMIC_PLATFORM_WINDOWS
+
+        Project* project = GetSubsystem<ToolSystem>()->GetProject();
+        NETBuildSystem* buildSystem = GetSubsystem<NETBuildSystem>();
+
+        if (buildSystem)
+        {
+            NETBuild* build = buildSystem->BuildAtomicProject(project);
+
+            if (build)
+            {
+                build->SubscribeToEvent(E_NETBUILDRESULT, HANDLER(NETProjectSystem, HandleNETBuildResult));
+            }
+
+        }
+#endif
+
+    }
+
+    bool NETProjectSystem::GenerateSolution()
+    {
+        ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+        Project* project = tsystem->GetProject();
+
+        if (!project)
+        {
+            LOGERRORF("NETProjectSystem::GenerateSolution - No Project Loaded");
+            return false;
+        }
+
+        SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
+
+        gen->SetScriptPlatform("WINDOWS");
+
+        if (!gen->LoadProject(project))
+        {
+            LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Load Project");
+            return false;
+        }
+
+        if (!gen->Generate())
+        {
+            LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Generate Project");
+            return false;
+        }
+
+        return true;
+
+    }
+
 
     void NETProjectSystem::HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
@@ -140,39 +225,14 @@ namespace ToolCore
 
         if (solutionDirty_)
         {
-            ToolSystem* tsystem = GetSubsystem<ToolSystem>();
-            Project* project = tsystem->GetProject();
-
-            SharedPtr<NETProjectGen> gen(new NETProjectGen(context_));
-
-            gen->SetScriptPlatform("WINDOWS");
-
-            if (!gen->LoadProject(project))
-            {
-                return;
-            }
-
-            if (!gen->Generate())
-            {
-                return;
-            }
-
             solutionDirty_ = false;
-
+            GenerateSolution();
         }
 
         if (projectAssemblyDirty_)
-        {
-            Project* project = GetSubsystem<ToolSystem>()->GetProject();
-            NETBuild* build = GetSubsystem<NETBuildSystem>()->BuildAtomicProject(project);
-
-            if (build)
-            {
-                build->SubscribeToEvent(E_NETBUILDRESULT, HANDLER(NETProjectSystem, HandleNETBuildResult));
-            }
-
+        {        
+            BuildAtomicProject();
             projectAssemblyDirty_ = false;
-
         }
 
     }
