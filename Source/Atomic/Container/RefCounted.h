@@ -22,11 +22,7 @@
 
 #pragma once
 
-#ifdef ATOMIC_IS_BUILDING
-#include "Atomic.h"
-#else
-#include <Atomic/Atomic.h>
-#endif
+#include "Atomic/Atomic.h"
 
 namespace Atomic
 {
@@ -92,6 +88,11 @@ public:
     RefCount* RefCountPtr() { return refCount_; }
 
 // ATOMIC BEGIN
+
+    virtual bool IsObject() const { return false; }
+
+    virtual ClassID GetClassID() const  = 0;
+    static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
 
     /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
     inline void* JSGetHeapPtr() const { return jsHeapPtr_; }

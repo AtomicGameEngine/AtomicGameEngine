@@ -36,7 +36,7 @@ class JSComponent;
 /// Script document resource.
 class ATOMIC_API JSComponentFile : public ScriptComponentFile
 {
-    OBJECT(JSComponentFile);
+    ATOMIC_OBJECT(JSComponentFile, ScriptComponentFile);
 
 public:
 

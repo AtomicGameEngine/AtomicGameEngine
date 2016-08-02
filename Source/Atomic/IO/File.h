@@ -113,6 +113,9 @@ public:
     /// Reads a text file, ensuring data from file is 0 terminated
     virtual void ReadText(String& text);
 
+    /// Return the fullpath to the file
+    const String& GetFullPath() const { return fullPath_; }
+
     // ATOMIC END
 
 private:
@@ -151,6 +154,13 @@ private:
     bool readSyncNeeded_;
     /// Synchronization needed before write -flag.
     bool writeSyncNeeded_;
+
+    // ATOMIC BEGIN
+
+    /// Full path to file
+    String fullPath_;
+
+    // ATOMIC END
 };
 
 }

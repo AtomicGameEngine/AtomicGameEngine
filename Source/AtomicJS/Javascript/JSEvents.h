@@ -35,28 +35,28 @@ lineNumber	Rhino	Linenumber related to error source, inherited accessor
 stack	V8	Traceback as a multi-line human redable string, inherited accessor
 */
 
-EVENT(E_JSOBJECTADDED, ObjectAdded)
+ATOMIC_EVENT(E_JSOBJECTADDED, ObjectAdded)
 {
-    PARAM(P_OBJECT, Object); // object
+    ATOMIC_PARAM(P_OBJECT, Object); // object
 }
 
-EVENT(E_JSOBJECTREMOVED, ObjectRemoved)
+ATOMIC_EVENT(E_JSOBJECTREMOVED, ObjectRemoved)
 {
-    PARAM(P_OBJECT, Object); // object
+    ATOMIC_PARAM(P_OBJECT, Object); // object
 }
 
-EVENT(E_JSERROR, JSError)
+ATOMIC_EVENT(E_JSERROR, JSError)
 {
-    PARAM(P_ERRORNAME, ErrorName); // string
-    PARAM(P_ERRORMESSAGE, ErrorMessage); // string
-    PARAM(P_ERRORFILENAME, ErrorFileName); // string
-    PARAM(P_ERRORLINENUMBER, ErrorLineNumber); // int
-    PARAM(P_ERRORSTACK, ErrorStack); // string
+    ATOMIC_PARAM(P_ERRORNAME, ErrorName); // string
+    ATOMIC_PARAM(P_ERRORMESSAGE, ErrorMessage); // string
+    ATOMIC_PARAM(P_ERRORFILENAME, ErrorFileName); // string
+    ATOMIC_PARAM(P_ERRORLINENUMBER, ErrorLineNumber); // int
+    ATOMIC_PARAM(P_ERRORSTACK, ErrorStack); // string
 }
 
-EVENT(E_JSPRINT, JSPrint)
+ATOMIC_EVENT(E_JSPRINT, JSPrint)
 {
-    PARAM(P_TEXT, Text); // string
+    ATOMIC_PARAM(P_TEXT, Text); // string
 }
 
 }

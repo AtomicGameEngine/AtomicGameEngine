@@ -37,6 +37,8 @@ class XMLFile;
 /// Tmx layer.
 class TmxLayer2D : public RefCounted
 {
+    ATOMIC_REFCOUNTED(TmxLayer2D)
+
 public:
     TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
     virtual ~TmxLayer2D();

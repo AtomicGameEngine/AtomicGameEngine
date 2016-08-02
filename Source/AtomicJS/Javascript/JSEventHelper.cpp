@@ -121,7 +121,7 @@ void JSEventHelper::AddEventHandler(StringHash eventType)
     GetSubsystem<JSEventDispatcher>()->RegisterJSEvent(eventType);
 
     // subscribe using object, so unsubscribing from object and not the event helper works
-    object_->SubscribeToEvent(eventType, HANDLER(JSEventHelper, HandleEvent));
+    object_->SubscribeToEvent(eventType, ATOMIC_HANDLER(JSEventHelper, HandleEvent));
 }
 
 void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
@@ -129,7 +129,7 @@ void JSEventHelper::AddEventHandler(Object* sender, StringHash eventType)
     GetSubsystem<JSEventDispatcher>()->RegisterJSEvent(eventType);
 
     // subscribe using object, so unsubscribing from object and not the event helper works
-    object_->SubscribeToEvent(sender, eventType, HANDLER(JSEventHelper, HandleEvent));
+    object_->SubscribeToEvent(sender, eventType, ATOMIC_HANDLER(JSEventHelper, HandleEvent));
 }
 
 void JSEventHelper::HandleEvent(StringHash eventType, VariantMap& eventData)

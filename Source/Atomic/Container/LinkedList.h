@@ -22,11 +22,8 @@
 
 #pragma once
 
-#ifdef ATOMIC_IS_BUILDING
-#include "Atomic.h"
-#else
-#include <Atomic/Atomic.h>
-#endif
+#include "Atomic/Atomic.h"
+
 #if ATOMIC_CXX11
 #include <initializer_list>
 #endif

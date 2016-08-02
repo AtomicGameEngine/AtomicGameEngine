@@ -37,6 +37,8 @@ class Graphics;
 /// Linked shader program on the GPU.
 class ATOMIC_API ShaderProgram : public RefCounted, public GPUObject
 {
+    ATOMIC_REFCOUNTED(ShaderProgram)
+
 public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);

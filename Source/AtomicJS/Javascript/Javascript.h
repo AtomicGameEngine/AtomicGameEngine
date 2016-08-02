@@ -34,7 +34,7 @@ class JSVM;
 /// Javascript subsystem.
 class ATOMIC_API Javascript : public Object
 {
-    OBJECT(Javascript);
+    ATOMIC_OBJECT(Javascript, Object);
 
 public:
     /// Construct.

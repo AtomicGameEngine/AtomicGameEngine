@@ -110,7 +110,7 @@ static int js_print(duk_context* ctx)
     JSVM* vm = JSVM::GetJSVM(ctx);
     vm->SendEvent(E_JSPRINT, eventData);
 
-    LOGINFOF("%s", duk_to_string(ctx, -1));
+    ATOMIC_LOGINFOF("%s", duk_to_string(ctx, -1));
     return 0;
 }
 

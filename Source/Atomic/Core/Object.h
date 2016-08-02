@@ -76,6 +76,11 @@ private:
         static Atomic::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
         static const Atomic::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
         static const Atomic::TypeInfo* GetTypeInfoStatic() { static const Atomic::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
+        virtual Atomic::StringHash GetBaseType() const { return GetBaseTypeStatic(); } \
+        virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; } \
+        static Atomic::StringHash GetBaseTypeStatic() { static const Atomic::StringHash baseTypeStatic(#baseTypeName); return baseTypeStatic; }
+
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
 class ATOMIC_API Object : public RefCounted
@@ -173,6 +178,15 @@ public:
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
 
+    // ATOMIC BEGIN
+
+    virtual bool IsObject() const { return true; }
+
+    static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
+    static const Atomic::String& GetTypeNameStatic() { static const Atomic::String typeNameStatic("Object"); return typeNameStatic; }
+
+    // ATOMIC END
+
 protected:
     /// Execution context.
     Context* context_;
@@ -196,6 +210,8 @@ template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetS
 /// Base class for object factories.
 class ATOMIC_API ObjectFactory : public RefCounted
 {
+    ATOMIC_REFCOUNTED(ObjectFactory)
+
 public:
     /// Construct.
     ObjectFactory(Context* context) :

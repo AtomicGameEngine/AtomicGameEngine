@@ -61,7 +61,7 @@ static int Node_CreateJSComponent(duk_context* ctx)
 
     if (!file)
     {
-        LOGERRORF("Unable to load component file %s", path.CString());
+        ATOMIC_LOGERRORF("Unable to load component file %s", path.CString());
         duk_push_undefined(ctx);
         return 1;
     }

@@ -136,13 +136,13 @@ void JSVM::RegisterPackage(JSVMPackageRegistrationSettingsFunction regFunction, 
 
 void JSVM::SubscribeToEvents()
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(JSVM, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(JSVM, HandleUpdate));
 }
 
 void JSVM::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
 
-    PROFILE(JSVM_HandleUpdate);
+    ATOMIC_PROFILE(JSVM_HandleUpdate);
 
     using namespace Update;
 
@@ -152,7 +152,7 @@ void JSVM::HandleUpdate(StringHash eventType, VariantMap& eventData)
     gcTime_ += timeStep;
     if (gcTime_ > 5.0f)
     {
-        PROFILE(JSVM_GC);
+        ATOMIC_PROFILE(JSVM_GC);
 
         // run twice to call finalizers
         // see duktape docs
@@ -293,7 +293,7 @@ void JSVM::SendJSErrorEvent(const String& filename)
 
     duk_pop_n(ctx, 5);
 
-    LOGERRORF("JSErrorEvent: %s : Line %i\n Name: %s\n Message: %s\n Stack:%s",
+    ATOMIC_LOGERRORF("JSErrorEvent: %s : Line %i\n Name: %s\n Message: %s\n Stack:%s",
               filename.CString(), lineNumber, name.CString(), message.CString(), stack.CString());
 
     SendEvent(E_JSERROR, eventData);

@@ -29,6 +29,17 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+
+class GlobalEventListener
+{
+public:
+    virtual void BeginSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
+    virtual void EndSendEvent(Context* context, Object* sender, StringHash eventType, VariantMap& eventData) = 0;
+};
+
+// ATOMIC END
+
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class ATOMIC_API Context : public RefCounted
 {
@@ -162,6 +173,10 @@ public:
     /// Get whether an Editor Context
     void SetEditorContext(bool editor) { editorContext_ = editor; }
 
+    // hook for listening into events
+    void AddGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Push(listener); }
+    void RemoveGlobalEventListener(GlobalEventListener* listener) { globalEventListeners_.Erase(globalEventListeners_.Find(listener)); }
+
     // ATOMIC END
 
 private:
@@ -209,6 +224,7 @@ private:
     VariantMap globalVars_;
 
     // ATOMIC BEGIN
+    PODVector<GlobalEventListener*> globalEventListeners_;
     bool editorContext_;
     // ATOMIC END
 

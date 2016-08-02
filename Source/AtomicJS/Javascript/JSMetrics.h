@@ -33,7 +33,7 @@ class JSVM;
 
 class JSMetrics : public Object
 {
-    OBJECT(JSMetrics);
+    ATOMIC_OBJECT(JSMetrics, Object);
 
     struct ObjectMetric
     {

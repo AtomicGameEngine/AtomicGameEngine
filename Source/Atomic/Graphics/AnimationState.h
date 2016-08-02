@@ -68,6 +68,8 @@ struct AnimationStateTrack
 /// %Animation instance.
 class ATOMIC_API AnimationState : public RefCounted
 {
+    ATOMIC_REFCOUNTED(AnimationState)
+
 public:
     /// Construct with animated model and animation pointers.
     AnimationState(AnimatedModel* model, Animation* animation);

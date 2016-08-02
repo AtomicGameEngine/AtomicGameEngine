@@ -122,7 +122,7 @@ JSComponent* JSComponentFile::CreateJSComponent()
 
     if (!component)
     {
-        LOGERRORF("Failed to create script class from component file %s", GetName().CString());
+        ATOMIC_LOGERRORF("Failed to create script class from component file %s", GetName().CString());
         component =  new JSComponent(context_);
     }
 
@@ -162,7 +162,7 @@ bool JSComponentFile::InitModule()
 
             if (!duk_is_function(ctx, -1))
             {
-                LOGERRORF("Component file export object does not export a key \"component\" function: %s", GetName().CString());
+                ATOMIC_LOGERRORF("Component file export object does not export a key \"component\" function: %s", GetName().CString());
                 duk_set_top(ctx, top);
                 return false;
             }
@@ -192,7 +192,7 @@ bool JSComponentFile::BeginLoad(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Zero sized component file in " + source.GetName());
+        ATOMIC_LOGERROR("Zero sized component file in " + source.GetName());
         return false;
     }
 

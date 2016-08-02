@@ -37,6 +37,8 @@ class ATOMIC_API RenderSurface : public RefCounted
     friend class Texture2DArray;
     friend class TextureCube;
 
+    ATOMIC_REFCOUNTED(RenderSurface)
+
 public:
     /// Construct with parent texture.
     RenderSurface(Texture* parentTexture);

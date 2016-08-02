@@ -38,8 +38,8 @@
 
 // ATOMIC BEGIN
 // #include "../UI/Text.h"
-// #include "../UI/UI.h"
-
+#include "../UI/UI.h"
+#include "../UI/UIWidget.h"
 #include <SDL/include/SDL.h>
 
 // ATOMIC END
@@ -78,9 +78,9 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
         return SDL_tolower(keySym);
 }
 
-UIElement* TouchState::GetTouchedElement()
+UIWidget* TouchState::GetTouchedElement()
 {
-    return touchedElement_.Get();
+    return touchedWidget_.Get();
 }
 
 #ifdef __EMSCRIPTEN__
@@ -1132,13 +1132,16 @@ bool Input::RemoveScreenJoystick(SDL_JoystickID id)
     }
 
     JoystickState& state = joysticks_[id];
+// ATOMIC BEGIN
+/*
     if (!state.screenJoystick_)
     {
         ATOMIC_LOGERRORF("Failed to remove joystick with ID #%d which is not a screen joystick", id);
         return false;
     }
-// ATOMIC BEGIN
-    // state.screenJoystick_->Remove();
+
+     state.screenJoystick_->Remove();
+*/
 // ATOMIC END
     joysticks_.Erase(id);
 
@@ -2063,6 +2066,9 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 (int)(evt.tfinger.y * graphics_->GetHeight()));
             state.delta_ = state.position_ - state.lastPosition_;
             state.pressure_ = evt.tfinger.pressure;
+            // ATOMIC BEGIN
+            state.touchedWidget_ = GetSubsystem<UI>()->GetWidgetAt(state.position_.x_, state.position_.y_, true);
+            // ATOMIC END
 
             using namespace TouchMove;
 

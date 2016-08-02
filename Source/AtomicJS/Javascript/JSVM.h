@@ -54,7 +54,7 @@ class ATOMIC_API JSVM : public Object
 
     friend class JSMetrics;
 
-    OBJECT(JSVM)
+    ATOMIC_OBJECT(JSVM, Object)
 
 public:
     /// Construct.
@@ -300,11 +300,11 @@ inline bool js_push_class_object_instance(duk_context* ctx, const RefCounted *in
     {
         if (instance->IsObject())
         {
-            LOGERRORF("Unable to push class object instance due to missing ClassID: %s", ((Object*)instance)->GetTypeName().CString());
+            ATOMIC_LOGERRORF("Unable to push class object instance due to missing ClassID: %s", ((Object*)instance)->GetTypeName().CString());
         }
         else
         {
-            LOGERROR("Unable to push RefCounted instance due to missing ClassID");
+            ATOMIC_LOGERROR("Unable to push RefCounted instance due to missing ClassID");
         }
 
         duk_set_top(ctx, top);

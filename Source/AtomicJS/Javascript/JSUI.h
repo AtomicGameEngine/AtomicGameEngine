@@ -35,7 +35,7 @@ namespace Atomic
 
 class JSUI : public Object
 {
-    OBJECT(JSUI)
+    ATOMIC_OBJECT(JSUI, Object)
 
 public:
 

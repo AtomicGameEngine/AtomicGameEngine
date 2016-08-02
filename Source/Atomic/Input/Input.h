@@ -48,7 +48,7 @@ enum MouseMode
 class Deserializer;
 class Graphics;
 class Serializer;
-class UIElement;
+class UIWidget;
 class XMLFile;
 
 const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
@@ -57,7 +57,7 @@ const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_MIN_INT, M_MIN_INT);
 struct TouchState
 {
     /// Return last touched UI element, used by scripting integration.
-    UIElement* GetTouchedElement();
+    UIWidget* GetTouchedElement();
 
     /// Touch (finger) ID.
     int touchID_;
@@ -69,8 +69,10 @@ struct TouchState
     IntVector2 delta_;
     /// Finger pressure.
     float pressure_;
-    /// Last touched UI element from screen joystick.
-    WeakPtr<UIElement> touchedElement_;
+// ATOMIC BEGIN
+    /// Last touched UI widget
+    WeakPtr<UIWidget> touchedWidget_;
+// ATOMIC END
 };
 
 /// %Input state for a joystick.
@@ -78,7 +80,7 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0), controller_(0), screenJoystick_(0)
+        joystick_(0), controller_(0)
     {
     }
 
@@ -117,8 +119,10 @@ struct JoystickState
     SDL_JoystickID joystickID_;
     /// SDL game controller.
     SDL_GameController* controller_;
+    // ATOMIC BEGIN
     /// UI element containing the screen joystick.
-    UIElement* screenJoystick_;
+    // UIElement* screenJoystick_;
+    // ATOMIC END
     /// Joystick name.
     String name_;
     /// Button up/down state.

@@ -102,6 +102,7 @@ enum TileMapObjectType2D
 /// Property set.
 class ATOMIC_API PropertySet2D : public RefCounted
 {
+    ATOMIC_REFCOUNTED(PropertySet2D)
 public:
     PropertySet2D();
     virtual ~PropertySet2D();
@@ -121,6 +122,8 @@ protected:
 /// Tile define.
 class ATOMIC_API Tile2D : public RefCounted
 {
+    ATOMIC_REFCOUNTED(Tile2D)
+
 public:
     /// Construct.
     Tile2D();
@@ -149,6 +152,8 @@ private:
 /// Tile map object.
 class ATOMIC_API TileMapObject2D : public RefCounted
 {
+    ATOMIC_REFCOUNTED(TileMapObject2D)
+
 public:
     TileMapObject2D();
 

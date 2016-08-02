@@ -95,7 +95,10 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     checksum_(0),
     compressed_(false),
     readSyncNeeded_(false),
-    writeSyncNeeded_(false)
+    writeSyncNeeded_(false),
+    // ATOMIC BEGIN
+    fullPath_(fileName)
+    // ATOMIC END
 {
     Open(fileName, mode);
 }

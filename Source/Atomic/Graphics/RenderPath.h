@@ -207,6 +207,8 @@ struct ATOMIC_API RenderPathCommand
 /// Rendering path definition. A sequence of commands (e.g. clear screen, draw objects with specific pass) that yields the scene rendering result.
 class ATOMIC_API RenderPath : public RefCounted
 {
+    ATOMIC_REFCOUNTED(RenderPath)
+
 public:
     /// Construct.
     RenderPath();

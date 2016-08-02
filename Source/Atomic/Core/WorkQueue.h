@@ -42,6 +42,8 @@ struct WorkItem : public RefCounted
 {
     friend class WorkQueue;
 
+    ATOMIC_REFCOUNTED(WorkItem)
+
 public:
     // Construct
     WorkItem() :

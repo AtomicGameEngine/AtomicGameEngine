@@ -62,6 +62,8 @@ enum ShapeType
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
+    ATOMIC_REFCOUNTED(CollisionGeometryData)
+
 };
 
 /// Triangle mesh geometry data.

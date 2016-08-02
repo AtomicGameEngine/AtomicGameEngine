@@ -593,6 +593,17 @@ public:
     /// Set local transform silently without marking the node & child nodes dirty. Used by animation code.
     void SetTransformSilent(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
+    // ATOMIC BEGIN
+
+    /// Return child scene nodes by name, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, const String& name, bool recursive = false) const;
+    /// Return child scene nodes by name, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, const char* name, bool recursive = false) const;
+    /// Return child scene nodes by name hash, optionally recursive
+    void GetChildrenWithName(PODVector<Node*>& dest, StringHash nameHash, bool recursive = false) const;
+
+    // ATOMIC END
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
@@ -670,6 +681,13 @@ private:
     StringHash nameHash_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
+
+    // ATOMIC BEGIN
+
+    /// Return child nodes by name, recursively
+    void GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const;
+
+    // ATOMIC END
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id)
