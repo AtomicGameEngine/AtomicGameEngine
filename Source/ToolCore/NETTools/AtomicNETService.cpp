@@ -68,7 +68,7 @@ namespace ToolCore
         String config = "Release";
 #endif
 
-        execPath = tenv->GetRootSourceDir() + "Artifacts/AtomicNET/" + config + "/AtomicNETService.exe";
+        execPath = tenv->GetAtomicNETCoreAssemblyDir() + "/AtomicNETService.exe";
 
 #elif ATOMIC_PLATFORM_OSX
 
