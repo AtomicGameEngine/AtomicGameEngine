@@ -442,9 +442,9 @@ namespace ToolCore
                     String startArguments;
 
 #ifdef ATOMIC_DEV_BUILD
-                    String playerBin = tenv->GetAtomicNETRootDir() + cfg + "/AtomicPlayer.exe";
+                    String playerBin = tenv->GetAtomicNETRootDir() + cfg + "/AtomicIPCPlayer.exe";
 #else
-                    String playerBin = tenv->GetAtomicNETRootDir() + "Release/AtomicPlayer.exe";
+                    String playerBin = tenv->GetAtomicNETRootDir() + "Release/AtomicIPCPlayer.exe";
 
                     startArguments += ToString("--resourcePrefix \"%s\" ", (fileSystem->GetProgramDir() + "Resources/").CString());
 

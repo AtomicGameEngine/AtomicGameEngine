@@ -21,6 +21,7 @@
 //
 
 #include <Atomic/Core/StringUtils.h>
+#include <Atomic/IO/Log.h>
 #include <Atomic/IO/FileSystem.h>
 #include <Atomic/Resource/ResourceCache.h>
 
@@ -90,9 +91,90 @@ bool BuildWindows::CheckIncludeResourceFile(const String& resourceDir, const Str
     return BuildBase::CheckIncludeResourceFile(resourceDir, fileName);
 }
 
+void BuildWindows::BuildManaged(const String& buildPath)
+{
+    BuildLog("Building Managed Application");
+
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    ToolSystem* toolSystem = GetSubsystem<ToolSystem>();
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    Project* project = toolSystem->GetProject();
+    
+    StringVector results;
+    StringVector filtered;
+    fileSystem->ScanDir(results, tenv->GetAtomicNETCoreAssemblyDir(), "", SCAN_FILES, false);
+
+    StringVector filterList;
+
+    filterList.Push("AtomicIPCPlayer");
+    filterList.Push(".pdb");
+    filterList.Push("System.Collections.Immutable");
+    filterList.Push("System.Reflection.Metadata");
+    filterList.Push("ComponentTest");
+    filterList.Push("AtomicNETService");
+
+    StringVector::Iterator itr = results.Begin();
+    while (itr != results.End())
+    {
+        unsigned i;
+        for (i = 0; i < filterList.Size(); i++)
+        {
+            if (itr->Contains(filterList[i]))
+                break;
+        }
+
+        if (i == filterList.Size())
+            filtered.Push(*itr);
+
+        itr++;
+    }
+
+    String playerBinary = tenv->GetAtomicNETManagedPlayerBinary();
+   
+    if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer.exe"))
+        return;
+
+    for (unsigned i = 0; i < filtered.Size(); i++)
+    {
+        String filename = filtered[i];
+
+        if (!BuildCopyFile(tenv->GetAtomicNETCoreAssemblyDir() + filename, buildPath_ + "/" + filename))
+            return;
+
+    }
+    if (!BuildCopyFile(project->GetResourcePath() + "/AtomicProject.dll", buildPath_ + "/AtomicProject.dll"));
+        return;
+
+   
+  
+}
+
+void BuildWindows::BuildNative(const String& buildPath)
+{
+    BuildLog("Building Native Application");
+
+    ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+
+    String playerBinary = tenv->GetPlayerBinary();
+
+    String d3d9dll = GetPath(playerBinary) + "/D3DCompiler_47.dll";
+
+    if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer.exe"))
+        return;
+
+    if (!BuildCopyFile(d3d9dll, buildPath_ + "/D3DCompiler_47.dll"))
+        return;
+
+}
+
+
 void BuildWindows::Build(const String& buildPath)
 {
+    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
+    FileSystem* fileSystem = GetSubsystem<FileSystem>();
     ToolEnvironment* tenv = GetSubsystem<ToolEnvironment>();
+    ToolSystem* tsystem = GetSubsystem<ToolSystem>();
+    Project* project = tsystem->GetProject();
 
     buildPath_ = AddTrailingSlash(buildPath) + GetBuildSubfolder();
 
@@ -103,13 +185,7 @@ void BuildWindows::Build(const String& buildPath)
     if (!BuildClean(buildPath_))
         return;
 
-    BuildSystem* buildSystem = GetSubsystem<BuildSystem>();
-
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-
-    String rootSourceDir = tenv->GetRootSourceDir();
-    String playerBinary = tenv->GetPlayerBinary();
-    String d3d9dll = GetPath(playerBinary) + "/D3DCompiler_47.dll";
+    String rootSourceDir = tenv->GetRootSourceDir();        
 
     if (!BuildCreateDirectory(buildPath_))
         return;
@@ -133,12 +209,17 @@ void BuildWindows::Build(const String& buildPath)
             return;
     }
 
-    if (!BuildCopyFile(playerBinary, buildPath_ + "/AtomicPlayer.exe"))
-        return;
+    // TODO: Set project as managed and don't key off AtomicProject.dll
 
-    if (!BuildCopyFile(d3d9dll, buildPath_ + "/D3DCompiler_47.dll"))
-        return;
-
+    if (fileSystem->FileExists(project->GetResourcePath() + "/AtomicProject.dll"))
+    {
+        BuildManaged(buildPath);
+    }
+    else
+    {
+        BuildNative(buildPath);
+    }
+    
     BuildLog("Windows Deployment Complete");
 
     buildSystem->BuildComplete(PLATFORMID_WINDOWS, buildPath_);

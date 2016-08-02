@@ -1,5 +1,6 @@
 //
-// Copyright (c) 2014-2016 THUNDERBEAST GAMES LLC
+// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,36 +23,37 @@
 
 #pragma once
 
-#include "BuildBase.h"
+#include <AtomicApp/Player/PlayerApp.h>
 
-namespace ToolCore
+namespace Atomic
 {
 
-class Project;
+    class NETAtomicPlayer : public PlayerApp
+    {
+        OBJECT(NETAtomicPlayer)
 
-class BuildWindows : public BuildBase
-{
-    OBJECT(BuildWindows);
+    public:
 
-public:
+        static NETAtomicPlayer* CreateInternal();
 
-    BuildWindows(Context* context, Project* project);
-    virtual ~BuildWindows();
+        int Initialize();
 
-    String GetBuildSubfolder() { return "Windows-Build"; }
+        bool RunFrame();
 
-    void Build(const String& buildPath);
+        void Shutdown();
 
-protected:
+    private:
 
-    void Initialize();
-    virtual bool CheckIncludeResourceFile(const String& resourceDir, const String& fileName);
+        /// Construct.
+        NETAtomicPlayer(Context* context);
 
-private:
+        /// Setup before engine initialization.
+        virtual void Setup();
+        /// Cleanup after the main loop.
+        virtual void Stop();
 
-    void BuildNative(const String& buildPath);
-    void BuildManaged(const String& buildPath);
+        void ReadEngineConfig();
 
-};
+    };
 
 }

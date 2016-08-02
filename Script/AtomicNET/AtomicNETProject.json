@@ -64,10 +64,10 @@
       ]
     },
     {
-      "name": "AtomicPlayer",
+      "name": "AtomicIPCPlayer",
       "outputType" : "Exe",
-      "rootNamespace" : "AtomicPlayer",
-      "assemblyName" : "AtomicPlayer",
+      "rootNamespace" : "AtomicIPCPlayer",
+      "assemblyName" : "AtomicIPCPlayer",
       "assemblyOutputPath" : "..\\..\\",
       "references" : [
         "System",
@@ -77,8 +77,26 @@
         "AtomicNET"
       ],
       "sources" : [
-        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicPlayer/"
+        "$ATOMIC_ROOT$/Script/AtomicNET/AtomicIPCPlayer/"
       ]
-    }
+  },
+  {
+    "name": "AtomicPlayer",
+    "outputType" : "Exe",
+    "rootNamespace" : "AtomicPlayer",
+    "assemblyName" : "AtomicPlayer",
+    "assemblyOutputPath" : "..\\..\\",
+    "references" : [
+      "System",
+      "System.Core" ,
+      "System.Xml.Linq",
+      "System.XML",
+      "AtomicNET"
+    ],
+    "sources" : [
+      "$ATOMIC_ROOT$/Script/AtomicNET/AtomicPlayer/"
+    ]
+  }
+
   ]
 }
