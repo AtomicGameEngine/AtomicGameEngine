@@ -24,10 +24,12 @@
 
 #include "../Navigation/NavBuildData.h"
 
-#include <DetourTileCache/DetourTileCacheBuilder.h>
-#include <Recast/Recast.h>
+// ATOMIC BEGIN
+#include <DetourTileCache/include/DetourTileCacheBuilder.h>
+#include <Recast/include/Recast.h>
+// ATOMIC END
 
-namespace Urho3D
+namespace Atomic
 {
 
 NavBuildData::NavBuildData() :

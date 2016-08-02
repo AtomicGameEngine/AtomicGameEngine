@@ -29,7 +29,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void VertexBuffer::OnDeviceLost()
@@ -79,13 +79,13 @@ bool VertexBuffer::SetData(const void* data)
 {
     if (!data)
     {
-        URHO3D_LOGERROR("Null pointer for vertex buffer data");
+        ATOMIC_LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
 
     if (!vertexSize_)
     {
-        URHO3D_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        ATOMIC_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
 
@@ -101,7 +101,7 @@ bool VertexBuffer::SetData(const void* data)
         }
         else
         {
-            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
+            ATOMIC_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -117,19 +117,19 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
 
     if (!data)
     {
-        URHO3D_LOGERROR("Null pointer for vertex buffer data");
+        ATOMIC_LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
 
     if (!vertexSize_)
     {
-        URHO3D_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        ATOMIC_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
 
     if (start + count > vertexCount_)
     {
-        URHO3D_LOGERROR("Illegal range for setting new vertex buffer data");
+        ATOMIC_LOGERROR("Illegal range for setting new vertex buffer data");
         return false;
     }
 
@@ -151,7 +151,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         }
         else
         {
-            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
+            ATOMIC_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -163,19 +163,19 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
-        URHO3D_LOGERROR("Vertex buffer already locked");
+        ATOMIC_LOGERROR("Vertex buffer already locked");
         return 0;
     }
 
     if (!vertexSize_)
     {
-        URHO3D_LOGERROR("Vertex elements not defined, can not lock vertex buffer");
+        ATOMIC_LOGERROR("Vertex elements not defined, can not lock vertex buffer");
         return 0;
     }
 
     if (start + count > vertexCount_)
     {
-        URHO3D_LOGERROR("Illegal range for locking vertex buffer");
+        ATOMIC_LOGERROR("Illegal range for locking vertex buffer");
         return 0;
     }
 
@@ -234,7 +234,7 @@ bool VertexBuffer::Create()
     {
         if (graphics_->IsDeviceLost())
         {
-            URHO3D_LOGWARNING("Vertex buffer creation while device is lost");
+            ATOMIC_LOGWARNING("Vertex buffer creation while device is lost");
             return true;
         }
 
@@ -242,7 +242,7 @@ bool VertexBuffer::Create()
             glGenBuffers(1, &object_.name_);
         if (!object_.name_)
         {
-            URHO3D_LOGERROR("Failed to create vertex buffer");
+            ATOMIC_LOGERROR("Failed to create vertex buffer");
             return false;
         }
 

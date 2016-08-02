@@ -29,10 +29,10 @@
 #include "../Core/Profiler.h"
 
 
-namespace Urho3D
+namespace Atomic
 {
 /// Event profiling data for one block in the event profiling tree.
-class URHO3D_API EventProfilerBlock
+class ATOMIC_API EventProfilerBlock
 {
 public:
     /// Construct with the specified parent block and event id.
@@ -164,9 +164,9 @@ public:
 };
 
 /// Hierarchical performance event profiler subsystem.
-class URHO3D_API EventProfiler : public Object
+class ATOMIC_API EventProfiler : public Object
 {
-    URHO3D_OBJECT(EventProfiler, Object);
+    ATOMIC_OBJECT(EventProfiler, Object);
 
 public:
     /// Construct.

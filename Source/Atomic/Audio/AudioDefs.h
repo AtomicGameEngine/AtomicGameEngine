@@ -24,7 +24,7 @@
 
 #include "../Container/Str.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// SoundSource type defaults

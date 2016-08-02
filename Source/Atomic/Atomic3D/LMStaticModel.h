@@ -13,7 +13,7 @@ namespace Atomic
 
 class LMStaticModel: public StaticModel
 {
-    OBJECT(LMStaticModel);
+    ATOMIC_OBJECT(LMStaticModel, StaticModel);
 
 public:
     /// Construct.

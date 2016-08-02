@@ -25,13 +25,13 @@
 #include "../Resource/Resource.h"
 #include "../Resource/JSONValue.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// JSON document resource.
-class URHO3D_API JSONFile : public Resource
+class ATOMIC_API JSONFile : public Resource
 {
-    URHO3D_OBJECT(JSONFile, Resource);
+    ATOMIC_OBJECT(JSONFile, Resource);
 
 public:
     /// Construct.
@@ -55,6 +55,12 @@ public:
     JSONValue& GetRoot() { return root_; }
     /// Return root value.
     const JSONValue& GetRoot() const { return root_; }
+
+    // ATOMIC BEGIN
+
+    static bool ParseJSON(const String& json, JSONValue& value, bool reportError = true);
+
+    // ATOMIC END
 
 private:
     /// JSON root value.

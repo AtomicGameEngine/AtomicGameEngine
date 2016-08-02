@@ -25,7 +25,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Matrix3x4.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BoundingBox;
@@ -34,7 +34,7 @@ class Plane;
 class Sphere;
 
 /// Infinite straight line in three-dimensional space.
-class URHO3D_API Ray
+class ATOMIC_API Ray
 {
 public:
     /// Construct a degenerate ray with zero origin and direction.

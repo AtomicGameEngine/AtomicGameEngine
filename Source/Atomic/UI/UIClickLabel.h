@@ -30,7 +30,7 @@ namespace Atomic
 
 class UIClickLabel : public UIWidget
 {
-    OBJECT(UIClickLabel)
+    ATOMIC_OBJECT(UIClickLabel, UIWidget)
 
 public:
 

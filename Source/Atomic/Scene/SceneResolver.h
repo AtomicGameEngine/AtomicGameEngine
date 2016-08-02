@@ -25,14 +25,14 @@
 #include "../Container/HashMap.h"
 #include "../Container/Ptr.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Component;
 class Node;
 
 /// Utility class that resolves node & component IDs after a scene or partial scene load.
-class URHO3D_API SceneResolver
+class ATOMIC_API SceneResolver
 {
 public:
     /// Construct.

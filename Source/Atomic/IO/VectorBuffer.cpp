@@ -24,7 +24,7 @@
 
 #include "../IO/VectorBuffer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 VectorBuffer::VectorBuffer()

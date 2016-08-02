@@ -161,7 +161,7 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 {
     friend class UI;
 
-    OBJECT(UIWidget)
+    ATOMIC_OBJECT(UIWidget, Object)
 
     public:
 

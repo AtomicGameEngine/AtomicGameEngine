@@ -28,7 +28,7 @@
 #include "../Math/Rect.h"
 #include "../Math/Vector2.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Camera;
@@ -38,9 +38,9 @@ class XMLFile;
 class View;
 
 /// %Viewport definition either for a render surface or the backbuffer.
-class URHO3D_API Viewport : public Object
+class ATOMIC_API Viewport : public Object
 {
-    URHO3D_OBJECT(Viewport, Object);
+    ATOMIC_OBJECT(Viewport, Object);
 
 public:
     /// Construct with defaults.

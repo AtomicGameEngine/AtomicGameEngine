@@ -24,20 +24,20 @@
 
 #include "../Math/Matrix4.h"
 
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
 #include <emmintrin.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 3x4 matrix for scene node transform calculations.
-class URHO3D_API Matrix3x4
+class ATOMIC_API Matrix3x4
 {
 public:
     /// Construct an identity matrix.
     Matrix3x4()
-#ifndef URHO3D_SSE
+#ifndef ATOMIC_SSE
        :m00_(1.0f),
         m01_(0.0f),
         m02_(0.0f),
@@ -52,7 +52,7 @@ public:
         m23_(0.0f)
 #endif
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&m00_, _mm_set_ps(0.f, 0.f, 0.f, 1.f));
         _mm_storeu_ps(&m10_, _mm_set_ps(0.f, 0.f, 1.f, 0.f));
         _mm_storeu_ps(&m20_, _mm_set_ps(0.f, 1.f, 0.f, 0.f));
@@ -61,7 +61,7 @@ public:
 
     /// Copy-construct from another matrix.
     Matrix3x4(const Matrix3x4& matrix)
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+#if defined(ATOMIC_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
     {
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
         _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
@@ -103,7 +103,7 @@ public:
 
     /// Copy-construct from a 4x4 matrix which is assumed to contain no projection.
     Matrix3x4(const Matrix4& matrix)
-#ifndef URHO3D_SSE
+#ifndef ATOMIC_SSE
        :m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -118,7 +118,7 @@ public:
         m23_(matrix.m23_)
 #endif
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
         _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
         _mm_storeu_ps(&m20_, _mm_loadu_ps(&matrix.m20_));
@@ -146,7 +146,7 @@ public:
 
     /// Construct from a float array.
     explicit Matrix3x4(const float* data)
-#ifndef URHO3D_SSE
+#ifndef ATOMIC_SSE
        :m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),
@@ -161,7 +161,7 @@ public:
         m23_(data[11])
 #endif
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&m00_, _mm_loadu_ps(data));
         _mm_storeu_ps(&m10_, _mm_loadu_ps(data + 4));
         _mm_storeu_ps(&m20_, _mm_loadu_ps(data + 8));
@@ -171,7 +171,7 @@ public:
     /// Construct from translation, rotation and uniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale, scale, scale);
@@ -185,7 +185,7 @@ public:
     /// Construct from translation, rotation and nonuniform scale.
     Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 t = _mm_set_ps(1.f, translation.z_, translation.y_, translation.x_);
         __m128 q = _mm_loadu_ps(&rotation.w_);
         __m128 s = _mm_set_ps(1.f, scale.z_, scale.y_, scale.x_);
@@ -199,7 +199,7 @@ public:
     /// Assign from another matrix.
     Matrix3x4& operator =(const Matrix3x4& rhs)
     {
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+#if defined(ATOMIC_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
         _mm_storeu_ps(&m10_, _mm_loadu_ps(&rhs.m10_));
         _mm_storeu_ps(&m20_, _mm_loadu_ps(&rhs.m20_));
@@ -241,7 +241,7 @@ public:
     /// Assign from a 4x4 matrix which is assumed to contain no projection.
     Matrix3x4& operator =(const Matrix4& rhs)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
         _mm_storeu_ps(&m10_, _mm_loadu_ps(&rhs.m10_));
         _mm_storeu_ps(&m20_, _mm_loadu_ps(&rhs.m20_));
@@ -265,7 +265,7 @@ public:
     /// Test for equality with another matrix without epsilon.
     bool operator ==(const Matrix3x4& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 c0 = _mm_cmpeq_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_));
         __m128 c1 = _mm_cmpeq_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_));
         c0 = _mm_and_ps(c0, c1);
@@ -296,7 +296,7 @@ public:
     /// Multiply a Vector3 which is assumed to represent position.
     Vector3 operator *(const Vector3& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
@@ -326,7 +326,7 @@ public:
     /// Multiply a Vector4.
     Vector3 operator *(const Vector4& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 vec = _mm_loadu_ps(&rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
@@ -356,7 +356,7 @@ public:
     /// Add a matrix.
     Matrix3x4 operator +(const Matrix3x4& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         Matrix3x4 ret;
         _mm_storeu_ps(&ret.m00_, _mm_add_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_)));
         _mm_storeu_ps(&ret.m10_, _mm_add_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_)));
@@ -383,7 +383,7 @@ public:
     /// Subtract a matrix.
     Matrix3x4 operator -(const Matrix3x4& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         Matrix3x4 ret;
         _mm_storeu_ps(&ret.m00_, _mm_sub_ps(_mm_loadu_ps(&m00_), _mm_loadu_ps(&rhs.m00_)));
         _mm_storeu_ps(&ret.m10_, _mm_sub_ps(_mm_loadu_ps(&m10_), _mm_loadu_ps(&rhs.m10_)));
@@ -410,7 +410,7 @@ public:
     /// Multiply with a scalar.
     Matrix3x4 operator *(float rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         Matrix3x4 ret;
         const __m128 mul = _mm_set1_ps(rhs);
         _mm_storeu_ps(&ret.m00_, _mm_mul_ps(_mm_loadu_ps(&m00_), mul));
@@ -438,7 +438,7 @@ public:
     /// Multiply a matrix.
     Matrix3x4 operator *(const Matrix3x4& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         Matrix3x4 out;
 
         __m128 r0 = _mm_loadu_ps(&rhs.m00_);
@@ -489,7 +489,7 @@ public:
     /// Multiply a 4x4 matrix.
     Matrix4 operator *(const Matrix4& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         Matrix4 out;
 
         __m128 r0 = _mm_loadu_ps(&rhs.m00_);
@@ -600,7 +600,7 @@ public:
     /// Convert to a 4x4 matrix by filling in an identity last row.
     Matrix4 ToMatrix4() const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         Matrix4 ret;
         _mm_storeu_ps(&ret.m00_, _mm_loadu_ps(&m00_));
         _mm_storeu_ps(&ret.m10_, _mm_loadu_ps(&m10_));
@@ -673,7 +673,7 @@ public:
 
         for (unsigned i = 0; i < 12; ++i)
         {
-            if (!Urho3D::Equals(leftData[i], rightData[i]))
+            if (!Atomic::Equals(leftData[i], rightData[i]))
                 return false;
         }
 
@@ -709,7 +709,7 @@ public:
     /// Identity matrix.
     static const Matrix3x4 IDENTITY;
 
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
 private:
     /// \brief Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters. Note: the w component of the scale parameter passed to this function must be 1.
     void inline SetFromTRS(__m128 t, __m128 q, __m128 s)

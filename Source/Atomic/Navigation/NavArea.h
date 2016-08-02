@@ -25,12 +25,12 @@
 #include "../Math/BoundingBox.h"
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
-class URHO3D_API NavArea : public Component
+class ATOMIC_API NavArea : public Component
 {
-    URHO3D_OBJECT(NavArea, Component);
+    ATOMIC_OBJECT(NavArea, Component);
 
 public:
     /// Construct.

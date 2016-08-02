@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 unsigned CountElements(const char* buffer, char separator)

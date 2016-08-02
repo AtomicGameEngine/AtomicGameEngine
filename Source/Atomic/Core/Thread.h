@@ -22,10 +22,10 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
 #ifndef _WIN32
@@ -35,11 +35,11 @@ typedef pthread_t ThreadID;
 typedef unsigned ThreadID;
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Operating system thread.
-class URHO3D_API Thread
+class ATOMIC_API Thread
 {
 public:
     /// Construct. Does not start the thread yet.

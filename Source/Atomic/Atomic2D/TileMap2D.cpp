@@ -27,13 +27,13 @@
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
-#include "../Urho2D/TileMap2D.h"
-#include "../Urho2D/TileMapLayer2D.h"
-#include "../Urho2D/TmxFile2D.h"
+#include "../Atomic2D/TileMap2D.h"
+#include "../Atomic2D/TileMapLayer2D.h"
+#include "../Atomic2D/TmxFile2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const float PIXEL_SIZE;
@@ -52,8 +52,8 @@ void TileMap2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<TileMap2D>(URHO2D_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
         AM_DEFAULT);
 }
 

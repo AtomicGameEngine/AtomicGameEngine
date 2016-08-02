@@ -34,7 +34,7 @@ class dtCrowd;
 class dtQueryFilter;
 struct dtCrowdAgent;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class CrowdAgent;
@@ -56,9 +56,9 @@ struct CrowdObstacleAvoidanceParams
 };
 
 /// Crowd manager scene component. Should be added only to the root scene node.
-class URHO3D_API CrowdManager : public Component
+class ATOMIC_API CrowdManager : public Component
 {
-    URHO3D_OBJECT(CrowdManager, Component);
+    ATOMIC_OBJECT(CrowdManager, Component);
 
     friend class CrowdAgent;
 

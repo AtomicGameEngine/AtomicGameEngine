@@ -32,25 +32,25 @@
 #include "../Resource/Image.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
-#include "../Urho2D/AnimationSet2D.h"
-#include "../Urho2D/Sprite2D.h"
-#include "../Urho2D/SpriterData2D.h"
-#include "../Urho2D/SpriteSheet2D.h"
+#include "../Atomic2D/AnimationSet2D.h"
+#include "../Atomic2D/Sprite2D.h"
+#include "../Atomic2D/SpriterData2D.h"
+#include "../Atomic2D/SpriteSheet2D.h"
 
 #include "../DebugNew.h"
 
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
 #include <spine/spine.h>
 #include <spine/extension.h>
 #endif
 
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
 // Current animation set
-static Urho3D::AnimationSet2D* currentAnimationSet = 0;
+static Atomic::AnimationSet2D* currentAnimationSet = 0;
 
 void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 {
-    using namespace Urho3D;
+    using namespace Atomic;
     if (!currentAnimationSet)
         return;
 
@@ -68,7 +68,7 @@ void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
 
 void _spAtlasPage_disposeTexture(spAtlasPage* self)
 {
-    using namespace Urho3D;
+    using namespace Atomic;
     Sprite2D* sprite = static_cast<Sprite2D*>(self->rendererObject);
     if (sprite)
         sprite->ReleaseRef();
@@ -78,7 +78,7 @@ void _spAtlasPage_disposeTexture(spAtlasPage* self)
 
 char* _spUtil_readFile(const char* path, int* length)
 {
-    using namespace Urho3D;
+    using namespace Atomic;
     
     if (!currentAnimationSet)
         return 0;
@@ -101,12 +101,12 @@ char* _spUtil_readFile(const char* path, int* length)
 }
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 AnimationSet2D::AnimationSet2D(Context* context) :
     Resource(context),
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     skeletonData_(0),
     atlas_(0),
 #endif
@@ -133,21 +133,21 @@ bool AnimationSet2D::BeginLoad(Deserializer& source)
         SetName(source.GetName());
 
     String extension = GetExtension(source.GetName());
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     if (extension == ".json")
         return BeginLoadSpine(source);
 #endif
     if (extension == ".scml")
         return BeginLoadSpriter(source);
 
-    URHO3D_LOGERROR("Unsupport animation set file: " + source.GetName());
+    ATOMIC_LOGERROR("Unsupport animation set file: " + source.GetName());
 
     return false;
 }
 
 bool AnimationSet2D::EndLoad()
 {
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     if (jsonData_)
         return EndLoadSpine();
 #endif
@@ -159,7 +159,7 @@ bool AnimationSet2D::EndLoad()
 
 unsigned AnimationSet2D::GetNumAnimations() const
 {
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     if (skeletonData_)
         return (unsigned)skeletonData_->animationsCount;
 #endif
@@ -173,7 +173,7 @@ String AnimationSet2D::GetAnimation(unsigned index) const
     if (index >= GetNumAnimations())
         return String::EMPTY;
 
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     if (skeletonData_)
         return skeletonData_->animations[index]->name;
 #endif
@@ -185,7 +185,7 @@ String AnimationSet2D::GetAnimation(unsigned index) const
 
 bool AnimationSet2D::HasAnimation(const String& animationName) const
 {
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     if (skeletonData_)
     {
         for (int i = 0; i < skeletonData_->animationsCount; ++i)
@@ -223,7 +223,7 @@ Sprite2D* AnimationSet2D::GetSpriterFileSprite(int folderId, int fileId) const
     return 0;
 }
 
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
 bool AnimationSet2D::BeginLoadSpine(Deserializer& source)
 {
     if (GetName().Empty())
@@ -245,7 +245,7 @@ bool AnimationSet2D::EndLoadSpine()
     atlas_ = spAtlas_createFromFile(atlasFileName.CString(), 0);
     if (!atlas_)
     {
-        URHO3D_LOGERROR("Create spine atlas failed");
+        ATOMIC_LOGERROR("Create spine atlas failed");
         return false;
     }
 
@@ -259,7 +259,7 @@ bool AnimationSet2D::EndLoadSpine()
 
     if (numAtlasPages > 1)
     {
-        URHO3D_LOGERROR("Only one page is supported in Urho3D");
+        ATOMIC_LOGERROR("Only one page is supported in Urho3D");
         return false;
     }
 
@@ -268,7 +268,7 @@ bool AnimationSet2D::EndLoadSpine()
     spSkeletonJson* skeletonJson = spSkeletonJson_create(atlas_);
     if (!skeletonJson)
     {
-        URHO3D_LOGERROR("Create skeleton Json failed");
+        ATOMIC_LOGERROR("Create skeleton Json failed");
         return false;
     }
 
@@ -289,7 +289,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        URHO3D_LOGERROR("Zero sized XML data in " + source.GetName());
+        ATOMIC_LOGERROR("Zero sized XML data in " + source.GetName());
         return false;
     }
 
@@ -300,7 +300,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     spriterData_ = new Spriter::SpriterData();
     if (!spriterData_->Load(buffer.Get(), dataSize))
     {
-        URHO3D_LOGERROR("Could not spriter data from " + source.GetName());
+        ATOMIC_LOGERROR("Could not spriter data from " + source.GetName());
         return false;
     }
 
@@ -370,7 +370,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 SharedPtr<Sprite2D> sprite(spriteSheet_->GetSprite(GetFileName(file->name_)));
                 if (!sprite)
                 {
-                    URHO3D_LOGERROR("Could not load sprite " + file->name_);
+                    ATOMIC_LOGERROR("Could not load sprite " + file->name_);
                     return false;
                 }
 
@@ -413,17 +413,17 @@ bool AnimationSet2D::EndLoadSpriter()
                 SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
                 if (!image)
                 {
-                    URHO3D_LOGERROR("Could not load image");
+                    ATOMIC_LOGERROR("Could not load image");
                     return false;
                 }
                 if (image->IsCompressed())
                 {
-                    URHO3D_LOGERROR("Compressed image is not support");
+                    ATOMIC_LOGERROR("Compressed image is not support");
                     return false;
                 }
                 if (image->GetComponents() != 4)
                 {
-                    URHO3D_LOGERROR("Only support image with 4 components");
+                    ATOMIC_LOGERROR("Only support image with 4 components");
                     return false;
                 }
 
@@ -448,7 +448,7 @@ bool AnimationSet2D::EndLoadSpriter()
                 Image* image = info.image_;
                 if (!allocator.Allocate(image->GetWidth() + 1, image->GetHeight() + 1, info.x, info.y))
                 {
-                    URHO3D_LOGERROR("Could not allocate area");
+                    ATOMIC_LOGERROR("Could not allocate area");
                     return false;
                 }
             }
@@ -511,7 +511,7 @@ bool AnimationSet2D::EndLoadSpriter()
 
 void AnimationSet2D::Dispose()
 {
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     if (skeletonData_)
     {
         spSkeletonData_dispose(skeletonData_);

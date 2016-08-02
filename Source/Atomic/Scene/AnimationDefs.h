@@ -22,7 +22,7 @@
 
 #pragma once
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Animation wrap mode.

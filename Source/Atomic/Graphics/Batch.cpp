@@ -37,7 +37,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 inline bool CompareBatchesState(Batch* lhs, Batch* rhs)
@@ -113,7 +113,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     offset.x_ += scale.x_ + pixelUVOffset.x_ / width;
     offset.y_ += scale.y_ + pixelUVOffset.y_ / height;
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     offset.z_ = 0.5f;
     scale.z_ = 0.5f;
     offset.y_ = 1.0f - offset.y_;
@@ -148,7 +148,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light)
     spotProj.m22_ = 1.0f / Max(light->GetRange(), M_EPSILON);
     spotProj.m32_ = 1.0f;
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
     texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
 #else
@@ -351,7 +351,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                         // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                         // the next parameter
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
 #else
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
@@ -409,7 +409,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         Matrix4 lightVecRot(lightNode->GetWorldRotation().RotationMatrix());
                         // HLSL compiler will pack the parameters as if the matrix is only 3x4, so must be careful to not overwrite
                         // the next parameter
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 16);
 #else
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, lightVecRot.Data(), 12);
@@ -428,7 +428,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     unsigned faceHeight = (unsigned)(shadowMap->GetHeight() / 3);
                     float width = (float)shadowMap->GetWidth();
                     float height = (float)shadowMap->GetHeight();
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
                     float mulX = (float)(faceWidth - 3) / width;
                     float mulY = (float)(faceHeight - 3) / height;
                     float addX = 1.5f / width;

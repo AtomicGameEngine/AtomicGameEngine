@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Urho2D/Constraint2D.h"
+#include "../Atomic2D/Constraint2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 2D distance constraint component.
-class URHO3D_API ConstraintDistance2D : public Constraint2D
+class ATOMIC_API ConstraintDistance2D : public Constraint2D
 {
-    URHO3D_OBJECT(ConstraintDistance2D, Constraint2D);
+    ATOMIC_OBJECT(ConstraintDistance2D, Constraint2D);
 
 public:
     /// Construct.

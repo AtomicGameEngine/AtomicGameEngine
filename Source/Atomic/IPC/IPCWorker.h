@@ -31,7 +31,7 @@ namespace Atomic
 
 class IPCWorker : public IPCChannel
 {
-    OBJECT(IPCWorker);
+    ATOMIC_OBJECT(IPCWorker, IPCChannel);
 
 public:
     /// POSIX Constructor

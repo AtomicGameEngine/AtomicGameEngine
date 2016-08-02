@@ -26,11 +26,11 @@
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Profiling data for one block in the profiling tree.
-class URHO3D_API ProfilerBlock
+class ATOMIC_API ProfilerBlock
 {
 public:
     /// Construct with the specified parent block and name.
@@ -169,9 +169,9 @@ public:
 };
 
 /// Hierarchical performance profiler subsystem.
-class URHO3D_API Profiler : public Object
+class ATOMIC_API Profiler : public Object
 {
-    URHO3D_OBJECT(Profiler, Object);
+    ATOMIC_OBJECT(Profiler, Object);
     
 public:
     /// Construct.
@@ -232,7 +232,7 @@ private:
 };
 
 /// Helper class for automatically beginning and ending a profiling block
-class URHO3D_API AutoProfileBlock
+class ATOMIC_API AutoProfileBlock
 {
 public:
     /// Construct. Begin a profiling block with the specified name and optional call count.
@@ -255,10 +255,10 @@ private:
     Profiler* profiler_;
 };
 
-#ifdef URHO3D_PROFILING
-#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
+#ifdef ATOMIC_PROFILING
+#define ATOMIC_PROFILE(name) Atomic::AutoProfileBlock profile_ ## name (GetSubsystem<Atomic::Profiler>(), #name)
 #else
-#define URHO3D_PROFILE(name)
+#define ATOMIC_PROFILE(name)
 #endif
 
 }

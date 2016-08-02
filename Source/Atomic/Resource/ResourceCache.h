@@ -28,7 +28,7 @@
 #include "../IO/File.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BackgroundLoader;
@@ -64,7 +64,7 @@ enum ResourceRequest
 };
 
 /// Optional resource request processor. Can deny requests, re-route resource file names, or perform other processing per request.
-class URHO3D_API ResourceRouter : public Object
+class ATOMIC_API ResourceRouter : public Object
 {
 public:
     /// Construct.
@@ -78,9 +78,9 @@ public:
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
-class URHO3D_API ResourceCache : public Object
+class ATOMIC_API ResourceCache : public Object
 {
-    URHO3D_OBJECT(ResourceCache, Object);
+    ATOMIC_OBJECT(ResourceCache, Object);
 
 public:
     /// Construct.
@@ -299,6 +299,6 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 }
 
 /// Register Resource library subsystems and objects.
-void URHO3D_API RegisterResourceLibrary(Context* context);
+void ATOMIC_API RegisterResourceLibrary(Context* context);
 
 }

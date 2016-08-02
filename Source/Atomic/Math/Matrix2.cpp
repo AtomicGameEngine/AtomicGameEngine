@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const Matrix2 Matrix2::ZERO(

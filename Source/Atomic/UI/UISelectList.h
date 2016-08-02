@@ -35,7 +35,7 @@ namespace Atomic
 
 class UISelectList : public UIWidget
 {
-    OBJECT(UISelectList)
+    ATOMIC_OBJECT(UISelectList, UIWidget)
 
 public:
 

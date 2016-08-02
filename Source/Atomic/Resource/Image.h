@@ -27,7 +27,7 @@
 
 struct SDL_Surface;
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int COLOR_LUT_SIZE = 16;
@@ -88,9 +88,9 @@ struct CompressedLevel
 };
 
 /// %Image resource.
-class URHO3D_API Image : public Resource
+class ATOMIC_API Image : public Resource
 {
-    URHO3D_OBJECT(Image, Resource);
+    ATOMIC_OBJECT(Image, Resource);
 
 public:
     /// Construct empty.

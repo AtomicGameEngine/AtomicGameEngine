@@ -22,16 +22,16 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
 #include "../Container/Allocator.h"
 #include "../Container/Swap.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Doubly-linked list node base class.
@@ -90,7 +90,7 @@ struct ListIteratorBase
 };
 
 /// Doubly-linked list base class.
-class URHO3D_API ListBase
+class ATOMIC_API ListBase
 {
 public:
     /// Construct.
@@ -105,10 +105,10 @@ public:
     /// Swap with another linked list.
     void Swap(ListBase& rhs)
     {
-        Urho3D::Swap(head_, rhs.head_);
-        Urho3D::Swap(tail_, rhs.tail_);
-        Urho3D::Swap(allocator_, rhs.allocator_);
-        Urho3D::Swap(size_, rhs.size_);
+        Atomic::Swap(head_, rhs.head_);
+        Atomic::Swap(tail_, rhs.tail_);
+        Atomic::Swap(allocator_, rhs.allocator_);
+        Atomic::Swap(size_, rhs.size_);
     }
 
 protected:

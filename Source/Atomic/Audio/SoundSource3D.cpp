@@ -30,7 +30,7 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../Scene/Node.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const float DEFAULT_NEARDISTANCE = 0.0f;
@@ -116,15 +116,15 @@ void SoundSource3D::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundSource3D>(AUDIO_CATEGORY);
 
-    URHO3D_COPY_BASE_ATTRIBUTES(SoundSource);
+    ATOMIC_COPY_BASE_ATTRIBUTES(SoundSource);
     // Remove Attenuation and Panning as attribute as they are constantly being updated
-    URHO3D_REMOVE_ATTRIBUTE("Attenuation");
-    URHO3D_REMOVE_ATTRIBUTE("Panning");
-    URHO3D_ATTRIBUTE("Near Distance", float, nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Far Distance", float, farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Inner Angle", float, innerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Outer Angle", float, outerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Rolloff Factor", float, rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);
+    ATOMIC_REMOVE_ATTRIBUTE("Attenuation");
+    ATOMIC_REMOVE_ATTRIBUTE("Panning");
+    ATOMIC_ATTRIBUTE("Near Distance", float, nearDistance_, DEFAULT_NEARDISTANCE, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Far Distance", float, farDistance_, DEFAULT_FARDISTANCE, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Inner Angle", float, innerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Outer Angle", float, outerAngle_, DEFAULT_ANGLE, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Rolloff Factor", float, rolloffFactor_, DEFAULT_ROLLOFF, AM_DEFAULT);
 }
 
 void SoundSource3D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)

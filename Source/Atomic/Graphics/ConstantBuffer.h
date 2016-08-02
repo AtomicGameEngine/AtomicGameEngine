@@ -27,13 +27,13 @@
 #include "../Graphics/GPUObject.h"
 #include "../Graphics/GraphicsDefs.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Hardware constant buffer.
-class URHO3D_API ConstantBuffer : public Object, public GPUObject
+class ATOMIC_API ConstantBuffer : public Object, public GPUObject
 {
-    URHO3D_OBJECT(ConstantBuffer, Object);
+    ATOMIC_OBJECT(ConstantBuffer, Object);
 
 public:
     /// Construct.

@@ -34,7 +34,7 @@ namespace SystemUI
 /// %Menu %UI element that optionally shows a popup.
 class ATOMIC_API Menu : public Button
 {
-    OBJECT(Menu);
+    ATOMIC_OBJECT(Menu, Button);
 
     using UIElement::LoadXML;
 

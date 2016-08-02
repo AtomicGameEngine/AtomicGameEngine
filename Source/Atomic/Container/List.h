@@ -23,11 +23,11 @@
 #pragma once
 
 #include "../Container/ListBase.h"
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
 #include <initializer_list>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Doubly-linked list template class.
@@ -188,7 +188,7 @@ public:
         head_ = tail_ = ReserveNode();
         *this = list;
     }
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Aggregate initialization constructor.
     List(const std::initializer_list<T>& list) : List()
     {
@@ -486,12 +486,12 @@ private:
     }
 };
 
-template <class T> typename Urho3D::List<T>::ConstIterator begin(const Urho3D::List<T>& v) { return v.Begin(); }
+template <class T> typename Atomic::List<T>::ConstIterator begin(const Atomic::List<T>& v) { return v.Begin(); }
 
-template <class T> typename Urho3D::List<T>::ConstIterator end(const Urho3D::List<T>& v) { return v.End(); }
+template <class T> typename Atomic::List<T>::ConstIterator end(const Atomic::List<T>& v) { return v.End(); }
 
-template <class T> typename Urho3D::List<T>::Iterator begin(Urho3D::List<T>& v) { return v.Begin(); }
+template <class T> typename Atomic::List<T>::Iterator begin(Atomic::List<T>& v) { return v.Begin(); }
 
-template <class T> typename Urho3D::List<T>::Iterator end(Urho3D::List<T>& v) { return v.End(); }
+template <class T> typename Atomic::List<T>::Iterator end(Atomic::List<T>& v) { return v.End(); }
 
 }

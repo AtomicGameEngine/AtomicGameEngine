@@ -22,17 +22,17 @@
 
 #pragma once
 
-#include "../Urho2D/Drawable2D.h"
+#include "../Atomic2D/Drawable2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Sprite2D;
 
 /// Static sprite component.
-class URHO3D_API StaticSprite2D : public Drawable2D
+class ATOMIC_API StaticSprite2D : public Drawable2D
 {
-    URHO3D_OBJECT(StaticSprite2D, Drawable2D);
+    ATOMIC_OBJECT(StaticSprite2D, Drawable2D);
 
 public:
     /// Construct.

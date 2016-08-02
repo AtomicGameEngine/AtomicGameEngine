@@ -27,7 +27,7 @@
 #include "../Math/Color.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
@@ -36,7 +36,7 @@ class XMLElement;
 class XMLFile;
 
 /// Base class for texture resources.
-class URHO3D_API Texture : public Resource, public GPUObject
+class ATOMIC_API Texture : public Resource, public GPUObject
 {
 public:
     /// Construct.

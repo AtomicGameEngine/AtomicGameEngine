@@ -26,11 +26,11 @@
 #include "../Math/BoundingBox.h"
 #include "../Math/Rect.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Abstract stream for reading.
-class URHO3D_API Deserializer
+class ATOMIC_API Deserializer
 {
 public:
     /// Construct with zero size.

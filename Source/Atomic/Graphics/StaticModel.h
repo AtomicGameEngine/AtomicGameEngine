@@ -24,7 +24,7 @@
 
 #include "../Graphics/Drawable.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Model;
@@ -39,9 +39,9 @@ struct StaticModelGeometryData
 };
 
 /// Static model component.
-class URHO3D_API StaticModel : public Drawable
+class ATOMIC_API StaticModel : public Drawable
 {
-    URHO3D_OBJECT(StaticModel, Drawable);
+    ATOMIC_OBJECT(StaticModel, Drawable);
 
 public:
     /// Construct.

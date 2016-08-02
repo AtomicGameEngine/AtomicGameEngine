@@ -46,7 +46,7 @@ class UIElement;
 /// %UI subsystem. Manages the graphical user interface.
 class ATOMIC_API SystemUI : public Object
 {
-    OBJECT(SystemUI);
+    ATOMIC_OBJECT(SystemUI, Object);
 
 public:
     /// Construct.

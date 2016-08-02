@@ -27,7 +27,7 @@
 #include <cassert>
 #include <cstddef>
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Shared pointer template class with intrusive reference counting.
@@ -40,7 +40,7 @@ public:
     {
     }
 
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Construct a null shared pointer.
     SharedPtr(std::nullptr_t) :
         ptr_(0)
@@ -250,7 +250,7 @@ public:
     {
     }
 
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Construct a null weak pointer.
     WeakPtr(std::nullptr_t) :
         ptr_(0),

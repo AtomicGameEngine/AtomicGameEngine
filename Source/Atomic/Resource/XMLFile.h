@@ -34,13 +34,13 @@ class xpath_node;
 
 }
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// XML document resource.
-class URHO3D_API XMLFile : public Resource
+class ATOMIC_API XMLFile : public Resource
 {
-    URHO3D_OBJECT(XMLFile, Resource);
+    ATOMIC_OBJECT(XMLFile, Resource);
 
 public:
     /// Construct.

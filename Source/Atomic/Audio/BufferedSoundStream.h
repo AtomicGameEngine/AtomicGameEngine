@@ -28,11 +28,11 @@
 #include "../Core/Mutex.h"
 #include "../Container/Pair.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Sound stream that supports manual buffering of data from the main thread.
-class URHO3D_API BufferedSoundStream : public SoundStream
+class ATOMIC_API BufferedSoundStream : public SoundStream
 {
 public:
     /// Construct.

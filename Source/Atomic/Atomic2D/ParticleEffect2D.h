@@ -25,7 +25,7 @@
 #include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class XMLElement;
@@ -39,9 +39,9 @@ enum EmitterType2D
 };
 
 /// 2D particle effect resource.
-class URHO3D_API ParticleEffect2D : public Resource
+class ATOMIC_API ParticleEffect2D : public Resource
 {
-    URHO3D_OBJECT(ParticleEffect2D, Resource);
+    ATOMIC_OBJECT(ParticleEffect2D, Resource);
 
 public:
     /// Construct.

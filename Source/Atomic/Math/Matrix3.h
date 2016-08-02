@@ -24,11 +24,11 @@
 
 #include "../Math/Vector3.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 3x3 matrix for rotation and scaling.
-class URHO3D_API Matrix3
+class ATOMIC_API Matrix3
 {
 public:
     /// Construct an identity matrix.
@@ -262,7 +262,7 @@ public:
 
         for (unsigned i = 0; i < 9; ++i)
         {
-            if (!Urho3D::Equals(leftData[i], rightData[i]))
+            if (!Atomic::Equals(leftData[i], rightData[i]))
                 return false;
         }
 

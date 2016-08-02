@@ -28,7 +28,7 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class AudioImpl;
@@ -37,9 +37,9 @@ class SoundListener;
 class SoundSource;
 
 /// %Audio subsystem.
-class URHO3D_API Audio : public Object
+class ATOMIC_API Audio : public Object
 {
-    URHO3D_OBJECT(Audio, Object);
+    ATOMIC_OBJECT(Audio, Object);
 
 public:
     /// Construct.
@@ -158,6 +158,6 @@ private:
 };
 
 /// Register Audio library objects.
-void URHO3D_API RegisterAudioLibrary(Context* context);
+void ATOMIC_API RegisterAudioLibrary(Context* context);
 
 }

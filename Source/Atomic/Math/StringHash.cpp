@@ -29,7 +29,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const StringHash StringHash::ZERO;

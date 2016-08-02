@@ -34,7 +34,7 @@ namespace SystemUI
 /// Tooltip %UI element.
 class ATOMIC_API ToolTip : public UIElement
 {
-    OBJECT(ToolTip)
+    ATOMIC_OBJECT(ToolTip, UIElement)
 
 public:
     /// Construct.

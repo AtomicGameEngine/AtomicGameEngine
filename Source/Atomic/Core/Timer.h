@@ -24,11 +24,11 @@
 
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Low-resolution operating system timer.
-class URHO3D_API Timer
+class ATOMIC_API Timer
 {
 public:
     /// Construct. Get the starting clock value.
@@ -45,7 +45,7 @@ private:
 };
 
 /// High-resolution operating system timer used in profiling.
-class URHO3D_API HiresTimer
+class ATOMIC_API HiresTimer
 {
     friend class Time;
 
@@ -75,9 +75,9 @@ private:
 };
 
 /// %Time and frame counter subsystem.
-class URHO3D_API Time : public Object
+class ATOMIC_API Time : public Object
 {
-    URHO3D_OBJECT(Time, Object);
+    ATOMIC_OBJECT(Time, Object);
 
 public:
     /// Construct.

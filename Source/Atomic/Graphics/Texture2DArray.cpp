@@ -40,14 +40,14 @@
 #pragma warning(disable:4355)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 Texture2DArray::Texture2DArray(Context* context) :
     Texture(context),
     layers_(0)
 {
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
 #ifndef GL_ES_VERSION_2_0
     target_ = GL_TEXTURE_2D_ARRAY;
 #else
@@ -77,7 +77,7 @@ bool Texture2DArray::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture load while device is lost");
+        ATOMIC_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -157,12 +157,12 @@ bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned fo
 {
     if (width <= 0 || height <= 0)
     {
-        URHO3D_LOGERROR("Zero or negative texture array size");
+        ATOMIC_LOGERROR("Zero or negative texture array size");
         return false;
     }
     if (usage == TEXTURE_DEPTHSTENCIL)
     {
-        URHO3D_LOGERROR("Depth-stencil usage not supported for texture arrays");
+        ATOMIC_LOGERROR("Depth-stencil usage not supported for texture arrays");
         return false;
     }
 
@@ -181,7 +181,7 @@ bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned fo
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2DArray, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, ATOMIC_HANDLER(Texture2DArray, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 

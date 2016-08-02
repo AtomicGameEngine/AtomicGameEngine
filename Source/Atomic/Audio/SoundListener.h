@@ -24,13 +24,13 @@
 
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Sound listener component
-class URHO3D_API SoundListener : public Component
+class ATOMIC_API SoundListener : public Component
 {
-    URHO3D_OBJECT(SoundListener, Component);
+    ATOMIC_OBJECT(SoundListener, Component);
 
 public:
     /// Construct.

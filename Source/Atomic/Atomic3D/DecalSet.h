@@ -27,7 +27,7 @@
 #include "../Graphics/Skeleton.h"
 #include "../Math/Frustum.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class IndexBuffer;
@@ -102,9 +102,9 @@ struct Decal
 };
 
 /// %Decal renderer component.
-class URHO3D_API DecalSet : public Drawable
+class ATOMIC_API DecalSet : public Drawable
 {
-    URHO3D_OBJECT(DecalSet, Drawable);
+    ATOMIC_OBJECT(DecalSet, Drawable);
 
 public:
     /// Construct.

@@ -22,17 +22,17 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Operating system mutual exclusion primitive.
-class URHO3D_API Mutex
+class ATOMIC_API Mutex
 {
 public:
     /// Construct.
@@ -53,7 +53,7 @@ private:
 };
 
 /// Lock that automatically acquires and releases a mutex.
-class URHO3D_API MutexLock
+class ATOMIC_API MutexLock
 {
 public:
     /// Construct and acquire the mutex.

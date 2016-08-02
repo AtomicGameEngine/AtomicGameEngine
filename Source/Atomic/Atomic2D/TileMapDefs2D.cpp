@@ -24,13 +24,13 @@
 
 #include "../Resource/XMLElement.h"
 #include "../Resource/JSONFile.h"
-#include "../Urho2D/TileMapDefs2D.h"
+#include "../Atomic2D/TileMapDefs2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
-extern URHO3D_API const float PIXEL_SIZE;
+extern ATOMIC_API const float PIXEL_SIZE;
 
 float TileMapInfo2D::GetMapWidth() const
 {

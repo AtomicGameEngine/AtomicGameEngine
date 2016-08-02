@@ -30,7 +30,7 @@
 #include "../Graphics/Zone.h"
 #include "../Math/Polyhedron.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Camera;
@@ -107,12 +107,12 @@ struct PerThreadSceneResult
 static const unsigned MAX_VIEWPORT_TEXTURES = 2;
 
 /// Internal structure for 3D rendering work. Created for each backbuffer and texture viewport, but not for shadow cameras.
-class URHO3D_API View : public Object
+class ATOMIC_API View : public Object
 {
     friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
 
-    URHO3D_OBJECT(View, Object);
+    ATOMIC_OBJECT(View, Object);
 
 public:
     /// Construct.

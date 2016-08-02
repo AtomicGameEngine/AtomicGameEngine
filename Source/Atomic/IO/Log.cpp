@@ -42,7 +42,7 @@ extern "C" void SDL_IOS_LogMessage(const char* message);
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const char* logLevelPrefixes[] =
@@ -70,7 +70,7 @@ Log::Log(Context* context) :
 {
     logInstance = this;
 
-    SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(Log, HandleEndFrame));
+    SubscribeToEvent(E_ENDFRAME, ATOMIC_HANDLER(Log, HandleEndFrame));
 }
 
 Log::~Log()
@@ -117,7 +117,7 @@ void Log::SetLevel(int level)
 {
     if (level < LOG_DEBUG || level > LOG_NONE)
     {
-        URHO3D_LOGERRORF("Attempted to set erroneous log level %d", level);
+        ATOMIC_LOGERRORF("Attempted to set erroneous log level %d", level);
         return;
     }
 

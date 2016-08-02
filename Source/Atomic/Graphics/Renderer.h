@@ -29,7 +29,7 @@
 #include "../Graphics/Viewport.h"
 #include "../Math/Color.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Geometry;
@@ -168,9 +168,9 @@ enum DeferredLightPSVariation
 };
 
 /// High-level rendering subsystem. Manages drawing of 3D views.
-class URHO3D_API Renderer : public Object
+class ATOMIC_API Renderer : public Object
 {
-    URHO3D_OBJECT(Renderer, Object);
+    ATOMIC_OBJECT(Renderer, Object);
 
 public:
     typedef void(Object::*ShadowMapFilter)(View* view, Texture2D* shadowMap, float blurScale);

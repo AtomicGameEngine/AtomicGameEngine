@@ -36,13 +36,13 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Texture3D::Texture3D(Context* context) :
     Texture(context)
 {
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
 #ifndef GL_ES_VERSION_2_0
     target_ = GL_TEXTURE_3D;
 #else
@@ -72,7 +72,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture load while device is lost");
+        ATOMIC_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -135,7 +135,7 @@ bool Texture3D::BeginLoad(Deserializer& source)
         return true;
     }
 
-    URHO3D_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
+    ATOMIC_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
     return false;
 }
 
@@ -162,12 +162,12 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
 {
     if (width <= 0 || height <= 0 || depth <= 0)
     {
-        URHO3D_LOGERROR("Zero or negative 3D texture dimensions");
+        ATOMIC_LOGERROR("Zero or negative 3D texture dimensions");
         return false;
     }
     if (usage >= TEXTURE_RENDERTARGET)
     {
-        URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
+        ATOMIC_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
         return false;
     }
 

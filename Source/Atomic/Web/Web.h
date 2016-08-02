@@ -37,7 +37,7 @@ struct WebPrivate;
 /// %Web subsystem. Manages HTTP requests and WebSocket communications.
 class ATOMIC_API Web : public Object
 {
-    OBJECT(Web);
+    ATOMIC_OBJECT(Web, Object);
 
 public:
     /// Construct.

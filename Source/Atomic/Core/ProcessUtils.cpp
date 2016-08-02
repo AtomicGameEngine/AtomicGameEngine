@@ -36,7 +36,9 @@
 #include "../Math/MathDefs.h"
 #include <mach/mach_host.h>
 #elif !defined(__linux__) && !defined(__EMSCRIPTEN__)
-#include <LibCpuId/libcpuid.h>
+// ATOMIC BEGIN
+#include <LibCpuId/src/libcpuid.h>
+// ATOMIC END
 #endif
 
 #ifdef _WIN32
@@ -80,12 +82,14 @@ inline void SetFPUState(unsigned control)
 #endif
 
 #ifndef MINI_URHO
-#include <SDL/SDL.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL.h>
+// ATOMIC END
 #endif
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 #ifdef _WIN32
@@ -316,7 +320,7 @@ const Vector<String>& GetArguments()
 String GetConsoleInput()
 {
     String ret;
-#ifdef URHO3D_TESTING
+#ifdef ATOMIC_TESTING
     // When we are running automated tests, reading the console may block. Just return empty in that case
     return ret;
 #else

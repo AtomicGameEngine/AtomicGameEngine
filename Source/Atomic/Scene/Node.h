@@ -26,7 +26,7 @@
 #include "../Math/Matrix3x4.h"
 #include "../Scene/Animatable.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Component;
@@ -52,9 +52,9 @@ enum TransformSpace
 };
 
 /// %Scene node that may contain components and child nodes.
-class URHO3D_API Node : public Animatable
+class ATOMIC_API Node : public Animatable
 {
-    URHO3D_OBJECT(Node, Animatable);
+    ATOMIC_OBJECT(Node, Animatable);
 
     friend class Connection;
 
@@ -112,16 +112,16 @@ public:
     /// Set position in parent space. If the scene node is on the root level (is child of the scene itself), this is same as world space.
     void SetPosition(const Vector3& position);
 
-    /// Set position in parent space (for Urho2D).
+    /// Set position in parent space (for Atomic2D).
     void SetPosition2D(const Vector2& position) { SetPosition(Vector3(position)); }
 
-    /// Set position in parent space (for Urho2D).
+    /// Set position in parent space (for Atomic2D).
     void SetPosition2D(float x, float y) { SetPosition(Vector3(x, y, 0.0f)); }
 
     /// Set rotation in parent space.
     void SetRotation(const Quaternion& rotation);
 
-    /// Set rotation in parent space (for Urho2D).
+    /// Set rotation in parent space (for Atomic2D).
     void SetRotation2D(float rotation) { SetRotation(Quaternion(rotation)); }
 
     /// Set forward direction in parent space. Positive Z axis equals identity rotation.
@@ -131,10 +131,10 @@ public:
     /// Set scale in parent space.
     void SetScale(const Vector3& scale);
 
-    /// Set scale in parent space (for Urho2D).
+    /// Set scale in parent space (for Atomic2D).
     void SetScale2D(const Vector2& scale) { SetScale(Vector3(scale, 1.0f)); }
 
-    /// Set scale in parent space (for Urho2D).
+    /// Set scale in parent space (for Atomic2D).
     void SetScale2D(float x, float y) { SetScale(Vector3(x, y, 1.0f)); }
 
     /// Set both position and rotation in parent space as an atomic operation. This is faster than setting position and rotation separately.
@@ -144,16 +144,16 @@ public:
     /// Set both position, rotation and scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
-    /// Set both position and rotation in parent space as an atomic operation (for Urho2D).
+    /// Set both position and rotation in parent space as an atomic operation (for Atomic2D).
     void SetTransform2D(const Vector2& position, float rotation) { SetTransform(Vector3(position), Quaternion(rotation)); }
 
-    /// Set both position, rotation and uniform scale in parent space as an atomic operation (for Urho2D).
+    /// Set both position, rotation and uniform scale in parent space as an atomic operation (for Atomic2D).
     void SetTransform2D(const Vector2& position, float rotation, float scale)
     {
         SetTransform(Vector3(position), Quaternion(rotation), scale);
     }
 
-    /// Set both position, rotation and scale in parent space as an atomic operation (for Urho2D).
+    /// Set both position, rotation and scale in parent space as an atomic operation (for Atomic2D).
     void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale)
     {
         SetTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f));
@@ -162,16 +162,16 @@ public:
     /// Set position in world space.
     void SetWorldPosition(const Vector3& position);
 
-    /// Set position in world space (for Urho2D).
+    /// Set position in world space (for Atomic2D).
     void SetWorldPosition2D(const Vector2& position) { SetWorldPosition(Vector3(position)); }
 
-    /// Set position in world space (for Urho2D).
+    /// Set position in world space (for Atomic2D).
     void SetWorldPosition2D(float x, float y) { SetWorldPosition(Vector3(x, y, 0.0f)); }
 
     /// Set rotation in world space.
     void SetWorldRotation(const Quaternion& rotation);
 
-    /// Set rotation in world space (for Urho2D).
+    /// Set rotation in world space (for Atomic2D).
     void SetWorldRotation2D(float rotation) { SetWorldRotation(Quaternion(rotation)); }
 
     /// Set forward direction in world space.
@@ -181,10 +181,10 @@ public:
     /// Set scale in world space.
     void SetWorldScale(const Vector3& scale);
 
-    /// Set scale in world space (for Urho2D).
+    /// Set scale in world space (for Atomic2D).
     void SetWorldScale2D(const Vector2& scale) { SetWorldScale(Vector3(scale, 1.0f)); }
 
-    /// Set scale in world space (for Urho2D).
+    /// Set scale in world space (for Atomic2D).
     void SetWorldScale2D(float x, float y) { SetWorldScale(Vector3(x, y, 1.0f)); }
 
     /// Set both position and rotation in world space as an atomic operation.
@@ -194,19 +194,19 @@ public:
     /// Set both position, rotation and scale in world space as an atomic opration.
     void SetWorldTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
 
-    /// Set both position and rotation in world space as an atomic operation (for Urho2D).
+    /// Set both position and rotation in world space as an atomic operation (for Atomic2D).
     void SetWorldTransform2D(const Vector2& position, float rotation)
     {
         SetWorldTransform(Vector3(position), Quaternion(rotation));
     }
 
-    /// Set both position, rotation and uniform scale in world space as an atomic operation (for Urho2D).
+    /// Set both position, rotation and uniform scale in world space as an atomic operation (for Atomic2D).
     void SetWorldTransform2D(const Vector2& position, float rotation, float scale)
     {
         SetWorldTransform(Vector3(position), Quaternion(rotation), scale);
     }
 
-    /// Set both position, rotation and scale in world space as an atomic opration (for Urho2D).
+    /// Set both position, rotation and scale in world space as an atomic opration (for Atomic2D).
     void SetWorldTransform2D(const Vector2& position, float rotation, const Vector2& scale)
     {
         SetWorldTransform(Vector3(position), Quaternion(rotation), Vector3(scale, 1.0f));
@@ -215,19 +215,19 @@ public:
     /// Move the scene node in the chosen transform space.
     void Translate(const Vector3& delta, TransformSpace space = TS_LOCAL);
 
-    /// Move the scene node in the chosen transform space (for Urho2D).
+    /// Move the scene node in the chosen transform space (for Atomic2D).
     void Translate2D(const Vector2& delta, TransformSpace space = TS_LOCAL) { Translate(Vector3(delta), space); }
 
     /// Rotate the scene node in the chosen transform space.
     void Rotate(const Quaternion& delta, TransformSpace space = TS_LOCAL);
 
-    /// Rotate the scene node in the chosen transform space (for Urho2D).
+    /// Rotate the scene node in the chosen transform space (for Atomic2D).
     void Rotate2D(float delta, TransformSpace space = TS_LOCAL) { Rotate(Quaternion(delta), space); }
 
     /// Rotate around a point in the chosen transform space.
     void RotateAround(const Vector3& point, const Quaternion& delta, TransformSpace space = TS_LOCAL);
 
-    /// Rotate around a point in the chosen transform space (for Urho2D).
+    /// Rotate around a point in the chosen transform space (for Atomic2D).
     void RotateAround2D(const Vector2& point, float delta, TransformSpace space = TS_LOCAL)
     {
         RotateAround(Vector3(point), Quaternion(delta), space);
@@ -246,7 +246,7 @@ public:
     /// Modify scale in parent space.
     void Scale(const Vector3& scale);
 
-    /// Modify scale in parent space (for Urho2D).
+    /// Modify scale in parent space (for Atomic2D).
     void Scale2D(const Vector2& scale) { Scale(Vector3(scale, 1.0f)); }
 
     /// Set enabled/disabled state without recursion. Components in a disabled node become effectively disabled regardless of their own enable/disable state.
@@ -345,13 +345,13 @@ public:
     /// Return position in parent space.
     const Vector3& GetPosition() const { return position_; }
 
-    /// Return position in parent space (for Urho2D).
+    /// Return position in parent space (for Atomic2D).
     Vector2 GetPosition2D() const { return Vector2(position_.x_, position_.y_); }
 
     /// Return rotation in parent space.
     const Quaternion& GetRotation() const { return rotation_; }
 
-    /// Return rotation in parent space (for Urho2D).
+    /// Return rotation in parent space (for Atomic2D).
     float GetRotation2D() const { return rotation_.RollAngle(); }
 
     /// Return forward direction in parent space. Positive Z axis equals identity rotation.
@@ -366,7 +366,7 @@ public:
     /// Return scale in parent space.
     const Vector3& GetScale() const { return scale_; }
 
-    /// Return scale in parent space (for Urho2D).
+    /// Return scale in parent space (for Atomic2D).
     Vector2 GetScale2D() const { return Vector2(scale_.x_, scale_.y_); }
 
     /// Return parent space transform matrix.
@@ -381,7 +381,7 @@ public:
         return worldTransform_.Translation();
     }
 
-    /// Return position in world space (for Urho2D).
+    /// Return position in world space (for Atomic2D).
     Vector2 GetWorldPosition2D() const
     {
         Vector3 worldPosition = GetWorldPosition();
@@ -397,7 +397,7 @@ public:
         return worldRotation_;
     }
 
-    /// Return rotation in world space (for Urho2D).
+    /// Return rotation in world space (for Atomic2D).
     float GetWorldRotation2D() const
     {
         return GetWorldRotation().RollAngle();
@@ -439,7 +439,7 @@ public:
         return worldTransform_.Scale();
     }
 
-    /// Return scale in world space (for Urho2D).
+    /// Return scale in world space (for Atomic2D).
     Vector2 GetWorldScale2D() const
     {
         Vector3 worldScale = GetWorldScale();
@@ -459,13 +459,13 @@ public:
     Vector3 LocalToWorld(const Vector3& position) const;
     /// Convert a local space position or rotation to world space.
     Vector3 LocalToWorld(const Vector4& vector) const;
-    /// Convert a local space position or rotation to world space (for Urho2D).
+    /// Convert a local space position or rotation to world space (for Atomic2D).
     Vector2 LocalToWorld2D(const Vector2& vector) const;
     /// Convert a world space position to local space.
     Vector3 WorldToLocal(const Vector3& position) const;
     /// Convert a world space position or rotation to local space.
     Vector3 WorldToLocal(const Vector4& vector) const;
-    /// Convert a world space position or rotation to local space (for Urho2D).
+    /// Convert a world space position or rotation to local space (for Atomic2D).
     Vector2 WorldToLocal2D(const Vector2& vector) const;
 
     /// Return whether transform has changed and world transform needs recalculation.

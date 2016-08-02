@@ -30,7 +30,7 @@
 #include "../Core/Thread.h"
 #include "../Math/StringHash.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Resource;

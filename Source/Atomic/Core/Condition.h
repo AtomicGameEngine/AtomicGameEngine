@@ -22,17 +22,17 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Condition on which a thread can wait.
-class URHO3D_API Condition
+class ATOMIC_API Condition
 {
 public:
     /// Construct.

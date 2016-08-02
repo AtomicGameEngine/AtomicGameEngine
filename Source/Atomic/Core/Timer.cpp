@@ -39,7 +39,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 bool HiresTimer::supported(false);
@@ -115,7 +115,7 @@ void Time::BeginFrame(float timeStep)
         profiler->BeginFrame();
 
     {
-        URHO3D_PROFILE(BeginFrame);
+        ATOMIC_PROFILE(BeginFrame);
 
         // Frame begin event
         using namespace BeginFrame;
@@ -130,7 +130,7 @@ void Time::BeginFrame(float timeStep)
 void Time::EndFrame()
 {
     {
-        URHO3D_PROFILE(EndFrame);
+        ATOMIC_PROFILE(EndFrame);
 
         // Frame end event
         SendEvent(E_ENDFRAME);

@@ -25,7 +25,7 @@
 #include "../Resource/Resource.h"
 #include "../Scene/AnimationDefs.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ValueAnimation;
@@ -34,9 +34,9 @@ class XMLElement;
 class JSONValue;
 
 /// Object animation class, an object animation include one or more attribute animations and theirs wrap mode and speed for an Animatable object.
-class URHO3D_API ObjectAnimation : public Resource
+class ATOMIC_API ObjectAnimation : public Resource
 {
-    URHO3D_OBJECT(ObjectAnimation, Resource);
+    ATOMIC_OBJECT(ObjectAnimation, Resource);
 
 public:
     /// Construct.

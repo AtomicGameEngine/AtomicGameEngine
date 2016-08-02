@@ -36,13 +36,13 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Texture2D::Texture2D(Context* context) :
     Texture(context)
 {
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     target_ = GL_TEXTURE_2D;
 #endif
 }
@@ -66,7 +66,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture load while device is lost");
+        ATOMIC_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -113,7 +113,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 {
     if (width <= 0 || height <= 0)
     {
-        URHO3D_LOGERROR("Zero or negative texture dimensions");
+        ATOMIC_LOGERROR("Zero or negative texture dimensions");
         return false;
     }
 
@@ -134,7 +134,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, ATOMIC_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 

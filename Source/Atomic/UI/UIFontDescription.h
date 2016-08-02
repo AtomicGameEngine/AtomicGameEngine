@@ -29,7 +29,7 @@ namespace Atomic
 
 class UIFontDescription : public Object
 {
-    OBJECT(UIFontDescription)
+    ATOMIC_OBJECT(UIFontDescription, Object)
 
 public:
 

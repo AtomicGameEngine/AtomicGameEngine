@@ -32,7 +32,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* NAVIGATION_CATEGORY;
@@ -54,9 +54,9 @@ Obstacle::~Obstacle()
 void Obstacle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Obstacle>(NAVIGATION_CATEGORY);
-    URHO3D_COPY_BASE_ATTRIBUTES(Component);
-    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 5.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, float, 5.0f, AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Component);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, 5.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Height", GetHeight, SetHeight, float, 5.0f, AM_DEFAULT);
 }
 
 void Obstacle::OnSetEnabled()
@@ -92,7 +92,7 @@ void Obstacle::OnSceneSet(Scene* scene)
     {
         if (scene == node_)
         {
-            URHO3D_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            ATOMIC_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
             return;
         }
         if (!ownerMesh_)

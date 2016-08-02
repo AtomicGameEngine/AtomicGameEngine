@@ -28,15 +28,15 @@
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class FileSystem;
 
 /// Watches a directory and its subdirectories for files being modified.
-class URHO3D_API FileWatcher : public Object, public Thread
+class ATOMIC_API FileWatcher : public Object, public Thread
 {
-    URHO3D_OBJECT(FileWatcher, Object);
+    ATOMIC_OBJECT(FileWatcher, Object);
 
 public:
     /// Construct.

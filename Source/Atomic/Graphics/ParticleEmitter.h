@@ -24,7 +24,7 @@
 
 #include "../Graphics/BillboardSet.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ParticleEffect;
@@ -51,9 +51,9 @@ struct Particle
 };
 
 /// %Particle emitter component.
-class URHO3D_API ParticleEmitter : public BillboardSet
+class ATOMIC_API ParticleEmitter : public BillboardSet
 {
-    URHO3D_OBJECT(ParticleEmitter, BillboardSet);
+    ATOMIC_OBJECT(ParticleEmitter, BillboardSet);
 
 public:
     /// Construct.

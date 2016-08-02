@@ -28,7 +28,7 @@
 #include "../Graphics/GraphicsDefs.h"
 #include "../Math/Frustum.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BoundingBox;
@@ -86,9 +86,9 @@ static const float OCCLUSION_X_SCALE = 65536.0f;
 static const float OCCLUSION_Z_SCALE = 16777216.0f;
 
 /// Software renderer for occlusion.
-class URHO3D_API OcclusionBuffer : public Object
+class ATOMIC_API OcclusionBuffer : public Object
 {
-    URHO3D_OBJECT(OcclusionBuffer, Object);
+    ATOMIC_OBJECT(OcclusionBuffer, Object);
 
 public:
     /// Construct.

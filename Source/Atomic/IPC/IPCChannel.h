@@ -43,7 +43,7 @@ namespace Atomic
 
 class IPCChannel : public Object, public Thread
 {
-    OBJECT(IPCChannel)
+    ATOMIC_OBJECT(IPCChannel, Object)
 
 public:
 

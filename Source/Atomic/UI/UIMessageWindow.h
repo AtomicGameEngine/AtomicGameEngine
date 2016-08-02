@@ -39,7 +39,7 @@ enum UI_MESSAGEWINDOW_SETTINGS
 
 class UIMessageWindow : public UIWindow
 {
-    OBJECT(UIMessageWindow)
+    ATOMIC_OBJECT(UIMessageWindow, UIWindow)
 
 public:
 

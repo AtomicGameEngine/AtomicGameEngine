@@ -26,14 +26,14 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
-#include "../Urho2D/StaticSprite2D.h"
-#include "../Urho2D/TileMap2D.h"
-#include "../Urho2D/TileMapLayer2D.h"
-#include "../Urho2D/TmxFile2D.h"
+#include "../Atomic2D/StaticSprite2D.h"
+#include "../Atomic2D/TileMap2D.h"
+#include "../Atomic2D/TileMapLayer2D.h"
+#include "../Atomic2D/TmxFile2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 TileMapLayer2D::TileMapLayer2D(Context* context) :

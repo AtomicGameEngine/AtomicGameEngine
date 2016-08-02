@@ -26,11 +26,13 @@
 #include "../IO/Log.h"
 #include "../Resource/XMLFile.h"
 
-#include <PugiXml/pugixml.hpp>
+// ATOMIC BEGIN
+#include <PugiXml/src/pugixml.hpp>
+// ATOMIC END
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const XMLElement XMLElement::EMPTY;
@@ -968,7 +970,7 @@ XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
 XMLElement XPathResultSet::operator [](unsigned index) const
 {
     if (!resultSet_)
-        URHO3D_LOGERRORF(
+        ATOMIC_LOGERRORF(
             "Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.",
             index);
 

@@ -26,7 +26,7 @@
 #include "../Math/Frustum.h"
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BoundingBox;
@@ -92,9 +92,9 @@ struct DebugTriangle
 };
 
 /// Debug geometry rendering component. Should be added only to the root scene node.
-class URHO3D_API DebugRenderer : public Component
+class ATOMIC_API DebugRenderer : public Component
 {
-    URHO3D_OBJECT(DebugRenderer, Component);
+    ATOMIC_OBJECT(DebugRenderer, Component);
 
 public:
     /// Construct.

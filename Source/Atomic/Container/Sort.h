@@ -25,7 +25,7 @@
 #include "../Container/Swap.h"
 #include "../Container/VectorBase.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int QUICKSORT_THRESHOLD = 16;

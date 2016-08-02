@@ -24,7 +24,7 @@
 
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %File entry within the package file.
@@ -39,9 +39,9 @@ struct PackageEntry
 };
 
 /// Stores files of a directory tree sequentially for convenient access.
-class URHO3D_API PackageFile : public Object
+class ATOMIC_API PackageFile : public Object
 {
-    URHO3D_OBJECT(PackageFile, Object);
+    ATOMIC_OBJECT(PackageFile, Object);
 
 public:
     /// Construct.

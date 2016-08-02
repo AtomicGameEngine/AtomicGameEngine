@@ -24,11 +24,11 @@
 
 #include "../Math/Matrix3x4.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Surface in three-dimensional space.
-class URHO3D_API Plane
+class ATOMIC_API Plane
 {
 public:
     /// Construct a degenerate plane with zero normal and parameter.

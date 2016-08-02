@@ -24,11 +24,11 @@
 
 #include "../Math/Vector4.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Two-dimensional bounding rectangle.
-class URHO3D_API Rect
+class ATOMIC_API Rect
 {
 public:
     /// Construct an undefined rect.
@@ -193,7 +193,7 @@ public:
 };
 
 /// Two-dimensional bounding rectangle with integer values.
-class URHO3D_API IntRect
+class ATOMIC_API IntRect
 {
 public:
     /// Construct a zero rect.

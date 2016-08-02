@@ -24,7 +24,7 @@
 
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class XMLElement;
@@ -50,7 +50,7 @@ typedef HashMap<String, PListValue> PListValueMap;
 typedef Vector<PListValue> PListValueVector;
 
 /// PList value.
-class URHO3D_API PListValue
+class ATOMIC_API PListValue
 {
 public:
     /// Construct.
@@ -135,9 +135,9 @@ private:
 };
 
 /// Property list (plist).
-class URHO3D_API PListFile : public Resource
+class ATOMIC_API PListFile : public Resource
 {
-    URHO3D_OBJECT(PListFile, Resource);
+    ATOMIC_OBJECT(PListFile, Resource);
 
 public:
     /// Construct.

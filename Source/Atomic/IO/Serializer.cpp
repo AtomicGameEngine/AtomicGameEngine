@@ -26,7 +26,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const float q = 32767.0f;

@@ -24,7 +24,7 @@
 
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Image;
@@ -34,9 +34,9 @@ class Node;
 class TerrainPatch;
 
 /// Heightmap terrain component.
-class URHO3D_API Terrain : public Component
+class ATOMIC_API Terrain : public Component
 {
-    URHO3D_OBJECT(Terrain, Component);
+    ATOMIC_OBJECT(Terrain, Component);
 
 public:
     /// Construct.

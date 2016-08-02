@@ -24,13 +24,13 @@
 
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// A link between otherwise unconnected regions of the navigation mesh.
-class URHO3D_API OffMeshConnection : public Component
+class ATOMIC_API OffMeshConnection : public Component
 {
-    URHO3D_OBJECT(OffMeshConnection, Component);
+    ATOMIC_OBJECT(OffMeshConnection, Component);
 
 public:
     /// Construct.

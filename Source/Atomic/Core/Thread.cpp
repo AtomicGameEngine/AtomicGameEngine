@@ -32,10 +32,10 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
-#ifdef URHO3D_THREADING
+#ifdef ATOMIC_THREADING
 #ifdef _WIN32
 
 DWORD WINAPI ThreadFunctionStatic(void* data)
@@ -73,7 +73,7 @@ Thread::~Thread()
 
 bool Thread::Run()
 {
-#ifdef URHO3D_THREADING
+#ifdef ATOMIC_THREADING
     // Check if already running
     if (handle_)
         return false;
@@ -96,7 +96,7 @@ bool Thread::Run()
 
 void Thread::Stop()
 {
-#ifdef URHO3D_THREADING
+#ifdef ATOMIC_THREADING
     // Check if already stopped
     if (!handle_)
         return;
@@ -117,7 +117,7 @@ void Thread::Stop()
 
 void Thread::SetPriority(int priority)
 {
-#ifdef URHO3D_THREADING
+#ifdef ATOMIC_THREADING
 #ifdef _WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
@@ -146,7 +146,7 @@ ThreadID Thread::GetCurrentThreadID()
 
 bool Thread::IsMainThread()
 {
-#ifdef URHO3D_THREADING
+#ifdef ATOMIC_THREADING
     return GetCurrentThreadID() == mainThreadID;
 #else
     return true;

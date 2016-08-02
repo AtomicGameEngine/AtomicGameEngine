@@ -22,20 +22,20 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
 #include <initializer_list>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Singly-linked list node base class.
-struct URHO3D_API LinkedListNode
+struct ATOMIC_API LinkedListNode
 {
     /// Construct.
     LinkedListNode() :
@@ -56,7 +56,7 @@ public:
         head_(0)
     {
     }
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Aggregate initialization constructor.
     LinkedList(const std::initializer_list<T>& list) : LinkedList()
     {

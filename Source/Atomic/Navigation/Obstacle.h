@@ -25,15 +25,15 @@
 #include "../Container/Ptr.h"
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class DynamicNavigationMesh;
 
 /// Obstacle for dynamic navigation mesh.
-class URHO3D_API Obstacle : public Component
+class ATOMIC_API Obstacle : public Component
 {
-    URHO3D_OBJECT(Obstacle, Component)
+    ATOMIC_OBJECT(Obstacle, Component)
 
     friend class DynamicNavigationMesh;
 

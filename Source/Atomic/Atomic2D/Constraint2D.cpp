@@ -26,14 +26,14 @@
 #include "../IO/Log.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
-#include "../Urho2D/Constraint2D.h"
-#include "../Urho2D/PhysicsUtils2D.h"
-#include "../Urho2D/RigidBody2D.h"
-#include "../Urho2D/PhysicsWorld2D.h"
+#include "../Atomic2D/Constraint2D.h"
+#include "../Atomic2D/PhysicsUtils2D.h"
+#include "../Atomic2D/RigidBody2D.h"
+#include "../Atomic2D/PhysicsWorld2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* URHO2D_CATEGORY;
@@ -59,7 +59,7 @@ Constraint2D::~Constraint2D()
 
 void Constraint2D::RegisterObject(Context* context)
 {
-    URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
 }
 
 void Constraint2D::OnSetEnabled()
@@ -130,7 +130,7 @@ void Constraint2D::OnNodeSet(Node* node)
         ownerBody_ = node->GetComponent<RigidBody2D>();
         if (!ownerBody_)
         {
-            URHO3D_LOGERROR("No right body component in node, can not create constraint");
+            ATOMIC_LOGERROR("No right body component in node, can not create constraint");
             return;
         }
     }

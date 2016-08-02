@@ -10,7 +10,7 @@ class ScriptComponentFile;
 
 class ATOMIC_API ScriptComponent : public Component
 {
-    OBJECT(ScriptComponent);
+    ATOMIC_OBJECT(ScriptComponent, Component);
 
 public:
 

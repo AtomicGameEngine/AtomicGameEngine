@@ -27,7 +27,7 @@
 #include "../Math/Vector3.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Skeletal animation keyframe.
@@ -51,7 +51,7 @@ struct AnimationKeyFrame
 };
 
 /// Skeletal animation track, stores keyframes of a single bone.
-struct URHO3D_API AnimationTrack
+struct ATOMIC_API AnimationTrack
 {
     /// Construct.
     AnimationTrack() :
@@ -107,9 +107,9 @@ static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
 
 /// Skeletal animation resource.
-class URHO3D_API Animation : public Resource
+class ATOMIC_API Animation : public Resource
 {
-    URHO3D_OBJECT(Animation, Resource);
+    ATOMIC_OBJECT(Animation, Resource);
 
 public:
     /// Construct.

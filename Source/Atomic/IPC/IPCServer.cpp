@@ -66,9 +66,9 @@ namespace Atomic
         serverBroker_->PostMessage(E_IPCINITIALIZE, startupData);
         brokerEnabled_ = true;
 
-        SubscribeToEvent(E_UPDATE, HANDLER(IPCServer, HandleUpdate));
+        SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(IPCServer, HandleUpdate));
 
-        SubscribeToEvent(serverBroker_, E_IPCCMDRESULT, HANDLER(IPCServer, HandleIPCCmdResult));
+        SubscribeToEvent(serverBroker_, E_IPCCMDRESULT, ATOMIC_HANDLER(IPCServer, HandleIPCCmdResult));
     }
 
     void IPCServer::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData)
@@ -104,27 +104,27 @@ namespace Atomic
 
         if (!clientExecutable_.Length() || !fileSystem->FileExists(clientExecutable_))
         {
-            LOGERRORF("IPCServer::Start - Client Executable does not exist: %s", clientExecutable_.CString());
+            ATOMIC_LOGERRORF("IPCServer::Start - Client Executable does not exist: %s", clientExecutable_.CString());
             return false;
         }
 
         String dump;
         dump.Join(args, " ");
 
-        LOGDEBUGF("Launching Broker %s %s", clientExecutable_.CString(), dump.CString());
+        ATOMIC_LOGDEBUGF("Launching Broker %s %s", clientExecutable_.CString(), dump.CString());
 
         IPC* ipc = GetSubsystem<IPC>();
         serverBroker_ = ipc->SpawnWorker(clientExecutable_, args);
 
         if (serverBroker_)
         {
-            SubscribeToEvent(serverBroker_, E_IPCWORKERSTART, HANDLER(IPCServer, HandleIPCWorkerStarted));
-            SubscribeToEvent(serverBroker_, E_IPCWORKEREXIT, HANDLER(IPCServer, HandleIPCWorkerExit));
-            SubscribeToEvent(serverBroker_, E_IPCWORKERLOG, HANDLER(IPCServer, HandleIPCWorkerLog));
+            SubscribeToEvent(serverBroker_, E_IPCWORKERSTART, ATOMIC_HANDLER(IPCServer, HandleIPCWorkerStarted));
+            SubscribeToEvent(serverBroker_, E_IPCWORKEREXIT, ATOMIC_HANDLER(IPCServer, HandleIPCWorkerExit));
+            SubscribeToEvent(serverBroker_, E_IPCWORKERLOG, ATOMIC_HANDLER(IPCServer, HandleIPCWorkerLog));
         }
         else
         {
-            LOGERRORF("Error Spawning Broker %s %s", clientExecutable_.CString(), dump.CString());
+            ATOMIC_LOGERRORF("Error Spawning Broker %s %s", clientExecutable_.CString(), dump.CString());
         }
 
         return serverBroker_.NotNull();
@@ -157,7 +157,7 @@ namespace Atomic
 
                 if (cmd.handler_.Expired())
                 {
-                    LOGERROR("IPCServer::HandleIPCNETCmdResult - IPCNETResult for expired client");
+                    ATOMIC_LOGERROR("IPCServer::HandleIPCNETCmdResult - IPCNETResult for expired client");
                     break;
                 }
 
@@ -172,7 +172,7 @@ namespace Atomic
 
         if (!found)
         {
-            LOGERRORF("IPCServer::HandleIPCNETCmdResult - IPCNETResult command %u not found in process queue", id);
+            ATOMIC_LOGERRORF("IPCServer::HandleIPCNETCmdResult - IPCNETResult command %u not found in process queue", id);
         }
 
     }
@@ -205,7 +205,7 @@ namespace Atomic
 
         if (!serverBroker_)
         {
-            LOGERRORF("IPCServer::HandleUpdate - null player broker for command: %s", cmdString.CString());
+            ATOMIC_LOGERRORF("IPCServer::HandleUpdate - null player broker for command: %s", cmdString.CString());
             return;
         }
 

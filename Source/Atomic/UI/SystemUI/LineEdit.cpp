@@ -64,9 +64,9 @@ LineEdit::LineEdit(Context* context) :
     cursor_->SetInternal(true);
     cursor_->SetPriority(1); // Show over text
 
-    SubscribeToEvent(this, E_FOCUSED, HANDLER(LineEdit, HandleFocused));
-    SubscribeToEvent(this, E_DEFOCUSED, HANDLER(LineEdit, HandleDefocused));
-    SubscribeToEvent(this, E_LAYOUTUPDATED, HANDLER(LineEdit, HandleLayoutUpdated));
+    SubscribeToEvent(this, E_FOCUSED, ATOMIC_HANDLER(LineEdit, HandleFocused));
+    SubscribeToEvent(this, E_DEFOCUSED, ATOMIC_HANDLER(LineEdit, HandleDefocused));
+    SubscribeToEvent(this, E_LAYOUTUPDATED, ATOMIC_HANDLER(LineEdit, HandleLayoutUpdated));
 }
 
 LineEdit::~LineEdit()
@@ -77,16 +77,16 @@ void LineEdit::RegisterObject(Context* context)
 {
     context->RegisterFactory<LineEdit>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
-    ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
-    ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
+    ATOMIC_COPY_BASE_ATTRIBUTES(BorderImage);
+    ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
+    ATOMIC_ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
 }
 
 void LineEdit::ApplyAttributes()

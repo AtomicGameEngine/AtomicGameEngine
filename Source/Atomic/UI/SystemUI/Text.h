@@ -75,7 +75,7 @@ struct GlyphLocation
 /// %Text %UI element.
 class ATOMIC_API Text : public UIElement
 {
-    OBJECT(Text);
+    ATOMIC_OBJECT(Text, UIElement);
 
     friend class Text3D;
 

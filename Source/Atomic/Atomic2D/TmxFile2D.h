@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../Resource/Resource.h"
-#include "../Urho2D/TileMapDefs2D.h"
+#include "../Atomic2D/TileMapDefs2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Sprite2D;
@@ -151,9 +151,9 @@ private:
 };
 
 /// Tile map file.
-class URHO3D_API TmxFile2D : public Resource
+class ATOMIC_API TmxFile2D : public Resource
 {
-    URHO3D_OBJECT(TmxFile2D, Resource);
+    ATOMIC_OBJECT(TmxFile2D, Resource);
 
 public:
     /// Construct.
@@ -175,7 +175,7 @@ public:
     void AddLayer(unsigned index, TmxLayer2D *layer);
 
     /// Append layer to end.
-    void AddLayer(Urho3D::TmxLayer2D* layer);
+    void AddLayer(Atomic::TmxLayer2D* layer);
 
     /// Return Tilemap information.
     const TileMapInfo2D& GetInfo() const { return info_; }

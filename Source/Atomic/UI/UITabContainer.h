@@ -31,7 +31,7 @@ class UILayout;
 
 class UITabContainer : public UIWidget
 {
-    OBJECT(UITabContainer)
+    ATOMIC_OBJECT(UITabContainer, UIWidget)
 
 public:
 

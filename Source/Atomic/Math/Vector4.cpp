@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const Vector4 Vector4::ZERO;

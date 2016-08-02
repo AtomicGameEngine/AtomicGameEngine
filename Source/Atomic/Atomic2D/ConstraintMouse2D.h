@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Urho2D/Constraint2D.h"
+#include "../Atomic2D/Constraint2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 2D mouse constraint component.
-class URHO3D_API ConstraintMouse2D : public Constraint2D
+class ATOMIC_API ConstraintMouse2D : public Constraint2D
 {
-    URHO3D_OBJECT(ConstraintMouse2D, Constraint2D);
+    ATOMIC_OBJECT(ConstraintMouse2D, Constraint2D);
 
 public:
     /// Construct.

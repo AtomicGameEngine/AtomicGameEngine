@@ -26,7 +26,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 // Static initialization order can not be relied on, so do not use Vector3 constants

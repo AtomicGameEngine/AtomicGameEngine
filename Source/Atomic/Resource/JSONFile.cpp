@@ -39,7 +39,7 @@
 
 using namespace rapidjson;
 
-namespace Urho3D
+namespace Atomic
 {
 
 JSONFile::JSONFile(Context* context) :
@@ -118,7 +118,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        URHO3D_LOGERROR("Zero sized JSON data in " + source.GetName());
+        ATOMIC_LOGERROR("Zero sized JSON data in " + source.GetName());
         return false;
     }
 
@@ -130,7 +130,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     rapidjson::Document document;
     if (document.Parse<0>(buffer).HasParseError())
     {
-        URHO3D_LOGERROR("Could not parse JSON data from " + source.GetName());
+        ATOMIC_LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
     }
 
@@ -239,5 +239,26 @@ bool JSONFile::FromString(const String & source)
     MemoryBuffer buffer(source.CString(), source.Length());
     return Load(buffer);
 }
+
+// ATOMIC BEGIN
+
+bool JSONFile::ParseJSON(const String& json, JSONValue& value, bool reportError)
+{
+    rapidjson::Document document;
+    if (document.Parse<0>(json.CString()).HasParseError())
+    {
+        if (reportError)
+            ATOMIC_LOGERRORF("Could not parse JSON data from string with error: %s", document.GetParseError());
+
+        return false;
+    }
+
+    ToJSONValue(value, document);
+
+    return true;
+
+}
+
+// ATOMIC END
 
 }

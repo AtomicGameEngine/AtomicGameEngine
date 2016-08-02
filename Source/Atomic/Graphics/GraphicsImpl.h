@@ -25,9 +25,9 @@
 // Note: GraphicsImpl class is purposefully API-specific. It should not be used by Urho3D client applications,
 // unless required for e.g. integration of 3rd party libraries that interface directly with the graphics device.
 
-#if defined(URHO3D_OPENGL)
+#if defined(ATOMIC_OPENGL)
 #include "OpenGL/OGLGraphicsImpl.h"
-#elif defined(URHO3D_D3D11)
+#elif defined(ATOMIC_D3D11)
 #include "Direct3D11/D3D11GraphicsImpl.h"
 #else
 #include "Direct3D9/D3D9GraphicsImpl.h"

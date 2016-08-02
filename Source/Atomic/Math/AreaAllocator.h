@@ -24,11 +24,11 @@
 
 #include "../Math/Rect.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Rectangular area allocator.
-class URHO3D_API AreaAllocator
+class ATOMIC_API AreaAllocator
 {
 public:
     /// Default construct with empty size.

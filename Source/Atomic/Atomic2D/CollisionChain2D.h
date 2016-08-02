@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include "../Urho2D/CollisionShape2D.h"
+#include "../Atomic2D/CollisionShape2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 /// 2D chain collision component.
-class URHO3D_API CollisionChain2D : public CollisionShape2D
+class ATOMIC_API CollisionChain2D : public CollisionShape2D
 {
-    URHO3D_OBJECT(CollisionChain2D, CollisionShape2D);
+    ATOMIC_OBJECT(CollisionChain2D, CollisionShape2D);
 
 public:
     /// Construct.

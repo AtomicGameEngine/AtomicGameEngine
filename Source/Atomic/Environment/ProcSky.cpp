@@ -74,7 +74,7 @@ void ProcSky::RegisterObject(Context* context)
 {
     context->RegisterFactory<ProcSky>(GEOMETRY_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(Drawable);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Drawable);
 }
 
 
@@ -128,8 +128,8 @@ void ProcSky::OnNodeSet(Node* node)
 
     if (node && node->GetScene())
     {
-        SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, HANDLER(ProcSky, HandleSceneUpdate));
-        SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(ProcSky, HandleBeginViewUpdate));
+        SubscribeToEvent(node->GetScene(), E_SCENEUPDATE, ATOMIC_HANDLER(ProcSky, HandleSceneUpdate));
+        SubscribeToEvent(E_BEGINVIEWUPDATE, ATOMIC_HANDLER(ProcSky, HandleBeginViewUpdate));
     }
 
 }
@@ -439,7 +439,7 @@ void ProcSky::Initialize()
 
     skyMaterial_ = cache->GetResource<Material>("Materials/ProcSky.xml");
 
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL );
+    geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetIndexBuffer(indexBuffer_);
 
     indexBuffer_->SetSize( 6, false);

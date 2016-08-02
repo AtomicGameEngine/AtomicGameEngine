@@ -26,7 +26,7 @@
 #include "../Scene/Component.h"
 #include "../Graphics/AnimationState.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class AnimatedModel;
@@ -81,9 +81,9 @@ struct AnimationControl
 };
 
 /// %Component that drives an AnimatedModel's animations.
-class URHO3D_API AnimationController : public Component
+class ATOMIC_API AnimationController : public Component
 {
-    URHO3D_OBJECT(AnimationController, Component);
+    ATOMIC_OBJECT(AnimationController, Component);
 
 public:
     /// Construct.

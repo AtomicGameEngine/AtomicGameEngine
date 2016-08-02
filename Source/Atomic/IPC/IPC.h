@@ -43,7 +43,7 @@ struct QueuedEvent
 
 class IPC : public Object
 {
-    OBJECT(IPC);
+    ATOMIC_OBJECT(IPC, Object);
 
 public:
 

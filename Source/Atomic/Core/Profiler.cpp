@@ -29,7 +29,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int LINE_MAX_LENGTH = 256;

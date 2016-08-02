@@ -30,7 +30,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const unsigned CLIPMASK_X_POS = 0x1;
@@ -79,7 +79,7 @@ bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
 
     if (!IsPowerOfTwo((unsigned)width))
     {
-        URHO3D_LOGERRORF("Requested occlusion buffer width %d is not a power of two", width);
+        ATOMIC_LOGERRORF("Requested occlusion buffer width %d is not a power of two", width);
         return false;
     }
 
@@ -112,7 +112,7 @@ bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
             break;
     }
 
-    URHO3D_LOGDEBUG("Set occlusion buffer size " + String(width_) + "x" + String(height_) + " with " +
+    ATOMIC_LOGDEBUG("Set occlusion buffer size " + String(width_) + "x" + String(height_) + " with " +
              String(mipBuffers_.Size()) + " mip levels and " + String(numThreadBuffers) + " thread buffers");
 
     CalculateViewport();
@@ -243,7 +243,7 @@ void OcclusionBuffer::BuildDepthHierarchy()
     if (buffers_.Empty() || !depthHierarchyDirty_)
         return;
 
-    URHO3D_PROFILE(BuildDepthHierarchy);
+    ATOMIC_PROFILE(BuildDepthHierarchy);
 
     // Build the first mip level from the pixel-level data
     int width = (width_ + 1) / 2;
@@ -996,7 +996,7 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
 
 void OcclusionBuffer::MergeBuffers()
 {
-    URHO3D_PROFILE(MergeBuffers);
+    ATOMIC_PROFILE(MergeBuffers);
 
     for (unsigned i = 1; i < buffers_.Size(); ++i)
     {

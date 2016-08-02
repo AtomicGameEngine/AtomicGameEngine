@@ -298,9 +298,15 @@ void NetworkWorkerThread::MainLoop()
 				} catch(const NetException &e)
 				{
 					KNET_LOG(LogError, (std::string("kNet::NetException thrown when processing client connection: ") + e.what()).c_str());
-					if (connection->GetSocket())
-						connection->GetSocket()->Close();
-				}
+                    // ATOMIC BEGIN
+                    //Just ignore the exception and keep the socket open.
+                    //Because we have to send dummy packets to open the ports on the routers,
+                    //a non-valid packet may get through. We don't want to close the socket when
+                    //this happens.
+                    //if (connection->GetSocket())
+                    //	connection->GetSocket()->Close();
+                    // ATOMIC END
+                }
 			}
 			else // A UDP server received a message.
 			{

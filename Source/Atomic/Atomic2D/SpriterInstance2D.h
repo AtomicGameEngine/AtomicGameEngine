@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Urho2D/SpriterData2D.h"
+#include "../Atomic2D/SpriterData2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Component;

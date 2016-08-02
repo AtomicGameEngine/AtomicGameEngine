@@ -25,7 +25,7 @@
 #include "../Audio/SoundListener.h"
 #include "../Core/Context.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* AUDIO_CATEGORY;
@@ -43,7 +43,7 @@ void SoundListener::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundListener>(AUDIO_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
 }
 
 }

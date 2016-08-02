@@ -38,7 +38,7 @@ class xpath_variable_set;
 
 }
 
-namespace Urho3D
+namespace Atomic
 {
 
 class XMLFile;
@@ -46,7 +46,7 @@ class XPathQuery;
 class XPathResultSet;
 
 /// Element in an XML file.
-class URHO3D_API XMLElement
+class ATOMIC_API XMLElement
 {
 public:
     /// Construct null element.
@@ -296,7 +296,7 @@ private:
 };
 
 /// XPath query result set.
-class URHO3D_API XPathResultSet
+class ATOMIC_API XPathResultSet
 {
 public:
     /// Construct empty result set.
@@ -331,7 +331,7 @@ private:
 };
 
 /// XPath query.
-class URHO3D_API XPathQuery
+class ATOMIC_API XPathQuery
 {
 public:
     /// Construct empty.

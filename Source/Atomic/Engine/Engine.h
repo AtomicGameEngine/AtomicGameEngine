@@ -25,16 +25,16 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Console;
 class DebugHud;
 
 /// Urho3D engine. Creates the other subsystems.
-class URHO3D_API Engine : public Object
+class ATOMIC_API Engine : public Object
 {
-    URHO3D_OBJECT(Engine, Object);
+    ATOMIC_OBJECT(Engine, Object);
 
 public:
     /// Construct.
@@ -140,7 +140,7 @@ private:
     unsigned maxInactiveFps_;
     /// Pause when minimized flag.
     bool pauseMinimized_;
-#ifdef URHO3D_TESTING
+#ifdef ATOMIC_TESTING
     /// Time out counter for testing.
     long long timeOut_;
 #endif

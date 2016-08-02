@@ -32,7 +32,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static PListValue EMPTY_VALUE;
@@ -308,14 +308,14 @@ bool PListFile::BeginLoad(Deserializer& source)
     XMLFile xmlFile(context_);
     if (!xmlFile.Load(source))
     {
-        URHO3D_LOGERROR("Could not load property list");
+        ATOMIC_LOGERROR("Could not load property list");
         return false;
     }
 
     XMLElement plistElem = xmlFile.GetRoot("plist");
     if (!plistElem)
     {
-        URHO3D_LOGERROR("Invalid property list file");
+        ATOMIC_LOGERROR("Invalid property list file");
         return false;
     }
 
@@ -399,7 +399,7 @@ bool PListFile::LoadValue(PListValue& value, const XMLElement& valueElem)
     }
     else
     {
-        URHO3D_LOGERROR("Supported value type");
+        ATOMIC_LOGERROR("Supported value type");
         return false;
     }
 

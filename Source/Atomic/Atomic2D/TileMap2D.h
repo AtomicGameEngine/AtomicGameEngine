@@ -23,18 +23,18 @@
 #pragma once
 
 #include "../Scene/Component.h"
-#include "../Urho2D/TileMapDefs2D.h"
+#include "../Atomic2D/TileMapDefs2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class TileMapLayer2D;
 class TmxFile2D;
 
 /// Tile map component.
-class URHO3D_API TileMap2D : public Component
+class ATOMIC_API TileMap2D : public Component
 {
-    URHO3D_OBJECT(TileMap2D, Component);
+    ATOMIC_OBJECT(TileMap2D, Component);
 
 public:
     /// Construct.

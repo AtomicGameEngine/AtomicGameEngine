@@ -34,7 +34,7 @@ namespace SystemUI
 /// %UI element which allows sub-pixel positioning and size, as well as rotation. Only other Sprites should be added as child elements.
 class ATOMIC_API Sprite : public UIElement
 {
-    OBJECT(Sprite);
+    ATOMIC_OBJECT(Sprite, UIElement);
 
 public:
     /// Construct.

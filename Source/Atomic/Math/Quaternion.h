@@ -24,34 +24,34 @@
 
 #include "../Math/Matrix3.h"
 
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
 #include <emmintrin.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Rotation represented as a four-dimensional normalized vector.
-class URHO3D_API Quaternion
+class ATOMIC_API Quaternion
 {
 public:
     /// Construct an identity quaternion.
     Quaternion()
-#ifndef URHO3D_SSE
+#ifndef ATOMIC_SSE
        :w_(1.0f),
         x_(0.0f),
         y_(0.0f),
         z_(0.0f)
 #endif
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&w_, _mm_set_ps(0.f, 0.f, 0.f, 1.f));
 #endif
     }
 
     /// Copy-construct from another quaternion.
     Quaternion(const Quaternion& quat)
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+#if defined(ATOMIC_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
     {
         _mm_storeu_ps(&w_, _mm_loadu_ps(&quat.w_));
     }
@@ -66,28 +66,28 @@ public:
 
     /// Construct from values.
     Quaternion(float w, float x, float y, float z)
-#ifndef URHO3D_SSE
+#ifndef ATOMIC_SSE
        :w_(w),
         x_(x),
         y_(y),
         z_(z)
 #endif
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&w_, _mm_set_ps(z, y, x, w));
 #endif
     }
 
     /// Construct from a float array.
     explicit Quaternion(const float* data)
-#ifndef URHO3D_SSE
+#ifndef ATOMIC_SSE
        :w_(data[0]),
         x_(data[1]),
         y_(data[2]),
         z_(data[3])
 #endif
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&w_, _mm_loadu_ps(data));
 #endif
     }
@@ -98,7 +98,7 @@ public:
         FromAngleAxis(angle, axis);
     }
 
-    /// Construct from an angle (in degrees, for Urho2D).
+    /// Construct from an angle (in degrees, for Atomic2D).
     explicit Quaternion(float angle)
     {
         FromAngleAxis(angle, Vector3::FORWARD);
@@ -128,7 +128,7 @@ public:
         FromRotationMatrix(matrix);
     }
 
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
     explicit Quaternion(__m128 wxyz)
     {
         _mm_storeu_ps(&w_, wxyz);
@@ -138,7 +138,7 @@ public:
     /// Assign from another quaternion.
     Quaternion& operator =(const Quaternion& rhs)
     {
-#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+#if defined(ATOMIC_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
         _mm_storeu_ps(&w_, _mm_loadu_ps(&rhs.w_));
 #else
         w_ = rhs.w_;
@@ -152,7 +152,7 @@ public:
     /// Add-assign a quaternion.
     Quaternion& operator +=(const Quaternion& rhs)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&w_, _mm_add_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
 #else
         w_ += rhs.w_;
@@ -166,7 +166,7 @@ public:
     /// Multiply-assign a scalar.
     Quaternion& operator *=(float rhs)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&w_, _mm_mul_ps(_mm_loadu_ps(&w_), _mm_set1_ps(rhs)));
 #else
         w_ *= rhs;
@@ -180,7 +180,7 @@ public:
     /// Test for equality with another quaternion without epsilon.
     bool operator ==(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 c = _mm_cmpeq_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_));
         c = _mm_and_ps(c, _mm_movehl_ps(c, c));
         c = _mm_and_ps(c, _mm_shuffle_ps(c, c, _MM_SHUFFLE(1, 1, 1, 1)));
@@ -196,7 +196,7 @@ public:
     /// Multiply with a scalar.
     Quaternion operator *(float rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         return Quaternion(_mm_mul_ps(_mm_loadu_ps(&w_), _mm_set1_ps(rhs)));
 #else
         return Quaternion(w_ * rhs, x_ * rhs, y_ * rhs, z_ * rhs);
@@ -206,7 +206,7 @@ public:
     /// Return negation.
     Quaternion operator -() const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         return Quaternion(_mm_xor_ps(_mm_loadu_ps(&w_), _mm_castsi128_ps(_mm_set1_epi32((int)0x80000000UL))));
 #else
         return Quaternion(-w_, -x_, -y_, -z_);
@@ -216,7 +216,7 @@ public:
     /// Add a quaternion.
     Quaternion operator +(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         return Quaternion(_mm_add_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
 #else
         return Quaternion(w_ + rhs.w_, x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_);
@@ -226,7 +226,7 @@ public:
     /// Subtract a quaternion.
     Quaternion operator -(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         return Quaternion(_mm_sub_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
 #else
         return Quaternion(w_ - rhs.w_, x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_);
@@ -236,7 +236,7 @@ public:
     /// Multiply a quaternion.
     Quaternion operator *(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q1 = _mm_loadu_ps(&w_);
         __m128 q2 = _mm_loadu_ps(&rhs.w_);
         q2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 3, 2, 1));
@@ -261,7 +261,7 @@ public:
     /// Multiply a Vector3.
     Vector3 operator *(const Vector3& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q = _mm_loadu_ps(&w_);
         q = _mm_shuffle_ps(q, q, _MM_SHUFFLE(0, 3, 2, 1));
         __m128 v = _mm_set_ps(0.f, rhs.z_, rhs.y_, rhs.x_);
@@ -306,7 +306,7 @@ public:
     /// Normalize to unit length.
     void Normalize()
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -318,7 +318,7 @@ public:
         _mm_storeu_ps(&w_, _mm_mul_ps(q, n));
 #else
         float lenSquared = LengthSquared();
-        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        if (!Atomic::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
         {
             float invLen = 1.0f / sqrtf(lenSquared);
             w_ *= invLen;
@@ -332,7 +332,7 @@ public:
     /// Return normalized to unit length.
     Quaternion Normalized() const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -344,7 +344,7 @@ public:
         return Quaternion(_mm_mul_ps(q, n));
 #else
         float lenSquared = LengthSquared();
-        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        if (!Atomic::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
         {
             float invLen = 1.0f / sqrtf(lenSquared);
             return *this * invLen;
@@ -357,7 +357,7 @@ public:
     /// Return inverse.
     Quaternion Inverse() const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -377,7 +377,7 @@ public:
     /// Return squared length.
     float LengthSquared() const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q = _mm_loadu_ps(&w_);
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
@@ -391,7 +391,7 @@ public:
     /// Calculate dot product.
     float DotProduct(const Quaternion& rhs) const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q1 = _mm_loadu_ps(&w_);
         __m128 q2 = _mm_loadu_ps(&rhs.w_);
         __m128 n = _mm_mul_ps(q1, q2);
@@ -406,16 +406,16 @@ public:
     /// Test for equality with another quaternion with epsilon.
     bool Equals(const Quaternion& rhs) const
     {
-        return Urho3D::Equals(w_, rhs.w_) && Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_);
+        return Atomic::Equals(w_, rhs.w_) && Atomic::Equals(x_, rhs.x_) && Atomic::Equals(y_, rhs.y_) && Atomic::Equals(z_, rhs.z_);
     }
 
     /// Return whether is NaN.
-    bool IsNaN() const { return Urho3D::IsNaN(w_) || Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_); }
+    bool IsNaN() const { return Atomic::IsNaN(w_) || Atomic::IsNaN(x_) || Atomic::IsNaN(y_) || Atomic::IsNaN(z_); }
 
     /// Return conjugate.
     Quaternion Conjugate() const
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 q = _mm_loadu_ps(&w_);
         return Quaternion(_mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))));
 #else

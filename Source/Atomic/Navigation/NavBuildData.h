@@ -38,11 +38,11 @@ struct rcHeightfieldLayerSet;
 struct rcPolyMesh;
 struct rcPolyMeshDetail;
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Navigation area stub.
-struct URHO3D_API NavAreaStub
+struct ATOMIC_API NavAreaStub
 {
     /// Area bounding box.
     BoundingBox bounds_;
@@ -51,7 +51,7 @@ struct URHO3D_API NavAreaStub
 };
 
 /// Navigation build data.
-struct URHO3D_API NavBuildData
+struct ATOMIC_API NavBuildData
 {
     /// Constructor.
     NavBuildData();

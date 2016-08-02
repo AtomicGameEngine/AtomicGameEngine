@@ -24,7 +24,7 @@
 
 #include "../Math/Vector3.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BoundingBox;
@@ -34,7 +34,7 @@ class Matrix3x4;
 class Plane;
 
 /// A convex volume built from polygon faces.
-class URHO3D_API Polyhedron
+class ATOMIC_API Polyhedron
 {
 public:
     /// Construct empty.

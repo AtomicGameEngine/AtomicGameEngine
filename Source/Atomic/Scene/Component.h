@@ -24,7 +24,7 @@
 
 #include "../Scene/Animatable.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class DebugRenderer;
@@ -34,9 +34,9 @@ class Scene;
 struct ComponentReplicationState;
 
 /// Base class for components. Components can be created to scene nodes.
-class URHO3D_API Component : public Animatable
+class ATOMIC_API Component : public Animatable
 {
-    URHO3D_OBJECT(Component, Animatable);
+    ATOMIC_OBJECT(Component, Animatable);
 
     friend class Node;
     friend class Scene;

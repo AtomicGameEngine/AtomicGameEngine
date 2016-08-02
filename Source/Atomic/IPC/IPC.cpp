@@ -46,7 +46,7 @@ namespace Atomic
 IPC::IPC(Context* context) : Object(context),
     workerChannelID_(0)
 {
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(IPC, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, ATOMIC_HANDLER(IPC, HandleBeginFrame));
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
@@ -125,7 +125,7 @@ bool IPC::ProcessArguments(const Vector<String>& arguments, int& id, IPCHandle& 
 
             else if (argument.StartsWith("--ipc-server=") || argument.StartsWith("--ipc-client="))
             {
-                LOGINFOF("Starting IPCWorker %s", argument.CString());
+                ATOMIC_LOGINFOF("Starting IPCWorker %s", argument.CString());
 
                 Vector<String> ipc = argument.Split(argument.CString(), '=');
 

@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attributes, StringHash objectType, const char* name)
@@ -54,7 +54,10 @@ void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attribute
 }
 
 Context::Context() :
-    eventHandler_(0)
+    eventHandler_(0),
+// ATOMIC BEGIN
+    editorContext_(false)
+// ATOMIC END
 {
 #ifdef __ANDROID__
     // Always reset the random seed on Android, as the Urho3D library might not be unloaded between runs
@@ -131,7 +134,7 @@ void Context::RegisterAttribute(StringHash objectType, const AttributeInfo& attr
     // None or pointer types can not be supported
     if (attr.type_ == VAR_NONE || attr.type_ == VAR_VOIDPTR || attr.type_ == VAR_PTR)
     {
-        URHO3D_LOGWARNING("Attempt to register unsupported attribute type " + Variant::GetTypeName(attr.type_) + " to class " +
+        ATOMIC_LOGWARNING("Attempt to register unsupported attribute type " + Variant::GetTypeName(attr.type_) + " to class " +
             GetTypeName(objectType));
         return;
     }
@@ -172,7 +175,7 @@ void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
     // Prevent endless loop if mistakenly copying attributes from same class as derived
     if (baseType == derivedType)
     {
-        URHO3D_LOGWARNING("Attempt to copy base attributes to itself for class " + GetTypeName(baseType));
+        ATOMIC_LOGWARNING("Attempt to copy base attributes to itself for class " + GetTypeName(baseType));
         return;
     }
 

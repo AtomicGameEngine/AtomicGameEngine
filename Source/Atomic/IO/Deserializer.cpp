@@ -26,7 +26,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const float invQ = 1.0f / 32767.0f;

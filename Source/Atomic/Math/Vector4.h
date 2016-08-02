@@ -24,11 +24,11 @@
 
 #include "../Math/Vector3.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Four-dimensional vector.
-class URHO3D_API Vector4
+class ATOMIC_API Vector4
 {
 public:
     /// Construct a zero vector.
@@ -180,11 +180,11 @@ public:
     /// Calculate absolute dot product.
     float AbsDotProduct(const Vector4& rhs) const
     {
-        return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_) + Urho3D::Abs(w_ * rhs.w_);
+        return Atomic::Abs(x_ * rhs.x_) + Atomic::Abs(y_ * rhs.y_) + Atomic::Abs(z_ * rhs.z_) + Atomic::Abs(w_ * rhs.w_);
     }
 
     /// Return absolute vector.
-    Vector4 Abs() const { return Vector4(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_), Urho3D::Abs(w_)); }
+    Vector4 Abs() const { return Vector4(Atomic::Abs(x_), Atomic::Abs(y_), Atomic::Abs(z_), Atomic::Abs(w_)); }
 
     /// Linear interpolation with another vector.
     Vector4 Lerp(const Vector4& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
@@ -192,11 +192,11 @@ public:
     /// Test for equality with another vector with epsilon.
     bool Equals(const Vector4& rhs) const
     {
-        return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_) && Urho3D::Equals(w_, rhs.w_);
+        return Atomic::Equals(x_, rhs.x_) && Atomic::Equals(y_, rhs.y_) && Atomic::Equals(z_, rhs.z_) && Atomic::Equals(w_, rhs.w_);
     }
 
     /// Return whether is NaN.
-    bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_) || Urho3D::IsNaN(w_); }
+    bool IsNaN() const { return Atomic::IsNaN(x_) || Atomic::IsNaN(y_) || Atomic::IsNaN(z_) || Atomic::IsNaN(w_); }
 
     /// Return float data.
     const float* Data() const { return &x_; }

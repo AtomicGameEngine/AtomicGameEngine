@@ -25,11 +25,11 @@
 #include "../Math/Rect.h"
 #include "../Math/Vector3.h"
 
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
 #include <xmmintrin.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Polyhedron;
@@ -40,7 +40,7 @@ class Matrix3x4;
 class Sphere;
 
 /// Three-dimensional axis-aligned bounding box.
-class URHO3D_API BoundingBox
+class ATOMIC_API BoundingBox
 {
 public:
     /// Construct with zero size.
@@ -78,7 +78,7 @@ public:
     {
     }
 
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
     BoundingBox(__m128 min, __m128 max)
     {
         _mm_storeu_ps(&min_.x_, min);
@@ -175,7 +175,7 @@ public:
     /// Merge a point.
     void Merge(const Vector3& point)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         __m128 vec = _mm_set_ps(1.f, point.z_, point.y_, point.x_);
         _mm_storeu_ps(&min_.x_, _mm_min_ps(_mm_loadu_ps(&min_.x_), vec));
         _mm_storeu_ps(&max_.x_, _mm_max_ps(_mm_loadu_ps(&max_.x_), vec));
@@ -198,7 +198,7 @@ public:
     /// Merge another bounding box.
     void Merge(const BoundingBox& box)
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&min_.x_, _mm_min_ps(_mm_loadu_ps(&min_.x_), _mm_loadu_ps(&box.min_.x_)));
         _mm_storeu_ps(&max_.x_, _mm_max_ps(_mm_loadu_ps(&max_.x_), _mm_loadu_ps(&box.max_.x_)));
 #else
@@ -243,7 +243,7 @@ public:
     /// Clear to undefined state.
     void Clear()
     {
-#ifdef URHO3D_SSE
+#ifdef ATOMIC_SSE
         _mm_storeu_ps(&min_.x_, _mm_set1_ps(M_INFINITY));
         _mm_storeu_ps(&max_.x_, _mm_set1_ps(-M_INFINITY));
 #else

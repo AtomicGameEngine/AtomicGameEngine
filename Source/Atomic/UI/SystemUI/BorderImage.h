@@ -37,7 +37,7 @@ namespace SystemUI
 /// %Image %UI element with optional border.
 class ATOMIC_API BorderImage : public UIElement
 {
-    OBJECT(BorderImage);
+    ATOMIC_OBJECT(BorderImage, UIElement);
 
 public:
     /// Construct.

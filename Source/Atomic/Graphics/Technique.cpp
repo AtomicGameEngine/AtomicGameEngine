@@ -34,7 +34,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* cullModeNames[];
@@ -294,7 +294,7 @@ bool Technique::BeginLoad(Deserializer& source)
                 newPass->SetAlphaMask(globalAlphaMask);
         }
         else
-            URHO3D_LOGERROR("Missing pass name");
+            ATOMIC_LOGERROR("Missing pass name");
 
         passElem = passElem.GetNext("pass");
     }

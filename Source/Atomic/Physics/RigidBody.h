@@ -25,12 +25,14 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/Component.h"
 
-#include <Bullet/LinearMath/btMotionState.h>
+// ATOMIC BEGIN
+#include <Bullet/src/LinearMath/btMotionState.h>
+// ATOMIC END
 
 class btCompoundShape;
 class btRigidBody;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class CollisionShape;
@@ -47,9 +49,9 @@ enum CollisionEventMode
 };
 
 /// Physics rigid body component.
-class URHO3D_API RigidBody : public Component, public btMotionState
+class ATOMIC_API RigidBody : public Component, public btMotionState
 {
-    URHO3D_OBJECT(RigidBody, Component);
+    ATOMIC_OBJECT(RigidBody, Component);
 
 public:
     /// Construct.

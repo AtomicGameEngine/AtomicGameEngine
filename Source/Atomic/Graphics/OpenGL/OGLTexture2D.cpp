@@ -36,7 +36,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void Texture2D::OnDeviceLost()
@@ -98,29 +98,29 @@ void Texture2D::Release()
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
-    URHO3D_PROFILE(SetTextureData);
+    ATOMIC_PROFILE(SetTextureData);
 
     if (!object_.name_ || !graphics_)
     {
-        URHO3D_LOGERROR("No texture created, can not set data");
+        ATOMIC_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        URHO3D_LOGERROR("Null source for setting data");
+        ATOMIC_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for setting data");
+        ATOMIC_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture data assignment while device is lost");
+        ATOMIC_LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -135,7 +135,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
     {
-        URHO3D_LOGERROR("Illegal dimensions for setting data");
+        ATOMIC_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -167,7 +167,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
-        URHO3D_LOGERROR("Null image, can not set data");
+        ATOMIC_LOGERROR("Null image, can not set data");
         return false;
     }
 
@@ -301,26 +301,26 @@ bool Texture2D::GetData(unsigned level, void* dest) const
 {
     if (!object_.name_ || !graphics_)
     {
-        URHO3D_LOGERROR("No texture created, can not get data");
+        ATOMIC_LOGERROR("No texture created, can not get data");
         return false;
     }
 
 #ifndef GL_ES_VERSION_2_0
     if (!dest)
     {
-        URHO3D_LOGERROR("Null destination for getting data");
+        ATOMIC_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for getting data");
+        ATOMIC_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Getting texture data while device is lost");
+        ATOMIC_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
 
@@ -344,7 +344,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return true;
     }
 
-    URHO3D_LOGERROR("Getting texture data not supported");
+    ATOMIC_LOGERROR("Getting texture data not supported");
     return false;
 #endif
 }
@@ -358,7 +358,7 @@ bool Texture2D::Create()
 
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture creation while device is lost");
+        ATOMIC_LOGWARNING("Texture creation while device is lost");
         return true;
     }
 
@@ -398,7 +398,7 @@ bool Texture2D::Create()
         glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
-            URHO3D_LOGERROR("Failed to create texture");
+            ATOMIC_LOGERROR("Failed to create texture");
             success = false;
         }
     }

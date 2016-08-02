@@ -25,7 +25,7 @@
 #include "../Container/Ptr.h"
 #include "../Core/Variant.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Attribute shown only in the editor, but not serialized.
@@ -50,7 +50,7 @@ static const unsigned AM_NODEIDVECTOR = 0x40;
 class Serializable;
 
 /// Abstract base class for invoking attribute accessors.
-class URHO3D_API AttributeAccessor : public RefCounted
+class ATOMIC_API AttributeAccessor : public RefCounted
 {
 public:
     /// Get the attribute.

@@ -36,7 +36,7 @@ class Text;
 /// Single-line text editor %UI element.
 class ATOMIC_API LineEdit : public BorderImage
 {
-    OBJECT(LineEdit);
+    ATOMIC_OBJECT(LineEdit, BorderImage);
 
 public:
     /// Construct.

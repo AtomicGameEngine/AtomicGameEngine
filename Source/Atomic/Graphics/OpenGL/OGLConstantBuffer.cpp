@@ -29,7 +29,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void ConstantBuffer::Release()
@@ -60,7 +60,7 @@ bool ConstantBuffer::SetSize(unsigned size)
 {
     if (!size)
     {
-        URHO3D_LOGERROR("Can not create zero-sized constant buffer");
+        ATOMIC_LOGERROR("Can not create zero-sized constant buffer");
         return false;
     }
 

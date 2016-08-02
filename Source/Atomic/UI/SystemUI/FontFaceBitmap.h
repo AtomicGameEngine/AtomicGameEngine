@@ -37,7 +37,7 @@ namespace SystemUI
 /// Bitmap font face description.
 class ATOMIC_API FontFaceBitmap : public FontFace
 {
-    REFCOUNTED(FontFaceBitmap)
+    ATOMIC_REFCOUNTED(FontFaceBitmap)
 
 public:
     /// Construct.

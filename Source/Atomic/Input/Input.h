@@ -27,9 +27,12 @@
 #include "../Core/Object.h"
 #include "../Container/List.h"
 #include "../Input/InputEvents.h"
-#include "../UI/Cursor.h"
 
-namespace Urho3D
+// ATOMIC BEGIN
+// #include "../UI/Cursor.h"
+// ATOMIC END
+
+namespace Atomic
 {
 
 /// %Input Mouse Modes.
@@ -133,9 +136,9 @@ class EmscriptenInput;
 #endif
 
 /// %Input subsystem. Converts operating system window messages to input state and events.
-class URHO3D_API Input : public Object
+class ATOMIC_API Input : public Object
 {
-    URHO3D_OBJECT(Input, Object);
+    ATOMIC_OBJECT(Input, Object);
 
 #ifdef __EMSCRIPTEN__
     friend class EmscriptenInput;
@@ -296,6 +299,11 @@ public:
 
     /// Return whether application window is minimized.
     bool IsMinimized() const;
+
+// ATOMIC BEGIN
+    void SimulateButtonDown(int button);
+    void SimulateButtonUp(int button);
+// ATOMIC END
 
 private:
     /// Initialize when screen mode initially set.

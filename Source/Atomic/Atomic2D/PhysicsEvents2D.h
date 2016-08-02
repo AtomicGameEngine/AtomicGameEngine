@@ -28,29 +28,29 @@
 // on whether 3D physics support or Bullet has been compiled in.
 #include "../Physics/PhysicsEvents.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Physics begin contact.
-URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
+ATOMIC_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
 {
-    URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
-    URHO3D_PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer
-    URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
-    URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
-    URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
-    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
+    ATOMIC_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
+    ATOMIC_PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer
+    ATOMIC_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
+    ATOMIC_PARAM(P_NODEA, NodeA);                  // Node pointer
+    ATOMIC_PARAM(P_NODEB, NodeB);                  // Node pointer
+    ATOMIC_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
 /// Physics end contact.
-URHO3D_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
+ATOMIC_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
 {
-    URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
-    URHO3D_PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer
-    URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
-    URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
-    URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
-    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
+    ATOMIC_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
+    ATOMIC_PARAM(P_BODYA, BodyA);                  // RigidBody2D pointer
+    ATOMIC_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
+    ATOMIC_PARAM(P_NODEA, NodeA);                  // Node pointer
+    ATOMIC_PARAM(P_NODEB, NodeB);                  // Node pointer
+    ATOMIC_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
 }

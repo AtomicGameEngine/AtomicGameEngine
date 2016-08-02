@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../Container/RefCounted.h"
-#include "../Urho2D/Sprite2D.h"
+#include "../Atomic2D/Sprite2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class XMLElement;
@@ -44,7 +44,7 @@ enum Orientation2D
 };
 
 /// Tile map information.
-struct URHO3D_API TileMapInfo2D
+struct ATOMIC_API TileMapInfo2D
 {
     /// Orientation.
     Orientation2D orientation_;
@@ -100,7 +100,7 @@ enum TileMapObjectType2D
 };
 
 /// Property set.
-class URHO3D_API PropertySet2D : public RefCounted
+class ATOMIC_API PropertySet2D : public RefCounted
 {
 public:
     PropertySet2D();
@@ -119,7 +119,7 @@ protected:
 };
 
 /// Tile define.
-class URHO3D_API Tile2D : public RefCounted
+class ATOMIC_API Tile2D : public RefCounted
 {
 public:
     /// Construct.
@@ -147,7 +147,7 @@ private:
 };
 
 /// Tile map object.
-class URHO3D_API TileMapObject2D : public RefCounted
+class ATOMIC_API TileMapObject2D : public RefCounted
 {
 public:
     TileMapObject2D();

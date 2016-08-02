@@ -25,7 +25,7 @@
 #include "../Graphics/Tangent.h"
 #include "../Math/Vector4.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 inline unsigned GetIndex(void*& indexPointer, unsigned indexSize)

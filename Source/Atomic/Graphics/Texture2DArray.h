@@ -26,16 +26,16 @@
 #include "../Graphics/RenderSurface.h"
 #include "../Graphics/Texture.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Deserializer;
 class Image;
 
 /// 2D texture array resource.
-class URHO3D_API Texture2DArray : public Texture
+class ATOMIC_API Texture2DArray : public Texture
 {
-    URHO3D_OBJECT(Texture2DArray, Texture)
+    ATOMIC_OBJECT(Texture2DArray, Texture)
 
 public:
     /// Construct.

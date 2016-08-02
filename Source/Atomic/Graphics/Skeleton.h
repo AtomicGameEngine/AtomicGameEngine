@@ -25,7 +25,7 @@
 #include "../Math/BoundingBox.h"
 #include "../Scene/Node.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const unsigned BONECOLLISION_NONE = 0x0;
@@ -78,7 +78,7 @@ struct Bone
 };
 
 /// Hierarchical collection of bones.
-class URHO3D_API Skeleton
+class ATOMIC_API Skeleton
 {
 public:
     /// Construct an empty skeleton.

@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
+#if defined(_MSC_VER) && defined(ATOMIC_MINIDUMPS)
 
 #include "../Precompiled.h"
 
@@ -33,12 +33,12 @@
 #include <windows.h>
 #include <dbghelp.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 static bool miniDumpWritten = false;
 
-URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointers)
+ATOMIC_API int WriteMiniDump(const char* applicationName, void* exceptionPointers)
 {
     // In case of recursive or repeating exceptions, only write the dump once
     /// \todo This function should not allocate any dynamic memory

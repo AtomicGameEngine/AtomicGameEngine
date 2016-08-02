@@ -26,7 +26,7 @@
 #include "../IO/Log.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Resource::Resource(Context* context) :
@@ -40,7 +40,7 @@ bool Resource::Load(Deserializer& source)
 {
     // Because BeginLoad() / EndLoad() can be called from worker threads, where profiling would be a no-op,
     // create a type name -based profile block here
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     String profileBlockName("Load" + GetTypeName());
 
     Profiler* profiler = GetSubsystem<Profiler>();
@@ -56,7 +56,7 @@ bool Resource::Load(Deserializer& source)
         success &= EndLoad();
     SetAsyncLoadState(ASYNC_DONE);
 
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     if (profiler)
         profiler->EndBlock();
 #endif
@@ -78,7 +78,7 @@ bool Resource::EndLoad()
 
 bool Resource::Save(Serializer& dest) const
 {
-    URHO3D_LOGERROR("Save not supported for " + GetTypeName());
+    ATOMIC_LOGERROR("Save not supported for " + GetTypeName());
     return false;
 }
 

@@ -27,7 +27,7 @@
 
 #include <cstring>
 
-namespace Urho3D
+namespace Atomic
 {
 
 const Variant Variant::EMPTY;

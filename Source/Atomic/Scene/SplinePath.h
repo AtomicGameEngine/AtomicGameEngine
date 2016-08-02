@@ -32,13 +32,13 @@
 #include "../Scene/Component.h"
 #include "../Scene/Node.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.
-class URHO3D_API SplinePath : public Component
+class ATOMIC_API SplinePath : public Component
 {
-    URHO3D_OBJECT(SplinePath, Component)
+    ATOMIC_OBJECT(SplinePath, Component)
 
 public:
     /// Construct an Empty SplinePath.

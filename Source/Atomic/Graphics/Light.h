@@ -27,7 +27,7 @@
 #include "../Math/Frustum.h"
 #include "../Graphics/Texture.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Camera;
@@ -51,7 +51,7 @@ static const unsigned MAX_CASCADE_SPLITS = 1;
 #endif
 
 /// Shadow depth bias parameters.
-struct URHO3D_API BiasParameters
+struct ATOMIC_API BiasParameters
 {
     /// Construct undefined.
     BiasParameters()
@@ -78,7 +78,7 @@ struct URHO3D_API BiasParameters
 };
 
 /// Cascaded shadow map parameters.
-struct URHO3D_API CascadeParameters
+struct ATOMIC_API CascadeParameters
 {
     /// Construct undefined.
     CascadeParameters()
@@ -118,7 +118,7 @@ struct URHO3D_API CascadeParameters
 };
 
 /// Shadow map focusing parameters.
-struct URHO3D_API FocusParameters
+struct ATOMIC_API FocusParameters
 {
     /// Construct undefined.
     FocusParameters()
@@ -151,9 +151,9 @@ struct URHO3D_API FocusParameters
 };
 
 /// %Light component.
-class URHO3D_API Light : public Drawable
+class ATOMIC_API Light : public Drawable
 {
-    URHO3D_OBJECT(Light, Drawable);
+    ATOMIC_OBJECT(Light, Drawable);
 
 public:
     /// Construct.

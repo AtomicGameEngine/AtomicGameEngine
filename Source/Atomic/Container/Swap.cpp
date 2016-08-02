@@ -24,7 +24,7 @@
 
 #include "../Container/ListBase.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 template <> void Swap<String>(String& first, String& second)

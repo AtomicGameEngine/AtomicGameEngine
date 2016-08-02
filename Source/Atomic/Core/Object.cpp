@@ -31,7 +31,7 @@
 #include "../DebugNew.h"
 
 
-namespace Urho3D
+namespace Atomic
 {
 
 TypeInfo::TypeInfo(const char* typeName, const TypeInfo* baseTypeInfo) :
@@ -183,7 +183,7 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     context_->AddEventReceiver(this, sender, eventType);
 }
 
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
 void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
 {
     SubscribeToEvent(eventType, new EventHandler11Impl(function, userData));
@@ -301,11 +301,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
     if (!Thread::IsMainThread())
     {
-        URHO3D_LOGERROR("Sending events is only supported from the main thread");
+        ATOMIC_LOGERROR("Sending events is only supported from the main thread");
         return;
     }
 
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     EventProfiler* eventProfiler = 0;
     if (EventProfiler::IsActive())
     {
@@ -341,7 +341,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             if (self.Expired())
             {
                 context->EndSendEvent();
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
                 if (eventProfiler)
                     eventProfiler->EndBlock();
 #endif
@@ -377,7 +377,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (self.Expired())
                 {
                     context->EndSendEvent();
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
                     if (eventProfiler)
                          eventProfiler->EndBlock();
 #endif
@@ -407,7 +407,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     if (self.Expired())
                     {
                         context->EndSendEvent();
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
                         if (eventProfiler)
                             eventProfiler->EndBlock();
 #endif
@@ -423,7 +423,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
     context->EndSendEvent();
 
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     if (eventProfiler)
         eventProfiler->EndBlock();
 #endif
@@ -565,7 +565,7 @@ void Object::RemoveEventSender(Object* sender)
 }
 
 
-Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
+Atomic::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
 {  
     StringHash id(eventName);
     GetEventNameMap()[id] = eventName;

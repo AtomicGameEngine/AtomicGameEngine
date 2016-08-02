@@ -28,7 +28,7 @@
 #include "../Math/Color.h"
 #include "../Math/Vector4.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class XMLElement;
@@ -63,7 +63,7 @@ enum RenderTargetSizeMode
 };
 
 /// Rendertarget definition.
-struct URHO3D_API RenderTargetInfo
+struct ATOMIC_API RenderTargetInfo
 {
     /// Construct.
     RenderTargetInfo() :
@@ -103,7 +103,7 @@ struct URHO3D_API RenderTargetInfo
 };
 
 /// Rendering path command.
-struct URHO3D_API RenderPathCommand
+struct ATOMIC_API RenderPathCommand
 {
     /// Construct.
     RenderPathCommand() :
@@ -205,7 +205,7 @@ struct URHO3D_API RenderPathCommand
 };
 
 /// Rendering path definition. A sequence of commands (e.g. clear screen, draw objects with specific pass) that yields the scene rendering result.
-class URHO3D_API RenderPath : public RefCounted
+class ATOMIC_API RenderPath : public RefCounted
 {
 public:
     /// Construct.

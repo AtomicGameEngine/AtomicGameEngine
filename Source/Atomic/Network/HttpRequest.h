@@ -28,7 +28,7 @@
 #include "../Core/Thread.h"
 #include "../IO/Deserializer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// HTTP connection state
@@ -41,7 +41,7 @@ enum HttpRequestState
 };
 
 /// An HTTP connection with response data stream.
-class URHO3D_API HttpRequest : public RefCounted, public Deserializer, public Thread
+class ATOMIC_API HttpRequest : public RefCounted, public Deserializer, public Thread
 {
 public:
     /// Construct with parameters.

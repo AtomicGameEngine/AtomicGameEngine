@@ -24,7 +24,7 @@
 
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Bitmask for using the scene update event.
@@ -37,9 +37,9 @@ static const unsigned char USE_FIXEDUPDATE = 0x4;
 static const unsigned char USE_FIXEDPOSTUPDATE = 0x8;
 
 /// Helper base class for user-defined game logic components that hooks up to update events and forwards them to virtual functions similar to ScriptInstance class.
-class URHO3D_API LogicComponent : public Component
+class ATOMIC_API LogicComponent : public Component
 {
-    URHO3D_OBJECT(LogicComponent, Component);
+    ATOMIC_OBJECT(LogicComponent, Component);
 
     /// Construct.
     LogicComponent(Context* context);
@@ -89,7 +89,7 @@ private:
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
-#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+#if defined(ATOMIC_PHYSICS) || defined(ATOMIC_ATOMIC2D)
     /// Handle physics pre-step event.
     void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData);
     /// Handle physics post-step event.

@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "../Urho2D/StaticSprite2D.h"
+#include "../Atomic2D/StaticSprite2D.h"
 
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
 struct spAnimationState;
 struct spAnimationStateData;
 struct spSkeleton;
@@ -41,7 +41,7 @@ enum LoopMode2D
     LM_FORCE_CLAMPED
 };
 
-namespace Urho3D
+namespace Atomic
 {
 
 namespace Spriter
@@ -52,9 +52,9 @@ namespace Spriter
 class AnimationSet2D;
 
 /// Animated sprite component, it uses to play animation created by Spine (http://www.esotericsoftware.com) and Spriter (http://www.brashmonkey.com/).
-class URHO3D_API AnimatedSprite2D : public StaticSprite2D
+class ATOMIC_API AnimatedSprite2D : public StaticSprite2D
 {
-    URHO3D_OBJECT(AnimatedSprite2D, StaticSprite2D);
+    ATOMIC_OBJECT(AnimatedSprite2D, StaticSprite2D);
 
 public:
     /// Construct.
@@ -105,7 +105,7 @@ protected:
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Update animation.
     void UpdateAnimation(float timeStep);
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     /// Handle set spine animation.
     void SetSpineAnimation();
     /// Update spine animation.
@@ -133,7 +133,7 @@ protected:
     /// Loop mode.
     LoopMode2D loopMode_;
 
-#ifdef URHO3D_SPINE
+#ifdef ATOMIC_SPINE
     /// Skeleton.
     spSkeleton* skeleton_;
     /// Animation state data.

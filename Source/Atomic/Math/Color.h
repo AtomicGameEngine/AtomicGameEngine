@@ -27,13 +27,13 @@
 // Defined by Windows headers
 #undef TRANSPARENT
 
-namespace Urho3D
+namespace Atomic
 {
 
 class String;
 
 /// RGBA color.
-class URHO3D_API Color
+class ATOMIC_API Color
 {
 public:
     /// Construct with default values (opaque white.)
@@ -189,12 +189,12 @@ public:
     Color Lerp(const Color& rhs, float t) const;
 
     /// Return color with absolute components.
-    Color Abs() const { return Color(Urho3D::Abs(r_), Urho3D::Abs(g_), Urho3D::Abs(b_), Urho3D::Abs(a_)); }
+    Color Abs() const { return Color(Atomic::Abs(r_), Atomic::Abs(g_), Atomic::Abs(b_), Atomic::Abs(a_)); }
 
     /// Test for equality with another color with epsilon.
     bool Equals(const Color& rhs) const
     {
-        return Urho3D::Equals(r_, rhs.r_) && Urho3D::Equals(g_, rhs.g_) && Urho3D::Equals(b_, rhs.b_) && Urho3D::Equals(a_, rhs.a_);
+        return Atomic::Equals(r_, rhs.r_) && Atomic::Equals(g_, rhs.g_) && Atomic::Equals(b_, rhs.b_) && Atomic::Equals(a_, rhs.a_);
     }
 
     /// Return as string.

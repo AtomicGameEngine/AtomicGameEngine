@@ -27,13 +27,13 @@
 #include "../Graphics/GPUObject.h"
 #include "../Graphics/GraphicsDefs.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Hardware index buffer.
-class URHO3D_API IndexBuffer : public Object, public GPUObject
+class ATOMIC_API IndexBuffer : public Object, public GPUObject
 {
-    URHO3D_OBJECT(IndexBuffer, Object);
+    ATOMIC_OBJECT(IndexBuffer, Object);
 
 public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.

@@ -52,7 +52,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const Vector3* directions[] =
@@ -343,7 +343,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     rtSize_ = IntVector2(rtWidth, rtHeight);
 
     // On OpenGL flip the viewport if rendering to a texture for consistent UV addressing with Direct3D9
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     if (renderTarget_)
     {
         viewRect_.bottom_ = rtHeight - viewRect_.top_;
@@ -397,7 +397,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     scenePasses_.Clear();
     geometriesUpdated_ = false;
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
 #ifdef GL_ES_VERSION_2_0
     // On OpenGL ES we assume a stencil is not available or would not give a good performance, and disable light stencil
     // optimizations in any case
@@ -618,7 +618,7 @@ void View::Render()
     {
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
         // as a render texture produced on Direct3D9
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
         if (camera_)
             camera_->SetFlipVertical(true);
 #endif
@@ -663,7 +663,7 @@ void View::Render()
         }
     }
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     if (camera_)
         camera_->SetFlipVertical(false);
 #endif
@@ -725,7 +725,7 @@ void View::SetCameraShaderParameters(Camera* camera)
     if (camera->IsOrthographic())
     {
         depthMode.x_ = 1.0f;
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
         depthMode.z_ = 0.5f;
         depthMode.w_ = 0.5f;
 #else
@@ -747,7 +747,7 @@ void View::SetCameraShaderParameters(Camera* camera)
     graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
 
     Matrix4 projection = camera->GetProjection();
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
     float constantBias = 2.0f * graphics_->GetDepthConstantBias();
     projection.m22_ += projection.m32_ * constantBias;
@@ -764,7 +764,7 @@ void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& 
     float widthRange = 0.5f * viewRect.Width() / texWidth;
     float heightRange = 0.5f * viewRect.Height() / texHeight;
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     Vector4 bufferUVOffset(((float)viewRect.left_) / texWidth + widthRange,
         1.0f - (((float)viewRect.top_) / texHeight + heightRange), widthRange, heightRange);
 #else
@@ -784,7 +784,7 @@ void View::GetDrawables()
     if (!octree_ || !cullCamera_)
         return;
 
-    URHO3D_PROFILE(GetDrawables);
+    ATOMIC_PROFILE(GetDrawables);
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
@@ -850,7 +850,7 @@ void View::GetDrawables()
         UpdateOccluders(occluders_, cullCamera_);
         if (occluders_.Size())
         {
-            URHO3D_PROFILE(DrawOcclusion);
+            ATOMIC_PROFILE(DrawOcclusion);
 
             occlusionBuffer_ = renderer_->GetOcclusionBuffer(cullCamera_);
             DrawOccluders(occlusionBuffer_, occluders_);
@@ -967,7 +967,7 @@ void View::GetBatches()
 void View::ProcessLights()
 {
     // Process lit geometries and shadow casters for each light
-    URHO3D_PROFILE(ProcessLights);
+    ATOMIC_PROFILE(ProcessLights);
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
     lightQueryResults_.Resize(lights_.Size());
@@ -996,7 +996,7 @@ void View::GetLightBatches()
 
     // Build light queues and lit batches
     {
-        URHO3D_PROFILE(GetLightBatches);
+        ATOMIC_PROFILE(GetLightBatches);
 
         // Preallocate light queues: per-pixel lights which have lit geometries
         unsigned numLightQueues = 0;
@@ -1148,7 +1148,7 @@ void View::GetLightBatches()
     // Process drawables with limited per-pixel light count
     if (maxLightsDrawables_.Size())
     {
-        URHO3D_PROFILE(GetMaxLightsBatches);
+        ATOMIC_PROFILE(GetMaxLightsBatches);
 
         for (HashSet<Drawable*>::Iterator i = maxLightsDrawables_.Begin(); i != maxLightsDrawables_.End(); ++i)
         {
@@ -1170,7 +1170,7 @@ void View::GetLightBatches()
 
 void View::GetBaseBatches()
 {
-    URHO3D_PROFILE(GetBaseBatches);
+    ATOMIC_PROFILE(GetBaseBatches);
 
     for (PODVector<Drawable*>::ConstIterator i = geometries_.Begin(); i != geometries_.End(); ++i)
     {
@@ -1265,7 +1265,7 @@ void View::UpdateGeometries()
         return;
     }
 
-    URHO3D_PROFILE(SortAndUpdateGeometry);
+    ATOMIC_PROFILE(SortAndUpdateGeometry);
 
     WorkQueue* queue = GetSubsystem<WorkQueue>();
 
@@ -1433,7 +1433,7 @@ void View::ExecuteRenderPathCommands()
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->GetReuseShadowMaps() && renderer_->GetDrawShadows() && !actualView->lightQueues_.Empty())
     {
-        URHO3D_PROFILE(RenderShadowMaps);
+        ATOMIC_PROFILE(RenderShadowMaps);
 
         for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
         {
@@ -1443,7 +1443,7 @@ void View::ExecuteRenderPathCommands()
     }
 
     {
-        URHO3D_PROFILE(ExecuteRenderPath);
+        ATOMIC_PROFILE(ExecuteRenderPath);
 
         // Set for safety in case of empty renderpath
         currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
@@ -1528,7 +1528,7 @@ void View::ExecuteRenderPathCommands()
                     // If the render path ends into a quad, it can be redirected to the final render target
                     // However, on OpenGL we can not reliably do this in case the final target is the backbuffer, and we want to
                     // render depth buffer sensitive debug geometry afterward (backbuffer and textures can not share depth)
-#ifndef URHO3D_OPENGL
+#ifndef ATOMIC_OPENGL
                     if (i == lastCommandIndex && command.type_ == CMD_QUAD)
 #else
                     if (i == lastCommandIndex && command.type_ == CMD_QUAD && renderTarget_)
@@ -1543,7 +1543,7 @@ void View::ExecuteRenderPathCommands()
             {
             case CMD_CLEAR:
                 {
-                    URHO3D_PROFILE(ClearRenderTarget);
+                    ATOMIC_PROFILE(ClearRenderTarget);
 
                     Color clearColor = command.clearColor_;
                     if (command.useFogColor_)
@@ -1559,7 +1559,7 @@ void View::ExecuteRenderPathCommands()
                     BatchQueue& queue = actualView->batchQueues_[command.passIndex_];
                     if (!queue.IsEmpty())
                     {
-                        URHO3D_PROFILE(RenderScenePass);
+                        ATOMIC_PROFILE(RenderScenePass);
 
                         SetRenderTargets(command);
                         bool allowDepthWrite = SetTextures(command);
@@ -1572,7 +1572,7 @@ void View::ExecuteRenderPathCommands()
 
             case CMD_QUAD:
                 {
-                    URHO3D_PROFILE(RenderQuad);
+                    ATOMIC_PROFILE(RenderQuad);
 
                     SetRenderTargets(command);
                     SetTextures(command);
@@ -1584,7 +1584,7 @@ void View::ExecuteRenderPathCommands()
                 // Render shadow maps + opaque objects' additive lighting
                 if (!actualView->lightQueues_.Empty())
                 {
-                    URHO3D_PROFILE(RenderLights);
+                    ATOMIC_PROFILE(RenderLights);
 
                     SetRenderTargets(command);
 
@@ -1623,7 +1623,7 @@ void View::ExecuteRenderPathCommands()
                 // Render shadow maps + light volumes
                 if (!actualView->lightQueues_.Empty())
                 {
-                    URHO3D_PROFILE(RenderLightVolumes);
+                    ATOMIC_PROFILE(RenderLightVolumes);
 
                     SetRenderTargets(command);
                     for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
@@ -1701,7 +1701,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
             {
                 useColorWrite = false;
                 useCustomDepth = true;
-#if !defined(URHO3D_OPENGL) && !defined(URHO3D_D3D11)
+#if !defined(ATOMIC_OPENGL) && !defined(ATOMIC_D3D11)
                 // On D3D9 actual depth-only rendering is illegal, we need a color rendertarget
                 if (!depthOnlyDummyTexture_)
                 {
@@ -1938,7 +1938,7 @@ void View::AllocateScreenBuffers()
         }
     }
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     // Due to FBO limitations, in OpenGL deferred modes need to render to texture first and then blit to the backbuffer
     // Also, if rendering to a texture with full deferred rendering, it must be RGBA to comply with the rest of the buffers,
     // unless using OpenGL 3
@@ -1970,7 +1970,7 @@ void View::AllocateScreenBuffers()
         needSubstitute = true;
     }
 
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     // On OpenGL 2 ensure that all MRT buffers are RGBA in deferred rendering
     if (deferred_ && !renderer_->GetHDRRendering() && !Graphics::GetGL3Support())
         format = Graphics::GetRGBAFormat();
@@ -2052,7 +2052,7 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     if (!source)
         return;
 
-    URHO3D_PROFILE(BlitFramebuffer);
+    ATOMIC_PROFILE(BlitFramebuffer);
 
     // If blitting to the destination rendertarget, use the actual viewport. Intermediate textures on the other hand
     // are always viewport-sized
@@ -2097,7 +2097,7 @@ void View::DrawFullscreenQuad(bool setIdentityProjection)
     {
         Matrix3x4 model = Matrix3x4::IDENTITY;
         Matrix4 projection = Matrix4::IDENTITY;
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
         if (camera_ && camera_->GetFlipVertical())
             projection.m11_ = -1.0f;
         model.m23_ = 0.0f;
@@ -2651,7 +2651,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
             shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 2.0f) / shadowMapWidth));
         else
         {
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
             shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 3.0f) / shadowMapWidth));
 #else
             shadowCamera->SetZoom(shadowCamera->GetZoom() * ((shadowMapWidth - 4.0f) / shadowMapWidth));
@@ -2879,7 +2879,7 @@ void View::PrepareInstancingBuffer()
         return;
     }
 
-    URHO3D_PROFILE(PrepareInstancingBuffer);
+    ATOMIC_PROFILE(PrepareInstancingBuffer);
 
     unsigned totalInstances = 0;
 
@@ -2968,7 +2968,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
 
 void View::RenderShadowMap(const LightBatchQueue& queue)
 {
-    URHO3D_PROFILE(RenderShadowMap);
+    ATOMIC_PROFILE(RenderShadowMap);
 
     Texture2D* shadowMap = queue.shadowMap_;
     graphics_->SetTexture(TU_SHADOWMAP, 0);

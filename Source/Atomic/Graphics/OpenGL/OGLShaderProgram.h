@@ -28,14 +28,14 @@
 #include "../../Graphics/GraphicsDefs.h"
 #include "../../Graphics/ShaderVariation.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ConstantBuffer;
 class Graphics;
 
 /// Linked shader program on the GPU.
-class URHO3D_API ShaderProgram : public RefCounted, public GPUObject
+class ATOMIC_API ShaderProgram : public RefCounted, public GPUObject
 {
 public:
     /// Construct.

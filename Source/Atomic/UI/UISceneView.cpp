@@ -65,7 +65,7 @@ UISceneView::UISceneView(Context* context, bool createWidget) : UIWidget(context
 
     renderer_ = ui->GetRenderer();
 
-    SubscribeToEvent(E_ENDFRAME, HANDLER(UISceneView, HandleEndFrame));
+    SubscribeToEvent(E_ENDFRAME, ATOMIC_HANDLER(UISceneView, HandleEndFrame));
 }
 
 UISceneView::~UISceneView()

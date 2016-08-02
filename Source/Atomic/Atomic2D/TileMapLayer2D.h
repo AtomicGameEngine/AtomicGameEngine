@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../Scene/Component.h"
-#include "../Urho2D/TileMapDefs2D.h"
+#include "../Atomic2D/TileMapDefs2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class DebugRenderer;
@@ -37,9 +37,9 @@ class TmxObjectGroup2D;
 class TmxTileLayer2D;
 
 /// Tile map component.
-class URHO3D_API TileMapLayer2D : public Component
+class ATOMIC_API TileMapLayer2D : public Component
 {
-    URHO3D_OBJECT(TileMapLayer2D, Component);
+    ATOMIC_OBJECT(TileMapLayer2D, Component);
 
 public:
     /// Construct.

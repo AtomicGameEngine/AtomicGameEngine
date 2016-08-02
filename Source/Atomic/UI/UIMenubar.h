@@ -31,7 +31,7 @@ class UIMenuItemSource;
 
 class UIMenuItem : public UISelectItem
 {
-    OBJECT(UIMenuItem)
+    ATOMIC_OBJECT(UIMenuItem, UISelectItem)
 
 public:
 
@@ -49,7 +49,7 @@ private:
 
 class UIMenuItemSource : public UISelectItemSource
 {
-    OBJECT(UIMenuItemSource)
+    ATOMIC_OBJECT(UIMenuItemSource, UISelectItemSource)
 
 public:
 

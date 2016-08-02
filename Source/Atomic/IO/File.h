@@ -31,19 +31,19 @@
 struct SDL_RWops;
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 #ifdef __ANDROID__
 extern const char* APK;
 
 // Macro for checking if a given pathname is inside APK's assets directory
-#define URHO3D_IS_ASSET(p) p.StartsWith(APK)
+#define ATOMIC_IS_ASSET(p) p.StartsWith(APK)
 // Macro for truncating the APK prefix string from the asset pathname and at the same time patching the directory name components (see custom_rules.xml)
 #ifdef ASSET_DIR_INDICATOR
-#define URHO3D_ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
+#define ATOMIC_ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
 #else
-#define URHO3D_ASSET(p) p.Substring(5).CString()
+#define ATOMIC_ASSET(p) p.Substring(5).CString()
 #endif
 #endif
 
@@ -58,9 +58,9 @@ enum FileMode
 class PackageFile;
 
 /// %File opened either through the filesystem or from within a package file.
-class URHO3D_API File : public Object, public Deserializer, public Serializer
+class ATOMIC_API File : public Object, public Deserializer, public Serializer
 {
-    URHO3D_OBJECT(File, Object);
+    ATOMIC_OBJECT(File, Object);
 
 public:
     /// Construct.
@@ -107,6 +107,13 @@ public:
 
     /// Return whether the file originates from a package.
     bool IsPackaged() const { return offset_ != 0; }
+
+    // ATOMIC BEGIN
+
+    /// Reads a text file, ensuring data from file is 0 terminated
+    virtual void ReadText(String& text);
+
+    // ATOMIC END
 
 private:
     /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.

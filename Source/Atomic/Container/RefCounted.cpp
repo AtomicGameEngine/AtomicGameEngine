@@ -26,11 +26,14 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 RefCounted::RefCounted() :
-    refCount_(new RefCount())
+    refCount_(new RefCount()),
+// ATOMIC BEGIN
+    jsHeapPtr_(0)
+// ATOMIC END
 {
     // Hold a weak ref to self to avoid possible double delete of the refcount
     (refCount_->weakRefs_)++;

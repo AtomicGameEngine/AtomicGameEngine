@@ -26,11 +26,11 @@
 #include "../Core/Object.h"
 #include "../Container/HashSet.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
-class URHO3D_API Context : public RefCounted
+class ATOMIC_API Context : public RefCounted
 {
     friend class Object;
 
@@ -154,6 +154,16 @@ public:
         return i != eventReceivers_.End() ? &i->second_ : 0;
     }
 
+    // ATOMIC BEGIN
+
+    /// Get whether an Editor Context
+    bool GetEditorContext() { return editorContext_; }
+
+    /// Get whether an Editor Context
+    void SetEditorContext(bool editor) { editorContext_ = editor; }
+
+    // ATOMIC END
+
 private:
     /// Add event receiver.
     void AddEventReceiver(Object* receiver, StringHash eventType);
@@ -197,6 +207,11 @@ private:
     HashMap<String, Vector<StringHash> > objectCategories_;
     /// Variant map for global variables that can persist throughout application execution.
     VariantMap globalVars_;
+
+    // ATOMIC BEGIN
+    bool editorContext_;
+    // ATOMIC END
+
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

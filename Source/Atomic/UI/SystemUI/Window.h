@@ -48,7 +48,7 @@ enum WindowDragMode
 /// %Window %UI element that can optionally by moved or resized.
 class ATOMIC_API Window : public BorderImage
 {
-    OBJECT(Window);
+    ATOMIC_OBJECT(Window, BorderImage);
 
 public:
     /// Construct.

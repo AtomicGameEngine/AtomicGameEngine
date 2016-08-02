@@ -24,7 +24,7 @@
 
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class PListFile;
@@ -34,9 +34,9 @@ class XMLFile;
 class JSONFile;
 
 /// Sprite sheet.
-class URHO3D_API SpriteSheet2D : public Resource
+class ATOMIC_API SpriteSheet2D : public Resource
 {
-    URHO3D_OBJECT(SpriteSheet2D, Resource);
+    ATOMIC_OBJECT(SpriteSheet2D, Resource);
 
 public:
     /// Construct.

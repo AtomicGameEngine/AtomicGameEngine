@@ -30,7 +30,7 @@ namespace Atomic
 /// a view off the root widget
 class UIView : public UIWidget
 {
-    OBJECT(UIView)
+    ATOMIC_OBJECT(UIView, UIWidget)
 
 public:
 

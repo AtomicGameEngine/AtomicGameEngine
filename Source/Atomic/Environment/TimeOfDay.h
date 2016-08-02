@@ -29,7 +29,7 @@ namespace Atomic
 
 class TimeOfDay : public Component
 {
-    OBJECT(TimeOfDay);
+    ATOMIC_OBJECT(TimeOfDay, Component);
 
     /// Construct.
     TimeOfDay(Context* context);

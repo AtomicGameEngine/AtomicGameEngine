@@ -64,10 +64,10 @@ ScrollBar::ScrollBar(Context* context) :
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
     forwardButton_->SetFocusMode(FM_NOTFOCUSABLE);
 
-    SubscribeToEvent(backButton_, E_PRESSED, HANDLER(ScrollBar, HandleBackButtonPressed));
-    SubscribeToEvent(forwardButton_, E_PRESSED, HANDLER(ScrollBar, HandleForwardButtonPressed));
-    SubscribeToEvent(slider_, E_SLIDERCHANGED, HANDLER(ScrollBar, HandleSliderChanged));
-    SubscribeToEvent(slider_, E_SLIDERPAGED, HANDLER(ScrollBar, HandleSliderPaged));
+    SubscribeToEvent(backButton_, E_PRESSED, ATOMIC_HANDLER(ScrollBar, HandleBackButtonPressed));
+    SubscribeToEvent(forwardButton_, E_PRESSED, ATOMIC_HANDLER(ScrollBar, HandleForwardButtonPressed));
+    SubscribeToEvent(slider_, E_SLIDERCHANGED, ATOMIC_HANDLER(ScrollBar, HandleSliderChanged));
+    SubscribeToEvent(slider_, E_SLIDERPAGED, ATOMIC_HANDLER(ScrollBar, HandleSliderPaged));
 
     // Set default orientation
     SetOrientation(O_HORIZONTAL);
@@ -81,17 +81,17 @@ void ScrollBar::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollBar>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(UIElement);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
-    ATTRIBUTE("Left Image Rect", IntRect, leftRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE("Right Image Rect", IntRect, rightRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE("Up Image Rect", IntRect, upRect_, IntRect::ZERO, AM_FILE);
-    ATTRIBUTE("Down Image Rect", IntRect, downRect_, IntRect::ZERO, AM_FILE);
+    ATOMIC_COPY_BASE_ATTRIBUTES(UIElement);
+    ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    ATOMIC_ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Scroll Step", GetScrollStep, SetScrollStep, float, DEFAULT_SCROLL_STEP, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Step Factor", GetStepFactor, SetStepFactor, float, 1.0f, AM_FILE);
+    ATOMIC_ATTRIBUTE("Left Image Rect", IntRect, leftRect_, IntRect::ZERO, AM_FILE);
+    ATOMIC_ATTRIBUTE("Right Image Rect", IntRect, rightRect_, IntRect::ZERO, AM_FILE);
+    ATOMIC_ATTRIBUTE("Up Image Rect", IntRect, upRect_, IntRect::ZERO, AM_FILE);
+    ATOMIC_ATTRIBUTE("Down Image Rect", IntRect, downRect_, IntRect::ZERO, AM_FILE);
 }
 
 void ScrollBar::ApplyAttributes()

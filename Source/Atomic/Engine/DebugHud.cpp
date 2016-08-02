@@ -1,3 +1,5 @@
+#ifdef DISABLED__
+
 //
 // Copyright (c) 2008-2016 the Urho3D project.
 //
@@ -38,7 +40,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const char* qualityTexts[] =
@@ -98,7 +100,7 @@ DebugHud::DebugHud(Context* context) :
     eventProfilerText_->SetVisible(false);
     uiRoot->AddChild(eventProfilerText_);
 
-    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(DebugHud, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, ATOMIC_HANDLER(DebugHud, HandlePostUpdate));
 }
 
 DebugHud::~DebugHud()
@@ -237,7 +239,7 @@ void DebugHud::SetMode(unsigned mode)
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
     memoryText_->SetVisible((mode & DEBUGHUD_SHOW_MEMORY) != 0);
     eventProfilerText_->SetVisible((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
     // Event profiler is created on engine initialization if "EventProfiler" parameter is set
     EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
     if (eventProfiler)
@@ -312,3 +314,5 @@ void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 }
 
 }
+
+#endif

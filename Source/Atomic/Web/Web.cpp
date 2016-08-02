@@ -55,7 +55,7 @@ Web::Web(Context* context) :
 #ifndef EMSCRIPTEN
     d->curlm = curl_multi_init();
 #endif
-    SubscribeToEvent(E_UPDATE, HANDLER(Web, internalUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(Web, internalUpdate));
 }
 
 Web::~Web()
@@ -97,7 +97,7 @@ void Web::internalUpdate(StringHash eventType, VariantMap& eventData)
 
 SharedPtr<WebRequest> Web::MakeWebRequest(const String& verb, const String& url, double requestContentSize)
 {
-    PROFILE(MakeWebRequest);
+    ATOMIC_PROFILE(MakeWebRequest);
 
     // The initialization of the request will take time, can not know at this point if it has an error or not
     SharedPtr<WebRequest> webRequest(new WebRequest(context_, verb, url, requestContentSize));
@@ -109,7 +109,7 @@ SharedPtr<WebRequest> Web::MakeWebRequest(const String& verb, const String& url,
 
 SharedPtr<WebSocket> Web::MakeWebSocket(const String& url)
 {
-  PROFILE(MakeWebSocket);
+  ATOMIC_PROFILE(MakeWebSocket);
 
   // The initialization of the WebSocket will take time, can not know at this point if it has an error or not
   SharedPtr<WebSocket> webSocket(new WebSocket(context_, url));

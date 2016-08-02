@@ -49,12 +49,14 @@
 #include "../Graphics/Zone.h"
 #include "../IO/Log.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL.h>
+#include <SDL/include/SDL_syswm.h>
+// ATOMIC END
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void Graphics::SetExternalWindow(void* window)
@@ -62,7 +64,7 @@ void Graphics::SetExternalWindow(void* window)
     if (!window_)
         externalWindow_ = window;
     else
-        URHO3D_LOGERROR("Window already opened, can not set external window");
+        ATOMIC_LOGERROR("Window already opened, can not set external window");
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
@@ -212,7 +214,7 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
             i->size_ = size;
             i->reserved_ = true;
 
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(size));
+            ATOMIC_LOGDEBUG("Resized scratch buffer to size " + String(size));
 
             return i->data_.Get();
         }
@@ -226,7 +228,7 @@ void* Graphics::ReserveScratchBuffer(unsigned size)
     scratchBuffers_.Push(newBuffer);
     return newBuffer.data_.Get();
 
-    URHO3D_LOGDEBUG("Allocated scratch buffer with size " + String(size));
+    ATOMIC_LOGDEBUG("Allocated scratch buffer with size " + String(size));
 }
 
 void Graphics::FreeScratchBuffer(void* buffer)
@@ -243,7 +245,7 @@ void Graphics::FreeScratchBuffer(void* buffer)
         }
     }
 
-    URHO3D_LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
+    ATOMIC_LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
 }
 
 void Graphics::CleanupScratchBuffers()
@@ -255,7 +257,7 @@ void Graphics::CleanupScratchBuffers()
             i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
             i->size_ = maxScratchBufferRequest_;
 
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
+            ATOMIC_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
         }
     }
 

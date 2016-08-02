@@ -83,12 +83,12 @@ struct WebRequestInternalState
     WebRequestInternalState(WebRequest &es_) :
         es(es_)
     {
-        LOGDEBUG("Create WebRequestInternalState");
+        ATOMIC_LOGDEBUG("Create WebRequestInternalState");
     }
 
     ~WebRequestInternalState()
     {
-        LOGDEBUG("Destroy WebRequestInternalState");
+        ATOMIC_LOGDEBUG("Destroy WebRequestInternalState");
     }
 
     static int onProgress(void *clientp, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
@@ -283,7 +283,7 @@ WebRequest::WebRequest(Context* context, const String& verb, const String& url, 
 
 WebRequest::~WebRequest()
 {
-    LOGDEBUG("Destroy WebRequest");
+    ATOMIC_LOGDEBUG("Destroy WebRequest");
 
     curl_slist_free_all(is_->headers);
     if (is_->curlm == NULL)
@@ -296,13 +296,13 @@ WebRequest::~WebRequest()
 
 void WebRequest::setup(asio::io_service *service, CURLM *curlm)
 {
-    LOGDEBUG("Create WebRequest");
+    ATOMIC_LOGDEBUG("Create WebRequest");
 
     is_->service = service;
     is_->curlm = curlm;
     is_->curl = curl_easy_init();
 
-    LOGDEBUG("HTTP " + is_->verb + " request to URL " + is_->url);
+    ATOMIC_LOGDEBUG("HTTP " + is_->verb + " request to URL " + is_->url);
 
     curl_easy_setopt(is_->curl, CURLOPT_ERRORBUFFER, is_->error);
     is_->error[0] = '\0';

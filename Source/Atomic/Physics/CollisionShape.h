@@ -34,7 +34,7 @@ class btTriangleMesh;
 
 struct btTriangleInfoMap;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class CustomGeometry;
@@ -126,9 +126,9 @@ struct HeightfieldData : public CollisionGeometryData
 };
 
 /// Physics collision shape component.
-class URHO3D_API CollisionShape : public Component
+class ATOMIC_API CollisionShape : public Component
 {
-    URHO3D_OBJECT(CollisionShape, Component);
+    ATOMIC_OBJECT(CollisionShape, Component);
 
 public:
     /// Construct.

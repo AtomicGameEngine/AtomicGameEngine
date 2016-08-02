@@ -34,7 +34,7 @@
 #include <cmath>
 #include <limits>
 
-namespace Urho3D
+namespace Atomic
 {
 
 #undef M_PI
@@ -257,7 +257,7 @@ inline float HalfToFloat(unsigned short value)
 }
 
 /// Calculate both sine and cosine, with angle in degrees.
-URHO3D_API void SinCos(float angle, float& sin, float& cos);
+ATOMIC_API void SinCos(float angle, float& sin, float& cos);
 
 }
 

@@ -29,7 +29,7 @@
 #include "../Scene/Node.h"
 #include "../Scene/SceneResolver.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class File;
@@ -82,9 +82,9 @@ struct AsyncProgress
 };
 
 /// Root scene node, represents the whole scene.
-class URHO3D_API Scene : public Node
+class ATOMIC_API Scene : public Node
 {
-    URHO3D_OBJECT(Scene, Node);
+    ATOMIC_OBJECT(Scene, Node);
 
     using Node::GetComponent;
     using Node::SaveXML;
@@ -335,6 +335,6 @@ private:
 };
 
 /// Register Scene library objects.
-void URHO3D_API RegisterSceneLibrary(Context* context);
+void ATOMIC_API RegisterSceneLibrary(Context* context);
 
 }

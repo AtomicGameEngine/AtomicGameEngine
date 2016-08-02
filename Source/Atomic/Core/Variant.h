@@ -30,7 +30,7 @@
 #include "../Math/Rect.h"
 #include "../Math/StringHash.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Variant's supported types.
@@ -109,7 +109,7 @@ typedef Vector<String> StringVector;
 typedef HashMap<StringHash, Variant> VariantMap;
 
 /// Typed resource reference.
-struct URHO3D_API ResourceRef
+struct ATOMIC_API ResourceRef
 {
     /// Construct.
     ResourceRef()
@@ -163,7 +163,7 @@ struct URHO3D_API ResourceRef
 };
 
 /// %List of typed resource references.
-struct URHO3D_API ResourceRefList
+struct ATOMIC_API ResourceRefList
 {
     /// Construct.
     ResourceRefList()
@@ -196,7 +196,7 @@ struct URHO3D_API ResourceRefList
 };
 
 /// Variable that supports a fixed set of types.
-class URHO3D_API Variant
+class ATOMIC_API Variant
 {
 public:
     /// Construct empty.
@@ -1164,78 +1164,78 @@ template <> inline VariantType GetVariantType<Matrix3x4>() { return VAR_MATRIX3X
 template <> inline VariantType GetVariantType<Matrix4>() { return VAR_MATRIX4; }
 
 // Specializations of Variant::Get<T>
-template <> URHO3D_API int Variant::Get<int>() const;
+template <> ATOMIC_API int Variant::Get<int>() const;
 
-template <> URHO3D_API unsigned Variant::Get<unsigned>() const;
+template <> ATOMIC_API unsigned Variant::Get<unsigned>() const;
 
-template <> URHO3D_API StringHash Variant::Get<StringHash>() const;
+template <> ATOMIC_API StringHash Variant::Get<StringHash>() const;
 
-template <> URHO3D_API bool Variant::Get<bool>() const;
+template <> ATOMIC_API bool Variant::Get<bool>() const;
 
-template <> URHO3D_API float Variant::Get<float>() const;
+template <> ATOMIC_API float Variant::Get<float>() const;
 
-template <> URHO3D_API double Variant::Get<double>() const;
+template <> ATOMIC_API double Variant::Get<double>() const;
 
-template <> URHO3D_API const Vector2& Variant::Get<const Vector2&>() const;
+template <> ATOMIC_API const Vector2& Variant::Get<const Vector2&>() const;
 
-template <> URHO3D_API const Vector3& Variant::Get<const Vector3&>() const;
+template <> ATOMIC_API const Vector3& Variant::Get<const Vector3&>() const;
 
-template <> URHO3D_API const Vector4& Variant::Get<const Vector4&>() const;
+template <> ATOMIC_API const Vector4& Variant::Get<const Vector4&>() const;
 
-template <> URHO3D_API const Quaternion& Variant::Get<const Quaternion&>() const;
+template <> ATOMIC_API const Quaternion& Variant::Get<const Quaternion&>() const;
 
-template <> URHO3D_API const Color& Variant::Get<const Color&>() const;
+template <> ATOMIC_API const Color& Variant::Get<const Color&>() const;
 
-template <> URHO3D_API const String& Variant::Get<const String&>() const;
+template <> ATOMIC_API const String& Variant::Get<const String&>() const;
 
-template <> URHO3D_API const IntRect& Variant::Get<const IntRect&>() const;
+template <> ATOMIC_API const IntRect& Variant::Get<const IntRect&>() const;
 
-template <> URHO3D_API const IntVector2& Variant::Get<const IntVector2&>() const;
+template <> ATOMIC_API const IntVector2& Variant::Get<const IntVector2&>() const;
 
-template <> URHO3D_API const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const;
+template <> ATOMIC_API const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const;
 
-template <> URHO3D_API void* Variant::Get<void*>() const;
+template <> ATOMIC_API void* Variant::Get<void*>() const;
 
-template <> URHO3D_API RefCounted* Variant::Get<RefCounted*>() const;
+template <> ATOMIC_API RefCounted* Variant::Get<RefCounted*>() const;
 
-template <> URHO3D_API const Matrix3& Variant::Get<const Matrix3&>() const;
+template <> ATOMIC_API const Matrix3& Variant::Get<const Matrix3&>() const;
 
-template <> URHO3D_API const Matrix3x4& Variant::Get<const Matrix3x4&>() const;
+template <> ATOMIC_API const Matrix3x4& Variant::Get<const Matrix3x4&>() const;
 
-template <> URHO3D_API const Matrix4& Variant::Get<const Matrix4&>() const;
+template <> ATOMIC_API const Matrix4& Variant::Get<const Matrix4&>() const;
 
-template <> URHO3D_API ResourceRef Variant::Get<ResourceRef>() const;
+template <> ATOMIC_API ResourceRef Variant::Get<ResourceRef>() const;
 
-template <> URHO3D_API ResourceRefList Variant::Get<ResourceRefList>() const;
+template <> ATOMIC_API ResourceRefList Variant::Get<ResourceRefList>() const;
 
-template <> URHO3D_API VariantVector Variant::Get<VariantVector>() const;
+template <> ATOMIC_API VariantVector Variant::Get<VariantVector>() const;
 
-template <> URHO3D_API StringVector Variant::Get<StringVector>() const;
+template <> ATOMIC_API StringVector Variant::Get<StringVector>() const;
 
-template <> URHO3D_API VariantMap Variant::Get<VariantMap>() const;
+template <> ATOMIC_API VariantMap Variant::Get<VariantMap>() const;
 
-template <> URHO3D_API Vector2 Variant::Get<Vector2>() const;
+template <> ATOMIC_API Vector2 Variant::Get<Vector2>() const;
 
-template <> URHO3D_API Vector3 Variant::Get<Vector3>() const;
+template <> ATOMIC_API Vector3 Variant::Get<Vector3>() const;
 
-template <> URHO3D_API Vector4 Variant::Get<Vector4>() const;
+template <> ATOMIC_API Vector4 Variant::Get<Vector4>() const;
 
-template <> URHO3D_API Quaternion Variant::Get<Quaternion>() const;
+template <> ATOMIC_API Quaternion Variant::Get<Quaternion>() const;
 
-template <> URHO3D_API Color Variant::Get<Color>() const;
+template <> ATOMIC_API Color Variant::Get<Color>() const;
 
-template <> URHO3D_API String Variant::Get<String>() const;
+template <> ATOMIC_API String Variant::Get<String>() const;
 
-template <> URHO3D_API IntRect Variant::Get<IntRect>() const;
+template <> ATOMIC_API IntRect Variant::Get<IntRect>() const;
 
-template <> URHO3D_API IntVector2 Variant::Get<IntVector2>() const;
+template <> ATOMIC_API IntVector2 Variant::Get<IntVector2>() const;
 
-template <> URHO3D_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const;
+template <> ATOMIC_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const;
 
-template <> URHO3D_API Matrix3 Variant::Get<Matrix3>() const;
+template <> ATOMIC_API Matrix3 Variant::Get<Matrix3>() const;
 
-template <> URHO3D_API Matrix3x4 Variant::Get<Matrix3x4>() const;
+template <> ATOMIC_API Matrix3x4 Variant::Get<Matrix3x4>() const;
 
-template <> URHO3D_API Matrix4 Variant::Get<Matrix4>() const;
+template <> ATOMIC_API Matrix4 Variant::Get<Matrix4>() const;
 
 }

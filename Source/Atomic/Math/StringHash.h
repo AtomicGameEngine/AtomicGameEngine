@@ -24,11 +24,11 @@
 
 #include "../Container/Str.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 32-bit hash value for a string.
-class URHO3D_API StringHash
+class ATOMIC_API StringHash
 {
 public:
     /// Construct with zero value.

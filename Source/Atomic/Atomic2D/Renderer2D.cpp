@@ -38,12 +38,12 @@
 #include "../IO/Log.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
-#include "../Urho2D/Drawable2D.h"
-#include "../Urho2D/Renderer2D.h"
+#include "../Atomic2D/Drawable2D.h"
+#include "../Atomic2D/Renderer2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* blendModeNames[];
@@ -65,12 +65,12 @@ Renderer2D::Renderer2D(Context* context) :
     indexBuffer_(new IndexBuffer(context_)),
     viewMask_(DEFAULT_VIEWMASK)
 {
-    material_->SetName("Urho2D");
+    material_->SetName("Atomic2D");
 
     Technique* tech = new Technique(context_);
     Pass* pass = tech->CreatePass("alpha");
-    pass->SetVertexShader("Urho2D");
-    pass->SetPixelShader("Urho2D");
+    pass->SetVertexShader("Atomic2D");
+    pass->SetPixelShader("Atomic2D");
     pass->SetDepthWrite(false);
     cachedTechniques_[BLEND_REPLACE] = tech;
 
@@ -78,7 +78,7 @@ Renderer2D::Renderer2D(Context* context) :
     material_->SetCullMode(CULL_NONE);
 
     frame_.frameNumber_ = 0;
-    SubscribeToEvent(E_BEGINVIEWUPDATE, URHO3D_HANDLER(Renderer2D, HandleBeginViewUpdate));
+    SubscribeToEvent(E_BEGINVIEWUPDATE, ATOMIC_HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
 
 Renderer2D::~Renderer2D()
@@ -182,7 +182,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         }
         else
         {
-            URHO3D_LOGERROR("Failed to lock index buffer");
+            ATOMIC_LOGERROR("Failed to lock index buffer");
             return;
         }
     }
@@ -214,7 +214,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
                 vertexBuffer->Unlock();
             }
             else
-                URHO3D_LOGERROR("Failed to lock vertex buffer");
+                ATOMIC_LOGERROR("Failed to lock vertex buffer");
         }
 
         viewBatchInfo.vertexBufferUpdateFrameNumber_ = frame_.frameNumber_;
@@ -291,8 +291,8 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
     {
         SharedPtr<Technique> tech(new Technique(context_));
         Pass* pass = tech->CreatePass("alpha");
-        pass->SetVertexShader("Urho2D");
-        pass->SetPixelShader("Urho2D");
+        pass->SetVertexShader("Atomic2D");
+        pass->SetPixelShader("Atomic2D");
         pass->SetDepthWrite(false);
         pass->SetBlendMode(blendMode);
         techIt = cachedTechniques_.Insert(MakePair((int)blendMode, tech));
@@ -329,7 +329,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
 
-    URHO3D_PROFILE(UpdateRenderer2D);
+    ATOMIC_PROFILE(UpdateRenderer2D);
 
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = camera->GetFrustum();
@@ -337,7 +337,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     // Check visibility
     {
-        URHO3D_PROFILE(CheckDrawableVisibility);
+        ATOMIC_PROFILE(CheckDrawableVisibility);
 
         WorkQueue* queue = GetSubsystem<WorkQueue>();
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread

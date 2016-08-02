@@ -25,7 +25,7 @@
 #include "../Graphics/Drawable.h"
 #include "../Graphics/GraphicsDefs.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Drawable2D; 
@@ -63,12 +63,12 @@ struct SourceBatch2D
 };
 
 /// Pixel size (equal 0.01f).
-extern URHO3D_API const float PIXEL_SIZE;
+extern ATOMIC_API const float PIXEL_SIZE;
 
 /// Base class for 2D visible components.
-class URHO3D_API Drawable2D : public Drawable
+class ATOMIC_API Drawable2D : public Drawable
 {
-    URHO3D_OBJECT(Drawable2D, Drawable);
+    ATOMIC_OBJECT(Drawable2D, Drawable);
 
 public:
     /// Construct.

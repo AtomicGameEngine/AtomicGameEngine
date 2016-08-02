@@ -34,7 +34,7 @@ namespace SystemUI
 /// %UI element that can be toggled between unchecked and checked state.
 class ATOMIC_API CheckBox : public BorderImage
 {
-    OBJECT(CheckBox);
+    ATOMIC_OBJECT(CheckBox, BorderImage);
 
 public:
     /// Construct.

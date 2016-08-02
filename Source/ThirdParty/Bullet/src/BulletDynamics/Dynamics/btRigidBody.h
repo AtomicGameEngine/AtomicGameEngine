@@ -16,10 +16,12 @@ subject to the following restrictions:
 #ifndef BT_RIGIDBODY_H
 #define BT_RIGIDBODY_H
 
-#include "LinearMath/btAlignedObjectArray.h"
-#include "LinearMath/btTransform.h"
-#include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
-#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+// ATOMIC BEGIN
+#include "../../LinearMath/btAlignedObjectArray.h"
+#include "../../LinearMath/btTransform.h"
+#include "../../BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
+#include "../../BulletCollision/CollisionDispatch/btCollisionObject.h"
+// ATOMIC END
 
 class btCollisionShape;
 class btMotionState;

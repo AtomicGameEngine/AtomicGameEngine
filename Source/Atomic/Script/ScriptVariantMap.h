@@ -13,7 +13,7 @@ namespace Atomic
 /// For performance sensitive code, specialized marshaling should be used instead (for example physics event data)
 class ScriptVariantMap : public RefCounted
 {
-    REFCOUNTED(ScriptVariantMap)
+    ATOMIC_REFCOUNTED(ScriptVariantMap)
 
 public:
 

@@ -66,7 +66,7 @@
 
 typedef void *SDL_GLContext;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Context;
@@ -100,7 +100,7 @@ struct FrameBufferObject
 };
 
 /// %Graphics subsystem implementation. Holds API-specific objects.
-class URHO3D_API GraphicsImpl
+class ATOMIC_API GraphicsImpl
 {
     friend class Graphics;
 

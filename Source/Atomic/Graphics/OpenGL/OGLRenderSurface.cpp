@@ -39,7 +39,7 @@
 #define glDeleteRenderbuffersEXT glDeleteRenderbuffers
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 RenderSurface::RenderSurface(Texture* parentTexture) :

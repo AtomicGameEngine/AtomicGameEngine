@@ -25,7 +25,7 @@
 #include "../Container/HashMap.h"
 #include "../Container/Ptr.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Animation;
@@ -66,7 +66,7 @@ struct AnimationStateTrack
 };
 
 /// %Animation instance.
-class URHO3D_API AnimationState : public RefCounted
+class ATOMIC_API AnimationState : public RefCounted
 {
 public:
     /// Construct with animated model and animation pointers.

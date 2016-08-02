@@ -26,15 +26,15 @@
 #include "../Core/Main.h"
 #include "../Engine/Engine.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Engine;
 
 /// Base class for creating applications which initialize the Urho3D engine and run a main loop until exited.
-class URHO3D_API Application : public Object
+class ATOMIC_API Application : public Object
 {
-    URHO3D_OBJECT(Application, Object);
+    ATOMIC_OBJECT(Application, Object);
 
 public:
     /// Construct. Parse default engine parameters from the command line, and create the engine in an uninitialized state.
@@ -70,24 +70,24 @@ protected:
 
 // Macro for defining a main function which creates a Context and the application, then runs it
 #ifndef IOS
-#define URHO3D_DEFINE_APPLICATION_MAIN(className) \
+#define ATOMIC_DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \
-    Urho3D::SharedPtr<Urho3D::Context> context(new Urho3D::Context()); \
-    Urho3D::SharedPtr<className> application(new className(context)); \
+    Atomic::SharedPtr<Atomic::Context> context(new Atomic::Context()); \
+    Atomic::SharedPtr<className> application(new className(context)); \
     return application->Run(); \
 } \
-URHO3D_DEFINE_MAIN(RunApplication());
+ATOMIC_DEFINE_MAIN(RunApplication());
 #else
 // On iOS we will let this function exit, so do not hold the context and application in SharedPtr's
-#define URHO3D_DEFINE_APPLICATION_MAIN(className) \
+#define ATOMIC_DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \
-    Urho3D::Context* context = new Urho3D::Context(); \
+    Atomic::Context* context = new Atomic::Context(); \
     className* application = new className(context); \
     return application->Run(); \
 } \
-URHO3D_DEFINE_MAIN(RunApplication());
+ATOMIC_DEFINE_MAIN(RunApplication());
 #endif
 
 }

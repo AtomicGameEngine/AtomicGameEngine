@@ -25,7 +25,7 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Deserializer;
@@ -47,9 +47,9 @@ enum AsyncLoadState
 };
 
 /// Base class for resources.
-class URHO3D_API Resource : public Object
+class ATOMIC_API Resource : public Object
 {
-    URHO3D_OBJECT(Resource, Object);
+    ATOMIC_OBJECT(Resource, Object);
 
 public:
     /// Construct.

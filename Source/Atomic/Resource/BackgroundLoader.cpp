@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#ifdef URHO3D_THREADING
+#ifdef ATOMIC_THREADING
 
 #include "../Precompiled.h"
 
@@ -33,7 +33,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 BackgroundLoader::BackgroundLoader(ResourceCache* owner) :
@@ -127,7 +127,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
     item.resource_ = DynamicCast<Resource>(owner_->GetContext()->CreateObject(type));
     if (!item.resource_)
     {
-        URHO3D_LOGERROR("Could not load unknown resource type " + String(type));
+        ATOMIC_LOGERROR("Could not load unknown resource type " + String(type));
 
         if (sendEventOnFailure && Thread::IsMainThread())
         {
@@ -142,7 +142,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
         return false;
     }
 
-    URHO3D_LOGDEBUG("Background loading resource " + name);
+    ATOMIC_LOGDEBUG("Background loading resource " + name);
 
     item.resource_->SetName(name);
     item.resource_->SetAsyncLoadState(ASYNC_QUEUED);
@@ -159,7 +159,7 @@ bool BackgroundLoader::QueueResource(StringHash type, const String& name, bool s
             callerItem.dependencies_.Insert(key);
         }
         else
-            URHO3D_LOGWARNING("Resource " + caller->GetName() +
+            ATOMIC_LOGWARNING("Resource " + caller->GetName() +
                        " requested for a background loaded resource but was not in the background load queue");
     }
 
@@ -200,7 +200,7 @@ void BackgroundLoader::WaitForResource(StringHash type, StringHash nameHash)
             }
 
             if (didWait)
-                URHO3D_LOGDEBUG("Waited " + String(waitTimer.GetUSec(false) / 1000) + " ms for background loaded resource " +
+                ATOMIC_LOGDEBUG("Waited " + String(waitTimer.GetUSec(false) / 1000) + " ms for background loaded resource " +
                          resource->GetName());
         }
 
@@ -264,17 +264,17 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
     // If BeginLoad() phase was successful, call EndLoad() and get the final success/failure result
     if (success)
     {
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
         String profileBlockName("Finish" + resource->GetTypeName());
 
         Profiler* profiler = owner_->GetSubsystem<Profiler>();
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif
-        URHO3D_LOGDEBUG("Finishing background loaded resource " + resource->GetName());
+        ATOMIC_LOGDEBUG("Finishing background loaded resource " + resource->GetName());
         success = resource->EndLoad();
 
-#ifdef URHO3D_PROFILING
+#ifdef ATOMIC_PROFILING
         if (profiler)
             profiler->EndBlock();
 #endif

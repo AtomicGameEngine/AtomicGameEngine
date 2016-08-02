@@ -23,12 +23,12 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Urho2D/CollisionCircle2D.h"
-#include "../Urho2D/PhysicsUtils2D.h"
+#include "../Atomic2D/CollisionCircle2D.h"
+#include "../Atomic2D/PhysicsUtils2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* URHO2D_CATEGORY;
@@ -51,10 +51,10 @@ void CollisionCircle2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionCircle2D>(URHO2D_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_CLRCLE_RADIUS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_CLRCLE_RADIUS, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Center", GetCenter, SetCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionCircle2D::SetRadius(float radius)

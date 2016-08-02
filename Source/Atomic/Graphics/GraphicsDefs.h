@@ -25,7 +25,7 @@
 #include "../Container/HashBase.h"
 #include "../Math/StringHash.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Vector3;
@@ -176,7 +176,7 @@ enum VertexElementSemantic
 };
 
 /// Vertex element description for arbitrary vertex declarations.
-struct URHO3D_API VertexElement
+struct ATOMIC_API VertexElement
 {
     /// Default-construct.
     VertexElement() :
@@ -217,10 +217,10 @@ struct URHO3D_API VertexElement
 };
 
 /// Sizes of vertex element types.
-extern URHO3D_API const unsigned ELEMENT_TYPESIZES[];
+extern ATOMIC_API const unsigned ELEMENT_TYPESIZES[];
 
 /// Vertex element definitions for the legacy elements.
-extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[];
+extern ATOMIC_API const VertexElement LEGACY_VERTEXELEMENTS[];
 
 /// Texture filtering mode.
 enum TextureFilterMode
@@ -367,61 +367,61 @@ enum ShadowQuality
 };
 
 // Inbuilt shader parameters.
-extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR;
-extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
-extern URHO3D_API const StringHash VSP_BILLBOARDROT;
-extern URHO3D_API const StringHash VSP_CAMERAPOS;
-extern URHO3D_API const StringHash VSP_CLIPPLANE;
-extern URHO3D_API const StringHash VSP_NEARCLIP;
-extern URHO3D_API const StringHash VSP_FARCLIP;
-extern URHO3D_API const StringHash VSP_DEPTHMODE;
-extern URHO3D_API const StringHash VSP_DELTATIME;
-extern URHO3D_API const StringHash VSP_ELAPSEDTIME;
-extern URHO3D_API const StringHash VSP_FRUSTUMSIZE;
-extern URHO3D_API const StringHash VSP_GBUFFEROFFSETS;
-extern URHO3D_API const StringHash VSP_LIGHTDIR;
-extern URHO3D_API const StringHash VSP_LIGHTPOS;
-extern URHO3D_API const StringHash VSP_NORMALOFFSETSCALE;
-extern URHO3D_API const StringHash VSP_MODEL;
-extern URHO3D_API const StringHash VSP_VIEW;
-extern URHO3D_API const StringHash VSP_VIEWINV;
-extern URHO3D_API const StringHash VSP_VIEWPROJ;
-extern URHO3D_API const StringHash VSP_UOFFSET;
-extern URHO3D_API const StringHash VSP_VOFFSET;
-extern URHO3D_API const StringHash VSP_ZONE;
-extern URHO3D_API const StringHash VSP_LIGHTMATRICES;
-extern URHO3D_API const StringHash VSP_SKINMATRICES;
-extern URHO3D_API const StringHash VSP_VERTEXLIGHTS;
-extern URHO3D_API const StringHash PSP_AMBIENTCOLOR;
-extern URHO3D_API const StringHash PSP_CAMERAPOS;
-extern URHO3D_API const StringHash PSP_DELTATIME;
-extern URHO3D_API const StringHash PSP_DEPTHRECONSTRUCT;
-extern URHO3D_API const StringHash PSP_ELAPSEDTIME;
-extern URHO3D_API const StringHash PSP_FOGCOLOR;
-extern URHO3D_API const StringHash PSP_FOGPARAMS;
-extern URHO3D_API const StringHash PSP_GBUFFERINVSIZE;
-extern URHO3D_API const StringHash PSP_LIGHTCOLOR;
-extern URHO3D_API const StringHash PSP_LIGHTDIR;
-extern URHO3D_API const StringHash PSP_LIGHTPOS;
-extern URHO3D_API const StringHash PSP_NORMALOFFSETSCALE;
-extern URHO3D_API const StringHash PSP_MATDIFFCOLOR;
-extern URHO3D_API const StringHash PSP_MATEMISSIVECOLOR;
-extern URHO3D_API const StringHash PSP_MATENVMAPCOLOR;
-extern URHO3D_API const StringHash PSP_MATSPECCOLOR;
-extern URHO3D_API const StringHash PSP_NEARCLIP;
-extern URHO3D_API const StringHash PSP_FARCLIP;
-extern URHO3D_API const StringHash PSP_SHADOWCUBEADJUST;
-extern URHO3D_API const StringHash PSP_SHADOWDEPTHFADE;
-extern URHO3D_API const StringHash PSP_SHADOWINTENSITY;
-extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
-extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
-extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
-extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS;
-extern URHO3D_API const StringHash PSP_ROUGHNESS;
-extern URHO3D_API const StringHash PSP_METALLIC;
+extern ATOMIC_API const StringHash VSP_AMBIENTSTARTCOLOR;
+extern ATOMIC_API const StringHash VSP_AMBIENTENDCOLOR;
+extern ATOMIC_API const StringHash VSP_BILLBOARDROT;
+extern ATOMIC_API const StringHash VSP_CAMERAPOS;
+extern ATOMIC_API const StringHash VSP_CLIPPLANE;
+extern ATOMIC_API const StringHash VSP_NEARCLIP;
+extern ATOMIC_API const StringHash VSP_FARCLIP;
+extern ATOMIC_API const StringHash VSP_DEPTHMODE;
+extern ATOMIC_API const StringHash VSP_DELTATIME;
+extern ATOMIC_API const StringHash VSP_ELAPSEDTIME;
+extern ATOMIC_API const StringHash VSP_FRUSTUMSIZE;
+extern ATOMIC_API const StringHash VSP_GBUFFEROFFSETS;
+extern ATOMIC_API const StringHash VSP_LIGHTDIR;
+extern ATOMIC_API const StringHash VSP_LIGHTPOS;
+extern ATOMIC_API const StringHash VSP_NORMALOFFSETSCALE;
+extern ATOMIC_API const StringHash VSP_MODEL;
+extern ATOMIC_API const StringHash VSP_VIEW;
+extern ATOMIC_API const StringHash VSP_VIEWINV;
+extern ATOMIC_API const StringHash VSP_VIEWPROJ;
+extern ATOMIC_API const StringHash VSP_UOFFSET;
+extern ATOMIC_API const StringHash VSP_VOFFSET;
+extern ATOMIC_API const StringHash VSP_ZONE;
+extern ATOMIC_API const StringHash VSP_LIGHTMATRICES;
+extern ATOMIC_API const StringHash VSP_SKINMATRICES;
+extern ATOMIC_API const StringHash VSP_VERTEXLIGHTS;
+extern ATOMIC_API const StringHash PSP_AMBIENTCOLOR;
+extern ATOMIC_API const StringHash PSP_CAMERAPOS;
+extern ATOMIC_API const StringHash PSP_DELTATIME;
+extern ATOMIC_API const StringHash PSP_DEPTHRECONSTRUCT;
+extern ATOMIC_API const StringHash PSP_ELAPSEDTIME;
+extern ATOMIC_API const StringHash PSP_FOGCOLOR;
+extern ATOMIC_API const StringHash PSP_FOGPARAMS;
+extern ATOMIC_API const StringHash PSP_GBUFFERINVSIZE;
+extern ATOMIC_API const StringHash PSP_LIGHTCOLOR;
+extern ATOMIC_API const StringHash PSP_LIGHTDIR;
+extern ATOMIC_API const StringHash PSP_LIGHTPOS;
+extern ATOMIC_API const StringHash PSP_NORMALOFFSETSCALE;
+extern ATOMIC_API const StringHash PSP_MATDIFFCOLOR;
+extern ATOMIC_API const StringHash PSP_MATEMISSIVECOLOR;
+extern ATOMIC_API const StringHash PSP_MATENVMAPCOLOR;
+extern ATOMIC_API const StringHash PSP_MATSPECCOLOR;
+extern ATOMIC_API const StringHash PSP_NEARCLIP;
+extern ATOMIC_API const StringHash PSP_FARCLIP;
+extern ATOMIC_API const StringHash PSP_SHADOWCUBEADJUST;
+extern ATOMIC_API const StringHash PSP_SHADOWDEPTHFADE;
+extern ATOMIC_API const StringHash PSP_SHADOWINTENSITY;
+extern ATOMIC_API const StringHash PSP_SHADOWMAPINVSIZE;
+extern ATOMIC_API const StringHash PSP_SHADOWSPLITS;
+extern ATOMIC_API const StringHash PSP_LIGHTMATRICES;
+extern ATOMIC_API const StringHash PSP_VSMSHADOWPARAMS;
+extern ATOMIC_API const StringHash PSP_ROUGHNESS;
+extern ATOMIC_API const StringHash PSP_METALLIC;
 
 // Scale calculation from bounding box diagonal.
-extern URHO3D_API const Vector3 DOT_SCALE;
+extern ATOMIC_API const Vector3 DOT_SCALE;
 
 static const int QUALITY_LOW = 0;
 static const int QUALITY_MEDIUM = 1;

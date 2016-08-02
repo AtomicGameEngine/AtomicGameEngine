@@ -30,7 +30,7 @@
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 class HttpRequest;
@@ -44,9 +44,9 @@ template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 }
 
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
-class URHO3D_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
+class ATOMIC_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
-    URHO3D_OBJECT(Network, Object);
+    ATOMIC_OBJECT(Network, Object);
 
 public:
     /// Construct.
@@ -134,6 +134,19 @@ public:
     /// Send outgoing messages after frame logic. Called by HandleRenderUpdate.
     void PostUpdate(float timeStep);
 
+    // ATOMIC BEGIN
+
+    friend class MasterServerClient;
+
+    unsigned short GetServerPort() const { return serverPort_; }
+
+    bool IsEndPointConnected(const kNet::EndPoint& endPoint) const;
+
+    /// Connect to a server, reusing an existing Socket
+    bool ConnectWithExistingSocket(kNet::Socket* existingSocket, Scene* scene);
+
+    // ATOMIC END
+
 private:
     /// Handle begin frame event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
@@ -170,9 +183,17 @@ private:
     float updateAcc_;
     /// Package cache directory.
     String packageCacheDir_;
+
+    // ATOMIC BEGIN
+
+    kNet::Network* GetKnetNetwork() { return network_; }
+
+    unsigned short serverPort_;
+    // ATOMIC END
+
 };
 
 /// Register Network library objects.
-void URHO3D_API RegisterNetworkLibrary(Context* context);
+void ATOMIC_API RegisterNetworkLibrary(Context* context);
 
 }

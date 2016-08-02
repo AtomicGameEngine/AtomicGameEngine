@@ -22,15 +22,15 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
 #include <stddef.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 struct AllocatorBlock;
@@ -59,13 +59,13 @@ struct AllocatorNode
 };
 
 /// Initialize a fixed-size allocator with the node size and initial capacity.
-URHO3D_API AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
+ATOMIC_API AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
 /// Uninitialize a fixed-size allocator. Frees all blocks in the chain.
-URHO3D_API void AllocatorUninitialize(AllocatorBlock* allocator);
+ATOMIC_API void AllocatorUninitialize(AllocatorBlock* allocator);
 /// Reserve a node. Creates a new block if necessary.
-URHO3D_API void* AllocatorReserve(AllocatorBlock* allocator);
+ATOMIC_API void* AllocatorReserve(AllocatorBlock* allocator);
 /// Free a node. Does not free any blocks.
-URHO3D_API void AllocatorFree(AllocatorBlock* allocator, void* ptr);
+ATOMIC_API void AllocatorFree(AllocatorBlock* allocator, void* ptr);
 
 /// %Allocator template class. Allocates objects of a specific class.
 template <class T> class Allocator

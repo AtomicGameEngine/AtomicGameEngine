@@ -24,7 +24,7 @@
 
 #include "../Math/Vector3.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class BoundingBox;
@@ -32,7 +32,7 @@ class Polyhedron;
 class Frustum;
 
 /// %Sphere in three-dimensional space.
-class URHO3D_API Sphere
+class ATOMIC_API Sphere
 {
 public:
     /// Construct undefined.

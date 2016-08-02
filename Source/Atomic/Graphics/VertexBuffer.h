@@ -27,13 +27,13 @@
 #include "../Graphics/GPUObject.h"
 #include "../Graphics/GraphicsDefs.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Hardware vertex buffer.
-class URHO3D_API VertexBuffer : public Object, public GPUObject
+class ATOMIC_API VertexBuffer : public Object, public GPUObject
 {
-    URHO3D_OBJECT(VertexBuffer, Object);
+    ATOMIC_OBJECT(VertexBuffer, Object);
 
 public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.

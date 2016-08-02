@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) :
@@ -140,7 +140,7 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
         return Clamp(currentTime, beginTime, endTime);
 
     default:
-        URHO3D_LOGERROR("Unsupported attribute animation wrap mode");
+        ATOMIC_LOGERROR("Unsupported attribute animation wrap mode");
         return beginTime;
     }
 }

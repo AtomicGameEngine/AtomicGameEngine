@@ -20,6 +20,7 @@
 // THE SOFTWARE.
 //
 
+#include <Cocoa/Cocoa.h>
 #include <stdio.h>
 
 #include <ThirdParty/SDL/include/SDL.h>

@@ -27,12 +27,12 @@
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
-#include "../Urho2D/ParticleEffect2D.h"
-#include "../Urho2D/Sprite2D.h"
+#include "../Atomic2D/ParticleEffect2D.h"
+#include "../Atomic2D/Sprite2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int srcBlendFuncs[] =
@@ -210,7 +210,7 @@ bool ParticleEffect2D::EndLoad()
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
         if (!sprite_)
-            URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
+            ATOMIC_LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
 
         loadSpriteName_.Clear();
     }

@@ -69,12 +69,12 @@ IPCWorker::IPCWorker(Context* context, IPCHandle fd, unsigned id) : IPCChannel(c
 
     if (!transport_.OpenClient(clientRead_))
     {
-        LOGERRORF("Unable to open IPC transport fd = %i", clientRead_);
+        ATOMIC_LOGERRORF("Unable to open IPC transport fd = %i", clientRead_);
         shouldRun_ = false;
         return;
     }
 
-    LOGERRORF("Opened IPC transport fd = %i", clientRead_);
+    ATOMIC_LOGERRORF("Opened IPC transport fd = %i", clientRead_);
 #endif
 }
 

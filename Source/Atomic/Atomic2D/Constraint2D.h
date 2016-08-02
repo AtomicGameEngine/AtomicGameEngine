@@ -26,16 +26,16 @@
 
 #include <Box2D/Box2D.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 class RigidBody2D;
 class PhysicsWorld2D;
 
 /// 2D physics constraint component.
-class URHO3D_API Constraint2D : public Component
+class ATOMIC_API Constraint2D : public Component
 {
-    URHO3D_OBJECT(Constraint2D, Component);
+    ATOMIC_OBJECT(Constraint2D, Component);
 
 public:
     /// Construct.

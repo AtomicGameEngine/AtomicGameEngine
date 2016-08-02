@@ -29,7 +29,9 @@
 #include "../Math/Vector3.h"
 #include "../Scene/Component.h"
 
-#include <Bullet/LinearMath/btIDebugDraw.h>
+// ATOMIC BEGIN
+#include <Bullet/src/LinearMath/btIDebugDraw.h>
+// ATOMIC END
 
 class btCollisionConfiguration;
 class btCollisionShape;
@@ -40,7 +42,7 @@ class btDispatcher;
 class btDynamicsWorld;
 class btPersistentManifold;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class CollisionShape;
@@ -57,7 +59,7 @@ class XMLElement;
 struct CollisionGeometryData;
 
 /// Physics raycast hit.
-struct URHO3D_API PhysicsRaycastResult
+struct ATOMIC_API PhysicsRaycastResult
 {
     /// Construct with defaults.
     PhysicsRaycastResult() :
@@ -111,9 +113,9 @@ struct PhysicsWorldConfig
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Physics simulation world component. Should be added only to the root scene node.
-class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
+class ATOMIC_API PhysicsWorld : public Component, public btIDebugDraw
 {
-    URHO3D_OBJECT(PhysicsWorld, Component);
+    ATOMIC_OBJECT(PhysicsWorld, Component);
 
     friend void InternalPreTickCallback(btDynamicsWorld* world, btScalar timeStep);
     friend void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep);
@@ -343,6 +345,6 @@ private:
 };
 
 /// Register Physics library objects.
-void URHO3D_API RegisterPhysicsLibrary(Context* context);
+void ATOMIC_API RegisterPhysicsLibrary(Context* context);
 
 }

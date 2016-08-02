@@ -28,14 +28,14 @@
 #include "../Math/Matrix3x4.h"
 #include "../Math/Rect.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class IndexBuffer;
 class VertexBuffer;
 
 /// One billboard in the billboard set.
-struct URHO3D_API Billboard
+struct ATOMIC_API Billboard
 {
     /// Position.
     Vector3 position_;
@@ -60,9 +60,9 @@ struct URHO3D_API Billboard
 static const unsigned MAX_BILLBOARDS = 65536 / 4;
 
 /// %Billboard component.
-class URHO3D_API BillboardSet : public Drawable
+class ATOMIC_API BillboardSet : public Drawable
 {
-    URHO3D_OBJECT(BillboardSet, Drawable);
+    ATOMIC_OBJECT(BillboardSet, Drawable);
 
 public:
     /// Construct.

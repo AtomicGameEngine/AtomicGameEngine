@@ -26,16 +26,16 @@
 #include "../Graphics/Skeleton.h"
 #include "../Graphics/StaticModel.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Animation;
 class AnimationState;
 
 /// Animated model component.
-class URHO3D_API AnimatedModel : public StaticModel
+class ATOMIC_API AnimatedModel : public StaticModel
 {
-    URHO3D_OBJECT(AnimatedModel, StaticModel);
+    ATOMIC_OBJECT(AnimatedModel, StaticModel);
 
     friend class AnimationState;
 

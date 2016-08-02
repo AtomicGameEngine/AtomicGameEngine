@@ -30,7 +30,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 IndexBuffer::IndexBuffer(Context* context, bool forceHeadless) :
@@ -92,13 +92,13 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
 {
     if (!shadowData_)
     {
-        URHO3D_LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
+        ATOMIC_LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
         return false;
     }
 
     if (start + count > indexCount_)
     {
-        URHO3D_LOGERROR("Illegal index range for querying used vertices");
+        ATOMIC_LOGERROR("Illegal index range for querying used vertices");
         return false;
     }
 

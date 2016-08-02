@@ -26,7 +26,7 @@
 
 #include <Box2D/Box2D.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 class CollisionShape2D;
@@ -42,9 +42,9 @@ enum BodyType2D
 };
 
 /// 2D rigid body component.
-class URHO3D_API RigidBody2D : public Component
+class ATOMIC_API RigidBody2D : public Component
 {
-    URHO3D_OBJECT(RigidBody2D, Component);
+    ATOMIC_OBJECT(RigidBody2D, Component);
 
 public:
     /// Construct.
@@ -155,6 +155,13 @@ public:
     /// Return Box2D body.
     b2Body* GetBody() const { return body_; }
 
+    // ATOMIC BEGIN
+
+    bool GetCastShadows() const { return castShadows_; }
+    void SetCastShadows(bool castShadows) { castShadows_ = castShadows; }
+
+    // ATOMIC END
+
 private:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -177,6 +184,10 @@ private:
     Vector<WeakPtr<CollisionShape2D> > collisionShapes_;
     /// Constraints.
     Vector<WeakPtr<Constraint2D> > constraints_;
+
+// ATOMIC BEGIN
+    bool castShadows_;
+// ATOMIC END
 };
 
 }

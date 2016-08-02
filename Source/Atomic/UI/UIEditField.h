@@ -41,7 +41,7 @@ enum UI_EDIT_TYPE {
 
 class UIEditField : public UIWidget
 {
-    OBJECT(UIEditField)
+    ATOMIC_OBJECT(UIEditField, UIWidget)
 
 public:
 

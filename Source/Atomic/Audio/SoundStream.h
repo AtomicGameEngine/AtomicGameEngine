@@ -24,11 +24,11 @@
 
 #include "../Container/RefCounted.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Base class for sound streams.
-class URHO3D_API SoundStream : public RefCounted
+class ATOMIC_API SoundStream : public RefCounted
 {
 public:
     /// Construct.

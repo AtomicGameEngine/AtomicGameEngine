@@ -28,7 +28,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Vector4.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 enum InterpolationMode
@@ -44,7 +44,7 @@ enum InterpolationMode
 };
 
 /// Spline class to get a point on it based off the interpolation mode.
-class URHO3D_API Spline
+class ATOMIC_API Spline
 {
 public:
     /// Default constructor.

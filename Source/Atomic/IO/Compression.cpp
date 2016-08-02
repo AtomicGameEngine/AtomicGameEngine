@@ -31,7 +31,7 @@
 #include <LZ4/lz4.h>
 #include <LZ4/lz4hc.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 unsigned EstimateCompressBound(unsigned srcSize)

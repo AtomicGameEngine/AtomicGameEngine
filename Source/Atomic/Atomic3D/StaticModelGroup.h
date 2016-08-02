@@ -24,13 +24,13 @@
 
 #include "../Graphics/StaticModel.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Renders several object instances while culling and receiving light as one unit. Can be used as a CPU-side optimization, but note that also regular StaticModels will use instanced rendering if possible.
-class URHO3D_API StaticModelGroup : public StaticModel
+class ATOMIC_API StaticModelGroup : public StaticModel
 {
-    URHO3D_OBJECT(StaticModelGroup, StaticModel);
+    ATOMIC_OBJECT(StaticModelGroup, StaticModel);
 
 public:
     /// Construct.

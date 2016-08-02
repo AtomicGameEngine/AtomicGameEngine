@@ -29,7 +29,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const int LINE_MAX_LENGTH = 256;
@@ -98,7 +98,7 @@ void EventProfiler::Clear()
     current_->name_ = "Root";
 }
 
-Urho3D::String EventProfiler::PrintData(bool showUnused /*= false*/, bool showTotal /*= false*/, unsigned maxDepth /*= M_MAX_UNSIGNED*/) const
+Atomic::String EventProfiler::PrintData(bool showUnused /*= false*/, bool showTotal /*= false*/, unsigned maxDepth /*= M_MAX_UNSIGNED*/) const
 {
     String output;
 

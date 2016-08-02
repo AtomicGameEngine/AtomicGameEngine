@@ -22,14 +22,29 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
+
+// ATOMIC BEGIN
+
+struct RefCounted;
+typedef void (*RefCountedDeletedFunction)(RefCounted*);
+typedef const void* ClassID;
+
+/// Macro to be included in RefCounted derived classes for efficient RTTI
+#define ATOMIC_REFCOUNTED(typeName) \
+    public: \
+        virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
+
+// ATOMIC END
+
 
 /// Reference count structure.
 struct RefCount
@@ -56,7 +71,7 @@ struct RefCount
 };
 
 /// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
-class URHO3D_API RefCounted
+class ATOMIC_API RefCounted
 {
 public:
     /// Construct. Allocate the reference count structure and set an initial self weak reference.
@@ -76,6 +91,14 @@ public:
     /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
 
+// ATOMIC BEGIN
+
+    /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
+    inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
+    inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
+
+// ATOMIC END
+
 private:
     /// Prevent copy construction.
     RefCounted(const RefCounted& rhs);
@@ -84,6 +107,11 @@ private:
 
     /// Pointer to the reference count structure.
     RefCount* refCount_;
+
+    // ATOMIC BEGIN
+    void* jsHeapPtr_;
+    // ATOMIC END
+
 };
 
 }

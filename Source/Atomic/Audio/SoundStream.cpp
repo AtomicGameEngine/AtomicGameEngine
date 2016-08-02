@@ -24,7 +24,7 @@
 
 #include "../Audio/SoundStream.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 SoundStream::SoundStream() :

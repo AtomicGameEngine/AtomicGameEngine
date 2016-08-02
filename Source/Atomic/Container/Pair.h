@@ -24,7 +24,7 @@
 
 #include "../Container/Hash.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Pair template class.

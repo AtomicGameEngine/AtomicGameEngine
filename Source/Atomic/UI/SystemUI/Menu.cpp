@@ -51,10 +51,10 @@ Menu::Menu(Context* context) :
 {
     focusMode_ = FM_NOTFOCUSABLE;
 
-    SubscribeToEvent(this, E_PRESSED, HANDLER(Menu, HandlePressedReleased));
-    SubscribeToEvent(this, E_RELEASED, HANDLER(Menu, HandlePressedReleased));
-    SubscribeToEvent(E_UIMOUSECLICK, HANDLER(Menu, HandleFocusChanged));
-    SubscribeToEvent(E_FOCUSCHANGED, HANDLER(Menu, HandleFocusChanged));
+    SubscribeToEvent(this, E_PRESSED, ATOMIC_HANDLER(Menu, HandlePressedReleased));
+    SubscribeToEvent(this, E_RELEASED, ATOMIC_HANDLER(Menu, HandlePressedReleased));
+    SubscribeToEvent(E_UIMOUSECLICK, ATOMIC_HANDLER(Menu, HandleFocusChanged));
+    SubscribeToEvent(E_FOCUSCHANGED, ATOMIC_HANDLER(Menu, HandleFocusChanged));
 }
 
 Menu::~Menu()
@@ -67,9 +67,9 @@ void Menu::RegisterObject(Context* context)
 {
     context->RegisterFactory<Menu>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(Button);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_NOTFOCUSABLE);
-    ACCESSOR_ATTRIBUTE("Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    ATOMIC_COPY_BASE_ATTRIBUTES(Button);
+    ATOMIC_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_NOTFOCUSABLE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Popup Offset", GetPopupOffset, SetPopupOffset, IntVector2, IntVector2::ZERO, AM_FILE);
 }
 
 void Menu::Update(float timeStep)
@@ -180,7 +180,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
                 // Do not add the popup element as a child even temporarily, as that can break layouts
                 SharedPtr<UIElement> popup = DynamicCast<UIElement>(context_->CreateObject(typeName));
                 if (!popup)
-                    LOGERROR("Could not create popup element type " + typeName);
+                    ATOMIC_LOGERROR("Could not create popup element type " + typeName);
                 else
                 {
                     child = popup;
@@ -206,7 +206,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
                 }
 
                 if (!child)
-                    LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
+                    ATOMIC_LOGWARNING("Could not find matching internal child element of type " + typeName + " in " + GetTypeName());
             }
         }
 
@@ -248,7 +248,7 @@ bool Menu::SaveXML(XMLElement& dest) const
         // Filter popup implicit attributes
         if (!FilterPopupImplicitAttributes(childElem))
         {
-            LOGERROR("Could not remove popup implicit attributes");
+            ATOMIC_LOGERROR("Could not remove popup implicit attributes");
             return false;
         }
     }
@@ -264,7 +264,7 @@ void Menu::SetPopup(UIElement* popup)
     // Currently only allow popup 'window'
     if (popup->GetType() != Window::GetTypeStatic())
     {
-        LOGERROR("Could not set popup element of type " + popup->GetTypeName() + ", only support popup window for now");
+        ATOMIC_LOGERROR("Could not set popup element of type " + popup->GetTypeName() + ", only support popup window for now");
         return;
     }
 
@@ -338,7 +338,7 @@ void Menu::SetAccelerator(int key, int qualifiers)
     acceleratorQualifiers_ = qualifiers;
 
     if (key)
-        SubscribeToEvent(E_KEYDOWN, HANDLER(Menu, HandleKeyDown));
+        SubscribeToEvent(E_KEYDOWN, ATOMIC_HANDLER(Menu, HandleKeyDown));
     else
         UnsubscribeFromEvent(E_KEYDOWN);
 }

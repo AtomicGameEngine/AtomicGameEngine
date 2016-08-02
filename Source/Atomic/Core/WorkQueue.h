@@ -26,13 +26,13 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Work item completed event.
-URHO3D_EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+ATOMIC_EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
 {
-    URHO3D_PARAM(P_ITEM, Item);                        // WorkItem ptr
+    ATOMIC_PARAM(P_ITEM, Item);                        // WorkItem ptr
 }
 
 class WorkerThread;
@@ -72,9 +72,9 @@ private:
 };
 
 /// Work queue subsystem for multithreading.
-class URHO3D_API WorkQueue : public Object
+class ATOMIC_API WorkQueue : public Object
 {
-    URHO3D_OBJECT(WorkQueue, Object);
+    ATOMIC_OBJECT(WorkQueue, Object);
 
     friend class WorkerThread;
 

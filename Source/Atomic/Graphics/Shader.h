@@ -25,15 +25,15 @@
 #include "../Container/ArrayPtr.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ShaderVariation;
 
 /// %Shader resource consisting of several shader variations.
-class URHO3D_API Shader : public Resource
+class ATOMIC_API Shader : public Resource
 {
-    URHO3D_OBJECT(Shader, Resource);
+    ATOMIC_OBJECT(Shader, Resource);
 
 public:
     /// Construct.

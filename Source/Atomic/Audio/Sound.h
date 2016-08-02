@@ -25,15 +25,15 @@
 #include "../Container/ArrayPtr.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class SoundStream;
 
 /// %Sound resource.
-class URHO3D_API Sound : public Resource
+class ATOMIC_API Sound : public Resource
 {
-    URHO3D_OBJECT(Sound, Resource);
+    ATOMIC_OBJECT(Sound, Resource);
 
 public:
     /// Construct.

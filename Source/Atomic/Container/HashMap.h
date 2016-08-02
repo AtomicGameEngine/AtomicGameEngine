@@ -28,11 +28,11 @@
 #include "../Container/Vector.h"
 
 #include <cassert>
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
 #include <initializer_list>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Hash map template class.
@@ -240,7 +240,7 @@ public:
         head_ = tail_ = ReserveNode();
         *this = map;
     }
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Aggregate initialization constructor.
     HashMap(const std::initializer_list<Pair<T, U>>& list) : HashMap()
     {
@@ -341,7 +341,7 @@ public:
         return node ? &node->pair_.second_ : 0;
     }
 
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Populate the map using variadic template. This handles the base case.
     HashMap& Populate(const T& key, const U& value)
     {
@@ -481,7 +481,7 @@ public:
             ptr = ptr->Next();
         }
 
-        Urho3D::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
+        Atomic::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
 
         head_ = ptrs[0];
         ptrs[0]->prev_ = 0;
@@ -607,6 +607,24 @@ public:
 
     /// Return last pair.
     const KeyValue& Back() const { return *(--End()); }
+
+    // ATOMIC BEGIN
+
+    /// Insert a pair only if a corresponding key does not already exist.
+    Iterator InsertNew(const T& key, const U& value)
+    {
+        unsigned hashKey = Hash(key);
+        if (ptrs_)
+        {
+            Node* node = FindNode(key, hashKey);
+            if (node)
+                return Iterator(node);
+        }
+
+        return InsertNode(key, value, false);
+    }
+
+    // ATOMIC END
 
 private:
     /// Return the head node.
@@ -771,12 +789,12 @@ private:
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 
-template <class T, class U> typename Urho3D::HashMap<T, U>::ConstIterator begin(const Urho3D::HashMap<T, U>& v) { return v.Begin(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator begin(const Atomic::HashMap<T, U>& v) { return v.Begin(); }
 
-template <class T, class U> typename Urho3D::HashMap<T, U>::ConstIterator end(const Urho3D::HashMap<T, U>& v) { return v.End(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator end(const Atomic::HashMap<T, U>& v) { return v.End(); }
 
-template <class T, class U> typename Urho3D::HashMap<T, U>::Iterator begin(Urho3D::HashMap<T, U>& v) { return v.Begin(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::Iterator begin(Atomic::HashMap<T, U>& v) { return v.Begin(); }
 
-template <class T, class U> typename Urho3D::HashMap<T, U>::Iterator end(Urho3D::HashMap<T, U>& v) { return v.End(); }
+template <class T, class U> typename Atomic::HashMap<T, U>::Iterator end(Atomic::HashMap<T, U>& v) { return v.End(); }
 
 }

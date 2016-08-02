@@ -24,15 +24,15 @@
 
 #include "../Audio/SoundSource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Audio;
 
 /// %Sound source component with three-dimensional position.
-class URHO3D_API SoundSource3D : public SoundSource
+class ATOMIC_API SoundSource3D : public SoundSource
 {
-    URHO3D_OBJECT(SoundSource3D, SoundSource);
+    ATOMIC_OBJECT(SoundSource3D, SoundSource);
 
 public:
     /// Construct.

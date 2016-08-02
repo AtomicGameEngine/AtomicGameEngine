@@ -34,7 +34,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* wrapModeNames[];
@@ -78,7 +78,7 @@ Animatable::~Animatable()
 
 void Animatable::RegisterObject(Context* context)
 {
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
         ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
 
@@ -153,7 +153,7 @@ bool Animatable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
 
     if (!attributeAnimationValue.IsObject())
     {
-        URHO3D_LOGWARNING("'attributeanimation' value is present in JSON data, but is not a JSON object; skipping it");
+        ATOMIC_LOGWARNING("'attributeanimation' value is present in JSON data, but is not a JSON object; skipping it");
         return true;
     }
 
@@ -319,8 +319,8 @@ void Animatable::SetObjectAnimation(ObjectAnimation* objectAnimation)
     if (objectAnimation_)
     {
         OnObjectAnimationAdded(objectAnimation_);
-        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationAdded));
-        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, URHO3D_HANDLER(Animatable, HandleAttributeAnimationRemoved));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONADDED, ATOMIC_HANDLER(Animatable, HandleAttributeAnimationAdded));
+        SubscribeToEvent(objectAnimation_, E_ATTRIBUTEANIMATIONREMOVED, ATOMIC_HANDLER(Animatable, HandleAttributeAnimationRemoved));
     }
 }
 
@@ -346,7 +346,7 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
             const Vector<AttributeInfo>* attributes = GetAttributes();
             if (!attributes)
             {
-                URHO3D_LOGERROR(GetTypeName() + " has no attributes");
+                ATOMIC_LOGERROR(GetTypeName() + " has no attributes");
                 return;
             }
 
@@ -362,14 +362,14 @@ void Animatable::SetAttributeAnimation(const String& name, ValueAnimation* attri
 
         if (!attributeInfo)
         {
-            URHO3D_LOGERROR("Invalid name: " + name);
+            ATOMIC_LOGERROR("Invalid name: " + name);
             return;
         }
 
         // Check value type is same with attribute type
         if (attributeAnimation->GetValueType() != attributeInfo->type_)
         {
-            URHO3D_LOGERROR("Invalid value type");
+            ATOMIC_LOGERROR("Invalid value type");
             return;
         }
 

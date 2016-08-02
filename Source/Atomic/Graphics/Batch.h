@@ -29,7 +29,7 @@
 #include "../Math/Matrix3x4.h"
 #include "../Math/Rect.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Camera;

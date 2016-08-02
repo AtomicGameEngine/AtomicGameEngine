@@ -44,7 +44,7 @@ UISelectList::UISelectList(Context* context, bool createWidget) : UIWidget(conte
         GetSubsystem<UI>()->WrapWidget(this, widget_);
     }
 
-    SubscribeToEvent(E_UIUPDATE, HANDLER(UISelectList, HandleUIUpdate));
+    SubscribeToEvent(E_UIUPDATE, ATOMIC_HANDLER(UISelectList, HandleUIUpdate));
 }
 
 UISelectList::~UISelectList()

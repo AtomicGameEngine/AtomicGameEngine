@@ -32,7 +32,7 @@ namespace Atomic
 
 class UIButton : public UIWidget
 {
-    OBJECT(UIButton)
+    ATOMIC_OBJECT(UIButton, UIWidget)
 
 public:
 

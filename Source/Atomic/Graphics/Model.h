@@ -29,7 +29,7 @@
 #include "../Math/BoundingBox.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Geometry;
@@ -105,9 +105,9 @@ struct GeometryDesc
 };
 
 /// 3D model resource.
-class URHO3D_API Model : public Resource
+class ATOMIC_API Model : public Resource
 {
-    URHO3D_OBJECT(Model, Resource);
+    ATOMIC_OBJECT(Model, Resource);
 
 public:
     /// Construct.

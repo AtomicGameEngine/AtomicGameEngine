@@ -26,7 +26,7 @@
 #include "../Math/BoundingBox.h"
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
@@ -75,7 +75,7 @@ struct FrameInfo
 };
 
 /// Source data for a 3D geometry draw call.
-struct URHO3D_API SourceBatch
+struct ATOMIC_API SourceBatch
 {
     /// Construct with defaults.
     SourceBatch();
@@ -104,9 +104,9 @@ struct URHO3D_API SourceBatch
 };
 
 /// Base class for visible components.
-class URHO3D_API Drawable : public Component
+class ATOMIC_API Drawable : public Component
 {
-    URHO3D_OBJECT(Drawable, Component);
+    ATOMIC_OBJECT(Drawable, Component);
 
     friend class Octant;
     friend class Octree;
@@ -391,6 +391,6 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
 
-URHO3D_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
+ATOMIC_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
 
 }

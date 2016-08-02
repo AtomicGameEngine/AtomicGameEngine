@@ -30,7 +30,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :

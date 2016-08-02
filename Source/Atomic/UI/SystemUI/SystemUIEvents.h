@@ -31,355 +31,355 @@ namespace SystemUI
 {
 
 /// Mouse click in the UI.
-EVENT(E_UIMOUSECLICK, UIMouseClick)
+ATOMIC_EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse click end in the UI.
-EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
+ATOMIC_EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_BEGINELEMENT, BeginElement);    // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_BEGINELEMENT, BeginElement);    // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse double click in the UI.
-EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
+ATOMIC_EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Drag and drop test.
-EVENT(E_DRAGDROPTEST, DragDropTest)
+ATOMIC_EVENT(E_DRAGDROPTEST, DragDropTest)
 {
-    PARAM(P_SOURCE, Source);                // UIElement pointer
-    PARAM(P_TARGET, Target);                // UIElement pointer
-    PARAM(P_ACCEPT, Accept);                // bool
+    ATOMIC_PARAM(P_SOURCE, Source);                // UIElement pointer
+    ATOMIC_PARAM(P_TARGET, Target);                // UIElement pointer
+    ATOMIC_PARAM(P_ACCEPT, Accept);                // bool
 };
 
 /// Drag and drop finish.
-EVENT(E_DRAGDROPFINISH, DragDropFinish)
+ATOMIC_EVENT(E_DRAGDROPFINISH, DragDropFinish)
 {
-    PARAM(P_SOURCE, Source);                // UIElement pointer
-    PARAM(P_TARGET, Target);                // UIElement pointer
-    PARAM(P_ACCEPT, Accept);                // bool
+    ATOMIC_PARAM(P_SOURCE, Source);                // UIElement pointer
+    ATOMIC_PARAM(P_TARGET, Target);                // UIElement pointer
+    ATOMIC_PARAM(P_ACCEPT, Accept);                // bool
 };
 
 /// Focus element changed.
-EVENT(E_FOCUSCHANGED, FocusChanged)
+ATOMIC_EVENT(E_FOCUSCHANGED, FocusChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_CLICKEDELEMENT, ClickedElement); // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_CLICKEDELEMENT, ClickedElement); // UIElement pointer
 }
 
 /// UI element name changed.
-EVENT(E_NAMECHANGED, NameChanged)
+ATOMIC_EVENT(E_NAMECHANGED, NameChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI element resized.
-EVENT(E_RESIZED, Resized)
+ATOMIC_EVENT(E_RESIZED, Resized)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_WIDTH, Width);                  // int
-    PARAM(P_HEIGHT, Height);                // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_WIDTH, Width);                  // int
+    ATOMIC_PARAM(P_HEIGHT, Height);                // int
 }
 
 /// UI element positioned.
-EVENT(E_POSITIONED, Positioned)
+ATOMIC_EVENT(E_POSITIONED, Positioned)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
 }
 
 /// UI element visibility changed.
-EVENT(E_VISIBLECHANGED, VisibleChanged)
+ATOMIC_EVENT(E_VISIBLECHANGED, VisibleChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_VISIBLE, Visible);              // bool
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_VISIBLE, Visible);              // bool
 }
 
 /// UI element focused.
-EVENT(E_FOCUSED, Focused)
+ATOMIC_EVENT(E_FOCUSED, Focused)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_BYKEY, ByKey);                  // bool
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_BYKEY, ByKey);                  // bool
 }
 
 /// UI element defocused.
-EVENT(E_DEFOCUSED, Defocused)
+ATOMIC_EVENT(E_DEFOCUSED, Defocused)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI element layout updated.
-EVENT(E_LAYOUTUPDATED, LayoutUpdated)
+ATOMIC_EVENT(E_LAYOUTUPDATED, LayoutUpdated)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI button pressed.
-EVENT(E_PRESSED, Pressed)
+ATOMIC_EVENT(E_PRESSED, Pressed)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI button was pressed, then released.
-EVENT(E_RELEASED, Released)
+ATOMIC_EVENT(E_RELEASED, Released)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// UI checkbox toggled.
-EVENT(E_TOGGLED, Toggled)
+ATOMIC_EVENT(E_TOGGLED, Toggled)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_STATE, State);                  // bool
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_STATE, State);                  // bool
 }
 
 /// UI slider value changed
-EVENT(E_SLIDERCHANGED, SliderChanged)
+ATOMIC_EVENT(E_SLIDERCHANGED, SliderChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_VALUE, Value);                  // float
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_VALUE, Value);                  // float
 }
 
 /// UI slider being paged.
-EVENT(E_SLIDERPAGED, SliderPaged)
+ATOMIC_EVENT(E_SLIDERPAGED, SliderPaged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_OFFSET, Offset);                // int
-    PARAM(P_PRESSED, Pressed);              // bool
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_OFFSET, Offset);                // int
+    ATOMIC_PARAM(P_PRESSED, Pressed);              // bool
 }
 
 /// UI scrollbar value changed.
-EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
+ATOMIC_EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_VALUE, Value);                  // float
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_VALUE, Value);                  // float
 }
 
 /// UI scrollview position changed.
-EVENT(E_VIEWCHANGED, ViewChanged)
+ATOMIC_EVENT(E_VIEWCHANGED, ViewChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
 }
 
 /// UI modal changed (currently only Window has modal flag).
-EVENT(E_MODALCHANGED, ModalChanged)
+ATOMIC_EVENT(E_MODALCHANGED, ModalChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_MODAL, Modal);                  // bool
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_MODAL, Modal);                  // bool
 }
 
 /// Text entry into a LineEdit. The char can be modified in the event data.
-EVENT(E_TEXTENTRY, CharEntry)
+ATOMIC_EVENT(E_TEXTENTRY, CharEntry)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_TEXT, Text);                    // String
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_TEXT, Text);                    // String
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Editable text changed
-EVENT(E_TEXTCHANGED, TextChanged)
+ATOMIC_EVENT(E_TEXTCHANGED, TextChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_TEXT, Text);                    // String
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_TEXT, Text);                    // String
 }
 
 /// Text editing finished (enter pressed on a LineEdit)
-EVENT(E_TEXTFINISHED, TextFinished)
+ATOMIC_EVENT(E_TEXTFINISHED, TextFinished)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_TEXT, Text);                    // String
-    PARAM(P_VALUE, Value);                 // Float
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_TEXT, Text);                    // String
+    ATOMIC_PARAM(P_VALUE, Value);                 // Float
 }
 
 /// Menu selected.
-EVENT(E_MENUSELECTED, MenuSelected)
+ATOMIC_EVENT(E_MENUSELECTED, MenuSelected)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Listview or DropDownList item selected.
-EVENT(E_ITEMSELECTED, ItemSelected)
+ATOMIC_EVENT(E_ITEMSELECTED, ItemSelected)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_SELECTION, Selection);          // int
 }
 
 /// Listview item deselected.
-EVENT(E_ITEMDESELECTED, ItemDeselected)
+ATOMIC_EVENT(E_ITEMDESELECTED, ItemDeselected)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_SELECTION, Selection);          // int
 }
 
 /// Listview selection change finished.
-EVENT(E_SELECTIONCHANGED, SelectionChanged)
+ATOMIC_EVENT(E_SELECTIONCHANGED, SelectionChanged)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Listview item clicked. If this is a left-click, also ItemSelected event will be sent. If this is a right-click, only this event is sent.
-EVENT(E_ITEMCLICKED, ItemClicked)
+ATOMIC_EVENT(E_ITEMCLICKED, ItemClicked)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_ITEM, Item);                    // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ITEM, Item);                    // UIElement pointer
+    ATOMIC_PARAM(P_SELECTION, Selection);          // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Listview item double clicked.
-EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
+ATOMIC_EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_ITEM, Item);                    // UIElement pointer
-    PARAM(P_SELECTION, Selection);          // int
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ITEM, Item);                    // UIElement pointer
+    ATOMIC_PARAM(P_SELECTION, Selection);          // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// LineEdit or ListView unhandled key pressed.
-EVENT(E_UNHANDLEDKEY, UnhandledKey)
+ATOMIC_EVENT(E_UNHANDLEDKEY, UnhandledKey)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_KEY, Key);                      // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_KEY, Key);                      // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Fileselector choice.
-EVENT(E_FILESELECTED, FileSelected)
+ATOMIC_EVENT(E_FILESELECTED, FileSelected)
 {
-    PARAM(P_FILENAME, FileName);            // String
-    PARAM(P_FILTER, Filter);                // String
-    PARAM(P_OK, Ok);                        // bool
+    ATOMIC_PARAM(P_FILENAME, FileName);            // String
+    ATOMIC_PARAM(P_FILTER, Filter);                // String
+    ATOMIC_PARAM(P_OK, Ok);                        // bool
 }
 
 /// MessageBox acknowlegement.
-EVENT(E_MESSAGEACK, MessageACK)
+ATOMIC_EVENT(E_MESSAGEACK, MessageACK)
 {
-    PARAM(P_OK, Ok);                        // bool
+    ATOMIC_PARAM(P_OK, Ok);                        // bool
 }
 
 /// A child element has been added to an element. Sent by the UI root element, or element-event-sender if set.
-EVENT(E_ELEMENTADDED, ElementAdded)
+ATOMIC_EVENT(E_ELEMENTADDED, ElementAdded)
 {
-    PARAM(P_ROOT, Root);                    // UIElement pointer
-    PARAM(P_PARENT, Parent);                // UIElement pointer
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ROOT, Root);                    // UIElement pointer
+    ATOMIC_PARAM(P_PARENT, Parent);                // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// A child element is about to be removed from an element. Sent by the UI root element, or element-event-sender if set.
-EVENT(E_ELEMENTREMOVED, ElementRemoved)
+ATOMIC_EVENT(E_ELEMENTREMOVED, ElementRemoved)
 {
-    PARAM(P_ROOT, Root);                    // UIElement pointer
-    PARAM(P_PARENT, Parent);                // UIElement pointer
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ROOT, Root);                    // UIElement pointer
+    ATOMIC_PARAM(P_PARENT, Parent);                // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Hovering on an UI element has started
-EVENT(E_HOVERBEGIN, HoverBegin)
+ATOMIC_EVENT(E_HOVERBEGIN, HoverBegin)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENTX, ElementX);            // int
+    ATOMIC_PARAM(P_ELEMENTY, ElementY);            // int
 }
 
 /// Hovering on an UI element has ended
-EVENT(E_HOVEREND, HoverEnd)
+ATOMIC_EVENT(E_HOVEREND, HoverEnd)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
 }
 
 /// Drag behavior of a UI Element has started
-EVENT(E_DRAGBEGIN, DragBegin)
+ATOMIC_EVENT(E_DRAGBEGIN, DragBegin)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENTX, ElementX);            // int
+    ATOMIC_PARAM(P_ELEMENTY, ElementY);            // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag behavior of a UI Element when the input device has moved
-EVENT(E_DRAGMOVE, DragMove)
+ATOMIC_EVENT(E_DRAGMOVE, DragMove)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_DX, DX);                        // int
-    PARAM(P_DY, DY);                        // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_DX, DX);                        // int
+    ATOMIC_PARAM(P_DY, DY);                        // int
+    ATOMIC_PARAM(P_ELEMENTX, ElementX);            // int
+    ATOMIC_PARAM(P_ELEMENTY, ElementY);            // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag behavior of a UI Element has finished
-EVENT(E_DRAGEND, DragEnd)
+ATOMIC_EVENT(E_DRAGEND, DragEnd)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENTX, ElementX);            // int
+    ATOMIC_PARAM(P_ELEMENTY, ElementY);            // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// Drag of a UI Element was canceled by pressing ESC
-EVENT(E_DRAGCANCEL, DragCancel)
+ATOMIC_EVENT(E_DRAGCANCEL, DragCancel)
 {
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int
-    PARAM(P_ELEMENTY, ElementY);            // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_NUMBUTTONS, NumButtons);        // int
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENTX, ElementX);            // int
+    ATOMIC_PARAM(P_ELEMENTY, ElementY);            // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_NUMBUTTONS, NumButtons);        // int
 }
 
 /// A file was drag-dropped into the application window. Includes also coordinates and UI element if applicable
-EVENT(E_UIDROPFILE, UIDropFile)
+ATOMIC_EVENT(E_UIDROPFILE, UIDropFile)
 {
-    PARAM(P_FILENAME, FileName);            // String
-    PARAM(P_ELEMENT, Element);              // UIElement pointer
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
-    PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
+    ATOMIC_PARAM(P_FILENAME, FileName);            // String
+    ATOMIC_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_ELEMENTX, ElementX);            // int (only if element is non-null)
+    ATOMIC_PARAM(P_ELEMENTY, ElementY);            // int (only if element is non-null)
 }
 
-EVENT(E_CONSOLECLOSED, ConsoleClosed)
+ATOMIC_EVENT(E_CONSOLECLOSED, ConsoleClosed)
 {
 
 }

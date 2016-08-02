@@ -24,21 +24,21 @@
 
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Log message event.
-URHO3D_EVENT(E_LOGMESSAGE, LogMessage)
+ATOMIC_EVENT(E_LOGMESSAGE, LogMessage)
 {
-    URHO3D_PARAM(P_MESSAGE, Message);              // String
-    URHO3D_PARAM(P_LEVEL, Level);                  // int
+    ATOMIC_PARAM(P_MESSAGE, Message);              // String
+    ATOMIC_PARAM(P_LEVEL, Level);                  // int
 }
 
 /// Async system command execution finished.
-URHO3D_EVENT(E_ASYNCEXECFINISHED, AsyncExecFinished)
+ATOMIC_EVENT(E_ASYNCEXECFINISHED, AsyncExecFinished)
 {
-    URHO3D_PARAM(P_REQUESTID, RequestID);          // unsigned
-    URHO3D_PARAM(P_EXITCODE, ExitCode);            // int
+    ATOMIC_PARAM(P_REQUESTID, RequestID);          // unsigned
+    ATOMIC_PARAM(P_EXITCODE, ExitCode);            // int
 }
 
 }

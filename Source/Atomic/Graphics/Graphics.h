@@ -35,7 +35,7 @@
 
 struct SDL_Window;
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ConstantBuffer;
@@ -78,9 +78,9 @@ struct ScratchBuffer
 };
 
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
-class URHO3D_API Graphics : public Object
+class ATOMIC_API Graphics : public Object
 {
-    URHO3D_OBJECT(Graphics, Object);
+    ATOMIC_OBJECT(Graphics, Object);
 
 public:
     /// Construct.
@@ -532,6 +532,11 @@ public:
     /// Return whether is using an OpenGL 3 context. Return always false on Direct3D9 & Direct3D11.
     static bool GetGL3Support();
 
+    // ATOMIC BEGIN
+    /// Get the SDL_Window as a void* to avoid having to include the graphics implementation
+    void* GetSDLWindow() { return window_; }
+    // ATOMIC END
+
 private:
     /// Create the application window.
     bool OpenWindow(int width, int height, bool resizable, bool borderless);
@@ -752,6 +757,6 @@ private:
 };
 
 /// Register Graphics library objects.
-void URHO3D_API RegisterGraphicsLibrary(Context* context);
+void ATOMIC_API RegisterGraphicsLibrary(Context* context);
 
 }

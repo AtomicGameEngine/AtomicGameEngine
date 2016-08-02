@@ -29,14 +29,16 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
 
-#include <kNet/kNetFwd.h>
-#include <kNet/SharedPtr.h>
+// ATOMIC BEGIN
+#include <kNet/include/kNetFwd.h>
+#include <kNet/include/kNet/SharedPtr.h>
+// ATOMIC END
 
 #ifdef SendMessage
 #undef SendMessage
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 class File;
@@ -102,9 +104,9 @@ enum ObserverPositionSendMode
 };
 
 /// %Connection to a remote network host.
-class URHO3D_API Connection : public Object
+class ATOMIC_API Connection : public Object
 {
-    URHO3D_OBJECT(Connection, Object);
+    ATOMIC_OBJECT(Connection, Object);
 
 public:
     /// Construct with context and kNet message connection pointers.

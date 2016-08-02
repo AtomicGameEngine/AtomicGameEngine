@@ -29,7 +29,7 @@ namespace Atomic
 
 class UIContainer : public UIWidget
 {
-    OBJECT(UIContainer)
+    ATOMIC_OBJECT(UIContainer, UIWidget)
 
 public:
 

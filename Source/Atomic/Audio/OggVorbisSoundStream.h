@@ -25,13 +25,13 @@
 #include "../Audio/SoundStream.h"
 #include "../Container/ArrayPtr.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Sound;
 
 /// Ogg Vorbis sound stream.
-class URHO3D_API OggVorbisSoundStream : public SoundStream
+class ATOMIC_API OggVorbisSoundStream : public SoundStream
 {
 public:
     /// Construct from an Ogg Vorbis compressed sound.

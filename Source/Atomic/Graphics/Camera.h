@@ -27,7 +27,7 @@
 #include "../Math/Ray.h"
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const float DEFAULT_NEARCLIP = 0.1f;
@@ -41,9 +41,9 @@ static const unsigned VO_DISABLE_SHADOWS = 0x2;
 static const unsigned VO_DISABLE_OCCLUSION = 0x4;
 
 /// %Camera component.
-class URHO3D_API Camera : public Component
+class ATOMIC_API Camera : public Component
 {
-    URHO3D_OBJECT(Camera, Component);
+    ATOMIC_OBJECT(Camera, Component);
 
 public:
     /// Construct.

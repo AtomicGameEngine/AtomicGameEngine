@@ -33,7 +33,7 @@ namespace SystemUI
 /// %Slider bar %UI element.
 class ATOMIC_API Slider : public BorderImage
 {
-    OBJECT(Slider);
+    ATOMIC_OBJECT(Slider, BorderImage);
 
 public:
     /// Construct.

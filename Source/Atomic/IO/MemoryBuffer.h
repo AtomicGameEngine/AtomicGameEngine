@@ -25,11 +25,11 @@
 #include "../IO/Deserializer.h"
 #include "../IO/Serializer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Memory area that can be read and written to as a stream.
-class URHO3D_API MemoryBuffer : public Deserializer, public Serializer
+class ATOMIC_API MemoryBuffer : public Deserializer, public Serializer
 {
 public:
     /// Construct with a pointer and size.

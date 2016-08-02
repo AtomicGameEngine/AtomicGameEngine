@@ -22,7 +22,7 @@
 
 #pragma once
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// JSON value type.
@@ -67,7 +67,7 @@ typedef JSONObject::Iterator JSONObjectIterator;
 typedef JSONObject::ConstIterator ConstJSONObjectIterator;
 
 /// JSON value class.
-class URHO3D_API JSONValue
+class ATOMIC_API JSONValue
 {
 public:
     /// Construct null value.

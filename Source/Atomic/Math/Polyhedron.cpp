@@ -31,7 +31,7 @@
 #pragma warning(disable:6293)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 Polyhedron::~Polyhedron()

@@ -27,7 +27,7 @@
 
 class btTypedConstraint;
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Supported constraint types.
@@ -43,9 +43,9 @@ class PhysicsWorld;
 class RigidBody;
 
 /// Physics constraint component. Connects two rigid bodies together, or one rigid body to a static point.
-class URHO3D_API Constraint : public Component
+class ATOMIC_API Constraint : public Component
 {
-    URHO3D_OBJECT(Constraint, Component);
+    ATOMIC_OBJECT(Constraint, Component);
 
     friend class RigidBody;
 

@@ -25,7 +25,7 @@
 #include "../Core/Variant.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class XMLElement;
@@ -63,9 +63,9 @@ struct VAnimEventFrame
 };
 
 /// Value animation class.
-class URHO3D_API ValueAnimation : public Resource
+class ATOMIC_API ValueAnimation : public Resource
 {
-    URHO3D_OBJECT(ValueAnimation, Resource);
+    ATOMIC_OBJECT(ValueAnimation, Resource);
 
 public:
     /// Construct.

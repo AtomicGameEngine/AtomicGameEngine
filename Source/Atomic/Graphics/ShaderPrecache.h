@@ -26,16 +26,16 @@
 #include "../Core/Object.h"
 #include "../Resource/XMLFile.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Graphics;
 class ShaderVariation;
 
 /// Utility class for collecting used shader combinations during runtime for precaching.
-class URHO3D_API ShaderPrecache : public Object
+class ATOMIC_API ShaderPrecache : public Object
 {
-    URHO3D_OBJECT(ShaderPrecache, Object);
+    ATOMIC_OBJECT(ShaderPrecache, Object);
 
 public:
     /// Construct and begin collecting shader combinations. Load existing combinations from XML if the file exists.

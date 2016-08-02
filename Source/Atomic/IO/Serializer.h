@@ -27,7 +27,7 @@
 #include "../Math/BoundingBox.h"
 #include "../Math/StringHash.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Color;
@@ -40,7 +40,7 @@ class Vector3;
 class Vector4;
 
 /// Abstract stream for writing.
-class URHO3D_API Serializer
+class ATOMIC_API Serializer
 {
 public:
     /// Destruct.

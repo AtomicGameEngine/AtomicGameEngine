@@ -18,7 +18,7 @@ namespace Atomic
 PrefabComponent::PrefabComponent(Context* context) :
     Component(context)
 {
-    SubscribeToEvent(E_PREFABCHANGED, HANDLER(PrefabComponent, HandlePrefabChanged));
+    SubscribeToEvent(E_PREFABCHANGED, ATOMIC_HANDLER(PrefabComponent, HandlePrefabChanged));
 }
 
 PrefabComponent::~PrefabComponent()
@@ -44,7 +44,7 @@ void PrefabComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<PrefabComponent>();
 
-    ACCESSOR_ATTRIBUTE("PrefabGUID", GetPrefabGUID, SetPrefabGUID, String, String::EMPTY, AM_FILE | AM_NOEDIT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("PrefabGUID", GetPrefabGUID, SetPrefabGUID, String, String::EMPTY, AM_FILE | AM_NOEDIT);
 }
 
 void PrefabComponent::LoadPrefabNode()
@@ -137,9 +137,11 @@ void PrefabComponent::BreakPrefab()
 
             if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
             {
-                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
-                if (asprite->GetRootNode())
-                    filterNodes.Push(asprite->GetRootNode());
+// ATOMIC_UPDATE_FIX_BEGIN
+//                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
+//                if (asprite->GetRootNode())
+//                    filterNodes.Push(asprite->GetRootNode());
+// ATOMIC_UPDATE_FIX_END
             }
 
         }

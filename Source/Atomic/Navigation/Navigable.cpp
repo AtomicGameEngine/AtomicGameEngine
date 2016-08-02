@@ -27,7 +27,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* NAVIGATION_CATEGORY;
@@ -46,8 +46,8 @@ void Navigable::RegisterObject(Context* context)
 {
     context->RegisterFactory<Navigable>(NAVIGATION_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Recursive", bool, recursive_, true, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Recursive", bool, recursive_, true, AM_DEFAULT);
 }
 
 void Navigable::SetRecursive(bool enable)

@@ -23,15 +23,17 @@
 #include "../Precompiled.h"
 
 #include "../Math/MathDefs.h"
-#include "../Urho2D/SpriterData2D.h"
+#include "../Atomic2D/SpriterData2D.h"
 
-#include <PugiXml/pugixml.hpp>
+// ATOMIC BEGIN
+#include <PugiXml/src/pugixml.hpp>
+// ATOMIC END
 
 #include <cstring>
 
 using namespace pugi;
 
-namespace Urho3D
+namespace Atomic
 {
 
 namespace Spriter

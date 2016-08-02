@@ -45,7 +45,7 @@ enum HighlightMode
 /// Scrollable list %UI element.
 class ATOMIC_API ListView : public ScrollView
 {
-    OBJECT(ListView);
+    ATOMIC_OBJECT(ListView, ScrollView);
 
 public:
     /// Construct.

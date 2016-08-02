@@ -25,7 +25,7 @@
 #include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Particle emitter shapes.
@@ -100,9 +100,9 @@ class XMLFile;
 class XMLElement;
 
 /// %Particle effect definition.
-class URHO3D_API ParticleEffect : public Resource
+class ATOMIC_API ParticleEffect : public Resource
 {
-    URHO3D_OBJECT(ParticleEffect, Resource);
+    ATOMIC_OBJECT(ParticleEffect, Resource);
 
 public:
     /// Construct.

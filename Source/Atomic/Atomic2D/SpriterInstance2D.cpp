@@ -25,11 +25,11 @@
 #include "../Graphics/DrawableEvents.h"
 #include "../Scene/Component.h"
 #include "../Scene/Node.h"
-#include "../Urho2D/SpriterInstance2D.h"
+#include "../Atomic2D/SpriterInstance2D.h"
 
 #include <cmath>
 
-namespace Urho3D
+namespace Atomic
 {
 
 namespace Spriter

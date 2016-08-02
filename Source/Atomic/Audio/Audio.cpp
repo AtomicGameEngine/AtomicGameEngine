@@ -32,7 +32,9 @@
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
 
-#include <SDL/SDL.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL.h>
+// ATOMIC END
 
 #include "../DebugNew.h"
 
@@ -40,7 +42,7 @@
 #pragma warning(disable:6293)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 const char* AUDIO_CATEGORY = "Audio";
@@ -64,7 +66,7 @@ Audio::Audio(Context* context) :
     // Register Audio library object factories
     RegisterAudioLibrary(context_);
 
-    SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(Audio, HandleRenderUpdate));
+    SubscribeToEvent(E_RENDERUPDATE, ATOMIC_HANDLER(Audio, HandleRenderUpdate));
 }
 
 Audio::~Audio()
@@ -103,14 +105,14 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     deviceID_ = SDL_OpenAudioDevice(0, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
     if (!deviceID_)
     {
-        URHO3D_LOGERROR("Could not initialize audio output");
+        ATOMIC_LOGERROR("Could not initialize audio output");
         return false;
     }
 
 #ifdef __EMSCRIPTEN__
     if (obtained.format != AUDIO_F32LSB && obtained.format != AUDIO_F32MSB && obtained.format != AUDIO_F32SYS)
     {
-        URHO3D_LOGERROR("Could not initialize audio output, 32-bit float buffer format not supported");
+        ATOMIC_LOGERROR("Could not initialize audio output, 32-bit float buffer format not supported");
         SDL_CloseAudioDevice(deviceID_);
         deviceID_ = 0;
         return false;
@@ -118,7 +120,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
 #else
     if (obtained.format != AUDIO_S16SYS && obtained.format != AUDIO_S16LSB && obtained.format != AUDIO_S16MSB)
     {
-        URHO3D_LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
+        ATOMIC_LOGERROR("Could not initialize audio output, 16-bit buffer format not supported");
         SDL_CloseAudioDevice(deviceID_);
         deviceID_ = 0;
         return false;
@@ -133,7 +135,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1 : fragmentSize_];
 
-    URHO3D_LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
+    ATOMIC_LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
             (interpolation_ ? "interpolated" : ""));
 
     return Play();
@@ -154,7 +156,7 @@ bool Audio::Play()
 
     if (!deviceID_)
     {
-        URHO3D_LOGERROR("No audio mode set, can not start playback");
+        ATOMIC_LOGERROR("No audio mode set, can not start playback");
         return false;
     }
 
@@ -345,7 +347,7 @@ void Audio::Release()
 
 void Audio::UpdateInternal(float timeStep)
 {
-    URHO3D_PROFILE(UpdateAudio);
+    ATOMIC_PROFILE(UpdateAudio);
 
     // Update in reverse order, because sound sources might remove themselves
     for (unsigned i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)

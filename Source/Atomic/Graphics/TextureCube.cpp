@@ -40,7 +40,7 @@
 #pragma warning(disable:4355)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const char* cubeMapLayoutNames[] = {
@@ -61,7 +61,7 @@ static SharedPtr<Image> GetTileImage(Image* src, int tileX, int tileY, int tileW
 TextureCube::TextureCube(Context* context) :
     Texture(context)
 {
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
     target_ = GL_TEXTURE_CUBE_MAP;
 #endif
 
@@ -95,7 +95,7 @@ bool TextureCube::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture load while device is lost");
+        ATOMIC_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -262,12 +262,12 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
 {
     if (size <= 0)
     {
-        URHO3D_LOGERROR("Zero or negative cube texture size");
+        ATOMIC_LOGERROR("Zero or negative cube texture size");
         return false;
     }
     if (usage == TEXTURE_DEPTHSTENCIL)
     {
-        URHO3D_LOGERROR("Depth-stencil usage not supported for cube maps");
+        ATOMIC_LOGERROR("Depth-stencil usage not supported for cube maps");
         return false;
     }
 
@@ -285,7 +285,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
             renderSurfaces_[i] = new RenderSurface(this);
-#ifdef URHO3D_OPENGL
+#ifdef ATOMIC_OPENGL
             renderSurfaces_[i]->target_ = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
 #endif
         }
@@ -296,7 +296,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(TextureCube, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, ATOMIC_HANDLER(TextureCube, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 

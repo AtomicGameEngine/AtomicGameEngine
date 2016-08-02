@@ -32,7 +32,7 @@
 #pragma warning(disable:6293)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 char String::endZero = 0;
@@ -482,9 +482,9 @@ void String::Clear()
 
 void String::Swap(String& str)
 {
-    Urho3D::Swap(length_, str.length_);
-    Urho3D::Swap(capacity_, str.capacity_);
-    Urho3D::Swap(buffer_, str.buffer_);
+    Atomic::Swap(length_, str.length_);
+    Atomic::Swap(capacity_, str.capacity_);
+    Atomic::Swap(buffer_, str.buffer_);
 }
 
 String String::Substring(unsigned pos) const
@@ -1180,7 +1180,7 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
             }
 
         default:
-            URHO3D_LOGWARNINGF("Unsupported format specifier: '%c'", format);
+            ATOMIC_LOGWARNINGF("Unsupported format specifier: '%c'", format);
             break;
         }
     }

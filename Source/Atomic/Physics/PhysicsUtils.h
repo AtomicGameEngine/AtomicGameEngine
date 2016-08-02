@@ -25,10 +25,12 @@
 #include "../Math/Quaternion.h"
 #include "../Math/Vector3.h"
 
-#include <Bullet/LinearMath/btVector3.h>
-#include <Bullet/LinearMath/btQuaternion.h>
+// ATOMIC BEGIN
+#include <Bullet/src/LinearMath/btVector3.h>
+#include <Bullet/src/LinearMath/btQuaternion.h>
+// ATOMIC END
 
-namespace Urho3D
+namespace Atomic
 {
 
 inline btVector3 ToBtVector3(const Vector3& vector)

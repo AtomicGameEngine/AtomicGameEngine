@@ -22,22 +22,22 @@
 
 #pragma once
 
-#ifdef URHO3D_IS_BUILDING
-#include "Urho3D.h"
+#ifdef ATOMIC_IS_BUILDING
+#include "Atomic.h"
 #else
-#include <Urho3D/Urho3D.h>
+#include <Atomic/Atomic.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Set the random seed. The default seed is 1.
-URHO3D_API void SetRandomSeed(unsigned seed);
+ATOMIC_API void SetRandomSeed(unsigned seed);
 /// Return the current random seed.
-URHO3D_API unsigned GetRandomSeed();
+ATOMIC_API unsigned GetRandomSeed();
 /// Return a random number between 0-32767. Should operate similarly to MSVC rand().
-URHO3D_API int Rand();
+ATOMIC_API int Rand();
 /// Return a standard normal distributed number.
-URHO3D_API float RandStandardNormal();
+ATOMIC_API float RandStandardNormal();
 
 }

@@ -28,7 +28,7 @@
 #include "../Resource/Resource.h"
 #include "../Scene/ValueAnimationInfo.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Material;
@@ -101,9 +101,9 @@ template <> inline unsigned MakeHash(const TextureUnit& value)
 }
 
 /// Describes how to render 3D geometries.
-class URHO3D_API Material : public Resource
+class ATOMIC_API Material : public Resource
 {
-    URHO3D_OBJECT(Material, Resource);
+    ATOMIC_OBJECT(Material, Resource);
 
 public:
     /// Construct.

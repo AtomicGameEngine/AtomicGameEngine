@@ -22,44 +22,44 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Urho2D/AnimatedSprite2D.h"
-#include "../Urho2D/AnimationSet2D.h"
-#include "../Urho2D/CollisionBox2D.h"
-#include "../Urho2D/CollisionChain2D.h"
-#include "../Urho2D/CollisionCircle2D.h"
-#include "../Urho2D/CollisionEdge2D.h"
-#include "../Urho2D/CollisionPolygon2D.h"
-#include "../Urho2D/Constraint2D.h"
-#include "../Urho2D/ConstraintDistance2D.h"
-#include "../Urho2D/ConstraintFriction2D.h"
-#include "../Urho2D/ConstraintGear2D.h"
-#include "../Urho2D/ConstraintMotor2D.h"
-#include "../Urho2D/ConstraintMouse2D.h"
-#include "../Urho2D/ConstraintPrismatic2D.h"
-#include "../Urho2D/ConstraintPulley2D.h"
-#include "../Urho2D/ConstraintRevolute2D.h"
-#include "../Urho2D/ConstraintRope2D.h"
-#include "../Urho2D/ConstraintWeld2D.h"
-#include "../Urho2D/ConstraintWheel2D.h"
-#include "../Urho2D/ParticleEffect2D.h"
-#include "../Urho2D/ParticleEmitter2D.h"
-#include "../Urho2D/PhysicsWorld2D.h"
-#include "../Urho2D/Renderer2D.h"
-#include "../Urho2D/RigidBody2D.h"
-#include "../Urho2D/Sprite2D.h"
-#include "../Urho2D/SpriteSheet2D.h"
-#include "../Urho2D/TileMap2D.h"
-#include "../Urho2D/TileMapLayer2D.h"
-#include "../Urho2D/TmxFile2D.h"
+#include "../Atomic2D/AnimatedSprite2D.h"
+#include "../Atomic2D/AnimationSet2D.h"
+#include "../Atomic2D/CollisionBox2D.h"
+#include "../Atomic2D/CollisionChain2D.h"
+#include "../Atomic2D/CollisionCircle2D.h"
+#include "../Atomic2D/CollisionEdge2D.h"
+#include "../Atomic2D/CollisionPolygon2D.h"
+#include "../Atomic2D/Constraint2D.h"
+#include "../Atomic2D/ConstraintDistance2D.h"
+#include "../Atomic2D/ConstraintFriction2D.h"
+#include "../Atomic2D/ConstraintGear2D.h"
+#include "../Atomic2D/ConstraintMotor2D.h"
+#include "../Atomic2D/ConstraintMouse2D.h"
+#include "../Atomic2D/ConstraintPrismatic2D.h"
+#include "../Atomic2D/ConstraintPulley2D.h"
+#include "../Atomic2D/ConstraintRevolute2D.h"
+#include "../Atomic2D/ConstraintRope2D.h"
+#include "../Atomic2D/ConstraintWeld2D.h"
+#include "../Atomic2D/ConstraintWheel2D.h"
+#include "../Atomic2D/ParticleEffect2D.h"
+#include "../Atomic2D/ParticleEmitter2D.h"
+#include "../Atomic2D/PhysicsWorld2D.h"
+#include "../Atomic2D/Renderer2D.h"
+#include "../Atomic2D/RigidBody2D.h"
+#include "../Atomic2D/Sprite2D.h"
+#include "../Atomic2D/SpriteSheet2D.h"
+#include "../Atomic2D/TileMap2D.h"
+#include "../Atomic2D/TileMapLayer2D.h"
+#include "../Atomic2D/TmxFile2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
-const char* URHO2D_CATEGORY = "Urho2D";
+const char* URHO2D_CATEGORY = "Atomic2D";
 
-void RegisterUrho2DLibrary(Context* context)
+void RegisterAtomic2DLibrary(Context* context)
 {
     Renderer2D::RegisterObject(context);
 

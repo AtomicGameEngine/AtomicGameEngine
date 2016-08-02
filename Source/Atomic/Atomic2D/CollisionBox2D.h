@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Urho2D/CollisionShape2D.h"
+#include "../Atomic2D/CollisionShape2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 2D box collision component.
-class URHO3D_API CollisionBox2D : public CollisionShape2D
+class ATOMIC_API CollisionBox2D : public CollisionShape2D
 {
-    URHO3D_OBJECT(CollisionBox2D, CollisionShape2D);
+    ATOMIC_OBJECT(CollisionBox2D, CollisionShape2D);
 
 public:
     /// Construct.

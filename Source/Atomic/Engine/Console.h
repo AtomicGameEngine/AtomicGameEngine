@@ -24,7 +24,7 @@
 
 #include "../Core/Object.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Button;
@@ -39,9 +39,9 @@ class UIElement;
 class XMLFile;
 
 /// %Console window with log history and command line prompt.
-class URHO3D_API Console : public Object
+class ATOMIC_API Console : public Object
 {
-    URHO3D_OBJECT(Console, Object);
+    ATOMIC_OBJECT(Console, Object);
 
 public:
     /// Construct.

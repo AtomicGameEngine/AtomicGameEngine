@@ -24,18 +24,18 @@
 
 #include "../Container/LinkedList.h"
 #include "../Core/Variant.h"
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
 #include <functional>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Context;
 class EventHandler;
 
 /// Type info.
-class URHO3D_API TypeInfo
+class ATOMIC_API TypeInfo
 {
 public:
     /// Construct.
@@ -66,19 +66,19 @@ private:
     const TypeInfo* baseTypeInfo_;
 };
 
-#define URHO3D_OBJECT(typeName, baseTypeName) \
+#define ATOMIC_OBJECT(typeName, baseTypeName) \
     public: \
         typedef typeName ClassName; \
         typedef baseTypeName BaseClassName; \
-        virtual Urho3D::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
-        virtual const Urho3D::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
-        static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
-        static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
-        static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
+        virtual Atomic::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
+        virtual const Atomic::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
+        virtual const Atomic::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
+        static Atomic::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
+        static const Atomic::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
+        static const Atomic::TypeInfo* GetTypeInfoStatic() { static const Atomic::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
 
 /// Base class for objects with type identification, subsystem access and event sending/receiving capability.
-class URHO3D_API Object : public RefCounted
+class ATOMIC_API Object : public RefCounted
 {
     friend class Context;
 
@@ -116,7 +116,7 @@ public:
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event.
     void SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler);
-#ifdef URHO3D_CXX11
+#ifdef ATOMIC_CXX11
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
     /// Subscribe to a specific sender's event.
@@ -138,7 +138,7 @@ public:
     void SendEvent(StringHash eventType, VariantMap& eventData);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap() const;
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
     /// Send event with variadic parameter pairs to all subscribers. The parameter pairs is a list of paramID and paramValue separated by comma, one pair after another.
     template <typename... Args> void SendEvent(StringHash eventType, Args... args)
     {
@@ -194,7 +194,7 @@ private:
 template <class T> T* Object::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
 
 /// Base class for object factories.
-class URHO3D_API ObjectFactory : public RefCounted
+class ATOMIC_API ObjectFactory : public RefCounted
 {
 public:
     /// Construct.
@@ -242,7 +242,7 @@ public:
 };
 
 /// Internal helper class for invoking event handler functions.
-class URHO3D_API EventHandler : public LinkedListNode
+class ATOMIC_API EventHandler : public LinkedListNode
 {
 public:
     /// Construct with specified receiver and userdata.
@@ -324,7 +324,7 @@ private:
     HandlerFunctionPtr function_;
 };
 
-#if URHO3D_CXX11
+#if ATOMIC_CXX11
 /// Template implementation of the event handler invoke helper (std::function instance).
 class EventHandler11Impl : public EventHandler
 {
@@ -357,7 +357,7 @@ private:
 #endif
 
 /// Register event names.
-struct URHO3D_API EventNameRegistrar
+struct ATOMIC_API EventNameRegistrar
 {
     static StringHash RegisterEventName(const char* eventName);
     /// Return Event name or empty string if not found.
@@ -367,12 +367,12 @@ struct URHO3D_API EventNameRegistrar
 };
 
 /// Describe an event's hash ID and begin a namespace in which to define its parameters.
-#define URHO3D_EVENT(eventID, eventName) static const Urho3D::StringHash eventID(Urho3D::EventNameRegistrar::RegisterEventName(#eventName)); namespace eventName
+#define ATOMIC_EVENT(eventID, eventName) static const Atomic::StringHash eventID(Atomic::EventNameRegistrar::RegisterEventName(#eventName)); namespace eventName
 /// Describe an event's parameter hash ID. Should be used inside an event namespace.
-#define URHO3D_PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
+#define ATOMIC_PARAM(paramID, paramName) static const Atomic::StringHash paramID(#paramName)
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function.
-#define URHO3D_HANDLER(className, function) (new Urho3D::EventHandlerImpl<className>(this, &className::function))
+#define ATOMIC_HANDLER(className, function) (new Atomic::EventHandlerImpl<className>(this, &className::function))
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
-#define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
+#define ATOMIC_HANDLER_USERDATA(className, function, userData) (new Atomic::EventHandlerImpl<className>(this, &className::function, userData))
 
 }

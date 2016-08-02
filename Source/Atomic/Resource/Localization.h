@@ -25,13 +25,13 @@
 #include "../Core/Context.h"
 #include "../Resource/JSONValue.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Localization subsystem. Stores all the strings in all languages.
-class URHO3D_API Localization : public Object
+class ATOMIC_API Localization : public Object
 {
-    URHO3D_OBJECT(Localization, Object);
+    ATOMIC_OBJECT(Localization, Object);
 
 public:
     /// Construct.

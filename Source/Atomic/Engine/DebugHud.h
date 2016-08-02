@@ -25,7 +25,7 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Engine;
@@ -43,9 +43,9 @@ static const unsigned DEBUGHUD_SHOW_ALL_MEMORY = 0xB;
 static const unsigned DEBUGHUD_SHOW_EVENTPROFILER = 0x10;
 
 /// Displays rendering stats and profiling information.
-class URHO3D_API DebugHud : public Object
+class ATOMIC_API DebugHud : public Object
 {
-    URHO3D_OBJECT(DebugHud, Object);
+    ATOMIC_OBJECT(DebugHud, Object);
 
 public:
     /// Construct.

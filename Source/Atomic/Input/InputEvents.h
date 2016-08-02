@@ -24,200 +24,202 @@
 
 #include "../Core/Object.h"
 
-#include <SDL/SDL_joystick.h>
-#include <SDL/SDL_gamecontroller.h>
-#include <SDL/SDL_keycode.h>
-#include <SDL/SDL_mouse.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL_joystick.h>
+#include <SDL/include/SDL_gamecontroller.h>
+#include <SDL/include/SDL_keycode.h>
+#include <SDL/include/SDL_mouse.h>
+// ATOMIC END
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Mouse button pressed.
-URHO3D_EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
+ATOMIC_EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
 {
-    URHO3D_PARAM(P_BUTTON, Button);                // int
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse button released.
-URHO3D_EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
+ATOMIC_EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
 {
-    URHO3D_PARAM(P_BUTTON, Button);                // int
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse moved.
-URHO3D_EVENT(E_MOUSEMOVE, MouseMove)
+ATOMIC_EVENT(E_MOUSEMOVE, MouseMove)
 {
-    URHO3D_PARAM(P_X, X);                          // int (only when mouse visible)
-    URHO3D_PARAM(P_Y, Y);                          // int (only when mouse visible)
-    URHO3D_PARAM(P_DX, DX);                        // int
-    URHO3D_PARAM(P_DY, DY);                        // int
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_X, X);                          // int (only when mouse visible)
+    ATOMIC_PARAM(P_Y, Y);                          // int (only when mouse visible)
+    ATOMIC_PARAM(P_DX, DX);                        // int
+    ATOMIC_PARAM(P_DY, DY);                        // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse wheel moved.
-URHO3D_EVENT(E_MOUSEWHEEL, MouseWheel)
+ATOMIC_EVENT(E_MOUSEWHEEL, MouseWheel)
 {
-    URHO3D_PARAM(P_WHEEL, Wheel);                  // int
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_WHEEL, Wheel);                  // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Key pressed.
-URHO3D_EVENT(E_KEYDOWN, KeyDown)
+ATOMIC_EVENT(E_KEYDOWN, KeyDown)
 {
-    URHO3D_PARAM(P_KEY, Key);                      // int
-    URHO3D_PARAM(P_SCANCODE, Scancode);            // int
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
-    URHO3D_PARAM(P_REPEAT, Repeat);                // bool
+    ATOMIC_PARAM(P_KEY, Key);                      // int
+    ATOMIC_PARAM(P_SCANCODE, Scancode);            // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_REPEAT, Repeat);                // bool
 }
 
 /// Key released.
-URHO3D_EVENT(E_KEYUP, KeyUp)
+ATOMIC_EVENT(E_KEYUP, KeyUp)
 {
-    URHO3D_PARAM(P_KEY, Key);                      // int
-    URHO3D_PARAM(P_SCANCODE, Scancode);            // int
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_KEY, Key);                      // int
+    ATOMIC_PARAM(P_SCANCODE, Scancode);            // int
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Text input event.
-URHO3D_EVENT(E_TEXTINPUT, TextInput)
+ATOMIC_EVENT(E_TEXTINPUT, TextInput)
 {
-    URHO3D_PARAM(P_TEXT, Text);                    // String
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    ATOMIC_PARAM(P_TEXT, Text);                    // String
+    ATOMIC_PARAM(P_BUTTONS, Buttons);              // int
+    ATOMIC_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Joystick connected.
-URHO3D_EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
+ATOMIC_EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
 {
-    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
+    ATOMIC_PARAM(P_JOYSTICKID, JoystickID);        // int
 }
 
 /// Joystick disconnected.
-URHO3D_EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
+ATOMIC_EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
 {
-    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
+    ATOMIC_PARAM(P_JOYSTICKID, JoystickID);        // int
 }
 
 /// Joystick button pressed.
-URHO3D_EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
+ATOMIC_EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
 {
-    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
-    URHO3D_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_JOYSTICKID, JoystickID);        // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
 }
 
 /// Joystick button released.
-URHO3D_EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
+ATOMIC_EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
 {
-    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
-    URHO3D_PARAM(P_BUTTON, Button);                // int
+    ATOMIC_PARAM(P_JOYSTICKID, JoystickID);        // int
+    ATOMIC_PARAM(P_BUTTON, Button);                // int
 }
 
 /// Joystick axis moved.
-URHO3D_EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
+ATOMIC_EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
 {
-    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
-    URHO3D_PARAM(P_AXIS, Button);                  // int
-    URHO3D_PARAM(P_POSITION, Position);            // float
+    ATOMIC_PARAM(P_JOYSTICKID, JoystickID);        // int
+    ATOMIC_PARAM(P_AXIS, Button);                  // int
+    ATOMIC_PARAM(P_POSITION, Position);            // float
 }
 
 /// Joystick POV hat moved.
-URHO3D_EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
+ATOMIC_EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
 {
-    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
-    URHO3D_PARAM(P_HAT, Button);                   // int
-    URHO3D_PARAM(P_POSITION, Position);            // int
+    ATOMIC_PARAM(P_JOYSTICKID, JoystickID);        // int
+    ATOMIC_PARAM(P_HAT, Button);                   // int
+    ATOMIC_PARAM(P_POSITION, Position);            // int
 }
 
 /// Finger pressed on the screen.
-URHO3D_EVENT(E_TOUCHBEGIN, TouchBegin)
+ATOMIC_EVENT(E_TOUCHBEGIN, TouchBegin)
 {
-    URHO3D_PARAM(P_TOUCHID, TouchID);              // int
-    URHO3D_PARAM(P_X, X);                          // int
-    URHO3D_PARAM(P_Y, Y);                          // int
-    URHO3D_PARAM(P_PRESSURE, Pressure);            // float
+    ATOMIC_PARAM(P_TOUCHID, TouchID);              // int
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// Finger released from the screen.
-URHO3D_EVENT(E_TOUCHEND, TouchEnd)
+ATOMIC_EVENT(E_TOUCHEND, TouchEnd)
 {
-    URHO3D_PARAM(P_TOUCHID, TouchID);              // int
-    URHO3D_PARAM(P_X, X);                          // int
-    URHO3D_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_TOUCHID, TouchID);              // int
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
 }
 
 /// Finger moved on the screen.
-URHO3D_EVENT(E_TOUCHMOVE, TouchMove)
+ATOMIC_EVENT(E_TOUCHMOVE, TouchMove)
 {
-    URHO3D_PARAM(P_TOUCHID, TouchID);              // int
-    URHO3D_PARAM(P_X, X);                          // int
-    URHO3D_PARAM(P_Y, Y);                          // int
-    URHO3D_PARAM(P_DX, DX);                        // int
-    URHO3D_PARAM(P_DY, DY);                        // int
-    URHO3D_PARAM(P_PRESSURE, Pressure);            // float
+    ATOMIC_PARAM(P_TOUCHID, TouchID);              // int
+    ATOMIC_PARAM(P_X, X);                          // int
+    ATOMIC_PARAM(P_Y, Y);                          // int
+    ATOMIC_PARAM(P_DX, DX);                        // int
+    ATOMIC_PARAM(P_DY, DY);                        // int
+    ATOMIC_PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// A touch gesture finished recording.
-URHO3D_EVENT(E_GESTURERECORDED, GestureRecorded)
+ATOMIC_EVENT(E_GESTURERECORDED, GestureRecorded)
 {
-    URHO3D_PARAM(P_GESTUREID, GestureID);          // unsigned
+    ATOMIC_PARAM(P_GESTUREID, GestureID);          // unsigned
 }
 
 /// A recognized touch gesture was input by the user.
-URHO3D_EVENT(E_GESTUREINPUT, GestureInput)
+ATOMIC_EVENT(E_GESTUREINPUT, GestureInput)
 {
-    URHO3D_PARAM(P_GESTUREID, GestureID);          // unsigned
-    URHO3D_PARAM(P_CENTERX, CenterX);              // int
-    URHO3D_PARAM(P_CENTERY, CenterY);              // int
-    URHO3D_PARAM(P_NUMFINGERS, NumFingers);        // int
-    URHO3D_PARAM(P_ERROR, Error);                  // float
+    ATOMIC_PARAM(P_GESTUREID, GestureID);          // unsigned
+    ATOMIC_PARAM(P_CENTERX, CenterX);              // int
+    ATOMIC_PARAM(P_CENTERY, CenterY);              // int
+    ATOMIC_PARAM(P_NUMFINGERS, NumFingers);        // int
+    ATOMIC_PARAM(P_ERROR, Error);                  // float
 }
 
 /// Pinch/rotate multi-finger touch gesture motion update.
-URHO3D_EVENT(E_MULTIGESTURE, MultiGesture)
+ATOMIC_EVENT(E_MULTIGESTURE, MultiGesture)
 {
-    URHO3D_PARAM(P_CENTERX, CenterX);              // int
-    URHO3D_PARAM(P_CENTERY, CenterY);              // int
-    URHO3D_PARAM(P_NUMFINGERS, NumFingers);        // int
-    URHO3D_PARAM(P_DTHETA, DTheta);                // float (degrees)
-    URHO3D_PARAM(P_DDIST, DDist);                  // float
+    ATOMIC_PARAM(P_CENTERX, CenterX);              // int
+    ATOMIC_PARAM(P_CENTERY, CenterY);              // int
+    ATOMIC_PARAM(P_NUMFINGERS, NumFingers);        // int
+    ATOMIC_PARAM(P_DTHETA, DTheta);                // float (degrees)
+    ATOMIC_PARAM(P_DDIST, DDist);                  // float
 }
 
 /// A file was drag-dropped into the application window.
-URHO3D_EVENT(E_DROPFILE, DropFile)
+ATOMIC_EVENT(E_DROPFILE, DropFile)
 {
-    URHO3D_PARAM(P_FILENAME, FileName);            // String
+    ATOMIC_PARAM(P_FILENAME, FileName);            // String
 }
 
 /// Application input focus or minimization changed.
-URHO3D_EVENT(E_INPUTFOCUS, InputFocus)
+ATOMIC_EVENT(E_INPUTFOCUS, InputFocus)
 {
-    URHO3D_PARAM(P_FOCUS, Focus);                  // bool
-    URHO3D_PARAM(P_MINIMIZED, Minimized);          // bool
+    ATOMIC_PARAM(P_FOCUS, Focus);                  // bool
+    ATOMIC_PARAM(P_MINIMIZED, Minimized);          // bool
 }
 
 /// OS mouse cursor visibility changed.
-URHO3D_EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
+ATOMIC_EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
 {
-    URHO3D_PARAM(P_VISIBLE, Visible);              // bool
+    ATOMIC_PARAM(P_VISIBLE, Visible);              // bool
 }
 
 /// Mouse mode changed.
-URHO3D_EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
+ATOMIC_EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
 {
-    URHO3D_PARAM(P_MODE, Mode);                    // MouseMode
-    URHO3D_PARAM(P_MOUSELOCKED, MouseLocked);      // bool
+    ATOMIC_PARAM(P_MODE, Mode);                    // MouseMode
+    ATOMIC_PARAM(P_MOUSELOCKED, MouseLocked);      // bool
 }
 
 /// Application exit requested.
-URHO3D_EVENT(E_EXITREQUESTED, ExitRequested)
+ATOMIC_EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 

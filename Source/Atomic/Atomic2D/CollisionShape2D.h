@@ -26,15 +26,15 @@
 
 #include <Box2D/Box2D.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 class RigidBody2D;
 
 /// 2D collision shape component.
-class URHO3D_API CollisionShape2D : public Component
+class ATOMIC_API CollisionShape2D : public Component
 {
-    URHO3D_OBJECT(CollisionShape2D, Component);
+    ATOMIC_OBJECT(CollisionShape2D, Component);
 
 public:
     /// Construct.

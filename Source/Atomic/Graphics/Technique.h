@@ -25,7 +25,7 @@
 #include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class ShaderVariation;
@@ -39,7 +39,7 @@ enum PassLightingMode
 };
 
 /// %Material rendering pass, which defines shaders and render state.
-class URHO3D_API Pass : public RefCounted
+class ATOMIC_API Pass : public RefCounted
 {
 public:
     /// Construct.
@@ -158,9 +158,9 @@ private:
 };
 
 /// %Material technique. Consists of several passes.
-class URHO3D_API Technique : public Resource
+class ATOMIC_API Technique : public Resource
 {
-    URHO3D_OBJECT(Technique, Resource);
+    ATOMIC_OBJECT(Technique, Resource);
 
     friend class Renderer;
 

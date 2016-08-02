@@ -31,13 +31,13 @@
 #include <SDL/SDL_rwops.h>
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Named pipe for interprocess communication.
-class URHO3D_API NamedPipe : public Object, public Deserializer, public Serializer
+class ATOMIC_API NamedPipe : public Object, public Deserializer, public Serializer
 {
-    URHO3D_OBJECT(NamedPipe, Object);
+    ATOMIC_OBJECT(NamedPipe, Object);
 
 public:
     /// Construct.

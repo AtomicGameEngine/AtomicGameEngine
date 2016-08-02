@@ -25,7 +25,7 @@
 #include "../Audio/AudioDefs.h"
 #include "../Scene/Component.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Audio;
@@ -36,9 +36,9 @@ class SoundStream;
 static const int STREAM_BUFFER_LENGTH = 100;
 
 /// %Sound source component with stereo position. A sound source needs to be created to a node to be considered "enabled" and be able to play, however that node does not need to belong to a scene.
-class URHO3D_API SoundSource : public Component
+class ATOMIC_API SoundSource : public Component
 {
-    URHO3D_OBJECT(SoundSource, Component);
+    ATOMIC_OBJECT(SoundSource, Component);
 
 public:
     /// Construct.
@@ -71,7 +71,7 @@ public:
     /// Set stereo panning. -1.0 is full left and 1.0 is full right.
     void SetPanning(float panning);
     /// \deprecated Set whether sound source will be automatically removed from the scene node when playback stops. Note: this is deprecated, consider subscribing to the SoundFinished event instead.
-    URHO3D_DEPRECATED void SetAutoRemove(bool enable);
+    ATOMIC_DEPRECATED void SetAutoRemove(bool enable);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
 
@@ -100,7 +100,7 @@ public:
     float GetPanning() const { return panning_; }
 
     /// \deprecated Return autoremove mode.
-    URHO3D_DEPRECATED bool GetAutoRemove() const { return autoRemove_; }
+    ATOMIC_DEPRECATED bool GetAutoRemove() const { return autoRemove_; }
 
     /// Return whether is playing.
     bool IsPlaying() const;

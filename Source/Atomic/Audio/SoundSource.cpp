@@ -35,7 +35,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 #define INC_POS_LOOPED() \
@@ -134,16 +134,16 @@ void SoundSource::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundSource>(AUDIO_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, SOUND_EFFECT, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Frequency", float, frequency_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Gain", float, gain_, 1.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Panning", float, panning_, 0.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Autoremove on Stop", bool, autoRemove_, false, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Type", GetSoundType, SetSoundType, String, SOUND_EFFECT, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Frequency", float, frequency_, 0.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Gain", float, gain_, 1.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Panning", float, panning_, 0.0f, AM_DEFAULT);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
+    ATOMIC_ATTRIBUTE("Autoremove on Stop", bool, autoRemove_, false, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
 }
 
 void SoundSource::Play(Sound* sound)
@@ -286,7 +286,7 @@ void SoundSource::SetPanning(float panning)
 void SoundSource::SetAutoRemove(bool enable)
 {
     if (enable == true)
-        URHO3D_LOGWARNING("SoundSource::SetAutoRemove is deprecated. Consider using the SoundFinished event instead");
+        ATOMIC_LOGWARNING("SoundSource::SetAutoRemove is deprecated. Consider using the SoundFinished event instead");
 
     autoRemove_ = enable;
 }

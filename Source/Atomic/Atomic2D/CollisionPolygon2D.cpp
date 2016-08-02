@@ -25,12 +25,12 @@
 #include "../Core/Context.h"
 #include "../IO/MemoryBuffer.h"
 #include "../IO/VectorBuffer.h"
-#include "../Urho2D/CollisionPolygon2D.h"
-#include "../Urho2D/PhysicsUtils2D.h"
+#include "../Atomic2D/CollisionPolygon2D.h"
+#include "../Atomic2D/PhysicsUtils2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* URHO2D_CATEGORY;
@@ -49,9 +49,9 @@ void CollisionPolygon2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<CollisionPolygon2D>(URHO2D_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE);
+    ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    ATOMIC_COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Vertices", GetVerticesAttr, SetVerticesAttr, PODVector<unsigned char>, Variant::emptyBuffer, AM_FILE);
 }
 
 void CollisionPolygon2D::SetVertexCount(unsigned count)

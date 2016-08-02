@@ -27,7 +27,7 @@ namespace pugi
 class xml_node;
 }
 
-namespace Urho3D
+namespace Atomic
 {
 
 namespace Spriter

@@ -30,7 +30,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 extern const char* GEOMETRY_CATEGORY;
@@ -49,7 +49,7 @@ void Skybox::RegisterObject(Context* context)
 {
     context->RegisterFactory<Skybox>(GEOMETRY_CATEGORY);
 
-    URHO3D_COPY_BASE_ATTRIBUTES(StaticModel);
+    ATOMIC_COPY_BASE_ATTRIBUTES(StaticModel);
 }
 
 void Skybox::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)

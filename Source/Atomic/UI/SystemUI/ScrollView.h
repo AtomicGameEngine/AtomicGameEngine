@@ -37,7 +37,7 @@ class ScrollBar;
 /// Scrollable %UI element for showing a (possibly large) child element.
 class ATOMIC_API ScrollView : public UIElement
 {
-    OBJECT(ScrollView);
+    ATOMIC_OBJECT(ScrollView, UIElement);
 
 public:
     /// Construct.

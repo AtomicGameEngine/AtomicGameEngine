@@ -24,13 +24,13 @@
 
 #include "../Graphics/StaticModel.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Static model component with fixed position in relation to the camera.
-class URHO3D_API Skybox : public StaticModel
+class ATOMIC_API Skybox : public StaticModel
 {
-    URHO3D_OBJECT(Skybox, StaticModel);
+    ATOMIC_OBJECT(Skybox, StaticModel);
 
 public:
     /// Construct.

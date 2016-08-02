@@ -24,7 +24,7 @@
 
 #include "../Graphics/Drawable.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Custom geometry vertex.
@@ -45,9 +45,9 @@ struct CustomGeometryVertex
 class VertexBuffer;
 
 /// Custom geometry component.
-class URHO3D_API CustomGeometry : public Drawable
+class ATOMIC_API CustomGeometry : public Drawable
 {
-    URHO3D_OBJECT(CustomGeometry, Drawable);
+    ATOMIC_OBJECT(CustomGeometry, Drawable);
 
 public:
     /// Construct.

@@ -26,16 +26,16 @@
 #include "../Graphics/RenderSurface.h"
 #include "../Graphics/Texture.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Image;
 class XMLFile;
 
 /// 2D texture resource.
-class URHO3D_API Texture2D : public Texture
+class ATOMIC_API Texture2D : public Texture
 {
-    URHO3D_OBJECT(Texture2D, Texture);
+    ATOMIC_OBJECT(Texture2D, Texture);
 
 public:
     /// Construct.

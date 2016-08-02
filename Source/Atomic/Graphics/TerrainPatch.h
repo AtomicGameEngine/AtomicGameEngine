@@ -24,7 +24,7 @@
 
 #include "../Graphics/Drawable.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Geometry;
@@ -32,9 +32,9 @@ class Terrain;
 class VertexBuffer;
 
 /// Individually rendered part of a heightmap terrain.
-class URHO3D_API TerrainPatch : public Drawable
+class ATOMIC_API TerrainPatch : public Drawable
 {
-    URHO3D_OBJECT(TerrainPatch, Drawable);
+    ATOMIC_OBJECT(TerrainPatch, Drawable);
 
 public:
     /// Construct.

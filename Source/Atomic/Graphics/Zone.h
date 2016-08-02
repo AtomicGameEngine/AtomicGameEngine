@@ -26,13 +26,13 @@
 #include "../Graphics/Texture.h"
 #include "../Math/Color.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// %Component that describes global rendering properties.
-class URHO3D_API Zone : public Drawable
+class ATOMIC_API Zone : public Drawable
 {
-    URHO3D_OBJECT(Zone, Drawable);
+    ATOMIC_OBJECT(Zone, Drawable);
 
 public:
     /// Construct.

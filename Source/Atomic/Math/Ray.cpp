@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Vector3 Ray::ClosestPoint(const Ray& ray) const

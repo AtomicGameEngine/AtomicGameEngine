@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Urho2D/Constraint2D.h"
+#include "../Atomic2D/Constraint2D.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// 2D motor constraint component.
-class URHO3D_API ConstraintMotor2D : public Constraint2D
+class ATOMIC_API ConstraintMotor2D : public Constraint2D
 {
-    URHO3D_OBJECT(ConstraintMotor2D, Constraint2D);
+    ATOMIC_OBJECT(ConstraintMotor2D, Constraint2D);
 
 public:
     /// Construct.

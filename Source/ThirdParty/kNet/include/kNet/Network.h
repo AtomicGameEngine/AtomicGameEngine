@@ -106,6 +106,15 @@ public:
 	/// Returns the data structure that collects statistics about the whole Network.
 	Lock<StatsEventHierarchyNode> Statistics() { return statistics.Acquire(); }
 
+    // BEGIN ATOMIC
+
+    Socket* CreateUnconnectedUDPSocket(const char *address, unsigned short port);
+
+    /** Connect with an existing socket. This is used when creating a connection with NAT punchthrough. */
+    Ptr(MessageConnection) Connect(Socket* s, IMessageHandler *messageHandler, Datagram *connectMessage = 0);
+
+    // END ATOMIC
+
 private:
 	/// Specifies the local network address of the system. This name is cached here on initialization
 	/// to avoid multiple queries to namespace providers whenever the name is needed.

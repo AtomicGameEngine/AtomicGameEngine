@@ -26,14 +26,14 @@
 
 #include <Box2D/Box2D.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Camera;
 class RigidBody2D;
 
 /// 2D Physics raycast hit.
-struct URHO3D_API PhysicsRaycastResult2D
+struct ATOMIC_API PhysicsRaycastResult2D
 {
     /// Construct with defaults.
     PhysicsRaycastResult2D() :
@@ -71,9 +71,9 @@ struct DelayedWorldTransform2D
 };
 
 /// 2D physics simulation world component. Should be added only to the root scene node.
-class URHO3D_API PhysicsWorld2D : public Component, public b2ContactListener, public b2Draw
+class ATOMIC_API PhysicsWorld2D : public Component, public b2ContactListener, public b2Draw
 {
-    URHO3D_OBJECT(PhysicsWorld2D, Component);
+    ATOMIC_OBJECT(PhysicsWorld2D, Component);
 
 public:
     /// Construct.

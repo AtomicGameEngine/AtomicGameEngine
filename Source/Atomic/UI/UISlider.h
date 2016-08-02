@@ -30,7 +30,7 @@ namespace Atomic
 
 class UISlider : public UIWidget
 {
-    OBJECT(UISlider)
+    ATOMIC_OBJECT(UISlider, UIWidget)
 
 public:
 

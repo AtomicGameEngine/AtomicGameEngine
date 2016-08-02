@@ -26,13 +26,13 @@
 #include "../Graphics/Texture2D.h"
 #include "../IO/Deserializer.h"
 #include "../Resource/ResourceCache.h"
-#include "../Urho2D/Drawable2D.h"
-#include "../Urho2D/Sprite2D.h"
-#include "../Urho2D/SpriteSheet2D.h"
+#include "../Atomic2D/Drawable2D.h"
+#include "../Atomic2D/Sprite2D.h"
+#include "../Atomic2D/SpriteSheet2D.h"
 
 #include "../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 Sprite2D::Sprite2D(Context* context) :
