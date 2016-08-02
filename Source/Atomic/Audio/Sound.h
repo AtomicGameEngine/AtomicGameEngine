@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,15 +25,15 @@
 #include "../Container/ArrayPtr.h"
 #include "../Resource/Resource.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class SoundStream;
 
 /// %Sound resource.
-class ATOMIC_API Sound : public Resource
+class URHO3D_API Sound : public Resource
 {
-    OBJECT(Sound);
+    URHO3D_OBJECT(Sound, Resource);
 
 public:
     /// Construct.

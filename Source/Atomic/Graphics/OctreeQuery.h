@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,14 @@
 #include "../Math/Ray.h"
 #include "../Math/Sphere.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Drawable;
 class Node;
 
 /// Base class for octree queries.
-class ATOMIC_API OctreeQuery
+class URHO3D_API OctreeQuery
 {
 public:
     /// Construct with query parameters.
@@ -71,7 +71,7 @@ private:
 };
 
 /// Point octree query.
-class ATOMIC_API PointOctreeQuery : public OctreeQuery
+class URHO3D_API PointOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with point and query parameters.
@@ -92,7 +92,7 @@ public:
 };
 
 /// %Sphere octree query.
-class ATOMIC_API SphereOctreeQuery : public OctreeQuery
+class URHO3D_API SphereOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with sphere and query parameters.
@@ -113,7 +113,7 @@ public:
 };
 
 /// Bounding box octree query.
-class ATOMIC_API BoxOctreeQuery : public OctreeQuery
+class URHO3D_API BoxOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with bounding box and query parameters.
@@ -134,7 +134,7 @@ public:
 };
 
 /// %Frustum octree query.
-class ATOMIC_API FrustumOctreeQuery : public OctreeQuery
+class URHO3D_API FrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum and query parameters.
@@ -155,7 +155,7 @@ public:
 };
 
 /// General octree query result. Used for Lua bindings only.
-struct ATOMIC_API OctreeQueryResult
+struct URHO3D_API OctreeQueryResult
 {
     /// Construct with defaults.
     OctreeQueryResult() :
@@ -183,7 +183,7 @@ enum RayQueryLevel
 };
 
 /// Raycast result.
-struct ATOMIC_API RayQueryResult
+struct URHO3D_API RayQueryResult
 {
     /// Construct with defaults.
     RayQueryResult() :
@@ -221,7 +221,7 @@ struct ATOMIC_API RayQueryResult
 };
 
 /// Raycast octree query.
-class ATOMIC_API RayOctreeQuery
+class URHO3D_API RayOctreeQuery
 {
 public:
     /// Construct with ray and query parameters.
@@ -254,6 +254,21 @@ private:
     RayOctreeQuery(const RayOctreeQuery& rhs);
     /// Prevent assignment.
     RayOctreeQuery& operator =(const RayOctreeQuery& rhs);
+};
+
+class URHO3D_API AllContentOctreeQuery : public OctreeQuery
+{
+public:
+    /// Construct.
+    AllContentOctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask) :
+        OctreeQuery(result, drawableFlags, viewMask)
+    {
+    }
+
+    /// Intersection test for an octant.
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside);
+    /// Intersection test for drawables.
+    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside);
 };
 
 }

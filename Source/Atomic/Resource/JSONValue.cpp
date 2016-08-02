@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 const JSONValue JSONValue::EMPTY;
@@ -46,7 +46,7 @@ JSONValue& JSONValue::operator =(bool rhs)
 JSONValue& JSONValue::operator =(int rhs)
 {
     SetType(JSON_NUMBER, JSONNT_INT);
-    numberValue_ = rhs;
+    numberValue_ = rhs;    
 
     return *this;
 }
@@ -357,24 +357,24 @@ void JSONValue::SetVariant(const Variant& variant, Context* context)
 {
     if (!IsNull())
     {
-        LOGWARNING("JsonValue is not null");
+        URHO3D_LOGWARNING("JsonValue is not null");
     }
 
     (*this)["type"] = variant.GetTypeName();
     (*this)["value"].SetVariantValue(variant, context);
 }
 
-void JSONValue::GetVariant(Variant& variant) const
+Variant JSONValue::GetVariant() const
 {
     VariantType type = Variant::GetTypeFromName((*this)["type"].GetString());
-    (*this)["value"].GetVariantValue(variant, type);
+    return (*this)["value"].GetVariantValue(type);
 }
 
 void JSONValue::SetVariantValue(const Variant& variant, Context* context)
 {
     if (!IsNull())
     {
-        LOGWARNING("JsonValue is not null");
+        URHO3D_LOGWARNING("JsonValue is not null");
     }
 
     switch (variant.GetType())
@@ -382,7 +382,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
     case VAR_BOOL:
         *this = variant.GetBool();
         return;
-
+    
     case VAR_INT:
         *this = variant.GetInt();
         return;
@@ -411,7 +411,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             if (!context)
             {
-                LOGERROR("Context must not null for ResourceRef");
+                URHO3D_LOGERROR("Context must not be null for ResourceRef");
                 return;
             }
 
@@ -424,7 +424,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             if (!context)
             {
-                LOGERROR("Context must not null for ResourceRefList");
+                URHO3D_LOGERROR("Context must not be null for ResourceRefList");
                 return;
             }
 
@@ -453,45 +453,38 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
     }
 }
 
-void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
+Variant JSONValue::GetVariantValue(VariantType type) const
 {
+    Variant variant;
     switch (type)
     {
     case VAR_BOOL:
         variant = GetBool();
-        return;
+        break;
 
     case VAR_INT:
         variant = GetInt();
-        return;
+        break;
 
     case VAR_FLOAT:
         variant = GetFloat();
-        return;
+        break;
 
     case VAR_DOUBLE:
         variant = GetDouble();
-        return;
+        break;
 
     case VAR_STRING:
         variant = GetString();
-        return;
+        break;
 
     case VAR_VARIANTVECTOR:
-        {
-            VariantVector vector;
-            GetVariantVector(vector);
-            variant = vector;
-        }
-        return;
+        variant = GetVariantVector();
+        break;
 
     case VAR_VARIANTMAP:
-        {
-            VariantMap map;
-            GetVariantMap(map);
-            variant = map;
-        }
-        return;
+        variant = GetVariantMap();
+        break;
 
     case VAR_RESOURCEREF:
         {
@@ -504,12 +497,12 @@ void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
             }
             variant = ref;
         }
-        return;
+        break;
 
     case VAR_RESOURCEREFLIST:
         {
             ResourceRefList refList;
-            Vector<String> values = GetString().Split(';');
+            Vector<String> values = GetString().Split(';', true);
             if (values.Size() >= 1)
             {
                 refList.type_ = values[0];
@@ -519,7 +512,7 @@ void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
             }
             variant = refList;
         }
-        return;
+        break;
 
     case VAR_STRINGVECTOR:
         {
@@ -528,12 +521,13 @@ void JSONValue::GetVariantValue(Variant& variant, VariantType type) const
                 vector.Push((*this)[i].GetString());
             variant = vector;
         }
-        return;
+        break;
 
     default:
         variant.FromString(type, GetString());
-        return;
     }
+
+    return variant;
 }
 
 void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context)
@@ -543,44 +537,53 @@ void JSONValue::SetVariantMap(const VariantMap& variantMap, Context* context)
         (*this)[i->first_.ToString()].SetVariant(i->second_);
 }
 
-void JSONValue::GetVariantMap(VariantMap& variantMap) const
+VariantMap JSONValue::GetVariantMap() const
 {
+    VariantMap variantMap;
     if (!IsObject())
     {
-        LOGERROR("JSONValue is not a object");
-        return;
+        URHO3D_LOGERROR("JSONValue is not a object");
+        return variantMap;
     }
 
     for (ConstJSONObjectIterator i = Begin(); i != End(); ++i)
     {
         StringHash key(ToUInt(i->first_));
-        Variant variant;
-        i->second_.GetVariant(variant);
+        Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }
+
+    return variantMap;
 }
 
 void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context)
 {
     SetType(JSON_ARRAY);
+    arrayValue_->Reserve(variantVector.Size());
     for (unsigned i = 0; i < variantVector.Size(); ++i)
-        (*this)[i].SetVariant(variantVector[i]);
+    {
+        JSONValue val;
+        val.SetVariant(variantVector[i], context);
+        arrayValue_->Push(val);
+    }
 }
 
-void JSONValue::GetVariantVector(VariantVector& variantVector) const
+VariantVector JSONValue::GetVariantVector() const
 {
+    VariantVector variantVector;
     if (!IsArray())
     {
-        LOGERROR("JSONValue is not a array");
-        return;
+        URHO3D_LOGERROR("JSONValue is not a array");
+        return variantVector;
     }
 
     for (unsigned i = 0; i < Size(); ++i)
     {
-        Variant variant;
-        (*this)[i].GetVariant(variant);
+        Variant variant = (*this)[i].GetVariant();
         variantVector.Push(variant);
     }
+
+    return variantVector;
 }
 
 }

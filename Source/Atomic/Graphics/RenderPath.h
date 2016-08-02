@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include "../Math/Color.h"
 #include "../Math/Vector4.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class XMLElement;
@@ -63,7 +63,7 @@ enum RenderTargetSizeMode
 };
 
 /// Rendertarget definition.
-struct RenderTargetInfo
+struct URHO3D_API RenderTargetInfo
 {
     /// Construct.
     RenderTargetInfo() :
@@ -103,7 +103,7 @@ struct RenderTargetInfo
 };
 
 /// Rendering path command.
-struct RenderPathCommand
+struct URHO3D_API RenderPathCommand
 {
     /// Construct.
     RenderPathCommand() :
@@ -204,11 +204,9 @@ struct RenderPathCommand
     String eventName_;
 };
 
-/// Rendering path definition.
-class ATOMIC_API RenderPath : public RefCounted
+/// Rendering path definition. A sequence of commands (e.g. clear screen, draw objects with specific pass) that yields the scene rendering result.
+class URHO3D_API RenderPath : public RefCounted
 {
-    REFCOUNTED(RenderPath)
-
 public:
     /// Construct.
     RenderPath();

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,11 @@
 
 #pragma once
 
-#if defined(ATOMIC_OPENGL)
+// Note: ShaderProgram class is purposefully API-specific. It should not be used by Urho3D client applications.
+
+#if defined(URHO3D_OPENGL)
 #include "OpenGL/OGLShaderProgram.h"
-#elif defined(ATOMIC_D3D11)
+#elif defined(URHO3D_D3D11)
 #include "Direct3D11/D3D11ShaderProgram.h"
 #else
 #include "Direct3D9/D3D9ShaderProgram.h"

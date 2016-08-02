@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 
 #include <cstring>
 
-namespace Atomic
+namespace Urho3D
 {
 
 static const unsigned MAX_NETWORK_ATTRIBUTES = 64;
@@ -46,7 +46,7 @@ struct NodeReplicationState;
 struct SceneReplicationState;
 
 /// Dirty attribute bits structure for network replication.
-struct ATOMIC_API DirtyBits
+struct URHO3D_API DirtyBits
 {
     /// Construct empty.
     DirtyBits() :
@@ -122,7 +122,7 @@ struct ATOMIC_API DirtyBits
 };
 
 /// Per-object attribute state for network replication, allocated on demand.
-struct ATOMIC_API NetworkState
+struct URHO3D_API NetworkState
 {
     /// Construct with defaults.
     NetworkState() :
@@ -145,14 +145,14 @@ struct ATOMIC_API NetworkState
 };
 
 /// Base class for per-user network replication states.
-struct ATOMIC_API ReplicationState
+struct URHO3D_API ReplicationState
 {
     /// Parent network connection.
     Connection* connection_;
 };
 
 /// Per-user component network replication state.
-struct ATOMIC_API ComponentReplicationState : public ReplicationState
+struct URHO3D_API ComponentReplicationState : public ReplicationState
 {
     /// Parent node replication state.
     NodeReplicationState* nodeState_;
@@ -163,7 +163,7 @@ struct ATOMIC_API ComponentReplicationState : public ReplicationState
 };
 
 /// Per-user node network replication state.
-struct ATOMIC_API NodeReplicationState : public ReplicationState
+struct URHO3D_API NodeReplicationState : public ReplicationState
 {
     /// Construct.
     NodeReplicationState() :
@@ -190,7 +190,7 @@ struct ATOMIC_API NodeReplicationState : public ReplicationState
 };
 
 /// Per-user scene network replication state.
-struct ATOMIC_API SceneReplicationState : public ReplicationState
+struct URHO3D_API SceneReplicationState : public ReplicationState
 {
     /// Nodes by ID.
     HashMap<unsigned, NodeReplicationState> nodeStates_;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 #pragma once
 
-namespace Atomic
+namespace Urho3D
 {
 
-/// Register Atomic2D library objects.
-void ATOMIC_API RegisterAtomic2DLibrary(Context* context);
+/// Register Urho2D library objects.
+void URHO3D_API RegisterUrho2DLibrary(Context* context);
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,9 @@
 #pragma once
 
 #include "../Resource/Resource.h"
-#include "../Atomic2D/TileMapDefs2D.h"
+#include "../Urho2D/TileMapDefs2D.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Sprite2D;
@@ -37,10 +37,8 @@ class XMLFile;
 /// Tmx layer.
 class TmxLayer2D : public RefCounted
 {
-    REFCOUNTED(TmxLayer2D)
-
 public:
-    TmxLayer2D(TmxFile2D* tmxFile = 0, TileMapLayerType2D type = LT_TILE_LAYER);
+    TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
     virtual ~TmxLayer2D();
 
     /// Return tmx file.
@@ -92,10 +90,8 @@ protected:
 /// Tmx tile layer.
 class TmxTileLayer2D : public TmxLayer2D
 {
-    REFCOUNTED(TmxTileLayer2D)
-
 public:
-    TmxTileLayer2D(TmxFile2D* tmxFile = 0);
+    TmxTileLayer2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
     bool Load(const XMLElement& element, const TileMapInfo2D& info);
@@ -110,13 +106,11 @@ protected:
 /// Tmx image layer.
 class TmxObjectGroup2D : public TmxLayer2D
 {
-    REFCOUNTED(TmxObjectGroup2D)
-
 public:
     TmxObjectGroup2D(TmxFile2D* tmxFile);
 
     /// Load from XML element.
-    bool Load(const XMLElement& element, const TileMapInfo2D& info, bool local = false);
+    bool Load(const XMLElement& element, const TileMapInfo2D& info);
 
     /// Return number of objects.
     unsigned GetNumObjects() const { return objects_.Size(); }
@@ -132,8 +126,6 @@ private:
 /// Tmx image layer.
 class TmxImageLayer2D : public TmxLayer2D
 {
-    REFCOUNTED(TmxImageLayer2D)
-
 public:
     TmxImageLayer2D(TmxFile2D* tmxFile);
 
@@ -159,9 +151,9 @@ private:
 };
 
 /// Tile map file.
-class ATOMIC_API TmxFile2D : public Resource
+class URHO3D_API TmxFile2D : public Resource
 {
-    OBJECT(TmxFile2D);
+    URHO3D_OBJECT(TmxFile2D, Resource);
 
 public:
     /// Construct.
@@ -176,15 +168,23 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return information.
+    /// Set Tilemap information.
+    bool SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight);
+
+    /// Add layer at index, if index > number of layers then append to end.
+    void AddLayer(unsigned index, TmxLayer2D *layer);
+
+    /// Append layer to end.
+    void AddLayer(Urho3D::TmxLayer2D* layer);
+
+    /// Return Tilemap information.
     const TileMapInfo2D& GetInfo() const { return info_; }
 
     /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
+
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(int gid) const;
-    /// Return tile object group by gid, if not exist return 0.
-    TmxObjectGroup2D* GetTileObjectGroup(int gid) const;
 
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
@@ -210,10 +210,8 @@ private:
     HashMap<int, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.
     HashMap<int, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
-    /// Gid to tile objectgroup  mapping.
-    HashMap<int, SharedPtr<TmxObjectGroup2D> > gidToObjectGroupMapping_;
     /// Layers.
-    Vector<SharedPtr<TmxLayer2D>> layers_;
+    Vector<TmxLayer2D*> layers_;
 };
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Vector4.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 enum InterpolationMode
@@ -44,7 +44,7 @@ enum InterpolationMode
 };
 
 /// Spline class to get a point on it based off the interpolation mode.
-class ATOMIC_API Spline
+class URHO3D_API Spline
 {
 public:
     /// Default constructor.

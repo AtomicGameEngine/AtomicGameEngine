@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,20 +25,16 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Console;
-    
-namespace SystemUI
-{
 class DebugHud;
-}
 
-/// Atomic engine. Creates the other subsystems.
-class ATOMIC_API Engine : public Object
+/// Urho3D engine. Creates the other subsystems.
+class URHO3D_API Engine : public Object
 {
-    OBJECT(Engine);
+    URHO3D_OBJECT(Engine, Object);
 
 public:
     /// Construct.
@@ -53,7 +49,7 @@ public:
     /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
     Console* CreateConsole();
     /// Create the debug hud.
-    SystemUI::DebugHud* CreateDebugHud();
+    DebugHud* CreateDebugHud();
     /// Set minimum frames per second. If FPS goes lower than this, time will appear to slow down.
     void SetMinFps(int fps);
     /// Set maximum frames per second. The engine will sleep if FPS is higher than this.
@@ -68,10 +64,6 @@ public:
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);
-    /// Set whether the engine is paused.
-    void SetPaused(bool paused);
-    /// Set whether to run the next frame even if paused (for stepping frame by frame)
-    void SetRunNextPausedFrame(bool run);
     /// Close the graphics window and set the exit flag. No-op on iOS, as an iOS application can not legally exit.
     void Exit();
     /// Dump profiling information to the log.
@@ -105,12 +97,6 @@ public:
     /// Return whether engine has been initialized.
     bool IsInitialized() const { return initialized_; }
 
-    /// Return whether the engine is paused.
-    bool IsPaused() const { return paused_; }
-
-    /// Return whether to run the next frame even if paused (for stepping frame by frame)
-    bool GetRunNextPausedFrame() const { return runNextPausedFrame_; }
-
     /// Return whether exit has been requested.
     bool IsExiting() const { return exiting_; }
 
@@ -132,15 +118,7 @@ public:
     static const Variant
         & GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
 
-    // ATOMIC BEGIN
-    static bool GetDebugBuild();
-    // ATOMIC END
-
 private:
-    /// Handle exit requested event. Auto-exit if enabled.
-    void HandlePauseResumeRequested(StringHash eventType, VariantMap& eventData);
-    /// Handle exit requested event. Auto-exit if enabled.
-    void HandlePauseStepRequested(StringHash eventType, VariantMap& eventData);
     /// Handle exit requested event. Auto-exit if enabled.
     void HandleExitRequested(StringHash eventType, VariantMap& eventData);
     /// Actually perform the exit actions.
@@ -162,7 +140,7 @@ private:
     unsigned maxInactiveFps_;
     /// Pause when minimized flag.
     bool pauseMinimized_;
-#ifdef ATOMIC_TESTING
+#ifdef URHO3D_TESTING
     /// Time out counter for testing.
     long long timeOut_;
 #endif
@@ -176,10 +154,6 @@ private:
     bool headless_;
     /// Audio paused flag.
     bool audioPaused_;
-    /// Engine paused flag
-    bool paused_;
-    /// Whether to run the next frame even if paused (for stepping frame by frame)
-    bool runNextPausedFrame_;
 };
 
 }

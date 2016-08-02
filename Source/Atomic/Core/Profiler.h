@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@
 #include "../Core/Thread.h"
 #include "../Core/Timer.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Profiling data for one block in the profiling tree.
-class ATOMIC_API ProfilerBlock
+class URHO3D_API ProfilerBlock
 {
 public:
     /// Construct with the specified parent block and name.
@@ -169,9 +169,9 @@ public:
 };
 
 /// Hierarchical performance profiler subsystem.
-class ATOMIC_API Profiler : public Object
+class URHO3D_API Profiler : public Object
 {
-    OBJECT(Profiler);
+    URHO3D_OBJECT(Profiler, Object);
     
 public:
     /// Construct.
@@ -211,7 +211,7 @@ public:
     void BeginInterval();
     
     /// Return profiling data as text output.
-    String GetData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
+    String PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
     /// Return the current profiling block.
     const ProfilerBlock* GetCurrentBlock() { return current_; }
     /// Return the root profiling block.
@@ -219,7 +219,7 @@ public:
     
 private:
     /// Return profiling data as text output for a specified profiling block.
-    void GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
+    void PrintData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
     
     /// Current profiling block.
     ProfilerBlock* current_;
@@ -232,7 +232,7 @@ private:
 };
 
 /// Helper class for automatically beginning and ending a profiling block
-class ATOMIC_API AutoProfileBlock
+class URHO3D_API AutoProfileBlock
 {
 public:
     /// Construct. Begin a profiling block with the specified name and optional call count.
@@ -255,10 +255,10 @@ private:
     Profiler* profiler_;
 };
 
-#ifdef ATOMIC_PROFILING
-#define PROFILE(name) Atomic::AutoProfileBlock profile_ ## name (GetSubsystem<Atomic::Profiler>(), #name)
+#ifdef URHO3D_PROFILING
+#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
 #else
-#define PROFILE(name)
+#define URHO3D_PROFILE(name)
 #endif
 
 }

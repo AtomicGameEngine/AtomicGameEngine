@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #include "../Graphics/Drawable.h"
 #include "../Graphics/OctreeQuery.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Octree;
@@ -36,7 +36,7 @@ static const int NUM_OCTANTS = 8;
 static const unsigned ROOT_INDEX = M_MAX_UNSIGNED;
 
 /// %Octree octant
-class ATOMIC_API Octant
+class URHO3D_API Octant
 {
 public:
     /// Construct.
@@ -157,11 +157,11 @@ protected:
 };
 
 /// %Octree component. Should be added only to the root scene node
-class ATOMIC_API Octree : public Component, public Octant
+class URHO3D_API Octree : public Component, public Octant
 {
     friend void RaycastDrawablesWork(const WorkItem* item, unsigned threadIndex);
 
-    OBJECT(Octree);
+    URHO3D_OBJECT(Octree, Component);
 
 public:
     /// Construct.
@@ -208,16 +208,12 @@ private:
 
     /// Drawable objects that require update.
     PODVector<Drawable*> drawableUpdates_;
-    /// Drawable objects that require reinsertion.
-    PODVector<Drawable*> drawableReinsertions_;
+    /// Drawable objects that were inserted during threaded update phase.
+    PODVector<Drawable*> threadedDrawableUpdates_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
-    /// Current threaded ray query.
-    mutable RayOctreeQuery* rayQuery_;
-    /// Drawable list for threaded ray query.
+    /// Ray query temporary list of drawables.
     mutable PODVector<Drawable*> rayQueryDrawables_;
-    /// Threaded ray query intermediate results.
-    mutable Vector<PODVector<RayQueryResult> > rayQueryResults_;
     /// Subdivision level.
     unsigned numLevels_;
 };

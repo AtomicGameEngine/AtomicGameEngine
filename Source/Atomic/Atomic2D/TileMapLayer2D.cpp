@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,14 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
-#include "../Atomic2D/StaticSprite2D.h"
-#include "../Atomic2D/TileMap2D.h"
-#include "../Atomic2D/TileMapLayer2D.h"
-#include "../Atomic2D/TmxFile2D.h"
-
-#include "../Atomic2D/RigidBody2D.h"
+#include "../Urho2D/StaticSprite2D.h"
+#include "../Urho2D/TileMap2D.h"
+#include "../Urho2D/TileMapLayer2D.h"
+#include "../Urho2D/TmxFile2D.h"
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 TileMapLayer2D::TileMapLayer2D(Context* context) :
@@ -311,30 +309,6 @@ void TileMapLayer2D::SetTileLayer(const TmxTileLayer2D* tileLayer)
             staticSprite->SetLayer(drawOrder_);
             staticSprite->SetOrderInLayer(y * width + x);
 
-            // collision
-            RigidBody2D *body = NULL;
-            TmxObjectGroup2D* group = tile->GetObjectGroup();
-            if (group)
-            {
-                for (unsigned i = 0; i < group->GetNumObjects(); i++)
-                {
-                    TileMapObject2D* o = group->GetObject(i);
-
-                    if (o->ValidCollisionShape())
-                    {
-                        if (!body)
-                        {
-                            body = tileNode->CreateComponent<RigidBody2D>();
-                            body->SetBodyType(BT_STATIC);
-                        }
-
-                        o->CreateCollisionShape(tileNode);
-
-                    }
-                }
-
-            }
-
             nodes_[y * width + x] = tileNode;
         }
     }
@@ -352,7 +326,7 @@ void TileMapLayer2D::SetObjectGroup(const TmxObjectGroup2D* objectGroup)
         const TileMapObject2D* object = objectGroup->GetObject(i);
 
         // Create dummy node for all object
-        SharedPtr<Node> objectNode(GetNode()->CreateChild(object->GetName()));
+        SharedPtr<Node> objectNode(GetNode()->CreateChild("Object"));
         objectNode->SetTemporary(true);
         objectNode->SetPosition(object->GetPosition());
 
@@ -393,12 +367,4 @@ void TileMapLayer2D::SetImageLayer(const TmxImageLayer2D* imageLayer)
     nodes_.Push(imageNode);
 }
 
-const String& TileMapLayer2D::GetName() const
-{
-    static String none("");
-    if (tmxLayer_)
-        return tmxLayer_->GetName();
-
-    return none;
-}
 }

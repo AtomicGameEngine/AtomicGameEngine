@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 void CommentOutFunction(String& code, const String& signature)
@@ -72,7 +72,8 @@ Shader::Shader(Context* context) :
 Shader::~Shader()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    cache->ResetDependencies(this);
+    if (cache)
+        cache->ResetDependencies(this);
 }
 
 void Shader::RegisterObject(Context* context)
@@ -99,7 +100,7 @@ bool Shader::BeginLoad(Deserializer& source)
     CommentOutFunction(psSourceCode_, "void VS(");
 
     // OpenGL: rename either VS() or PS() to main()
-#ifdef ATOMIC_OPENGL
+#ifdef URHO3D_OPENGL
     vsSourceCode_.Replace("void VS(", "void main(");
     psSourceCode_.Replace("void PS(", "void main(");
 #endif

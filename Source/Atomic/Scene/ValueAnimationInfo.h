@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../Container/RefCounted.h"
 #include "../Scene/AnimationDefs.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Object;
@@ -33,10 +33,8 @@ class ValueAnimation;
 struct VAnimEventFrame;
 
 /// Base class for a value animation instance, which includes animation runtime information and updates the target object's value automatically.
-class ValueAnimationInfo : public RefCounted
+class URHO3D_API ValueAnimationInfo : public RefCounted
 {
-    REFCOUNTED(ValueAnimationInfo)
-
 public:
     /// Construct without target object.
     ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed);
@@ -47,8 +45,10 @@ public:
     /// Destruct.
     ~ValueAnimationInfo();
 
-    /// Update. Return true when the animation is finished. No-op when the target object is not defined.
+    /// Advance time position and apply. Return true when the animation is finished. No-op when the target object is not defined.
     bool Update(float timeStep);
+    /// Set time position and apply. Return true when the animation is finished. No-op when the target object is not defined.
+    bool SetTime(float time);
 
     /// Set wrap mode.
     void SetWrapMode(WrapMode wrapMode) { wrapMode_ = wrapMode; }
@@ -64,6 +64,9 @@ public:
 
     /// Return wrap mode.
     WrapMode GetWrapMode() const { return wrapMode_; }
+
+    /// Return time position.
+    float GetTime() const { return currentTime_; }
 
     /// Return speed.
     float GetSpeed() const { return speed_; }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include "../IO/File.h"
 #include "../Resource/Resource.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class BackgroundLoader;
@@ -37,10 +37,6 @@ class PackageFile;
 
 /// Sets to priority so that a package or file is pushed to the end of the vector.
 static const unsigned PRIORITY_LAST = 0xffffffff;
-/// Extension used for package files
-extern const char* PAK_EXTENSION;
-/// File search filter used to find package files
-extern const char* PAK_FILTER;
 
 /// Container of resources with specific type.
 struct ResourceGroup
@@ -53,9 +49,9 @@ struct ResourceGroup
     }
 
     /// Memory budget.
-    unsigned memoryBudget_;
+    unsigned long long memoryBudget_;
     /// Current memory use.
-    unsigned memoryUse_;
+    unsigned long long memoryUse_;
     /// Resources.
     HashMap<StringHash, SharedPtr<Resource> > resources_;
 };
@@ -68,7 +64,7 @@ enum ResourceRequest
 };
 
 /// Optional resource request processor. Can deny requests, re-route resource file names, or perform other processing per request.
-class ATOMIC_API ResourceRouter : public Object
+class URHO3D_API ResourceRouter : public Object
 {
 public:
     /// Construct.
@@ -82,9 +78,9 @@ public:
 };
 
 /// %Resource cache subsystem. Loads resources on demand and stores them for later access.
-class ATOMIC_API ResourceCache : public Object
+class URHO3D_API ResourceCache : public Object
 {
-    OBJECT(ResourceCache);
+    URHO3D_OBJECT(ResourceCache, Object);
 
 public:
     /// Construct.
@@ -121,7 +117,7 @@ public:
     /// Reload a resource based on filename. Causes also reload of dependent resources if necessary.
     void ReloadResourceWithDependencies(const String& fileName);
     /// Set memory budget for a specific resource type, default 0 is unlimited.
-    void SetMemoryBudget(StringHash type, unsigned budget);
+    void SetMemoryBudget(StringHash type, unsigned long long budget);
     /// Enable or disable automatic reloading of resources as files are modified. Default false.
     void SetAutoReloadResources(bool enable);
     /// Enable or disable returning resources that failed to load. Default false. This may be useful in editing to not lose resource ref attributes.
@@ -168,6 +164,8 @@ public:
     template <class T> T* GetExistingResource(const String& name);
     /// Template version of loading a resource without storing it to the cache.
     template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
+    /// Template version of releasing a resource by name.
+    template <class T> void ReleaseResource(const String& name, bool force = false);
     /// Template version of queueing a resource background load.
     template <class T> bool BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Template version of returning loaded resources of a specific type.
@@ -175,11 +173,11 @@ public:
     /// Return whether a file exists by name.
     bool Exists(const String& name) const;
     /// Return memory budget for a resource type.
-    unsigned GetMemoryBudget(StringHash type) const;
+    unsigned long long GetMemoryBudget(StringHash type) const;
     /// Return total memory use for a resource type.
-    unsigned GetMemoryUse(StringHash type) const;
+    unsigned long long GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
-    unsigned GetTotalMemoryUse() const;
+    unsigned long long GetTotalMemoryUse() const;
     /// Return full absolute file name of resource if possible.
     String GetResourceFileName(const String& name) const;
 
@@ -208,6 +206,9 @@ public:
     void StoreResourceDependency(Resource* resource, const String& dependency);
     /// Reset dependencies for a resource.
     void ResetDependencies(Resource* resource);
+
+    /// Returns a formatted string containing the memory actively used.
+    String PrintMemoryUsage() const;
 
 private:
     /// Find a resource.
@@ -265,6 +266,12 @@ template <class T> T* ResourceCache::GetResource(const String& name, bool sendEv
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
 }
 
+template <class T> void ResourceCache::ReleaseResource(const String& name, bool force)
+{
+    StringHash type = T::GetTypeStatic();
+    ReleaseResource(type, name, force);
+}
+
 template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure)
 {
     StringHash type = T::GetTypeStatic();
@@ -292,6 +299,6 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 }
 
 /// Register Resource library subsystems and objects.
-void ATOMIC_API RegisterResourceLibrary(Context* context);
+void URHO3D_API RegisterResourceLibrary(Context* context);
 
 }

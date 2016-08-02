@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "../IO/Log.h"
 #include "../Resource/Resource.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 Resource::Resource(Context* context) :
@@ -40,7 +40,7 @@ bool Resource::Load(Deserializer& source)
 {
     // Because BeginLoad() / EndLoad() can be called from worker threads, where profiling would be a no-op,
     // create a type name -based profile block here
-#ifdef ATOMIC_PROFILING
+#ifdef URHO3D_PROFILING
     String profileBlockName("Load" + GetTypeName());
 
     Profiler* profiler = GetSubsystem<Profiler>();
@@ -56,7 +56,7 @@ bool Resource::Load(Deserializer& source)
         success &= EndLoad();
     SetAsyncLoadState(ASYNC_DONE);
 
-#ifdef ATOMIC_PROFILING
+#ifdef URHO3D_PROFILING
     if (profiler)
         profiler->EndBlock();
 #endif
@@ -78,7 +78,7 @@ bool Resource::EndLoad()
 
 bool Resource::Save(Serializer& dest) const
 {
-    LOGERROR("Save not supported for " + GetTypeName());
+    URHO3D_LOGERROR("Save not supported for " + GetTypeName());
     return false;
 }
 

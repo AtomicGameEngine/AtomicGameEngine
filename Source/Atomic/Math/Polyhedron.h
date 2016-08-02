@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 #include "../Math/Vector3.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class BoundingBox;
@@ -34,7 +34,7 @@ class Matrix3x4;
 class Plane;
 
 /// A convex volume built from polygon faces.
-class ATOMIC_API Polyhedron
+class URHO3D_API Polyhedron
 {
 public:
     /// Construct empty.

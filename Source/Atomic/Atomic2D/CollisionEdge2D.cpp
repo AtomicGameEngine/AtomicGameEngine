@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,15 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Atomic2D/CollisionEdge2D.h"
-#include "../Atomic2D/PhysicsUtils2D.h"
+#include "../Urho2D/CollisionEdge2D.h"
+#include "../Urho2D/PhysicsUtils2D.h"
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
-extern const char* ATOMIC2D_CATEGORY;
+extern const char* URHO2D_CATEGORY;
 static const Vector2 DEFAULT_VERTEX1(-0.01f, 0.0f);
 static const Vector2 DEFAULT_VERTEX2(0.01f, 0.0f);
 
@@ -52,12 +52,12 @@ CollisionEdge2D::~CollisionEdge2D()
 
 void CollisionEdge2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionEdge2D>(ATOMIC2D_CATEGORY);
+    context->RegisterFactory<CollisionEdge2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Vertex 1", GetVertex1, SetVertex1, Vector2, DEFAULT_VERTEX1, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Vertex 2", GetVertex2, SetVertex2, Vector2, DEFAULT_VERTEX2, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(CollisionShape2D);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertex 1", GetVertex1, SetVertex1, Vector2, DEFAULT_VERTEX1, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Vertex 2", GetVertex2, SetVertex2, Vector2, DEFAULT_VERTEX2, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(CollisionShape2D);
 }
 
 void CollisionEdge2D::SetVertex1(const Vector2& vertex)

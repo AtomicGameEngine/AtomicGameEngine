@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,15 @@
 
 #pragma once
 
-#include <new>
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
 #include <stddef.h>
 
-namespace Atomic
+namespace Urho3D
 {
 
 struct AllocatorBlock;
@@ -54,13 +59,13 @@ struct AllocatorNode
 };
 
 /// Initialize a fixed-size allocator with the node size and initial capacity.
-ATOMIC_API AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
+URHO3D_API AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
 /// Uninitialize a fixed-size allocator. Frees all blocks in the chain.
-ATOMIC_API void AllocatorUninitialize(AllocatorBlock* allocator);
+URHO3D_API void AllocatorUninitialize(AllocatorBlock* allocator);
 /// Reserve a node. Creates a new block if necessary.
-ATOMIC_API void* AllocatorReserve(AllocatorBlock* allocator);
+URHO3D_API void* AllocatorReserve(AllocatorBlock* allocator);
 /// Free a node. Does not free any blocks.
-ATOMIC_API void AllocatorFree(AllocatorBlock* allocator, void* ptr);
+URHO3D_API void AllocatorFree(AllocatorBlock* allocator, void* ptr);
 
 /// %Allocator template class. Allocates objects of a specific class.
 template <class T> class Allocator

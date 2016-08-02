@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Atomic2D/CollisionShape2D.h"
+#include "../Urho2D/CollisionShape2D.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// 2D box collision component.
-class ATOMIC_API CollisionBox2D : public CollisionShape2D
+class URHO3D_API CollisionBox2D : public CollisionShape2D
 {
-    OBJECT(CollisionBox2D);
+    URHO3D_OBJECT(CollisionBox2D, CollisionShape2D);
 
 public:
     /// Construct.

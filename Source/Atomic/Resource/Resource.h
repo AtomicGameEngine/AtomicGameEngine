@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Deserializer;
@@ -47,10 +47,9 @@ enum AsyncLoadState
 };
 
 /// Base class for resources.
-class ATOMIC_API Resource : public Object
+class URHO3D_API Resource : public Object
 {
-    OBJECT(Resource);
-    BASEOBJECT(Resource);
+    URHO3D_OBJECT(Resource, Object);
 
 public:
     /// Construct.

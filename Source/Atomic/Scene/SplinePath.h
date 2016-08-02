@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +32,13 @@
 #include "../Scene/Component.h"
 #include "../Scene/Node.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.
-class ATOMIC_API SplinePath : public Component
+class URHO3D_API SplinePath : public Component
 {
-    OBJECT(SplinePath)
+    URHO3D_OBJECT(SplinePath, Component)
 
 public:
     /// Construct an Empty SplinePath.
@@ -77,7 +77,7 @@ public:
 
     /// Get the movement Speed.
     float GetSpeed() const { return speed_; }
-
+    
     /// Get the length of SplinePath;
     float GetLength() const { return length_; }
 

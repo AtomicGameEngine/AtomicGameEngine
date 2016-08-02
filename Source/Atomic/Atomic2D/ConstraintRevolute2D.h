@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "../Atomic2D/Constraint2D.h"
+#include "../Urho2D/Constraint2D.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// 2D revolute constraint component.
-class ATOMIC_API ConstraintRevolute2D : public Constraint2D
+class URHO3D_API ConstraintRevolute2D : public Constraint2D
 {
-    OBJECT(ConstraintRevolute2D);
+    URHO3D_OBJECT(ConstraintRevolute2D, Constraint2D);
 
 public:
     /// Construct.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,17 +27,18 @@
 #include "../Graphics/Material.h"
 #include "../Graphics/Texture2D.h"
 #include "../Scene/Scene.h"
-#include "../Atomic2D/Drawable2D.h"
-#include "../Atomic2D/Renderer2D.h"
+#include "../Urho2D/Drawable2D.h"
+#include "../Urho2D/Renderer2D.h"
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 const float PIXEL_SIZE = 0.01f;
 
 SourceBatch2D::SourceBatch2D() :
+    distance_(0.0f),
     drawOrder_(0)
 {
 }
@@ -58,8 +59,9 @@ Drawable2D::~Drawable2D()
 
 void Drawable2D::RegisterObject(Context* context)
 {
-    ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Layer", GetLayer, SetLayer, int, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Order in Layer", GetOrderInLayer, SetOrderInLayer, int, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
 }
 
 void Drawable2D::OnSetEnabled()

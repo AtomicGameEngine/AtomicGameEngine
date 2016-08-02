@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,11 @@
 
 #include "../Math/Vector3.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// 3x3 matrix for rotation and scaling.
-class ATOMIC_API Matrix3
+class URHO3D_API Matrix3
 {
 public:
     /// Construct an identity matrix.
@@ -76,7 +76,7 @@ public:
     }
 
     /// Construct from a float array.
-    Matrix3(const float* data) :
+    explicit Matrix3(const float* data) :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),
@@ -262,7 +262,7 @@ public:
 
         for (unsigned i = 0; i < 9; ++i)
         {
-            if (!Atomic::Equals(leftData[i], rightData[i]))
+            if (!Urho3D::Equals(leftData[i], rightData[i]))
                 return false;
         }
 

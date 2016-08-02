@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,13 @@
 
 #include "../Scene/Component.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// A link between otherwise unconnected regions of the navigation mesh.
-class ATOMIC_API OffMeshConnection : public Component
+class URHO3D_API OffMeshConnection : public Component
 {
-    OBJECT(OffMeshConnection);
+    URHO3D_OBJECT(OffMeshConnection, Component);
 
 public:
     /// Construct.

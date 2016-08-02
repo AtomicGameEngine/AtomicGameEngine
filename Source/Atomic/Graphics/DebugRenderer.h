@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "../Math/Frustum.h"
 #include "../Scene/Component.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class BoundingBox;
@@ -92,9 +92,9 @@ struct DebugTriangle
 };
 
 /// Debug geometry rendering component. Should be added only to the root scene node.
-class ATOMIC_API DebugRenderer : public Component
+class URHO3D_API DebugRenderer : public Component
 {
-    OBJECT(DebugRenderer);
+    URHO3D_OBJECT(DebugRenderer, Component);
 
 public:
     /// Construct.
@@ -134,13 +134,12 @@ public:
     void AddTriangleMesh
         (const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart,
             unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true);
-
-    /// Create positive and negative X axis lines
-    void CreateXAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z);
-    /// Create positive and negative Z axis lines
-    void CreateZAxisLines(unsigned gridColor, bool depthTest, int x, int y, int z);
-    /// Creates a grid on all axis
-    void CreateGrid(const Color& grid, bool depthTest, Vector3 position);
+    /// Add a circle.
+    void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true);
+    /// Add a cross.
+    void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true);
+    /// Add a quad on the XZ plane.
+    void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true);
 
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
@@ -179,24 +178,6 @@ private:
     Frustum frustum_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
-
-    /// Positioning of grid lines point 1
-    Vector3 position1_;
-    /// Positioning of grid lines point 2
-    Vector3 position2_;
-    /// Positioning of grid lines point 3
-    Vector3 position3_;
-    
-    /// Number of total grid lines
-    int numGridLines_;
-    /// Length of a grid line
-    int lineLength_;
-    /// Offset centres the grid
-    int offset_;
-    /// Scales the grid according to y-position of camera
-    int scale_;
-    /// The amount the scale gets incremented
-    int scaleIncrement_;
 };
 
 }

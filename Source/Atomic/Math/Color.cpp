@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 unsigned Color::ToUInt() const
@@ -237,9 +237,9 @@ float Color::Hue(float min, float max) const
         return 0.0f;
 
     // Calculate and return hue
-    if (Atomic::Equals(g_, max))
+    if (Urho3D::Equals(g_, max))
         return (b_ + 2.0f * chroma - r_) / (6.0f * chroma);
-    else if (Atomic::Equals(b_, max))
+    else if (Urho3D::Equals(b_, max))
         return (4.0f * chroma - g_ + r_) / (6.0f * chroma);
     else
     {
@@ -280,7 +280,7 @@ void Color::FromHCM(float h, float c, float m)
         h -= floorf(h);
 
     float hs = h * 6.0f;
-    float x = c * (1.0f - Atomic::Abs(fmodf(hs, 2.0f) - 1.0f));
+    float x = c * (1.0f - Urho3D::Abs(fmodf(hs, 2.0f) - 1.0f));
 
     // Reconstruct r', g', b' from hue
     if (hs < 2.0f)

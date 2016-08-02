@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,16 @@
 
 #pragma once
 
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
 #include "../Container/Allocator.h"
 #include "../Container/Swap.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Doubly-linked list node base class.
@@ -84,11 +90,13 @@ struct ListIteratorBase
 };
 
 /// Doubly-linked list base class.
-class ATOMIC_API ListBase
+class URHO3D_API ListBase
 {
 public:
     /// Construct.
     ListBase() :
+        head_(0),
+        tail_(0),
         allocator_(0),
         size_(0)
     {
@@ -97,10 +105,10 @@ public:
     /// Swap with another linked list.
     void Swap(ListBase& rhs)
     {
-        Atomic::Swap(head_, rhs.head_);
-        Atomic::Swap(tail_, rhs.tail_);
-        Atomic::Swap(allocator_, rhs.allocator_);
-        Atomic::Swap(size_, rhs.size_);
+        Urho3D::Swap(head_, rhs.head_);
+        Urho3D::Swap(tail_, rhs.tail_);
+        Urho3D::Swap(allocator_, rhs.allocator_);
+        Urho3D::Swap(size_, rhs.size_);
     }
 
 protected:

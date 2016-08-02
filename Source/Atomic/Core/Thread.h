@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,24 @@
 
 #pragma once
 
-#ifndef WIN32
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
+#ifndef _WIN32
 #include <pthread.h>
 typedef pthread_t ThreadID;
 #else
 typedef unsigned ThreadID;
 #endif
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Operating system thread.
-class ATOMIC_API Thread
+class URHO3D_API Thread
 {
 public:
     /// Construct. Does not start the thread yet.

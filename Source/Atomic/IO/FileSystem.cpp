@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,18 @@
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
 
-#include <SDL/include/SDL_filesystem.h>
+#ifdef __ANDROID__
+#include <SDL/SDL_rwops.h>
+#endif
+
+#ifndef MINI_URHO
+#include <SDL/SDL_filesystem.h>
+#endif
 
 #include <sys/stat.h>
-
-#ifdef WIN32
 #include <cstdio>
+
+#ifdef _WIN32
 #ifndef _MSC_VER
 #define _WIN32_IE 0x501
 #endif
@@ -62,7 +68,7 @@
 
 extern "C"
 {
-#ifdef ANDROID
+#ifdef __ANDROID__
 const char* SDL_Android_GetFilesDir();
 char** SDL_Android_GetFileList(const char* path, int* count);
 void SDL_Android_FreeFileList(char*** array, int* count);
@@ -74,18 +80,21 @@ const char* SDL_IOS_GetDocumentsDir();
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
+#if !defined(NO_POPEN) && !defined(MINI_URHO)
     if (!redirectToLog)
+#endif
         return system(commandLine.CString());
 
+#if !defined(NO_POPEN) && !defined(MINI_URHO)
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
-    char* prefPath = SDL_GetPrefPath("atomicgameengine", "temp");
+    char* prefPath = SDL_GetPrefPath("urho3d", "temp");
     if (prefPath)
     {
         stderrFilename = String(prefPath) + "command-stderr";
@@ -108,7 +117,7 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     while (!feof(file))
     {
         if (fgets(buffer, sizeof(buffer), file))
-            LOGRAW(String(buffer));
+            URHO3D_LOGRAW(String(buffer));
     }
     int exitCode = pclose(file);
 
@@ -125,13 +134,14 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
     }
 
     return exitCode;
+#endif
 }
 
 int DoSystemRun(const String& fileName, const Vector<String>& arguments)
 {
     String fixedFileName = GetNativePath(fileName);
 
-#ifdef WIN32
+#ifdef _WIN32
     // Add .exe extension if no extension defined
     if (GetExtension(fixedFileName).Empty())
         fixedFileName += ".exe";
@@ -270,7 +280,7 @@ FileSystem::FileSystem(Context* context) :
     nextAsyncExecID_(1),
     executeConsoleCommands_(false)
 {
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(FileSystem, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(FileSystem, HandleBeginFrame));
 
     // Subscribe to console commands
     SetExecuteConsoleCommands(true);
@@ -292,19 +302,19 @@ bool FileSystem::SetCurrentDir(const String& pathName)
 {
     if (!CheckAccess(pathName))
     {
-        LOGERROR("Access denied to " + pathName);
+        URHO3D_LOGERROR("Access denied to " + pathName);
         return false;
     }
-#ifdef WIN32
+#ifdef _WIN32
     if (SetCurrentDirectoryW(GetWideNativePath(pathName).CString()) == FALSE)
     {
-        LOGERROR("Failed to change directory to " + pathName);
+        URHO3D_LOGERROR("Failed to change directory to " + pathName);
         return false;
     }
 #else
     if (chdir(GetNativePath(pathName).CString()) != 0)
     {
-        LOGERROR("Failed to change directory to " + pathName);
+        URHO3D_LOGERROR("Failed to change directory to " + pathName);
         return false;
     }
 #endif
@@ -316,11 +326,19 @@ bool FileSystem::CreateDir(const String& pathName)
 {
     if (!CheckAccess(pathName))
     {
-        LOGERROR("Access denied to " + pathName);
+        URHO3D_LOGERROR("Access denied to " + pathName);
         return false;
     }
 
-#ifdef WIN32
+    // Create each of the parents if necessary
+    String parentPath = GetParentPath(pathName);
+    if (parentPath.Length() > 1 && !DirExists(parentPath))
+    {
+        if (!CreateDir(parentPath))
+            return false;
+    }
+
+#ifdef _WIN32
     bool success = (CreateDirectoryW(GetWideNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
 #else
@@ -328,9 +346,9 @@ bool FileSystem::CreateDir(const String& pathName)
 #endif
 
     if (success)
-        LOGDEBUG("Created directory " + pathName);
+        URHO3D_LOGDEBUG("Created directory " + pathName);
     else
-        LOGERROR("Failed to create directory " + pathName);
+        URHO3D_LOGERROR("Failed to create directory " + pathName);
 
     return success;
 }
@@ -342,7 +360,7 @@ void FileSystem::SetExecuteConsoleCommands(bool enable)
 
     executeConsoleCommands_ = enable;
     if (enable)
-        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(FileSystem, HandleConsoleCommand));
+        SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(FileSystem, HandleConsoleCommand));
     else
         UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
@@ -353,7 +371,7 @@ int FileSystem::SystemCommand(const String& commandLine, bool redirectStdOutToLo
         return DoSystemCommand(commandLine, redirectStdOutToLog, context_);
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return -1;
     }
 }
@@ -364,13 +382,14 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         return DoSystemRun(fileName, arguments);
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return -1;
     }
 }
 
 unsigned FileSystem::SystemCommandAsync(const String& commandLine)
 {
+#ifdef URHO3D_THREADING
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
@@ -380,13 +399,18 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
     }
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return M_MAX_UNSIGNED;
     }
+#else
+    URHO3D_LOGERROR("Can not execute an asynchronous command as threading is disabled");
+    return M_MAX_UNSIGNED;
+#endif
 }
 
 unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>& arguments)
 {
+#ifdef URHO3D_THREADING
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
@@ -396,23 +420,26 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
     }
     else
     {
-        LOGERROR("Executing an external command is not allowed");
+        URHO3D_LOGERROR("Executing an external command is not allowed");
         return M_MAX_UNSIGNED;
     }
+#else
+    URHO3D_LOGERROR("Can not run asynchronously as threading is disabled");
+    return M_MAX_UNSIGNED;
+#endif
 }
 
 bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
     if (allowedPaths_.Empty())
     {
-        if (!fileName.StartsWith("http://") && !fileName.StartsWith("https://") && !fileName.StartsWith("file://"))
-            if (!FileExists(fileName) && !DirExists(fileName))
-            {
-                LOGERROR("File or directory " + fileName + " not found");
-                return false;
-            }
+        if (!FileExists(fileName) && !DirExists(fileName))
+        {
+            URHO3D_LOGERROR("File or directory " + fileName + " not found");
+            return false;
+        }
 
-#ifdef WIN32
+#ifdef _WIN32
         bool success = (size_t)ShellExecuteW(0, !mode.Empty() ? WString(mode).CString() : 0,
             GetWideNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
 #else
@@ -427,12 +454,12 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
             arguments) == 0;
 #endif
         if (!success)
-            LOGERROR("Failed to open " + fileName + " externally");
+            URHO3D_LOGERROR("Failed to open " + fileName + " externally");
         return success;
     }
     else
     {
-        LOGERROR("Opening a file externally is not allowed");
+        URHO3D_LOGERROR("Opening a file externally is not allowed");
         return false;
     }
 }
@@ -441,12 +468,12 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
 {
     if (!CheckAccess(GetPath(srcFileName)))
     {
-        LOGERROR("Access denied to " + srcFileName);
+        URHO3D_LOGERROR("Access denied to " + srcFileName);
         return false;
     }
     if (!CheckAccess(GetPath(destFileName)))
     {
-        LOGERROR("Access denied to " + destFileName);
+        URHO3D_LOGERROR("Access denied to " + destFileName);
         return false;
     }
 
@@ -469,16 +496,16 @@ bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
 {
     if (!CheckAccess(GetPath(srcFileName)))
     {
-        LOGERROR("Access denied to " + srcFileName);
+        URHO3D_LOGERROR("Access denied to " + srcFileName);
         return false;
     }
     if (!CheckAccess(GetPath(destFileName)))
     {
-        LOGERROR("Access denied to " + destFileName);
+        URHO3D_LOGERROR("Access denied to " + destFileName);
         return false;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     return MoveFileW(GetWideNativePath(srcFileName).CString(), GetWideNativePath(destFileName).CString()) != 0;
 #else
     return rename(GetNativePath(srcFileName).CString(), GetNativePath(destFileName).CString()) == 0;
@@ -489,11 +516,11 @@ bool FileSystem::Delete(const String& fileName)
 {
     if (!CheckAccess(GetPath(fileName)))
     {
-        LOGERROR("Access denied to " + fileName);
+        URHO3D_LOGERROR("Access denied to " + fileName);
         return false;
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     return DeleteFileW(GetWideNativePath(fileName).CString()) != 0;
 #else
     return remove(GetNativePath(fileName).CString()) == 0;
@@ -502,7 +529,7 @@ bool FileSystem::Delete(const String& fileName)
 
 String FileSystem::GetCurrentDir() const
 {
-#ifdef WIN32
+#ifdef _WIN32
     wchar_t path[MAX_PATH];
     path[0] = 0;
     GetCurrentDirectoryW(MAX_PATH, path);
@@ -543,7 +570,7 @@ unsigned FileSystem::GetLastModifiedTime(const String& fileName) const
     if (fileName.Empty() || !CheckAccess(fileName))
         return 0;
 
-#ifdef WIN32
+#ifdef _WIN32
     struct _stat st;
     if (!_stat(fileName.CString(), &st))
         return (unsigned)st.st_mtime;
@@ -563,10 +590,10 @@ bool FileSystem::FileExists(const String& fileName) const
     if (!CheckAccess(GetPath(fileName)))
         return false;
 
-#ifdef ANDROID
-    if (IS_ASSET(fileName))
+#ifdef __ANDROID__
+    if (URHO3D_IS_ASSET(fileName))
     {
-        SDL_RWops* rwOps = SDL_RWFromFile(ASSET(fileName), "rb");
+        SDL_RWops* rwOps = SDL_RWFromFile(URHO3D_ASSET(fileName), "rb");
         if (rwOps)
         {
             SDL_RWclose(rwOps);
@@ -579,7 +606,7 @@ bool FileSystem::FileExists(const String& fileName) const
 
     String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
 
-#ifdef WIN32
+#ifdef _WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
         return false;
@@ -597,7 +624,7 @@ bool FileSystem::DirExists(const String& pathName) const
     if (!CheckAccess(pathName))
         return false;
 
-#ifndef WIN32
+#ifndef _WIN32
     // Always return true for the root directory
     if (pathName == "/")
         return true;
@@ -605,16 +632,16 @@ bool FileSystem::DirExists(const String& pathName) const
 
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
 
-#ifdef ANDROID
-    if (IS_ASSET(fixedName))
+#ifdef __ANDROID__
+    if (URHO3D_IS_ASSET(fixedName))
     {
         // Split the pathname into two components: the longest parent directory path and the last name component
-        String assetPath(ASSET((fixedName + '/')));
+        String assetPath(URHO3D_ASSET((fixedName + '/')));
         String parentPath;
         unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
         {
-            parentPath = assetPath.Substring(0, pos - 1);
+            parentPath = assetPath.Substring(0, pos);
             assetPath = assetPath.Substring(pos + 1);
         }
         assetPath.Resize(assetPath.Length() - 1);
@@ -633,7 +660,7 @@ bool FileSystem::DirExists(const String& pathName) const
     }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     DWORD attributes = GetFileAttributesW(WString(fixedName).CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
@@ -663,7 +690,7 @@ String FileSystem::GetProgramDir() const
     if (!programDir_.Empty())
         return programDir_;
 
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     // This is an internal directory specifier pointing to the assets in the .apk
     // Files from this directory will be opened using special handling
     programDir_ = APK;
@@ -671,7 +698,7 @@ String FileSystem::GetProgramDir() const
 #elif defined(IOS)
     programDir_ = AddTrailingSlash(SDL_IOS_GetResourceDir());
     return programDir_;
-#elif defined(WIN32)
+#elif defined(_WIN32)
     wchar_t exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileNameW(0, exeName, MAX_PATH);
@@ -695,7 +722,8 @@ String FileSystem::GetProgramDir() const
     // current working directory instead
     /// \todo Should not rely on such fixed convention
     String currentDir = GetCurrentDir();
-    if (!DirExists(programDir_ + "CoreData") && (DirExists(currentDir + "CoreData")))
+    if (!DirExists(programDir_ + "CoreData") && !DirExists(programDir_ + "Data") &&
+        (DirExists(currentDir + "CoreData") || DirExists(currentDir + "Data")))
         programDir_ = currentDir;
 
     // Sanitate /./ construct away
@@ -706,11 +734,11 @@ String FileSystem::GetProgramDir() const
 
 String FileSystem::GetUserDocumentsDir() const
 {
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     return AddTrailingSlash(SDL_Android_GetFilesDir());
 #elif defined(IOS)
     return AddTrailingSlash(SDL_IOS_GetDocumentsDir());
-#elif defined(WIN32)
+#elif defined(_WIN32)
     wchar_t pathName[MAX_PATH];
     pathName[0] = 0;
     SHGetSpecialFolderPathW(0, pathName, CSIDL_PERSONAL, 0);
@@ -726,6 +754,7 @@ String FileSystem::GetUserDocumentsDir() const
 String FileSystem::GetAppPreferencesDir(const String& org, const String& app) const
 {
     String dir;
+#ifndef MINI_URHO
     char* prefPath = SDL_GetPrefPath(org.CString(), app.CString());
     if (prefPath)
     {
@@ -733,7 +762,8 @@ String FileSystem::GetAppPreferencesDir(const String& org, const String& app) co
         SDL_free(prefPath);
     }
     else
-        LOGWARNING("Could not get application preferences directory");
+#endif
+        URHO3D_LOGWARNING("Could not get application preferences directory");
 
     return dir;
 }
@@ -751,7 +781,7 @@ bool FileSystem::SetLastModifiedTime(const String& fileName, unsigned newTime)
     if (fileName.Empty() || !CheckAccess(fileName))
         return false;
 
-#ifdef WIN32
+#ifdef _WIN32
     struct _stat oldTime;
     struct _utimbuf newTimes;
     if (_stat(fileName.CString(), &oldTime) != 0)
@@ -778,14 +808,14 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
 
-    String filterExtension = filter.Substring(filter.FindLast('.'));
+    String filterExtension = filter.Substring(filter.Find('.'));
     if (filterExtension.Contains('*'))
         filterExtension.Clear();
 
-#ifdef ANDROID
-    if (IS_ASSET(path))
+#ifdef __ANDROID__
+    if (URHO3D_IS_ASSET(path))
     {
-        String assetPath(ASSET(path));
+        String assetPath(URHO3D_ASSET(path));
         assetPath.Resize(assetPath.Length() - 1);       // AssetManager.list() does not like trailing slash
         int count;
         char** list = SDL_Android_GetFileList(assetPath.CString(), &count);
@@ -808,7 +838,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
             }
             else if (flags & SCAN_FILES)
 #endif
-            {              
+            {
                 if (filterExtension.Empty() || fileName.EndsWith(filterExtension))
                     result.Push(deltaPath + fileName);
             }
@@ -817,7 +847,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         return;
     }
 #endif
-#ifdef WIN32
+#ifdef _WIN32
     WIN32_FIND_DATAW info;
     HANDLE handle = FindFirstFileW(WString(path + "*").CString(), &info);
     if (handle != INVALID_HANDLE_VALUE)
@@ -881,164 +911,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
         closedir(dir);
     }
 #endif
-
 }
-
-bool FileSystem::CreateDirs(const String& root, const String& subdirectory)
-{
-    String folder = AddTrailingSlash(GetInternalPath(root));
-    String sub = GetInternalPath(subdirectory);
-    Vector<String> subs = sub.Split('/');
-
-    for (unsigned i = 0; i < subs.Size(); i++)
-    {
-        folder += subs[i];
-        folder += "/";
-
-        if (DirExists(folder))
-            continue;
-
-        CreateDir(folder);
-
-        if (!DirExists(folder))
-            return false;
-    }
-
-    return true;
-
-}
-
-bool FileSystem::CreateDirsRecursive(const String& directoryIn)
-{
-    String directory = AddTrailingSlash(GetInternalPath(directoryIn));
-
-    if (DirExists(directory))
-        return true;
-
-    if (FileExists(directory))
-        return false;
-
-    String parentPath = directory;
-
-    Vector<String> paths;
-
-    paths.Push(directory);
-
-    while (true)
-    {
-        parentPath = GetParentPath(parentPath);
-
-        if (!parentPath.Length())
-            break;
-
-        paths.Push(parentPath);
-    }
-
-    if (!paths.Size())
-        return false;
-
-    for (int i = (int) (paths.Size() - 1); i >= 0; i--)
-    {
-        const String& pathName = paths[i];
-
-        if (FileExists(pathName))
-            return false;
-
-        if (DirExists(pathName))
-            continue;
-
-        if (!CreateDir(pathName))
-            return false;
-
-        // double check
-        if (!DirExists(pathName))
-            return false;
-
-    }
-
-    return true;
-
-}
-
-bool FileSystem::CopyDir(const String& directoryIn, const String& directoryOut)
-{
-    if (FileExists(directoryOut) || DirExists(directoryOut))
-        return false;
-
-    Vector<String> results;
-    ScanDir(results, directoryIn, "*", SCAN_FILES, true );
-
-    for (unsigned i = 0; i < results.Size(); i++)
-    {
-        String srcFile = directoryIn + "/" + results[i];
-        String dstFile = directoryOut + "/" + results[i];
-
-        String dstPath = GetPath(dstFile);
-
-        if (!CreateDirsRecursive(dstPath))
-            return false;
-
-        //LOGINFOF("SRC: %s DST: %s", srcFile.CString(), dstFile.CString());
-        if (!Copy(srcFile, dstFile))
-            return false;
-    }
-
-    return true;
-
-}
-
-bool FileSystem::RemoveDir(const String& directoryIn, bool recursive)
-{
-    String directory = AddTrailingSlash(directoryIn);
-
-    if (!DirExists(directory))
-        return false;
-
-    Vector<String> results;
-
-    // ensure empty if not recursive
-    if (!recursive)
-    {
-        ScanDir(results, directory, "*", SCAN_DIRS | SCAN_FILES | SCAN_HIDDEN, true );
-        while (results.Remove(".")) {}
-        while (results.Remove("..")) {}
-
-        if (results.Size())
-            return false;
-
-#ifdef WIN32
-        return RemoveDirectoryW(GetWideNativePath(directory).CString()) != 0;
-#endif
-
-#ifdef __APPLE__
-        return remove(GetNativePath(directory).CString()) == 0;
-#endif
-    }
-
-    // delete all files at this level
-    ScanDir(results, directory, "*", SCAN_FILES | SCAN_HIDDEN, false );
-    for (unsigned i = 0; i < results.Size(); i++)
-    {
-        if (!Delete(directory + results[i]))
-            return false;
-    }
-    results.Clear();
-
-    // recurse into subfolders
-    ScanDir(results, directory, "*", SCAN_DIRS, false );
-    for (unsigned i = 0; i < results.Size(); i++)
-    {
-        if (results[i] == "." || results[i] == "..")
-            continue;
-
-        if (!RemoveDir(directory + results[i], true))
-            return false;
-    }
-
-    return RemoveDir(directory, false);
-
-}
-
 
 void FileSystem::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
@@ -1068,27 +941,6 @@ void FileSystem::HandleConsoleCommand(StringHash eventType, VariantMap& eventDat
     using namespace ConsoleCommand;
     if (eventData[P_ID].GetString() == GetTypeName())
         SystemCommand(eventData[P_COMMAND].GetString(), true);
-}
-
-String FileSystem::GetAppBundleResourceFolder()
-{
-#if __APPLE__ && !defined(IOS)
-
-    // Fix up to use the bundle layout
-    String programDir = GetProgramDir();
-    unsigned p = programDir.FindLast("/MacOS/");
-    if (p != String::NPOS)
-    {
-        programDir.Erase(p, programDir.Length() - p);
-        programDir += "/Resources/";
-
-        return programDir;
-    }
-
-#endif
-
-    return "";
-
 }
 
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension)
@@ -1190,7 +1042,7 @@ String GetInternalPath(const String& pathName)
 
 String GetNativePath(const String& pathName)
 {
-#ifdef WIN32
+#ifdef _WIN32
     return pathName.Replaced('/', '\\');
 #else
     return pathName;
@@ -1199,7 +1051,7 @@ String GetNativePath(const String& pathName)
 
 WString GetWideNativePath(const String& pathName)
 {
-#ifdef WIN32
+#ifdef _WIN32
     return WString(pathName.Replaced('/', '\\'));
 #else
     return WString(pathName);
@@ -1216,24 +1068,10 @@ bool IsAbsolutePath(const String& pathName)
     if (path[0] == '/')
         return true;
 
-#ifdef WIN32
+#ifdef _WIN32
     if (path.Length() > 1 && IsAlpha(path[0]) && path[1] == ':')
         return true;
 #endif
-
-    return false;
-}
-
-bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath)
-{
-    if (!IsAbsolutePath(absParentPath) || !IsAbsolutePath(fullPath))
-        return false;
-
-    String path1 = AddTrailingSlash(absParentPath);
-    String path2 = AddTrailingSlash(GetPath(fullPath));
-
-    if (path2.StartsWith(path1))
-        return true;
 
     return false;
 }

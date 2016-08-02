@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@
 
 #include "../IO/File.h"
 
-#include <SDL/include/SDL_rwops.h>
+#include <SDL/SDL_rwops.h>
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Template wrapper class for using Serializer / Deserializer or their subclasses through SDL's RWOps structure.

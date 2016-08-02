@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@
 // See https://github.com/urho3d/Urho3D/issues/561
 #else
 
-namespace Atomic
+namespace Urho3D
 {
 
 template<typename T>
@@ -55,84 +55,84 @@ false_wrapper<T> make_false_wrapper(const T& value) {
 // vector support functions
 
 template <class T>
-Atomic::RandomAccessIterator<T> Begin(Atomic::Vector<T> &v) {
+Urho3D::RandomAccessIterator<T> Begin(Urho3D::Vector<T> &v) {
     return v.Begin();
 }
 template <class T>
-Atomic::RandomAccessIterator<T> Begin(Atomic::Vector<T> *v) {
+Urho3D::RandomAccessIterator<T> Begin(Urho3D::Vector<T> *v) {
     return v->Begin();
 }
 
 template <class T>
-Atomic::RandomAccessConstIterator<T> Begin(const Atomic::Vector<T> &v) {
+Urho3D::RandomAccessConstIterator<T> Begin(const Urho3D::Vector<T> &v) {
     return v.Begin();
 }
 template <class T>
-Atomic::RandomAccessConstIterator<T> Begin(const Atomic::Vector<T> *v) {
+Urho3D::RandomAccessConstIterator<T> Begin(const Urho3D::Vector<T> *v) {
     return v->Begin();
 }
 
 template <class T>
-Atomic::RandomAccessIterator<T> End(Atomic::Vector<T> &v) {
+Urho3D::RandomAccessIterator<T> End(Urho3D::Vector<T> &v) {
     return v.End();
 }
 template <class T>
-Atomic::RandomAccessIterator<T> End(Atomic::Vector<T> *v) {
+Urho3D::RandomAccessIterator<T> End(Urho3D::Vector<T> *v) {
     return v->End();
 }
 
 template <class T>
-Atomic::RandomAccessConstIterator<T> End(const Atomic::Vector<T> &v) {
+Urho3D::RandomAccessConstIterator<T> End(const Urho3D::Vector<T> &v) {
     return v.End();
 }
 template <class T>
-Atomic::RandomAccessConstIterator<T> End(const Atomic::Vector<T> *v) {
+Urho3D::RandomAccessConstIterator<T> End(const Urho3D::Vector<T> *v) {
     return v->End();
 }
 
 // podvector support functions
 
 template <class T>
-Atomic::RandomAccessIterator<T> Begin(Atomic::PODVector<T> &v) {
+Urho3D::RandomAccessIterator<T> Begin(Urho3D::PODVector<T> &v) {
     return v.Begin();
 }
 template <class T>
-Atomic::RandomAccessIterator<T> Begin(Atomic::PODVector<T> *v) {
+Urho3D::RandomAccessIterator<T> Begin(Urho3D::PODVector<T> *v) {
     return v->Begin();
 }
 
 template <class T>
-Atomic::RandomAccessConstIterator<T> Begin(const Atomic::PODVector<T> &v) {
+Urho3D::RandomAccessConstIterator<T> Begin(const Urho3D::PODVector<T> &v) {
     return v.Begin();
 }
 template <class T>
-Atomic::RandomAccessConstIterator<T> Begin(const Atomic::PODVector<T> *v) {
+Urho3D::RandomAccessConstIterator<T> Begin(const Urho3D::PODVector<T> *v) {
     return v->Begin();
 }
 
 template <class T>
-Atomic::RandomAccessIterator<T> End(Atomic::PODVector<T> &v) {
+Urho3D::RandomAccessIterator<T> End(Urho3D::PODVector<T> &v) {
     return v.End();
 }
 template <class T>
-Atomic::RandomAccessIterator<T> End(Atomic::PODVector<T> *v) {
+Urho3D::RandomAccessIterator<T> End(Urho3D::PODVector<T> *v) {
     return v->End();
 }
 
 template <class T>
-Atomic::RandomAccessConstIterator<T> End(const Atomic::PODVector<T> &v) {
+Urho3D::RandomAccessConstIterator<T> End(const Urho3D::PODVector<T> &v) {
     return v.End();
 }
 template <class T>
-Atomic::RandomAccessConstIterator<T> End(const Atomic::PODVector<T> *v) {
+Urho3D::RandomAccessConstIterator<T> End(const Urho3D::PODVector<T> *v) {
     return v->End();
 }
 
 }
 
 #define foreach(VAL, VALS) \
-    if (const auto& _foreach_begin = Atomic::make_false_wrapper(Atomic::Begin(VALS))) { } else \
-    if (const auto& _foreach_end = Atomic::make_false_wrapper(Atomic::End(VALS))) { } else \
+    if (const auto& _foreach_begin = Urho3D::make_false_wrapper(Urho3D::Begin(VALS))) { } else \
+    if (const auto& _foreach_end = Urho3D::make_false_wrapper(Urho3D::End(VALS))) { } else \
     for (auto it = _foreach_begin.value; it != _foreach_end.value; ++it) \
     if (bool _foreach_flag = false) { } else \
     for (VAL = *it; !_foreach_flag; _foreach_flag = true)

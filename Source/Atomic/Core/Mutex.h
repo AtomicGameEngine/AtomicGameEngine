@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,17 @@
 
 #pragma once
 
-namespace Atomic
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
+namespace Urho3D
 {
 
 /// Operating system mutual exclusion primitive.
-class ATOMIC_API Mutex
+class URHO3D_API Mutex
 {
 public:
     /// Construct.
@@ -36,6 +42,8 @@ public:
 
     /// Acquire the mutex. Block if already acquired.
     void Acquire();
+    /// Try to acquire the mutex without locking. Return true if successful.
+    bool TryAcquire();
     /// Release the mutex.
     void Release();
 
@@ -45,7 +53,7 @@ private:
 };
 
 /// Lock that automatically acquires and releases a mutex.
-class ATOMIC_API MutexLock
+class URHO3D_API MutexLock
 {
 public:
     /// Construct and acquire the mutex.

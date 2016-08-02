@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,17 @@
 
 #pragma once
 
-#include "../Atomic2D/Drawable2D.h"
+#include "../Urho2D/Drawable2D.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Sprite2D;
 
 /// Static sprite component.
-class ATOMIC_API StaticSprite2D : public Drawable2D
+class URHO3D_API StaticSprite2D : public Drawable2D
 {
-    OBJECT(StaticSprite2D);
+    URHO3D_OBJECT(StaticSprite2D, Drawable2D);
 
 public:
     /// Construct.
@@ -106,8 +106,6 @@ protected:
     virtual void OnDrawOrderChanged();
     /// Update source batches.
     virtual void UpdateSourceBatches();
-    /// Handle flip changed.
-    virtual void OnFlipChanged();
     /// Update material.
     void UpdateMaterial();
 

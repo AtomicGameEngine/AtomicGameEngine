@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 #include "../Math/Vector3.h"
 #include "../Scene/Component.h"
 
-#include <Bullet/src/LinearMath/btIDebugDraw.h>
+#include <Bullet/LinearMath/btIDebugDraw.h>
 
 class btCollisionConfiguration;
 class btCollisionShape;
@@ -40,7 +40,7 @@ class btDispatcher;
 class btDynamicsWorld;
 class btPersistentManifold;
 
-namespace Atomic
+namespace Urho3D
 {
 
 class CollisionShape;
@@ -57,7 +57,7 @@ class XMLElement;
 struct CollisionGeometryData;
 
 /// Physics raycast hit.
-struct ATOMIC_API PhysicsRaycastResult
+struct URHO3D_API PhysicsRaycastResult
 {
     /// Construct with defaults.
     PhysicsRaycastResult() :
@@ -77,6 +77,8 @@ struct ATOMIC_API PhysicsRaycastResult
     Vector3 normal_;
     /// Hit distance from ray origin.
     float distance_;
+    /// Hit fraction.
+    float hitFraction_;
     /// Rigid body that was hit.
     RigidBody* body_;
 };
@@ -94,12 +96,24 @@ struct DelayedWorldTransform
     Quaternion worldRotation_;
 };
 
+/// Custom overrides of physics internals. To use overrides, must be set before the physics component is created.
+struct PhysicsWorldConfig
+{
+    PhysicsWorldConfig() :
+        collisionConfig_(0)
+    {
+    }
+
+    /// Override for the collision configuration (default btDefaultCollisionConfiguration).
+    btCollisionConfiguration* collisionConfig_;
+};
+
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Physics simulation world component. Should be added only to the root scene node.
-class ATOMIC_API PhysicsWorld : public Component, public btIDebugDraw
+class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 {
-    OBJECT(PhysicsWorld);
+    URHO3D_OBJECT(PhysicsWorld, Component);
 
     friend void InternalPreTickCallback(btDynamicsWorld* world, btScalar timeStep);
     friend void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep);
@@ -145,6 +159,8 @@ public:
     void SetMaxSubSteps(int num);
     /// Set number of constraint solver iterations.
     void SetNumIterations(int num);
+    /// Enable or disable automatic physics simulation during scene update. Enabled by default.
+    void SetUpdateEnabled(bool enable);
     /// Set whether to interpolate between simulation steps.
     void SetInterpolation(bool enable);
     /// Set whether to use Bullet's internal edge utility for trimesh collisions. Disabled by default.
@@ -158,6 +174,8 @@ public:
         (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
+    void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast
         (PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
@@ -173,8 +191,10 @@ public:
     void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Return rigid bodies by a box query.
     void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
-    /// Return rigid bodies that have been in collision with a specific body on the last simulation step.
+    /// Return rigid bodies by contact test with the specified body. It needs to be active to return all contacts reliably.
     void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    /// Return rigid bodies that have been in collision with the specified body on the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.
+    void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
 
     /// Return gravity.
     Vector3 GetGravity() const;
@@ -184,6 +204,9 @@ public:
 
     /// Return number of constraint solver iterations.
     int GetNumIterations() const;
+
+    /// Return whether physics world will automatically simulate during scene update.
+    bool IsUpdateEnabled() const { return updateEnabled_; }
 
     /// Return whether interpolation between simulation steps is enabled.
     bool GetInterpolation() const { return interpolation_; }
@@ -238,6 +261,12 @@ public:
 
     /// Return whether node dirtying should be disregarded.
     bool IsApplyingTransforms() const { return applyingTransforms_; }
+
+    /// Return whether is currently inside the Bullet substep loop.
+    bool IsSimulating() const { return simulating_; }
+
+    /// Overrides of the internal configuration.
+    static struct PhysicsWorldConfig config;
 
 protected:
     /// Handle scene being assigned.
@@ -295,21 +324,25 @@ private:
     float timeAcc_;
     /// Maximum angular velocity for network replication.
     float maxNetworkAngularVelocity_;
+    /// Automatic simulation update enabled flag.
+    bool updateEnabled_;
     /// Interpolation flag.
     bool interpolation_;
     /// Use internal edge utility flag.
     bool internalEdge_;
     /// Applying transforms flag.
     bool applyingTransforms_;
+    /// Simulating flag.
+    bool simulating_;
+    /// Debug draw depth test mode.
+    bool debugDepthTest_;
     /// Debug renderer.
     DebugRenderer* debugRenderer_;
     /// Debug draw flags.
     int debugMode_;
-    /// Debug draw depth test mode.
-    bool debugDepthTest_;
 };
 
 /// Register Physics library objects.
-void ATOMIC_API RegisterPhysicsLibrary(Context* context);
+void URHO3D_API RegisterPhysicsLibrary(Context* context);
 
 }

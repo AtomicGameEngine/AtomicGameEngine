@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,17 +27,17 @@
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
-#include "../Atomic2D/TileMap2D.h"
-#include "../Atomic2D/TileMapLayer2D.h"
-#include "../Atomic2D/TmxFile2D.h"
+#include "../Urho2D/TileMap2D.h"
+#include "../Urho2D/TileMapLayer2D.h"
+#include "../Urho2D/TmxFile2D.h"
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 extern const float PIXEL_SIZE;
-extern const char* ATOMIC2D_CATEGORY;
+extern const char* URHO2D_CATEGORY;
 
 TileMap2D::TileMap2D(Context* context) :
     Component(context)
@@ -50,10 +50,10 @@ TileMap2D::~TileMap2D()
 
 void TileMap2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<TileMap2D>(ATOMIC2D_CATEGORY);
+    context->RegisterFactory<TileMap2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Tmx File", GetTmxFileAttr, SetTmxFileAttr, ResourceRef, ResourceRef(TmxFile2D::GetTypeStatic()),
         AM_DEFAULT);
 }
 
@@ -80,6 +80,13 @@ void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         break;
 
     case O_STAGGERED:
+        debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
+        debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
+        debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
+        debug->AddLine(Vector2(0.0f, mapH), Vector2(0.0f, 0.0f), color);
+        break;
+
+    case O_HEXAGONAL:
         debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
         debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
         debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
@@ -155,17 +162,6 @@ TileMapLayer2D* TileMap2D::GetLayer(unsigned index) const
         return 0;
 
     return layers_[index];
-}
-
-TileMapLayer2D* TileMap2D::GetLayerByName(const String& name) const
-{
-    for (unsigned i = 0; i < layers_.Size(); i++)
-    {
-        if (layers_[i]->GetName() == name)
-            return layers_[i];
-    }
-
-    return 0;
 }
 
 Vector2 TileMap2D::TileIndexToPosition(int x, int y) const

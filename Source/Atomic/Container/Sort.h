@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../Container/Swap.h"
 #include "../Container/VectorBase.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 static const int QUICKSORT_THRESHOLD = 16;

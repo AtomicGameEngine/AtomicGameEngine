@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,24 +22,14 @@
 
 #pragma once
 
-#include "HashMap.h"
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
 
-namespace Atomic
+namespace Urho3D
 {
-
-// ATOMIC BEGIN
-
-class RefCounted;
-typedef void (*RefCountedDeletedFunction)(RefCounted*);
-typedef const void* ClassID;
-
-/// Macro to be included in RefCounted derived classes for efficient RTTI
-#define REFCOUNTED(typeName) \
-    public: \
-        virtual Atomic::ClassID GetClassID() const { return GetClassIDStatic(); } \
-        static Atomic::ClassID GetClassIDStatic() { static const int typeID = 0; return (Atomic::ClassID) &typeID; }
-
-// ATOMIC END
 
 /// Reference count structure.
 struct RefCount
@@ -66,7 +56,7 @@ struct RefCount
 };
 
 /// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
-class ATOMIC_API RefCounted
+class URHO3D_API RefCounted
 {
 public:
     /// Construct. Allocate the reference count structure and set an initial self weak reference.
@@ -86,20 +76,6 @@ public:
     /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
 
-    // ATOMIC BEGIN
-    virtual bool IsObject() const { return false; }
-
-    virtual ClassID GetClassID() const  = 0;
-    static ClassID GetClassIDStatic() { static const int typeID = 0; return (ClassID) &typeID; }
-
-    /// JavaScript VM, heap object which can be pushed directly on stack without any lookups
-    inline void* JSGetHeapPtr() const { return jsHeapPtr_; }
-    inline void  JSSetHeapPtr(void* heapptr) { jsHeapPtr_ = heapptr; }
-
-    static void SetRefCountedDeletedFunction(RefCountedDeletedFunction function) { refCountedDeletedFunction_ = function; }
-
-    // ATOMIC END
-
 private:
     /// Prevent copy construction.
     RefCounted(const RefCounted& rhs);
@@ -108,13 +84,6 @@ private:
 
     /// Pointer to the reference count structure.
     RefCount* refCount_;
-
-    // ATOMIC BEGIN
-    void* jsHeapPtr_;
-    static RefCountedDeletedFunction refCountedDeletedFunction_;
-    // ATOMIC END
-
-
 };
 
 }

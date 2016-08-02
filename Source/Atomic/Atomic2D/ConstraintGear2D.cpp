@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,16 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Atomic2D/ConstraintGear2D.h"
-#include "../Atomic2D/PhysicsUtils2D.h"
-#include "../Atomic2D/RigidBody2D.h"
+#include "../Urho2D/ConstraintGear2D.h"
+#include "../Urho2D/PhysicsUtils2D.h"
+#include "../Urho2D/RigidBody2D.h"
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
+
+extern const char* URHO2D_CATEGORY;
 
 ConstraintGear2D::ConstraintGear2D(Context* context) :
     Constraint2D(context)
@@ -43,11 +45,11 @@ ConstraintGear2D::~ConstraintGear2D()
 
 void ConstraintGear2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintGear2D>();
+    context->RegisterFactory<ConstraintGear2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Constraint2D);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
 void ConstraintGear2D::SetOwnerConstraint(Constraint2D* constraint)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@
 #include "../Container/Str.h"
 #include "../Math/MathDefs.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Two-dimensional vector.
-class ATOMIC_API Vector2
+class URHO3D_API Vector2
 {
 public:
     /// Construct a zero vector.
@@ -54,7 +54,7 @@ public:
     }
 
     /// Construct from a float array.
-    Vector2(const float* data) :
+    explicit Vector2(const float* data) :
         x_(data[0]),
         y_(data[1])
     {
@@ -148,7 +148,7 @@ public:
     void Normalize()
     {
         float lenSquared = LengthSquared();
-        if (!Atomic::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
         {
             float invLen = 1.0f / sqrtf(lenSquared);
             x_ *= invLen;
@@ -166,25 +166,28 @@ public:
     float DotProduct(const Vector2& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_; }
 
     /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector2& rhs) const { return Atomic::Abs(x_ * rhs.x_) + Atomic::Abs(y_ * rhs.y_); }
+    float AbsDotProduct(const Vector2& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_); }
+
+    /// Returns the angle between this vector and another vector in degrees.
+    float Angle(const Vector2& rhs) const { return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length())); }
 
     /// Return absolute vector.
-    Vector2 Abs() const { return Vector2(Atomic::Abs(x_), Atomic::Abs(y_)); }
+    Vector2 Abs() const { return Vector2(Urho3D::Abs(x_), Urho3D::Abs(y_)); }
 
     /// Linear interpolation with another vector.
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
 
     /// Test for equality with another vector with epsilon.
-    bool Equals(const Vector2& rhs) const { return Atomic::Equals(x_, rhs.x_) && Atomic::Equals(y_, rhs.y_); }
+    bool Equals(const Vector2& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_); }
 
     /// Return whether is NaN.
-    bool IsNaN() const { return Atomic::IsNaN(x_) || Atomic::IsNaN(y_); }
+    bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_); }
 
     /// Return normalized to unit length.
     Vector2 Normalized() const
     {
         float lenSquared = LengthSquared();
-        if (!Atomic::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
+        if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
         {
             float invLen = 1.0f / sqrtf(lenSquared);
             return *this * invLen;
@@ -222,7 +225,7 @@ public:
 inline Vector2 operator *(float lhs, const Vector2& rhs) { return rhs * lhs; }
 
 /// Two-dimensional vector with integer values.
-class ATOMIC_API IntVector2
+class URHO3D_API IntVector2
 {
 public:
     /// Construct a zero vector.

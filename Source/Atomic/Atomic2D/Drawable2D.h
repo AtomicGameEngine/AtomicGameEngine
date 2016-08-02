@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,10 @@
 #include "../Graphics/Drawable.h"
 #include "../Graphics/GraphicsDefs.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
+class Drawable2D; 
 class Renderer2D;
 class Texture2D;
 class VertexBuffer;
@@ -49,6 +50,10 @@ struct SourceBatch2D
     /// Construct.
     SourceBatch2D();
 
+    /// Owner.
+    WeakPtr<Drawable2D> owner_;
+    /// Distance to camera.
+    mutable float distance_;
     /// Draw order.
     int drawOrder_;
     /// Material.
@@ -58,12 +63,12 @@ struct SourceBatch2D
 };
 
 /// Pixel size (equal 0.01f).
-extern ATOMIC_API const float PIXEL_SIZE;
+extern URHO3D_API const float PIXEL_SIZE;
 
 /// Base class for 2D visible components.
-class ATOMIC_API Drawable2D : public Drawable
+class URHO3D_API Drawable2D : public Drawable
 {
-    OBJECT(Drawable2D);
+    URHO3D_OBJECT(Drawable2D, Drawable);
 
 public:
     /// Construct.

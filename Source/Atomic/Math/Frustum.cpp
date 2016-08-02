@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 inline Vector3 ClipEdgeZ(const Vector3& v0, const Vector3& v1, float clipZ)
@@ -59,7 +59,6 @@ void ProjectAndMergeEdge(Vector3 v0, Vector3 v1, Rect& rect, const Matrix4& proj
 
 Frustum::Frustum()
 {
-    UpdatePlanes();
 }
 
 Frustum::Frustum(const Frustum& frustum)

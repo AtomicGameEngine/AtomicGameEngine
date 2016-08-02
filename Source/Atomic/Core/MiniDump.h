@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,12 @@
 
 #pragma once
 
-namespace Atomic
+namespace Urho3D
 {
 
-#if defined(_MSC_VER) && defined(ATOMIC_MINIDUMPS)
+#if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 /// Write a minidump. Needs to be called from within a structured exception handler.
-ATOMIC_API int WriteMiniDump(const char* applicationName, void* exceptionPointers);
+URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointers);
 #endif
 
 }

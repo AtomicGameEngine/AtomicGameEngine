@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,13 +27,13 @@
 // Defined by Windows headers
 #undef TRANSPARENT
 
-namespace Atomic
+namespace Urho3D
 {
 
 class String;
 
 /// RGBA color.
-class ATOMIC_API Color
+class URHO3D_API Color
 {
 public:
     /// Construct with default values (opaque white.)
@@ -82,14 +82,14 @@ public:
     }
 
     /// Construct from a float array.
-    Color(const float* data) :
+    explicit Color(const float* data) :
         r_(data[0]),
         g_(data[1]),
         b_(data[2]),
         a_(data[3])
     {
     }
-
+    
     /// Assign from another color.
     Color& operator =(const Color& rhs)
     {
@@ -98,7 +98,7 @@ public:
         b_ = rhs.b_;
         a_ = rhs.a_;
         return *this;
-    }
+    }    
 
     /// Test for equality with another color without epsilon.
     bool operator ==(const Color& rhs) const { return r_ == rhs.r_ && g_ == rhs.g_ && b_ == rhs.b_ && a_ == rhs.a_; }
@@ -189,12 +189,12 @@ public:
     Color Lerp(const Color& rhs, float t) const;
 
     /// Return color with absolute components.
-    Color Abs() const { return Color(Atomic::Abs(r_), Atomic::Abs(g_), Atomic::Abs(b_), Atomic::Abs(a_)); }
+    Color Abs() const { return Color(Urho3D::Abs(r_), Urho3D::Abs(g_), Urho3D::Abs(b_), Urho3D::Abs(a_)); }
 
     /// Test for equality with another color with epsilon.
     bool Equals(const Color& rhs) const
     {
-        return Atomic::Equals(r_, rhs.r_) && Atomic::Equals(g_, rhs.g_) && Atomic::Equals(b_, rhs.b_) && Atomic::Equals(a_, rhs.a_);
+        return Urho3D::Equals(r_, rhs.r_) && Urho3D::Equals(g_, rhs.g_) && Urho3D::Equals(b_, rhs.b_) && Urho3D::Equals(a_, rhs.a_);
     }
 
     /// Return as string.

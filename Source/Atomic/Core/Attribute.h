@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../Container/Ptr.h"
 #include "../Core/Variant.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Attribute shown only in the editor, but not serialized.
@@ -50,10 +50,8 @@ static const unsigned AM_NODEIDVECTOR = 0x40;
 class Serializable;
 
 /// Abstract base class for invoking attribute accessors.
-class ATOMIC_API AttributeAccessor : public RefCounted
+class URHO3D_API AttributeAccessor : public RefCounted
 {
-    REFCOUNTED(AttributeAccessor)
-
 public:
     /// Get the attribute.
     virtual void Get(const Serializable* ptr, Variant& dest) const = 0;

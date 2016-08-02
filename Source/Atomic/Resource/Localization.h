@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,13 @@
 #include "../Core/Context.h"
 #include "../Resource/JSONValue.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// %Localization subsystem. Stores all the strings in all languages.
-class ATOMIC_API Localization : public Object
+class URHO3D_API Localization : public Object
 {
-    OBJECT(Localization);
+    URHO3D_OBJECT(Localization, Object);
 
 public:
     /// Construct.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,11 @@
 #include "../Container/Sort.h"
 
 #include <cassert>
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Hash set template class.
@@ -192,7 +195,16 @@ public:
         head_ = tail_ = ReserveNode();
         *this = set;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    HashSet(const std::initializer_list<T>& list) : HashSet()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Insert(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~HashSet()
     {
@@ -288,6 +300,15 @@ public:
         return Iterator(newNode);
     }
 
+    /// Insert a key. Return an iterator and set exists flag according to whether the key already existed.
+    Iterator Insert(const T& key, bool& exists)
+    {
+        unsigned oldSize = Size();
+        Iterator ret = Insert(key);
+        exists = (Size() == oldSize);
+        return ret;
+    }
+
     /// Insert a set.
     void Insert(const HashSet<T>& set)
     {
@@ -358,6 +379,9 @@ public:
     /// Clear the set.
     void Clear()
     {
+        // Prevent Find() from returning anything while the map is being cleared
+        ResetPtrs();
+
         if (Size())
         {
             for (Iterator i = Begin(); i != End();)
@@ -369,8 +393,6 @@ public:
             head_ = tail_;
             SetSize(0);
         }
-
-        ResetPtrs();
     }
 
     /// Sort keys. After sorting the set can be iterated in order until new elements are inserted.
@@ -389,7 +411,7 @@ public:
             ptr = ptr->Next();
         }
 
-        Atomic::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
+        Urho3D::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
 
         head_ = ptrs[0];
         ptrs[0]->prev_ = 0;
@@ -606,17 +628,12 @@ private:
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 
-}
+template <class T> typename Urho3D::HashSet<T>::ConstIterator begin(const Urho3D::HashSet<T>& v) { return v.Begin(); }
 
-namespace std
-{
+template <class T> typename Urho3D::HashSet<T>::ConstIterator end(const Urho3D::HashSet<T>& v) { return v.End(); }
 
-template <class T> typename Atomic::HashSet<T>::ConstIterator begin(const Atomic::HashSet<T>& v) { return v.Begin(); }
+template <class T> typename Urho3D::HashSet<T>::Iterator begin(Urho3D::HashSet<T>& v) { return v.Begin(); }
 
-template <class T> typename Atomic::HashSet<T>::ConstIterator end(const Atomic::HashSet<T>& v) { return v.End(); }
-
-template <class T> typename Atomic::HashSet<T>::Iterator begin(Atomic::HashSet<T>& v) { return v.Begin(); }
-
-template <class T> typename Atomic::HashSet<T>::Iterator end(Atomic::HashSet<T>& v) { return v.End(); }
+template <class T> typename Urho3D::HashSet<T>::Iterator end(Urho3D::HashSet<T>& v) { return v.End(); }
 
 }

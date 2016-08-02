@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,22 @@
 
 #pragma once
 
-namespace Atomic
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
+namespace Urho3D
 {
 
 /// Set the random seed. The default seed is 1.
-ATOMIC_API void SetRandomSeed(unsigned seed);
+URHO3D_API void SetRandomSeed(unsigned seed);
 /// Return the current random seed.
-ATOMIC_API unsigned GetRandomSeed();
+URHO3D_API unsigned GetRandomSeed();
 /// Return a random number between 0-32767. Should operate similarly to MSVC rand().
-ATOMIC_API int Rand();
+URHO3D_API int Rand();
 /// Return a standard normal distributed number.
-ATOMIC_API float RandStandardNormal();
+URHO3D_API float RandStandardNormal();
 
 }

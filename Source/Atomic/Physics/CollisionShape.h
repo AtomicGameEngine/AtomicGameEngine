@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class btTriangleMesh;
 
 struct btTriangleInfoMap;
 
-namespace Atomic
+namespace Urho3D
 {
 
 class CustomGeometry;
@@ -62,14 +62,11 @@ enum ShapeType
 /// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
-    REFCOUNTED(CollisionGeometryData)
 };
 
 /// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
 {
-    REFCOUNTED(TriangleMeshData)
-
     /// Construct from a model.
     TriangleMeshData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -88,8 +85,6 @@ struct TriangleMeshData : public CollisionGeometryData
 /// Convex hull geometry data.
 struct ConvexData : public CollisionGeometryData
 {
-    REFCOUNTED(ConvexData)
-
     /// Construct from a model.
     ConvexData(Model* model, unsigned lodLevel);
     /// Construct from a custom geometry.
@@ -113,8 +108,6 @@ struct ConvexData : public CollisionGeometryData
 /// Heightfield geometry data.
 struct HeightfieldData : public CollisionGeometryData
 {
-    REFCOUNTED(HeightfieldData)
-
     /// Construct from a terrain.
     HeightfieldData(Terrain* terrain, unsigned lodLevel);
     /// Destruct. Free geometry data.
@@ -133,9 +126,9 @@ struct HeightfieldData : public CollisionGeometryData
 };
 
 /// Physics collision shape component.
-class ATOMIC_API CollisionShape : public Component
+class URHO3D_API CollisionShape : public Component
 {
-    OBJECT(CollisionShape);
+    URHO3D_OBJECT(CollisionShape, Component);
 
 public:
     /// Construct.
@@ -251,6 +244,14 @@ protected:
     virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /**
+     * Called when instantiating a collision shape that is not one of ShapeType (default no-op).
+     *
+     * Useful for custom shape types that subclass CollisionShape and use a non-standard underlying
+     * btCollisionShape. UpdateDerivedShape can then be overridden to create the required
+     * btCollisionShape subclass.
+     */
+    virtual btCollisionShape* UpdateDerivedShape(int shapeType, const Vector3& newWorldScale);
 
 private:
     /// Find the parent rigid body component and return its compound collision shape.
@@ -284,7 +285,7 @@ private:
     Vector3 cachedWorldScale_;
     /// Model LOD level.
     unsigned lodLevel_;
-    /// CustomGeometry component ID for convex hull mode. 0 if not creating the convex hull from a CustomGeometry.
+    /// CustomGeometry component ID. 0 if not creating the convex hull / triangle mesh from a CustomGeometry.
     unsigned customGeometryID_;
     /// Collision margin.
     float margin_;

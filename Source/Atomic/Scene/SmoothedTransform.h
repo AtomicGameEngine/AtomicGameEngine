@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 #include "../Scene/Component.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// No ongoing smoothing.
@@ -35,9 +35,9 @@ static const unsigned SMOOTH_POSITION = 1;
 static const unsigned SMOOTH_ROTATION = 2;
 
 /// Transform smoothing component for network updates.
-class ATOMIC_API SmoothedTransform : public Component
+class URHO3D_API SmoothedTransform : public Component
 {
-    OBJECT(SmoothedTransform);
+    URHO3D_OBJECT(SmoothedTransform, Component);
 
 public:
     /// Construct.

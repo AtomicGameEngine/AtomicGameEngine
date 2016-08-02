@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,12 @@
 #include "../Core/WorkQueue.h"
 #include "../IO/Log.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Worker thread managed by the work queue.
 class WorkerThread : public Thread, public RefCounted
 {
-    REFCOUNTED(WorkerThread)
-
 public:
     /// Construct.
     WorkerThread(WorkQueue* owner, unsigned index) :
@@ -72,7 +70,7 @@ WorkQueue::WorkQueue(Context* context) :
     lastSize_(0),
     maxNonThreadedWorkMs_(5)
 {
-    SubscribeToEvent(E_BEGINFRAME, HANDLER(WorkQueue, HandleBeginFrame));
+    SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(WorkQueue, HandleBeginFrame));
 }
 
 WorkQueue::~WorkQueue()
@@ -87,6 +85,7 @@ WorkQueue::~WorkQueue()
 
 void WorkQueue::CreateThreads(unsigned numThreads)
 {
+#ifdef URHO3D_THREADING
     // Other subsystems may initialize themselves according to the number of threads.
     // Therefore allow creating the threads only once, after which the amount is fixed
     if (!threads_.Empty())
@@ -101,6 +100,9 @@ void WorkQueue::CreateThreads(unsigned numThreads)
         thread->Run();
         threads_.Push(thread);
     }
+#else
+    URHO3D_LOGERROR("Can not create worker threads as threading is disabled");
+#endif
 }
 
 SharedPtr<WorkItem> WorkQueue::GetFreeItem()
@@ -124,7 +126,7 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
 {
     if (!item)
     {
-        LOGERROR("Null work item submitted to the work queue");
+        URHO3D_LOGERROR("Null work item submitted to the work queue");
         return;
     }
 
@@ -374,7 +376,7 @@ void WorkQueue::ReturnToPool(SharedPtr<WorkItem>& item)
     // Check if this was a pooled item and set it to usable
     if (item->pooled_)
     {
-        // Reset the values to their defaults. This should
+        // Reset the values to their defaults. This should 
         // be safe to do here as the completed event has
         // already been handled and this is part of the
         // internal pool.
@@ -395,7 +397,7 @@ void WorkQueue::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     // If no worker threads, complete low-priority work here
     if (threads_.Empty() && !queue_.Empty())
     {
-        PROFILE(CompleteWorkNonthreaded);
+        URHO3D_PROFILE(CompleteWorkNonthreaded);
 
         HiresTimer timer;
 

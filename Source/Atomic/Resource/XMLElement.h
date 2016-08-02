@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ class xpath_variable_set;
 
 }
 
-namespace Atomic
+namespace Urho3D
 {
 
 class XMLFile;
@@ -46,7 +46,7 @@ class XPathQuery;
 class XPathResultSet;
 
 /// Element in an XML file.
-class ATOMIC_API XMLElement
+class URHO3D_API XMLElement
 {
 public:
     /// Construct null element.
@@ -296,14 +296,14 @@ private:
 };
 
 /// XPath query result set.
-class ATOMIC_API XPathResultSet
+class URHO3D_API XPathResultSet
 {
 public:
     /// Construct empty result set.
     XPathResultSet();
     /// Construct with result set from XPath query.
     XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet);
-    // Copy-construct.
+    /// Copy-construct.
     XPathResultSet(const XPathResultSet& rhs);
     /// Destruct.
     ~XPathResultSet();
@@ -331,7 +331,7 @@ private:
 };
 
 /// XPath query.
-class ATOMIC_API XPathQuery
+class URHO3D_API XPathQuery
 {
 public:
     /// Construct empty.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,15 @@
 
 #pragma once
 
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
 #include "../Container/Swap.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Random access iterator.
@@ -236,7 +242,7 @@ template <class T> struct RandomAccessConstIterator
 /** Note that to prevent extra memory use due to vtable pointer, %VectorBase intentionally does not declare a virtual destructor
     and therefore %VectorBase pointers should never be used.
   */
-class ATOMIC_API VectorBase
+class URHO3D_API VectorBase
 {
 public:
     /// Construct.
@@ -250,9 +256,9 @@ public:
     /// Swap with another vector.
     void Swap(VectorBase& rhs)
     {
-        Atomic::Swap(size_, rhs.size_);
-        Atomic::Swap(capacity_, rhs.capacity_);
-        Atomic::Swap(buffer_, rhs.buffer_);
+        Urho3D::Swap(size_, rhs.size_);
+        Urho3D::Swap(capacity_, rhs.capacity_);
+        Urho3D::Swap(buffer_, rhs.buffer_);
     }
 
 protected:

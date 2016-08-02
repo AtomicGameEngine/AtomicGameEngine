@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,11 @@
 
 #include "../Scene/Component.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Placeholder for allowing unregistered components to be loaded & saved along with scenes.
-class ATOMIC_API UnknownComponent : public Component
+class URHO3D_API UnknownComponent : public Component
 {
 public:
     /// Construct.
@@ -50,10 +50,14 @@ public:
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest) const;
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
+    /// Save as JSON data. Return true if successful.
+    virtual bool SaveJSON(JSONValue& dest) const;
 
     /// Initialize the type name. Called by Node when loading.
     void SetTypeName(const String& typeName);
@@ -70,13 +74,13 @@ public:
     bool GetUseXML() const { return useXML_; }
 
     /// Return static type.
-    static Atomic::StringHash GetTypeStatic()
+    static Urho3D::StringHash GetTypeStatic()
     {
         static const StringHash typeStatic("UnknownComponent");
         return typeStatic;
     }
     /// Return static type name.
-    static const Atomic::String& GetTypeNameStatic()
+    static const Urho3D::String& GetTypeNameStatic()
     {
         static const String typeNameStatic("UnknownComponent");
         return typeNameStatic;
@@ -93,8 +97,9 @@ private:
     Vector<String> xmlAttributes_;
     /// Binary attributes.
     PODVector<unsigned char> binaryAttributes_;
-    /// Flag of whether was loaded using XML data.
+    /// Flag of whether was loaded using XML/JSON data.
     bool useXML_;
+
 };
 
 }

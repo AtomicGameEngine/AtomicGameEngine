@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,14 +27,12 @@
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/ShaderVariation.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Combined information for specific vertex and pixel shaders.
-class ATOMIC_API ShaderProgram : public RefCounted
+class URHO3D_API ShaderProgram : public RefCounted
 {
-    REFCOUNTED(ShaderProgram)
-
 public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)
@@ -54,7 +52,7 @@ public:
                 psConstantBuffers_[i] = graphics->GetOrCreateConstantBuffer(PS, i, psBufferSizes[i]);
         }
 
-        // Copy parameters. Add direct links to constant buffers.
+        // Copy parameters, add direct links to constant buffers
         const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader->GetParameters();
         for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)
         {

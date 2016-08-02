@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "../Navigation/CrowdManager.h"
 #include "../Scene/Component.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 enum CrowdAgentRequestedTarget
@@ -68,9 +68,9 @@ enum NavigationPushiness
 };
 
 /// Crowd agent component, requires a CrowdManager component in the scene. When not set explicitly, agent's radius and height are defaulted to navigation mesh's agent radius and height, respectively.
-class ATOMIC_API CrowdAgent : public Component
+class URHO3D_API CrowdAgent : public Component
 {
-    OBJECT(CrowdAgent);
+    URHO3D_OBJECT(CrowdAgent, Component);
 
     friend class CrowdManager;
     friend void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt);

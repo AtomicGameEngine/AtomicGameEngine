@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,13 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Work item completed event.
-EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
+URHO3D_EVENT(E_WORKITEMCOMPLETED, WorkItemCompleted)
 {
-    PARAM(P_ITEM, Item);                        // WorkItem ptr
+    URHO3D_PARAM(P_ITEM, Item);                        // WorkItem ptr
 }
 
 class WorkerThread;
@@ -40,8 +40,6 @@ class WorkerThread;
 /// Work queue item.
 struct WorkItem : public RefCounted
 {
-    REFCOUNTED(WorkItem)
-
     friend class WorkQueue;
 
 public:
@@ -74,9 +72,9 @@ private:
 };
 
 /// Work queue subsystem for multithreading.
-class ATOMIC_API WorkQueue : public Object
+class URHO3D_API WorkQueue : public Object
 {
-    OBJECT(WorkQueue);
+    URHO3D_OBJECT(WorkQueue, Object);
 
     friend class WorkerThread;
 

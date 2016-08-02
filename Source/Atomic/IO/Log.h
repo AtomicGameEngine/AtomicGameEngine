@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #include "../Core/Object.h"
 #include "../Core/StringUtils.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Fictional message level to indicate a stored raw message.
@@ -70,9 +70,9 @@ struct StoredLogMessage
 };
 
 /// Logging subsystem.
-class ATOMIC_API Log : public Object
+class URHO3D_API Log : public Object
 {
-    OBJECT(Log);
+    URHO3D_OBJECT(Log, Object);
 
 public:
     /// Construct.
@@ -108,12 +108,6 @@ public:
     /// Write raw output to the log.
     static void WriteRaw(const String& message, bool error = false);
 
-    // ATOMIC BEGIN
-
-    const File* GetLogFile() const { return logFile_; }
-
-    // ATOMIC END
-
 private:
     /// Handle end of frame. Process the threaded log messages.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
@@ -136,28 +130,28 @@ private:
     bool quiet_;
 };
 
-#ifdef ATOMIC_LOGGING
-#define LOGDEBUG(message) Atomic::Log::Write(Atomic::LOG_DEBUG, message)
-#define LOGINFO(message) Atomic::Log::Write(Atomic::LOG_INFO, message)
-#define LOGWARNING(message) Atomic::Log::Write(Atomic::LOG_WARNING, message)
-#define LOGERROR(message) Atomic::Log::Write(Atomic::LOG_ERROR, message)
-#define LOGRAW(message) Atomic::Log::WriteRaw(message)
-#define LOGDEBUGF(format, ...) Atomic::Log::Write(Atomic::LOG_DEBUG, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGINFOF(format, ...) Atomic::Log::Write(Atomic::LOG_INFO, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGWARNINGF(format, ...) Atomic::Log::Write(Atomic::LOG_WARNING, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGERRORF(format, ...) Atomic::Log::Write(Atomic::LOG_ERROR, Atomic::ToString(format, ##__VA_ARGS__))
-#define LOGRAWF(format, ...) Atomic::Log::WriteRaw(Atomic::ToString(format, ##__VA_ARGS__))
+#ifdef URHO3D_LOGGING
+#define URHO3D_LOGDEBUG(message) Urho3D::Log::Write(Urho3D::LOG_DEBUG, message)
+#define URHO3D_LOGINFO(message) Urho3D::Log::Write(Urho3D::LOG_INFO, message)
+#define URHO3D_LOGWARNING(message) Urho3D::Log::Write(Urho3D::LOG_WARNING, message)
+#define URHO3D_LOGERROR(message) Urho3D::Log::Write(Urho3D::LOG_ERROR, message)
+#define URHO3D_LOGRAW(message) Urho3D::Log::WriteRaw(message)
+#define URHO3D_LOGDEBUGF(format, ...) Urho3D::Log::Write(Urho3D::LOG_DEBUG, Urho3D::ToString(format, ##__VA_ARGS__))
+#define URHO3D_LOGINFOF(format, ...) Urho3D::Log::Write(Urho3D::LOG_INFO, Urho3D::ToString(format, ##__VA_ARGS__))
+#define URHO3D_LOGWARNINGF(format, ...) Urho3D::Log::Write(Urho3D::LOG_WARNING, Urho3D::ToString(format, ##__VA_ARGS__))
+#define URHO3D_LOGERRORF(format, ...) Urho3D::Log::Write(Urho3D::LOG_ERROR, Urho3D::ToString(format, ##__VA_ARGS__))
+#define URHO3D_LOGRAWF(format, ...) Urho3D::Log::WriteRaw(Urho3D::ToString(format, ##__VA_ARGS__))
 #else
-#define LOGDEBUG(message) ((void)0)
-#define LOGINFO(message) ((void)0)
-#define LOGWARNING(message) ((void)0)
-#define LOGERROR(message) ((void)0)
-#define LOGRAW(message) ((void)0)
-#define LOGDEBUGF(...) ((void)0)
-#define LOGINFOF(...) ((void)0)
-#define LOGWARNINGF(...) ((void)0)
-#define LOGERRORF(...) ((void)0)
-#define LOGRAWF(...) ((void)0)
+#define URHO3D_LOGDEBUG(message) ((void)0)
+#define URHO3D_LOGINFO(message) ((void)0)
+#define URHO3D_LOGWARNING(message) ((void)0)
+#define URHO3D_LOGERROR(message) ((void)0)
+#define URHO3D_LOGRAW(message) ((void)0)
+#define URHO3D_LOGDEBUGF(...) ((void)0)
+#define URHO3D_LOGINFOF(...) ((void)0)
+#define URHO3D_LOGWARNINGF(...) ((void)0)
+#define URHO3D_LOGERRORF(...) ((void)0)
+#define URHO3D_LOGRAWF(...) ((void)0)
 #endif
 
 }

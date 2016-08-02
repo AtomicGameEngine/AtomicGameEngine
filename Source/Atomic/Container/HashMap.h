@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,11 @@
 #include "../Container/Vector.h"
 
 #include <cassert>
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Hash map template class.
@@ -237,7 +240,16 @@ public:
         head_ = tail_ = ReserveNode();
         *this = map;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    HashMap(const std::initializer_list<Pair<T, U>>& list) : HashMap()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Insert(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~HashMap()
     {
@@ -329,10 +341,34 @@ public:
         return node ? &node->pair_.second_ : 0;
     }
 
+#if URHO3D_CXX11
+    /// Populate the map using variadic template. This handles the base case.
+    HashMap& Populate(const T& key, const U& value)
+    {
+        this->operator [](key) = value;
+        return *this;
+    };
+    /// Populate the map using variadic template.
+    template <typename... Args> HashMap& Populate(const T& key, const U& value, Args... args)
+    {
+        this->operator [](key) = value;
+        return Populate(args...);
+    };
+#endif
+
     /// Insert a pair. Return an iterator to it.
     Iterator Insert(const Pair<T, U>& pair)
     {
         return Iterator(InsertNode(pair.first_, pair.second_));
+    }
+
+    /// Insert a pair. Return iterator and set exists flag according to whether the key already existed.
+    Iterator Insert(const Pair<T, U>& pair, bool& exists)
+    {
+        unsigned oldSize = Size();
+        Iterator ret(InsertNode(pair.first_, pair.second_));
+        exists = (Size() == oldSize);
+        return ret;
     }
 
     /// Insert a map.
@@ -357,24 +393,6 @@ public:
         while (it != end)
             InsertNode(*it++);
     }
-
-    // ATOMIC BEGIN
-
-    /// Insert a pair only if a corresponding key does not already exist.
-    Iterator InsertNew(const T& key, const U& value)
-    {
-        unsigned hashKey = Hash(key);
-        if (ptrs_) 
-        {
-            Node* node = FindNode(key, hashKey);
-            if (node)
-                return Iterator(node);
-        }
-
-        return InsertNode(key, value, false);
-    }
-
-    // ATOMIC END
 
     /// Erase a pair by key. Return true if was found.
     bool Erase(const T& key)
@@ -431,6 +449,9 @@ public:
     /// Clear the map.
     void Clear()
     {
+        // Prevent Find() from returning anything while the map is being cleared
+        ResetPtrs();
+
         if (Size())
         {
             for (Iterator i = Begin(); i != End();)
@@ -442,8 +463,6 @@ public:
             head_ = tail_;
             SetSize(0);
         }
-
-        ResetPtrs();
     }
 
     /// Sort pairs. After sorting the map can be iterated in order until new elements are inserted.
@@ -462,7 +481,7 @@ public:
             ptr = ptr->Next();
         }
 
-        Atomic::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
+        Urho3D::Sort(RandomAccessIterator<Node*>(ptrs), RandomAccessIterator<Node*>(ptrs + numKeys), CompareNodes);
 
         head_ = ptrs[0];
         ptrs[0]->prev_ = 0;
@@ -535,6 +554,22 @@ public:
         return FindNode(key, hashKey) != 0;
     }
 
+    /// Try to copy value to output. Return true if was found.
+    bool TryGetValue(const T& key, U& out) const
+    {
+        if (!ptrs_)
+            return false;
+        unsigned hashKey = Hash(key);
+        Node* node = FindNode(key, hashKey);
+        if (node)
+        {
+            out = node->pair_.second_;
+            return true;
+        }
+        else
+            return false;
+    }
+
     /// Return all the keys.
     Vector<T> Keys() const
     {
@@ -567,11 +602,11 @@ public:
     /// Return iterator to the end.
     ConstIterator End() const { return ConstIterator(Tail()); }
 
-    /// Return first key.
-    const T& Front() const { return *Begin(); }
+    /// Return first pair.
+    const KeyValue& Front() const { return *Begin(); }
 
-    /// Return last key.
-    const T& Back() const { return *(--End()); }
+    /// Return last pair.
+    const KeyValue& Back() const { return *(--End()); }
 
 private:
     /// Return the head node.
@@ -736,20 +771,12 @@ private:
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
 
-}
+template <class T, class U> typename Urho3D::HashMap<T, U>::ConstIterator begin(const Urho3D::HashMap<T, U>& v) { return v.Begin(); }
 
-namespace std
-{
+template <class T, class U> typename Urho3D::HashMap<T, U>::ConstIterator end(const Urho3D::HashMap<T, U>& v) { return v.End(); }
 
-template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator begin(const Atomic::HashMap<T, U>& v)
-{
-    return v.Begin();
-}
+template <class T, class U> typename Urho3D::HashMap<T, U>::Iterator begin(Urho3D::HashMap<T, U>& v) { return v.Begin(); }
 
-template <class T, class U> typename Atomic::HashMap<T, U>::ConstIterator end(const Atomic::HashMap<T, U>& v) { return v.End(); }
-
-template <class T, class U> typename Atomic::HashMap<T, U>::Iterator begin(Atomic::HashMap<T, U>& v) { return v.Begin(); }
-
-template <class T, class U> typename Atomic::HashMap<T, U>::Iterator end(Atomic::HashMap<T, U>& v) { return v.End(); }
+template <class T, class U> typename Urho3D::HashMap<T, U>::Iterator end(Urho3D::HashMap<T, U>& v) { return v.End(); }
 
 }

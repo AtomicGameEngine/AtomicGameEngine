@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 
 #include "../DebugNew.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 unsigned CountElements(const char* buffer, char separator)
@@ -399,7 +399,7 @@ Variant ToVectorVariant(const char* source)
         break;
 
     default:
-        assert(false);  // Should not get here
+        // Illegal input. Return variant remains empty
         break;
     }
 
@@ -647,13 +647,6 @@ String ToString(const char* formatString, ...)
     return ret;
 }
 
-String ToStringVariadic(const char* formatString, va_list args)
-{
-    String ret;
-    ret.AppendWithFormatArgs(formatString, args);
-    return ret;
-}
-
 bool IsAlpha(unsigned ch)
 {
     return ch < 256 ? isalpha(ch) != 0 : false;
@@ -672,6 +665,31 @@ unsigned ToUpper(unsigned ch)
 unsigned ToLower(unsigned ch)
 {
     return (unsigned)tolower(ch);
+}
+
+String GetFileSizeString(unsigned long long memorySize)
+{
+    static const char* memorySizeStrings = "kMGTPE";
+
+    String output;
+
+    if (memorySize < 1024)
+    {
+        output = String(memorySize) + " b";
+    }
+    else
+    {
+        const int exponent = (int)(log((double)memorySize) / log(1024.0));
+        const double majorValue = ((double)memorySize) / pow(1024.0, exponent);
+        char buffer[64];
+        memset(buffer, 0, 64);
+        sprintf(buffer, "%.1f", majorValue);
+        output = buffer;
+        output += " ";
+        output += memorySizeStrings[exponent - 1];
+    }
+
+    return output;
 }
 
 }

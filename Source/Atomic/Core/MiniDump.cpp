@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#if defined(_MSC_VER) && defined(ATOMIC_MINIDUMPS)
+#if defined(_MSC_VER) && defined(URHO3D_MINIDUMPS)
 
 #include "../Precompiled.h"
 
@@ -32,14 +32,13 @@
 #include <time.h>
 #include <windows.h>
 #include <dbghelp.h>
-#include <SDL/SDL.h>
 
-namespace Atomic
+namespace Urho3D
 {
 
 static bool miniDumpWritten = false;
 
-ATOMIC_API int WriteMiniDump(const char* applicationName, void* exceptionPointers)
+URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointers)
 {
     // In case of recursive or repeating exceptions, only write the dump once
     /// \todo This function should not allocate any dynamic memory
@@ -62,11 +61,8 @@ ATOMIC_API int WriteMiniDump(const char* applicationName, void* exceptionPointer
     dateTimeStr.Replace("/", "");
     dateTimeStr.Replace(' ', '_');
     
-    char* pathName = SDL_GetPrefPath("urho3d", "crashdumps");
-    String miniDumpDir(pathName);
+    String miniDumpDir = GetMiniDumpDir();
     String miniDumpName = miniDumpDir + String(applicationName) + "_" + dateTimeStr + ".dmp";
-    if (pathName)
-        SDL_free(pathName);
     
     CreateDirectoryW(WString(miniDumpDir).CString(), 0);
     HANDLE file = CreateFileW(WString(miniDumpName).CString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ,

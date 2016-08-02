@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,11 @@ struct rcHeightfieldLayerSet;
 struct rcPolyMesh;
 struct rcPolyMeshDetail;
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Navigation area stub.
-struct ATOMIC_API NavAreaStub
+struct URHO3D_API NavAreaStub
 {
     /// Area bounding box.
     BoundingBox bounds_;
@@ -51,7 +51,7 @@ struct ATOMIC_API NavAreaStub
 };
 
 /// Navigation build data.
-struct ATOMIC_API NavBuildData
+struct URHO3D_API NavBuildData
 {
     /// Constructor.
     NavBuildData();

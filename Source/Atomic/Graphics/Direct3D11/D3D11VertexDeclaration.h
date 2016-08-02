@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "../../Container/Vector.h"
 #include "../../Graphics/GraphicsDefs.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Graphics;
@@ -34,13 +34,11 @@ class ShaderVariation;
 class VertexBuffer;
 
 /// Vertex declaration.
-class ATOMIC_API VertexDeclaration : public RefCounted
+class URHO3D_API VertexDeclaration : public RefCounted
 {
-    REFCOUNTED(VertexDeclaration)
-
 public:
     /// Construct with vertex buffers and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers, unsigned* elementMasks);
+    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers);
     /// Destruct.
     ~VertexDeclaration();
 

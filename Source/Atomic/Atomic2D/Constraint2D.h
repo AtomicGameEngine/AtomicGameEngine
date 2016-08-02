@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,16 @@
 
 #include <Box2D/Box2D.h>
 
-namespace Atomic
+namespace Urho3D
 {
 
 class RigidBody2D;
 class PhysicsWorld2D;
 
 /// 2D physics constraint component.
-class ATOMIC_API Constraint2D : public Component
+class URHO3D_API Constraint2D : public Component
 {
-    OBJECT(Constraint2D);
+    URHO3D_OBJECT(Constraint2D, Component);
 
 public:
     /// Construct.

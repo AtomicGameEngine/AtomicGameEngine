@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,16 @@
 #include "../Core/Object.h"
 #include "../Resource/XMLFile.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Graphics;
 class ShaderVariation;
 
 /// Utility class for collecting used shader combinations during runtime for precaching.
-class ATOMIC_API ShaderPrecache : public Object
+class URHO3D_API ShaderPrecache : public Object
 {
-    OBJECT(ShaderPrecache);
+    URHO3D_OBJECT(ShaderPrecache, Object);
 
 public:
     /// Construct and begin collecting shader combinations. Load existing combinations from XML if the file exists.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,14 @@
 #include "../Container/HashMap.h"
 #include "../Container/Ptr.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 class Component;
 class Node;
 
 /// Utility class that resolves node & component IDs after a scene or partial scene load.
-class ATOMIC_API SceneResolver
+class URHO3D_API SceneResolver
 {
 public:
     /// Construct.

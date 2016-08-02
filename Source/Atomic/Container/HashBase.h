@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,17 @@
 
 #pragma once
 
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
 #include "../Container/Allocator.h"
 #include "../Container/Hash.h"
 #include "../Container/Swap.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 /// Hash set/map node base class.
@@ -91,7 +97,7 @@ struct HashIteratorBase
 /** Note that to prevent extra memory use due to vtable pointer, %HashBase intentionally does not declare a virtual destructor
     and therefore %HashBase pointers should never be used.
   */
-class ATOMIC_API HashBase
+class URHO3D_API HashBase
 {
 public:
     /// Initial amount of buckets.
@@ -101,6 +107,8 @@ public:
 
     /// Construct.
     HashBase() :
+        head_(0),
+        tail_(0),
         ptrs_(0),
         allocator_(0)
     {
@@ -109,10 +117,10 @@ public:
     /// Swap with another hash set or map.
     void Swap(HashBase& rhs)
     {
-        Atomic::Swap(head_, rhs.head_);
-        Atomic::Swap(tail_, rhs.tail_);
-        Atomic::Swap(ptrs_, rhs.ptrs_);
-        Atomic::Swap(allocator_, rhs.allocator_);
+        Urho3D::Swap(head_, rhs.head_);
+        Urho3D::Swap(tail_, rhs.tail_);
+        Urho3D::Swap(ptrs_, rhs.ptrs_);
+        Urho3D::Swap(allocator_, rhs.allocator_);
     }
 
     /// Return number of elements.

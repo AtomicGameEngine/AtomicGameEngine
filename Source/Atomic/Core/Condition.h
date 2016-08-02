@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,17 @@
 
 #pragma once
 
-namespace Atomic
+#ifdef URHO3D_IS_BUILDING
+#include "Urho3D.h"
+#else
+#include <Urho3D/Urho3D.h>
+#endif
+
+namespace Urho3D
 {
 
 /// %Condition on which a thread can wait.
-class ATOMIC_API Condition
+class URHO3D_API Condition
 {
 public:
     /// Construct.
@@ -42,7 +48,7 @@ public:
     void Wait();
 
 private:
-#ifndef WIN32
+#ifndef _WIN32
     /// Mutex for the event, necessary for pthreads-based implementation.
     void* mutex_;
 #endif

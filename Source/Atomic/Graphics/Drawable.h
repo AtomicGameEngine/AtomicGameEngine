@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "../Math/BoundingBox.h"
 #include "../Scene/Component.h"
 
-namespace Atomic
+namespace Urho3D
 {
 
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
@@ -42,6 +42,7 @@ static const int MAX_VERTEX_LIGHTS = 4;
 static const float ANIMATION_LOD_BASESCALE = 2500.0f;
 
 class Camera;
+class File;
 class Geometry;
 class Light;
 class Material;
@@ -74,12 +75,17 @@ struct FrameInfo
 };
 
 /// Source data for a 3D geometry draw call.
-struct SourceBatch
+struct URHO3D_API SourceBatch
 {
     /// Construct with defaults.
     SourceBatch();
+    /// Copy-construct.
+    SourceBatch(const SourceBatch& batch);
     /// Destruct.
     ~SourceBatch();
+
+    /// Assignment operator.
+    SourceBatch& operator =(const SourceBatch& rhs);
 
     /// Distance from camera.
     float distance_;
@@ -91,14 +97,16 @@ struct SourceBatch
     const Matrix3x4* worldTransform_;
     /// Number of world transforms.
     unsigned numWorldTransforms_;
+    /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
+    void* instancingData_;
     /// %Geometry type.
     GeometryType geometryType_;
 };
 
 /// Base class for visible components.
-class ATOMIC_API Drawable : public Component
+class URHO3D_API Drawable : public Component
 {
-    OBJECT(Drawable);
+    URHO3D_OBJECT(Drawable, Component);
 
     friend class Octant;
     friend class Octree;
@@ -106,7 +114,7 @@ class ATOMIC_API Drawable : public Component
 
 public:
     /// Construct.
-    Drawable(Context* context, unsigned char drawableFlags = 0);
+    Drawable(Context* context, unsigned char drawableFlags);
     /// Destruct.
     virtual ~Drawable();
     /// Register object attributes. Drawable must be registered first.
@@ -116,12 +124,12 @@ public:
     virtual void OnSetEnabled();
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
-    /// Update before octree reinsertion. Is called from a worker thread.
-    virtual void Update(const FrameInfo& frame);
+    /// Update before octree reinsertion. Is called from a worker thread
+    virtual void Update(const FrameInfo& frame) { }
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);
     /// Prepare geometry for rendering.
-    virtual void UpdateGeometry(const FrameInfo& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame) { }
 
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
     virtual UpdateGeometryType GetUpdateGeometryType() { return UPDATE_NONE; }
@@ -275,19 +283,19 @@ public:
     /// Return the maximum view-space depth.
     float GetMaxZ() const { return maxZ_; }
 
-    // Add a per-pixel light affecting the object this frame.
+    /// Add a per-pixel light affecting the object this frame.
     void AddLight(Light* light)
     {
         if (!firstLight_)
             firstLight_ = light;
 
-        // Need to store into the light list only if the per-pixel lights are being limited.
+        // Need to store into the light list only if the per-pixel lights are being limited
         // Otherwise recording the first light is enough
         if (maxLights_)
             lights_.Push(light);
     }
 
-    // Add a per-vertex light affecting the object this frame.
+    /// Add a per-vertex light affecting the object this frame.
     void AddVertexLight(Light* light)
     {
         vertexLights_.Push(light);
@@ -382,5 +390,7 @@ inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
 {
     return lhs->GetSortValue() < rhs->GetSortValue();
 }
+
+URHO3D_API bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV = false);
 
 }
