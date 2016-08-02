@@ -39,7 +39,7 @@ Player::Player(Context* context) :
     viewport_ = new Viewport(context_);
     GetSubsystem<Renderer>()->SetViewport(0, viewport_);
 
-    SubscribeToEvent(E_EXITREQUESTED, HANDLER(Player, HandleExitRequested));
+    SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(Player, HandleExitRequested));
 }
 
 Player::~Player()

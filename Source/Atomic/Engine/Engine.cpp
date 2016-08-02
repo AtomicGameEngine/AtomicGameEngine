@@ -491,6 +491,8 @@ void Engine::RunFrame()
 
 Console* Engine::CreateConsole()
 {
+// ATOMIC BEGIN
+/*
     if (headless_ || !initialized_)
         return 0;
 
@@ -503,10 +505,17 @@ Console* Engine::CreateConsole()
     }
 
     return console;
+*/
+// ATOMIC END
+
+    return 0;
 }
 
 DebugHud* Engine::CreateDebugHud()
 {
+// ATOMIC BEGIN
+
+/*
     if (headless_ || !initialized_)
         return 0;
 
@@ -519,6 +528,11 @@ DebugHud* Engine::CreateDebugHud()
     }
 
     return debugHud;
+*/
+// ATOMIC END
+
+    return 0;
+
 }
 
 void Engine::SetTimeStepSmoothing(int frames)

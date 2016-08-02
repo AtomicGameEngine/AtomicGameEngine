@@ -45,6 +45,8 @@ class ATOMIC_API Context : public RefCounted
 {
     friend class Object;
 
+    ATOMIC_REFCOUNTED(Context)
+
 public:
     /// Construct.
     Context();
