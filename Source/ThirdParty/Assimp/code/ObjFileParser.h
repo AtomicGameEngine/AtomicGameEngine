@@ -43,30 +43,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include <map>
-#include "../include/assimp/vector2.h"
-#include "../include/assimp/vector3.h"
-#include "../include/assimp/mesh.h"
+#include <assimp/vector2.h>
+#include <assimp/vector3.h>
+#include <assimp/mesh.h>
 
-namespace Assimp
-{
+namespace Assimp {
 
-namespace ObjFile
-{
-struct Model;
-struct Object;
-struct Material;
-struct Point3;
-struct Point2;
+namespace ObjFile {
+    struct Model;
+    struct Object;
+    struct Material;
+    struct Point3;
+    struct Point2;
 }
+
 class ObjFileImporter;
 class IOSystem;
 
 /// \class  ObjFileParser
 /// \brief  Parser for a obj waveform file
-class ObjFileParser
-{
+class ObjFileParser {
 public:
-    static const size_t BUFFERSIZE = 4096;
+    static const size_t Buffersize = 4096;
     typedef std::vector<char> DataArray;
     typedef std::vector<char>::iterator DataArrayIt;
     typedef std::vector<char>::const_iterator ConstDataArrayIt;
@@ -113,9 +111,9 @@ private:
     /// Parse object name
     void getObjectName();
     /// Creates a new object.
-    void createObject(const std::string &strObjectName);
+    void createObject( const std::string &strObjectName );
     /// Creates a new mesh.
-    void createMesh();
+    void createMesh( const std::string &meshName );
     /// Returns true, if a new mesh instance must be created.
     bool needsNewMesh( const std::string &rMaterialName );
     /// Error report in token
@@ -138,9 +136,10 @@ private:
     //! Current line (for debugging)
     unsigned int m_uiLine;
     //! Helper buffer
-    char m_buffer[BUFFERSIZE];
+    char m_buffer[Buffersize];
     /// Pointer to IO system instance.
     IOSystem *m_pIO;
+    /// Path to the current model
 };
 
 }   // Namespace Assimp

@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ObjFileData.h"
 #include "fast_atof.h"
 #include "ParsingUtils.h"
-#include "../include/assimp/material.h"
-#include "../include/assimp/DefaultLogger.hpp"
+#include <assimp/material.h>
+#include <assimp/DefaultLogger.hpp>
 
 
 namespace Assimp    {
@@ -162,11 +162,17 @@ void ObjFileMtlImporter::load()
             }
             break;
 
-        case 'd':   // Alpha value
+        case 'd':   
             {
-                ++m_DataIt;
-                getFloatValue( m_pModel->m_pCurrentMaterial->alpha );
-                m_DataIt = skipLine<DataArrayIt>( m_DataIt, m_DataItEnd, m_uiLine );
+                if( *(m_DataIt+1) == 'i' && *( m_DataIt + 2 ) == 's' && *( m_DataIt + 3 ) == 'p' ) {
+                    // A displacement map
+                    getTexture();
+                } else {
+                    // Alpha value
+                    ++m_DataIt;
+                    getFloatValue( m_pModel->m_pCurrentMaterial->alpha );
+                    m_DataIt = skipLine<DataArrayIt>( m_DataIt, m_DataItEnd, m_uiLine );
+                }
             }
             break;
 
@@ -343,9 +349,9 @@ void ObjFileMtlImporter::getTexture() {
     getTextureOption(clamp);
     m_pModel->m_pCurrentMaterial->clamp[clampIndex] = clamp;
 
-    std::string strTexture;
-    m_DataIt = getName<DataArrayIt>( m_DataIt, m_DataItEnd, strTexture );
-    out->Set( strTexture );
+    std::string texture;
+    m_DataIt = getName<DataArrayIt>( m_DataIt, m_DataItEnd, texture );
+    out->Set( texture );
 }
 
 /* /////////////////////////////////////////////////////////////////////////////

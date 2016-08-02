@@ -1,8 +1,11 @@
 #ifndef DETOURTILECACHE_H
 #define DETOURTILECACHE_H
 
-#include <Detour/include/DetourStatus.h>
 // Modified by Lasse Oorni for Urho3D
+
+#include "DetourStatus.h"
+
+
 
 typedef unsigned int dtObstacleRef;
 

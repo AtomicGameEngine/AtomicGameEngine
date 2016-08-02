@@ -15,7 +15,7 @@ subject to the following restrictions:
 
 #ifndef BT_DISPATCHER_H
 #define BT_DISPATCHER_H
-#include "../../LinearMath/btScalar.h"
+#include "LinearMath/btScalar.h"
 
 class btCollisionAlgorithm;
 struct btBroadphaseProxy;

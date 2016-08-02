@@ -47,10 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ObjFileParser.h"
 #include "ObjFileData.h"
 #include <boost/scoped_ptr.hpp>
-#include "../include/assimp/Importer.hpp"
-#include "../include/assimp/scene.h"
-#include "../include/assimp/ai_assert.h"
-#include "../include/assimp/DefaultLogger.hpp"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/ai_assert.h>
+#include <assimp/DefaultLogger.hpp>
 
 
 static const aiImporterDesc desc = {
@@ -133,15 +133,16 @@ void ObjFileImporter::InternReadFile( const std::string& pFile, aiScene* pScene,
     TextFileToBuffer(file.get(),m_Buffer);
 
     // Get the model name
-    std::string  strModelName;
+    std::string  modelName, folderName;
     std::string::size_type pos = pFile.find_last_of( "\\/" );
-    if ( pos != std::string::npos )
-    {
-        strModelName = pFile.substr(pos+1, pFile.size() - pos - 1);
-    }
-    else
-    {
-        strModelName = pFile;
+    if ( pos != std::string::npos ) {
+        modelName = pFile.substr(pos+1, pFile.size() - pos - 1);
+        folderName = pFile.substr( 0, pos );
+        if ( folderName.empty() ) {
+            pIOHandler->PushDirectory( folderName );
+        }
+    } else {
+        modelName = pFile;
     }
 
     // process all '\'
@@ -161,13 +162,18 @@ void ObjFileImporter::InternReadFile( const std::string& pFile, aiScene* pScene,
     }
 
     // parse the file into a temporary representation
-    ObjFileParser parser(m_Buffer, strModelName, pIOHandler);
+    ObjFileParser parser(m_Buffer, modelName, pIOHandler);
 
     // And create the proper return structures out of it
     CreateDataFromImport(parser.GetModel(), pScene);
 
     // Clean up allocated storage for the next import
     m_Buffer.clear();
+
+    // Pop directory stack
+    if ( pIOHandler->StackSize() > 0 ) {
+        pIOHandler->PopDirectory();
+    }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -289,6 +295,10 @@ aiMesh *ObjFileImporter::createTopology( const ObjFile::Model* pModel, const Obj
     }
     ai_assert( NULL != pObjMesh );
     aiMesh* pMesh = new aiMesh;
+    if( !pObjMesh->m_name.empty() ) {
+        pMesh->mName.Set( pObjMesh->m_name );
+    }
+
     for (size_t index = 0; index < pObjMesh->m_Faces.size(); index++)
     {
         ObjFile::Face *const inp = pObjMesh->m_Faces[ index ];
@@ -311,19 +321,16 @@ aiMesh *ObjFileImporter::createTopology( const ObjFile::Model* pModel, const Obj
     }
 
     unsigned int uiIdxCount( 0u );
-    if ( pMesh->mNumFaces > 0 )
-    {
+    if ( pMesh->mNumFaces > 0 ) {
         pMesh->mFaces = new aiFace[ pMesh->mNumFaces ];
-        if ( pObjMesh->m_uiMaterialIndex != ObjFile::Mesh::NoMaterial )
-        {
+        if ( pObjMesh->m_uiMaterialIndex != ObjFile::Mesh::NoMaterial ) {
             pMesh->mMaterialIndex = pObjMesh->m_uiMaterialIndex;
         }
 
         unsigned int outIndex( 0 );
 
         // Copy all data from all stored meshes
-        for (size_t index = 0; index < pObjMesh->m_Faces.size(); index++)
-        {
+        for (size_t index = 0; index < pObjMesh->m_Faces.size(); index++) {
             ObjFile::Face* const inp = pObjMesh->m_Faces[ index ];
             if (inp->m_PrimitiveType == aiPrimitiveType_LINE) {
                 for(size_t i = 0; i < inp->m_pVertices->size() - 1; ++i) {
@@ -379,6 +386,11 @@ void ObjFileImporter::createVertexArray(const ObjFile::Model* pModel,
 
     // Copy vertices of this mesh instance
     pMesh->mNumVertices = numIndices;
+    if (pMesh->mNumVertices == 0) {
+        throw DeadlyImportError( "OBJ: no vertices" );
+    } else if (pMesh->mNumVertices > AI_MAX_ALLOC(aiVector3D)) {
+        throw DeadlyImportError( "OBJ: Too many vertices, would run out of memory" );
+    }
     pMesh->mVertices = new aiVector3D[ pMesh->mNumVertices ];
 
     // Allocate buffer for normal vectors

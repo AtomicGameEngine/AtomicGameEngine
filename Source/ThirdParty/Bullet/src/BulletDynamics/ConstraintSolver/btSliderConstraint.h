@@ -33,7 +33,7 @@ TODO:
 #define btSliderConstraintDataName	"btSliderConstraintData"
 #endif //BT_USE_DOUBLE_PRECISION
 
-#include "../../LinearMath/btVector3.h"
+#include "LinearMath/btVector3.h"
 #include "btJacobianEntry.h"
 #include "btTypedConstraint.h"
 

@@ -20,7 +20,8 @@
 
 #include <cassert>
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -49,7 +50,7 @@ const int cMaxUDPSendSize = 1400;
 
 std::string Network::GetErrorString(int error)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	void *lpMsgBuf = 0;
 
 	HRESULT hresult = HRESULT_FROM_WIN32(error);
@@ -70,7 +71,7 @@ std::string Network::GetErrorString(int error)
 
 int Network::GetLastError()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return WSAGetLastError();
 #else
 	return errno;
@@ -105,7 +106,7 @@ std::string FormatBytes(double numBytes)
 
 Network::Network()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	memset(&wsaData, 0, sizeof(wsaData));
 #endif
 	Init();
@@ -163,7 +164,7 @@ void Network::PrintAddrInfo(const addrinfo *ptr)
 	case AF_INET6:
 		KNET_LOG(LogInfo, "AF_INET6 (IPv6)\n");
 		break;
-#ifdef WIN32
+#ifdef _WIN32
 	case AF_NETBIOS:
 		KNET_LOG(LogInfo, "AF_NETBIOS (NetBIOS)\n");
 		break;
@@ -267,7 +268,7 @@ void Network::PrintHostNameInfo(const char *hostname, const char *port)
 
 void Network::Init()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// Initialize Winsock
 	int result = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if (result != 0)
@@ -528,7 +529,7 @@ void Network::DeInit()
 	}
 
 	// Deinitialize network subsystem.
-#ifdef WIN32
+#ifdef _WIN32
 	WSACleanup();
 #endif
 
@@ -575,7 +576,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 		// Allow other sockets to be bound to this address after this. 
 		// (Possibly unsecure, only enable for development purposes - to avoid having to wait for the server listen socket 
 		//  to time out if the server crashes.)
-#ifdef WIN32
+#ifdef _WIN32
 		BOOL val = TRUE;
 		ret = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (const char *)&val, sizeof(val));
 #else
@@ -649,7 +650,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 		return 0;
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	SOCKET connectSocket = WSASocket(result->ai_family, result->ai_socktype, result->ai_protocol,
 		NULL, 0, WSA_FLAG_OVERLAPPED);
 #else
@@ -664,7 +665,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	}
 
 	// Connect to server.
-#ifdef WIN32
+#ifdef _WIN32
 	ret = WSAConnect(connectSocket, result->ai_addr, (int)result->ai_addrlen, 0, 0, 0, 0);
 #else
 	ret = connect(connectSocket, result->ai_addr, (int)result->ai_addrlen);
@@ -715,82 +716,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	return sock;
 }
 
-// BEGIN ATOMIC CHANGE
-// An unconnected UDP socket can be used to communicate to more than one host.
-// This is useful when using NAT punchthrough.
-Socket* Network::CreateUnconnectedUDPSocket(const char *address, unsigned short port)
-{
-	addrinfo *result = NULL;
-	addrinfo hints;
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_protocol = IPPROTO_UDP;
-
-	char strPort[256];
-	sprintf(strPort, "%d", (unsigned int)port);
-	int ret = getaddrinfo(address, strPort, &hints, &result);
-	if (ret != 0)
-	{
-		KNET_LOG(LogError, "Network::Connect: getaddrinfo failed: %s", GetErrorString(ret).c_str());
-		return 0;
-	}
-
-#ifdef WIN32
-	SOCKET connectSocket = WSASocket(result->ai_family, result->ai_socktype, result->ai_protocol,
-		NULL, 0, WSA_FLAG_OVERLAPPED);
-#else
-	SOCKET connectSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	KNET_LOG(LogInfo, "A call to socket() returned a new socket 0x%8X.", (unsigned int)connectSocket);
-#endif
-	if (connectSocket == INVALID_SOCKET)
-	{
-		KNET_LOG(LogError, "Network::Connect: Error at socket(): %s", GetLastErrorString().c_str());
-		freeaddrinfo(result);
-		return 0;
-	}
-
-	freeaddrinfo(result);
-
-	if (connectSocket == INVALID_SOCKET)
-	{
-		KNET_LOG(LogError, "Unable to connect to server!");
-		return 0;
-	}
-
-	EndPoint localEndPoint;
-	sockaddr_in sockname;
-	socklen_t socknamelen = sizeof(sockname);
-	ret = getsockname(connectSocket, (sockaddr*)&sockname, &socknamelen);
-	if (ret == 0)
-		localEndPoint = EndPoint::FromSockAddrIn(sockname);
-	else
-		KNET_LOG(LogError, "Network::ConnectSocket: getsockname failed: %s!", Network::GetLastErrorString().c_str());
-
-	EndPoint remoteEndPoint;
-	sscanf(address, "%hu.%hu.%hu.%hu",
-		   (unsigned short *) &remoteEndPoint.ip[0],
-		   (unsigned short *) &remoteEndPoint.ip[1],
-		   (unsigned short *) &remoteEndPoint.ip[2],
-		   (unsigned short *) &remoteEndPoint.ip[3]);
-
-	remoteEndPoint.port = port;
-
-	std::string remoteHostName = remoteEndPoint.IPToString();
-
-	const size_t maxSendSize = cMaxUDPSendSize;
-	Socket socket(connectSocket, localEndPoint, localHostName.c_str(), remoteEndPoint, remoteHostName.c_str(), SocketOverUDP, ServerClientSocket, maxSendSize);
-
-	socket.SetBlocking(false);
-	sockets.push_back(socket);
-
-	Socket *sock = &sockets.back();
-
-	return sock;
-}
-// END ATOMIC CHANGE
-
-Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port,
+Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port, 
 	SocketTransportLayer transport, IMessageHandler *messageHandler, Datagram *connectMessage)
 {
 	Socket *socket = ConnectSocket(address, port, transport);
@@ -817,31 +743,6 @@ Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port
 	connections.insert(connection);
 	return connection;
 }
-
-// BEGIN ATOMIC CHANGE
-// Start up the connection worker thread on an existing socket.
-// This allows us to create a kNet connection with the same socket
-// we used to connect to the master server.
-Ptr(MessageConnection) Network::Connect(Socket* socket, IMessageHandler *messageHandler, Datagram *connectMessage)
-{
-	// This only works with UDP
-	if (socket->TransportLayer() == SocketOverTCP)
-	{
-		return 0;
-	}
-
-	SendUDPConnectDatagram(*socket, connectMessage);
-	KNET_LOG(LogInfo, "Network::Connect: Sent a UDP Connection Start datagram to to %s.", socket->ToString().c_str());
-
-	Ptr(MessageConnection) connection = new UDPMessageConnection(this, 0, socket, ConnectionPending);
-
-	connection->RegisterInboundMessageHandler(messageHandler);
-	AssignConnectionToWorkerThread(connection);
-
-	connections.insert(connection);
-	return connection;
-}
-// END ATOMIC CHANGE
 
 Socket *Network::CreateUDPSlaveSocket(Socket *serverListenSocket, const EndPoint &remoteEndPoint, const char *remoteHostName)
 {

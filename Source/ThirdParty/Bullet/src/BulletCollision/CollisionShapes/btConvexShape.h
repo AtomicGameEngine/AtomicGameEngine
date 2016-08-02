@@ -18,11 +18,11 @@ subject to the following restrictions:
 
 #include "btCollisionShape.h"
 
-#include "../../LinearMath/btVector3.h"
-#include "../../LinearMath/btTransform.h"
-#include "../../LinearMath/btMatrix3x3.h"
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btTransform.h"
+#include "LinearMath/btMatrix3x3.h"
 #include "btCollisionMargin.h"
-#include "../../LinearMath/btAlignedAllocator.h"
+#include "LinearMath/btAlignedAllocator.h"
 
 #define MAX_PREFERRED_PENETRATION_DIRECTIONS 10
 
@@ -52,7 +52,8 @@ public:
 	btScalar getMarginNonVirtual () const;
 	void getAabbNonVirtual (const btTransform& t, btVector3& aabbMin, btVector3& aabbMax) const;
 
-	virtual void project(const btTransform& trans, const btVector3& dir, btScalar& min, btScalar& max) const;
+
+	virtual void project(const btTransform& trans, const btVector3& dir, btScalar& minProj, btScalar& maxProj, btVector3& witnesPtMin,btVector3& witnesPtMax) const;
 
 	
 	//notice that the vectors should be unit length

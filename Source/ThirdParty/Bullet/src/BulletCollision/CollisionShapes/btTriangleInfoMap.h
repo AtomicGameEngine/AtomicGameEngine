@@ -17,8 +17,8 @@ subject to the following restrictions:
 #define _BT_TRIANGLE_INFO_MAP_H
 
 
-#include "../../LinearMath/btHashMap.h"
-#include "../../LinearMath/btSerializer.h"
+#include "LinearMath/btHashMap.h"
+#include "LinearMath/btSerializer.h"
 
 
 ///for btTriangleInfo m_flags
