@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
@@ -245,6 +246,12 @@ namespace AtomicEngine
             if (!componentCache.TryGetValue(assemblyPath, out assemblyTypes))
             {
                 componentCache[assemblyPath] = assemblyTypes = new Dictionary<string, CSComponentInfo>();
+            }
+
+            // HACK!
+            if (PlayerApp.DeployedApp)
+            {
+                assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/AtomicProject.dll";
             }
 
             Assembly assembly = Assembly.LoadFrom(assemblyPath);

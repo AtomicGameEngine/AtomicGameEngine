@@ -1,5 +1,5 @@
 {
 	"name" : "AtomicNETNative",
 	"sources" : ["Source/AtomicNET/NETNative"],
-	"classes" : ["NETCore", "NETIPCPlayerApp", "NETServiceApplication"]
+	"classes" : ["NETCore", "NETIPCPlayerApp", "NETServiceApplication", "NETAtomicPlayer"]
 }

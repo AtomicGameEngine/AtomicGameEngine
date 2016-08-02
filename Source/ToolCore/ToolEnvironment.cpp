@@ -81,6 +81,7 @@ bool ToolEnvironment::InitFromPackage()
     atomicNETRootDir_ = resourcesDir + "ToolData/AtomicNET/";
     atomicNETCoreAssemblyDir_ = atomicNETRootDir_ + "Release/";
     atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
+    atomicNETManagedIPCPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicIPCPlayer.exe";
 
     return true;
 }
@@ -179,6 +180,7 @@ void ToolEnvironment::SetRootSourceDir(const String& sourceDir)
     atomicNETRootDir_ = rootSourceDir_ + "Artifacts/AtomicNET/";
     atomicNETCoreAssemblyDir_ = rootSourceDir_ + "Artifacts/AtomicNET/" + config + "/";
     atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
+    atomicNETManagedIPCPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicIPCPlayer.exe";
 
 }
 

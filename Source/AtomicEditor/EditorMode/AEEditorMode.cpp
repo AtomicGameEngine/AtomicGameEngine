@@ -143,7 +143,7 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
     if (fileSystem->FileExists(project->GetResourcePath() + "AtomicProject.dll"))
     {
         managed = true;
-        playerBinary = env->GetAtomicNETManagedPlayerBinary();
+        playerBinary = env->GetAtomicNETManagedIPCPlayerBinary();
     }
 
 

@@ -4,9 +4,9 @@ using AtomicEngine;
 public class Program
 {
     public static void Main(string[] args)
-    {
+    {               
         // Create the Application
-        var app = NETAtomicPlayer.Create(args);
+        var app = NETIPCPlayerApp.Create(args);
 
         // Managed code in charge of main loop
         while (app.RunFrame())
@@ -18,3 +18,5 @@ public class Program
         app.Shutdown();
     }
 }
+
+
