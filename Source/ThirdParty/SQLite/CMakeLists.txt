@@ -66,4 +66,7 @@ if (NOT IOS AND NOT WEB)
 endif ()
 
 # SQLite will not work correctly with the -ffast-math option of GCC
+# ATOMIC: Add check for empty CMAKE_C_FLAGS
+if (CMAKE_C_FLAGS)
 string (REPLACE -ffast-math "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+endif()
