@@ -35,7 +35,7 @@ typedef HashMap<String, HashMap<String, Variant>> GlobalPropertyMap;
 /// Browser host subsystem, responsible for initializing CEF
 class ATOMIC_API WebBrowserHost : public Object
 {
-    OBJECT(WebBrowserHost);
+    ATOMIC_OBJECT(WebBrowserHost, Object);
 
 public:
     /// Construct.

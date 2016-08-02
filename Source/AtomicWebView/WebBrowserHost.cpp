@@ -212,7 +212,7 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     // before initializing graphics subsystem
     if (!CefInitialize(args, settings, d_->app_, nullptr))
     {
-        LOGERROR("CefInitialize - Error");
+        ATOMIC_LOGERROR("CefInitialize - Error");
     }
 
     RegisterWebSchemeHandlers(this);
@@ -220,7 +220,7 @@ WebBrowserHost::WebBrowserHost(Context* context) : Object (context)
     // Ensure cookie manager is created
     CefCookieManager::GetGlobalManager(nullptr);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(WebBrowserHost, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(WebBrowserHost, HandleUpdate));
 
     instance_ = this;
 

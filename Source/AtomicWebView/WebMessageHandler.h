@@ -33,7 +33,7 @@ class WebMessageHandlerPrivate;
 class WebMessageHandler : public Object
 {
 
-    OBJECT(WebMessageHandler);
+    ATOMIC_OBJECT(WebMessageHandler, Object);
 
 public:
 
