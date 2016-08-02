@@ -74,6 +74,14 @@ bool ToolEnvironment::InitFromPackage()
 
     toolDataDir_ =  resourcesDir + "ToolData/";
 
+    // AtomicNET
+
+    // atomicNETNuGetBinary_ = ToString("%sBuild/Managed/nuget/nuget.exe", rootSourceDir_.CString());
+
+    atomicNETRootDir_ = resourcesDir + "ToolData/AtomicNET/";
+    atomicNETCoreAssemblyDir_ = atomicNETRootDir_ + "Release/";
+    atomicNETManagedPlayerBinary_ = atomicNETCoreAssemblyDir_ + "AtomicPlayer.exe";
+
     return true;
 }
 

@@ -75,6 +75,9 @@ namespace Atomic
             ErrorExit("IPCPlayerApp::ProcessArguments FileSystem subsystem does not exist");
         }
 
+        String resourcePrefix;
+        engineParameters_["ResourcePrefixPath"] = "";
+
         for (unsigned i = 0; i < arguments_.Size(); ++i)
         {
             if (arguments_[i].Length() > 1)
@@ -90,10 +93,13 @@ namespace Atomic
                 {
                     debugPlayer_ = true;
                 }
+                else if (argument == "--resourceprefix" && value.Length())
+                {
+                    resourcePrefix = value;
+                    engineParameters_["ResourcePrefixPath"] = resourcePrefix;
+                }
                 else if (argument == "--project" && value.Length())
                 {
-                    engineParameters_["ResourcePrefixPath"] = "";
-
                     value = AddTrailingSlash(value);
 
                     AddEngineConfigSearchPath(value + "Settings/");
@@ -115,7 +121,11 @@ namespace Atomic
 #ifdef __APPLE__
                     engineParameters_["ResourcePrefixPath"] = "../Resources";
 #else
-                    engineParameters_["ResourcePrefixPath"] = fileSystem->GetProgramDir() + "Resources";
+                    if (!resourcePrefix.Length())
+                    {
+                        engineParameters_["ResourcePrefixPath"] = fileSystem->GetProgramDir() + "Resources";
+                    }
+
 #endif
 
                     String resourcePaths = ToString("CoreData;PlayerData;%s/;%s/Resources;%s;%sCache",

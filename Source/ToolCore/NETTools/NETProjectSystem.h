@@ -50,15 +50,25 @@ namespace ToolCore
         NETProjectSystem(Context* context);
         virtual ~NETProjectSystem();
 
-        const String& GetSolutionPath() const { return solutionPath_; }
-
         bool GetVisualStudioAvailable() const { return visualStudioPath_.Length() != 0; }
 
+        const String& GetSolutionPath() const { return solutionPath_; }
+
+        void BuildAtomicProject();        
+
+        /// Open the solution, if opening a source file, better to call OpenSourceFile as will launch VS instance with source file loaded
+        /// otherwise, no guarantee where source file will load when multiple VS instances running
+        void OpenSolution();       
+
         void OpenSourceFile(const String& sourceFilePath);
+
+        bool GenerateSolution();
 
     private:
 
         void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+        void HandleNETBuildResult(StringHash eventType, VariantMap& eventData);
 
         void HandleFileChanged(StringHash eventType, VariantMap& eventData);
         void HandleResourceAdded(StringHash eventType, VariantMap& eventData);

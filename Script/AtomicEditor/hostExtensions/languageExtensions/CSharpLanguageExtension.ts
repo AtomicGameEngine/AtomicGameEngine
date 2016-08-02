@@ -64,6 +64,7 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
             const menu = this.serviceRegistry.uiServices.createPluginMenuItemSource("AtomicNET", {});
             menu.addItem(new Atomic.UIMenuItem("Open Solution", `${this.name}.opensolution`));
             menu.addItem(new Atomic.UIMenuItem("Compile Project", `${this.name}.compileproject`));
+            menu.addItem(new Atomic.UIMenuItem("Generate Solution", `${this.name}.generatesolution`));
             this.menuCreated = true;
         }
 
@@ -174,8 +175,15 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
         if (extension == this.name) {
             switch (action) {
                 case "compileproject":
-                this.doFullCompile();
-                return true;
+                    this.doFullCompile();
+                    return true;
+                case "opensolution":
+                    this.openSolution();
+                    return true;
+                case "generatesolution":
+                    this.generateSolution();
+                    return true;
+
             }
         }
     }
@@ -185,6 +193,31 @@ export default class CSharpLanguageExtension implements Editor.HostExtensions.Re
     */
     doFullCompile() {
 
+        if (ToolCore.netProjectSystem)
+            ToolCore.netProjectSystem.buildAtomicProject();
+
     }
+    /**
+    * Open Solution
+    */
+    openSolution() {
+
+        if (ToolCore.netProjectSystem) {
+            ToolCore.netProjectSystem.openSolution();
+        }
+
+    }
+
+    /**
+    * Generate Solution
+    */
+    generateSolution() {
+
+        if (ToolCore.netProjectSystem) {
+            ToolCore.netProjectSystem.generateSolution();
+        }
+
+    }
+
 
 }
