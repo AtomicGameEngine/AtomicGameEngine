@@ -121,7 +121,7 @@ public:
 
         if (type == PET_VIEW)
         {
-            glBindTexture(GL_TEXTURE_2D, (GLuint) ((GPUObjectHandle*)webTexture2D_->GetTexture2D()->GetGPUObject())->name_);
+            glBindTexture(GL_TEXTURE_2D, (GLuint) webTexture2D_->GetTexture2D()->GetGPUObjectName());
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, width);
 
@@ -186,7 +186,7 @@ public:
                 h -= y + h - viewheight;
             }
 
-            glBindTexture(GL_TEXTURE_2D, (GLuint) ((GPUObjectHandle*)webTexture2D_->GetTexture2D()->GetGPUObject())->name_);
+            glBindTexture(GL_TEXTURE_2D, (GLuint) webTexture2D_->GetTexture2D()->GetGPUObjectName());
 
             // Update the popup rectangle.
             glPixelStorei(GL_UNPACK_ROW_LENGTH, width);

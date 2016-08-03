@@ -52,6 +52,8 @@ struct BackgroundLoadItem
 /// Background loader of resources. Owned by the ResourceCache.
 class BackgroundLoader : public RefCounted, public Thread
 {
+    ATOMIC_REFCOUNTED(BackgroundLoader
+                      )
 public:
     /// Construct.
     BackgroundLoader(ResourceCache* owner);

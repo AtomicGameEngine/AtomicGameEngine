@@ -226,6 +226,21 @@ private:
     VariantMap globalVars_;
 
     // ATOMIC BEGIN
+
+    /// Begin event send.
+    void GlobalBeginSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
+        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
+            globalEventListeners_[i]->BeginSendEvent(this, sender, eventType, eventData);
+        eventSenders_.Push(sender);
+    }
+
+    /// End event send. Clean up event receivers removed in the meanwhile.
+    void GlobalEndSendEvent(Object* sender, StringHash eventType, VariantMap& eventData) {
+        for (unsigned i = 0; i < globalEventListeners_.Size(); i++)
+            globalEventListeners_[i]->EndSendEvent(this, sender, eventType, eventData);
+        eventSenders_.Pop();
+    }
+
     PODVector<GlobalEventListener*> globalEventListeners_;
     bool editorContext_;
     // ATOMIC END

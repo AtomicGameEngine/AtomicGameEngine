@@ -320,6 +320,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     Context* context = context_;
     HashSet<Object*> processed;
 
+// ATOMIC BEGIN
+    context->GlobalBeginSendEvent(this, eventType, eventData);
+// ATOMIC END
+
     context->BeginSendEvent(this);
 
     // Check first the specific event receivers
@@ -422,6 +426,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
 
     context->EndSendEvent();
+
+// ATOMIC BEGIN
+    context->GlobalEndSendEvent(this,eventType, eventData);
+// ATOMIC END
 
 #ifdef ATOMIC_PROFILING
     if (eventProfiler)

@@ -1305,16 +1305,23 @@ void Node::GetComponents(PODVector<Component*>& dest, StringHash type, bool recu
 {
     dest.Clear();
 
+// ATOMIC BEGIN
+
+    bool all = type == Component::GetTypeStatic();
+
     if (!recursive)
     {
         for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
         {
-            if ((*i)->GetType() == type)
+            if (all || (*i)->GetType() == type)
                 dest.Push(*i);
         }
     }
     else
         GetComponentsRecursive(dest, type);
+
+    // ATOMIC END
+
 }
 
 bool Node::HasComponent(StringHash type) const
@@ -2093,13 +2100,19 @@ void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, StringHash 
 
 void Node::GetComponentsRecursive(PODVector<Component*>& dest, StringHash type) const
 {
+    // ATOMIC BEGIN
+
+    bool all = type == Component::GetTypeStatic();
+
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        if ((*i)->GetType() == type)
+        if (all || (*i)->GetType() == type)
             dest.Push(*i);
     }
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->GetComponentsRecursive(dest, type);
+
+    // ATOMIC END
 }
 
 void Node::GetChildrenWithTagRecursive(PODVector<Node*>& dest, const String& tag) const

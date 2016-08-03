@@ -34,6 +34,8 @@ namespace Atomic
 /// Worker thread managed by the work queue.
 class WorkerThread : public Thread, public RefCounted
 {
+    ATOMIC_REFCOUNTED(WorkerThread)
+
 public:
     /// Construct.
     WorkerThread(WorkQueue* owner, unsigned index) :
