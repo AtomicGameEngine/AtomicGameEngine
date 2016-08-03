@@ -277,6 +277,9 @@ public:
     /// Return number of views rendered.
     unsigned GetNumViews() const { return views_.Size(); }
 
+    /// Return number of true primitives rendered.
+    unsigned GetSinglePassPrimitives() { return numSinglePassPrimitives_; }
+
     /// Return number of primitives rendered.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
 
@@ -484,6 +487,8 @@ private:
     unsigned numOcclusionBuffers_;
     /// Number of temporary shadow cameras in use.
     unsigned numShadowCameras_;
+    /// Number of True primitives (3D geometry only.)
+    unsigned numSinglePassPrimitives_;
     /// Number of primitives (3D geometry only.)
     unsigned numPrimitives_;
     /// Number of batches (3D geometry only.)

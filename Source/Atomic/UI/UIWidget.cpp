@@ -948,6 +948,22 @@ UI_WIDGET_STATE UIWidget::GetStateRaw()
 
 }
 
+void UIWidget::SetOpacity(float opacity)
+{
+    if (!widget_)
+        return;
+
+    widget_->SetOpacity(opacity);
+}
+
+float UIWidget::GetOpacity()
+{
+    if (!widget_)
+        return 0.f;
+
+    return widget_->GetOpacity();
+}
+
 UIView* UIWidget::GetView()
 {
     if (!widget_)

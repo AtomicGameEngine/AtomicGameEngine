@@ -261,6 +261,7 @@ Graphics::Graphics(Context* context) :
     instancingSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
+    numSinglePassPrimitives_(0),
     numPrimitives_(0),
     numBatches_(0),
     maxScratchBufferRequest_(0),
@@ -814,6 +815,7 @@ bool Graphics::BeginFrame()
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         SetTexture(i, 0);
 
+    numSinglePassPrimitives_ = 0;
     numPrimitives_ = 0;
     numBatches_ = 0;
 
@@ -935,6 +937,8 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += primitiveCount;
+    if (GetNumPasses() == 1)
+        numSinglePassPrimitives_ += primitiveCount;
     ++numBatches_;
 }
 
@@ -963,6 +967,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += instanceCount * primitiveCount;
+    numSinglePassPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
 }
 

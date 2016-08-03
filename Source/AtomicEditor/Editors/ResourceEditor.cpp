@@ -154,6 +154,34 @@ ResourceEditor::ResourceEditor(Context* context, const String& fullpath, UITabCo
     rootContentWidget_->SetGravity(UI_GRAVITY_ALL);
     container_->GetContentRoot()->AddChild(rootContentWidget_);
 
+    profilerContentWidget_ = new UIWidget(context_);
+    profilerContentWidget_->SetGravity(UI_GRAVITY_ALL);
+    profilerContentWidget_->GetInternalWidget()->SetDisabledOpacity(1.0f);
+
+    statsText_ = new UIEditField(context_);
+    statsText_->SetGravity(UI_GRAVITY_LEFT);
+    statsText_->SetSize(250, 200);
+    statsText_->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+    statsText_->SetMultiline(true);
+    statsText_->SetSkinBg("0");
+
+    modeText_ = new UIEditField(context_);
+    modeText_->SetGravity(UI_GRAVITY_BOTTOM);
+    modeText_->SetSize(700, 20);
+    modeText_->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+    modeText_->SetSkinBg("0");
+
+    profilerText_ = new UIEditField(context_);
+    profilerText_->SetGravity(UI_GRAVITY_RIGHT);
+    profilerText_->SetSize(500, 550);
+    profilerText_->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+    profilerText_->SetMultiline(true);
+    profilerText_->SetSkinBg("0");
+
+    profilerContentWidget_->AddChild(statsText_);
+    profilerContentWidget_->AddChild(modeText_);
+    profilerContentWidget_->AddChild(profilerText_);
+
     SubscribeToEvent(E_FILECHANGED, HANDLER(ResourceEditor, HandleFileChanged));
     SubscribeToEvent(E_RENAMERESOURCENOTIFICATION, HANDLER(ResourceEditor, HandleRenameResourceNotification));
 

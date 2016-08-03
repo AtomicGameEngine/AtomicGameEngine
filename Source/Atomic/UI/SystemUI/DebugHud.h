@@ -106,6 +106,17 @@ public:
     /// Clear all application-specific stats.
     void ClearAppStats();
 
+    bool GetSceneOpen() { return sceneOpen_; }
+    void SetSceneOpen(bool isOpen) { sceneOpen_ = isOpen; }
+
+    String GetStatsString() { return statsString_; }
+    String GetModeString() { return modeString_; }
+    String GetProfilerString() { return profilerString_; }
+
+    void ToggleSceneHud();
+    bool GetShowSceneHud() { return showSceneHud_; }
+    void SetShowSceneHud(bool showSceneHud) { showSceneHud_ = showSceneHud; }
+
 private:
     /// Handle logic post-update event. The HUD texts are updated here.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
@@ -134,6 +145,13 @@ private:
     float fpsFramesSinceUpdate_;
     /// Calculated fps
     unsigned fps_;
+
+    String statsString_;
+    String modeString_;
+    String profilerString_;
+
+    bool sceneOpen_;
+    bool showSceneHud_;
 };
 
 }

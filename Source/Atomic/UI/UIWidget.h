@@ -205,7 +205,6 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
     void SetFocus();
     bool GetFocus();
 
-
     /// Set focus to first widget which accepts it
     void SetFocusRecursive();
     void OnFocusChanged(bool focused);
@@ -218,6 +217,9 @@ class UIWidget : public Object, public tb::TBWidgetDelegate
 
     void SetStateRaw(UI_WIDGET_STATE state);
     UI_WIDGET_STATE GetStateRaw();
+
+    void SetOpacity(float opacity);
+    float GetOpacity();
 
     void Invalidate();
     void Die();

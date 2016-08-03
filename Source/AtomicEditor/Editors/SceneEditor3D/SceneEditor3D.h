@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <Atomic/UI/SystemUI/SystemUI.h>
+#include <Atomic/UI/SystemUI/DebugHud.h>
+
 #include <TurboBadger/tb_widgets_common.h>
 
 #include "../ResourceEditor.h"
@@ -118,6 +121,8 @@ private:
     void UpdateGizmoSnapSettings();
 
     SharedPtr<Scene> scene_;
+
+    SystemUI::DebugHud* debugHud_;
 
     // TODO: multiple views
     SharedPtr<SceneView3D> sceneView_;
