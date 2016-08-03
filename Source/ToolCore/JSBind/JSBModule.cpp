@@ -405,9 +405,7 @@ void JSBModule::RegisterConstant(const String& constantName, const String& value
 }
 
 bool JSBModule::Load(const String& jsonFilename)
-{
-    JSBind* jsbind = GetSubsystem<JSBind>();
-
+{    
     ATOMIC_LOGINFOF("Loading Module: %s", jsonFilename.CString());
 
     SharedPtr<File> jsonFile(new File(context_, jsonFilename));
@@ -470,6 +468,16 @@ bool JSBModule::Load(const String& jsonFilename)
         {
             includes_.Push(includes.GetArray()[j].GetString());
 
+        }
+    }
+
+    JSONValue jsmodulepreamble = root.Get("jsmodulepreamble");
+
+    if (jsmodulepreamble.IsArray())
+    {
+        for (unsigned j = 0; j < jsmodulepreamble.GetArray().Size(); j++)
+        {
+            jsmodulePreamble_.Push(jsmodulepreamble.GetArray()[j].GetString());
         }
     }
 

@@ -102,6 +102,7 @@ private:
     SharedPtr<JSBPackage> package_;
     Vector<SharedPtr<JSBHeader>> headers_;
     Vector<String> includes_;
+    Vector<String> jsmodulePreamble_;
 
     Vector<String> sourceDirs_;
     Vector<String> classnames_;

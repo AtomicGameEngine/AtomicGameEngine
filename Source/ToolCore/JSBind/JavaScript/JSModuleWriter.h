@@ -45,6 +45,7 @@ public:
 private:
 
     void WriteIncludes(String& source);
+    void WritePreamble(String& source);
     void WriteForwardDeclarations(String& source);
     void WriteClassDeclaration(String& source);
 
