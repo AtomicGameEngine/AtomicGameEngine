@@ -104,6 +104,12 @@ struct GeometryDesc
     unsigned indexCount_;
 };
 
+// ATOMIC BEGIN
+
+static const unsigned MODEL_VERSION = 1;
+
+// ATOMIC END
+
 /// 3D model resource.
 class ATOMIC_API Model : public Resource
 {

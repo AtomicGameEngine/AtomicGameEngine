@@ -138,7 +138,7 @@ JSComponent::~JSComponent()
 
 void JSComponent::RegisterObject(Context* context)
 {
-    context->RegisterFactory<JSComponent>(LOGIC_CATEGORY);
+    context->RegisterFactory( new JSComponentFactory(context), LOGIC_CATEGORY);
     ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("ComponentFile", GetComponentFileAttr, SetComponentFileAttr, ResourceRef, ResourceRef(JSComponentFile::GetTypeStatic()), AM_DEFAULT);
     ATOMIC_COPY_BASE_ATTRIBUTES(ScriptComponent);
 }

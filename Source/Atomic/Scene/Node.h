@@ -620,8 +620,12 @@ protected:
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
     void SetEnabled(bool enable, bool recursive, bool storeSelf);
+
+// ATOMIC BEGIN
     /// Create component, allowing UnknownComponent if actual type is not supported. Leave typeName empty if not known.
-    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id);
+    Component* SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const XMLElement& source = XMLElement::EMPTY);
+// ATOMIC END
+
     /// Recalculate the world transform.
     void UpdateWorldTransform() const;
     /// Remove child node by iterator.
@@ -686,6 +690,8 @@ private:
 
     /// Return child nodes by name, recursively
     void GetChildrenWithNameRecursive(PODVector<Node*>& dest, StringHash nameHash) const;
+
+    Component* CreateComponentInternal(StringHash type, CreateMode mode, unsigned id, const XMLElement& source = XMLElement::EMPTY);
 
     // ATOMIC END
 };

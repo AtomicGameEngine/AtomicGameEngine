@@ -898,7 +898,8 @@ void Node::RemoveChildren(bool removeReplicated, bool removeLocal, bool recursiv
         MarkReplicationDirty();
 }
 
-Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
+// ATOMIC BEGIN
+Component* Node::CreateComponentInternal(StringHash type, CreateMode mode, unsigned id, const XMLElement& source)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -906,7 +907,7 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
         mode = LOCAL;
 
     // Check that creation succeeds and that the object in fact is a component
-    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
+    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type, source));
     if (!newComponent)
     {
         ATOMIC_LOGERROR("Could not create unknown component type " + type.ToString());
@@ -915,7 +916,15 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
 
     AddComponent(newComponent, id, mode);
     return newComponent;
+
 }
+
+Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
+{
+    return CreateComponentInternal(type, mode, id);
+}
+
+// ATOMIC END
 
 Component* Node::GetOrCreateComponent(StringHash type, CreateMode mode, unsigned id)
 {
@@ -1553,8 +1562,10 @@ bool Node::LoadXML(const XMLElement& source, SceneResolver& resolver, bool readC
     {
         String typeName = compElem.GetAttribute("type");
         unsigned compID = compElem.GetUInt("id");
+// ATOMIC BEGIN
         Component* newComponent = SafeCreateComponent(typeName, StringHash(typeName),
-            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID);
+            (mode == REPLICATED && compID < FIRST_LOCAL_ID) ? REPLICATED : LOCAL, rewriteIDs ? 0 : compID, compElem);
+// ATOMIC END
         if (newComponent)
         {
             resolver.AddComponent(compID, newComponent);
@@ -2005,7 +2016,9 @@ void Node::SetEnabled(bool enable, bool recursive, bool storeSelf)
     }
 }
 
-Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id)
+// ATOMIC BEGIN
+
+Component* Node::SafeCreateComponent(const String& typeName, StringHash type, CreateMode mode, unsigned id, const XMLElement& source)
 {
     // Do not attempt to create replicated components to local nodes, as that may lead to component ID overwrite
     // as replicated components are synced over
@@ -2014,7 +2027,7 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
 
     // First check if factory for type exists
     if (!context_->GetTypeName(type).Empty())
-        return CreateComponent(type, mode, id);
+        return CreateComponentInternal(type, mode, id, source);
     else
     {
         ATOMIC_LOGWARNING("Component type " + type.ToString() + " not known, creating UnknownComponent as placeholder");
@@ -2029,6 +2042,8 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
         return newComponent;
     }
 }
+
+// ATOMIC END
 
 void Node::UpdateWorldTransform() const
 {

@@ -24,6 +24,11 @@
 
 #include "../Container/LinkedList.h"
 #include "../Core/Variant.h"
+
+// ATOMIC BEGIN
+#include "../Resource/XMLElement.h"
+// ATOMIC END
+
 #if ATOMIC_CXX11
 #include <functional>
 #endif
@@ -220,8 +225,10 @@ public:
         assert(context_);
     }
 
+// ATOMIC BEGIN
     /// Create an object. Implemented in templated subclasses.
-    virtual SharedPtr<Object> CreateObject() = 0;
+    virtual SharedPtr<Object> CreateObject(const XMLElement& source = XMLElement::EMPTY) = 0;
+// ATOMIC END
 
     /// Return execution context.
     Context* GetContext() const { return context_; }
@@ -253,8 +260,10 @@ public:
         typeInfo_ = T::GetTypeInfoStatic();
     }
 
+    // ATOMIC BEGIN
     /// Create an object of the specific type.
-    virtual SharedPtr<Object> CreateObject() { return SharedPtr<Object>(new T(context_)); }
+    virtual SharedPtr<Object> CreateObject(const XMLElement& source = XMLElement::EMPTY) { return SharedPtr<Object>(new T(context_)); }
+    // ATOMIC END
 };
 
 /// Internal helper class for invoking event handler functions.

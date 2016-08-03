@@ -58,8 +58,13 @@ public:
     {
         return StaticCast<T>(CreateObject(T::GetTypeStatic()));
     }
+
+    // ATOMIC BEGIN
     /// Create an object by type hash. Return pointer to it or null if no factory found.
-    SharedPtr<Object> CreateObject(StringHash objectType);
+    SharedPtr<Object> CreateObject(StringHash objectType, const XMLElement &source = XMLElement::EMPTY);
+    // ATOMIC END
+
+
     /// Register a factory for an object type.
     void RegisterFactory(ObjectFactory* factory);
     /// Register a factory for an object type and specify the object category.

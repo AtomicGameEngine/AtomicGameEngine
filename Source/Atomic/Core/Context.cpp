@@ -87,14 +87,16 @@ Context::~Context()
     eventDataMaps_.Clear();
 }
 
-SharedPtr<Object> Context::CreateObject(StringHash objectType)
+// ATOMIC BEGIN
+SharedPtr<Object> Context::CreateObject(StringHash objectType, const XMLElement& source)
 {
     HashMap<StringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
     if (i != factories_.End())
-        return i->second_->CreateObject();
+        return i->second_->CreateObject(source);
     else
         return SharedPtr<Object>();
 }
+// ATOMIC END
 
 void Context::RegisterFactory(ObjectFactory* factory)
 {

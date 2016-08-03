@@ -74,14 +74,26 @@ void Model::RegisterObject(Context* context)
 bool Model::BeginLoad(Deserializer& source)
 {
     // Check ID
+
     String fileID = source.ReadFileID();
-    if (fileID != "UMDL" && fileID != "UMD2")
+
+// ATOMIC BEGIN
+
+    bool umdl = false;
+    if (fileID == "UMDL" || fileID == "UMD2")
+        umdl = true;
+
+    if (!umdl && fileID != "AMDL" && fileID != "AMD2")
     {
         ATOMIC_LOGERROR(source.GetName() + " is not a valid model file");
         return false;
     }
 
-    bool hasVertexDeclarations = (fileID == "UMD2");
+    bool hasVertexDeclarations = (fileID == "UMD2" || fileID == "AMD2");
+
+    geometryNames_.Clear();
+
+// ATOMIC END
 
     geometries_.Clear();
     geometryBoneMappings_.Clear();
@@ -306,7 +318,26 @@ bool Model::BeginLoad(Deserializer& source)
         geometryCenters_.Push(Vector3::ZERO);
     memoryUse += sizeof(Vector3) * geometries_.Size();
 
+// ATOMIC BEGIN
+    if (umdl)
+    {
+        SetMemoryUse(memoryUse);
+        return true;
+    }
+
+    // MODEL_VERSION
+    unsigned version = source.ReadUInt();
+
+    // Read geometry names
+    geometryNames_.Resize(geometries_.Size());
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
+    {
+        geometryNames_[i] = source.ReadString();
+    }
+
     SetMemoryUse(memoryUse);
+
+// ATOMIC END
     return true;
 }
 
@@ -359,9 +390,13 @@ bool Model::EndLoad()
 
 bool Model::Save(Serializer& dest) const
 {
+    // ATOMIC BEGIN
+
     // Write ID
-    if (!dest.WriteFileID("UMD2"))
+    if (!dest.WriteFileID("AMD2"))
         return false;
+
+    // ATOMIC END
 
     // Write vertex buffers
     dest.WriteUInt(vertexBuffers_.Size());
@@ -453,6 +488,16 @@ bool Model::Save(Serializer& dest) const
     for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
         dest.WriteVector3(geometryCenters_[i]);
 
+    // ATOMIC BEGIN
+
+    dest.WriteUInt(MODEL_VERSION);
+
+    // Write geometry names
+    for (unsigned i = 0; i < geometryNames_.Size(); ++i)
+        dest.WriteString(geometryNames_[i]);
+
+    // ATOMIC END
+
     return true;
 }
 
@@ -517,6 +562,10 @@ void Model::SetNumGeometries(unsigned num)
     geometries_.Resize(num);
     geometryBoneMappings_.Resize(num);
     geometryCenters_.Resize(num);
+
+    // ATOMIC BEGIN
+    geometryNames_.Resize(num);
+    // ATOMIC END
 
     // For easier creation of from-scratch geometry, ensure that all geometries start with at least 1 LOD level (0 makes no sense)
     for (unsigned i = 0; i < geometries_.Size(); ++i)
@@ -656,6 +705,11 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
         ret->indexBuffers_.Push(cloneBuffer);
     }
 
+
+    // ATOMIC BEGIN
+    ret->geometryNames_.Resize(geometryNames_.Size());
+    // ATOMIC END
+
     // Deep copy all the geometry LOD levels and refer to the copied vertex/index buffers
     ret->geometries_.Resize(geometries_.Size());
     for (unsigned i = 0; i < geometries_.Size(); ++i)
@@ -663,6 +717,10 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
         ret->geometries_[i].Resize(geometries_[i].Size());
         for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
+            // ATOMIC BEGIN
+            ret->geometryNames_[i] = geometryNames_[i];
+            // ATOMIC END
+
             SharedPtr<Geometry> cloneGeometry;
             Geometry* origGeometry = geometries_[i][j];
 
