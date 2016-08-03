@@ -45,6 +45,10 @@
 
 #include "../DebugNew.h"
 
+// ATOMIC BEGIN
+#include "PrefabComponent.h"
+// ATOMIC END
+
 namespace Atomic
 {
 
@@ -1537,6 +1541,10 @@ void RegisterSceneLibrary(Context* context)
     SmoothedTransform::RegisterObject(context);
     UnknownComponent::RegisterObject(context);
     SplinePath::RegisterObject(context);
+
+    // ATOMIC BEGIN
+    PrefabComponent::RegisterObject(context);
+    // ATOMIC END
 }
 
 }

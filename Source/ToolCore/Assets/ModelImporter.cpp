@@ -134,10 +134,8 @@ bool ModelImporter::ImportAnimation(const String& filename, const String& name, 
             if (animatedModel && controller)
             {
                 SharedPtr<Animation> animation = cache->GetTempResource<Animation>(fileName + extension);
-// ATOMIC_UPDATE_FIX_BEGIN
-                //if (animation)
-                //    controller->AddAnimationResource(animation);
-// ATOMIC_UPDATE_FIX_END
+                if (animation)
+                    controller->AddAnimationResource(animation);
             }
 
             ATOMIC_LOGINFOF("Import Info: %s : %s", info.name_.CString(), fileName.CString());
@@ -326,8 +324,6 @@ void ModelImporter::GetAnimations(PODVector<Animation*>& animations)
     if (!controller)
         return;
 
-// ATOMIC_UPDATE_FIX_BEGIN
-    /*
     const Vector<SharedPtr<Animation>>& animresources = controller->GetAnimationResources();
 
     for (unsigned i = 0; i < animresources.Size(); i++)
@@ -337,8 +333,7 @@ void ModelImporter::GetAnimations(PODVector<Animation*>& animations)
             animations.Push(animresources[i]);
         }
     }
-    */
-// ATOMIC_UPDATE_FIX_END
+
 }
 
 bool ModelImporter::LoadSettingsInternal(JSONValue& jsonRoot)

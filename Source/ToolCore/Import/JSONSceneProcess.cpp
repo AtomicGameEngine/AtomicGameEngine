@@ -773,9 +773,8 @@ bool JSONSceneProcess::ProcessComponent(Node* node, const JSONAnimation* janim )
             tracks.Push(track);
 
         }
-// ATOMIC_UPDATE_FIX_BEGIN
-        //outAnim->SetTracks(tracks);
-// ATOMIC_UPDATE_FIX_END
+
+        outAnim->SetTracks(tracks);
 
         String filename = resourcePath_;
 

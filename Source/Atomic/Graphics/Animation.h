@@ -178,6 +178,13 @@ public:
     /// Return a trigger point by index.
     AnimationTriggerPoint* GetTrigger(unsigned index);
 
+    // ATOMIC BEGIN
+
+    /// Set all animation tracks.
+    void SetTracks(const Vector<AnimationTrack>& tracks);
+
+    // ATOMIC END
+
 private:
     /// Animation name.
     String animationName_;

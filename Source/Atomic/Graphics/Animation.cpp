@@ -395,4 +395,22 @@ AnimationTriggerPoint* Animation::GetTrigger(unsigned index)
     return index < triggers_.Size() ? &triggers_[index] : (AnimationTriggerPoint*)0;
 }
 
+// ATOMIC BEGIN
+
+/// Set all animation tracks.
+void Animation::SetTracks(const Vector<AnimationTrack>& tracks)
+{
+    tracks_.Clear();
+
+    for (Vector<AnimationTrack>::ConstIterator itr = tracks.Begin(); itr != tracks.End(); itr++)
+    {
+        tracks_[itr->name_] = *itr;
+    }
+
+
+}
+
+// ATOMIC END
+
+
 }

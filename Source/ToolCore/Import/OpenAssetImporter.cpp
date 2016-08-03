@@ -1165,9 +1165,7 @@ bool OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &an
             tracks.Push(track);
         }
 
-// ATOMIC_UPDATE_FIX_BEGIN
-        // outAnim->SetTracks(tracks);
-// ATOMIC_UPDATE_FIX_END
+        outAnim->SetTracks(tracks);
 
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))

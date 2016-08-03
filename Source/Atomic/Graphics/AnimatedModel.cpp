@@ -111,6 +111,14 @@ void AnimatedModel::RegisterObject(Context* context)
         Variant::emptyVariantVector, AM_FILE);
     ATOMIC_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
+
+    // ATOMIC BEGIN
+
+    ATOMIC_ACCESSOR_ATTRIBUTE("Geometry Enabled", GetGeometryEnabledAttr, SetGeometryEnabledAttr, VariantVector,
+        Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+
+    // ATOMIC END
+
 }
 
 bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
