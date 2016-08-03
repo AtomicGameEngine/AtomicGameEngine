@@ -11,13 +11,7 @@ vec2 Noise(vec2 coord)
 // Adapted: http://callumhay.blogspot.com/2010/09/gaussian-blur-shader-glsl.html
 vec4 GaussianBlur(int blurKernelSize, vec2 blurDir, vec2 blurRadius, float sigma, sampler2D texSampler, vec2 texCoord)
 {
-
-#if defined(GL_ES)
-    // hardcoded for GL_ES to avoid loop comparison issue below
-    const int blurKernelSizeHalfSize = 3 / 2;
-#else
     int blurKernelSizeHalfSize = blurKernelSize / 2;
-#endif
 
     // Incremental Gaussian Coefficent Calculation (See GPU Gems 3 pp. 877 - 889)
     vec3 gaussCoeff;

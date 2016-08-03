@@ -6,7 +6,7 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    #ifndef BILLBOARD
+    #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
     #endif
     #ifndef NOUV
@@ -18,7 +18,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #ifdef NORMALMAP
+    #if defined(NORMALMAP) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -26,9 +26,9 @@ void VS(float4 iPos : POSITION,
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
-        float4x3 iModelInstance : TEXCOORD2,
+        float4x3 iModelInstance : TEXCOORD4,
     #endif
-    #ifdef BILLBOARD
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
     #ifndef NORMALMAP
@@ -101,7 +101,7 @@ void VS(float4 iPos : POSITION,
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            GetShadowPos(projWorldPos, oShadowPos);
+            GetShadowPos(projWorldPos, oNormal, oShadowPos);
         #endif
 
         #ifdef SPOTLIGHT
@@ -152,7 +152,7 @@ void PS(
         #ifdef SPOTLIGHT
             float4 iSpotPos : TEXCOORD5,
         #endif
-        #ifdef CUBEMASK
+        #ifdef POINTLIGHT
             float3 iCubeMaskVec : TEXCOORD5,
         #endif
     #else
@@ -225,43 +225,33 @@ void PS(
         float3 lightColor;
         float3 finalColor;
 
-        #if defined(LIGHTMAP) && defined(SHADOW)
-            float diff = 1-GetShadow(iShadowPos, iWorldPos.w);
+        float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
 
-            finalColor = diff * diffColor.rgb * cAmbientColor;
+        #ifdef SHADOW
+            diff *= GetShadow(iShadowPos, iWorldPos.w);
+        #endif
 
-            oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
-		#elif defined(LIGHTMAP)            
-            oColor = float4(0.0, 0.0, 0.0, 0.0);
+        #if defined(SPOTLIGHT)
+            lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+        #elif defined(CUBEMASK)
+            lightColor = SampleCube(LightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
         #else
-            float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
+            lightColor = cLightColor.rgb;
+        #endif
+    
+        #ifdef SPECULAR
+            float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
+            finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
+        #else
+            finalColor = diff * lightColor * diffColor.rgb;
+        #endif
 
-            #ifdef SHADOW
-                diff *= GetShadow(iShadowPos, iWorldPos.w);
-            #endif
-
-            #if defined(SPOTLIGHT)
-                lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
-            #elif defined(CUBEMASK)
-                lightColor = SampleCube(LightCubeMap, iCubeMaskVec).rgb * cLightColor.rgb;
-            #else
-                lightColor = cLightColor.rgb;
-            #endif
-        
-            #ifdef SPECULAR
-                float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
-                finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
-            #else
-                finalColor = diff * lightColor * diffColor.rgb;
-            #endif
-
-            #ifdef AMBIENT
-                finalColor += cAmbientColor * diffColor.rgb;
-                finalColor += cMatEmissiveColor;
-                oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
-            #else
-                oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
-            #endif
+        #ifdef AMBIENT
+            finalColor += cAmbientColor.rgb * diffColor.rgb;
+            finalColor += cMatEmissiveColor;
+            oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
+        #else
+            oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(PREPASS)
         // Fill light pre-pass G-Buffer
@@ -277,7 +267,7 @@ void PS(
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor.rgb * diffColor.rgb;
         #endif
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
@@ -300,7 +290,7 @@ void PS(
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor.rgb * diffColor.rgb;
         #endif
 
         #ifdef MATERIAL
@@ -312,16 +302,11 @@ void PS(
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif
 
+        #ifdef ENVCUBEMAP
+            finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
+        #endif
         #ifdef LIGHTMAP
             finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
-			
-			#ifdef ENVCUBEMAP
-				finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb * Sample2D(EmissiveMap, iTexCoord2).rgb;
-			#endif
-		#else
-			#ifdef ENVCUBEMAP
-				finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
-			#endif
         #endif
         #ifdef EMISSIVEMAP
             finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;
