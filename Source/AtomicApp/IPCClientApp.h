@@ -32,7 +32,7 @@ namespace Atomic
     class IPCClientApp : public AppBase
     {
 
-        OBJECT(IPCClientApp)
+        ATOMIC_OBJECT(IPCClientApp, AppBase)
 
     public:
         /// Construct.

@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintDistance2D::ConstraintDistance2D(Context* context) :
     Constraint2D(context),
@@ -48,7 +48,7 @@ ConstraintDistance2D::~ConstraintDistance2D()
 
 void ConstraintDistance2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintDistance2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintDistance2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Owner Body Anchor", GetOwnerBodyAnchor, SetOwnerBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

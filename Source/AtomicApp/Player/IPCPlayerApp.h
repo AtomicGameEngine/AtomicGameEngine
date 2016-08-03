@@ -31,7 +31,7 @@ namespace Atomic
 
     class IPCPlayerApp : public PlayerApp
     {
-        OBJECT(IPCPlayerApp)
+        ATOMIC_OBJECT(IPCPlayerApp, PlayerApp)
 
     public:
         /// Construct.

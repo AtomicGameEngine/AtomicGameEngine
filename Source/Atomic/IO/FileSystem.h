@@ -102,6 +102,19 @@ public:
     /// Return the application preferences directory.
     String GetAppPreferencesDir(const String& org, const String& app) const;
 
+// ATOMIC BEGIN
+
+    /// Check if a file or directory exists at the specified path
+    bool Exists(const String& pathName) const { return FileExists(pathName) || DirExists(pathName); }
+
+    bool CopyDir(const String& directoryIn, const String& directoryOut);
+
+    bool CreateDirs(const String& root, const String& subdirectory);
+    bool CreateDirsRecursive(const String& directoryIn);
+
+    bool RemoveDir(const String& directoryIn, bool recursive);
+// ATOMIC END
+
 private:
     /// Scan directory, called internally.
     void ScanDirInternal
@@ -150,5 +163,9 @@ ATOMIC_API String GetNativePath(const String& pathName);
 ATOMIC_API WString GetWideNativePath(const String& pathName);
 /// Return whether a path is absolute.
 ATOMIC_API bool IsAbsolutePath(const String& pathName);
+
+// ATOMIC BEGIN
+ATOMIC_API bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath);
+// ATOMIC END
 
 }

@@ -321,6 +321,30 @@ public:
     /// Maximum vector.
     Vector3 max_;
     float dummyMax_; // This is never used, but exists to pad the max_ value to four floats.
+
+    // ATOMIC BEGIN
+    float data_[6];
+
+    BoundingBox(float* data) :
+        min_(Vector3(data[0], data[1], data[2])),
+        max_(Vector3(data[3], data[4], data[5]))
+    {
+    }
+
+    float* Data() const
+    {
+        float* data = const_cast<BoundingBox*>(this)->data_;
+
+        data[0] = min_.x_;
+        data[1] = min_.y_;
+        data[2] = min_.z_;
+        data[3] = max_.x_;
+        data[4] = max_.y_;
+        data[5] = max_.z_;
+        return data;
+    }
+    // ATOMIC END
+
 };
 
 }

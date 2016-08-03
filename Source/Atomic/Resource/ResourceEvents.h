@@ -80,4 +80,17 @@ ATOMIC_EVENT(E_CHANGELANGUAGE, ChangeLanguage)
 {
 }
 
+// ATOMIC BEGIN
+
+/// Resource was renamed
+ATOMIC_EVENT(E_RENAMERESOURCENOTIFICATION, RenameResourceNotification)
+{
+    ATOMIC_PARAM(P_RESOURCEPATH, Path);                    // String
+    ATOMIC_PARAM(P_NEWRESOURCEPATH, NewPath);              // String
+    ATOMIC_PARAM(P_NEWNAME, NewName);                      // String
+    ATOMIC_PARAM(P_RESOURCE, Asset);                       // Resource pointer
+}
+
+// ATOMIC END
+
 }

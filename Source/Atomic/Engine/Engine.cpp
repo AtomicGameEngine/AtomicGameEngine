@@ -29,8 +29,6 @@
 #include "../Core/Profiler.h"
 #include "../Core/EventProfiler.h"
 #include "../Core/WorkQueue.h"
-#include "../Engine/Console.h"
-#include "../Engine/DebugHud.h"
 #include "../Engine/Engine.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Renderer.h"
@@ -961,5 +959,18 @@ void Engine::DoExit()
     emscripten_force_exit(EXIT_SUCCESS);    // Some how this is required to signal emrun to stop
 #endif
 }
+
+// ATOMIC BEGIN
+
+bool Engine::GetDebugBuild() const
+{
+#ifdef ATOMIC_DEBUG
+    return true;
+#else
+    return false;
+#endif
+}
+
+// ATOMIC END
 
 }

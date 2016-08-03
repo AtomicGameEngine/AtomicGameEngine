@@ -31,7 +31,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 static const Vector2 DEFAULT_BOX_SIZE(0.01f, 0.01f);
 
 CollisionBox2D::CollisionBox2D(Context* context) :
@@ -52,7 +52,7 @@ CollisionBox2D::~CollisionBox2D()
 
 void CollisionBox2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionBox2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<CollisionBox2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, Vector2, DEFAULT_BOX_SIZE, AM_DEFAULT);

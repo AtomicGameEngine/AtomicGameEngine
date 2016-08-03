@@ -29,7 +29,7 @@ namespace ToolCore
 
 class JSONImporter : public AssetImporter
 {
-    OBJECT(JSONImporter);
+    ATOMIC_OBJECT(JSONImporter, AssetImporter);
 
 public:
     /// Construct.

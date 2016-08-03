@@ -30,7 +30,7 @@ namespace Atomic
 
     class NETIPCPlayerApp : public IPCPlayerApp
     {
-        OBJECT(NETIPCPlayerApp)
+        ATOMIC_OBJECT(NETIPCPlayerApp,IPCPlayerApp)
 
     public:
 

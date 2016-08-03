@@ -39,7 +39,7 @@ class SelectionEditOp;
 
 class SceneEditHistory: public Object
 {
-    OBJECT(SceneEditHistory);
+    ATOMIC_OBJECT(SceneEditHistory, Object);
 
 public:
 

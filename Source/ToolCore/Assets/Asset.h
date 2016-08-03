@@ -40,7 +40,7 @@ class Asset : public Object
     friend class AssetDatabase;
     friend class AssetImporter;
 
-    OBJECT(Asset);
+    ATOMIC_OBJECT(Asset, Object);
 
 public:
     /// Construct.

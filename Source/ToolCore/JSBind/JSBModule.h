@@ -45,7 +45,7 @@ class JSBModule : public Object
     friend class JSModuleWriter;
     friend class CSModuleWriter;
 
-    OBJECT(JSBModule)
+    ATOMIC_OBJECT(JSBModule, Object)
 
 public:
 

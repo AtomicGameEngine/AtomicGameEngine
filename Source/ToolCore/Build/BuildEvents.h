@@ -29,17 +29,17 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-EVENT(E_BUILDCOMPLETE, BuildComplete)
+ATOMIC_EVENT(E_BUILDCOMPLETE, BuildComplete)
 {
-    PARAM(P_PLATFORMID, PlatformID); // unsigned (PLATFORMID)
-    PARAM(P_BUILDFOLDER, BuildFolder); // String
-    PARAM(P_MESSAGE, Message); // String
-    PARAM(P_SUCCESS, Success); // Bool
+    ATOMIC_PARAM(P_PLATFORMID, PlatformID); // unsigned (PLATFORMID)
+    ATOMIC_PARAM(P_BUILDFOLDER, BuildFolder); // String
+    ATOMIC_PARAM(P_MESSAGE, Message); // String
+    ATOMIC_PARAM(P_SUCCESS, Success); // Bool
 }
 
-EVENT(E_BUILDOUTPUT, BuildOutput)
+ATOMIC_EVENT(E_BUILDOUTPUT, BuildOutput)
 {
-    PARAM(P_TEXT, Text); // string
+    ATOMIC_PARAM(P_TEXT, Text); // string
 }
 
 }

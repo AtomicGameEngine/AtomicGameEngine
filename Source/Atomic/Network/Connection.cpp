@@ -62,6 +62,16 @@ PackageUpload::PackageUpload() :
 {
 }
 
+Connection::Connection(Context* context) : Object(context),
+    timeStamp_(0),
+    sendMode_(OPSM_NONE),
+    connectPending_(false),
+    sceneLoaded_(false),
+    logStatistics_(false)
+{
+
+}
+
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
     timeStamp_(0),

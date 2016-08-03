@@ -35,7 +35,7 @@ class SceneEditor3D;
 /// IMPORTANT: Other tool related components, which don't require the editor, should be in ToolCore
 class EditorComponent : public Component
 {
-    OBJECT(EditorComponent);
+    ATOMIC_OBJECT(EditorComponent, Component);
 
 public:
 

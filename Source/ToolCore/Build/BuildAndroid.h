@@ -33,7 +33,7 @@ class PlatformAndroid;
 
 class BuildAndroid : public BuildBase
 {
-    OBJECT(BuildAndroid);
+    ATOMIC_OBJECT(BuildAndroid, BuildBase);
 
 public:
 

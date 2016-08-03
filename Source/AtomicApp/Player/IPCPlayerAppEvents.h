@@ -27,37 +27,37 @@
 namespace Atomic
 {
 
-    EVENT(E_IPCPLAYERPAUSERESUMEREQUEST, IPCPlayerPauseResumeRequest)
+    ATOMIC_EVENT(E_IPCPLAYERPAUSERESUMEREQUEST, IPCPlayerPauseResumeRequest)
     {
 
     }
 
-    EVENT(E_IPCPLAYERUPDATESPAUSEDRESUMED, IPCPlayerUpdatesPausedResumed)
+    ATOMIC_EVENT(E_IPCPLAYERUPDATESPAUSEDRESUMED, IPCPlayerUpdatesPausedResumed)
     {
-        PARAM(P_PAUSED, Paused);            // bool
+        ATOMIC_PARAM(P_PAUSED, Paused);            // bool
     }
 
-    EVENT(E_IPCPLAYERPAUSESTEPREQUEST, IPCPlayerPauseStepRequest)
-    {
-
-    }
-
-    EVENT(E_IPCPLAYEREXITREQUEST, IPCPlayerExitRequest)
+    ATOMIC_EVENT(E_IPCPLAYERPAUSESTEPREQUEST, IPCPlayerPauseStepRequest)
     {
 
     }
 
-    EVENT(E_IPCPLAYERWINDOWCHANGED, IPCPlayerWindowChanged)
+    ATOMIC_EVENT(E_IPCPLAYEREXITREQUEST, IPCPlayerExitRequest)
     {
-        PARAM(P_POSX, PosX);
-        PARAM(P_POSY, PosY);
-        PARAM(P_WIDTH, Width);
-        PARAM(P_HEIGHT, Height);
-        PARAM(P_MONITOR, Monitor);
-        PARAM(P_MAXIMIZED, Maximized);
+
     }
 
-    EVENT(E_PLAYERQUIT, PlayerQuit)
+    ATOMIC_EVENT(E_IPCPLAYERWINDOWCHANGED, IPCPlayerWindowChanged)
+    {
+        ATOMIC_PARAM(P_POSX, PosX);
+        ATOMIC_PARAM(P_POSY, PosY);
+        ATOMIC_PARAM(P_WIDTH, Width);
+        ATOMIC_PARAM(P_HEIGHT, Height);
+        ATOMIC_PARAM(P_MONITOR, Monitor);
+        ATOMIC_PARAM(P_MAXIMIZED, Maximized);
+    }
+
+    ATOMIC_EVENT(E_PLAYERQUIT, PlayerQuit)
     {
 
     }

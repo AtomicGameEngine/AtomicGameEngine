@@ -2,7 +2,7 @@
 	"name" : "Physics",
 	"requires" : ["3D"],
 	"sources" : ["Source/Atomic/Physics"],
-	"includes" : ["<Atomic/Atomic3D/Model.h>"],
+	"includes" : ["<Atomic/Graphics/Model.h>"],
 	"classes" : ["CollisionShape", "Constraint", "PhysicsWorld", "RigidBody"],
  	"overloads" : {
 		"RigidBody" : {

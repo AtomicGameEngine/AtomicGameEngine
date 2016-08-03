@@ -31,7 +31,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 static const float DEFAULT_CLRCLE_RADIUS(0.01f);
 
 CollisionCircle2D::CollisionCircle2D(Context* context) :
@@ -49,7 +49,7 @@ CollisionCircle2D::~CollisionCircle2D()
 
 void CollisionCircle2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionCircle2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<CollisionCircle2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_CLRCLE_RADIUS, AM_DEFAULT);

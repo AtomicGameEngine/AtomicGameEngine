@@ -99,7 +99,7 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     }
     else
     {
-        LOGERRORF("SceneEditor3D::SceneEditor3D - Unable to get scene asset");
+        ATOMIC_LOGERRORF("SceneEditor3D::SceneEditor3D - Unable to get scene asset");
     }
 
     sceneView_->SetGravity(UI_GRAVITY_ALL);
@@ -111,26 +111,26 @@ SceneEditor3D::SceneEditor3D(Context* context, const String &fullpath, UITabCont
     gizmo3D_->Show();
     UpdateGizmoSnapSettings();
 
-    SubscribeToEvent(E_UPDATE, HANDLER(SceneEditor3D, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(SceneEditor3D, HandleUpdate));
 
-    SubscribeToEvent(E_GIZMOEDITMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
-    SubscribeToEvent(E_GIZMOAXISMODECHANGED, HANDLER(SceneEditor3D, HandleGizmoAxisModeChanged));
+    SubscribeToEvent(E_GIZMOEDITMODECHANGED, ATOMIC_HANDLER(SceneEditor3D, HandleGizmoEditModeChanged));
+    SubscribeToEvent(E_GIZMOAXISMODECHANGED, ATOMIC_HANDLER(SceneEditor3D, HandleGizmoAxisModeChanged));
 
     // FIXME: Set the size at the end of setup, so all children are updated accordingly
     // future size changes will be handled automatically
     IntRect rect = container_->GetContentRoot()->GetRect();
     rootContentWidget_->SetSize(rect.Width(), rect.Height());
 
-    SubscribeToEvent(E_PROJECTUSERPREFSAVED, HANDLER(SceneEditor3D, HandleUserPrefSaved));
+    SubscribeToEvent(E_PROJECTUSERPREFSAVED, ATOMIC_HANDLER(SceneEditor3D, HandleUserPrefSaved));
 
-    SubscribeToEvent(scene_, E_SCENEEDITNODECREATED, HANDLER(SceneEditor3D, HandleSceneEditNodeCreated));
+    SubscribeToEvent(scene_, E_SCENEEDITNODECREATED, ATOMIC_HANDLER(SceneEditor3D, HandleSceneEditNodeCreated));
 
-    SubscribeToEvent(E_EDITORPLAYERSTARTED, HANDLER(SceneEditor3D, HandlePlayStarted));
-    SubscribeToEvent(E_EDITORPLAYERSTOPPED, HANDLER(SceneEditor3D, HandlePlayStopped));
-    SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
+    SubscribeToEvent(E_EDITORPLAYERSTARTED, ATOMIC_HANDLER(SceneEditor3D, HandlePlayStarted));
+    SubscribeToEvent(E_EDITORPLAYERSTOPPED, ATOMIC_HANDLER(SceneEditor3D, HandlePlayStopped));
+    SubscribeToEvent(scene_, E_SCENEEDITSCENEMODIFIED, ATOMIC_HANDLER(SceneEditor3D, HandleSceneEditSceneModified));
 
-    SubscribeToEvent(scene_, E_CUBEMAPRENDERBEGIN, HANDLER(SceneEditor3D, HandleCubemapRenderBegin));
-    SubscribeToEvent(scene_, E_CUBEMAPRENDEREND, HANDLER(SceneEditor3D, HandleCubemapRenderEnd));
+    SubscribeToEvent(scene_, E_CUBEMAPRENDERBEGIN, ATOMIC_HANDLER(SceneEditor3D, HandleCubemapRenderBegin));
+    SubscribeToEvent(scene_, E_CUBEMAPRENDEREND, ATOMIC_HANDLER(SceneEditor3D, HandleCubemapRenderEnd));
 
     RegisterSceneEditor();
 

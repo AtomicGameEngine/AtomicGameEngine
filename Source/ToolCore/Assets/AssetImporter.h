@@ -38,7 +38,7 @@ class AssetImporter : public Object
 {
     friend class Asset;
 
-    OBJECT(AssetImporter);
+    ATOMIC_OBJECT(AssetImporter, Object);
 
 public:
     /// Construct.

@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintGear2D::ConstraintGear2D(Context* context) :
     Constraint2D(context)
@@ -45,7 +45,7 @@ ConstraintGear2D::~ConstraintGear2D()
 
 void ConstraintGear2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintGear2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintGear2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Ratio", GetRatio, SetRatio, float, 0.0f, AM_DEFAULT);

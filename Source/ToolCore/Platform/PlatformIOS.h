@@ -29,7 +29,7 @@ namespace ToolCore
 
 class PlatformIOS : public Platform
 {
-    OBJECT(PlatformIOS);
+    ATOMIC_OBJECT(PlatformIOS, Platform);
 
 public:
 

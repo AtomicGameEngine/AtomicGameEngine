@@ -280,6 +280,34 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
+
+    // ATOMIC BEGIN
+
+    // Handle mesh hiding
+    if (geometryDisabled_)
+    {
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            SourceBatch* batch = &batches_[i];
+            StaticModelGeometryData* data = &geometryData_[i];
+
+            if (batch->geometry_)
+                data->batchGeometry_ = batch->geometry_;
+
+            if (data->enabled_ && !batch->geometry_)
+            {
+                batch->geometry_ = data->batchGeometry_;
+            }
+            else if (!data->enabled_ && batch->geometry_)
+            {
+                data->batchGeometry_ = batch->geometry_;
+                batch->geometry_ = 0;
+            }
+        }
+    }
+
+    // ATOMIC END
+
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -340,6 +368,13 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         {
             geometries_[i] = geometries[i];
             geometryData_[i].center_ = geometryCenters[i];
+
+            // ATOMIC BEGIN
+
+            geometryData_[i].enabled_ = true;
+            geometryData_[i].batchGeometry_ = 0;
+
+            // ATOMIC END
         }
 
         // Copy geometry bone mappings

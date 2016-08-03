@@ -101,7 +101,7 @@ void EditorMode::HandleIPCWorkerExit(StringHash eventType, VariantMap& eventData
     }
     else
     {
-        LOGERROR("EditorMode::HandleIPCWorkerExit - Unknown Broker");
+        ATOMIC_LOGERROR("EditorMode::HandleIPCWorkerExit - Unknown Broker");
     }
 }
 
@@ -179,24 +179,24 @@ bool EditorMode::PlayProject(String addArgs, bool debug)
 
     String dump;
     dump.Join(vargs, " ");
-    LOGINFOF("Launching Broker %s %s", playerBinary.CString(), dump.CString());
+    ATOMIC_LOGINFOF("Launching Broker %s %s", playerBinary.CString(), dump.CString());
 
     IPC* ipc = GetSubsystem<IPC>();
     playerBroker_ = ipc->SpawnWorker(playerBinary, vargs);
 
     if (playerBroker_)
     {
-        SubscribeToEvent(playerBroker_, E_IPCWORKERSTART, HANDLER(EditorMode, HandleIPCWorkerStarted));
+        SubscribeToEvent(playerBroker_, E_IPCWORKERSTART, ATOMIC_HANDLER(EditorMode, HandleIPCWorkerStarted));
 
-        SubscribeToEvent(E_IPCPLAYERPAUSERESUMEREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseResumeRequest));
-        SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
-        SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
-        SubscribeToEvent(E_IPCPLAYEREXITREQUEST, HANDLER(EditorMode, HandleIPCPlayerExitRequest));
+        SubscribeToEvent(E_IPCPLAYERPAUSERESUMEREQUEST, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerPauseResumeRequest));
+        SubscribeToEvent(E_IPCPLAYERUPDATESPAUSEDRESUMED, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerUpdatesPausedResumed));
+        SubscribeToEvent(E_IPCPLAYERPAUSESTEPREQUEST, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerPauseStepRequest));
+        SubscribeToEvent(E_IPCPLAYEREXITREQUEST, ATOMIC_HANDLER(EditorMode, HandleIPCPlayerExitRequest));
     
 
-        SubscribeToEvent(playerBroker_, E_IPCJSERROR, HANDLER(EditorMode, HandleIPCJSError));
-        SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, HANDLER(EditorMode, HandleIPCWorkerExit));
-        SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, HANDLER(EditorMode, HandleIPCWorkerLog));
+        SubscribeToEvent(playerBroker_, E_IPCJSERROR, ATOMIC_HANDLER(EditorMode, HandleIPCJSError));
+        SubscribeToEvent(playerBroker_, E_IPCWORKEREXIT, ATOMIC_HANDLER(EditorMode, HandleIPCWorkerExit));
+        SubscribeToEvent(playerBroker_, E_IPCWORKERLOG, ATOMIC_HANDLER(EditorMode, HandleIPCWorkerLog));
     }
 
     return playerBroker_.NotNull();

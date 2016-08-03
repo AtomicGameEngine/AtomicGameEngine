@@ -44,9 +44,9 @@ namespace ToolCore
 
 AssetDatabase::AssetDatabase(Context* context) : Object(context)
 {
-    SubscribeToEvent(E_LOADFAILED, HANDLER(AssetDatabase, HandleResourceLoadFailed));
-    SubscribeToEvent(E_PROJECTLOADED, HANDLER(AssetDatabase, HandleProjectLoaded));
-    SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(AssetDatabase, HandleProjectUnloaded));
+    SubscribeToEvent(E_LOADFAILED, ATOMIC_HANDLER(AssetDatabase, HandleResourceLoadFailed));
+    SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(AssetDatabase, HandleProjectLoaded));
+    SubscribeToEvent(E_PROJECTUNLOADED, ATOMIC_HANDLER(AssetDatabase, HandleProjectUnloaded));
 }
 
 AssetDatabase::~AssetDatabase()
@@ -186,7 +186,7 @@ void AssetDatabase::PruneOrphanedDotAssetFiles()
 
     if (project_.Null())
     {
-        LOGDEBUG("AssetDatabase::PruneOrphanedDotAssetFiles - called without project loaded");
+        ATOMIC_LOGDEBUG("AssetDatabase::PruneOrphanedDotAssetFiles - called without project loaded");
         return;
     }
 
@@ -207,7 +207,7 @@ void AssetDatabase::PruneOrphanedDotAssetFiles()
         if (!fs->FileExists(assetFilename) && !fs->DirExists(assetFilename))
         {
 
-            LOGINFOF("Removing orphaned asset file: %s", dotAssetFilename.CString());
+            ATOMIC_LOGINFOF("Removing orphaned asset file: %s", dotAssetFilename.CString());
             fs->Delete(dotAssetFilename);
         }
 
@@ -465,7 +465,7 @@ void AssetDatabase::HandleProjectLoaded(StringHash eventType, VariantMap& eventD
 
     Scan();
 
-    SubscribeToEvent(E_FILECHANGED, HANDLER(AssetDatabase, HandleFileChanged));
+    SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(AssetDatabase, HandleFileChanged));
 }
 
 void AssetDatabase::HandleProjectUnloaded(StringHash eventType, VariantMap& eventData)

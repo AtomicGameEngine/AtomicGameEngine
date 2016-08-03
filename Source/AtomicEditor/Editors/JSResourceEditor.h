@@ -39,7 +39,7 @@ namespace AtomicEditor
 
 class JSResourceEditor: public ResourceEditor
 {
-    OBJECT(JSResourceEditor);
+    ATOMIC_OBJECT(JSResourceEditor, ResourceEditor);
 
 public:
 

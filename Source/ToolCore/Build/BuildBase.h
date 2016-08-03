@@ -41,7 +41,7 @@ class Project;
 
 class BuildBase : public Object
 {
-    OBJECT(BuildBase);
+    ATOMIC_OBJECT(BuildBase, Object);
 
 friend class AndroidProjectGenerator;
 

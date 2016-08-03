@@ -45,6 +45,11 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+const char* PAK_EXTENSION = ".pak";
+// ATOMIC END
+
+
 static const char* checkDirs[] =
 {
     "Fonts",

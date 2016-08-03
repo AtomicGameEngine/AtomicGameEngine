@@ -215,7 +215,7 @@ bool SelectionEditOp::Undo()
         bool changed = !CompareStates(enode->stateBegin_, enode->stateEnd_);
         if (changed && !node->Serializable::Load(enode->stateBegin_))
         {
-            LOGERRORF("Unable to Undo node serializable");
+            ATOMIC_LOGERRORF("Unable to Undo node serializable");
             return false;
         }
 
@@ -273,7 +273,7 @@ bool SelectionEditOp::Undo()
             changed = !CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_);
             if (changed && !component->Serializable::Load(ecomponent->stateBegin_))
             {
-                LOGERRORF("Unable to Undo component serializable");
+                ATOMIC_LOGERRORF("Unable to Undo component serializable");
                 return false;
             }
 
@@ -334,7 +334,7 @@ bool SelectionEditOp::Redo()
         bool changed = !CompareStates(enode->stateBegin_, enode->stateEnd_);
         if ( changed && !node->Serializable::Load(enode->stateEnd_))
         {
-            LOGERRORF("Unable to Redo node serializable");
+            ATOMIC_LOGERRORF("Unable to Redo node serializable");
             return false;
         }
 
@@ -391,7 +391,7 @@ bool SelectionEditOp::Redo()
             changed = !CompareStates(ecomponent->stateBegin_, ecomponent->stateEnd_);
             if ( changed && !component->Serializable::Load(ecomponent->stateEnd_))
             {
-                LOGERRORF("Unable to Redo component serializable");
+                ATOMIC_LOGERRORF("Unable to Redo component serializable");
                 return false;
             }
 

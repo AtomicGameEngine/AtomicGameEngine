@@ -26,7 +26,7 @@
 #include <Atomic/IPC/IPC.h>
 
 // This can be removed once bone hack is fixed
-#include <Atomic/Atomic3D/AnimatedModel.h>
+#include <Atomic/Graphics/AnimatedModel.h>
 
 #include <ToolCore/License/LicenseSystem.h>
 #include <ToolCore/ToolSystem.h>
@@ -152,10 +152,6 @@ namespace AtomicEditor
 
     void AEEditorApp::Start()
     {
-        // Do not create bone structure by default when in the editor
-        // this can be toggled temporarily, for example to setup an animation preview
-        AnimatedModel::SetBoneCreationEnabled(false);
-
         GetSubsystem<AEEditorPrefs>()->ValidateWindow();
 
         context_->RegisterSubsystem(new EditorMode(context_));

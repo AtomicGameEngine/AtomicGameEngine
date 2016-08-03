@@ -62,7 +62,7 @@ namespace Atomic
 
                 if (argument == "--log-std")
                 {
-                    SubscribeToEvent(E_LOGMESSAGE, HANDLER(AppBase, HandleLogMessage));
+                    SubscribeToEvent(E_LOGMESSAGE, ATOMIC_HANDLER(AppBase, HandleLogMessage));
                 }
             }
         }
@@ -89,7 +89,7 @@ namespace Atomic
         context_->RegisterSubsystem(javascript);
         vm_ = javascript->InstantiateVM("MainVM");
 
-        SubscribeToEvent(E_JSERROR, HANDLER(AppBase, HandleJSError));
+        SubscribeToEvent(E_JSERROR, ATOMIC_HANDLER(AppBase, HandleJSError));
 
     }
 
@@ -173,7 +173,7 @@ namespace Atomic
         String errorString = ToString("%s - %s - Line: %i",
             errFilename.CString(), errMessage.CString(), errLineNumber);
 
-        LOGERROR(errorString);
+        ATOMIC_LOGERROR(errorString);
 
     }
 

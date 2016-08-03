@@ -39,7 +39,7 @@ class SceneEditor3D;
 
 class SceneSelection: public Object
 {
-    OBJECT(SceneSelection);
+    ATOMIC_OBJECT(SceneSelection, Object);
 
 public:
 

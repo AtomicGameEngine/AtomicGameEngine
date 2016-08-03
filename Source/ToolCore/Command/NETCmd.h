@@ -35,7 +35,7 @@ class NETCmd: public Command
 {
     friend class AtomicNETService;
 
-    OBJECT(NETCmd)
+    ATOMIC_OBJECT(NETCmd, Command)
 
 public:
 

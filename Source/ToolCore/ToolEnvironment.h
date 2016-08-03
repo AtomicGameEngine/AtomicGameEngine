@@ -39,7 +39,7 @@ namespace ToolCore
 
 class ToolEnvironment : public Object
 {
-    OBJECT(ToolEnvironment)
+    ATOMIC_OBJECT(ToolEnvironment, Object)
 
 public:
 

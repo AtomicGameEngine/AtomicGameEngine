@@ -309,4 +309,37 @@ void RegisterGraphicsLibrary(Context* context)
     Zone::RegisterObject(context);
 }
 
+// ATOMIC BEGIN
+int Graphics::GetCurrentMonitor()
+{
+    return SDL_GetWindowDisplayIndex((SDL_Window*) this->GetSDLWindow());
+}
+
+int Graphics::GetNumMonitors()
+{
+    return SDL_GetNumVideoDisplays();
+}
+bool Graphics::GetMaximized()
+{
+    if (!window_)
+        return false;
+
+    return SDL_GetWindowFlags(window_) & SDL_WINDOW_MAXIMIZED;
+}
+IntVector2 Graphics::GetMonitorResolution(int monitorId) const
+{
+    SDL_DisplayMode mode;
+    SDL_GetDesktopDisplayMode(monitorId, &mode);
+    return IntVector2(mode.w, mode.h);
+}
+
+void Graphics::RaiseWindow()
+{
+    if (window_)
+        SDL_RaiseWindow(window_);
+}
+
+
+// ATOMIC END
+
 }

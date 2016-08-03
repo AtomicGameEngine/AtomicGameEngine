@@ -36,7 +36,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 extern const char* blendModeNames[];
 
 StaticSprite2D::StaticSprite2D(Context* context) :
@@ -58,7 +58,7 @@ StaticSprite2D::~StaticSprite2D()
 
 void StaticSprite2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<StaticSprite2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<StaticSprite2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_COPY_BASE_ATTRIBUTES(Drawable2D);

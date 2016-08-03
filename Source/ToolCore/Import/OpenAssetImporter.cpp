@@ -31,9 +31,9 @@
 #include <Atomic/Resource/XMLFile.h>
 #include <Atomic/Resource/ResourceCache.h>
 
-#include <Atomic/Atomic3D/AnimatedModel.h>
-#include <Atomic/Atomic3D/Animation.h>
-#include <Atomic/Atomic3D/AnimationController.h>
+#include <Atomic/Graphics/AnimatedModel.h>
+#include <Atomic/Graphics/Animation.h>
+#include <Atomic/Graphics/AnimationController.h>
 
 #include <Atomic/Graphics/Geometry.h>
 #include <Atomic/Graphics/IndexBuffer.h>
@@ -1165,7 +1165,9 @@ bool OpenAssetImporter::BuildAndSaveAnimations(OutModel* model, const String &an
             tracks.Push(track);
         }
 
-        outAnim->SetTracks(tracks);
+// ATOMIC_UPDATE_FIX_BEGIN
+        // outAnim->SetTracks(tracks);
+// ATOMIC_UPDATE_FIX_END
 
         File outFile(context_);
         if (!outFile.Open(animOutName, FILE_WRITE))

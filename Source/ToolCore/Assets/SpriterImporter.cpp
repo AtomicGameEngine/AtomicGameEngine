@@ -97,7 +97,7 @@ Node* SpriterImporter::InstantiateNode(Node* parent, const String& name)
 
     if (animationSet->GetNumAnimations())
     {
-        animationName = animationSet->GetAnimation(0)->GetName();
+        animationName = animationSet->GetAnimation(0);
     }
 
     Node* node = parent->CreateChild(name);
@@ -107,7 +107,7 @@ Node* SpriterImporter::InstantiateNode(Node* parent, const String& name)
     if (!animationName.Length())
         sprite->SetAnimationSet(animationSet);
     else
-        sprite->SetAnimation(animationSet, animationName);
+        sprite->SetAnimation(animationName);
 
     return node;
 

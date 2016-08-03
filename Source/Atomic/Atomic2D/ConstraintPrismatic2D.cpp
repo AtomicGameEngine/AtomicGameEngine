@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintPrismatic2D::ConstraintPrismatic2D(Context* context) :
     Constraint2D(context),
@@ -47,7 +47,7 @@ ConstraintPrismatic2D::~ConstraintPrismatic2D()
 
 void ConstraintPrismatic2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintPrismatic2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintPrismatic2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

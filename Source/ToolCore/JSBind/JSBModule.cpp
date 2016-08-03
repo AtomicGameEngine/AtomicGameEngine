@@ -408,13 +408,13 @@ bool JSBModule::Load(const String& jsonFilename)
 {
     JSBind* jsbind = GetSubsystem<JSBind>();
 
-    LOGINFOF("Loading Module: %s", jsonFilename.CString());
+    ATOMIC_LOGINFOF("Loading Module: %s", jsonFilename.CString());
 
     SharedPtr<File> jsonFile(new File(context_, jsonFilename));
 
     if (!jsonFile->IsOpen())
     {
-        LOGERRORF("Unable to open module json: %s", jsonFilename.CString());
+        ATOMIC_LOGERRORF("Unable to open module json: %s", jsonFilename.CString());
         return false;
     }
 
@@ -422,7 +422,7 @@ bool JSBModule::Load(const String& jsonFilename)
 
     if (!moduleJSON_->BeginLoad(*jsonFile))
     {
-        LOGERRORF("Unable to parse module json: %s", jsonFilename.CString());
+        ATOMIC_LOGERRORF("Unable to parse module json: %s", jsonFilename.CString());
         return false;
     }
 

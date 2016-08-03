@@ -133,14 +133,14 @@ namespace ToolCore
 
         if (eventData[P_SUCCESS].GetBool())
         {
-            LOGINFOF("NETBuild Success for project");
+            ATOMIC_LOGINFOF("NETBuild Success for project");
         }
         else
         {
             const String& errorText = eventData[P_ERRORTEXT].GetString();
 
-            LOGERRORF("\n%s\n", errorText.CString());
-            LOGERRORF("NETBuild Error for project");
+            ATOMIC_LOGERRORF("\n%s\n", errorText.CString());
+            ATOMIC_LOGERRORF("NETBuild Error for project");
         }
 
     }
@@ -153,7 +153,7 @@ namespace ToolCore
         {
             if (!GenerateSolution())
             {
-                LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
+                ATOMIC_LOGERRORF("NETProjectSystem::BuildAtomicProject - solutionPath does not exist: %s", solutionPath_.CString());
                 return;
             }
         }
@@ -184,7 +184,7 @@ namespace ToolCore
 
         if (!project)
         {
-            LOGERRORF("NETProjectSystem::GenerateSolution - No Project Loaded");
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - No Project Loaded");
             return false;
         }
 
@@ -194,13 +194,13 @@ namespace ToolCore
 
         if (!gen->LoadProject(project))
         {
-            LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Load Project");
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Load Project");
             return false;
         }
 
         if (!gen->Generate())
         {
-            LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Generate Project");
+            ATOMIC_LOGERRORF("NETProjectSystem::GenerateSolution - Unable to Generate Project");
             return false;
         }
 

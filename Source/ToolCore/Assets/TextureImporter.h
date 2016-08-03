@@ -29,7 +29,7 @@ namespace ToolCore
 
 class TextureImporter : public AssetImporter
 {
-    OBJECT(TextureImporter);
+    ATOMIC_OBJECT(TextureImporter, AssetImporter);
 
 public:
     /// Construct.

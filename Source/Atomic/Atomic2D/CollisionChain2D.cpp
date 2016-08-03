@@ -33,7 +33,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 CollisionChain2D::CollisionChain2D(Context* context) :
     CollisionShape2D(context),
@@ -48,7 +48,7 @@ CollisionChain2D::~CollisionChain2D()
 
 void CollisionChain2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionChain2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<CollisionChain2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Loop", GetLoop, SetLoop, bool, false, AM_DEFAULT);

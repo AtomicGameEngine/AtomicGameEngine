@@ -93,7 +93,7 @@ CurlManager::CurlManager(Context* context) :
     Object(context)
 {
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    SubscribeToEvent(E_UPDATE, HANDLER(CurlManager, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(CurlManager, HandleUpdate));
 }
 
 CurlManager::~CurlManager()

@@ -198,6 +198,12 @@ public:
     /// Precalculate the mip levels. Used by asynchronous texture loading.
     void PrecalculateLevels();
 
+    // ATOMIC BEGIN
+    /// Whether this texture has an alpha channel
+    bool HasAlphaChannel() const;
+    bool SaveDDS(const String& fileName) const;
+    // ATOMIC END
+
 private:
     /// Decode an image using stb_image.
     static unsigned char* GetImageData(Deserializer& source, int& width, int& height, unsigned& components);

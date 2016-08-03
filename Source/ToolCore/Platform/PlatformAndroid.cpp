@@ -106,7 +106,7 @@ void PlatformAndroid::RefreshAndroidTargets()
 
     if (!fileSystem->DirExists(androidSDKPath))
     {
-        LOGERRORF("The Android SDK path %s does not exist", androidSDKPath.CString());
+        ATOMIC_LOGERRORF("The Android SDK path %s does not exist", androidSDKPath.CString());
         return;
     }
 
@@ -125,8 +125,8 @@ void PlatformAndroid::RefreshAndroidTargets()
     if (refreshAndroidTargetsProcess_.NotNull())
     {
 
-        SubscribeToEvent(refreshAndroidTargetsProcess_, E_SUBPROCESSCOMPLETE, HANDLER(PlatformAndroid, HandleRefreshAndroidTargetsEvent));
-        SubscribeToEvent(refreshAndroidTargetsProcess_, E_SUBPROCESSOUTPUT, HANDLER(PlatformAndroid, HandleRefreshAndroidTargetsEvent));
+        SubscribeToEvent(refreshAndroidTargetsProcess_, E_SUBPROCESSCOMPLETE, ATOMIC_HANDLER(PlatformAndroid, HandleRefreshAndroidTargetsEvent));
+        SubscribeToEvent(refreshAndroidTargetsProcess_, E_SUBPROCESSOUTPUT, ATOMIC_HANDLER(PlatformAndroid, HandleRefreshAndroidTargetsEvent));
 
 
     }

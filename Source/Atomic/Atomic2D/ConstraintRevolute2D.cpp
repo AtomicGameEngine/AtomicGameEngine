@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintRevolute2D::ConstraintRevolute2D(Context* context) :
     Constraint2D(context),
@@ -46,7 +46,7 @@ ConstraintRevolute2D::~ConstraintRevolute2D()
 
 void ConstraintRevolute2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintRevolute2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintRevolute2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

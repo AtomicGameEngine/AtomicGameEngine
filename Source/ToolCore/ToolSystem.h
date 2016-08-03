@@ -36,7 +36,7 @@ class Project;
 
 class ToolSystem : public Object
 {
-    OBJECT(ToolSystem);
+    ATOMIC_OBJECT(ToolSystem, Object);
 
 public:
 

@@ -132,7 +132,7 @@ namespace Atomic
                         value.CString(), value.CString(), value.CString(), value.CString());
 #endif
 
-                    LOGINFOF("Adding ResourcePaths: %s", resourcePaths.CString());
+                    ATOMIC_LOGINFOF("Adding ResourcePaths: %s", resourcePaths.CString());
 
                     engineParameters_["ResourcePaths"] = resourcePaths;
 
@@ -161,13 +161,13 @@ namespace Atomic
 
         if (IPC::ProcessArguments(arguments_, id, fd_[0], fd_[1]))
         {
-            SubscribeToEvent(E_IPCINITIALIZE, HANDLER(IPCPlayerApp, HandleIPCInitialize));
-            SubscribeToEvent(E_LOGMESSAGE, HANDLER(IPCPlayerApp, HandleLogMessage));
-            SubscribeToEvent(E_JSERROR, HANDLER(IPCPlayerApp, HandleJSError));
-            SubscribeToEvent(E_EXITREQUESTED, HANDLER(IPCPlayerApp, HandleExitRequest));
-            SubscribeToEvent(E_SCREENMODE, HANDLER(IPCPlayerApp, HandlePlayerWindowChanged));
-            SubscribeToEvent(E_WINDOWPOS, HANDLER(IPCPlayerApp, HandlePlayerWindowChanged));
-            SubscribeToEvent(E_UPDATESPAUSEDRESUMED, HANDLER(IPCPlayerApp, HandleUpdatesPausedResumed));
+            SubscribeToEvent(E_IPCINITIALIZE, ATOMIC_HANDLER(IPCPlayerApp, HandleIPCInitialize));
+            SubscribeToEvent(E_LOGMESSAGE, ATOMIC_HANDLER(IPCPlayerApp, HandleLogMessage));
+            SubscribeToEvent(E_JSERROR, ATOMIC_HANDLER(IPCPlayerApp, HandleJSError));
+            SubscribeToEvent(E_EXITREQUESTED, ATOMIC_HANDLER(IPCPlayerApp, HandleExitRequest));
+            SubscribeToEvent(E_SCREENMODE, ATOMIC_HANDLER(IPCPlayerApp, HandlePlayerWindowChanged));
+            SubscribeToEvent(E_WINDOWPOS, ATOMIC_HANDLER(IPCPlayerApp, HandlePlayerWindowChanged));
+            SubscribeToEvent(E_UPDATESPAUSEDRESUMED, ATOMIC_HANDLER(IPCPlayerApp, HandleUpdatesPausedResumed));
 
             if (ipc_->InitWorker((unsigned)id, fd_[0], fd_[1]))
             {
@@ -175,7 +175,7 @@ namespace Atomic
             }
             else if (subprocess_)
             {
-                LOGERROR("IPCPlayerApp::Start() - Unable to initialize IPC Worker");
+                ATOMIC_LOGERROR("IPCPlayerApp::Start() - Unable to initialize IPC Worker");
             }
         }
 
@@ -188,7 +188,7 @@ namespace Atomic
                 SendEvent(E_EXITREQUESTED);
             }
 
-            SubscribeToEvent(E_PLAYERQUIT, HANDLER(IPCPlayerApp, HandleQuit));
+            SubscribeToEvent(E_PLAYERQUIT, ATOMIC_HANDLER(IPCPlayerApp, HandleQuit));
         }
 
         
@@ -237,7 +237,7 @@ namespace Atomic
 
             ipc_->SendEventToBroker(E_IPCJSERROR, ipcErrorData);
 
-            LOGERROR("SENDING E_IPCJSERROR");
+            ATOMIC_LOGERROR("SENDING E_IPCJSERROR");
 
         }
 

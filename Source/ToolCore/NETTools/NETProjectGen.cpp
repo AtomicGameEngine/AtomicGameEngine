@@ -81,7 +81,7 @@ namespace ToolCore
 
         if (!fileSystem->DirExists(path))
         {
-            LOGERRORF("Unable to create dir: %s", path.CString());
+            ATOMIC_LOGERRORF("Unable to create dir: %s", path.CString());
             return false;
         }
 
@@ -174,7 +174,7 @@ namespace ToolCore
 
                 if (!xmlFile.FromString(ref))
                 {
-                    LOGERROR("NETCSProject::CreateReferencesItemGroup - Unable to parse reference XML");
+                    ATOMIC_LOGERROR("NETCSProject::CreateReferencesItemGroup - Unable to parse reference XML");
                 }
                 
 
@@ -235,7 +235,7 @@ namespace ToolCore
             XMLFile xmlFile(context_);
             if (!xmlFile.FromString(packages_[i]))
             {
-                LOGERROR("NETCSProject::CreatePackagesItemGroup - Unable to parse package xml");
+                ATOMIC_LOGERROR("NETCSProject::CreatePackagesItemGroup - Unable to parse package xml");
             }
 
             xref = packageRoot.CreateChild("package");
@@ -510,7 +510,7 @@ namespace ToolCore
 
             if (packages_.Find(package) != packages_.End())
             {
-                LOGERRORF("Duplicate package found %s", package.CString());
+                ATOMIC_LOGERRORF("Duplicate package found %s", package.CString());
                 continue;
             }
 
@@ -784,7 +784,7 @@ namespace ToolCore
 
         if (!fileSystem->FileExists(atomicNETAssembly))
         {
-            LOGERRORF("NETProjectGen::LoadProject - AtomicNET assembly does not exist: %s", atomicNETAssembly.CString());
+            ATOMIC_LOGERRORF("NETProjectGen::LoadProject - AtomicNET assembly does not exist: %s", atomicNETAssembly.CString());
             return false;
         }
 
@@ -809,7 +809,7 @@ namespace ToolCore
     {
         if (solution_.Null())
         {
-            LOGERROR("NETProjectGen::GetRequiresNuGet() - called without a solution loaded");
+            ATOMIC_LOGERROR("NETProjectGen::GetRequiresNuGet() - called without a solution loaded");
             return false;
         }
 

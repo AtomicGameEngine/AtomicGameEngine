@@ -753,4 +753,31 @@ unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
     return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
 }
 
+// ATOMIC BEGIN
+
+bool Model::SetGeometryName(unsigned index, const String& name)
+{
+    if (index >= geometryNames_.Size())
+    {
+        ATOMIC_LOGERROR("Geometry name index out of bounds");
+        return false;
+    }
+
+    geometryNames_[index] = name;
+
+    return true;
+
+}
+
+const String& Model::GetGeometryName(unsigned index) const
+{
+    if (index >= geometryNames_.Size())
+        return String::EMPTY;
+
+    return geometryNames_[index];
+
+}
+
+// ATOMIC END
+
 }

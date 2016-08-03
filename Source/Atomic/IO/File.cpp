@@ -567,6 +567,23 @@ void File::ReadText(String& text)
     Read((void*)text.CString(), size_);
 }
 
+bool File::Copy(File* srcFile)
+{
+    if (!srcFile || !srcFile->IsOpen() || srcFile->GetMode() != FILE_READ)
+        return false;
+
+    if (!IsOpen() || GetMode() != FILE_WRITE)
+        return false;
+
+    unsigned fileSize = srcFile->GetSize();
+    SharedArrayPtr<unsigned char> buffer(new unsigned char[fileSize]);
+
+    unsigned bytesRead = srcFile->Read(buffer.Get(), fileSize);
+    unsigned bytesWritten = Write(buffer.Get(), fileSize);
+    return bytesRead == fileSize && bytesWritten == fileSize;
+
+}
+
 // ATOMIC END
 
 }

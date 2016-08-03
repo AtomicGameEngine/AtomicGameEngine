@@ -31,7 +31,7 @@ class Project;
 
 class BuildWindows : public BuildBase
 {
-    OBJECT(BuildWindows);
+    ATOMIC_OBJECT(BuildWindows, BuildBase);
 
 public:
 

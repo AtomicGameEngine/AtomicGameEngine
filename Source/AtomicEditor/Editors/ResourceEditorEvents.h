@@ -27,13 +27,13 @@
 namespace AtomicEditor
 {
 
-EVENT(E_EDITORRESOURCECLOSE, EditorResourceClose)
+ATOMIC_EVENT(E_EDITORRESOURCECLOSE, EditorResourceClose)
 {
-PARAM(P_EDITOR, Editor);            // ResourceEditor
-PARAM(P_NAVIGATE, NavigateToAvailableResource); // bool
+    ATOMIC_PARAM(P_EDITOR, Editor);            // ResourceEditor
+    ATOMIC_PARAM(P_NAVIGATE, NavigateToAvailableResource); // bool
 }
 
-EVENT(E_EDITORRESOURCECLOSECANCELED, EditorResourceCloseCanceled)
+ATOMIC_EVENT(E_EDITORRESOURCECLOSECANCELED, EditorResourceCloseCanceled)
 {
 
 }

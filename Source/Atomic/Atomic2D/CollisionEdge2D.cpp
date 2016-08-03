@@ -31,7 +31,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 static const Vector2 DEFAULT_VERTEX1(-0.01f, 0.0f);
 static const Vector2 DEFAULT_VERTEX2(0.01f, 0.0f);
 
@@ -52,7 +52,7 @@ CollisionEdge2D::~CollisionEdge2D()
 
 void CollisionEdge2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionEdge2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<CollisionEdge2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Vertex 1", GetVertex1, SetVertex1, Vector2, DEFAULT_VERTEX1, AM_DEFAULT);

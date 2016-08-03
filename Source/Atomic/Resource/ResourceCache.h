@@ -301,4 +301,10 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 /// Register Resource library subsystems and objects.
 void ATOMIC_API RegisterResourceLibrary(Context* context);
 
+// ATOMIC BEGIN
+/// Extension used for package files
+extern const char* PAK_EXTENSION;
+// ATOMIC END
+
+
 }

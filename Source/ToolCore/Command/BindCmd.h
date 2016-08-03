@@ -31,7 +31,7 @@ namespace ToolCore
 
 class BindCmd: public Command
 {
-    OBJECT(BindCmd);
+    ATOMIC_OBJECT(BindCmd, Command);
 
 public:
 

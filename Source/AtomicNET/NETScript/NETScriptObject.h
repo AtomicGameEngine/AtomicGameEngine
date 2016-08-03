@@ -32,7 +32,7 @@ namespace Atomic
     class NETScriptObject : public Object
     {
 
-        OBJECT(NETScriptObject)
+        ATOMIC_OBJECT(NETScriptObject, Object)
 
     public:
         /// Construct.

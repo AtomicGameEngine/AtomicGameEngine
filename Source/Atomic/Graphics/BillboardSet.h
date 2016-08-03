@@ -35,8 +35,41 @@ class IndexBuffer;
 class VertexBuffer;
 
 /// One billboard in the billboard set.
-struct ATOMIC_API Billboard
+class ATOMIC_API Billboard : public RefCounted
 {
+    friend class BillboardSet;
+    friend class ParticleEmitter;
+
+    ATOMIC_REFCOUNTED(Billboard);
+
+public:
+    Billboard();
+    virtual ~Billboard();
+
+    const Vector3& GetPosition() const { return position_; }
+    void SetPosition(Vector3 &position) { position_ = position; }
+
+    const Vector2 GetSize() const { return size_; }
+    void SetSize(Vector2 &size) { size_ = size; }
+
+    const Rect& GetUV() const { return uv_; }
+    void SetUV(Rect &uv) { uv_ = uv; }
+
+    const Color& GetColor() const { return color_; }
+    void SetColor(Color &color) { color_ = color; }
+
+    float GetRotation() const { return rotation_; }
+    void SetRotation(float rotation) { rotation_ = rotation; }
+
+    const Vector3& GetDirection() const { return direction_; }
+    void SetDirection(const Vector3& direction) { direction_ = direction; }
+
+    bool IsEnabled() const { return enabled_; }
+    void SetEnabled(bool enabled) { enabled_ = enabled; }
+
+    float GetSortDistance() const { return sortDistance_; }
+    void SetSortDistance(float sortDistance) { sortDistance_ = sortDistance; }
+
     /// Position.
     Vector3 position_;
     /// Two-dimensional size. If BillboardSet has fixed screen size enabled, this is measured in pixels instead of world units.
@@ -56,6 +89,7 @@ struct ATOMIC_API Billboard
     /// Scale factor for fixed screen size mode. Used internally.
     float screenScaleFactor_;
 };
+
 
 static const unsigned MAX_BILLBOARDS = 65536 / 4;
 
@@ -107,7 +141,7 @@ public:
     unsigned GetNumBillboards() const { return billboards_.Size(); }
 
     /// Return all billboards.
-    PODVector<Billboard>& GetBillboards() { return billboards_; }
+    Vector<SharedPtr<Billboard>>& GetBillboards() { return billboards_; }
 
     /// Return billboard by index.
     Billboard* GetBillboard(unsigned index);
@@ -150,7 +184,9 @@ protected:
     void MarkPositionsDirty();
 
     /// Billboards.
-    PODVector<Billboard> billboards_;
+    // ATOMIC BEGIN
+    Vector<SharedPtr<Billboard>> billboards_;
+    // ATOMIC END
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.

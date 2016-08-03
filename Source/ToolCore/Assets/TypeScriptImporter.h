@@ -29,7 +29,7 @@ namespace ToolCore
 
 class TypeScriptImporter : public AssetImporter
 {
-    OBJECT(TypeScriptImporter);
+    ATOMIC_OBJECT(TypeScriptImporter, AssetImporter);
 
 public:
     /// Construct.

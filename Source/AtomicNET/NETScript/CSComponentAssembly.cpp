@@ -137,7 +137,7 @@ namespace Atomic
 
                     if (varType == VAR_NONE)
                     {
-                        LOGERRORF("Component Class %s contains unmappable type %s in field %s",
+                        ATOMIC_LOGERRORF("Component Class %s contains unmappable type %s in field %s",
                             className.CString(), typeName.CString(), fieldName.CString());
 
                         continue;

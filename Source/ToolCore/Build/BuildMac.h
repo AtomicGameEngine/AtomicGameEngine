@@ -31,7 +31,7 @@ class Project;
 
 class BuildMac : public BuildBase
 {
-    OBJECT(BuildMac);
+    ATOMIC_OBJECT(BuildMac, BuildBase);
 
 public:
 

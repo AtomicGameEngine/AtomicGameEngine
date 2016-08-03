@@ -41,7 +41,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 extern const char* blendModeNames[];
 
 const char* loopModeNames[] =
@@ -72,7 +72,7 @@ AnimatedSprite2D::~AnimatedSprite2D()
 
 void AnimatedSprite2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<AnimatedSprite2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_COPY_BASE_ATTRIBUTES(StaticSprite2D);
     ATOMIC_REMOVE_ATTRIBUTE("Sprite");

@@ -116,6 +116,10 @@ public:
     /// Return the fullpath to the file
     const String& GetFullPath() const { return fullPath_; }
 
+    /// Copy a file from a source file, must be opened and FILE_WRITE
+    /// Unlike FileSystem.Copy this copy works when the source file is in a package file
+    bool Copy(File* srcFile);
+
     // ATOMIC END
 
 private:

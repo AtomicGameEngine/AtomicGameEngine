@@ -31,7 +31,7 @@ class Project;
 
 class BuildIOS : public BuildBase
 {
-    OBJECT(BuildIOS);
+    ATOMIC_OBJECT(BuildIOS, BuildBase);
 
 public:
 

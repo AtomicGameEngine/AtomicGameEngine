@@ -223,6 +223,20 @@ ATOMIC_EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 
+// ATOMIC BEGIN
+
+/// Application pause requested.
+ATOMIC_EVENT(E_PAUSERESUMEREQUESTED, PauseResumeRequested)
+{
+}
+
+/// Application step frame while paused requested.
+ATOMIC_EVENT(E_PAUSESTEPREQUESTED, PauseStepRequested)
+{
+}
+
+// ATOMIC END
+
 static const int MOUSEB_LEFT = SDL_BUTTON_LMASK;
 static const int MOUSEB_MIDDLE = SDL_BUTTON_MMASK;
 static const int MOUSEB_RIGHT = SDL_BUTTON_RMASK;

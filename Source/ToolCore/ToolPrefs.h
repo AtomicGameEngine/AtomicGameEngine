@@ -31,7 +31,7 @@ namespace ToolCore
 
 class ToolPrefs : public Object
 {
-    OBJECT(ToolPrefs)
+    ATOMIC_OBJECT(ToolPrefs, Object)
 
 public:
 

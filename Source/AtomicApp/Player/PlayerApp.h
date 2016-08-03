@@ -29,7 +29,7 @@ namespace Atomic
 
     class PlayerApp : public AppBase
     {
-        OBJECT(PlayerApp)
+        ATOMIC_OBJECT(PlayerApp, AppBase)
 
     public:
         /// Construct.

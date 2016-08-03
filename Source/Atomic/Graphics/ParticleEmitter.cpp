@@ -173,16 +173,16 @@ void ParticleEmitter::Update(const FrameInfo& frame)
     for (unsigned i = 0; i < particles_.Size(); ++i)
     {
         Particle& particle = particles_[i];
-        Billboard& billboard = billboards_[i];
+        Billboard* billboard = billboards_[i];
 
-        if (billboard.enabled_)
+        if (billboard->enabled_)
         {
             needCommit = true;
 
             // Time to live
             if (particle.timer_ >= particle.timeToLive_)
             {
-                billboard.enabled_ = false;
+                billboard->enabled_ = false;
                 continue;
             }
             particle.timer_ += lastTimeStep_;
@@ -203,11 +203,11 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                 Vector3 force = -dampingForce * particle.velocity_;
                 particle.velocity_ += lastTimeStep_ * force;
             }
-            billboard.position_ += lastTimeStep_ * particle.velocity_ * scaleVector;
-            billboard.direction_ = particle.velocity_.Normalized();
+            billboard->position_ += lastTimeStep_ * particle.velocity_ * scaleVector;
+            billboard->direction_ = particle.velocity_.Normalized();
 
             // Rotation
-            billboard.rotation_ += lastTimeStep_ * particle.rotationSpeed_;
+            billboard->rotation_ += lastTimeStep_ * particle.rotationSpeed_;
 
             // Scaling
             float sizeAdd = effect_->GetSizeAdd();
@@ -219,7 +219,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                     particle.scale_ = 0.0f;
                 if (sizeMul != 1.0f)
                     particle.scale_ *= (lastTimeStep_ * (sizeMul - 1.0f)) + 1.0f;
-                billboard.size_ = particle.size_ * particle.scale_;
+                billboard->size_ = particle.size_ * particle.scale_;
             }
 
             // Color interpolation
@@ -233,9 +233,9 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                         ++index;
                 }
                 if (index < colorFrames_.Size() - 1)
-                    billboard.color_ = colorFrames_[index].Interpolate(colorFrames_[index + 1], particle.timer_);
+                    billboard->color_ = colorFrames_[index].Interpolate(colorFrames_[index + 1], particle.timer_);
                 else
-                    billboard.color_ = colorFrames_[index].color_;
+                    billboard->color_ = colorFrames_[index].color_;
             }
 
             // Texture animation
@@ -245,7 +245,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
             {
                 if (particle.timer_ >= textureFrames_[texIndex + 1].time_)
                 {
-                    billboard.uv_ = textureFrames_[texIndex + 1].uv_;
+                    billboard->uv_ = textureFrames_[texIndex + 1].uv_;
                     ++texIndex;
                 }
             }
@@ -314,8 +314,8 @@ void ParticleEmitter::ResetEmissionTimer()
 
 void ParticleEmitter::RemoveAllParticles()
 {
-    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
-        i->enabled_ = false;
+    for (Vector<SharedPtr<Billboard>>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+        (*i)->enabled_ = false;
 
     Commit();
 }
@@ -413,15 +413,15 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
     ret.Reserve(billboards_.Size() * 7 + 1);
     ret.Push(billboards_.Size());
 
-    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    for (Vector<SharedPtr<Billboard>>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        ret.Push(i->position_);
-        ret.Push(i->size_);
-        ret.Push(Vector4(i->uv_.min_.x_, i->uv_.min_.y_, i->uv_.max_.x_, i->uv_.max_.y_));
-        ret.Push(i->color_);
-        ret.Push(i->rotation_);
-        ret.Push(i->direction_);
-        ret.Push(i->enabled_);
+        ret.Push((*i)->position_);
+        ret.Push((*i)->size_);
+        ret.Push(Vector4((*i)->uv_.min_.x_, (*i)->uv_.min_.y_, (*i)->uv_.max_.x_, (*i)->uv_.max_.y_));
+        ret.Push((*i)->color_);
+        ret.Push((*i)->rotation_);
+        ret.Push((*i)->direction_);
+        ret.Push((*i)->enabled_);
     }
 
     return ret;
@@ -444,7 +444,7 @@ bool ParticleEmitter::EmitNewParticle()
         return false;
     assert(index < particles_.Size());
     Particle& particle = particles_[index];
-    Billboard& billboard = billboards_[index];
+    Billboard* billboard = billboards_[index];
 
     Vector3 startDir;
     Vector3 startPos;
@@ -499,15 +499,15 @@ bool ParticleEmitter::EmitNewParticle()
 
     particle.velocity_ = effect_->GetRandomVelocity() * startDir;
 
-    billboard.position_ = startPos;
-    billboard.size_ = particles_[index].size_;
+    billboard->position_ = startPos;
+    billboard->size_ = particles_[index].size_;
     const Vector<TextureFrame>& textureFrames_ = effect_->GetTextureFrames();
-    billboard.uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
-    billboard.rotation_ = effect_->GetRandomRotation();
+    billboard->uv_ = textureFrames_.Size() ? textureFrames_[0].uv_ : Rect::POSITIVE;
+    billboard->rotation_ = effect_->GetRandomRotation();
     const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
-    billboard.color_ = colorFrames_.Size() ? colorFrames_[0].color_ : Color();
-    billboard.enabled_ = true;
-    billboard.direction_ = startDir;
+    billboard->color_ = colorFrames_.Size() ? colorFrames_[0].color_ : Color();
+    billboard->enabled_ = true;
+    billboard->direction_ = startDir;
 
     return true;
 }
@@ -516,7 +516,7 @@ unsigned ParticleEmitter::GetFreeParticle() const
 {
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
-        if (!billboards_[i].enabled_)
+        if (!billboards_[i]->enabled_)
             return i;
     }
 
@@ -545,7 +545,7 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
 
         for (unsigned i = 0; i < billboards_.Size(); ++i)
         {
-            if (billboards_[i].enabled_)
+            if (billboards_[i]->enabled_)
             {
                 hasEnabledBillboards = true;
                 break;

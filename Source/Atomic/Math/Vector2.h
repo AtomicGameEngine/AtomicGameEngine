@@ -330,6 +330,9 @@ public:
 
     /// Zero vector.
     static const IntVector2 ZERO;
+
+    // ATOMIC BEGIN
+
 };
 
 /// Multiply IntVector2 with a scalar.

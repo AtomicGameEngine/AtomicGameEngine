@@ -34,7 +34,7 @@ namespace ToolCore
 
 class PrefabImporter : public AssetImporter
 {
-    OBJECT(PrefabImporter);
+    ATOMIC_OBJECT(PrefabImporter, AssetImporter);
 
 public:
     /// Construct.

@@ -61,7 +61,7 @@ bool JSBind::GenerateCSharpBindings()
     if (!package_->GenerateBindings(JSBPackage::CSHARP))
         return true;
 
-    LOGINFOF("Generating C# Bindings");
+    ATOMIC_LOGINFOF("Generating C# Bindings");
 
     String modulesFolder = "Artifacts/Build/Source/Generated/" + platform_ + "/CSharp/Packages/";
     modulesFolder += package_->GetName() + "/";
@@ -99,7 +99,7 @@ bool JSBind::GenerateJavaScriptBindings()
     if (!package_->GenerateBindings(JSBPackage::JAVASCRIPT))
         return true;
 
-    LOGINFOF("Generating JS Bindings");
+    ATOMIC_LOGINFOF("Generating JS Bindings");
 
     String modulesFolder = "Artifacts/Build/Source/Generated/" + platform_ + "/Javascript/Packages/";
     modulesFolder += package_->GetName() + "/";

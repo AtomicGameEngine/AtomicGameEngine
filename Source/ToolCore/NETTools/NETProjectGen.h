@@ -36,7 +36,7 @@ namespace ToolCore
 
     class NETProjectBase : public Object
     {
-        OBJECT(NETProjectBase)
+        ATOMIC_OBJECT(NETProjectBase, Object)
 
     public:
 
@@ -56,7 +56,7 @@ namespace ToolCore
 
     class NETCSProject : public NETProjectBase
     {
-        OBJECT(NETCSProject)
+        ATOMIC_OBJECT(NETCSProject, NETProjectBase)
 
     public:
 
@@ -107,7 +107,7 @@ namespace ToolCore
 
     class NETSolution : public NETProjectBase
     {
-        OBJECT(NETSolution)
+        ATOMIC_OBJECT(NETSolution, NETProjectBase)
 
     public:
 
@@ -139,7 +139,7 @@ namespace ToolCore
 
     class NETProjectGen : public Object
     {
-        OBJECT(NETProjectGen)
+        ATOMIC_OBJECT(NETProjectGen, Object)
 
     public:
 

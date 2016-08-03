@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintPulley2D::ConstraintPulley2D(Context* context) :
     Constraint2D(context),
@@ -50,7 +50,7 @@ ConstraintPulley2D::~ConstraintPulley2D()
 
 void ConstraintPulley2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintPulley2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintPulley2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Owner Body Ground Anchor", GetOwnerBodyGroundAnchor, SetOwnerBodyGroundAnchor, Vector2, Vector2::ZERO,

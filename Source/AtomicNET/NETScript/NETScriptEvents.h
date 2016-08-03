@@ -28,23 +28,23 @@ namespace Atomic
 {
 
     /// Reference to CSAssembly made
-    EVENT(E_CSCOMPONENTASSEMBLYREFERENCE, CSComponentAssemblyReference)
+    ATOMIC_EVENT(E_CSCOMPONENTASSEMBLYREFERENCE, CSComponentAssemblyReference)
     {
-        PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
+        ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
     }
 
-    EVENT(E_CSCOMPONENTLOAD, CSComponentLoad)
+    ATOMIC_EVENT(E_CSCOMPONENTLOAD, CSComponentLoad)
     {
-        PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
-        PARAM(P_CLASSNAME, ClassName); // String
-        PARAM(P_NATIVEINSTANCE, NativeInstance); // CSComponent as void*
-        PARAM(P_FIELDVALUES, FieldValues);  // VariantMap as void*
+        ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
+        ATOMIC_PARAM(P_CLASSNAME, ClassName); // String
+        ATOMIC_PARAM(P_NATIVEINSTANCE, NativeInstance); // CSComponent as void*
+        ATOMIC_PARAM(P_FIELDVALUES, FieldValues);  // VariantMap as void*
     }
 
-    EVENT(E_CSCOMPONENTASSEMBLYCHANGED, CSComponentAssemblyChanged)
+    ATOMIC_EVENT(E_CSCOMPONENTASSEMBLYCHANGED, CSComponentAssemblyChanged)
     {
-        PARAM(P_RESOURCE, Resource); // resource* 
-        PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
+        ATOMIC_PARAM(P_RESOURCE, Resource); // resource*
+        ATOMIC_PARAM(P_ASSEMBLYPATH, AssemblyPath); // String
     }
 
 

@@ -372,9 +372,12 @@ void Node::AddTag(const String& tag)
     MarkNetworkUpdate();
 }
 
-void Node::AddTags(const String& tags, char separator)
+void Node::AddTags(const String& tags, String separator)
 {
-    StringVector tagVector = tags.Split(separator);
+    if (!separator.Length())
+        return;
+
+    StringVector tagVector = tags.Split(separator[0]);
     AddTags(tagVector);
 }
 

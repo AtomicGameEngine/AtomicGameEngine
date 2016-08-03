@@ -30,7 +30,7 @@
 #include <Atomic/Math/Ray.h>
 #include <Atomic/Scene/Scene.h>
 
-#include <Atomic/Atomic3D/StaticModel.h>
+#include <Atomic/Graphics/StaticModel.h>
 #include <Atomic/Graphics/Camera.h>
 
 
@@ -88,7 +88,7 @@ public:
         // Update selected status only when not dragging
         if (!drag)
         {
-            selected_ = Abs(d_) < axisMaxD * scale && t_ >= -axisMaxD * scale && t_ <= axisMaxT * scale;
+            selected_ = Atomic::Abs(d_) < axisMaxD * scale && t_ >= -axisMaxD * scale && t_ <= axisMaxT * scale;
             lastT_ = t_;
             lastD_ = d_;
         }
@@ -117,7 +117,7 @@ enum AxisMode
 
 class Gizmo3D: public Object
 {
-    OBJECT(Gizmo3D);
+    ATOMIC_OBJECT(Gizmo3D, Object);
 
 public:
 

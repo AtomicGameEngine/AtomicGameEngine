@@ -92,7 +92,7 @@ bool AssetImporter::Move(const String& newPath)
         asset_->name_ = oldName;
         asset_->path_ = oldPath;
 
-        LOGERRORF("Unable to rename asset: %s to %s", GetNativePath(oldPath + ".asset").CString(), GetNativePath(newPath + ".asset").CString());
+        ATOMIC_LOGERRORF("Unable to rename asset: %s to %s", GetNativePath(oldPath + ".asset").CString(), GetNativePath(newPath + ".asset").CString());
         return false;
     }
 
@@ -105,7 +105,7 @@ bool AssetImporter::Move(const String& newPath)
         // restore .asset
         fs->Rename(newPath + ".asset", oldPath + ".asset");
 
-        LOGERRORF("Unable to rename: %s to %s", GetNativePath(oldPath).CString(), GetNativePath(newPath).CString());
+        ATOMIC_LOGERRORF("Unable to rename: %s to %s", GetNativePath(oldPath).CString(), GetNativePath(newPath).CString());
         return false;
     }
 

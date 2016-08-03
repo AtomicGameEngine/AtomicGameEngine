@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintMouse2D::ConstraintMouse2D(Context* context) :
     Constraint2D(context),
@@ -47,7 +47,7 @@ ConstraintMouse2D::~ConstraintMouse2D()
 
 void ConstraintMouse2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintMouse2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintMouse2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Target", GetTarget, SetTarget, Vector2, Vector2::ZERO, AM_DEFAULT);

@@ -423,6 +423,11 @@ public:
     /// Return a view or its source view if it uses one. Used internally for render statistics.
     static View* GetActualView(View* view);
 
+    // ATOMIC BEGIN
+    /// Reload textures.
+    void ReloadTextures();
+    // ATOMIC END
+
 private:
     /// Initialize when screen mode initially set.
     void Initialize();
@@ -432,8 +437,6 @@ private:
     void LoadPassShaders(Pass* pass);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
-    /// Reload textures.
-    void ReloadTextures();
     /// Create light volume geometries.
     void CreateGeometries();
     /// Create instancing vertex buffer.

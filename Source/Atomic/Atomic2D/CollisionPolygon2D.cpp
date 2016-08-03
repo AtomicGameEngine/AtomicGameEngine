@@ -33,7 +33,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 CollisionPolygon2D::CollisionPolygon2D(Context* context) :
     CollisionShape2D(context)
@@ -47,7 +47,7 @@ CollisionPolygon2D::~CollisionPolygon2D()
 
 void CollisionPolygon2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<CollisionPolygon2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<CollisionPolygon2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_COPY_BASE_ATTRIBUTES(CollisionShape2D);

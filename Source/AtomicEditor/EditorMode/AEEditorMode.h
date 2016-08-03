@@ -39,7 +39,7 @@ namespace AtomicEditor
 /// EditorMode subsystem
 class EditorMode : public Object
 {
-    OBJECT(EditorMode)
+    ATOMIC_OBJECT(EditorMode, Object)
 
 public:
     /// Construct.

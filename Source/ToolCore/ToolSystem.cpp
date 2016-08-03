@@ -65,7 +65,7 @@ ToolSystem::ToolSystem(Context* context) : Object(context),
     RegisterPlatform(new PlatformIOS(context));
     RegisterPlatform(new PlatformAndroid(context));
 
-    SubscribeToEvent(E_UPDATE, HANDLER(ToolSystem, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(ToolSystem, HandleUpdate));
 }
 
 ToolSystem::~ToolSystem()

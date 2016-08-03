@@ -57,7 +57,7 @@
 namespace Atomic
 {
 
-const char* URHO2D_CATEGORY = "Atomic2D";
+const char* ATOMIC2D_CATEGORY = "Atomic2D";
 
 void RegisterAtomic2DLibrary(Context* context)
 {

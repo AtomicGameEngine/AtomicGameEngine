@@ -1078,4 +1078,178 @@ bool IsAbsolutePath(const String& pathName)
     return false;
 }
 
+// ATOMIC BEGIN
+bool FileSystem::CreateDirs(const String& root, const String& subdirectory)
+{
+    String folder = AddTrailingSlash(GetInternalPath(root));
+    String sub = GetInternalPath(subdirectory);
+    Vector<String> subs = sub.Split('/');
+
+    for (unsigned i = 0; i < subs.Size(); i++)
+    {
+        folder += subs[i];
+        folder += "/";
+
+        if (DirExists(folder))
+            continue;
+
+        CreateDir(folder);
+
+        if (!DirExists(folder))
+            return false;
+    }
+
+    return true;
+
+}
+
+bool FileSystem::CreateDirsRecursive(const String& directoryIn)
+{
+    String directory = AddTrailingSlash(GetInternalPath(directoryIn));
+
+    if (DirExists(directory))
+        return true;
+
+    if (FileExists(directory))
+        return false;
+
+    String parentPath = directory;
+
+    Vector<String> paths;
+
+    paths.Push(directory);
+
+    while (true)
+    {
+        parentPath = GetParentPath(parentPath);
+
+        if (!parentPath.Length())
+            break;
+
+        paths.Push(parentPath);
+    }
+
+    if (!paths.Size())
+        return false;
+
+    for (int i = (int) (paths.Size() - 1); i >= 0; i--)
+    {
+        const String& pathName = paths[i];
+
+        if (FileExists(pathName))
+            return false;
+
+        if (DirExists(pathName))
+            continue;
+
+        if (!CreateDir(pathName))
+            return false;
+
+        // double check
+        if (!DirExists(pathName))
+            return false;
+
+    }
+
+    return true;
+
+}
+
+bool FileSystem::RemoveDir(const String& directoryIn, bool recursive)
+{
+    String directory = AddTrailingSlash(directoryIn);
+
+    if (!DirExists(directory))
+        return false;
+
+    Vector<String> results;
+
+    // ensure empty if not recursive
+    if (!recursive)
+    {
+        ScanDir(results, directory, "*", SCAN_DIRS | SCAN_FILES | SCAN_HIDDEN, true );
+        while (results.Remove(".")) {}
+        while (results.Remove("..")) {}
+
+        if (results.Size())
+            return false;
+
+#ifdef WIN32
+        return RemoveDirectoryW(GetWideNativePath(directory).CString()) != 0;
+#endif
+
+#ifdef __APPLE__
+        return remove(GetNativePath(directory).CString()) == 0;
+#endif
+    }
+
+    // delete all files at this level
+    ScanDir(results, directory, "*", SCAN_FILES | SCAN_HIDDEN, false );
+    for (unsigned i = 0; i < results.Size(); i++)
+    {
+        if (!Delete(directory + results[i]))
+            return false;
+    }
+    results.Clear();
+
+    // recurse into subfolders
+    ScanDir(results, directory, "*", SCAN_DIRS, false );
+    for (unsigned i = 0; i < results.Size(); i++)
+    {
+        if (results[i] == "." || results[i] == "..")
+            continue;
+
+        if (!RemoveDir(directory + results[i], true))
+            return false;
+    }
+
+    return RemoveDir(directory, false);
+
+}
+
+bool FileSystem::CopyDir(const String& directoryIn, const String& directoryOut)
+{
+    if (FileExists(directoryOut) || DirExists(directoryOut))
+        return false;
+
+    Vector<String> results;
+    ScanDir(results, directoryIn, "*", SCAN_FILES, true );
+
+    for (unsigned i = 0; i < results.Size(); i++)
+    {
+        String srcFile = directoryIn + "/" + results[i];
+        String dstFile = directoryOut + "/" + results[i];
+
+        String dstPath = GetPath(dstFile);
+
+        if (!CreateDirsRecursive(dstPath))
+            return false;
+
+        //LOGINFOF("SRC: %s DST: %s", srcFile.CString(), dstFile.CString());
+        if (!Copy(srcFile, dstFile))
+            return false;
+    }
+
+    return true;
+
+}
+
+bool IsAbsoluteParentPath(const String& absParentPath, const String& fullPath)
+{
+    if (!IsAbsolutePath(absParentPath) || !IsAbsolutePath(fullPath))
+        return false;
+
+    String path1 = AddTrailingSlash(absParentPath);
+    String path2 = AddTrailingSlash(GetPath(fullPath));
+
+    if (path2.StartsWith(path1))
+        return true;
+
+    return false;
+}
+
+
+
+// ATOMIC END
+
 }

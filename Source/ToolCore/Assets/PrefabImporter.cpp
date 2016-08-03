@@ -37,7 +37,7 @@ namespace ToolCore
 
 PrefabImporter::PrefabImporter(Context* context, Asset* asset) : AssetImporter(context, asset)
 {
-    SubscribeToEvent(E_PREFABSAVE, HANDLER(PrefabImporter, HandlePrefabSave));
+    SubscribeToEvent(E_PREFABSAVE, ATOMIC_HANDLER(PrefabImporter, HandlePrefabSave));
 }
 
 PrefabImporter::~PrefabImporter()
@@ -96,9 +96,11 @@ void PrefabImporter::HandlePrefabSave(StringHash eventType, VariantMap& eventDat
             // breaking node as well
             if (rootComponents[i]->GetType() == AnimatedSprite2D::GetTypeStatic())
             {
-                AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
-                if (asprite->GetRootNode())
-                    filterNodes.Push(asprite->GetRootNode());
+// ATOMIC_UPDATE_FIX_BEGIN
+                //AnimatedSprite2D* asprite = (AnimatedSprite2D*) rootComponents[i].Get();
+                //if (asprite->GetRootNode())
+                //    filterNodes.Push(asprite->GetRootNode());
+// ATOMIC_UPDATE_FIX_END
             }
 
         }

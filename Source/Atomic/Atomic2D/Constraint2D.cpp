@@ -36,7 +36,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 Constraint2D::Constraint2D(Context* context) :
     Component(context),

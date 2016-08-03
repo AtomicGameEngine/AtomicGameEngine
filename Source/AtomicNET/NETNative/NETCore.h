@@ -40,7 +40,7 @@ struct NETCoreDelegates
 class ATOMIC_API NETCore : public Object
 {
 
-    OBJECT(NETCore)
+    ATOMIC_OBJECT(NETCore, Object)
 
 public:
 

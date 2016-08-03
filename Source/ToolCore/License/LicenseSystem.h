@@ -34,7 +34,7 @@ namespace ToolCore
 
 class LicenseSystem : public Object
 {
-    OBJECT(LicenseSystem);
+    ATOMIC_OBJECT(LicenseSystem, Object);
 
 public:
 

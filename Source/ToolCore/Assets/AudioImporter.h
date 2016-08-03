@@ -29,7 +29,7 @@ namespace ToolCore
 
 class AudioImporter : public AssetImporter
 {
-    OBJECT(AudioImporter);
+    ATOMIC_OBJECT(AudioImporter, AssetImporter);
 
 public:
     /// Construct.

@@ -28,148 +28,148 @@ namespace AtomicEditor
 {
 
 /// Variable timestep scene update.
-EVENT(E_GIZMOEDITMODECHANGED, GizmoEditModeChanged)
+ATOMIC_EVENT(E_GIZMOEDITMODECHANGED, GizmoEditModeChanged)
 {
-    PARAM(P_MODE, Mode);            // int
+    ATOMIC_PARAM(P_MODE, Mode);            // int
 }
 
-EVENT(E_GIZMOAXISMODECHANGED, GizmoAxisModeChanged)
+ATOMIC_EVENT(E_GIZMOAXISMODECHANGED, GizmoAxisModeChanged)
 {
-    PARAM(P_MODE, Mode);            // int
+    ATOMIC_PARAM(P_MODE, Mode);            // int
 }
 
-EVENT(E_GIZMOMOVED, GizmoMoved)
-{
-
-}
-
-EVENT(E_SCENENODESELECTED, SceneNodeSelected)
-{
-    PARAM(P_SCENE, Scene);             // Scene
-    PARAM(P_NODE, Node);               // Node
-    PARAM(P_SELECTED, Selected);       // bool
-    PARAM(P_QUIET, Quiet);             // bool (don't record edit event)
-}
-
-EVENT(E_SCENEEDITBEGIN, SceneEditBegin)
-{
-    PARAM(P_SCENE, Scene);             // Scene
-
-}
-
-EVENT(E_SCENEEDITNODEREPARENT, SceneEditNodeReparent)
-{
-    PARAM(P_NODE, Node);             // Node
-    PARAM(P_ADDED, Added);             // Boolean
-}
-
-
-EVENT(E_SCENEEDITEND, SceneEditEnd)
-{
-    PARAM(P_SCENE, Scene);             // Scene
-}
-
-EVENT(E_SCENEEDITSTATECHANGESBEGIN, SceneEditStateChangesBegin)
+ATOMIC_EVENT(E_GIZMOMOVED, GizmoMoved)
 {
 
 }
 
-EVENT(E_SCENEEDITSTATECHANGE, SceneEditStateChange)
+ATOMIC_EVENT(E_SCENENODESELECTED, SceneNodeSelected)
 {
-    PARAM(P_SERIALIZABLE, Serializable);     // Serializable
+    ATOMIC_PARAM(P_SCENE, Scene);             // Scene
+    ATOMIC_PARAM(P_NODE, Node);               // Node
+    ATOMIC_PARAM(P_SELECTED, Selected);       // bool
+    ATOMIC_PARAM(P_QUIET, Quiet);             // bool (don't record edit event)
 }
 
-EVENT(E_SCENEEDITSTATECHANGESEND, SceneEditStateChangesEnd)
+ATOMIC_EVENT(E_SCENEEDITBEGIN, SceneEditBegin)
+{
+    ATOMIC_PARAM(P_SCENE, Scene);             // Scene
+
+}
+
+ATOMIC_EVENT(E_SCENEEDITNODEREPARENT, SceneEditNodeReparent)
+{
+    ATOMIC_PARAM(P_NODE, Node);             // Node
+    ATOMIC_PARAM(P_ADDED, Added);             // Boolean
+}
+
+
+ATOMIC_EVENT(E_SCENEEDITEND, SceneEditEnd)
+{
+    ATOMIC_PARAM(P_SCENE, Scene);             // Scene
+}
+
+ATOMIC_EVENT(E_SCENEEDITSTATECHANGESBEGIN, SceneEditStateChangesBegin)
+{
+
+}
+
+ATOMIC_EVENT(E_SCENEEDITSTATECHANGE, SceneEditStateChange)
+{
+    ATOMIC_PARAM(P_SERIALIZABLE, Serializable);     // Serializable
+}
+
+ATOMIC_EVENT(E_SCENEEDITSTATECHANGESEND, SceneEditStateChangesEnd)
 {
 
 }
 
 /// A child node has been added to a parent node.
-EVENT(E_SCENEEDITNODECREATED, SceneEditNodeCreated)
+ATOMIC_EVENT(E_SCENEEDITNODECREATED, SceneEditNodeCreated)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 
 /// A child node has been added to a parent node.
-EVENT(E_SCENEEDITNODEADDED, SceneEditNodeAdded)
+ATOMIC_EVENT(E_SCENEEDITNODEADDED, SceneEditNodeAdded)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PARENT, Parent);                // Node pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_PARENT, Parent);                // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// A child node is about to be removed from a parent node.
-EVENT(E_SCENEEDITNODEREMOVED, SceneEditNodeRemoved)
+ATOMIC_EVENT(E_SCENEEDITNODEREMOVED, SceneEditNodeRemoved)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_PARENT, Parent);                // Node pointer
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_PARENT, Parent);                // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 
 /// A child node has been added to a parent node.
-EVENT(E_SCENEEDITCOMPONENTADDEDREMOVED, SceneEditComponentAddedRemoved)
+ATOMIC_EVENT(E_SCENEEDITCOMPONENTADDEDREMOVED, SceneEditComponentAddedRemoved)
 {
-    PARAM(P_SCENE, Scene);                  // Scene pointer
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_COMPONENT, Component);          // Component pointer
-    PARAM(P_REMOVED, Removed);          // bool
+    ATOMIC_PARAM(P_SCENE, Scene);                  // Scene pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_REMOVED, Removed);          // bool
 
 }
 
-EVENT(E_SCENEEDITPREFABSAVE, SceneEditPrefabSave)
+ATOMIC_EVENT(E_SCENEEDITPREFABSAVE, SceneEditPrefabSave)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-EVENT(E_SCENEEDITPREFABREVERT, SceneEditPrefabRevert)
+ATOMIC_EVENT(E_SCENEEDITPREFABREVERT, SceneEditPrefabRevert)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-EVENT(E_SCENEEDITPREFABCOPY, SceneEditPrefabCopy)
+ATOMIC_EVENT(E_SCENEEDITPREFABCOPY, SceneEditPrefabCopy)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-EVENT(E_SCENEEDITPREFABPASTE, SceneEditPrefabPaste)
+ATOMIC_EVENT(E_SCENEEDITPREFABPASTE, SceneEditPrefabPaste)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-EVENT(E_SCENEEDITPREFABBREAK, SceneEditPrefabBreak)
+ATOMIC_EVENT(E_SCENEEDITPREFABBREAK, SceneEditPrefabBreak)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    ATOMIC_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-EVENT(E_SCENEEDITCOMPONENTCOPY, SceneEditComponentCopy)
+ATOMIC_EVENT(E_SCENEEDITCOMPONENTCOPY, SceneEditComponentCopy)
 {
-    PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
 }
 
-EVENT(E_SCENEEDITCOMPONENTPASTE, SceneEditComponentPaste)
+ATOMIC_EVENT(E_SCENEEDITCOMPONENTPASTE, SceneEditComponentPaste)
 {
-    PARAM(P_COMPONENT, Component);          // Component pointer
-    PARAM(P_END, End);                       // bool
+    ATOMIC_PARAM(P_COMPONENT, Component);          // Component pointer
+    ATOMIC_PARAM(P_END, End);                       // bool
 }
 
-EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
+ATOMIC_EVENT(E_SCENEEDITADDREMOVENODES, SceneEditAddRemoveNodes)
 {
-    PARAM(P_END, End);       // bool
+    ATOMIC_PARAM(P_END, End);       // bool
 }
 
-EVENT(E_SCENEEDITSCENEMODIFIED, SceneEditSceneModified)
-{
-
-}
-
-EVENT(E_CUBEMAPRENDERBEGIN, CubemapRenderBegin)
+ATOMIC_EVENT(E_SCENEEDITSCENEMODIFIED, SceneEditSceneModified)
 {
 
 }
 
-EVENT(E_CUBEMAPRENDEREND, CubemapRenderEnd)
+ATOMIC_EVENT(E_CUBEMAPRENDERBEGIN, CubemapRenderBegin)
+{
+
+}
+
+ATOMIC_EVENT(E_CUBEMAPRENDEREND, CubemapRenderEnd)
 {
 
 }

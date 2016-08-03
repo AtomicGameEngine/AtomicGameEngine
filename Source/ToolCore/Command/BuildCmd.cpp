@@ -85,7 +85,7 @@ void BuildCmd::HandleBuildComplete(StringHash eventType, VariantMap& eventData)
 
 void BuildCmd::Run()
 {
-    LOGINFOF("Building project for: %s", buildPlatform_.CString());
+    ATOMIC_LOGINFOF("Building project for: %s", buildPlatform_.CString());
 
     ToolSystem* tsystem = GetSubsystem<ToolSystem>();
     Project* project = tsystem->GetProject();
@@ -118,7 +118,7 @@ void BuildCmd::Run()
 
     buildSystem->QueueBuild(buildBase);
 
-    SubscribeToEvent(E_BUILDCOMPLETE, HANDLER(BuildCmd, HandleBuildComplete));
+    SubscribeToEvent(E_BUILDCOMPLETE, ATOMIC_HANDLER(BuildCmd, HandleBuildComplete));
 
     // TODO: parallel/serial builds
     buildSystem->StartNextBuild();

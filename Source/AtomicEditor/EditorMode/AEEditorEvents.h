@@ -36,75 +36,75 @@ static const unsigned FINDTEXT_FLAG_WRAP = 0x4;
 static const unsigned FINDTEXT_FLAG_NEXT = 0x8;
 static const unsigned FINDTEXT_FLAG_PREV = 0x10;
 
-EVENT(E_FINDTEXT, FindText)
+ATOMIC_EVENT(E_FINDTEXT, FindText)
 {
-    PARAM(P_FLAGS, Flags);    // int
-    PARAM(P_TEXT, Text);      // string
+    ATOMIC_PARAM(P_FLAGS, Flags);    // int
+    ATOMIC_PARAM(P_TEXT, Text);      // string
 }
 
-EVENT(E_FINDTEXTCLOSE, FindTextClose)
-{
-
-}
-
-EVENT(E_FINDTEXTOPEN, FindTextOpen)
+ATOMIC_EVENT(E_FINDTEXTCLOSE, FindTextClose)
 {
 
 }
 
-EVENT(E_JAVASCRIPTSAVED, JavascriptSaved)
+ATOMIC_EVENT(E_FINDTEXTOPEN, FindTextOpen)
+{
+
+}
+
+ATOMIC_EVENT(E_JAVASCRIPTSAVED, JavascriptSaved)
 {
 
 }
 
 // editor play request
-EVENT(E_EDITORPLAYREQUEST, EditorPlayRequest)
+ATOMIC_EVENT(E_EDITORPLAYREQUEST, EditorPlayRequest)
 {
-    PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
+    ATOMIC_PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
 
 }
 
 // stop play mode
-EVENT(E_EDITORPLAYSTOP, EditorPlayStop)
+ATOMIC_EVENT(E_EDITORPLAYSTOP, EditorPlayStop)
 {
 
 }
 
 // stop play mode
-EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
+ATOMIC_EVENT(E_EDITORRESOURCEEDITORCHANGED, EditorResourceEditorChanged)
 {
-    PARAM(P_RESOURCEEDITOR, ResourceEditor); // ResourceEditor*
+    ATOMIC_PARAM(P_RESOURCEEDITOR, ResourceEditor); // ResourceEditor*
 }
 
 
 // emitted once play has started
-EVENT(E_EDITORPLAYERSTARTED, EditorPlayerStarted)
+ATOMIC_EVENT(E_EDITORPLAYERSTARTED, EditorPlayerStarted)
 {
-    PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
+    ATOMIC_PARAM(P_MODE, Mode);    // uint (AEPlayerMode)
 }
 
 // emitted once player has paused
-EVENT(E_EDITORPLAYERPAUSED, EditorPlayerPaused)
+ATOMIC_EVENT(E_EDITORPLAYERPAUSED, EditorPlayerPaused)
 {
 
 }
 
 // emitted once paused player has resumed
-EVENT(E_EDITORPLAYERRESUMED, EditorPlayerResumed)
+ATOMIC_EVENT(E_EDITORPLAYERRESUMED, EditorPlayerResumed)
 {
 
 }
 
 // emitted once play has stopped
-EVENT(E_EDITORPLAYERSTOPPED, EditorPlayerStopped)
+ATOMIC_EVENT(E_EDITORPLAYERSTOPPED, EditorPlayerStopped)
 {
 
 }
 
-EVENT(E_EDITORBUILD, EditorBuild)
+ATOMIC_EVENT(E_EDITORBUILD, EditorBuild)
 {
-    PARAM(P_PLATFORM, Platform);      // string
-    PARAM(P_BUILDPATH, BuildPath);    // string
+    ATOMIC_PARAM(P_PLATFORM, Platform);      // string
+    ATOMIC_PARAM(P_BUILDPATH, BuildPath);    // string
 }
 
 
@@ -114,56 +114,56 @@ static const unsigned EDITOR_MODALERROR = 0x1;
 static const unsigned EDITOR_MODALINFO = 0x2;
 
 
-EVENT(E_EDITORMODAL, EditorModal)
+ATOMIC_EVENT(E_EDITORMODAL, EditorModal)
 {
-    PARAM(P_TYPE, Type);      // uint (EDITOR_ERROR_MODAL, etc)
-    PARAM(P_TITLE, Title);      // for modal errors, title text
-    PARAM(P_MESSAGE, Message);    // for modal errors, error text
+    ATOMIC_PARAM(P_TYPE, Type);      // uint (EDITOR_ERROR_MODAL, etc)
+    ATOMIC_PARAM(P_TITLE, Title);      // for modal errors, title text
+    ATOMIC_PARAM(P_MESSAGE, Message);    // for modal errors, error text
 }
 
-EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
+ATOMIC_EVENT(E_EDITORACTIVESCENEEDITORCHANGE, EditorActiveSceneEditorChange)
 {
-    PARAM(P_SCENEEDITOR, SceneEditor);
+    ATOMIC_PARAM(P_SCENEEDITOR, SceneEditor);
 }
 
 
-EVENT(E_PLAYERERROR, PlayerError)
+ATOMIC_EVENT(E_PLAYERERROR, PlayerError)
 {
-    PARAM(P_TEXT, Text);      // string
+    ATOMIC_PARAM(P_TEXT, Text);      // string
 }
 
-EVENT(E_CONSOLEMESSAGE, ConsoleMessage)
+ATOMIC_EVENT(E_CONSOLEMESSAGE, ConsoleMessage)
 {
-    PARAM(P_TEXT, Text);      // string
+    ATOMIC_PARAM(P_TEXT, Text);      // string
 }
 
-EVENT(E_CONSOLEERRORMESSAGE, ConsoleErrorMessage)
+ATOMIC_EVENT(E_CONSOLEERRORMESSAGE, ConsoleErrorMessage)
 {
-    PARAM(P_TEXT, Text);      // string
+    ATOMIC_PARAM(P_TEXT, Text);      // string
 }
 
-EVENT(E_PLATFORMCHANGE, PlatformChange)
+ATOMIC_EVENT(E_PLATFORMCHANGE, PlatformChange)
 {
-    PARAM(P_PLATFORM, Platform);      // uint (AEEditorPlatform)
+    ATOMIC_PARAM(P_PLATFORM, Platform);      // uint (AEEditorPlatform)
 }
 
-EVENT(E_SUBPROCESSOUTPUT, SubprocessOutput)
+ATOMIC_EVENT(E_SUBPROCESSOUTPUT, SubprocessOutput)
 {
-    PARAM(P_TEXT, Text);      // string
+    ATOMIC_PARAM(P_TEXT, Text);      // string
 }
 
-EVENT(E_SUBPROCESSCOMPLETE, SubprocessComplete)
+ATOMIC_EVENT(E_SUBPROCESSCOMPLETE, SubprocessComplete)
 {
-    PARAM(P_PROCESSKEY, ProcessKey); // unsigned
-    PARAM(P_RETCODE, RetCode);      // int (return code of process)
+    ATOMIC_PARAM(P_PROCESSKEY, ProcessKey); // unsigned
+    ATOMIC_PARAM(P_RETCODE, RetCode);      // int (return code of process)
 }
 
-EVENT(E_CURLCOMPLETE, CurlComplete)
+ATOMIC_EVENT(E_CURLCOMPLETE, CurlComplete)
 {
-    PARAM(P_CURLREQUEST, Request);      // CurlRequest*
+    ATOMIC_PARAM(P_CURLREQUEST, Request);      // CurlRequest*
 }
 
-EVENT(E_EDITORSHUTDOWN, EditorShutdown)
+ATOMIC_EVENT(E_EDITORSHUTDOWN, EditorShutdown)
 {
 
 }

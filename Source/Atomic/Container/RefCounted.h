@@ -29,7 +29,7 @@ namespace Atomic
 
 // ATOMIC BEGIN
 
-struct RefCounted;
+class RefCounted;
 typedef void (*RefCountedDeletedFunction)(RefCounted*);
 typedef const void* ClassID;
 

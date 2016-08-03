@@ -30,56 +30,56 @@ namespace ToolCore
 {
 
 // requires EULA agreement
-EVENT(E_LICENSE_EULAREQUIRED, LicenseEulaRequired)
+ATOMIC_EVENT(E_LICENSE_EULAREQUIRED, LicenseEulaRequired)
 {
 
 }
 
 // EULA agreement accepted
-EVENT(E_LICENSE_EULAACCEPTED, LicenseEulaAccepted)
+ATOMIC_EVENT(E_LICENSE_EULAACCEPTED, LicenseEulaAccepted)
 {
 
 }
 
 // activation required
-EVENT(E_LICENSE_ACTIVATIONREQUIRED, LicenseActivationRequired)
+ATOMIC_EVENT(E_LICENSE_ACTIVATIONREQUIRED, LicenseActivationRequired)
 {
 
 }
 
 // license verification required
-EVENT(E_LICENSE_VERIFICATIONREQUIRED, LicenseVerificationRequired)
+ATOMIC_EVENT(E_LICENSE_VERIFICATIONREQUIRED, LicenseVerificationRequired)
 {
 
 }
 
 // license success
-EVENT(E_LICENSE_SUCCESS, LicenseSuccess)
+ATOMIC_EVENT(E_LICENSE_SUCCESS, LicenseSuccess)
 {
 
 }
 
-EVENT(E_LICENSE_ACTIVATIONSUCCESS, LicenseActivationSuccess)
+ATOMIC_EVENT(E_LICENSE_ACTIVATIONSUCCESS, LicenseActivationSuccess)
 {
 }
 
-EVENT(E_LICENSE_ACTIVATIONERROR, LicenseActivationError)
+ATOMIC_EVENT(E_LICENSE_ACTIVATIONERROR, LicenseActivationError)
 {
-    PARAM(P_MESSAGE, Message); // String
+    ATOMIC_PARAM(P_MESSAGE, Message); // String
 }
 
-EVENT(E_LICENSE_DEACTIVATIONSUCCESS, LicenseDeactivationSuccess)
+ATOMIC_EVENT(E_LICENSE_DEACTIVATIONSUCCESS, LicenseDeactivationSuccess)
 {
 }
 
-EVENT(E_LICENSE_DEACTIVATIONERROR, LicenseDeactivationError)
+ATOMIC_EVENT(E_LICENSE_DEACTIVATIONERROR, LicenseDeactivationError)
 {
-    PARAM(P_MESSAGE, Message); // String
+    ATOMIC_PARAM(P_MESSAGE, Message); // String
 }
 
 
 // license error
-EVENT(E_LICENSE_ERROR, LicenseError)
+ATOMIC_EVENT(E_LICENSE_ERROR, LicenseError)
 {
 
 }

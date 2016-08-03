@@ -29,7 +29,7 @@ namespace ToolCore
 
 class PlatformWindows : public Platform
 {
-    OBJECT(PlatformWindows);
+    ATOMIC_OBJECT(PlatformWindows, Platform);
 
 public:
 

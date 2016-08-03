@@ -29,20 +29,20 @@ using namespace Atomic;
 namespace ToolCore
 {
 
-EVENT(E_COMMANDERROR, CommandError)
+ATOMIC_EVENT(E_COMMANDERROR, CommandError)
 {
-    PARAM(P_MESSAGE, Message);      // string
+    ATOMIC_PARAM(P_MESSAGE, Message);      // string
 }
 
 
-EVENT(E_COMMANDFINISHED, CommandFinished)
+ATOMIC_EVENT(E_COMMANDFINISHED, CommandFinished)
 {
 
 }
 
 class Command : public Object
 {
-    OBJECT(Command)
+    ATOMIC_OBJECT(Command, Object)
 
 public:
 

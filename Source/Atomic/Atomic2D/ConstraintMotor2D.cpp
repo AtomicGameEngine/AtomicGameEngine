@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintMotor2D::ConstraintMotor2D(Context* context) :
     Constraint2D(context),
@@ -47,7 +47,7 @@ ConstraintMotor2D::~ConstraintMotor2D()
 
 void ConstraintMotor2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintMotor2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintMotor2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Linear Offset", GetLinearOffset, SetLinearOffset, Vector2, Vector2::ZERO, AM_DEFAULT);

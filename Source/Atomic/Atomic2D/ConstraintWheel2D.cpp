@@ -32,7 +32,7 @@
 namespace Atomic
 {
 
-extern const char* URHO2D_CATEGORY;
+extern const char* ATOMIC2D_CATEGORY;
 
 ConstraintWheel2D::ConstraintWheel2D(Context* context) :
     Constraint2D(context),
@@ -47,7 +47,7 @@ ConstraintWheel2D::~ConstraintWheel2D()
 
 void ConstraintWheel2D::RegisterObject(Context* context)
 {
-    context->RegisterFactory<ConstraintWheel2D>(URHO2D_CATEGORY);
+    context->RegisterFactory<ConstraintWheel2D>(ATOMIC2D_CATEGORY);
 
     ATOMIC_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Anchor", GetAnchor, SetAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);

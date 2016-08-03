@@ -27,13 +27,13 @@
 namespace Atomic
 {
 
-EVENT(E_IPCJSERROR, IPCJSError)
+ATOMIC_EVENT(E_IPCJSERROR, IPCJSError)
 {
-    PARAM(P_ERRORNAME, ErrorName); // string
-    PARAM(P_ERRORMESSAGE, ErrorMessage); // string
-    PARAM(P_ERRORFILENAME, ErrorFileName); // string
-    PARAM(P_ERRORLINENUMBER, ErrorLineNumber); // int
-    PARAM(P_ERRORSTACK, ErrorStack); // string
+    ATOMIC_PARAM(P_ERRORNAME, ErrorName); // string
+    ATOMIC_PARAM(P_ERRORMESSAGE, ErrorMessage); // string
+    ATOMIC_PARAM(P_ERRORFILENAME, ErrorFileName); // string
+    ATOMIC_PARAM(P_ERRORLINENUMBER, ErrorLineNumber); // int
+    ATOMIC_PARAM(P_ERRORSTACK, ErrorStack); // string
 }
 
 }

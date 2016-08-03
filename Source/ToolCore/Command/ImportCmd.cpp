@@ -88,7 +88,7 @@ void ImportCmd::Run()
             return;
         }
 
-        LOGRAWF("Importing JSON: %s", assetFilename_.CString());
+        ATOMIC_LOGRAWF("Importing JSON: %s", assetFilename_.CString());
 
         SharedPtr<JSONSceneImporter> jimporter;
         jimporter = new JSONSceneImporter(context_);

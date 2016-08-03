@@ -101,7 +101,7 @@ public:
     /// Add a tag.
     void AddTag(const String& tag);
     /// Add tags with the specified separator, by default ;
-    void AddTags(const String& tags, char separator = ';');
+    void AddTags(const String& tags, String separator = ";");
     /// Add tags.
     void AddTags(const StringVector& tags);
     /// Remove tag. Return true if existed.

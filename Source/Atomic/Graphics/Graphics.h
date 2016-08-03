@@ -119,7 +119,7 @@ public:
     /// Close the window.
     void Close();
     /// Take a screenshot. Return true if successful.
-    bool TakeScreenShot(Image& destImage);
+    bool TakeScreenShot(Image* destImage);
     /// Begin frame rendering. Return true if device available and can render.
     bool BeginFrame();
     /// End frame rendering and swap buffers.
@@ -533,8 +533,16 @@ public:
     static bool GetGL3Support();
 
     // ATOMIC BEGIN
+
     /// Get the SDL_Window as a void* to avoid having to include the graphics implementation
     void* GetSDLWindow() { return window_; }
+
+    int GetCurrentMonitor();
+    int GetNumMonitors();
+    bool GetMaximized();
+    IntVector2 GetMonitorResolution(int monitorId) const;
+    void RaiseWindow();
+
     // ATOMIC END
 
 private:

@@ -63,4 +63,12 @@ ATOMIC_EVENT(E_ENDFRAME, EndFrame)
 {
 }
 
+// ATOMIC BEGIN
+/// Updating paused or resumed event.
+ATOMIC_EVENT(E_UPDATESPAUSEDRESUMED, UpdatesPaused)
+{
+    ATOMIC_PARAM(P_PAUSED, Paused);            // bool
+}
+// ATOMIC END
+
 }

@@ -55,7 +55,7 @@ namespace Atomic
         ipc_ = new IPC(context_);
         context_->RegisterSubsystem(ipc_);
 
-        SubscribeToEvent(E_LOGMESSAGE, HANDLER(IPCClientApp, HandleLogMessage));
+        SubscribeToEvent(E_LOGMESSAGE, ATOMIC_HANDLER(IPCClientApp, HandleLogMessage));
     }
 
     void IPCClientApp::HandleIPCInitialize(StringHash eventType, VariantMap& eventData)
@@ -70,7 +70,7 @@ namespace Atomic
         if (!IPC::ProcessArguments(arguments, id, fd_[0], fd_[1]))
             return false;
 
-        SubscribeToEvent(E_IPCINITIALIZE, HANDLER(IPCClientApp, HandleIPCInitialize));
+        SubscribeToEvent(E_IPCINITIALIZE, ATOMIC_HANDLER(IPCClientApp, HandleIPCInitialize));
         ipc_->InitWorker((unsigned)id, fd_[0], fd_[1]);
 
         return true;

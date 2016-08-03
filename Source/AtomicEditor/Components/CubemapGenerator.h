@@ -45,7 +45,7 @@ namespace AtomicEditor
 
 class CubemapGenerator : public EditorComponent
 {
-    OBJECT(CubemapGenerator);
+    ATOMIC_OBJECT(CubemapGenerator, EditorComponent);
 
 public:
     /// Construct.

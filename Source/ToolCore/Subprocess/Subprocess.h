@@ -42,7 +42,7 @@ class Subprocess : public Object, public Thread
 {
     friend class SubprocessSystem;
 
-    OBJECT(Subprocess);
+    ATOMIC_OBJECT(Subprocess, Object);
 
 public:
     /// Construct.

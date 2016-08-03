@@ -30,7 +30,7 @@ namespace AtomicEditor
 {
     class AEEditorApp : public AppBase
     {
-        OBJECT(AEEditorApp)
+        ATOMIC_OBJECT(AEEditorApp, AppBase)
 
     public:
         /// Construct.

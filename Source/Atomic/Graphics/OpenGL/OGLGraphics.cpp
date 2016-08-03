@@ -585,7 +585,7 @@ void Graphics::Close()
     Release(true, true);
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot(Image* destImage)
 {
     ATOMIC_PROFILE(TakeScreenShot);
 
@@ -600,10 +600,10 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     ResetRenderTargets();
 
-    destImage.SetSize(width_, height_, 3);
-    glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
+    destImage->SetSize(width_, height_, 3);
+    glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage->GetData());
     // On OpenGL we need to flip the image vertically after reading
-    destImage.FlipVertical();
+    destImage->FlipVertical();
 
     return true;
 }
