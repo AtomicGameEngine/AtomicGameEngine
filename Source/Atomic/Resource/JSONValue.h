@@ -22,6 +22,13 @@
 
 #pragma once
 
+// ATOMIC BEGIN
+
+#include <Atomic/Core/Context.h>
+#include <Atomic/Core/Variant.h>
+
+// ATOMIC END
+
 namespace Atomic
 {
 

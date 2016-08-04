@@ -50,6 +50,13 @@
 #include "WebString.h"
 
 #include <SDL/include/SDL.h>
+
+#ifdef ATOMIC_PLATFORM_LINUX
+  #ifndef SDL_VIDEO_DRIVER_X11
+  #define SDL_VIDEO_DRIVER_X11
+  #endif
+#endif
+
 #include <ThirdParty/SDL/include/SDL_syswm.h>
 
 namespace Atomic
