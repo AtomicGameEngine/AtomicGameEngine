@@ -26,11 +26,21 @@
 #include "../Resource/JSONFile.h"
 #include "../Atomic2D/TileMapDefs2D.h"
 
+// ATOMIC BEGIN
+#include "../Scene/Node.h"
+#include "../Atomic2D/CollisionBox2D.h"
+#include "../Atomic2D/Drawable2D.h"
+#include "../Atomic2D/TmxFile2D.h"
+// ATOMIC END
+
 #include "../DebugNew.h"
 
 namespace Atomic
 {
-extern ATOMIC_API const float PIXEL_SIZE;
+
+// ATOMIC BEGIN
+// extern ATOMIC_API const float PIXEL_SIZE;
+// ATOMIC END
 
 float TileMapInfo2D::GetMapWidth() const
 {
@@ -228,5 +238,37 @@ const String& TileMapObject2D::GetProperty(const String& name) const
         return String::EMPTY;
     return propertySet_->GetProperty(name);
 }
+
+// ATOMIC BEGIN
+
+TmxObjectGroup2D* Tile2D::GetObjectGroup() const
+{
+    return objectGroup_;
+}
+
+bool TileMapObject2D::ValidCollisionShape() const
+{
+    if (objectType_ == OT_RECTANGLE)
+        return true;
+
+    return false;
+}
+
+CollisionShape2D* TileMapObject2D::CreateCollisionShape(Node *node) const
+{
+    CollisionShape2D* shape = NULL;
+
+    if (objectType_ == OT_RECTANGLE)
+    {
+        CollisionBox2D* box = node->CreateComponent<CollisionBox2D>();
+        box->SetSize(size_);
+        box->SetCenter(position_);
+        shape = box;
+    }
+
+    return shape;
+}
+
+// ATOMIC END
 
 }

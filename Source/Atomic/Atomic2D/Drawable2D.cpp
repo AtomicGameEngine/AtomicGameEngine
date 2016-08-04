@@ -35,7 +35,10 @@
 namespace Atomic
 {
 
-const float PIXEL_SIZE = 0.01f;
+// ATOMIC BEGIN
+// defined in header
+// const float PIXEL_SIZE = 0.01f;
+// ATOMIC END
 
 SourceBatch2D::SourceBatch2D() :
     distance_(0.0f),

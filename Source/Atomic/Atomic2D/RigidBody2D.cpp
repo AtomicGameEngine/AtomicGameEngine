@@ -52,7 +52,7 @@ RigidBody2D::RigidBody2D(Context* context) :
     useFixtureMass_(true),
     body_(0),
 // ATOMIC BEGIN
-    castShadows_(false)
+    castShadows_(true)
 // ATOMIC END
 {
     // Make sure the massData members are zero-initialized.
@@ -90,6 +90,10 @@ void RigidBody2D::RegisterObject(Context* context)
     ATOMIC_ACCESSOR_ATTRIBUTE("Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
     ATOMIC_MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
     ATOMIC_ACCESSOR_ATTRIBUTE("Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
+
+    // ATOMIC BEGIN
+    ATOMIC_ACCESSOR_ATTRIBUTE("CastShadows", GetCastShadows, SetCastShadows, bool, true, AM_DEFAULT);
+    // ATOMIC END
 }
 
 

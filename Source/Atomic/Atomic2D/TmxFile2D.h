@@ -92,6 +92,8 @@ protected:
 /// Tmx tile layer.
 class TmxTileLayer2D : public TmxLayer2D
 {
+    ATOMIC_REFCOUNTED(TmxTileLayer2D)
+
 public:
     TmxTileLayer2D(TmxFile2D* tmxFile);
 
@@ -108,11 +110,15 @@ protected:
 /// Tmx image layer.
 class TmxObjectGroup2D : public TmxLayer2D
 {
+    ATOMIC_REFCOUNTED(TmxObjectGroup2D)
+
 public:
     TmxObjectGroup2D(TmxFile2D* tmxFile);
 
+// ATOMIC BEGIN
     /// Load from XML element.
-    bool Load(const XMLElement& element, const TileMapInfo2D& info);
+    bool Load(const XMLElement& element, const TileMapInfo2D& info, bool local = false);
+// ATOMIC END
 
     /// Return number of objects.
     unsigned GetNumObjects() const { return objects_.Size(); }
@@ -128,6 +134,8 @@ private:
 /// Tmx image layer.
 class TmxImageLayer2D : public TmxLayer2D
 {
+    ATOMIC_REFCOUNTED(TmxImageLayer2D)
+
 public:
     TmxImageLayer2D(TmxFile2D* tmxFile);
 
@@ -194,6 +202,12 @@ public:
     /// Return layer at index.
     const TmxLayer2D* GetLayer(unsigned index) const;
 
+    // BEGIN ATOMIC
+
+    TmxObjectGroup2D* GetTileObjectGroup(int gid) const;
+
+    // END ATOMIC
+
 private:
     /// Load TSX file.
     SharedPtr<XMLFile> LoadTSXFile(const String& source);
@@ -212,8 +226,16 @@ private:
     HashMap<int, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.
     HashMap<int, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
+
+    // ATOMIC BEGIN
+
     /// Layers.
-    Vector<TmxLayer2D*> layers_;
+    Vector<SharedPtr<TmxLayer2D>> layers_;
+
+    /// Gid to tile objectgroup  mapping.
+    HashMap<int, SharedPtr<TmxObjectGroup2D> > gidToObjectGroupMapping_;
+
+    // ATOMIC END
 };
 
 }

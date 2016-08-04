@@ -36,7 +36,10 @@
 namespace Atomic
 {
 
-extern const float PIXEL_SIZE;
+// ATOMIC BEGIN
+// extern const float PIXEL_SIZE;
+// ATOMIC END
+
 extern const char* ATOMIC2D_CATEGORY;
 
 TileMap2D::TileMap2D(Context* context) :
@@ -184,5 +187,20 @@ ResourceRef TileMap2D::GetTmxFileAttr() const
 {
     return GetResourceRef(tmxFile_, TmxFile2D::GetTypeStatic());
 }
+
+// ATOMIC BEGIN
+
+TileMapLayer2D* TileMap2D::GetLayerByName(const String& name) const
+{
+    for (unsigned i = 0; i < layers_.Size(); i++)
+    {
+        if (layers_[i]->GetName() == name)
+            return layers_[i];
+    }
+
+    return 0;
+}
+
+// ATOMIC END
 
 }

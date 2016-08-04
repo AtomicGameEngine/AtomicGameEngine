@@ -66,8 +66,12 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     // Set debug draw
     world_->SetDebugDraw(this);
 
-    world_->SetContinuousPhysics(true);
-    world_->SetSubStepping(true);
+    // BEGIN ATOMIC
+    // These should be false, as per the attribute defaults
+    world_->SetContinuousPhysics(false);
+    world_->SetSubStepping(false);
+    // END ATOMIC
+
 }
 
 PhysicsWorld2D::~PhysicsWorld2D()
@@ -228,12 +232,17 @@ void PhysicsWorld2D::Update(float timeStep)
 {
     ATOMIC_PROFILE(UpdatePhysics2D);
 
-    using namespace PhysicsPreStep;
+// ATOMIC BEGIN
+
+    using namespace PhysicsPreStep2D;
+
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = this;
     eventData[P_TIMESTEP] = timeStep;
-    SendEvent(E_PHYSICSPRESTEP, eventData);
+    SendEvent(E_PHYSICSPRESTEP2D, eventData);
+
+// ATOMIC END
 
     physicsStepping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
@@ -276,8 +285,10 @@ void PhysicsWorld2D::Update(float timeStep)
     SendBeginContactEvents();
     SendEndContactEvents();
 
-    using namespace PhysicsPostStep;
-    SendEvent(E_PHYSICSPOSTSTEP, eventData);
+// ATOMIC BEGIN
+    using namespace PhysicsPostStep2D;
+    SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
+// ATOMIC END
 }
 
 void PhysicsWorld2D::DrawDebugGeometry()

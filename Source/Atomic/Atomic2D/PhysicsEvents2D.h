@@ -24,12 +24,38 @@
 
 #include "../Core/Object.h"
 
+// ATOMIC BEGIN
+
+//  Discrete Physics2D Events
+
 // For prestep / poststep events, which are the same for 2D and 3D physics. The events themselves don't depend
 // on whether 3D physics support or Bullet has been compiled in.
-#include "../Physics/PhysicsEvents.h"
+// #include "../Physics/PhysicsEvents.h"
+
+// ATOMIC END
 
 namespace Atomic
 {
+
+
+// ATOMIC BEGIN
+
+/// Physics world is about to be stepped.
+ATOMIC_EVENT(E_PHYSICSPRESTEP2D, PhysicsPreStep2D)
+{
+    ATOMIC_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
+}
+
+/// Physics world has been stepped.
+ATOMIC_EVENT(E_PHYSICSPOSTSTEP2D, PhysicsPostStep2D)
+{
+    ATOMIC_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
+    ATOMIC_PARAM(P_TIMESTEP, TimeStep);            // float
+}
+
+// ATOMIC END
+
 
 /// Physics begin contact.
 ATOMIC_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)

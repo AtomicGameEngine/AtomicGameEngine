@@ -30,6 +30,12 @@ namespace Atomic
 
 class XMLElement;
 
+// ATOMIC BEGIN
+class TmxObjectGroup2D;
+class CollisionShape2D;
+class Node;
+// ATOMIC END
+
 /// Orientation.
 enum Orientation2D
 {
@@ -138,6 +144,13 @@ public:
     /// Return property.
     const String& GetProperty(const String& name) const;
 
+    // ATOMIC BEGIN
+
+    /// Return Object Group.
+    TmxObjectGroup2D* GetObjectGroup() const;
+
+    // ATOMIC END
+
 private:
     friend class TmxTileLayer2D;
 
@@ -147,6 +160,11 @@ private:
     SharedPtr<Sprite2D> sprite_;
     /// Property set.
     SharedPtr<PropertySet2D> propertySet_;
+
+    // ATOMIC BEGIN
+    /// Object group (collision)
+    SharedPtr<TmxObjectGroup2D> objectGroup_;
+    // ATOMIC END
 };
 
 /// Tile map object.
@@ -186,6 +204,11 @@ public:
     bool HasProperty(const String& name) const;
     /// Return property value.
     const String& GetProperty(const String& name) const;
+
+    // ATOMIC BEGIN
+    bool ValidCollisionShape() const;
+    CollisionShape2D* CreateCollisionShape(Node* node) const;
+    // ATOMIC END
 
 private:
     friend class TmxObjectGroup2D;

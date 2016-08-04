@@ -73,6 +73,12 @@ public:
     /// Return tile map file attribute.
     ResourceRef GetTmxFileAttr() const;
 
+    // ATOMIC BEGIN
+
+    TileMapLayer2D* GetLayerByName(const String& name) const;
+
+    // ATOMIC END
+
 private:
     /// Tmx file.
     SharedPtr<TmxFile2D> tmxFile_;

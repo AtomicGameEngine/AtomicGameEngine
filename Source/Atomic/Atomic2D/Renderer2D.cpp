@@ -63,7 +63,10 @@ Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     material_(new Material(context)),
     indexBuffer_(new IndexBuffer(context_)),
-    viewMask_(DEFAULT_VIEWMASK)
+    viewMask_(DEFAULT_VIEWMASK),
+    // ATOMIC BEGIN
+    useTris_(false)
+    // ATOMIC END
 {
     material_->SetName("Atomic2D");
 
@@ -146,20 +149,30 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         void* buffer = indexBuffer_->Lock(0, indexCount, true);
         if (buffer)
         {
-            unsigned quadCount = indexCount / 6;
+            // ATOMIC BEGIN
+            unsigned quadCount =  useTris_ ? indexCount/3 : indexCount / 6;
+            // ATOMIC END
+
             if (largeIndices)
             {
                 unsigned* dest = reinterpret_cast<unsigned*>(buffer);
                 for (unsigned i = 0; i < quadCount; ++i)
                 {
-                    unsigned base = i * 4;
+                    // ATOMIC BEGIN
+                    unsigned base = i * (useTris_ ? 3 : 4);
                     dest[0] = base;
                     dest[1] = base + 1;
                     dest[2] = base + 2;
-                    dest[3] = base;
-                    dest[4] = base + 2;
-                    dest[5] = base + 3;
-                    dest += 6;
+                    if (!useTris_)
+                    {
+                        dest[3] = base;
+                        dest[4] = base + 2;
+                        dest[5] = base + 3;
+                        dest += 6;
+                    }
+                    else
+                        dest += 3;
+                    // ATOMIC END
                 }
             }
             else
@@ -167,14 +180,21 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
                 unsigned short* dest = reinterpret_cast<unsigned short*>(buffer);
                 for (unsigned i = 0; i < quadCount; ++i)
                 {
-                    unsigned base = i * 4;
+                    // ATOMIC BEGIN
+                    unsigned base = i * (useTris_ ? 3 : 4);
                     dest[0] = (unsigned short)(base);
                     dest[1] = (unsigned short)(base + 1);
                     dest[2] = (unsigned short)(base + 2);
-                    dest[3] = (unsigned short)(base);
-                    dest[4] = (unsigned short)(base + 2);
-                    dest[5] = (unsigned short)(base + 3);
-                    dest += 6;
+                    if (!useTris_)
+                    {
+                        dest[3] = (unsigned short)(base);
+                        dest[4] = (unsigned short)(base + 2);
+                        dest[5] = (unsigned short)(base + 3);
+                        dest += 6;
+                    }
+                    else
+                        dest += 3;
+                    // ATOMIC END
                 }
             }
 
@@ -478,7 +498,16 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
             currMaterial = material;
         }
 
-        iCount += vertices.Size() * 6 / 4;
+        // ATOMIC BEGIN
+        unsigned indices;
+        if (useTris_)
+            indices = vertices.Size();
+        else
+            indices = vertices.Size() * 6 / 4;
+
+        iCount += indices;
+        // ATOMIC END
+
         vCount += vertices.Size();
     }
 

@@ -331,8 +331,11 @@ Input::Input(Context* context) :
     mouseMoveWheel_(0),
     windowID_(0),
     toggleFullscreen_(true),
-    mouseVisible_(false),
-    lastMouseVisible_(false),
+// ATOMIC BEGIN
+    // default mouse to visible
+    mouseVisible_(true),
+    lastMouseVisible_(true),
+// ATOMIC END
     mouseGrabbed_(false),
     lastMouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),

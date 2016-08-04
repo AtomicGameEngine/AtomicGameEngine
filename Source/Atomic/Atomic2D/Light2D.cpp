@@ -564,9 +564,7 @@ void Light2DGroup::OnSceneSet(Scene* scene)
 
         renderer_ = node_->GetOrCreateComponent<Renderer2D>();
         renderer_->SetTemporary(true);
-// ATOMIC_UPDATE_FIX_BEGIN
-        //renderer_->SetUseTris(true);
-// ATOMIC_UPDATE_FIX_END
+        renderer_->SetUseTris(true);
 
         if (light2DMaterial_.Null())
             CreateLight2DMaterial();
@@ -590,6 +588,7 @@ Light2DGroup::Light2DGroup(Context* context) : Drawable2D(context),
     frustum_(0)
 {
     sourceBatches_.Resize(1);
+    sourceBatches_[0].owner_ = this;
     SubscribeToEvent(E_BEGINRENDERING, ATOMIC_HANDLER(Light2DGroup, HandleBeginRendering));
     SubscribeToEvent(E_BEGINVIEWUPDATE, ATOMIC_HANDLER(Light2DGroup, HandleBeginViewUpdate));
 }

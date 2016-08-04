@@ -62,8 +62,11 @@ struct SourceBatch2D
     Vector<Vertex2D> vertices_;
 };
 
+// ATOMIC BEGIN
+// Defined in header to be consistent with other constants
 /// Pixel size (equal 0.01f).
-extern ATOMIC_API const float PIXEL_SIZE;
+static const float PIXEL_SIZE = 0.01f;
+// ATOMIC END
 
 /// Base class for 2D visible components.
 class ATOMIC_API Drawable2D : public Drawable

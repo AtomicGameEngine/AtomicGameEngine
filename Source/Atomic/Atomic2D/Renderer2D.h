@@ -98,6 +98,14 @@ public:
     /// Check visibility.
     bool CheckVisibility(Drawable2D* drawable) const;
 
+    // ATOMIC BEGIN
+
+    /// Whether this renderer uses triangles (instead of quads)
+    void SetUseTris(bool useTris) { useTris_ = useTris; }
+    bool GetUseTris() const { return useTris_; }
+
+    // ATOMIC END
+
 private:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
@@ -131,6 +139,13 @@ private:
     HashMap<Texture2D*, HashMap<int, SharedPtr<Material> > > cachedMaterials_;
     /// Cached techniques per blend mode.
     HashMap<int, SharedPtr<Technique> > cachedTechniques_;
+
+    // ATOMIC BEGIN
+
+    /// Whether or not the renderer containts tris (default is quads)
+    bool useTris_;
+
+    // ATOMIC END
 };
 
 }

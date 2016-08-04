@@ -52,6 +52,12 @@
 #include "../Atomic2D/TileMapLayer2D.h"
 #include "../Atomic2D/TmxFile2D.h"
 
+// ATOMIC BEGIN
+
+#include "../Atomic2D/Light2D.h"
+
+// ATOMIC END
+
 #include "../DebugNew.h"
 
 namespace Atomic
@@ -102,6 +108,16 @@ void RegisterAtomic2DLibrary(Context* context)
     ConstraintRope2D::RegisterObject(context);
     ConstraintWeld2D::RegisterObject(context);
     ConstraintWheel2D::RegisterObject(context);
+
+// ATOMIC BEGIN
+
+    Light2DGroup::RegisterObject(context);
+    Light2D::RegisterObject(context);
+    DirectionalLight2D::RegisterObject(context);
+    PositionalLight2D::RegisterObject(context);
+    PointLight2D::RegisterObject(context);
+
+// ATOMIC END
 }
 
 }
