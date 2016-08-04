@@ -31,7 +31,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const DXGI_FORMAT d3dElementFormats[] =
@@ -104,15 +104,15 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertex
         byteCode.Size(), (ID3D11InputLayout**)&inputLayout_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(inputLayout_);
-        URHO3D_LOGERRORF("Failed to create input layout for shader %s due to missing vertex element(s) (HRESULT %x)",
+        ATOMIC_SAFE_RELEASE(inputLayout_);
+        ATOMIC_LOGERRORF("Failed to create input layout for shader %s due to missing vertex element(s) (HRESULT %x)",
             vertexShader->GetFullName().CString(), (unsigned)hr);
     }
 }
 
 VertexDeclaration::~VertexDeclaration()
 {
-    URHO3D_SAFE_RELEASE(inputLayout_);
+    ATOMIC_SAFE_RELEASE(inputLayout_);
 }
 
 }

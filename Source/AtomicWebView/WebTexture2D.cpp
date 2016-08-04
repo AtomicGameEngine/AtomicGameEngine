@@ -209,6 +209,8 @@ public:
 
     void D3D9Blit(const IntRect& dstRect, unsigned char* src, unsigned srcStride, bool discard = false)
     {
+#ifndef ATOMIC_D3D11
+
         RECT d3dRect;
 
         d3dRect.left = dstRect.left_;
@@ -224,7 +226,7 @@ public:
 
         if (FAILED(object->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags)))
         {
-            LOGERROR("WebTexture2D - Could not lock texture");
+            ATOMIC_LOGERROR("WebTexture2D - Could not lock texture");
             return;
         }
 
@@ -239,11 +241,13 @@ public:
         }
 
         object->UnlockRect(level);
+#endif
     }
 
     void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects,
                  const void *buffer, int width, int height) OVERRIDE
     {
+#ifndef ATOMIC_D3D11
 
         if (type == PET_VIEW)
         {
@@ -297,6 +301,8 @@ public:
             D3D9Blit(IntRect(x, y, x + w, y + h), src, width * 4, false);
 
         }
+
+#endif
 
     }
 

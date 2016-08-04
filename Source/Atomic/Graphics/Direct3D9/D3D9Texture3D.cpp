@@ -36,7 +36,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void Texture3D::OnDeviceLost()
@@ -75,34 +75,34 @@ void Texture3D::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_.ptr_);
+    ATOMIC_SAFE_RELEASE(object_.ptr_);
 }
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
-    URHO3D_PROFILE(SetTextureData);
+    ATOMIC_PROFILE(SetTextureData);
 
     if (!object_.ptr_)
     {
-        URHO3D_LOGERROR("No texture created, can not set data");
+        ATOMIC_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        URHO3D_LOGERROR("Null source for setting data");
+        ATOMIC_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for setting data");
+        ATOMIC_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture data assignment while device is lost");
+        ATOMIC_LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -119,7 +119,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 ||
         height <= 0 || depth <= 0)
     {
-        URHO3D_LOGERROR("Illegal dimensions for setting data");
+        ATOMIC_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -140,7 +140,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags);
     if (FAILED(hr))
     {
-        URHO3D_LOGD3DERROR("Could not lock texture", hr);
+        ATOMIC_LOGD3DERROR("Could not lock texture", hr);
         return false;
     }
 
@@ -220,7 +220,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
-        URHO3D_LOGERROR("Null image, can not load texture");
+        ATOMIC_LOGERROR("Null image, can not load texture");
         return false;
     }
 
@@ -348,25 +348,25 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 {
     if (!object_.ptr_)
     {
-        URHO3D_LOGERROR("No texture created, can not get data");
+        ATOMIC_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        URHO3D_LOGERROR("Null destination for getting data");
+        ATOMIC_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for getting data");
+        ATOMIC_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Getting texture data while device is lost");
+        ATOMIC_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
 
@@ -386,7 +386,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, &d3dBox, D3DLOCK_READONLY);
     if (FAILED(hr))
     {
-        URHO3D_LOGD3DERROR("Could not lock texture", hr);
+        ATOMIC_LOGD3DERROR("Could not lock texture", hr);
         return false;
     }
 
@@ -465,7 +465,7 @@ bool Texture3D::Create()
 
     if (graphics_->IsDeviceLost())
     {
-        URHO3D_LOGWARNING("Texture creation while device is lost");
+        ATOMIC_LOGWARNING("Texture creation while device is lost");
         return true;
     }
 
@@ -485,8 +485,8 @@ bool Texture3D::Create()
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
-        URHO3D_LOGD3DERROR("Could not create texture", hr);
+        ATOMIC_SAFE_RELEASE(object_.ptr_);
+        ATOMIC_LOGD3DERROR("Could not create texture", hr);
         return false;
     }
 

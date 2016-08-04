@@ -76,7 +76,7 @@ namespace Atomic
         }
 
         String resourcePrefix;
-        engineParameters_["ResourcePrefixPath"] = "";
+        engineParameters_["ResourcePrefixPaths"] = "";
 
         for (unsigned i = 0; i < arguments_.Size(); ++i)
         {
@@ -96,7 +96,7 @@ namespace Atomic
                 else if (argument == "--resourceprefix" && value.Length())
                 {
                     resourcePrefix = value;
-                    engineParameters_["ResourcePrefixPath"] = resourcePrefix;
+                    engineParameters_["ResourcePrefixPaths"] = resourcePrefix;
                 }
                 else if (argument == "--project" && value.Length())
                 {
@@ -119,11 +119,11 @@ namespace Atomic
 #else
 
 #ifdef __APPLE__
-                    engineParameters_["ResourcePrefixPath"] = "../Resources";
+                    engineParameters_["ResourcePrefixPaths"] = "../Resources";
 #else
                     if (!resourcePrefix.Length())
                     {
-                        engineParameters_["ResourcePrefixPath"] = fileSystem->GetProgramDir() + "Resources";
+                        engineParameters_["ResourcePrefixPaths"] = fileSystem->GetProgramDir() + "Resources";
                     }
 
 #endif

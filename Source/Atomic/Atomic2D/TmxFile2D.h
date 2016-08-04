@@ -40,7 +40,12 @@ class TmxLayer2D : public RefCounted
     ATOMIC_REFCOUNTED(TmxLayer2D)
 
 public:
-    TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type);
+
+// ATOMIC BEGIN
+    // default arguments for script bindings on subclasses
+    TmxLayer2D(TmxFile2D* tmxFile = 0, TileMapLayerType2D type = LT_INVALID);
+// ATOMIC END
+
     virtual ~TmxLayer2D();
 
     /// Return tmx file.

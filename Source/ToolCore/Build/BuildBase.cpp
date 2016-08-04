@@ -73,7 +73,7 @@ bool BuildBase::BuildClean(const String& path)
 {
     if (buildFailed_)
     {
-        LOGERRORF("BuildBase::BuildClean - Attempt to clean directory of failed build, %s", path.CString());
+        ATOMIC_LOGERRORF("BuildBase::BuildClean - Attempt to clean directory of failed build, %s", path.CString());
         return false;
     }
 
@@ -107,7 +107,7 @@ bool BuildBase::BuildClean(const String& path)
         }
         else
         {
-            LOGWARNINGF("BuildBase::BuildClean - temp build folder exists, removing: %s", newPath.CString());
+            ATOMIC_LOGWARNINGF("BuildBase::BuildClean - temp build folder exists, removing: %s", newPath.CString());
             fileSystem->RemoveDir(newPath, true);
         }
 

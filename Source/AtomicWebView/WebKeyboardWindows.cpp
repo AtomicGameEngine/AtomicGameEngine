@@ -94,7 +94,7 @@ bool ConvertKeyEvent(Input* input, const StringHash eventType, VariantMap& event
 {
     if (eventType != "KeyDown" && eventType != "KeyUp")
     {
-        LOGERROR("ConvertKeyEvent - Unknown event type");
+        ATOMIC_LOGERROR("ConvertKeyEvent - Unknown event type");
         return false;
     }
 
@@ -138,7 +138,7 @@ bool ConvertTextInputEvent(StringHash eventType, VariantMap& eventData, CefKeyEv
 {
     if (eventType != "TextInput")
     {
-        LOGERROR("ConvertTextInputEvent - Unknown event type");
+        ATOMIC_LOGERROR("ConvertTextInputEvent - Unknown event type");
         return false;
     }
 

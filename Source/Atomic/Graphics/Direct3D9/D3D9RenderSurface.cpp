@@ -31,7 +31,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 RenderSurface::RenderSurface(Texture* parentTexture) :
@@ -57,7 +57,7 @@ void RenderSurface::Release()
             graphics->ResetDepthStencil();
     }
 
-    URHO3D_SAFE_RELEASE(surface_);
+    ATOMIC_SAFE_RELEASE(surface_);
 }
 
 bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)

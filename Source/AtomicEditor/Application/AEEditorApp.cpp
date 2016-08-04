@@ -118,7 +118,7 @@ namespace AtomicEditor
 #endif
 
 #ifdef ATOMIC_DEV_BUILD
-        engineParameters_["ResourcePrefixPath"] = "";
+        engineParameters_["ResourcePrefixPaths"] = "";
         String resourcePaths = env->GetCoreDataDir() + ";" + env->GetEditorDataDir();
         // for dev builds, add the compile editor scripts from artifacts
         resourcePaths += ";" + env->GetRootSourceDir() + "Artifacts/Build/Resources/EditorData/";
@@ -126,10 +126,10 @@ namespace AtomicEditor
 #else
 
 #ifdef ATOMIC_PLATFORM_OSX
-        engineParameters_["ResourcePrefixPath"] = "../Resources";
+        engineParameters_["ResourcePrefixPaths"] = "../Resources";
 
 #else
-        engineParameters_["ResourcePrefixPath"] = filesystem->GetProgramDir() + "Resources";
+        engineParameters_["ResourcePrefixPaths"] = filesystem->GetProgramDir() + "Resources";
 #endif
 
         engineParameters_["ResourcePaths"] = "CoreData;EditorData";

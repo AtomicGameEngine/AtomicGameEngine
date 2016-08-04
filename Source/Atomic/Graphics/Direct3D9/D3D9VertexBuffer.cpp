@@ -29,7 +29,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void VertexBuffer::OnDeviceLost()
@@ -66,20 +66,20 @@ void VertexBuffer::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_.ptr_);
+    ATOMIC_SAFE_RELEASE(object_.ptr_);
 }
 
 bool VertexBuffer::SetData(const void* data)
 {
     if (!data)
     {
-        URHO3D_LOGERROR("Null pointer for vertex buffer data");
+        ATOMIC_LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
 
     if (!vertexSize_)
     {
-        URHO3D_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        ATOMIC_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
 
@@ -90,7 +90,7 @@ bool VertexBuffer::SetData(const void* data)
     {
         if (graphics_->IsDeviceLost())
         {
-            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
+            ATOMIC_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
             return true;
         }
@@ -116,19 +116,19 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
 
     if (!data)
     {
-        URHO3D_LOGERROR("Null pointer for vertex buffer data");
+        ATOMIC_LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
 
     if (!vertexSize_)
     {
-        URHO3D_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        ATOMIC_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
 
     if (start + count > vertexCount_)
     {
-        URHO3D_LOGERROR("Illegal range for setting new vertex buffer data");
+        ATOMIC_LOGERROR("Illegal range for setting new vertex buffer data");
         return false;
     }
 
@@ -142,7 +142,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     {
         if (graphics_->IsDeviceLost())
         {
-            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
+            ATOMIC_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
             return true;
         }
@@ -164,19 +164,19 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
-        URHO3D_LOGERROR("Vertex buffer already locked");
+        ATOMIC_LOGERROR("Vertex buffer already locked");
         return 0;
     }
 
     if (!vertexSize_)
     {
-        URHO3D_LOGERROR("Vertex elements not defined, can not lock vertex buffer");
+        ATOMIC_LOGERROR("Vertex elements not defined, can not lock vertex buffer");
         return 0;
     }
 
     if (start + count > vertexCount_)
     {
-        URHO3D_LOGERROR("Illegal range for locking vertex buffer");
+        ATOMIC_LOGERROR("Illegal range for locking vertex buffer");
         return 0;
     }
 
@@ -240,7 +240,7 @@ bool VertexBuffer::Create()
     {
         if (graphics_->IsDeviceLost())
         {
-            URHO3D_LOGWARNING("Vertex buffer creation while device is lost");
+            ATOMIC_LOGWARNING("Vertex buffer creation while device is lost");
             return true;
         }
 
@@ -257,8 +257,8 @@ bool VertexBuffer::Create()
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_.ptr_);
-            URHO3D_LOGD3DERROR("Could not create vertex buffer", hr);
+            ATOMIC_SAFE_RELEASE(object_.ptr_);
+            ATOMIC_LOGD3DERROR("Could not create vertex buffer", hr);
             return false;
         }
     }
@@ -287,7 +287,7 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 
         HRESULT hr = ((IDirect3DVertexBuffer9*)object_.ptr_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags);
         if (FAILED(hr))
-            URHO3D_LOGD3DERROR("Could not lock vertex buffer", hr);
+            ATOMIC_LOGD3DERROR("Could not lock vertex buffer", hr);
         else
             lockState_ = LOCK_HARDWARE;
     }

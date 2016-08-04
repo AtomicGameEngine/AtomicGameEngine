@@ -30,7 +30,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const BYTE d3dElementType[] =
@@ -68,7 +68,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexE
 
         if (srcElement.semantic_ == SEM_OBJECTINDEX)
         {
-            URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+            ATOMIC_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
             continue;
         }
 
@@ -104,7 +104,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
 
             if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
-                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+                ATOMIC_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
                 continue;
             }
 
@@ -158,7 +158,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
 
             if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
-                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+                ATOMIC_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
                 continue;
             }
 
@@ -224,14 +224,14 @@ void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclara
     HRESULT hr = device->CreateVertexDeclaration(elementArray, &declaration_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(declaration_);
-        URHO3D_LOGD3DERROR("Failed to create vertex declaration", hr);
+        ATOMIC_SAFE_RELEASE(declaration_);
+        ATOMIC_LOGD3DERROR("Failed to create vertex declaration", hr);
     }
 }
 
 void VertexDeclaration::Release()
 {
-    URHO3D_SAFE_RELEASE(declaration_);
+    ATOMIC_SAFE_RELEASE(declaration_);
 }
 
 }

@@ -36,6 +36,10 @@
 #include "../IO/Log.h"
 #include "../Scene/Scene.h"
 
+// ATOMIC BEGIN
+#include "../IO/Log.h"
+// ATOMIC END
+
 #include "../DebugNew.h"
 
 #ifdef _MSC_VER
@@ -80,10 +84,10 @@ SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
 }
 
 
-Drawable::Drawable(Context* context, unsigned char drawableFlags) :
+Drawable::Drawable(Context* context, unsigned drawableFlags) :
     Component(context),
     boundingBox_(0.0f, 0.0f),
-    drawableFlags_(drawableFlags),
+    drawableFlags_((unsigned char)drawableFlags),
     worldBoundingBoxDirty_(true),
     castShadows_(false),
     occluder_(false),
@@ -109,6 +113,12 @@ Drawable::Drawable(Context* context, unsigned char drawableFlags) :
     maxLights_(0),
     firstLight_(0)
 {
+// ATOMIC BEGIN
+    if (drawableFlags == DRAWABLE_UNDEFINED || drawableFlags > DRAWABLE_ANY)
+    {
+        ATOMIC_LOGERROR("Drawable with undefined drawableFlags");
+    }
+// ATOMIC END
 }
 
 Drawable::~Drawable()

@@ -29,6 +29,9 @@
 namespace Atomic
 {
 
+// ATOMIC BEGIN
+static const unsigned DRAWABLE_UNDEFINED = 0x0;
+// ATOMIC END
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
 static const unsigned DRAWABLE_ZONE = 0x4;
@@ -114,7 +117,9 @@ class ATOMIC_API Drawable : public Component
 
 public:
     /// Construct.
-    Drawable(Context* context, unsigned char drawableFlags);
+// ATOMIC BEGIN
+    Drawable(Context* context, unsigned drawableFlags = DRAWABLE_UNDEFINED);
+// ATOMIC END
     /// Destruct.
     virtual ~Drawable();
     /// Register object attributes. Drawable must be registered first.

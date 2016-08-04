@@ -40,8 +40,10 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL.h>
+#include <SDL/include/SDL_syswm.h>
+// ATOMIC END
 
 #include "../../DebugNew.h"
 
@@ -67,7 +69,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #define D3DSTREAMSOURCE_INSTANCEDATA (2<<30)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const D3DCMPFUNC d3dCmpFunc[] =
@@ -296,11 +298,11 @@ Graphics::~Graphics()
 
     impl_->vertexDeclarations_.Clear();
 
-    URHO3D_SAFE_RELEASE(impl_->defaultColorSurface_);
-    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilSurface_);
-    URHO3D_SAFE_RELEASE(impl_->frameQuery_);
-    URHO3D_SAFE_RELEASE(impl_->device_);
-    URHO3D_SAFE_RELEASE(impl_->interface_);
+    ATOMIC_SAFE_RELEASE(impl_->defaultColorSurface_);
+    ATOMIC_SAFE_RELEASE(impl_->defaultDepthStencilSurface_);
+    ATOMIC_SAFE_RELEASE(impl_->frameQuery_);
+    ATOMIC_SAFE_RELEASE(impl_->device_);
+    ATOMIC_SAFE_RELEASE(impl_->interface_);
 
     if (window_)
     {
@@ -319,7 +321,7 @@ Graphics::~Graphics()
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
     bool tripleBuffer, int multiSample)
 {
-    URHO3D_PROFILE(SetScreenMode);
+    ATOMIC_PROFILE(SetScreenMode);
 
     highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
@@ -488,7 +490,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     impl_->device_->EndScene();
     impl_->device_->Present(0, 0, 0, 0);
 
-#ifdef URHO3D_LOGGING
+#ifdef ATOMIC_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
     if (borderless_)
@@ -497,7 +499,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         msg.Append(" resizable");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
-    URHO3D_LOGINFO(msg);
+    ATOMIC_LOGINFO(msg);
 #endif
 
     using namespace ScreenMode;
@@ -549,16 +551,16 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot(Image* destImage)
 {
-    URHO3D_PROFILE(TakeScreenShot);
+    ATOMIC_PROFILE(TakeScreenShot);
 
     if (!impl_->device_)
         return false;
 
     if (IsDeviceLost())
     {
-        URHO3D_LOGERROR("Can not take screenshot while device is lost");
+        ATOMIC_LOGERROR("Can not take screenshot while device is lost");
         return false;
     }
 
@@ -588,8 +590,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
     HRESULT hr = impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(surface);
-        URHO3D_LOGD3DERROR("Could not create surface for taking a screenshot", hr);
+        ATOMIC_SAFE_RELEASE(surface);
+        ATOMIC_LOGD3DERROR("Could not create surface for taking a screenshot", hr);
         return false;
     }
 
@@ -599,8 +601,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
         hr = impl_->device_->GetFrontBufferData(0, surface);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(surface);
-        URHO3D_LOGD3DERROR("Could not get rendertarget data for taking a screenshot", hr);
+        ATOMIC_SAFE_RELEASE(surface);
+        ATOMIC_LOGD3DERROR("Could not get rendertarget data for taking a screenshot", hr);
         return false;
     }
 
@@ -625,13 +627,13 @@ bool Graphics::TakeScreenShot(Image& destImage)
     hr = surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
     if (FAILED(hr) || !lockedRect.pBits)
     {
-        URHO3D_SAFE_RELEASE(surface);
-        URHO3D_LOGD3DERROR("Could not lock surface for taking a screenshot", hr);
+        ATOMIC_SAFE_RELEASE(surface);
+        ATOMIC_LOGD3DERROR("Could not lock surface for taking a screenshot", hr);
         return false;
     }
 
-    destImage.SetSize(width_, height_, 3);
-    unsigned char* destData = destImage.GetData();
+    destImage->SetSize(width_, height_, 3);
+    unsigned char* destData = destImage->GetData();
 
     if (surfaceDesc.Format == D3DFMT_R5G6B5)
     {
@@ -704,7 +706,7 @@ bool Graphics::BeginFrame()
     HRESULT hr = impl_->device_->TestCooperativeLevel();
     if (hr != D3D_OK)
     {
-        URHO3D_PROFILE(DeviceLost);
+        ATOMIC_PROFILE(DeviceLost);
 
         impl_->deviceLost_ = true;
 
@@ -745,7 +747,7 @@ void Graphics::EndFrame()
         return;
 
     {
-        URHO3D_PROFILE(Present);
+        ATOMIC_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
 
@@ -759,7 +761,7 @@ void Graphics::EndFrame()
     {
         if (impl_->queryIssued_)
         {
-            URHO3D_PROFILE(FlushGPU);
+            ATOMIC_PROFILE(FlushGPU);
 
             while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
             {
@@ -797,7 +799,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (!destination || !destination->GetRenderSurface())
         return false;
 
-    URHO3D_PROFILE(ResolveToTexture);
+    ATOMIC_PROFILE(ResolveToTexture);
 
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
@@ -821,7 +823,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
         (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE);
     if (FAILED(hr))
     {
-        URHO3D_LOGD3DERROR("Failed to resolve to texture", hr);
+        ATOMIC_LOGD3DERROR("Failed to resolve to texture", hr);
         return false;
     }
     else
@@ -951,7 +953,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
-        URHO3D_LOGERROR("Too many vertex buffers");
+        ATOMIC_LOGERROR("Too many vertex buffers");
         return false;
     }
 
@@ -1048,12 +1050,12 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (vs->GetCompilerOutput().Empty())
             {
-                URHO3D_PROFILE(CompileVertexShader);
+                ATOMIC_PROFILE(CompileVertexShader);
 
                 bool success = vs->Create();
                 if (!success)
                 {
-                    URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
+                    ATOMIC_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -1078,12 +1080,12 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (ps->GetCompilerOutput().Empty())
             {
-                URHO3D_PROFILE(CompilePixelShader);
+                ATOMIC_PROFILE(CompilePixelShader);
 
                 bool success = ps->Create();
                 if (!success)
                 {
-                    URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
+                    ATOMIC_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }
@@ -1871,7 +1873,7 @@ void Graphics::EndDumpShaders()
 
 void Graphics::PrecacheShaders(Deserializer& source)
 {
-    URHO3D_PROFILE(PrecacheShaders);
+    ATOMIC_PROFILE(PrecacheShaders);
 
     ShaderPrecache::LoadShaders(this, source);
 }
@@ -2031,7 +2033,7 @@ void Graphics::OnWindowResized()
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
 
-    URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
+    ATOMIC_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
 
     using namespace ScreenMode;
 
@@ -2058,7 +2060,7 @@ void Graphics::OnWindowMoved()
     position_.x_ = newX;
     position_.y_ = newY;
 
-    URHO3D_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+    ATOMIC_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
 
     using namespace WindowPos;
 
@@ -2250,7 +2252,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
     if (!window_)
     {
-        URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
+        ATOMIC_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 
@@ -2292,27 +2294,27 @@ bool Graphics::CreateInterface()
     impl_->interface_ = Direct3DCreate9(D3D_SDK_VERSION);
     if (!impl_->interface_)
     {
-        URHO3D_LOGERROR("Could not create Direct3D9 interface");
+        ATOMIC_LOGERROR("Could not create Direct3D9 interface");
         return false;
     }
 
     HRESULT hr = impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_);
     if (FAILED(hr))
     {
-        URHO3D_LOGD3DERROR("Could not get Direct3D capabilities", hr);
+        ATOMIC_LOGD3DERROR("Could not get Direct3D capabilities", hr);
         return false;
     }
 
     hr = impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_);
     if (FAILED(hr))
     {
-        URHO3D_LOGD3DERROR("Could not get Direct3D adapter identifier", hr);
+        ATOMIC_LOGD3DERROR("Could not get Direct3D adapter identifier", hr);
         return false;
     }
 
     if (impl_->deviceCaps_.PixelShaderVersion < D3DPS_VERSION(3, 0))
     {
-        URHO3D_LOGERROR("Shader model 3.0 display adapter is required");
+        ATOMIC_LOGERROR("Shader model 3.0 display adapter is required");
         return false;
     }
 
@@ -2321,7 +2323,7 @@ bool Graphics::CreateInterface()
 
 bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 {
-#ifdef URHO3D_LUAJIT
+#ifdef ATOMIC_LUAJIT
     DWORD behaviorFlags = D3DCREATE_FPU_PRESERVE;
 #else
     DWORD behaviorFlags = 0;
@@ -2344,7 +2346,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
         &impl_->device_);
     if (FAILED(hr))
     {
-        URHO3D_LOGD3DERROR("Could not create Direct3D9 device", hr);
+        ATOMIC_LOGD3DERROR("Could not create Direct3D9 device", hr);
         return false;
     }
 
@@ -2353,7 +2355,7 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
 
     OnDeviceReset();
 
-    URHO3D_LOGINFO("Created Direct3D9 device");
+    ATOMIC_LOGINFO("Created Direct3D9 device");
     return true;
 }
 
@@ -2456,7 +2458,7 @@ void Graphics::ResetDevice()
 
 void Graphics::OnDeviceLost()
 {
-    URHO3D_LOGINFO("Device lost");
+    ATOMIC_LOGINFO("Device lost");
 
     if (impl_->defaultColorSurface_)
     {
@@ -2590,4 +2592,58 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ZoneVolumeMap"] = TU_ZONE;
 }
 
+// ATOMIC BEGIN
+
+// To satisfy script binding linking
+void Graphics::SetTextureForUpdate(Texture* texture)
+{
+
 }
+
+void Graphics::SetTextureParametersDirty()
+{
+
+}
+
+/// Return shader program. This is an API-specific class and should not be used by applications.
+ShaderProgram* Graphics::GetShaderProgram() const
+{
+    return 0;
+}
+
+/// Restore GPU objects and reinitialize state. Requires an open window. Used only on OpenGL.
+void Graphics::Restore()
+{
+
+}
+
+void Graphics::CleanupRenderSurface(RenderSurface* surface)
+{
+
+}
+
+ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType type, unsigned index, unsigned size)
+{
+    return 0;
+}
+
+void Graphics::MarkFBODirty()
+{
+
+}
+
+void Graphics::SetVBO(unsigned object)
+{
+
+}
+
+void Graphics::SetUBO(unsigned object)
+{
+
+}
+
+
+// ATOMIC END
+
+}
+

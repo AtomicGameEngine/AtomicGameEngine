@@ -53,7 +53,7 @@ IPC::IPC(Context* context) : Object(context),
     jobHandle_ = CreateJobObject(NULL, NULL);
     if (!jobHandle_)
     {
-        LOGERROR("IPC::IPC - Unable to create IPC job");
+        ATOMIC_LOGERROR("IPC::IPC - Unable to create IPC job");
     }
     else
     {
@@ -63,7 +63,7 @@ IPC::IPC(Context* context) : Object(context),
         jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
         if (0 == SetInformationJobObject(jobHandle_, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
         {
-            LOGERROR("IPC::IPC - Unable set job information");
+            ATOMIC_LOGERROR("IPC::IPC - Unable set job information");
             jobHandle_ = 0;
         }
     }

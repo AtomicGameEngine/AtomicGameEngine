@@ -24,7 +24,7 @@
 set (TARGET_NAME LibCpuId)
 
 # Define generated source files
-if (MSVC AND URHO3D_64BIT)
+if (MSVC AND ATOMIC_64BIT)
     enable_language (ASM_MASM)
     # Commented out due to cmake bug
     #set (ASM_FILES src/masm-x64.asm)

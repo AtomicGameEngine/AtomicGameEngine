@@ -491,6 +491,7 @@ bool JSBModule::Load(const String& jsonFilename)
     if (name_ == "Graphics")
     {
 #ifdef _MSC_VER
+        JSBind* jsbind = GetSubsystem<JSBind>();
         if (jsbind->GetPlatform() == "ANDROID" || jsbind->GetPlatform() == "WEB")
         {
             sourceDirs_.Push("Source/Atomic/Graphics/OpenGL");

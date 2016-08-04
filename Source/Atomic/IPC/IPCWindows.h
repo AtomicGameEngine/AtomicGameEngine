@@ -114,7 +114,7 @@ private:
 
 class IPCProcess : public Object
 {
-    OBJECT(IPCProcess)
+    ATOMIC_OBJECT(IPCProcess, Object)
 
     public:
 

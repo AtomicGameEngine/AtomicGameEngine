@@ -27,12 +27,14 @@
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/ShaderVariation.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 /// Combined information for specific vertex and pixel shaders.
-class URHO3D_API ShaderProgram : public RefCounted
+class ATOMIC_API ShaderProgram : public RefCounted
 {
+    ATOMIC_REFCOUNTED(ShaderProgram)
+
 public:
     /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader)

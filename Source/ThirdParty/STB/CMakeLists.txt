@@ -24,7 +24,7 @@
 set (TARGET_NAME STB)
 
 # Define source files
-define_source_files (GLOB_CPP_PATTERNS *.c *.h)
+define_source_files (GLOB_CPP_PATTERNS *.c *.cpp *.h)
 
 # Setup target
 setup_library ()

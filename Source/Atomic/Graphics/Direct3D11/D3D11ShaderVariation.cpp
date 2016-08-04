@@ -35,7 +35,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 const char* ShaderVariation::elementSemanticNames[] =
@@ -95,7 +95,7 @@ bool ShaderVariation::Create()
             HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_.ptr_);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(object_.ptr_);
+                ATOMIC_SAFE_RELEASE(object_.ptr_);
                 compilerOutput_ = "Could not create vertex shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
             }
         }
@@ -109,7 +109,7 @@ bool ShaderVariation::Create()
             HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_.ptr_);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(object_.ptr_);
+                ATOMIC_SAFE_RELEASE(object_.ptr_);
                 compilerOutput_ = "Could not create pixel shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
             }
         }
@@ -140,7 +140,7 @@ void ShaderVariation::Release()
                 graphics_->SetShaders(0, 0);
         }
 
-        URHO3D_SAFE_RELEASE(object_.ptr_);
+        ATOMIC_SAFE_RELEASE(object_.ptr_);
     }
 
     compilerOutput_.Clear();
@@ -180,7 +180,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     SharedPtr<File> file = cache->GetFile(binaryShaderName);
     if (!file || file->ReadFileID() != "USHD")
     {
-        URHO3D_LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
+        ATOMIC_LOGERROR(binaryShaderName + " is not a valid shader bytecode file");
         return false;
     }
 
@@ -224,16 +224,16 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         file->Read(&byteCode_[0], byteCodeSize);
 
         if (type_ == VS)
-            URHO3D_LOGDEBUG("Loaded cached vertex shader " + GetFullName());
+            ATOMIC_LOGDEBUG("Loaded cached vertex shader " + GetFullName());
         else
-            URHO3D_LOGDEBUG("Loaded cached pixel shader " + GetFullName());
+            ATOMIC_LOGDEBUG("Loaded cached pixel shader " + GetFullName());
 
         CalculateConstantBufferSizes();
         return true;
     }
     else
     {
-        URHO3D_LOGERROR(binaryShaderName + " has zero length bytecode");
+        ATOMIC_LOGERROR(binaryShaderName + " has zero length bytecode");
         return false;
     }
 }
@@ -291,7 +291,7 @@ bool ShaderVariation::Compile()
         // In debug mode, check that all defines are referenced by the shader code
 #ifdef _DEBUG
         if (sourceCode.Find(defines[i]) == String::NPOS)
-            URHO3D_LOGWARNING("Shader " + GetFullName() + " does not use the define " + defines[i]);
+            ATOMIC_LOGWARNING("Shader " + GetFullName() + " does not use the define " + defines[i]);
 #endif
     }
 
@@ -314,9 +314,9 @@ bool ShaderVariation::Compile()
     else
     {
         if (type_ == VS)
-            URHO3D_LOGDEBUG("Compiled vertex shader " + GetFullName());
+            ATOMIC_LOGDEBUG("Compiled vertex shader " + GetFullName());
         else
-            URHO3D_LOGDEBUG("Compiled pixel shader " + GetFullName());
+            ATOMIC_LOGDEBUG("Compiled pixel shader " + GetFullName());
 
         unsigned char* bufData = (unsigned char*)shaderCode->GetBufferPointer();
         unsigned bufSize = (unsigned)shaderCode->GetBufferSize();
@@ -333,8 +333,8 @@ bool ShaderVariation::Compile()
         strippedCode->Release();
     }
 
-    URHO3D_SAFE_RELEASE(shaderCode);
-    URHO3D_SAFE_RELEASE(errorMsgs);
+    ATOMIC_SAFE_RELEASE(shaderCode);
+    ATOMIC_SAFE_RELEASE(errorMsgs);
     
     return !byteCode_.Empty();
 }
@@ -347,8 +347,8 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
     HRESULT hr = D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
     if (FAILED(hr) || !reflection)
     {
-        URHO3D_SAFE_RELEASE(reflection);
-        URHO3D_LOGD3DERROR("Failed to reflect vertex shader's input signature", hr);
+        ATOMIC_SAFE_RELEASE(reflection);
+        ATOMIC_LOGD3DERROR("Failed to reflect vertex shader's input signature", hr);
         return;
     }
 

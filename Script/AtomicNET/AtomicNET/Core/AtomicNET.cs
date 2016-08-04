@@ -59,7 +59,6 @@ namespace AtomicEngine
             GraphicsModule.Initialize();
             SceneModule.Initialize();
             Atomic2DModule.Initialize();
-            Atomic3DModule.Initialize();
             NavigationModule.Initialize();
             NetworkModule.Initialize();
             PhysicsModule.Initialize();

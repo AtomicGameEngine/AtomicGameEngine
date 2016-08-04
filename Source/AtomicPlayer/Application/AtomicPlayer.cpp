@@ -98,12 +98,12 @@ void AtomicPlayerApp::Setup()
 #if ATOMIC_PLATFORM_WINDOWS || ATOMIC_PLATFORM_LINUX
 
     engineParameters_.InsertNew("WindowIcon", "Images/AtomicLogo32.png");
-    engineParameters_.InsertNew("ResourcePrefixPath", "AtomicPlayer_Resources");
+    engineParameters_.InsertNew("ResourcePrefixPaths", "AtomicPlayer_Resources");
 
 #elif ATOMIC_PLATFORM_ANDROID
-    //engineParameters_.InsertNew("ResourcePrefixPath"], "assets");
+    //engineParameters_.InsertNew("ResourcePrefixPaths"], "assets");
 #elif ATOMIC_PLATFORM_OSX
-    engineParameters_.InsertNew("ResourcePrefixPath", "../Resources");
+    engineParameters_.InsertNew("ResourcePrefixPaths", "../Resources");
 #endif
 
     const Vector<String>& arguments = GetArguments();

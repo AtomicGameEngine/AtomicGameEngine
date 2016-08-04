@@ -28,7 +28,7 @@
 
 #include <d3d9.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
 class Graphics;
@@ -50,8 +50,10 @@ struct VertexDeclarationElement
 };
 
 /// Vertex declaration.
-class URHO3D_API VertexDeclaration : public RefCounted
+class ATOMIC_API VertexDeclaration : public RefCounted
 {
+    ATOMIC_REFCOUNTED(VertexDeclaration)
+
 public:
     /// Construct with a single buffer's vertex element list.
     VertexDeclaration(Graphics* graphics, const PODVector<VertexElement>& srcElements);

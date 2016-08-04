@@ -250,7 +250,9 @@ bool Engine::Initialize(const VariantMap& parameters)
                         return false;
                 }
             }
-            if (j == resourcePrefixPaths.Size())
+
+            // ATOMIC: Only fail when CoreData can't be opened and not headless
+            if (j == resourcePrefixPaths.Size() && !headless_)
             {
                 ATOMIC_LOGERRORF(
                     "Failed to add resource path '%s', check the documentation on how to set the 'resource prefix path'",
@@ -282,12 +284,12 @@ bool Engine::Initialize(const VariantMap& parameters)
                     return false;
             }
         }
-        if (j == resourcePrefixPaths.Size())
+        // ATOMIC: Only fail when CoreData can't be opened and not headless
+        if (j == resourcePrefixPaths.Size() && !headless_)
         {
             ATOMIC_LOGERRORF(
                 "Failed to add resource package '%s', check the documentation on how to set the 'resource prefix path'",
                 resourcePackages[i].CString());
-            return false;
         }
     }
 

@@ -356,8 +356,14 @@ class EventHandler11Impl : public EventHandler
 public:
     /// Construct with receiver and function pointers and userdata.
     EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = 0) :
-        EventHandler((Object*)0xDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
+#ifdef ATOMIC_64BIT
+        EventHandler((Object*)0xDEADBEEFDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
                                           * `function_` already and is not used by `EventHandler11Impl` */, userData),
+#else
+        EventHandler((Object*)0xDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
+                                         * `function_` already and is not used by `EventHandler11Impl` */, userData),
+#endif
+
         function_(function)
     {
         assert(function_);

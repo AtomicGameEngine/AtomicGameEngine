@@ -41,8 +41,10 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL.h>
+#include <SDL/include/SDL_syswm.h>
+// ATOMIC END
 
 #include "../../DebugNew.h"
 
@@ -57,7 +59,7 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const D3D11_COMPARISON_FUNC d3dCmpFunc[] =
@@ -257,30 +259,30 @@ Graphics::~Graphics()
 
     for (HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Begin(); i != impl_->blendStates_.End(); ++i)
     {
-        URHO3D_SAFE_RELEASE(i->second_);
+        ATOMIC_SAFE_RELEASE(i->second_);
     }
     impl_->blendStates_.Clear();
 
     for (HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Begin(); i != impl_->depthStates_.End(); ++i)
     {
-        URHO3D_SAFE_RELEASE(i->second_);
+        ATOMIC_SAFE_RELEASE(i->second_);
     }
     impl_->depthStates_.Clear();
 
     for (HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Begin();
          i != impl_->rasterizerStates_.End(); ++i)
     {
-        URHO3D_SAFE_RELEASE(i->second_);
+        ATOMIC_SAFE_RELEASE(i->second_);
     }
     impl_->rasterizerStates_.Clear();
 
-    URHO3D_SAFE_RELEASE(impl_->defaultRenderTargetView_);
-    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilView_);
-    URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
-    URHO3D_SAFE_RELEASE(impl_->resolveTexture_);
-    URHO3D_SAFE_RELEASE(impl_->swapChain_);
-    URHO3D_SAFE_RELEASE(impl_->deviceContext_);
-    URHO3D_SAFE_RELEASE(impl_->device_);
+    ATOMIC_SAFE_RELEASE(impl_->defaultRenderTargetView_);
+    ATOMIC_SAFE_RELEASE(impl_->defaultDepthStencilView_);
+    ATOMIC_SAFE_RELEASE(impl_->defaultDepthTexture_);
+    ATOMIC_SAFE_RELEASE(impl_->resolveTexture_);
+    ATOMIC_SAFE_RELEASE(impl_->swapChain_);
+    ATOMIC_SAFE_RELEASE(impl_->deviceContext_);
+    ATOMIC_SAFE_RELEASE(impl_->device_);
 
     if (window_)
     {
@@ -299,7 +301,7 @@ Graphics::~Graphics()
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
     int multiSample)
 {
-    URHO3D_PROFILE(SetScreenMode);
+    ATOMIC_PROFILE(SetScreenMode);
 
     highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
@@ -394,7 +396,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     Clear(CLEAR_COLOR);
     impl_->swapChain_->Present(0, 0);
 
-#ifdef URHO3D_LOGGING
+#ifdef ATOMIC_LOGGING
     String msg;
     msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
     if (borderless_)
@@ -403,7 +405,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         msg.Append(" resizable");
     if (multiSample > 1)
         msg.AppendWithFormat(" multisample %d", multiSample);
-    URHO3D_LOGINFO(msg);
+    ATOMIC_LOGINFO(msg);
 #endif
 
     using namespace ScreenMode;
@@ -476,9 +478,9 @@ void Graphics::Close()
     }
 }
 
-bool Graphics::TakeScreenShot(Image& destImage)
+bool Graphics::TakeScreenShot(Image* destImage)
 {
-    URHO3D_PROFILE(TakeScreenShot);
+    ATOMIC_PROFILE(TakeScreenShot);
 
     if (!impl_->device_)
         return false;
@@ -499,8 +501,8 @@ bool Graphics::TakeScreenShot(Image& destImage)
     HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, 0, &stagingTexture);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(stagingTexture);
-        URHO3D_LOGD3DERROR("Could not create staging texture for screenshot", hr);
+        ATOMIC_SAFE_RELEASE(stagingTexture);
+        ATOMIC_LOGD3DERROR("Could not create staging texture for screenshot", hr);
         return false;
     }
 
@@ -532,13 +534,13 @@ bool Graphics::TakeScreenShot(Image& destImage)
     hr = impl_->deviceContext_->Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (FAILED(hr) || !mappedData.pData)
     {
-        URHO3D_LOGD3DERROR("Could not map staging texture for screenshot", hr);
+        ATOMIC_LOGD3DERROR("Could not map staging texture for screenshot", hr);
         stagingTexture->Release();
         return false;
     }
 
-    destImage.SetSize(width_, height_, 3);
-    unsigned char* destData = destImage.GetData();
+    destImage->SetSize(width_, height_, 3);
+    unsigned char* destData = destImage->GetData();
     for (int y = 0; y < height_; ++y)
     {
         unsigned char* src = (unsigned char*)mappedData.pData + y * mappedData.RowPitch;
@@ -598,7 +600,7 @@ void Graphics::EndFrame()
         return;
 
     {
-        URHO3D_PROFILE(Present);
+        ATOMIC_PROFILE(Present);
 
         SendEvent(E_ENDRENDERING);
         impl_->swapChain_->Present(vsync_ ? 1 : 0, 0);
@@ -677,7 +679,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     if (!destination || !destination->GetRenderSurface())
         return false;
 
-    URHO3D_PROFILE(ResolveToTexture);
+    ATOMIC_PROFILE(ResolveToTexture);
 
     IntRect vpCopy = viewport;
     if (vpCopy.right_ <= vpCopy.left_)
@@ -867,7 +869,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
-        URHO3D_LOGERROR("Too many vertex buffers");
+        ATOMIC_LOGERROR("Too many vertex buffers");
         return false;
     }
 
@@ -961,12 +963,12 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (vs->GetCompilerOutput().Empty())
             {
-                URHO3D_PROFILE(CompileVertexShader);
+                ATOMIC_PROFILE(CompileVertexShader);
 
                 bool success = vs->Create();
                 if (!success)
                 {
-                    URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
+                    ATOMIC_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
                     vs = 0;
                 }
             }
@@ -985,12 +987,12 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             if (ps->GetCompilerOutput().Empty())
             {
-                URHO3D_PROFILE(CompilePixelShader);
+                ATOMIC_PROFILE(CompilePixelShader);
 
                 bool success = ps->Create();
                 if (!success)
                 {
-                    URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
+                    ATOMIC_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
                     ps = 0;
                 }
             }
@@ -1664,7 +1666,7 @@ void Graphics::EndDumpShaders()
 
 void Graphics::PrecacheShaders(Deserializer& source)
 {
-    URHO3D_PROFILE(PrecacheShaders);
+    ATOMIC_PROFILE(PrecacheShaders);
 
     ShaderPrecache::LoadShaders(this, source);
 }
@@ -1828,7 +1830,7 @@ void Graphics::OnWindowResized()
     // Reset rendertargets and viewport for the new screen size
     ResetRenderTargets();
 
-    URHO3D_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
+    ATOMIC_LOGDEBUGF("Window was resized to %dx%d", width_, height_);
 
     using namespace ScreenMode;
 
@@ -1855,7 +1857,7 @@ void Graphics::OnWindowMoved()
     position_.x_ = newX;
     position_.y_ = newY;
 
-    URHO3D_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
+    ATOMIC_LOGDEBUGF("Window was moved to %d,%d", position_.x_, position_.y_);
 
     using namespace WindowPos;
 
@@ -2049,7 +2051,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
 
     if (!window_)
     {
-        URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
+        ATOMIC_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 
@@ -2106,9 +2108,9 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
 
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(impl_->device_);
-            URHO3D_SAFE_RELEASE(impl_->deviceContext_);
-            URHO3D_LOGD3DERROR("Failed to create D3D11 device", hr);
+            ATOMIC_SAFE_RELEASE(impl_->device_);
+            ATOMIC_SAFE_RELEASE(impl_->deviceContext_);
+            ATOMIC_LOGD3DERROR("Failed to create D3D11 device", hr);
             return false;
         }
 
@@ -2159,8 +2161,8 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
 
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(impl_->swapChain_);
-        URHO3D_LOGD3DERROR("Failed to create D3D11 swap chain", hr);
+        ATOMIC_SAFE_RELEASE(impl_->swapChain_);
+        ATOMIC_LOGD3DERROR("Failed to create D3D11 swap chain", hr);
         return false;
     }
 
@@ -2207,8 +2209,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
     HRESULT hr = impl_->swapChain_->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backbufferTexture);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(backbufferTexture);
-        URHO3D_LOGD3DERROR("Failed to get backbuffer texture", hr);
+        ATOMIC_SAFE_RELEASE(backbufferTexture);
+        ATOMIC_LOGD3DERROR("Failed to get backbuffer texture", hr);
         success = false;
     }
     else
@@ -2217,8 +2219,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
         backbufferTexture->Release();
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(impl_->defaultRenderTargetView_);
-            URHO3D_LOGD3DERROR("Failed to create backbuffer rendertarget view", hr);
+            ATOMIC_SAFE_RELEASE(impl_->defaultRenderTargetView_);
+            ATOMIC_LOGD3DERROR("Failed to create backbuffer rendertarget view", hr);
             success = false;
         }
     }
@@ -2240,8 +2242,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
     hr = impl_->device_->CreateTexture2D(&depthDesc, 0, &impl_->defaultDepthTexture_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(impl_->defaultDepthTexture_);
-        URHO3D_LOGD3DERROR("Failed to create backbuffer depth-stencil texture", hr);
+        ATOMIC_SAFE_RELEASE(impl_->defaultDepthTexture_);
+        ATOMIC_LOGD3DERROR("Failed to create backbuffer depth-stencil texture", hr);
         success = false;
     }
     else
@@ -2249,8 +2251,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
         hr = impl_->device_->CreateDepthStencilView(impl_->defaultDepthTexture_, 0, &impl_->defaultDepthStencilView_);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilView_);
-            URHO3D_LOGD3DERROR("Failed to create backbuffer depth-stencil view", hr);
+            ATOMIC_SAFE_RELEASE(impl_->defaultDepthStencilView_);
+            ATOMIC_LOGD3DERROR("Failed to create backbuffer depth-stencil view", hr);
             success = false;
         }
     }
@@ -2442,7 +2444,7 @@ void Graphics::PrepareDraw()
             HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Find(newBlendStateHash);
             if (i == impl_->blendStates_.End())
             {
-                URHO3D_PROFILE(CreateBlendState);
+                ATOMIC_PROFILE(CreateBlendState);
 
                 D3D11_BLEND_DESC stateDesc;
                 memset(&stateDesc, 0, sizeof stateDesc);
@@ -2461,8 +2463,8 @@ void Graphics::PrepareDraw()
                 HRESULT hr = impl_->device_->CreateBlendState(&stateDesc, &newBlendState);
                 if (FAILED(hr))
                 {
-                    URHO3D_SAFE_RELEASE(newBlendState);
-                    URHO3D_LOGD3DERROR("Failed to create blend state", hr);
+                    ATOMIC_SAFE_RELEASE(newBlendState);
+                    ATOMIC_LOGD3DERROR("Failed to create blend state", hr);
                 }
 
                 i = impl_->blendStates_.Insert(MakePair(newBlendStateHash, newBlendState));
@@ -2486,7 +2488,7 @@ void Graphics::PrepareDraw()
             HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Find(newDepthStateHash);
             if (i == impl_->depthStates_.End())
             {
-                URHO3D_PROFILE(CreateDepthState);
+                ATOMIC_PROFILE(CreateDepthState);
 
                 D3D11_DEPTH_STENCIL_DESC stateDesc;
                 memset(&stateDesc, 0, sizeof stateDesc);
@@ -2509,8 +2511,8 @@ void Graphics::PrepareDraw()
                 HRESULT hr = impl_->device_->CreateDepthStencilState(&stateDesc, &newDepthState);
                 if (FAILED(hr))
                 {
-                    URHO3D_SAFE_RELEASE(newDepthState);
-                    URHO3D_LOGD3DERROR("Failed to create depth state", hr);
+                    ATOMIC_SAFE_RELEASE(newDepthState);
+                    ATOMIC_LOGD3DERROR("Failed to create depth state", hr);
                 }
 
                 i = impl_->depthStates_.Insert(MakePair(newDepthStateHash, newDepthState));
@@ -2539,7 +2541,7 @@ void Graphics::PrepareDraw()
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
             if (i == impl_->rasterizerStates_.End())
             {
-                URHO3D_PROFILE(CreateRasterizerState);
+                ATOMIC_PROFILE(CreateRasterizerState);
 
                 D3D11_RASTERIZER_DESC stateDesc;
                 memset(&stateDesc, 0, sizeof stateDesc);
@@ -2558,8 +2560,8 @@ void Graphics::PrepareDraw()
                 HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);
                 if (FAILED(hr))
                 {
-                    URHO3D_SAFE_RELEASE(newRasterizerState);
-                    URHO3D_LOGD3DERROR("Failed to create rasterizer state", hr);
+                    ATOMIC_SAFE_RELEASE(newRasterizerState);
+                    ATOMIC_LOGD3DERROR("Failed to create rasterizer state", hr);
                 }
 
                 i = impl_->rasterizerStates_.Insert(MakePair(newRasterizerStateHash, newRasterizerState));
@@ -2608,8 +2610,8 @@ void Graphics::CreateResolveTexture()
     HRESULT hr = impl_->device_->CreateTexture2D(&textureDesc, 0, &impl_->resolveTexture_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(impl_->resolveTexture_);
-        URHO3D_LOGD3DERROR("Could not create resolve texture", hr);
+        ATOMIC_SAFE_RELEASE(impl_->resolveTexture_);
+        ATOMIC_LOGD3DERROR("Could not create resolve texture", hr);
     }
 }
 
@@ -2632,5 +2634,32 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["ZoneCubeMap"] = TU_ZONE;
     textureUnits_["ZoneVolumeMap"] = TU_ZONE;
 }
+
+// ATOMIC BEGIN
+
+// To satisfy script binding linking
+void Graphics::SetTextureForUpdate(Texture* texture)
+{
+
+}
+
+void Graphics::MarkFBODirty()
+{
+
+}
+
+void Graphics::SetVBO(unsigned object)
+{
+
+}
+
+void Graphics::SetUBO(unsigned object)
+{
+
+}
+
+
+// ATOMIC END
+
 
 }

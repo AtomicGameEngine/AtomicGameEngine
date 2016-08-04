@@ -315,7 +315,7 @@ bool IPCProcess::Launch(const String& command, const Vector<String>& args, const
     {
         if (0 == AssignProcessToJobObject(jobHandle, pi.hProcess))
         {
-            LOGERROR("IPCProcess::Launch - unable to assign job");
+            ATOMIC_LOGERROR("IPCProcess::Launch - unable to assign job");
         }
     }
 

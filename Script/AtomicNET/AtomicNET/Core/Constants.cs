@@ -9,8 +9,6 @@ namespace AtomicEngine
     {
         public const string LIBNAME = "AtomicNETNative.dll";
 
-        // Atomic2D
-        public const float PIXEL_SIZE = 0.01f;
     }
 
 }

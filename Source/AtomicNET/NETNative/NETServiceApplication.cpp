@@ -59,7 +59,7 @@ namespace Atomic
         engineParameters_["Headless"] = true;
 
         // FIXME AtomicNET:
-        engineParameters_["ResourcePrefixPath"] = "C:/Dev/atomic/AtomicGameEngine/Resources/";
+        // engineParameters_["ResourcePrefixPaths"] = "C:/Dev/atomic/AtomicGameEngine/Resources/";
 
         FileSystem* filesystem = GetSubsystem<FileSystem>();
         engineParameters_.InsertNew("LogName", filesystem->GetAppPreferencesDir("AtomicEditor", "Logs") + "NETServiceApplication.log");

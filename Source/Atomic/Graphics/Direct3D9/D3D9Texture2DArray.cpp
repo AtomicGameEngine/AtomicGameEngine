@@ -40,7 +40,7 @@
 #pragma warning(disable:4355)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 void Texture2DArray::OnDeviceLost()
@@ -82,12 +82,12 @@ void Texture2DArray::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_.ptr_);
+    ATOMIC_SAFE_RELEASE(object_.ptr_);
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
 {
-    URHO3D_LOGERROR("Texture2DArray not supported on Direct3D9, can not set data");
+    ATOMIC_LOGERROR("Texture2DArray not supported on Direct3D9, can not set data");
     return false;
 }
 
@@ -104,17 +104,17 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 {
     if (!image)
     {
-        URHO3D_LOGERROR("Null image, can not set data");
+        ATOMIC_LOGERROR("Null image, can not set data");
         return false;
     }
     if (!layers_)
     {
-        URHO3D_LOGERROR("Number of layers in the array must be set first");
+        ATOMIC_LOGERROR("Number of layers in the array must be set first");
         return false;
     }
     if (layer >= layers_)
     {
-        URHO3D_LOGERROR("Illegal layer for setting data");
+        ATOMIC_LOGERROR("Illegal layer for setting data");
         return false;
     }
 
@@ -170,12 +170,12 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
             if (!object_.ptr_)
             {
                 // Do not spam this error on D3D9
-                //URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
+                //ATOMIC_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
             }
             if (levelWidth != width_ || levelHeight != height_ || format != format_)
             {
-                URHO3D_LOGERROR("Texture array layer does not match size or format of layer 0");
+                ATOMIC_LOGERROR("Texture array layer does not match size or format of layer 0");
                 return false;
             }
         }
@@ -226,12 +226,12 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         {
             if (!object_.ptr_)
             {
-                //URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
+                //ATOMIC_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
             }
             if (width != width_ || height != height_ || format != format_)
             {
-                URHO3D_LOGERROR("Texture array layer does not match size or format of layer 0");
+                ATOMIC_LOGERROR("Texture array layer does not match size or format of layer 0");
                 return false;
             }
         }
@@ -266,7 +266,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 
 bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 {
-    URHO3D_LOGERROR("Texture2DArray not supported on Direct3D9, can not get data");
+    ATOMIC_LOGERROR("Texture2DArray not supported on Direct3D9, can not get data");
     return false;
 }
 
@@ -277,7 +277,7 @@ bool Texture2DArray::Create()
     if (!graphics_ || !width_ || !height_ || !layers_)
         return false;
 
-    URHO3D_LOGERROR("Texture2DArray not supported on Direct3D9, can not create");
+    ATOMIC_LOGERROR("Texture2DArray not supported on Direct3D9, can not create");
     return false;
 }
 

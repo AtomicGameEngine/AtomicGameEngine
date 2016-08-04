@@ -40,7 +40,7 @@
 #pragma warning(disable:4355)
 #endif
 
-namespace Urho3D
+namespace Atomic
 {
 
 void Texture2DArray::OnDeviceLost()
@@ -67,36 +67,36 @@ void Texture2DArray::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_.ptr_);
-    URHO3D_SAFE_RELEASE(shaderResourceView_);
-    URHO3D_SAFE_RELEASE(sampler_);
+    ATOMIC_SAFE_RELEASE(object_.ptr_);
+    ATOMIC_SAFE_RELEASE(shaderResourceView_);
+    ATOMIC_SAFE_RELEASE(sampler_);
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
 {
-    URHO3D_PROFILE(SetTextureData);
+    ATOMIC_PROFILE(SetTextureData);
 
     if (!object_.ptr_)
     {
-        URHO3D_LOGERROR("Texture array not created, can not set data");
+        ATOMIC_LOGERROR("Texture array not created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        URHO3D_LOGERROR("Null source for setting data");
+        ATOMIC_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (layer >= layers_)
     {
-        URHO3D_LOGERROR("Illegal layer for setting data");
+        ATOMIC_LOGERROR("Illegal layer for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for setting data");
+        ATOMIC_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
@@ -104,7 +104,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
     {
-        URHO3D_LOGERROR("Illegal dimensions for setting data");
+        ATOMIC_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -139,7 +139,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
-            URHO3D_LOGD3DERROR("Failed to map texture for update", hr);
+            ATOMIC_LOGD3DERROR("Failed to map texture for update", hr);
             return false;
         }
         else
@@ -179,17 +179,17 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 {
     if (!image)
     {
-        URHO3D_LOGERROR("Null image, can not set data");
+        ATOMIC_LOGERROR("Null image, can not set data");
         return false;
     }
     if (!layers_)
     {
-        URHO3D_LOGERROR("Number of layers in the array must be set first");
+        ATOMIC_LOGERROR("Number of layers in the array must be set first");
         return false;
     }
     if (layer >= layers_)
     {
-        URHO3D_LOGERROR("Illegal layer for setting data");
+        ATOMIC_LOGERROR("Illegal layer for setting data");
         return false;
     }
 
@@ -253,12 +253,12 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         {
             if (!object_.ptr_)
             {
-                URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
+                ATOMIC_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
             }
             if (levelWidth != width_ || levelHeight != height_ || format != format_)
             {
-                URHO3D_LOGERROR("Texture array layer does not match size or format of layer 0");
+                ATOMIC_LOGERROR("Texture array layer does not match size or format of layer 0");
                 return false;
             }
         }
@@ -309,12 +309,12 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         {
             if (!object_.ptr_)
             {
-                URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
+                ATOMIC_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
             }
             if (width != width_ || height != height_ || format != format_)
             {
-                URHO3D_LOGERROR("Texture array layer does not match size or format of layer 0");
+                ATOMIC_LOGERROR("Texture array layer does not match size or format of layer 0");
                 return false;
             }
         }
@@ -351,25 +351,25 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 {
     if (!object_.ptr_)
     {
-        URHO3D_LOGERROR("Texture array not created, can not get data");
+        ATOMIC_LOGERROR("Texture array not created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        URHO3D_LOGERROR("Null destination for getting data");
+        ATOMIC_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (layer >= layers_)
     {
-        URHO3D_LOGERROR("Illegal layer for getting data");
+        ATOMIC_LOGERROR("Illegal layer for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for getting data");
+        ATOMIC_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
@@ -392,8 +392,8 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(stagingTexture);
-        URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
+        ATOMIC_SAFE_RELEASE(stagingTexture);
+        ATOMIC_LOGD3DERROR("Failed to create staging texture for GetData", hr);
         return false;
     }
 
@@ -416,7 +416,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (FAILED(hr) || !mappedData.pData)
     {
-        URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
+        ATOMIC_LOGD3DERROR("Failed to map staging texture for GetData", hr);
         stagingTexture->Release();
         return false;
     }
@@ -459,8 +459,8 @@ bool Texture2DArray::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
-        URHO3D_LOGD3DERROR("Failed to create texture array", hr);
+        ATOMIC_SAFE_RELEASE(object_.ptr_);
+        ATOMIC_LOGD3DERROR("Failed to create texture array", hr);
         return false;
     }
 
@@ -486,8 +486,8 @@ bool Texture2DArray::Create()
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(shaderResourceView_);
-        URHO3D_LOGD3DERROR("Failed to create shader resource view for texture array", hr);
+        ATOMIC_SAFE_RELEASE(shaderResourceView_);
+        ATOMIC_LOGD3DERROR("Failed to create shader resource view for texture array", hr);
         return false;
     }
 
@@ -514,8 +514,8 @@ bool Texture2DArray::Create()
 
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(renderSurface_->renderTargetView_);
-            URHO3D_LOGD3DERROR("Failed to create rendertarget view for texture array", hr);
+            ATOMIC_SAFE_RELEASE(renderSurface_->renderTargetView_);
+            ATOMIC_LOGD3DERROR("Failed to create rendertarget view for texture array", hr);
             return false;
         }
     }

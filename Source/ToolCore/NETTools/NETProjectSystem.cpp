@@ -169,7 +169,7 @@ namespace ToolCore
 
             if (build)
             {
-                build->SubscribeToEvent(E_NETBUILDRESULT, HANDLER(NETProjectSystem, HandleNETBuildResult));
+                build->SubscribeToEvent(E_NETBUILDRESULT, ATOMIC_HANDLER(NETProjectSystem, HandleNETBuildResult));
             }
 
         }
@@ -297,18 +297,18 @@ namespace ToolCore
 
 #ifdef ATOMIC_PLATFORM_WINDOWS
 
-        SubscribeToEvent(E_UPDATE, HANDLER(NETProjectSystem, HandleUpdate));
+        SubscribeToEvent(E_UPDATE, ATOMIC_HANDLER(NETProjectSystem, HandleUpdate));
 
-        SubscribeToEvent(E_PROJECTLOADED, HANDLER(NETProjectSystem, HandleProjectLoaded));
-        SubscribeToEvent(E_PROJECTUNLOADED, HANDLER(NETProjectSystem, HandleProjectUnloaded));
+        SubscribeToEvent(E_PROJECTLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectLoaded));
+        SubscribeToEvent(E_PROJECTUNLOADED, ATOMIC_HANDLER(NETProjectSystem, HandleProjectUnloaded));
 
-        SubscribeToEvent(E_FILECHANGED, HANDLER(NETProjectSystem, HandleFileChanged));
+        SubscribeToEvent(E_FILECHANGED, ATOMIC_HANDLER(NETProjectSystem, HandleFileChanged));
 
-        SubscribeToEvent(E_RESOURCEADDED, HANDLER(NETProjectSystem, HandleResourceAdded));
-        SubscribeToEvent(E_RESOURCEREMOVED, HANDLER(NETProjectSystem, HandleResourceRemoved));
+        SubscribeToEvent(E_RESOURCEADDED, ATOMIC_HANDLER(NETProjectSystem, HandleResourceAdded));
+        SubscribeToEvent(E_RESOURCEREMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleResourceRemoved));
 
-        SubscribeToEvent(E_ASSETRENAMED, HANDLER(NETProjectSystem, HandleAssetRenamed));
-        SubscribeToEvent(E_ASSETMOVED, HANDLER(NETProjectSystem, HandleAssetMoved));
+        SubscribeToEvent(E_ASSETRENAMED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetRenamed));
+        SubscribeToEvent(E_ASSETMOVED, ATOMIC_HANDLER(NETProjectSystem, HandleAssetMoved));
 
         FileSystem* fileSystem = GetSubsystem<FileSystem>();
 

@@ -29,7 +29,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void ConstantBuffer::OnDeviceReset()
@@ -39,7 +39,7 @@ void ConstantBuffer::OnDeviceReset()
 
 void ConstantBuffer::Release()
 {
-    URHO3D_SAFE_RELEASE(object_.ptr_);
+    ATOMIC_SAFE_RELEASE(object_.ptr_);
 
     shadowData_.Reset();
     size_ = 0;
@@ -51,7 +51,7 @@ bool ConstantBuffer::SetSize(unsigned size)
 
     if (!size)
     {
-        URHO3D_LOGERROR("Can not create zero-sized constant buffer");
+        ATOMIC_LOGERROR("Can not create zero-sized constant buffer");
         return false;
     }
 
@@ -77,8 +77,8 @@ bool ConstantBuffer::SetSize(unsigned size)
         HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_.ptr_);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_.ptr_);
-            URHO3D_LOGD3DERROR("Failed to create constant buffer", hr);
+            ATOMIC_SAFE_RELEASE(object_.ptr_);
+            ATOMIC_LOGD3DERROR("Failed to create constant buffer", hr);
             return false;
         }
     }

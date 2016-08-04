@@ -28,18 +28,18 @@
 
 #include <d3d9.h>
 
-namespace Urho3D
+namespace Atomic
 {
 
-#define URHO3D_SAFE_RELEASE(p) if (p) { ((IUnknown*)p)->Release();  p = 0; }
+#define ATOMIC_SAFE_RELEASE(p) if (p) { ((IUnknown*)p)->Release();  p = 0; }
 
-#define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
+#define ATOMIC_LOGD3DERROR(msg, hr) ATOMIC_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
 
 typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 typedef HashMap<unsigned long long, SharedPtr<VertexDeclaration> > VertexDeclarationMap;
 
 /// %Graphics implementation. Holds API-specific objects.
-class URHO3D_API GraphicsImpl
+class ATOMIC_API GraphicsImpl
 {
     friend class Graphics;
 

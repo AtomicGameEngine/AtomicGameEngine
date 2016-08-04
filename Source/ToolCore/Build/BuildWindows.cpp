@@ -142,7 +142,7 @@ void BuildWindows::BuildManaged(const String& buildPath)
             return;
 
     }
-    if (!BuildCopyFile(project->GetResourcePath() + "/AtomicProject.dll", buildPath_ + "/AtomicProject.dll"));
+    if (!BuildCopyFile(project->GetResourcePath() + "/AtomicProject.dll", buildPath_ + "/AtomicProject.dll"))
         return;
 
    

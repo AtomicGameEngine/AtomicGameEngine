@@ -33,7 +33,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 static const D3D11_FILTER d3dFilterMode[] =
@@ -127,7 +127,7 @@ void Texture::UpdateParameters()
         return;
 
     // Release old sampler
-    URHO3D_SAFE_RELEASE(sampler_);
+    ATOMIC_SAFE_RELEASE(sampler_);
 
     D3D11_SAMPLER_DESC samplerDesc;
     memset(&samplerDesc, 0, sizeof samplerDesc);
@@ -147,8 +147,8 @@ void Texture::UpdateParameters()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(sampler_);
-        URHO3D_LOGD3DERROR("Failed to create sampler state", hr);
+        ATOMIC_SAFE_RELEASE(sampler_);
+        ATOMIC_LOGD3DERROR("Failed to create sampler state", hr);
     }
 
     parametersDirty_ = false;
@@ -191,5 +191,22 @@ unsigned Texture::GetSRGBFormat(unsigned format)
     else
         return format;
 }
+
+// ATOMIC BEGIN
+
+// Satisfy script binding link
+
+unsigned Texture::GetExternalFormat(unsigned format)
+{
+    return 0;
+}
+
+unsigned Texture::GetDataType(unsigned format)
+{
+    return 0;
+}
+
+// ATOMIC END
+
 
 }

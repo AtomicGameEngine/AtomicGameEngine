@@ -36,7 +36,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void Texture3D::OnDeviceLost()
@@ -60,30 +60,30 @@ void Texture3D::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_.ptr_);
-    URHO3D_SAFE_RELEASE(shaderResourceView_);
-    URHO3D_SAFE_RELEASE(sampler_);
+    ATOMIC_SAFE_RELEASE(object_.ptr_);
+    ATOMIC_SAFE_RELEASE(shaderResourceView_);
+    ATOMIC_SAFE_RELEASE(sampler_);
 }
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
-    URHO3D_PROFILE(SetTextureData);
+    ATOMIC_PROFILE(SetTextureData);
 
     if (!object_.ptr_)
     {
-        URHO3D_LOGERROR("No texture created, can not set data");
+        ATOMIC_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        URHO3D_LOGERROR("Null source for setting data");
+        ATOMIC_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for setting data");
+        ATOMIC_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
@@ -93,7 +93,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || z < 0 || z + depth > levelDepth || width <= 0 ||
         height <= 0 || depth <= 0)
     {
-        URHO3D_LOGERROR("Illegal dimensions for setting data");
+        ATOMIC_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -128,7 +128,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
-            URHO3D_LOGD3DERROR("Failed to map texture for update", hr);
+            ATOMIC_LOGD3DERROR("Failed to map texture for update", hr);
             return false;
         }
         else
@@ -169,7 +169,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
-        URHO3D_LOGERROR("Null image, can not load texture");
+        ATOMIC_LOGERROR("Null image, can not load texture");
         return false;
     }
 
@@ -296,19 +296,19 @@ bool Texture3D::GetData(unsigned level, void* dest) const
 {
     if (!object_.ptr_)
     {
-        URHO3D_LOGERROR("No texture created, can not get data");
+        ATOMIC_LOGERROR("No texture created, can not get data");
         return false;
     }
 
     if (!dest)
     {
-        URHO3D_LOGERROR("Null destination for getting data");
+        ATOMIC_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        URHO3D_LOGERROR("Illegal mip level for getting data");
+        ATOMIC_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
@@ -330,8 +330,8 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, &stagingTexture);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(stagingTexture);
-        URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
+        ATOMIC_SAFE_RELEASE(stagingTexture);
+        ATOMIC_LOGD3DERROR("Failed to create staging texture for GetData", hr);
         return false;
     }
 
@@ -354,7 +354,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
     if (FAILED(hr) || !mappedData.pData)
     {
-        URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
+        ATOMIC_LOGD3DERROR("Failed to map staging texture for GetData", hr);
         stagingTexture->Release();
         return false;
     }
@@ -397,8 +397,8 @@ bool Texture3D::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_.ptr_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
-        URHO3D_LOGD3DERROR("Failed to create texture", hr);
+        ATOMIC_SAFE_RELEASE(object_.ptr_);
+        ATOMIC_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
 
@@ -412,8 +412,8 @@ bool Texture3D::Create()
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(shaderResourceView_);
-        URHO3D_LOGD3DERROR("Failed to create shader resource view for texture", hr);
+        ATOMIC_SAFE_RELEASE(shaderResourceView_);
+        ATOMIC_LOGD3DERROR("Failed to create shader resource view for texture", hr);
         return false;
     }
 

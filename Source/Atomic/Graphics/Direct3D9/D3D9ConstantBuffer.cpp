@@ -28,7 +28,7 @@
 
 #include "../../DebugNew.h"
 
-namespace Urho3D
+namespace Atomic
 {
 
 void ConstantBuffer::OnDeviceReset()
@@ -41,7 +41,7 @@ void ConstantBuffer::Release()
 
 bool ConstantBuffer::SetSize(unsigned size)
 {
-    URHO3D_LOGERROR("Constant buffers are not supported on Direct3D9");
+    ATOMIC_LOGERROR("Constant buffers are not supported on Direct3D9");
     return false;
 }
 
