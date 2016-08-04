@@ -151,7 +151,42 @@ bool AnimatedModel::LoadJSON(const JSONValue& source, bool setInstanceDefault)
 void AnimatedModel::ApplyAttributes()
 {
     if (assignBonesPending_)
+    {
         AssignBoneNodes();
+
+// ATOMIC BEGIN
+
+        // initialize skinning matrices in batches
+
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            if (skinMatrices_.Size())
+            {
+                batches_[i].geometryType_ = GEOM_SKINNED;
+                // Check if model has per-geometry bone mappings
+                if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[i].Size())
+                {
+                    batches_[i].worldTransform_ = &geometrySkinMatrices_[i][0];
+                    batches_[i].numWorldTransforms_ = geometrySkinMatrices_[i].Size();
+                }
+                // If not, use the global skin matrices
+                else
+                {
+                    batches_[i].worldTransform_ = &skinMatrices_[0];
+                    batches_[i].numWorldTransforms_ = skinMatrices_.Size();
+                }
+            }
+            else
+            {
+                batches_[i].geometryType_ = GEOM_STATIC;
+                batches_[i].worldTransform_ = &node_->GetWorldTransform();
+                batches_[i].numWorldTransforms_ = 1;
+            }
+        }
+
+// ATOMIC END
+
+    }
 }
 
 void AnimatedModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
