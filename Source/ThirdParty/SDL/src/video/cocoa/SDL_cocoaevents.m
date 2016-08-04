@@ -37,6 +37,10 @@
 
 - (void)terminate:(id)sender;
 
+// ATOMIC BEGIN
+- (void)sendEvent:(NSEvent *)theEvent;
+// ATOMIC END
+
 @end
 
 @implementation SDLApplication
@@ -45,6 +49,41 @@
 - (void)terminate:(id)sender
 {
     SDL_SendQuit();
+}
+
+// ATOMIC: Fixes missing WebView keystrokes on OSX
+// (see https://bugzilla.libsdl.org/show_bug.cgi?id=3107)
+// Dispatch events here so that we can handle events caught by
+// nextEventMatchingMask in SDL, as well as events caught by other
+// processes (such as CEF) that are passed down to NSApp.
+- (void)sendEvent:(NSEvent *)theEvent
+{
+    SDL_VideoDevice *_this = SDL_GetVideoDevice();
+
+    switch ([theEvent type]) {
+        case NSLeftMouseDown:
+        case NSOtherMouseDown:
+        case NSRightMouseDown:
+        case NSLeftMouseUp:
+        case NSOtherMouseUp:
+        case NSRightMouseUp:
+        case NSLeftMouseDragged:
+        case NSRightMouseDragged:
+        case NSOtherMouseDragged: /* usually middle mouse dragged */
+        case NSMouseMoved:
+        case NSScrollWheel:
+            Cocoa_HandleMouseEvent(_this, theEvent);
+            break;
+        case NSKeyDown:
+        case NSKeyUp:
+        case NSFlagsChanged:
+            Cocoa_HandleKeyEvent(_this, theEvent);
+            break;
+        default:
+            break;
+    }
+
+    [super sendEvent:theEvent];
 }
 
 @end // SDLApplication
@@ -381,6 +420,11 @@ Cocoa_PumpEvents(_THIS)
             break;
         }
 
+// ATOMIC BEGIN
+
+// See note in sendEvent above
+
+/*
         switch ([event type]) {
         case NSLeftMouseDown:
         case NSOtherMouseDown:
@@ -390,7 +434,7 @@ Cocoa_PumpEvents(_THIS)
         case NSRightMouseUp:
         case NSLeftMouseDragged:
         case NSRightMouseDragged:
-        case NSOtherMouseDragged: /* usually middle mouse dragged */
+        case NSOtherMouseDragged:
         case NSMouseMoved:
         case NSScrollWheel:
             Cocoa_HandleMouseEvent(_this, event);
@@ -403,6 +447,9 @@ Cocoa_PumpEvents(_THIS)
         default:
             break;
         }
+*/
+
+// ATOMIC END
         /* Pass through to NSApp to make sure everything stays in sync */
         [NSApp sendEvent:event];
     }

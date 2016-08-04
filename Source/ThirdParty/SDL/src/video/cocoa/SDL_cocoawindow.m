@@ -63,10 +63,22 @@
 - (void)sendEvent:(NSEvent *)event;
 - (void)doCommandBySelector:(SEL)aSelector;
 
+// ATOMIC BEGIN
+
+// disable drag and drop as interferes with Atomic Editor
+// TODO: a more graceful way of handling this
+
+#ifdef ATOMIC_DISABLED
+
 /* Handle drag-and-drop of files onto the SDL window. */
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 - (BOOL)wantsPeriodicDraggingUpdates;
+
+// ATOMIC END
+
+#endif
+
 @end
 
 @implementation SDLWindow
@@ -106,6 +118,13 @@
 {
     /*NSLog(@"doCommandBySelector: %@\n", NSStringFromSelector(aSelector));*/
 }
+
+// ATOMIC BEGIN
+
+// disable drag and drop as interferes with Atomic Editor
+// TODO: a more graceful way of handling this
+
+#ifdef ATOMIC_DISABLED
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
@@ -173,7 +192,14 @@
     return NO;
 }
 
+
+#endif
+
+// ATOMIC END
+
 @end
+
+
 
 
 static Uint32 s_moveHack;
@@ -1271,8 +1297,15 @@ Cocoa_CreateWindow(_THIS, SDL_Window * window)
     [nswindow setContentView: contentView];
     [contentView release];
 
+// ATOMIC BEGIN
+
+    // disable drag and drop as interferes with Atomic Editor
+    // TODO: a more graceful way of handling this
+
     /* Allow files and folders to be dragged onto the window by users */
-    [nswindow registerForDraggedTypes:[NSArray arrayWithObject:(NSString *)kUTTypeFileURL]];
+    // [nswindow registerForDraggedTypes:[NSArray arrayWithObject:(NSString *)kUTTypeFileURL]];
+
+// ATOMIC END
 
     if (SetupWindowData(_this, window, nswindow, SDL_TRUE) < 0) {
         [nswindow release];
