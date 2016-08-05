@@ -28,7 +28,9 @@
 
 #ifdef IOS
 #include "../Graphics/Graphics.h"
-#include <SDL/SDL.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL.h>
+// ATOMIC END
 #endif
 
 #include "../DebugNew.h"
