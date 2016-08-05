@@ -30,7 +30,9 @@
 #include "../IO/PackageFile.h"
 
 #ifdef __ANDROID__
-#include <SDL/SDL_rwops.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL_rwops.h>
+// ATOMIC END
 #endif
 
 #include <cstdio>
@@ -435,7 +437,7 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     compressed_ = false;
     readSyncNeeded_ = false;
     writeSyncNeeded_ = false;
-    
+
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {

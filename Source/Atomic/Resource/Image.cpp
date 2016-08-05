@@ -299,7 +299,7 @@ bool Image::BeginLoad(Deserializer& source)
         // DDS compressed format
         DDSurfaceDesc2 ddsd;
         source.Read(&ddsd, sizeof(ddsd));
-        
+
         // DDS DX10+
         const bool hasDXGI = ddsd.ddpfPixelFormat_.dwFourCC_ == FOURCC_DX10;
         DDSHeader10 dxgiHeader;
@@ -307,7 +307,7 @@ bool Image::BeginLoad(Deserializer& source)
             source.Read(&dxgiHeader, sizeof(dxgiHeader));
 
         unsigned fourCC = ddsd.ddpfPixelFormat_.dwFourCC_;
-        
+
         // If the DXGI header is available then remap formats and check sRGB
         if (hasDXGI)
         {
@@ -396,7 +396,7 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned blocksWide = (ddsd.dwWidth_ + 3) / 4;
             unsigned blocksHeight = (ddsd.dwHeight_ + 3) / 4;
             dataSize = blocksWide * blocksHeight * blockSize;
-            
+
             // Calculate mip data size
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
@@ -437,7 +437,7 @@ bool Image::BeginLoad(Deserializer& source)
             currentImage->numCompressedLevels_ = ddsd.dwMipMapCount_;
             if (!currentImage->numCompressedLevels_)
                 currentImage->numCompressedLevels_ = 1;
-            
+
             // Memory use needs to be exact per image as it's used for verifying the data size in GetCompressedLevel()
             // even though it would be more proper for the first image to report the size of all siblings combined
             currentImage->SetMemoryUse(dataSize);
@@ -452,7 +452,7 @@ bool Image::BeginLoad(Deserializer& source)
                 currentImage = nextImage;
             }
         }
-        
+
         // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
         if (compressedFormat_ == CF_RGBA)
         {
@@ -487,7 +487,7 @@ bool Image::BeginLoad(Deserializer& source)
                 ADJUSTSHIFT(gMask, gShiftL, gShiftR)
                 ADJUSTSHIFT(bMask, bShiftL, bShiftR)
                 ADJUSTSHIFT(aMask, aShiftL, aShiftR)
-                
+
                 SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
 
                 switch (sourcePixelByteSize)
@@ -2080,7 +2080,7 @@ bool Image::SaveDDS(const String& fileName) const
 {
 #if !defined(ATOMIC_PLATFORM_DESKTOP)
 
-    LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
+    ATOMIC_LOGERRORF("Image::SaveDDS - Unsupported on current platform: %s", fileName.CString());
     return false;
 
 #else
@@ -2203,5 +2203,5 @@ bool Image::HasAlphaChannel() const
 
 
 // ATOMIC END
- 
+
 }

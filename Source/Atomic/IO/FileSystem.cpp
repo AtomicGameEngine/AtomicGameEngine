@@ -33,7 +33,9 @@
 #include "../IO/Log.h"
 
 #ifdef __ANDROID__
-#include <SDL/SDL_rwops.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL_rwops.h>
+// ATOMIC END
 #endif
 
 #ifndef MINI_URHO

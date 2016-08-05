@@ -5,12 +5,20 @@
 // Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 // Urho3D - use SDK include dir
-#include <SDL/SDL_internal.h>
+// ATOMIC BEGIN
+
+// We don't "install" the Third Party sources, so use from build tree
+#include <SDL/src/SDL_internal.h>
+
+// ATOMIC END
 
 #ifdef __ANDROID__
 
 /* Include the SDL main definition header */ // Urho3D - use SDK include dir
-#include <SDL/SDL_main.h>
+
+// ATOMIC BEGIN
+#include <SDL/include/SDL_main.h>
+// ATOMIC END
 
 /*******************************************************************************
                  Functions called by JNI

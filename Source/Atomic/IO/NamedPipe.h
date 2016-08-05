@@ -28,7 +28,9 @@
 #include "../IO/Serializer.h"
 
 #ifdef __ANDROID__
-#include <SDL/SDL_rwops.h>
+// ATOMIC BEGIN
+#include <SDL/include/SDL_rwops.h>
+// ATOMIC END
 #endif
 
 namespace Atomic
