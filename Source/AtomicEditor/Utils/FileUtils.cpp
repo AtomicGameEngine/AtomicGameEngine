@@ -45,9 +45,11 @@ FileUtils::~FileUtils()
 String FileUtils::OpenProjectFileDialog()
 {
     nfdchar_t *outPath = NULL;
+    
+    String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
 
     nfdresult_t result = NFD_OpenDialog( "atomic",
-                                NULL,
+                                upath.CString(),
                                 &outPath);
 
     String fullpath;
@@ -84,8 +86,10 @@ String FileUtils::NewProjectFileDialog()
 
     nfdchar_t *outPath = NULL;
 
+    String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
+
     nfdresult_t result = NFD_ChooseDirectory( "Please choose the root folder for your project",
-                                NULL,
+                                upath.CString(),
                                 &outPath);
 
 
@@ -108,9 +112,12 @@ String FileUtils::GetBuildPath(const String& defaultPath)
     String buildPath;
 
     nfdchar_t *outPath = NULL;
+    
+    String ppath = GetSubsystem<FileSystem>()->GetProgramDir();
+    if ( defaultPath.Length() > 0) ppath = defaultPath;
 
     nfdresult_t result = NFD_ChooseDirectory( "Please choose the build folder",
-                                defaultPath.Length() ? defaultPath.CString() : NULL,
+                               ppath.CString(),
                                 &outPath);
 
     if (outPath && result == NFD_OKAY)
@@ -139,8 +146,11 @@ String FileUtils::GetAntPath(const String& defaultPath)
     String msg = "Please select the folder which contains the ant executable";
 #endif
 
+    String ppath = GetSubsystem<FileSystem>()->GetProgramDir();
+    if ( defaultPath.Length() > 0) ppath = defaultPath;
+
     nfdresult_t result = NFD_ChooseDirectory(msg.CString(),
-        defaultPath.Length() ? defaultPath.CString() : NULL,
+        ppath.CString(),
         &outPath);
 
     if (outPath && result == NFD_OKAY)
@@ -160,8 +170,10 @@ String FileUtils::GetMobileProvisionPath()
 {
     nfdchar_t *outPath = NULL;
 
+    String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
+
     nfdresult_t result = NFD_OpenDialog( "mobileprovision",
-                                NULL,
+                                upath.CString(),
                                 &outPath);
 
     String fullpath;
@@ -196,8 +208,11 @@ String FileUtils::FindPath(const String& title, const String& defaultPath)
     String resultPath;
     nfdchar_t *outPath = NULL;
 
+    String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
+    if ( defaultPath.Length() > 0) upath = defaultPath;
+
     nfdresult_t result = NFD_ChooseDirectory(title.CString(),
-        defaultPath.Length() ? defaultPath.CString() : NULL,
+        upath.CString(),
         &outPath);
 
     if (outPath && result == NFD_OKAY)
@@ -218,8 +233,11 @@ String FileUtils::FindFile (const String& filterlist, const String& defaultPath)
     String fullpath;
     nfdchar_t *outPath = NULL;
 
+    String upath = GetSubsystem<FileSystem>()->GetUserDocumentsDir();
+    if ( defaultPath.Length() > 0) upath = defaultPath;
+
     nfdresult_t result = NFD_OpenDialog( filterlist.CString(),
-        defaultPath.Length() ? defaultPath.CString() : NULL,
+        upath.CString(),
         &outPath);
 
     if (outPath && result == NFD_OKAY)
