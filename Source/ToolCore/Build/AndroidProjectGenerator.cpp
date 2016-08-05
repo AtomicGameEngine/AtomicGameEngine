@@ -283,16 +283,22 @@ bool AndroidProjectGenerator::GenerateAndroidManifest()
     manifest.AppendWithFormat("package=\"%s\"\n", package.CString());
     manifest += "android:versionCode=\"1\"\n";
     manifest += "android:versionName=\"1.0\">\n";
+    manifest += "android:installLocation=\"auto\">\n";
 
+    manifest += "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>\n";
     manifest += "<uses-permission android:name=\"android.permission.INTERNET\" />\n";
     manifest += "<uses-feature android:glEsVersion=\"0x00020000\" />\n";
     manifest += "<uses-sdk android:targetSdkVersion=\"12\" android:minSdkVersion=\"10\" />\n";
 
-    manifest += "<application android:label=\"@string/app_name\" android:icon=\"@drawable/icon\">\n";
+    manifest += "<application\n";
+    manifest += "android:label=\"@string/app_name\"\n";
+    manifest += "android:icon=\"@drawable/icon\"\n";
+    manifest += "android:theme=\"@android:style/Theme.NoTitleBar.Fullscreen\"\n";
+    manifest += "android:hardwareAccelerated=\"true\"\n";
+    manifest += "android:allowBackup=\"false\">\n";
+
     manifest.AppendWithFormat("<activity android:name=\".%s\"\n", activityName.CString());
 
-    manifest += "android:label=\"@string/app_name\"\n";
-    manifest += "android:theme=\"@android:style/Theme.NoTitleBar.Fullscreen\"\n";
     manifest += "android:configChanges=\"keyboardHidden|orientation\"\n";
     manifest += "android:screenOrientation=\"landscape\">\n";
     manifest += "<intent-filter>\n";
@@ -301,6 +307,8 @@ bool AndroidProjectGenerator::GenerateAndroidManifest()
     manifest += "</intent-filter>\n";
     manifest += "</activity>\n";
     manifest += "</application>\n";
+
+
     manifest += "</manifest>\n";
 
     File file(context_, buildPath_ + "/AndroidManifest.xml", FILE_WRITE);
@@ -364,7 +372,3 @@ bool AndroidProjectGenerator::CopyUserIcons()
 }
 
 }
-
-/*
-
-*/
